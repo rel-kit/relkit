@@ -13,6 +13,18 @@
       "skillPath": "clean-code/SKILL.md",
       "computedHash": "917f01d5f5800f1f575c6701a4a34939647e74c423bd3108e894191abb0593f6"
     },
+    "code-review": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/code-review/SKILL.md",
+      "computedHash": "1d5e7242a98674635be79ab310cdda0e555d36a9903d2526ebf4263d0b7997ca"
+    },
+    "design-patterns": {
+      "source": "miles990/claude-software-skills",
+      "sourceType": "github",
+      "skillPath": "software-design/design-patterns/SKILL.md",
+      "computedHash": "cf0817a354b9fdbb038aa877c23dd6283e202ed817ba00807a91890ae041f469"
+    },
     "effect-ts": {
       "source": "effect-ts/skills",
       "sourceType": "github",
@@ -24,6 +36,12 @@
       "sourceType": "github",
       "skillPath": "skills/turborepo/SKILL.md",
       "computedHash": "fda851d916bbee5b78446b9a22510e7f38aefdfab57f93de6e0bccbb5b0b537a"
+    },
+    "typescript-async-patterns": {
+      "source": "thebushidocollective/han",
+      "sourceType": "github",
+      "skillPath": "plugins/languages/typescript/skills/typescript-async-patterns/SKILL.md",
+      "computedHash": "9e1c16df576a89d62cf3f974617e2c08d265b5a6119a4a1580e467a121ca6d9f"
     },
     "typescript-pro": {
       "source": "jeffallan/claude-skills",
