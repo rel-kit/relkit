@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "blume": {
+      "source": "haydenbleasel/blume",
+      "sourceType": "github",
+      "skillPath": "skills/blume/SKILL.md",
+      "computedHash": "bba88e2dccc4170e16220e21054b4978f37e6f52afaff072f7ad66e192821a40"
+    },
+    "clean-code": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "clean-code/SKILL.md",
+      "computedHash": "917f01d5f5800f1f575c6701a4a34939647e74c423bd3108e894191abb0593f6"
+    },
+    "effect-ts": {
+      "source": "effect-ts/skills",
+      "sourceType": "github",
+      "skillPath": "skills/effect-ts/SKILL.md",
+      "computedHash": "9a425920916902a856c16dd9bd16f61e7276e18b2aaffdc45d55ca84cdd84b3e"
+    },
+    "turborepo": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/turborepo/SKILL.md",
+      "computedHash": "fda851d916bbee5b78446b9a22510e7f38aefdfab57f93de6e0bccbb5b0b537a"
+    },
+    "typescript-pro": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/typescript-pro/SKILL.md",
+      "computedHash": "b53b57340243eab4b75acee9096f0444319bb1b9e8530fdab4d1d75e1568fa6c"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vitest/SKILL.md",
+      "computedHash": "943d436114c677802426741980146c07560bf375297666b03062444f4b98a785"
+    }
+  }
+}
