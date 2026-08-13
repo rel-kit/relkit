@@ -1,0 +1,5 @@
+{
+  "name": "zsys-export-smoke-fixture",
+  "private": true,
+  "type": "module"
+}

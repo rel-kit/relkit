@@ -1,0 +1,19 @@
+{
+  "name": "create-zsys",
+  "version": "0.0.0",
+  "type": "module",
+  "bin": {
+    "create-zsys": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

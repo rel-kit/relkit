@@ -27,6 +27,12 @@ out/
 build
 dist
 
+# ZSys generated and local runtime data
+/.zsys/generated/
+/.zsys/build/
+/.zsys/state/
+/.zsys/observability/
+
 
 # Debug
 npm-debug.log*
