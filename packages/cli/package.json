@@ -11,6 +11,19 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@zsys/config": "workspace:*",
+    "@zsys/compiler": "workspace:*",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/deploy": "workspace:*",
+    "@zsys/deploy-pulumi": "workspace:*",
+    "@zsys/diagnostics": "workspace:*",
+    "create-zsys": "workspace:*",
+    "@zsys/graph": "workspace:*",
+    "@zsys/runtime-effect": "workspace:*",
+    "@zsys/supervisor": "workspace:*",
+    "effect": "4.0.0-beta.107"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",

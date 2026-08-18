@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.zsys/generated/
+.zsys/build/
+.zsys/state/
+.zsys/observability/
+coverage/
+dist/
