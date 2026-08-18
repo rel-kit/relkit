@@ -31,6 +31,12 @@ Konsistent audit retains one advisory `packages/cli/src/index.ts`
 the intentional local `.agents/skills/openspec-iterator/SKILL.md`. The next
 different unchecked unit is `17.3`.
 
+Dispatched fresh same-directory task `01a01589-0ebf-7333-ae4f-0bb3d85a449e`
+on host `local` for checkbox `17.3`. One bounded `wait_threads` snapshot with
+`timeoutMs: 10000` timed out while the task was active after reading context;
+cursor `28625dd3-846d-4a34-b403-de378ab3e0c7:2`. The timeout is a successful
+handoff result, not a dispatch blocker.
+
 # Task 17.1 Gate 0–15 prerequisite audit complete
 
 Checkbox `17.1` is complete and progress is `268/287`. The approved packets
