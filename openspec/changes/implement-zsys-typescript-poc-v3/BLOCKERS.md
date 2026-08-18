@@ -1,3 +1,14 @@
+# Task 17.3 status
+
+No active blocker remains. The actual fixture consistency test, focused
+integration suite, typecheck, and full `bun run verify` pass. The one
+`package-entry-barrel` Konsistent result in `packages/cli/src/index.ts` remains
+an advisory finding already tolerated by the configured audit. Real AWS
+deployment evidence remains release-gated and is covered by the approved Gate
+15 packet; this task uses the deterministic provider-neutral deployment/Pulumi
+plan path. The only untracked path remains the intentional local iterator
+skill. Checkbox `17.4` is the next different unchecked unit.
+
 # Task 17.2 status
 
 No active blocker remains. Repeated `bun run verify`, boundary/scope checks,

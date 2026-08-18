@@ -1,3 +1,31 @@
+# Task 17.3 fixture-commerce acceptance complete
+
+Checkbox `17.3` is complete; progress is now `270/287`. The new
+`tests/integration/fixture-commerce-consistency.test.ts` compiles the actual
+`apps/fixture-commerce` public authoring surface once, derives the registration
+plan and provider-neutral deployment/Pulumi program from that graph, and
+asserts one `graphHash` across compiler output, manifest, registration,
+deployment, Pulumi plan/program, generated OpenAPI/client output, the runtime
+graph endpoint, and request records. It exercises the fixture's HTTP routes
+and middleware, direct function call, cache/event/job dependencies, durable
+event listener, agent tool call, environment/provider recipes, observability,
+and deployment coverage. Existing fixture job, resource, and agent integration
+tests remain part of the same integration gate.
+
+The runtime route materializer now treats non-numeric optional timeout values
+from JSON graph data (including normalized `null`) as absent before calling the
+engine. This keeps the data-only graph boundary compatible with the typed
+runtime invocation contract without changing authored descriptors or hashes.
+
+Validation passed: focused fixture test (1 pass, 38 assertions),
+`bun run test:integration` (37 pass, 302 assertions), `bun run typecheck`, and
+`bun run verify` including frozen install, packed smoke, 30-package build,
+generated-output no-diff, security scans, and whitespace checks. The configured
+Konsistent audit retains its one advisory `packages/cli/src/index.ts`
+`package-entry-barrel` finding; it is non-blocking. The only untracked path
+remains the intentional local `.agents/skills/openspec-iterator/SKILL.md`.
+The next different unchecked unit is `17.4`.
+
 # Task 17.2 verification pipeline and CI complete
 
 Checkbox `17.2` is complete; progress is now `269/287`. `scripts/verify.ts`

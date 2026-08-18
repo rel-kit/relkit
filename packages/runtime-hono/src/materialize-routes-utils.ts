@@ -49,7 +49,7 @@ export function createRouteHandler(
             ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
             ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
             ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
-            ...(trigger.config.timeoutMs === undefined
+            ...(typeof trigger.config.timeoutMs !== "number"
               ? {}
               : { timeoutMs: trigger.config.timeoutMs }),
           },
@@ -89,7 +89,7 @@ export function createRouteHandler(
           ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
           ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
           ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
-          ...(trigger.config.timeoutMs === undefined
+          ...(typeof trigger.config.timeoutMs !== "number"
             ? {}
             : { timeoutMs: trigger.config.timeoutMs }),
         },

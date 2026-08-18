@@ -1,3 +1,17 @@
+# Task 17.3 decision
+
+- Use the actual fixture authoring modules and one compiler graph as the
+  acceptance source. Derive registration, runtime manifest, OpenAPI/client,
+  provider-neutral deployment, and Pulumi output from that same graph instead
+  of maintaining a second fixture graph or a parallel expected hash.
+- Keep the cross-consumer coverage in one integration test and reuse the
+  existing fixture job/resource/agent tests for their detailed local restart
+  behavior. This covers the full acceptance surface with the fewest new
+  artifacts while keeping public imports and engine execution paths visible.
+- Treat JSON `null` for an absent route timeout as unset at Hono materialization
+  time. The compiler graph remains data-only and hash-stable; only the runtime
+  boundary narrows the value before passing invocation options to the engine.
+
 # Task 17.2 decision
 
 - Keep verification as one ordered, fail-fast driver. Capture Git state before
