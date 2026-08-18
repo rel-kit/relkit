@@ -2,7 +2,7 @@ import { Config, ConfigProvider, Effect, Option } from "effect";
 import type { EnvDefinition, EnvShape } from "../env-types.js";
 import { EnvResolutionError, resolveEnv, type EnvSource, type ResolvedEnv } from "../resolve.js";
 
-/** Internal bridge; the package export map intentionally does not expose this module. */
+/** Internal bridge; the public package root intentionally does not expose this module. */
 export function resolveEnvWithEffect<S extends EnvShape>(
   definition: EnvDefinition<S>,
   source: EnvSource,

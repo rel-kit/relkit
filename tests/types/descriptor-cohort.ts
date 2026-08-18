@@ -1,0 +1,305 @@
+import { defineApp, localProviders, testProviders, awsProviders } from "@zsys/app";
+import { defineAgent } from "@zsys/agents";
+import { defineBucket } from "@zsys/buckets";
+import { defineCache } from "@zsys/cache";
+import { defineEnv, env, type EnvRef } from "@zsys/config";
+import {
+  defineEvent,
+  events,
+  onEvent,
+  type EventEnvelope,
+  type EventSelectorInput,
+  type UnknownEventEnvelope,
+} from "@zsys/events";
+import { defineError, defineFunction } from "@zsys/functions";
+import { defineJob } from "@zsys/jobs";
+import { defineRoute, http } from "@zsys/routes";
+import { z, type InferInput, type InferOutput } from "@zsys/schema";
+import { defineTool } from "@zsys/tools";
+
+const input = z.object({ id: z.string() });
+const output = z.object({ ok: z.boolean() });
+const declared = defineError({
+  id: "types.invalid-order",
+  data: z.object({ reason: z.string() }),
+  message: ({ reason }) => reason,
+  retry: "never",
+});
+const child = defineFunction({
+  id: "types.child",
+  input,
+  output,
+  handler: async () => ({ ok: true }),
+});
+const createdPayload = z.object({ orderId: z.string() });
+const changedPayload = z.object({ orderId: z.string(), state: z.string() });
+const eventCreated = defineEvent({
+  id: "types.created",
+  version: 1,
+  payload: createdPayload,
+});
+const eventChanged = defineEvent({
+  id: "types.changed",
+  version: 2,
+  payload: changedPayload,
+});
+const createdEnvelope = z.object({
+  instanceId: z.string(),
+  eventId: z.literal("types.created"),
+  version: z.literal(1),
+  payload: createdPayload,
+  occurredAt: z.string(),
+  publishedAt: z.string(),
+  traceId: z.string(),
+  attributes: z.object({}),
+});
+const changedEnvelope = z.object({
+  instanceId: z.string(),
+  eventId: z.literal("types.changed"),
+  version: z.literal(2),
+  payload: changedPayload,
+  occurredAt: z.string(),
+  publishedAt: z.string(),
+  traceId: z.string(),
+  attributes: z.object({}),
+});
+const anyEnvelope = z.union([createdEnvelope, changedEnvelope]);
+const singleEnvelopeTarget = defineFunction({
+  id: "types.single-envelope",
+  input: createdEnvelope,
+  output,
+  handler: async (value) => {
+    const envelope: EventEnvelope<"types.created", 1, { orderId: string }> = value;
+    const eventId: "types.created" = value.eventId;
+    const version: 1 = value.version;
+    void envelope;
+    void eventId;
+    void version;
+    return { ok: true };
+  },
+});
+const unionEnvelopeTarget = defineFunction({
+  id: "types.union-envelope",
+  input: anyEnvelope,
+  output,
+  handler: async (value) => {
+    if (value.eventId === "types.created") {
+      const version: 1 = value.version;
+      const orderId: string = value.payload.orderId;
+      void version;
+      void orderId;
+    } else {
+      const version: 2 = value.version;
+      const state: string = value.payload.state;
+      void version;
+      void state;
+    }
+    return { ok: true };
+  },
+});
+const job = defineJob({
+  id: "types.job",
+  input,
+  target: child,
+  retry: { maxAttempts: 2, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+});
+const bucket = defineBucket({ id: "types.bucket", visibility: "private" });
+const cache = defineCache({
+  id: "types.cache",
+  key: z.object({ sku: z.string() }),
+  value: z.object({ price: z.number() }),
+});
+const numericCache = defineCache({
+  id: "types.numeric-cache",
+  key: z.string(),
+  value: z.number(),
+});
+const tool = defineTool({
+  id: "types.tool",
+  target: child,
+  description: "Read an order",
+  sideEffect: "read",
+  approval: "never",
+});
+const agent = defineAgent({
+  id: "types.agent",
+  input: z.object({ prompt: z.string() }),
+  output: z.object({ answer: z.string() }),
+  modelProfile: "default",
+  instructions: "Answer",
+  tools: [tool],
+  limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },
+});
+
+const parent = defineFunction({
+  id: "types.parent",
+  input,
+  output,
+  dependencies: {
+    functions: { child },
+    jobs: { job },
+    events: { created: eventCreated },
+    buckets: { bucket },
+    cache: { cache, numericCache },
+    agents: { agent },
+  },
+  handler: async (value, context) => {
+    const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
+    const queued = await context.jobs.job.enqueue({ id: value.id });
+    const published = await context.events.created.publish({ orderId: value.id });
+    const object = await context.buckets.bucket.get("orders/1");
+    const cached: { price: number } | undefined = await context.cache.cache.get({ sku: value.id });
+    // @ts-expect-error increment is not exposed for object-valued caches
+    await context.cache.cache.increment({ sku: value.id });
+    const count: number = await context.cache.numericCache.increment(value.id);
+    const assisted: { answer: string } = await context.agents.agent({ prompt: value.id });
+    void childResult;
+    void queued;
+    void published;
+    void object;
+    void cached;
+    void count;
+    void assisted;
+    return { ok: true };
+  },
+});
+
+const routeRequest = http.input({ id: http.path("id"), limit: http.query("limit") });
+const route = defineRoute({
+  id: "types.route",
+  method: "GET",
+  path: "/orders/:id",
+  target: parent,
+  request: routeRequest,
+  responses: [http.success(200, output)],
+});
+const mapped: { id: string; limit: string } = {
+  id: "order-1",
+  limit: "10",
+};
+void route;
+void mapped;
+
+const selector = events.anyOf(eventCreated, eventChanged);
+const selected: EventSelectorInput<typeof selector> = {
+  instanceId: "event-1",
+  eventId: "types.created",
+  version: 1,
+  payload: { orderId: "order-1" },
+  occurredAt: "2026-01-01T00:00:00.000Z",
+  publishedAt: "2026-01-01T00:00:00.000Z",
+  traceId: "trace-1",
+  attributes: {},
+};
+void selected;
+function assertSelectedEnvelope(value: EventSelectorInput<typeof selector>): void {
+  if (value.eventId === "types.created") {
+    const version: 1 = value.version;
+    const orderId: string = value.payload.orderId;
+    void version;
+    void orderId;
+  } else {
+    const version: 2 = value.version;
+    const state: string = value.payload.state;
+    void version;
+    void state;
+  }
+}
+assertSelectedEnvelope(selected);
+const invalidSelected: EventSelectorInput<typeof selector> = {
+  ...selected,
+  // @ts-expect-error the selector union rejects an unknown event ID
+  eventId: "types.unknown",
+};
+void invalidSelected;
+
+const singleTrigger = onEvent(eventCreated, {
+  id: "types.single-trigger",
+  target: singleEnvelopeTarget,
+  delivery: "durable",
+});
+const anyTrigger = onEvent(selector, {
+  id: "types.any-trigger",
+  target: unionEnvelopeTarget,
+  delivery: "durable",
+});
+const matchTrigger = onEvent(events.match("types.*"), {
+  id: "types.match-trigger",
+  target: unionEnvelopeTarget,
+  delivery: "durable",
+});
+const rawSelector = events.all({ payload: "unknown", purpose: "telemetry" });
+const rawEnvelope: UnknownEventEnvelope = {
+  instanceId: "event-raw",
+  eventId: "types.any",
+  version: 1,
+  payload: { orderId: "order-1" },
+  occurredAt: "2026-01-01T00:00:00.000Z",
+  publishedAt: "2026-01-01T00:00:00.000Z",
+  traceId: "trace-raw",
+  attributes: {},
+};
+const rawInput: EventSelectorInput<typeof rawSelector> = rawEnvelope;
+const rawTarget = defineFunction({
+  id: "types.raw-envelope",
+  input: z.object({
+    instanceId: z.string(),
+    eventId: z.string(),
+    version: z.number(),
+    payload: z.unknown(),
+    occurredAt: z.string(),
+    publishedAt: z.string(),
+    traceId: z.string(),
+    attributes: z.object({}),
+  }),
+  output,
+  handler: async (value) => {
+    const payload: unknown = value.payload;
+    void payload;
+    return { ok: true };
+  },
+});
+const rawTrigger = onEvent(rawSelector, {
+  id: "types.raw-trigger",
+  target: rawTarget,
+  delivery: "ephemeral",
+});
+void singleTrigger;
+void anyTrigger;
+void matchTrigger;
+void rawInput;
+void rawTrigger;
+
+const trigger = onEvent(eventCreated, {
+  id: "types.trigger",
+  target: child,
+  delivery: "durable",
+});
+const triggerKind: "event-trigger" = trigger.kind;
+void triggerKind;
+
+const environment = defineEnv({
+  AWS_REGION: env.string(),
+  API_KEY: env.secret(),
+});
+const region: EnvRef<"AWS_REGION", string> = environment.AWS_REGION;
+const app = defineApp({
+  id: "types.app",
+  env: environment,
+  providers: {
+    development: localProviders(),
+    test: testProviders(),
+    production: awsProviders({ region: environment.AWS_REGION }),
+  },
+});
+void region;
+void app;
+
+const error = declared.create({ reason: "bad" });
+const errorInput: InferInput<typeof declared.data> = { reason: "bad" };
+void error;
+void errorInput;
+const toolInput: InferInput<typeof tool.target.input> = { id: "order-1" };
+const toolOutput: InferOutput<typeof tool.target.output> = { ok: true };
+void toolInput;
+void toolOutput;

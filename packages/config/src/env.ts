@@ -1,4 +1,8 @@
 import { toJsonValue, type JsonValue } from "./env-json.js";
+import { createEnvRef, isEnvRef } from "./env-ref.js";
+import { parseBoolean, parseLiteral, parseNumber, parsePort } from "./env-parsers.js";
+
+export { isEnvRef };
 import {
   type EnvBuilder,
   type EnvBuilderBase,
@@ -8,6 +12,7 @@ import {
   type EnvMetadataMap,
   type EnvShape,
   type EnvValueType,
+  type EnvRef,
   type InferEnvValue,
   type InferEnvValues,
   type LiteralValue,
@@ -23,6 +28,7 @@ export type {
   EnvMetadataMap,
   EnvShape,
   EnvValueType,
+  EnvRef,
   InferEnvValue,
   InferEnvValues,
   LiteralValue,
@@ -126,7 +132,21 @@ export function defineEnv<const S extends EnvShape>(shape: S): EnvDefinition<S> 
   const metadata = Object.freeze(
     Object.fromEntries(entries.map(([name, field]) => [name, field.metadata])),
   ) as EnvMetadataMap<S>;
-  return Object.freeze({ kind: "env-definition" as const, shape: frozenShape, metadata });
+  const definition: Record<string, unknown> = {
+    kind: "env-definition",
+    shape: frozenShape,
+    metadata,
+  };
+  for (const [name, field] of entries) {
+    if (name === "kind" || name === "shape" || name === "metadata") {
+      throw new TypeError(`Environment variable name "${name}" is reserved`);
+    }
+    Object.defineProperty(definition, name, {
+      value: createEnvRef(name, field),
+      enumerable: false,
+    });
+  }
+  return Object.freeze(definition) as EnvDefinition<S>;
 }
 
 function createBuilder<T>(type: EnvValueType, parse: Parse<T>, sensitive = false): EnvBuilder<T> {
@@ -158,32 +178,4 @@ function freezeMetadata(value: EnvMetadata): EnvMetadata {
     requiredIn: Object.freeze([...value.requiredIn]),
     ...(value.values ? { values: Object.freeze([...value.values]) } : {}),
   });
-}
-
-function parseNumber(value: string): number {
-  const parsed = Number(value.trim());
-  if (value.trim() === "" || !Number.isFinite(parsed)) {
-    throw new TypeError("Expected a finite number");
-  }
-  return parsed;
-}
-
-function parsePort(value: string): number {
-  const parsed = parseNumber(value);
-  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65535) {
-    throw new TypeError("Expected a port from 1 through 65535");
-  }
-  return parsed;
-}
-
-function parseBoolean(value: string): boolean {
-  if (value === "true") return true;
-  if (value === "false") return false;
-  throw new TypeError("Expected true or false");
-}
-
-function parseLiteral<T extends LiteralValue>(value: string, values: readonly T[]): T {
-  const match = values.find((expected) => String(expected) === value);
-  if (match === undefined) throw new TypeError(`Expected one of: ${values.join(", ")}`);
-  return match;
 }

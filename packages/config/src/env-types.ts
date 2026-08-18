@@ -16,6 +16,16 @@ export interface EnvMetadata {
   readonly example?: JsonValue;
 }
 
+/** A typed, value-free reference to one declared environment variable. */
+export interface EnvRef<Name extends string = string, Value = unknown> {
+  readonly kind: "env-ref";
+  readonly name: Name;
+  readonly type: EnvValueType;
+  readonly sensitive: boolean;
+  readonly metadata: EnvMetadata;
+  readonly __value?: Value;
+}
+
 export interface EnvBuilderBase {
   readonly kind: "env-builder";
   readonly metadata: EnvMetadata;
@@ -46,11 +56,13 @@ export type EnvMetadataMap<S extends EnvShape> = {
 };
 
 /** The immutable declaration returned by `defineEnv`. */
-export interface EnvDefinition<S extends EnvShape> {
+export type EnvDefinition<S extends EnvShape> = {
   readonly kind: "env-definition";
   readonly shape: S;
   readonly metadata: EnvMetadataMap<S>;
-}
+} & {
+  readonly [K in keyof S]: EnvRef<K & string, InferEnvValue<S[K]>>;
+};
 
 export interface EnvBuilderFactory {
   string(): EnvBuilder<string>;

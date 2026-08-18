@@ -6,6 +6,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./internal/config": {
+      "types": "./dist/internal/config.d.ts",
+      "import": "./dist/internal/config.js"
     }
   },
   "dependencies": {

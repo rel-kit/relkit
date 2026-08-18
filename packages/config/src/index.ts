@@ -1,4 +1,4 @@
-export { defineEnv, env } from "./env.js";
+export { defineEnv, env, isEnvRef } from "./env.js";
 export type {
   EnvBuilder,
   EnvBuilderBase,
@@ -8,6 +8,7 @@ export type {
   EnvMetadataMap,
   EnvShape,
   EnvValueType,
+  EnvRef,
   InferEnvValue,
   InferEnvValues,
   JsonValue,

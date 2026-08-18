@@ -8,6 +8,18 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@zsys/agents": "workspace:*",
+    "@zsys/buckets": "workspace:*",
+    "@zsys/cache": "workspace:*",
+    "@zsys/config": "workspace:*",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/events": "workspace:*",
+    "@zsys/functions": "workspace:*",
+    "@zsys/jobs": "workspace:*",
+    "@zsys/routes": "workspace:*",
+    "@zsys/tools": "workspace:*"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",

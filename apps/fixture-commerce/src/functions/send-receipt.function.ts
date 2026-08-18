@@ -1,0 +1,24 @@
+import { defineFunction } from "@zsys/app";
+import assets from "../buckets/assets.bucket.js";
+import { receiptInput, receiptOutput } from "../shared/schemas.js";
+
+const sendReceipt = defineFunction({
+  id: "receipts.send",
+  input: receiptInput,
+  output: receiptOutput,
+  dependencies: { buckets: { assets } },
+  handler: async (input, context) => {
+    context.log.info("receipt.sent", {
+      orderId: input.orderId,
+      receiptKey: input.receiptKey,
+    });
+    await context.buckets.assets.put(
+      input.receiptKey,
+      new TextEncoder().encode(JSON.stringify({ orderId: input.orderId })),
+      { contentType: "application/json" },
+    );
+    return { receiptId: `${input.orderId}:${input.receiptKey}` };
+  },
+});
+
+export default sendReceipt;
