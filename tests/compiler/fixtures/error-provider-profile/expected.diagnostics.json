@@ -1,0 +1,11 @@
+[
+  {
+    "code": "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+    "column": 17,
+    "descriptorId": "archive",
+    "file": "src/buckets/archive.bucket.ts",
+    "line": 3,
+    "message": "Provider profile \"missing-profile\" does not provide buckets.",
+    "severity": "error"
+  }
+]

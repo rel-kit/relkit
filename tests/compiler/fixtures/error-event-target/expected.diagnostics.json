@@ -1,0 +1,11 @@
+[
+  {
+    "code": "ZSYS_EVENT_TARGET_INCOMPATIBLE",
+    "column": 17,
+    "descriptorId": "orders.created-trigger",
+    "file": "src/events/order-created-trigger.event.ts",
+    "line": 5,
+    "message": "Event target input is incompatible with \"orders.created@1\".",
+    "severity": "error"
+  }
+]

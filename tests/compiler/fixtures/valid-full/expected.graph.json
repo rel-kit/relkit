@@ -1,0 +1,467 @@
+{
+  "appId": "full-app",
+  "contractVersion": 1,
+  "edges": [
+    { "from": "orders.handle-created", "kind": "enqueues-job", "to": "receipts.send-job" },
+    { "from": "orders.get", "kind": "exposes-as-tool", "to": "orders.lookup-tool" },
+    { "from": "orders.listener", "kind": "listens-to-event", "to": "orders.created" },
+    { "from": "orders.create", "kind": "publishes-event", "to": "orders.created" },
+    {
+      "from": "orders.get-route",
+      "kind": "targets-function",
+      "role": "middleware",
+      "to": "orders.authorize"
+    },
+    {
+      "from": "orders.get-route",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "orders.get"
+    },
+    {
+      "from": "orders.listener",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "orders.handle-created"
+    },
+    {
+      "from": "orders.lookup-tool",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "orders.get"
+    },
+    {
+      "from": "receipts.send-job",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "receipts.send"
+    },
+    { "from": "orders.create", "kind": "uses-cache", "to": "prices" },
+    { "from": "assets", "kind": "uses-provider-profile", "to": "default" },
+    { "from": "orders.listener", "kind": "uses-provider-profile", "to": "default" },
+    { "from": "orders.support-agent", "kind": "uses-provider-profile", "to": "default" },
+    { "from": "prices", "kind": "uses-provider-profile", "to": "default" },
+    { "from": "receipts.send-job", "kind": "uses-provider-profile", "to": "default" },
+    { "from": "orders.support-agent", "kind": "uses-tool", "to": "orders.lookup-tool" }
+  ],
+  "nodes": [
+    {
+      "generatedFunction": {
+        "agentId": "orders.support-agent",
+        "functionId": "zsys.agent.orders.support-agent.invoke",
+        "generated": true,
+        "generatedBy": "agent"
+      },
+      "id": "orders.support-agent",
+      "input": {
+        "properties": { "question": { "type": "string" } },
+        "required": ["question"],
+        "type": "object"
+      },
+      "instructions": "Answer order questions.",
+      "kind": "agent",
+      "limits": { "maxSteps": 2, "maxToolCalls": 2, "timeoutMs": 1000 },
+      "modelProfile": "default",
+      "output": {
+        "properties": { "answer": { "type": "string" } },
+        "required": ["answer"],
+        "type": "object"
+      },
+      "source": { "column": 22, "file": "src/agents/order-support.agent.ts", "line": 5 },
+      "toolIds": ["orders.lookup-tool"]
+    },
+    {
+      "defaults": { "currency": "USD" },
+      "environment": {
+        "PORT": {
+          "hasDefault": true,
+          "optional": false,
+          "requiredIn": [],
+          "sensitive": false,
+          "type": "port"
+        }
+      },
+      "id": "full-app",
+      "kind": "app",
+      "observability": { "bodyCapture": { "mode": "off" } },
+      "providerProfiles": ["default"],
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 }
+    },
+    {
+      "allowedContentTypes": ["application/json"],
+      "id": "assets",
+      "kind": "bucket",
+      "maxObjectBytes": 10000,
+      "profile": "default",
+      "source": { "column": 16, "file": "src/buckets/assets.bucket.ts", "line": 3 },
+      "visibility": "private"
+    },
+    {
+      "defaultTtlMs": 1000,
+      "id": "prices",
+      "key": {
+        "properties": { "sku": { "type": "string" } },
+        "required": ["sku"],
+        "type": "object"
+      },
+      "kind": "cache",
+      "maxTtlMs": 5000,
+      "profile": "default",
+      "source": { "column": 16, "file": "src/cache/prices.cache.ts", "line": 4 },
+      "value": { "type": "number" }
+    },
+    {
+      "hasDefault": true,
+      "id": "PORT",
+      "kind": "env",
+      "name": "PORT",
+      "requiredIn": [],
+      "sensitive": false,
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 },
+      "type": "port"
+    },
+    {
+      "id": "orders.created",
+      "kind": "event",
+      "payload": {
+        "properties": { "orderId": { "type": "string" }, "sku": { "type": "string" } },
+        "required": ["orderId", "sku"],
+        "type": "object"
+      },
+      "sensitiveFields": null,
+      "source": { "column": 22, "file": "src/events/order-created.event.ts", "line": 4 },
+      "version": 1
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "id": "orders.authorize",
+      "input": {
+        "properties": { "authorization": { "type": "string" } },
+        "required": ["authorization"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "allowed": { "type": "boolean" } },
+        "required": ["allowed"],
+        "type": "object"
+      },
+      "source": { "column": 19, "file": "src/functions/authorize.function.ts", "line": 4 },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": {
+        "cache": {
+          "prices": {
+            "defaultTtlMs": 1000,
+            "id": "prices",
+            "key": {
+              "$zsys": "schema",
+              "jsonSchema": {
+                "properties": { "sku": { "type": "string" } },
+                "required": ["sku"],
+                "type": "object"
+              }
+            },
+            "kind": "cache",
+            "maxTtlMs": 5000,
+            "profile": "default",
+            "ref": { "id": "prices", "kind": "cache" },
+            "value": { "$zsys": "schema", "jsonSchema": { "type": "number" } }
+          }
+        },
+        "events": {
+          "orderCreated": {
+            "id": "orders.created",
+            "kind": "event",
+            "payload": {
+              "$zsys": "schema",
+              "jsonSchema": {
+                "properties": { "orderId": { "type": "string" }, "sku": { "type": "string" } },
+                "required": ["orderId", "sku"],
+                "type": "object"
+              }
+            },
+            "ref": { "id": "orders.created", "kind": "event" },
+            "version": 1
+          }
+        }
+      },
+      "errors": null,
+      "id": "orders.create",
+      "input": {
+        "properties": { "orderId": { "type": "string" }, "sku": { "type": "string" } },
+        "required": ["orderId", "sku"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "orderId": { "type": "string" }, "totalCents": { "type": "number" } },
+        "required": ["orderId", "totalCents"],
+        "type": "object"
+      },
+      "source": { "column": 21, "file": "src/functions/create-order.function.ts", "line": 6 },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "id": "orders.get",
+      "input": {
+        "properties": { "orderId": { "type": "string" } },
+        "required": ["orderId"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "orderId": { "type": "string" }, "totalCents": { "type": "number" } },
+        "required": ["orderId", "totalCents"],
+        "type": "object"
+      },
+      "source": { "column": 18, "file": "src/functions/get-order.function.ts", "line": 4 },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": {
+        "jobs": {
+          "receiptJob": {
+            "id": "receipts.send-job",
+            "idempotency": { "key": "orderId", "retentionMs": 1000 },
+            "input": {
+              "$zsys": "schema",
+              "jsonSchema": {
+                "properties": { "orderId": { "type": "string" } },
+                "required": ["orderId"],
+                "type": "object"
+              }
+            },
+            "kind": "job",
+            "profile": "default",
+            "ref": { "id": "receipts.send-job", "kind": "job" },
+            "retry": {
+              "initialDelayMs": 1,
+              "jitter": "none",
+              "maxAttempts": 2,
+              "maxDelayMs": 5,
+              "multiplier": 2
+            },
+            "schedule": [
+              {
+                "cron": "0 * * * *",
+                "id": "receipts.reconcile",
+                "input": { "orderId": "scheduled" },
+                "overlap": "skip",
+                "timezone": "UTC"
+              }
+            ],
+            "target": {
+              "handler": { "$zsys": "function", "name": "handler" },
+              "id": "receipts.send",
+              "input": {
+                "$zsys": "schema",
+                "jsonSchema": {
+                  "properties": { "orderId": { "type": "string" } },
+                  "required": ["orderId"],
+                  "type": "object"
+                }
+              },
+              "kind": "function",
+              "output": {
+                "$zsys": "schema",
+                "jsonSchema": {
+                  "properties": { "receiptId": { "type": "string" } },
+                  "required": ["receiptId"],
+                  "type": "object"
+                }
+              },
+              "ref": { "id": "receipts.send", "kind": "function" }
+            }
+          }
+        }
+      },
+      "errors": null,
+      "id": "orders.handle-created",
+      "input": {
+        "properties": {
+          "eventId": { "type": "string" },
+          "payload": {
+            "properties": { "orderId": { "type": "string" }, "sku": { "type": "string" } },
+            "required": ["orderId", "sku"],
+            "type": "object"
+          },
+          "version": { "type": "number" }
+        },
+        "required": ["eventId", "payload", "version"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "eventId": { "type": "string" },
+          "payload": {
+            "properties": { "orderId": { "type": "string" }, "sku": { "type": "string" } },
+            "required": ["orderId", "sku"],
+            "type": "object"
+          },
+          "version": { "type": "number" }
+        },
+        "required": ["eventId", "payload", "version"],
+        "type": "object"
+      },
+      "source": { "column": 23, "file": "src/functions/handle-created.function.ts", "line": 5 },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "id": "receipts.send",
+      "input": {
+        "properties": { "orderId": { "type": "string" } },
+        "required": ["orderId"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "receiptId": { "type": "string" } },
+        "required": ["receiptId"],
+        "type": "object"
+      },
+      "source": { "column": 21, "file": "src/functions/send-receipt.function.ts", "line": 4 },
+      "timeoutMs": null
+    },
+    {
+      "generated": {
+        "agentId": "orders.support-agent",
+        "functionId": "zsys.agent.orders.support-agent.invoke",
+        "generated": true,
+        "generatedBy": "agent"
+      },
+      "id": "zsys.agent.orders.support-agent.invoke",
+      "input": {
+        "properties": { "question": { "type": "string" } },
+        "required": ["question"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "answer": { "type": "string" } },
+        "required": ["answer"],
+        "type": "object"
+      },
+      "source": { "column": 22, "file": "src/agents/order-support.agent.ts", "line": 5 }
+    },
+    {
+      "concurrency": null,
+      "id": "receipts.send-job",
+      "idempotency": { "key": "orderId", "retentionMs": 1000 },
+      "input": {
+        "properties": { "orderId": { "type": "string" } },
+        "required": ["orderId"],
+        "type": "object"
+      },
+      "kind": "job",
+      "profile": "default",
+      "retry": {
+        "initialDelayMs": 1,
+        "jitter": "none",
+        "maxAttempts": 2,
+        "maxDelayMs": 5,
+        "multiplier": 2
+      },
+      "schedule": [
+        {
+          "cron": "0 * * * *",
+          "id": "receipts.reconcile",
+          "input": { "orderId": "scheduled" },
+          "overlap": "skip",
+          "timezone": "UTC"
+        }
+      ],
+      "source": { "column": 20, "file": "src/jobs/send-receipt.job.ts", "line": 5 },
+      "targetFunctionId": "receipts.send",
+      "timeoutMs": null
+    },
+    {
+      "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
+      "configuration": { "development": [], "production": ["region"], "test": [] },
+      "environment": [],
+      "id": "default",
+      "kind": "provider",
+      "profile": "default",
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 }
+    },
+    {
+      "approval": "never",
+      "description": "Read one order",
+      "id": "orders.lookup-tool",
+      "kind": "tool",
+      "sideEffect": "read",
+      "source": { "column": 21, "file": "src/tools/lookup-order.tool.ts", "line": 4 },
+      "targetFunctionId": "orders.get",
+      "timeoutMs": null
+    },
+    {
+      "config": {
+        "method": "GET",
+        "middleware": [{ "id": "orders.auth", "targetFunctionId": "orders.authorize" }],
+        "path": "/orders/:orderId",
+        "request": {
+          "fields": {
+            "orderId": {
+              "kind": "transform",
+              "transformId": "orders.normalize-id",
+              "value": { "kind": "path", "name": "orderId" }
+            }
+          },
+          "kind": "input"
+        },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": { "orderId": { "type": "string" }, "totalCents": { "type": "number" } },
+              "required": ["orderId", "totalCents"],
+              "type": "object"
+            },
+            "status": 200
+          }
+        ],
+        "timeoutMs": null,
+        "transforms": [{ "id": "orders.normalize-id", "schema": { "type": "string" } }]
+      },
+      "id": "orders.get-route",
+      "kind": "trigger",
+      "source": { "column": 16, "file": "src/routes/orders.route.ts", "line": 11 },
+      "targetFunctionId": "orders.get",
+      "triggerType": "http"
+    },
+    {
+      "config": {
+        "concurrency": null,
+        "delivery": "durable",
+        "expansion": ["orders.created@1"],
+        "profile": "default",
+        "retry": {
+          "initialDelayMs": 1,
+          "jitter": "none",
+          "maxAttempts": 2,
+          "maxDelayMs": 5,
+          "multiplier": 2
+        },
+        "selector": { "event": { "eventId": "orders.created", "version": 1 }, "kind": "single" }
+      },
+      "id": "orders.listener",
+      "kind": "trigger",
+      "source": { "column": 18, "file": "src/events/order-listener.event.ts", "line": 5 },
+      "targetFunctionId": "orders.handle-created",
+      "triggerType": "event"
+    }
+  ]
+}

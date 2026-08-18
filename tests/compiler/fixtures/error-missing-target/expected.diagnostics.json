@@ -1,0 +1,11 @@
+[
+  {
+    "code": "ZSYS_MISSING_TARGET",
+    "column": 15,
+    "descriptorId": "missing.route",
+    "file": "src/routes/missing.route.ts",
+    "line": 10,
+    "message": "route target target does not resolve to a function.",
+    "severity": "error"
+  }
+]
