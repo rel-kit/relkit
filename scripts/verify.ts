@@ -7,8 +7,6 @@ const bun = process.execPath;
 type Placeholder = readonly [label: string, command: string, owner: string];
 
 const placeholders: Placeholder[] = [
-  ["full source lint", "bun run lint", "Phase 2 / Gate 2, task 3.16"],
-  ["type fixtures", "bun run test:types", "Phase 2 / Gate 2, task 3.4"],
   ["unit and schema tests", "bun run test:unit", "Phase 1 / Gate 1, tasks 2.4 and 2.7"],
   ["compiler and graph tests", "bun run test:compiler", "Phase 3 / Gate 3, task 4.19"],
   ["provider contracts", "bun run test:contracts", "Phase 7 / Gate 7, task 8.14"],
@@ -104,14 +102,22 @@ async function main(): Promise<void> {
     "tests",
   ]);
   await run("ESLint configuration check", bun, ["x", "eslint", "eslint.config.mjs"]);
+  await run("public authoring scans", bun, ["run", "lint"]);
   await run("dependency and scope checks", bun, ["run", "scripts/check-boundaries.ts"]);
+  await run("observability sink source scan", bun, ["run", "scripts/check-observability-sinks.ts"]);
   checkImplementationSize();
   await run("Konsistent configuration validation", bun, ["run", "konsistent", "--", "validate"]);
   await runStructuralAudit();
   await run("typecheck", bun, ["run", "typecheck"]);
+  await run("public type fixtures", bun, ["run", "test:types"]);
   await run("public declaration emission and leak scan", bun, [
     "run",
     "scripts/check-public-declarations.ts",
+  ]);
+  await run("agent declaration/source/graph scans", bun, [
+    "test",
+    "tests/agents/source-boundaries.test.ts",
+    "tests/compiler/fixture-commerce.test.ts",
   ]);
   await run("Phase 0 guardrail tests", bun, ["test", "tests/phase0.test.ts"]);
 

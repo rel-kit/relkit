@@ -1,4 +1,4 @@
-import { cp, mkdtemp, readFile, readdir, rm, mkdir } from "node:fs/promises";
+import { access, cp, mkdtemp, readFile, readdir, rm, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +10,7 @@ const rootExport = {
 
 type PackageManifest = {
   name?: string;
+  dependencies?: Record<string, string>;
   exports?: Record<string, unknown>;
   bin?: Record<string, string>;
 };
@@ -52,6 +53,17 @@ async function runNode(args: string[], cwd: string): Promise<string> {
   return stdout;
 }
 
+async function unpackTarball(tarball: string, target: string): Promise<void> {
+  await mkdir(target, { recursive: true });
+  const child = Bun.spawn(["tar", "-xzf", tarball, "--strip-components=1", "-C", target], {
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const stderr = await new Response(child.stderr).text();
+  const exitCode = await child.exited;
+  if (exitCode !== 0) throw new Error(`tar extraction failed for ${tarball}\n${stderr}`);
+}
+
 async function readManifest(packageDirectory: string): Promise<PackageManifest> {
   const manifestPath = join(packageDirectory, "package.json");
   return JSON.parse(await readFile(manifestPath, "utf8")) as PackageManifest;
@@ -67,8 +79,18 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
   }
 
   const actualRoot = manifest.exports?.["."];
+  const expectedExports =
+    packageDirectoryName === "config"
+      ? {
+          ".": rootExport,
+          "./internal/config": {
+            types: "./dist/internal/config.d.ts",
+            import: "./dist/internal/config.js",
+          },
+        }
+      : { ".": rootExport };
   if (
-    Object.keys(manifest.exports ?? {}).length !== 1 ||
+    JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports) ||
     JSON.stringify(actualRoot) !== JSON.stringify(rootExport)
   ) {
     throw new Error(`Unsupported export map in ${packageDirectory}`);
@@ -107,9 +129,19 @@ async function main(): Promise<void> {
     .filter((entry) => entry.isDirectory())
     .map((entry) => join(packageRoot, entry.name))
     .sort();
+  const manifests = new Map<string, PackageManifest>();
 
   for (const packageDirectory of packageDirectories) {
-    assertPackageManifest(packageDirectory, await readManifest(packageDirectory));
+    const manifest = await readManifest(packageDirectory);
+    assertPackageManifest(packageDirectory, manifest);
+    if (manifest.name) manifests.set(manifest.name, manifest);
+  }
+
+  const requiredNames = new Set(["@zsys/app", "@zsys/compiler"]);
+  for (const packageName of requiredNames) {
+    for (const dependency of Object.keys(manifests.get(packageName)?.dependencies ?? {})) {
+      if (manifests.has(dependency)) requiredNames.add(dependency);
+    }
   }
 
   const temporaryRoot = await mkdtemp(join(tmpdir(), "zsys-export-smoke-"));
@@ -121,9 +153,44 @@ async function main(): Promise<void> {
     });
     await mkdir(artifactRoot);
 
-    const appTarball = await packPackage(join(packageRoot, "app"), artifactRoot);
-    const compilerTarball = await packPackage(join(packageRoot, "compiler"), artifactRoot);
-    await runBun(["add", appTarball, compilerTarball], fixtureRoot);
+    const tarballs = new Map<string, string>();
+    for (const packageDirectory of packageDirectories) {
+      const manifest = manifests.get((await readManifest(packageDirectory)).name ?? "");
+      if (manifest?.name && requiredNames.has(manifest.name)) {
+        tarballs.set(manifest.name, await packPackage(packageDirectory, artifactRoot));
+      }
+    }
+    for (const [name, tarball] of tarballs) {
+      await unpackTarball(tarball, join(fixtureRoot, "node_modules", ...name.split("/")));
+    }
+    const externalDependencies = new Set<string>();
+    for (const name of requiredNames) {
+      for (const dependency of Object.keys(manifests.get(name)?.dependencies ?? {})) {
+        if (!manifests.has(dependency)) externalDependencies.add(dependency);
+      }
+    }
+    for (const dependency of [...externalDependencies].sort()) {
+      const sourceCandidates = [
+        join(repositoryRoot, "node_modules", ...dependency.split("/")),
+        ...packageDirectories.map((directory) =>
+          join(directory, "node_modules", ...dependency.split("/")),
+        ),
+      ];
+      let source: string | undefined;
+      for (const candidate of sourceCandidates) {
+        try {
+          await access(candidate);
+          source = candidate;
+          break;
+        } catch {
+          // Try the next workspace-local dependency location.
+        }
+      }
+      if (source === undefined) throw new Error(`Missing packed dependency ${dependency}`);
+      const target = join(fixtureRoot, "node_modules", ...dependency.split("/"));
+      await mkdir(dirname(target), { recursive: true });
+      await cp(source, target, { recursive: true, dereference: true });
+    }
     process.stdout.write(await runNode(["resolve.mjs"], fixtureRoot));
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });

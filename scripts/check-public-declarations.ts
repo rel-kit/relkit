@@ -1,11 +1,23 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
+import * as ts from "typescript";
+import { agentProviderPropertyOffsets } from "./public-declaration-agent";
 
-const phaseOnePackages = [
+const publicPackages = [
   "packages/contracts",
   "packages/schema",
   "packages/config",
   "packages/diagnostics",
+  "packages/functions",
+  "packages/routes",
+  "packages/jobs",
+  "packages/events",
+  "packages/buckets",
+  "packages/cache",
+  "packages/tools",
+  "packages/agents",
+  "packages/app",
+  "packages/testing",
 ] as const;
 
 const forbiddenSymbols = [
@@ -15,6 +27,22 @@ const forbiddenSymbols = [
   ["Schema.Schema", /\bSchema\.Schema\b/g],
   ["Fiber", /\bFiber\b/g],
   ["Cause", /\bCause\b/g],
+  ["Hono", /\bHono(?:Context|Request|Response)?\b/g],
+  ["Next.js", /\bNext(?:JS|\.js)?\b/g],
+  ["Pulumi", /\bPulumi\b|from ["'](?:pulumi|@pulumi\/)[^"']*["']/g],
+  [
+    "cloud-client",
+    /\b(?:S3|DynamoDB|Redis|CloudWatch|EventBridge|SQS|ECS|RDS|Aws|Azure|Gcp|OpenAI|Anthropic|Gemini|Bedrock)(?:Client|Provider|Runtime)?\b/g,
+  ],
+  ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
+  [
+    "internal-provider-sdk",
+    /from ["']@zsys\/(?:providers-local|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
+  ],
+  [
+    "framework-or-provider-import",
+    /from ["'](?:effect|hono|next|openai|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
+  ],
 ] as const;
 
 type PackageManifest = {
@@ -68,9 +96,29 @@ function lineAndColumn(text: string, offset: number): { line: number; column: nu
   };
 }
 
+function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {
+  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const leaks: DeclarationLeak[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isPropertySignature(node) && node.name.getText(source) === "handler") {
+      const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
+      if (!/Function/.test(owner)) {
+        leaks.push({
+          file,
+          ...lineAndColumn(text, node.getStart(source)),
+          symbol: "non-function-handler",
+        });
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return leaks;
+}
+
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {
   const leaks: DeclarationLeak[] = [];
-  for (const packagePath of phaseOnePackages) {
+  for (const packagePath of publicPackages) {
     const pending = [declarationEntry(root, packagePath)];
     const visited = new Set<string>();
     while (pending.length > 0) {
@@ -78,7 +126,7 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
       if (!file || visited.has(file)) continue;
       visited.add(file);
       const text = readFileSync(file, "utf8");
-      for (const [symbol, pattern] of forbiddenSymbols) {
+      for (const [symbol, pattern] of declarationSymbols(file)) {
         pattern.lastIndex = 0;
         for (const match of text.matchAll(pattern)) {
           const offset = match.index ?? 0;
@@ -86,6 +134,15 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
           leaks.push({ file: relative(root, file), ...location, symbol });
         }
       }
+      for (const leak of nonFunctionHandlers(file, text)) {
+        leaks.push({ ...leak, file: relative(root, leak.file) });
+      }
+      for (const offset of agentProviderPropertyOffsets(file, text))
+        leaks.push({
+          file: relative(root, file),
+          ...lineAndColumn(text, offset),
+          symbol: "agent-provider-details",
+        });
       pending.push(...localDeclarationReferences(file, text));
     }
   }
@@ -96,9 +153,15 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
   );
 }
 
+function declarationSymbols(file: string): typeof forbiddenSymbols {
+  return file.includes("/packages/testing/")
+    ? forbiddenSymbols.filter(([symbol]) => symbol !== "internal-provider-sdk")
+    : forbiddenSymbols;
+}
+
 async function emitDeclarations(root: string): Promise<void> {
   const child = Bun.spawn(
-    [process.execPath, "x", "tsc", "-b", ...phaseOnePackages, "--pretty", "false"],
+    [process.execPath, "x", "tsc", "-b", ...publicPackages, "--pretty", "false"],
     { cwd: root, stdout: "pipe", stderr: "pipe" },
   );
   const [stdout, stderr] = await Promise.all([
@@ -123,7 +186,7 @@ async function main(): Promise<void> {
     }
     throw new Error(`Public declaration scan failed with ${leaks.length} forbidden symbol(s).`);
   }
-  console.log(`Public declaration scan passed (${phaseOnePackages.length} packages).`);
+  console.log(`Public declaration scan passed (${publicPackages.length} packages).`);
 }
 
 if (import.meta.main) {
