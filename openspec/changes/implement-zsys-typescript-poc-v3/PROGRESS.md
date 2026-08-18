@@ -1,6 +1,7 @@
 # Task 17.7 release checklist complete
 
-Checkbox `17.7` is complete; progress is now `274/287`. Added the root
+Checkbox `17.7` is complete; progress is now `274/287`. Commit `cbe489a7e`
+contains the root checklist and its 17.7 bookkeeping. Added the root
 `RELEASE_CHECKLIST.md` with candidate metadata, all Gate 16 required evidence
 slots, the exact reproduction commands, final reviewer questions, every
 Section 25 acceptance criterion, reviewed `RELEASE_NOTES.md`, seven owner
@@ -16,11 +17,22 @@ implemented and `RELEASE_NOTES.md` was not modified.
 | `git diff --check`                                            | exit `0`                                                                                                                                                                      |
 | `openspec validate implement-zsys-typescript-poc-v3 --strict` | valid                                                                                                                                                                         |
 | `bun run verify`                                              | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts`                                                          |
+| `bun run scripts/release-check.ts`                            | exit `0`; 30 packages, 30 packed artifacts, 3 templates, fingerprint `f4e352d69f2a7b1862318b26d0bdcd993f9b9b075cef2182250bb5a42ac5c78a` |
 | approved v3 source document checksums                         | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
 
 No active blocker remains. The only untracked path is the intentional local
 `.agents/skills/openspec-iterator/SKILL.md`; no vendor or approved normative v3
 source document changed. The next different unchecked unit is `17.8`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a015d6-7e46-7a81-a203-f563ad80be45` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.8`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirmed
+it is reading the required context and implementing only the clean-checkout
+verification unit. Cursor:
+`31b90ad2-2c96-4124-8c3f-a7369f803356:2`.
 
 # Task 17.6 documentation complete
 

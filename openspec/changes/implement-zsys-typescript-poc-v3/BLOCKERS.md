@@ -1,11 +1,12 @@
 # Task 17.7 status
 
 No active blocker, required-check failure, or rejected Gate 16 prerequisite
-remains. `RELEASE_CHECKLIST.md` formats cleanly, strict OpenSpec validation and
-the fixed fail-fast `bun run verify` pipeline pass, and the known advisory
+remains. `RELEASE_CHECKLIST.md` formats cleanly, strict OpenSpec validation,
+the fixed fail-fast `bun run verify` pipeline, and the committed-candidate
+`bun run scripts/release-check.ts` pass. The known advisory
 `packages/cli/src/index.ts` `package-entry-barrel` finding remains non-blocking.
 The only untracked path is the intentional local iterator skill. Checkbox
-`17.8` is the next different unchecked unit.
+`17.8` is the next different unchecked unit and is eligible for handoff.
 
 # Task 17.6 status
 
