@@ -1,3 +1,13 @@
+# Task 17.5 status
+
+No active blocker remains. The release-check implementation, 30 packed
+artifacts, three template scans/checksums, packed generator reproducibility,
+public declaration scan, boundary/scope scan, and deterministic
+`RELEASE_NOTES.md` generation passed. The default command's clean-worktree
+enforcement is ready for the committed candidate; the only allowed local
+untracked path is `.agents/skills/openspec-iterator/SKILL.md`. Checkbox `17.6`
+is the next different unchecked unit.
+
 # Task 17.4 status
 
 No active blocker remains. The reproducible performance harness ran successfully

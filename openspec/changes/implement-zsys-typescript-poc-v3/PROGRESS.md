@@ -1,3 +1,36 @@
+# Task 17.5 release check and release notes complete
+
+Checkbox `17.5` is complete; progress is now `272/287`. Added the strict
+`scripts/release-check.ts` orchestrator with focused package/manifest checks in
+`release-check-support.ts` and packed-artifact/template checks in
+`release-check-artifacts.ts`; every implementation file remains below the
+200-line limit. The check validates one exact version across all 30 workspace
+packages, expected export/bin maps, pinned dependency fields, packed export
+targets with no remaining `workspace:*`, all three versioned templates and
+their public-import/tooling/script compatibility, deterministic template
+checksums, the existing packed generator smoke/reproducibility path, the
+existing boundary/scope scan, the public declaration scan, and clean worktree
+state (excluding only the intentional local iterator skill).
+
+The reviewed deterministic `RELEASE_NOTES.md` output records the 30 package
+tarball SHA-256 values, three template SHA-256 values, full dependency/export
+inputs, package manager, and an input fingerprint. `--write-notes` is an
+explicit staging mode; the default command requires the notes to already match
+the computed output and enforces the clean-worktree rule.
+
+### Checks
+
+| Command | Result |
+| --- | --- |
+| `bun run scripts/release-check.ts --write-notes` | exit `0`; 30 packages/artifacts, 3 templates, packed generator smoke, declaration scan, boundary/scope scan, checksums, and deterministic notes output passed |
+| `bunx prettier --check scripts/release-check.ts scripts/release-check-support.ts scripts/release-check-artifacts.ts` | exit `0` |
+| focused `bunx tsc --noEmit ... scripts/release-check*.ts` | exit `0` |
+
+No later checkbox was implemented. The only untracked path remains the
+intentional local `.agents/skills/openspec-iterator/SKILL.md`; no vendor or
+normative v3 source document changed. The next different unchecked unit is
+`17.6`.
+
 # Task 17.4 performance baseline harness complete
 
 Checkbox `17.4` is complete; progress is now `271/287`. Added the reproducible

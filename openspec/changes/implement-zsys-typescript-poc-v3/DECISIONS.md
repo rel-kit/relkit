@@ -1,3 +1,17 @@
+# Task 17.5 decision
+
+- Keep release validation as one direct script over existing build, boundary,
+  declaration, and packed-generator commands. Add only two small helpers to
+  keep each implementation file below the repository's 200-line limit.
+- Pack all 30 workspace packages into a disposable temporary directory and
+  validate normalized tarball manifests/export targets before hashing them;
+  this makes the release notes useful for every package while the existing
+  packed generator smoke remains the installability/reproducibility proof.
+- Generate notes from sorted manifest/template inputs with no timestamps. The
+  explicit `--write-notes` mode permits only the release script/output paths
+  while the default mode requires a clean worktree except for the intentional
+  local iterator skill, then verifies the checked-in notes byte-for-byte.
+
 # Task 17.4 decision
 
 - Use deterministic in-memory `defineFunction` descriptor arrays at 100, 1,000,
