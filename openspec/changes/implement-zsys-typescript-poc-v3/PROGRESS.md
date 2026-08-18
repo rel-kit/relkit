@@ -21,6 +21,11 @@ Validation passed: Gate 0–15 packet/artifact audit, `bun run verify`,
 Prettier over the change notes, and `git diff --check`. The next different
 unchecked unit is `17.2`.
 
+Dispatched fresh same-directory task `01a01571-7d34-7ae3-8204-470ac01b9543`
+on host `local` for checkbox `17.2`. One bounded `wait_threads` snapshot
+timed out after 30 seconds while the task was active and reading its context;
+the timeout is a successful handoff result, not a dispatch blocker.
+
 # Task 16.22 Gate 15 evidence and approval
 
 Checkbox `16.22` remains complete; progress is `267/287`. Gate 15 is now
