@@ -1,3 +1,88 @@
+# Task 17.18 blocker
+
+Gate 16 owner approvals are unavailable. `RELEASE_CHECKLIST.md:146-152` has
+blank Name, Signature / approval, Date, and Evidence reviewed cells for all
+seven required roles. Reviewers must reproduce their evidence and record each
+role separately, including when one person covers multiple roles. This worker
+cannot prefill or infer those approvals, so checkbox `17.18` remains unchecked
+and the iterator stops without dispatching 17.19 or 17.20.
+
+# Task 17.17 status
+
+No active blocker or required-check failure remains. The initial broad
+inspector run exposed and the focused rerun confirmed one stale stream-frame
+assertion; it was corrected without changing runtime behavior. The first
+deployment invocation omitted the documented cloud opt-out and attempted the
+release-gated test without a Pulumi CLI; the supported opt-out rerun passed
+14 tests with one release-gated test skipped. Prior real AWS evidence still
+proves no-op, stable source moves, destroy, and independent cleanup. The known
+Konsistent findings remain advisory and non-blocking. Checkbox `17.18` is the
+next different unchecked unit and is ready for fresh same-directory handoff.
+
+# Task 17.14 status
+
+No active blocker or required-check failure remains. All public declaration,
+dependency/import, graph, generated-project, package, inspector, documentation,
+and scope scans passed; the generated-output source-scan false positive was
+fixed and rerun. The known Konsistent findings remain advisory and
+non-blocking. Checkbox `17.15` is the next different unchecked unit.
+
+# Task 17.13 status
+
+No active blocker or required-check failure remains. The recursive scanner,
+image-enabled scan, full verify pipeline, focused security/observability/
+deployment tests, temporary-type-link E2E rerun, typecheck, strict OpenSpec
+validation, formatting, and whitespace checks passed. The direct E2E startup
+limitation from missing external Next type packages was handled with
+disposable links and left no workspace changes; the known Konsistent finding
+remains advisory and non-blocking. Checkbox `17.14` is the next different
+unchecked unit.
+
+# Task 17.12 status
+
+No active blocker or required-check failure remains. The first release attempt
+stopped before resource creation because Pulumi needed a stack passphrase; an
+ephemeral process-only passphrase resolved that setup condition and the full
+AWS lifecycle then passed. Cleanup verification found zero live resources. The
+known `packages/cli/src/index.ts` Konsistent finding remains advisory and
+non-blocking. Checkbox `17.13` is the next different unchecked unit.
+
+# Task 17.11 status
+
+No active blocker, required-check failure, or rejected Gate 16 prerequisite
+remains. The packed artifact smoke and the fresh exact getting-started flow
+passed; the route, versioned graph API, test, check, build, and bounded
+Ctrl-C stop are recorded in `evidence/17.11/`. Only the resolved temporary
+project was removed.
+
+The default generator's approved Pulumi/AWS doctor checks were satisfied in
+the disposable harness with a local no-op `pulumi` and `AWS_PROFILE`; no cloud
+call or deployment was attempted. The known
+`packages/cli/src/index.ts` Konsistent finding remains advisory and
+non-blocking. Checkbox `17.12` is the next different unchecked unit.
+
+# Task 17.10 status
+
+No active blocker, required-check failure, or rejected Gate 16 prerequisite
+remains. `bun run test:container`, real Docker image build/reproducibility,
+non-root/content scans, health ordering, SIGTERM admission stop, cancellation,
+telemetry flush, and bounded exit all passed. The initial Dockerfile build
+failure from unavailable `addgroup`/`adduser` commands was fixed by reusing
+the base image's `bun` user; the final checks and evidence are clean. The
+known `packages/cli/src/index.ts` Konsistent finding remains advisory and
+non-blocking. Checkbox `17.11` is the next different unchecked unit.
+
+# Task 17.9 status
+
+No active blocker, required-check failure, or rejected Gate 16 prerequisite
+remains. The complete-fixture E2E suite passed 6/6, the fixed fail-fast
+verification passed, protected source checksums are unchanged, and temporary
+test-only type links were removed. The missing local Next external types are a
+known startup limitation handled by the documented temporary bootstrap; they
+did not change the manifest or lockfile. The configured
+`packages/cli/src/index.ts` Konsistent result remains advisory and
+non-blocking. Checkbox `17.10` is the next different unchecked unit.
+
 # Task 17.8 status
 
 No active blocker, required-check failure, or rejected Gate 16 prerequisite
@@ -2465,6 +2550,16 @@ No blocker or check/gate failure remains; a fresh same-directory task for checkb
 
 Fresh same-directory task `019ffc7e-816d-7180-9677-4f66b8739552` was dispatched for checkbox `3.4` on host `local` with the saved project/local target. Its one bounded `wait_threads(timeoutMs: 10000)` snapshot timed out while active/in progress; no blocker or user-input request was reported. The timeout is a successful handoff, not an active blocker.
 
+# Task 17.15 status
+
+No active blocker, required-check failure, or rejected Gate 16 prerequisite
+remains. Two distinct absolute-root runs produced identical graph, manifest,
+OpenAPI, client, deployment plan/program, package, and template bytes. The
+first checksum comparison found 10 stale package rows in `RELEASE_NOTES.md`;
+those rows were corrected and the documented checksum list now matches all 30
+packed packages and 3 templates. No package source, packing logic, protected
+source document, vendor tree, or later checkbox changed.
+
 ## Task 3.4 status
 
 Checkbox `3.4` is complete with no implementation blocker. The public function context now exposes the exact v3 invocation/source metadata, `AbortSignal`, readonly resolved environment, synchronous logger, and `Date`/Promise clock contracts; the new type fixture rejects all undeclared client names and `Effect.Effect` handler returns. `bun run test:types`, the combined prior-contract suite, typecheck, boundaries, repository verification, formatting, strict OpenSpec validation, and whitespace checks pass. Checkbox `3.5` is the next unchecked unit.
@@ -2606,3 +2701,15 @@ supports the template integration route, and the built dev server reports the
 version/identity metadata required by supervisor verification. The final
 packed smoke passed with 25 packages and 15.16 is complete; no active blocker
 remains and 15.17 is the next unchecked unit.
+
+# Task 17.16 status
+
+No active blocker or required-check failure remains. Five performance runs
+passed with stable structural outputs, and three repeated restart/resource
+runs passed without intermittent failures or leftover temporary state. The
+observed heap-delta variance is a measured, non-blocking GC-sensitivity
+follow-up recorded in `evidence/17.16/`; it is not a release threshold or
+implementation blocker. No Rust or speculative optimization was added.
+
+Checkbox `17.17` is the next different unchecked unit. It was not implemented
+here.

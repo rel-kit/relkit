@@ -102,6 +102,7 @@ export function streamResponse(
   };
   const subscription = stream.subscribe(subscriptionOptions);
   let closed = false;
+  let connected = false;
   const encoder = new TextEncoder();
   const close = (): void => {
     if (closed) return;
@@ -113,6 +114,11 @@ export function streamResponse(
   const body = new ReadableStream<Uint8Array>({
     async pull(controller) {
       try {
+        if (!connected) {
+          connected = true;
+          controller.enqueue(encoder.encode(": connected\n\n"));
+          return;
+        }
         while (!closed) {
           const result = await subscription.next();
           if (closed) return;

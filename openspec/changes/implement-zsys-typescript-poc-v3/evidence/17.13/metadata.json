@@ -1,0 +1,28 @@
+{
+  "task": "17.13",
+  "result": "passed",
+  "syntheticKeys": ["password", "authorization", "cookie", "apiKey"],
+  "artifactScan": {
+    "command": "ZSYS_SECURITY_IMAGE=sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54 bun run scripts/secret-scan.ts",
+    "exitCode": 0,
+    "filesScanned": 2579,
+    "bytesScanned": 586511872,
+    "rawMatches": 0,
+    "image": "sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54"
+  },
+  "dynamicSurfaces": {
+    "terminal": "passed",
+    "json": "passed",
+    "ndjson": "passed",
+    "requestApi": "passed",
+    "traceApi": "passed",
+    "sse": "passed",
+    "html": "passed",
+    "browserNetwork": "passed"
+  },
+  "protectedSourceChecksums": {
+    "technicalSpec": "d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183",
+    "reviewGates": "9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464"
+  },
+  "laterCheckboxesImplemented": false
+}

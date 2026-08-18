@@ -1,0 +1,10 @@
+bun test v1.3.10 (30e609e0)
+
+tests/deployment/aws-integration.test.ts:
+(pass) keeps source moves on stable deployment identities [13.51ms]
+(pass) creates, smokes, updates, and independently cleans an ephemeral AWS stack [1434268.68ms]
+
+ 2 pass
+ 0 fail
+ 21 expect() calls
+Ran 2 tests across 1 file. [1434.92s]

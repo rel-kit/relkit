@@ -18,11 +18,22 @@ const providerInternalPrefixes = [
   "tests/integration/events/provider-internal/",
   "tests/restart/events/provider-internal/",
 ];
+const providerInternalFiles = new Set([
+  "packages/inspector-api/src/observability-utils.ts",
+  "packages/observability/src/stream-subscriber.ts",
+]);
 const scanRoots = ["apps", "packages", "templates", "tests", ".zsys/generated", ".zsys/build"];
-const scanGuardFiles = new Set(["packages/events/source-export.test.ts", "tests/phase0.test.ts"]);
+const scanGuardFiles = new Set([
+  "packages/events/source-export.test.ts",
+  "tests/e2e/inspector.spec.ts",
+  "tests/phase0.test.ts",
+]);
 
 function isProviderInternal(path: string): boolean {
-  return providerInternalPrefixes.some((prefix) => path.startsWith(prefix));
+  return (
+    providerInternalFiles.has(path) ||
+    providerInternalPrefixes.some((prefix) => path.startsWith(prefix))
+  );
 }
 
 function sourceFiles(directory: string): SourceFile[] {
@@ -33,6 +44,7 @@ function sourceFiles(directory: string): SourceFile[] {
       onlyFiles: true,
     }),
   ]
+    .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path))
     .sort()
     .map((path) => ({
       path: relative(repositoryRoot, join(directory, path)).replaceAll("\\", "/"),

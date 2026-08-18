@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rename } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -93,10 +94,7 @@ export async function generateProject(
   }
   throwIfAborted(context.signal);
 
-  const templateRoot = resolve(
-    context.templateRoot ??
-      fileURLToPath(new URL("../../../templates/default/v1", import.meta.url)),
-  );
+  const templateRoot = resolveTemplateRoot(context);
   const template = join(templateRoot, options.template);
   let stage: string | undefined;
   let published = false;
@@ -175,4 +173,11 @@ export async function generateProject(
       : await cleanupStagedProject(stage, validated.destination);
     throw generationError(error, "ZSYS_CREATE_FAILED", cleanup);
   }
+}
+
+function resolveTemplateRoot(context: GenerateProjectContext): string {
+  if (context.templateRoot !== undefined) return resolve(context.templateRoot);
+  const packaged = fileURLToPath(new URL("../../../templates/default/v1", import.meta.url));
+  if (existsSync(packaged)) return resolve(packaged);
+  return resolve(context.cwd ?? process.cwd(), "templates/default/v1");
 }

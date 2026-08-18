@@ -1,3 +1,319 @@
+# Task 17.18 blocked on required human owner signatures
+
+Checkbox `17.18` remains unchecked. The seven owner rows in
+`RELEASE_CHECKLIST.md:146-152` have blank names, approvals, dates, and evidence
+references; the available `17.17` evidence also records that signatures remain
+intentionally blank. This worker cannot obtain or infer human approvals, and
+one person covering multiple roles would still need a separate approval in
+each applicable row.
+
+No product files, checklist rows, evidence, or 17.19–17.20 tasks were changed.
+The fresh same-directory task `01a01690-eaa4-7e33-88de-97103301180d` inspected
+the live OpenSpec state, required context, checklist, and prior evidence.
+`openspec validate implement-zsys-typescript-poc-v3 --strict`, focused
+formatting, and `git diff --check` passed after the blocker note was recorded.
+The next action is human owner review/reproduction and separate row-level
+sign-off; no next task is dispatched while this blocker remains.
+
+# Task 17.17 final Section 25 acceptance complete
+
+Checkbox `17.17` is complete; progress is now `284/287`. All 40 v3 Section 25
+criteria passed individually. Evidence is under `evidence/17.17/`.
+
+The focused authoring/compiler/graph matrix passed 26 tests and 374 assertions;
+the engine/runtime/recovery matrix passed 166 tests and 709 assertions; and the
+inspector/security/observability matrix passed 64 tests and 433 assertions.
+The local deployment suite passed 14 tests with one intentionally skipped
+release-gated AWS case after `ZSYS_AWS_INTEGRATION=0` was set. The previous
+release-gated AWS evidence remains valid: 66 resources created, a zero-change
+no-op, zero replacements after a source move, 66 resources destroyed, and zero
+live resources independently verified.
+
+The first broad inspector check found a stale read-only contract assertion that
+did not consume the stream's required `: connected` preamble. The test was
+corrected to assert and consume that frame; runtime behavior was unchanged and
+the isolated inspector matrix then passed. `bun run verify`, `bun run check`,
+`bun run typecheck`, `bun run test:types`, the recursive secret scan, public
+declaration scan, strict OpenSpec validation, focused Prettier, and
+`git diff --check` passed. The known Konsistent findings remain advisory.
+
+Changed files for this unit: `packages/inspector-api/contracts-readonly.test.ts`,
+the three durable change notes, `tasks.md`, and
+`evidence/17.17/{acceptance-report.md,metadata.json}`. No release checklist
+signatures, protected source documents, vendor files, or 17.18–17.20 work was
+changed.
+
+The next different unchecked unit is `17.18`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a01690-eaa4-7e33-88de-97103301180d` was
+dispatched on host `local` for checkbox `17.18` using the saved `zsys` project.
+One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out while
+the task remained active and in progress; startup commentary confirmed it is
+using the OpenSpec apply-change and iterator instructions and will not invent
+human signatures. Cursor:
+`92df5545-1994-4cd8-adbf-f7b2af4f77e2:2`.
+
+# Task 17.14 public-boundary and scope scans complete
+
+Checkbox `17.14` is complete; progress is now `281/287`. Evidence is under
+`evidence/17.14/`.
+
+The public declaration scan passed for 14 packages with no Effect, Hono,
+Next.js, Pulumi, AWS/cloud-client, or provider-client leakage. The dependency,
+import, and source scope scan passed across 34 roots and 768 TypeScript files.
+Focused graph/event tests found only approved node kinds and no subscription
+node or public subscription source. The generator matrix scanned every template
+and examples/install/Git combination; package manifests validated as the exact
+30-package v3 list; inspector navigation contained 15 allowed top-level paths;
+and the seven shipped documentation/release files had no stale topology or
+forbidden artifact names.
+
+The event source scan was corrected at its boundary to ignore generated `dist`,
+cache, and `.zsys` paths and allow only the two internal stream-subscription
+implementation files plus the E2E negative assertion. Public inspector API
+contracts remain covered. No product subsystem or later checkbox was added.
+
+### Checks
+
+`bun run verify`, `bun run test:types`, focused graph/source/generator/inspector
+tests, the aggregate package/navigation/documentation/scope scan, focused
+Prettier, `git diff --check`, and strict OpenSpec validation passed. The known
+Konsistent `package-entry-barrel` findings remain advisory and non-blocking.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a0166c-be0c-75a3-822c-d2ea3fafc65a` was
+dispatched on host `local` for checkbox `17.15` using the saved `zsys` project.
+One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out while
+the task remained active and in progress; startup commentary confirmed it is
+using the OpenSpec apply/iterator skills and limiting work to `17.15`. Cursor:
+`48b67cfd-4826-4918-b8f4-774853d9de0c:2`.
+
+# Task 17.13 recursive synthetic-secret scan complete
+
+Checkbox `17.13` is complete; progress is now `280/287`. The exact Section
+23.17 synthetic set is covered by the shared recursive matcher across terminal,
+JSON/NDJSON, request and trace APIs, SSE, inspector HTML/browser network
+responses, snapshots, graph/manifest artifacts, generated source, package
+build output, production image bytes, deployment plans, Pulumi reports, and
+cloud evidence. Reports and failure output contain only safe key names and
+locations.
+
+The release-wide scanner is `scripts/secret-scan.ts`, with artifact discovery
+in `scripts/secret-scan-files.ts`. `scripts/verify.ts`,
+`scripts/release-check.ts`, and the CI security job fail on any raw match. The
+image-enabled run scanned 2,579 files and 586,509,631 bytes plus the
+reproducible image `sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54`;
+all matches were zero. Evidence is under `evidence/17.13/`.
+
+### Checks
+
+`bun run verify`, `bun run typecheck`, `bun test tests/security`, the focused
+observability/deployment tests, the image-enabled scanner, temporary-type-link
+E2E rerun (6/6), focused Prettier, `git diff --check`, and strict OpenSpec
+validation passed. The direct E2E startup still has the documented missing
+external Next type-package limitation; temporary links were removed without
+changing the manifest or lockfile. The known Konsistent finding remains
+advisory and non-blocking.
+
+No 17.14 or later checkbox was implemented.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a01662-86ab-7150-9ca2-ca877da68344` was
+dispatched on host `local` for checkbox `17.14` using the saved `zsys` project.
+One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out while
+the task remained active and in progress; startup commentary confirmed it is
+using the OpenSpec apply/iterator skills and limiting work to `17.14`. Cursor:
+`b90909f3-d12f-456d-b303-dca4792a2760:2`.
+
+# Task 17.12 AWS deployment acceptance complete
+
+Checkbox `17.12` is complete; progress is now `279/287`. The deployment suite
+passed with `ZSYS_AWS_INTEGRATION=0` (14 passed, 1 release-gated test skipped,
+108 assertions), then the isolated release-gated AWS Automation API run passed
+2 tests with 21 assertions in 1434.92 seconds.
+
+The ephemeral stack was `zsys-nightly-1787078392190-14ac0016` in `us-east-1`
+using the redacted S3 backend recorded in `evidence/17.12/`. Initial up created
+66 resources, the no-op changed 0, source move preview/up updated 35 and left
+31 unchanged with zero replacements, and destroy deleted all 66. Job, event,
+bucket, cache, log, readiness, and CloudWatch marker checks passed. The test's
+cleanup and an independent post-run query both found zero live resources; the
+independent query returned five stale tag records classified as non-live.
+
+The first release attempt stopped before cloud resource creation because the
+new S3-backed stack required a Pulumi passphrase; the successful retry used an
+ephemeral process-only passphrase, which is not recorded. Only redacted
+reports and bounded command logs are retained in `evidence/17.12/`.
+
+### Checks
+
+| Command                                          | Result                                         |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `ZSYS_AWS_INTEGRATION=0 bun run test:deployment` | exit `0`; 14 passed, 1 skipped, 108 assertions |
+| release-gated AWS integration test               | exit `0`; 2 passed, 21 assertions              |
+
+`bun run typecheck`, `bun run verify`, `openspec validate
+implement-zsys-typescript-poc-v3 --strict`, focused evidence JSON/Prettier,
+and `git diff --check` also passed.
+
+No 17.13 or later checkbox was implemented. The known
+`packages/cli/src/index.ts` Konsistent finding remains advisory and
+non-blocking.
+
+### Next fresh-task handoff
+
+Fresh same-directory task `01a0164c-2718-7490-acd6-4ed21b01048b` was dispatched
+for checkbox `17.13` after selecting the saved local `zsys` project. The one
+bounded wait snapshot timed out after 10 seconds while the task was active and
+its first turn was still in progress; it reported no error.
+
+# Task 17.11 packed/getting-started acceptance complete
+
+Checkbox `17.11` is complete; progress is now `278/287`. The required packed
+artifact command passed with the exact output `packed create smoke passed (27
+packages)`. Evidence is under `evidence/17.11/`.
+
+The fresh temporary-project run used the exact documented command
+`bunx create-zsys@latest my-app`, then `bun install`, `bun run dev`, both
+documented `curl` requests, `Ctrl-C`, `bun run test`, `bun run check`, and
+`bun run build`. Every command returned exit `0` except the intentional
+`SIGINT` stop, which returned `130`; the route returned
+`{"message":"Hello, ZSys!"}`, and the inspector graph and manifest hashes
+matched at
+`sha256:0c00c9cd7ab37388964c7bf0461a0e402fcbc2e26fcf434b1e26e7011f286417`.
+Only the resolved project directory was removed; its exact path and the
+verified `projectRemoved=true` result are recorded in `evidence/17.11/`.
+
+The packed `create-zsys` entrypoint now executes the generator through its
+published `dist/index.js` bin, and the generator falls back to the copied
+`templates/default/v1` tree when Bun runs the package from its cache. No
+manifest, lockfile, documentation, protected source document, or vendor file
+changed. The disposable doctor setup used a local no-op Pulumi executable and
+`AWS_PROFILE=zsys-docs-smoke`; it made no deployment or cloud API calls.
+
+### Checks
+
+| Command                                                       | Result                                                                                 |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `bun run scripts/pack-and-smoke-create-zsys.ts`               | exit `0`; 27 packages                                                                  |
+| fresh packed getting-started flow                             | exit `0` for create/install/route/inspector/test/check/build; `SIGINT` stop exit `130` |
+| `bun run typecheck`                                           | exit `0`                                                                               |
+| `bun run verify`                                              | exit `0`; fixed fail-fast pipeline passed; known Konsistent finding remains advisory   |
+| `bun test tests/phase0.test.ts`                               | exit `0`; 22 tests, 105 assertions                                                     |
+| focused Prettier                                              | exit `0`                                                                               |
+| `git diff --check`                                            | exit `0`                                                                               |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict` | exit `0`                                                                               |
+
+No active blocker or rejected Gate 16 prerequisite remains. Prior 17.9 and
+17.10 work/evidence, `RELEASE_CHECKLIST.md`, `RELEASE_NOTES.md`, protected
+source documents, the vendor tree, and the intentional untracked iterator
+skill remain preserved. The next different unchecked unit is `17.12`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a01628-77c5-7d93-80f8-d8b057844e8f` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.12`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed
+out while the task remained active and in progress; startup commentary
+confirmed it is using the OpenSpec apply/iterator skills and limiting work to
+`17.12`. Cursor: `cbdc3e24-5f8f-4374-8329-9f70c14a25fa:2`.
+
+# Task 17.10 container evidence complete
+
+Checkbox `17.10` is complete; progress is now `277/287`. The exact
+`bun run test:container` command passed all 3 tests and 19 assertions. Real
+Docker image builds also passed after the generated Dockerfile was corrected
+to reuse the pinned Bun base image's existing non-root `bun` user; the base
+does not provide the previously generated `addgroup`/`adduser` commands.
+
+Two no-cache builds with `SOURCE_DATE_EPOCH=0` produced the same image ID
+`sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54`.
+The runtime image reported `uid=1000(bun)`, contained only the four expected
+production files under `/app`, and excluded `.env`, `.zsys/state`, and
+`.zsys/observability`. With a 1000ms provider delay, liveness returned 200
+before readiness returned 503 and then 200. The signal smoke returned 503 for
+new traffic, cancelled the in-flight request, flushed telemetry, and exited
+with code 0 in 801ms under a 500ms drain bound. Full evidence is under
+`evidence/17.10/`.
+
+### Checks
+
+| Command                                                                                      | Result                                                                               |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `bun run test:container`                                                                     | exit `0`; 3 pass, 19 assertions                                                      |
+| Docker reproducibility build                                                                 | exit `0`; identical image IDs with `SOURCE_DATE_EPOCH=0`                             |
+| `bunx prettier --check packages/cli/src/commands/build.ts tests/container/lifecycle.test.ts` | exit `0`                                                                             |
+| `bun run verify`                                                                             | exit `0`; fixed fail-fast pipeline passed; known Konsistent finding remains advisory |
+| `bun run typecheck`                                                                          | exit `0`                                                                             |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict`                                | exit `0`                                                                             |
+| `git diff --check`                                                                           | exit `0`                                                                             |
+
+No active blocker or rejected Gate 16 prerequisite remains. Protected source
+checksums, prior 17.9 work/evidence, the vendor tree, and the intentional
+untracked iterator skill remain preserved. The next different unchecked unit
+is `17.11`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a0160b-d8a2-70f3-bf36-0928583c70b7` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.11`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirmed
+it is using the OpenSpec apply/iterator skills and limiting work to `17.11`.
+Cursor: `0d2571b0-5884-4a1d-89ca-9b0fb2dc4e7b:2`. The timeout is a successful
+handoff result, not a blocker.
+
+# Task 17.9 inspector E2E complete
+
+Checkbox `17.9` is complete; progress is now `276/287`. The final
+`bun run test:e2e` run against the complete commerce fixture passed all 6
+tests with 1 worker in `12.0s`. Evidence is under `evidence/17.9/`.
+
+The E2E matrix captured the active graph hash
+`sha256:commerce-inspector-fixture-v1`, every required top-level and exercised
+detail page, live request/log/trace correlation, invalid-candidate preservation
+for `commerce-generation-1`, event-trigger terminology without subscription
+text, local dead-letter retry, agent tool timeline, project-relative source
+links, 390px responsiveness, critical semantic controls, and zero bundle or
+network boundary violations. The bundle scan covered 96 browser files and 470
+server files.
+
+### Checks
+
+| Command                                                                                              | Result                                    |
+| ---------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `bun run test:e2e`                                                                                   | exit `0`; 6/6 passed in `12.0s`           |
+| `bun run verify`                                                                                     | exit `0`; fixed fail-fast pipeline passed |
+| `bun run test:inspector`                                                                             | exit `0`; 5 tests, 27 assertions          |
+| `bun run typecheck`                                                                                  | exit `0`                                  |
+| `bun test packages/inspector-api/observability.test.ts packages/inspector-api/inspector-api.test.ts` | exit `0`; 6 tests, 43 assertions          |
+| focused Prettier and `git diff --check`                                                              | exit `0`                                  |
+
+The first direct E2E startup attempt hit the existing missing external Next
+type-package limitation. The successful run used temporary external links to
+`@types/react@19.2.18` and `@types/node@26.2.0`, then removed the links and
+temporary directory without changing the manifest or lockfile. The SSE
+heartbeat, current `.next/dev` scan fallback, and plural bucket collection
+mapping are minimal fixes required for the complete fixture flow. The known
+`packages/cli/src/index.ts` Konsistent finding remains advisory/non-blocking.
+
+No `17.10` or later checkbox was implemented. The protected v3 source document
+checksums remain unchanged, and the intentional untracked
+`.agents/skills/openspec-iterator/SKILL.md` remains preserved.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a015fd-5070-75b1-bdf0-e9fde5ca299c` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.10`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirms it
+is implementing only `17.10` and preserving the existing 17.9 worktree. Cursor:
+`679d50c4-f9a4-48fd-af3c-664e305a9f13:3`.
+
 # Task 17.8 clean-checkout verification complete
 
 Checkbox `17.8` is complete; progress is now `275/287`. From clean tracked
@@ -8,11 +324,11 @@ are under `evidence/17.8/`.
 
 ### Checks
 
-| Command | Exit | Duration | Evidence |
-| --- | ---: | ---: | --- |
-| `bun install --frozen-lockfile` | 0 | 27.594 ms | `bun-install.stdout.txt`, `bun-install.stderr.txt` |
-| `bun run verify` | 0 | 47,473.671 ms | `bun-verify.stdout.txt`, `bun-verify.stderr.txt` |
-| `git diff --exit-code --binary --no-ext-diff` | 0 | 19.067 ms | empty generated diff artifacts |
+| Command                                       | Exit |      Duration | Evidence                                           |
+| --------------------------------------------- | ---: | ------------: | -------------------------------------------------- |
+| `bun install --frozen-lockfile`               |    0 |     27.594 ms | `bun-install.stdout.txt`, `bun-install.stderr.txt` |
+| `bun run verify`                              |    0 | 47,473.671 ms | `bun-verify.stdout.txt`, `bun-verify.stderr.txt`   |
+| `git diff --exit-code --binary --no-ext-diff` |    0 |     19.067 ms | empty generated diff artifacts                     |
 
 The verify transcript includes frozen-install no-diff and generated-file
 no-diff success, all fixed fail-fast checks, and the known non-blocking
@@ -52,7 +368,7 @@ implemented and `RELEASE_NOTES.md` was not modified.
 | `git diff --check`                                            | exit `0`                                                                                                                                                                      |
 | `openspec validate implement-zsys-typescript-poc-v3 --strict` | valid                                                                                                                                                                         |
 | `bun run verify`                                              | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts`                                                          |
-| `bun run scripts/release-check.ts`                            | exit `0`; 30 packages, 30 packed artifacts, 3 templates, fingerprint `f4e352d69f2a7b1862318b26d0bdcd993f9b9b075cef2182250bb5a42ac5c78a` |
+| `bun run scripts/release-check.ts`                            | exit `0`; 30 packages, 30 packed artifacts, 3 templates, fingerprint `f4e352d69f2a7b1862318b26d0bdcd993f9b9b075cef2182250bb5a42ac5c78a`                                       |
 | approved v3 source document checksums                         | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
 
 No active blocker remains. The only untracked path is the intentional local
@@ -81,13 +397,13 @@ is not documented as a runnable check.
 
 ### Checks
 
-| Command | Result |
-| --- | --- |
-| `bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md` | exit `0` |
-| `git diff --check` | exit `0` |
-| `openspec validate implement-zsys-typescript-poc-v3 --strict` | valid |
-| `bun run verify` | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts` |
-| approved v3 source document checksums | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
+| Command                                                                                                                         | Result                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md` | exit `0`                                                                                                                                                                      |
+| `git diff --check`                                                                                                              | exit `0`                                                                                                                                                                      |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict`                                                                   | valid                                                                                                                                                                         |
+| `bun run verify`                                                                                                                | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts`                                                          |
+| approved v3 source document checksums                                                                                           | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
 
 No later checkbox was implemented. The only untracked path remains the
 intentional local `.agents/skills/openspec-iterator/SKILL.md`; no vendor or
@@ -126,11 +442,11 @@ the computed output and enforces the clean-worktree rule.
 
 ### Checks
 
-| Command | Result |
-| --- | --- |
-| `bun run scripts/release-check.ts --write-notes` | exit `0`; 30 packages/artifacts, 3 templates, packed generator smoke, declaration scan, boundary/scope scan, checksums, and deterministic notes output passed |
-| `bunx prettier --check scripts/release-check.ts scripts/release-check-support.ts scripts/release-check-artifacts.ts` | exit `0` |
-| focused `bunx tsc --noEmit ... scripts/release-check*.ts` | exit `0` |
+| Command                                                                                                              | Result                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run scripts/release-check.ts --write-notes`                                                                     | exit `0`; 30 packages/artifacts, 3 templates, packed generator smoke, declaration scan, boundary/scope scan, checksums, and deterministic notes output passed |
+| `bunx prettier --check scripts/release-check.ts scripts/release-check-support.ts scripts/release-check-artifacts.ts` | exit `0`                                                                                                                                                      |
+| focused `bunx tsc --noEmit ... scripts/release-check*.ts`                                                            | exit `0`                                                                                                                                                      |
 
 No later checkbox was implemented. The only untracked path remains the
 intentional local `.agents/skills/openspec-iterator/SKILL.md`; no vendor or
@@ -8282,3 +8598,113 @@ nine truthful later-suite `NOT RUN` placeholders); focused Prettier;
 --check`.
 
 Progress is now `241/287`; the next different unchecked unit is `15.15`.
+
+# Task 17.10 container evidence complete
+
+Checkbox `17.10` is complete; progress is now `277/287`. The exact
+`bun run test:container` command passed all 3 tests and 19 assertions. Real
+Docker image builds also passed after the generated Dockerfile was corrected
+to reuse the pinned Bun base image's existing non-root `bun` user; the base
+does not provide the previously generated `addgroup`/`adduser` commands.
+
+Two no-cache builds with `SOURCE_DATE_EPOCH=0` produced the same image ID
+`sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54`.
+The runtime image reported `uid=1000(bun)`, contained only the four expected
+production files under `/app`, and excluded `.env`, `.zsys/state`, and
+`.zsys/observability`. With a 1000ms provider delay, liveness returned 200
+before readiness returned 503 and then 200. The signal smoke returned 503 for
+new traffic, cancelled the in-flight request, flushed telemetry, and exited
+with code 0 in 801ms under a 500ms drain bound. Full evidence is under
+`evidence/17.10/`.
+
+### Checks
+
+| Command                                                                                      | Result                                                                               |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `bun run test:container`                                                                     | exit `0`; 3 pass, 19 assertions                                                      |
+| Docker reproducibility build                                                                 | exit `0`; identical image IDs with `SOURCE_DATE_EPOCH=0`                             |
+| `bunx prettier --check packages/cli/src/commands/build.ts tests/container/lifecycle.test.ts` | exit `0`                                                                             |
+| `bun run verify`                                                                             | exit `0`; fixed fail-fast pipeline passed; known Konsistent finding remains advisory |
+| `bun run typecheck`                                                                          | exit `0`                                                                             |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict`                                | exit `0`                                                                             |
+| `git diff --check`                                                                           | exit `0`                                                                             |
+
+No active blocker or rejected Gate 16 prerequisite remains. Protected source
+checksums, prior 17.9 work/evidence, the vendor tree, and the intentional
+untracked iterator skill remain preserved. The next different unchecked unit
+is `17.11`.
+
+### Next fresh-task handoff
+
+# Task 17.15 generated determinism and checksum evidence
+
+Checkbox `17.15` is complete; progress is now `282/287`. The existing
+compiler/graph/OpenAPI/client/deployment/Pulumi checks passed with 19 tests and
+264 assertions. Two distinct absolute compiler roots, reversed candidate order,
+and different evaluator identities produced identical graph bytes, graph hash,
+manifest bytes/contract/hash, OpenAPI, client, deployment plan, and Pulumi
+program bytes. The program contained no temporary project root.
+
+Two distinct absolute package/template roots produced identical packed bytes
+for all 30 packages and template-tree bytes for all 3 templates. The initial
+documented checksum comparison found 10 stale package hashes in
+`RELEASE_NOTES.md`; the current hashes were updated there, the release input
+fingerprint remained `f4e352d69f2a7b1862318b26d0bdcd993f9b9b075cef2182250bb5a42ac5c78a`,
+and the final documented list comparison passed. Full evidence is under
+`evidence/17.15/`.
+
+Changed files for this unit: `RELEASE_NOTES.md`,
+`openspec/changes/implement-zsys-typescript-poc-v3/tasks.md`, the three durable
+change notes, and `evidence/17.15/{acceptance-report.md,metadata.json}`. No
+source implementation, template, lockfile, protected normative document,
+vendor tree, or 17.16+ behavior changed.
+
+The next different unchecked unit is `17.16`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a0167d-6f9d-7be1-83e2-1b14db2e2415` was
+dispatched on host `local` for checkbox `17.16` using the saved `zsys` project.
+One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out while
+the task remained active and in progress; startup commentary confirmed it is
+using the OpenSpec apply/iterator skills and limiting work to `17.16`.
+
+# Task 17.16 performance baseline and stability complete
+
+Checkbox `17.16` is complete; progress is now `283/287`. The existing
+`bun run scripts/performance.ts` harness ran five times successfully on Bun
+`1.3.10`, Node `v24.3.0`, Darwin `24.6.0` arm64, Apple M1 Pro, 10 cores, and
+16 GiB. The first structurally stable run is stored in
+`evidence/17.16/metadata.json`, with all repeated measurements and the
+environment recorded.
+
+The baseline covers 100/1,000/10,000 descriptor compilation, graph bytes and
+heap deltas, warm direct/route/stream overhead, local job throughput, eight-way
+event fan-out, 1,000-node inspector layout, and candidate activation. Graph
+bytes/hashes, node/completion counts, layout dimensions, and exit codes were
+stable across all five runs; thresholds remain unset.
+
+The restart/resource command
+`bun test tests/restart tests/integration/engine/fixture-resources.test.ts`
+passed three consecutive runs (7 tests, 41 assertions each). No matching
+temporary `/tmp/zsys-*` roots remained, and the performance harness closes its
+job/event fakes. The only measured follow-up is GC-sensitive heap variance at
+10,000 descriptors; it is diagnostic-only and requires controlled profiling
+before a memory budget is set. No Rust, speculative optimization, or release
+scope change was added.
+
+Evidence: `evidence/17.16/{acceptance-report.md,metadata.json}`.
+
+Changed files for this unit: the three durable change notes, `tasks.md`, and
+`evidence/17.16/{acceptance-report.md,metadata.json}`. No performance harness,
+runtime, test, template, normative document, release-note, or vendor source
+changed. The next different unchecked unit is `17.17`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a01688-0824-78a3-92f1-31cc7c66367b` was
+dispatched on host `local` for checkbox `17.17` using the saved `zsys` project.
+One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out while
+the task remained active and in progress; startup commentary confirmed it is
+using the OpenSpec apply/iterator skills and limiting work to `17.17`.
+Cursor: `1ff4d236-1cd1-40bc-b072-bfbb2cecadf7:2`.

@@ -91,6 +91,7 @@ async function main(): Promise<void> {
   const rootManifest = await readJson(join(root, "package.json"));
   const { version, summary } = checkManifests(items);
   await command(bun, ["run", "build"]);
+  await command(bun, ["run", "scripts/secret-scan.ts"]);
   const templates = await templateInputs(version, rootManifest);
   const artifacts = await packAll(items, version);
   await command(bun, ["run", "check"]);

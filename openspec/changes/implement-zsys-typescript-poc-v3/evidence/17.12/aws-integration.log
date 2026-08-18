@@ -1,0 +1,58 @@
+bun test v1.3.10 (30e609e0)
+
+tests/deployment/aws-integration.test.ts:
+(pass) keeps source moves on stable deployment identities [15.49ms]
+76 |             ? new StackAlreadyExistsError(result)
+77 |             : stderr.indexOf(conflictText) >= 0
+78 |                 ? new ConcurrentUpdateError(result)
+79 |                 : stderr.indexOf(diyBackendConflictText) >= 0
+80 |                     ? new ConcurrentUpdateError(result)
+81 |                     : new CommandError(result);
+                           ^
+CommandError: code: -2
+ stdout: 
+ stderr: Command failed with exit code 1: pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive
+error: could not create secrets manager for new stack: passphrase must be set with PULUMI_CONFIG_PASSPHRASE or PULUMI_CONFIG_PASSPHRASE_FILE environment variables
+ err?: Error: Command failed with exit code 1: pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive
+error: could not create secrets manager for new stack: passphrase must be set with PULUMI_CONFIG_PASSPHRASE or PULUMI_CONFIG_PASSPHRASE_FILE environment variables
+
+ commandResult: CommandResult {
+  stdout: "",
+  stderr: "Command failed with exit code 1: pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive\nerror: could not create secrets manager for new stack: passphrase must be set with PULUMI_CONFIG_PASSPHRASE or PULUMI_CONFIG_PASSPHRASE_FILE environment variables",
+  code: -2,
+  err: 55 | 
+56 | 	if (isError) {
+57 | 		error.originalMessage = error.message;
+58 | 		error.message = message;
+59 | 	} else {
+60 | 		error = new Error(message);
+                   ^
+error: Command failed with exit code 1: pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive
+error: could not create secrets manager for new stack: passphrase must be set with PULUMI_CONFIG_PASSPHRASE or PULUMI_CONFIG_PASSPHRASE_FILE environment variables
+ shortMessage: "Command failed with exit code 1: pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive",
+    command: "pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive",
+ escapedCommand: "pulumi stack init zsys-nightly-1787078371345-d3e16db1 --non-interactive",
+   exitCode: 1,
+     signal: undefined,
+ signalDescription: undefined,
+     stdout: "",
+     stderr: "error: could not create secrets manager for new stack: passphrase must be set with PULUMI_CONFIG_PASSPHRASE or PULUMI_CONFIG_PASSPHRASE_FILE environment variables",
+     failed: true,
+   timedOut: false,
+ isCanceled: false,
+     killed: false,
+
+      at makeError (/Users/mustafaelsayed/Workspace/zsys/node_modules/.bun/execa@5.1.1/node_modules/execa/lib/error.js:60:15)
+      at <anonymous> (/Users/mustafaelsayed/Workspace/zsys/node_modules/.bun/execa@5.1.1/node_modules/execa/index.js:118:26)
+,
+  toString: [Function: toString],
+},
+
+      at createCommandError (/Users/mustafaelsayed/Workspace/zsys/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/errors.js:81:23)
+      at exec (/Users/mustafaelsayed/Workspace/zsys/node_modules/.bun/@pulumi+pulumi@3.258.0+ca84541ac88a3075/node_modules/@pulumi/pulumi/automation/cmd.js:195:24)
+(fail) creates, smokes, updates, and independently cleans an ephemeral AWS stack [4155.82ms]
+
+ 1 pass
+ 1 fail
+ 2 expect() calls
+Ran 2 tests across 1 file. [4.85s]

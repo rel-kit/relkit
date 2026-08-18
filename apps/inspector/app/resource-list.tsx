@@ -11,9 +11,10 @@ export function ResourceList({ kind }: { readonly kind: ResourceKind }) {
 
   useEffect(() => {
     const api = createInspectorClient();
+    const collection = kind === "bucket" ? "buckets" : "cache";
     void Promise.all([
-      api.list<InspectorObject>(kind, { limit: 100 }),
-      api.runtimeList<InspectorObject>(kind, { limit: 100 }),
+      api.list<InspectorObject>(collection, { limit: 100 }),
+      api.runtimeList<InspectorObject>(collection, { limit: 100 }),
     ])
       .then(
         ([nodes, runtime]: [InspectorPage<InspectorObject>, InspectorPage<InspectorObject>]) => {

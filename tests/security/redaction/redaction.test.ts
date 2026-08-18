@@ -38,6 +38,7 @@ import {
   type JsonLogSink,
 } from "../../../packages/runtime-effect/src/logger.ts";
 import { installObservabilityEndpoints } from "../../../packages/inspector-api/src/index.ts";
+import { assertNoRawSyntheticSecrets } from "../../../scripts/secret-scan.ts";
 
 const secrets = Object.freeze({
   password: "super-secret-password",
@@ -470,21 +471,5 @@ async function readTree(root: string): Promise<readonly string[]> {
 }
 
 function assertNoSecrets(label: string, value: unknown): void {
-  const leaks: string[] = [];
-  const visit = (current: unknown, path: string): void => {
-    if (typeof current === "string") {
-      for (const [name, secret] of Object.entries(secrets))
-        if (current.includes(secret)) leaks.push(`${path}.${name}`);
-      return;
-    }
-    if (Array.isArray(current)) {
-      current.forEach((entry, index) => visit(entry, `${path}[${index}]`));
-      return;
-    }
-    if (current !== null && typeof current === "object")
-      Object.entries(current).forEach(([key, entry]) => visit(entry, `${path}.${key}`));
-  };
-  visit(value, "$");
-  if (leaks.length > 0)
-    throw new Error(`${label} contains raw synthetic secret at ${leaks.join(", ")}`);
+  assertNoRawSyntheticSecrets(label, value);
 }

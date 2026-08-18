@@ -210,6 +210,7 @@ jobs:
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
           bun run test:security 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/redaction.log"
+          bun run scripts/secret-scan.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/secret-scan.log"
           bun run scripts/check-public-declarations.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/public-declarations.log"
           bun run scripts/check-observability-sinks.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/observability-sinks.log"
           bun test tests/agents/source-boundaries.test.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/agent-boundaries.log"

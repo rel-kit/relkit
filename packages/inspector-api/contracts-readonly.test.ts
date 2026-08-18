@@ -108,6 +108,8 @@ describe("inspector read-only contract matrix", () => {
     );
     expectResponse(response, 200);
     const reader = response.body!.getReader();
+    const connected = new TextDecoder().decode((await reader.read()).value);
+    expect(connected).toBe(": connected\n\n");
     const frame = new TextDecoder().decode((await reader.read()).value);
     await reader.cancel();
     expect(frame).toContain("event: generation.changed");

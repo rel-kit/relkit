@@ -54,8 +54,7 @@ test("builds reproducible production context without local env or state", async 
   const dockerfile = firstBytes.get("Dockerfile") ?? "";
   const dockerignore = firstBytes.get(".dockerignore") ?? "";
   expect(dockerfile).toContain("FROM oven/bun:1.3.10");
-  expect(dockerfile).toContain("adduser --system --ingroup zsys zsys");
-  expect(dockerfile).toContain("USER zsys");
+  expect(dockerfile).toContain("USER bun");
   expect(dockerfile).toContain("STOPSIGNAL SIGTERM");
   expect(dockerfile).not.toContain("COPY .");
   expect(dockerignore).toContain(".env");

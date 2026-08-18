@@ -51,8 +51,14 @@ export async function scanInspectorImports(root: string): Promise<InspectorImpor
 }
 
 export async function scanInspectorBundles(root: string): Promise<InspectorBundleScan> {
-  const browser = await bundleFiles(resolve(root, "apps/inspector/.next/static"));
-  const server = await bundleFiles(resolve(root, "apps/inspector/.next/server"));
+  const browser = await firstBundleFiles([
+    resolve(root, "apps/inspector/.next/static"),
+    resolve(root, "apps/inspector/.next/dev/static"),
+  ]);
+  const server = await firstBundleFiles([
+    resolve(root, "apps/inspector/.next/server"),
+    resolve(root, "apps/inspector/.next/dev/server"),
+  ]);
   const violations: string[] = [];
   for (const [kind, files] of [
     ["browser", browser],
@@ -93,6 +99,14 @@ async function bundleFiles(directory: string): Promise<string[]> {
   } catch {
     return [];
   }
+}
+
+async function firstBundleFiles(directories: readonly string[]): Promise<string[]> {
+  for (const directory of directories) {
+    const files = await bundleFiles(directory);
+    if (files.length > 0) return files;
+  }
+  return [];
 }
 
 async function filesUnder(directory: string): Promise<string[]> {

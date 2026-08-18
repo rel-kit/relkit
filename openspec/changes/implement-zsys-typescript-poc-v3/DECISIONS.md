@@ -1,3 +1,130 @@
+# Task 17.17 decisions
+
+- Verify all 40 Section 25 rows in one evidence table and carry forward the
+  already accepted `17.9`–`17.16` artifacts instead of creating another
+  release-test framework.
+- Keep release checklist rows, owner names/signatures, and Gate 16 approval
+  untouched; those facts belong to later acceptance checkboxes.
+- Correct the read-only inspector test to consume its existing connection
+  preamble before reading the published event. The protocol implementation was
+  already covered by the dedicated stream tests, so changing runtime behavior
+  would have broadened this verification unit unnecessarily.
+- Run the local deployment suite with `ZSYS_AWS_INTEGRATION=0`; retain the
+  release-gated AWS create/no-op/source-move/destroy/cleanup record from
+  `evidence/17.12` rather than making a new cloud mutation for this checklist.
+
+# Task 17.15 decisions
+
+- Reuse the existing compiler fixture, graph/OpenAPI/client generators,
+  provider-neutral planner, Pulumi renderer, and release pack/template helpers;
+  add no second release pipeline or product abstraction for this evidence-only
+  verification unit.
+- Treat the 10 release-note package rows that differed from current packed
+  bytes as stale documentation, not nondeterminism: both absolute-root pack
+  runs were identical. Update only those documented hashes and preserve the
+  release input fingerprint, template hashes, package source, and pack logic.
+- Use reversed candidate enumeration and distinct generation identities for the
+  two compiler runs, and exclude only the caller-selected project directory
+  field from Pulumi program comparison. The rendered program bytes themselves
+  must remain path-independent.
+
+# Task 17.14 decisions
+
+- Reuse the existing declaration, boundary/scope, compiler, generator,
+  inspector, manifest, and documentation checks instead of adding a second
+  release-scan framework.
+- Treat generated `dist`, cache, and `.zsys` outputs as non-authored source;
+  allow only the two internal stream-subscription implementation files and the
+  E2E negative assertion that intentionally mention provider mechanics or the
+  rejected UI term. Keep public inspector contracts in the scan.
+- Validate package names/exports/dependencies through the existing manifest
+  validator and compare inspector navigation against the approved v3 route
+  set. Record only 17.14; leave determinism, performance, final acceptance,
+  signatures, reproduction, and Gate 16 approval to later checkboxes.
+
+# Task 17.13 decisions
+
+- Reuse the exact Section 23.17 synthetic set in one shared recursive matcher;
+  report only safe key names and source locations so scan failures cannot leak
+  the values being protected.
+- Scan the bounded release surfaces already produced by the repository:
+  generated/build output, browser output, test artifacts, package dist files,
+  deployment evidence, release documents, and optional `docker save` bytes
+  selected by `ZSYS_SECURITY_IMAGE`. Do not scan source files containing the
+  intentional test fixtures themselves.
+- Wire the scanner into verify, release-check, and the CI security job, and
+  reuse the matcher in dynamic redaction/browser checks. Record only 17.13;
+  leave 17.14 and later release gates to their owning tasks.
+
+# Task 17.12 decisions
+
+- Run the deployment script with the cloud case explicitly disabled for its
+  short local suite, then run the release-gated AWS test separately with the
+  required long timeout; this keeps the root suite's local checks meaningful
+  while allowing the real isolated lifecycle to finish.
+- Use a process-only random `PULUMI_CONFIG_PASSPHRASE` for the new S3-backed
+  ephemeral stack. Do not persist the passphrase or raw Pulumi debug transcript;
+  retain only redacted aggregate reports and command outcomes.
+- Reuse the existing Automation API lifecycle and cleanup verification. Record
+  only checkbox `17.12`; leave synthetic-secret scanning and all later release
+  gates to their owning checkboxes.
+
+# Task 17.11 decisions
+
+- Make the existing `create-zsys` package bin a real executable by keeping the
+  public exports and adding the smallest `import.meta.main` wrapper around the
+  existing normalizer/generator/output functions. Preserve structured JSON
+  errors and the established usage/failure exit codes.
+- Resolve the default template from the installed package first, then from the
+  current packed-project working tree. Bun executes `bunx` packages from its
+  cache, while the release smoke stages the template tree beside the temporary
+  parent, so this keeps published execution independent of workspace-relative
+  source paths.
+- Reuse the existing packed local registry and smoke command. For the exact
+  documented default create command, satisfy the generator's approved Pulumi/
+  AWS doctor prerequisites with a disposable no-op Pulumi binary and named
+  `AWS_PROFILE`; do not invoke deployment or cloud APIs.
+- Record only checkbox `17.11`; leave deployment, security scanning, boundary
+  scanning, determinism, performance, and later release acceptance to their
+  owning checkboxes.
+
+# Task 17.10 decisions
+
+- Reuse the pinned Bun base image's existing `bun` user instead of adding a
+  second account layer. The base is Debian and lacks `addgroup`/`adduser`; the
+  existing user is already non-root and removes build-time account metadata
+  that made otherwise identical image builds differ.
+- Use Docker BuildKit's explicit `SOURCE_DATE_EPOCH=0` build argument for
+  image digest reproducibility. The generated Dockerfile declares the accepted
+  argument, while the repository's lifecycle test continues to prove
+  deterministic production-context bytes independently of Docker availability.
+- Keep real image execution as evidence for 17.10 only: inspect `/app`, health
+  ordering, and the SIGTERM lifecycle in a disposable local Docker container;
+  do not add registry publication, cloud deployment, or 17.11 project-smoke
+  behavior.
+
+# Task 17.9 decision
+
+- Keep the complete fixture acceptance in the existing Playwright suite. Add
+  one semantic required-page matrix and extend the live request flow to cover
+  logs, traces, trace detail, and the resource detail pages; do not create a
+  second browser harness or duplicate fixture state.
+- Fix the shared SSE response seam with one immediate `: connected` comment so
+  browser fetch resolves before the first event. The test waits for the
+  semantic `Live: connected` status before publishing the live request, which
+  removes the subscription race without changing event semantics.
+- Translate the singular resource view kind to the versioned API's `buckets`
+  collection in both list and detail clients. Keep the existing `cache`
+  collection unchanged; no API aliases or new abstraction are needed.
+- Make the bundle scan recognize Next's current `.next/dev` output with a
+  legacy-directory fallback. Continue scanning the actual emitted bundles and
+  keep the existing forbidden-payload rules.
+- Use temporary external React/Node type links only to start the current
+  Bun/Next development server. Remove them after E2E, make no dependency or
+  lockfile change, and record the limitation in the evidence rather than
+  treating it as a product dependency.
+- Record only checkbox `17.9`; `17.10` remains the next unchecked unit.
+
 # Task 17.8 decision
 
 - Treat the checkout as clean under the repository's existing release
@@ -3351,3 +3478,16 @@ context)`, so `zsys create` cannot drift from the standalone generator.
 - Preserve a Pulumi-managed `backend:` stanza when refreshing generated
   `Pulumi.yaml`; the generated project remains deterministic on a fresh root,
   while repeated CLI operations retain the explicitly selected backend.
+
+# Task 17.16 performance baseline decisions
+
+- Reuse the existing `scripts/performance.ts` harness and record its first
+  structurally stable result after repeated isolated runs; do not add a second
+  benchmark framework, threshold, or product optimization.
+- Treat stable graph bytes/hashes, completion counts, layout dimensions, and
+  successful process exits as the stability signal. Keep short-run timing and
+  heap deltas as baseline diagnostics until a measured regression justifies a
+  controlled profiler.
+- Record the observed 10,000-descriptor heap-delta range as the only measured
+  follow-up. No Rust work or speculative release-scope optimization is
+  warranted by the current evidence.

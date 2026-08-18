@@ -97,6 +97,14 @@ bun run scripts/pack-and-smoke-create-zsys.ts
 bun run scripts/performance.ts
 ```
 
+For the release-wide synthetic-secret artifact scan, optionally set
+`ZSYS_SECURITY_IMAGE` to the locally built image reference so its saved bytes
+are scanned too:
+
+```sh
+ZSYS_SECURITY_IMAGE=<image-reference> bun run scripts/secret-scan.ts
+```
+
 Release acceptance additionally uses:
 
 ```sh

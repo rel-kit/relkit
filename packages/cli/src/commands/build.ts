@@ -121,11 +121,11 @@ function failure(
 
 function dockerfile(): string {
   return `FROM oven/bun:1.3.10
+ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
-RUN addgroup --system zsys && adduser --system --ingroup zsys zsys
 COPY server/index.js ./server/index.js
 COPY application.graph.json manifest.json openapi.json ./
-USER zsys
+USER bun
 ENV NODE_ENV=production
 EXPOSE 3000
 STOPSIGNAL SIGTERM

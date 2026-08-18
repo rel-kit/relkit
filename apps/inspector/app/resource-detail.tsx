@@ -16,9 +16,10 @@ export function ResourceDetail({ kind }: { readonly kind: ResourceKind }) {
   useEffect(() => {
     if (id === "") return;
     const api = createInspectorClient();
+    const collection = kind === "bucket" ? "buckets" : "cache";
     void Promise.all([
-      api.detail<InspectorObject>(kind, id),
-      api.runtimeList<InspectorObject>(kind, { limit: 100 }),
+      api.detail<InspectorObject>(collection, id),
+      api.runtimeList<InspectorObject>(collection, { limit: 100 }),
     ])
       .then(([detail, runtime]: [InspectorObject, InspectorPage<InspectorObject>]) => {
         const node = record(detail.node) ?? record(detail.descriptor) ?? record(detail);

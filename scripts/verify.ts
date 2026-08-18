@@ -143,6 +143,7 @@ async function main(): Promise<void> {
   const buildState = await gitState();
   await run("build", bun, ["run", "build"]);
   assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
+  await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
   await run("security and redaction tests", bun, ["run", "test:security"]);
   await run("public declaration leak scan", bun, ["run", "scripts/check-public-declarations.ts"]);

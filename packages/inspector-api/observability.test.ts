@@ -107,8 +107,10 @@ describe("inspector observability endpoints", () => {
     });
     expect(response.headers.get("content-type")).toContain("text/event-stream");
     const reader = response.body!.getReader();
-    const first = await reader.read();
-    const text = new TextDecoder().decode(first.value);
+    const connected = await reader.read();
+    expect(new TextDecoder().decode(connected.value)).toBe(": connected\n\n");
+    const event = await reader.read();
+    const text = new TextDecoder().decode(event.value);
     expect(text).toContain("id: 1");
     expect(text).toContain("event: log.emitted");
     expect(text).toContain('"protocol":"zsys.observability.stream"');
@@ -133,8 +135,10 @@ describe("inspector observability endpoints", () => {
 
     const response = await service.request(`${API_BASE_PATH}/stream?type=generation.changed`);
     const reader = response.body!.getReader();
-    const first = await reader.read();
-    const text = new TextDecoder().decode(first.value);
+    const connected = await reader.read();
+    expect(new TextDecoder().decode(connected.value)).toBe(": connected\n\n");
+    const event = await reader.read();
+    const text = new TextDecoder().decode(event.value);
     expect(text).toContain("id: 1");
     expect(text).toContain("event: generation.changed");
     expect(text).toContain('"generationId":"generation-2"');
