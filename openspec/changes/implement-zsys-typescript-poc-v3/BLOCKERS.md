@@ -1,3 +1,13 @@
+# Task 17.8 status
+
+No active blocker, required-check failure, or rejected Gate 16 prerequisite
+remains. `bun install --frozen-lockfile`, `bun run verify`, generated
+no-diff, and whitespace checks passed from the clean tracked candidate. The
+known `packages/cli/src/index.ts` `package-entry-barrel` Konsistent finding
+is advisory and non-blocking. Evidence is committed under
+`openspec/changes/implement-zsys-typescript-poc-v3/evidence/17.8/`; checkbox
+`17.9` is the next different unchecked unit.
+
 # Task 17.7 status
 
 No active blocker, required-check failure, or rejected Gate 16 prerequisite

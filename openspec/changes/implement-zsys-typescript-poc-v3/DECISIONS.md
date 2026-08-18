@@ -1,3 +1,17 @@
+# Task 17.8 decision
+
+- Treat the checkout as clean under the repository's existing release
+  contract: no tracked diff was present, and only the explicitly allowlisted
+  local iterator skill remained untracked.
+- Store exact command stdout/stderr and Git status artifacts under
+  `evidence/17.8/`; keep `RELEASE_CHECKLIST.md` evidence/sign-off slots
+  blank for their owning release-acceptance tasks.
+- Record the verify advisory as non-blocking because the configured audit
+  exits successfully for advisory findings and every required check passed.
+- Preserve the captured CRLF bytes in the verify stdout artifact; changing
+  them would violate exact-transcript evidence, so staged whitespace checking
+  uses Git's `cr-at-eol` interpretation for that generated log only.
+
 # Task 17.7 decision
 
 - Keep release acceptance in one root Markdown checklist so reviewers have a

@@ -1,3 +1,29 @@
+# Task 17.8 clean-checkout verification complete
+
+Checkbox `17.8` is complete; progress is now `275/287`. From clean tracked
+candidate `3f13380f286a2e984e7f7ca14f503b5aaa1a1bf3`, the required commands
+passed with the protected local iterator skill as the only allowlisted
+untracked path. Exact byte-preserved logs, status transcripts, and metadata
+are under `evidence/17.8/`.
+
+### Checks
+
+| Command | Exit | Duration | Evidence |
+| --- | ---: | ---: | --- |
+| `bun install --frozen-lockfile` | 0 | 27.594 ms | `bun-install.stdout.txt`, `bun-install.stderr.txt` |
+| `bun run verify` | 0 | 47,473.671 ms | `bun-verify.stdout.txt`, `bun-verify.stderr.txt` |
+| `git diff --exit-code --binary --no-ext-diff` | 0 | 19.067 ms | empty generated diff artifacts |
+
+The verify transcript includes frozen-install no-diff and generated-file
+no-diff success, all fixed fail-fast checks, and the known non-blocking
+Konsistent advisory at `packages/cli/src/index.ts`. Final captured
+`git status --short --untracked-files=all` is exactly:
+`?? .agents/skills/openspec-iterator/SKILL.md`.
+
+Tool/OS versions, artifact checksums, exit codes, and status-before/after
+comparison are recorded in `evidence/17.8/metadata.json`. No normative v3
+document, `RELEASE_CHECKLIST.md`, vendor file, or later checkbox changed.
+
 # Task 17.7 release checklist complete
 
 Checkbox `17.7` is complete; progress is now `274/287`. Commit `cbe489a7e`
