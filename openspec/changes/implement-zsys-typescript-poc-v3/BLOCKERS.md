@@ -1,3 +1,16 @@
+# Task 17.2 status
+
+No active blocker remains. Repeated `bun run verify`, boundary/scope checks,
+container tests, cloud-free Pulumi/deployment tests, strict OpenSpec
+validation, focused formatting, and whitespace checks pass. The one
+`package-entry-barrel` Konsistent result in `packages/cli/src/index.ts` is an
+advisory structural finding already tolerated by the configured audit; it does
+not fail verification. Real AWS create/smoke/destroy remains release-gated and
+is covered by the approved Gate 15 evidence, not run by ordinary local/PR CI.
+The only untracked path remains the intentional local iterator skill; exact
+generated build metadata was removed. Checkbox `17.3` is the next different
+unchecked unit.
+
 # Task 17.1 status
 
 No active blocker, required-check failure, or rejected Gate 0–15 prerequisite
@@ -5,7 +18,8 @@ remains. User-authorized phase commits are present in short capability-level
 scopes, all implementation artifacts are tracked, and the recorded deferred
 issues are non-blocking. The only remaining untracked path is the intentional
 local `.agents/skills/openspec-iterator/SKILL.md`; generated test metadata was
-removed. Checkbox `17.1` is complete and `17.2` is eligible for dispatch.
+removed. Checkboxes `17.1` and `17.2` are complete; `17.3` is eligible for
+dispatch.
 
 # Task 16.22 status
 

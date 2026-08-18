@@ -178,9 +178,9 @@ function filesToScan(root: string): string[] {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     paths.push(
-      ...[...new Bun.Glob("**/*").scanSync({ cwd: absolute, onlyFiles: true })].map(
-        (path) => `${directory}/${path}`,
-      ),
+      ...[...new Bun.Glob("**/*").scanSync({ cwd: absolute, onlyFiles: true })]
+        .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path))
+        .map((path) => `${directory}/${path}`),
     );
   }
   return [...new Set(paths.map((path) => resolve(root, path)))].sort();

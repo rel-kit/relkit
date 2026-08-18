@@ -31,7 +31,13 @@ describe("commerce receipt jobs", () => {
     const plan = createRegistrationPlan(graph, { projectRoot: "/fixture" });
     const job = graph.nodes.find((node) => node.kind === "job" && node.id === "receipts.send-job");
 
-    expect(compiled.diagnostics).toEqual([]);
+    expect(compiled.diagnostics).toEqual([
+      expect.objectContaining({
+        code: "ZSYS_EVENT_WILDCARD_RESTRICTED",
+        severity: "warning",
+        message: "Raw all-event selector is restricted to telemetry.",
+      }),
+    ]);
     expect(job).toMatchObject({
       kind: "job",
       targetFunctionId: "receipts.send",

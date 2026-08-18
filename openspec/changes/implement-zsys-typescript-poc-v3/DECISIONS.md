@@ -1,3 +1,20 @@
+# Task 17.2 decision
+
+- Keep verification as one ordered, fail-fast driver. Capture Git state before
+  and after frozen install/build so generated outputs are checked without
+  requiring a clean checkout or hiding intentional user changes.
+- Use explicit root test paths and a `test:container` script. This prevents
+  Bun's directory-pattern discovery from entering generated templates while
+  keeping CI and local verification on the same commands.
+- Treat the fixture's telemetry wildcard diagnostic as an intentional warning;
+  integration assertions record it instead of weakening compiler validation.
+  Scope scans exclude ignored `dist`, `node_modules`, `.turbo`, and `.zsys`
+  outputs so repeated verification remains stable.
+- Retain per-job logs in the runner temporary directory and upload them as
+  artifacts. Install Pulumi CLI `3.258.0` in Pulumi/AWS jobs; ordinary CI runs
+  remain cloud-free, while schedule/manual `aws-nightly` uses the protected
+  environment, AWS OIDC, and release-provided Pulumi/AWS credentials.
+
 # Task 17.1 decision
 
 - Approve `17.1` after verifying the recorded Gate 0–15 packets, the complete
@@ -8,7 +25,7 @@
   an intentional workspace skill; it is not a product artifact.
 - Keep final verification, documentation, fixture completion, release
   checklist, and evidence production in later checkbox ownership. The next
-  eligible unit is `17.2`.
+  eligible unit was `17.2`.
 
 # Task 16.22 Gate 15 decision
 

@@ -4,19 +4,37 @@ import { relative, resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
 const bun = process.execPath;
 
-type Placeholder = readonly [label: string, command: string, owner: string];
+type GitState = { readonly status: string; readonly diff: string };
 
-const placeholders: Placeholder[] = [
-  ["unit and schema tests", "bun run test:unit", "Phase 1 / Gate 1, tasks 2.4 and 2.7"],
-  ["compiler and graph tests", "bun run test:compiler", "Phase 3 / Gate 3, task 4.19"],
-  ["provider contracts", "bun run test:contracts", "Phase 7 / Gate 7, task 8.14"],
-  ["integration tests", "bun run test:integration", "Phase 5 / Gate 5, task 6.13"],
-  ["restart tests", "bun run test:restart", "Phases 8–9 / Gates 8–9, tasks 9.15 and 10.15"],
-  ["inspector API tests", "bun run test:inspector", "Phase 12 / Gate 12, task 13.15"],
-  ["packed generator smoke", "bun run test:generator", "Phase 14 / Gate 14, task 15.17"],
-  ["build", "bun run build", "Phase 15 / Gate 15, task 16.5"],
-  ["security and redaction tests", "bun run test:security", "Phase 11 / Gate 11, task 12.15"],
-];
+async function capture(executable: string, args: string[]): Promise<string> {
+  const child = Bun.spawn([executable, ...args], {
+    cwd: root,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [stdout, stderr] = await Promise.all([
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+  ]);
+  const exitCode = await child.exited;
+  if (exitCode !== 0)
+    throw new Error(`${executable} ${args.join(" ")} failed with exit code ${exitCode}: ${stderr}`);
+  return stdout;
+}
+
+async function gitState(): Promise<GitState> {
+  const [status, diff] = await Promise.all([
+    capture("git", ["status", "--short", "--untracked-files=all"]),
+    capture("git", ["diff", "--binary", "--no-ext-diff"]),
+  ]);
+  return { status, diff };
+}
+
+function assertNoGitStateChange(label: string, before: GitState, after: GitState): void {
+  if (before.status !== after.status || before.diff !== after.diff)
+    throw new Error(`${label} changed the tracked or untracked worktree state`);
+  console.log(`✓ ${label}`);
+}
 
 async function run(label: string, executable: string, args: string[]): Promise<void> {
   console.log(`\n▶ ${label}: ${[executable, ...args].join(" ")}`);
@@ -57,7 +75,7 @@ function checkImplementationSize(): void {
   const offenders = implementationSizeOffenders(root);
   if (offenders.length > 0)
     throw new Error(`Implementation files exceed 200 lines:\n${offenders.join("\n")}`);
-  console.log(`✓ implementation-file limit (maximum 200 lines)`);
+  console.log("✓ implementation-file limit (maximum 200 lines)");
 }
 
 async function runStructuralAudit(): Promise<void> {
@@ -75,15 +93,17 @@ async function runStructuralAudit(): Promise<void> {
   if (stderr) process.stderr.write(stderr);
   if (exitCode > 1)
     throw new Error(`configured structural audit failed with exit code ${exitCode}`);
-  if (exitCode === 1) {
-    console.log("⚠ structural findings are advisory; configuration validation remains blocking");
-  } else {
-    console.log("✓ configured structural audit");
-  }
+  console.log(
+    exitCode === 1
+      ? "⚠ structural findings are advisory; configuration validation remains blocking"
+      : "✓ configured structural audit",
+  );
 }
 
 async function main(): Promise<void> {
-  await run("frozen install check", bun, ["install", "--frozen-lockfile"]);
+  const installState = await gitState();
+  await run("frozen install", bun, ["install", "--frozen-lockfile"]);
+  assertNoGitStateChange("frozen install no-diff", installState, await gitState());
   await run("format check", bun, [
     "x",
     "prettier",
@@ -95,39 +115,43 @@ async function main(): Promise<void> {
     "tsconfig.json",
     ".prettierrc.json",
     "eslint.config.mjs",
+    "playwright.config.ts",
+    ".github/workflows/ci.yml",
     "apps",
     "packages",
     "scripts",
     "templates",
     "tests",
   ]);
+  await run("lint", bun, ["run", "lint"]);
   await run("ESLint configuration check", bun, ["x", "eslint", "eslint.config.mjs"]);
-  await run("public authoring scans", bun, ["run", "lint"]);
-  await run("dependency and scope checks", bun, ["run", "scripts/check-boundaries.ts"]);
+  await run("boundaries and scope", bun, ["run", "check"]);
   await run("observability sink source scan", bun, ["run", "scripts/check-observability-sinks.ts"]);
   checkImplementationSize();
   await run("Konsistent configuration validation", bun, ["run", "konsistent", "--", "validate"]);
   await runStructuralAudit();
   await run("typecheck", bun, ["run", "typecheck"]);
-  await run("public type fixtures", bun, ["run", "test:types"]);
-  await run("public declaration emission and leak scan", bun, [
-    "run",
-    "scripts/check-public-declarations.ts",
-  ]);
+  await run("type fixtures", bun, ["run", "test:types"]);
+  await run("unit and schema tests", bun, ["run", "test:unit"]);
+  await run("compiler and graph tests", bun, ["run", "test:compiler"]);
+  await run("provider contracts", bun, ["run", "test:contracts"]);
+  await run("integration tests", bun, ["run", "test:integration"]);
+  await run("restart tests", bun, ["run", "test:restart"]);
+  await run("inspector API tests", bun, ["run", "test:inspector"]);
+  await run("generator tests", bun, ["run", "test:generator"]);
+  await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-zsys.ts"]);
+  const buildState = await gitState();
+  await run("build", bun, ["run", "build"]);
+  assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
+  await run("whitespace check", "git", ["diff", "--check"]);
+  await run("security and redaction tests", bun, ["run", "test:security"]);
+  await run("public declaration leak scan", bun, ["run", "scripts/check-public-declarations.ts"]);
   await run("agent declaration/source/graph scans", bun, [
     "test",
     "tests/agents/source-boundaries.test.ts",
     "tests/compiler/fixture-commerce.test.ts",
   ]);
-  await run("Phase 0 guardrail tests", bun, ["test", "tests/phase0.test.ts"]);
-
-  for (const [label, command, owner] of placeholders) {
-    console.log(`○ NOT RUN — ${label}: ${command} (placeholder; owner: ${owner})`);
-  }
-  await run("whitespace check", "git", ["diff", "--check"]);
-  console.log(
-    `\nPhase 0 verification checks passed; ${placeholders.length} later suites remain NOT RUN placeholders.`,
-  );
+  console.log("\nVerification passed in the fixed fail-fast order.");
 }
 
 if (import.meta.main) {

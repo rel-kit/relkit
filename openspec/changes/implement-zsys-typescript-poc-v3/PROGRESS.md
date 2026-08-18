@@ -1,3 +1,36 @@
+# Task 17.2 verification pipeline and CI complete
+
+Checkbox `17.2` is complete; progress is now `269/287`. `scripts/verify.ts`
+now runs the required frozen-install/no-diff, format, lint, boundary/scope,
+typecheck/types, unit/schema, compiler/graph, provider-contract, integration,
+restart, inspector, generator, packed-smoke, build/generated-no-diff, and
+security stages in fixed fail-fast order. It snapshots the worktree around
+install/build, preserves the existing boundary and structural checks, and
+ignores only exact generated build metadata in scope scans. Root test commands
+use explicit `./tests/...` paths so template tests cannot be discovered by
+accident; the container command is now available as `bun run test:container`.
+
+`.github/workflows/ci.yml` now has the requested quality, core-tests,
+runtime-tests, recovery-tests, inspector, scaffolder, build, security, Pulumi,
+container, and release-gated `aws-nightly` jobs. Each job writes logs outside
+the checkout and uploads retained evidence. Pulumi jobs install CLI `3.258.0`;
+the nightly job is schedule/manual-only, environment-gated, uses AWS OIDC, and
+passes the release backend/image/credential inputs without enabling cloud work
+on ordinary pull requests.
+
+The intentional fixture telemetry warning is asserted by the two affected
+integration tests rather than suppressed. Validation passed: repeated `bun run
+verify` (including 27-package packed smoke and 30-package build), `bun run
+check` (34 roots, 761 TypeScript files), `bun run test:container` (3 pass, 20
+assertions), cloud-free `ZSYS_AWS_INTEGRATION=0 bun run test:deployment` with
+pinned Pulumi CLI (14 pass, 1 release-gated skip, 108 assertions), focused
+Prettier, `git diff --check`, and strict OpenSpec validation. The configured
+Konsistent audit retains one advisory `packages/cli/src/index.ts`
+`package-entry-barrel` finding; it is not a blocker. Exact generated
+`tsconfig.tsbuildinfo` metadata was removed, and the only untracked path remains
+the intentional local `.agents/skills/openspec-iterator/SKILL.md`. The next
+different unchecked unit is `17.3`.
+
 # Task 17.1 Gate 0–15 prerequisite audit complete
 
 Checkbox `17.1` is complete and progress is `268/287`. The approved packets
@@ -20,7 +53,7 @@ vendored test-discovery limitation remain explicitly non-blocking.
 Validation passed: Gate 0–15 packet/artifact audit, `bun run verify`,
 `openspec validate implement-zsys-typescript-poc-v3 --strict`, focused
 Prettier over the change notes, and `git diff --check`. The next different
-unchecked unit is `17.2`.
+unchecked unit was `17.2`.
 
 Dispatched fresh same-directory task `01a01571-7d34-7ae3-8204-470ac01b9543`
 on host `local` for checkbox `17.2`. One bounded `wait_threads` snapshot
