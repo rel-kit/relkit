@@ -24,6 +24,15 @@ Tool/OS versions, artifact checksums, exit codes, and status-before/after
 comparison are recorded in `evidence/17.8/metadata.json`. No normative v3
 document, `RELEASE_CHECKLIST.md`, vendor file, or later checkbox changed.
 
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a015e1-cdc5-7652-a231-841b3270624c` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.9`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirms it
+is reading the required context and implementing only `17.9`. Cursor:
+`7248df5c-8173-472c-8576-13a1d04d0bac:2`.
+
 # Task 17.7 release checklist complete
 
 Checkbox `17.7` is complete; progress is now `274/287`. Commit `cbe489a7e`
