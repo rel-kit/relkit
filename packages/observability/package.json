@@ -8,6 +8,9 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@zsys/contracts": "workspace:*"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
