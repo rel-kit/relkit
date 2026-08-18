@@ -1,3 +1,16 @@
+# Task 17.6 decision
+
+- Keep the documentation as five focused guides backed by existing commands
+  and output contracts. Reuse the generated template scripts and the shipped
+  `zsys` CLI instead of introducing documentation-only helpers or commands.
+- Describe the active graph and versioned inspector API as the shared runtime
+  source of truth, and state the generated inspector port without claiming an
+  unimplemented automatic UI launcher. Keep secrets, generated artifacts, and
+  deployment state on their existing safe paths.
+- Record documentation formatting, strict OpenSpec validation, full verify,
+  whitespace, and approved-source checksum evidence here and in `PROGRESS.md`;
+  leave `17.7` and all later release evidence to their owning tasks.
+
 # Task 17.5 decision
 
 - Keep release validation as one direct script over existing build, boundary,

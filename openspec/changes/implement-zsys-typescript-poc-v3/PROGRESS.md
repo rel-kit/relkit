@@ -1,3 +1,38 @@
+# Task 17.6 documentation complete
+
+Checkbox `17.6` is complete; progress is now `273/287`. Added the five
+requested guides for project creation/first route, generated-project and
+repository testing, Pulumi/AWS deployment, graph/runtime architecture, and
+diagnostic-led troubleshooting. The commands and examples use the shipped
+generator, `zsys` CLI, generated scripts, testing helpers, health/inspector
+protocol, and deployment lifecycle; the unavailable root `test:all` placeholder
+is not documented as a runnable check.
+
+### Checks
+
+| Command | Result |
+| --- | --- |
+| `bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md` | exit `0` |
+| `git diff --check` | exit `0` |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict` | valid |
+| `bun run verify` | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts` |
+| approved v3 source document checksums | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
+
+No later checkbox was implemented. The only untracked path remains the
+intentional local `.agents/skills/openspec-iterator/SKILL.md`; no vendor or
+approved normative v3 source document changed. The next different unchecked
+unit is `17.7`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a015ce-ea00-7481-9f76-c850e1624c8d` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.7`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirmed
+it is reading the required context and implementing only the release checklist
+unit. Cursor:
+`7efdd625-deaf-4ade-982c-d58a895af8c3:2`.
+
 # Task 17.5 release check and release notes complete
 
 Checkbox `17.5` is complete; progress is now `272/287`. Added the strict
@@ -30,6 +65,16 @@ No later checkbox was implemented. The only untracked path remains the
 intentional local `.agents/skills/openspec-iterator/SKILL.md`; no vendor or
 normative v3 source document changed. The next different unchecked unit is
 `17.6`.
+
+### Next fresh-task handoff
+
+Fresh same-directory local task `01a015c0-126a-7362-ae4c-6ab5037914c9` was
+dispatched on host `local` with the saved `zsys` project target for checkbox
+`17.6`. One bounded `wait_threads` snapshot with `timeoutMs: 10000` timed out
+while the task remained active and in progress; startup commentary confirmed
+it is reading the required context and implementing only the five requested
+documentation files. Cursor:
+`e3692d14-8535-4736-a26e-05d0b7cdd122:2`.
 
 # Task 17.4 performance baseline harness complete
 

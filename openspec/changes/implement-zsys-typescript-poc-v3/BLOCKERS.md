@@ -1,3 +1,13 @@
+# Task 17.6 status
+
+No active blocker remains. All five guides format cleanly, strict OpenSpec
+validation passes, the fixed fail-fast `bun run verify` pipeline passes, and
+the two approved v3 source document checksums are unchanged. The configured
+Konsistent audit retains only its known advisory
+`packages/cli/src/index.ts` `package-entry-barrel` finding. The only untracked
+path remains the intentional local iterator skill. Checkbox `17.7` is the
+next different unchecked unit.
+
 # Task 17.5 status
 
 No active blocker remains. The release-check implementation, 30 packed
