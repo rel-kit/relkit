@@ -1,0 +1,111 @@
+import {
+  canonicalJson,
+  CONTRACT_VERSION,
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  type JsonValue,
+} from "@zsys/contracts";
+import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@zsys/graph";
+import { buildOperation, openApiPath } from "./generate-utils.js";
+
+export type OpenApiSchema = { readonly [key: string]: JsonValue };
+export interface OpenApiParameter {
+  readonly name: string;
+  readonly in: "path" | "query" | "header" | "cookie";
+  readonly required: boolean;
+  readonly schema: OpenApiSchema;
+}
+export interface OpenApiMediaType {
+  readonly schema: OpenApiSchema;
+}
+export interface OpenApiResponse {
+  readonly description: string;
+  readonly content?: Readonly<Record<string, OpenApiMediaType>>;
+}
+export interface OpenApiOperation {
+  readonly operationId: string;
+  readonly parameters?: readonly OpenApiParameter[];
+  readonly requestBody?: {
+    readonly required: boolean;
+    readonly content: Readonly<Record<string, OpenApiMediaType>>;
+  };
+  readonly responses: Readonly<Record<string, OpenApiResponse>>;
+  readonly "x-zsys": {
+    readonly routeId: string;
+    readonly functionId: string;
+    readonly middleware: readonly { readonly id: string; readonly targetFunctionId: string }[];
+    readonly transforms: readonly string[];
+  };
+}
+export interface OpenApiPathItem {
+  readonly [method: string]: OpenApiOperation | undefined;
+}
+export interface OpenApiDocument {
+  readonly openapi: "3.1.0";
+  readonly info: { readonly title: string; readonly version: string };
+  readonly jsonSchemaDialect: string;
+  readonly paths: Readonly<Record<string, OpenApiPathItem>>;
+  readonly "x-zsys": {
+    readonly version: number;
+    readonly contractVersion: number;
+    readonly graphVersion: number;
+    readonly generatorVersion: number;
+  };
+}
+export type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> & {
+  readonly triggerType: "http";
+  readonly config: HttpTriggerConfig;
+};
+
+/** Generates a deterministic OpenAPI 3.1 document from the serializable graph contract. */
+export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
+  const functions = new Map(
+    graph.nodes
+      .filter((node): node is FunctionNode => node.kind === "function")
+      .map((node) => [node.id, node]),
+  );
+  const triggers = graph.nodes
+    .filter(isHttpTrigger)
+    .sort(
+      (left, right) =>
+        openApiPath(left.config.path).localeCompare(openApiPath(right.config.path)) ||
+        left.config.method.localeCompare(right.config.method) ||
+        left.id.localeCompare(right.id),
+    );
+  const paths: Record<string, OpenApiPathItem> = {};
+  for (const trigger of triggers) {
+    const target = functions.get(trigger.targetFunctionId);
+    if (target === undefined) {
+      throw new TypeError(
+        `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
+      );
+    }
+    const path = openApiPath(trigger.config.path);
+    const method = trigger.config.method.toLowerCase();
+    const item = paths[path] ?? {};
+    if (item[method] !== undefined)
+      throw new TypeError(`Duplicate OpenAPI route "${method.toUpperCase()} ${path}".`);
+    paths[path] = { ...item, [method]: buildOperation(trigger, target) };
+  }
+  return {
+    openapi: "3.1.0",
+    info: { title: graph.appId ?? "ZSys application", version: String(CONTRACT_VERSION) },
+    jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
+    paths,
+    "x-zsys": {
+      version: CONTRACT_VERSION,
+      contractVersion: CONTRACT_VERSION,
+      graphVersion: GRAPH_VERSION,
+      generatorVersion: GENERATOR_VERSION,
+    },
+  };
+}
+
+/** Serializes OpenAPI with the repository's canonical JSON ordering. */
+export function generateOpenApiJson(graph: ApplicationGraph): string {
+  return `${canonicalJson(generateOpenApi(graph) as unknown as JsonValue)}\n`;
+}
+
+function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
+  return node.kind === "trigger" && node.triggerType === "http";
+}

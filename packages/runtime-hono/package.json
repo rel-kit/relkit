@@ -8,6 +8,15 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@zsys/contracts": "workspace:*",
+    "@zsys/engine": "workspace:*",
+    "@zsys/graph": "workspace:*",
+    "@zsys/observability": "workspace:*",
+    "@zsys/runtime-effect": "workspace:*",
+    "@zsys/schema": "workspace:*",
+    "hono": "4.13.2"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
