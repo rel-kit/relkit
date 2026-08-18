@@ -1,3 +1,48 @@
+# Task 17.4 performance baseline harness complete
+
+Checkbox `17.4` is complete; progress is now `271/287`. Added the reproducible
+`scripts/performance.ts` entrypoint and its 125-line `performance-support.ts`
+helper. The harness loads the shipped compiler, engine, Hono runtime, local
+testing fakes, inspector fixed-grid layout, and supervisor state machine through
+absolute dynamic imports from the root script scope, so no package dependency
+or boundary exception was added.
+
+The descriptor fixtures are deterministic `defineFunction` arrays at 100,
+1,000, and 10,000 entries. Fixture construction is outside the timed compiler
+normalization; each result records normalization/output time, graph node count,
+canonical graph bytes, heap delta, and graph hash. Warm direct invocation and
+Hono route samples use 10 warmups and 100 measured operations. The remaining
+fixtures measure 100 local jobs, 100 events with eight ephemeral fan-out
+targets, 100 bounded request-stream responses, fixed-grid layout of 1,000
+inspector nodes, and 100 complete candidate state-machine activations.
+
+The command prints one JSON baseline to stdout and deliberately emits
+`thresholds: null`; no stable baseline artifact or pass budget is introduced
+before checkbox `17.16`.
+
+Environment for the recorded run (`2026-08-18T16:18:24.759Z`): Bun `1.3.10`,
+Node `v24.3.0`, Darwin `24.6.0`, `arm64`, Apple M1 Pro, 10 CPUs, and
+17,179,869,184 bytes total memory. Command: `bun run scripts/performance.ts`.
+
+| Measurement                  | Baseline                                                                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Compile 100 / 1,000 / 10,000 | `16.934 / 46.579 / 423.503 ms`; graph `100 / 1,000 / 10,000` nodes; `34,333 / 343,933 / 3,448,933` graph bytes; heap deltas `19,842,973 / 3,837,772 / 109,798,073` bytes |
+| Warm direct invocation       | 100 ops, 10 warmups; `7.152 ms` total, `0.051 ms` p50, `0.164 ms` p95, `13,982.185 ops/s`                                                                                |
+| Warm route                   | 100 ops, 10 warmups; `9.145 ms` total, `0.081 ms` p50, `0.147 ms` p95, `10,934.887 ops/s`                                                                                |
+| Local jobs                   | 100 enqueued/drained; 100 completed in `877.651 ms`, `113.941 jobs/s`                                                                                                    |
+| Event fan-out                | 100 events × 8 targets; 800 completed in `174.620 ms`, `572.673 events/s`                                                                                                |
+| Request stream               | 100 responses, 10 warmups; `4.650 ms` total, `0.043 ms` p50, `0.064 ms` p95, `21,507.499 ops/s`                                                                          |
+| Inspector graph              | 1,000 nodes / 999 edges; `0.703 ms`, layout `6912 × 2964`                                                                                                                |
+| Candidate activation         | 100 activations, 10 warmups; `0.443 ms` total, `0.003 ms` p50, `0.010 ms` p95, `225,521.349 ops/s`                                                                       |
+
+Validation passed: the performance command, focused Prettier, boundary check,
+typecheck, 94 focused engine/runtime/testing/supervisor/inspector tests, full
+`bun run verify`, and `git diff --check`. The configured Konsistent audit still
+has only its advisory `packages/cli/src/index.ts` package-entry-barrel finding;
+real AWS evidence remains release-gated and approved by Gate 15. The only
+untracked path remains the intentional local iterator skill. The next
+different unchecked unit is `17.5`.
+
 # Task 17.3 fixture-commerce acceptance complete
 
 Checkbox `17.3` is complete; progress is now `270/287`. The new

@@ -1,3 +1,14 @@
+# Task 17.4 status
+
+No active blocker remains. The reproducible performance harness ran successfully
+and records the environment and initial baseline in `PROGRESS.md` without pass
+thresholds. Boundary/scope, typecheck, focused tests, full `bun run verify`,
+formatting, and whitespace checks pass. The one `package-entry-barrel`
+Konsistent result in `packages/cli/src/index.ts` remains an advisory finding;
+real AWS evidence remains release-gated and covered by the approved Gate 15
+packet. The only untracked path remains the intentional local iterator skill.
+Checkbox `17.5` is the next different unchecked unit.
+
 # Task 17.3 status
 
 No active blocker remains. The actual fixture consistency test, focused

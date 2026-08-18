@@ -1,3 +1,19 @@
+# Task 17.4 decision
+
+- Use deterministic in-memory `defineFunction` descriptor arrays at 100, 1,000,
+  and 10,000 entries and time the existing compiler normalization/output path;
+  keep fixture construction outside that timer. Record canonical graph bytes,
+  graph nodes, heap delta, and hash so the first run is useful without making a
+  threshold claim.
+- Reuse the shipped direct engine, Hono route, local job/event fakes, bounded
+  inspector fixed-grid layout, and supervisor activation state machine. Use
+  eight ephemeral local event targets for independent fan-out throughput and
+  measure candidate activation as the deterministic compile/start/verify/switch
+  protocol; child-process startup and stable-budget review remain later work.
+- Print environment and measurements as JSON with `thresholds: null` instead of
+  checking in a mutable baseline artifact. Checkbox `17.16` owns the first
+  stable baseline and regression budget after repeated runs.
+
 # Task 17.3 decision
 
 - Use the actual fixture authoring modules and one compiler graph as the
