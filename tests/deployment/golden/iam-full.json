@@ -1,0 +1,73 @@
+{
+  "serviceRole": {
+    "statements": [
+      {
+        "capability": "cache",
+        "actions": ["elasticache:Connect"],
+        "resources": ["full-app-cache-prices"]
+      },
+      {
+        "capability": "events",
+        "actions": ["events:PutEvents"],
+        "resources": ["full-app-event-orders-created"]
+      },
+      {
+        "capability": "jobs",
+        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"],
+        "resources": ["full-app-job-receipts-send-job"]
+      },
+      {
+        "capability": "jobs",
+        "actions": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility",
+          "sqs:GetQueueAttributes"
+        ],
+        "resources": ["full-app-event-trigger-orders-listener"]
+      },
+      {
+        "capability": "jobs",
+        "actions": ["sqs:SendMessage"],
+        "resources": ["full-app-job-receipts-send-job"]
+      }
+    ]
+  },
+  "perFunction": [
+    {
+      "functionId": "orders.create",
+      "capability": "cache",
+      "resourceId": "prices",
+      "actions": ["elasticache:Connect"]
+    },
+    {
+      "functionId": "orders.create",
+      "capability": "events",
+      "resourceId": "orders.created",
+      "actions": ["events:PutEvents"]
+    },
+    {
+      "functionId": "orders.handle-created",
+      "capability": "jobs",
+      "resourceId": "orders.listener",
+      "actions": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:ChangeMessageVisibility",
+        "sqs:GetQueueAttributes"
+      ]
+    },
+    {
+      "functionId": "orders.handle-created",
+      "capability": "jobs",
+      "resourceId": "receipts.send-job",
+      "actions": ["sqs:SendMessage"]
+    },
+    {
+      "functionId": "receipts.send",
+      "capability": "jobs",
+      "resourceId": "receipts.send-job",
+      "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+    }
+  ]
+}

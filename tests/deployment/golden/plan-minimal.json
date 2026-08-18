@@ -1,0 +1,51 @@
+{
+  "contractVersion": 1,
+  "graphHash": "sha256:3bc6d305fcafab6dcb8602961dbaa0cfe3eb030a6b6f0c65900db1c4a7c03e0a",
+  "application": {
+    "id": "minimal-app",
+    "image": {
+      "name": "minimal-app",
+      "tag": "latest",
+      "health": {
+        "livenessPath": "/_zsys/v1/health/live",
+        "readinessPath": "/_zsys/v1/health/ready",
+        "port": 3000
+      }
+    },
+    "environmentNames": ["PORT"]
+  },
+  "http": {
+    "logicalName": "minimal-app-http-public",
+    "port": 3000,
+    "health": {
+      "livenessPath": "/_zsys/v1/health/live",
+      "readinessPath": "/_zsys/v1/health/ready",
+      "port": 3000
+    },
+    "routes": [
+      {
+        "id": "hello.route",
+        "method": "GET",
+        "path": "/hello/:name",
+        "targetFunctionId": "hello"
+      }
+    ],
+    "configurationNames": ["PORT"]
+  },
+  "jobs": [],
+  "schedules": [],
+  "events": [],
+  "eventTriggers": [],
+  "buckets": [],
+  "caches": [],
+  "iam": {
+    "serviceRole": { "statements": [] },
+    "perFunction": []
+  },
+  "observability": {
+    "logicalName": "minimal-app-observability-default",
+    "configurationNames": [],
+    "logs": true,
+    "traces": true
+  }
+}

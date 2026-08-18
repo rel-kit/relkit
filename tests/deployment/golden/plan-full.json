@@ -1,0 +1,277 @@
+{
+  "contractVersion": 1,
+  "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+  "application": {
+    "id": "full-app",
+    "image": {
+      "name": "registry.example/orders",
+      "tag": "2026-08-18",
+      "digest": "sha256:orders-image",
+      "health": {
+        "livenessPath": "/_zsys/v1/health/live",
+        "readinessPath": "/_zsys/v1/health/ready",
+        "port": 8080,
+        "intervalMs": 10000,
+        "timeoutMs": 2000
+      }
+    },
+    "environmentNames": ["PORT"]
+  },
+  "http": {
+    "logicalName": "full-app-http-public",
+    "port": 8080,
+    "health": {
+      "livenessPath": "/_zsys/v1/health/live",
+      "readinessPath": "/_zsys/v1/health/ready",
+      "port": 8080,
+      "intervalMs": 10000,
+      "timeoutMs": 2000
+    },
+    "routes": [
+      {
+        "id": "orders.get-route",
+        "method": "GET",
+        "path": "/orders/:orderId",
+        "targetFunctionId": "orders.get"
+      }
+    ],
+    "configurationNames": ["PORT"]
+  },
+  "jobs": [
+    {
+      "id": "receipts.send-job",
+      "logicalName": "full-app-job-receipts-send-job",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["jobs"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "metadata": {
+        "iamCapabilities": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility",
+          "sqs:SendMessage"
+        ]
+      },
+      "targetFunctionId": "receipts.send",
+      "retry": {
+        "initialDelayMs": 1,
+        "jitter": "none",
+        "maxAttempts": 2,
+        "maxDelayMs": 5,
+        "multiplier": 2
+      },
+      "idempotency": { "key": "orderId", "retentionMs": 1000 }
+    }
+  ],
+  "schedules": [
+    {
+      "id": "receipts.reconcile",
+      "logicalName": "full-app-schedule-receipts-reconcile",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["jobs"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "jobId": "receipts.send-job",
+      "schedule": {
+        "cron": "0 * * * *",
+        "id": "receipts.reconcile",
+        "input": { "orderId": "scheduled" },
+        "overlap": "skip",
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "orders.created",
+      "logicalName": "full-app-event-orders-created",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["events"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "metadata": { "iamCapabilities": ["events:PutEvents"] },
+      "version": 1,
+      "payload": {
+        "properties": {
+          "orderId": { "type": "string" },
+          "sku": { "type": "string" }
+        },
+        "required": ["orderId", "sku"],
+        "type": "object"
+      }
+    }
+  ],
+  "eventTriggers": [
+    {
+      "id": "orders.listener",
+      "logicalName": "full-app-event-trigger-orders-listener",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["events"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "metadata": {
+        "iamCapabilities": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility"
+        ]
+      },
+      "targetFunctionId": "orders.handle-created",
+      "expansion": ["orders.created@1"],
+      "delivery": "durable",
+      "retry": {
+        "initialDelayMs": 1,
+        "jitter": "none",
+        "maxAttempts": 2,
+        "maxDelayMs": 5,
+        "multiplier": 2
+      }
+    }
+  ],
+  "buckets": [
+    {
+      "id": "assets",
+      "logicalName": "full-app-bucket-assets",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["buckets"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "visibility": "private",
+      "maxObjectBytes": 10000,
+      "allowedContentTypes": ["application/json"]
+    }
+  ],
+  "caches": [
+    {
+      "id": "prices",
+      "logicalName": "full-app-cache-prices",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["cache"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "metadata": { "iamCapabilities": ["elasticache:Connect"] },
+      "defaultTtlMs": 1000,
+      "maxTtlMs": 5000
+    }
+  ],
+  "models": [
+    {
+      "id": "default",
+      "logicalName": "full-app-model-default",
+      "profile": "default",
+      "configurationNames": ["region"],
+      "capabilities": ["models"],
+      "tags": {
+        "app": "full-app",
+        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "managed-by": "zsys"
+      },
+      "provider": "openai",
+      "model": "gpt-4o-mini"
+    }
+  ],
+  "iam": {
+    "serviceRole": {
+      "statements": [
+        {
+          "capability": "cache",
+          "actions": ["elasticache:Connect"],
+          "resources": ["full-app-cache-prices"]
+        },
+        {
+          "capability": "events",
+          "actions": ["events:PutEvents"],
+          "resources": ["full-app-event-orders-created"]
+        },
+        {
+          "capability": "jobs",
+          "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"],
+          "resources": ["full-app-job-receipts-send-job"]
+        },
+        {
+          "capability": "jobs",
+          "actions": [
+            "sqs:ReceiveMessage",
+            "sqs:DeleteMessage",
+            "sqs:ChangeMessageVisibility",
+            "sqs:GetQueueAttributes"
+          ],
+          "resources": ["full-app-event-trigger-orders-listener"]
+        },
+        {
+          "capability": "jobs",
+          "actions": ["sqs:SendMessage"],
+          "resources": ["full-app-job-receipts-send-job"]
+        }
+      ]
+    },
+    "perFunction": [
+      {
+        "functionId": "orders.create",
+        "capability": "cache",
+        "resourceId": "prices",
+        "actions": ["elasticache:Connect"]
+      },
+      {
+        "functionId": "orders.create",
+        "capability": "events",
+        "resourceId": "orders.created",
+        "actions": ["events:PutEvents"]
+      },
+      {
+        "functionId": "orders.handle-created",
+        "capability": "jobs",
+        "resourceId": "orders.listener",
+        "actions": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility",
+          "sqs:GetQueueAttributes"
+        ]
+      },
+      {
+        "functionId": "orders.handle-created",
+        "capability": "jobs",
+        "resourceId": "receipts.send-job",
+        "actions": ["sqs:SendMessage"]
+      },
+      {
+        "functionId": "receipts.send",
+        "capability": "jobs",
+        "resourceId": "receipts.send-job",
+        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+      }
+    ]
+  },
+  "observability": {
+    "logicalName": "full-app-observability-default",
+    "configurationNames": [],
+    "logs": true,
+    "traces": true
+  }
+}

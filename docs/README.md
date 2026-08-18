@@ -76,4 +76,9 @@ zsys deploy preview --stack development
 zsys deploy up --stack development
 ```
 
+Deployment also accepts `--backend cloud|local|s3://...|azblob://...|gs://...`,
+repeatable `--config name=value` or `--config-secret name=value`, and
+`--non-interactive` (`--yes`) for explicitly confirmed CI changes. `refresh`,
+`outputs`, and `destroy` use the same explicit stack/backend options.
+
 Pulumi is the sole POC deployment engine. AWS is the first cloud target.

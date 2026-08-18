@@ -8,6 +8,21 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@zsys/agents": "workspace:*",
+    "@zsys/app": "workspace:*",
+    "@zsys/buckets": "workspace:*",
+    "@zsys/cache": "workspace:*",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/engine": "workspace:*",
+    "@zsys/events": "workspace:*",
+    "@zsys/graph": "workspace:*",
+    "@zsys/jobs": "workspace:*",
+    "@zsys/observability": "workspace:*",
+    "@pulumi/aws": "7.42.0",
+    "@pulumi/awsx": "3.8.0",
+    "@pulumi/pulumi": "3.258.0"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",

@@ -8,6 +8,14 @@
       "import": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "@pulumi/pulumi": "3.258.0",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/deploy": "workspace:*",
+    "@zsys/observability": "workspace:*",
+    "@zsys/runtime-effect": "workspace:*",
+    "effect": "4.0.0-beta.107"
+  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",
