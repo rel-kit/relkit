@@ -9,10 +9,10 @@ and blocker dispositions are recorded in the change notes: `1.18`, `2.16`,
 The phase candidate is now committed in short capability-level scopes (not
 per app or package): `6877e5021`, `d6c512974`, `5c5537a0f`, `c97b5d415`,
 `ec65c2a64`, `2774fc382`, `07002e34f`, `819ef4ab8`, and `c2067e6b8`.
-The evidence and handoff notes are committed as `38037a956` and `091155ce0`.
-`git rev-list --count main..HEAD` is `11`; implementation artifacts are tracked,
-and only the pre-existing local iterator skill remains untracked. Exact
-generated test metadata was removed. No deferred issue contradicts v3
+The evidence and handoff notes are committed in the docs commits following
+that implementation chain. Implementation artifacts are tracked, and only the
+pre-existing local iterator skill remains untracked. Exact generated test
+metadata was removed. No deferred issue contradicts v3
 acceptance: the advisory Konsistent finding, truthful later-suite `NOT RUN`
 placeholders, stale AWS tag records resolved by service state, and the known
 vendored test-discovery limitation remain explicitly non-blocking.
