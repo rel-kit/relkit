@@ -1,3 +1,27 @@
+# Task 17.7 release checklist complete
+
+Checkbox `17.7` is complete; progress is now `274/287`. Added the root
+`RELEASE_CHECKLIST.md` with candidate metadata, all Gate 16 required evidence
+slots, the exact reproduction commands, final reviewer questions, every
+Section 25 acceptance criterion, reviewed `RELEASE_NOTES.md`, seven owner
+sign-off rows, and the final decision record. Evidence and signatures remain
+blank for their owning release-acceptance tasks; no later checkbox was
+implemented and `RELEASE_NOTES.md` was not modified.
+
+### Checks
+
+| Command                                                       | Result                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bunx prettier --check RELEASE_CHECKLIST.md`                  | exit `0`                                                                                                                                                                      |
+| `git diff --check`                                            | exit `0`                                                                                                                                                                      |
+| `openspec validate implement-zsys-typescript-poc-v3 --strict` | valid                                                                                                                                                                         |
+| `bun run verify`                                              | exit `0`; fixed fail-fast pipeline passed, with the known advisory Konsistent finding at `packages/cli/src/index.ts`                                                          |
+| approved v3 source document checksums                         | unchanged: technical spec `d69f37f1ff0d157876d624e73bcf163162a73f531b3144e03ef566c672cbb183`; review gates `9f3d0225794ba7de12a5e7835a2f61ca2bc03ce4add8833cfdf21c2970aba464` |
+
+No active blocker remains. The only untracked path is the intentional local
+`.agents/skills/openspec-iterator/SKILL.md`; no vendor or approved normative v3
+source document changed. The next different unchecked unit is `17.8`.
+
 # Task 17.6 documentation complete
 
 Checkbox `17.6` is complete; progress is now `273/287`. Added the five

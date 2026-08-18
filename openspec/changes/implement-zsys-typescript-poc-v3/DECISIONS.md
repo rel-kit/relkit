@@ -1,3 +1,15 @@
+# Task 17.7 decision
+
+- Keep release acceptance in one root Markdown checklist so reviewers have a
+  single visible place for evidence paths, exact reproduction commands,
+  acceptance criteria, sign-offs, and the final Gate 16 decision.
+- Mirror the normative Gate 16 required evidence and reviewer questions, then
+  include every v3 Section 25 criterion verbatim enough to trace each release
+  decision back to the approved technical specification.
+- Leave evidence results, owner names, signatures, and the approval decision
+  unfilled. Later release tasks own those facts; pre-filling them would turn a
+  checklist template into unsupported acceptance.
+
 # Task 17.6 decision
 
 - Keep the documentation as five focused guides backed by existing commands
