@@ -31,6 +31,7 @@ jobs:
           bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/format.log"
           bun run lint 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/lint.log"
           bun run check 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/boundaries.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run typecheck 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/typecheck.log"
           bun x eslint eslint.config.mjs 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/eslint.log"
           git diff --check 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/whitespace.log"
@@ -57,6 +58,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:types 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/types.log"
           bun run test:unit 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/unit-schema.log"
           bun run test:compiler 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/compiler-graph.log"
@@ -83,6 +85,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:contracts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/provider-contracts.log"
           bun run test:integration 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/integration.log"
       - name: Upload runtime evidence
@@ -108,6 +111,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:restart 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/restart.log"
       - name: Upload recovery evidence
         if: always()
@@ -132,6 +136,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:inspector 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/inspector-api.log"
           bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/playwright-install.log"
           bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/playwright.log"
@@ -158,6 +163,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:generator 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generator-tests.log"
           bun run scripts/pack-and-smoke-create-zsys.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generator-packed-smoke.log"
       - name: Upload scaffolder evidence
@@ -209,6 +215,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:security 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/redaction.log"
           bun run scripts/secret-scan.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/secret-scan.log"
           bun run scripts/check-public-declarations.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/public-declarations.log"
@@ -242,6 +249,7 @@ jobs:
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
           pulumi version 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/pulumi-version.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:deployment 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/pulumi.log"
       - name: Upload Pulumi evidence
         if: always()
@@ -266,6 +274,7 @@ jobs:
         run: |
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:container 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/container.log"
       - name: Upload container evidence
         if: always()
@@ -316,6 +325,7 @@ jobs:
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
           set -o pipefail
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
           bun run test:aws-integration 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/aws-nightly.log"
       - name: Upload AWS evidence
         if: always()

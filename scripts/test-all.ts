@@ -18,6 +18,7 @@ const localLayers = [
 
 /** Runs the root test layers in their documented fail-fast order. */
 export async function runAllTests(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
+  await runScript("build", environment);
   for (const script of localLayers)
     await runScript(script, { ...environment, ZSYS_AWS_INTEGRATION: "0" });
   if (environment.ZSYS_TEST_ALL_CLOUD !== "1") {

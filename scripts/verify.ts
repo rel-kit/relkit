@@ -131,6 +131,9 @@ async function main(): Promise<void> {
   checkImplementationSize();
   await run("Konsistent configuration validation", bun, ["run", "konsistent", "--", "validate"]);
   await runStructuralAudit();
+  const buildState = await gitState();
+  await run("build", bun, ["run", "build"]);
+  assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
   await run("typecheck", bun, ["run", "typecheck"]);
   await run("type fixtures", bun, ["run", "test:types"]);
   await run("unit and schema tests", bun, ["run", "test:unit"]);
@@ -141,9 +144,6 @@ async function main(): Promise<void> {
   await run("inspector API tests", bun, ["run", "test:inspector"]);
   await run("generator tests", bun, ["run", "test:generator"]);
   await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-zsys.ts"]);
-  const buildState = await gitState();
-  await run("build", bun, ["run", "build"]);
-  assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
   await run("security and redaction tests", bun, ["run", "test:security"]);
