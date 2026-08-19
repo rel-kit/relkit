@@ -53,6 +53,8 @@ when the binding/change is unambiguous.
 
    ```text
    {
+     model: "gpt-5.6-luna",
+     thinking: "max",
      prompt: "<exact next-unit prompt>",
      target: {
        type: "project",
@@ -62,16 +64,17 @@ when the binding/change is unambiguous.
    }
    ```
 
-   Do not set `target.type` to `worktree`, add `startingState`, or put `type` or
-   `projectId` at the top level. Omit title, model, and thinking unless the user
-   explicitly requested them. Never use `fork_thread`, continue, resume, or send
-   implementation prompts to an existing task/chat/thread.
+   Always set `model` to `"gpt-5.6-luna"` and `thinking` to `"max"` for every
+   fresh iterator task. Do not set `target.type` to `worktree`, add
+   `startingState`, or put `type` or `projectId` at the top level. Omit title.
+   Never use `fork_thread`, continue, resume, or send implementation prompts to
+   an existing task/chat/thread.
 
 7. If `create_thread` rejects the call, re-read its live schema and retry once
-   with only `prompt` and the exact `target` above. Never fall back to
-   `spawn_agent` or another subagent: it is not a new Codex task and cannot
-   satisfy the iterator boundary. If the retry fails, record the concrete error
-   in `BLOCKERS.md` and stop.
+   with the same `model`, `thinking`, `prompt`, and exact `target` above. Never
+   fall back to `spawn_agent` or another subagent: it is not a new Codex task
+   and cannot satisfy the iterator boundary. If the retry fails, record the
+   concrete error in `BLOCKERS.md` and stop.
 8. When `create_thread` returns `threadId` and `hostId`, perform one bounded
    `wait_threads` snapshot to confirm startup or surface a blocker/input request.
    A timeout while the task is active is a successful handoff, not a reason to
