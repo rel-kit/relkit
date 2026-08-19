@@ -29,6 +29,15 @@ bun run test:all
 authorized. `bun run build` builds the workspace and `bun run verify` checks
 boundaries, scope, declarations, generated artifacts, and release invariants.
 
+To exercise the current checkout without publishing packages, build the
+workspace and use the source-backed CLI. It links the generated project's
+`@zsys/*` dependencies to this checkout:
+
+```sh
+bun run build
+bun run zsys:local -- create my-app --cloud none --deploy none
+```
+
 ## Repository layout
 
 - `apps/inspector` is the Next.js inspector served on port `3210` by a project

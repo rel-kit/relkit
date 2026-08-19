@@ -25,13 +25,13 @@ import {
   type RouteInvocationInput,
   type RouteInvocationResult,
 } from "./route-request";
+import { resolveBackendUrl } from "./backend-url";
 export * from "./api-types";
 interface CacheEntry {
   readonly value: unknown;
   readonly expiresAt: number;
   readonly tags: readonly string[];
 }
-
 export class InspectorApiClient {
   readonly baseUrl: string;
   private readonly fetcher: InspectorFetch;
@@ -39,7 +39,6 @@ export class InspectorApiClient {
   private readonly cacheTtlMs: number;
   private readonly signal: AbortSignal | undefined;
   private readonly cache = new Map<string, CacheEntry>();
-
   constructor(options: InspectorFetchOptions = {}) {
     this.baseUrl = options.baseUrl === undefined ? "" : String(options.baseUrl).replace(/\/$/, "");
     this.fetcher = options.fetch ?? ((input, init) => fetch(input, init));
@@ -50,7 +49,6 @@ export class InspectorApiClient {
     this.cacheTtlMs = Math.max(0, options.cacheTtlMs ?? 2_000);
     this.signal = options.signal;
   }
-
   async request<T = InspectorJson>(
     path: string,
     options: InspectorRequestOptions = {},
@@ -102,7 +100,6 @@ export class InspectorApiClient {
       });
     return payload as T;
   }
-
   clearCache(): void {
     this.cache.clear();
   }
@@ -159,17 +156,19 @@ export class InspectorApiClient {
     signal: SignalCollection,
     query: InspectorQuery = {},
   ): Promise<ObservabilityPage<T>> {
-    return this.request(`${INSPECTOR_API_BASE}/${signal}${this.queryString(query)}`, {
-      cacheTags: [signal, "signals"],
-      responseProtocols: [OBSERVABILITY_QUERY_PROTOCOL],
-    });
+    return this.request<ObservabilityPage<T>>(
+      `${INSPECTOR_API_BASE}/${signal}${this.queryString(query)}`,
+      {
+        cacheTags: [signal, "signals"],
+        responseProtocols: [OBSERVABILITY_QUERY_PROTOCOL, INSPECTOR_API_PROTOCOL],
+      },
+    );
   }
   invokeRoute(input: RouteInvocationInput): Promise<RouteInvocationResult> {
     return invokeActiveRoute(this.fetcher, this.baseUrl, this.headers, input);
   }
   private url(path: string): string {
-    if (this.baseUrl === "") return path;
-    return new URL(path, `${this.baseUrl}/`).toString();
+    return resolveBackendUrl(this.baseUrl, path);
   }
   private queryString(input: InspectorQuery): string {
     const params = new URLSearchParams();

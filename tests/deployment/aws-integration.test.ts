@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { appendFileSync } from "node:fs";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
@@ -13,24 +13,16 @@ import {
   type PulumiWorkspaceHandle,
 } from "../../packages/deploy-pulumi/src/workspace.ts";
 import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
+import { compileProject } from "../compiler/fixture-runner.ts";
 
 const enabled = process.env.ZSYS_AWS_INTEGRATION === "1";
 const awsTest = enabled ? test : test.skip;
-/** The release-provided image implements these bounded provider smoke routes. */
-const smokePaths = [
-  "/__zsys/aws-smoke/job",
-  "/__zsys/aws-smoke/event",
-  "/__zsys/aws-smoke/bucket",
-  "/__zsys/aws-smoke/cache",
-  "/__zsys/aws-smoke/logs",
-] as const;
-
-const graph = JSON.parse(
-  await readFile(
-    join(import.meta.dir, "../compiler/fixtures/valid-full/expected.graph.json"),
-    "utf8",
-  ),
-) as ApplicationGraph;
+const compiled = await compileProject(
+  "aws-fixture-commerce",
+  join(import.meta.dir, "../../apps/fixture-commerce"),
+);
+if (compiled.exitCode !== 0) throw new Error("fixture-commerce did not compile for AWS acceptance");
+const graph = JSON.parse(compiled.graphBytes) as ApplicationGraph;
 
 test("keeps source moves on stable deployment identities", () => {
   const moved = moveSources(graph);
@@ -62,7 +54,7 @@ awsTest("creates, smokes, updates, and independently cleans an ephemeral AWS sta
   const root = await mkdtemp(join(tmpdir(), "zsys-aws-integration-"));
   const stackName = `zsys-nightly-${Date.now()}-${randomUUID().slice(0, 8)}`;
   const marker = `zsys-aws-smoke-${randomUUID()}`;
-  const appId = "full-app";
+  const appId = graph.appId ?? "commerce-api";
   const initialPlan = planFor(graph, config.image);
   let active: PulumiWorkspaceHandle | undefined;
   let primaryError: unknown;
@@ -73,7 +65,7 @@ awsTest("creates, smokes, updates, and independently cleans an ephemeral AWS sta
     await up(active, config.operationTimeoutMs);
     const outputs = await smokeOutputs(active);
     await waitForReadiness(outputs.endpoint, config.operationTimeoutMs);
-    await exerciseHttp(outputs.endpoint, marker);
+    await exerciseProduct(outputs, marker, config.region, config.operationTimeoutMs);
     await waitForLog(outputs.logGroupName, marker, config.region, config.operationTimeoutMs);
 
     const noOp = await up(active, config.operationTimeoutMs);
@@ -163,11 +155,13 @@ async function openStack(
         forceDestroy: true,
         tags: { "zsys-smoke": marker },
         serviceEnvironment: ({ jobs, events, buckets, caches }) => ({
-          ZSYS_AWS_SMOKE_MARKER: marker,
-          ZSYS_AWS_SMOKE_BUCKET_NAME: buckets.buckets[0]!.name,
-          ZSYS_AWS_SMOKE_QUEUE_URL: jobs.queues[0]!.worker.queueUrl,
-          ZSYS_AWS_SMOKE_EVENT_BUS_NAME: events.eventBusName,
-          ZSYS_AWS_SMOKE_CACHE_URL: caches.caches[0]!.url,
+          NODE_ENV: "production",
+          ZSYS_ENV: "production",
+          AWS_REGION: config.region,
+          ASSETS_BUCKET_NAME: buckets.buckets[0]!.name,
+          JOB_QUEUE_URL: jobs.queues[0]!.worker.queueUrl,
+          EVENT_BUS_NAME: events.eventBusName,
+          CACHE_ENDPOINT: caches.caches[0]!.url,
         }),
       },
     }),
@@ -191,22 +185,50 @@ async function smokeOutputs(handle: PulumiWorkspaceHandle): Promise<SmokeOutputs
   };
 }
 
-async function exerciseHttp(endpoint: string, marker: string): Promise<void> {
-  for (const path of smokePaths) {
-    const response = await fetch(`${endpoint}${path}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ marker }),
-      signal: AbortSignal.timeout(60_000),
-    });
-    expect(response.status).toBeGreaterThanOrEqual(200);
-    expect(response.status).toBeLessThan(300);
-    expect(await response.json()).toMatchObject({
-      ok: true,
-      operation: path.slice(path.lastIndexOf("/") + 1),
-      marker,
-    });
+async function exerciseProduct(
+  outputs: SmokeOutputs,
+  marker: string,
+  region: string,
+  timeoutMs: number,
+): Promise<void> {
+  const response = await fetch(`${outputs.endpoint}/orders`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "idempotency-key": marker,
+      "x-customer-email": "aws-acceptance@example.invalid",
+    },
+    body: JSON.stringify({ sku: marker, quantity: 1 }),
+    signal: AbortSignal.timeout(60_000),
+  });
+  expect(response.status).toBe(201);
+  expect(await response.json()).toMatchObject({
+    orderId: marker,
+    receiptKey: `${marker}.json`,
+    totalCents: 1_000,
+  });
+  await waitForObject(outputs.bucketName, `${marker}.json`, region, timeoutMs);
+}
+
+async function waitForObject(
+  bucketName: string,
+  key: string,
+  region: string,
+  timeoutMs: number,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      await awsCli(
+        ["s3api", "head-object", "--bucket", bucketName, "--key", key, "--region", region],
+        Math.min(60_000, Math.max(1_000, deadline - Date.now())),
+      );
+      return;
+    } catch {
+      await delay(5_000);
+    }
   }
+  throw new Error("AWS integration receipt was not written through the ZSys job worker.");
 }
 
 async function waitForReadiness(endpoint: string, timeoutMs: number): Promise<void> {

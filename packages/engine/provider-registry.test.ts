@@ -28,7 +28,7 @@ function cacheGraph(profile: string): ApplicationGraph {
 
 function factory(
   events: string[],
-  generation: ProviderGeneration = { release: () => events.push("release") },
+  generation: ProviderGeneration = completeGeneration({ release: () => events.push("release") }),
 ): ProviderFactory {
   return {
     recipeTag: "test",
@@ -39,15 +39,31 @@ function factory(
   };
 }
 
+function completeGeneration(generation: ProviderGeneration): ProviderGeneration {
+  return {
+    ...generation,
+    providers: {
+      buckets: { default: {} },
+      cache: { default: {} },
+      jobs: { default: {} },
+      events: { default: {} },
+      models: { default: {} },
+      observability: { default: {} },
+      ...generation.providers,
+    },
+  };
+}
+
 describe("provider registry", () => {
   test("selects one active set, constructs once, resolves profiles, and releases idempotently", async () => {
     const events: string[] = [];
-    const client = Object.freeze({ name: "cache" });
-    const generation: ProviderGeneration = {
-      providers: { cache: client },
+    const defaultClient = Object.freeze({ name: "default-cache" });
+    const archiveClient = Object.freeze({ name: "archive-cache" });
+    const generation: ProviderGeneration = completeGeneration({
+      providers: { cache: { default: defaultClient, archive: archiveClient } },
       readiness: () => events.push("ready"),
       release: () => events.push("release"),
-    };
+    });
     const registry = await createProviderRegistry({
       generationId: "generation-1",
       environment: "test",
@@ -58,12 +74,46 @@ describe("provider registry", () => {
     });
 
     expect(events).toEqual(["create:test:generation-1", "ready"]);
-    expect(registry.get("cache", "archive")?.value).toBe(client);
-    expect(registry.resolve("cache", "default").value).toBe(client);
+    expect(registry.get("cache", "archive")?.value).toBe(archiveClient);
+    expect(registry.resolve("cache", "default").value).toBe(defaultClient);
     expect(registry.get("buckets", "archive")).toBeUndefined();
     await registry.release();
     await registry.dispose();
     expect(events).toEqual(["create:test:generation-1", "ready", "release"]);
+  });
+
+  test("does not collapse a named profile to a scalar default provider", async () => {
+    await expect(
+      createProviderRegistry({
+        generationId: "generation-profile",
+        environment: "test",
+        providers: providerSets({ cache: { archive: {} } }),
+        graph: cacheGraph("archive"),
+        factories: {
+          test: factory([], completeGeneration({ providers: { cache: { name: "default-only" } } })),
+        },
+      }),
+    ).rejects.toMatchObject({ code: "ZSYS_PROVIDER_PROFILE_UNKNOWN" });
+  });
+
+  test("keeps unconfigured default capabilities when one default profile is customized", async () => {
+    const providers = providerSets({ cache: { default: { maxEntries: 10 } } });
+    const graph = cacheGraph("default");
+    const registry = await createProviderRegistry({
+      generationId: "generation-default-profile",
+      environment: "test",
+      providers,
+      graph: {
+        ...graph,
+        nodes: [
+          ...graph.nodes,
+          { kind: "bucket", id: "assets", source, profile: "default", visibility: "private" },
+        ],
+      },
+      factories: { test: factory([]) },
+    });
+    expect(registry.resolve("buckets", "default").value).toBeDefined();
+    await registry.dispose();
   });
 
   test("rejects an unknown required profile before construction", async () => {
@@ -98,14 +148,15 @@ describe("provider registry", () => {
       factories: {
         test: {
           recipeTag: "test",
-          create: async () => ({
-            ready: () => {
-              throw new Error("CACHE_TOKEN=secret");
-            },
-            release: () => {
-              releases += 1;
-            },
-          }),
+          create: async () =>
+            completeGeneration({
+              ready: () => {
+                throw new Error("CACHE_TOKEN=secret");
+              },
+              release: () => {
+                releases += 1;
+              },
+            }),
         },
       },
     });

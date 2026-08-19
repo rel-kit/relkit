@@ -30,10 +30,12 @@ export function ToolDetailClient() {
     const traces =
       initial.targetFunctionId === ""
         ? { items: [] as readonly InspectorObject[] }
-        : await api.query<InspectorObject>("traces", {
-            functionId: initial.targetFunctionId,
-            limit: 100,
-          });
+        : await api
+            .query<InspectorObject>("traces", {
+              functionId: initial.targetFunctionId,
+              limit: 100,
+            })
+            .catch(() => ({ items: [] as readonly InspectorObject[] }));
     const next = toolView(graph, runtime.items, id, traces.items);
     if (next === undefined) throw new Error("Tool unavailable");
     setView(next);

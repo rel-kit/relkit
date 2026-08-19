@@ -69,7 +69,12 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(firstArtifacts[1]).not.toContain("COPY .");
   expect(firstArtifacts[0]).toContain(".env");
   expect(firstArtifacts[0]).toContain(".zsys/state");
-  expect(firstArtifacts[6]).toContain("createInspectableObservabilityHooks");
+  expect(firstArtifacts[6]).toContain("createObservabilityRuntime");
+  expect(firstArtifacts[6]).toContain("materializeEvents");
+  expect(firstArtifacts[6]).toContain("materializeJobs");
+  expect(firstArtifacts[6]).toContain("invokeAgent");
+  expect(firstArtifacts[6]).toContain("formatHumanLog(record)");
+  expect(firstArtifacts[6]).toContain('source: request.source ?? "http"');
   expect(firstArtifacts[6]).toContain("SIGTERM");
   await rm(built.buildDirectory, { recursive: true, force: true });
   const rebuilt = await buildProject({ projectRoot: validRoot });
@@ -85,7 +90,7 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   );
 });
 
-test("start serves health and graph and rejects an invalid build", async () => {
+test("start serves health, graph, inspector collections, and rejects an invalid build", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   const built = await buildProject({ projectRoot: root });
   const started = await startProject({ projectRoot: root, port: 0, healthTimeoutMs: 3_000 });
@@ -95,11 +100,52 @@ test("start serves health and graph and rejects an invalid build", async () => {
     expect(live.status).toBe(200);
     expect(graph.status).toBe(200);
     expect((await graph.json()) as { graphHash: string }).toMatchObject({
+      generationId: "generation.runtime",
       graphHash: built.graphHash,
+      graph: { nodes: expect.arrayContaining([expect.objectContaining({ id: "hello" })]) },
+    });
+    const routes = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/routes`);
+    const functions = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/functions`);
+    expect(routes.status).toBe(200);
+    expect(functions.status).toBe(200);
+    expect((await routes.json()) as { items: unknown[] }).toMatchObject({
+      items: [expect.objectContaining({ id: "hello.route" })],
+    });
+    expect((await functions.json()) as { items: unknown[] }).toMatchObject({
+      items: [expect.objectContaining({ id: "hello" })],
     });
     const route = await fetch(`http://${started.hostname}:${started.port}/hello/ZSys`);
     expect(route.status).toBe(200);
     expect(await route.json()).toEqual({ message: "Hello, ZSys" });
+    const action = await fetch(
+      `http://${started.hostname}:${started.port}/_zsys/v1/actions/functions/hello/invoke`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", "idempotency-key": "hello-action" },
+        body: JSON.stringify({
+          generationId: "generation.runtime",
+          graphHash: built.graphHash,
+          input: { name: "Inspector" },
+        }),
+      },
+    );
+    expect(action.status).toBe(200);
+    expect(await action.json()).toMatchObject({ output: { message: "Hello, Inspector" } });
+    const logUrl = `http://${started.hostname}:${started.port}/_zsys/v1/logs`;
+    const logs = (await (
+      await fetch(`${logUrl}?functionId=hello&severity=info&limit=1`)
+    ).json()) as { items: Array<{ invocationId: string }>; nextCursor?: string };
+    expect(logs.items).toEqual([
+      expect.objectContaining({ component: "hello", message: "hello invoked" }),
+    ]);
+    expect(logs.nextCursor).toBeDefined();
+    const continued = (await (
+      await fetch(`${logUrl}?functionId=hello&severity=info&limit=1&cursor=${logs.nextCursor}`)
+    ).json()) as { items: Array<{ invocationId: string }> };
+    expect(continued.items).toEqual([
+      expect.objectContaining({ component: "hello", message: "hello invoked" }),
+    ]);
+    expect(continued.items[0]?.invocationId).not.toBe(logs.items[0]?.invocationId);
   } finally {
     await started.stop();
   }
@@ -171,6 +217,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "events",
     "functions",
     "graph",
+    "inspector-api",
     "jobs",
     "observability",
     "providers-local",

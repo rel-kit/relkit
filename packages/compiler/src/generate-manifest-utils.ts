@@ -74,6 +74,7 @@ export function collectModules(
   functionById: ReadonlyMap<string, NormalizedDescriptor>,
   input: ManifestGenerationInput,
   application?: NormalizedDescriptor,
+  runtimeDescriptors: readonly NormalizedDescriptor[] = [],
 ): readonly string[] {
   const modules = new Set<string>();
   const add = (descriptor: NormalizedDescriptor | undefined): void => {
@@ -86,6 +87,7 @@ export function collectModules(
   transforms.forEach(add);
   for (const descriptor of middleware) add(functionById.get(referenceId(descriptor.value) ?? ""));
   add(application);
+  runtimeDescriptors.forEach(add);
   return [...modules].sort();
 }
 

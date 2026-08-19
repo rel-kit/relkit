@@ -24,6 +24,7 @@ export interface LocalProviderGeneration {
   readonly stateRoot: string;
   readonly bucketProfiles: LocalProviderResources["bucketProfiles"];
   readonly cacheProfiles: LocalProviderResources["cacheProfiles"];
+  readonly jobProfiles: LocalProviderResources["jobProfiles"];
   readonly providers: LocalProviderResources["providers"];
   readonly ready: () => Promise<void>;
   readonly readiness: () => Promise<void>;
@@ -110,6 +111,7 @@ function createFactory(
         stateRoot: stateRoot.root,
         bucketProfiles: resources.bucketProfiles,
         cacheProfiles: resources.cacheProfiles,
+        jobProfiles: resources.jobProfiles,
         providers: resources.providers,
         ready,
         readiness: ready,

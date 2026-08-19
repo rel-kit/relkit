@@ -61,10 +61,13 @@ export function normalizeEnvironment(payload: InspectorEnvironmentPage): Environ
   return { active, fields: fields(payload.items) };
 }
 
-export function normalizeDiagnostics(payload: InspectorDiagnosticsPage): DiagnosticsSnapshot {
+export function normalizeDiagnostics(
+  payload: InspectorDiagnosticsPage,
+  fallback: { readonly generationId?: unknown; readonly graphHash?: unknown } = {},
+): DiagnosticsSnapshot {
   const activePage = payload.active ?? payload;
   const active = {
-    identity: generation(activePage, "active"),
+    identity: generation(activePage, "active", fallback),
     items: diagnostics(activePage.items),
   };
   const candidatePage = payload.candidate;
@@ -92,9 +95,10 @@ function generation(
     readonly status?: unknown;
   },
   role: GenerationView["role"],
+  fallback: { readonly generationId?: unknown; readonly graphHash?: unknown } = {},
 ): GenerationView {
-  const generationId = text(value.generationId);
-  const graphHash = text(value.graphHash);
+  const generationId = text(value.generationId) ?? text(fallback.generationId);
+  const graphHash = text(value.graphHash) ?? text(fallback.graphHash);
   if (generationId === undefined || graphHash === undefined)
     throw new TypeError("Inspector generation identity is unavailable");
   return {

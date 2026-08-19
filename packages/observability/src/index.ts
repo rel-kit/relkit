@@ -8,3 +8,4 @@ export * from "./storage/segments.js";
 export * from "./storage/index.js";
 export * from "./query.js";
 export * from "./stream.js";
+export * from "./runtime.js";

@@ -131,17 +131,18 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
     ["traces", options.traces],
     ["diagnostics", options.diagnostics],
   ] as const) {
+    if (source === undefined && name !== "diagnostics") continue;
     app.get(
       `${contracts.API_BASE_PATH}/${name}`,
       handle(async (context) => listResponse(source, context)),
     );
   }
-  app.get(
-    `${contracts.API_BASE_PATH}/stream`,
-    handle(async (context) => streamResponse(options.stream, context)),
-  );
+  if (options.stream !== undefined)
+    app.get(
+      `${contracts.API_BASE_PATH}/stream`,
+      handle(async (context) => streamResponse(options.stream, context)),
+    );
 }
-
 /** Builds the safe graph stub available to the HTTP phase. */
 export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   return {
@@ -183,7 +184,6 @@ function validateConfiguration(
   if (options.bearerToken !== undefined && options.bearerToken.trim().length === 0)
     throw new InternalEndpointConfigurationError("bearerToken must not be empty.");
 }
-
 async function streamResponse(
   source: InternalEndpointOptions["stream"],
   context: Context,

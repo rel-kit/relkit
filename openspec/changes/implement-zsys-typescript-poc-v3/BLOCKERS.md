@@ -1,18 +1,87 @@
-# Current repair blockers
+# Current blockers
 
-1. **Clean candidate and authority.** The repair is intentionally unstaged and
-   no commit authority was provided. Candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b`
-   is historical, so clean-candidate reproducibility and release packaging
-   cannot be claimed.
-2. **Fresh release-gated AWS evidence.** The Pulumi product composition changed
-   in this repair. The retained 17.19 cloud run predates that change, and a
-   fresh real AWS mutation was not authorized. Local/mock deployment checks
-   pass, but Gate 16 must remain rejected until an authorized cloud rerun.
+No implementation blocker remains. One release prerequisite is still open:
+clean-candidate reproducibility has not been established for the intentionally
+dirty checkout and is not waived by the AWS decision. On `2026-08-19` the
+owner explicitly waived fresh AWS product acceptance as an archive prerequisite
+because repeated gated lifecycles were too slow. The waiver is not a cloud
+pass: the latest product-image attempts reached AWS but timed out waiting for
+service readiness, and the product capability smoke never ran.
 
-No implementation check is currently blocked locally. Do not dispatch the
-read-only final-review task while either release blocker remains. Protected
-normative documents, vendored Effect source, generated outputs, and user-owned
-dirty paths remain preserved.
+The attempts did expose and locally repair durable/ephemeral event
+materialization, collision-safe AWS child naming, the production agent model
+credential contract without plaintext injection, and non-root container
+state-directory ownership. The final
+independent AWS audit reported zero live tagged resources; NAT gateways were
+deleted, tasks were stopped or absent, and ECS services, clusters, and task
+definitions were inactive. No further AWS run is required or authorized for
+this change. Fresh exact `ZSYS_AWS_INTEGRATION=0 bun run test:all` now passes;
+the current implementation repair is locally verified, but the clean-candidate
+release prerequisite remains unclaimed.
+
+# Historical fresh final-review findings (repaired locally; cloud rerun pending)
+
+The fresh complete-branch/worktree review found four must-fix issues. Gate 16
+remains pending and archive is blocked.
+
+1. **P0 — The shipped runtime does not materialize jobs/schedules or bind
+   generated agents.** `packages/cli/src/commands/build-server.ts:8-39`
+   imports and starts `materializeEvents` only; the repository's only
+   `materializeJobs` callers are tests/testing. The same server never supplies
+   an executor for the unbound handler emitted at
+   `packages/compiler/src/generate-manifest-expressions.ts:23-29`, which throws
+   at `packages/agents/src/generated-function.ts:46-48`. A full-graph server
+   probe reported `jobs=1`, `agents=1`, `materializeJobs=false`, and
+   `generatedAgentExecutor=false`. This breaks the common-engine, durable-job,
+   schedule, agent, and complete generated-project requirements.
+2. **P0 — Provider handles do not resolve the requested capability profile,
+   and local providers omit required capabilities.**
+   `packages/engine/src/provider-registry-validation.ts:85-97` returns the
+   whole `generation.providers[capability]` value for every profile. AWS
+   constructs profile maps at `packages/cloud-aws/src/runtime/factory.ts:63-124`,
+   so every AWS bucket/cache/job/event/model handle is the map rather than its
+   selected provider; a direct probe returned `selectedProvider=false` and
+   `selectedProfileMap=true`. Local generation exposes only default bucket,
+   cache, and event providers at
+   `packages/providers-local/src/generation.ts:16-24,83-91`, despite advertising
+   jobs/models/observability. In addition,
+   `packages/engine/src/dependency-clients.ts:128-146` looks up an agent under
+   `dependencies.functions` and reports a function edge, so a declared agent
+   call reproducibly fails with `DependencyNotConfiguredError`. This violates
+   global profile selection and makes local/full AWS runtime capabilities
+   unusable through the engine.
+3. **P1 — The product inspector backend has no live observability query/stream
+   integration.** `packages/cli/src/commands/build-server.ts:43-97` exposes
+   separate in-memory arrays but passes neither `query` nor `stream` to
+   `installInspectorEndpoints`. That installer therefore skips the real
+   observability routes (`packages/inspector-api/src/router-utils.ts:118-136`),
+   while the Hono fallback emits an empty finite SSE response when no stream is
+   configured (`packages/runtime-hono/src/internal-endpoints.ts:187-199`). The
+   new client fallbacks at `apps/inspector/lib/observability-api.ts:19-47`
+   reduce details to list records and cannot provide the required correlated
+   timeline or cursor replay. This contradicts live request/log/trace and
+   resilient SSE acceptance.
+4. **P0 — The release-gated AWS smoke does not exercise the claimed AWS or
+   product capabilities.** `tests/deployment/aws-integration.test.ts:19-26,194-209`
+   calls five custom paths and accepts echoed `{ ok, operation, marker }`.
+   `tests/deployment/smoke-image/server.js:1-35` implements those paths by
+   logging and echoing only; it never touches SQS, EventBridge, S3, Valkey, the
+   ZSys engine, or the generated application. The retained report's five
+   capability-smoke claim is therefore unsupported, so the cloud/Gate 16
+   evidence must be replaced after the real product path is repaired.
+
+The committed candidate also predates the latest visible bounded repair, and
+the checklist explicitly records that clean install/verification was not rerun
+after the final candidate. This is a downstream archive prerequisite, not a
+fifth implementation finding: after repair, reproduce the complete candidate
+truthfully before any Gate 16 approval or archive dispatch.
+
+# Historical current repair blockers
+
+No repair blocker remained at that point. The user stopped the inspector process and the
+exact local root command `ZSYS_AWS_INTEGRATION=0 bun run test:all` passed,
+including all 7 Playwright tests. The required fresh read-only final review is
+ready for dispatch.
 
 # Historical final review findings (resolved)
 

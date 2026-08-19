@@ -21,8 +21,8 @@ export function readPolicy(registration: QueueRegistration): JobPolicy {
       targetFunctionId: registration.targetFunctionId,
       profile: registration.profile ?? "default",
       retry: readRetry(registration.retry),
-      ...(registration.timeoutMs === undefined ? {} : { timeoutMs: registration.timeoutMs }),
-      ...(registration.concurrency === undefined ? {} : { concurrency: registration.concurrency }),
+      ...(registration.timeoutMs == null ? {} : { timeoutMs: registration.timeoutMs }),
+      ...(registration.concurrency == null ? {} : { concurrency: registration.concurrency }),
       ...(registration.idempotency === undefined
         ? {}
         : { idempotency: readIdempotency(registration.idempotency) }),

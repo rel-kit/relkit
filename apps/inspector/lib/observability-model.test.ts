@@ -7,8 +7,16 @@ import {
   waterfall,
   EMPTY_SIGNAL_FILTERS,
 } from "./observability-model";
+import { defaultSignalFilters } from "./signal-defaults";
 
 describe("inspector observability model", () => {
+  test("defaults logs to the previous 24 hours", () => {
+    const now = Date.parse("2026-08-19T12:00:00.000Z");
+    const filters = defaultSignalFilters("logs", now);
+    expect(Date.parse(filters.from)).toBe(now - 24 * 60 * 60 * 1_000);
+    expect(defaultSignalFilters("traces", now)).toBe(EMPTY_SIGNAL_FILTERS);
+  });
+
   test("bounds query filters and merges a redacted live record once", () => {
     const query = queryFromFilters(
       { ...EMPTY_SIGNAL_FILTERS, routeId: "orders", from: "2026-08-16T00:00" },

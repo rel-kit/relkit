@@ -1,4 +1,4 @@
-import { cp, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,6 +21,22 @@ async function main(): Promise<void> {
       join(temporary, "templates", "default"),
       { recursive: true },
     );
+    const allocatePort = async (): Promise<number> => {
+      const probe = Bun.serve({ port: 0, fetch: () => new Response() });
+      const port = probe.port;
+      await probe.stop(true);
+      if (port === undefined) throw new Error("Unable to allocate a smoke port.");
+      return port;
+    };
+    process.env.PORT = String(await allocatePort());
+    const inspectorPort = await allocatePort();
+    for (const template of ["minimal", "api", "agent"]) {
+      const config = join(temporary, "templates", "default", "v1", template, "zsys.config.ts");
+      await writeFile(
+        config,
+        (await readFile(config, "utf8")).replace("3210", String(inspectorPort)),
+      );
+    }
     server = await startRegistry(temporary, tarballs, manifests);
     const registry = `http://127.0.0.1:${server.port!}`;
     const cacheDir = join(temporary, "cache");
@@ -44,7 +60,8 @@ async function main(): Promise<void> {
     await writeFile(
       runner,
       `import { normalizeCreateOptions, generateProject } from "create-zsys";
-const result = await generateProject(normalizeCreateOptions(process.argv.slice(2)), { bunExecutable: process.execPath, zsysExecutable: ${JSON.stringify(packedCli)}, commandRunner: async (command, cwd) => { const bin = ${JSON.stringify(packedCli)}; const actual = command[0] === bin ? [process.execPath, ...command] : command.at(-1) === "install" ? [...command, "--force", "--registry", ${JSON.stringify(registry)}] : command; const child = Bun.spawn(actual, { cwd, env: { ...process.env, BUN_CONFIG_REGISTRY: ${JSON.stringify(registry)}, npm_config_registry: ${JSON.stringify(registry)}, BUN_INSTALL_CACHE_DIR: ${JSON.stringify(cacheDir)} }, stdout: "pipe", stderr: "pipe" }); const [stdout, stderr, exitCode] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]); console.error(stderr); return { stdout, stderr, exitCode }; } });
+const freePort = async () => { const probe = Bun.serve({ port: 0, fetch: () => new Response() }); const port = probe.port; await probe.stop(true); if (port === undefined) throw new Error("Unable to allocate a smoke port."); return port; };
+const result = await generateProject(normalizeCreateOptions(process.argv.slice(2)), { bunExecutable: process.execPath, zsysExecutable: ${JSON.stringify(packedCli)}, commandRunner: async (command, cwd) => { const bin = ${JSON.stringify(packedCli)}; const ports = command[1] === "doctor" ? [await freePort(), await freePort()] : undefined; const checked = ports === undefined ? command : [...command, "--port", String(ports[0]), "--inspector-port", String(ports[1])]; const actual = checked[0] === bin ? [process.execPath, ...checked] : checked.at(-1) === "install" ? [...checked, "--force", "--registry", ${JSON.stringify(registry)}] : checked; const child = Bun.spawn(actual, { cwd, env: { ...process.env, BUN_CONFIG_REGISTRY: ${JSON.stringify(registry)}, npm_config_registry: ${JSON.stringify(registry)}, BUN_INSTALL_CACHE_DIR: ${JSON.stringify(cacheDir)} }, stdout: "pipe", stderr: "pipe" }); const [stdout, stderr, exitCode] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]); console.error(stderr); return { stdout, stderr, exitCode }; } });
 console.log(JSON.stringify(result));
 `,
     );

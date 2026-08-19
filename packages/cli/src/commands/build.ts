@@ -125,6 +125,7 @@ ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
 COPY server/index.js ./server/index.js
 COPY application.graph.json manifest.json openapi.json ./
+RUN mkdir -p .zsys/state .zsys/observability && chown -R bun:bun .zsys
 USER bun
 ENV NODE_ENV=production
 EXPOSE 3000

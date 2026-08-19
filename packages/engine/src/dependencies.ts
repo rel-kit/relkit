@@ -125,7 +125,7 @@ function buildCategory(
       from: options.ownerId,
       to: targetId,
     } as GraphEdge);
-    clients[name] = createClient(category, name, sources[name], options);
+    clients[name] = createClient(category, name, sources[name] ?? sources[targetId], options);
   }
   return guardedMap(category, clients);
 }

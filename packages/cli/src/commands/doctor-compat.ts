@@ -74,7 +74,9 @@ function zsysVersions(manifest: PackageJson): {
     ...new Set(
       entries
         .map(([, version]) => String(version))
-        .filter((version) => !["workspace:*", "*"].includes(version)),
+        .filter(
+          (version) => !["workspace:*", "*"].includes(version) && !version.startsWith("link:"),
+        ),
     ),
   ];
   return {

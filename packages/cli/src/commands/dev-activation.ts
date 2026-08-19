@@ -47,7 +47,12 @@ export async function activateCandidate(
         session.log({
           level: event.level,
           event: event.event,
-          fields: { directory: event.directory, ...(event.fields ?? {}) },
+          fields: {
+            directory: event.directory,
+            ...(event.stream === undefined ? {} : { stream: event.stream }),
+            ...(event.output === undefined ? {} : { output: event.output }),
+            ...(event.fields ?? {}),
+          },
         }),
     });
     if (

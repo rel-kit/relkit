@@ -1,6 +1,6 @@
 import type { SourceLocation } from "@zsys/contracts";
 import type { ApplicationGraph, GraphNode } from "@zsys/graph";
-import type { ProviderCapability, ProviderSet } from "@zsys/app";
+import type { EnvMetadata, ProviderCapability, ProviderSet } from "@zsys/app";
 import { ProviderRegistryError } from "./provider-registry-types.js";
 import type {
   ProviderHandle,
@@ -45,11 +45,10 @@ export function validateRequirements(
 ): void {
   const metadata = providerSet.metadata;
   for (const requirement of requirements) {
-    const configured = metadata.profiles[requirement.profile];
     const supported =
-      configured === undefined && requirement.profile === "default"
+      requirement.profile === "default"
         ? metadata.capabilities
-        : configured;
+        : metadata.profiles[requirement.profile];
     if (
       supported === undefined ||
       !metadata.capabilities.includes(requirement.capability) ||
@@ -68,6 +67,26 @@ export function validateRequirements(
   }
 }
 
+export function validateEnvironment(
+  environment: string,
+  metadata: Readonly<Record<string, EnvMetadata>> | undefined,
+  values: Readonly<Record<string, unknown>> | undefined,
+): void {
+  if (metadata === undefined) return;
+  for (const [variable, field] of Object.entries(metadata)) {
+    const required =
+      field.requiredIn.length > 0 ? field.requiredIn.includes(environment) : !field.optional;
+    if (!required || field.hasDefault || values?.[variable] !== undefined) continue;
+    throw new ProviderRegistryError([
+      {
+        code: "ZSYS_PROVIDER_ENVIRONMENT_INVALID",
+        message: `Required environment variable "${variable}" is missing.`,
+        variable,
+      },
+    ]);
+  }
+}
+
 export function makeHandles(
   requirements: readonly ProviderRequirement[],
   providerSet: ProviderSet,
@@ -80,7 +99,7 @@ export function makeHandles(
         pairs.set(key(capability, profile), { capability, profile });
     }
   }
-  for (const capability of providerSet.metadata.capabilities)
+  for (const { capability } of [...pairs.values()])
     pairs.set(key(capability, "default"), { capability, profile: "default" });
   const values = generation.providers;
   return Object.freeze(
@@ -90,14 +109,55 @@ export function makeHandles(
         Object.freeze({
           capability,
           profile,
-          value:
-            values && Object.prototype.hasOwnProperty.call(values, capability)
-              ? values[capability]
-              : generation,
+          value: selectProvider(
+            values?.[capability],
+            capability,
+            profile,
+            providerSet.metadata.profiles,
+          ),
         }),
       ]),
     ),
   ) as Readonly<Record<string, ProviderHandle>>;
+}
+
+function selectProvider(
+  capabilityValue: unknown,
+  capability: ProviderCapability,
+  profile: string,
+  profiles: Readonly<Record<string, readonly ProviderCapability[]>>,
+): unknown {
+  const profileMap =
+    capabilityValue instanceof Map ||
+    (isRecord(capabilityValue) &&
+      (Object.prototype.hasOwnProperty.call(capabilityValue, profile) ||
+        Object.prototype.hasOwnProperty.call(capabilityValue, "default") ||
+        Object.entries(profiles).some(
+          ([name, supported]) =>
+            name !== "default" &&
+            supported.includes(capability) &&
+            Object.prototype.hasOwnProperty.call(capabilityValue, name),
+        )));
+  const selected = profileMap
+    ? capabilityValue instanceof Map
+      ? capabilityValue.get(profile)
+      : isRecord(capabilityValue) && Object.prototype.hasOwnProperty.call(capabilityValue, profile)
+        ? capabilityValue[profile]
+        : undefined
+    : profile === "default"
+      ? capabilityValue
+      : undefined;
+  if (selected === undefined) {
+    throw new ProviderRegistryError([
+      {
+        code: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+        message: `Profile "${profile}" has no ${capability} runtime provider.`,
+        capability,
+        profile,
+      },
+    ]);
+  }
+  return selected;
 }
 
 export function key(capability: ProviderCapability, profile: string): string {

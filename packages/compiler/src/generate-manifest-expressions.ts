@@ -65,6 +65,19 @@ export function applicationExpressionFor(
     : executableExpression(descriptor, "descriptor", bindings, input);
 }
 
+export function descriptorExpressionsFor(
+  descriptors: readonly NormalizedDescriptor[],
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+): ReadonlyMap<string, string> {
+  return new Map(
+    descriptors.flatMap((descriptor) => {
+      const expression = executableExpression(descriptor, "descriptor", bindings, input);
+      return expression === undefined ? [] : [[descriptor.id, expression] as const];
+    }),
+  );
+}
+
 function isGeneratedFunction(value: unknown): ReturnType<typeof generatedAgentMarker> | undefined {
   if (!isRecord(value) || !isRecord(value.generated)) return undefined;
   if (

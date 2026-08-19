@@ -1,8 +1,9 @@
 import { canonicalJson } from "@zsys/contracts";
+import { resolve } from "node:path";
 import { buildProject } from "./commands/build.js";
 import { checkProject } from "./commands/check.js";
 import { startDev } from "./commands/dev.js";
-import { defaultInspectorOptions } from "./commands/dev-inspector.js";
+import { configuredInspectorOptions } from "./commands/dev-inspector.js";
 import { startDevSourceWatcher } from "./commands/dev-watch.js";
 import { runDeploy } from "./commands/deploy.js";
 import { runDoctor } from "./commands/doctor.js";
@@ -60,11 +61,12 @@ export async function executeCommand(
 
 async function runDevCommand(args: readonly string[], context: CliCommandContext): Promise<void> {
   const options = parseProjectArgs(args, "dev");
+  const projectRoot = resolve(options.projectRoot ?? process.cwd());
   const session = await startDev({
-    ...(options.projectRoot === undefined ? {} : { projectRoot: options.projectRoot }),
+    projectRoot,
     ...(options.port === undefined ? {} : { stablePort: options.port }),
     signal: context.signal,
-    inspector: defaultInspectorOptions(options.inspectorPort),
+    inspector: await configuredInspectorOptions(projectRoot, options.inspectorPort),
     compile: async (request) => {
       const result = await buildProject({
         projectRoot: request.projectRoot,
@@ -76,11 +78,15 @@ async function runDevCommand(args: readonly string[], context: CliCommandContext
       return { entrypoint: "server/index.ts" };
     },
   });
-  const watcher = startDevSourceWatcher(session);
   try {
-    await session.waitForShutdown();
+    const watcher = startDevSourceWatcher(session);
+    try {
+      await session.waitForShutdown();
+    } finally {
+      watcher.close();
+    }
   } finally {
-    watcher.close();
+    await session.stop();
   }
 }
 

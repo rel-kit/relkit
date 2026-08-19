@@ -10,19 +10,32 @@ import {
   type LocalCacheProvider,
   type LocalCacheProviderOptions,
 } from "./cache/index.js";
+import { createLocalEventProvider, type LocalEventProvider } from "./events/provider.js";
+import {
+  createLocalJobProvider,
+  createLocalModelProvider,
+  createLocalObservabilityProvider,
+  type LocalJobProvider,
+} from "./runtime-capabilities.js";
 import type { LocalProviderStateRoot } from "./state.js";
-
 export interface LocalProviderResources {
   readonly bucketProfiles: Readonly<Record<string, LocalBucketProvider>>;
   readonly cacheProfiles: Readonly<Record<string, LocalCacheProvider>>;
+  readonly eventProfiles: Readonly<Record<string, LocalEventProvider>>;
+  readonly jobProfiles: Readonly<Record<string, LocalJobProvider>>;
   readonly providers: Readonly<{
-    readonly buckets: LocalBucketProvider;
-    readonly cache: LocalCacheProvider;
+    readonly buckets: Readonly<Record<string, LocalBucketProvider>>;
+    readonly cache: Readonly<Record<string, LocalCacheProvider>>;
+    readonly jobs: Readonly<Record<string, LocalJobProvider>>;
+    readonly events: Readonly<Record<string, LocalEventProvider>>;
+    readonly models: Readonly<Record<string, ReturnType<typeof createLocalModelProvider>>>;
+    readonly observability: Readonly<
+      Record<string, ReturnType<typeof createLocalObservabilityProvider>>
+    >;
   }>;
   readonly ready: () => Promise<void>;
   readonly release: () => Promise<void>;
 }
-
 export async function createLocalProviderResources(
   stateRoot: LocalProviderStateRoot,
   providerSet: ProviderSet<"local" | "test">,
@@ -30,6 +43,8 @@ export async function createLocalProviderResources(
 ): Promise<LocalProviderResources> {
   const buckets: Record<string, LocalBucketProvider> = {};
   const cache: Record<string, LocalCacheProvider> = {};
+  const events: Record<string, LocalEventProvider> = {};
+  const jobs: Record<string, LocalJobProvider> = {};
   try {
     for (const profile of profiles(providerSet, "buckets")) {
       checkAborted(signal);
@@ -45,18 +60,37 @@ export async function createLocalProviderResources(
         cacheOptions(root, profile, profileConfig(providerSet, "cache", profile)),
       );
     }
+    for (const profile of profiles(providerSet, "events")) {
+      checkAborted(signal);
+      events[profile] = await createLocalEventProvider(join(stateRoot.root, "events", profile));
+    }
+    for (const profile of profiles(providerSet, "jobs")) {
+      jobs[profile] = createLocalJobProvider(stateRoot.root, profile);
+    }
   } catch (cause) {
-    await closeAll(cache, buckets);
+    await closeAll(cache, buckets, events, jobs);
     throw cause;
   }
   const bucketProfiles = Object.freeze(buckets);
   const cacheProfiles = Object.freeze(cache);
-  const defaultBucket = bucketProfiles.default;
-  const defaultCache = cacheProfiles.default;
-  if (defaultBucket === undefined || defaultCache === undefined) {
-    await closeAll(cacheProfiles, bucketProfiles);
-    throw new Error("Local provider default capability was not constructed");
-  }
+  const eventProfiles = Object.freeze(events);
+  const jobProfiles = Object.freeze(jobs);
+  const modelProfiles = Object.freeze(
+    Object.fromEntries(
+      profiles(providerSet, "models").map((profile) => [
+        profile,
+        createLocalModelProvider(profile, profileConfig(providerSet, "models", profile)),
+      ]),
+    ),
+  );
+  const observabilityProfiles = Object.freeze(
+    Object.fromEntries(
+      profiles(providerSet, "observability").map((profile) => [
+        profile,
+        createLocalObservabilityProvider(),
+      ]),
+    ),
+  );
   let released = false;
   const ready = async (): Promise<void> => {
     if (released) throw new Error("Local provider generation is closed");
@@ -68,17 +102,25 @@ export async function createLocalProviderResources(
   const release = async (): Promise<void> => {
     if (released) return;
     released = true;
-    await closeAll(cacheProfiles, bucketProfiles);
+    await closeAll(cacheProfiles, bucketProfiles, eventProfiles, jobProfiles);
   };
   return Object.freeze({
     bucketProfiles,
     cacheProfiles,
-    providers: Object.freeze({ buckets: defaultBucket, cache: defaultCache }),
+    eventProfiles,
+    jobProfiles,
+    providers: Object.freeze({
+      buckets: bucketProfiles,
+      cache: cacheProfiles,
+      jobs: jobProfiles,
+      events: eventProfiles,
+      models: modelProfiles,
+      observability: observabilityProfiles,
+    }),
     ready,
     release,
   });
 }
-
 function profiles(
   providerSet: ProviderSet<"local" | "test">,
   capability: ProviderCapability,
@@ -91,7 +133,6 @@ function profiles(
   }
   return [...names].sort();
 }
-
 function profileConfig(
   providerSet: ProviderSet<"local" | "test">,
   capability: ProviderCapability,
@@ -101,7 +142,6 @@ function profileConfig(
   if (!isRecord(configured) || !isRecord(configured[profile])) return {};
   return configured[profile] as Record<string, ProviderValue>;
 }
-
 function bucketOptions(
   root: string,
   config: Record<string, ProviderValue>,
@@ -115,7 +155,6 @@ function bucketOptions(
     ...(has(config, "pageSize") ? { pageSize: config.pageSize as number } : {}),
   };
 }
-
 function cacheOptions(
   root: string,
   profile: string,
@@ -134,28 +173,28 @@ function cacheOptions(
     ...(has(config, "evictionPolicy") ? { evictionPolicy: config.evictionPolicy as "lru" } : {}),
   };
 }
-
 async function closeAll(
   cache: Readonly<Record<string, LocalCacheProvider>>,
   buckets: Readonly<Record<string, LocalBucketProvider>>,
+  events: Readonly<Record<string, LocalEventProvider>>,
+  jobs: Readonly<Record<string, LocalJobProvider>>,
 ): Promise<void> {
   const results = await Promise.allSettled([
     ...Object.values(cache).map((value) => value.close()),
     ...Object.values(buckets).map((value) => value.close()),
+    ...Object.values(events).map((value) => value.close()),
+    ...Object.values(jobs).map((value) => value.close()),
   ]);
   if (results.some((result) => result.status === "rejected")) {
     throw new Error("Local provider shutdown failed");
   }
 }
-
 function checkAborted(signal: AbortSignal | undefined): void {
   if (signal?.aborted) throw signal.reason ?? new Error("Local provider startup was aborted");
 }
-
 function has(value: Record<string, unknown>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }
-
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

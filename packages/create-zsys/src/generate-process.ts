@@ -64,11 +64,13 @@ export async function runProjectStep(
   injectGenerateFailure(context, point);
   const result = await (context.commandRunner ?? runProjectCommand)(command, cwd, context.signal);
   throwIfAborted(context.signal);
-  if (result.exitCode !== 0)
+  if (result.exitCode !== 0) {
+    const output = result.stderr?.trim() || result.stdout?.trim();
     throw new GenerateProjectError(
       `ZSYS_CREATE_${step.toUpperCase()}_FAILED`,
-      `${step} failed with exit code ${result.exitCode}.`,
+      `${step} failed with exit code ${result.exitCode}.${output ? `\n${output}` : ""}`,
     );
+  }
 }
 
 export function throwIfAborted(signal: AbortSignal | undefined): void {

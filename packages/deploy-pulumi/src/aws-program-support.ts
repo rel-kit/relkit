@@ -70,7 +70,7 @@ export function createServicePolicy(
   plan.events.forEach((entry) => arns.set(entry.logicalName, events.eventBusArn));
   addArns(
     arns,
-    plan.eventTriggers,
+    plan.eventTriggers.filter(({ delivery }) => delivery === "durable"),
     events.triggers.map(({ id, queue }) => ({ id, arn: queue.arn })),
   );
   const values: pulumi.Input<string>[] = [];

@@ -22,10 +22,12 @@ export function AgentDetailClient() {
     ]);
     const initial = agentView(graph, runtime.items, id);
     if (initial === undefined) throw new Error("Agent unavailable");
-    const traces = await api.query<InspectorObject>("traces", {
-      functionId: initial.generatedFunctionId,
-      limit: 100,
-    });
+    const traces = await api
+      .query<InspectorObject>("traces", {
+        functionId: initial.generatedFunctionId,
+        limit: 100,
+      })
+      .catch(() => ({ items: [] as readonly InspectorObject[] }));
     const next = agentView(graph, runtime.items, id, traces.items);
     if (next === undefined) throw new Error("Agent unavailable");
     setView(next);

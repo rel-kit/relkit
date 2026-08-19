@@ -1,7 +1,7 @@
 import type { MaybePromise } from "@zsys/contracts";
 import { createBucketClient } from "@zsys/buckets";
-import { createEventDependencyClient } from "./event-client.js";
 import type { GraphEdge, ObservedEdge } from "@zsys/graph";
+import { createEventDependencyClient } from "./event-client.js";
 import type {
   DependencyBridgeOptions,
   DependencyCategory,
@@ -11,6 +11,7 @@ import type {
 import { createCacheDependencyClient } from "./cache-client.js";
 import { createJobDependencyClient } from "./job-client.js";
 import { notify } from "./edge-hooks.js";
+
 export class DependencyAccessError extends TypeError {
   readonly category: DependencyCategory;
   readonly dependencyName: string;
@@ -128,15 +129,16 @@ function wrapCallable(
   return (input) => {
     if (options.invokeFunction !== undefined) {
       notify(options.onObservedEdge, {
-        relationship: edgeKinds.functions,
+        relationship: edgeKinds[category],
         from: options.ownerId,
         to: dependencyIdFromClient(options, category, name),
       });
-      const declaration = options.dependencies?.functions?.[name];
+      const declaration = options.dependencies?.[category]?.[name];
       if (declaration === undefined) throw new DependencyNotConfiguredError(category, name);
+      const dependency = dependencyId(category, name, declaration);
       return Promise.resolve(
         options.invokeFunction({
-          functionId: dependencyId(category, name, declaration),
+          functionId: category === "agents" ? `zsys.agent.${dependency}.invoke` : dependency,
           name,
           declaration,
           source,
@@ -188,12 +190,8 @@ export function guardedMap(
   const target = Object.freeze(clients);
   return new Proxy(target, {
     get(current, property, receiver) {
-      if (
-        typeof property === "string" &&
-        !Object.prototype.hasOwnProperty.call(current, property)
-      ) {
+      if (typeof property === "string" && !Object.hasOwn(current, property))
         throw new DependencyAccessError(category, property);
-      }
       return Reflect.get(current, property, receiver);
     },
   });

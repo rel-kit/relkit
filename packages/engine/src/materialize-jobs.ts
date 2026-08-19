@@ -123,8 +123,9 @@ export async function materializeJobs(
       policy.concurrency,
       consumerLimit(options.consumerConcurrency, policy.jobId),
     );
-    const effectiveLimit = effectiveConcurrencyLimit(functionNode.concurrency, triggerLimit);
-    const admit = createAdmit(admission, policy, functionNode.concurrency, effectiveLimit);
+    const functionLimit = functionNode.concurrency ?? undefined;
+    const effectiveLimit = effectiveConcurrencyLimit(functionLimit, triggerLimit);
+    const admit = createAdmit(admission, policy, functionLimit, effectiveLimit);
     const binding = createBinding(queue, policy, admit, effectiveLimit, options);
     jobs.set(policy.jobId, binding);
     queues.set(policy.jobId, queue);

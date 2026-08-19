@@ -14,6 +14,8 @@ export function renderManifest(
   middlewareDescriptors: readonly NormalizedDescriptor[],
   providers: readonly string[],
   application?: string,
+  agents: ReadonlyMap<string, string> = new Map(),
+  tools: ReadonlyMap<string, string> = new Map(),
 ): string {
   const imports = [...bindings.values()]
     .map(
@@ -47,6 +49,8 @@ export function renderManifest(
     "  graphHash: manifestGraphHash,",
     `  functions: ${renderMap(functions)},`,
     `  targets: ${renderMap(targets)},`,
+    `  agents: ${renderMap(agents)},`,
+    `  tools: ${renderMap(tools)},`,
     "  providers: providerFactories,",
     "  providerFactories,",
     `  middleware: ${renderMap(middleware)},`,

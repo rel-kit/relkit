@@ -13,6 +13,7 @@ import {
 } from "./generate-manifest-utils.js";
 import {
   applicationExpressionFor,
+  descriptorExpressionsFor,
   functionExpressionsFor,
   functionTargetExpressionsFor,
   middlewareExpressionsFor,
@@ -75,6 +76,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const application = descriptorsOf(input.descriptors, "app")[0];
   const middleware = descriptorsOf(input.middleware ?? input.descriptors, "middleware");
   const transforms = descriptorsOf(input.transforms ?? input.descriptors, "transform");
+  const agents = descriptorsOf(input.descriptors, "agent");
+  const tools = descriptorsOf(input.descriptors, "tool");
   const functionById = uniqueById(functions, diagnostics);
   const modules = collectModules(
     functions,
@@ -83,6 +86,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     functionById,
     input,
     application,
+    [...agents, ...tools],
   );
   const bindings = importBindings(modules);
   const functionExpressions = functionExpressionsFor(
@@ -94,6 +98,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   );
   const targetExpressions = functionTargetExpressionsFor(functions, bindings, input);
   const applicationExpression = applicationExpressionFor(application, bindings, input);
+  const agentExpressions = descriptorExpressionsFor(agents, bindings, input);
+  const toolExpressions = descriptorExpressionsFor(tools, bindings, input);
   const transformExpressions = transformExpressionsFor(transforms, bindings, input, diagnostics);
   const middlewareExpressions = middlewareExpressionsFor(
     middleware,
@@ -116,6 +122,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       middleware,
       providerTags(input.descriptors),
       applicationExpression,
+      agentExpressions,
+      toolExpressions,
     ),
     diagnostics,
     true,

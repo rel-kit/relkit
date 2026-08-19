@@ -19,6 +19,7 @@ export * from "./jobs/scheduler.js";
 export * from "./jobs/admin.js";
 export * from "./events/log.js";
 export * from "./events/router.js";
+export * from "./events/provider.js";
 export * from "./events/admin.js";
 export * from "./events/ephemeral.js";
 export { EVENT_DELIVERY_CAPABILITIES, createEventDelivery } from "./events/delivery.js";

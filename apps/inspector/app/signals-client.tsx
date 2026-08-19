@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorBackendStream, createInspectorClient } from "../lib/client";
 import {
-  EMPTY_SIGNAL_FILTERS,
   eventRecord,
   matchesQuery,
   mergeLiveItems,
@@ -12,12 +11,13 @@ import {
   type SignalFilters,
   type SignalKind,
 } from "../lib/observability-model";
+import { defaultSignalFilters } from "../lib/signal-defaults";
 import { SignalsFilters } from "./signals-filters";
 import { SignalRows } from "./signal-rows";
 
 export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
-  const [draft, setDraft] = useState<SignalFilters>(EMPTY_SIGNAL_FILTERS);
-  const [filters, setFilters] = useState<SignalFilters>(EMPTY_SIGNAL_FILTERS);
+  const [draft, setDraft] = useState<SignalFilters>(() => defaultSignalFilters(kind));
+  const [filters, setFilters] = useState<SignalFilters>(() => defaultSignalFilters(kind));
   const [limit, setLimit] = useState(50);
   const [cursors, setCursors] = useState<readonly (string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
@@ -83,8 +83,9 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
     setAnnouncement("Filters applied. Loading results…");
   };
   const reset = (): void => {
-    setDraft(EMPTY_SIGNAL_FILTERS);
-    setFilters(EMPTY_SIGNAL_FILTERS);
+    const defaults = defaultSignalFilters(kind);
+    setDraft(defaults);
+    setFilters(defaults);
     setLimit(50);
     resetPage();
     setAnnouncement("Filters reset. Loading results…");

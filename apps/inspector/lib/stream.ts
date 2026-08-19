@@ -14,6 +14,7 @@ import {
   type StreamSnapshot,
 } from "./stream-protocol";
 import { connectStream } from "./stream-reader";
+import { resolveBackendUrl } from "./backend-url";
 export * from "./stream-protocol";
 
 export class InspectorStreamClient {
@@ -181,9 +182,7 @@ export class InspectorStreamClient {
     const path = `${INSPECTOR_API_BASE}/stream${this.options.type === undefined ? "" : `?type=${encodeURIComponent(this.options.type)}`}`;
     const separator = path.includes("?") ? "&" : "?";
     const query = cursor === undefined ? "" : `${separator}cursor=${encodeURIComponent(cursor)}`;
-    return this.baseUrl === ""
-      ? `${path}${query}`
-      : new URL(`${path}${query}`, `${this.baseUrl}/`).toString();
+    return resolveBackendUrl(this.baseUrl, `${path}${query}`);
   }
   private wait(ms: number): Promise<void> {
     return new Promise((resolve) => {

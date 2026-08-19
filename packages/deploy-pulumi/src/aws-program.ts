@@ -55,6 +55,7 @@ export function createAwsPulumiResources(
   plan: DeploymentPlan,
   options: AwsProgramOptions = {},
 ): AwsProgramResources {
+  const durableEventTriggers = plan.eventTriggers.filter(({ delivery }) => delivery === "durable");
   const root = new pulumi.ComponentResource("zsys:cloud-aws:application", plan.application.id);
   const common = {
     appId: plan.application.id,
@@ -87,7 +88,7 @@ export function createAwsPulumiResources(
     {
       ...common,
       events: plan.events.map(({ id, version }) => ({ id, version })),
-      eventTriggers: plan.eventTriggers.map(eventTriggerDefinition),
+      eventTriggers: durableEventTriggers.map(eventTriggerDefinition),
       eventSource: "zsys.application",
     },
     child,

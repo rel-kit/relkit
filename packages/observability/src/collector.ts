@@ -35,7 +35,7 @@ export interface ObservabilityCollectorOptions {
 export interface ObservabilityCollector {
   readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
   readonly version: typeof OBSERVABILITY_HOOK_VERSION;
-  readonly emit: (event: unknown) => void;
+  readonly emit: (event: unknown) => RedactedObservabilityRecord | undefined;
   readonly collect: (record: ObservabilityRecord) => RedactedObservabilityRecord | undefined;
   readonly read: () => readonly RedactedObservabilityRecord[];
   readonly clear: () => void;
@@ -66,9 +66,9 @@ export function createObservabilityCollector(
     retained.push(admitted);
     return admitted;
   };
-  const emit = (event: unknown): void => {
+  const emit = (event: unknown): RedactedObservabilityRecord | undefined => {
     const record = toObservabilityRecord(event);
-    if (record !== undefined) collect(record);
+    return record === undefined ? undefined : collect(record);
   };
   return Object.freeze({
     protocol: OBSERVABILITY_HOOK_PROTOCOL,

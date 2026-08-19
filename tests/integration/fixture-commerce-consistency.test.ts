@@ -85,6 +85,7 @@ test("fixture-commerce keeps one graph and hash across every acceptance consumer
   expect(providerRecipe(app.providers.test)).toBe("test");
   expect(providerRecipe(app.providers.production)).toBe("aws");
   expect(app.env.OPENAI_API_KEY.sensitive).toBe(true);
+  expect(app.env.metadata.OPENAI_API_KEY?.requiredIn).toEqual(["production"]);
   expect(app.observability?.bodyCapture?.mode).toBe("off");
 
   const observability = createInspectableObservabilityHooks();

@@ -1,0 +1,3 @@
+command=bun run verify
+exitCode=0
+durationSeconds=50.411

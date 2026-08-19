@@ -48,8 +48,12 @@ export function FunctionDetailClient() {
     const api = createInspectorClient();
     void Promise.all([
       api.detail<InspectorObject>("functions", id),
-      api.query<InspectorObject>("logs", { functionId: id, limit: 10 }),
-      api.query<InspectorObject>("traces", { functionId: id, limit: 10 }),
+      api
+        .query<InspectorObject>("logs", { functionId: id, limit: 10 })
+        .catch(() => ({ items: [] as readonly InspectorObject[] })),
+      api
+        .query<InspectorObject>("traces", { functionId: id, limit: 10 })
+        .catch(() => ({ items: [] as readonly InspectorObject[] })),
     ])
       .then(([detail, logPage, tracePage]) => {
         const node = record(detail.node) ?? record(detail.descriptor) ?? record(detail);

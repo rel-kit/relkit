@@ -1,0 +1,3 @@
+command=bun run scripts/pack-and-smoke-create-zsys.ts
+exitCode=0
+durationSeconds=30.411

@@ -1,24 +1,109 @@
-# Current repair status — Gate 16 rejected
+# Current AWS waiver and final-review readiness
 
-The bounded same-directory repair addressed findings 1–9 and 11 from the
-final review: shipped HTTP execution now uses the common engine and protected
-internal endpoints; product Pulumi code composes the AWS topology; dev starts
-the Next inspector and forwards source changes; defaults/docs/guidance,
-`test:all`, public JSDoc, speculative exports, naming, and the verified 17.15
-checksum are corrected. Focused runtime, deployment, dev, packed-smoke, build,
-and local test-layer checks pass. Preserved generated outputs and unrelated
-dirty paths were not removed or moved.
+On `2026-08-19` the owner explicitly removed fresh AWS product acceptance as an
+archive blocker because the gated lifecycle took too long. This is a waiver,
+not passing evidence: the current product image reached AWS but service
+readiness timed out before `POST /orders` and the SQS/EventBridge/S3/Valkey/
+CloudWatch smoke could run. The lifecycle's guaranteed destroy completed, and
+an independent tag/status audit found zero live resources.
 
-OpenSpec remains `spec-driven`, `all_done`, and `287/287`; tasks were not
-unchecked or reimplemented. The current repair is unstaged, so candidate
-`6c0e219974230c6b9071ca13ead5a8187e9ef45b` is historical and not clean-checkout
-reproducible. Fresh release-gated AWS evidence for the changed product path is
-required but was not authorized. Gate 16 remains rejected and no fresh
-read-only final review was dispatched.
+The attempts exposed four locally repaired shipped-path issues: ephemeral
+listeners are no longer materialized as durable AWS queues, truncated AWS child
+names retain collision-safe hashes, the shipped production agent model key is
+required without plaintext injection, and generated containers pre-create
+writable runtime state/observability directories for the non-root `bun` user.
+The final-review repair also validates declared runtime environment values
+before provider startup, rejects named-only provider maps as default handles,
+releases failed generations, and admits provider/worker failures to the
+observability runtime. Focused regressions, typecheck, boundaries, workspace
+build, container lifecycle, local product liveness/readiness, cloud-free
+deployment, formatting, and `git diff --check` pass. Fresh exact
+`ZSYS_AWS_INTEGRATION=0 bun run test:all` also passes every local layer,
+including all seven Playwright tests. No implementation blocker remains; a
+clean-candidate reproduction is still unclaimed for this intentionally dirty
+checkout and must not be presented as current release evidence.
+
+# Historical bounded product-path repair
+
+The same-directory repair resolved the four active findings without changing
+any of the 287 completed task checkboxes. The emitted dev/start/container
+server now binds generated agents to `invokeAgent`, materializes jobs and
+schedules through the common engine, runs the provider-backed worker, and
+materializes event triggers. The runtime manifest now carries the authored
+agent/tool descriptors required by that binding.
+
+Provider generations now expose per-profile capability maps in both local and
+AWS shapes. Registry handles select the requested profile, the default profile
+retains all advertised capabilities, local/test construct jobs, deterministic
+models, and observability, and declared agent dependencies route to the stable
+generated function ID with an `invokes-agent` observation.
+
+The product server now uses one admitted observability runtime for engine
+hooks, request records, structured logs, persistent query/index storage, and
+replay/live SSE. The real inspector receives that query and stream; empty Hono
+observability stubs and inspector detail-list fallbacks no longer mask a
+missing backend. The full-graph product regression proves request detail and
+timeline, filtered cursor pagination, live SSE, pre-sink redaction, an agent
+invocation, event-to-job routing, and common-engine job execution.
+
+The echo-only AWS smoke image was removed. The gated contract now drives the
+fixture-commerce `POST /orders` product path and waits for the SQS worker's S3
+receipt plus its CloudWatch log; the request also requires Valkey and
+EventBridge success. AWS runtime mocks cover SQS send/receive/acknowledge and
+ECS task-role credential signing. At that point no authorized cloud acceptance
+had run.
+
+Focused engine/provider/compiler/observability/runtime/AWS/product tests pass.
+Root typecheck, the 34-root/786-file boundary scan, security/redaction,
+integration (37), inspector (5), deployment with
+`ZSYS_AWS_INTEGRATION=0` (14 pass/1 skip), and container (3) all pass. One
+mistaken unguarded deployment-test invocation inherited the `.env` AWS flag
+and failed before stack creation at `pulumi stack init` for a missing Pulumi
+passphrase; it is not evidence and created no cloud resources.
+
+This historical cloud prerequisite was later owner-waived as recorded above.
+
+# Historical fresh final review — repair required
+
+Fresh read-only review task `01a01ae7-6c25-7de0-8c55-5de2b83aa9a9`
+reviewed the complete branch from merge base
+`b94efe52729ba161c6c6fb0ee02988f40c7f6fba` through candidate
+`73a7e3c16e0add0fe4a984d450f1e1c65a4499be` plus every visible tracked and
+untracked worktree change, including bounded repair
+`01a01ab6-e5be-7632-981a-ff1a95c9aa9e`. The two bounded cursor/redaction
+repairs are correct, but four complete-branch must-fix findings remain; they
+are recorded once at the top of `BLOCKERS.md`. No archive task was dispatched.
+
+The review's read-only probes found that the full compiler fixture has one job,
+one agent, and one event trigger, while the emitted product server contains
+`materializeEvents` but no `materializeJobs`, observability query/stream, or
+generated-agent executor. The only `materializeJobs` callers are tests/testing.
+A direct engine probe reproduced declared agent invocation failing with
+`DependencyNotConfiguredError`, and a provider-registry probe showed an AWS
+profile map is returned instead of the selected provider. Inspection also
+confirmed that the release-gated AWS smoke image only echoes operation names
+and does not call SQS, EventBridge, S3, Valkey, or the product runtime.
+
+OpenSpec remains `spec-driven`, `all_done`, and `287/287`; `git diff --check`
+passes. Strict archive validation was not rerun because a clean final review is
+an unmet prerequisite. Gate 16 remains pending and archive is blocked until a
+bounded repair, affected product-path regressions, truthful replacement cloud
+evidence, and another fresh complete-branch review succeed.
+
+### Bounded repair handoff
+
+Fresh same-directory bounded repair task
+`01a01aee-bef9-7421-ae9d-2d8a8dcfc116` was dispatched on host `local` using
+the saved `zsys` project and normal checkout. Its exactly one bounded
+`wait_threads(timeoutMs: 10000)` snapshot timed out while the task remained
+active and in progress. Startup commentary confirmed the requested iterator
+and apply-change workflows, existing-seam/minimal-repair scope, and bounded
+verification sequence; no blocker or user-input request was reported. Cursor:
+`9f846bbf-bf31-4c80-9ca6-d32b1c9bcc14:3`.
 
 The historical review/17.20 records below are retained for audit context; the
-current release decision is in `RELEASE_CHECKLIST.md` and remaining blockers
-are recorded once below in `BLOCKERS.md`.
+current release decision is in `RELEASE_CHECKLIST.md` and current blockers are
+recorded once in `BLOCKERS.md`.
 
 # Historical final branch review (superseded)
 

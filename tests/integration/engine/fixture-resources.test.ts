@@ -58,10 +58,10 @@ describe("fixture-commerce managed resources", () => {
           { clients: clientsFor(first) },
         ),
       ).resolves.toEqual({ receiptId: "order-1:order-1.json" });
-      expect(first.providers.cache.snapshot()).toMatchObject({ entries: 1, misses: 1 });
-      expect(new TextDecoder().decode(await first.providers.buckets.get("order-1.json"))).toBe(
-        JSON.stringify({ orderId: "order-1" }),
-      );
+      expect(first.providers.cache.default!.snapshot()).toMatchObject({ entries: 1, misses: 1 });
+      expect(
+        new TextDecoder().decode(await first.providers.buckets.default!.get("order-1.json")),
+      ).toBe(JSON.stringify({ orderId: "order-1" }));
 
       await first.release();
       second = await factory.create({
@@ -82,10 +82,10 @@ describe("fixture-commerce managed resources", () => {
           { clients: clientsFor(second) },
         ),
       ).resolves.toEqual({ orderId: "order-1", receiptKey: "order-1.json", totalCents: 2_000 });
-      expect(second.providers.cache.snapshot()).toMatchObject({ entries: 1, hits: 1 });
-      expect(new TextDecoder().decode(await second.providers.buckets.get("order-1.json"))).toBe(
-        JSON.stringify({ orderId: "order-1" }),
-      );
+      expect(second.providers.cache.default!.snapshot()).toMatchObject({ entries: 1, hits: 1 });
+      expect(
+        new TextDecoder().decode(await second.providers.buckets.default!.get("order-1.json")),
+      ).toBe(JSON.stringify({ orderId: "order-1" }));
     } finally {
       await second?.release();
       await first?.release();
@@ -95,8 +95,8 @@ describe("fixture-commerce managed resources", () => {
 
 function clientsFor(generation: LocalProviderGeneration): DependencyClientSources {
   return {
-    buckets: { assets: generation.providers.buckets },
-    cache: { prices: generation.providers.cache },
+    buckets: { assets: generation.providers.buckets.default! },
+    cache: { prices: generation.providers.cache.default! },
     events: {
       orderCreated: {
         publish: async () => ({ instanceId: "event-1", accepted: true }),

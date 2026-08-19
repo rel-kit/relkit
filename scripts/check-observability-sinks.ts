@@ -10,6 +10,11 @@ export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
   "packages/engine/src",
   "packages/agents/src",
   "packages/inspector-api/src",
+  "packages/cli/src/commands",
+] as const);
+
+export const OBSERVABILITY_DIRECT_OUTPUT_ADAPTERS = Object.freeze([
+  "packages/cli/src/commands/dev-logger.ts",
 ] as const);
 
 export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
@@ -67,7 +72,10 @@ function visit(
   violations: ObservabilitySinkViolation[],
 ): void {
   if (ts.isCallExpression(node)) {
-    if (isDirectOutput(node.expression))
+    if (
+      isDirectOutput(node.expression) &&
+      !OBSERVABILITY_DIRECT_OUTPUT_ADAPTERS.includes(file as never)
+    )
       add(
         violations,
         source,

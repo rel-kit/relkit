@@ -1,3 +1,5 @@
+import { boundedAwsName } from "../common.js";
+
 export function childResourceName(
   componentName: string,
   id: string,
@@ -8,5 +10,5 @@ export function childResourceName(
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return normalized.slice(0, maxLength).replace(/-+$/, "") || "zsys";
+  return boundedAwsName(normalized, maxLength);
 }

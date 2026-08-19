@@ -3,6 +3,9 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { DeploymentPlan } from "@zsys/deploy";
+import * as pulumi from "@pulumi/pulumi";
+import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
+import { createAwsPulumiResources } from "./src/aws-program.ts";
 import { imageValue } from "./src/aws-program-support.ts";
 import { PULUMI_PROGRAM_VERSION, renderPulumiProgram, writePulumiProgram } from "./src/program.ts";
 
@@ -13,6 +16,110 @@ afterEach(async () => {
 });
 
 describe("Pulumi program generation", () => {
+  test("materializes only durable event triggers in AWS", async () => {
+    const resources: Array<{ readonly type: string; readonly name: string }> = [];
+    await pulumi.runtime.setMocks(
+      {
+        newResource: (args: MockResourceArgs) => {
+          resources.push({ type: args.type, name: args.name });
+          return {
+            id: `${args.name}-id`,
+            state: {
+              ...args.inputs,
+              arn: `arn:test:${args.name}`,
+              name: args.inputs.name ?? args.name,
+              publicSubnetIds: ["public-1"],
+              privateSubnetIds: ["private-1"],
+              bucket: `${args.name}.bucket`,
+              endpoints: [{ address: "cache.test", port: 6379 }],
+              repositoryUrl: `registry.test/${args.name}`,
+              resourceId: `service/${args.name}`,
+            },
+          };
+        },
+        call: () => ({ region: "us-east-1", name: "us-east-1" }),
+      },
+      "zsys-program-test",
+      "development",
+    );
+    await pulumi.runtime.runInPulumiStack(() => {
+      createAwsPulumiResources({
+        ...plan(),
+        jobs: [
+          {
+            id: "receipts.send",
+            logicalName: "receipts-job",
+            configurationNames: [],
+            targetFunctionId: "receipts.send",
+            profile: "default",
+          },
+        ],
+        events: [
+          {
+            id: "orders.created",
+            logicalName: "orders-event",
+            configurationNames: [],
+            version: 1,
+            payload: {},
+          },
+        ],
+        eventTriggers: [
+          {
+            id: "telemetry.capture",
+            logicalName: "telemetry-trigger",
+            configurationNames: [],
+            targetFunctionId: "telemetry.capture",
+            expansion: [],
+            delivery: "ephemeral",
+          },
+          {
+            id: "orders.handle",
+            logicalName: "orders-trigger",
+            configurationNames: [],
+            targetFunctionId: "orders.handle",
+            expansion: ["orders.created@1"],
+            delivery: "durable",
+          },
+        ],
+        buckets: [
+          {
+            id: "assets",
+            logicalName: "assets-bucket",
+            configurationNames: [],
+            profile: "default",
+            visibility: "private",
+          },
+        ],
+        caches: [
+          {
+            id: "prices",
+            logicalName: "prices-cache",
+            configurationNames: [],
+            profile: "default",
+          },
+        ],
+        iam: {
+          serviceRole: {
+            statements: [
+              {
+                capability: "jobs",
+                actions: ["sqs:ReceiveMessage"],
+                resources: ["orders-trigger"],
+              },
+            ],
+          },
+          perFunction: [],
+        },
+      });
+    });
+    await Bun.sleep(100);
+
+    expect(
+      resources.filter(({ type }) => type === "aws:cloudwatch/eventRule:EventRule"),
+    ).toHaveLength(1);
+    expect(resources.some(({ name }) => name.includes("telemetry-capture"))).toBe(false);
+  });
+
   test("preserves an image name that already contains a tag", () => {
     expect(
       imageValue({

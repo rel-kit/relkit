@@ -30,7 +30,7 @@ describe("declared dependency clients", () => {
     const sources: DependencyClientSources = {
       functions: { lookup: async (input) => ({ input }) },
       jobs: { send: { enqueue: async (input) => ({ input }) } },
-      events: { created: { publish: async (payload) => ({ payload }) } },
+      events: { "orders.created": { publish: async (payload) => ({ payload }) } },
       buckets: { files: { put: async () => undefined, get: async () => new Uint8Array() } },
       cache: { prices: { get: async () => 3, set: async () => undefined } },
       agents: { summarize: async (input) => ({ input }) },
@@ -146,6 +146,32 @@ describe("declared dependency clients", () => {
     ]);
     expect(observed).toEqual([
       { relationship: "calls-function", from: "orders.handle", to: "orders.lookup" },
+    ]);
+  });
+
+  test("routes declared agents to their generated function and agent edge", async () => {
+    const calls: unknown[] = [];
+    const observed: unknown[] = [];
+    const clients = buildDependencyClients({
+      ownerId: "orders.handle",
+      dependencies: { agents: { support: ref("agent", "orders.support") } },
+      sources: { agents: { "orders.support": async () => ({ answer: "ok" }) } },
+      invokeFunction: async (request) => {
+        calls.push(request);
+        return { answer: "ok" };
+      },
+      onObservedEdge: (edge) => observed.push(edge),
+    });
+
+    await (clients.agents.support as (input: unknown) => Promise<unknown>)({ question: "status" });
+    expect(calls).toEqual([
+      expect.objectContaining({
+        functionId: "zsys.agent.orders.support.invoke",
+        declaration: ref("agent", "orders.support"),
+      }),
+    ]);
+    expect(observed).toEqual([
+      { relationship: "invokes-agent", from: "orders.handle", to: "orders.support" },
     ]);
   });
 });

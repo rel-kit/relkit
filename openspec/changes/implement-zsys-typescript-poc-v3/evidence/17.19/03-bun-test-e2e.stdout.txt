@@ -1,0 +1,11 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 tests/e2e/inspector.spec.ts:14:1 › loads the active graph and follows route/detail/composer flows (1.5s)
+  ✓  2 tests/e2e/inspector.spec.ts:34:1 › shows a new request live and renders its correlated timeline and edges (2.4s)
+  ✓  3 tests/e2e/inspector.spec.ts:70:1 › renders every required inspector page (4.0s)
+  ✓  4 tests/e2e/inspector.spec.ts:110:1 › uses event terminology, local job actions, diagnostics, agent tools, and source links (2.6s)
+  ✓  5 tests/e2e/inspector.spec.ts:150:1 › keeps critical controls usable on a narrow viewport (299ms)
+  ✓  6 tests/e2e/inspector.spec.ts:162:1 › scans inspector bundles and network payloads for boundary leaks (548ms)
+
+  6 passed (14.4s)

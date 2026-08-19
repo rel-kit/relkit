@@ -1,6 +1,12 @@
 import type { MaybePromise, SourceLocation } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
-import type { ProviderCapability, ProviderRecipe, ProviderSet, ProviderSets } from "@zsys/app";
+import type {
+  EnvMetadata,
+  ProviderCapability,
+  ProviderRecipe,
+  ProviderSet,
+  ProviderSets,
+} from "@zsys/app";
 
 export const PROVIDER_RECIPES = {
   development: "local",
@@ -49,6 +55,7 @@ export interface ProviderRegistryOptions {
   readonly graph: ApplicationGraph;
   readonly factories?: ProviderFactories;
   readonly values?: Readonly<Record<string, unknown>>;
+  readonly environmentMetadata?: Readonly<Record<string, EnvMetadata>>;
   readonly signal?: AbortSignal;
 }
 export interface ProviderRegistry {
@@ -79,6 +86,7 @@ export interface ProviderRegistryIssue {
   readonly message: string;
   readonly capability?: ProviderCapability;
   readonly profile?: string;
+  readonly variable?: string;
   readonly source?: SourceLocation;
 }
 export class ProviderRegistryError extends Error {

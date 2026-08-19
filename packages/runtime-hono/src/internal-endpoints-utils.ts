@@ -43,8 +43,9 @@ export async function listResponse(
   source: QuerySource | undefined,
   context: Context,
 ): Promise<Response> {
-  const value = source === undefined ? [] : await resolveQuery(source, readQuery(context.req.raw));
-  const page = toPage(value as JsonValue | InternalPage);
+  const query = readQuery(context.req.raw);
+  const value = source === undefined ? [] : await resolveQuery(source, query);
+  const page = queryPage(toPage(value as JsonValue | InternalPage), query);
   return jsonResponse({
     items: page.items,
     ...(page.nextCursor === undefined ? {} : { nextCursor: page.nextCursor }),
@@ -96,6 +97,54 @@ export function toPage(value: JsonValue | InternalPage): InternalPage {
     };
   }
   return { items: [value] };
+}
+
+function queryPage(page: InternalPage, query: InternalQuery): InternalPage {
+  const from = query.from === undefined ? undefined : Date.parse(query.from);
+  const to = query.to === undefined ? undefined : Date.parse(query.to);
+  if ((from !== undefined && !Number.isFinite(from)) || (to !== undefined && !Number.isFinite(to)))
+    throw new InternalQueryError();
+  if (from !== undefined && to !== undefined && from > to) throw new InternalQueryError();
+  const filtered = page.items.filter((item) => matchesQuery(item, query, from, to));
+  const start = page.nextCursor === undefined ? cursorOffset(query.cursor) : 0;
+  const items = filtered.slice(start, start + query.limit);
+  const next = start + items.length < filtered.length ? String(start + items.length) : undefined;
+  const nextCursor = next ?? page.nextCursor;
+  return { items, ...(nextCursor === undefined ? {} : { nextCursor }) };
+}
+
+function matchesQuery(item: JsonValue, query: InternalQuery, from?: number, to?: number): boolean {
+  if (!isRecord(item))
+    return Object.keys(query).every((key) => key === "limit" || key === "cursor");
+  const timestamp = [item.timestamp, item.startedAt, item.occurredAt, item.completedAt].find(
+    (value) => typeof value === "string",
+  );
+  const time = typeof timestamp === "string" ? Date.parse(timestamp) : Number.NaN;
+  return (
+    exact(item, query.routeId, "routeId") &&
+    exact(item, query.functionId, "functionId") &&
+    exact(item, query.outcome, "outcome") &&
+    exact(item, query.traceId, "traceId") &&
+    (query.requestId === undefined ||
+      item.requestId === query.requestId ||
+      item.correlationId === query.requestId) &&
+    (query.severity === undefined ||
+      item.level === query.severity ||
+      item.severity === query.severity) &&
+    (from === undefined || (Number.isFinite(time) && time >= from)) &&
+    (to === undefined || (Number.isFinite(time) && time <= to))
+  );
+}
+
+function exact(item: Record<string, JsonValue>, value: string | undefined, key: string): boolean {
+  return value === undefined || item[key] === value;
+}
+
+function cursorOffset(value: string | undefined): number {
+  if (value === undefined) return 0;
+  const offset = Number(value);
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new InternalQueryError();
+  return offset;
 }
 
 export function streamBody(value: unknown): string {

@@ -23,13 +23,23 @@ export function createBinding(
   triggerLimit: number | undefined,
   options: JobMaterializationOptions,
 ): MaterializedJob {
-  const enqueue = (input: JsonValue, request: JobEnqueueOptions = {}): Promise<JobQueueEntry> =>
-    queue.enqueue({
+  const enqueue = async (
+    input: JsonValue,
+    request: JobEnqueueOptions = {},
+  ): Promise<JobQueueEntry> => {
+    const accepted = await queue.enqueue({
       input,
       profile: policy.profile,
       ...(policy.idempotency === undefined ? {} : { idempotency: policy.idempotency }),
       ...request,
     });
+    return accepted.state === "accepted"
+      ? queue.transition(accepted.instanceId, "available", {
+          expectedState: "accepted",
+          availableAt: accepted.acceptedAt,
+        })
+      : accepted;
+  };
   const runNext = async (instanceId?: string): Promise<JobRunResult | undefined> => {
     const leased = await queue.acquire(instanceId);
     if (leased === undefined) return undefined;

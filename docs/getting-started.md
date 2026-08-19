@@ -29,6 +29,14 @@ bunx create-zsys@latest my-app
 cd my-app
 ```
 
+When testing changes from a ZSys checkout, use its source-backed CLI after
+building the workspace; this does not publish packages:
+
+```sh
+bun run build
+bun run zsys:local -- create my-app --cloud none --deploy none
+```
+
 The equivalent CLI form is `zsys create my-app`. The generator supports three
 templates:
 

@@ -31,6 +31,19 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
   await expect(page.getByRole("link", { name: "Open trace" })).toBeVisible();
 });
 
+test("keeps contracts available when observability is unavailable", async ({ page }) => {
+  await page.route(/\/_zsys\/v1\/(?:requests|logs|traces)(?:\?|$)/, (route) => route.abort());
+
+  await page.goto("/routes/orders.create.http");
+  await expect(page.getByRole("heading", { name: "Route detail" })).toBeVisible();
+  await page.goto("/functions/orders.create");
+  await expect(page.getByRole("heading", { name: "Function detail" })).toBeVisible();
+  await page.goto("/tools/orders.get.tool");
+  await expect(page.getByRole("heading", { name: "Tool detail" })).toBeVisible();
+  await page.goto("/agents/support.order");
+  await expect(page.getByRole("heading", { name: "Agent detail" })).toBeVisible();
+});
+
 test("shows a new request live and renders its correlated timeline and edges", async ({
   page,
   request,

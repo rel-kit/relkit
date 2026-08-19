@@ -4,7 +4,11 @@ import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@zsys/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
-import { defaultInspectorOptions } from "./src/commands/dev-inspector.js";
+import {
+  configuredInspectorOptions,
+  defaultInspectorOptions,
+} from "./src/commands/dev-inspector.js";
+import { createDevLogger } from "./src/commands/dev-logger.js";
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
 
 const sessions: Array<Awaited<ReturnType<typeof startDev>>> = [];
@@ -68,6 +72,26 @@ test("stops an inspector child through the external shutdown signal", async () =
   expect(session.activeTarget).toBeUndefined();
 });
 
+test("releases the backend port when its terminal closes", async () => {
+  const root = await makeRoot();
+  const existingHandlers = new Set(process.listeners("SIGHUP"));
+  const session = await startDev({
+    ...options(root, "sha256:dev-hangup"),
+    installSignalHandlers: true,
+  });
+  sessions.push(session);
+  const port = session.backendPort;
+  const hangup = process.listeners("SIGHUP").find((handler) => !existingHandlers.has(handler));
+
+  expect(hangup).toBeDefined();
+  hangup?.();
+  await session.waitForShutdown();
+
+  expect(session.activeTarget).toBeUndefined();
+  const replacement = Bun.serve({ hostname: "127.0.0.1", port, fetch: () => new Response() });
+  await replacement.stop(true);
+});
+
 test("forwards source saves through the supervisor watcher", async () => {
   const root = await makeRoot();
   await mkdir(join(root, "src"));
@@ -90,11 +114,63 @@ test("forwards source saves through the supervisor watcher", async () => {
   expect(session.stateMachine.state).toBe("active");
 });
 
+test("forwards backend console output through dev logs", async () => {
+  const root = await makeRoot();
+  const logs: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
+  const output: string[] = [];
+  const session = await startDev({
+    ...options(root, "sha256:console-output"),
+    logger: { human: { write: (line) => output.push(line) }, json: false },
+    onLog: (event) => logs.push(event),
+  });
+  sessions.push(session);
+
+  await fetch(`http://127.0.0.1:${session.backendPort}/hello`);
+  await waitFor(() =>
+    logs.some(
+      (event) =>
+        event.event === "candidate.startup-output" &&
+        String(event.fields?.output).includes("backend hello"),
+    ),
+  );
+  expect(output).toContain("backend hello");
+  expect(output.some((line) => line.includes("candidate.startup-output"))).toBe(false);
+});
+
+test("redacts candidate output before callbacks and human sinks", () => {
+  const secret = "super-secret-password";
+  const callbacks: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
+  const output: string[] = [];
+  const log = createDevLogger({
+    compile: async () => {
+      throw new Error("unused");
+    },
+    logger: { human: { write: (line) => output.push(line) }, json: false },
+    onLog: (event) => callbacks.push(event),
+  });
+
+  log({
+    level: "info",
+    event: "candidate.startup-output",
+    fields: { stream: "stdout", output: `backend ready password=${secret}` },
+  });
+
+  expect(output).toEqual(["backend ready password=[REDACTED]"]);
+  expect(JSON.stringify({ callbacks, output })).not.toContain(secret);
+});
+
 test("uses the workspace Next inspector and configured port by default", () => {
   const options = defaultInspectorOptions(3217);
   expect(options.command).toEqual([process.execPath, "run", "dev"]);
   expect(options.cwd?.endsWith("/apps/inspector")).toBe(true);
   expect(options.port).toBe(3217);
+});
+
+test("reads the inspector port from zsys.config.ts unless the CLI overrides it", async () => {
+  const root = await makeRoot();
+  await writeFile(join(root, "zsys.config.ts"), "export default { inspector: { port: 4210 } };\n");
+  expect((await configuredInspectorOptions(root)).port).toBe(4210);
+  expect((await configuredInspectorOptions(root, 4211)).port).toBe(4211);
 });
 
 async function makeRoot(): Promise<string> {
@@ -126,7 +202,7 @@ Bun.serve({ port: Number(process.env.PORT), fetch(request) {
   const path = new URL(request.url).pathname;
   const identity = { sourceToken: Number(process.env.ZSYS_SOURCE_TOKEN), generationToken: Number(process.env.ZSYS_GENERATION_TOKEN) };
   const headers = { "content-type": "application/json", "x-zsys-api-version": "1" };
-  if (path === "/hello") return new Response("hello");
+  if (path === "/hello") { console.log("backend hello"); return new Response("hello"); }
   if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ok", ...identity }, { headers });
   if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: 1, manifestContractVersion: 1, manifestGeneratorVersion: 1, ...identity }, { headers });
   if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });

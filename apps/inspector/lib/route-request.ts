@@ -1,4 +1,5 @@
 import { InspectorApiError, type InspectorFetch } from "./api-types";
+import { resolveBackendUrl } from "./backend-url";
 
 export interface RouteInvocationInput {
   readonly path: string;
@@ -23,7 +24,7 @@ export async function invokeActiveRoute(
   headers.set("accept", "application/json");
   let response: Response;
   try {
-    response = await fetcher(resolveUrl(baseUrl, input.path), { ...input.init, headers });
+    response = await fetcher(resolveBackendUrl(baseUrl, input.path), { ...input.init, headers });
   } catch {
     throw new InspectorApiError(
       "Active backend is disconnected",
@@ -38,10 +39,6 @@ export async function invokeActiveRoute(
     ...headerValue(response, "x-request-id", "requestId"),
     ...headerValue(response, "x-trace-id", "traceId"),
   };
-}
-
-function resolveUrl(baseUrl: string, path: string): string {
-  return baseUrl === "" ? path : new URL(path, `${baseUrl}/`).toString();
 }
 
 async function readBody(response: Response): Promise<unknown> {

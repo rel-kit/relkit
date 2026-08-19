@@ -14,6 +14,7 @@ import {
   collectRequirements,
   key,
   makeHandles,
+  validateEnvironment,
   validateRequirements,
 } from "./provider-registry-validation.js";
 import {
@@ -23,6 +24,7 @@ import {
   type ProviderFactory,
   type ProviderFactoryContext,
   type ProviderGeneration,
+  type ProviderHandle,
   type ProviderRegistryErrorCode,
   type ProviderRegistry,
   type ProviderRegistryOptions,
@@ -47,6 +49,7 @@ export async function createProviderRegistry(
     throw error("ZSYS_PROVIDER_METADATA_INVALID", "Active provider metadata is invalid.");
   const requirements = collectRequirements(options.graph);
   validateRequirements(providerSet, requirements);
+  validateEnvironment(environment, options.environmentMetadata, options.values);
   const factory = options.factories?.[recipe] ?? defaultFactory(recipe);
   if (factory === undefined)
     throw error("ZSYS_PROVIDER_FACTORY_MISSING", "No provider factory is bound.");
@@ -79,7 +82,13 @@ export async function createProviderRegistry(
     if (cause instanceof ProviderRegistryError) throw cause;
     throw error("ZSYS_PROVIDER_READINESS_FAILED", "Provider readiness failed.");
   }
-  const handles = makeHandles(requirements, providerSet, generation);
+  let handles: Readonly<Record<string, ProviderHandle>>;
+  try {
+    handles = makeHandles(requirements, providerSet, generation);
+  } catch (cause) {
+    await releaseOne(factory, generation).catch(() => undefined);
+    throw cause;
+  }
   let released = false;
   const release = async (): Promise<void> => {
     if (released) return;

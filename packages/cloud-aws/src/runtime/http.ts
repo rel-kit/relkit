@@ -16,14 +16,51 @@ export async function awsRequest(url: string, options: AwsRequestOptions): Promi
   const request = options.init ?? {};
   const headers = new Headers(request.headers);
   const body = request.body ?? "";
-  if (options.credentials !== undefined) await sign(url, options, headers, body);
   const fetcher = options.fetch ?? globalThis.fetch;
+  const resolvedCredentials = options.credentials ?? (await runtimeCredentials(fetcher));
+  if (resolvedCredentials !== undefined)
+    await sign(url, { ...options, credentials: resolvedCredentials }, headers, body);
   const { body: requestBody, ...requestWithoutBody } = request;
   return fetcher(url, {
     ...requestWithoutBody,
     ...(requestBody === undefined ? {} : { body: requestBody as unknown as RequestInit["body"] }),
     headers,
   });
+}
+
+let cachedCredentials: { readonly value: AwsCredentials; readonly expiresAt: number } | undefined;
+
+async function runtimeCredentials(
+  fetcher: typeof globalThis.fetch,
+): Promise<AwsCredentials | undefined> {
+  const path = process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI;
+  if (path === undefined || !path.startsWith("/")) return undefined;
+  if (cachedCredentials !== undefined && cachedCredentials.expiresAt > Date.now() + 60_000)
+    return cachedCredentials.value;
+  const headers = new Headers();
+  const token = process.env.AWS_CONTAINER_AUTHORIZATION_TOKEN;
+  if (token !== undefined) headers.set("authorization", token);
+  const response = await fetcher(`http://169.254.170.2${path}`, { headers });
+  await assertResponse(response, "container credentials");
+  const value = (await response.json()) as {
+    readonly AccessKeyId?: unknown;
+    readonly SecretAccessKey?: unknown;
+    readonly Token?: unknown;
+    readonly Expiration?: unknown;
+  };
+  if (typeof value.AccessKeyId !== "string" || typeof value.SecretAccessKey !== "string")
+    throw new Error("AWS container credentials response is invalid");
+  const credentials = {
+    accessKeyId: value.AccessKeyId,
+    secretAccessKey: value.SecretAccessKey,
+    ...(typeof value.Token === "string" ? { sessionToken: value.Token } : {}),
+  };
+  const expiration = typeof value.Expiration === "string" ? Date.parse(value.Expiration) : NaN;
+  cachedCredentials = {
+    value: credentials,
+    expiresAt: Number.isFinite(expiration) ? expiration : Date.now() + 5 * 60_000,
+  };
+  return credentials;
 }
 
 export async function assertResponse(response: Response, operation: string): Promise<Response> {
@@ -97,7 +134,7 @@ async function hmac(keyValue: string | ArrayBuffer, value: string): Promise<Arra
 
 async function hash(value: string | Uint8Array): Promise<string> {
   const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;
-  return hex(await crypto.subtle.digest("SHA-256", bytes));
+  return hex(await crypto.subtle.digest("SHA-256", Uint8Array.from(bytes)));
 }
 
 function hex(value: ArrayBuffer): string {

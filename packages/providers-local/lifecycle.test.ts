@@ -21,19 +21,21 @@ describe("local provider generation lifecycle", () => {
     expect(first.stateRoot).toBe(stateRoot);
     expect(await readdir(join(stateRoot, "buckets"))).toContain("default");
     expect(await readdir(join(stateRoot, "cache"))).toContain("default");
-    await first.providers.buckets.put("assets/item", new Uint8Array([1, 2]));
-    await first.providers.cache.set("sku", { price: 25 });
+    await first.providers.buckets.default!.put("assets/item", new Uint8Array([1, 2]));
+    await first.providers.cache.default!.set("sku", { price: 25 });
     await first.dispose();
-    await expect(first.providers.buckets.get("assets/item")).rejects.toThrow("closed");
+    await expect(first.providers.buckets.default!.get("assets/item")).rejects.toThrow("closed");
 
     const second = await factory.create({
       generationId: "generation-two",
       environment: "development",
       providerSet,
     });
-    expect(await second.providers.buckets.get("assets/item")).toEqual(new Uint8Array([1, 2]));
-    expect(await second.providers.cache.get("sku")).toEqual({ price: 25 });
-    expect(second.providers.cache.capabilities.persistence).toBe("restart-recovery");
+    expect(await second.providers.buckets.default!.get("assets/item")).toEqual(
+      new Uint8Array([1, 2]),
+    );
+    expect(await second.providers.cache.default!.get("sku")).toEqual({ price: 25 });
+    expect(second.providers.cache.default!.capabilities.persistence).toBe("restart-recovery");
     await second.release();
     await second.release();
   });
@@ -47,8 +49,8 @@ describe("local provider generation lifecycle", () => {
       environment: "development",
       providerSet,
     });
-    await generation.providers.buckets.put("broken", new Uint8Array([9]));
-    await generation.providers.cache.set("broken", "value");
+    await generation.providers.buckets.default!.put("broken", new Uint8Array([9]));
+    await generation.providers.cache.default!.set("broken", "value");
     await generation.dispose();
 
     const objectFile = (await readdir(join(stateRoot, "buckets", "default", "objects")))[0]!;
@@ -60,8 +62,8 @@ describe("local provider generation lifecycle", () => {
       environment: "development",
       providerSet,
     });
-    expect(await recovered.providers.buckets.get("broken")).toBeUndefined();
-    expect(await recovered.providers.cache.get("broken")).toBeUndefined();
+    expect(await recovered.providers.buckets.default!.get("broken")).toBeUndefined();
+    expect(await recovered.providers.cache.default!.get("broken")).toBeUndefined();
     expect(await readdir(join(stateRoot, "buckets", "default", ".zsys-quarantine"))).toHaveLength(
       1,
     );
@@ -79,9 +81,9 @@ describe("local provider generation lifecycle", () => {
       providerSet,
     });
 
-    await generation.providers.cache.set("opaque", true);
-    expect("readFile" in generation.providers.buckets).toBe(false);
-    expect("readFile" in generation.providers.cache).toBe(false);
+    await generation.providers.cache.default!.set("opaque", true);
+    expect("readFile" in generation.providers.buckets.default!).toBe(false);
+    expect("readFile" in generation.providers.cache.default!).toBe(false);
     expect(await readFile(join(stateRoot, "cache", "default", "snapshot.json"), "utf8")).toContain(
       '"version":1',
     );

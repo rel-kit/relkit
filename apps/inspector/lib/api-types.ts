@@ -70,7 +70,7 @@ export interface ObservabilityPage<T = InspectorObject> extends Omit<
   InspectorIdentity,
   "protocol"
 > {
-  readonly protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
+  readonly protocol: InspectorResponseProtocol;
   readonly items: readonly T[];
   readonly nextCursor?: string;
 }

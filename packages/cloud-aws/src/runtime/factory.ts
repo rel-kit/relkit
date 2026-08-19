@@ -120,7 +120,7 @@ async function createGeneration(
     jobs: Object.freeze(Object.fromEntries(jobs)),
     events: Object.freeze(Object.fromEntries(events)),
     models: Object.freeze(Object.fromEntries(models)),
-    observability,
+    observability: Object.freeze({ default: observability }),
   });
   return Object.freeze({
     generationId: context.generationId,

@@ -1,18 +1,79 @@
-# Current repair decisions
+# Current bounded-repair decisions
+
+- Treat fresh AWS product acceptance as owner-waived on `2026-08-19`, not as a
+  pass. The latest attempts timed out at service readiness, all cleanup checks
+  are clean, and no further AWS run is required or authorized for archive.
+- Keep the truthful product-image test contract and the locally repaired AWS
+  deployment/container paths. Do not restore the echo smoke or weaken secret,
+  non-root, naming, or durable-listener boundaries to make cloud testing faster.
+- Keep the local repair evidence current, but do not claim clean-candidate
+  reproducibility for the intentionally dirty checkout. The AWS waiver remains
+  controlling, and no further cloud run is required or authorized.
+
+- Repair the shared engine/provider/observability seams once and prove them
+  through the emitted full-graph product server; do not add a testing-only
+  runtime or capability facade.
+- Keep local and AWS provider generations profile-shaped. A named profile must
+  select its own provider, while the configured `default` profile retains the
+  provider set's advertised default capabilities.
+- Use one redacting observability admission point for memory retention,
+  persistent query/index storage, and SSE publication. A missing detail/query
+  backend is an error, not a reason to synthesize detail from a list response.
+- Replace the echo smoke image with the fixture-commerce product contract.
+  Retain the prior cloud report only as historical topology/cleanup context;
+  it is not capability acceptance.
+- Keep all cloud execution gated. The later owner waiver supersedes the
+  historical requirement for another product-image/cloud rerun.
+- Preserve `tasks.md` at `287/287`, protected normative and historical evidence
+  documents, vendor/generated/user-owned paths, and unrelated worktree edits.
+
+# Historical current fresh-final-review decisions
+
+- Accept the bounded inspector cursor and candidate-output admission repairs;
+  their focused regressions match the backend-owned cursor and pre-sink
+  redaction contracts.
+- Reject archive handoff because unit tests and synthetic fallbacks do not
+  replace a working shipped product path. The production server must bind jobs,
+  schedules, agents, model providers, profile-specific capability providers,
+  and live observability through the existing engine/provider/query/stream
+  seams.
+- Treat the current AWS lifecycle record as topology/cleanup evidence only.
+  Its smoke image echoes operation labels without exercising the five claimed
+  capabilities, so it cannot satisfy Gate 16 product-path acceptance.
+- Preserve `287/287`, the pending release decision, protected normative/vendor
+  and generated/user-owned paths, and unrelated dirty changes. Dispatch one
+  fresh same-directory bounded repair task for the recorded findings; do not
+  implement them in the review task or dispatch archive.
+
+# Historical release-record repair decisions
+
+- Record the cleared PID condition and fresh exact local `test:all` pass as the
+  current worktree result while retaining the historical direct `test:e2e`
+  transcript and isolated 6/6 rerun as historical evidence.
+- Mark Gate 16 pending, not rejected or approved, until the required fresh
+  read-only final review evaluates the complete branch and visible worktree
+  diff.
+- Preserve every implementation/source change, generated output, protected
+  document, vendored path, task checkbox, and user-owned dirty path. The review
+  found no product-behavior issue requiring a source edit.
+
+# Historical implementation repair decisions
 
 - Keep the repair in the normal checkout and preserve user-owned dirty
-  outputs, generated directories, protected documents, vendor files, and
-  `tasks.md` at `287/287`. Do not stage, commit, or dispatch a subagent.
+  outputs, generated directories, protected documents, vendor files, `tasks.md`
+  at `287/287`, and concurrent dirty CLI/generator paths. The repair candidate
+  is committed; preserved unrelated paths remain outside it.
 - Route dev/start/container HTTP through the existing engine/provider/
   observability seams and reuse the product AWS Pulumi composition; no parallel
   runtime or test-only deployment program is acceptable.
-- Treat candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b` and evidence under
-  17.19 as historical pre-repair records. The current repair is unstaged, so
-  it cannot be called clean-candidate reproducible.
-- Keep Gate 16 rejected until an authorized clean candidate and fresh
-  release-gated AWS rerun cover the changed Pulumi/runtime paths. Local/mock
-  verification is sufficient for this bounded unit; no cloud mutation is
-  authorized.
+- Treat candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b` as historical.
+  Candidate `73a7e3c16e0add0fe4a984d450f1e1c65a4499be` is the committed product
+  candidate; its retained release-gated AWS record is historical only and does
+  not establish current product acceptance. No clean-checkout reproducibility
+  claim is made for preserved dirty CLI/generator paths.
+- Keep Gate 16 pending only until a fresh read-only final review confirms the
+  complete visible diff. The exact local `test:all` gate now passes after the
+  user stopped the inspector; do not claim approval before that review.
 - Correct the 17.15 metadata hash only after validating all 30 package and 3
   template rows against `RELEASE_NOTES.md`; record only verified facts.
 

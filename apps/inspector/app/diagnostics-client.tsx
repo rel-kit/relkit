@@ -15,11 +15,10 @@ export function DiagnosticsClient() {
     const api = createInspectorClient();
     const load = (): void => {
       setState("loading");
-      void api
-        .diagnostics({ limit: 100 })
-        .then((payload) => {
+      void Promise.all([api.diagnostics({ limit: 100 }), api.graph()])
+        .then(([payload, graph]) => {
           if (disposed) return;
-          setSnapshot(normalizeDiagnostics(payload));
+          setSnapshot(normalizeDiagnostics(payload, graph));
           setState("ready");
         })
         .catch(() => {

@@ -43,7 +43,8 @@ export async function startInspector(
     PORT: String(port),
     ZSYS_INSPECTOR_PORT: String(port),
     ZSYS_BACKEND_PORT: String(backendPort),
-    NEXT_PUBLIC_ZSYS_BACKEND_URL: `http://${hostname}:${backendPort}`,
+    ZSYS_BACKEND_URL: `http://${hostname}:${backendPort}`,
+    NEXT_PUBLIC_ZSYS_BACKEND_URL: `http://${hostname}:${port}/_zsys/backend`,
   };
   const child = spawn([...options.command], {
     ...(options.cwd === undefined ? {} : { cwd: options.cwd }),

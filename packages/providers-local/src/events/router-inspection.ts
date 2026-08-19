@@ -28,17 +28,17 @@ export function normalizeContract(value: unknown): EventContractInput {
     throw new EventRouterStateError(`Event contract ${id} is not JSON-safe`);
   if (value.source !== undefined && !isJsonValue(value.source))
     throw new EventRouterStateError(`Event contract ${id} has an invalid source`);
+  const sensitiveFields = value.sensitiveFields ?? undefined;
   if (
-    value.sensitiveFields !== undefined &&
-    (!Array.isArray(value.sensitiveFields) ||
-      value.sensitiveFields.some((field) => typeof field !== "string"))
+    sensitiveFields !== undefined &&
+    (!Array.isArray(sensitiveFields) || sensitiveFields.some((field) => typeof field !== "string"))
   )
     throw new EventRouterStateError(`Event contract ${id} has invalid sensitive fields`);
   return deepFreeze({
     id,
     version: value.version,
     payload: value.payload,
-    ...(value.sensitiveFields === undefined ? {} : { sensitiveFields: value.sensitiveFields }),
+    ...(sensitiveFields === undefined ? {} : { sensitiveFields }),
     ...(value.source === undefined ? {} : { source: value.source }),
   });
 }

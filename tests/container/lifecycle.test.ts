@@ -54,6 +54,9 @@ test("builds reproducible production context without local env or state", async 
   const dockerfile = firstBytes.get("Dockerfile") ?? "";
   const dockerignore = firstBytes.get(".dockerignore") ?? "";
   expect(dockerfile).toContain("FROM oven/bun:1.3.10");
+  expect(dockerfile).toContain(
+    "RUN mkdir -p .zsys/state .zsys/observability && chown -R bun:bun .zsys",
+  );
   expect(dockerfile).toContain("USER bun");
   expect(dockerfile).toContain("STOPSIGNAL SIGTERM");
   expect(dockerfile).not.toContain("COPY .");
@@ -172,6 +175,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "events",
     "functions",
     "graph",
+    "inspector-api",
     "jobs",
     "observability",
     "providers-local",

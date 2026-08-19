@@ -128,9 +128,19 @@ describe("provider and generation integration", () => {
           environment: context.environment,
           ...(context.values === undefined ? {} : { values: context.values }),
         });
-        const value = Object.freeze({ generationId: context.generationId });
+        const value = Object.freeze({ generationId: context.generationId, profile: "default" });
+        const archive = Object.freeze({ generationId: context.generationId, profile: "archive" });
         created.push(value);
-        return { providers: { cache: value } } satisfies ProviderGeneration;
+        return {
+          providers: {
+            buckets: { default: {} },
+            cache: { default: value, archive },
+            jobs: { default: {} },
+            events: { default: {} },
+            models: { default: {} },
+            observability: { default: {} },
+          },
+        } satisfies ProviderGeneration;
       },
     };
     const providers = providerSets({ cache: { archive: {} } });
@@ -162,8 +172,10 @@ describe("provider and generation integration", () => {
         { environment: "test", values: { providerToken: "resolved-at-startup" } },
       ]);
       expect(created).toHaveLength(2);
-      expect(first.resolve("cache", "default").value).toBe(first.resolve("cache", "archive").value);
-      expect(second.resolve("cache", "default").value).toBe(
+      expect(first.resolve("cache", "default").value).not.toBe(
+        first.resolve("cache", "archive").value,
+      );
+      expect(second.resolve("cache", "default").value).not.toBe(
         second.resolve("cache", "archive").value,
       );
       expect(first.resolve("cache", "default").value).not.toBe(
@@ -238,6 +250,14 @@ describe("provider and generation integration", () => {
         test: {
           recipeTag: "test",
           create: async () => ({
+            providers: {
+              buckets: { default: {} },
+              cache: { default: {} },
+              jobs: { default: {} },
+              events: { default: {} },
+              models: { default: {} },
+              observability: { default: {} },
+            },
             readiness: () => {
               events.push("readiness");
               throw new Error("readiness-secret");

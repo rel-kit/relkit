@@ -22,6 +22,7 @@
     "test:container": "bun test ./tests/container",
     "test:security": "bun test ./tests/security",
     "test:all": "bun run scripts/test-all.ts",
+    "zsys:local": "bun packages/cli/src/local.ts",
     "build": "bun run scripts/build.ts",
     "verify": "bun run scripts/verify.ts",
     "konsistent": "konsistent"

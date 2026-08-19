@@ -34,7 +34,9 @@ export function RouteDetailClient() {
     const api = createInspectorClient();
     void Promise.all([
       api.detail<InspectorObject>("routes", id),
-      api.query<InspectorObject>("requests", { routeId: id, limit: 10 }),
+      api
+        .query<InspectorObject>("requests", { routeId: id, limit: 10 })
+        .catch(() => ({ items: [] as readonly InspectorObject[] })),
     ])
       .then(async ([routePayload, requestPayload]) => {
         const nextRoute =

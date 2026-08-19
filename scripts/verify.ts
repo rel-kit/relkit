@@ -63,6 +63,7 @@ export function implementationSizeOffenders(root: string): string[] {
       onlyFiles: true,
     })) {
       if (/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path)) continue;
+      if (/(^|\/)[^/]+\.(?:test|spec)\.[^.]+$/.test(path)) continue;
       const file = resolve(absolute, path);
       const lines = lineCount(readFileSync(file, "utf8"));
       if (lines > 200) offenders.push(`${relative(root, file)} (${lines} lines)`);

@@ -81,3 +81,19 @@ test("keeps active diagnostics while exposing candidate diagnostics separately",
   expect(snapshot.visible[0]).toMatchObject({ code: "ZSYS_CANDIDATE" });
   expect(snapshot.active.items).toHaveLength(1);
 });
+
+test("uses graph identity for runtime diagnostic stubs", () => {
+  const payload = {
+    ...identity,
+    status: "active",
+    items: [],
+  } as unknown as InspectorDiagnosticsPage;
+  const snapshot = normalizeDiagnostics(payload, {
+    generationId: "generation.runtime",
+    graphHash: "sha256:runtime",
+  });
+  expect(snapshot.active.identity).toMatchObject({
+    generationId: "generation.runtime",
+    graphHash: "sha256:runtime",
+  });
+});

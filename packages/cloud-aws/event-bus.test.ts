@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
 import { ZsysEventBus } from "./src/index.js";
+import { childResourceName } from "./src/components/ZsysEventBus/names.js";
 
 interface SeenResource {
   readonly type: string;
@@ -17,6 +18,16 @@ const retry = {
 } as const;
 
 describe("ZsysEventBus", () => {
+  test("keeps truncated child resource names distinct", () => {
+    const prefix = "zsys-nightly-1787163689822-commerce-api-events";
+    const first = childResourceName(prefix, "orders.audit-changes-orders.created@1", "rule", 64);
+    const second = childResourceName(prefix, "orders.audit-changes-orders.updated@1", "rule", 64);
+
+    expect(first).not.toBe(second);
+    expect(first.length).toBeLessThanOrEqual(64);
+    expect(second.length).toBeLessThanOrEqual(64);
+  });
+
   test("maps explicit versions to independent durable fan-out queues", async () => {
     const resources: SeenResource[] = [];
     await pulumi.runtime.setMocks(

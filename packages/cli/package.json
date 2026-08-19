@@ -22,6 +22,7 @@
     "create-zsys": "workspace:*",
     "@zsys/graph": "workspace:*",
     "@zsys/engine": "workspace:*",
+    "@zsys/inspector-api": "workspace:*",
     "@zsys/observability": "workspace:*",
     "@zsys/runtime-effect": "workspace:*",
     "@zsys/runtime-hono": "workspace:*",
