@@ -1,0 +1,32 @@
+{
+  "name": "@zsys/testing",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@zsys/agents": "workspace:*",
+    "@zsys/buckets": "workspace:*",
+    "@zsys/cache": "workspace:*",
+    "@zsys/config": "workspace:*",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/engine": "workspace:*",
+    "@zsys/events": "workspace:*",
+    "@zsys/functions": "workspace:*",
+    "@zsys/jobs": "workspace:*",
+    "@zsys/providers-local": "workspace:*",
+    "@zsys/runtime-effect": "workspace:*",
+    "@zsys/schema": "workspace:*",
+    "@zsys/tools": "workspace:*",
+    "effect": "4.0.0-beta.107"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

@@ -1,0 +1,125 @@
+import { describe, expect, test } from "bun:test";
+import { generatedAgentFunctionId, invokeAgent, type ModelTurn } from "@zsys/agents";
+import { createFakeModelProvider } from "@zsys/providers-local";
+import { harness, makeFixture, scriptedToolCall } from "./agent-matrix-helpers.ts";
+
+describe("agent limit and privacy matrix", () => {
+  test("keeps generated identity and capture disabled by default", async () => {
+    const fixture = makeFixture();
+    const agent = harness(fixture, scriptedToolCall(fixture.tool.id));
+    await agent.invoke({ question: "password=matrix-secret" });
+
+    const trace = agent.trace.read();
+    const root = trace.spans.find((span) => span.kind === "agent" && span.status === "started");
+    expect(root?.functionId).toBe(generatedAgentFunctionId(fixture.agent.id));
+    expect(trace.spans.some((span) => span.kind === "model")).toBe(true);
+    expect(trace.spans.every((span) => span.capture === undefined)).toBe(true);
+    expect(JSON.stringify(trace)).not.toContain("matrix-secret");
+    expect(JSON.stringify(trace)).not.toContain("Answer order questions");
+  });
+
+  test("validates final output and enforces step and tool-call limits", async () => {
+    const invalid = makeFixture();
+    const invalidAgent = harness(invalid, [{ type: "final", output: { wrong: true } }]);
+    await expect(invalidAgent.invoke({ question: "invalid" })).rejects.toMatchObject({
+      code: "ZSYS_AGENT_OUTPUT_VALIDATION",
+    });
+
+    const steps = makeFixture({ maxSteps: 1 });
+    const stepAgent = harness(steps, scriptedToolCall(steps.tool.id));
+    await expect(stepAgent.invoke({ question: "steps" })).rejects.toMatchObject({
+      code: "ZSYS_AGENT_STEP_LIMIT",
+    });
+    expect(steps.invocations).toHaveLength(1);
+    expect(stepAgent.model.calls).toHaveLength(1);
+
+    const tools = makeFixture({ maxToolCalls: 1 });
+    const toolAgent = harness(tools, [
+      { type: "tool-call", callId: "call-1", toolId: tools.tool.id, input: { id: "1" } },
+      { type: "tool-call", callId: "call-2", toolId: tools.tool.id, input: { id: "2" } },
+    ]);
+    await expect(toolAgent.invoke({ question: "tools" })).rejects.toMatchObject({
+      code: "ZSYS_AGENT_TOOL_LIMIT",
+    });
+    expect(tools.invocations).toHaveLength(1);
+    expect(toolAgent.model.calls).toHaveLength(2);
+  });
+
+  test("enforces content-size, timeout, and cancellation limits", async () => {
+    const size = makeFixture();
+    const inputProvider = createFakeModelProvider({
+      maxInputBytes: 1_024,
+      maxOutputBytes: 1_024,
+      script: [{ type: "final", output: { answer: "ok" } }],
+    });
+    await expect(
+      invokeAgent({
+        agent: size.agent,
+        tools: [size.tool],
+        engine: size.engine,
+        provider: inputProvider,
+        input: { question: "x".repeat(100) },
+        maxInputBytes: 16,
+        invocationId: "size-input",
+      }),
+    ).rejects.toMatchObject({ code: "ZSYS_AGENT_RESPONSE_LIMIT" });
+    expect(inputProvider.calls).toHaveLength(0);
+
+    const outputProvider = createFakeModelProvider({
+      maxInputBytes: 1_024,
+      maxOutputBytes: 1_024,
+      script: [{ type: "final", output: { answer: "x".repeat(100) } }],
+    });
+    await expect(
+      invokeAgent({
+        agent: size.agent,
+        tools: [size.tool],
+        engine: size.engine,
+        provider: outputProvider,
+        input: { question: "size" },
+        maxOutputBytes: 16,
+        invocationId: "size-output",
+      }),
+    ).rejects.toMatchObject({ code: "ZSYS_AGENT_MODEL_ERROR" });
+
+    const hangingProvider = {
+      profile: "default",
+      capabilities: {
+        toolCalls: true,
+        cancellation: true,
+        maxInputBytes: 1_024,
+        maxOutputBytes: 1_024,
+      },
+      request: () => new Promise<ModelTurn>(() => undefined),
+    };
+    await expect(
+      invokeAgent({
+        agent: size.agent,
+        tools: [size.tool],
+        engine: size.engine,
+        provider: hangingProvider,
+        input: { question: "timeout" },
+        timeoutMs: 0,
+        invocationId: "timeout",
+      }),
+    ).rejects.toMatchObject({ code: "ZSYS_AGENT_TIMEOUT" });
+
+    const controller = new AbortController();
+    controller.abort();
+    const cancelledProvider = createFakeModelProvider({
+      script: [{ type: "final", output: { answer: "never" } }],
+    });
+    await expect(
+      invokeAgent({
+        agent: size.agent,
+        tools: [size.tool],
+        engine: size.engine,
+        provider: cancelledProvider,
+        input: { question: "cancel" },
+        signal: controller.signal,
+        invocationId: "cancelled",
+      }),
+    ).rejects.toMatchObject({ code: "ZSYS_AGENT_CANCELLED" });
+    expect(cancelledProvider.calls).toHaveLength(0);
+  });
+});

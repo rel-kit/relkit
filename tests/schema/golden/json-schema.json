@@ -1,0 +1,43 @@
+{
+  "builtIn": {
+    "ok": true,
+    "schema": {
+      "properties": {
+        "orderId": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "quantity": {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        "status": {
+          "default": "pending",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["orderId", "quantity"],
+      "type": "object"
+    }
+  },
+  "thirdParty": {
+    "ok": true,
+    "schema": {
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": ["name"],
+      "type": "object"
+    }
+  }
+}

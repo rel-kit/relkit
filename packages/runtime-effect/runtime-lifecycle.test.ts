@@ -1,0 +1,144 @@
+import { Effect } from "effect";
+import { describe, expect, test } from "bun:test";
+import { defineEnv } from "@zsys/config";
+import type { ApplicationGraph } from "@zsys/graph";
+import { createGenerationRuntime, type GenerationRuntimeOptions } from "./src/runtime.js";
+import type { RuntimeManifest } from "./src/services.js";
+import type { GenerationServiceDefinition } from "./src/scope.js";
+
+const graph = {
+  contractVersion: 1,
+  nodes: [],
+  edges: [],
+} satisfies ApplicationGraph;
+
+const manifest = {
+  contractVersion: 1,
+  generatorVersion: 1,
+  graphHash: "graph-hash",
+  functions: {},
+  providers: {},
+  middleware: {},
+  requestTransforms: {},
+} satisfies RuntimeManifest;
+
+const environment = defineEnv({});
+
+function options(
+  services: readonly GenerationServiceDefinition[],
+  signal?: AbortSignal,
+): GenerationRuntimeOptions {
+  return {
+    environment: "test",
+    env: environment,
+    source: {},
+    graph,
+    graphHash: manifest.graphHash,
+    manifest,
+    services,
+    ...(signal === undefined ? {} : { signal }),
+  };
+}
+
+function resource(
+  id: string,
+  events: string[],
+  acquire: () => Effect.Effect<unknown, unknown, never> = () => Effect.succeed(id),
+): GenerationServiceDefinition {
+  return {
+    id,
+    acquire: () => {
+      events.push(`acquire:${id}`);
+      return acquire();
+    },
+    release: () => Effect.sync(() => events.push(`release:${id}`)),
+  };
+}
+
+async function rejects(promise: Promise<unknown>): Promise<void> {
+  let rejected = false;
+  try {
+    await promise;
+  } catch {
+    rejected = true;
+  }
+  expect(rejected).toBe(true);
+}
+
+describe("generation runtime resource ownership", () => {
+  test("releases acquired resources in reverse order after success", async () => {
+    const events: string[] = [];
+    const generation = await createGenerationRuntime(
+      options([
+        resource("config", events),
+        { ...resource("provider", events), dependencies: ["config"] },
+      ]),
+    );
+
+    await generation.dispose();
+
+    expect(events).toEqual([
+      "acquire:config",
+      "acquire:provider",
+      "release:provider",
+      "release:config",
+    ]);
+  });
+
+  test("releases acquired resources when a later service fails", async () => {
+    const events: string[] = [];
+    await rejects(
+      createGenerationRuntime(
+        options([
+          resource("config", events),
+          resource("provider", events, () => Effect.fail(new Error("provider failed"))),
+        ]),
+      ),
+    );
+
+    expect(events).toEqual(["acquire:config", "acquire:provider", "release:config"]);
+  });
+
+  test("interrupts pending acquisition and releases completed work", async () => {
+    const events: string[] = [];
+    const controller = new AbortController();
+    let started!: () => void;
+    const pendingStarted = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const pending = resource("provider", events, () => {
+      started();
+      return Effect.never;
+    });
+    const creation = createGenerationRuntime(
+      options([resource("config", events), pending], controller.signal),
+    );
+
+    await pendingStarted;
+    controller.abort(new Error("startup interrupted"));
+    await rejects(creation);
+
+    expect(events).toEqual(["acquire:config", "acquire:provider", "release:config"]);
+  });
+
+  test("releases only the partially acquired prefix after failure", async () => {
+    const events: string[] = [];
+    await rejects(
+      createGenerationRuntime(
+        options([
+          resource("config", events),
+          resource("cache", events),
+          resource("worker", events, () => Effect.fail(new Error("worker failed"))),
+        ]),
+      ),
+    );
+
+    expect(events).toEqual([
+      "acquire:config",
+      "acquire:cache",
+      "acquire:worker",
+      "release:cache",
+      "release:config",
+    ]);
+  });
+});

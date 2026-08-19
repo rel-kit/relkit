@@ -1,0 +1,3 @@
+command=bun run test:e2e
+exitCode=0
+durationSeconds=14.867

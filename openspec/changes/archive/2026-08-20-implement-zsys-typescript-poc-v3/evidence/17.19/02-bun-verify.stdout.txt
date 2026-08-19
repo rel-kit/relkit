@@ -1,0 +1,207 @@
+
+▶ frozen install: /Users/mustafaelsayed/.bun/bin/bun install --frozen-lockfile
+bun install v1.3.10 (30e609e0)
+
+Checked 423 installs across 440 packages (no changes) [18.00ms]
+✓ frozen install
+✓ frozen install no-diff
+
+▶ format check: /Users/mustafaelsayed/.bun/bin/bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests
+Checking formatting...
+All matched files use Prettier code style!
+✓ format check
+
+▶ lint: /Users/mustafaelsayed/.bun/bin/bun run lint
+Public authoring scan passed (44 source/example fragments).
+✓ lint
+
+▶ ESLint configuration check: /Users/mustafaelsayed/.bun/bin/bun x eslint eslint.config.mjs
+✓ ESLint configuration check
+
+▶ boundaries and scope: /Users/mustafaelsayed/.bun/bin/bun run check
+Boundary check passed (34 roots, 768 TypeScript files).
+✓ boundaries and scope
+
+▶ observability sink source scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-observability-sinks.ts
+Observability sink source scan passed.
+✓ observability sink source scan
+✓ implementation-file limit (maximum 200 lines)
+
+▶ Konsistent configuration validation: /Users/mustafaelsayed/.bun/bin/bun run konsistent -- validate
+Configuration is valid.
+✓ Konsistent configuration validation
+
+▶ configured structural audit: bun run konsistent -- check --format=json
+[
+  {
+    "severity": "error",
+    "conventionName": "package-entry-barrel",
+    "filePath": "packages/cli/src/index.ts",
+    "predicateName": "importFromCurrentDir",
+    "message": "Import from current directory is not allowed",
+    "line": 5
+  },
+  {
+    "severity": "error",
+    "conventionName": "package-entry-barrel",
+    "filePath": "packages/create-zsys/src/index.ts",
+    "predicateName": "importFromCurrentDir",
+    "message": "Import from current directory is not allowed",
+    "line": 2
+  }
+]
+⚠ structural findings are advisory; configuration validation remains blocking
+
+▶ typecheck: /Users/mustafaelsayed/.bun/bin/bun run typecheck
+✓ typecheck
+
+▶ type fixtures: /Users/mustafaelsayed/.bun/bin/bun run test:types
+Type fixtures passed (public descriptor inference and boundary rejection).
+✓ type fixtures
+
+▶ unit and schema tests: /Users/mustafaelsayed/.bun/bin/bun run test:unit
+bun test v1.3.10 (30e609e0)
+✓ unit and schema tests
+
+▶ compiler and graph tests: /Users/mustafaelsayed/.bun/bin/bun run test:compiler
+bun test v1.3.10 (30e609e0)
+✓ compiler and graph tests
+
+▶ provider contracts: /Users/mustafaelsayed/.bun/bin/bun run test:contracts
+bun test v1.3.10 (30e609e0)
+✓ provider contracts
+
+▶ integration tests: /Users/mustafaelsayed/.bun/bin/bun run test:integration
+bun test v1.3.10 (30e609e0)
+✓ integration tests
+
+▶ restart tests: /Users/mustafaelsayed/.bun/bin/bun run test:restart
+bun test v1.3.10 (30e609e0)
+✓ restart tests
+
+▶ inspector API tests: /Users/mustafaelsayed/.bun/bin/bun run test:inspector
+bun test v1.3.10 (30e609e0)
+✓ inspector API tests
+
+▶ generator tests: /Users/mustafaelsayed/.bun/bin/bun run test:generator
+bun test v1.3.10 (30e609e0)
+✓ generator tests
+
+▶ packed generator smoke: /Users/mustafaelsayed/.bun/bin/bun run scripts/pack-and-smoke-create-zsys.ts
+packed create smoke passed (27 packages)
+✓ packed generator smoke
+
+▶ build: /Users/mustafaelsayed/.bun/bin/bun run build
+
+   • Packages in scope: @zsys/agents, @zsys/app, @zsys/buckets, @zsys/cache, @zsys/cli, @zsys/client-generator, @zsys/cloud-aws, @zsys/compiler, @zsys/config, @zsys/contracts, @zsys/deploy, @zsys/deploy-pulumi, @zsys/diagnostics, @zsys/engine, @zsys/events, @zsys/fixture-commerce, @zsys/functions, @zsys/graph, @zsys/inspector, @zsys/inspector-api, @zsys/jobs, @zsys/observability, @zsys/openapi, @zsys/providers-local, @zsys/routes, @zsys/runtime-effect, @zsys/runtime-hono, @zsys/schema, @zsys/supervisor, @zsys/testing, @zsys/tools, create-zsys
+   • Running build in 32 packages
+   • Remote caching disabled
+
+@zsys/contracts:build: cache hit, replaying logs 6420adb28d42db2a
+@zsys/contracts:build: $ tsc -b
+@zsys/schema:build: cache hit, replaying logs d5c2e3c3501909cf
+create-zsys:build: cache hit, replaying logs 32230cfe94d50f56
+@zsys/schema:build: $ tsc -b
+create-zsys:build: $ tsc -b
+@zsys/config:build: cache hit, replaying logs 2dd65704923d0bdc
+@zsys/config:build: $ tsc -b
+@zsys/buckets:build: cache hit, replaying logs 0990b9dfb6a9e101
+@zsys/buckets:build: $ tsc -b
+@zsys/cache:build: cache hit, replaying logs 33c815c241cdff9b
+@zsys/cache:build: $ tsc -b
+@zsys/diagnostics:build: cache hit, replaying logs 5b2d9a9da8a4ccf8
+@zsys/diagnostics:build: $ tsc -b
+@zsys/graph:build: cache hit, replaying logs 570f5bc0fc75fea8
+@zsys/graph:build: $ tsc -b
+@zsys/functions:build: cache hit, replaying logs 8f06ef6069509c37
+@zsys/functions:build: $ tsc -b
+@zsys/observability:build: cache hit, replaying logs 4083068e2146d570
+@zsys/observability:build: $ tsc -b
+@zsys/client-generator:build: cache hit, replaying logs 0a1491279df6d9a1
+@zsys/client-generator:build: $ tsc -b
+@zsys/openapi:build: cache hit, replaying logs c486a031c8cb1c37
+@zsys/openapi:build: $ tsc -b
+@zsys/routes:build: cache hit, replaying logs 899cb0788f856031
+@zsys/jobs:build: cache hit, replaying logs f2b056d7ffe37498
+@zsys/tools:build: cache hit, replaying logs 42da00a848b813bd
+@zsys/deploy:build: cache hit, replaying logs 1395b1b5aabf1567
+@zsys/jobs:build: $ tsc -b
+@zsys/routes:build: $ tsc -b
+@zsys/tools:build: $ tsc -b
+@zsys/deploy:build: $ tsc -b
+@zsys/runtime-effect:build: cache hit, replaying logs a01bcb1c6b6ecd90
+@zsys/runtime-effect:build: $ tsc -b
+@zsys/supervisor:build: cache hit, replaying logs f39f9bcc659f00d6
+@zsys/supervisor:build: $ tsc -b
+@zsys/agents:build: cache hit, replaying logs fd0703b8194e6dbd
+@zsys/agents:build: $ tsc -b
+@zsys/events:build: cache hit, replaying logs 1c3faf05b89492d5
+@zsys/events:build: $ tsc -b
+@zsys/inspector-api:build: cache hit, replaying logs a701e0b43bbb1c4f
+@zsys/inspector-api:build: $ tsc -b
+@zsys/deploy-pulumi:build: cache hit, replaying logs 656fa7d1da23ae20
+@zsys/deploy-pulumi:build: $ tsc -b
+@zsys/app:build: cache hit, replaying logs 557e8d4a948c20f1
+@zsys/app:build: $ tsc -b
+@zsys/compiler:build: cache hit, replaying logs 474fe1fc0ecfd2d6
+@zsys/compiler:build: $ tsc -b
+@zsys/cli:build: cache hit, replaying logs 23755b14957f9508
+@zsys/cli:build: $ tsc -b
+@zsys/providers-local:build: cache hit, replaying logs e89295b19ec8a331
+@zsys/providers-local:build: $ tsc -b
+@zsys/engine:build: cache hit, replaying logs 74d17e1fc571e470
+@zsys/engine:build: $ tsc -b
+@zsys/runtime-hono:build: cache hit, replaying logs fd4eca3b362df2bb
+@zsys/runtime-hono:build: $ tsc -b
+@zsys/testing:build: cache hit, replaying logs 8a1e43c9760cf9e9
+@zsys/testing:build: $ tsc -b
+@zsys/cloud-aws:build: cache hit, replaying logs a1a3e24d8fd7516d
+@zsys/cloud-aws:build: $ tsc -b
+
+ Tasks:    30 successful, 30 total
+Cached:    30 cached, 30 total
+  Time:    52ms >>> FULL TURBO
+
+Workspace build passed.
+✓ build
+✓ generated-file no-diff
+
+▶ recursive synthetic-secret artifact scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/secret-scan.ts
+{
+  "protocol": "zsys.synthetic-secret-scan",
+  "filesScanned": 2583,
+  "bytesScanned": 340513928,
+  "categories": {
+    "snapshots": 17,
+    "graph": 101,
+    "manifest": 16,
+    "generated-source": 1764,
+    "build-image": 0,
+    "plan": 6,
+    "pulumi-reports": 37,
+    "cloud-evidence": 37,
+    "browser": 605
+  },
+  "matches": [],
+  "image": {
+    "scanned": false
+  }
+}
+✓ recursive synthetic-secret artifact scan
+
+▶ whitespace check: git diff --check
+✓ whitespace check
+
+▶ security and redaction tests: /Users/mustafaelsayed/.bun/bin/bun run test:security
+bun test v1.3.10 (30e609e0)
+✓ security and redaction tests
+
+▶ public declaration leak scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-public-declarations.ts
+Public declaration scan passed (14 packages).
+✓ public declaration leak scan
+
+▶ agent declaration/source/graph scans: /Users/mustafaelsayed/.bun/bin/bun test tests/agents/source-boundaries.test.ts tests/compiler/fixture-commerce.test.ts
+bun test v1.3.10 (30e609e0)
+✓ agent declaration/source/graph scans
+
+Verification passed in the fixed fail-fast order.

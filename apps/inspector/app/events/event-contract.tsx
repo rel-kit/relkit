@@ -1,0 +1,97 @@
+import type { InspectorObject } from "../../lib/api-types";
+import type { ReactNode } from "react";
+import { EventDeliveryPanel, EventListenerPanel, EventPublisherPanel } from "./event-state-panels";
+import type { EventView } from "../../lib/events-model";
+import { SourceLink } from "../source-link";
+
+export function EventContract({ view }: { readonly view: EventView }) {
+  const event = view.event;
+  const source = record(event.source);
+  return (
+    <>
+      <section className="panel route-identity" aria-labelledby="event-contract-heading">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">EVENT CONTRACT</p>
+            <h2 id="event-contract-heading">
+              {text(event.id)}@{number(event.version)}
+            </h2>
+          </div>
+          <span className="badge">version {number(event.version)}</span>
+        </div>
+        <dl className="route-meta">
+          <Meta label="Event ID" value={text(event.id) || "Unknown"} />
+          <Meta label="Source" value={<SourceLink source={source} />} />
+          <Meta label="Sensitive fields" value={fieldList(event.sensitiveFields)} />
+        </dl>
+      </section>
+      <div className="route-contract-grid">
+        <JsonPanel title="Payload schema" value={event.payload} />
+        <JsonPanel
+          title="Selector and delivery summary"
+          value={{
+            listeners: view.listeners.map((listener) => ({
+              id: listener.id,
+              targetFunctionId: listener.targetFunctionId,
+              config: listener.config,
+            })),
+          }}
+        />
+      </div>
+      <EventPublisherPanel publishers={view.publishers} />
+      <EventListenerPanel listeners={view.listeners} />
+      <EventDeliveryPanel
+        deliveries={view.deliveries}
+        deadLetters={view.deadLetters}
+        publications={view.publications}
+      />
+    </>
+  );
+}
+
+function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
+  return (
+    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
+      <p className="eyebrow">CONTRACT DATA</p>
+      <h2 id={`${title}-heading`}>{title}</h2>
+      <pre>{format(value)}</pre>
+    </section>
+  );
+}
+
+function Meta({ label, value }: { readonly label: string; readonly value: ReactNode }) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
+function record(value: unknown): InspectorObject | undefined {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as InspectorObject)
+    : undefined;
+}
+
+function fieldList(value: unknown): string {
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+    ? value.join(", ") || "None reported"
+    : "None reported";
+}
+
+function format(value: unknown): string {
+  if (value === undefined) return "Not declared";
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "Unavailable";
+  }
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+function number(value: unknown): string {
+  return typeof value === "number" ? String(value) : "?";
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@zsys/compiler",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@zsys/contracts": "workspace:*",
+    "@zsys/client-generator": "workspace:*",
+    "@zsys/diagnostics": "workspace:*",
+    "@zsys/graph": "workspace:*",
+    "@zsys/openapi": "workspace:*",
+    "@zsys/schema": "workspace:*",
+    "typescript": "5.9.2"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

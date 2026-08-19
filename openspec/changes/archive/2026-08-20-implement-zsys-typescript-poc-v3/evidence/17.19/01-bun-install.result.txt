@@ -1,0 +1,3 @@
+command=bun install --frozen-lockfile
+exitCode=0
+durationSeconds=0.018

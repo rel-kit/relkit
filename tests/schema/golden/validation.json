@@ -1,0 +1,35 @@
+{
+  "async": {
+    "value": "hello"
+  },
+  "defaulted": {
+    "value": {
+      "orderId": "550e8400-e29b-41d4-a716-446655440000",
+      "quantity": 2,
+      "status": "pending"
+    }
+  },
+  "nestedIssues": {
+    "issues": [
+      {
+        "message": "Expected an email address",
+        "path": ["profile", "email"]
+      },
+      {
+        "message": "Expected a positive number",
+        "path": ["lines", 0, "quantity"]
+      }
+    ]
+  },
+  "thirdPartyIssues": {
+    "issues": [
+      {
+        "message": "Expected a product name",
+        "path": ["product", "name"]
+      }
+    ]
+  },
+  "transformed": {
+    "value": "12.50"
+  }
+}

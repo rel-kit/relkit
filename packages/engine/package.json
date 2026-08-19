@@ -1,0 +1,30 @@
+{
+  "name": "@zsys/engine",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@zsys/app": "workspace:*",
+    "@zsys/buckets": "workspace:*",
+    "@zsys/cache": "workspace:*",
+    "@zsys/contracts": "workspace:*",
+    "@zsys/events": "workspace:*",
+    "@zsys/graph": "workspace:*",
+    "@zsys/jobs": "workspace:*",
+    "@zsys/observability": "workspace:*",
+    "@zsys/providers-local": "workspace:*",
+    "@zsys/runtime-effect": "workspace:*",
+    "@zsys/schema": "workspace:*",
+    "effect": "4.0.0-beta.107"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

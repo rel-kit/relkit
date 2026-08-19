@@ -1,0 +1,31 @@
+{
+  "task": "17.14",
+  "result": "passed",
+  "publicDeclarationPackages": 14,
+  "boundaryRoots": 34,
+  "boundaryTypeScriptFiles": 768,
+  "packageCount": 30,
+  "packageVersion": "0.0.0",
+  "inspectorTopLevelNavigationEntries": 15,
+  "documentationFiles": 7,
+  "forbiddenPublicLeakCategories": [
+    "Effect",
+    "Hono",
+    "Next.js",
+    "Pulumi",
+    "AWS/cloud-client",
+    "provider-client"
+  ],
+  "forbiddenSubsystemCategories": [
+    "persistence",
+    "identity",
+    "workflow",
+    "knowledge",
+    "plugin",
+    "marketplace",
+    "subscription",
+    "alternate-IaC",
+    "Rust"
+  ],
+  "laterCheckboxesImplemented": false
+}

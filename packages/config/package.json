@@ -1,0 +1,23 @@
+{
+  "name": "@zsys/config",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./internal/config": {
+      "types": "./dist/internal/config.d.ts",
+      "import": "./dist/internal/config.js"
+    }
+  },
+  "dependencies": {
+    "effect": "4.0.0-beta.107"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  }
+}

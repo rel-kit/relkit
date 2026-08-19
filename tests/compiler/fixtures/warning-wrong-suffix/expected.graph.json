@@ -1,0 +1,62 @@
+{
+  "appId": "warning-suffix-app",
+  "contractVersion": 1,
+  "edges": [],
+  "nodes": [
+    {
+      "defaults": null,
+      "environment": {
+        "PORT": {
+          "hasDefault": true,
+          "optional": false,
+          "requiredIn": [],
+          "sensitive": false,
+          "type": "port"
+        }
+      },
+      "id": "warning-suffix-app",
+      "kind": "app",
+      "observability": null,
+      "providerProfiles": ["default"],
+      "source": { "column": 13, "file": "src/app.ts", "line": 11 }
+    },
+    {
+      "hasDefault": true,
+      "id": "PORT",
+      "kind": "env",
+      "name": "PORT",
+      "requiredIn": [],
+      "sensitive": false,
+      "source": { "column": 13, "file": "src/app.ts", "line": 11 },
+      "type": "port"
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "id": "warning.suffix",
+      "input": {
+        "properties": { "value": { "type": "string" } },
+        "required": ["value"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "value": { "type": "string" } },
+        "required": ["value"],
+        "type": "object"
+      },
+      "source": { "column": 23, "file": "src/functions/wrong-suffix.ts", "line": 4 },
+      "timeoutMs": null
+    },
+    {
+      "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
+      "configuration": { "development": [], "production": ["region"], "test": [] },
+      "environment": [],
+      "id": "default",
+      "kind": "provider",
+      "profile": "default",
+      "source": { "column": 13, "file": "src/app.ts", "line": 11 }
+    }
+  ]
+}

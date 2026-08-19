@@ -1,0 +1,55 @@
+[
+  {
+    "code": "ZSYS_CONVENTION_DIRECTORY",
+    "column": 7,
+    "descriptorId": "orders.route",
+    "documentationPath": "docs/diagnostics.md",
+    "file": "src/routes.ts",
+    "line": 2,
+    "message": "Route is outside the recommended directory",
+    "related": [
+      {
+        "column": 3,
+        "descriptorId": "orders.handler",
+        "file": "src/functions/orders.ts",
+        "line": 4,
+        "message": "Target function is declared here"
+      },
+      {
+        "column": 1,
+        "file": "src/routes/index.ts",
+        "line": 1,
+        "message": "Exported route is here"
+      }
+    ],
+    "severity": "warning",
+    "suggestion": "Move the descriptor under src/routes/**/*.route.ts"
+  },
+  {
+    "code": "ZSYS_DUPLICATE_ID",
+    "column": 8,
+    "descriptorId": "orders.route",
+    "documentationPath": "docs/diagnostics.md",
+    "file": "src/routes.ts",
+    "line": 5,
+    "message": "Descriptor ID is already declared",
+    "related": [
+      {
+        "column": 3,
+        "descriptorId": "orders.handler",
+        "file": "src/functions/orders.ts",
+        "line": 4,
+        "message": "Duplicate target uses this ID"
+      },
+      {
+        "column": 7,
+        "descriptorId": "orders.route",
+        "file": "src/routes.ts",
+        "line": 2,
+        "message": "First route declaration"
+      }
+    ],
+    "severity": "error",
+    "suggestion": "Choose a unique stable descriptor ID"
+  }
+]

@@ -1,0 +1,11 @@
+$ bun test ./tests/container
+
+tests/container/lifecycle.test.ts:
+(pass) builds reproducible production context without local env or state [234.69ms]
+(pass) keeps liveness available while provider readiness is pending [1137.33ms]
+(pass) stops admission, cancels in-flight work, flushes telemetry, and exits on time [218.03ms]
+
+ 3 pass
+ 0 fail
+ 19 expect() calls
+Ran 3 tests across 1 file. [1.86s]

@@ -1,0 +1,33 @@
+$ bun test ./tests/deployment
+bun test v1.3.10 (30e609e0)
+
+tests/deployment/iam.test.ts:
+(pass) derives shared IAM and future per-function grants only from graph edges [18.11ms]
+(pass) omits every unused cloud action from a capability-free graph [0.98ms]
+
+tests/deployment/pulumi-mocks.test.ts:
+(pass) executes the generated plan with stable capability mappings and secret-safe inputs [42.63ms]
+(pass) maps AWS resources with parents, tags, security rules, and secret injection [68.58ms]
+(pass) source moves preserve mocked Pulumi resource identities without replacement [27.25ms]
+
+tests/deployment/plan.test.ts:
+(pass) full deployment plan matches the stable golden contract [1.61ms]
+(pass) minimal deployment plan omits optional capability resources [0.78ms]
+(pass) rejects missing AWS capabilities and production configuration [2.00ms]
+(pass) keeps plans secret-free and rejects secret/live deployment values [1.50ms]
+(pass) classifies an identical plan as a no-op [1.86ms]
+(pass) keeps deployment identities stable when descriptor source files move [2.88ms]
+(pass) renders deterministic Pulumi program bytes from distinct roots [1.72ms]
+
+tests/deployment/preview.test.ts:
+(pass) previews an isolated stack with redacted events, confirmation, and a no-op repeat [1345.88ms]
+
+tests/deployment/aws-integration.test.ts:
+(pass) keeps source moves on stable deployment identities [5.41ms]
+(skip) creates, smokes, updates, and independently cleans an ephemeral AWS stack
+
+ 14 pass
+ 1 skip
+ 0 fail
+ 108 expect() calls
+Ran 15 tests across 5 files. [2.69s]

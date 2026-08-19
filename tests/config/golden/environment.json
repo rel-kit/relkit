@@ -1,0 +1,41 @@
+[
+  {
+    "name": "API_KEY",
+    "type": "secret-string",
+    "requiredIn": ["production"],
+    "hasDefault": true,
+    "optional": false,
+    "sensitive": true,
+    "description": "External API key",
+    "example": "[redacted]"
+  },
+  {
+    "name": "APP_ENV",
+    "type": "literal",
+    "requiredIn": ["production"],
+    "hasDefault": true,
+    "optional": false,
+    "sensitive": false,
+    "values": ["development", "production"],
+    "description": "Application environment",
+    "example": "development"
+  },
+  {
+    "name": "OPTIONAL_URL",
+    "type": "url",
+    "requiredIn": [],
+    "hasDefault": false,
+    "optional": true,
+    "sensitive": false,
+    "example": "https://example.test/"
+  },
+  {
+    "name": "PORT",
+    "type": "port",
+    "requiredIn": [],
+    "hasDefault": true,
+    "optional": false,
+    "sensitive": false,
+    "description": "HTTP port"
+  }
+]

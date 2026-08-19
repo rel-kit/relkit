@@ -1,0 +1,334 @@
+$ bun run scripts/verify.ts
+[0.02ms] ".env"
+$ bun run scripts/lint.ts
+$ bun run scripts/check-boundaries.ts
+$ konsistent validate
+$ konsistent check "--format=json" "--max-diagnostics=1000"
+error: script "konsistent" exited with code 1
+$ tsc -b --pretty false
+$ bun run scripts/test-types.ts
+$ bun test ./tests/unit ./tests/schema
+
+tests/schema/schema.test.ts:
+(pass) @zsys/schema > validates sync and async Standard Schema values [2.34ms]
+(pass) @zsys/schema > applies v3-style defaults and transforms [0.38ms]
+(pass) @zsys/schema > preserves nested object and array issue paths [0.13ms]
+(pass) @zsys/schema > accepts a third-party Standard Schema fixture and prefixes its issues [0.14ms]
+(pass) @zsys/schema > returns the unavailable result for a compatible schema without projection [0.02ms]
+(pass) @zsys/schema > keeps validation and JSON Schema goldens stable [0.72ms]
+
+ 6 pass
+ 0 fail
+ 11 expect() calls
+Ran 6 tests across 1 file. [24.00ms]
+$ bun test ./tests/compiler ./tests/graph
+
+tests/compiler/fixtures.test.ts:
+(pass) compiler fixture goldens > valid-minimal [159.18ms]
+(pass) compiler fixture goldens > valid-full [149.04ms]
+(pass) compiler fixture goldens > warning-wrong-directory [114.81ms]
+(pass) compiler fixture goldens > warning-wrong-suffix [109.43ms]
+(pass) compiler fixture goldens > error-duplicate-id [109.29ms]
+(pass) compiler fixture goldens > error-route-collision [120.09ms]
+(pass) compiler fixture goldens > error-missing-target [111.97ms]
+(pass) compiler fixture goldens > error-event-target [114.82ms]
+(pass) compiler fixture goldens > error-provider-profile [110.35ms]
+
+tests/compiler/evaluator.test.ts:
+(pass) isolated evaluator > returns snapshots and manifest references without corrupting output [38.79ms]
+(pass) isolated evaluator > reports supported side effects and keeps generated writes allowed [76.42ms]
+(pass) isolated evaluator > returns source-mapped structured import failures [40.16ms]
+(pass) isolated evaluator > kills a candidate that exceeds the compilation timeout [205.07ms]
+(pass) isolated evaluator > rejects candidates outside the fixed project root [0.75ms]
+
+tests/compiler/manifest.test.ts:
+(pass) runtime manifest generation > sorts imports and emits one handler, adapter, validator, and provider slot [0.50ms]
+(pass) runtime manifest generation > projects provider metadata as safe names and keeps factory slots out of graph data [0.55ms]
+(pass) runtime manifest generation > does not activate without executable references or with a hash mismatch [0.23ms]
+
+tests/compiler/ast-prefilter.test.ts:
+(pass) AST discovery prefilter > finds syntax candidates without evaluating ordinary source [2.00ms]
+(pass) AST discovery prefilter > ignores type-only ZSys references and uses default exclusions [0.18ms]
+
+tests/compiler/graph-construction.test.ts:
+(pass) compiler graph construction > projects triggers, ordered middleware/transforms, and declared edges [4.32ms]
+
+tests/compiler/semantic-validation.test.ts:
+(pass) compiler semantic validation > indexes middleware and transforms without duplicating exported references [0.39ms]
+(pass) compiler semantic validation > reports missing references, response incompatibility, and transform collisions [1.01ms]
+(pass) compiler semantic validation > validates raw selectors, provider capabilities, and direct-call cycles [0.82ms]
+(pass) compiler semantic validation > uses match expansion for typed envelopes and warns on restricted raw all [2.76ms]
+
+tests/compiler/fixture-commerce.test.ts:
+(pass) fixture-commerce compiler acceptance > keeps authored contracts unique, hash-matched, and data-only [92.94ms]
+
+tests/compiler/extract.test.ts:
+(pass) descriptor extraction > preserves named/default exports, source positions, and data-only references [0.75ms]
+
+tests/compiler/generated-artifacts.test.ts:
+(pass) compiler generated artifacts > writes core bytes once and preserves unchanged modification state [2.71ms]
+(pass) compiler generated artifacts > accepts only versioned future artifact extensions [1.60ms]
+(pass) compiler generated artifacts > invalidates changed descriptors and transitive dependants deterministically [0.30ms]
+
+tests/compiler/normalize.test.ts:
+(pass) compiler normalization > runs all v3 passes in their exact order [1.94ms]
+(pass) compiler normalization > keeps diagnostic codes stable for duplicate IDs and route collisions [0.75ms]
+(pass) compiler normalization > sorts canonical graph bytes independently of descriptor enumeration [1.57ms]
+(pass) compiler normalization > normalizes raw IDs and paths without losing mapped source locations [0.30ms]
+(pass) compiler normalization > keeps invalid raw IDs as stable diagnostics [0.29ms]
+
+tests/compiler/determinism.test.ts:
+(pass) compiler determinism > keeps compiler and Phase 6 artifact bytes stable across roots, orders, identities, and insertion order [220.16ms]
+(pass) compiler determinism > normalizes Windows roots and excludes PID, clock, generation, and random metadata [0.28ms]
+(pass) compiler determinism > matches clean compilation for watch add/change/remove cycles and preserves unaffected writes [7.12ms]
+
+tests/graph/model.test.ts:
+(pass) graph model > exposes only the approved node and declared edge kinds [0.18ms]
+(pass) graph model > models ordered HTTP metadata and generated agent identity as data [0.09ms]
+
+tests/graph/diff.test.ts:
+(pass) graph compatibility diff > reports source moves as informational and output removal as breaking [0.99ms]
+(pass) graph compatibility diff > classifies selector expansion separately and deterministically [0.23ms]
+(pass) graph compatibility diff > uses compatible additions and breaking removals [0.18ms]
+(pass) graph compatibility diff > classifies the remaining capability families [0.36ms]
+
+tests/graph/hash.test.ts:
+(pass) canonical graph hashing > normalizes roots/separators, sorts nodes/edges, and excludes ephemeral metadata [0.54ms]
+
+tests/graph/registration-plan.test.ts:
+(pass) registration planning > projects every runtime registration family without acquiring resources [0.88ms]
+(pass) registration planning > orders HTTP routes by precedence and keeps normalized duplicates visible [0.20ms]
+
+ 46 pass
+ 0 fail
+ 450 expect() calls
+Ran 46 tests across 15 files. [1.97s]
+$ bun test ./tests/contracts
+
+tests/contracts/descriptor-cohort.test.ts:
+(pass) Phase 2 descriptor cohort > brands, freezes, and keeps explicit stable refs immutable [0.16ms]
+(pass) Phase 2 descriptor cohort > narrows declared dependencies and creates typed declared errors [1.20ms]
+(pass) Phase 2 descriptor cohort > serializes route ASTs and named transform projections without closures [1.33ms]
+(pass) Phase 2 descriptor cohort > keeps environment and provider references value-free [1.30ms]
+(pass) Phase 2 descriptor cohort > validates job policies and omits executable handlers [0.21ms]
+(pass) Phase 2 descriptor cohort > projects event selector unions and onEvent as event-trigger [0.75ms]
+(pass) Phase 2 descriptor cohort > keeps bucket/cache contracts logical and tools/agents handler-free [0.90ms]
+(pass) Phase 2 descriptor cohort > emits every convention warning without excluding a descriptor [0.87ms]
+
+tests/contracts/events.test.ts:
+(pass) event contract: deterministic testing event harness > publishes a validated payload as one correlated envelope [30.46ms]
+(pass) event contract: deterministic testing event harness > rejects invalid payload before acceptance or delivery [4.58ms]
+(pass) event contract: deterministic testing event harness > exposes honest ephemeral and durable delivery capabilities [0.19ms]
+(pass) event contract: deterministic testing event harness > expands single, anyOf, and pattern selectors to known pairs [6.94ms]
+(pass) event contract: deterministic testing event harness > warns on a pattern with no known event without rejecting the graph [0.63ms]
+(pass) event contract: deterministic testing event harness > classifies a compatible pattern expansion change [0.69ms]
+(pass) event contract: deterministic testing event harness > restricts raw wildcard selectors to the declared audit purposes [0.62ms]
+(pass) event contract: deterministic testing event harness > fans out independently and invokes the selected target [20.91ms]
+(pass) event contract: deterministic testing event harness > recovers durable work, exposes duplicates, retries, and dead-letters safely [41.48ms]
+(pass) event contract: deterministic testing event harness > does not claim recovery for in-flight ephemeral delivery [5.59ms]
+
+tests/contracts/cache.test.ts:
+(pass) cache contract: local provider > covers get, set, delete, has, getOrSet, and increment [3.42ms]
+(pass) cache contract: local provider > uses canonical object keys and deterministic TTL expiry [0.40ms]
+(pass) cache contract: local provider > rejects invalid keys, values, and TTLs without replacing a value [0.39ms]
+(pass) cache contract: local provider > runs one producer per key for concurrent misses [0.35ms]
+(pass) cache contract: local provider > keeps cache observations free of raw keys and values [0.04ms]
+(pass) cache contract: local provider > rejects an unavailable increment capability explicitly [0.40ms]
+(pass) cache contract: local provider > rejects reads after the provider goes out of service [0.21ms]
+(pass) cache contract: local provider > evicts the least recently used entry within the configured bound [0.23ms]
+(pass) cache contract: test fake > covers get, set, delete, has, getOrSet, and increment [2.24ms]
+(pass) cache contract: test fake > uses canonical object keys and deterministic TTL expiry [4.98ms]
+(pass) cache contract: test fake > rejects invalid keys, values, and TTLs without replacing a value [0.85ms]
+(pass) cache contract: test fake > runs one producer per key for concurrent misses [1.18ms]
+(pass) cache contract: test fake > keeps cache observations free of raw keys and values [0.95ms]
+(pass) cache contract: test fake > rejects an unavailable increment capability explicitly [0.99ms]
+(pass) cache contract: test fake > rejects reads after the provider goes out of service [0.84ms]
+(pass) cache contract: test fake > preserves the prior entry when a write outage is injected [1.22ms]
+
+tests/contracts/buckets.test.ts:
+(pass) bucket contract: local provider > round-trips every operation and metadata [4.62ms]
+(pass) bucket contract: local provider > rejects traversal, absolute keys, and policy violations [1.31ms]
+(pass) bucket contract: local provider > reports unsupported signed URLs through capabilities [1.52ms]
+(pass) bucket contract: local provider > rejects operations after the provider goes out of service [1.52ms]
+(pass) bucket contract: local provider > returns sorted, cursor-based pages without duplicates [6.06ms]
+(pass) bucket contract: test fake > round-trips every operation and metadata [6.09ms]
+(pass) bucket contract: test fake > rejects traversal, absolute keys, and policy violations [1.04ms]
+(pass) bucket contract: test fake > reports unsupported signed URLs through capabilities [0.63ms]
+(pass) bucket contract: test fake > rejects operations after the provider goes out of service [0.65ms]
+(pass) bucket contract: test fake > keeps the prior object visible across injected write failures [1.41ms]
+
+tests/contracts/jobs.test.ts:
+(pass) job contract: deterministic testing job harness > publishes durable at-least-once capabilities without exactly-once claims
+(pass) job contract: deterministic testing job harness > rejects invalid input before durable acceptance or target invocation [4.66ms]
+(pass) job contract: deterministic testing job harness > enqueues, consumes through the engine, and acknowledges completion [9.15ms]
+(pass) job contract: deterministic testing job harness > uses deterministic retry delay and succeeds on the next attempt [16.98ms]
+(pass) job contract: deterministic testing job harness > dead-letters an exhausted retry with safe failure metadata [25.14ms]
+(pass) job contract: deterministic testing job harness > returns an expired lease to available without inventing a state [22.84ms]
+(pass) job contract: deterministic testing job harness > makes acknowledgement-gap duplicates visible after lease recovery [11.45ms]
+(pass) job contract: deterministic testing job harness > retains idempotency keys, returns duplicates, and accepts after expiry [10.58ms]
+(pass) job contract: deterministic testing job harness > enforces the stricter function and consumer concurrency limit [11.59ms]
+(pass) job contract: deterministic testing job harness > fires schedules through enqueue and applies skip/allow overlap policies [30.20ms]
+(pass) job contract: deterministic testing job harness > recovers delayed state and completed state across a restart [16.67ms]
+(pass) job contract: deterministic testing job harness > quarantines malformed durable records while preserving valid work [10.61ms]
+(pass) job contract: deterministic testing job harness > cancels an in-flight enqueue before the provider accepts work [3.17ms]
+
+tests/contracts/canonical-contracts.test.ts:
+(pass) canonical contracts > sorts object keys recursively while preserving array order [0.53ms]
+(pass) canonical contracts > rejects invalid JSON values with stable paths [0.46ms]
+(pass) canonical contracts > normalizes explicit IDs and protocol IDs without source paths [0.24ms]
+(pass) canonical contracts > normalizes source locations across roots and separators [0.36ms]
+(pass) canonical contracts > validates one-based source positions with stable errors [0.16ms]
+(pass) canonical contracts > exposes the v1 contract and protocol versions [0.03ms]
+
+tests/contracts/descriptor.test.ts:
+(pass) descriptor contracts > uses the global brand and normalized immutable refs [1.59ms]
+(pass) descriptor contracts > rejects forged or mismatched values and freezes nested cycles [0.09ms]
+
+ 65 pass
+ 0 fail
+ 480 expect() calls
+Ran 65 tests across 7 files. [591.00ms]
+$ bun test ./tests/integration
+
+tests/integration/fixture-commerce-consistency.test.ts:
+(pass) fixture-commerce keeps one graph and hash across every acceptance consumer [194.73ms]
+
+tests/integration/agents/fixture-commerce.test.ts:
+(pass) fixture-commerce support agent > runs a scripted tool call through the function engine without storing content [1.47ms]
+
+tests/integration/observability/collector-consumers.test.ts:
+(pass) every collector consumer and sink receives an admitted record [19.73ms]
+(pass) source scan keeps record serialization and direct output inside adapters [87.52ms]
+
+tests/integration/http/http.test.ts:
+(pass) HTTP integration > selects static, parameter, and wildcard routes in precedence order [2.37ms]
+(pass) HTTP integration > maps path, query, header, cookie, JSON, whole-body, nested, default, optional, constant, and transform inputs [2.95ms]
+(pass) HTTP integration > rejects malformed JSON before engine invocation [1.83ms]
+(pass) HTTP integration > rejects wrong content type before engine invocation [0.43ms]
+(pass) HTTP integration > rejects body too large before engine invocation [0.40ms]
+(pass) HTTP integration > rejects target schema failures before the handler runs [2.14ms]
+(pass) HTTP integration > maps declared errors, defects, and timeouts to safe responses [24.72ms]
+(pass) HTTP integration > runs framework middleware in order and continues through declared middleware [0.81ms]
+(pass) HTTP integration > honors a declared middleware short-circuit without invoking the route target [0.64ms]
+(pass) HTTP integration > propagates request IDs and records request lifecycle plus trace hooks [1.90ms]
+(pass) HTTP integration > rejects invalid response bodies in test mode [0.24ms]
+(pass) HTTP integration > rejects normalized route collisions before startup [2.19ms]
+(pass) HTTP integration > aborts ctx.signal and records a cancelled outcome when a real client disconnects [12.10ms]
+
+tests/integration/http/fixture-commerce.test.ts:
+(pass) serves the compiled fixture routes through one HTTP engine path [91.89ms]
+
+tests/integration/http/contracts.test.ts:
+(pass) keeps runtime, OpenAPI, and generated client contracts aligned [2.92ms]
+
+tests/integration/jobs/fixture-commerce.test.ts:
+(pass) commerce receipt jobs > projects the receipt queue, schedule, and target edges [89.24ms]
+(pass) commerce receipt jobs > runs the scheduled receipt through the job engine and keeps query state after restart [35.27ms]
+
+tests/integration/engine/engine.test.ts:
+(pass) engine integration matrix > covers success, input failure, output defect, declared error, and unknown error [2.31ms]
+(pass) engine integration matrix > preserves parent/child metadata, trace propagation, logs, and spans [1.04ms]
+(pass) engine integration matrix > handles pre-start cancellation and cancellation while awaiting a provider [1.06ms]
+(pass) engine integration matrix > classifies deterministic timeout and queues concurrency without counting waiters [7.32ms]
+(pass) engine integration matrix > interrupts shutdown work and rejects undeclared dependency access [3.32ms]
+(pass) engine integration matrix > covers recursion policy and rejects a graph/manifest mismatch [0.52ms]
+(pass) engine integration matrix > releases generation providers in reverse order and cleans up construction failure [2.82ms]
+
+tests/integration/engine/fixture-resources.test.ts:
+(pass) fixture-commerce managed resources > uses declared typed clients and recovers bucket/cache state after restart [16.24ms]
+
+tests/integration/engine/providers.test.ts:
+(pass) provider and generation integration > resolves the active environment and profiles with one provider instance per generation [3.72ms]
+(pass) provider and generation integration > reports an unknown profile before constructing providers [0.18ms]
+(pass) provider and generation integration > cleans provider construction and readiness failures [0.38ms]
+(pass) provider and generation integration > keeps named provider startup and shutdown failures observable and ordered [0.89ms]
+(pass) provider and generation integration > enforces declared dependencies and keeps observed edges outside the graph [3.71ms]
+
+tests/integration/engine/fixture-functions.test.ts:
+(pass) fixture functions through the common engine > invokes cache, event, and job clients and applies function limits [1.63ms]
+(pass) fixture functions through the common engine > invokes a fixture child directly and preserves declared errors [0.97ms]
+(pass) fixture functions through the common engine > rejects forged undeclared clients at runtime [0.37ms]
+
+ 37 pass
+ 0 fail
+ 302 expect() calls
+Ran 37 tests across 11 files. [1465.00ms]
+$ bun test ./tests/restart
+
+tests/restart/events.test.ts:
+(pass) child-process event recovery > recovers a durable listener after process loss [270.25ms]
+(pass) child-process event recovery > makes a handler-success acknowledgement gap duplicate visible [265.36ms]
+(pass) child-process event recovery > does not claim recovery for an ephemeral listener lost with its process [364.31ms]
+(pass) child-process event recovery > keeps one listener completion when another listener fails [162.45ms]
+
+tests/restart/jobs.test.ts:
+(pass) child-process job restart recovery > recovers an expired lease after the worker is killed [263.76ms]
+(pass) child-process job restart recovery > makes a handler-success acknowledgement gap duplicate visible after restart [254.66ms]
+
+ 6 pass
+ 0 fail
+ 32 expect() calls
+Ran 6 tests across 2 files. [1.59s]
+$ bun test ./tests/inspector
+
+tests/inspector/fixture-backend.test.ts:
+(pass) deterministic inspector fixture backend > serves the versioned graph, collections, and redacted source metadata [19.48ms]
+(pass) deterministic inspector fixture backend > keeps active identity while exposing a deterministic invalid candidate [2.20ms]
+(pass) deterministic inspector fixture backend > applies a local dead-letter retry through the protected action contract [1.41ms]
+
+tests/inspector/inspector-scans.test.ts:
+(pass) inspector protocol boundary scans > keeps imports and network access behind the local protocol clients [92.66ms]
+(pass) inspector protocol boundary scans > detects forbidden handler, provider, and secret payloads [0.55ms]
+
+ 5 pass
+ 0 fail
+ 27 expect() calls
+Ran 5 tests across 2 files. [281.00ms]
+$ bun test ./tests/generator
+
+tests/generator/option-matrix.test.ts:
+(pass) covers every template and examples/install/Git combination [191.15ms]
+(pass) accepts valid names and rejects invalid names without mutation [0.89ms]
+(pass) handles absent, empty, and non-empty destinations atomically [14.57ms]
+(pass) normalizes JSON options and keeps generated results JSON-safe [7.13ms]
+(pass) produces byte-identical content from separate destinations [17.70ms]
+(pass) rolls back every pre-rename failure and removes its temporary sibling [40.36ms]
+
+tests/generator/failure-cleanup.test.ts:
+(pass) cleans the staged sibling after an injected copy failure [1.03ms]
+(pass) cleans the staged sibling after an injected substitute failure [5.29ms]
+(pass) cleans the staged sibling after an injected install failure [5.75ms]
+(pass) cleans the staged sibling after an injected git failure [7.50ms]
+(pass) cleans the staged sibling after an injected doctor failure [6.04ms]
+(pass) cleans the staged sibling after an injected check failure [7.22ms]
+(pass) cleans the staged sibling after an injected rename failure [5.42ms]
+(pass) preserves an existing empty destination when publication fails [6.09ms]
+(pass) refuses broad cleanup paths without recursive deletion [0.39ms]
+
+ 15 pass
+ 0 fail
+ 410 expect() calls
+Ran 15 tests across 2 files. [331.00ms]
+$ bun run scripts/build.ts
+• turbo 2.10.9
+$ bun test ./tests/security
+
+tests/security/redaction/redaction.test.ts:
+(pass) recursively finds no synthetic secret in observable flows or sinks [79.41ms]
+
+ 1 pass
+ 0 fail
+ 7 expect() calls
+Ran 1 test across 1 file. [205.00ms]
+
+tests/agents/source-boundaries.test.ts:
+(pass) agent declaration/source boundaries > the real public authoring sources contain no vendor agent details [30.06ms]
+(pass) agent declaration/source boundaries > the shared authoring scan rejects vendor models and credentials on agents [4.11ms]
+
+tests/compiler/fixture-commerce.test.ts:
+(pass) fixture-commerce compiler acceptance > keeps authored contracts unique, hash-matched, and data-only [114.78ms]
+
+ 3 pass
+ 0 fail
+ 115 expect() calls
+Ran 3 tests across 2 files. [293.00ms]

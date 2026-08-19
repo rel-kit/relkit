@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "paths": {
+      "@zsys/agents": ["packages/agents/src/index.ts"],
+      "@zsys/app": ["packages/app/src/index.ts"],
+      "@zsys/buckets": ["packages/buckets/src/index.ts"],
+      "@zsys/cache": ["packages/cache/src/index.ts"],
+      "@zsys/config": ["packages/config/src/index.ts"],
+      "@zsys/contracts": ["packages/contracts/src/index.ts"],
+      "@zsys/events": ["packages/events/src/index.ts"],
+      "@zsys/functions": ["packages/functions/src/index.ts"],
+      "@zsys/jobs": ["packages/jobs/src/index.ts"],
+      "@zsys/routes": ["packages/routes/src/index.ts"],
+      "@zsys/schema": ["packages/schema/src/index.ts"],
+      "@zsys/tools": ["packages/tools/src/index.ts"],
+      "effect": ["packages/config/node_modules/effect/dist/index.d.ts"]
+    },
+    "types": ["bun"]
+  },
+  "include": ["./*.ts"]
+}

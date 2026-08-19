@@ -1,0 +1,91 @@
+{
+  "appId": "minimal-app",
+  "contractVersion": 1,
+  "edges": [
+    { "from": "hello.route", "kind": "targets-function", "role": "primary", "to": "hello" }
+  ],
+  "nodes": [
+    {
+      "defaults": null,
+      "environment": {
+        "PORT": {
+          "hasDefault": true,
+          "optional": false,
+          "requiredIn": [],
+          "sensitive": false,
+          "type": "port"
+        }
+      },
+      "id": "minimal-app",
+      "kind": "app",
+      "observability": null,
+      "providerProfiles": ["default"],
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 }
+    },
+    {
+      "hasDefault": true,
+      "id": "PORT",
+      "kind": "env",
+      "name": "PORT",
+      "requiredIn": [],
+      "sensitive": false,
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 },
+      "type": "port"
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "id": "hello",
+      "input": {
+        "properties": { "name": { "type": "string" } },
+        "required": ["name"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": { "message": { "type": "string" } },
+        "required": ["message"],
+        "type": "object"
+      },
+      "source": { "column": 15, "file": "src/functions/hello.function.ts", "line": 4 },
+      "timeoutMs": null
+    },
+    {
+      "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
+      "configuration": { "development": [], "production": ["region"], "test": [] },
+      "environment": [],
+      "id": "default",
+      "kind": "provider",
+      "profile": "default",
+      "source": { "column": 13, "file": "src/app.ts", "line": 12 }
+    },
+    {
+      "config": {
+        "method": "GET",
+        "middleware": [],
+        "path": "/hello/:name",
+        "request": { "fields": { "name": { "kind": "path", "name": "name" } }, "kind": "input" },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": { "message": { "type": "string" } },
+              "required": ["message"],
+              "type": "object"
+            },
+            "status": 200
+          }
+        ],
+        "timeoutMs": null,
+        "transforms": []
+      },
+      "id": "hello.route",
+      "kind": "trigger",
+      "source": { "column": 15, "file": "src/routes/hello.route.ts", "line": 4 },
+      "targetFunctionId": "hello",
+      "triggerType": "http"
+    }
+  ]
+}

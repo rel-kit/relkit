@@ -1,0 +1,337 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run quality checks
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          git diff --exit-code -- bun.lock 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install-no-diff.log"
+          bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/format.log"
+          bun run lint 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/lint.log"
+          bun run check 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/boundaries.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run typecheck 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/typecheck.log"
+          bun x eslint eslint.config.mjs 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/eslint.log"
+          git diff --check 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/whitespace.log"
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-quality
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  core-tests:
+    name: Core tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run core tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:types 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/types.log"
+          bun run test:unit 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/unit-schema.log"
+          bun run test:compiler 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/compiler-graph.log"
+      - name: Upload core evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-core-tests
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  runtime-tests:
+    name: Runtime tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run runtime tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:contracts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/provider-contracts.log"
+          bun run test:integration 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/integration.log"
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-runtime-tests
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  recovery-tests:
+    name: Recovery tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run restart and recovery tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:restart 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/restart.log"
+      - name: Upload recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-recovery-tests
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  inspector:
+    name: Inspector
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run inspector API and browser tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:inspector 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/inspector-api.log"
+          bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/playwright-install.log"
+          bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/playwright.log"
+      - name: Upload inspector evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-inspector
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  scaffolder:
+    name: Scaffolder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run generator acceptance
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:generator 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generator-tests.log"
+          bun run scripts/pack-and-smoke-create-zsys.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generator-packed-smoke.log"
+      - name: Upload scaffolder evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-scaffolder
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Build and check generated-file no-diff
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/build.log"
+          git diff --exit-code 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generated-diff.log"
+          test -z "$(git status --short --untracked-files=all)" 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/generated-status.log"
+      - name: Upload build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-build
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run security and boundary scans
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:security 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/redaction.log"
+          bun run scripts/secret-scan.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/secret-scan.log"
+          bun run scripts/check-public-declarations.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/public-declarations.log"
+          bun run scripts/check-observability-sinks.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/observability-sinks.log"
+          bun test tests/agents/source-boundaries.test.ts 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/agent-boundaries.log"
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-security
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  pulumi:
+    name: Pulumi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v7
+        with:
+          pulumi-version: "3.258.0"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run Pulumi plan and mock tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          pulumi version 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/pulumi-version.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:deployment 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/pulumi.log"
+      - name: Upload Pulumi evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-pulumi
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  container:
+    name: Container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Run container lifecycle tests
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:container 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/container.log"
+      - name: Upload container evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-container
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
+  aws-nightly:
+    name: AWS nightly (release-gated)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: aws-nightly
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v7
+        with:
+          pulumi-version: "3.258.0"
+      - name: Prepare evidence
+        run: mkdir -p "$RUNNER_TEMP/zsys-evidence"
+      - name: Install dependencies
+        run: |
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/install.log"
+          pulumi version 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/pulumi-version.log"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ZSYS_AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.ZSYS_AWS_INTEGRATION_REGION }}
+      - name: Run release-gated AWS integration
+        env:
+          ZSYS_AWS_INTEGRATION: "1"
+          ZSYS_AWS_INTEGRATION_REGION: ${{ secrets.ZSYS_AWS_INTEGRATION_REGION }}
+          ZSYS_AWS_INTEGRATION_IMAGE: ${{ secrets.ZSYS_AWS_INTEGRATION_IMAGE }}
+          ZSYS_AWS_INTEGRATION_BACKEND: ${{ secrets.ZSYS_AWS_INTEGRATION_BACKEND || 'cloud' }}
+          ZSYS_AWS_INTEGRATION_TIMEOUT_MS: "3000000"
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+        run: |
+          set -o pipefail
+          bun run build 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/prebuild.log"
+          bun run test:aws-integration 2>&1 | tee "$RUNNER_TEMP/zsys-evidence/aws-nightly.log"
+      - name: Upload AWS evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-aws-nightly
+          path: ${{ runner.temp }}/zsys-evidence
+          if-no-files-found: ignore
+          retention-days: 30

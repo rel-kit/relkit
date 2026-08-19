@@ -1,0 +1,15 @@
+{
+  "stack": "zsys-nightly-1787078392190-14ac0016",
+  "region": "us-east-1",
+  "tagFilter": {
+    "managed-by": "zsys",
+    "app": "full-app"
+  },
+  "taggedResourceCount": 5,
+  "taggedServiceCounts": {
+    "ec2": 1,
+    "ecs": 4
+  },
+  "liveResourceCount": 0,
+  "liveResources": []
+}
