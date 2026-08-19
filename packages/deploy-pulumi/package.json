@@ -9,6 +9,8 @@
     }
   },
   "dependencies": {
+    "@pulumi/aws": "7.42.0",
+    "@zsys/cloud-aws": "workspace:*",
     "@pulumi/pulumi": "3.258.0",
     "@zsys/contracts": "workspace:*",
     "@zsys/deploy": "workspace:*",

@@ -119,9 +119,6 @@ export function createCacheClient<
   return client;
 }
 
-export const createCacheClientAdapter = createCacheClient;
-export const createCacheInvocationAdapter = createCacheClient;
-
 function assertText(value: unknown, name: string): asserts value is string {
   if (typeof value !== "string" || value.trim() === "") {
     throw new TypeError(`Cache ${name} must be non-empty`);

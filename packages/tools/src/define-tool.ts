@@ -55,6 +55,7 @@ export interface DefineToolOptions<
   readonly timeoutMs?: number;
 }
 
+/** Defines a tool boundary with side-effect and approval metadata for safe invocation. */
 export function defineTool<const Id extends string, const Target extends FunctionRefAny>(
   options: DefineToolOptions<Id, Target>,
 ): ToolDescriptor<Id, Target> {

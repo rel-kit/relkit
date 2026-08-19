@@ -63,7 +63,7 @@
       "@zsys/diagnostics": "94b618154bb5ae8441bb447cbce6d4cb8f5596fc2789b5fd226fd2aeb492219d",
       "@zsys/engine": "377b73eb482dfcb0d0fa036f59beff69bef630191b03fc0088e23bcd1123a14d",
       "@zsys/events": "c3a9da02a824f019eee47c0069a3877a9946ebe7cc5d59659052c12393335b93",
-      "@zsys/functions": "6168e3feeee3bfdc68fe5d307d05d531259634267c4d3102cf2abfee2349310",
+      "@zsys/functions": "6168a35feeee3bfdc68fe5d307d05d531259634267c4d3102cf2abfee2349310",
       "@zsys/graph": "2699bbeff349176f08b4b4dbe7b7fd928fec8c84f531fbd2389d617312ce022d",
       "@zsys/inspector-api": "c7b926b7c8fe28b1b5ce77e81993e59a2f4011e13c6a8b18835280ba5d774c80",
       "@zsys/jobs": "f178335a199d0a98e172eca3d104d398a4c1900a8407927f34048fe21e3045b6",

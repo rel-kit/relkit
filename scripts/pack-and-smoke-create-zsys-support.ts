@@ -63,20 +63,10 @@ export async function snapshotProject(root: string, current = root): Promise<Sna
 }
 
 async function sourceScan(root: string): Promise<void> {
-  const bad = [
-    "ef" + "fect",
-    "ho" + "no",
-    "ne" + "xt",
-    "@pul" + "umi/",
-    "@aws" + "-sdk/",
-    "@zsys/compiler",
-    "@zsys/engine",
-    "@zsys/graph",
-    "@zsys/runtime-effect",
-    "@zsys/runtime-hono",
-    "@zsys/supervisor",
-  ];
-  const pattern = new RegExp(`(?:from|import)\\s*["'](?:${bad.join("|")})`);
+  const bad =
+    "effect hono next @pulumi/ @aws-sdk/ @zsys/compiler @zsys/engine @zsys/graph " +
+    "@zsys/runtime-effect @zsys/runtime-hono @zsys/supervisor";
+  const pattern = new RegExp(`(?:from|import)\\s*["'](?:${bad.split(" ").join("|")})`);
   const scan = async (directory: string): Promise<string[]> => {
     const result: string[] = [];
     for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -116,7 +106,7 @@ async function waitFor(check: () => Promise<boolean>): Promise<void> {
   throw new Error("Timed out waiting for the generated development server.");
 }
 
-async function devSmoke(root: string): Promise<void> {
+async function devSmoke(root: string, inspectorRoot?: string): Promise<void> {
   const port = await freePort();
   const inspector = await freePort();
   const child = Bun.spawn(
@@ -132,18 +122,26 @@ async function devSmoke(root: string): Promise<void> {
       "--inspector-port",
       String(inspector),
     ],
-    { cwd: root, env: { ...process.env, PORT: String(port) }, stdout: "pipe", stderr: "pipe" },
+    {
+      cwd: root,
+      env: {
+        ...process.env,
+        PORT: String(port),
+        ...(inspectorRoot === undefined ? {} : { ZSYS_INSPECTOR_ROOT: inspectorRoot }),
+      },
+      stdout: "pipe",
+      stderr: "pipe",
+    },
   );
   const output = Promise.all([
     new Response(child.stdout).text(),
     new Response(child.stderr).text(),
   ]);
+  let failure: unknown;
   try {
     await waitFor(async () => {
-      if (child.exitCode !== null) {
-        const [stdout, stderr] = await output;
-        throw new Error(`Development process exited with ${child.exitCode}.\n${stdout}${stderr}`);
-      }
+      if (child.exitCode !== null)
+        throw new Error(`Development process exited with ${child.exitCode}.`);
       const response = await fetch(`http://127.0.0.1:${port}/hello?name=ZSys`);
       if (!response.ok) throw new Error(`${response.status}: ${await response.text()}`);
       return true;
@@ -156,22 +154,25 @@ async function devSmoke(root: string): Promise<void> {
     const graph = await fetch(`http://127.0.0.1:${port}/_zsys/v1/graph`);
     if (!graph.ok || !(await graph.text()).includes('"graphHash"'))
       throw new Error("Inspector graph API failed.");
+  } catch (error) {
+    failure = error;
   } finally {
     if (child.exitCode === null) child.kill("SIGTERM");
     await Promise.race([child.exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
     if (child.exitCode === null) child.kill("SIGKILL");
     await child.exited;
   }
-  if (child.exitCode !== 0 && child.exitCode !== 143) {
-    const [stdout, stderr] = await output;
+  const [stdout, stderr] = await output;
+  if (failure !== undefined) throw new Error(`${failure}\n${stdout}${stderr}`);
+  if (child.exitCode !== 0 && child.exitCode !== 143)
     throw new Error(`Development process exited with ${child.exitCode}.\n${stdout}${stderr}`);
-  }
 }
 
 export async function verifyProject(
   root: string,
   registry: string,
   cacheDir: string,
+  inspectorRoot?: string,
 ): Promise<void> {
   for (const file of [
     "package.json",
@@ -192,6 +193,6 @@ export async function verifyProject(
   );
   for (const script of ["check", "typecheck", "test", "build"])
     await runCommand(["run", script], root);
-  await devSmoke(root);
+  await devSmoke(root, inspectorRoot);
   await sourceScan(root);
 }

@@ -1,19 +1,129 @@
-# Task 17.18 blocked on required human owner signatures
+# Current repair status — Gate 16 rejected
 
-Checkbox `17.18` remains unchecked. The seven owner rows in
-`RELEASE_CHECKLIST.md:146-152` have blank names, approvals, dates, and evidence
-references; the available `17.17` evidence also records that signatures remain
-intentionally blank. This worker cannot obtain or infer human approvals, and
-one person covering multiple roles would still need a separate approval in
-each applicable row.
+The bounded same-directory repair addressed findings 1–9 and 11 from the
+final review: shipped HTTP execution now uses the common engine and protected
+internal endpoints; product Pulumi code composes the AWS topology; dev starts
+the Next inspector and forwards source changes; defaults/docs/guidance,
+`test:all`, public JSDoc, speculative exports, naming, and the verified 17.15
+checksum are corrected. Focused runtime, deployment, dev, packed-smoke, build,
+and local test-layer checks pass. Preserved generated outputs and unrelated
+dirty paths were not removed or moved.
 
-No product files, checklist rows, evidence, or 17.19–17.20 tasks were changed.
-The fresh same-directory task `01a01690-eaa4-7e33-88de-97103301180d` inspected
-the live OpenSpec state, required context, checklist, and prior evidence.
-`openspec validate implement-zsys-typescript-poc-v3 --strict`, focused
-formatting, and `git diff --check` passed after the blocker note was recorded.
-The next action is human owner review/reproduction and separate row-level
-sign-off; no next task is dispatched while this blocker remains.
+OpenSpec remains `spec-driven`, `all_done`, and `287/287`; tasks were not
+unchecked or reimplemented. The current repair is unstaged, so candidate
+`6c0e219974230c6b9071ca13ead5a8187e9ef45b` is historical and not clean-checkout
+reproducible. Fresh release-gated AWS evidence for the changed product path is
+required but was not authorized. Gate 16 remains rejected and no fresh
+read-only final review was dispatched.
+
+The historical review/17.20 records below are retained for audit context; the
+current release decision is in `RELEASE_CHECKLIST.md` and remaining blockers
+are recorded once below in `BLOCKERS.md`.
+
+# Historical final branch review (superseded)
+
+The fresh read-only final review covered the complete branch diff from merge
+base `b94efe52729c367b62f29d7bd783f13ab6a62352` through candidate
+`6c0e219974230c6b9071ca13ead5a8187e9ef45b`, plus the visible tracked and
+untracked worktree. Independent standards, specification, and retained-evidence
+reviews completed. OpenSpec still reports `287/287` and `all_done`, but the
+review rejected archive because must-fix findings remain; the findings are
+recorded once in `BLOCKERS.md`.
+
+No product/source behavior, task checkbox, release checklist decision, evidence
+artifact, protected v3 document, vendor file, or local iterator skill changed in
+the review unit. Only the durable review notes were updated, including
+correction of the historical 17.13 byte-count transcription below. Strict
+archive validation was not rerun because the prerequisite clean final review
+failed.
+
+After the user explicitly said to proceed and fix the findings, fresh
+same-directory repair task `01a01751-4193-7e83-ad11-9d859af2f617` was
+dispatched on host `local` using the saved `zsys` project. One bounded
+`wait_threads` snapshot with `timeoutMs: 10000` timed out while the task remained
+active and in progress; startup commentary confirmed it is reading the required
+repair context and preserving the dirty/protected paths. This is a successful
+bounded handoff, not a blocker. Cursor:
+`a1484785-39d3-4c11-b8dd-f6fe85eeaf31:2`.
+
+# Historical Task 17.20 Gate 16 record (superseded)
+
+The following table is the pre-repair record only; it is not current approval
+evidence. At that time, checkbox `17.20` was recorded at `287/287`. The
+independent final evidence/consistency review approved Gate 16. All six exact Gate 16
+reproduction commands and the separate release-gated AWS lifecycle passed,
+the seven owner approvals are recorded separately, and all 40 Section 25
+criteria are checked with retained evidence links.
+
+| Command                                         | Result                                                    |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| `bun install --frozen-lockfile`                 | exit `0`; no changes; `0.018s`                            |
+| `bun run verify`                                | exit `0`; generated no-diff; `50.411s`                    |
+| `bun run test:e2e`                              | exit `0`; 6/6 in `14.4s`; capture `14.867s`               |
+| `bun run test:container`                        | exit `0`; 3 tests/19 assertions; `1.891s`                 |
+| `bun run scripts/pack-and-smoke-create-zsys.ts` | exit `0`; 27 packages; `30.411s`                          |
+| `bun run test:deployment`                       | exit `0`; 14 pass/1 release case skipped; `2.772s`        |
+| separate release-gated AWS integration          | exit `0`; 2 tests/21 assertions; `1402.22s`; cleanup pass |
+
+The pre-existing generated `apps/fixture-commerce/.zsys` and `test-results`
+directories were moved to the explicit recoverable path
+`/tmp/zsys-gate16-17.19.zdylhf/preserved-generated` for verify and restored.
+E2E used the documented disposable external React/Node type links; the links
+and external package directory were removed, and `package.json`/`bun.lock`
+remain unchanged. The local deployment command was invoked exactly after a
+process-local `ZSYS_AWS_INTEGRATION=0` setup because `.env` enables the
+separately recorded release case.
+
+Raw stdout/stderr/result transcripts, checksums, metadata, E2E evidence, and
+separate AWS stage evidence are under `evidence/17.19/`. The required Gate 16
+evidence and reproduction rows in `RELEASE_CHECKLIST.md` now cite actual
+results. Final reviewer questions, Section 25 checklist rows, candidate/gate
+status, and the approve decision are now recorded from retained evidence.
+No product/source file changed in this unit.
+
+### Validation
+
+Focused Prettier, JSON parsing for all evidence JSON, transcript SHA-256
+verification, protected-document SHA-256 verification, `git diff --check`,
+strict OpenSpec validation, and the post-evidence recursive secret scan passed.
+The secret scan covered 2,604 files and 340,604,821 bytes with zero matches.
+OpenSpec reports `287/287`; no active blocker or required-check failure
+remains. The known Konsistent findings are advisory, while configuration
+validation and `bun run verify` pass.
+
+### Next fresh-task handoff
+
+Fresh same-directory local final-review task
+`01a01729-f3bf-7652-a6a0-88a699e09d73` was dispatched on host `local` using the
+saved `zsys` project. One bounded `wait_threads` snapshot with `timeoutMs:
+10000` confirmed startup commentary and an active in-progress turn, then
+timed out while the task continued; this is a successful bounded handoff, not
+a blocker. Cursor: `b450fcf3-c1a4-43c8-bc22-b232c876d59e:2`.
+
+# Packed smoke harness repaired
+
+The user ran `bun run scripts/pack-and-smoke-create-zsys.ts`. Generation
+installed from the temporary registry, then `zsys doctor` initially failed its
+frozen lockfile probe because the custom packed runner did not pass that
+registry to the `--dry-run` subprocess. The runner now propagates the temporary
+registry and cache to every generated-project subprocess. The exact command
+passed with `packed create smoke passed (27 packages)` after the unrelated
+manual fixture process was stopped. No 17.19/17.20 implementation or checkbox
+change was made.
+
+# Task 17.18 owner review complete
+
+Mustafa explicitly covered all seven owner roles and supplied a separate
+approval for each row after reviewing the assigned evidence. The rows at
+`RELEASE_CHECKLIST.md:146-152` record `mustafa`, the actual review date
+`2026-08-19`, and role-specific evidence references. Focused compiler, runtime,
+restart, generator, inspector, security, integration, container, deployment,
+type, boundary, packed-smoke, and full `bun run verify` checks passed. The
+accepted 17.9 browser rerun remains the inspector evidence; the direct rerun
+still requires the documented temporary external type links.
+
+Only checkbox `17.18` was advanced; progress is now `285/287`. The final Gate
+16 decision and checkboxes `17.19` and `17.20` remain untouched.
 
 # Task 17.17 final Section 25 acceptance complete
 
@@ -104,7 +214,7 @@ locations.
 The release-wide scanner is `scripts/secret-scan.ts`, with artifact discovery
 in `scripts/secret-scan-files.ts`. `scripts/verify.ts`,
 `scripts/release-check.ts`, and the CI security job fail on any raw match. The
-image-enabled run scanned 2,579 files and 586,509,631 bytes plus the
+image-enabled run scanned 2,579 files and 586,511,872 bytes plus the
 reproducible image `sha256:16fa36766af3f607ed1126490d728c7996597ae4abdfb616b06675f374782e54`;
 all matches were zero. Evidence is under `evidence/17.13/`.
 

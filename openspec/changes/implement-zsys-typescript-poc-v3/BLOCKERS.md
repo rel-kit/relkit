@@ -1,11 +1,124 @@
-# Task 17.18 blocker
+# Current repair blockers
 
-Gate 16 owner approvals are unavailable. `RELEASE_CHECKLIST.md:146-152` has
-blank Name, Signature / approval, Date, and Evidence reviewed cells for all
-seven required roles. Reviewers must reproduce their evidence and record each
-role separately, including when one person covers multiple roles. This worker
-cannot prefill or infer those approvals, so checkbox `17.18` remains unchecked
-and the iterator stops without dispatching 17.19 or 17.20.
+1. **Clean candidate and authority.** The repair is intentionally unstaged and
+   no commit authority was provided. Candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b`
+   is historical, so clean-candidate reproducibility and release packaging
+   cannot be claimed.
+2. **Fresh release-gated AWS evidence.** The Pulumi product composition changed
+   in this repair. The retained 17.19 cloud run predates that change, and a
+   fresh real AWS mutation was not authorized. Local/mock deployment checks
+   pass, but Gate 16 must remain rejected until an authorized cloud rerun.
+
+No implementation check is currently blocked locally. Do not dispatch the
+read-only final-review task while either release blocker remains. Protected
+normative documents, vendored Effect source, generated outputs, and user-owned
+dirty paths remain preserved.
+
+# Historical final review findings (resolved)
+
+The fresh read-only final review found the following must-fix issues across the
+complete branch diff and visible worktree:
+
+1. **P0 — The shipped server bypasses the function engine and exposes unsafe
+   production internals.** `packages/cli/src/commands/build-server.ts:60`
+   invokes a manifest handler directly with the synthetic empty context from
+   line 50, so the real dev/start/container HTTP path skips engine registration,
+   validation, dependencies, lifecycle, telemetry, and safe failure handling.
+   The same server exposes the graph API unconditionally at line 71 and raw
+   error messages at line 73. This violates the function-runtime and
+   production-endpoint requirements and contradicts the approved Section 25
+   common-engine claim.
+2. **P0 — The product deployment path does not create the required AWS
+   topology.** `packages/deploy-pulumi/src/program.ts:88` creates only generic
+   `ComponentResource` placeholders, and `packages/cli/src/commands/deploy.ts:111`
+   selects that program. The real AWS resources are wired only by the test-local
+   program at `tests/deployment/aws-integration.test.ts:178`, so `zsys deploy up`
+   cannot produce the accepted ECR/ECS/ALB/SQS/EventBridge/S3/Valkey/CloudWatch
+   deployment.
+3. **P1 — The printed default development flow has neither the inspector nor
+   source watching.** `packages/cli/src/command-dispatch.ts:65` hard-disables the
+   inspector and ignores the parsed inspector port. No production caller joins
+   `packages/supervisor/src/watcher.ts` to
+   `DevSession.notifySourceChange`, so saves do not rebuild. This contradicts
+   the first-run and last-known-good development requirements.
+4. **P1 — The getting-started flow is not executable as documented.**
+   `docs/getting-started.md:11` says AWS/Pulumi are needed only for deployment,
+   and lines 37–38 document `none` defaults, while
+   `packages/create-zsys/src/options.ts:10-13` defaults to AWS/Pulumi and
+   generation runs the deployment-enabled doctor. Evidence 17.11 supplied an
+   undocumented no-op Pulumi binary and fake AWS profile, so it does not prove
+   the checklist's docs-only clean-environment claim.
+5. **P1 — The declared root `test:all` command is broken.** `package.json:24`
+   points to absent `scripts/test-all.ts`; the direct read-only reproduction
+   exited `1` with `Module not found`.
+6. **P1 — Repository guidance still describes the removed starter/empty Phase
+   0 topology.** `AGENTS.md:12-30,46-85` says implemented roots and suites are
+   empty or unavailable, while `README.md:1-23` still advertises the deleted
+   Turborepo starter. This violates the executable-guidance requirement.
+7. **P2 — Primary public authoring factories lack the required useful JSDoc.**
+   The affected cohort includes `defineApp`, `defineFunction`, `defineRoute`,
+   `defineJob`, `defineEvent`, `defineBucket`, `defineCache`, `defineTool`, and
+   `defineAgent`, contrary to the repository public-API quality contract.
+8. **P2 — Bucket/cache clients expose speculative synonym factories.**
+   `packages/buckets/src/client.ts:176-177` and
+   `packages/cache/src/client.ts:122-123` export two unused aliases each for one
+   implementation, with no requirement, documentation, or caller.
+9. **P2 — The performance helper exports a mysterious catch-all name.**
+   `scripts/performance-support.ts:6` exports `R = Record<string, any>` and uses
+   it for unrelated shapes, contrary to the precise-naming rule.
+10. **P0 — The recorded Gate 16 candidate is not clean-checkout reproducible.**
+    Candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b` changes only the local
+    iterator skill; the packed-smoke repair remains unstaged at
+    `scripts/pack-and-smoke-create-zsys.ts:47`. The candidate version is the
+    version recorded as failing doctor, while 17.19 labels the dirty repaired
+    pass as that candidate without disclosing the tracked diff.
+11. **P1 — The retained 17.15 checksum record contradicts the release record.**
+    `evidence/17.15/metadata.json:66` contains a malformed 63-character
+    `@zsys/functions` value (`6168e3fe…`), while `RELEASE_NOTES.md:69` contains
+    the 64-character SHA-256 (`6168a35f…`). The metadata and checklist
+    nevertheless claim that every documented checksum matches.
+
+Gate 16 cannot remain archive-ready while these findings are unresolved. After
+the user explicitly authorized repair, fresh same-directory task
+`01a01751-4193-7e83-ad11-9d859af2f617` was dispatched to fix this exact set;
+no archive task was dispatched. The final-review unit itself left the protected
+v3 documents and all product/source files untouched.
+
+# Historical Task 17.20 record (superseded)
+
+The prior record stated that no active blocker or required-check failure remained and that the final Gate 16 review
+approved the candidate after all six exact reproductions, the separate
+release-gated AWS lifecycle, seven owner approvals, 40/40 Section 25 criteria,
+checksums, documentation flow, and consistency/security/scope checks were
+reconciled in `RELEASE_CHECKLIST.md`. Checkbox `17.20` is complete; the only
+remaining lifecycle action is the fresh final-review handoff.
+
+# Task 17.19 packed smoke check repaired
+
+The user reproduced `bun run scripts/pack-and-smoke-create-zsys.ts`; the
+packed generator reached `zsys doctor` and failed with
+`ZSYS_CREATE_DOCTOR_FAILED` because the generated runner at
+`scripts/pack-and-smoke-create-zsys.ts:47` forwarded the temporary registry
+only for commands whose final argument was `install`. The runner now
+propagates the temporary registry and cache environment to every subprocess,
+including doctor’s `bun install --frozen-lockfile --dry-run` probe. The exact
+command now passes with `packed create smoke passed (27 packages)`.
+
+This harness blocker is resolved. The successful fixture curls remain valid
+local-runtime evidence, while 17.19 and 17.20 remain unchecked pending their
+full required reproduction, evidence, and approval work.
+
+# Task 17.18 owner review complete
+
+Mustafa explicitly covered all seven required roles. After the role-specific
+evidence review and focused reproduction checks, each row at
+`RELEASE_CHECKLIST.md:146-152` records a separate `mustafa` approval dated
+`2026-08-19` with evidence references. The direct E2E startup limitation is
+documented in the accepted 17.9 evidence and is non-blocking when the
+documented temporary type-link bootstrap is used.
+
+Checkbox `17.18` is complete. The final Gate 16 decision and checkboxes `17.19`
+and `17.20` remain unchecked.
 
 # Task 17.17 status
 

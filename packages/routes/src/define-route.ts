@@ -51,6 +51,7 @@ export interface DefineRouteOptions<
   readonly timeoutMs?: number;
 }
 
+/** Defines an HTTP route that maps a request contract to an existing function reference. */
 export function defineRoute<
   const Id extends string,
   const Target extends FunctionRefAny,

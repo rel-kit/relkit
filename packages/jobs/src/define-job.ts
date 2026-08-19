@@ -72,6 +72,7 @@ export interface DefineJobOptions<
   readonly idempotency?: IdempotencyDefinition<InferInput<InputSchema>>;
 }
 
+/** Defines a durable job trigger with validated input, retry, timeout, and idempotency policy. */
 export function defineJob<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,

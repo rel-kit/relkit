@@ -40,6 +40,31 @@ export function functionExpressionsFor(
   return expressions;
 }
 
+/** Returns the imported descriptors used by the runtime engine for validation and dependencies. */
+export function functionTargetExpressionsFor(
+  functions: readonly NormalizedDescriptor[],
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+): ReadonlyMap<string, string> {
+  const expressions = new Map<string, string>();
+  for (const descriptor of functions) {
+    const expression = executableExpression(descriptor, "descriptor", bindings, input);
+    if (expression !== undefined) expressions.set(descriptor.id, expression);
+  }
+  return expressions;
+}
+
+/** Returns the imported app descriptor needed to construct runtime providers. */
+export function applicationExpressionFor(
+  descriptor: NormalizedDescriptor | undefined,
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+): string | undefined {
+  return descriptor === undefined
+    ? undefined
+    : executableExpression(descriptor, "descriptor", bindings, input);
+}
+
 function isGeneratedFunction(value: unknown): ReturnType<typeof generatedAgentMarker> | undefined {
   if (!isRecord(value) || !isRecord(value.generated)) return undefined;
   if (
@@ -91,7 +116,7 @@ export function middlewareExpressionsFor(
 
 function executableExpression(
   descriptor: NormalizedDescriptor,
-  property: "handler" | "schema",
+  property: "handler" | "schema" | "descriptor",
   bindings: ReadonlyMap<string, ImportBinding>,
   input: ManifestGenerationInput,
 ): string | undefined {
@@ -104,9 +129,9 @@ function executableExpression(
     return undefined;
   const module = modulePath(reference, input);
   const binding = module === undefined ? undefined : bindings.get(module);
-  return binding === undefined
-    ? undefined
-    : `${binding.alias}[${JSON.stringify(reference.exportName)}].${property}`;
+  if (binding === undefined) return undefined;
+  const value = `${binding.alias}[${JSON.stringify(reference.exportName)}]`;
+  return property === "descriptor" ? value : `${value}.${property}`;
 }
 
 function modulePath(

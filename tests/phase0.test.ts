@@ -278,8 +278,10 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
-  test("AGENTS.md has current commands and topology", () => {
+  test("repository guidance has current commands and topology", () => {
     const guidance = readFileSync(join(root, "AGENTS.md"), "utf8");
+    const readme = readFileSync(join(root, "README.md"), "utf8");
+    const gettingStarted = readFileSync(join(root, "docs/getting-started.md"), "utf8");
     for (const stale of [
       "apps/web",
       "apps/docs",
@@ -289,8 +291,13 @@ describe.serial("Phase 0 guardrails", () => {
       "3001",
       "There is currently no checked-in test implementation",
       "no Phase 0\n`scripts/*.ts` implementation",
+      "Turborepo starter",
+      "currently empty",
+      "reserved inspector",
     ]) {
       expect(guidance).not.toContain(stale);
+      expect(readme).not.toContain(stale);
+      expect(gettingStarted).not.toContain(stale);
     }
     for (const current of [
       "apps/inspector",
@@ -299,11 +306,17 @@ describe.serial("Phase 0 guardrails", () => {
       "bun run typecheck",
       "tests/phase0.test.ts",
       "bun run verify",
-      "backend `PORT=3000`",
-      "inspector port `3210`",
+      "PORT=3000",
+      "port `3210`",
     ]) {
       expect(guidance).toContain(current);
     }
+    for (const current of ["apps/inspector", "Pulumi", "ZSYS_INSPECTOR_ROOT"]) {
+      expect(readme).toContain(current);
+      expect(gettingStarted).toContain(current);
+    }
+    expect(gettingStarted).toContain("| `--cloud`                 | `aws`, `none`");
+    expect(gettingStarted).toContain("| `--deploy`                | `pulumi`, `none`");
   });
 
   test("ignores only ZSys generated and local runtime roots", async () => {

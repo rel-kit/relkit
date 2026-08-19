@@ -8,10 +8,12 @@ export function renderManifest(
   input: ManifestGenerationInput,
   bindings: ReadonlyMap<string, ImportBinding>,
   functions: ReadonlyMap<string, string>,
+  targets: ReadonlyMap<string, string>,
   middleware: ReadonlyMap<string, string>,
   transforms: ReadonlyMap<string, string>,
   middlewareDescriptors: readonly NormalizedDescriptor[],
   providers: readonly string[],
+  application?: string,
 ): string {
   const imports = [...bindings.values()]
     .map(
@@ -44,10 +46,12 @@ export function renderManifest(
     "  generatorVersion: manifestGeneratorVersion,",
     "  graphHash: manifestGraphHash,",
     `  functions: ${renderMap(functions)},`,
+    `  targets: ${renderMap(targets)},`,
     "  providers: providerFactories,",
     "  providerFactories,",
     `  middleware: ${renderMap(middleware)},`,
     `  requestTransforms: ${renderMap(transforms)},`,
+    ...(application === undefined ? [] : [`  application: ${application},`]),
     "} as const;",
     "",
   ].join("\n");

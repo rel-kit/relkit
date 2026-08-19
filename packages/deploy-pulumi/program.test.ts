@@ -25,9 +25,10 @@ describe("Pulumi program generation", () => {
     expect(left.pulumiYaml).toBe(right.pulumiYaml);
     expect(left.indexTs).toBe(right.indexTs);
     expect(left.planJson).toBe(right.planJson);
-    expect(left.indexTs).toContain('"managed-by":"zsys"');
-    expect(left.indexTs).toContain('"stack":"ci-blue"');
-    expect(left.indexTs).toContain("zsys:deployment:application");
+    expect(left.indexTs).toContain("createAwsPulumiResources");
+    expect(left.indexTs).toContain('const stackName = "ci-blue";');
+    expect(left.indexTs).toContain("@zsys/deploy-pulumi");
+    expect(left.indexTs).not.toContain("zsys:deployment:application");
     expect(left.indexTs).not.toContain("/tmp/zsys-");
     expect(left.indexTs).not.toContain("source.ts");
     expect(left.indexTs).not.toContain("callback");

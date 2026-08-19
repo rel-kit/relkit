@@ -105,15 +105,23 @@ export function checkManifests(items: PackageInfo[]): {
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
     const expectedExports =
-      directoryName === "config"
+      directoryName === "cloud-aws"
         ? {
             ".": rootExport,
-            "./internal/config": {
-              types: "./dist/internal/config.d.ts",
-              import: "./dist/internal/config.js",
+            "./runtime": {
+              types: "./dist/runtime/index.d.ts",
+              import: "./dist/runtime/index.js",
             },
           }
-        : { ".": rootExport };
+        : directoryName === "config"
+          ? {
+              ".": rootExport,
+              "./internal/config": {
+                types: "./dist/internal/config.d.ts",
+                import: "./dist/internal/config.js",
+              },
+            }
+          : { ".": rootExport };
     if (JSON.stringify(stable(item.manifest.exports)) !== JSON.stringify(stable(expectedExports)))
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =

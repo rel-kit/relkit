@@ -1,158 +1,73 @@
 # AGENTS.md
 
-This file is the working guide for coding agents in the ZSYS repository. Read it
-before editing. User instructions take precedence; more-specific instructions
-inside a subtree take precedence over this file.
-
-The format follows the open [AGENTS.md](https://agents.md/) convention.
+This is the working guide for agents in the ZSYS repository. User instructions
+take precedence; a more-specific `AGENTS.md` in a subtree takes precedence
+over this file. Read it before editing.
 
 ## Repository
 
-ZSYS is an open-source TypeScript monorepo using Bun and Turborepo. The generic
-Next.js/React starter has been removed. Phase 0 is still being assembled, so
-the repository files and package scripts are current truth; v3 documents and
-later task descriptions are intended design, not implemented behavior.
+ZSYS is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
+The main product topology is:
 
-| Path                    | Role                                                                         |
-| ----------------------- | ---------------------------------------------------------------------------- |
-| `apps/inspector`        | Reserved inspector app root; currently empty.                                |
-| `apps/fixture-commerce` | Reserved acceptance fixture root; currently empty.                           |
-| `packages/*`            | Reserved ZSys package workspace; package shells are added by tasks 1.4–1.6.  |
-| `templates/default`     | Reserved generated-project template root; currently empty.                   |
-| `tests/*`               | Phase 0 test-layer roots; `tests/phase0.test.ts` covers current guardrails.  |
-| `scripts`               | Phase 0 boundary/scope/export/verification tooling; later checks land later. |
-| `docs`                  | Briefs, technical specifications, decision records, and ADRs.                |
-| `openspec`              | Change proposals, tasks, and delta specifications.                           |
-| `repos/effect`          | Vendored Effect source; reference only, not a ZSYS edit target.              |
+| Path                    | Role                                                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
+| `apps/fixture-commerce` | Acceptance fixture used by integration and deployment tests.                                                                    |
+| `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
+| `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
+| `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
+| `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
+| `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
+| `openspec/`             | Change proposals, tasks, delta specifications, and change evidence.                                                             |
+| `repos/effect`          | Vendored Effect reference source; never edit or install in it.                                                                  |
 
-The root Bun workspace currently matches `apps/*` and `packages/*`; empty
-directories are represented by `.gitkeep`. `repos/effect` is not a workspace
-member. No runtime framework or application package is installed in Phase 0.
+Generated projects run a backend on `PORT=3000` and the real Next inspector on
+port `3210` by default. `.zsys/generated` contains graph and manifest outputs;
+`.zsys/build` contains server and deployment build output; `.zsys/state` and
+`.zsys/observability` contain local runtime data. Preserve user-owned output
+and dirty worktree changes.
 
-## Setup and development
+## Commands
 
-Run these commands from the repository root:
+From the repository root:
 
 ```sh
 bun install --frozen-lockfile
 bun run typecheck
-bun run dev
-```
-
-The repository pins Bun `1.3.10` through `packageManager`, `devEngines`, and
-`bunfig.toml`'s exact install mode. The root tooling versions are Bun types
-`1.3.10`, TypeScript `5.9.2`, Turbo `2.10.9`, Prettier `3.9.6`, ESLint
-`9.39.5`, and Konsistent `1.0.0-beta.4`. `bun run dev` invokes Turborepo's
-workspace development tasks. The current Phase 0 roots have no development
-task yet, so it exits after finding no runnable package; the real ZSys
-supervisor/CLI development flow belongs to its later owning task.
-
-The v3 application defaults are backend `PORT=3000` and inspector port `3210`.
-They are not live services in the current empty-root Phase 0 topology.
-
-The root manifest reserves the v3 Section 23.4 commands:
-
-```sh
 bun run check
-bun run typecheck
-bun run lint
-bun test
-bun run test:types
-bun run test:unit
-bun run test:compiler
-bun run test:contracts
-bun run test:integration
-bun run test:restart
-bun run test:inspector
-bun run test:e2e
-bun run test:generator
-bun run test:deployment
-bun run test:security
 bun run test:all
 bun run build
 bun run verify
 ```
 
-The commands above become runnable as their owning Phase 0 scripts and test
-layers land. Do not describe an unimplemented script as a passing check or
-invent another root command. Use `bunx prettier --check <files>` and
-`bunx eslint <files>` for focused checks while those scripts are unavailable.
+Use focused scripts such as `bun run test:compiler`,
+`bun run test:integration`, `bun run test:inspector`,
+`bun run test:generator`, and `bun run test:deployment` while iterating.
+The repository guardrail suite is `bun test tests/phase0.test.ts`.
+`test:all` is fail-fast and local by default. Cloud acceptance requires
+explicit `ZSYS_TEST_ALL_CLOUD=1`, `ZSYS_AWS_INTEGRATION_REGION`, and
+`ZSYS_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
 
-## Test and verification
+Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
+`bun run typecheck`, `bun run build`, and `bun run start`. The default generator
+configuration is AWS/Pulumi. Use `--cloud none --deploy none` for a local-only
+project. A published CLI may need `ZSYS_INSPECTOR_ROOT` pointing to a compatible
+`apps/inspector` checkout.
 
-Phase 0 now has checked-in boundary/scope/export/verification tooling and a
-guardrail test suite. Later Section 23.4 test layers remain reserved until
-their owning phases land; they are not passing gates yet. The checks currently
-runnable against this task's root tooling are:
+## Editing rules
 
-```sh
-bun install --frozen-lockfile
-bun run typecheck
-bun run dev
-bun test tests/phase0.test.ts
-bun run verify
-bunx prettier --check AGENTS.md package.json turbo.json bunfig.toml tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs
-bunx eslint eslint.config.mjs
-```
+- Use strict TypeScript, double quotes, semicolons, and the shared configs.
+- Keep implementation files at or below 200 lines; split by responsibility.
+- Prefer existing utilities and standard-library APIs over new abstractions or
+  dependencies. Add focused regression coverage for non-trivial behavior.
+- Use `apply_patch` for source and documentation edits; do not hand-edit
+  generated files.
+- Do not stage, commit, push, reset, check out, or delete user-owned work unless
+  explicitly requested. Do not modify protected normative documents or
+  `repos/effect` during unrelated work.
+- Inspect overlapping dirty changes before editing and report unavailable or
+  intentionally skipped checks honestly.
 
-When adding runtime behavior, add a focused test with the owning package and
-run that package's declared test command. For Markdown-only changes, check the
-changed files with `bunx prettier --check <files>` and inspect links and shell
-commands manually.
-
-For a focused workspace task, use Turborepo filters after the owning package
-exists, for example:
-
-```sh
-bunx turbo run dev --filter=<package>
-```
-
-### Effect vendor
-
-Treat `repos/effect` as vendored reference material, not as a ZSYS edit target.
-Do not modify, reformat, install dependencies in, or mix vendor maintenance
-into a ZSYS change. Use its source and documentation to understand Effect APIs,
-then implement ZSYS changes in the root `apps`, `packages`, or project docs.
-
-Before using Effect guidance, read:
-
-- [`repos/effect/.agents/AGENTS.md`](repos/effect/.agents/AGENTS.md)
-- [`repos/effect/LLMS.md`](repos/effect/LLMS.md)
-
-Those files describe the upstream Effect repository and are reference material
-for this project. Upstream maintenance belongs in the vendor's own workflow,
-not in a ZSYS change.
-
-## Code standards
-
-- Keep TypeScript strict and follow the shared configs, ESLint, and Prettier.
-- Match the existing format: double-quoted strings and semicolons in TypeScript.
-- Keep implementation files at or below 200 lines. Split code by responsibility
-  when it exceeds the limit. The limit does not apply to tests, e2e tests,
-  documents, fixtures, generated output, or vendored code.
-- Prefer the smallest clear change. Reuse existing utilities and dependencies;
-  do not add abstractions, configuration, or dependencies without a concrete use.
-- Clean code is required: use precise names, small focused functions, explicit
-  error handling, and no dead or commented-out code.
-- Comments and JSDoc are part of the public quality bar. Add them for public
-  APIs, invariants, non-obvious intent, or important trade-offs. Explain why,
-  not what the code already says; do not use comments to hide unclear code.
-- Do not hand-edit generated files. Keep changes focused and leave unrelated
-  worktree changes untouched.
-
-## Structural consistency for agents
-
-Before changing directory, file, export, import, or naming conventions, read
-[`konsistent-config`](.agents/skills/konsistent-config/SKILL.md). The pinned
-Konsistent CLI and root script now exist, but `konsistent.json` is intentionally
-deferred until the complete package-shell cohort provides evidence (task 1.8).
-When configuring it, follow the skill's evidence-first workflow rather than
-inventing rules, validate the config, then report audit findings separately
-from validation success.
-
-## Open-source contribution hygiene
-
-Keep public documentation and examples accurate, avoid secrets and local
-environment files, and update the nearest README/spec when behavior changes.
-Before handing off, report the checks run, any checks that were unavailable, and
-any intentional limitations.
+Before changing exports, imports, directories, or naming conventions, read
+`.agents/skills/konsistent-config/SKILL.md`. For Effect API reference, first
+read `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md`.

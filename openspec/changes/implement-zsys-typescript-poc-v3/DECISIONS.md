@@ -1,3 +1,82 @@
+# Current repair decisions
+
+- Keep the repair in the normal checkout and preserve user-owned dirty
+  outputs, generated directories, protected documents, vendor files, and
+  `tasks.md` at `287/287`. Do not stage, commit, or dispatch a subagent.
+- Route dev/start/container HTTP through the existing engine/provider/
+  observability seams and reuse the product AWS Pulumi composition; no parallel
+  runtime or test-only deployment program is acceptable.
+- Treat candidate `6c0e219974230c6b9071ca13ead5a8187e9ef45b` and evidence under
+  17.19 as historical pre-repair records. The current repair is unstaged, so
+  it cannot be called clean-candidate reproducible.
+- Keep Gate 16 rejected until an authorized clean candidate and fresh
+  release-gated AWS rerun cover the changed Pulumi/runtime paths. Local/mock
+  verification is sufficient for this bounded unit; no cloud mutation is
+  authorized.
+- Correct the 17.15 metadata hash only after validating all 30 package and 3
+  template rows against `RELEASE_NOTES.md`; record only verified facts.
+
+# Historical final branch decision (superseded)
+
+- Do not archive while the must-fix product, standards, and retained-evidence
+  issues recorded once in `BLOCKERS.md` remain. After the user explicitly said
+  to proceed, dispatch one fresh same-directory repair task for that exact set.
+- Preserve checkbox 17.20, the existing Gate 16 checklist decision, all
+  product/source behavior, evidence artifacts, protected documents, vendor
+  files, and user-owned dirty outputs; a final-review unit does not repair or
+  reapprove them.
+- Correct only the durable 17.13 byte-count transcription in `PROGRESS.md`; the
+  evidence files already agreed on the verified value.
+
+# Historical Task 17.20 decisions (superseded)
+
+- The prior record approved Gate 16 because the retained evidence independently covered every
+  required evidence item, all 40 Section 25 criteria, the seven separate owner
+  approvals, matching artifact/release-note checksums, documentation flow,
+  secret/declaration/scope scans, and the complete AWS cleanup lifecycle.
+- Record the candidate as release `0.0.0` at candidate commit
+  `6c0e219974230c6b9071ca13ead5a8187e9ef45b`, with its parent
+  `af75ac35a205a1323f20c9ab43781045ee0695be` as the base and the 17.19
+  environment/transcripts as the reproduction record.
+- Treat the known Konsistent audit findings as advisory because the configured
+  validation and fixed fail-fast `bun run verify` path both pass; do not hide or
+  relabel those findings as zero violations.
+- Fill the final reviewer questions, Section 25 rows, candidate/gate fields,
+  and approve decision in `RELEASE_CHECKLIST.md`; advance only checkbox 17.20.
+
+# Task 17.19 decisions
+
+- Capture the six exact reproduction commands as separate stdout, stderr, and
+  result files with SHA-256 checksums; reuse accepted 17.13–17.17 evidence for
+  the other required Gate 16 rows instead of rerunning unrelated baselines.
+- Move only the two verified disposable generated-output directories aside for
+  `bun run verify`, restore them afterward, and use/remove the already
+  documented external E2E type links without changing dependencies.
+- Set `ZSYS_AWS_INTEGRATION=0` in the process before invoking the exact local
+  `bun run test:deployment` command because `.env` enables the cloud case.
+  Retain the fresh release-gated AWS run as separate evidence and use the 17.12
+  report only for supplementary detailed resource counts.
+- Fill only the Gate 16 required-evidence and reproduction tables. Leave the
+  final reviewer questions, Section 25 checklist rows, candidate/gate status,
+  and approve/reject decision to checkbox `17.20`.
+
+# Task 17.18 decisions
+
+- Treat Mustafa’s explicit assignment as separate approval for each of the
+  seven owner roles; do not collapse multi-role coverage into one signature.
+- Record the actual review date `2026-08-19` only after the focused checks and
+  existing release evidence were reviewed.
+- Reuse the accepted AWS lifecycle evidence and run the local deployment suite
+  with `ZSYS_AWS_INTEGRATION=0`; do not create another cloud stack for owner
+  sign-off.
+
+# Packed smoke harness repair
+
+- Propagate the temporary registry and cache through the packed create
+  runner’s child environment so generated-project installs and doctor’s frozen
+  lockfile dry run resolve unpublished local tarballs; keep the existing
+  explicit install flags unchanged.
+
 # Task 17.17 decisions
 
 - Verify all 40 Section 25 rows in one evidence table and carry forward the

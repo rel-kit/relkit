@@ -17,6 +17,11 @@ export interface RuntimeManifest {
   readonly generatorVersion: number;
   readonly graphHash: string;
   readonly functions: ManifestEntries<unknown>;
+  readonly targets?: ManifestEntries<unknown>;
+  readonly application?: {
+    readonly env: unknown;
+    readonly providers: unknown;
+  };
   readonly middleware: ManifestEntries<unknown>;
   readonly requestTransforms: ManifestEntries<unknown>;
   readonly responseSchemas?: ManifestEntries<unknown>;

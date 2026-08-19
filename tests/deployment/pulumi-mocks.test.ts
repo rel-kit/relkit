@@ -4,6 +4,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import * as pulumi from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/index.js";
+import {
+  ZsysApplicationService,
+  ZsysBuckets,
+  ZsysCaches,
+  ZsysContainerRegistry,
+  ZsysEventBus,
+  ZsysJobQueues,
+  ZsysNetwork,
+  ZsysObservability,
+} from "../../packages/cloud-aws/src/index.ts";
 import { diffDeploymentPlans, fromGraph } from "../../packages/deploy/src/index.ts";
 import type { DeploymentPlan } from "../../packages/deploy/src/plan.ts";
 import type { ApplicationGraph, GraphNode } from "../../packages/graph/src/index.ts";
@@ -71,53 +81,41 @@ test("executes the generated plan with stable capability mappings and secret-saf
     seen.filter(({ type }) => type !== "pulumi:pulumi:Stack").map(({ type }) => type),
   );
 
-  expect(types).toEqual(
-    new Set([
-      "zsys:deployment:application",
-      "zsys:deployment:http",
-      "zsys:deployment:job",
-      "zsys:deployment:schedule",
-      "zsys:deployment:event",
-      "zsys:deployment:event-trigger",
-      "zsys:deployment:bucket",
-      "zsys:deployment:cache",
-      "zsys:deployment:model",
-      "zsys:deployment:observability",
+  expect([...types]).toEqual(
+    expect.arrayContaining([
+      "zsys:cloud-aws:application",
+      "zsys:cloud-aws:ZsysNetwork",
+      "zsys:cloud-aws:ZsysContainerRegistry",
+      "zsys:cloud-aws:ZsysJobQueues",
+      "zsys:cloud-aws:ZsysEventBus",
+      "zsys:cloud-aws:ZsysBuckets",
+      "zsys:cloud-aws:ZsysCaches",
+      "zsys:cloud-aws:ZsysObservability",
+      "zsys:cloud-aws:ZsysApplicationService",
+      "aws:sqs/queue:Queue",
+      "aws:cloudwatch/eventRule:EventRule",
+      "aws:s3/bucket:Bucket",
+      "aws:elasticache/serverlessCache:ServerlessCache",
     ]),
   );
 
-  const root = resource(seen, "zsys:deployment:application");
-  expect(root.inputs.tags).toMatchObject({
-    app: "full-app",
-    stack: "ci-blue",
-    graphHash: plan.graphHash,
-    "managed-by": "zsys",
+  expect(
+    resourceMatching(
+      seen,
+      "aws:sqs/queue:Queue",
+      ({ name }) => name.includes("receipts-send") && !name.includes("dlq"),
+    ).inputs,
+  ).toMatchObject({
+    visibilityTimeoutSeconds: 60,
   });
-  expect(resource(seen, "zsys:deployment:http").inputs).toMatchObject({
-    logicalName: "full-app-http-public",
-    port: 8080,
-    routes: plan.http.routes,
-  });
-  expect(resource(seen, "zsys:deployment:job").inputs).toMatchObject({
-    logicalName: "full-app-job-receipts-send-job",
-    targetFunctionId: "receipts.send",
-  });
-  expect(resource(seen, "zsys:deployment:event").inputs).toMatchObject({
-    logicalName: "full-app-event-orders-created",
-    version: 1,
-  });
-  expect(resource(seen, "zsys:deployment:event-trigger").inputs).toMatchObject({
-    logicalName: "full-app-event-trigger-orders-listener",
-    delivery: "durable",
-    expansion: ["orders.created@1"],
-  });
-  expect(resource(seen, "zsys:deployment:bucket").inputs).toMatchObject({
-    logicalName: "full-app-bucket-assets",
-    visibility: "private",
-  });
-  expect(resource(seen, "zsys:deployment:cache").inputs).toMatchObject({
-    logicalName: "full-app-cache-prices",
-    profile: "default",
+  expect(
+    resourceMatching(seen, "aws:cloudwatch/eventRule:EventRule", ({ name }) =>
+      name.includes("orders-created"),
+    ).inputs,
+  ).toMatchObject({ eventPattern: expect.any(String) });
+  expect(resource(seen, "aws:s3/bucket:Bucket").inputs).toMatchObject({ acl: "private" });
+  expect(resource(seen, "aws:elasticache/serverlessCache:ServerlessCache").inputs).toMatchObject({
+    engine: "valkey",
   });
 
   const secretPlan = fromGraph(withSecretConfiguration(loadGraph("valid-full")), {

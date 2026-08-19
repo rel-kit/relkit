@@ -26,6 +26,7 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
   readonly allowedContentTypes?: readonly string[];
 }
 
+/** Defines a managed object store with explicit visibility and bounded upload policy. */
 export function defineBucket<const Id extends string>(
   options: DefineBucketOptions<Id>,
 ): BucketDescriptor<Id> {

@@ -51,6 +51,7 @@ export type {
   ResolvedApplicationEnv,
 } from "./types.js";
 
+/** Defines a graph-visible function whose schemas and declared dependencies bound invocation. */
 export function defineFunction<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,

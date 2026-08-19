@@ -4,20 +4,9 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
-import * as aws from "../../packages/cloud-aws/node_modules/@pulumi/aws/index.js";
 import * as pulumi from "../../packages/cloud-aws/node_modules/@pulumi/pulumi/index.js";
-import type { PulumiFn } from "../../packages/cloud-aws/node_modules/@pulumi/pulumi/automation/index.js";
-import {
-  ZsysApplicationService,
-  ZsysBuckets,
-  ZsysCaches,
-  ZsysContainerRegistry,
-  ZsysEventBus,
-  ZsysJobQueues,
-  ZsysNetwork,
-  ZsysObservability,
-} from "../../packages/cloud-aws/src/index.ts";
 import { fromGraph, type DeploymentPlan } from "../../packages/deploy/src/index.ts";
+import { createPulumiProgram } from "../../packages/deploy-pulumi/src/program.ts";
 import {
   createPulumiWorkspace,
   type PulumiBackend,
@@ -166,152 +155,28 @@ async function openStack(
     pulumiHome: join(root, "pulumi-home"),
     backend: config.backend,
     mode,
-    program: awsProgram(plan, config, marker),
+    program: createPulumiProgram(plan, {
+      stackName,
+      aws: {
+        region: config.region,
+        forceDelete: true,
+        forceDestroy: true,
+        tags: { "zsys-smoke": marker },
+        serviceEnvironment: ({ jobs, events, buckets, caches }) => ({
+          ZSYS_AWS_SMOKE_MARKER: marker,
+          ZSYS_AWS_SMOKE_BUCKET_NAME: buckets.buckets[0]!.name,
+          ZSYS_AWS_SMOKE_QUEUE_URL: jobs.queues[0]!.worker.queueUrl,
+          ZSYS_AWS_SMOKE_EVENT_BUS_NAME: events.eventBusName,
+          ZSYS_AWS_SMOKE_CACHE_URL: caches.caches[0]!.url,
+        }),
+      },
+    }),
     envVars: {
       AWS_REGION: config.region,
       AWS_DEFAULT_REGION: config.region,
       AWS_PAGER: "",
     },
   });
-}
-
-function awsProgram(plan: DeploymentPlan, config: IntegrationConfig, marker: string): PulumiFn {
-  return async () => {
-    const root = new pulumi.ComponentResource(
-      "zsys:aws-integration:application",
-      plan.application.id,
-    );
-    const common = {
-      appId: plan.application.id,
-      stackName: pulumi.getStack(),
-      graphHash: plan.graphHash,
-      region: config.region,
-      tags: { "zsys-smoke": marker },
-    } as const;
-    const network = new ZsysNetwork(
-      "network",
-      { ...common, natGatewayStrategy: "Single" },
-      { parent: root },
-    );
-    const registry = new ZsysContainerRegistry(
-      "registry",
-      { ...common, forceDelete: true },
-      { parent: root },
-    );
-    const job = plan.jobs[0];
-    const event = plan.events[0];
-    const trigger = plan.eventTriggers[0];
-    const bucket = plan.buckets[0];
-    const cache = plan.caches[0];
-    if (
-      job === undefined ||
-      event === undefined ||
-      trigger === undefined ||
-      bucket === undefined ||
-      cache === undefined
-    )
-      throw new Error("AWS integration requires the full deployment fixture capabilities.");
-    const queues = new ZsysJobQueues(
-      "jobs",
-      {
-        ...common,
-        jobs: [{ id: job.id, retry: retryPolicy(job.retry), timeoutMs: job.timeoutMs }],
-      },
-      { parent: root },
-    );
-    const events = new ZsysEventBus(
-      "events",
-      {
-        ...common,
-        events: plan.events.map(({ id, version }) => ({ id, version })),
-        eventTriggers: [
-          {
-            id: trigger.id,
-            targetFunctionId: trigger.targetFunctionId,
-            expansion: trigger.expansion,
-            retry: retryPolicy(trigger.retry),
-            timeoutMs: 30_000,
-          },
-        ],
-        eventSource: "zsys.application",
-      },
-      { parent: root },
-    );
-    const buckets = new ZsysBuckets(
-      "buckets",
-      {
-        ...common,
-        buckets: [{ id: bucket.id, visibility: bucket.visibility, forceDestroy: true }],
-      },
-      { parent: root },
-    );
-    const caches = new ZsysCaches(
-      "caches",
-      { ...common, network, caches: [{ id: cache.id }] },
-      { parent: root },
-    );
-    const observability = new ZsysObservability("observability", { ...common }, { parent: root });
-    const service = new ZsysApplicationService(
-      "service",
-      {
-        ...common,
-        network,
-        registry,
-        image: plan.application.image.name,
-        environment: {
-          ZSYS_AWS_SMOKE_MARKER: marker,
-          ZSYS_AWS_SMOKE_BUCKET_NAME: buckets.buckets[0]!.name,
-          ZSYS_AWS_SMOKE_QUEUE_URL: queues.queues[0]!.worker.queueUrl,
-          ZSYS_AWS_SMOKE_EVENT_BUS_NAME: events.eventBusName,
-          ZSYS_AWS_SMOKE_CACHE_URL: caches.caches[0]!.url,
-        },
-      },
-      { parent: root },
-    );
-    const bucketArn = buckets.buckets[0]!.arn;
-    const queueArn = queues.queues[0]!.queue.arn;
-    const eventBusArn = events.eventBusArn;
-    const cacheArn = caches.caches[0]!.cache.arn;
-    new aws.iam.RolePolicy(
-      "smoke-access",
-      {
-        role: service.taskRole.name,
-        policy: pulumi
-          .all({ bucketArn, queueArn, eventBusArn, cacheArn })
-          .apply(
-            ({
-              bucketArn: bucketResource,
-              queueArn: queueResource,
-              eventBusArn: busResource,
-              cacheArn: cacheResource,
-            }) =>
-              JSON.stringify({
-                Version: "2012-10-17",
-                Statement: [
-                  {
-                    Effect: "Allow",
-                    Action: ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"],
-                    Resource: [bucketResource, `${bucketResource}/*`],
-                  },
-                  { Effect: "Allow", Action: ["sqs:SendMessage"], Resource: queueResource },
-                  { Effect: "Allow", Action: ["events:PutEvents"], Resource: busResource },
-                  { Effect: "Allow", Action: ["elasticache:Connect"], Resource: cacheResource },
-                ],
-              }),
-          ),
-      },
-      { parent: root, dependsOn: [service, buckets, queues, events, caches] },
-    );
-    return {
-      endpoint: pulumi.interpolate`http://${service.loadBalancer.dnsName}`,
-      bucketName: buckets.buckets[0]!.name,
-      queueUrl: queues.queues[0]!.worker.queueUrl,
-      eventBusName: events.eventBusName,
-      cacheUrl: caches.caches[0]!.url,
-      logGroupName: service.logGroup.name,
-      observabilityLogGroupName: observability.logGroupName,
-    };
-  };
 }
 
 async function smokeOutputs(handle: PulumiWorkspaceHandle): Promise<SmokeOutputs> {
@@ -607,18 +472,6 @@ function moveSources(value: ApplicationGraph): ApplicationGraph {
   return moved;
 }
 
-function retryPolicy(value: unknown) {
-  const retry =
-    value !== null && typeof value === "object" ? (value as Record<string, unknown>) : {};
-  return {
-    maxAttempts: integer(retry.maxAttempts, 2),
-    initialDelayMs: integer(retry.initialDelayMs, 100),
-    maxDelayMs: integer(retry.maxDelayMs, 1_000),
-    multiplier: number(retry.multiplier, 2),
-    jitter: "none" as const,
-  };
-}
-
 function duration(name: string, fallback: number): number {
   return integer(process.env[name], fallback, 1_000, 1_800_000);
 }
@@ -631,10 +484,6 @@ function integer(
 ): number {
   const parsed = typeof value === "number" ? value : Number(value);
   return Number.isSafeInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : fallback;
-}
-
-function number(value: unknown, fallback: number): number {
-  return typeof value === "number" && Number.isFinite(value) && value >= 1 ? value : fallback;
 }
 
 function delay(milliseconds: number): Promise<void> {

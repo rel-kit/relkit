@@ -172,6 +172,3 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
     },
   });
 }
-
-export const createBucketClientAdapter = createBucketClient;
-export const createBucketInvocationAdapter = createBucketClient;

@@ -52,6 +52,7 @@ export interface DefineAgentOptions<
   readonly limits: AgentLimits;
 }
 
+/** Defines an agent contract with bounded tools, model selection, and execution limits. */
 export function defineAgent<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,
@@ -194,7 +195,6 @@ function requiredText(value: unknown, name: string): string {
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }

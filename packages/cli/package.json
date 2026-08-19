@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@zsys/config": "workspace:*",
+    "@zsys/cloud-aws": "workspace:*",
     "@zsys/compiler": "workspace:*",
     "@zsys/contracts": "workspace:*",
     "@zsys/deploy": "workspace:*",
@@ -20,7 +21,10 @@
     "@zsys/diagnostics": "workspace:*",
     "create-zsys": "workspace:*",
     "@zsys/graph": "workspace:*",
+    "@zsys/engine": "workspace:*",
+    "@zsys/observability": "workspace:*",
     "@zsys/runtime-effect": "workspace:*",
+    "@zsys/runtime-hono": "workspace:*",
     "@zsys/supervisor": "workspace:*",
     "effect": "4.0.0-beta.107"
   },

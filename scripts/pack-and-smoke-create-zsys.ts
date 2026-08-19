@@ -44,7 +44,7 @@ async function main(): Promise<void> {
     await writeFile(
       runner,
       `import { normalizeCreateOptions, generateProject } from "create-zsys";
-const result = await generateProject(normalizeCreateOptions(process.argv.slice(2)), { bunExecutable: process.execPath, zsysExecutable: ${JSON.stringify(packedCli)}, commandRunner: async (command, cwd) => { const bin = ${JSON.stringify(packedCli)}; const actual = command[0] === bin ? [process.execPath, ...command] : command.at(-1) === "install" ? [...command, "--force", "--registry", ${JSON.stringify(registry)}] : command; const child = Bun.spawn(actual, { cwd, stdout: "pipe", stderr: "pipe" }); const [stdout, stderr, exitCode] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]); console.error(stderr); return { stdout, stderr, exitCode }; } });
+const result = await generateProject(normalizeCreateOptions(process.argv.slice(2)), { bunExecutable: process.execPath, zsysExecutable: ${JSON.stringify(packedCli)}, commandRunner: async (command, cwd) => { const bin = ${JSON.stringify(packedCli)}; const actual = command[0] === bin ? [process.execPath, ...command] : command.at(-1) === "install" ? [...command, "--force", "--registry", ${JSON.stringify(registry)}] : command; const child = Bun.spawn(actual, { cwd, env: { ...process.env, BUN_CONFIG_REGISTRY: ${JSON.stringify(registry)}, npm_config_registry: ${JSON.stringify(registry)}, BUN_INSTALL_CACHE_DIR: ${JSON.stringify(cacheDir)} }, stdout: "pipe", stderr: "pipe" }); const [stdout, stderr, exitCode] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]); console.error(stderr); return { stdout, stderr, exitCode }; } });
 console.log(JSON.stringify(result));
 `,
     );
@@ -90,8 +90,8 @@ console.log(JSON.stringify(result));
     const directBytes = await snapshotProject(direct.destination);
     if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
       throw new Error("Packed create-zsys and zsys create generated different bytes.");
-    await verifyProject(direct.destination, registry, cacheDir);
-    await verifyProject(cli.destination, registry, cacheDir);
+    await verifyProject(direct.destination, registry, cacheDir, repositoryRoot);
+    await verifyProject(cli.destination, registry, cacheDir, repositoryRoot);
     const second = JSON.parse(
       (
         await runCommand(

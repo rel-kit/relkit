@@ -2,16 +2,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { canonicalJson } from "@zsys/contracts";
 import type { DeploymentPlan } from "@zsys/deploy";
-import { ComponentResource, type Inputs, type Resource } from "@pulumi/pulumi";
+import * as pulumi from "@pulumi/pulumi";
 import type { PulumiFn } from "@pulumi/pulumi/automation";
-import {
-  entryTags,
-  identity,
-  requiredTags,
-  resourceEntries,
-  scopedName,
-  snapshotPlan,
-} from "./program-support.js";
+import { identity, snapshotPlan } from "./program-support.js";
+import { createAwsPulumiResources, type AwsProgramOptions } from "./aws-program.js";
 
 export const PULUMI_PROGRAM_VERSION = 1 as const;
 const DEFAULT_STACK = "development";
@@ -22,6 +16,7 @@ export interface PulumiProgramOptions {
   readonly projectName?: string;
   readonly projectRoot?: string;
   readonly directory?: string;
+  readonly aws?: Omit<AwsProgramOptions, "stackName">;
 }
 
 export interface PulumiProgramFiles {
@@ -78,59 +73,29 @@ export function createPulumiProgram(
   const snapshot = snapshotPlan(plan);
   const stackName = identity(options.stackName ?? DEFAULT_STACK, "stackName");
   return async () => {
-    const tags = requiredTags(snapshot, stackName);
-    const root = new ComponentResource(
-      "zsys:deployment:application",
-      scopedName(stackName, snapshot.application.id),
-      { id: snapshot.application.id, tags },
-    );
-    const entries = resourceEntries(snapshot);
-    for (const entry of entries)
-      new ComponentResource(
-        `zsys:deployment:${entry.kind}`,
-        scopedName(stackName, entry.logicalName),
-        { ...(entry.value as Inputs), tags: entryTags(entry.value, tags) },
-        { parent: root },
-      );
-    return { graphHash: snapshot.graphHash, resourceCount: entries.length + 1 };
+    const resources = createAwsPulumiResources(snapshot, { ...options.aws, stackName });
+    return {
+      graphHash: snapshot.graphHash,
+      resourceCount: 9 + (resources.policy === undefined ? 0 : 1),
+      endpoint: pulumi.interpolate`http://${resources.service.loadBalancer.dnsName}`,
+      bucketName: resources.buckets.buckets[0]?.name,
+      queueUrl: resources.jobs.queues[0]?.worker.queueUrl,
+      eventBusName: resources.events.eventBusName,
+      cacheUrl: resources.caches.caches[0]?.url,
+      logGroupName: resources.service.logGroup.name,
+    };
   };
 }
 
 export const createInlinePulumiProgram = createPulumiProgram;
 
 function renderIndex(plan: DeploymentPlan, stackName: string): string {
-  return `import { ComponentResource, type Inputs, type Resource } from "@pulumi/pulumi";
+  return `import { createAwsPulumiResources } from "@zsys/deploy-pulumi";
 
 const plan = ${canonicalJson(plan)} as const;
 const stackName = ${JSON.stringify(stackName)};
-const tags = ${canonicalJson(requiredTags(plan, stackName))} as const;
-const scopedName = (logicalName: string) => {
-  const value = [stackName, logicalName].join("-").toLowerCase().replace(/[^a-z0-9-]+/g, "-");
-  return value.replace(/^-+|-+$/g, "") || "resource";
-};
-const entryTags = (value: Inputs) => ({ ...(value.tags as Record<string, string> | undefined), ...tags });
-const add = (kind: string, logicalName: string, value: Inputs, parent: Resource) =>
-  new ComponentResource(
-    \`zsys:deployment:\${kind}\`,
-    scopedName(logicalName),
-    { ...value, tags: entryTags(value) },
-    { parent },
-  );
-
-const application = new ComponentResource(
-  "zsys:deployment:application",
-  scopedName(plan.application.id),
-  { id: plan.application.id, tags },
-);
-add("http", plan.http.logicalName, plan.http as Inputs, application);
-add("observability", plan.observability.logicalName, plan.observability as Inputs, application);
-for (const entry of plan.jobs) add("job", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.schedules) add("schedule", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.events) add("event", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.eventTriggers) add("event-trigger", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.buckets) add("bucket", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.caches) add("cache", entry.logicalName, entry as Inputs, application);
-for (const entry of plan.models ?? []) add("model", entry.logicalName, entry as Inputs, application);
+const resources = createAwsPulumiResources(plan, { stackName });
+export const endpoint = resources.service.loadBalancer.dnsName.apply((value) => \`http://\${value}\`);
 
 export const graphHash = plan.graphHash;
 export const zsysPulumiProgramVersion = ${PULUMI_PROGRAM_VERSION};

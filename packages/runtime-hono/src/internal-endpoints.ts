@@ -1,4 +1,4 @@
-import { API_BASE_PATH, API_VERSION, type JsonValue, type MaybePromise } from "@zsys/contracts";
+import * as contracts from "@zsys/contracts";
 import type { RegistrationPlan } from "@zsys/graph";
 import type { Context, Hono } from "hono";
 import {
@@ -13,16 +13,16 @@ import {
 } from "./internal-endpoints-utils.js";
 
 export const INTERNAL_ENDPOINT_PROTOCOL = "zsys.inspector" as const;
-export const INTERNAL_ENDPOINT_VERSION = API_VERSION;
+export const INTERNAL_ENDPOINT_VERSION = contracts.API_VERSION;
 export const INTERNAL_ENDPOINT_PATHS = Object.freeze([
-  `${API_BASE_PATH}/health/live`,
-  `${API_BASE_PATH}/health/ready`,
-  `${API_BASE_PATH}/graph`,
-  `${API_BASE_PATH}/requests`,
-  `${API_BASE_PATH}/logs`,
-  `${API_BASE_PATH}/traces`,
-  `${API_BASE_PATH}/stream`,
-  `${API_BASE_PATH}/diagnostics`,
+  `${contracts.API_BASE_PATH}/health/live`,
+  `${contracts.API_BASE_PATH}/health/ready`,
+  `${contracts.API_BASE_PATH}/graph`,
+  `${contracts.API_BASE_PATH}/requests`,
+  `${contracts.API_BASE_PATH}/logs`,
+  `${contracts.API_BASE_PATH}/traces`,
+  `${contracts.API_BASE_PATH}/stream`,
+  `${contracts.API_BASE_PATH}/diagnostics`,
 ] as const);
 
 export type InternalEndpointMode = "development" | "test" | "production";
@@ -39,8 +39,8 @@ export interface InternalQuery {
   readonly traceId?: string;
 }
 export interface InternalPage {
-  readonly [key: string]: JsonValue;
-  readonly items: readonly JsonValue[];
+  readonly [key: string]: contracts.JsonValue;
+  readonly items: readonly contracts.JsonValue[];
   readonly nextCursor?: string;
 }
 export interface InternalReadiness {
@@ -48,22 +48,23 @@ export interface InternalReadiness {
   readonly reason?: string;
 }
 export interface InternalStreamEvent {
-  readonly [key: string]: JsonValue;
+  readonly [key: string]: contracts.JsonValue;
   readonly cursor: string;
   readonly type: string;
-  readonly data: JsonValue;
+  readonly data: contracts.JsonValue;
 }
 export type QuerySource =
-  JsonValue | InternalPage | ((query: InternalQuery) => MaybePromise<JsonValue | InternalPage>);
-export type ValueSource<T> = T | (() => MaybePromise<T>);
-
+  | contracts.JsonValue
+  | InternalPage
+  | ((query: InternalQuery) => contracts.MaybePromise<contracts.JsonValue | InternalPage>);
+export type ValueSource<T> = T | (() => contracts.MaybePromise<T>);
 export interface InternalEndpointOptions {
   readonly mode?: InternalEndpointMode;
   readonly environment?: InternalEndpointMode;
   readonly enabled?: boolean;
   readonly bearerToken?: string;
-  readonly authorize?: (request: Request) => MaybePromise<boolean>;
-  readonly graph?: ValueSource<JsonValue>;
+  readonly authorize?: (request: Request) => contracts.MaybePromise<boolean>;
+  readonly graph?: ValueSource<contracts.JsonValue>;
   readonly readiness?: ValueSource<InternalReadiness>;
   readonly ready?: ValueSource<InternalReadiness>;
   readonly requests?: QuerySource;
@@ -72,7 +73,7 @@ export interface InternalEndpointOptions {
   readonly diagnostics?: QuerySource;
   readonly stream?:
     | ValueSource<readonly InternalStreamEvent[]>
-    | ((query: InternalQuery) => MaybePromise<readonly InternalStreamEvent[]>);
+    | ((query: InternalQuery) => contracts.MaybePromise<readonly InternalStreamEvent[]>);
 }
 
 export class InternalEndpointConfigurationError extends TypeError {
@@ -105,11 +106,11 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
     };
 
   app.get(
-    `${API_BASE_PATH}/health/live`,
+    `${contracts.API_BASE_PATH}/health/live`,
     handle(async () => jsonResponse({ status: "ok" })),
   );
   app.get(
-    `${API_BASE_PATH}/health/ready`,
+    `${contracts.API_BASE_PATH}/health/ready`,
     handle(async () => {
       const readiness = await resolveValue(options.readiness ?? options.ready ?? { ready: true });
       return jsonResponse(
@@ -121,7 +122,7 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
     }),
   );
   app.get(
-    `${API_BASE_PATH}/graph`,
+    `${contracts.API_BASE_PATH}/graph`,
     handle(async () => jsonResponse(await resolveValue(options.graph ?? { graph: null }))),
   );
   for (const [name, source] of [
@@ -131,20 +132,26 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
     ["diagnostics", options.diagnostics],
   ] as const) {
     app.get(
-      `${API_BASE_PATH}/${name}`,
+      `${contracts.API_BASE_PATH}/${name}`,
       handle(async (context) => listResponse(source, context)),
     );
   }
   app.get(
-    `${API_BASE_PATH}/stream`,
+    `${contracts.API_BASE_PATH}/stream`,
     handle(async (context) => streamResponse(options.stream, context)),
   );
 }
 
 /** Builds the safe graph stub available to the HTTP phase. */
-export function graphSnapshot(plan: RegistrationPlan): JsonValue {
+export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   return {
+    protocol: INTERNAL_ENDPOINT_PROTOCOL,
+    version: INTERNAL_ENDPOINT_VERSION,
     graphHash: plan.graphHash,
+    manifestGraphHash: plan.graphHash,
+    graphContractVersion: contracts.GRAPH_VERSION,
+    manifestContractVersion: contracts.MANIFEST_VERSION,
+    manifestGeneratorVersion: contracts.GENERATOR_VERSION,
     functions: plan.functions,
     httpTriggers: plan.httpTriggers,
     queues: plan.queues,
@@ -154,7 +161,7 @@ export function graphSnapshot(plan: RegistrationPlan): JsonValue {
     caches: plan.caches,
     tools: plan.tools,
     agents: plan.agents,
-  } as unknown as JsonValue;
+  } as unknown as contracts.JsonValue;
 }
 
 function validateConfiguration(

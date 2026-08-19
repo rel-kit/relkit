@@ -8,7 +8,8 @@ application graph, run the local supervisor, and build deployment artifacts.
 
 - Bun `1.3.10`.
 - A working TypeScript toolchain from the generated project.
-- Pulumi CLI and AWS credentials only when using deployment commands.
+- Pulumi CLI and AWS credentials for the default AWS/Pulumi project. Use the
+  explicit `--cloud none --deploy none` options for local-only development.
 
 Check the local toolchain from a generated project with:
 
@@ -34,8 +35,8 @@ templates:
 | Option                    | Values                            | Default         |
 | ------------------------- | --------------------------------- | --------------- |
 | `--template`              | `minimal`, `api`, `agent`         | `minimal`       |
-| `--cloud`                 | `aws`, `none`                     | `none`          |
-| `--deploy`                | `pulumi`, `none`                  | `none`          |
+| `--cloud`                 | `aws`, `none`                     | `aws`           |
+| `--deploy`                | `pulumi`, `none`                  | `pulumi`        |
 | `--install`               | install dependencies              | enabled         |
 | `--no-install`            | skip dependency installation      | —               |
 | `--git`                   | initialize Git                    | enabled         |
@@ -46,10 +47,18 @@ templates:
 | `--force-empty-directory` | allow an existing empty directory | disabled        |
 | `--json`                  | print structured output           | disabled        |
 
-For example:
+The default command creates the AWS/Pulumi project and runs its install,
+doctor, and check steps. For a project that does not need cloud prerequisites,
+opt out explicitly:
 
 ```sh
-bunx create-zsys@latest my-api --template api --cloud none --deploy none
+bunx create-zsys@latest my-app --cloud none --deploy none
+```
+
+For example, an API project is:
+
+```sh
+bunx create-zsys@latest my-api --template api
 ```
 
 Generation validates the destination before writing. A failed generation does
@@ -77,16 +86,23 @@ The response is:
 { "message": "Hello, ZSys!" }
 ```
 
-The generated configuration reserves inspector port `3210`. The portable
-development check is the versioned graph API on the active backend port:
+The generated configuration starts the real Next.js inspector on port `3210`.
+The portable development check is the versioned graph API on the active backend
+port:
 
 ```sh
 curl "http://localhost:3000/_zsys/v1/graph"
 ```
 
-The graph response includes the active `graphHash`. An inspector client uses
-the same versioned API and must display that active graph, not a separately
-reconstructed source model. Stop development with `Ctrl-C`.
+The graph response includes the active `graphHash`. The inspector at
+`http://localhost:3210` uses the same versioned API and displays that active
+graph, not a separately reconstructed source model. Stop both processes with
+`Ctrl-C`.
+
+When using a published CLI whose inspector app is not bundled, set
+`ZSYS_INSPECTOR_ROOT` to a compatible `apps/inspector` checkout before
+`bun run dev`; workspace development resolves the repository inspector
+automatically.
 
 ## Check, test, and build
 

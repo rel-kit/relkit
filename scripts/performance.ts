@@ -1,17 +1,19 @@
 import {
-  environment,
   invocationOptions,
   load,
   makeDescriptors,
   makeRoutePlan,
   manifest,
   measure,
+  printPerformanceReport,
   repeat,
   root,
   round,
   scales,
-  type R,
+  type PerformanceRecord,
 } from "./performance-support.js";
+
+type BenchmarkValue = PerformanceRecord;
 
 async function main(): Promise<void> {
   const [compiler, functions, schema, engine, runtime, testing, supervisor, layoutModule] =
@@ -26,7 +28,7 @@ async function main(): Promise<void> {
       load("apps/inspector/lib/graph-layout.ts"),
     ]);
   const z = schema.z;
-  const compile = compiler.normalizeCompilation as (input: R) => R;
+  const compile = compiler.normalizeCompilation as (input: BenchmarkValue) => BenchmarkValue;
   const compilation = scales.map((descriptors) => {
     const fixture = makeDescriptors(descriptors, functions.defineFunction, z);
     const before = process.memoryUsage().heapUsed;
@@ -46,11 +48,16 @@ async function main(): Promise<void> {
   });
   const io = z.object({ value: z.string() });
   const invokeFunction = engine.invokeFunction as (
-    target: R,
+    target: BenchmarkValue,
     input: unknown,
-    options: R,
+    options: BenchmarkValue,
   ) => Promise<unknown>;
-  const directTarget = { id: "bench.direct", input: io, output: io, handler: (value: R) => value };
+  const directTarget = {
+    id: "bench.direct",
+    input: io,
+    output: io,
+    handler: (value: BenchmarkValue) => value,
+  };
   const warmDirectInvocation = await measure(100, async (index) => {
     await invokeFunction(directTarget, { value: String(index) }, invocationOptions("direct"));
   });
@@ -60,7 +67,7 @@ async function main(): Promise<void> {
     plan: routePlan,
     manifest: manifest(routePlan.graphHash),
     engine: {
-      invoke: ({ input, source }: R) =>
+      invoke: ({ input, source }: BenchmarkValue) =>
         invokeFunction(routeTarget, input, invocationOptions(source)),
     },
   });
@@ -89,7 +96,12 @@ async function main(): Promise<void> {
   const jobSchema = z.object({ value: z.number() });
   const job = await testing.createTestJob({
     jobId: "bench.job",
-    target: { id: "bench.job", input: jobSchema, output: jobSchema, handler: (value: R) => value },
+    target: {
+      id: "bench.job",
+      input: jobSchema,
+      output: jobSchema,
+      handler: (value: BenchmarkValue) => value,
+    },
   });
   const jobStarted = performance.now();
   await repeat(100, (index) => job.enqueue({ value: index }));
@@ -120,7 +132,7 @@ async function main(): Promise<void> {
   if (completed !== 800) throw new Error(`Event fan-out completed ${completed} deliveries`);
   await event.close();
 
-  const layout = layoutModule.layoutGraph as (graph: R) => R;
+  const layout = layoutModule.layoutGraph as (graph: BenchmarkValue) => BenchmarkValue;
   const nodes = Array.from({ length: 1_000 }, (_, index) => ({
     id: `node.${index}`,
     kind: "function",
@@ -143,7 +155,7 @@ async function main(): Promise<void> {
   if (graphLayout.nodes.length !== 1_000)
     throw new Error("Inspector fixture did not layout 1,000 nodes");
 
-  const createSupervisor = supervisor.createSupervisorStateMachine as () => R;
+  const createSupervisor = supervisor.createSupervisorStateMachine as () => BenchmarkValue;
   const candidateActivation = await measure(100, async () => {
     const machine = createSupervisor();
     const token = machine.requestSourceChange();
@@ -181,20 +193,7 @@ async function main(): Promise<void> {
     },
     candidateActivation,
   };
-  console.log(
-    JSON.stringify(
-      {
-        protocol: "zsys.performance",
-        version: 1,
-        environment: environment(),
-        fixtures: { descriptorScales: scales, inspectorNodes: 1_000, eventFanOut: 8 },
-        measurements,
-        thresholds: null,
-      },
-      null,
-      2,
-    ),
-  );
+  printPerformanceReport(measurements);
 }
 
 await main();

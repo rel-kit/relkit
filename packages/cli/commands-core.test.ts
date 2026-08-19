@@ -63,13 +63,13 @@ test("build succeeds from a checked graph and reports failed checks", async () =
     Promise.all(artifactPaths.map((path) => readFile(join(built.buildDirectory, path), "utf8")));
   const firstArtifacts = await readArtifacts();
   expect(firstArtifacts[1]).toContain("FROM oven/bun:1.3.10");
-  expect(firstArtifacts[1]).toContain("USER zsys");
+  expect(firstArtifacts[1]).toContain("USER bun");
   expect(firstArtifacts[1]).toContain("STOPSIGNAL SIGTERM");
   expect(firstArtifacts[1]).toContain("COPY server/index.js ./server/index.js");
   expect(firstArtifacts[1]).not.toContain("COPY .");
   expect(firstArtifacts[0]).toContain(".env");
   expect(firstArtifacts[0]).toContain(".zsys/state");
-  expect(firstArtifacts[6]).toContain("ZSYS_TELEMETRY_FLUSH_TIMEOUT_MS");
+  expect(firstArtifacts[6]).toContain("createInspectableObservabilityHooks");
   expect(firstArtifacts[6]).toContain("SIGTERM");
   await rm(built.buildDirectory, { recursive: true, force: true });
   const rebuilt = await buildProject({ projectRoot: validRoot });
@@ -97,6 +97,9 @@ test("start serves health and graph and rejects an invalid build", async () => {
     expect((await graph.json()) as { graphHash: string }).toMatchObject({
       graphHash: built.graphHash,
     });
+    const route = await fetch(`http://${started.hostname}:${started.port}/hello/ZSys`);
+    expect(route.status).toBe(200);
+    expect(await route.json()).toEqual({ message: "Hello, ZSys" });
   } finally {
     await started.stop();
   }
@@ -122,6 +125,25 @@ test("start cleanup follows an external abort signal", async () => {
   expect(started.process.exitCode).toBe(0);
 });
 
+test("production start keeps internal endpoints private", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  await buildProject({ projectRoot: root });
+  const started = await startProject({
+    projectRoot: root,
+    port: 0,
+    environment: { NODE_ENV: "production" },
+  });
+  try {
+    const live = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/health/live`);
+    const graph = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/graph`);
+    expect(live.status).toBe(200);
+    expect(graph.status).toBe(404);
+    expect(await graph.text()).not.toContain("Runtime graph hash verification failed");
+  } finally {
+    await started.stop();
+  }
+});
+
 async function copyProject(relativePath: string): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".zsys-cli-test-"));
   roots.push(root);
@@ -140,6 +162,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "app",
     "buckets",
     "cache",
+    "cloud-aws",
     "compiler",
     "config",
     "contracts",
@@ -153,6 +176,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "providers-local",
     "routes",
     "runtime-effect",
+    "runtime-hono",
     "schema",
     "supervisor",
     "testing",

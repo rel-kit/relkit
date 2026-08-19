@@ -39,6 +39,7 @@ export interface DefineCacheOptions<
   readonly maxTtlMs?: number;
 }
 
+/** Defines a typed cache contract with validated key/value schemas and TTL bounds. */
 export function defineCache<
   const Id extends string,
   const KeySchema extends StandardSchemaV1,

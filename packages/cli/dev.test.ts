@@ -1,9 +1,11 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@zsys/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
+import { defaultInspectorOptions } from "./src/commands/dev-inspector.js";
+import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
 
 const sessions: Array<Awaited<ReturnType<typeof startDev>>> = [];
 const roots: string[] = [];
@@ -66,6 +68,35 @@ test("stops an inspector child through the external shutdown signal", async () =
   expect(session.activeTarget).toBeUndefined();
 });
 
+test("forwards source saves through the supervisor watcher", async () => {
+  const root = await makeRoot();
+  await mkdir(join(root, "src"));
+  let builds = 0;
+  const session = await startDev({
+    ...options(root, "sha256:watcher"),
+    compile: async (request) => {
+      builds += 1;
+      return options(root, "sha256:watcher").compile(request);
+    },
+  });
+  sessions.push(session);
+  const watcher = startDevSourceWatcher(session);
+  try {
+    await writeFile(join(root, "src", "app.ts"), "export const changed = true;\n");
+    await waitFor(() => builds > 1 && session.stateMachine.state === "active");
+  } finally {
+    watcher.close();
+  }
+  expect(session.stateMachine.state).toBe("active");
+});
+
+test("uses the workspace Next inspector and configured port by default", () => {
+  const options = defaultInspectorOptions(3217);
+  expect(options.command).toEqual([process.execPath, "run", "dev"]);
+  expect(options.cwd?.endsWith("/apps/inspector")).toBe(true);
+  expect(options.port).toBe(3217);
+});
+
 async function makeRoot(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "zsys-dev-"));
   roots.push(root);
@@ -101,6 +132,15 @@ Bun.serve({ port: Number(process.env.PORT), fetch(request) {
   if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;
+}
+
+async function waitFor(check: () => boolean): Promise<void> {
+  const deadline = Date.now() + 2_000;
+  while (Date.now() < deadline) {
+    if (check()) return;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error("Timed out waiting for the source watcher.");
 }
 
 afterEach(async () => {

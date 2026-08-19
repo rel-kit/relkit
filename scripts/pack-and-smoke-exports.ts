@@ -15,8 +15,8 @@ type PackageManifest = {
   bin?: Record<string, string>;
 };
 
-async function runBun(args: string[], cwd: string): Promise<string> {
-  const child = Bun.spawn([process.execPath, ...args], {
+async function runProcess(command: string, args: string[], cwd: string): Promise<string> {
+  const child = Bun.spawn([command, ...args], {
     cwd,
     stdout: "pipe",
     stderr: "pipe",
@@ -28,26 +28,7 @@ async function runBun(args: string[], cwd: string): Promise<string> {
   const exitCode = await child.exited;
 
   if (exitCode !== 0) {
-    throw new Error(`bun ${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
-  }
-
-  return stdout;
-}
-
-async function runNode(args: string[], cwd: string): Promise<string> {
-  const child = Bun.spawn(["node", ...args], {
-    cwd,
-    stdout: "pipe",
-    stderr: "pipe",
-  });
-  const [stdout, stderr] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  const exitCode = await child.exited;
-
-  if (exitCode !== 0) {
-    throw new Error(`node ${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
+    throw new Error(`${command} ${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
   }
 
   return stdout;
@@ -80,15 +61,23 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
 
   const actualRoot = manifest.exports?.["."];
   const expectedExports =
-    packageDirectoryName === "config"
+    packageDirectoryName === "cloud-aws"
       ? {
           ".": rootExport,
-          "./internal/config": {
-            types: "./dist/internal/config.d.ts",
-            import: "./dist/internal/config.js",
+          "./runtime": {
+            types: "./dist/runtime/index.d.ts",
+            import: "./dist/runtime/index.js",
           },
         }
-      : { ".": rootExport };
+      : packageDirectoryName === "config"
+        ? {
+            ".": rootExport,
+            "./internal/config": {
+              types: "./dist/internal/config.d.ts",
+              import: "./dist/internal/config.js",
+            },
+          }
+        : { ".": rootExport };
   if (
     JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports) ||
     JSON.stringify(actualRoot) !== JSON.stringify(rootExport)
@@ -110,8 +99,9 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
 async function packPackage(packageDirectory: string, artifactRoot: string): Promise<string> {
   const artifactDirectory = join(artifactRoot, basename(packageDirectory));
   await mkdir(artifactDirectory);
-  await runBun(["run", "build"], packageDirectory);
-  await runBun(
+  await runProcess(process.execPath, ["run", "build"], packageDirectory);
+  await runProcess(
+    process.execPath,
     ["pm", "pack", "--ignore-scripts", "--destination", artifactDirectory, "--quiet"],
     packageDirectory,
   );
@@ -191,7 +181,7 @@ async function main(): Promise<void> {
       await mkdir(dirname(target), { recursive: true });
       await cp(source, target, { recursive: true, dereference: true });
     }
-    process.stdout.write(await runNode(["resolve.mjs"], fixtureRoot));
+    process.stdout.write(await runProcess("node", ["resolve.mjs"], fixtureRoot));
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }

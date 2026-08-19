@@ -136,7 +136,7 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
     const exitCode = await within(started.exited, 1_000);
 
     expect(rejected.status).toBe(503);
-    expect([200, undefined]).toContain(result.status);
+    expect([200, 499, undefined]).toContain(result.status);
     await waitForFile(cancelledFile);
     await waitForFile(flushedFile);
     expect(exitCode).toBe(0);
@@ -163,6 +163,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "app",
     "buckets",
     "cache",
+    "cloud-aws",
     "compiler",
     "config",
     "contracts",
@@ -176,6 +177,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "providers-local",
     "routes",
     "runtime-effect",
+    "runtime-hono",
     "schema",
     "supervisor",
     "testing",

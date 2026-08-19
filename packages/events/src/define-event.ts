@@ -47,6 +47,7 @@ export interface DefineEventOptions<
   readonly sensitiveFields?: readonly string[];
 }
 
+/** Defines a versioned event contract; payload versions remain explicit for trigger matching. */
 export function defineEvent<
   const Id extends string,
   const Version extends number,

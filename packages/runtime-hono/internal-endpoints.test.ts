@@ -62,6 +62,17 @@ describe("versioned internal endpoints", () => {
     expect(ready.status).toBe(503);
     expect(await ready.json()).toMatchObject({ status: "not-ready", reason: "provider-starting" });
 
+    const graph = await service.request(`${API_BASE_PATH}/graph`);
+    expect(await graph.json()).toMatchObject({
+      protocol: "zsys.inspector",
+      version: 1,
+      graphHash: "sha256:internal",
+      manifestGraphHash: "sha256:internal",
+      graphContractVersion: 1,
+      manifestContractVersion: 1,
+      manifestGeneratorVersion: 1,
+    });
+
     const requests = await service.request(`${API_BASE_PATH}/requests?limit=1000&cursor=cursor-1`);
     expect(requests.status).toBe(200);
     expect(await requests.json()).toMatchObject({

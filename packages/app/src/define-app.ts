@@ -48,6 +48,7 @@ export interface DefineAppOptions<
   readonly defaults?: ApplicationDefaults;
 }
 
+/** Defines the application boundary, including its environment and provider capabilities. */
 export function defineApp<const Id extends string, const S extends EnvShape>(
   options: DefineAppOptions<Id, S>,
 ): AppDescriptor<Id, S> {

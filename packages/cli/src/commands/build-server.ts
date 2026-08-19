@@ -1,95 +1,192 @@
 import { canonicalJson, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 
+/** Emits the one Bun entrypoint used by dev, start, and the production container. */
 export function serverSource(graph: ApplicationGraph, graphHash: string): string {
-  return `import { runtimeManifest } from "./runtime.manifest.ts";
+  return `import { getAwsProviderFactory } from "@zsys/cloud-aws/runtime";
+import { createFunctionRegistry, createInspectableObservabilityHooks, createProviderRegistry, invoke } from "@zsys/engine";
+import { createRegistrationPlan } from "@zsys/graph";
+import { createObservabilityCollector } from "@zsys/observability";
+import { createApp } from "@zsys/runtime-hono";
+import { runtimeManifest } from "./runtime.manifest.ts";
+
 const graph = ${canonicalJson(graph)};
 const graphHash = ${JSON.stringify(graphHash)};
-const headers = { "content-type": "application/json", "cache-control": "no-store", "x-zsys-api-version": "1" };
-const sourceToken = process.env.ZSYS_SOURCE_TOKEN === undefined ? undefined : Number(process.env.ZSYS_SOURCE_TOKEN);
-const generationToken = process.env.ZSYS_GENERATION_TOKEN === undefined ? undefined : Number(process.env.ZSYS_GENERATION_TOKEN);
-const maxShutdownTimeoutMs = 30_000;
-const providerReadyDelayMs = timeoutFrom(process.env.ZSYS_PROVIDER_READY_DELAY_MS, 0);
-let providerReady = providerReadyDelayMs === 0;
-let ready = providerReady;
-const providerReadyTimer = providerReady ? undefined : setTimeout(() => { providerReady = true; ready = true; }, providerReadyDelayMs);
-let stopping;
-const activeRequests = new Set();
-let drainWaiter;
-function json(value, status = 200) { return new Response(JSON.stringify(value), { status, headers }); }
-function health() { return { protocol: "zsys.inspector", version: 1, status: "ok", graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }; }
-function timeoutFrom(value, fallback) { const parsed = Number(value); return Number.isSafeInteger(parsed) && parsed >= 0 ? Math.min(parsed, maxShutdownTimeoutMs) : fallback; }
-function waitForDrain() { return activeRequests.size === 0 ? Promise.resolve() : new Promise((resolve) => { drainWaiter = resolve; }); }
-function requestDone(controller) { activeRequests.delete(controller); if (activeRequests.size === 0 && drainWaiter !== undefined) { drainWaiter(); drainWaiter = undefined; } }
-function flushTelemetry() { const flush = (globalThis as Record<string, unknown>)["__zsys_flush_telemetry"]; return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve(); }
-function bounded(task, milliseconds) { return new Promise((resolve) => { let settled = false; const timer = setTimeout(() => { settled = true; resolve(false); }, milliseconds); Promise.resolve(task).then(() => { if (!settled) { settled = true; clearTimeout(timer); resolve(true); } }, () => { if (!settled) { settled = true; clearTimeout(timer); resolve(true); } }); }); }
-function paramsFor(path, pathname) {
-  const expected = path.split("/"), actual = pathname.split("/");
-  if (expected.length !== actual.length) return;
-  const params = {};
-  for (let index = 0; index < expected.length; index += 1) {
-    const segment = expected[index], value = actual[index];
-    if (segment.startsWith(":")) params[segment.slice(1)] = decodeURIComponent(value);
-    else if (segment !== value) return;
-  }
-  return params;
-}
-async function readBody(request) { const text = await request.text(); if (text === "") return; try { return JSON.parse(text); } catch { return text; } }
-function valueAt(value, name) { return value && typeof value === "object" ? value[name] : undefined; }
-function mapInput(mapping, url, params, request, body) {
-  if (!mapping || typeof mapping !== "object") return;
-  if (mapping.kind === "input" || mapping.kind === "nested") return Object.fromEntries(Object.entries(mapping.fields).map(([key, value]) => [key, mapInput(value, url, params, request, body)]));
-  if (mapping.kind === "constant") return mapping.value;
-  if (mapping.kind === "default") { const value = mapInput(mapping.value, url, params, request, body); return value === undefined ? mapping.default : value; }
-  if (mapping.kind === "optional") return mapInput(mapping.value, url, params, request, body);
-  if (mapping.kind === "query") return url.searchParams.get(mapping.name) ?? undefined;
-  if (mapping.kind === "path") return params[mapping.name];
-  if (mapping.kind === "header") return request.headers.get(mapping.name) ?? undefined;
-  if (mapping.kind === "body") return mapping.name === undefined ? body : valueAt(body, mapping.name);
-}
-function context(signal) { const log = { trace() {}, debug() {}, info() {}, warn() {}, error() {} }; return { invocation: { id: "zsys-production", traceId: "zsys-production", startedAt: new Date().toISOString(), attempt: 1, source: "http" }, signal, env: {}, log, time: { now: () => new Date(), sleep: (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)) }, functions: {}, jobs: {}, events: {}, buckets: {}, cache: {}, agents: {} }; }
-async function route(request) {
-  if (!ready) return json({ error: "Server is draining" }, 503);
-  const url = new URL(request.url), node = graph.nodes.find((value) => value.kind === "trigger" && value.triggerType === "http" && value.config.method === request.method && paramsFor(value.config.path, url.pathname));
-  if (!node) return;
-  const controller = new AbortController();
-  activeRequests.add(controller);
+const plan = createRegistrationPlan(graph);
+if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
+const environment = resolveEnvironment(process.env.ZSYS_ENV, process.env.NODE_ENV);
+const generationId = process.env.ZSYS_GENERATION_ID ?? "generation.runtime";
+const sourceToken = tokenFrom(process.env.ZSYS_SOURCE_TOKEN);
+const generationToken = tokenFrom(process.env.ZSYS_GENERATION_TOKEN);
+const values = Object.fromEntries(Object.entries(process.env).filter((entry) => entry[1] !== undefined));
+const shutdownController = new AbortController();
+const registry = createFunctionRegistry(graph, runtimeManifest);
+const application = runtimeManifest.application;
+if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
+const awsFactory = getAwsProviderFactory("aws");
+const providerStartup = createProviderRegistry({ generationId, environment, providers: application.providers, graph, values, signal: shutdownController.signal, ...(awsFactory === undefined ? {} : { factories: { aws: awsFactory } }) }).then(async (value) => {
+  await waitForProviderReady();
+  providerReady = true;
+  providers = value;
+  return value;
+}).catch(() => {
+  providerFailed = true;
+  return undefined;
+});
+let providers;
+let providerReady = false;
+let providerFailed = false;
+const runtimeRecords = createInspectableObservabilityHooks();
+const requestRecords = createObservabilityCollector();
+const requestSink = { collect: (record) => requestRecords.collect(record), read: requestRecords.read, readRecords: requestRecords.read };
+const activeInvocations = new Set();
+let stopping = false;
+const internalEndpointsEnabled = environment !== "production" || process.env.ZSYS_INTERNAL_ENDPOINTS === "1";
+const app = createApp({
+  plan,
+  manifest: runtimeManifest,
+  engine: { invoke: invokeHttp },
+  observability: requestSink,
+  middleware: { generationId, observability: requestSink },
+  internalEndpoints: {
+    mode: environment,
+    enabled: internalEndpointsEnabled,
+    ...(process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN === undefined
+      ? {}
+      : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
+    readiness: () => ({
+      ready: providerReady && !stopping,
+      ...(stopping ? { reason: "stopping" } : providerFailed ? { reason: "unavailable" } : {}),
+    }),
+    requests: () => ({ items: requestRecords.read() }),
+    logs: () => ({ items: runtimeRecords.readRecords().filter((record) => record.signal === "log") }),
+    traces: () => ({ items: runtimeRecords.readRecords().filter((record) => record.signal === "trace" || record.signal === "span") }),
+  },
+});
+const server = Bun.serve({
+  port: Number(process.env.PORT ?? 3000),
+  fetch: async (request) => {
+    const path = new URL(request.url).pathname;
+    if (path === "/_zsys/v1/health/live") return healthResponse("ok");
+    if (path === "/_zsys/v1/health/ready")
+      return healthResponse(providerReady && !stopping ? "ready" : "not-ready", providerReady && !stopping ? 200 : 503);
+    if (stopping) return Response.json({ error: "draining" }, { status: 503 });
+    try {
+      return await app.fetch(request);
+    } catch {
+      return Response.json({ error: "internal-error" }, { status: 500 });
+    }
+  },
+});
+
+async function invokeHttp(request) {
+  const providerRegistry = await providerStartup;
+  if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+  const target = targetFor(request.functionId);
+  const task = invoke({
+    input: request.input,
+    source: "http",
+    registry,
+    functionId: request.functionId,
+    ...(target === undefined ? {} : { target }),
+    ...(request.signal === undefined
+      ? { signal: shutdownController.signal }
+      : { signal: AbortSignal.any([request.signal, shutdownController.signal]) }),
+    ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
+    ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
+    ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
+    clients: createDependencySources(providerRegistry),
+    hooks: { observability: runtimeRecords },
+  });
+  activeInvocations.add(task);
   try {
-    const handler = runtimeManifest.functions[node.targetFunctionId];
-    if (typeof handler !== "function") return json({ error: "Handler unavailable" }, 500);
-    const value = await handler(mapInput(node.config.request, url, paramsFor(node.config.path, url.pathname), request, await readBody(request)), context(controller.signal));
-    const success = node.config.responses.find((response) => response.kind === "success");
-    return json(value, success?.status ?? 200);
+    return await task;
   } finally {
-    requestDone(controller);
+    activeInvocations.delete(task);
   }
 }
-const server = Bun.serve({ port: Number(process.env.PORT ?? 3000), async fetch(request) {
-  const path = new URL(request.url).pathname;
-  if (path === "/_zsys/v1/health/live") return json(health());
-  if (path === "/_zsys/v1/health/ready") return ready ? json({ ...health(), status: "ready", environmentReady: true, providerReady: true }) : json({ ...health(), status: "not-ready", environmentReady: true, providerReady: false }, 503);
-  if (path === "/_zsys/v1/graph") return json({ protocol: "zsys.inspector", version: 1, ...graph, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) });
-  if (!ready) return json({ error: "Server is draining" }, 503);
-  try { return (await route(request)) ?? new Response("Not found", { status: 404 }); } catch (error) { return json({ error: error instanceof Error ? error.message : String(error) }, 500); }
-} });
+
+function targetFor(functionId) {
+  const target = runtimeManifest.targets?.[functionId];
+  return target !== null && typeof target === "object" && typeof target.handler === "function"
+    ? target
+    : undefined;
+}
+
+function createDependencySources(providerRegistry) {
+  return {
+    functions: Object.fromEntries(plan.functions.map((node) => [node.id, registry.get(node.id)])),
+    agents: Object.fromEntries(
+      plan.agents.map((node) => [\`zsys.agent.\${node.id}.invoke\`, registry.get(\`zsys.agent.\${node.id}.invoke\`)]),
+    ),
+    buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "buckets", node.profile)])),
+    cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
+    jobs: Object.fromEntries(plan.queues.filter((node) => node.kind === "job").map((node) => [node.id, provider(providerRegistry, "jobs", node.profile)])),
+    events: Object.fromEntries((plan.events ?? []).map((node) => [node.id, provider(providerRegistry, "events", "default")])),
+  };
+}
+
+function provider(providerRegistry, capability, profile) {
+  return providerRegistry.get(capability, profile)?.value;
+}
+
+function healthResponse(status, code = 200) {
+  return Response.json({ protocol: "zsys.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-zsys-api-version": "1" } });
+}
+
+function tokenFrom(value) {
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) ? parsed : undefined;
+}
+
+function resolveEnvironment(value, nodeEnvironment) {
+  if (value === "development" || value === "test" || value === "production") return value;
+  return nodeEnvironment === "production" ? "production" : "development";
+}
+
+function waitForProviderReady() {
+  const milliseconds = timeoutFrom(process.env.ZSYS_PROVIDER_READY_DELAY_MS, 0);
+  if (milliseconds === 0) return Promise.resolve();
+  return new Promise((resolve, reject) => { const timer = setTimeout(resolve, milliseconds); shutdownController.signal.addEventListener("abort", () => { clearTimeout(timer); reject(shutdownController.signal.reason ?? new Error("Provider startup was aborted.")); }, { once: true }); });
+}
+
+function timeoutFrom(value, fallback) {
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? Math.min(parsed, 30_000) : fallback;
+}
+
+function bounded(task, milliseconds) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timer = setTimeout(() => { settled = true; resolve(false); }, milliseconds);
+    Promise.resolve(task).then(() => {
+      if (!settled) { settled = true; clearTimeout(timer); resolve(true); }
+    }, () => {
+      if (!settled) { settled = true; clearTimeout(timer); resolve(true); }
+    });
+  });
+}
+
+function flushTelemetry() {
+  const flush = globalThis["__zsys_flush_telemetry"];
+  return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
+}
+
 async function shutdown() {
-  if (stopping !== undefined) return stopping;
-  ready = false;
-  providerReady = false;
-  if (providerReadyTimer !== undefined) clearTimeout(providerReadyTimer);
+  if (stopping) return;
+  stopping = true;
+  shutdownController.abort(new Error("Runtime is stopping."));
   const drainTimeoutMs = timeoutFrom(process.env.ZSYS_DRAIN_TIMEOUT_MS, 10_000);
   const telemetryTimeoutMs = timeoutFrom(process.env.ZSYS_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
-  stopping = (async () => {
-    const drained = await bounded(waitForDrain(), drainTimeoutMs);
-    if (!drained) for (const controller of activeRequests) controller.abort();
-    await bounded(flushTelemetry(), telemetryTimeoutMs);
-    await server.stop(true);
-    process.exitCode = 0;
-  })();
-  await stopping;
+  await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
+  await bounded(flushTelemetry(), telemetryTimeoutMs);
+  await bounded(providerStartup, drainTimeoutMs);
+  if (providers !== undefined) await providers.dispose().catch(() => undefined);
+  await server.stop(true);
+  process.exit(0);
 }
-process.on("SIGINT", () => void shutdown());
-process.on("SIGTERM", () => void shutdown());
-void server;
+
+process.once("SIGINT", () => void shutdown());
+process.once("SIGTERM", () => void shutdown());
 `;
 }
