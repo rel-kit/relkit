@@ -131,7 +131,6 @@ export function createAwsPulumiResources(
       readinessPath: plan.application.image.health.readinessPath,
       environment: {
         ZSYS_APPLICATION_ID: plan.application.id,
-        ZSYS_GRAPH_HASH: plan.graphHash,
         ...(environment === undefined ? {} : environment),
         ...Object.fromEntries(
           buckets.buckets.map(({ environment }) => [environment.name, environment.value]),

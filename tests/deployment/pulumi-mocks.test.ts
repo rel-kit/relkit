@@ -336,6 +336,16 @@ test("source moves preserve mocked Pulumi resource identities without replacemen
   const afterResources = await runGeneratedProgram(after, "after-move");
 
   expect(resourceKeys(beforeResources)).toEqual(resourceKeys(afterResources));
+  expect(
+    await resolveValue(
+      resource(beforeResources, "aws:ecs/taskDefinition:TaskDefinition").inputs
+        .containerDefinitions,
+    ),
+  ).toBe(
+    await resolveValue(
+      resource(afterResources, "aws:ecs/taskDefinition:TaskDefinition").inputs.containerDefinitions,
+    ),
+  );
   expect(diffDeploymentPlans(before, after).summary.replace).toBe(0);
   expect(JSON.stringify(afterResources)).not.toContain("src/moved/");
 });
