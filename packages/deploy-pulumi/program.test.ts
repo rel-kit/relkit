@@ -3,6 +3,7 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { DeploymentPlan } from "@zsys/deploy";
+import { imageValue } from "./src/aws-program-support.ts";
 import { PULUMI_PROGRAM_VERSION, renderPulumiProgram, writePulumiProgram } from "./src/program.ts";
 
 const roots: string[] = [];
@@ -12,6 +13,22 @@ afterEach(async () => {
 });
 
 describe("Pulumi program generation", () => {
+  test("preserves an image name that already contains a tag", () => {
+    expect(
+      imageValue({
+        ...plan(),
+        application: {
+          ...plan().application,
+          image: {
+            ...plan().application.image,
+            tag: undefined,
+            name: "123456789.dkr.ecr.us-east-1.amazonaws.com/smoke:release",
+          },
+        },
+      }),
+    ).toBe("123456789.dkr.ecr.us-east-1.amazonaws.com/smoke:release");
+  });
+
   test("renders identical bytes from different project roots with stable identity metadata", () => {
     const left = renderPulumiProgram(plan(), {
       projectRoot: "/tmp/zsys-left",

@@ -105,9 +105,12 @@ export function createServicePolicy(
 
 export function imageValue(plan: DeploymentPlan): string {
   const image = plan.application.image;
-  return image.digest === undefined
-    ? `${image.name}:${image.tag ?? "latest"}`
-    : `${image.name}@${image.digest}`;
+  if (image.digest !== undefined) return `${image.name}@${image.digest}`;
+  if (image.tag !== undefined) return `${image.name}:${image.tag}`;
+  const lastSegment = image.name.slice(image.name.lastIndexOf("/") + 1);
+  return lastSegment.includes(":") || image.name.includes("@")
+    ? image.name
+    : `${image.name}:latest`;
 }
 
 function addArns(
