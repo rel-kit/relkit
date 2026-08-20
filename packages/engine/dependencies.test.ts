@@ -115,7 +115,7 @@ describe("declared dependency clients", () => {
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
       dependencies: { functions: { lookup: ref("function", "orders.lookup") } },
-      handler: async (_input, context) => {
+      handler: async (_input, _request, context) => {
         const clients = context as unknown as {
           readonly functions: { readonly lookup: (input: unknown) => Promise<unknown> };
         };

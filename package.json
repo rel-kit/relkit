@@ -1,13 +1,14 @@
 {
   "name": "zsys",
+  "homepage": "https://github.com/zsys-dev/zsys",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "turbo run dev",
     "check": "bun run scripts/check-boundaries.ts",
-    "typecheck": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false && bun packages/cli/dist/index.js check --project-root examples/commerce --json",
     "lint": "bun run scripts/lint.ts",
-    "test": "bun test",
+    "test": "bun run scripts/test-all.ts",
     "test:types": "bun run scripts/test-types.ts",
     "test:unit": "bun test ./tests/unit ./tests/schema",
     "test:compiler": "bun test ./tests/compiler ./tests/graph",
@@ -17,6 +18,8 @@
     "test:inspector": "bun test ./tests/inspector",
     "test:e2e": "playwright test",
     "test:generator": "bun test ./tests/generator",
+    "test:examples": "bunx turbo run check typecheck test build --filter='./examples/*'",
+    "test:docs": "bunx turbo run check test --filter=@zsys/docs",
     "test:deployment": "bun test ./tests/deployment",
     "test:aws-integration": "bun test ./tests/deployment/aws-integration.test.ts",
     "test:container": "bun test ./tests/container",
@@ -53,6 +56,7 @@
   },
   "workspaces": [
     "apps/*",
+    "examples/*",
     "packages/*"
   ]
 }

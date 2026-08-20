@@ -123,7 +123,9 @@ export const env: EnvBuilderFactory = Object.freeze({
 });
 
 /** Creates an immutable environment declaration without reading runtime values. */
-export function defineEnv<const S extends EnvShape>(shape: S): EnvDefinition<S> {
+export function defineEnv<const S extends EnvShape>(
+  shape: S & { readonly PORT?: never },
+): EnvDefinition<S> {
   const entries = Object.keys(shape).map((name) => [name, shape[name]!] as const);
   if (entries.some(([, field]) => field.kind !== "env-builder")) {
     throw new TypeError("Environment definitions must contain env builders");
@@ -138,6 +140,11 @@ export function defineEnv<const S extends EnvShape>(shape: S): EnvDefinition<S> 
     metadata,
   };
   for (const [name, field] of entries) {
+    if (name === "PORT") {
+      throw new TypeError(
+        'Environment variable name "PORT" is framework-reserved; configure server.port instead.',
+      );
+    }
     if (name === "kind" || name === "shape" || name === "metadata") {
       throw new TypeError(`Environment variable name "${name}" is reserved`);
     }

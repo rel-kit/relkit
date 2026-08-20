@@ -1,0 +1,44 @@
+---
+title: Uploads, middleware, and rate limits
+description: Bound multipart input, compose route policy, and enforce distributed production limits.
+---
+
+## Multipart uploads
+
+Use `z.file` for the Web `File` type and explicitly map form fields. Uploads are buffered.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/uploads/route.ts"'>
+  ../../examples/commerce/src/routes/uploads/route.ts
+</include>
+
+`http.multipart(name)` reads one value; `http.multipartAll(name)` reads repeated values. Set per-file
+`maxBytes`/`mediaTypes` in `z.file` and per-route `maxBodyBytes` when the server default is too broad.
+The global default is 1 MiB. Missing fields, unsupported media types, oversized files, and oversized
+bodies return bounded `422` errors. Streaming upload APIs are not currently exposed.
+
+## Middleware order
+
+1. Framework request setup, correlation, security, and body-size protection.
+2. Rate limiter.
+3. Declared middleware in author order.
+4. Request mapping and input validation.
+5. Target invocation through the common function engine.
+
+Middleware references are serializable descriptors targeting functions, not inline Hono callbacks.
+
+## Rate limiting
+
+```ts
+rateLimit: {
+  limit: 100,
+  windowMs: 60_000,
+  key: http.header("x-api-key"),
+  store: apiRateLimitCache,
+}
+```
+
+Keys may come from path, query, header, cookie, or constants. Callback/body-dependent keys are rejected.
+Local development may omit the store and use generation-local memory. Production check/build/start/deploy
+requires an explicit shared numeric cache because process memory is neither distributed nor restart-safe.
+Responses include standard limit/retry headers, a safe JSON `429`, OpenAPI metadata, request records,
+and trace attributes.

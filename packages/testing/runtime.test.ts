@@ -19,6 +19,7 @@ const target = {
   output: z.object({ value: z.number(), now: z.number() }),
   handler: async (
     input: { value: number },
+    _request: undefined,
     context: {
       readonly env: Readonly<Record<string, unknown>>;
       readonly time: { now: () => Date };

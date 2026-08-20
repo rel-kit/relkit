@@ -22,6 +22,15 @@ const validationSchema: OpenApiSchema = {
   },
 };
 
+const rateLimitSchema: OpenApiSchema = {
+  type: "object",
+  required: ["error", "retryAfterMs"],
+  properties: {
+    error: { const: "rate-limit", type: "string" },
+    retryAfterMs: { type: "integer", minimum: 0 },
+  },
+};
+
 export function buildResponses(
   values: JsonValue,
   target: FunctionNode,
@@ -45,9 +54,13 @@ export function buildResponses(
           : entry.kind === "error"
             ? errorSchema(entry, target)
             : schemaValue(entry.schema);
+    const rateLimited = status === "429" && String(entry.id).startsWith("rate-limit");
     const next = makeResponse(
-      description(entry),
-      status === "204" || status === "304" ? undefined : schema,
+      rateLimited ? "Rate limit exceeded" : description(entry),
+      status === "204" || status === "304"
+        ? undefined
+        : (schema ?? (rateLimited ? rateLimitSchema : undefined)),
+      rateLimited,
     );
     result[status] = result[status] === undefined ? next : mergeResponses(result[status]!, next);
   }
@@ -107,11 +120,40 @@ function mergeResponses(left: OpenApiResponse, right: OpenApiResponse): OpenApiR
   };
 }
 
-function makeResponse(description: string, schema?: OpenApiSchema): OpenApiResponse {
-  return schema === undefined
-    ? { description }
-    : { description, content: { "application/json": { schema } } };
+function makeResponse(
+  description: string,
+  schema?: OpenApiSchema,
+  rateLimited = false,
+): OpenApiResponse {
+  return {
+    description,
+    ...(schema === undefined ? {} : { content: { "application/json": { schema } } }),
+    ...(rateLimited ? { headers: rateLimitHeaders } : {}),
+  };
 }
+
+const rateLimitHeaders = {
+  "RateLimit-Policy": {
+    description: "Limit and window policy applied to the route",
+    schema: { type: "string" },
+  },
+  "RateLimit-Limit": {
+    description: "Request limit for the active window",
+    schema: { type: "integer" },
+  },
+  "RateLimit-Remaining": {
+    description: "Requests remaining in the active window",
+    schema: { type: "integer" },
+  },
+  "RateLimit-Reset": {
+    description: "Seconds until the active window resets",
+    schema: { type: "integer" },
+  },
+  "Retry-After": {
+    description: "Seconds before another request should be attempted",
+    schema: { type: "integer" },
+  },
+} satisfies NonNullable<OpenApiResponse["headers"]>;
 
 function description(entry: Record<string, unknown>): string {
   if (entry.kind === "success") return "Successful response";

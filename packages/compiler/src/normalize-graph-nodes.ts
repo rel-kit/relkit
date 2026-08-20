@@ -59,6 +59,7 @@ function nodeFor(descriptor: NormalizedDescriptor, work: NormalizationWork): Gra
         dependencies: clean(value.dependencies),
         timeoutMs: clean(value.timeoutMs),
         concurrency: clean(value.concurrency),
+        generated: clean(value.generated),
       };
     case "job":
       return {

@@ -45,6 +45,22 @@ export interface MiddlewareDescriptor<
   readonly decision: MiddlewareDecisionMapping;
 }
 
+/**
+ * Defines serializable route middleware backed by a function target.
+ *
+ * @example
+ * ```ts
+ * import { defineFunction } from "@zsys/functions"
+ * import { defineMiddleware, http } from "@zsys/routes"
+ * import { z } from "@zsys/schema"
+ *
+ * const authorize = defineFunction({ id: "auth", input: z.object({ token: z.string() }), output: z.void(), handler: async () => undefined })
+ * const middleware = defineMiddleware({ id: "auth.http", target: authorize, request: http.input({ token: http.header("authorization") }), decision: http.continue() })
+ * void middleware
+ * ```
+ * @category Middleware
+ * @since 0.1.0
+ */
 export function defineMiddleware<
   const Id extends string,
   const Target extends FunctionRefAny,

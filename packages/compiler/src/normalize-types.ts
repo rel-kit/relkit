@@ -15,6 +15,13 @@ export const NORMALIZE_CODES = Object.freeze({
   id: "ZSYS_ID_INVALID",
   method: "ZSYS_METHOD_INVALID",
   path: "ZSYS_PATH_INVALID",
+  routeFile: "ZSYS_ROUTE_FILE_REQUIRED",
+  routeExport: "ZSYS_ROUTE_EXPORT_METHOD",
+  routeTransport: "ZSYS_ROUTE_LEGACY_TRANSPORT",
+  reservedRoute: "ZSYS_ROUTE_RESERVED_PATH",
+  rateLimit: "ZSYS_RATE_LIMIT_INVALID",
+  rateLimitStore: "ZSYS_RATE_LIMIT_STORE_REQUIRED",
+  rateLimitReference: "ZSYS_RATE_LIMIT_STORE_INVALID",
   profile: "ZSYS_PROFILE_INVALID",
   schedule: "ZSYS_SCHEDULE_INVALID",
   retry: "ZSYS_RETRY_INVALID",
@@ -31,6 +38,8 @@ export const NORMALIZE_CODES = Object.freeze({
   response: "ZSYS_ROUTE_RESPONSE_INCOMPATIBLE",
   jobInput: "ZSYS_JOB_INPUT_INCOMPATIBLE",
   selector: "ZSYS_EVENT_SELECTOR_EMPTY",
+  eventName: "ZSYS_EVENT_NAME_UNKNOWN",
+  eventListenerId: "ZSYS_EVENT_LISTENER_ID_REQUIRED",
   wildcard: "ZSYS_EVENT_WILDCARD_RESTRICTED",
   eventTarget: "ZSYS_EVENT_TARGET_INCOMPATIBLE",
   toolTarget: "ZSYS_TOOL_TARGET_INCOMPATIBLE",
@@ -65,7 +74,6 @@ export const VALIDATION_PASSES = Object.freeze([
 ] as const);
 
 export type ValidationPass = (typeof VALIDATION_PASSES)[number];
-
 export interface NormalizeInput {
   readonly descriptors?: readonly unknown[];
   readonly observedEdges?: readonly ObservedEdge[];
@@ -74,13 +82,13 @@ export interface NormalizeInput {
   readonly modules?: readonly EvaluatorModuleResult[];
   readonly projectRoot?: string;
   readonly generationId?: string;
+  readonly mode?: "development" | "test" | "production";
   readonly sources?: readonly SourceMapSource[];
   readonly sourceMap?: readonly SourceMapEntry[];
   readonly locations?:
     ReadonlyMap<string, SourceLocation> | Readonly<Record<string, SourceLocation>>;
   readonly onPass?: (pass: ValidationPass, index: number) => void;
 }
-
 export interface NormalizedDescriptor {
   readonly kind: string;
   readonly id: string;
@@ -90,28 +98,24 @@ export interface NormalizedDescriptor {
   readonly reference?: EvaluatorManifestReference;
   readonly value: unknown;
 }
-
 export interface GraphNode {
   readonly kind: string;
   readonly id: string;
   readonly source: SourceLocation;
   readonly [key: string]: unknown;
 }
-
 export interface GraphEdge {
   readonly kind: string;
   readonly from: string;
   readonly to: string;
   readonly [key: string]: unknown;
 }
-
 /** Runtime relationships kept outside the canonical graph contract. */
 export interface ObservedEdge {
   readonly relationship: string;
   readonly from: string;
   readonly to: string;
 }
-
 export interface NormalizedGraph {
   readonly contractVersion: number;
   readonly appId?: string;

@@ -110,9 +110,8 @@ describe("compiler semantic validation", () => {
       output,
       handler: async () => ({ ok: true }),
     });
-    const trigger = onEvent(events.all({ payload: "unknown" }), {
+    const trigger = onEvent(events.all({ payload: "unknown" }), async () => ({ ok: true }), {
       id: "events.all",
-      target,
       delivery: "ephemeral",
     });
     const app = {
@@ -203,16 +202,14 @@ describe("compiler semantic validation", () => {
       output,
       handler: async () => ({ ok: true }),
     });
-    const matchTrigger = onEvent(events.match("orders.*"), {
+    const matchTrigger = onEvent(events.match("orders.*"), async () => ({ ok: true }), {
       id: "orders.match",
-      target: typedTarget,
-      delivery: "durable",
     });
-    const anyTrigger = onEvent(events.anyOf(updated, created), {
-      id: "orders.any",
-      target: typedTarget,
-      delivery: "durable",
-    });
+    const anyTrigger = onEvent(
+      events.anyOf("orders.updated" as never, "orders.created" as never),
+      async () => ({ ok: true }),
+      { id: "orders.any" },
+    );
     const rawTarget = defineFunction({
       id: "orders.telemetry-target",
       input: z.object({
@@ -228,11 +225,11 @@ describe("compiler semantic validation", () => {
       output,
       handler: async () => ({ ok: true }),
     });
-    const rawTrigger = onEvent(events.all({ payload: "unknown", purpose: "telemetry" }), {
-      id: "orders.telemetry",
-      target: rawTarget,
-      delivery: "ephemeral",
-    });
+    const rawTrigger = onEvent(
+      events.all({ payload: "unknown", purpose: "telemetry" }),
+      async () => ({ ok: true }),
+      { id: "orders.telemetry", delivery: "ephemeral" },
+    );
     const result = normalizeCompilation({
       descriptors: [created, updated, typedTarget, matchTrigger, anyTrigger, rawTarget, rawTrigger],
     });

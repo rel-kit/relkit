@@ -6,12 +6,13 @@ import {
   type Missing,
 } from "./request-mapping-body.js";
 import { applyTransform } from "./request-mapping-transform.js";
-import { readCookie, readHeader, readScalar } from "./request-mapping-sources.js";
+import { readCookie, readHeader, readPathSegments, readScalar } from "./request-mapping-sources.js";
 import { mapObject, type MappingState } from "./request-mapping-object.js";
 
 export type MappingValue = string | readonly string[];
 export interface MappingRequest {
   readonly request: Request;
+  readonly pathPattern?: string;
   readonly params: Readonly<Record<string, string>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
@@ -37,9 +38,6 @@ export interface RequestMappingOptions {
 }
 export const DEFAULT_MAX_BODY_BYTES = 1_048_576;
 
-type State = MappingState;
-type Node = Record<string, unknown>;
-
 export function isRequestMappingFailure(value: unknown): value is RequestMappingFailure {
   return isRecord(value) && value.ok === false && Array.isArray(value.issues);
 }
@@ -49,10 +47,13 @@ export async function mapRequest(
   mapping: unknown,
   options: RequestMappingOptions = {},
 ): Promise<RequestMappingResult> {
-  const state: State = {
+  const state: MappingState = {
     request,
     body: {
-      request: request.request,
+      // Bun and Undici expose equivalent Fetch requests with incompatible declarations.
+      request: request.request.bodyUsed
+        ? request.request
+        : (request.request.clone() as unknown as Request),
       maxBodyBytes: options.maxBodyBytes ?? DEFAULT_MAX_BODY_BYTES,
     },
     options,
@@ -70,7 +71,7 @@ export async function mapRequest(
 
 async function visit(
   node: unknown,
-  state: State,
+  state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
   if (!isNode(node) || typeof node.kind !== "string") {
@@ -82,11 +83,13 @@ async function visit(
     case "nested":
       return mapObject(node.fields, state, path, visit, add.bind(null, state));
     case "path":
+    case "path-segments":
     case "query":
     case "header":
     case "cookie":
     case "body":
-    case "multipart": {
+    case "multipart":
+    case "multipart-all": {
       const name = typeof node.name === "string" ? node.name : undefined;
       if (name === undefined) {
         add(state, "mapping", `Mapping node "${node.kind}" needs a name`, path);
@@ -94,6 +97,14 @@ async function visit(
       }
       if (node.kind === "path")
         return readScalar(state.request.params[name], "path", path, add.bind(null, state));
+      if (node.kind === "path-segments")
+        return readPathSegments(
+          state.request.request.url,
+          state.request.pathPattern,
+          name,
+          path,
+          add.bind(null, state),
+        );
       if (node.kind === "query")
         return readScalar(state.request.query[name], "query", path, add.bind(null, state));
       if (node.kind === "header")
@@ -106,7 +117,7 @@ async function visit(
       if (node.kind === "cookie")
         return readCookie(name, state.request.headers, path, add.bind(null, state));
       if (node.kind === "body") return bodyField(name, state, path);
-      return formField(name, state, path);
+      return formField(name, state, path, node.kind === "multipart-all");
     }
     case "whole-body":
       return jsonValue(state, path);
@@ -136,7 +147,7 @@ async function visit(
 
 async function bodyField(
   name: string,
-  state: State,
+  state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
   const value = await jsonValue(state, path);
@@ -146,7 +157,7 @@ async function bodyField(
 }
 
 async function jsonValue(
-  state: State,
+  state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
   const result = await parseJson(state.body);
@@ -156,22 +167,24 @@ async function jsonValue(
 
 async function formField(
   name: string,
-  state: State,
+  state: MappingState,
   path: readonly (string | number)[],
+  all: boolean,
 ): Promise<unknown | Missing> {
   const result = await parseForm(state.body);
   if (result.issue !== undefined) add(state, result.issue.code, result.issue.message, path);
   if (result.value === MISSING) return MISSING;
   const values = result.value.getAll(name);
+  if (all) return values.length === 0 ? MISSING : Object.freeze([...values]);
   if (values.length > 1) add(state, "duplicate", `Duplicate multipart field "${name}"`, path);
   return values.length === 1 ? values[0] : MISSING;
 }
 
-function failure(state: State): RequestMappingFailure {
+function failure(state: MappingState): RequestMappingFailure {
   return { ok: false, issues: Object.freeze(state.issues.map((item) => Object.freeze(item))) };
 }
 function add(
-  state: State,
+  state: MappingState,
   code: RequestIssueCode,
   message: string,
   path: readonly (string | number)[],
@@ -181,7 +194,7 @@ function add(
   state.reported.add(key);
   state.issues.push(Object.freeze({ code, message, path: Object.freeze([...path]) }));
 }
-function isNode(value: unknown): value is Node {
+function isNode(value: unknown): value is Record<string, unknown> {
   return isRecord(value);
 }
 function isRecord(value: unknown): value is Record<string, unknown> {

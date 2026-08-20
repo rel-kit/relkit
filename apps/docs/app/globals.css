@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+:root {
+  --zsys-accent: oklch(0.64 0.18 262);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--zsys-accent) 28%, transparent);
+}
+
+code {
+  font-variant-ligatures: none;
+}

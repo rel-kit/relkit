@@ -1,72 +1,74 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { InspectorGraph, InspectorObject, InspectorPage } from "../lib/api-types";
+import { useCallback } from "react";
+import type { InspectorObject, InspectorPage, InspectorQuery } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
-import { toolViews, type ToolView } from "../lib/agents-model";
+import { unpagedQuery } from "../lib/list-query";
+import { toolViews } from "../lib/agents-model";
+import { ResourceTable, type ResourceTableItem } from "./resource-table";
+
+interface ToolItem extends ResourceTableItem {
+  readonly target: string;
+  readonly sideEffect: string;
+  readonly approval: string;
+  readonly pending: number;
+  readonly runtime: number;
+}
+
+const statuses = ["pending", "running", "completed", "failed"].map((id) => ({ id, label: id }));
 
 export function ToolsClient() {
-  const [views, setViews] = useState<readonly ToolView[]>([]);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
-
-  useEffect(() => {
+  const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<ToolItem>> => {
     const api = createInspectorClient();
-    void Promise.all([api.graph(), api.runtimeList<InspectorObject>("tools", { limit: 100 })])
-      .then(([graph, runtime]: [InspectorGraph, InspectorPage<InspectorObject>]) => {
-        setViews(toolViews(graph, runtime.items));
-        setState("ready");
-      })
-      .catch(() => setState("error"));
+    const { status, ...graphQuery } = query;
+    const [page, graph, runtime] = await Promise.all([
+      api.list<InspectorObject>("tools", graphQuery),
+      api.graph(),
+      api.runtimeList<InspectorObject>("tools", unpagedQuery(query)),
+    ]);
+    const ids = new Set(page.items.map((item) => text(item.id)));
+    const items = toolViews(graph, runtime.items).flatMap((view) =>
+      ids.has(view.id) && (status === undefined || view.runtime.length > 0)
+        ? [
+            {
+              id: view.id,
+              target: view.targetFunctionId || "unavailable",
+              sideEffect: view.sideEffect,
+              approval: view.approvalPolicy,
+              pending: view.pendingApprovals.length,
+              runtime: view.runtime.length,
+            },
+          ]
+        : [],
+    );
+    return { ...page, items };
   }, []);
-
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Tools</h1>
-          <p className="lede">
-            Function-backed contracts with inherited schemas, side-effect policy, and safe runtime
-            state.
-          </p>
-        </div>
-        <span className="badge">{views.length} tools</span>
-      </header>
-      {state === "loading" && (
-        <p className="panel route-state" role="status">
-          Loading tools…
-        </p>
-      )}
-      {state === "error" && (
-        <p className="panel route-state" role="alert">
-          The tools API is unavailable.
-        </p>
-      )}
-      {state === "ready" && views.length === 0 && (
-        <p className="panel route-state">No tools are reported by the active graph.</p>
-      )}
-      {views.length > 0 && (
-        <ul className="route-list">
-          {views.map((view) => (
-            <li className="panel route-row" key={view.id}>
-              <div>
-                <strong>{view.id}</strong>
-                <p className="supporting-copy">Target: {view.targetFunctionId || "Unavailable"}</p>
-              </div>
-              <div className="route-row-detail">
-                <span>Side effect: {view.sideEffect}</span>
-                <span>Approval: {view.approvalPolicy}</span>
-                {view.pendingApprovals.length > 0 && (
-                  <span>{view.pendingApprovals.length} pending</span>
-                )}
-              </div>
-              <a className="text-link" href={`/tools/${encodeURIComponent(view.id)}`}>
-                Open tool <span aria-hidden="true">→</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <ResourceTable
+      title="Tools"
+      description="Function-backed contracts with side-effect policy, approval controls, and safe runtime state."
+      noun="tools"
+      load={load}
+      statusOptions={statuses}
+      columns={[
+        { key: "target", label: "Target", render: (item) => item.target },
+        {
+          key: "policy",
+          label: "Policy",
+          render: (item) => `${item.sideEffect} · ${item.approval}`,
+        },
+        {
+          key: "runtime",
+          label: "Runtime",
+          render: (item) => `${item.runtime} calls · ${item.pending} pending`,
+        },
+      ]}
+      href={(item) => `/tools/${encodeURIComponent(item.id)}`}
+      openLabel="Open tool"
+    />
   );
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }

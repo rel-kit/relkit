@@ -1,13 +1,7 @@
-import { access, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import {
-  API_BASE_PATH,
-  CONTRACT_VERSION,
-  GENERATOR_VERSION,
-  GRAPH_VERSION,
-  MANIFEST_VERSION,
-} from "@zsys/contracts";
-import { hashGraph, type ApplicationGraph } from "@zsys/graph";
+import { API_BASE_PATH } from "@zsys/contracts";
+import { resolveApplicationPort } from "./ports.js";
+import { readBuilt } from "./start-built.js";
 export interface StartOptions {
   readonly projectRoot?: string;
   readonly buildDirectory?: string;
@@ -35,19 +29,32 @@ export async function startProject(options: StartOptions = {}): Promise<StartedP
   const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".zsys", "build"));
   const built = await readBuilt(buildDirectory);
   const hostname = options.hostname ?? "127.0.0.1";
-  const port = await resolvePort(options.port ?? Number(process.env.PORT ?? 3000), hostname);
-  if (options.signal?.aborted) throw options.signal.reason ?? new Error("Start was aborted.");
-  const environment = {
-    ...Object.fromEntries(
-      Object.entries(process.env).filter(
-        (entry): entry is [string, string] => entry[1] !== undefined,
-      ),
+  const inherited = Object.fromEntries(
+    Object.entries(process.env).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined,
     ),
+  );
+  const source = {
+    ...inherited,
     ...Object.fromEntries(
       Object.entries(options.environment ?? {}).filter(
         (entry): entry is [string, string] => entry[1] !== undefined,
       ),
     ),
+  };
+  const port = await allocatePort(
+    resolveApplicationPort({
+      ...(options.port === undefined ? {} : { flag: options.port }),
+      source,
+      ...(built.manifest.server?.port === undefined
+        ? {}
+        : { configured: built.manifest.server.port }),
+    }),
+    hostname,
+  );
+  if (options.signal?.aborted) throw options.signal.reason ?? new Error("Start was aborted.");
+  const environment = {
+    ...source,
     PORT: String(port),
     ZSYS_GRAPH_HASH: built.graphHash,
   };
@@ -101,49 +108,6 @@ export async function runStart(options: StartOptions = {}): Promise<number> {
   const server = await startProject(options);
   return server.exited;
 }
-async function readBuilt(
-  buildDirectory: string,
-): Promise<{ readonly graphHash: string; readonly manifest: BuiltManifest }> {
-  const graph = JSON.parse(
-    await readFile(join(buildDirectory, "application.graph.json"), "utf8"),
-  ) as ApplicationGraph;
-  const manifest = JSON.parse(
-    await readFile(join(buildDirectory, "manifest.json"), "utf8"),
-  ) as BuiltManifest;
-  if (
-    graph.contractVersion !== CONTRACT_VERSION ||
-    manifest.contractVersion !== CONTRACT_VERSION ||
-    manifest.graphVersion !== GRAPH_VERSION ||
-    manifest.manifestVersion !== MANIFEST_VERSION ||
-    manifest.generatorVersion !== GENERATOR_VERSION
-  )
-    throw new Error("Built graph or manifest version is unsupported.");
-  const graphHash = hashGraph(graph);
-  if (manifest.graphHash !== graphHash)
-    throw new Error("Built graph and manifest hashes do not match.");
-  if (
-    manifest.entrypoint !== "server/index.ts" ||
-    manifest.runtimeManifestFile !== "server/runtime.manifest.ts"
-  )
-    throw new Error("Built manifest paths are invalid.");
-  await access(join(buildDirectory, manifest.entrypoint));
-  const runtimeManifest = await readFile(
-    join(buildDirectory, manifest.runtimeManifestFile),
-    "utf8",
-  );
-  if (!runtimeManifest.includes(`manifestGraphHash = ${JSON.stringify(graphHash)}`))
-    throw new Error("Built runtime manifest hash does not match the graph.");
-  return { graphHash, manifest };
-}
-interface BuiltManifest {
-  readonly contractVersion: number;
-  readonly generatorVersion: number;
-  readonly graphVersion: number;
-  readonly manifestVersion: number;
-  readonly graphHash: string;
-  readonly entrypoint: string;
-  readonly runtimeManifestFile: string;
-}
 async function waitForHealth(
   hostname: string,
   port: number,
@@ -186,7 +150,7 @@ async function stopChild(child: Bun.ReadableSubprocess, timeoutMs: number): Prom
     await child.exited;
   }
 }
-async function resolvePort(port: number, hostname: string): Promise<number> {
+async function allocatePort(port: number, hostname: string): Promise<number> {
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535)
     throw new RangeError("port must be between 0 and 65535.");
   if (port !== 0) return port;

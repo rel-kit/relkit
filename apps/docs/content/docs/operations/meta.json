@@ -1,0 +1,12 @@
+{
+  "title": "Tooling and operations",
+  "pages": [
+    "cli-reference",
+    "inspector",
+    "observability",
+    "testing",
+    "deployment",
+    "troubleshooting",
+    "migration"
+  ]
+}

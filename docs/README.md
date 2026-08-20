@@ -37,8 +37,8 @@ export const hello = defineFunction({
   id: "hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
-  handler: async ({ name }, ctx) => {
-    ctx.log.info("hello", { name });
+  handler: async ({ name }, request, ctx) => {
+    ctx.log.info("hello", { name, url: request?.url });
     return { message: `Hello, ${name}!` };
   },
 });

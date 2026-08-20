@@ -16,10 +16,7 @@ export function EventDetailClient() {
   useEffect(() => {
     if (id === "") return;
     const api = createInspectorClient();
-    void Promise.all([
-      api.graph(),
-      api.runtimeList<InspectorEventRuntime>("events", { eventId: id, limit: 100 }),
-    ])
+    void Promise.all([api.graph(), api.eventRuntime({ eventId: id, limit: 100 })])
       .then(([graph, runtime]: [InspectorGraph, InspectorEventRuntime]) => {
         const next = eventView(graph, runtime, id);
         if (next === undefined) throw new Error("Event unavailable");

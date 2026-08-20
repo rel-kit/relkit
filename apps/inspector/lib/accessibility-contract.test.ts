@@ -31,11 +31,12 @@ describe("inspector accessibility contract", () => {
   });
 
   test("critical actions use semantic groups and an accessible modal confirmation", async () => {
-    const [dialog, jobs, tools, layout] = await Promise.all([
+    const [dialog, jobs, tools, layout, shell] = await Promise.all([
       source("confirmation-dialog.tsx"),
       source("jobs/job-actions.tsx"),
       source("tool-approval-actions.tsx"),
       source("layout.tsx"),
+      source("inspector-shell.tsx"),
     ]);
 
     expect(dialog).toContain("<dialog");
@@ -50,7 +51,18 @@ describe("inspector accessibility contract", () => {
     expect(tools).toContain("Approve");
     expect(tools).toContain("Deny");
     expect(tools).not.toContain("window.confirm");
-    expect(layout).toContain('href="#main-content"');
-    expect(layout).toContain("tabIndex={-1}");
+    expect(layout + shell).toContain('href="#main-content"');
+    expect(layout + shell).toContain("tabIndex={-1}");
+  });
+
+  test("the API reference exposes a titled embedded view and direct fallback", async () => {
+    const [page, navigation] = await Promise.all([
+      source("api-reference/page.tsx"),
+      source("navigation-data.ts"),
+    ]);
+
+    expect(page).toContain('title="Scalar API Reference"');
+    expect(page).toContain("Open in new tab");
+    expect(navigation).toContain('href: "/api-reference"');
   });
 });

@@ -1,0 +1,16 @@
+---
+title: Buckets and cache
+description: Declare resources once and consume only typed, authorized clients.
+---
+
+Use `defineBucket` and `defineCache` to create graph-visible logical resources. Add them to a function's
+`dependencies`, then access the corresponding typed client on its context. Applications never import
+provider SDK clients directly.
+
+Buckets support bounded object reads/writes and metadata through the provider contract. Cache keys and
+values are schema-backed; numeric caches can also back distributed route rate limiting. Local providers
+persist recoverable state, test providers expose controllable fakes, and production profiles map logical
+resources to managed infrastructure.
+
+Stable resource IDs drive graph edges, inspector views, permissions, and deployment identity. Moving a
+descriptor file must not force resource replacement.

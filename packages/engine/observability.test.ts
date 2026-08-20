@@ -90,7 +90,7 @@ describe("versioned invocation observability hooks", () => {
             },
           },
         },
-        handler: async (_input, context) => {
+        handler: async (_input, _request, context) => {
           const functions = context as typeof context & {
             readonly functions: Readonly<Record<string, (input: unknown) => Promise<unknown>>>;
           };

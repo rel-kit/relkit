@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { ProtocolId } from "@zsys/contracts";
+import { Effect } from "effect";
+import { defineError, defineFunction, fail } from "@zsys/app";
 import { z } from "@zsys/schema";
 import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/invoke.ts";
 
@@ -22,11 +24,26 @@ function target(
 }
 
 describe("function invocation pipeline", () => {
+  test("passes the transport request between input and context", async () => {
+    let seen: { readonly url: string } | undefined;
+    const request = new Request("http://zsys.test/orders/1");
+    await invokeFunction(
+      target((_input, currentRequest, _context) => {
+        seen = currentRequest;
+        return { value: 1 };
+      }),
+      { value: 1 },
+      { request },
+    );
+
+    expect(seen?.url).toBe(request.url);
+  });
+
   test("validates, traces, and releases a successful invocation", async () => {
     const events: string[] = [];
     const now = Date.now();
     const result = await invokeFunction(
-      target((input, context) => {
+      target((input, _request, context) => {
         expect(context.invocation.source).toBe("direct");
         expect(context.signal.aborted).toBe(false);
         return { value: (input as { value: number }).value + 1 };
@@ -130,5 +147,45 @@ describe("function invocation pipeline", () => {
       id: "orders.unavailable",
       data: { reason: "sold out" },
     });
+  });
+
+  test("runs plain and Effect function failures through the declared error path", async () => {
+    const unavailable = defineError({
+      id: "orders.returned-unavailable",
+      data: z.object({ reason: z.string() }),
+      message: ({ reason }) => reason,
+      retry: "never",
+    });
+    const input = z.object({});
+    const output = z.object({ ok: z.boolean() });
+    const plain = defineFunction({
+      id: "orders.returned-plain",
+      input,
+      output,
+      errors: [unavailable],
+      handler: () => fail(unavailable, { reason: "sold out" }),
+    });
+    const direct = defineFunction({
+      id: "orders.returned-direct",
+      input,
+      output,
+      errors: [unavailable],
+      handler: () => new unavailable({ reason: "sold out" }),
+    });
+    const effect = defineFunction({
+      id: "orders.returned-effect",
+      input,
+      output,
+      errors: [unavailable],
+      handler: () => Effect.fail(unavailable.create({ reason: "sold out" })),
+    });
+
+    for (const target of [plain, direct, effect]) {
+      await expect(invokeFunction(target, {})).rejects.toMatchObject({
+        kind: "application",
+        id: "orders.returned-unavailable",
+        data: { reason: "sold out" },
+      });
+    }
   });
 });

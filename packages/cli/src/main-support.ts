@@ -1,5 +1,6 @@
 import { canonicalJson } from "@zsys/contracts";
 import type { LogLevel, LogRecord } from "@zsys/runtime-effect";
+import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
 
 export const CLI_VERSION = "0.0.0" as const;
 export const CLI_EXIT_CODES = Object.freeze({
@@ -9,29 +10,9 @@ export const CLI_EXIT_CODES = Object.freeze({
   sigint: 130,
   sigterm: 143,
 });
-const COMMANDS = Object.freeze([
-  "dev",
-  "check",
-  "build",
-  "start",
-  "graph",
-  "env",
-  "doctor",
-  "create",
-  "deploy",
-]);
-
 export interface CliIo {
   readonly stdout: (line: string) => void;
   readonly stderr: (line: string) => void;
-}
-export interface ParsedCliArgs {
-  readonly command: string | undefined;
-  readonly args: readonly string[];
-  readonly json: boolean;
-  readonly help: boolean;
-  readonly version: boolean;
-  readonly error: string | undefined;
 }
 export interface CliReporter {
   readonly output: (value: unknown, human?: string) => void;
@@ -63,6 +44,8 @@ export interface CreateZsysGeneratorApi {
 export interface CliRuntime {
   readonly io?: CliIo;
   readonly version?: string;
+  readonly tty?: boolean;
+  readonly ci?: boolean;
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;
   readonly loadCreateZsys?: () => Promise<CreateZsysGeneratorApi>;
@@ -72,35 +55,6 @@ export type CliFailure = Error & {
   readonly exitCode: number;
   readonly signal?: "SIGINT" | "SIGTERM";
 };
-
-export function parseCliArgs(argv: readonly string[]): ParsedCliArgs {
-  let command: string | undefined;
-  let json = false;
-  let help = false;
-  let version = false;
-  let passthrough = false;
-  const args: string[] = [];
-  for (const token of argv) {
-    if (passthrough) {
-      if (command === undefined) command = token;
-      else args.push(token);
-    } else if (token === "--") passthrough = true;
-    else if (token === "--json") json = true;
-    else if (token === "--help" || token === "-h") help = true;
-    else if (token === "--version" || token === "-v") version = true;
-    else if (command === undefined && token.startsWith("-"))
-      return { command, args, json, help, version, error: `Unknown option: ${token}` };
-    else if (command === undefined) command = token;
-    else args.push(token);
-  }
-  if (help && version)
-    return { command, args, json, help, version, error: "--help and --version are exclusive" };
-  if (command === "help")
-    return { command: args[0], args: [], json, help: true, version: false, error: undefined };
-  if (command === "version" && args.length === 0)
-    return { command: undefined, args, json, help: false, version: true, error: undefined };
-  return { command, args, json, help, version, error: undefined };
-}
 
 export async function loadCreateZsys(): Promise<CreateZsysGeneratorApi> {
   let loaded: { readonly default?: unknown } & Partial<CreateZsysGeneratorApi>;
@@ -130,22 +84,28 @@ export function createReporter(json: boolean, io: CliIo): CliReporter {
     },
   };
 }
-export function helpPayload(version: string, command: string | undefined): unknown {
+export function helpPayload(
+  version: string,
+  command: string | readonly string[] | undefined,
+): unknown {
+  const path = typeof command === "string" ? [command] : (command ?? []);
+  const selected = findCliHelp(path) ?? getCliHelpModel(version);
   return {
     name: "zsys",
     version,
-    usage: command ? `zsys ${command} [options]` : "zsys [--json] <command> [options]",
-    commands: COMMANDS,
+    usage: path.length === 0 ? "zsys [--json] <command> [options]" : selected.usage,
+    commands: selected.commands.map(({ name }) => name),
   };
 }
 export function helpText(version: string, command: string | undefined): string {
-  const usage = command ? `zsys ${command} [options]` : "zsys [--json] <command> [options]";
+  const selected = findCliHelp(command ? [command] : []) ?? getCliHelpModel(version);
+  const usage = command ? selected.usage : "zsys [--json] <command> [options]";
   const lines = [
     `zsys ${version}`,
     `Usage: ${usage}`,
     "",
     "Commands:",
-    ...COMMANDS.map((name) => `  ${name}`),
+    ...selected.commands.map(({ name }) => `  ${name}`),
     "",
     "Global options:",
     "  --json",

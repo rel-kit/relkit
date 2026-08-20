@@ -1,6 +1,6 @@
 {
   "contractVersion": 1,
-  "graphHash": "sha256:3bc6d305fcafab6dcb8602961dbaa0cfe3eb030a6b6f0c65900db1c4a7c03e0a",
+  "graphHash": "sha256:0cf52a5f08e087e2c36996debe951a11b1624d92f3873ed4a2ae9e38b73a34c2",
   "application": {
     "id": "minimal-app",
     "image": {
@@ -12,7 +12,7 @@
         "port": 3000
       }
     },
-    "environmentNames": ["PORT"]
+    "environmentNames": ["SERVICE_PORT"]
   },
   "http": {
     "logicalName": "minimal-app-http-public",
@@ -30,7 +30,7 @@
         "targetFunctionId": "hello"
       }
     ],
-    "configurationNames": ["PORT"]
+    "configurationNames": ["SERVICE_PORT"]
   },
   "jobs": [],
   "schedules": [],
@@ -39,7 +39,9 @@
   "buckets": [],
   "caches": [],
   "iam": {
-    "serviceRole": { "statements": [] },
+    "serviceRole": {
+      "statements": []
+    },
     "perFunction": []
   },
   "observability": {

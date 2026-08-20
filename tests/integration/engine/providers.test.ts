@@ -327,7 +327,7 @@ describe("provider and generation integration", () => {
       input: z.object({}),
       output: z.object({ value: z.number() }),
       dependencies: { cache: { prices: cache } },
-      handler: async (_input, context) => {
+      handler: async (_input, _request, context) => {
         await context.cache.prices.set("sku-1", 42);
         return { value: (await context.cache.prices.get("sku-1")) ?? 0 };
       },
@@ -370,7 +370,7 @@ describe("provider and generation integration", () => {
         id: "orders.undeclared",
         input: z.object({}),
         output: z.object({ value: z.number() }),
-        handler: async (_input, context) => {
+        handler: async (_input, _request, context) => {
           const forged = context as unknown as {
             readonly cache: { readonly prices: { readonly get: (key: string) => Promise<number> } };
           };

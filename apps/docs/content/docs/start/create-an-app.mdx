@@ -1,0 +1,49 @@
+---
+title: Create an application
+description: Install the prerequisites, choose a template, and understand the generated project.
+---
+
+## Prerequisites
+
+- Bun 1.3.10.
+- Pulumi and AWS credentials only when you keep the default AWS/Pulumi choices.
+
+Create a project with the supported generator:
+
+```sh
+bunx create-zsys@latest my-app
+cd my-app
+```
+
+For a local-only API project:
+
+```sh
+bunx create-zsys@latest my-api --template api --cloud none --deploy none
+```
+
+Templates are `minimal`, `api`, and `agent`. Use `--no-install`, `--no-git`, or `--no-examples`
+only when the surrounding automation owns that step. Generation validates its destination first and
+does not leave a partially created project after a failure.
+
+## Generated structure
+
+```text
+my-app/
+├── src/
+│   ├── app.ts
+│   ├── functions/
+│   └── routes/
+│       └── hello/
+│           └── route.ts
+├── tests/
+├── package.json
+├── tsconfig.json
+└── zsys.config.ts
+```
+
+ZSYS always discovers `src/**/*.ts`, starts from `src/app.ts`, and writes derived artifacts to
+`.zsys/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
+These conventions are intentionally not configurable.
+
+Run `zsys doctor` after creation to check Bun, project configuration, ports, and optional Pulumi
+requirements without printing secret values.

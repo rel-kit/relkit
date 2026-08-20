@@ -49,6 +49,18 @@
     {
       "functionId": "orders.handle-created",
       "capability": "jobs",
+      "resourceId": "receipts.send-job",
+      "actions": ["sqs:SendMessage"]
+    },
+    {
+      "functionId": "receipts.send",
+      "capability": "jobs",
+      "resourceId": "receipts.send-job",
+      "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+    },
+    {
+      "functionId": "zsys.event.orders.listener.handler",
+      "capability": "jobs",
       "resourceId": "orders.listener",
       "actions": [
         "sqs:ReceiveMessage",
@@ -58,16 +70,10 @@
       ]
     },
     {
-      "functionId": "orders.handle-created",
+      "functionId": "zsys.event.orders.listener.handler",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
       "actions": ["sqs:SendMessage"]
-    },
-    {
-      "functionId": "receipts.send",
-      "capability": "jobs",
-      "resourceId": "receipts.send-job",
-      "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
     }
   ]
 }

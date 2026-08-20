@@ -20,7 +20,7 @@ The repository SHALL provide a private Bun/TypeScript workspace whose committed 
 
 ### Requirement: V3 workspace ownership
 
-The workspace SHALL contain the public and internal package set, `apps/inspector`, `apps/fixture-commerce`, root acceptance tests, scripts, and default template defined by the approved v3 baseline, with each package exposing an explicit supported entry point.
+The workspace SHALL contain the public and internal package set, `apps/inspector`, `examples/commerce`, root acceptance tests, scripts, and default template defined by the approved v3 baseline, with each package exposing an explicit supported entry point.
 
 #### Scenario: Package export smoke test
 

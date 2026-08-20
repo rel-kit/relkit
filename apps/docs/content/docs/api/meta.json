@@ -1,0 +1,16 @@
+{
+  "title": "Generated API reference",
+  "pages": [
+    "app",
+    "schema",
+    "functions",
+    "routes",
+    "events",
+    "jobs",
+    "buckets",
+    "cache",
+    "tools",
+    "agents",
+    "testing"
+  ]
+}

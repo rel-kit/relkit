@@ -26,6 +26,7 @@ export const EMPTY_SIGNAL_FILTERS: SignalFilters = Object.freeze({
 });
 
 export interface TimelineEntry {
+  readonly id: string;
   readonly kind: string;
   readonly at: string;
   readonly targetId?: string;
@@ -116,9 +117,11 @@ export function requestTimeline(
   related: readonly InspectorObject[],
 ): readonly TimelineEntry[] {
   const entries: TimelineEntry[] = [];
+  let sequence = 0;
   const add = (kind: string, at: string, value: InspectorObject = {}): void => {
     if (at === "") return;
     entries.push({
+      id: `${kind}:${at}:${sequence++}`,
       kind,
       at,
       ...(text(value.targetId) ? { targetId: text(value.targetId) } : {}),
@@ -144,7 +147,7 @@ export function requestTimeline(
   return entries.sort(byTimelineTime);
 }
 
-function signalKey(value: InspectorObject): string {
+export function signalKey(value: InspectorObject): string {
   const signal = text(value.signal);
   const id =
     text(value.requestId) ||

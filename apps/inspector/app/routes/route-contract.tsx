@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { openApiOperation } from "../../lib/route-openapi";
 import type { InspectorObject } from "../../lib/api-types";
+import { signalKey } from "../../lib/observability-model";
 import { SourceLink } from "../source-link";
 
 export function RouteContract({
@@ -44,6 +46,12 @@ export function RouteContract({
             </dd>
           </div>
         </dl>
+        <p className="supporting-copy">
+          <Link className="text-link" href="/api-reference">
+            Explore this operation in the active Scalar API Reference{" "}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </p>
       </section>
       <div className="route-contract-grid">
         <JsonPanel title="Request mapping" value={config?.request} />
@@ -73,8 +81,8 @@ function RecentRequests({ requests }: { readonly requests: readonly InspectorObj
         <p className="supporting-copy">No requests are retained for this route.</p>
       ) : (
         <ul className="request-list">
-          {requests.map((request, index) => (
-            <RequestRow key={text(request.requestId) || String(index)} request={request} />
+          {requests.map((request) => (
+            <RequestRow key={signalKey(request)} request={request} />
           ))}
         </ul>
       )}

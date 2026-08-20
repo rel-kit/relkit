@@ -12,7 +12,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: "sync",
         publicContext: context(),
-        handler: (input, current) => {
+        handler: (input, _request, current) => {
           syncSignal = current.signal;
           return input.toUpperCase();
         },
@@ -22,7 +22,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: "async",
         publicContext: context(),
-        handler: async (input, current) => {
+        handler: async (input, _request, current) => {
           expect(current.signal).toBeInstanceOf(AbortSignal);
           return `${input}-done`;
         },
@@ -92,6 +92,40 @@ describe("runtime handler bridge", () => {
     }
   });
 
+  test("normalizes returned plain and Effect failures", async () => {
+    const failure = Object.assign(new Error("Order missing"), {
+      name: "DeclaredError",
+      id: "orders.not-found",
+      ref: { kind: "error", id: "orders.not-found" },
+      data: { orderId: "order-1" },
+      retry: "never" as const,
+      http: { status: 404 },
+    });
+    const plain = await Effect.runPromiseExit(
+      invokeUserHandler({
+        input: undefined,
+        publicContext: context(),
+        handler: () => ({ _tag: "FunctionFailure" as const, error: failure }),
+      }),
+    );
+    const effect = await Effect.runPromiseExit(
+      invokeUserHandler({
+        input: undefined,
+        publicContext: context(),
+        handler: () => Effect.fail(failure),
+      }),
+    );
+
+    for (const exit of [plain, effect]) {
+      expect(exit._tag).toBe("Failure");
+      if (exit._tag === "Failure") {
+        const reason = exit.cause.reasons.find(Cause.isFailReason);
+        expect(reason).toBeDefined();
+        if (reason !== undefined) expect(normalizeFailure(reason.error).kind).toBe("application");
+      }
+    }
+  });
+
   test("interrupts once and ignores a late Promise settlement", async () => {
     const controller = new AbortController();
     let resolveHandler!: (value: string) => void;
@@ -103,7 +137,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: undefined,
         publicContext: context(),
-        handler: (_input, current) => {
+        handler: (_input, _request, current) => {
           expect(current.signal).not.toBe(controller.signal);
           started();
           return new Promise<string>((resolve) => {

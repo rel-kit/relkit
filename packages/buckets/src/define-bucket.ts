@@ -26,7 +26,19 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
   readonly allowedContentTypes?: readonly string[];
 }
 
-/** Defines a managed object store with explicit visibility and bounded upload policy. */
+/**
+ * Defines a managed object store with explicit visibility and bounded upload policy.
+ *
+ * @example
+ * ```ts
+ * import { defineBucket } from "@zsys/buckets"
+ *
+ * const assets = defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 })
+ * void assets
+ * ```
+ * @category Resources
+ * @since 0.1.0
+ */
 export function defineBucket<const Id extends string>(
   options: DefineBucketOptions<Id>,
 ): BucketDescriptor<Id> {

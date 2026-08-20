@@ -26,7 +26,11 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     const target = refId(value.target);
     if (target && isTargetingDescriptor(descriptor.kind))
       add("targets-function", descriptor.id, target, "primary");
-    if (descriptor.kind === "route") addMiddlewareEdges(add, value.middleware, work, descriptor.id);
+    if (descriptor.kind === "route") {
+      addMiddlewareEdges(add, value.middleware, work, descriptor.id);
+      const store = isRecord(value.rateLimit) ? refId(value.rateLimit.store) : undefined;
+      if (store !== undefined) add("uses-cache", descriptor.id, store);
+    }
     if (descriptor.kind === "event-trigger") addEventEdges(add, descriptor, work);
     if (descriptor.kind === "tool" && target) add("exposes-as-tool", target, descriptor.id);
     if (descriptor.kind === "agent") addToolEdges(add, descriptor.id, value.tools);

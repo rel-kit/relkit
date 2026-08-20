@@ -1,4 +1,5 @@
 import type { DevLogEvent, DevLog } from "./dev.js";
+import { assertPortAvailable } from "./port-availability.js";
 
 export interface DevInspectorOptions {
   readonly command: readonly string[];
@@ -41,6 +42,7 @@ export async function startInspector(
       ),
     ),
     PORT: String(port),
+    HOSTNAME: hostname,
     ZSYS_INSPECTOR_PORT: String(port),
     ZSYS_BACKEND_PORT: String(backendPort),
     ZSYS_BACKEND_URL: `http://${hostname}:${backendPort}`,
@@ -64,7 +66,10 @@ export async function startInspector(
 async function resolvePort(port: number, hostname: string): Promise<number> {
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535)
     throw new RangeError("Inspector port must be between 0 and 65535.");
-  if (port !== 0) return port;
+  if (port !== 0) {
+    await assertPortAvailable(port, hostname, "--inspector-port");
+    return port;
+  }
   const server = Bun.serve({ hostname, port: 0, fetch: () => new Response() });
   const allocated = server.port;
   await server.stop(true);

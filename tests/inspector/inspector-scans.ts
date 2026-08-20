@@ -3,14 +3,29 @@ import { extname, relative, resolve } from "node:path";
 import * as ts from "typescript";
 import { dependencyName, importReferences } from "../../scripts/boundary-imports.ts";
 
-const allowedPackages = new Set(["next", "react", "react-dom"]);
-const sourceDirectories = ["apps/inspector/app", "apps/inspector/lib"] as const;
+const allowedPackages = new Set([
+  "@xyflow/react",
+  "lucide-react",
+  "next",
+  "react",
+  "react-aria-components",
+  "react-dom",
+]);
+const sourceDirectories = [
+  "apps/inspector/app",
+  "apps/inspector/components",
+  "apps/inspector/lib",
+] as const;
 const bundleExtensions = new Set([".js", ".json", ".map"]);
-const networkFiles = new Set(["apps/inspector/lib/api.ts", "apps/inspector/lib/stream.ts"]);
+const networkFiles = new Set([
+  "apps/inspector/app/%5Fzsys/backend/[...path]/route.ts",
+  "apps/inspector/lib/api.ts",
+  "apps/inspector/lib/stream.ts",
+]);
 
 export const FORBIDDEN_PAYLOAD_MARKERS = Object.freeze([
   "@zsys/",
-  "apps/fixture-commerce",
+  "examples/commerce",
   "packages/engine",
   "packages/providers-local",
   "packages/cloud-aws",

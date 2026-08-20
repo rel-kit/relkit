@@ -7,17 +7,21 @@ import {
   schemaEquivalent,
   schemaProperties,
 } from "./normalize-compat.js";
-import { isRecord, refId } from "./normalize-utils.js";
+import { isErrorDescriptorLike, isRecord, refId } from "./normalize-utils.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
+const RESERVED_ROUTE_MESSAGE = 'Routes under "/_zsys" are framework-reserved.';
 
 /** Checks route inputs, responses, and function-backed middleware contracts. */
 export function validateHttpCompatibility(work: NormalizationWork): void {
   for (const route of work.descriptors.filter((entry) => entry.kind === "route")) {
     const value = isRecord(route.value) ? route.value : {};
+    const path = typeof value.path === "string" ? value.path : "";
+    if (path === "/_zsys" || path.startsWith("/_zsys/"))
+      add(work, route, NORMALIZE_CODES.reservedRoute, RESERVED_ROUTE_MESSAGE);
     const target = referenceFor(work, value.target, "function");
     const targetValue = isRecord(target?.value) ? target.value : undefined;
     const inputReason = mappingCompatible(value.request, targetValue?.input);
@@ -29,14 +33,30 @@ export function validateHttpCompatibility(work: NormalizationWork): void {
 
 /** Canonicalizes path parameters so `/orders/:id` and `/orders/:orderId` collide. */
 export function routeCollisionKey(value: unknown): string {
-  if (!isRecord(value)) return " ";
+  return routeCollisionKeys(value)[0] ?? " ";
+}
+
+/** Returns every normalized runtime method/path variant for collision checks. */
+export function routeCollisionKeys(value: unknown): readonly string[] {
+  if (!isRecord(value)) return [" "];
   const method = typeof value.method === "string" ? value.method : "";
-  const routePath = typeof value.path === "string" ? value.path : "";
+  const routePaths = Array.isArray(value.runtimePaths)
+    ? value.runtimePaths.filter((entry): entry is string => typeof entry === "string")
+    : [typeof value.path === "string" ? value.path : ""];
+  return [
+    ...new Set(routePaths.map((routePath) => `${method} ${normalizeRuntimePath(routePath)}`)),
+  ];
+}
+
+function normalizeRuntimePath(routePath: string): string {
   const pattern = routePath
     .split("/")
-    .map((segment) => (segment.startsWith(":") ? ":" : segment))
+    .map((segment) => {
+      if (/^:[^{]+\{\.\+\}$/.test(segment) || segment.startsWith("*")) return ":*";
+      return segment.startsWith(":") ? ":" : segment;
+    })
     .join("/");
-  return `${method} ${pattern}`;
+  return pattern;
 }
 
 function validateResponses(
@@ -56,7 +76,7 @@ function validateResponses(
     if (response.kind === "error") {
       const errorId = typeof response.errorId === "string" ? response.errorId : "";
       const errors = Array.isArray(target?.errors) ? target.errors : [];
-      const declared = errors.find((error) => isRecord(error) && error.id === errorId);
+      const declared = errors.find((error) => isErrorDescriptorLike(error) && error.id === errorId);
       if (declared === undefined) {
         add(
           work,
@@ -66,7 +86,7 @@ function validateResponses(
         );
       } else if (
         response.schema !== undefined &&
-        isRecord(declared) &&
+        isErrorDescriptorLike(declared) &&
         schema(response.schema).ok &&
         schema(declared.data).ok &&
         !schemaEquivalent(response.schema, declared.data)

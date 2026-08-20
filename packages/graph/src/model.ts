@@ -1,4 +1,10 @@
 import type { JsonValue, SourceLocation } from "@zsys/contracts";
+import type {
+  AppNode,
+  EnvironmentVariableNode,
+  GeneratedAgentMarker,
+  GeneratedFunctionMarker,
+} from "./foundation-nodes.js";
 
 export const GRAPH_NODE_KINDS = [
   "app",
@@ -20,26 +26,6 @@ export interface GraphNodeBase<Kind extends GraphNodeKind = GraphNodeKind> {
   readonly id: string;
   readonly source: SourceLocation;
 }
-export interface AppNode extends GraphNodeBase<"app"> {
-  readonly environment?: JsonValue;
-  readonly providerProfiles?: readonly string[];
-  readonly observability?: JsonValue;
-  readonly defaults?: JsonValue;
-}
-export interface EnvironmentVariableNode extends GraphNodeBase<"env"> {
-  readonly name: string;
-  readonly type: string;
-  readonly requiredIn: readonly string[];
-  readonly hasDefault: boolean;
-  readonly sensitive: boolean;
-  readonly description?: string;
-}
-export interface GeneratedAgentMarker {
-  readonly generated: true;
-  readonly generatedBy: "agent";
-  readonly agentId: string;
-  readonly functionId: string;
-}
 export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly input: JsonValue;
   readonly output: JsonValue;
@@ -47,8 +33,9 @@ export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly dependencies?: JsonValue;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly generated?: GeneratedAgentMarker;
+  readonly generated?: GeneratedFunctionMarker;
 }
+export type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
 export interface MiddlewareTargetRef {
   readonly id: string;
   readonly targetFunctionId: string;
@@ -60,10 +47,18 @@ export interface TransformProjection {
 export interface HttpTriggerConfig {
   readonly method: string;
   readonly path: string;
+  readonly runtimePaths?: readonly string[];
   readonly request: JsonValue;
   readonly responses: JsonValue;
   readonly middleware: readonly MiddlewareTargetRef[];
   readonly transforms: readonly TransformProjection[];
+  readonly rateLimit?: {
+    readonly limit: number;
+    readonly windowMs: number;
+    readonly key: JsonValue;
+    readonly storeId?: string;
+  };
+  readonly maxBodyBytes?: number;
   readonly timeoutMs?: number;
 }
 export type SelectorExpansion = `${string}@${number}`;

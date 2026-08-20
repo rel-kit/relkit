@@ -1,6 +1,7 @@
 import type { JsonValue } from "@zsys/contracts";
 import { getJsonSchema, type StandardSchemaV1 } from "@zsys/schema";
 import type { EvaluatorDescriptorSnapshot } from "./evaluator-protocol.js";
+import { isErrorDescriptorLike } from "../normalize-utils.js";
 
 /** Keeps descriptor identity while replacing executable values with JSON markers. */
 export function snapshotDescriptor(value: SnapshotDescriptorLike): EvaluatorDescriptorSnapshot {
@@ -17,16 +18,32 @@ function snapshotValue(value: unknown, seen: WeakSet<object>, depth = 0): JsonVa
   if (typeof value === "number")
     return Number.isFinite(value) ? value : marker("non-finite-number");
   if (typeof value === "undefined") return marker("undefined");
-  if (typeof value === "function") return marker("function", value.name);
+  if (depth > 8) return marker("depth-limit");
+  if (typeof value === "function") {
+    return isErrorDescriptorLike(value)
+      ? snapshotObject(value, seen, depth)
+      : marker("function", (value as { readonly name: string }).name);
+  }
   if (typeof value === "symbol") return marker("symbol", value.description);
   if (typeof value === "bigint") return marker("bigint");
   const schema = snapshotSchema(value);
   if (schema !== undefined) return schema;
-  if (depth > 8) return marker("depth-limit");
+  if (Array.isArray(value)) {
+    if (seen.has(value)) return marker("cycle");
+    seen.add(value);
+    try {
+      return value.map((entry) => snapshotValue(entry, seen, depth + 1));
+    } finally {
+      seen.delete(value);
+    }
+  }
+  return snapshotObject(value, seen, depth);
+}
+
+function snapshotObject(value: object, seen: WeakSet<object>, depth: number): JsonValue {
   if (seen.has(value)) return marker("cycle");
   seen.add(value);
   try {
-    if (Array.isArray(value)) return value.map((entry) => snapshotValue(entry, seen, depth + 1));
     const output: Record<string, JsonValue> = {};
     for (const key of Object.keys(value).sort()) {
       const descriptor = Object.getOwnPropertyDescriptor(value, key);

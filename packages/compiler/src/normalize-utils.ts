@@ -13,6 +13,18 @@ export function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+export function isErrorDescriptorLike(value: unknown): value is Record<string, any> {
+  if (value === null || (typeof value !== "object" && typeof value !== "function")) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    candidate.kind === "error" &&
+    typeof candidate.id === "string" &&
+    isRecord(candidate.ref) &&
+    candidate.ref.kind === "error" &&
+    candidate.ref.id === candidate.id
+  );
+}
+
 export function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }
@@ -52,7 +64,12 @@ export function method(value: unknown): string | undefined {
 export function path(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const raw = value.trim().replaceAll("\\", "/");
-  if (!raw.startsWith("/") || raw.includes("?") || raw.includes("#")) return undefined;
+  if (
+    !raw.startsWith("/") ||
+    raw.includes("#") ||
+    raw.split("/").some((part) => part.includes("?") && !/^\*[A-Za-z_][A-Za-z0-9_]*\?$/.test(part))
+  )
+    return undefined;
   const parts = raw.split("/").filter((part, index) => part !== "" || index === 0);
   const result = `/${parts.slice(1).join("/")}`.replace(/\/+/g, "/");
   return result === "/" ? result : result.replace(/\/$/, "");

@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import type { MappingValue } from "./request-mapping.js";
 import type { HttpRouteRequest } from "./materialize-routes.js";
 
-export function requestFromContext(context: Context): HttpRouteRequest {
+export function requestFromContext(context: Context, pathPattern?: string): HttpRouteRequest {
   const query: Record<string, MappingValue> = {};
   const headers: Record<string, MappingValue> = {};
   for (const [key, value] of new URL(context.req.url).searchParams.entries()) {
@@ -24,6 +24,7 @@ export function requestFromContext(context: Context): HttpRouteRequest {
   }
   return Object.freeze({
     request: context.req.raw,
+    ...(pathPattern === undefined ? {} : { pathPattern }),
     params: Object.freeze({ ...context.req.param() }),
     query: Object.freeze(query),
     headers: Object.freeze(headers),

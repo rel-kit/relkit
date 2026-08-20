@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./help": {
+      "types": "./dist/cli-help-model.d.ts",
+      "import": "./dist/cli-help-model.js"
     }
   },
   "dependencies": {
@@ -27,10 +31,13 @@
     "@zsys/runtime-effect": "workspace:*",
     "@zsys/runtime-hono": "workspace:*",
     "@zsys/supervisor": "workspace:*",
-    "effect": "4.0.0-beta.107"
+    "effect": "4.0.0-beta.107",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc -b && bun run ../../scripts/package-inspector.ts",
     "check": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
   }

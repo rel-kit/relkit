@@ -33,12 +33,12 @@ const child = defineFunction({
 });
 const createdPayload = z.object({ orderId: z.string() });
 const changedPayload = z.object({ orderId: z.string(), state: z.string() });
-const eventCreated = defineEvent({
+export const eventCreated = defineEvent({
   id: "types.created",
   version: 1,
   payload: createdPayload,
 });
-const eventChanged = defineEvent({
+export const eventChanged = defineEvent({
   id: "types.changed",
   version: 2,
   payload: changedPayload,
@@ -143,7 +143,7 @@ const parent = defineFunction({
     cache: { cache, numericCache },
     agents: { agent },
   },
-  handler: async (value, context) => {
+  handler: async (value, _request, context) => {
     const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
     const queued = await context.jobs.job.enqueue({ id: value.id });
     const published = await context.events.created.publish({ orderId: value.id });
@@ -167,8 +167,6 @@ const parent = defineFunction({
 const routeRequest = http.input({ id: http.path("id"), limit: http.query("limit") });
 const route = defineRoute({
   id: "types.route",
-  method: "GET",
-  path: "/orders/:id",
   target: parent,
   request: routeRequest,
   responses: [http.success(200, output)],
@@ -180,7 +178,7 @@ const mapped: { id: string; limit: string } = {
 void route;
 void mapped;
 
-const selector = events.anyOf(eventCreated, eventChanged);
+const selector = events.anyOf("types.created", "types.changed");
 const selected: EventSelectorInput<typeof selector> = {
   instanceId: "event-1",
   eventId: "types.created",
@@ -213,21 +211,30 @@ const invalidSelected: EventSelectorInput<typeof selector> = {
 };
 void invalidSelected;
 
-const singleTrigger = onEvent(eventCreated, {
-  id: "types.single-trigger",
-  target: singleEnvelopeTarget,
-  delivery: "durable",
-});
-const anyTrigger = onEvent(selector, {
-  id: "types.any-trigger",
-  target: unionEnvelopeTarget,
-  delivery: "durable",
-});
-const matchTrigger = onEvent(events.match("types.*"), {
-  id: "types.match-trigger",
-  target: unionEnvelopeTarget,
-  delivery: "durable",
-});
+const singleTrigger = onEvent(
+  "types.created",
+  async (payload, context) => {
+    const orderId: string = payload.orderId;
+    const eventId: string = context.event.eventId;
+    void orderId;
+    void eventId;
+  },
+  { id: "types.single-trigger" },
+);
+const anyTrigger = onEvent(
+  selector,
+  async (envelope) => {
+    assertSelectedEnvelope(envelope);
+  },
+  { id: "types.any-trigger" },
+);
+const matchTrigger = onEvent(
+  events.match("types.*"),
+  async (envelope) => {
+    assertSelectedEnvelope(envelope);
+  },
+  { id: "types.match-trigger" },
+);
 const rawSelector = events.all({ payload: "unknown", purpose: "telemetry" });
 const rawEnvelope: UnknownEventEnvelope = {
   instanceId: "event-raw",
@@ -259,22 +266,31 @@ const rawTarget = defineFunction({
     return { ok: true };
   },
 });
-const rawTrigger = onEvent(rawSelector, {
-  id: "types.raw-trigger",
-  target: rawTarget,
-  delivery: "ephemeral",
-});
+const rawTrigger = onEvent(
+  rawSelector,
+  async (envelope) => {
+    const payload: unknown = envelope.payload;
+    void payload;
+  },
+  { id: "types.raw-trigger", delivery: "ephemeral" },
+);
 void singleTrigger;
 void anyTrigger;
 void matchTrigger;
 void rawInput;
 void rawTrigger;
 
-const trigger = onEvent(eventCreated, {
-  id: "types.trigger",
-  target: child,
-  delivery: "durable",
-});
+const trigger = onEvent(
+  "types.created",
+  async (payload, context) => {
+    const orderId: string = payload.orderId;
+    const result: { ok: boolean } = await context.functions.child({ id: orderId });
+    void result;
+  },
+  { id: "types.trigger", dependencies: { functions: { child } } },
+);
+// @ts-expect-error event names come from the generated registry
+onEvent("types.missing", async () => undefined);
 const triggerKind: "event-trigger" = trigger.kind;
 void triggerKind;
 

@@ -1,92 +1,38 @@
-import { deepFreeze, isStableId } from "@zsys/contracts";
+import { deepFreeze } from "@zsys/contracts";
+import type { EventName } from "./event-registry.js";
 import {
-  isEventDescriptor,
-  type EventDescriptor,
-  type EventDescriptorAny,
-  type EventEnvelopeFor,
-  type UnknownEventEnvelope,
-} from "./define-event.js";
+  type AllEventPurpose,
+  type AllEventSelector,
+  type AnyOfEventSelector,
+  type EventSelectorAny,
+  type EventSelectorReference,
+  type MatchEventSelector,
+  type MatchingEventName,
+  type SingleEventSelector,
+} from "./selector-types.js";
 
-export interface EventSelectorReference<E extends EventDescriptorAny = EventDescriptorAny> {
-  readonly eventId: E["id"];
-  readonly version: E["version"];
-  readonly __event?: E;
+export function single<const Name extends EventName>(name: Name): SingleEventSelector<Name> {
+  assertEventName(name);
+  return deepFreeze({ kind: "single" as const, event: { eventId: name } });
 }
 
-export interface SingleEventSelector<E extends EventDescriptorAny = EventDescriptorAny> {
-  readonly kind: "single";
-  readonly event: EventSelectorReference<E>;
-  readonly __input?: EventEnvelopeFor<E>;
-}
-
-export interface AnyOfEventSelector<
-  Events extends readonly EventDescriptorAny[] = readonly EventDescriptorAny[],
-> {
-  readonly kind: "anyOf";
-  readonly events: readonly EventSelectorReference<Events[number]>[];
-  readonly __input?: EventEnvelopeFor<Events[number]>;
-}
-
-export interface MatchEventSelector<
-  Pattern extends string = string,
-  Matched extends readonly EventDescriptorAny[] = readonly [],
-> {
-  readonly kind: "match";
-  readonly pattern: Pattern;
-  readonly __input?: Matched extends readonly []
-    ? UnknownEventEnvelope
-    : EventEnvelopeFor<Matched[number]>;
-}
-
-export interface AllEventSelector {
-  readonly kind: "all";
-  readonly payload: "unknown";
-  readonly purpose?: AllEventPurpose;
-  readonly __input?: UnknownEventEnvelope;
-}
-
-export type AllEventPurpose = "audit" | "telemetry" | "development";
-export type EventSelector =
-  SingleEventSelector | AnyOfEventSelector | MatchEventSelector | AllEventSelector;
-export type EventSelectorAny = EventSelector;
-
-export type EventSelectorInput<S extends EventSelectorAny> =
-  S extends SingleEventSelector<infer Event>
-    ? EventEnvelopeFor<Event>
-    : S extends AnyOfEventSelector<infer Events>
-      ? EventEnvelopeFor<Events[number]>
-      : S extends MatchEventSelector<infer _Pattern, infer Matched>
-        ? Matched extends readonly []
-          ? UnknownEventEnvelope
-          : EventEnvelopeFor<Matched[number]>
-        : S extends AllEventSelector
-          ? UnknownEventEnvelope
-          : UnknownEventEnvelope;
-
-export function single<const Event extends EventDescriptorAny>(
-  event: Event,
-): SingleEventSelector<Event> {
-  assertEvent(event);
+export function anyOf<const Names extends readonly [EventName, ...EventName[]]>(
+  ...names: Names
+): AnyOfEventSelector<Names> {
+  names.forEach(assertEventName);
+  if (new Set(names).size !== names.length)
+    throw new TypeError("Event selector names must be unique");
   return deepFreeze({
-    kind: "single" as const,
-    event: eventReference(event),
-  }) as SingleEventSelector<Event>;
+    kind: "anyOf" as const,
+    events: names.map((eventId) => ({ eventId })),
+  }) as AnyOfEventSelector<Names>;
 }
 
-export function anyOf<const Events extends readonly [EventDescriptorAny, ...EventDescriptorAny[]]>(
-  ...events: Events
-): AnyOfEventSelector<Events> {
-  const references = events.map((event) => {
-    assertEvent(event);
-    return eventReference(event);
-  });
-  assertUnique(references);
-  return deepFreeze({ kind: "anyOf" as const, events: references }) as AnyOfEventSelector<Events>;
-}
-
-export function match<const Pattern extends string>(pattern: Pattern): MatchEventSelector<Pattern> {
+export function match<const Pattern extends string>(
+  pattern: Pattern,
+): MatchEventSelector<Pattern, MatchingEventName<Pattern>> {
   assertEventPattern(pattern);
-  return deepFreeze({ kind: "match" as const, pattern }) as MatchEventSelector<Pattern>;
+  return deepFreeze({ kind: "match" as const, pattern });
 }
 
 export function all(options: {
@@ -104,6 +50,19 @@ export function all(options: {
   });
 }
 
+/**
+ * Builds typed selectors for one event, a list, a registry pattern, or every event.
+ *
+ * @example
+ * ```ts
+ * import { events } from "@zsys/events"
+ *
+ * const orderEvents = events.match("orders.*")
+ * void orderEvents
+ * ```
+ * @category Events
+ * @since 0.1.0
+ */
 export const events = Object.freeze({ single, anyOf, match, all });
 
 export function isEventSelector(value: unknown): value is EventSelectorAny {
@@ -114,8 +73,7 @@ export function isEventSelector(value: unknown): value is EventSelectorAny {
       Array.isArray(value.events) &&
       value.events.length > 0 &&
       value.events.every(isEventSelectorReference) &&
-      new Set(value.events.map((event) => `${event.eventId}@${event.version}`)).size ===
-        value.events.length
+      new Set(value.events.map((event) => event.eventId)).size === value.events.length
     );
   }
   if (value.kind === "match") return isEventPattern(value.pattern);
@@ -132,69 +90,54 @@ export function assertEventSelector(value: unknown): asserts value is EventSelec
 
 export function copyEventSelector(value: EventSelectorAny): EventSelectorAny {
   assertEventSelector(value);
-  if (value.kind === "single") {
-    return deepFreeze({ kind: "single" as const, event: { ...value.event } });
-  }
-  if (value.kind === "anyOf") {
-    return deepFreeze({
-      kind: "anyOf" as const,
-      events: value.events.map((event) => ({ ...event })),
-    });
-  }
-  if (value.kind === "match") {
-    return deepFreeze({ kind: "match" as const, pattern: value.pattern });
-  }
+  if (value.kind === "single") return deepFreeze({ kind: "single", event: { ...value.event } });
+  if (value.kind === "anyOf")
+    return deepFreeze({ kind: "anyOf", events: value.events.map((event) => ({ ...event })) });
+  if (value.kind === "match") return deepFreeze({ kind: "match", pattern: value.pattern });
   return deepFreeze({
-    kind: "all" as const,
-    payload: "unknown" as const,
+    kind: "all",
+    payload: "unknown",
     ...(value.purpose === undefined ? {} : { purpose: value.purpose }),
   });
 }
 
 export function isEventPattern(value: unknown): value is string {
-  if (typeof value !== "string" || value.length === 0 || value.trim() !== value) return false;
-  return value.split(".").every((segment) => {
-    return segment === "*" || segment === "**" || /^[A-Za-z0-9_-]+$/.test(segment);
-  });
+  return (
+    typeof value === "string" &&
+    value.length > 0 &&
+    value.trim() === value &&
+    value
+      .split(".")
+      .every((segment) => segment === "*" || segment === "**" || /^[A-Za-z0-9_-]+$/.test(segment))
+  );
 }
 
 export function assertEventPattern(value: unknown): asserts value is string {
-  if (!isEventPattern(value)) {
+  if (!isEventPattern(value))
     throw new TypeError(
       "Event patterns use non-empty dot segments, * for one segment, or ** for zero or more",
     );
-  }
-}
-
-function eventReference<E extends EventDescriptorAny>(event: E): EventSelectorReference<E> {
-  return Object.freeze({ eventId: event.id, version: event.version });
-}
-
-function assertEvent(value: unknown): asserts value is EventDescriptorAny {
-  if (!isEventDescriptor(value)) throw new TypeError("Event selectors require event descriptors");
-}
-
-function assertUnique(eventsToCheck: readonly EventSelectorReference[]): void {
-  if (
-    new Set(eventsToCheck.map((event) => `${event.eventId}@${event.version}`)).size !==
-    eventsToCheck.length
-  )
-    throw new TypeError("Event selector entries must be unique");
 }
 
 function isEventSelectorReference(value: unknown): value is EventSelectorReference {
-  if (!isRecord(value)) return false;
   return (
+    isRecord(value) &&
     Reflect.ownKeys(value).every((key) => key === "eventId" || key === "version") &&
-    isStableId(value.eventId) &&
-    Number.isSafeInteger(value.version) &&
-    (value.version as number) > 0
+    typeof value.eventId === "string" &&
+    value.eventId.trim() !== "" &&
+    (value.version === undefined || (Number.isSafeInteger(value.version) && value.version > 0))
   );
+}
+
+function assertEventName(value: unknown): asserts value is EventName {
+  if (typeof value !== "string" || value.trim() === "")
+    throw new TypeError("Event names must be non-empty strings");
 }
 
 function isPurpose(value: unknown): value is AllEventPurpose {
   return value === "audit" || value === "telemetry" || value === "development";
 }
+
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

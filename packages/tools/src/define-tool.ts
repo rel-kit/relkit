@@ -55,7 +55,22 @@ export interface DefineToolOptions<
   readonly timeoutMs?: number;
 }
 
-/** Defines a tool boundary with side-effect and approval metadata for safe invocation. */
+/**
+ * Defines a tool boundary with side-effect and approval metadata for safe invocation.
+ *
+ * @example
+ * ```ts
+ * import { defineFunction } from "@zsys/functions"
+ * import { z } from "@zsys/schema"
+ * import { defineTool } from "@zsys/tools"
+ *
+ * const target = defineFunction({ id: "lookup", input: z.string(), output: z.string(), handler: async (id) => id })
+ * const tool = defineTool({ id: "lookup", target, description: "Look up an order", sideEffect: "read", approval: "never" })
+ * void tool
+ * ```
+ * @category Tools
+ * @since 0.1.0
+ */
 export function defineTool<const Id extends string, const Target extends FunctionRefAny>(
   options: DefineToolOptions<Id, Target>,
 ): ToolDescriptor<Id, Target> {

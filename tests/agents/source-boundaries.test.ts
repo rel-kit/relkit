@@ -13,9 +13,9 @@ describe("agent declaration/source boundaries", () => {
   test("the shared authoring scan rejects vendor models and credentials on agents", async () => {
     const root = await mkdtemp(join(process.env.TMPDIR ?? "/tmp", "zsys-agent-scan-"));
     try {
-      const source = join(root, "apps/fixture-commerce/src/invalid.agent.ts");
+      const source = join(root, "examples/commerce/src/invalid.agent.ts");
       await mkdir(join(root, "packages"), { recursive: true });
-      await mkdir(join(root, "apps/fixture-commerce/src"), { recursive: true });
+      await mkdir(join(root, "examples/commerce/src"), { recursive: true });
       await writeFile(
         source,
         `defineAgent({ id: "bad.agent", input, output, modelProfile: "gpt-4o", credentials: { apiKey: "secret" }, instructions: "bad", tools: [], limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1 } });\n`,

@@ -1,0 +1,21 @@
+---
+title: Tools, approvals, and agents
+description: Expose safe function targets to bounded model-driven agents.
+---
+
+<include cwd lang="ts" meta='title="examples/commerce/src/tools/lookup-order.tool.ts"'>
+  ../../examples/commerce/src/tools/lookup-order.tool.ts
+</include>
+
+A tool wraps a target function with a human description, side-effect classification, approval policy,
+and timeout. The target's schemas remain the validation contract. Use `approval: "always"` for sensitive
+or mutating work; never hide side effects behind a read classification.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/agents/order-support.agent.ts"'>
+  ../../examples/commerce/src/agents/order-support.agent.ts
+</include>
+
+Agents declare an input/output contract, model profile, instructions, allowlisted tools, and hard limits
+for steps, calls, and time. Only allowlisted tool IDs can execute. Approval decisions, tool invocations,
+model steps, and errors are traced with redaction. Test agents use scripted model output so tests stay
+deterministic and do not call external models.

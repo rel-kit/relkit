@@ -1,5 +1,7 @@
+import { Badge } from "../components/ui/badge";
+import { DataTable, DataTableCell, DataTableEmpty, DataTableHead } from "../components/ui/table";
 import type { InspectorObject } from "../lib/api-types";
-import { traceGroups, type SignalKind, text, number } from "../lib/observability-model";
+import { traceGroups, signalKey, type SignalKind, text, number } from "../lib/observability-model";
 
 export function SignalRows({
   kind,
@@ -8,99 +10,162 @@ export function SignalRows({
   readonly kind: SignalKind;
   readonly items: readonly InspectorObject[];
 }) {
-  if (items.length === 0)
-    return <p className="panel route-state">No retained {kind} match the active filters.</p>;
-  return (
-    <ul className="route-list" aria-label={`${kind} results`}>
-      {kind === "requests" &&
-        items.map((item, index) => <RequestRow item={item} key={key(item, index)} />)}
-      {kind === "logs" && items.map((item, index) => <LogRow item={item} key={key(item, index)} />)}
-      {kind === "traces" &&
-        traceGroups(items).map((group) => <TraceRow group={group} key={group.traceId} />)}
-    </ul>
-  );
+  if (kind === "requests") return <RequestTable items={items} />;
+  if (kind === "logs") return <LogTable items={items} />;
+  return <TraceTable items={items} />;
 }
 
-function RequestRow({ item }: { readonly item: InspectorObject }) {
-  const id = text(item.requestId) || "request unavailable";
-  const route = text(item.normalizedRoute) || text(item.rawPath) || "HTTP request";
+function RequestTable({ items }: { readonly items: readonly InspectorObject[] }) {
   return (
-    <li className="panel route-row">
-      <div>
-        <strong>
-          {text(item.method) || "HTTP"} {route}
-        </strong>
-        <p className="supporting-copy">
-          {text(item.outcome) || "outcome unavailable"} · HTTP {number(item.status) ?? "—"}
-        </p>
-      </div>
-      <div className="route-row-detail">
-        <span>{bounded(id)}</span>
-        <span>{bounded(text(item.completedAt) || text(item.startedAt) || "time unavailable")}</span>
-      </div>
-      <a className="text-link" href={`/requests/${encodeURIComponent(id)}`}>
-        Open request <span aria-hidden="true">→</span>
-      </a>
-    </li>
-  );
-}
-
-function LogRow({ item }: { readonly item: InspectorObject }) {
-  const requestId = text(item.requestId) || text(item.correlationId);
-  const traceId = text(item.traceId);
-  return (
-    <li className="panel route-row">
-      <div>
-        <strong>{bounded(text(item.message) || "Structured log")}</strong>
-        <p className="supporting-copy">
-          {text(item.level) || "level unavailable"} ·{" "}
-          {text(item.component) || "component unavailable"}
-        </p>
-      </div>
-      <div className="route-row-detail">
-        <span>{bounded(text(item.timestamp) || "time unavailable")}</span>
-        {requestId !== "" && <span>Request {bounded(requestId)}</span>}
-      </div>
-      <div className="request-links">
-        {requestId !== "" && (
-          <a className="text-link" href={`/requests/${encodeURIComponent(requestId)}`}>
-            Request
-          </a>
+    <DataTable>
+      <caption className="sr-only">Request results</caption>
+      <thead>
+        <tr>
+          <DataTableHead>Request</DataTableHead>
+          <DataTableHead>Route</DataTableHead>
+          <DataTableHead>Outcome</DataTableHead>
+          <DataTableHead>Time</DataTableHead>
+          <DataTableHead>Action</DataTableHead>
+        </tr>
+      </thead>
+      <tbody>
+        {items.length === 0 ? (
+          <tr>
+            <DataTableEmpty>No retained requests match the active filters.</DataTableEmpty>
+          </tr>
+        ) : (
+          items.map((item) => {
+            const id = text(item.requestId);
+            return (
+              <tr key={signalKey(item)}>
+                <DataTableCell>
+                  <code>{bounded(id || "unavailable")}</code>
+                </DataTableCell>
+                <DataTableCell>
+                  <strong>{text(item.method) || "HTTP"}</strong>{" "}
+                  {text(item.normalizedRoute) || text(item.rawPath) || "request"}
+                </DataTableCell>
+                <DataTableCell>
+                  <Badge>{text(item.outcome) || "unknown"}</Badge> HTTP {number(item.status) ?? "—"}
+                </DataTableCell>
+                <DataTableCell>
+                  {bounded(text(item.completedAt) || text(item.startedAt) || "unavailable")}
+                </DataTableCell>
+                <DataTableCell>
+                  {id === "" ? (
+                    "Unavailable"
+                  ) : (
+                    <a className="text-link" href={`/requests/${encodeURIComponent(id)}`}>
+                      Open request
+                    </a>
+                  )}
+                </DataTableCell>
+              </tr>
+            );
+          })
         )}
-        {traceId !== "" && (
-          <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
-            Trace
-          </a>
-        )}
-      </div>
-    </li>
+      </tbody>
+    </DataTable>
   );
 }
 
-function TraceRow({ group }: { readonly group: ReturnType<typeof traceGroups>[number] }) {
+function LogTable({ items }: { readonly items: readonly InspectorObject[] }) {
   return (
-    <li className="panel route-row">
-      <div>
-        <strong>{bounded(group.traceId)}</strong>
-        <p className="supporting-copy">
-          {group.outcome || "outcome unavailable"} · {group.spans.length} span(s)
-        </p>
-      </div>
-      <div className="route-row-detail">
-        <span>
-          {group.durationMs === undefined ? "Duration unavailable" : `${group.durationMs} ms`}
-        </span>
-        <span>{bounded(group.startedAt || "time unavailable")}</span>
-      </div>
-      <a className="text-link" href={`/traces/${encodeURIComponent(group.traceId)}`}>
-        Open trace <span aria-hidden="true">→</span>
-      </a>
-    </li>
+    <DataTable>
+      <caption className="sr-only">Log results</caption>
+      <thead>
+        <tr>
+          <DataTableHead>Message</DataTableHead>
+          <DataTableHead>Context</DataTableHead>
+          <DataTableHead>Time</DataTableHead>
+          <DataTableHead>Links</DataTableHead>
+        </tr>
+      </thead>
+      <tbody>
+        {items.length === 0 ? (
+          <tr>
+            <DataTableEmpty>No retained logs match the active filters.</DataTableEmpty>
+          </tr>
+        ) : (
+          items.map((item) => {
+            const requestId = text(item.requestId) || text(item.correlationId);
+            const traceId = text(item.traceId);
+            return (
+              <tr key={signalKey(item)}>
+                <DataTableCell>
+                  <strong>{bounded(text(item.message) || "Structured log")}</strong>
+                </DataTableCell>
+                <DataTableCell>
+                  <Badge>{text(item.level) || "unknown"}</Badge>{" "}
+                  {text(item.component) || "component unavailable"}
+                </DataTableCell>
+                <DataTableCell>{bounded(text(item.timestamp) || "unavailable")}</DataTableCell>
+                <DataTableCell>
+                  <span className="request-links">
+                    {requestId && (
+                      <a className="text-link" href={`/requests/${encodeURIComponent(requestId)}`}>
+                        Request
+                      </a>
+                    )}
+                    {traceId && (
+                      <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
+                        Trace
+                      </a>
+                    )}
+                  </span>
+                </DataTableCell>
+              </tr>
+            );
+          })
+        )}
+      </tbody>
+    </DataTable>
   );
 }
 
-function key(item: InspectorObject, index: number): string {
-  return `${text(item.signal)}:${text(item.requestId) || text(item.cursor) || text(item.spanId) || index}`;
+function TraceTable({ items }: { readonly items: readonly InspectorObject[] }) {
+  const groups = traceGroups(items);
+  return (
+    <DataTable>
+      <caption className="sr-only">Trace results</caption>
+      <thead>
+        <tr>
+          <DataTableHead>Trace</DataTableHead>
+          <DataTableHead>Outcome</DataTableHead>
+          <DataTableHead>Duration</DataTableHead>
+          <DataTableHead>Started</DataTableHead>
+          <DataTableHead>Action</DataTableHead>
+        </tr>
+      </thead>
+      <tbody>
+        {groups.length === 0 ? (
+          <tr>
+            <DataTableEmpty>No retained traces match the active filters.</DataTableEmpty>
+          </tr>
+        ) : (
+          groups.map((group) => (
+            <tr key={group.traceId}>
+              <DataTableCell>
+                <code>{bounded(group.traceId)}</code>
+              </DataTableCell>
+              <DataTableCell>
+                <Badge>{group.outcome || "unknown"}</Badge> · {group.spans.length} spans
+              </DataTableCell>
+              <DataTableCell>
+                {group.durationMs === undefined ? "Unavailable" : `${group.durationMs} ms`}
+              </DataTableCell>
+              <DataTableCell>{bounded(group.startedAt || "unavailable")}</DataTableCell>
+              <DataTableCell>
+                <a className="text-link" href={`/traces/${encodeURIComponent(group.traceId)}`}>
+                  Open trace
+                </a>
+              </DataTableCell>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </DataTable>
+  );
 }
 
 function bounded(value: string): string {

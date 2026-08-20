@@ -1,7 +1,6 @@
-export default {
-  entry: "src/app.ts",
-  source: ["src/**/*.ts"],
-  exclude: ["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/__fixtures__/**"],
-  generatedDirectory: ".zsys/generated",
+import { defineConfig } from "@zsys/app/config";
+
+export default defineConfig({
+  server: { port: 3000, maxBodyBytes: 1_048_576 },
   inspector: { port: 3210 },
-};
+});

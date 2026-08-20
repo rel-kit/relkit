@@ -6,7 +6,7 @@
     {
       "defaults": null,
       "environment": {
-        "PORT": {
+        "SERVICE_PORT": {
           "hasDefault": true,
           "optional": false,
           "requiredIn": [],
@@ -18,45 +18,74 @@
       "kind": "app",
       "observability": null,
       "providerProfiles": ["default"],
-      "source": { "column": 13, "file": "src/app.ts", "line": 11 }
+      "source": {
+        "column": 13,
+        "file": "src/app.ts",
+        "line": 11
+      }
     },
     {
       "hasDefault": true,
-      "id": "PORT",
+      "id": "SERVICE_PORT",
       "kind": "env",
-      "name": "PORT",
+      "name": "SERVICE_PORT",
       "requiredIn": [],
       "sensitive": false,
-      "source": { "column": 13, "file": "src/app.ts", "line": 11 },
+      "source": {
+        "column": 13,
+        "file": "src/app.ts",
+        "line": 11
+      },
       "type": "port"
     },
     {
       "concurrency": null,
       "dependencies": null,
       "errors": null,
+      "generated": null,
       "id": "warning.directory",
       "input": {
-        "properties": { "value": { "type": "string" } },
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
         "required": ["value"],
         "type": "object"
       },
       "kind": "function",
       "output": {
-        "properties": { "value": { "type": "string" } },
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
         "required": ["value"],
         "type": "object"
       },
-      "source": { "column": 26, "file": "src/misc/wrong-directory.function.ts", "line": 4 },
+      "source": {
+        "column": 26,
+        "file": "src/misc/wrong-directory.function.ts",
+        "line": 4
+      },
       "timeoutMs": null
     },
     {
       "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
-      "configuration": { "development": [], "production": ["region"], "test": [] },
+      "configuration": {
+        "development": [],
+        "production": ["region"],
+        "test": []
+      },
       "environment": [],
       "id": "default",
       "kind": "provider",
       "profile": "default",
-      "source": { "column": 13, "file": "src/app.ts", "line": 11 }
+      "source": {
+        "column": 13,
+        "file": "src/app.ts",
+        "line": 11
+      }
     }
   ]
 }

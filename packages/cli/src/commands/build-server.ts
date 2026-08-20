@@ -1,10 +1,19 @@
 import { canonicalJson, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import type { JsonValue } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
 
 /** Emits the one Bun entrypoint used by dev, start, and the production container. */
-export function serverSource(graph: ApplicationGraph, graphHash: string): string {
+export function serverSource(
+  graph: ApplicationGraph,
+  graphHash: string,
+  openapi: JsonValue = {},
+  configuration: {
+    readonly maxBodyBytes: number;
+    readonly apiDocs: { readonly enabledInProduction: boolean };
+  } = { maxBodyBytes: 1_048_576, apiDocs: { enabledInProduction: false } },
+): string {
   return `import { createGeneratedAgentFunction, invokeAgent } from "@zsys/agents";
 import { resolveEnv } from "@zsys/config";
 import { getAwsProviderFactory } from "@zsys/cloud-aws/runtime";
@@ -18,6 +27,7 @@ import { runtimeManifest } from "./runtime.manifest.ts";
 
 const graph = ${canonicalJson(graph)};
 const graphHash = ${JSON.stringify(graphHash)};
+const openapiDocument = ${canonicalJson(openapi)};
 const plan = createRegistrationPlan(graph);
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
 const environment = resolveEnvironment(process.env.ZSYS_ENV, process.env.NODE_ENV);
@@ -64,7 +74,16 @@ const app = createApp({
   manifest: executableManifest,
   engine: { invoke: invokeHttp },
   observability: telemetry,
-  middleware: { generationId, observability: telemetry },
+  middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes} },
+  apiDocs: {
+    mode: environment,
+    document: openapiDocument,
+    enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
+    ...(process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN === undefined
+      ? {}
+      : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
+  },
+  rateLimitRuntime: { resolveStore: resolveRateLimitStore },
   internalEndpoints: {
     mode: environment,
     enabled: internalEndpointsEnabled,
@@ -138,6 +157,7 @@ async function invokeHttp(request) {
     ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
     ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
     ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
+    ...(request.request === undefined ? {} : { request: request.request }),
     clients: createDependencySources(providerRegistry),
     ...(request.parent === undefined ? {} : { parent: request.parent }),
     ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),

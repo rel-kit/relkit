@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type FunctionRequest } from "@zsys/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import type { RequestRecordSink } from "@zsys/observability";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
@@ -9,6 +9,7 @@ import {
   type FrameworkMiddleware,
   type FrameworkMiddlewareName,
 } from "./middleware.js";
+import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
 
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
 
@@ -29,6 +30,7 @@ export interface RuntimeManifest {
 export interface HttpInvocationOptions {
   readonly functionId: string;
   readonly input: unknown;
+  readonly request?: FunctionRequest;
   readonly source: "http";
   readonly signal?: AbortSignal;
   readonly requestId?: string;
@@ -41,6 +43,7 @@ export interface HttpEngine {
 }
 export interface HttpRouteRequest {
   readonly request: Request;
+  readonly pathPattern?: string;
   readonly params: Readonly<Record<string, string>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
@@ -60,6 +63,7 @@ export interface RouteMaterializationOptions {
   readonly responseMapping?: import("./response-mapping.js").ResponseMappingOptions;
   readonly generationId?: string;
   readonly observability?: RequestRecordSink;
+  readonly rateLimitRuntime?: RateLimitRuntimeOptions;
 }
 export type RuntimeHonoManifestErrorCode =
   | "ZSYS_MANIFEST_VERSION_UNSUPPORTED"
@@ -129,8 +133,20 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
 /** Registers only the HTTP triggers already present in the immutable plan. */
 export function materializeRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
-  for (const trigger of options.plan.httpTriggers) {
-    app.on(trigger.config.method, trigger.config.path, createRouteHandler(trigger, options));
+  const triggers = [...options.plan.httpTriggers].sort(
+    (left, right) => Number(right.config.method === "HEAD") - Number(left.config.method === "HEAD"),
+  );
+  for (const trigger of triggers) {
+    const handler = withRateLimit(trigger, options, createRouteHandler(trigger, options));
+    for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
+      if (trigger.config.method === "HEAD") {
+        app.on("GET", path, (context, next) =>
+          context.req.method === "HEAD" ? handler(context) : next(),
+        );
+      } else {
+        app.on(trigger.config.method, path, handler);
+      }
+    }
   }
 }
 

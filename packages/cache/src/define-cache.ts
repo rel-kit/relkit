@@ -39,7 +39,20 @@ export interface DefineCacheOptions<
   readonly maxTtlMs?: number;
 }
 
-/** Defines a typed cache contract with validated key/value schemas and TTL bounds. */
+/**
+ * Defines a typed cache contract with validated key/value schemas and TTL bounds.
+ *
+ * @example
+ * ```ts
+ * import { defineCache } from "@zsys/cache"
+ * import { z } from "@zsys/schema"
+ *
+ * const prices = defineCache({ id: "prices", key: z.string(), value: z.number(), defaultTtlMs: 60_000 })
+ * void prices
+ * ```
+ * @category Resources
+ * @since 0.1.0
+ */
 export function defineCache<
   const Id extends string,
   const KeySchema extends StandardSchemaV1,

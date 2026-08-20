@@ -15,17 +15,19 @@ zsys --json doctor
 zsys --json check
 ```
 
-`--json` is a global option and must appear before the command. Check output
-is also written to `.zsys/generated/diagnostics.json`; it contains stable
-codes, severity, messages, source locations, descriptor IDs, and suggestions.
-Do not delete generated output to hide a diagnostic. Fix the source and run
-`zsys check` again.
+`--json` is a global option and must appear before the command. Every command
+and nested subcommand owns contextual help, for example `zsys create --help`
+and `zsys graph diff --help`. Check output is also written to
+`.zsys/generated/diagnostics.json`; it contains stable codes, severity,
+messages, source locations, descriptor IDs, and suggestions. Do not delete
+generated output to hide a diagnostic. Fix the source and run `zsys check`
+again.
 
 ## Common failures
 
 | Symptom                                      | Inspect                                                                                              | Fix                                                                                                                                                            |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The CLI rejects an option                    | `zsys --help` and the command usage                                                                  | Put global `--json`, `--help`, or `--version` before the command; use the exact subcommand options.                                                            |
+| The CLI rejects an option                    | `zsys <command> --help` or `zsys <group> <command> --help`                                           | Put global `--json` before the command and use the exact contextual options; follow the suggested command or flag when available.                              |
 | A project will not compile                   | `zsys --json check` and `diagnostics.json`                                                           | Fix the first `ZSYS_CONFIG_*`, `ZSYS_EVALUATOR_*`, `ZSYS_DUPLICATE_ID`, `ZSYS_MISSING_TARGET`, `ZSYS_ROUTE_COLLISION`, or schema diagnostic, then rerun check. |
 | Environment is incomplete                    | `zsys env check`, `zsys env list`, `zsys env explain NAME`                                           | Add the missing non-secret value for the selected environment. Use `zsys env example` to see names and `--write` only when writing the example is intended.    |
 | The dev port is busy                         | `zsys doctor --port 3000 --inspector-port 3210`                                                      | Stop the process using the port or choose unused ports in the dev command/configuration.                                                                       |

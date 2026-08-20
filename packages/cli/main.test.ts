@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { CLI_EXIT_CODES, runCli } from "./src/main.js";
+import { CLI_EXIT_CODES, getCliHelpModel, runCli, type CliHelpCommand } from "./src/main.js";
 
 function io() {
   const stdout: string[] = [];
@@ -19,14 +19,15 @@ test("covers human and JSON help/version/usage exits", async () => {
   expect(await runCli([], { io: human.io, installSignalHandlers: false })).toBe(
     CLI_EXIT_CODES.success,
   );
-  expect(human.stdout[0]).toContain("Usage: zsys");
+  expect(human.stdout[0]).toContain("USAGE");
+  expect(human.stdout[0]).toContain("zsys <subcommand> [flags]");
   expect(human.stderr).toEqual([]);
 
   const commandHelp = io();
   expect(
     await runCli(["help", "check"], { io: commandHelp.io, installSignalHandlers: false }),
   ).toBe(CLI_EXIT_CODES.success);
-  expect(commandHelp.stdout[0]).toContain("Usage: zsys check [options]");
+  expect(commandHelp.stdout[0]).toContain("zsys check [flags]");
 
   const json = io();
   expect(await runCli(["--json", "--help"], { io: json.io, installSignalHandlers: false })).toBe(
@@ -160,6 +161,73 @@ test("keeps command and create failures structured in JSON", async () => {
   expect(JSON.parse(createSuccess.stdout[0]!)).toEqual(result);
 });
 
+test("renders focused help for every command and nested subcommand", async () => {
+  const paths = [
+    [],
+    ...["create", "dev", "check", "build", "start", "graph", "env", "doctor", "deploy"].map(
+      (name) => [name],
+    ),
+    ...["print", "check", "diff"].map((name) => ["graph", name]),
+    ...["check", "list", "explain", "example"].map((name) => ["env", name]),
+    ...["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) => ["deploy", name]),
+  ];
+  const output: Record<string, string> = {};
+  for (const path of paths) {
+    const captured = io();
+    expect(
+      await runCli([...path, "--help"], {
+        io: captured.io,
+        installSignalHandlers: false,
+      }),
+    ).toBe(CLI_EXIT_CODES.success);
+    output[path.join(" ") || "zsys"] = captured.stdout[0]!;
+    expect(captured.stderr).toEqual([]);
+  }
+  expect(output).toMatchSnapshot();
+});
+
+test("generates completions, suggestions, help metadata, and TTY-only status", async () => {
+  for (const shell of ["bash", "zsh", "fish"] as const) {
+    const captured = io();
+    expect(
+      await runCli(["--completions", shell], {
+        io: captured.io,
+        installSignalHandlers: false,
+      }),
+    ).toBe(CLI_EXIT_CODES.success);
+    expect(captured.stdout[0]).toContain(`begin-zsys-completions`);
+    expect(captured.stdout[0]).toContain("graph");
+    expect(captured.stdout[0]).not.toContain("--wizard");
+  }
+
+  const typo = io();
+  expect(await runCli(["--json", "chek"], { io: typo.io, installSignalHandlers: false })).toBe(
+    CLI_EXIT_CODES.failure,
+  );
+  expect(JSON.parse(typo.stdout[0]!).error.message).toContain("check");
+
+  const model = getCliHelpModel("test-version");
+  expect(JSON.parse(JSON.stringify(model))).toEqual(model);
+  expect(
+    allCommands(model).every(({ description, examples }) => description && examples.length),
+  ).toBe(true);
+
+  const status = io();
+  expect(
+    await runCli(["create", "demo"], {
+      io: status.io,
+      tty: true,
+      ci: false,
+      installSignalHandlers: false,
+      loadCreateZsys: async () => ({
+        normalizeCreateOptions: () => ({ name: "demo" }),
+        generateProject: async () => undefined,
+      }),
+    }),
+  ).toBe(CLI_EXIT_CODES.success);
+  expect(status.stderr).toEqual(["● zsys create", "✓ zsys create"]);
+});
+
 test("removes signal handlers and reports interruption without corrupting JSON", async () => {
   const controller = new AbortController();
   const captured = io();
@@ -188,3 +256,7 @@ test("removes signal handlers and reports interruption without corrupting JSON",
     error: { code: "ZSYS_INTERRUPTED" },
   });
 });
+
+function allCommands(command: CliHelpCommand): CliHelpCommand[] {
+  return [command, ...command.commands.flatMap(allCommands)];
+}

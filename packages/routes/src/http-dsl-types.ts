@@ -14,6 +14,10 @@ export interface HttpPathMapping<Output = string> extends HttpMapping<Output> {
   readonly kind: "path";
   readonly name: string;
 }
+export interface HttpPathSegmentsMapping<Output = readonly string[]> extends HttpMapping<Output> {
+  readonly kind: "path-segments";
+  readonly name: string;
+}
 export interface HttpQueryMapping<Output = string> extends HttpMapping<Output> {
   readonly kind: "query";
   readonly name: string;
@@ -33,8 +37,14 @@ export interface HttpBodyMapping<Output = unknown> extends HttpMapping<Output> {
 export interface HttpWholeBodyMapping<Output = unknown> extends HttpMapping<Output> {
   readonly kind: "whole-body";
 }
-export interface HttpMultipartMapping<Output = unknown> extends HttpMapping<Output> {
+export interface HttpMultipartMapping<Output = string | File> extends HttpMapping<Output> {
   readonly kind: "multipart";
+  readonly name: string;
+}
+export interface HttpMultipartAllMapping<
+  Output = readonly (string | File)[],
+> extends HttpMapping<Output> {
+  readonly kind: "multipart-all";
   readonly name: string;
 }
 export interface HttpConstantMapping<
@@ -76,12 +86,14 @@ export interface HttpTransformMapping<Output = unknown> extends HttpMapping<Outp
 }
 export type HttpMappingNode =
   | HttpPathMapping
+  | HttpPathSegmentsMapping
   | HttpQueryMapping
   | HttpHeaderMapping
   | HttpCookieMapping
   | HttpBodyMapping
   | HttpWholeBodyMapping
   | HttpMultipartMapping
+  | HttpMultipartAllMapping
   | HttpConstantMapping
   | HttpInputMapping
   | HttpNestedMapping
@@ -147,6 +159,8 @@ export interface HttpDsl {
   nested<const S extends HttpMappingShape>(fields: S): HttpNestedMapping<S>;
   path(name: string): HttpPathMapping;
   path(name: string, options: HttpSourceOptions): HttpMappingNode;
+  pathSegments(name: string): HttpPathSegmentsMapping;
+  pathSegments(name: string, options: HttpSourceOptions): HttpMappingNode;
   query(name: string): HttpQueryMapping;
   query(name: string, options: HttpSourceOptions): HttpMappingNode;
   header(name: string): HttpHeaderMapping;
@@ -159,6 +173,8 @@ export interface HttpDsl {
   wholeBody(): HttpWholeBodyMapping;
   multipart(name: string): HttpMultipartMapping;
   multipart(name: string, options: HttpSourceOptions): HttpMappingNode;
+  multipartAll(name: string): HttpMultipartAllMapping;
+  multipartAll(name: string, options: HttpSourceOptions): HttpMappingNode;
   constant<const V extends JsonValue>(value: V): HttpConstantMapping<V>;
   optional<const M extends HttpMappingNode>(value: M): HttpOptionalMapping<M>;
   default<const M extends HttpMappingNode, const V extends JsonValue>(

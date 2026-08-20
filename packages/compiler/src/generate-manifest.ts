@@ -78,6 +78,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const transforms = descriptorsOf(input.transforms ?? input.descriptors, "transform");
   const agents = descriptorsOf(input.descriptors, "agent");
   const tools = descriptorsOf(input.descriptors, "tool");
+  const events = descriptorsOf(input.descriptors, "event");
   const functionById = uniqueById(functions, diagnostics);
   const modules = collectModules(
     functions,
@@ -86,7 +87,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     functionById,
     input,
     application,
-    [...agents, ...tools],
+    [...agents, ...tools, ...events],
   );
   const bindings = importBindings(modules);
   const functionExpressions = functionExpressionsFor(

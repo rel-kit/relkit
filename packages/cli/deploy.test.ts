@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
+import type { DeploymentPlan } from "@zsys/deploy";
 import { hashGraph, type ApplicationGraph } from "@zsys/graph";
 import { runDeploy } from "./src/commands/deploy.js";
 
@@ -44,6 +45,7 @@ test("preview plans through Automation API without calling up and redacts config
         "api-key": { secret: true },
       },
     });
+    expect(state.plan?.http.port).toBe(4321);
     expect(JSON.stringify(captured.outputs)).not.toContain("deploy-synthetic-secret");
     expect(JSON.stringify(captured.outputs[0])).toContain("preview.report.json");
   } finally {
@@ -118,6 +120,19 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
         openapi: "",
         client: "",
       },
+      config: {
+        projectRoot: root,
+        entry: "src/app.ts",
+        source: ["src/**/*.ts"],
+        exclude: [],
+        generatedDirectory: ".zsys/generated",
+        server: {
+          port: 4321,
+          maxBodyBytes: 1_048_576,
+          apiDocs: { enabledInProduction: false },
+        },
+        inspector: { port: 3210 },
+      },
     }),
     build: async () => ({
       ok: true,
@@ -127,14 +142,17 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
       artifacts: [],
       graphHash,
     }),
-    writeProgram: async () => ({
-      directory: join(root, ".zsys", "generated", "pulumi"),
-      projectName: "minimal-app",
-      stackName: "development",
-      pulumiYaml: "",
-      indexTs: "",
-      planJson: "{}\n",
-    }),
+    writeProgram: async (plan: DeploymentPlan) => {
+      state.plan = plan;
+      return {
+        directory: join(root, ".zsys", "generated", "pulumi"),
+        projectName: "minimal-app",
+        stackName: "development",
+        pulumiYaml: "",
+        indexTs: "",
+        planJson: "{}\n",
+      };
+    },
     createWorkspace: async (workspaceOptions: unknown) => {
       state.workspaceOptions = workspaceOptions;
       return {
@@ -174,7 +192,12 @@ function fakeState(changeSummary: Record<string, number>) {
     },
     outputs: async () => ({}),
   };
-  return { calls, stack, workspaceOptions: undefined as unknown };
+  return {
+    calls,
+    stack,
+    workspaceOptions: undefined as unknown,
+    plan: undefined as DeploymentPlan | undefined,
+  };
 }
 
 function capture() {

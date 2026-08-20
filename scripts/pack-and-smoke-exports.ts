@@ -7,14 +7,12 @@ const rootExport = {
   types: "./dist/index.d.ts",
   import: "./dist/index.js",
 };
-
 type PackageManifest = {
   name?: string;
   dependencies?: Record<string, string>;
   exports?: Record<string, unknown>;
   bin?: Record<string, string>;
 };
-
 async function runProcess(command: string, args: string[], cwd: string): Promise<string> {
   const child = Bun.spawn([command, ...args], {
     cwd,
@@ -26,14 +24,11 @@ async function runProcess(command: string, args: string[], cwd: string): Promise
     new Response(child.stderr).text(),
   ]);
   const exitCode = await child.exited;
-
   if (exitCode !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
   }
-
   return stdout;
 }
-
 async function unpackTarball(tarball: string, target: string): Promise<void> {
   await mkdir(target, { recursive: true });
   const child = Bun.spawn(["tar", "-xzf", tarball, "--strip-components=1", "-C", target], {
@@ -44,7 +39,6 @@ async function unpackTarball(tarball: string, target: string): Promise<void> {
   const exitCode = await child.exited;
   if (exitCode !== 0) throw new Error(`tar extraction failed for ${tarball}\n${stderr}`);
 }
-
 async function readManifest(packageDirectory: string): Promise<PackageManifest> {
   const manifestPath = join(packageDirectory, "package.json");
   return JSON.parse(await readFile(manifestPath, "utf8")) as PackageManifest;
@@ -69,15 +63,31 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
             import: "./dist/runtime/index.js",
           },
         }
-      : packageDirectoryName === "config"
+      : packageDirectoryName === "app"
         ? {
             ".": rootExport,
-            "./internal/config": {
-              types: "./dist/internal/config.d.ts",
-              import: "./dist/internal/config.js",
+            "./config": {
+              types: "./dist/config.d.ts",
+              import: "./dist/config.js",
             },
           }
-        : { ".": rootExport };
+        : packageDirectoryName === "cli"
+          ? {
+              ".": rootExport,
+              "./help": {
+                types: "./dist/cli-help-model.d.ts",
+                import: "./dist/cli-help-model.js",
+              },
+            }
+          : packageDirectoryName === "config"
+            ? {
+                ".": rootExport,
+                "./internal/config": {
+                  types: "./dist/internal/config.d.ts",
+                  import: "./dist/internal/config.js",
+                },
+              }
+            : { ".": rootExport };
   if (
     JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports) ||
     JSON.stringify(actualRoot) !== JSON.stringify(rootExport)

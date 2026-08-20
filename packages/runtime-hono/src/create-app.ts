@@ -16,6 +16,7 @@ import {
   installInternalEndpoints,
   type InternalEndpointOptions,
 } from "./internal-endpoints.js";
+import { installApiDocs, type ApiDocsOptions } from "./api-docs.js";
 
 export type FrameworkMiddlewareInput =
   | Partial<Record<(typeof FRAMEWORK_MIDDLEWARE_ORDER)[number], MiddlewareHandler>>
@@ -25,6 +26,7 @@ export interface CreateAppOptions extends RouteMaterializationOptions {
   readonly frameworkMiddleware?: FrameworkMiddlewareInput;
   readonly middleware?: HttpMiddlewareOptions;
   readonly internalEndpoints?: InternalEndpointOptions;
+  readonly apiDocs?: ApiDocsOptions;
 }
 
 /** Creates the HTTP application from the already verified registration plan. */
@@ -45,6 +47,7 @@ export function createApp(options: CreateAppOptions): Hono {
     graph: graphSnapshot(options.plan),
     ...(options.internalEndpoints ?? {}),
   });
+  installApiDocs(app, options.plan, apiDocsOptions(options));
   const requestMapping =
     options.middleware?.maxBodyBytes === undefined
       ? options.requestMapping
@@ -54,6 +57,25 @@ export function createApp(options: CreateAppOptions): Hono {
     ...(requestMapping === undefined ? {} : { requestMapping }),
   });
   return app;
+}
+
+function apiDocsOptions(options: CreateAppOptions): ApiDocsOptions {
+  const docs = options.apiDocs ?? {};
+  const internal = options.internalEndpoints ?? {};
+  return {
+    ...docs,
+    mode: docs.mode ?? internal.environment ?? internal.mode ?? "development",
+    ...(docs.bearerToken !== undefined
+      ? { bearerToken: docs.bearerToken }
+      : internal.bearerToken === undefined
+        ? {}
+        : { bearerToken: internal.bearerToken }),
+    ...(docs.authorize !== undefined
+      ? { authorize: docs.authorize }
+      : internal.authorize === undefined
+        ? {}
+        : { authorize: internal.authorize }),
+  };
 }
 
 /** Installs supplied framework middleware in the fixed v3 order. */

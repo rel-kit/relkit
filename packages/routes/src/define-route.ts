@@ -16,6 +16,7 @@ import {
   type HttpRequestMapping,
   type HttpResponseMapping,
 } from "./http-dsl.js";
+import { copyRateLimit, positive, successStatus, type RouteRateLimit } from "./route-options.js";
 import {
   isMiddlewareDescriptor,
   isMiddlewareRef,
@@ -26,61 +27,101 @@ import {
 export interface RouteDescriptor<
   Id extends string,
   Target extends FunctionRefAny = FunctionRefAny,
-  Request extends HttpRequestMapping = HttpRequestMapping,
+  Request extends HttpRequestMapping | undefined = HttpRequestMapping | undefined,
 > extends DescriptorBase<"route", Id> {
-  readonly method: HttpMethod;
-  readonly path: string;
+  readonly method?: HttpMethod;
+  readonly path?: string;
+  readonly runtimePaths?: readonly string[];
   readonly target: Target;
-  readonly request: Request;
-  readonly responses: readonly HttpResponseMapping[];
+  readonly request?: Request;
+  readonly responses?: readonly HttpResponseMapping[];
+  readonly successStatus?: number;
+  readonly maxBodyBytes?: number;
+  readonly rateLimit?: RouteRateLimit;
   readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 export interface DefineRouteOptions<
   Id extends string,
   Target extends FunctionRefAny,
-  Request extends HttpRequestMapping,
+  Request extends HttpRequestMapping | undefined = undefined,
 > extends DescriptorMetadata {
   readonly id: Id;
-  readonly method: HttpMethod;
-  readonly path: string;
   readonly target: Target;
-  readonly request: Request;
-  readonly responses: readonly HttpResponseMapping[];
+  readonly request?: Request;
+  readonly responses?: readonly HttpResponseMapping[];
+  readonly successStatus?: number;
+  readonly maxBodyBytes?: number;
+  readonly rateLimit?: RouteRateLimit;
   readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 
-/** Defines an HTTP route that maps a request contract to an existing function reference. */
+/**
+ * Defines one HTTP method exported by a nested `route.ts` module.
+ *
+ * The compiler derives the method from the named export and the path from the
+ * file. Omit `request` and `responses` when schema-based inference represents
+ * the transport; explicit mappings replace inference completely.
+ *
+ * @example A GET route with inferred path and query input
+ * ```ts
+ * import { defineFunction, defineRoute } from "@zsys/app"
+ * import { z } from "@zsys/schema"
+ *
+ * const listOrders = defineFunction({
+ *   id: "orders.list",
+ *   input: z.object({ status: z.string().optional() }),
+ *   output: z.object({ count: z.number().int() }),
+ *   handler: async () => ({ count: 0 })
+ * })
+ *
+ * export const GET = defineRoute({ id: "orders.list.http", target: listOrders })
+ * ```
+ *
+ * @category HTTP
+ * @since 0.1.0
+ */
 export function defineRoute<
   const Id extends string,
   const Target extends FunctionRefAny,
-  const Request extends HttpRequestMapping,
+  const Request extends HttpRequestMapping | undefined = undefined,
 >(options: DefineRouteOptions<Id, Target, Request>): RouteDescriptor<Id, Target, Request> {
   if (hasOwn(options, "handler")) throw new TypeError("Routes cannot own handlers");
   if (!isFunctionTarget(options.target))
     throw new TypeError("Route target must be a function reference");
-  if (!isMethod(options.method))
-    throw new TypeError(`Unsupported HTTP method: ${String(options.method)}`);
-  assertPath(options.path);
-  assertRequestMapping(options.request);
+  if (options.request !== undefined) assertRequestMapping(options.request);
   const responses = copyResponses(options.responses);
   const middleware = copyMiddleware(options.middleware, responses);
-  validateLimit(options.timeoutMs, "timeoutMs");
+  const timeoutMs = positive(options.timeoutMs, "timeoutMs");
+  const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
+  const status = successStatus(options.successStatus);
+  const rateLimit = copyRateLimit(options.rateLimit);
   const base = createDescriptorBase("route", options.id, options);
+  const legacy = options as DefineRouteOptions<Id, Target, Request> & {
+    readonly method?: HttpMethod;
+    readonly path?: string;
+  };
   return deepFreeze({
     ...base,
-    method: options.method,
-    path: options.path,
+    // Retained only so the compiler can emit a source-located migration diagnostic.
+    ...(legacy.method === undefined ? {} : { method: legacy.method }),
+    ...(legacy.path === undefined ? {} : { path: legacy.path }),
     target: options.target,
-    request: options.request,
-    responses,
+    ...(options.request === undefined ? {} : { request: options.request }),
+    ...(responses === undefined ? {} : { responses }),
+    ...(status === undefined ? {} : { successStatus: status }),
+    ...(maxBodyBytes === undefined ? {} : { maxBodyBytes }),
+    ...(rateLimit === undefined ? {} : { rateLimit }),
     ...(middleware === undefined ? {} : { middleware }),
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+    ...(timeoutMs === undefined ? {} : { timeoutMs }),
   }) as RouteDescriptor<Id, Target, Request>;
 }
 
-function copyResponses(values: readonly HttpResponseMapping[]): readonly HttpResponseMapping[] {
+function copyResponses(
+  values: readonly HttpResponseMapping[] | undefined,
+): readonly HttpResponseMapping[] | undefined {
+  if (values === undefined) return undefined;
   if (!Array.isArray(values) || values.length === 0)
     throw new TypeError("A route needs one response mapping");
   const ids = new Set<string>();
@@ -95,12 +136,11 @@ function copyResponses(values: readonly HttpResponseMapping[]): readonly HttpRes
 
 function copyMiddleware(
   values: readonly MiddlewareRef[] | undefined,
-  responses: readonly HttpResponseMapping[],
+  responses: readonly HttpResponseMapping[] | undefined,
 ): readonly MiddlewareRef[] | undefined {
   if (values === undefined) return undefined;
   if (!Array.isArray(values)) throw new TypeError("Route middleware must be an array");
   const ids = new Set<string>();
-  const responseIds = new Set(responses.map((response) => response.id));
   const result = values.map((value) => {
     if (!isMiddlewareRef(value))
       throw new TypeError("Route middleware must be a middleware reference");
@@ -108,8 +148,14 @@ function copyMiddleware(
     if (ids.has(id)) throw new TypeError(`Duplicate route middleware "${id}"`);
     ids.add(id);
     const decision = isMiddlewareDescriptor(value) ? value.decision : undefined;
-    if (decision?.kind === "respond" && !isDeclaredResponse(decision.responseId, responses))
-      throw new TypeError(`Middleware "${id}" responds with an undeclared route response`);
+    if (decision?.kind === "respond") {
+      if (responses === undefined) {
+        throw new TypeError(`Middleware "${id}" requires explicit route responses`);
+      }
+      if (!isDeclaredResponse(decision.responseId, responses)) {
+        throw new TypeError(`Middleware "${id}" responds with an undeclared route response`);
+      }
+    }
     return value;
   });
   return Object.freeze(result);
@@ -139,22 +185,6 @@ function isSchema(value: unknown): value is StandardSchemaV1 {
     value["~standard"].version === 1 &&
     typeof value["~standard"].validate === "function"
   );
-}
-function isMethod(value: unknown): value is HttpMethod {
-  return ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(String(value));
-}
-function assertPath(value: string): void {
-  if (
-    typeof value !== "string" ||
-    !value.startsWith("/") ||
-    value.includes("?") ||
-    value.includes("#")
-  )
-    throw new TypeError("HTTP route path must be an absolute path without query or hash");
-}
-function validateLimit(value: number | undefined, name: string): void {
-  if (value !== undefined && (!Number.isSafeInteger(value) || value < 1))
-    throw new TypeError(`${name} must be a positive integer`);
 }
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);

@@ -113,6 +113,6 @@ test("the scan rejects public names but permits allowlisted provider terminology
     [`${publicPath}:source-name`],
   );
   expect(
-    violations([{ path: `apps/fixture-commerce/src/events.${term}.ts`, text: "export {};\n" }]),
-  ).toEqual([`apps/fixture-commerce/src/events.${term}.ts:source-suffix`]);
+    violations([{ path: `examples/commerce/src/events.${term}.ts`, text: "export {};\n" }]),
+  ).toEqual([`examples/commerce/src/events.${term}.ts:source-suffix`]);
 });

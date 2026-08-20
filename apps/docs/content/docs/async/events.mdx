@@ -1,0 +1,27 @@
+---
+title: Events
+description: Declare typed events, publish them, and listen with payload-first callbacks.
+---
+
+Declare an event with a stable ID, version, and payload schema. `zsys dev`, `check`, and `create` discover
+descriptors first and atomically refresh `.zsys/generated/event-registry.d.ts`, which gives listener
+names autocomplete and payload inference.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/events/order-receipt.event.ts"'>
+  ../../examples/commerce/src/events/order-receipt.event.ts
+</include>
+
+The handler receives validated payload first and context second. `ctx.event` includes version, instance
+ID, key, attributes, occurrence time, trace, correlation, and causation metadata. Listeners may be
+exported from any scanned source file; the compiler lowers each callback to an internal function node
+plus an event-trigger node so it uses the common engine.
+
+Delivery defaults to durable with one attempt. Use `delivery: "ephemeral"` explicitly. Options include
+`id`, `retry`, `profile`, `concurrency`, `timeoutMs`, and function dependencies. When `id` is absent, ZSYS
+derives it from the event plus named export and rejects duplicates; production listeners should pin IDs
+when rename stability matters.
+
+Use `events.anyOf(...)` for a discriminated union and `events.match("orders.*")` for a registry-expanded
+pattern. `events.all(...)` requires explicit unknown-payload and telemetry/audit purpose. Unknown or stale
+names fail TypeScript and compiler validation. Durable failure, redrive, and dead-letter details remain
+provider-owned.

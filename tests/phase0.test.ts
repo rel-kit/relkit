@@ -25,7 +25,11 @@ async function createFixture(files: Files): Promise<string> {
   const fixture = await mkdtemp(join(tmpdir(), "zsys-phase0-"));
   await writeFile(
     join(fixture, "package.json"),
-    JSON.stringify({ private: true, type: "module", workspaces: ["apps/*", "packages/*"] }),
+    JSON.stringify({
+      private: true,
+      type: "module",
+      workspaces: ["apps/*", "examples/*", "packages/*"],
+    }),
   );
   for (const [path, contents] of Object.entries(files)) {
     const file = join(fixture, path);
@@ -180,15 +184,15 @@ describe.serial("Phase 0 guardrails", () => {
         name: `fixture imports ${dependency}`,
         files: packageFiles([
           {
-            path: "apps/fixture-commerce",
-            name: "fixture-commerce",
+            path: "examples/commerce",
+            name: "commerce-example",
             source: `import "${dependency}";`,
             dependencies: { [dependency]: "test" },
           },
         ]),
         expected: {
-          path: "apps/fixture-commerce/src/index.ts",
-          owner: "apps/fixture-commerce",
+          path: "examples/commerce/src/index.ts",
+          owner: "examples/commerce",
           rule: "fixture-template-internal-import",
         },
       }),
@@ -230,8 +234,8 @@ describe.serial("Phase 0 guardrails", () => {
     const fixture = await createFixture({
       "packages/not-approved/src/index.ts": "export {};\n",
       "packages/app/src/subscription-api.ts": `export const value = ${subscription};\n`,
-      "apps/fixture-commerce/src/events.subscription.ts": "export {};\n",
-      "apps/fixture-commerce/src/lib.rs": "fn main() {}\n",
+      "examples/commerce/src/events.subscription.ts": "export {};\n",
+      "examples/commerce/src/lib.rs": "fn main() {}\n",
       "templates/not-approved/README.md": "# invalid template\n",
       "packages/app/src/persistence-api.ts": `export const value = ${forbiddenApi};\n`,
       "packages/app/src/internal-import.ts": `export const value = "${internalPackage}";\n`,
@@ -239,13 +243,13 @@ describe.serial("Phase 0 guardrails", () => {
       "packages/app/src/navigation.ts": `export const value = ${navigation};\n`,
       "packages/app/src/template.ts": `export const value = ${template};\n`,
       "packages/app/src/iac.ts": `export const value = ${alternateIac};\n`,
-      "apps/fixture-commerce/src/persistence.ts": "export {};\n",
+      "examples/commerce/src/persistence.ts": "export {};\n",
     });
     const expected = [
       ["packages/not-approved/src/index.ts", "out-of-scope-package"],
       ["packages/app/src/subscription-api.ts", "subscription-primitive"],
-      ["apps/fixture-commerce/src/events.subscription.ts", "subscription-source"],
-      ["apps/fixture-commerce/src/lib.rs", "rust-source"],
+      ["examples/commerce/src/events.subscription.ts", "subscription-source"],
+      ["examples/commerce/src/lib.rs", "rust-source"],
       ["templates/not-approved/README.md", "out-of-scope-template-name"],
       ["packages/app/src/persistence-api.ts", "out-of-scope-api"],
       ["packages/app/src/internal-import.ts", "out-of-scope-package"],
@@ -253,7 +257,7 @@ describe.serial("Phase 0 guardrails", () => {
       ["packages/app/src/navigation.ts", "out-of-scope-navigation-name"],
       ["packages/app/src/template.ts", "out-of-scope-template-name"],
       ["packages/app/src/iac.ts", "alternate-iac"],
-      ["apps/fixture-commerce/src/persistence.ts", "out-of-scope-navigation-name"],
+      ["examples/commerce/src/persistence.ts", "out-of-scope-navigation-name"],
     ];
     try {
       const findings = scanScope(fixture);
@@ -284,11 +288,9 @@ describe.serial("Phase 0 guardrails", () => {
     const gettingStarted = readFileSync(join(root, "docs/getting-started.md"), "utf8");
     for (const stale of [
       "apps/web",
-      "apps/docs",
       "packages/ui",
       "@repo/",
       "bun run check-types",
-      "3001",
       "There is currently no checked-in test implementation",
       "no Phase 0\n`scripts/*.ts` implementation",
       "Turborepo starter",
@@ -300,8 +302,9 @@ describe.serial("Phase 0 guardrails", () => {
       expect(gettingStarted).not.toContain(stale);
     }
     for (const current of [
+      "apps/docs",
       "apps/inspector",
-      "apps/fixture-commerce",
+      "examples/commerce",
       "templates/default",
       "bun run typecheck",
       "tests/phase0.test.ts",
@@ -311,6 +314,8 @@ describe.serial("Phase 0 guardrails", () => {
     ]) {
       expect(guidance).toContain(current);
     }
+    expect(guidance).toContain("port `3001`");
+    expect(readme).toContain("apps/docs");
     for (const current of ["apps/inspector", "Pulumi", "ZSYS_INSPECTOR_ROOT"]) {
       expect(readme).toContain(current);
       expect(gettingStarted).toContain(current);

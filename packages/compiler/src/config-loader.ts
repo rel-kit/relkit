@@ -12,9 +12,8 @@ import {
   isAbsolute,
   posixNormalize,
   readInspector,
-  readPath,
-  readPaths,
   readRecord,
+  readServer,
   unwrapDefault,
 } from "./config-loader-utils.js";
 
@@ -84,44 +83,50 @@ function parseConfig(
   if (record === undefined) return { issues: freezeIssues(issues) };
   for (const key of Object.keys(record)) {
     if (!allowedKeys.has(key)) {
+      const migration = legacyMigration(key);
       const behavior = typeof record[key] === "function";
       issues.push({
-        code: behavior ? CONFIG_CODES.behavior : CONFIG_CODES.key,
+        code:
+          migration === undefined
+            ? behavior
+              ? CONFIG_CODES.behavior
+              : CONFIG_CODES.key
+            : CONFIG_CODES.legacy,
         path: key,
-        message: behavior
-          ? `Application behavior is not allowed in tooling config at "${key}".`
-          : `Unknown tooling config key "${key}".`,
+        message:
+          migration ??
+          (behavior
+            ? `Application behavior is not allowed in tooling config at "${key}".`
+            : `Unknown tooling config key "${key}".`),
       });
     }
   }
-  const entry = readPath(record.entry, "entry", DEFAULT_TOOLING_CONFIG.entry, root, false, issues);
-  const source = readPaths(record.source, "source", DEFAULT_TOOLING_CONFIG.source, root, issues);
-  const exclude = readPaths(
-    record.exclude,
-    "exclude",
-    DEFAULT_TOOLING_CONFIG.exclude,
-    root,
-    issues,
-  );
-  const generatedDirectory = readPath(
-    record.generatedDirectory,
-    "generatedDirectory",
-    DEFAULT_TOOLING_CONFIG.generatedDirectory,
-    root,
-    false,
-    issues,
-  );
+  const server = readServer(record.server, issues);
   const inspector = readInspector(record.inspector, issues);
   if (issues.length > 0) return { issues: freezeIssues(issues) };
   return {
     config: Object.freeze({
       projectRoot: root,
-      entry,
-      source,
-      exclude,
-      generatedDirectory,
+      entry: DEFAULT_TOOLING_CONFIG.entry,
+      source: DEFAULT_TOOLING_CONFIG.source,
+      exclude: DEFAULT_TOOLING_CONFIG.exclude,
+      generatedDirectory: DEFAULT_TOOLING_CONFIG.generatedDirectory,
+      server: Object.freeze({ ...server, apiDocs: Object.freeze(server.apiDocs) }),
       inspector: Object.freeze(inspector),
     }),
     issues: Object.freeze([]),
   };
+}
+
+function legacyMigration(key: string): string | undefined {
+  return (
+    {
+      entry: 'Remove "entry"; the application entry is always "src/app.ts".',
+      source: 'Remove "source"; ZSYS always discovers "src/**/*.ts".',
+      exclude:
+        'Remove "exclude"; tests, fixtures, declarations, and generated content are excluded by convention.',
+      generatedDirectory:
+        'Remove "generatedDirectory"; generated output is always ".zsys/generated".',
+    } as Record<string, string>
+  )[key];
 }

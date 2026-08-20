@@ -138,6 +138,7 @@ describe("registration planning", () => {
     const input = graph();
     const routes = [
       httpTrigger("orders.wildcard", "/orders/*"),
+      httpTrigger("orders.optional-wildcard", "/orders/*parts?"),
       httpTrigger("orders.parameter-b", "/orders/:orderId"),
       httpTrigger("orders.exact", "/orders/new"),
       httpTrigger("orders.parameter-a", "/orders/:id"),
@@ -151,6 +152,7 @@ describe("registration planning", () => {
       "orders.parameter-a",
       "orders.parameter-b",
       "orders.wildcard",
+      "orders.optional-wildcard",
     ]);
     expect(plan.httpTriggers).toHaveLength(routes.length);
     expect(plan.httpTriggers.slice(1, 4).map(normalizedRouteKey)).toEqual([

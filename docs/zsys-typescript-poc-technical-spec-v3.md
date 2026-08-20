@@ -7,7 +7,7 @@
 **Internal execution kernel:** Effect  
 **Inspector:** Next.js  
 **Deployment engine:** Pulumi  
-**First cloud target:** AWS  
+**First cloud target:** AWS
 
 ---
 
@@ -68,7 +68,7 @@ Effect is the internal execution kernel of ZSys. An application developer writes
 handler: async (input, ctx) => {
   ctx.log.info("processing order", { orderId: input.orderId });
   return { accepted: true };
-}
+};
 ```
 
 Application developers do **not** need to:
@@ -326,17 +326,17 @@ tsconfig.json
 
 ### 5.2 File suffix conventions
 
-| Descriptor | Recommended suffix | Recommended directory |
-|---|---|---|
-| Function | `*.function.ts` | `src/functions` |
-| Route | `*.route.ts` | `src/routes` |
-| Job | `*.job.ts` | `src/jobs` |
-| Event contract or event trigger | `*.event.ts` | `src/events` |
-| Bucket | `*.bucket.ts` | `src/buckets` |
-| Cache | `*.cache.ts` | `src/cache` |
-| Tool | `*.tool.ts` | `src/tools` |
-| Agent | `*.agent.ts` | `src/agents` |
-| Middleware | `*.middleware.ts` | `src/middleware` |
+| Descriptor                      | Recommended suffix | Recommended directory |
+| ------------------------------- | ------------------ | --------------------- |
+| Function                        | `*.function.ts`    | `src/functions`       |
+| Route                           | `*.route.ts`       | `src/routes`          |
+| Job                             | `*.job.ts`         | `src/jobs`            |
+| Event contract or event trigger | `*.event.ts`       | `src/events`          |
+| Bucket                          | `*.bucket.ts`      | `src/buckets`         |
+| Cache                           | `*.cache.ts`       | `src/cache`           |
+| Tool                            | `*.tool.ts`        | `src/tools`           |
+| Agent                           | `*.agent.ts`       | `src/agents`          |
+| Middleware                      | `*.middleware.ts`  | `src/middleware`      |
 
 There is no `*.subscription.ts` convention.
 
@@ -401,8 +401,10 @@ Multiple descriptors in one file are valid but produce an informational warning 
 
 ```text
 apps/
-├── inspector/
-└── fixture-commerce/
+└── inspector/
+
+examples/
+└── commerce/
 
 packages/
 ├── app/
@@ -442,20 +444,20 @@ templates/
 
 ### 6.2 Public application packages
 
-| Package | Responsibility |
-|---|---|
-| `@zsys/app` | `defineApp` and re-exports for common descriptor factories |
-| `@zsys/schema` | supported schema builder plus Standard Schema bridge |
-| `@zsys/config` | environment declaration DSL |
-| `@zsys/functions` | function, error, and reference contracts |
-| `@zsys/routes` | HTTP route declaration and mapping DSL |
-| `@zsys/jobs` | job and schedule declarations |
-| `@zsys/events` | event contracts, selectors, `onEvent`, and publishing references |
-| `@zsys/buckets` | logical bucket declarations |
-| `@zsys/cache` | typed cache declarations |
-| `@zsys/tools` | function-to-tool declarations |
-| `@zsys/agents` | agent declarations and model profiles |
-| `@zsys/testing` | application test harness and provider fakes |
+| Package           | Responsibility                                                   |
+| ----------------- | ---------------------------------------------------------------- |
+| `@zsys/app`       | `defineApp` and re-exports for common descriptor factories       |
+| `@zsys/schema`    | supported schema builder plus Standard Schema bridge             |
+| `@zsys/config`    | environment declaration DSL                                      |
+| `@zsys/functions` | function, error, and reference contracts                         |
+| `@zsys/routes`    | HTTP route declaration and mapping DSL                           |
+| `@zsys/jobs`      | job and schedule declarations                                    |
+| `@zsys/events`    | event contracts, selectors, `onEvent`, and publishing references |
+| `@zsys/buckets`   | logical bucket declarations                                      |
+| `@zsys/cache`     | typed cache declarations                                         |
+| `@zsys/tools`     | function-to-tool declarations                                    |
+| `@zsys/agents`    | agent declarations and model profiles                            |
+| `@zsys/testing`   | application test harness and provider fakes                      |
 
 `@zsys/app` SHOULD re-export the common surface so a generated project normally needs only:
 
@@ -476,40 +478,40 @@ import {
 
 ### 6.3 Internal packages
 
-| Package | Responsibility |
-|---|---|
-| `@zsys/contracts` | JSON values, branded IDs, source locations, versioned protocol types |
-| `@zsys/diagnostics` | structured errors and warnings |
-| `@zsys/graph` | normalized graph schema, hashing, sorting, compatibility diff |
-| `@zsys/compiler` | discovery, evaluation, normalization, code generation |
-| `@zsys/engine` | invocation protocol, lifecycle, concurrency, cancellation |
-| `@zsys/runtime-effect` | Effect runtime, Layers, internal error causes, loggers, tracing |
-| `@zsys/runtime-hono` | graph-driven Hono materialization |
-| `@zsys/providers-local` | local bucket, cache, jobs, events, and fake model providers |
-| `@zsys/observability` | request records, logs, traces, storage, query protocol |
-| `@zsys/supervisor` | candidate generation, readiness, switching, draining |
-| `@zsys/inspector-api` | versioned inspector HTTP/SSE protocol |
-| `@zsys/deploy` | provider-neutral deployment plan |
-| `@zsys/deploy-pulumi` | Pulumi Automation API integration |
-| `@zsys/cloud-aws` | AWS runtime providers and Pulumi resource mapping |
-| `@zsys/cli` | `zsys` commands and terminal UX |
-| `create-zsys` | new-project generator |
+| Package                 | Responsibility                                                       |
+| ----------------------- | -------------------------------------------------------------------- |
+| `@zsys/contracts`       | JSON values, branded IDs, source locations, versioned protocol types |
+| `@zsys/diagnostics`     | structured errors and warnings                                       |
+| `@zsys/graph`           | normalized graph schema, hashing, sorting, compatibility diff        |
+| `@zsys/compiler`        | discovery, evaluation, normalization, code generation                |
+| `@zsys/engine`          | invocation protocol, lifecycle, concurrency, cancellation            |
+| `@zsys/runtime-effect`  | Effect runtime, Layers, internal error causes, loggers, tracing      |
+| `@zsys/runtime-hono`    | graph-driven Hono materialization                                    |
+| `@zsys/providers-local` | local bucket, cache, jobs, events, and fake model providers          |
+| `@zsys/observability`   | request records, logs, traces, storage, query protocol               |
+| `@zsys/supervisor`      | candidate generation, readiness, switching, draining                 |
+| `@zsys/inspector-api`   | versioned inspector HTTP/SSE protocol                                |
+| `@zsys/deploy`          | provider-neutral deployment plan                                     |
+| `@zsys/deploy-pulumi`   | Pulumi Automation API integration                                    |
+| `@zsys/cloud-aws`       | AWS runtime providers and Pulumi resource mapping                    |
+| `@zsys/cli`             | `zsys` commands and terminal UX                                      |
+| `create-zsys`           | new-project generator                                                |
 
 ### 6.4 External implementation dependencies
 
 These dependencies are hidden behind ZSys packages in generated applications:
 
-| Dependency | Used by |
-|---|---|
-| `effect` | internal execution, lifecycle, logs, tracing, config, concurrency |
-| `hono` | internal HTTP runtime |
-| `zod` or equivalent supported implementation | `@zsys/schema` default builder |
-| `typescript` | compiler AST, type checks, declaration emission |
-| `next`, `react`, `react-dom` | inspector application |
-| `@pulumi/pulumi` | deployment engine and Automation API |
-| `@pulumi/aws` | primary AWS resource provider |
-| `@pulumi/awsx` | selected high-level ECS/network components |
-| `playwright` | inspector browser tests |
+| Dependency                                   | Used by                                                           |
+| -------------------------------------------- | ----------------------------------------------------------------- |
+| `effect`                                     | internal execution, lifecycle, logs, tracing, config, concurrency |
+| `hono`                                       | internal HTTP runtime                                             |
+| `zod` or equivalent supported implementation | `@zsys/schema` default builder                                    |
+| `typescript`                                 | compiler AST, type checks, declaration emission                   |
+| `next`, `react`, `react-dom`                 | inspector application                                             |
+| `@pulumi/pulumi`                             | deployment engine and Automation API                              |
+| `@pulumi/aws`                                | primary AWS resource provider                                     |
+| `@pulumi/awsx`                               | selected high-level ECS/network components                        |
+| `playwright`                                 | inspector browser tests                                           |
 
 Application packages MUST NOT require the developer to import Effect, Hono, Next.js, or Pulumi.
 
@@ -548,9 +550,7 @@ export type MaybePromise<T> = T | Promise<T>;
 
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue =
-  | JsonPrimitive
-  | readonly JsonValue[]
-  | { readonly [key: string]: JsonValue };
+  JsonPrimitive | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
 ### 7.2 Standard Schema boundary
@@ -565,10 +565,7 @@ export interface ZsysSchema<TInput = unknown, TOutput = TInput> {
     ) =>
       | { readonly value: TOutput }
       | { readonly issues: readonly StandardIssue[] }
-      | Promise<
-          | { readonly value: TOutput }
-          | { readonly issues: readonly StandardIssue[] }
-        >;
+      | Promise<{ readonly value: TOutput } | { readonly issues: readonly StandardIssue[] }>;
   };
 
   readonly zsys?: {
@@ -613,10 +610,7 @@ IDs MUST be explicit. File paths are not IDs because paths change during refacto
 ```ts
 export const ZSYS_DESCRIPTOR = Symbol.for("zsys.descriptor");
 
-export interface DescriptorBase<
-  Kind extends DescriptorKind,
-  Id extends string,
-> {
+export interface DescriptorBase<Kind extends DescriptorKind, Id extends string> {
   readonly [ZSYS_DESCRIPTOR]: true;
   readonly kind: Kind;
   readonly id: Id;
@@ -665,13 +659,7 @@ export interface FunctionContext<D extends FunctionDependencies> {
     readonly startedAt: string;
     readonly deadline?: string;
     readonly attempt: number;
-    readonly source:
-      | "direct"
-      | "http"
-      | "job"
-      | "event"
-      | "tool"
-      | "agent";
+    readonly source: "direct" | "http" | "job" | "event" | "tool" | "agent";
   };
 
   readonly signal: AbortSignal;
@@ -747,18 +735,14 @@ export interface FunctionDescriptor<
   readonly dependencies?: Dependencies;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly handler: (
-    input: Input,
-    context: FunctionContext<Dependencies>,
-  ) => MaybePromise<Output>;
+  readonly handler: (input: Input, context: FunctionContext<Dependencies>) => MaybePromise<Output>;
 }
 ```
 
 ### 7.9 Route descriptor
 
 ```ts
-export interface RouteDescriptor<Id extends string>
-  extends DescriptorBase<"route", Id> {
+export interface RouteDescriptor<Id extends string> extends DescriptorBase<"route", Id> {
   readonly method: HttpMethod;
   readonly path: string;
   readonly target: FunctionRefAny;
@@ -774,8 +758,7 @@ A route contains no handler.
 ### 7.10 Job descriptor
 
 ```ts
-export interface JobDescriptor<Id extends string, Input>
-  extends DescriptorBase<"job", Id> {
+export interface JobDescriptor<Id extends string, Input> extends DescriptorBase<"job", Id> {
   readonly input: ZsysSchema<unknown, Input>;
   readonly target: FunctionRefAny;
   readonly profile?: string;
@@ -806,8 +789,10 @@ export interface EventDescriptor<
 ### 7.12 Event trigger descriptor
 
 ```ts
-export interface EventTriggerDescriptor<Id extends string>
-  extends DescriptorBase<"event-trigger", Id> {
+export interface EventTriggerDescriptor<Id extends string> extends DescriptorBase<
+  "event-trigger",
+  Id
+> {
   readonly selector: EventSelector;
   readonly target: FunctionRefAny;
   readonly delivery: "ephemeral" | "durable";
@@ -830,16 +815,17 @@ export const sendReceiptWhenOrderCreated = onEvent(orderCreated, {
 ### 7.13 Bucket and cache descriptors
 
 ```ts
-export interface BucketDescriptor<Id extends string>
-  extends DescriptorBase<"bucket", Id> {
+export interface BucketDescriptor<Id extends string> extends DescriptorBase<"bucket", Id> {
   readonly profile?: string;
   readonly visibility: "private" | "public";
   readonly maxObjectBytes?: number;
   readonly allowedContentTypes?: readonly string[];
 }
 
-export interface CacheDescriptor<Id extends string, Key, Value>
-  extends DescriptorBase<"cache", Id> {
+export interface CacheDescriptor<Id extends string, Key, Value> extends DescriptorBase<
+  "cache",
+  Id
+> {
   readonly profile?: string;
   readonly key: ZsysSchema<unknown, Key>;
   readonly value: ZsysSchema<unknown, Value>;
@@ -853,8 +839,7 @@ export interface CacheDescriptor<Id extends string, Key, Value>
 A tool is a constrained view of a function:
 
 ```ts
-export interface ToolDescriptor<Id extends string>
-  extends DescriptorBase<"tool", Id> {
+export interface ToolDescriptor<Id extends string> extends DescriptorBase<"tool", Id> {
   readonly target: FunctionRefAny;
   readonly description: string;
   readonly sideEffect: "none" | "read" | "write" | "external";
@@ -866,8 +851,10 @@ export interface ToolDescriptor<Id extends string>
 ### 7.15 Agent descriptor
 
 ```ts
-export interface AgentDescriptor<Id extends string, Input, Output>
-  extends DescriptorBase<"agent", Id> {
+export interface AgentDescriptor<Id extends string, Input, Output> extends DescriptorBase<
+  "agent",
+  Id
+> {
   readonly input: ZsysSchema<unknown, Input>;
   readonly output: ZsysSchema<unknown, Output>;
   readonly modelProfile: string;
@@ -884,8 +871,7 @@ export interface AgentDescriptor<Id extends string, Input, Output>
 ### 7.16 Application descriptor
 
 ```ts
-export interface AppDescriptor<Id extends string>
-  extends DescriptorBase<"app", Id> {
+export interface AppDescriptor<Id extends string> extends DescriptorBase<"app", Id> {
   readonly env: EnvDescriptorAny;
   readonly providers: ProviderSets;
   readonly observability?: ObservabilityConfiguration;
@@ -1055,14 +1041,10 @@ Every generated project contains `src/env.ts`:
 import { defineEnv, env } from "@zsys/config";
 
 export default defineEnv({
-  ZSYS_ENV: env
-    .literal("development", "test", "production")
-    .default("development"),
+  ZSYS_ENV: env.literal("development", "test", "production").default("development"),
 
   PORT: env.port().default(3000),
-  LOG_LEVEL: env
-    .literal("trace", "debug", "info", "warn", "error")
-    .default("info"),
+  LOG_LEVEL: env.literal("trace", "debug", "info", "warn", "error").default("info"),
 
   AWS_REGION: env.string().requiredIn("production"),
   ASSETS_BUCKET_NAME: env.string().requiredIn("production"),
@@ -1162,12 +1144,7 @@ Concrete providers are selected globally in `src/app.ts`. Resource descriptors d
 
 ```ts
 // src/app.ts
-import {
-  defineApp,
-  localProviders,
-  testProviders,
-  awsProviders,
-} from "@zsys/app";
+import { defineApp, localProviders, testProviders, awsProviders } from "@zsys/app";
 import env from "./env";
 
 export default defineApp({
@@ -1319,11 +1296,7 @@ import { defineConfig } from "@zsys/cli";
 export default defineConfig({
   entry: "src/app.ts",
   source: ["src/**/*.ts"],
-  exclude: [
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/__fixtures__/**",
-  ],
+  exclude: ["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/__fixtures__/**"],
   generatedDirectory: ".zsys/generated",
   inspector: {
     port: 3210,
@@ -2120,11 +2093,7 @@ export default orderCreated;
 ### 16.3 Event envelope
 
 ```ts
-export interface EventEnvelope<
-  Id extends string,
-  Version extends number,
-  Payload,
-> {
+export interface EventEnvelope<Id extends string, Version extends number, Payload> {
   readonly instanceId: string;
   readonly eventId: Id;
   readonly version: Version;
@@ -2185,14 +2154,11 @@ The target receives the full typed event envelope by default. A `payloadOnly: tr
 ### 16.6 Listening to several known changes
 
 ```ts
-export default onEvent(
-  events.anyOf(orderCreated, orderUpdated, orderCancelled),
-  {
-    id: "orders.project-any-change",
-    target: updateOrderProjection,
-    delivery: "durable",
-  },
-);
+export default onEvent(events.anyOf(orderCreated, orderUpdated, orderCancelled), {
+  id: "orders.project-any-change",
+  target: updateOrderProjection,
+  delivery: "durable",
+});
 ```
 
 The target input is a discriminated union by `eventId` and `version`.
@@ -2326,11 +2292,7 @@ export const assets = defineBucket({
   id: "assets",
   visibility: "private",
   maxObjectBytes: 25_000_000,
-  allowedContentTypes: [
-    "image/png",
-    "image/jpeg",
-    "application/pdf",
-  ],
+  allowedContentTypes: ["image/png", "image/jpeg", "application/pdf"],
 });
 
 export default assets;
@@ -2416,11 +2378,9 @@ await ctx.cache.priceCache.set({ sku }, 25, {
   ttlMs: 60_000,
 });
 
-const value2 = await ctx.cache.priceCache.getOrSet(
-  { sku },
-  async () => fetchPrice(sku),
-  { ttlMs: 60_000 },
-);
+const value2 = await ctx.cache.priceCache.getOrSet({ sku }, async () => fetchPrice(sku), {
+  ttlMs: 60_000,
+});
 ```
 
 Required operations:
@@ -2692,12 +2652,7 @@ export interface RequestRecord {
   readonly requestBytes?: number;
   readonly responseBytes?: number;
   readonly outcome:
-    | "success"
-    | "declared-error"
-    | "validation-error"
-    | "timeout"
-    | "cancelled"
-    | "defect";
+    "success" | "declared-error" | "validation-error" | "timeout" | "cancelled" | "defect";
   readonly errorId?: string;
   readonly invocationId: string;
 }
@@ -3135,13 +3090,9 @@ Version placeholders are resolved by the generator; they are not left in the pro
 import { defineEnv, env } from "@zsys/config";
 
 export default defineEnv({
-  ZSYS_ENV: env
-    .literal("development", "test", "production")
-    .default("development"),
+  ZSYS_ENV: env.literal("development", "test", "production").default("development"),
   PORT: env.port().default(3000),
-  LOG_LEVEL: env
-    .literal("trace", "debug", "info", "warn", "error")
-    .default("info"),
+  LOG_LEVEL: env.literal("trace", "debug", "info", "warn", "error").default("info"),
   AWS_REGION: env.string().default("us-east-1"),
 });
 ```
@@ -3149,12 +3100,7 @@ export default defineEnv({
 ### 21.8 Generated `src/app.ts`
 
 ```ts
-import {
-  defineApp,
-  localProviders,
-  testProviders,
-  awsProviders,
-} from "@zsys/app";
+import { defineApp, localProviders, testProviders, awsProviders } from "@zsys/app";
 import env from "./env";
 
 export default defineApp({
@@ -3404,19 +3350,19 @@ Components encapsulate defaults while exposing an escape hatch only through expl
 
 ### 22.6 Initial AWS mapping
 
-| ZSys concept | AWS resource |
-|---|---|
-| Bun/Hono runtime | ECS/Fargate service |
-| Public HTTP | Application Load Balancer |
-| Container image | ECR |
-| Job | SQS queue plus DLQ |
-| Schedule | EventBridge Scheduler |
-| Event | EventBridge custom event bus |
-| Durable event trigger | EventBridge rule plus SQS queue/DLQ |
-| Bucket | S3 bucket |
-| Cache | ElastiCache-compatible deployment |
-| Logs | CloudWatch and optional OTLP export |
-| Secrets/environment | deployment-injected process environment from configured secret source |
+| ZSys concept          | AWS resource                                                          |
+| --------------------- | --------------------------------------------------------------------- |
+| Bun/Hono runtime      | ECS/Fargate service                                                   |
+| Public HTTP           | Application Load Balancer                                             |
+| Container image       | ECR                                                                   |
+| Job                   | SQS queue plus DLQ                                                    |
+| Schedule              | EventBridge Scheduler                                                 |
+| Event                 | EventBridge custom event bus                                          |
+| Durable event trigger | EventBridge rule plus SQS queue/DLQ                                   |
+| Bucket                | S3 bucket                                                             |
+| Cache                 | ElastiCache-compatible deployment                                     |
+| Logs                  | CloudWatch and optional OTLP export                                   |
+| Secrets/environment   | deployment-injected process environment from configured secret source |
 
 ### 22.7 Build artifact
 
@@ -3524,24 +3470,24 @@ Are secrets absent from all observable outputs?
 
 ### 23.2 Test layers
 
-| Layer | Purpose | Default tool |
-|---|---|---|
-| Type fixtures | compile-time inference and expected failures | `tsc` |
-| Unit tests | pure functions, normalization, policies | `bun test` |
-| Schema tests | input/output/error validation | `bun test` |
-| Compiler fixtures | discovery and diagnostics | `bun test` + golden files |
-| Graph tests | canonical nodes, edges, hash, diff | `bun test` |
-| Provider contract tests | shared behavior across implementations | `bun test` |
-| Runtime integration | engine plus providers | `bun test` |
-| HTTP integration | Hono materialization and request records | `bun test` |
-| Restart/recovery | file-backed durability and leases | child processes |
-| Inspector API | versioned query and SSE protocol | `bun test` |
-| Browser E2E | critical Next.js flows | Playwright |
-| Generator smoke | create a real project and run commands | child processes |
-| Pulumi unit | resource plan with mocks | Pulumi mocks + `bun test` |
-| Cloud integration | real isolated AWS stack | Pulumi preview/up/destroy |
-| Container smoke | production image lifecycle | Docker |
-| Security/redaction | no sensitive output | all relevant layers |
+| Layer                   | Purpose                                      | Default tool              |
+| ----------------------- | -------------------------------------------- | ------------------------- |
+| Type fixtures           | compile-time inference and expected failures | `tsc`                     |
+| Unit tests              | pure functions, normalization, policies      | `bun test`                |
+| Schema tests            | input/output/error validation                | `bun test`                |
+| Compiler fixtures       | discovery and diagnostics                    | `bun test` + golden files |
+| Graph tests             | canonical nodes, edges, hash, diff           | `bun test`                |
+| Provider contract tests | shared behavior across implementations       | `bun test`                |
+| Runtime integration     | engine plus providers                        | `bun test`                |
+| HTTP integration        | Hono materialization and request records     | `bun test`                |
+| Restart/recovery        | file-backed durability and leases            | child processes           |
+| Inspector API           | versioned query and SSE protocol             | `bun test`                |
+| Browser E2E             | critical Next.js flows                       | Playwright                |
+| Generator smoke         | create a real project and run commands       | child processes           |
+| Pulumi unit             | resource plan with mocks                     | Pulumi mocks + `bun test` |
+| Cloud integration       | real isolated AWS stack                      | Pulumi preview/up/destroy |
+| Container smoke         | production image lifecycle                   | Docker                    |
+| Security/redaction      | no sensitive output                          | all relevant layers       |
 
 ### 23.3 Test repository layout
 
@@ -4166,19 +4112,19 @@ None.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `package.json` | workspace scripts and exact package-manager policy |
-| `bunfig.toml` | Bun workspace/test settings |
-| `bun.lock` | committed dependency lock |
-| `tsconfig.base.json` | strict shared TypeScript settings |
-| `tsconfig.json` | project references |
-| `packages/*/package.json` | package identity and exports |
-| `scripts/check-boundaries.ts` | forbidden dependency/import checks |
-| `scripts/verify.ts` | ordered merge-blocking verification |
-| `.github/workflows/ci.yml` | initial CI matrix |
-| `apps/fixture-commerce/` | empty fixture application shell |
-| `docs/adr/` | accepted architectural decisions |
+| Path                          | Responsibility                                     |
+| ----------------------------- | -------------------------------------------------- |
+| `package.json`                | workspace scripts and exact package-manager policy |
+| `bunfig.toml`                 | Bun workspace/test settings                        |
+| `bun.lock`                    | committed dependency lock                          |
+| `tsconfig.base.json`          | strict shared TypeScript settings                  |
+| `tsconfig.json`               | project references                                 |
+| `packages/*/package.json`     | package identity and exports                       |
+| `scripts/check-boundaries.ts` | forbidden dependency/import checks                 |
+| `scripts/verify.ts`           | ordered merge-blocking verification                |
+| `.github/workflows/ci.yml`    | initial CI matrix                                  |
+| `examples/commerce/`          | empty example application shell                    |
+| `docs/adr/`                   | accepted architectural decisions                   |
 
 #### Dependencies
 
@@ -4274,19 +4220,19 @@ Phase 0.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/contracts/src/json.ts` | JSON boundary types and guards |
-| `packages/contracts/src/id.ts` | branded IDs and normalization |
-| `packages/contracts/src/source-location.ts` | portable source locations |
-| `packages/contracts/src/version.ts` | protocol/generator versions |
-| `packages/schema/src/index.ts` | supported schema builder exports |
-| `packages/schema/src/standard-schema.ts` | Standard Schema bridge |
-| `packages/schema/src/json-schema.ts` | deterministic JSON Schema extraction |
-| `packages/config/src/env.ts` | public environment DSL |
-| `packages/config/src/resolve.ts` | runtime validation contract, not resolution side effects |
-| `packages/diagnostics/src/diagnostic.ts` | diagnostic model |
-| `packages/diagnostics/src/reporter.ts` | text and JSON reporters |
+| Path                                        | Responsibility                                           |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `packages/contracts/src/json.ts`            | JSON boundary types and guards                           |
+| `packages/contracts/src/id.ts`              | branded IDs and normalization                            |
+| `packages/contracts/src/source-location.ts` | portable source locations                                |
+| `packages/contracts/src/version.ts`         | protocol/generator versions                              |
+| `packages/schema/src/index.ts`              | supported schema builder exports                         |
+| `packages/schema/src/standard-schema.ts`    | Standard Schema bridge                                   |
+| `packages/schema/src/json-schema.ts`        | deterministic JSON Schema extraction                     |
+| `packages/config/src/env.ts`                | public environment DSL                                   |
+| `packages/config/src/resolve.ts`            | runtime validation contract, not resolution side effects |
+| `packages/diagnostics/src/diagnostic.ts`    | diagnostic model                                         |
+| `packages/diagnostics/src/reporter.ts`      | text and JSON reporters                                  |
 
 #### Dependencies
 
@@ -4392,23 +4338,23 @@ Phase 1.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/app/src/index.ts` | common public re-exports |
-| `packages/app/src/define-app.ts` | app descriptor |
-| `packages/functions/src/define-function.ts` | function descriptor and reference |
-| `packages/functions/src/define-error.ts` | declared error factory |
-| `packages/routes/src/define-route.ts` | route descriptor |
-| `packages/routes/src/http-dsl.ts` | serializable request/response mapping |
-| `packages/jobs/src/define-job.ts` | job and schedule descriptor |
-| `packages/events/src/define-event.ts` | event contract |
-| `packages/events/src/on-event.ts` | event trigger descriptor |
-| `packages/events/src/selectors.ts` | one/anyOf/match/all selectors |
-| `packages/buckets/src/define-bucket.ts` | bucket descriptor |
-| `packages/cache/src/define-cache.ts` | cache descriptor |
-| `packages/tools/src/define-tool.ts` | function-to-tool descriptor |
-| `packages/agents/src/define-agent.ts` | agent descriptor |
-| `packages/compiler/src/conventions.ts` | suffix/directory diagnostics |
+| Path                                        | Responsibility                        |
+| ------------------------------------------- | ------------------------------------- |
+| `packages/app/src/index.ts`                 | common public re-exports              |
+| `packages/app/src/define-app.ts`            | app descriptor                        |
+| `packages/functions/src/define-function.ts` | function descriptor and reference     |
+| `packages/functions/src/define-error.ts`    | declared error factory                |
+| `packages/routes/src/define-route.ts`       | route descriptor                      |
+| `packages/routes/src/http-dsl.ts`           | serializable request/response mapping |
+| `packages/jobs/src/define-job.ts`           | job and schedule descriptor           |
+| `packages/events/src/define-event.ts`       | event contract                        |
+| `packages/events/src/on-event.ts`           | event trigger descriptor              |
+| `packages/events/src/selectors.ts`          | one/anyOf/match/all selectors         |
+| `packages/buckets/src/define-bucket.ts`     | bucket descriptor                     |
+| `packages/cache/src/define-cache.ts`        | cache descriptor                      |
+| `packages/tools/src/define-tool.ts`         | function-to-tool descriptor           |
+| `packages/agents/src/define-agent.ts`       | agent descriptor                      |
+| `packages/compiler/src/conventions.ts`      | suffix/directory diagnostics          |
 
 #### Dependencies
 
@@ -4515,21 +4461,21 @@ Phases 1–2.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/compiler/src/config-loader.ts` | load `zsys.config.ts` |
-| `packages/compiler/src/discovery/ast-prefilter.ts` | candidate scan |
-| `packages/compiler/src/discovery/evaluator.ts` | isolated module evaluation |
-| `packages/compiler/src/extract.ts` | descriptor extraction |
-| `packages/compiler/src/normalize.ts` | normalized contracts |
-| `packages/compiler/src/validate/*.ts` | semantic validation passes |
-| `packages/compiler/src/source-map.ts` | source location capture |
-| `packages/compiler/src/generate-manifest.ts` | executable reference generation |
-| `packages/graph/src/model.ts` | graph node/edge contracts |
-| `packages/graph/src/build.ts` | graph construction |
-| `packages/graph/src/hash.ts` | canonical hash |
-| `packages/graph/src/diff.ts` | compatibility diff |
-| `tests/compiler/fixtures/*` | valid/warning/error fixtures |
+| Path                                               | Responsibility                  |
+| -------------------------------------------------- | ------------------------------- |
+| `packages/compiler/src/config-loader.ts`           | load `zsys.config.ts`           |
+| `packages/compiler/src/discovery/ast-prefilter.ts` | candidate scan                  |
+| `packages/compiler/src/discovery/evaluator.ts`     | isolated module evaluation      |
+| `packages/compiler/src/extract.ts`                 | descriptor extraction           |
+| `packages/compiler/src/normalize.ts`               | normalized contracts            |
+| `packages/compiler/src/validate/*.ts`              | semantic validation passes      |
+| `packages/compiler/src/source-map.ts`              | source location capture         |
+| `packages/compiler/src/generate-manifest.ts`       | executable reference generation |
+| `packages/graph/src/model.ts`                      | graph node/edge contracts       |
+| `packages/graph/src/build.ts`                      | graph construction              |
+| `packages/graph/src/hash.ts`                       | canonical hash                  |
+| `packages/graph/src/diff.ts`                       | compatibility diff              |
+| `tests/compiler/fixtures/*`                        | valid/warning/error fixtures    |
 
 #### Dependencies
 
@@ -4641,18 +4587,18 @@ Phases 1 and 3.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/runtime-effect/src/runtime.ts` | managed runtime construction |
-| `packages/runtime-effect/src/services.ts` | internal service tags |
+| Path                                            | Responsibility                   |
+| ----------------------------------------------- | -------------------------------- |
+| `packages/runtime-effect/src/runtime.ts`        | managed runtime construction     |
+| `packages/runtime-effect/src/services.ts`       | internal service tags            |
 | `packages/runtime-effect/src/handler-bridge.ts` | Promise handler to Effect bridge |
-| `packages/runtime-effect/src/failure.ts` | internal failure algebra |
-| `packages/runtime-effect/src/scope.ts` | acquisition/release ordering |
-| `packages/runtime-effect/src/logger.ts` | Effect logger sinks |
-| `packages/runtime-effect/src/tracing.ts` | span creation/propagation |
-| `packages/runtime-effect/src/clock.ts` | public clock bridge |
-| `packages/runtime-effect/src/abort.ts` | fiber/AbortSignal bridge |
-| `packages/engine/src/lifecycle.ts` | generation lifecycle state |
+| `packages/runtime-effect/src/failure.ts`        | internal failure algebra         |
+| `packages/runtime-effect/src/scope.ts`          | acquisition/release ordering     |
+| `packages/runtime-effect/src/logger.ts`         | Effect logger sinks              |
+| `packages/runtime-effect/src/tracing.ts`        | span creation/propagation        |
+| `packages/runtime-effect/src/clock.ts`          | public clock bridge              |
+| `packages/runtime-effect/src/abort.ts`          | fiber/AbortSignal bridge         |
+| `packages/engine/src/lifecycle.ts`              | generation lifecycle state       |
 
 #### Dependencies
 
@@ -4756,17 +4702,17 @@ Phases 3–4.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/engine/src/registry.ts` | function registry keyed by stable ID |
-| `packages/engine/src/invoke.ts` | invocation pipeline |
-| `packages/engine/src/context.ts` | typed public context construction |
-| `packages/engine/src/concurrency.ts` | per-function admission |
-| `packages/engine/src/dependencies.ts` | declared dependency enforcement |
-| `packages/engine/src/recursion.ts` | call-stack policy |
-| `packages/testing/src/runtime.ts` | first test runtime |
-| `packages/testing/src/invoke-function.ts` | standalone function helper |
-| `packages/testing/src/fakes.ts` | initial dependency fakes |
+| Path                                      | Responsibility                       |
+| ----------------------------------------- | ------------------------------------ |
+| `packages/engine/src/registry.ts`         | function registry keyed by stable ID |
+| `packages/engine/src/invoke.ts`           | invocation pipeline                  |
+| `packages/engine/src/context.ts`          | typed public context construction    |
+| `packages/engine/src/concurrency.ts`      | per-function admission               |
+| `packages/engine/src/dependencies.ts`     | declared dependency enforcement      |
+| `packages/engine/src/recursion.ts`        | call-stack policy                    |
+| `packages/testing/src/runtime.ts`         | first test runtime                   |
+| `packages/testing/src/invoke-function.ts` | standalone function helper           |
+| `packages/testing/src/fakes.ts`           | initial dependency fakes             |
 
 #### Dependencies
 
@@ -4858,17 +4804,17 @@ Phases 3 and 5.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/runtime-hono/src/create-app.ts` | Hono application creation |
-| `packages/runtime-hono/src/materialize-routes.ts` | HTTP trigger registration |
-| `packages/runtime-hono/src/request-mapping.ts` | mapping AST execution |
-| `packages/runtime-hono/src/response-mapping.ts` | result/error conversion |
-| `packages/runtime-hono/src/middleware.ts` | generic middleware pipeline |
-| `packages/runtime-hono/src/internal-endpoints.ts` | health and inspector APIs |
-| `packages/openapi/src/generate.ts` | OpenAPI 3.1 generation |
-| `packages/client-generator/src/generate.ts` | typed HTTP client |
-| `packages/testing/src/http.ts` | in-memory HTTP harness |
+| Path                                              | Responsibility              |
+| ------------------------------------------------- | --------------------------- |
+| `packages/runtime-hono/src/create-app.ts`         | Hono application creation   |
+| `packages/runtime-hono/src/materialize-routes.ts` | HTTP trigger registration   |
+| `packages/runtime-hono/src/request-mapping.ts`    | mapping AST execution       |
+| `packages/runtime-hono/src/response-mapping.ts`   | result/error conversion     |
+| `packages/runtime-hono/src/middleware.ts`         | generic middleware pipeline |
+| `packages/runtime-hono/src/internal-endpoints.ts` | health and inspector APIs   |
+| `packages/openapi/src/generate.ts`                | OpenAPI 3.1 generation      |
+| `packages/client-generator/src/generate.ts`       | typed HTTP client           |
+| `packages/testing/src/http.ts`                    | in-memory HTTP harness      |
 
 #### Dependencies
 
@@ -4966,19 +4912,19 @@ Phases 2, 4, and 5.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/app/src/providers.ts` | serializable provider-set declarations |
-| `packages/engine/src/provider-registry.ts` | active provider resolution |
-| `packages/providers-local/src/index.ts` | local provider set |
-| `packages/providers-local/src/buckets/*` | atomic filesystem bucket |
-| `packages/providers-local/src/cache/*` | bounded typed cache |
-| `packages/buckets/src/client.ts` | public Promise client contract |
-| `packages/cache/src/client.ts` | public Promise client contract |
-| `packages/testing/src/buckets.ts` | bucket fakes/inspectors |
-| `packages/testing/src/cache.ts` | cache fakes/inspectors |
-| `tests/contracts/buckets/*` | reusable bucket provider suite |
-| `tests/contracts/cache/*` | reusable cache provider suite |
+| Path                                       | Responsibility                         |
+| ------------------------------------------ | -------------------------------------- |
+| `packages/app/src/providers.ts`            | serializable provider-set declarations |
+| `packages/engine/src/provider-registry.ts` | active provider resolution             |
+| `packages/providers-local/src/index.ts`    | local provider set                     |
+| `packages/providers-local/src/buckets/*`   | atomic filesystem bucket               |
+| `packages/providers-local/src/cache/*`     | bounded typed cache                    |
+| `packages/buckets/src/client.ts`           | public Promise client contract         |
+| `packages/cache/src/client.ts`             | public Promise client contract         |
+| `packages/testing/src/buckets.ts`          | bucket fakes/inspectors                |
+| `packages/testing/src/cache.ts`            | cache fakes/inspectors                 |
+| `tests/contracts/buckets/*`                | reusable bucket provider suite         |
+| `tests/contracts/cache/*`                  | reusable cache provider suite          |
 
 #### Dependencies
 
@@ -5065,18 +5011,18 @@ Phases 5 and 7.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/jobs/src/client.ts` | enqueue API |
-| `packages/engine/src/materialize-jobs.ts` | queue/schedule plan binding |
-| `packages/providers-local/src/jobs/store.ts` | append-only durable state |
-| `packages/providers-local/src/jobs/queue.ts` | availability and lease logic |
-| `packages/providers-local/src/jobs/retry.ts` | delay calculation |
-| `packages/providers-local/src/jobs/scheduler.ts` | cron/test-clock scheduler |
-| `packages/providers-local/src/jobs/admin.ts` | local retry/cancel/dead-letter controls |
-| `packages/testing/src/jobs.ts` | deterministic job harness |
-| `tests/contracts/jobs/*` | provider contract suite |
-| `tests/restart/jobs/*` | child-process recovery tests |
+| Path                                             | Responsibility                          |
+| ------------------------------------------------ | --------------------------------------- |
+| `packages/jobs/src/client.ts`                    | enqueue API                             |
+| `packages/engine/src/materialize-jobs.ts`        | queue/schedule plan binding             |
+| `packages/providers-local/src/jobs/store.ts`     | append-only durable state               |
+| `packages/providers-local/src/jobs/queue.ts`     | availability and lease logic            |
+| `packages/providers-local/src/jobs/retry.ts`     | delay calculation                       |
+| `packages/providers-local/src/jobs/scheduler.ts` | cron/test-clock scheduler               |
+| `packages/providers-local/src/jobs/admin.ts`     | local retry/cancel/dead-letter controls |
+| `packages/testing/src/jobs.ts`                   | deterministic job harness               |
+| `tests/contracts/jobs/*`                         | provider contract suite                 |
+| `tests/restart/jobs/*`                           | child-process recovery tests            |
 
 #### Dependencies
 
@@ -5167,17 +5113,17 @@ Phases 5, 7, and 8 for reusable durable-state patterns.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/events/src/client.ts` | typed publish API |
-| `packages/engine/src/materialize-events.ts` | event contract and trigger registration |
-| `packages/providers-local/src/events/log.ts` | accepted event envelope log |
-| `packages/providers-local/src/events/router.ts` | selector matching and fan-out |
-| `packages/providers-local/src/events/delivery.ts` | durable leases/retries |
-| `packages/providers-local/src/events/ephemeral.ts` | transient in-process delivery |
-| `packages/testing/src/events.ts` | publish/drain/inspect harness |
-| `tests/contracts/events/*` | provider contract suite |
-| `tests/restart/events/*` | durable recovery tests |
+| Path                                               | Responsibility                          |
+| -------------------------------------------------- | --------------------------------------- |
+| `packages/events/src/client.ts`                    | typed publish API                       |
+| `packages/engine/src/materialize-events.ts`        | event contract and trigger registration |
+| `packages/providers-local/src/events/log.ts`       | accepted event envelope log             |
+| `packages/providers-local/src/events/router.ts`    | selector matching and fan-out           |
+| `packages/providers-local/src/events/delivery.ts`  | durable leases/retries                  |
+| `packages/providers-local/src/events/ephemeral.ts` | transient in-process delivery           |
+| `packages/testing/src/events.ts`                   | publish/drain/inspect harness           |
+| `tests/contracts/events/*`                         | provider contract suite                 |
+| `tests/restart/events/*`                           | durable recovery tests                  |
 
 #### Dependencies
 
@@ -5269,16 +5215,16 @@ Phases 5, 7, and 9.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/tools/src/runtime.ts` | tool validation and invocation policy |
-| `packages/agents/src/runtime.ts` | agent loop contract |
-| `packages/agents/src/generated-function.ts` | generated agent invocation identity |
-| `packages/agents/src/model-provider.ts` | internal provider interface |
-| `packages/agents/src/approval.ts` | tool approval state |
-| `packages/providers-local/src/models/fake.ts` | scripted fake model |
-| `packages/testing/src/agents.ts` | agent script and assertion helpers |
-| `tests/integration/agents/*` | deterministic agent tests |
+| Path                                          | Responsibility                        |
+| --------------------------------------------- | ------------------------------------- |
+| `packages/tools/src/runtime.ts`               | tool validation and invocation policy |
+| `packages/agents/src/runtime.ts`              | agent loop contract                   |
+| `packages/agents/src/generated-function.ts`   | generated agent invocation identity   |
+| `packages/agents/src/model-provider.ts`       | internal provider interface           |
+| `packages/agents/src/approval.ts`             | tool approval state                   |
+| `packages/providers-local/src/models/fake.ts` | scripted fake model                   |
+| `packages/testing/src/agents.ts`              | agent script and assertion helpers    |
+| `tests/integration/agents/*`                  | deterministic agent tests             |
 
 #### Dependencies
 
@@ -5368,17 +5314,17 @@ Phases 4–10.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/observability/src/model.ts` | request/log/span record contracts |
-| `packages/observability/src/collector.ts` | in-memory event collection |
-| `packages/observability/src/redaction.ts` | field/value redaction |
-| `packages/observability/src/storage/segments.ts` | NDJSON append/rotation |
-| `packages/observability/src/storage/index.ts` | bounded query index |
-| `packages/observability/src/query.ts` | filters and pagination |
-| `packages/observability/src/stream.ts` | cursor-based live stream |
-| `packages/inspector-api/src/observability.ts` | HTTP/SSE routes |
-| `tests/security/redaction/*` | recursive secret scans |
+| Path                                             | Responsibility                    |
+| ------------------------------------------------ | --------------------------------- |
+| `packages/observability/src/model.ts`            | request/log/span record contracts |
+| `packages/observability/src/collector.ts`        | in-memory event collection        |
+| `packages/observability/src/redaction.ts`        | field/value redaction             |
+| `packages/observability/src/storage/segments.ts` | NDJSON append/rotation            |
+| `packages/observability/src/storage/index.ts`    | bounded query index               |
+| `packages/observability/src/query.ts`            | filters and pagination            |
+| `packages/observability/src/stream.ts`           | cursor-based live stream          |
+| `packages/inspector-api/src/observability.ts`    | HTTP/SSE routes                   |
+| `tests/security/redaction/*`                     | recursive secret scans            |
 
 #### Dependencies
 
@@ -5469,18 +5415,18 @@ Phases 3–11.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/supervisor/src/state-machine.ts` | generation states and transitions |
-| `packages/supervisor/src/watcher.ts` | grouped file change detection |
-| `packages/supervisor/src/candidate.ts` | compile/start/verify candidate |
-| `packages/supervisor/src/proxy.ts` | stable-port active target |
-| `packages/supervisor/src/drain.ts` | old generation shutdown |
-| `packages/inspector-api/src/router.ts` | versioned API root |
-| `packages/inspector-api/src/graph.ts` | graph queries |
-| `packages/inspector-api/src/runtime.ts` | functions/jobs/events/resources queries |
-| `packages/inspector-api/src/actions.ts` | local safe actions |
-| `packages/cli/src/commands/dev.ts` | `zsys dev` orchestration |
+| Path                                       | Responsibility                          |
+| ------------------------------------------ | --------------------------------------- |
+| `packages/supervisor/src/state-machine.ts` | generation states and transitions       |
+| `packages/supervisor/src/watcher.ts`       | grouped file change detection           |
+| `packages/supervisor/src/candidate.ts`     | compile/start/verify candidate          |
+| `packages/supervisor/src/proxy.ts`         | stable-port active target               |
+| `packages/supervisor/src/drain.ts`         | old generation shutdown                 |
+| `packages/inspector-api/src/router.ts`     | versioned API root                      |
+| `packages/inspector-api/src/graph.ts`      | graph queries                           |
+| `packages/inspector-api/src/runtime.ts`    | functions/jobs/events/resources queries |
+| `packages/inspector-api/src/actions.ts`    | local safe actions                      |
+| `packages/cli/src/commands/dev.ts`         | `zsys dev` orchestration                |
 
 #### Dependencies
 
@@ -5569,26 +5515,26 @@ Phase 12.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `apps/inspector/app/layout.tsx` | application shell |
-| `apps/inspector/app/page.tsx` | overview |
-| `apps/inspector/app/graph/*` | graph view |
-| `apps/inspector/app/routes/*` | route list/detail/composer |
-| `apps/inspector/app/functions/*` | function list/detail/invoke |
-| `apps/inspector/app/jobs/*` | job state and local actions |
-| `apps/inspector/app/events/*` | event contracts and triggers |
-| `apps/inspector/app/buckets/*` | bucket metadata/browser where safe |
-| `apps/inspector/app/cache/*` | cache metadata, not raw sensitive keys by default |
-| `apps/inspector/app/tools/*` | tool contracts |
-| `apps/inspector/app/agents/*` | agent timeline and approvals |
-| `apps/inspector/app/requests/*` | request list/detail |
-| `apps/inspector/app/logs/*` | live/searchable logs |
-| `apps/inspector/app/traces/*` | trace waterfall |
-| `apps/inspector/app/diagnostics/*` | compile/runtime diagnostics |
-| `apps/inspector/lib/api.ts` | versioned client |
-| `apps/inspector/lib/stream.ts` | SSE reconnect client |
-| `tests/e2e/*` | Playwright flows |
+| Path                               | Responsibility                                    |
+| ---------------------------------- | ------------------------------------------------- |
+| `apps/inspector/app/layout.tsx`    | application shell                                 |
+| `apps/inspector/app/page.tsx`      | overview                                          |
+| `apps/inspector/app/graph/*`       | graph view                                        |
+| `apps/inspector/app/routes/*`      | route list/detail/composer                        |
+| `apps/inspector/app/functions/*`   | function list/detail/invoke                       |
+| `apps/inspector/app/jobs/*`        | job state and local actions                       |
+| `apps/inspector/app/events/*`      | event contracts and triggers                      |
+| `apps/inspector/app/buckets/*`     | bucket metadata/browser where safe                |
+| `apps/inspector/app/cache/*`       | cache metadata, not raw sensitive keys by default |
+| `apps/inspector/app/tools/*`       | tool contracts                                    |
+| `apps/inspector/app/agents/*`      | agent timeline and approvals                      |
+| `apps/inspector/app/requests/*`    | request list/detail                               |
+| `apps/inspector/app/logs/*`        | live/searchable logs                              |
+| `apps/inspector/app/traces/*`      | trace waterfall                                   |
+| `apps/inspector/app/diagnostics/*` | compile/runtime diagnostics                       |
+| `apps/inspector/lib/api.ts`        | versioned client                                  |
+| `apps/inspector/lib/stream.ts`     | SSE reconnect client                              |
+| `tests/e2e/*`                      | Playwright flows                                  |
 
 #### Dependencies
 
@@ -5682,21 +5628,21 @@ Phases 1–13.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/cli/src/main.ts` | CLI entry and command routing |
-| `packages/cli/src/commands/check.ts` | compile/diagnostics |
-| `packages/cli/src/commands/build.ts` | production build |
-| `packages/cli/src/commands/start.ts` | start built server |
-| `packages/cli/src/commands/graph.ts` | print/check/diff graph |
-| `packages/cli/src/commands/env.ts` | env commands |
-| `packages/cli/src/commands/doctor.ts` | environment checks |
-| `packages/create-zsys/src/index.ts` | generator entry |
-| `packages/create-zsys/src/options.ts` | flags and defaults |
-| `packages/create-zsys/src/generate.ts` | temporary-dir generation |
-| `packages/create-zsys/src/validate.ts` | name/path validation |
-| `templates/default/*` | generated project template |
-| `tests/generator/*` | packed-artifact smoke suite |
+| Path                                   | Responsibility                |
+| -------------------------------------- | ----------------------------- |
+| `packages/cli/src/main.ts`             | CLI entry and command routing |
+| `packages/cli/src/commands/check.ts`   | compile/diagnostics           |
+| `packages/cli/src/commands/build.ts`   | production build              |
+| `packages/cli/src/commands/start.ts`   | start built server            |
+| `packages/cli/src/commands/graph.ts`   | print/check/diff graph        |
+| `packages/cli/src/commands/env.ts`     | env commands                  |
+| `packages/cli/src/commands/doctor.ts`  | environment checks            |
+| `packages/create-zsys/src/index.ts`    | generator entry               |
+| `packages/create-zsys/src/options.ts`  | flags and defaults            |
+| `packages/create-zsys/src/generate.ts` | temporary-dir generation      |
+| `packages/create-zsys/src/validate.ts` | name/path validation          |
+| `templates/default/*`                  | generated project template    |
+| `tests/generator/*`                    | packed-artifact smoke suite   |
 
 #### Dependencies
 
@@ -5785,20 +5731,20 @@ Phases 3, 6–11, and 14.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `packages/deploy/src/plan.ts` | provider-neutral plan contracts |
-| `packages/deploy/src/from-graph.ts` | graph-to-plan compiler |
-| `packages/deploy/src/diff.ts` | deployment risk summary |
-| `packages/deploy-pulumi/src/workspace.ts` | Automation API workspace/stack |
-| `packages/deploy-pulumi/src/program.ts` | plan-to-Pulumi program |
-| `packages/deploy-pulumi/src/events.ts` | Pulumi event to Effect log mapping |
-| `packages/cloud-aws/src/components/*` | AWS Pulumi components |
-| `packages/cloud-aws/src/runtime/*` | AWS provider implementations |
-| `packages/cli/src/commands/deploy.ts` | deploy subcommands |
-| `tests/deployment/plan/*` | plan golden tests |
-| `tests/deployment/pulumi/*` | Pulumi mock tests |
-| `tests/deployment/aws/*` | isolated cloud tests |
+| Path                                      | Responsibility                     |
+| ----------------------------------------- | ---------------------------------- |
+| `packages/deploy/src/plan.ts`             | provider-neutral plan contracts    |
+| `packages/deploy/src/from-graph.ts`       | graph-to-plan compiler             |
+| `packages/deploy/src/diff.ts`             | deployment risk summary            |
+| `packages/deploy-pulumi/src/workspace.ts` | Automation API workspace/stack     |
+| `packages/deploy-pulumi/src/program.ts`   | plan-to-Pulumi program             |
+| `packages/deploy-pulumi/src/events.ts`    | Pulumi event to Effect log mapping |
+| `packages/cloud-aws/src/components/*`     | AWS Pulumi components              |
+| `packages/cloud-aws/src/runtime/*`        | AWS provider implementations       |
+| `packages/cli/src/commands/deploy.ts`     | deploy subcommands                 |
+| `tests/deployment/plan/*`                 | plan golden tests                  |
+| `tests/deployment/pulumi/*`               | Pulumi mock tests                  |
+| `tests/deployment/aws/*`                  | isolated cloud tests               |
 
 #### Dependencies
 
@@ -5903,18 +5849,18 @@ Phases 0–15.
 
 #### Files and packages
 
-| Path | Responsibility |
-|---|---|
-| `scripts/verify.ts` | final complete verification pipeline |
-| `scripts/performance.ts` | repeatable baseline measurements |
-| `scripts/release-check.ts` | package/version/artifact checks |
-| `docs/getting-started.md` | project creation and first route |
-| `docs/testing.md` | application and framework testing |
-| `docs/deployment.md` | Pulumi/AWS workflow |
-| `docs/architecture.md` | graph/runtime overview |
-| `docs/troubleshooting.md` | diagnostic-led fixes |
-| `RELEASE_CHECKLIST.md` | signed review evidence |
-| `apps/fixture-commerce/` | complete POC acceptance app |
+| Path                       | Responsibility                          |
+| -------------------------- | --------------------------------------- |
+| `scripts/verify.ts`        | final complete verification pipeline    |
+| `scripts/performance.ts`   | repeatable baseline measurements        |
+| `scripts/release-check.ts` | package/version/artifact checks         |
+| `docs/getting-started.md`  | project creation and first route        |
+| `docs/testing.md`          | application and framework testing       |
+| `docs/deployment.md`       | Pulumi/AWS workflow                     |
+| `docs/architecture.md`     | graph/runtime overview                  |
+| `docs/troubleshooting.md`  | diagnostic-led fixes                    |
+| `RELEASE_CHECKLIST.md`     | signed review evidence                  |
+| `examples/commerce/`       | complete POC example and acceptance app |
 
 #### Dependencies
 

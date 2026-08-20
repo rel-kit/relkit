@@ -158,6 +158,7 @@ export function isFrameworkRuntime(dependency: string): boolean {
 }
 
 export function isFixtureForbidden(dependency: string): boolean {
+  if (dependency === "@zsys/app/config") return false;
   return (
     (dependency.startsWith("@zsys/") && !publicApplicationPackages.has(dependency)) ||
     dependency === "create-zsys" ||

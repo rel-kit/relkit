@@ -98,6 +98,9 @@ export type { RouteInvocationInput, RouteInvocationResult } from "./route-reques
 export interface InspectorQuery {
   readonly cursor?: string;
   readonly limit?: number;
+  readonly search?: string;
+  readonly kind?: string;
+  readonly status?: string;
   readonly from?: string;
   readonly to?: string;
   readonly severity?: string;

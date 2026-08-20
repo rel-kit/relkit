@@ -1,191 +1,146 @@
-import {
-  createDescriptorBase,
-  deepFreeze,
-  isRef,
-  normalizeId,
-  type DescriptorBase,
-  type DescriptorMetadata,
-} from "@zsys/contracts";
-import type { ErrorDescriptorAny, FunctionRef, FunctionRefAny } from "@zsys/functions";
-import type { RetryPolicy } from "@zsys/jobs";
-import type { EventDescriptor, EventDescriptorAny } from "./define-event.js";
-import { isEventDescriptor } from "./define-event.js";
-import {
-  single,
-  copyEventSelector,
-  isEventSelector,
-  type EventSelectorAny,
-  type EventSelectorInput,
-} from "./selectors.js";
-import type { SingleEventSelector } from "./selectors.js";
+import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
+import { defineFunction, type FunctionContext, type FunctionDependencies } from "@zsys/functions";
+import { z } from "@zsys/schema";
+import type { UnknownEventEnvelope } from "./define-event.js";
+import type { EventName } from "./event-registry.js";
+import type {
+  EventListenerContext,
+  EventListenerHandler,
+  EventListenerMetadata,
+  EventTriggerDescriptor,
+  OnEventOptions,
+} from "./listener-types.js";
+import { delivery, isRecord, optionalId, positive, retryPolicy } from "./listener-validation.js";
+import { copyEventSelector, isEventSelector, single } from "./selectors.js";
+import type {
+  EventSelectorAny,
+  EventSelectorInput,
+  SingleEventSelector,
+} from "./selector-types.js";
 
-export type EventDelivery = "ephemeral" | "durable";
+const pendingListenerId = "zsys.event.listener.pending";
 
-export type EventTriggerTarget<Target extends FunctionRefAny> = FunctionRef<
-  Target["ref"]["id"],
-  Target extends { readonly __input?: infer Input } ? Input : unknown,
-  Target extends { readonly __output?: infer Output } ? Output : unknown,
-  readonly ErrorDescriptorAny[],
-  Target["input"],
-  Target["output"]
->;
-
-export interface EventTriggerDescriptor<
-  Id extends string,
-  Selector extends EventSelectorAny = EventSelectorAny,
-  Target extends FunctionRefAny = FunctionRefAny,
-> extends DescriptorBase<"event-trigger", Id> {
-  readonly selector: Selector;
-  readonly target: EventTriggerTarget<Target>;
-  readonly delivery: EventDelivery;
-  readonly profile?: string;
-  readonly retry?: RetryPolicy;
-  readonly concurrency?: number;
-  readonly __input?: EventSelectorInput<Selector>;
-}
-
-export interface OnEventOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-> extends DescriptorMetadata {
-  readonly id: Id;
-  readonly target: Target;
-  readonly delivery: EventDelivery;
-  readonly profile?: string;
-  readonly retry?: RetryPolicy;
-  readonly concurrency?: number;
-}
-
+/**
+ * Registers a typed callback for an event name or selector.
+ *
+ * @example
+ * ```ts
+ * import { events, onEvent } from "@zsys/events"
+ *
+ * const audit = onEvent(events.all({ payload: "unknown", purpose: "audit" }), async (event, ctx) => {
+ *   ctx.log.info("event received", { eventId: event.eventId })
+ * })
+ * void audit
+ * ```
+ * @category Events
+ * @since 0.1.0
+ */
 export function onEvent<
-  const Event extends EventDescriptorAny,
-  const Id extends string,
-  const Target extends FunctionRefAny,
+  const Name extends EventName,
+  const Id extends string = string,
+  const Dependencies extends FunctionDependencies = {},
 >(
-  event: Event,
-  options: OnEventOptions<Id, Target>,
-): EventTriggerDescriptor<Id, SingleEventSelector<Event>, Target>;
+  name: Name,
+  handler: EventListenerHandler<EventSelectorInput<SingleEventSelector<Name>>, Dependencies>,
+  options?: OnEventOptions<Id, Dependencies>,
+): EventTriggerDescriptor<Id, SingleEventSelector<Name>, Dependencies>;
 export function onEvent<
   const Selector extends EventSelectorAny,
-  const Id extends string,
-  const Target extends FunctionRefAny,
+  const Id extends string = string,
+  const Dependencies extends FunctionDependencies = {},
 >(
   selector: Selector,
-  options: OnEventOptions<Id, Target>,
-): EventTriggerDescriptor<Id, Selector, Target>;
+  handler: EventListenerHandler<EventSelectorInput<Selector>, Dependencies>,
+  options?: OnEventOptions<Id, Dependencies>,
+): EventTriggerDescriptor<Id, Selector, Dependencies>;
 export function onEvent(
-  source: EventDescriptorAny | EventSelectorAny,
-  options: OnEventOptions<string, FunctionRefAny>,
-): EventTriggerDescriptor<string> {
-  if (!isRecord(options)) throw new TypeError("Event trigger options must be an object");
-  if (hasOwn(options, "handler")) throw new TypeError("Event triggers cannot own handlers");
-  const selector = isEventSelector(source)
-    ? copyEventSelector(source)
-    : isEventDescriptor(source)
-      ? single(source)
-      : (() => {
-          throw new TypeError("onEvent requires an event descriptor or selector");
-        })();
-  const target = copyFunctionTarget(options.target);
-  const delivery = validateDelivery(options.delivery);
-  const profile = options.profile === undefined ? undefined : normalizeId(options.profile);
-  const retry = options.retry === undefined ? undefined : copyRetry(options.retry);
-  if (options.concurrency !== undefined)
-    validatePositiveInteger(options.concurrency, "concurrency");
-  const base = createDescriptorBase("event-trigger", options.id, options);
-
+  source: string | EventSelectorAny,
+  handler: EventListenerHandler<any, any>,
+  options: OnEventOptions<string, any> = {},
+): EventTriggerDescriptor<any, any, any> {
+  if (typeof handler !== "function")
+    throw new TypeError("onEvent requires a callback as its second argument");
+  if (!isRecord(options)) throw new TypeError("Event listener options must be an object");
+  const selector =
+    typeof source === "string"
+      ? single(source as EventName)
+      : isEventSelector(source)
+        ? copyEventSelector(source)
+        : invalidSource();
+  const explicitId = optionalId(options.id);
+  const id = explicitId ?? pendingListenerId;
+  const selectedDelivery = delivery(options.delivery);
+  const profile = optionalId(options.profile);
+  const retry = retryPolicy(options.retry);
+  const concurrency = positive(options.concurrency, "concurrency");
+  const timeoutMs = positive(options.timeoutMs, "timeoutMs");
+  const target = defineFunction({
+    id: eventListenerFunctionId(id),
+    input: z.unknown(),
+    output: z.unknown(),
+    ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
+    ...(timeoutMs === undefined ? {} : { timeoutMs }),
+    ...(concurrency === undefined ? {} : { concurrency }),
+    handler: (input, _request, context) => {
+      const envelope = input as UnknownEventEnvelope;
+      return handler(listenerInput(selector, envelope), listenerContext(context, envelope));
+    },
+  });
+  const base = createDescriptorBase("event-trigger", id, options);
   return deepFreeze({
     ...base,
     selector,
     target,
-    delivery,
+    delivery: selectedDelivery,
+    callback: true as const,
+    inferredId: explicitId === undefined,
     ...(profile === undefined ? {} : { profile }),
     ...(retry === undefined ? {} : { retry }),
-    ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
-  }) as EventTriggerDescriptor<string>;
+    ...(concurrency === undefined ? {} : { concurrency }),
+    ...(timeoutMs === undefined ? {} : { timeoutMs }),
+  }) as EventTriggerDescriptor;
 }
 
-export function isEventTriggerDescriptor(value: unknown): value is EventTriggerDescriptor<string> {
-  if (!isRecord(value) || value.kind !== "event-trigger") return false;
+export function eventListenerFunctionId(listenerId: string): string {
+  return `zsys.event.${listenerId}.handler`;
+}
+
+export function isEventTriggerDescriptor(value: unknown): value is EventTriggerDescriptor {
   return (
+    isRecord(value) &&
+    value.kind === "event-trigger" &&
+    value.callback === true &&
     isEventSelector(value.selector) &&
-    isFunctionTarget(value.target) &&
+    isRecord(value.target) &&
+    typeof value.target.handler === "function" &&
     (value.delivery === "ephemeral" || value.delivery === "durable")
   );
 }
 
-function copyFunctionTarget<Target extends FunctionRefAny>(
-  target: Target,
-): EventTriggerTarget<Target> {
-  if (!isFunctionTarget(target))
-    throw new TypeError("Event trigger target must be a function reference");
-  return deepFreeze({
-    ref: Object.freeze({ kind: "function" as const, id: target.ref.id }),
-    input: target.input,
-    output: target.output,
-    ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
-  }) as EventTriggerTarget<Target>;
+function listenerInput(selector: EventSelectorAny, envelope: UnknownEventEnvelope): unknown {
+  return selector.kind === "single" ? envelope.payload : envelope;
 }
 
-function copyRetry(value: RetryPolicy): RetryPolicy {
-  if (!isRecord(value)) throw new TypeError("Event retry policy must be an object");
-  validatePositiveInteger(value.maxAttempts, "retry.maxAttempts");
-  validateNonNegativeInteger(value.initialDelayMs, "retry.initialDelayMs");
-  validateNonNegativeInteger(value.maxDelayMs, "retry.maxDelayMs");
-  if (value.maxDelayMs < value.initialDelayMs)
-    throw new TypeError("retry.maxDelayMs must be at least retry.initialDelayMs");
-  if (
-    typeof value.multiplier !== "number" ||
-    !Number.isFinite(value.multiplier) ||
-    value.multiplier < 1
-  )
-    throw new TypeError("retry.multiplier must be a finite number at least 1");
-  if (value.jitter !== "none" && value.jitter !== "full" && value.jitter !== "equal")
-    throw new TypeError("retry.jitter must be none, full, or equal");
-  return Object.freeze({
-    maxAttempts: value.maxAttempts,
-    initialDelayMs: value.initialDelayMs,
-    maxDelayMs: value.maxDelayMs,
-    multiplier: value.multiplier,
-    jitter: value.jitter,
+function listenerContext(
+  context: FunctionContext<FunctionDependencies>,
+  envelope: UnknownEventEnvelope,
+): EventListenerContext<FunctionDependencies> {
+  const event: EventListenerMetadata = Object.freeze({
+    eventId: envelope.eventId,
+    version: envelope.version,
+    instanceId: envelope.instanceId,
+    ...(envelope.key === undefined ? {} : { key: envelope.key }),
+    attributes: envelope.attributes,
+    occurredAt: envelope.occurredAt,
+    traceId: envelope.traceId,
+    ...(envelope.correlationId === undefined ? {} : { correlationId: envelope.correlationId }),
+    ...(envelope.causationInvocationId === undefined
+      ? {}
+      : { causationInvocationId: envelope.causationInvocationId }),
   });
+  return Object.freeze({ ...context, event });
 }
 
-function validateDelivery(value: unknown): EventDelivery {
-  if (value !== "ephemeral" && value !== "durable")
-    throw new TypeError("Event delivery must be ephemeral or durable");
-  return value;
+function invalidSource(): never {
+  throw new TypeError("onEvent requires an event name or selector");
 }
-
-function validatePositiveInteger(value: unknown, name: string): asserts value is number {
-  if (!Number.isSafeInteger(value) || (value as number) < 1)
-    throw new TypeError(`${name} must be a positive integer`);
-}
-
-function validateNonNegativeInteger(value: unknown, name: string): asserts value is number {
-  if (!Number.isSafeInteger(value) || (value as number) < 0)
-    throw new TypeError(`${name} must be a non-negative integer`);
-}
-
-function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return (
-    isRecord(value) &&
-    isRef(value.ref, "function") &&
-    isSchema(value.input) &&
-    isSchema(value.output)
-  );
-}
-
-function isSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
-  return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
-}
-
-export type { FunctionRef };

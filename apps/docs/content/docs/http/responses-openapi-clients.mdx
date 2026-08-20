@@ -1,0 +1,24 @@
+---
+title: Responses, OpenAPI, Scalar, and clients
+description: Follow response inference or take full control of transport-specific contracts.
+---
+
+Without `responses`, a non-void output becomes JSON `200`; void/undefined becomes `204`.
+`successStatus` overrides the successful status—`POST` does not imply `201`. Declared errors with
+`http.status`, validation `422`, and route rate-limit `429` are added automatically.
+
+An explicit `responses` array is a complete override for redirects, alternate media types, multiple
+success shapes, or middleware-owned responses. `HEAD` invokes the normal target and removes its body.
+`OPTIONS` exists only when the route file explicitly exports it.
+
+During development:
+
+- `/_zsys/v1/openapi.json` serves deterministic OpenAPI 3.1.
+- `/_zsys/v1/api-reference` serves the bundled Scalar reference.
+
+Production requires `server.apiDocs.enabledInProduction: true` plus internal-endpoint authorization.
+Scalar embeds the document in protected production mode; the raw OpenAPI endpoint remains protected.
+
+The generated client mirrors inferred requests and response unions. Optional catch-all remains one
+operation accepting an optional segment array, even though the runtime registers two paths. Regenerate
+with `zsys check`; never edit `.zsys/generated/client.ts` directly.

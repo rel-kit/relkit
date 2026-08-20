@@ -1,0 +1,38 @@
+---
+title: First route
+description: Define a validated function and expose it through a convention-derived HTTP route.
+---
+
+Create `src/functions/hello.function.ts`:
+
+```ts
+import { defineFunction } from "@zsys/app";
+import { z } from "@zsys/schema";
+
+export default defineFunction({
+  id: "hello",
+  input: z.object({ name: z.string().default("world") }),
+  output: z.object({ message: z.string() }),
+  handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
+});
+```
+
+Create `src/routes/hello/route.ts`:
+
+```ts
+import { defineRoute } from "@zsys/app";
+import hello from "../../functions/hello.function.js";
+
+export const GET = defineRoute({ id: "hello.http", target: hello });
+```
+
+The file supplies `/hello`; the named export supplies `GET`. Because this is a `GET`, the remaining
+object input property becomes `?name=`. Start everything and call it:
+
+```sh
+bun run dev
+curl "http://localhost:3000/hello?name=ZSYS"
+```
+
+The response is `{ "message": "Hello, ZSYS!" }`. Keep the explicit descriptor ID stable when a
+file moves: paths are transport identity, while IDs are graph and deployment identity.

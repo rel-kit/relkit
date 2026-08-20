@@ -40,9 +40,11 @@ bun run zsys:local -- create my-app --cloud none --deploy none
 
 ## Repository layout
 
+- `apps/docs` is the searchable Next.js/Fumadocs documentation application on
+  port `3001`.
 - `apps/inspector` is the Next.js inspector served on port `3210` by a project
   development session.
-- `apps/fixture-commerce` is the acceptance fixture.
+- `examples/commerce` is the canonical executable, cross-feature example.
 - `packages/` contains the public authoring APIs, compiler, graph, engine,
   runtime, inspector API, providers, CLI, generator, and Pulumi deployment
   packages.
@@ -51,6 +53,9 @@ bun run zsys:local -- create my-app --cloud none --deploy none
 - `tests/` and `scripts/` contain the focused test layers and verification
   tooling.
 - `repos/effect` is vendored reference source, not a ZSYS edit target.
+
+Run `bunx turbo run dev --filter=@zsys/docs` for documentation development and
+`bun run test:docs` for generated-reference, doctest, link, and search checks.
 
 ## Generate and run an application
 
@@ -86,6 +91,5 @@ observability files live under `.zsys/` and should not be edited by hand.
 
 AWS deployment uses Pulumi as its engine and requires explicit credentials and
 authorization; local deployment tests use mocks. Production internal runtime
-endpoints are disabled unless `ZSYS_INTERNAL_ENDPOINTS=1` is set. A published
-CLI that cannot resolve a bundled inspector app must be given an inspector
-checkout through `ZSYS_INSPECTOR_ROOT`.
+endpoints are disabled unless `ZSYS_INTERNAL_ENDPOINTS=1` is set. The CLI ships
+the inspector; `ZSYS_INSPECTOR_ROOT` is reserved for framework contributors.

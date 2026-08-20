@@ -10,7 +10,7 @@ import { runGraph } from "./src/commands/graph.js";
 const roots: string[] = [];
 const cliEnv = defineEnv({
   API_KEY: env.secret().default("cli-synthetic-secret").description("API key"),
-  PORT: env.port().default(3210),
+  SERVICE_PORT: env.port().default(3210),
   REQUIRED: env.string().requiredIn("production").example("safe-value"),
 });
 
@@ -79,7 +79,7 @@ test("env and doctor cover safe success, failure, and usage paths", async () => 
   expect(await runEnv(["check", "--unknown"], envUsage.context)).toBe(2);
   expect(envUsage.errors[0]).toMatchObject({ code: "ZSYS_ENV_USAGE" });
 
-  const doctorRoot = await copyProject("apps/fixture-commerce");
+  const doctorRoot = await copyProject("examples/commerce");
   const doctorSuccess = capture();
   expect(
     await runDoctor(["--project-root", doctorRoot, "--no-pulumi"], doctorSuccess.context, {
@@ -110,7 +110,7 @@ async function copyProject(relativePath: string): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".zsys-cli-test-"));
   roots.push(root);
   await cp(join(process.cwd(), relativePath), root, { recursive: true });
-  await cp(join(process.cwd(), "apps/fixture-commerce/package.json"), join(root, "package.json"));
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   await rm(join(root, "node_modules"), { recursive: true, force: true });
   await linkWorkspacePackages(root);
   return root;

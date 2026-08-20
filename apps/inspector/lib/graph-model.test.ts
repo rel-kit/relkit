@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { normalizeGraphResponse, type GraphSnapshot } from "./graph-model";
 import { layoutGraph } from "./graph-layout";
+import { filterGraph, graphKinds } from "./graph-filter";
 import type { InspectorGraph } from "./api-types";
 
 function response(
@@ -13,7 +14,7 @@ function response(
     version: 1,
     generationId: "generation-one",
     graphHash: "sha256:fixture",
-    graph: { appId: "fixture-commerce", nodes, edges, observedEdges },
+    graph: { appId: "commerce-example", nodes, edges, observedEdges },
   } as InspectorGraph;
 }
 
@@ -59,5 +60,25 @@ describe("inspector graph model", () => {
     expect(layout.nodes[0]?.x).not.toBe(layout.nodes[31]?.x);
     expect(layout.nodes[0]?.x).toBe(layout.nodes[32]?.x);
     expect(layout.nodes[0]?.y).toBeLessThan(layout.nodes[32]?.y ?? 0);
+  });
+
+  test("filters nodes and edges without changing deterministic source order", () => {
+    const graph = normalizeGraphResponse(
+      response(
+        [
+          { kind: "function", id: "orders.create" },
+          { kind: "trigger", id: "orders.create.http" },
+          { kind: "function", id: "users.create" },
+        ],
+        [{ kind: "targets-function", from: "orders.create.http", to: "orders.create" }],
+        [],
+      ),
+    );
+    expect(graphKinds(graph)).toEqual(["function", "trigger"]);
+    expect(filterGraph(graph, "orders", "all").nodes.map((node) => node.id)).toEqual([
+      "orders.create",
+      "orders.create.http",
+    ]);
+    expect(filterGraph(graph, "", "function").edges).toEqual([]);
   });
 });

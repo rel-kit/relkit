@@ -44,3 +44,8 @@ import { getJsonSchema, z } from "@zsys/schema";
 const projection = getJsonSchema(z.object({ id: z.string().uuid() }));
 if (projection.ok) console.log(projection.schema);
 ```
+
+For buffered multipart uploads, `z.file({ maxBytes, mediaTypes })` validates the
+Web `File` type and projects OpenAPI binary-string metadata. Combine it with
+`http.multipart(name)` or `http.multipartAll(name)` in an explicit route
+request mapping.

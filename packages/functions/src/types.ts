@@ -2,11 +2,13 @@ import {
   type DescriptorBase,
   type DescriptorKind,
   type DescriptorMetadata,
+  type FunctionRequest as ContractFunctionRequest,
   type MaybePromise,
   type Ref,
 } from "@zsys/contracts";
 import { type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
-import { type ErrorDescriptorAny } from "./define-error.js";
+import type { ErrorDescriptorAny } from "./define-error.js";
+import type { FunctionHandlerResult } from "./handler-result.js";
 import type {
   AgentClients,
   BucketClients,
@@ -127,6 +129,8 @@ export interface InvocationMetadata {
 
 export type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
 
+export type FunctionRequest = ContractFunctionRequest | undefined;
+
 export interface PublicLogger {
   trace(message: string, fields?: Readonly<Record<string, unknown>>): void;
   debug(message: string, fields?: Readonly<Record<string, unknown>>): void;
@@ -169,7 +173,7 @@ export interface FunctionDescriptor<
   readonly dependencies?: Dependencies;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly handler: (input: Input, context: FunctionContext<Dependencies>) => MaybePromise<Output>;
+  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors>;
 }
 
 export interface DefineFunctionOptions<
@@ -186,8 +190,21 @@ export interface DefineFunctionOptions<
   readonly dependencies?: Dependencies;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly handler: (
-    input: InferOutput<InputSchema>,
-    context: FunctionContext<Dependencies>,
-  ) => MaybePromise<InferOutput<OutputSchema>>;
+  readonly handler: FunctionHandler<
+    InferOutput<InputSchema>,
+    InferOutput<OutputSchema>,
+    Dependencies,
+    Errors
+  >;
 }
+
+export type FunctionHandler<
+  Input,
+  Output,
+  Dependencies extends FunctionDependencies,
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+> = (
+  input: Input,
+  request: FunctionRequest,
+  context: FunctionContext<Dependencies>,
+) => MaybePromise<FunctionHandlerResult<Output, Errors>>;

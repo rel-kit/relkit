@@ -11,7 +11,7 @@ import { defineEnv, env } from "@zsys/config";
 
 export default defineEnv({
   APP_MODE: env.literal("development", "test", "production").default("development"),
-  PORT: env.port().default(3210),
+  WORKER_PORT: env.port().default(3210),
   API_URL: env.url().requiredIn("production"),
   API_TOKEN: env.secret().optional().description("Token for the external API"),
 });
@@ -43,3 +43,7 @@ export function start(source: Readonly<Record<string, string | undefined>>, envi
 types, requirements, default presence, and sensitivity without resolved values
 or secret defaults. `resolveEnv` returns an immutable value object and reports
 missing or malformed values with structured issues.
+
+`PORT` is reserved for framework server selection and is rejected by
+`defineEnv`; configure it with `server.port`, the `PORT` process variable, or
+the CLI `--port` flag.

@@ -68,7 +68,11 @@ async function prepare(
   options: DeployCommandOptions,
 ): Promise<Prepared> {
   throwIfAborted(signal);
-  const checked = await (options.check ?? checkProject)({ projectRoot: root, signal });
+  const checked = await (options.check ?? checkProject)({
+    projectRoot: root,
+    signal,
+    mode: "production",
+  });
   throwIfAborted(signal);
   if (!checked.ok || checked.graphHash === undefined)
     throw new DeployCommandError("ZSYS_DEPLOY_CHECK_FAILED", checkFailure(checked));
@@ -78,7 +82,9 @@ async function prepare(
   } catch {
     throw new DeployCommandError("ZSYS_DEPLOY_GRAPH_INVALID", "The checked graph is invalid JSON.");
   }
-  const plan = fromGraph(graph);
+  const plan = fromGraph(graph, {
+    ...(checked.config?.server.port === undefined ? {} : { httpPort: checked.config.server.port }),
+  });
   if (plan.graphHash !== checked.graphHash)
     throw new DeployCommandError(
       "ZSYS_DEPLOY_CHECK_FAILED",

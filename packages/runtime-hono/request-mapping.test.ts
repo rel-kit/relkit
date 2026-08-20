@@ -63,6 +63,22 @@ test("maps every request source with nesting, defaults, and a named transform", 
   });
 });
 
+test("leaves the source request readable after body mapping", async () => {
+  const source = new Request("http://localhost/orders", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ orderId: "order-1" }),
+  });
+  const result = await mapRequest(
+    request(source),
+    { kind: "input", fields: { orderId: { kind: "body", name: "orderId" } } },
+  );
+
+  expect(result).toEqual({ ok: true, value: { orderId: "order-1" } });
+  expect(source.bodyUsed).toBe(false);
+  await expect(source.json()).resolves.toEqual({ orderId: "order-1" });
+});
+
 test("rejects missing and duplicate scalar sources with structured issues", async () => {
   const result = await mapRequest(
     request(
@@ -133,11 +149,25 @@ test("rejects wrong content type, malformed JSON, and oversized bodies", async (
 test("maps multipart fields and stops before engine invocation on failure", async () => {
   const form = new FormData();
   form.append("file", "contents");
+  form.append("files", new File(["first"], "first.txt", { type: "text/plain" }));
+  form.append("files", new File(["second"], "second.txt", { type: "text/plain" }));
   const multipart = await mapRequest(
     request(new Request("http://localhost", { method: "POST", body: form })),
-    { kind: "input", fields: { file: { kind: "multipart", name: "file" } } },
+    {
+      kind: "input",
+      fields: {
+        file: { kind: "multipart", name: "file" },
+        files: { kind: "multipart-all", name: "files" },
+      },
+    },
   );
   expect(multipart).toMatchObject({ ok: true, value: { file: "contents" } });
+  if (multipart.ok) {
+    expect((multipart.value as any).files.map((file: File) => file.name)).toEqual([
+      "first.txt",
+      "second.txt",
+    ]);
+  }
 
   let calls = 0;
   const plan = routePlan();
@@ -165,6 +195,46 @@ test("maps multipart fields and stops before engine invocation on failure", asyn
     error: "validation",
     issues: [{ code: "missing" }],
   });
+});
+
+test("applies a route body limit before invoking its target", async () => {
+  let calls = 0;
+  const trigger = routePlan().httpTriggers[0]!;
+  const plan = {
+    ...routePlan(),
+    httpTriggers: [
+      {
+        ...trigger,
+        config: {
+          ...trigger.config,
+          method: "POST",
+          maxBodyBytes: 3,
+          request: { kind: "input", fields: { body: { kind: "whole-body" } } },
+        },
+      },
+    ],
+  };
+  const app = createApp({
+    plan,
+    manifest: {
+      contractVersion: 1,
+      generatorVersion: 1,
+      graphHash: plan.graphHash,
+      functions: {},
+      middleware: {},
+      requestTransforms: {},
+    },
+    engine: { invoke: async () => (calls++, { ok: true }) },
+  });
+  const response = await app.request("http://localhost/orders", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "12345",
+  });
+
+  expect(response.status).toBe(422);
+  expect(calls).toBe(0);
+  expect(await response.json()).toMatchObject({ issues: [{ code: "body-too-large" }] });
 });
 
 function routePlan(): RegistrationPlan {

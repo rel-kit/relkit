@@ -49,6 +49,101 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
   expect(generateOpenApiJson(first)).toBe(generateOpenApiJson(second));
 });
 
+test("expands optional catch-all routes without duplicating the authored route", () => {
+  const inputGraph = graph(false);
+  const target = inputGraph.nodes.find((node) => node.kind === "function")! as any;
+  const trigger = inputGraph.nodes.find((node) => node.kind === "trigger")! as any;
+  target.input = {
+    type: "object",
+    properties: { parts: { type: "array", items: { type: "string" } } },
+  };
+  trigger.id = "docs.read";
+  trigger.config.path = "/docs/*parts?";
+  trigger.config.runtimePaths = ["/docs", "/docs/:parts{.+}"];
+  trigger.config.request = {
+    kind: "input",
+    fields: { parts: { kind: "optional", value: { kind: "path-segments", name: "parts" } } },
+  };
+  const document = generateOpenApi(inputGraph);
+
+  expect(document.paths["/docs"]?.get?.operationId).toBe("docs.read");
+  expect(document.paths["/docs"]?.get?.parameters).toBeUndefined();
+  expect(document.paths["/docs/{parts}"]?.get?.operationId).toBe("docs.read.catch-all");
+  expect(document.paths["/docs/{parts}"]?.get?.parameters).toContainEqual({
+    name: "parts",
+    in: "path",
+    required: true,
+    schema: { type: "string" },
+  });
+});
+
+test("projects single and repeated file fields as multipart binary schemas", () => {
+  const inputGraph = graph(false);
+  const target = inputGraph.nodes.find((node) => node.kind === "function")! as any;
+  const trigger = inputGraph.nodes.find((node) => node.kind === "trigger")! as any;
+  const binary = { type: "string", format: "binary" };
+  target.input = {
+    type: "object",
+    required: ["avatar", "attachments"],
+    properties: {
+      avatar: binary,
+      attachments: { type: "array", items: binary },
+    },
+  };
+  trigger.config.path = "/uploads";
+  trigger.config.request = {
+    kind: "input",
+    fields: {
+      avatar: { kind: "multipart", name: "avatar" },
+      attachments: { kind: "multipart-all", name: "attachments" },
+    },
+  };
+  const body = generateOpenApi(inputGraph).paths["/uploads"]?.get?.requestBody;
+
+  expect(body?.content["multipart/form-data"]?.schema).toEqual({
+    type: "object",
+    properties: {
+      attachments: { type: "array", items: binary },
+      avatar: binary,
+    },
+    required: ["attachments", "avatar"],
+  });
+});
+
+test("documents rate-limit policy, safe body, and standard headers", () => {
+  const inputGraph = graph(false);
+  const trigger = inputGraph.nodes.find((node) => node.kind === "trigger")! as any;
+  trigger.config.rateLimit = {
+    limit: 10,
+    windowMs: 1_000,
+    key: { kind: "header", name: "x-api-key" },
+    storeId: "api-rate-limits",
+  };
+  trigger.config.responses.push({
+    kind: "response",
+    id: "rate-limit.429",
+    status: 429,
+  });
+  const operation = generateOpenApi(inputGraph).paths["/orders/{id}"]?.get;
+
+  expect(operation?.["x-zsys"].rateLimit).toEqual(trigger.config.rateLimit);
+  expect(operation?.responses["429"]).toMatchObject({
+    description: "Rate limit exceeded",
+    headers: {
+      "RateLimit-Policy": {},
+      "RateLimit-Limit": {},
+      "RateLimit-Remaining": {},
+      "RateLimit-Reset": {},
+      "Retry-After": {},
+    },
+    content: {
+      "application/json": {
+        schema: { properties: { error: { const: "rate-limit" }, retryAfterMs: {} } },
+      },
+    },
+  });
+});
+
 function graph(reverse: boolean): ApplicationGraph {
   const nodes = [
     {

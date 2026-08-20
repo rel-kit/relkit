@@ -1,0 +1,29 @@
+---
+title: Application, providers, and configuration
+description: Define the application once and select logical provider profiles by environment.
+---
+
+`src/app.ts` exports one `defineApp` descriptor. Providers are logical profiles; functions depend on
+declared resources rather than concrete SDK clients.
+
+```ts
+import { awsProviders, defineApp, localProviders, testProviders } from "@zsys/app";
+
+export default defineApp({
+  id: "commerce-api",
+  env,
+  providers: {
+    development: localProviders({ stateDirectory: ".zsys/state" }),
+    test: testProviders({ deterministicIds: true, deterministicClock: true }),
+    production: awsProviders({ region: env.AWS_REGION }),
+  },
+});
+```
+
+Use `defineEnv` for value-free environment contracts. Mark secrets as sensitive and list the profiles
+where each value is required. `PORT` is framework-reserved and must not appear in the application
+environment definition. `zsys env list`, `check`, `explain`, and `example` expose metadata without
+printing secret values.
+
+Public configuration only controls server and inspector behavior. `entry`, `source`, `exclude`, and
+`generatedDirectory` are removed; using them produces migration diagnostics rather than being ignored.

@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import app from "../../../apps/fixture-commerce/src/app.ts";
-import createOrder from "../../../apps/fixture-commerce/src/functions/create-order.function.ts";
-import sendReceipt from "../../../apps/fixture-commerce/src/functions/send-receipt.function.ts";
+import app from "../../../examples/commerce/src/app.ts";
+import createOrder from "../../../examples/commerce/src/functions/create-order.function.ts";
+import sendReceipt from "../../../examples/commerce/src/functions/send-receipt.function.ts";
 import {
   bindLocalProviderFactory,
   type LocalProviderGeneration,
@@ -14,7 +14,7 @@ import type { DependencyClientSources } from "../../../packages/engine/src/index
 
 const roots: string[] = [];
 
-describe("fixture-commerce managed resources", () => {
+describe("commerce-example managed resources", () => {
   test("uses declared typed clients and recovers bucket/cache state after restart", async () => {
     const workspace = await mkdtemp(join(tmpdir(), "zsys-commerce-"));
     const stateRoot = join(workspace, ".zsys", "state");

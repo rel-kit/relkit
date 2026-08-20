@@ -2,6 +2,7 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { LoadedToolingConfig } from "@zsys/compiler";
 import type { DoctorCheck, DoctorOptions } from "./doctor-support.js";
+import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
 
 export async function checkPulumi(
   enabled: boolean,
@@ -85,13 +86,32 @@ export async function checkPorts(
   options: DoctorOptions,
   probe: (port: number) => Promise<boolean>,
 ): Promise<DoctorCheck> {
-  const backend = options.backendPort ?? numeric(options.source?.PORT ?? process.env.PORT) ?? 3000;
-  const inspector = options.inspectorPort ?? config?.inspector.port ?? 3210;
-  if (!validPort(backend, true) || !validPort(inspector, false) || backend === inspector)
+  let backend: number;
+  let inspector: number;
+  try {
+    const source = options.source ?? process.env;
+    backend = resolveApplicationPort({
+      ...(options.backendPort === undefined ? {} : { flag: options.backendPort }),
+      source,
+      ...(config === undefined ? {} : { configured: config.server.port }),
+    });
+    inspector = resolveInspectorPort({
+      ...(options.inspectorPort === undefined ? {} : { flag: options.inspectorPort }),
+      source,
+      ...(config === undefined ? {} : { configured: config.inspector.port }),
+    });
+  } catch (error) {
     return {
       name: "ports",
       ok: false,
-      message: "Configured backend and inspector ports are invalid or collide.",
+      message: error instanceof Error ? error.message : "Configured ports are invalid.",
+    };
+  }
+  if (backend === inspector)
+    return {
+      name: "ports",
+      ok: false,
+      message: "Configured backend and inspector ports collide.",
       details: { backend, inspector },
     };
   const ok = (await probe(backend)) && (await probe(inspector));
@@ -118,12 +138,6 @@ export async function checkLockfile(root: string, runner = runCommand): Promise<
   };
 }
 
-function numeric(value: string | undefined): number | undefined {
-  return value !== undefined && /^\d+$/.test(value) ? Number(value) : undefined;
-}
-function validPort(value: number, dynamic: boolean): boolean {
-  return Number.isInteger(value) && value >= (dynamic ? 0 : 1) && value <= 65535;
-}
 export async function availablePort(port: number): Promise<boolean> {
   try {
     const server = Bun.serve({ hostname: "127.0.0.1", port, fetch: () => new Response() });

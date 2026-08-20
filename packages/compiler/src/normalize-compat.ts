@@ -49,6 +49,7 @@ export function schemaProperties(value: unknown):
   if (!result.ok || document === undefined || Array.isArray(document) || document === null)
     return undefined;
   const object = document as { readonly [key: string]: JsonValue };
+  if (object.type !== "object") return undefined;
   const properties: Readonly<Record<string, JsonValue>> = isRecord(object.properties)
     ? (object.properties as Readonly<Record<string, JsonValue>>)
     : {};

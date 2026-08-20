@@ -48,7 +48,7 @@ type KindRule = {
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   app: { directory: "src", suffix: "app.ts" },
   function: { directory: "src/functions", suffix: ".function.ts" },
-  route: { directory: "src/routes", suffix: ".route.ts" },
+  route: { directory: "src/routes", suffix: "route.ts" },
   job: { directory: "src/jobs", suffix: ".job.ts" },
   event: { directory: "src/events", suffix: ".event.ts" },
   "event-trigger": { directory: "src/events", suffix: ".event.ts" },
@@ -95,21 +95,21 @@ export function checkConventions(
 
   const fileName = path.split("/").pop() ?? "";
   const pattern = recommendedPattern(rule);
-  if (!path.startsWith(`${rule.directory}/`)) {
+  if (descriptor.kind !== "route" && !path.startsWith(`${rule.directory}/`)) {
     add(
       CONVENTION_CODES.directory,
       `Descriptor "${descriptor.id}" has kind "${descriptor.kind}" outside its recommended directory.`,
       `Move the descriptor under ${pattern}`,
     );
   }
-  if (!fileName.endsWith(rule.suffix)) {
+  if (descriptor.kind !== "route" && !fileName.endsWith(rule.suffix)) {
     add(
       CONVENTION_CODES.suffix,
       `Descriptor "${descriptor.id}" does not use the recommended "${rule.suffix}" suffix.`,
       `Rename the file to use ${rule.suffix}`,
     );
   }
-  if (hasExportWarning(input)) {
+  if (descriptor.kind !== "route" && hasExportWarning(input)) {
     add(
       CONVENTION_CODES.export,
       `Descriptor file should default-export "${descriptor.id}".`,

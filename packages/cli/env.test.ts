@@ -7,7 +7,7 @@ import { runEnv } from "./src/commands/env.js";
 const definition = defineEnv({
   API_KEY: env.secret().default("synthetic-secret").description("External API key"),
   OPTIONAL: env.string().optional(),
-  PORT: env.port().example(3210),
+  SERVICE_PORT: env.port().example(3210),
   REQUIRED: env.string().requiredIn("production").example("safe-example"),
 });
 
@@ -53,7 +53,7 @@ describe("zsys env commands", () => {
       expect(await readFile(path, "utf8")).toBe("EDITED=1\n");
       expect(JSON.stringify(captured.outputs)).not.toContain("synthetic-secret");
       expect((captured.outputs[0] as { content: string }).content).toBe(
-        "API_KEY=[redacted]\nOPTIONAL=example\nPORT=3210\nREQUIRED=safe-example\n",
+        "API_KEY=[redacted]\nOPTIONAL=example\nREQUIRED=safe-example\nSERVICE_PORT=3210\n",
       );
 
       await runEnv(
@@ -62,7 +62,7 @@ describe("zsys env commands", () => {
         { definition, projectRoot: root },
       );
       expect(await readFile(path, "utf8")).toBe(
-        "API_KEY=[redacted]\nOPTIONAL=example\nPORT=3210\nREQUIRED=safe-example\n",
+        "API_KEY=[redacted]\nOPTIONAL=example\nREQUIRED=safe-example\nSERVICE_PORT=3210\n",
       );
     } finally {
       await rm(root, { recursive: true, force: true });

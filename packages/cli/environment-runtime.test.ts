@@ -13,8 +13,8 @@ test("the emitted server rejects missing production environment before provider 
   await writeFile(
     appPath,
     source.replace(
-      "defineEnv({ PORT: envFactory.port().default(3000) })",
-      'defineEnv({ PORT: envFactory.port().default(3000), REQUIRED_TOKEN: envFactory.secret().requiredIn("production") })',
+      "defineEnv({ SERVICE_PORT: envFactory.port().default(3000) })",
+      'defineEnv({ SERVICE_PORT: envFactory.port().default(3000), REQUIRED_TOKEN: envFactory.secret().requiredIn("production") })',
     ),
   );
   const built = await buildProject({ projectRoot: root });
@@ -34,7 +34,7 @@ async function copyFullProject(): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".zsys-environment-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-full"), root, { recursive: true });
-  await cp(join(process.cwd(), "apps/fixture-commerce/package.json"), join(root, "package.json"));
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   const scope = join(root, "node_modules", "@zsys");
   await mkdir(scope, { recursive: true });
   for (const name of [

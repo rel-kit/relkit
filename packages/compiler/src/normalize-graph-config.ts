@@ -12,11 +12,24 @@ export function httpConfig(
   return clean({
     method: value.method,
     path: value.path,
+    runtimePaths: value.runtimePaths,
     request: value.request,
     responses: responses(value.responses, descriptor.id, work),
     middleware: middleware(value.middleware, work),
     transforms: transforms(value.request, work),
+    rateLimit: rateLimit(value.rateLimit),
+    maxBodyBytes: value.maxBodyBytes,
     timeoutMs: value.timeoutMs,
+  });
+}
+
+function rateLimit(value: unknown): JsonValue | undefined {
+  if (!isRecord(value)) return undefined;
+  return clean({
+    limit: value.limit,
+    windowMs: value.windowMs,
+    key: value.key,
+    storeId: refId(value.store),
   });
 }
 

@@ -9,6 +9,7 @@
     "paths": {
       "@zsys/agents": ["packages/agents/src/index.ts"],
       "@zsys/app": ["packages/app/src/index.ts"],
+      "@zsys/app/config": ["packages/app/src/config.ts"],
       "@zsys/buckets": ["packages/buckets/src/index.ts"],
       "@zsys/cache": ["packages/cache/src/index.ts"],
       "@zsys/config": ["packages/config/src/index.ts"],

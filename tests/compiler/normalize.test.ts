@@ -36,9 +36,8 @@ function values() {
     request: http.input({ id: http.path("id") }),
     responses: [http.success(200, output)],
   });
-  const trigger = onEvent(events.single(event), {
+  const trigger = onEvent(events.single("orders.created" as never), async () => ({ ok: true }), {
     id: "orders.listener",
-    target,
     delivery: "ephemeral",
   });
   return [target, event, job, route, trigger] as const;

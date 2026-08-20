@@ -3,10 +3,15 @@ import type { HttpGraphTrigger, OpenApiOperation } from "./generate.js";
 import { buildRequest } from "./generate-request.js";
 import { buildResponses } from "./generate-response.js";
 
-export function buildOperation(trigger: HttpGraphTrigger, target: FunctionNode): OpenApiOperation {
-  const request = buildRequest(trigger.config.request, target.input, trigger.config.path);
+export function buildOperation(
+  trigger: HttpGraphTrigger,
+  target: FunctionNode,
+  routePath = trigger.config.path,
+  operationId = trigger.id,
+): OpenApiOperation {
+  const request = buildRequest(trigger.config.request, target.input, routePath);
   return {
-    operationId: trigger.id,
+    operationId,
     ...(request.parameters.length === 0 ? {} : { parameters: request.parameters }),
     ...(request.body === undefined ? {} : { requestBody: request.body }),
     responses: buildResponses(trigger.config.responses, target),
@@ -15,6 +20,7 @@ export function buildOperation(trigger: HttpGraphTrigger, target: FunctionNode):
       functionId: target.id,
       middleware: trigger.config.middleware.map((entry) => ({ ...entry })),
       transforms: trigger.config.transforms.map((entry) => entry.id),
+      ...(trigger.config.rateLimit === undefined ? {} : { rateLimit: trigger.config.rateLimit }),
     },
   };
 }

@@ -15,6 +15,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
+  "files": [".zsys/generated/event-registry.d.ts"],
   "include": ["src/**/*.ts", "tests/**/*.ts", "zsys.config.ts"],
   "exclude": ["node_modules", ".zsys"]
 }

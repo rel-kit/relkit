@@ -55,7 +55,7 @@ function lineCount(text: string): number {
 
 export function implementationSizeOffenders(root: string): string[] {
   const offenders: string[] = [];
-  for (const directory of ["apps", "packages", "scripts", "templates"]) {
+  for (const directory of ["apps", "examples", "packages", "scripts", "templates"]) {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     for (const path of new Bun.Glob("**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}").scanSync({
@@ -119,6 +119,7 @@ async function main(): Promise<void> {
     "playwright.config.ts",
     ".github/workflows/ci.yml",
     "apps",
+    "examples",
     "packages",
     "scripts",
     "templates",
@@ -143,6 +144,8 @@ async function main(): Promise<void> {
   await run("restart tests", bun, ["run", "test:restart"]);
   await run("inspector API tests", bun, ["run", "test:inspector"]);
   await run("generator tests", bun, ["run", "test:generator"]);
+  await run("executable examples", bun, ["run", "test:examples"]);
+  await run("documentation", bun, ["run", "test:docs"]);
   await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-zsys.ts"]);
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
@@ -151,7 +154,7 @@ async function main(): Promise<void> {
   await run("agent declaration/source/graph scans", bun, [
     "test",
     "tests/agents/source-boundaries.test.ts",
-    "tests/compiler/fixture-commerce.test.ts",
+    "tests/compiler/commerce-example.test.ts",
   ]);
   console.log("\nVerification passed in the fixed fail-fast order.");
 }

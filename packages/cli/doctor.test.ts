@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { doctorProject, runDoctor } from "./src/commands/doctor.js";
 
-const projectRoot = `${process.cwd()}/apps/fixture-commerce`;
+const projectRoot = `${process.cwd()}/examples/commerce`;
 
 test("doctor validates the fixture without deployment prerequisites", async () => {
   const commands: string[][] = [];
@@ -47,5 +47,9 @@ test("doctor reports deployment failures without credential values", async () =>
   expect(exitCode).toBe(1);
   expect(JSON.stringify(outputs)).not.toContain(secret);
   expect(JSON.stringify(outputs)).toContain("aws-credentials");
-  expect(JSON.stringify(outputs)).toContain("Pulumi CLI is not available.");
+  const report = outputs[0] as { checks: readonly { name: string; ok: boolean }[] };
+  expect(report.checks.find((check) => check.name === "pulumi")).toMatchObject({
+    name: "pulumi",
+    ok: false,
+  });
 });

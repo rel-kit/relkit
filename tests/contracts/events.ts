@@ -151,16 +151,16 @@ export function registerEventContractSuite(target: EventContractTarget): void {
         created,
         updated,
         targetFunction,
-        onEvent(created, { id: "orders.single", target: targetFunction, delivery: "durable" }),
-        onEvent(events.anyOf(updated, created), {
-          id: "orders.any",
-          target: targetFunction,
-          delivery: "durable",
+        onEvent("orders.created" as never, async () => ({ handled: true }), {
+          id: "orders.single",
         }),
-        onEvent(events.match("orders.*"), {
+        onEvent(
+          events.anyOf("orders.updated" as never, "orders.created" as never),
+          async () => ({ handled: true }),
+          { id: "orders.any" },
+        ),
+        onEvent(events.match("orders.*"), async () => ({ handled: true }), {
           id: "orders.pattern",
-          target: targetFunction,
-          delivery: "durable",
         }),
       ];
       const result = normalizeCompilation({ descriptors });
@@ -189,10 +189,8 @@ export function registerEventContractSuite(target: EventContractTarget): void {
       const result = normalizeCompilation({
         descriptors: [
           targetFunction,
-          onEvent(events.match("payments.*"), {
+          onEvent(events.match("payments.*"), async () => ({ handled: true }), {
             id: "payments.listener",
-            target: targetFunction,
-            delivery: "durable",
           }),
         ],
       });
@@ -259,9 +257,8 @@ export function registerEventContractSuite(target: EventContractTarget): void {
       const rejected = normalizeCompilation({
         descriptors: [
           targetFunction,
-          onEvent(events.all({ payload: "unknown" }), {
+          onEvent(events.all({ payload: "unknown" }), async () => ({ handled: true }), {
             id: "orders.raw",
-            target: targetFunction,
             delivery: "ephemeral",
           }),
         ],
@@ -276,11 +273,11 @@ export function registerEventContractSuite(target: EventContractTarget): void {
       const allowed = normalizeCompilation({
         descriptors: [
           targetFunction,
-          onEvent(events.all({ payload: "unknown", purpose: "telemetry" }), {
-            id: "orders.telemetry",
-            target: targetFunction,
-            delivery: "ephemeral",
-          }),
+          onEvent(
+            events.all({ payload: "unknown", purpose: "telemetry" }),
+            async () => ({ handled: true }),
+            { id: "orders.telemetry", delivery: "ephemeral" },
+          ),
         ],
       });
       expect(allowed.diagnostics).toContainEqual(

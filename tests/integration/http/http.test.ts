@@ -405,7 +405,7 @@ describe("HTTP integration", () => {
       id: "timeout",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, context) =>
+      handler: (_input, _request, context) =>
         new Promise<never>((_resolve, reject) => {
           context.signal.addEventListener("abort", () => reject(context.signal.reason), {
             once: true,
@@ -644,7 +644,7 @@ describe("HTTP integration", () => {
       id: "disconnect",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, context) => {
+      handler: (_input, _request, context) => {
         contextSignal = context.signal;
         started.resolve();
         return new Promise<never>((_resolve, reject) => {

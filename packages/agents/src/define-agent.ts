@@ -10,6 +10,7 @@ import {
 import type { AgentRef } from "@zsys/functions";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
 import { isToolRef, type ToolRefAny } from "@zsys/tools";
+import { copyAgentInstructions, copyAgentTools } from "./define-agent-support.js";
 
 export interface PromptTemplate {
   readonly template: string;
@@ -52,7 +53,20 @@ export interface DefineAgentOptions<
   readonly limits: AgentLimits;
 }
 
-/** Defines an agent contract with bounded tools, model selection, and execution limits. */
+/**
+ * Defines an agent contract with bounded tools, model selection, and execution limits.
+ *
+ * @example
+ * ```ts
+ * import { defineAgent } from "@zsys/agents"
+ * import { z } from "@zsys/schema"
+ *
+ * const support = defineAgent({ id: "support", input: z.string(), output: z.string(), modelProfile: "default", instructions: "Answer safely.", tools: [], limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 } })
+ * void support
+ * ```
+ * @category Agents
+ * @since 0.1.0
+ */
 export function defineAgent<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,
@@ -71,8 +85,8 @@ export function defineAgent<
   assertSchema(options.input, "input");
   assertSchema(options.output, "output");
   const modelProfile = normalizeId(options.modelProfile);
-  const instructions = copyInstructions(options.instructions);
-  const tools = copyToolRefs(options.tools);
+  const instructions = copyAgentInstructions(options.instructions);
+  const tools = copyAgentTools(options.tools);
   const limits = copyLimits(options.limits);
   const base = createDescriptorBase("agent", options.id, options);
 
@@ -116,28 +130,6 @@ export function assertAgentDescriptor(value: unknown): asserts value is AgentAny
   if (!isAgentDescriptor(value)) throw new TypeError("Invalid agent descriptor");
 }
 
-function copyInstructions(value: unknown): string | PromptTemplate {
-  if (typeof value === "string") return requiredText(value, "Agent instructions");
-  if (!isRecord(value)) throw new TypeError("Agent instructions must be text or a template");
-  const template = requiredText(value.template, "Agent instructions template");
-  const variables = copyVariables(value.variables);
-  return deepFreeze({ template, ...(variables === undefined ? {} : { variables }) });
-}
-
-function copyToolRefs(value: unknown): readonly ToolRefAny[] {
-  if (!Array.isArray(value)) throw new TypeError("Agent tools must be an array");
-  const ids = new Set<string>();
-  return Object.freeze(
-    value.map((tool, index) => {
-      if (!isToolRef(tool)) throw new TypeError(`Agent tool at index ${index} must be a tool ref`);
-      const id = tool.ref.id;
-      if (ids.has(id)) throw new TypeError(`Duplicate agent tool "${id}"`);
-      ids.add(id);
-      return Object.freeze({ ref: Object.freeze({ kind: "tool" as const, id }) });
-    }),
-  );
-}
-
 function copyLimits(value: unknown): AgentLimits {
   if (!isRecord(value)) throw new TypeError("Agent limits must be an object");
   return Object.freeze({
@@ -145,16 +137,6 @@ function copyLimits(value: unknown): AgentLimits {
     maxToolCalls: positiveInteger(value.maxToolCalls, "limits.maxToolCalls"),
     timeoutMs: positiveInteger(value.timeoutMs, "limits.timeoutMs"),
   });
-}
-
-function copyVariables(value: unknown): readonly string[] | undefined {
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) throw new TypeError("template.variables must be an array");
-  const variables = value.map((entry) => requiredText(entry, "template variable"));
-  if (new Set(variables).size !== variables.length) {
-    throw new TypeError("template.variables must be unique");
-  }
-  return Object.freeze(variables);
 }
 
 function isInstructions(value: unknown): value is string | PromptTemplate {
@@ -185,11 +167,6 @@ function positiveInteger(value: unknown, name: string): number {
 
 function isPositiveInteger(value: unknown): value is number {
   return Number.isSafeInteger(value) && (value as number) > 0;
-}
-
-function requiredText(value: unknown, name: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${name} is required`);
-  return value.trim();
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, any> {

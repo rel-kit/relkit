@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { MaybePromise, ProtocolId } from "@zsys/contracts";
+import type { FunctionRequest, MaybePromise, ProtocolId } from "@zsys/contracts";
 import {
   createPublicClockEffect,
   createInvocationBridge,
@@ -132,8 +132,13 @@ export async function runHandler<
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
     return yield* invokeUserHandler({
-      handler: target.handler as (value: unknown, context: Context) => unknown,
+      handler: target.handler as (
+        value: unknown,
+        request: FunctionRequest | undefined,
+        context: Context,
+      ) => unknown,
       input,
+      ...(options.request === undefined ? {} : { request: options.request }),
       publicContext: context,
       ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
       onSignal: (signal) => {

@@ -1,99 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { InspectorObject, InspectorPage } from "../../lib/api-types";
+import { useCallback } from "react";
+import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
-import { itemsForJob, queueCounts } from "../../lib/jobs-model";
+import { unpagedQuery } from "../../lib/list-query";
+import { itemsForJob, JOB_STATES, queueCounts, type JobQueueCounts } from "../../lib/jobs-model";
+import { ResourceTable, type ResourceTableItem } from "../resource-table";
 
-export function JobsClient() {
-  const [jobs, setJobs] = useState<readonly InspectorObject[]>([]);
-  const [runtime, setRuntime] = useState<readonly InspectorObject[]>([]);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
-
-  useEffect(() => {
-    const api = createInspectorClient();
-    void Promise.all([
-      api.list<InspectorObject>("jobs", { limit: 100 }),
-      api.runtimeList<InspectorObject>("jobs", { limit: 100 }),
-    ])
-      .then(
-        ([jobPage, runtimePage]: [
-          InspectorPage<InspectorObject>,
-          InspectorPage<InspectorObject>,
-        ]) => {
-          setJobs(jobPage.items);
-          setRuntime(runtimePage.items);
-          setState("ready");
-        },
-      )
-      .catch(() => setState("error"));
-  }, []);
-
-  const jobIds = jobs.flatMap((job) => (text(job.id) === "" ? [] : [text(job.id)]));
-  return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Jobs</h1>
-          <p className="lede">
-            Inspect durable queue state, retry policy, schedules, and local actions.
-          </p>
-        </div>
-        <span className="badge">{jobs.length} jobs</span>
-      </header>
-      {state === "loading" && (
-        <p className="panel route-state" role="status">
-          Loading jobs…
-        </p>
-      )}
-      {state === "error" && (
-        <p className="panel route-state" role="alert">
-          The jobs API is unavailable.
-        </p>
-      )}
-      {state === "ready" && jobs.length === 0 && (
-        <p className="panel route-state">No jobs are reported by the active graph.</p>
-      )}
-      {jobs.length > 0 && (
-        <ul className="route-list">
-          {jobs.map((job) => {
-            const id = text(job.id);
-            const counts = queueCounts(itemsForJob(runtime, id, jobIds));
-            return <JobRow key={id} job={job} counts={counts} />;
-          })}
-        </ul>
-      )}
-    </div>
-  );
+interface JobItem extends ResourceTableItem {
+  readonly target: string;
+  readonly counts: JobQueueCounts;
 }
 
-function JobRow({
-  job,
-  counts,
-}: {
-  readonly job: InspectorObject;
-  readonly counts: ReturnType<typeof queueCounts>;
-}) {
-  const id = text(job.id) || "job";
+const statusOptions = JOB_STATES.map((id) => ({ id, label: id }));
+
+export function JobsClient() {
+  const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<JobItem>> => {
+    const api = createInspectorClient();
+    const { status, ...graphQuery } = query;
+    const [jobs, runtime] = await Promise.all([
+      api.list<InspectorObject>("jobs", graphQuery),
+      api.runtimeList<InspectorObject>("jobs", unpagedQuery(query)),
+    ]);
+    const ids = jobs.items.flatMap((job) => {
+      const id = text(job.id);
+      return id === "" ? [] : [id];
+    });
+    const items = jobs.items.flatMap((job) => {
+      const id = text(job.id);
+      const instances = itemsForJob(runtime.items, id, ids);
+      if (status !== undefined && instances.length === 0) return [];
+      return [
+        {
+          id,
+          target: text(job.targetFunctionId) || "function unavailable",
+          counts: queueCounts(instances),
+        },
+      ];
+    });
+    return { ...jobs, items };
+  }, []);
   return (
-    <li className="panel route-row">
-      <div>
-        <strong>{id}</strong>
-        <p className="supporting-copy">
-          Target: {text(job.targetFunctionId) || "function unavailable"}
-        </p>
-      </div>
-      <div className="route-row-detail">
-        <span>Available {counts.available}</span>
-        <span>Leased {counts.leased}</span>
-        <span>Delayed {counts.delayed}</span>
-        <span>Dead letters {counts["dead-lettered"]}</span>
-      </div>
-      <a className="text-link" href={`/jobs/${encodeURIComponent(id)}`}>
-        Open job <span aria-hidden="true">→</span>
-      </a>
-    </li>
+    <ResourceTable
+      title="Jobs"
+      description="Inspect durable queue state, retry policy, schedules, and local actions."
+      noun="jobs"
+      load={load}
+      statusOptions={statusOptions}
+      columns={[
+        { key: "target", label: "Target", render: (item) => item.target },
+        {
+          key: "queue",
+          label: "Queue",
+          render: (item) =>
+            `Available ${item.counts.available} · Leased ${item.counts.leased} · Delayed ${item.counts.delayed}`,
+        },
+        { key: "dead", label: "Dead letters", render: (item) => item.counts["dead-lettered"] },
+      ]}
+      href={(item) => `/jobs/${encodeURIComponent(item.id)}`}
+      openLabel="Open job"
+      details={(item) => (
+        <dl className="identity-grid">
+          {Object.entries(item.counts).map(([state, count]) => (
+            <div key={state}>
+              <dt>{state}</dt>
+              <dd>{count}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    />
   );
 }
 

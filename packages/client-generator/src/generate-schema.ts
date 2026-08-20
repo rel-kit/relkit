@@ -39,6 +39,7 @@ export function schemaAt(root: unknown, path: readonly string[]): unknown {
 export function responseSchema(route: ClientRoute, response: ResponseContract): unknown {
   if (response.kind === "success") return route.target.output;
   if (response.kind === "validation-error") return validationSchema;
+  if (response.status === 429) return rateLimitSchema;
   if (response.kind !== "error") return undefined;
   const errors = Array.isArray(route.target.errors) ? route.target.errors : [];
   const declared = errors.find(
@@ -56,8 +57,8 @@ export function responseSchema(route: ClientRoute, response: ResponseContract): 
       "outcome",
       "code",
       "message",
-      "status",
       "retry",
+      ...(status === undefined ? [] : ["status"]),
       ...(response.schema === undefined && data === undefined ? [] : ["data"]),
     ],
     properties: {
@@ -81,6 +82,15 @@ const validationSchema = {
   properties: {
     error: { const: "validation" },
     issues: { type: "array", items: { type: "object" } },
+  },
+};
+
+const rateLimitSchema = {
+  type: "object",
+  required: ["error", "retryAfterMs"],
+  properties: {
+    error: { const: "rate-limit" },
+    retryAfterMs: { type: "integer" },
   },
 };
 

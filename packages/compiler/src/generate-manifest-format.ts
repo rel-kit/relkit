@@ -23,11 +23,18 @@ export function renderManifest(
         `import * as ${alias} from ${JSON.stringify(importPath(module, input))};`,
     )
     .join("\n");
-  const generatedImport = [...functions.values()].some((value) =>
-    value.startsWith("__zsys_createGeneratedAgentFunction("),
-  )
-    ? 'import { createGeneratedAgentFunction as __zsys_createGeneratedAgentFunction } from "@zsys/agents";'
-    : "";
+  const generatedImports = [
+    [...functions.values()].some((value) =>
+      value.startsWith("__zsys_createGeneratedAgentFunction("),
+    )
+      ? 'import { createGeneratedAgentFunction as __zsys_createGeneratedAgentFunction } from "@zsys/agents";'
+      : "",
+    [...targets.values()].some((value) => value.startsWith("__zsys_createEventListenerTarget("))
+      ? 'import { createEventListenerTarget as __zsys_createEventListenerTarget } from "@zsys/events";'
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
   const middlewareDeclarations = middlewareDescriptors
     .map((descriptor, index) => {
       const targetId = referenceId(descriptor.value) ?? "";
@@ -36,8 +43,8 @@ export function renderManifest(
     })
     .join("\n");
   return [
-    [generatedImport, imports].filter(Boolean).join("\n"),
-    ...(generatedImport !== "" || imports !== "" ? [""] : []),
+    [generatedImports, imports].filter(Boolean).join("\n"),
+    ...(generatedImports !== "" || imports !== "" ? [""] : []),
     `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
     `export const manifestGeneratorVersion = ${GENERATOR_VERSION} as const;`,
     `export const manifestGraphHash = ${JSON.stringify(input.graphHash)} as const;`,

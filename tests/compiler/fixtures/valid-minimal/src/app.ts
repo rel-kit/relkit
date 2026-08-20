@@ -7,7 +7,7 @@ import {
   testProviders,
 } from "@zsys/app";
 
-const env = defineEnv({ PORT: envFactory.port().default(3000) });
+const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000) });
 
 const app = defineApp({
   id: "minimal-app",

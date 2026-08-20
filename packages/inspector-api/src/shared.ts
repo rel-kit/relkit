@@ -96,11 +96,46 @@ export interface Page<T extends JsonValue = JsonValue> {
 
 export function page<T extends JsonValue>(items: readonly T[], request: Request): Page<T> {
   const params = new URL(request.url).searchParams;
+  const search = readFilter(params.get("search"), "search");
+  const kind = readFilter(params.get("kind"), "kind");
+  const status = readFilter(params.get("status"), "status");
+  const filtered = items.filter(
+    (item) =>
+      (search === undefined || includesText(item, search.toLowerCase())) &&
+      (kind === undefined || matchesField(item, ["kind", "type", "method"], kind)) &&
+      (status === undefined || matchesField(item, ["status", "state", "outcome"], status)),
+  );
   const cursor = readInteger(params.get("cursor"), "cursor", 0);
   const limit = Math.min(readInteger(params.get("limit"), "limit", 50), 100);
-  const selected = items.slice(cursor, cursor + limit);
+  const selected = filtered.slice(cursor, cursor + limit);
   const next = cursor + selected.length;
-  return next < items.length ? { items: selected, nextCursor: String(next) } : { items: selected };
+  return next < filtered.length
+    ? { items: selected, nextCursor: String(next) }
+    : { items: selected };
+}
+
+function readFilter(value: string | null, name: string): string | undefined {
+  if (value === null || value.trim() === "") return undefined;
+  if (value.length > 128) throw new InspectorQueryError(`${name} is invalid`);
+  return value.trim();
+}
+
+function matchesField(value: JsonValue, names: readonly string[], expected: string): boolean {
+  if (!isRecord(value)) return false;
+  return names.some(
+    (name) =>
+      value[name] === expected || (isRecord(value.config) && value.config[name] === expected),
+  );
+}
+
+function includesText(value: JsonValue, query: string): boolean {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value).toLowerCase().includes(query);
+  }
+  if (Array.isArray(value)) return value.some((item) => includesText(item, query));
+  return (
+    isRecord(value) && Object.values(value).some((item) => includesText(item as JsonValue, query))
+  );
 }
 
 function readInteger(value: string | null, name: string, fallback: number): number {

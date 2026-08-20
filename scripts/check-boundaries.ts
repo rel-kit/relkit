@@ -61,6 +61,7 @@ function reportImport(
     owner.manifest &&
     dependency !== owner.manifest.name &&
     dependency !== "bun" &&
+    !(reference.specifier === "mdx/types" && owner.declaredDependencies.has("@types/mdx")) &&
     !nodeBuiltins.has(dependency) &&
     !owner.declaredDependencies.has(dependency)
   ) {
@@ -83,8 +84,7 @@ function reportImport(
   ) {
     add("graph-hono-pulumi-import", `@zsys/graph imports Hono/Pulumi package "${dependency}"`);
   }
-  const fixturePackage = scopes.find((scope) => scope.path === "apps/fixture-commerce")?.manifest
-    ?.name;
+  const fixturePackage = scopes.find((scope) => scope.path === "examples/commerce")?.manifest?.name;
   if (
     owner.path === "apps/inspector" &&
     (publicApplicationPackages.has(dependency) ||
@@ -102,7 +102,7 @@ function reportImport(
     );
   }
   if (
-    (owner.path === "apps/fixture-commerce" || owner.path.startsWith("templates/")) &&
+    (owner.path === "examples/commerce" || owner.path.startsWith("templates/")) &&
     isFixtureForbidden(dependency)
   ) {
     add(

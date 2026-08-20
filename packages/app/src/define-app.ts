@@ -48,7 +48,27 @@ export interface DefineAppOptions<
   readonly defaults?: ApplicationDefaults;
 }
 
-/** Defines the application boundary, including its environment and provider capabilities. */
+/**
+ * Defines the application boundary, environment, and provider profiles.
+ *
+ * @example
+ * ```ts
+ * import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders } from "@zsys/app"
+ *
+ * const values = defineEnv({ AWS_REGION: env.string().default("us-east-1") })
+ * export default defineApp({
+ *   id: "shop",
+ *   env: values,
+ *   providers: {
+ *     development: localProviders(),
+ *     test: testProviders(),
+ *     production: awsProviders({ region: values.AWS_REGION })
+ *   }
+ * })
+ * ```
+ * @category Application
+ * @since 0.1.0
+ */
 export function defineApp<const Id extends string, const S extends EnvShape>(
   options: DefineAppOptions<Id, S>,
 ): AppDescriptor<Id, S> {

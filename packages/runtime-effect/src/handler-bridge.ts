@@ -1,13 +1,19 @@
 import { Effect } from "effect";
-import type { MaybePromise } from "@zsys/contracts";
+import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
 import { createAbortBridge } from "./abort.js";
 import { withDeadline, withTimeout } from "./deadline.js";
+import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";
 import { normalizeFailure } from "./failure.js";
 import type { InvocationFailure } from "./failure-types.js";
 
 export interface HandlerBridgeOptions<Input, Output, Context extends object> {
-  readonly handler: (input: Input, context: Context) => MaybePromise<Output>;
+  readonly handler: (
+    input: Input,
+    request: FunctionRequest | undefined,
+    context: Context,
+  ) => MaybePromise<unknown>;
   readonly input: Input;
+  readonly request?: FunctionRequest;
   readonly publicContext: Context;
   readonly deadline?: number;
   readonly timeoutMs?: number;
@@ -34,8 +40,7 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
     const complete = (effect: Effect.Effect<Output, InvocationFailure>): void => {
       if (completed) return;
       completed = true;
-      cleanup();
-      resume(effect);
+      resume(effect.pipe(Effect.ensuring(Effect.sync(cleanup))));
     };
     const onAbort = (): void =>
       complete(
@@ -53,21 +58,16 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
     bridge.signal.addEventListener("abort", onAbort, { once: true });
     const context = Object.freeze({ ...options.publicContext, signal: bridge.signal }) as Context;
 
-    let result: MaybePromise<Output>;
+    let result: MaybePromise<unknown>;
     try {
-      result = options.handler(options.input, context);
+      result = options.handler(options.input, options.request, context);
     } catch (cause) {
       complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal })));
       return;
     }
 
     Promise.resolve(result).then(
-      (value) =>
-        complete(
-          bridge.signal.aborted
-            ? Effect.fail(normalizeFailure(bridge.signal.reason, { signal: bridge.signal }))
-            : Effect.succeed(value),
-        ),
+      (value) => completeValue(value, bridge.signal, complete),
       (cause) => complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal }))),
     );
 
@@ -79,4 +79,40 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
       ? withDeadline(execution, options.deadline)
       : withTimeout(execution, options.timeoutMs, options.deadline);
   return timed.pipe(Effect.mapError((cause) => normalizeFailure(cause)));
+}
+
+function completeValue<Output>(
+  value: unknown,
+  signal: AbortSignal,
+  complete: (effect: Effect.Effect<Output, InvocationFailure>) => void,
+): void {
+  if (signal.aborted) {
+    complete(Effect.fail(normalizeFailure(signal.reason, { signal })));
+    return;
+  }
+  if (isFunctionFailure(value)) {
+    complete(Effect.fail(normalizeFailure(value.error, { signal })));
+    return;
+  }
+  if (isDeclaredError(value)) {
+    complete(Effect.fail(normalizeFailure(value, { signal })));
+    return;
+  }
+  if (Effect.isEffect(value)) {
+    const effect = value.pipe(
+      Effect.flatMap((result) =>
+        signal.aborted
+          ? Effect.fail(normalizeFailure(signal.reason, { signal }))
+          : isFunctionFailure(result)
+            ? Effect.fail(normalizeFailure(result.error, { signal }))
+            : isDeclaredError(result)
+              ? Effect.fail(normalizeFailure(result, { signal }))
+              : Effect.succeed(result as Output),
+      ),
+      Effect.mapError((cause) => normalizeFailure(cause, { signal })),
+    );
+    complete(effect as Effect.Effect<Output, InvocationFailure>);
+    return;
+  }
+  complete(Effect.succeed(value as Output));
 }

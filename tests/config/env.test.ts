@@ -33,6 +33,13 @@ function assertSecretAbsent(value: unknown, forbidden: string, seen = new WeakSe
 }
 
 describe.serial("@zsys/config environment", () => {
+  test("reserves PORT for framework server selection", () => {
+    const unsafeDefineEnv = defineEnv as (shape: Record<string, unknown>) => unknown;
+    expect(() => unsafeDefineEnv({ PORT: env.port() })).toThrow(
+      'Environment variable name "PORT" is framework-reserved; configure server.port instead.',
+    );
+  });
+
   test("resolves defaults and environment-specific requirements", () => {
     const definition = defineEnv({
       requiredOnlyInProduction: env.string().requiredIn("production"),
@@ -143,7 +150,7 @@ describe.serial("@zsys/config environment", () => {
         .description("Application environment")
         .example("development"),
       OPTIONAL_URL: env.url().optional().example(new URL("https://example.test")),
-      PORT: env.port().default(3210).description("HTTP port"),
+      SERVICE_PORT: env.port().default(3210).description("Upstream service port"),
     });
     const projection = projectEnv(definition);
 
@@ -152,7 +159,7 @@ describe.serial("@zsys/config environment", () => {
       "API_KEY",
       "APP_ENV",
       "OPTIONAL_URL",
-      "PORT",
+      "SERVICE_PORT",
     ]);
     expect(Object.isFrozen(projection)).toBe(true);
     expect(JSON.parse(JSON.stringify(projection))).toEqual(projection);

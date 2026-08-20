@@ -1,0 +1,28 @@
+---
+title: File-system routes
+description: Map nested route.ts files and named method exports to deterministic HTTP operations.
+---
+
+Every `src/routes/**/route.ts` file defines a path. Export one or more of `GET`, `POST`, `PUT`,
+`PATCH`, `DELETE`, `HEAD`, and `OPTIONS`; helper exports are allowed.
+
+| File                                    | Runtime path               | Parameter type                   |
+| --------------------------------------- | -------------------------- | -------------------------------- |
+| `src/routes/route.ts`                   | `/`                        | none                             |
+| `src/routes/orders/route.ts`            | `/orders`                  | none                             |
+| `src/routes/orders/[orderId]/route.ts`  | `/orders/:orderId`         | `string`                         |
+| `src/routes/files/[...parts]/route.ts`  | `/files/*parts`            | `readonly string[]`              |
+| `src/routes/docs/[[...parts]]/route.ts` | `/docs` and `/docs/*parts` | `readonly string[] \| undefined` |
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
+  ../../examples/commerce/src/routes/orders/[orderId]/route.ts
+</include>
+
+`path` and `method` are not route options. An explicit `id` is still required so graph and deployment
+identity survive a file move. Default exports and legacy `*.route.ts` files fail with source-located
+migration guidance.
+
+Static routes win over dynamic routes, then required catch-all, then optional catch-all. The compiler
+expands optional catch-all paths into two runtime registrations but keeps one authored descriptor and
+one generated client operation. It rejects collisions after normalization. Route groups, parallel
+routes, and intercepting routes are not supported.

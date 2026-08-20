@@ -112,7 +112,7 @@ function visitMapping(
   result.push({
     inputPath: path,
     outputPath:
-      value.kind === "body" || value.kind === "multipart"
+      value.kind === "body" || value.kind === "multipart" || value.kind === "multipart-all"
         ? [typeof value.name === "string" ? value.name : (path.at(-1) ?? "value")]
         : path,
     kind: value.kind,
@@ -188,7 +188,7 @@ function isHttpTrigger(node: ApplicationGraph["nodes"][number]): node is HttpGra
 }
 
 function isParameter(value: string): boolean {
-  return ["path", "query", "header", "cookie"].includes(value);
+  return ["path", "path-segments", "query", "header", "cookie"].includes(value);
 }
 
 function isRecord(value: unknown): value is Record<string, any> {

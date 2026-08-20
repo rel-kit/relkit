@@ -7,7 +7,7 @@ import type {
 } from "./model.js";
 
 export interface RequestRecordSink {
-  readonly collect: (record: RequestRecord) => unknown;
+  readonly collect: (record: ObservabilityRecord) => unknown;
   readonly read?: () => readonly ObservabilityRecord[];
   readonly readRecords?: () => readonly ObservabilityRecord[];
 }

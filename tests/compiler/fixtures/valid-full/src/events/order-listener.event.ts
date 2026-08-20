@@ -1,19 +1,23 @@
 import { onEvent } from "@zsys/app";
-import handleCreated from "../functions/handle-created.function.js";
-import orderCreated from "./order-created.event.js";
+import receiptJob from "../jobs/send-receipt.job.js";
 
-const listener = onEvent(orderCreated, {
-  id: "orders.listener",
-  target: handleCreated,
-  delivery: "durable",
-  profile: "default",
-  retry: {
-    maxAttempts: 2,
-    initialDelayMs: 1,
-    maxDelayMs: 5,
-    multiplier: 2,
-    jitter: "none",
+const listener = onEvent(
+  "orders.created",
+  async (payload, context) => {
+    await context.jobs.receiptJob.enqueue({ orderId: payload.orderId });
   },
-});
+  {
+    id: "orders.listener",
+    profile: "default",
+    dependencies: { jobs: { receiptJob } },
+    retry: {
+      maxAttempts: 2,
+      initialDelayMs: 1,
+      maxDelayMs: 5,
+      multiplier: 2,
+      jitter: "none",
+    },
+  },
+);
 
 export default listener;

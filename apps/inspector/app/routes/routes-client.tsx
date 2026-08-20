@@ -1,80 +1,76 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import type { InspectorObject, InspectorPage, InspectorQuery } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
-import type { InspectorPage, InspectorObject } from "../../lib/api-types";
+import { ResourceTable, type ResourceTableItem } from "../resource-table";
+
+interface RouteItem extends ResourceTableItem {
+  readonly method: string;
+  readonly path: string;
+  readonly target: string;
+}
+
+const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].map((id) => ({
+  id,
+  label: id,
+}));
 
 export function RoutesClient() {
-  const [items, setItems] = useState<readonly InspectorObject[]>([]);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
-
-  useEffect(() => {
-    void createInspectorClient()
-      .list<InspectorObject>("routes", { limit: 100 })
-      .then((payload: InspectorPage<InspectorObject>) => {
-        setItems(payload.items);
-        setState("ready");
-      })
-      .catch(() => setState("error"));
+  const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<RouteItem>> => {
+    const page = await createInspectorClient().list<InspectorObject>("routes", query);
+    return { ...page, items: page.items.map(routeItem) };
   }, []);
-
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Routes</h1>
-          <p className="lede">
-            Inspect transport contracts and send a safe request to the active backend.
-          </p>
-        </div>
-        <span className="badge">{items.length} routes</span>
-      </header>
-      {state === "loading" && (
-        <p className="panel route-state" role="status">
-          Loading route contracts…
-        </p>
+    <ResourceTable
+      title="Routes"
+      description="Inspect transport contracts and send a safe request to the active backend."
+      noun="routes"
+      load={load}
+      kindOptions={methods}
+      columns={[
+        {
+          key: "transport",
+          label: "Transport",
+          render: (item) => (
+            <>
+              <span className="route-method">{item.method}</span>
+              <code>{item.path}</code>
+            </>
+          ),
+        },
+        { key: "target", label: "Target", render: (item) => item.target },
+      ]}
+      href={(item) => `/routes/${encodeURIComponent(item.id)}`}
+      openLabel="Open route"
+      details={(item) => (
+        <dl className="identity-grid">
+          <div>
+            <dt>Method</dt>
+            <dd>{item.method}</dd>
+          </div>
+          <div>
+            <dt>Path</dt>
+            <dd>{item.path}</dd>
+          </div>
+          <div>
+            <dt>Target</dt>
+            <dd>{item.target}</dd>
+          </div>
+        </dl>
       )}
-      {state === "error" && (
-        <p className="panel route-state" role="alert">
-          The route API is unavailable.
-        </p>
-      )}
-      {state === "ready" && items.length === 0 && (
-        <p className="panel route-state">No HTTP routes are reported by the active graph.</p>
-      )}
-      {items.length > 0 && (
-        <ul className="route-list">
-          {items.map((route) => (
-            <RouteRow key={text(route.id)} route={route} />
-          ))}
-        </ul>
-      )}
-    </div>
+    />
   );
 }
 
-function RouteRow({ route }: { readonly route: InspectorObject }) {
+function routeItem(route: InspectorObject): RouteItem {
   const config = record(route.config);
-  const id = text(route.id) ?? "route";
-  const method = text(config?.method) ?? "HTTP";
-  const path = text(config?.path) ?? "/";
-  const target = text(route.targetFunctionId) ?? "unknown function";
-  return (
-    <li className="panel route-row">
-      <div>
-        <span className="route-method">{method}</span>
-        <code>{path}</code>
-      </div>
-      <div className="route-row-detail">
-        <strong>{id}</strong>
-        <span>→ {target}</span>
-      </div>
-      <a className="text-link" href={`/routes/${encodeURIComponent(id)}`}>
-        Open route <span aria-hidden="true">→</span>
-      </a>
-    </li>
-  );
+  return {
+    id: text(route.id) || "route",
+    method: text(config?.method) || "HTTP",
+    path: text(config?.path) || "/",
+    target: text(route.targetFunctionId) || "unknown function",
+  };
 }
 
 function record(value: unknown): InspectorObject | undefined {
@@ -82,6 +78,7 @@ function record(value: unknown): InspectorObject | undefined {
     ? (value as InspectorObject)
     : undefined;
 }
+
 function text(value: unknown): string {
-  return typeof value === "string" && value.trim() !== "" ? value : "";
+  return typeof value === "string" ? value : "";
 }

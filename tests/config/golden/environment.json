@@ -30,12 +30,12 @@
     "example": "https://example.test/"
   },
   {
-    "name": "PORT",
+    "name": "SERVICE_PORT",
     "type": "port",
     "requiredIn": [],
     "hasDefault": true,
     "optional": false,
     "sensitive": false,
-    "description": "HTTP port"
+    "description": "Upstream service port"
   }
 ]

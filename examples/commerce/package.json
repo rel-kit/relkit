@@ -1,0 +1,23 @@
+{
+  "name": "@zsys/example-commerce",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.10",
+  "scripts": {
+    "dev": "zsys dev",
+    "check": "zsys check",
+    "typecheck": "zsys check && tsc --noEmit",
+    "test": "bun test",
+    "build": "zsys build"
+  },
+  "dependencies": {
+    "@zsys/app": "workspace:*",
+    "@zsys/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.10",
+    "@zsys/cli": "workspace:*",
+    "@zsys/testing": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}

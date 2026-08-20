@@ -1,0 +1,20 @@
+---
+title: Inspector and API explorer
+description: Explore the active generation, resources, relationships, traces, requests, and Scalar reference.
+---
+
+`zsys dev` starts the inspector on port 3210 by default. It reads the active backend's versioned internal
+API and shows the same generation ID and graph hash used by requests, clients, and deployment.
+
+Use global search or the sidebar to open routes, functions, jobs, events, buckets, cache, tools, agents,
+signals, environment contracts, logs, requests, traces, the graph, and the API reference. Filters and
+cursor pagination are server-backed. Detail URLs are canonical and shareable; sheets provide quick
+inspection without replacing those URLs.
+
+The graph supports pan, zoom, fit view, minimap, search, kind filters, and node details. Its relationship
+table is the keyboard and screen-reader equivalent. Traces render an expandable span tree and waterfall
+with zoom, status, duration, available resource attributes/logs, and correlated request/job/event links.
+
+Inspector actions retain local-only authorization, production restrictions, source-link validation, and
+secret redaction. The API Reference page opens the same Scalar document exposed by the application and
+route details connect to the request composer.

@@ -9,17 +9,18 @@ over this file. Read it before editing.
 ZSYS is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
-| Path                    | Role                                                                                                                            |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
-| `apps/fixture-commerce` | Acceptance fixture used by integration and deployment tests.                                                                    |
-| `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
-| `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
-| `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
-| `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
-| `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
-| `openspec/`             | Change proposals, tasks, delta specifications, and change evidence.                                                             |
-| `repos/effect`          | Vendored Effect reference source; never edit or install in it.                                                                  |
+| Path                   | Role                                                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/docs`            | Searchable Next.js/Fumadocs guides and generated API/CLI reference, normally served on port `3001`.                             |
+| `apps/inspector`       | Next.js inspector app, normally served on port `3210`.                                                                          |
+| `examples/commerce`    | Canonical executable example and cross-feature acceptance application.                                                          |
+| `packages/`            | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
+| `templates/default/v1` | Generated `minimal`, `api`, and `agent` projects.                                                                               |
+| `tests/`               | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
+| `scripts/`             | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
+| `docs/`                | User documentation, technical specifications, decisions, and evidence.                                                          |
+| `openspec/`            | Change proposals, tasks, delta specifications, and change evidence.                                                             |
+| `repos/effect`         | Vendored Effect reference source; never edit or install in it.                                                                  |
 
 Generated projects run a backend on `PORT=3000` and the real Next inspector on
 port `3210` by default. `.zsys/generated` contains graph and manifest outputs;
@@ -42,7 +43,8 @@ bun run verify
 
 Use focused scripts such as `bun run test:compiler`,
 `bun run test:integration`, `bun run test:inspector`,
-`bun run test:generator`, and `bun run test:deployment` while iterating.
+`bun run test:generator`, `bun run test:examples`, `bun run test:docs`, and
+`bun run test:deployment` while iterating.
 The repository guardrail suite is `bun test tests/phase0.test.ts`.
 `test:all` is fail-fast and local by default. Cloud acceptance requires
 explicit `ZSYS_TEST_ALL_CLOUD=1`, `ZSYS_AWS_INTEGRATION_REGION`, and
@@ -51,8 +53,8 @@ explicit `ZSYS_TEST_ALL_CLOUD=1`, `ZSYS_AWS_INTEGRATION_REGION`, and
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. The default generator
 configuration is AWS/Pulumi. Use `--cloud none --deploy none` for a local-only
-project. A published CLI may need `ZSYS_INSPECTOR_ROOT` pointing to a compatible
-`apps/inspector` checkout.
+project. The CLI package contains the prebuilt inspector; `ZSYS_INSPECTOR_ROOT`
+is only for framework contributors testing inspector source.
 
 ## Editing rules
 

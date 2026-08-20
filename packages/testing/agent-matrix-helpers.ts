@@ -36,7 +36,7 @@ export function makeFixture(
     errors: [unavailable],
     handler: async (input) => {
       if (options.targetFailure === "declared") {
-        throw unavailable.create({ reason: `order ${input.id} is unavailable` });
+        return new unavailable({ reason: `order ${input.id} is unavailable` });
       }
       if (options.targetFailure === "defect") throw new Error("database-password");
       return { state: "ready" };

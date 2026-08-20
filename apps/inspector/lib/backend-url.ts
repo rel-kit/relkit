@@ -1,3 +1,6 @@
 export function resolveBackendUrl(baseUrl: string, path: string): string {
-  return baseUrl === "" ? path : new URL(path.replace(/^\//, ""), `${baseUrl}/`).toString();
+  if (baseUrl === "") return path;
+  const normalizedPath = path.replace(/^\//, "");
+  if (baseUrl.startsWith("/")) return `${baseUrl.replace(/\/$/, "")}/${normalizedPath}`;
+  return new URL(normalizedPath, `${baseUrl}/`).toString();
 }

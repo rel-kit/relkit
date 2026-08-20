@@ -1,19 +1,63 @@
 import { afterEach, expect, test } from "bun:test";
+import { GET, POST } from "./app/%5Fzsys/backend/[...path]/route";
 import nextConfig from "./next.config";
 
 const previousBackendUrl = process.env.ZSYS_BACKEND_URL;
+let backend: ReturnType<typeof Bun.serve> | undefined;
 
-test("proxies browser backend requests through the inspector origin", async () => {
-  process.env.ZSYS_BACKEND_URL = "http://127.0.0.1:3000/";
-  expect(await nextConfig.rewrites?.()).toEqual([
-    {
-      source: "/_zsys/backend/:path*",
-      destination: "http://127.0.0.1:3000/:path*",
-    },
-  ]);
+test("builds a standalone inspector distribution", () => {
+  expect(nextConfig.output).toBe("standalone");
 });
 
-afterEach(() => {
+test("proxies browser backend requests using runtime configuration", async () => {
+  backend = Bun.serve({
+    port: 0,
+    async fetch(request) {
+      const url = new URL(request.url);
+      return Response.json({
+        method: request.method,
+        path: url.pathname,
+        search: url.search,
+        body: await request.text(),
+      });
+    },
+  });
+  process.env.ZSYS_BACKEND_URL = `http://127.0.0.1:${backend.port}`;
+  const response = await POST(
+    new Request("http://inspector.local/_zsys/backend/_zsys/v1/actions?dryRun=true", {
+      method: "POST",
+      body: "payload",
+    }),
+    { params: Promise.resolve({ path: ["_zsys", "v1", "actions"] }) },
+  );
+
+  expect(await response.json()).toEqual({
+    method: "POST",
+    path: "/_zsys/v1/actions",
+    search: "?dryRun=true",
+    body: "payload",
+  });
+});
+
+test("adds the inspector proxy base to proxied OpenAPI documents", async () => {
+  backend = Bun.serve({
+    port: 0,
+    fetch: () => Response.json({ openapi: "3.1.0", paths: {} }),
+  });
+  process.env.ZSYS_BACKEND_URL = `http://127.0.0.1:${backend.port}`;
+  const response = await GET(
+    new Request("http://inspector.local/_zsys/backend/_zsys/v1/openapi.json"),
+    { params: Promise.resolve({ path: ["_zsys", "v1", "openapi.json"] }) },
+  );
+
+  expect(await response.json()).toMatchObject({
+    servers: [{ url: "/_zsys/backend" }],
+  });
+});
+
+afterEach(async () => {
+  await backend?.stop(true);
+  backend = undefined;
   if (previousBackendUrl === undefined) delete process.env.ZSYS_BACKEND_URL;
   else process.env.ZSYS_BACKEND_URL = previousBackendUrl;
 });

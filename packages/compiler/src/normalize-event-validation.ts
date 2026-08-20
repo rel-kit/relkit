@@ -1,7 +1,8 @@
 import { canonicalJson } from "@zsys/contracts";
+import { setEventListenerSchemas } from "./normalize-event-listener.js";
 import { add } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";
-import { matchingEvents, schema, schemaEquivalent, selectorEntries } from "./normalize-compat.js";
+import { matchingEvents, schema, schemaEquivalent } from "./normalize-compat.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 import {
   NORMALIZE_CODES,
@@ -16,7 +17,8 @@ export function validateEventCompatibility(work: NormalizationWork): void {
     const selector = value.selector;
     const expansion = expandSelector(work, trigger, selector);
     work.selectorExpansions.set(trigger.id, expansion);
-    validateEventTarget(work, trigger, value.target, expansion);
+    setEventListenerSchemas(work, trigger, expansion);
+    validateEventTarget(work, trigger, value, expansion);
   }
 }
 
@@ -66,20 +68,39 @@ function expandSelector(
     }
     return [];
   }
-  const entries = selectorEntries(selector);
-  if (entries.length === 0) {
+  const references =
+    selector.kind === "single" && isRecord(selector.event)
+      ? [selector.event]
+      : selector.kind === "anyOf" && Array.isArray(selector.events)
+        ? selector.events
+        : [];
+  if (references.length === 0) {
     add(work, trigger, NORMALIZE_CODES.selector, "Event selector has no entries.");
     return [];
   }
-  for (const entry of entries) {
-    const at = entry.lastIndexOf("@");
-    const eventId = entry.slice(0, at);
-    const version = Number(entry.slice(at + 1));
+  const entries: string[] = [];
+  for (const reference of references) {
+    if (!isRecord(reference) || typeof reference.eventId !== "string") {
+      add(work, trigger, NORMALIZE_CODES.selector, "Event selector entry is invalid.");
+      continue;
+    }
+    const eventId = reference.eventId;
     const event = work.referencesByKind.get("event")?.get(eventId);
     const eventVersion = isRecord(event?.value) ? event.value.version : undefined;
-    if (event === undefined || eventVersion !== version) {
-      add(work, trigger, NORMALIZE_CODES.selector, `Event selector target "${entry}" is missing.`);
+    if (event === undefined || typeof eventVersion !== "number") {
+      add(work, trigger, NORMALIZE_CODES.eventName, `Event name "${eventId}" is not registered.`);
+      continue;
     }
+    if (reference.version !== undefined && reference.version !== eventVersion) {
+      add(
+        work,
+        trigger,
+        NORMALIZE_CODES.eventName,
+        `Event name "${eventId}" is stale at version ${String(reference.version)}; current version is ${eventVersion}.`,
+      );
+      continue;
+    }
+    entries.push(`${eventId}@${eventVersion}`);
   }
   return [...new Set(entries)].sort();
 }
@@ -87,9 +108,11 @@ function expandSelector(
 function validateEventTarget(
   work: NormalizationWork,
   trigger: NormalizedDescriptor,
-  targetValue: unknown,
+  triggerValue: Record<string, unknown>,
   expansion: readonly string[],
 ): void {
+  if (triggerValue.callback === true) return;
+  const targetValue = triggerValue.target;
   if (refKind(targetValue) !== "function") {
     add(work, trigger, NORMALIZE_CODES.eventTarget, "Event trigger target must be a function.");
     return;

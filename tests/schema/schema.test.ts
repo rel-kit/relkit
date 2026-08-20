@@ -96,6 +96,38 @@ describe.serial("@zsys/schema", () => {
     });
   });
 
+  test("projects void outputs without pretending undefined is JSON", () => {
+    expect(validateSync(z.void(), undefined)).toEqual({ value: undefined });
+    expect(getJsonSchema(z.undefined())).toEqual({
+      ok: true,
+      schema: { "x-zsys-void": true },
+    });
+  });
+
+  test("validates Web Files and projects binary upload constraints", () => {
+    const schema = z.file({ maxBytes: 5, mediaTypes: ["image/*", "text/plain"] });
+    const valid = new File(["hello"], "hello.txt", { type: "text/plain" });
+    const oversized = new File(["123456"], "large.txt", { type: "text/plain" });
+    const unsupported = new File(["{}"], "data.json", { type: "application/json" });
+
+    expect(validateSync(schema, valid)).toEqual({ value: valid });
+    expect(validateSync(schema, oversized)).toMatchObject({
+      issues: [{ message: "File exceeds 5 bytes" }],
+    });
+    expect(validateSync(schema, unsupported)).toMatchObject({
+      issues: [{ message: 'Unsupported file media type "application/json"' }],
+    });
+    expect(getJsonSchema(schema)).toEqual({
+      ok: true,
+      schema: {
+        type: "string",
+        format: "binary",
+        "x-zsys-maxBytes": 5,
+        "x-zsys-mediaTypes": ["image/*", "text/plain"],
+      },
+    });
+  });
+
   test("keeps validation and JSON Schema goldens stable", async () => {
     const nestedIssues = validateSync(
       z.object({

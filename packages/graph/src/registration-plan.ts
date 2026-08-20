@@ -161,7 +161,8 @@ function compareHttpTrigger(left: HttpTriggerRegistration, right: HttpTriggerReg
   );
 }
 
-function routePrecedence(path: string): 0 | 1 | 2 {
+function routePrecedence(path: string): 0 | 1 | 2 | 3 {
+  if (path.includes("*") && path.endsWith("?")) return 3;
   if (path.includes("*")) return 2;
   return path.split("/").some((segment) => segment.startsWith(":")) ? 1 : 0;
 }

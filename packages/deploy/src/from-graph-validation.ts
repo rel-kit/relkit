@@ -14,6 +14,7 @@ type EnvNode = Extract<GraphNode, { kind: "env" }>;
 
 export interface FromGraphOptions {
   readonly image?: import("./plan.js").ContainerImagePlan;
+  readonly httpPort?: number;
   readonly modelProfiles?: Readonly<
     Record<string, { readonly provider: string; readonly model?: string }>
   >;

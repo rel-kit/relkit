@@ -2,7 +2,7 @@ import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders 
 
 const application = defineApp({
   id: "provider-profile-app",
-  env: defineEnv({ PORT: env.port().default(3000) }),
+  env: defineEnv({ SERVICE_PORT: env.port().default(3000) }),
   providers: {
     development: localProviders(),
     test: testProviders({ deterministicIds: true, deterministicClock: true }),

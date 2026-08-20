@@ -20,8 +20,18 @@ export interface WaterfallSpan {
   readonly durationMs?: number;
   readonly status?: string;
   readonly outcome?: string;
+  readonly kind: string;
+  readonly error: boolean;
+  readonly details: InspectorObject;
+  readonly correlations: readonly TraceCorrelation[];
   readonly offsetPercent: number;
   readonly widthPercent: number;
+}
+
+export interface TraceCorrelation {
+  readonly kind: "request" | "job" | "event";
+  readonly id: string;
+  readonly href: string;
 }
 
 export function traceGroups(items: readonly InspectorObject[]): readonly TraceGroup[] {
@@ -56,14 +66,18 @@ export function traceGroups(items: readonly InspectorObject[]): readonly TraceGr
 
 export function waterfall(spans: readonly InspectorObject[]): readonly WaterfallSpan[] {
   const valid = spans.filter((span) => text(span.spanId) !== "");
-  const starts = valid.map((span) => Date.parse(text(span.startedAt))).filter(Number.isFinite);
-  const origin = starts.length === 0 ? 0 : Math.min(...starts);
-  const ends = valid.map((span) => {
+  let origin = Number.POSITIVE_INFINITY;
+  for (const span of valid) {
     const start = Date.parse(text(span.startedAt));
-    const duration = number(span.durationMs) ?? 0;
-    return Number.isFinite(start) ? start + duration : origin + duration;
-  });
-  const total = Math.max(1, ...ends.map((end) => end - origin));
+    if (Number.isFinite(start)) origin = Math.min(origin, start);
+  }
+  if (!Number.isFinite(origin)) origin = 0;
+  let total = 1;
+  for (const span of valid) {
+    const start = Date.parse(text(span.startedAt));
+    const end = (Number.isFinite(start) ? start : origin) + (number(span.durationMs) ?? 0);
+    total = Math.max(total, end - origin);
+  }
   const parents = new Map(valid.map((span) => [text(span.spanId), text(span.parentSpanId)]));
   const depthOf = (id: string, seen = new Set<string>()): number => {
     const parent = parents.get(id);
@@ -71,28 +85,106 @@ export function waterfall(spans: readonly InspectorObject[]): readonly Waterfall
     seen.add(parent);
     return Math.min(8, depthOf(parent, seen) + 1);
   };
-  return valid.sort(byTime).map((span) => {
-    const start = Date.parse(text(span.startedAt));
-    const duration = Math.max(0, number(span.durationMs) ?? 0);
-    const offset = Number.isFinite(start) ? ((start - origin) / total) * 100 : 0;
-    return {
-      spanId: text(span.spanId),
-      name: text(span.name) || "span",
-      ...(text(span.parentSpanId) ? { parentSpanId: text(span.parentSpanId) } : {}),
-      depth: depthOf(text(span.spanId)),
-      ...(text(span.startedAt) ? { startedAt: text(span.startedAt) } : {}),
-      ...(text(span.completedAt) ? { completedAt: text(span.completedAt) } : {}),
-      ...(number(span.durationMs) === undefined ? {} : { durationMs: duration }),
-      ...(text(span.status) ? { status: text(span.status) } : {}),
-      ...(text(span.outcome) ? { outcome: text(span.outcome) } : {}),
-      offsetPercent: Math.max(0, Math.min(96, offset)),
-      widthPercent: Math.max(4, Math.min(100 - Math.max(0, offset), (duration / total) * 100)),
-    };
+  const isAncestor = (ancestor: string, descendant: string): boolean => {
+    const seen = new Set<string>();
+    let parent = parents.get(descendant);
+    while (parent && !seen.has(parent)) {
+      if (parent === ancestor) return true;
+      seen.add(parent);
+      parent = parents.get(parent);
+    }
+    return false;
+  };
+  return valid
+    .sort((left, right) => {
+      const leftId = text(left.spanId);
+      const rightId = text(right.spanId);
+      if (isAncestor(leftId, rightId)) return -1;
+      if (isAncestor(rightId, leftId)) return 1;
+      return byTime(left, right);
+    })
+    .map((span) => {
+      const start = Date.parse(text(span.startedAt));
+      const duration = Math.max(0, number(span.durationMs) ?? 0);
+      const offset = Number.isFinite(start) ? ((start - origin) / total) * 100 : 0;
+      const status = text(span.status);
+      const outcome = text(span.outcome);
+      return {
+        spanId: text(span.spanId),
+        name: text(span.name) || "span",
+        ...(text(span.parentSpanId) ? { parentSpanId: text(span.parentSpanId) } : {}),
+        depth: depthOf(text(span.spanId)),
+        ...(text(span.startedAt) ? { startedAt: text(span.startedAt) } : {}),
+        ...(text(span.completedAt) ? { completedAt: text(span.completedAt) } : {}),
+        ...(number(span.durationMs) === undefined ? {} : { durationMs: duration }),
+        ...(status ? { status } : {}),
+        ...(outcome ? { outcome } : {}),
+        kind: spanKind(span),
+        error: /error|fail/i.test(`${status} ${outcome}`),
+        details: safeDetails(span),
+        correlations: correlations(span),
+        offsetPercent: Math.max(0, Math.min(96, offset)),
+        widthPercent: Math.max(4, Math.min(100 - Math.max(0, offset), (duration / total) * 100)),
+      };
+    });
+}
+
+function spanKind(span: InspectorObject): string {
+  const value = text(span.spanKind) || text(span.kind);
+  return value === "" || value === "span" ? "internal" : value;
+}
+
+function correlations(span: InspectorObject): readonly TraceCorrelation[] {
+  return [
+    link("request", span.requestId, "/requests/"),
+    link("job", span.jobId, "/jobs/"),
+    link("event", span.eventId, "/events/"),
+  ].flatMap((value) => value ?? []);
+}
+
+function link(
+  kind: TraceCorrelation["kind"],
+  value: unknown,
+  prefix: string,
+): TraceCorrelation | undefined {
+  const id = text(value);
+  return id === "" ? undefined : { kind, id, href: `${prefix}${encodeURIComponent(id)}` };
+}
+
+function safeDetails(span: InspectorObject): InspectorObject {
+  const details = redact({
+    attributes: span.attributes,
+    resourceAttributes: span.resourceAttributes ?? span.resource,
+    logs: span.logs ?? span.events,
   });
+  return isRecord(details) ? details : {};
+}
+
+function redact(value: unknown, key = "", depth = 0): unknown {
+  if (
+    /authorization|cookie|password|secret|token|api.?key|request.?body|response.?body/i.test(key)
+  ) {
+    return "[redacted]";
+  }
+  if (depth > 5) return "[truncated]";
+  if (typeof value === "string") return value.length > 4_096 ? `${value.slice(0, 4_096)}…` : value;
+  if (value === null || typeof value === "number" || typeof value === "boolean") return value;
+  if (Array.isArray(value)) return value.slice(0, 100).map((item) => redact(item, key, depth + 1));
+  if (!isRecord(value)) return undefined;
+  const entries: [string, unknown][] = [];
+  for (const [name, item] of Object.entries(value)) {
+    if (entries.length === 100) break;
+    entries.push([name, redact(item, name, depth + 1)]);
+  }
+  return Object.fromEntries(entries);
 }
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+function isRecord(value: unknown): value is InspectorObject {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 function number(value: unknown): number | undefined {

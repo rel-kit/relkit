@@ -18,10 +18,10 @@ import { compileProject } from "../compiler/fixture-runner.ts";
 const enabled = process.env.ZSYS_AWS_INTEGRATION === "1";
 const awsTest = enabled ? test : test.skip;
 const compiled = await compileProject(
-  "aws-fixture-commerce",
-  join(import.meta.dir, "../../apps/fixture-commerce"),
+  "aws-commerce-example",
+  join(import.meta.dir, "../../examples/commerce"),
 );
-if (compiled.exitCode !== 0) throw new Error("fixture-commerce did not compile for AWS acceptance");
+if (compiled.exitCode !== 0) throw new Error("commerce-example did not compile for AWS acceptance");
 const graph = JSON.parse(compiled.graphBytes) as ApplicationGraph;
 
 test("keeps source moves on stable deployment identities", () => {

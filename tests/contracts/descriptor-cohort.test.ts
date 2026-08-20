@@ -52,7 +52,8 @@ const lookup = defineFunction({
   input,
   output,
   errors: [notFound],
-  handler: async (value) => ({ ok: value.id.length > 0 }),
+  handler: async (value) =>
+    value.id === "missing" ? new notFound({ orderId: value.id }) : { ok: value.id.length > 0 },
 });
 
 const created = defineEvent({
@@ -162,7 +163,11 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(Object.isFrozen(dependent.dependencies?.functions)).toBe(true);
 
     const failure = notFound.create({ orderId: "order-1" });
+    const constructed = new notFound({ orderId: "order-2" });
     expect(failure).toBeInstanceOf(DeclaredError);
+    expect(constructed).toBeInstanceOf(notFound);
+    expect(constructed).toBeInstanceOf(DeclaredError);
+    expect(constructed.data).toEqual({ orderId: "order-2" });
     expect(failure.id).toBe("orders.not-found");
     expect(failure.ref).toEqual({ kind: "error", id: "orders.not-found" });
     expect(failure.data).toEqual({ orderId: "order-1" });
@@ -325,24 +330,21 @@ describe.serial("Phase 2 descriptor cohort", () => {
   });
 
   test("projects event selector unions and onEvent as event-trigger", () => {
-    const selector = events.anyOf(created, changed);
+    const selector = events.anyOf("orders.created" as never, "orders.changed" as never);
     expect(selector.kind).toBe("anyOf");
-    expect(selector.events).toEqual([
-      { eventId: "orders.created", version: 1 },
-      { eventId: "orders.changed", version: 2 },
-    ]);
+    expect(selector.events).toEqual([{ eventId: "orders.created" }, { eventId: "orders.changed" }]);
     expect(isEventDescriptor(created)).toBe(true);
     expect(Object.isFrozen(selector)).toBe(true);
-    expect(() => events.anyOf(created, created)).toThrow("unique");
+    expect(() => events.anyOf("orders.created" as never, "orders.created" as never)).toThrow(
+      "unique",
+    );
     expect(events.match("orders.*").pattern).toBe("orders.*");
     expect(events.match("orders.**").pattern).toBe("orders.**");
     expect(() => events.match("orders.*.bad*" as never)).toThrow("Event patterns");
     expect(() => events.all({ payload: "known" } as never)).toThrow("payload");
 
-    const trigger = onEvent(selector, {
+    const trigger = onEvent(selector, async () => ({ ok: true }), {
       id: "orders.on-change",
-      target: lookup,
-      delivery: "durable",
       profile: "default",
       retry: {
         maxAttempts: 3,
@@ -353,15 +355,17 @@ describe.serial("Phase 2 descriptor cohort", () => {
       },
       concurrency: 1,
     });
-    const singleTrigger = onEvent(created, {
+    const singleTrigger = onEvent("orders.created" as never, async () => ({ ok: true }), {
       id: "orders.on-created",
-      target: lookup,
       delivery: "ephemeral",
     });
 
     expect(trigger.kind).toBe("event-trigger");
     expect(trigger.selector.kind).toBe("anyOf");
-    expect(trigger.target.ref).toEqual(lookup.ref);
+    expect(trigger.target.ref).toEqual({
+      kind: "function",
+      id: "zsys.event.orders.on-change.handler",
+    });
     expect(isEventTriggerDescriptor(trigger)).toBe(true);
     expect(singleTrigger.selector.kind).toBe("single");
     expect(Object.prototype.hasOwnProperty.call(trigger, "handler")).toBe(false);

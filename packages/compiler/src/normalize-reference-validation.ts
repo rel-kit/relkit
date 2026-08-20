@@ -6,6 +6,7 @@ import {
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
+import { validateRateLimitStore } from "./normalize-rate-limit.js";
 
 /** Resolves descriptor, middleware, and named-transform references without importing code. */
 export function passReferences(work: NormalizationWork): void {
@@ -22,7 +23,10 @@ export function passReferences(work: NormalizationWork): void {
       }
     }
     if (descriptor.kind === "function") validateDependencies(work, descriptor, value.dependencies);
-    if (descriptor.kind === "route") validateRouteReferences(work, descriptor, value);
+    if (descriptor.kind === "route") {
+      validateRouteReferences(work, descriptor, value);
+      validateRateLimitStore(work, descriptor, value.rateLimit);
+    }
   }
 
   for (const middleware of work.middlewareReferences.values()) {

@@ -21,6 +21,9 @@ export interface OpenApiMediaType {
 export interface OpenApiResponse {
   readonly description: string;
   readonly content?: Readonly<Record<string, OpenApiMediaType>>;
+  readonly headers?: Readonly<
+    Record<string, { readonly description: string; readonly schema: OpenApiSchema }>
+  >;
 }
 export interface OpenApiOperation {
   readonly operationId: string;
@@ -35,6 +38,7 @@ export interface OpenApiOperation {
     readonly functionId: string;
     readonly middleware: readonly { readonly id: string; readonly targetFunctionId: string }[];
     readonly transforms: readonly string[];
+    readonly rateLimit?: JsonValue;
   };
 }
 export interface OpenApiPathItem {
@@ -80,12 +84,22 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
         `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
       );
     }
-    const path = openApiPath(trigger.config.path);
-    const method = trigger.config.method.toLowerCase();
-    const item = paths[path] ?? {};
-    if (item[method] !== undefined)
-      throw new TypeError(`Duplicate OpenAPI route "${method.toUpperCase()} ${path}".`);
-    paths[path] = { ...item, [method]: buildOperation(trigger, target) };
+    for (const [index, routePath] of openApiPaths(trigger.config.path).entries()) {
+      const path = openApiPath(routePath);
+      const method = trigger.config.method.toLowerCase();
+      const item = paths[path] ?? {};
+      if (item[method] !== undefined)
+        throw new TypeError(`Duplicate OpenAPI route "${method.toUpperCase()} ${path}".`);
+      paths[path] = {
+        ...item,
+        [method]: buildOperation(
+          trigger,
+          target,
+          routePath,
+          index === 0 ? trigger.id : `${trigger.id}.catch-all`,
+        ),
+      };
+    }
   }
   return {
     openapi: "3.1.0",
@@ -99,6 +113,16 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
       generatorVersion: GENERATOR_VERSION,
     },
   };
+}
+
+function openApiPaths(path: string): readonly string[] {
+  const segments = path.split("/");
+  const optional = segments.findIndex(
+    (segment) => segment.startsWith("*") && segment.endsWith("?"),
+  );
+  if (optional < 0) return [path];
+  const base = segments.slice(0, optional).join("/") || "/";
+  return [base, path.replace(/\?$/, "")];
 }
 
 /** Serializes OpenAPI with the repository's canonical JSON ordering. */

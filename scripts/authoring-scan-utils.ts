@@ -19,7 +19,7 @@ export function authoringFragments(root: string): Fragment[] {
     const file = resolve(packageRoot, path);
     result.push(...markdownFragments(file, readFileSync(file, "utf8")));
   }
-  const fixtureRoot = resolve(root, "apps/fixture-commerce");
+  const fixtureRoot = resolve(root, "examples/commerce");
   for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: fixtureRoot, onlyFiles: true })) {
     const file = resolve(fixtureRoot, path);
     const text = readFileSync(file, "utf8");

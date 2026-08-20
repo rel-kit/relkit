@@ -1,53 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
 import { CONFIG_CODES, DEFAULT_TOOLING_CONFIG, type ConfigIssue } from "./config-loader-types.js";
-
-export function readPath(
-  value: unknown,
-  path: string,
-  fallback: string,
-  root: string,
-  allowGlob: boolean,
-  issues: ConfigIssue[],
-): string {
-  if (value === undefined) return fallback;
-  if (typeof value !== "string" || value.trim().length === 0 || (!allowGlob && hasGlob(value))) {
-    issues.push({ code: CONFIG_CODES.path, path, message: `${path} must be a valid path.` });
-    return fallback;
-  }
-  try {
-    return normalizeSourcePath(value, root);
-  } catch (error) {
-    const message = errorMessage(error);
-    issues.push({
-      code: message.includes("inside") ? CONFIG_CODES.outsideRoot : CONFIG_CODES.path,
-      path,
-      message: `${path}: ${message}`,
-    });
-    return fallback;
-  }
-}
-
-export function readPaths(
-  value: unknown,
-  path: "source" | "exclude",
-  fallback: readonly string[],
-  root: string,
-  issues: ConfigIssue[],
-): readonly string[] {
-  if (value === undefined) return fallback;
-  if (!Array.isArray(value) || (path === "source" && value.length === 0)) {
-    issues.push({
-      code: path === "source" ? CONFIG_CODES.source : CONFIG_CODES.exclude,
-      path,
-      message: `${path} must be a non-empty array of path patterns.`,
-    });
-    return fallback;
-  }
-  const normalized = value.map((entry, index) =>
-    readPath(entry, `${path}[${index}]`, fallback[0] ?? "src/**/*.ts", root, true, issues),
-  );
-  return Object.freeze([...new Set(normalized)].sort());
-}
 
 export function readInspector(value: unknown, issues: ConfigIssue[]): { readonly port: number } {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.inspector;
@@ -74,6 +25,94 @@ export function readInspector(value: unknown, issues: ConfigIssue[]): { readonly
     });
   }
   return { port: typeof port === "number" ? port : 3210 };
+}
+
+export function readServer(
+  value: unknown,
+  issues: ConfigIssue[],
+): {
+  readonly port: number;
+  readonly maxBodyBytes: number;
+  readonly apiDocs: { readonly enabledInProduction: boolean };
+} {
+  if (value === undefined) return DEFAULT_TOOLING_CONFIG.server;
+  const record = readRecord(value, "server", issues);
+  if (record === undefined) return DEFAULT_TOOLING_CONFIG.server;
+  rejectUnknown(record, "server", ["port", "maxBodyBytes", "apiDocs"], issues);
+  const port = readPort(record.port, "server.port", DEFAULT_TOOLING_CONFIG.server.port, issues);
+  const maxBodyBytes = readPositive(
+    record.maxBodyBytes,
+    "server.maxBodyBytes",
+    DEFAULT_TOOLING_CONFIG.server.maxBodyBytes,
+    issues,
+  );
+  const apiDocs = readApiDocs(record.apiDocs, issues);
+  return { port, maxBodyBytes, apiDocs };
+}
+
+function readApiDocs(
+  value: unknown,
+  issues: ConfigIssue[],
+): { readonly enabledInProduction: boolean } {
+  if (value === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
+  const record = readRecord(value, "server.apiDocs", issues);
+  if (record === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
+  rejectUnknown(record, "server.apiDocs", ["enabledInProduction"], issues);
+  if (record.enabledInProduction !== undefined && typeof record.enabledInProduction !== "boolean") {
+    issues.push({
+      code: CONFIG_CODES.behavior,
+      path: "server.apiDocs.enabledInProduction",
+      message: "server.apiDocs.enabledInProduction must be a boolean.",
+    });
+  }
+  return {
+    enabledInProduction:
+      typeof record.enabledInProduction === "boolean" ? record.enabledInProduction : false,
+  };
+}
+
+function readPort(value: unknown, path: string, fallback: number, issues: ConfigIssue[]): number {
+  if (value === undefined) return fallback;
+  if (!Number.isSafeInteger(value) || Number(value) < 1 || Number(value) > 65_535) {
+    issues.push({
+      code: CONFIG_CODES.port,
+      path,
+      message: `${path} must be from 1 through 65535.`,
+    });
+    return fallback;
+  }
+  return Number(value);
+}
+
+function readPositive(
+  value: unknown,
+  path: string,
+  fallback: number,
+  issues: ConfigIssue[],
+): number {
+  if (value === undefined) return fallback;
+  if (!Number.isSafeInteger(value) || Number(value) < 1) {
+    issues.push({ code: CONFIG_CODES.behavior, path, message: `${path} must be positive.` });
+    return fallback;
+  }
+  return Number(value);
+}
+
+function rejectUnknown(
+  record: Record<string, unknown>,
+  path: string,
+  allowed: readonly string[],
+  issues: ConfigIssue[],
+): void {
+  for (const key of Object.keys(record)) {
+    if (!allowed.includes(key)) {
+      issues.push({
+        code: CONFIG_CODES.key,
+        path: `${path}.${key}`,
+        message: `Unknown ${path} setting "${key}".`,
+      });
+    }
+  }
 }
 
 export function readRecord(
@@ -151,14 +190,4 @@ export function posixNormalize(value: string): string {
   return `${prefix}${segments.join("/")}` || prefix || ".";
 }
 
-export function hasGlob(value: string): boolean {
-  return /[*?\[\]{}]/.test(value);
-}
-
-export const allowedKeys = new Set([
-  "entry",
-  "source",
-  "exclude",
-  "generatedDirectory",
-  "inspector",
-]);
+export const allowedKeys = new Set(["server", "inspector"]);

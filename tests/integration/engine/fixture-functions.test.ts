@@ -4,9 +4,9 @@ import {
   invokeFunction,
   type InvocationCompletion,
 } from "../../../packages/engine/src/index.ts";
-import createOrder from "../../../apps/fixture-commerce/src/functions/create-order.function.ts";
-import getOrder from "../../../apps/fixture-commerce/src/functions/get-order.function.ts";
-import handleOrderCreated from "../../../apps/fixture-commerce/src/functions/handle-order-created.function.ts";
+import createOrder from "../../../examples/commerce/src/functions/create-order.function.ts";
+import getOrder from "../../../examples/commerce/src/functions/get-order.function.ts";
+import orderReceipt from "../../../examples/commerce/src/events/order-receipt.event.ts";
 import { z } from "../../../packages/schema/src/index.ts";
 
 const orderInput = {
@@ -16,7 +16,7 @@ const orderInput = {
   customerEmail: "customer@example.com",
 };
 
-describe("fixture functions through the common engine", () => {
+describe("commerce example functions through the common engine", () => {
   test("invokes cache, event, and job clients and applies function limits", async () => {
     const published: unknown[] = [];
     const enqueued: unknown[] = [];
@@ -70,7 +70,7 @@ describe("fixture functions through the common engine", () => {
       traceId: "trace-1",
       attributes: {},
     };
-    const result = await invokeFunction(handleOrderCreated, envelope, {
+    const result = await invokeFunction(orderReceipt.target, envelope, {
       now: () => 0,
       clients: {
         functions: { getOrder },
@@ -86,10 +86,10 @@ describe("fixture functions through the common engine", () => {
       },
     });
 
-    expect(result).toEqual(envelope);
+    expect(result).toBeUndefined();
     expect(records.map(({ functionId }) => functionId)).toEqual([
       "orders.get",
-      "orders.handle-created",
+      "zsys.event.receipts.on-order-created.handler",
     ]);
     const child = records.find(({ functionId }) => functionId === "orders.get");
     expect(child?.source).toBe("direct");
@@ -107,7 +107,11 @@ describe("fixture functions through the common engine", () => {
       id: "fixture.forged-client",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input: unknown, context: { readonly signal: AbortSignal }) => {
+      handler: (
+        _input: unknown,
+        _request: Request | undefined,
+        context: { readonly signal: AbortSignal },
+      ) => {
         const forged = context as unknown as {
           readonly cache: { readonly prices: { readonly get: () => Promise<unknown> } };
         };

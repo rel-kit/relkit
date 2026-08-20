@@ -13,6 +13,7 @@
     "@zsys/buckets": "workspace:*",
     "@zsys/cache": "workspace:*",
     "@zsys/config": "workspace:*",
+    "@zsys/compiler": "workspace:*",
     "@zsys/contracts": "workspace:*",
     "@zsys/engine": "workspace:*",
     "@zsys/events": "workspace:*",

@@ -12,6 +12,7 @@ import {
   type SignalKind,
 } from "../lib/observability-model";
 import { defaultSignalFilters } from "../lib/signal-defaults";
+import { Pagination } from "../components/ui/pagination";
 import { SignalsFilters } from "./signals-filters";
 import { SignalRows } from "./signal-rows";
 
@@ -128,33 +129,22 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
         </p>
       )}
       {state === "ready" && <SignalRows kind={kind} items={items} />}
-      <nav className="signal-pagination" aria-label={`${title} pagination`}>
-        <button
-          className="button-link"
-          type="button"
-          disabled={pageIndex === 0 || state === "loading"}
-          onClick={() => {
-            setPageIndex((value) => Math.max(0, value - 1));
-            setNextCursor(undefined);
-          }}
-        >
-          Previous
-        </button>
-        <span aria-live="polite">Page {pageIndex + 1}</span>
-        <button
-          className="button-link"
-          type="button"
-          disabled={nextCursor === undefined || state === "loading"}
-          onClick={() => {
-            if (nextCursor !== undefined) {
-              setCursors((value) => [...value, nextCursor]);
-              setPageIndex((value) => value + 1);
-            }
-          }}
-        >
-          Next
-        </button>
-      </nav>
+      <Pagination
+        page={pageIndex + 1}
+        hasPrevious={pageIndex > 0}
+        hasNext={nextCursor !== undefined}
+        disabled={state === "loading"}
+        onPrevious={() => {
+          setPageIndex((value) => Math.max(0, value - 1));
+          setNextCursor(undefined);
+        }}
+        onNext={() => {
+          if (nextCursor !== undefined) {
+            setCursors((value) => [...value, nextCursor]);
+            setPageIndex((value) => value + 1);
+          }
+        }}
+      />
     </div>
   );
 }

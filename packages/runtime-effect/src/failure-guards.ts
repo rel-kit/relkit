@@ -8,6 +8,15 @@ export type DeclaredErrorLike = Error & {
   readonly ref: { readonly kind: unknown; readonly id: string };
 };
 
+export type FunctionFailureLike = {
+  readonly _tag: "FunctionFailure";
+  readonly error: unknown;
+};
+
+export function isFunctionFailure(value: unknown): value is FunctionFailureLike {
+  return isRecord(value) && value._tag === "FunctionFailure" && "error" in value;
+}
+
 export function isDeclaredError(value: unknown): value is DeclaredErrorLike {
   if (!(value instanceof Error) || value.name !== "DeclaredError" || !isRecord(value)) return false;
   const ref = value.ref;

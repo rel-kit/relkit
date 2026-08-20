@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
@@ -17,6 +17,9 @@ test("check emits activatable success and portable structured diagnostics on fai
   expect(valid.ok).toBe(true);
   expect(valid.activatable).toBe(true);
   expect(valid.graphHash).toMatch(/^sha256:/);
+  expect(await readFile(join(valid.generatedDirectory, "event-registry.d.ts"), "utf8")).toContain(
+    'declare module "@zsys/events"',
+  );
   expect(JSON.parse(await readFile(join(valid.generatedDirectory, "diagnostics.json")))).toEqual(
     [],
   );
@@ -35,6 +38,49 @@ test("check emits activatable success and portable structured diagnostics on fai
     }),
   );
   expect(JSON.stringify(invalid.diagnostics)).not.toContain(invalidRoot);
+});
+
+test("check locates removed config keys and shows the fixed replacement", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  await writeFile(
+    join(root, "zsys.config.ts"),
+    'export default {\n  source: ["lib/**/*.ts"],\n};\n',
+  );
+
+  const result = await checkProject({ projectRoot: root });
+  expect(result.ok).toBe(false);
+  expect(result.diagnostics).toContainEqual(
+    expect.objectContaining({
+      code: "ZSYS_CONFIG_LEGACY_KEY",
+      file: "zsys.config.ts",
+      line: 2,
+      column: 3,
+      message: expect.stringContaining('ZSYS always discovers "src/**/*.ts"'),
+    }),
+  );
+  expect(result.diagnostics[0]?.message).toContain("defineConfig({ server:");
+});
+
+test("check refreshes generated event types before project typechecking", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  await writeFile(join(root, "src/type-error.ts"), "const value: string = 1;\nvoid value;\n");
+  await writeFile(
+    join(root, "tsconfig.json"),
+    JSON.stringify({
+      compilerOptions: { strict: true, noEmit: true },
+      files: ["src/type-error.ts", ".zsys/generated/event-registry.d.ts"],
+    }),
+  );
+
+  const result = await checkProject({ projectRoot: root });
+  expect(result.ok).toBe(false);
+  expect(result.diagnostics).toContainEqual(
+    expect.objectContaining({ code: "TS2322", file: "src/type-error.ts", line: 1 }),
+  );
+  expect(result.diagnostics.some(({ code }) => code === "TS6053")).toBe(false);
+  expect(await readFile(join(root, ".zsys/generated/event-registry.d.ts"), "utf8")).toContain(
+    "interface EventRegistry",
+  );
 });
 
 test("build succeeds from a checked graph and reports failed checks", async () => {
@@ -88,6 +134,25 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(failed.diagnostics).toContainEqual(
     expect.objectContaining({ code: "ZSYS_ROUTE_COLLISION" }),
   );
+});
+
+test("build carries server port, body limit, and API docs settings into runtime artifacts", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  await writeFile(
+    join(root, "zsys.config.ts"),
+    'import { defineConfig } from "@zsys/app/config";\nexport default defineConfig({ server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
+  );
+  const built = await buildProject({ projectRoot: root });
+  expect(built.ok).toBe(true);
+  const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json")));
+  expect(manifest.server).toEqual({
+    port: 4321,
+    maxBodyBytes: 2048,
+    apiDocs: { enabledInProduction: true },
+  });
+  const server = await readFile(join(built.buildDirectory, "server/index.ts"), "utf8");
+  expect(server).toContain("maxBodyBytes: 2048");
+  expect(server).toContain("enabledInProduction: true");
 });
 
 test("start serves health, graph, inspector collections, and rejects an invalid build", async () => {
@@ -194,7 +259,7 @@ async function copyProject(relativePath: string): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".zsys-cli-test-"));
   roots.push(root);
   await cp(join(process.cwd(), relativePath), root, { recursive: true });
-  await cp(join(process.cwd(), "apps/fixture-commerce/package.json"), join(root, "package.json"));
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   await rm(join(root, "node_modules"), { recursive: true, force: true });
   await linkWorkspacePackages(root);
   return root;

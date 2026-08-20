@@ -7,7 +7,7 @@ import type {
 } from "./generate.js";
 
 type BodyEntry = {
-  readonly kind: "body" | "multipart" | "whole-body";
+  readonly kind: "body" | "multipart" | "multipart-all" | "whole-body";
   readonly name?: string;
   readonly schema: OpenApiSchema;
   readonly required: boolean;
@@ -21,18 +21,21 @@ export function buildRequest(
   const parameters: OpenApiParameter[] = [];
   const bodies: BodyEntry[] = [];
   collect(mapping, [], root, parameters, bodies, false, false);
-  const parameterKeys = new Set(parameters.map((entry) => `${entry.in}:${entry.name}`));
-  for (const name of routeParameters(routePath)) {
+  const routeNames = routeParameters(routePath);
+  const declared = new Set(routeNames);
+  const matching = parameters.filter((entry) => entry.in !== "path" || declared.has(entry.name));
+  const parameterKeys = new Set(matching.map((entry) => `${entry.in}:${entry.name}`));
+  for (const name of routeNames) {
     if (!parameterKeys.has(`path:${name}`))
-      parameters.push({ name, in: "path", required: true, schema: { type: "string" } });
+      matching.push({ name, in: "path", required: true, schema: { type: "string" } });
   }
-  parameters.sort((left, right) =>
+  matching.sort((left, right) =>
     `${left.in}:${left.name}`.localeCompare(`${right.in}:${right.name}`),
   );
-  if (bodies.length === 0) return { parameters };
+  if (bodies.length === 0) return { parameters: matching };
   const groups = new Map<string, BodyEntry[]>();
   for (const entry of bodies) {
-    const media = entry.kind === "multipart" ? "multipart/form-data" : "application/json";
+    const media = entry.kind.startsWith("multipart") ? "multipart/form-data" : "application/json";
     const group = groups.get(media) ?? [];
     group.push(entry);
     groups.set(media, group);
@@ -46,7 +49,7 @@ export function buildRequest(
     const whole = entries.length === 1 && entries[0]?.kind === "whole-body";
     content[media] = { schema: whole ? entries[0]!.schema : objectSchema(entries) };
   }
-  return { parameters, body: { required, content } };
+  return { parameters: matching, body: { required, content } };
 }
 
 function collect(
@@ -81,11 +84,17 @@ function collect(
     const name = typeof value.name === "string" ? value.name : (path.at(-1) ?? "value");
     parameters.push({
       name,
-      in: value.kind,
-      required: value.kind === "path" || (!optional && !defaulted),
-      schema,
+      in: value.kind === "path-segments" ? "path" : value.kind,
+      required:
+        value.kind === "path" || value.kind === "path-segments" || (!optional && !defaulted),
+      schema: value.kind === "path-segments" ? { type: "string" } : schema,
     });
-  } else if (value.kind === "body" || value.kind === "multipart" || value.kind === "whole-body") {
+  } else if (
+    value.kind === "body" ||
+    value.kind === "multipart" ||
+    value.kind === "multipart-all" ||
+    value.kind === "whole-body"
+  ) {
     bodies.push({
       kind: value.kind,
       ...(typeof value.name === "string" ? { name: value.name } : {}),
@@ -137,8 +146,8 @@ function parameterName(value: string, index: number, fallback = "param"): string
   return result || `${fallback}${index}`;
 }
 
-function isParameterKind(value: string): value is OpenApiParameter["in"] {
-  return value === "path" || value === "query" || value === "header" || value === "cookie";
+function isParameterKind(value: string): value is OpenApiParameter["in"] | "path-segments" {
+  return ["path", "path-segments", "query", "header", "cookie"].includes(value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -25,6 +25,30 @@ export function readScalar(
   return value;
 }
 
+export function readPathSegments(
+  url: string,
+  pattern: string | undefined,
+  name: string,
+  path: readonly (string | number)[],
+  report: (code: RequestIssueCode, message: string, path: readonly (string | number)[]) => void,
+): readonly string[] | Missing {
+  const token = pattern?.split("/").findIndex((segment) => {
+    return segment === `*${name}` || segment === `*${name}?`;
+  });
+  if (token === undefined || token < 0) {
+    report("mapping", `Catch-all path "${name}" is not declared by the route`, path);
+    return MISSING;
+  }
+  const segments = new URL(url).pathname.split("/").slice(token);
+  if (segments.length === 0 || segments.every((segment) => segment === "")) return MISSING;
+  try {
+    return Object.freeze(segments.map((segment) => decodeURIComponent(segment)));
+  } catch {
+    report("mapping", `Catch-all path "${name}" is not valid`, path);
+    return MISSING;
+  }
+}
+
 export function readCookie(
   name: string,
   headers: Readonly<Record<string, MappingValue>>,

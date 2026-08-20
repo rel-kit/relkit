@@ -14,6 +14,8 @@ node_modules
 
 # Testing
 coverage
+playwright-report/
+test-results/
 
 # Turbo
 .turbo
@@ -23,15 +25,19 @@ coverage
 
 # Build Outputs
 .next/
+apps/inspector/.next-packaged/
+apps/docs/.source/
 out/
 build
 dist
+*.tsbuildinfo
 
 # ZSys generated and local runtime data
 /.zsys/generated/
 /.zsys/build/
 /.zsys/state/
 /.zsys/observability/
+/.zsys/docgen*/
 
 
 # Debug

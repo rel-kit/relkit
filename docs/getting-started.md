@@ -107,10 +107,8 @@ The graph response includes the active `graphHash`. The inspector at
 graph, not a separately reconstructed source model. Stop both processes with
 `Ctrl-C`.
 
-When using a published CLI whose inspector app is not bundled, set
-`ZSYS_INSPECTOR_ROOT` to a compatible `apps/inspector` checkout before
-`bun run dev`; workspace development resolves the repository inspector
-automatically.
+The published CLI includes the prebuilt inspector. Framework contributors can
+set `ZSYS_INSPECTOR_ROOT` to run a compatible `apps/inspector` checkout instead.
 
 ## Check, test, and build
 
@@ -167,7 +165,7 @@ Application source uses public ZSys descriptors. A function is the executable
 unit and routes target function descriptors:
 
 ```ts
-import { defineFunction, defineRoute, http } from "@zsys/app";
+import { defineFunction, defineRoute } from "@zsys/app";
 import { z } from "@zsys/schema";
 
 const hello = defineFunction({
@@ -177,19 +175,18 @@ const hello = defineFunction({
   handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
 });
 
-export default defineRoute({
+// src/routes/hello/route.ts
+export const GET = defineRoute({
   id: "hello.http",
-  method: "GET",
-  path: "/hello",
   target: hello,
-  request: http.input({ name: http.query("name", { default: "world" }) }),
-  responses: [http.success(200, hello.output), http.validationError()],
 });
 ```
 
-Descriptors are pure metadata. The compiler discovers them, validates the
-canonical graph, and emits the runtime manifest. Do not put executable
-closures in graph mappings or edit `.zsys/generated` by hand.
+The `route.ts` location supplies `/hello`, its `GET` export supplies the method,
+and the object input is inferred as query parameters. Descriptors are pure
+metadata. The compiler discovers them, validates the canonical graph, and
+emits the runtime manifest. Do not put executable closures in graph mappings or
+edit `.zsys/generated` by hand.
 
 ## Project directories
 

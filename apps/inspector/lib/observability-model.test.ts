@@ -55,11 +55,19 @@ describe("inspector observability model", () => {
         spanId: "child",
         parentSpanId: "root",
         name: "function.invoke",
-        startedAt: "2026-08-16T00:00:00.002Z",
+        startedAt: "2026-08-16T00:00:00.000Z",
         durationMs: 4,
+        spanKind: "server",
+        requestId: "request-1",
+        attributes: { route: "/orders", authorization: "Bearer raw-secret" },
+        status: "error",
       },
     ]);
+    expect(spans.map((span) => span.spanId)).toEqual(["root", "child"]);
     expect(spans[1]).toMatchObject({ spanId: "child", depth: 1 });
+    expect(spans[1]).toMatchObject({ kind: "server", error: true });
+    expect(spans[1]?.correlations[0]).toMatchObject({ kind: "request", id: "request-1" });
+    expect(JSON.stringify(spans[1]?.details)).not.toContain("raw-secret");
     expect(traceGroups([{ signal: "trace", traceId: "trace-1", spanCount: 1 }])).toHaveLength(1);
   });
 });

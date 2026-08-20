@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
-
 export type ScopeViolation = {
   file: string;
   line: number;
@@ -8,13 +7,13 @@ export type ScopeViolation = {
   rule: string;
   message: string;
 };
-
 const approvedPackages = new Set(
   "agents app buckets cache cli client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics engine events functions graph inspector-api jobs observability openapi providers-local routes runtime-effect runtime-hono schema supervisor testing tools".split(
     " ",
   ),
 );
-const approvedApps = new Set(["fixture-commerce", "inspector"]);
+const approvedApps = new Set(["docs", "inspector"]);
+const approvedExamples = new Set(["README.md", "commerce"]);
 const approvedTemplates = new Set(["default"]);
 const forbiddenNames =
   "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";
@@ -23,7 +22,7 @@ const proseAllowlist = [
   /^docs\/(?:README\.md|briefs\/|records\/|zsys-typescript-poc-(?:technical-spec|review-gates)-v3\.md)/,
   /^openspec\/changes\/implement-zsys-typescript-poc-v3\//,
 ];
-const implementationFiles = new Set(["scripts/scope-scan.ts"]);
+const implementationFiles = new Set(["apps/docs/tsconfig.json", "scripts/scope-scan.ts"]);
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
 const alternateIac =
   /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
@@ -31,14 +30,12 @@ const alternateIac =
 function isAllowlistedProse(path: string): boolean {
   return proseAllowlist.some((pattern) => pattern.test(path));
 }
-
 function position(text: string, offset: number): { line: number; column: number } {
   const before = text.slice(0, offset);
   const line = before.split("\n").length;
   const column = offset - before.lastIndexOf("\n");
   return { line, column };
 }
-
 function violation(
   root: string,
   file: string,
@@ -66,6 +63,9 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   if (parts[0] === "apps" && parts[1] && !approvedApps.has(parts[1])) {
     add("out-of-scope-package", `apps/${parts[1]} is not an approved ZSys app`);
   }
+  if (parts[0] === "examples" && parts[1] && !approvedExamples.has(parts[1])) {
+    add("out-of-scope-package", `examples/${parts[1]} is not an approved ZSYS example`);
+  }
   if (parts[0] === "templates" && parts[1] && !approvedTemplates.has(parts[1])) {
     add("out-of-scope-template-name", `templates/${parts[1]} is not the approved template root`);
   }
@@ -83,7 +83,7 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   ) {
     add("alternate-iac", `alternate infrastructure-engine path or file is forbidden: ${path}`);
   }
-  if (["apps", "templates", "tests"].includes(parts[0] ?? "")) {
+  if (["apps", "examples", "templates", "tests"].includes(parts[0] ?? "")) {
     for (const part of parts.slice(1)) {
       const name = part
         .replace(/\.[^.]+$/, "")
@@ -174,7 +174,7 @@ function filesToScan(root: string): string[] {
     "tsconfig.json",
     "tsconfig.base.json",
   ];
-  for (const directory of ["apps", "packages", "templates", "scripts", "tests", ".github"]) {
+  for (const directory of "apps examples packages templates scripts tests .github".split(" ")) {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     paths.push(

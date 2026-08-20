@@ -153,7 +153,7 @@ async function copyProject(): Promise<string> {
   const root = await mkdtemp(join("/tmp", "zsys-container-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-minimal"), root, { recursive: true });
-  await cp(join(process.cwd(), "apps/fixture-commerce/package.json"), join(root, "package.json"));
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   await linkWorkspacePackages(root);
   return root;
 }
@@ -249,7 +249,7 @@ const hello = defineFunction({
   id: "hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
-  handler: async (input, context) => {
+  handler: async (input, _request, context) => {
     const started = process.env.ZSYS_TEST_INFLIGHT_FILE;
     if (started !== undefined) await Bun.write(started, "started");
     const flushed = process.env.ZSYS_TEST_FLUSH_FILE;

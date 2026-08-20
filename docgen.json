@@ -1,0 +1,6 @@
+{
+  "$schema": "apps/docs/node_modules/@effect/docgen/schema.json",
+  "outDir": ".zsys/docgen",
+  "runExamples": true,
+  "tscExecutable": "node_modules/.bin/tsc"
+}

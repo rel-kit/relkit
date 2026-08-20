@@ -62,11 +62,11 @@ describe("compiler graph construction", () => {
     });
     const first = defineEvent({ id: "orders.created", version: 1, payload: input });
     const second = defineEvent({ id: "orders.updated", version: 2, payload: input });
-    const listener = onEvent(events.anyOf(second, first), {
-      id: "orders.listener",
-      target,
-      delivery: "durable",
-    });
+    const listener = onEvent(
+      events.anyOf("orders.updated" as never, "orders.created" as never),
+      async () => ({ ok: true }),
+      { id: "orders.listener" },
+    );
     const result = normalizeCompilation({
       descriptors: [
         prices,
@@ -128,7 +128,12 @@ describe("compiler graph construction", () => {
       expect.arrayContaining([
         { kind: "targets-function", from: "orders.route", to: "orders.get", role: "primary" },
         { kind: "targets-function", from: "orders.route", to: "orders.auth", role: "middleware" },
-        { kind: "targets-function", from: "orders.listener", to: "orders.get", role: "primary" },
+        {
+          kind: "targets-function",
+          from: "orders.listener",
+          to: "zsys.event.orders.listener.handler",
+          role: "primary",
+        },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.created" },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.updated" },
         { kind: "calls-function", from: "orders.get", to: "orders.helper" },

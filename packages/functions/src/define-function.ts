@@ -1,7 +1,23 @@
 import { createDescriptorBase, deepFreeze, isRef, type DescriptorKind } from "@zsys/contracts";
-import { type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+import { type StandardSchemaV1 } from "@zsys/schema";
 import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
-import type { DefineFunctionOptions, FunctionDependencies, FunctionDescriptor } from "./types.js";
+import type { DefineFunction } from "./define-function-types.js";
+import type {
+  DefineFunctionOptions,
+  FunctionDependencies,
+  FunctionDescriptor,
+} from "./types.js";
+
+type FunctionImplementationOptions = Omit<
+  DefineFunctionOptions<
+    string,
+    StandardSchemaV1,
+    StandardSchemaV1,
+    FunctionDependencies,
+    readonly ErrorDescriptorAny[]
+  >,
+  "handler"
+> & { readonly handler: (...args: any[]) => unknown };
 
 export type {
   AgentClientFor,
@@ -34,6 +50,7 @@ export type {
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
+  FunctionRequest,
   FunctionRef,
   FunctionRefAny,
   InvocationMetadata,
@@ -51,24 +68,37 @@ export type {
   ResolvedApplicationEnv,
 } from "./types.js";
 
-/** Defines a graph-visible function whose schemas and declared dependencies bound invocation. */
-export function defineFunction<
-  const Id extends string,
-  const InputSchema extends StandardSchemaV1,
-  const OutputSchema extends StandardSchemaV1,
-  const Dependencies extends FunctionDependencies = {},
-  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
->(
-  options: DefineFunctionOptions<Id, InputSchema, OutputSchema, Dependencies, Errors>,
+/**
+ * Defines a graph-visible executable with runtime schemas and declared dependencies.
+ *
+ * @example
+ * ```ts
+ * import { defineFunction } from "@zsys/functions"
+ * import { z } from "@zsys/schema"
+ *
+ * const greet = defineFunction({
+ *   id: "greet",
+ *   input: z.object({ name: z.string() }),
+ *   output: z.object({ message: z.string() }),
+ *   handler: async ({ name }, request, context) => {
+ *     context.log.info("greeting requested", { url: request?.url })
+ *     return { message: `Hello, ${name}!` }
+ *   }
+ * })
+ * void greet
+ * ```
+ * @category Functions
+ * @since 0.1.0
+ */
+export const defineFunction: DefineFunction = (
+  options: FunctionImplementationOptions,
 ): FunctionDescriptor<
-  Id,
-  InferOutput<InputSchema>,
-  InferOutput<OutputSchema>,
-  Dependencies,
-  Errors,
-  InputSchema,
-  OutputSchema
-> {
+  string,
+  unknown,
+  unknown,
+  FunctionDependencies,
+  readonly ErrorDescriptorAny[]
+> => {
   assertSchema(options.input, "input");
   assertSchema(options.output, "output");
   if (typeof options.handler !== "function") {
@@ -90,15 +120,13 @@ export function defineFunction<
     handler: options.handler,
   };
   return deepFreeze(descriptor) as FunctionDescriptor<
-    Id,
-    InferOutput<InputSchema>,
-    InferOutput<OutputSchema>,
-    Dependencies,
-    Errors,
-    InputSchema,
-    OutputSchema
+    string,
+    unknown,
+    unknown,
+    FunctionDependencies,
+    readonly ErrorDescriptorAny[]
   >;
-}
+};
 
 function copyErrors<E extends readonly ErrorDescriptorAny[]>(errors: E | undefined): E | undefined {
   if (errors === undefined) return undefined;

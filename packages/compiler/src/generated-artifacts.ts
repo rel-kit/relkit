@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import {
   CONTRACT_VERSION,
@@ -100,7 +100,13 @@ export async function writeIfChanged(
   }
   if (!unchanged) {
     await mkdir(dirname(filePath), { recursive: true });
-    await writeFile(filePath, next);
+    const temporary = `${filePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
+    try {
+      await writeFile(temporary, next, { flag: "wx" });
+      await rename(temporary, filePath);
+    } finally {
+      await rm(temporary, { force: true });
+    }
   }
   return Object.freeze({
     fileName: basename(filePath),

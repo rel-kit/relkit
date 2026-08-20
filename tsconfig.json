@@ -2,7 +2,6 @@
   "extends": "./tsconfig.base.json",
   "files": [],
   "references": [
-    { "path": "./apps/fixture-commerce" },
     { "path": "./apps/inspector" },
     { "path": "./packages/agents" },
     { "path": "./packages/app" },

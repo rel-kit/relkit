@@ -220,6 +220,11 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
     gitInitialized: false,
   });
   expect(json.nextSteps.endpoints).not.toHaveProperty("route");
+  expect(json.nextSteps.endpoints).toMatchObject({
+    openapi: "http://localhost:3000/_zsys/v1/openapi.json",
+    apiReference: "http://localhost:3000/_zsys/v1/api-reference",
+  });
+  expect(formatGenerateResult(json)).toContain("api docs:");
   expect(formatGenerateResult(json)).not.toContain("route:");
 });
 

@@ -56,6 +56,7 @@ export interface ErrorDescriptor<
   readonly http?: ErrorHttpMapping;
   readonly retry: ErrorRetry;
   readonly create: (input: InferInput<DataSchema>) => DeclaredError<Id, Data>;
+  new (input: InferInput<DataSchema>): DeclaredError<Id, Data>;
 }
 
 export type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
@@ -71,6 +72,27 @@ export interface DefineErrorOptions<
   readonly retry: ErrorRetry;
 }
 
+/**
+ * Defines a typed application error that can contribute transport metadata.
+ *
+ * @example
+ * ```ts
+ * import { defineError } from "@zsys/functions"
+ * import { z } from "@zsys/schema"
+ *
+ * const notFound = defineError({
+ *   id: "orders.not-found",
+ *   data: z.object({ orderId: z.string() }),
+ *   message: ({ orderId }) => `Order ${orderId} was not found`,
+ *   http: { status: 404 },
+ *   retry: "never"
+ * })
+ * const failure = new notFound({ orderId: "order-1" })
+ * void failure
+ * ```
+ * @category Errors
+ * @since 0.1.0
+ */
 export function defineError<const Id extends string, const DataSchema extends StandardSchemaV1>(
   options: DefineErrorOptions<Id, DataSchema>,
 ): ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema> {
@@ -87,7 +109,30 @@ export function defineError<const Id extends string, const DataSchema extends St
   const ref = Object.freeze({ kind: "error" as const, id });
   const http =
     options.http === undefined ? undefined : Object.freeze({ status: options.http.status });
-  const descriptor = {
+  const makeError = (
+    input: InferInput<DataSchema>,
+  ): {
+    readonly data: InferOutput<DataSchema>;
+    readonly message: string;
+  } => {
+    const result = validateSync(options.data, input);
+    if (!("value" in result)) throw new TypeError(`Invalid data for declared error "${id}"`);
+    const data = deepFreeze(result.value);
+    const message = typeof options.message === "function" ? options.message(data) : options.message;
+    if (typeof message !== "string")
+      throw new TypeError(`Error message for "${id}" must be a string`);
+    return { data, message };
+  };
+
+  class DefinedError extends DeclaredError<Id, InferOutput<DataSchema>> {
+    constructor(input: InferInput<DataSchema>) {
+      const error = makeError(input);
+      super(id, ref, error.data, error.message, options.retry, http);
+    }
+  }
+
+  Object.defineProperty(DefinedError, "name", { value: id });
+  const descriptor = deepFreeze({
     kind: "error" as const,
     id,
     ref,
@@ -98,18 +143,13 @@ export function defineError<const Id extends string, const DataSchema extends St
     ...(options.title === undefined ? {} : { title: options.title }),
     ...(options.description === undefined ? {} : { description: options.description }),
     ...(options.tags === undefined ? {} : { tags: Object.freeze([...options.tags]) }),
-    create: (input: InferInput<DataSchema>): DeclaredError<Id, InferOutput<DataSchema>> => {
-      const result = validateSync(options.data, input);
-      if (!("value" in result)) throw new TypeError(`Invalid data for declared error "${id}"`);
-      const data = deepFreeze(result.value);
-      const message =
-        typeof options.message === "function" ? options.message(data) : options.message;
-      if (typeof message !== "string")
-        throw new TypeError(`Error message for "${id}" must be a string`);
-      return new DeclaredError(id, ref, data, message, options.retry, http);
-    },
-  };
-  return deepFreeze(descriptor) as ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
+    create: (input: InferInput<DataSchema>): DeclaredError<Id, InferOutput<DataSchema>> =>
+      new DefinedError(input),
+  });
+  Object.assign(DefinedError, descriptor);
+  Object.freeze(DefinedError.prototype);
+  Object.freeze(DefinedError);
+  return DefinedError as unknown as ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
 }
 
 export function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {
@@ -145,5 +185,9 @@ function assertSchema(value: unknown): asserts value is StandardSchemaV1 {
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return (
+    value !== null &&
+    (typeof value === "object" || typeof value === "function") &&
+    !Array.isArray(value)
+  );
 }

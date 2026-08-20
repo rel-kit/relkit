@@ -41,7 +41,7 @@ describe("direct child function clients", () => {
       input: valueInput,
       output: valueOutput,
       timeoutMs: 900,
-      handler: (input, context) => {
+      handler: (input, _request, context) => {
         childSignal = context.signal;
         return { value: (input as { value: number }).value + 1 };
       },
@@ -51,7 +51,7 @@ describe("direct child function clients", () => {
       input: valueInput,
       output: valueOutput,
       dependencies: { functions: { child: dependency(child) } },
-      handler: async (input, context) => {
+      handler: async (input, _request, context) => {
         const result = await childClient(context).functions.child(input);
         return result as { value: number };
       },
@@ -121,7 +121,7 @@ describe("direct child function clients", () => {
         input: z.object({}),
         output: z.object({ ok: z.boolean() }),
         dependencies: { functions: { child: dependency(child) } },
-        handler: async (_value, context) => {
+        handler: async (_value, _request, context) => {
           try {
             await childClient(context).functions.child(input);
           } catch (error) {
@@ -166,7 +166,7 @@ describe("direct child function clients", () => {
       id: "orders.wait-child",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, context) =>
+      handler: (_input, _request, context) =>
         new Promise((_resolve, reject) => {
           childStarted();
           context.signal.addEventListener("abort", () => {
@@ -180,7 +180,7 @@ describe("direct child function clients", () => {
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
       dependencies: { functions: { child: dependency(child) } },
-      handler: (_input, context) => childClient(context).functions.child({}),
+      handler: (_input, _request, context) => childClient(context).functions.child({}),
     };
     const execution = invokeFunction(
       parent,

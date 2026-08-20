@@ -67,10 +67,7 @@ export class InspectorApiClient {
       const headers = new Headers(this.headers);
       if (init.headers !== undefined)
         new Headers(init.headers).forEach((value, key) => headers.set(key, value));
-      const requestInit: RequestInit = {
-        ...init,
-        headers,
-      };
+      const requestInit: RequestInit = { ...init, headers };
       if (init.signal !== undefined) requestInit.signal = init.signal;
       else if (this.signal !== undefined) requestInit.signal = this.signal;
       response = await this.fetcher(url, requestInit);
@@ -103,13 +100,12 @@ export class InspectorApiClient {
   clearCache(): void {
     this.cache.clear();
   }
-
   invalidate(tags: readonly string[] = []): void {
     if (tags.length === 0) return this.clearCache();
+    const selected = new Set(tags);
     for (const [key, entry] of this.cache)
-      if (entry.tags.some((tag) => tags.includes(tag))) this.cache.delete(key);
+      if (entry.tags.some((tag) => selected.has(tag))) this.cache.delete(key);
   }
-
   health(kind: "live" | "ready" = "ready"): Promise<InspectorObject> {
     return this.request(`${INSPECTOR_API_BASE}/health/${kind}`, { cacheTags: ["health"] });
   }
@@ -135,6 +131,11 @@ export class InspectorApiClient {
   ): Promise<InspectorPage<T>> {
     return this.request(`${INSPECTOR_API_BASE}/runtime/${collection}${this.queryString(query)}`, {
       cacheTags: [collection, "runtime"],
+    });
+  }
+  eventRuntime(query: InspectorQuery = {}): Promise<import("./api-types").InspectorEventRuntime> {
+    return this.request(`${INSPECTOR_API_BASE}/runtime/events${this.queryString(query)}`, {
+      cacheTags: ["events", "runtime"],
     });
   }
   env(query: InspectorQuery = {}): Promise<InspectorEnvironmentPage> {

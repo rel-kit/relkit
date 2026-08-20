@@ -107,7 +107,19 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends ZsysSchema<T
   safeParse(value: unknown): StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
 }
 
-/** Validates a value with any Standard Schema v1-compatible validator. */
+/**
+ * Validates a value with any Standard Schema v1-compatible validator.
+ *
+ * @example
+ * ```ts
+ * import { validate, z } from "@zsys/schema"
+ *
+ * const result = await validate(z.string(), "ready")
+ * if (!("value" in result)) throw new Error("validation failed")
+ * ```
+ * @category Validation
+ * @since 0.1.0
+ */
 export function validate<S extends StandardSchemaV1>(
   schema: S,
   value: InferInput<S>,

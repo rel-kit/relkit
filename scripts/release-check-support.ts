@@ -113,15 +113,31 @@ export function checkManifests(items: PackageInfo[]): {
               import: "./dist/runtime/index.js",
             },
           }
-        : directoryName === "config"
+        : directoryName === "app"
           ? {
               ".": rootExport,
-              "./internal/config": {
-                types: "./dist/internal/config.d.ts",
-                import: "./dist/internal/config.js",
+              "./config": {
+                types: "./dist/config.d.ts",
+                import: "./dist/config.js",
               },
             }
-          : { ".": rootExport };
+          : directoryName === "cli"
+            ? {
+                ".": rootExport,
+                "./help": {
+                  types: "./dist/cli-help-model.d.ts",
+                  import: "./dist/cli-help-model.js",
+                },
+              }
+            : directoryName === "config"
+              ? {
+                  ".": rootExport,
+                  "./internal/config": {
+                    types: "./dist/internal/config.d.ts",
+                    import: "./dist/internal/config.js",
+                  },
+                }
+              : { ".": rootExport };
     if (JSON.stringify(stable(item.manifest.exports)) !== JSON.stringify(stable(expectedExports)))
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =

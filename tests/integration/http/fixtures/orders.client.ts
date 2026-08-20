@@ -71,11 +71,17 @@ function appendQuery(query: URLSearchParams, name: string, value: unknown): void
 function setHeader(headers: Record<string, string>, name: string, value: unknown): void {
   if (value !== undefined) headers[name] = String(value);
 }
+function replacePathSegments(path: string, token: string, value: unknown): string {
+  if ((value === undefined || (Array.isArray(value) && value.length === 0)) && token.endsWith("?")) return path.replace(`/${token}`, "") || "/";
+  if (!Array.isArray(value) || value.length === 0) throw new TypeError(`Catch-all path "${token}" needs at least one segment`);
+  return path.replace(token, value.map((segment) => encodeURIComponent(String(segment))).join("/"));
+}
 function appendCookie(cookies: string[], name: string, value: unknown): void {
   if (value !== undefined) cookies.push(`${name}=${encodeURIComponent(String(value))}`);
 }
 function appendFormValue(form: FormData, name: string, value: unknown): void {
-  if (value !== undefined) form.append(name, typeof value === "string" ? value : JSON.stringify(value));
+  if (Array.isArray(value)) { value.forEach((item) => appendFormValue(form, name, item)); return; }
+  if (value !== undefined) form.append(name, value instanceof Blob ? value : typeof value === "string" ? value : JSON.stringify(value));
 }
 async function request(fetcher: typeof globalThis.fetch, url: string, init: RequestInit): Promise<{ readonly status: number; readonly data: unknown }> {
   const response = await fetcher(url, init);

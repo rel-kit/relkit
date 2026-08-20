@@ -63,11 +63,17 @@ export function runtimeHelpers(): string[] {
     "function setHeader(headers: Record<string, string>, name: string, value: unknown): void {",
     "  if (value !== undefined) headers[name] = String(value);",
     "}",
+    "function replacePathSegments(path: string, token: string, value: unknown): string {",
+    '  if ((value === undefined || (Array.isArray(value) && value.length === 0)) && token.endsWith("?")) return path.replace(`/\${token}`, "") || "/";',
+    '  if (!Array.isArray(value) || value.length === 0) throw new TypeError(`Catch-all path "${token}" needs at least one segment`);',
+    '  return path.replace(token, value.map((segment) => encodeURIComponent(String(segment))).join("/"));',
+    "}",
     "function appendCookie(cookies: string[], name: string, value: unknown): void {",
     "  if (value !== undefined) cookies.push(`${name}=${encodeURIComponent(String(value))}`);",
     "}",
     "function appendFormValue(form: FormData, name: string, value: unknown): void {",
-    '  if (value !== undefined) form.append(name, typeof value === "string" ? value : JSON.stringify(value));',
+    "  if (Array.isArray(value)) { value.forEach((item) => appendFormValue(form, name, item)); return; }",
+    '  if (value !== undefined) form.append(name, value instanceof Blob ? value : typeof value === "string" ? value : JSON.stringify(value));',
     "}",
     "async function request(fetcher: typeof globalThis.fetch, url: string, init: RequestInit): Promise<{ readonly status: number; readonly data: unknown }> {",
     "  const response = await fetcher(url, init);",
@@ -82,9 +88,15 @@ export function runtimeHelpers(): string[] {
 function pathStatements(route: ClientRoute): string[] {
   return route.trigger.config.path.split("/").flatMap((segment) => {
     if (!segment.startsWith(":") && !segment.startsWith("*")) return [];
-    const name = segment.slice(1);
-    const field = route.fields.find((entry) => entry.kind === "path" && entry.name === name);
+    const name = segment.slice(1).replace(/\?$/, "");
+    const kind = segment.startsWith("*") ? "path-segments" : "path";
+    const field = route.fields.find((entry) => entry.kind === kind && entry.name === name);
     const path = field?.inputPath ?? [name];
+    if (kind === "path-segments") {
+      return [
+        `      path = replacePathSegments(path, ${JSON.stringify(segment)}, readPath(input, ${canonicalJson(path)}));`,
+      ];
+    }
     return [
       `      path = path.replace(${JSON.stringify(segment)}, encodeURIComponent(String(readPath(input, ${canonicalJson(path)}))));`,
     ];
@@ -131,7 +143,7 @@ function bodyStatements(route: ClientRoute): string[] {
     );
     return lines;
   }
-  if (fields.some((field) => field.kind === "multipart")) {
+  if (fields.some((field) => field.kind === "multipart" || field.kind === "multipart-all")) {
     lines.push("      const form = new FormData();");
     for (const [index, field] of fields.entries()) {
       const value =
@@ -165,7 +177,7 @@ function hasBody(route: ClientRoute): boolean {
 }
 
 function isBody(field: MappingLeaf): boolean {
-  return ["body", "whole-body", "multipart", "constant"].includes(field.kind);
+  return ["body", "whole-body", "multipart", "multipart-all", "constant"].includes(field.kind);
 }
 
 function literal(value: unknown): string {

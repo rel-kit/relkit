@@ -12,6 +12,8 @@ export interface GenerateNextSteps {
   readonly endpoints: Readonly<{
     readonly backend: "http://localhost:3000";
     readonly inspector: "http://localhost:3210";
+    readonly openapi: "http://localhost:3000/_zsys/v1/openapi.json";
+    readonly apiReference: "http://localhost:3000/_zsys/v1/api-reference";
     readonly route?: "GET http://localhost:3000/hello?name=ZSys";
   }>;
 }
@@ -32,6 +34,8 @@ export function createGenerateNextSteps(
   const endpoints = Object.freeze({
     backend: "http://localhost:3000" as const,
     inspector: "http://localhost:3210" as const,
+    openapi: "http://localhost:3000/_zsys/v1/openapi.json" as const,
+    apiReference: "http://localhost:3000/_zsys/v1/api-reference" as const,
     ...(options.examples ? { route: "GET http://localhost:3000/hello?name=ZSys" as const } : {}),
   });
   return Object.freeze({ commands, endpoints });
@@ -46,6 +50,8 @@ export function formatGenerateResult(value: unknown): string {
     "",
     `backend:   ${endpoints.backend}`,
     `inspector: ${endpoints.inspector}`,
+    `openapi:   ${endpoints.openapi}`,
+    `api docs:  ${endpoints.apiReference}`,
     ...(endpoints.route === undefined ? [] : [`route:     ${endpoints.route}`]),
     "",
     commands.test,
@@ -71,6 +77,8 @@ function isNextSteps(value: unknown): value is GenerateNextSteps {
     commands.build === "bun run build" &&
     endpoints.backend === "http://localhost:3000" &&
     endpoints.inspector === "http://localhost:3210" &&
+    endpoints.openapi === "http://localhost:3000/_zsys/v1/openapi.json" &&
+    endpoints.apiReference === "http://localhost:3000/_zsys/v1/api-reference" &&
     (endpoints.route === undefined ||
       endpoints.route === "GET http://localhost:3000/hello?name=ZSys")
   );

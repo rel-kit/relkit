@@ -10,6 +10,7 @@ import {
 } from "@zsys/contracts";
 import type { FunctionRefAny } from "@zsys/functions";
 import { type InferInput, type StandardSchemaV1 } from "@zsys/schema";
+import { validateRetry } from "./retry-policy.js";
 
 export type RetryJitter = "none" | "full" | "equal";
 
@@ -72,7 +73,22 @@ export interface DefineJobOptions<
   readonly idempotency?: IdempotencyDefinition<InferInput<InputSchema>>;
 }
 
-/** Defines a durable job trigger with validated input, retry, timeout, and idempotency policy. */
+/**
+ * Defines a durable job trigger with validated input, retry, timeout, and idempotency policy.
+ *
+ * @example
+ * ```ts
+ * import { defineFunction } from "@zsys/functions"
+ * import { defineJob } from "@zsys/jobs"
+ * import { z } from "@zsys/schema"
+ *
+ * const target = defineFunction({ id: "email", input: z.string(), output: z.void(), handler: async () => undefined })
+ * const job = defineJob({ id: "email", input: z.string(), target, retry: { maxAttempts: 3, initialDelayMs: 100, maxDelayMs: 1_000, multiplier: 2, jitter: "full" } })
+ * void job
+ * ```
+ * @category Jobs
+ * @since 0.1.0
+ */
 export function defineJob<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,
@@ -106,30 +122,6 @@ export function defineJob<
     ...(schedule === undefined ? {} : { schedule }),
     ...(idempotency === undefined ? {} : { idempotency }),
   }) as JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>;
-}
-
-function validateRetry(value: RetryPolicy): RetryPolicy {
-  if (!isRecord(value)) throw new TypeError("Job retry policy is required");
-  positiveInteger(value.maxAttempts, "retry.maxAttempts");
-  validateNonNegativeInteger(value.initialDelayMs, "retry.initialDelayMs");
-  validateNonNegativeInteger(value.maxDelayMs, "retry.maxDelayMs");
-  if (value.maxDelayMs < value.initialDelayMs)
-    throw new TypeError("retry.maxDelayMs must be at least retry.initialDelayMs");
-  if (
-    typeof value.multiplier !== "number" ||
-    !Number.isFinite(value.multiplier) ||
-    value.multiplier < 1
-  )
-    throw new TypeError("retry.multiplier must be a finite number at least 1");
-  if (value.jitter !== "none" && value.jitter !== "full" && value.jitter !== "equal")
-    throw new TypeError("retry.jitter must be none, full, or equal");
-  return Object.freeze({
-    maxAttempts: value.maxAttempts,
-    initialDelayMs: value.initialDelayMs,
-    maxDelayMs: value.maxDelayMs,
-    multiplier: value.multiplier,
-    jitter: value.jitter,
-  });
 }
 
 function copySchedules<Input>(
@@ -169,10 +161,6 @@ function positiveInteger(value: unknown, name: string): number {
   if (!Number.isSafeInteger(value) || (value as number) < 1)
     throw new TypeError(`${name} must be a positive integer`);
   return value as number;
-}
-function validateNonNegativeInteger(value: unknown, name: string): void {
-  if (!Number.isSafeInteger(value) || (value as number) < 0)
-    throw new TypeError(`${name} must be a non-negative integer`);
 }
 function requiredText(value: unknown, name: string): string {
   if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${name} is required`);

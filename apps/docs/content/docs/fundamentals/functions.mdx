@@ -1,0 +1,20 @@
+---
+title: Functions
+description: Define the validated executable unit shared by every transport and background trigger.
+---
+
+Every route, job, listener, middleware target, and tool ultimately invokes a function through the
+common engine.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/functions/create-order.function.ts"'>
+  ../../examples/commerce/src/functions/create-order.function.ts
+</include>
+
+`input` and `output` remain required because TypeScript types disappear at runtime. Their Standard
+Schemas perform validation and provide graph metadata, OpenAPI shapes, generated client types, and
+inspector forms. A target handler receives validated input followed by a context containing only its
+declared dependencies.
+
+Use stable IDs, explicit dependencies, bounded `timeoutMs`, and `concurrency` where contention needs a
+limit. Undeclared clients are rejected at runtime. Child function calls preserve trace, correlation,
+causation, deadline, and cancellation context.

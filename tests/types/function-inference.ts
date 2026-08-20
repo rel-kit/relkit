@@ -1,4 +1,9 @@
-import type { FunctionClientFor, FunctionContext, FunctionDependencies } from "@zsys/functions";
+import type {
+  FunctionClientFor,
+  FunctionContext,
+  FunctionDependencies,
+  FunctionHandlerValidation,
+} from "@zsys/functions";
 import { defineError, defineFunction } from "@zsys/functions";
 import { defineBucket } from "@zsys/buckets";
 import { defineCache } from "@zsys/cache";
@@ -17,13 +22,29 @@ const notFound = defineError({
   message: ({ orderId }) => "Missing " + orderId,
   retry: "never",
 });
+const constructedNotFound: ReturnType<typeof notFound.create> = new notFound({
+  orderId: "missing",
+});
+void constructedNotFound;
+type LookupHandlerResult = Promise<
+  ReturnType<typeof notFound.create> | InferOutput<typeof lookupOutput>
+>;
+const lookupValidation: FunctionHandlerValidation<
+  LookupHandlerResult,
+  InferOutput<typeof lookupOutput>,
+  [typeof notFound]
+> = {};
+void lookupValidation;
 
 const lookup = defineFunction({
   id: "types.inference-lookup",
   input: transformedInput,
   output: lookupOutput,
   errors: [notFound],
-  handler: async (input) => ({ orderId: input.orderId, totalCents: 100 }),
+  handler: async (input) =>
+    input.orderId === "missing"
+      ? new notFound({ orderId: input.orderId })
+      : { orderId: input.orderId, totalCents: 100 },
 });
 
 const jobInput = z.object({ rawId: z.string() });
@@ -58,7 +79,7 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
-  handler: async (input, context) => {
+  handler: async (input, _request, context) => {
     const lookupResult: InferOutput<typeof lookup.output> = await context.functions.lookup({
       rawId: input.orderId,
     });

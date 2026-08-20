@@ -3,7 +3,7 @@ import { jobCompatible, providerProfiles, schema, schemaEquivalent } from "./nor
 import { add } from "./normalize-pass-utils.js";
 import { detectCycles } from "./normalize-cycles.js";
 import { referenceFor } from "./normalize-reference-index.js";
-import { routeCollisionKey, validateHttpCompatibility } from "./normalize-http-validation.js";
+import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-validation.js";
 import { validateEventCompatibility } from "./normalize-event-validation.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 import {
@@ -131,18 +131,19 @@ export function passCollisions(work: NormalizationWork): void {
     .sort(compareDescriptors);
   for (const descriptor of descriptors) {
     const value = descriptor.value as Record<string, any>;
-    const key = routeCollisionKey(value);
-    const previous = routes.get(key);
-    if (previous === undefined) routes.set(key, descriptor);
-    else
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.collision,
-        `Route collides with "${previous.id}" at ${key}.`,
-        "error",
-        previous,
-      );
+    for (const key of routeCollisionKeys(value)) {
+      const previous = routes.get(key);
+      if (previous === undefined) routes.set(key, descriptor);
+      else if (previous.id !== descriptor.id)
+        add(
+          work,
+          descriptor,
+          NORMALIZE_CODES.collision,
+          `Route collides with "${previous.id}" at ${key}.`,
+          "error",
+          previous,
+        );
+    }
   }
   detectCycles(work);
 }

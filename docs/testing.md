@@ -76,6 +76,8 @@ From the ZSys repository root, the shipped focused commands are:
 | Restart and recovery             | `bun run test:restart`          |
 | Inspector API                    | `bun run test:inspector`        |
 | Packed generator                 | `bun run test:generator`        |
+| Canonical examples               | `bun run test:examples`         |
+| Documentation and doctests       | `bun run test:docs`             |
 | Browser E2E                      | `bun run test:e2e`              |
 | Deployment plan and Pulumi tests | `bun run test:deployment`       |
 | Release-gated AWS integration    | `bun run test:aws-integration`  |
@@ -121,7 +123,7 @@ From the repository root, check the documentation and OpenSpec change with:
 ```sh
 bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md
 git diff --check
-openspec validate implement-zsys-typescript-poc-v3 --strict
+openspec validate make-zsys-developer-first --strict
 ```
 
 The final release reproduction follows the getting-started flow verbatim in a

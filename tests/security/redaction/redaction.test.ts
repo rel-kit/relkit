@@ -273,7 +273,7 @@ function flowTarget(id: string): InvocationTarget<typeof flowInput, { readonly o
       OPENAI_API_KEY: z.string(),
     }),
     output: z.object({ ok: z.boolean() }),
-    handler: async (_input, context) => {
+    handler: async (_input, _request, context) => {
       context.log.info("flow.credentials", flowInput);
       return { ok: true };
     },

@@ -8,7 +8,7 @@ function bindAgents() {
     const functionId = \`zsys.agent.\${node.id}.invoke\`;
     executableManifest.functions[functionId] = createGeneratedAgentFunction(
       node.id,
-      (input, context) => invokeBoundAgent(agent, input, context),
+      (input, _request, context) => invokeBoundAgent(agent, input, context),
     );
   }
 }
@@ -50,6 +50,14 @@ function createDependencySources(providerRegistry) {
 
 function provider(providerRegistry, capability, profile) {
   return providerRegistry.resolve(capability, profile).value;
+}
+
+async function resolveRateLimitStore(storeId) {
+  const cache = plan.caches.find((node) => node.id === storeId);
+  if (cache === undefined) throw new Error(\`Rate-limit cache "\${storeId}" is unavailable.\`);
+  const providerRegistry = await providerStartup;
+  if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+  return provider(providerRegistry, "cache", cache.profile);
 }
 
 function queueProvider(providerRegistry, context) {

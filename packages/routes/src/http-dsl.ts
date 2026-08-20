@@ -75,11 +75,26 @@ export function isTransformRef(value: unknown): value is HttpTransformRef {
   );
 }
 
+/**
+ * Creates serializable HTTP request, response, transform, and policy mappings.
+ *
+ * @example
+ * ```ts
+ * import { http } from "@zsys/routes"
+ *
+ * const request = http.input({ id: http.path("id"), token: http.header("authorization") })
+ * void request
+ * ```
+ * @category HTTP
+ * @since 0.1.0
+ */
 export const http: HttpDsl = {
   input: (fields) => makeObject("input", fields) as HttpInputMapping<typeof fields>,
   nested: (fields) => makeObject("nested", fields) as HttpNestedMapping<typeof fields>,
   path: ((name: string, options?: HttpSourceOptions) =>
     source("path", name, options)) as HttpDsl["path"],
+  pathSegments: ((name: string, options?: HttpSourceOptions) =>
+    source("path-segments", name, options)) as HttpDsl["pathSegments"],
   query: ((name: string, options?: HttpSourceOptions) =>
     source("query", name, options)) as HttpDsl["query"],
   header: ((name: string, options?: HttpSourceOptions) =>
@@ -91,6 +106,8 @@ export const http: HttpDsl = {
   wholeBody: () => deepFreeze({ kind: "whole-body" }),
   multipart: ((name: string, options?: HttpSourceOptions) =>
     source("multipart", name, options)) as HttpDsl["multipart"],
+  multipartAll: ((name: string, options?: HttpSourceOptions) =>
+    source("multipart-all", name, options)) as HttpDsl["multipartAll"],
   constant: (value) => {
     assertJsonValue(value);
     return deepFreeze({ kind: "constant" as const, value });

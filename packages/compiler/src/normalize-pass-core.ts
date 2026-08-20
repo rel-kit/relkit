@@ -20,6 +20,10 @@ import {
   validateRetry,
 } from "./normalize-pass-utils.js";
 import { validateJob } from "./normalize-job-validation.js";
+import { bindRouteFile } from "./normalize-route-file.js";
+import { inferRouteContract } from "./normalize-route-inference.js";
+import { validateRateLimit } from "./normalize-rate-limit.js";
+import { normalizeEventListeners } from "./normalize-event-listener.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 
 export function passExtract(work: NormalizationWork): void {
@@ -44,42 +48,43 @@ export function passSources(work: NormalizationWork): void {
 }
 
 export function passNormalize(work: NormalizationWork): void {
-  work.descriptors = work.descriptors.map((descriptor) => {
-    const value = isRecord(descriptor.value) ? { ...descriptor.value } : {};
-    const nextId = id(value.id ?? descriptor.id);
-    if (nextId === undefined)
-      add(work, descriptor, NORMALIZE_CODES.id, "Descriptor ID is not a valid stable ID.");
-    value.id = nextId ?? descriptor.id;
-    if (descriptor.kind === "route") {
-      const nextMethod = method(value.method);
-      const nextPath = path(value.path);
-      if (nextMethod !== undefined) value.method = nextMethod;
-      if (nextPath !== undefined) value.path = nextPath;
-    }
-    for (const key of ["profile", "modelProfile"] as const) {
-      if (value[key] !== undefined) {
-        const nextProfile = profile(value[key]);
-        if (nextProfile === undefined) {
-          add(
-            work,
-            descriptor,
-            NORMALIZE_CODES.profile,
-            `${key} is not a valid stable profile ID.`,
-          );
-          if (key === "profile") delete value[key];
-          else value[key] = "";
-        } else value[key] = nextProfile;
+  work.descriptors = normalizeEventListeners(
+    work,
+    work.descriptors.map((descriptor) => {
+      const value = isRecord(descriptor.value) ? { ...descriptor.value } : {};
+      const nextId = id(value.id ?? descriptor.id);
+      if (nextId === undefined)
+        add(work, descriptor, NORMALIZE_CODES.id, "Descriptor ID is not a valid stable ID.");
+      value.id = nextId ?? descriptor.id;
+      if (descriptor.kind === "route") {
+        bindRouteFile(work, descriptor, value);
+        inferRouteContract(work, descriptor, value);
       }
-    }
-    if (isRecord(value.retry)) value.retry = normalizeRetry(value.retry);
-    if (Array.isArray(value.schedule)) value.schedule = value.schedule.map(normalizeSchedule);
-    if (isRecord(value.idempotency))
-      value.idempotency = {
-        ...value.idempotency,
-        key: text(value.idempotency.key) ?? value.idempotency.key,
-      };
-    return { ...descriptor, id: nextId ?? descriptor.id, value };
-  });
+      for (const key of ["profile", "modelProfile"] as const) {
+        if (value[key] !== undefined) {
+          const nextProfile = profile(value[key]);
+          if (nextProfile === undefined) {
+            add(
+              work,
+              descriptor,
+              NORMALIZE_CODES.profile,
+              `${key} is not a valid stable profile ID.`,
+            );
+            if (key === "profile") delete value[key];
+            else value[key] = "";
+          } else value[key] = nextProfile;
+        }
+      }
+      if (isRecord(value.retry)) value.retry = normalizeRetry(value.retry);
+      if (Array.isArray(value.schedule)) value.schedule = value.schedule.map(normalizeSchedule);
+      if (isRecord(value.idempotency))
+        value.idempotency = {
+          ...value.idempotency,
+          key: text(value.idempotency.key) ?? value.idempotency.key,
+        };
+      return { ...descriptor, id: nextId ?? descriptor.id, value };
+    }),
+  );
 }
 
 export function passLocal(work: NormalizationWork): void {
@@ -94,8 +99,7 @@ export function passLocal(work: NormalizationWork): void {
         add(work, descriptor, NORMALIZE_CODES.method, "HTTP method is invalid.");
       if (path(value.path) === undefined)
         add(work, descriptor, NORMALIZE_CODES.path, "HTTP path is invalid.");
-      if (!Array.isArray(value.responses) || value.responses.length === 0)
-        add(work, descriptor, NORMALIZE_CODES.mapping, "Route must declare a response mapping.");
+      validateRateLimit(work, descriptor, value.rateLimit);
     }
     if (descriptor.kind === "job" || descriptor.kind === "event-trigger")
       validateRetry(work, descriptor, value, descriptor.kind === "job");

@@ -1,4 +1,4 @@
-import type { MaybePromise, ProtocolId } from "@zsys/contracts";
+import type { FunctionRequest, MaybePromise, ProtocolId } from "@zsys/contracts";
 import type { BucketOperationObservation } from "@zsys/buckets";
 import type { CacheOperationObservation } from "@zsys/cache";
 import type { GraphEdge, ObservedEdge } from "@zsys/graph";
@@ -54,7 +54,11 @@ export interface InvocationTarget<
   readonly dependencies?: DependencyDeclarations;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly handler: (input: Input, context: Context) => MaybePromise<Output>;
+  readonly handler: (
+    input: Input,
+    request: FunctionRequest | undefined,
+    context: Context,
+  ) => MaybePromise<Output>;
 }
 export interface InvocationMetadata {
   readonly id: string;
@@ -174,6 +178,7 @@ export interface InvokeOptions<
   readonly deadline?: number;
   readonly timeoutMs?: number;
   readonly signal?: AbortSignal;
+  readonly request?: FunctionRequest;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
   readonly now?: () => number;

@@ -4,13 +4,19 @@ import { createLoggerLayer, type LogRecord } from "@zsys/runtime-effect";
 import { formatGenerateResult } from "create-zsys";
 import { executeCommand } from "./command-dispatch.js";
 import {
+  cliErrorMessage,
+  isJsonMode,
+  parseEffectCli,
+  unknownCommandMessage,
+  type CliInvocation,
+} from "./cli-effect-runtime.js";
+import {
   CLI_EXIT_CODES,
   CLI_VERSION,
   createReporter,
   errorMessage,
   fail,
   helpPayload,
-  helpText,
   installSignals,
   isGeneratorApi,
   loadCreateZsys,
@@ -19,119 +25,167 @@ import {
   type CliLogger,
   type CliReporter,
   type CliRuntime,
-  type ParsedCliArgs,
-  parseCliArgs,
 } from "./main-support.js";
 
+export * from "./cli-help-model.js";
 export * from "./main-support.js";
 
 export async function runCli(
   argv: readonly string[] = process.argv.slice(2),
   runtime: CliRuntime = {},
 ): Promise<number> {
-  const parsed = parseCliArgs(argv);
   const io = runtime.io ?? processIo;
-  const reporter = createReporter(parsed.json, io);
-  if (parsed.error !== undefined) {
-    reporter.error("ZSYS_CLI_USAGE", parsed.error);
+  const json = isJsonMode(argv);
+  const reporter = createReporter(json, io);
+  if (hasAction(argv, "help", "h") && hasAction(argv, "version", "v")) {
+    reporter.error("ZSYS_CLI_USAGE", "--help and --version are exclusive");
     return CLI_EXIT_CODES.usage;
   }
   const version = runtime.version ?? CLI_VERSION;
-  if (parsed.help) {
-    reporter.output(helpPayload(version, parsed.command), helpText(version, parsed.command));
-    return CLI_EXIT_CODES.success;
+  let parsed: Awaited<ReturnType<typeof parseEffectCli>>;
+  try {
+    parsed = await parseEffectCli(argv, version);
+  } catch (error) {
+    reporter.error("ZSYS_INTERNAL_ERROR", errorMessage(error));
+    return CLI_EXIT_CODES.failure;
   }
-  if (parsed.version) {
+  if (parsed.error !== undefined) {
+    if (parsed.error._tag === "ShowHelp" && parsed.error.errors.length === 0) {
+      reporter.output(helpPayload(version, parsed.helpPath), parsed.stdout);
+      return CLI_EXIT_CODES.success;
+    }
+    const unknown = unknownCommandMessage(parsed.error);
+    reporter.error(
+      unknown === undefined ? "ZSYS_CLI_USAGE" : "ZSYS_COMMAND_UNAVAILABLE",
+      unknown ?? cliErrorMessage(parsed.error),
+    );
+    return unknown === undefined ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+  }
+  if (hasAction(parsed.argv, "version", "v")) {
     reporter.output({ name: "zsys", version }, `zsys ${version}`);
     return CLI_EXIT_CODES.success;
   }
-  if (parsed.command === undefined) {
-    reporter.output(helpPayload(version, undefined), helpText(version, undefined));
+  const completionShell = actionValue(parsed.argv, "completions");
+  if (completionShell !== undefined) {
+    reporter.output(
+      {
+        name: "zsys",
+        shell: completionShell === "sh" ? "bash" : completionShell,
+        script: parsed.stdout,
+      },
+      parsed.stdout,
+    );
     return CLI_EXIT_CODES.success;
   }
-
-  const controller = new AbortController();
-  const signal = runtime.signal
-    ? AbortSignal.any([runtime.signal, controller.signal])
-    : controller.signal;
-  const removeSignals =
-    runtime.installSignalHandlers === false ? () => undefined : installSignals(controller);
-  const loggerLayer = createLoggerLayer({
-    component: "cli",
-    human: parsed.json ? false : { write: (line: string) => io.stderr(line) },
-    json: parsed.json ? { write: (record: LogRecord) => io.stderr(canonicalJson(record)) } : false,
-  });
-  const log: CliLogger = (level, message, fields) => {
-    try {
-      const effect =
-        level === "error" || level === "fatal"
-          ? Effect.logError(message)
-          : level === "warn"
-            ? Effect.logWarning(message)
-            : level === "info"
-              ? Effect.logInfo(message)
-              : Effect.logDebug(message);
-      Effect.runSync(effect.pipe(Effect.annotateLogs(fields ?? {}), Effect.provide(loggerLayer)));
-    } catch {
-      /* Logging must not change command cleanup. */
-    }
-  };
-  try {
-    const result = await execute(parsed, runtime, signal, reporter, log);
-    if (signal.aborted) {
-      const failure = toFailure(signal.reason, signal);
-      reporter.error(failure.code, failure.message);
-      return failure.exitCode;
-    }
-    return result;
-  } catch (error) {
-    const failure = toFailure(error, signal);
-    reporter.error(failure.code, failure.message);
-    return failure.exitCode;
-  } finally {
-    removeSignals();
+  if (hasAction(parsed.argv, "help", "h") || parsed.invocation === undefined) {
+    reporter.output(helpPayload(version, parsed.helpPath), parsed.stdout);
+    return CLI_EXIT_CODES.success;
   }
+  return executeInvocation(parsed.invocation, json, runtime, reporter, io);
 }
 
 export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
   return runCli(argv);
 }
 
+async function executeInvocation(
+  invocation: CliInvocation,
+  json: boolean,
+  runtime: CliRuntime,
+  reporter: CliReporter,
+  io: CliIo,
+): Promise<number> {
+  const controller = new AbortController();
+  const signal = runtime.signal
+    ? AbortSignal.any([runtime.signal, controller.signal])
+    : controller.signal;
+  const removeSignals =
+    runtime.installSignalHandlers === false ? () => undefined : installSignals(controller);
+  const log = createCliLogger(json, io);
+  const status = richStatus(runtime, json, io, invocation.command);
+  try {
+    status.start();
+    const result = await execute(invocation, runtime, signal, reporter, log, json);
+    if (signal.aborted) {
+      const failure = toFailure(signal.reason, signal);
+      reporter.error(failure.code, failure.message);
+      return failure.exitCode;
+    }
+    status.finish(result === CLI_EXIT_CODES.success);
+    return result;
+  } catch (error) {
+    const failure = toFailure(error, signal);
+    reporter.error(failure.code, failure.message);
+    status.finish(false);
+    return failure.exitCode;
+  } finally {
+    removeSignals();
+  }
+}
+
 async function execute(
-  parsed: ParsedCliArgs,
+  invocation: CliInvocation,
   runtime: CliRuntime,
   signal: AbortSignal,
   reporter: CliReporter,
   log: CliLogger,
+  json: boolean,
 ): Promise<number> {
-  if (parsed.command !== "create")
-    return executeCommand(parsed, {
-      command: parsed.command ?? "",
-      args: parsed.args,
-      json: parsed.json,
-      signal,
-      reporter,
-      log,
-    });
+  const context = {
+    command: invocation.command,
+    args: invocation.args,
+    json,
+    signal,
+    reporter,
+    log,
+  };
+  if (invocation.command !== "create") return executeCommand(invocation, context);
   const api = await (runtime.loadCreateZsys ?? loadCreateZsys)();
   if (!isGeneratorApi(api))
     throw fail("ZSYS_CREATE_API_UNAVAILABLE", "The create-zsys generator API is unavailable.");
   let options: unknown;
   try {
-    options = api.normalizeCreateOptions(parsed.args, { json: parsed.json });
+    options = api.normalizeCreateOptions(invocation.args, { json });
   } catch (error) {
     throw fail("ZSYS_CLI_USAGE", errorMessage(error), CLI_EXIT_CODES.usage);
   }
-  const result = await api.generateProject(options, {
-    command: "create",
-    args: parsed.args,
-    json: parsed.json,
-    signal,
-    reporter,
-    log,
-  });
+  const result = await api.generateProject(options, context);
   if (result !== undefined) reporter.output(result, formatGenerateResult(result));
   return CLI_EXIT_CODES.success;
+}
+
+function createCliLogger(json: boolean, io: CliIo): CliLogger {
+  const layer = createLoggerLayer({
+    component: "cli",
+    human: json ? false : { write: (line: string) => io.stderr(line) },
+    json: json ? { write: (record: LogRecord) => io.stderr(canonicalJson(record)) } : false,
+  });
+  return (level, message, fields) => {
+    const effect =
+      level === "error" || level === "fatal" ? Effect.logError(message) : Effect.logInfo(message);
+    Effect.runSync(effect.pipe(Effect.annotateLogs(fields ?? {}), Effect.provide(layer)));
+  };
+}
+
+function hasAction(argv: readonly string[], name: string, alias?: string): boolean {
+  return argv.some(
+    (entry) => entry === `--${name}` || (alias === undefined ? false : entry === `-${alias}`),
+  );
+}
+function actionValue(argv: readonly string[], name: string): string | undefined {
+  const index = argv.findIndex((entry) => entry === `--${name}` || entry.startsWith(`--${name}=`));
+  if (index < 0) return undefined;
+  return argv[index]!.includes("=") ? argv[index]!.split("=", 2)[1] : argv[index + 1];
+}
+function richStatus(runtime: CliRuntime, json: boolean, io: CliIo, command: string) {
+  const enabled =
+    !json &&
+    !(runtime.ci ?? Boolean(process.env.CI)) &&
+    (runtime.tty ?? process.stderr.isTTY) === true;
+  return {
+    start: () => enabled && io.stderr(`● zsys ${command}`),
+    finish: (ok: boolean) => enabled && io.stderr(`${ok ? "✓" : "✗"} zsys ${command}`),
+  };
 }
 
 const processIo: CliIo = Object.freeze({

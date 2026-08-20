@@ -1,9 +1,0 @@
-{
-  "name": "@zsys/fixture-commerce",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@zsys/app": "workspace:*",
-    "@zsys/schema": "workspace:*"
-  }
-}

@@ -13,6 +13,8 @@ import { activateCandidate, drainCandidate } from "./dev-activation.js";
 import { createDevLogger } from "./dev-logger.js";
 import { installDevSignals } from "./dev-signals.js";
 import { shutdownDev } from "./dev-shutdown.js";
+import { logDevReady } from "./dev-ready.js";
+import { assertPortAvailable } from "./port-availability.js";
 
 /** Owns the stable development proxy and every child generation it starts. */
 export class DevSession {
@@ -91,6 +93,7 @@ export class DevSession {
     this.started = true;
     this.removeSignals = installDevSignals(this.options, this.log, (reason) => this.stop(reason));
     try {
+      await assertPortAvailable(this.backendPort, this.options.hostname ?? "127.0.0.1", "--port");
       await this.proxy.listen();
       if (this.options.inspector !== undefined && this.options.inspector !== false) {
         this.inspector = await startInspector(
@@ -105,6 +108,12 @@ export class DevSession {
       }
       if (!(await this.activate(0)))
         throw this.options.signal?.reason ?? new Error("Initial development candidate failed.");
+      logDevReady(
+        this.log,
+        this.options.hostname ?? "127.0.0.1",
+        this.backendPort,
+        this.inspectorPort,
+      );
       return this;
     } catch (error) {
       await this.stop(error);
@@ -173,7 +182,6 @@ export class DevSession {
   markStopping(): void {
     this.stopping = true;
   }
-
   get pendingActivations(): Promise<boolean> {
     return this.activationTail;
   }
@@ -181,7 +189,6 @@ export class DevSession {
   get inspectorChild(): DevInspector | undefined {
     return this.inspector;
   }
-
   clearSignals(): void {
     this.removeSignals?.();
     this.removeSignals = undefined;

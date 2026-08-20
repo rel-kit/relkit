@@ -1,0 +1,558 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`renders focused help for every command and nested subcommand 1`] = `
+{
+  "build": 
+"DESCRIPTION
+  Build a deployable application
+
+USAGE
+  zsys build [flags]
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Build a deployable application
+  zsys build"
+,
+  "check": 
+"DESCRIPTION
+  Compile and validate the application
+
+USAGE
+  zsys check [flags]
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Compile and validate the application
+  zsys check"
+,
+  "create": 
+"DESCRIPTION
+  Create a new ZSYS application
+
+USAGE
+  zsys create [flags] <name>
+
+ARGUMENTS
+  name string    npm package and application name
+
+FLAGS
+  --json                     Emit machine-readable output
+  --template choice          Starter template (choices: minimal, api, agent)
+  --cloud choice             Cloud provider (choices: aws, none)
+  --deploy choice            Deployment adapter (choices: pulumi, none)
+  --directory string         Destination directory
+  --install                  Install generated project setup
+  --no-install               No install generated project setup
+  --git                      Git generated project setup
+  --no-git                   No git generated project setup
+  --examples                 Examples generated project setup
+  --no-examples              No examples generated project setup
+  --force-empty-directory    Allow an existing empty destination
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Create a new ZSYS application
+  zsys create"
+,
+  "deploy": 
+"DESCRIPTION
+  Manage Pulumi deployments
+
+USAGE
+  zsys deploy <subcommand> [flags]
+
+FLAGS
+  --json    Emit machine-readable output
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+SUBCOMMANDS
+  init       Init the Pulumi stack
+  preview    Preview the Pulumi stack
+  up         Up the Pulumi stack
+  refresh    Refresh the Pulumi stack
+  outputs    Outputs the Pulumi stack
+  destroy    Destroy the Pulumi stack
+EXAMPLES
+  # Manage Pulumi deployments
+  zsys deploy"
+,
+  "deploy destroy": 
+"DESCRIPTION
+  Destroy the Pulumi stack
+
+USAGE
+  zsys deploy destroy [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Destroy the Pulumi stack
+  zsys deploy destroy"
+,
+  "deploy init": 
+"DESCRIPTION
+  Init the Pulumi stack
+
+USAGE
+  zsys deploy init [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Init the Pulumi stack
+  zsys deploy init"
+,
+  "deploy outputs": 
+"DESCRIPTION
+  Outputs the Pulumi stack
+
+USAGE
+  zsys deploy outputs [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Outputs the Pulumi stack
+  zsys deploy outputs"
+,
+  "deploy preview": 
+"DESCRIPTION
+  Preview the Pulumi stack
+
+USAGE
+  zsys deploy preview [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Preview the Pulumi stack
+  zsys deploy preview"
+,
+  "deploy refresh": 
+"DESCRIPTION
+  Refresh the Pulumi stack
+
+USAGE
+  zsys deploy refresh [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Refresh the Pulumi stack
+  zsys deploy refresh"
+,
+  "deploy up": 
+"DESCRIPTION
+  Up the Pulumi stack
+
+USAGE
+  zsys deploy up [flags]
+
+FLAGS
+  --json                       Emit machine-readable output
+  --project-root string        Application directory (defaults to cwd)
+  --stack string               Pulumi stack name (default: development)
+  --backend string             cloud, local, or object-storage URL
+  --config key=value           Set a non-secret Pulumi value; repeatable
+  --config-secret key=value    Set a secret Pulumi value; repeatable
+  --non-interactive, --yes     Approve protected operations
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Up the Pulumi stack
+  zsys deploy up"
+,
+  "dev": 
+"DESCRIPTION
+  Run app, inspector, OpenAPI, and Scalar
+
+USAGE
+  zsys dev [flags]
+
+FLAGS
+  --json                      Emit machine-readable output
+  --project-root string       Application directory (defaults to cwd)
+  --port integer              Application port
+  --inspector-port integer    Inspector port
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Run app, inspector, OpenAPI, and Scalar
+  zsys dev"
+,
+  "doctor": 
+"DESCRIPTION
+  Check local prerequisites and ports
+
+USAGE
+  zsys doctor [flags]
+
+FLAGS
+  --json                      Emit machine-readable output
+  --project-root string       Application directory (defaults to cwd)
+  --port integer              Application port
+  --inspector-port integer    Inspector port
+  --pulumi                    Require Pulumi
+  --no-pulumi                 Skip Pulumi requirements
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Check local prerequisites and ports
+  zsys doctor"
+,
+  "env": 
+"DESCRIPTION
+  Inspect value-free environment contracts
+
+USAGE
+  zsys env <subcommand> [flags]
+
+FLAGS
+  --json    Emit machine-readable output
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+SUBCOMMANDS
+  check      Validate environment values
+  list       List environment value status
+  explain    Explain one environment variable
+  example    Render or write a safe .env example
+EXAMPLES
+  # Inspect value-free environment contracts
+  zsys env"
+,
+  "env check": 
+"DESCRIPTION
+  Validate environment values
+
+USAGE
+  zsys env check [flags]
+
+FLAGS
+  --json                         Emit machine-readable output
+  --project-root string          Application directory (defaults to cwd)
+  --environment, --env string    Provider environment
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Validate environment values
+  zsys env check"
+,
+  "env example": 
+"DESCRIPTION
+  Render or write a safe .env example
+
+USAGE
+  zsys env example [flags]
+
+FLAGS
+  --json                         Emit machine-readable output
+  --project-root string          Application directory (defaults to cwd)
+  --environment, --env string    Provider environment
+  --path, --file string          Output path
+  --write                        Write the rendered example
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Render or write a safe .env example
+  zsys env example"
+,
+  "env explain": 
+"DESCRIPTION
+  Explain one environment variable
+
+USAGE
+  zsys env explain [flags] <name>
+
+ARGUMENTS
+  name string    Environment variable name
+
+FLAGS
+  --json                         Emit machine-readable output
+  --project-root string          Application directory (defaults to cwd)
+  --environment, --env string    Provider environment
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Explain one environment variable
+  zsys env explain"
+,
+  "env list": 
+"DESCRIPTION
+  List environment value status
+
+USAGE
+  zsys env list [flags]
+
+FLAGS
+  --json                         Emit machine-readable output
+  --project-root string          Application directory (defaults to cwd)
+  --environment, --env string    Provider environment
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # List environment value status
+  zsys env list"
+,
+  "graph": 
+"DESCRIPTION
+  Inspect deterministic application graphs
+
+USAGE
+  zsys graph <subcommand> [flags]
+
+FLAGS
+  --json    Emit machine-readable output
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+SUBCOMMANDS
+  print    Print a canonical graph
+  check    Validate a graph and optional hash
+  diff     Compare graph compatibility
+EXAMPLES
+  # Inspect deterministic application graphs
+  zsys graph"
+,
+  "graph check": 
+"DESCRIPTION
+  Validate a graph and optional hash
+
+USAGE
+  zsys graph check [flags] [<graph>]
+
+ARGUMENTS
+  graph string    Graph JSON path (optional)
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+  --hash string            Expected sha256 graph hash
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Validate a graph and optional hash
+  zsys graph check"
+,
+  "graph diff": 
+"DESCRIPTION
+  Compare graph compatibility
+
+USAGE
+  zsys graph diff [flags] <before> <after>
+
+ARGUMENTS
+  before string    Previous graph path
+  after string     Next graph path
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Compare graph compatibility
+  zsys graph diff"
+,
+  "graph print": 
+"DESCRIPTION
+  Print a canonical graph
+
+USAGE
+  zsys graph print [flags] [<graph>]
+
+ARGUMENTS
+  graph string    Graph JSON path (optional)
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Print a canonical graph
+  zsys graph print"
+,
+  "start": 
+"DESCRIPTION
+  Start a built application
+
+USAGE
+  zsys start [flags]
+
+FLAGS
+  --json                   Emit machine-readable output
+  --project-root string    Application directory (defaults to cwd)
+  --port integer           Application port
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+EXAMPLES
+  # Start a built application
+  zsys start"
+,
+  "zsys": 
+"DESCRIPTION
+  Convention-first TypeScript application framework
+
+USAGE
+  zsys <subcommand> [flags]
+
+FLAGS
+  --json    Emit machine-readable output
+
+GLOBAL FLAGS
+  --help, -h                          Show help information
+  --version, -v                       Show version information
+  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
+
+SUBCOMMANDS
+  create    Create a new ZSYS application
+  dev       Run app, inspector, OpenAPI, and Scalar
+  check     Compile and validate the application
+  build     Build a deployable application
+  start     Start a built application
+  graph     Inspect deterministic application graphs
+  env       Inspect value-free environment contracts
+  doctor    Check local prerequisites and ports
+  deploy    Manage Pulumi deployments
+EXAMPLES
+  # Convention-first TypeScript application framework
+  zsys"
+,
+}
+`;

@@ -1,0 +1,26 @@
+---
+title: Schemas, errors, and context
+description: Validate runtime boundaries, declare failures, and propagate invocation metadata safely.
+---
+
+`@zsys/schema` implements Standard Schema v1. Compose `z.object`, strings, numbers, literals, arrays,
+optional/default values, unions, and refinements, then use `validate` or let a ZSYS boundary validate
+automatically.
+
+Declared errors are data contracts:
+
+```ts
+const orderNotFound = defineError({
+  id: "orders.not-found",
+  data: z.object({ orderId: z.string() }),
+  http: { status: 404 },
+  retry: "never",
+});
+```
+
+Throw or return errors through the owning function APIs; do not turn arbitrary exceptions into public
+responses. HTTP status metadata contributes an inferred OpenAPI response. Input validation contributes
+`422` automatically.
+
+Invocation context carries the abort signal, deadline, trace/correlation/causation identifiers, source,
+and declared resource clients. Treat it as request-scoped and never store it globally.

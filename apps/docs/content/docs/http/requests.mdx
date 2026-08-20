@@ -1,0 +1,35 @@
+---
+title: Request inference and mapping
+description: Understand the default transport projection and the explicit mapping escape hatch.
+---
+
+When `request` is omitted, ZSYS projects an object input schema as follows:
+
+- Dynamic segment names map to matching object properties.
+- Remaining properties become query parameters for `GET`, `HEAD`, `DELETE`, and `OPTIONS`.
+- Remaining properties become a JSON body for `POST`, `PUT`, and `PATCH`.
+
+A missing path property or an input schema without a usable object projection is a compile error.
+Headers, cookies, renamed fields, transforms, multipart bodies, and non-object inputs require a complete
+explicit mapping:
+
+```ts
+export const POST = defineRoute({
+  id: "orders.create.http",
+  target: createOrder,
+  request: http.input({
+    orderId: http.header("idempotency-key"),
+    customerEmail: http.header("x-customer-email"),
+    sku: http.body("sku"),
+    quantity: http.body("quantity"),
+  }),
+});
+```
+
+Available sources are `http.path`, `pathSegments`, `query`, `header`, `cookie`, `body`, `wholeBody`,
+`multipart`, `multipartAll`, and `constant`. Compose nested objects with `http.input`/`http.nested`.
+Use `http.transform(descriptor, source)` for a serializable, compiler-known transform. An explicit
+mapping replaces inference entirely; it is never merged with inferred fields.
+
+Generated clients URL-encode each catch-all segment independently, so embedded `/` characters cannot
+silently change the route structure.

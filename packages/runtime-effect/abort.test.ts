@@ -17,7 +17,7 @@ describe("runtime abort bridge", () => {
       invokeUserHandler({
         input: undefined,
         publicContext: { signal: new AbortController().signal },
-        handler: (_input, context) => {
+        handler: (_input, _request, context) => {
           publicSignal = context.signal;
           return abortablePromise(context.signal, (signal) => {
             providerSignal = signal;
@@ -71,7 +71,7 @@ describe("runtime abort bridge", () => {
       invokeUserHandler({
         input: undefined,
         publicContext: { signal: parent.signal },
-        handler: (_input, context) => {
+        handler: (_input, _request, context) => {
           publicSignal = context.signal;
           return "done";
         },

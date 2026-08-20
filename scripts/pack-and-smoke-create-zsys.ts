@@ -107,8 +107,8 @@ console.log(JSON.stringify(result));
     const directBytes = await snapshotProject(direct.destination);
     if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
       throw new Error("Packed create-zsys and zsys create generated different bytes.");
-    await verifyProject(direct.destination, registry, cacheDir, repositoryRoot);
-    await verifyProject(cli.destination, registry, cacheDir, repositoryRoot);
+    await verifyProject(direct.destination, registry, cacheDir);
+    await verifyProject(cli.destination, registry, cacheDir);
     const second = JSON.parse(
       (
         await runCommand(

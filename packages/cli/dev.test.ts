@@ -17,13 +17,25 @@ const roots: string[] = [];
 test("owns a stable proxy, dynamic backend, candidate, and clean stop", async () => {
   const root = await makeRoot();
   const graphHash = "sha256:dev-test";
-  const session = await startDev(options(root, graphHash));
+  const logs: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
+  const session = await startDev({
+    ...options(root, graphHash),
+    onLog: (event) => logs.push(event),
+  });
   sessions.push(session);
 
   expect(session.backendPort).toBeGreaterThan(0);
   expect(session.activeTarget?.port).toBeGreaterThan(0);
   expect(session.activeTarget?.port).not.toBe(session.backendPort);
   expect(session.stateMachine.state).toBe("active");
+  expect(logs).toContainEqual({
+    level: "info",
+    event: "dev.ready",
+    fields: expect.objectContaining({
+      openapi: `http://127.0.0.1:${session.backendPort}/_zsys/v1/openapi.json`,
+      apiReference: `http://127.0.0.1:${session.backendPort}/_zsys/v1/api-reference`,
+    }),
+  });
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
 
   const candidate = session.active;

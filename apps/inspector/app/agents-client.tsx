@@ -1,71 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { InspectorGraph, InspectorObject, InspectorPage } from "../lib/api-types";
+import { useCallback } from "react";
+import type { InspectorObject, InspectorPage, InspectorQuery } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
-import { agentViews, type AgentView } from "../lib/agents-model";
+import { unpagedQuery } from "../lib/list-query";
+import { agentViews } from "../lib/agents-model";
+import { ResourceTable, type ResourceTableItem } from "./resource-table";
+
+interface AgentItem extends ResourceTableItem {
+  readonly model: string;
+  readonly tools: number;
+  readonly generatedFunction: string;
+  readonly invocations: number;
+}
+
+const statuses = ["running", "completed", "failed", "cancelled"].map((id) => ({ id, label: id }));
 
 export function AgentsClient() {
-  const [views, setViews] = useState<readonly AgentView[]>([]);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
-
-  useEffect(() => {
+  const load = useCallback(async (query: InspectorQuery): Promise<InspectorPage<AgentItem>> => {
     const api = createInspectorClient();
-    void Promise.all([api.graph(), api.runtimeList<InspectorObject>("agents", { limit: 100 })])
-      .then(([graph, runtime]: [InspectorGraph, InspectorPage<InspectorObject>]) => {
-        setViews(agentViews(graph, runtime.items));
-        setState("ready");
-      })
-      .catch(() => setState("error"));
+    const { status, ...graphQuery } = query;
+    const [page, graph, runtime] = await Promise.all([
+      api.list<InspectorObject>("agents", graphQuery),
+      api.graph(),
+      api.runtimeList<InspectorObject>("agents", unpagedQuery(query)),
+    ]);
+    const ids = new Set(page.items.map((item) => text(item.id)));
+    const items = agentViews(graph, runtime.items).flatMap((view) =>
+      ids.has(view.id) && (status === undefined || view.runtime.length > 0)
+        ? [
+            {
+              id: view.id,
+              model: view.modelProfile || "unavailable",
+              tools: view.toolIds.length,
+              generatedFunction: view.generatedFunctionId,
+              invocations: view.runtime.length,
+            },
+          ]
+        : [],
+    );
+    return { ...page, items };
   }, []);
-
   return (
-    <div className="route-page">
-      <header className="page-heading">
-        <div>
-          <p className="eyebrow">ACTIVE WORKSPACE</p>
-          <h1>Agents</h1>
-          <p className="lede">
-            Bounded model profiles, inherited tool contracts, limits, and redacted invocation
-            metadata.
-          </p>
-        </div>
-        <span className="badge">{views.length} agents</span>
-      </header>
-      {state === "loading" && (
-        <p className="panel route-state" role="status">
-          Loading agents…
-        </p>
-      )}
-      {state === "error" && (
-        <p className="panel route-state" role="alert">
-          The agents API is unavailable.
-        </p>
-      )}
-      {state === "ready" && views.length === 0 && (
-        <p className="panel route-state">No agents are reported by the active graph.</p>
-      )}
-      {views.length > 0 && (
-        <ul className="route-list">
-          {views.map((view) => (
-            <li className="panel route-row" key={view.id}>
-              <div>
-                <strong>{view.id}</strong>
-                <p className="supporting-copy">
-                  Model profile: {view.modelProfile || "Unavailable"}
-                </p>
-              </div>
-              <div className="route-row-detail">
-                <span>{view.toolIds.length} allowed tools</span>
-                <span>Function: {view.generatedFunctionId}</span>
-              </div>
-              <a className="text-link" href={`/agents/${encodeURIComponent(view.id)}`}>
-                Open agent <span aria-hidden="true">→</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <ResourceTable
+      title="Agents"
+      description="Bounded model profiles, inherited tool contracts, limits, and redacted invocation metadata."
+      noun="agents"
+      load={load}
+      statusOptions={statuses}
+      columns={[
+        { key: "model", label: "Model profile", render: (item) => item.model },
+        { key: "tools", label: "Allowed tools", render: (item) => item.tools },
+        {
+          key: "runtime",
+          label: "Runtime",
+          render: (item) => `${item.invocations} invocations · ${item.generatedFunction}`,
+        },
+      ]}
+      href={(item) => `/agents/${encodeURIComponent(item.id)}`}
+      openLabel="Open agent"
+    />
   );
+}
+
+function text(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }

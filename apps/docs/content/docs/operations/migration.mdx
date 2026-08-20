@@ -1,0 +1,51 @@
+---
+title: Breaking-change migration
+description: Move pre-1.0 route, event, configuration, and generated artifacts to developer-first conventions.
+---
+
+This release is intentionally breaking and has no compatibility layer or codemod. Migrate one compiler
+diagnostic at a time and keep explicit descriptor IDs stable.
+
+## Routes
+
+Move `src/routes/orders.route.ts` to `src/routes/orders/route.ts`. Replace the default descriptor with
+named method exports and remove `method`/`path`:
+
+```ts
+// before
+export default defineRoute({ id: "orders.list", method: "GET", path: "/orders", target });
+
+// after: src/routes/orders/route.ts
+export const GET = defineRoute({ id: "orders.list", target });
+```
+
+Use `[id]`, `[...parts]`, or `[[...parts]]` directories for dynamic forms. Remove routine request and
+response maps when inference matches the intended transport; retain explicit complete mappings for
+headers, cookies, renames, transforms, multipart, redirects, or alternate media types.
+
+## Events
+
+Replace target-based listener descriptors with `onEvent(name, async (payload, ctx) => {}, options)`.
+Move dependencies and runtime limits into listener options. Run `zsys check` to regenerate the typed
+event registry, then fix unknown or stale event names reported by TypeScript and the compiler.
+
+## Configuration
+
+Wrap configuration with `defineConfig` from `@zsys/app/config`. Delete `entry`, `source`, `exclude`, and
+`generatedDirectory`; use fixed `src/app.ts`, `src/**/*.ts`, and `.zsys/generated`. Move application
+port to `server.port`, inspector port to `inspector.port`, and body/API-doc settings under `server`.
+Remove `PORT` from application environment definitions because the framework reserves it.
+
+## Regenerate and verify
+
+Delete no authored data. Run:
+
+```sh
+zsys check
+bun run typecheck
+bun run test
+bun run build
+```
+
+Review `.zsys/generated` as derived output, generated client changes, OpenAPI changes, and a deployment
+preview. Preserve route/listener/resource IDs whenever the logical operation is unchanged.

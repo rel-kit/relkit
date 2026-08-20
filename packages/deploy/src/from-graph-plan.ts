@@ -23,7 +23,7 @@ export function buildPlan(
   providers: Map<string, ProviderProfileNode>,
 ): DeploymentPlan {
   const context: PlanContext = { appId, graphHash, graph, providers };
-  const image = options.image ?? defaultImage(appId);
+  const image = options.image ?? defaultImage(appId, options.httpPort ?? 3000);
   validateImage(image);
   const environmentNames = envNames(graph.nodes);
   const models = modelPlans(context, options);
@@ -95,14 +95,14 @@ function schedules(context: PlanContext) {
     .sort(byLogical);
 }
 
-function defaultImage(appId: string): ContainerImagePlan {
+function defaultImage(appId: string, port: number): ContainerImagePlan {
   return {
     name: appId,
     tag: "latest",
     health: {
       livenessPath: "/_zsys/v1/health/live",
       readinessPath: "/_zsys/v1/health/ready",
-      port: 3000,
+      port,
     },
   };
 }

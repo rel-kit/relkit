@@ -138,7 +138,7 @@ describe("engine integration matrix", () => {
         id: "engine.success",
         input: valueInput,
         output: valueOutput,
-        handler: (input, context) => {
+        handler: (input, _request, context) => {
           context.log.info("success", { functionId: context.invocation.functionId });
           return { value: input.value + 1 };
         },
@@ -189,7 +189,7 @@ describe("engine integration matrix", () => {
         id: "engine.output-defect",
         input: valueInput,
         output: valueOutput,
-        handler: (_input: Value, context: EngineContext) => {
+        handler: (_input: Value, _request, context: EngineContext) => {
           context.log.error("invalid output");
           return { value: "bad" } as unknown as Value;
         },
@@ -208,7 +208,7 @@ describe("engine integration matrix", () => {
         input: valueInput,
         output: valueOutput,
         errors: [{ id: "orders.unavailable", data: z.object({ reason: z.string() }) }],
-        handler: (_input: Value, context: EngineContext) => {
+        handler: (_input: Value, _request, context: EngineContext) => {
           context.log.warn("declared failure");
           throw declaredError("orders.unavailable");
         },
@@ -229,7 +229,7 @@ describe("engine integration matrix", () => {
         id: "engine.unknown-error",
         input: valueInput,
         output: valueOutput,
-        handler: (_input: Value, context: EngineContext) => {
+        handler: (_input: Value, _request, context: EngineContext) => {
           context.log.error("unexpected failure");
           throw new Error("internal secret");
         },
@@ -252,7 +252,7 @@ describe("engine integration matrix", () => {
       id: "engine.child",
       input: valueInput,
       output: valueOutput,
-      handler: (input, context) => {
+      handler: (input, _request, context) => {
         context.log.info("child", { invocationId: context.invocation.id });
         return { value: input.value + 1 };
       },
@@ -262,7 +262,7 @@ describe("engine integration matrix", () => {
       input: valueInput,
       output: valueOutput,
       dependencies: { functions: { child: functionDependency(child) } },
-      handler: async (input, context) => {
+      handler: async (input, _request, context) => {
         context.log.info("parent", { invocationId: context.invocation.id });
         const functions = context as EngineContext & {
           readonly functions: Readonly<Record<string, (value: unknown) => Promise<unknown>>>;
@@ -352,7 +352,7 @@ describe("engine integration matrix", () => {
       dependencies: {
         cache: { prices: { ref: { kind: "cache", id: "prices" } } },
       },
-      handler: (_input, context) => {
+      handler: (_input, _request, context) => {
         handlerSignal = context.signal;
         const cache = context as EngineContext & {
           readonly cache: {
@@ -408,7 +408,7 @@ describe("engine integration matrix", () => {
         id: "engine.timeout",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, context: EngineContext) => {
+        handler: (_input: unknown, _request, context: EngineContext) => {
           context.log.info("waiting for deadline");
           timeoutStarted();
           return new Promise<never>((_resolve) => {
@@ -458,7 +458,7 @@ describe("engine integration matrix", () => {
       input: valueInput,
       output: valueOutput,
       concurrency: 1,
-      handler: async (input, context) => {
+      handler: async (input, _request, context) => {
         starts.push(input.value);
         active += 1;
         maximumActive = Math.max(maximumActive, active);
@@ -527,7 +527,7 @@ describe("engine integration matrix", () => {
         id: "engine.shutdown",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, context: EngineContext) => {
+        handler: (_input: unknown, _request, context: EngineContext) => {
           started();
           return new Promise<never>((_resolve, reject) => {
             context.signal.addEventListener("abort", () => {
@@ -554,7 +554,7 @@ describe("engine integration matrix", () => {
         id: "engine.undeclared",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, context: EngineContext) => {
+        handler: (_input: unknown, _request, context: EngineContext) => {
           context.log.info("checking dependency");
           const clients = context as EngineContext & {
             readonly cache: {

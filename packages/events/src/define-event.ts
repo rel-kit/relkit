@@ -47,7 +47,20 @@ export interface DefineEventOptions<
   readonly sensitiveFields?: readonly string[];
 }
 
-/** Defines a versioned event contract; payload versions remain explicit for trigger matching. */
+/**
+ * Defines a versioned event contract used by publishers and typed listeners.
+ *
+ * @example
+ * ```ts
+ * import { defineEvent } from "@zsys/events"
+ * import { z } from "@zsys/schema"
+ *
+ * const created = defineEvent({ id: "orders.created", version: 1, payload: z.object({ orderId: z.string() }) })
+ * void created
+ * ```
+ * @category Events
+ * @since 0.1.0
+ */
 export function defineEvent<
   const Id extends string,
   const Version extends number,

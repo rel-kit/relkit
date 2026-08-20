@@ -94,6 +94,14 @@ describe("versioned inspector router", () => {
 
     const functions = await app.request(`${API_BASE_PATH}/functions?limit=1`);
     expect((await functions.json()).items).toHaveLength(1);
+    const searched = await app.request(`${API_BASE_PATH}/functions?search=orders&kind=function`);
+    expect((await searched.json()).items).toMatchObject([{ id: "orders.create" }]);
+    const routes = await app.request(`${API_BASE_PATH}/routes?kind=POST&search=orders`);
+    expect((await routes.json()).items).toMatchObject([{ id: "orders.create.http" }]);
+    const filteredRuntime = await app.request(
+      `${API_BASE_PATH}/runtime/functions?status=completed&search=orders`,
+    );
+    expect((await filteredRuntime.json()).items).toMatchObject([{ id: "orders.create" }]);
     const runtime = await app.request(`${API_BASE_PATH}/runtime/functions`);
     expect((await runtime.json()).items).toMatchObject([
       { id: "orders.create", status: "completed" },

@@ -11,11 +11,13 @@ export function isHttpMapping(value: unknown): value is HttpMappingNode {
   if (!isRecord(value) || typeof value.kind !== "string") return false;
   switch (value.kind) {
     case "path":
+    case "path-segments":
     case "query":
     case "header":
     case "cookie":
     case "body":
     case "multipart":
+    case "multipart-all":
       return (
         ownKeys(value, "kind", "name") && typeof value.name === "string" && value.name.length > 0
       );

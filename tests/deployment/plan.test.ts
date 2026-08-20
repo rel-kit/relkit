@@ -32,7 +32,7 @@ test("full deployment plan matches the stable golden contract", () => {
   const plan = fromGraph(loadGraph("valid-full"), fullOptions);
 
   expect(plan).toEqual(readGolden("plan-full.json"));
-  expect(plan.application.environmentNames).toEqual(["PORT"]);
+  expect(plan.application.environmentNames).toEqual(["SERVICE_PORT"]);
   expect(plan.http.health).toEqual(fullOptions.image.health);
   expect(plan.models?.[0]).toMatchObject({
     logicalName: "full-app-model-default",
@@ -53,6 +53,12 @@ test("minimal deployment plan omits optional capability resources", () => {
   expect(plan.caches).toEqual([]);
   expect(plan.models).toBeUndefined();
   expect(plan.iam.serviceRole.statements).toEqual([]);
+});
+
+test("uses the configured application port for default deployment health", () => {
+  const plan = fromGraph(loadGraph("valid-minimal"), { httpPort: 4321 });
+  expect(plan.http.port).toBe(4321);
+  expect(plan.application.image.health.port).toBe(4321);
 });
 
 test("rejects missing AWS capabilities and production configuration", () => {

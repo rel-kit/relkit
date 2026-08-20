@@ -1,6 +1,7 @@
 "use client";
 
 import type { SignalFilters, SignalKind } from "../lib/observability-model";
+import { Button } from "../components/ui/button";
 
 interface SignalsFiltersProps {
   readonly kind: SignalKind;
@@ -98,12 +99,10 @@ export function SignalsFilters({
         </label>
       </div>
       <div className="request-links">
-        <button className="button-link" type="submit">
-          Apply filters
-        </button>
-        <button className="button-link" type="button" onClick={onReset}>
+        <Button type="submit">Apply filters</Button>
+        <Button variant="secondary" type="button" onPress={onReset}>
           Reset
-        </button>
+        </Button>
       </div>
     </form>
   );

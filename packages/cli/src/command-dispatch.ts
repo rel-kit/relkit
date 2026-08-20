@@ -3,28 +3,24 @@ import { resolve } from "node:path";
 import { buildProject } from "./commands/build.js";
 import { checkProject } from "./commands/check.js";
 import { startDev } from "./commands/dev.js";
-import { configuredInspectorOptions } from "./commands/dev-inspector.js";
+import { developmentPorts } from "./commands/dev-inspector.js";
 import { startDevSourceWatcher } from "./commands/dev-watch.js";
 import { runDeploy } from "./commands/deploy.js";
 import { runDoctor } from "./commands/doctor.js";
 import { runEnv } from "./commands/env.js";
 import { runGraph } from "./commands/graph.js";
 import { runStart } from "./commands/start.js";
-import {
-  CLI_EXIT_CODES,
-  fail,
-  type CliCommandContext,
-  type ParsedCliArgs,
-} from "./main-support.js";
+import { CLI_EXIT_CODES, fail, type CliCommandContext } from "./main-support.js";
+import type { CliInvocation } from "./cli-effect-runtime.js";
 
 export async function executeCommand(
-  parsed: ParsedCliArgs,
+  invocation: CliInvocation,
   context: CliCommandContext,
 ): Promise<number> {
-  switch (parsed.command) {
+  switch (invocation.command) {
     case "check": {
       const result = await checkProject({
-        ...optionalProjectRoot(parseProjectArgs(parsed.args, "check").projectRoot),
+        ...optionalProjectRoot(parseProjectArgs(invocation.args, "check").projectRoot),
         signal: context.signal,
       });
       context.reporter.output(result, canonicalJson(result));
@@ -32,41 +28,50 @@ export async function executeCommand(
     }
     case "build": {
       const result = await buildProject({
-        ...optionalProjectRoot(parseProjectArgs(parsed.args, "build").projectRoot),
+        ...optionalProjectRoot(parseProjectArgs(invocation.args, "build").projectRoot),
         signal: context.signal,
       });
       context.reporter.output(result, canonicalJson(result));
       return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
     }
     case "doctor":
-      return runDoctor(parsed.args, context);
+      return runDoctor(invocation.args, context);
     case "dev":
-      await runDevCommand(parsed.args, context);
+      await runDevCommand(invocation.args, context);
       return CLI_EXIT_CODES.success;
-    case "start":
+    case "start": {
+      const options = parseProjectArgs(invocation.args, "start");
       return runStart({
-        ...optionalProjectRoot(parseProjectArgs(parsed.args, "start").projectRoot),
+        ...optionalProjectRoot(options.projectRoot),
+        ...(options.port === undefined ? {} : { port: options.port }),
         signal: context.signal,
       });
+    }
     case "graph":
-      return runGraph(parsed.args, context);
+      return runGraph(invocation.args, context);
     case "env":
-      return runEnv(parsed.args, context);
+      return runEnv(invocation.args, context);
     case "deploy":
-      return runDeploy(parsed.args, context);
+      return runDeploy(invocation.args, context);
     default:
-      throw fail("ZSYS_COMMAND_UNAVAILABLE", `Command is not implemented: ${parsed.command}`);
+      throw fail("ZSYS_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`);
   }
 }
 
 async function runDevCommand(args: readonly string[], context: CliCommandContext): Promise<void> {
   const options = parseProjectArgs(args, "dev");
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
+  const ports = await developmentPorts(
+    projectRoot,
+    options.port,
+    options.inspectorPort,
+    process.env,
+  );
   const session = await startDev({
     projectRoot,
-    ...(options.port === undefined ? {} : { stablePort: options.port }),
+    stablePort: ports.backend,
     signal: context.signal,
-    inspector: await configuredInspectorOptions(projectRoot, options.inspectorPort),
+    inspector: ports.inspector,
     compile: async (request) => {
       const result = await buildProject({
         projectRoot: request.projectRoot,

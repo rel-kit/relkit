@@ -132,8 +132,8 @@ async function configureProductFixture(root: string): Promise<void> {
   await writeFile(
     functionPath,
     source.replace(
-      "handler: async (input, context) => {",
-      'handler: async (input, context) => {\n    context.log.info("creating order", { password: input.sku });',
+      "handler: async (input, _request, context) => {",
+      'handler: async (input, _request, context) => {\n    context.log.info("creating order", { password: input.sku });',
     ),
   );
 }
@@ -142,7 +142,7 @@ async function copyFullProject(): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".zsys-product-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-full"), root, { recursive: true });
-  await cp(join(process.cwd(), "apps/fixture-commerce/package.json"), join(root, "package.json"));
+  await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
   const scope = join(root, "node_modules", "@zsys");
   await mkdir(scope, { recursive: true });
   for (const name of [

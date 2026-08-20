@@ -3,6 +3,7 @@ import { isJsonValue } from "@zsys/contracts";
 import {
   isCancellation,
   isDeclaredError,
+  isFunctionFailure,
   isProviderError,
   isTimeout,
   requiredText,
@@ -137,6 +138,7 @@ function normalizeValue(
   detail: unknown,
   options: NormalizeFailureOptions,
 ): InvocationFailure {
+  if (isFunctionFailure(value)) return normalizeValue(value.error, detail, options);
   if (options.timedOut || isTimeout(value)) return timeoutFailure(detail);
   if (options.signal?.aborted || isCancellation(value)) return cancellationFailure(detail);
   if (isDeclaredError(value)) {

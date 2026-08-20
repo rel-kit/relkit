@@ -1,11 +1,11 @@
 [
   {
-    "code": "ZSYS_EVENT_TARGET_INCOMPATIBLE",
+    "code": "ZSYS_EVENT_NAME_UNKNOWN",
     "column": 17,
     "descriptorId": "orders.created-trigger",
     "file": "src/events/order-created-trigger.event.ts",
-    "line": 5,
-    "message": "Event target input is incompatible with \"orders.created@1\".",
+    "line": 3,
+    "message": "Event name \"orders.missing\" is not registered.",
     "severity": "error"
   }
 ]

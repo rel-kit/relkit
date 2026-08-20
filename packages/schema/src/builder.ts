@@ -8,6 +8,7 @@ import {
 } from "./standard-schema.js";
 import { arraySchema, objectSchema, unionSchema } from "./builder-composites.js";
 import { numberSchema, stringSchema } from "./builder-refinements.js";
+import { fileSchema, type FileSchema, type FileSchemaOptions } from "./file.js";
 import type { JsonValue } from "./standard-schema.js";
 
 export type AnySchema = StandardSchemaV1;
@@ -60,14 +61,29 @@ export interface ZBuilder {
   unknown(): Schema<unknown, unknown>;
   any(): Schema<unknown, unknown>;
   null(): Schema<null, null>;
+  file(options?: FileSchemaOptions): FileSchema;
+  undefined(): Schema<undefined, undefined>;
+  void(): Schema<undefined, undefined>;
   literal<T extends string | number | boolean | null | undefined>(value: T): Schema<T, T>;
   object<S extends Shape>(shape: S): Schema<ObjectInput<S>, ObjectOutput<S>>;
   array<S extends AnySchema>(schema: S): Schema<InputOf<S>[], OutputOf<S>[]>;
   union<S extends SchemaTuple>(schemas: S): Schema<InputOf<S[number]>, OutputOf<S[number]>>;
 }
 
-/** Builds the default ZSys Standard Schema validators. */
-const z: ZBuilder = {
+/**
+ * Builds ZSYS Standard Schema validators with familiar composition helpers.
+ *
+ * @example
+ * ```ts
+ * import { z } from "@zsys/schema"
+ *
+ * const order = z.object({ id: z.string(), quantity: z.number().int().positive() })
+ * order.parse({ id: "order-1", quantity: 2 })
+ * ```
+ * @category Schemas
+ * @since 0.1.0
+ */
+export const z: ZBuilder = {
   string: () => stringSchema(),
   number: () => numberSchema(),
   boolean: () =>
@@ -75,13 +91,14 @@ const z: ZBuilder = {
   unknown: () => createSchema((value) => ({ value }), { jsonSchema: () => ({}) }),
   any: () => createSchema((value) => ({ value }), { jsonSchema: () => ({}) }),
   null: () => primitiveSchema("null", (value): value is null => value === null),
+  file: fileSchema,
+  undefined: undefinedSchema,
+  void: undefinedSchema,
   literal: literalSchema,
   object: objectSchema,
   array: arraySchema,
   union: unionSchema,
 };
-
-export { z };
 
 function primitiveSchema<T>(name: string, guard: (value: unknown) => value is T): Schema<T, T> {
   return createSchema(
@@ -98,6 +115,16 @@ function literalSchema<T extends string | number | boolean | null | undefined>(
       Object.is(value, expected)
         ? { value: expected }
         : issue(`Expected ${String(expected)}`, path),
-    expected === undefined ? {} : { jsonSchema: () => ({ const: expected as JsonValue }) },
+    {
+      jsonSchema: () =>
+        expected === undefined ? { "x-zsys-void": true } : { const: expected as JsonValue },
+    },
+  );
+}
+
+function undefinedSchema(): Schema<undefined, undefined> {
+  return createSchema(
+    (value, path) => (value === undefined ? { value } : issue("Expected undefined", path)),
+    { jsonSchema: () => ({ "x-zsys-void": true }) },
   );
 }

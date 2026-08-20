@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
 import {
   invokeFunction as invokeEngineFunction,
   type DependencyClientSources,
@@ -30,7 +30,10 @@ export type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }>
 >;
 
 export type FunctionContextOf<Target> =
-  Target extends Record<"handler", (input: infer _Input, context: infer Context) => unknown>
+  Target extends Record<
+    "handler",
+    (input: infer _Input, request: infer _Request, context: infer Context) => unknown
+  >
     ? Context extends { readonly signal: AbortSignal }
       ? Context
       : InvocationContext
@@ -39,6 +42,7 @@ export type FunctionContextOf<Target> =
 export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
+  readonly request?: FunctionRequest;
   readonly signal?: AbortSignal;
   readonly now?: () => number;
   readonly idSource?: InvocationIdSource;
@@ -46,7 +50,22 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
   readonly hooks?: InvocationHooks<Context>;
 }
 
-/** Invokes a function descriptor through the engine's direct, transport-free path. */
+/**
+ * Invokes a function descriptor through the engine's direct, transport-free path.
+ *
+ * @example
+ * ```ts
+ * import { defineFunction } from "@zsys/functions"
+ * import { z } from "@zsys/schema"
+ * import { invokeFunction } from "@zsys/testing"
+ *
+ * const greet = defineFunction({ id: "greet", input: z.string(), output: z.string(), handler: async (name) => `Hello ${name}` })
+ * const result = await invokeFunction(greet, "Ada")
+ * console.log(result)
+ * ```
+ * @category Testing
+ * @since 0.1.0
+ */
 export function invokeFunction<
   const Target extends StandaloneFunctionTarget,
   Context extends { readonly signal: AbortSignal } = FunctionContextOf<Target>,
@@ -78,6 +97,7 @@ export function invokeFunctionWithRunner<
     source: "direct",
     env,
     ...(options?.clients === undefined ? {} : { clients: options.clients }),
+    ...(options?.request === undefined ? {} : { request: options.request }),
     ...(options?.signal === undefined ? {} : { signal: options.signal }),
     ...(options?.now === undefined ? {} : { now: options.now }),
     ...(options?.idSource === undefined ? {} : { idSource: options.idSource }),

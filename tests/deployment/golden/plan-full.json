@@ -1,6 +1,6 @@
 {
   "contractVersion": 1,
-  "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+  "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
   "application": {
     "id": "full-app",
     "image": {
@@ -15,7 +15,7 @@
         "timeoutMs": 2000
       }
     },
-    "environmentNames": ["PORT"]
+    "environmentNames": ["SERVICE_PORT"]
   },
   "http": {
     "logicalName": "full-app-http-public",
@@ -35,7 +35,7 @@
         "targetFunctionId": "orders.get"
       }
     ],
-    "configurationNames": ["PORT"]
+    "configurationNames": ["SERVICE_PORT"]
   },
   "jobs": [
     {
@@ -46,7 +46,7 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -65,7 +65,10 @@
         "maxDelayMs": 5,
         "multiplier": 2
       },
-      "idempotency": { "key": "orderId", "retentionMs": 1000 }
+      "idempotency": {
+        "key": "orderId",
+        "retentionMs": 1000
+      }
     }
   ],
   "schedules": [
@@ -77,14 +80,16 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
       "jobId": "receipts.send-job",
       "schedule": {
         "cron": "0 * * * *",
         "id": "receipts.reconcile",
-        "input": { "orderId": "scheduled" },
+        "input": {
+          "orderId": "scheduled"
+        },
         "overlap": "skip",
         "timezone": "UTC"
       }
@@ -99,15 +104,21 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
-      "metadata": { "iamCapabilities": ["events:PutEvents"] },
+      "metadata": {
+        "iamCapabilities": ["events:PutEvents"]
+      },
       "version": 1,
       "payload": {
         "properties": {
-          "orderId": { "type": "string" },
-          "sku": { "type": "string" }
+          "orderId": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          }
         },
         "required": ["orderId", "sku"],
         "type": "object"
@@ -123,7 +134,7 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -133,7 +144,7 @@
           "sqs:ChangeMessageVisibility"
         ]
       },
-      "targetFunctionId": "orders.handle-created",
+      "targetFunctionId": "zsys.event.orders.listener.handler",
       "expansion": ["orders.created@1"],
       "delivery": "durable",
       "retry": {
@@ -154,7 +165,7 @@
       "capabilities": ["buckets"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
       "visibility": "private",
@@ -171,10 +182,12 @@
       "capabilities": ["cache"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
-      "metadata": { "iamCapabilities": ["elasticache:Connect"] },
+      "metadata": {
+        "iamCapabilities": ["elasticache:Connect"]
+      },
       "defaultTtlMs": 1000,
       "maxTtlMs": 5000
     }
@@ -188,7 +201,7 @@
       "capabilities": ["models"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f3b185408f823d071381f549ea479eac19105c39572e2a80f7423457c9d948c8",
+        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
         "managed-by": "zsys"
       },
       "provider": "openai",
@@ -246,6 +259,18 @@
       {
         "functionId": "orders.handle-created",
         "capability": "jobs",
+        "resourceId": "receipts.send-job",
+        "actions": ["sqs:SendMessage"]
+      },
+      {
+        "functionId": "receipts.send",
+        "capability": "jobs",
+        "resourceId": "receipts.send-job",
+        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+      },
+      {
+        "functionId": "zsys.event.orders.listener.handler",
+        "capability": "jobs",
         "resourceId": "orders.listener",
         "actions": [
           "sqs:ReceiveMessage",
@@ -255,16 +280,10 @@
         ]
       },
       {
-        "functionId": "orders.handle-created",
+        "functionId": "zsys.event.orders.listener.handler",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
         "actions": ["sqs:SendMessage"]
-      },
-      {
-        "functionId": "receipts.send",
-        "capability": "jobs",
-        "resourceId": "receipts.send-job",
-        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
       }
     ]
   },

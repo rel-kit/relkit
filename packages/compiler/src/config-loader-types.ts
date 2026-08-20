@@ -8,6 +8,7 @@ export const CONFIG_CODES = Object.freeze({
   exclude: "ZSYS_CONFIG_EXCLUDE_INVALID",
   inspector: "ZSYS_CONFIG_INSPECTOR_INVALID",
   port: "ZSYS_CONFIG_PORT_INVALID",
+  legacy: "ZSYS_CONFIG_LEGACY_KEY",
 } as const);
 
 export type ConfigIssueCode = (typeof CONFIG_CODES)[keyof typeof CONFIG_CODES];
@@ -19,10 +20,11 @@ export interface ConfigIssue {
 }
 
 export interface ToolingConfigInput {
-  readonly entry?: string;
-  readonly source?: readonly string[];
-  readonly exclude?: readonly string[];
-  readonly generatedDirectory?: string;
+  readonly server?: {
+    readonly port?: number;
+    readonly maxBodyBytes?: number;
+    readonly apiDocs?: { readonly enabledInProduction?: boolean };
+  };
   readonly inspector?: { readonly port?: number };
 }
 
@@ -32,6 +34,11 @@ export interface LoadedToolingConfig {
   readonly source: readonly string[];
   readonly exclude: readonly string[];
   readonly generatedDirectory: string;
+  readonly server: {
+    readonly port: number;
+    readonly maxBodyBytes: number;
+    readonly apiDocs: { readonly enabledInProduction: boolean };
+  };
   readonly inspector: { readonly port: number };
 }
 
@@ -43,8 +50,19 @@ export type ConfigLoaderOptions = { readonly projectRoot?: string };
 export const DEFAULT_TOOLING_CONFIG = Object.freeze({
   entry: "src/app.ts",
   source: Object.freeze(["src/**/*.ts"]),
-  exclude: Object.freeze(["src/**/*.test.ts", "src/**/*.spec.ts", "src/**/__fixtures__/**"]),
+  exclude: Object.freeze([
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts",
+    "src/**/__tests__/**",
+    "src/**/__fixtures__/**",
+  ]),
   generatedDirectory: ".zsys/generated",
+  server: Object.freeze({
+    port: 3000,
+    maxBodyBytes: 1_048_576,
+    apiDocs: Object.freeze({ enabledInProduction: false }),
+  }),
   inspector: Object.freeze({ port: 3210 }),
 });
 
