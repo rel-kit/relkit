@@ -6,7 +6,13 @@ import {
 } from "effect";
 import type { Effect } from "effect";
 import type { ApplicationGraph } from "@zsys/graph";
-import type { JsonValue, MaybePromise, ProtocolId } from "@zsys/contracts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  type JsonValue,
+  type MaybePromise,
+  type ProtocolId,
+} from "@zsys/contracts";
 
 /** Canonical graph and hash used by one runtime generation. */
 export interface GraphService {
@@ -20,8 +26,8 @@ export class Graph extends Context.Service<Graph, GraphService>()("zsys/runtime/
 export type RuntimeHandler = (...arguments_: readonly unknown[]) => MaybePromise<unknown>;
 
 export interface RuntimeManifest {
-  readonly contractVersion: number;
-  readonly generatorVersion: number;
+  readonly contractVersion: typeof MANIFEST_VERSION;
+  readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: Readonly<Record<string, RuntimeHandler>>;
   readonly providers: Readonly<Record<string, unknown>>;
@@ -37,8 +43,7 @@ export class Manifest extends Context.Service<Manifest, ManifestService>()(
   "zsys/runtime/Manifest",
 ) {}
 
-export type ProviderCapability =
-  "buckets" | "cache" | "jobs" | "events" | "models" | "observability";
+export type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
 
 export interface ProviderHandle {
   readonly capability: ProviderCapability;

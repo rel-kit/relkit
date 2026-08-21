@@ -33,6 +33,8 @@ export function toDescriptor(
       extracted?.exportName ??
       (isRecord(entry) && typeof entry.exportName === "string" ? entry.exportName : "default"),
     exportKind: extracted?.exportKind ?? "default",
+    ...(extracted?.facts === undefined ? {} : { facts: extracted.facts }),
+    ...(extracted?.exportFact === undefined ? {} : { exportFact: extracted.exportFact }),
     ...(extracted?.reference === undefined ? {} : { reference: extracted.reference }),
     value: snapshot,
   };
@@ -91,7 +93,6 @@ function dependencyKind(category: string): string {
   return (
     (
       {
-        functions: "function",
         jobs: "job",
         events: "event",
         buckets: "bucket",
@@ -151,6 +152,7 @@ export function add(
   message: string,
   severity: "info" | "warning" | "error" = "error",
   related?: NormalizedDescriptor,
+  suggestion?: string,
 ): void {
   work.diagnostics.push(
     createDiagnostic({
@@ -162,6 +164,7 @@ export function add(
       ...(related === undefined
         ? {}
         : { related: [{ ...related.source, descriptorId: related.id }] }),
+      ...(suggestion === undefined ? {} : { suggestion }),
     }),
   );
 }

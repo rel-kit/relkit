@@ -53,6 +53,77 @@ describe("route contract inference", () => {
     expect(result.diagnostics).toEqual([]);
   });
 
+  test("maps only matching path fields and leaves unmatched params on the request", () => {
+    const target = defineFunction({
+      id: "orders.read",
+      input: z.object({ orderId: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const result = compile(
+      target,
+      "GET",
+      "src/routes/orders/[orderId]/products/[productId]/route.ts",
+    );
+
+    expect(routeValue(result).request).toEqual({
+      kind: "input",
+      fields: { orderId: { kind: "path", name: "orderId" } },
+    });
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  test("does not infer unmatched catch-all params into reusable input", () => {
+    const target = defineFunction({
+      id: "docs.read",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const result = compile(target, "GET", "src/routes/docs/[...parts]/route.ts");
+
+    expect(routeValue(result).request).toEqual({ kind: "input", fields: {} });
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  test("keeps explicit request mappings as complete overrides", () => {
+    const target = defineFunction({
+      id: "orders.search",
+      input: z.object({ query: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const descriptor = defineRoute({
+      id: "orders.search.route",
+      target,
+      request: { kind: "input", fields: { query: { kind: "query", name: "q" } } },
+    });
+    const result = normalizeCompilation({
+      descriptors: [
+        target,
+        {
+          descriptor,
+          exportName: "GET",
+          exportKind: "named",
+          source: { file: "src/routes/orders/[orderId]/route.ts", line: 1, column: 14 },
+          reference: {
+            generationId: "route-inference-test",
+            descriptorId: descriptor.id,
+            kind: "route",
+            module: "src/routes/orders/[orderId]/route.ts",
+            exportName: "GET",
+          },
+        },
+      ],
+    });
+
+    expect(routeValue(result).request).toEqual({
+      kind: "input",
+      fields: { query: { kind: "query", name: "q" } },
+    });
+    expect(result.diagnostics).toEqual([]);
+  });
+
   test("includes declared errors without explicit HTTP status mappings", () => {
     const invalid = defineError({
       id: "orders.invalid",

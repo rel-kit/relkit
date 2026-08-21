@@ -160,10 +160,7 @@ export function cronLike(value: unknown): boolean {
 
 export function providerProfiles(input: NormalizeInput): ReadonlyMap<string, readonly string[]> {
   const profiles = new Map<string, Set<string>>();
-  profiles.set(
-    "default",
-    new Set(["buckets", "cache", "jobs", "events", "models", "observability"]),
-  );
+  profiles.set("default", new Set(["buckets", "cache", "jobs", "events", "observability"]));
   for (const descriptor of input.descriptors ?? []) {
     if (!isRecord(descriptor) || descriptor.kind !== "app" || !isRecord(descriptor.providers))
       continue;

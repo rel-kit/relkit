@@ -33,6 +33,7 @@ describe("local durable event delivery", () => {
               message: "try again",
               data: null,
               retry: "later",
+              afterMs: 25,
             });
           }
           return event.instanceId;
@@ -46,7 +47,7 @@ describe("local durable event delivery", () => {
       status: "failed",
       attempt: 1,
       duplicate: false,
-      failure: { retry: "later" },
+      failure: { retry: "later", afterMs: 25 },
     });
     expect(delivery.snapshot()).toMatchObject({
       cursor: 4,
@@ -54,7 +55,9 @@ describe("local durable event delivery", () => {
       capabilities: { restartRecovery: true, exactlyOnce: false, orderedByKey: false },
     });
 
-    now = 110;
+    now = 124;
+    await expect(delivery.runNext()).resolves.toBeUndefined();
+    now = 125;
     await expect(delivery.runNext()).resolves.toMatchObject({
       state: "completed",
       attempt: 2,
@@ -62,6 +65,93 @@ describe("local durable event delivery", () => {
       value: "event-1",
     });
     expect(calls).toEqual(["event-1", "event-1"]);
+    await delivery.close();
+  });
+
+  test("stops on an omitted retry declaration even when attempts remain", async () => {
+    const root = await makeRoot();
+    let calls = 0;
+    const delivery = await createEventDelivery(
+      join(root, "non-retryable"),
+      {
+        id: "orders.invalid",
+        retry: {
+          maxAttempts: 3,
+          initialDelayMs: 10,
+          maxDelayMs: 10,
+          multiplier: 1,
+          jitter: "none",
+        },
+        invoke: async () => {
+          calls += 1;
+          throw applicationFailure({
+            id: "orders.invalid",
+            message: "Invalid order",
+            data: null,
+          });
+        },
+      },
+      { now: () => 0 },
+    );
+
+    await expect(delivery.deliver(envelope("event-invalid"))).resolves.toMatchObject({
+      state: "dead-lettered",
+      attempt: 1,
+      failure: { retry: "never" },
+    });
+    await expect(delivery.runNext()).resolves.toBeUndefined();
+    expect(calls).toBe(1);
+    await delivery.close();
+  });
+
+  test("uses the policy clock for legacy retryable failures without a hint", async () => {
+    const root = await makeRoot();
+    let now = 100;
+    let calls = 0;
+    const delivery = await createEventDelivery(
+      join(root, "legacy-retry"),
+      {
+        id: "orders.busy",
+        retry: {
+          maxAttempts: 2,
+          initialDelayMs: 10,
+          maxDelayMs: 10,
+          multiplier: 1,
+          jitter: "none",
+        },
+        invoke: async () => {
+          calls += 1;
+          throw applicationFailure({
+            id: "orders.busy",
+            message: "Try again",
+            data: null,
+            retry: "later",
+          });
+        },
+      },
+      { now: () => now },
+    );
+
+    const delayed = await delivery.deliver(envelope("event-legacy-retry"));
+    expect(delayed).toMatchObject({ state: "delayed", attempt: 1, failure: { retry: "later" } });
+    expect(delayed.failure).toEqual({
+      kind: "application",
+      outcome: "declared-error",
+      code: "orders.busy",
+      message: "Try again",
+      data: null,
+      retry: "later",
+    });
+
+    now = 109;
+    await expect(delivery.runNext()).resolves.toBeUndefined();
+    now = 110;
+    await expect(delivery.runNext()).resolves.toMatchObject({
+      state: "dead-lettered",
+      attempt: 2,
+      failure: { retry: "later" },
+    });
+    expect(calls).toBe(2);
     await delivery.close();
   });
 

@@ -5,7 +5,7 @@ const source = { file: "src/functions.ts", line: 1, column: 1 } as const;
 
 function baseGraph(): ApplicationGraph {
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     appId: "orders",
     nodes: [
       {
@@ -113,9 +113,39 @@ describe("graph compatibility diff", () => {
     );
   });
 
+  test("classifies service membership and policy changes", () => {
+    const service = {
+      kind: "service" as const,
+      id: "orders",
+      source,
+      title: "Orders",
+      members: [{ name: "create", functionId: "orders.create" }],
+      middleware: [{ id: "orders.context" }],
+    };
+    const before: ApplicationGraph = { contractVersion: 2, nodes: [service], edges: [] };
+    const metadata = diffGraph(before, {
+      ...before,
+      nodes: [{ ...service, title: "Order service" }],
+    });
+    expect(metadata.changes[0]).toMatchObject({
+      category: "service",
+      classification: "compatible",
+    });
+    const membership = diffGraph(before, {
+      ...before,
+      nodes: [
+        { ...service, members: [...service.members, { name: "save", functionId: "orders.save" }] },
+      ],
+    });
+    expect(membership.changes[0]).toMatchObject({
+      category: "service",
+      classification: "breaking",
+    });
+  });
+
   test("classifies the remaining capability families", () => {
     const before: ApplicationGraph = {
-      contractVersion: 1,
+      contractVersion: 2,
       nodes: [
         {
           kind: "trigger",
@@ -158,7 +188,7 @@ describe("graph compatibility diff", () => {
           source,
           input: {},
           output: {},
-          modelProfile: "default",
+          model: "default",
           instructions: "help",
           toolIds: [],
           limits: { maxSteps: 1 },
@@ -190,8 +220,8 @@ describe("graph compatibility diff", () => {
         if (node.kind === "bucket") return { ...node, profile: "archive" };
         if (node.kind === "cache") return { ...node, profile: "archive" };
         if (node.kind === "tool") return { ...node, approval: "always" as const };
-        if (node.kind === "agent") return { ...node, modelProfile: "fast" };
-        if (node.kind === "provider") return { ...node, capabilities: ["jobs", "models"] };
+        if (node.kind === "agent") return { ...node, model: "fast" };
+        if (node.kind === "provider") return { ...node, capabilities: ["jobs", "events"] };
         return node;
       }),
     };

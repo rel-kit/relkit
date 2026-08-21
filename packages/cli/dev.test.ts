@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 import {
   configuredInspectorOptions,
@@ -216,7 +216,7 @@ Bun.serve({ port: Number(process.env.PORT), fetch(request) {
   const headers = { "content-type": "application/json", "x-zsys-api-version": "1" };
   if (path === "/hello") { console.log("backend hello"); return new Response("hello"); }
   if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ok", ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: 1, manifestContractVersion: 1, manifestGeneratorVersion: 1, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
   if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;

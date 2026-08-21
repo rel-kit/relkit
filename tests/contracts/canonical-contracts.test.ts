@@ -210,7 +210,7 @@ describe.serial("canonical contracts", () => {
     expect(() => createSourceLocation("src/index.ts", 1, 0)).toThrow(SourceLocationError);
   });
 
-  test("exposes the v1 contract and protocol versions", () => {
+  test("versions graph and manifest shapes independently from v1 protocols", () => {
     expect({
       contract: CONTRACT_VERSION,
       generator: GENERATOR_VERSION,
@@ -218,7 +218,7 @@ describe.serial("canonical contracts", () => {
       manifest: MANIFEST_VERSION,
       api: API_VERSION,
       protocol: PROTOCOL_VERSION,
-    }).toEqual({ contract: 1, generator: 1, graph: 1, manifest: 1, api: 1, protocol: 1 });
+    }).toEqual({ contract: 1, generator: 1, graph: 2, manifest: 2, api: 1, protocol: 1 });
     expect(PROTOCOL_VERSION).toBe(API_VERSION);
     expect(API_BASE_PATH).toBe("/_zsys/v1");
   });

@@ -9,4 +9,5 @@ export * from "@zsys/functions";
 export type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@zsys/events";
 export * from "@zsys/jobs";
 export * from "@zsys/routes";
+export * from "@zsys/services";
 export * from "@zsys/tools";

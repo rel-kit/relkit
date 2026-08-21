@@ -16,7 +16,7 @@ const vendorProfile =
 const vendorModel =
   /^(?:gpt(?:[-./_].*)?|claude(?:[-./_].*)?|gemini(?:[-./_].*)?|llama(?:[-./_].*)?|mistral(?:[-./_].*)?|command(?:[-./_].*)?|o[134](?:[-./_].*)?)$/i;
 const agentProviderProperty =
-  /^(?:api[-_]?key|access[-_]?key|client|credential(?:s)?|endpoint|model(?:id|name)?|provider|sdk|secret(?:key)?|token)$/i;
+  /^(?:api[-_]?key|access[-_]?key|client|credential(?:s)?|endpoint|model(?:id|name)|provider|sdk|secret(?:key)?|token)$/i;
 const forbiddenSymbols =
   /\b(?:Effect|Layer|Context\.Tag|Schema\.Schema|Fiber|Cause|Hono|Next(?:JS|\.js)?|Pulumi|(?:S3|DynamoDB|Redis|CloudWatch|EventBridge|SQS|ECS|RDS)Client|ProviderClient|CloudClient)\b/g;
 const valueReads =
@@ -44,7 +44,11 @@ function scanCall(
     for (const member of options.properties) {
       if (!ts.isPropertyAssignment(member)) continue;
       const key = propertyName(member.name);
-      if (key === "handler" && shortName !== "defineFunction")
+      if (
+        key === "handler" &&
+        shortName !== "defineFunction" &&
+        shortName !== "defineServiceMiddleware"
+      )
         add(
           root,
           fragment,
@@ -66,7 +70,7 @@ function scanCall(
           member.initializer.getStart(source),
         );
       if (
-        (key === "profile" || key === "modelProfile") &&
+        (key === "profile" || key === "model") &&
         [vendorProfile, vendorModel].some((pattern) =>
           pattern.test(stringValue(member.initializer) ?? ""),
         )

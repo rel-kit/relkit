@@ -205,7 +205,7 @@ async function runAgent(collector: ObservabilityCollector): Promise<void> {
       OPENAI_API_KEY: z.string(),
     }),
     output: z.object({ answer: z.string() }),
-    modelProfile: "default",
+    model: "default",
     instructions: "Return a safe answer.",
     tools: [],
     limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
@@ -338,7 +338,7 @@ function createHttpRuntime(
       agents: [],
     } satisfies RegistrationPlan,
     manifest: {
-      contractVersion: 1,
+      contractVersion: 2,
       generatorVersion: 1,
       graphHash: "sha256:security",
       functions: {},

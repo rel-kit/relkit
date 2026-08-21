@@ -75,6 +75,8 @@ test("projects invocation and trace annotations", async () => {
     withRootSpan(Effect.logInfo("started").pipe(Effect.annotateLogs({ requestId: "request-1" })), {
       name: "test",
       invocationId: "invocation-1",
+      functionId: "orders.get",
+      serviceId: "orders",
       correlationId: "correlation-1",
       source: "direct",
     }).pipe(
@@ -92,6 +94,8 @@ test("projects invocation and trace annotations", async () => {
     traceId: "trace-1",
     correlationId: "correlation-1",
     source: "direct",
+    functionId: "orders.get",
+    serviceId: "orders",
   });
 });
 

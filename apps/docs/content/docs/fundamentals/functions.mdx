@@ -3,18 +3,47 @@ title: Functions
 description: Define the validated executable unit shared by every transport and background trigger.
 ---
 
-Every route, job, listener, middleware target, and tool ultimately invokes a function through the
-common engine.
+Every route, job, event listener, route middleware target, service member, tool, and agent ultimately
+invokes a function through the common engine.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/functions/create-order.function.ts"'>
-  ../../examples/commerce/src/functions/create-order.function.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/functions/orders/create-order.function.ts"'
+>
+  ../../examples/commerce/src/functions/orders/create-order.function.ts
 </include>
 
 `input` and `output` remain required because TypeScript types disappear at runtime. Their Standard
 Schemas perform validation and provide graph metadata, OpenAPI shapes, generated client types, and
-inspector forms. A target handler receives validated input followed by a context containing only its
-declared dependencies.
+inspector forms. A target handler receives validated reusable input, an optional immutable HTTP
+request, and a context containing only its declared managed dependencies.
 
-Use stable IDs, explicit dependencies, bounded `timeoutMs`, and `concurrency` where contention needs a
-limit. Undeclared clients are rejected at runtime. Child function calls preserve trace, correlation,
-causation, deadline, and cancellation context.
+IDs are optional for source-scoped functions, routes, services, tools, agents, errors, middleware, and
+transforms. The compiler derives filesystem-safe IDs from source and export/member structure. Keep
+explicit IDs when a refactor must preserve identity; application, event, job, bucket, and cache IDs
+remain explicit because they address durable or external state.
+
+Use `await target.invoke(input)` for nested function calls. It enters the active generation when one is
+running and otherwise uses an isolated common kernel, preserving validation, service policy, limits,
+trace, correlation, causation, deadline, cancellation, and observed child-call telemetry. Function
+calls do not need a declared function dependency map; managed resources still do.
+
+For HTTP, transport data stays on `request`: `request.params`, `request.query`, and normalized
+`request.headers` are immutable, and unmatched path values remain there instead of becoming artificial
+business input. Direct, job, event, tool, and agent calls pass no fabricated request.
+
+Services group member functions and shared policy without owning another handler:
+
+```ts
+const Orders = defineService({
+  functions: { getOrder, createOrder },
+  middleware: [ordersContext],
+});
+
+export const GET = defineRoute({ target: Orders.getOrder });
+```
+
+Use `getOrder.asTool({ description, sideEffect, approval })` for a function-derived tool. The tool
+inherits the function schemas and errors, and `tool.invoke(input)` applies the same validation and
+approval boundary.

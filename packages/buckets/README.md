@@ -16,5 +16,5 @@ export default defineBucket({
 ```
 
 The package also exports the Promise-based `BucketClient` contract used by
-declared function dependencies. The engine supplies the provider and active
+declared resource dependencies. The engine supplies the provider and active
 invocation bridge; application code receives only declared clients.

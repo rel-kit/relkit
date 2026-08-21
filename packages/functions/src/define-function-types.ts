@@ -1,5 +1,6 @@
 import type { InferOutput, StandardSchemaV1 } from "@zsys/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
+import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionHandlerValidation } from "./handler-result.js";
 import type {
   DefineFunctionOptions,
@@ -45,6 +46,12 @@ type ErrorListOf<Options> = Options extends {
   ? Errors
   : readonly [];
 
+type ToolMetadataOf<Options> = Options extends { readonly tool: infer Tool }
+  ? Tool extends FunctionToolMetadata
+    ? Tool
+    : undefined
+  : undefined;
+
 export interface DefineFunction {
   <
     const Id extends string,
@@ -64,7 +71,8 @@ export interface DefineFunction {
     {},
     ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 
   <
@@ -84,6 +92,7 @@ export interface DefineFunction {
     Dependencies,
     ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 }

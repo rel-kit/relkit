@@ -2,15 +2,15 @@ import {
   createDescriptorBase,
   deepFreeze,
   isDescriptor,
-  isStableId,
-  normalizeId,
   type DescriptorBase,
   type DescriptorMetadata,
 } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import type { AgentRef } from "@zsys/functions";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
 import { isToolRef, type ToolRefAny } from "@zsys/tools";
 import { copyAgentInstructions, copyAgentTools } from "./define-agent-support.js";
+import { normalizeModelSelector } from "./model-selection.js";
 
 export interface PromptTemplate {
   readonly template: string;
@@ -31,7 +31,7 @@ export interface AgentDescriptor<
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
 >
   extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
-  readonly modelProfile: string;
+  readonly model?: string;
   readonly instructions: string | PromptTemplate;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
@@ -44,24 +44,28 @@ export interface DefineAgentOptions<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly input: InputSchema;
   readonly output: OutputSchema;
-  readonly modelProfile: string;
+  readonly model?: string;
   readonly instructions: string | PromptTemplate;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
 }
 
 /**
- * Defines an agent contract with bounded tools, model selection, and execution limits.
+ * Defines an agent contract with bounded tools, an optional serializable AI SDK
+ * model selector, and execution limits. Omitted `model` uses the active provider
+ * defaults; a provider name selects that provider's default model and
+ * `provider:model` selects an exact registry model. Credentials and live model
+ * objects belong in environment provider configuration, never in this descriptor.
  *
  * @example
  * ```ts
  * import { defineAgent } from "@zsys/agents"
  * import { z } from "@zsys/schema"
  *
- * const support = defineAgent({ id: "support", input: z.string(), output: z.string(), modelProfile: "default", instructions: "Answer safely.", tools: [], limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 } })
+ * const support = defineAgent({ id: "support", input: z.string(), output: z.string(), instructions: "Answer safely.", tools: [], limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 } })
  * void support
  * ```
  * @category Agents
@@ -84,17 +88,18 @@ export function defineAgent<
   if (hasOwn(options, "handler")) throw new TypeError("Agents cannot own handlers");
   assertSchema(options.input, "input");
   assertSchema(options.output, "output");
-  const modelProfile = normalizeId(options.modelProfile);
+  const model = normalizeModelSelector(options.model);
   const instructions = copyAgentInstructions(options.instructions);
   const tools = copyAgentTools(options.tools);
   const limits = copyLimits(options.limits);
-  const base = createDescriptorBase("agent", options.id, options);
+  const id = (options.id === undefined ? createUnboundIdentity() : options.id) as Id;
+  const base = createDescriptorBase("agent", id, options);
 
   return deepFreeze({
     ...base,
     input: options.input,
     output: options.output,
-    modelProfile,
+    ...(model === undefined ? {} : { model }),
     instructions,
     tools,
     limits,
@@ -115,7 +120,7 @@ export function isAgentDescriptor(value: unknown): value is AgentAny {
   return (
     isSchema(descriptor.input) &&
     isSchema(descriptor.output) &&
-    isStableId(descriptor.modelProfile) &&
+    isModelSelector(descriptor.model) &&
     isInstructions(descriptor.instructions) &&
     Array.isArray(descriptor.tools) &&
     descriptor.tools.every(isToolRef) &&
@@ -124,6 +129,14 @@ export function isAgentDescriptor(value: unknown): value is AgentAny {
     isPositiveInteger(descriptor.limits.maxToolCalls) &&
     isPositiveInteger(descriptor.limits.timeoutMs)
   );
+}
+
+function isModelSelector(value: unknown): value is string | undefined {
+  try {
+    return normalizeModelSelector(value) === value;
+  } catch {
+    return false;
+  }
 }
 
 export function assertAgentDescriptor(value: unknown): asserts value is AgentAny {

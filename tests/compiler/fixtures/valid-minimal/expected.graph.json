@@ -1,6 +1,6 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 1,
+  "contractVersion": 2,
   "edges": [
     {
       "from": "hello.route",
@@ -78,7 +78,7 @@
       "timeoutMs": null
     },
     {
-      "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
+      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
       "configuration": {
         "development": [],
         "production": ["region"],

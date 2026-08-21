@@ -1,11 +1,23 @@
 import { createDescriptorBase, deepFreeze, isRef, type DescriptorKind } from "@zsys/contracts";
+import {
+  createUnboundIdentity,
+  dispatchInvocation,
+  getDescriptorIdentity,
+  type InvocationTarget,
+} from "@zsys/invocation";
 import { type StandardSchemaV1 } from "@zsys/schema";
 import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
 import type { DefineFunction } from "./define-function-types.js";
+import {
+  copyFunctionToolMetadata,
+  createFunctionTool,
+  type FunctionToolOptions,
+} from "./function-tool.js";
 import type {
   DefineFunctionOptions,
   FunctionDependencies,
   FunctionDescriptor,
+  FunctionRefAny,
 } from "./types.js";
 
 type FunctionImplementationOptions = Omit<
@@ -45,8 +57,6 @@ export type {
   EventPublishResult,
   EventRef,
   EventRefAny,
-  FunctionClientFor,
-  FunctionClients,
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
@@ -69,7 +79,13 @@ export type {
 } from "./types.js";
 
 /**
- * Defines a graph-visible executable with runtime schemas and declared dependencies.
+ * Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
+ *
+ * The `id` is optional for source-scoped functions; the compiler derives it from the
+ * source/export hierarchy. Durable resources keep explicit IDs. The handler receives
+ * validated reusable input, an immutable HTTP request when the call has HTTP transport,
+ * and a request-scoped context. Use `descriptor.invoke(input)` for nested calls so the
+ * common engine preserves validation, service policy, limits, and telemetry.
  *
  * @example
  * ```ts
@@ -77,7 +93,6 @@ export type {
  * import { z } from "@zsys/schema"
  *
  * const greet = defineFunction({
- *   id: "greet",
  *   input: z.object({ name: z.string() }),
  *   output: z.object({ message: z.string() }),
  *   handler: async ({ name }, request, context) => {
@@ -85,6 +100,8 @@ export type {
  *     return { message: `Hello, ${name}!` }
  *   }
  * })
+ * const result = await greet.invoke({ name: "Ada" })
+ * void result
  * void greet
  * ```
  * @category Functions
@@ -106,9 +123,11 @@ export const defineFunction: DefineFunction = (
   }
   validateLimit(options.timeoutMs, "timeoutMs");
   validateLimit(options.concurrency, "concurrency");
-  const base = createDescriptorBase("function", options.id, options);
+  const id = options.id === undefined ? createUnboundIdentity() : options.id;
+  const base = createDescriptorBase("function", id, options);
   const dependencies = copyDependencies(options.dependencies);
   const errors = copyErrors(options.errors);
+  const tool = options.tool === undefined ? undefined : copyFunctionToolMetadata(options.tool);
   const descriptor = {
     ...base,
     input: options.input,
@@ -117,9 +136,43 @@ export const defineFunction: DefineFunction = (
     ...(dependencies === undefined ? {} : { dependencies }),
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
+    ...(tool === undefined ? {} : { tool }),
     handler: options.handler,
   };
-  return deepFreeze(descriptor) as FunctionDescriptor<
+  Object.defineProperty(descriptor, "invoke", {
+    value: function (this: unknown, input: unknown) {
+      return dispatchInvocation({
+        target: functionTargetForReceiver(
+          this,
+          descriptor as unknown as FunctionRefAny,
+        ) as unknown as InvocationTarget,
+        input,
+      });
+    },
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  Object.defineProperty(descriptor, "asTool", {
+    value: function (this: unknown, toolOptions?: FunctionToolOptions<string>) {
+      const metadata = toolOptions === undefined ? tool : copyFunctionToolMetadata(toolOptions);
+      if (metadata === undefined) {
+        throw new TypeError(
+          `Function "${descriptor.id}" must declare complete tool metadata before calling asTool()`,
+        );
+      }
+      const target = functionTargetForReceiver(this, descriptor as unknown as FunctionRefAny);
+      return createFunctionTool({
+        ...metadata,
+        id: toolOptions?.id ?? `${getDescriptorIdentity(target)}.tool`,
+        target,
+      });
+    },
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  return deepFreeze(descriptor) as unknown as FunctionDescriptor<
     string,
     unknown,
     unknown,
@@ -139,9 +192,11 @@ function copyDependencies<D extends FunctionDependencies>(
   dependencies: D | undefined,
 ): D | undefined {
   if (dependencies === undefined) return undefined;
+  if (Object.hasOwn(dependencies, "functions")) {
+    throw new TypeError("Function dependencies are not supported; use descriptor.invoke");
+  }
   const result: Record<string, unknown> = {};
   const kinds: Readonly<Record<string, DescriptorKind>> = {
-    functions: "function",
     jobs: "job",
     events: "event",
     buckets: "bucket",
@@ -180,4 +235,15 @@ function assertSchema(value: unknown, name: string): asserts value is StandardSc
 
 function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function functionTargetForReceiver(receiver: unknown, fallback: FunctionRefAny): FunctionRefAny {
+  if (
+    isRecord(receiver) &&
+    isRef(receiver.ref, "function") &&
+    typeof receiver.handler === "function"
+  ) {
+    return receiver as unknown as FunctionRefAny;
+  }
+  return fallback;
 }

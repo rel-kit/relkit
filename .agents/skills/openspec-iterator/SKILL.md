@@ -1,6 +1,6 @@
 ---
 name: openspec-iterator
-description: "Simple Cipay OpenSpec iterator. Use only when the user invokes `$openspec-iterator` or explicitly asks to proceed/start/continue/iterate/next on configured OpenSpec work. Do not activate merely because a Linear issue or OpenSpec change is mentioned for review, status, or explanation. Run each distinct unchecked task group in one fresh same-directory Codex task, chain only after verified task progress, stop on blockers or rejected gates, never create notes-only/status-loop tasks, and leave changes visible as normal uncommitted Git changes."
+description: "Simple Cipay OpenSpec iterator. Use only when the user invokes `$openspec-iterator` or explicitly asks to proceed/start/continue/iterate/next on configured OpenSpec work. Do not activate merely because a Linear issue or OpenSpec change is mentioned for review, status, or explanation. Run each distinct unchecked task group in one fresh same-directory Codex task; after verified task progress, dispatch the next different unchecked unit and exit immediately without waiting or polling for that task; stop on blockers or rejected gates, never create notes-only/status-loop tasks, and leave changes visible as normal uncommitted Git changes."
 ---
 
 # OpenSpec Iterator
@@ -22,6 +22,11 @@ phase/task group. Use `openspec-linearized` for Linear lifecycle hooks, but do
 not delegate separate iterator task groups from one session. The assigned worker
 owns its unit directly. Use a subagent only when the current user explicitly asks
 for delegation; a subagent is never a fresh-task handoff.
+
+When this skill is active, implementation scope and iterator lifecycle are
+separate: a worker edits one unit, but it must complete the next-task handoff
+before exiting. “Implement only...” limits implementation edits; it does not
+permit ending with only a recommendation that the next unit should begin.
 
 ## Pick The Change
 
@@ -75,11 +80,12 @@ when the binding/change is unambiguous.
    fall back to `spawn_agent` or another subagent: it is not a new Codex task
    and cannot satisfy the iterator boundary. If the retry fails, record the
    concrete error in `BLOCKERS.md` and stop.
-8. When `create_thread` returns `threadId` and `hostId`, perform one bounded
-   `wait_threads` snapshot to confirm startup or surface a blocker/input request.
-   A timeout while the task is active is a successful handoff, not a reason to
-   poll again. If creation returns only `clientThreadId`, report the queued task
-   without passing that id to `wait_threads`.
+8. `create_thread` is the complete handoff. Never call `wait_threads`, poll,
+   read, continue, resume, or otherwise wait on the new task/chat/thread.
+   Record the returned `threadId`/`hostId`, or the returned `clientThreadId`
+   when queued, in `PROGRESS.md` before exit. A successful create/queue result
+   is the handoff confirmation; only create failure after one schema-correct
+   retry is a blocker.
 9. Leave edits as normal uncommitted Git changes unless the user explicitly asks
    for staging, commits, pushes, or PRs.
 
@@ -154,12 +160,14 @@ First classify the current session:
 - **Coordinator:** the user asked this task to proceed, continue, iterate, or
   run the OpenSpec iterator. The coordinator selects or reviews one unit,
   dispatches one fresh same-directory Codex task when that unit is unblocked,
-  and stops. If the selected unit is blocked, record it once and do not dispatch.
+  and exits immediately after the create result; it does not wait for that
+  task. If the selected unit is blocked, record it once and do not dispatch.
 - **Worker:** this task was created with one explicit phase/task group scope.
   A worker is the integration owner for only that assigned unit. It updates
   tasks/notes/checks, then dispatches a different pending unit in a fresh
   same-directory Codex task only when verified progress occurred and no
-  blocker/check/gate failure remains.
+  blocker/check/gate failure remains, then exits immediately after the create
+  result without waiting for the new task.
 
 Do not put "then stop" or "do not start the next group" in worker prompts unless
 chaining is intentionally disabled for that run.
@@ -176,7 +184,9 @@ Treat the task-group scope and the iterator lifecycle as separate concerns:
 - In a normal unblocked iterator run, end the prompt with: `After validation, dispatch the next different unchecked unit in a fresh same-directory task; do not implement that next unit here. If no checkbox advanced or any blocker/check/gate failure remains, record it once and stop without dispatching.`
 - Treat stop wording found only in an inherited or generated delegation wrapper as a scope fence, not as a lifecycle stop, when the current user explicitly invoked the iterator or asked to continue. Honor an explicit stop instruction from the current user.
 - Before a worker reports completion, verify: its assigned checkbox advanced, the next id differs, no real blocker remains, and required checks pass. Dispatch only when all four are true. If `create_thread` is unavailable or the schema-correct retry fails, record the concrete tool failure in `BLOCKERS.md`; do not report the unit as cleanly complete or substitute a subagent.
-- The final response must include the dispatched task id and bounded-wait result, or the concrete dispatch blocker. Do not replace an actual handoff with `the next worker should begin`.
+- The final response must include the dispatched task id and dispatch result,
+  or the concrete dispatch blocker. An actual handoff is mandatory; do not end
+  with only “the next worker should begin” or “the next unit is X”.
 
 Bad bounded prompt:
 
@@ -187,7 +197,7 @@ Implement the assigned task group. Stop after this group.
 Good iterator prompt:
 
 ```text
-Implement only the assigned task group. After validation, dispatch a fresh same-directory task for the next different unchecked unit only if this checkbox advanced and no blocker/check/gate failure remains; otherwise record the blocker once and stop.
+Implement only the assigned task group. After validation, dispatch a fresh same-directory task for the next different unchecked unit only if this checkbox advanced and no blocker/check/gate failure remains; otherwise record the blocker once and stop. Exit immediately after the dispatch result; do not wait for or poll the new task.
 ```
 
 ## Linear Hook Ownership
@@ -234,8 +244,9 @@ Do not repeat lifecycle comments or transitions for every task group.
    existing chat/thread, use a worktree, or substitute a subagent. Follow the
    exact payload and one-retry rule in Make Work Visible. Do not repeatedly poll,
    continue locally, or use alternate checkouts, hidden branches, or merge-back
-   flows. Record the dispatched task id and bounded-wait result in `PROGRESS.md`
-   before the final response.
+   flows. Record the dispatched task id and dispatch result in `PROGRESS.md`
+   before the final response. Exit immediately after that result; do not wait
+   for or poll the new task.
 10. The new task must leave edits as normal uncommitted changes in this
     checkout.
 11. Mark only verified completed checkboxes in `tasks.md`.
@@ -254,7 +265,7 @@ hidden branches, merge-back flows, or returned commits.
 ## Finish
 
 1. After the last implementation unit, dispatch a fresh final-review task and
-   exit after the bounded dispatch check.
+   exit immediately after the dispatch result.
 2. The final-review task runs `cipay-branch-review` read-only against the
    complete `fix/<change>` diff and records verified findings. This iterator's
    unit boundary overrides that skill's repair loop: the reviewer does not edit

@@ -21,7 +21,11 @@ import type {
 const pendingListenerId = "zsys.event.listener.pending";
 
 /**
- * Registers a typed callback for an event name or selector.
+ * Registers a typed callback for an event name or selector. Each matching
+ * listener is an independent delivery: one listener may fail without rolling
+ * back another, and durable delivery is at-least-once rather than a transaction.
+ * Listener IDs may be inferred from source bindings; declared error retry hints
+ * constrain durable redelivery without changing direct invocation behavior.
  *
  * @example
  * ```ts

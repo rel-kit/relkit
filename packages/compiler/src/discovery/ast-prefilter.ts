@@ -1,6 +1,7 @@
 import { normalizeSourcePath } from "@zsys/contracts";
 import { DEFAULT_TOOLING_CONFIG } from "../config-loader-types.js";
 import { matchesExclude, scanSource } from "./ast-prefilter-utils.js";
+import type { SourceFacts } from "./source-facts.js";
 
 export type AstCandidateIndicator =
   "zsys-import" | "factory" | "default-export" | "brand-access" | "re-export";
@@ -23,6 +24,7 @@ export interface AstPrefilterCandidate {
   readonly defaultExports: readonly string[];
   readonly brandAccess: boolean;
   readonly reExports: readonly AstReExport[];
+  readonly facts: SourceFacts;
   readonly indicators: readonly AstCandidateIndicator[];
 }
 

@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { invokeFunction, type InvocationTarget } from "@zsys/engine";
 import { z } from "@zsys/schema";
 import { createApp, type RuntimeManifest } from "./src/index.js";
@@ -170,8 +171,8 @@ function plan(): RegistrationPlan {
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:middleware",
     functions: {},
     middleware: {},

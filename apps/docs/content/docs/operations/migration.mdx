@@ -4,7 +4,8 @@ description: Move pre-1.0 route, event, configuration, and generated artifacts t
 ---
 
 This release is intentionally breaking and has no compatibility layer or codemod. Migrate one compiler
-diagnostic at a time and keep explicit descriptor IDs stable.
+diagnostic at a time. Source-scoped IDs can now be inferred, but keep explicit IDs whenever a refactor
+must preserve identity.
 
 ## Routes
 
@@ -23,11 +24,110 @@ Use `[id]`, `[...parts]`, or `[[...parts]]` directories for dynamic forms. Remov
 response maps when inference matches the intended transport; retain explicit complete mappings for
 headers, cookies, renames, transforms, multipart, redirects, or alternate media types.
 
+## Source-scoped IDs
+
+Remove routine IDs from functions, routes, services, tools, agents, declared errors, route/service
+middleware, and transforms when their source binding or export is statically identifiable. The compiler
+derives a filesystem-safe hierarchy from the source and export/member name. For example, a named
+`getOrder` function under `src/functions/orders/` derives an ID equivalent to `orders.get-order`, and
+`GET` in `src/routes/orders/[orderId]/route.ts` derives an ID equivalent to
+`route.get.orders.by-order-id`.
+
+Application, event, job, bucket, and cache IDs remain required because they address durable or external
+state. Inferred IDs change when their identity-bearing source moves; add an explicit ID before a move
+when compatibility must preserve the logical identity. Explicit IDs always override inference, and
+collisions or ambiguous bindings fail compilation with both source locations.
+
+## Function calls and request boundaries
+
+Replace declared function clients and `context.functions` calls:
+
+```ts
+// before
+await context.functions.getOrder({ orderId });
+
+// after
+await getOrder.invoke({ orderId });
+```
+
+Remove `dependencies.functions`; keep declarations for jobs, events, buckets, cache, and agents. The
+descriptor method enters the active generation when called from ZSYS and an isolated common kernel when
+called directly, so validation, service middleware, limits, cancellation, and telemetry remain intact.
+
+Handlers now receive reusable validated input separately from an optional immutable HTTP request:
+`request.params`, `request.query`, and repeated `request.headers` values are transport data. A path
+name matching an input property maps into business input; an unmatched path value remains on
+`request.params`. Direct, job, event, tool, and agent calls do not receive a fabricated request.
+
+## Services and tools
+
+Group existing function descriptors instead of adding a service handler:
+
+```ts
+export const Orders = defineService({
+  functions: { getOrder, createOrder },
+  middleware: [ordersContext],
+});
+
+export const GET = defineRoute({ target: Orders.getOrder });
+```
+
+Service middleware runs for every member source and can add an immutable, invocation-scoped
+`context.service` patch. Use the member facade for routes and nested calls. Replace a duplicate tool
+wrapper with a function-derived view:
+
+```ts
+const lookupOrder = getOrder.asTool({
+  description: "Read one order by ID",
+  sideEffect: "read",
+  approval: "never",
+});
+await lookupOrder.invoke({ orderId });
+```
+
+The function remains the only business-handler owner. `asTool` inherits its schemas and errors, while
+tool approval and side-effect policy are enforced before target invocation.
+
+## Declared-error retry hints
+
+`defineError` no longer requires an ID or retry declaration for source-scoped errors. Omitted `retry`
+means non-retryable. Keep `retry: "later"` for a retryable error, or use
+`retry: { kind: "later", afterMs: 2_000 }` to provide a minimum delay. Jobs and durable event listeners
+wait for the larger of the provider policy delay and `afterMs`; HTTP and direct calls invoke once and
+return the normalized failure.
+
+## AI SDK model configuration
+
+Replace `modelProfile` and custom `ModelProvider` implementations with an optional agent `model` and
+value-free environment provider configuration:
+
+```ts
+model: "openai:gpt-5-mini";
+
+production: awsProviders({
+  region: env.AWS_REGION,
+  modelProviders: {
+    defaultProvider: "openai",
+    defaultModel: "gpt-5-mini",
+    openai: { apiKey: env.OPENAI_API_KEY },
+    anthropic: { defaultModel: "claude-sonnet-4-5", apiKey: env.ANTHROPIC_API_KEY },
+  },
+});
+```
+
+An omitted agent model uses both global defaults; a bare provider name uses that provider's default;
+`provider:model` selects an exact AI SDK v7 registry model. Keep credentials as environment references
+and live model objects out of descriptors. Use the repository's `ai/test`-backed test harness for
+offline development/test coverage.
+
 ## Events
 
 Replace target-based listener descriptors with `onEvent(name, async (payload, ctx) => {}, options)`.
 Move dependencies and runtime limits into listener options. Run `zsys check` to regenerate the typed
 event registry, then fix unknown or stale event names reported by TypeScript and the compiler.
+
+Each matching listener is an independent delivery. Durable event fan-out is at-least-once and is not a
+transaction or simultaneous-execution guarantee; a failed listener cannot roll back a successful sibling.
 
 ## Configuration
 

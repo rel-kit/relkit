@@ -4,5 +4,4 @@ export * from "./config.js";
 export * from "./events.js";
 export * from "./factory.js";
 export * from "./jobs.js";
-export * from "./models.js";
 export * from "./observability.js";

@@ -14,12 +14,20 @@ names autocomplete and payload inference.
 The handler receives validated payload first and context second. `ctx.event` includes version, instance
 ID, key, attributes, occurrence time, trace, correlation, and causation metadata. Listeners may be
 exported from any scanned source file; the compiler lowers each callback to an internal function node
-plus an event-trigger node so it uses the common engine.
+plus an event-trigger node so it uses the common engine. Listener IDs may be inferred from the source
+binding. Function-to-function calls use `target.invoke(input)`; only managed resources remain declared
+dependencies.
 
 Delivery defaults to durable with one attempt. Use `delivery: "ephemeral"` explicitly. Options include
-`id`, `retry`, `profile`, `concurrency`, `timeoutMs`, and function dependencies. When `id` is absent, ZSYS
-derives it from the event plus named export and rejects duplicates; production listeners should pin IDs
-when rename stability matters.
+Listener options include `id`, `retry`, `profile`, `concurrency`, `timeoutMs`, and managed-resource
+dependencies. When `id` is absent, ZSYS derives it from the source binding and rejects duplicates;
+production listeners should pin IDs when rename stability matters. A declared error with omitted or
+`retry: "never"` stops a delivery. `retry: "later"` or `{ kind: "later", afterMs }` permits another
+policy-bounded attempt, with `afterMs` acting as a minimum delay.
+
+One published event creates an independent delivery for each matching listener. Durable delivery is
+at-least-once, not a transaction or promise of simultaneous execution: one listener can fail or enter
+its own retry/dead-letter path while another listener succeeds.
 
 Use `events.anyOf(...)` for a discriminated union and `events.match("orders.*")` for a registry-expanded
 pattern. `events.all(...)` requires explicit unknown-payload and telemetry/audit purpose. Unknown or stale

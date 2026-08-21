@@ -16,7 +16,11 @@ const app = defineApp({
       cache: { default: { endpoint: env.CACHE_ENDPOINT } },
       jobs: { default: { queueUrl: env.JOB_QUEUE_URL } },
       events: { default: { busName: env.EVENT_BUS_NAME } },
-      models: { default: { provider: "openai", apiKey: env.OPENAI_API_KEY } },
+      modelProviders: {
+        defaultProvider: "openai",
+        defaultModel: "gpt-5-mini",
+        openai: { apiKey: env.OPENAI_API_KEY },
+      },
     }),
   },
   observability: { bodyCapture: { mode: "off" } },

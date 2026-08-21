@@ -1,0 +1,29 @@
+import { defineFunction } from "@zsys/app";
+import { z } from "@zsys/schema";
+import orderCreated from "../../events/order-created.event.js";
+import priceOrder from "./price-order.function.js";
+
+const orderInput = z.object({
+  orderId: z.string().min(1),
+  sku: z.string().min(1),
+  quantity: z.number().int().positive(),
+});
+const orderOutput = z.object({
+  orderId: z.string(),
+  sku: z.string(),
+  totalCents: z.number().int().nonnegative(),
+});
+
+const createOrder = defineFunction({
+  input: orderInput,
+  output: orderOutput,
+  dependencies: { events: { orderCreated } },
+  handler: async (input, _request, context) => {
+    const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
+    const order = { orderId: input.orderId, sku: input.sku, totalCents };
+    await context.events.orderCreated.publish(order);
+    return order;
+  },
+});
+
+export default createOrder;

@@ -1,4 +1,5 @@
 import { z } from "@zsys/schema";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { createApp } from "./src/index.js";
 import { mapRequest, type MappingRequest } from "./src/request-mapping.js";
 import type { RegistrationPlan } from "@zsys/graph";
@@ -69,10 +70,10 @@ test("leaves the source request readable after body mapping", async () => {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ orderId: "order-1" }),
   });
-  const result = await mapRequest(
-    request(source),
-    { kind: "input", fields: { orderId: { kind: "body", name: "orderId" } } },
-  );
+  const result = await mapRequest(request(source), {
+    kind: "input",
+    fields: { orderId: { kind: "body", name: "orderId" } },
+  });
 
   expect(result).toEqual({ ok: true, value: { orderId: "order-1" } });
   expect(source.bodyUsed).toBe(false);
@@ -174,8 +175,8 @@ test("maps multipart fields and stops before engine invocation on failure", asyn
   const app = createApp({
     plan,
     manifest: {
-      contractVersion: 1,
-      generatorVersion: 1,
+      contractVersion: MANIFEST_VERSION,
+      generatorVersion: GENERATOR_VERSION,
       graphHash: plan.graphHash,
       functions: {},
       middleware: {},
@@ -217,8 +218,8 @@ test("applies a route body limit before invoking its target", async () => {
   const app = createApp({
     plan,
     manifest: {
-      contractVersion: 1,
-      generatorVersion: 1,
+      contractVersion: MANIFEST_VERSION,
+      generatorVersion: GENERATOR_VERSION,
       graphHash: plan.graphHash,
       functions: {},
       middleware: {},

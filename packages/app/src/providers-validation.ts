@@ -6,6 +6,7 @@ import type {
   ProviderSetMetadata,
   ProviderValue,
 } from "./providers.js";
+import { assertModelProviders } from "./model-providers.js";
 import {
   isCapabilityList,
   isPlainRecord,
@@ -24,7 +25,6 @@ export const PROVIDER_CAPABILITIES: readonly ProviderCapability[] = Object.freez
   "cache",
   "jobs",
   "events",
-  "models",
   "observability",
 ]);
 
@@ -35,11 +35,14 @@ const localKeys = new Set([
   "cache",
   "jobs",
   "events",
-  "models",
+  "modelProviders",
 ]);
 
 export function normalizeProviderOptions(recipe: ProviderRecipe, value: unknown): ProviderConfig {
   if (!isPlainRecord(value)) throw new TypeError("Provider options must be a plain object");
+  if (Object.prototype.hasOwnProperty.call(value, "modelProviders")) {
+    assertModelProviders(value.modelProviders);
+  }
   const allowed = allowedKeys(recipe);
   const result: Record<string, ProviderValue> = {};
   if (Object.getOwnPropertySymbols(value).length > 0) {
@@ -139,7 +142,7 @@ function hasExactKeys(value: object, expected: readonly string[]): boolean {
 function allowedKeys(recipe: ProviderRecipe): Set<string> {
   if (recipe === "local") return localKeys;
   if (recipe === "test") return new Set([...localKeys, "deterministicIds", "deterministicClock"]);
-  return new Set(["region", "buckets", "cache", "jobs", "events", "models"]);
+  return new Set(["region", "buckets", "cache", "jobs", "events", "modelProviders"]);
 }
 
 function validateRecipeOptions(recipe: ProviderRecipe, value: ProviderConfig): void {

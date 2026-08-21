@@ -34,6 +34,8 @@ describe("runtime tracing", () => {
             {
               name: "root",
               invocationId: "root-invocation",
+              functionId: "orders.get",
+              serviceId: "orders",
               correlationId: "request-1",
               source: "http",
             },
@@ -45,6 +47,9 @@ describe("runtime tracing", () => {
 
       expect(result.root?.traceId).toBe(result.child?.traceId);
       expect(result.root?.correlationId).toBe("request-1");
+      expect(result.root?.functionId).toBe("orders.get");
+      expect(result.root?.serviceId).toBe("orders");
+      expect(result.child?.serviceId).toBe("orders");
       expect(result.child?.parentInvocationId).toBe("root-invocation");
       expect(result.child?.parentSpanId).toBe(result.root?.spanId);
     } finally {

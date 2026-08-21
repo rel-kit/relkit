@@ -26,6 +26,7 @@ describe("graph model", () => {
       "tool",
       "agent",
       "provider",
+      "service",
     ]);
     expect(GRAPH_EDGE_KINDS).toEqual([
       "targets-function",
@@ -39,6 +40,8 @@ describe("graph model", () => {
       "exposes-as-tool",
       "uses-tool",
       "uses-provider-profile",
+      "contains-function",
+      "uses-service-middleware",
     ]);
     expect(isGraphNodeKind("route")).toBe(false);
     expect(isGraphNodeKind("event-trigger")).toBe(false);
@@ -69,7 +72,7 @@ describe("graph model", () => {
       source,
       input: { type: "object" },
       output: { type: "object" },
-      modelProfile: "default",
+      model: "default",
       instructions: "help with orders",
       toolIds: ["orders.lookup"],
       limits: { maxSteps: 3 },
@@ -82,7 +85,7 @@ describe("graph model", () => {
       role: "primary",
     };
     const graph: ApplicationGraph = {
-      contractVersion: 1,
+      contractVersion: 2,
       appId: "orders",
       nodes: [agent],
       edges: [edge],

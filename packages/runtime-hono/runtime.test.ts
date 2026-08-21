@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { createApp, materializeRoutes, type RuntimeManifest } from "./src/index.js";
 import type { RegistrationPlan } from "@zsys/graph";
 
@@ -38,8 +39,8 @@ function plan(withRefs = true): RegistrationPlan {
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:test",
     functions: {},
     middleware: {

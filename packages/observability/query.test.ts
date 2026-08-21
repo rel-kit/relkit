@@ -47,7 +47,9 @@ test("filters correlated requests and returns redacted request/trace details", a
     level: "info",
     component: "runtime.http",
     message: "request completed",
-    fields: { token: "top-secret-token", visible: "yes" },
+    fields: { context: { tenant: "tenant-1" }, token: "top-secret-token", visible: "yes" },
+    functionId: "orders.create",
+    serviceId: "orders",
     traceId: "trace-1",
     correlationId: "request-1",
   });
@@ -66,6 +68,8 @@ test("filters correlated requests and returns redacted request/trace details", a
     invocationId: "invocation-1",
     traceId: "trace-1",
     name: "orders.create",
+    functionId: "orders.create",
+    serviceId: "orders",
     status: "completed",
     startedAt: "2026-08-16T00:00:00.000Z",
     completedAt: "2026-08-16T00:00:00.001Z",
@@ -76,6 +80,7 @@ test("filters correlated requests and returns redacted request/trace details", a
   const requests = await query.requests({ routeId: "orders.create", outcome: "success" });
   const byFunction = await query.requests({ functionId: "orders.create" });
   const byRequest = await query.logs({ requestId: "request-1" });
+  const byService = await query.logs({ serviceId: "orders" });
   const requestDetails = await query.request("request-1");
   const traceItems = await query.traces({ traceId: "trace-1" });
   const traceDetails = await query.trace("trace-1");
@@ -83,12 +88,14 @@ test("filters correlated requests and returns redacted request/trace details", a
   expect(requests.items).toHaveLength(1);
   expect(byFunction.items).toHaveLength(1);
   expect(byRequest.items).toHaveLength(1);
+  expect(byService.items).toHaveLength(1);
   expect(requestDetails?.request.requestId).toBe("request-1");
   expect(requestDetails?.records.some((record) => record.signal === "log")).toBe(true);
   expect(traceItems.items).toHaveLength(2);
   expect(traceDetails?.trace?.traceId).toBe("trace-1");
   expect(traceDetails?.spans).toHaveLength(1);
   expect(JSON.stringify({ requestDetails, traceDetails })).not.toContain("top-secret-token");
+  expect(JSON.stringify({ requestDetails, traceDetails })).not.toContain("tenant-1");
   await store.shutdown();
   await index.close();
 });
@@ -126,6 +133,7 @@ function request(requestId: string, traceId: string, routeId: string, outcome: "
     normalizedRoute: routeId,
     routeId,
     functionId: "orders.create",
+    serviceId: "orders",
     status: 201,
     outcome,
     timeline: [],

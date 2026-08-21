@@ -23,7 +23,7 @@ function setup(approval?: "approved" | "pending") {
     id: "support.order",
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
-    modelProfile: "default",
+    model: "default",
     instructions: "Answer order questions",
     tools: [tool],
     limits: { maxSteps: 3, maxToolCalls: 2, timeoutMs: 1_000 },

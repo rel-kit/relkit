@@ -35,6 +35,6 @@ dead letters, and honest capability flags without payload projection. Only a
 validated local dead-letter retry is mutating; it is disabled in production and
 records an audit action.
 
-Agent tests use `createFakeModelProvider` with a finite `script` of validated
-tool-call, final, error, or cancelled turns. Its signal-free `inspect()`
-transcript makes merge-blocking tests deterministic without model network calls.
+Agent tests use the `ai/test` `MockLanguageModelV3` surface with a finite script
+of validated tool-call, final, error, or cancelled turns. Its recorded calls
+make merge-blocking tests deterministic without model network calls.

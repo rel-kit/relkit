@@ -57,6 +57,7 @@ export interface JobFailureMetadata {
   readonly data?: JsonValue;
   readonly status?: number;
   readonly retry?: JobFailureRetry;
+  readonly afterMs?: number;
 }
 export interface JobQueueEnqueue {
   readonly input: JsonValue;

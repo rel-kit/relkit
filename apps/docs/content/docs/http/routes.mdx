@@ -18,9 +18,16 @@ Every `src/routes/**/route.ts` file defines a path. Export one or more of `GET`,
   ../../examples/commerce/src/routes/orders/[orderId]/route.ts
 </include>
 
-`path` and `method` are not route options. An explicit `id` is still required so graph and deployment
-identity survive a file move. Default exports and legacy `*.route.ts` files fail with source-located
-migration guidance.
+`path` and `method` are not route options. Route IDs are source-scoped and may be omitted; for example,
+`src/routes/orders/[orderId]/route.ts` exporting `GET` derives a safe identity equivalent to
+`route.get.orders.by-order-id`. Explicit IDs remain useful when a file or export will move without
+changing graph and deployment identity. Default exports and legacy `*.route.ts` files fail with
+source-located migration guidance.
+
+Matching dynamic names can become reusable function input. An unmatched dynamic or catch-all value is
+still available through the immutable `request.params` view and is represented as a transport path
+parameter in OpenAPI and generated clients. Service-member targets retain their service identity and
+share the service's ordered middleware.
 
 Static routes win over dynamic routes, then required catch-all, then optional catch-all. The compiler
 expands optional catch-all paths into two runtime registrations but keeps one authored descriptor and

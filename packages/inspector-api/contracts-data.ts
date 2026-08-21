@@ -19,7 +19,7 @@ export function poison<T extends Record<string, unknown>>(value: T): T {
 }
 
 export const graph = {
-  contractVersion: 1,
+  contractVersion: 2,
   appId: "contract-fixture",
   nodes: [
     {
@@ -50,8 +50,27 @@ export const graph = {
     { kind: "cache", id: "orders.cache", source: source("src/cache.ts") },
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
     { kind: "agent", id: "orders.agent", source: source("src/agents.ts") },
+    {
+      kind: "service",
+      id: "orders",
+      source: source("src/services.ts"),
+      title: "Orders",
+      tags: ["orders"],
+      members: [{ name: "create", functionId: "orders.create" }],
+      middleware: [{ id: "orders.context" }],
+    },
   ],
-  edges: [{ kind: "targets-function", from: "orders.create.http", to: "orders.create" }],
+  edges: [
+    { kind: "targets-function", from: "orders.create.http", to: "orders.create" },
+    {
+      kind: "contains-function",
+      from: "orders",
+      to: "orders.create",
+      member: "create",
+      order: 0,
+    },
+    { kind: "uses-service-middleware", from: "orders", to: "orders.context", order: 0 },
+  ],
 };
 
 export function getForbiddenReads(): number {

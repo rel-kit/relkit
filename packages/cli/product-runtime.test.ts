@@ -8,13 +8,43 @@ const roots: string[] = [];
 
 test("the emitted full-graph server runs jobs, agents, and correlated observability", async () => {
   const root = await copyFullProject();
-  await configureProductFixture(root);
+  const modelServer = Bun.serve({
+    port: 0,
+    fetch: () =>
+      Response.json({
+        id: "resp-local",
+        created_at: Math.floor(Date.now() / 1_000),
+        model: "gpt-5-mini",
+        output: [
+          {
+            type: "message",
+            role: "assistant",
+            id: "msg-local",
+            content: [
+              {
+                type: "output_text",
+                text: JSON.stringify({ answer: "local answer" }),
+                annotations: [],
+              },
+            ],
+          },
+        ],
+        usage: {
+          input_tokens: 0,
+          input_tokens_details: { cached_tokens: 0 },
+          output_tokens: 0,
+          output_tokens_details: { reasoning_tokens: 0 },
+        },
+      }),
+  });
+  await configureProductFixture(root, `http://127.0.0.1:${modelServer.port}/v1`);
   const built = await buildProject({ projectRoot: root });
   expect(built.ok).toBe(true);
   const started = await startProject({
     projectRoot: root,
     port: 0,
     healthTimeoutMs: 3_000,
+    environment: { OPENAI_API_KEY: "local-test-key" },
     spawn: (command, options) => Bun.spawn(command, { ...options, stderr: "inherit" }),
   });
   const base = `http://${started.hostname}:${started.port}`;
@@ -45,8 +75,9 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
     const agent = await invoke(base, built.graphHash, "zsys.agent.orders.support-agent.invoke", {
       question: "Where is order-1?",
     });
-    expect(agent.status).toBe(200);
-    expect(await agent.json()).toMatchObject({ output: { answer: "local answer" } });
+    const agentBody = await agent.json();
+    if (agent.status !== 200) throw new Error(JSON.stringify(agentBody));
+    expect(agentBody).toMatchObject({ output: { answer: "local answer" } });
 
     const detail = await fetch(`${base}/_zsys/v1/requests/${requestId}`);
     expect(detail.status).toBe(200);
@@ -82,6 +113,7 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
     streamController.abort();
     await started.stop();
     await started.exited;
+    modelServer.stop(true);
   }
 });
 
@@ -117,15 +149,20 @@ async function eventually(check: () => Promise<boolean>): Promise<boolean> {
   return false;
 }
 
-async function configureProductFixture(root: string): Promise<void> {
+async function configureProductFixture(root: string, modelBaseUrl: string): Promise<void> {
   const appPath = join(root, "src/app.ts");
   const app = await readFile(appPath, "utf8");
   await writeFile(
     appPath,
-    app.replace(
-      "development: localProviders(),",
-      'development: localProviders({ models: { default: { script: [{ type: "final", output: { answer: "local answer" } }] } } }),',
-    ),
+    app
+      .replace(
+        "const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000) });",
+        "const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000), OPENAI_API_KEY: envFactory.secret() });",
+      )
+      .replace(
+        "development: localProviders(),",
+        `development: localProviders({ modelProviders: { defaultProvider: "openai", defaultModel: "gpt-5-mini", openai: { apiKey: env.OPENAI_API_KEY, baseURL: "${modelBaseUrl}" } } }),`,
+      ),
   );
   const functionPath = join(root, "src/functions/create-order.function.ts");
   const source = await readFile(functionPath, "utf8");
@@ -160,6 +197,7 @@ async function copyFullProject(): Promise<string> {
     "functions",
     "graph",
     "inspector-api",
+    "invocation",
     "jobs",
     "observability",
     "providers-local",
@@ -167,6 +205,7 @@ async function copyFullProject(): Promise<string> {
     "runtime-effect",
     "runtime-hono",
     "schema",
+    "services",
     "supervisor",
     "testing",
     "tools",

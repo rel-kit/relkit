@@ -22,8 +22,9 @@ export type InspectorCollection =
   | "buckets"
   | "cache"
   | "tools"
-  | "agents";
-export type RuntimeCollection = Exclude<InspectorCollection, "descriptors" | "routes">;
+  | "agents"
+  | "services";
+export type RuntimeCollection = Exclude<InspectorCollection, "descriptors" | "routes" | "services">;
 export type SignalCollection = "requests" | "logs" | "traces";
 
 export interface InspectorIdentity {
@@ -109,6 +110,7 @@ export interface InspectorQuery {
   readonly outcome?: string;
   readonly requestId?: string;
   readonly traceId?: string;
+  readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
   readonly eventId?: string;

@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { GRAPH_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -37,6 +38,20 @@ test("generates stable typed methods from mapped HTTP routes", () => {
   expect(first).toContain('setBodyValue(payload, [\"sku\"]');
   expect(first).not.toContain("hono");
   expect(first).not.toContain("@zsys/runtime");
+});
+
+test("types and encodes route parameters omitted from explicit request mappings", () => {
+  const generated = generateClient(unmappedPathGraph());
+
+  expect(generated).toContain(
+    'export type ReportsReadInput = { "payload": string; "reportId": string };',
+  );
+  expect(generated).toContain(
+    'path = path.replace(":reportId", encodeURIComponent(String(readPath(input, ["reportId"]))));',
+  );
+  expect(generated).toContain(
+    "readonly reportsRead: (input: ReportsReadInput) => Promise<ReportsReadResult>;",
+  );
 });
 
 test("keeps the envelope status optional when an error has no HTTP mapping", () => {
@@ -122,12 +137,50 @@ function catchAllGraph(): ApplicationGraph {
     },
   });
   return {
-    contractVersion: 1,
+    contractVersion: GRAPH_VERSION,
     nodes: [
       functionNode("files.read"),
       functionNode("docs.read"),
       route("files.read", "/files/*parts", false),
       route("docs.read", "/docs/*parts?", true),
+    ],
+    edges: [],
+  };
+}
+
+function unmappedPathGraph(): ApplicationGraph {
+  return {
+    contractVersion: GRAPH_VERSION,
+    nodes: [
+      {
+        kind: "function",
+        id: "reports.read",
+        source: { file: "src/functions/read.ts", line: 1, column: 1 },
+        input: {
+          type: "object",
+          required: ["payload"],
+          properties: { payload: { type: "string" } },
+        },
+        output: { type: "object" },
+      },
+      {
+        kind: "trigger",
+        id: "reports.read",
+        triggerType: "http",
+        targetFunctionId: "reports.read",
+        source: { file: "src/routes/read.ts", line: 1, column: 1 },
+        config: {
+          method: "POST",
+          path: "/reports/:reportId",
+          request: {
+            kind: "input",
+            fields: { payload: { kind: "body", name: "payload" } },
+          },
+          responses: [{ kind: "success", id: "success.200", status: 200 }],
+          middleware: [],
+          transforms: [],
+        },
+      },
     ],
     edges: [],
   };
@@ -190,7 +243,7 @@ function graph(reverse: boolean): ApplicationGraph {
     },
   ];
   return {
-    contractVersion: 1,
+    contractVersion: GRAPH_VERSION,
     appId: "commerce",
     nodes: reverse ? nodes.reverse() : nodes,
     edges: [],

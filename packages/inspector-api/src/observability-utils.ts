@@ -24,6 +24,7 @@ export function readObservabilityQuery(request: Request): ObservabilityQueryRequ
     "outcome",
     "requestId",
     "traceId",
+    "serviceId",
     "generationId",
     "graphHash",
   ]) {

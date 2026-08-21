@@ -24,6 +24,8 @@ export interface ProviderFactoryContext {
 }
 export interface ProviderGeneration {
   readonly providers?: Readonly<Partial<Record<ProviderCapability, unknown>>>;
+  /** Runtime-only AI SDK registry; absent when no modelProviders recipe is configured. */
+  readonly modelRegistry?: unknown;
   readonly ready?: () => MaybePromise<void>;
   readonly readiness?: () => MaybePromise<void>;
   readonly release?: () => MaybePromise<void>;
@@ -63,6 +65,7 @@ export interface ProviderRegistry {
   readonly environment: ProviderEnvironment;
   readonly recipeTag: ProviderRecipe;
   readonly providerSet: ProviderSet;
+  readonly modelRegistry?: unknown;
   readonly requirements: readonly ProviderRequirement[];
   readonly handles: Readonly<Record<string, ProviderHandle>>;
   readonly get: (capability: ProviderCapability, profile: string) => ProviderHandle | undefined;
@@ -80,12 +83,21 @@ export type ProviderRegistryErrorCode =
   | "ZSYS_PROVIDER_CONSTRUCTION_FAILED"
   | "ZSYS_PROVIDER_READINESS_FAILED"
   | "ZSYS_PROVIDER_RELEASE_FAILED"
-  | "ZSYS_PROVIDER_ABORTED";
+  | "ZSYS_PROVIDER_ABORTED"
+  | "ZSYS_MODEL_PROVIDER_REGISTRY_INVALID"
+  | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
+  | "ZSYS_MODEL_PROVIDER_UNSUPPORTED"
+  | "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID"
+  | "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE"
+  | "ZSYS_MODEL_SELECTOR_INVALID"
+  | "ZSYS_MODEL_PROVIDER_UNKNOWN"
+  | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
 export interface ProviderRegistryIssue {
   readonly code: ProviderRegistryErrorCode;
   readonly message: string;
   readonly capability?: ProviderCapability;
   readonly profile?: string;
+  readonly agentId?: string;
   readonly variable?: string;
   readonly source?: SourceLocation;
 }

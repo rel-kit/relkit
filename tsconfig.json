@@ -22,6 +22,7 @@
     { "path": "./packages/functions" },
     { "path": "./packages/graph" },
     { "path": "./packages/inspector-api" },
+    { "path": "./packages/invocation" },
     { "path": "./packages/jobs" },
     { "path": "./packages/observability" },
     { "path": "./packages/openapi" },
@@ -30,6 +31,7 @@
     { "path": "./packages/runtime-effect" },
     { "path": "./packages/runtime-hono" },
     { "path": "./packages/schema" },
+    { "path": "./packages/services" },
     { "path": "./packages/supervisor" },
     { "path": "./packages/testing" },
     { "path": "./packages/tools" }

@@ -10,6 +10,7 @@ test.beforeEach(async ({ page, request }) => {
 test("supports keyboard search and accessible route table quick views", async ({ page }) => {
   await page.goto("/routes");
   await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.keyboard.press("ControlOrMeta+K");
   const search = page.getByRole("dialog", { name: "Search inspector" });
   await expect(search).toBeVisible();

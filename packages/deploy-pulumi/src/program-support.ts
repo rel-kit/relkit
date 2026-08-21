@@ -26,7 +26,6 @@ export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
     eventTriggers: sortEntries(value.eventTriggers),
     buckets: sortEntries(value.buckets),
     caches: sortEntries(value.caches),
-    ...(value.models === undefined ? {} : { models: sortEntries(value.models) }),
     iam: {
       serviceRole: {
         ...value.iam.serviceRole,
@@ -68,11 +67,6 @@ export function resourceEntries(plan: DeploymentPlan): readonly ResourceEntry[] 
     })),
     ...plan.buckets.map((value) => ({ kind: "bucket", logicalName: value.logicalName, value })),
     ...plan.caches.map((value) => ({ kind: "cache", logicalName: value.logicalName, value })),
-    ...(plan.models ?? []).map((value) => ({
-      kind: "model",
-      logicalName: value.logicalName,
-      value,
-    })),
   ];
 }
 

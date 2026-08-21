@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { generatedAgentFunctionId, invokeAgent, type ModelTurn } from "@zsys/agents";
-import { createFakeModelProvider } from "@zsys/providers-local";
+import { generatedAgentFunctionId } from "@zsys/agents";
 import { harness, makeFixture, scriptedToolCall } from "./agent-matrix-helpers.ts";
 
 describe("agent limit and privacy matrix", () => {
@@ -47,79 +46,32 @@ describe("agent limit and privacy matrix", () => {
 
   test("enforces content-size, timeout, and cancellation limits", async () => {
     const size = makeFixture();
-    const inputProvider = createFakeModelProvider({
-      maxInputBytes: 1_024,
-      maxOutputBytes: 1_024,
-      script: [{ type: "final", output: { answer: "ok" } }],
+    const inputAgent = harness(size, [{ type: "final", output: { answer: "ok" } }], {
+      maxInputBytes: 16,
     });
-    await expect(
-      invokeAgent({
-        agent: size.agent,
-        tools: [size.tool],
-        engine: size.engine,
-        provider: inputProvider,
-        input: { question: "x".repeat(100) },
-        maxInputBytes: 16,
-        invocationId: "size-input",
-      }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_RESPONSE_LIMIT" });
-    expect(inputProvider.calls).toHaveLength(0);
-
-    const outputProvider = createFakeModelProvider({
-      maxInputBytes: 1_024,
-      maxOutputBytes: 1_024,
-      script: [{ type: "final", output: { answer: "x".repeat(100) } }],
+    await expect(inputAgent.invoke({ question: "x".repeat(100) })).rejects.toMatchObject({
+      code: "ZSYS_AGENT_RESPONSE_LIMIT",
     });
-    await expect(
-      invokeAgent({
-        agent: size.agent,
-        tools: [size.tool],
-        engine: size.engine,
-        provider: outputProvider,
-        input: { question: "size" },
-        maxOutputBytes: 16,
-        invocationId: "size-output",
-      }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_MODEL_ERROR" });
+    expect(inputAgent.model.calls).toHaveLength(0);
 
-    const hangingProvider = {
-      profile: "default",
-      capabilities: {
-        toolCalls: true,
-        cancellation: true,
-        maxInputBytes: 1_024,
-        maxOutputBytes: 1_024,
-      },
-      request: () => new Promise<ModelTurn>(() => undefined),
-    };
+    const outputAgent = harness(size, [{ type: "final", output: { answer: "x".repeat(100) } }], {
+      maxOutputBytes: 16,
+    });
+    await expect(outputAgent.invoke({ question: "size" })).rejects.toMatchObject({
+      code: "ZSYS_AGENT_RESPONSE_LIMIT",
+    });
+
+    const timeoutAgent = harness(size, [], { model: { hang: true } });
     await expect(
-      invokeAgent({
-        agent: size.agent,
-        tools: [size.tool],
-        engine: size.engine,
-        provider: hangingProvider,
-        input: { question: "timeout" },
-        timeoutMs: 0,
-        invocationId: "timeout",
-      }),
+      timeoutAgent.invoke({ question: "timeout" }, { timeoutMs: 0 }),
     ).rejects.toMatchObject({ code: "ZSYS_AGENT_TIMEOUT" });
 
     const controller = new AbortController();
     controller.abort();
-    const cancelledProvider = createFakeModelProvider({
-      script: [{ type: "final", output: { answer: "never" } }],
-    });
+    const cancelledAgent = harness(size, [{ type: "final", output: { answer: "never" } }]);
     await expect(
-      invokeAgent({
-        agent: size.agent,
-        tools: [size.tool],
-        engine: size.engine,
-        provider: cancelledProvider,
-        input: { question: "cancel" },
-        signal: controller.signal,
-        invocationId: "cancelled",
-      }),
+      cancelledAgent.invoke({ question: "cancel" }, { signal: controller.signal }),
     ).rejects.toMatchObject({ code: "ZSYS_AGENT_CANCELLED" });
-    expect(cancelledProvider.calls).toHaveLength(0);
+    expect(cancelledAgent.model.calls).toHaveLength(0);
   });
 });

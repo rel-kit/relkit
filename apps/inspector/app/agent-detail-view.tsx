@@ -19,10 +19,10 @@ export function AgentDetailView({ view }: { readonly view: AgentView }) {
             <p className="eyebrow">AGENT CONTRACT</p>
             <h2 id="agent-identity-heading">{view.id}</h2>
           </div>
-          <span className="badge">{view.modelProfile || "profile unavailable"}</span>
+          <span className="badge">{view.model || "model unavailable"}</span>
         </div>
         <dl className="route-meta">
-          <Meta label="Model profile" value={view.modelProfile || "Unavailable"} />
+          <Meta label="Model" value={view.model || "Unavailable"} />
           <Meta label="Generated function" value={view.generatedFunctionId} />
           <Meta label="Allowed tools" value={String(view.toolIds.length)} />
         </dl>

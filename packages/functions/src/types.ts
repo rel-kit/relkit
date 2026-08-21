@@ -6,15 +6,25 @@ import {
   type MaybePromise,
   type Ref,
 } from "@zsys/contracts";
-import { type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+import type {
+  InvocationMetadata as SharedInvocationMetadata,
+  InvocationSource as SharedInvocationSource,
+  PublicClock as SharedPublicClock,
+  PublicLogger as SharedPublicLogger,
+} from "@zsys/invocation";
+import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
+import type {
+  FunctionToolDescriptor,
+  FunctionToolMetadata,
+  FunctionToolOptions,
+} from "./function-tool.js";
 import type { FunctionHandlerResult } from "./handler-result.js";
 import type {
   AgentClients,
   BucketClients,
   CacheClients,
   EventClients,
-  FunctionClients,
   JobClients,
 } from "./clients.js";
 
@@ -34,8 +44,6 @@ export type {
   EventAttributeValue,
   EventPublishOptions,
   EventPublishResult,
-  FunctionClientFor,
-  FunctionClients,
   JobEnqueueOptions,
   JobClientFor,
   JobClients,
@@ -107,7 +115,6 @@ export type CacheRefAny = CacheRef;
 export type AgentRefAny = AgentRef;
 
 export interface FunctionDependencies {
-  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly events?: Readonly<Record<string, EventRefAny>>;
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
@@ -115,34 +122,81 @@ export interface FunctionDependencies {
   readonly agents?: Readonly<Record<string, AgentRefAny>>;
 }
 
-export type InvocationSource = "direct" | "http" | "job" | "event" | "tool" | "agent";
+export type InvocationSource = SharedInvocationSource;
 
-export interface InvocationMetadata {
-  readonly id: string;
-  readonly parentId?: string;
-  readonly traceId: string;
-  readonly startedAt: string;
-  readonly deadline?: string;
-  readonly attempt: number;
-  readonly source: InvocationSource;
-}
+export type InvocationMetadata = SharedInvocationMetadata;
 
 export type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
 
+/** Optional immutable HTTP transport view; non-HTTP calls receive `undefined`. */
 export type FunctionRequest = ContractFunctionRequest | undefined;
 
-export interface PublicLogger {
-  trace(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  debug(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  info(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  warn(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  error(message: string, fields?: Readonly<Record<string, unknown>>): void;
-}
+export type PublicLogger = SharedPublicLogger;
 
-export interface PublicClock {
-  now(): Date;
-  sleep(milliseconds: number): Promise<void>;
-}
+export type PublicClock = SharedPublicClock;
+
+type FunctionDependencyOptions<D extends FunctionDependencies> = "functions" extends keyof D
+  ? never
+  : D;
+
+type FunctionToolTarget<
+  Id extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+> = FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
+
+type FunctionToolView<
+  ToolId extends string,
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+> = FunctionToolDescriptor<
+  ToolId,
+  FunctionToolTarget<FunctionId, Input, Output, Errors, InputSchema, OutputSchema>
+>;
+
+type FunctionAsTool<
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  ToolMetadata extends FunctionToolMetadata | undefined,
+> = {
+  <const ToolId extends string>(
+    options: FunctionToolOptions<ToolId> & { readonly id: ToolId },
+  ): FunctionToolView<ToolId, FunctionId, Input, Output, Errors, InputSchema, OutputSchema>;
+  (
+    options: FunctionToolOptions,
+  ): FunctionToolView<
+    `${FunctionId}.tool`,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema
+  >;
+} & ([ToolMetadata] extends [FunctionToolMetadata]
+  ? {
+      (): FunctionToolView<
+        `${FunctionId}.tool`,
+        FunctionId,
+        Input,
+        Output,
+        Errors,
+        InputSchema,
+        OutputSchema
+      >;
+    }
+  : {});
 
 export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly invocation: InvocationMetadata;
@@ -150,12 +204,13 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly env: ResolvedApplicationEnv;
   readonly log: PublicLogger;
   readonly time: PublicClock;
-  readonly functions: FunctionClients<D["functions"]>;
   readonly jobs: JobClients<D["jobs"]>;
   readonly events: EventClients<D["events"]>;
   readonly buckets: BucketClients<D["buckets"]>;
   readonly cache: CacheClients<D["cache"]>;
   readonly agents: AgentClients<D["agents"]>;
+  /** Read-only context added by the owning service middleware for this invocation. */
+  readonly service: Readonly<Record<string, unknown>>;
 }
 
 export interface FunctionDescriptor<
@@ -166,14 +221,28 @@ export interface FunctionDescriptor<
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  ToolMetadata extends FunctionToolMetadata | undefined = undefined,
 >
   extends
     DescriptorBase<"function", Id>,
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
-  readonly dependencies?: Dependencies;
+  readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
+  readonly tool?: ToolMetadata;
   readonly handler: FunctionHandler<Input, Output, Dependencies, Errors>;
+  /** Invokes the descriptor through the active or isolated common engine. */
+  readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
+  /** Creates a handler-free tool view with inherited schemas and declared errors. */
+  readonly asTool: FunctionAsTool<
+    Id,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    ToolMetadata
+  >;
 }
 
 export interface DefineFunctionOptions<
@@ -183,13 +252,14 @@ export interface DefineFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly input: InputSchema;
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
+  readonly tool?: FunctionToolMetadata;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,

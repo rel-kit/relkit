@@ -11,10 +11,10 @@ const input = z.object({ name: z.string().min(1) });
 const output = z.object({ greeting: z.string() });
 
 export default defineFunction({
-  id: "greetings.say-hello",
   input,
   output,
   handler: async (value, request, context) => {
+    request?.params;
     request?.headers.get("x-request-id");
     context.log.info("greeting requested");
     return { greeting: `Hello, ${value.name}!` };
@@ -23,7 +23,15 @@ export default defineFunction({
 ```
 
 Declared dependencies add named Promise clients to the handler context. No
-runtime framework type is needed in application code.
+runtime framework type is needed in application code. The request is optional
+and only exists for HTTP; its immutable params, query, and headers are
+transport data separate from reusable input. Calls from other functions use
+`target.invoke(input)` rather than a declared function dependency map.
+
+IDs are optional for source-scoped functions. The compiler derives a stable
+filesystem-safe ID from the source/export hierarchy; keep an explicit ID when
+a move must preserve identity. Application, event, job, bucket, and cache IDs
+remain explicit.
 
 `input` and `output` remain required runtime schemas: TypeScript types are
 erased, while Standard Schemas drive validation, graph metadata, OpenAPI,
@@ -44,7 +52,6 @@ const invalidName = defineError({
 });
 
 const greet = defineFunction({
-  id: "greetings.say-hello",
   input,
   output,
   errors: [invalidName],
@@ -52,3 +59,20 @@ const greet = defineFunction({
     value.name.trim() === "" ? new invalidName(value) : { greeting: `Hello ${value.name}!` },
 });
 ```
+
+Functions can become tools without a second handler:
+
+```ts
+const lookup = greet.asTool({
+  description: "Read a greeting",
+  sideEffect: "read",
+  approval: "never",
+});
+
+await lookup.invoke({ name: "Ada" });
+```
+
+`asTool` inherits the function schemas and errors. Declared error IDs may also
+be inferred from source bindings; omitted `retry` is terminal, while
+`retry: { kind: "later", afterMs }` is a minimum delay hint for jobs and
+durable events. HTTP and direct calls never retry automatically.

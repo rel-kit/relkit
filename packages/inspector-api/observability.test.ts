@@ -40,11 +40,16 @@ describe("inspector observability endpoints", () => {
     });
 
     const page = await service.request(
-      `${API_BASE_PATH}/requests?limit=1000&cursor=1&severity=error&routeId=orders.create`,
+      `${API_BASE_PATH}/requests?limit=1000&cursor=1&severity=error&routeId=orders.create&serviceId=orders`,
     );
     expect(page.status).toBe(200);
     expect(await page.json()).toMatchObject({ protocol: queryProtocol, version: 1, items: [] });
-    expect(seen[0]).toMatchObject({ limit: 100, cursor: "1", severity: "error" });
+    expect(seen[0]).toMatchObject({
+      limit: 100,
+      cursor: "1",
+      severity: "error",
+      serviceId: "orders",
+    });
 
     const detail = await service.request(`${API_BASE_PATH}/requests/request-1`);
     expect(detail.status).toBe(200);

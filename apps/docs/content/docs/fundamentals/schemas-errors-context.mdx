@@ -11,16 +11,20 @@ Declared errors are data contracts:
 
 ```ts
 const orderNotFound = defineError({
-  id: "orders.not-found",
   data: z.object({ orderId: z.string() }),
   http: { status: 404 },
-  retry: "never",
+  retry: { kind: "later", afterMs: 1_000 },
 });
 ```
 
 Throw or return errors through the owning function APIs; do not turn arbitrary exceptions into public
 responses. HTTP status metadata contributes an inferred OpenAPI response. Input validation contributes
-`422` automatically.
+`422` automatically. Error IDs may be inferred from a named source binding. Omit `retry` for a terminal
+application failure; `"later"` or `{ kind: "later", afterMs }` marks a retryable failure and `afterMs`
+is only a minimum delay hint for jobs and durable event deliveries. HTTP and direct calls do not retry
+the function automatically.
 
 Invocation context carries the abort signal, deadline, trace/correlation/causation identifiers, source,
-and declared resource clients. Treat it as request-scoped and never store it globally.
+declared managed-resource clients, and an immutable service-scoped context when service middleware is
+active. Treat it as invocation-scoped and never store it globally. HTTP transport data remains separate
+on the optional request view.

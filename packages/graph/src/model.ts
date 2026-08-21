@@ -5,6 +5,7 @@ import type {
   GeneratedAgentMarker,
   GeneratedFunctionMarker,
 } from "./foundation-nodes.js";
+import type { ServiceMemberEdge, ServiceMiddlewareEdge, ServiceNode } from "./service-nodes.js";
 
 export const GRAPH_NODE_KINDS = [
   "app",
@@ -18,6 +19,7 @@ export const GRAPH_NODE_KINDS = [
   "tool",
   "agent",
   "provider",
+  "service",
 ] as const;
 export type GraphNodeKind = (typeof GRAPH_NODE_KINDS)[number];
 export type GraphTriggerType = "http" | "queue" | "schedule" | "event";
@@ -47,6 +49,9 @@ export interface TransformProjection {
 export interface HttpTriggerConfig {
   readonly method: string;
   readonly path: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly tags?: readonly string[];
   readonly runtimePaths?: readonly string[];
   readonly request: JsonValue;
   readonly responses: JsonValue;
@@ -116,7 +121,7 @@ export interface ToolNode extends GraphNodeBase<"tool"> {
 export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly input: JsonValue;
   readonly output: JsonValue;
-  readonly modelProfile: string;
+  readonly model?: string;
   readonly instructions: JsonValue;
   readonly toolIds: readonly string[];
   readonly limits: JsonValue;
@@ -139,7 +144,8 @@ export type GraphNode =
   | CacheNode
   | ToolNode
   | AgentNode
-  | ProviderProfileNode;
+  | ProviderProfileNode
+  | ServiceNode;
 export const GRAPH_EDGE_KINDS = [
   "targets-function",
   "calls-function",
@@ -152,6 +158,8 @@ export const GRAPH_EDGE_KINDS = [
   "exposes-as-tool",
   "uses-tool",
   "uses-provider-profile",
+  "contains-function",
+  "uses-service-middleware",
 ] as const;
 export type GraphEdgeKind = (typeof GRAPH_EDGE_KINDS)[number];
 export type TargetFunctionRole = "primary" | "middleware";
@@ -174,19 +182,10 @@ export type GraphEdge =
   | GraphEdgeBase<"invokes-agent">
   | GraphEdgeBase<"exposes-as-tool">
   | GraphEdgeBase<"uses-tool">
-  | GraphEdgeBase<"uses-provider-profile">;
-export interface ObservedEdge {
-  readonly relationship: GraphEdgeKind;
-  readonly from: string;
-  readonly to: string;
-}
-export interface ApplicationGraph {
-  readonly contractVersion: number;
-  readonly appId?: string;
-  readonly nodes: readonly GraphNode[];
-  readonly edges: readonly GraphEdge[];
-}
-export type Graph = ApplicationGraph;
+  | GraphEdgeBase<"uses-provider-profile">
+  | ServiceMemberEdge
+  | ServiceMiddlewareEdge;
+export type { ApplicationGraph, Graph, ObservedEdge } from "./graph-types.js";
 export function isGraphNodeKind(value: unknown): value is GraphNodeKind {
   return typeof value === "string" && (GRAPH_NODE_KINDS as readonly string[]).includes(value);
 }

@@ -159,6 +159,7 @@ async function invokeHttp(request) {
     ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
     ...(request.request === undefined ? {} : { request: request.request }),
     clients: createDependencySources(providerRegistry),
+    servicePolicies: runtimeManifest.services,
     ...(request.parent === undefined ? {} : { parent: request.parent }),
     ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
     ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
@@ -175,7 +176,7 @@ async function invokeHttp(request) {
 
 function invocationContext({ invocation, signal, env, time }) {
   const write = (level, message, fields = {}) => {
-    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, invocationId: invocation.id, traceId: invocation.traceId });
+    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId });
     if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
   };
   const logger = (level) => (message, fields) => write(level, message, fields);

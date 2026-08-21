@@ -9,6 +9,7 @@
     }
   },
   "dependencies": {
+    "ai": "7.0.0",
     "@zsys/agents": "workspace:*",
     "@zsys/buckets": "workspace:*",
     "@zsys/cache": "workspace:*",

@@ -75,6 +75,8 @@ export interface DefineJobOptions<
 
 /**
  * Defines a durable job trigger with validated input, retry, timeout, and idempotency policy.
+ * A retryable declared error may add an `afterMs` minimum delay; the provider
+ * combines it with this job policy and direct function calls do not auto-retry.
  *
  * @example
  * ```ts

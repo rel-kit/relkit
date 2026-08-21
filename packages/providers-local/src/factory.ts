@@ -26,6 +26,7 @@ export interface LocalProviderGeneration {
   readonly cacheProfiles: LocalProviderResources["cacheProfiles"];
   readonly jobProfiles: LocalProviderResources["jobProfiles"];
   readonly providers: LocalProviderResources["providers"];
+  readonly modelRegistry?: unknown;
   readonly ready: () => Promise<void>;
   readonly readiness: () => Promise<void>;
   readonly release: () => Promise<void>;
@@ -87,6 +88,7 @@ function createFactory(
           stateRoot,
           context.providerSet,
           context.signal,
+          context.values,
         );
         await resources.ready();
       } catch (cause) {
@@ -113,6 +115,9 @@ function createFactory(
         cacheProfiles: resources.cacheProfiles,
         jobProfiles: resources.jobProfiles,
         providers: resources.providers,
+        ...(resources.modelRegistry === undefined
+          ? {}
+          : { modelRegistry: resources.modelRegistry }),
         ready,
         readiness: ready,
         release,

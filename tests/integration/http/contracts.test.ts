@@ -98,7 +98,7 @@ function service(plan: RegistrationPlan, calls: unknown[]) {
 
 function manifestFor(plan: RegistrationPlan): RuntimeManifest {
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     generatorVersion: 1,
     graphHash: plan.graphHash,
     functions: {},

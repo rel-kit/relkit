@@ -11,7 +11,7 @@ import {
 } from "./response-mapping.js";
 import { getRequestState } from "./middleware.js";
 import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-record-utils.js";
-import { requestFromContext } from "./request-context.js";
+import { functionRequestFromRoute, requestFromContext } from "./request-context.js";
 
 export function createRouteHandler(
   trigger: HttpTriggerRegistration,
@@ -25,11 +25,17 @@ async function handleRoute(
   trigger: HttpTriggerRegistration,
   options: RouteMaterializationOptions,
 ): Promise<Response> {
-  const request = requestFromContext(context, trigger.config.path);
   const state = getRequestState(context);
+  const request = requestFromContext(context, trigger.config.path, {
+    routeId: trigger.id,
+    ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
+    ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
+    ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
+  });
   const builder = state?.requestRecord;
-  const handlerRequest = request.request.clone();
+  const handlerRequest = functionRequestFromRoute(request);
   builder?.setRoute(trigger.id, trigger.targetFunctionId);
+  builder?.setServiceId(trigger.serviceId);
   recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
   const responseOptions = responseOptionsFor(options, state?.signal);
 

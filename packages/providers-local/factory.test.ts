@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { awsProviders, localProviders, testProviders } from "@zsys/app";
+import { awsProviders, defineEnv, env, localProviders, testProviders } from "@zsys/app";
 import {
   bindLocalProviderFactory,
   getLocalProviderFactory,
@@ -68,9 +68,28 @@ describe("local provider recipe bindings", () => {
 
     expect(generation.providers.cache.archive).not.toBe(generation.providers.cache.default);
     expect(generation.providers.jobs.default?.createQueue).toBeFunction();
-    expect(generation.providers.models.default?.request).toBeFunction();
     generation.providers.observability.default?.collect({ ready: true });
     expect(generation.providers.observability.default?.read()).toEqual([{ ready: true }]);
+    await generation.dispose();
+  });
+
+  test("constructs the model registry from resolved environment values", async () => {
+    const environment = defineEnv({ OPENAI_API_KEY: env.secret() });
+    const providerSet = localProviders({
+      modelProviders: {
+        defaultProvider: "openai",
+        defaultModel: "gpt-5-mini",
+        openai: { apiKey: environment.OPENAI_API_KEY },
+      },
+    });
+    const generation = await bindLocalProviderFactory(providerSet)!.create({
+      generationId: "generation-model-registry",
+      environment: "development",
+      providerSet,
+      values: { OPENAI_API_KEY: "resolved-at-startup" },
+    });
+
+    expect(generation.modelRegistry).toBeDefined();
     await generation.dispose();
   });
 });

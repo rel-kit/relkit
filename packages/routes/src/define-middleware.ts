@@ -5,6 +5,7 @@ import {
   normalizeId,
   type DescriptorMetadata,
 } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import type { FunctionRefAny } from "@zsys/functions";
 import type { StandardSchemaV1 } from "@zsys/schema";
 import {
@@ -27,7 +28,7 @@ export interface DefineMiddlewareOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly target: Target;
   readonly request: Request;
   readonly decision: MiddlewareDecisionMapping;
@@ -46,7 +47,9 @@ export interface MiddlewareDescriptor<
 }
 
 /**
- * Defines serializable route middleware backed by a function target.
+ * Defines serializable route middleware backed by a function target. Its optional
+ * source-scoped ID is inferred when the compiler can identify the declaration;
+ * the decision mapping can continue or return a declared route response.
  *
  * @example
  * ```ts
@@ -70,7 +73,9 @@ export function defineMiddleware<
 ): MiddlewareDescriptor<Id, Target, Request> {
   if (hasOwn(options, "handler"))
     throw new TypeError("Middleware declarations cannot own handlers");
-  const id = normalizeId(options.id) as unknown as Id;
+  const id = normalizeId(
+    options.id === undefined ? createUnboundIdentity() : options.id,
+  ) as unknown as Id;
   if (!isFunctionTarget(options.target))
     throw new TypeError("Middleware target must be a function reference");
   assertRequestMapping(options.request);

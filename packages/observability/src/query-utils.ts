@@ -115,6 +115,7 @@ function indexOptions(
     ...(query.functionId === undefined ? {} : { functionId: query.functionId }),
     ...(query.outcome === undefined ? {} : { outcome: query.outcome }),
     ...(query.traceId === undefined ? {} : { traceId: query.traceId }),
+    ...(query.serviceId === undefined ? {} : { serviceId: query.serviceId }),
     ...(query.generationId === undefined ? {} : { generationId: query.generationId }),
     ...(query.graphHash === undefined ? {} : { graphHash: query.graphHash }),
   };

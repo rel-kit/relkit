@@ -2,10 +2,13 @@ import { defineFunction } from "@zsys/app";
 import { pathInput, pathOutput } from "../shared/schemas.js";
 
 const browsePath = defineFunction({
-  id: "content.browse-path",
   input: pathInput,
   output: pathOutput,
-  handler: async ({ parts }) => ({ path: `/${parts?.join("/") ?? ""}` }),
+  handler: async ({ parts }, request) => {
+    const requestParts = request?.params.parts;
+    const pathParts = Array.isArray(requestParts) ? requestParts : parts;
+    return { path: `/${pathParts?.join("/") ?? ""}` };
+  },
 });
 
 export default browsePath;

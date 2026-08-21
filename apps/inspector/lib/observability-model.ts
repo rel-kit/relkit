@@ -12,6 +12,7 @@ export interface SignalFilters {
   readonly outcome: string;
   readonly requestId: string;
   readonly traceId: string;
+  readonly serviceId: string;
 }
 
 export const EMPTY_SIGNAL_FILTERS: SignalFilters = Object.freeze({
@@ -23,6 +24,7 @@ export const EMPTY_SIGNAL_FILTERS: SignalFilters = Object.freeze({
   outcome: "",
   requestId: "",
   traceId: "",
+  serviceId: "",
 });
 
 export interface TimelineEntry {
@@ -72,6 +74,7 @@ export function queryFromFilters(
     ...(filters.outcome === "" ? {} : { outcome: filters.outcome }),
     ...(filters.requestId === "" ? {} : { requestId: filters.requestId }),
     ...(filters.traceId === "" ? {} : { traceId: filters.traceId }),
+    ...(filters.serviceId === "" ? {} : { serviceId: filters.serviceId }),
   };
 }
 
@@ -101,6 +104,7 @@ export function matchesQuery(value: InspectorObject, query: InspectorQuery): boo
     matches(value, query.functionId, "functionId") &&
     matches(value, query.outcome, "outcome") &&
     matches(value, query.traceId, "traceId") &&
+    matches(value, query.serviceId, "serviceId") &&
     (query.requestId === undefined ||
       value.requestId === query.requestId ||
       value.correlationId === query.requestId) &&

@@ -287,6 +287,7 @@ declare const isAppDescriptor: (value: unknown) => value is AppDescriptor<string
   - ["@zsys/functions" (namespace export)](#zsysfunctions-namespace-export)
   - ["@zsys/jobs" (namespace export)](#zsysjobs-namespace-export)
   - ["@zsys/routes" (namespace export)](#zsysroutes-namespace-export)
+  - ["@zsys/services" (namespace export)](#zsysservices-namespace-export)
   - ["@zsys/tools" (namespace export)](#zsystools-namespace-export)
   - [EnvBuilder](#envbuilder)
   - [EnvDefinition](#envdefinition)
@@ -400,6 +401,18 @@ export * from "@zsys/routes";
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/index.ts#L11)
 
+## "@zsys/services" (namespace export)
+
+Re-exports all named exports from the "@zsys/services" module.
+
+**Signature**
+
+```ts
+export * from "@zsys/services";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/index.ts#L12)
+
 ## "@zsys/tools" (namespace export)
 
 Re-exports all named exports from the "@zsys/tools" module.
@@ -410,7 +423,7 @@ Re-exports all named exports from the "@zsys/tools" module.
 export * from "@zsys/tools";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/index.ts#L13)
 
 ## EnvBuilder
 
@@ -523,6 +536,64 @@ declare const isEnvRef: (value: unknown) => value is EnvRef;
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/index.ts#L2)
+
+## `model-providers.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ModelProviderOptions (interface)](#modelprovideroptions-interface)
+  - [ModelProviders (interface)](#modelproviders-interface)
+  - [assertModelProviders](#assertmodelproviders)
+
+---
+
+# utils
+
+## ModelProviderOptions (interface)
+
+Serializable settings for one named AI SDK provider recipe.
+
+**Signature**
+
+```ts
+export interface ModelProviderOptions {
+  readonly defaultModel?: string;
+  readonly [key: string]: ProviderValue;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/model-providers.ts#L5)
+
+## ModelProviders (interface)
+
+Value-free per-environment AI SDK provider configuration. Both defaults are
+required; credentials should be environment references and are resolved only
+when a runtime provider registry is constructed.
+
+**Signature**
+
+```ts
+export interface ModelProviders {
+  readonly defaultProvider: string;
+  readonly defaultModel: string;
+  readonly [provider: string]: string | ModelProviderOptions;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/model-providers.ts#L15)
+
+## assertModelProviders
+
+**Signature**
+
+```ts
+declare const assertModelProviders: (value: unknown) => asserts value is ModelProviders;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/model-providers.ts#L21)
 
 ## `providers-validation-utils.ts`
 
@@ -682,7 +753,7 @@ declare const walk: (value: ProviderValue, visit: (reference: EnvRef) => void) =
 declare const PROVIDER_CAPABILITIES: ReadonlyArray<ProviderCapability>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L22)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L23)
 
 ## isProviderMetadata
 
@@ -695,7 +766,7 @@ declare const isProviderMetadata: (
 ) => value is ProviderSetMetadata;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L101)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L104)
 
 ## normalizeProviderOptions
 
@@ -717,7 +788,7 @@ declare const providerEnvironment: (
 ) => readonly { name: string; type: string; sensitive: boolean }[];
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L83)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L86)
 
 ## providerProfiles
 
@@ -729,7 +800,7 @@ declare const providerProfiles: (
 ) => Readonly<Record<string, readonly ProviderCapability[]>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L60)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers-validation.ts#L63)
 
 ## `providers.ts`
 
@@ -740,6 +811,8 @@ declare const providerProfiles: (
 - [utils](#utils)
   - [AwsProviderOptions (interface)](#awsprovideroptions-interface)
   - [LocalProviderOptions (interface)](#localprovideroptions-interface)
+  - [ModelProviderOptions](#modelprovideroptions)
+  - [ModelProviders](#modelproviders)
   - [PROVIDER_RECIPE](#provider_recipe)
   - [ProviderCapability (type alias)](#providercapability-type-alias)
   - [ProviderConfig (type alias)](#providerconfig-type-alias)
@@ -772,11 +845,12 @@ export interface AwsProviderOptions {
   readonly cache?: ProviderProfiles;
   readonly jobs?: ProviderProfiles;
   readonly events?: ProviderProfiles;
-  readonly models?: ProviderProfiles;
+  /** Optional serializable AI SDK provider defaults and named recipes. */
+  readonly modelProviders?: ModelProviders;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L35)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L38)
 
 ## LocalProviderOptions (interface)
 
@@ -790,11 +864,32 @@ export interface LocalProviderOptions {
   readonly cache?: ProviderProfiles;
   readonly jobs?: ProviderProfiles;
   readonly events?: ProviderProfiles;
-  readonly models?: ProviderProfiles;
+  /** Optional serializable AI SDK provider defaults and named recipes. */
+  readonly modelProviders?: ModelProviders;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L20)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L22)
+
+## ModelProviderOptions
+
+**Signature**
+
+```ts
+declare const ModelProviderOptions: ModelProviderOptions;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L12)
+
+## ModelProviders
+
+**Signature**
+
+```ts
+declare const ModelProviders: ModelProviders;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L12)
 
 ## PROVIDER_RECIPE
 
@@ -804,17 +899,17 @@ export interface LocalProviderOptions {
 declare const PROVIDER_RECIPE: unique symbol;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L12)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L15)
 
 ## ProviderCapability (type alias)
 
 **Signature**
 
 ```ts
-type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "models" | "observability";
+type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L13)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L16)
 
 ## ProviderConfig (type alias)
 
@@ -824,7 +919,7 @@ type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "models" | "
 type ProviderConfig = Readonly<Record<string, ProviderValue>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L17)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L19)
 
 ## ProviderProfiles (type alias)
 
@@ -834,7 +929,7 @@ type ProviderConfig = Readonly<Record<string, ProviderValue>>;
 type ProviderProfiles = Readonly<Record<string, ProviderConfig>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L18)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L20)
 
 ## ProviderRecipe (type alias)
 
@@ -844,7 +939,7 @@ type ProviderProfiles = Readonly<Record<string, ProviderConfig>>;
 type ProviderRecipe = "local" | "test" | "aws";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L11)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L14)
 
 ## ProviderSet (interface)
 
@@ -860,7 +955,7 @@ export interface ProviderSet<Recipe extends ProviderRecipe = ProviderRecipe> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L56)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L60)
 
 ## ProviderSetMetadata (interface)
 
@@ -880,7 +975,7 @@ export interface ProviderSetMetadata {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L48)
 
 ## ProviderSets (interface)
 
@@ -894,7 +989,7 @@ export interface ProviderSets {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L68)
 
 ## ProviderValue (type alias)
 
@@ -905,7 +1000,7 @@ type ProviderValue =
   JsonPrimitive | EnvRef | readonly ProviderValue[] | { readonly [key: string]: ProviderValue };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L15)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L17)
 
 ## TestProviderOptions (interface)
 
@@ -918,7 +1013,7 @@ export interface TestProviderOptions extends LocalProviderOptions {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L33)
 
 ## awsProviders
 
@@ -928,7 +1023,7 @@ export interface TestProviderOptions extends LocalProviderOptions {
 declare const awsProviders: (options: AwsProviderOptions) => ProviderSet<"aws">;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L78)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L82)
 
 ## copyProviderSets
 
@@ -938,7 +1033,7 @@ declare const awsProviders: (options: AwsProviderOptions) => ProviderSet<"aws">;
 declare const copyProviderSets: (value: unknown) => ProviderSets;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L109)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L113)
 
 ## isProviderSet
 
@@ -948,7 +1043,7 @@ declare const copyProviderSets: (value: unknown) => ProviderSets;
 declare const isProviderSet: (value: unknown) => value is ProviderSet;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L82)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L86)
 
 ## localProviders
 
@@ -958,7 +1053,7 @@ declare const isProviderSet: (value: unknown) => value is ProviderSet;
 declare const localProviders: (options?: LocalProviderOptions) => ProviderSet<"local">;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L70)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L74)
 
 ## providerRecipe
 
@@ -970,7 +1065,7 @@ Returns the hidden internal recipe tag without exposing runtime factories.
 declare const providerRecipe: (value: unknown) => ProviderRecipe | undefined;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L97)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L101)
 
 ## testProviders
 
@@ -980,4 +1075,4 @@ declare const providerRecipe: (value: unknown) => ProviderRecipe | undefined;
 declare const testProviders: (options?: TestProviderOptions) => ProviderSet<"test">;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/app/src/providers.ts#L78)

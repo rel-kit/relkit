@@ -31,7 +31,6 @@ export class DependencyNotConfiguredError extends Error {
 }
 
 const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
-  functions: "calls-function",
   jobs: "enqueues-job",
   events: "publishes-event",
   buckets: "uses-bucket",
@@ -40,7 +39,6 @@ const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
 };
 
 const refKinds: Readonly<Record<DependencyCategory, string>> = {
-  functions: "function",
   jobs: "job",
   events: "event",
   buckets: "bucket",
@@ -75,7 +73,6 @@ export function createClient(
   options: DependencyClientBuildOptions,
 ): unknown {
   switch (category) {
-    case "functions":
     case "agents":
       return wrapCallable(category, name, source, options);
     case "jobs":

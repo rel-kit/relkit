@@ -10,7 +10,6 @@ import { defineFunction } from "@zsys/app";
 import { z } from "@zsys/schema";
 
 export default defineFunction({
-  id: "hello",
   input: z.object({ name: z.string().default("world") }),
   output: z.object({ message: z.string() }),
   handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
@@ -23,7 +22,7 @@ Create `src/routes/hello/route.ts`:
 import { defineRoute } from "@zsys/app";
 import hello from "../../functions/hello.function.js";
 
-export const GET = defineRoute({ id: "hello.http", target: hello });
+export const GET = defineRoute({ target: hello });
 ```
 
 The file supplies `/hello`; the named export supplies `GET`. Because this is a `GET`, the remaining
@@ -34,5 +33,6 @@ bun run dev
 curl "http://localhost:3000/hello?name=ZSYS"
 ```
 
-The response is `{ "message": "Hello, ZSYS!" }`. Keep the explicit descriptor ID stable when a
-file moves: paths are transport identity, while IDs are graph and deployment identity.
+The response is `{ "message": "Hello, ZSYS!" }`. The compiler derives safe source-scoped IDs from the
+file and export. Add an explicit ID when a descriptor must keep its graph and deployment identity after
+a source move; durable application, event, job, bucket, and cache descriptors always keep explicit IDs.

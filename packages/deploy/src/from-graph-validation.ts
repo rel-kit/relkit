@@ -6,7 +6,6 @@ export const AWS_DEPLOYMENT_CAPABILITIES = [
   "cache",
   "events",
   "jobs",
-  "models",
   "observability",
 ] as const;
 export type Capability = (typeof AWS_DEPLOYMENT_CAPABILITIES)[number];
@@ -15,9 +14,6 @@ type EnvNode = Extract<GraphNode, { kind: "env" }>;
 export interface FromGraphOptions {
   readonly image?: import("./plan.js").ContainerImagePlan;
   readonly httpPort?: number;
-  readonly modelProfiles?: Readonly<
-    Record<string, { readonly provider: string; readonly model?: string }>
-  >;
 }
 
 export type DeploymentPlanErrorCode =

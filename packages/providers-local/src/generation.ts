@@ -1,4 +1,5 @@
 import type { ProviderCapability, ProviderSet, ProviderValue } from "@zsys/app";
+import { createModelProviderRegistry } from "@zsys/agents";
 import { join } from "node:path";
 import {
   createLocalBucketProvider,
@@ -13,7 +14,6 @@ import {
 import { createLocalEventProvider, type LocalEventProvider } from "./events/provider.js";
 import {
   createLocalJobProvider,
-  createLocalModelProvider,
   createLocalObservabilityProvider,
   type LocalJobProvider,
 } from "./runtime-capabilities.js";
@@ -28,11 +28,11 @@ export interface LocalProviderResources {
     readonly cache: Readonly<Record<string, LocalCacheProvider>>;
     readonly jobs: Readonly<Record<string, LocalJobProvider>>;
     readonly events: Readonly<Record<string, LocalEventProvider>>;
-    readonly models: Readonly<Record<string, ReturnType<typeof createLocalModelProvider>>>;
     readonly observability: Readonly<
       Record<string, ReturnType<typeof createLocalObservabilityProvider>>
     >;
   }>;
+  readonly modelRegistry?: unknown;
   readonly ready: () => Promise<void>;
   readonly release: () => Promise<void>;
 }
@@ -40,7 +40,12 @@ export async function createLocalProviderResources(
   stateRoot: LocalProviderStateRoot,
   providerSet: ProviderSet<"local" | "test">,
   signal: AbortSignal | undefined,
+  values?: Readonly<Record<string, unknown>>,
 ): Promise<LocalProviderResources> {
+  const modelRegistry = await createModelProviderRegistry({
+    configuration: providerSet.metadata.configuration.modelProviders,
+    ...(values === undefined ? {} : { values }),
+  });
   const buckets: Record<string, LocalBucketProvider> = {};
   const cache: Record<string, LocalCacheProvider> = {};
   const events: Record<string, LocalEventProvider> = {};
@@ -75,14 +80,6 @@ export async function createLocalProviderResources(
   const cacheProfiles = Object.freeze(cache);
   const eventProfiles = Object.freeze(events);
   const jobProfiles = Object.freeze(jobs);
-  const modelProfiles = Object.freeze(
-    Object.fromEntries(
-      profiles(providerSet, "models").map((profile) => [
-        profile,
-        createLocalModelProvider(profile, profileConfig(providerSet, "models", profile)),
-      ]),
-    ),
-  );
   const observabilityProfiles = Object.freeze(
     Object.fromEntries(
       profiles(providerSet, "observability").map((profile) => [
@@ -114,9 +111,9 @@ export async function createLocalProviderResources(
       cache: cacheProfiles,
       jobs: jobProfiles,
       events: eventProfiles,
-      models: modelProfiles,
       observability: observabilityProfiles,
     }),
+    ...(modelRegistry === undefined ? {} : { modelRegistry }),
     ready,
     release,
   });

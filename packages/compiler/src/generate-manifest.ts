@@ -20,6 +20,7 @@ import {
   transformExpressionsFor,
 } from "./generate-manifest-expressions.js";
 import { renderManifest } from "./generate-manifest-format.js";
+import { identityBindingStatements } from "./generate-manifest-identities.js";
 
 export const MANIFEST_CODES = Object.freeze({
   handler: "ZSYS_MANIFEST_HANDLER_MISSING",
@@ -78,6 +79,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const transforms = descriptorsOf(input.transforms ?? input.descriptors, "transform");
   const agents = descriptorsOf(input.descriptors, "agent");
   const tools = descriptorsOf(input.descriptors, "tool");
+  const services = descriptorsOf(input.descriptors, "service");
   const events = descriptorsOf(input.descriptors, "event");
   const functionById = uniqueById(functions, diagnostics);
   const modules = collectModules(
@@ -87,9 +89,10 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     functionById,
     input,
     application,
-    [...agents, ...tools, ...events],
+    [...input.descriptors, ...agents, ...tools, ...events],
   );
   const bindings = importBindings(modules);
+  const identityBindings = identityBindingStatements(input.descriptors, bindings, input);
   const functionExpressions = functionExpressionsFor(
     functions,
     functionById,
@@ -101,6 +104,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const applicationExpression = applicationExpressionFor(application, bindings, input);
   const agentExpressions = descriptorExpressionsFor(agents, bindings, input);
   const toolExpressions = descriptorExpressionsFor(tools, bindings, input);
+  const serviceExpressions = descriptorExpressionsFor(services, bindings, input);
   const transformExpressions = transformExpressionsFor(transforms, bindings, input, diagnostics);
   const middlewareExpressions = middlewareExpressionsFor(
     middleware,
@@ -125,6 +129,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       applicationExpression,
       agentExpressions,
       toolExpressions,
+      serviceExpressions,
+      identityBindings,
     ),
     diagnostics,
     true,

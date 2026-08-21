@@ -76,7 +76,7 @@ export function contractGraph(root = "/project", reverse = false): ApplicationGr
     },
   ];
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     appId: "commerce",
     nodes: reverse ? nodes.reverse() : nodes,
     edges: [],

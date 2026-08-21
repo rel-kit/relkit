@@ -9,10 +9,14 @@
     }
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "4.0.0",
+    "@ai-sdk/openai": "4.0.0",
     "@zsys/contracts": "workspace:*",
     "@zsys/functions": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/schema": "workspace:*",
-    "@zsys/tools": "workspace:*"
+    "@zsys/tools": "workspace:*",
+    "ai": "7.0.0"
   },
   "scripts": {
     "build": "tsc -b",

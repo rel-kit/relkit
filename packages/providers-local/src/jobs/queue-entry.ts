@@ -177,6 +177,8 @@ function assertFailure(value: JobFailureMetadata): void {
     throw new JobQueueStateError("Job failure status is invalid");
   if (value.retry !== undefined && value.retry !== "never" && value.retry !== "later")
     throw new JobQueueStateError("Job failure retry classification is invalid");
+  if (value.afterMs !== undefined && (!Number.isSafeInteger(value.afterMs) || value.afterMs < 0))
+    throw new JobQueueStateError("Job failure retry delay is invalid");
   if (value.data !== undefined) canonicalJson(value.data);
 }
 

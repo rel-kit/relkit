@@ -30,7 +30,7 @@ const graph = {
       input: { type: "object" },
       output: { type: "string" },
       instructions: "raw agent instructions",
-      modelProfile: "local-fast",
+      model: "local-fast",
       toolIds: ["orders.tool"],
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
       generatedFunction: { functionId: "zsys.agent.orders.agent.invoke" },
@@ -121,7 +121,7 @@ describe("inspector tool and agent projections", () => {
     const view = agentView(graph, runtime, "orders.agent", spans);
     expect(view).toMatchObject({
       id: "orders.agent",
-      modelProfile: "local-fast",
+      model: "local-fast",
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
       toolIds: ["orders.tool"],
       generatedFunctionId: "zsys.agent.orders.agent.invoke",

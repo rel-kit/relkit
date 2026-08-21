@@ -28,8 +28,6 @@ description: Generated public TypeScript reference for @zsys/functions.
   - [EventClients (type alias)](#eventclients-type-alias)
   - [EventPublishOptions (interface)](#eventpublishoptions-interface)
   - [EventPublishResult (interface)](#eventpublishresult-interface)
-  - [FunctionClientFor (type alias)](#functionclientfor-type-alias)
-  - [FunctionClients (type alias)](#functionclients-type-alias)
   - [JobClientFor (type alias)](#jobclientfor-type-alias)
   - [JobClients (type alias)](#jobclients-type-alias)
   - [JobEnqueueOptions (interface)](#jobenqueueoptions-interface)
@@ -46,10 +44,10 @@ description: Generated public TypeScript reference for @zsys/functions.
 **Signature**
 
 ```ts
-type AgentClientFor<T> = FunctionClientFor<T>;
+type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L109)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L108)
 
 ## AgentClients (type alias)
 
@@ -61,7 +59,7 @@ type AgentClients<M> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L137)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L133)
 
 ## BucketClient
 
@@ -81,7 +79,7 @@ declare const BucketClient: BucketClient;
 type BucketClient = BucketClient;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L119)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L118)
 
 ## BucketClients (type alias)
 
@@ -93,7 +91,7 @@ type BucketClients<M> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L131)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L127)
 
 ## BucketObjectMetadata
 
@@ -133,7 +131,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L120)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L119)
 
 ## CacheClients (type alias)
 
@@ -145,7 +143,7 @@ type CacheClients<M> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L134)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L130)
 
 ## CacheOperationOptions
 
@@ -180,7 +178,7 @@ type EventClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L113)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L112)
 
 ## EventClients (type alias)
 
@@ -192,7 +190,7 @@ type EventClients<M> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L128)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L124)
 
 ## EventPublishOptions (interface)
 
@@ -223,28 +221,6 @@ export interface EventPublishResult<
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L56)
 
-## FunctionClientFor (type alias)
-
-**Signature**
-
-```ts
-type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L108)
-
-## FunctionClients (type alias)
-
-**Signature**
-
-```ts
-type FunctionClients<M> = {
-  readonly [Name in keyof NonNullable<M> & string]: FunctionClientFor<NonNullable<M>[Name]>;
-};
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L122)
-
 ## JobClientFor (type alias)
 
 **Signature**
@@ -255,7 +231,7 @@ type JobClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L110)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L109)
 
 ## JobClients (type alias)
 
@@ -267,7 +243,7 @@ type JobClients<M> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L125)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/clients.ts#L121)
 
 ## JobEnqueueOptions (interface)
 
@@ -340,13 +316,16 @@ export interface JobStatus {
     - [ref (property)](#ref-property)
     - [data (property)](#data-property)
     - [retry (property)](#retry-property)
+    - [afterMs (property)](#afterms-property)
     - [http (property)](#http-property)
   - [DefineErrorOptions (interface)](#defineerroroptions-interface)
   - [ErrorDescriptor (interface)](#errordescriptor-interface)
   - [ErrorDescriptorAny (type alias)](#errordescriptorany-type-alias)
   - [ErrorHttpMapping (interface)](#errorhttpmapping-interface)
   - [ErrorRef (interface)](#errorref-interface)
-  - [ErrorRetry (type alias)](#errorretry-type-alias)
+  - [ErrorRetry](#errorretry)
+  - [ErrorRetryInput](#errorretryinput)
+  - [NormalizedErrorRetry](#normalizederrorretry)
   - [isErrorDescriptor](#iserrordescriptor)
 
 ---
@@ -355,7 +334,12 @@ export interface JobStatus {
 
 ## defineError
 
-Defines a typed application error that can contribute transport metadata.
+Defines a typed application error with safe data, transport metadata, and an optional retry hint.
+
+Source-scoped errors may omit `id`; the compiler derives an identity from a statically
+identifiable binding such as `InvalidError`. Omitted `retry` is non-retryable. Use
+`{ kind: "later", afterMs }` to provide a minimum delay hint for jobs and durable events;
+HTTP and direct calls never repeat the function automatically.
 
 **Example**
 
@@ -370,7 +354,8 @@ const notFound = defineError({
   http: { status: 404 },
   retry: "never",
 });
-void notFound;
+const failure = new notFound({ orderId: "order-1" });
+void failure;
 ```
 
 **Signature**
@@ -381,7 +366,7 @@ declare const defineError: <const Id extends string, const DataSchema extends St
 ) => ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L94)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L112)
 
 Since v0.1.0
 
@@ -399,12 +384,13 @@ declare class DeclaredError<Id, Data> {
     data: Data,
     message: string,
     retry: ErrorRetry,
+    afterMs: number | undefined,
     http: ErrorHttpMapping | undefined,
   );
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L20)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L27)
 
 ### id (property)
 
@@ -414,7 +400,7 @@ declare class DeclaredError<Id, Data> {
 readonly id: Id
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L21)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L28)
 
 ### ref (property)
 
@@ -424,7 +410,7 @@ readonly id: Id
 readonly ref: ErrorRef<Id>
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L22)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L29)
 
 ### data (property)
 
@@ -434,7 +420,7 @@ readonly ref: ErrorRef<Id>
 readonly data: Data
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L23)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L30)
 
 ### retry (property)
 
@@ -444,7 +430,17 @@ readonly data: Data
 readonly retry: ErrorRetry
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L24)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L31)
+
+### afterMs (property)
+
+**Signature**
+
+```ts
+readonly afterMs: number | undefined
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L32)
 
 ### http (property)
 
@@ -454,7 +450,7 @@ readonly retry: ErrorRetry
 readonly http: ErrorHttpMapping | undefined
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L25)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L33)
 
 ## DefineErrorOptions (interface)
 
@@ -465,15 +461,15 @@ export interface DefineErrorOptions<
   Id extends string,
   DataSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly data: DataSchema;
   readonly message: string | ((data: InferOutput<DataSchema>) => string);
   readonly http?: ErrorHttpMapping;
-  readonly retry: ErrorRetry;
+  readonly retry?: ErrorRetryInput;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L63)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L75)
 
 ## ErrorDescriptor (interface)
 
@@ -492,11 +488,13 @@ export interface ErrorDescriptor<
   readonly message: string | ((data: Data) => string);
   readonly http?: ErrorHttpMapping;
   readonly retry: ErrorRetry;
+  readonly afterMs?: number;
   readonly create: (input: InferInput<DataSchema>) => DeclaredError<Id, Data>;
+  new (input: InferInput<DataSchema>): DeclaredError<Id, Data>;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L46)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L56)
 
 ## ErrorDescriptorAny (type alias)
 
@@ -506,7 +504,7 @@ export interface ErrorDescriptor<
 type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L61)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L73)
 
 ## ErrorHttpMapping (interface)
 
@@ -518,7 +516,7 @@ export interface ErrorHttpMapping {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L11)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L18)
 
 ## ErrorRef (interface)
 
@@ -531,17 +529,37 @@ export interface ErrorRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L15)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L22)
 
-## ErrorRetry (type alias)
+## ErrorRetry
 
 **Signature**
 
 ```ts
-type ErrorRetry = "never" | "later";
+declare const ErrorRetry: ErrorRetry;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L9)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L16)
+
+## ErrorRetryInput
+
+**Signature**
+
+```ts
+declare const ErrorRetryInput: ErrorRetryInput;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L16)
+
+## NormalizedErrorRetry
+
+**Signature**
+
+```ts
+declare const NormalizedErrorRetry: NormalizedErrorRetry;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L16)
 
 ## isErrorDescriptor
 
@@ -551,7 +569,7 @@ type ErrorRetry = "never" | "later";
 declare const isErrorDescriptor: (value: unknown) => value is ErrorDescriptorAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L135)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-error.ts#L182)
 
 ## `define-function-types.ts`
 
@@ -576,27 +594,22 @@ export interface DefineFunction {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    Handler extends (
-      input: InferOutput<InputSchema>,
-      request: FunctionRequest,
-      context: FunctionContext<{}>,
-    ) => any,
-    const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}>,
   >(
-    options: Omit<
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Errors, Handler>,
-      "dependencies"
-    > & {
-      readonly dependencies?: never;
-    } & FunctionHandlerValidation<Handler, InferOutput<OutputSchema>, Errors>,
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}> &
+      Options &
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
+        readonly dependencies?: never;
+      },
   ): FunctionDescriptor<
     Id,
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
     {},
-    Errors,
+    ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 
   <
@@ -604,28 +617,25 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
-    Handler extends (
-      input: InferOutput<InputSchema>,
-      request: FunctionRequest,
-      context: FunctionContext<Dependencies>,
-    ) => any,
-    const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Errors, Handler> &
-      FunctionHandlerValidation<Handler, InferOutput<OutputSchema>, Errors>,
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies> &
+      Options &
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): FunctionDescriptor<
     Id,
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
     Dependencies,
-    Errors,
+    ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function-types.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function-types.ts#L55)
 
 ## `define-function.ts`
 
@@ -661,8 +671,6 @@ export interface DefineFunction {
   - [EventPublishResult](#eventpublishresult)
   - [EventRef](#eventref)
   - [EventRefAny](#eventrefany)
-  - [FunctionClientFor](#functionclientfor)
-  - [FunctionClients](#functionclients)
   - [FunctionContext](#functioncontext)
   - [FunctionDependencies](#functiondependencies)
   - [FunctionDescriptor](#functiondescriptor)
@@ -689,7 +697,13 @@ export interface DefineFunction {
 
 ## defineFunction
 
-Defines a graph-visible executable with runtime schemas and declared dependencies.
+Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
+
+The `id` is optional for source-scoped functions; the compiler derives it from the
+source/export hierarchy. Durable resources keep explicit IDs. The handler receives
+validated reusable input, an immutable HTTP request when the call has HTTP transport,
+and a request-scoped context. Use `descriptor.invoke(input)` for nested calls so the
+common engine preserves validation, service policy, limits, and telemetry.
 
 **Example**
 
@@ -698,7 +712,6 @@ import { defineFunction } from "@zsys/functions";
 import { z } from "@zsys/schema";
 
 const greet = defineFunction({
-  id: "greet",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
   handler: async ({ name }, request, context) => {
@@ -706,6 +719,8 @@ const greet = defineFunction({
     return { message: `Hello, ${name}!` };
   },
 });
+const result = await greet.invoke({ name: "Ada" });
+void result;
 void greet;
 ```
 
@@ -715,7 +730,7 @@ void greet;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L93)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L110)
 
 Since v0.1.0
 
@@ -729,7 +744,7 @@ Since v0.1.0
 declare const AgentClientFor: AgentClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L23)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L35)
 
 ## AgentClients
 
@@ -739,7 +754,7 @@ declare const AgentClientFor: AgentClientFor<T>;
 declare const AgentClients: AgentClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L24)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L36)
 
 ## AgentRef
 
@@ -749,7 +764,7 @@ declare const AgentClients: AgentClients<M>;
 declare const AgentRef: AgentRef<Id, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L25)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L37)
 
 ## AgentRefAny
 
@@ -759,7 +774,7 @@ declare const AgentRef: AgentRef<Id, InputSchema, OutputSchema>;
 declare const AgentRefAny: AgentRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L26)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L38)
 
 ## BucketClient
 
@@ -769,7 +784,7 @@ declare const AgentRefAny: AgentRefAny;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L39)
 
 ## BucketClientFor
 
@@ -779,7 +794,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L28)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L40)
 
 ## BucketClients
 
@@ -789,7 +804,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L29)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L41)
 
 ## BucketObjectMetadata
 
@@ -799,7 +814,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L42)
 
 ## BucketRef
 
@@ -809,7 +824,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketRef: BucketRef<Id>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L31)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L43)
 
 ## BucketRefAny
 
@@ -819,7 +834,7 @@ declare const BucketRef: BucketRef<Id>;
 declare const BucketRefAny: BucketRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L32)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L44)
 
 ## CacheClient
 
@@ -829,7 +844,7 @@ declare const BucketRefAny: BucketRefAny;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L33)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L45)
 
 ## CacheClientFor
 
@@ -839,7 +854,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L34)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L46)
 
 ## CacheClients
 
@@ -849,7 +864,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L35)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L47)
 
 ## CacheOperationOptions
 
@@ -859,7 +874,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L48)
 
 ## CacheRef
 
@@ -869,7 +884,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L37)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L49)
 
 ## CacheRefAny
 
@@ -879,7 +894,7 @@ declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 declare const CacheRefAny: CacheRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L38)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L50)
 
 ## DefineFunctionOptions
 
@@ -895,7 +910,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 >;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L40)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L52)
 
 ## DescriptorRef
 
@@ -905,7 +920,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 declare const DescriptorRef: DescriptorRef<Kind, Id>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L39)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L51)
 
 ## EventAttributeValue
 
@@ -915,7 +930,7 @@ declare const DescriptorRef: DescriptorRef<Kind, Id>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L43)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L55)
 
 ## EventClientFor
 
@@ -925,7 +940,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L41)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L53)
 
 ## EventClients
 
@@ -935,7 +950,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L42)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L54)
 
 ## EventPublishOptions
 
@@ -945,7 +960,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L56)
 
 ## EventPublishResult
 
@@ -955,7 +970,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L45)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L57)
 
 ## EventRef
 
@@ -965,7 +980,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const EventRef: EventRef<Id, PayloadSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L46)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L58)
 
 ## EventRefAny
 
@@ -975,27 +990,7 @@ declare const EventRef: EventRef<Id, PayloadSchema>;
 declare const EventRefAny: EventRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L47)
-
-## FunctionClientFor
-
-**Signature**
-
-```ts
-declare const FunctionClientFor: FunctionClientFor<T>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L48)
-
-## FunctionClients
-
-**Signature**
-
-```ts
-declare const FunctionClients: FunctionClients<M>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L49)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L59)
 
 ## FunctionContext
 
@@ -1005,7 +1000,7 @@ declare const FunctionClients: FunctionClients<M>;
 declare const FunctionContext: FunctionContext<D>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L50)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L60)
 
 ## FunctionDependencies
 
@@ -1015,7 +1010,7 @@ declare const FunctionContext: FunctionContext<D>;
 declare const FunctionDependencies: FunctionDependencies;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L51)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L61)
 
 ## FunctionDescriptor
 
@@ -1029,11 +1024,12 @@ declare const FunctionDescriptor: FunctionDescriptor<
   Dependencies,
   Errors,
   InputSchema,
-  OutputSchema
+  OutputSchema,
+  ToolMetadata
 >;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L52)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L62)
 
 ## FunctionRef
 
@@ -1043,7 +1039,7 @@ declare const FunctionDescriptor: FunctionDescriptor<
 declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L54)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L64)
 
 ## FunctionRefAny
 
@@ -1053,7 +1049,7 @@ declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, O
 declare const FunctionRefAny: FunctionRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L55)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L65)
 
 ## FunctionRequest
 
@@ -1063,7 +1059,7 @@ declare const FunctionRefAny: FunctionRefAny;
 declare const FunctionRequest: FunctionRequest;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L53)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L63)
 
 ## InvocationMetadata
 
@@ -1073,7 +1069,7 @@ declare const FunctionRequest: FunctionRequest;
 declare const InvocationMetadata: InvocationMetadata;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L56)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L66)
 
 ## InvocationSource
 
@@ -1083,7 +1079,7 @@ declare const InvocationMetadata: InvocationMetadata;
 declare const InvocationSource: InvocationSource;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L57)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L67)
 
 ## JobClientFor
 
@@ -1093,7 +1089,7 @@ declare const InvocationSource: InvocationSource;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L59)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L69)
 
 ## JobClients
 
@@ -1103,7 +1099,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L60)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L70)
 
 ## JobEnqueueOptions
 
@@ -1113,7 +1109,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L58)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L68)
 
 ## JobEnqueueResult
 
@@ -1123,7 +1119,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L61)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L71)
 
 ## JobRef
 
@@ -1133,7 +1129,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare const JobRef: JobRef<Id, InputSchema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L62)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L72)
 
 ## JobRefAny
 
@@ -1143,7 +1139,7 @@ declare const JobRef: JobRef<Id, InputSchema>;
 declare const JobRefAny: JobRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L63)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L73)
 
 ## JobState
 
@@ -1153,7 +1149,7 @@ declare const JobRefAny: JobRefAny;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L74)
 
 ## JobStatus
 
@@ -1163,7 +1159,7 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L65)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L75)
 
 ## PublicClock
 
@@ -1173,7 +1169,7 @@ declare const JobStatus: JobStatus;
 declare const PublicClock: PublicClock;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L66)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L76)
 
 ## PublicLogger
 
@@ -1183,7 +1179,7 @@ declare const PublicClock: PublicClock;
 declare const PublicLogger: PublicLogger;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L67)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L77)
 
 ## ResolvedApplicationEnv
 
@@ -1193,7 +1189,324 @@ declare const PublicLogger: PublicLogger;
 declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L68)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/define-function.ts#L78)
+
+## `function-tool-runtime.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FunctionToolApprovalDeniedError (class)](#functiontoolapprovaldeniederror-class)
+    - [code (property)](#code-property)
+  - [FunctionToolApprovalRequiredError (class)](#functiontoolapprovalrequirederror-class)
+    - [code (property)](#code-property-1)
+  - [FunctionToolArgumentValidationError (class)](#functiontoolargumentvalidationerror-class)
+    - [code (property)](#code-property-2)
+    - [issues (property)](#issues-property)
+  - [FunctionToolOperationCancelledError (class)](#functiontooloperationcancellederror-class)
+    - [code (property)](#code-property-3)
+  - [createFunctionToolInvoker](#createfunctiontoolinvoker)
+
+---
+
+# utils
+
+## FunctionToolApprovalDeniedError (class)
+
+**Signature**
+
+```ts
+declare class FunctionToolApprovalDeniedError { constructor(readonly approval: FunctionToolApprovalRequest) }
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L50)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "ZSYS_APPROVAL_DENIED"
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L51)
+
+## FunctionToolApprovalRequiredError (class)
+
+**Signature**
+
+```ts
+declare class FunctionToolApprovalRequiredError { constructor(readonly approval: FunctionToolApprovalRequest) }
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L41)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "ZSYS_APPROVAL_REQUIRED"
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L42)
+
+## FunctionToolArgumentValidationError (class)
+
+**Signature**
+
+```ts
+declare class FunctionToolArgumentValidationError {
+  constructor(issues: readonly StandardIssue[]);
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L21)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "ZSYS_TOOL_ARGUMENT_VALIDATION"
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L22)
+
+### issues (property)
+
+**Signature**
+
+```ts
+readonly issues: ReadonlyArray<StandardIssue>
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L23)
+
+## FunctionToolOperationCancelledError (class)
+
+**Signature**
+
+```ts
+declare class FunctionToolOperationCancelledError {
+  constructor();
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L32)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "ABORT_ERR"
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L33)
+
+## createFunctionToolInvoker
+
+**Signature**
+
+```ts
+declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
+  target: Target,
+  metadata: FunctionToolRuntimeMetadata,
+  identity?: object,
+) => (
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => Promise<InferOutput<Target["output"]>>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool-runtime.ts#L59)
+
+## `function-tool.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FunctionToolApproval (type alias)](#functiontoolapproval-type-alias)
+  - [FunctionToolApprovalDecision (type alias)](#functiontoolapprovaldecision-type-alias)
+  - [FunctionToolApprovalRequest (interface)](#functiontoolapprovalrequest-interface)
+  - [FunctionToolApprovalResolver (type alias)](#functiontoolapprovalresolver-type-alias)
+  - [FunctionToolDescriptor (interface)](#functiontooldescriptor-interface)
+  - [FunctionToolInvokeOptions (interface)](#functiontoolinvokeoptions-interface)
+  - [FunctionToolMetadata (interface)](#functiontoolmetadata-interface)
+  - [FunctionToolOptions (interface)](#functiontooloptions-interface)
+  - [FunctionToolSideEffect (type alias)](#functiontoolsideeffect-type-alias)
+  - [FunctionToolTarget (type alias)](#functiontooltarget-type-alias)
+  - [copyFunctionToolMetadata](#copyfunctiontoolmetadata)
+  - [createFunctionTool](#createfunctiontool)
+
+---
+
+# utils
+
+## FunctionToolApproval (type alias)
+
+**Signature**
+
+```ts
+type FunctionToolApproval = "never" | "on-write" | "always";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L17)
+
+## FunctionToolApprovalDecision (type alias)
+
+**Signature**
+
+```ts
+type FunctionToolApprovalDecision = "approved" | "denied" | boolean;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L36)
+
+## FunctionToolApprovalRequest (interface)
+
+**Signature**
+
+```ts
+export interface FunctionToolApprovalRequest {
+  readonly toolId: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly policy: FunctionToolApproval;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L30)
+
+## FunctionToolApprovalResolver (type alias)
+
+**Signature**
+
+```ts
+type FunctionToolApprovalResolver = (
+  approval: FunctionToolApprovalRequest,
+) => MaybePromise<FunctionToolApprovalDecision>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L38)
+
+## FunctionToolDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface FunctionToolDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+> extends DescriptorBase<"tool", Id> {
+  readonly ref: { readonly kind: "tool"; readonly id: Id };
+  readonly target: FunctionToolTarget<Target>;
+  readonly description: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly approval: FunctionToolApproval;
+  readonly timeoutMs?: number;
+  /** Invokes the target through the common tool and function runtime. */
+  readonly invoke: (
+    input: InferInput<Target["input"]>,
+    options?: FunctionToolInvokeOptions,
+  ) => Promise<InferOutput<Target["output"]>>;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L56)
+
+## FunctionToolInvokeOptions (interface)
+
+**Signature**
+
+```ts
+export interface FunctionToolInvokeOptions {
+  readonly signal?: AbortSignal;
+  readonly approval?: FunctionToolApprovalResolver;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L42)
+
+## FunctionToolMetadata (interface)
+
+**Signature**
+
+```ts
+export interface FunctionToolMetadata extends DescriptorMetadata {
+  readonly description: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly approval: FunctionToolApproval;
+  readonly timeoutMs?: number;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L19)
+
+## FunctionToolOptions (interface)
+
+**Signature**
+
+```ts
+export interface FunctionToolOptions<Id extends string = string> extends FunctionToolMetadata {
+  readonly id?: Id;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L26)
+
+## FunctionToolSideEffect (type alias)
+
+**Signature**
+
+```ts
+type FunctionToolSideEffect = "none" | "read" | "write" | "external";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L16)
+
+## FunctionToolTarget (type alias)
+
+**Signature**
+
+```ts
+type FunctionToolTarget<Target> = FunctionRef<
+  Target["ref"]["id"],
+  Target extends { readonly __input?: infer Input } ? Input : unknown,
+  Target extends { readonly __output?: infer Output } ? Output : unknown,
+  TargetErrors<Target>,
+  Target["input"],
+  Target["output"]
+>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L47)
+
+## copyFunctionToolMetadata
+
+**Signature**
+
+```ts
+declare const copyFunctionToolMetadata: (value: unknown) => FunctionToolMetadata;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L116)
+
+## createFunctionTool
+
+**Signature**
+
+```ts
+declare const createFunctionTool: <const Id extends string, const Target extends FunctionRefAny>(
+  options: FunctionToolCreateOptions<Id, Target>,
+) => FunctionToolDescriptor<Id, Target>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/function-tool.ts#L81)
 
 ## `handler-result.ts`
 
@@ -1222,7 +1535,7 @@ declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 type DeclaredErrorOf<Descriptor> = ReturnType<Descriptor["create"]>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L15)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L19)
 
 ## DeclaredErrorsOf (type alias)
 
@@ -1236,7 +1549,7 @@ type DeclaredErrorsOf<Descriptors> = Descriptors[number] extends infer Descripto
   : never;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L17)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L23)
 
 ## FunctionEffectValue (interface)
 
@@ -1245,8 +1558,12 @@ Structural Effect shape used without making Effect a required dependency.
 **Signature**
 
 ```ts
-export interface FunctionEffectValue {
-  readonly "~effect/Effect": unknown;
+export interface FunctionEffectValue<Output = unknown, Error = unknown, Requirements = unknown> {
+  readonly "~effect/Effect": {
+    readonly _A: (_: never) => Output;
+    readonly _E: (_: never) => Error;
+    readonly _R: (_: never) => Requirements;
+  };
   readonly pipe: (...args: never[]) => unknown;
   readonly [Symbol.iterator]: () => unknown;
 }
@@ -1273,26 +1590,33 @@ export interface FunctionFailure<Error extends globalThis.Error = globalThis.Err
 
 ```ts
 type FunctionHandlerResult<Output, Errors> =
-  Output | FunctionFailure<DeclaredErrorsOf<Errors>> | FunctionEffectValue;
+  | Output
+  | DeclaredErrorsOf<Errors>
+  | FunctionFailure<DeclaredErrorsOf<Errors>>
+  | FunctionEffectValue<Output, DeclaredErrorsOf<Errors>, never>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L42)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L30)
 
 ## FunctionHandlerValidation (type alias)
 
 **Signature**
 
 ```ts
-type FunctionHandlerValidation<Handler, Output, Errors> = [
-  InvalidHandlerResult<HandlerReturn<NoInfer<Handler>>, Output, DeclaredErrorsOf<Errors>>,
+type FunctionHandlerValidation<Result, Output, Errors> = [
+  InvalidHandlerResult<Awaited<Result>, Output, DeclaredErrorsOf<Errors>>,
 ] extends [never]
-  ? {}
+  ? [MissingDeclaredErrors<Result, Errors>] extends [never]
+    ? {}
+    : {
+        readonly __zsys_handler_error__: "Return every error declared in the function's errors list";
+      }
   : {
-      readonly __zsys_handler_error__: "Declare every error returned by the handler in the function's errors list";
+      readonly __zsys_handler_error__: "Return values and errors must match the function contract";
     };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L99)
 
 ## fail
 
@@ -1307,7 +1631,7 @@ declare const fail: <const Descriptor extends ErrorDescriptorAny>(
 ) => FunctionFailure<DeclaredErrorOf<Descriptor>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L88)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/handler-result.ts#L114)
 
 ## `index.ts`
 
@@ -1319,6 +1643,21 @@ declare const fail: <const Descriptor extends ErrorDescriptorAny>(
   - ["./define-error.js" (namespace export)](#define-errorjs-namespace-export)
   - ["./define-function.js" (namespace export)](#define-functionjs-namespace-export)
   - ["./handler-result.js" (namespace export)](#handler-resultjs-namespace-export)
+  - [FunctionToolApproval](#functiontoolapproval)
+  - [FunctionToolApprovalDecision](#functiontoolapprovaldecision)
+  - [FunctionToolApprovalDeniedError](#functiontoolapprovaldeniederror)
+  - [FunctionToolApprovalRequest](#functiontoolapprovalrequest)
+  - [FunctionToolApprovalRequiredError](#functiontoolapprovalrequirederror)
+  - [FunctionToolApprovalResolver](#functiontoolapprovalresolver)
+  - [FunctionToolArgumentValidationError](#functiontoolargumentvalidationerror)
+  - [FunctionToolDescriptor](#functiontooldescriptor)
+  - [FunctionToolInvokeOptions](#functiontoolinvokeoptions)
+  - [FunctionToolMetadata](#functiontoolmetadata)
+  - [FunctionToolOperationCancelledError](#functiontooloperationcancellederror)
+  - [FunctionToolOptions](#functiontooloptions)
+  - [FunctionToolSideEffect](#functiontoolsideeffect)
+  - [FunctionToolTarget](#functiontooltarget)
+  - [createFunctionToolInvoker](#createfunctiontoolinvoker)
 
 ---
 
@@ -1360,6 +1699,163 @@ export * from "./handler-result.js";
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L3)
 
+## FunctionToolApproval
+
+**Signature**
+
+```ts
+declare const FunctionToolApproval: FunctionToolApproval;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L5)
+
+## FunctionToolApprovalDecision
+
+**Signature**
+
+```ts
+declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L6)
+
+## FunctionToolApprovalDeniedError
+
+**Signature**
+
+```ts
+declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L18)
+
+## FunctionToolApprovalRequest
+
+**Signature**
+
+```ts
+declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L7)
+
+## FunctionToolApprovalRequiredError
+
+**Signature**
+
+```ts
+declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L19)
+
+## FunctionToolApprovalResolver
+
+**Signature**
+
+```ts
+declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L8)
+
+## FunctionToolArgumentValidationError
+
+**Signature**
+
+```ts
+declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L20)
+
+## FunctionToolDescriptor
+
+**Signature**
+
+```ts
+declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L9)
+
+## FunctionToolInvokeOptions
+
+**Signature**
+
+```ts
+declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L10)
+
+## FunctionToolMetadata
+
+**Signature**
+
+```ts
+declare const FunctionToolMetadata: FunctionToolMetadata;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L11)
+
+## FunctionToolOperationCancelledError
+
+**Signature**
+
+```ts
+declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L21)
+
+## FunctionToolOptions
+
+**Signature**
+
+```ts
+declare const FunctionToolOptions: FunctionToolOptions<Id>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L12)
+
+## FunctionToolSideEffect
+
+**Signature**
+
+```ts
+declare const FunctionToolSideEffect: FunctionToolSideEffect;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L13)
+
+## FunctionToolTarget
+
+**Signature**
+
+```ts
+declare const FunctionToolTarget: FunctionToolTarget<Target>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L14)
+
+## createFunctionToolInvoker
+
+**Signature**
+
+```ts
+declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
+  target: Target,
+  metadata: FunctionToolRuntimeMetadata,
+  identity?: object,
+) => (
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => Promise<InferOutput<Target["output"]>>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/index.ts#L17)
+
 ## `types.ts`
 
 ---
@@ -1392,8 +1888,6 @@ export * from "./handler-result.js";
   - [EventPublishResult](#eventpublishresult)
   - [EventRef (interface)](#eventref-interface)
   - [EventRefAny (type alias)](#eventrefany-type-alias)
-  - [FunctionClientFor](#functionclientfor)
-  - [FunctionClients](#functionclients)
   - [FunctionContext (interface)](#functioncontext-interface)
   - [FunctionDependencies (interface)](#functiondependencies-interface)
   - [FunctionDescriptor (interface)](#functiondescriptor-interface)
@@ -1401,7 +1895,7 @@ export * from "./handler-result.js";
   - [FunctionRef (interface)](#functionref-interface)
   - [FunctionRefAny (type alias)](#functionrefany-type-alias)
   - [FunctionRequest (type alias)](#functionrequest-type-alias)
-  - [InvocationMetadata (interface)](#invocationmetadata-interface)
+  - [InvocationMetadata (type alias)](#invocationmetadata-type-alias)
   - [InvocationSource (type alias)](#invocationsource-type-alias)
   - [JobClientFor](#jobclientfor)
   - [JobClients](#jobclients)
@@ -1411,8 +1905,8 @@ export * from "./handler-result.js";
   - [JobRefAny (type alias)](#jobrefany-type-alias)
   - [JobState](#jobstate)
   - [JobStatus](#jobstatus)
-  - [PublicClock (interface)](#publicclock-interface)
-  - [PublicLogger (interface)](#publiclogger-interface)
+  - [PublicClock (type alias)](#publicclock-type-alias)
+  - [PublicLogger (type alias)](#publiclogger-type-alias)
   - [ResolvedApplicationEnv (type alias)](#resolvedapplicationenv-type-alias)
 
 ---
@@ -1427,7 +1921,7 @@ export * from "./handler-result.js";
 declare const AgentClientFor: AgentClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L22)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L32)
 
 ## AgentClients
 
@@ -1437,7 +1931,7 @@ declare const AgentClientFor: AgentClientFor<T>;
 declare const AgentClients: AgentClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L23)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L33)
 
 ## AgentRef (interface)
 
@@ -1454,7 +1948,7 @@ export interface AgentRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L93)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L101)
 
 ## AgentRefAny (type alias)
 
@@ -1464,7 +1958,7 @@ export interface AgentRef<
 type AgentRefAny = AgentRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L107)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L115)
 
 ## BucketClient
 
@@ -1474,7 +1968,7 @@ type AgentRefAny = AgentRef;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L24)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L34)
 
 ## BucketClientFor
 
@@ -1484,7 +1978,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L25)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L35)
 
 ## BucketClients
 
@@ -1494,7 +1988,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L26)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L36)
 
 ## BucketObjectMetadata
 
@@ -1504,7 +1998,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L37)
 
 ## BucketRef (type alias)
 
@@ -1514,7 +2008,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 type BucketRef<Id> = DescriptorRef<"bucket", Id>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L82)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L90)
 
 ## BucketRefAny (type alias)
 
@@ -1524,7 +2018,7 @@ type BucketRef<Id> = DescriptorRef<"bucket", Id>;
 type BucketRefAny = BucketRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L105)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L113)
 
 ## CacheClient
 
@@ -1534,7 +2028,7 @@ type BucketRefAny = BucketRef;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L28)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L38)
 
 ## CacheClientFor
 
@@ -1544,7 +2038,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L29)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L39)
 
 ## CacheClients
 
@@ -1554,7 +2048,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L40)
 
 ## CacheOperationOptions
 
@@ -1564,7 +2058,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L31)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L41)
 
 ## CacheRef (interface)
 
@@ -1581,7 +2075,7 @@ export interface CacheRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L84)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L92)
 
 ## CacheRefAny (type alias)
 
@@ -1591,7 +2085,7 @@ export interface CacheRef<
 type CacheRefAny = CacheRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L106)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L114)
 
 ## DefineFunctionOptions (interface)
 
@@ -1605,13 +2099,14 @@ export interface DefineFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly input: InputSchema;
   readonly output: OutputSchema;
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
+  readonly tool?: FunctionToolMetadata;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
@@ -1621,7 +2116,7 @@ export interface DefineFunctionOptions<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L179)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L248)
 
 ## DescriptorRef (interface)
 
@@ -1633,7 +2128,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L47)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L55)
 
 ## EventAttributeValue
 
@@ -1643,7 +2138,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L34)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L44)
 
 ## EventClientFor
 
@@ -1653,7 +2148,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L32)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L42)
 
 ## EventClients
 
@@ -1663,7 +2158,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L33)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L43)
 
 ## EventPublishOptions
 
@@ -1673,7 +2168,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L35)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L45)
 
 ## EventPublishResult
 
@@ -1683,7 +2178,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L46)
 
 ## EventRef (interface)
 
@@ -1699,7 +2194,7 @@ export interface EventRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L82)
 
 ## EventRefAny (type alias)
 
@@ -1709,27 +2204,7 @@ export interface EventRef<
 type EventRefAny = EventRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L104)
-
-## FunctionClientFor
-
-**Signature**
-
-```ts
-declare const FunctionClientFor: FunctionClientFor<T>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L37)
-
-## FunctionClients
-
-**Signature**
-
-```ts
-declare const FunctionClients: FunctionClients<M>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L38)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L112)
 
 ## FunctionContext (interface)
 
@@ -1742,16 +2217,17 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly env: ResolvedApplicationEnv;
   readonly log: PublicLogger;
   readonly time: PublicClock;
-  readonly functions: FunctionClients<D["functions"]>;
   readonly jobs: JobClients<D["jobs"]>;
   readonly events: EventClients<D["events"]>;
   readonly buckets: BucketClients<D["buckets"]>;
   readonly cache: CacheClients<D["cache"]>;
   readonly agents: AgentClients<D["agents"]>;
+  /** Read-only context added by the owning service middleware for this invocation. */
+  readonly service: Readonly<Record<string, unknown>>;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L147)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L201)
 
 ## FunctionDependencies (interface)
 
@@ -1759,7 +2235,6 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
 
 ```ts
 export interface FunctionDependencies {
-  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly events?: Readonly<Record<string, EventRefAny>>;
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
@@ -1768,7 +2243,7 @@ export interface FunctionDependencies {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L109)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L117)
 
 ## FunctionDescriptor (interface)
 
@@ -1783,18 +2258,32 @@ export interface FunctionDescriptor<
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  ToolMetadata extends FunctionToolMetadata | undefined = undefined,
 >
   extends
     DescriptorBase<"function", Id>,
     FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema> {
-  readonly dependencies?: Dependencies;
+  readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
+  readonly tool?: ToolMetadata;
   readonly handler: FunctionHandler<Input, Output, Dependencies, Errors>;
+  /** Invokes the descriptor through the active or isolated common engine. */
+  readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
+  /** Creates a handler-free tool view with inherited schemas and declared errors. */
+  readonly asTool: FunctionAsTool<
+    Id,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    ToolMetadata
+  >;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L161)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L216)
 
 ## FunctionHandler (type alias)
 
@@ -1808,7 +2297,7 @@ type FunctionHandler<Input, Output, Dependencies, Errors> = (
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L201)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L271)
 
 ## FunctionRef (interface)
 
@@ -1831,7 +2320,7 @@ export interface FunctionRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L51)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L59)
 
 ## FunctionRefAny (type alias)
 
@@ -1841,9 +2330,11 @@ export interface FunctionRef<
 type FunctionRefAny = FunctionRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L102)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L110)
 
 ## FunctionRequest (type alias)
+
+Optional immutable HTTP transport view; non-HTTP calls receive `undefined`.
 
 **Signature**
 
@@ -1853,33 +2344,25 @@ type FunctionRequest = ContractFunctionRequest | undefined;
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L132)
 
-## InvocationMetadata (interface)
+## InvocationMetadata (type alias)
 
 **Signature**
 
 ```ts
-export interface InvocationMetadata {
-  readonly id: string;
-  readonly parentId?: string;
-  readonly traceId: string;
-  readonly startedAt: string;
-  readonly deadline?: string;
-  readonly attempt: number;
-  readonly source: InvocationSource;
-}
+type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L120)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L127)
 
 ## InvocationSource (type alias)
 
 **Signature**
 
 ```ts
-type InvocationSource = "direct" | "http" | "job" | "event" | "tool" | "agent";
+type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L118)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L125)
 
 ## JobClientFor
 
@@ -1889,7 +2372,7 @@ type InvocationSource = "direct" | "http" | "job" | "event" | "tool" | "agent";
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L40)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L48)
 
 ## JobClients
 
@@ -1899,7 +2382,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L41)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L49)
 
 ## JobEnqueueOptions
 
@@ -1909,7 +2392,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L39)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L47)
 
 ## JobEnqueueResult
 
@@ -1919,7 +2402,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L42)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L50)
 
 ## JobRef (interface)
 
@@ -1935,7 +2418,7 @@ export interface JobRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L66)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L74)
 
 ## JobRefAny (type alias)
 
@@ -1945,7 +2428,7 @@ export interface JobRef<
 type JobRefAny = JobRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L103)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L111)
 
 ## JobState
 
@@ -1955,7 +2438,7 @@ type JobRefAny = JobRef;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L43)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L51)
 
 ## JobStatus
 
@@ -1965,33 +2448,24 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L52)
 
-## PublicClock (interface)
+## PublicClock (type alias)
 
 **Signature**
 
 ```ts
-export interface PublicClock {
-  now(): Date;
-  sleep(milliseconds: number): Promise<void>;
-}
+type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L142)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L136)
 
-## PublicLogger (interface)
+## PublicLogger (type alias)
 
 **Signature**
 
 ```ts
-export interface PublicLogger {
-  trace(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  debug(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  info(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  warn(message: string, fields?: Readonly<Record<string, unknown>>): void;
-  error(message: string, fields?: Readonly<Record<string, unknown>>): void;
-}
+type PublicLogger = SharedPublicLogger;
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L134)
@@ -2004,4 +2478,4 @@ export interface PublicLogger {
 type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L130)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/functions/src/types.ts#L129)

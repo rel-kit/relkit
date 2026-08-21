@@ -12,6 +12,7 @@ export interface InvocationContextBase {
   readonly env: Readonly<Record<string, unknown>>;
   readonly log: unknown;
   readonly time: unknown;
+  readonly service?: Readonly<Record<string, unknown>>;
 }
 
 export interface ContextBuildOptions {
@@ -60,21 +61,18 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
   });
   return Object.freeze({
     ...base,
-    functions: clients.functions,
     jobs: clients.jobs,
     events: clients.events,
     buckets: clients.buckets,
     cache: clients.cache,
     agents: clients.agents,
+    service: (base as unknown as InvocationContextBase).service ?? Object.freeze({}),
   }) as Context;
 }
 
 function sourceMaps(base: InvocationContextBase): DependencyClientSources {
   const value = base as InvocationContextBase & Record<string, unknown>;
   return {
-    ...(value.functions === undefined
-      ? {}
-      : { functions: value.functions as Readonly<Record<string, unknown>> }),
     ...(value.jobs === undefined ? {} : { jobs: value.jobs as Readonly<Record<string, unknown>> }),
     ...(value.events === undefined
       ? {}

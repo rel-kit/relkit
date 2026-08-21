@@ -81,7 +81,7 @@ export interface ToolView {
 }
 export interface AgentView {
   readonly id: string;
-  readonly modelProfile: string;
+  readonly model: string;
   readonly limits?: unknown;
   readonly input?: unknown;
   readonly output?: unknown;
@@ -187,7 +187,7 @@ function makeAgentView(
   });
   return {
     id,
-    modelProfile: text(node.modelProfile),
+    model: text(node.model),
     ...(node.limits === undefined ? {} : { limits: node.limits }),
     ...(node.input === undefined ? {} : { input: node.input }),
     ...(node.output === undefined ? {} : { output: node.output }),

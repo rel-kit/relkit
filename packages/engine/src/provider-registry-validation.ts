@@ -13,7 +13,6 @@ const capabilities = new Set<ProviderCapability>([
   "cache",
   "jobs",
   "events",
-  "models",
   "observability",
 ]);
 
@@ -173,7 +172,6 @@ function nodeRequirement(
       capability: node.kind === "bucket" ? "buckets" : node.kind === "cache" ? "cache" : "jobs",
       profile: node.profile,
     };
-  if (node.kind === "agent") return { capability: "models", profile: node.modelProfile };
   if (node.kind !== "trigger" || node.triggerType !== "event") return undefined;
   const profile =
     isRecord(node.config) && typeof node.config.profile === "string"

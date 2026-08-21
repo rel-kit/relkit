@@ -444,7 +444,11 @@ declare const copyAgentTools: (value: unknown) => readonly ToolRefAny[];
 
 ## defineAgent
 
-Defines an agent contract with bounded tools, model selection, and execution limits.
+Defines an agent contract with bounded tools, an optional serializable AI SDK
+model selector, and execution limits. Omitted `model` uses the active provider
+defaults; a provider name selects that provider's default model and
+`provider:model` selects an exact registry model. Credentials and live model
+objects belong in environment provider configuration, never in this descriptor.
 
 **Example**
 
@@ -456,7 +460,6 @@ const support = defineAgent({
   id: "support",
   input: z.string(),
   output: z.string(),
-  modelProfile: "default",
   instructions: "Answer safely.",
   tools: [],
   limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 },
@@ -482,7 +485,7 @@ declare const defineAgent: <
 >;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L70)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L74)
 
 Since v0.1.0
 
@@ -501,7 +504,7 @@ export interface AgentDescriptor<
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
 >
   extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
-  readonly modelProfile: string;
+  readonly model?: string;
   readonly instructions: string | PromptTemplate;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
@@ -534,10 +537,10 @@ export interface DefineAgentOptions<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly input: InputSchema;
   readonly output: OutputSchema;
-  readonly modelProfile: string;
+  readonly model?: string;
   readonly instructions: string | PromptTemplate;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
@@ -567,7 +570,7 @@ export interface PromptTemplate {
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L129)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L142)
 
 ## isAgentDescriptor
 
@@ -577,7 +580,7 @@ declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentA
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L110)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L115)
 
 ## `generated-function.ts`
 
@@ -734,7 +737,8 @@ declare const isGeneratedAgentFunction: (value: unknown) => value is GeneratedAg
   - ["./approval.js" (namespace export)](#approvaljs-namespace-export)
   - ["./define-agent.js" (namespace export)](#define-agentjs-namespace-export)
   - ["./generated-function.js" (namespace export)](#generated-functionjs-namespace-export)
-  - ["./model-provider.js" (namespace export)](#model-providerjs-namespace-export)
+  - ["./model-provider-registry.js" (namespace export)](#model-provider-registryjs-namespace-export)
+  - ["./model-selection.js" (namespace export)](#model-selectionjs-namespace-export)
   - ["./observability.js" (namespace export)](#observabilityjs-namespace-export)
   - ["./runtime.js" (namespace export)](#runtimejs-namespace-export)
 
@@ -776,19 +780,31 @@ Re-exports all named exports from the "./generated-function.js" module.
 export * from "./generated-function.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L4)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L3)
 
-## "./model-provider.js" (namespace export)
+## "./model-provider-registry.js" (namespace export)
 
-Re-exports all named exports from the "./model-provider.js" module.
+Re-exports all named exports from the "./model-provider-registry.js" module.
 
 **Signature**
 
 ```ts
-export * from "./model-provider.js";
+export * from "./model-provider-registry.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L3)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L6)
+
+## "./model-selection.js" (namespace export)
+
+Re-exports all named exports from the "./model-selection.js" module.
+
+**Signature**
+
+```ts
+export * from "./model-selection.js";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L7)
 
 ## "./observability.js" (namespace export)
 
@@ -800,7 +816,7 @@ Re-exports all named exports from the "./observability.js" module.
 export * from "./observability.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L6)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L5)
 
 ## "./runtime.js" (namespace export)
 
@@ -812,266 +828,296 @@ Re-exports all named exports from the "./runtime.js" module.
 export * from "./runtime.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L5)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/index.ts#L4)
 
-## `model-provider.ts`
+## `model-provider-registry-errors.ts`
 
 ---
 
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [CreateModelRequestOptions (interface)](#createmodelrequestoptions-interface)
-  - [LogicalModelProfile (type alias)](#logicalmodelprofile-type-alias)
-  - [MODEL_PROVIDER_PROTOCOL](#model_provider_protocol)
-  - [MODEL_PROVIDER_VERSION](#model_provider_version)
-  - [ModelCapabilities (interface)](#modelcapabilities-interface)
-  - [ModelContractError (class)](#modelcontracterror-class)
-    - [code (property)](#code-property)
-  - [ModelMessage (interface)](#modelmessage-interface)
-  - [ModelProfile (type alias)](#modelprofile-type-alias)
-  - [ModelProvider (interface)](#modelprovider-interface)
-  - [ModelRequest (interface)](#modelrequest-interface)
-  - [ModelRole (type alias)](#modelrole-type-alias)
-  - [ModelToolDefinition (interface)](#modeltooldefinition-interface)
-  - [ModelTurn (type alias)](#modelturn-type-alias)
-  - [createModelCapabilities](#createmodelcapabilities)
-  - [createModelRequest](#createmodelrequest)
-  - [createModelTurn](#createmodelturn)
-  - [normalizeModelProfile](#normalizemodelprofile)
+  - [ModelProviderRegistryError (class)](#modelproviderregistryerror-class)
+    - [name (property)](#name-property)
+  - [ModelProviderRegistryErrorCode (type alias)](#modelproviderregistryerrorcode-type-alias)
 
 ---
 
 # utils
 
-## CreateModelRequestOptions (interface)
+## ModelProviderRegistryError (class)
 
 **Signature**
 
 ```ts
-export interface CreateModelRequestOptions {
-  readonly profile: unknown;
-  readonly messages: readonly ModelMessage[];
-  readonly tools?: readonly ModelToolDefinition[];
-  readonly maxInputBytes: number;
-  readonly maxOutputBytes: number;
-  readonly signal?: AbortSignal;
+declare class ModelProviderRegistryError { constructor(
+    readonly code: ModelProviderRegistryErrorCode,
+    message: string,
+  ) }
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry-errors.ts#L10)
+
+### name (property)
+
+**Signature**
+
+```ts
+readonly name: "ModelProviderRegistryError"
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry-errors.ts#L11)
+
+## ModelProviderRegistryErrorCode (type alias)
+
+**Signature**
+
+```ts
+type ModelProviderRegistryErrorCode =
+  | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
+  | "ZSYS_MODEL_PROVIDER_UNSUPPORTED"
+  | "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID"
+  | "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE"
+  | ModelSelectionErrorCode;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry-errors.ts#L3)
+
+## `model-provider-registry.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ActiveModelProviderRegistry (interface)](#activemodelproviderregistry-interface)
+  - [ModelProviderRegistryError](#modelproviderregistryerror)
+  - [ModelProviderRegistryErrorCode](#modelproviderregistryerrorcode)
+  - [ModelProviderRegistryOptions (interface)](#modelproviderregistryoptions-interface)
+  - [createModelProviderRegistry](#createmodelproviderregistry)
+
+---
+
+# utils
+
+## ActiveModelProviderRegistry (interface)
+
+**Signature**
+
+```ts
+export interface ActiveModelProviderRegistry {
+  readonly languageModel: (modelId: string) => unknown;
+  readonly resolveModel: (
+    selector?: string,
+  ) => Omit<ResolvedModelSelection, "model"> & { readonly model: unknown };
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry.ts#L27)
 
-## LogicalModelProfile (type alias)
-
-A provider-neutral profile selected by an agent descriptor.
+## ModelProviderRegistryError
 
 **Signature**
 
 ```ts
-type LogicalModelProfile = string;
+declare const ModelProviderRegistryError: typeof ModelProviderRegistryError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L5)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry.ts#L14)
 
-## MODEL_PROVIDER_PROTOCOL
+## ModelProviderRegistryErrorCode
 
 **Signature**
 
 ```ts
-declare const MODEL_PROVIDER_PROTOCOL: "zsys.model-provider";
+declare const ModelProviderRegistryErrorCode: ModelProviderRegistryErrorCode;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L2)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry.ts#L15)
 
-## MODEL_PROVIDER_VERSION
-
-**Signature**
-
-```ts
-declare const MODEL_PROVIDER_VERSION: 1;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L3)
-
-## ModelCapabilities (interface)
+## ModelProviderRegistryOptions (interface)
 
 **Signature**
 
 ```ts
-export interface ModelCapabilities {
-  readonly toolCalls: boolean;
-  readonly cancellation: boolean;
-  readonly maxInputBytes: number;
-  readonly maxOutputBytes: number;
+export interface ModelProviderRegistryOptions {
+  readonly configuration: unknown;
+  /** Resolved environment values. The constructor never reads process.env. */
+  readonly values?: Readonly<Record<string, unknown>>;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L35)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry.ts#L21)
 
-## ModelContractError (class)
+## createModelProviderRegistry
+
+Creates live AI SDK providers from already-resolved runtime configuration.
 
 **Signature**
 
 ```ts
-declare class ModelContractError {
-  constructor(message: string);
+declare const createModelProviderRegistry: (
+  options: ModelProviderRegistryOptions,
+) => Promise<ActiveModelProviderRegistry | undefined>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-registry.ts#L35)
+
+## `model-provider-values.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [isRecord](#isrecord)
+  - [resolveValue](#resolvevalue)
+
+---
+
+# utils
+
+## isRecord
+
+**Signature**
+
+```ts
+declare const isRecord: (value: unknown) => value is Record<string, unknown>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-values.ts#L39)
+
+## resolveValue
+
+**Signature**
+
+```ts
+declare const resolveValue: (
+  value: unknown,
+  values: Readonly<Record<string, unknown>> | undefined,
+  path: string,
+) => unknown;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider-values.ts#L3)
+
+## `model-selection.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ModelProviderConfiguration (interface)](#modelproviderconfiguration-interface)
+  - [ModelSelectionError (class)](#modelselectionerror-class)
+    - [name (property)](#name-property)
+  - [ModelSelectionErrorCode (type alias)](#modelselectionerrorcode-type-alias)
+  - [ResolvedModelSelection (interface)](#resolvedmodelselection-interface)
+  - [normalizeModelSelector](#normalizemodelselector)
+  - [parseModelProviderConfiguration](#parsemodelproviderconfiguration)
+  - [resolveModelSelector](#resolvemodelselector)
+
+---
+
+# utils
+
+## ModelProviderConfiguration (interface)
+
+**Signature**
+
+```ts
+export interface ModelProviderConfiguration {
+  readonly defaultProvider: string;
+  readonly defaultModel: string;
+  readonly providers: Readonly<Record<string, { readonly defaultModel?: string }>>;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L57)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L9)
 
-### code (property)
+## ModelSelectionError (class)
 
 **Signature**
 
 ```ts
-readonly code: "ZSYS_MODEL_CONTRACT_INVALID"
+declare class ModelSelectionError { constructor(
+    readonly code: ModelSelectionErrorCode,
+    message: string,
+  ) }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L58)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L21)
 
-## ModelMessage (interface)
+### name (property)
 
 **Signature**
 
 ```ts
-export interface ModelMessage {
-  readonly role: ModelRole;
-  readonly content: JsonValue;
-  readonly toolCallId?: string;
-}
+readonly name: "ModelSelectionError"
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L8)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L22)
 
-## ModelProfile (type alias)
+## ModelSelectionErrorCode (type alias)
 
 **Signature**
 
 ```ts
-type ModelProfile = LogicalModelProfile;
+type ModelSelectionErrorCode =
+  | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
+  | "ZSYS_MODEL_SELECTOR_INVALID"
+  | "ZSYS_MODEL_PROVIDER_UNKNOWN"
+  | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L6)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L3)
 
-## ModelProvider (interface)
-
-The only runtime seam provider implementations need to satisfy.
+## ResolvedModelSelection (interface)
 
 **Signature**
 
 ```ts
-export interface ModelProvider {
-  readonly profile: LogicalModelProfile;
-  readonly capabilities: ModelCapabilities;
-  readonly request: (request: ModelRequest) => Promise<ModelTurn>;
-}
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L52)
-
-## ModelRequest (interface)
-
-**Signature**
-
-```ts
-export interface ModelRequest {
-  readonly profile: LogicalModelProfile;
-  readonly messages: readonly ModelMessage[];
-  readonly tools: readonly ModelToolDefinition[];
-  readonly inputBytes: number;
-  readonly maxOutputBytes: number;
-  readonly signal?: AbortSignal;
-}
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L19)
-
-## ModelRole (type alias)
-
-**Signature**
-
-```ts
-type ModelRole = "system" | "user" | "assistant" | "tool";
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L7)
-
-## ModelToolDefinition (interface)
-
-**Signature**
-
-```ts
-export interface ModelToolDefinition {
+export interface ResolvedModelSelection {
+  readonly provider: string;
+  readonly model: string;
   readonly id: string;
-  readonly description: string;
-  /** JSON-safe input schema projected from the tool's target function. */
-  readonly input: JsonValue;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L13)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L15)
 
-## ModelTurn (type alias)
-
-**Signature**
-
-```ts
-type ModelTurn =
-  | {
-      readonly type: "tool-call";
-      readonly callId: string;
-      readonly toolId: string;
-      readonly input: JsonValue;
-    }
-  | { readonly type: "final"; readonly output: JsonValue }
-  | { readonly type: "error"; readonly code: string; readonly message: string }
-  | { readonly type: "cancelled"; readonly reason?: string };
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L41)
-
-## createModelCapabilities
+## normalizeModelSelector
 
 **Signature**
 
 ```ts
-declare const createModelCapabilities: (options: ModelCapabilities) => ModelCapabilities;
+declare const normalizeModelSelector: (value: unknown) => string | undefined;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L72)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L32)
 
-## createModelRequest
+## parseModelProviderConfiguration
 
 **Signature**
 
 ```ts
-declare const createModelRequest: (options: CreateModelRequestOptions) => ModelRequest;
+declare const parseModelProviderConfiguration: (value: unknown) => ModelProviderConfiguration;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L80)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L48)
 
-## createModelTurn
-
-Validates one provider turn and rejects unbounded model content.
+## resolveModelSelector
 
 **Signature**
 
 ```ts
-declare const createModelTurn: (value: unknown, maxOutputBytes: number) => ModelTurn;
+declare const resolveModelSelector: (
+  selector: unknown,
+  configuration: ModelProviderConfiguration,
+) => ResolvedModelSelection;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L100)
-
-## normalizeModelProfile
-
-**Signature**
-
-```ts
-declare const normalizeModelProfile: (value: unknown) => LogicalModelProfile;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-provider.ts#L65)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/model-selection.ts#L82)
 
 ## `observability.ts`
 
@@ -1433,6 +1479,47 @@ declare class AgentRuntimeError { constructor(
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-errors.ts#L4)
 
+## `runtime-loop-telemetry.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [createLoopTelemetry](#createlooptelemetry)
+
+---
+
+# utils
+
+## createLoopTelemetry
+
+**Signature**
+
+```ts
+declare const createLoopTelemetry: (options: {
+  readonly runtime: AgentRuntimeOptions;
+  readonly input: unknown;
+  readonly instructions: string;
+  readonly modelId: string;
+  readonly invocationId: string;
+  readonly traceId: string;
+  readonly agentSpanId: string;
+  readonly capture: AgentCapturePolicy;
+  readonly signal: AbortSignal;
+}) => {
+  modelSpanId: () => string | undefined;
+  toolSpanId: (callId: string) => string | undefined;
+  close: (cause: unknown, signal: AbortSignal) => void;
+  onStepStart: (event: GenerateTextStepStartEvent) => void;
+  onToolExecutionStart: (event: ToolExecutionStartEvent) => void;
+  onToolExecutionEnd: (event: ToolExecutionEndEvent) => void;
+  onStepEnd: (event: GenerateTextStepEndEvent) => void;
+};
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-loop-telemetry.ts#L25)
+
 ## `runtime-loop.ts`
 
 ---
@@ -1453,6 +1540,8 @@ declare class AgentRuntimeError { constructor(
 ```ts
 declare const runAgentLoop: (
   options: AgentOptions,
+  model: import("ai").LanguageModel,
+  modelId: string,
   signal: AbortSignal,
   input: unknown,
   maxInputBytes: number,
@@ -1464,7 +1553,156 @@ declare const runAgentLoop: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-loop.ts#L37)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-loop.ts#L18)
+
+## `runtime-model.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [resolveRuntimeModel](#resolveruntimemodel)
+
+---
+
+# utils
+
+## resolveRuntimeModel
+
+**Signature**
+
+```ts
+declare const resolveRuntimeModel: (options: {
+  readonly selector?: string;
+  readonly registry: unknown;
+  readonly maxInputBytes?: number;
+  readonly maxOutputBytes?: number;
+}) => {
+  readonly id: string;
+  readonly model: import("ai").LanguageModel;
+  readonly maxInputBytes: number;
+  readonly maxOutputBytes: number;
+};
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-model.ts#L6)
+
+## `runtime-tool-adapter.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [createAiInputSchema](#createaiinputschema)
+  - [invokeAgentTool](#invokeagenttool)
+
+---
+
+# utils
+
+## createAiInputSchema
+
+**Signature**
+
+```ts
+declare const createAiInputSchema: (schema: StandardSchemaV1) => FlexibleSchema<unknown>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tool-adapter.ts#L28)
+
+## invokeAgentTool
+
+**Signature**
+
+```ts
+declare const invokeAgentTool: (
+  engine: ToolEngine,
+  tool: ToolDescriptor<string>,
+  turn: AgentToolCall,
+  options: AgentRuntimeOptions & AgentInvocationOptions,
+  signal: AbortSignal,
+  invocationId: string,
+  traceId?: string,
+  parentSpanId?: string,
+) => Promise<unknown>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tool-adapter.ts#L50)
+
+## `runtime-tools.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [AgentToolCall (interface)](#agenttoolcall-interface)
+  - [findTool](#findtool)
+  - [modelTools](#modeltools)
+  - [runTool](#runtool)
+
+---
+
+# utils
+
+## AgentToolCall (interface)
+
+**Signature**
+
+```ts
+export interface AgentToolCall {
+  readonly callId: string;
+  readonly toolId: string;
+  readonly input: unknown;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tools.ts#L10)
+
+## findTool
+
+**Signature**
+
+```ts
+declare const findTool: (source: ToolSource, id: string) => ToolDescriptor<string> | undefined;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tools.ts#L74)
+
+## modelTools
+
+**Signature**
+
+```ts
+declare const modelTools: (
+  refs: readonly { readonly ref: { readonly id: string } }[],
+  source: ToolSource,
+  execute: (turn: AgentToolCall) => Promise<JsonValue>,
+  sdk: { readonly tool: typeof import("ai").tool },
+) => ToolSet;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tools.ts#L50)
+
+## runTool
+
+**Signature**
+
+```ts
+declare const runTool: (
+  options: AgentRuntimeOptions & AgentInvocationOptions,
+  turn: AgentToolCall,
+  signal: AbortSignal,
+  maxOutputBytes: number,
+  invocationId: string,
+  traceId?: string,
+  parentSpanId?: string,
+) => Promise<JsonValue>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-tools.ts#L16)
 
 ## `runtime-utils.ts`
 
@@ -1474,11 +1712,8 @@ declare const runAgentLoop: (
 
 - [utils](#utils)
   - [createExecutionSignal](#createexecutionsignal)
-  - [findTool](#findtool)
   - [jsonValue](#jsonvalue)
   - [modelFailure](#modelfailure)
-  - [modelTools](#modeltools)
-  - [runTool](#runtool)
   - [signalFailure](#signalfailure)
   - [validateValue](#validatevalue)
   - [withSignal](#withsignal)
@@ -1498,17 +1733,7 @@ declare const createExecutionSignal: (options: AgentRuntimeOptions & AgentInvoca
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L16)
-
-## findTool
-
-**Signature**
-
-```ts
-declare const findTool: (source: ToolSource, id: string) => ToolDescriptor<string> | undefined;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L92)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L5)
 
 ## jsonValue
 
@@ -1518,7 +1743,7 @@ declare const findTool: (source: ToolSource, id: string) => ToolDescriptor<strin
 declare const jsonValue: (value: unknown, maxBytes: number, label: string) => JsonValue;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L123)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L30)
 
 ## modelFailure
 
@@ -1528,38 +1753,7 @@ declare const jsonValue: (value: unknown, maxBytes: number, label: string) => Js
 declare const modelFailure: (cause: unknown, signal: AbortSignal) => AgentRuntimeError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L152)
-
-## modelTools
-
-**Signature**
-
-```ts
-declare const modelTools: (
-  refs: readonly { readonly ref: { readonly id: string } }[],
-  source: ToolSource,
-) => readonly { readonly id: string; readonly description: string; readonly input: JsonValue }[];
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L77)
-
-## runTool
-
-**Signature**
-
-```ts
-declare const runTool: (
-  options: AgentRuntimeOptions & AgentInvocationOptions,
-  turn: Extract<ModelTurn, { readonly type: "tool-call" }>,
-  signal: AbortSignal,
-  maxOutputBytes: number,
-  invocationId: string,
-  traceId?: string,
-  parentSpanId?: string,
-) => Promise<JsonValue>;
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L17)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L42)
 
 ## signalFailure
 
@@ -1569,7 +1763,7 @@ declare const runTool: (
 declare const signalFailure: (signal: AbortSignal) => AgentRuntimeError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L16)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L5)
 
 ## validateValue
 
@@ -1583,7 +1777,7 @@ declare const validateValue: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L100)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L7)
 
 ## withSignal
 
@@ -1593,7 +1787,7 @@ declare const validateValue: (
 declare const withSignal: <T>(work: MaybePromise<T>, signal: AbortSignal) => Promise<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L16)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime-utils.ts#L5)
 
 ## `runtime.ts`
 
@@ -1606,7 +1800,7 @@ declare const withSignal: <T>(work: MaybePromise<T>, signal: AbortSignal) => Pro
   - [AgentInvocationOptions (interface)](#agentinvocationoptions-interface)
   - [AgentRuntime (interface)](#agentruntime-interface)
   - [AgentRuntimeError](#agentruntimeerror)
-  - [AgentRuntimeOptions (interface)](#agentruntimeoptions-interface)
+  - [AgentRuntimeOptions (type alias)](#agentruntimeoptions-type-alias)
   - [createAgentRuntime](#createagentruntime)
   - [invokeAgent](#invokeagent)
   - [runAgent](#runagent)
@@ -1646,7 +1840,7 @@ export interface AgentInvocationOptions {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L47)
 
 ## AgentRuntime (interface)
 
@@ -1661,7 +1855,7 @@ export interface AgentRuntime {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L57)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L60)
 
 ## AgentRuntimeError
 
@@ -1671,27 +1865,19 @@ export interface AgentRuntime {
 declare const AgentRuntimeError: typeof AgentRuntimeError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L67)
 
-## AgentRuntimeOptions (interface)
+## AgentRuntimeOptions (type alias)
 
 **Signature**
 
 ```ts
-export interface AgentRuntimeOptions {
-  readonly agent: AgentAny;
-  readonly provider: ModelProvider;
-  readonly tools: import("@zsys/tools").ToolSource;
-  readonly engine: import("@zsys/tools").ToolEngine;
-  readonly maxInputBytes?: number;
-  readonly maxOutputBytes?: number;
-  readonly approval?: AgentApprovalHandler;
-  readonly hooks?: AgentRuntimeHooks;
-  readonly capture?: AgentCapturePolicy;
-}
+type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
+  readonly modelRegistry: unknown;
+};
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L32)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L43)
 
 ## createAgentRuntime
 
@@ -1703,7 +1889,7 @@ Creates a reusable runtime for one immutable agent/provider/tool catalog.
 declare const createAgentRuntime: (options: AgentRuntimeOptions) => AgentRuntime;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L148)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L138)
 
 ## invokeAgent
 
@@ -1717,7 +1903,7 @@ declare const invokeAgent: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L67)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L70)
 
 ## runAgent
 
@@ -1727,7 +1913,7 @@ declare const invokeAgent: (
 declare const runAgent: (options: AgentRuntimeOptions & AgentInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L155)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/runtime.ts#L145)
 
 ## `signal.ts`
 

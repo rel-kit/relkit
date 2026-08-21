@@ -1,4 +1,9 @@
-import type { DescriptorKind, GenerationId, JsonValue, SourceLocation } from "@zsys/contracts";
+import {
+  type DescriptorKind,
+  type GenerationId,
+  type JsonValue,
+  type SourceLocation,
+} from "@zsys/contracts";
 import type { Diagnostic } from "@zsys/diagnostics";
 import type {
   EvaluatorModuleResult,
@@ -6,8 +11,21 @@ import type {
   EvaluatorManifestReference,
 } from "./discovery/evaluator-protocol.js";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
-import type { SourceMapEntry, SourceMapSource } from "./discovery/source-map.js";
+import type {
+  ExportFact,
+  ExportFacts,
+  SourceMapEntry,
+  SourceMapSource,
+} from "./discovery/source-map.js";
 import type { WatchDependencyIndex } from "./watch.js";
+import type {
+  GraphEdge,
+  GraphNode,
+  NormalizedGraph,
+  ObservedEdge,
+} from "./normalize-graph-types.js";
+
+export type { GraphEdge, GraphNode, NormalizedGraph, ObservedEdge } from "./normalize-graph-types.js";
 
 /** Stable diagnostics emitted by the normalization stage. */
 export const NORMALIZE_CODES = Object.freeze({
@@ -44,11 +62,14 @@ export const NORMALIZE_CODES = Object.freeze({
   eventTarget: "ZSYS_EVENT_TARGET_INCOMPATIBLE",
   toolTarget: "ZSYS_TOOL_TARGET_INCOMPATIBLE",
   agentTool: "ZSYS_AGENT_TOOL_INVALID",
-  modelProfile: "ZSYS_MODEL_PROFILE_UNKNOWN",
+  model: "ZSYS_MODEL_SELECTOR_INVALID",
+  modelProvider: "ZSYS_MODEL_PROVIDER_UNKNOWN",
+  modelDefault: "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
+  modelConfiguration: "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID",
   providerProfile: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+  identityAmbiguous: "ZSYS_ID_INFERENCE_AMBIGUOUS",
   source: "ZSYS_SOURCE_LOCATION_INVALID",
   collision: "ZSYS_ROUTE_COLLISION",
-  cycle: "ZSYS_DIRECT_CALL_CYCLE",
   handler: "ZSYS_MANIFEST_HANDLER_MISSING",
 } as const);
 
@@ -56,7 +77,7 @@ export const NORMALIZE_CODES = Object.freeze({
 export const VALIDATION_PASSES = Object.freeze([
   "extract descriptor values",
   "assign source locations",
-  "normalize IDs, paths, methods, profiles, and schedules",
+  "normalize IDs, paths, methods, profiles, models, and schedules",
   "validate descriptor-local fields",
   "build stable reference index",
   "resolve target references",
@@ -66,9 +87,9 @@ export const VALIDATION_PASSES = Object.freeze([
   "expand event selectors",
   "validate event target compatibility",
   "validate tool target compatibility",
-  "validate agent tool and model profiles",
+  "validate agent tools and model selectors",
   "validate provider profiles",
-  "detect route collisions and prohibited cycles",
+  "detect route collisions",
   "sort graph nodes and edges",
   "produce hash and generated outputs",
 ] as const);
@@ -95,34 +116,12 @@ export interface NormalizedDescriptor {
   readonly source: SourceLocation;
   readonly exportName: string;
   readonly exportKind: "default" | "named";
+  readonly identity?: "explicit" | "inferred";
+  readonly facts?: ExportFacts;
+  readonly exportFact?: ExportFact;
   readonly reference?: EvaluatorManifestReference;
   readonly value: unknown;
 }
-export interface GraphNode {
-  readonly kind: string;
-  readonly id: string;
-  readonly source: SourceLocation;
-  readonly [key: string]: unknown;
-}
-export interface GraphEdge {
-  readonly kind: string;
-  readonly from: string;
-  readonly to: string;
-  readonly [key: string]: unknown;
-}
-/** Runtime relationships kept outside the canonical graph contract. */
-export interface ObservedEdge {
-  readonly relationship: string;
-  readonly from: string;
-  readonly to: string;
-}
-export interface NormalizedGraph {
-  readonly contractVersion: number;
-  readonly appId?: string;
-  readonly nodes: readonly GraphNode[];
-  readonly edges: readonly GraphEdge[];
-}
-
 export interface RuntimeReference {
   readonly descriptorId: string;
   readonly kind: string;
@@ -175,6 +174,7 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
   return [
     "app",
     "function",
+    "service",
     "route",
     "job",
     "event",

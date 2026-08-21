@@ -19,6 +19,7 @@ export const GRAPH_COLLECTIONS = Object.freeze([
   "cache",
   "tools",
   "agents",
+  "services",
 ] as const);
 export type GraphCollection = (typeof GRAPH_COLLECTIONS)[number];
 
@@ -108,7 +109,7 @@ function graphData(
       typeof edge.to !== "string"
     )
       return [];
-    return [safeJson(pick(edge, ["kind", "from", "to", "role"]))];
+    return [safeJson(pick(edge, ["kind", "from", "to", "role", "member", "order"]))];
   });
   return {
     contractVersion:

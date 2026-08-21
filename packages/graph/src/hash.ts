@@ -109,12 +109,24 @@ function sortJsonEdges(edges: readonly JsonValue[]): readonly JsonValue[] {
 function compareGraphValues(left: JsonValue, right: JsonValue, kind: "node" | "edge"): number {
   const a = isRecord(left) ? left : {};
   const b = isRecord(right) ? right : {};
+  if (kind === "edge" && isOrderedServiceEdge(a) && isOrderedServiceEdge(b)) {
+    const order = numberValue(a.order) - numberValue(b.order);
+    if (order !== 0) return order;
+  }
   const fields = kind === "node" ? ["kind", "id"] : ["kind", "from", "to", "role"];
   for (const field of fields) {
     const compared = compareStrings(text(a[field]), text(b[field]));
     if (compared !== 0) return compared;
   }
   return compareStrings(canonicalJson(left), canonicalJson(right));
+}
+
+function isOrderedServiceEdge(value: Record<string, JsonValue>): boolean {
+  return value.kind === "contains-function" || value.kind === "uses-service-middleware";
+}
+
+function numberValue(value: JsonValue | undefined): number {
+  return typeof value === "number" ? value : Number.MAX_SAFE_INTEGER;
 }
 
 function isSourceLocation(value: unknown): value is { file: string; line: number; column: number } {

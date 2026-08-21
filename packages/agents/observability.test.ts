@@ -8,8 +8,8 @@ import {
   type AgentCapturePolicy,
   type AgentRuntimeHooks,
   type AgentSpanRecord,
-  type ModelTurn,
 } from "./src/index.ts";
+import { createTestModel, type TestModelTurn } from "./test-model.ts";
 
 function setup(hooks?: AgentRuntimeHooks, capture?: AgentCapturePolicy) {
   const target = defineFunction({
@@ -29,30 +29,18 @@ function setup(hooks?: AgentRuntimeHooks, capture?: AgentCapturePolicy) {
     id: "support.order",
     input: z.object({ question: z.string(), token: z.string() }),
     output: z.object({ answer: z.string() }),
-    modelProfile: "default",
+    model: "default",
     instructions: "Use token=password=TOP-SECRET only for the request.",
     tools: [tool],
     limits: { maxSteps: 3, maxToolCalls: 2, timeoutMs: 1_000 },
   });
-  let calls = 0;
-  const provider = {
-    profile: "default",
-    capabilities: {
-      toolCalls: true,
-      cancellation: true,
-      maxInputBytes: 4_096,
-      maxOutputBytes: 512,
-    },
-    request: async (): Promise<ModelTurn> => {
-      calls += 1;
-      return calls === 1
-        ? { type: "tool-call", callId: "call-1", toolId: tool.id, input: { id: "known" } }
-        : { type: "final", output: { answer: "ready" } };
-    },
-  };
+  const model = createTestModel([
+    { type: "tool-call", callId: "call-1", toolId: tool.id, input: { id: "known" } },
+    { type: "final", output: { answer: "ready" } },
+  ] satisfies readonly TestModelTurn[]);
   return {
     agent,
-    provider,
+    modelRegistry: { resolveModel: () => ({ id: "default", model: model.model }) },
     tools: [tool],
     engine: { invoke: async () => ({ state: "ready" }) },
     hooks,

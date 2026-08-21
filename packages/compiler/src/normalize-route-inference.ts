@@ -40,15 +40,7 @@ function inferRequest(
   const parameters = pathParameters(String(route.path ?? ""));
   for (const parameter of parameters) {
     const property = projection.properties[parameter.name];
-    if (property === undefined) {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.mapping,
-        `Path segment "${parameter.name}" is missing from the target input schema.`,
-      );
-      continue;
-    }
+    if (property === undefined) continue;
     if (parameter.catchAll && !allowsArray(property)) {
       add(
         work,

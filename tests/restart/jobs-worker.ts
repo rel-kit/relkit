@@ -23,6 +23,7 @@ const target = {
   output,
   handler: async (
     value: { readonly orderId: string },
+    _request: undefined,
     context: InvocationContext,
   ): Promise<{ readonly processed: true }> => {
     await appendFile(

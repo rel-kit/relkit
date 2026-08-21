@@ -27,6 +27,7 @@ export type DescriptorAny = DescriptorBase<DescriptorKind, string>;
 const descriptorKinds: readonly DescriptorKind[] = [
   "app",
   "function",
+  "service",
   "route",
   "job",
   "event",

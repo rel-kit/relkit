@@ -68,6 +68,7 @@ describe("job materialization", () => {
             message: "Try again",
             data: { orderId: "failed" },
             retry: "later",
+            afterMs: 25,
           });
         },
       },
@@ -80,9 +81,11 @@ describe("job materialization", () => {
     expect(result).toMatchObject({
       state: "delayed",
       classification: "retryable",
+      entry: { availableAt: 125 },
       failure: {
         code: "orders.temporarily-unavailable",
         retry: "later",
+        afterMs: 25,
       },
     });
     expect(queue.get(accepted.instanceId)?.state).toBe("delayed");

@@ -88,21 +88,6 @@ export function caches(context: PlanContext) {
     .sort(byLogical);
 }
 
-export function modelPlans(context: PlanContext, options: FromGraphOptions) {
-  return [...new Set(nodes(context.graph.nodes, "agent").map((agent) => agent.modelProfile))]
-    .sort()
-    .map((profile) => {
-      const metadata = options.modelProfiles?.[profile] ?? { provider: "openai" };
-      return {
-        ...base(context, profile, "model", "models", "default"),
-        profile,
-        provider: metadata.provider,
-        ...(defined(metadata.model) ? { model: metadata.model } : {}),
-      };
-    })
-    .sort(byLogical);
-}
-
 export function routes(graphNodes: readonly GraphNode[]) {
   return graphNodes
     .filter(

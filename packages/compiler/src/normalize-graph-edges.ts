@@ -2,7 +2,6 @@ import { isRecord, refId } from "./normalize-utils.js";
 import type { GraphEdge, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
-  functions: "calls-function",
   jobs: "enqueues-job",
   events: "publishes-event",
   buckets: "uses-bucket",
@@ -13,12 +12,22 @@ const dependencyEdges: Readonly<Record<string, string>> = {
 export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
-  const add = (kind: string, from: string, to: string, role?: string): void => {
+  const add = (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ): void => {
     if (!to) return;
-    const key = `${kind}\0${from}\0${to}\0${role ?? ""}`;
+    const key = `${kind}\0${from}\0${to}\0${JSON.stringify(metadata ?? null)}`;
     if (seen.has(key)) return;
     seen.add(key);
-    edges.push({ kind, from, to, ...(role === undefined ? {} : { role }) });
+    edges.push({
+      kind,
+      from,
+      to,
+      ...(typeof metadata === "string" ? { role: metadata } : (metadata ?? {})),
+    });
   };
 
   for (const descriptor of work.descriptors) {
@@ -34,6 +43,7 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     if (descriptor.kind === "event-trigger") addEventEdges(add, descriptor, work);
     if (descriptor.kind === "tool" && target) add("exposes-as-tool", target, descriptor.id);
     if (descriptor.kind === "agent") addToolEdges(add, descriptor.id, value.tools);
+    if (descriptor.kind === "service") addServiceEdges(add, descriptor.id, value);
     if (descriptor.kind === "function") addDependencyEdges(add, descriptor, value.dependencies);
     addProviderEdge(add, descriptor, value, work);
   }
@@ -41,14 +51,19 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
 }
 
 function addProviderEdge(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
   work: NormalizationWork,
 ): void {
   const profile =
     descriptor.kind === "agent"
-      ? value.modelProfile
+      ? "default"
       : ["bucket", "cache", "job", "event-trigger"].includes(descriptor.kind)
         ? (value.profile ?? "default")
         : undefined;
@@ -63,7 +78,12 @@ function isTargetingDescriptor(kind: string): boolean {
 }
 
 function addMiddlewareEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   value: unknown,
   work: NormalizationWork,
   routeId: string,
@@ -79,7 +99,12 @@ function addMiddlewareEdges(
 }
 
 function addEventEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
 ): void {
@@ -91,7 +116,12 @@ function addEventEdges(
 }
 
 function addDependencyEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   dependencies: unknown,
 ): void {
@@ -107,7 +137,12 @@ function addDependencyEdges(
 }
 
 function addToolEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   agentId: string,
   tools: unknown,
 ): void {
@@ -115,5 +150,31 @@ function addToolEdges(
   for (const tool of tools) {
     const toolId = refId(tool);
     if (toolId) add("uses-tool", agentId, toolId);
+  }
+}
+
+function addServiceEdges(
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
+  serviceId: string,
+  value: Record<string, unknown>,
+): void {
+  if (isRecord(value.functions)) {
+    for (const [order, [member, target]] of Object.entries(value.functions).entries()) {
+      const functionId = refId(target);
+      if (functionId !== undefined)
+        add("contains-function", serviceId, functionId, { member, order });
+    }
+  }
+  if (Array.isArray(value.middleware)) {
+    for (const [order, entry] of value.middleware.entries()) {
+      const middlewareId = refId(entry);
+      if (middlewareId !== undefined)
+        add("uses-service-middleware", serviceId, middlewareId, { order });
+    }
   }
 }

@@ -18,7 +18,7 @@ describe("agent declaration/source boundaries", () => {
       await mkdir(join(root, "examples/commerce/src"), { recursive: true });
       await writeFile(
         source,
-        `defineAgent({ id: "bad.agent", input, output, modelProfile: "gpt-4o", credentials: { apiKey: "secret" }, instructions: "bad", tools: [], limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1 } });\n`,
+        `defineAgent({ id: "bad.agent", input, output, model: "gpt-4o", credentials: { apiKey: "secret" }, instructions: "bad", tools: [], limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1 } });\n`,
       );
       expect(scanAuthoring(root).map(({ rule }) => rule)).toEqual([
         "vendor-profile-name",

@@ -6,14 +6,7 @@ import { byLogical, envNames, logicalName, nodes } from "./from-graph-validation
 import { iam } from "./from-graph-aws.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 import { createIamPlan } from "./iam.js";
-import {
-  buckets,
-  caches,
-  eventTriggers,
-  events,
-  modelPlans,
-  routes,
-} from "./from-graph-resources.js";
+import { buckets, caches, eventTriggers, events, routes } from "./from-graph-resources.js";
 
 export function buildPlan(
   graph: ApplicationGraph,
@@ -26,7 +19,6 @@ export function buildPlan(
   const image = options.image ?? defaultImage(appId, options.httpPort ?? 3000);
   validateImage(image);
   const environmentNames = envNames(graph.nodes);
-  const models = modelPlans(context, options);
   return deepFreeze({
     contractVersion: DEPLOYMENT_PLAN_VERSION,
     graphHash,
@@ -44,7 +36,6 @@ export function buildPlan(
     eventTriggers: eventTriggers(context),
     buckets: buckets(context),
     caches: caches(context),
-    ...(models.length === 0 ? {} : { models }),
     iam: createIamPlan(appId, graph),
     observability: {
       logicalName: logicalName(appId, "observability", "default"),

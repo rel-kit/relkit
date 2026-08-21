@@ -34,6 +34,7 @@ export interface ObservabilityIndexEntry {
   readonly traceId?: string;
   readonly routeId?: string;
   readonly functionId?: string;
+  readonly serviceId?: string;
   readonly outcome?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
@@ -49,6 +50,7 @@ export interface ObservabilityIndexPageOptions {
   readonly outcome?: string;
   readonly requestId?: string;
   readonly traceId?: string;
+  readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
   readonly severity?: LogLevel;

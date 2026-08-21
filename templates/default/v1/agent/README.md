@@ -1,9 +1,12 @@
 # my-app
 
 A ZSys TypeScript/Bun project with the minimal HTTP example and a bounded
-agent backed by a read-only tool. The model profile is logical metadata; local
-and test runs use the scripted provider, while production uses the configured
-AWS provider set.
+agent backed by a function-derived read-only tool. Tests use deterministic AI
+SDK test models, while production uses the configured AWS provider set.
+
+The agent may omit `model` to use the configured `defaultProvider` and
+`defaultModel`; production keeps OpenAI and Anthropic credentials as
+environment references in `modelProviders`.
 
 ## Commands
 

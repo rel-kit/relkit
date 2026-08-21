@@ -94,6 +94,7 @@ function documentFrom(plan: RegistrationPlan): OpenApiDocument {
     nodes: [
       ...plan.functions,
       ...plan.httpTriggers.filter(({ targetFunctionId }) => functions.has(targetFunctionId)),
+      ...(plan.services ?? []),
     ],
     edges: [],
   } as unknown as ApplicationGraph);

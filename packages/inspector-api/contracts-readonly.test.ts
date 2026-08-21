@@ -23,6 +23,7 @@ const graphIds: Record<string, string> = {
   cache: "orders.cache",
   tools: "orders.tool",
   agents: "orders.agent",
+  services: "orders",
 };
 
 describe("inspector read-only contract matrix", () => {
@@ -54,6 +55,15 @@ describe("inspector read-only contract matrix", () => {
       await json(app, API_BASE_PATH + "/runtime/" + collection);
       await json(app, API_BASE_PATH + "/runtime/" + collection + "/" + graphIds[collection]);
     }
+    expect(await json(app, API_BASE_PATH + "/services/orders")).toMatchObject({
+      descriptor: {
+        kind: "service",
+        title: "Orders",
+        tags: ["orders"],
+        members: [{ name: "create", functionId: "orders.create" }],
+        middleware: [{ id: "orders.context" }],
+      },
+    });
     const page = await json(app, API_BASE_PATH + "/descriptors?cursor=1&limit=2");
     expect(page.items).toHaveLength(2);
     expect(page.nextCursor).toBe("3");
@@ -68,7 +78,8 @@ describe("inspector read-only contract matrix", () => {
       "from=2026-08-16T00%3A00%3A00.000Z&to=2026-08-16T01%3A00%3A00.000Z" +
       "&severity=error&routeId=orders.create.http&functionId=orders.create" +
       "&outcome=success&requestId=request-1&traceId=trace-1&generationId=generation-one" +
-      "&graphHash=sha256%3Aone&cursor=7&limit=1000&protocol=zsys.observability.query&version=1";
+      "&graphHash=sha256%3Aone&serviceId=orders&cursor=7&limit=1000" +
+      "&protocol=zsys.observability.query&version=1";
     for (const path of [
       API_BASE_PATH + "/requests?" + filter,
       API_BASE_PATH + "/logs?" + filter,
@@ -89,6 +100,7 @@ describe("inspector read-only contract matrix", () => {
       traceId: "trace-1",
       generationId: "generation-one",
       graphHash: "sha256:one",
+      serviceId: "orders",
       cursor: "7",
       limit: 100,
       protocol: "zsys.observability.query",

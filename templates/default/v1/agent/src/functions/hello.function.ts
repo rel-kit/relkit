@@ -11,4 +11,11 @@ const hello = defineFunction({
   },
 });
 
+export const lookup = hello.asTool({
+  id: "hello.lookup",
+  description: "Read a greeting for a supplied name",
+  sideEffect: "read",
+  approval: "never",
+});
+
 export default hello;

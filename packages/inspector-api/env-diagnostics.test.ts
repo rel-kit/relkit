@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 
 const activeGraph = {
-  contractVersion: 1,
+  contractVersion: 2,
   nodes: [
     {
       kind: "env",
@@ -99,7 +99,7 @@ test("drops absolute and executable-looking source paths at the API boundary", a
       generationId: "active-1",
       graphHash: "sha256:active",
       graph: {
-        contractVersion: 1,
+        contractVersion: 2,
         nodes: [
           {
             kind: "env",

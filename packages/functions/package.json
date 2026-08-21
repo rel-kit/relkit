@@ -12,6 +12,7 @@
     "@zsys/buckets": "workspace:*",
     "@zsys/cache": "workspace:*",
     "@zsys/contracts": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/schema": "workspace:*"
   },
   "scripts": {

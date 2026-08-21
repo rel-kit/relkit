@@ -5,6 +5,7 @@ import {
   type DescriptorBase,
   type DescriptorMetadata,
 } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import type { FunctionRefAny } from "@zsys/functions";
 import type { StandardSchemaV1 } from "@zsys/schema";
 import {
@@ -46,7 +47,7 @@ export interface DefineRouteOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping | undefined = undefined,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly target: Target;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
@@ -61,8 +62,10 @@ export interface DefineRouteOptions<
  * Defines one HTTP method exported by a nested `route.ts` module.
  *
  * The compiler derives the method from the named export and the path from the
- * file. Omit `request` and `responses` when schema-based inference represents
- * the transport; explicit mappings replace inference completely.
+ * file. Omit `id` for a source-derived route identity, and omit `request` and
+ * `responses` when schema-based inference represents the transport; explicit
+ * mappings replace inference completely. Matching path names map into reusable
+ * function input, while unmatched values remain in `request.params`.
  *
  * @example A GET route with inferred path and query input
  * ```ts
@@ -76,7 +79,7 @@ export interface DefineRouteOptions<
  *   handler: async () => ({ count: 0 })
  * })
  *
- * export const GET = defineRoute({ id: "orders.list.http", target: listOrders })
+ * export const GET = defineRoute({ target: listOrders })
  * ```
  *
  * @category HTTP
@@ -97,7 +100,8 @@ export function defineRoute<
   const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
   const status = successStatus(options.successStatus);
   const rateLimit = copyRateLimit(options.rateLimit);
-  const base = createDescriptorBase("route", options.id, options);
+  const id = options.id === undefined ? createUnboundIdentity() : options.id;
+  const base = createDescriptorBase("route", id, options);
   const legacy = options as DefineRouteOptions<Id, Target, Request> & {
     readonly method?: HttpMethod;
     readonly path?: string;

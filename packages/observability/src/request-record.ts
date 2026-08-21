@@ -19,6 +19,7 @@ export interface RequestRecordBuilderOptions {
   readonly graphHash: string;
   readonly method: string;
   readonly rawPath: string;
+  readonly serviceId?: string;
   readonly startedAt?: number;
   readonly requestBytes?: number;
   readonly now?: () => number;
@@ -37,6 +38,7 @@ export interface RequestRecordBuilder {
   readonly add: (detail: RequestDetailInput) => void;
   readonly setTraceId: (traceId: string) => void;
   readonly setRoute: (routeId: string, functionId: string) => void;
+  readonly setServiceId: (serviceId: string | undefined) => void;
   readonly setInvocationId: (invocationId: string) => void;
   readonly setOutcome: (outcome: RequestOutcome, errorId?: string) => RequestOutcome;
   readonly finish: (options: {
@@ -61,6 +63,7 @@ export function createRequestRecordBuilder(
   let order = 0;
   let routeId = "unknown";
   let functionId = "unknown";
+  let serviceId = options.serviceId;
   let invocationId = `request:${options.requestId}`;
   let requestOutcome: RequestOutcome = "success";
   let errorId: string | undefined;
@@ -108,6 +111,7 @@ export function createRequestRecordBuilder(
       normalizedRoute: routeId,
       routeId,
       functionId,
+      ...(serviceId === undefined ? {} : { serviceId }),
       status: validStatus(finishOptions.status) ? finishOptions.status : 500,
       ...(validBytes(options.requestBytes) ? { requestBytes: options.requestBytes } : {}),
       ...(validBytes(finishOptions.responseBytes)
@@ -128,6 +132,9 @@ export function createRequestRecordBuilder(
       if (finished !== undefined) return;
       if (text(nextRouteId) !== undefined) routeId = nextRouteId;
       if (text(nextFunctionId) !== undefined) functionId = nextFunctionId;
+    },
+    setServiceId: (value: string | undefined): void => {
+      if (finished === undefined && text(value) !== undefined) serviceId = value;
     },
     setInvocationId: (value: string): void => {
       if (finished === undefined && text(value) !== undefined) invocationId = value;

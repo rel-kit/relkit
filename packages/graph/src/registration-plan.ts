@@ -14,9 +14,14 @@ import type {
   ToolNode,
   TriggerNode,
 } from "./model.js";
+import type { ServiceNode } from "./service-nodes.js";
 
-export interface FunctionRegistration extends FunctionNode {}
-export type HttpTriggerRegistration = TriggerNode<"http", HttpTriggerConfig>;
+export interface FunctionRegistration extends FunctionNode {
+  readonly serviceId?: string;
+}
+export type HttpTriggerRegistration = TriggerNode<"http", HttpTriggerConfig> & {
+  readonly serviceId?: string;
+};
 export type QueueRegistration = JobNode | TriggerNode<"queue", JsonValue>;
 export interface ScheduleRegistration {
   readonly id: string;
@@ -30,6 +35,7 @@ export interface BucketRegistration extends BucketNode {}
 export interface CacheRegistration extends CacheNode {}
 export interface ToolRegistration extends ToolNode {}
 export interface AgentRegistration extends AgentNode {}
+export interface ServiceRegistration extends ServiceNode {}
 
 /** The provider-free, immutable work list consumed by later materializers. */
 export interface RegistrationPlan {
@@ -44,6 +50,7 @@ export interface RegistrationPlan {
   readonly caches: readonly CacheRegistration[];
   readonly tools: readonly ToolRegistration[];
   readonly agents: readonly AgentRegistration[];
+  readonly services?: readonly ServiceRegistration[];
 }
 
 /** Builds a deterministic plan without constructing providers or changing the graph. */
@@ -70,9 +77,14 @@ export function createRegistrationPlan(
     caches: [],
     tools: [],
     agents: [],
+    services: [],
   };
 
-  for (const node of canonical.nodes) addNode(plan, node);
+  const serviceIds = new Map<string, string>();
+  for (const node of canonical.nodes)
+    if (node.kind === "service")
+      for (const member of node.members) serviceIds.set(member.functionId, node.id);
+  for (const node of canonical.nodes) addNode(plan, node, serviceIds);
   plan.httpTriggers.sort(compareHttpTrigger);
   plan.schedules.sort(compareSchedule);
   return deepFreeze(plan);
@@ -90,15 +102,20 @@ function addNode(
     caches: CacheRegistration[];
     tools: ToolRegistration[];
     agents: AgentRegistration[];
+    services: ServiceRegistration[];
   },
   node: GraphNode,
+  serviceIds: ReadonlyMap<string, string>,
 ): void {
   switch (node.kind) {
     case "function":
-      plan.functions.push(node);
+      {
+        const serviceId = serviceIds.get(node.id);
+        plan.functions.push(serviceId === undefined ? node : { ...node, serviceId });
+      }
       return;
     case "trigger":
-      addTrigger(plan, node);
+      addTrigger(plan, node, serviceIds);
       return;
     case "job":
       plan.queues.push(node);
@@ -116,6 +133,9 @@ function addNode(
     case "agent":
       plan.agents.push(node);
       return;
+    case "service":
+      plan.services.push(node);
+      return;
     case "event":
       plan.events.push(node);
       return;
@@ -124,10 +144,19 @@ function addNode(
   }
 }
 
-function addTrigger(plan: Parameters<typeof addNode>[0], node: TriggerNode): void {
-  if (node.triggerType === "http")
-    plan.httpTriggers.push(node as unknown as HttpTriggerRegistration);
-  else if (node.triggerType === "event")
+function addTrigger(
+  plan: Parameters<typeof addNode>[0],
+  node: TriggerNode,
+  serviceIds: ReadonlyMap<string, string>,
+): void {
+  if (node.triggerType === "http") {
+    const serviceId = serviceIds.get(node.targetFunctionId);
+    plan.httpTriggers.push(
+      (serviceId === undefined
+        ? node
+        : { ...node, serviceId }) as unknown as HttpTriggerRegistration,
+    );
+  } else if (node.triggerType === "event")
     plan.eventTriggers.push(node as unknown as EventTriggerRegistration);
   else if (node.triggerType === "queue")
     plan.queues.push(node as unknown as TriggerNode<"queue", JsonValue>);
@@ -141,14 +170,12 @@ function addSchedules(output: ScheduleRegistration[], node: JobNode): void {
     output.push({ id: `${node.id}:${id}`, source: node.source, jobId: node.id, schedule });
   });
 }
-
 function scheduleFromTrigger(node: TriggerNode): ScheduleRegistration {
   const config = isRecord(node.config) ? node.config : {};
   const schedule = config.schedule ?? node.config;
   const jobId = typeof config.jobId === "string" ? config.jobId : node.targetFunctionId;
   return { id: node.id, source: node.source, jobId, schedule };
 }
-
 function compareSchedule(left: ScheduleRegistration, right: ScheduleRegistration): number {
   return left.id.localeCompare(right.id) || left.jobId.localeCompare(right.jobId);
 }

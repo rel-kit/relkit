@@ -7,11 +7,13 @@ import {
   providerProfiles,
   PROVIDER_CAPABILITIES,
 } from "./providers-validation.js";
+import type { ModelProviders } from "./model-providers.js";
+
+export type { ModelProviderOptions, ModelProviders } from "./model-providers.js";
 
 export type ProviderRecipe = "local" | "test" | "aws";
 export const PROVIDER_RECIPE: unique symbol = Symbol.for("zsys.provider.recipe");
-export type ProviderCapability =
-  "buckets" | "cache" | "jobs" | "events" | "models" | "observability";
+export type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
 export type ProviderValue =
   JsonPrimitive | EnvRef | readonly ProviderValue[] | { readonly [key: string]: ProviderValue };
 export type ProviderConfig = Readonly<Record<string, ProviderValue>>;
@@ -24,7 +26,8 @@ export interface LocalProviderOptions {
   readonly cache?: ProviderProfiles;
   readonly jobs?: ProviderProfiles;
   readonly events?: ProviderProfiles;
-  readonly models?: ProviderProfiles;
+  /** Optional serializable AI SDK provider defaults and named recipes. */
+  readonly modelProviders?: ModelProviders;
 }
 
 export interface TestProviderOptions extends LocalProviderOptions {
@@ -38,7 +41,8 @@ export interface AwsProviderOptions {
   readonly cache?: ProviderProfiles;
   readonly jobs?: ProviderProfiles;
   readonly events?: ProviderProfiles;
-  readonly models?: ProviderProfiles;
+  /** Optional serializable AI SDK provider defaults and named recipes. */
+  readonly modelProviders?: ModelProviders;
 }
 
 export interface ProviderSetMetadata {

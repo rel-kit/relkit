@@ -93,14 +93,6 @@ export interface CacheDeploymentPlan extends DeploymentCapabilityPlan {
   readonly maxTtlMs?: number;
 }
 
-/** Logical model selection; credentials and provider clients stay outside the plan. */
-export interface LogicalModelProfilePlan extends DeploymentCapabilityPlan {
-  readonly profile: string;
-  readonly provider: string;
-  readonly model?: string;
-}
-export type ModelProfileDeploymentPlan = LogicalModelProfilePlan;
-
 export interface ObservabilityDeploymentPlan {
   readonly logicalName: string;
   readonly configurationNames: readonly string[];
@@ -148,8 +140,6 @@ export interface DeploymentPlan {
   readonly eventTriggers: readonly EventTriggerDeploymentPlan[];
   readonly buckets: readonly BucketDeploymentPlan[];
   readonly caches: readonly CacheDeploymentPlan[];
-  /** Optional in v1 when no agent references a model profile. */
-  readonly models?: readonly LogicalModelProfilePlan[];
   readonly iam: DeploymentIamPlan;
   readonly observability: ObservabilityDeploymentPlan;
 }

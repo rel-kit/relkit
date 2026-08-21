@@ -4,13 +4,13 @@ import {
   type ProviderCapability,
   type ProviderSet,
 } from "@zsys/app";
+import { createModelProviderRegistry } from "@zsys/agents";
 import type { ProviderFactory, ProviderFactoryContext, ProviderGeneration } from "@zsys/engine";
 import { createEventBridgeProvider } from "./events.js";
 import { configuredProfiles, profileConfig, resolveValue, text } from "./config.js";
 import { createS3BucketProvider } from "./buckets.js";
 import { createValkeyCacheProvider } from "./cache.js";
 import { createSqsJobProvider } from "./jobs.js";
-import { createOpenAiModelProvider } from "./models.js";
 import { createAwsObservabilityProvider } from "./observability.js";
 
 export type AwsProviderFactoryContext = ProviderFactoryContext;
@@ -55,6 +55,10 @@ async function createGeneration(
     throw new TypeError("Provider set does not use the aws recipe");
   if (context.signal?.aborted) throw context.signal.reason ?? new Error("AWS startup was aborted");
   const values = context.values;
+  const modelRegistry = await createModelProviderRegistry({
+    configuration: providerSet.metadata.configuration.modelProviders,
+    ...(values === undefined ? {} : { values }),
+  });
   const region = text(
     resolveValue(providerSet.metadata.configuration.region, values),
     "AWS region",
@@ -104,9 +108,6 @@ async function createGeneration(
         }),
       ] as const,
   );
-  const models = profiles(providerSet, "models").map(
-    (profile) => [profile, model(providerSet, profile, values)] as const,
-  );
   const observability = createAwsObservabilityProvider();
   let released = false;
   const release = async (): Promise<void> => {
@@ -119,7 +120,6 @@ async function createGeneration(
     cache: Object.freeze(Object.fromEntries(cache)),
     jobs: Object.freeze(Object.fromEntries(jobs)),
     events: Object.freeze(Object.fromEntries(events)),
-    models: Object.freeze(Object.fromEntries(models)),
     observability: Object.freeze({ default: observability }),
   });
   return Object.freeze({
@@ -128,6 +128,7 @@ async function createGeneration(
     recipeTag: "aws" as const,
     providerSet,
     providers,
+    ...(modelRegistry === undefined ? {} : { modelRegistry }),
     ready: async () => undefined,
     readiness: async () => undefined,
     release,
@@ -144,22 +145,4 @@ function profiles(
   capability: ProviderCapability,
 ): readonly string[] {
   return configuredProfiles(providerSet, capability);
-}
-
-function model(
-  providerSet: ProviderSet<"aws">,
-  profile: string,
-  values: Readonly<Record<string, unknown>> | undefined,
-) {
-  const config = profileConfig(providerSet, "models", profile, values);
-  const provider = text(config.provider, `AWS model ${profile} provider`);
-  if (provider !== "openai")
-    throw new TypeError(`AWS model provider ${provider ?? "unknown"} is unsupported`);
-  return createOpenAiModelProvider({
-    profile,
-    apiKey: config.apiKey,
-    model: config.model,
-    endpoint: config.endpoint,
-    values,
-  });
 }

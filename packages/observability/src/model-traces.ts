@@ -42,6 +42,7 @@ export interface LogRecord extends VersionedRecord<"log"> {
   readonly timestamp: string;
   readonly level: LogLevel;
   readonly component: string;
+  readonly functionId?: string;
   readonly message: string;
   readonly fields: SafeFields;
   readonly spanId?: string;
@@ -66,6 +67,7 @@ export interface SpanRecord extends VersionedRecord<"span"> {
 
 export interface TraceRecord extends VersionedRecord<"trace"> {
   readonly traceId: string;
+  readonly functionId?: string;
   readonly rootInvocationId?: string;
   readonly rootSpanId?: string;
   readonly startedAt: string;

@@ -73,9 +73,12 @@ export async function mapFailureResponse(
       const declaration = findError(trigger, failure.id);
       if (declaration === undefined) return genericResponse("internal-error", 500);
       const body = toPublicEnvelope(failure);
-      return (await responseIsValid(trigger, declaration, failure.data, options))
-        ? jsonResponse(body, responseStatus(declaration, 500))
-        : genericResponse("internal-error", 500);
+      if (!(await responseIsValid(trigger, declaration, failure.data, options)))
+        return genericResponse("internal-error", 500);
+      const response = jsonResponse(body, responseStatus(declaration, 500));
+      if (failure.retry === "later" && failure.afterMs !== undefined)
+        response.headers.set("Retry-After", String(Math.ceil(failure.afterMs / 1000)));
+      return response;
     }
     return genericFailureResponse(trigger, failure.kind, failure.outcome, options);
   } catch {

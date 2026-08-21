@@ -11,6 +11,7 @@
   "dependencies": {
     "@zsys/contracts": "workspace:*",
     "@zsys/functions": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/schema": "workspace:*"
   },
   "scripts": {

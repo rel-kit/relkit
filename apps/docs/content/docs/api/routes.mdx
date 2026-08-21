@@ -27,7 +27,9 @@ description: Generated public TypeScript reference for @zsys/routes.
 
 ## defineMiddleware
 
-Defines serializable route middleware backed by a function target.
+Defines serializable route middleware backed by a function target. Its optional
+source-scoped ID is inferred when the compiler can identify the declaration;
+the decision mapping can continue or return a declared route response.
 
 **Example**
 
@@ -63,7 +65,7 @@ declare const defineMiddleware: <
 ) => MiddlewareDescriptor<Id, Target, Request>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L67)
 
 Since v0.1.0
 
@@ -79,14 +81,14 @@ export interface DefineMiddlewareOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly target: Target;
   readonly request: Request;
   readonly decision: MiddlewareDecisionMapping;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L25)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L26)
 
 ## MiddlewareDescriptor (interface)
 
@@ -107,7 +109,7 @@ export interface MiddlewareDescriptor<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L35)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L36)
 
 ## MiddlewareRef (interface)
 
@@ -119,7 +121,7 @@ export interface MiddlewareRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L22)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L23)
 
 ## MiddlewareReference (interface)
 
@@ -132,7 +134,7 @@ export interface MiddlewareReference<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L18)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L19)
 
 ## isMiddlewareDescriptor
 
@@ -144,7 +146,7 @@ declare const isMiddlewareDescriptor: (
 ) => value is MiddlewareDescriptor<string, FunctionRefAny, HttpRequestMapping>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L97)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L102)
 
 ## isMiddlewareRef
 
@@ -154,7 +156,7 @@ declare const isMiddlewareDescriptor: (
 declare const isMiddlewareRef: (value: unknown) => value is MiddlewareRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L92)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L97)
 
 ## `define-route.ts`
 
@@ -177,8 +179,10 @@ declare const isMiddlewareRef: (value: unknown) => value is MiddlewareRef;
 Defines one HTTP method exported by a nested `route.ts` module.
 
 The compiler derives the method from the named export and the path from the
-file. Omit `request` and `responses` when schema-based inference represents
-the transport; explicit mappings replace inference completely.
+file. Omit `id` for a source-derived route identity, and omit `request` and
+`responses` when schema-based inference represents the transport; explicit
+mappings replace inference completely. Matching path names map into reusable
+function input, while unmatched values remain in `request.params`.
 
 **Example**
 
@@ -195,7 +199,7 @@ const listOrders = defineFunction({
   handler: async () => ({ count: 0 })
 })
 
-export const GET = defineRoute({ id: "orders.list.http", target: listOrders })
+export const GET = defineRoute({ target: listOrders })
 ````
 
 ````
@@ -206,7 +210,7 @@ export const GET = defineRoute({ id: "orders.list.http", target: listOrders })
 declare const defineRoute: <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: DefineRouteOptions<Id, Target, Request>) => RouteDescriptor<Id, Target, Request>
 ````
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L85)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L88)
 
 Since v0.1.0
 
@@ -222,7 +226,7 @@ export interface DefineRouteOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping | undefined = undefined,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly target: Target;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
@@ -234,7 +238,7 @@ export interface DefineRouteOptions<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L45)
 
 ## RouteDescriptor (interface)
 
@@ -260,7 +264,7 @@ export interface RouteDescriptor<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L28)
 
 ## `http-dsl-types.ts`
 
@@ -328,7 +332,7 @@ export interface DefineTransformOptions<
   Id extends string,
   Schema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly schema: Schema;
 }
 ```
@@ -968,7 +972,7 @@ void request;
 declare const http: HttpDsl;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L91)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L94)
 
 Since v0.1.0
 
@@ -984,7 +988,7 @@ Re-exports all named exports from the "./http-dsl-types.js" module.
 export * from "./http-dsl-types.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L39)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L40)
 
 ## assertRequestMapping
 
@@ -994,7 +998,7 @@ export * from "./http-dsl-types.js";
 declare const assertRequestMapping: (value: unknown) => asserts value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L41)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L42)
 
 ## assertResponse
 
@@ -1004,7 +1008,7 @@ declare const assertRequestMapping: (value: unknown) => asserts value is HttpReq
 declare const assertResponse: (value: unknown) => HttpResponseMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L42)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L43)
 
 ## defineRequestTransform
 
@@ -1019,7 +1023,7 @@ declare const defineRequestTransform: <
 ) => HttpTransformDescriptor<Id, Schema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L66)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L69)
 
 ## defineTransform
 
@@ -1031,7 +1035,7 @@ declare const defineTransform: <const Id extends string, const Schema extends St
 ) => HttpTransformDescriptor<Id, Schema>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L49)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L50)
 
 ## isHttpMapping
 
@@ -1041,7 +1045,7 @@ declare const defineTransform: <const Id extends string, const Schema extends St
 declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L43)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L44)
 
 ## isHttpRequestMapping
 
@@ -1051,7 +1055,7 @@ declare const isHttpMapping: (value: unknown) => value is HttpMappingNode;
 declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L45)
 
 ## isHttpResponseMapping
 
@@ -1061,7 +1065,7 @@ declare const isHttpRequestMapping: (value: unknown) => value is HttpRequestMapp
 declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L45)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L46)
 
 ## isMiddlewareDecision
 
@@ -1071,7 +1075,7 @@ declare const isHttpResponseMapping: (value: unknown) => value is HttpResponseMa
 declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecisionMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L46)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L47)
 
 ## isTransformRef
 
@@ -1081,7 +1085,7 @@ declare const isMiddlewareDecision: (value: unknown) => value is MiddlewareDecis
 declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L68)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl.ts#L71)
 
 ## `index.ts`
 

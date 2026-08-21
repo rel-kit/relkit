@@ -1,4 +1,13 @@
-import { defineApp, localProviders, testProviders, awsProviders } from "@zsys/app";
+import {
+  awsProviders,
+  defineApp,
+  defineService,
+  defineServiceMiddleware,
+  localProviders,
+  testProviders,
+  type FunctionRequest,
+  type InvocationSource,
+} from "@zsys/app";
 import { defineAgent } from "@zsys/agents";
 import { defineBucket } from "@zsys/buckets";
 import { defineCache } from "@zsys/cache";
@@ -125,7 +134,7 @@ const agent = defineAgent({
   id: "types.agent",
   input: z.object({ prompt: z.string() }),
   output: z.object({ answer: z.string() }),
-  modelProfile: "default",
+  model: "default",
   instructions: "Answer",
   tools: [tool],
   limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },
@@ -136,7 +145,6 @@ const parent = defineFunction({
   input,
   output,
   dependencies: {
-    functions: { child },
     jobs: { job },
     events: { created: eventCreated },
     buckets: { bucket },
@@ -144,7 +152,7 @@ const parent = defineFunction({
     agents: { agent },
   },
   handler: async (value, _request, context) => {
-    const childResult: InferOutput<typeof output> = await context.functions.child({ id: value.id });
+    const childResult: InferOutput<typeof output> = await child.invoke({ id: value.id });
     const queued = await context.jobs.job.enqueue({ id: value.id });
     const published = await context.events.created.publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
@@ -284,10 +292,10 @@ const trigger = onEvent(
   "types.created",
   async (payload, context) => {
     const orderId: string = payload.orderId;
-    const result: { ok: boolean } = await context.functions.child({ id: orderId });
+    const result: { ok: boolean } = await child.invoke({ id: orderId });
     void result;
   },
-  { id: "types.trigger", dependencies: { functions: { child } } },
+  { id: "types.trigger" },
 );
 // @ts-expect-error event names come from the generated registry
 onEvent("types.missing", async () => undefined);
@@ -319,3 +327,60 @@ const toolInput: InferInput<typeof tool.target.input> = { id: "order-1" };
 const toolOutput: InferOutput<typeof tool.target.output> = { ok: true };
 void toolInput;
 void toolOutput;
+
+const serviceMiddleware = defineServiceMiddleware({
+  id: "types.orders-policy",
+  handler: async ({ input: middlewareInput, request, context }, next) => {
+    const inputValue: unknown = middlewareInput;
+    const requestValue: FunctionRequest = request;
+    if (requestValue !== undefined) {
+      const requestQuery: string | readonly string[] | undefined = requestValue.query["tag"];
+      const requestHeaders: readonly string[] = requestValue.headers.getAll("x-tag");
+      const requestRoute: string | undefined = requestValue.metadata.routeId;
+      void requestQuery;
+      void requestHeaders;
+      void requestRoute;
+    }
+    const source: InvocationSource = context.invocation.source;
+    const continuation: Promise<void> = next({ actorId: "actor-1" });
+    await continuation;
+    void inputValue;
+    void requestValue;
+    void source;
+  },
+});
+
+const service = defineService({
+  id: "types.orders",
+  functions: { lookup: child },
+  middleware: [serviceMiddleware],
+});
+const serviceInput: Parameters<typeof service.lookup.invoke>[0] = { id: "order-1" };
+const serviceOutput: Promise<InferOutput<typeof child.output>> =
+  service.lookup.invoke(serviceInput);
+const serviceTool = service.lookup.asTool({
+  id: "types.orders.lookup-tool",
+  description: "Look up an order",
+  sideEffect: "read",
+  approval: "never",
+});
+const serviceToolOutput: Promise<InferOutput<typeof child.output>> = serviceTool.invoke({
+  id: "order-1",
+});
+const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke({ id: "order-1" });
+const serviceId: "types.orders" = service.lookup.service.ref.id;
+void serviceOutput;
+void serviceToolOutput;
+void directToolOutput;
+void serviceId;
+
+// @ts-expect-error service members must be function descriptors
+defineService({ id: "types.invalid-service-member", functions: { broken: {} } });
+// @ts-expect-error zero-argument asTool requires complete function tool metadata
+child.asTool();
+// @ts-expect-error service member invoke uses the original function input
+service.lookup.invoke({ orderId: "order-1" });
+// @ts-expect-error service declarations are immutable
+service.functions.lookup = child;
+// @ts-expect-error middleware declarations are immutable
+service.middleware?.push(serviceMiddleware);

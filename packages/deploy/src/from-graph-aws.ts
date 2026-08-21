@@ -27,7 +27,6 @@ export function usedCapabilities(
       used.add(node.kind === "bucket" ? "buckets" : node.kind === "cache" ? "cache" : "jobs");
     if (node.kind === "event" || (node.kind === "trigger" && node.triggerType === "event"))
       used.add("events");
-    if (node.kind === "agent") used.add("models");
     if (
       node.kind === "trigger" &&
       (node.triggerType === "queue" || node.triggerType === "schedule")

@@ -9,6 +9,8 @@ export * from "./tracing-bridge.js";
 export interface InvocationTraceOptions {
   readonly name: string;
   readonly invocationId: string;
+  readonly functionId?: string;
+  readonly serviceId?: string;
   readonly parentInvocationId?: string;
   readonly correlationId?: string;
   readonly source?: string;
@@ -20,6 +22,8 @@ export interface InvocationTraceOptions {
 
 export interface InvocationTraceContext {
   readonly invocationId: string;
+  readonly functionId?: string;
+  readonly serviceId?: string;
   readonly parentInvocationId?: string;
   readonly traceId: string;
   readonly spanId: string;
@@ -37,12 +41,20 @@ export const InvocationTrace = Context.Reference<InvocationTraceContext | undefi
 function spanAttributes(
   options: Pick<
     InvocationTraceOptions,
-    "invocationId" | "parentInvocationId" | "correlationId" | "source" | "attributes"
+    | "invocationId"
+    | "functionId"
+    | "serviceId"
+    | "parentInvocationId"
+    | "correlationId"
+    | "source"
+    | "attributes"
   >,
 ): Record<string, unknown> {
   return {
     ...(options.attributes ?? {}),
     "zsys.invocation.id": options.invocationId,
+    ...(options.functionId === undefined ? {} : { "zsys.function.id": options.functionId }),
+    ...(options.serviceId === undefined ? {} : { "zsys.service.id": options.serviceId }),
     ...(options.parentInvocationId === undefined
       ? {}
       : { "zsys.invocation.parent_id": options.parentInvocationId }),
@@ -60,6 +72,8 @@ function contextFromSpan(
   const parentSpan = Option.getOrUndefined(span.parent);
   return Object.freeze({
     invocationId: options.invocationId,
+    ...(options.functionId === undefined ? {} : { functionId: options.functionId }),
+    ...(options.serviceId === undefined ? {} : { serviceId: options.serviceId }),
     ...(options.parentInvocationId === undefined
       ? {}
       : { parentInvocationId: options.parentInvocationId }),
@@ -114,6 +128,16 @@ function childOptions(
       : parent?.correlationId === undefined
         ? {}
         : { correlationId: parent.correlationId }),
+    ...(options.functionId !== undefined
+      ? {}
+      : parent?.functionId === undefined
+        ? {}
+        : { functionId: parent.functionId }),
+    ...(options.serviceId !== undefined
+      ? {}
+      : parent?.serviceId === undefined
+        ? {}
+        : { serviceId: parent.serviceId }),
     ...(options.source !== undefined
       ? {}
       : parent?.source === undefined

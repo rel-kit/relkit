@@ -143,7 +143,6 @@ export function installInternalEndpoints(app: Hono, options: InternalEndpointOpt
       handle(async (context) => streamResponse(options.stream, context)),
     );
 }
-/** Builds the safe graph stub available to the HTTP phase. */
 export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
   return {
     protocol: INTERNAL_ENDPOINT_PROTOCOL,
@@ -162,6 +161,7 @@ export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
     caches: plan.caches,
     tools: plan.tools,
     agents: plan.agents,
+    services: plan.services ?? [],
   } as unknown as contracts.JsonValue;
 }
 

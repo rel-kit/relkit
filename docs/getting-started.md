@@ -169,7 +169,6 @@ import { defineFunction, defineRoute } from "@zsys/app";
 import { z } from "@zsys/schema";
 
 const hello = defineFunction({
-  id: "hello",
   input: z.object({ name: z.string().default("world") }),
   output: z.object({ message: z.string() }),
   handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
@@ -177,16 +176,18 @@ const hello = defineFunction({
 
 // src/routes/hello/route.ts
 export const GET = defineRoute({
-  id: "hello.http",
   target: hello,
 });
 ```
 
 The `route.ts` location supplies `/hello`, its `GET` export supplies the method,
-and the object input is inferred as query parameters. Descriptors are pure
-metadata. The compiler discovers them, validates the canonical graph, and
-emits the runtime manifest. Do not put executable closures in graph mappings or
-edit `.zsys/generated` by hand.
+and the object input is inferred as query parameters. Source-scoped IDs are
+derived from file/export/member structure; add an explicit ID when a source
+move must preserve graph identity. Descriptors are pure metadata. The compiler
+discovers them, validates the canonical graph, and emits the runtime manifest.
+Use `target.invoke(input)` for nested calls; managed resources remain explicit
+dependencies. Do not put executable closures in graph mappings or edit
+`.zsys/generated` by hand.
 
 ## Project directories
 

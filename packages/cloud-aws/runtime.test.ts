@@ -1,13 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { awsProviders, defineEnv, env } from "@zsys/app";
-import { createModelRequest } from "@zsys/agents";
 import type { JobQueueFactoryContext } from "@zsys/engine";
-import {
-  awsProviderFactories,
-  bindAwsProviderFactory,
-  createOpenAiModelProvider,
-  createSqsJobProvider,
-} from "./src/index.ts";
+import { awsProviderFactories, bindAwsProviderFactory, createSqsJobProvider } from "./src/index.ts";
 
 describe("AWS runtime providers", () => {
   test("binds the AWS recipe to independent generation factories", async () => {
@@ -18,12 +12,10 @@ describe("AWS runtime providers", () => {
       cache: { default: { endpoint: "redis://127.0.0.1:6379" } },
       jobs: { default: { queueUrl: "http://127.0.0.1/queue" } },
       events: { default: { busName: "events" } },
-      models: {
-        default: {
-          provider: "openai",
-          apiKey: environment.OPENAI_API_KEY,
-          endpoint: "http://127.0.0.1",
-        },
+      modelProviders: {
+        defaultProvider: "openai",
+        defaultModel: "gpt-5-mini",
+        openai: { apiKey: environment.OPENAI_API_KEY },
       },
     });
     const factory = bindAwsProviderFactory(providerSet);
@@ -48,51 +40,10 @@ describe("AWS runtime providers", () => {
     expect(Object.keys(first.providers?.cache ?? {})).toEqual(["default"]);
     expect(Object.keys(first.providers?.jobs ?? {})).toEqual(["default"]);
     expect(Object.keys(first.providers?.events ?? {})).toEqual(["default"]);
-    expect(Object.keys(first.providers?.models ?? {})).toEqual(["default"]);
+    expect(first.modelRegistry).toBeDefined();
     expect(first.providers?.observability).toBeDefined();
     await first.dispose();
     await second.dispose();
-  });
-
-  test("uses a bounded local fake server for the OpenAI-compatible model", async () => {
-    const authorizations: (string | null)[] = [];
-    let requestCount = 0;
-    const server = Bun.serve({
-      port: 0,
-      fetch: async (request) => {
-        authorizations.push(request.headers.get("authorization"));
-        requestCount += 1;
-        if (requestCount > 1) return new Response("upstream unavailable", { status: 503 });
-        return Response.json({
-          choices: [{ message: { role: "assistant", content: "local response" } }],
-        });
-      },
-    });
-    try {
-      const provider = createOpenAiModelProvider({
-        profile: "default",
-        apiKey: "local-test-key",
-        model: "fake-model",
-        endpoint: `http://127.0.0.1:${server.port}/v1/chat/completions`,
-      });
-      const request = createModelRequest({
-        profile: "default",
-        messages: [{ role: "user", content: "hello" }],
-        maxInputBytes: 4096,
-        maxOutputBytes: 4096,
-      });
-
-      await expect(provider.request(request)).resolves.toMatchObject({
-        type: "final",
-        output: "local response",
-      });
-      expect(authorizations[0]).toBe("Bearer local-test-key");
-      await expect(provider.request(request)).rejects.toThrow(
-        "OpenAI request failed with status 503",
-      );
-    } finally {
-      server.stop(true);
-    }
   });
 
   test("maps the materialized job queue contract to SQS send, receive, and acknowledge", async () => {

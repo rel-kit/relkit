@@ -25,6 +25,7 @@ export type EventInstanceId = ProtocolId<"EventInstanceId">;
 export type DescriptorKind =
   | "app"
   | "function"
+  | "service"
   | "route"
   | "job"
   | "event"

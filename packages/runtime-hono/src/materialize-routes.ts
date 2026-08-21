@@ -1,5 +1,11 @@
 import type { Hono } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION, type FunctionRequest } from "@zsys/contracts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  type FunctionRequest,
+  type FunctionRequestMetadata,
+  type FunctionRequestValue,
+} from "@zsys/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import type { RequestRecordSink } from "@zsys/observability";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
@@ -14,11 +20,12 @@ import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
 
 export interface RuntimeManifest {
-  readonly contractVersion: number;
-  readonly generatorVersion: number;
+  readonly contractVersion: typeof MANIFEST_VERSION;
+  readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: ManifestEntries<unknown>;
   readonly targets?: ManifestEntries<unknown>;
+  readonly services?: ManifestEntries<unknown>;
   readonly application?: {
     readonly env: unknown;
     readonly providers: unknown;
@@ -44,9 +51,10 @@ export interface HttpEngine {
 export interface HttpRouteRequest {
   readonly request: Request;
   readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, string>>;
+  readonly params: Readonly<Record<string, FunctionRequestValue>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
+  readonly metadata: FunctionRequestMetadata;
 }
 export type HttpInputMapper = (
   request: HttpRouteRequest,

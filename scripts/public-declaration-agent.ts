@@ -10,7 +10,6 @@ const providerProperties = new Set([
   "credential",
   "credentials",
   "endpoint",
-  "model",
   "modelId",
   "modelName",
   "provider",

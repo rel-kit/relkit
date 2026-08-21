@@ -31,3 +31,9 @@ export default defineJob({
   ],
 });
 ```
+
+Function handlers call other descriptors with `target.invoke(input)`; function
+dependencies are not declared in the context. Declared application errors
+with omitted or `never` retry stop a delivery. A retryable error can use
+`{ kind: "later", afterMs }` to require a minimum delay in addition to the job
+policy. Direct function and tool calls do not retry automatically.

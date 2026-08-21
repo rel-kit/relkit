@@ -1,9 +1,11 @@
 import * as ts from "typescript";
 import type { AstCandidateIndicator, AstPrefilterCandidate, AstReExport } from "./ast-prefilter.js";
+import { readFacts } from "./source-facts.js";
 
 const KNOWN_FACTORIES = new Set([
   "defineApp",
   "defineFunction",
+  "defineError",
   "defineRoute",
   "defineJob",
   "defineEvent",
@@ -14,6 +16,9 @@ const KNOWN_FACTORIES = new Set([
   "defineAgent",
   "defineTransform",
   "defineRequestTransform",
+  "defineMiddleware",
+  "defineService",
+  "defineServiceMiddleware",
 ]);
 
 const INDICATOR_ORDER: readonly AstCandidateIndicator[] = [
@@ -98,6 +103,7 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
     reExports: Object.freeze(
       reExports.sort((left, right) => left.moduleSpecifier.localeCompare(right.moduleSpecifier)),
     ),
+    facts: readFacts(source),
     indicators: Object.freeze(INDICATOR_ORDER.filter((indicator) => indicators.has(indicator))),
   });
 }

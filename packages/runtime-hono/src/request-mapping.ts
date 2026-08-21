@@ -5,15 +5,16 @@ import {
   type BodyIssueCode,
   type Missing,
 } from "./request-mapping-body.js";
+import type { FunctionRequestValue } from "@zsys/contracts";
 import { applyTransform } from "./request-mapping-transform.js";
 import { readCookie, readHeader, readPathSegments, readScalar } from "./request-mapping-sources.js";
 import { mapObject, type MappingState } from "./request-mapping-object.js";
 
-export type MappingValue = string | readonly string[];
+export type MappingValue = FunctionRequestValue;
 export interface MappingRequest {
   readonly request: Request;
   readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, string>>;
+  readonly params: Readonly<Record<string, FunctionRequestValue>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
 }
@@ -60,7 +61,7 @@ export async function mapRequest(
     issues: [],
     reported: new Set(),
   };
-  if (!isNode(mapping) || mapping.kind !== "input") {
+  if (!isRecord(mapping) || mapping.kind !== "input") {
     add(state, "mapping", "Request mapping must be an input node", []);
     return failure(state);
   }
@@ -74,7 +75,7 @@ async function visit(
   state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
-  if (!isNode(node) || typeof node.kind !== "string") {
+  if (!isRecord(node) || typeof node.kind !== "string") {
     add(state, "mapping", "Invalid serialized request mapping", path);
     return MISSING;
   }
@@ -151,7 +152,7 @@ async function bodyField(
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
   const value = await jsonValue(state, path);
-  return value !== MISSING && isNode(value) && Object.prototype.hasOwnProperty.call(value, name)
+  return value !== MISSING && isRecord(value) && Object.prototype.hasOwnProperty.call(value, name)
     ? value[name]
     : MISSING;
 }
@@ -193,9 +194,6 @@ function add(
   if (state.reported.has(key)) return;
   state.reported.add(key);
   state.issues.push(Object.freeze({ code, message, path: Object.freeze([...path]) }));
-}
-function isNode(value: unknown): value is Record<string, unknown> {
-  return isRecord(value);
 }
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);

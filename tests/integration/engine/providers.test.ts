@@ -137,7 +137,6 @@ describe("provider and generation integration", () => {
             cache: { default: value, archive },
             jobs: { default: {} },
             events: { default: {} },
-            models: { default: {} },
             observability: { default: {} },
           },
         } satisfies ProviderGeneration;
@@ -255,7 +254,6 @@ describe("provider and generation integration", () => {
               cache: { default: {} },
               jobs: { default: {} },
               events: { default: {} },
-              models: { default: {} },
               observability: { default: {} },
             },
             readiness: () => {

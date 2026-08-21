@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GRAPH_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
 import { hashGraph } from "../../packages/graph/src/index.ts";
 import {
   generateManifest,
@@ -6,7 +7,7 @@ import {
   normalizeCompilation,
 } from "../../packages/compiler/src/index.ts";
 
-const graph = { contractVersion: 1, nodes: [], edges: [] } as const;
+const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] } as const;
 const graphHash = hashGraph(graph);
 
 function descriptor(
@@ -86,6 +87,10 @@ describe("runtime manifest generation", () => {
     );
     expect(result.source).toContain("providers: providerFactories,");
     expect(result.source).toContain("providerFactories,");
+    expect(result.source).toContain(
+      `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
+    );
+    expect(result.source).toContain("contractVersion: manifestContractVersion,");
     expect(result.source).toContain(`manifestGraphHash = "${graphHash}"`);
   });
 
@@ -101,14 +106,18 @@ describe("runtime manifest generation", () => {
       providers: {
         production: {
           metadata: {
-            capabilities: ["buckets", "models"],
-            profiles: { default: ["buckets", "models"] },
+            capabilities: ["buckets"],
+            profiles: { default: ["buckets"] },
             environment: [{ name: "MODEL_ENDPOINT", type: "url", sensitive: true }],
             configuration: {
               endpoint,
               credential,
               client: { transport: { token: credential } },
-              models: { default: { endpoint, apiKey: credential } },
+              modelProviders: {
+                defaultProvider: "openai",
+                defaultModel: "gpt-5-mini",
+                openai: { apiKey: credential },
+              },
             },
           },
         },
@@ -122,14 +131,15 @@ describe("runtime manifest generation", () => {
     expect(provider).toMatchObject({
       id: "default",
       profile: "default",
-      capabilities: ["buckets", "models"],
+      capabilities: ["buckets"],
       configuration: {
         production: [
           "client",
           "credential",
           "endpoint",
-          "models.default.apiKey",
-          "models.default.endpoint",
+          "modelProviders.defaultModel",
+          "modelProviders.defaultProvider",
+          "modelProviders.openai.apiKey",
         ],
       },
       environment: ["MODEL_ENDPOINT"],

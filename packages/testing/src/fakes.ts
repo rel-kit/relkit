@@ -39,7 +39,7 @@ export interface TestFakes {
 export function createTestFakes(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
   if (stateRoot.length === 0) throw new TypeError("Test fake state root must not be empty");
   const clients = Object.fromEntries(
-    ["functions", "jobs", "events", "buckets", "cache", "agents"].map((category) => [
+    ["jobs", "events", "buckets", "cache", "agents"].map((category) => [
       category,
       Object.create(null) as Record<string, unknown>,
     ]),

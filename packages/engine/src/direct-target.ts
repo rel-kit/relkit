@@ -1,4 +1,3 @@
-import { DependencyNotConfiguredError } from "./dependencies.js";
 import type { DirectFunctionRequest } from "./dependencies.js";
 import { unknownSchema } from "./invoke-utils.js";
 import type { InvocationTarget, InvokeOptions } from "./invoke-types.js";
@@ -15,7 +14,8 @@ export function resolveDirectTarget<Context extends { readonly signal: AbortSign
   }
   const handler =
     typeof request.source === "function" ? request.source : registry?.get(request.functionId);
-  if (handler === undefined) throw new DependencyNotConfiguredError("functions", request.name);
+  if (handler === undefined)
+    throw new TypeError(`Function handler is not registered: ${request.functionId}`);
   return {
     id: request.functionId,
     input: request.declaration.input ?? unknownSchema,

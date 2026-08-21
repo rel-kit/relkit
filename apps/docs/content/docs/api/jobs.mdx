@@ -510,6 +510,8 @@ declare const createJobClient: (options: JobClientOptions) => JobClient;
 ## defineJob
 
 Defines a durable job trigger with validated input, retry, timeout, and idempotency policy.
+A retryable declared error may add an `afterMs` minimum delay; the provider
+combines it with this job policy and direct function calls do not auto-retry.
 
 **Example**
 
@@ -545,7 +547,7 @@ declare const defineJob: <
 ) => JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/jobs/src/define-job.ts#L92)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/jobs/src/define-job.ts#L94)
 
 Since v0.1.0
 

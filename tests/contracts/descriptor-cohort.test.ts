@@ -24,7 +24,18 @@ import {
   http,
   isMiddlewareDescriptor,
 } from "../../packages/routes/src/index.ts";
-import { defineTool, isToolDescriptor } from "../../packages/tools/src/index.ts";
+import {
+  defineTool,
+  isToolDescriptor,
+  ToolApprovalRequiredError,
+} from "../../packages/tools/src/index.ts";
+import {
+  defineService,
+  defineServiceMiddleware,
+  isServiceDescriptor,
+  isServiceMiddlewareDescriptor,
+  isServiceRef,
+} from "../../packages/services/src/index.ts";
 import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
 import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
 import {
@@ -130,7 +141,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       id: "orders.support",
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
-      modelProfile: "default",
+      model: "default",
       instructions: "Answer order questions",
       tools: [agentTool],
       limits: { maxSteps: 3, maxToolCalls: 2, timeoutMs: 1_000 },
@@ -141,7 +152,6 @@ describe.serial("Phase 2 descriptor cohort", () => {
       input,
       output,
       dependencies: {
-        functions: { lookup },
         jobs: { reconcile: job },
         events: { created },
         buckets: { assets: bucket },
@@ -156,11 +166,8 @@ describe.serial("Phase 2 descriptor cohort", () => {
       "buckets",
       "cache",
       "events",
-      "functions",
       "jobs",
     ]);
-    expect(dependent.dependencies?.functions?.lookup.ref).toEqual(lookup.ref);
-    expect(Object.isFrozen(dependent.dependencies?.functions)).toBe(true);
 
     const failure = notFound.create({ orderId: "order-1" });
     const constructed = new notFound({ orderId: "order-2" });
@@ -254,7 +261,11 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const production = awsProviders({
       region: definition.AWS_REGION,
-      models: { default: { apiKey: definition.API_KEY, endpoint: "https://model.test" } },
+      modelProviders: {
+        defaultProvider: "openai",
+        defaultModel: "gpt-5-mini",
+        openai: { apiKey: definition.API_KEY },
+      },
     });
     const providers = {
       development: localProviders({ cache: { default: { namespace: "orders" } } }),
@@ -400,7 +411,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       id: "orders.support-agent",
       input: z.object({ prompt: z.string() }),
       output: z.object({ answer: z.string() }),
-      modelProfile: "openai.default",
+      model: "openai.default",
       instructions: { template: "Answer {{prompt}}", variables: ["prompt"] },
       tools: [tool],
       limits: { maxSteps: 5, maxToolCalls: 3, timeoutMs: 2_000 },
@@ -428,12 +439,150 @@ describe.serial("Phase 2 descriptor cohort", () => {
         id: "bad.agent",
         input: z.unknown(),
         output: z.unknown(),
-        modelProfile: "default",
+        model: "default",
         instructions: "bad",
         tools: [tool],
         limits: { maxSteps: 0, maxToolCalls: 1, timeoutMs: 1 },
       }),
     ).toThrow();
+  });
+
+  test("keeps service members, middleware, and descriptor capabilities cohesive", async () => {
+    let calls = 0;
+    const member = defineFunction({
+      id: "orders.service-member",
+      input,
+      output,
+      handler: async () => {
+        calls += 1;
+        return { ok: true };
+      },
+    });
+    const middleware = defineServiceMiddleware({
+      id: "orders.policy",
+      handler: async ({ input: value, request, context }, next) => {
+        expect(value).toEqual({ id: "order-1" });
+        expect(request).toBeUndefined();
+        expect(context).toBeDefined();
+        await next({ actorId: "actor-1" });
+      },
+    });
+    const service = defineService({
+      id: "orders",
+      functions: { get: member },
+      middleware: [middleware],
+    });
+
+    expect(isServiceDescriptor(service)).toBe(true);
+    expect(isServiceRef(service)).toBe(true);
+    expect(isServiceMiddlewareDescriptor(middleware)).toBe(true);
+    expect(Object.isFrozen(middleware)).toBe(true);
+    expect(service.functions.get).toBe(member);
+    expect(service.get.ref).toEqual(member.ref);
+    expect(service.get.input).toBe(member.input);
+    expect(service.get.output).toBe(member.output);
+    expect(service.get.handler).toBe(member.handler);
+    expect(service.get.invoke).toBe(member.invoke);
+    expect(service.get.asTool).toBe(member.asTool);
+    expect(service.get.service.ref).toBe(service.ref);
+    expect(service.middleware).toEqual([middleware]);
+    expect(Object.isFrozen(service.middleware)).toBe(true);
+
+    await expect(service.get.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
+    const derivedTool = service.get.asTool({
+      id: "orders.service-tool",
+      description: "Read an order",
+      sideEffect: "read",
+      approval: "never",
+    });
+    await expect(derivedTool.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
+    const directTool = defineTool({
+      id: "orders.direct-tool",
+      target: service.get,
+      description: "Read an order directly",
+      sideEffect: "read",
+      approval: "never",
+    });
+    await expect(directTool.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
+    expect(calls).toBe(3);
+
+    const guardedTool = defineTool({
+      id: "orders.guarded-tool",
+      target: member,
+      description: "Write an order",
+      sideEffect: "write",
+      approval: "on-write",
+    });
+    await expect(guardedTool.invoke({ id: "order-1" })).rejects.toBeInstanceOf(
+      ToolApprovalRequiredError,
+    );
+    expect(calls).toBe(3);
+  });
+
+  test("rejects invalid declarations and keeps the public cohort immutable", () => {
+    expect(() =>
+      defineService({
+        id: "orders.invalid-member",
+        functions: { broken: {} },
+      } as never),
+    ).toThrow("Invalid service descriptor");
+    expect(() =>
+      defineService({
+        id: "orders.reserved-member",
+        functions: { invoke: lookup },
+      } as never),
+    ).toThrow("reserved");
+    expect(() =>
+      defineService({
+        id: "orders.colliding-members",
+        functions: { " get ": lookup, get: lookup },
+      } as never),
+    ).toThrow("Duplicate service member");
+    expect(() =>
+      defineService({
+        id: "orders.invalid-middleware",
+        functions: { get: lookup },
+        middleware: [{}],
+      } as never),
+    ).toThrow("Invalid service middleware reference");
+    expect(() => lookup.asTool()).toThrow("complete tool metadata");
+
+    const service = defineService({ id: "orders.immutable", functions: { get: lookup } });
+    const tool = service.get.asTool({
+      description: "Read an order",
+      sideEffect: "read",
+      approval: "never",
+    });
+    expect(Object.isFrozen(service)).toBe(true);
+    expect(Object.isFrozen(service.functions)).toBe(true);
+    expect(Object.isFrozen(service.get)).toBe(true);
+    expect(Object.isFrozen(service.get.service)).toBe(true);
+    expect(Object.isFrozen(tool)).toBe(true);
+    expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toMatchObject({
+      enumerable: false,
+      writable: false,
+      configurable: false,
+    });
+    expect(Object.getOwnPropertyDescriptor(lookup, "asTool")).toMatchObject({
+      enumerable: false,
+      writable: false,
+      configurable: false,
+    });
+    expect(Object.getOwnPropertyDescriptor(tool, "invoke")).toMatchObject({
+      enumerable: false,
+      writable: false,
+      configurable: false,
+    });
+    expect(() => {
+      (service as unknown as { id: string }).id = "changed";
+    }).toThrow(TypeError);
+    expect(() => {
+      (service.functions as Record<string, unknown>).get = lookup;
+    }).toThrow(TypeError);
+    expect(() => {
+      (service.get.service.ref as { id: string }).id = "changed";
+    }).toThrow(TypeError);
+    expect(service.id).toBe("orders.immutable");
   });
 
   test("emits every convention warning without excluding a descriptor", () => {

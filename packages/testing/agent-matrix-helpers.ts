@@ -1,5 +1,5 @@
 import type { JsonValue } from "@zsys/contracts";
-import { defineAgent, type ModelTurn } from "@zsys/agents";
+import { defineAgent } from "@zsys/agents";
 import { invokeFunction, type InvocationParent, type InvocationTarget } from "@zsys/engine";
 import { defineError, defineFunction } from "@zsys/functions";
 import { z } from "@zsys/schema";
@@ -10,6 +10,7 @@ import {
   type ToolEngineInvocation,
 } from "@zsys/tools";
 import { createTestAgent } from "./src/index.ts";
+import type { TestAgentModelOptions, TestModelTurn } from "./src/index.ts";
 
 export type TargetFailure = "declared" | "defect";
 
@@ -54,7 +55,7 @@ export function makeFixture(
     id: "support.order",
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
-    modelProfile: "default",
+    model: "default",
     instructions: "Answer order questions without exposing internal details.",
     tools: [tool],
     limits: {
@@ -77,7 +78,7 @@ export function scriptedToolCall(
   toolId: string,
   input: JsonValue = { id: "1" },
   answer = "ready",
-): readonly ModelTurn[] {
+): readonly TestModelTurn[] {
   return [
     { type: "tool-call", callId: "call-1", toolId, input },
     { type: "final", output: { answer } },
@@ -86,10 +87,13 @@ export function scriptedToolCall(
 
 export function harness(
   fixture: ReturnType<typeof makeFixture>,
-  script: readonly ModelTurn[],
+  script: readonly TestModelTurn[],
   options: {
     readonly approval?: "approved" | "denied" | "pending";
     readonly engine?: ToolEngine;
+    readonly maxInputBytes?: number;
+    readonly maxOutputBytes?: number;
+    readonly model?: TestAgentModelOptions;
     readonly tools?: readonly ToolDescriptor<string>[];
   } = {},
 ) {
@@ -98,6 +102,9 @@ export function harness(
     tools: options.tools ?? [fixture.tool],
     engine: options.engine ?? fixture.engine,
     script,
+    ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
+    ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
+    ...(options.model === undefined ? {} : { model: options.model }),
     ...(options.approval === undefined ? {} : { approval: options.approval }),
   });
 }

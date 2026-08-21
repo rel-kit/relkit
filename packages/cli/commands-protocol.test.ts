@@ -2,6 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { defineEnv, env } from "@zsys/config";
+import { GRAPH_VERSION } from "@zsys/contracts";
 import { checkProject } from "./src/commands/check.js";
 import { runDoctor } from "./src/commands/doctor.js";
 import { runEnv } from "./src/commands/env.js";
@@ -46,6 +47,62 @@ test("graph print/check/diff success and failure use structured exits", async ()
   const usage = capture();
   expect(await runGraph(["diff", graphPath], usage.context)).toBe(2);
   expect(usage.errors[0]).toMatchObject({ code: "ZSYS_GRAPH_USAGE" });
+});
+
+test("graph commands accept current services and reject stale or unbound identities", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  await checkProject({ projectRoot: root });
+  const graphPath = join(root, ".zsys", "generated", "application.graph.json");
+  const graph = JSON.parse(await readFile(graphPath, "utf8")) as {
+    contractVersion: number;
+    nodes: Array<Record<string, unknown>>;
+    edges: Array<Record<string, unknown>>;
+  };
+  const source = graph.nodes[0]?.source;
+  const service = {
+    kind: "service",
+    id: "hello-service",
+    source,
+    members: [{ name: "hello", functionId: "hello" }],
+    middleware: [],
+  };
+  await writeFile(
+    graphPath,
+    JSON.stringify({
+      ...graph,
+      nodes: [...graph.nodes, service],
+      edges: [
+        ...graph.edges,
+        {
+          kind: "contains-function",
+          from: "hello-service",
+          to: "hello",
+          member: "hello",
+          order: 0,
+        },
+      ],
+    }),
+  );
+  expect(await runGraph(["print", graphPath], capture().context)).toBe(0);
+
+  await writeFile(graphPath, JSON.stringify({ ...graph, contractVersion: GRAPH_VERSION - 1 }));
+  const stale = capture();
+  expect(await runGraph(["print", graphPath], stale.context)).toBe(1);
+  expect(stale.errors[0]).toMatchObject({ code: "ZSYS_GRAPH_VERSION_UNSUPPORTED" });
+
+  await writeFile(
+    graphPath,
+    JSON.stringify({
+      ...graph,
+      nodes: [
+        ...graph.nodes,
+        { ...service, members: [{ name: "hello", functionId: "unbound.hello" }] },
+      ],
+    }),
+  );
+  const unbound = capture();
+  expect(await runGraph(["print", graphPath], unbound.context)).toBe(1);
+  expect(unbound.errors[0]).toMatchObject({ code: "ZSYS_GRAPH_INVALID" });
 });
 
 test("env and doctor cover safe success, failure, and usage paths", async () => {

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
 import { defineEvent, onEvent, events } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineJob } from "../../packages/jobs/src/index.ts";
@@ -53,7 +54,7 @@ describe("compiler normalization", () => {
     expect(seen).toEqual(VALIDATION_PASSES);
     expect(result.passOrder).toEqual(VALIDATION_PASSES);
     expect(result.graphHash).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(result.outputs.graph).toContain('"contractVersion":1');
+    expect(result.outputs.graph).toContain(`"contractVersion":${GRAPH_VERSION}`);
     expect(result.outputs.manifest).toContain("manifestGraphHash");
   });
 

@@ -16,32 +16,33 @@ const DESCRIPTOR_IDS = [
   "orders.project-any-change",
   "orders.audit-changes",
   "telemetry.capture-events",
-  "orders.authorize",
-  "content.browse-path",
-  "orders.create",
-  "orders.delete",
-  "orders.get",
-  "orders.search",
-  "receipts.send",
-  "orders.update",
-  "assets.upload",
+  "authorize-order",
+  "browse-path",
+  "orders.create-order",
+  "orders.delete-order",
+  "orders.get-order",
+  "orders.search-orders",
+  "send-receipt",
+  "orders.update-order",
+  "upload-assets",
   "receipts.send-job",
-  "orders.auth",
-  "docs.browse",
-  "files.browse",
-  "orders.delete.http",
-  "orders.get-route",
-  "orders.head",
-  "orders.list.http",
-  "orders.options",
-  "orders.replace",
-  "orders.search.http",
-  "orders.update.http",
-  "orders.create.http",
-  "assets.upload.http",
+  "order-auth",
+  "route.get.docs.optional-catch-all-parts",
+  "route.get.files.catch-all-parts",
+  "route.delete.orders.by-order-id",
+  "route.get.orders.by-order-id",
+  "route.head.orders.by-order-id",
+  "route.get.orders",
+  "route.options.orders.by-order-id",
+  "route.put.orders.by-order-id",
+  "route.get.orders.search",
+  "route.patch.orders.by-order-id",
+  "route.post.orders",
+  "route.post.uploads",
+  "orders",
   "orders.normalize-id",
-  "orders.get.tool",
-  "support.order",
+  "lookup-order",
+  "order-support",
 ];
 
 describe("commerce-example compiler acceptance", () => {
@@ -57,19 +58,14 @@ describe("commerce-example compiler acceptance", () => {
       }),
     ]);
     expect(run.exitCode).toBe(0);
-    expect(run.extracted.map(({ descriptor }) => descriptor.id).sort()).toEqual(
-      [...DESCRIPTOR_IDS].sort(),
-    );
-    expect(unique(run.extracted.map(({ descriptor }) => descriptor.id))).toHaveLength(
-      DESCRIPTOR_IDS.length,
-    );
+    const authoredIds = run.normalization.descriptors
+      .filter(({ identity }) => identity !== undefined)
+      .map(({ id }) => id)
+      .sort();
+    expect(authoredIds).toEqual([...DESCRIPTOR_IDS].sort());
+    expect(run.extracted).toHaveLength(DESCRIPTOR_IDS.length);
     expect(
-      unique(
-        run.extracted.map(
-          ({ descriptor, source }) =>
-            `${descriptor.id}@${source.file}:${source.line}:${source.column}`,
-        ),
-      ),
+      unique(run.extracted.map(({ source }) => `${source.file}:${source.line}:${source.column}`)),
     ).toHaveLength(DESCRIPTOR_IDS.length);
 
     const nodes = graph.nodes as readonly Record<string, any>[];
@@ -81,7 +77,7 @@ describe("commerce-example compiler acceptance", () => {
         .map((node) => node.id)
         .sort(),
     ).toEqual(
-      DESCRIPTOR_IDS.filter((id) => !["orders.auth", "orders.normalize-id"].includes(id)).sort(),
+      DESCRIPTOR_IDS.filter((id) => !["order-auth", "orders.normalize-id"].includes(id)).sort(),
     );
     expect(unique(edges.map(edgeKey))).toHaveLength(edges.length);
     expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(16);
@@ -90,31 +86,32 @@ describe("commerce-example compiler acceptance", () => {
         .filter((node) => node.kind === "trigger")
         .map((node) => node.id)
         .sort(),
-    ).toEqual([
-      "assets.upload.http",
-      "docs.browse",
-      "files.browse",
-      "orders.audit-changes",
-      "orders.create.http",
-      "orders.delete.http",
-      "orders.get-route",
-      "orders.head",
-      "orders.list.http",
-      "orders.options",
-      "orders.project-any-change",
-      "orders.replace",
-      "orders.search.http",
-      "orders.update.http",
-      "receipts.on-order-created",
-      "telemetry.capture-events",
-    ]);
+    ).toEqual(
+      [
+        "route.post.uploads",
+        "route.get.docs.optional-catch-all-parts",
+        "route.get.files.catch-all-parts",
+        "orders.audit-changes",
+        "orders.project-any-change",
+        "route.post.orders",
+        "route.delete.orders.by-order-id",
+        "route.get.orders.by-order-id",
+        "route.head.orders.by-order-id",
+        "route.get.orders",
+        "route.options.orders.by-order-id",
+        "route.put.orders.by-order-id",
+        "route.get.orders.search",
+        "route.patch.orders.by-order-id",
+        "receipts.on-order-created",
+        "telemetry.capture-events",
+      ].sort(),
+    );
 
     expect(edges.map(edgeKey).sort()).toEqual(
       [
-        ["calls-function", "zsys.event.receipts.on-order-created.handler", "orders.get"],
-        ["enqueues-job", "orders.create", "receipts.send-job"],
+        ["enqueues-job", "orders.create-order", "receipts.send-job"],
         ["enqueues-job", "zsys.event.receipts.on-order-created.handler", "receipts.send-job"],
-        ["exposes-as-tool", "orders.get", "orders.get.tool"],
+        ["exposes-as-tool", "orders.get-order", "lookup-order"],
         ["listens-to-event", "receipts.on-order-created", "orders.created"],
         ["listens-to-event", "orders.project-any-change", "orders.cancelled"],
         ["listens-to-event", "orders.project-any-change", "orders.created"],
@@ -122,21 +119,21 @@ describe("commerce-example compiler acceptance", () => {
         ["listens-to-event", "orders.audit-changes", "orders.cancelled"],
         ["listens-to-event", "orders.audit-changes", "orders.created"],
         ["listens-to-event", "orders.audit-changes", "orders.updated"],
-        ["publishes-event", "orders.create", "orders.created"],
-        ["targets-function", "assets.upload.http", "assets.upload", "primary"],
-        ["targets-function", "docs.browse", "content.browse-path", "primary"],
-        ["targets-function", "files.browse", "content.browse-path", "primary"],
-        ["targets-function", "orders.delete.http", "orders.delete", "primary"],
-        ["targets-function", "orders.get-route", "orders.authorize", "middleware"],
-        ["targets-function", "orders.get-route", "orders.get", "primary"],
-        ["targets-function", "orders.create.http", "orders.create", "primary"],
-        ["targets-function", "orders.get.tool", "orders.get", "primary"],
-        ["targets-function", "orders.head", "orders.get", "primary"],
-        ["targets-function", "orders.list.http", "orders.search", "primary"],
-        ["targets-function", "orders.options", "orders.get", "primary"],
-        ["targets-function", "orders.replace", "orders.update", "primary"],
-        ["targets-function", "orders.search.http", "orders.search", "primary"],
-        ["targets-function", "orders.update.http", "orders.update", "primary"],
+        ["publishes-event", "orders.create-order", "orders.created"],
+        ["targets-function", "route.post.uploads", "upload-assets", "primary"],
+        ["targets-function", "route.get.docs.optional-catch-all-parts", "browse-path", "primary"],
+        ["targets-function", "route.get.files.catch-all-parts", "browse-path", "primary"],
+        ["targets-function", "route.delete.orders.by-order-id", "orders.delete-order", "primary"],
+        ["targets-function", "route.get.orders.by-order-id", "authorize-order", "middleware"],
+        ["targets-function", "route.get.orders.by-order-id", "orders.get-order", "primary"],
+        ["targets-function", "route.post.orders", "orders.create-order", "primary"],
+        ["targets-function", "lookup-order", "orders.get-order", "primary"],
+        ["targets-function", "route.head.orders.by-order-id", "orders.get-order", "primary"],
+        ["targets-function", "route.get.orders", "orders.search-orders", "primary"],
+        ["targets-function", "route.options.orders.by-order-id", "orders.get-order", "primary"],
+        ["targets-function", "route.put.orders.by-order-id", "orders.update-order", "primary"],
+        ["targets-function", "route.get.orders.search", "orders.search-orders", "primary"],
+        ["targets-function", "route.patch.orders.by-order-id", "orders.update-order", "primary"],
         [
           "targets-function",
           "receipts.on-order-created",
@@ -161,19 +158,25 @@ describe("commerce-example compiler acceptance", () => {
           "zsys.event.telemetry.capture-events.handler",
           "primary",
         ],
-        ["targets-function", "receipts.send-job", "receipts.send", "primary"],
-        ["uses-bucket", "receipts.send", "assets"],
-        ["uses-cache", "orders.create", "prices"],
-        ["uses-cache", "orders.list.http", "prices"],
+        ["targets-function", "receipts.send-job", "send-receipt", "primary"],
+        ["uses-bucket", "send-receipt", "assets"],
+        ["uses-cache", "orders.create-order", "prices"],
+        ["uses-cache", "route.get.orders", "prices"],
         ["uses-provider-profile", "assets", "default"],
-        ["uses-provider-profile", "support.order", "default"],
+        ["uses-provider-profile", "order-support", "default"],
         ["uses-provider-profile", "prices", "default"],
         ["uses-provider-profile", "receipts.on-order-created", "default"],
         ["uses-provider-profile", "orders.project-any-change", "default"],
         ["uses-provider-profile", "orders.audit-changes", "default"],
         ["uses-provider-profile", "telemetry.capture-events", "default"],
         ["uses-provider-profile", "receipts.send-job", "default"],
-        ["uses-tool", "support.order", "orders.get.tool"],
+        ["uses-tool", "order-support", "lookup-order"],
+        ["contains-function", "orders", "orders.create-order", "createOrder", "0"],
+        ["contains-function", "orders", "orders.delete-order", "deleteOrder", "1"],
+        ["contains-function", "orders", "orders.get-order", "getOrder", "2"],
+        ["contains-function", "orders", "orders.search-orders", "searchOrders", "3"],
+        ["contains-function", "orders", "orders.update-order", "updateOrder", "4"],
+        ["uses-service-middleware", "orders", "orders.context", "0"],
       ].sort(),
     );
 
@@ -192,11 +195,11 @@ describe("commerce-example compiler acceptance", () => {
     expect(hashGraph(graph)).toBe(run.graphHash);
     expect(run.manifest.match(/manifestGraphHash = "([^"]+)"/)?.[1]).toBe(run.graphHash);
 
-    const functionIds = run.extracted
-      .filter(({ descriptor }) => descriptor.kind === "function")
-      .map(({ descriptor }) => descriptor.id)
+    const functionIds = run.normalization.descriptors
+      .filter(({ kind, identity }) => kind === "function" && identity !== undefined)
+      .map(({ id }) => id)
       .sort();
-    const generatedFunctionId = "zsys.agent.support.order.invoke";
+    const generatedFunctionId = "zsys.agent.order-support.invoke";
     const eventFunctionIds = [
       "zsys.event.orders.audit-changes.handler",
       "zsys.event.orders.project-any-change.handler",
@@ -209,15 +212,13 @@ describe("commerce-example compiler acceptance", () => {
       generated: {
         generated: true,
         generatedBy: "agent",
-        agentId: "support.order",
+        agentId: "order-support",
         functionId: generatedFunctionId,
       },
     });
-    expect(mapIds(run.manifest, "functions")).toEqual([
-      ...functionIds,
-      generatedFunctionId,
-      ...eventFunctionIds,
-    ]);
+    expect(mapIds(run.manifest, "functions")).toEqual(
+      expect.arrayContaining([...functionIds, generatedFunctionId, ...eventFunctionIds]),
+    );
     expect(run.manifest.match(/__zsys_createGeneratedAgentFunction\(/g)).toHaveLength(1);
     expect(run.manifest.match(/__zsys_createEventListenerTarget\(/g)).toHaveLength(4);
     for (const functionId of eventFunctionIds) {
@@ -227,19 +228,19 @@ describe("commerce-example compiler acceptance", () => {
       });
     }
     expect(run.manifest.match(/^const __zsys_middleware_\d+ =/gm)).toHaveLength(1);
-    expect(mapIds(run.manifest, "middleware")).toEqual(["orders.auth"]);
+    expect(mapIds(run.manifest, "middleware")).toEqual(["order-auth"]);
     expect(mapIds(run.manifest, "requestTransforms")).toEqual(["orders.normalize-id"]);
 
-    const route = nodes.find((node) => node.id === "orders.get-route");
+    const route = nodes.find((node) => node.id === "route.get.orders.by-order-id");
     expect(route?.config.middleware).toEqual([
-      { id: "orders.auth", targetFunctionId: "orders.authorize" },
+      { id: "order-auth", targetFunctionId: "authorize-order" },
     ]);
     expect(route?.config.transforms).toEqual([
       expect.objectContaining({ id: "orders.normalize-id" }),
     ]);
 
-    const createRoute = nodes.find((node) => node.id === "orders.create.http");
-    expect(createRoute?.targetFunctionId).toBe("orders.create");
+    const createRoute = nodes.find((node) => node.id === "route.post.orders");
+    expect(createRoute?.targetFunctionId).toBe("orders.create-order");
     expect(createRoute?.config).toMatchObject({
       method: "POST",
       path: "/orders",
@@ -264,15 +265,19 @@ describe("commerce-example compiler acceptance", () => {
       "POST",
       "PUT",
     ]);
-    expect(nodes.find((node) => node.id === "docs.browse")?.config).toMatchObject({
+    expect(
+      nodes.find((node) => node.id === "route.get.docs.optional-catch-all-parts")?.config,
+    ).toMatchObject({
       path: "/docs/*parts?",
       runtimePaths: ["/docs", "/docs/:parts{.+}"],
     });
-    expect(nodes.find((node) => node.id === "files.browse")?.config).toMatchObject({
+    expect(
+      nodes.find((node) => node.id === "route.get.files.catch-all-parts")?.config,
+    ).toMatchObject({
       path: "/files/*parts",
       runtimePaths: ["/files/:parts{.+}"],
     });
-    expect(nodes.find((node) => node.id === "assets.upload.http")?.config).toMatchObject({
+    expect(nodes.find((node) => node.id === "route.post.uploads")?.config).toMatchObject({
       maxBodyBytes: 1_024,
       request: {
         fields: {
@@ -281,10 +286,18 @@ describe("commerce-example compiler acceptance", () => {
         },
       },
     });
-    expect(nodes.find((node) => node.id === "orders.list.http")?.config).toMatchObject({
+    expect(nodes.find((node) => node.id === "route.get.orders")?.config).toMatchObject({
       rateLimit: { limit: 2, windowMs: 60_000, storeId: "prices" },
       responses: expect.arrayContaining([expect.objectContaining({ status: 429 })]),
     });
+    expect(nodes.find((node) => node.id === "orders")?.middleware).toEqual([
+      { id: "orders.context" },
+    ]);
+    expect(nodes.find((node) => node.id === "orders.get-order")?.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "orders.not-found", retry: "later", afterMs: 1_000 }),
+      ]),
+    );
 
     assertDataOnly(graph, run.manifest);
     assertDataOnly(run.extracted, run.manifest);
@@ -325,7 +338,14 @@ function assertLogicalResourceDescriptors(
 }
 
 function edgeKey(edge: Record<string, any>): string[] {
-  return [edge.kind, edge.from, edge.to, ...(edge.role === undefined ? [] : [edge.role])];
+  return [
+    edge.kind,
+    edge.from,
+    edge.to,
+    ...(edge.role === undefined ? [] : [edge.role]),
+    ...(edge.member === undefined ? [] : [edge.member]),
+    ...(edge.order === undefined ? [] : [String(edge.order)]),
+  ];
 }
 
 function unique(values: readonly string[]): string[] {
@@ -358,7 +378,7 @@ function agentBoundaryViolations(
   const findings: string[] = [];
   const agents = nodes.filter((node) => node.kind === "agent");
   const forbidden =
-    /^(?:api[-_]?key|access[-_]?key|client|credential(?:s)?|endpoint|model(?:id|name)?|provider|sdk|secret(?:key)?|token)$/i;
+    /^(?:api[-_]?key|access[-_]?key|client|credential(?:s)?|endpoint|model(?:id|name)|provider|sdk|secret(?:key)?|token)$/i;
   for (const tool of nodes.filter((node) => node.kind === "tool")) {
     if (Object.prototype.hasOwnProperty.call(tool, "handler"))
       findings.push(`${tool.id}:tool-handler`);

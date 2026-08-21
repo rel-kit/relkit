@@ -26,6 +26,32 @@ function cacheGraph(profile: string): ApplicationGraph {
   };
 }
 
+function agentGraph(model?: string): ApplicationGraph {
+  return {
+    contractVersion: GRAPH_VERSION,
+    nodes: [
+      {
+        kind: "agent",
+        id: "support.agent",
+        source,
+        input: null,
+        output: null,
+        ...(model === undefined ? {} : { model }),
+        instructions: "Answer safely.",
+        toolIds: [],
+        limits: null,
+        generatedFunction: {
+          generated: true,
+          generatedBy: "agent",
+          agentId: "support.agent",
+          functionId: "zsys.agent.support.agent.invoke",
+        },
+      },
+    ],
+    edges: [],
+  };
+}
+
 function factory(
   events: string[],
   generation: ProviderGeneration = completeGeneration({ release: () => events.push("release") }),
@@ -47,7 +73,6 @@ function completeGeneration(generation: ProviderGeneration): ProviderGeneration 
       cache: { default: {} },
       jobs: { default: {} },
       events: { default: {} },
-      models: { default: {} },
       observability: { default: {} },
       ...generation.providers,
     },
@@ -55,6 +80,72 @@ function completeGeneration(generation: ProviderGeneration): ProviderGeneration 
 }
 
 describe("provider registry", () => {
+  test("resolves configured omitted and exact agent models before readiness", async () => {
+    const modelProviders = {
+      defaultProvider: "openai",
+      defaultModel: "gpt-5-mini",
+      openai: {},
+    };
+    const resolved: (string | undefined)[] = [];
+    const registry = await createProviderRegistry({
+      generationId: "generation-model",
+      environment: "test",
+      providers: providerSets({ modelProviders }),
+      graph: agentGraph(),
+      factories: {
+        test: factory(
+          [],
+          completeGeneration({
+            modelRegistry: {
+              resolveModel: (selector?: string) => {
+                resolved.push(selector);
+                return { id: selector ?? "openai:gpt-5-mini" };
+              },
+            },
+          }),
+        ),
+      },
+    });
+    expect(resolved).toEqual([undefined]);
+    await registry.dispose();
+  });
+
+  test("reports a safe model selector readiness diagnostic", async () => {
+    await expect(
+      createProviderRegistry({
+        generationId: "generation-model-invalid",
+        environment: "test",
+        providers: providerSets({
+          modelProviders: {
+            defaultProvider: "openai",
+            defaultModel: "gpt-5-mini",
+            openai: {},
+          },
+        }),
+        graph: agentGraph("missing"),
+        factories: {
+          test: factory(
+            [],
+            completeGeneration({
+              modelRegistry: {
+                resolveModel: () => {
+                  throw {
+                    code: "ZSYS_MODEL_PROVIDER_UNKNOWN",
+                    message: "Model provider is not configured.",
+                  };
+                },
+                release: () => undefined,
+              },
+            }),
+          ),
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: "ZSYS_MODEL_PROVIDER_UNKNOWN",
+      issues: [{ agentId: "support.agent" }],
+    });
+  });
+
   test("selects one active set, constructs once, resolves profiles, and releases idempotently", async () => {
     const events: string[] = [];
     const defaultClient = Object.freeze({ name: "default-cache" });

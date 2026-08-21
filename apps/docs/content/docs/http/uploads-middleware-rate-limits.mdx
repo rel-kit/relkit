@@ -21,8 +21,9 @@ bodies return bounded `422` errors. Streaming upload APIs are not currently expo
 1. Framework request setup, correlation, security, and body-size protection.
 2. Rate limiter.
 3. Declared middleware in author order.
-4. Request mapping and input validation.
-5. Target invocation through the common function engine.
+4. Request mapping, input validation, and admission.
+5. Ordered service middleware, when the route targets a service member.
+6. Target invocation through the common function engine.
 
 Middleware references are serializable descriptors targeting functions, not inline Hono callbacks.
 

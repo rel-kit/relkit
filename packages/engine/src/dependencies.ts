@@ -8,14 +8,7 @@ import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-c
 
 export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-clients.js";
 
-export const DEPENDENCY_CATEGORIES = [
-  "functions",
-  "jobs",
-  "events",
-  "buckets",
-  "cache",
-  "agents",
-] as const;
+export const DEPENDENCY_CATEGORIES = ["jobs", "events", "buckets", "cache", "agents"] as const;
 export type DependencyCategory = (typeof DEPENDENCY_CATEGORIES)[number];
 
 export interface DependencyRefLike {
@@ -102,7 +95,6 @@ export function buildDependencyClients(
   options: DependencyClientBuildOptions,
 ): DependencyClientMaps {
   return Object.freeze({
-    functions: buildCategory("functions", options),
     jobs: buildCategory("jobs", options),
     events: buildCategory("events", options),
     buckets: buildCategory("buckets", options),

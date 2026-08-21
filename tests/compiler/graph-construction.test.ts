@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { defineEvent, events, onEvent } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
+import { defineService } from "../../packages/services/src/index.ts";
 import {
   defineMiddleware,
   defineRoute,
@@ -20,7 +21,6 @@ describe("compiler graph construction", () => {
       input,
       output,
       dependencies: {
-        functions: { helper: { ref: { kind: "function", id: "orders.helper" }, input, output } },
         cache: { prices: { ref: { kind: "cache", id: "prices" }, key: input, value: output } },
       },
       handler: async () => ({ ok: true }),
@@ -67,6 +67,17 @@ describe("compiler graph construction", () => {
       async () => ({ ok: true }),
       { id: "orders.listener" },
     );
+    const service = defineService({
+      id: "orders",
+      title: "Orders",
+      description: "Order operations",
+      tags: ["orders"],
+      functions: { get: target, helper, authorize: auth },
+      middleware: [
+        { ref: { kind: "service-middleware", id: "orders.context" } },
+        { ref: { kind: "service-middleware", id: "orders.audit" } },
+      ],
+    });
     const result = normalizeCompilation({
       descriptors: [
         prices,
@@ -79,6 +90,7 @@ describe("compiler graph construction", () => {
         first,
         middleware,
         target,
+        service,
       ],
       observedEdges: [{ relationship: "uses-cache", from: "orders.get", to: "prices" }],
     });
@@ -100,6 +112,7 @@ describe("compiler graph construction", () => {
         first,
         middleware,
         target,
+        service,
       ],
     });
     expect(result.graphHash).toBe(withoutObserved.graphHash);
@@ -123,6 +136,18 @@ describe("compiler graph construction", () => {
       "orders.created@1",
       "orders.updated@2",
     ]);
+    const serviceNode = nodes.find((node) => node.id === "orders" && node.kind === "service");
+    expect(serviceNode).toMatchObject({
+      title: "Orders",
+      description: "Order operations",
+      tags: ["orders"],
+      members: [
+        { name: "get", functionId: "orders.get" },
+        { name: "helper", functionId: "orders.helper" },
+        { name: "authorize", functionId: "orders.auth" },
+      ],
+      middleware: [{ id: "orders.context" }, { id: "orders.audit" }],
+    });
 
     expect(result.graph?.edges).toEqual(
       expect.arrayContaining([
@@ -136,9 +161,57 @@ describe("compiler graph construction", () => {
         },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.created" },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.updated" },
-        { kind: "calls-function", from: "orders.get", to: "orders.helper" },
         { kind: "uses-cache", from: "orders.get", to: "prices" },
+        {
+          kind: "contains-function",
+          from: "orders",
+          to: "orders.get",
+          member: "get",
+          order: 0,
+        },
+        {
+          kind: "contains-function",
+          from: "orders",
+          to: "orders.helper",
+          member: "helper",
+          order: 1,
+        },
+        {
+          kind: "contains-function",
+          from: "orders",
+          to: "orders.auth",
+          member: "authorize",
+          order: 2,
+        },
+        { kind: "uses-service-middleware", from: "orders", to: "orders.context", order: 0 },
+        { kind: "uses-service-middleware", from: "orders", to: "orders.audit", order: 1 },
       ]),
+    );
+    expect(result.graph?.edges).not.toContainEqual({
+      kind: "calls-function",
+      from: "orders.get",
+      to: "orders.helper",
+    });
+  });
+
+  test("rejects a function declared by two services", () => {
+    const target = defineFunction({
+      id: "orders.get",
+      input,
+      output,
+      handler: async () => ({ ok: true }),
+    });
+    const service = (id: string) => ({
+      kind: "service" as const,
+      id,
+      ref: { kind: "service" as const, id },
+      functions: { get: target },
+    });
+    const result = normalizeCompilation({
+      descriptors: [target, service("orders"), service("billing")],
+    });
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({ code: "ZSYS_SERVICE_OWNERSHIP", descriptorId: "billing" }),
     );
   });
 });

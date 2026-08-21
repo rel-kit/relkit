@@ -90,7 +90,6 @@ function completeGeneration(generation: ProviderGeneration): ProviderGeneration 
       cache: { default: {} },
       jobs: { default: {} },
       events: { default: {} },
-      models: { default: {} },
       observability: { default: {} },
       ...generation.providers,
     },

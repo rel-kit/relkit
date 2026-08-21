@@ -1,12 +1,19 @@
 import { deepFreeze, isStableId, normalizeId, type DescriptorMetadata } from "@zsys/contracts";
 import {
+  createUnboundIdentity,
+  getDescriptorIdentity,
+  normalizeErrorRetry,
+  type ErrorRetry,
+  type ErrorRetryInput,
+} from "@zsys/invocation";
+import {
   validateSync,
   type InferInput,
   type InferOutput,
   type StandardSchemaV1,
 } from "@zsys/schema";
 
-export type ErrorRetry = "never" | "later";
+export type { ErrorRetry, ErrorRetryInput, NormalizedErrorRetry } from "@zsys/invocation";
 
 export interface ErrorHttpMapping {
   readonly status: number;
@@ -22,6 +29,7 @@ export class DeclaredError<Id extends string = string, Data = unknown> extends E
   readonly ref: ErrorRef<Id>;
   readonly data: Data;
   readonly retry: ErrorRetry;
+  readonly afterMs?: number;
   readonly http?: ErrorHttpMapping;
 
   constructor(
@@ -30,6 +38,7 @@ export class DeclaredError<Id extends string = string, Data = unknown> extends E
     data: Data,
     message: string,
     retry: ErrorRetry,
+    afterMs: number | undefined,
     http: ErrorHttpMapping | undefined,
   ) {
     super(message);
@@ -38,6 +47,7 @@ export class DeclaredError<Id extends string = string, Data = unknown> extends E
     this.ref = ref;
     this.data = data;
     this.retry = retry;
+    if (afterMs !== undefined) this.afterMs = afterMs;
     if (http !== undefined) this.http = http;
     Object.freeze(this);
   }
@@ -55,6 +65,7 @@ export interface ErrorDescriptor<
   readonly message: string | ((data: Data) => string);
   readonly http?: ErrorHttpMapping;
   readonly retry: ErrorRetry;
+  readonly afterMs?: number;
   readonly create: (input: InferInput<DataSchema>) => DeclaredError<Id, Data>;
   new (input: InferInput<DataSchema>): DeclaredError<Id, Data>;
 }
@@ -65,15 +76,20 @@ export interface DefineErrorOptions<
   Id extends string,
   DataSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly data: DataSchema;
   readonly message: string | ((data: InferOutput<DataSchema>) => string);
   readonly http?: ErrorHttpMapping;
-  readonly retry: ErrorRetry;
+  readonly retry?: ErrorRetryInput;
 }
 
 /**
- * Defines a typed application error that can contribute transport metadata.
+ * Defines a typed application error with safe data, transport metadata, and an optional retry hint.
+ *
+ * Source-scoped errors may omit `id`; the compiler derives an identity from a statically
+ * identifiable binding such as `InvalidError`. Omitted `retry` is non-retryable. Use
+ * `{ kind: "later", afterMs }` to provide a minimum delay hint for jobs and durable events;
+ * HTTP and direct calls never repeat the function automatically.
  *
  * @example
  * ```ts
@@ -100,11 +116,11 @@ export function defineError<const Id extends string, const DataSchema extends St
   if (typeof options.message !== "string" && typeof options.message !== "function") {
     throw new TypeError("Error message must be a string or function");
   }
-  const id = normalizeId(options.id) as unknown as Id;
+  const id = normalizeId(
+    options.id === undefined ? createUnboundIdentity() : options.id,
+  ) as unknown as Id;
   validateHttp(options.http);
-  if (options.retry !== "never" && options.retry !== "later") {
-    throw new TypeError("Error retry must be never or later");
-  }
+  const retry = normalizeErrorRetry(options.retry);
 
   const ref = Object.freeze({ kind: "error" as const, id });
   const http =
@@ -127,7 +143,17 @@ export function defineError<const Id extends string, const DataSchema extends St
   class DefinedError extends DeclaredError<Id, InferOutput<DataSchema>> {
     constructor(input: InferInput<DataSchema>) {
       const error = makeError(input);
-      super(id, ref, error.data, error.message, options.retry, http);
+      const boundId = getDescriptorIdentity(DefinedError);
+      const boundRef = Object.freeze({ kind: "error" as const, id: boundId });
+      super(
+        boundId as Id,
+        boundRef as ErrorRef<Id>,
+        error.data,
+        error.message,
+        retry.retry,
+        retry.afterMs,
+        http,
+      );
     }
   }
 
@@ -138,7 +164,8 @@ export function defineError<const Id extends string, const DataSchema extends St
     ref,
     data: options.data,
     message: options.message,
-    retry: options.retry,
+    retry: retry.retry,
+    ...(retry.afterMs === undefined ? {} : { afterMs: retry.afterMs }),
     ...(http === undefined ? {} : { http }),
     ...(options.title === undefined ? {} : { title: options.title }),
     ...(options.description === undefined ? {} : { description: options.description }),
@@ -155,6 +182,11 @@ export function defineError<const Id extends string, const DataSchema extends St
 export function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {
   if (!isRecord(value)) return false;
   const ref = value.ref;
+  try {
+    normalizeErrorRetry(value.retry, value.afterMs);
+  } catch {
+    return false;
+  }
   return (
     value.kind === "error" &&
     isStableId(value.id) &&

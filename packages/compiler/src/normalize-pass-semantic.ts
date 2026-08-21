@@ -1,10 +1,10 @@
 import { buildGraph } from "./normalize-graph.js";
 import { jobCompatible, providerProfiles, schema, schemaEquivalent } from "./normalize-compat.js";
 import { add } from "./normalize-pass-utils.js";
-import { detectCycles } from "./normalize-cycles.js";
 import { referenceFor } from "./normalize-reference-index.js";
 import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-validation.js";
 import { validateEventCompatibility } from "./normalize-event-validation.js";
+import { readModelConfigurations, resolveCompiledModel } from "./normalize-model-selection.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
 import {
   NORMALIZE_CODES,
@@ -84,8 +84,8 @@ export function passAgents(work: NormalizationWork): void {
           "Agent tool reference does not resolve to a tool.",
         );
     }
-    if (typeof value.modelProfile !== "string" || value.modelProfile.trim() === "")
-      add(work, descriptor, NORMALIZE_CODES.modelProfile, "Agent model profile is required.");
+    if (value.model !== undefined && typeof value.model !== "string")
+      add(work, descriptor, NORMALIZE_CODES.model, "Agent model must be serializable text.");
   }
 }
 
@@ -94,10 +94,10 @@ export function passProviders(work: NormalizationWork): void {
     ...work.input,
     descriptors: work.descriptors.map((entry) => entry.value),
   });
+  const modelConfigurations = readModelConfigurations(work.descriptors);
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     const profile = typeof value.profile === "string" ? value.profile : undefined;
-    const model = typeof value.modelProfile === "string" ? value.modelProfile : undefined;
     const profileCapability = capabilityFor(descriptor.kind);
     if (profileCapability !== undefined) {
       const selected = profile ?? "default";
@@ -111,15 +111,15 @@ export function passProviders(work: NormalizationWork): void {
         );
       }
     }
-    if (model !== undefined && model.trim() !== "") {
-      const capabilities = profiles.get(model);
-      if (capabilities === undefined || !capabilities.includes("models"))
-        add(
-          work,
-          descriptor,
-          NORMALIZE_CODES.modelProfile,
-          `Model profile "${model}" is not configured.`,
-        );
+    if (descriptor.kind !== "agent") continue;
+    for (const entry of modelConfigurations) {
+      if (entry.error !== undefined) {
+        add(work, descriptor, entry.error.code, entry.error.message);
+        continue;
+      }
+      if (entry.configuration === undefined) continue;
+      const error = resolveCompiledModel(value.model, entry.configuration);
+      if (error !== undefined) add(work, descriptor, error.code, error.message);
     }
   }
 }
@@ -145,7 +145,6 @@ export function passCollisions(work: NormalizationWork): void {
         );
     }
   }
-  detectCycles(work);
 }
 
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {

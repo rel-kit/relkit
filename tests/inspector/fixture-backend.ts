@@ -35,7 +35,7 @@ const source = (file: string, line: number) => ({ file, line, column: 1 });
 const schema = (type: string): Record<string, unknown> => ({ type });
 
 const graph = {
-  contractVersion: 1,
+  contractVersion: 2,
   appId: "commerce-api",
   nodes: [
     {
@@ -224,7 +224,7 @@ const graph = {
     {
       kind: "agent",
       id: "support.order",
-      modelProfile: "default",
+      model: "default",
       input: { type: "object", properties: { question: schema("string") } },
       output: { type: "object", properties: { answer: schema("string") } },
       toolIds: ["orders.get.tool"],

@@ -59,6 +59,8 @@ export function reenterInvocation<A, E>(
   const tracedOptions: InvocationTraceOptions = {
     name: options.name ?? "zsys.context",
     invocationId: context.invocationId,
+    ...(context.functionId === undefined ? {} : { functionId: context.functionId }),
+    ...(context.serviceId === undefined ? {} : { serviceId: context.serviceId }),
     ...(context.parentInvocationId === undefined
       ? {}
       : { parentInvocationId: context.parentInvocationId }),

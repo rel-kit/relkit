@@ -31,7 +31,7 @@ export function AgentsClient() {
         ? [
             {
               id: view.id,
-              model: view.modelProfile || "unavailable",
+              model: view.model || "unavailable",
               tools: view.toolIds.length,
               generatedFunction: view.generatedFunctionId,
               invocations: view.runtime.length,
@@ -44,12 +44,12 @@ export function AgentsClient() {
   return (
     <ResourceTable
       title="Agents"
-      description="Bounded model profiles, inherited tool contracts, limits, and redacted invocation metadata."
+      description="Bounded model selection, inherited tool contracts, limits, and redacted invocation metadata."
       noun="agents"
       load={load}
       statusOptions={statuses}
       columns={[
-        { key: "model", label: "Model profile", render: (item) => item.model },
+        { key: "model", label: "Model", render: (item) => item.model },
         { key: "tools", label: "Allowed tools", render: (item) => item.tools },
         {
           key: "runtime",

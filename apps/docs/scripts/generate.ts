@@ -10,6 +10,7 @@ const packages = [
   ["app", "Application"],
   ["schema", "Schema"],
   ["functions", "Functions"],
+  ["services", "Services"],
   ["routes", "Routes"],
   ["events", "Events"],
   ["jobs", "Jobs"],

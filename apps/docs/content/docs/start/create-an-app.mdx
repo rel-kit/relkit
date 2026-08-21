@@ -45,5 +45,9 @@ ZSYS always discovers `src/**/*.ts`, starts from `src/app.ts`, and writes derive
 `.zsys/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
 These conventions are intentionally not configurable.
 
+The `api` template demonstrates a small service and independent event listeners; the `agent` template
+derives a tool with `function.asTool` and keeps development/test model calls offline. Both templates use
+the same inferred source-scoped IDs and common `invoke` boundary described in the guides.
+
 Run `zsys doctor` after creation to check Bun, project configuration, ports, and optional Pulumi
 requirements without printing secret values.

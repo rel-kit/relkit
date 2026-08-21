@@ -77,6 +77,7 @@ export function makeEntry(
     ...optionalText(value, "traceId"),
     ...optionalText(value, "routeId"),
     ...optionalText(value, "functionId"),
+    ...optionalText(value, "serviceId"),
     ...optionalText(value, "outcome"),
     ...optionalText(value, "generationId"),
     ...optionalText(value, "graphHash"),
@@ -149,6 +150,7 @@ export function matches(
     (options.outcome === undefined || entry.outcome === options.outcome) &&
     (options.requestId === undefined || entry.requestId === options.requestId) &&
     (options.traceId === undefined || entry.traceId === options.traceId) &&
+    (options.serviceId === undefined || entry.serviceId === options.serviceId) &&
     (options.generationId === undefined || entry.generationId === options.generationId) &&
     (options.graphHash === undefined || entry.graphHash === options.graphHash) &&
     (options.severity === undefined || entry.severity === options.severity)

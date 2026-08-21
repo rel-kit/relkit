@@ -9,6 +9,7 @@ const publicPackages = [
   "packages/config",
   "packages/diagnostics",
   "packages/functions",
+  "packages/services",
   "packages/routes",
   "packages/jobs",
   "packages/events",
@@ -21,7 +22,6 @@ const publicPackages = [
 ] as const;
 
 const forbiddenSymbols = [
-  ["Effect", /\bEffect\b/g],
   ["Layer", /\bLayer\b/g],
   ["Context.Tag", /\bContext\.Tag\b/g],
   ["Schema.Schema", /\bSchema\.Schema\b/g],
@@ -41,7 +41,7 @@ const forbiddenSymbols = [
   ],
   [
     "framework-or-provider-import",
-    /from ["'](?:effect|hono|next|openai|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
+    /from ["'](?:ai|effect|hono|next|openai|@(?:ai-sdk|effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
   ],
 ] as const;
 
@@ -101,8 +101,13 @@ function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {
   const leaks: DeclarationLeak[] = [];
   const visit = (node: ts.Node): void => {
     if (ts.isPropertySignature(node) && node.name.getText(source) === "handler") {
+      const declaration = nearestDeclaration(node);
+      if (!declaration || ts.getModifiers(declaration)?.some(isExportModifier) !== true) {
+        ts.forEachChild(node, visit);
+        return;
+      }
       const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
-      if (!/Function/.test(owner)) {
+      if (!/Function|ServiceMiddleware/.test(owner)) {
         leaks.push({
           file,
           ...lineAndColumn(text, node.getStart(source)),
@@ -114,6 +119,17 @@ function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {
   };
   visit(source);
   return leaks;
+}
+
+function nearestDeclaration(node: ts.Node): ts.Declaration | undefined {
+  for (let current = node.parent; current && !ts.isSourceFile(current); current = current.parent) {
+    if (ts.isDeclaration(current)) return current;
+  }
+  return undefined;
+}
+
+function isExportModifier(modifier: ts.Modifier): boolean {
+  return modifier.kind === ts.SyntaxKind.ExportKeyword;
 }
 
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {

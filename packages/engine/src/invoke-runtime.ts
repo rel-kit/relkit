@@ -1,23 +1,27 @@
 import { Effect } from "effect";
 import type { FunctionRequest, MaybePromise, ProtocolId } from "@zsys/contracts";
 import {
+  invokeUserHandler,
+  normalizeFailure,
+  resolveServicePolicy,
+  type InvocationRunner,
+} from "@zsys/invocation";
+import {
   createPublicClockEffect,
   createInvocationBridge,
   captureInvocationTrace,
-  invokeUserHandler,
   withChildSpan,
-  normalizeFailure,
   withRootSpan,
   createZsysTracer,
   IdSource,
   InvocationTrace,
   type CapturedInvocationTrace,
-  type InvocationRunner,
 } from "@zsys/runtime-effect";
 import type { DirectFunctionInvoker, DirectFunctionRequest } from "./dependencies.js";
 import { createContext } from "./context.js";
 import { callHook, makeContext } from "./invoke-utils.js";
 import { createDependencyBridge } from "./dependency-bridge.js";
+import { runServiceHandler } from "./service-runtime.js";
 import {
   emitObservabilityEvent,
   OBSERVABILITY_HOOK_PROTOCOL,
@@ -51,6 +55,7 @@ export async function runHandler<
   idSource: InvocationIdSource,
   runner: InvocationRunner,
   childInvoker: DirectChildInvoker | undefined,
+  onTrace?: (trace: CapturedInvocationTrace) => void,
 ): Promise<unknown> {
   const spanSource: InvocationIdSource = {
     next: (kind) => (kind === "trace" ? (traceId as ProtocolId) : idSource.next(kind)),
@@ -59,6 +64,7 @@ export async function runHandler<
     const signalRef = { current: controller.signal };
     const time = yield* createPublicClockEffect(runner, controller.signal);
     const trace = yield* captureInvocationTrace;
+    onTrace?.(trace);
     const bridge = createDependencyBridge(createInvocationBridge(runner, trace), controller.signal);
     const invokeFunction: DirectFunctionInvoker | undefined =
       childInvoker === undefined
@@ -131,24 +137,42 @@ export async function runHandler<
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
-    return yield* invokeUserHandler({
-      handler: target.handler as (
-        value: unknown,
-        request: FunctionRequest | undefined,
-        context: Context,
-      ) => unknown,
-      input,
-      ...(options.request === undefined ? {} : { request: options.request }),
-      publicContext: context,
-      ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
-      onSignal: (signal) => {
-        signalRef.current = signal;
-      },
+    const invokeHandler = (publicContext: unknown) =>
+      invokeUserHandler({
+        handler: target.handler as (
+          value: unknown,
+          request: FunctionRequest | undefined,
+          context: Context,
+        ) => unknown,
+        input,
+        ...(options.request === undefined ? {} : { request: options.request }),
+        publicContext: publicContext as Context,
+        ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
+        onSignal: (signal) => {
+          signalRef.current = signal;
+        },
+      });
+    const policy = resolveServicePolicy(target, options.servicePolicies);
+    if (policy === undefined) return yield* invokeHandler(context);
+    return yield* Effect.tryPromise({
+      try: () =>
+        runServiceHandler(
+          policy,
+          input,
+          options.request,
+          context,
+          invokeHandler,
+          runner,
+          controller.signal,
+        ),
+      catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
   });
   const spanOptions: import("@zsys/runtime-effect").InvocationTraceOptions = {
     name: `zsys.invoke.${target.id}`,
     invocationId: record.id,
+    functionId: target.id,
+    ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),
     ...(record.parentId === undefined ? {} : { parentInvocationId: record.parentId }),
     ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
     source: record.source,
@@ -165,6 +189,7 @@ export async function runHandler<
         ...(parentSpanId === undefined ? {} : { parentSpanId }),
         traceId: span.traceId,
         source: record.source as import("./invoke-types.js").InvocationSource,
+        ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),
         status: event.type,
         startedAt: record.startedAt,
         ...(event.type === "completed" ? { completedAt: new Date().toISOString() } : {}),

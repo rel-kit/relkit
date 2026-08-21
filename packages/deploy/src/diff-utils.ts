@@ -30,7 +30,6 @@ export function resources(plan: DeploymentPlan): readonly Resource[] {
     ...entries("event-trigger", plan.eventTriggers),
     ...entries("bucket", plan.buckets),
     ...entries("cache", plan.caches),
-    ...entries("model", plan.models ?? []),
   ];
   return result.sort((left, right) => left.stableId.localeCompare(right.stableId));
 }
@@ -79,12 +78,9 @@ export function isSecuritySensitive(
     return true;
   if (operation === "create" || operation === "delete")
     return [before, after].some(
-      (value) =>
-        hasSecurityMetadata(value) ||
-        hasPublicVisibility(value) ||
-        (kind === "model" && isRecord(value) && typeof value.provider === "string"),
+      (value) => hasSecurityMetadata(value) || hasPublicVisibility(value),
     );
-  return kind === "model" && changed.includes("model");
+  return false;
 }
 
 function hasPublicVisibility(value: JsonValue | undefined): boolean {

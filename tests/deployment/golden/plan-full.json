@@ -1,6 +1,6 @@
 {
   "contractVersion": 1,
-  "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+  "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
   "application": {
     "id": "full-app",
     "image": {
@@ -46,7 +46,7 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -80,7 +80,7 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "jobId": "receipts.send-job",
@@ -104,7 +104,7 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -134,7 +134,7 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -165,7 +165,7 @@
       "capabilities": ["buckets"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "visibility": "private",
@@ -182,7 +182,7 @@
       "capabilities": ["cache"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
+        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -190,22 +190,6 @@
       },
       "defaultTtlMs": 1000,
       "maxTtlMs": 5000
-    }
-  ],
-  "models": [
-    {
-      "id": "default",
-      "logicalName": "full-app-model-default",
-      "profile": "default",
-      "configurationNames": ["region"],
-      "capabilities": ["models"],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:60aff519353dadf9ff399d2de9036ef7706d556e34dd88d8cf859e0a832abe04",
-        "managed-by": "zsys"
-      },
-      "provider": "openai",
-      "model": "gpt-4o-mini"
     }
   ],
   "iam": {

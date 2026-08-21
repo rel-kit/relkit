@@ -39,6 +39,7 @@ export interface ObservabilityCorrelation {
   readonly requestId?: string;
   readonly traceId?: string;
   readonly invocationId?: string;
+  readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
   readonly correlationId?: string;

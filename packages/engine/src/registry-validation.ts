@@ -1,9 +1,4 @@
-import {
-  CONTRACT_VERSION,
-  GENERATOR_VERSION,
-  GRAPH_VERSION,
-  MANIFEST_VERSION,
-} from "@zsys/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 import type { RegistryIssue, RuntimeManifestInput } from "./registry.js";
 
@@ -12,18 +7,16 @@ export function versionIssues(
   manifest: RuntimeManifestInput,
 ): RegistryIssue[] {
   const issues: RegistryIssue[] = [];
-  const graphVersion = optionalNumber(graph, "graphVersion") ?? graph.contractVersion;
-  const manifestVersion = optionalNumber(manifest, "manifestVersion") ?? manifest.contractVersion;
-  if (graphVersion !== GRAPH_VERSION || graph.contractVersion !== CONTRACT_VERSION) {
+  if (graph.contractVersion !== GRAPH_VERSION) {
     issues.push({
       code: "ZSYS_GRAPH_VERSION_UNSUPPORTED",
-      message: `Graph version ${String(graphVersion)} is not supported.`,
+      message: `Graph version ${String(graph.contractVersion)} is not supported.`,
     });
   }
-  if (manifestVersion !== MANIFEST_VERSION) {
+  if (manifest.contractVersion !== MANIFEST_VERSION) {
     issues.push({
       code: "ZSYS_MANIFEST_VERSION_UNSUPPORTED",
-      message: `Manifest version ${String(manifestVersion)} is not supported.`,
+      message: `Manifest version ${String(manifest.contractVersion)} is not supported.`,
     });
   }
   if (manifest.generatorVersion !== GENERATOR_VERSION) {
@@ -132,9 +125,4 @@ export function compareIds(left: string, right: string): number {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function optionalNumber(value: object, key: string): number | undefined {
-  const candidate = (value as Record<string, unknown>)[key];
-  return typeof candidate === "number" ? candidate : undefined;
 }

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { defineEvent, events, onEvent } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
+import { defineAgent } from "../../packages/agents/src/index.ts";
 import {
   defineMiddleware,
   defineRoute,
@@ -18,6 +19,49 @@ function codes(result: ReturnType<typeof normalizeCompilation>): readonly string
 }
 
 describe("compiler semantic validation", () => {
+  test("resolves configured agent model selectors without storing live values", () => {
+    const app = (modelProviders: Record<string, unknown>) => ({
+      kind: "app",
+      id: "app",
+      ref: { kind: "app", id: "app" },
+      providers: {
+        development: { metadata: { configuration: { modelProviders } } },
+      },
+    });
+    const agent = (model?: string) =>
+      defineAgent({
+        id: "support.agent",
+        input: z.string(),
+        output: z.string(),
+        ...(model === undefined ? {} : { model }),
+        instructions: "Answer safely.",
+        tools: [],
+        limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
+      });
+    const configuration = {
+      defaultProvider: "openai",
+      defaultModel: "gpt-5-mini",
+      openai: {},
+      anthropic: { defaultModel: "claude-sonnet-4-5" },
+    };
+    expect(codes(normalizeCompilation({ descriptors: [app(configuration), agent()] }))).not.toEqual(
+      expect.arrayContaining([
+        NORMALIZE_CODES.modelProvider,
+        NORMALIZE_CODES.modelDefault,
+        NORMALIZE_CODES.modelConfiguration,
+      ]),
+    );
+    expect(
+      codes(normalizeCompilation({ descriptors: [app(configuration), agent("missing")] })),
+    ).toContain(NORMALIZE_CODES.modelProvider);
+    expect(
+      codes(normalizeCompilation({ descriptors: [app(configuration), agent("anthropic")] })),
+    ).not.toContain(NORMALIZE_CODES.modelDefault);
+    expect(
+      codes(normalizeCompilation({ descriptors: [app(configuration), agent("openai:gpt-4.1")] })),
+    ).not.toContain(NORMALIZE_CODES.modelProvider);
+  });
+
   test("indexes middleware and transforms without duplicating exported references", () => {
     const target = defineFunction({
       id: "orders.get",
@@ -103,7 +147,7 @@ describe("compiler semantic validation", () => {
     );
   });
 
-  test("validates raw selectors, provider capabilities, and direct-call cycles", () => {
+  test("validates raw selectors and provider capabilities without static function cycles", () => {
     const target = defineFunction({
       id: "events.target",
       input,
@@ -130,34 +174,11 @@ describe("compiler semantic validation", () => {
       key: z.string(),
       value: z.string(),
     };
-    const functionA = defineFunction({
-      id: "cycle.a",
-      input,
-      output,
-      dependencies: {
-        functions: { b: { ref: { kind: "function", id: "cycle.b" }, input, output } },
-      },
-      handler: async () => ({ ok: true }),
-    });
-    const functionB = defineFunction({
-      id: "cycle.b",
-      input,
-      output,
-      dependencies: {
-        functions: { a: { ref: { kind: "function", id: "cycle.a" }, input, output } },
-      },
-      handler: async () => ({ ok: true }),
-    });
-
     const result = normalizeCompilation({
-      descriptors: [app, cache, target, trigger, functionA, functionB],
+      descriptors: [app, cache, target, trigger],
     });
     expect(codes(result)).toEqual(
-      expect.arrayContaining([
-        NORMALIZE_CODES.wildcard,
-        NORMALIZE_CODES.providerProfile,
-        NORMALIZE_CODES.cycle,
-      ]),
+      expect.arrayContaining([NORMALIZE_CODES.wildcard, NORMALIZE_CODES.providerProfile]),
     );
   });
 

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type FunctionRequest } from "@zsys/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import { createApp, type RuntimeManifest } from "./src/index.ts";
 
@@ -7,15 +8,25 @@ const source = { file: "src/routes/docs/[[...parts]]/route.ts", line: 1, column:
 describe("catch-all and method runtime behavior", () => {
   test("registers optional variants and preserves independently encoded segments", async () => {
     const inputs: unknown[] = [];
+    const requests: FunctionRequest[] = [];
     const app = createApp({
       plan: plan(optionalCatchAll()),
       manifest: manifest(),
-      engine: { invoke: async ({ input }) => (inputs.push(input), { ok: true }) },
+      engine: {
+        invoke: async ({ input, request }) => {
+          inputs.push(input);
+          if (request !== undefined) requests.push(request);
+          return { ok: true };
+        },
+      },
     });
 
     expect((await app.request("http://localhost/docs")).status).toBe(200);
     expect((await app.request("http://localhost/docs/a%2Fb/c%20d")).status).toBe(200);
     expect(inputs).toEqual([{ parts: undefined }, { parts: ["a/b", "c d"] }]);
+    expect(requests[0]?.params).toEqual({});
+    expect(requests[1]?.params.parts).toEqual(["a/b", "c d"]);
+    expect(Object.isFrozen(requests[1]?.params.parts)).toBe(true);
   });
 
   test("runs HEAD targets but removes their response body", async () => {
@@ -104,8 +115,8 @@ function plan(...triggers: readonly HttpTriggerRegistration[]): RegistrationPlan
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:catch-all",
     functions: {},
     middleware: {},

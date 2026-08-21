@@ -6,7 +6,7 @@ const orderSupport = defineAgent({
   id: "orders.support-agent",
   input: agentInput,
   output: agentOutput,
-  modelProfile: "default",
+  model: "openai:gpt-5-mini",
   instructions: "Answer order questions.",
   tools: [lookupOrder],
   limits: { maxSteps: 2, maxToolCalls: 2, timeoutMs: 1_000 },

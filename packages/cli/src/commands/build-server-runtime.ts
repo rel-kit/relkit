@@ -16,10 +16,12 @@ function bindAgents() {
 async function invokeBoundAgent(agent, input, context) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+  if (providerRegistry.modelRegistry === undefined)
+    throw new Error("Model provider registry unavailable.");
   return invokeAgent({
     agent,
     input,
-    provider: provider(providerRegistry, "models", agent.modelProfile),
+    modelRegistry: providerRegistry.modelRegistry,
     tools: runtimeManifest.tools ?? {},
     engine: { invoke: invokeHttp },
     invocationId: context.invocation.id,
@@ -39,7 +41,6 @@ function targetFor(functionId) {
 
 function createDependencySources(providerRegistry) {
   return {
-    functions: Object.fromEntries(plan.functions.map((node) => [node.id, registry.get(node.id)])),
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`zsys.agent.\${node.id}.invoke\`)])),
     buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "buckets", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),

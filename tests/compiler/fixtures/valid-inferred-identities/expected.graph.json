@@ -1,0 +1,631 @@
+{
+  "appId": "inferred-app",
+  "contractVersion": 2,
+  "edges": [
+    {
+      "from": "orders",
+      "kind": "contains-function",
+      "member": "getOrder",
+      "order": 0,
+      "to": "orders.get-order"
+    },
+    {
+      "from": "orders.get-order",
+      "kind": "exposes-as-tool",
+      "to": "lookup-order"
+    },
+    {
+      "from": "health.custom-route",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "health.check"
+    },
+    {
+      "from": "lookup-order",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "orders.get-order"
+    },
+    {
+      "from": "route.get.files.catch-all-parts",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "files.read-files"
+    },
+    {
+      "from": "route.get.orders.by-order-id",
+      "kind": "targets-function",
+      "role": "middleware",
+      "to": "orders.authorize"
+    },
+    {
+      "from": "route.get.orders.by-order-id",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "orders.get-order"
+    },
+    {
+      "from": "route.get.root",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "health.check"
+    },
+    {
+      "from": "support",
+      "kind": "uses-provider-profile",
+      "to": "default"
+    },
+    {
+      "from": "orders",
+      "kind": "uses-service-middleware",
+      "order": 0,
+      "to": "orders.context"
+    },
+    {
+      "from": "support",
+      "kind": "uses-tool",
+      "to": "lookup-order"
+    }
+  ],
+  "nodes": [
+    {
+      "generatedFunction": {
+        "agentId": "support",
+        "functionId": "zsys.agent.support.invoke",
+        "generated": true,
+        "generatedBy": "agent"
+      },
+      "id": "support",
+      "input": {
+        "properties": {},
+        "type": "object"
+      },
+      "instructions": "Answer order questions.",
+      "kind": "agent",
+      "limits": {
+        "maxSteps": 2,
+        "maxToolCalls": 2,
+        "timeoutMs": 1000
+      },
+      "model": "default",
+      "output": {
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": ["ok", "orderId"],
+        "type": "object"
+      },
+      "source": {
+        "column": 16,
+        "file": "src/agents/support.agent.ts",
+        "line": 5
+      },
+      "toolIds": ["lookup-order"]
+    },
+    {
+      "defaults": null,
+      "environment": {
+        "SERVICE_PORT": {
+          "hasDefault": true,
+          "optional": false,
+          "requiredIn": [],
+          "sensitive": false,
+          "type": "port"
+        }
+      },
+      "id": "inferred-app",
+      "kind": "app",
+      "observability": null,
+      "providerProfiles": ["default"],
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 12
+      }
+    },
+    {
+      "hasDefault": true,
+      "id": "SERVICE_PORT",
+      "kind": "env",
+      "name": "SERVICE_PORT",
+      "requiredIn": [],
+      "sensitive": false,
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 12
+      },
+      "type": "port"
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "generated": null,
+      "id": "files.read-files",
+      "input": {
+        "properties": {
+          "parts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["parts"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": ["count"],
+        "type": "object"
+      },
+      "source": {
+        "column": 19,
+        "file": "src/functions/files/read-files.function.ts",
+        "line": 4
+      },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "generated": null,
+      "id": "health.check",
+      "input": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": ["ok", "orderId"],
+        "type": "object"
+      },
+      "source": {
+        "column": 16,
+        "file": "src/functions/health.function.ts",
+        "line": 4
+      },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": null,
+      "generated": null,
+      "id": "orders.authorize",
+      "input": {
+        "properties": {
+          "authorization": {
+            "type": "string"
+          }
+        },
+        "required": ["authorization"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "allowed": {
+            "type": "boolean"
+          }
+        },
+        "required": ["allowed"],
+        "type": "object"
+      },
+      "source": {
+        "column": 19,
+        "file": "src/functions/orders/authorize.function.ts",
+        "line": 4
+      },
+      "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "errors": [
+        {
+          "create": {
+            "$zsys": "function",
+            "name": "create"
+          },
+          "data": {
+            "$zsys": "schema",
+            "jsonSchema": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": ["orderId"],
+              "type": "object"
+            }
+          },
+          "http": {
+            "status": 400
+          },
+          "id": "functions.orders.get-order-function.InvalidError",
+          "kind": "error",
+          "message": {
+            "$zsys": "function",
+            "name": "message"
+          },
+          "ref": {
+            "id": "functions.orders.get-order-function.InvalidError",
+            "kind": "error"
+          },
+          "retry": "never"
+        }
+      ],
+      "generated": null,
+      "id": "orders.get-order",
+      "input": {
+        "properties": {
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": ["orderId"],
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": ["ok", "orderId"],
+        "type": "object"
+      },
+      "source": {
+        "column": 18,
+        "file": "src/functions/orders/get-order.function.ts",
+        "line": 11
+      },
+      "timeoutMs": null
+    },
+    {
+      "generated": {
+        "agentId": "support",
+        "functionId": "zsys.agent.support.invoke",
+        "generated": true,
+        "generatedBy": "agent"
+      },
+      "id": "zsys.agent.support.invoke",
+      "input": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "function",
+      "output": {
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": ["ok", "orderId"],
+        "type": "object"
+      },
+      "source": {
+        "column": 16,
+        "file": "src/agents/support.agent.ts",
+        "line": 5
+      }
+    },
+    {
+      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
+      "configuration": {
+        "development": [],
+        "production": ["region"],
+        "test": []
+      },
+      "environment": [],
+      "id": "default",
+      "kind": "provider",
+      "profile": "default",
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 12
+      }
+    },
+    {
+      "id": "orders",
+      "kind": "service",
+      "members": [
+        {
+          "functionId": "orders.get-order",
+          "name": "getOrder"
+        }
+      ],
+      "middleware": [
+        {
+          "id": "orders.context"
+        }
+      ],
+      "source": {
+        "column": 16,
+        "file": "src/services/orders.service.ts",
+        "line": 5
+      }
+    },
+    {
+      "approval": "never",
+      "description": "Look up one order",
+      "id": "lookup-order",
+      "kind": "tool",
+      "sideEffect": "read",
+      "source": {
+        "column": 16,
+        "file": "src/tools/lookup-order.tool.ts",
+        "line": 4
+      },
+      "targetFunctionId": "orders.get-order",
+      "timeoutMs": null
+    },
+    {
+      "config": {
+        "maxBodyBytes": null,
+        "method": "POST",
+        "middleware": [],
+        "path": "/custom",
+        "rateLimit": null,
+        "request": {
+          "fields": {},
+          "kind": "input"
+        },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": ["ok", "orderId"],
+              "type": "object"
+            },
+            "status": 200
+          },
+          {
+            "id": "validation.422",
+            "kind": "validation-error",
+            "schema": null,
+            "status": 422
+          }
+        ],
+        "runtimePaths": ["/custom"],
+        "timeoutMs": null,
+        "transforms": []
+      },
+      "id": "health.custom-route",
+      "kind": "trigger",
+      "source": {
+        "column": 21,
+        "file": "src/routes/custom/route.ts",
+        "line": 4
+      },
+      "targetFunctionId": "health.check",
+      "triggerType": "http"
+    },
+    {
+      "config": {
+        "maxBodyBytes": null,
+        "method": "GET",
+        "middleware": [],
+        "path": "/files/*parts",
+        "rateLimit": null,
+        "request": {
+          "fields": {
+            "parts": {
+              "kind": "path-segments",
+              "name": "parts"
+            }
+          },
+          "kind": "input"
+        },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": {
+                "count": {
+                  "type": "number"
+                }
+              },
+              "required": ["count"],
+              "type": "object"
+            },
+            "status": 200
+          },
+          {
+            "id": "validation.422",
+            "kind": "validation-error",
+            "schema": null,
+            "status": 422
+          }
+        ],
+        "runtimePaths": ["/files/:parts{.+}"],
+        "timeoutMs": null,
+        "transforms": []
+      },
+      "id": "route.get.files.catch-all-parts",
+      "kind": "trigger",
+      "source": {
+        "column": 20,
+        "file": "src/routes/files/[...parts]/route.ts",
+        "line": 4
+      },
+      "targetFunctionId": "files.read-files",
+      "triggerType": "http"
+    },
+    {
+      "config": {
+        "maxBodyBytes": null,
+        "method": "GET",
+        "middleware": [
+          {
+            "id": "orders-auth",
+            "targetFunctionId": "orders.authorize"
+          }
+        ],
+        "path": "/orders/:orderId",
+        "rateLimit": null,
+        "request": {
+          "fields": {
+            "orderId": {
+              "kind": "transform",
+              "transformId": "orders.normalize-id",
+              "value": {
+                "kind": "path",
+                "name": "orderId"
+              }
+            }
+          },
+          "kind": "input"
+        },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": ["ok", "orderId"],
+              "type": "object"
+            },
+            "status": 200
+          },
+          {
+            "errorId": "functions.orders.get-order-function.InvalidError",
+            "id": "error.functions.orders.get-order-function.InvalidError.400",
+            "kind": "error",
+            "schema": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": ["orderId"],
+              "type": "object"
+            },
+            "status": 400
+          },
+          {
+            "id": "validation.422",
+            "kind": "validation-error",
+            "schema": null,
+            "status": 422
+          }
+        ],
+        "runtimePaths": ["/orders/:orderId"],
+        "timeoutMs": null,
+        "transforms": [
+          {
+            "id": "orders.normalize-id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "id": "route.get.orders.by-order-id",
+      "kind": "trigger",
+      "source": {
+        "column": 20,
+        "file": "src/routes/orders/[orderId]/route.ts",
+        "line": 6
+      },
+      "targetFunctionId": "orders.get-order",
+      "triggerType": "http"
+    },
+    {
+      "config": {
+        "maxBodyBytes": null,
+        "method": "GET",
+        "middleware": [],
+        "path": "/",
+        "rateLimit": null,
+        "request": {
+          "fields": {},
+          "kind": "input"
+        },
+        "responses": [
+          {
+            "id": "success.200",
+            "kind": "success",
+            "schema": {
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": ["ok", "orderId"],
+              "type": "object"
+            },
+            "status": 200
+          },
+          {
+            "id": "validation.422",
+            "kind": "validation-error",
+            "schema": null,
+            "status": 422
+          }
+        ],
+        "runtimePaths": ["/"],
+        "timeoutMs": null,
+        "transforms": []
+      },
+      "id": "route.get.root",
+      "kind": "trigger",
+      "source": {
+        "column": 20,
+        "file": "src/routes/route.ts",
+        "line": 4
+      },
+      "targetFunctionId": "health.check",
+      "triggerType": "http"
+    }
+  ]
+}

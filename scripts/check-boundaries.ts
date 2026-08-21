@@ -4,6 +4,7 @@ import * as ts from "typescript";
 import {
   dependencyName,
   descriptorPackages,
+  descriptorRuntimeDependencies,
   discoverScopes,
   importReferences,
   internalRuntimePackages,
@@ -70,7 +71,11 @@ function reportImport(
       `${ownerName} imports undeclared dependency "${dependency}" via "${reference.specifier}"`,
     );
   }
-  if (descriptorPackages.has(ownerName) && isFrameworkRuntime(dependency)) {
+  if (
+    descriptorPackages.has(ownerName) &&
+    isFrameworkRuntime(dependency) &&
+    !descriptorRuntimeDependencies.get(ownerName)?.has(dependency)
+  ) {
     add("descriptor-runtime-import", `${ownerName} imports runtime package "${dependency}"`);
   }
   if (

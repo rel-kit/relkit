@@ -1,12 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import type { ProtocolId } from "@zsys/contracts";
+import { dispatchInvocation } from "@zsys/invocation";
 import { z } from "@zsys/schema";
-import {
-  InvocationValidationError,
-  invokeFunction,
-  type InvocationContext,
-  type InvocationTarget,
-} from "./src/index.ts";
+import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/index.ts";
 const valueInput = z.object({ value: z.number() });
 const valueOutput = z.object({ value: z.number() });
 
@@ -15,22 +11,7 @@ function ids() {
   return { next: (kind: "trace" | "invocation" | "span") => `${kind}-${++next}` as ProtocolId };
 }
 
-function dependency(child: InvocationTarget) {
-  return {
-    ref: { kind: "function", id: child.id },
-    input: child.input,
-    output: child.output,
-    ...(child.errors === undefined ? {} : { errors: child.errors }),
-  };
-}
-
-function childClient(context: InvocationContext) {
-  return context as unknown as {
-    readonly functions: Readonly<Record<string, (input: unknown) => Promise<unknown>>>;
-  };
-}
-
-describe("direct child function clients", () => {
+describe("direct child descriptor invocation", () => {
   test("invokes a child with independent identity and inherited trace state", async () => {
     const records: Array<Record<string, unknown>> = [];
     const spans: Array<Record<string, unknown>> = [];
@@ -50,9 +31,8 @@ describe("direct child function clients", () => {
       id: "orders.parent",
       input: valueInput,
       output: valueOutput,
-      dependencies: { functions: { child: dependency(child) } },
-      handler: async (input, _request, context) => {
-        const result = await childClient(context).functions.child(input);
+      handler: async (input) => {
+        const result = await dispatchInvocation({ target: child, input });
         return result as { value: number };
       },
     };
@@ -61,7 +41,6 @@ describe("direct child function clients", () => {
       parent,
       { value: 2 },
       {
-        clients: { functions: { child } },
         idSource: ids(),
         correlationId: "request-1",
         now: () => now,
@@ -120,10 +99,9 @@ describe("direct child function clients", () => {
         id: `orders.parent-${child.id}`,
         input: z.object({}),
         output: z.object({ ok: z.boolean() }),
-        dependencies: { functions: { child: dependency(child) } },
-        handler: async (_value, _request, context) => {
+        handler: async (_value) => {
           try {
-            await childClient(context).functions.child(input);
+            await dispatchInvocation({ target: child, input });
           } catch (error) {
             expect(
               error instanceof InvocationValidationError || (error as { kind?: string }).kind,
@@ -136,7 +114,6 @@ describe("direct child function clients", () => {
         parent,
         {},
         {
-          clients: { functions: { child } },
           idSource: ids(),
           hooks: {
             onCompletion: (event) =>
@@ -179,14 +156,12 @@ describe("direct child function clients", () => {
       id: "orders.wait-parent",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      dependencies: { functions: { child: dependency(child) } },
-      handler: (_input, _request, context) => childClient(context).functions.child({}),
+      handler: (_input) => dispatchInvocation({ target: child, input: {} }),
     };
     const execution = invokeFunction(
       parent,
       {},
       {
-        clients: { functions: { child } },
         signal: controller.signal,
         idSource: ids(),
       },

@@ -3,6 +3,7 @@ import { clean } from "./normalize-graph-utils.js";
 import { eventConfig, httpConfig } from "./normalize-graph-config.js";
 import { providerNodes } from "./normalize-graph-providers.js";
 import { generatedAgentMarker, generatedFunctionNode } from "./normalize-generated-function.js";
+import { serviceNodeData } from "./normalize-graph-services.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 
@@ -117,12 +118,14 @@ function nodeFor(descriptor: NormalizedDescriptor, work: NormalizationWork): Gra
         kind: "agent",
         input: schema(work, descriptor, "input"),
         output: schema(work, descriptor, "output"),
-        modelProfile: typeof value.modelProfile === "string" ? value.modelProfile : "",
+        ...(typeof value.model === "string" ? { model: value.model } : {}),
         instructions: clean(value.instructions),
         toolIds: toolIds(value.tools),
         limits: clean(value.limits),
         generatedFunction: generatedAgentMarker(descriptor.id),
       };
+    case "service":
+      return { ...base, kind: "service", ...serviceNodeData(value) };
     default:
       return undefined;
   }

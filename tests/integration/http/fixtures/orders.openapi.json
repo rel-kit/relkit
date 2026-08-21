@@ -89,5 +89,5 @@
       }
     }
   },
-  "x-zsys": { "contractVersion": 1, "generatorVersion": 1, "graphVersion": 1, "version": 1 }
+  "x-zsys": { "contractVersion": 1, "generatorVersion": 1, "graphVersion": 2, "version": 1 }
 }

@@ -38,7 +38,7 @@ function makeGraph(root: string, reverse: boolean): TestGraph {
     ? [{ to: "orders.get", from: "orders.route", kind: "targets-function", role: "primary" }]
     : [{ role: "primary", kind: "targets-function", from: "orders.route", to: "orders.get" }];
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     appId: "orders",
     nodes,
     edges,
@@ -66,5 +66,29 @@ describe("canonical graph hashing", () => {
     expect(firstJson).toContain('"timezone":"UTC"');
     expect(firstJson).not.toMatch(/"(?:generationId|timestamp|pid|randomId)"/);
     expect(firstJson).not.toContain("/tmp/zsys-a");
+  });
+
+  test("keeps ordered service edges in declaration order", () => {
+    const graph = {
+      contractVersion: 2,
+      nodes: [
+        {
+          kind: "service",
+          id: "orders",
+          source: { file: "src/orders.ts", line: 1, column: 1 },
+          members: [
+            { name: "get", functionId: "orders.get" },
+            { name: "save", functionId: "orders.save" },
+          ],
+          middleware: [],
+        },
+      ],
+      edges: [
+        { kind: "contains-function", from: "orders", to: "orders.save", member: "save", order: 1 },
+        { kind: "contains-function", from: "orders", to: "orders.get", member: "get", order: 0 },
+      ],
+    };
+    const canonical = JSON.parse(canonicalGraphJson(graph)) as { edges: { order: number }[] };
+    expect(canonical.edges.map(({ order }) => order)).toEqual([0, 1]);
   });
 });

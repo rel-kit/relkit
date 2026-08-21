@@ -25,7 +25,6 @@ const fullOptions = {
       timeoutMs: 2_000,
     },
   },
-  modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
 } as const;
 
 test("full deployment plan matches the stable golden contract", () => {
@@ -34,12 +33,6 @@ test("full deployment plan matches the stable golden contract", () => {
   expect(plan).toEqual(readGolden("plan-full.json"));
   expect(plan.application.environmentNames).toEqual(["SERVICE_PORT"]);
   expect(plan.http.health).toEqual(fullOptions.image.health);
-  expect(plan.models?.[0]).toMatchObject({
-    logicalName: "full-app-model-default",
-    profile: "default",
-    provider: "openai",
-    model: "gpt-4o-mini",
-  });
   expect(resourceTags(plan).every((tags) => tags["managed-by"] === "zsys")).toBe(true);
 });
 
@@ -51,7 +44,6 @@ test("minimal deployment plan omits optional capability resources", () => {
   expect(plan.events).toEqual([]);
   expect(plan.buckets).toEqual([]);
   expect(plan.caches).toEqual([]);
-  expect(plan.models).toBeUndefined();
   expect(plan.iam.serviceRole.statements).toEqual([]);
 });
 
@@ -214,7 +206,6 @@ function resourceIdentity(plan: DeploymentPlan): unknown {
     ...plan.eventTriggers,
     ...plan.buckets,
     ...plan.caches,
-    ...(plan.models ?? []),
   ];
   return resources.map((resource) => {
     const value = resource as unknown as Record<string, unknown>;
@@ -235,7 +226,6 @@ function resourceTags(plan: DeploymentPlan): readonly Record<string, string>[] {
     ...plan.eventTriggers,
     ...plan.buckets,
     ...plan.caches,
-    ...(plan.models ?? []),
   ].map((resource) => resource.tags ?? {});
 }
 

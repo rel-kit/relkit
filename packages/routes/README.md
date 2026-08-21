@@ -38,8 +38,11 @@ Route files may export any combination of `GET`, `POST`, `PUT`, `PATCH`,
 `[...parts]`, and `[[...parts]]` directories for dynamic, required catch-all,
 and optional catch-all segments.
 
-`request` and `responses` are optional. Object input fields matching path
-segments become path parameters; remaining fields become query parameters for
-read methods or a JSON body for write methods. Explicit mappings and response
-arrays are complete overrides for headers, cookies, transforms, multipart,
-redirects, and alternate media types.
+Route IDs are optional and are inferred from the route method/path. Function and
+service-member IDs may be inferred the same way; use explicit IDs when a source
+move must preserve identity. `request` and `responses` are optional. Object
+input fields matching path segments become reusable input and path parameters;
+unmatched values remain on the immutable `request.params` view. Remaining
+fields become query parameters for read methods or a JSON body for write
+methods. Explicit mappings and response arrays are complete overrides for
+headers, cookies, transforms, multipart, redirects, and alternate media types.

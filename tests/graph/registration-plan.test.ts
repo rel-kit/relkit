@@ -5,7 +5,7 @@ const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
 function graph(): ApplicationGraph {
   return {
-    contractVersion: 1,
+    contractVersion: 2,
     appId: "orders",
     nodes: [
       {
@@ -88,7 +88,7 @@ function graph(): ApplicationGraph {
         source,
         input: { type: "object" },
         output: { type: "object" },
-        modelProfile: "default",
+        model: "default",
         instructions: "help",
         toolIds: ["orders.lookup-tool"],
         limits: { maxSteps: 2 },
@@ -104,9 +104,17 @@ function graph(): ApplicationGraph {
         id: "default",
         source,
         profile: "default",
-        capabilities: ["buckets", "cache", "jobs", "events", "models"],
+        capabilities: ["buckets", "cache", "jobs", "events"],
         configuration: {},
         environment: [],
+      },
+      {
+        kind: "service",
+        id: "orders",
+        source,
+        title: "Orders",
+        members: [{ name: "create", functionId: "orders.create" }],
+        middleware: [{ id: "orders.context" }],
       },
     ],
     edges: [],
@@ -121,7 +129,9 @@ describe("registration planning", () => {
 
     expect(second).toEqual(first);
     expect(first.functions.map(({ id }) => id)).toEqual(["orders.create"]);
+    expect(first.functions[0]).toMatchObject({ serviceId: "orders" });
     expect(first.httpTriggers.map(({ id }) => id)).toEqual(["orders.route"]);
+    expect(first.httpTriggers[0]).toMatchObject({ serviceId: "orders" });
     expect(first.eventTriggers.map(({ id }) => id)).toEqual(["orders.listener"]);
     expect(first.queues.map(({ id }) => id)).toEqual(["orders.refresh"]);
     expect(first.schedules.map(({ id }) => id)).toEqual(["orders.refresh:hourly"]);
@@ -129,6 +139,7 @@ describe("registration planning", () => {
     expect(first.caches.map(({ id }) => id)).toEqual(["orders.cache"]);
     expect(first.tools.map(({ id }) => id)).toEqual(["orders.lookup-tool"]);
     expect(first.agents.map(({ id }) => id)).toEqual(["orders.agent"]);
+    expect(first.services?.map(({ id }) => id)).toEqual(["orders"]);
     expect(Object.isFrozen(first)).toBe(true);
     expect(Object.isFrozen(first.functions)).toBe(true);
     expect(Object.isFrozen(input.nodes[0])).toBe(false);

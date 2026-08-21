@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import {
   createObservabilityCollector,
   type RequestRecord,
@@ -159,8 +160,8 @@ function plan(
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:rate-limit",
     functions: {},
     middleware: { auth: { targetFunctionId: "auth", decision: { kind: "continue" } } },

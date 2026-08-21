@@ -34,6 +34,10 @@ test("hello returns a greeting", async () => {
 });
 ```
 
+Application code can use the same standalone boundary directly with
+`await hello.invoke(input)`. It validates input/output and runs through the
+isolated common kernel without borrowing another application's providers.
+
 Integration tests use `createTestApplication` and its in-process HTTP client:
 
 ```ts
@@ -52,10 +56,11 @@ afterAll(() => testApp.close());
 ```
 
 The test provider set supplies deterministic IDs and time, isolated local
-state, and test fakes for external resources. Prefer those providers over
-network calls in unit and integration tests. Tests that exercise restart and
-recovery should use a disposable state directory and assert durable duplicate
-behavior rather than relying on timing or arbitrary sleeps.
+state, and test fakes for external resources. Agent tests use the AI SDK v7
+`ai/test` surface and never call live model providers. Prefer these providers
+over network calls in unit and integration tests. Tests that exercise restart
+and recovery should use a disposable state directory and assert durable
+duplicate behavior rather than relying on timing or arbitrary sleeps.
 
 ## Repository checks
 

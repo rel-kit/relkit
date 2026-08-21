@@ -1,5 +1,10 @@
 import { normalizeId } from "@zsys/contracts";
-import type { ErrorDescriptorAny } from "@zsys/functions";
+import { getDescriptorIdentity, resolveDescriptorIdentity } from "@zsys/invocation";
+import {
+  FunctionToolArgumentValidationError as ToolArgumentValidationError,
+  FunctionToolOperationCancelledError as ToolOperationCancelledError,
+  type ErrorDescriptorAny,
+} from "@zsys/functions";
 import { validate, type StandardIssue, type StandardSchemaV1 } from "@zsys/schema";
 import { isToolDescriptor, type ToolDescriptor, type ToolRefAny } from "./define-tool.js";
 
@@ -82,31 +87,13 @@ export class ToolNotAllowedError extends TypeError {
   }
 }
 
-export class ToolArgumentValidationError extends TypeError {
-  readonly code = "ZSYS_TOOL_ARGUMENT_VALIDATION" as const;
-  readonly issues: readonly StandardIssue[];
-
-  constructor(issues: readonly StandardIssue[]) {
-    super("Tool arguments failed validation");
-    this.name = "ToolArgumentValidationError";
-    this.issues = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
-  }
-}
-
-export class ToolOperationCancelledError extends Error {
-  readonly code = "ABORT_ERR" as const;
-
-  constructor() {
-    super("Tool operation cancelled");
-    this.name = "AbortError";
-  }
-}
+export { ToolArgumentValidationError, ToolOperationCancelledError };
 
 export function resolveToolTarget(tool: ToolDescriptor<string>): ResolvedToolTarget {
   if (!isToolDescriptor(tool)) throw new TypeError("Invalid tool descriptor");
   const target = tool.target;
   return Object.freeze({
-    functionId: target.ref.id,
+    functionId: functionTargetId(target),
     input: target.input,
     output: target.output,
     ...(target.errors === undefined ? {} : { errors: target.errors }),
@@ -119,7 +106,9 @@ export async function invokeTool(
 ): Promise<unknown> {
   const toolId = normalizeId(options.toolId);
   const tool = findTool(options.tools, toolId);
-  if (tool === undefined || tool.id !== toolId) throw new ToolUnknownError(toolId);
+  if (tool === undefined || getDescriptorIdentity(tool) !== toolId) {
+    throw new ToolUnknownError(toolId);
+  }
   if (options.allowedTools !== undefined && !isAllowed(toolId, options.allowedTools)) {
     throw new ToolNotAllowedError(toolId);
   }
@@ -158,11 +147,13 @@ export function createToolRuntime(options: ToolRuntimeOptions): ToolRuntime {
 }
 
 function findTool(source: ToolSource, id: string): ToolDescriptor<string> | undefined {
-  if (Array.isArray(source)) return source.find((tool) => tool.id === id);
+  if (Array.isArray(source)) return source.find((tool) => getDescriptorIdentity(tool) === id);
   if (source instanceof Map)
-    return source.get(id) ?? [...source.values()].find((tool) => tool.id === id);
+    return (
+      source.get(id) ?? [...source.values()].find((tool) => getDescriptorIdentity(tool) === id)
+    );
   const record = source as Readonly<Record<string, ToolDescriptor<string>>>;
-  return record[id] ?? Object.values(record).find((tool) => tool.id === id);
+  return record[id] ?? Object.values(record).find((tool) => getDescriptorIdentity(tool) === id);
 }
 
 function isAllowed(id: string, allowlist: readonly ToolAllowlistEntry[]): boolean {
@@ -170,10 +161,15 @@ function isAllowed(id: string, allowlist: readonly ToolAllowlistEntry[]): boolea
     (entry) =>
       (typeof entry === "string"
         ? normalizeId(entry)
-        : "ref" in entry
-          ? entry.ref.id
-          : entry.id) === id,
+        : "id" in entry
+          ? getDescriptorIdentity(entry)
+          : entry.ref.id) === id,
   );
+}
+
+function functionTargetId(target: ToolDescriptor<string>["target"]): string {
+  const identity = resolveDescriptorIdentity(target);
+  return identity.canonical ? identity.id : target.ref.id;
 }
 
 function parseArguments(value: unknown): unknown {

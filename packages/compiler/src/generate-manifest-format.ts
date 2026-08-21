@@ -16,6 +16,8 @@ export function renderManifest(
   application?: string,
   agents: ReadonlyMap<string, string> = new Map(),
   tools: ReadonlyMap<string, string> = new Map(),
+  services: ReadonlyMap<string, string> = new Map(),
+  identityBindings: readonly string[] = [],
 ): string {
   const imports = [...bindings.values()]
     .map(
@@ -24,6 +26,9 @@ export function renderManifest(
     )
     .join("\n");
   const generatedImports = [
+    identityBindings.length > 0
+      ? 'import { bindDescriptorIdentity as __zsys_bindDescriptorIdentity } from "@zsys/invocation";'
+      : "",
     [...functions.values()].some((value) =>
       value.startsWith("__zsys_createGeneratedAgentFunction("),
     )
@@ -45,6 +50,8 @@ export function renderManifest(
   return [
     [generatedImports, imports].filter(Boolean).join("\n"),
     ...(generatedImports !== "" || imports !== "" ? [""] : []),
+    ...identityBindings,
+    ...(identityBindings.length > 0 ? [""] : []),
     `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
     `export const manifestGeneratorVersion = ${GENERATOR_VERSION} as const;`,
     `export const manifestGraphHash = ${JSON.stringify(input.graphHash)} as const;`,
@@ -58,6 +65,7 @@ export function renderManifest(
     `  targets: ${renderMap(targets)},`,
     `  agents: ${renderMap(agents)},`,
     `  tools: ${renderMap(tools)},`,
+    `  services: ${renderMap(services)},`,
     "  providers: providerFactories,",
     "  providerFactories,",
     `  middleware: ${renderMap(middleware)},`,

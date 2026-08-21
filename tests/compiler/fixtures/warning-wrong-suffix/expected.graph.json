@@ -1,6 +1,6 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 1,
+  "contractVersion": 2,
   "edges": [],
   "nodes": [
     {
@@ -71,7 +71,7 @@
       "timeoutMs": null
     },
     {
-      "capabilities": ["buckets", "cache", "events", "jobs", "models", "observability"],
+      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
       "configuration": {
         "development": [],
         "production": ["region"],

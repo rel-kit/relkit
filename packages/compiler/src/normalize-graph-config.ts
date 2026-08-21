@@ -12,6 +12,9 @@ export function httpConfig(
   return clean({
     method: value.method,
     path: value.path,
+    ...(typeof value.title === "string" ? { title: value.title } : {}),
+    ...(typeof value.description === "string" ? { description: value.description } : {}),
+    ...(Array.isArray(value.tags) ? { tags: clean(value.tags) } : {}),
     runtimePaths: value.runtimePaths,
     request: value.request,
     responses: responses(value.responses, descriptor.id, work),

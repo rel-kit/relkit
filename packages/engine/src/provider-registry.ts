@@ -17,6 +17,7 @@ import {
   validateEnvironment,
   validateRequirements,
 } from "./provider-registry-validation.js";
+import { validateModelReadiness } from "./model-readiness.js";
 import {
   PROVIDER_RECIPES as recipes,
   ProviderRegistryError,
@@ -68,13 +69,16 @@ export async function createProviderRegistry(
   let generation: ProviderGeneration;
   try {
     generation = await factory.create(context);
-  } catch {
+  } catch (cause) {
+    const modelError = modelRegistryError(cause);
+    if (modelError !== undefined) throw modelError;
     throw error("ZSYS_PROVIDER_CONSTRUCTION_FAILED", "Provider construction failed.");
   }
   try {
     await factory.ready?.(generation);
     await generation.ready?.();
     await generation.readiness?.();
+    validateModelReadiness(options.graph, providerSet, generation);
     if (options.signal?.aborted)
       throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
   } catch (cause) {
@@ -100,6 +104,7 @@ export async function createProviderRegistry(
     environment,
     recipeTag: recipe,
     providerSet,
+    ...(generation.modelRegistry === undefined ? {} : { modelRegistry: generation.modelRegistry }),
     requirements: Object.freeze(requirements),
     handles,
     get: (capability: ProviderCapability, profile: string) => handles[key(capability, profile)],
@@ -159,4 +164,28 @@ function error(
       ...(profile === undefined ? {} : { profile }),
     },
   ]);
+}
+
+function modelRegistryError(cause: unknown): ProviderRegistryError | undefined {
+  if (!isRecord(cause) || typeof cause.code !== "string") return undefined;
+  const codes = new Set<ProviderRegistryErrorCode>([
+    "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID",
+    "ZSYS_MODEL_PROVIDER_UNSUPPORTED",
+    "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID",
+    "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE",
+    "ZSYS_MODEL_SELECTOR_INVALID",
+    "ZSYS_MODEL_PROVIDER_UNKNOWN",
+    "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
+  ]);
+  if (!codes.has(cause.code as ProviderRegistryErrorCode)) return undefined;
+  return new ProviderRegistryError([
+    {
+      code: cause.code as ProviderRegistryErrorCode,
+      message: typeof cause.message === "string" ? cause.message : "Model provider is invalid.",
+    },
+  ]);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
 }

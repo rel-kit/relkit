@@ -101,7 +101,7 @@ function planFor(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
 
 function orderedPlan(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
   const graph: ApplicationGraph = {
-    contractVersion: 1,
+    contractVersion: 2,
     nodes: routes as unknown as ApplicationGraph["nodes"],
     edges: [],
   };
@@ -120,7 +120,7 @@ function createHarness(options: HarnessOptions): Harness {
   const calls: HttpInvocationOptions[] = [];
   const observability = options.observability ?? createTestObservability();
   const manifest: RuntimeManifest = {
-    contractVersion: 1,
+    contractVersion: 2,
     generatorVersion: 1,
     graphHash: options.plan.graphHash,
     functions: {},
@@ -369,7 +369,7 @@ describe("HTTP integration", () => {
     });
     try {
       const response = await harness.client.get("/schema?id=rejected");
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(422);
       expect(handlerCalled).toBe(false);
     } finally {
       await harness.close();

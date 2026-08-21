@@ -1,7 +1,15 @@
-import { normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
+import {
+  createInvocationCallStack,
+  currentInvocationScope,
+  normalizeFailure,
+  resolveServicePolicy,
+  runInInvocationScope,
+  toPublicEnvelope,
+} from "@zsys/invocation";
 import {
   assertSource,
   callHook,
+  canonicalTarget,
   calculateDeadline,
   completeRecord,
   createRecord,
@@ -13,6 +21,7 @@ import {
   validated,
 } from "./invoke-utils.js";
 import { runHandler } from "./invoke-runtime.js";
+import { createEngineDispatcher } from "./invocation-dispatcher.js";
 import { resolveDirectTarget } from "./direct-target.js";
 import {
   emitObservabilityEvent,
@@ -38,14 +47,42 @@ export async function invoke<
   Output = unknown,
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 >(options: InvokeOptions<Input, Output, Context>): Promise<Output> {
-  const target = resolveTarget(options);
+  const activeScope = currentInvocationScope();
+  if (options.parent === undefined && activeScope?.parent !== undefined) {
+    options = { ...options, parent: activeScope.parent };
+  }
+  const dispatcher = createEngineDispatcher(
+    options,
+    (next) => invoke(next),
+    (edge) => {
+      void callHook(options.hooks?.onObservedEdge, edge);
+      void emitObservabilityEvent(options.hooks?.observability, {
+        protocol: OBSERVABILITY_HOOK_PROTOCOL,
+        version: OBSERVABILITY_HOOK_VERSION,
+        type: "edge.observed",
+        edge,
+      });
+    },
+  );
+  const parentChain = activeScope?.chain ?? createInvocationCallStack();
+  const target = canonicalTarget(resolveTarget(options));
   const source = options.source ?? "direct";
   assertSource(source);
   const now = options.now?.() ?? Date.now();
   const deadlineMs = calculateDeadline(target.timeoutMs, options, options.parent?.deadlineMs, now);
   const idSource = options.idSource ?? defaultIdSource;
   const traceId = options.traceId ?? options.parent?.traceId ?? idSource.next("trace");
-  const record = createRecord(target.id, source, options, traceId, deadlineMs, now, idSource);
+  const policy = resolveServicePolicy(target, options.servicePolicies);
+  const record = createRecord(
+    target.id,
+    source,
+    options,
+    traceId,
+    deadlineMs,
+    now,
+    idSource,
+    policy?.serviceId,
+  );
   await callHook(options.hooks?.onInvocationStart, record);
   await emitObservabilityEvent(options.hooks?.observability, {
     protocol: OBSERVABILITY_HOOK_PROTOCOL,
@@ -62,6 +99,7 @@ export async function invoke<
   let error: InvocationValidationError | ReturnType<typeof normalizeFailure> | undefined;
   let outcome: InvocationOutcome = "defect";
   try {
+    const chain = parentChain.enterDescriptor(target, record.id);
     if (controller.signal.aborted) {
       throw normalizeFailure(controller.signal.reason, { signal: controller.signal });
     }
@@ -90,6 +128,9 @@ export async function invoke<
         parent,
         ...(options.env === undefined ? {} : { env: options.env }),
         ...(options.clients === undefined ? {} : { clients: options.clients }),
+        ...(options.servicePolicies === undefined
+          ? {}
+          : { servicePolicies: options.servicePolicies }),
         ...(options.now === undefined ? {} : { now: options.now }),
         ...(options.admit === undefined ? {} : { admit: options.admit }),
         ...(options.admission === undefined ? {} : { admission: options.admission }),
@@ -97,17 +138,38 @@ export async function invoke<
         effectRunner: runner,
         idSource,
       });
-    value = (await runHandler(
-      target,
-      input,
-      record,
-      options,
-      controller,
-      deadlineMs,
+    const scopeParent: {
+      id: string;
+      traceId: string;
+      correlationId?: string;
+      deadlineMs?: number;
+      signal: AbortSignal;
+      spanId?: string;
+      trace?: unknown;
+    } = {
+      id: record.id,
       traceId,
-      idSource,
-      runner,
-      childInvoker,
+      ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
+      ...(deadlineMs === undefined ? {} : { deadlineMs }),
+      signal: controller.signal,
+    };
+    value = (await runInInvocationScope({ dispatcher, parent: scopeParent, chain }, () =>
+      runHandler(
+        target,
+        input,
+        record,
+        options,
+        controller,
+        deadlineMs,
+        traceId,
+        idSource,
+        runner,
+        childInvoker,
+        (trace) => {
+          scopeParent.trace = trace;
+          if (trace.context?.spanId !== undefined) scopeParent.spanId = trace.context.spanId;
+        },
+      ),
     )) as Output;
     value = (await validated(target.output, value, "output")) as Output;
     outcome = "success";

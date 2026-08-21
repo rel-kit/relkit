@@ -72,10 +72,14 @@
       "name": "@zsys/agents",
       "version": "0.0.0",
       "dependencies": {
+        "@ai-sdk/anthropic": "4.0.0",
+        "@ai-sdk/openai": "4.0.0",
         "@zsys/contracts": "workspace:*",
         "@zsys/functions": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/schema": "workspace:*",
         "@zsys/tools": "workspace:*",
+        "ai": "7.0.0",
       },
     },
     "packages/app": {
@@ -89,8 +93,10 @@
         "@zsys/contracts": "workspace:*",
         "@zsys/events": "workspace:*",
         "@zsys/functions": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/jobs": "workspace:*",
         "@zsys/routes": "workspace:*",
+        "@zsys/services": "workspace:*",
         "@zsys/tools": "workspace:*",
       },
     },
@@ -234,6 +240,7 @@
         "@zsys/contracts": "workspace:*",
         "@zsys/events": "workspace:*",
         "@zsys/graph": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/jobs": "workspace:*",
         "@zsys/observability": "workspace:*",
         "@zsys/providers-local": "workspace:*",
@@ -259,6 +266,7 @@
         "@zsys/buckets": "workspace:*",
         "@zsys/cache": "workspace:*",
         "@zsys/contracts": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/schema": "workspace:*",
       },
     },
@@ -276,6 +284,15 @@
         "@zsys/contracts": "workspace:*",
         "@zsys/observability": "workspace:*",
         "hono": "4.13.2",
+      },
+    },
+    "packages/invocation": {
+      "name": "@zsys/invocation",
+      "version": "0.0.0",
+      "dependencies": {
+        "@zsys/contracts": "workspace:*",
+        "@zsys/schema": "workspace:*",
+        "effect": "4.0.0-beta.107",
       },
     },
     "packages/jobs": {
@@ -323,6 +340,7 @@
       "dependencies": {
         "@zsys/contracts": "workspace:*",
         "@zsys/functions": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/schema": "workspace:*",
       },
     },
@@ -335,6 +353,7 @@
         "@zsys/config": "workspace:*",
         "@zsys/contracts": "workspace:*",
         "@zsys/graph": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/observability": "workspace:*",
         "effect": "4.0.0-beta.107",
       },
@@ -358,6 +377,16 @@
     "packages/schema": {
       "name": "@zsys/schema",
       "version": "0.0.0",
+    },
+    "packages/services": {
+      "name": "@zsys/services",
+      "version": "0.0.0",
+      "dependencies": {
+        "@zsys/contracts": "workspace:*",
+        "@zsys/functions": "workspace:*",
+        "@zsys/invocation": "workspace:*",
+        "@zsys/schema": "workspace:*",
+      },
     },
     "packages/supervisor": {
       "name": "@zsys/supervisor",
@@ -385,6 +414,7 @@
         "@zsys/runtime-effect": "workspace:*",
         "@zsys/schema": "workspace:*",
         "@zsys/tools": "workspace:*",
+        "ai": "7.0.0",
         "effect": "4.0.0-beta.107",
       },
     },
@@ -394,6 +424,7 @@
       "dependencies": {
         "@zsys/contracts": "workspace:*",
         "@zsys/functions": "workspace:*",
+        "@zsys/invocation": "workspace:*",
         "@zsys/schema": "workspace:*",
       },
     },
@@ -402,6 +433,16 @@
     "@effect/platform-node-shared": "4.0.0-beta.107",
   },
   "packages": {
+    "@ai-sdk/anthropic": ["@ai-sdk/anthropic@4.0.0", "", { "dependencies": { "@ai-sdk/provider": "4.0.0", "@ai-sdk/provider-utils": "5.0.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-N0lT1g6/5DEIZvalpkpwYRCdu7n5qb8qPN3PcTem6k4VkPBLC2+T2LAAyx1GS0eNOxavVa0CP7n2kCiye0yyfw=="],
+
+    "@ai-sdk/gateway": ["@ai-sdk/gateway@4.0.0", "", { "dependencies": { "@ai-sdk/provider": "4.0.0", "@ai-sdk/provider-utils": "5.0.0", "@vercel/oidc": "3.2.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-rcKukspbM4h511ot2E8TsPl7rXjRK1zHKrMCP7w4+XF55UKqQHaDzo2kKbGv5rp8Bjb1yQatIHJZE1E2yrOOMw=="],
+
+    "@ai-sdk/openai": ["@ai-sdk/openai@4.0.0", "", { "dependencies": { "@ai-sdk/provider": "4.0.0", "@ai-sdk/provider-utils": "5.0.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-XcI/bJEG+Ymx8ZwQMY9GE9waHdEcSzT6wn2o+YW80hOQPf8IAGQvdNWKaD0mxLi6AmOM0L01y/p626w7rImblQ=="],
+
+    "@ai-sdk/provider": ["@ai-sdk/provider@4.0.0", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-fr9Gs89prDWiuox/T+kCA+i2cJkHpxU5S+tr4megjTzRC27ZsvFhwjU/+XrqqMbvBUlfmXxTOYWy8ng45dsjIg=="],
+
+    "@ai-sdk/provider-utils": ["@ai-sdk/provider-utils@5.0.0", "", { "dependencies": { "@ai-sdk/provider": "4.0.0", "@standard-schema/spec": "^1.1.0", "@workflow/serde": "4.1.0", "eventsource-parser": "^3.0.8" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-zj66M02jc6ASYwIgWZowsooDUwaVngeNZQ3H10GwcPMZ+KR6gHMhcUuKl6tkai+JPXTKDyHY1pnszuxRtw2D4A=="],
+
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
 
     "@aws-sdk/client-ecs": ["@aws-sdk/client-ecs@3.1112.0", "", { "dependencies": { "@aws-sdk/core": "^3.977.8", "@aws-sdk/credential-provider-node": "^3.972.80", "@aws-sdk/types": "^3.974.4", "@smithy/core": "^3.31.1", "@smithy/fetch-http-handler": "^5.6.13", "@smithy/node-http-handler": "^4.9.13", "@smithy/types": "^4.16.1", "tslib": "^2.6.2" } }, "sha512-srrIoK0XhOfeVdaome93JiFu5LABeY89Qwp3m5k0Gmnteo8EqkVF+vz4O0LGhZIMkVC06pozdO3+U7hANBWVYw=="],
@@ -990,6 +1031,10 @@
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.3.3", "", {}, "sha512-60YRaenCQcVjYEKOcG824+DRGGIQ3VKErcBoAEDJZz5bKIs2ZG+X/H9Nk+Q6EVkwJk5QNApxbrc5QtBSwtrXAg=="],
 
+    "@vercel/oidc": ["@vercel/oidc@3.2.0", "", {}, "sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug=="],
+
+    "@workflow/serde": ["@workflow/serde@4.1.0", "", {}, "sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ=="],
+
     "@xyflow/react": ["@xyflow/react@12.11.3", "", { "dependencies": { "@xyflow/system": "0.0.80", "classcat": "^5.0.3", "zustand": "^4.4.0" }, "peerDependencies": { "@types/react": ">=17", "@types/react-dom": ">=17", "react": ">=17", "react-dom": ">=17" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-G3jogHz2GWUtIOkhavUGno2YzY9u6fILIJBttfsBendb0/HWB90JG+sOTAvlIMEwyvq9zgy9V9ZQSwyQjR5QzQ=="],
 
     "@xyflow/system": ["@xyflow/system@0.0.80", "", { "dependencies": { "@types/d3-drag": "^3.0.7", "@types/d3-interpolate": "^3.0.4", "@types/d3-selection": "^3.0.10", "@types/d3-transition": "^3.0.8", "@types/d3-zoom": "^3.0.8", "d3-drag": "^3.0.0", "d3-interpolate": "^3.0.1", "d3-selection": "^3.0.0", "d3-zoom": "^3.0.0" } }, "sha512-ywc3ZqG91brzWrH1WlwMdIX4goOfrpBy6AbLdVSaof/Xx9l138ijIKRExM6EkMro2F+OImGmSiA/WKcXvKVcfA=="],
@@ -1062,6 +1107,8 @@
 
     "@zsys/inspector-api": ["@zsys/inspector-api@workspace:packages/inspector-api"],
 
+    "@zsys/invocation": ["@zsys/invocation@workspace:packages/invocation"],
+
     "@zsys/jobs": ["@zsys/jobs@workspace:packages/jobs"],
 
     "@zsys/observability": ["@zsys/observability@workspace:packages/observability"],
@@ -1078,6 +1125,8 @@
 
     "@zsys/schema": ["@zsys/schema@workspace:packages/schema"],
 
+    "@zsys/services": ["@zsys/services@workspace:packages/services"],
+
     "@zsys/supervisor": ["@zsys/supervisor@workspace:packages/supervisor"],
 
     "@zsys/testing": ["@zsys/testing@workspace:packages/testing"],
@@ -1091,6 +1140,8 @@
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
 
     "agent-base": ["agent-base@7.1.4", "", {}, "sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ=="],
+
+    "ai": ["ai@7.0.0", "", { "dependencies": { "@ai-sdk/gateway": "4.0.0", "@ai-sdk/provider": "4.0.0", "@ai-sdk/provider-utils": "5.0.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-hncs+jamJh8r36K6G8xky7oF4Ai/RLU5TF85FMzI2vElyMJGGnLoHihpdmuDiuY2BsktDWHevKaJM1l0VcRLGw=="],
 
     "ajv": ["ajv@6.15.0", "", { "dependencies": { "fast-deep-equal": "^3.1.1", "fast-json-stable-stringify": "^2.0.0", "json-schema-traverse": "^0.4.1", "uri-js": "^4.2.2" } }, "sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw=="],
 
@@ -1290,6 +1341,8 @@
 
     "esutils": ["esutils@2.0.3", "", {}, "sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g=="],
 
+    "eventsource-parser": ["eventsource-parser@3.1.1", "", {}, "sha512-EKN1vKAMcZ8MlYMpaNuxN6R9yakzH6uajHcHVTqWJzvu5pWw9DyhbP35HH8MVBQ+dZjAfDxk+A8NiR9KWaXiyQ=="],
+
     "execa": ["execa@5.1.1", "", { "dependencies": { "cross-spawn": "^7.0.3", "get-stream": "^6.0.0", "human-signals": "^2.1.0", "is-stream": "^2.0.0", "merge-stream": "^2.0.0", "npm-run-path": "^4.0.1", "onetime": "^5.1.2", "signal-exit": "^3.0.3", "strip-final-newline": "^2.0.0" } }, "sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg=="],
 
     "expand-range": ["expand-range@1.8.2", "", { "dependencies": { "fill-range": "^2.1.0" } }, "sha512-AFASGfIlnIbkKPQwX1yHaDjFvh/1gyKJODme52V6IORh69uEYgZp0o9C+qsIGNVEiuuhQU0CSSl++Rlegg1qvA=="],
@@ -1455,6 +1508,8 @@
     "json-buffer": ["json-buffer@3.0.1", "", {}, "sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ=="],
 
     "json-parse-even-better-errors": ["json-parse-even-better-errors@5.0.0", "", {}, "sha512-ZF1nxZ28VhQouRWhUcVlUIN3qwSgPuswK05s/HIaoetAoE/9tngVmCHjSxmSQPav1nd+lPtTL0YZ/2AFdR/iYQ=="],
+
+    "json-schema": ["json-schema@0.4.0", "", {}, "sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA=="],
 
     "json-schema-traverse": ["json-schema-traverse@0.4.1", "", {}, "sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg=="],
 

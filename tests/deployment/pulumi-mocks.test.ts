@@ -124,7 +124,6 @@ test("executes the generated plan with stable capability mappings and secret-saf
       tag: "2026-08-18",
       health: plan.application.image.health,
     },
-    modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
   });
   const secretBytes = JSON.stringify(await runGeneratedProgram(secretPlan, "secret"));
   expect(secretBytes).not.toContain("OPENAI_API_KEY");
@@ -396,7 +395,6 @@ function deploymentOptions() {
         timeoutMs: 2_000,
       },
     },
-    modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
   } as const;
 }
 
@@ -472,8 +470,7 @@ function programResourceCount(plan: DeploymentPlan): number {
     plan.events.length +
     plan.eventTriggers.length +
     plan.buckets.length +
-    plan.caches.length +
-    (plan.models?.length ?? 0)
+    plan.caches.length
   );
 }
 

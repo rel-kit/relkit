@@ -15,6 +15,7 @@
     "@zsys/contracts": "workspace:*",
     "@zsys/events": "workspace:*",
     "@zsys/graph": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/jobs": "workspace:*",
     "@zsys/observability": "workspace:*",
     "@zsys/providers-local": "workspace:*",

@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import app from "../../../examples/commerce/src/app.ts";
-import createOrder from "../../../examples/commerce/src/functions/create-order.function.ts";
+import createOrder from "../../../examples/commerce/src/functions/orders/create-order.function.ts";
 import sendReceipt from "../../../examples/commerce/src/functions/send-receipt.function.ts";
 import {
   bindLocalProviderFactory,

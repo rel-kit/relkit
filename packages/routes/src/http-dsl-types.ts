@@ -133,7 +133,7 @@ export interface DefineTransformOptions<
   Id extends string,
   Schema extends StandardSchemaV1,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly schema: Schema;
 }
 
