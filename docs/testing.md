@@ -55,10 +55,11 @@ test("GET /hello", async () => {
 afterAll(() => testApp.close());
 ```
 
-The test provider set supplies deterministic IDs and time, isolated local
-state, and test fakes for external resources. Agent tests use the AI SDK v7
-`ai/test` surface and never call live model providers. Prefer these providers
-over network calls in unit and integration tests. Tests that exercise restart
+`@zsys/testing` replaces every graph-required provider binding with deterministic
+in-memory fakes by default, so configured S3, Redis, queue, event, model, and
+observability credentials are unnecessary. Explicit protocol integration tests
+may opt into configured adapters. Agent tests use the AI SDK v7 `ai/test` surface
+and never call live model providers by default. Tests that exercise restart
 and recovery should use a disposable state directory and assert durable
 duplicate behavior rather than relying on timing or arbitrary sleeps.
 
