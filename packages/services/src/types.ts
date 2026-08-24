@@ -1,5 +1,5 @@
 import type { DescriptorBase, DescriptorMetadata, MaybePromise, Ref } from "@zsys/contracts";
-import type { FunctionContext, FunctionRefAny, FunctionRequest } from "@zsys/functions";
+import type { FunctionContext, FunctionRefAny } from "@zsys/functions";
 
 export interface ServiceRef<Id extends string = string> {
   readonly ref: Ref<"service", Id>;
@@ -23,7 +23,6 @@ export interface ServiceMiddlewareInvocation<
   Context extends FunctionContext = FunctionContext,
 > {
   readonly input: Input;
-  readonly request: FunctionRequest | undefined;
   readonly context: Context;
 }
 

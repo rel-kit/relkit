@@ -13,6 +13,7 @@ import type {
   ServiceMiddlewareHandler,
   ServiceMiddlewareNext,
 } from "./types.js";
+import { freezeServiceContextValue } from "./service-context.js";
 
 export const SERVICE_MIDDLEWARE_POLICY_CODE = "ZSYS_SERVICE_MIDDLEWARE_POLICY" as const;
 
@@ -34,15 +35,16 @@ export class ServiceMiddlewarePolicyError extends TypeError {
  *
  * The callback must call `next` exactly once. Its optional frozen patch enriches
  * the current invocation's read-only `context.service` value and never mutates
- * the request or shared context.
+ * shared context.
  *
  * @example
  * ```ts
  * import { defineServiceMiddleware } from "@zsys/app"
  *
  * const tenantContext = defineServiceMiddleware({
- *   handler: async ({ request }, next) => {
- *     await next({ tenantId: request?.headers.get("x-tenant-id") ?? "system" })
+ *   handler: async ({ input }, next) => {
+ *     const value = input as { readonly tenantId?: string }
+ *     await next({ tenantId: value.tenantId ?? "system" })
  *   }
  * })
  * void tenantContext
@@ -166,25 +168,7 @@ function freezePatch<Patch extends ServiceContextPatch>(
   if (patch === null || typeof patch !== "object" || Array.isArray(patch)) {
     throw new ServiceMiddlewarePolicyError("invalid-patch");
   }
-  return freezePatchValue(patch, new WeakMap()) as Patch;
-}
-
-function freezePatchValue(value: unknown, seen: WeakMap<object, object>): unknown {
-  if (value === null || typeof value !== "object") return value;
-  const existing = seen.get(value);
-  if (existing !== undefined) return existing;
-  if (Array.isArray(value)) {
-    const copy: unknown[] = [];
-    seen.set(value, copy);
-    for (const item of value) copy.push(freezePatchValue(item, seen));
-    return Object.freeze(copy);
-  }
-  const prototype = Object.getPrototypeOf(value);
-  if (prototype !== Object.prototype && prototype !== null) return value;
-  const copy: Record<string, unknown> = {};
-  seen.set(value, copy);
-  for (const [key, child] of Object.entries(value)) copy[key] = freezePatchValue(child, seen);
-  return Object.freeze(copy);
+  return freezeServiceContextValue(patch, new WeakMap()) as Patch;
 }
 
 function rejected<T>(cause: unknown): Promise<T> {

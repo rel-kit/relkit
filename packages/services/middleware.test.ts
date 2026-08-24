@@ -9,7 +9,6 @@ import {
 
 const invocation = {
   input: { orderId: "order-1" },
-  request: undefined,
   context: {} as never,
 };
 
@@ -19,9 +18,8 @@ describe("service middleware", () => {
     const patches: unknown[] = [];
     const middleware = defineServiceMiddleware({
       id: "orders.context",
-      handler: async ({ input, request, context }, next) => {
+      handler: async ({ input, context }, next) => {
         expect(input).toEqual({ orderId: "order-1" });
-        expect(request).toBeUndefined();
         expect(context).toBe(invocation.context);
         try {
           await next({ actorId: "actor-1", nested: { role: "admin" } });
