@@ -1,6 +1,6 @@
 {
   "appId": "inferred-app",
-  "contractVersion": 2,
+  "contractVersion": 4,
   "edges": [
     {
       "from": "orders",
@@ -35,12 +35,6 @@
     {
       "from": "route.get.orders.by-order-id",
       "kind": "targets-function",
-      "role": "middleware",
-      "to": "orders.authorize"
-    },
-    {
-      "from": "route.get.orders.by-order-id",
-      "kind": "targets-function",
       "role": "primary",
       "to": "orders.get-order"
     },
@@ -51,9 +45,16 @@
       "to": "health.check"
     },
     {
+      "from": "route.get.orders.by-order-id",
+      "kind": "uses-middleware",
+      "match": "always",
+      "order": 0,
+      "to": "orders-auth"
+    },
+    {
       "from": "support",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.models.default"
     },
     {
       "from": "orders",
@@ -87,7 +88,7 @@
         "maxToolCalls": 2,
         "timeoutMs": 1000
       },
-      "model": "default",
+      "model": "openai:gpt-5-mini",
       "output": {
         "properties": {
           "ok": {
@@ -110,6 +111,13 @@
     {
       "defaults": null,
       "environment": {
+        "MODEL_API_KEY": {
+          "hasDefault": false,
+          "optional": true,
+          "requiredIn": [],
+          "sensitive": true,
+          "type": "secret-string"
+        },
         "SERVICE_PORT": {
           "hasDefault": true,
           "optional": false,
@@ -121,12 +129,26 @@
       "id": "inferred-app",
       "kind": "app",
       "observability": null,
-      "providerProfiles": ["default"],
+      "providerBindings": ["provider.models.default"],
       "source": {
         "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 8
       }
+    },
+    {
+      "hasDefault": false,
+      "id": "MODEL_API_KEY",
+      "kind": "env",
+      "name": "MODEL_API_KEY",
+      "requiredIn": [],
+      "sensitive": true,
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 8
+      },
+      "type": "secret-string"
     },
     {
       "hasDefault": true,
@@ -138,7 +160,7 @@
       "source": {
         "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 8
       },
       "type": "port"
     },
@@ -339,20 +361,46 @@
       }
     },
     {
-      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
+      "id": "orders-auth",
+      "kind": "middleware",
+      "order": 0,
+      "path": "/orders/*",
+      "source": {
+        "column": 16,
+        "file": "src/middleware/orders-auth.middleware.ts",
+        "line": 4
+      }
+    },
+    {
+      "adapter": "ai-sdk",
+      "capability": "models",
       "configuration": {
-        "development": [],
-        "production": ["region"],
-        "test": []
+        "defaultModel": "gpt-5-mini",
+        "defaultProvider": "openai",
+        "openai": {
+          "apiKey": {
+            "kind": "env-ref",
+            "name": "MODEL_API_KEY",
+            "sensitive": true,
+            "type": "secret-string"
+          }
+        }
       },
-      "environment": [],
-      "id": "default",
+      "environment": [
+        {
+          "name": "MODEL_API_KEY",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      ],
+      "id": "provider.models.default",
       "kind": "provider",
+      "ownership": "external",
       "profile": "default",
       "source": {
         "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 8
       }
     },
     {
@@ -498,7 +546,9 @@
         "middleware": [
           {
             "id": "orders-auth",
-            "targetFunctionId": "orders.authorize"
+            "match": "always",
+            "order": 0,
+            "path": "/orders/*"
           }
         ],
         "path": "/orders/:orderId",
@@ -572,7 +622,7 @@
       "source": {
         "column": 20,
         "file": "src/routes/orders/[orderId]/route.ts",
-        "line": 6
+        "line": 5
       },
       "targetFunctionId": "orders.get-order",
       "triggerType": "http"
