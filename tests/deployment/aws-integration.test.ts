@@ -15,7 +15,7 @@ import {
 import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
-const enabled = process.env.ZSYS_AWS_INTEGRATION === "1";
+const enabled = process.env.ZSYS_TEST_ALL_CLOUD === "1" && process.env.ZSYS_AWS_INTEGRATION === "1";
 const awsTest = enabled ? test : test.skip;
 const compiled = await compileProject(
   "aws-commerce-example",

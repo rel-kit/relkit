@@ -1,6 +1,6 @@
 {
-  "contractVersion": 1,
-  "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+  "contractVersion": 2,
+  "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
   "application": {
     "id": "full-app",
     "image": {
@@ -17,6 +17,45 @@
     },
     "environmentNames": ["SERVICE_PORT"]
   },
+  "providerBindings": [
+    {
+      "id": "provider.buckets.default",
+      "capability": "buckets",
+      "profile": "default",
+      "adapter": "s3",
+      "ownership": "managed",
+      "configuration": {
+        "bucketName": "assets",
+        "endpoint": "https://s3.us-east-1.amazonaws.com",
+        "region": "us-east-1"
+      },
+      "environment": []
+    },
+    {
+      "id": "provider.events.default",
+      "capability": "events",
+      "profile": "default",
+      "adapter": "eventbridge",
+      "ownership": "managed",
+      "configuration": {
+        "busName": "events",
+        "region": "us-east-1"
+      },
+      "environment": []
+    },
+    {
+      "id": "provider.jobs.default",
+      "capability": "jobs",
+      "profile": "default",
+      "adapter": "sqs",
+      "ownership": "managed",
+      "configuration": {
+        "queueUrl": "https://sqs.us-east-1.amazonaws.com/1/jobs",
+        "region": "us-east-1"
+      },
+      "environment": []
+    }
+  ],
   "http": {
     "logicalName": "full-app-http-public",
     "port": 8080,
@@ -41,12 +80,13 @@
     {
       "id": "receipts.send-job",
       "logicalName": "full-app-job-receipts-send-job",
+      "bindingId": "provider.jobs.default",
       "profile": "default",
-      "configurationNames": ["region"],
+      "configurationNames": [],
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -75,12 +115,13 @@
     {
       "id": "receipts.reconcile",
       "logicalName": "full-app-schedule-receipts-reconcile",
+      "bindingId": "provider.jobs.default",
       "profile": "default",
-      "configurationNames": ["region"],
+      "configurationNames": [],
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
         "managed-by": "zsys"
       },
       "jobId": "receipts.send-job",
@@ -99,12 +140,13 @@
     {
       "id": "orders.created",
       "logicalName": "full-app-event-orders-created",
+      "bindingId": "provider.events.default",
       "profile": "default",
-      "configurationNames": ["region"],
+      "configurationNames": [],
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -129,12 +171,13 @@
     {
       "id": "orders.listener",
       "logicalName": "full-app-event-trigger-orders-listener",
+      "bindingId": "provider.events.default",
       "profile": "default",
-      "configurationNames": ["region"],
+      "configurationNames": [],
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -160,12 +203,13 @@
     {
       "id": "assets",
       "logicalName": "full-app-bucket-assets",
+      "bindingId": "provider.buckets.default",
       "profile": "default",
-      "configurationNames": ["region"],
+      "configurationNames": [],
       "capabilities": ["buckets"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
+        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
         "managed-by": "zsys"
       },
       "visibility": "private",
@@ -173,33 +217,10 @@
       "allowedContentTypes": ["application/json"]
     }
   ],
-  "caches": [
-    {
-      "id": "prices",
-      "logicalName": "full-app-cache-prices",
-      "profile": "default",
-      "configurationNames": ["region"],
-      "capabilities": ["cache"],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:f2d16c5eecaa2ce8fc4b6be57dca8814c89ee9d9c0af5d5127b9db37bcd2860b",
-        "managed-by": "zsys"
-      },
-      "metadata": {
-        "iamCapabilities": ["elasticache:Connect"]
-      },
-      "defaultTtlMs": 1000,
-      "maxTtlMs": 5000
-    }
-  ],
+  "caches": [],
   "iam": {
     "serviceRole": {
       "statements": [
-        {
-          "capability": "cache",
-          "actions": ["elasticache:Connect"],
-          "resources": ["full-app-cache-prices"]
-        },
         {
           "capability": "events",
           "actions": ["events:PutEvents"],
@@ -228,12 +249,6 @@
       ]
     },
     "perFunction": [
-      {
-        "functionId": "orders.create",
-        "capability": "cache",
-        "resourceId": "prices",
-        "actions": ["elasticache:Connect"]
-      },
       {
         "functionId": "orders.create",
         "capability": "events",
@@ -270,11 +285,5 @@
         "actions": ["sqs:SendMessage"]
       }
     ]
-  },
-  "observability": {
-    "logicalName": "full-app-observability-default",
-    "configurationNames": [],
-    "logs": true,
-    "traces": true
   }
 }
