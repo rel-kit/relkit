@@ -1,97 +1,149 @@
 import { expect, test } from "bun:test";
-import { awsProviders, localProviders, testProviders, type ProviderSets } from "@zsys/app";
+import { defineEnv, env, external, redis, s3, type ProviderTopology } from "@zsys/app";
 import { GRAPH_VERSION, type SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
-import { createProviderRegistry, type ProviderGeneration } from "./src/provider-registry.ts";
+import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
+import {
+  createProviderRegistry,
+  type ProviderFactories,
+  type ProviderFactory,
+} from "./src/provider-registry.ts";
 
 const source: SourceLocation = { file: "src/app.ts", line: 1, column: 1 };
 
-test("does not collapse a named-only provider map to the default provider", async () => {
-  const events: string[] = [];
-  await expect(
-    createProviderRegistry({
-      generationId: "generation-named-only",
-      environment: "test",
-      providers: providerSets({ cache: { archive: {} } }),
-      graph: cacheGraph("default"),
-      factories: {
-        test: {
-          recipeTag: "test",
-          create: async (context) => {
-            events.push(`create:${context.generationId}`);
-            return completeGeneration({
-              providers: { cache: { archive: {} } },
-              release: () => events.push("release"),
-            });
-          },
-        },
-      },
+test("constructs only required bindings with isolated resolved configuration", async () => {
+  const values = defineEnv({
+    CACHE_URL: env.secret(),
+    BUCKET_SECRET: env.secret(),
+  });
+  const providers: ProviderTopology = {
+    cache: { default: external(redis({ url: values.CACHE_URL })) },
+    buckets: {
+      default: external(
+        s3({
+          endpoint: "https://example.test",
+          bucketName: "unused",
+          region: "auto",
+          credentials: { secretAccessKey: values.BUCKET_SECRET },
+        }),
+      ),
+    },
+  };
+  const contexts: Readonly<Record<string, unknown>>[] = [];
+  let bucketCreates = 0;
+  const factories: ProviderFactories = {
+    "cache:redis": factory("cache", "redis", (configuration) => {
+      contexts.push(configuration);
+      return { get: async () => undefined };
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_PROVIDER_PROFILE_UNKNOWN" });
-  expect(events).toEqual(["create:generation-named-only", "release"]);
+    "buckets:s3": factory("buckets", "s3", () => {
+      bucketCreates += 1;
+      return {};
+    }),
+  };
+  const registry = await createProviderRegistry({
+    generationId: "generation-isolated",
+    environment: "production",
+    providers,
+    graph: cacheGraph(),
+    values: { CACHE_URL: "rediss://cache.example", BUCKET_SECRET: "must-not-cross" },
+    factories,
+  });
+
+  expect(contexts).toEqual([{ url: "rediss://cache.example" }]);
+  expect(JSON.stringify(contexts)).not.toContain("must-not-cross");
+  expect(bucketCreates).toBe(0);
+  expect(registry.resolve("cache", "default").binding.ownership).toBe("external");
+  await registry.release();
+});
+
+test("uses deterministic test overrides instead of configured adapters", async () => {
+  const values = defineEnv({ CACHE_URL: env.secret() });
+  const providers: ProviderTopology = {
+    cache: { default: external(redis({ url: values.CACHE_URL })) },
+  };
+  let configuredCreates = 0;
+  let fakeCreates = 0;
+  const registry = await createProviderRegistry({
+    generationId: "generation-test",
+    environment: "test",
+    providers,
+    graph: cacheGraph(),
+    values: {},
+    factories: {
+      "cache:redis": factory("cache", "redis", () => {
+        configuredCreates += 1;
+        return {};
+      }),
+    },
+    testFactories: {
+      cache: factory("cache", "memory", () => {
+        fakeCreates += 1;
+        return { deterministic: true };
+      }),
+    },
+  });
+
+  expect(configuredCreates).toBe(0);
+  expect(fakeCreates).toBe(1);
+  expect(registry.resolve("cache", "default").value).toEqual({ deterministic: true });
+  await registry.release();
 });
 
 test("rejects missing required environment values before construction", async () => {
+  const values = defineEnv({ CACHE_URL: env.secret() });
   let creates = 0;
   await expect(
     createProviderRegistry({
       generationId: "generation-environment",
       environment: "production",
-      providers: providerSets(),
-      graph: cacheGraph("default"),
-      environmentMetadata: {
-        OPENAI_API_KEY: {
-          type: "secret-string",
-          requiredIn: ["production"],
-          hasDefault: false,
-          optional: false,
-          sensitive: true,
-        },
-      },
+      providers: { cache: { default: external(redis({ url: values.CACHE_URL })) } },
+      graph: cacheGraph(),
+      environmentMetadata: values.metadata,
       values: {},
       factories: {
-        aws: {
-          recipeTag: "aws",
-          create: async () => {
-            creates += 1;
-            return completeGeneration({});
-          },
-        },
+        "cache:redis": factory("cache", "redis", () => {
+          creates += 1;
+          return {};
+        }),
       },
     }),
   ).rejects.toMatchObject({
     code: "ZSYS_PROVIDER_ENVIRONMENT_INVALID",
-    issues: [{ variable: "OPENAI_API_KEY" }],
+    issues: [{ variable: "CACHE_URL" }],
   });
   expect(creates).toBe(0);
 });
 
-function providerSets(options: Parameters<typeof testProviders>[0] = {}): ProviderSets {
+function factory(
+  capability: ProviderFactory["capability"],
+  adapter: string,
+  create: (configuration: Readonly<Record<string, unknown>>) => unknown,
+): ProviderFactory {
   return {
-    development: localProviders(),
-    test: testProviders(options),
-    production: awsProviders({ region: "us-east-1" }),
+    capability,
+    adapter,
+    create: (context) => ({ value: create(context.configuration) }),
   };
 }
 
-function cacheGraph(profile: string): ApplicationGraph {
+function cacheGraph(): ApplicationGraph {
+  const provider: ProviderProfileNode = {
+    kind: "provider",
+    id: "provider.cache.default",
+    source,
+    capability: "cache",
+    profile: "default",
+    adapter: "redis",
+    ownership: "external",
+    configuration: {},
+    environment: [],
+  };
   return {
     contractVersion: GRAPH_VERSION,
-    nodes: [{ kind: "cache", id: "cache", source, key: null, value: null, profile }],
-    edges: [],
-  };
-}
-
-function completeGeneration(generation: ProviderGeneration): ProviderGeneration {
-  return {
-    ...generation,
-    providers: {
-      buckets: { default: {} },
-      cache: { default: {} },
-      jobs: { default: {} },
-      events: { default: {} },
-      observability: { default: {} },
-      ...generation.providers,
-    },
+    nodes: [
+      provider,
+      { kind: "cache", id: "cache", source, key: null, value: null, profile: "default" },
+    ],
+    edges: [{ kind: "uses-provider-profile", from: "cache", to: provider.id }],
   };
 }

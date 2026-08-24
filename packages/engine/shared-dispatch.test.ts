@@ -31,7 +31,7 @@ test("engine dispatch uses the verified generation registry in its shared scope"
     id: "orders.parent",
     input,
     output,
-    handler: (_value, _request, _context) => dispatchInvocation({ target: child, input: 1 }),
+    handler: (_value, _context) => dispatchInvocation({ target: child, input: 1 }),
   };
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,

@@ -22,7 +22,7 @@ describe("direct child descriptor invocation", () => {
       input: valueInput,
       output: valueOutput,
       timeoutMs: 900,
-      handler: (input, _request, context) => {
+      handler: (input, context) => {
         childSignal = context.signal;
         return { value: (input as { value: number }).value + 1 };
       },
@@ -143,7 +143,7 @@ describe("direct child descriptor invocation", () => {
       id: "orders.wait-child",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, _request, context) =>
+      handler: (_input, context) =>
         new Promise((_resolve, reject) => {
           childStarted();
           context.signal.addEventListener("abort", () => {
