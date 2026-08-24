@@ -31,10 +31,10 @@ export function OverlayDialog({
       <ModalOverlay className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[2px] entering:animate-in exiting:animate-out">
         <Modal
           className={cx(
-            "fixed max-h-[90vh] overflow-auto border border-[var(--line)] bg-[var(--panel)] shadow-2xl outline-none",
+            "fixed overflow-auto border border-[var(--line)] bg-[var(--panel)] shadow-2xl outline-none entering:animate-in entering:duration-200 exiting:animate-out exiting:duration-150",
             placement === "right"
-              ? "inset-y-0 right-0 w-[min(32rem,94vw)] border-y-0 border-r-0"
-              : "left-1/2 top-[12vh] w-[min(42rem,92vw)] -translate-x-1/2 rounded-xl",
+              ? "inset-y-0 right-0 h-full w-[min(32rem,94vw)] rounded-l-xl border-y-0 border-r-0 entering:slide-in-from-right exiting:slide-out-to-right"
+              : "left-1/2 top-[12vh] max-h-[90vh] w-[min(42rem,92vw)] -translate-x-1/2 rounded-xl entering:zoom-in-95 exiting:zoom-out-95",
           )}
         >
           <Dialog className="outline-none">
