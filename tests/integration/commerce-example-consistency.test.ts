@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
-import { providerRecipe } from "../../packages/app/src/index.ts";
 import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
 import { createEventListenerTarget } from "../../packages/events/src/index.ts";
 import { fromGraph } from "../../packages/deploy/src/index.ts";
@@ -41,6 +40,7 @@ import orders from "../../examples/commerce/src/services/orders.service.ts";
 import orderSupport from "../../examples/commerce/src/agents/order-support.agent.ts";
 import lookupOrder from "../../examples/commerce/src/tools/lookup-order.tool.ts";
 import normalizeOrderId from "../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
+import orderAuth from "../../examples/commerce/src/middleware/order-auth.middleware.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../examples/commerce");
@@ -89,9 +89,9 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   expect(compiled.normalization.outputs.client).toBe(generateClient(graph));
 
   assertApplicationCoverage(graph, registration);
-  expect(providerRecipe(app.providers.development)).toBe("local");
-  expect(providerRecipe(app.providers.test)).toBe("test");
-  expect(providerRecipe(app.providers.production)).toBe("aws");
+  expect(app.providers.buckets?.default?.adapter.adapter).toBe("s3");
+  expect(app.providers.cache?.default?.adapter.adapter).toBe("redis");
+  expect(app.providers.models?.default?.ownership).toBe("external");
   expect(app.env.OPENAI_API_KEY.sensitive).toBe(true);
   expect(app.env.metadata.OPENAI_API_KEY?.requiredIn).toEqual(["production"]);
   expect(app.observability?.bodyCapture?.mode).toBe("off");
@@ -152,6 +152,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
 
     const created = await client.post("/orders", {
       headers: {
+        authorization: "Bearer fixture",
         "content-type": "application/json",
         "idempotency-key": "order-1",
         "x-customer-email": "customer@example.com",
@@ -171,7 +172,6 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
 
   expect(calls.map(({ functionId, source }) => [functionId, source])).toEqual([
     ["orders.create-order", "http"],
-    ["authorize-order", "http"],
     ["orders.get-order", "http"],
   ]);
   expect(requestRecords).toHaveLength(3);
@@ -243,7 +243,8 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
     expect.arrayContaining([
       "commerce-api",
       "APP_ENV",
-      "AWS_REGION",
+      "BUCKET_ENDPOINT",
+      "CACHE_URL",
       "OPENAI_API_KEY",
       "assets",
       "prices",
@@ -255,6 +256,12 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
       "receipts.on-order-created",
       "lookup-order",
       "order-support",
+      "provider.buckets.default",
+      "provider.cache.default",
+      "provider.events.default",
+      "provider.jobs.default",
+      "provider.models.default",
+      "provider.observability.default",
     ]),
   );
   expect(plan.httpTriggers.map(({ id }) => id).sort()).toEqual([
@@ -299,16 +306,7 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
-    middleware: {
-      "order-auth": {
-        targetFunctionId: "authorize-order",
-        request: {
-          kind: "input",
-          fields: { authorization: { kind: "header", name: "authorization" } },
-        },
-        decision: { kind: "continue" },
-      },
-    },
+    middleware: { "order-auth": orderAuth },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },
   };
 }
