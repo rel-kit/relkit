@@ -81,6 +81,13 @@ export function edgeLabel(edge: GraphEdge): string {
   return edge.kind.replace(/[._-]+/g, " ");
 }
 
+export function graphKindColor(kind: string): string {
+  const colors = ["#dbeafe", "#dcfce7", "#fef3c7", "#f3e8ff", "#ffe4e6", "#e0f2fe"];
+  let hash = 0;
+  for (const character of kind) hash = (hash * 31 + character.charCodeAt(0)) | 0;
+  return colors[Math.abs(hash) % colors.length]!;
+}
+
 function readNodes(value: readonly unknown[]): readonly GraphNode[] {
   return value
     .flatMap((item) => {

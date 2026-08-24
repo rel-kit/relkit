@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import type { FilteredGraph } from "../../lib/graph-filter";
 import { layoutGraph } from "../../lib/graph-layout";
-import type { GraphNode, GraphSnapshot } from "../../lib/graph-model";
+import { graphKindColor, type GraphNode, type GraphSnapshot } from "../../lib/graph-model";
 
 type FlowNode = Node<{ node: GraphNode; label: ReactNode }>;
 
@@ -52,7 +52,11 @@ export function GraphFlow({
                 },
                 ariaLabel: `${node.kind} ${node.id}`,
                 className: `flow-node flow-node--${safeClass(node.kind)}`,
-                style: { width: position.width, minHeight: position.height },
+                style: {
+                  width: position.width,
+                  minHeight: position.height,
+                  "--node-color": graphKindColor(node.kind),
+                } as CSSProperties,
               },
             ];
       }),
@@ -83,7 +87,12 @@ export function GraphFlow({
         onNodeClick={(_event, node) => onSelect(node.data.node)}
         proOptions={{ hideAttribution: true }}
       >
-        <MiniMap pannable zoomable nodeColor="var(--accent)" ariaLabel="Graph minimap" />
+        <MiniMap
+          pannable
+          zoomable
+          nodeColor={(node) => graphKindColor(String(node.data?.node?.kind ?? ""))}
+          ariaLabel="Graph minimap"
+        />
         <Controls showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
       </ReactFlow>

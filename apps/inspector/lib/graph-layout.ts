@@ -23,28 +23,33 @@ export interface GraphLayout {
   readonly edges: readonly PositionedEdge[];
 }
 
-/** Uses a sorted fixed grid so the fixture is repeatable and large graphs avoid force simulation. */
+/** Uses deterministic kind columns so related capabilities stay visually grouped. */
 export function layoutGraph(graph: GraphSnapshot): GraphLayout {
   const nodeWidth = 168;
   const nodeHeight = 64;
   const padding = 24;
   const columnGap = 48;
   const rowGap = 28;
-  const columns = Math.max(1, Math.ceil(Math.sqrt(graph.nodes.length)));
-  const rows = Math.max(1, Math.ceil(graph.nodes.length / columns));
+  const groups = new Map<string, GraphNode[]>();
+  for (const node of graph.nodes) {
+    const group = groups.get(node.kind);
+    if (group === undefined) groups.set(node.kind, [node]);
+    else group.push(node);
+  }
+  const groupEntries = [...groups.entries()].sort(([left], [right]) => left.localeCompare(right));
+  const columns = Math.max(1, groupEntries.length);
+  const rows = Math.max(1, ...groupEntries.map(([, nodes]) => nodes.length));
   const width = Math.max(720, padding * 2 + columns * nodeWidth + (columns - 1) * columnGap);
   const height = Math.max(180, padding * 2 + rows * nodeHeight + (rows - 1) * rowGap);
-  const nodes = graph.nodes.map((node, index) => {
-    const column = index % columns;
-    const row = Math.floor(index / columns);
-    return {
+  const nodes = groupEntries.flatMap(([, group], column) =>
+    group.map((node, row) => ({
       node,
       x: padding + column * (nodeWidth + columnGap),
       y: padding + row * (nodeHeight + rowGap),
       width: nodeWidth,
       height: nodeHeight,
-    };
-  });
+    })),
+  );
   const positions = new Map(nodes.map((position) => [position.node.id, position]));
   const edges = [...graph.declaredEdges, ...graph.observedEdges].flatMap((edge, index) => {
     const from = positions.get(edge.from);

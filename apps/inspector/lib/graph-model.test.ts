@@ -78,8 +78,7 @@ describe("inspector graph model", () => {
     const layout = layoutGraph(graph);
     expect(layout.nodes).toHaveLength(1_000);
     expect(layout.edges).toHaveLength(999);
-    expect(layout.nodes[0]?.x).not.toBe(layout.nodes[31]?.x);
-    expect(layout.nodes[0]?.x).toBe(layout.nodes[32]?.x);
+    expect(layout.nodes[0]?.x).toBe(layout.nodes[31]?.x);
     expect(layout.nodes[0]?.y).toBeLessThan(layout.nodes[32]?.y ?? 0);
   });
 
