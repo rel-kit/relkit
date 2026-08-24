@@ -1,6 +1,6 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 2,
+  "contractVersion": 4,
   "edges": [],
   "nodes": [
     {
@@ -17,11 +17,11 @@
       "id": "warning-suffix-app",
       "kind": "app",
       "observability": null,
-      "providerProfiles": ["default"],
+      "providerBindings": [],
       "source": {
-        "column": 13,
+        "column": 16,
         "file": "src/app.ts",
-        "line": 11
+        "line": 4
       }
     },
     {
@@ -32,9 +32,9 @@
       "requiredIn": [],
       "sensitive": false,
       "source": {
-        "column": 13,
+        "column": 16,
         "file": "src/app.ts",
-        "line": 11
+        "line": 4
       },
       "type": "port"
     },
@@ -69,23 +69,6 @@
         "line": 4
       },
       "timeoutMs": null
-    },
-    {
-      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
-      "configuration": {
-        "development": [],
-        "production": ["region"],
-        "test": []
-      },
-      "environment": [],
-      "id": "default",
-      "kind": "provider",
-      "profile": "default",
-      "source": {
-        "column": 13,
-        "file": "src/app.ts",
-        "line": 11
-      }
     }
   ]
 }
