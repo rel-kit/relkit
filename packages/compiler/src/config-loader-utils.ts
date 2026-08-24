@@ -190,4 +190,4 @@ export function posixNormalize(value: string): string {
   return `${prefix}${segments.join("/")}` || prefix || ".";
 }
 
-export const allowedKeys = new Set(["server", "inspector"]);
+export const allowedKeys = new Set(["server", "inspector", "deployment"]);

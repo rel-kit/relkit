@@ -16,6 +16,7 @@ import {
   readServer,
   unwrapDefault,
 } from "./config-loader-utils.js";
+import { readDeployment } from "./config-loader-deployment.js";
 
 export { CONFIG_CODES, DEFAULT_CONFIG, DEFAULT_TOOLING_CONFIG } from "./config-loader-types.js";
 export type {
@@ -103,6 +104,7 @@ function parseConfig(
   }
   const server = readServer(record.server, issues);
   const inspector = readInspector(record.inspector, issues);
+  const deployment = readDeployment(record.deployment, issues);
   if (issues.length > 0) return { issues: freezeIssues(issues) };
   return {
     config: Object.freeze({
@@ -113,6 +115,7 @@ function parseConfig(
       generatedDirectory: DEFAULT_TOOLING_CONFIG.generatedDirectory,
       server: Object.freeze({ ...server, apiDocs: Object.freeze(server.apiDocs) }),
       inspector: Object.freeze(inspector),
+      ...(deployment === undefined ? {} : { deployment }),
     }),
     issues: Object.freeze([]),
   };
