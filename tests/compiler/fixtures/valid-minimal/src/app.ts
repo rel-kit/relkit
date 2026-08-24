@@ -1,22 +1,4 @@
-import {
-  awsProviders,
-  defineApp,
-  defineEnv,
-  env as envFactory,
-  localProviders,
-  testProviders,
-} from "@zsys/app";
+import { defineApp, defineEnv, env as envFactory } from "@zsys/app";
 
 const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000) });
-
-const app = defineApp({
-  id: "minimal-app",
-  env,
-  providers: {
-    development: localProviders(),
-    test: testProviders(),
-    production: awsProviders({ region: "us-east-1" }),
-  },
-});
-
-export default app;
+export default defineApp({ id: "minimal-app", env, providers: {} });
