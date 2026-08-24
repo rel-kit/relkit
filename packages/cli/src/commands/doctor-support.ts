@@ -57,7 +57,7 @@ export async function doctorProject(options: DoctorOptions = {}): Promise<Doctor
   checks.push(...(await versionChecks(manifest, root)));
   const config = await checkConfig(root, checks);
   const app = await checkApp(root, config, checks);
-  const enabled = options.deploymentEnabled ?? detectDeployment(manifest, app);
+  const enabled = options.deploymentEnabled ?? detectDeployment(manifest, config);
   checks.push(await checkPulumi(enabled, root, options.commandRunner));
   checks.push(checkAws(enabled, options.source ?? process.env));
   checks.push(await checkRoots(root));

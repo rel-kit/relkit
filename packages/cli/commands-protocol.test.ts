@@ -192,6 +192,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "jobs",
     "observability",
     "providers-local",
+    "providers-standard",
     "routes",
     "runtime-effect",
     "schema",
