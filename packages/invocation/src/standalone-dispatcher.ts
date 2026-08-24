@@ -1,4 +1,3 @@
-import type { FunctionRequest } from "@zsys/contracts";
 import {
   assertSource,
   callHook,
@@ -9,8 +8,7 @@ import {
 } from "./validation.js";
 import { InvocationValidationError } from "./contracts.js";
 import { linkSignals } from "./context.js";
-import { invokeUserHandler } from "./handler-bridge.js";
-import { resolveServicePolicy, runServicePolicy } from "./service-policy.js";
+import { resolveServicePolicy } from "./service-policy.js";
 import { normalizeFailure, toPublicEnvelope, type InvocationFailure } from "./failure.js";
 import { makeStandaloneContext, createLocalClock } from "./dispatcher-context.js";
 import { currentInvocationScope, runInInvocationScope } from "./dispatcher-scope.js";
@@ -28,6 +26,7 @@ import {
   createStandaloneRecord,
   standaloneParent,
 } from "./standalone-utils.js";
+import { runStandaloneLifecycle } from "./standalone-lifecycle.js";
 
 export function createStandaloneDispatcher(
   baseOptions: StandaloneDispatcherOptions = {},
@@ -108,21 +107,6 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
       ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.clients === undefined ? {} : { clients: options.clients }),
     });
-    const invokeHandler = (publicContext: unknown): Promise<unknown> =>
-      runner.run(
-        invokeUserHandler({
-          handler: request.target.handler as (
-            value: unknown,
-            request: FunctionRequest | undefined,
-            context: Context,
-          ) => unknown,
-          input,
-          ...(options.request === undefined ? {} : { request: options.request }),
-          publicContext: publicContext as Context,
-          ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
-        }),
-        { signal: controller.signal },
-      );
     const result = await runInInvocationScope(
       {
         dispatcher,
@@ -130,9 +114,18 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
         chain,
       },
       () =>
-        policy === undefined
-          ? invokeHandler(context)
-          : runServicePolicy(policy, input, options.request, context, invokeHandler),
+        runStandaloneLifecycle({
+          target: request.target,
+          input,
+          context,
+          ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
+          ...(options.servicePolicies === undefined
+            ? {}
+            : { servicePolicies: options.servicePolicies }),
+          ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
+          runner,
+          signal: controller.signal,
+        }),
     );
     value = (await validated(request.target.output, result, "output")) as Output;
     outcome = "success";

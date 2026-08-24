@@ -1,12 +1,10 @@
-import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@zsys/contracts";
 import { getDescriptorIdentity } from "./identity.js";
-import { isolateFunctionRequest } from "./request.js";
 
 export const SERVICE_POLICY = Symbol.for("zsys.service.policy");
 
 export interface InvocationServiceMiddlewareInvocation {
   readonly input: unknown;
-  readonly request: FunctionRequest | undefined;
   readonly context: unknown;
 }
 
@@ -50,13 +48,11 @@ export function resolveServicePolicy(
 export async function runServicePolicy(
   policy: InvocationServicePolicy,
   input: unknown,
-  request: FunctionRequest | undefined,
   context: unknown,
   terminal: (context: unknown) => MaybePromise<unknown>,
 ): Promise<unknown> {
   let result: unknown;
   const base = serviceContext(context);
-  const policyRequest = isolateFunctionRequest(request);
 
   const run = async (index: number, service: Readonly<Record<string, unknown>>): Promise<void> => {
     const current = Object.freeze({ ...contextRecord(context), service });
@@ -65,12 +61,9 @@ export async function runServicePolicy(
       result = await terminal(current);
       return;
     }
-    await middleware.handler(
-      Object.freeze({ input, request: policyRequest, context: current }),
-      async (patch) => {
-        await run(index + 1, mergeServiceContext(service, patch));
-      },
-    );
+    await middleware.handler(Object.freeze({ input, context: current }), async (patch) => {
+      await run(index + 1, mergeServiceContext(service, patch));
+    });
   };
 
   await run(0, base);
