@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -102,6 +102,11 @@ export function ResourceTable<Item extends ResourceTableItem>({
         <Badge>{items.length} visible</Badge>
       </header>
       <Card className="resource-toolbar" aria-label={`${title} filters`}>
+        <div className="resource-filter-heading">
+          <SlidersHorizontal aria-hidden="true" className="size-4" />
+          <strong>Filters</strong>
+          <span>Search and narrow the active collection.</span>
+        </div>
         <Field
           label={`Search ${noun}`}
           value={search}
@@ -133,9 +138,11 @@ export function ResourceTable<Item extends ResourceTableItem>({
             }}
           />
         )}
-        <Button variant="ghost" size="sm" onPress={clear}>
-          <RotateCcw aria-hidden="true" className="size-3.5" /> Reset
-        </Button>
+        <div className="resource-filter-footer">
+          <Button variant="ghost" size="sm" onPress={clear}>
+            <RotateCcw aria-hidden="true" className="size-3.5" /> Reset filters
+          </Button>
+        </div>
       </Card>
       <ResourceTableBody
         state={state}

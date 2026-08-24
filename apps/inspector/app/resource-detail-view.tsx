@@ -1,6 +1,7 @@
 import type { OperationStatus, ResourceOperationView, ResourceView } from "../lib/resources-model";
 import type { ReactNode } from "react";
 import { SourceLink } from "./source-link";
+import { SchemaPanel } from "./schema-panel";
 
 export function ResourceDetailView({ view }: { readonly view: ResourceView }) {
   const label = view.kind === "bucket" ? "Bucket" : "Cache";
@@ -127,13 +128,7 @@ function StatsPanel({ stats }: { readonly stats: Readonly<Record<string, number>
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">SAFE SCHEMA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{formatJson(value)}</pre>
-    </section>
-  );
+  return <SchemaPanel title={title} value={value} eyebrow="SAFE SCHEMA" />;
 }
 
 function Meta({ label, value }: { readonly label: string; readonly value: ReactNode }) {
@@ -157,13 +152,4 @@ function statusLabel(status: OperationStatus): string {
 
 function formatNumber(value: number | undefined): string {
   return value === undefined ? "Provider default" : value.toLocaleString("en-US");
-}
-
-function formatJson(value: unknown): string {
-  if (value === undefined) return "Not declared";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Unavailable";
-  }
 }
