@@ -107,7 +107,7 @@ describe("declared dependency clients", () => {
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
       dependencies: { jobs: { send: ref("job", "orders.send") } },
-      handler: async (_input, _request, context) => {
+      handler: async (_input, context) => {
         const clients = context as unknown as {
           readonly jobs: { readonly send: { enqueue: (input: unknown) => Promise<unknown> } };
         };

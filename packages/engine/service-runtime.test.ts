@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import type { FunctionRequest } from "@zsys/contracts";
 import { defineError, defineFunction, defineService, defineServiceMiddleware } from "@zsys/app";
 import { z } from "@zsys/schema";
 import type { LocalStructuredLogger } from "@zsys/invocation";
@@ -13,7 +12,7 @@ describe("service runtime isolation", () => {
       id: "orders.lookup",
       input: z.object({}),
       output: z.object({ ok: z.boolean() }),
-      handler: (_input, _request, context) => {
+      handler: (_input, context) => {
         invocation = context.invocation;
         logger = context.log as LocalStructuredLogger;
         expect(Object.isFrozen(context.service)).toBe(true);
@@ -28,40 +27,29 @@ describe("service runtime isolation", () => {
     expect(logger?.records).toMatchObject([{ functionId: "orders.lookup", serviceId: "orders" }]);
   });
 
-  test("isolates concurrent patches and protects the raw request", async () => {
+  test("isolates concurrent service context patches", async () => {
     const entered: string[] = [];
     let release!: () => void;
     let bothEntered!: () => void;
     const gate = new Promise<void>((resolve) => (release = resolve));
     const ready = new Promise<void>((resolve) => (bothEntered = resolve));
-    let originalBody = "original";
     const middleware = defineServiceMiddleware({
       id: "orders.context",
-      handler: async ({ input, request }, next) => {
-        try {
-          (request as { body: { value: string } } | undefined)!.body.value = "changed";
-        } catch {
-          // The request view is intentionally immutable.
-        }
+      handler: async ({ input }, next) => {
         await next({ actor: (input as { actor: string }).actor, nested: { ok: true } });
       },
     });
     const target = defineFunction({
       id: "orders.lookup",
       input: z.object({ actor: z.string() }),
-      output: z.object({ actor: z.string(), body: z.string() }),
-      handler: async (input, request, context) => {
+      output: z.object({ actor: z.string() }),
+      handler: async (input, context) => {
         entered.push(input.actor);
         if (entered.length === 2) bothEntered();
         expect(Object.isFrozen(context.service)).toBe(true);
         expect(Object.isFrozen(context.service.nested)).toBe(true);
-        expect(request?.params.orderId).toBe("order-1");
-        expect(request?.query.tag).toEqual(["first", "second"]);
-        expect(request?.headers.getAll("x-actor")).toEqual(["actor"]);
-        expect(request?.metadata.kind).toBe("http");
-        originalBody = (request?.body as { value: string }).value;
         await gate;
-        return { actor: context.service.actor as string, body: originalBody };
+        return { actor: context.service.actor as string };
       },
     });
     const service = defineService({
@@ -69,17 +57,15 @@ describe("service runtime isolation", () => {
       functions: { lookup: target },
       middleware: [middleware],
     });
-    const request = mutableRequest();
-    const first = invokeFunction(service.lookup, { actor: "first" }, { request });
-    const second = invokeFunction(service.lookup, { actor: "second" }, { request });
+    const first = invokeFunction(service.lookup, { actor: "first" });
+    const second = invokeFunction(service.lookup, { actor: "second" });
 
     await ready;
     release();
     await expect(Promise.all([first, second])).resolves.toEqual([
-      { actor: "first", body: "original" },
-      { actor: "second", body: "original" },
+      { actor: "first" },
+      { actor: "second" },
     ]);
-    expect((request.body as { value: string }).value).toBe("original");
   });
 
   test("short-circuits safely and normalizes middleware failures", async () => {
@@ -144,25 +130,3 @@ describe("service runtime isolation", () => {
     expect(rejectedCalls).toBe(0);
   });
 });
-
-function mutableRequest(): FunctionRequest {
-  const body = { value: "original" };
-  return {
-    method: "POST",
-    url: "http://zsys.test/orders",
-    params: { orderId: "order-1" },
-    query: { tag: ["first", "second"] },
-    headers: {
-      get: (name) => (name === "x-actor" ? "actor" : null),
-      getAll: (name) => (name === "x-actor" ? ["actor"] : []),
-      values: { "x-actor": "actor" },
-    },
-    metadata: { kind: "http" },
-    body,
-    bodyUsed: false,
-    clone: () => mutableRequest(),
-    arrayBuffer: async () => new ArrayBuffer(0),
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  };
-}

@@ -1,4 +1,3 @@
-import type { FunctionRequest } from "@zsys/contracts";
 import {
   runServicePolicy,
   type InvocationRunner,
@@ -11,13 +10,12 @@ type HandlerEffect = ReturnType<typeof invokeUserHandler>;
 export function runServiceHandler(
   policy: InvocationServicePolicy,
   input: unknown,
-  request: FunctionRequest | undefined,
   context: unknown,
   handler: (context: unknown) => HandlerEffect,
   runner: InvocationRunner,
   signal: AbortSignal,
 ): Promise<unknown> {
-  return runServicePolicy(policy, input, request, context, (serviceContext) =>
+  return runServicePolicy(policy, input, context, (serviceContext) =>
     runner.run(handler(serviceContext), { signal }),
   );
 }

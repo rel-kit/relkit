@@ -10,7 +10,7 @@ function ids() {
 }
 
 describe("service policy materialization", () => {
-  test("runs after admission and unwinds before output validation for every source", async () => {
+  test("runs after admission and unwinds after a successful function lifecycle", async () => {
     const events: string[] = [];
     const middleware = defineServiceMiddleware({
       id: "orders.context",
@@ -24,7 +24,7 @@ describe("service policy materialization", () => {
       id: "orders.lookup",
       input: z.object({ value: z.number() }),
       output: z.object({ value: z.number() }),
-      handler: (input, _request, context) => {
+      handler: (input, context) => {
         events.push(`handler:${context.service.tenant}`);
         return (input as { value: number }).value === 9
           ? { value: "invalid" }
@@ -89,7 +89,7 @@ describe("service policy materialization", () => {
     await expect(
       invokeFunction(service.lookup, { value: 9 }, { source: "direct", idSource: ids() }),
     ).rejects.toMatchObject({ kind: "defect" });
-    expect(events.slice(-3)).toEqual(["before:direct", "handler:acme", "after"]);
+    expect(events.slice(-2)).toEqual(["before:direct", "handler:acme"]);
   });
 
   test("resolves policy from the compiled service map for a root target", async () => {
