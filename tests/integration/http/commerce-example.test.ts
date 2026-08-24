@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../../packages/contracts/src/index.ts";
 import {
   invokeFunction,
   type InvocationTarget,
@@ -22,7 +23,7 @@ import {
 } from "../../../packages/runtime-hono/src/index.ts";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import normalizeOrderId from "../../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
-import authorizeOrder from "../../../examples/commerce/src/functions/authorize-order.function.ts";
+import orderAuth from "../../../examples/commerce/src/middleware/order-auth.middleware.ts";
 import browsePath from "../../../examples/commerce/src/functions/browse-path.function.ts";
 import deleteOrder from "../../../examples/commerce/src/functions/orders/delete-order.function.ts";
 import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
@@ -32,7 +33,6 @@ import uploadAssets from "../../../examples/commerce/src/functions/upload-assets
 
 const APP_ROOT = resolve(import.meta.dir, "../../../examples/commerce");
 const targets: Readonly<Record<string, InvocationTarget<any, any>>> = {
-  "authorize-order": authorizeOrder,
   "browse-path": browsePath,
   "orders.delete-order": deleteOrder,
   "orders.get-order": getOrder,
@@ -182,7 +182,6 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
   expect(invocations.map(({ functionId }) => functionId)).toEqual(
     expect.arrayContaining([
       "orders.create-order",
-      "authorize-order",
       "orders.get-order",
       "orders.search-orders",
       "orders.update-order",
@@ -204,18 +203,14 @@ function createOrderResult(value: unknown) {
 
 function manifestFor(plan: RegistrationPlan): RuntimeManifest {
   return {
-    contractVersion: 2,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
     middleware: {
       "order-auth": {
-        targetFunctionId: "authorize-order",
-        request: {
-          kind: "input",
-          fields: { authorization: { kind: "header", name: "authorization" } },
-        },
-        decision: { kind: "continue" },
+        path: orderAuth.path,
+        handler: async (_context: unknown, next: () => Promise<void>) => next(),
       },
     },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },

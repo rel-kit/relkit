@@ -60,7 +60,6 @@ interface RouteOptions {
   readonly targetFunctionId?: string;
   readonly request?: unknown;
   readonly responses?: readonly Record<string, unknown>[];
-  readonly middleware?: readonly { readonly id: string; readonly targetFunctionId: string }[];
   readonly transforms?: readonly { readonly id: string; readonly schema: unknown }[];
   readonly timeoutMs?: number;
 }
@@ -77,7 +76,7 @@ function route(id: string, options: RouteOptions = {}): HttpTriggerRegistration 
       path: options.path ?? `/${id.replaceAll(".", "/")}`,
       request: options.request ?? { kind: "input", fields: {} },
       responses: options.responses ?? [],
-      middleware: options.middleware ?? [],
+      middleware: [],
       transforms: options.transforms ?? [],
       ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     },
@@ -96,12 +95,13 @@ function planFor(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
 function orderedPlan(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
   const graph: ApplicationGraph = {
-    contractVersion: 2,
+    contractVersion: 4,
     nodes: routes as unknown as ApplicationGraph["nodes"],
     edges: [],
   };
@@ -120,7 +120,7 @@ function createHarness(options: HarnessOptions): Harness {
   const calls: HttpInvocationOptions[] = [];
   const observability = options.observability ?? createTestObservability();
   const manifest: RuntimeManifest = {
-    contractVersion: 2,
+    contractVersion: 4,
     generatorVersion: 1,
     graphHash: options.plan.graphHash,
     functions: {},
@@ -405,7 +405,7 @@ describe("HTTP integration", () => {
       id: "timeout",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, _request, context) =>
+      handler: (_input, context) =>
         new Promise<never>((_resolve, reject) => {
           context.signal.addEventListener("abort", () => reject(context.signal.reason), {
             once: true,
@@ -469,21 +469,23 @@ describe("HTTP integration", () => {
         }) as MiddlewareHandler,
       }),
     ) as FrameworkMiddlewareInput;
+    const basePlan = planFor([
+      route("middleware.route", {
+        path: "/middleware",
+        targetFunctionId: "main",
+        responses: [success()],
+      }),
+    ]);
     const harness = createHarness({
-      plan: planFor([
-        route("middleware.route", {
-          path: "/middleware",
-          targetFunctionId: "main",
-          responses: [success()],
-          middleware: [{ id: "auth", targetFunctionId: "auth" }],
-        }),
-      ]),
+      plan: {
+        ...basePlan,
+        middlewares: [{ kind: "middleware", id: "auth", source, path: "/middleware", order: 0 }],
+      },
       frameworkMiddleware,
       manifestMiddleware: {
         auth: {
-          targetFunctionId: "auth",
-          request: { kind: "input", fields: {} },
-          decision: { kind: "continue" },
+          path: "/middleware",
+          handler: async (_context: unknown, next: () => Promise<void>) => next(),
         },
       },
       handlers: {
@@ -495,27 +497,29 @@ describe("HTTP integration", () => {
       const response = await harness.client.get("/middleware");
       expect(response.status).toBe(200);
       expect(order).toEqual(["request-id", "trace", "limits", "request-record"]);
-      expect(harness.calls.map(({ functionId }) => functionId)).toEqual(["auth", "main"]);
+      expect(harness.calls.map(({ functionId }) => functionId)).toEqual(["main"]);
     } finally {
       await harness.close();
     }
   });
 
   test("honors a declared middleware short-circuit without invoking the route target", async () => {
+    const basePlan = planFor([
+      route("protected.route", {
+        path: "/protected",
+        targetFunctionId: "main",
+        responses: [success("ok"), { kind: "response", id: "blocked", status: 401 }],
+      }),
+    ]);
     const harness = createHarness({
-      plan: planFor([
-        route("protected.route", {
-          path: "/protected",
-          targetFunctionId: "main",
-          responses: [success("ok"), { kind: "response", id: "blocked", status: 401 }],
-          middleware: [{ id: "auth", targetFunctionId: "auth" }],
-        }),
-      ]),
+      plan: {
+        ...basePlan,
+        middlewares: [{ kind: "middleware", id: "auth", source, path: "/protected", order: 0 }],
+      },
       manifestMiddleware: {
         auth: {
-          targetFunctionId: "auth",
-          request: { kind: "input", fields: {} },
-          decision: { kind: "respond", responseId: "blocked" },
+          path: "/protected",
+          handler: () => Response.json({ error: "unauthorized" }, { status: 401 }),
         },
       },
       handlers: { auth: () => ({ error: "unauthorized" }), main: () => ({ ok: true }) },
@@ -524,7 +528,7 @@ describe("HTTP integration", () => {
       const response = await harness.client.get("/protected");
       expect(response.status).toBe(401);
       expect(await response.json()).toEqual({ error: "unauthorized" });
-      expect(harness.calls.map(({ functionId }) => functionId)).toEqual(["auth"]);
+      expect(harness.calls).toHaveLength(0);
     } finally {
       await harness.close();
     }
@@ -644,7 +648,7 @@ describe("HTTP integration", () => {
       id: "disconnect",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, _request, context) => {
+      handler: (_input, context) => {
         contextSignal = context.signal;
         started.resolve();
         return new Promise<never>((_resolve, reject) => {
