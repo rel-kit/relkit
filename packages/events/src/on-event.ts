@@ -85,7 +85,7 @@ export function onEvent(
     ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
     ...(concurrency === undefined ? {} : { concurrency }),
-    handler: (input, _request, context) => {
+    handler: (input, context) => {
       const envelope = input as UnknownEventEnvelope;
       return handler(listenerInput(selector, envelope), listenerContext(context, envelope));
     },

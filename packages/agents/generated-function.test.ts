@@ -8,8 +8,8 @@ import {
 describe("generated agent functions", () => {
   test("keep one stable marked handler and executor", async () => {
     const calls: unknown[] = [];
-    const handler = createGeneratedAgentFunction("support.order", (input, request, context) => {
-      calls.push(input, request, context);
+    const handler = createGeneratedAgentFunction("support.order", (input, context) => {
+      calls.push(input, context);
       return { ok: true };
     });
 
@@ -17,9 +17,8 @@ describe("generated agent functions", () => {
     expect(isGeneratedAgentFunction(handler)).toBe(true);
     expect(handler.functionId).toBe("zsys.agent.support.order.invoke");
     expect(Object.isFrozen(handler)).toBe(true);
-    const request = { url: "http://zsys.test" };
     const context = { invocationId: "invocation-1" };
-    expect(await handler({ id: "order-1" }, request, context)).toEqual({ ok: true });
-    expect(calls).toEqual([{ id: "order-1" }, request, context]);
+    expect(await handler({ id: "order-1" }, context)).toEqual({ ok: true });
+    expect(calls).toEqual([{ id: "order-1" }, context]);
   });
 });
