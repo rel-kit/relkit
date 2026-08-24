@@ -15,7 +15,6 @@ import {
   defineTool,
   defineTransform,
   http,
-  testProviders,
 } from "@zsys/app";
 import { z } from "@zsys/schema";
 
@@ -31,11 +30,7 @@ const optionalDelayedError = defineError({
   retry: { kind: "later", afterMs: 1_000 },
 });
 const optionalRoute = defineRoute({ target });
-const optionalMiddleware = defineMiddleware({
-  target,
-  request: http.input({ id: http.path("id") }),
-  decision: http.continue(),
-});
+const optionalMiddleware = defineMiddleware("/orders/*", async (_context, next) => next());
 const optionalTransform = defineTransform({ schema: z.string() });
 const optionalServiceMiddleware = defineServiceMiddleware({
   handler: async (_value, next) => next(),
@@ -94,7 +89,7 @@ void optionalAgentId;
 
 // Durable application and managed-resource identities remain required.
 // @ts-expect-error app IDs are mandatory
-defineApp({ env: defineEnv({}), providers: testProviders() });
+defineApp({ env: defineEnv({}), providers: {} });
 // @ts-expect-error event IDs are mandatory
 defineEvent({ version: 1, payload: input });
 // @ts-expect-error job IDs are mandatory
