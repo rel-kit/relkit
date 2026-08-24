@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import type { FunctionRequest } from "@zsys/contracts";
 import { defineError, defineFunction } from "@zsys/functions";
 import { z } from "@zsys/schema";
 import { handleTestRequest } from "./src/application-http.ts";
@@ -50,16 +49,16 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
   }
 });
 
-test("passes an immutable structured request through the in-process HTTP harness", async () => {
-  let observed: FunctionRequest | undefined;
+test("maps HTTP data into function input without exposing the request", async () => {
+  let observedInput: unknown;
+  let observedContext: unknown;
   const target = defineFunction({
     id: "orders.request",
     input: z.object({ value: z.string() }),
     output: z.object({ ok: z.boolean() }),
-    handler: async (_input, request) => {
-      if (request === undefined) throw new Error("Expected an HTTP request");
-      observed = request;
-      expect(await request.text()).toBe('{"value":"ready"}');
+    handler: async (input, context) => {
+      observedInput = input;
+      observedContext = context;
       return { ok: true };
     },
   });
@@ -84,18 +83,8 @@ test("passes an immutable structured request through the in-process HTTP harness
     );
 
     expect(response.status).toBe(200);
-    expect(observed?.params).toEqual({ orderId: "order-1", parts: ["a", "b"] });
-    expect(observed?.query).toEqual({ tag: ["red", "blue"] });
-    expect(observed?.headers.getAll("x-tags")).toEqual(["one", "two"]);
-    expect(observed?.headers.get("x-tags")).toBe("one, two");
-    expect(observed?.metadata).toEqual({
-      kind: "http",
-      pathPattern: "/orders/:orderId/*parts",
-    });
-    expect(observed !== undefined && Object.isFrozen(observed)).toBe(true);
-    expect(observed !== undefined && Object.isFrozen(observed.params)).toBe(true);
-    expect(observed !== undefined && Object.isFrozen(observed.query)).toBe(true);
-    expect(observed !== undefined && Object.isFrozen(observed.headers.values)).toBe(true);
+    expect(observedInput).toEqual({ value: "ready" });
+    expect((observedContext as Record<string, unknown>).request).toBeUndefined();
   } finally {
     await runtime.close();
   }

@@ -19,7 +19,6 @@ const target = {
   output: z.object({ value: z.number(), now: z.number() }),
   handler: async (
     input: { value: number },
-    _request: undefined,
     context: {
       readonly env: Readonly<Record<string, unknown>>;
       readonly time: { now: () => Date };
@@ -48,6 +47,51 @@ describe("testing runtime foundation", () => {
     expect(observedRecord?.source).toBe("direct");
     expect(observedContext !== undefined && Object.isFrozen(observedContext)).toBe(true);
     expect(observedContext !== undefined && Object.isFrozen(observedContext.env)).toBe(true);
+  });
+
+  test("supplies deterministic dependency fakes to direct invocations", async () => {
+    const dependent = {
+      id: "testing.dependencies",
+      input: z.object({ message: z.string() }),
+      output: z.object({ accepted: z.boolean() }),
+      dependencies: {
+        buckets: {
+          assets: { ref: { kind: "bucket", id: "testing.assets" } },
+        },
+        events: {
+          notice: {
+            ref: { kind: "event", id: "testing.notice" },
+            version: 1,
+            payload: z.object({ message: z.string() }),
+          },
+        },
+      },
+      handler: async (
+        input: { readonly message: string },
+        context: {
+          readonly buckets: {
+            readonly assets: {
+              put(key: string, bytes: Uint8Array, options: unknown): Promise<void>;
+            };
+          };
+          readonly events: { readonly notice: { publish(value: unknown): Promise<unknown> } };
+        },
+      ) => {
+        const result = (await context.events.notice.publish(input)) as {
+          readonly accepted: boolean;
+        };
+        await context.buckets.assets.put(
+          "messages/hello.txt",
+          new TextEncoder().encode(input.message),
+          { contentType: "text/plain" },
+        );
+        return { accepted: result.accepted };
+      },
+    };
+
+    await expect(invokeFunction(dependent, { message: "hello" })).resolves.toEqual({
+      accepted: true,
+    });
   });
 
   test("resolves test environment values through the app definition", () => {
