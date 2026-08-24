@@ -1,8 +1,6 @@
 import {
   createDescriptorBase,
   deepFreeze,
-  isStableId,
-  isRef,
   type MaybePromise,
   type DescriptorBase,
   type DescriptorMetadata,
@@ -11,7 +9,21 @@ import { createUnboundIdentity, resolveDescriptorIdentity } from "@zsys/invocati
 import { type InferInput, type InferOutput } from "@zsys/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionRef, FunctionRefAny } from "./types.js";
+import type { FunctionContext } from "./function-descriptor-types.js";
 import { createFunctionToolInvoker } from "./function-tool-runtime.js";
+import {
+  hasOwn,
+  copyFunctionToolHooks,
+  isErrorDescriptor,
+  isFunctionTarget,
+  isRecord,
+  positiveInteger,
+  requiredText,
+  validateApproval,
+  validateSideEffect,
+} from "./function-tool-validation.js";
+
+export { copyFunctionToolHooks } from "./function-tool-validation.js";
 
 export type FunctionToolSideEffect = "none" | "read" | "write" | "external";
 export type FunctionToolApproval = "never" | "on-write" | "always";
@@ -23,8 +35,24 @@ export interface FunctionToolMetadata extends DescriptorMetadata {
   readonly timeoutMs?: number;
 }
 
-export interface FunctionToolOptions<Id extends string = string> extends FunctionToolMetadata {
+export type FunctionToolContext = Pick<
+  FunctionContext,
+  "invocation" | "signal" | "env" | "log" | "time"
+>;
+
+export type FunctionToolHook<Value = unknown> = (
+  value: Value,
+  context: FunctionToolContext,
+) => MaybePromise<Value>;
+
+export interface FunctionToolOptions<
+  Id extends string = string,
+  Input = unknown,
+  Output = unknown,
+> extends FunctionToolMetadata {
   readonly id?: Id;
+  readonly onBefore?: FunctionToolHook<Input>;
+  readonly onAfter?: FunctionToolHook<Output>;
 }
 
 export interface FunctionToolApprovalRequest {
@@ -63,6 +91,8 @@ export interface FunctionToolDescriptor<
   readonly sideEffect: FunctionToolSideEffect;
   readonly approval: FunctionToolApproval;
   readonly timeoutMs?: number;
+  readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
+  readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
   /** Invokes the target through the common tool and function runtime. */
   readonly invoke: (
     input: InferInput<Target["input"]>,
@@ -73,7 +103,7 @@ export interface FunctionToolDescriptor<
 type FunctionToolCreateOptions<
   Id extends string,
   Target extends FunctionRefAny,
-> = FunctionToolMetadata & {
+> = FunctionToolOptions<Id, InferInput<Target["input"]>, InferOutput<Target["output"]>> & {
   readonly id?: Id;
   readonly target: Target;
 };
@@ -85,6 +115,7 @@ export function createFunctionTool<const Id extends string, const Target extends
   if (hasOwn(options, "handler")) throw new TypeError("Tools cannot own handlers");
   const target = copyFunctionTarget(options.target);
   const metadata = copyFunctionToolMetadata(options);
+  const hooks = copyFunctionToolHooks(options);
   const id = options.id === undefined ? createUnboundIdentity() : options.id;
   const base = createDescriptorBase("tool", id, metadata);
   const descriptor = {
@@ -94,6 +125,7 @@ export function createFunctionTool<const Id extends string, const Target extends
     sideEffect: metadata.sideEffect,
     approval: metadata.approval,
     ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
+    ...hooks,
   };
   Object.defineProperty(descriptor, "invoke", {
     value: createFunctionToolInvoker(
@@ -103,6 +135,7 @@ export function createFunctionTool<const Id extends string, const Target extends
         sideEffect: metadata.sideEffect,
         approval: metadata.approval,
         ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
+        ...hooks,
       },
       descriptor,
     ),
@@ -150,64 +183,10 @@ function copyFunctionTarget<Target extends FunctionRefAny>(
   }) as FunctionToolTarget<Target>;
 }
 
-function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return (
-    isRecord(value) &&
-    isRef(value.ref, "function") &&
-    isSchema(value.input) &&
-    isSchema(value.output) &&
-    (!hasOwn(value, "handler") || typeof value.handler === "function") &&
-    (!hasOwn(value, "invoke") || typeof value.invoke === "function") &&
-    (value.errors === undefined ||
-      (Array.isArray(value.errors) && value.errors.every(isErrorDescriptor)))
-  );
-}
-
-function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {
-  if (!isRecord(value) || value.kind !== "error" || !isStableId(value.id)) return false;
-  const ref = value.ref;
-  return (
-    isRecord(ref) &&
-    ref.kind === "error" &&
-    ref.id === value.id &&
-    typeof value.create === "function"
-  );
-}
-
-function isSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
-  return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
-}
-
 type TargetErrors<Target extends FunctionRefAny> =
   NonNullable<Target["errors"]> extends readonly ErrorDescriptorAny[]
     ? NonNullable<Target["errors"]>
     : readonly ErrorDescriptorAny[];
-
-function validateSideEffect(value: unknown): FunctionToolSideEffect {
-  if (value !== "none" && value !== "read" && value !== "write" && value !== "external") {
-    throw new TypeError("Tool sideEffect must be none, read, write, or external");
-  }
-  return value;
-}
-
-function validateApproval(value: unknown): FunctionToolApproval {
-  if (value !== "never" && value !== "on-write" && value !== "always") {
-    throw new TypeError("Tool approval must be never, on-write, or always");
-  }
-  return value;
-}
-
-function requiredText(value: unknown, name: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${name} is required`);
-  return value.trim();
-}
-
-function positiveInteger(value: unknown, name: string): asserts value is number {
-  if (!Number.isSafeInteger(value) || (value as number) <= 0) {
-    throw new TypeError(`${name} must be a positive integer`);
-  }
-}
 
 function copyTags(value: unknown): readonly string[] | undefined {
   if (value === undefined) return undefined;
@@ -215,16 +194,4 @@ function copyTags(value: unknown): readonly string[] | undefined {
     throw new TypeError("Tool tags must be an array of strings");
   }
   return Object.freeze([...value]);
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return (
-    value !== null &&
-    (typeof value === "object" || typeof value === "function") &&
-    !Array.isArray(value)
-  );
-}
-
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
 }

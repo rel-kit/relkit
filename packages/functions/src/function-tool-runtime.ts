@@ -11,12 +11,17 @@ import type {
   FunctionToolApprovalRequest,
   FunctionToolInvokeOptions,
   FunctionToolMetadata,
+  FunctionToolHook,
 } from "./function-tool.js";
 
 type FunctionToolRuntimeMetadata = Pick<
   FunctionToolMetadata,
   "sideEffect" | "approval" | "timeoutMs"
-> & { readonly id: string };
+> & {
+  readonly id: string;
+  readonly onBefore?: FunctionToolHook;
+  readonly onAfter?: FunctionToolHook;
+};
 
 export class FunctionToolArgumentValidationError extends TypeError {
   readonly code = "ZSYS_TOOL_ARGUMENT_VALIDATION" as const;
@@ -82,6 +87,14 @@ export function createFunctionToolInvoker<Target extends FunctionRefAny>(
         source: "tool",
         ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
         ...(options.signal === undefined ? {} : { signal: options.signal }),
+        ...(metadata.onBefore === undefined && metadata.onAfter === undefined
+          ? {}
+          : {
+              toolHooks: {
+                ...(metadata.onBefore === undefined ? {} : { onBefore: metadata.onBefore }),
+                ...(metadata.onAfter === undefined ? {} : { onAfter: metadata.onAfter }),
+              },
+            }),
       },
     });
     return result as Promise<InferOutput<Target["output"]>>;
