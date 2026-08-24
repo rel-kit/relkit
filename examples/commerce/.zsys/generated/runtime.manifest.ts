@@ -70,7 +70,6 @@ __zsys_bindDescriptorIdentity(__zsys_module_20["default"], "receipts.send-job");
 __zsys_bindDescriptorIdentity(__zsys_module_20["default"]["target"], "send-receipt");
 __zsys_bindDescriptorIdentity(__zsys_module_20["default"]["target"]["dependencies"]["buckets"]["assets"], "assets");
 __zsys_bindDescriptorIdentity(__zsys_module_21["default"], "order-auth");
-__zsys_bindDescriptorIdentity(__zsys_module_21["default"]["target"], "authorize-order");
 __zsys_bindDescriptorIdentity(__zsys_module_22["GET"], "route.get.docs.optional-catch-all-parts");
 __zsys_bindDescriptorIdentity(__zsys_module_22["GET"]["target"], "browse-path");
 __zsys_bindDescriptorIdentity(__zsys_module_23["GET"], "route.get.files.catch-all-parts");
@@ -78,8 +77,6 @@ __zsys_bindDescriptorIdentity(__zsys_module_23["GET"]["target"], "browse-path");
 __zsys_bindDescriptorIdentity(__zsys_module_24["DELETE"], "route.delete.orders.by-order-id");
 __zsys_bindDescriptorIdentity(__zsys_module_24["DELETE"]["target"], "orders.delete-order");
 __zsys_bindDescriptorIdentity(__zsys_module_24["GET"], "route.get.orders.by-order-id");
-__zsys_bindDescriptorIdentity(__zsys_module_24["GET"]["middleware"][0], "order-auth");
-__zsys_bindDescriptorIdentity(__zsys_module_24["GET"]["middleware"][0]["target"], "authorize-order");
 __zsys_bindDescriptorIdentity(__zsys_module_24["GET"]["target"], "orders.get-order");
 __zsys_bindDescriptorIdentity(__zsys_module_24["GET"]["target"]["errors"][0], "orders.not-found");
 __zsys_bindDescriptorIdentity(__zsys_module_24["HEAD"], "route.head.orders.by-order-id");
@@ -132,11 +129,10 @@ __zsys_bindDescriptorIdentity(__zsys_module_29["default"]["target"], "orders.get
 __zsys_bindDescriptorIdentity(__zsys_module_29["default"]["target"]["errors"][0], "orders.not-found");
 __zsys_bindDescriptorIdentity(__zsys_module_30["default"], "orders.normalize-id");
 
-export const manifestContractVersion = 2 as const;
+export const manifestContractVersion = 4 as const;
 export const manifestGeneratorVersion = 1 as const;
-export const manifestGraphHash = "sha256:1b4a1b814d3ddba24f10f1c75eec69154b1cd581ff2192fc1d06ffd949a8288b" as const;
-export const providerFactories = { "aws": { recipeTag: "aws", factory: undefined }, "local": { recipeTag: "local", factory: undefined }, "test": { recipeTag: "test", factory: undefined } } as const;
-const __zsys_middleware_0 = Object.assign((...args: any[]) => (__zsys_module_11["default"].handler as (...values: any[]) => any)(...args), { targetFunctionId: "authorize-order", request: {"fields":{"authorization":{"kind":"header","name":"authorization"}},"kind":"input"}, decision: {"kind":"continue"} });
+export const manifestGraphHash = "sha256:3ebd891b57a4a0b16337db635f74a723a940c68014a2af9c79cc0fbb83b19b6b" as const;
+export const providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined }, "cache:redis": { capability: "cache", adapter: "redis", factory: undefined }, "events:eventbridge": { capability: "events", adapter: "eventbridge", factory: undefined }, "jobs:sqs": { capability: "jobs", adapter: "sqs", factory: undefined }, "models:ai-sdk": { capability: "models", adapter: "ai-sdk", factory: undefined }, "observability:cloudwatch": { capability: "observability", adapter: "cloudwatch", factory: undefined } } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
   generatorVersion: manifestGeneratorVersion,
@@ -148,7 +144,8 @@ export const runtimeManifest = {
   services: { "orders": __zsys_module_28["default"] },
   providers: providerFactories,
   providerFactories,
-  middleware: { "order-auth": __zsys_middleware_0 },
+  middleware: { "order-auth": __zsys_module_21["default"] },
+  hooks: {  },
   requestTransforms: { "orders.normalize-id": __zsys_module_30["default"].schema },
   application: __zsys_module_1["default"],
 } as const;
