@@ -47,6 +47,7 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  middlewares: [],
   services: [
     {
       kind: "service",
