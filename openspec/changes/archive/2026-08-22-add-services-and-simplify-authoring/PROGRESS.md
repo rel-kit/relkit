@@ -2,9 +2,11 @@
 
 - Coordinator selected the only active change: `add-services-and-simplify-authoring`.
 - Branch: `fix/add-services-and-simplify-authoring`.
-- OpenSpec status: ready, 49/51 tasks complete; apply instructions loaded for schema `spec-driven`.
+- OpenSpec status: ready, 50/51 tasks complete; apply instructions loaded for schema `spec-driven`.
 - Wayfinder alignment: skipped; no repository plan or traceability row names Wayfinder decision sources.
-- Current unit: Phase 9, task 9.1 complete; tasks 1.1–1.3, 2.1–2.8, 3.1–3.6, 4.1–4.8, 5.1–5.7, 6.1–6.4, 7.1–7.7, 8.1–8.5, and 9.1 are verified and checked. Task 9.2 remains unchecked because its broad gate failed; no 9.3 handoff was dispatched.
+- Current unit: Phase 9, task 9.2 complete; tasks 1.1–1.3, 2.1–2.8, 3.1–3.6, 4.1–4.8, 5.1–5.7, 6.1–6.4, 7.1–7.7, 8.1–8.5, and 9.1–9.2 are verified and checked. Task 9.3 is dispatched as the next unchecked unit in a fresh same-directory task.
+- Task 9.2 evidence: `bun run check`, `bun run typecheck`, `bun run test:all`, `bun run build`, and `bun run verify` all pass locally. The verify implementation-size guard was cleared by minimal behavior-preserving module splits; the remaining Konsistent barrel findings are advisory. Cloud acceptance and live model calls were intentionally not enabled, so no authorized-cloud evidence is available.
+- Fresh same-directory task `01a026d5-3cbb-7ed1-a212-04788e477814` was dispatched for task 9.3 on host `local` with project `03a21aee-82e5-434f-9f9f-83fb95086727` and max thinking; no wait or poll was performed.
 - Authorized post-handoff repair resolved the task 7.3 gate failure: native Fetch requests are now materialized through the shared immutable `FunctionRequest` adapter used by both the testing harness and Hono runtime, and the declaration guard recognizes `model` as the approved logical selector.
 - Post-repair checks: `bun run typecheck`; `bun run scripts/check-public-declarations.ts`; `bun run test:types`; `bun run check`; `bun run konsistent -- validate`; `openspec validate add-services-and-simplify-authoring --strict`; `git diff --check`; affected HTTP/testing/agent/engine cohort `80 pass/0 fail, 438 assertions`; compiler+graph `89/0, 615`; isolated Phase 0 `23/0, 137`.
 - Workspace was clean before branch creation; the pre-existing implementation-adjacent change is the restart test harness fix in `tests/restart/jobs-worker.ts`; task 1.3 now adds the recorded package/boundary files below.
@@ -192,4 +194,173 @@
 - Task 9.1 is complete. Formatting, `git diff --check`, Konsistent validation, lint, root boundary/check/authoring/declaration/observability scans, `bun x tsc -b --pretty false`, and `bun run test:types` pass. The focused cohorts pass: compiler (89/0, 617 assertions), contracts (72/0, 549), invocation/functions/engine/runtime (92/0, 328), HTTP/routes/OpenAPI/client-generator (81/0, 448), repository-owned agents/testing/agent integration (43/0, 214), jobs/events/local providers (81/0, 338), observability/inspector/security-redaction (53/0, 331), restart (6/0, 32), examples (Turbo 100 successful tasks), generator (17/0, 418), documentation (2/0, 30), security (2/0, 15), and unit (9/0, 19). Isolated Phase 0 passes 23/0 with 137 assertions using `TMPDIR=/private/tmp BUN_INSTALL_CACHE_DIR=/private/tmp/zsys-bun-install-cache bun test --timeout=30000 tests/phase0.test.ts`; the longer timeout only accommodates the packed-export and frozen-install child work, with no test-source timeout change.
 - Task 9.1 fixed only change regressions found during validation: formatted five changed compiler expected-graph fixtures, updated the shared invocation HTTP schema-failure expectation from 500 to the now-correct 422 response, and removed `middleware` from the sensitive content-key matcher so inspector service graph metadata is retained while request/context/service values remain protected. The broad `packages/tools` filter was not used as evidence because it enters the vendored Effect checkout; its repository-owned tools/agents cohort passes. An exploratory deployment command reached the unavailable AWS integration test and was not treated as a 9.1 gate; cloud acceptance and live model calls remained disabled.
 - Task 9.1 advanced its checkbox with no active blocker. The next unchecked unit is task 9.2.
-- Task 9.2 validation remains unchecked because `bun run verify` reaches the implementation-size guard and reports 13 existing files over the 200-line repository limit. `bun run check`, `bun run typecheck`, `bun run test:all` (all local layers, including 10/10 E2E; AWS integration skipped), and standalone `bun run build` pass. Validation repairs were limited to the stale Functions documentation include, missing `invocation`/`services` links in the container fixture, static inspector route-mapping projection, deterministic route selection and Next.js dev-portal hiding in E2E, and Prettier formatting. Cloud acceptance and live model calls were not enabled; no 9.3 handoff was dispatched.
+- Task 9.2 validation is complete: the implementation-size guard was cleared by minimal behavior-preserving module splits. `bun run check`, `bun run typecheck`, `bun run test:all` (all local layers, including 10/10 E2E; AWS integration skipped), standalone `bun run build`, and `bun run verify` pass. Validation repairs included the stale Functions documentation include, missing `invocation`/`services` links in the container fixture, static inspector route-mapping projection, deterministic route selection and Next.js dev-portal hiding in E2E, Prettier formatting, and the required size-limit splits. Cloud acceptance and live model calls were intentionally not enabled; no authorized-cloud evidence is available.
+- Task 9.3 is complete. Strict validation passes, all 97 acceptance scenarios in the ten capability specs map to runnable evidence below, the active-code/public-doc legacy scan is clean, and the change is ready for review and archive. Per the assigned scope, no archive or next-unit dispatch was performed.
+- Task 9.3 evidence results: `openspec validate add-services-and-simplify-authoring --strict` passes; `bun run lint` passes its 58-fragment authoring scan; `bun run scripts/check-public-declarations.ts` passes for 15 packages; `bun run test:types` passes; the contract/identity/tool cohort passes 25/0 with 212 expectations; invocation/service/observability/OpenAPI/engine cohorts pass 96/0 with 382 expectations; compiler/graph/HTTP/observability cohorts pass 107/0 with 780 expectations; runtime-Hono retry mapping passes 14/0 with 52 expectations; agent/testing/provider/job cohorts pass 90/0 with 426 expectations; and packed minimal/API/agent creation smoke passes for 32 packages. The five broad local gates from task 9.2 also remain recorded as passing.
+- Task 9.3 legacy scan: no active-code matches for `context.functions`, `modelProfile`, custom `ModelProvider` declarations, or handwritten Chat Completions adapters; active docs are clean outside the intentional migration guide and protected historical v3 technical spec. Explicit IDs remain only where the contract permits overrides or durable identity.
+- Task 9.3 evidence qualification: template source files are not standalone workspace tests because their generated-project package links are absent in the normal checkout; the packed create smoke is the runnable evidence and passes all three templates. Cloud acceptance and live model calls remain intentionally disabled, so no authorized-cloud evidence is available.
+
+### Task 9.3 acceptance evidence
+
+Evidence keys below point to runnable commands and existing test files. The matrix covers every `#### Scenario` in the ten change specs (97/97).
+
+- `E1` — `bun run test:types`; `bun run scripts/check-public-declarations.ts`; `bun run lint`; `bun test tests/agents/source-boundaries.test.ts`.
+- `E2` — `bun test tests/contracts/descriptor.test.ts tests/contracts/descriptor-cohort.test.ts tests/contracts/optional-ids.test.ts tests/contracts/declared-errors.test.ts tests/functions/identity-binding.test.ts tests/functions/tool.test.ts`.
+- `E3` — `bun test packages/invocation packages/engine`.
+- `E4` — `bun test tests/compiler tests/graph`.
+- `E5` — `bun test tests/integration/http packages/runtime-hono packages/openapi`.
+- `E6` — `bun test packages/services packages/engine/service-policy.test.ts packages/engine/service-runtime.test.ts tests/integration/http/service-contract.test.ts`.
+- `E7` — `bun test packages/observability packages/engine/observability.test.ts tests/integration/observability`.
+- `E8` — `bun test packages/providers-local packages/testing/jobs.test.ts packages/testing/events.test.ts tests/integration/jobs`.
+- `E9` — `bun test packages/agents packages/testing/agent-matrix-agent.test.ts packages/testing/agent-matrix-tools.test.ts tests/integration/agents`.
+- `E10` — `bun run scripts/pack-and-smoke-create-zsys.ts` (packed minimal/API/agent generation, deterministic output, check/typecheck/test/build/dev/source scans).
+- `E11` — task 9.2 recorded gates: `bun run check`, `bun run typecheck`, `bun run test:all`, `bun run build`, and `bun run verify`.
+- `E12` — active-source scan: `rg -n --hidden -g '!node_modules/**' -g '!repos/effect/**' '(context\.functions|\bmodelProfile\b|\b(?:interface|type|class|function|const)[[:space:]]+ModelProvider\b|chat/completions|Chat Completions)' apps/inspector examples packages templates tests scripts`; active-doc scan: the same pattern over `apps/docs/content/docs docs` with `--glob '!**/operations/migration.mdx' --glob '!**/zsys-typescript-poc-technical-spec-v3.md'`. Both return no matches.
+- `E13` — `openspec validate add-services-and-simplify-authoring --strict`.
+
+#### acceptance-verification
+
+| Scenario                           | Evidence       |
+| ---------------------------------- | -------------- |
+| Public declarations are checked    | E1, E2, E9     |
+| Compiler fixtures run twice        | E4             |
+| Invocation matrix runs             | E3, E5, E8, E9 |
+| AI matrix runs offline             | E9             |
+| Templates are packed and generated | E10            |
+| Legacy authoring is scanned        | E1, E10, E12   |
+
+#### public-authoring
+
+| Scenario                                           | Evidence   |
+| -------------------------------------------------- | ---------- |
+| Non-function handler is declared                   | E1, E2     |
+| Route middleware is declared                       | E2, E4     |
+| Function invokes another function                  | E3, E12    |
+| Managed dependency is declared                     | E3         |
+| Descriptor is mutated in development               | E2         |
+| Explicitly identified descriptor source moves      | E4         |
+| Inferred descriptor source moves                   | E4         |
+| Inferred identities collide                        | E4         |
+| Declared error is thrown                           | E2, E3     |
+| Error identity is omitted                          | E2, E4     |
+| Retry metadata is omitted                          | E2, E8     |
+| Retry delay is declared                            | E2, E8     |
+| Function uses an ordinary library                  | E4, E12    |
+| HTTP route invokes a function                      | E5         |
+| Non-HTTP source invokes a function                 | E3, E8, E9 |
+| Function is invoked from ordinary application code | E3         |
+| Function becomes a tool                            | E2, E9     |
+
+#### function-runtime
+
+| Scenario                                          | Evidence   |
+| ------------------------------------------------- | ---------- |
+| Handler is invoked from different sources         | E3, E5, E8 |
+| Child provider call is cancelled                  | E3         |
+| Undeclared managed dependency is forged           | E3         |
+| Function descriptor is invoked                    | E3         |
+| Function calls function descriptor                | E3, E7     |
+| Invoke runs inside an application invocation      | E3         |
+| Invoke runs outside an application invocation     | E3         |
+| Standalone function needs an application provider | E3         |
+| Applications execute concurrently                 | E3         |
+| Dynamic two-function cycle occurs                 | E3         |
+| Direct descriptor call completes                  | E3, E7     |
+
+#### service-orchestration
+
+| Scenario                                 | Evidence   |
+| ---------------------------------------- | ---------- |
+| Service member targets a route           | E5, E6     |
+| Invalid service member is declared       | E4, E6     |
+| Member is reached from different sources | E6         |
+| Service middleware rejects an invocation | E6         |
+| Service middleware controls continuation | E6         |
+| Middleware enriches context              | E6, E7     |
+| Concurrent members execute               | E6         |
+| Service-backed API is compiled           | E4, E5, E6 |
+
+#### compiler-graph
+
+| Scenario                                    | Evidence |
+| ------------------------------------------- | -------- |
+| Semantic error exists                       | E4       |
+| Convention warning exists                   | E4       |
+| Graph is inspected as JSON                  | E4, E7   |
+| Function uses a declared cache              | E3, E4   |
+| Function invokes another function           | E3, E7   |
+| Route ID is inferred                        | E4       |
+| Function ID is inferred                     | E4       |
+| Service member ID is inferred               | E4, E6   |
+| Error ID is inferred                        | E2, E4   |
+| Inference is ambiguous                      | E4       |
+| Two IDs collide                             | E4       |
+| Inferred function invokes inferred function | E3, E4   |
+| Service is compiled                         | E4, E6   |
+| Function belongs to two services            | E4, E6   |
+
+#### http-runtime
+
+| Scenario                                 | Evidence |
+| ---------------------------------------- | -------- |
+| Valid mapped request arrives             | E5       |
+| Matching path field is inferred          | E4, E5   |
+| Path field is not part of business input | E4, E5   |
+| Named transform executes                 | E4, E5   |
+| Malformed body arrives                   | E5       |
+| Route contract is generated              | E5, E6   |
+| Nested parameter route is invoked        | E5, E6   |
+| Handler attempts request mutation        | E5, E6   |
+| Dynamic name repeats                     | E4, E5   |
+| Dynamic names are distinct               | E4, E5   |
+| Retryable HTTP error is returned         | E2, E5   |
+
+#### jobs-events
+
+| Scenario                                   | Evidence |
+| ------------------------------------------ | -------- |
+| Non-retryable declared error is thrown     | E8       |
+| Retryable declared error is thrown         | E8       |
+| Error hint exceeds policy backoff          | E8       |
+| Policy backoff exceeds error hint          | E8       |
+| Direct invocation receives retryable error | E2, E3   |
+
+#### observability
+
+| Scenario                                | Evidence |
+| --------------------------------------- | -------- |
+| Service member logs                     | E7       |
+| Standalone service member runs          | E6, E7   |
+| Function invokes sibling service member | E7       |
+| Dynamic cycle is rejected               | E3, E7   |
+
+#### tools-agents
+
+| Scenario                                    | Evidence |
+| ------------------------------------------- | -------- |
+| Tool contract is compiled                   | E2, E4   |
+| Function creates a tool view                | E2       |
+| Zero-argument tool view lacks metadata      | E2       |
+| Required approval is denied                 | E2, E9   |
+| Required approval has no resolver           | E2, E9   |
+| Scripted agent test runs                    | E9       |
+| Agent omits model                           | E9       |
+| Agent selects provider default              | E9       |
+| Agent selects exact model                   | E9       |
+| Agent embeds live model                     | E1, E9   |
+| Defaults resolve                            | E9       |
+| Default provider is absent                  | E9       |
+| Multiple providers are configured           | E9       |
+| AI SDK model requests function-derived tool | E9       |
+| Prompt instructions are authored            | E9       |
+| Read-only tool is invoked standalone        | E2, E9   |
+| Tool input is invalid                       | E2, E9   |
+
+#### cli-scaffolding
+
+| Scenario                      | Evidence |
+| ----------------------------- | -------- |
+| API template is generated     | E10      |
+| Minimal template is generated | E10      |
+| Agent project is generated    | E9, E10  |
+| Template event is published   | E8, E10  |
