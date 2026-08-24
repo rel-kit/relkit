@@ -18,6 +18,7 @@ import {
   jobDefinition,
   scheduleDefinition,
 } from "./aws-program-support.js";
+import { managedEnvironment, withoutManagedCredentials } from "./aws-program-environment.js";
 
 export interface AwsProgramOptions {
   readonly stackName?: string;
@@ -45,7 +46,7 @@ export interface AwsProgramResources {
   readonly events: ZsysEventBus;
   readonly buckets: ZsysBuckets;
   readonly caches: ZsysCaches;
-  readonly observability: ZsysObservability;
+  readonly observability?: ZsysObservability;
   readonly service: ZsysApplicationService;
   readonly policy?: aws.iam.RolePolicy;
 }
@@ -114,12 +115,17 @@ export function createAwsPulumiResources(
     },
     child,
   );
-  const observability = new ZsysObservability(
-    "observability",
-    { ...common, logs: plan.observability.logs, traces: plan.observability.traces },
-    child,
-  );
+  const observability =
+    plan.observability === undefined
+      ? undefined
+      : new ZsysObservability(
+          "observability",
+          { ...common, logs: plan.observability.logs, traces: plan.observability.traces },
+          child,
+        );
   const environment = options.serviceEnvironment?.({ jobs, events, buckets, caches });
+  const region = options.region ?? aws.config.region ?? "us-east-1";
+  const generatedEnvironment = managedEnvironment(plan, { jobs, events, buckets, caches }, region);
   const service = new ZsysApplicationService(
     "service",
     {
@@ -132,16 +138,22 @@ export function createAwsPulumiResources(
       readinessPath: plan.application.image.health.readinessPath,
       environment: {
         ZSYS_APPLICATION_ID: plan.application.id,
-        ...(environment === undefined ? {} : environment),
-        ...Object.fromEntries(
-          buckets.buckets.map(({ environment }) => [environment.name, environment.value]),
-        ),
-        ...Object.fromEntries(
-          caches.caches.map(({ environment }) => [environment.name, environment.value]),
-        ),
+        ...(environment === undefined ? {} : withoutManagedCredentials(plan, environment)),
+        ...generatedEnvironment,
       },
     },
-    { parent: root, dependsOn: [network, registry, jobs, events, buckets, caches, observability] },
+    {
+      parent: root,
+      dependsOn: [
+        network,
+        registry,
+        jobs,
+        events,
+        buckets,
+        caches,
+        ...(observability === undefined ? [] : [observability]),
+      ],
+    },
   );
   const policy = createServicePolicy(plan, service, buckets, jobs, events, caches, root);
   return {
@@ -152,7 +164,7 @@ export function createAwsPulumiResources(
     events,
     buckets,
     caches,
-    observability,
+    ...(observability === undefined ? {} : { observability }),
     service,
     ...(policy === undefined ? {} : { policy }),
   };

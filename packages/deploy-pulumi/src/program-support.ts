@@ -42,21 +42,29 @@ export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
           left.resourceId.localeCompare(right.resourceId),
       ),
     },
-    observability: {
-      ...value.observability,
-      configurationNames: [...value.observability.configurationNames].sort(),
-    },
+    ...(value.observability === undefined
+      ? {}
+      : {
+          observability: {
+            ...value.observability,
+            configurationNames: [...value.observability.configurationNames].sort(),
+          },
+        }),
   };
 }
 
 export function resourceEntries(plan: DeploymentPlan): readonly ResourceEntry[] {
   return [
     { kind: "http", logicalName: plan.http.logicalName, value: plan.http },
-    {
-      kind: "observability",
-      logicalName: plan.observability.logicalName,
-      value: plan.observability,
-    },
+    ...(plan.observability === undefined
+      ? []
+      : [
+          {
+            kind: "observability",
+            logicalName: plan.observability.logicalName,
+            value: plan.observability,
+          },
+        ]),
     ...plan.jobs.map((value) => ({ kind: "job", logicalName: value.logicalName, value })),
     ...plan.schedules.map((value) => ({ kind: "schedule", logicalName: value.logicalName, value })),
     ...plan.events.map((value) => ({ kind: "event", logicalName: value.logicalName, value })),
