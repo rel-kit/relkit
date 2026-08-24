@@ -11,7 +11,7 @@ import {
 const identity = { generationId: "generation-one", graphHash: "sha256:one" };
 const generation = {
   ...identity,
-  graph: { contractVersion: 2, nodes: [], edges: [] },
+  graph: { contractVersion: 3, nodes: [], edges: [] },
 };
 const query: ObservabilityQuery = {
   requests: async () => ({ protocol: "zsys.observability.query", version: 1, items: [] }),

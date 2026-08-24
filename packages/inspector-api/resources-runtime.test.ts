@@ -11,7 +11,7 @@ describe("inspector managed-resource runtime boundary", () => {
         generationId: "generation-one",
         graphHash: "sha256:one",
         graph: {
-          contractVersion: 2,
+          contractVersion: 3,
           nodes: [
             {
               kind: "bucket",

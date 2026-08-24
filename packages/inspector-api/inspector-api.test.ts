@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 
 const graph = {
-  contractVersion: 2,
+  contractVersion: 3,
   appId: "test-app",
   nodes: [
     {
