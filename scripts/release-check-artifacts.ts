@@ -59,7 +59,7 @@ export async function templateInputs(
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
   const forbidden =
-    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@zsys\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@zsys\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
   const scripts = {
     dev: "zsys dev",
     check: "zsys check",
