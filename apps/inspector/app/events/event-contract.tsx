@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { EventDeliveryPanel, EventListenerPanel, EventPublisherPanel } from "./event-state-panels";
 import type { EventView } from "../../lib/events-model";
 import { SourceLink } from "../source-link";
+import { SchemaPanel } from "../schema-panel";
 
 export function EventContract({ view }: { readonly view: EventView }) {
   const event = view.event;
@@ -50,13 +51,7 @@ export function EventContract({ view }: { readonly view: EventView }) {
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">CONTRACT DATA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{format(value)}</pre>
-    </section>
-  );
+  return <SchemaPanel title={title} value={value} eyebrow="CONTRACT DATA" />;
 }
 
 function Meta({ label, value }: { readonly label: string; readonly value: ReactNode }) {
@@ -78,15 +73,6 @@ function fieldList(value: unknown): string {
   return Array.isArray(value) && value.every((item) => typeof item === "string")
     ? value.join(", ") || "None reported"
     : "None reported";
-}
-
-function format(value: unknown): string {
-  if (value === undefined) return "Not declared";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Unavailable";
-  }
 }
 
 function text(value: unknown): string {

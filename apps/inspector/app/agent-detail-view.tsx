@@ -1,4 +1,5 @@
 import type { AgentView } from "../lib/agents-model";
+import { SchemaPanel } from "./schema-panel";
 
 export function AgentDetailView({ view }: { readonly view: AgentView }) {
   return (
@@ -124,13 +125,7 @@ function TimelinePanel({ view }: { readonly view: AgentView }) {
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">SAFE SCHEMA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{format(value)}</pre>
-    </section>
-  );
+  return <SchemaPanel title={title} value={value} eyebrow="SAFE SCHEMA" />;
 }
 function Meta({ label, value }: { readonly label: string; readonly value: string }) {
   return (
@@ -139,7 +134,4 @@ function Meta({ label, value }: { readonly label: string; readonly value: string
       <dd>{value}</dd>
     </div>
   );
-}
-function format(value: unknown): string {
-  return value === undefined ? "Not declared" : JSON.stringify(value, null, 2);
 }

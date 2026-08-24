@@ -2,6 +2,7 @@ import type { InspectorObject } from "../../lib/api-types";
 import { itemsForJob, nextRunValue, queueCounts } from "../../lib/jobs-model";
 import type { JobAction } from "../../lib/job-actions";
 import { AttemptsPanel, QueuePanel } from "./job-state-panels";
+import { SchemaPanel } from "../schema-panel";
 
 export function JobContract({
   node,
@@ -94,13 +95,7 @@ function SchedulePanel({
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">CONTRACT DATA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{formatJson(value)}</pre>
-    </section>
-  );
+  return <SchemaPanel title={title} value={value} eyebrow="CONTRACT DATA" />;
 }
 
 function Meta({ label, value }: { readonly label: string; readonly value: string }) {
@@ -132,15 +127,6 @@ function formatTime(value: unknown): string {
     if (Number.isFinite(date.getTime())) return date.toLocaleString("en-US");
   }
   return "Not reported";
-}
-
-function formatJson(value: unknown): string {
-  if (value === undefined) return "Not declared";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Unavailable";
-  }
 }
 
 function text(value: unknown): string {
