@@ -56,6 +56,7 @@ export const internalRuntimePackages = new Set([
   "@zsys/invocation",
   "@zsys/observability",
   "@zsys/providers-local",
+  "@zsys/providers-standard",
   "@zsys/runtime-effect",
   "@zsys/runtime-hono",
   "@zsys/supervisor",
@@ -66,6 +67,7 @@ export const dependencyNeutralPackages = new Set(["@zsys/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
   ["@zsys/agents", new Set(["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"])],
+  ["@zsys/routes", new Set(["hono"])],
 ]);
 
 export const nodeBuiltins = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));

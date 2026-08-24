@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
 import { agentProviderPropertyOffsets } from "./public-declaration-agent";
+import { nonFunctionHandlers } from "./public-declaration-ast";
 
 const publicPackages = [
   "packages/contracts",
@@ -37,7 +37,7 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["']@zsys\/(?:providers-local|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
+    /from ["']@zsys\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",
@@ -94,42 +94,6 @@ function lineAndColumn(text: string, offset: number): { line: number; column: nu
     line: before.split("\n").length,
     column: offset - lineStart + 1,
   };
-}
-
-function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {
-  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  const leaks: DeclarationLeak[] = [];
-  const visit = (node: ts.Node): void => {
-    if (ts.isPropertySignature(node) && node.name.getText(source) === "handler") {
-      const declaration = nearestDeclaration(node);
-      if (!declaration || ts.getModifiers(declaration)?.some(isExportModifier) !== true) {
-        ts.forEachChild(node, visit);
-        return;
-      }
-      const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
-      if (!/Function|ServiceMiddleware/.test(owner)) {
-        leaks.push({
-          file,
-          ...lineAndColumn(text, node.getStart(source)),
-          symbol: "non-function-handler",
-        });
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(source);
-  return leaks;
-}
-
-function nearestDeclaration(node: ts.Node): ts.Declaration | undefined {
-  for (let current = node.parent; current && !ts.isSourceFile(current); current = current.parent) {
-    if (ts.isDeclaration(current)) return current;
-  }
-  return undefined;
-}
-
-function isExportModifier(modifier: ts.Modifier): boolean {
-  return modifier.kind === ts.SyntaxKind.ExportKeyword;
 }
 
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {
