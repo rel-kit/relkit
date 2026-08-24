@@ -1,6 +1,6 @@
 {
   "appId": "full-app",
-  "contractVersion": 2,
+  "contractVersion": 4,
   "edges": [
     {
       "from": "orders.handle-created",
@@ -26,12 +26,6 @@
       "from": "orders.create",
       "kind": "publishes-event",
       "to": "orders.created"
-    },
-    {
-      "from": "orders.get-route",
-      "kind": "targets-function",
-      "role": "middleware",
-      "to": "orders.authorize"
     },
     {
       "from": "orders.get-route",
@@ -63,29 +57,41 @@
       "to": "prices"
     },
     {
+      "from": "orders.get-route",
+      "kind": "uses-middleware",
+      "match": "always",
+      "order": 0,
+      "to": "order-auth"
+    },
+    {
       "from": "assets",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.buckets.default"
+    },
+    {
+      "from": "orders.created",
+      "kind": "uses-provider-profile",
+      "to": "provider.events.default"
     },
     {
       "from": "orders.listener",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.events.default"
     },
     {
       "from": "orders.support-agent",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.models.default"
     },
     {
       "from": "prices",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.cache.default"
     },
     {
       "from": "receipts.send-job",
       "kind": "uses-provider-profile",
-      "to": "default"
+      "to": "provider.jobs.default"
     },
     {
       "from": "orders.support-agent",
@@ -140,6 +146,20 @@
         "currency": "USD"
       },
       "environment": {
+        "CACHE_URL": {
+          "hasDefault": false,
+          "optional": true,
+          "requiredIn": [],
+          "sensitive": true,
+          "type": "secret-string"
+        },
+        "MODEL_API_KEY": {
+          "hasDefault": false,
+          "optional": true,
+          "requiredIn": [],
+          "sensitive": true,
+          "type": "secret-string"
+        },
         "SERVICE_PORT": {
           "hasDefault": true,
           "optional": false,
@@ -155,11 +175,17 @@
           "mode": "off"
         }
       },
-      "providerProfiles": ["default"],
+      "providerBindings": [
+        "provider.buckets.default",
+        "provider.cache.default",
+        "provider.events.default",
+        "provider.jobs.default",
+        "provider.models.default"
+      ],
       "source": {
-        "column": 13,
+        "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 20
       }
     },
     {
@@ -200,6 +226,34 @@
       }
     },
     {
+      "hasDefault": false,
+      "id": "CACHE_URL",
+      "kind": "env",
+      "name": "CACHE_URL",
+      "requiredIn": [],
+      "sensitive": true,
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
+      },
+      "type": "secret-string"
+    },
+    {
+      "hasDefault": false,
+      "id": "MODEL_API_KEY",
+      "kind": "env",
+      "name": "MODEL_API_KEY",
+      "requiredIn": [],
+      "sensitive": true,
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
+      },
+      "type": "secret-string"
+    },
+    {
       "hasDefault": true,
       "id": "SERVICE_PORT",
       "kind": "env",
@@ -207,9 +261,9 @@
       "requiredIn": [],
       "sensitive": false,
       "source": {
-        "column": 13,
+        "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 20
       },
       "type": "port"
     },
@@ -814,20 +868,129 @@
       "timeoutMs": null
     },
     {
-      "capabilities": ["buckets", "cache", "events", "jobs", "observability"],
+      "id": "order-auth",
+      "kind": "middleware",
+      "order": 0,
+      "path": "/orders/*",
+      "source": {
+        "column": 19,
+        "file": "src/middleware/order-auth.middleware.ts",
+        "line": 4
+      }
+    },
+    {
+      "adapter": "s3",
+      "capability": "buckets",
       "configuration": {
-        "development": [],
-        "production": ["region"],
-        "test": []
+        "bucketName": "assets",
+        "endpoint": "https://s3.us-east-1.amazonaws.com",
+        "region": "us-east-1"
       },
       "environment": [],
-      "id": "default",
+      "id": "provider.buckets.default",
       "kind": "provider",
+      "ownership": "managed",
       "profile": "default",
       "source": {
-        "column": 13,
+        "column": 16,
         "file": "src/app.ts",
-        "line": 12
+        "line": 20
+      }
+    },
+    {
+      "adapter": "redis",
+      "capability": "cache",
+      "configuration": {
+        "url": {
+          "kind": "env-ref",
+          "name": "CACHE_URL",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      },
+      "environment": [
+        {
+          "name": "CACHE_URL",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      ],
+      "id": "provider.cache.default",
+      "kind": "provider",
+      "ownership": "external",
+      "profile": "default",
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
+      }
+    },
+    {
+      "adapter": "eventbridge",
+      "capability": "events",
+      "configuration": {
+        "busName": "events",
+        "region": "us-east-1"
+      },
+      "environment": [],
+      "id": "provider.events.default",
+      "kind": "provider",
+      "ownership": "managed",
+      "profile": "default",
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
+      }
+    },
+    {
+      "adapter": "sqs",
+      "capability": "jobs",
+      "configuration": {
+        "queueUrl": "https://sqs.us-east-1.amazonaws.com/1/jobs",
+        "region": "us-east-1"
+      },
+      "environment": [],
+      "id": "provider.jobs.default",
+      "kind": "provider",
+      "ownership": "managed",
+      "profile": "default",
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
+      }
+    },
+    {
+      "adapter": "ai-sdk",
+      "capability": "models",
+      "configuration": {
+        "defaultModel": "gpt-5-mini",
+        "defaultProvider": "openai",
+        "openai": {
+          "apiKey": {
+            "kind": "env-ref",
+            "name": "MODEL_API_KEY",
+            "sensitive": true,
+            "type": "secret-string"
+          }
+        }
+      },
+      "environment": [
+        {
+          "name": "MODEL_API_KEY",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      ],
+      "id": "provider.models.default",
+      "kind": "provider",
+      "ownership": "external",
+      "profile": "default",
+      "source": {
+        "column": 16,
+        "file": "src/app.ts",
+        "line": 20
       }
     },
     {
@@ -850,8 +1013,10 @@
         "method": "GET",
         "middleware": [
           {
-            "id": "orders.auth",
-            "targetFunctionId": "orders.authorize"
+            "id": "order-auth",
+            "match": "always",
+            "order": 0,
+            "path": "/orders/*"
           }
         ],
         "path": "/orders/:orderId",
@@ -904,7 +1069,7 @@
       "source": {
         "column": 20,
         "file": "src/routes/orders/[orderId]/route.ts",
-        "line": 11
+        "line": 10
       },
       "targetFunctionId": "orders.get",
       "triggerType": "http"
