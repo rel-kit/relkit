@@ -7,6 +7,23 @@ This release is intentionally breaking and has no compatibility layer or codemod
 diagnostic at a time. Source-scoped IDs can now be inferred, but keep explicit IDs whenever a refactor
 must preserve identity.
 
+## Provider topology and environment values
+
+Delete `localProviders`, `testProviders`, `awsProviders`, `ProviderSets`, and all environment branches.
+Declare one capability/profile topology with protocol adapters. Wrap resources owned elsewhere with
+`external()` and resources owned by the selected deployment target with `managed()`:
+
+```ts
+providers: {
+  buckets: { default: external(s3({ endpoint, bucketName, region, credentials })) },
+  cache: { default: external(redis({ url: env.CACHE_URL })) },
+}
+```
+
+Keep the same environment keys in every pipeline. Local values may point to MinIO and Redis, while
+production values point to R2 and Upstash. Remove `ZSYS_ENV` from `defineEnv`; the framework owns it.
+Move AWS/Pulumi hosting selection to `zsys.config.ts` under `deployment`.
+
 ## Routes
 
 Move `src/routes/orders.route.ts` to `src/routes/orders/route.ts`. Replace the default descriptor with
@@ -54,10 +71,9 @@ Remove `dependencies.functions`; keep declarations for jobs, events, buckets, ca
 descriptor method enters the active generation when called from ZSYS and an isolated common kernel when
 called directly, so validation, service middleware, limits, cancellation, and telemetry remain intact.
 
-Handlers now receive reusable validated input separately from an optional immutable HTTP request:
-`request.params`, `request.query`, and repeated `request.headers` values are transport data. A path
-name matching an input property maps into business input; an unmatched path value remains on
-`request.params`. Direct, job, event, tool, and agent calls do not receive a fabricated request.
+Handlers now receive `(input, context)` for every invocation source. Move required HTTP values into the
+route input mapping or a path-scoped `defineMiddleware(path, handler)` callback. Remove route
+`middleware` arrays; matching is automatic and middleware runs in canonical ID order through Hono.
 
 ## Services and tools
 
@@ -104,15 +120,14 @@ value-free environment provider configuration:
 ```ts
 model: "openai:gpt-5-mini";
 
-production: awsProviders({
-  region: env.AWS_REGION,
-  modelProviders: {
+models: {
+  default: external(aiSdk({
     defaultProvider: "openai",
     defaultModel: "gpt-5-mini",
     openai: { apiKey: env.OPENAI_API_KEY },
     anthropic: { defaultModel: "claude-sonnet-4-5", apiKey: env.ANTHROPIC_API_KEY },
-  },
-});
+  })),
+},
 ```
 
 An omitted agent model uses both global defaults; a bare provider name uses that provider's default;
@@ -134,7 +149,8 @@ transaction or simultaneous-execution guarantee; a failed listener cannot roll b
 Wrap configuration with `defineConfig` from `@zsys/app/config`. Delete `entry`, `source`, `exclude`, and
 `generatedDirectory`; use fixed `src/app.ts`, `src/**/*.ts`, and `.zsys/generated`. Move application
 port to `server.port`, inspector port to `inspector.port`, and body/API-doc settings under `server`.
-Remove `PORT` from application environment definitions because the framework reserves it.
+Remove `PORT` and `ZSYS_ENV` from application environment definitions because the framework reserves
+them. Add `deployment: { target: "aws", adapter: "pulumi" }` when the project is AWS-hosted.
 
 ## Regenerate and verify
 

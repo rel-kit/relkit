@@ -8,7 +8,8 @@ Without `responses`, a non-void output becomes JSON `200`; void/undefined become
 `http.status`, validation `422`, and route rate-limit `429` are added automatically.
 
 An explicit `responses` array is a complete override for redirects, alternate media types, multiple
-success shapes, or middleware-owned responses. `HEAD` invokes the normal target and removes its body.
+success shapes. Middleware may return any runtime `Response`, but those responses are not yet added to
+typed SDK or OpenAPI error contracts. `HEAD` invokes the normal target and removes its body.
 `OPTIONS` exists only when the route file explicitly exports it.
 
 During development:

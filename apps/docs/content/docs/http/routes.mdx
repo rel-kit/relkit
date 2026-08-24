@@ -24,10 +24,9 @@ Every `src/routes/**/route.ts` file defines a path. Export one or more of `GET`,
 changing graph and deployment identity. Default exports and legacy `*.route.ts` files fail with
 source-located migration guidance.
 
-Matching dynamic names can become reusable function input. An unmatched dynamic or catch-all value is
-still available through the immutable `request.params` view and is represented as a transport path
-parameter in OpenAPI and generated clients. Service-member targets retain their service identity and
-share the service's ordered middleware.
+Matching dynamic names become reusable function input and are represented as transport path parameters
+in OpenAPI and generated clients. Route mapping occurs after matching path middleware. Service-member
+targets retain their service identity and share the service's ordered middleware.
 
 Static routes win over dynamic routes, then required catch-all, then optional catch-all. The compiler
 expands optional catch-all paths into two runtime registrations but keeps one authored descriptor and

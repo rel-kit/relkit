@@ -7,10 +7,23 @@ Use `defineBucket` and `defineCache` to create graph-visible logical resources. 
 `dependencies`, then access the corresponding typed client on its context. Applications never import
 provider SDK clients directly.
 
-Buckets support bounded object reads/writes and metadata through the provider contract. Cache keys and
-values are schema-backed; numeric caches can also back distributed route rate limiting. Local providers
-persist recoverable state, test providers expose controllable fakes, and production profiles map logical
-resources to managed infrastructure.
+Buckets support bounded object reads/writes, metadata, listing, cancellation, and signed URLs through
+the provider contract. Cache keys and values are schema-backed; numeric caches can also back distributed
+route rate limiting.
+
+Bind each logical profile to one protocol adapter in `defineApp`:
+
+```ts
+providers: {
+  buckets: { assets: external(s3({ endpoint, bucketName, region, credentials })) },
+  cache: { default: external(redis({ url: env.CACHE_URL })) },
+}
+```
+
+S3-compatible endpoints include AWS S3, R2, and MinIO. Redis-compatible endpoints include Redis,
+Valkey, ElastiCache, and Upstash's Redis protocol. Pipelines can swap endpoint values without changing
+the topology. Use `managed()` when the deployment target should own the resource; use `external()` to
+prevent provisioning and IAM generation. Tests substitute deterministic in-memory fakes by default.
 
 Stable resource IDs drive graph edges, inspector views, permissions, and deployment identity. Moving a
 descriptor file must not force resource replacement.
