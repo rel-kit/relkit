@@ -113,7 +113,7 @@ describe("standalone descriptor runtime", () => {
       input: empty,
       output: z.object({ ok: z.literal(true) }),
       timeoutMs: 10_000,
-      handler: (_input, _request, context) => {
+      handler: (_input, context) => {
         childSignal = context.signal;
         return { ok: true };
       },
@@ -156,7 +156,7 @@ describe("standalone descriptor runtime", () => {
       id: "orders.runtime-child",
       input: empty,
       output: z.string(),
-      handler: async (_input, _request, context) => {
+      handler: async (_input, context) => {
         started += 1;
         if (started === 2) bothStarted();
         await gate;
@@ -189,7 +189,7 @@ describe("standalone descriptor runtime", () => {
       id: "orders.cancel-child",
       input: empty,
       output: z.object({ ok: z.literal(true) }),
-      handler: (_input, _request, context) =>
+      handler: (_input, context) =>
         new Promise((_resolve, reject) => {
           childStarted();
           context.signal.addEventListener(
@@ -225,7 +225,7 @@ describe("standalone descriptor runtime", () => {
       id: "orders.provider",
       input: empty,
       output: empty,
-      handler: (_input, _request, context) =>
+      handler: (_input, context) =>
         (context.jobs as unknown as Record<string, () => Promise<unknown>>).publish(),
     };
     await expect(

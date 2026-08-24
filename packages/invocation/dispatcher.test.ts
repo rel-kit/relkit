@@ -53,7 +53,7 @@ describe("invocation dispatch scope", () => {
       id: "orders.double",
       input: z.number(),
       output: z.object({ value: z.number() }),
-      handler: (value, _request, context) => {
+      handler: (value, context) => {
         logger = context.log as LocalStructuredLogger;
         context.log.info("standalone", { value });
         expect(Object.isFrozen(context.env)).toBe(true);
@@ -106,7 +106,7 @@ describe("invocation dispatch scope", () => {
       id: "orders.publish",
       input: empty,
       output: empty,
-      handler: (_input, _request, context) => {
+      handler: (_input, context) => {
         const jobs = context.jobs as unknown as Record<string, (value: unknown) => Promise<void>>;
         return jobs.publish({});
       },
