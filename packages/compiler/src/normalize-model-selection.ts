@@ -26,14 +26,11 @@ export function readModelConfigurations(descriptors: readonly NormalizedDescript
     .flatMap((descriptor) => {
       const value = isRecord(descriptor.value) ? descriptor.value : {};
       const providers = isRecord(value.providers) ? value.providers : {};
-      return Object.values(providers).flatMap((provider) => {
-        const metadata = isRecord(provider) && isRecord(provider.metadata) ? provider.metadata : {};
-        const configuration = isRecord(metadata.configuration)
-          ? metadata.configuration.modelProviders
-          : undefined;
-        if (configuration === undefined) return [];
-        const parsed = parseModelConfiguration(configuration);
-        return [parsed];
+      const models = isRecord(providers.models) ? providers.models : {};
+      return Object.values(models).flatMap((binding) => {
+        const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
+        if (adapter.adapter !== "ai-sdk" || !isRecord(adapter.configuration)) return [];
+        return [parseModelConfiguration(adapter.configuration)];
       });
     });
 }

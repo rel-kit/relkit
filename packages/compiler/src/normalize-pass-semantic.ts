@@ -11,11 +11,9 @@ import {
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
-
 export function passRoutes(work: NormalizationWork): void {
   validateHttpCompatibility(work);
 }
-
 export function passJobs(work: NormalizationWork): void {
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "job")) {
     const value = descriptor.value as Record<string, any>;
@@ -27,15 +25,12 @@ export function passJobs(work: NormalizationWork): void {
     if (reason !== undefined) add(work, descriptor, NORMALIZE_CODES.jobInput, reason);
   }
 }
-
 export function passEvents(work: NormalizationWork): void {
   validateEventCompatibility(work);
 }
-
 export function passEventTargets(work: NormalizationWork): void {
   return;
 }
-
 export function passTools(work: NormalizationWork): void {
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "tool")) {
     const value = descriptor.value as Record<string, any>;
@@ -90,6 +85,8 @@ export function passAgents(work: NormalizationWork): void {
 }
 
 export function passProviders(work: NormalizationWork): void {
+  validateUniqueBucketProfiles(work);
+  if (!work.descriptors.some((entry) => entry.kind === "app")) return;
   const profiles = providerProfiles({
     ...work.input,
     descriptors: work.descriptors.map((entry) => entry.value),
@@ -112,6 +109,16 @@ export function passProviders(work: NormalizationWork): void {
       }
     }
     if (descriptor.kind !== "agent") continue;
+    const modelCapabilities = profiles.get("default");
+    if (modelCapabilities === undefined || !modelCapabilities.includes("models")) {
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.providerProfile,
+        'Provider profile "default" does not provide models.',
+      );
+      continue;
+    }
     for (const entry of modelConfigurations) {
       if (entry.error !== undefined) {
         add(work, descriptor, entry.error.code, entry.error.message);
@@ -120,6 +127,26 @@ export function passProviders(work: NormalizationWork): void {
       if (entry.configuration === undefined) continue;
       const error = resolveCompiledModel(value.model, entry.configuration);
       if (error !== undefined) add(work, descriptor, error.code, error.message);
+    }
+  }
+}
+
+function validateUniqueBucketProfiles(work: NormalizationWork): void {
+  const profiles = new Map<string, NormalizedDescriptor>();
+  for (const descriptor of work.descriptors.filter((entry) => entry.kind === "bucket")) {
+    const value = isRecord(descriptor.value) ? descriptor.value : {};
+    const profile = typeof value.profile === "string" ? value.profile : "default";
+    const previous = profiles.get(profile);
+    if (previous === undefined) profiles.set(profile, descriptor);
+    else {
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.bucketProfileDuplicate,
+        `Bucket profile "${profile}" is already owned by "${previous.id}".`,
+        "error",
+        previous,
+      );
     }
   }
 }
@@ -158,10 +185,13 @@ function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescrip
 
 function capabilityFor(kind: string): string | undefined {
   return (
-    { bucket: "buckets", cache: "cache", job: "jobs", "event-trigger": "events" } as Record<
-      string,
-      string
-    >
+    {
+      bucket: "buckets",
+      cache: "cache",
+      job: "jobs",
+      event: "events",
+      "event-trigger": "events",
+    } as Record<string, string>
   )[kind];
 }
 

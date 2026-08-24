@@ -25,6 +25,7 @@ import { normalizeEventListeners } from "./normalize-event-listener.js";
 import { normalizeSourceIdentities } from "./normalize-source-identities.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 import { normalizeSelector } from "./normalize-model-selection.js";
+import { isMiddlewarePath } from "./middleware-coverage.js";
 
 export { passSchemas } from "./normalize-schema-validation.js";
 
@@ -113,6 +114,9 @@ export function passLocal(work: NormalizationWork): void {
         add(work, descriptor, NORMALIZE_CODES.path, "HTTP path is invalid.");
       validateRateLimit(work, descriptor, value.rateLimit);
     }
+    if (descriptor.kind === "middleware" && !isMiddlewarePath(value.path)) {
+      add(work, descriptor, NORMALIZE_CODES.path, "Middleware path is invalid.");
+    }
     if (descriptor.kind === "job" || descriptor.kind === "event-trigger")
       validateRetry(work, descriptor, value, descriptor.kind === "job");
     if (descriptor.kind === "job") validateJob(work, descriptor, value);
@@ -132,7 +136,6 @@ export function passLocal(work: NormalizationWork): void {
       add(work, descriptor, NORMALIZE_CODES.descriptor, "Agent limits must be positive integers.");
   }
 }
-
 
 export { passIndex } from "./normalize-reference-index.js";
 export { passReferences } from "./normalize-reference-validation.js";
