@@ -1,70 +1,69 @@
+import type { EnvMetadata, ProviderBinding, ProviderCapability, ProviderTopology } from "@zsys/app";
 import type { MaybePromise, SourceLocation } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
-import type {
-  EnvMetadata,
-  ProviderCapability,
-  ProviderRecipe,
-  ProviderSet,
-  ProviderSets,
-} from "@zsys/app";
 
-export const PROVIDER_RECIPES = {
-  development: "local",
-  test: "test",
-  production: "aws",
-} as const;
-export type ProviderEnvironment = keyof typeof PROVIDER_RECIPES;
+export type ProviderEnvironment = "development" | "test" | "production";
 
 export interface ProviderFactoryContext {
   readonly generationId: string;
   readonly environment: ProviderEnvironment;
-  readonly providerSet: ProviderSet;
-  readonly values?: Readonly<Record<string, unknown>>;
+  readonly capability: ProviderCapability;
+  readonly profile: string;
+  readonly binding: ProviderBinding;
+  readonly configuration: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
 }
+
 export interface ProviderGeneration {
-  readonly providers?: Readonly<Partial<Record<ProviderCapability, unknown>>>;
-  /** Runtime-only AI SDK registry; absent when no modelProviders recipe is configured. */
+  readonly value?: unknown;
   readonly modelRegistry?: unknown;
   readonly ready?: () => MaybePromise<void>;
   readonly readiness?: () => MaybePromise<void>;
   readonly release?: () => MaybePromise<void>;
   readonly dispose?: () => MaybePromise<void>;
 }
+
 export interface ProviderFactory {
-  readonly recipeTag: ProviderRecipe;
+  readonly capability: ProviderCapability;
+  readonly adapter: string;
   readonly create: (context: ProviderFactoryContext) => MaybePromise<ProviderGeneration>;
   readonly ready?: (generation: ProviderGeneration) => MaybePromise<void>;
   readonly release?: (generation: ProviderGeneration) => MaybePromise<void>;
 }
-export type ProviderFactories = Partial<Record<ProviderRecipe, ProviderFactory>>;
+
+export type ProviderFactories = Readonly<Record<string, ProviderFactory>>;
 
 export interface ProviderRequirement {
   readonly capability: ProviderCapability;
   readonly profile: string;
+  readonly bindingId: string;
   readonly source?: SourceLocation;
 }
+
 export interface ProviderHandle {
   readonly capability: ProviderCapability;
   readonly profile: string;
+  readonly binding: ProviderBinding;
   readonly value: unknown;
 }
+
 export interface ProviderRegistryOptions {
   readonly generationId: string;
   readonly environment: ProviderEnvironment;
-  readonly providers?: ProviderSets;
-  readonly providerSets?: ProviderSets;
+  readonly providers: ProviderTopology;
   readonly graph: ApplicationGraph;
   readonly factories?: ProviderFactories;
+  readonly testFactories?: ProviderFactories;
+  readonly useConfiguredAdaptersInTests?: boolean;
   readonly values?: Readonly<Record<string, unknown>>;
   readonly environmentMetadata?: Readonly<Record<string, EnvMetadata>>;
   readonly signal?: AbortSignal;
 }
+
 export interface ProviderRegistry {
   readonly generationId: string;
   readonly environment: ProviderEnvironment;
-  readonly recipeTag: ProviderRecipe;
-  readonly providerSet: ProviderSet;
+  readonly providers: ProviderTopology;
   readonly modelRegistry?: unknown;
   readonly requirements: readonly ProviderRequirement[];
   readonly handles: Readonly<Record<string, ProviderHandle>>;
@@ -92,6 +91,7 @@ export type ProviderRegistryErrorCode =
   | "ZSYS_MODEL_SELECTOR_INVALID"
   | "ZSYS_MODEL_PROVIDER_UNKNOWN"
   | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
+
 export interface ProviderRegistryIssue {
   readonly code: ProviderRegistryErrorCode;
   readonly message: string;
@@ -101,6 +101,7 @@ export interface ProviderRegistryIssue {
   readonly variable?: string;
   readonly source?: SourceLocation;
 }
+
 export class ProviderRegistryError extends Error {
   readonly code: ProviderRegistryErrorCode;
   readonly issues: readonly ProviderRegistryIssue[];

@@ -1,8 +1,6 @@
-import type { ProviderSet } from "@zsys/app";
 import type { ApplicationGraph } from "@zsys/graph";
 import {
   ProviderRegistryError,
-  type ProviderGeneration,
   type ProviderRegistryErrorCode,
 } from "./provider-registry-types.js";
 
@@ -17,15 +15,9 @@ const modelCodes = new Set<ModelReadinessCode>([
   "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
 ]);
 
-export function validateModelReadiness(
-  graph: ApplicationGraph,
-  providerSet: ProviderSet,
-  generation: ProviderGeneration,
-): void {
-  if (providerSet.metadata.configuration.modelProviders === undefined) return;
+export function validateModelReadiness(graph: ApplicationGraph, registry: unknown): void {
   const agents = graph.nodes.filter((node) => node.kind === "agent");
   if (agents.length === 0) return;
-  const registry = generation.modelRegistry;
   if (!isRegistry(registry)) {
     throw new ProviderRegistryError([
       {

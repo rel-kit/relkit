@@ -1,153 +1,165 @@
+import { isProviderTopology, type ProviderCapability, type ProviderTopology } from "@zsys/app";
+import { getLocalProviderFactory } from "@zsys/providers-local";
 import {
-  isProviderSet,
-  providerRecipe,
-  type ProviderCapability,
-  type ProviderRecipe,
-  type ProviderSet,
-} from "@zsys/app";
-import {
-  getLocalProviderFactory,
-  type LocalProviderEnvironment,
-  type LocalProviderRecipe,
-} from "@zsys/providers-local";
-import {
+  bindingFor,
   collectRequirements,
+  factoryKey,
   key,
-  makeHandles,
+  resolveBindingConfiguration,
   validateEnvironment,
-  validateRequirements,
 } from "./provider-registry-validation.js";
 import { validateModelReadiness } from "./model-readiness.js";
 import {
-  PROVIDER_RECIPES as recipes,
   ProviderRegistryError,
-  type ProviderEnvironment,
   type ProviderFactory,
-  type ProviderFactoryContext,
   type ProviderGeneration,
   type ProviderHandle,
-  type ProviderRegistryErrorCode,
   type ProviderRegistry,
+  type ProviderRegistryErrorCode,
   type ProviderRegistryOptions,
 } from "./provider-registry-types.js";
 
 export * from "./provider-registry-types.js";
+export { factoryKey as providerFactoryKey } from "./provider-registry-validation.js";
 
 export async function createProviderRegistry(
   options: ProviderRegistryOptions,
 ): Promise<ProviderRegistry> {
-  const environment = options.environment;
-  if (!(environment in recipes))
-    throw error("ZSYS_PROVIDER_ENVIRONMENT_INVALID", "Unknown environment.");
-  if (options.generationId.trim() === "")
-    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Generation ID is required.");
-  if (options.signal?.aborted)
-    throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
-  const sets = options.providers ?? options.providerSets;
-  const providerSet = sets?.[environment];
-  const recipe = providerRecipe(providerSet);
-  if (!isProviderSet(providerSet) || recipe === undefined || recipe !== recipes[environment])
-    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Active provider metadata is invalid.");
+  validateOptions(options);
+  validateEnvironment(options.environment, options.environmentMetadata, options.values);
   const requirements = collectRequirements(options.graph);
-  validateRequirements(providerSet, requirements);
-  validateEnvironment(environment, options.environmentMetadata, options.values);
-  const factory = options.factories?.[recipe] ?? defaultFactory(recipe);
-  if (factory === undefined)
-    throw error("ZSYS_PROVIDER_FACTORY_MISSING", "No provider factory is bound.");
-  if (factory.recipeTag !== recipe)
-    throw error(
-      "ZSYS_PROVIDER_FACTORY_MISMATCH",
-      "Provider factory recipe does not match the active set.",
-    );
-  const context: ProviderFactoryContext = {
-    generationId: options.generationId,
-    environment,
-    providerSet,
-    ...(options.values === undefined ? {} : { values: options.values }),
-    ...(options.signal === undefined ? {} : { signal: options.signal }),
-  };
-  let generation: ProviderGeneration;
+  const acquired: Acquired[] = [];
+  const handles: Record<string, ProviderHandle> = {};
+  let modelRegistry: unknown;
   try {
-    generation = await factory.create(context);
+    for (const requirement of requirements) {
+      const binding = bindingFor(options.providers, requirement);
+      const useTestFactory =
+        options.environment === "test" && options.useConfiguredAdaptersInTests !== true;
+      const factory = useTestFactory
+        ? (options.testFactories?.[requirement.capability] ??
+          getLocalProviderFactory(requirement.capability))
+        : options.factories?.[factoryKey(requirement.capability, binding.adapter.adapter)];
+      if (factory === undefined) {
+        throw error(
+          "ZSYS_PROVIDER_FACTORY_MISSING",
+          `No factory is registered for ${requirement.capability}:${binding.adapter.adapter}.`,
+          requirement.capability,
+          requirement.profile,
+        );
+      }
+      if (factory.capability !== requirement.capability) {
+        throw error(
+          "ZSYS_PROVIDER_FACTORY_MISMATCH",
+          "Provider factory capability does not match the binding.",
+          requirement.capability,
+          requirement.profile,
+        );
+      }
+      const generation = await construct(factory, {
+        generationId: options.generationId,
+        environment: options.environment,
+        capability: requirement.capability,
+        profile: requirement.profile,
+        binding,
+        configuration: useTestFactory
+          ? Object.freeze({})
+          : resolveBindingConfiguration(binding, options.values),
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+      });
+      acquired.push({ factory, generation });
+      if (generation.modelRegistry !== undefined) modelRegistry = generation.modelRegistry;
+      if (requirement.capability !== "models" && generation.value === undefined) {
+        throw error(
+          "ZSYS_PROVIDER_CONSTRUCTION_FAILED",
+          "Provider factory returned no client.",
+          requirement.capability,
+          requirement.profile,
+        );
+      }
+      handles[key(requirement.capability, requirement.profile)] = Object.freeze({
+        capability: requirement.capability,
+        profile: requirement.profile,
+        binding,
+        value: generation.value ?? generation.modelRegistry,
+      });
+    }
+    validateModelReadiness(options.graph, modelRegistry);
   } catch (cause) {
-    const modelError = modelRegistryError(cause);
-    if (modelError !== undefined) throw modelError;
-    throw error("ZSYS_PROVIDER_CONSTRUCTION_FAILED", "Provider construction failed.");
-  }
-  try {
-    await factory.ready?.(generation);
-    await generation.ready?.();
-    await generation.readiness?.();
-    validateModelReadiness(options.graph, providerSet, generation);
-    if (options.signal?.aborted)
-      throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
-  } catch (cause) {
-    await releaseOne(factory, generation).catch(() => undefined);
+    await releaseAll(acquired).catch(() => undefined);
     if (cause instanceof ProviderRegistryError) throw cause;
-    throw error("ZSYS_PROVIDER_READINESS_FAILED", "Provider readiness failed.");
-  }
-  let handles: Readonly<Record<string, ProviderHandle>>;
-  try {
-    handles = makeHandles(requirements, providerSet, generation);
-  } catch (cause) {
-    await releaseOne(factory, generation).catch(() => undefined);
-    throw cause;
+    throw error("ZSYS_PROVIDER_CONSTRUCTION_FAILED", "Provider construction failed.");
   }
   let released = false;
   const release = async (): Promise<void> => {
     if (released) return;
     released = true;
-    await releaseOne(factory, generation);
+    await releaseAll(acquired);
   };
+  const frozenHandles = Object.freeze(handles);
   return Object.freeze({
     generationId: options.generationId,
-    environment,
-    recipeTag: recipe,
-    providerSet,
-    ...(generation.modelRegistry === undefined ? {} : { modelRegistry: generation.modelRegistry }),
+    environment: options.environment,
+    providers: options.providers,
+    ...(modelRegistry === undefined ? {} : { modelRegistry }),
     requirements: Object.freeze(requirements),
-    handles,
-    get: (capability: ProviderCapability, profile: string) => handles[key(capability, profile)],
+    handles: frozenHandles,
+    get: (capability: ProviderCapability, profile: string) =>
+      frozenHandles[key(capability, profile)],
     resolve: (capability: ProviderCapability, profile: string) => {
-      const handle = handles[key(capability, profile)];
-      if (handle === undefined)
-        throw error(
-          "ZSYS_PROVIDER_PROFILE_UNKNOWN",
-          "Provider profile is not available.",
-          capability,
-          profile,
-        );
-      return handle;
+      const handle = frozenHandles[key(capability, profile)];
+      if (handle !== undefined) return handle;
+      throw error(
+        "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+        "Provider profile is not available.",
+        capability,
+        profile,
+      );
     },
     release,
     dispose: release,
   });
 }
 
-function defaultFactory(recipe: ProviderRecipe): ProviderFactory | undefined {
-  const factory = getLocalProviderFactory(recipe);
-  if (!factory) return undefined;
-  return {
-    recipeTag: factory.recipeTag,
-    create: (context) =>
-      factory.create({
-        generationId: context.generationId,
-        environment: context.environment as LocalProviderEnvironment,
-        providerSet: context.providerSet as ProviderSet<LocalProviderRecipe>,
-        ...(context.values === undefined ? {} : { values: context.values }),
-        ...(context.signal === undefined ? {} : { signal: context.signal }),
-      }),
-  };
+interface Acquired {
+  readonly factory: ProviderFactory;
+  readonly generation: ProviderGeneration;
 }
 
-async function releaseOne(factory: ProviderFactory, generation: ProviderGeneration): Promise<void> {
-  try {
-    if (factory.release) await factory.release(generation);
-    else if (generation.release) await generation.release();
-    else await generation.dispose?.();
-  } catch {
-    throw error("ZSYS_PROVIDER_RELEASE_FAILED", "Provider release failed.");
+async function construct(
+  factory: ProviderFactory,
+  context: Parameters<ProviderFactory["create"]>[0],
+): Promise<ProviderGeneration> {
+  const generation = await factory.create(context);
+  await factory.ready?.(generation);
+  await generation.ready?.();
+  await generation.readiness?.();
+  if (context.signal?.aborted)
+    throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
+  return generation;
+}
+
+async function releaseAll(acquired: readonly Acquired[]): Promise<void> {
+  for (const { factory, generation } of [...acquired].reverse()) {
+    try {
+      if (factory.release) await factory.release(generation);
+      else if (generation.release) await generation.release();
+      else await generation.dispose?.();
+    } catch {
+      throw error("ZSYS_PROVIDER_RELEASE_FAILED", "Provider release failed.");
+    }
   }
+}
+
+function validateOptions(options: ProviderRegistryOptions): void {
+  if (options.generationId.trim() === "") {
+    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Generation ID is required.");
+  }
+  if (!isProviderTopology(options.providers)) {
+    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Provider topology is invalid.");
+  }
+  if (options.signal?.aborted)
+    throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
 }
 
 function error(
@@ -164,28 +176,4 @@ function error(
       ...(profile === undefined ? {} : { profile }),
     },
   ]);
-}
-
-function modelRegistryError(cause: unknown): ProviderRegistryError | undefined {
-  if (!isRecord(cause) || typeof cause.code !== "string") return undefined;
-  const codes = new Set<ProviderRegistryErrorCode>([
-    "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID",
-    "ZSYS_MODEL_PROVIDER_UNSUPPORTED",
-    "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID",
-    "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE",
-    "ZSYS_MODEL_SELECTOR_INVALID",
-    "ZSYS_MODEL_PROVIDER_UNKNOWN",
-    "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
-  ]);
-  if (!codes.has(cause.code as ProviderRegistryErrorCode)) return undefined;
-  return new ProviderRegistryError([
-    {
-      code: cause.code as ProviderRegistryErrorCode,
-      message: typeof cause.message === "string" ? cause.message : "Model provider is invalid.",
-    },
-  ]);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object";
 }
