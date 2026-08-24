@@ -42,7 +42,12 @@ export interface OpenApiOperation {
     readonly routeId: string;
     readonly functionId: string;
     readonly serviceId?: string;
-    readonly middleware: readonly { readonly id: string; readonly targetFunctionId: string }[];
+    readonly middleware: readonly {
+      readonly id: string;
+      readonly path: string;
+      readonly order: number;
+      readonly match: "always" | "conditional";
+    }[];
     readonly transforms: readonly string[];
     readonly rateLimit?: JsonValue;
   };
