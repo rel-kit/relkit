@@ -160,8 +160,8 @@ async function configureProductFixture(root: string, modelBaseUrl: string): Prom
         "const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000), OPENAI_API_KEY: envFactory.secret() });",
       )
       .replace(
-        "development: localProviders(),",
-        `development: localProviders({ modelProviders: { defaultProvider: "openai", defaultModel: "gpt-5-mini", openai: { apiKey: env.OPENAI_API_KEY, baseURL: "${modelBaseUrl}" } } }),`,
+        "openai: { apiKey: env.MODEL_API_KEY },",
+        `openai: { apiKey: env.MODEL_API_KEY, baseURL: "${modelBaseUrl}" },`,
       ),
   );
   const functionPath = join(root, "src/functions/create-order.function.ts");
@@ -169,8 +169,8 @@ async function configureProductFixture(root: string, modelBaseUrl: string): Prom
   await writeFile(
     functionPath,
     source.replace(
-      "handler: async (input, _request, context) => {",
-      'handler: async (input, _request, context) => {\n    context.log.info("creating order", { password: input.sku });',
+      "handler: async (input, context) => {",
+      'handler: async (input, context) => {\n    context.log.info("creating order", { password: input.sku });',
     ),
   );
 }
@@ -201,6 +201,7 @@ async function copyFullProject(): Promise<string> {
     "jobs",
     "observability",
     "providers-local",
+    "providers-standard",
     "routes",
     "runtime-effect",
     "runtime-hono",

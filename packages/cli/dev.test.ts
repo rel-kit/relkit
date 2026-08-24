@@ -7,6 +7,7 @@ import { startDev, type DevOptions } from "./src/commands/dev.js";
 import {
   configuredInspectorOptions,
   defaultInspectorOptions,
+  resolveInspectorInstallation,
 } from "./src/commands/dev-inspector.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
@@ -171,11 +172,25 @@ test("redacts candidate output before callbacks and human sinks", () => {
   expect(JSON.stringify({ callbacks, output })).not.toContain(secret);
 });
 
-test("uses the workspace Next inspector and configured port by default", () => {
+test("prefers the workspace Next inspector and configured port by default", () => {
   const options = defaultInspectorOptions(3217);
   expect(options.command).toEqual([process.execPath, "run", "dev"]);
   expect(options.cwd?.endsWith("/apps/inspector")).toBe(true);
   expect(options.port).toBe(3217);
+});
+
+test("prefers source when a compiled CLI also contains the packaged inspector", async () => {
+  const root = await makeRoot();
+  const source = join(root, "apps", "inspector");
+  const compiled = join(root, "packages", "cli", "dist", "commands");
+  await mkdir(source, { recursive: true });
+  await mkdir(join(compiled, "..", "inspector"), { recursive: true });
+  await writeFile(join(source, "package.json"), "{}\n");
+  await writeFile(join(compiled, "..", "inspector", "server.js"), "\n");
+
+  const options = resolveInspectorInstallation(compiled, {});
+  expect(options.command).toEqual([process.execPath, "run", "dev"]);
+  expect(options.root).toBe(source);
 });
 
 test("reads the inspector port from zsys.config.ts unless the CLI overrides it", async () => {
