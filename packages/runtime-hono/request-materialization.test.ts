@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION, type FunctionRequest } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { RegistrationPlan } from "@zsys/graph";
 import { createApp } from "./src/index.ts";
 
 describe("framework-neutral HTTP request materialization", () => {
-  test("preserves immutable params, repeated values, and transport metadata", async () => {
-    const requests: FunctionRequest[] = [];
+  test("keeps params, repeated values, and headers inside HTTP input mapping", async () => {
+    let mapped: import("./src/index.ts").HttpRouteRequest | undefined;
     const plan = routePlan();
     const app = createApp({
       plan,
@@ -21,13 +21,12 @@ describe("framework-neutral HTTP request materialization", () => {
         requestId: () => "request.test",
         traceId: () => "trace.test",
       },
-      mapInput: () => ({}),
+      mapInput: (request) => {
+        mapped = request;
+        return {};
+      },
       engine: {
-        invoke: async (options) => {
-          if (options.functionId === "orders.get" && options.request !== undefined)
-            requests.push(options.request);
-          return { ok: true };
-        },
+        invoke: async () => ({ ok: true }),
       },
     });
 
@@ -37,30 +36,12 @@ describe("framework-neutral HTTP request materialization", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(requests).toHaveLength(1);
-    const request = requests[0]!;
-    expect(request.params).toEqual({ orderId: "order-1", productId: "product-2" });
-    expect(request.query).toEqual({ tag: ["red", "blue"] });
-    expect(request.headers.getAll("x-tags")).toEqual(["one", "two"]);
-    expect(request.headers.get("x-tags")).toBe("one, two");
-    expect(request.metadata).toEqual({
-      kind: "http",
-      routeId: "orders.get.route",
-      pathPattern: "/orders/:orderId/products/:productId",
-      requestId: "request.test",
-      traceId: "trace.test",
-      correlationId: "request.test",
-    });
-    expect(Object.isFrozen(request)).toBe(true);
-    expect(Object.isFrozen(request.params)).toBe(true);
-    expect(Object.isFrozen(request.query)).toBe(true);
-    expect(Object.isFrozen(request.query.tag)).toBe(true);
-    expect(Object.isFrozen(request.headers)).toBe(true);
-    expect(Object.isFrozen(request.headers.values)).toBe(true);
-    expect(Object.isFrozen(request.metadata)).toBe(true);
-    expect(() => Object.defineProperty(request.query, "extra", { value: "value" })).toThrow();
-    expect(() => (request.query.tag as string[]).push("green")).toThrow();
-    expect(request.clone().query).toEqual(request.query);
+    expect(mapped?.params).toEqual({ orderId: "order-1", productId: "product-2" });
+    expect(mapped?.query).toEqual({ tag: ["red", "blue"] });
+    expect(mapped?.headers["x-tags"]).toEqual(["one", "two"]);
+    expect(mapped?.pathPattern).toBe("/orders/:orderId/products/:productId");
+    expect(Object.isFrozen(mapped?.params)).toBe(true);
+    expect(Object.isFrozen(mapped?.query)).toBe(true);
   });
 });
 
@@ -92,5 +73,6 @@ function routePlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }

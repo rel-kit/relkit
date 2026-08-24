@@ -99,14 +99,12 @@ test("the engine receives function input and the public context, never Hono cont
   let observedContext: {
     readonly invocation: { readonly correlationId?: string; readonly traceId: string };
   };
-  let observedRequest: { readonly url: string } | undefined;
   const target: InvocationTarget = {
     id: "hello",
     input,
     output,
-    handler: (value, request, context) => {
+    handler: (value, context) => {
       observedInput = value;
-      observedRequest = request;
       observedContext = context;
       return { ok: true };
     },
@@ -122,7 +120,6 @@ test("the engine receives function input and the public context, never Hono cont
           ...(options.signal === undefined ? {} : { signal: options.signal }),
           ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
           ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
-          ...(options.request === undefined ? {} : { request: options.request }),
         }),
     },
   });
@@ -132,7 +129,6 @@ test("the engine receives function input and the public context, never Hono cont
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({ ok: true });
   expect(observedInput).toEqual({});
-  expect(observedRequest?.url).toBe("http://localhost/hello");
   expect((observedContext as Record<string, unknown>).req).toBeUndefined();
   expect(observedContext?.invocation.correlationId).toBe("request.fixed");
   expect(observedContext?.invocation.traceId).toBe("trace.fixed");
@@ -166,6 +162,7 @@ function plan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 

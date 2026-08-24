@@ -266,5 +266,6 @@ function routePlan(): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
