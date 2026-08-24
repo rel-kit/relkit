@@ -30,17 +30,12 @@ export type TestRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
-  readonly middleware?: readonly {
-    readonly target: Parameters<TestRuntime["invoke"]>[0];
-    readonly request: unknown;
-  }[];
 };
 
 type AuthoredRoute = Omit<TestRoute, "method" | "path" | "request" | "responses"> & {
   readonly request?: unknown;
   readonly responses?: TestRoute["responses"];
   readonly successStatus?: number;
-  readonly middleware?: TestRoute["middleware"];
 };
 
 export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]> {
@@ -79,7 +74,6 @@ function normalizeRoute(
     target: route.target,
     request: route.request ?? inferRequest(route, method, parsed),
     responses: route.responses ?? inferResponses(route),
-    ...(route.middleware === undefined ? {} : { middleware: route.middleware }),
   });
 }
 

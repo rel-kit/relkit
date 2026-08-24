@@ -1,4 +1,3 @@
-import { createFunctionRequest, type FunctionRequestValue } from "@zsys/contracts";
 import type { TestRoute } from "./application-routes.js";
 import { normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
@@ -12,25 +11,11 @@ export async function handleTestRequest(
   const matched = routes.find((route) => route.method === request.method && match(route.path, url));
   if (matched === undefined) return new Response("Not found", { status: 404 });
   const params = match(matched.path, url) ?? {};
-  const handlerRequest = createFunctionRequest(request.clone(), {
-    params,
-    query: queryValues(url),
-    headers: headerValues(request),
-    metadata: { pathPattern: matched.path },
-  });
   const body = await readBody(request);
   try {
-    for (const middleware of matched.middleware ?? []) {
-      await runtime.invoke(
-        middleware.target,
-        mapInput(middleware.request, url, params, request, body),
-        { request: handlerRequest.clone() },
-      );
-    }
     const value = await runtime.invoke(
       matched.target,
       mapInput(matched.request, url, params, request, body),
-      { request: handlerRequest.clone() },
     );
     const status = matched.responses.find((response) => response.kind === "success")?.status ?? 200;
     const response = new Response(value === undefined ? null : JSON.stringify(value), {
@@ -157,35 +142,6 @@ function match(path: string, url: URL): Record<string, string | readonly string[
 
 function valueAt(value: unknown, name: string): unknown {
   return isRecord(value) ? value[name] : undefined;
-}
-
-function queryValues(url: URL): Record<string, FunctionRequestValue> {
-  const values: Record<string, FunctionRequestValue> = {};
-  for (const [key, value] of url.searchParams.entries()) append(values, key, value);
-  return values;
-}
-
-function headerValues(request: Request): Record<string, FunctionRequestValue> {
-  const values: Record<string, FunctionRequestValue> = {};
-  for (const [key, value] of request.headers.entries()) {
-    // ponytail: Fetch Headers combines repeated values; split the normalized transport value to match Hono.
-    const parts = value
-      .split(",")
-      .map((part) => part.trim())
-      .filter(Boolean);
-    values[key] = parts.length > 1 ? parts : value;
-  }
-  return values;
-}
-
-function append(target: Record<string, FunctionRequestValue>, key: string, value: string): void {
-  const previous = target[key];
-  target[key] =
-    previous === undefined
-      ? value
-      : Array.isArray(previous)
-        ? [...previous, value]
-        : [previous, value];
 }
 
 function isRecord(value: unknown): value is Record<string, any> {
