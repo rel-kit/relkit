@@ -15,7 +15,7 @@ const createOrder = defineFunction({
   },
   timeoutMs: 10_000,
   concurrency: 100,
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     const unitPrice = await context.cache.prices.getOrSet({ sku: input.sku }, async () => 1_000);
     const totalCents = unitPrice * input.quantity;
     await context.events.orderCreated.publish({ ...input, totalCents });

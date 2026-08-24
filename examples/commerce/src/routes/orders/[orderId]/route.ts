@@ -1,7 +1,6 @@
 import { defineRoute, http } from "@zsys/app";
 import orders from "../../../services/orders.service.js";
 import orderNotFound from "../../../errors/order-not-found.error.js";
-import orderAuth from "../../../middleware/order-auth.middleware.js";
 import normalizeOrderId from "../../../transforms/orders/normalize-id.transform.js";
 
 export const GET = defineRoute({
@@ -9,7 +8,6 @@ export const GET = defineRoute({
   request: http.input({
     orderId: http.transform(normalizeOrderId, http.path("orderId")),
   }),
-  middleware: [orderAuth],
   responses: [
     http.success(200, orders.getOrder.output),
     http.error(orderNotFound.id, 404, orderNotFound.data),

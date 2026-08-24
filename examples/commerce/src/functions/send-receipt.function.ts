@@ -6,7 +6,7 @@ const sendReceipt = defineFunction({
   input: receiptInput,
   output: receiptOutput,
   dependencies: { buckets: { assets } },
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     context.log.info("receipt.sent", {
       orderId: input.orderId,
       receiptKey: input.receiptKey,
