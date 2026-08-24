@@ -18,7 +18,7 @@ const createOrder = defineFunction({
   input: orderInput,
   output: orderOutput,
   dependencies: { events: { orderCreated } },
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
     const order = { orderId: input.orderId, sku: input.sku, totalCents };
     await context.events.orderCreated.publish(order);
