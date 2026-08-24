@@ -2,12 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { defineEvent, events, onEvent } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineService } from "../../packages/services/src/index.ts";
-import {
-  defineMiddleware,
-  defineRoute,
-  defineTransform,
-  http,
-} from "../../packages/routes/src/index.ts";
+import { defineRoute, defineTransform, http } from "../../packages/routes/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 
@@ -23,6 +18,8 @@ describe("compiler graph construction", () => {
       dependencies: {
         cache: { prices: { ref: { kind: "cache", id: "prices" }, key: input, value: output } },
       },
+      onBefore: async (value) => value,
+      onAfter: async (value) => value,
       handler: async () => ({ ok: true }),
     });
     const helper = defineFunction({
@@ -45,12 +42,13 @@ describe("compiler graph construction", () => {
       value: output,
     };
     const transform = defineTransform({ id: "orders.normalize", schema: z.string() });
-    const middleware = defineMiddleware({
+    const middleware = {
+      kind: "middleware",
       id: "orders.middleware",
-      target: auth,
-      request: http.input({ id: http.header("x-order-id") }),
-      decision: http.continue(),
-    });
+      ref: { kind: "middleware", id: "orders.middleware" },
+      path: "/orders/*",
+      handler: async () => undefined,
+    };
     const route = defineRoute({
       id: "orders.route",
       method: "GET",
@@ -58,7 +56,6 @@ describe("compiler graph construction", () => {
       target,
       request: http.input({ id: http.transform(transform, http.path("id")) }),
       responses: [http.success(200, output)],
-      middleware: [middleware],
     });
     const first = defineEvent({ id: "orders.created", version: 1, payload: input });
     const second = defineEvent({ id: "orders.updated", version: 2, payload: input });
@@ -120,15 +117,31 @@ describe("compiler graph construction", () => {
 
     const nodes = result.graph?.nodes ?? [];
     expect(nodes.map((node) => node.kind)).not.toEqual(
-      expect.arrayContaining(["route", "event-trigger", "middleware", "transform"]),
+      expect.arrayContaining(["route", "event-trigger", "transform"]),
     );
     const routeNode = nodes.find((node) => node.id === "orders.route");
     const listenerNode = nodes.find((node) => node.id === "orders.listener");
     expect(routeNode).toMatchObject({ kind: "trigger", triggerType: "http" });
     expect(listenerNode).toMatchObject({ kind: "trigger", triggerType: "event" });
+    expect(nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "hook",
+          id: "orders.get.before",
+          ownerId: "orders.get",
+          phase: "before",
+        }),
+        expect.objectContaining({
+          kind: "hook",
+          id: "orders.get.after",
+          ownerId: "orders.get",
+          phase: "after",
+        }),
+      ]),
+    );
     expect(
       (routeNode?.config as { middleware: unknown[]; transforms: unknown[] }).middleware,
-    ).toEqual([{ id: "orders.middleware", targetFunctionId: "orders.auth" }]);
+    ).toEqual([{ id: "orders.middleware", path: "/orders/*", order: 0, match: "always" }]);
     expect(
       (routeNode?.config as { middleware: unknown[]; transforms: unknown[] }).transforms,
     ).toEqual([expect.objectContaining({ id: "orders.normalize" })]);
@@ -152,7 +165,13 @@ describe("compiler graph construction", () => {
     expect(result.graph?.edges).toEqual(
       expect.arrayContaining([
         { kind: "targets-function", from: "orders.route", to: "orders.get", role: "primary" },
-        { kind: "targets-function", from: "orders.route", to: "orders.auth", role: "middleware" },
+        {
+          kind: "uses-middleware",
+          from: "orders.route",
+          to: "orders.middleware",
+          order: 0,
+          match: "always",
+        },
         {
           kind: "targets-function",
           from: "orders.listener",
@@ -162,6 +181,8 @@ describe("compiler graph construction", () => {
         { kind: "listens-to-event", from: "orders.listener", to: "orders.created" },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.updated" },
         { kind: "uses-cache", from: "orders.get", to: "prices" },
+        { kind: "uses-hook", from: "orders.get", to: "orders.get.before", phase: "before" },
+        { kind: "uses-hook", from: "orders.get", to: "orders.get.after", phase: "after" },
         {
           kind: "contains-function",
           from: "orders",

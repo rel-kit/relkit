@@ -76,9 +76,7 @@ describe("commerce-example compiler acceptance", () => {
         .filter((node) => DESCRIPTOR_IDS.includes(node.id))
         .map((node) => node.id)
         .sort(),
-    ).toEqual(
-      DESCRIPTOR_IDS.filter((id) => !["order-auth", "orders.normalize-id"].includes(id)).sort(),
-    );
+    ).toEqual(DESCRIPTOR_IDS.filter((id) => id !== "orders.normalize-id").sort());
     expect(unique(edges.map(edgeKey))).toHaveLength(edges.length);
     expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(16);
     expect(
@@ -124,7 +122,6 @@ describe("commerce-example compiler acceptance", () => {
         ["targets-function", "route.get.docs.optional-catch-all-parts", "browse-path", "primary"],
         ["targets-function", "route.get.files.catch-all-parts", "browse-path", "primary"],
         ["targets-function", "route.delete.orders.by-order-id", "orders.delete-order", "primary"],
-        ["targets-function", "route.get.orders.by-order-id", "authorize-order", "middleware"],
         ["targets-function", "route.get.orders.by-order-id", "orders.get-order", "primary"],
         ["targets-function", "route.post.orders", "orders.create-order", "primary"],
         ["targets-function", "lookup-order", "orders.get-order", "primary"],
@@ -162,15 +159,27 @@ describe("commerce-example compiler acceptance", () => {
         ["uses-bucket", "send-receipt", "assets"],
         ["uses-cache", "orders.create-order", "prices"],
         ["uses-cache", "route.get.orders", "prices"],
-        ["uses-provider-profile", "assets", "default"],
-        ["uses-provider-profile", "order-support", "default"],
-        ["uses-provider-profile", "prices", "default"],
-        ["uses-provider-profile", "receipts.on-order-created", "default"],
-        ["uses-provider-profile", "orders.project-any-change", "default"],
-        ["uses-provider-profile", "orders.audit-changes", "default"],
-        ["uses-provider-profile", "telemetry.capture-events", "default"],
-        ["uses-provider-profile", "receipts.send-job", "default"],
+        ["uses-provider-profile", "assets", "provider.buckets.default"],
+        ["uses-provider-profile", "order-support", "provider.models.default"],
+        ["uses-provider-profile", "prices", "provider.cache.default"],
+        ["uses-provider-profile", "orders.created", "provider.events.default"],
+        ["uses-provider-profile", "orders.updated", "provider.events.default"],
+        ["uses-provider-profile", "orders.cancelled", "provider.events.default"],
+        ["uses-provider-profile", "receipts.on-order-created", "provider.events.default"],
+        ["uses-provider-profile", "orders.project-any-change", "provider.events.default"],
+        ["uses-provider-profile", "orders.audit-changes", "provider.events.default"],
+        ["uses-provider-profile", "telemetry.capture-events", "provider.events.default"],
+        ["uses-provider-profile", "receipts.send-job", "provider.jobs.default"],
         ["uses-tool", "order-support", "lookup-order"],
+        ["uses-middleware", "route.delete.orders.by-order-id", "order-auth", "0"],
+        ["uses-middleware", "route.get.orders.by-order-id", "order-auth", "0"],
+        ["uses-middleware", "route.get.orders.search", "order-auth", "0"],
+        ["uses-middleware", "route.get.orders", "order-auth", "0"],
+        ["uses-middleware", "route.head.orders.by-order-id", "order-auth", "0"],
+        ["uses-middleware", "route.options.orders.by-order-id", "order-auth", "0"],
+        ["uses-middleware", "route.patch.orders.by-order-id", "order-auth", "0"],
+        ["uses-middleware", "route.post.orders", "order-auth", "0"],
+        ["uses-middleware", "route.put.orders.by-order-id", "order-auth", "0"],
         ["contains-function", "orders", "orders.create-order", "createOrder", "0"],
         ["contains-function", "orders", "orders.delete-order", "deleteOrder", "1"],
         ["contains-function", "orders", "orders.get-order", "getOrder", "2"],
@@ -227,13 +236,13 @@ describe("commerce-example compiler acceptance", () => {
         generated: { generated: true, generatedBy: "event-listener", functionId },
       });
     }
-    expect(run.manifest.match(/^const __zsys_middleware_\d+ =/gm)).toHaveLength(1);
+    expect(run.manifest.match(/^const __zsys_middleware_\d+ =/gm) ?? []).toHaveLength(0);
     expect(mapIds(run.manifest, "middleware")).toEqual(["order-auth"]);
     expect(mapIds(run.manifest, "requestTransforms")).toEqual(["orders.normalize-id"]);
 
     const route = nodes.find((node) => node.id === "route.get.orders.by-order-id");
     expect(route?.config.middleware).toEqual([
-      { id: "order-auth", targetFunctionId: "authorize-order" },
+      { id: "order-auth", path: "/orders/*", order: 0, match: "always" },
     ]);
     expect(route?.config.transforms).toEqual([
       expect.objectContaining({ id: "orders.normalize-id" }),
