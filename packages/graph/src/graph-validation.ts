@@ -1,5 +1,6 @@
 import { isStableId, normalizeSourceLocation } from "@zsys/contracts";
 import { isGraphEdgeKind, isGraphNodeKind } from "./model.js";
+import { validateProviderNode } from "./provider-validation.js";
 
 export function validateGraphShape(value: unknown, root?: string): void {
   if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
@@ -34,6 +35,21 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
     validateHttpIdentities(value.config, index);
   }
   if (value.kind === "service") validateService(value, index);
+  if (value.kind === "provider") validateProviderNode(value, index, fail);
+  if (value.kind === "middleware") {
+    if (typeof value.path !== "string" || !Number.isSafeInteger(value.order)) {
+      fail(`Graph nodes[${index}] middleware metadata is invalid.`);
+    }
+  }
+  if (value.kind === "hook") {
+    validateId(value.ownerId, `Graph nodes[${index}].ownerId`);
+    if (!(value.ownerKind === "function" || value.ownerKind === "tool")) {
+      fail(`Graph nodes[${index}].ownerKind is invalid.`);
+    }
+    if (!(value.phase === "before" || value.phase === "after")) {
+      fail(`Graph nodes[${index}].phase is invalid.`);
+    }
+  }
 }
 
 function validateGenerated(value: unknown, index: number, field: string): void {
@@ -52,6 +68,14 @@ function validateHttpIdentities(value: unknown, index: number): void {
       if (!isRecord(entry))
         fail(`Graph nodes[${index}].config.${field}[${entryIndex}] is invalid.`);
       validateId(entry.id, `Graph nodes[${index}].config.${field}[${entryIndex}].id`);
+      if (field === "middleware") {
+        if (
+          typeof entry.path !== "string" ||
+          !Number.isSafeInteger(entry.order) ||
+          (entry.match !== "always" && entry.match !== "conditional")
+        )
+          fail(`Graph nodes[${index}].config.middleware[${entryIndex}] is invalid.`);
+      }
       if (entry.targetFunctionId !== undefined) {
         validateId(
           entry.targetFunctionId,
@@ -97,21 +121,24 @@ function validateEdge(value: unknown, index: number): void {
   }
   validateId(value.from, `Graph edges[${index}].from`);
   validateId(value.to, `Graph edges[${index}].to`);
-  if (
-    value.kind === "targets-function" &&
-    value.role !== "primary" &&
-    value.role !== "middleware"
-  ) {
+  if (value.kind === "targets-function" && value.role !== "primary") {
     fail(`Graph edges[${index}].role is invalid.`);
   }
   if (value.kind === "contains-function" && !nonEmpty(value.member)) {
     fail(`Graph edges[${index}].member is invalid.`);
   }
   if (
-    (value.kind === "contains-function" || value.kind === "uses-service-middleware") &&
+    (value.kind === "contains-function" ||
+      value.kind === "uses-service-middleware" ||
+      value.kind === "uses-middleware") &&
     (!Number.isSafeInteger(value.order) || (value.order as number) < 0)
   ) {
     fail(`Graph edges[${index}].order is invalid.`);
+  }
+  if (value.kind === "uses-middleware" && value.match !== "always" && value.match !== "conditional")
+    fail(`Graph edges[${index}].match is invalid.`);
+  if (value.kind === "uses-hook" && value.phase !== "before" && value.phase !== "after") {
+    fail(`Graph edges[${index}].phase is invalid.`);
   }
 }
 

@@ -5,7 +5,7 @@ import type {
   GeneratedAgentMarker,
   GeneratedFunctionMarker,
 } from "./foundation-nodes.js";
-import type { ServiceMemberEdge, ServiceMiddlewareEdge, ServiceNode } from "./service-nodes.js";
+import type { ServiceNode } from "./service-nodes.js";
 
 export const GRAPH_NODE_KINDS = [
   "app",
@@ -20,6 +20,8 @@ export const GRAPH_NODE_KINDS = [
   "agent",
   "provider",
   "service",
+  "middleware",
+  "hook",
 ] as const;
 export type GraphNodeKind = (typeof GRAPH_NODE_KINDS)[number];
 export type GraphTriggerType = "http" | "queue" | "schedule" | "event";
@@ -38,9 +40,11 @@ export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly generated?: GeneratedFunctionMarker;
 }
 export type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
-export interface MiddlewareTargetRef {
+export interface MiddlewareRouteRef {
   readonly id: string;
-  readonly targetFunctionId: string;
+  readonly path: string;
+  readonly order: number;
+  readonly match: "always" | "conditional";
 }
 export interface TransformProjection {
   readonly id: string;
@@ -55,7 +59,7 @@ export interface HttpTriggerConfig {
   readonly runtimePaths?: readonly string[];
   readonly request: JsonValue;
   readonly responses: JsonValue;
-  readonly middleware: readonly MiddlewareTargetRef[];
+  readonly middleware: readonly MiddlewareRouteRef[];
   readonly transforms: readonly TransformProjection[];
   readonly rateLimit?: {
     readonly limit: number;
@@ -118,6 +122,15 @@ export interface ToolNode extends GraphNodeBase<"tool"> {
   readonly approval: "never" | "on-write" | "always";
   readonly timeoutMs?: number;
 }
+export interface MiddlewareNode extends GraphNodeBase<"middleware"> {
+  readonly path: string;
+  readonly order: number;
+}
+export interface HookNode extends GraphNodeBase<"hook"> {
+  readonly ownerId: string;
+  readonly ownerKind: "function" | "tool";
+  readonly phase: "before" | "after";
+}
 export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly input: JsonValue;
   readonly output: JsonValue;
@@ -129,9 +142,15 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
 }
 export interface ProviderProfileNode extends GraphNodeBase<"provider"> {
   readonly profile: string;
-  readonly capabilities: readonly string[];
+  readonly capability: string;
+  readonly adapter: string;
+  readonly ownership: "external" | "managed";
   readonly configuration: JsonValue;
-  readonly environment: readonly string[];
+  readonly environment: readonly {
+    readonly name: string;
+    readonly type: string;
+    readonly sensitive: boolean;
+  }[];
 }
 export type GraphNode =
   | AppNode
@@ -145,50 +164,21 @@ export type GraphNode =
   | ToolNode
   | AgentNode
   | ProviderProfileNode
-  | ServiceNode;
-export const GRAPH_EDGE_KINDS = [
-  "targets-function",
-  "calls-function",
-  "enqueues-job",
-  "publishes-event",
-  "listens-to-event",
-  "uses-bucket",
-  "uses-cache",
-  "invokes-agent",
-  "exposes-as-tool",
-  "uses-tool",
-  "uses-provider-profile",
-  "contains-function",
-  "uses-service-middleware",
-] as const;
-export type GraphEdgeKind = (typeof GRAPH_EDGE_KINDS)[number];
-export type TargetFunctionRole = "primary" | "middleware";
-export interface GraphEdgeBase<Kind extends GraphEdgeKind = GraphEdgeKind> {
-  readonly kind: Kind;
-  readonly from: string;
-  readonly to: string;
-}
-export interface TargetsFunctionEdge extends GraphEdgeBase<"targets-function"> {
-  readonly role: TargetFunctionRole;
-}
-export type GraphEdge =
-  | TargetsFunctionEdge
-  | GraphEdgeBase<"calls-function">
-  | GraphEdgeBase<"enqueues-job">
-  | GraphEdgeBase<"publishes-event">
-  | GraphEdgeBase<"listens-to-event">
-  | GraphEdgeBase<"uses-bucket">
-  | GraphEdgeBase<"uses-cache">
-  | GraphEdgeBase<"invokes-agent">
-  | GraphEdgeBase<"exposes-as-tool">
-  | GraphEdgeBase<"uses-tool">
-  | GraphEdgeBase<"uses-provider-profile">
-  | ServiceMemberEdge
-  | ServiceMiddlewareEdge;
+  | ServiceNode
+  | MiddlewareNode
+  | HookNode;
+export {
+  GRAPH_EDGE_KINDS,
+  isGraphEdgeKind,
+  type GraphEdge,
+  type GraphEdgeBase,
+  type GraphEdgeKind,
+  type TargetsFunctionEdge,
+  type UsesHookEdge,
+  type UsesMiddlewareEdge,
+} from "./graph-edges.js";
+export type TargetFunctionRole = "primary";
 export type { ApplicationGraph, Graph, ObservedEdge } from "./graph-types.js";
 export function isGraphNodeKind(value: unknown): value is GraphNodeKind {
   return typeof value === "string" && (GRAPH_NODE_KINDS as readonly string[]).includes(value);
-}
-export function isGraphEdgeKind(value: unknown): value is GraphEdgeKind {
-  return typeof value === "string" && (GRAPH_EDGE_KINDS as readonly string[]).includes(value);
 }

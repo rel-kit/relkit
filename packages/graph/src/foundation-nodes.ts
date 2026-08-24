@@ -3,7 +3,7 @@ import type { GraphNodeBase } from "./model.js";
 
 export interface AppNode extends GraphNodeBase<"app"> {
   readonly environment?: JsonValue;
-  readonly providerProfiles?: readonly string[];
+  readonly providerBindings?: readonly string[];
   readonly observability?: JsonValue;
   readonly defaults?: JsonValue;
 }
