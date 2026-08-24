@@ -70,7 +70,7 @@ describe("function tool views", () => {
       id: "orders.invoke",
       input,
       output,
-      handler: async (_input, _request, context) => {
+      handler: async (_input, context) => {
         sources.push(context.invocation.source);
         return { ok: true };
       },
@@ -171,6 +171,58 @@ describe("function tool views", () => {
     });
     expect(approvals).toBe(1);
     expect(executions).toBe(1);
+  });
+
+  test("runs approval, tool hooks, and function hooks in pipeline order", async () => {
+    const events: string[] = [];
+    const target = defineFunction({
+      id: "orders.hooked-tool",
+      input,
+      output,
+      onBefore: (value) => {
+        events.push("function-before");
+        return value;
+      },
+      handler: async () => {
+        events.push("handler");
+        return { ok: true };
+      },
+      onAfter: (value) => {
+        events.push("function-after");
+        return value;
+      },
+    });
+    const tool = target.asTool({
+      description: "Update an order",
+      sideEffect: "write",
+      approval: "always",
+      onBefore: (value) => {
+        events.push("tool-before");
+        return value;
+      },
+      onAfter: (value) => {
+        events.push("tool-after");
+        return value;
+      },
+    });
+
+    await tool.invoke(
+      { id: "order-1" },
+      {
+        approval: () => {
+          events.push("approval");
+          return "approved";
+        },
+      },
+    );
+    expect(events).toEqual([
+      "approval",
+      "tool-before",
+      "function-before",
+      "handler",
+      "function-after",
+      "tool-after",
+    ]);
   });
 
   test("applies the tool timeout", async () => {
