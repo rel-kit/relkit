@@ -1,4 +1,4 @@
-import { deepFreeze, isStableId, normalizeId, type DescriptorMetadata } from "@zsys/contracts";
+import { deepFreeze, normalizeId, type DescriptorMetadata } from "@zsys/contracts";
 import {
   createUnboundIdentity,
   getDescriptorIdentity,
@@ -12,6 +12,9 @@ import {
   type InferOutput,
   type StandardSchemaV1,
 } from "@zsys/schema";
+import { assertErrorSchema, validateErrorHttp } from "./define-error-validation.js";
+
+export { isErrorDescriptor } from "./define-error-validation.js";
 
 export type { ErrorRetry, ErrorRetryInput, NormalizedErrorRetry } from "@zsys/invocation";
 
@@ -112,14 +115,14 @@ export interface DefineErrorOptions<
 export function defineError<const Id extends string, const DataSchema extends StandardSchemaV1>(
   options: DefineErrorOptions<Id, DataSchema>,
 ): ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema> {
-  assertSchema(options.data);
+  assertErrorSchema(options.data);
   if (typeof options.message !== "string" && typeof options.message !== "function") {
     throw new TypeError("Error message must be a string or function");
   }
   const id = normalizeId(
     options.id === undefined ? createUnboundIdentity() : options.id,
   ) as unknown as Id;
-  validateHttp(options.http);
+  validateErrorHttp(options.http);
   const retry = normalizeErrorRetry(options.retry);
 
   const ref = Object.freeze({ kind: "error" as const, id });
@@ -177,49 +180,4 @@ export function defineError<const Id extends string, const DataSchema extends St
   Object.freeze(DefinedError.prototype);
   Object.freeze(DefinedError);
   return DefinedError as unknown as ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
-}
-
-export function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {
-  if (!isRecord(value)) return false;
-  const ref = value.ref;
-  try {
-    normalizeErrorRetry(value.retry, value.afterMs);
-  } catch {
-    return false;
-  }
-  return (
-    value.kind === "error" &&
-    isStableId(value.id) &&
-    isRecord(ref) &&
-    ref.kind === "error" &&
-    ref.id === value.id &&
-    Reflect.ownKeys(ref).length === 2 &&
-    typeof value.create === "function"
-  );
-}
-
-function validateHttp(http: ErrorHttpMapping | undefined): void {
-  if (
-    http !== undefined &&
-    (!Number.isInteger(http.status) || http.status < 100 || http.status > 599)
-  ) {
-    throw new TypeError("Error HTTP status must be an integer from 100 through 599");
-  }
-}
-
-function assertSchema(value: unknown): asserts value is StandardSchemaV1 {
-  if (!isRecord(value))
-    throw new TypeError("Declared error data must be a Standard Schema v1 validator");
-  const standard = value["~standard"];
-  if (!isRecord(standard) || standard.version !== 1 || typeof standard.validate !== "function") {
-    throw new TypeError("Declared error data must be a Standard Schema v1 validator");
-  }
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
-  return (
-    value !== null &&
-    (typeof value === "object" || typeof value === "function") &&
-    !Array.isArray(value)
-  );
 }

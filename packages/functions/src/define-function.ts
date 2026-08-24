@@ -1,4 +1,4 @@
-import { createDescriptorBase, deepFreeze, isRef, type DescriptorKind } from "@zsys/contracts";
+import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
 import {
   createUnboundIdentity,
   dispatchInvocation,
@@ -10,9 +10,17 @@ import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
 import type { DefineFunction } from "./define-function-types.js";
 import {
   copyFunctionToolMetadata,
+  copyFunctionToolHooks,
   createFunctionTool,
   type FunctionToolOptions,
 } from "./function-tool.js";
+import {
+  assertSchema,
+  assertHook,
+  copyDependencies,
+  functionTargetForReceiver,
+  validateLimit,
+} from "./define-function-validation.js";
 import type {
   DefineFunctionOptions,
   FunctionDependencies,
@@ -60,7 +68,6 @@ export type {
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
-  FunctionRequest,
   FunctionRef,
   FunctionRefAny,
   InvocationMetadata,
@@ -83,8 +90,8 @@ export type {
  *
  * The `id` is optional for source-scoped functions; the compiler derives it from the
  * source/export hierarchy. Durable resources keep explicit IDs. The handler receives
- * validated reusable input, an immutable HTTP request when the call has HTTP transport,
- * and a request-scoped context. Use `descriptor.invoke(input)` for nested calls so the
+ * validated reusable input and an invocation-scoped context. Use `descriptor.invoke(input)`
+ * for nested calls so the
  * common engine preserves validation, service policy, limits, and telemetry.
  *
  * @example
@@ -95,8 +102,8 @@ export type {
  * const greet = defineFunction({
  *   input: z.object({ name: z.string() }),
  *   output: z.object({ message: z.string() }),
- *   handler: async ({ name }, request, context) => {
- *     context.log.info("greeting requested", { url: request?.url })
+ *   handler: async ({ name }, context) => {
+ *     context.log.info("greeting requested")
  *     return { message: `Hello, ${name}!` }
  *   }
  * })
@@ -121,6 +128,8 @@ export const defineFunction: DefineFunction = (
   if (typeof options.handler !== "function") {
     throw new TypeError("Function handler must be a function");
   }
+  assertHook(options.onBefore, "onBefore");
+  assertHook(options.onAfter, "onAfter");
   validateLimit(options.timeoutMs, "timeoutMs");
   validateLimit(options.concurrency, "concurrency");
   const id = options.id === undefined ? createUnboundIdentity() : options.id;
@@ -137,6 +146,8 @@ export const defineFunction: DefineFunction = (
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
     ...(tool === undefined ? {} : { tool }),
+    ...(options.onBefore === undefined ? {} : { onBefore: options.onBefore }),
+    ...(options.onAfter === undefined ? {} : { onAfter: options.onAfter }),
     handler: options.handler,
   };
   Object.defineProperty(descriptor, "invoke", {
@@ -162,8 +173,10 @@ export const defineFunction: DefineFunction = (
         );
       }
       const target = functionTargetForReceiver(this, descriptor as unknown as FunctionRefAny);
+      const hooks = toolOptions === undefined ? {} : copyFunctionToolHooks(toolOptions);
       return createFunctionTool({
         ...metadata,
+        ...hooks,
         id: toolOptions?.id ?? `${getDescriptorIdentity(target)}.tool`,
         target,
       });
@@ -186,64 +199,4 @@ function copyErrors<E extends readonly ErrorDescriptorAny[]>(errors: E | undefin
   if (!errors.every(isErrorDescriptor))
     throw new TypeError("Function errors must be declared errors");
   return Object.freeze([...errors]) as E;
-}
-
-function copyDependencies<D extends FunctionDependencies>(
-  dependencies: D | undefined,
-): D | undefined {
-  if (dependencies === undefined) return undefined;
-  if (Object.hasOwn(dependencies, "functions")) {
-    throw new TypeError("Function dependencies are not supported; use descriptor.invoke");
-  }
-  const result: Record<string, unknown> = {};
-  const kinds: Readonly<Record<string, DescriptorKind>> = {
-    jobs: "job",
-    events: "event",
-    buckets: "bucket",
-    cache: "cache",
-    agents: "agent",
-  };
-  for (const [name, kind] of Object.entries(kinds)) {
-    const map = dependencies[name as keyof FunctionDependencies];
-    if (map === undefined) continue;
-    if (!isRecord(map)) throw new TypeError(`Function dependency map "${name}" must be an object`);
-    const copied: Record<string, unknown> = {};
-    for (const [client, target] of Object.entries(map)) {
-      if (!isRecord(target) || !isRef(target.ref, kind)) {
-        throw new TypeError(`Invalid ${name} dependency "${client}"`);
-      }
-      copied[client] = target;
-    }
-    result[name] = Object.freeze(copied);
-  }
-  return Object.freeze(result) as D;
-}
-
-function validateLimit(value: number | undefined, name: string): void {
-  if (value !== undefined && (!Number.isSafeInteger(value) || value < 1)) {
-    throw new TypeError(`${name} must be a positive integer`);
-  }
-}
-
-function assertSchema(value: unknown, name: string): asserts value is StandardSchemaV1 {
-  if (!isRecord(value)) throw new TypeError(`${name} must be a Standard Schema v1 validator`);
-  const standard = value["~standard"];
-  if (!isRecord(standard) || standard.version !== 1 || typeof standard.validate !== "function") {
-    throw new TypeError(`${name} must be a Standard Schema v1 validator`);
-  }
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function functionTargetForReceiver(receiver: unknown, fallback: FunctionRefAny): FunctionRefAny {
-  if (
-    isRecord(receiver) &&
-    isRef(receiver.ref, "function") &&
-    typeof receiver.handler === "function"
-  ) {
-    return receiver as unknown as FunctionRefAny;
-  }
-  return fallback;
 }

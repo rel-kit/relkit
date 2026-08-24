@@ -7,7 +7,7 @@ import type {
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
-  FunctionRequest,
+  FunctionLifecycleHook,
 } from "./types.js";
 
 type FunctionCallOptions<
@@ -17,11 +17,12 @@ type FunctionCallOptions<
   Dependencies extends FunctionDependencies,
 > = Omit<
   DefineFunctionOptions<Id, InputSchema, OutputSchema, Dependencies, readonly ErrorDescriptorAny[]>,
-  "handler"
+  "handler" | "onBefore" | "onAfter"
 > & {
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies>;
   readonly handler: (
     input: InferOutput<InputSchema>,
-    request: FunctionRequest,
     context: FunctionContext<Dependencies>,
   ) => unknown;
 };
