@@ -5,8 +5,10 @@ import { dependencyName, importReferences } from "../../scripts/boundary-imports
 
 const allowedPackages = new Set([
   "@xyflow/react",
+  "class-variance-authority",
   "lucide-react",
   "next",
+  "radix-ui",
   "react",
   "react-aria-components",
   "react-dom",
@@ -28,6 +30,7 @@ export const FORBIDDEN_PAYLOAD_MARKERS = Object.freeze([
   "examples/commerce",
   "packages/engine",
   "packages/providers-local",
+  "packages/providers-standard",
   "packages/cloud-aws",
   "inspector-synthetic-secret-14-16",
   "inspector-synthetic-provider-client-14-16",

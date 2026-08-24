@@ -35,7 +35,7 @@ const source = (file: string, line: number) => ({ file, line, column: 1 });
 const schema = (type: string): Record<string, unknown> => ({ type });
 
 const graph = {
-  contractVersion: 2,
+  contractVersion: 3,
   appId: "commerce-api",
   nodes: [
     {
