@@ -1,45 +1,62 @@
 ---
 title: Application, providers, and configuration
-description: Define the application once and select logical provider profiles by environment.
+description: Define one provider topology and supply environment values from each pipeline.
 ---
 
-`src/app.ts` exports one `defineApp` descriptor. Providers are logical profiles; functions depend on
-declared resources rather than concrete SDK clients. AI model providers use the same value-free
-configuration boundary and are constructed only after the active environment resolves.
+`src/app.ts` exports one `defineApp` descriptor. The topology does not branch by development,
+test, or production. A deployment pipeline supplies different values for the same environment keys.
 
 ```ts
-import { awsProviders, defineApp, localProviders, testProviders } from "@zsys/app";
+import { defineEnv, env, external, redis, s3 } from "@zsys/app";
+
+const values = defineEnv({
+  BUCKET_ENDPOINT: env.url(),
+  BUCKET_NAME: env.string(),
+  BUCKET_REGION: env.string(),
+  BUCKET_ACCESS_KEY_ID: env.secret().optional(),
+  BUCKET_SECRET_ACCESS_KEY: env.secret().optional(),
+  CACHE_URL: env.secret(),
+});
 
 export default defineApp({
   id: "commerce-api",
-  env,
+  env: values,
   providers: {
-    development: localProviders({ stateDirectory: ".zsys/state" }),
-    test: testProviders({ deterministicIds: true, deterministicClock: true }),
-    production: awsProviders({
-      region: env.AWS_REGION,
-      modelProviders: {
-        defaultProvider: "openai",
-        defaultModel: "gpt-5-mini",
-        openai: { apiKey: env.OPENAI_API_KEY },
-        anthropic: {
-          defaultModel: "claude-sonnet-4-5",
-          apiKey: env.ANTHROPIC_API_KEY,
-        },
-      },
-    }),
+    buckets: {
+      default: external(
+        s3({
+          endpoint: values.BUCKET_ENDPOINT,
+          bucketName: values.BUCKET_NAME,
+          region: values.BUCKET_REGION,
+          credentials: {
+            accessKeyId: values.BUCKET_ACCESS_KEY_ID,
+            secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
+          },
+        }),
+      ),
+    },
+    cache: { default: external(redis({ url: values.CACHE_URL })) },
   },
 });
 ```
 
-`defaultProvider` and `defaultModel` are both required when `modelProviders` is present. Provider
-credentials should be `env` references, never live SDK clients or secrets embedded in descriptors.
-Agents may omit `model`, select a provider default by name, or select an exact `provider:model`.
+`s3()` speaks the S3 protocol and works with AWS S3, Cloudflare R2, MinIO, and compatible
+endpoints. `redis()` accepts `redis://` and `rediss://` URLs for Redis, Valkey, ElastiCache, and
+Upstash's Redis protocol. `external(adapter)` connects without provisioning. `managed(adapter)`
+allows the selected deployment target to provision and bind the resource.
 
-Use `defineEnv` for value-free environment contracts. Mark secrets as sensitive and list the profiles
-where each value is required. `PORT` is framework-reserved and must not appear in the application
-environment definition. `zsys env list`, `check`, `explain`, and `example` expose metadata without
-printing secret values.
+Keep provider credentials as secret environment references. Literal secrets are rejected and values
+never enter the graph, manifest, plan, inspector, or logs. `PORT` and `ZSYS_ENV` are framework-reserved;
+pipelines select values without adding environment branches to application source. `requiredIn()`
+remains available when a key is required only in selected runtime modes.
 
-Public configuration only controls server and inspector behavior. `entry`, `source`, `exclude`, and
-`generatedDirectory` are removed; using them produces migration diagnostics rather than being ignored.
+Hosting is separate from resource providers:
+
+```ts title="zsys.config.ts"
+export default defineConfig({
+  deployment: { target: "aws", adapter: "pulumi" },
+});
+```
+
+Tests replace required bindings with deterministic in-memory fakes by default. Explicit integration
+tests can opt into configured protocol adapters.

@@ -13,8 +13,8 @@ bounded retries, timeout, concurrency, and idempotency retention explicitly.
 
 Schedules live on the job descriptor. Give each schedule a stable ID, cron expression, timezone,
 validated input, and overlap policy. Durable retry, redrive, and dead-letter behavior belongs to the
-selected provider. Local and test providers expose deterministic recovery controls; AWS maps durable
-jobs to SQS and schedules to EventBridge Scheduler.
+selected provider binding. Tests use deterministic recovery controls by default; a managed AWS binding
+maps durable jobs to SQS and schedules to EventBridge Scheduler.
 
 Handlers still execute through the common function engine, preserving validation, declared managed
 dependencies, service middleware, observability, cancellation, correlation, and causation. A declared

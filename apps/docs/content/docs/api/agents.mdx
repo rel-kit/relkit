@@ -629,11 +629,7 @@ declare const GENERATED_AGENT_FUNCTION_SUFFIX: ".invoke";
 **Signature**
 
 ```ts
-type GeneratedAgentExecutor = (
-  input: unknown,
-  request: unknown,
-  context: unknown,
-) => MaybePromise<unknown>;
+type GeneratedAgentExecutor = (input: unknown, context: unknown) => MaybePromise<unknown>;
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L14)
@@ -647,7 +643,7 @@ type GeneratedAgentFunction = ((...arguments_: readonly unknown[]) => MaybePromi
   GeneratedAgentFunctionMarker;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L20)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L16)
 
 ## GeneratedAgentFunctionMarker (interface)
 
@@ -678,7 +674,7 @@ declare class GeneratedAgentFunctionUnboundError {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L26)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L22)
 
 ### code (property)
 
@@ -688,7 +684,7 @@ declare class GeneratedAgentFunctionUnboundError {
 readonly code: "ZSYS_GENERATED_FUNCTION_UNBOUND"
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L23)
 
 ## createGeneratedAgentFunction
 
@@ -703,7 +699,7 @@ declare const createGeneratedAgentFunction: (
 ) => GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L41)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L37)
 
 ## generatedAgentFunctionId
 
@@ -715,7 +711,7 @@ Derives the stable generated function ID without using the source path.
 declare const generatedAgentFunctionId: (agentId: unknown) => string;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L32)
 
 ## isGeneratedAgentFunction
 
@@ -725,7 +721,7 @@ declare const generatedAgentFunctionId: (agentId: unknown) => string;
 declare const isGeneratedAgentFunction: (value: unknown) => value is GeneratedAgentFunction;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L63)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/generated-function.ts#L59)
 
 ## `index.ts`
 

@@ -3,7 +3,7 @@ title: Functions
 description: Define the validated executable unit shared by every transport and background trigger.
 ---
 
-Every route, job, event listener, route middleware target, service member, tool, and agent ultimately
+Every route, job, event listener, service member, tool, and agent ultimately
 invokes a function through the common engine.
 
 <include
@@ -16,8 +16,8 @@ invokes a function through the common engine.
 
 `input` and `output` remain required because TypeScript types disappear at runtime. Their Standard
 Schemas perform validation and provide graph metadata, OpenAPI shapes, generated client types, and
-inspector forms. A target handler receives validated reusable input, an optional immutable HTTP
-request, and a context containing only its declared managed dependencies.
+inspector forms. A target handler receives validated reusable input and a context containing only its
+declared managed dependencies. HTTP request objects never enter a function.
 
 IDs are optional for source-scoped functions, routes, services, tools, agents, errors, middleware, and
 transforms. The compiler derives filesystem-safe IDs from source and export/member structure. Keep
@@ -29,9 +29,12 @@ running and otherwise uses an isolated common kernel, preserving validation, ser
 trace, correlation, causation, deadline, cancellation, and observed child-call telemetry. Function
 calls do not need a declared function dependency map; managed resources still do.
 
-For HTTP, transport data stays on `request`: `request.params`, `request.query`, and normalized
-`request.headers` are immutable, and unmatched path values remain there instead of becoming artificial
-business input. Direct, job, event, tool, and agent calls pass no fabricated request.
+For HTTP, the route maps transport data into validated function input after matching middleware has
+completed. Direct, HTTP, job, event, tool, and agent calls therefore use the same handler signature.
+
+Use `onBefore(input, context)` to transform validated input and `onAfter(output, context)` to transform
+a successful result. Each returned value is validated against the function schema; `onAfter` does not
+run after a failure.
 
 Services group member functions and shared policy without owning another handler:
 
