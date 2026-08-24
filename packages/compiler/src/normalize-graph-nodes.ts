@@ -1,5 +1,10 @@
 import type { JsonValue } from "@zsys/contracts";
 import { clean } from "./normalize-graph-utils.js";
+import {
+  environmentMetadata,
+  environmentNodes,
+  providerBindingIds,
+} from "./normalize-graph-app.js";
 import { eventConfig, httpConfig } from "./normalize-graph-config.js";
 import { providerNodes } from "./normalize-graph-providers.js";
 import { generatedAgentMarker, generatedFunctionNode } from "./normalize-generated-function.js";
@@ -9,9 +14,13 @@ import { isRecord, refId } from "./normalize-utils.js";
 
 export function buildGraphNodes(work: NormalizationWork): GraphNode[] {
   const nodes: GraphNode[] = [];
+  const middlewareOrder = new Map(
+    [...work.middlewareReferences.keys()].sort().map((id, order) => [id, order]),
+  );
   for (const descriptor of work.descriptors) {
-    const node = nodeFor(descriptor, work);
+    const node = nodeFor(descriptor, work, middlewareOrder);
     if (node !== undefined) nodes.push(node);
+    nodes.push(...hookNodes(descriptor));
     if (descriptor.kind === "agent") nodes.push(generatedFunctionNode(descriptor, work));
     if (descriptor.kind === "app") {
       nodes.push(...environmentNodes(descriptor));
@@ -21,7 +30,11 @@ export function buildGraphNodes(work: NormalizationWork): GraphNode[] {
   return nodes;
 }
 
-function nodeFor(descriptor: NormalizedDescriptor, work: NormalizationWork): GraphNode | undefined {
+function nodeFor(
+  descriptor: NormalizedDescriptor,
+  work: NormalizationWork,
+  middlewareOrder: ReadonlyMap<string, number>,
+): GraphNode | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const base = { id: descriptor.id, source: descriptor.source };
   switch (descriptor.kind) {
@@ -30,7 +43,7 @@ function nodeFor(descriptor: NormalizedDescriptor, work: NormalizationWork): Gra
         ...base,
         kind: "app",
         environment: environmentMetadata(value.env),
-        providerProfiles: profiles(value.providers),
+        providerBindings: providerBindingIds(value.providers),
         observability: clean(value.observability),
         defaults: clean(value.defaults),
       };
@@ -126,9 +139,39 @@ function nodeFor(descriptor: NormalizedDescriptor, work: NormalizationWork): Gra
       };
     case "service":
       return { ...base, kind: "service", ...serviceNodeData(value) };
+    case "middleware":
+      return {
+        ...base,
+        kind: "middleware",
+        path: typeof value.path === "string" ? value.path : "",
+        order: middlewareOrder.get(descriptor.id) ?? 0,
+      };
     default:
       return undefined;
   }
+}
+
+function hookNodes(descriptor: NormalizedDescriptor): GraphNode[] {
+  if (descriptor.kind !== "function" && descriptor.kind !== "tool") return [];
+  const value = isRecord(descriptor.value) ? descriptor.value : {};
+  return (["before", "after"] as const).flatMap((phase) => {
+    const hook = value[phase === "before" ? "onBefore" : "onAfter"];
+    if (!isExecutableMarker(hook)) return [];
+    return [
+      {
+        kind: "hook",
+        id: `${descriptor.id}.${phase}`,
+        source: descriptor.source,
+        ownerId: descriptor.id,
+        ownerKind: descriptor.kind,
+        phase,
+      },
+    ];
+  });
+}
+
+function isExecutableMarker(value: unknown): boolean {
+  return typeof value === "function" || (isRecord(value) && value.$zsys === "function");
 }
 
 function schema(
@@ -145,46 +188,5 @@ function toolIds(value: unknown): readonly string[] {
         const id = refId(entry);
         return id === undefined ? [] : [id];
       })
-    : [];
-}
-
-function environmentMetadata(value: unknown): JsonValue {
-  return isRecord(value) && isRecord(value.metadata) ? clean(value.metadata) : {};
-}
-
-function profiles(value: unknown): readonly string[] {
-  const names = new Set<string>(["default"]);
-  if (!isRecord(value)) return ["default"];
-  for (const provider of Object.values(value)) {
-    const metadata =
-      isRecord(provider) && isRecord(provider.metadata) ? provider.metadata : undefined;
-    const profileMap = metadata && isRecord(metadata.profiles) ? metadata.profiles : undefined;
-    if (profileMap) Object.keys(profileMap).forEach((name) => names.add(name));
-  }
-  return [...names].sort();
-}
-
-function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] {
-  const value = isRecord(descriptor.value) ? descriptor.value : {};
-  const env = isRecord(value.env) && isRecord(value.env.metadata) ? value.env.metadata : {};
-  return Object.entries(env).map(([name, metadata]) => {
-    const data = isRecord(metadata) ? metadata : {};
-    return {
-      kind: "env",
-      id: name,
-      source: descriptor.source,
-      name,
-      type: typeof data.type === "string" ? data.type : "",
-      requiredIn: textList(data.requiredIn),
-      hasDefault: data.hasDefault === true,
-      sensitive: data.sensitive === true,
-      ...(typeof data.description === "string" ? { description: data.description } : {}),
-    };
-  });
-}
-
-function textList(value: unknown): readonly string[] {
-  return Array.isArray(value)
-    ? value.filter((entry): entry is string => typeof entry === "string")
     : [];
 }
