@@ -1,13 +1,11 @@
-import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders } from "@zsys/app";
+import { defineApp, defineEnv, env, eventBridge, managed } from "@zsys/app";
 
-const application = defineApp({
+export default defineApp({
   id: "event-target-app",
   env: defineEnv({ SERVICE_PORT: env.port().default(3000) }),
   providers: {
-    development: localProviders(),
-    test: testProviders({ deterministicIds: true, deterministicClock: true }),
-    production: awsProviders({ region: "us-east-1" }),
+    events: {
+      default: managed(eventBridge({ region: "us-east-1", busName: "test-events" })),
+    },
   },
 });
-
-export default application;
