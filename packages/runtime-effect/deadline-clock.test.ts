@@ -39,7 +39,7 @@ describe("runtime deadline composition", () => {
           input: undefined,
           publicContext: { signal: new AbortController().signal },
           timeoutMs: 100,
-          handler: (_input, _request, context) =>
+          handler: (_input, context) =>
             new Promise<void>(() => {
               context.signal.addEventListener("abort", () => {
                 aborted = true;

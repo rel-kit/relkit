@@ -19,14 +19,12 @@ export function formatHumanLog(record: LogRecord): string {
   const fields = Object.entries(record.fields).map(
     ([key, value]) => `${key}=${formatValue(value)}`,
   );
-  return [
-    record.timestamp,
-    record.level.toUpperCase(),
-    record.component,
-    record.message,
-    ...annotations,
-    ...fields,
-  ].join(" ");
+  const details = [...annotations, ...fields];
+  const prefix = `${formatTimestamp(record.timestamp)} ${record.level.toUpperCase().padEnd(5)} `;
+  const headline = `${prefix}${record.component} ${record.message}`;
+  return details.length === 0
+    ? headline
+    : `${headline}\n${" ".repeat(prefix.length)}${details.join(" ")}`;
 }
 
 export const formatMessage = (message: unknown): string =>
@@ -35,4 +33,8 @@ export const formatMessage = (message: unknown): string =>
 function formatValue(value: unknown): string {
   const safe = redactFailureDetail(value);
   return typeof safe === "string" ? safe : (JSON.stringify(safe) ?? "[unavailable]");
+}
+
+function formatTimestamp(timestamp: string): string {
+  return /^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2}:\d{2})/.exec(timestamp)?.[1] ?? timestamp;
 }

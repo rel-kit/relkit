@@ -61,7 +61,10 @@ test("formats correlated human and structured JSON logs", () => {
   };
 
   expect(formatHumanLog(record)).toBe(
-    "2026-08-16T00:00:00.000Z INFO runtime.http request completed request=request-1 trace=trace-1 correlation=request-1 route=/orders status=201",
+    [
+      "00:00:00 INFO  runtime.http request completed",
+      `${" ".repeat(15)}request=request-1 trace=trace-1 correlation=request-1 route=/orders status=201`,
+    ].join("\n"),
   );
   expect(JSON.parse(JSON.stringify(record))).toEqual(record);
 });

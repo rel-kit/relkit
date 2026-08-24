@@ -12,7 +12,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: "sync",
         publicContext: context(),
-        handler: (input, _request, current) => {
+        handler: (input, current) => {
           syncSignal = current.signal;
           return input.toUpperCase();
         },
@@ -22,7 +22,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: "async",
         publicContext: context(),
-        handler: async (input, _request, current) => {
+        handler: async (input, current) => {
           expect(current.signal).toBeInstanceOf(AbortSignal);
           return `${input}-done`;
         },
@@ -137,7 +137,7 @@ describe("runtime handler bridge", () => {
       invokeUserHandler({
         input: undefined,
         publicContext: context(),
-        handler: (_input, _request, current) => {
+        handler: (_input, current) => {
           expect(current.signal).not.toBe(controller.signal);
           started();
           return new Promise<string>((resolve) => {
