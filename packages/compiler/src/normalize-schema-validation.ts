@@ -5,11 +5,7 @@ import { schemaKey } from "./normalize-utils.js";
 
 export function passSchemas(work: NormalizationWork): void {
   const seen = new Set<unknown>();
-  const descriptors = [
-    ...work.descriptors,
-    ...work.middlewareReferences.values(),
-    ...work.transformReferences.values(),
-  ];
+  const descriptors = [...work.descriptors, ...work.transformReferences.values()];
   for (const descriptor of descriptors) {
     if (seen.has(descriptor.value)) continue;
     seen.add(descriptor.value);

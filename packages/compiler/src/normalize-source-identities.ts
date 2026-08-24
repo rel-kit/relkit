@@ -43,7 +43,6 @@ export function normalizeSourceIdentities(
   }
   addServiceMemberIdentities(candidates, identities);
   addNestedErrorIdentities(candidates, identities);
-
   return descriptors.map((descriptor, index) => {
     const entry = candidates[index]!;
     const resolved = entry.resolved ?? descriptor.id;
@@ -75,11 +74,12 @@ interface IdentityCandidate {
 }
 function candidate(descriptor: NormalizedDescriptor): IdentityCandidate {
   const factory = descriptor.exportFact?.factory;
-  const error = descriptor.exportFact?.errorBinding;
-  const presence = error?.id ?? factory?.id;
+  const presence = descriptor.exportFact?.errorBinding?.id ?? factory?.id;
   const inferred =
     SOURCE_SCOPED_KINDS.has(descriptor.kind) &&
-    (presence === "omitted" || (presence === undefined && descriptor.id.startsWith("unbound.")));
+    (presence === "omitted" ||
+      ((presence === undefined || descriptor.kind === "middleware") &&
+        descriptor.id.startsWith("unbound.")));
   return { descriptor, originalId: descriptor.id, inferred };
 }
 function derive(descriptor: NormalizedDescriptor, work: NormalizationWork): string | undefined {

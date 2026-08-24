@@ -1,9 +1,4 @@
-import {
-  type DescriptorKind,
-  type GenerationId,
-  type JsonValue,
-  type SourceLocation,
-} from "@zsys/contracts";
+import { type DescriptorKind, type JsonValue, type SourceLocation } from "@zsys/contracts";
 import type { Diagnostic } from "@zsys/diagnostics";
 import type {
   EvaluatorModuleResult,
@@ -25,7 +20,17 @@ import type {
   ObservedEdge,
 } from "./normalize-graph-types.js";
 
-export type { GraphEdge, GraphNode, NormalizedGraph, ObservedEdge } from "./normalize-graph-types.js";
+export type {
+  GraphEdge,
+  GraphNode,
+  NormalizedGraph,
+  ObservedEdge,
+} from "./normalize-graph-types.js";
+export type {
+  GenerationIdentity,
+  NormalizationSource,
+  RuntimeReference,
+} from "./normalize-public-types.js";
 
 /** Stable diagnostics emitted by the normalization stage. */
 export const NORMALIZE_CODES = Object.freeze({
@@ -67,6 +72,7 @@ export const NORMALIZE_CODES = Object.freeze({
   modelDefault: "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
   modelConfiguration: "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID",
   providerProfile: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+  bucketProfileDuplicate: "ZSYS_BUCKET_PROFILE_DUPLICATE",
   identityAmbiguous: "ZSYS_ID_INFERENCE_AMBIGUOUS",
   source: "ZSYS_SOURCE_LOCATION_INVALID",
   collision: "ZSYS_ROUTE_COLLISION",
@@ -122,14 +128,6 @@ export interface NormalizedDescriptor {
   readonly reference?: EvaluatorManifestReference;
   readonly value: unknown;
 }
-export interface RuntimeReference {
-  readonly descriptorId: string;
-  readonly kind: string;
-  readonly module?: string;
-  readonly exportName?: string;
-  readonly generationId?: string;
-}
-
 export interface GeneratedOutputs {
   readonly graph: string;
   readonly manifest: string;
@@ -174,6 +172,7 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
   return [
     "app",
     "function",
+    "middleware",
     "service",
     "route",
     "job",
@@ -193,8 +192,3 @@ export const EMPTY_OUTPUTS: GeneratedOutputs = Object.freeze({
   openapi: "",
   client: "",
 });
-
-export type NormalizationSource =
-  EvaluatorResponse | readonly EvaluatorModuleResult[] | readonly ExtractedDescriptor[];
-
-export type GenerationIdentity = GenerationId | string;

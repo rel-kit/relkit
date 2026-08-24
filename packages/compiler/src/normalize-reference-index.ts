@@ -11,15 +11,6 @@ export function passIndex(work: NormalizationWork): void {
   const descriptors = [...work.descriptors].sort(compareDescriptors);
   for (const descriptor of descriptors) register(work, descriptor, false);
 
-  for (const route of descriptors.filter((entry) => entry.kind === "route")) {
-    const value = isRecord(route.value) ? route.value : {};
-    const middleware = Array.isArray(value.middleware) ? value.middleware : [];
-    for (const entry of middleware) {
-      if (!isRecord(entry) || entry.kind !== "middleware") continue;
-      const nested = nestedDescriptor(entry, "middleware", route, work);
-      if (nested !== undefined) register(work, nested, true);
-    }
-  }
   for (const service of descriptors.filter((entry) => entry.kind === "service")) {
     const value = isRecord(service.value) ? service.value : {};
     const functions = isRecord(value.functions) ? value.functions : {};

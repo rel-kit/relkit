@@ -27,24 +27,12 @@ export function passReferences(work: NormalizationWork): void {
     }
     if (descriptor.kind === "function") validateDependencies(work, descriptor, value.dependencies);
     if (descriptor.kind === "route") {
-      validateRouteReferences(work, descriptor, value);
+      collectTransforms(work, descriptor, value.request);
       validateRateLimitStore(work, descriptor, value.rateLimit);
     }
     if (descriptor.kind === "service") validateService(work, descriptor, value, serviceOwners);
   }
 
-  for (const middleware of work.middlewareReferences.values()) {
-    const value = isRecord(middleware.value) ? middleware.value : {};
-    if (referenceFor(work, value.target, "function") === undefined) {
-      add(
-        work,
-        middleware,
-        NORMALIZE_CODES.missingTarget,
-        "Middleware target does not resolve to a function.",
-      );
-    }
-    collectTransforms(work, middleware, value.request);
-  }
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "transform")) {
     if (!work.transformReferences.has(descriptor.id)) {
       add(work, descriptor, NORMALIZE_CODES.missingTransform, "Named transform is not indexed.");
@@ -98,53 +86,6 @@ function validateService(
       add(work, service, NORMALIZE_CODES.descriptor, "Service middleware reference is invalid.");
     }
   }
-}
-
-function validateRouteReferences(
-  work: NormalizationWork,
-  route: NormalizedDescriptor,
-  value: Record<string, unknown>,
-): void {
-  const middleware = value.middleware;
-  if (middleware === undefined) {
-    collectTransforms(work, route, value.request);
-    return;
-  }
-  if (!Array.isArray(middleware)) {
-    add(work, route, NORMALIZE_CODES.missingMiddleware, "Route middleware must be an array.");
-  } else {
-    const seen = new Set<string>();
-    for (const entry of middleware) {
-      const middlewareId = id(refId(entry) ?? (isRecord(entry) ? entry.id : undefined));
-      if (middlewareId === undefined || refKind(entry) !== "middleware") {
-        add(
-          work,
-          route,
-          NORMALIZE_CODES.missingMiddleware,
-          "Route middleware reference is invalid.",
-        );
-        continue;
-      }
-      if (seen.has(middlewareId)) {
-        add(
-          work,
-          route,
-          NORMALIZE_CODES.duplicateId,
-          `Route middleware "${middlewareId}" is repeated.`,
-        );
-      }
-      seen.add(middlewareId);
-      if (!work.middlewareReferences.has(middlewareId)) {
-        add(
-          work,
-          route,
-          NORMALIZE_CODES.missingMiddleware,
-          `Middleware "${middlewareId}" is missing.`,
-        );
-      }
-    }
-  }
-  collectTransforms(work, route, value.request);
 }
 
 function collectTransforms(
