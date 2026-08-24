@@ -4,16 +4,19 @@
   "rsc": true,
   "tsx": true,
   "tailwind": {
+    "config": "",
     "css": "app/globals.css",
     "baseColor": "neutral",
-    "cssVariables": true
+    "cssVariables": true,
+    "prefix": ""
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "./components",
-    "ui": "./components/ui",
-    "lib": "./lib",
-    "hooks": "./hooks"
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
   },
   "registries": {
     "@react-aria": "https://react-aria-components.com/r/{name}.json"

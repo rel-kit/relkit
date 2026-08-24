@@ -2,24 +2,23 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Activity, ExternalLink, Moon, MoreHorizontal, PanelLeft, Sun } from "lucide-react";
+import { Activity, ExternalLink, Moon, MoreHorizontal, Sun } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Badge } from "../components/ui/badge";
 import { Breadcrumbs } from "../components/ui/breadcrumb";
 import { Button } from "../components/ui/button";
 import { DropdownMenu } from "../components/ui/dropdown-menu";
-import { Separator } from "../components/ui/separator";
 import { Tooltip } from "../components/ui/tooltip";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { useInspectorGraph } from "../lib/use-graph";
+import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
+import { AppSidebar } from "../components/app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { navigation } from "./navigation-data";
-import { InspectorNavigation } from "./navigation";
 
 export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const graph = useInspectorGraph();
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -33,6 +32,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
           : "light";
     setTheme(initial);
     document.documentElement.dataset.theme = initial;
+    document.documentElement.classList.toggle("dark", initial === "dark");
   }, []);
   useEffect(() => {
     const openSearch = (event: KeyboardEvent): void => {
@@ -50,67 +50,19 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
     setTheme(next);
     localStorage.setItem("zsys.inspector.theme", next);
     document.documentElement.dataset.theme = next;
-  };
-  const openUtility = (id: string): void => {
-    window.location.assign(id === "docs" ? "https://zsys.dev/docs" : "/api-reference");
+    document.documentElement.classList.toggle("dark", next === "dark");
   };
   const status = graph.error ? "offline" : graph.connection;
 
   return (
-    <div
-      className="inspector-shell"
-      data-sidebar-collapsed={collapsed}
-      data-mobile-open={mobileOpen}
-    >
+    <SidebarProvider className="inspector-shell">
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <aside className="shell-sidebar">
-        <div className="sidebar-brand">
-          <span className="brand-mark" aria-hidden="true">
-            Z
-          </span>
-          {!collapsed && (
-            <div>
-              <strong>ZSYS</strong>
-              <small>Inspector</small>
-            </div>
-          )}
-        </div>
-        <Separator />
-        <div className="sidebar-scroll">
-          <InspectorNavigation collapsed={collapsed} />
-        </div>
-        <div className="sidebar-footer">
-          <span className="status-dot" data-state={status} aria-hidden="true" />
-          {!collapsed && <span>{status === "connected" ? "Backend healthy" : status}</span>}
-        </div>
-      </aside>
-      <button
-        className="sidebar-scrim"
-        type="button"
-        aria-label="Close navigation"
-        onClick={() => setMobileOpen(false)}
-      />
-      <div className="shell-workspace">
+      <AppSidebar status={status} />
+      <SidebarInset className="shell-workspace">
         <header className="shell-header">
-          <Tooltip
-            trigger={
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Toggle navigation"
-                onPress={() => {
-                  if (matchMedia("(max-width: 760px)").matches) setMobileOpen((value) => !value);
-                  else setCollapsed((value) => !value);
-                }}
-              >
-                <PanelLeft aria-hidden="true" className="size-4" />
-              </Button>
-            }
-          >
-            Toggle navigation
-          </Tooltip>
+          <SidebarTrigger aria-label="Toggle navigation" />
           <Breadcrumbs items={breadcrumbs(pathname)} />
           <div className="header-actions">
             <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} />
@@ -156,15 +108,23 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
           <span>
             Graph <code>{bounded(graph.graph?.graphHash, "unavailable")}</code>
           </span>
-          <a href="/api-reference">
+          <a href={SCALAR_API_REFERENCE_URL} target="_blank" rel="noreferrer">
             API reference <ExternalLink aria-hidden="true" className="size-3" />
           </a>
         </div>
-        <main id="main-content" className="main-content" tabIndex={-1}>
+        <div id="main-content" className="main-content" tabIndex={-1}>
           {children}
-        </main>
-      </div>
-    </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function openUtility(id: string): void {
+  window.open(
+    id === "docs" ? "https://zsys.dev/docs" : SCALAR_API_REFERENCE_URL,
+    "_blank",
+    "noopener,noreferrer",
   );
 }
 
