@@ -73,5 +73,5 @@
 ## 9. Verification and Handoff
 
 - [x] 9.1 Run formatting, structural consistency, lint, type/type-fixture, compiler, function/runtime, HTTP, tools/agents, jobs/events, observability, examples, generator, documentation, security, restart, and phase-zero focused gates and fix only regressions introduced by this change
-- [ ] 9.2 Run `bun run check`, `bun run typecheck`, `bun run test:all`, `bun run build`, and `bun run verify` locally without enabling cloud acceptance; report any unavailable authorized-cloud evidence honestly
-- [ ] 9.3 Re-run strict OpenSpec validation, map every acceptance scenario to runnable evidence, confirm no legacy public pattern remains, and leave the completed change ready for review and archive
+- [x] 9.2 Run `bun run check`, `bun run typecheck`, `bun run test:all`, `bun run build`, and `bun run verify` locally without enabling cloud acceptance; report any unavailable authorized-cloud evidence honestly
+- [x] 9.3 Re-run strict OpenSpec validation, map every acceptance scenario to runnable evidence, confirm no legacy public pattern remains, and leave the completed change ready for review and archive
