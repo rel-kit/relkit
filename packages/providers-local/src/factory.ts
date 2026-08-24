@@ -1,143 +1,114 @@
-import { isProviderSet, providerRecipe, type ProviderRecipe, type ProviderSet } from "@zsys/app";
-import { createLocalProviderResources, type LocalProviderResources } from "./generation.js";
+import type { ProviderBinding, ProviderCapability } from "@zsys/app";
+import type { MaybePromise } from "@zsys/contracts";
+import { join } from "node:path";
+import { createLocalBucketProvider } from "./buckets/index.js";
+import { createLocalCacheProvider } from "./cache/index.js";
+import { createLocalEventProvider } from "./events/provider.js";
+import {
+  createLocalJobProvider,
+  createLocalObservabilityProvider,
+} from "./runtime-capabilities.js";
 import { createLocalProviderStateRoot } from "./state.js";
 
-export type LocalProviderRecipe = Extract<ProviderRecipe, "local" | "test">;
-export type LocalProviderEnvironment = "development" | "test";
-
-export interface LocalProviderFactoryContext {
+export interface LocalBindingFactoryContext {
   readonly generationId: string;
-  readonly environment: LocalProviderEnvironment;
-  readonly providerSet: ProviderSet<LocalProviderRecipe>;
-  /** Resolved values are runtime-only and are never copied into the graph. */
-  readonly values?: Readonly<Record<string, unknown>>;
+  readonly environment: "development" | "test" | "production";
+  readonly capability: ProviderCapability;
+  readonly profile: string;
+  readonly binding: ProviderBinding;
+  readonly configuration: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
-  /** Runtime-only override used by isolated provider tests. */
-  readonly stateRoot?: string;
 }
 
-export interface LocalProviderGeneration {
-  readonly generationId: string;
-  readonly environment: LocalProviderEnvironment;
-  readonly recipeTag: LocalProviderRecipe;
-  readonly providerSet: ProviderSet<LocalProviderRecipe>;
-  readonly stateRoot: string;
-  readonly bucketProfiles: LocalProviderResources["bucketProfiles"];
-  readonly cacheProfiles: LocalProviderResources["cacheProfiles"];
-  readonly jobProfiles: LocalProviderResources["jobProfiles"];
-  readonly providers: LocalProviderResources["providers"];
+export interface LocalBindingGeneration {
+  readonly value?: unknown;
   readonly modelRegistry?: unknown;
-  readonly ready: () => Promise<void>;
-  readonly readiness: () => Promise<void>;
-  readonly release: () => Promise<void>;
-  readonly dispose: () => Promise<void>;
+  readonly ready?: () => MaybePromise<void>;
+  readonly release?: () => MaybePromise<void>;
+  readonly dispose?: () => MaybePromise<void>;
 }
 
-export interface LocalProviderFactory {
-  readonly recipeTag: LocalProviderRecipe;
-  readonly create: (context: LocalProviderFactoryContext) => Promise<LocalProviderGeneration>;
+export interface LocalBindingFactory {
+  readonly capability: ProviderCapability;
+  readonly adapter: "memory";
+  readonly create: (context: LocalBindingFactoryContext) => MaybePromise<LocalBindingGeneration>;
 }
 
-/** Runtime-only bindings for the Phase 2 local and test recipe tags. */
-export const localProviderFactories: Readonly<Record<LocalProviderRecipe, LocalProviderFactory>> =
+export const localProviderFactories: Readonly<Record<ProviderCapability, LocalBindingFactory>> =
   Object.freeze({
-    local: createFactory("local", "development"),
-    test: createFactory("test", "test"),
+    buckets: factory("buckets", createBucket),
+    cache: factory("cache", createCache),
+    jobs: factory("jobs", createJobs),
+    events: factory("events", createEvents),
+    models: factory("models", createModels),
+    observability: factory("observability", createObservability),
   });
 
-/** Returns no factory for `aws`; production binding belongs to Phase 15. */
-export function getLocalProviderFactory(recipe: ProviderRecipe): LocalProviderFactory | undefined {
-  return recipe === "local" || recipe === "test" ? localProviderFactories[recipe] : undefined;
+export function getLocalProviderFactory(
+  capability: ProviderCapability,
+): LocalBindingFactory | undefined {
+  return localProviderFactories[capability];
 }
 
-/** Binds a validated provider declaration to its local/test generation factory. */
-export function bindLocalProviderFactory(
-  providerSet: ProviderSet,
-): LocalProviderFactory | undefined {
-  if (!isProviderSet(providerSet)) throw new TypeError("Invalid provider set");
-  const recipe = providerRecipe(providerSet);
-  return recipe === undefined ? undefined : getLocalProviderFactory(recipe);
+function factory(
+  capability: ProviderCapability,
+  create: (context: LocalBindingFactoryContext) => MaybePromise<LocalBindingGeneration>,
+): LocalBindingFactory {
+  return Object.freeze({ capability, adapter: "memory" as const, create });
 }
 
-function createFactory(
-  recipeTag: LocalProviderRecipe,
-  environment: LocalProviderEnvironment,
-): LocalProviderFactory {
-  return Object.freeze({
-    recipeTag,
-    create: async (context: LocalProviderFactoryContext): Promise<LocalProviderGeneration> => {
-      if (context.generationId.trim() === "") throw new TypeError("Generation ID is required");
-      if (context.environment !== environment) {
-        throw new TypeError(`${recipeTag} providers require the ${environment} environment`);
-      }
-      if (
-        !isProviderSet(context.providerSet) ||
-        providerRecipe(context.providerSet) !== recipeTag
-      ) {
-        throw new TypeError(`Provider set does not use the ${recipeTag} recipe`);
-      }
-      if (context.signal?.aborted) {
-        throw context.signal.reason ?? new Error("Provider generation was aborted");
-      }
-      const stateRoot = createLocalProviderStateRoot(
-        context.stateRoot ?? configuredStateDirectory(context),
-      );
-      let resources: Awaited<ReturnType<typeof createLocalProviderResources>> | undefined;
-      try {
-        resources = await createLocalProviderResources(
-          stateRoot,
-          context.providerSet,
-          context.signal,
-          context.values,
-        );
-        await resources.ready();
-      } catch (cause) {
-        await resources?.release().catch(() => undefined);
-        throw cause;
-      }
-      let released = false;
-      const release = async (): Promise<void> => {
-        if (released) return;
-        released = true;
-        await resources!.release();
-      };
-      const ready = async (): Promise<void> => {
-        if (released) throw new Error("Local provider generation is closed");
-        await resources!.ready();
-      };
-      return Object.freeze({
-        generationId: context.generationId,
-        environment,
-        recipeTag,
-        providerSet: context.providerSet,
-        stateRoot: stateRoot.root,
-        bucketProfiles: resources.bucketProfiles,
-        cacheProfiles: resources.cacheProfiles,
-        jobProfiles: resources.jobProfiles,
-        providers: resources.providers,
-        ...(resources.modelRegistry === undefined
-          ? {}
-          : { modelRegistry: resources.modelRegistry }),
-        ready,
-        readiness: ready,
-        release,
-        dispose: release,
-      });
-    },
+function createBucket(context: LocalBindingFactoryContext): LocalBindingGeneration {
+  const provider = createLocalBucketProvider({
+    root: join(stateRoot(context).buckets, context.profile),
   });
+  return { value: provider, ready: provider.ready, release: provider.close };
 }
 
-function configuredStateDirectory(context: LocalProviderFactoryContext): string | undefined {
-  const value = context.providerSet.metadata.configuration.stateDirectory;
-  if (value === undefined) return undefined;
-  if (typeof value === "string") return value;
-  if (isRecord(value) && value.kind === "env-ref" && typeof value.name === "string") {
-    const resolved = context.values?.[value.name];
-    if (typeof resolved === "string" && resolved.trim() !== "") return resolved;
+function createCache(context: LocalBindingFactoryContext): LocalBindingGeneration {
+  const provider = createLocalCacheProvider({
+    stateRoot: join(stateRoot(context).cache, context.profile),
+    cacheId: context.profile,
+  });
+  return { value: provider, ready: provider.ready, release: provider.close };
+}
+
+async function createEvents(context: LocalBindingFactoryContext): Promise<LocalBindingGeneration> {
+  const provider = await createLocalEventProvider(
+    join(stateRoot(context).root, "events", context.profile),
+  );
+  return { value: provider, release: provider.close };
+}
+
+function createJobs(context: LocalBindingFactoryContext): LocalBindingGeneration {
+  const provider = createLocalJobProvider(stateRoot(context).root, context.profile);
+  return { value: provider, release: provider.close };
+}
+
+function createObservability(_context: LocalBindingFactoryContext): LocalBindingGeneration {
+  return { value: createLocalObservabilityProvider() };
+}
+
+function createModels(_context: LocalBindingFactoryContext): LocalBindingGeneration {
+  const modelRegistry = Object.freeze({
+    resolveModel: (selector?: string) => ({
+      provider: "test",
+      id: selector ?? "test:default",
+      model: Object.freeze({ provider: "zsys.test", modelId: "default" }),
+    }),
+  });
+  return { modelRegistry };
+}
+
+function stateRoot(context: LocalBindingFactoryContext) {
+  check(context);
+  return createLocalProviderStateRoot(
+    join(process.cwd(), ".zsys", "state", "testing", context.generationId),
+  );
+}
+
+function check(context: LocalBindingFactoryContext): void {
+  if (context.generationId.trim() === "") throw new TypeError("Generation ID is required");
+  if (context.signal?.aborted) {
+    throw context.signal.reason ?? new Error("Provider generation was aborted");
   }
-  throw new TypeError("Local provider state directory was not resolved");
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
