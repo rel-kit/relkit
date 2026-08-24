@@ -62,41 +62,42 @@ describe("inspector SSE client", () => {
     expect(invalidations).toContainEqual(["logs", "signals"]);
   });
 
-  test("clears an expired cursor before replay and exposes reconnect state", async () => {
-    const saved = storage("9");
-    const urls: string[] = [];
-    const states: string[] = [];
-    let calls = 0;
-    const client = createInspectorStream({
-      storage: saved,
-      reconnectDelayMs: 0,
-      maxReconnectAttempts: 0,
-      onStateChange: (snapshot) => states.push(snapshot.state),
-      onInvalidate: (tags) => {
-        if (tags.length === 0) states.push("cursor-expired");
-      },
-      fetch: async (url) => {
-        urls.push(String(url));
-        calls += 1;
-        return calls === 1
-          ? new Response(
-              JSON.stringify({
-                protocol: "zsys.inspector",
-                version: 1,
-                error: "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
-              }),
-              { status: 400, headers: { "content-type": "application/json" } },
-            )
-          : response("");
-      },
-    });
-    client.start();
-    await waitFor(() => calls === 2);
-    client.stop();
-    expect(urls[0]).toContain("cursor=9");
-    expect(urls[1]).not.toContain("cursor=");
-    expect(saved.getItem("zsys.inspector.stream.cursor")).toBeNull();
-    expect(states).toContain("reconnecting");
-    expect(states).toContain("cursor-expired");
+  test("clears expired and future cursors before replay", async () => {
+    for (const error of [
+      "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
+      "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE",
+    ]) {
+      const saved = storage("9");
+      const urls: string[] = [];
+      const states: string[] = [];
+      let calls = 0;
+      const client = createInspectorStream({
+        storage: saved,
+        reconnectDelayMs: 0,
+        maxReconnectAttempts: 0,
+        onStateChange: (snapshot) => states.push(snapshot.state),
+        onInvalidate: (tags) => {
+          if (tags.length === 0) states.push("cursor-reset");
+        },
+        fetch: async (url) => {
+          urls.push(String(url));
+          calls += 1;
+          return calls === 1
+            ? new Response(JSON.stringify({ protocol: "zsys.inspector", version: 1, error }), {
+                status: 400,
+                headers: { "content-type": "application/json" },
+              })
+            : response("");
+        },
+      });
+      client.start();
+      await waitFor(() => calls === 2);
+      client.stop();
+      expect(urls[0]).toContain("cursor=9");
+      expect(urls[1]).not.toContain("cursor=");
+      expect(saved.getItem("zsys.inspector.stream.cursor")).toBeNull();
+      expect(states).toContain("reconnecting");
+      expect(states).toContain("cursor-reset");
+    }
   });
 });
