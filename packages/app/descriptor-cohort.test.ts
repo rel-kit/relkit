@@ -1,90 +1,101 @@
 import "../../tests/contracts/descriptor-cohort.test.ts";
 import { describe, expect, test } from "bun:test";
 import {
-  awsProviders,
-  copyProviderSets,
-  env,
+  aiSdk,
+  copyProviderTopology,
   defineEnv,
-  localProviders,
-  providerRecipe,
-  testProviders,
+  env,
+  external,
+  isProviderBinding,
+  managed,
+  redis,
+  s3,
 } from "@zsys/app";
 
-describe("provider declaration validation", () => {
-  test("keeps metadata value-free and enforces recipe placement", () => {
-    const local = localProviders();
-    const redacted = localProviders();
-
-    expect(providerRecipe(local)).toBe("local");
-    expect(local.metadata.profiles).toEqual({});
-    expect(local.metadata.environment).toEqual([]);
-    expect(JSON.stringify(redacted)).not.toContain("synthetic-secret");
-    expect(() => localProviders({ invalid: true } as never)).toThrow(
-      "Unknown local provider option",
+describe("composable provider declarations", () => {
+  test("keeps protocol bindings value-free", () => {
+    const values = defineEnv({
+      BUCKET_ENDPOINT: env.url(),
+      BUCKET_NAME: env.string(),
+      BUCKET_REGION: env.string(),
+      BUCKET_ACCESS_KEY_ID: env.secret().optional(),
+      BUCKET_SECRET_ACCESS_KEY: env.secret().optional(),
+      CACHE_URL: env.secret(),
+    });
+    const bucket = external(
+      s3({
+        endpoint: values.BUCKET_ENDPOINT,
+        bucketName: values.BUCKET_NAME,
+        region: values.BUCKET_REGION,
+        credentials: {
+          accessKeyId: values.BUCKET_ACCESS_KEY_ID,
+          secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
+        },
+        forcePathStyle: true,
+      }),
     );
-    expect(() =>
-      copyProviderSets({
-        development: testProviders(),
-        test: testProviders(),
-        production: awsProviders({ region: "us-east-1" }),
-      } as never),
-    ).toThrow("development providers must use the local recipe");
+    const topology = copyProviderTopology({
+      buckets: { default: bucket },
+      cache: { default: external(redis({ url: values.CACHE_URL })) },
+    });
+
+    expect(isProviderBinding(bucket)).toBe(true);
+    expect(bucket.ownership).toBe("external");
+    expect(bucket.adapter.adapter).toBe("s3");
+    expect(bucket.adapter.environment.map(({ name }) => name)).toEqual([
+      "BUCKET_ACCESS_KEY_ID",
+      "BUCKET_ENDPOINT",
+      "BUCKET_NAME",
+      "BUCKET_REGION",
+      "BUCKET_SECRET_ACCESS_KEY",
+    ]);
+    expect(JSON.stringify(topology)).not.toContain("resolved-secret");
+    expect(Object.isFrozen(topology)).toBe(true);
   });
 
-  test("stores value-free model provider recipes with required defaults", () => {
-    const environment = defineEnv({ OPENAI_API_KEY: env.secret() });
-    const local = localProviders({
-      modelProviders: {
+  test("requires secret references for credential-bearing fields", () => {
+    const values = defineEnv({
+      PUBLIC_KEY: env.string(),
+      SECRET_KEY: env.secret(),
+    });
+    expect(() =>
+      s3({
+        endpoint: "https://example.test",
+        bucketName: "assets",
+        region: "auto",
+        credentials: { accessKeyId: values.PUBLIC_KEY },
+      }),
+    ).toThrow("s3.credentials.accessKeyId must be a secret environment reference");
+    expect(() => redis({ url: values.PUBLIC_KEY })).toThrow(
+      "redis.url must be a secret environment reference",
+    );
+    expect(() =>
+      aiSdk({
         defaultProvider: "openai",
         defaultModel: "gpt-5-mini",
-        openai: { apiKey: environment.OPENAI_API_KEY },
-        anthropic: { defaultModel: "claude-sonnet-4-5", apiKey: "synthetic-secret" },
-      },
-    });
-    const configured = local.metadata.configuration.modelProviders;
-
-    expect(configured).toEqual({
-      defaultProvider: "openai",
-      defaultModel: "gpt-5-mini",
-      openai: { apiKey: environment.OPENAI_API_KEY },
-      anthropic: {
-        defaultModel: "claude-sonnet-4-5",
-        apiKey: { kind: "sensitive-configuration", configured: true },
-      },
-    });
-    expect(Object.isFrozen(configured)).toBe(true);
-    expect(local.metadata.environment).toEqual([
-      { name: "OPENAI_API_KEY", type: "secret-string", sensitive: true },
-    ]);
-    expect(JSON.stringify(local)).not.toContain("synthetic-secret");
-    expect(() =>
-      localProviders({
-        modelProviders: { defaultProvider: "openai", openai: {} },
-      } as never),
-    ).toThrow("modelProviders.defaultModel is required");
-    expect(() =>
-      localProviders({
-        modelProviders: { defaultModel: "gpt-5-mini", openai: {} },
-      } as never),
-    ).toThrow("modelProviders.defaultProvider is required");
-    expect(() =>
-      localProviders({
-        modelProviders: { defaultProvider: "missing", defaultModel: "gpt-5-mini", openai: {} },
-      } as never),
-    ).toThrow('modelProviders.defaultProvider "missing" is not configured');
-    expect(() =>
-      localProviders({
-        modelProviders: { defaultProvider: "open ai", defaultModel: "gpt-5-mini", "open ai": {} },
-      } as never),
-    ).toThrow('modelProviders provider name "open ai" must be a stable ID');
-    expect(() =>
-      localProviders({
-        modelProviders: {
+        openai: { apiKey: "literal-secret" },
+      }),
+    ).toThrow("ai-sdk.openai.apiKey must use a secret environment reference");
+    expect(
+      managed(
+        aiSdk({
           defaultProvider: "openai",
           defaultModel: "gpt-5-mini",
-          openai: { defaultModel: " " },
-        },
-      } as never),
-    ).toThrow("modelProviders.openai.defaultModel must be non-empty text");
+          openai: { apiKey: values.SECRET_KEY },
+        }),
+      ).ownership,
+    ).toBe("managed");
+  });
+
+  test("rejects capability mismatches and environment branches", () => {
+    const values = defineEnv({ CACHE_URL: env.secret() });
+    const cache = external(redis({ url: values.CACHE_URL }));
+
+    expect(() => copyProviderTopology({ buckets: { default: cache } })).toThrow(
+      'Invalid buckets provider binding "default"',
+    );
+    expect(() => copyProviderTopology({ development: {} })).toThrow(
+      'Unknown provider capability "development"',
+    );
   });
 });

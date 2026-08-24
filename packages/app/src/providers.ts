@@ -1,180 +1,159 @@
-import { deepFreeze, type JsonPrimitive } from "@zsys/contracts";
 import type { EnvRef } from "@zsys/config";
-import {
-  isProviderMetadata,
-  normalizeProviderOptions,
-  providerEnvironment,
-  providerProfiles,
-  PROVIDER_CAPABILITIES,
-} from "./providers-validation.js";
+import type { JsonPrimitive } from "@zsys/contracts";
 import type { ModelProviders } from "./model-providers.js";
+import {
+  copyProviderTopology,
+  createAdapter,
+  createBinding,
+  isProviderBinding,
+  isProviderTopology,
+  providerEnvironment,
+} from "./providers-validation.js";
 
 export type { ModelProviderOptions, ModelProviders } from "./model-providers.js";
 
-export type ProviderRecipe = "local" | "test" | "aws";
-export const PROVIDER_RECIPE: unique symbol = Symbol.for("zsys.provider.recipe");
-export type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
+export const PROVIDER_CAPABILITIES = Object.freeze([
+  "buckets",
+  "cache",
+  "jobs",
+  "events",
+  "models",
+  "observability",
+] as const);
+
+export type ProviderCapability = (typeof PROVIDER_CAPABILITIES)[number];
+export type ProviderOwnership = "external" | "managed";
 export type ProviderValue =
   JsonPrimitive | EnvRef | readonly ProviderValue[] | { readonly [key: string]: ProviderValue };
 export type ProviderConfig = Readonly<Record<string, ProviderValue>>;
-export type ProviderProfiles = Readonly<Record<string, ProviderConfig>>;
 
-export interface LocalProviderOptions {
-  readonly stateDirectory?: string;
-  readonly observabilityDirectory?: string;
-  readonly buckets?: ProviderProfiles;
-  readonly cache?: ProviderProfiles;
-  readonly jobs?: ProviderProfiles;
-  readonly events?: ProviderProfiles;
-  /** Optional serializable AI SDK provider defaults and named recipes. */
-  readonly modelProviders?: ModelProviders;
+export interface ProviderEnvironmentReference {
+  readonly name: string;
+  readonly type: string;
+  readonly sensitive: boolean;
 }
 
-export interface TestProviderOptions extends LocalProviderOptions {
-  readonly deterministicIds?: boolean;
-  readonly deterministicClock?: boolean;
-}
-
-export interface AwsProviderOptions {
-  readonly region: string | EnvRef<string, string>;
-  readonly buckets?: ProviderProfiles;
-  readonly cache?: ProviderProfiles;
-  readonly jobs?: ProviderProfiles;
-  readonly events?: ProviderProfiles;
-  /** Optional serializable AI SDK provider defaults and named recipes. */
-  readonly modelProviders?: ModelProviders;
-}
-
-export interface ProviderSetMetadata {
-  readonly kind: "provider-metadata";
-  readonly capabilities: readonly ProviderCapability[];
+export interface ProviderAdapter<
+  Capability extends ProviderCapability = ProviderCapability,
+  Name extends string = string,
+> {
+  readonly kind: "provider-adapter";
+  readonly capability: Capability;
+  readonly adapter: Name;
   readonly configuration: ProviderConfig;
-  readonly profiles: Readonly<Record<string, readonly ProviderCapability[]>>;
-  readonly environment: readonly {
-    readonly name: string;
-    readonly type: string;
-    readonly sensitive: boolean;
-  }[];
+  readonly environment: readonly ProviderEnvironmentReference[];
 }
 
-export interface ProviderSet<Recipe extends ProviderRecipe = ProviderRecipe> {
-  readonly kind: "provider-set";
-  readonly metadata: ProviderSetMetadata;
-  readonly recipe: Recipe;
-  readonly recipeTag: Recipe;
-  readonly [PROVIDER_RECIPE]: Recipe;
+export interface ProviderBinding<
+  Capability extends ProviderCapability = ProviderCapability,
+  Name extends string = string,
+> {
+  readonly kind: "provider-binding";
+  readonly ownership: ProviderOwnership;
+  readonly adapter: ProviderAdapter<Capability, Name>;
 }
 
-export interface ProviderSets {
-  readonly development: ProviderSet<"local">;
-  readonly test: ProviderSet<"test">;
-  readonly production: ProviderSet<"aws">;
+export type CapabilityBindings<C extends ProviderCapability> = Readonly<
+  Record<string, ProviderBinding<C>>
+>;
+
+export interface ProviderTopology {
+  readonly buckets?: CapabilityBindings<"buckets">;
+  readonly cache?: CapabilityBindings<"cache">;
+  readonly jobs?: CapabilityBindings<"jobs">;
+  readonly events?: CapabilityBindings<"events">;
+  readonly models?: CapabilityBindings<"models">;
+  readonly observability?: CapabilityBindings<"observability">;
 }
 
-export function localProviders(options: LocalProviderOptions = {}): ProviderSet<"local"> {
-  return createProviderSet("local", options);
+export interface S3Options {
+  readonly endpoint: string | URL | EnvRef;
+  readonly bucketName: string | EnvRef;
+  readonly region: string | EnvRef;
+  readonly credentials?: {
+    readonly accessKeyId?: EnvRef;
+    readonly secretAccessKey?: EnvRef;
+    readonly sessionToken?: EnvRef;
+  };
+  readonly forcePathStyle?: boolean | EnvRef;
 }
 
-export function testProviders(options: TestProviderOptions = {}): ProviderSet<"test"> {
-  return createProviderSet("test", options);
+export interface RedisOptions {
+  readonly url: EnvRef;
 }
 
-export function awsProviders(options: AwsProviderOptions): ProviderSet<"aws"> {
-  return createProviderSet("aws", options);
+export interface AwsProtocolOptions {
+  readonly region: string | EnvRef;
+  readonly endpoint?: string | URL | EnvRef;
+  readonly credentials?: S3Options["credentials"];
 }
 
-export function isProviderSet(value: unknown): value is ProviderSet {
-  const recipe = providerRecipe(value);
-  const metadata = isRecord(value) ? Object.getOwnPropertyDescriptor(value, "metadata") : undefined;
-  return (
-    recipe !== undefined &&
-    isRecord(value) &&
-    Reflect.ownKeys(value).length === 5 &&
-    Object.getOwnPropertyDescriptor(value, "kind")?.value === "provider-set" &&
-    metadata !== undefined &&
-    "value" in metadata &&
-    isProviderMetadata(metadata.value)
-  );
+export interface SqsOptions extends AwsProtocolOptions {
+  readonly queueUrl: string | URL | EnvRef;
 }
 
-/** Returns the hidden internal recipe tag without exposing runtime factories. */
-export function providerRecipe(value: unknown): ProviderRecipe | undefined {
-  if (!isRecord(value)) return undefined;
-  const descriptor = Object.getOwnPropertyDescriptor(value, PROVIDER_RECIPE);
-  const recipe = descriptor && "value" in descriptor ? descriptor.value : undefined;
-  if (!isRecipe(recipe)) return undefined;
-  return hiddenTag(value, PROVIDER_RECIPE, recipe) &&
-    hiddenTag(value, "recipe", recipe) &&
-    hiddenTag(value, "recipeTag", recipe)
-    ? recipe
-    : undefined;
+export interface EventBridgeOptions extends AwsProtocolOptions {
+  readonly busName: string | EnvRef;
+  readonly source?: string | EnvRef;
 }
 
-export function copyProviderSets(value: unknown): ProviderSets {
-  if (!isRecord(value)) throw new TypeError("App providers must be an object");
-  const expected = {
-    development: "local",
-    test: "test",
-    production: "aws",
-  } as const;
-  const names = Object.keys(expected) as (keyof typeof expected)[];
-  const keys = Reflect.ownKeys(value);
-  if (
-    keys.length !== names.length ||
-    keys.some((name) => typeof name !== "string" || !names.includes(name as keyof typeof expected))
-  ) {
-    throw new TypeError("App providers must contain only development, test, and production sets");
-  }
-  const providers = {} as Record<keyof typeof expected, ProviderSet>;
-  for (const name of names) {
-    const descriptor = Object.getOwnPropertyDescriptor(value, name);
-    const provider = descriptor && "value" in descriptor ? descriptor.value : undefined;
-    if (!isProviderSet(provider) || providerRecipe(provider) !== expected[name]) {
-      throw new TypeError(`${name} providers must use the ${expected[name]} recipe`);
-    }
-    providers[name] = provider;
-  }
-  return Object.freeze(providers) as ProviderSets;
+export interface OtlpOptions {
+  readonly endpoint: string | URL | EnvRef;
+  readonly headers?: Readonly<Record<string, EnvRef>>;
 }
 
-function createProviderSet<Recipe extends ProviderRecipe>(
-  recipe: Recipe,
-  options: object,
-): ProviderSet<Recipe> {
-  if (!isRecord(options)) throw new TypeError("Provider options must be an object");
-  const configuration = normalizeProviderOptions(recipe, options);
-  const metadata = deepFreeze({
-    kind: "provider-metadata" as const,
-    capabilities: PROVIDER_CAPABILITIES,
-    configuration,
-    profiles: providerProfiles(options),
-    environment: providerEnvironment(configuration),
-  }) as ProviderSetMetadata;
-  const result = { kind: "provider-set" as const, metadata } as Record<PropertyKey, unknown>;
-  Object.defineProperty(result, "recipe", { value: recipe });
-  Object.defineProperty(result, "recipeTag", { value: recipe });
-  Object.defineProperty(result, PROVIDER_RECIPE, { value: recipe });
-  return Object.freeze(result) as unknown as ProviderSet<Recipe>;
+export function s3(options: S3Options): ProviderAdapter<"buckets", "s3"> {
+  return createAdapter("buckets", "s3", options, [
+    "credentials.accessKeyId",
+    "credentials.secretAccessKey",
+    "credentials.sessionToken",
+  ]);
 }
 
-function hiddenTag(
-  value: Record<PropertyKey, any>,
-  key: PropertyKey,
-  expected: ProviderRecipe,
-): boolean {
-  const descriptor = Object.getOwnPropertyDescriptor(value, key);
-  return (
-    descriptor?.value === expected &&
-    descriptor.enumerable === false &&
-    descriptor.writable === false &&
-    descriptor.configurable === false
-  );
+export function redis(options: RedisOptions): ProviderAdapter<"cache", "redis"> {
+  return createAdapter("cache", "redis", options, ["url"]);
 }
 
-function isRecipe(value: unknown): value is ProviderRecipe {
-  return value === "local" || value === "test" || value === "aws";
+export function sqs(options: SqsOptions): ProviderAdapter<"jobs", "sqs"> {
+  return createAdapter("jobs", "sqs", options, [
+    "credentials.accessKeyId",
+    "credentials.secretAccessKey",
+    "credentials.sessionToken",
+  ]);
 }
 
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+export function eventBridge(options: EventBridgeOptions): ProviderAdapter<"events", "eventbridge"> {
+  return createAdapter("events", "eventbridge", options, [
+    "credentials.accessKeyId",
+    "credentials.secretAccessKey",
+    "credentials.sessionToken",
+  ]);
 }
+
+export function aiSdk(options: ModelProviders): ProviderAdapter<"models", "ai-sdk"> {
+  return createAdapter("models", "ai-sdk", options, [], true);
+}
+
+export function otlp(options: OtlpOptions): ProviderAdapter<"observability", "otlp"> {
+  return createAdapter("observability", "otlp", options, [], true);
+}
+
+export function cloudWatch(
+  options: Pick<AwsProtocolOptions, "region">,
+): ProviderAdapter<"observability", "cloudwatch"> {
+  return createAdapter("observability", "cloudwatch", options, []);
+}
+
+export function external<C extends ProviderCapability, N extends string>(
+  adapter: ProviderAdapter<C, N>,
+): ProviderBinding<C, N> {
+  return createBinding("external", adapter);
+}
+
+export function managed<C extends ProviderCapability, N extends string>(
+  adapter: ProviderAdapter<C, N>,
+): ProviderBinding<C, N> {
+  return createBinding("managed", adapter);
+}
+
+export { copyProviderTopology, isProviderBinding, isProviderTopology, providerEnvironment };
