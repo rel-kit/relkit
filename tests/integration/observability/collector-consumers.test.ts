@@ -50,7 +50,11 @@ test("every collector consumer and sink receives an admitted record", async () =
   const stateRoot = await mkdtemp("/tmp/zsys-observability-consumers-");
   let index: Awaited<ReturnType<typeof createObservabilityIndex>> | undefined;
   try {
-    index = await createObservabilityIndex({ root: stateRoot, maxEntries: 100 });
+    index = await createObservabilityIndex({
+      root: stateRoot,
+      maxEntries: 100,
+      now: () => Date.parse("2026-08-16T00:00:00.000Z"),
+    });
     const store = await createObservabilitySegmentStore({ root: stateRoot, index });
     assertAdmitted("segment sink", await store.append(unsafeRequest()));
     assertAdmitted("segment sink", await store.append(unsafeTrace()));

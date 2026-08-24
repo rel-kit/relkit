@@ -33,38 +33,43 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
   const events: string[] = [];
   const middleware = defineServiceMiddleware({
     id: "orders.context",
-    handler: async ({ request }, next) => {
+    handler: async ({ input }, next) => {
       events.push("middleware:before");
-      expect(request?.params).toEqual({ orderId: "order-1", productId: "product-2" });
+      expect(input).toMatchObject({ orderId: "order-1", productId: "product-2" });
       await next({ tenant: "acme" });
       events.push("middleware:after");
     },
   });
   const target = defineFunction({
     id: "orders.get",
-    input: z.object({ orderId: z.string(), note: z.string() }),
+    input: z.object({
+      orderId: z.string(),
+      productId: z.string(),
+      note: z.string(),
+      tag: z.string(),
+    }),
     output: z.object({
       orderId: z.string(),
       productId: z.string(),
       tags: z.array(z.string()),
       tenant: z.string(),
     }),
-    handler: (input, request, context) => {
+    handler: (input, context) => {
       events.push("handler");
-      expect(input).toEqual({ orderId: "order-1", note: "gift" });
-      expect(request && Object.isFrozen(request.params)).toBe(true);
-      expect(request && Object.isFrozen(request.query)).toBe(true);
+      expect(input).toEqual({
+        orderId: "order-1",
+        productId: "product-2",
+        note: "gift",
+        tag: "red",
+      });
       expect(Object.isFrozen(context.service)).toBe(true);
-      expect(() =>
-        Object.defineProperty(request!.params, "productId", { value: "changed" }),
-      ).toThrow();
       expect(() =>
         Object.defineProperty(context.service, "tenant", { value: "changed" }),
       ).toThrow();
       return {
         orderId: input.orderId,
-        productId: String(request!.params.productId),
-        tags: [...(request!.query.tag as readonly string[])],
+        productId: input.productId,
+        tags: [input.tag],
         tenant: String(context.service.tenant),
       };
     },
@@ -96,7 +101,6 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
       invoke: (options) =>
         invokeFunction(service.get, options.input, {
           source: "http",
-          request: options.request,
           ...(options.signal === undefined ? {} : { signal: options.signal }),
           ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
           ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
@@ -106,13 +110,13 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
   });
 
   const response = await app.request(
-    "http://localhost/orders/order-1/products/product-2?note=gift&tag=red&tag=blue",
+    "http://localhost/orders/order-1/products/product-2?note=gift&tag=red",
   );
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
     orderId: "order-1",
     productId: "product-2",
-    tags: ["red", "blue"],
+    tags: ["red"],
     tenant: "acme",
   });
   expect(events).toEqual(["middleware:before", "handler", "middleware:after"]);
@@ -128,6 +132,7 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
       { in: "path", name: "orderId", required: true },
       { in: "path", name: "productId", required: true },
       { in: "query", name: "note", required: true },
+      { in: "query", name: "tag", required: true },
     ],
   });
   expect(generateClient(graph)).toContain('path.replace(":productId"');
@@ -155,8 +160,13 @@ function serviceGraph(): ApplicationGraph {
         source,
         input: {
           type: "object",
-          required: ["orderId", "note"],
-          properties: { orderId: { type: "string" }, note: { type: "string" } },
+          required: ["orderId", "productId", "note", "tag"],
+          properties: {
+            orderId: { type: "string" },
+            productId: { type: "string" },
+            note: { type: "string" },
+            tag: { type: "string" },
+          },
         },
         output: {
           type: "object",
@@ -182,7 +192,9 @@ function serviceGraph(): ApplicationGraph {
             kind: "input",
             fields: {
               orderId: { kind: "path", name: "orderId" },
+              productId: { kind: "path", name: "productId" },
               note: { kind: "query", name: "note" },
+              tag: { kind: "query", name: "tag" },
             },
           },
           responses: [{ kind: "success", id: "success.200", status: 200 }],
