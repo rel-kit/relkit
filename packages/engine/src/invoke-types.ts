@@ -1,4 +1,4 @@
-import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@zsys/contracts";
 import type { BucketOperationObservation } from "@zsys/buckets";
 import type { CacheOperationObservation } from "@zsys/cache";
 import type { GraphEdge, ObservedEdge } from "@zsys/graph";
@@ -15,6 +15,7 @@ import {
   type PublicClock as SharedPublicClock,
   type PublicLogger as SharedPublicLogger,
   type ServicePolicySource,
+  type InvocationValueHooks,
 } from "@zsys/invocation";
 import type { InvocationFailure, InvocationRunner, PublicFailureEnvelope } from "@zsys/invocation";
 import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
@@ -127,7 +128,7 @@ export interface InvokeOptions<
   readonly deadline?: number;
   readonly timeoutMs?: number;
   readonly signal?: AbortSignal;
-  readonly request?: FunctionRequest;
+  readonly toolHooks?: InvocationValueHooks<Context>;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
   readonly servicePolicies?: ServicePolicySource;

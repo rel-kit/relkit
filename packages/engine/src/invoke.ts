@@ -4,14 +4,12 @@ import {
   normalizeFailure,
   resolveServicePolicy,
   runInInvocationScope,
-  toPublicEnvelope,
 } from "@zsys/invocation";
 import {
   assertSource,
   callHook,
   canonicalTarget,
   calculateDeadline,
-  completeRecord,
   createRecord,
   defaultIdSource,
   defaultRunner,
@@ -21,6 +19,7 @@ import {
   validated,
 } from "./invoke-utils.js";
 import { runHandler } from "./invoke-runtime.js";
+import { completeInvocation } from "./invoke-completion.js";
 import { createEngineDispatcher } from "./invocation-dispatcher.js";
 import { resolveDirectTarget } from "./direct-target.js";
 import {
@@ -30,7 +29,6 @@ import {
 } from "./observability.js";
 import type { DirectFunctionRequest } from "./dependencies.js";
 import type {
-  InvocationCompletion,
   InvocationContext,
   InvocationOutcome,
   InvocationParent,
@@ -183,34 +181,7 @@ export async function invoke<
     error = await validateDeclaredError(target.errors, error);
     outcome = error instanceof ValidationError ? "validation-error" : error.outcome;
   } finally {
-    const completed = completeRecord(record, outcome, options.now?.() ?? Date.now());
-    const completion: InvocationCompletion = Object.freeze({
-      record: completed,
-      outcome,
-      ...(error === undefined ? {} : { error, publicError: toPublicEnvelope(error) }),
-    });
-    try {
-      await callHook(options.hooks?.onCompletion, completion);
-      await emitObservabilityEvent(options.hooks?.observability, {
-        protocol: OBSERVABILITY_HOOK_PROTOCOL,
-        version: OBSERVABILITY_HOOK_VERSION,
-        type: "invocation.completed",
-        completion,
-      });
-    } finally {
-      try {
-        await lease?.release();
-      } finally {
-        await callHook(options.hooks?.onRelease, { record: completed, admitted });
-        await emitObservabilityEvent(options.hooks?.observability, {
-          protocol: OBSERVABILITY_HOOK_PROTOCOL,
-          version: OBSERVABILITY_HOOK_VERSION,
-          type: "invocation.released",
-          release: { record: completed, admitted },
-        });
-        unlink();
-      }
-    }
+    await completeInvocation({ record, outcome, error, options, lease, admitted, unlink });
   }
   if (error !== undefined) throw error;
   return value as Output;

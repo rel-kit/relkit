@@ -84,7 +84,7 @@ function engineOptions<Context extends { readonly signal: AbortSignal }>(
     ...(options.deadlineMs === undefined ? {} : { deadlineMs: options.deadlineMs }),
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
-    ...(options.request === undefined ? {} : { request: options.request }),
+    ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
     ...(options.env === undefined ? {} : { env: options.env }),
     ...(options.clients === undefined ? {} : { clients: options.clients }),
     ...(options.servicePolicies === undefined ? {} : { servicePolicies: options.servicePolicies }),
