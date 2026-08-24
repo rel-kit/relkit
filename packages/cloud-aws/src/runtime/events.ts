@@ -2,14 +2,14 @@ import type { EventOperationContext, EventProvider, EventProviderResult } from "
 import type { EventRuntimeProvider, EventTriggerBinding } from "@zsys/engine";
 import type { EventNode } from "@zsys/graph";
 import { assertResponse, awsRequest } from "./http.js";
-import { credentials, text } from "./config.js";
+import { type AwsCredentials, text } from "./config.js";
 
 export interface AwsEventOptions {
   readonly region: string;
   readonly busName?: unknown;
   readonly source?: unknown;
   readonly endpoint?: unknown;
-  readonly values?: Readonly<Record<string, unknown>> | undefined;
+  readonly credentials?: AwsCredentials;
   readonly fetch?: typeof globalThis.fetch | undefined;
 }
 
@@ -23,7 +23,7 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
   const endpoint =
     text(options.endpoint, "AWS EventBridge endpoint") ??
     `https://events.${options.region}.amazonaws.com`;
-  const auth = credentials(options.values);
+  const auth = options.credentials;
   const triggers = new Map<string, EventTriggerBinding>();
   const publish = async (
     payload: unknown,
