@@ -360,6 +360,29 @@ declare const claimServiceFunctionOwnership: (
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/ownership.ts#L19)
 
+## `service-context.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [freezeServiceContextValue](#freezeservicecontextvalue)
+
+---
+
+# utils
+
+## freezeServiceContextValue
+
+**Signature**
+
+```ts
+declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, object>) => unknown;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-context.ts#L1)
+
 ## `service-middleware.ts`
 
 ---
@@ -386,7 +409,7 @@ Defines ordered, non-business policy for service members.
 
 The callback must call `next` exactly once. Its optional frozen patch enriches
 the current invocation's read-only `context.service` value and never mutates
-the request or shared context.
+shared context.
 
 **Example**
 
@@ -394,8 +417,9 @@ the request or shared context.
 import { defineServiceMiddleware } from "@zsys/app";
 
 const tenantContext = defineServiceMiddleware({
-  handler: async ({ request }, next) => {
-    await next({ tenantId: request?.headers.get("x-tenant-id") ?? "system" });
+  handler: async ({ input }, next) => {
+    const value = input as { readonly tenantId?: string };
+    await next({ tenantId: value.tenantId ?? "system" });
   },
 });
 void tenantContext;
@@ -407,7 +431,7 @@ void tenantContext;
 declare const defineServiceMiddleware: DefineServiceMiddleware;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L53)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L55)
 
 Since v0.1.0
 
@@ -421,7 +445,7 @@ Since v0.1.0
 declare const SERVICE_MIDDLEWARE_POLICY_CODE: "ZSYS_SERVICE_MIDDLEWARE_POLICY";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L17)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L18)
 
 ## ServiceMiddlewarePolicyError (class)
 
@@ -433,7 +457,7 @@ declare class ServiceMiddlewarePolicyError {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L21)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L22)
 
 ### code (property)
 
@@ -443,7 +467,7 @@ declare class ServiceMiddlewarePolicyError {
 readonly code: "ZSYS_SERVICE_MIDDLEWARE_POLICY"
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L22)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L23)
 
 ### reason (property)
 
@@ -453,7 +477,7 @@ readonly code: "ZSYS_SERVICE_MIDDLEWARE_POLICY"
 readonly reason: ServiceMiddlewarePolicyReason
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L23)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L24)
 
 ## ServiceMiddlewarePolicyReason (type alias)
 
@@ -463,7 +487,7 @@ readonly reason: ServiceMiddlewarePolicyReason
 type ServiceMiddlewarePolicyReason = "missing-next" | "duplicate-next" | "invalid-patch";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L19)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L20)
 
 ## normalizeServiceMiddlewareRejection
 
@@ -473,7 +497,7 @@ type ServiceMiddlewarePolicyReason = "missing-next" | "duplicate-next" | "invali
 declare const normalizeServiceMiddlewareRejection: (value: unknown) => InvocationFailure;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L82)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/service-middleware.ts#L84)
 
 ## `types.ts`
 
@@ -522,7 +546,7 @@ export interface DefineService {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L119)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L118)
 
 ## DefineServiceMiddleware (interface)
 
@@ -541,7 +565,7 @@ export interface DefineServiceMiddleware {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L63)
 
 ## DefineServiceMiddlewareOptions (interface)
 
@@ -559,7 +583,7 @@ export interface DefineServiceMiddlewareOptions<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L54)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L53)
 
 ## DefineServiceOptions (interface)
 
@@ -577,7 +601,7 @@ export interface DefineServiceOptions<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L109)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L108)
 
 ## NonEmptyServiceFunctionMap (type alias)
 
@@ -587,7 +611,7 @@ export interface DefineServiceOptions<
 type NonEmptyServiceFunctionMap<Functions> = keyof Functions extends never ? never : Functions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L77)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L76)
 
 ## ServiceContextPatch (type alias)
 
@@ -611,7 +635,7 @@ type ServiceDescriptor<Id, Functions, Middleware> = DescriptorBase<"service", Id
   } & ServiceMemberMap<Id, Functions>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L93)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L92)
 
 ## ServiceDescriptorAny (type alias)
 
@@ -625,7 +649,7 @@ type ServiceDescriptorAny = DescriptorBase<"service", string> &
   };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L103)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L102)
 
 ## ServiceFunctionMap (type alias)
 
@@ -635,7 +659,7 @@ type ServiceDescriptorAny = DescriptorBase<"service", string> &
 type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L75)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L74)
 
 ## ServiceMember (type alias)
 
@@ -647,7 +671,7 @@ type ServiceMember<ServiceId, Target> = Target & {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L80)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L79)
 
 ## ServiceMiddlewareDescriptor (interface)
 
@@ -666,7 +690,7 @@ export interface ServiceMiddlewareDescriptor<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L43)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L42)
 
 ## ServiceMiddlewareHandler (type alias)
 
@@ -679,7 +703,7 @@ type ServiceMiddlewareHandler<Input, Context, Patch> = (
 ) => MaybePromise<void>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L34)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L33)
 
 ## ServiceMiddlewareInvocation (interface)
 
@@ -691,7 +715,6 @@ export interface ServiceMiddlewareInvocation<
   Context extends FunctionContext = FunctionContext,
 > {
   readonly input: Input;
-  readonly request: FunctionRequest | undefined;
   readonly context: Context;
 }
 ```
@@ -706,7 +729,7 @@ export interface ServiceMiddlewareInvocation<
 type ServiceMiddlewareNext<Patch> = (patch?: Patch) => Promise<void>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/services/src/types.ts#L29)
 
 ## ServiceMiddlewareRef (interface)
 

@@ -11,152 +11,115 @@ description: Generated public TypeScript reference for @zsys/routes.
 
 ## Exports Grouped by Category
 
-- [Middleware](#middleware)
+- [Routes](#routes)
   - [defineMiddleware](#definemiddleware)
 - [utils](#utils)
-  - [DefineMiddlewareOptions (interface)](#definemiddlewareoptions-interface)
+  - [MiddlewareContext (interface)](#middlewarecontext-interface)
   - [MiddlewareDescriptor (interface)](#middlewaredescriptor-interface)
-  - [MiddlewareRef (interface)](#middlewareref-interface)
-  - [MiddlewareReference (interface)](#middlewarereference-interface)
+  - [MiddlewareHandler (type alias)](#middlewarehandler-type-alias)
   - [isMiddlewareDescriptor](#ismiddlewaredescriptor)
-  - [isMiddlewareRef](#ismiddlewareref)
+  - [isMiddlewarePath](#ismiddlewarepath)
 
 ---
 
-# Middleware
+# Routes
 
 ## defineMiddleware
 
-Defines serializable route middleware backed by a function target. Its optional
-source-scoped ID is inferred when the compiler can identify the declaration;
-the decision mapping can continue or return a declared route response.
+Defines one automatically discovered path-scoped HTTP middleware handler.
 
 **Example**
 
 ```ts
-import { defineFunction } from "@zsys/functions";
-import { defineMiddleware, http } from "@zsys/routes";
-import { z } from "@zsys/schema";
+import { defineMiddleware } from "@zsys/app";
 
-const authorize = defineFunction({
-  id: "auth",
-  input: z.object({ token: z.string() }),
-  output: z.void(),
-  handler: async () => undefined,
+export default defineMiddleware("/orders/*", async (context, next) => {
+  if (context.req.header("authorization") === undefined) {
+    return context.json({ error: "unauthorized" }, 401);
+  }
+  await next();
 });
-const middleware = defineMiddleware({
-  id: "auth.http",
-  target: authorize,
-  request: http.input({ token: http.header("authorization") }),
-  decision: http.continue(),
-});
-void middleware;
 ```
 
 **Signature**
 
 ```ts
-declare const defineMiddleware: <
-  const Id extends string,
-  const Target extends FunctionRefAny,
-  const Request extends HttpRequestMapping,
->(
-  options: DefineMiddlewareOptions<Id, Target, Request>,
-) => MiddlewareDescriptor<Id, Target, Request>;
+declare const defineMiddleware: (
+  path: string,
+  handler: MiddlewareHandler,
+) => MiddlewareDescriptor<string>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L67)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L49)
 
 Since v0.1.0
 
 # utils
 
-## DefineMiddlewareOptions (interface)
+## MiddlewareContext (interface)
 
 **Signature**
 
 ```ts
-export interface DefineMiddlewareOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly target: Target;
-  readonly request: Request;
-  readonly decision: MiddlewareDecisionMapping;
+export interface MiddlewareContext {
+  readonly signal: AbortSignal;
+  readonly env: Readonly<Record<string, unknown>>;
+  readonly log: PublicLogger;
+  readonly time: PublicClock;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L26)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L11)
 
 ## MiddlewareDescriptor (interface)
 
 **Signature**
 
 ```ts
-export interface MiddlewareDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping,
->
-  extends DescriptorMetadata, MiddlewareRef<Id> {
-  readonly kind: "middleware";
-  readonly id: Id;
-  readonly target: Target;
-  readonly request: Request;
-  readonly decision: MiddlewareDecisionMapping;
+export interface MiddlewareDescriptor<Id extends string = string> extends DescriptorBase<
+  "middleware",
+  Id
+> {
+  readonly path: string;
+  readonly handler: MiddlewareHandler;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L24)
 
-## MiddlewareRef (interface)
+## MiddlewareHandler (type alias)
 
 **Signature**
 
 ```ts
-export interface MiddlewareRef<Id extends string = string> {
-  readonly ref: MiddlewareReference<Id>;
-}
+type MiddlewareHandler = (
+  context: Context,
+  next: Next,
+  zsys: MiddlewareContext,
+) => MaybePromise<Response | void>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L23)
-
-## MiddlewareReference (interface)
-
-**Signature**
-
-```ts
-export interface MiddlewareReference<Id extends string = string> {
-  readonly kind: "middleware";
-  readonly id: Id;
-}
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L19)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L18)
 
 ## isMiddlewareDescriptor
 
 **Signature**
 
 ```ts
-declare const isMiddlewareDescriptor: (
-  value: unknown,
-) => value is MiddlewareDescriptor<string, FunctionRefAny, HttpRequestMapping>;
+declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L102)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L63)
 
-## isMiddlewareRef
+## isMiddlewarePath
 
 **Signature**
 
 ```ts
-declare const isMiddlewareRef: (value: unknown) => value is MiddlewareRef;
+declare const isMiddlewarePath: (value: unknown) => value is string;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L97)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-middleware.ts#L73)
 
 ## `define-route.ts`
 
@@ -182,7 +145,7 @@ The compiler derives the method from the named export and the path from the
 file. Omit `id` for a source-derived route identity, and omit `request` and
 `responses` when schema-based inference represents the transport; explicit
 mappings replace inference completely. Matching path names map into reusable
-function input, while unmatched values remain in `request.params`.
+function input.
 
 **Example**
 
@@ -210,7 +173,7 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: DefineRouteOptions<Id, Target, Request>) => RouteDescriptor<Id, Target, Request>
 ````
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L88)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L79)
 
 Since v0.1.0
 
@@ -233,12 +196,11 @@ export interface DefineRouteOptions<
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L45)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L37)
 
 ## RouteDescriptor (interface)
 
@@ -259,12 +221,11 @@ export interface RouteDescriptor<
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L28)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L21)
 
 ## `http-dsl-types.ts`
 
