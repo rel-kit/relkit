@@ -1,8 +1,6 @@
-import { canonicalJson, GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { NormalizedDescriptor } from "./normalize-types.js";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
-import { referenceId } from "./generate-manifest-utils.js";
 
 export function renderManifest(
   input: ManifestGenerationInput,
@@ -10,8 +8,8 @@ export function renderManifest(
   functions: ReadonlyMap<string, string>,
   targets: ReadonlyMap<string, string>,
   middleware: ReadonlyMap<string, string>,
+  hooks: ReadonlyMap<string, string>,
   transforms: ReadonlyMap<string, string>,
-  middlewareDescriptors: readonly NormalizedDescriptor[],
   providers: readonly string[],
   application?: string,
   agents: ReadonlyMap<string, string> = new Map(),
@@ -40,13 +38,6 @@ export function renderManifest(
   ]
     .filter(Boolean)
     .join("\n");
-  const middlewareDeclarations = middlewareDescriptors
-    .map((descriptor, index) => {
-      const targetId = referenceId(descriptor.value) ?? "";
-      const target = functions.get(targetId) ?? "undefined";
-      return `const __zsys_middleware_${index} = Object.assign((...args: any[]) => (${target} as (...values: any[]) => any)(...args), { targetFunctionId: ${JSON.stringify(targetId)}, request: ${recordValue(descriptor.value, "request")}, decision: ${recordValue(descriptor.value, "decision")} });`;
-    })
-    .join("\n");
   return [
     [generatedImports, imports].filter(Boolean).join("\n"),
     ...(generatedImports !== "" || imports !== "" ? [""] : []),
@@ -56,7 +47,6 @@ export function renderManifest(
     `export const manifestGeneratorVersion = ${GENERATOR_VERSION} as const;`,
     `export const manifestGraphHash = ${JSON.stringify(input.graphHash)} as const;`,
     `export const providerFactories = ${renderProviders(providers)} as const;`,
-    ...(middlewareDeclarations === "" ? [] : [middlewareDeclarations]),
     "export const runtimeManifest = {",
     "  contractVersion: manifestContractVersion,",
     "  generatorVersion: manifestGeneratorVersion,",
@@ -69,6 +59,7 @@ export function renderManifest(
     "  providers: providerFactories,",
     "  providerFactories,",
     `  middleware: ${renderMap(middleware)},`,
+    `  hooks: ${renderMap(hooks)},`,
     `  requestTransforms: ${renderMap(transforms)},`,
     ...(application === undefined ? [] : [`  application: ${application},`]),
     "} as const;",
@@ -81,11 +72,14 @@ function renderMap(values: ReadonlyMap<string, string>): string {
   return `{ ${entries.map(([key, value]) => `${JSON.stringify(key)}: ${value}`).join(", ")} }`;
 }
 
-function renderProviders(tags: readonly string[]): string {
-  return `{ ${tags
-    .map(
-      (tag) => `${JSON.stringify(tag)}: { recipeTag: ${JSON.stringify(tag)}, factory: undefined }`,
-    )
+function renderProviders(keys: readonly string[]): string {
+  return `{ ${keys
+    .map((key) => {
+      const separator = key.indexOf(":");
+      const capability = key.slice(0, separator);
+      const adapter = key.slice(separator + 1);
+      return `${JSON.stringify(key)}: { capability: ${JSON.stringify(capability)}, adapter: ${JSON.stringify(adapter)}, factory: undefined }`;
+    })
     .join(", ")} }`;
 }
 
@@ -97,17 +91,4 @@ function importPath(module: string, input: ManifestGenerationInput): string {
   const prefix = depth === 0 ? "" : "../".repeat(depth);
   const path = `${prefix}${module}`;
   return path.startsWith(".") ? path : `./${path}`;
-}
-
-function recordValue(value: unknown, key: string): string {
-  const record = isRecord(value) ? value[key] : undefined;
-  try {
-    return canonicalJson(record ?? null);
-  } catch {
-    return "null";
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

@@ -71,7 +71,6 @@ export function collectModules(
   functions: readonly NormalizedDescriptor[],
   middleware: readonly NormalizedDescriptor[],
   transforms: readonly NormalizedDescriptor[],
-  functionById: ReadonlyMap<string, NormalizedDescriptor>,
   input: ManifestGenerationInput,
   application?: NormalizedDescriptor,
   runtimeDescriptors: readonly NormalizedDescriptor[] = [],
@@ -85,7 +84,7 @@ export function collectModules(
   };
   functions.forEach(add);
   transforms.forEach(add);
-  for (const descriptor of middleware) add(functionById.get(referenceId(descriptor.value) ?? ""));
+  middleware.forEach(add);
   add(application);
   runtimeDescriptors.forEach(add);
   return [...modules].sort();
@@ -97,28 +96,21 @@ export function importBindings(modules: readonly string[]): ReadonlyMap<string, 
   );
 }
 
-export function providerTags(descriptors: readonly NormalizedDescriptor[]): readonly string[] {
-  const tags = new Set<string>();
+export function providerFactoryKeys(
+  descriptors: readonly NormalizedDescriptor[],
+): readonly string[] {
+  const keys = new Set<string>();
   const app = descriptors.find((descriptor) => descriptor.kind === "app");
   const providers =
     app && isRecord(app.value) && isRecord(app.value.providers) ? app.value.providers : {};
-  const defaults: Readonly<Record<string, string>> = {
-    development: "local",
-    test: "test",
-    production: "aws",
-  };
-  for (const environment of Object.keys(providers).sort()) {
-    const provider = providers[environment];
-    const tag = isRecord(provider)
-      ? typeof provider.recipeTag === "string"
-        ? provider.recipeTag
-        : typeof provider.recipe === "string"
-          ? provider.recipe
-          : undefined
-      : undefined;
-    tags.add(tag ?? defaults[environment] ?? environment);
+  for (const [capability, profiles] of Object.entries(providers)) {
+    if (!isRecord(profiles)) continue;
+    for (const binding of Object.values(profiles)) {
+      const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
+      if (typeof adapter.adapter === "string") keys.add(`${capability}:${adapter.adapter}`);
+    }
   }
-  return [...tags].sort();
+  return [...keys].sort();
 }
 
 function modulePath(
