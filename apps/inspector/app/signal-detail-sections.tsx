@@ -46,6 +46,67 @@ export function WaterfallPanel({ spans }: { readonly spans: readonly InspectorOb
   return <TraceWaterfall spans={spans} />;
 }
 
+export function RequestExchangePanel({ request }: { readonly request: InspectorObject }) {
+  return (
+    <section className="panel" aria-labelledby="request-exchange-heading">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">REQUEST / RESPONSE</p>
+          <h2 id="request-exchange-heading">Payload and headers</h2>
+        </div>
+        <span className="badge">Redaction-first</span>
+      </div>
+      <div className="exchange-grid">
+        <CapturePanel title="Request headers" value={first(request, "requestHeaders", "headers")} />
+        <CapturePanel
+          title="Request payload"
+          value={first(request, "requestBody", "requestPayload", "body")}
+        />
+        <CapturePanel title="Response headers" value={first(request, "responseHeaders")} />
+        <CapturePanel
+          title="Response body"
+          value={first(request, "responseBody", "responsePayload")}
+        />
+      </div>
+      <p className="supporting-copy">
+        Bodies and protected headers appear only when the active backend explicitly enables bounded,
+        redacted development capture. Otherwise they are intentionally not retained.
+      </p>
+    </section>
+  );
+}
+
+function CapturePanel({ title, value }: { readonly title: string; readonly value: unknown }) {
+  return (
+    <div className="capture-panel">
+      <h3>{title}</h3>
+      {value === undefined ? (
+        <p className="schema-empty">Not retained by the active backend.</p>
+      ) : (
+        <DataValue value={value} />
+      )}
+    </div>
+  );
+}
+
+function DataValue({ value }: { readonly value: unknown }) {
+  if (value === null || typeof value !== "object")
+    return <code className="schema-value">{String(value)}</code>;
+  return <pre className="safe-json">{safeJson(value)}</pre>;
+}
+
+function first(value: InspectorObject, ...keys: readonly string[]): unknown {
+  return keys.map((key) => value[key]).find((item) => item !== undefined);
+}
+
+function safeJson(value: unknown): string {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "Unavailable";
+  }
+}
+
 export function RequestsPanel({ items }: { readonly items: readonly InspectorObject[] }) {
   return (
     <section className="panel" aria-labelledby="trace-requests-heading">

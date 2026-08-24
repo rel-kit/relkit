@@ -1,6 +1,12 @@
 import type { InspectorObject } from "../lib/api-types";
 import { text, number, type SignalKind } from "../lib/observability-model";
-import { LogsPanel, RequestsPanel, TimelinePanel, WaterfallPanel } from "./signal-detail-sections";
+import {
+  LogsPanel,
+  RequestsPanel,
+  RequestExchangePanel,
+  TimelinePanel,
+  WaterfallPanel,
+} from "./signal-detail-sections";
 
 interface SignalDetailViewProps {
   readonly kind: SignalKind;
@@ -38,6 +44,7 @@ export function SignalDetailView(props: SignalDetailViewProps) {
         {...(request === undefined ? {} : { request })}
         {...(trace === undefined ? {} : { trace })}
       />
+      {isRequest && request !== undefined && <RequestExchangePanel request={request} />}
       {isRequest && request !== undefined && (
         <TimelinePanel request={request} records={props.records} />
       )}

@@ -1,7 +1,17 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { SignalFilters, SignalKind } from "../lib/observability-model";
 import { Button } from "../components/ui/button";
+import {
+  Activity,
+  CalendarClock,
+  Code2,
+  Fingerprint,
+  GitBranch,
+  ListFilter,
+  Route,
+} from "lucide-react";
 
 interface SignalsFiltersProps {
   readonly kind: SignalKind;
@@ -52,20 +62,67 @@ export function SignalsFilters({
       <div className="signal-filter-grid">
         <Field
           label="From"
+          icon={<CalendarClock aria-hidden="true" />}
           name="from"
           value={value.from}
           type="datetime-local"
           onChange={update}
         />
-        <Field label="To" name="to" value={value.to} type="datetime-local" onChange={update} />
-        <Field label="Route ID" name="routeId" value={value.routeId} onChange={update} />
-        <Field label="Function ID" name="functionId" value={value.functionId} onChange={update} />
-        <Field label="Request ID" name="requestId" value={value.requestId} onChange={update} />
-        <Field label="Trace ID" name="traceId" value={value.traceId} onChange={update} />
-        <Field label="Outcome" name="outcome" value={value.outcome} onChange={update} />
+        <Field
+          label="To"
+          icon={<CalendarClock aria-hidden="true" />}
+          name="to"
+          value={value.to}
+          type="datetime-local"
+          onChange={update}
+        />
+        <Field
+          label="Route ID"
+          icon={<Route aria-hidden="true" />}
+          name="routeId"
+          value={value.routeId}
+          onChange={update}
+        />
+        <Field
+          label="Function ID"
+          icon={<Code2 aria-hidden="true" />}
+          name="functionId"
+          value={value.functionId}
+          onChange={update}
+        />
+        <Field
+          label="Request ID"
+          icon={<Fingerprint aria-hidden="true" />}
+          name="requestId"
+          value={value.requestId}
+          onChange={update}
+        />
+        <Field
+          label="Trace ID"
+          icon={<GitBranch aria-hidden="true" />}
+          name="traceId"
+          value={value.traceId}
+          onChange={update}
+        />
+        <Field
+          label="Service ID"
+          icon={<Activity aria-hidden="true" />}
+          name="serviceId"
+          value={value.serviceId}
+          onChange={update}
+        />
+        <Field
+          label="Outcome"
+          icon={<ListFilter aria-hidden="true" />}
+          name="outcome"
+          value={value.outcome}
+          onChange={update}
+        />
         {kind === "logs" && (
           <label className="signal-filter-field">
-            <span id="signal-filter-severity-label">Severity</span>
+            <span id="signal-filter-severity-label" className="signal-filter-label">
+              <ListFilter aria-hidden="true" /> Severity
+            </span>
             <select
               id="signal-filter-severity"
               name="severity"
@@ -84,7 +141,9 @@ export function SignalsFilters({
           </label>
         )}
         <label className="signal-filter-field">
-          <span id="signal-filter-limit-label">Page size</span>
+          <span id="signal-filter-limit-label" className="signal-filter-label">
+            <ListFilter aria-hidden="true" /> Page size
+          </span>
           <select
             id="signal-filter-limit"
             name="limit"
@@ -110,12 +169,14 @@ export function SignalsFilters({
 
 function Field({
   label,
+  icon,
   name,
   value,
   type = "text",
   onChange,
 }: {
   readonly label: string;
+  readonly icon: ReactNode;
   readonly name: keyof SignalFilters;
   readonly value: string;
   readonly type?: "text" | "datetime-local";
@@ -123,7 +184,9 @@ function Field({
 }) {
   return (
     <label className="signal-filter-field">
-      <span id={`signal-filter-${name}-label`}>{label}</span>
+      <span id={`signal-filter-${name}-label`} className="signal-filter-label">
+        {icon} {label}
+      </span>
       <input
         id={`signal-filter-${name}`}
         name={name}
