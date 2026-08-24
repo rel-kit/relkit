@@ -1,11 +1,12 @@
 import type { EventTriggerConfig, GraphNode } from "@zsys/graph";
 import type { FromGraphOptions } from "./from-graph-validation.js";
-import { byLogical, nodes } from "./from-graph-validation.js";
+import { byLogical, isManaged, nodes } from "./from-graph-validation.js";
 import { iam } from "./from-graph-aws.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 
 export function events(context: PlanContext) {
   return nodes(context.graph.nodes, "event")
+    .filter(() => isManaged(context.providers, "events", "default"))
     .map((event) => ({
       ...base(
         context,
@@ -27,6 +28,10 @@ export function eventTriggers(context: PlanContext) {
       (node): node is Extract<GraphNode, { kind: "trigger" }> =>
         node.kind === "trigger" && node.triggerType === "event",
     )
+    .filter((node) => {
+      const config = node.config as unknown as EventTriggerConfig;
+      return isManaged(context.providers, "events", config.profile ?? "default");
+    })
     .map((node) => {
       const config = node.config as unknown as EventTriggerConfig;
       const profile = config.profile ?? "default";
@@ -51,6 +56,7 @@ export function eventTriggers(context: PlanContext) {
 
 export function buckets(context: PlanContext) {
   return nodes(context.graph.nodes, "bucket")
+    .filter((bucket) => isManaged(context.providers, "buckets", bucket.profile))
     .map((bucket) => ({
       ...base(
         context,
@@ -72,6 +78,7 @@ export function buckets(context: PlanContext) {
 
 export function caches(context: PlanContext) {
   return nodes(context.graph.nodes, "cache")
+    .filter((cache) => isManaged(context.providers, "cache", cache.profile))
     .map((cache) => ({
       ...base(
         context,

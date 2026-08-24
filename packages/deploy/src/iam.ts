@@ -1,4 +1,4 @@
-import type { ApplicationGraph, GraphNode } from "@zsys/graph";
+import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@zsys/graph";
 import { logicalName } from "./from-graph-validation.js";
 import type {
   DeploymentFunctionCapability,
@@ -29,8 +29,18 @@ interface Grant {
 }
 
 /** Builds edge-derived shared-role policy data and future per-function grants. */
-export function createIamPlan(appId: string, graph: ApplicationGraph): DeploymentIamPlan {
+export function createIamPlan(
+  appId: string,
+  graph: ApplicationGraph,
+  providers: ReadonlyMap<string, ProviderProfileNode>,
+): DeploymentIamPlan {
   const grants = new Map<string, Grant>();
+  const managedResources = new Set(
+    graph.edges.flatMap((edge) => {
+      if (edge.kind !== "uses-provider-profile") return [];
+      return providers.get(edge.to)?.ownership === "managed" ? [edge.from] : [];
+    }),
+  );
   const functionIds = new Set(
     graph.nodes.filter((node) => node.kind === "function").map((node) => node.id),
   );
@@ -41,7 +51,7 @@ export function createIamPlan(appId: string, graph: ApplicationGraph): Deploymen
     kind: string,
     actions: readonly string[],
   ): void => {
-    if (actions.length === 0) return;
+    if (actions.length === 0 || !managedResources.has(resourceId)) return;
     const resource = logicalName(appId, kind, resourceId);
     const key = [functionId, capability, resourceId, actions.join(",")].join("\0");
     grants.set(key, { functionId, capability, resourceId, resource, actions });
