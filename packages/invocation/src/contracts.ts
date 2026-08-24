@@ -1,4 +1,4 @@
-import type { FunctionRequest, MaybePromise, ProtocolId } from "@zsys/contracts";
+import type { MaybePromise, ProtocolId } from "@zsys/contracts";
 import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
 import { Effect } from "effect";
 import type { InvocationFailure, PublicFailureEnvelope } from "./failure-types.js";
@@ -62,11 +62,9 @@ export interface InvocationTarget<
   readonly errors?: readonly InvocationErrorDefinition[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
-  readonly handler: (
-    input: Input,
-    request: FunctionRequest | undefined,
-    context: Context,
-  ) => MaybePromise<Output>;
+  readonly onBefore?: (input: Input, context: Context) => MaybePromise<Input>;
+  readonly onAfter?: (output: Output, context: Context) => MaybePromise<Output>;
+  readonly handler: (input: Input, context: Context) => MaybePromise<Output>;
 }
 
 export interface InvocationRecord extends InvocationMetadata {

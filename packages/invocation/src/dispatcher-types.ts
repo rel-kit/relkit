@@ -1,4 +1,4 @@
-import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@zsys/contracts";
 import type {
   InvocationCompletion,
   InvocationContext,
@@ -59,7 +59,7 @@ export interface InvocationDispatchOptions<
   readonly deadlineMs?: number;
   readonly timeoutMs?: number;
   readonly signal?: AbortSignal;
-  readonly request?: FunctionRequest;
+  readonly toolHooks?: InvocationValueHooks<Context>;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly now?: () => number;
   readonly time?: PublicClock;
@@ -75,6 +75,11 @@ export interface InvocationDispatchOptions<
     readonly record: InvocationRecord;
     readonly admitted: boolean;
   }) => MaybePromise<void>;
+}
+
+export interface InvocationValueHooks<Context extends { readonly signal: AbortSignal }> {
+  readonly onBefore?: (input: unknown, context: Context) => MaybePromise<unknown>;
+  readonly onAfter?: (output: unknown, context: Context) => MaybePromise<unknown>;
 }
 
 export type StandaloneDispatcherOptions<

@@ -1,20 +1,14 @@
 import { Effect } from "effect";
-import type { FunctionRequest, MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@zsys/contracts";
 import { createAbortBridge } from "./abort.js";
 import { withDeadline, withTimeout } from "./deadline.js";
 import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";
 import { normalizeFailure } from "./failure.js";
 import type { InvocationFailure } from "./failure-types.js";
-import { isolateFunctionRequest } from "./request.js";
 
 export interface HandlerBridgeOptions<Input, Output, Context extends object> {
-  readonly handler: (
-    input: Input,
-    request: FunctionRequest | undefined,
-    context: Context,
-  ) => MaybePromise<unknown>;
+  readonly handler: (input: Input, context: Context) => MaybePromise<unknown>;
   readonly input: Input;
-  readonly request?: FunctionRequest;
   readonly publicContext: Context;
   readonly deadline?: number;
   readonly timeoutMs?: number;
@@ -57,7 +51,7 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
 
     let result: MaybePromise<unknown>;
     try {
-      result = options.handler(options.input, isolateFunctionRequest(options.request), context);
+      result = options.handler(options.input, context);
     } catch (cause) {
       complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal })));
       return;

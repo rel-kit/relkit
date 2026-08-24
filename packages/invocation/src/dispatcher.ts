@@ -4,6 +4,7 @@ import type {
   InvocationDispatchRequest,
   InvocationDispatcher,
   InvocationDispatchScope,
+  InvocationValueHooks,
 } from "./dispatcher-types.js";
 
 export function currentInvocationDispatcher(): InvocationDispatcher | undefined {
@@ -23,6 +24,7 @@ export type {
   InvocationDispatcher,
   InvocationDispatchOptions,
   InvocationDispatchScope,
+  InvocationValueHooks,
   LocalStructuredLogger,
   ManagedDependencyCategory,
   ManagedDependencySources,

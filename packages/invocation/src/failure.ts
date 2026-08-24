@@ -33,26 +33,7 @@ import type {
   TimeoutFailure,
   UnexpectedDefect,
 } from "./failure-types.js";
-export type {
-  ApplicationFailure,
-  ApplicationFailureOptions,
-  CancellationFailure,
-  ErrorRetry,
-  FailureBase,
-  FailureKind,
-  FailureOutcome,
-  FailureTag,
-  FailureTelemetry,
-  FailureTelemetryOptions,
-  InvocationFailure,
-  NormalizeFailureOptions,
-  ProviderFailure,
-  ProviderFailureOptions,
-  PublicFailureEnvelope,
-  RedactedFailureDetail,
-  TimeoutFailure,
-  UnexpectedDefect,
-} from "./failure-types.js";
+export type * from "./failure-types.js";
 export function applicationFailure(options: ApplicationFailureOptions): ApplicationFailure {
   const retry = normalizeErrorRetry(options.retry, options.afterMs);
   return makeFailure(
