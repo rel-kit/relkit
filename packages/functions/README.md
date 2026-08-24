@@ -13,20 +13,18 @@ const output = z.object({ greeting: z.string() });
 export default defineFunction({
   input,
   output,
-  handler: async (value, request, context) => {
-    request?.params;
-    request?.headers.get("x-request-id");
+  onBefore: async (value, context) => ({ ...value, name: value.name.trim() }),
+  handler: async (value, context) => {
     context.log.info("greeting requested");
     return { greeting: `Hello, ${value.name}!` };
   },
 });
 ```
 
-Declared dependencies add named Promise clients to the handler context. No
-runtime framework type is needed in application code. The request is optional
-and only exists for HTTP; its immutable params, query, and headers are
-transport data separate from reusable input. Calls from other functions use
-`target.invoke(input)` rather than a declared function dependency map.
+Declared dependencies add named Promise clients to the handler and hook context.
+HTTP request state remains in route middleware and route mapping. Calls from
+other functions use `target.invoke(input)` rather than a declared function
+dependency map.
 
 IDs are optional for source-scoped functions. The compiler derives a stable
 filesystem-safe ID from the source/export hierarchy; keep an explicit ID when

@@ -8,11 +8,14 @@ export type {
   FunctionToolApprovalResolver,
   FunctionToolDescriptor,
   FunctionToolInvokeOptions,
+  FunctionToolContext,
+  FunctionToolHook,
   FunctionToolMetadata,
   FunctionToolOptions,
   FunctionToolSideEffect,
   FunctionToolTarget,
 } from "./function-tool.js";
+export { copyFunctionToolHooks } from "./function-tool.js";
 export {
   createFunctionToolInvoker,
   FunctionToolApprovalDeniedError,
