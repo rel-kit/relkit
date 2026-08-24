@@ -12,18 +12,11 @@ import {
   assertRequestMapping,
   assertResponse,
   isHttpResponseMapping,
-  isMiddlewareDecision,
   type HttpMethod,
   type HttpRequestMapping,
   type HttpResponseMapping,
 } from "./http-dsl.js";
 import { copyRateLimit, positive, successStatus, type RouteRateLimit } from "./route-options.js";
-import {
-  isMiddlewareDescriptor,
-  isMiddlewareRef,
-  type MiddlewareDescriptor,
-  type MiddlewareRef,
-} from "./define-middleware.js";
 
 export interface RouteDescriptor<
   Id extends string,
@@ -39,7 +32,6 @@ export interface RouteDescriptor<
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 export interface DefineRouteOptions<
@@ -54,7 +46,6 @@ export interface DefineRouteOptions<
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 
@@ -65,7 +56,7 @@ export interface DefineRouteOptions<
  * file. Omit `id` for a source-derived route identity, and omit `request` and
  * `responses` when schema-based inference represents the transport; explicit
  * mappings replace inference completely. Matching path names map into reusable
- * function input, while unmatched values remain in `request.params`.
+ * function input.
  *
  * @example A GET route with inferred path and query input
  * ```ts
@@ -95,7 +86,6 @@ export function defineRoute<
     throw new TypeError("Route target must be a function reference");
   if (options.request !== undefined) assertRequestMapping(options.request);
   const responses = copyResponses(options.responses);
-  const middleware = copyMiddleware(options.middleware, responses);
   const timeoutMs = positive(options.timeoutMs, "timeoutMs");
   const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
   const status = successStatus(options.successStatus);
@@ -117,7 +107,6 @@ export function defineRoute<
     ...(status === undefined ? {} : { successStatus: status }),
     ...(maxBodyBytes === undefined ? {} : { maxBodyBytes }),
     ...(rateLimit === undefined ? {} : { rateLimit }),
-    ...(middleware === undefined ? {} : { middleware }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
   }) as RouteDescriptor<Id, Target, Request>;
 }
@@ -136,42 +125,6 @@ function copyResponses(
     return response;
   });
   return Object.freeze(result);
-}
-
-function copyMiddleware(
-  values: readonly MiddlewareRef[] | undefined,
-  responses: readonly HttpResponseMapping[] | undefined,
-): readonly MiddlewareRef[] | undefined {
-  if (values === undefined) return undefined;
-  if (!Array.isArray(values)) throw new TypeError("Route middleware must be an array");
-  const ids = new Set<string>();
-  const result = values.map((value) => {
-    if (!isMiddlewareRef(value))
-      throw new TypeError("Route middleware must be a middleware reference");
-    const id = value.ref.id;
-    if (ids.has(id)) throw new TypeError(`Duplicate route middleware "${id}"`);
-    ids.add(id);
-    const decision = isMiddlewareDescriptor(value) ? value.decision : undefined;
-    if (decision?.kind === "respond") {
-      if (responses === undefined) {
-        throw new TypeError(`Middleware "${id}" requires explicit route responses`);
-      }
-      if (!isDeclaredResponse(decision.responseId, responses)) {
-        throw new TypeError(`Middleware "${id}" responds with an undeclared route response`);
-      }
-    }
-    return value;
-  });
-  return Object.freeze(result);
-}
-
-function isDeclaredResponse(id: string, responses: readonly HttpResponseMapping[]): boolean {
-  return responses.some(
-    (response) =>
-      response.id === id ||
-      response.errorId === id ||
-      (id === "validation" && response.kind === "validation-error"),
-  );
 }
 
 function isFunctionTarget(value: unknown): value is FunctionRefAny {

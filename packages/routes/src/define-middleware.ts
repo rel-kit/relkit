@@ -1,136 +1,93 @@
+import type { Context, Next } from "hono";
 import {
+  createDescriptorBase,
   deepFreeze,
-  isRef,
-  isStableId,
-  normalizeId,
-  type DescriptorMetadata,
+  isDescriptor,
+  type DescriptorBase,
+  type MaybePromise,
 } from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
-import type { FunctionRefAny } from "@zsys/functions";
-import type { StandardSchemaV1 } from "@zsys/schema";
-import {
-  assertRequestMapping,
-  isHttpRequestMapping,
-  isMiddlewareDecision,
-  type HttpRequestMapping,
-  type MiddlewareDecisionMapping,
-} from "./http-dsl.js";
+import { createUnboundIdentity, type PublicClock, type PublicLogger } from "@zsys/invocation";
 
-export interface MiddlewareReference<Id extends string = string> {
-  readonly kind: "middleware";
-  readonly id: Id;
+export interface MiddlewareContext {
+  readonly signal: AbortSignal;
+  readonly env: Readonly<Record<string, unknown>>;
+  readonly log: PublicLogger;
+  readonly time: PublicClock;
 }
-export interface MiddlewareRef<Id extends string = string> {
-  readonly ref: MiddlewareReference<Id>;
-}
-export interface DefineMiddlewareOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly target: Target;
-  readonly request: Request;
-  readonly decision: MiddlewareDecisionMapping;
-}
-export interface MiddlewareDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping,
->
-  extends DescriptorMetadata, MiddlewareRef<Id> {
-  readonly kind: "middleware";
-  readonly id: Id;
-  readonly target: Target;
-  readonly request: Request;
-  readonly decision: MiddlewareDecisionMapping;
+
+export type MiddlewareHandler = (
+  context: Context,
+  next: Next,
+  zsys: MiddlewareContext,
+) => MaybePromise<Response | void>;
+
+export interface MiddlewareDescriptor<Id extends string = string> extends DescriptorBase<
+  "middleware",
+  Id
+> {
+  readonly path: string;
+  readonly handler: MiddlewareHandler;
 }
 
 /**
- * Defines serializable route middleware backed by a function target. Its optional
- * source-scoped ID is inferred when the compiler can identify the declaration;
- * the decision mapping can continue or return a declared route response.
+ * Defines one automatically discovered path-scoped HTTP middleware handler.
  *
  * @example
  * ```ts
- * import { defineFunction } from "@zsys/functions"
- * import { defineMiddleware, http } from "@zsys/routes"
- * import { z } from "@zsys/schema"
+ * import { defineMiddleware } from "@zsys/app"
  *
- * const authorize = defineFunction({ id: "auth", input: z.object({ token: z.string() }), output: z.void(), handler: async () => undefined })
- * const middleware = defineMiddleware({ id: "auth.http", target: authorize, request: http.input({ token: http.header("authorization") }), decision: http.continue() })
- * void middleware
+ * export default defineMiddleware("/orders/*", async (context, next) => {
+ *   if (context.req.header("authorization") === undefined) {
+ *     return context.json({ error: "unauthorized" }, 401)
+ *   }
+ *   await next()
+ * })
  * ```
- * @category Middleware
+ * @category Routes
  * @since 0.1.0
  */
-export function defineMiddleware<
-  const Id extends string,
-  const Target extends FunctionRefAny,
-  const Request extends HttpRequestMapping,
->(
-  options: DefineMiddlewareOptions<Id, Target, Request>,
-): MiddlewareDescriptor<Id, Target, Request> {
-  if (hasOwn(options, "handler"))
-    throw new TypeError("Middleware declarations cannot own handlers");
-  const id = normalizeId(
-    options.id === undefined ? createUnboundIdentity() : options.id,
-  ) as unknown as Id;
-  if (!isFunctionTarget(options.target))
-    throw new TypeError("Middleware target must be a function reference");
-  assertRequestMapping(options.request);
-  if (!isMiddlewareDecision(options.decision))
-    throw new TypeError("Middleware decision must be serializable");
+export function defineMiddleware(
+  path: string,
+  handler: MiddlewareHandler,
+): MiddlewareDescriptor<string> {
+  const normalizedPath = middlewarePath(path);
+  if (typeof handler !== "function") throw new TypeError("Middleware handler must be a function");
+  const id = createUnboundIdentity();
   return deepFreeze({
-    kind: "middleware" as const,
-    id,
-    ref: Object.freeze({ kind: "middleware" as const, id }),
-    target: options.target,
-    request: options.request,
-    decision: options.decision,
-    ...(options.title === undefined ? {} : { title: options.title }),
-    ...(options.description === undefined ? {} : { description: options.description }),
-    ...(options.tags === undefined ? {} : { tags: Object.freeze([...options.tags]) }),
-  }) as MiddlewareDescriptor<Id, Target, Request>;
+    ...createDescriptorBase("middleware", id),
+    path: normalizedPath,
+    handler,
+  });
 }
 
-export function isMiddlewareRef(value: unknown): value is MiddlewareRef {
-  if (!isRecord(value) || !isRecord(value.ref)) return false;
-  return value.ref.kind === "middleware" && isStableId(value.ref.id);
-}
-
-export function isMiddlewareDescriptor(
-  value: unknown,
-): value is MiddlewareDescriptor<string, FunctionRefAny, HttpRequestMapping> {
-  if (!isMiddlewareRef(value) || !isRecord(value)) return false;
-  const descriptor = value as MiddlewareDescriptor<string, FunctionRefAny, HttpRequestMapping>;
+export function isMiddlewareDescriptor(value: unknown): value is MiddlewareDescriptor {
+  const candidate = value as Partial<MiddlewareDescriptor>;
   return (
-    descriptor.kind === "middleware" &&
-    isFunctionTarget(descriptor.target) &&
-    isHttpRequestMapping(descriptor.request) &&
-    isMiddlewareDecision(descriptor.decision)
+    isDescriptor(value, "middleware") &&
+    typeof candidate.path === "string" &&
+    isMiddlewarePath(candidate.path) &&
+    typeof candidate.handler === "function"
   );
 }
 
-function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return (
-    isRecord(value) &&
-    isRef(value.ref, "function") &&
-    isSchema(value.input) &&
-    isSchema(value.output)
-  );
+export function isMiddlewarePath(value: unknown): value is string {
+  if (value === "*") return true;
+  if (typeof value !== "string" || !value.startsWith("/")) return false;
+  if (value === "/") return true;
+  const segments = value.slice(1).split("/");
+  if (segments.some((segment) => segment === "")) return false;
+  return segments.every((segment, index) => {
+    if (segment === "*") return index === segments.length - 1;
+    if (/^:[A-Za-z_][A-Za-z0-9_]*$/.test(segment)) return true;
+    return !/[*:?{}]/.test(segment);
+  });
 }
-function isSchema(value: unknown): value is StandardSchemaV1 {
-  return (
-    isRecord(value) &&
-    isRecord(value["~standard"]) &&
-    value["~standard"].version === 1 &&
-    typeof value["~standard"].validate === "function"
-  );
-}
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
-}
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+
+function middlewarePath(value: unknown): string {
+  if (!isMiddlewarePath(value)) {
+    throw new TypeError(
+      'Middleware path must be "*" or an absolute path containing static segments, :params, and an optional trailing *',
+    );
+  }
+  return value;
 }
