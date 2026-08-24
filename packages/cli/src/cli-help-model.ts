@@ -1,6 +1,12 @@
-import type { CliHelpArgument, CliHelpCommand, CliHelpModel, CliHelpOption } from "./cli-help-types.js";
+import { deepFreeze } from "@zsys/contracts";
+import type {
+  CliHelpArgument,
+  CliHelpCommand,
+  CliHelpModel,
+  CliHelpOption,
+} from "./cli-help-types.js";
 
-export type { CliHelpArgument, CliHelpCommand, CliHelpModel, CliHelpOption } from "./cli-help-types.js";
+export type * from "./cli-help-types.js";
 
 const projectRoot = option("project-root", "string", "Application directory (defaults to cwd)");
 const environment = option(
@@ -187,10 +193,4 @@ function argument(name: string, required: boolean, description: string): CliHelp
 }
 function title(value: string): string {
   return value.replaceAll("-", " ").replace(/^./, (character) => character.toUpperCase());
-}
-function deepFreeze<T extends object>(value: T): T {
-  Object.freeze(value);
-  for (const child of Object.values(value))
-    if (child && typeof child === "object") deepFreeze(child);
-  return value;
 }

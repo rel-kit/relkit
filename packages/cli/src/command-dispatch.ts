@@ -1,5 +1,6 @@
 import { canonicalJson } from "@zsys/contracts";
-import { resolve } from "node:path";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { buildProject } from "./commands/build.js";
 import { checkProject } from "./commands/check.js";
 import { startDev } from "./commands/dev.js";
@@ -67,32 +68,44 @@ async function runDevCommand(args: readonly string[], context: CliCommandContext
     options.inspectorPort,
     process.env,
   );
-  const session = await startDev({
-    projectRoot,
-    stablePort: ports.backend,
-    signal: context.signal,
-    inspector: ports.inspector,
-    compile: async (request) => {
-      const result = await buildProject({
-        projectRoot: request.projectRoot,
-        buildDirectory: request.outputDirectory,
-        signal: request.signal,
-      });
-      if (!result.ok)
-        throw new Error(result.diagnostics.map((diagnostic) => diagnostic.message).join("\n"));
-      return { entrypoint: "server/index.ts" };
-    },
-  });
+  const generatedDirectory = await createDevGeneratedDirectory(projectRoot);
   try {
-    const watcher = startDevSourceWatcher(session);
+    const session = await startDev({
+      projectRoot,
+      stablePort: ports.backend,
+      generatedDirectory,
+      signal: context.signal,
+      inspector: ports.inspector,
+      compile: async (request) => {
+        const result = await buildProject({
+          projectRoot: request.projectRoot,
+          buildDirectory: request.outputDirectory,
+          signal: request.signal,
+        });
+        if (!result.ok)
+          throw new Error(result.diagnostics.map((diagnostic) => diagnostic.message).join("\n"));
+        return { entrypoint: "server/index.ts" };
+      },
+    });
     try {
-      await session.waitForShutdown();
+      const watcher = startDevSourceWatcher(session);
+      try {
+        await session.waitForShutdown();
+      } finally {
+        watcher.close();
+      }
     } finally {
-      watcher.close();
+      await session.stop();
     }
   } finally {
-    await session.stop();
+    await rm(generatedDirectory, { recursive: true, force: true }).catch(() => undefined);
   }
+}
+
+async function createDevGeneratedDirectory(projectRoot: string): Promise<string> {
+  const generatedRoot = join(projectRoot, ".zsys", "generated");
+  await mkdir(generatedRoot, { recursive: true });
+  return mkdtemp(join(generatedRoot, ".dev-"));
 }
 
 type ProjectArgs = {

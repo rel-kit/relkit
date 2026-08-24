@@ -8,9 +8,41 @@ function bindAgents() {
     const functionId = \`zsys.agent.\${node.id}.invoke\`;
     executableManifest.functions[functionId] = createGeneratedAgentFunction(
       node.id,
-      (input, _request, context) => invokeBoundAgent(agent, input, context),
+      (input, context) => invokeBoundAgent(agent, input, context),
     );
   }
+}
+
+function routeMiddlewareContext({ middlewareId, signal }) {
+  const time = Object.freeze({
+    now: () => new Date(),
+    sleep: (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+  });
+  const write = (level, message, fields = {}) => {
+    const record = telemetry.collect({
+      version: 1,
+      signal: "log",
+      timestamp: time.now().toISOString(),
+      level,
+      component: middlewareId,
+      message,
+      fields,
+    });
+    if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
+  };
+  const logger = (level) => (message, fields) => write(level, message, fields);
+  return {
+    signal,
+    env: values,
+    time,
+    log: Object.freeze({
+      trace: logger("trace"),
+      debug: logger("debug"),
+      info: logger("info"),
+      warn: logger("warn"),
+      error: logger("error"),
+    }),
+  };
 }
 
 async function invokeBoundAgent(agent, input, context) {

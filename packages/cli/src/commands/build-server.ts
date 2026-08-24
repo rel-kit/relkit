@@ -16,11 +16,12 @@ export function serverSource(
 ): string {
   return `import { createGeneratedAgentFunction, invokeAgent } from "@zsys/agents";
 import { resolveEnv } from "@zsys/config";
-import { getAwsProviderFactory } from "@zsys/cloud-aws/runtime";
+import { awsProviderFactories } from "@zsys/cloud-aws/runtime";
 import { createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs } from "@zsys/engine";
 import { createRegistrationPlan } from "@zsys/graph";
 import { installInspectorEndpoints } from "@zsys/inspector-api";
 import { createObservabilityRuntime } from "@zsys/observability";
+import { standardProviderFactories } from "@zsys/providers-standard";
 import { consoleHumanSink, formatHumanLog } from "@zsys/runtime-effect";
 import { createApp } from "@zsys/runtime-hono";
 import { runtimeManifest } from "./runtime.manifest.ts";
@@ -45,11 +46,11 @@ const environmentResolution = resolveRuntimeEnvironment(application.env, environ
 const values = environmentResolution.values;
 bindAgents();
 const registry = createFunctionRegistry(graph, executableManifest);
-const awsFactory = getAwsProviderFactory("aws");
+const providerFactories = { ...standardProviderFactories, ...awsProviderFactories };
 let materializedJobs;
 let jobWorker;
 const providerStartup = (environmentResolution.error === undefined
-  ? createProviderRegistry({ generationId, environment, providers: application.providers, graph, values, environmentMetadata: application.env.metadata, signal: shutdownController.signal, ...(awsFactory === undefined ? {} : { factories: { aws: awsFactory } }) })
+  ? createProviderRegistry({ generationId, environment, providers: application.providers, graph, values, environmentMetadata: application.env.metadata, signal: shutdownController.signal, factories: providerFactories })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context) });
@@ -74,6 +75,7 @@ const app = createApp({
   manifest: executableManifest,
   engine: { invoke: invokeHttp },
   observability: telemetry,
+  middlewareContext: routeMiddlewareContext,
   middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes} },
   apiDocs: {
     mode: environment,
@@ -157,7 +159,6 @@ async function invokeHttp(request) {
     ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
     ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
     ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
-    ...(request.request === undefined ? {} : { request: request.request }),
     clients: createDependencySources(providerRegistry),
     servicePolicies: runtimeManifest.services,
     ...(request.parent === undefined ? {} : { parent: request.parent }),
