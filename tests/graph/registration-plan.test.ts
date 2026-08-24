@@ -5,7 +5,7 @@ const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
 function graph(): ApplicationGraph {
   return {
-    contractVersion: 2,
+    contractVersion: 3,
     appId: "orders",
     nodes: [
       {
@@ -101,10 +101,12 @@ function graph(): ApplicationGraph {
       },
       {
         kind: "provider",
-        id: "default",
+        id: "provider.buckets.default",
         source,
         profile: "default",
-        capabilities: ["buckets", "cache", "jobs", "events"],
+        capability: "buckets",
+        adapter: "s3",
+        ownership: "managed",
         configuration: {},
         environment: [],
       },

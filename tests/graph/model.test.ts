@@ -27,6 +27,8 @@ describe("graph model", () => {
       "agent",
       "provider",
       "service",
+      "middleware",
+      "hook",
     ]);
     expect(GRAPH_EDGE_KINDS).toEqual([
       "targets-function",
@@ -42,6 +44,8 @@ describe("graph model", () => {
       "uses-provider-profile",
       "contains-function",
       "uses-service-middleware",
+      "uses-middleware",
+      "uses-hook",
     ]);
     expect(isGraphNodeKind("route")).toBe(false);
     expect(isGraphNodeKind("event-trigger")).toBe(false);
@@ -55,8 +59,8 @@ describe("graph model", () => {
       request: { kind: "input" },
       responses: [],
       middleware: [
-        { id: "auth", targetFunctionId: "orders.authorize" },
-        { id: "audit", targetFunctionId: "orders.audit" },
+        { id: "auth", path: "/orders/*", order: 0, match: "always" },
+        { id: "audit", path: "*", order: 1, match: "always" },
       ],
       transforms: [{ id: "orders.normalize", schema: { type: "object" } }],
     };
@@ -85,7 +89,7 @@ describe("graph model", () => {
       role: "primary",
     };
     const graph: ApplicationGraph = {
-      contractVersion: 2,
+      contractVersion: 3,
       appId: "orders",
       nodes: [agent],
       edges: [edge],

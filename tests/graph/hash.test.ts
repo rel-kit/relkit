@@ -38,7 +38,7 @@ function makeGraph(root: string, reverse: boolean): TestGraph {
     ? [{ to: "orders.get", from: "orders.route", kind: "targets-function", role: "primary" }]
     : [{ role: "primary", kind: "targets-function", from: "orders.route", to: "orders.get" }];
   return {
-    contractVersion: 2,
+    contractVersion: 3,
     appId: "orders",
     nodes,
     edges,
@@ -70,7 +70,7 @@ describe("canonical graph hashing", () => {
 
   test("keeps ordered service edges in declaration order", () => {
     const graph = {
-      contractVersion: 2,
+      contractVersion: 3,
       nodes: [
         {
           kind: "service",

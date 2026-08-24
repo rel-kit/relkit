@@ -5,7 +5,7 @@ const source = { file: "src/functions.ts", line: 1, column: 1 } as const;
 
 function baseGraph(): ApplicationGraph {
   return {
-    contractVersion: 2,
+    contractVersion: 3,
     appId: "orders",
     nodes: [
       {
@@ -122,7 +122,7 @@ describe("graph compatibility diff", () => {
       members: [{ name: "create", functionId: "orders.create" }],
       middleware: [{ id: "orders.context" }],
     };
-    const before: ApplicationGraph = { contractVersion: 2, nodes: [service], edges: [] };
+    const before: ApplicationGraph = { contractVersion: 3, nodes: [service], edges: [] };
     const metadata = diffGraph(before, {
       ...before,
       nodes: [{ ...service, title: "Order service" }],
@@ -145,7 +145,7 @@ describe("graph compatibility diff", () => {
 
   test("classifies the remaining capability families", () => {
     const before: ApplicationGraph = {
-      contractVersion: 2,
+      contractVersion: 3,
       nodes: [
         {
           kind: "trigger",
@@ -201,10 +201,12 @@ describe("graph compatibility diff", () => {
         },
         {
           kind: "provider",
-          id: "default",
+          id: "provider.jobs.default",
           source,
           profile: "default",
-          capabilities: ["jobs"],
+          capability: "jobs",
+          adapter: "sqs",
+          ownership: "managed",
           configuration: {},
           environment: [],
         },
@@ -221,7 +223,7 @@ describe("graph compatibility diff", () => {
         if (node.kind === "cache") return { ...node, profile: "archive" };
         if (node.kind === "tool") return { ...node, approval: "always" as const };
         if (node.kind === "agent") return { ...node, model: "fast" };
-        if (node.kind === "provider") return { ...node, capabilities: ["jobs", "events"] };
+        if (node.kind === "provider") return { ...node, adapter: "memory" };
         return node;
       }),
     };
