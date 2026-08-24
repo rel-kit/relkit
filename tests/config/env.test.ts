@@ -40,6 +40,13 @@ describe.serial("@zsys/config environment", () => {
     );
   });
 
+  test("reserves ZSYS_ENV for framework runtime selection", () => {
+    const unsafeDefineEnv = defineEnv as (shape: Record<string, unknown>) => unknown;
+    expect(() => unsafeDefineEnv({ ZSYS_ENV: env.string() })).toThrow(
+      'Environment variable name "ZSYS_ENV" is framework-reserved.',
+    );
+  });
+
   test("resolves defaults and environment-specific requirements", () => {
     const definition = defineEnv({
       requiredOnlyInProduction: env.string().requiredIn("production"),

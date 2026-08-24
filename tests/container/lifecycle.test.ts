@@ -180,6 +180,7 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "jobs",
     "observability",
     "providers-local",
+    "providers-standard",
     "routes",
     "runtime-effect",
     "runtime-hono",
@@ -251,7 +252,7 @@ const hello = defineFunction({
   id: "hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     const started = process.env.ZSYS_TEST_INFLIGHT_FILE;
     if (started !== undefined) await Bun.write(started, "started");
     const flushed = process.env.ZSYS_TEST_FLUSH_FILE;
