@@ -11,6 +11,7 @@ import type {
   GraphNode,
   HttpTriggerConfig,
   JobNode,
+  MiddlewareNode,
   ToolNode,
   TriggerNode,
 } from "./model.js";
@@ -36,8 +37,8 @@ export interface CacheRegistration extends CacheNode {}
 export interface ToolRegistration extends ToolNode {}
 export interface AgentRegistration extends AgentNode {}
 export interface ServiceRegistration extends ServiceNode {}
+export interface MiddlewareRegistration extends MiddlewareNode {}
 
-/** The provider-free, immutable work list consumed by later materializers. */
 export interface RegistrationPlan {
   readonly graphHash: string;
   readonly functions: readonly FunctionRegistration[];
@@ -51,21 +52,22 @@ export interface RegistrationPlan {
   readonly tools: readonly ToolRegistration[];
   readonly agents: readonly AgentRegistration[];
   readonly services?: readonly ServiceRegistration[];
+  readonly middlewares: readonly MiddlewareRegistration[];
 }
+type MutableRegistrationPlan = {
+  -readonly [Key in keyof RegistrationPlan]-?: NonNullable<
+    RegistrationPlan[Key]
+  > extends readonly (infer Item)[]
+    ? Item[]
+    : NonNullable<RegistrationPlan[Key]>;
+};
 
-/** Builds a deterministic plan without constructing providers or changing the graph. */
 export function createRegistrationPlan(
   graph: ApplicationGraph,
   options: GraphCanonicalizationOptions = {},
 ): RegistrationPlan {
   const canonical = canonicalizeGraph(graph, options);
-  const plan: {
-    -readonly [Key in keyof RegistrationPlan]-?: NonNullable<
-      RegistrationPlan[Key]
-    > extends readonly (infer Item)[]
-      ? Item[]
-      : NonNullable<RegistrationPlan[Key]>;
-  } = {
+  const plan: MutableRegistrationPlan = {
     graphHash: hashGraph(canonical, options),
     functions: [],
     httpTriggers: [],
@@ -78,8 +80,8 @@ export function createRegistrationPlan(
     tools: [],
     agents: [],
     services: [],
+    middlewares: [],
   };
-
   const serviceIds = new Map<string, string>();
   for (const node of canonical.nodes)
     if (node.kind === "service")
@@ -89,21 +91,8 @@ export function createRegistrationPlan(
   plan.schedules.sort(compareSchedule);
   return deepFreeze(plan);
 }
-
 function addNode(
-  plan: {
-    functions: FunctionRegistration[];
-    httpTriggers: HttpTriggerRegistration[];
-    queues: QueueRegistration[];
-    schedules: ScheduleRegistration[];
-    eventTriggers: EventTriggerRegistration[];
-    events: EventRegistration[];
-    buckets: BucketRegistration[];
-    caches: CacheRegistration[];
-    tools: ToolRegistration[];
-    agents: AgentRegistration[];
-    services: ServiceRegistration[];
-  },
+  plan: MutableRegistrationPlan,
   node: GraphNode,
   serviceIds: ReadonlyMap<string, string>,
 ): void {
@@ -138,6 +127,9 @@ function addNode(
       return;
     case "event":
       plan.events.push(node);
+      return;
+    case "middleware":
+      plan.middlewares.push(node);
       return;
     default:
       return;
