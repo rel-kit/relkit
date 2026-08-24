@@ -99,7 +99,11 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
   const root = await mkdtemp(join("/tmp", "zsys-security-redaction-"));
   let index: Awaited<ReturnType<typeof createObservabilityIndex>> | undefined;
   try {
-    index = await createObservabilityIndex({ root, maxEntries: 200 });
+    index = await createObservabilityIndex({
+      root,
+      maxEntries: 200,
+      now: () => Date.parse("2026-08-16T00:00:01.000Z"),
+    });
     const store = await createObservabilitySegmentStore({ root, index });
     for (const record of [
       ...collector.read(),
@@ -273,7 +277,7 @@ function flowTarget(id: string): InvocationTarget<typeof flowInput, { readonly o
       OPENAI_API_KEY: z.string(),
     }),
     output: z.object({ ok: z.boolean() }),
-    handler: async (_input, _request, context) => {
+    handler: async (_input, context) => {
       context.log.info("flow.credentials", flowInput);
       return { ok: true };
     },
@@ -336,9 +340,10 @@ function createHttpRuntime(
       caches: [],
       tools: [],
       agents: [],
+      middlewares: [],
     } satisfies RegistrationPlan,
     manifest: {
-      contractVersion: 2,
+      contractVersion: 4,
       generatorVersion: 1,
       graphHash: "sha256:security",
       functions: {},
