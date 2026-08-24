@@ -12,7 +12,8 @@ describe("inspector redesign contracts", () => {
     ]);
     expect(shell).toContain("CommandPalette");
     expect(shell).toContain("prefers-color-scheme: dark");
-    expect(shell).toContain("data-mobile-open");
+    expect(shell).toContain("SidebarProvider");
+    expect(shell).toContain("AppSidebar");
     expect(table).toContain("ResourceTableBody");
     expect(table).toContain("Pagination");
     expect(table).toContain("OverlayDialog");
