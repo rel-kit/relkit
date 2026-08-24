@@ -3,7 +3,7 @@ import type { JsonValue } from "@zsys/contracts";
 /** Versioned, JSON-safe protocol name for deployment plans. */
 export const DEPLOYMENT_PLAN_PROTOCOL = "zsys.deployment-plan" as const;
 /** Current provider-neutral deployment-plan contract version. */
-export const DEPLOYMENT_PLAN_VERSION = 1 as const;
+export const DEPLOYMENT_PLAN_VERSION = 2 as const;
 export type DeploymentPlanVersion = typeof DEPLOYMENT_PLAN_VERSION;
 
 export interface DeploymentHealthPlan {
@@ -31,11 +31,26 @@ export interface ApplicationDeploymentPlan {
 export interface DeploymentCapabilityPlan {
   readonly id: string;
   readonly logicalName: string;
+  readonly bindingId: string;
   readonly profile?: string;
   readonly configurationNames: readonly string[];
   readonly capabilities?: readonly string[];
   readonly tags?: Readonly<Record<string, string>>;
   readonly metadata?: JsonValue;
+}
+
+export interface ProviderDeploymentPlan {
+  readonly id: string;
+  readonly capability: string;
+  readonly profile: string;
+  readonly adapter: string;
+  readonly ownership: "managed";
+  readonly configuration: JsonValue;
+  readonly environment: readonly {
+    readonly name: string;
+    readonly type: string;
+    readonly sensitive: boolean;
+  }[];
 }
 
 export interface HttpRouteDeploymentPlan {
@@ -133,6 +148,7 @@ export interface DeploymentPlan {
   readonly contractVersion: number;
   readonly graphHash: string;
   readonly application: ApplicationDeploymentPlan;
+  readonly providerBindings: readonly ProviderDeploymentPlan[];
   readonly http: HttpDeploymentPlan;
   readonly jobs: readonly JobDeploymentPlan[];
   readonly schedules: readonly ScheduleDeploymentPlan[];
@@ -141,5 +157,5 @@ export interface DeploymentPlan {
   readonly buckets: readonly BucketDeploymentPlan[];
   readonly caches: readonly CacheDeploymentPlan[];
   readonly iam: DeploymentIamPlan;
-  readonly observability: ObservabilityDeploymentPlan;
+  readonly observability?: ObservabilityDeploymentPlan;
 }

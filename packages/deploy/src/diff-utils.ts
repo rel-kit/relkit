@@ -18,12 +18,16 @@ export function resources(plan: DeploymentPlan): readonly Resource[] {
       graphHash: plan.graphHash,
     }),
     resource("http", plan.http.logicalName, plan.http.logicalName, plan.http),
-    resource(
-      "observability",
-      plan.observability.logicalName,
-      plan.observability.logicalName,
-      plan.observability,
-    ),
+    ...(plan.observability === undefined
+      ? []
+      : [
+          resource(
+            "observability",
+            plan.observability.logicalName,
+            plan.observability.logicalName,
+            plan.observability,
+          ),
+        ]),
     ...entries("job", plan.jobs),
     ...entries("schedule", plan.schedules),
     ...entries("event", plan.events),

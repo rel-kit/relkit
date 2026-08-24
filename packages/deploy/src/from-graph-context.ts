@@ -1,7 +1,7 @@
 import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
 import type { DeploymentCapabilityPlan } from "./plan.js";
 import type { Capability } from "./from-graph-validation.js";
-import { configNames, logicalName } from "./from-graph-validation.js";
+import { configNames, logicalName, providerId } from "./from-graph-validation.js";
 
 export interface PlanContext {
   readonly appId: string;
@@ -21,8 +21,9 @@ export function base(
   return {
     id,
     logicalName: logicalName(context.appId, kind, id),
+    bindingId: providerId(name, profile),
     profile,
-    configurationNames: configNames(context.providers, context.graph.nodes, name, profile),
+    configurationNames: configNames(context.providers, name, profile),
     capabilities: [name],
     tags: { app: context.appId, graphHash: context.graphHash, "managed-by": "zsys" },
     ...(actions.length === 0 ? {} : { metadata: { iamCapabilities: actions } }),
