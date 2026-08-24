@@ -1,11 +1,7 @@
 import {
-  awsProviders,
   defineApp,
   defineService,
   defineServiceMiddleware,
-  localProviders,
-  testProviders,
-  type FunctionRequest,
   type InvocationSource,
 } from "@zsys/app";
 import { defineAgent } from "@zsys/agents";
@@ -151,7 +147,7 @@ const parent = defineFunction({
     cache: { cache, numericCache },
     agents: { agent },
   },
-  handler: async (value, _request, context) => {
+  handler: async (value, context) => {
     const childResult: InferOutput<typeof output> = await child.invoke({ id: value.id });
     const queued = await context.jobs.job.enqueue({ id: value.id });
     const published = await context.events.created.publish({ orderId: value.id });
@@ -310,11 +306,7 @@ const region: EnvRef<"AWS_REGION", string> = environment.AWS_REGION;
 const app = defineApp({
   id: "types.app",
   env: environment,
-  providers: {
-    development: localProviders(),
-    test: testProviders(),
-    production: awsProviders({ region: environment.AWS_REGION }),
-  },
+  providers: {},
 });
 void region;
 void app;
@@ -330,22 +322,12 @@ void toolOutput;
 
 const serviceMiddleware = defineServiceMiddleware({
   id: "types.orders-policy",
-  handler: async ({ input: middlewareInput, request, context }, next) => {
+  handler: async ({ input: middlewareInput, context }, next) => {
     const inputValue: unknown = middlewareInput;
-    const requestValue: FunctionRequest = request;
-    if (requestValue !== undefined) {
-      const requestQuery: string | readonly string[] | undefined = requestValue.query["tag"];
-      const requestHeaders: readonly string[] = requestValue.headers.getAll("x-tag");
-      const requestRoute: string | undefined = requestValue.metadata.routeId;
-      void requestQuery;
-      void requestHeaders;
-      void requestRoute;
-    }
     const source: InvocationSource = context.invocation.source;
     const continuation: Promise<void> = next({ actorId: "actor-1" });
     await continuation;
     void inputValue;
-    void requestValue;
     void source;
   },
 });

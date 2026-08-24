@@ -83,7 +83,7 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     const lookupResult: InferOutput<typeof lookup.output> = await lookup.invoke({
       rawId: input.orderId,
     });

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { defineEnv } from "../../packages/config/src/index.ts";
-import { defineApp, testProviders } from "../../packages/app/src/index.ts";
+import { defineApp } from "../../packages/app/src/index.ts";
 import { defineBucket } from "../../packages/buckets/src/index.ts";
 import { defineCache } from "../../packages/cache/src/index.ts";
 import { defineEvent } from "../../packages/events/src/index.ts";
@@ -30,11 +30,7 @@ describe("optional authoring IDs", () => {
     });
     const error = defineError({ data: input, message: "Invalid", retry: "never" });
     const route = defineRoute({ target });
-    const middleware = defineMiddleware({
-      target,
-      request: http.input({ id: http.path("id") }),
-      decision: http.continue(),
-    });
+    const middleware = defineMiddleware("/orders/*", async (_context, next) => next());
     const transform = defineTransform({ schema: z.string() });
     const serviceMiddleware = defineServiceMiddleware({ handler: async (_value, next) => next() });
     const service = defineService({ functions: { get: target }, middleware: [serviceMiddleware] });
@@ -79,7 +75,7 @@ describe("optional authoring IDs", () => {
   });
 
   test("keeps durable identities mandatory at runtime", () => {
-    expect(() => defineApp({ env: defineEnv({}), providers: testProviders() } as never)).toThrow(
+    expect(() => defineApp({ env: defineEnv({}), providers: {} } as never)).toThrow(
       "Invalid stable ID",
     );
     expect(() => defineEvent({ version: 1, payload: input } as never)).toThrow("Invalid stable ID");
