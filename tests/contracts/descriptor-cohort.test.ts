@@ -38,12 +38,7 @@ import {
 } from "../../packages/services/src/index.ts";
 import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
 import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
-import {
-  localProviders,
-  testProviders,
-  awsProviders,
-  PROVIDER_RECIPE,
-} from "../../packages/app/src/index.ts";
+import { aiSdk, external, managed, redis, s3 } from "../../packages/app/src/index.ts";
 import { getJsonSchema, z } from "../../packages/schema/src/index.ts";
 
 const input = z.object({ id: z.string() });
@@ -225,12 +220,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(JSON.stringify(serialized)).not.toContain("validate");
 
     const success = http.success(200, output);
-    const middleware = defineMiddleware({
-      id: "orders.auth",
-      target: lookup,
-      request: http.input({ token: http.header("x-auth") }),
-      decision: http.respond(success, http.constant({ ok: true })),
-    });
+    const middleware = defineMiddleware("/orders/*", async (_context, next) => next());
     const route = defineRoute({
       id: "orders.get",
       method: "GET",
@@ -238,14 +228,13 @@ describe.serial("Phase 2 descriptor cohort", () => {
       target: lookup,
       request,
       responses: [success, http.validationError()],
-      middleware: [middleware],
     });
 
     expect(isMiddlewareDescriptor(middleware)).toBe(true);
-    expect(middleware.ref).toEqual({ kind: "middleware", id: "orders.auth" });
-    expect(middleware.target.ref).toEqual(lookup.ref);
-    expect(Object.prototype.hasOwnProperty.call(middleware, "handler")).toBe(false);
-    expect(route.middleware?.[0]).toBe(middleware);
+    expect(middleware.path).toBe("/orders/*");
+    expect(Object.prototype.hasOwnProperty.call(middleware, "target")).toBe(false);
+    expect(typeof middleware.handler).toBe("function");
+    expect(Object.prototype.hasOwnProperty.call(route, "middleware")).toBe(false);
     expect(() =>
       defineTransform({ id: "bad.transform", schema: z.string(), handler: () => "bad" } as never),
     ).toThrow("cannot own handlers");
@@ -257,37 +246,45 @@ describe.serial("Phase 2 descriptor cohort", () => {
   test("keeps environment and provider references value-free", () => {
     const definition = defineEnv({
       AWS_REGION: env.string().requiredIn("production"),
+      BUCKET_ENDPOINT: env.url(),
+      BUCKET_NAME: env.string(),
+      CACHE_URL: env.secret(),
       API_KEY: env.secret().requiredIn("production").example("synthetic-secret"),
     });
-    const production = awsProviders({
-      region: definition.AWS_REGION,
-      modelProviders: {
-        defaultProvider: "openai",
-        defaultModel: "gpt-5-mini",
-        openai: { apiKey: definition.API_KEY },
-      },
-    });
+    const bucket = managed(
+      s3({
+        endpoint: definition.BUCKET_ENDPOINT,
+        bucketName: definition.BUCKET_NAME,
+        region: definition.AWS_REGION,
+      }),
+    );
     const providers = {
-      development: localProviders({ cache: { default: { namespace: "orders" } } }),
-      test: testProviders({ deterministicIds: true, deterministicClock: true }),
-      production,
+      buckets: { default: bucket },
+      cache: { default: external(redis({ url: definition.CACHE_URL })) },
+      models: {
+        default: external(
+          aiSdk({
+            defaultProvider: "openai",
+            defaultModel: "gpt-5-mini",
+            openai: { apiKey: definition.API_KEY },
+          }),
+        ),
+      },
     };
 
     expect(isEnvRef(definition.AWS_REGION)).toBe(true);
     expect(Object.keys(definition)).toEqual(["kind", "shape", "metadata"]);
     expect(Object.getOwnPropertyDescriptor(definition, "API_KEY")?.enumerable).toBe(false);
-    expect(production[PROVIDER_RECIPE]).toBe("aws");
-    expect(Object.keys(production)).toEqual(["kind", "metadata"]);
-    expect(production.metadata.environment).toEqual([
-      { name: "API_KEY", type: "secret-string", sensitive: true },
+    expect(bucket.ownership).toBe("managed");
+    expect(bucket.adapter.environment).toEqual([
       { name: "AWS_REGION", type: "string", sensitive: false },
+      { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
+      { name: "BUCKET_NAME", type: "string", sensitive: false },
     ]);
-    expect(JSON.stringify(production)).not.toContain("synthetic-secret");
-    expect(JSON.stringify(production)).toContain("AWS_REGION");
-    expect(production[PROVIDER_RECIPE]).toBe("aws");
-    expect(Object.isFrozen(production)).toBe(true);
-    expect(Object.isFrozen(production.metadata)).toBe(true);
-    expect(providers.test.metadata.configuration.deterministicIds).toBe(true);
+    expect(JSON.stringify(providers)).not.toContain("synthetic-secret");
+    expect(JSON.stringify(providers)).toContain("BUCKET_ENDPOINT");
+    expect(Object.isFrozen(bucket)).toBe(true);
+    expect(Object.isFrozen(bucket.adapter)).toBe(true);
   });
 
   test("validates job policies and omits executable handlers", () => {
@@ -460,9 +457,8 @@ describe.serial("Phase 2 descriptor cohort", () => {
     });
     const middleware = defineServiceMiddleware({
       id: "orders.policy",
-      handler: async ({ input: value, request, context }, next) => {
+      handler: async ({ input: value, context }, next) => {
         expect(value).toEqual({ id: "order-1" });
-        expect(request).toBeUndefined();
         expect(context).toBeDefined();
         await next({ actorId: "actor-1" });
       },

@@ -218,7 +218,7 @@ describe.serial("canonical contracts", () => {
       manifest: MANIFEST_VERSION,
       api: API_VERSION,
       protocol: PROTOCOL_VERSION,
-    }).toEqual({ contract: 1, generator: 1, graph: 2, manifest: 2, api: 1, protocol: 1 });
+    }).toEqual({ contract: 1, generator: 1, graph: 4, manifest: 4, api: 1, protocol: 1 });
     expect(PROTOCOL_VERSION).toBe(API_VERSION);
     expect(API_BASE_PATH).toBe("/_zsys/v1");
   });

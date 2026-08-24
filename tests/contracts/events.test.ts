@@ -56,7 +56,6 @@ const testingEvents: EventContractTarget = {
         errors: [retryableError],
         handler: async (
           input: Parameters<NonNullable<EventContractTrigger["handler"]>>[0],
-          _request,
           context: InvocationContext,
         ) => {
           invocations.push({

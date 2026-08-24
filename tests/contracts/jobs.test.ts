@@ -33,11 +33,7 @@ const testingJobs: JobContractTarget = {
       ...(options.functionConcurrency === undefined
         ? {}
         : { concurrency: options.functionConcurrency }),
-      handler: async (
-        currentInput: { readonly orderId: string },
-        _request,
-        context: InvocationContext,
-      ) => {
+      handler: async (currentInput: { readonly orderId: string }, context: InvocationContext) => {
         invocations.push({
           input: currentInput,
           source: context.invocation.source,
