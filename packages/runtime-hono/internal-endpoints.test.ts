@@ -19,6 +19,7 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  middlewares: [],
 };
 const manifest: RuntimeManifest = {
   contractVersion: MANIFEST_VERSION,

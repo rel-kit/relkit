@@ -49,6 +49,7 @@ function plan(route: HttpTriggerRegistration): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 

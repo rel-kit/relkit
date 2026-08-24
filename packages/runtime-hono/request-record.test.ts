@@ -100,6 +100,7 @@ function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 

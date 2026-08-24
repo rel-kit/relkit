@@ -38,7 +38,7 @@ describe("route rate limiting", () => {
       error: "rate-limit",
       retryAfterMs: expect.any(Number),
     });
-    expect(calls).toEqual(["auth", "hello", "auth", "hello"]);
+    expect(calls).toEqual(["hello", "hello"]);
   });
 
   test("shares counters across runtimes, isolates keys, expires windows, and records telemetry", async () => {
@@ -93,7 +93,7 @@ describe("route rate limiting", () => {
         .status,
     ).toBe(200);
 
-    expect(events.slice(0, 3)).toEqual(["rate-limit", "auth", "hello"]);
+    expect(events.slice(0, 2)).toEqual(["rate-limit", "hello"]);
     const records = collector.read();
     const blocked = records.find(
       (record): record is RequestRecord => record.signal === "request" && record.status === 429,
@@ -140,7 +140,7 @@ function plan(
           path: "/limited",
           request: { kind: "input", fields: {} },
           responses: [],
-          middleware: [{ id: "auth", targetFunctionId: "auth" }],
+          middleware: [],
           transforms: [],
           rateLimit,
         },
@@ -155,6 +155,7 @@ function plan(
       : [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
@@ -164,7 +165,7 @@ function manifest(): RuntimeManifest {
     generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:rate-limit",
     functions: {},
-    middleware: { auth: { targetFunctionId: "auth", decision: { kind: "continue" } } },
+    middleware: {},
     requestTransforms: {},
   };
 }
