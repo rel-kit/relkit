@@ -11,7 +11,7 @@ import {
 } from "./response-mapping.js";
 import { getRequestState } from "./middleware.js";
 import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-record-utils.js";
-import { functionRequestFromRoute, requestFromContext } from "./request-context.js";
+import { requestFromContext } from "./request-context.js";
 
 export function createRouteHandler(
   trigger: HttpTriggerRegistration,
@@ -26,62 +26,12 @@ async function handleRoute(
   options: RouteMaterializationOptions,
 ): Promise<Response> {
   const state = getRequestState(context);
-  const request = requestFromContext(context, trigger.config.path, {
-    routeId: trigger.id,
-    ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
-    ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
-    ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
-  });
+  const request = requestFromContext(context, trigger.config.path);
   const builder = state?.requestRecord;
-  const handlerRequest = functionRequestFromRoute(request);
   builder?.setRoute(trigger.id, trigger.targetFunctionId);
   builder?.setServiceId(trigger.serviceId);
   recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
   const responseOptions = responseOptionsFor(options, state?.signal);
-
-  for (const middleware of trigger.config.middleware) {
-    const entry = getEntry(options.manifest.middleware, middleware.id);
-    const input = await mapInputWithRecord(
-      () => routeInput(request, trigger, middleware.targetFunctionId, options, middleware.id),
-      builder,
-      middleware.id,
-    );
-    if (isRequestMappingFailure(input)) {
-      builder?.setOutcome("validation-error");
-      return mapInputValidationResponse(trigger, input.issues, responseOptions);
-    }
-    let value: unknown;
-    try {
-      value = await invokeWithRecord(
-        options.engine,
-        {
-          functionId: middleware.targetFunctionId,
-          input,
-          request: handlerRequest.clone(),
-          source: "http",
-          ...(state?.signal === undefined ? {} : { signal: state.signal }),
-          ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
-          ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
-          ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
-          ...(typeof trigger.config.timeoutMs !== "number"
-            ? {}
-            : { timeoutMs: trigger.config.timeoutMs }),
-        },
-        builder,
-        "middleware",
-        middleware.targetFunctionId,
-      );
-    } catch (cause) {
-      return mapFailureResponse(trigger, cause, responseOptions);
-    }
-    const responseId = middlewareDecisionId(entry);
-    if (middlewareDecision(entry) === "respond")
-      return mapSuccessResponse(
-        trigger,
-        value,
-        responseId === undefined ? responseOptions : { ...responseOptions, responseId },
-      );
-  }
 
   const input = await mapInputWithRecord(
     () => routeInput(request, trigger, trigger.targetFunctionId, options),
@@ -98,7 +48,6 @@ async function handleRoute(
       {
         functionId: trigger.targetFunctionId,
         input,
-        request: handlerRequest.clone(),
         source: "http",
         ...(state?.signal === undefined ? {} : { signal: state.signal }),
         ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
@@ -145,17 +94,10 @@ export async function routeInput(
   trigger: HttpTriggerRegistration,
   targetFunctionId: string,
   options: RouteMaterializationOptions,
-  middlewareId?: string,
 ): Promise<unknown> {
-  const entry =
-    middlewareId === undefined ? undefined : getEntry(options.manifest.middleware, middlewareId);
-  const mapping =
-    isRecord(entry) && Object.prototype.hasOwnProperty.call(entry, "request")
-      ? entry.request
-      : trigger.config.request;
   if (options.mapInput !== undefined)
-    return options.mapInput(request, trigger, targetFunctionId, mapping);
-  const result = await mapRequest(request, mapping, {
+    return options.mapInput(request, trigger, targetFunctionId, trigger.config.request);
+  const result = await mapRequest(request, trigger.config.request, {
     ...(options.requestMapping ?? {}),
     ...(trigger.config.maxBodyBytes === undefined
       ? {}
@@ -172,19 +114,6 @@ export function getEntry<T>(
   if (entries instanceof Map) return entries.get(id);
   const record = entries as Readonly<Record<string, T>>;
   return Object.prototype.hasOwnProperty.call(record, id) ? record[id] : undefined;
-}
-export function middlewareTarget(value: unknown): string | undefined {
-  return isRecord(value) && typeof value.targetFunctionId === "string"
-    ? value.targetFunctionId
-    : undefined;
-}
-export function middlewareDecision(value: unknown): "respond" | "continue" {
-  const decision = isRecord(value) && isRecord(value.decision) ? value.decision : undefined;
-  return decision?.kind === "respond" ? "respond" : "continue";
-}
-export function middlewareDecisionId(value: unknown): string | undefined {
-  const decision = isRecord(value) && isRecord(value.decision) ? value.decision : undefined;
-  return typeof decision?.responseId === "string" ? decision.responseId : undefined;
 }
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && (typeof value === "object" || typeof value === "function");

@@ -16,6 +16,7 @@
     "@zsys/observability": "workspace:*",
     "@zsys/openapi": "workspace:*",
     "@zsys/runtime-effect": "workspace:*",
+    "@zsys/routes": "workspace:*",
     "@zsys/schema": "workspace:*",
     "hono": "4.13.2",
     "hono-rate-limiter": "0.5.3"

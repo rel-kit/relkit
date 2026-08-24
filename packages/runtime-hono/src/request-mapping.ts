@@ -5,18 +5,18 @@ import {
   type BodyIssueCode,
   type Missing,
 } from "./request-mapping-body.js";
-import type { FunctionRequestValue } from "@zsys/contracts";
 import { applyTransform } from "./request-mapping-transform.js";
 import { readCookie, readHeader, readPathSegments, readScalar } from "./request-mapping-sources.js";
 import { mapObject, type MappingState } from "./request-mapping-object.js";
 
-export type MappingValue = FunctionRequestValue;
+export type MappingValue = string | readonly string[];
 export interface MappingRequest {
   readonly request: Request;
   readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, FunctionRequestValue>>;
+  readonly params: Readonly<Record<string, MappingValue>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
+  readonly validated?: Readonly<Record<string, unknown>>;
 }
 export type RequestIssueCode = "missing" | "duplicate" | "transform" | "mapping" | BodyIssueCode;
 export interface RequestMappingIssue {
@@ -96,9 +96,15 @@ async function visit(
         add(state, "mapping", `Mapping node "${node.kind}" needs a name`, path);
         return MISSING;
       }
-      if (node.kind === "path")
-        return readScalar(state.request.params[name], "path", path, add.bind(null, state));
-      if (node.kind === "path-segments")
+      if (node.kind === "path") {
+        const value = validatedSource(state, "param", name);
+        return value.found
+          ? value.value
+          : readScalar(state.request.params[name], "path", path, add.bind(null, state));
+      }
+      if (node.kind === "path-segments") {
+        const value = validatedSource(state, "param", name);
+        if (value.found) return value.value;
         return readPathSegments(
           state.request.request.url,
           state.request.pathPattern,
@@ -106,17 +112,29 @@ async function visit(
           path,
           add.bind(null, state),
         );
-      if (node.kind === "query")
-        return readScalar(state.request.query[name], "query", path, add.bind(null, state));
-      if (node.kind === "header")
+      }
+      if (node.kind === "query") {
+        const value = validatedSource(state, "query", name);
+        return value.found
+          ? value.value
+          : readScalar(state.request.query[name], "query", path, add.bind(null, state));
+      }
+      if (node.kind === "header") {
+        const value = validatedSource(state, "header", name);
+        if (value.found) return value.value;
         return readScalar(
           readHeader(state.request.headers, name),
           "header",
           path,
           add.bind(null, state),
         );
-      if (node.kind === "cookie")
-        return readCookie(name, state.request.headers, path, add.bind(null, state));
+      }
+      if (node.kind === "cookie") {
+        const value = validatedSource(state, "cookie", name);
+        return value.found
+          ? value.value
+          : readCookie(name, state.request.headers, path, add.bind(null, state));
+      }
       if (node.kind === "body") return bodyField(name, state, path);
       return formField(name, state, path, node.kind === "multipart-all");
     }
@@ -151,6 +169,10 @@ async function bodyField(
   state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
+  const validated = validatedTarget(state, "json");
+  if (isRecord(validated) && Object.prototype.hasOwnProperty.call(validated, name)) {
+    return validated[name];
+  }
   const value = await jsonValue(state, path);
   return value !== MISSING && isRecord(value) && Object.prototype.hasOwnProperty.call(value, name)
     ? value[name]
@@ -161,9 +183,26 @@ async function jsonValue(
   state: MappingState,
   path: readonly (string | number)[],
 ): Promise<unknown | Missing> {
+  const validated = validatedTarget(state, "json");
+  if (validated !== undefined) return validated;
   const result = await parseJson(state.body);
   if (result.issue !== undefined) add(state, result.issue.code, result.issue.message, path);
   return result.value;
+}
+
+function validatedSource(
+  state: MappingState,
+  target: string,
+  name: string,
+): { readonly found: boolean; readonly value?: unknown } {
+  const validated = validatedTarget(state, target);
+  return isRecord(validated) && Object.prototype.hasOwnProperty.call(validated, name)
+    ? { found: true, value: validated[name] }
+    : { found: false };
+}
+
+function validatedTarget(state: MappingState, target: string): unknown {
+  return state.request.validated?.[target];
 }
 
 async function formField(
@@ -172,6 +211,14 @@ async function formField(
   path: readonly (string | number)[],
   all: boolean,
 ): Promise<unknown | Missing> {
+  const validated = validatedTarget(state, "form");
+  if (isRecord(validated) && Object.prototype.hasOwnProperty.call(validated, name)) {
+    return validated[name];
+  }
+  if (isFormDataLike(validated)) {
+    const values = validated.getAll(name);
+    return all ? (values.length === 0 ? MISSING : values) : (values[0] ?? MISSING);
+  }
   const result = await parseForm(state.body);
   if (result.issue !== undefined) add(state, result.issue.code, result.issue.message, path);
   if (result.value === MISSING) return MISSING;
@@ -197,4 +244,8 @@ function add(
 }
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isFormDataLike(value: unknown): value is { getAll: (name: string) => readonly unknown[] } {
+  return isRecord(value) && typeof value.getAll === "function";
 }

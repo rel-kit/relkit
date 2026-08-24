@@ -1,18 +1,8 @@
 import type { Context } from "hono";
-import type {
-  FunctionRequest,
-  FunctionRequestMetadata,
-  FunctionRequestValue,
-} from "@zsys/contracts";
-import { createFunctionRequest } from "@zsys/contracts";
 import type { MappingValue } from "./request-mapping.js";
 import type { HttpRouteRequest } from "./materialize-routes.js";
 
-export function requestFromContext(
-  context: Context,
-  pathPattern?: string,
-  metadata: Omit<FunctionRequestMetadata, "kind" | "pathPattern"> = {},
-): HttpRouteRequest {
+export function requestFromContext(context: Context, pathPattern?: string): HttpRouteRequest {
   const query: Record<string, MappingValue> = {};
   const headers: Record<string, MappingValue> = {};
   for (const [key, value] of new URL(context.req.url).searchParams.entries()) {
@@ -27,37 +17,35 @@ export function requestFromContext(
     headers[key] = values.length > 1 ? Object.freeze(values) : value;
   }
   const params = materializeParams(context, pathPattern);
-  const normalizedPathPattern = pathPattern;
   return Object.freeze({
     request: context.req.raw,
-    ...(normalizedPathPattern === undefined ? {} : { pathPattern: normalizedPathPattern }),
+    ...(pathPattern === undefined ? {} : { pathPattern }),
     params,
     query: Object.freeze(query),
     headers: Object.freeze(headers),
-    metadata: Object.freeze({
-      kind: "http" as const,
-      ...(normalizedPathPattern === undefined ? {} : { pathPattern: normalizedPathPattern }),
-      ...metadata,
-    }),
-  });
-}
-
-export function functionRequestFromRoute(route: HttpRouteRequest): FunctionRequest {
-  return createFunctionRequest(route.request.clone(), {
-    params: route.params,
-    query: route.query,
-    headers: route.headers,
-    metadata: route.metadata,
+    validated: validatedData(context),
   });
 }
 
 function materializeParams(context: Context, pathPattern: string | undefined) {
-  const params: Record<string, FunctionRequestValue> = {};
+  const params: Record<string, MappingValue> = {};
   for (const [name, value] of Object.entries(context.req.param())) {
     const token = catchAllToken(pathPattern, name);
     params[name] = token === undefined ? value : catchAllValues(context.req.url, token);
   }
   return Object.freeze(params);
+}
+
+function validatedData(context: Context): Readonly<Record<string, unknown>> {
+  const request = context.req as unknown as { valid: (target: string) => unknown };
+  return Object.freeze(
+    Object.fromEntries(
+      ["param", "query", "header", "cookie", "json", "form"].flatMap((target) => {
+        const value = request.valid(target);
+        return value === undefined ? [] : [[target, value]];
+      }),
+    ),
+  );
 }
 
 function catchAllToken(pathPattern: string | undefined, name: string): number | undefined {
