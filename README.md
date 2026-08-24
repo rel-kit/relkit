@@ -70,6 +70,9 @@ bun run dev
 The default is AWS with Pulumi deployment. `bun run dev` starts the generated
 backend on `http://localhost:3000` and the real Next inspector on
 `http://localhost:3210`; source saves keep the last-known-good backend active.
+When the generated project links `@zsys/cli` from this checkout, development
+automatically uses `apps/inspector`; published CLI installs use the packaged
+inspector instead.
 The example route is:
 
 ```sh
@@ -92,4 +95,5 @@ observability files live under `.zsys/` and should not be edited by hand.
 AWS deployment uses Pulumi as its engine and requires explicit credentials and
 authorization; local deployment tests use mocks. Production internal runtime
 endpoints are disabled unless `ZSYS_INTERNAL_ENDPOINTS=1` is set. The CLI ships
-the inspector; `ZSYS_INSPECTOR_ROOT` is reserved for framework contributors.
+the inspector; `ZSYS_INSPECTOR_ROOT` remains available when a different source
+checkout must be selected explicitly.

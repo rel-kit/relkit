@@ -105,10 +105,10 @@ curl "http://localhost:3000/_zsys/v1/graph"
 The graph response includes the active `graphHash`. The inspector at
 `http://localhost:3210` uses the same versioned API and displays that active
 graph, not a separately reconstructed source model. Stop both processes with
-`Ctrl-C`.
-
-The published CLI includes the prebuilt inspector. Framework contributors can
-set `ZSYS_INSPECTOR_ROOT` to run a compatible `apps/inspector` checkout instead.
+`Ctrl-C`. When `@zsys/cli` is linked from this checkout, `zsys dev` prefers the
+workspace `apps/inspector` source automatically; published CLI installs use the
+packaged inspector. Set `ZSYS_INSPECTOR_ROOT` only when selecting another
+inspector checkout.
 
 ## Check, test, and build
 
@@ -157,7 +157,9 @@ zsys env example
 write the example file; the command does not overwrite an existing file by
 default. Production-required fields are reported by `zsys env check`; set
 their values through the environment or the deployment configuration rather
-than committing secrets.
+than committing secrets. Do not declare `ZSYS_ENV`; it is framework-reserved.
+Use identical keys in every pipeline—for example MinIO/Redis locally and
+R2/Upstash in production—while keeping one application provider topology.
 
 ## Authoring model
 
@@ -196,6 +198,6 @@ dependencies. Do not put executable closures in graph mappings or edit
 - `.zsys/build/` contains production build output.
 - `.zsys/state/` and `.zsys/observability/` contain local development state and telemetry.
 
-Keep `.env`, local state, and generated output out of commits. The generated
-templates use local providers in development, deterministic test providers in
-tests, and the configured AWS provider set in production.
+Keep `.env`, local state, and generated output out of commits. Tests replace
+graph-required bindings with deterministic fakes; normal runtimes resolve the
+single topology from pipeline-provided environment values.
