@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@zsys/app": "workspace:*",
+    "@zsys/providers-standard": "workspace:*",
     "@zsys/schema": "workspace:*"
   },
   "devDependencies": {
