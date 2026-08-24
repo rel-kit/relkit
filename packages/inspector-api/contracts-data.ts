@@ -19,7 +19,7 @@ export function poison<T extends Record<string, unknown>>(value: T): T {
 }
 
 export const graph = {
-  contractVersion: 2,
+  contractVersion: 3,
   appId: "contract-fixture",
   nodes: [
     {
@@ -42,7 +42,18 @@ export const graph = {
       source: source("src/routes.ts"),
       triggerType: "http",
       targetFunctionId: "orders.create",
-      config: { method: "POST", path: "/orders" },
+      config: {
+        method: "POST",
+        path: "/orders",
+        middleware: [{ id: "orders.auth", path: "/orders/*", order: 0, match: "always" }],
+      },
+    },
+    {
+      kind: "middleware",
+      id: "orders.auth",
+      source: source("src/middleware.ts"),
+      path: "/orders/*",
+      order: 0,
     },
     { kind: "job", id: "orders.job", source: source("src/jobs.ts") },
     { kind: "event", id: "orders.created", source: source("src/events.ts") },
@@ -62,6 +73,13 @@ export const graph = {
   ],
   edges: [
     { kind: "targets-function", from: "orders.create.http", to: "orders.create" },
+    {
+      kind: "uses-middleware",
+      from: "orders.create.http",
+      to: "orders.auth",
+      order: 0,
+      match: "always",
+    },
     {
       kind: "contains-function",
       from: "orders",

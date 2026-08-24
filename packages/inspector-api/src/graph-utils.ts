@@ -2,13 +2,13 @@ import { deepFreeze, type JsonValue } from "@zsys/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 
 const GRAPH_FIELDS = `
-environment providerProfiles observability defaults name type requiredIn hasDefault sensitive
+environment providerBindings observability defaults name type requiredIn hasDefault sensitive
 description input output errors dependencies timeoutMs concurrency generated triggerType
 targetFunctionId config method path request responses middleware transforms selector expansion
 delivery profile retry schedule idempotency version payload sensitiveFields visibility maxObjectBytes
 allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model toolIds limits
-generatedFunction capabilities configuration
-title tags members
+generatedFunction capabilities capability adapter ownership configuration
+title tags members order ownerId ownerKind phase
 `
   .trim()
   .split(/\s+/);

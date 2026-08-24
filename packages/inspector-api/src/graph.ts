@@ -12,6 +12,7 @@ import { projectDescriptors, projectNode, projectObservedEdges } from "./graph-u
 export const GRAPH_COLLECTIONS = Object.freeze([
   "descriptors",
   "routes",
+  "middlewares",
   "functions",
   "jobs",
   "events",
@@ -20,6 +21,7 @@ export const GRAPH_COLLECTIONS = Object.freeze([
   "tools",
   "agents",
   "services",
+  "providers",
 ] as const);
 export type GraphCollection = (typeof GRAPH_COLLECTIONS)[number];
 
@@ -109,7 +111,9 @@ function graphData(
       typeof edge.to !== "string"
     )
       return [];
-    return [safeJson(pick(edge, ["kind", "from", "to", "role", "member", "order"]))];
+    return [
+      safeJson(pick(edge, ["kind", "from", "to", "role", "member", "order", "match", "phase"])),
+    ];
   });
   return {
     contractVersion:
@@ -134,6 +138,7 @@ function belongs(node: JsonValue, collection: string): boolean {
   if (collection === "routes")
     return node.kind === "trigger" && isRecord(node.config) && node.config.method !== undefined;
   if (collection === "env") return node.kind === "env";
+  if (collection === "providers") return node.kind === "provider";
   return node.kind === (collection === "cache" ? "cache" : collection.slice(0, -1));
 }
 

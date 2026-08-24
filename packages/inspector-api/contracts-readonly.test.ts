@@ -16,6 +16,7 @@ import {
 const graphIds: Record<string, string> = {
   descriptors: "orders.create",
   routes: "orders.create.http",
+  middlewares: "orders.auth",
   functions: "orders.create",
   jobs: "orders.job",
   events: "orders.created",
