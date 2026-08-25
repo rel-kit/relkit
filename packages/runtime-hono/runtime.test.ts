@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { createApp, materializeRoutes, type RuntimeManifest } from "./src/index.js";
 import type { RegistrationPlan } from "@zsys/graph";
 
@@ -21,7 +22,7 @@ function plan(withRefs = true): RegistrationPlan {
           path: "/hello",
           request: { kind: "input" },
           responses: [],
-          middleware: withRefs ? [{ id: "auth", targetFunctionId: "auth" }] : [],
+          middleware: [],
           transforms: withRefs ? [{ id: "name", schema: {} }] : [],
         },
       },
@@ -33,23 +34,17 @@ function plan(withRefs = true): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:test",
     functions: {},
-    middleware: {
-      auth: Object.assign(
-        () => {
-          throw new Error("manifest middleware must not be called directly");
-        },
-        { targetFunctionId: "auth", decision: { kind: "continue" } },
-      ),
-    },
+    middleware: {},
     requestTransforms: { name: {} },
   };
 }
@@ -83,7 +78,6 @@ test("materializes planned routes after manifest reference checks", async () => 
   expect(await response.json()).toEqual({ ok: true });
   expect(events).toEqual(["request-id", "trace", "limits", "request-record"]);
   expect(calls).toEqual([
-    expect.objectContaining({ functionId: "auth", input: "auth", source: "http" }),
     expect.objectContaining({ functionId: "hello", input: "hello", source: "http" }),
   ]);
 });

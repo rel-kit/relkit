@@ -3,7 +3,7 @@ import { assertProductionGraph, type ApplicationGraph } from "../../packages/gra
 
 test("rejects a production graph with a generation-local rate-limit store", () => {
   const graph = {
-    contractVersion: 1,
+    contractVersion: 3,
     nodes: [
       {
         kind: "trigger",

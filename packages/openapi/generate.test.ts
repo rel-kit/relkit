@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { GRAPH_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 import { generateOpenApi, generateOpenApiJson } from "./src/index.ts";
 
@@ -6,7 +7,12 @@ const stringSchema = { type: "string" } as const;
 const input = {
   type: "object",
   required: ["id", "sku", "authorization"],
-  properties: { id: stringSchema, sku: stringSchema, authorization: stringSchema },
+  properties: {
+    id: stringSchema,
+    sku: stringSchema,
+    authorization: stringSchema,
+    tag: stringSchema,
+  },
 };
 const output = {
   type: "object",
@@ -22,12 +28,25 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
   const operation = document.paths["/orders/{id}"]?.get;
 
   expect(document.openapi).toBe("3.1.0");
-  expect(document["x-zsys"].graphVersion).toBe(1);
+  expect(document.tags).toEqual([
+    { name: "orders", description: "Order operations" },
+    { name: "read" },
+  ]);
+  expect(document["x-zsys"].graphVersion).toBe(GRAPH_VERSION);
   expect(operation?.operationId).toBe("orders.get");
+  expect(operation?.summary).toBe("Get order");
+  expect(operation?.description).toBe("Returns one order.");
+  expect(operation?.tags).toEqual(["orders", "read"]);
   expect(operation?.parameters).toContainEqual({
     name: "authorization",
     in: "header",
     required: true,
+    schema: stringSchema,
+  });
+  expect(operation?.parameters).toContainEqual({
+    name: "tag",
+    in: "query",
+    required: false,
     schema: stringSchema,
   });
   expect(operation?.requestBody?.content["application/json"]?.schema).toEqual({
@@ -147,6 +166,16 @@ test("documents rate-limit policy, safe body, and standard headers", () => {
 function graph(reverse: boolean): ApplicationGraph {
   const nodes = [
     {
+      kind: "service",
+      id: "orders",
+      source: { file: "src/services/orders.ts", line: 1, column: 1 },
+      title: "Orders",
+      description: "Order operations",
+      tags: ["orders"],
+      members: [{ name: "get", functionId: "orders.get" }],
+      middleware: [],
+    },
+    {
       kind: "function",
       id: "orders.get",
       source: { file: "src/functions/get.ts", line: 1, column: 1 },
@@ -172,12 +201,16 @@ function graph(reverse: boolean): ApplicationGraph {
       config: {
         method: "GET",
         path: "/orders/:id",
+        title: "Get order",
+        description: "Returns one order.",
+        tags: ["read"],
         request: {
           kind: "input",
           fields: {
             id: { kind: "path", name: "id" },
             sku: { kind: "body", name: "sku" },
             authorization: { kind: "header", name: "authorization" },
+            tag: { kind: "optional", value: { kind: "query", name: "tag" } },
           },
         },
         responses: [
@@ -197,7 +230,7 @@ function graph(reverse: boolean): ApplicationGraph {
     },
   ];
   return {
-    contractVersion: 1,
+    contractVersion: GRAPH_VERSION,
     appId: "commerce",
     nodes: reverse ? nodes.reverse() : nodes,
     edges: [],

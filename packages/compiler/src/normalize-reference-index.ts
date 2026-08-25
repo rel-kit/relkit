@@ -11,12 +11,12 @@ export function passIndex(work: NormalizationWork): void {
   const descriptors = [...work.descriptors].sort(compareDescriptors);
   for (const descriptor of descriptors) register(work, descriptor, false);
 
-  for (const route of descriptors.filter((entry) => entry.kind === "route")) {
-    const value = isRecord(route.value) ? route.value : {};
-    const middleware = Array.isArray(value.middleware) ? value.middleware : [];
-    for (const entry of middleware) {
-      if (!isRecord(entry) || entry.kind !== "middleware") continue;
-      const nested = nestedDescriptor(entry, "middleware", route, work);
+  for (const service of descriptors.filter((entry) => entry.kind === "service")) {
+    const value = isRecord(service.value) ? service.value : {};
+    const functions = isRecord(value.functions) ? value.functions : {};
+    for (const [member, target] of Object.entries(functions)) {
+      if (!isRecord(target) || refKind(target) !== "function") continue;
+      const nested = nestedDescriptor(target, "function", service, work, member);
       if (nested !== undefined) register(work, nested, true);
     }
   }
@@ -69,21 +69,26 @@ function addDuplicate(
     descriptor.kind === "transform" || previous.kind === "transform"
       ? NORMALIZE_CODES.transformCollision
       : NORMALIZE_CODES.duplicateId;
+  const inferred = descriptor.identity === "inferred" || previous.identity === "inferred";
   add(
     work,
     descriptor,
     code,
-    `Duplicate ${descriptor.kind} ID "${descriptor.id}".`,
+    inferred
+      ? `Source-inferred ${descriptor.kind} ID "${descriptor.id}" collides with another descriptor.`
+      : `Duplicate ${descriptor.kind} ID "${descriptor.id}".`,
     "error",
     previous,
+    inferred ? "Provide an explicit id to disambiguate the colliding descriptor." : undefined,
   );
 }
 
 function nestedDescriptor(
   value: Record<string, unknown>,
-  kind: "middleware" | "transform",
+  kind: string,
   parent: NormalizedDescriptor,
   work: NormalizationWork,
+  exportName = parent.exportName,
 ): NormalizedDescriptor | undefined {
   const nestedId = id(value.id ?? refId(value));
   if (nestedId === undefined) return undefined;
@@ -91,7 +96,7 @@ function nestedDescriptor(
     kind,
     id: nestedId,
     source: source(value.source, work.input, parent.source.file),
-    exportName: parent.exportName,
+    exportName,
     exportKind: parent.exportKind,
     value,
   };

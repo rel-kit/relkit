@@ -1,5 +1,10 @@
 import { GRAPH_VERSION } from "@zsys/contracts";
-import { canonicalizeGraph, hashGraph, type ApplicationGraph } from "@zsys/graph";
+import {
+  canonicalizeGraph,
+  hashGraph,
+  validateGraphShape,
+  type ApplicationGraph,
+} from "@zsys/graph";
 import { validateBoundary } from "./from-graph-boundary.js";
 import { buildPlan } from "./from-graph-plan.js";
 import {
@@ -22,6 +27,14 @@ export {
 export function fromGraph(graph: ApplicationGraph, options: FromGraphOptions = {}) {
   validateBoundary(graph);
   validateBoundary(options);
+  try {
+    validateGraphShape(graph);
+  } catch (error) {
+    throw new DeploymentPlanError(
+      "ZSYS_DEPLOY_GRAPH_INVALID",
+      error instanceof Error ? error.message : "Graph shape is invalid.",
+    );
+  }
   const normalized = canonicalizeGraph(graph);
   if (normalized.contractVersion !== GRAPH_VERSION)
     throw new DeploymentPlanError(

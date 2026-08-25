@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
 import { fromGraph, type DeploymentIamPlan } from "../../packages/deploy/src/index.ts";
@@ -9,7 +9,7 @@ const fixtureRoot = join(import.meta.dir, "..", "compiler", "fixtures");
 test("derives shared IAM and future per-function grants only from graph edges", () => {
   const iam = snapshot("valid-full");
 
-  expect(iam).toEqual(readGolden("iam-full.json"));
+  expect(iam).toEqual(readGolden("iam-full.json", iam));
   expect(JSON.stringify(iam)).not.toContain("s3:");
   expect(JSON.stringify(iam)).not.toContain("secretsmanager:");
 });
@@ -29,6 +29,10 @@ function snapshot(fixture: string): DeploymentIamPlan {
   return fromGraph(graph).iam;
 }
 
-function readGolden(name: string): unknown {
-  return JSON.parse(readFileSync(join(import.meta.dir, "golden", name), "utf8"));
+function readGolden(name: string, value?: unknown): unknown {
+  const path = join(import.meta.dir, "golden", name);
+  if (process.env.UPDATE_GOLDEN === "1" && value !== undefined) {
+    writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
+  }
+  return JSON.parse(readFileSync(path, "utf8"));
 }

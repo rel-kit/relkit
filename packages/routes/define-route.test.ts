@@ -30,6 +30,7 @@ describe("defineRoute", () => {
     const route = defineRoute({
       id: "orders.create",
       target,
+      accept: "multipart/form-data",
       request: http.input({ orderId: http.header("x-order-id") }),
       responses: [http.success(201, target.output)],
       successStatus: 201,
@@ -43,6 +44,7 @@ describe("defineRoute", () => {
     });
 
     expect(route).toMatchObject({
+      accept: "multipart/form-data",
       successStatus: 201,
       maxBodyBytes: 2_048,
       rateLimit: { limit: 10, windowMs: 60_000, store },
@@ -68,6 +70,9 @@ describe("defineRoute", () => {
     expect(() => defineRoute({ id: "bad-status", target, successStatus: 404 })).toThrow(
       "successStatus",
     );
+    expect(() =>
+      defineRoute({ id: "bad-accept", target, accept: "text/plain" as never }),
+    ).toThrow("Route accept");
     expect(() =>
       defineRoute({
         id: "bad-store",

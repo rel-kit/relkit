@@ -8,7 +8,7 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app buckets cache cli client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics engine events functions graph inspector-api jobs observability openapi providers-local routes runtime-effect runtime-hono schema supervisor testing tools".split(
+  "agents app buckets cache cli client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );

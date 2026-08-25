@@ -21,9 +21,12 @@ import { pathToFileURL } from "node:url";
 export const COMPILER_FIXTURES = Object.freeze([
   "valid-minimal",
   "valid-full",
+  "valid-inferred-identities",
   "warning-wrong-directory",
   "warning-wrong-suffix",
   "error-duplicate-id",
+  "error-ambiguous-id",
+  "error-inferred-collision",
   "error-route-collision",
   "error-missing-target",
   "error-event-target",
@@ -108,15 +111,19 @@ export async function compileProject(
           exportKind: descriptor.exportKind,
         }),
       ),
-    ]);
-    const graphBytes = normalization.graph ? `${canonicalGraphJson(normalization.graph)}\n` : "";
+    ]) as readonly Diagnostic[];
+    const stableDiagnostics = stabilizeUnbound(diagnostics) as readonly Diagnostic[];
+    const stableGraph = stabilizeUnbound(normalization.graph);
+    const graphBytes = stableGraph
+      ? `${canonicalGraphJson(stableGraph as NonNullable<typeof normalization.graph>)}\n`
+      : "";
     return {
       name,
       temporaryRoot,
       evaluator,
       extracted,
-      diagnostics,
-      diagnosticsBytes: `${canonicalJson(diagnostics)}\n`,
+      diagnostics: stableDiagnostics,
+      diagnosticsBytes: `${canonicalJson(stableDiagnostics)}\n`,
       graphBytes,
       graphHash: normalization.graphHash ?? "",
       exitCode: diagnostics.some((diagnostic) => diagnostic.severity === "error") ? 1 : 0,
@@ -126,6 +133,17 @@ export async function compileProject(
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }
+}
+
+function stabilizeUnbound(value: unknown): unknown {
+  if (typeof value === "string") {
+    return value.replace(/unbound\.[0-9a-f]{8}-[0-9a-f-]{27}/gi, "unbound.fixture");
+  }
+  if (Array.isArray(value)) return value.map(stabilizeUnbound);
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => [key, stabilizeUnbound(child)]),
+  );
 }
 
 function orderCandidates(candidates: readonly string[], order: FixtureEnumeration): string[] {

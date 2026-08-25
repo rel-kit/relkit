@@ -1,12 +1,8 @@
+import type { EnvMetadata, ProviderBinding, ProviderCapability, ProviderTopology } from "@zsys/app";
 import type { SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph, GraphNode } from "@zsys/graph";
-import type { EnvMetadata, ProviderCapability, ProviderSet } from "@zsys/app";
+import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@zsys/graph";
 import { ProviderRegistryError } from "./provider-registry-types.js";
-import type {
-  ProviderHandle,
-  ProviderGeneration,
-  ProviderRequirement,
-} from "./provider-registry-types.js";
+import type { ProviderRequirement } from "./provider-registry-types.js";
 
 const capabilities = new Set<ProviderCapability>([
   "buckets",
@@ -18,53 +14,40 @@ const capabilities = new Set<ProviderCapability>([
 ]);
 
 export function collectRequirements(graph: ApplicationGraph): ProviderRequirement[] {
-  const result = new Map<string, ProviderRequirement>();
-  const add = (capability: ProviderCapability, profile: string, source?: SourceLocation): void => {
-    if (!capabilities.has(capability)) return;
-    const item = { capability, profile, ...(source === undefined ? {} : { source }) };
-    result.set(key(capability, profile), result.get(key(capability, profile)) ?? item);
-  };
-  for (const node of graph.nodes) {
-    const requirement = nodeRequirement(node);
-    if (requirement) add(requirement.capability, requirement.profile, node.source);
-  }
   const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+  const result = new Map<string, ProviderRequirement>();
   for (const edge of graph.edges) {
     if (edge.kind !== "uses-provider-profile") continue;
-    const requirement = nodeRequirement(nodes.get(edge.from));
-    if (requirement) add(requirement.capability, edge.to, nodes.get(edge.from)?.source);
+    const binding = nodes.get(edge.to);
+    if (!isProviderNode(binding)) continue;
+    const requirement = {
+      capability: binding.capability as ProviderCapability,
+      profile: binding.profile,
+      bindingId: binding.id,
+      source: nodes.get(edge.from)?.source ?? binding.source,
+    };
+    result.set(key(requirement.capability, requirement.profile), requirement);
   }
   return [...result.values()].sort((left, right) =>
     key(left.capability, left.profile).localeCompare(key(right.capability, right.profile)),
   );
 }
 
-export function validateRequirements(
-  providerSet: ProviderSet,
-  requirements: readonly ProviderRequirement[],
-): void {
-  const metadata = providerSet.metadata;
-  for (const requirement of requirements) {
-    const supported =
-      requirement.profile === "default"
-        ? metadata.capabilities
-        : metadata.profiles[requirement.profile];
-    if (
-      supported === undefined ||
-      !metadata.capabilities.includes(requirement.capability) ||
-      !supported.includes(requirement.capability)
-    ) {
-      throw new ProviderRegistryError([
-        {
-          code: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
-          message: `Profile "${requirement.profile}" does not provide ${requirement.capability}.`,
-          capability: requirement.capability,
-          profile: requirement.profile,
-          ...(requirement.source === undefined ? {} : { source: requirement.source }),
-        },
-      ]);
-    }
-  }
+export function bindingFor(
+  providers: ProviderTopology,
+  requirement: ProviderRequirement,
+): ProviderBinding {
+  const profiles = providers[requirement.capability] as
+    Readonly<Record<string, ProviderBinding>> | undefined;
+  const binding = profiles?.[requirement.profile];
+  if (binding !== undefined) return binding;
+  throw issue(
+    "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+    `Profile "${requirement.profile}" does not provide ${requirement.capability}.`,
+    requirement.capability,
+    requirement.profile,
+    requirement.source,
+  );
 }
 
 export function validateEnvironment(
@@ -87,99 +70,51 @@ export function validateEnvironment(
   }
 }
 
-export function makeHandles(
-  requirements: readonly ProviderRequirement[],
-  providerSet: ProviderSet,
-  generation: ProviderGeneration,
-): Readonly<Record<string, ProviderHandle>> {
-  const pairs = new Map(requirements.map((item) => [key(item.capability, item.profile), item]));
-  for (const [profile, supported] of Object.entries(providerSet.metadata.profiles)) {
-    for (const capability of supported) {
-      if (capabilities.has(capability))
-        pairs.set(key(capability, profile), { capability, profile });
-    }
-  }
-  for (const { capability } of [...pairs.values()])
-    pairs.set(key(capability, "default"), { capability, profile: "default" });
-  const values = generation.providers;
-  return Object.freeze(
-    Object.fromEntries(
-      [...pairs.values()].map(({ capability, profile }) => [
-        key(capability, profile),
-        Object.freeze({
-          capability,
-          profile,
-          value: selectProvider(
-            values?.[capability],
-            capability,
-            profile,
-            providerSet.metadata.profiles,
-          ),
-        }),
-      ]),
-    ),
-  ) as Readonly<Record<string, ProviderHandle>>;
-}
-
-function selectProvider(
-  capabilityValue: unknown,
-  capability: ProviderCapability,
-  profile: string,
-  profiles: Readonly<Record<string, readonly ProviderCapability[]>>,
-): unknown {
-  const profileMap =
-    capabilityValue instanceof Map ||
-    (isRecord(capabilityValue) &&
-      (Object.prototype.hasOwnProperty.call(capabilityValue, profile) ||
-        Object.prototype.hasOwnProperty.call(capabilityValue, "default") ||
-        Object.entries(profiles).some(
-          ([name, supported]) =>
-            name !== "default" &&
-            supported.includes(capability) &&
-            Object.prototype.hasOwnProperty.call(capabilityValue, name),
-        )));
-  const selected = profileMap
-    ? capabilityValue instanceof Map
-      ? capabilityValue.get(profile)
-      : isRecord(capabilityValue) && Object.prototype.hasOwnProperty.call(capabilityValue, profile)
-        ? capabilityValue[profile]
-        : undefined
-    : profile === "default"
-      ? capabilityValue
-      : undefined;
-  if (selected === undefined) {
-    throw new ProviderRegistryError([
-      {
-        code: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
-        message: `Profile "${profile}" has no ${capability} runtime provider.`,
-        capability,
-        profile,
-      },
-    ]);
-  }
-  return selected;
+export function resolveBindingConfiguration(
+  binding: ProviderBinding,
+  values: Readonly<Record<string, unknown>> | undefined,
+): Readonly<Record<string, unknown>> {
+  return resolveValue(binding.adapter.configuration, values) as Readonly<Record<string, unknown>>;
 }
 
 export function key(capability: ProviderCapability, profile: string): string {
   return `${capability}\0${profile}`;
 }
 
-function nodeRequirement(
-  node: GraphNode | undefined,
-): { capability: ProviderCapability; profile: string } | undefined {
-  if (!node) return undefined;
-  if (node.kind === "bucket" || node.kind === "cache" || node.kind === "job")
-    return {
-      capability: node.kind === "bucket" ? "buckets" : node.kind === "cache" ? "cache" : "jobs",
-      profile: node.profile,
-    };
-  if (node.kind === "agent") return { capability: "models", profile: node.modelProfile };
-  if (node.kind !== "trigger" || node.triggerType !== "event") return undefined;
-  const profile =
-    isRecord(node.config) && typeof node.config.profile === "string"
-      ? node.config.profile
-      : "default";
-  return { capability: "events", profile };
+export function factoryKey(capability: ProviderCapability, adapter: string): string {
+  return `${capability}:${adapter}`;
+}
+
+function resolveValue(
+  value: unknown,
+  values: Readonly<Record<string, unknown>> | undefined,
+): unknown {
+  if (Array.isArray(value)) return value.map((item) => resolveValue(item, values));
+  if (!isRecord(value)) return value;
+  if (value.kind === "env-ref" && typeof value.name === "string") return values?.[value.name];
+  return Object.fromEntries(
+    Object.entries(value).map(([name, item]) => [name, resolveValue(item, values)]),
+  );
+}
+
+function isProviderNode(value: GraphNode | undefined): value is ProviderProfileNode {
+  return (
+    value?.kind === "provider" &&
+    capabilities.has(value.capability as ProviderCapability) &&
+    typeof value.profile === "string"
+  );
+}
+
+function issue(
+  code: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+  message: string,
+  capability: ProviderCapability,
+  profile: string,
+  source?: SourceLocation,
+): ProviderRegistryError {
+  return new ProviderRegistryError([
+    { code, message, capability, profile, ...(source === undefined ? {} : { source }) },
+  ]);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

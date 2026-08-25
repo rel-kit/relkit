@@ -1,5 +1,4 @@
 import { extractDescriptors } from "./discovery/extract.js";
-import { schema, schemaEntries } from "./normalize-compat.js";
 import {
   id,
   isRecord,
@@ -8,7 +7,6 @@ import {
   path,
   positive,
   profile,
-  schemaKey,
   text,
 } from "./normalize-utils.js";
 import {
@@ -24,7 +22,12 @@ import { bindRouteFile } from "./normalize-route-file.js";
 import { inferRouteContract } from "./normalize-route-inference.js";
 import { validateRateLimit } from "./normalize-rate-limit.js";
 import { normalizeEventListeners } from "./normalize-event-listener.js";
+import { normalizeSourceIdentities } from "./normalize-source-identities.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
+import { normalizeSelector } from "./normalize-model-selection.js";
+import { isMiddlewarePath } from "./middleware-coverage.js";
+
+export { passSchemas } from "./normalize-schema-validation.js";
 
 export function passExtract(work: NormalizationWork): void {
   const input = work.input;
@@ -48,19 +51,22 @@ export function passSources(work: NormalizationWork): void {
 }
 
 export function passNormalize(work: NormalizationWork): void {
+  const prepared = work.descriptors.map((descriptor) => {
+    const value = isRecord(descriptor.value) ? { ...descriptor.value } : {};
+    if (descriptor.kind === "route") bindRouteFile(work, descriptor, value);
+    return { ...descriptor, value };
+  });
+  const identified = normalizeSourceIdentities(work, prepared);
   work.descriptors = normalizeEventListeners(
     work,
-    work.descriptors.map((descriptor) => {
+    identified.map((descriptor) => {
       const value = isRecord(descriptor.value) ? { ...descriptor.value } : {};
       const nextId = id(value.id ?? descriptor.id);
       if (nextId === undefined)
         add(work, descriptor, NORMALIZE_CODES.id, "Descriptor ID is not a valid stable ID.");
       value.id = nextId ?? descriptor.id;
-      if (descriptor.kind === "route") {
-        bindRouteFile(work, descriptor, value);
-        inferRouteContract(work, descriptor, value);
-      }
-      for (const key of ["profile", "modelProfile"] as const) {
+      if (descriptor.kind === "route") inferRouteContract(work, descriptor, value);
+      for (const key of ["profile"] as const) {
         if (value[key] !== undefined) {
           const nextProfile = profile(value[key]);
           if (nextProfile === undefined) {
@@ -74,6 +80,13 @@ export function passNormalize(work: NormalizationWork): void {
             else value[key] = "";
           } else value[key] = nextProfile;
         }
+      }
+      if (value.model !== undefined) {
+        const model = normalizeSelector(value.model);
+        if (model === undefined) {
+          add(work, descriptor, NORMALIZE_CODES.model, "Model selector is invalid.");
+          delete value.model;
+        } else value.model = model;
       }
       if (isRecord(value.retry)) value.retry = normalizeRetry(value.retry);
       if (Array.isArray(value.schedule)) value.schedule = value.schedule.map(normalizeSchedule);
@@ -101,6 +114,9 @@ export function passLocal(work: NormalizationWork): void {
         add(work, descriptor, NORMALIZE_CODES.path, "HTTP path is invalid.");
       validateRateLimit(work, descriptor, value.rateLimit);
     }
+    if (descriptor.kind === "middleware" && !isMiddlewarePath(value.path)) {
+      add(work, descriptor, NORMALIZE_CODES.path, "Middleware path is invalid.");
+    }
     if (descriptor.kind === "job" || descriptor.kind === "event-trigger")
       validateRetry(work, descriptor, value, descriptor.kind === "job");
     if (descriptor.kind === "job") validateJob(work, descriptor, value);
@@ -119,72 +135,6 @@ export function passLocal(work: NormalizationWork): void {
     )
       add(work, descriptor, NORMALIZE_CODES.descriptor, "Agent limits must be positive integers.");
   }
-}
-
-export function passSchemas(work: NormalizationWork): void {
-  const seen = new Set<unknown>();
-  const descriptors = [
-    ...work.descriptors,
-    ...work.middlewareReferences.values(),
-    ...work.transformReferences.values(),
-  ];
-  for (const descriptor of descriptors) {
-    if (seen.has(descriptor.value)) continue;
-    seen.add(descriptor.value);
-    for (const [key, value] of schemaEntries(descriptor)) {
-      validateSchema(work, descriptor, key, value);
-    }
-    const value = isRecord(descriptor.value) ? descriptor.value : {};
-    for (const field of requiredSchemaFields(descriptor.kind)) {
-      if (value[field] === undefined)
-        validateSchema(work, descriptor, schemaKey(descriptor.id, field), value[field]);
-    }
-    if (descriptor.kind === "transform")
-      validateSchema(work, descriptor, `${descriptor.id}:transform`, value.schema);
-    if (descriptor.kind === "route" && Array.isArray(value.responses)) {
-      for (const response of value.responses) {
-        if (isRecord(response) && response.schema !== undefined) {
-          validateSchema(
-            work,
-            descriptor,
-            `${descriptor.id}:response:${String(response.id)}`,
-            response.schema,
-          );
-        }
-      }
-    }
-  }
-}
-
-function requiredSchemaFields(kind: string): readonly string[] {
-  return (
-    (
-      {
-        function: ["input", "output"],
-        job: ["input"],
-        event: ["payload"],
-        cache: ["key", "value"],
-        agent: ["input", "output"],
-      } as Readonly<Record<string, readonly string[]>>
-    )[kind] ?? []
-  );
-}
-
-function validateSchema(
-  work: NormalizationWork,
-  descriptor: NormalizationWork["descriptors"][number],
-  key: string,
-  value: unknown,
-): void {
-  const result = schema(value);
-  if (!result.ok)
-    add(
-      work,
-      descriptor,
-      NORMALIZE_CODES.schema,
-      `${key} cannot produce deterministic JSON Schema: ${result.reason ?? "unavailable"}.`,
-    );
-  else if (result.schema !== undefined) work.schemas.set(key, result.schema);
 }
 
 export { passIndex } from "./normalize-reference-index.js";

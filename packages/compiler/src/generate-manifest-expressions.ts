@@ -6,7 +6,6 @@ import {
   isRecord,
   generatedAgentMarker,
   missingReference,
-  referenceId,
   type ImportBinding,
 } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
@@ -46,7 +45,6 @@ export function functionExpressionsFor(
   return expressions;
 }
 
-/** Returns the imported descriptors used by the runtime engine for validation and dependencies. */
 export function functionTargetExpressionsFor(
   functions: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -65,7 +63,6 @@ export function functionTargetExpressionsFor(
   return expressions;
 }
 
-/** Returns the imported app descriptor needed to construct runtime providers. */
 export function applicationExpressionFor(
   descriptor: NormalizedDescriptor | undefined,
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -88,7 +85,6 @@ export function descriptorExpressionsFor(
     }),
   );
 }
-
 function isGeneratedFunction(value: unknown): ReturnType<typeof generatedAgentMarker> | undefined {
   if (!isRecord(value) || !isRecord(value.generated)) return undefined;
   if (
@@ -121,20 +117,42 @@ export function transformExpressionsFor(
 
 export function middlewareExpressionsFor(
   middleware: readonly NormalizedDescriptor[],
-  functionById: ReadonlyMap<string, NormalizedDescriptor>,
-  functions: ReadonlyMap<string, string>,
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
   diagnostics: Diagnostic[],
 ): ReadonlyMap<string, string> {
   const expressions = new Map<string, string>();
-  middleware.forEach((descriptor, index) => {
-    const target = functionById.get(referenceId(descriptor.value) ?? "");
-    const targetExpression = target === undefined ? undefined : functions.get(target.id);
-    if (target === undefined || targetExpression === undefined) {
-      missingReference(diagnostics, descriptor, "middleware");
-      return;
+  for (const descriptor of middleware) {
+    const expression = executableExpression(descriptor, "descriptor", bindings, input);
+    if (expression !== undefined) expressions.set(descriptor.id, expression);
+    else if (
+      descriptor.reference === undefined &&
+      isExecutableProperty(descriptor.value, "handler")
+    )
+      expressions.set(descriptor.id, "undefined");
+    else missingReference(diagnostics, descriptor, "middleware");
+  }
+  return expressions;
+}
+
+export function hookExpressionsFor(
+  descriptors: readonly NormalizedDescriptor[],
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+): ReadonlyMap<string, string> {
+  const expressions = new Map<string, string>();
+  for (const descriptor of descriptors) {
+    if (descriptor.kind !== "function" && descriptor.kind !== "tool") continue;
+    const target = executableExpression(descriptor, "descriptor", bindings, input);
+    for (const phase of ["before", "after"] as const) {
+      const property = phase === "before" ? "onBefore" : "onAfter";
+      if (!isExecutableProperty(descriptor.value, property)) continue;
+      expressions.set(
+        `${descriptor.id}.${phase}`,
+        target === undefined ? "undefined" : `${target}.${property}`,
+      );
     }
-    expressions.set(descriptor.id, `__zsys_middleware_${index}`);
-  });
+  }
   return expressions;
 }
 
@@ -173,4 +191,10 @@ function isExecutableSchema(value: unknown): boolean {
   if (!isRecord(value) || !isRecord(value.schema) || !isRecord(value.schema["~standard"]))
     return false;
   return typeof value.schema["~standard"].validate === "function";
+}
+
+function isExecutableProperty(value: unknown, property: string): boolean {
+  if (!isRecord(value)) return false;
+  const candidate = value[property];
+  return typeof candidate === "function" || (isRecord(candidate) && candidate.$zsys === "function");
 }

@@ -55,14 +55,16 @@ describe("inspector accessibility contract", () => {
     expect(layout + shell).toContain("tabIndex={-1}");
   });
 
-  test("the API reference exposes a titled embedded view and direct fallback", async () => {
+  test("the API reference opens Scalar directly in a new tab", async () => {
     const [page, navigation] = await Promise.all([
       source("api-reference/page.tsx"),
       source("navigation-data.ts"),
     ]);
 
-    expect(page).toContain('title="Scalar API Reference"');
-    expect(page).toContain("Open in new tab");
-    expect(navigation).toContain('href: "/api-reference"');
+    expect(page).toContain("SCALAR_API_REFERENCE_URL");
+    expect(page).toContain('target="_blank"');
+    expect(page).not.toContain("<iframe");
+    expect(navigation).toContain("SCALAR_API_REFERENCE_URL");
+    expect(navigation).toContain("external: true");
   });
 });

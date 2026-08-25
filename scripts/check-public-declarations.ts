@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
-import * as ts from "typescript";
 import { agentProviderPropertyOffsets } from "./public-declaration-agent";
+import { nonFunctionHandlers } from "./public-declaration-ast";
 
 const publicPackages = [
   "packages/contracts",
@@ -9,6 +9,7 @@ const publicPackages = [
   "packages/config",
   "packages/diagnostics",
   "packages/functions",
+  "packages/services",
   "packages/routes",
   "packages/jobs",
   "packages/events",
@@ -21,7 +22,6 @@ const publicPackages = [
 ] as const;
 
 const forbiddenSymbols = [
-  ["Effect", /\bEffect\b/g],
   ["Layer", /\bLayer\b/g],
   ["Context.Tag", /\bContext\.Tag\b/g],
   ["Schema.Schema", /\bSchema\.Schema\b/g],
@@ -37,11 +37,11 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["']@zsys\/(?:providers-local|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
+    /from ["']@zsys\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",
-    /from ["'](?:effect|hono|next|openai|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
+    /from ["'](?:ai|effect|hono|next|openai|@(?:ai-sdk|effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare|anthropic-ai|google-generative-ai)\/|aws-sdk)[^"']*["']/g,
   ],
 ] as const;
 
@@ -94,26 +94,6 @@ function lineAndColumn(text: string, offset: number): { line: number; column: nu
     line: before.split("\n").length,
     column: offset - lineStart + 1,
   };
-}
-
-function nonFunctionHandlers(file: string, text: string): DeclarationLeak[] {
-  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  const leaks: DeclarationLeak[] = [];
-  const visit = (node: ts.Node): void => {
-    if (ts.isPropertySignature(node) && node.name.getText(source) === "handler") {
-      const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
-      if (!/Function/.test(owner)) {
-        leaks.push({
-          file,
-          ...lineAndColumn(text, node.getStart(source)),
-          symbol: "non-function-handler",
-        });
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(source);
-  return leaks;
 }
 
 export function scanPublicDeclarations(root: string): DeclarationLeak[] {

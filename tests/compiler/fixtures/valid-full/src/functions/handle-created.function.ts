@@ -7,7 +7,7 @@ const handleCreated = defineFunction({
   input: eventEnvelope,
   output: eventEnvelope,
   dependencies: { jobs: { receiptJob } },
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     await context.jobs.receiptJob.enqueue({ orderId: input.payload.orderId });
     return input;
   },

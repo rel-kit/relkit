@@ -160,26 +160,15 @@ export function cronLike(value: unknown): boolean {
 
 export function providerProfiles(input: NormalizeInput): ReadonlyMap<string, readonly string[]> {
   const profiles = new Map<string, Set<string>>();
-  profiles.set(
-    "default",
-    new Set(["buckets", "cache", "jobs", "events", "models", "observability"]),
-  );
   for (const descriptor of input.descriptors ?? []) {
     if (!isRecord(descriptor) || descriptor.kind !== "app" || !isRecord(descriptor.providers))
       continue;
-    for (const provider of Object.values(descriptor.providers)) {
-      if (
-        !isRecord(provider) ||
-        !isRecord(provider.metadata) ||
-        !isRecord(provider.metadata.profiles)
-      )
-        continue;
-      for (const [name, capabilities] of Object.entries(provider.metadata.profiles)) {
+    for (const [capability, bindings] of Object.entries(descriptor.providers)) {
+      if (!isRecord(bindings)) continue;
+      for (const name of Object.keys(bindings)) {
         const profileName = id(name) ?? name;
         const set = profiles.get(profileName) ?? new Set<string>();
-        for (const capability of Array.isArray(capabilities) ? capabilities : []) {
-          if (typeof capability === "string") set.add(capability);
-        }
+        set.add(capability);
         profiles.set(profileName, set);
       }
     }

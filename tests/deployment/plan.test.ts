@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
 import {
@@ -25,33 +25,25 @@ const fullOptions = {
       timeoutMs: 2_000,
     },
   },
-  modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
 } as const;
 
 test("full deployment plan matches the stable golden contract", () => {
   const plan = fromGraph(loadGraph("valid-full"), fullOptions);
 
-  expect(plan).toEqual(readGolden("plan-full.json"));
+  expect(plan).toEqual(readGolden("plan-full.json", plan));
   expect(plan.application.environmentNames).toEqual(["SERVICE_PORT"]);
   expect(plan.http.health).toEqual(fullOptions.image.health);
-  expect(plan.models?.[0]).toMatchObject({
-    logicalName: "full-app-model-default",
-    profile: "default",
-    provider: "openai",
-    model: "gpt-4o-mini",
-  });
   expect(resourceTags(plan).every((tags) => tags["managed-by"] === "zsys")).toBe(true);
 });
 
 test("minimal deployment plan omits optional capability resources", () => {
   const plan = fromGraph(loadGraph("valid-minimal"));
 
-  expect(plan).toEqual(readGolden("plan-minimal.json"));
+  expect(plan).toEqual(readGolden("plan-minimal.json", plan));
   expect(plan.jobs).toEqual([]);
   expect(plan.events).toEqual([]);
   expect(plan.buckets).toEqual([]);
   expect(plan.caches).toEqual([]);
-  expect(plan.models).toBeUndefined();
   expect(plan.iam.serviceRole.statements).toEqual([]);
 });
 
@@ -61,24 +53,16 @@ test("uses the configured application port for default deployment health", () =>
   expect(plan.application.image.health.port).toBe(4321);
 });
 
-test("rejects missing AWS capabilities and production configuration", () => {
+test("rejects a missing provider binding for a used capability", () => {
   const graph = loadGraph("valid-full");
-  const withoutCache = mapProvider(graph, (provider) => ({
-    ...provider,
-    capabilities: provider.capabilities.filter((capability) => capability !== "cache"),
-  }));
-  const withoutRegion = mapProvider(graph, (provider) => ({
-    ...provider,
-    configuration: { development: [], production: [], test: [] },
-  }));
+  const withoutCache = {
+    ...graph,
+    nodes: graph.nodes.filter((node) => node.kind !== "provider" || node.capability !== "cache"),
+  } as ApplicationGraph;
 
   expectDeploymentError(
     () => fromGraph(withoutCache, fullOptions),
     "ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED",
-  );
-  expectDeploymentError(
-    () => fromGraph(withoutRegion, fullOptions),
-    "ZSYS_DEPLOY_CONFIGURATION_MISSING",
   );
 });
 
@@ -87,7 +71,7 @@ test("keeps plans secret-free and rejects secret/live deployment values", () => 
   const plan = fromGraph(graph, fullOptions);
   const bytes = JSON.stringify(plan);
 
-  expect(bytes).not.toContain("OPENAI_API_KEY");
+  expect(bytes).toContain("OPENAI_API_KEY");
   expect(bytes).not.toContain("synthetic-secret");
   expect(bytes).not.toContain("pulumiValue");
   expectDeploymentError(
@@ -152,8 +136,12 @@ function loadGraph(name: string): ApplicationGraph {
   ) as ApplicationGraph;
 }
 
-function readGolden(name: string): unknown {
-  return JSON.parse(readFileSync(join(goldenRoot, name), "utf8"));
+function readGolden(name: string, value?: unknown): unknown {
+  const path = join(goldenRoot, name);
+  if (process.env.UPDATE_GOLDEN === "1" && value !== undefined) {
+    writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
+  }
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
 function mapProvider(
@@ -179,16 +167,27 @@ function withSecretConfiguration(graph: ApplicationGraph): ApplicationGraph {
   };
   return mapProvider({ ...graph, nodes: [...graph.nodes, secret] }, (provider) => ({
     ...provider,
-    environment: [...provider.environment, "OPENAI_API_KEY"],
-    configuration: { development: [], production: ["region", "OPENAI_API_KEY"], test: [] },
+    environment: [
+      ...provider.environment,
+      { name: "OPENAI_API_KEY", type: "secret", sensitive: true },
+    ],
+    configuration: {
+      ...provider.configuration,
+      apiKey: {
+        kind: "env-ref",
+        name: "OPENAI_API_KEY",
+        type: "secret",
+        sensitive: true,
+      },
+    },
   }));
 }
 
 function withRawField(graph: ApplicationGraph, key: string, value: unknown): ApplicationGraph {
   return {
     ...graph,
-    nodes: graph.nodes.map((node) =>
-      node.kind === "provider" ? ({ ...node, [key]: value } as unknown as GraphNode) : node,
+    nodes: graph.nodes.map((node, index) =>
+      index === 0 ? ({ ...node, [key]: value } as unknown as GraphNode) : node,
     ),
   };
 }
@@ -207,14 +206,13 @@ function resourceIdentity(plan: DeploymentPlan): unknown {
   const resources = [
     plan.application,
     plan.http,
-    plan.observability,
+    ...(plan.observability === undefined ? [] : [plan.observability]),
     ...plan.jobs,
     ...plan.schedules,
     ...plan.events,
     ...plan.eventTriggers,
     ...plan.buckets,
     ...plan.caches,
-    ...(plan.models ?? []),
   ];
   return resources.map((resource) => {
     const value = resource as unknown as Record<string, unknown>;
@@ -235,7 +233,6 @@ function resourceTags(plan: DeploymentPlan): readonly Record<string, string>[] {
     ...plan.eventTriggers,
     ...plan.buckets,
     ...plan.caches,
-    ...(plan.models ?? []),
   ].map((resource) => resource.tags ?? {});
 }
 

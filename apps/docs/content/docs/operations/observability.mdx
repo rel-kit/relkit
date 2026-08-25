@@ -9,8 +9,10 @@ spans, records declared and observed edges, propagates trace/correlation/causati
 completion outcomes.
 
 HTTP request records include route/function identity, graph hash, status, duration, rate-limit outcome,
-and bounded metadata. Jobs and events retain their instance/attempt identity. Resource, model, tool, and
-child-function calls appear as correlated spans when available.
+and bounded metadata. Service members add service identity without automatically capturing enriched
+service context. Jobs and events retain their instance/attempt identity. Resource, model, tool, and
+child-function calls appear as correlated spans when available; descriptor `invoke` calls are observed
+relationships, not mutations to the canonical graph or its hash.
 
 Redaction happens before data crosses an inspector or sink boundary. Environment secret values, protected
 headers, request bodies under an off/redacted capture policy, and provider credentials must never appear

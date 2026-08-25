@@ -41,6 +41,9 @@ describe("callback event listener compilation", () => {
     expect(result.outputs.manifest).toContain(
       '__zsys_createEventListenerTarget(__zsys_module_1["sendReceipt"], [__zsys_module_0["orderCreated"]], "zsys.event.orders.created.sendReceipt.handler")',
     );
+    expect(result.outputs.manifest).not.toContain(
+      '__zsys_bindDescriptorIdentity(__zsys_module_1["sendReceipt"], "zsys.event.orders.created.sendReceipt.handler");',
+    );
   });
 
   test("requires explicit identity for default exports and rejects duplicate inferred IDs", () => {

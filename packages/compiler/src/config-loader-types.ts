@@ -26,6 +26,10 @@ export interface ToolingConfigInput {
     readonly apiDocs?: { readonly enabledInProduction?: boolean };
   };
   readonly inspector?: { readonly port?: number };
+  readonly deployment?: {
+    readonly target: "aws";
+    readonly adapter: "pulumi";
+  };
 }
 
 export interface LoadedToolingConfig {
@@ -40,6 +44,10 @@ export interface LoadedToolingConfig {
     readonly apiDocs: { readonly enabledInProduction: boolean };
   };
   readonly inspector: { readonly port: number };
+  readonly deployment?: {
+    readonly target: "aws";
+    readonly adapter: "pulumi";
+  };
 }
 
 export type InspectorConfigInput = ToolingConfigInput["inspector"];

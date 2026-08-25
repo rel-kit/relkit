@@ -48,7 +48,9 @@ type KindRule = {
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   app: { directory: "src", suffix: "app.ts" },
   function: { directory: "src/functions", suffix: ".function.ts" },
+  service: { directory: "src/services", suffix: ".service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },
+  middleware: { directory: "src/middleware", suffix: ".middleware.ts" },
   job: { directory: "src/jobs", suffix: ".job.ts" },
   event: { directory: "src/events", suffix: ".event.ts" },
   "event-trigger": { directory: "src/events", suffix: ".event.ts" },

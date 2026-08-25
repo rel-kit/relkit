@@ -36,11 +36,11 @@ test("exercises file routes, inferred requests, middleware, methods, and uploads
 
   const form = new FormData();
   form.append("label", "receipts");
-  form.append("primary", new File(["primary"], "primary.txt", { type: "text/plain" }));
-  form.append("attachments", new File(["detail"], "detail.txt", { type: "text/plain" }));
+  form.append("primary", new File(["primary"], "primary.png", { type: "image/png" }));
+  form.append("attachments", new File(["detail"], "detail.png", { type: "image/png" }));
   expect(await (await application.http.post("/uploads", { body: form })).json()).toEqual({
     label: "receipts",
-    files: ["primary.txt", "detail.txt"],
+    files: ["primary.png", "detail.png"],
   });
 });
 

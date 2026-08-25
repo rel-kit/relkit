@@ -4,6 +4,7 @@
     "app",
     "schema",
     "functions",
+    "services",
     "routes",
     "events",
     "jobs",

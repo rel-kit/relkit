@@ -25,7 +25,7 @@ defineFunction({
   id: "types.context",
   input,
   output,
-  handler: (_value, _request, context) => {
+  handler: (_value, context) => {
     const invocationId: string = context.invocation.id;
     const source: "direct" | "http" | "job" | "event" | "tool" | "agent" =
       context.invocation.source;

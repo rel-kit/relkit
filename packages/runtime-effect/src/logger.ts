@@ -8,7 +8,9 @@ import {
   type ObservabilityCollector,
 } from "@zsys/observability";
 import { redactCause, redactFailureDetail } from "./failure-redaction.js";
+import { formatHumanLog, formatMessage } from "./logger-format.js";
 import { InvocationTrace } from "./tracing.js";
+export { formatHumanLog } from "./logger-format.js";
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 export type MinimumLogLevel = LogLevel | "all" | "none";
 type EffectLogLevel = "All" | "Fatal" | "Error" | "Warn" | "Info" | "Debug" | "Trace" | "None";
@@ -40,6 +42,8 @@ const levelOrder: Record<LogLevel, number> = {
 };
 const reservedAnnotations = new Set([
   "component",
+  "functionId",
+  "serviceId",
   "requestId",
   "invocationId",
   "traceId",
@@ -53,31 +57,6 @@ export function isLogLevelEnabled(level: LogLevel, minimum: MinimumLogLevel): bo
   if (minimum === "none") return false;
   if (minimum === "all") return true;
   return levelOrder[level] >= levelOrder[minimum];
-}
-export function formatHumanLog(record: LogRecord): string {
-  const annotations = [
-    ["request", record.requestId],
-    ["invocation", record.invocationId],
-    ["trace", record.traceId],
-    ["span", record.spanId],
-    ["correlation", record.correlationId],
-    ["generation", record.generationId],
-    ["graph", record.graphHash],
-    ["source", record.source],
-  ]
-    .filter((entry): entry is [string, string] => entry[1] !== undefined)
-    .map(([key, value]) => `${key}=${value}`);
-  const fields = Object.entries(record.fields).map(
-    ([key, value]) => `${key}=${formatValue(value)}`,
-  );
-  return [
-    record.timestamp,
-    record.level.toUpperCase(),
-    record.component,
-    record.message,
-    ...annotations,
-    ...fields,
-  ].join(" ");
 }
 export const consoleHumanSink: HumanLogSink = Object.freeze({
   write: (line: string) => console.log(line),
@@ -127,6 +106,7 @@ function makeRecord(event: EffectLogger.Options<unknown>, component: string): Lo
     component: text(annotations.component) ?? component,
     message: formatMessage(event.message),
     fields: jsonObject(fields),
+    ...optional("functionId", trace?.functionId ?? annotations.functionId),
     ...optional("requestId", annotations.requestId),
     ...optional("invocationId", trace?.invocationId ?? annotations.invocationId),
     ...optional("traceId", trace?.traceId ?? annotations.traceId),
@@ -135,6 +115,7 @@ function makeRecord(event: EffectLogger.Options<unknown>, component: string): Lo
     ...optional("generationId", annotations.generationId),
     ...optional("graphHash", annotations.graphHash),
     ...optional("source", trace?.source ?? annotations.source),
+    ...optional("serviceId", trace?.serviceId ?? annotations.serviceId),
   });
 }
 function admitRecord(record: LogRecord, redact: RedactLogRecord, collector: LogCollector) {
@@ -162,6 +143,7 @@ function safeRecord(record: LogRecord): LogRecord {
     component: text(record.component) ?? "runtime",
     message: text(record.message) ?? "[unavailable]",
     fields: jsonObject(record.fields),
+    ...optional("functionId", record.functionId),
     ...optional("requestId", record.requestId),
     ...optional("invocationId", record.invocationId),
     ...optional("traceId", record.traceId),
@@ -170,6 +152,7 @@ function safeRecord(record: LogRecord): LogRecord {
     ...optional("generationId", record.generationId),
     ...optional("graphHash", record.graphHash),
     ...optional("source", record.source),
+    ...optional("serviceId", record.serviceId),
   });
 }
 function effectLevel(level: EffectLogLevel): LogLevel | undefined {
@@ -180,12 +163,6 @@ function effectMinimum(level: MinimumLogLevel): EffectLogLevel {
   if (level === "none") return "None";
   return `${level[0]!.toUpperCase()}${level.slice(1)}` as EffectLogLevel;
 }
-const formatMessage = (message: unknown): string =>
-  (Array.isArray(message) ? message : [message]).map(formatValue).join(" ");
-const formatValue = (value: unknown): string => {
-  const safe = redactFailureDetail(value);
-  return typeof safe === "string" ? safe : (JSON.stringify(safe) ?? "[unavailable]");
-};
 function jsonObject(value: unknown): Readonly<Record<string, JsonValue>> {
   const safe = redactFailureDetail(value);
   return safe !== null && typeof safe === "object" && !Array.isArray(safe)

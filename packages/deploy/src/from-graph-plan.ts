@@ -2,18 +2,11 @@ import { deepFreeze } from "@zsys/contracts";
 import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
 import { DEPLOYMENT_PLAN_VERSION, type ContainerImagePlan, type DeploymentPlan } from "./plan.js";
 import type { FromGraphOptions } from "./from-graph-validation.js";
-import { byLogical, envNames, logicalName, nodes } from "./from-graph-validation.js";
+import { byLogical, envNames, isManaged, logicalName, nodes } from "./from-graph-validation.js";
 import { iam } from "./from-graph-aws.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 import { createIamPlan } from "./iam.js";
-import {
-  buckets,
-  caches,
-  eventTriggers,
-  events,
-  modelPlans,
-  routes,
-} from "./from-graph-resources.js";
+import { buckets, caches, eventTriggers, events, routes } from "./from-graph-resources.js";
 
 export function buildPlan(
   graph: ApplicationGraph,
@@ -26,11 +19,22 @@ export function buildPlan(
   const image = options.image ?? defaultImage(appId, options.httpPort ?? 3000);
   validateImage(image);
   const environmentNames = envNames(graph.nodes);
-  const models = modelPlans(context, options);
   return deepFreeze({
     contractVersion: DEPLOYMENT_PLAN_VERSION,
     graphHash,
     application: { id: appId, image, environmentNames },
+    providerBindings: [...providers.values()]
+      .filter((provider) => provider.ownership === "managed")
+      .map((provider) => ({
+        id: provider.id,
+        capability: provider.capability,
+        profile: provider.profile,
+        adapter: provider.adapter,
+        ownership: "managed" as const,
+        configuration: provider.configuration,
+        environment: provider.environment,
+      }))
+      .sort((left, right) => left.id.localeCompare(right.id)),
     http: {
       logicalName: logicalName(appId, "http", "public"),
       port: image.health.port,
@@ -44,19 +48,33 @@ export function buildPlan(
     eventTriggers: eventTriggers(context),
     buckets: buckets(context),
     caches: caches(context),
-    ...(models.length === 0 ? {} : { models }),
-    iam: createIamPlan(appId, graph),
+    iam: createIamPlan(appId, graph, providers),
+    ...managedObservability(providers, appId, environmentNames),
+  } as DeploymentPlan);
+}
+
+function managedObservability(
+  providers: Map<string, ProviderProfileNode>,
+  appId: string,
+  environmentNames: readonly string[],
+): { readonly observability?: DeploymentPlan["observability"] } {
+  const binding = [...providers.values()].find(
+    (provider) => provider.capability === "observability" && provider.ownership === "managed",
+  );
+  if (binding === undefined) return {};
+  return {
     observability: {
-      logicalName: logicalName(appId, "observability", "default"),
+      logicalName: logicalName(appId, "observability", binding.profile),
       configurationNames: environmentNames.filter((name) => /log|trace|otlp/i.test(name)),
       logs: true,
       traces: true,
     },
-  } as DeploymentPlan);
+  };
 }
 
 function jobs(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
+    .filter((job) => isManaged(context.providers, "jobs", job.profile))
     .map((job) => ({
       ...base(
         context,
@@ -78,6 +96,7 @@ function jobs(context: PlanContext) {
 
 function schedules(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
+    .filter((job) => isManaged(context.providers, "jobs", job.profile))
     .flatMap((job) => {
       if (!Array.isArray(job.schedule)) return [];
       return job.schedule.map((schedule, index) => ({

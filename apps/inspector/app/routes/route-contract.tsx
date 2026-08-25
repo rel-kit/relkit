@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { openApiOperation } from "../../lib/route-openapi";
 import type { InspectorObject } from "../../lib/api-types";
+import { SCALAR_API_REFERENCE_URL } from "../../lib/api-reference";
 import { signalKey } from "../../lib/observability-model";
 import { SourceLink } from "../source-link";
+import { SchemaPanel } from "../schema-panel";
 
 export function RouteContract({
   route,
@@ -47,10 +48,10 @@ export function RouteContract({
           </div>
         </dl>
         <p className="supporting-copy">
-          <Link className="text-link" href="/api-reference">
+          <a className="text-link" href={SCALAR_API_REFERENCE_URL} target="_blank" rel="noreferrer">
             Explore this operation in the active Scalar API Reference{" "}
             <span aria-hidden="true">→</span>
-          </Link>
+          </a>
         </p>
       </section>
       <div className="route-contract-grid">
@@ -62,8 +63,39 @@ export function RouteContract({
         />
         <JsonPanel title="OpenAPI operation" value={openApiOperation(route, target)} />
       </div>
+      <RouteMiddleware value={config?.middleware} />
       <RecentRequests requests={requests} />
     </>
+  );
+}
+
+function RouteMiddleware({ value }: { readonly value: unknown }) {
+  const middleware = Array.isArray(value)
+    ? value.flatMap((item) => (record(item) ? [item] : []))
+    : [];
+  return (
+    <section className="panel" aria-labelledby="route-middleware-heading">
+      <div className="section-heading">
+        <h2 id="route-middleware-heading">Middleware</h2>
+        <span className="badge">{middleware.length}</span>
+      </div>
+      {middleware.length === 0 ? (
+        <p className="supporting-copy">No middleware matches this route.</p>
+      ) : (
+        <ul className="request-list">
+          {middleware.map((item) => (
+            <li className="request-row" key={text(item.id)}>
+              <a className="text-link" href={`/middlewares/${encodeURIComponent(text(item.id))}`}>
+                {text(item.id)}
+              </a>
+              <span>
+                <code>{text(item.path)}</code> · {text(item.match)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -118,22 +150,7 @@ function RequestRow({ request }: { readonly request: InspectorObject }) {
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">CONTRACT DATA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{formatJson(value)}</pre>
-    </section>
-  );
-}
-
-function formatJson(value: unknown): string {
-  if (value === undefined) return "Not declared";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Unavailable";
-  }
+  return <SchemaPanel title={title} value={value} eyebrow="CONTRACT DATA" />;
 }
 function record(value: unknown): InspectorObject | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)

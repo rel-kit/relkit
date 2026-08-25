@@ -8,7 +8,7 @@ import {
   type JsonValue,
 } from "@zsys/contracts";
 import { isEnvRef, type EnvDefinition, type EnvShape } from "@zsys/config";
-import { copyProviderSets, isProviderSet, type ProviderSets } from "./providers.js";
+import { copyProviderTopology, isProviderTopology, type ProviderTopology } from "./providers.js";
 
 export * from "./providers.js";
 
@@ -32,7 +32,7 @@ export interface AppDescriptor<
   S extends EnvShape = EnvShape,
 > extends DescriptorBase<"app", Id> {
   readonly env: EnvDefinition<S>;
-  readonly providers: ProviderSets;
+  readonly providers: ProviderTopology;
   readonly observability?: ObservabilityConfiguration;
   readonly defaults?: ApplicationDefaults;
 }
@@ -43,7 +43,7 @@ export interface DefineAppOptions<
 > extends DescriptorMetadata {
   readonly id: Id;
   readonly env: EnvDefinition<S>;
-  readonly providers: ProviderSets;
+  readonly providers: ProviderTopology;
   readonly observability?: ObservabilityConfiguration;
   readonly defaults?: ApplicationDefaults;
 }
@@ -53,17 +53,25 @@ export interface DefineAppOptions<
  *
  * @example
  * ```ts
- * import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders } from "@zsys/app"
+ * import { defineApp, defineEnv, env, external, redis, s3 } from "@zsys/app"
  *
- * const values = defineEnv({ AWS_REGION: env.string().default("us-east-1") })
+ * const values = defineEnv({
+ *   BUCKET_ENDPOINT: env.url(),
+ *   BUCKET_NAME: env.string(),
+ *   BUCKET_REGION: env.string(),
+ *   CACHE_URL: env.secret(),
+ * })
  * export default defineApp({
  *   id: "shop",
  *   env: values,
  *   providers: {
- *     development: localProviders(),
- *     test: testProviders(),
- *     production: awsProviders({ region: values.AWS_REGION })
- *   }
+ *     buckets: { default: external(s3({
+ *       endpoint: values.BUCKET_ENDPOINT,
+ *       bucketName: values.BUCKET_NAME,
+ *       region: values.BUCKET_REGION,
+ *     })) },
+ *     cache: { default: external(redis({ url: values.CACHE_URL })) },
+ *   },
  * })
  * ```
  * @category Application
@@ -81,7 +89,7 @@ export function defineApp<const Id extends string, const S extends EnvShape>(
   return deepFreeze({
     ...base,
     env: options.env,
-    providers: copyProviderSets(options.providers),
+    providers: copyProviderTopology(options.providers),
     ...(observability === undefined ? {} : { observability }),
     ...(defaults === undefined ? {} : { defaults }),
   }) as AppDescriptor<Id, S>;
@@ -90,7 +98,7 @@ export function defineApp<const Id extends string, const S extends EnvShape>(
 export function isAppDescriptor(value: unknown): value is AppDescriptor<string> {
   if (!isRecord(value) || !isDescriptor(value, "app")) return false;
   const descriptor = value as AppDescriptor<string>;
-  return isEnvDefinition(descriptor.env) && isProviderSets(descriptor.providers);
+  return isEnvDefinition(descriptor.env) && isProviderTopology(descriptor.providers);
 }
 
 export function assertAppDescriptor(value: unknown): asserts value is AppDescriptor<string> {
@@ -147,14 +155,6 @@ function isEnvDefinition(value: unknown): value is EnvDefinition<EnvShape> {
       isEnvRef(reference) &&
       reference.name === name
     );
-  });
-}
-
-function isProviderSets(value: unknown): value is ProviderSets {
-  if (!isRecord(value)) return false;
-  return ["development", "test", "production"].every((name) => {
-    const provider = value[name];
-    return isProviderSet(provider);
   });
 }
 

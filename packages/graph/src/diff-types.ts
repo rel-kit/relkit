@@ -16,7 +16,8 @@ export type GraphDiffCategory =
   | "bucket/cache"
   | "tool"
   | "agent"
-  | "profile";
+  | "profile"
+  | "service";
 export type GraphDiffChange = "added" | "removed" | "changed" | "source-moved";
 
 export interface SelectorExpansionDiff {

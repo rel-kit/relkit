@@ -14,6 +14,7 @@ test("publishes authored, CLI, and application-facing API documentation", async 
     "app",
     "schema",
     "functions",
+    "services",
     "routes",
     "events",
     "jobs",

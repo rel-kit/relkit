@@ -8,18 +8,52 @@ function bindAgents() {
     const functionId = \`zsys.agent.\${node.id}.invoke\`;
     executableManifest.functions[functionId] = createGeneratedAgentFunction(
       node.id,
-      (input, _request, context) => invokeBoundAgent(agent, input, context),
+      (input, context) => invokeBoundAgent(agent, input, context),
     );
   }
+}
+
+function routeMiddlewareContext({ middlewareId, signal }) {
+  const time = Object.freeze({
+    now: () => new Date(),
+    sleep: (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+  });
+  const write = (level, message, fields = {}) => {
+    const record = telemetry.collect({
+      version: 1,
+      signal: "log",
+      timestamp: time.now().toISOString(),
+      level,
+      component: middlewareId,
+      message,
+      fields,
+    });
+    if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
+  };
+  const logger = (level) => (message, fields) => write(level, message, fields);
+  return {
+    signal,
+    env: values,
+    time,
+    log: Object.freeze({
+      trace: logger("trace"),
+      debug: logger("debug"),
+      info: logger("info"),
+      warn: logger("warn"),
+      error: logger("error"),
+    }),
+  };
 }
 
 async function invokeBoundAgent(agent, input, context) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
+  if (providerRegistry.modelRegistry === undefined)
+    throw new Error("Model provider registry unavailable.");
   return invokeAgent({
     agent,
     input,
-    provider: provider(providerRegistry, "models", agent.modelProfile),
+    modelRegistry: providerRegistry.modelRegistry,
     tools: runtimeManifest.tools ?? {},
     engine: { invoke: invokeHttp },
     invocationId: context.invocation.id,
@@ -39,7 +73,6 @@ function targetFor(functionId) {
 
 function createDependencySources(providerRegistry) {
   return {
-    functions: Object.fromEntries(plan.functions.map((node) => [node.id, registry.get(node.id)])),
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`zsys.agent.\${node.id}.invoke\`)])),
     buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "buckets", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
@@ -91,6 +124,10 @@ function errorCode(error) {
   return error instanceof Error ? error.name : "unknown";
 }
 
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function recordRuntimeFailure(component, message, error, source) {
   const record = telemetry.collect({
     version: 1,
@@ -99,7 +136,7 @@ function recordRuntimeFailure(component, message, error, source) {
     level: "error",
     component,
     message,
-    fields: { code: errorCode(error) },
+    fields: { code: errorCode(error), detail: errorMessage(error) },
     generationId,
     graphHash,
     source,
@@ -136,9 +173,7 @@ function resolveRuntimeEnvironment(definition, environment, source) {
 }
 
 function runtimeEnvironmentValue(value) {
-  if (value instanceof URL) return value.toString();
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
-  return JSON.stringify(value);
+  return value;
 }
 
 function waitForProviderReady() {

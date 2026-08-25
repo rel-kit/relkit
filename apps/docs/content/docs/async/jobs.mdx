@@ -8,12 +8,15 @@ description: Queue validated work with retries, idempotency, concurrency, and sc
 </include>
 
 A job names a target function and input schema. Calls to the generated dependency client validate input
-before enqueueing. Configure bounded retries, timeout, concurrency, and idempotency retention explicitly.
+before enqueueing; function handlers call other descriptors with `target.invoke(input)`. Configure
+bounded retries, timeout, concurrency, and idempotency retention explicitly.
 
 Schedules live on the job descriptor. Give each schedule a stable ID, cron expression, timezone,
 validated input, and overlap policy. Durable retry, redrive, and dead-letter behavior belongs to the
-selected provider. Local and test providers expose deterministic recovery controls; AWS maps durable
-jobs to SQS and schedules to EventBridge Scheduler.
+selected provider binding. Tests use deterministic recovery controls by default; a managed AWS binding
+maps durable jobs to SQS and schedules to EventBridge Scheduler.
 
-Handlers still execute through the common function engine, preserving validation, declared dependencies,
-observability, cancellation, correlation, and causation.
+Handlers still execute through the common function engine, preserving validation, declared managed
+dependencies, service middleware, observability, cancellation, correlation, and causation. A declared
+error with omitted or `retry: "never"` is terminal. A retryable declared error may provide
+`{ kind: "later", afterMs }`; the next attempt waits for the larger of the policy delay and this hint.

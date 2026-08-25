@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../../packages/contracts/src/index.ts";
 import {
   invokeFunction,
   type InvocationTarget,
@@ -21,24 +22,23 @@ import {
   type RuntimeManifest,
 } from "../../../packages/runtime-hono/src/index.ts";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
-import { normalizeOrderId } from "../../../examples/commerce/src/routes/orders/[orderId]/route.ts";
-import authorizeOrder from "../../../examples/commerce/src/functions/authorize-order.function.ts";
+import normalizeOrderId from "../../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
+import orderAuth from "../../../examples/commerce/src/middleware/order-auth.middleware.ts";
 import browsePath from "../../../examples/commerce/src/functions/browse-path.function.ts";
-import deleteOrder from "../../../examples/commerce/src/functions/delete-order.function.ts";
-import getOrder from "../../../examples/commerce/src/functions/get-order.function.ts";
-import searchOrders from "../../../examples/commerce/src/functions/search-orders.function.ts";
-import updateOrder from "../../../examples/commerce/src/functions/update-order.function.ts";
+import deleteOrder from "../../../examples/commerce/src/functions/orders/delete-order.function.ts";
+import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
+import searchOrders from "../../../examples/commerce/src/functions/orders/search-orders.function.ts";
+import updateOrder from "../../../examples/commerce/src/functions/orders/update-order.function.ts";
 import uploadAssets from "../../../examples/commerce/src/functions/upload-assets.function.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../../examples/commerce");
 const targets: Readonly<Record<string, InvocationTarget<any, any>>> = {
-  [authorizeOrder.id]: authorizeOrder,
-  [browsePath.id]: browsePath,
-  [deleteOrder.id]: deleteOrder,
-  [getOrder.id]: getOrder,
-  [searchOrders.id]: searchOrders,
-  [updateOrder.id]: updateOrder,
-  [uploadAssets.id]: uploadAssets,
+  "browse-path": browsePath,
+  "orders.delete-order": deleteOrder,
+  "orders.get-order": getOrder,
+  "orders.search-orders": searchOrders,
+  "orders.update-order": updateOrder,
+  "upload-assets": uploadAssets,
 };
 
 test("serves the compiled commerce routes through one HTTP engine path", async () => {
@@ -57,7 +57,8 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
         invocations.push(invocation);
         const target = targets[invocation.functionId];
         if (target !== undefined) return invokeFunction(target, invocation.input);
-        if (invocation.functionId === "orders.create") return createOrderResult(invocation.input);
+        if (invocation.functionId === "orders.create-order")
+          return createOrderResult(invocation.input);
         throw new Error(`Unexpected function ${invocation.functionId}`);
       },
     },
@@ -92,7 +93,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
 
     const searched = await client.get("/orders/search?status=confirmed");
     expect(await searched.json()).toEqual({ status: "confirmed", count: 1 });
-    expect(invocations.at(-1)?.functionId).toBe("orders.search");
+    expect(invocations.at(-1)?.functionId).toBe("orders.search-orders");
 
     const limitedHeaders = { "x-api-key": "example-key" };
     expect((await client.get("/orders?status=open", { headers: limitedHeaders })).status).toBe(200);
@@ -128,14 +129,14 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
 
     const upload = new FormData();
     upload.append("label", "receipts");
-    upload.append("primary", new File(["primary"], "primary.txt", { type: "text/plain" }));
-    upload.append("attachments", new File(["one"], "one.txt", { type: "text/plain" }));
-    upload.append("attachments", new File(["two"], "two.txt", { type: "text/plain" }));
+    upload.append("primary", new File(["primary"], "primary.png", { type: "image/png" }));
+    upload.append("attachments", new File(["one"], "one.png", { type: "image/png" }));
+    upload.append("attachments", new File(["two"], "two.png", { type: "image/png" }));
     const uploaded = await client.post("/uploads", { body: upload });
     expect(uploaded.status).toBe(200);
     expect(await uploaded.json()).toEqual({
       label: "receipts",
-      files: ["primary.txt", "one.txt", "two.txt"],
+      files: ["primary.png", "one.png", "two.png"],
     });
 
     const invalidUpload = new FormData();
@@ -150,7 +151,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
     oversizedUpload.append("label", "large");
     oversizedUpload.append(
       "primary",
-      new File(["x".repeat(2_000)], "large.txt", { type: "text/plain" }),
+      new File(["x".repeat(11 * 1024 * 1024)], "large.png", { type: "image/png" }),
     );
     const oversized = await client.post("/uploads", { body: oversizedUpload });
     expect(oversized.status).toBe(422);
@@ -180,14 +181,13 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
   expect(invocations.every(({ source }) => source === "http")).toBe(true);
   expect(invocations.map(({ functionId }) => functionId)).toEqual(
     expect.arrayContaining([
-      "orders.create",
-      "orders.authorize",
-      "orders.get",
-      "orders.search",
-      "orders.update",
-      "orders.delete",
-      "content.browse-path",
-      "assets.upload",
+      "orders.create-order",
+      "orders.get-order",
+      "orders.search-orders",
+      "orders.update-order",
+      "orders.delete-order",
+      "browse-path",
+      "upload-assets",
     ]),
   );
 });
@@ -203,18 +203,14 @@ function createOrderResult(value: unknown) {
 
 function manifestFor(plan: RegistrationPlan): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
     middleware: {
-      "orders.auth": {
-        targetFunctionId: "orders.authorize",
-        request: {
-          kind: "input",
-          fields: { authorization: { kind: "header", name: "authorization" } },
-        },
-        decision: { kind: "continue" },
+      "order-auth": {
+        path: orderAuth.path,
+        handler: async (_context: unknown, next: () => Promise<void>) => next(),
       },
     },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },

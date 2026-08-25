@@ -11,6 +11,8 @@ test("publishes versioned redacted events with bounded monotonic replay", () => 
   const third = stream.publish({ type: "diagnostic.changed", data: { token: "secret", ok: true } });
 
   expect([first?.cursor, second?.cursor, third?.cursor]).toEqual(["1", "2", "3"]);
+  expect(first?.data).toMatchObject({ functionId: "orders.get", serviceId: "orders" });
+  expect(JSON.stringify(first)).not.toContain("tenant-1");
   expect(JSON.stringify(third)).not.toContain("secret");
   expect(stream.replay({ cursor: "1" }).events.map((event) => event.cursor)).toEqual(["2", "3"]);
   expect(stream.replay("2").events[0]?.type).toBe("diagnostic.changed");
@@ -85,6 +87,8 @@ function log(message: string) {
     level: "info" as const,
     component: "test",
     message,
-    fields: { token: "secret" },
+    fields: { service: { tenant: "tenant-1" }, token: "secret" },
+    functionId: "orders.get",
+    serviceId: "orders",
   };
 }

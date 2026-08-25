@@ -64,6 +64,7 @@ export function validate(value: ObservabilityQueryRequest, maximum: number): Nor
     ["outcome", value.outcome],
     ["requestId", value.requestId],
     ["traceId", value.traceId],
+    ["serviceId", value.serviceId],
     ["generationId", value.generationId],
     ["graphHash", value.graphHash],
   ] as const) {
@@ -88,7 +89,8 @@ export function matches(record: ObservabilityRecord, query: NormalizedQuery): bo
       value.requestId === query.requestId ||
       value.correlationId === query.requestId) &&
     (query.generationId === undefined || value.generationId === query.generationId) &&
-    (query.graphHash === undefined || value.graphHash === query.graphHash)
+    (query.graphHash === undefined || value.graphHash === query.graphHash) &&
+    (query.serviceId === undefined || value.serviceId === query.serviceId)
   );
 }
 

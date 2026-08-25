@@ -9,6 +9,8 @@ const publicApis = [
   ["packages/schema/src/standard-schema.ts", "validate"],
   ["packages/functions/src/define-error.ts", "defineError"],
   ["packages/functions/src/define-function.ts", "defineFunction"],
+  ["packages/services/src/define-service.ts", "defineService"],
+  ["packages/services/src/service-middleware.ts", "defineServiceMiddleware"],
   ["packages/routes/src/define-route.ts", "defineRoute"],
   ["packages/routes/src/define-middleware.ts", "defineMiddleware"],
   ["packages/routes/src/http-dsl.ts", "http"],

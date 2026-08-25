@@ -5,27 +5,41 @@ import type {
   FunctionInvocationInput,
   FunctionInvocationResult,
 } from "../../lib/function-invocation";
+import { SchemaForm } from "../schema-form";
+import { SchemaViewer } from "../schema-panel";
+import { schemaFields, schemaInput } from "../../lib/schema-model";
 
 export function FunctionInvocation({
   functionId,
   generationId,
   graphHash,
+  inputSchema,
   invoke,
   onComplete,
 }: {
   readonly functionId: string;
   readonly generationId: string;
   readonly graphHash: string;
+  readonly inputSchema?: unknown;
   readonly invoke: (input: FunctionInvocationInput) => Promise<FunctionInvocationResult>;
   readonly onComplete: (result: FunctionInvocationResult) => void;
 }) {
   const [value, setValue] = useState("{}");
+  const [values, setValues] = useState<Record<string, unknown>>(() =>
+    Object.fromEntries(
+      schemaFields(inputSchema).flatMap((field) =>
+        field.defaultValue === undefined ? [] : [[field.key, field.defaultValue]],
+      ),
+    ),
+  );
+  const [fieldErrors, setFieldErrors] = useState<readonly string[]>([]);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<FunctionInvocationResult>();
   const [status, setStatus] = useState("");
   const errorRef = useRef<HTMLParagraphElement>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
+  const fields = schemaFields(inputSchema);
 
   useEffect(() => {
     if (error !== "") errorRef.current?.focus();
@@ -38,12 +52,23 @@ export function FunctionInvocation({
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     let input: unknown;
-    try {
-      input = JSON.parse(value);
-    } catch {
-      setError("Enter valid JSON input.");
-      setStatus("Invocation validation failed.");
-      return;
+    if (fields.length > 0) {
+      const built = schemaInput(inputSchema, values);
+      setFieldErrors(built.errors);
+      if (built.errors.length > 0 || built.value === undefined) {
+        setError(built.errors.join(" "));
+        setStatus("Invocation validation failed.");
+        return;
+      }
+      input = built.value;
+    } else {
+      try {
+        input = JSON.parse(value);
+      } catch {
+        setError("Enter valid JSON input.");
+        setStatus("Invocation validation failed.");
+        return;
+      }
     }
     setError("");
     setPending(true);
@@ -82,25 +107,37 @@ export function FunctionInvocation({
         noValidate
       >
         <p id="function-invocation-description" className="sr-only">
-          Enter a JSON value that matches the function input schema, then invoke the active
-          generation.
+          Enter values that match the function input schema, then invoke the active generation.
         </p>
-        <label className="composer-field" htmlFor="function-input">
-          <span>JSON input</span>
-          <textarea
-            id="function-input"
-            name="input"
-            rows={7}
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            aria-describedby={
-              error === "" ? "function-input-help" : "function-input-help function-input-error"
-            }
-            aria-errormessage={error === "" ? undefined : "function-input-error"}
-            aria-invalid={error !== ""}
+        {fields.length > 0 ? (
+          <SchemaForm
+            schema={inputSchema}
+            values={values}
+            errors={fieldErrors}
+            onChange={(key, next) => {
+              setValues((current) => ({ ...current, [key]: next }));
+              setFieldErrors([]);
+              setError("");
+            }}
           />
-          <small id="function-input-help">The active function schema validates the value.</small>
-        </label>
+        ) : (
+          <label className="composer-field" htmlFor="function-input">
+            <span>JSON input</span>
+            <textarea
+              id="function-input"
+              name="input"
+              rows={7}
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              aria-describedby={
+                error === "" ? "function-input-help" : "function-input-help function-input-error"
+              }
+              aria-errormessage={error === "" ? undefined : "function-input-error"}
+              aria-invalid={error !== ""}
+            />
+            <small id="function-input-help">The active function schema validates the value.</small>
+          </label>
+        )}
         {error !== "" && (
           <p
             ref={errorRef}
@@ -127,7 +164,7 @@ export function FunctionInvocation({
             </h3>
             <span className="badge">Applied</span>
           </div>
-          <pre>{format(result.output)}</pre>
+          <SchemaViewer value={result.output} />
           {record(result.action)?.actionId && (
             <p className="supporting-copy">
               Action recorded: {String(record(result.action)?.actionId)}
@@ -139,14 +176,6 @@ export function FunctionInvocation({
   );
 }
 
-function format(value: unknown): string {
-  if (value === undefined) return "No output returned.";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Output unavailable.";
-  }
-}
 function record(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)

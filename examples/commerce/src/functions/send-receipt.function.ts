@@ -3,11 +3,10 @@ import assets from "../buckets/assets.bucket.js";
 import { receiptInput, receiptOutput } from "../shared/schemas.js";
 
 const sendReceipt = defineFunction({
-  id: "receipts.send",
   input: receiptInput,
   output: receiptOutput,
   dependencies: { buckets: { assets } },
-  handler: async (input, _request, context) => {
+  handler: async (input, context) => {
     context.log.info("receipt.sent", {
       orderId: input.orderId,
       receiptKey: input.receiptKey,

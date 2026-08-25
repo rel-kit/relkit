@@ -166,7 +166,7 @@ function sensitiveKey(
 }
 
 function contentKey(key: string): boolean {
-  return /^(?:body|requestbody|responsebody|binary|payload|prompt|result|messages|content|environment|env|modelprompt|modelresult|toolinput|toolresult)$/.test(
+  return /^(?:body|requestbody|responsebody|binary|payload|prompt|result|messages|content|environment|env|modelprompt|modelresult|toolinput|toolresult|request|context|service|servicecontext|principal|tenant)$/.test(
     normalizeKey(key),
   );
 }

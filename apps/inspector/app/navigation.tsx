@@ -7,28 +7,33 @@ import { navigationGroups } from "./navigation-data";
 export function InspectorNavigation({ collapsed = false }: { readonly collapsed?: boolean }) {
   const pathname = usePathname() ?? "/";
   return (
-    <nav aria-label="Inspector sections">
+    <nav className="sidebar-navigation" aria-label="Inspector sections">
       {navigationGroups.map((group) => (
-        <section className="nav-group" key={group.label} aria-labelledby={`${group.label}-nav`}>
-          <h2 className={cx(collapsed && "sr-only")} id={`${group.label}-nav`}>
+        <section className="sidebar-group" key={group.label} aria-labelledby={`${group.label}-nav`}>
+          <h2
+            className={cx("sidebar-group-label", collapsed && "sr-only")}
+            id={`${group.label}-nav`}
+          >
             {group.label}
           </h2>
-          <ul className="nav-list">
-            {group.items.map((item) => (
-              <li key={item.href}>
-                <a
-                  className="nav-link"
-                  href={item.href}
-                  aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
-                  title={collapsed ? item.label : undefined}
-                >
-                  <span className="nav-glyph" aria-hidden="true">
-                    {item.glyph}
-                  </span>
-                  {!collapsed && <span>{item.label}</span>}
-                </a>
-              </li>
-            ))}
+          <ul className="sidebar-menu">
+            {group.items.map((item) => {
+              const active = isCurrent(pathname, item.href);
+              return (
+                <li key={item.href}>
+                  <a
+                    className="sidebar-menu-button"
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    data-active={active}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <item.icon aria-hidden="true" className="sidebar-menu-icon" />
+                    {!collapsed && <span>{item.label}</span>}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))}

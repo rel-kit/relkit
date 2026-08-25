@@ -1,5 +1,7 @@
 import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@zsys/graph";
 import { responseSchema, schemaAt, schemaType } from "./generate-schema.js";
+import { addInputField, renderInputTree, type InputTree } from "./input-tree.js";
+import { routeParameters } from "./route-parameters.js";
 
 export interface MappingLeaf {
   readonly inputPath: readonly string[];
@@ -62,6 +64,22 @@ export function mappedInputType(route: ClientRoute): string {
       field.inputPath,
       schemaType(schema ?? (isParameter(field.kind) ? { type: "string" } : undefined)),
       { optional: field.optional || field.defaulted },
+    );
+  }
+  for (const parameter of routeParameters(route.trigger.config.path)) {
+    if (
+      route.fields.some((field) => field.kind === parameter.kind && field.name === parameter.name)
+    )
+      continue;
+    addInputField(
+      root,
+      [parameter.name],
+      schemaType(
+        parameter.kind === "path-segments"
+          ? { type: "array", items: { type: "string" } }
+          : { type: "string" },
+      ),
+      { optional: parameter.optional },
     );
   }
   return renderInputTree(root);
@@ -137,45 +155,6 @@ function responseContracts(value: unknown): readonly ResponseContract[] {
   return responses.sort(
     (left, right) => left.status - right.status || left.id.localeCompare(right.id),
   );
-}
-
-function addInputField(
-  tree: InputTree,
-  path: readonly string[],
-  type: string,
-  options: { readonly optional: boolean },
-): void {
-  const key = path[0];
-  if (key === undefined) return;
-  const field = tree.fields.get(key) ?? { optional: options.optional, type };
-  if (path.length === 1) {
-    field.optional = field.optional && options.optional;
-    field.type = type;
-  } else {
-    field.children ??= { fields: new Map() };
-    addInputField(field.children, path.slice(1), type, options);
-  }
-  tree.fields.set(key, field);
-}
-
-function renderInputTree(tree: InputTree): string {
-  const entries = [...tree.fields.entries()].sort(([left], [right]) => left.localeCompare(right));
-  if (entries.length === 0) return "{}";
-  return `{ ${entries
-    .map(([key, field]) => {
-      const value = field.children === undefined ? field.type : renderInputTree(field.children);
-      return `${JSON.stringify(key)}${field.optional ? "?" : ""}: ${value}`;
-    })
-    .join("; ")} }`;
-}
-
-interface InputTree {
-  readonly fields: Map<string, InputField>;
-}
-interface InputField {
-  optional: boolean;
-  type: string;
-  children?: InputTree;
 }
 
 type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> & {

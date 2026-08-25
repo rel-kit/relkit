@@ -5,24 +5,19 @@ import {
   type DescriptorBase,
   type DescriptorMetadata,
 } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import type { FunctionRefAny } from "@zsys/functions";
 import type { StandardSchemaV1 } from "@zsys/schema";
 import {
   assertRequestMapping,
   assertResponse,
   isHttpResponseMapping,
-  isMiddlewareDecision,
   type HttpMethod,
+  type HttpRequestContentType,
   type HttpRequestMapping,
   type HttpResponseMapping,
 } from "./http-dsl.js";
 import { copyRateLimit, positive, successStatus, type RouteRateLimit } from "./route-options.js";
-import {
-  isMiddlewareDescriptor,
-  isMiddlewareRef,
-  type MiddlewareDescriptor,
-  type MiddlewareRef,
-} from "./define-middleware.js";
 
 export interface RouteDescriptor<
   Id extends string,
@@ -33,12 +28,12 @@ export interface RouteDescriptor<
   readonly path?: string;
   readonly runtimePaths?: readonly string[];
   readonly target: Target;
+  readonly accept?: HttpRequestContentType;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 export interface DefineRouteOptions<
@@ -46,14 +41,14 @@ export interface DefineRouteOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping | undefined = undefined,
 > extends DescriptorMetadata {
-  readonly id: Id;
+  readonly id?: Id;
   readonly target: Target;
+  readonly accept?: HttpRequestContentType;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
   readonly successStatus?: number;
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
-  readonly middleware?: readonly MiddlewareRef[];
   readonly timeoutMs?: number;
 }
 
@@ -61,8 +56,10 @@ export interface DefineRouteOptions<
  * Defines one HTTP method exported by a nested `route.ts` module.
  *
  * The compiler derives the method from the named export and the path from the
- * file. Omit `request` and `responses` when schema-based inference represents
- * the transport; explicit mappings replace inference completely.
+ * file. Omit `id` for a source-derived route identity, and omit `request` and
+ * `responses` when schema-based inference represents the transport; explicit
+ * mappings replace inference completely. Matching path names map into reusable
+ * function input.
  *
  * @example A GET route with inferred path and query input
  * ```ts
@@ -76,7 +73,7 @@ export interface DefineRouteOptions<
  *   handler: async () => ({ count: 0 })
  * })
  *
- * export const GET = defineRoute({ id: "orders.list.http", target: listOrders })
+ * export const GET = defineRoute({ target: listOrders })
  * ```
  *
  * @category HTTP
@@ -92,12 +89,13 @@ export function defineRoute<
     throw new TypeError("Route target must be a function reference");
   if (options.request !== undefined) assertRequestMapping(options.request);
   const responses = copyResponses(options.responses);
-  const middleware = copyMiddleware(options.middleware, responses);
+  const accept = requestContentType(options.accept);
   const timeoutMs = positive(options.timeoutMs, "timeoutMs");
   const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
   const status = successStatus(options.successStatus);
   const rateLimit = copyRateLimit(options.rateLimit);
-  const base = createDescriptorBase("route", options.id, options);
+  const id = options.id === undefined ? createUnboundIdentity() : options.id;
+  const base = createDescriptorBase("route", id, options);
   const legacy = options as DefineRouteOptions<Id, Target, Request> & {
     readonly method?: HttpMethod;
     readonly path?: string;
@@ -108,14 +106,20 @@ export function defineRoute<
     ...(legacy.method === undefined ? {} : { method: legacy.method }),
     ...(legacy.path === undefined ? {} : { path: legacy.path }),
     target: options.target,
+    ...(accept === undefined ? {} : { accept }),
     ...(options.request === undefined ? {} : { request: options.request }),
     ...(responses === undefined ? {} : { responses }),
     ...(status === undefined ? {} : { successStatus: status }),
     ...(maxBodyBytes === undefined ? {} : { maxBodyBytes }),
     ...(rateLimit === undefined ? {} : { rateLimit }),
-    ...(middleware === undefined ? {} : { middleware }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
   }) as RouteDescriptor<Id, Target, Request>;
+}
+
+function requestContentType(value: unknown): HttpRequestContentType | undefined {
+  if (value === undefined) return undefined;
+  if (value === "application/json" || value === "multipart/form-data") return value;
+  throw new TypeError('Route accept must be "application/json" or "multipart/form-data"');
 }
 
 function copyResponses(
@@ -132,42 +136,6 @@ function copyResponses(
     return response;
   });
   return Object.freeze(result);
-}
-
-function copyMiddleware(
-  values: readonly MiddlewareRef[] | undefined,
-  responses: readonly HttpResponseMapping[] | undefined,
-): readonly MiddlewareRef[] | undefined {
-  if (values === undefined) return undefined;
-  if (!Array.isArray(values)) throw new TypeError("Route middleware must be an array");
-  const ids = new Set<string>();
-  const result = values.map((value) => {
-    if (!isMiddlewareRef(value))
-      throw new TypeError("Route middleware must be a middleware reference");
-    const id = value.ref.id;
-    if (ids.has(id)) throw new TypeError(`Duplicate route middleware "${id}"`);
-    ids.add(id);
-    const decision = isMiddlewareDescriptor(value) ? value.decision : undefined;
-    if (decision?.kind === "respond") {
-      if (responses === undefined) {
-        throw new TypeError(`Middleware "${id}" requires explicit route responses`);
-      }
-      if (!isDeclaredResponse(decision.responseId, responses)) {
-        throw new TypeError(`Middleware "${id}" responds with an undeclared route response`);
-      }
-    }
-    return value;
-  });
-  return Object.freeze(result);
-}
-
-function isDeclaredResponse(id: string, responses: readonly HttpResponseMapping[]): boolean {
-  return responses.some(
-    (response) =>
-      response.id === id ||
-      response.errorId === id ||
-      (id === "validation" && response.kind === "validation-error"),
-  );
 }
 
 function isFunctionTarget(value: unknown): value is FunctionRefAny {

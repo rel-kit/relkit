@@ -4,10 +4,16 @@ import {
   invokeFunction,
   type InvocationCompletion,
 } from "../../../packages/engine/src/index.ts";
-import createOrder from "../../../examples/commerce/src/functions/create-order.function.ts";
-import getOrder from "../../../examples/commerce/src/functions/get-order.function.ts";
+import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
+import createOrder from "../../../examples/commerce/src/functions/orders/create-order.function.ts";
+import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
 import orderReceipt from "../../../examples/commerce/src/events/order-receipt.event.ts";
+import orders from "../../../examples/commerce/src/services/orders.service.ts";
 import { z } from "../../../packages/schema/src/index.ts";
+
+bindDescriptorIdentity(createOrder, "orders.create-order");
+bindDescriptorIdentity(getOrder, "orders.get-order");
+bindDescriptorIdentity(orders.getOrder, "orders.get-order");
 
 const orderInput = {
   orderId: "order-1",
@@ -73,7 +79,6 @@ describe("commerce example functions through the common engine", () => {
     const result = await invokeFunction(orderReceipt.target, envelope, {
       now: () => 0,
       clients: {
-        functions: { getOrder },
         jobs: { sendReceiptJob: { enqueue: async () => undefined } },
       },
       hooks: {
@@ -88,10 +93,10 @@ describe("commerce example functions through the common engine", () => {
 
     expect(result).toBeUndefined();
     expect(records.map(({ functionId }) => functionId)).toEqual([
-      "orders.get",
+      "orders.get-order",
       "zsys.event.receipts.on-order-created.handler",
     ]);
-    const child = records.find(({ functionId }) => functionId === "orders.get");
+    const child = records.find(({ functionId }) => functionId === "orders.get-order");
     expect(child?.source).toBe("direct");
     expect(child?.parentId).toBeDefined();
 

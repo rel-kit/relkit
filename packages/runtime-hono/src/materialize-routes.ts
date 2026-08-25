@@ -1,9 +1,11 @@
 import type { Hono } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION, type FunctionRequest } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@zsys/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import type { RequestRecordSink } from "@zsys/observability";
+import type { MiddlewareContext } from "@zsys/routes";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
-import { createRouteHandler, getEntry, middlewareTarget } from "./materialize-routes-utils.js";
+import { createRouteHandler, getEntry, isRecord } from "./materialize-routes-utils.js";
+import { registerRouteMiddleware } from "./route-middleware.js";
 import {
   FRAMEWORK_MIDDLEWARE_ORDER,
   type FrameworkMiddleware,
@@ -14,11 +16,13 @@ import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
 
 export interface RuntimeManifest {
-  readonly contractVersion: number;
-  readonly generatorVersion: number;
+  readonly contractVersion: typeof MANIFEST_VERSION;
+  readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: ManifestEntries<unknown>;
   readonly targets?: ManifestEntries<unknown>;
+  readonly services?: ManifestEntries<unknown>;
+  readonly hooks?: ManifestEntries<unknown>;
   readonly application?: {
     readonly env: unknown;
     readonly providers: unknown;
@@ -30,7 +34,6 @@ export interface RuntimeManifest {
 export interface HttpInvocationOptions {
   readonly functionId: string;
   readonly input: unknown;
-  readonly request?: FunctionRequest;
   readonly source: "http";
   readonly signal?: AbortSignal;
   readonly requestId?: string;
@@ -44,9 +47,10 @@ export interface HttpEngine {
 export interface HttpRouteRequest {
   readonly request: Request;
   readonly pathPattern?: string;
-  readonly params: Readonly<Record<string, string>>;
+  readonly params: Readonly<Record<string, MappingValue>>;
   readonly query: Readonly<Record<string, MappingValue>>;
   readonly headers: Readonly<Record<string, MappingValue>>;
+  readonly validated?: Readonly<Record<string, unknown>>;
 }
 export type HttpInputMapper = (
   request: HttpRouteRequest,
@@ -64,6 +68,12 @@ export interface RouteMaterializationOptions {
   readonly generationId?: string;
   readonly observability?: RequestRecordSink;
   readonly rateLimitRuntime?: RateLimitRuntimeOptions;
+  readonly middlewareContext?: (options: {
+    readonly middlewareId: string;
+    readonly signal: AbortSignal;
+    readonly requestId?: string;
+    readonly traceId?: string;
+  }) => MaybePromise<MiddlewareContext>;
 }
 export type RuntimeHonoManifestErrorCode =
   | "ZSYS_MANIFEST_VERSION_UNSUPPORTED"
@@ -103,23 +113,18 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
       `Manifest hash ${JSON.stringify(manifest.graphHash)} does not match plan hash ${JSON.stringify(plan.graphHash)}.`,
     );
 
+  for (const middleware of plan.middlewares) {
+    const entry = getEntry(manifest.middleware, middleware.id);
+    if (!isRecord(entry) || entry.path !== middleware.path || typeof entry.handler !== "function")
+      throw new RuntimeHonoManifestError(
+        entry === undefined
+          ? "ZSYS_MANIFEST_MIDDLEWARE_MISSING"
+          : "ZSYS_MANIFEST_MIDDLEWARE_MISMATCH",
+        `Manifest middleware "${middleware.id}" is missing or does not match its graph node.`,
+        middleware.id,
+      );
+  }
   for (const trigger of plan.httpTriggers) {
-    for (const middleware of trigger.config.middleware) {
-      const entry = getEntry(manifest.middleware, middleware.id);
-      if (entry === undefined)
-        throw new RuntimeHonoManifestError(
-          "ZSYS_MANIFEST_MIDDLEWARE_MISSING",
-          `Manifest middleware "${middleware.id}" is missing.`,
-          middleware.id,
-        );
-      const target = middlewareTarget(entry);
-      if (target !== undefined && target !== middleware.targetFunctionId)
-        throw new RuntimeHonoManifestError(
-          "ZSYS_MANIFEST_MIDDLEWARE_MISMATCH",
-          `Manifest middleware "${middleware.id}" targets "${target}" instead of "${middleware.targetFunctionId}".`,
-          middleware.id,
-        );
-    }
     for (const transform of trigger.config.transforms) {
       if (getEntry(manifest.requestTransforms, transform.id) === undefined)
         throw new RuntimeHonoManifestError(
@@ -133,6 +138,7 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
 /** Registers only the HTTP triggers already present in the immutable plan. */
 export function materializeRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
+  registerRouteMiddleware(app, options);
   const triggers = [...options.plan.httpTriggers].sort(
     (left, right) => Number(right.config.method === "HEAD") - Number(left.config.method === "HEAD"),
   );

@@ -20,8 +20,10 @@
     "@zsys/contracts": "workspace:*",
     "@zsys/events": "workspace:*",
     "@zsys/functions": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/jobs": "workspace:*",
     "@zsys/routes": "workspace:*",
+    "@zsys/services": "workspace:*",
     "@zsys/tools": "workspace:*"
   },
   "scripts": {

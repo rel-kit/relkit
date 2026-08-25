@@ -19,7 +19,7 @@ export function poison<T extends Record<string, unknown>>(value: T): T {
 }
 
 export const graph = {
-  contractVersion: 1,
+  contractVersion: 3,
   appId: "contract-fixture",
   nodes: [
     {
@@ -42,7 +42,18 @@ export const graph = {
       source: source("src/routes.ts"),
       triggerType: "http",
       targetFunctionId: "orders.create",
-      config: { method: "POST", path: "/orders" },
+      config: {
+        method: "POST",
+        path: "/orders",
+        middleware: [{ id: "orders.auth", path: "/orders/*", order: 0, match: "always" }],
+      },
+    },
+    {
+      kind: "middleware",
+      id: "orders.auth",
+      source: source("src/middleware.ts"),
+      path: "/orders/*",
+      order: 0,
     },
     { kind: "job", id: "orders.job", source: source("src/jobs.ts") },
     { kind: "event", id: "orders.created", source: source("src/events.ts") },
@@ -50,8 +61,34 @@ export const graph = {
     { kind: "cache", id: "orders.cache", source: source("src/cache.ts") },
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
     { kind: "agent", id: "orders.agent", source: source("src/agents.ts") },
+    {
+      kind: "service",
+      id: "orders",
+      source: source("src/services.ts"),
+      title: "Orders",
+      tags: ["orders"],
+      members: [{ name: "create", functionId: "orders.create" }],
+      middleware: [{ id: "orders.context" }],
+    },
   ],
-  edges: [{ kind: "targets-function", from: "orders.create.http", to: "orders.create" }],
+  edges: [
+    { kind: "targets-function", from: "orders.create.http", to: "orders.create" },
+    {
+      kind: "uses-middleware",
+      from: "orders.create.http",
+      to: "orders.auth",
+      order: 0,
+      match: "always",
+    },
+    {
+      kind: "contains-function",
+      from: "orders",
+      to: "orders.create",
+      member: "create",
+      order: 0,
+    },
+    { kind: "uses-service-middleware", from: "orders", to: "orders.context", order: 0 },
+  ],
 };
 
 export function getForbiddenReads(): number {

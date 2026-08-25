@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Effect } from "../../../packages/testing/node_modules/effect/dist/index.js";
+import { dispatchInvocation } from "../../../packages/invocation/dist/index.js";
 import { defineEnv } from "../../../packages/config/src/index.ts";
 import {
   createConcurrencyAdmission,
@@ -122,14 +123,6 @@ function declaredError(id: string): Error {
   });
 }
 
-function functionDependency(target: InvocationTarget): {
-  readonly ref: { kind: string; id: string };
-} {
-  return {
-    ref: { kind: "function", id: target.id },
-  };
-}
-
 describe("engine integration matrix", () => {
   test("covers success, input failure, output defect, declared error, and unknown error", async () => {
     const successCapture = capture();
@@ -138,7 +131,7 @@ describe("engine integration matrix", () => {
         id: "engine.success",
         input: valueInput,
         output: valueOutput,
-        handler: (input, _request, context) => {
+        handler: (input, context) => {
           context.log.info("success", { functionId: context.invocation.functionId });
           return { value: input.value + 1 };
         },
@@ -189,7 +182,7 @@ describe("engine integration matrix", () => {
         id: "engine.output-defect",
         input: valueInput,
         output: valueOutput,
-        handler: (_input: Value, _request, context: EngineContext) => {
+        handler: (_input: Value, context: EngineContext) => {
           context.log.error("invalid output");
           return { value: "bad" } as unknown as Value;
         },
@@ -208,7 +201,7 @@ describe("engine integration matrix", () => {
         input: valueInput,
         output: valueOutput,
         errors: [{ id: "orders.unavailable", data: z.object({ reason: z.string() }) }],
-        handler: (_input: Value, _request, context: EngineContext) => {
+        handler: (_input: Value, context: EngineContext) => {
           context.log.warn("declared failure");
           throw declaredError("orders.unavailable");
         },
@@ -229,7 +222,7 @@ describe("engine integration matrix", () => {
         id: "engine.unknown-error",
         input: valueInput,
         output: valueOutput,
-        handler: (_input: Value, _request, context: EngineContext) => {
+        handler: (_input: Value, context: EngineContext) => {
           context.log.error("unexpected failure");
           throw new Error("internal secret");
         },
@@ -252,7 +245,7 @@ describe("engine integration matrix", () => {
       id: "engine.child",
       input: valueInput,
       output: valueOutput,
-      handler: (input, _request, context) => {
+      handler: (input, context) => {
         context.log.info("child", { invocationId: context.invocation.id });
         return { value: input.value + 1 };
       },
@@ -261,13 +254,9 @@ describe("engine integration matrix", () => {
       id: "engine.parent",
       input: valueInput,
       output: valueOutput,
-      dependencies: { functions: { child: functionDependency(child) } },
-      handler: async (input, _request, context) => {
+      handler: async (input, context) => {
         context.log.info("parent", { invocationId: context.invocation.id });
-        const functions = context as EngineContext & {
-          readonly functions: Readonly<Record<string, (value: unknown) => Promise<unknown>>>;
-        };
-        return (await functions.functions.child(input)) as Value;
+        return (await dispatchInvocation({ target: child, input })) as Value;
       },
     };
 
@@ -275,7 +264,6 @@ describe("engine integration matrix", () => {
       parent,
       { value: 2 },
       {
-        clients: { functions: { child } },
         correlationId: "request-1",
         idSource: ids("parent"),
         hooks: hooksFor(state),
@@ -310,7 +298,7 @@ describe("engine integration matrix", () => {
       parentSpanId: rootSpan?.spanId,
     });
     expect(state.logs.map(({ message }) => message)).toEqual(["parent", "child"]);
-    expect(eventTypes(state)).toContain("edge.declared");
+    expect(eventTypes(state)).not.toContain("edge.declared");
     expect(eventTypes(state)).toContain("edge.observed");
   });
 
@@ -352,7 +340,7 @@ describe("engine integration matrix", () => {
       dependencies: {
         cache: { prices: { ref: { kind: "cache", id: "prices" } } },
       },
-      handler: (_input, _request, context) => {
+      handler: (_input, context) => {
         handlerSignal = context.signal;
         const cache = context as EngineContext & {
           readonly cache: {
@@ -408,7 +396,7 @@ describe("engine integration matrix", () => {
         id: "engine.timeout",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, _request, context: EngineContext) => {
+        handler: (_input: unknown, context: EngineContext) => {
           context.log.info("waiting for deadline");
           timeoutStarted();
           return new Promise<never>((_resolve) => {
@@ -458,7 +446,7 @@ describe("engine integration matrix", () => {
       input: valueInput,
       output: valueOutput,
       concurrency: 1,
-      handler: async (input, _request, context) => {
+      handler: async (input, context) => {
         starts.push(input.value);
         active += 1;
         maximumActive = Math.max(maximumActive, active);
@@ -527,7 +515,7 @@ describe("engine integration matrix", () => {
         id: "engine.shutdown",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, _request, context: EngineContext) => {
+        handler: (_input: unknown, context: EngineContext) => {
           started();
           return new Promise<never>((_resolve, reject) => {
             context.signal.addEventListener("abort", () => {
@@ -554,7 +542,7 @@ describe("engine integration matrix", () => {
         id: "engine.undeclared",
         input: emptyInput,
         output: emptyOutput,
-        handler: (_input: unknown, _request, context: EngineContext) => {
+        handler: (_input: unknown, context: EngineContext) => {
           context.log.info("checking dependency");
           const clients = context as EngineContext & {
             readonly cache: {
@@ -608,7 +596,7 @@ describe("engine integration matrix", () => {
       }),
     ).toThrow("ZSYS_GRAPH_MANIFEST_MISMATCH");
     expect(hashGraph(graph)).not.toBe("sha256:mismatch");
-    expect(CONTRACT_VERSION).toBe(GRAPH_VERSION);
+    expect(CONTRACT_VERSION).not.toBe(GRAPH_VERSION);
   });
 
   test("releases generation providers in reverse order and cleans up construction failure", async () => {

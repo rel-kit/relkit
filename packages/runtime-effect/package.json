@@ -14,6 +14,7 @@
     "@zsys/config": "workspace:*",
     "@zsys/contracts": "workspace:*",
     "@zsys/graph": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/observability": "workspace:*",
     "effect": "4.0.0-beta.107"
   },

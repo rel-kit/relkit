@@ -24,26 +24,25 @@ function target(
 }
 
 describe("function invocation pipeline", () => {
-  test("passes the transport request between input and context", async () => {
-    let seen: { readonly url: string } | undefined;
-    const request = new Request("http://zsys.test/orders/1");
+  test("passes only validated input and execution context to handlers", async () => {
+    let seen: unknown;
     await invokeFunction(
-      target((_input, currentRequest, _context) => {
-        seen = currentRequest;
+      target((_input, context) => {
+        seen = context;
         return { value: 1 };
       }),
       { value: 1 },
-      { request },
     );
 
-    expect(seen?.url).toBe(request.url);
+    expect(seen).toMatchObject({ signal: expect.any(AbortSignal) });
+    expect((seen as Record<string, unknown>).request).toBeUndefined();
   });
 
   test("validates, traces, and releases a successful invocation", async () => {
     const events: string[] = [];
     const now = Date.now();
     const result = await invokeFunction(
-      target((input, _request, context) => {
+      target((input, context) => {
         expect(context.invocation.source).toBe("direct");
         expect(context.signal.aborted).toBe(false);
         return { value: (input as { value: number }).value + 1 };
@@ -74,6 +73,62 @@ describe("function invocation pipeline", () => {
       "complete:success",
       "release:true",
     ]);
+  });
+
+  test("validates transformations and runs after hooks only on success", async () => {
+    const events: string[] = [];
+    const transformed = defineFunction({
+      id: "orders.hooks",
+      input: z.object({ value: z.number() }),
+      output: z.object({ value: z.number() }),
+      onBefore: (input, context) => {
+        events.push(`before:${context.invocation.source}`);
+        return { value: input.value + 1 };
+      },
+      handler: (input) => {
+        events.push(`handler:${input.value}`);
+        return { value: input.value + 1 };
+      },
+      onAfter: (output) => {
+        events.push(`after:${output.value}`);
+        return { value: output.value + 1 };
+      },
+    });
+
+    await expect(invokeFunction(transformed, { value: 1 })).resolves.toEqual({ value: 4 });
+    expect(events).toEqual(["before:direct", "handler:2", "after:3"]);
+
+    let after = false;
+    const failed = defineFunction({
+      id: "orders.failed-hooks",
+      input: z.object({ value: z.number() }),
+      output: z.object({ value: z.number() }),
+      handler: () => {
+        throw new Error("failed");
+      },
+      onAfter: (output) => {
+        after = true;
+        return output;
+      },
+    });
+    await expect(invokeFunction(failed, { value: 1 })).rejects.toMatchObject({ kind: "defect" });
+    expect(after).toBe(false);
+
+    let invalidHandler = false;
+    const invalid = defineFunction({
+      id: "orders.invalid-hook",
+      input: z.object({ value: z.number() }),
+      output: z.object({ value: z.number() }),
+      onBefore: () => ({ value: "invalid" }) as never,
+      handler: (input) => {
+        invalidHandler = true;
+        return input;
+      },
+    });
+    await expect(invokeFunction(invalid, { value: 1 })).rejects.toMatchObject({
+      kind: "defect",
+    });
+    expect(invalidHandler).toBe(false);
   });
 
   test("rejects invalid input before admission and still completes hooks", async () => {

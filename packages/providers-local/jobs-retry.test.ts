@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { applicationFailure } from "@zsys/runtime-effect";
+import { applicationFailure, cancellationFailure, timeoutFailure } from "@zsys/runtime-effect";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -43,13 +43,14 @@ describe("local job retry policy", () => {
       message: "Try again",
       data: { orderId: "order-1" },
       retry: "later",
+      afterMs: 200,
       cause: new Error("password=should-not-persist"),
     });
     const delayed = await applyRetry(
       queue,
       "job-1",
       {
-        maxAttempts: 2,
+        maxAttempts: 3,
         initialDelayMs: 50,
         maxDelayMs: 100,
         multiplier: 2,
@@ -58,26 +59,51 @@ describe("local job retry policy", () => {
       retryable,
       { now: () => now },
     );
-    expect(delayed).toMatchObject({ state: "delayed", attempt: 1, availableAt: 150 });
+    expect(delayed).toMatchObject({ state: "delayed", attempt: 1, availableAt: 300 });
     expect(delayed.failure).toEqual({
       kind: "application",
       outcome: "declared-error",
       code: "orders.temporarily-unavailable",
       message: "Try again",
       data: { orderId: "order-1" },
+      afterMs: 200,
       retry: "later",
     });
     expect(JSON.stringify(delayed)).not.toContain("should-not-persist");
 
-    now = 150;
-    await queue.transition("job-1", "available", { availableAt: 150 });
+    now = 300;
+    await queue.transition("job-1", "available", { availableAt: 300 });
     await queue.acquire("job-1");
-    now = 200;
+    const policyDelayFailure = applicationFailure({
+      id: "orders.temporarily-unavailable",
+      message: "Try again",
+      data: { orderId: "order-1" },
+      retry: "later",
+      afterMs: 10,
+    });
+    const policyDelayed = await applyRetry(
+      queue,
+      "job-1",
+      {
+        maxAttempts: 3,
+        initialDelayMs: 50,
+        maxDelayMs: 100,
+        multiplier: 2,
+        jitter: "none",
+      },
+      policyDelayFailure,
+      { now: () => now },
+    );
+    expect(policyDelayed).toMatchObject({ state: "delayed", attempt: 2, availableAt: 400 });
+
+    now = 400;
+    await queue.transition("job-1", "available", { availableAt: 400 });
+    await queue.acquire("job-1");
     const dead = await applyRetry(
       queue,
       "job-1",
       {
-        maxAttempts: 2,
+        maxAttempts: 3,
         initialDelayMs: 50,
         maxDelayMs: 100,
         multiplier: 2,
@@ -87,17 +113,16 @@ describe("local job retry policy", () => {
       { now: () => now },
     );
     expect(dead.state).toBe("dead-lettered");
-    expect(dead.attempt).toBe(2);
+    expect(dead.attempt).toBe(3);
     expect(queue.counts()["dead-lettered"]).toBe(1);
     await store.close();
   });
 
   test("dead-letters a non-retryable declared failure before the limit", () => {
-    const failure = applicationFailure({
+    const omitted = applicationFailure({
       id: "orders.invalid",
       message: "Invalid order",
       data: {},
-      retry: "never",
     });
     expect(
       planRetry(
@@ -109,9 +134,100 @@ describe("local job retry policy", () => {
           jitter: "full",
         },
         1,
-        failure,
+        omitted,
+      ),
+    ).toMatchObject({
+      classification: "non-retryable",
+      state: "dead-lettered",
+      delayMs: 0,
+      failure: { retry: "never" },
+    });
+    expect(
+      planRetry(
+        {
+          maxAttempts: 8,
+          initialDelayMs: 10,
+          maxDelayMs: 100,
+          multiplier: 2,
+          jitter: "full",
+        },
+        1,
+        applicationFailure({
+          id: "orders.invalid",
+          message: "Invalid order",
+          data: {},
+          retry: "never",
+        }),
       ),
     ).toMatchObject({ classification: "non-retryable", state: "dead-lettered", delayMs: 0 });
+  });
+
+  test("uses the larger declared delay and preserves deadline/cancellation bounds", () => {
+    const policy = {
+      maxAttempts: 3,
+      initialDelayMs: 50,
+      maxDelayMs: 50,
+      multiplier: 1,
+      jitter: "none" as const,
+    };
+    expect(
+      planRetry(
+        policy,
+        1,
+        applicationFailure({
+          id: "orders.retryable",
+          message: "Try again",
+          data: {},
+          retry: "later",
+          afterMs: 100,
+        }),
+      ),
+    ).toMatchObject({ state: "delayed", delayMs: 100, failure: { afterMs: 100 } });
+    expect(
+      planRetry(
+        policy,
+        1,
+        applicationFailure({
+          id: "orders.retryable",
+          message: "Try again",
+          data: {},
+          retry: "later",
+          afterMs: 10,
+        }),
+      ).delayMs,
+    ).toBe(50);
+    expect(
+      planRetry(
+        policy,
+        1,
+        applicationFailure({
+          id: "orders.retryable",
+          message: "Try again",
+          data: {},
+          retry: "later",
+        }),
+      ),
+    ).toMatchObject({
+      classification: "retryable",
+      state: "delayed",
+      delayMs: 50,
+      failure: { retry: "later" },
+    });
+    expect(planRetry(policy, 1, cancellationFailure()).state).toBe("dead-lettered");
+    expect(planRetry(policy, 1, timeoutFailure()).state).toBe("dead-lettered");
+    expect(
+      planRetry(
+        policy,
+        3,
+        applicationFailure({
+          id: "orders.retryable",
+          message: "Try again",
+          data: {},
+          retry: "later",
+          afterMs: 100,
+        }),
+      ),
+    ).toMatchObject({ state: "dead-lettered", delayMs: 0 });
   });
 });
 

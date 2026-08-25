@@ -63,8 +63,12 @@ export type {
   TestAgentApprovals,
   TestAgentDescriptor,
   TestAgentInvocationOptions,
+  TestAgentModel,
+  TestAgentModelCall,
+  TestAgentModelOptions,
   TestAgentOptions,
   TestAgentTrace,
   TestAgentTraceExpectation,
   TestAgentTraceSnapshot,
+  TestModelTurn,
 } from "./agents.js";

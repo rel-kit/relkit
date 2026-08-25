@@ -43,7 +43,28 @@ describe("function registry", () => {
     expect(() => ((registry as { handlers: unknown }).handlers = {})).toThrow();
   });
 
-  test("rejects version and graph-hash mismatches before registration", () => {
+  test("rejects stale versions and graph-hash mismatches before registration", () => {
+    const staleGraph = {
+      ...graph(),
+      contractVersion: GRAPH_VERSION - 1,
+    } as unknown as ApplicationGraph;
+    expect(() => createFunctionRegistry(staleGraph, manifest(staleGraph))).toThrow(
+      "ZSYS_GRAPH_VERSION_UNSUPPORTED",
+    );
+    expect(() =>
+      createFunctionRegistry(graph(), {
+        ...manifest(),
+        contractVersion: MANIFEST_VERSION - 1,
+      } as unknown as RuntimeManifestInput),
+    ).toThrow("ZSYS_MANIFEST_VERSION_UNSUPPORTED");
+    const unboundGraph = {
+      ...graph(),
+      nodes: [
+        { ...graph().nodes[0]!, errors: [{ id: "unbound.orders-not-found" }] },
+        graph().nodes[1]!,
+      ],
+    } as ApplicationGraph;
+    expect(() => createFunctionRegistry(unboundGraph, manifest())).toThrow("ZSYS_GRAPH_INVALID");
     expect(() =>
       createFunctionRegistry(graph(), { ...manifest(), graphHash: "sha256:wrong" }),
     ).toThrow("ZSYS_GRAPH_MANIFEST_MISMATCH");

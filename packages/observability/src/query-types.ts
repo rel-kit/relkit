@@ -27,6 +27,7 @@ export interface ObservabilityQueryRequest {
   readonly outcome?: string;
   readonly requestId?: string;
   readonly traceId?: string;
+  readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
 }

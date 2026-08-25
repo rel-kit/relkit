@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -12,6 +12,7 @@ import { Pagination } from "../components/ui/pagination";
 import { type Choice, SelectField } from "../components/ui/select";
 import { ContentTabs } from "../components/ui/tabs";
 import type { InspectorPage, InspectorQuery } from "../lib/api-types";
+import { INSPECTOR_BACKEND_CONNECTED_EVENT } from "../lib/client";
 import { ResourceTableBody } from "./resource-table-body";
 export interface ResourceTableItem {
   readonly id: string;
@@ -54,6 +55,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
   const [page, setPage] = useState(0);
   const [nextCursor, setNextCursor] = useState<string>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [refresh, setRefresh] = useState(0);
   const [selected, setSelected] = useState<Item>();
   const request = useRef(0);
   const query = useMemo<InspectorQuery>(
@@ -68,6 +70,12 @@ export function ResourceTable<Item extends ResourceTableItem>({
   );
 
   useEffect(() => {
+    const refreshOnConnection = (): void => setRefresh((value) => value + 1);
+    window.addEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refreshOnConnection);
+    return () => window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refreshOnConnection);
+  }, []);
+
+  useEffect(() => {
     const current = ++request.current;
     setState("loading");
     void load(query)
@@ -78,7 +86,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
         setState("ready");
       })
       .catch(() => current === request.current && setState("error"));
-  }, [load, query]);
+  }, [load, query, refresh]);
 
   const resetPage = (): void => {
     setCursors([undefined]);
@@ -102,6 +110,11 @@ export function ResourceTable<Item extends ResourceTableItem>({
         <Badge>{items.length} visible</Badge>
       </header>
       <Card className="resource-toolbar" aria-label={`${title} filters`}>
+        <div className="resource-filter-heading">
+          <SlidersHorizontal aria-hidden="true" className="size-4" />
+          <strong>Filters</strong>
+          <span>Search and narrow the active collection.</span>
+        </div>
         <Field
           label={`Search ${noun}`}
           value={search}
@@ -133,9 +146,11 @@ export function ResourceTable<Item extends ResourceTableItem>({
             }}
           />
         )}
-        <Button variant="ghost" size="sm" onPress={clear}>
-          <RotateCcw aria-hidden="true" className="size-3.5" /> Reset
-        </Button>
+        <div className="resource-filter-footer">
+          <Button variant="ghost" size="sm" onPress={clear}>
+            <RotateCcw aria-hidden="true" className="size-3.5" /> Reset filters
+          </Button>
+        </div>
       </Card>
       <ResourceTableBody
         state={state}

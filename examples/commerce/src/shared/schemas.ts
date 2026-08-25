@@ -54,7 +54,10 @@ export const orderSearchOutput = z.object({ status: z.string(), count: z.number(
 export const pathInput = z.object({ parts: z.array(z.string()).optional() });
 export const pathOutput = z.object({ path: z.string() });
 
-const uploadedFile = z.file({ maxBytes: 256, mediaTypes: ["text/plain"] });
+const uploadedFile = z.file({
+  maxBytes: 1024 * 1024 * 10,
+  mediaTypes: ["image/jpeg", "image/png"],
+});
 export const assetUploadInput = z.object({
   label: z.string().min(1),
   primary: uploadedFile,

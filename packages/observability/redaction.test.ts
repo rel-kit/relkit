@@ -58,3 +58,15 @@ test("keeps request bodies off by default and redacted when explicitly captured"
   });
   expect(JSON.stringify(capture)).not.toContain("top-secret-token");
 });
+
+test("keeps service context out of default records while allowing bounded capture", () => {
+  const value = { service: { principal: "user-1", tenant: "tenant-1", token: "secret" } };
+  expect(redactRecord(value)).toEqual("[REDACTED]");
+  const capture = captureRedacted(value, {
+    mode: "development-redacted",
+    maxBytes: 256,
+  });
+  expect(capture?.content).toEqual({
+    service: { principal: "user-1", tenant: "tenant-1", token: "[REDACTED]" },
+  });
+});

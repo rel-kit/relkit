@@ -8,13 +8,12 @@ import {
   invokeAgent,
   type AgentRuntimeOptions,
 } from "./src/index.ts";
-import type { ModelTurn } from "./src/index.ts";
+import { createHangingTestModel, createTestModel, type TestModelTurn } from "./test-model.ts";
 
 function setup(
-  turns: readonly ModelTurn[],
+  turns: readonly TestModelTurn[],
   options: { write?: boolean; maxSteps?: number; maxToolCalls?: number } = {},
 ) {
-  const calls: unknown[] = [];
   const invocations: unknown[] = [];
   const lookup = defineFunction({
     id: "orders.lookup",
@@ -33,7 +32,7 @@ function setup(
     id: "support.order",
     input: z.object({ question: z.string() }),
     output: z.object({ answer: z.string() }),
-    modelProfile: "default",
+    model: "default",
     instructions: "Answer order questions.",
     tools: [tool],
     limits: {
@@ -42,24 +41,10 @@ function setup(
       timeoutMs: 1_000,
     },
   });
-  const provider = {
-    profile: "default",
-    capabilities: {
-      toolCalls: true,
-      cancellation: true,
-      maxInputBytes: 4_096,
-      maxOutputBytes: 512,
-    },
-    request: async (request: { readonly messages: readonly unknown[] }): Promise<ModelTurn> => {
-      calls.push(request);
-      const turn = turns[calls.length - 1];
-      if (turn === undefined) throw new Error("script exhausted");
-      return turn;
-    },
-  };
+  const model = createTestModel(turns);
   const runtime: AgentRuntimeOptions = {
     agent,
-    provider,
+    modelRegistry: { resolveModel: () => ({ id: "default", model: model.model }) },
     tools: [tool],
     engine: {
       invoke: async (request) => {
@@ -68,7 +53,7 @@ function setup(
       },
     },
   };
-  return { runtime, calls, invocations };
+  return { runtime, calls: model.calls, invocations };
 }
 
 describe("bounded agent runtime", () => {
@@ -181,15 +166,45 @@ describe("bounded agent runtime", () => {
     expect(cancelled.calls).toHaveLength(0);
 
     const timeout = setup([]);
+    const hanging = createHangingTestModel();
     const stalled = {
       ...timeout.runtime,
-      provider: {
-        ...timeout.runtime.provider,
-        request: () => new Promise<ModelTurn>(() => undefined),
+      modelRegistry: {
+        resolveModel: () => ({ id: "default", model: hanging.model }),
       },
     };
     await expect(
       invokeAgent({ ...stalled, input: { question: "Hi" }, timeoutMs: 0 }),
     ).rejects.toMatchObject({ code: "ZSYS_AGENT_TIMEOUT" });
+  });
+
+  test("resolves the active AI SDK model without exposing it on the descriptor", async () => {
+    const state = setup([]);
+    const { modelRegistry: _registry, ...runtime } = state.runtime;
+    const spans: import("./src/index.ts").AgentSpanRecord[] = [];
+    const { model } = createTestModel([{ type: "final", output: { answer: "registry" } }], {
+      provider: "test",
+      modelId: "model",
+    });
+
+    await expect(
+      invokeAgent({
+        ...runtime,
+        modelRegistry: {
+          resolveModel: (selector?: string) => ({
+            provider: "test",
+            id: `test:${selector ?? "model"}`,
+            model,
+          }),
+        },
+        input: { question: "Hi" },
+        hooks: { onSpanStart: (span) => spans.push(span) },
+      }),
+    ).resolves.toEqual({ answer: "registry" });
+    expect(spans.find((span) => span.kind === "model")?.attributes).toMatchObject({
+      "zsys.model.id": "test:default",
+    });
+    expect("model" in state.runtime.agent).toBe(true);
+    expect(typeof state.runtime.agent.model).toBe("string");
   });
 });

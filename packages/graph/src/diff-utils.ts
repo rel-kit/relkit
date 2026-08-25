@@ -24,6 +24,7 @@ export function categoryFor(node: GraphNode): GraphDiffCategory | undefined {
   if (node.kind === "tool") return "tool";
   if (node.kind === "agent") return "agent";
   if (node.kind === "provider") return "profile";
+  if (node.kind === "service") return "service";
   return undefined;
 }
 
@@ -72,6 +73,7 @@ export function classifyChange(
   if (category === "bucket/cache") return classifyResource(fields, before, after);
   if (category === "tool") return classifyTool(fields);
   if (category === "agent") return classifyAgent(fields);
+  if (category === "service") return classifyService(fields);
   return fields.length === 0 ? "informational" : "potentially-breaking";
 }
 
@@ -121,6 +123,12 @@ function classifyTool(fields: readonly string[]): GraphDiffClassification {
 function classifyAgent(fields: readonly string[]): GraphDiffClassification {
   if (fields.some((field) => ["input", "output"].includes(field))) return "breaking";
   return fields.length === 0 ? "informational" : "potentially-breaking";
+}
+
+function classifyService(fields: readonly string[]): GraphDiffClassification {
+  if (fields.includes("members")) return "breaking";
+  if (fields.includes("middleware")) return "potentially-breaking";
+  return fields.length === 0 ? "informational" : "compatible";
 }
 
 function inputSchemaClass(

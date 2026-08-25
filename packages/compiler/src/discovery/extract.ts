@@ -12,6 +12,7 @@ import {
   type SourceMapEntry,
   type SourceMapOptions,
 } from "./source-map.js";
+import type { ExportFact, ExportFacts } from "./source-map-utils.js";
 import { resolve } from "node:path";
 
 export interface ExtractOptions extends SourceMapOptions {
@@ -24,6 +25,8 @@ export interface ExtractedDescriptor {
   readonly exportName: string;
   readonly exportKind: ExportKind;
   readonly source: SourceLocation;
+  readonly facts?: ExportFacts;
+  readonly exportFact?: ExportFact;
   readonly reference: EvaluatorManifestReference;
 }
 
@@ -50,15 +53,18 @@ export function extractDescriptors(
         .sort((left, right) => left.exportName.localeCompare(right.exportName))
         .map((exported) => {
           const moduleFile = normalizeSourcePath(module.file, root);
-          const location =
-            locations.get(entryKey(moduleFile, exported.exportName))?.source ??
-            createSourceLocation(moduleFile, 1, 1, root);
+          const sourceEntry = locations.get(entryKey(moduleFile, exported.exportName));
+          const location = sourceEntry?.source ?? createSourceLocation(moduleFile, 1, 1, root);
           const reference = findReference(module, exported, generationId);
           return Object.freeze({
             descriptor: exported.descriptor,
             exportName: exported.exportName,
             exportKind: exportKind(exported.exportName),
             source: Object.freeze(location),
+            ...(sourceEntry?.facts === undefined ? {} : { facts: sourceEntry.facts }),
+            ...(sourceEntry?.exportFact === undefined
+              ? {}
+              : { exportFact: sourceEntry.exportFact }),
             reference: Object.freeze(reference),
           });
         }),

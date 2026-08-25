@@ -14,7 +14,8 @@ describe("inspector observability model", () => {
     const now = Date.parse("2026-08-19T12:00:00.000Z");
     const filters = defaultSignalFilters("logs", now);
     expect(Date.parse(filters.from)).toBe(now - 24 * 60 * 60 * 1_000);
-    expect(defaultSignalFilters("traces", now)).toBe(EMPTY_SIGNAL_FILTERS);
+    expect(Date.parse(filters.to)).toBe(now);
+    expect(Date.parse(defaultSignalFilters("traces", now).from)).toBe(now - 24 * 60 * 60 * 1_000);
   });
 
   test("bounds query filters and merges a redacted live record once", () => {

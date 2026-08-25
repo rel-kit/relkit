@@ -1,4 +1,4 @@
 import { defineRoute } from "@zsys/app";
-import searchOrders from "../../../functions/search-orders.function.js";
+import orders from "../../../services/orders.service.js";
 
-export const GET = defineRoute({ id: "orders.search.http", target: searchOrders });
+export const GET = defineRoute({ target: orders.searchOrders });

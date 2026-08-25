@@ -26,7 +26,6 @@ export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
     eventTriggers: sortEntries(value.eventTriggers),
     buckets: sortEntries(value.buckets),
     caches: sortEntries(value.caches),
-    ...(value.models === undefined ? {} : { models: sortEntries(value.models) }),
     iam: {
       serviceRole: {
         ...value.iam.serviceRole,
@@ -43,21 +42,29 @@ export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
           left.resourceId.localeCompare(right.resourceId),
       ),
     },
-    observability: {
-      ...value.observability,
-      configurationNames: [...value.observability.configurationNames].sort(),
-    },
+    ...(value.observability === undefined
+      ? {}
+      : {
+          observability: {
+            ...value.observability,
+            configurationNames: [...value.observability.configurationNames].sort(),
+          },
+        }),
   };
 }
 
 export function resourceEntries(plan: DeploymentPlan): readonly ResourceEntry[] {
   return [
     { kind: "http", logicalName: plan.http.logicalName, value: plan.http },
-    {
-      kind: "observability",
-      logicalName: plan.observability.logicalName,
-      value: plan.observability,
-    },
+    ...(plan.observability === undefined
+      ? []
+      : [
+          {
+            kind: "observability",
+            logicalName: plan.observability.logicalName,
+            value: plan.observability,
+          },
+        ]),
     ...plan.jobs.map((value) => ({ kind: "job", logicalName: value.logicalName, value })),
     ...plan.schedules.map((value) => ({ kind: "schedule", logicalName: value.logicalName, value })),
     ...plan.events.map((value) => ({ kind: "event", logicalName: value.logicalName, value })),
@@ -68,11 +75,6 @@ export function resourceEntries(plan: DeploymentPlan): readonly ResourceEntry[] 
     })),
     ...plan.buckets.map((value) => ({ kind: "bucket", logicalName: value.logicalName, value })),
     ...plan.caches.map((value) => ({ kind: "cache", logicalName: value.logicalName, value })),
-    ...(plan.models ?? []).map((value) => ({
-      kind: "model",
-      logicalName: value.logicalName,
-      value,
-    })),
   ];
 }
 

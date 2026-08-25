@@ -102,6 +102,7 @@ export function FunctionDetailClient() {
         functionId={id}
         generationId={snapshot.generationId}
         graphHash={snapshot.graphHash}
+        inputSchema={snapshot.node.input}
         invoke={(input) => invokeFunction(api, input)}
         onComplete={(_result: FunctionInvocationResult) => loadSignals()}
       />

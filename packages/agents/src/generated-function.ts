@@ -11,11 +11,7 @@ export interface GeneratedAgentFunctionMarker {
   readonly functionId: string;
 }
 
-export type GeneratedAgentExecutor = (
-  input: unknown,
-  request: unknown,
-  context: unknown,
-) => MaybePromise<unknown>;
+export type GeneratedAgentExecutor = (input: unknown, context: unknown) => MaybePromise<unknown>;
 
 export type GeneratedAgentFunction = ((
   ...arguments_: readonly unknown[]
@@ -49,7 +45,7 @@ export function createGeneratedAgentFunction(
   }
   const handler = ((...arguments_: readonly unknown[]) => {
     if (executor === undefined) throw new GeneratedAgentFunctionUnboundError(functionId);
-    return executor(arguments_[0], arguments_[1], arguments_[2]);
+    return executor(arguments_[0], arguments_[1]);
   }) as GeneratedAgentFunction;
   Object.defineProperties(handler, {
     generated: { value: true, enumerable: true },

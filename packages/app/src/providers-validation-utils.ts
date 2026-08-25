@@ -5,21 +5,17 @@ import type { ProviderCapability, ProviderValue } from "./providers.js";
 export function normalizeValue(
   value: unknown,
   path: string,
-  key?: string,
   active = new Set<object>(),
 ): ProviderValue {
   if (isValueFreeEnvRef(value)) return value;
-  if (isSensitiveKey(key)) {
-    if (typeof value === "string") return { kind: "sensitive-configuration", configured: true };
-    throw new TypeError(`${path} must be a string or environment reference`);
-  }
+  if (value instanceof URL) return value.toString();
   if (isJsonPrimitive(value)) return value;
   if (Array.isArray(value)) {
     assertArray(value, path);
     enter(value, path, active);
     try {
       return Object.freeze(
-        value.map((item, index) => normalizeValue(item, `${path}[${index}]`, undefined, active)),
+        value.map((item, index) => normalizeValue(item, `${path}[${index}]`, active)),
       );
     } finally {
       active.delete(value);
@@ -37,7 +33,7 @@ export function normalizeValue(
       if (!descriptor || !("value" in descriptor)) {
         throw new TypeError(`${path}.${name} must be data`);
       }
-      result[name] = normalizeValue(descriptor.value, `${path}.${name}`, name, active);
+      result[name] = normalizeValue(descriptor.value, `${path}.${name}`, active);
     }
     return deepFreeze(result);
   } finally {

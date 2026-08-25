@@ -2,11 +2,12 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 import {
   configuredInspectorOptions,
   defaultInspectorOptions,
+  resolveInspectorInstallation,
 } from "./src/commands/dev-inspector.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
@@ -171,11 +172,25 @@ test("redacts candidate output before callbacks and human sinks", () => {
   expect(JSON.stringify({ callbacks, output })).not.toContain(secret);
 });
 
-test("uses the workspace Next inspector and configured port by default", () => {
+test("prefers the workspace Next inspector and configured port by default", () => {
   const options = defaultInspectorOptions(3217);
   expect(options.command).toEqual([process.execPath, "run", "dev"]);
   expect(options.cwd?.endsWith("/apps/inspector")).toBe(true);
   expect(options.port).toBe(3217);
+});
+
+test("prefers source when a compiled CLI also contains the packaged inspector", async () => {
+  const root = await makeRoot();
+  const source = join(root, "apps", "inspector");
+  const compiled = join(root, "packages", "cli", "dist", "commands");
+  await mkdir(source, { recursive: true });
+  await mkdir(join(compiled, "..", "inspector"), { recursive: true });
+  await writeFile(join(source, "package.json"), "{}\n");
+  await writeFile(join(compiled, "..", "inspector", "server.js"), "\n");
+
+  const options = resolveInspectorInstallation(compiled, {});
+  expect(options.command).toEqual([process.execPath, "run", "dev"]);
+  expect(options.root).toBe(source);
 });
 
 test("reads the inspector port from zsys.config.ts unless the CLI overrides it", async () => {
@@ -216,7 +231,7 @@ Bun.serve({ port: Number(process.env.PORT), fetch(request) {
   const headers = { "content-type": "application/json", "x-zsys-api-version": "1" };
   if (path === "/hello") { console.log("backend hello"); return new Response("hello"); }
   if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ok", ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: 1, manifestContractVersion: 1, manifestGeneratorVersion: 1, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
   if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;

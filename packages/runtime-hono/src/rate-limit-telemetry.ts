@@ -14,6 +14,7 @@ export function recordRateLimitResult(
 ): void {
   const builder = state?.requestRecord;
   builder?.setRoute(trigger.id, trigger.targetFunctionId);
+  builder?.setServiceId(trigger.serviceId);
   if (blocked && !continued) builder?.add({ kind: "match", at: startedAt, targetId: trigger.id });
   builder?.add({
     kind: "middleware",

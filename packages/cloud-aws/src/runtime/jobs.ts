@@ -1,14 +1,14 @@
 import type { JsonValue } from "@zsys/contracts";
 import type { JobQueueFactoryContext, JobQueueHandle } from "@zsys/engine";
 import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@zsys/jobs";
-import { credentials, text } from "./config.js";
+import { type AwsCredentials, text } from "./config.js";
 import { assertResponse, awsRequest } from "./http.js";
 
 export interface AwsJobOptions {
   readonly region: string;
   readonly queueUrl?: unknown;
   readonly endpoint?: unknown;
-  readonly values?: Readonly<Record<string, unknown>> | undefined;
+  readonly credentials?: AwsCredentials;
   readonly fetch?: typeof globalThis.fetch | undefined;
 }
 
@@ -20,7 +20,7 @@ export function createSqsJobProvider(options: AwsJobOptions): AwsJobProvider {
   const queueUrl = text(options.queueUrl, "AWS job queueUrl");
   const endpoint =
     text(options.endpoint, "AWS SQS endpoint") ?? `https://sqs.${options.region}.amazonaws.com`;
-  const auth = credentials(options.values);
+  const auth = options.credentials;
   const request = async (values: Record<string, string>, operation: string): Promise<string> => {
     if (queueUrl === undefined) throw new Error("AWS job queueUrl is not configured");
     const response = await awsRequest(endpoint, {

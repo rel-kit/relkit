@@ -207,7 +207,7 @@ export function registerEventContractSuite(target: EventContractTarget): void {
     test("classifies a compatible pattern expansion change", () => {
       const source = { file: "events.ts", line: 1, column: 1 } as const;
       const before: ApplicationGraph = {
-        contractVersion: 1,
+        contractVersion: 3,
         nodes: [
           { kind: "function", id: "orders.listener", source, input: {}, output: {} },
           {

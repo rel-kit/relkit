@@ -11,7 +11,9 @@
   "dependencies": {
     "@zsys/contracts": "workspace:*",
     "@zsys/functions": "workspace:*",
-    "@zsys/schema": "workspace:*"
+    "@zsys/invocation": "workspace:*",
+    "@zsys/schema": "workspace:*",
+    "hono": "4.13.2"
   },
   "scripts": {
     "build": "tsc -b",

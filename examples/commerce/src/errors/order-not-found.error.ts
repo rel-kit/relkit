@@ -6,7 +6,7 @@ const orderNotFound = defineError({
   data: z.object({ orderId: z.string() }),
   message: ({ orderId }) => `Order ${orderId} was not found`,
   http: { status: 404 },
-  retry: "never",
+  retry: { kind: "later", afterMs: 1_000 },
 });
 
 export default orderNotFound;

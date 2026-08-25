@@ -28,7 +28,6 @@ describe("declared dependency clients", () => {
       },
     };
     const sources: DependencyClientSources = {
-      functions: { lookup: async (input) => ({ input }) },
       jobs: { send: { enqueue: async (input) => ({ input }) } },
       events: { "orders.created": { publish: async (payload) => ({ payload }) } },
       buckets: { files: { put: async () => undefined, get: async () => new Uint8Array() } },
@@ -38,7 +37,6 @@ describe("declared dependency clients", () => {
     const clients = buildDependencyClients({
       ownerId: "orders.handle",
       dependencies: {
-        functions: { lookup: ref("function", "orders.lookup") },
         jobs: { send: ref("job", "orders.send") },
         events: { created: ref("event", "orders.created") },
         buckets: { files: ref("bucket", "orders.files") },
@@ -52,11 +50,6 @@ describe("declared dependency clients", () => {
       onOperation: (operation) => operations.push(operation),
     });
 
-    expect(Object.keys(clients.functions)).toEqual(["lookup"]);
-    expect(() => (clients.functions as Record<string, unknown>).missing).toThrow(
-      DependencyAccessError,
-    );
-    await (clients.functions.lookup as (input: unknown) => Promise<unknown>)({ id: 1 });
     await (clients.jobs.send as { enqueue: (input: unknown) => Promise<unknown> }).enqueue({});
     await (clients.events.created as { publish: (input: unknown) => Promise<unknown> }).publish({});
     await (clients.buckets.files as { put: (...input: unknown[]) => Promise<unknown> }).put(
@@ -66,9 +59,8 @@ describe("declared dependency clients", () => {
     await (clients.cache.prices as { get: (input: unknown) => Promise<unknown> }).get("a");
     await (clients.agents.summarize as (input: unknown) => Promise<unknown>)({});
 
-    expect(bridged).toHaveLength(6);
+    expect(bridged).toHaveLength(5);
     expect(declared).toEqual([
-      { kind: "calls-function", from: "orders.handle", to: "orders.lookup" },
       { kind: "enqueues-job", from: "orders.handle", to: "orders.send" },
       { kind: "publishes-event", from: "orders.handle", to: "orders.created" },
       { kind: "uses-bucket", from: "orders.handle", to: "orders.files" },
@@ -114,13 +106,13 @@ describe("declared dependency clients", () => {
       id: "orders.handle",
       input: z.object({}),
       output: z.object({ ok: z.literal(true) }),
-      dependencies: { functions: { lookup: ref("function", "orders.lookup") } },
-      handler: async (_input, _request, context) => {
+      dependencies: { jobs: { send: ref("job", "orders.send") } },
+      handler: async (_input, context) => {
         const clients = context as unknown as {
-          readonly functions: { readonly lookup: (input: unknown) => Promise<unknown> };
+          readonly jobs: { readonly send: { enqueue: (input: unknown) => Promise<unknown> } };
         };
-        await clients.functions.lookup({ id: 1 });
-        expect(() => (context.functions as Record<string, unknown>).missing).toThrow(
+        await clients.jobs.send.enqueue({});
+        expect(() => (context.jobs as Record<string, unknown>).missing).toThrow(
           DependencyAccessError,
         );
         return { ok: true };
@@ -132,7 +124,7 @@ describe("declared dependency clients", () => {
       {},
       {
         effectRunner: runner,
-        clients: { functions: { lookup: async () => ({}) } },
+        clients: { jobs: { "orders.send": { enqueue: async () => ({}) } } },
         hooks: {
           onDeclaredEdge: (edge) => declared.push(edge),
           onObservedEdge: (edge) => observed.push(edge),
@@ -141,11 +133,9 @@ describe("declared dependency clients", () => {
     );
 
     expect(bridgeRuns).toBeGreaterThan(1);
-    expect(declared).toEqual([
-      { kind: "calls-function", from: "orders.handle", to: "orders.lookup" },
-    ]);
+    expect(declared).toEqual([{ kind: "enqueues-job", from: "orders.handle", to: "orders.send" }]);
     expect(observed).toEqual([
-      { relationship: "calls-function", from: "orders.handle", to: "orders.lookup" },
+      { relationship: "enqueues-job", from: "orders.handle", to: "orders.send" },
     ]);
   });
 

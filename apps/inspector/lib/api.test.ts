@@ -6,10 +6,13 @@ import {
   createInspectorApiClient,
 } from "./api";
 
-const envelope = (value: Record<string, unknown>) =>
+const envelope = (value: Record<string, unknown>, status = 200) =>
   new Response(
     JSON.stringify({ protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, ...value }),
-    { headers: { "content-type": "application/json", "x-zsys-api-version": "1" } },
+    {
+      status,
+      headers: { "content-type": "application/json", "x-zsys-api-version": "1" },
+    },
   );
 
 describe("inspector API client", () => {
@@ -45,6 +48,22 @@ describe("inspector API client", () => {
     client.invalidate(["graph"]);
     await client.graph();
     expect(requests).toHaveLength(2);
+  });
+
+  test("retries transient GET failures during backend startup", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return attempts === 1
+          ? envelope({ error: "ZSYS_INSPECTOR_GRAPH_UNAVAILABLE" }, 503)
+          : envelope({ items: [] });
+      },
+    });
+
+    await expect(client.list("routes")).resolves.toMatchObject({ items: [] });
+    expect(attempts).toBe(2);
   });
 
   test("rejects protocol mismatch and reports network disconnection", async () => {

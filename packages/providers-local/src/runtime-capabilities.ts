@@ -1,10 +1,8 @@
 import { join } from "node:path";
-import type { ModelTurn } from "@zsys/agents";
 import type { JsonValue } from "@zsys/contracts";
 import { createJobQueue, type JobQueue } from "./jobs/queue.js";
 import type { JobIdempotencyDefinition } from "./jobs/queue-utils.js";
 import { createJobStore, type JobStore } from "./jobs/store.js";
-import { createFakeModelProvider } from "./models/fake.js";
 
 export interface LocalJobProvider {
   readonly createQueue: (context: {
@@ -31,13 +29,6 @@ export function createLocalJobProvider(root: string, profile: string): LocalJobP
     close: async () => {
       await Promise.all([...stores.values()].map((store) => store.close()));
     },
-  });
-}
-
-export function createLocalModelProvider(profile: string, config: Record<string, unknown> = {}) {
-  return createFakeModelProvider({
-    profile,
-    ...(Array.isArray(config.script) ? { script: config.script as readonly ModelTurn[] } : {}),
   });
 }
 

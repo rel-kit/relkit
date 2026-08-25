@@ -1,5 +1,10 @@
-import type { MaybePromise } from "@zsys/contracts";
-import { hashGraph, type ApplicationGraph, type GraphCanonicalizationOptions } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@zsys/contracts";
+import {
+  hashGraph,
+  validateGraphShape,
+  type ApplicationGraph,
+  type GraphCanonicalizationOptions,
+} from "@zsys/graph";
 import {
   collectHandlerEntries,
   compareIds,
@@ -16,8 +21,8 @@ export type RuntimeHandlerEntries =
   | readonly (readonly [string, FunctionHandler])[];
 
 export interface RuntimeManifestInput {
-  readonly contractVersion: number;
-  readonly generatorVersion: number;
+  readonly contractVersion: typeof MANIFEST_VERSION;
+  readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: RuntimeHandlerEntries;
 }
@@ -94,6 +99,7 @@ export function createFunctionRegistry(
 
   let graphHash: string | undefined;
   try {
+    validateGraphShape(graph, input.hashOptions.projectRoot);
     graphHash = hashGraph(graph, input.hashOptions);
   } catch (error) {
     issues.push({

@@ -105,8 +105,7 @@ type ValueOf<T> = T extends { readonly value: infer S }
     : never
   : never;
 
-export type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
-export type AgentClientFor<T> = FunctionClientFor<T>;
+export type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 export type JobClientFor<T> = {
   enqueue(input: InputOf<T>, options?: JobEnqueueOptions): Promise<JobEnqueueResult>;
 };
@@ -119,9 +118,6 @@ export type EventClientFor<T> = {
 export type BucketClientFor<T> = BucketClient;
 export type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 
-export type FunctionClients<M> = {
-  readonly [Name in keyof NonNullable<M> & string]: FunctionClientFor<NonNullable<M>[Name]>;
-};
 export type JobClients<M> = {
   readonly [Name in keyof NonNullable<M> & string]: JobClientFor<NonNullable<M>[Name]>;
 };

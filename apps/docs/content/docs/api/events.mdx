@@ -1058,7 +1058,7 @@ export interface EventTriggerDescriptor<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/listener-types.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/listener-types.ts#L48)
 
 ## OnEventOptions (interface)
 
@@ -1075,11 +1075,11 @@ export interface OnEventOptions<
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly dependencies?: Dependencies;
+  readonly dependencies?: FunctionDependencyOptions<Dependencies>;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/listener-types.ts#L61)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/listener-types.ts#L65)
 
 ## `listener-validation.ts`
 
@@ -1166,7 +1166,11 @@ declare const retryPolicy: (value: unknown) => RetryPolicy | undefined;
 
 ## onEvent
 
-Registers a typed callback for an event name or selector.
+Registers a typed callback for an event name or selector. Each matching
+listener is an independent delivery: one listener may fail without rolling
+back another, and durable delivery is at-least-once rather than a transaction.
+Listener IDs may be inferred from source bindings; declared error retry hints
+constrain durable redelivery without changing direct invocation behavior.
 
 **Example**
 
@@ -1204,7 +1208,7 @@ declare const onEvent: {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L56)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L60)
 
 Since v0.1.0
 
@@ -1218,7 +1222,7 @@ Since v0.1.0
 declare const eventListenerFunctionId: (listenerId: string) => string;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L104)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L108)
 
 ## isEventTriggerDescriptor
 
@@ -1228,7 +1232,7 @@ declare const eventListenerFunctionId: (listenerId: string) => string;
 declare const isEventTriggerDescriptor: (value: unknown) => value is EventTriggerDescriptor;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L108)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/events/src/on-event.ts#L112)
 
 ## `selector-types.ts`
 

@@ -28,6 +28,7 @@
     "@zsys/engine": "workspace:*",
     "@zsys/inspector-api": "workspace:*",
     "@zsys/observability": "workspace:*",
+    "@zsys/providers-standard": "workspace:*",
     "@zsys/runtime-effect": "workspace:*",
     "@zsys/runtime-hono": "workspace:*",
     "@zsys/supervisor": "workspace:*",

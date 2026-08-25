@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { events, type EventSelectorInput, type UnknownEventEnvelope } from "@zsys/app";
-import createOrder from "./functions/create-order.function.js";
+import createOrder from "./functions/orders/create-order.function.js";
 import { receiptObjectName } from "./shared/receipt-object.js";
 
 /** Keeps ordinary helper calls opaque to the explicit ZSys dependency surface. */

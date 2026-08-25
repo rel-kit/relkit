@@ -2,11 +2,6 @@
   "serviceRole": {
     "statements": [
       {
-        "capability": "cache",
-        "actions": ["elasticache:Connect"],
-        "resources": ["full-app-cache-prices"]
-      },
-      {
         "capability": "events",
         "actions": ["events:PutEvents"],
         "resources": ["full-app-event-orders-created"]
@@ -34,12 +29,6 @@
     ]
   },
   "perFunction": [
-    {
-      "functionId": "orders.create",
-      "capability": "cache",
-      "resourceId": "prices",
-      "actions": ["elasticache:Connect"]
-    },
     {
       "functionId": "orders.create",
       "capability": "events",

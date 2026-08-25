@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { InspectorObject } from "../lib/api-types";
-import { createInspectorBackendStream, createInspectorClient } from "../lib/client";
+import {
+  createInspectorBackendStream,
+  createInspectorClient,
+  INSPECTOR_BACKEND_CONNECTED_EVENT,
+} from "../lib/client";
 import {
   eventRecord,
   matchesQuery,
@@ -53,6 +57,8 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
       }
     };
     void refresh(true);
+    const refreshOnConnection = (): void => void refresh(true);
+    window.addEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refreshOnConnection);
     const stream = createInspectorBackendStream({
       onStateChange: (snapshot) => mounted && setLiveState(snapshot.state),
       onEvent: (event) => {
@@ -70,6 +76,7 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
     stream.start();
     return () => {
       mounted = false;
+      window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refreshOnConnection);
       stream.stop();
     };
   }, [kind, query, cursor, title]);

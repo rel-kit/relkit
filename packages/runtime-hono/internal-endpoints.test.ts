@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { RegistrationPlan } from "@zsys/graph";
 import {
   createApp,
@@ -19,10 +19,11 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  middlewares: [],
 };
 const manifest: RuntimeManifest = {
-  contractVersion: 1,
-  generatorVersion: 1,
+  contractVersion: MANIFEST_VERSION,
+  generatorVersion: GENERATOR_VERSION,
   graphHash: plan.graphHash,
   functions: {},
   middleware: {},
@@ -68,9 +69,9 @@ describe("versioned internal endpoints", () => {
       version: 1,
       graphHash: "sha256:internal",
       manifestGraphHash: "sha256:internal",
-      graphContractVersion: 1,
-      manifestContractVersion: 1,
-      manifestGeneratorVersion: 1,
+      graphContractVersion: GRAPH_VERSION,
+      manifestContractVersion: MANIFEST_VERSION,
+      manifestGeneratorVersion: GENERATOR_VERSION,
     });
 
     const requests = await service.request(`${API_BASE_PATH}/requests?limit=1000&cursor=cursor-1`);

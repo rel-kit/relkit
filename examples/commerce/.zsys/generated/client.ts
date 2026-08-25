@@ -10,119 +10,119 @@ export type ClientResult<Status extends number, Data> = {
   readonly data: Data;
 };
 
-export type AssetsUploadHttpInput = { "attachments": readonly string[]; "label": string; "primary": string };
-type AssetsUploadHttpResponse0 = ClientResult<200, { "files": readonly string[]; "label": string }>;
-type AssetsUploadHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type AssetsUploadHttpSuccess = AssetsUploadHttpResponse0;
-export type AssetsUploadHttpError = AssetsUploadHttpResponse1;
-export type AssetsUploadHttpResult = AssetsUploadHttpSuccess | AssetsUploadHttpError;
-export type AssetsUploadHttpStatus = AssetsUploadHttpResult["status"];
+export type RouteDeleteOrdersByOrderIdInput = { "orderId": string; "reason"?: string };
+type RouteDeleteOrdersByOrderIdResponse0 = ClientResult<202, { "deleted": boolean; "orderId": string }>;
+type RouteDeleteOrdersByOrderIdResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteDeleteOrdersByOrderIdSuccess = RouteDeleteOrdersByOrderIdResponse0;
+export type RouteDeleteOrdersByOrderIdError = RouteDeleteOrdersByOrderIdResponse1;
+export type RouteDeleteOrdersByOrderIdResult = RouteDeleteOrdersByOrderIdSuccess | RouteDeleteOrdersByOrderIdError;
+export type RouteDeleteOrdersByOrderIdStatus = RouteDeleteOrdersByOrderIdResult["status"];
 
-export type DocsBrowseInput = { "parts"?: readonly string[] };
-type DocsBrowseResponse0 = ClientResult<200, { "path": string }>;
-type DocsBrowseResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type DocsBrowseSuccess = DocsBrowseResponse0;
-export type DocsBrowseError = DocsBrowseResponse1;
-export type DocsBrowseResult = DocsBrowseSuccess | DocsBrowseError;
-export type DocsBrowseStatus = DocsBrowseResult["status"];
+export type RouteGetDocsOptionalCatchAllPartsInput = { "parts"?: readonly string[] };
+type RouteGetDocsOptionalCatchAllPartsResponse0 = ClientResult<200, { "path": string }>;
+type RouteGetDocsOptionalCatchAllPartsResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteGetDocsOptionalCatchAllPartsSuccess = RouteGetDocsOptionalCatchAllPartsResponse0;
+export type RouteGetDocsOptionalCatchAllPartsError = RouteGetDocsOptionalCatchAllPartsResponse1;
+export type RouteGetDocsOptionalCatchAllPartsResult = RouteGetDocsOptionalCatchAllPartsSuccess | RouteGetDocsOptionalCatchAllPartsError;
+export type RouteGetDocsOptionalCatchAllPartsStatus = RouteGetDocsOptionalCatchAllPartsResult["status"];
 
-export type FilesBrowseInput = { "parts": readonly string[] };
-type FilesBrowseResponse0 = ClientResult<200, { "path": string }>;
-type FilesBrowseResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type FilesBrowseSuccess = FilesBrowseResponse0;
-export type FilesBrowseError = FilesBrowseResponse1;
-export type FilesBrowseResult = FilesBrowseSuccess | FilesBrowseError;
-export type FilesBrowseStatus = FilesBrowseResult["status"];
+export type RouteGetFilesCatchAllPartsInput = { "parts": readonly string[] };
+type RouteGetFilesCatchAllPartsResponse0 = ClientResult<200, { "path": string }>;
+type RouteGetFilesCatchAllPartsResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteGetFilesCatchAllPartsSuccess = RouteGetFilesCatchAllPartsResponse0;
+export type RouteGetFilesCatchAllPartsError = RouteGetFilesCatchAllPartsResponse1;
+export type RouteGetFilesCatchAllPartsResult = RouteGetFilesCatchAllPartsSuccess | RouteGetFilesCatchAllPartsError;
+export type RouteGetFilesCatchAllPartsStatus = RouteGetFilesCatchAllPartsResult["status"];
 
-export type OrdersCreateHttpInput = { "customerEmail": string; "orderId": string; "quantity": number; "sku": string };
-type OrdersCreateHttpResponse0 = ClientResult<201, { "orderId": string; "receiptKey": string; "totalCents": number }>;
-type OrdersCreateHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersCreateHttpSuccess = OrdersCreateHttpResponse0;
-export type OrdersCreateHttpError = OrdersCreateHttpResponse1;
-export type OrdersCreateHttpResult = OrdersCreateHttpSuccess | OrdersCreateHttpError;
-export type OrdersCreateHttpStatus = OrdersCreateHttpResult["status"];
+export type RouteGetOrdersInput = { "status"?: string };
+type RouteGetOrdersResponse0 = ClientResult<200, { "count": number; "status": string }>;
+type RouteGetOrdersResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+type RouteGetOrdersResponse2 = ClientResult<429, { "error": "rate-limit"; "retryAfterMs": number }>;
+export type RouteGetOrdersSuccess = RouteGetOrdersResponse0;
+export type RouteGetOrdersError = RouteGetOrdersResponse1 | RouteGetOrdersResponse2;
+export type RouteGetOrdersResult = RouteGetOrdersSuccess | RouteGetOrdersError;
+export type RouteGetOrdersStatus = RouteGetOrdersResult["status"];
 
-export type OrdersDeleteHttpInput = { "orderId": string; "reason"?: string };
-type OrdersDeleteHttpResponse0 = ClientResult<202, { "deleted": boolean; "orderId": string }>;
-type OrdersDeleteHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersDeleteHttpSuccess = OrdersDeleteHttpResponse0;
-export type OrdersDeleteHttpError = OrdersDeleteHttpResponse1;
-export type OrdersDeleteHttpResult = OrdersDeleteHttpSuccess | OrdersDeleteHttpError;
-export type OrdersDeleteHttpStatus = OrdersDeleteHttpResult["status"];
+export type RouteGetOrdersByOrderIdInput = { "orderId": string };
+type RouteGetOrdersByOrderIdResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
+type RouteGetOrdersByOrderIdResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "later"; "status": 404 }>;
+type RouteGetOrdersByOrderIdResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteGetOrdersByOrderIdSuccess = RouteGetOrdersByOrderIdResponse0;
+export type RouteGetOrdersByOrderIdError = RouteGetOrdersByOrderIdResponse1 | RouteGetOrdersByOrderIdResponse2;
+export type RouteGetOrdersByOrderIdResult = RouteGetOrdersByOrderIdSuccess | RouteGetOrdersByOrderIdError;
+export type RouteGetOrdersByOrderIdStatus = RouteGetOrdersByOrderIdResult["status"];
 
-export type OrdersGetRouteInput = { "orderId": string };
-type OrdersGetRouteResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
-type OrdersGetRouteResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "never"; "status": 404 }>;
-type OrdersGetRouteResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersGetRouteSuccess = OrdersGetRouteResponse0;
-export type OrdersGetRouteError = OrdersGetRouteResponse1 | OrdersGetRouteResponse2;
-export type OrdersGetRouteResult = OrdersGetRouteSuccess | OrdersGetRouteError;
-export type OrdersGetRouteStatus = OrdersGetRouteResult["status"];
+export type RouteGetOrdersSearchInput = { "status"?: string };
+type RouteGetOrdersSearchResponse0 = ClientResult<200, { "count": number; "status": string }>;
+type RouteGetOrdersSearchResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteGetOrdersSearchSuccess = RouteGetOrdersSearchResponse0;
+export type RouteGetOrdersSearchError = RouteGetOrdersSearchResponse1;
+export type RouteGetOrdersSearchResult = RouteGetOrdersSearchSuccess | RouteGetOrdersSearchError;
+export type RouteGetOrdersSearchStatus = RouteGetOrdersSearchResult["status"];
 
-export type OrdersHeadInput = { "orderId": string };
-type OrdersHeadResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
-type OrdersHeadResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "never"; "status": 404 }>;
-type OrdersHeadResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersHeadSuccess = OrdersHeadResponse0;
-export type OrdersHeadError = OrdersHeadResponse1 | OrdersHeadResponse2;
-export type OrdersHeadResult = OrdersHeadSuccess | OrdersHeadError;
-export type OrdersHeadStatus = OrdersHeadResult["status"];
+export type RouteHeadOrdersByOrderIdInput = { "orderId": string };
+type RouteHeadOrdersByOrderIdResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
+type RouteHeadOrdersByOrderIdResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "later"; "status": 404 }>;
+type RouteHeadOrdersByOrderIdResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteHeadOrdersByOrderIdSuccess = RouteHeadOrdersByOrderIdResponse0;
+export type RouteHeadOrdersByOrderIdError = RouteHeadOrdersByOrderIdResponse1 | RouteHeadOrdersByOrderIdResponse2;
+export type RouteHeadOrdersByOrderIdResult = RouteHeadOrdersByOrderIdSuccess | RouteHeadOrdersByOrderIdError;
+export type RouteHeadOrdersByOrderIdStatus = RouteHeadOrdersByOrderIdResult["status"];
 
-export type OrdersListHttpInput = { "status"?: string };
-type OrdersListHttpResponse0 = ClientResult<200, { "count": number; "status": string }>;
-type OrdersListHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-type OrdersListHttpResponse2 = ClientResult<429, { "error": "rate-limit"; "retryAfterMs": number }>;
-export type OrdersListHttpSuccess = OrdersListHttpResponse0;
-export type OrdersListHttpError = OrdersListHttpResponse1 | OrdersListHttpResponse2;
-export type OrdersListHttpResult = OrdersListHttpSuccess | OrdersListHttpError;
-export type OrdersListHttpStatus = OrdersListHttpResult["status"];
+export type RouteOptionsOrdersByOrderIdInput = { "orderId": string };
+type RouteOptionsOrdersByOrderIdResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
+type RouteOptionsOrdersByOrderIdResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "later"; "status": 404 }>;
+type RouteOptionsOrdersByOrderIdResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RouteOptionsOrdersByOrderIdSuccess = RouteOptionsOrdersByOrderIdResponse0;
+export type RouteOptionsOrdersByOrderIdError = RouteOptionsOrdersByOrderIdResponse1 | RouteOptionsOrdersByOrderIdResponse2;
+export type RouteOptionsOrdersByOrderIdResult = RouteOptionsOrdersByOrderIdSuccess | RouteOptionsOrdersByOrderIdError;
+export type RouteOptionsOrdersByOrderIdStatus = RouteOptionsOrdersByOrderIdResult["status"];
 
-export type OrdersOptionsInput = { "orderId": string };
-type OrdersOptionsResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
-type OrdersOptionsResponse1 = ClientResult<404, { "code": "orders.not-found"; "data": { "orderId": string }; "kind": "application"; "message": string; "outcome": "declared-error"; "retry": "never"; "status": 404 }>;
-type OrdersOptionsResponse2 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersOptionsSuccess = OrdersOptionsResponse0;
-export type OrdersOptionsError = OrdersOptionsResponse1 | OrdersOptionsResponse2;
-export type OrdersOptionsResult = OrdersOptionsSuccess | OrdersOptionsError;
-export type OrdersOptionsStatus = OrdersOptionsResult["status"];
+export type RoutePatchOrdersByOrderIdInput = { "orderId": string; "state": string };
+type RoutePatchOrdersByOrderIdResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
+type RoutePatchOrdersByOrderIdResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RoutePatchOrdersByOrderIdSuccess = RoutePatchOrdersByOrderIdResponse0;
+export type RoutePatchOrdersByOrderIdError = RoutePatchOrdersByOrderIdResponse1;
+export type RoutePatchOrdersByOrderIdResult = RoutePatchOrdersByOrderIdSuccess | RoutePatchOrdersByOrderIdError;
+export type RoutePatchOrdersByOrderIdStatus = RoutePatchOrdersByOrderIdResult["status"];
 
-export type OrdersReplaceInput = { "orderId": string; "state": string };
-type OrdersReplaceResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
-type OrdersReplaceResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersReplaceSuccess = OrdersReplaceResponse0;
-export type OrdersReplaceError = OrdersReplaceResponse1;
-export type OrdersReplaceResult = OrdersReplaceSuccess | OrdersReplaceError;
-export type OrdersReplaceStatus = OrdersReplaceResult["status"];
+export type RoutePostOrdersInput = { "customerEmail": string; "orderId": string; "quantity": number; "sku": string };
+type RoutePostOrdersResponse0 = ClientResult<201, { "orderId": string; "receiptKey": string; "totalCents": number }>;
+type RoutePostOrdersResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RoutePostOrdersSuccess = RoutePostOrdersResponse0;
+export type RoutePostOrdersError = RoutePostOrdersResponse1;
+export type RoutePostOrdersResult = RoutePostOrdersSuccess | RoutePostOrdersError;
+export type RoutePostOrdersStatus = RoutePostOrdersResult["status"];
 
-export type OrdersSearchHttpInput = { "status"?: string };
-type OrdersSearchHttpResponse0 = ClientResult<200, { "count": number; "status": string }>;
-type OrdersSearchHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersSearchHttpSuccess = OrdersSearchHttpResponse0;
-export type OrdersSearchHttpError = OrdersSearchHttpResponse1;
-export type OrdersSearchHttpResult = OrdersSearchHttpSuccess | OrdersSearchHttpError;
-export type OrdersSearchHttpStatus = OrdersSearchHttpResult["status"];
+export type RoutePostUploadsInput = { "attachments": readonly string[]; "label": string; "primary": string };
+type RoutePostUploadsResponse0 = ClientResult<200, { "files": readonly string[]; "label": string }>;
+type RoutePostUploadsResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RoutePostUploadsSuccess = RoutePostUploadsResponse0;
+export type RoutePostUploadsError = RoutePostUploadsResponse1;
+export type RoutePostUploadsResult = RoutePostUploadsSuccess | RoutePostUploadsError;
+export type RoutePostUploadsStatus = RoutePostUploadsResult["status"];
 
-export type OrdersUpdateHttpInput = { "orderId": string; "state": string };
-type OrdersUpdateHttpResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
-type OrdersUpdateHttpResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
-export type OrdersUpdateHttpSuccess = OrdersUpdateHttpResponse0;
-export type OrdersUpdateHttpError = OrdersUpdateHttpResponse1;
-export type OrdersUpdateHttpResult = OrdersUpdateHttpSuccess | OrdersUpdateHttpError;
-export type OrdersUpdateHttpStatus = OrdersUpdateHttpResult["status"];
+export type RoutePutOrdersByOrderIdInput = { "orderId": string; "state": string };
+type RoutePutOrdersByOrderIdResponse0 = ClientResult<200, { "orderId": string; "status": string; "totalCents": number }>;
+type RoutePutOrdersByOrderIdResponse1 = ClientResult<422, { "error": "validation"; "issues": readonly Record<string, unknown>[] }>;
+export type RoutePutOrdersByOrderIdSuccess = RoutePutOrdersByOrderIdResponse0;
+export type RoutePutOrdersByOrderIdError = RoutePutOrdersByOrderIdResponse1;
+export type RoutePutOrdersByOrderIdResult = RoutePutOrdersByOrderIdSuccess | RoutePutOrdersByOrderIdError;
+export type RoutePutOrdersByOrderIdStatus = RoutePutOrdersByOrderIdResult["status"];
 
 export interface ZsysClient {
-  readonly assetsUploadHttp: (input: AssetsUploadHttpInput) => Promise<AssetsUploadHttpResult>;
-  readonly docsBrowse: (input?: DocsBrowseInput) => Promise<DocsBrowseResult>;
-  readonly filesBrowse: (input: FilesBrowseInput) => Promise<FilesBrowseResult>;
-  readonly ordersCreateHttp: (input: OrdersCreateHttpInput) => Promise<OrdersCreateHttpResult>;
-  readonly ordersDeleteHttp: (input: OrdersDeleteHttpInput) => Promise<OrdersDeleteHttpResult>;
-  readonly ordersGetRoute: (input: OrdersGetRouteInput) => Promise<OrdersGetRouteResult>;
-  readonly ordersHead: (input: OrdersHeadInput) => Promise<OrdersHeadResult>;
-  readonly ordersListHttp: (input?: OrdersListHttpInput) => Promise<OrdersListHttpResult>;
-  readonly ordersOptions: (input: OrdersOptionsInput) => Promise<OrdersOptionsResult>;
-  readonly ordersReplace: (input: OrdersReplaceInput) => Promise<OrdersReplaceResult>;
-  readonly ordersSearchHttp: (input?: OrdersSearchHttpInput) => Promise<OrdersSearchHttpResult>;
-  readonly ordersUpdateHttp: (input: OrdersUpdateHttpInput) => Promise<OrdersUpdateHttpResult>;
+  readonly routeDeleteOrdersByOrderId: (input: RouteDeleteOrdersByOrderIdInput) => Promise<RouteDeleteOrdersByOrderIdResult>;
+  readonly routeGetDocsOptionalCatchAllParts: (input?: RouteGetDocsOptionalCatchAllPartsInput) => Promise<RouteGetDocsOptionalCatchAllPartsResult>;
+  readonly routeGetFilesCatchAllParts: (input: RouteGetFilesCatchAllPartsInput) => Promise<RouteGetFilesCatchAllPartsResult>;
+  readonly routeGetOrders: (input?: RouteGetOrdersInput) => Promise<RouteGetOrdersResult>;
+  readonly routeGetOrdersByOrderId: (input: RouteGetOrdersByOrderIdInput) => Promise<RouteGetOrdersByOrderIdResult>;
+  readonly routeGetOrdersSearch: (input?: RouteGetOrdersSearchInput) => Promise<RouteGetOrdersSearchResult>;
+  readonly routeHeadOrdersByOrderId: (input: RouteHeadOrdersByOrderIdInput) => Promise<RouteHeadOrdersByOrderIdResult>;
+  readonly routeOptionsOrdersByOrderId: (input: RouteOptionsOrdersByOrderIdInput) => Promise<RouteOptionsOrdersByOrderIdResult>;
+  readonly routePatchOrdersByOrderId: (input: RoutePatchOrdersByOrderIdInput) => Promise<RoutePatchOrdersByOrderIdResult>;
+  readonly routePostOrders: (input: RoutePostOrdersInput) => Promise<RoutePostOrdersResult>;
+  readonly routePostUploads: (input: RoutePostUploadsInput) => Promise<RoutePostUploadsResult>;
+  readonly routePutOrdersByOrderId: (input: RoutePutOrdersByOrderIdInput) => Promise<RoutePutOrdersByOrderIdResult>;
 }
 export type Client = ZsysClient;
 
@@ -130,22 +130,18 @@ export function createClient(options: ClientOptions = {}): ZsysClient {
   const baseUrl = options.baseUrl ?? "";
   const fetcher = options.fetch ?? globalThis.fetch;
   return {
-    async assetsUploadHttp(input: AssetsUploadHttpInput) {
-      let path = "/uploads";
+    async routeDeleteOrdersByOrderId(input: RouteDeleteOrdersByOrderIdInput) {
+      let path = "/orders/:orderId";
+      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
       const query = new URLSearchParams();
+      appendQuery(query, "reason", readPath(input, ["reason"]));
       const queryString = query.toString();
       const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
       const headers: Record<string, string> = {};
-      let requestBody: string | FormData | undefined;
-      const form = new FormData();
-      appendFormValue(form, "attachments", readPath(input, ["attachments"]));
-      appendFormValue(form, "label", readPath(input, ["label"]));
-      appendFormValue(form, "primary", readPath(input, ["primary"]));
-      requestBody = form;
-      const result = await request(fetcher, url, { method: "POST", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
-      return result as AssetsUploadHttpResult;
+      const result = await request(fetcher, url, { method: "DELETE", headers, ...({}) });
+      return result as RouteDeleteOrdersByOrderIdResult;
     },
-    async docsBrowse(input: DocsBrowseInput = {} as DocsBrowseInput) {
+    async routeGetDocsOptionalCatchAllParts(input: RouteGetDocsOptionalCatchAllPartsInput = {} as RouteGetDocsOptionalCatchAllPartsInput) {
       let path = "/docs/*parts?";
       path = replacePathSegments(path, "*parts?", readPath(input, ["parts"]));
       const query = new URLSearchParams();
@@ -153,9 +149,9 @@ export function createClient(options: ClientOptions = {}): ZsysClient {
       const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
       const headers: Record<string, string> = {};
       const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
-      return result as DocsBrowseResult;
+      return result as RouteGetDocsOptionalCatchAllPartsResult;
     },
-    async filesBrowse(input: FilesBrowseInput) {
+    async routeGetFilesCatchAllParts(input: RouteGetFilesCatchAllPartsInput) {
       let path = "/files/*parts";
       path = replacePathSegments(path, "*parts", readPath(input, ["parts"]));
       const query = new URLSearchParams();
@@ -163,9 +159,74 @@ export function createClient(options: ClientOptions = {}): ZsysClient {
       const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
       const headers: Record<string, string> = {};
       const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
-      return result as FilesBrowseResult;
+      return result as RouteGetFilesCatchAllPartsResult;
     },
-    async ordersCreateHttp(input: OrdersCreateHttpInput) {
+    async routeGetOrders(input: RouteGetOrdersInput = {} as RouteGetOrdersInput) {
+      let path = "/orders";
+      const query = new URLSearchParams();
+      appendQuery(query, "status", readPath(input, ["status"]));
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
+      return result as RouteGetOrdersResult;
+    },
+    async routeGetOrdersByOrderId(input: RouteGetOrdersByOrderIdInput) {
+      let path = "/orders/:orderId";
+      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
+      const query = new URLSearchParams();
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
+      return result as RouteGetOrdersByOrderIdResult;
+    },
+    async routeGetOrdersSearch(input: RouteGetOrdersSearchInput = {} as RouteGetOrdersSearchInput) {
+      let path = "/orders/search";
+      const query = new URLSearchParams();
+      appendQuery(query, "status", readPath(input, ["status"]));
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
+      return result as RouteGetOrdersSearchResult;
+    },
+    async routeHeadOrdersByOrderId(input: RouteHeadOrdersByOrderIdInput) {
+      let path = "/orders/:orderId";
+      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
+      const query = new URLSearchParams();
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      const result = await request(fetcher, url, { method: "HEAD", headers, ...({}) });
+      return result as RouteHeadOrdersByOrderIdResult;
+    },
+    async routeOptionsOrdersByOrderId(input: RouteOptionsOrdersByOrderIdInput) {
+      let path = "/orders/:orderId";
+      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
+      const query = new URLSearchParams();
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      const result = await request(fetcher, url, { method: "OPTIONS", headers, ...({}) });
+      return result as RouteOptionsOrdersByOrderIdResult;
+    },
+    async routePatchOrdersByOrderId(input: RoutePatchOrdersByOrderIdInput) {
+      let path = "/orders/:orderId";
+      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
+      const query = new URLSearchParams();
+      const queryString = query.toString();
+      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
+      const headers: Record<string, string> = {};
+      let requestBody: string | FormData | undefined;
+      const payload: Record<string, unknown> = {};
+      setBodyValue(payload, ["state"], readPath(input, ["state"]));
+      headers["content-type"] = "application/json";
+      requestBody = JSON.stringify(payload);
+      const result = await request(fetcher, url, { method: "PATCH", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
+      return result as RoutePatchOrdersByOrderIdResult;
+    },
+    async routePostOrders(input: RoutePostOrdersInput) {
       let path = "/orders";
       const query = new URLSearchParams();
       const queryString = query.toString();
@@ -180,60 +241,24 @@ export function createClient(options: ClientOptions = {}): ZsysClient {
       headers["content-type"] = "application/json";
       requestBody = JSON.stringify(payload);
       const result = await request(fetcher, url, { method: "POST", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
-      return result as OrdersCreateHttpResult;
+      return result as RoutePostOrdersResult;
     },
-    async ordersDeleteHttp(input: OrdersDeleteHttpInput) {
-      let path = "/orders/:orderId";
-      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
-      const query = new URLSearchParams();
-      appendQuery(query, "reason", readPath(input, ["reason"]));
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "DELETE", headers, ...({}) });
-      return result as OrdersDeleteHttpResult;
-    },
-    async ordersGetRoute(input: OrdersGetRouteInput) {
-      let path = "/orders/:orderId";
-      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
+    async routePostUploads(input: RoutePostUploadsInput) {
+      let path = "/uploads";
       const query = new URLSearchParams();
       const queryString = query.toString();
       const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
       const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
-      return result as OrdersGetRouteResult;
+      let requestBody: string | FormData | undefined;
+      const form = new FormData();
+      appendFormValue(form, "attachments", readPath(input, ["attachments"]));
+      appendFormValue(form, "label", readPath(input, ["label"]));
+      appendFormValue(form, "primary", readPath(input, ["primary"]));
+      requestBody = form;
+      const result = await request(fetcher, url, { method: "POST", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
+      return result as RoutePostUploadsResult;
     },
-    async ordersHead(input: OrdersHeadInput) {
-      let path = "/orders/:orderId";
-      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
-      const query = new URLSearchParams();
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "HEAD", headers, ...({}) });
-      return result as OrdersHeadResult;
-    },
-    async ordersListHttp(input: OrdersListHttpInput = {} as OrdersListHttpInput) {
-      let path = "/orders";
-      const query = new URLSearchParams();
-      appendQuery(query, "status", readPath(input, ["status"]));
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
-      return result as OrdersListHttpResult;
-    },
-    async ordersOptions(input: OrdersOptionsInput) {
-      let path = "/orders/:orderId";
-      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
-      const query = new URLSearchParams();
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "OPTIONS", headers, ...({}) });
-      return result as OrdersOptionsResult;
-    },
-    async ordersReplace(input: OrdersReplaceInput) {
+    async routePutOrdersByOrderId(input: RoutePutOrdersByOrderIdInput) {
       let path = "/orders/:orderId";
       path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
       const query = new URLSearchParams();
@@ -246,32 +271,7 @@ export function createClient(options: ClientOptions = {}): ZsysClient {
       headers["content-type"] = "application/json";
       requestBody = JSON.stringify(payload);
       const result = await request(fetcher, url, { method: "PUT", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
-      return result as OrdersReplaceResult;
-    },
-    async ordersSearchHttp(input: OrdersSearchHttpInput = {} as OrdersSearchHttpInput) {
-      let path = "/orders/search";
-      const query = new URLSearchParams();
-      appendQuery(query, "status", readPath(input, ["status"]));
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      const result = await request(fetcher, url, { method: "GET", headers, ...({}) });
-      return result as OrdersSearchHttpResult;
-    },
-    async ordersUpdateHttp(input: OrdersUpdateHttpInput) {
-      let path = "/orders/:orderId";
-      path = path.replace(":orderId", encodeURIComponent(String(readPath(input, ["orderId"]))));
-      const query = new URLSearchParams();
-      const queryString = query.toString();
-      const url = joinUrl(baseUrl, path) + (queryString === "" ? "" : `?${queryString}`);
-      const headers: Record<string, string> = {};
-      let requestBody: string | FormData | undefined;
-      const payload: Record<string, unknown> = {};
-      setBodyValue(payload, ["state"], readPath(input, ["state"]));
-      headers["content-type"] = "application/json";
-      requestBody = JSON.stringify(payload);
-      const result = await request(fetcher, url, { method: "PATCH", headers, ...(requestBody === undefined ? {} : { body: requestBody }) });
-      return result as OrdersUpdateHttpResult;
+      return result as RoutePutOrdersByOrderIdResult;
     },
   };
 }

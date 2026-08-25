@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import orderSupport from "../../../examples/commerce/src/agents/order-support.agent.ts";
-import getOrder from "../../../examples/commerce/src/functions/get-order.function.ts";
+import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
 import getOrderTool from "../../../examples/commerce/src/tools/lookup-order.tool.ts";
 import {
   invokeFunction,
@@ -8,7 +8,11 @@ import {
   type InvocationParent,
   type SpanRecord,
 } from "../../../packages/engine/src/index.ts";
+import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import { createTestAgent } from "../../../packages/testing/src/index.ts";
+
+bindDescriptorIdentity(getOrder, "orders.get-order");
+bindDescriptorIdentity(getOrderTool.target, "orders.get-order");
 
 describe("commerce-example support agent", () => {
   test("runs a scripted tool call through the function engine without storing content", async () => {
@@ -37,7 +41,7 @@ describe("commerce-example support agent", () => {
         {
           type: "tool-call",
           callId: "call-1",
-          toolId: "orders.get.tool",
+          toolId: "lookup-order",
           input: { orderId: "order-1" },
         },
         { type: "final", output: { answer: "raw-result-secret" } },
@@ -48,15 +52,14 @@ describe("commerce-example support agent", () => {
       answer: "raw-result-secret",
     });
 
-    expect(orderSupport.modelProfile).toBe("default");
-    expect(getOrderTool.id).toBe("orders.get.tool");
+    expect(orderSupport.model).toBe("openai:gpt-5-mini");
+    expect(getOrderTool.id).toBe("lookup-order");
     expect(agent.model.calls).toHaveLength(2);
     agent.trace.assert({
       spanKinds: ["agent", "model", "model", "tool", "tool", "model", "model", "agent"],
       edges: [
-        { relationship: "uses-provider-profile", from: "support.order", to: "default" },
-        { relationship: "uses-tool", from: "support.order", to: "orders.get.tool" },
-        { relationship: "targets-function", from: "orders.get.tool", to: "orders.get" },
+        { relationship: "uses-provider-profile", from: orderSupport.id, to: "default" },
+        { relationship: "uses-tool", from: orderSupport.id, to: "lookup-order" },
       ],
     });
 
@@ -69,23 +72,29 @@ describe("commerce-example support agent", () => {
     );
     const toolSpan = trace.spans.find((span) => span.kind === "tool" && span.status === "started");
     const functionSpan = functionSpans.find((span) => span.status === "started");
+    const targetEdge = trace.edges.find(
+      (edge) => edge.relationship === "targets-function" && edge.from === "lookup-order",
+    );
 
-    expect(agentSpan?.functionId).toBe("zsys.agent.support.order.invoke");
+    expect(agentSpan?.functionId).toBe(`zsys.agent.${orderSupport.id}.invoke`);
     expect(modelSpans.map((span) => span.parentSpanId)).toEqual([
       agentSpan?.spanId,
       agentSpan?.spanId,
     ]);
     expect(toolSpan).toMatchObject({
-      functionId: "orders.get",
       parentSpanId: modelSpans[0]?.spanId,
     });
+    expect(targetEdge?.to).toMatch(/^unbound\./);
     expect(functionSpan).toMatchObject({
-      functionId: "orders.get",
+      functionId: "orders.get-order",
       source: "tool",
       parentSpanId: toolSpan?.spanId,
     });
     expect(completions).toHaveLength(1);
-    expect(completions[0]?.record).toMatchObject({ functionId: "orders.get", source: "tool" });
+    expect(completions[0]?.record).toMatchObject({
+      functionId: "orders.get-order",
+      source: "tool",
+    });
 
     const allSpans = [...trace.spans, ...functionSpans];
     const spanIds = new Set(allSpans.map((span) => span.spanId));

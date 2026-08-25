@@ -24,7 +24,23 @@ describe("inspector graph model", () => {
       { kind: "function", id: "orders.create" },
       { kind: "trigger", id: "orders.create.http" },
     ];
-    const edges = [{ kind: "targets-function", from: "orders.create.http", to: "orders.create" }];
+    const edges = [
+      { kind: "targets-function", from: "orders.create.http", to: "orders.create" },
+      {
+        kind: "contains-function",
+        from: "orders",
+        to: "orders.create",
+        member: "create",
+        order: 1,
+      },
+      {
+        kind: "contains-function",
+        from: "orders",
+        to: "orders.get",
+        member: "get",
+        order: 0,
+      },
+    ];
     const observedEdges = [
       { relationship: "cache.read", from: "orders.create", to: "orders.cache" },
     ];
@@ -34,6 +50,11 @@ describe("inspector graph model", () => {
     );
     expect(first).toEqual(second);
     expect(first.declaredEdges[0]?.relationship).toBe("declared");
+    expect(
+      first.declaredEdges
+        .filter((edge) => edge.kind === "contains-function")
+        .map((edge) => edge.order),
+    ).toEqual([0, 1]);
     expect(first.observedEdges[0]?.relationship).toBe("observed");
   });
 
@@ -57,8 +78,7 @@ describe("inspector graph model", () => {
     const layout = layoutGraph(graph);
     expect(layout.nodes).toHaveLength(1_000);
     expect(layout.edges).toHaveLength(999);
-    expect(layout.nodes[0]?.x).not.toBe(layout.nodes[31]?.x);
-    expect(layout.nodes[0]?.x).toBe(layout.nodes[32]?.x);
+    expect(layout.nodes[0]?.x).toBe(layout.nodes[31]?.x);
     expect(layout.nodes[0]?.y).toBeLessThan(layout.nodes[32]?.y ?? 0);
   });
 

@@ -5,11 +5,17 @@ description: Understand the default transport projection and the explicit mappin
 
 When `request` is omitted, ZSYS projects an object input schema as follows:
 
-- Dynamic segment names map to matching object properties.
+- Dynamic segment names map to matching object properties; unmatched path names remain available only
+  through `request.params`.
 - Remaining properties become query parameters for `GET`, `HEAD`, `DELETE`, and `OPTIONS`.
 - Remaining properties become a JSON body for `POST`, `PUT`, and `PATCH`.
 
-A missing path property or an input schema without a usable object projection is a compile error.
+The handler receives the mapped, validated business input separately from an immutable framework-neutral
+request view. `request.params` contains scalar or catch-all path values, `request.query` contains scalar
+or repeated query values, and `request.headers.getAll(name)` preserves repeated headers. Direct, job,
+event, tool, and agent calls receive no fabricated request. An input schema without a usable object
+projection still requires a complete explicit mapping.
+
 Headers, cookies, renamed fields, transforms, multipart bodies, and non-object inputs require a complete
 explicit mapping:
 

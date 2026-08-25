@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GRAPH_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
 import { hashGraph } from "../../packages/graph/src/index.ts";
 import {
   generateManifest,
@@ -6,7 +7,7 @@ import {
   normalizeCompilation,
 } from "../../packages/compiler/src/index.ts";
 
-const graph = { contractVersion: 1, nodes: [], edges: [] } as const;
+const graph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] } as const;
 const graphHash = hashGraph(graph);
 
 function descriptor(
@@ -38,26 +39,31 @@ function descriptor(
 }
 
 describe("runtime manifest generation", () => {
-  test("sorts imports and emits one handler, adapter, validator, and provider slot", () => {
+  test("sorts imports and emits handlers, middleware, validators, and provider slots", () => {
     const first = descriptor("function", "orders.get", "src/functions.ts", "get", {
       handler: { $zsys: "function" },
+      onBefore: { $zsys: "function" },
+      onAfter: { $zsys: "function" },
     });
     const second = descriptor("function", "orders.save", "src/functions.ts", "save", {
       handler: { $zsys: "function" },
     });
-    const middleware = descriptor("middleware", "orders.auth", undefined, "auth", {
-      target: { ref: { kind: "function", id: "orders.get" } },
-      request: { kind: "input", fields: {} },
-      decision: { kind: "continue" },
+    const middleware = descriptor("middleware", "orders.auth", "src/middleware.ts", "auth", {
+      path: "/orders/*",
+      handler: { $zsys: "function" },
     });
     const transform = descriptor("transform", "orders.id", "src/transforms.ts", "id", {
       schema: { $zsys: "schema" },
     });
     const app = descriptor("app", "app", undefined, "app", {
       providers: {
-        development: { recipeTag: "local" },
-        test: { recipeTag: "test" },
-        production: { recipeTag: "aws" },
+        buckets: {
+          default: {
+            kind: "provider-binding",
+            ownership: "external",
+            adapter: { adapter: "s3" },
+          },
+        },
       },
     });
 
@@ -73,19 +79,27 @@ describe("runtime manifest generation", () => {
     expect(result.activatable).toBe(true);
     expect(result.diagnostics).toEqual([]);
     expect(result.source).toContain('import * as __zsys_module_0 from "../../src/functions.ts";');
-    expect(result.source).toContain('import * as __zsys_module_1 from "../../src/transforms.ts";');
+    expect(result.source).toContain('import * as __zsys_module_1 from "../../src/middleware.ts";');
+    expect(result.source).toContain('import * as __zsys_module_2 from "../../src/transforms.ts";');
     expect(result.source).toContain(
       'functions: { "orders.get": __zsys_module_0["get"].handler, "orders.save": __zsys_module_0["save"].handler },',
     );
-    expect(result.source).toContain('middleware: { "orders.auth": __zsys_middleware_0 },');
+    expect(result.source).toContain('middleware: { "orders.auth": __zsys_module_1["auth"] },');
     expect(result.source).toContain(
-      'requestTransforms: { "orders.id": __zsys_module_1["id"].schema },',
+      'hooks: { "orders.get.after": __zsys_module_0["get"].onAfter, "orders.get.before": __zsys_module_0["get"].onBefore },',
     );
     expect(result.source).toContain(
-      'providerFactories = { "aws": { recipeTag: "aws", factory: undefined }, "local": { recipeTag: "local", factory: undefined }, "test": { recipeTag: "test", factory: undefined } } as const;',
+      'requestTransforms: { "orders.id": __zsys_module_2["id"].schema },',
+    );
+    expect(result.source).toContain(
+      'providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined } } as const;',
     );
     expect(result.source).toContain("providers: providerFactories,");
     expect(result.source).toContain("providerFactories,");
+    expect(result.source).toContain(
+      `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
+    );
+    expect(result.source).toContain("contractVersion: manifestContractVersion,");
     expect(result.source).toContain(`manifestGraphHash = "${graphHash}"`);
   });
 
@@ -99,16 +113,32 @@ describe("runtime manifest generation", () => {
       exportName: "default",
       exportKind: "default" as const,
       providers: {
-        production: {
-          metadata: {
-            capabilities: ["buckets", "models"],
-            profiles: { default: ["buckets", "models"] },
-            environment: [{ name: "MODEL_ENDPOINT", type: "url", sensitive: true }],
-            configuration: {
-              endpoint,
-              credential,
-              client: { transport: { token: credential } },
-              models: { default: { endpoint, apiKey: credential } },
+        buckets: {
+          default: {
+            kind: "provider-binding",
+            ownership: "external",
+            adapter: {
+              adapter: "s3",
+              environment: [
+                { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
+                { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
+              ],
+              configuration: {
+                endpoint: {
+                  kind: "env-ref",
+                  name: "BUCKET_ENDPOINT",
+                  type: "url",
+                  sensitive: false,
+                },
+                credentials: {
+                  accessKeyId: {
+                    kind: "env-ref",
+                    name: "BUCKET_ACCESS_KEY_ID",
+                    type: "secret",
+                    sensitive: true,
+                  },
+                },
+              },
             },
           },
         },
@@ -120,19 +150,23 @@ describe("runtime manifest generation", () => {
 
     expect(result.diagnostics).toEqual([]);
     expect(provider).toMatchObject({
-      id: "default",
+      id: "provider.buckets.default",
       profile: "default",
-      capabilities: ["buckets", "models"],
+      capability: "buckets",
+      adapter: "s3",
+      ownership: "external",
       configuration: {
-        production: [
-          "client",
-          "credential",
-          "endpoint",
-          "models.default.apiKey",
-          "models.default.endpoint",
-        ],
+        endpoint: {
+          kind: "env-ref",
+          name: "BUCKET_ENDPOINT",
+          type: "url",
+          sensitive: false,
+        },
       },
-      environment: ["MODEL_ENDPOINT"],
+      environment: [
+        { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
+        { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
+      ],
       source: { file: "src/app.ts", line: 1, column: 1 },
     });
     expect(graphValue).toBeDefined();

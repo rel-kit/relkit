@@ -55,6 +55,7 @@ async function copyFullProject(): Promise<string> {
     "jobs",
     "observability",
     "providers-local",
+    "providers-standard",
     "routes",
     "runtime-effect",
     "runtime-hono",

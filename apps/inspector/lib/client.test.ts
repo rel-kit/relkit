@@ -17,3 +17,18 @@ test("preserves an explicitly configured backend URL", () => {
   process.env.NEXT_PUBLIC_ZSYS_BACKEND_URL = "http://127.0.0.1:3212";
   expect(inspectorBackendUrl()).toBe("http://127.0.0.1:3212");
 });
+
+test("uses the same-origin proxy for a local hostname alias", () => {
+  process.env.NEXT_PUBLIC_ZSYS_BACKEND_URL = "http://127.0.0.1:3210/_zsys/backend";
+  const previousWindow = (globalThis as { window?: unknown }).window;
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: { location: { href: "http://localhost:3210/routes" } },
+  });
+  try {
+    expect(inspectorBackendUrl()).toBe(INSPECTOR_BACKEND_PROXY);
+  } finally {
+    if (previousWindow === undefined) Reflect.deleteProperty(globalThis, "window");
+    else Object.defineProperty(globalThis, "window", { configurable: true, value: previousWindow });
+  }
+});

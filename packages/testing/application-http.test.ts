@@ -48,3 +48,44 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
     await runtime.close();
   }
 });
+
+test("maps HTTP data into function input without exposing the request", async () => {
+  let observedInput: unknown;
+  let observedContext: unknown;
+  const target = defineFunction({
+    id: "orders.request",
+    input: z.object({ value: z.string() }),
+    output: z.object({ ok: z.boolean() }),
+    handler: async (input, context) => {
+      observedInput = input;
+      observedContext = context;
+      return { ok: true };
+    },
+  });
+  const route: TestRoute = {
+    method: "POST",
+    path: "/orders/:orderId/*parts",
+    request: { kind: "input", fields: { value: { kind: "body", name: "value" } } },
+    target,
+    responses: [{ kind: "success", status: 200 }],
+  };
+  const runtime: TestRuntime = createTestRuntime();
+
+  try {
+    const response = await handleTestRequest(
+      [route],
+      runtime,
+      new Request("http://zsys.test/orders/order-1/a/b?tag=red&tag=blue", {
+        method: "POST",
+        headers: { "x-tags": "one, two", "content-type": "application/json" },
+        body: '{"value":"ready"}',
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(observedInput).toEqual({ value: "ready" });
+    expect((observedContext as Record<string, unknown>).request).toBeUndefined();
+  } finally {
+    await runtime.close();
+  }
+});

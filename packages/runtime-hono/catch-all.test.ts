@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import { createApp, type RuntimeManifest } from "./src/index.ts";
 
@@ -10,7 +11,12 @@ describe("catch-all and method runtime behavior", () => {
     const app = createApp({
       plan: plan(optionalCatchAll()),
       manifest: manifest(),
-      engine: { invoke: async ({ input }) => (inputs.push(input), { ok: true }) },
+      engine: {
+        invoke: async ({ input }) => {
+          inputs.push(input);
+          return { ok: true };
+        },
+      },
     });
 
     expect((await app.request("http://localhost/docs")).status).toBe(200);
@@ -99,13 +105,14 @@ function plan(...triggers: readonly HttpTriggerRegistration[]): RegistrationPlan
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:catch-all",
     functions: {},
     middleware: {},

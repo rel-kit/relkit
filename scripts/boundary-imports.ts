@@ -37,6 +37,7 @@ export const publicApplicationPackages = new Set([
   "@zsys/jobs",
   "@zsys/routes",
   "@zsys/schema",
+  "@zsys/services",
   "@zsys/testing",
   "@zsys/tools",
 ]);
@@ -52,11 +53,21 @@ export const internalRuntimePackages = new Set([
   "@zsys/deploy-pulumi",
   "@zsys/engine",
   "@zsys/inspector-api",
+  "@zsys/invocation",
   "@zsys/observability",
   "@zsys/providers-local",
+  "@zsys/providers-standard",
   "@zsys/runtime-effect",
   "@zsys/runtime-hono",
   "@zsys/supervisor",
+]);
+
+/** Shared invocation contracts are internal, but descriptor packages may consume them. */
+export const dependencyNeutralPackages = new Set(["@zsys/invocation"]);
+
+export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
+  ["@zsys/agents", new Set(["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"])],
+  ["@zsys/routes", new Set(["hono"])],
 ]);
 
 export const nodeBuiltins = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));
@@ -147,13 +158,15 @@ export function importReferences(sourceFile: ts.SourceFile): ImportReference[] {
 
 export function isFrameworkRuntime(dependency: string): boolean {
   return (
-    internalRuntimePackages.has(dependency) ||
+    (internalRuntimePackages.has(dependency) && !dependencyNeutralPackages.has(dependency)) ||
     dependency === "effect" ||
     dependency.startsWith("@effect/") ||
     dependency === "hono" ||
     dependency.startsWith("@hono/") ||
     dependency === "next" ||
-    dependency.startsWith("@pulumi/")
+    dependency.startsWith("@pulumi/") ||
+    dependency === "ai" ||
+    dependency.startsWith("@ai-sdk/")
   );
 }
 

@@ -11,20 +11,11 @@ export async function handleTestRequest(
   const matched = routes.find((route) => route.method === request.method && match(route.path, url));
   if (matched === undefined) return new Response("Not found", { status: 404 });
   const params = match(matched.path, url) ?? {};
-  const handlerRequest = request.clone();
   const body = await readBody(request);
   try {
-    for (const middleware of matched.middleware ?? []) {
-      await runtime.invoke(
-        middleware.target,
-        mapInput(middleware.request, url, params, request, body),
-        { request: handlerRequest.clone() },
-      );
-    }
     const value = await runtime.invoke(
       matched.target,
       mapInput(matched.request, url, params, request, body),
-      { request: handlerRequest.clone() },
     );
     const status = matched.responses.find((response) => response.kind === "success")?.status ?? 200;
     const response = new Response(value === undefined ? null : JSON.stringify(value), {

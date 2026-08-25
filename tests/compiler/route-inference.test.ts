@@ -53,6 +53,77 @@ describe("route contract inference", () => {
     expect(result.diagnostics).toEqual([]);
   });
 
+  test("maps only matching path fields and leaves unmatched params on the request", () => {
+    const target = defineFunction({
+      id: "orders.read",
+      input: z.object({ orderId: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const result = compile(
+      target,
+      "GET",
+      "src/routes/orders/[orderId]/products/[productId]/route.ts",
+    );
+
+    expect(routeValue(result).request).toEqual({
+      kind: "input",
+      fields: { orderId: { kind: "path", name: "orderId" } },
+    });
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  test("does not infer unmatched catch-all params into reusable input", () => {
+    const target = defineFunction({
+      id: "docs.read",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const result = compile(target, "GET", "src/routes/docs/[...parts]/route.ts");
+
+    expect(routeValue(result).request).toEqual({ kind: "input", fields: {} });
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  test("keeps explicit request mappings as complete overrides", () => {
+    const target = defineFunction({
+      id: "orders.search",
+      input: z.object({ query: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const descriptor = defineRoute({
+      id: "orders.search.route",
+      target,
+      request: { kind: "input", fields: { query: { kind: "query", name: "q" } } },
+    });
+    const result = normalizeCompilation({
+      descriptors: [
+        target,
+        {
+          descriptor,
+          exportName: "GET",
+          exportKind: "named",
+          source: { file: "src/routes/orders/[orderId]/route.ts", line: 1, column: 14 },
+          reference: {
+            generationId: "route-inference-test",
+            descriptorId: descriptor.id,
+            kind: "route",
+            module: "src/routes/orders/[orderId]/route.ts",
+            exportName: "GET",
+          },
+        },
+      ],
+    });
+
+    expect(routeValue(result).request).toEqual({
+      kind: "input",
+      fields: { query: { kind: "query", name: "q" } },
+    });
+    expect(result.diagnostics).toEqual([]);
+  });
+
   test("includes declared errors without explicit HTTP status mappings", () => {
     const invalid = defineError({
       id: "orders.invalid",
@@ -107,6 +178,36 @@ describe("route contract inference", () => {
     ]);
   });
 
+  test("maps write fields to multipart when the route accepts form data", () => {
+    const file = z.file({ maxBytes: 10 * 1024 * 1024, mediaTypes: ["image/png"] });
+    const target = defineFunction({
+      id: "assets.upload",
+      input: z.object({
+        label: z.string(),
+        primary: file,
+        attachments: z.array(file),
+      }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const value = routeValue(
+      compile(target, "POST", "src/routes/uploads/route.ts", "multipart/form-data"),
+    );
+
+    expect(value.request).toEqual({
+      kind: "input",
+      fields: {
+        attachments: { kind: "multipart-all", name: "attachments" },
+        label: { kind: "multipart", name: "label" },
+        primary: { kind: "multipart", name: "primary" },
+      },
+    });
+    expect(value.responses).toEqual([
+      expect.objectContaining({ kind: "success", status: 200 }),
+      expect.objectContaining({ kind: "validation-error", status: 422 }),
+    ]);
+  });
+
   test("preserves schema defaults in inferred request mappings", () => {
     const target = defineFunction({
       id: "hello.read",
@@ -150,8 +251,17 @@ describe("route contract inference", () => {
   });
 });
 
-function compile(target: ReturnType<typeof defineFunction>, method: string, file: string) {
-  const descriptor = defineRoute({ id: `${target.id}.route`, target });
+function compile(
+  target: ReturnType<typeof defineFunction>,
+  method: string,
+  file: string,
+  accept?: "application/json" | "multipart/form-data",
+) {
+  const descriptor = defineRoute({
+    id: `${target.id}.route`,
+    target,
+    ...(accept === undefined ? {} : { accept }),
+  });
   return normalizeCompilation({
     descriptors: [
       target,

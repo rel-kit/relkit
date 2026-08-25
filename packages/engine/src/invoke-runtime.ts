@@ -1,23 +1,23 @@
 import { Effect } from "effect";
-import type { FunctionRequest, MaybePromise, ProtocolId } from "@zsys/contracts";
+import type { MaybePromise, ProtocolId } from "@zsys/contracts";
+import { normalizeFailure, type InvocationRunner } from "@zsys/invocation";
 import {
   createPublicClockEffect,
   createInvocationBridge,
   captureInvocationTrace,
-  invokeUserHandler,
   withChildSpan,
-  normalizeFailure,
   withRootSpan,
   createZsysTracer,
   IdSource,
   InvocationTrace,
   type CapturedInvocationTrace,
-  type InvocationRunner,
 } from "@zsys/runtime-effect";
 import type { DirectFunctionInvoker, DirectFunctionRequest } from "./dependencies.js";
 import { createContext } from "./context.js";
 import { callHook, makeContext } from "./invoke-utils.js";
 import { createDependencyBridge } from "./dependency-bridge.js";
+import { createInvocationSpanOptions } from "./invoke-tracing.js";
+import { runConfiguredLifecycle } from "./invoke-lifecycle.js";
 import {
   emitObservabilityEvent,
   OBSERVABILITY_HOOK_PROTOCOL,
@@ -30,7 +30,6 @@ import type {
   InvocationTarget,
   InvocationParent,
   InvokeOptions,
-  SpanRecord,
 } from "./invoke-types.js";
 type DirectChildInvoker = (
   request: DirectFunctionRequest,
@@ -51,6 +50,7 @@ export async function runHandler<
   idSource: InvocationIdSource,
   runner: InvocationRunner,
   childInvoker: DirectChildInvoker | undefined,
+  onTrace?: (trace: CapturedInvocationTrace) => void,
 ): Promise<unknown> {
   const spanSource: InvocationIdSource = {
     next: (kind) => (kind === "trace" ? (traceId as ProtocolId) : idSource.next(kind)),
@@ -59,6 +59,7 @@ export async function runHandler<
     const signalRef = { current: controller.signal };
     const time = yield* createPublicClockEffect(runner, controller.signal);
     const trace = yield* captureInvocationTrace;
+    onTrace?.(trace);
     const bridge = createDependencyBridge(createInvocationBridge(runner, trace), controller.signal);
     const invokeFunction: DirectFunctionInvoker | undefined =
       childInvoker === undefined
@@ -131,56 +132,23 @@ export async function runHandler<
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
-    return yield* invokeUserHandler({
-      handler: target.handler as (
-        value: unknown,
-        request: FunctionRequest | undefined,
-        context: Context,
-      ) => unknown,
+    return yield* runConfiguredLifecycle({
+      target: target as InvocationTarget<unknown, unknown, Context>,
       input,
-      ...(options.request === undefined ? {} : { request: options.request }),
-      publicContext: context,
+      context,
+      ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
+      ...(options.servicePolicies === undefined
+        ? {}
+        : { servicePolicies: options.servicePolicies }),
       ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
+      runner,
+      signal: controller.signal,
       onSignal: (signal) => {
         signalRef.current = signal;
       },
     });
   });
-  const spanOptions: import("@zsys/runtime-effect").InvocationTraceOptions = {
-    name: `zsys.invoke.${target.id}`,
-    invocationId: record.id,
-    ...(record.parentId === undefined ? {} : { parentInvocationId: record.parentId }),
-    ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
-    source: record.source,
-    signal: controller.signal,
-    attributes: { "zsys.function.id": target.id },
-    observer: (event) => {
-      const span = event.span;
-      const parentSpanId = options.parent?.spanId;
-      const value: SpanRecord = Object.freeze({
-        invocationId: record.id,
-        functionId: target.id,
-        name: span.name,
-        spanId: span.spanId,
-        ...(parentSpanId === undefined ? {} : { parentSpanId }),
-        traceId: span.traceId,
-        source: record.source as import("./invoke-types.js").InvocationSource,
-        status: event.type,
-        startedAt: record.startedAt,
-        ...(event.type === "completed" ? { completedAt: new Date().toISOString() } : {}),
-      });
-      void callHook(
-        event.type === "started" ? options.hooks?.onSpanStart : options.hooks?.onSpanComplete,
-        value,
-      );
-      void emitObservabilityEvent(options.hooks?.observability, {
-        protocol: OBSERVABILITY_HOOK_PROTOCOL,
-        version: OBSERVABILITY_HOOK_VERSION,
-        type: event.type === "started" ? "span.started" : "span.completed",
-        record: value,
-      });
-    },
-  };
+  const spanOptions = createInvocationSpanOptions(target, record, options, controller);
   const capturedParent = options.parent?.trace as CapturedInvocationTrace | undefined;
   const childTracerIds: import("@zsys/runtime-effect").IdSourceService = {
     next: (kind) => (kind === "trace" ? (traceId as ProtocolId) : idSource.next("span")),

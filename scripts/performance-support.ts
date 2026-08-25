@@ -70,7 +70,7 @@ export function makeDescriptors(
 }
 
 export const manifest = (graphHash: string): PerformanceRecord => ({
-  contractVersion: 1,
+  contractVersion: 2,
   generatorVersion: 1,
   graphHash,
   functions: {},

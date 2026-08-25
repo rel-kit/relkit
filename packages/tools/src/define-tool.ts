@@ -1,20 +1,50 @@
+import { createDescriptorBase, deepFreeze, isDescriptor, isRef } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import {
-  createDescriptorBase,
-  deepFreeze,
-  isDescriptor,
-  isRef,
-  type DescriptorBase,
-  type DescriptorMetadata,
-} from "@zsys/contracts";
-import {
-  isErrorDescriptor,
-  type ErrorDescriptorAny,
-  type FunctionRef,
+  createFunctionToolInvoker,
+  copyFunctionToolHooks,
+  FunctionToolApprovalDeniedError,
+  FunctionToolApprovalRequiredError,
+  FunctionToolArgumentValidationError,
+  FunctionToolOperationCancelledError,
+  type FunctionToolApproval,
+  type FunctionToolApprovalDecision,
+  type FunctionToolApprovalRequest,
+  type FunctionToolApprovalResolver,
+  type FunctionToolDescriptor,
+  type FunctionToolInvokeOptions,
+  type FunctionToolMetadata,
+  type FunctionToolSideEffect,
+  type FunctionToolTarget,
   type FunctionRefAny,
 } from "@zsys/functions";
+import {
+  copyFunctionTarget,
+  hasOwn,
+  isFunctionTarget,
+  isNonEmptyString,
+  isPositiveInteger,
+  isRecord,
+  isToolApproval,
+  isToolSideEffect,
+  positiveInteger,
+  requiredText,
+  validateApproval,
+  validateSideEffect,
+} from "./define-tool-validation.js";
 
-export type ToolSideEffect = "none" | "read" | "write" | "external";
-export type ToolApproval = "never" | "on-write" | "always";
+export type ToolSideEffect = FunctionToolSideEffect;
+export type ToolApproval = FunctionToolApproval;
+export type ToolApprovalDecision = FunctionToolApprovalDecision;
+export type ToolApprovalRequest = FunctionToolApprovalRequest;
+export type ToolApprovalResolver = FunctionToolApprovalResolver;
+export type ToolInvokeOptions = FunctionToolInvokeOptions;
+export {
+  FunctionToolApprovalDeniedError as ToolApprovalDeniedError,
+  FunctionToolApprovalRequiredError as ToolApprovalRequiredError,
+  FunctionToolArgumentValidationError as ToolArgumentValidationError,
+  FunctionToolOperationCancelledError as ToolOperationCancelledError,
+};
 
 export interface ToolRef<Id extends string = string> {
   readonly ref: {
@@ -25,38 +55,31 @@ export interface ToolRef<Id extends string = string> {
 
 export type ToolRefAny = ToolRef;
 
-export type ToolTarget<Target extends FunctionRefAny> = FunctionRef<
-  Target["ref"]["id"],
-  Target extends { readonly __input?: infer Input } ? Input : unknown,
-  Target extends { readonly __output?: infer Output } ? Output : unknown,
-  TargetErrors<Target>,
-  Target["input"],
-  Target["output"]
->;
+export type ToolTarget<Target extends FunctionRefAny> = FunctionToolTarget<Target>;
 
-export interface ToolDescriptor<Id extends string, Target extends FunctionRefAny = FunctionRefAny>
-  extends DescriptorBase<"tool", Id>, ToolRef<Id> {
-  readonly target: ToolTarget<Target>;
-  readonly description: string;
-  readonly sideEffect: ToolSideEffect;
-  readonly approval: ToolApproval;
-  readonly timeoutMs?: number;
-}
+export type ToolDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+> = FunctionToolDescriptor<Id, Target>;
 
 export interface DefineToolOptions<
   Id extends string,
   Target extends FunctionRefAny,
-> extends DescriptorMetadata {
-  readonly id: Id;
+> extends FunctionToolMetadata {
+  readonly id?: Id;
   readonly target: Target;
-  readonly description: string;
-  readonly sideEffect: ToolSideEffect;
-  readonly approval: ToolApproval;
-  readonly timeoutMs?: number;
+  readonly onBefore?: import("@zsys/functions").FunctionToolHook<
+    import("@zsys/schema").InferInput<Target["input"]>
+  >;
+  readonly onAfter?: import("@zsys/functions").FunctionToolHook<
+    import("@zsys/schema").InferOutput<Target["output"]>
+  >;
 }
 
 /**
- * Defines a tool boundary with side-effect and approval metadata for safe invocation.
+ * Defines a handler-free tool view over one function with side-effect and approval
+ * metadata for safe invocation. Tool IDs may be inferred; `invoke` validates the
+ * inherited input and fails closed when required approval is unavailable.
  *
  * @example
  * ```ts
@@ -80,17 +103,37 @@ export function defineTool<const Id extends string, const Target extends Functio
   const description = requiredText(options.description, "Tool description");
   const sideEffect = validateSideEffect(options.sideEffect);
   const approval = validateApproval(options.approval);
+  const hooks = copyFunctionToolHooks(options);
   if (options.timeoutMs !== undefined) positiveInteger(options.timeoutMs, "timeoutMs");
-  const base = createDescriptorBase("tool", options.id, options);
+  const id = options.id === undefined ? createUnboundIdentity() : options.id;
+  const base = createDescriptorBase("tool", id, options);
 
-  return deepFreeze({
+  const descriptor = {
     ...base,
     target,
     description,
     sideEffect,
     approval,
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-  }) as ToolDescriptor<Id, Target>;
+    ...hooks,
+  };
+  Object.defineProperty(descriptor, "invoke", {
+    value: createFunctionToolInvoker(
+      options.target,
+      {
+        id,
+        sideEffect,
+        approval,
+        ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+        ...hooks,
+      },
+      descriptor,
+    ),
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  return deepFreeze(descriptor) as ToolDescriptor<Id, Target>;
 }
 
 export function isToolDescriptor(value: unknown): value is ToolDescriptor<string> {
@@ -100,6 +143,7 @@ export function isToolDescriptor(value: unknown): value is ToolDescriptor<string
   const descriptor = value as ToolDescriptor<string>;
   return (
     isFunctionTarget(descriptor.target) &&
+    typeof descriptor.invoke === "function" &&
     isNonEmptyString(descriptor.description) &&
     isToolSideEffect(descriptor.sideEffect) &&
     isToolApproval(descriptor.approval) &&
@@ -113,83 +157,4 @@ export function assertToolDescriptor(value: unknown): asserts value is ToolDescr
 
 export function isToolRef(value: unknown): value is ToolRefAny {
   return isRecord(value) && isRef(value.ref, "tool");
-}
-
-function copyFunctionTarget<Target extends FunctionRefAny>(target: Target): ToolTarget<Target> {
-  if (!isFunctionTarget(target)) throw new TypeError("Tool target must be a function reference");
-  return deepFreeze({
-    ref: Object.freeze({ kind: "function" as const, id: target.ref.id }),
-    input: target.input,
-    output: target.output,
-    ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
-  }) as ToolTarget<Target>;
-}
-
-function validateSideEffect(value: unknown): ToolSideEffect {
-  if (!isToolSideEffect(value)) {
-    throw new TypeError("Tool sideEffect must be none, read, write, or external");
-  }
-  return value;
-}
-
-function validateApproval(value: unknown): ToolApproval {
-  if (!isToolApproval(value)) {
-    throw new TypeError("Tool approval must be never, on-write, or always");
-  }
-  return value;
-}
-
-function isToolSideEffect(value: unknown): value is ToolSideEffect {
-  return value === "none" || value === "read" || value === "write" || value === "external";
-}
-
-function isToolApproval(value: unknown): value is ToolApproval {
-  return value === "never" || value === "on-write" || value === "always";
-}
-
-function requiredText(value: unknown, name: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${name} is required`);
-  return value.trim();
-}
-
-function positiveInteger(value: unknown, name: string): asserts value is number {
-  if (!isPositiveInteger(value)) throw new TypeError(`${name} must be a positive integer`);
-}
-
-function isPositiveInteger(value: unknown): value is number {
-  return Number.isSafeInteger(value) && (value as number) > 0;
-}
-
-function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return (
-    isRecord(value) &&
-    isRef(value.ref, "function") &&
-    isSchema(value.input) &&
-    isSchema(value.output) &&
-    (!hasOwn(value, "handler") || typeof value.handler === "function") &&
-    (value.errors === undefined ||
-      (Array.isArray(value.errors) && value.errors.every(isErrorDescriptor)))
-  );
-}
-
-function isSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
-  return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
-}
-
-type TargetErrors<Target extends FunctionRefAny> =
-  NonNullable<Target["errors"]> extends readonly ErrorDescriptorAny[]
-    ? NonNullable<Target["errors"]>
-    : readonly ErrorDescriptorAny[];
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.trim() !== "";
-}
-
-function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
 }

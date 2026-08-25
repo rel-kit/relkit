@@ -3,7 +3,25 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import * as ts from "typescript";
 import type { EvaluatorModuleResult } from "./evaluator-protocol.js";
-import { readFacts, resolveImport, type ParsedSource } from "./source-map-utils.js";
+import {
+  readFacts,
+  resolveImport,
+  type ExportFact,
+  type ExportFacts,
+  type ParsedSource,
+} from "./source-map-utils.js";
+
+export type {
+  ErrorBindingFact,
+  ExportFact,
+  ExportFacts,
+  FactoryBindingFact,
+  FactoryIdPresence,
+  RouteOperationFact,
+  ServiceMemberFact,
+  SourceFacts,
+  SourceFactoryKind,
+} from "./source-map-utils.js";
 
 export type ExportKind = "default" | "named";
 
@@ -22,6 +40,14 @@ export interface SourceMapEntry {
   readonly exportName: string;
   readonly exportKind: ExportKind;
   readonly source: SourceLocation;
+  readonly facts?: ExportFacts;
+  readonly exportFact?: ExportFact;
+}
+
+interface LocatedSource {
+  readonly source: SourceLocation;
+  readonly facts?: ExportFacts;
+  readonly exportFact?: ExportFact;
 }
 
 interface MapContext {
@@ -39,14 +65,15 @@ export function mapSourceLocations(
   const entries = modules.flatMap((module) =>
     module.exports.map((exported) => {
       const file = relativeFile(module.file, context.root);
-      const source =
-        locate(file, exported.exportName, context, new Set()) ??
-        createSourceLocation(file, 1, 1, context.root);
+      const located = locate(file, exported.exportName, context, new Set());
+      const source = located?.source ?? createSourceLocation(file, 1, 1, context.root);
       return Object.freeze({
         module: file,
         exportName: exported.exportName,
         exportKind: exportKind(exported.exportName),
         source: Object.freeze(source),
+        ...(located?.facts === undefined ? {} : { facts: located.facts }),
+        ...(located?.exportFact === undefined ? {} : { exportFact: located.exportFact }),
       });
     }),
   );
@@ -79,7 +106,7 @@ function locate(
   exportName: string,
   context: MapContext,
   visited: Set<string>,
-): SourceLocation | undefined {
+): LocatedSource | undefined {
   if (visited.has(`${file}\0${exportName}`)) return undefined;
   visited.add(`${file}\0${exportName}`);
   const parsed = parseSource(file, context);
@@ -91,16 +118,25 @@ function locate(
       return locate(originFile, fact.origin.name, context, visited);
     }
   }
-  if (fact !== undefined) return position(file, parsed.sourceFile, fact.position, context.root);
+  if (fact !== undefined) {
+    return {
+      source: position(file, parsed.sourceFile, fact.position, context.root),
+      facts: parsed.facts,
+      exportFact: fact,
+    };
+  }
   for (const star of parsed.facts.stars) {
     const originFile = resolveImport(file, star.module, context.root, context.texts);
     if (originFile !== undefined) {
       const origin = locate(originFile, exportName, context, visited);
       if (origin !== undefined) return origin;
     }
-    return position(file, parsed.sourceFile, star.position, context.root);
+    return {
+      source: position(file, parsed.sourceFile, star.position, context.root),
+      facts: parsed.facts,
+    };
   }
-  return position(file, parsed.sourceFile, 0, context.root);
+  return { source: position(file, parsed.sourceFile, 0, context.root), facts: parsed.facts };
 }
 
 function parseSource(file: string, context: MapContext): ParsedSource | undefined {

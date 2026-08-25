@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import * as pulumi from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/index.js";
-import {
+import type {
   ZsysApplicationService,
   ZsysBuckets,
   ZsysCaches,
@@ -90,12 +90,10 @@ test("executes the generated plan with stable capability mappings and secret-saf
       "zsys:cloud-aws:ZsysEventBus",
       "zsys:cloud-aws:ZsysBuckets",
       "zsys:cloud-aws:ZsysCaches",
-      "zsys:cloud-aws:ZsysObservability",
       "zsys:cloud-aws:ZsysApplicationService",
       "aws:sqs/queue:Queue",
       "aws:cloudwatch/eventRule:EventRule",
       "aws:s3/bucket:Bucket",
-      "aws:elasticache/serverlessCache:ServerlessCache",
     ]),
   );
 
@@ -114,9 +112,6 @@ test("executes the generated plan with stable capability mappings and secret-saf
     ).inputs,
   ).toMatchObject({ eventPattern: expect.any(String) });
   expect(resource(seen, "aws:s3/bucket:Bucket").inputs).toMatchObject({ acl: "private" });
-  expect(resource(seen, "aws:elasticache/serverlessCache:ServerlessCache").inputs).toMatchObject({
-    engine: "valkey",
-  });
 
   const secretPlan = fromGraph(withSecretConfiguration(loadGraph("valid-full")), {
     image: {
@@ -124,8 +119,8 @@ test("executes the generated plan with stable capability mappings and secret-saf
       tag: "2026-08-18",
       health: plan.application.image.health,
     },
-    modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
   });
+  expect(JSON.stringify(secretPlan)).toContain("OPENAI_API_KEY");
   const secretBytes = JSON.stringify(await runGeneratedProgram(secretPlan, "secret"));
   expect(secretBytes).not.toContain("OPENAI_API_KEY");
   expect(secretBytes).not.toContain("synthetic-secret");
@@ -396,7 +391,6 @@ function deploymentOptions() {
         timeoutMs: 2_000,
       },
     },
-    modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
   } as const;
 }
 
@@ -418,11 +412,18 @@ function withSecretConfiguration(graph: ApplicationGraph): ApplicationGraph {
         node.kind === "provider"
           ? {
               ...node,
-              environment: [...node.environment, "OPENAI_API_KEY"],
+              environment: [
+                ...node.environment,
+                { name: "OPENAI_API_KEY", type: "secret", sensitive: true },
+              ],
               configuration: {
-                development: [],
-                production: ["region", "OPENAI_API_KEY"],
-                test: [],
+                ...node.configuration,
+                apiKey: {
+                  kind: "env-ref",
+                  name: "OPENAI_API_KEY",
+                  type: "secret",
+                  sensitive: true,
+                },
               },
             }
           : node,
@@ -473,7 +474,7 @@ function programResourceCount(plan: DeploymentPlan): number {
     plan.eventTriggers.length +
     plan.buckets.length +
     plan.caches.length +
-    (plan.models?.length ?? 0)
+    (plan.observability === undefined ? 0 : 1)
   );
 }
 

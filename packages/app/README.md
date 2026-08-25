@@ -1,42 +1,53 @@
 # @zsys/app
 
-`@zsys/app` is the small public entry point for value-free application and
-provider declarations. Concrete providers are selected once; descriptors keep
-logical profiles and stable metadata.
+`@zsys/app` is the public entry point for value-free application descriptors and composable provider
+bindings. Applications declare one topology; deployment pipelines provide different values for the
+same environment schema.
 
 ```ts
-import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders } from "@zsys/app";
+import { defineApp, defineEnv, env, external, redis, s3 } from "@zsys/app";
 
-const environment = defineEnv({
-  REGION: env.string().requiredIn("production"),
+const values = defineEnv({
+  BUCKET_ENDPOINT: env.url(),
+  BUCKET_NAME: env.string(),
+  BUCKET_REGION: env.string(),
+  BUCKET_ACCESS_KEY_ID: env.secret().optional(),
+  BUCKET_SECRET_ACCESS_KEY: env.secret().optional(),
+  CACHE_URL: env.secret(),
 });
 
 export default defineApp({
   id: "orders-app",
-  env: environment,
+  env: values,
   providers: {
-    development: localProviders(),
-    test: testProviders({ deterministicIds: true, deterministicClock: true }),
-    production: awsProviders({ region: environment.REGION }),
+    buckets: {
+      default: external(
+        s3({
+          endpoint: values.BUCKET_ENDPOINT,
+          bucketName: values.BUCKET_NAME,
+          region: values.BUCKET_REGION,
+          credentials: {
+            accessKeyId: values.BUCKET_ACCESS_KEY_ID,
+            secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
+          },
+        }),
+      ),
+    },
+    cache: { default: external(redis({ url: values.CACHE_URL })) },
   },
 });
 ```
 
-Importing this module creates metadata only. Runtime environment resolution and
-provider construction happen during generation startup.
+Use MinIO and Redis values locally, R2 and Upstash values in a hosted pipeline, or `managed()` S3 and
+Valkey bindings with an AWS deployment. `external()` resources are never provisioned and receive no
+deployment IAM statements. Secret adapter fields require secret environment references.
 
-Application configuration lives in `zsys.config.ts`. `PORT` is reserved by the
-framework; select ports through CLI flags, environment variables, or typed
-configuration instead:
+`PORT` and `ZSYS_ENV` are framework-reserved. Hosting belongs in `zsys.config.ts`:
 
 ```ts
-import { defineConfig } from "@zsys/app/config";
-
 export default defineConfig({
-  server: { port: 3000, maxBodyBytes: 1_048_576 },
+  deployment: { target: "aws", adapter: "pulumi" },
+  server: { port: 3000 },
   inspector: { port: 3210 },
 });
 ```
-
-Source discovery is fixed to `src/**/*.ts`, the application entry is
-`src/app.ts`, and generated files live in `.zsys/generated`.

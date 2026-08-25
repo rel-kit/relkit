@@ -20,11 +20,26 @@ bodies return bounded `422` errors. Streaming upload APIs are not currently expo
 
 1. Framework request setup, correlation, security, and body-size protection.
 2. Rate limiter.
-3. Declared middleware in author order.
-4. Request mapping and input validation.
-5. Target invocation through the common function engine.
+3. Matching path-scoped middleware in canonical middleware-ID order.
+4. Request mapping, input validation, and admission.
+5. Ordered service middleware, when the route targets a service member.
+6. Target invocation through the common function engine.
 
-Middleware references are serializable descriptors targeting functions, not inline Hono callbacks.
+Define HTTP middleware independently from routes. It receives the native Hono context, `next`, and
+ZSYS `signal`, `env`, `log`, and `time` utilities:
+
+```ts
+export default defineMiddleware("/orders/*", async (context, next, zsys) => {
+  zsys.log.info("checking order request");
+  if (!context.req.header("authorization")) return context.json({ error: "unauthorized" }, 401);
+  await next();
+  context.header("x-orders-policy", "checked");
+});
+```
+
+Supported scopes are `*`, static segments, `:param`, and a trailing `*`. Middleware is discovered
+automatically; routes do not carry middleware arrays. Returning a `Response` short-circuits, while
+`await next()` enables Hono onion-style response modification.
 
 ## Rate limiting
 

@@ -1,12 +1,13 @@
 import type { InferOutput, StandardSchemaV1 } from "@zsys/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
+import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionHandlerValidation } from "./handler-result.js";
 import type {
   DefineFunctionOptions,
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
-  FunctionRequest,
+  FunctionLifecycleHook,
 } from "./types.js";
 
 type FunctionCallOptions<
@@ -16,11 +17,12 @@ type FunctionCallOptions<
   Dependencies extends FunctionDependencies,
 > = Omit<
   DefineFunctionOptions<Id, InputSchema, OutputSchema, Dependencies, readonly ErrorDescriptorAny[]>,
-  "handler"
+  "handler" | "onBefore" | "onAfter"
 > & {
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies>;
   readonly handler: (
     input: InferOutput<InputSchema>,
-    request: FunctionRequest,
     context: FunctionContext<Dependencies>,
   ) => unknown;
 };
@@ -45,6 +47,12 @@ type ErrorListOf<Options> = Options extends {
   ? Errors
   : readonly [];
 
+type ToolMetadataOf<Options> = Options extends { readonly tool: infer Tool }
+  ? Tool extends FunctionToolMetadata
+    ? Tool
+    : undefined
+  : undefined;
+
 export interface DefineFunction {
   <
     const Id extends string,
@@ -64,7 +72,8 @@ export interface DefineFunction {
     {},
     ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 
   <
@@ -84,6 +93,7 @@ export interface DefineFunction {
     Dependencies,
     ErrorListOf<Options>,
     InputSchema,
-    OutputSchema
+    OutputSchema,
+    ToolMetadataOf<Options>
   >;
 }

@@ -1,36 +1,68 @@
+import {
+  BookOpen,
+  Bot,
+  Clock3,
+  Database,
+  FileText,
+  Globe2,
+  Inbox,
+  Layers3,
+  LayoutDashboard,
+  Network,
+  Radio,
+  Route,
+  ShieldCheck,
+  SquareFunction,
+  Stethoscope,
+  Waypoints,
+  Wrench,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
+
 export const navigationGroups = [
   {
     label: "Workspace",
     items: [
-      { href: "/", label: "Overview", glyph: "O" },
-      { href: "/graph", label: "Graph", glyph: "G" },
-      { href: "/routes", label: "Routes", glyph: "R" },
-      { href: "/api-reference", label: "API Reference", glyph: "A" },
-      { href: "/functions", label: "Functions", glyph: "F" },
+      { href: "/", label: "Overview", icon: LayoutDashboard },
+      { href: "/graph", label: "Graph", icon: Network },
+      { href: "/routes", label: "Routes", icon: Route },
+      { href: "/middlewares", label: "Middleware", icon: ShieldCheck },
+      {
+        href: SCALAR_API_REFERENCE_URL,
+        label: "API Reference",
+        icon: BookOpen,
+        external: true,
+      },
+      { href: "/functions", label: "Functions", icon: SquareFunction },
     ],
   },
   {
     label: "Runtime",
     items: [
-      { href: "/jobs", label: "Jobs", glyph: "J" },
-      { href: "/events", label: "Events & listeners", glyph: "E" },
-      { href: "/buckets", label: "Buckets", glyph: "B" },
-      { href: "/cache", label: "Cache", glyph: "C" },
-      { href: "/tools", label: "Tools", glyph: "T" },
-      { href: "/agents", label: "Agents", glyph: "A" },
+      { href: "/jobs", label: "Jobs", icon: Clock3 },
+      { href: "/events", label: "Events & listeners", icon: Radio },
+      { href: "/buckets", label: "Buckets", icon: Database },
+      { href: "/cache", label: "Cache", icon: Layers3 },
+      { href: "/providers", label: "Providers", icon: Globe2 },
+      { href: "/tools", label: "Tools", icon: Wrench },
+      { href: "/agents", label: "Agents", icon: Bot },
     ],
   },
   {
     label: "Signals",
     items: [
-      { href: "/requests", label: "Requests", glyph: "R" },
-      { href: "/logs", label: "Logs", glyph: "L" },
-      { href: "/traces", label: "Traces", glyph: "T" },
-      { href: "/env", label: "Environment", glyph: "E" },
-      { href: "/diagnostics", label: "Diagnostics", glyph: "D" },
+      { href: "/requests", label: "Requests", icon: Inbox },
+      { href: "/logs", label: "Logs", icon: FileText },
+      { href: "/traces", label: "Traces", icon: Waypoints },
+      { href: "/env", label: "Environment", icon: Globe2 },
+      { href: "/diagnostics", label: "Diagnostics", icon: Stethoscope },
     ],
   },
-] as const;
+] satisfies readonly {
+  label: string;
+  items: readonly { href: string; label: string; icon: LucideIcon; external?: boolean }[];
+}[];
 
 export const navigation = navigationGroups.flatMap(({ label: group, items }) =>
   items.map((item) => ({ ...item, group })),

@@ -1,30 +1,20 @@
-export interface CliHelpOption {
-  readonly name: string;
-  readonly aliases?: readonly string[];
-  readonly type: "boolean" | "string" | "integer" | "choice" | "key=value";
-  readonly description: string;
-  readonly values?: readonly string[];
-}
-export interface CliHelpArgument {
-  readonly name: string;
-  readonly required: boolean;
-  readonly description: string;
-}
-export interface CliHelpCommand {
-  readonly name: string;
-  readonly description: string;
-  readonly usage: string;
-  readonly examples: readonly { readonly command: string; readonly description: string }[];
-  readonly options: readonly CliHelpOption[];
-  readonly arguments: readonly CliHelpArgument[];
-  readonly commands: readonly CliHelpCommand[];
-}
-export interface CliHelpModel extends CliHelpCommand {
-  readonly version: string;
-}
+import { deepFreeze } from "@zsys/contracts";
+import type {
+  CliHelpArgument,
+  CliHelpCommand,
+  CliHelpModel,
+  CliHelpOption,
+} from "./cli-help-types.js";
+
+export type * from "./cli-help-types.js";
 
 const projectRoot = option("project-root", "string", "Application directory (defaults to cwd)");
-const environment = option("environment", "string", "Provider environment", ["env"]);
+const environment = option(
+  "environment",
+  "string",
+  "Provider environment, including value-free model-provider configuration",
+  ["env"],
+);
 const deployOptions = [
   projectRoot,
   option("stack", "string", "Pulumi stack name (default: development)"),
@@ -36,21 +26,31 @@ const deployOptions = [
 
 const graph = command("graph", "Inspect deterministic application graphs", "zsys graph <command>", {
   commands: [
-    command("print", "Print a canonical graph", "zsys graph print [graph]", {
-      options: [projectRoot],
-      arguments: [argument("graph", false, "Graph JSON path")],
-    }),
+    command(
+      "print",
+      "Print a canonical graph with services and resolved source IDs",
+      "zsys graph print [graph]",
+      {
+        options: [projectRoot],
+        arguments: [argument("graph", false, "Graph JSON path")],
+      },
+    ),
     command("check", "Validate a graph and optional hash", "zsys graph check [graph]", {
       options: [projectRoot, option("hash", "string", "Expected sha256 graph hash")],
       arguments: [argument("graph", false, "Graph JSON path")],
     }),
-    command("diff", "Compare graph compatibility", "zsys graph diff <before> <after>", {
-      options: [projectRoot],
-      arguments: [
-        argument("before", true, "Previous graph path"),
-        argument("after", true, "Next graph path"),
-      ],
-    }),
+    command(
+      "diff",
+      "Compare graph compatibility, including inferred identity moves",
+      "zsys graph diff <before> <after>",
+      {
+        options: [projectRoot],
+        arguments: [
+          argument("before", true, "Previous graph path"),
+          argument("after", true, "Next graph path"),
+        ],
+      },
+    ),
   ],
 });
 
@@ -112,10 +112,15 @@ const root = command(
           option("inspector-port", "integer", "Inspector port"),
         ],
       }),
-      command("check", "Compile and validate the application", "zsys check", {
-        options: [projectRoot],
-      }),
-      command("build", "Build a deployable application", "zsys build", {
+      command(
+        "check",
+        "Compile descriptors, infer eligible IDs, and validate the application",
+        "zsys check",
+        {
+          options: [projectRoot],
+        },
+      ),
+      command("build", "Build the checked graph, manifest, OpenAPI, and client", "zsys build", {
         options: [projectRoot],
       }),
       command("start", "Start a built application", "zsys start", {
@@ -188,10 +193,4 @@ function argument(name: string, required: boolean, description: string): CliHelp
 }
 function title(value: string): string {
   return value.replaceAll("-", " ").replace(/^./, (character) => character.toUpperCase());
-}
-function deepFreeze<T extends object>(value: T): T {
-  Object.freeze(value);
-  for (const child of Object.values(value))
-    if (child && typeof child === "object") deepFreeze(child);
-  return value;
 }

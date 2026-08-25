@@ -62,14 +62,17 @@ export function planRetry(
   options: Pick<RetryOptions, "random"> = {},
 ): RetryPlan {
   assertAttempt(attempt);
-  const classification = classifyFailure(failure);
+  const normalized = normalizeFailure(failure);
+  const classification = classifyFailure(normalized);
   const retry = classification === "retryable" && attempt < policy.maxAttempts;
+  const policyDelay = retry ? calculateRetryDelay(policy, attempt, options.random) : 0;
+  const errorDelay = normalized._tag === "ApplicationFailure" ? (normalized.afterMs ?? 0) : 0;
   return deepFreeze({
     classification,
     state: retry ? "delayed" : "dead-lettered",
     attempt,
-    delayMs: retry ? calculateRetryDelay(policy, attempt, options.random) : 0,
-    failure: safeFailureMetadata(failure),
+    delayMs: retry ? Math.max(policyDelay, errorDelay) : 0,
+    failure: safeFailureMetadata(normalized),
   });
 }
 

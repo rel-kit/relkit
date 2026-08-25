@@ -61,7 +61,10 @@ test("formats correlated human and structured JSON logs", () => {
   };
 
   expect(formatHumanLog(record)).toBe(
-    "2026-08-16T00:00:00.000Z INFO runtime.http request completed request=request-1 trace=trace-1 correlation=request-1 route=/orders status=201",
+    [
+      "00:00:00 INFO  runtime.http request completed",
+      `${" ".repeat(15)}request=request-1 trace=trace-1 correlation=request-1 route=/orders status=201`,
+    ].join("\n"),
   );
   expect(JSON.parse(JSON.stringify(record))).toEqual(record);
 });
@@ -75,6 +78,8 @@ test("projects invocation and trace annotations", async () => {
     withRootSpan(Effect.logInfo("started").pipe(Effect.annotateLogs({ requestId: "request-1" })), {
       name: "test",
       invocationId: "invocation-1",
+      functionId: "orders.get",
+      serviceId: "orders",
       correlationId: "correlation-1",
       source: "direct",
     }).pipe(
@@ -92,6 +97,8 @@ test("projects invocation and trace annotations", async () => {
     traceId: "trace-1",
     correlationId: "correlation-1",
     source: "direct",
+    functionId: "orders.get",
+    serviceId: "orders",
   });
 });
 

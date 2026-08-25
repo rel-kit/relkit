@@ -88,8 +88,8 @@ GET /_zsys/v1/health/live
 GET /_zsys/v1/health/ready
 ```
 
-Liveness means the process is running. Readiness also requires the configured
-provider set to be ready.
+Liveness means the process is running. Readiness also requires every graph-required
+capability/profile binding to be ready; unused bindings are not instantiated.
 
 ## Deployment boundary
 
@@ -99,10 +99,10 @@ state is the deployment state system. Resource names and identities use
 stable descriptor IDs, so a source-file move does not replace an unchanged
 resource and an unchanged graph produces a no-op update.
 
-The deployment plan is data first: it contains resource metadata, dependency
+The deployment plan is data first: it contains managed resource metadata, dependency
 edges, health, environment references, and IAM decisions, but not raw secret
-values or Pulumi output objects. AWS capability and configuration failures are
-reported before an apply.
+values or Pulumi output objects. External bindings are omitted from provisioning
+and IAM. AWS capability and configuration failures are reported before an apply.
 
 ## Observability and security
 

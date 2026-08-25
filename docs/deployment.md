@@ -82,9 +82,22 @@ The AWS plan maps the graph to the supported primitives:
 | Cache                 | ElastiCache Valkey                      |
 | Logs and traces       | CloudWatch and the configured OTLP sink |
 
-Provider profiles are logical names in application source. Their concrete
-AWS resources are selected by the deployment plan, while handlers still run
-through the common ZSys function engine.
+Provider profiles are logical names in application source. Only `managed()`
+bindings appear as provisioned resources in the deployment plan. An
+`external(s3(...))` R2 or MinIO bucket and an `external(redis(...))` cache are
+omitted along with their AWS IAM statements. Managed connection outputs take
+precedence over pipeline values and use workload identity when supported.
+
+Hosting is selected independently in `zsys.config.ts`:
+
+```ts
+export default defineConfig({
+  deployment: { target: "aws", adapter: "pulumi" },
+});
+```
+
+This allows an AWS-hosted server to use an external R2 bucket and Upstash
+cache without treating either resource as AWS-owned infrastructure.
 
 ## Safety and cleanup
 

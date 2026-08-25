@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { Badge } from "../../components/ui/badge";
 import { Card } from "../../components/ui/card";
 import { Field } from "../../components/ui/field";
-import { SelectField } from "../../components/ui/select";
 import { filterGraph, graphKinds } from "../../lib/graph-filter";
-import { edgeLabel, type GraphNode, type GraphSnapshot } from "../../lib/graph-model";
+import {
+  edgeLabel,
+  graphKindColor,
+  type GraphNode,
+  type GraphSnapshot,
+} from "../../lib/graph-model";
 import { GraphFlow } from "./graph-flow";
 import { GraphRelationships } from "./graph-relationships";
 import { OverlayDialog } from "../../components/ui/dialog";
@@ -33,12 +37,25 @@ export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
           onChange={setSearch}
           placeholder="Node ID or kind"
         />
-        <SelectField
-          label="Node kind"
-          items={[{ id: "all", label: "All kinds" }, ...kinds]}
-          value={kind}
-          onChange={setKind}
-        />
+        <div className="graph-kind-tabs" role="group" aria-label="Filter graph by node kind">
+          <KindTab
+            id="all"
+            label="All kinds"
+            count={graph.nodes.length}
+            active={kind === "all"}
+            onSelect={setKind}
+          />
+          {kinds.map((item) => (
+            <KindTab
+              key={item.id}
+              id={item.id}
+              label={item.label}
+              count={graph.nodes.filter((node) => node.kind === item.id).length}
+              active={kind === item.id}
+              onSelect={setKind}
+            />
+          ))}
+        </div>
         <Badge>
           {filtered.nodes.length} of {graph.nodes.length} nodes
         </Badge>
@@ -106,6 +123,41 @@ function GraphLegend() {
         Observed
       </span>
     </div>
+  );
+}
+
+function KindTab({
+  id,
+  label,
+  count,
+  active,
+  onSelect,
+}: {
+  readonly id: string;
+  readonly label: string;
+  readonly count: number;
+  readonly active: boolean;
+  readonly onSelect: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="graph-kind-tab"
+      data-active={active}
+      aria-pressed={active}
+      style={
+        {
+          "--kind-color": id === "all" ? "var(--accent)" : graphKindColor(id),
+        } as CSSProperties
+      }
+      onClick={() => onSelect(id)}
+    >
+      <span
+        className="graph-kind-swatch"
+        style={{ background: id === "all" ? "var(--accent)" : graphKindColor(id) }}
+      />
+      {label} <span className="graph-kind-count">{count}</span>
+    </button>
   );
 }
 

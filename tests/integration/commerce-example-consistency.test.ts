@@ -1,6 +1,5 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
-import { providerRecipe } from "../../packages/app/src/index.ts";
 import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
 import { createEventListenerTarget } from "../../packages/events/src/index.ts";
 import { fromGraph } from "../../packages/deploy/src/index.ts";
@@ -30,15 +29,18 @@ import {
   createTestEvent,
   createTestHttpClient,
 } from "../../packages/testing/src/index.ts";
+import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
 import app from "../../examples/commerce/src/app.ts";
 import orderCreated from "../../examples/commerce/src/events/order-created.event.ts";
 import orderReceipt from "../../examples/commerce/src/events/order-receipt.event.ts";
 import authorizeOrder from "../../examples/commerce/src/functions/authorize-order.function.ts";
-import createOrder from "../../examples/commerce/src/functions/create-order.function.ts";
-import getOrder from "../../examples/commerce/src/functions/get-order.function.ts";
+import createOrder from "../../examples/commerce/src/functions/orders/create-order.function.ts";
+import getOrder from "../../examples/commerce/src/functions/orders/get-order.function.ts";
+import orders from "../../examples/commerce/src/services/orders.service.ts";
 import orderSupport from "../../examples/commerce/src/agents/order-support.agent.ts";
 import lookupOrder from "../../examples/commerce/src/tools/lookup-order.tool.ts";
-import { normalizeOrderId } from "../../examples/commerce/src/routes/orders/[orderId]/route.ts";
+import normalizeOrderId from "../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
+import orderAuth from "../../examples/commerce/src/middleware/order-auth.middleware.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../examples/commerce");
@@ -48,6 +50,12 @@ const ORDER_INPUT = {
   quantity: 2,
   customerEmail: "customer@example.com",
 };
+
+bindDescriptorIdentity(authorizeOrder, "authorize-order");
+bindDescriptorIdentity(createOrder, "orders.create-order");
+bindDescriptorIdentity(getOrder, "orders.get-order");
+bindDescriptorIdentity(orders.getOrder, "orders.get-order");
+bindDescriptorIdentity(lookupOrder.target, "orders.get-order");
 
 test("commerce-example keeps one graph and hash across every acceptance consumer", async () => {
   const compiled = await compileProject("commerce-example", APP_ROOT);
@@ -64,7 +72,6 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
         port: 3000,
       },
     },
-    modelProfiles: { default: { provider: "openai", model: "gpt-4o-mini" } },
   });
   const pulumi = renderPulumiProgram(deployment, {
     projectRoot: "/tmp/commerce-example-acceptance",
@@ -82,9 +89,9 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   expect(compiled.normalization.outputs.client).toBe(generateClient(graph));
 
   assertApplicationCoverage(graph, registration);
-  expect(providerRecipe(app.providers.development)).toBe("local");
-  expect(providerRecipe(app.providers.test)).toBe("test");
-  expect(providerRecipe(app.providers.production)).toBe("aws");
+  expect(app.providers.buckets?.default?.adapter.adapter).toBe("s3");
+  expect(app.providers.cache?.default?.adapter.adapter).toBe("redis");
+  expect(app.providers.models?.default?.ownership).toBe("external");
   expect(app.env.OPENAI_API_KEY.sensitive).toBe(true);
   expect(app.env.metadata.OPENAI_API_KEY?.requiredIn).toEqual(["production"]);
   expect(app.observability?.bodyCapture?.mode).toBe("off");
@@ -93,9 +100,9 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   const requestRecords: RequestRecord[] = [];
   const clients = fixtureClients();
   const targets = new Map<string, InvocationTarget>([
-    [createOrder.id, createOrder],
-    [getOrder.id, getOrder],
-    [authorizeOrder.id, authorizeOrder],
+    ["orders.create-order", createOrder],
+    ["orders.get-order", getOrder],
+    ["authorize-order", authorizeOrder],
   ]);
   const calls: HttpInvocationOptions[] = [];
   const http = createApp({
@@ -145,6 +152,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
 
     const created = await client.post("/orders", {
       headers: {
+        authorization: "Bearer fixture",
         "content-type": "application/json",
         "idempotency-key": "order-1",
         "x-customer-email": "customer@example.com",
@@ -163,9 +171,8 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   }
 
   expect(calls.map(({ functionId, source }) => [functionId, source])).toEqual([
-    ["orders.create", "http"],
-    ["orders.authorize", "http"],
-    ["orders.get", "http"],
+    ["orders.create-order", "http"],
+    ["orders.get-order", "http"],
   ]);
   expect(requestRecords).toHaveLength(3);
   expect(requestRecords.map(({ rawPath }) => rawPath)).toEqual([
@@ -187,7 +194,6 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
     delivery: "durable",
     expansion: ["orders.created@1"],
     clients: {
-      functions: { getOrder },
       jobs: { sendReceiptJob: { enqueue: async () => ({ accepted: true, instanceId: "job-1" }) } },
     },
     payloadSchema: orderCreated.payload,
@@ -224,7 +230,11 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   await expect(agent.invoke({ question: "What is the order status?" })).resolves.toEqual({
     answer: "confirmed",
   });
-  expect(agent.trace.read().spans.some((span) => span.functionId === "orders.get")).toBe(true);
+  expect(
+    agent.trace
+      .read()
+      .spans.some((span) => span.kind === "tool" && span.functionId.startsWith("unbound.")),
+  ).toBe(true);
 });
 
 function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPlan): void {
@@ -233,32 +243,40 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
     expect.arrayContaining([
       "commerce-api",
       "APP_ENV",
-      "AWS_REGION",
+      "BUCKET_ENDPOINT",
+      "CACHE_URL",
       "OPENAI_API_KEY",
       "assets",
       "prices",
-      "orders.create",
-      "orders.get",
+      "orders",
+      "orders.create-order",
+      "orders.get-order",
       "receipts.send-job",
       "orders.created",
       "receipts.on-order-created",
-      "orders.get.tool",
-      "support.order",
+      "lookup-order",
+      "order-support",
+      "provider.buckets.default",
+      "provider.cache.default",
+      "provider.events.default",
+      "provider.jobs.default",
+      "provider.models.default",
+      "provider.observability.default",
     ]),
   );
   expect(plan.httpTriggers.map(({ id }) => id).sort()).toEqual([
-    "assets.upload.http",
-    "docs.browse",
-    "files.browse",
-    "orders.create.http",
-    "orders.delete.http",
-    "orders.get-route",
-    "orders.head",
-    "orders.list.http",
-    "orders.options",
-    "orders.replace",
-    "orders.search.http",
-    "orders.update.http",
+    "route.delete.orders.by-order-id",
+    "route.get.docs.optional-catch-all-parts",
+    "route.get.files.catch-all-parts",
+    "route.get.orders",
+    "route.get.orders.by-order-id",
+    "route.get.orders.search",
+    "route.head.orders.by-order-id",
+    "route.options.orders.by-order-id",
+    "route.patch.orders.by-order-id",
+    "route.post.orders",
+    "route.post.uploads",
+    "route.put.orders.by-order-id",
   ]);
   expect(plan.queues.map(({ id }) => id)).toEqual(["receipts.send-job"]);
   expect(plan.schedules.map(({ id }) => id)).toEqual(["receipts.send-job:receipts.reconcile"]);
@@ -270,14 +288,14 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
   ]);
   expect(plan.buckets.map(({ id }) => id)).toEqual(["assets"]);
   expect(plan.caches.map(({ id }) => id)).toEqual(["prices"]);
-  expect(plan.tools.map(({ id }) => id)).toEqual(["orders.get.tool"]);
-  expect(plan.agents.map(({ id }) => id)).toEqual(["support.order"]);
+  expect(plan.tools.map(({ id }) => id)).toEqual(["lookup-order"]);
+  expect(plan.agents.map(({ id }) => id)).toEqual(["order-support"]);
   expect(plan.functions.map(({ id }) => id)).toEqual(
     expect.arrayContaining([
-      "orders.create",
-      "orders.get",
-      "receipts.send",
-      "zsys.agent.support.order.invoke",
+      "orders.create-order",
+      "orders.get-order",
+      "send-receipt",
+      "zsys.agent.order-support.invoke",
     ]),
   );
 }
@@ -288,16 +306,7 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
-    middleware: {
-      "orders.auth": {
-        targetFunctionId: "orders.authorize",
-        request: {
-          kind: "input",
-          fields: { authorization: { kind: "header", name: "authorization" } },
-        },
-        decision: { kind: "continue" },
-      },
-    },
+    middleware: { "order-auth": orderAuth },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },
   };
 }

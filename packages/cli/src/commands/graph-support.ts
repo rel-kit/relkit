@@ -1,13 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { GRAPH_VERSION, normalizeSourceLocation } from "@zsys/contracts";
+import { GRAPH_VERSION } from "@zsys/contracts";
 import {
   canonicalGraphJson,
   canonicalizeGraph,
   diffGraph as diffCanonicalGraph,
   hashGraph,
-  isGraphEdgeKind,
-  isGraphNodeKind,
+  validateGraphShape,
   type ApplicationGraph,
   type GraphDiff,
 } from "@zsys/graph";
@@ -66,12 +65,18 @@ export async function readGraphFile(options: GraphFileOptions = {}) {
     const detail = code === "ZSYS_GRAPH_NOT_FOUND" ? "was not found" : "is not valid JSON";
     throw new GraphCommandError(code, `Graph file ${detail}: ${path}`);
   }
-  if (!isRecord(value) || value.contractVersion !== GRAPH_VERSION)
-    invalid(path, `contractVersion must be ${GRAPH_VERSION}`);
-  if (!Array.isArray(value.nodes) || !Array.isArray(value.edges))
-    invalid(path, "nodes and edges must be arrays");
-  value.nodes.forEach((node, index) => validateNode(node, root, path, index));
-  value.edges.forEach((edge, index) => validateEdge(edge, path, index));
+  if (!isRecord(value)) invalid(path, "the root must be an object");
+  if (value.contractVersion !== GRAPH_VERSION) {
+    throw new GraphCommandError(
+      "ZSYS_GRAPH_VERSION_UNSUPPORTED",
+      `Graph contract version ${String(value.contractVersion)} is unsupported; expected ${GRAPH_VERSION}: ${path}`,
+    );
+  }
+  try {
+    validateGraphShape(value, root);
+  } catch (error) {
+    invalid(path, error instanceof Error ? error.message : String(error));
+  }
   const graph = canonicalizeGraph(value as unknown as ApplicationGraph, { projectRoot: root });
   return Object.freeze({ path, graph, hash: hashGraph(graph), json: canonicalGraphJson(graph) });
 }
@@ -127,31 +132,6 @@ export async function diffGraphFiles(
   });
 }
 
-function validateNode(value: unknown, root: string, path: string, index: number): void {
-  if (!isRecord(value) || !isGraphNodeKind(value.kind) || !nonEmpty(value.id))
-    invalid(path, `nodes[${index}] has an invalid kind or id`);
-  try {
-    normalizeSourceLocation(value.source as never, root);
-  } catch (error) {
-    invalid(
-      path,
-      `nodes[${index}].source is invalid: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-}
-
-function validateEdge(value: unknown, path: string, index: number): void {
-  if (
-    !isRecord(value) ||
-    !isGraphEdgeKind(value.kind) ||
-    !nonEmpty(value.from) ||
-    !nonEmpty(value.to)
-  )
-    invalid(path, `edges[${index}] has an invalid kind, from, or to`);
-  if (value.kind === "targets-function" && value.role !== "primary" && value.role !== "middleware")
-    invalid(path, `edges[${index}].role is invalid`);
-}
-
 function assertHash(value: string, label: string): void {
   if (!HASH_PATTERN.test(value))
     throw new GraphCommandError(
@@ -162,9 +142,6 @@ function assertHash(value: string, label: string): void {
 
 function invalid(path: string, detail: string): never {
   throw new GraphCommandError("ZSYS_GRAPH_INVALID", `Invalid graph ${path}: ${detail}`);
-}
-function nonEmpty(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0;
 }
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);

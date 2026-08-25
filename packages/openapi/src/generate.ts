@@ -7,6 +7,8 @@ import {
 } from "@zsys/contracts";
 import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@zsys/graph";
 import { buildOperation, openApiPath } from "./generate-utils.js";
+import { documentTags, type OpenApiTag } from "./generate-tags.js";
+import { serviceContext, serviceFor } from "./generate-services.js";
 
 export type OpenApiSchema = { readonly [key: string]: JsonValue };
 export interface OpenApiParameter {
@@ -27,6 +29,9 @@ export interface OpenApiResponse {
 }
 export interface OpenApiOperation {
   readonly operationId: string;
+  readonly summary?: string;
+  readonly description?: string;
+  readonly tags?: readonly string[];
   readonly parameters?: readonly OpenApiParameter[];
   readonly requestBody?: {
     readonly required: boolean;
@@ -36,7 +41,13 @@ export interface OpenApiOperation {
   readonly "x-zsys": {
     readonly routeId: string;
     readonly functionId: string;
-    readonly middleware: readonly { readonly id: string; readonly targetFunctionId: string }[];
+    readonly serviceId?: string;
+    readonly middleware: readonly {
+      readonly id: string;
+      readonly path: string;
+      readonly order: number;
+      readonly match: "always" | "conditional";
+    }[];
     readonly transforms: readonly string[];
     readonly rateLimit?: JsonValue;
   };
@@ -48,6 +59,7 @@ export interface OpenApiDocument {
   readonly openapi: "3.1.0";
   readonly info: { readonly title: string; readonly version: string };
   readonly jsonSchemaDialect: string;
+  readonly tags?: readonly OpenApiTag[];
   readonly paths: Readonly<Record<string, OpenApiPathItem>>;
   readonly "x-zsys": {
     readonly version: number;
@@ -60,6 +72,7 @@ export type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> 
   readonly triggerType: "http";
   readonly config: HttpTriggerConfig;
 };
+export type { OpenApiTag } from "./generate-tags.js";
 
 /** Generates a deterministic OpenAPI 3.1 document from the serializable graph contract. */
 export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
@@ -76,6 +89,7 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
         left.config.method.localeCompare(right.config.method) ||
         left.id.localeCompare(right.id),
     );
+  const services = serviceContext(graph);
   const paths: Record<string, OpenApiPathItem> = {};
   for (const trigger of triggers) {
     const target = functions.get(trigger.targetFunctionId);
@@ -84,6 +98,7 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
         `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
       );
     }
+    const service = serviceFor(services, trigger, target);
     for (const [index, routePath] of openApiPaths(trigger.config.path).entries()) {
       const path = openApiPath(routePath);
       const method = trigger.config.method.toLowerCase();
@@ -97,14 +112,20 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
           target,
           routePath,
           index === 0 ? trigger.id : `${trigger.id}.catch-all`,
+          service,
         ),
       };
     }
   }
+  const tags = documentTags(
+    services.sources,
+    triggers.flatMap((trigger) => trigger.config.tags ?? []),
+  );
   return {
     openapi: "3.1.0",
     info: { title: graph.appId ?? "ZSys application", version: String(CONTRACT_VERSION) },
     jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
+    ...(tags.length === 0 ? {} : { tags }),
     paths,
     "x-zsys": {
       version: CONTRACT_VERSION,

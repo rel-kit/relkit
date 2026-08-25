@@ -1,5 +1,6 @@
 import { canonicalJson } from "@zsys/contracts";
 import type { ClientRoute, MappingLeaf } from "./generate-types.js";
+import { routeParameters } from "./route-parameters.js";
 
 export interface RouteMethodNames {
   readonly method: string;
@@ -29,8 +30,14 @@ export function routeMethod(route: ClientRoute, names: RouteMethodNames): string
 }
 
 export function acceptsMissingInput(route: ClientRoute): boolean {
-  return route.fields.every(
-    (field) => field.kind === "constant" || field.optional || field.defaulted,
+  const requiredUnmappedPath = routeParameters(route.trigger.config.path).some(
+    (parameter) =>
+      !parameter.optional &&
+      !route.fields.some((field) => field.kind === parameter.kind && field.name === parameter.name),
+  );
+  return (
+    !requiredUnmappedPath &&
+    route.fields.every((field) => field.kind === "constant" || field.optional || field.defaulted)
   );
 }
 
@@ -86,10 +93,7 @@ export function runtimeHelpers(): string[] {
 }
 
 function pathStatements(route: ClientRoute): string[] {
-  return route.trigger.config.path.split("/").flatMap((segment) => {
-    if (!segment.startsWith(":") && !segment.startsWith("*")) return [];
-    const name = segment.slice(1).replace(/\?$/, "");
-    const kind = segment.startsWith("*") ? "path-segments" : "path";
+  return routeParameters(route.trigger.config.path).flatMap(({ segment, name, kind }) => {
     const field = route.fields.find((entry) => entry.kind === kind && entry.name === name);
     const path = field?.inputPath ?? [name];
     if (kind === "path-segments") {

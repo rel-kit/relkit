@@ -61,7 +61,7 @@ Run app, inspector, OpenAPI, and Scalar
 
 ### `zsys check`
 
-Compile and validate the application
+Compile descriptors, infer eligible IDs, and validate the application
 
 | Option         | Value  | Description                             |
 | -------------- | ------ | --------------------------------------- |
@@ -69,11 +69,11 @@ Compile and validate the application
 
 #### Examples
 
-`zsys check` — Compile and validate the application
+`zsys check` — Compile descriptors, infer eligible IDs, and validate the application
 
 ### `zsys build`
 
-Build a deployable application
+Build the checked graph, manifest, OpenAPI, and client
 
 | Option         | Value  | Description                             |
 | -------------- | ------ | --------------------------------------- |
@@ -81,7 +81,7 @@ Build a deployable application
 
 #### Examples
 
-`zsys build` — Build a deployable application
+`zsys build` — Build the checked graph, manifest, OpenAPI, and client
 
 ### `zsys start`
 
@@ -106,7 +106,7 @@ Inspect deterministic application graphs
 
 #### `zsys graph print [graph]`
 
-Print a canonical graph
+Print a canonical graph with services and resolved source IDs
 
 | Argument | Value    | Description     |
 | -------- | -------- | --------------- |
@@ -118,7 +118,7 @@ Print a canonical graph
 
 ##### Examples
 
-`zsys graph print` — Print a canonical graph
+`zsys graph print` — Print a canonical graph with services and resolved source IDs
 
 #### `zsys graph check [graph]`
 
@@ -139,7 +139,7 @@ Validate a graph and optional hash
 
 #### `zsys graph diff <before> <after>`
 
-Compare graph compatibility
+Compare graph compatibility, including inferred identity moves
 
 | Argument | Value    | Description         |
 | -------- | -------- | ------------------- |
@@ -152,7 +152,7 @@ Compare graph compatibility
 
 ##### Examples
 
-`zsys graph diff` — Compare graph compatibility
+`zsys graph diff` — Compare graph compatibility, including inferred identity moves
 
 ### `zsys env <command>`
 
@@ -166,10 +166,10 @@ Inspect value-free environment contracts
 
 Validate environment values
 
-| Option                | Value  | Description                             |
-| --------------------- | ------ | --------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd) |
-| --environment / --env | string | Provider environment                    |
+| Option                | Value  | Description                                                             |
+| --------------------- | ------ | ----------------------------------------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd)                                 |
+| --environment / --env | string | Provider environment, including value-free model-provider configuration |
 
 ##### Examples
 
@@ -179,10 +179,10 @@ Validate environment values
 
 List environment value status
 
-| Option                | Value  | Description                             |
-| --------------------- | ------ | --------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd) |
-| --environment / --env | string | Provider environment                    |
+| Option                | Value  | Description                                                             |
+| --------------------- | ------ | ----------------------------------------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd)                                 |
+| --environment / --env | string | Provider environment, including value-free model-provider configuration |
 
 ##### Examples
 
@@ -196,10 +196,10 @@ Explain one environment variable
 | -------- | -------- | ------------------------- |
 | name     | required | Environment variable name |
 
-| Option                | Value  | Description                             |
-| --------------------- | ------ | --------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd) |
-| --environment / --env | string | Provider environment                    |
+| Option                | Value  | Description                                                             |
+| --------------------- | ------ | ----------------------------------------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd)                                 |
+| --environment / --env | string | Provider environment, including value-free model-provider configuration |
 
 ##### Examples
 
@@ -209,12 +209,12 @@ Explain one environment variable
 
 Render or write a safe .env example
 
-| Option                | Value   | Description                             |
-| --------------------- | ------- | --------------------------------------- |
-| --project-root        | string  | Application directory (defaults to cwd) |
-| --environment / --env | string  | Provider environment                    |
-| --path / --file       | string  | Output path                             |
-| --write               | boolean | Write the rendered example              |
+| Option                | Value   | Description                                                             |
+| --------------------- | ------- | ----------------------------------------------------------------------- |
+| --project-root        | string  | Application directory (defaults to cwd)                                 |
+| --environment / --env | string  | Provider environment, including value-free model-provider configuration |
+| --path / --file       | string  | Output path                                                             |
+| --write               | boolean | Write the rendered example                                              |
 
 ##### Examples
 

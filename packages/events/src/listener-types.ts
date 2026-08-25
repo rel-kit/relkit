@@ -41,6 +41,10 @@ export type EventListenerTarget<Dependencies extends FunctionDependencies> = Fun
   Dependencies
 >;
 
+type FunctionDependencyOptions<D extends FunctionDependencies> = "functions" extends keyof D
+  ? never
+  : D;
+
 export interface EventTriggerDescriptor<
   Id extends string = string,
   Selector extends EventSelectorAny = EventSelectorAny,
@@ -68,5 +72,5 @@ export interface OnEventOptions<
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
-  readonly dependencies?: Dependencies;
+  readonly dependencies?: FunctionDependencyOptions<Dependencies>;
 }

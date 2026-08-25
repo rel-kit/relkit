@@ -5,6 +5,7 @@ import {
   normalizeId,
   type JsonValue,
 } from "@zsys/contracts";
+import { createUnboundIdentity } from "@zsys/invocation";
 import type { StandardSchemaV1 } from "@zsys/schema";
 import type {
   ContinueMapping,
@@ -52,7 +53,9 @@ export function defineTransform<const Id extends string, const Schema extends St
   if (hasOwn(options, "handler") || hasOwn(options, "transform"))
     throw new TypeError("HTTP transforms cannot own handlers or closures");
   assertSchema(options.schema, "schema");
-  const id = normalizeId(options.id) as unknown as Id;
+  const id = normalizeId(
+    options.id === undefined ? createUnboundIdentity() : options.id,
+  ) as unknown as Id;
   return deepFreeze({
     kind: "transform" as const,
     id,

@@ -1,6 +1,6 @@
 {
-  "contractVersion": 1,
-  "graphHash": "sha256:0cf52a5f08e087e2c36996debe951a11b1624d92f3873ed4a2ae9e38b73a34c2",
+  "contractVersion": 2,
+  "graphHash": "sha256:9df5e74288c1e564e84c0909fa8e1f6c7128e1ca61296eac9298979859dae416",
   "application": {
     "id": "minimal-app",
     "image": {
@@ -14,6 +14,7 @@
     },
     "environmentNames": ["SERVICE_PORT"]
   },
+  "providerBindings": [],
   "http": {
     "logicalName": "minimal-app-http-public",
     "port": 3000,
@@ -43,11 +44,5 @@
       "statements": []
     },
     "perFunction": []
-  },
-  "observability": {
-    "logicalName": "minimal-app-observability-default",
-    "configurationNames": [],
-    "logs": true,
-    "traces": true
   }
 }

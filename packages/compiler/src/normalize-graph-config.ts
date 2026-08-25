@@ -1,6 +1,7 @@
 import type { JsonValue } from "@zsys/contracts";
 import { selectorEntries } from "./normalize-compat.js";
 import { clean } from "./normalize-graph-utils.js";
+import { middlewareForRoute } from "./middleware-coverage.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 
@@ -12,10 +13,13 @@ export function httpConfig(
   return clean({
     method: value.method,
     path: value.path,
+    ...(typeof value.title === "string" ? { title: value.title } : {}),
+    ...(typeof value.description === "string" ? { description: value.description } : {}),
+    ...(Array.isArray(value.tags) ? { tags: clean(value.tags) } : {}),
     runtimePaths: value.runtimePaths,
     request: value.request,
     responses: responses(value.responses, descriptor.id, work),
-    middleware: middleware(value.middleware, work),
+    middleware: middlewareForRoute(descriptor, work),
     transforms: transforms(value.request, work),
     rateLimit: rateLimit(value.rateLimit),
     maxBodyBytes: value.maxBodyBytes,
@@ -47,24 +51,6 @@ export function eventConfig(
     retry: value.retry,
     concurrency: value.concurrency,
   });
-}
-
-export function middlewareTargetIds(
-  value: unknown,
-  work: NormalizationWork,
-): readonly { readonly id: string; readonly targetFunctionId: string }[] {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap((entry) => {
-    const id = refId(entry);
-    if (id === undefined) return [];
-    const middleware = work.middlewareReferences.get(id);
-    const target = isRecord(middleware?.value) ? refId(middleware.value.target) : undefined;
-    return [{ id, targetFunctionId: target ?? "" }];
-  });
-}
-
-function middleware(value: unknown, work: NormalizationWork): JsonValue {
-  return middlewareTargetIds(value, work).map((entry) => ({ ...entry }));
 }
 
 function responses(value: unknown, descriptorId: string, work: NormalizationWork): JsonValue {

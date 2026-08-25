@@ -1,6 +1,6 @@
 import { normalizeId, type MaybePromise } from "@zsys/contracts";
 import { type AgentDescriptor } from "./define-agent.js";
-import { type ModelProvider } from "./model-provider.js";
+import { resolveRuntimeModel } from "./runtime-model.js";
 import {
   createExecutionSignal,
   signalFailure,
@@ -29,9 +29,8 @@ export type AgentApprovalHandler = (
   approval: import("./approval.js").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 
-export interface AgentRuntimeOptions {
+interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
-  readonly provider: ModelProvider;
   readonly tools: import("@zsys/tools").ToolSource;
   readonly engine: import("@zsys/tools").ToolEngine;
   readonly maxInputBytes?: number;
@@ -40,6 +39,10 @@ export interface AgentRuntimeOptions {
   readonly hooks?: AgentRuntimeHooks;
   readonly capture?: AgentCapturePolicy;
 }
+
+export type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
+  readonly modelRegistry: unknown;
+};
 
 export interface AgentInvocationOptions {
   readonly input: unknown;
@@ -71,6 +74,12 @@ export async function invokeAgent(
   const capture = createAgentCapturePolicy(options.capture);
   const invocationId = normalizeId(options.invocationId ?? `agent-${crypto.randomUUID()}`);
   const traceId = normalizeId(options.traceId ?? invocationId);
+  const runtimeModel = resolveRuntimeModel({
+    ...(options.agent.model === undefined ? {} : { selector: options.agent.model }),
+    registry: options.modelRegistry,
+    ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
+    ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
+  });
   const execution = createExecutionSignal(options);
   const agentSpan = startAgentSpan({
     kind: "agent",
@@ -82,7 +91,7 @@ export async function invokeAgent(
     ...(options.parentSpanId === undefined ? {} : { parentSpanId: options.parentSpanId }),
     attributes: {
       "zsys.agent.id": options.agent.id,
-      "zsys.model.profile": options.provider.profile,
+      "zsys.model.id": runtimeModel.id,
     },
   });
   emitAgentSpanStart(hooks, agentSpan);
@@ -93,33 +102,14 @@ export async function invokeAgent(
       validateValue(options.agent.input, options.input, "input"),
       execution.signal,
     );
-    const provider = options.provider;
-    if (normalizeId(provider.profile) !== options.agent.modelProfile)
-      throw new AgentRuntimeError(
-        "ZSYS_AGENT_PROFILE_MISMATCH",
-        "Model profile does not match agent",
-      );
-    if (!provider.capabilities.cancellation)
-      throw new AgentRuntimeError(
-        "ZSYS_AGENT_CANCELLATION_UNSUPPORTED",
-        "Model cancellation is required",
-      );
-    if (options.agent.tools.length > 0 && !provider.capabilities.toolCalls)
-      throw new AgentRuntimeError(
-        "ZSYS_AGENT_TOOL_CALLS_UNSUPPORTED",
-        "Model tool calls are required",
-      );
-    const maxInputBytes = boundedLimit(options.maxInputBytes, provider.capabilities.maxInputBytes);
-    const maxOutputBytes = boundedLimit(
-      options.maxOutputBytes,
-      provider.capabilities.maxOutputBytes,
-    );
     const result = await runAgentLoop(
       options,
+      runtimeModel.model,
+      runtimeModel.id,
       execution.signal,
       input,
-      maxInputBytes,
-      maxOutputBytes,
+      runtimeModel.maxInputBytes,
+      runtimeModel.maxOutputBytes,
       invocationId,
       traceId,
       agentSpan.spanId,
@@ -153,10 +143,3 @@ export function createAgentRuntime(options: AgentRuntimeOptions): AgentRuntime {
 }
 
 export const runAgent = invokeAgent;
-
-function boundedLimit(value: number | undefined, providerLimit: number): number {
-  const limit = value ?? providerLimit;
-  if (!Number.isSafeInteger(limit) || limit <= 0 || limit > providerLimit)
-    throw new AgentRuntimeError("ZSYS_AGENT_LIMIT_INVALID", "Agent content limit is invalid");
-  return limit;
-}

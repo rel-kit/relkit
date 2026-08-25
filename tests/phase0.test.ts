@@ -97,6 +97,26 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
+  test("allows AI SDK runtime dependencies only in agents", async () => {
+    const fixture = await createFixture(
+      packageFiles([
+        {
+          path: "packages/agents",
+          name: "@zsys/agents",
+          source: 'import "ai"; import "@ai-sdk/openai";',
+          dependencies: { ai: "7.0.0", "@ai-sdk/openai": "4.0.0" },
+        },
+      ]),
+    );
+    try {
+      const result = await execute(process.execPath, ["run", boundaryScript, fixture]);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("Boundary check passed");
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
   const boundaryCases: Array<{
     name: string;
     files: Files;

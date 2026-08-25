@@ -13,6 +13,8 @@ export interface GraphEdge {
   readonly from: string;
   readonly to: string;
   readonly role?: string;
+  readonly member?: string;
+  readonly order?: number;
 }
 
 export interface GraphSnapshot {
@@ -79,6 +81,13 @@ export function edgeLabel(edge: GraphEdge): string {
   return edge.kind.replace(/[._-]+/g, " ");
 }
 
+export function graphKindColor(kind: string): string {
+  const colors = ["#dbeafe", "#dcfce7", "#fef3c7", "#f3e8ff", "#ffe4e6", "#e0f2fe"];
+  let hash = 0;
+  for (const character of kind) hash = (hash * 31 + character.charCodeAt(0)) | 0;
+  return colors[Math.abs(hash) % colors.length]!;
+}
+
 function readNodes(value: readonly unknown[]): readonly GraphNode[] {
   return value
     .flatMap((item) => {
@@ -100,6 +109,8 @@ function readEdges(value: unknown, relationship: GraphRelationship): readonly Gr
       const kind = text(edge?.kind) ?? text(edge?.relationship);
       if (from === undefined || to === undefined || kind === undefined) return [];
       const role = text(edge?.role);
+      const member = text(edge?.member);
+      const order = typeof edge?.order === "number" ? edge.order : undefined;
       return [
         {
           relationship,
@@ -107,6 +118,8 @@ function readEdges(value: unknown, relationship: GraphRelationship): readonly Gr
           from,
           to,
           ...(role === undefined ? {} : { role }),
+          ...(member === undefined ? {} : { member }),
+          ...(order === undefined ? {} : { order }),
         },
       ];
     })
@@ -122,9 +135,14 @@ function compareEdges(left: GraphEdge, right: GraphEdge): number {
     compareText(left.relationship, right.relationship) ||
     compareText(left.kind, right.kind) ||
     compareText(left.from, right.from) ||
+    compareNumber(left.order, right.order) ||
     compareText(left.to, right.to) ||
     compareText(left.role ?? "", right.role ?? "")
   );
+}
+
+function compareNumber(left: number | undefined, right: number | undefined): number {
+  return (left ?? Number.MAX_SAFE_INTEGER) - (right ?? Number.MAX_SAFE_INTEGER);
 }
 
 function compareText(left: string, right: string): number {

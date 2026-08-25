@@ -1,8 +1,8 @@
 import { isRecord, refId } from "./normalize-utils.js";
+import { middlewareForRoute } from "./middleware-coverage.js";
 import type { GraphEdge, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
-  functions: "calls-function",
   jobs: "enqueues-job",
   events: "publishes-event",
   buckets: "uses-bucket",
@@ -13,12 +13,22 @@ const dependencyEdges: Readonly<Record<string, string>> = {
 export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
-  const add = (kind: string, from: string, to: string, role?: string): void => {
+  const add = (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ): void => {
     if (!to) return;
-    const key = `${kind}\0${from}\0${to}\0${role ?? ""}`;
+    const key = `${kind}\0${from}\0${to}\0${JSON.stringify(metadata ?? null)}`;
     if (seen.has(key)) return;
     seen.add(key);
-    edges.push({ kind, from, to, ...(role === undefined ? {} : { role }) });
+    edges.push({
+      kind,
+      from,
+      to,
+      ...(typeof metadata === "string" ? { role: metadata } : (metadata ?? {})),
+    });
   };
 
   for (const descriptor of work.descriptors) {
@@ -27,59 +37,90 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     if (target && isTargetingDescriptor(descriptor.kind))
       add("targets-function", descriptor.id, target, "primary");
     if (descriptor.kind === "route") {
-      addMiddlewareEdges(add, value.middleware, work, descriptor.id);
+      for (const middleware of middlewareForRoute(descriptor, work)) {
+        add("uses-middleware", descriptor.id, middleware.id, {
+          order: middleware.order,
+          match: middleware.match,
+        });
+      }
       const store = isRecord(value.rateLimit) ? refId(value.rateLimit.store) : undefined;
       if (store !== undefined) add("uses-cache", descriptor.id, store);
     }
     if (descriptor.kind === "event-trigger") addEventEdges(add, descriptor, work);
     if (descriptor.kind === "tool" && target) add("exposes-as-tool", target, descriptor.id);
     if (descriptor.kind === "agent") addToolEdges(add, descriptor.id, value.tools);
+    if (descriptor.kind === "service") addServiceEdges(add, descriptor.id, value);
     if (descriptor.kind === "function") addDependencyEdges(add, descriptor, value.dependencies);
+    if (descriptor.kind === "function" || descriptor.kind === "tool") {
+      addHookEdges(add, descriptor, value);
+    }
     addProviderEdge(add, descriptor, value, work);
   }
   return edges;
 }
 
 function addProviderEdge(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
   work: NormalizationWork,
 ): void {
-  const profile =
-    descriptor.kind === "agent"
-      ? value.modelProfile
-      : ["bucket", "cache", "job", "event-trigger"].includes(descriptor.kind)
-        ? (value.profile ?? "default")
-        : undefined;
-  if (typeof profile !== "string") return;
-  if (work.nodes.some((node) => node.kind === "provider" && node.id === profile)) {
-    add("uses-provider-profile", descriptor.id, profile);
+  const capability = providerCapability(descriptor.kind);
+  if (capability === undefined) return;
+  const profile = typeof value.profile === "string" ? value.profile : "default";
+  const bindingId = `provider.${capability}.${profile}`;
+  if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
+    add("uses-provider-profile", descriptor.id, bindingId);
   }
+}
+
+function providerCapability(kind: string): string | undefined {
+  return (
+    {
+      bucket: "buckets",
+      cache: "cache",
+      job: "jobs",
+      event: "events",
+      "event-trigger": "events",
+      agent: "models",
+    } as Record<string, string>
+  )[kind];
 }
 
 function isTargetingDescriptor(kind: string): boolean {
   return kind === "route" || kind === "event-trigger" || kind === "job" || kind === "tool";
 }
 
-function addMiddlewareEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
-  value: unknown,
-  work: NormalizationWork,
-  routeId: string,
+function addHookEdges(
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
+  descriptor: NormalizedDescriptor,
+  value: Record<string, unknown>,
 ): void {
-  if (!Array.isArray(value)) return;
-  for (const entry of value) {
-    const middlewareId = refId(entry);
-    const middleware =
-      middlewareId === undefined ? undefined : work.middlewareReferences.get(middlewareId);
-    const target = isRecord(middleware?.value) ? refId(middleware.value.target) : undefined;
-    if (target) add("targets-function", routeId, target, "middleware");
+  for (const phase of ["before", "after"] as const) {
+    const hook = value[phase === "before" ? "onBefore" : "onAfter"];
+    if (typeof hook === "function" || (isRecord(hook) && hook.$zsys === "function")) {
+      add("uses-hook", descriptor.id, `${descriptor.id}.${phase}`, { phase });
+    }
   }
 }
 
 function addEventEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
 ): void {
@@ -91,7 +132,12 @@ function addEventEdges(
 }
 
 function addDependencyEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   descriptor: NormalizedDescriptor,
   dependencies: unknown,
 ): void {
@@ -107,7 +153,12 @@ function addDependencyEdges(
 }
 
 function addToolEdges(
-  add: (kind: string, from: string, to: string, role?: string) => void,
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
   agentId: string,
   tools: unknown,
 ): void {
@@ -115,5 +166,31 @@ function addToolEdges(
   for (const tool of tools) {
     const toolId = refId(tool);
     if (toolId) add("uses-tool", agentId, toolId);
+  }
+}
+
+function addServiceEdges(
+  add: (
+    kind: string,
+    from: string,
+    to: string,
+    metadata?: string | Record<string, unknown>,
+  ) => void,
+  serviceId: string,
+  value: Record<string, unknown>,
+): void {
+  if (isRecord(value.functions)) {
+    for (const [order, [member, target]] of Object.entries(value.functions).entries()) {
+      const functionId = refId(target);
+      if (functionId !== undefined)
+        add("contains-function", serviceId, functionId, { member, order });
+    }
+  }
+  if (Array.isArray(value.middleware)) {
+    for (const [order, entry] of value.middleware.entries()) {
+      const middlewareId = refId(entry);
+      if (middlewareId !== undefined)
+        add("uses-service-middleware", serviceId, middlewareId, { order });
+    }
   }
 }

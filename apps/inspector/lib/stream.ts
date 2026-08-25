@@ -77,7 +77,7 @@ export class InspectorStreamClient {
 
   private async run(): Promise<void> {
     let attempt = 0;
-    let expiredCursorRetried = false;
+    let invalidCursorRetried = false;
     this.setState({ state: "connecting" });
     while (this.running) {
       try {
@@ -95,7 +95,7 @@ export class InspectorStreamClient {
         });
         if (!this.running) return;
         attempt = 0;
-        expiredCursorRetried = false;
+        invalidCursorRetried = false;
         throw new InspectorApiError(
           "Inspector stream disconnected",
           "ZSYS_INSPECTOR_DISCONNECTED",
@@ -116,8 +116,8 @@ export class InspectorStreamClient {
         if (failure.isProtocolMismatch) {
           return this.setState({ state: "offline", error: failure });
         }
-        if (failure.isCursorExpired && !expiredCursorRetried) {
-          expiredCursorRetried = true;
+        if (failure.isCursorResetRequired && !invalidCursorRetried) {
+          invalidCursorRetried = true;
           this.setState({ state: "reconnecting", reconnectAttempt: 0, error: failure });
           this.clearCursor();
           this.invalidate();

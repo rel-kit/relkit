@@ -1,13 +1,14 @@
-import type { JsonValue } from "@zsys/contracts";
+import { deepFreeze, type JsonValue } from "@zsys/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 
 const GRAPH_FIELDS = `
-environment providerProfiles observability defaults name type requiredIn hasDefault sensitive
+environment providerBindings observability defaults name type requiredIn hasDefault sensitive
 description input output errors dependencies timeoutMs concurrency generated triggerType
 targetFunctionId config method path request responses middleware transforms selector expansion
 delivery profile retry schedule idempotency version payload sensitiveFields visibility maxObjectBytes
-allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval modelProfile toolIds limits
-generatedFunction capabilities configuration
+allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model toolIds limits
+generatedFunction capabilities capability adapter ownership configuration
+title tags members order ownerId ownerKind phase
 `
   .trim()
   .split(/\s+/);
@@ -23,7 +24,16 @@ export function projectNode(value: unknown): JsonValue | undefined {
     const field = safeJson({ value: value[key] });
     if (isRecord(field) && field.value !== undefined) result[key] = field.value;
   }
-  return safeJson(result);
+  const projected = safeJson(result);
+  if (!isRecord(projected) || !isRecord(value.config)) return projected;
+  const request = safeConfigRequest(value.config.request);
+  if (request === undefined || !isRecord(projected.config)) return projected;
+  return deepFreeze({ ...projected, config: { ...projected.config, request } }) as JsonValue;
+}
+
+function safeConfigRequest(value: unknown): JsonValue | undefined {
+  const field = safeJson({ value });
+  return isRecord(field) && field.value !== undefined ? field.value : undefined;
 }
 
 export function projectDescriptors(value: unknown): JsonValue[] {

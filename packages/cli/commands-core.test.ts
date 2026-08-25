@@ -1,9 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { GRAPH_VERSION } from "@zsys/contracts";
 import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
 import { startProject } from "./src/commands/start.js";
+import { readBuilt } from "./src/commands/start-built.js";
 
 const roots: string[] = [];
 
@@ -126,6 +128,12 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   const rebuilt = await buildProject({ projectRoot: validRoot });
   expect(rebuilt.ok).toBe(true);
   expect(await readArtifacts()).toEqual(firstArtifacts);
+  const graphPath = join(rebuilt.buildDirectory, "application.graph.json");
+  const staleGraph = JSON.parse(await readFile(graphPath, "utf8")) as Record<string, unknown>;
+  await writeFile(graphPath, JSON.stringify({ ...staleGraph, contractVersion: GRAPH_VERSION - 1 }));
+  await expect(readBuilt(rebuilt.buildDirectory)).rejects.toThrow(
+    "Built graph or manifest version is unsupported.",
+  );
 
   const invalidRoot = await copyProject("tests/compiler/fixtures/error-route-collision");
   const failed = await buildProject({ projectRoot: invalidRoot });
@@ -283,13 +291,16 @@ async function linkWorkspacePackages(root: string): Promise<void> {
     "functions",
     "graph",
     "inspector-api",
+    "invocation",
     "jobs",
     "observability",
     "providers-local",
+    "providers-standard",
     "routes",
     "runtime-effect",
     "runtime-hono",
     "schema",
+    "services",
     "supervisor",
     "testing",
     "tools",

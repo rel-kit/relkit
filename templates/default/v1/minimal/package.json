@@ -19,6 +19,7 @@
   "dependencies": {
     "@zsys/app": "0.0.0",
     "@zsys/config": "0.0.0",
+    "@zsys/providers-standard": "0.0.0",
     "@zsys/schema": "0.0.0"
   },
   "devDependencies": {

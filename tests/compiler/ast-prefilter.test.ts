@@ -45,6 +45,14 @@ describe("AST discovery prefilter", () => {
       imports: ["@zsys/functions"],
       factories: ["defineFunction"],
       defaultExports: ["default"],
+      facts: {
+        factoryBindings: [
+          expect.objectContaining({
+            factory: "defineFunction",
+            id: "explicit",
+          }),
+        ],
+      },
       brandAccess: false,
       indicators: ["zsys-import", "factory", "default-export"],
     });

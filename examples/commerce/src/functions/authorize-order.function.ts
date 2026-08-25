@@ -2,7 +2,6 @@ import { defineFunction } from "@zsys/app";
 import { authorizationInput, authorizationOutput } from "../shared/schemas.js";
 
 const authorizeOrder = defineFunction({
-  id: "orders.authorize",
   input: authorizationInput,
   output: authorizationOutput,
   handler: async (input) => ({ allowed: input.authorization.startsWith("Bearer ") }),

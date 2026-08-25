@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { InvocationValidationError } from "@zsys/engine";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
 import {
@@ -48,6 +49,7 @@ function plan(route: HttpTriggerRegistration): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
@@ -105,7 +107,24 @@ describe("HTTP response mapping", () => {
       data: { orderId: "order-1" },
       retry: "never",
     });
+    expect(response.headers.get("Retry-After")).toBeNull();
     expect(JSON.stringify(body)).not.toContain("database-password");
+  });
+
+  test("keeps legacy retryable errors without a delay hint headerless", async () => {
+    const response = await mapFailureResponse(
+      trigger([{ kind: "error", id: "busy.response", errorId: "orders.busy", status: 503 }]),
+      applicationFailure({
+        id: "orders.busy",
+        message: "Order service is busy",
+        data: {},
+        retry: "later",
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    expect(response.headers.get("Retry-After")).toBeNull();
+    expect(await response.json()).toMatchObject({ retry: "later" });
   });
 
   test("maps input validation to a safe declared validation response", async () => {
@@ -140,8 +159,8 @@ describe("HTTP response mapping", () => {
     const app = createApp({
       plan: plan(route),
       manifest: {
-        contractVersion: 1,
-        generatorVersion: 1,
+        contractVersion: MANIFEST_VERSION,
+        generatorVersion: GENERATOR_VERSION,
         graphHash: "sha256:test",
         functions: {},
         middleware: {},
@@ -153,6 +172,42 @@ describe("HTTP response mapping", () => {
     const response = await app.request("http://localhost/orders");
     expect(response.status).toBe(504);
     expect(await response.json()).toEqual({ error: "timeout" });
+  });
+
+  test("rounds retry delay up without invoking the route twice", async () => {
+    let invocations = 0;
+    const route = trigger([
+      { kind: "error", id: "busy.response", errorId: "orders.busy", status: 503 },
+    ]);
+    const app = createApp({
+      plan: plan(route),
+      manifest: {
+        contractVersion: MANIFEST_VERSION,
+        generatorVersion: GENERATOR_VERSION,
+        graphHash: "sha256:test",
+        functions: {},
+        middleware: {},
+        requestTransforms: {},
+      },
+      engine: {
+        invoke: async () => {
+          invocations += 1;
+          throw applicationFailure({
+            id: "orders.busy",
+            message: "Order service is busy",
+            data: {},
+            retry: { kind: "later", afterMs: 1_500 },
+          });
+        },
+      },
+    });
+
+    const response = await app.request("http://localhost/orders");
+
+    expect(invocations).toBe(1);
+    expect(response.status).toBe(503);
+    expect(response.headers.get("Retry-After")).toBe("2");
+    expect(await response.json()).toMatchObject({ retry: "later", afterMs: 1_500 });
   });
 
   test("treats output validation failures as defects", async () => {

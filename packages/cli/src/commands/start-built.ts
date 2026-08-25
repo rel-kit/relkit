@@ -30,7 +30,7 @@ export async function readBuilt(
     await readFile(join(buildDirectory, "manifest.json"), "utf8"),
   ) as BuiltManifest;
   if (
-    graph.contractVersion !== CONTRACT_VERSION ||
+    graph.contractVersion !== GRAPH_VERSION ||
     manifest.contractVersion !== CONTRACT_VERSION ||
     manifest.graphVersion !== GRAPH_VERSION ||
     manifest.manifestVersion !== MANIFEST_VERSION ||

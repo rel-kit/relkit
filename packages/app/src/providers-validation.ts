@@ -1,162 +1,153 @@
+import { isEnvRef } from "@zsys/config";
 import { deepFreeze, normalizeId } from "@zsys/contracts";
+import { assertModelProviders } from "./model-providers.js";
 import type {
+  ProviderAdapter,
+  ProviderBinding,
   ProviderCapability,
   ProviderConfig,
-  ProviderRecipe,
-  ProviderSetMetadata,
+  ProviderEnvironmentReference,
+  ProviderOwnership,
+  ProviderTopology,
   ProviderValue,
 } from "./providers.js";
+import { PROVIDER_CAPABILITIES } from "./providers.js";
 import {
-  isCapabilityList,
   isPlainRecord,
   isProviderValue,
-  isSensitiveKey,
-  isStableProfile,
-  isStringEnvRef,
-  isValueFreeEnvRef,
   normalizeValue,
-  sameCapabilities,
   walk,
 } from "./providers-validation-utils.js";
 
-export const PROVIDER_CAPABILITIES: readonly ProviderCapability[] = Object.freeze([
-  "buckets",
-  "cache",
-  "jobs",
-  "events",
-  "models",
-  "observability",
-]);
-
-const localKeys = new Set([
-  "stateDirectory",
-  "observabilityDirectory",
-  "buckets",
-  "cache",
-  "jobs",
-  "events",
-  "models",
-]);
-
-export function normalizeProviderOptions(recipe: ProviderRecipe, value: unknown): ProviderConfig {
-  if (!isPlainRecord(value)) throw new TypeError("Provider options must be a plain object");
-  const allowed = allowedKeys(recipe);
-  const result: Record<string, ProviderValue> = {};
-  if (Object.getOwnPropertySymbols(value).length > 0) {
-    throw new TypeError("Provider options cannot contain symbol keys");
-  }
-  for (const key of Object.getOwnPropertyNames(value)) {
-    if (!allowed.has(key)) throw new TypeError(`Unknown ${recipe} provider option "${key}"`);
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    if (!descriptor || !("value" in descriptor)) {
-      throw new TypeError(`Provider option "${key}" must be a data property`);
-    }
-    result[key] = normalizeValue(descriptor.value, `provider.${key}`, key);
-  }
-  validateRecipeOptions(recipe, result);
-  return deepFreeze(result);
+export function createAdapter<C extends ProviderCapability, N extends string>(
+  capability: C,
+  adapter: N,
+  options: object,
+  secretPaths: readonly string[],
+  rejectSensitiveLiterals = false,
+): ProviderAdapter<C, N> {
+  if (!isPlainRecord(options)) throw new TypeError(`${adapter} options must be an object`);
+  if (capability === "models") assertModelProviders(options);
+  assertSecretPaths(options, secretPaths, adapter);
+  const configuration = normalizeValue(options, `providers.${capability}.${adapter}`);
+  if (!isPlainRecord(configuration)) throw new TypeError(`${adapter} options must be an object`);
+  if (rejectSensitiveLiterals) assertNoSensitiveLiterals(configuration, adapter);
+  return deepFreeze({
+    kind: "provider-adapter" as const,
+    capability,
+    adapter,
+    configuration: configuration as ProviderConfig,
+    environment: providerEnvironment(configuration),
+  });
 }
 
-export function providerProfiles(
-  value: Record<string, unknown>,
-): Readonly<Record<string, readonly ProviderCapability[]>> {
-  const profiles = new Map<string, Set<ProviderCapability>>();
-  for (const capability of PROVIDER_CAPABILITIES) {
-    const configured = value[capability];
-    if (!isPlainRecord(configured)) continue;
-    for (const name of Object.keys(configured)) {
-      const id = normalizeId(name);
-      const capabilities = profiles.get(id) ?? new Set<ProviderCapability>();
-      capabilities.add(capability);
-      profiles.set(id, capabilities);
+export function createBinding<C extends ProviderCapability, N extends string>(
+  ownership: ProviderOwnership,
+  adapter: ProviderAdapter<C, N>,
+): ProviderBinding<C, N> {
+  if (!isProviderAdapter(adapter)) throw new TypeError("Invalid provider adapter");
+  return deepFreeze({ kind: "provider-binding" as const, ownership, adapter });
+}
+
+export function copyProviderTopology(value: unknown): ProviderTopology {
+  if (!isPlainRecord(value)) throw new TypeError("App providers must be an object");
+  const result: Record<string, Record<string, ProviderBinding>> = {};
+  for (const [capability, profiles] of Object.entries(value)) {
+    if (!PROVIDER_CAPABILITIES.includes(capability as ProviderCapability)) {
+      throw new TypeError(`Unknown provider capability "${capability}"`);
     }
+    if (!isPlainRecord(profiles)) {
+      throw new TypeError(`Provider capability "${capability}" must contain profiles`);
+    }
+    const bindings: Record<string, ProviderBinding> = {};
+    for (const [profile, binding] of Object.entries(profiles)) {
+      normalizeId(profile);
+      if (!isProviderBinding(binding) || binding.adapter.capability !== capability) {
+        throw new TypeError(`Invalid ${capability} provider binding "${profile}"`);
+      }
+      bindings[profile] = binding;
+    }
+    result[capability] = bindings;
   }
-  return deepFreeze(
-    Object.fromEntries(
-      [...profiles.entries()]
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([name, capabilities]) => [name, [...capabilities].sort()]),
-    ),
+  return deepFreeze(result) as ProviderTopology;
+}
+
+export function isProviderTopology(value: unknown): value is ProviderTopology {
+  try {
+    copyProviderTopology(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isProviderBinding(value: unknown): value is ProviderBinding {
+  return (
+    isPlainRecord(value) &&
+    value.kind === "provider-binding" &&
+    (value.ownership === "external" || value.ownership === "managed") &&
+    isProviderAdapter(value.adapter)
   );
 }
 
-export function providerEnvironment(value: ProviderValue): readonly {
-  name: string;
-  type: string;
-  sensitive: boolean;
-}[] {
-  const refs = new Map<string, { name: string; type: string; sensitive: boolean }>();
-  walk(value, (reference) =>
+export function providerEnvironment(value: ProviderValue): readonly ProviderEnvironmentReference[] {
+  const refs = new Map<string, ProviderEnvironmentReference>();
+  walk(value, (reference) => {
     refs.set(reference.name, {
       name: reference.name,
       type: reference.type,
       sensitive: reference.sensitive,
-    }),
-  );
-  return Object.freeze(
-    [...refs.values()].sort((left, right) => left.name.localeCompare(right.name)),
-  );
+    });
+  });
+  return Object.freeze([...refs.values()].sort((a, b) => a.name.localeCompare(b.name)));
 }
 
-export function isProviderMetadata(
-  value: unknown,
-  capabilities: readonly ProviderCapability[] = PROVIDER_CAPABILITIES,
-): value is ProviderSetMetadata {
-  if (!isPlainRecord(value) || value.kind !== "provider-metadata") return false;
-  if (!hasExactKeys(value, ["capabilities", "configuration", "environment", "kind", "profiles"])) {
-    return false;
-  }
-  if (!sameCapabilities(value.capabilities, capabilities)) return false;
-  if (!isPlainRecord(value.configuration) || !isProviderValue(value.configuration)) return false;
-  for (const [name, profileCapabilities] of Object.entries(value.profiles)) {
-    if (!isStableProfile(name) || !isCapabilityList(profileCapabilities, capabilities))
-      return false;
-  }
-  if (!Array.isArray(value.environment)) return false;
-  const names = new Set<string>();
-  return value.environment.every(
-    (entry) =>
-      isPlainRecord(entry) &&
-      hasExactKeys(entry, ["name", "sensitive", "type"]) &&
-      typeof entry.name === "string" &&
-      entry.name.length > 0 &&
-      typeof entry.type === "string" &&
-      typeof entry.sensitive === "boolean" &&
-      !names.has(entry.name) &&
-      names.add(entry.name) === names,
-  );
-}
-
-function hasExactKeys(value: object, expected: readonly string[]): boolean {
-  if (Object.getOwnPropertySymbols(value).length > 0) return false;
-  const keys = Object.getOwnPropertyNames(value).sort();
-  const sortedExpected = [...expected].sort();
+function isProviderAdapter(value: unknown): value is ProviderAdapter {
   return (
-    keys.length === expected.length && keys.every((key, index) => key === sortedExpected[index])
+    isPlainRecord(value) &&
+    value.kind === "provider-adapter" &&
+    PROVIDER_CAPABILITIES.includes(value.capability as ProviderCapability) &&
+    typeof value.adapter === "string" &&
+    value.adapter.length > 0 &&
+    isPlainRecord(value.configuration) &&
+    isProviderValue(value.configuration) &&
+    Array.isArray(value.environment)
   );
 }
 
-function allowedKeys(recipe: ProviderRecipe): Set<string> {
-  if (recipe === "local") return localKeys;
-  if (recipe === "test") return new Set([...localKeys, "deterministicIds", "deterministicClock"]);
-  return new Set(["region", "buckets", "cache", "jobs", "events", "models"]);
+function assertSecretPaths(value: object, paths: readonly string[], adapter: string): void {
+  for (const path of paths) {
+    const candidate = readPath(value, path);
+    if (candidate !== undefined && (!isEnvRef(candidate) || !candidate.sensitive)) {
+      throw new TypeError(`${adapter}.${path} must be a secret environment reference`);
+    }
+  }
 }
 
-function validateRecipeOptions(recipe: ProviderRecipe, value: ProviderConfig): void {
-  if (recipe === "aws") {
-    const region = value.region;
-    if (!(typeof region === "string" && region.trim() !== "") && !isStringEnvRef(region)) {
-      throw new TypeError("AWS providers require a non-empty string region or string EnvRef");
+function assertNoSensitiveLiterals(value: ProviderValue, path: string): void {
+  if (!isPlainRecord(value)) return;
+  for (const [key, item] of Object.entries(value)) {
+    const current = `${path}.${key}`;
+    if (/(?:api[-_]?key|password|secret|token|credential|headers?)/i.test(key)) {
+      if (isEnvRef(item)) {
+        if (!item.sensitive)
+          throw new TypeError(`${current} must use a secret environment reference`);
+      } else if (isPlainRecord(item)) {
+        assertNoSensitiveLiterals(item, current);
+      } else {
+        throw new TypeError(`${current} must use a secret environment reference`);
+      }
+    } else if (isPlainRecord(item)) {
+      assertNoSensitiveLiterals(item, current);
     }
   }
-  for (const key of ["stateDirectory", "observabilityDirectory"] as const) {
-    if (key in value && (typeof value[key] !== "string" || value[key].trim() === "")) {
-      throw new TypeError(`Provider option "${key}" must be a non-empty string`);
-    }
+}
+
+function readPath(value: object, path: string): unknown {
+  let current: unknown = value;
+  for (const part of path.split(".")) {
+    if (!isPlainRecord(current)) return undefined;
+    current = current[part];
   }
-  for (const key of ["deterministicIds", "deterministicClock"] as const) {
-    if (key in value && typeof value[key] !== "boolean") {
-      throw new TypeError(`Provider option "${key}" must be boolean`);
-    }
-  }
+  return current;
 }

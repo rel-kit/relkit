@@ -1,7 +1,7 @@
 import type { AgentApprovalHandler, AgentObservedEdge, PendingApproval } from "@zsys/agents";
 import { invokeAgent } from "@zsys/agents";
-import { createFakeModelProvider } from "@zsys/providers-local";
 import { createFailures } from "./jobs-utils.js";
+import { createTestModel } from "./agents-model.js";
 import type {
   TestAgent,
   TestAgentApproval,
@@ -19,10 +19,14 @@ export type {
   TestAgentApprovals,
   TestAgentDescriptor,
   TestAgentInvocationOptions,
+  TestAgentModel,
+  TestAgentModelCall,
+  TestAgentModelOptions,
   TestAgentOptions,
   TestAgentTrace,
   TestAgentTraceExpectation,
   TestAgentTraceSnapshot,
+  TestModelTurn,
 } from "./agents-types.js";
 export { assertAgentTrace } from "./agents-utils.js";
 
@@ -31,9 +35,8 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
   options: TestAgentOptions<Agent>,
 ): TestAgent<Agent> {
   const failures = options.failures ?? createFailures();
-  const model = createFakeModelProvider({
+  const model = createTestModel({
     ...(options.model ?? {}),
-    profile: options.model?.profile ?? options.agent.modelProfile,
     ...(options.script === undefined ? {} : { script: options.script }),
   });
   const spans: import("@zsys/agents").AgentSpanRecord[] = [];
@@ -61,7 +64,11 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
       agent: options.agent,
       tools: options.tools,
       engine,
-      provider: model,
+      modelRegistry: {
+        resolveModel: () => ({ id: model.modelId, model: model.languageModel }),
+      },
+      ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
+      ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
       ...(approval === undefined ? {} : { approval }),
       ...(options.capture === undefined ? {} : { capture: options.capture }),
       ...invocation,
@@ -78,7 +85,6 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
   });
   return Object.freeze({
     model,
-    provider: model,
     failures,
     approvals,
     pending: approvals.pending,

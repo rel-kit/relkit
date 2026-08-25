@@ -5,9 +5,9 @@ import { loadConfig } from "@zsys/compiler";
 import type { DevInspectorOptions } from "./dev-process.js";
 import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
 
-/** Returns the workspace Next inspector command used by the default dev flow. */
+/** Returns the source inspector for a checkout, or the packaged inspector for installs. */
 export function defaultInspectorOptions(inspectorPort?: number): DevInspectorOptions {
-  const installation = inspectorInstallation();
+  const installation = resolveInspectorInstallation();
   return {
     command: installation.command,
     cwd: installation.root,
@@ -52,17 +52,20 @@ export async function developmentPorts(
 }
 
 export function inspectorRoot(): string {
-  return inspectorInstallation().root;
+  return resolveInspectorInstallation().root;
 }
 
-function inspectorInstallation(): { readonly root: string; readonly command: readonly string[] } {
-  const configured = process.env.ZSYS_INSPECTOR_ROOT;
+export function resolveInspectorInstallation(
+  baseDirectory: string = import.meta.dir,
+  source: Readonly<Record<string, string | undefined>> = process.env,
+): { readonly root: string; readonly command: readonly string[] } {
+  const configured = source.ZSYS_INSPECTOR_ROOT;
   if (configured !== undefined) return sourceInstallation(configured);
-  const packaged = resolve(import.meta.dir, "../inspector");
+  const workspace = resolve(baseDirectory, "../../../../apps/inspector");
+  if (existsSync(join(workspace, "package.json"))) return sourceInstallation(workspace);
+  const packaged = resolve(baseDirectory, "../inspector");
   if (existsSync(join(packaged, "server.js")))
     return { root: packaged, command: ["node", "server.js"] };
-  const workspace = resolve(import.meta.dir, "../../../../apps/inspector");
-  if (existsSync(join(workspace, "package.json"))) return sourceInstallation(workspace);
   throw new Error("The packaged ZSYS inspector is missing. Reinstall @zsys/cli.");
 }
 

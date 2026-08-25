@@ -16,14 +16,20 @@ export type InspectorObject = { readonly [key: string]: unknown };
 export type InspectorCollection =
   | "descriptors"
   | "routes"
+  | "middlewares"
   | "functions"
   | "jobs"
   | "events"
   | "buckets"
   | "cache"
   | "tools"
-  | "agents";
-export type RuntimeCollection = Exclude<InspectorCollection, "descriptors" | "routes">;
+  | "agents"
+  | "services"
+  | "providers";
+export type RuntimeCollection = Exclude<
+  InspectorCollection,
+  "descriptors" | "routes" | "middlewares" | "services" | "providers"
+>;
 export type SignalCollection = "requests" | "logs" | "traces";
 
 export interface InspectorIdentity {
@@ -109,6 +115,7 @@ export interface InspectorQuery {
   readonly outcome?: string;
   readonly requestId?: string;
   readonly traceId?: string;
+  readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
   readonly eventId?: string;
@@ -138,5 +145,8 @@ export class InspectorApiError extends Error {
   }
   get isCursorExpired(): boolean {
     return this.code === "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED";
+  }
+  get isCursorResetRequired(): boolean {
+    return this.isCursorExpired || this.code === "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE";
   }
 }

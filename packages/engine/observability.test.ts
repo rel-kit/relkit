@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { dispatchInvocation } from "@zsys/invocation";
+import { defineFunction, defineService } from "@zsys/app";
 import { z } from "@zsys/schema";
 import { createObservabilityCollector } from "@zsys/observability";
 import {
@@ -9,6 +11,28 @@ import {
 } from "./src/index.ts";
 
 describe("versioned invocation observability hooks", () => {
+  test("attaches service and member identity to invocation and spans", async () => {
+    const target = defineFunction({
+      id: "orders.get",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      handler: () => ({ ok: true }),
+    });
+    const service = defineService({ id: "orders", functions: { get: target } });
+    const collector = createObservabilityCollector();
+
+    await invokeFunction(service.get, {}, { hooks: { observability: collector } });
+
+    expect(collector.read().filter(({ signal }) => signal === "invocation")).toMatchObject([
+      { functionId: "orders.get", serviceId: "orders" },
+      { functionId: "orders.get", serviceId: "orders" },
+    ]);
+    expect(collector.read().filter(({ signal }) => signal === "span")).toMatchObject([
+      { functionId: "orders.get", serviceId: "orders" },
+      { functionId: "orders.get", serviceId: "orders" },
+    ]);
+  });
+
   test("exposes lifecycle events and collector records", async () => {
     const hooks = createInspectableObservabilityHooks();
     await invokeFunction(
@@ -68,7 +92,7 @@ describe("versioned invocation observability hooks", () => {
     ]);
   });
 
-  test("emits declared and observed dependency edges", async () => {
+  test("emits observed descriptor edges without declared function edges", async () => {
     const hooks = createInspectableObservabilityHooks();
     const child = {
       id: "orders.child",
@@ -81,27 +105,52 @@ describe("versioned invocation observability hooks", () => {
         id: "orders.parent",
         input: z.number(),
         output: z.number(),
-        dependencies: {
-          functions: {
-            child: {
-              ref: { kind: "function", id: child.id },
-              input: child.input,
-              output: child.output,
-            },
-          },
-        },
-        handler: async (_input, _request, context) => {
-          const functions = context as typeof context & {
-            readonly functions: Readonly<Record<string, (input: unknown) => Promise<unknown>>>;
-          };
-          return (await functions.functions.child(1)) as number;
+        handler: async () => {
+          return (await dispatchInvocation({ target: child, input: 1 })) as number;
         },
       },
       0,
-      { clients: { functions: { child } }, hooks: { observability: hooks } },
+      { hooks: { observability: hooks } },
     );
 
-    expect(hooks.read().map((event) => event.type)).toContain("edge.declared");
+    expect(hooks.read().map((event) => event.type)).not.toContain("edge.declared");
     expect(hooks.read().map((event) => event.type)).toContain("edge.observed");
+  });
+
+  test("observes calls between sibling service members with correlated records", async () => {
+    const hooks = createInspectableObservabilityHooks();
+    const child = defineFunction({
+      id: "orders.product",
+      input: z.object({}),
+      output: z.object({ sku: z.string() }),
+      handler: () => ({ sku: "sku-1" }),
+    });
+    const parent = defineFunction({
+      id: "orders.get",
+      input: z.object({}),
+      output: z.object({ sku: z.string() }),
+      handler: () => service.product.invoke({}),
+    });
+    const service = defineService({ id: "orders", functions: { get: parent, product: child } });
+
+    await expect(
+      invokeFunction(service.get, {}, { hooks: { observability: hooks } }),
+    ).resolves.toEqual({ sku: "sku-1" });
+
+    const starts = hooks.read().filter((event) => event.type === "invocation.started");
+    const parentStart = starts.find((event) => event.record.functionId === "orders.get")?.record;
+    const childStart = starts.find((event) => event.record.functionId === "orders.product")?.record;
+    expect(parentStart).toMatchObject({ serviceId: "orders" });
+    expect(childStart).toMatchObject({
+      serviceId: "orders",
+      parentId: parentStart?.id,
+      traceId: parentStart?.traceId,
+    });
+    expect(hooks.read()).toContainEqual(
+      expect.objectContaining({
+        type: "edge.observed",
+        edge: { relationship: "calls-function", from: "orders.get", to: "orders.product" },
+      }),
+    );
   });
 });

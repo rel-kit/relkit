@@ -1,5 +1,6 @@
 import type { InspectorObject } from "../../lib/api-types";
 import { SourceLink } from "../source-link";
+import { SchemaPanel } from "../schema-panel";
 
 export function FunctionContract({
   node,
@@ -116,21 +117,7 @@ function EdgePanel({
 }
 
 function JsonPanel({ title, value }: { readonly title: string; readonly value: unknown }) {
-  return (
-    <section className="panel json-panel" aria-labelledby={`${title}-heading`}>
-      <p className="eyebrow">CONTRACT DATA</p>
-      <h2 id={`${title}-heading`}>{title}</h2>
-      <pre>{format(value)}</pre>
-    </section>
-  );
-}
-function format(value: unknown): string {
-  if (value === undefined) return "Not declared";
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return "Unavailable";
-  }
+  return <SchemaPanel title={title} value={value} eyebrow="CONTRACT DATA" />;
 }
 function limit(value: unknown, fallback: string): string {
   return typeof value === "number" ? value.toLocaleString("en-US") : fallback;

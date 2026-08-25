@@ -1,13 +1,7 @@
-import { awsProviders, defineApp, defineEnv, env, localProviders, testProviders } from "@zsys/app";
+import { defineApp, defineEnv, env } from "@zsys/app";
 
-const application = defineApp({
+export default defineApp({
   id: "provider-profile-app",
   env: defineEnv({ SERVICE_PORT: env.port().default(3000) }),
-  providers: {
-    development: localProviders(),
-    test: testProviders({ deterministicIds: true, deterministicClock: true }),
-    production: awsProviders({ region: "us-east-1" }),
-  },
+  providers: {},
 });
-
-export default application;

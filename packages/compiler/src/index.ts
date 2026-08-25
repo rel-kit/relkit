@@ -4,6 +4,7 @@ export * from "./discovery/ast-prefilter.js";
 export * from "./discovery/evaluator.js";
 export * from "./discovery/extract.js";
 export * from "./discovery/source-map.js";
+export * from "./discovery/source-id.js";
 export * from "./generate-manifest.js";
 export * from "./event-registry.js";
 export * from "./generated-artifacts.js";

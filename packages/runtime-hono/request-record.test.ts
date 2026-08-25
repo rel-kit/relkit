@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import { createObservabilityCollector, type RequestRecord } from "@zsys/observability";
 import type { RegistrationPlan } from "@zsys/graph";
 import { createApp, type RuntimeManifest } from "./src/index.js";
@@ -31,6 +32,7 @@ test("records a correlated HTTP timeline without request values", async () => {
     graphHash: "sha256:request-record",
     routeId: "hello.route",
     functionId: "hello",
+    serviceId: "orders",
     status: 200,
     outcome: "success",
   });
@@ -80,6 +82,7 @@ function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
         source,
         triggerType: "http",
         targetFunctionId: "hello",
+        serviceId: "orders",
         config: {
           method: "GET",
           path: "/hello",
@@ -97,13 +100,14 @@ function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
   };
 }
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: 1,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:request-record",
     functions: {},
     middleware: {},

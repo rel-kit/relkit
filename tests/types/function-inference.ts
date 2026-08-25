@@ -1,5 +1,4 @@
 import type {
-  FunctionClientFor,
   FunctionContext,
   FunctionDependencies,
   FunctionHandlerValidation,
@@ -47,6 +46,12 @@ const lookup = defineFunction({
       : { orderId: input.orderId, totalCents: 100 },
 });
 
+const detachedLookup: (
+  input: InferInput<typeof transformedInput>,
+) => Promise<InferOutput<typeof lookup.output>> = lookup.invoke;
+const detachedLookupResult = detachedLookup({ rawId: "order-1" });
+void detachedLookupResult;
+
 const jobInput = z.object({ rawId: z.string() });
 const sendReceipt = defineJob({
   id: "types.inference-job",
@@ -67,7 +72,6 @@ const prices = defineCache({
 });
 
 const dependencies = {
-  functions: { lookup },
   jobs: { sendReceipt },
   events: { orderCreated },
   buckets: { receiptBucket },
@@ -79,8 +83,8 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
-  handler: async (input, _request, context) => {
-    const lookupResult: InferOutput<typeof lookup.output> = await context.functions.lookup({
+  handler: async (input, context) => {
+    const lookupResult: InferOutput<typeof lookup.output> = await lookup.invoke({
       rawId: input.orderId,
     });
     const price: number | undefined = await context.cache.prices.get({ sku: input.sku });
@@ -101,11 +105,6 @@ const createOrder = defineFunction({
   },
 });
 
-const lookupClient: FunctionClientFor<typeof lookup> = async ({ rawId }) => ({
-  orderId: rawId,
-  totalCents: 100,
-});
-void lookupClient;
 void createOrder;
 
 const tool = defineTool({
@@ -122,20 +121,44 @@ void toolInput;
 void toolOutput;
 void toolErrorId;
 
+const inferredFunctionTool = lookup.asTool({
+  description: "Look up an order",
+  sideEffect: "read",
+  approval: "never",
+});
+const inferredFunctionToolId: "types.inference-lookup.tool" = inferredFunctionTool.id;
+const functionToolContract: import("@zsys/tools").ToolDescriptor<string> = inferredFunctionTool;
+void inferredFunctionToolId;
+void functionToolContract;
+
+const metadataFunction = defineFunction({
+  id: "types.metadata-function",
+  input: z.object({ id: z.string() }),
+  output: lookupOutput,
+  tool: { description: "Read metadata", sideEffect: "read", approval: "never" },
+  handler: async () => ({ orderId: "order-1", totalCents: 100 }),
+});
+const metadataTool = metadataFunction.asTool();
+const metadataToolId: "types.metadata-function.tool" = metadataTool.id;
+void metadataToolId;
+
+// @ts-expect-error zero-argument asTool requires complete function tool metadata
+lookup.asTool();
+
 type NarrowedContext = FunctionContext<typeof dependencies>;
 declare const narrowed: NarrowedContext;
-const narrowedResult: Promise<InferOutput<typeof lookup.output>> = narrowed.functions.lookup({
+const narrowedResult: Promise<InferOutput<typeof lookup.output>> = lookup.invoke({
   rawId: "order-1",
 });
 void narrowedResult;
 
 // @ts-expect-error transformed function input accepts rawId, not the output property orderId
-narrowed.functions.lookup({ orderId: "order-1" });
+lookup.invoke({ orderId: "order-1" });
 // @ts-expect-error a function's output is validated and cannot be treated as an arbitrary string
-const invalidOutput: Promise<string> = narrowed.functions.lookup({ rawId: "order-1" });
+const invalidOutput: Promise<string> = lookup.invoke({ rawId: "order-1" });
 void invalidOutput;
-// @ts-expect-error undeclared names are absent from the narrowed dependency map
-narrowed.functions.missing;
+// @ts-expect-error function clients were removed; use descriptor.invoke
+narrowed.functions;
 // @ts-expect-error the job client is named by the dependency map
 narrowed.jobs.missing;
 // @ts-expect-error a bucket not declared on the function is unavailable
@@ -146,11 +169,11 @@ defineFunction({
   input: z.object({}),
   output: z.object({}),
   dependencies: {
+    // @ts-expect-error function dependencies were removed; use descriptor.invoke
     functions: {
       wrong: {
         ref: {
-          // @ts-expect-error dependency references must retain their declared descriptor kind
-          kind: "cache",
+          kind: "function",
           id: "types.inference-cache",
         },
         input: z.object({}),

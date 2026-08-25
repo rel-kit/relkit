@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { RegistrationPlan } from "@zsys/graph";
 import {
   API_REFERENCE_PATH,
@@ -15,6 +16,7 @@ const plan: RegistrationPlan = {
     {
       kind: "function",
       id: "hello",
+      serviceId: "hello-service",
       source,
       input: { type: "object", properties: {} },
       output: { type: "object", properties: { ok: { type: "boolean" } } },
@@ -27,6 +29,7 @@ const plan: RegistrationPlan = {
       source,
       triggerType: "http",
       targetFunctionId: "hello",
+      serviceId: "hello-service",
       config: {
         method: "GET",
         path: "/hello",
@@ -44,10 +47,23 @@ const plan: RegistrationPlan = {
   caches: [],
   tools: [],
   agents: [],
+  middlewares: [],
+  services: [
+    {
+      kind: "service",
+      id: "hello-service",
+      source,
+      title: "Hello",
+      description: "Hello operations",
+      tags: ["hello"],
+      members: [{ name: "hello", functionId: "hello" }],
+      middleware: [],
+    },
+  ],
 };
 const manifest: RuntimeManifest = {
-  contractVersion: 1,
-  generatorVersion: 1,
+  contractVersion: MANIFEST_VERSION,
+  generatorVersion: GENERATOR_VERSION,
   graphHash: plan.graphHash,
   functions: {},
   middleware: {},
@@ -64,7 +80,11 @@ describe("OpenAPI and Scalar endpoints", () => {
 
     expect(raw.status).toBe(200);
     expect(raw.headers.get("cache-control")).toBe("no-store");
-    expect(document).toMatchObject({ openapi: "3.1.0", paths: { "/hello": {} } });
+    expect(document).toMatchObject({
+      openapi: "3.1.0",
+      tags: [{ name: "hello", description: "Hello operations" }],
+      paths: { "/hello": { get: { tags: ["hello"] } } },
+    });
     expect(reference.status).toBe(200);
     expect(reference.headers.get("content-type")).toContain("text/html");
     expect(html).toContain("ZSYS API Reference");

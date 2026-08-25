@@ -1,20 +1,21 @@
 import { Effect } from "effect";
 import { describe, expect, test } from "bun:test";
 import { defineEnv } from "@zsys/config";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
 import { createGenerationRuntime, type GenerationRuntimeOptions } from "./src/runtime.js";
 import type { RuntimeManifest } from "./src/services.js";
 import type { GenerationServiceDefinition } from "./src/scope.js";
 
 const graph = {
-  contractVersion: 1,
+  contractVersion: GRAPH_VERSION,
   nodes: [],
   edges: [],
 } satisfies ApplicationGraph;
 
 const manifest = {
-  contractVersion: 1,
-  generatorVersion: 1,
+  contractVersion: MANIFEST_VERSION,
+  generatorVersion: GENERATOR_VERSION,
   graphHash: "graph-hash",
   functions: {},
   providers: {},

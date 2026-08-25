@@ -17,12 +17,15 @@ import { createScheduler } from "../../../packages/providers-local/src/index.ts"
 import { createTestFakes, createTestJob } from "../../../packages/testing/src/index.ts";
 import sendReceiptJob from "../../../examples/commerce/src/jobs/send-receipt.job.ts";
 import sendReceipt from "../../../examples/commerce/src/functions/send-receipt.function.ts";
+import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import { compileProject } from "../../compiler/fixture-runner.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../../examples/commerce");
 type ReceiptInput = { readonly orderId: string; readonly receiptKey: string };
 type ReceiptOutput = { readonly receiptId: string };
 type ReceiptTarget = InvocationTarget<ReceiptInput, ReceiptOutput>;
+
+bindDescriptorIdentity(sendReceipt, "send-receipt");
 
 describe("commerce receipt jobs", () => {
   test("projects the receipt queue, schedule, and target edges", async () => {
@@ -40,7 +43,7 @@ describe("commerce receipt jobs", () => {
     ]);
     expect(job).toMatchObject({
       kind: "job",
-      targetFunctionId: "receipts.send",
+      targetFunctionId: "send-receipt",
       schedule: [
         {
           id: "receipts.reconcile",
@@ -56,10 +59,10 @@ describe("commerce receipt jobs", () => {
         {
           kind: "targets-function",
           from: "receipts.send-job",
-          to: "receipts.send",
+          to: "send-receipt",
           role: "primary",
         },
-        { kind: "enqueues-job", from: "orders.create", to: "receipts.send-job" },
+        { kind: "enqueues-job", from: "orders.create-order", to: "receipts.send-job" },
         {
           kind: "enqueues-job",
           from: "zsys.event.receipts.on-order-created.handler",
@@ -68,7 +71,7 @@ describe("commerce receipt jobs", () => {
       ]),
     );
     expect(plan.queues).toEqual([
-      expect.objectContaining({ id: "receipts.send-job", targetFunctionId: "receipts.send" }),
+      expect.objectContaining({ id: "receipts.send-job", targetFunctionId: "send-receipt" }),
     ]);
     expect(plan.schedules).toEqual([
       expect.objectContaining({
@@ -182,11 +185,11 @@ describe("commerce receipt jobs", () => {
       expect(events.find((event) => event.type === "invocation.completed")).toMatchObject({
         completion: {
           outcome: "success",
-          record: { functionId: "receipts.send", source: "job", attempt: 1 },
+          record: { functionId: "send-receipt", source: "job", attempt: 1 },
         },
       });
       expect(events.find((event) => event.type === "span.started")).toMatchObject({
-        record: { functionId: "receipts.send", source: "job" },
+        record: { functionId: "send-receipt", source: "job" },
       });
 
       await job.restart();

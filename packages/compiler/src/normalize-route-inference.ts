@@ -40,15 +40,7 @@ function inferRequest(
   const parameters = pathParameters(String(route.path ?? ""));
   for (const parameter of parameters) {
     const property = projection.properties[parameter.name];
-    if (property === undefined) {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.mapping,
-        `Path segment "${parameter.name}" is missing from the target input schema.`,
-      );
-      continue;
-    }
+    if (property === undefined) continue;
     if (parameter.catchAll && !allowsArray(property)) {
       add(
         work,
@@ -67,8 +59,11 @@ function inferRequest(
   const body = !QUERY_METHODS.has(String(route.method));
   for (const name of Object.keys(projection.properties).sort()) {
     if (fields[name] !== undefined) continue;
-    const source = { kind: body ? "body" : "query", name };
-    const defaultValue = schemaDefault(projection.properties[name]);
+    const property = projection.properties[name];
+    const source = body
+      ? bodySource(route.accept, name, property)
+      : { kind: "query", name };
+    const defaultValue = schemaDefault(property);
     fields[name] =
       defaultValue === undefined
         ? required.has(name)
@@ -77,6 +72,15 @@ function inferRequest(
         : { kind: "default", value: source, default: defaultValue };
   }
   return { kind: "input", fields };
+}
+
+function bodySource(
+  accept: unknown,
+  name: string,
+  property: unknown,
+): { readonly kind: "body" | "multipart" | "multipart-all"; readonly name: string } {
+  if (accept !== "multipart/form-data") return { kind: "body", name };
+  return { kind: allowsArray(property) ? "multipart-all" : "multipart", name };
 }
 
 function inferResponses(

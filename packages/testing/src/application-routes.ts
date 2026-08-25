@@ -30,17 +30,13 @@ export type TestRoute = {
     readonly status?: number;
     readonly errorId?: string;
   }[];
-  readonly middleware?: readonly {
-    readonly target: Parameters<TestRuntime["invoke"]>[0];
-    readonly request: unknown;
-  }[];
 };
 
 type AuthoredRoute = Omit<TestRoute, "method" | "path" | "request" | "responses"> & {
+  readonly accept?: "application/json" | "multipart/form-data";
   readonly request?: unknown;
   readonly responses?: TestRoute["responses"];
   readonly successStatus?: number;
-  readonly middleware?: TestRoute["middleware"];
 };
 
 export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]> {
@@ -79,7 +75,6 @@ function normalizeRoute(
     target: route.target,
     request: route.request ?? inferRequest(route, method, parsed),
     responses: route.responses ?? inferResponses(route),
-    ...(route.middleware === undefined ? {} : { middleware: route.middleware }),
   });
 }
 
@@ -111,7 +106,11 @@ function inferRequest(
   }
   for (const name of Object.keys(properties).sort()) {
     if (name in fields) continue;
-    const source = { kind: queryMethods.has(method) ? "query" : "body", name };
+    const source = queryMethods.has(method)
+      ? { kind: "query", name }
+      : route.accept === "multipart/form-data"
+        ? { kind: allowsArray(properties[name]) ? "multipart-all" : "multipart", name }
+        : { kind: "body", name };
     const defaultValue = schemaDefault(properties[name]);
     fields[name] =
       defaultValue === undefined
@@ -125,6 +124,14 @@ function inferRequest(
 
 function schemaDefault(value: unknown): unknown {
   return isRecord(value) && "default" in value ? value.default : undefined;
+}
+
+function allowsArray(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (value.type === "array") return true;
+  return [value.anyOf, value.oneOf].some(
+    (variants) => Array.isArray(variants) && variants.some(allowsArray),
+  );
 }
 
 function inferResponses(route: AuthoredRoute): TestRoute["responses"] {

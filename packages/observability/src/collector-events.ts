@@ -38,6 +38,8 @@ export function toObservabilityRecord(value: unknown): ObservabilityRecord | und
 function requestLifecycleLog(value: RecordLike): LogRecord | undefined {
   const requestId = text(value.requestId);
   const traceId = text(value.traceId);
+  const serviceId = text(value.serviceId);
+  const functionId = text(value.functionId);
   const type = text(value.type);
   const timestamp = text(value.completedAt) ?? text(value.startedAt);
   if (
@@ -60,6 +62,8 @@ function requestLifecycleLog(value: RecordLike): LogRecord | undefined {
     fields: fields as LogRecord["fields"],
     requestId,
     traceId,
+    ...(serviceId === undefined ? {} : { serviceId }),
+    ...(functionId === undefined ? {} : { functionId }),
     source: "http",
   };
 }

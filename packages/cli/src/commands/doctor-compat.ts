@@ -89,7 +89,7 @@ function zsysVersions(manifest: PackageJson): {
   };
 }
 
-export function detectDeployment(manifest: PackageJson | undefined, app: unknown): boolean {
+export function detectDeployment(manifest: PackageJson | undefined, config: unknown): boolean {
   const dependencies = Object.entries({
     ...manifest?.dependencies,
     ...manifest?.devDependencies,
@@ -97,7 +97,8 @@ export function detectDeployment(manifest: PackageJson | undefined, app: unknown
   return (
     dependencies.some(
       ([name, value]) => name.includes("pulumi") || String(value).includes("pulumi"),
-    ) || providerRecipe(app) === "aws"
+    ) ||
+    (isRecord(config) && config.deployment !== undefined)
   );
 }
 
@@ -109,22 +110,28 @@ export function isAppDescriptor(value: unknown): boolean {
     typeof value.id !== "string"
   )
     return false;
-  const providers = value.providers;
   return (
     isRecord(value.env) &&
     value.env.kind === "env-definition" &&
-    isRecord(providers) &&
-    providerRecipe(value) === "aws" &&
-    ["development", "test", "production"].every(
-      (name) => isRecord(providers[name]) && providers[name]!.kind === "provider-set",
-    )
+    isProviderTopology(value.providers)
   );
 }
 
-function providerRecipe(app: unknown): unknown {
-  return isRecord(app) && isRecord(app.providers) && isRecord(app.providers.production)
-    ? app.providers.production.recipe
-    : undefined;
+function isProviderTopology(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  return Object.entries(value).every(
+    ([capability, profiles]) =>
+      ["buckets", "cache", "jobs", "events", "models", "observability"].includes(capability) &&
+      isRecord(profiles) &&
+      Object.values(profiles).every(
+        (binding) =>
+          isRecord(binding) &&
+          binding.kind === "provider-binding" &&
+          (binding.ownership === "external" || binding.ownership === "managed") &&
+          isRecord(binding.adapter) &&
+          binding.adapter.capability === capability,
+      ),
+  );
 }
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);

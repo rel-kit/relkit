@@ -65,65 +65,68 @@ const result = await generateProject(normalizeCreateOptions(process.argv.slice(2
 console.log(JSON.stringify(result));
 `,
     );
-    const base = [
-      "--template",
-      "minimal",
-      "--cloud",
-      "none",
-      "--deploy",
-      "none",
-      "--install",
-      "--no-git",
-      "--examples",
-      "--json",
-    ];
-    const args = (directory: string) => ["smoke-app", "--directory", directory, ...base];
-    const direct = JSON.parse(
-      (
+    for (const template of ["minimal", "api", "agent"] as const) {
+      const base = [
+        "--template",
+        template,
+        "--cloud",
+        "none",
+        "--deploy",
+        "none",
+        "--install",
+        "--no-git",
+        "--examples",
+        "--json",
+      ];
+      const args = (directory: string) => [`${template}-app`, "--directory", directory, ...base];
+      const direct = JSON.parse(
+        (
+          await runCommand(
+            ["run", "--silent", runner, ...args(`${template}-tarball-project`)],
+            temporary,
+            registry,
+            cacheDir,
+          )
+        )
+          .trim()
+          .split(/\r?\n/)
+          .at(-1)!,
+      ) as { destination: string };
+      const cli = JSON.parse(
         await runCommand(
-          ["run", "--silent", runner, ...args("tarball-project")],
+          [join(temporary, "node_modules/.bin/zsys"), "create", ...args(`${template}-cli-project`)],
           temporary,
           registry,
           cacheDir,
-        )
+        ),
+      ) as { destination: string };
+      if (
+        !direct.destination.endsWith(`/${template}-tarball-project`) ||
+        !cli.destination.endsWith(`/${template}-cli-project`)
       )
-        .trim()
-        .split(/\r?\n/)
-        .at(-1)!,
-    ) as { destination: string };
-    const cli = JSON.parse(
-      await runCommand(
-        [join(temporary, "node_modules/.bin/zsys"), "create", ...args("cli-project")],
-        temporary,
-        registry,
-        cacheDir,
-      ),
-    ) as { destination: string };
-    if (
-      !direct.destination.endsWith("/tarball-project") ||
-      !cli.destination.endsWith("/cli-project")
-    )
-      throw new Error("Packed generators returned unexpected destinations.");
-    const directBytes = await snapshotProject(direct.destination);
-    if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
-      throw new Error("Packed create-zsys and zsys create generated different bytes.");
-    await verifyProject(direct.destination, registry, cacheDir);
-    await verifyProject(cli.destination, registry, cacheDir);
-    const second = JSON.parse(
-      (
-        await runCommand(
-          ["run", "--silent", runner, ...args("second-project")],
-          temporary,
-          registry,
-          cacheDir,
+        throw new Error(`Packed ${template} generators returned unexpected destinations.`);
+      const directBytes = await snapshotProject(direct.destination);
+      if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
+        throw new Error(`Packed ${template} generators generated different bytes.`);
+      await verifyProject(direct.destination, registry, cacheDir);
+      await verifyProject(cli.destination, registry, cacheDir);
+      const second = JSON.parse(
+        (
+          await runCommand(
+            ["run", "--silent", runner, ...args(`${template}-second-project`)],
+            temporary,
+            registry,
+            cacheDir,
+          )
         )
-      )
-        .trim()
-        .split(/\r?\n/)
-        .at(-1)!,
-    ) as { destination: string };
-    if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(second.destination)))
-      throw new Error("Second generation was not byte-deterministic.");
+          .trim()
+          .split(/\r?\n/)
+          .at(-1)!,
+      ) as { destination: string };
+      if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(second.destination)))
+        throw new Error(`${template} generation was not byte-deterministic.`);
+      console.log(`packed ${template} smoke passed`);
+    }
     console.log(`packed create smoke passed (${tarballs.size} packages)`);
   } finally {
     server?.stop(true);

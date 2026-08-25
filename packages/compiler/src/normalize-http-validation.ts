@@ -1,13 +1,7 @@
 import { add } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";
-import {
-  mappingCompatible,
-  mappingFields,
-  schema,
-  schemaEquivalent,
-  schemaProperties,
-} from "./normalize-compat.js";
-import { isErrorDescriptorLike, isRecord, refId } from "./normalize-utils.js";
+import { mappingCompatible, schema, schemaEquivalent } from "./normalize-compat.js";
+import { isErrorDescriptorLike, isRecord } from "./normalize-utils.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -27,7 +21,6 @@ export function validateHttpCompatibility(work: NormalizationWork): void {
     const inputReason = mappingCompatible(value.request, targetValue?.input);
     if (inputReason !== undefined) add(work, route, NORMALIZE_CODES.mapping, inputReason);
     validateResponses(work, route, targetValue);
-    validateRouteMiddleware(work, route, value.middleware);
   }
 }
 
@@ -114,82 +107,4 @@ function validateResponses(
       );
     }
   }
-}
-
-function validateRouteMiddleware(
-  work: NormalizationWork,
-  route: NormalizedDescriptor,
-  value: unknown,
-): void {
-  if (!Array.isArray(value)) return;
-  const responses =
-    isRecord(route.value) && Array.isArray(route.value.responses) ? route.value.responses : [];
-  for (const entry of value) {
-    const middlewareId = refId(entry);
-    const middleware =
-      middlewareId === undefined ? undefined : work.middlewareReferences.get(middlewareId);
-    if (middleware === undefined) continue;
-    const middlewareValue = isRecord(middleware.value) ? middleware.value : {};
-    const target = referenceFor(work, middlewareValue.target, "function");
-    const targetValue = isRecord(target?.value) ? target.value : undefined;
-    const inputReason = mappingCompatible(middlewareValue.request, targetValue?.input);
-    if (inputReason !== undefined)
-      add(work, middleware, NORMALIZE_CODES.middlewareInput, inputReason);
-    const decision = middlewareValue.decision;
-    if (!isRecord(decision) || decision.kind !== "respond") continue;
-    const response = findResponse(responses, decision.responseId);
-    if (response === undefined) {
-      add(
-        work,
-        middleware,
-        NORMALIZE_CODES.response,
-        `Middleware response "${String(decision.responseId)}" is not declared by the route.`,
-      );
-      continue;
-    }
-    if (
-      response.schema !== undefined &&
-      targetValue?.output !== undefined &&
-      schema(response.schema).ok &&
-      schema(targetValue.output).ok &&
-      !schemaEquivalent(response.schema, targetValue.output)
-    ) {
-      add(
-        work,
-        middleware,
-        NORMALIZE_CODES.middlewareOutput,
-        `Middleware output does not match route response "${response.id}".`,
-      );
-    }
-    if (decision.body !== undefined && response.schema !== undefined) {
-      const fields = mappingFields(decision.body);
-      const required = responseSchemaRequired(response.schema);
-      const missing = required.filter((field) => !fields.includes(field));
-      if (missing.length > 0)
-        add(
-          work,
-          middleware,
-          NORMALIZE_CODES.response,
-          `Middleware response is missing fields: ${missing.join(", ")}.`,
-        );
-    }
-  }
-}
-
-function findResponse(
-  responses: readonly unknown[],
-  id: unknown,
-): Record<string, unknown> | undefined {
-  return responses.find((response) => {
-    if (!isRecord(response)) return false;
-    return (
-      response.id === id ||
-      response.errorId === id ||
-      (id === "validation" && response.kind === "validation-error")
-    );
-  }) as Record<string, unknown> | undefined;
-}
-
-function responseSchemaRequired(schema: unknown): readonly string[] {
-  return schemaProperties(schema)?.required ?? [];
 }

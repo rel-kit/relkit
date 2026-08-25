@@ -39,12 +39,14 @@ export interface TestFakes {
 export function createTestFakes(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
   if (stateRoot.length === 0) throw new TypeError("Test fake state root must not be empty");
   const clients = Object.fromEntries(
-    ["functions", "jobs", "events", "buckets", "cache", "agents"].map((category) => [
+    ["jobs", "events", "buckets", "cache", "agents"].map((category) => [
       category,
       Object.create(null) as Record<string, unknown>,
     ]),
   ) as Record<DependencyCategory, Record<string, unknown>>;
   const configuredFailures = new Map<string, { readonly cause: unknown; readonly once: boolean }>();
+  let eventSequence = 0;
+  let jobSequence = 0;
 
   const failures: TestFailureControls = Object.freeze({
     failAt: (point: string, cause?: unknown) => {
@@ -91,7 +93,6 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       ...(options.clock === undefined ? {} : { clock: options.clock }),
     });
     bucketRecords[id] = fake;
-    clients.buckets![id] = fake.provider;
     return fake;
   };
   const createCache = (
@@ -108,11 +109,36 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
       ...(options.clock === undefined ? {} : { clock: options.clock }),
     });
     cacheRecords[id] = fake as TestCacheFake<unknown, unknown>;
-    clients.cache![id] = fake.provider;
     return cacheRecords[id]!;
   };
   const buckets = lazyRecords(bucketRecords, createBucket);
   const cache = lazyRecords(cacheRecords, createCache);
+  clients.buckets = lazyRecords(
+    Object.create(null) as Record<string, unknown>,
+    (id) => createBucket(id).provider,
+  );
+  clients.cache = lazyRecords(
+    Object.create(null) as Record<string, unknown>,
+    (id) => createCache(id).provider,
+  );
+  clients.events = lazyRecords(clients.events!, (id) =>
+    Object.freeze({
+      publish: async (_payload: unknown, _options: unknown, context: { signal: AbortSignal }) => {
+        if (context.signal.aborted) throw context.signal.reason ?? new Error("Event cancelled");
+        failures.check("event.publish");
+        return { accepted: true, instanceId: `test-event-${id}-${++eventSequence}` };
+      },
+    }),
+  );
+  clients.jobs = lazyRecords(clients.jobs!, (id) =>
+    Object.freeze({
+      enqueue: async (_input: unknown, _options: unknown, context: { signal: AbortSignal }) => {
+        if (context.signal.aborted) throw context.signal.reason ?? new Error("Job cancelled");
+        failures.check("job.enqueue");
+        return { accepted: true, instanceId: `test-job-${id}-${++jobSequence}` };
+      },
+    }),
+  );
 
   return Object.freeze({
     stateRoot,
@@ -133,14 +159,13 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
   });
 }
 
-function lazyRecords<T>(
-  records: Record<string, T>,
-  create: (id: string) => T,
-): Readonly<Record<string, T>> {
+function lazyRecords<T>(records: Record<string, T>, create: (id: string) => T): Record<string, T> {
   return new Proxy(records, {
     get(target, property, receiver) {
       if (typeof property !== "string") return Reflect.get(target, property, receiver);
-      return target[property] ?? create(property);
+      if (target[property] !== undefined) return target[property];
+      const created = create(property);
+      return (target[property] ??= created);
     },
   });
 }

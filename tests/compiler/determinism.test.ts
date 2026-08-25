@@ -226,7 +226,7 @@ function score(value: string, seed: number): number {
 function volatileGraph(root: string, windows: boolean, pid: number, clock: string) {
   const file = (name: string) => (windows ? `${root}\\src\\${name}` : `${root}/src/${name}`);
   return {
-    contractVersion: 1,
+    contractVersion: 3,
     appId: "determinism",
     generationId: `generation-${pid}`,
     timestamp: clock,
