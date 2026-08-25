@@ -124,6 +124,10 @@ function errorCode(error) {
   return error instanceof Error ? error.name : "unknown";
 }
 
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function recordRuntimeFailure(component, message, error, source) {
   const record = telemetry.collect({
     version: 1,
@@ -132,7 +136,7 @@ function recordRuntimeFailure(component, message, error, source) {
     level: "error",
     component,
     message,
-    fields: { code: errorCode(error) },
+    fields: { code: errorCode(error), detail: errorMessage(error) },
     generationId,
     graphHash,
     source,
@@ -169,9 +173,7 @@ function resolveRuntimeEnvironment(definition, environment, source) {
 }
 
 function runtimeEnvironmentValue(value) {
-  if (value instanceof URL) return value.toString();
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
-  return JSON.stringify(value);
+  return value;
 }
 
 function waitForProviderReady() {

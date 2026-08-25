@@ -13,6 +13,7 @@ import {
   assertResponse,
   isHttpResponseMapping,
   type HttpMethod,
+  type HttpRequestContentType,
   type HttpRequestMapping,
   type HttpResponseMapping,
 } from "./http-dsl.js";
@@ -27,6 +28,7 @@ export interface RouteDescriptor<
   readonly path?: string;
   readonly runtimePaths?: readonly string[];
   readonly target: Target;
+  readonly accept?: HttpRequestContentType;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
   readonly successStatus?: number;
@@ -41,6 +43,7 @@ export interface DefineRouteOptions<
 > extends DescriptorMetadata {
   readonly id?: Id;
   readonly target: Target;
+  readonly accept?: HttpRequestContentType;
   readonly request?: Request;
   readonly responses?: readonly HttpResponseMapping[];
   readonly successStatus?: number;
@@ -86,6 +89,7 @@ export function defineRoute<
     throw new TypeError("Route target must be a function reference");
   if (options.request !== undefined) assertRequestMapping(options.request);
   const responses = copyResponses(options.responses);
+  const accept = requestContentType(options.accept);
   const timeoutMs = positive(options.timeoutMs, "timeoutMs");
   const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
   const status = successStatus(options.successStatus);
@@ -102,6 +106,7 @@ export function defineRoute<
     ...(legacy.method === undefined ? {} : { method: legacy.method }),
     ...(legacy.path === undefined ? {} : { path: legacy.path }),
     target: options.target,
+    ...(accept === undefined ? {} : { accept }),
     ...(options.request === undefined ? {} : { request: options.request }),
     ...(responses === undefined ? {} : { responses }),
     ...(status === undefined ? {} : { successStatus: status }),
@@ -109,6 +114,12 @@ export function defineRoute<
     ...(rateLimit === undefined ? {} : { rateLimit }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
   }) as RouteDescriptor<Id, Target, Request>;
+}
+
+function requestContentType(value: unknown): HttpRequestContentType | undefined {
+  if (value === undefined) return undefined;
+  if (value === "application/json" || value === "multipart/form-data") return value;
+  throw new TypeError('Route accept must be "application/json" or "multipart/form-data"');
 }
 
 function copyResponses(

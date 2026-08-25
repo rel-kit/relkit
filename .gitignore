@@ -48,3 +48,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+examples/commerce/.zsys/generated/application.graph.json
+examples/commerce/.zsys/generated/client.ts
+examples/commerce/.zsys/generated/openapi.json
+examples/commerce/.zsys/generated/runtime.manifest.ts

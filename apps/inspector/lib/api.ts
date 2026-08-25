@@ -19,12 +19,19 @@ import {
   type RuntimeCollection,
   type SignalCollection,
 } from "./api-types";
-import { assertEnvelope } from "./api-validation";
 import {
   invokeActiveRoute,
   type RouteInvocationInput,
   type RouteInvocationResult,
 } from "./route-request";
+import {
+  delay,
+  errorCode,
+  GET_RETRY_DELAYS_MS,
+  readPayload,
+  shouldRetry,
+} from "./api-request-utils";
+import { assertEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
 export * from "./api-types";
 interface CacheEntry {
@@ -62,40 +69,49 @@ export class InspectorApiClient {
       if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
       this.cache.delete(key);
     }
-    let response: Response;
-    try {
-      const headers = new Headers(this.headers);
-      if (init.headers !== undefined)
-        new Headers(init.headers).forEach((value, key) => headers.set(key, value));
-      const requestInit: RequestInit = { ...init, headers };
-      if (init.signal !== undefined) requestInit.signal = init.signal;
-      else if (this.signal !== undefined) requestInit.signal = this.signal;
-      response = await this.fetcher(url, requestInit);
-    } catch (error) {
-      throw new InspectorApiError(
-        "Inspector backend is disconnected",
-        "ZSYS_INSPECTOR_DISCONNECTED",
-        undefined,
-        "network",
-      );
+    let attempt = 0;
+    while (true) {
+      try {
+        const headers = new Headers(this.headers);
+        if (init.headers !== undefined)
+          new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+        const requestInit: RequestInit = { ...init, headers };
+        if (init.signal !== undefined) requestInit.signal = init.signal;
+        else if (this.signal !== undefined) requestInit.signal = this.signal;
+        let response: Response;
+        try {
+          response = await this.fetcher(url, requestInit);
+        } catch {
+          throw new InspectorApiError(
+            "Inspector backend is disconnected",
+            "ZSYS_INSPECTOR_DISCONNECTED",
+            undefined,
+            "network",
+          );
+        }
+        const payload = await readPayload(response);
+        assertEnvelope(payload, response.headers, responseProtocols);
+        if (!response.ok) {
+          const code = errorCode(payload);
+          throw new InspectorApiError(
+            typeof code === "string" ? code : `HTTP_${response.status}`,
+            typeof code === "string" ? code : `HTTP_${response.status}`,
+            response.status,
+          );
+        }
+        if (method === "GET" && this.cacheTtlMs > 0)
+          this.cache.set(key, {
+            value: payload,
+            expiresAt: Date.now() + this.cacheTtlMs,
+            tags: cacheTags ?? [],
+          });
+        return payload as T;
+      } catch (error) {
+        if (!shouldRetry(method, error, attempt)) throw error;
+        await delay(GET_RETRY_DELAYS_MS[attempt]!);
+        attempt += 1;
+      }
     }
-    const payload = await this.readPayload(response);
-    assertEnvelope(payload, response.headers, responseProtocols);
-    if (!response.ok) {
-      const code = this.object(payload)?.error;
-      throw new InspectorApiError(
-        typeof code === "string" ? code : `HTTP_${response.status}`,
-        typeof code === "string" ? code : `HTTP_${response.status}`,
-        response.status,
-      );
-    }
-    if (method === "GET" && this.cacheTtlMs > 0)
-      this.cache.set(key, {
-        value: payload,
-        expiresAt: Date.now() + this.cacheTtlMs,
-        tags: cacheTags ?? [],
-      });
-    return payload as T;
   }
   clearCache(): void {
     this.cache.clear();
@@ -177,21 +193,6 @@ export class InspectorApiClient {
       if (value !== undefined) params.set(key, String(value));
     const encoded = params.toString();
     return encoded === "" ? "" : `?${encoded}`;
-  }
-  private async readPayload(response: Response): Promise<unknown> {
-    try {
-      return await response.json();
-    } catch {
-      throw new InspectorApiError(
-        "Inspector returned invalid JSON",
-        "ZSYS_INSPECTOR_INVALID_RESPONSE",
-      );
-    }
-  }
-  private object(value: unknown): InspectorObject | undefined {
-    return value !== null && typeof value === "object" && !Array.isArray(value)
-      ? (value as InspectorObject)
-      : undefined;
   }
 }
 export const createInspectorApiClient = (options: InspectorFetchOptions = {}): InspectorApiClient =>

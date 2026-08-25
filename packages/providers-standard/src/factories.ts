@@ -8,22 +8,12 @@ const s3Factory: ProviderFactory = Object.freeze({
   adapter: "s3",
   create: (context: ProviderFactoryContext) => {
     const configuration = context.configuration;
-    const credentials = record(configuration.credentials);
+    const credentials = s3Credentials(record(configuration.credentials));
     const provider = createS3BucketProvider({
-      endpoint: text(configuration.endpoint, "S3 endpoint"),
+      endpoint: urlText(configuration.endpoint, "S3 endpoint"),
       bucketName: text(configuration.bucketName, "S3 bucketName"),
       region: text(configuration.region, "S3 region"),
-      ...(credentials === undefined
-        ? {}
-        : {
-            credentials: {
-              accessKeyId: text(credentials.accessKeyId, "S3 accessKeyId"),
-              secretAccessKey: text(credentials.secretAccessKey, "S3 secretAccessKey"),
-              ...(credentials.sessionToken === undefined
-                ? {}
-                : { sessionToken: text(credentials.sessionToken, "S3 sessionToken") }),
-            },
-          }),
+      ...(credentials === undefined ? {} : { credentials }),
       ...(configuration.forcePathStyle === undefined
         ? {}
         : { forcePathStyle: boolean(configuration.forcePathStyle, "S3 forcePathStyle") }),
@@ -81,6 +71,27 @@ function record(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : undefined;
+}
+
+function s3Credentials(value: Record<string, unknown> | undefined): S3BucketOptions["credentials"] {
+  if (value === undefined) return undefined;
+  const accessKeyId = optionalText(value.accessKeyId, "S3 accessKeyId");
+  const secretAccessKey = optionalText(value.secretAccessKey, "S3 secretAccessKey");
+  const sessionToken = optionalText(value.sessionToken, "S3 sessionToken");
+  if (accessKeyId === undefined && secretAccessKey === undefined && sessionToken === undefined)
+    return undefined;
+  if (accessKeyId === undefined || secretAccessKey === undefined) {
+    throw new TypeError("S3 credentials require both accessKeyId and secretAccessKey");
+  }
+  return { accessKeyId, secretAccessKey, ...(sessionToken === undefined ? {} : { sessionToken }) };
+}
+
+function optionalText(value: unknown, label: string): string | undefined {
+  return value === undefined ? undefined : text(value, label);
+}
+
+function urlText(value: unknown, label: string): string {
+  return value instanceof URL ? value.toString() : text(value, label);
 }
 
 function text(value: unknown, label: string): string {

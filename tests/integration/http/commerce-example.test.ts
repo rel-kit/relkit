@@ -129,14 +129,14 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
 
     const upload = new FormData();
     upload.append("label", "receipts");
-    upload.append("primary", new File(["primary"], "primary.txt", { type: "text/plain" }));
-    upload.append("attachments", new File(["one"], "one.txt", { type: "text/plain" }));
-    upload.append("attachments", new File(["two"], "two.txt", { type: "text/plain" }));
+    upload.append("primary", new File(["primary"], "primary.png", { type: "image/png" }));
+    upload.append("attachments", new File(["one"], "one.png", { type: "image/png" }));
+    upload.append("attachments", new File(["two"], "two.png", { type: "image/png" }));
     const uploaded = await client.post("/uploads", { body: upload });
     expect(uploaded.status).toBe(200);
     expect(await uploaded.json()).toEqual({
       label: "receipts",
-      files: ["primary.txt", "one.txt", "two.txt"],
+      files: ["primary.png", "one.png", "two.png"],
     });
 
     const invalidUpload = new FormData();
@@ -151,7 +151,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
     oversizedUpload.append("label", "large");
     oversizedUpload.append(
       "primary",
-      new File(["x".repeat(2_000)], "large.txt", { type: "text/plain" }),
+      new File(["x".repeat(11 * 1024 * 1024)], "large.png", { type: "image/png" }),
     );
     const oversized = await client.post("/uploads", { body: oversizedUpload });
     expect(oversized.status).toBe(422);

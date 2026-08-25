@@ -1,7 +1,7 @@
 import { API_VERSION } from "@zsys/contracts";
 import type { SupervisorCandidateToken } from "./state-machine-types.js";
 
-export const DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS = 2_000;
+export const DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS = 10_000;
 
 export type CandidateVerificationCode =
   | "ZSYS_CANDIDATE_API_VERSION_UNSUPPORTED"

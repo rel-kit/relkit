@@ -1,6 +1,6 @@
 import { defineAgent } from "@zsys/app";
-import lookupOrder from "../tools/lookup-order.tool.js";
 import { supportInput, supportOutput } from "../shared/schemas.js";
+import lookupOrder from "../tools/lookup-order.tool.js";
 
 const orderSupport = defineAgent({
   input: supportInput,

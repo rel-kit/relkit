@@ -14,6 +14,7 @@ import {
   type ProviderFactory,
   type ProviderGeneration,
   type ProviderHandle,
+  type ProviderRequirement,
   type ProviderRegistry,
   type ProviderRegistryErrorCode,
   type ProviderRegistryOptions,
@@ -31,8 +32,10 @@ export async function createProviderRegistry(
   const acquired: Acquired[] = [];
   const handles: Record<string, ProviderHandle> = {};
   let modelRegistry: unknown;
+  let activeRequirement: ProviderRequirement | undefined;
   try {
     for (const requirement of requirements) {
+      activeRequirement = requirement;
       const binding = bindingFor(options.providers, requirement);
       const useTestFactory =
         options.environment === "test" && options.useConfiguredAdaptersInTests !== true;
@@ -88,7 +91,16 @@ export async function createProviderRegistry(
   } catch (cause) {
     await releaseAll(acquired).catch(() => undefined);
     if (cause instanceof ProviderRegistryError) throw cause;
-    throw error("ZSYS_PROVIDER_CONSTRUCTION_FAILED", "Provider construction failed.");
+    throw error(
+      "ZSYS_PROVIDER_CONSTRUCTION_FAILED",
+      `Provider construction failed${
+        activeRequirement === undefined
+          ? ""
+          : ` for ${activeRequirement.capability}:${activeRequirement.profile}`
+      }: ${errorMessage(cause)}`,
+      activeRequirement?.capability,
+      activeRequirement?.profile,
+    );
   }
   let released = false;
   const release = async (): Promise<void> => {
@@ -176,4 +188,8 @@ function error(
       ...(profile === undefined ? {} : { profile }),
     },
   ]);
+}
+
+function errorMessage(cause: unknown): string {
+  return cause instanceof Error ? cause.message : String(cause);
 }

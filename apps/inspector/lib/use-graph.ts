@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createInspectorBackendStream, createInspectorClient } from "./client";
+import {
+  createInspectorBackendStream,
+  createInspectorClient,
+  INSPECTOR_BACKEND_CONNECTED_EVENT,
+} from "./client";
 import { normalizeGraphResponse, type GraphSnapshot } from "./graph-model";
 import type { StreamConnectionState } from "./stream";
 
@@ -39,6 +43,7 @@ export function useInspectorGraph(): InspectorGraphState {
             loading: false,
             error: false,
           }));
+          window.dispatchEvent(new Event(INSPECTOR_BACKEND_CONNECTED_EVENT));
         })
         .catch(() => {
           if (!disposed) setState((current) => ({ ...current, loading: false, error: true }));
@@ -50,12 +55,12 @@ export function useInspectorGraph(): InspectorGraphState {
         if (tags.includes("graph")) load();
       },
       onStateChange: (snapshot) => {
-        if (!disposed)
-          setState((current) => ({
-            ...current,
-            connection: snapshot.state,
-            droppedEvents: snapshot.droppedEvents,
-          }));
+        if (disposed) return;
+        setState((current) => ({
+          ...current,
+          connection: snapshot.state,
+          droppedEvents: snapshot.droppedEvents,
+        }));
       },
     });
     load();

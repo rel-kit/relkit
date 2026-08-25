@@ -71,6 +71,7 @@ function credentialsOption(value: unknown): { readonly credentials?: AwsCredenti
 }
 
 function text(value: unknown, label: string): string {
+  if (value instanceof URL) return value.toString();
   if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${label} is invalid`);
   return value.trim();
 }

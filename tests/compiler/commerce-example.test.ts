@@ -287,7 +287,7 @@ describe("commerce-example compiler acceptance", () => {
       runtimePaths: ["/files/:parts{.+}"],
     });
     expect(nodes.find((node) => node.id === "route.post.uploads")?.config).toMatchObject({
-      maxBodyBytes: 1_024,
+      maxBodyBytes: 10 * 1024 * 1024,
       request: {
         fields: {
           primary: { kind: "multipart", name: "primary" },

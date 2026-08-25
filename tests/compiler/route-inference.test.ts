@@ -178,6 +178,36 @@ describe("route contract inference", () => {
     ]);
   });
 
+  test("maps write fields to multipart when the route accepts form data", () => {
+    const file = z.file({ maxBytes: 10 * 1024 * 1024, mediaTypes: ["image/png"] });
+    const target = defineFunction({
+      id: "assets.upload",
+      input: z.object({
+        label: z.string(),
+        primary: file,
+        attachments: z.array(file),
+      }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const value = routeValue(
+      compile(target, "POST", "src/routes/uploads/route.ts", "multipart/form-data"),
+    );
+
+    expect(value.request).toEqual({
+      kind: "input",
+      fields: {
+        attachments: { kind: "multipart-all", name: "attachments" },
+        label: { kind: "multipart", name: "label" },
+        primary: { kind: "multipart", name: "primary" },
+      },
+    });
+    expect(value.responses).toEqual([
+      expect.objectContaining({ kind: "success", status: 200 }),
+      expect.objectContaining({ kind: "validation-error", status: 422 }),
+    ]);
+  });
+
   test("preserves schema defaults in inferred request mappings", () => {
     const target = defineFunction({
       id: "hello.read",
@@ -221,8 +251,17 @@ describe("route contract inference", () => {
   });
 });
 
-function compile(target: ReturnType<typeof defineFunction>, method: string, file: string) {
-  const descriptor = defineRoute({ id: `${target.id}.route`, target });
+function compile(
+  target: ReturnType<typeof defineFunction>,
+  method: string,
+  file: string,
+  accept?: "application/json" | "multipart/form-data",
+) {
+  const descriptor = defineRoute({
+    id: `${target.id}.route`,
+    target,
+    ...(accept === undefined ? {} : { accept }),
+  });
   return normalizeCompilation({
     descriptors: [
       target,

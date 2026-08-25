@@ -131,7 +131,7 @@ __zsys_bindDescriptorIdentity(__zsys_module_30["default"], "orders.normalize-id"
 
 export const manifestContractVersion = 4 as const;
 export const manifestGeneratorVersion = 1 as const;
-export const manifestGraphHash = "sha256:3ebd891b57a4a0b16337db635f74a723a940c68014a2af9c79cc0fbb83b19b6b" as const;
+export const manifestGraphHash = "sha256:cb86e904550aed6f4e71e26a429d93333fc6efe03b122b2f6d018f035dc56ccf" as const;
 export const providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined }, "cache:redis": { capability: "cache", adapter: "redis", factory: undefined }, "events:eventbridge": { capability: "events", adapter: "eventbridge", factory: undefined }, "jobs:sqs": { capability: "jobs", adapter: "sqs", factory: undefined }, "models:ai-sdk": { capability: "models", adapter: "ai-sdk", factory: undefined }, "observability:cloudwatch": { capability: "observability", adapter: "cloudwatch", factory: undefined } } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,

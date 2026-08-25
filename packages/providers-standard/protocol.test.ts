@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
+import { external, s3 } from "@zsys/app";
 import type { CacheOperationContext } from "@zsys/cache";
 import { createRedisCacheProvider } from "./src/redis.ts";
 import type { StandardRedisClient } from "./src/redis-client.ts";
 import { createS3BucketProvider } from "./src/s3.ts";
+import { standardProviderFactories } from "./src/factories.ts";
 
 const credentials = {
   accessKeyId: "test-access-key",
@@ -10,6 +12,32 @@ const credentials = {
 };
 
 describe("S3-compatible provider", () => {
+  test("allows optional credentials to resolve to no credentials", async () => {
+    const factory = standardProviderFactories["buckets:s3"]!;
+    const binding = external(
+      s3({
+        endpoint: new URL("http://127.0.0.1:9000"),
+        bucketName: "assets",
+        region: "us-east-1",
+      }),
+    );
+    const generation = await factory.create({
+      generationId: "provider-standard-test",
+      environment: "development",
+      capability: "buckets",
+      profile: "default",
+      binding,
+      configuration: {
+        endpoint: new URL("http://127.0.0.1:9000"),
+        bucketName: "assets",
+        region: "us-east-1",
+        credentials: { accessKeyId: undefined, secretAccessKey: undefined },
+      },
+    });
+
+    expect(generation.value).toBeDefined();
+  });
+
   for (const variant of [
     { name: "AWS-style", endpoint: "https://s3.us-east-1.amazonaws.com", path: false },
     { name: "R2-style", endpoint: "https://account.r2.cloudflarestorage.com", path: true },

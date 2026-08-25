@@ -2,6 +2,7 @@ import type { DescriptorMetadata, JsonValue } from "@zsys/contracts";
 import type { InferOutput, StandardSchemaV1 } from "@zsys/schema";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+export type HttpRequestContentType = "application/json" | "multipart/form-data";
 export interface HttpMapping<Output = unknown> {
   readonly __output?: Output;
 }
