@@ -2,6 +2,7 @@ import { canonicalJson, type JsonValue } from "@zsys/contracts";
 import { getJsonSchema, type StandardSchemaV1 } from "@zsys/schema";
 import { id, isRecord, json, refId, schemaKey } from "./normalize-utils.js";
 import type { NormalizedDescriptor, NormalizeInput } from "./normalize-types.js";
+import { providerMaps } from "./normalize-graph-app.js";
 
 export interface SchemaResult {
   readonly ok: boolean;
@@ -161,9 +162,8 @@ export function cronLike(value: unknown): boolean {
 export function providerProfiles(input: NormalizeInput): ReadonlyMap<string, readonly string[]> {
   const profiles = new Map<string, Set<string>>();
   for (const descriptor of input.descriptors ?? []) {
-    if (!isRecord(descriptor) || descriptor.kind !== "app" || !isRecord(descriptor.providers))
-      continue;
-    for (const [capability, bindings] of Object.entries(descriptor.providers)) {
+    if (!isRecord(descriptor) || descriptor.kind !== "app") continue;
+    for (const [capability, bindings] of providerMaps(descriptor)) {
       if (!isRecord(bindings)) continue;
       for (const name of Object.keys(bindings)) {
         const profileName = id(name) ?? name;

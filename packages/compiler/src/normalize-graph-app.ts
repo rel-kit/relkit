@@ -9,13 +9,49 @@ export function environmentMetadata(value: unknown): JsonValue {
 
 export function providerBindingIds(value: unknown): readonly string[] {
   if (!isRecord(value)) return [];
-  return Object.entries(value)
+  return providerMaps(value)
     .flatMap(([capability, profiles]) =>
       isRecord(profiles)
         ? Object.keys(profiles).map((profile) => `provider.${capability}.${profile}`)
         : [],
     )
     .sort();
+}
+
+export function providerMaps(value: Record<string, unknown>): [string, unknown][] {
+  return [
+    ["buckets", value.buckets],
+    ["cache", value.caches],
+    ["jobs", value.jobs],
+    ["events", value.events],
+    ["models", value.models],
+    ["observability", value.observability],
+  ].filter((entry): entry is [string, unknown] => entry[1] !== undefined);
+}
+
+const PROVIDER_DEFAULT_KEYS: Readonly<Record<string, string>> = Object.freeze({
+  buckets: "bucket",
+  cache: "cache",
+  jobs: "job",
+  events: "event",
+  models: "model",
+  observability: "observability",
+});
+
+export function selectedProviderProfile(
+  application: unknown,
+  capability: string,
+  requested?: string,
+): string | undefined {
+  if (!isRecord(application)) return requested;
+  const profiles = new Map(providerMaps(application)).get(capability);
+  if (!isRecord(profiles)) return requested;
+  if (requested !== undefined) return profiles[requested] === undefined ? undefined : requested;
+  const defaults = isRecord(application.defaults) ? application.defaults : {};
+  const selected = defaults[PROVIDER_DEFAULT_KEYS[capability] ?? ""];
+  if (typeof selected === "string" && profiles[selected] !== undefined) return selected;
+  const names = Object.keys(profiles);
+  return names.length === 1 ? names[0] : undefined;
 }
 
 export function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] {

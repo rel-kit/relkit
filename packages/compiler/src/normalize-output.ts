@@ -1,4 +1,8 @@
-import { generateClient } from "@zsys/client-generator";
+import {
+  generateClient,
+  generateClientContractDocument,
+  generateContract,
+} from "@zsys/client-generator";
 import { canonicalJson } from "@zsys/contracts";
 import { generateOpenApiJson } from "@zsys/openapi";
 import { canonicalGraphJson, type ApplicationGraph } from "@zsys/graph";
@@ -33,6 +37,10 @@ export function makeOutputs(
     diagnostics: `${canonicalJson(diagnostics)}\n`,
     openapi: generatedOpenApi(graph, diagnostics),
     client: generatedClient(graph, diagnostics),
+    contract: hasErrors(diagnostics) ? "" : generateContract(graph as unknown as ApplicationGraph),
+    clientContract: hasErrors(diagnostics)
+      ? ""
+      : generateClientContractDocument(graph as unknown as ApplicationGraph, hash),
   });
 }
 

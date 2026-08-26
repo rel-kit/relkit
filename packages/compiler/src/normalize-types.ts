@@ -19,7 +19,6 @@ import type {
   NormalizedGraph,
   ObservedEdge,
 } from "./normalize-graph-types.js";
-
 export type {
   GraphEdge,
   GraphNode,
@@ -31,7 +30,6 @@ export type {
   NormalizationSource,
   RuntimeReference,
 } from "./normalize-public-types.js";
-
 /** Stable diagnostics emitted by the normalization stage. */
 export const NORMALIZE_CODES = Object.freeze({
   descriptor: "ZSYS_DESCRIPTOR_INVALID",
@@ -77,8 +75,10 @@ export const NORMALIZE_CODES = Object.freeze({
   source: "ZSYS_SOURCE_LOCATION_INVALID",
   collision: "ZSYS_ROUTE_COLLISION",
   handler: "ZSYS_MANIFEST_HANDLER_MISSING",
+  authDuplicate: "ZSYS_AUTH_DUPLICATE",
+  dataModelDuplicate: "ZSYS_DATA_MODEL_DUPLICATE",
+  appDuplicate: "ZSYS_APP_DUPLICATE",
 } as const);
-
 /** The ordered pass names required by v3 Section 11.4. */
 export const VALIDATION_PASSES = Object.freeze([
   "extract descriptor values",
@@ -99,7 +99,6 @@ export const VALIDATION_PASSES = Object.freeze([
   "sort graph nodes and edges",
   "produce hash and generated outputs",
 ] as const);
-
 export type ValidationPass = (typeof VALIDATION_PASSES)[number];
 export interface NormalizeInput {
   readonly descriptors?: readonly unknown[];
@@ -108,6 +107,7 @@ export interface NormalizeInput {
   readonly evaluator?: EvaluatorResponse | readonly EvaluatorModuleResult[];
   readonly modules?: readonly EvaluatorModuleResult[];
   readonly projectRoot?: string;
+  readonly appId?: string;
   readonly generationId?: string;
   readonly mode?: "development" | "test" | "production";
   readonly sources?: readonly SourceMapSource[];
@@ -134,8 +134,9 @@ export interface GeneratedOutputs {
   readonly diagnostics: string;
   readonly openapi: string;
   readonly client: string;
+  readonly contract: string;
+  readonly clientContract: string;
 }
-
 export interface NormalizationResult {
   readonly passOrder: readonly ValidationPass[];
   readonly diagnostics: readonly Diagnostic[];
@@ -148,7 +149,6 @@ export interface NormalizationResult {
   readonly watch: WatchDependencyIndex;
   readonly activatable: boolean;
 }
-
 export interface NormalizationWork {
   readonly input: NormalizeInput;
   descriptors: NormalizedDescriptor[];
@@ -167,7 +167,6 @@ export interface NormalizationWork {
   graphHash?: string;
   outputs: GeneratedOutputs;
 }
-
 export function isDescriptorKindValue(value: string): value is DescriptorKind {
   return [
     "app",
@@ -182,13 +181,17 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
     "cache",
     "tool",
     "agent",
+    "data-model",
+    "constants",
+    "prompt",
   ].includes(value as DescriptorKind);
 }
-
 export const EMPTY_OUTPUTS: GeneratedOutputs = Object.freeze({
   graph: "",
   manifest: "",
   diagnostics: "",
   openapi: "",
   client: "",
+  contract: "",
+  clientContract: "",
 });

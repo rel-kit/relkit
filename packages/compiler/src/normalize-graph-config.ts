@@ -4,6 +4,7 @@ import { clean } from "./normalize-graph-utils.js";
 import { middlewareForRoute } from "./middleware-coverage.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
+import { selectedProviderProfile } from "./normalize-graph-app.js";
 
 export function httpConfig(
   descriptor: NormalizedDescriptor,
@@ -13,6 +14,7 @@ export function httpConfig(
   return clean({
     method: value.method,
     path: value.path,
+    ...(value.raw === true ? { rawHandler: true } : {}),
     ...(typeof value.title === "string" ? { title: value.title } : {}),
     ...(typeof value.description === "string" ? { description: value.description } : {}),
     ...(Array.isArray(value.tags) ? { tags: clean(value.tags) } : {}),
@@ -43,11 +45,16 @@ export function eventConfig(
   work: NormalizationWork,
 ): JsonValue {
   const expansion = work.selectorExpansions.get(descriptor.id) ?? selectorEntries(value.selector);
+  const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   return clean({
     selector: value.selector,
     expansion: sortEventPairs(expansion),
     delivery: value.delivery,
-    profile: value.profile,
+    profile: selectedProviderProfile(
+      application,
+      "events",
+      typeof value.profile === "string" ? value.profile : undefined,
+    ),
     retry: value.retry,
     concurrency: value.concurrency,
   });
