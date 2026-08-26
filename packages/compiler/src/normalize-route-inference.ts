@@ -15,6 +15,7 @@ export function inferRouteContract(
   descriptor: NormalizedDescriptor,
   value: Record<string, any>,
 ): void {
+  if (value.raw === true) return;
   const target = isRecord(value.target) ? value.target : {};
   if (value.request === undefined) value.request = inferRequest(work, descriptor, value, target);
   if (value.responses === undefined) value.responses = inferResponses(value, target);
@@ -60,9 +61,7 @@ function inferRequest(
   for (const name of Object.keys(projection.properties).sort()) {
     if (fields[name] !== undefined) continue;
     const property = projection.properties[name];
-    const source = body
-      ? bodySource(route.accept, name, property)
-      : { kind: "query", name };
+    const source = body ? bodySource(route.accept, name, property) : { kind: "query", name };
     const defaultValue = schemaDefault(property);
     fields[name] =
       defaultValue === undefined

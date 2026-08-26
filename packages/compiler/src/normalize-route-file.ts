@@ -50,6 +50,14 @@ export function bindRouteFile(
     );
   } else {
     value.method = nextMethod;
+    if ((nextMethod === "ALL") !== (value.raw === true)) {
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.routeExport,
+        "ALL is reserved for raw-handler routes, and raw-handler routes must use ALL.",
+      );
+    }
   }
   const nextPath = path(value.path);
   if (nextPath !== undefined) value.path = nextPath;

@@ -56,7 +56,7 @@ export function id(value: unknown): string | undefined {
 export function method(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const result = value.trim().toUpperCase();
-  return ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"].includes(result)
+  return ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"].includes(result)
     ? result
     : undefined;
 }
@@ -82,7 +82,7 @@ export function profile(value: unknown): string | undefined {
 export function source(
   value: unknown,
   input: NormalizeInput,
-  fallback = "src/app.ts",
+  fallback = "zsys.config.ts",
 ): SourceLocation {
   const root = input.projectRoot;
   const location = isSourceLocation(value) ? value : isRecord(value) ? value.source : undefined;
