@@ -149,6 +149,9 @@ function createAgentToolDispatcher(
           : { timeoutMs: request.options.timeoutMs }),
         signal: request.options?.signal ?? signal,
         ...(options.hooks === undefined ? {} : { hooks: options.hooks }),
+        ...(request.options?.toolHooks === undefined
+          ? {}
+          : { toolHooks: request.options.toolHooks }),
         parent,
       } satisfies ToolEngineInvocation;
       return engine.invoke(invocation) as Promise<Output>;

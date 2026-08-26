@@ -117,7 +117,8 @@ export async function runAgentLoop(
 }
 
 function instructions(options: AgentOptions): string {
-  return typeof options.agent.instructions === "string"
-    ? options.agent.instructions
-    : options.agent.instructions.template;
+  const value = options.agent.instructions;
+  if (typeof value === "string") return value;
+  if ("template" in value) return value.template;
+  return typeof value.value === "string" ? value.value : value.value.join("\n\n");
 }

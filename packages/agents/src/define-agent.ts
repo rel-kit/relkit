@@ -9,13 +9,26 @@ import { createUnboundIdentity } from "@zsys/invocation";
 import type { AgentRef } from "@zsys/functions";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
 import { isToolRef, type ToolRefAny } from "@zsys/tools";
-import { copyAgentInstructions, copyAgentTools } from "./define-agent-support.js";
+import {
+  copyAgentInstructions,
+  copyAgentTools,
+  isAgentInstructions,
+} from "./define-agent-support.js";
 import { normalizeModelSelector } from "./model-selection.js";
 
 export interface PromptTemplate {
   readonly template: string;
   readonly variables?: readonly string[];
 }
+
+export interface PromptInstructions {
+  readonly kind: "prompt";
+  readonly id: string;
+  readonly ref: { readonly kind: "prompt"; readonly id: string };
+  readonly value: string | readonly string[];
+}
+
+export type AgentInstructions = string | PromptTemplate | PromptInstructions;
 
 export interface AgentLimits {
   readonly maxSteps: number;
@@ -32,7 +45,7 @@ export interface AgentDescriptor<
 >
   extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
   readonly model?: string;
-  readonly instructions: string | PromptTemplate;
+  readonly instructions: AgentInstructions;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
 }
@@ -48,7 +61,7 @@ export interface DefineAgentOptions<
   readonly input: InputSchema;
   readonly output: OutputSchema;
   readonly model?: string;
-  readonly instructions: string | PromptTemplate;
+  readonly instructions: AgentInstructions;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
 }
@@ -121,7 +134,7 @@ export function isAgentDescriptor(value: unknown): value is AgentAny {
     isSchema(descriptor.input) &&
     isSchema(descriptor.output) &&
     isModelSelector(descriptor.model) &&
-    isInstructions(descriptor.instructions) &&
+    isAgentInstructions(descriptor.instructions) &&
     Array.isArray(descriptor.tools) &&
     descriptor.tools.every(isToolRef) &&
     isRecord(descriptor.limits) &&
@@ -150,18 +163,6 @@ function copyLimits(value: unknown): AgentLimits {
     maxToolCalls: positiveInteger(value.maxToolCalls, "limits.maxToolCalls"),
     timeoutMs: positiveInteger(value.timeoutMs, "limits.timeoutMs"),
   });
-}
-
-function isInstructions(value: unknown): value is string | PromptTemplate {
-  if (typeof value === "string") return value.trim() !== "";
-  if (!isRecord(value) || typeof value.template !== "string" || value.template.trim() === "") {
-    return false;
-  }
-  return (
-    value.variables === undefined ||
-    (Array.isArray(value.variables) &&
-      value.variables.every((entry) => typeof entry === "string" && entry.trim() !== ""))
-  );
 }
 
 function assertSchema(value: unknown, name: string): asserts value is StandardSchemaV1 {
