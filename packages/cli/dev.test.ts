@@ -60,7 +60,7 @@ test("keeps the active backend when a later candidate fails", async () => {
   sessions.push(session);
   const target = session.activeTarget;
 
-  expect(await session.notifySourceChange(1, ["src/app.ts"])).toBe(false);
+  expect(await session.notifySourceChange(1, ["zsys.config.ts"])).toBe(false);
   expect(session.activeTarget).toEqual(target);
   expect(session.stateMachine.state).toBe("active");
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");

@@ -150,7 +150,7 @@ async function eventually(check: () => Promise<boolean>): Promise<boolean> {
 }
 
 async function configureProductFixture(root: string, modelBaseUrl: string): Promise<void> {
-  const appPath = join(root, "src/app.ts");
+  const appPath = join(root, "zsys.config.ts");
   const app = await readFile(appPath, "utf8");
   await writeFile(
     appPath,

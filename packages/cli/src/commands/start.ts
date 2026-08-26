@@ -1,5 +1,6 @@
 import { join, resolve } from "node:path";
 import { API_BASE_PATH } from "@zsys/contracts";
+import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "@zsys/supervisor";
 import { resolveApplicationPort } from "./ports.js";
 import { readBuilt } from "./start-built.js";
 export interface StartOptions {
@@ -58,7 +59,7 @@ export async function startProject(options: StartOptions = {}): Promise<StartedP
     PORT: String(port),
     ZSYS_GRAPH_HASH: built.graphHash,
   };
-  const entrypoint = join(buildDirectory, built.manifest.entrypoint);
+  const entrypoint = join(buildDirectory, built.manifest.containerEntrypoint);
   const spawn = options.spawn ?? Bun.spawn;
   const child = spawn(
     [process.execPath, "run", "--no-env-file", "--no-install", "--silent", entrypoint],
@@ -85,7 +86,7 @@ export async function startProject(options: StartOptions = {}): Promise<StartedP
     await waitForHealth(
       hostname,
       port,
-      options.healthTimeoutMs ?? 2_000,
+      options.healthTimeoutMs ?? DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS,
       options.fetch ?? fetch,
       child,
     );

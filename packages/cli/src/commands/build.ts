@@ -1,5 +1,5 @@
 import { dirname, join, resolve } from "node:path";
-import { mkdtemp, readFile, rename, rm, writeFile, mkdir } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rename, rm, writeFile, mkdir } from "node:fs/promises";
 import {
   canonicalJson,
   CONTRACT_VERSION,
@@ -60,6 +60,13 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
     await mkdir(serverDirectory, { recursive: true });
     await writeFile(join(stage, "application.graph.json"), `${canonicalJson(graph)}\n`);
     await writeFile(join(stage, "openapi.json"), openapi === "" ? "{}\n" : openapi);
+    await mkdir(join(stage, "public"), { recursive: true });
+    await cp(join(projectRoot, "public"), join(stage, "public"), {
+      recursive: true,
+      force: true,
+    }).catch((error: NodeJS.ErrnoException) => {
+      if (error.code !== "ENOENT") throw error;
+    });
     await writeFile(join(serverDirectory, "runtime.manifest.ts"), manifestSource);
     await writeFile(
       join(serverDirectory, "index.ts"),
@@ -67,7 +74,10 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         graph,
         graphHash,
         JSON.parse(openapi === "" ? "{}" : openapi) as JsonValue,
-        tooling.server,
+        JSON.parse(
+          checked.outputs.clientContract === "" ? "{}" : checked.outputs.clientContract,
+        ) as JsonValue,
+        { ...tooling.server, maxPreviewBytes: tooling.inspector.maxPreviewBytes },
       ),
     );
     await bundleServer(serverDirectory, projectRoot);
@@ -104,6 +114,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         "application.graph.json",
         "manifest.json",
         "openapi.json",
+        "public/",
         "server/index.js",
         "server/index.ts",
         "server/runtime.manifest.ts",

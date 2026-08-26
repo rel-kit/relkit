@@ -15,6 +15,7 @@ export interface BuiltManifest {
   readonly manifestVersion: number;
   readonly graphHash: string;
   readonly entrypoint: string;
+  readonly containerEntrypoint: string;
   readonly runtimeManifestFile: string;
   readonly server?: { readonly port?: number };
 }
@@ -44,11 +45,13 @@ export async function readBuilt(
   }
   if (
     manifest.entrypoint !== "server/index.ts" ||
+    manifest.containerEntrypoint !== "server/index.js" ||
     manifest.runtimeManifestFile !== "server/runtime.manifest.ts"
   ) {
     throw new Error("Built manifest paths are invalid.");
   }
   await access(join(buildDirectory, manifest.entrypoint));
+  await access(join(buildDirectory, manifest.containerEntrypoint));
   const runtimeManifest = await readFile(
     join(buildDirectory, manifest.runtimeManifestFile),
     "utf8",
