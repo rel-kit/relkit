@@ -15,6 +15,13 @@ export interface StandardRedisClient {
   delete(key: string): Promise<number>;
   has(key: string): Promise<boolean>;
   increment(key: string, amount?: number): Promise<number>;
+  scan(
+    cursor: string,
+    pattern: string,
+    count: number,
+  ): Promise<readonly [string, readonly string[]]>;
+  type(key: string): Promise<string>;
+  ttl(key: string): Promise<number>;
 }
 
 export function createRedisClient(options: StandardRedisClientOptions): StandardRedisClient {
@@ -54,6 +61,15 @@ export function createRedisClient(options: StandardRedisClientOptions): Standard
       if (!Number.isSafeInteger(amount)) throw new RangeError("Redis increment must be an integer");
       return client.incrby(key, amount);
     },
+    scan: async (cursor, pattern, count) => {
+      const result = await client.send("SCAN", [cursor, "MATCH", pattern, "COUNT", String(count)]);
+      if (!Array.isArray(result) || result.length !== 2 || !Array.isArray(result[1])) {
+        throw new Error("Redis SCAN returned an invalid response");
+      }
+      return [String(result[0]), result[1].map(String)];
+    },
+    type: async (key) => String(await client.send("TYPE", [key])),
+    ttl: async (key) => Number(await client.send("PTTL", [key])),
   };
 }
 

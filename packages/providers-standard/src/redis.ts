@@ -12,6 +12,19 @@ export interface RedisCacheOptions {
 export interface RedisCacheProvider extends CacheProvider {
   readonly ready: () => Promise<void>;
   readonly close: () => Promise<void>;
+  readonly inspector: {
+    readonly scan: (request: {
+      readonly search?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{ readonly items: readonly unknown[]; readonly nextCursor?: string }>;
+    readonly value: (request: {
+      readonly key: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<unknown | undefined>;
+  };
 }
 
 export function createRedisCacheProvider(options: RedisCacheOptions): RedisCacheProvider {
@@ -82,6 +95,40 @@ export function createRedisCacheProvider(options: RedisCacheOptions): RedisCache
       if (flights.get(cacheKey) === flight) flights.delete(cacheKey);
     }
   };
+  const inspector: RedisCacheProvider["inspector"] = Object.freeze({
+    scan: async (request) => {
+      check({ operation: "get", signal: request.signal });
+      const redis = await connect();
+      const pattern = `${options.cacheId}:*${redisPattern(request.search ?? "")}*`;
+      const [nextCursor, keys] = await redis.scan(request.cursor ?? "0", pattern, request.limit);
+      const items = await Promise.all(
+        keys.slice(0, request.limit).map(async (key) => ({
+          key: key.slice(options.cacheId.length + 1),
+          type: await redis.type(key),
+          ttlMs: normalizeTtl(await redis.ttl(key)),
+          bytes: new TextEncoder().encode((await redis.get(key)) ?? "").byteLength,
+        })),
+      );
+      return { items, ...(nextCursor === "0" ? {} : { nextCursor }) };
+    },
+    value: async (request) => {
+      check({ operation: "get", signal: request.signal });
+      const redis = await connect();
+      const key = `${options.cacheId}:${request.key}`;
+      const value = await redis.get(key);
+      if (value === null) return undefined;
+      const bytes = new TextEncoder().encode(value).byteLength;
+      return {
+        key: request.key,
+        type: await redis.type(key),
+        ttlMs: normalizeTtl(await redis.ttl(key)),
+        bytes,
+        ...(bytes > request.limit
+          ? { truncated: true }
+          : { value: JSON.parse(value), truncated: false }),
+      };
+    },
+  });
   return Object.freeze({
     capabilities: Object.freeze({ increment: true }),
     get,
@@ -91,6 +138,7 @@ export function createRedisCacheProvider(options: RedisCacheOptions): RedisCache
       (await get(key, context)) !== undefined,
     getOrSet,
     increment,
+    inspector,
     ready: async () => {
       check(undefined);
       if (!(await (await connect()).ping())) throw new Error("Redis readiness check failed");
@@ -100,6 +148,14 @@ export function createRedisCacheProvider(options: RedisCacheOptions): RedisCache
       client.close();
     },
   });
+}
+
+function redisPattern(value: string): string {
+  return value.replace(/[\\*?\[\]]/g, "\\$&");
+}
+
+function normalizeTtl(value: number): number | null {
+  return value < 0 ? null : value;
 }
 
 function check(context: CacheOperationContext | undefined): void {
