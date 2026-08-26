@@ -1,6 +1,6 @@
 {
   "contractVersion": 2,
-  "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+  "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
   "application": {
     "id": "full-app",
     "image": {
@@ -86,7 +86,7 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -121,7 +121,7 @@
       "capabilities": ["jobs"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
         "managed-by": "zsys"
       },
       "jobId": "receipts.send-job",
@@ -146,7 +146,7 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -177,7 +177,7 @@
       "capabilities": ["events"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
         "managed-by": "zsys"
       },
       "metadata": {
@@ -209,7 +209,7 @@
       "capabilities": ["buckets"],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:89b837eef87fca39d101a8f294a4ebdb8d9feae7a6e0d95e993094b7413f0da0",
+        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
         "managed-by": "zsys"
       },
       "visibility": "private",
