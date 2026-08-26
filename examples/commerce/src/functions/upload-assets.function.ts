@@ -1,13 +1,22 @@
 import { defineFunction } from "@zsys/app";
+import assets from "../buckets/assets.bucket.js";
 import { assetUploadInput, assetUploadOutput } from "../shared/schemas.js";
 
 const uploadAssets = defineFunction({
   input: assetUploadInput,
   output: assetUploadOutput,
-  handler: async ({ label, primary, attachments }) => ({
-    label,
-    files: [primary.name, ...attachments.map(({ name }) => name)],
-  }),
+  dependencies: { buckets: { assets } },
+  handler: async ({ label, primary, attachments }, context) => {
+    const files = [primary, ...attachments];
+    await Promise.all(
+      files.map(async (file) =>
+        context.buckets.assets.put(file.name, new Uint8Array(await file.arrayBuffer()), {
+          contentType: file.type,
+        }),
+      ),
+    );
+    return { label, files: files.map(({ name }) => name) };
+  },
 });
 
 export default uploadAssets;
