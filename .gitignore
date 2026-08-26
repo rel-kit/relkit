@@ -33,11 +33,7 @@ dist
 *.tsbuildinfo
 
 # ZSys generated and local runtime data
-/.zsys/generated/
-/.zsys/build/
-/.zsys/state/
-/.zsys/observability/
-/.zsys/docgen*/
+.zsys/
 
 
 # Debug
