@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { ZSYS_DESCRIPTOR } from "@zsys/contracts";
+import { isDescriptor } from "@zsys/contracts";
 import type { DoctorCheck } from "./doctor-support.js";
 
 export type PackageJson = Record<string, any>;
@@ -103,35 +103,9 @@ export function detectDeployment(manifest: PackageJson | undefined, config: unkn
 }
 
 export function isAppDescriptor(value: unknown): boolean {
-  if (
-    !isRecord(value) ||
-    value[ZSYS_DESCRIPTOR] !== true ||
-    value.kind !== "app" ||
-    typeof value.id !== "string"
-  )
-    return false;
-  return (
-    isRecord(value.env) &&
-    value.env.kind === "env-definition" &&
-    isProviderTopology(value.providers)
-  );
-}
-
-function isProviderTopology(value: unknown): boolean {
-  if (!isRecord(value)) return false;
-  return Object.entries(value).every(
-    ([capability, profiles]) =>
-      ["buckets", "cache", "jobs", "events", "models", "observability"].includes(capability) &&
-      isRecord(profiles) &&
-      Object.values(profiles).every(
-        (binding) =>
-          isRecord(binding) &&
-          binding.kind === "provider-binding" &&
-          (binding.ownership === "external" || binding.ownership === "managed") &&
-          isRecord(binding.adapter) &&
-          binding.adapter.capability === capability,
-      ),
-  );
+  if (!isRecord(value) || !isDescriptor(value, "app")) return false;
+  const env = Reflect.get(value, "env");
+  return isRecord(env) && env.kind === "env-definition";
 }
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);

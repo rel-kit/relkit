@@ -130,18 +130,18 @@ async function checkApp(
     return undefined;
   }
   try {
-    const loaded = await import(`${pathToFileURL(resolve(root, config.entry)).href}?zsys_doctor=1`);
-    const module = loaded as { readonly default?: unknown; readonly app?: unknown };
-    const app = module.default ?? module.app;
+    const file = "zsys.config.ts";
+    const loaded = await import(`${pathToFileURL(resolve(root, file)).href}?zsys_doctor_app=1`);
+    const app = (loaded as { readonly default?: unknown }).default;
     const ok = isAppDescriptor(app);
     checks.push({
       name: "app",
       ok,
-      message: ok ? `${config.entry} is valid.` : `${config.entry} is not a valid app descriptor.`,
+      message: ok ? `${file} defines the application.` : `${file} is not a valid app config.`,
     });
     return app;
   } catch {
-    checks.push({ name: "app", ok: false, message: `${config.entry} could not be loaded.` });
+    checks.push({ name: "app", ok: false, message: "zsys.config.ts could not be loaded." });
     return undefined;
   }
 }

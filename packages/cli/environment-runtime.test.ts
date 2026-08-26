@@ -8,7 +8,7 @@ const roots: string[] = [];
 
 test("the emitted server rejects missing production environment before provider startup", async () => {
   const root = await copyFullProject();
-  const appPath = join(root, "src/app.ts");
+  const appPath = join(root, "zsys.config.ts");
   const source = await readFile(appPath, "utf8");
   await writeFile(
     appPath,
