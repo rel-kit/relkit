@@ -397,6 +397,7 @@ declare const createAgentSpanCapture: (
 - [utils](#utils)
   - [copyAgentInstructions](#copyagentinstructions)
   - [copyAgentTools](#copyagenttools)
+  - [isAgentInstructions](#isagentinstructions)
 
 ---
 
@@ -407,7 +408,7 @@ declare const createAgentSpanCapture: (
 **Signature**
 
 ```ts
-declare const copyAgentInstructions: (value: unknown) => string | PromptTemplate;
+declare const copyAgentInstructions: (value: unknown) => AgentInstructions;
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent-support.ts#L5)
@@ -420,7 +421,17 @@ declare const copyAgentInstructions: (value: unknown) => string | PromptTemplate
 declare const copyAgentTools: (value: unknown) => readonly ToolRefAny[];
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent-support.ts#L13)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent-support.ts#L55)
+
+## isAgentInstructions
+
+**Signature**
+
+```ts
+declare const isAgentInstructions: (value: unknown) => value is AgentInstructions;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent-support.ts#L14)
 
 ## `define-agent.ts`
 
@@ -432,8 +443,10 @@ declare const copyAgentTools: (value: unknown) => readonly ToolRefAny[];
   - [defineAgent](#defineagent)
 - [utils](#utils)
   - [AgentDescriptor (interface)](#agentdescriptor-interface)
+  - [AgentInstructions (type alias)](#agentinstructions-type-alias)
   - [AgentLimits (interface)](#agentlimits-interface)
   - [DefineAgentOptions (interface)](#defineagentoptions-interface)
+  - [PromptInstructions (interface)](#promptinstructions-interface)
   - [PromptTemplate (interface)](#prompttemplate-interface)
   - [assertAgentDescriptor](#assertagentdescriptor)
   - [isAgentDescriptor](#isagentdescriptor)
@@ -485,7 +498,7 @@ declare const defineAgent: <
 >;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L87)
 
 Since v0.1.0
 
@@ -505,13 +518,23 @@ export interface AgentDescriptor<
 >
   extends DescriptorBase<"agent", Id>, AgentRef<Id, InputSchema, OutputSchema> {
   readonly model?: string;
-  readonly instructions: string | PromptTemplate;
+  readonly instructions: AgentInstructions;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L26)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L39)
+
+## AgentInstructions (type alias)
+
+**Signature**
+
+```ts
+type AgentInstructions = string | PromptTemplate | PromptInstructions;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L31)
 
 ## AgentLimits (interface)
 
@@ -525,7 +548,7 @@ export interface AgentLimits {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L20)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L33)
 
 ## DefineAgentOptions (interface)
 
@@ -541,13 +564,28 @@ export interface DefineAgentOptions<
   readonly input: InputSchema;
   readonly output: OutputSchema;
   readonly model?: string;
-  readonly instructions: string | PromptTemplate;
+  readonly instructions: AgentInstructions;
   readonly tools: readonly ToolRefAny[];
   readonly limits: AgentLimits;
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L42)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L55)
+
+## PromptInstructions (interface)
+
+**Signature**
+
+```ts
+export interface PromptInstructions {
+  readonly kind: "prompt";
+  readonly id: string;
+  readonly ref: { readonly kind: "prompt"; readonly id: string };
+  readonly value: string | readonly string[];
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L24)
 
 ## PromptTemplate (interface)
 
@@ -560,7 +598,7 @@ export interface PromptTemplate {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L15)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L19)
 
 ## assertAgentDescriptor
 
@@ -570,7 +608,7 @@ export interface PromptTemplate {
 declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L142)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L155)
 
 ## isAgentDescriptor
 
@@ -580,7 +618,7 @@ declare const assertAgentDescriptor: (value: unknown) => asserts value is AgentA
 declare const isAgentDescriptor: (value: unknown) => value is AgentAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L115)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/agents/src/define-agent.ts#L128)
 
 ## `generated-function.ts`
 

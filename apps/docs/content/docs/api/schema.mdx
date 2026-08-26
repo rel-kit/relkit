@@ -347,6 +347,7 @@ declare const fileSchema: (options?: FileSchemaOptions) => FileSchema;
   - [SchemaValidationError](#schemavalidationerror)
   - [StandardFailure](#standardfailure)
   - [StandardIssue](#standardissue)
+  - [StandardJSONSchemaV1](#standardjsonschemav1)
   - [StandardPathSegment](#standardpathsegment)
   - [StandardResult](#standardresult)
   - [StandardSchemaOptions](#standardschemaoptions)
@@ -517,6 +518,16 @@ declare const StandardIssue: StandardIssue;
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L23)
 
+## StandardJSONSchemaV1
+
+**Signature**
+
+```ts
+declare const StandardJSONSchemaV1: StandardJSONSchemaV1<TInput, TOutput>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L29)
+
 ## StandardPathSegment
 
 **Signature**
@@ -575,7 +586,7 @@ declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 declare const StandardSuccess: StandardSuccess<T>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L29)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L30)
 
 ## StringSchema
 
@@ -605,7 +616,7 @@ declare const ZBuilder: ZBuilder;
 declare const ZsysSchema: ZsysSchema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/index.ts#L31)
 
 ## getJsonSchema
 
@@ -851,7 +862,7 @@ declare class SchemaValidationError {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L29)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L27)
 
 ### issues (property)
 
@@ -861,7 +872,7 @@ declare class SchemaValidationError {
 readonly issues: ReadonlyArray<StandardIssue>
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L30)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L28)
 
 ## createSchema
 
@@ -876,7 +887,7 @@ declare const createSchema: <TInput, TOutput>(
 ) => Schema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L40)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L36)
 
 ## runSchema
 
@@ -892,7 +903,7 @@ declare const runSchema: <TOutput>(
 ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L50)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/schema-impl.ts#L45)
 
 ## `schema-metadata.ts`
 
@@ -996,6 +1007,10 @@ A Standard Schema v1 path may use a key directly or a structured segment.
   - [SchemaValidationError](#schemavalidationerror)
   - [StandardFailure (interface)](#standardfailure-interface)
   - [StandardIssue (interface)](#standardissue-interface)
+  - [StandardJSONSchemaV1 (interface)](#standardjsonschemav1-interface)
+  - [StandardJSONSchemaV1 (namespace)](#standardjsonschemav1-namespace)
+    - [Props (interface)](#props-interface)
+    - [Options (interface)](#options-interface)
   - [StandardPathSegment (type alias)](#standardpathsegment-type-alias)
   - [StandardResult (type alias)](#standardresult-type-alias)
   - [StandardSchemaOptions (interface)](#standardschemaoptions-interface)
@@ -1046,7 +1061,7 @@ declare const validate: <S extends StandardSchemaV1>(
 ) => StandardResult<InferOutput<S>> | Promise<StandardResult<InferOutput<S>>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L123)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L145)
 
 Since v0.1.0
 
@@ -1068,7 +1083,7 @@ type InferInput<S> = S["~standard"] extends {
   : unknown;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L78)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L100)
 
 ## InferOutput (type alias)
 
@@ -1086,7 +1101,7 @@ type InferOutput<S> = S["~standard"] extends {
   : unknown;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L87)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L109)
 
 ## JsonValue (type alias)
 
@@ -1099,7 +1114,7 @@ type JsonValue =
   string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L96)
 
 ## Schema (interface)
 
@@ -1123,7 +1138,7 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends ZsysSchema<T
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L96)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L118)
 
 ## SchemaValidationError
 
@@ -1133,7 +1148,7 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends ZsysSchema<T
 declare const SchemaValidationError: typeof SchemaValidationError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L142)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L164)
 
 ## StandardFailure (interface)
 
@@ -1163,6 +1178,53 @@ export interface StandardIssue {
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L5)
+
+## StandardJSONSchemaV1 (interface)
+
+**Signature**
+
+```ts
+export interface StandardJSONSchemaV1<TInput = unknown, TOutput = TInput> {
+  readonly "~standard": StandardJSONSchemaV1.Props<TInput, TOutput>;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L48)
+
+## StandardJSONSchemaV1 (namespace)
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L52)
+
+### Props (interface)
+
+**Signature**
+
+```ts
+export interface Props<Input = unknown, Output = Input> {
+  readonly version: 1;
+  readonly vendor: string;
+  readonly types?: StandardSchemaTypes<Input, Output>;
+  readonly jsonSchema: {
+    readonly input: (options: Options) => Record<string, unknown>;
+    readonly output: (options: Options) => Record<string, unknown>;
+  };
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L53)
+
+### Options (interface)
+
+**Signature**
+
+```ts
+export interface Options {
+  readonly target: "draft-2020-12" | "draft-07" | "openapi-3.0" | ({} & string);
+  readonly libraryOptions?: Record<string, unknown> | undefined;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L62)
 
 ## StandardPathSegment (type alias)
 
@@ -1196,7 +1258,7 @@ Standard Schema v1 options accepted by compatible validators.
 
 ```ts
 export interface StandardSchemaOptions {
-  readonly libraryOptions?: Record<string, unknown>;
+  readonly libraryOptions?: Record<string, unknown> | undefined;
 }
 ```
 
@@ -1243,7 +1305,7 @@ export interface StandardSchemaV1<TInput = unknown, TOutput = TInput> {
 
 Namespace aliases matching the official Standard Schema v1 vocabulary.
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L49)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L69)
 
 ### Props (type alias)
 
@@ -1253,7 +1315,7 @@ Namespace aliases matching the official Standard Schema v1 vocabulary.
 type { readonly version: 1; readonly vendor: string; readonly validate: (value: unknown, options?: StandardSchemaOptions) => StandardResult<Output> | Promise<StandardResult<Output>>; readonly types?: StandardSchemaTypes<Input, Output>; } = StandardSchemaV1<Input, Output>["~standard"]
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L50)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L70)
 
 ### Result (type alias)
 
@@ -1263,7 +1325,7 @@ type { readonly version: 1; readonly vendor: string; readonly validate: (value: 
 type Result<Output> = StandardResult<Output>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L51)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L71)
 
 ### SuccessResult (type alias)
 
@@ -1273,7 +1335,7 @@ type Result<Output> = StandardResult<Output>;
 type SuccessResult<Output> = StandardSuccess<Output>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L52)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L72)
 
 ### FailureResult (type alias)
 
@@ -1283,7 +1345,7 @@ type SuccessResult<Output> = StandardSuccess<Output>;
 type FailureResult = StandardFailure;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L53)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L73)
 
 ### Issue (type alias)
 
@@ -1293,7 +1355,7 @@ type FailureResult = StandardFailure;
 type Issue = StandardIssue;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L54)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L74)
 
 ### PathSegment (type alias)
 
@@ -1303,7 +1365,7 @@ type Issue = StandardIssue;
 type PathSegment = { readonly key: PropertyKey };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L55)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L75)
 
 ### Types (type alias)
 
@@ -1313,7 +1375,7 @@ type PathSegment = { readonly key: PropertyKey };
 type Types<Input, Output> = StandardSchemaTypes<Input, Output>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L56)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L76)
 
 ### Options (type alias)
 
@@ -1323,7 +1385,7 @@ type Types<Input, Output> = StandardSchemaTypes<Input, Output>;
 type Options = StandardSchemaOptions;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L57)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L77)
 
 ### InferInput (type alias)
 
@@ -1333,7 +1395,7 @@ type Options = StandardSchemaOptions;
 type InferInput<S> = import("./standard-schema.js").InferInput<S>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L58)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L78)
 
 ### InferOutput (type alias)
 
@@ -1343,7 +1405,7 @@ type InferInput<S> = import("./standard-schema.js").InferInput<S>;
 type InferOutput<S> = import("./standard-schema.js").InferOutput<S>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L59)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L79)
 
 ## StandardSuccess (interface)
 
@@ -1371,13 +1433,15 @@ export interface ZsysSchema<TInput = unknown, TOutput = TInput> extends Standard
   TInput,
   TOutput
 > {
+  readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
+    StandardJSONSchemaV1<TInput, TOutput>["~standard"];
   readonly zsys?: {
     readonly jsonSchema?: () => JsonValue;
   };
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L64)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L84)
 
 ## createSchema
 
@@ -1390,7 +1454,7 @@ declare const createSchema: <TInput, TOutput>(
 ) => Schema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L142)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L164)
 
 ## isPromiseLike
 
@@ -1400,7 +1464,7 @@ declare const createSchema: <TInput, TOutput>(
 declare const isPromiseLike: (value: unknown) => value is PromiseLike<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L155)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L177)
 
 ## issue
 
@@ -1410,7 +1474,7 @@ declare const isPromiseLike: (value: unknown) => value is PromiseLike<unknown>;
 declare const issue: (message: string, path: readonly StandardPathSegment[]) => StandardFailure;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L144)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L166)
 
 ## runSchema
 
@@ -1424,7 +1488,7 @@ declare const runSchema: <TOutput>(
 ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L142)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L164)
 
 ## validateSync
 
@@ -1439,4 +1503,4 @@ declare const validateSync: <S extends StandardSchemaV1>(
 ) => StandardResult<InferOutput<S>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L133)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/schema/src/standard-schema.ts#L155)

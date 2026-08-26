@@ -130,8 +130,7 @@ declare const isMiddlewarePath: (value: unknown) => value is string;
 - [HTTP](#http)
   - [defineRoute](#defineroute)
 - [utils](#utils)
-  - [DefineRouteOptions (interface)](#definerouteoptions-interface)
-  - [RouteDescriptor (interface)](#routedescriptor-interface)
+  - ["./route-types.js" (namespace export)](#route-typesjs-namespace-export)
 
 ---
 
@@ -170,62 +169,26 @@ export const GET = defineRoute({ target: listOrders })
 **Signature**
 
 ```ts
-declare const defineRoute: <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: DefineRouteOptions<Id, Target, Request>) => RouteDescriptor<Id, Target, Request>
+declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L79)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L60)
 
 Since v0.1.0
 
 # utils
 
-## DefineRouteOptions (interface)
+## "./route-types.js" (namespace export)
+
+Re-exports all named exports from the "./route-types.js" module.
 
 **Signature**
 
 ```ts
-export interface DefineRouteOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping | undefined = undefined,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly target: Target;
-  readonly request?: Request;
-  readonly responses?: readonly HttpResponseMapping[];
-  readonly successStatus?: number;
-  readonly maxBodyBytes?: number;
-  readonly rateLimit?: RouteRateLimit;
-  readonly timeoutMs?: number;
-}
+export * from "./route-types.js";
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L37)
-
-## RouteDescriptor (interface)
-
-**Signature**
-
-```ts
-export interface RouteDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny = FunctionRefAny,
-  Request extends HttpRequestMapping | undefined = HttpRequestMapping | undefined,
-> extends DescriptorBase<"route", Id> {
-  readonly method?: HttpMethod;
-  readonly path?: string;
-  readonly runtimePaths?: readonly string[];
-  readonly target: Target;
-  readonly request?: Request;
-  readonly responses?: readonly HttpResponseMapping[];
-  readonly successStatus?: number;
-  readonly maxBodyBytes?: number;
-  readonly rateLimit?: RouteRateLimit;
-  readonly timeoutMs?: number;
-}
-```
-
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L21)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/define-route.ts#L22)
 
 ## `http-dsl-types.ts`
 
@@ -255,6 +218,7 @@ export interface RouteDescriptor<
   - [HttpPathMapping (interface)](#httppathmapping-interface)
   - [HttpPathSegmentsMapping (interface)](#httppathsegmentsmapping-interface)
   - [HttpQueryMapping (interface)](#httpquerymapping-interface)
+  - [HttpRequestContentType (type alias)](#httprequestcontenttype-type-alias)
   - [HttpRequestMapping (type alias)](#httprequestmapping-type-alias)
   - [HttpResponseMapping (interface)](#httpresponsemapping-interface)
   - [HttpSourceOptions (interface)](#httpsourceoptions-interface)
@@ -282,7 +246,7 @@ export interface ContinueMapping {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L147)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L148)
 
 ## DefineTransformOptions (interface)
 
@@ -298,7 +262,7 @@ export interface DefineTransformOptions<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L132)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L133)
 
 ## HttpBodyMapping (interface)
 
@@ -311,7 +275,7 @@ export interface HttpBodyMapping<Output = unknown> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L33)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L34)
 
 ## HttpConstantMapping (interface)
 
@@ -326,7 +290,7 @@ export interface HttpConstantMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L50)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L51)
 
 ## HttpCookieMapping (interface)
 
@@ -339,7 +303,7 @@ export interface HttpCookieMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L29)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L30)
 
 ## HttpDefaultMapping (interface)
 
@@ -356,7 +320,7 @@ export interface HttpDefaultMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L74)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L75)
 
 ## HttpDsl (interface)
 
@@ -403,7 +367,7 @@ export interface HttpDsl {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L157)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L158)
 
 ## HttpHeaderMapping (interface)
 
@@ -416,7 +380,7 @@ export interface HttpHeaderMapping<Output = string> extends HttpMapping<Output> 
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L25)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L26)
 
 ## HttpInputMapping (interface)
 
@@ -431,7 +395,7 @@ export interface HttpInputMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L62)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L63)
 
 ## HttpMapping (interface)
 
@@ -443,7 +407,7 @@ export interface HttpMapping<Output = unknown> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L5)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L6)
 
 ## HttpMappingNode (type alias)
 
@@ -468,7 +432,7 @@ type HttpMappingNode =
   | HttpTransformMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L87)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L88)
 
 ## HttpMappingOutput (type alias)
 
@@ -478,7 +442,7 @@ type HttpMappingNode =
 type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L12)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L13)
 
 ## HttpMappingShape (type alias)
 
@@ -488,14 +452,14 @@ type HttpMappingOutput<M> = M extends HttpMapping<infer Output> ? Output : never
 type HttpMappingShape = Readonly<Record<string, HttpMappingNode>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L8)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L9)
 
 ## HttpMethod (type alias)
 
 **Signature**
 
 ```ts
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS" | "ALL";
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L4)
@@ -513,7 +477,7 @@ export interface HttpMultipartAllMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L45)
 
 ## HttpMultipartMapping (interface)
 
@@ -526,7 +490,7 @@ export interface HttpMultipartMapping<Output = string | File> extends HttpMappin
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L40)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L41)
 
 ## HttpNestedMapping (interface)
 
@@ -541,7 +505,7 @@ export interface HttpNestedMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L56)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L57)
 
 ## HttpOptionalMapping (interface)
 
@@ -556,7 +520,7 @@ export interface HttpOptionalMapping<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L68)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L69)
 
 ## HttpPathMapping (interface)
 
@@ -569,7 +533,7 @@ export interface HttpPathMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L13)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L14)
 
 ## HttpPathSegmentsMapping (interface)
 
@@ -582,7 +546,7 @@ export interface HttpPathSegmentsMapping<Output = readonly string[]> extends Htt
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L17)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L18)
 
 ## HttpQueryMapping (interface)
 
@@ -595,7 +559,17 @@ export interface HttpQueryMapping<Output = string> extends HttpMapping<Output> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L21)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L22)
+
+## HttpRequestContentType (type alias)
+
+**Signature**
+
+```ts
+type HttpRequestContentType = "application/json" | "multipart/form-data";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L5)
 
 ## HttpRequestMapping (type alias)
 
@@ -605,7 +579,7 @@ export interface HttpQueryMapping<Output = string> extends HttpMapping<Output> {
 type HttpRequestMapping = HttpInputMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L103)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L104)
 
 ## HttpResponseMapping (interface)
 
@@ -621,7 +595,7 @@ export interface HttpResponseMapping {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L140)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L141)
 
 ## HttpSourceOptions (interface)
 
@@ -634,7 +608,7 @@ export interface HttpSourceOptions {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L104)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L105)
 
 ## HttpTransformDescriptor (interface)
 
@@ -650,7 +624,7 @@ export interface HttpTransformDescriptor<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L120)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L121)
 
 ## HttpTransformMapping (interface)
 
@@ -664,7 +638,7 @@ export interface HttpTransformMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L82)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L83)
 
 ## HttpTransformRef (interface)
 
@@ -680,7 +654,7 @@ export interface HttpTransformRef<
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L113)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L114)
 
 ## HttpWholeBodyMapping (interface)
 
@@ -692,7 +666,7 @@ export interface HttpWholeBodyMapping<Output = unknown> extends HttpMapping<Outp
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L37)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L38)
 
 ## MappingShapeOutput (type alias)
 
@@ -704,7 +678,7 @@ type MappingShapeOutput<S> = {
 };
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L9)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L10)
 
 ## MiddlewareDecisionMapping (type alias)
 
@@ -714,7 +688,7 @@ type MappingShapeOutput<S> = {
 type MiddlewareDecisionMapping = ContinueMapping | RespondMapping;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L155)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L156)
 
 ## RespondMapping (interface)
 
@@ -728,7 +702,7 @@ export interface RespondMapping {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L150)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L151)
 
 ## TransformOutput (type alias)
 
@@ -742,7 +716,7 @@ type TransformOutput<T> = T extends { readonly schema: infer Schema }
   : unknown;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L127)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L128)
 
 ## TransformReference (interface)
 
@@ -755,7 +729,7 @@ export interface TransformReference<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L109)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/http-dsl-types.ts#L110)
 
 ## `http-dsl-validation.ts`
 
@@ -1058,6 +1032,7 @@ declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
   - ["./define-middleware.js" (namespace export)](#define-middlewarejs-namespace-export)
   - ["./define-route.js" (namespace export)](#define-routejs-namespace-export)
   - ["./http-dsl.js" (namespace export)](#http-dsljs-namespace-export)
+  - ["./route-types.js" (namespace export)](#route-typesjs-namespace-export)
   - [HttpRateLimitKey](#httpratelimitkey)
   - [RouteRateLimit](#routeratelimit)
 
@@ -1101,6 +1076,18 @@ export * from "./http-dsl.js";
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L1)
 
+## "./route-types.js" (namespace export)
+
+Re-exports all named exports from the "./route-types.js" module.
+
+**Signature**
+
+```ts
+export * from "./route-types.js";
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L4)
+
 ## HttpRateLimitKey
 
 **Signature**
@@ -1109,7 +1096,7 @@ export * from "./http-dsl.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L4)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L5)
 
 ## RouteRateLimit
 
@@ -1119,7 +1106,7 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L4)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/index.ts#L5)
 
 ## `route-options.ts`
 
@@ -1193,3 +1180,131 @@ declare const successStatus: (value: number | undefined) => number | undefined;
 ```
 
 [Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-options.ts#L48)
+
+## `route-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FunctionRouteDescriptor (interface)](#functionroutedescriptor-interface)
+  - [FunctionRouteOptions (interface)](#functionrouteoptions-interface)
+  - [RawHttpHandler (type alias)](#rawhttphandler-type-alias)
+  - [RawRouteDescriptor (interface)](#rawroutedescriptor-interface)
+  - [RawRouteOptions (interface)](#rawrouteoptions-interface)
+  - [RouteDescriptor (type alias)](#routedescriptor-type-alias)
+
+---
+
+# utils
+
+## FunctionRouteDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface FunctionRouteDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+  Request extends HttpRequestMapping | undefined = HttpRequestMapping | undefined,
+> extends DescriptorBase<"route", Id> {
+  readonly method?: HttpMethod;
+  readonly path?: string;
+  readonly runtimePaths?: readonly string[];
+  readonly target: Target;
+  readonly accept?: HttpRequestContentType;
+  readonly request?: Request;
+  readonly responses?: readonly HttpResponseMapping[];
+  readonly successStatus?: number;
+  readonly maxBodyBytes?: number;
+  readonly rateLimit?: RouteRateLimit;
+  readonly timeoutMs?: number;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L41)
+
+## FunctionRouteOptions (interface)
+
+**Signature**
+
+```ts
+export interface FunctionRouteOptions<
+  Id extends string,
+  Target extends FunctionRefAny,
+  Request extends HttpRequestMapping | undefined = undefined,
+> extends RouteSharedOptions<Id> {
+  readonly target: Target;
+  readonly handler?: never;
+  readonly accept?: HttpRequestContentType;
+  readonly request?: Request;
+  readonly responses?: readonly HttpResponseMapping[];
+  readonly successStatus?: number;
+  readonly maxBodyBytes?: number;
+  readonly rateLimit?: RouteRateLimit;
+  readonly timeoutMs?: number;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L17)
+
+## RawHttpHandler (type alias)
+
+**Signature**
+
+```ts
+type RawHttpHandler = (request: Request) => MaybePromise<Response>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L11)
+
+## RawRouteDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface RawRouteDescriptor<
+  Id extends string,
+  Handler extends RawHttpHandler = RawHttpHandler,
+> extends DescriptorBase<"route", Id> {
+  readonly method?: "ALL";
+  readonly path?: string;
+  readonly runtimePaths?: readonly string[];
+  readonly raw: true;
+  readonly handler: Handler;
+  readonly auth?: {
+    readonly kind: "better-auth";
+    readonly protected: readonly string[];
+  };
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L59)
+
+## RawRouteOptions (interface)
+
+**Signature**
+
+```ts
+export interface RawRouteOptions<
+  Id extends string,
+  Handler extends RawHttpHandler = RawHttpHandler,
+> extends RouteSharedOptions<Id> {
+  readonly handler: Handler;
+  readonly target?: never;
+}
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L33)
+
+## RouteDescriptor (type alias)
+
+**Signature**
+
+```ts
+type RouteDescriptor<Id, Target, Request> =
+  FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
+```
+
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/routes/src/route-types.ts#L74)
