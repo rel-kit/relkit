@@ -15,7 +15,6 @@ describe("ZSYS configuration", () => {
 
     expect(config).toMatchObject({
       projectRoot: "/workspace/app",
-      entry: "src/app.ts",
       source: ["src/**/*.ts"],
       generatedDirectory: ".zsys/generated",
       server: {
@@ -48,7 +47,7 @@ describe("ZSYS configuration", () => {
       CONFIG_CODES.legacy,
     ]);
     expect(issues.map(({ message }) => message).join("\n")).toContain(
-      'the application entry is always "src/app.ts"',
+      'ZSYS discovers descriptors from "src/**/*.ts"',
     );
     expect(() => loadConfig({ server: { port: 0 } }, "/workspace/app")).toThrow(
       ConfigValidationError,

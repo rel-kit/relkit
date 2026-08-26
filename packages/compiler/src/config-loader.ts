@@ -11,11 +11,10 @@ import {
   freezeIssues,
   isAbsolute,
   posixNormalize,
-  readInspector,
   readRecord,
-  readServer,
   unwrapDefault,
 } from "./config-loader-utils.js";
+import { readInspector, readServer } from "./config-loader-runtime.js";
 import { readDeployment } from "./config-loader-deployment.js";
 
 export { CONFIG_CODES, DEFAULT_CONFIG, DEFAULT_TOOLING_CONFIG } from "./config-loader-types.js";
@@ -109,7 +108,6 @@ function parseConfig(
   return {
     config: Object.freeze({
       projectRoot: root,
-      entry: DEFAULT_TOOLING_CONFIG.entry,
       source: DEFAULT_TOOLING_CONFIG.source,
       exclude: DEFAULT_TOOLING_CONFIG.exclude,
       generatedDirectory: DEFAULT_TOOLING_CONFIG.generatedDirectory,
@@ -124,7 +122,7 @@ function parseConfig(
 function legacyMigration(key: string): string | undefined {
   return (
     {
-      entry: 'Remove "entry"; the application entry is always "src/app.ts".',
+      entry: 'Remove "entry"; ZSYS discovers descriptors from "src/**/*.ts".',
       source: 'Remove "source"; ZSYS always discovers "src/**/*.ts".',
       exclude:
         'Remove "exclude"; tests, fixtures, declarations, and generated content are excluded by convention.',

@@ -24,8 +24,14 @@ export interface ToolingConfigInput {
     readonly port?: number;
     readonly maxBodyBytes?: number;
     readonly apiDocs?: { readonly enabledInProduction?: boolean };
+    readonly clientContract?: boolean;
+    readonly mcp?: boolean;
   };
-  readonly inspector?: { readonly port?: number };
+  readonly inspector?: {
+    readonly port?: number;
+    readonly enabledInProduction?: boolean;
+    readonly maxPreviewBytes?: number;
+  };
   readonly deployment?: {
     readonly target: "aws";
     readonly adapter: "pulumi";
@@ -34,7 +40,6 @@ export interface ToolingConfigInput {
 
 export interface LoadedToolingConfig {
   readonly projectRoot: string;
-  readonly entry: string;
   readonly source: readonly string[];
   readonly exclude: readonly string[];
   readonly generatedDirectory: string;
@@ -42,8 +47,14 @@ export interface LoadedToolingConfig {
     readonly port: number;
     readonly maxBodyBytes: number;
     readonly apiDocs: { readonly enabledInProduction: boolean };
+    readonly clientContract: boolean;
+    readonly mcp: boolean;
   };
-  readonly inspector: { readonly port: number };
+  readonly inspector: {
+    readonly port: number;
+    readonly enabledInProduction: boolean;
+    readonly maxPreviewBytes: number;
+  };
   readonly deployment?: {
     readonly target: "aws";
     readonly adapter: "pulumi";
@@ -56,7 +67,6 @@ export type ZsysConfig = LoadedToolingConfig;
 export type ConfigLoaderOptions = { readonly projectRoot?: string };
 
 export const DEFAULT_TOOLING_CONFIG = Object.freeze({
-  entry: "src/app.ts",
   source: Object.freeze(["src/**/*.ts"]),
   exclude: Object.freeze([
     "src/**/*.test.ts",
@@ -70,8 +80,14 @@ export const DEFAULT_TOOLING_CONFIG = Object.freeze({
     port: 3000,
     maxBodyBytes: 1_048_576,
     apiDocs: Object.freeze({ enabledInProduction: false }),
+    clientContract: true,
+    mcp: true,
   }),
-  inspector: Object.freeze({ port: 3210 }),
+  inspector: Object.freeze({
+    port: 3210,
+    enabledInProduction: false,
+    maxPreviewBytes: 1_048_576,
+  }),
 });
 
 export const DEFAULT_CONFIG = DEFAULT_TOOLING_CONFIG;
