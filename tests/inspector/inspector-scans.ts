@@ -21,7 +21,7 @@ const sourceDirectories = [
 const bundleExtensions = new Set([".js", ".json", ".map"]);
 const networkFiles = new Set([
   "apps/inspector/app/%5Fzsys/backend/[...path]/route.ts",
-  "apps/inspector/lib/api.ts",
+  "apps/inspector/lib/api-transport.ts",
   "apps/inspector/lib/stream.ts",
 ]);
 

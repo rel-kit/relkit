@@ -33,9 +33,29 @@ export const FIXTURE_IDS = Object.freeze({
 const now = "2026-01-01T00:00:00.000Z";
 const source = (file: string, line: number) => ({ file, line, column: 1 });
 const schema = (type: string): Record<string, unknown> => ({ type });
+const bucketFixtures = [
+  { key: "docs/readme.txt", type: "text/plain", body: "Hello from the bucket inspector." },
+  { key: "docs/config.json", type: "application/json", body: '{"enabled":true}' },
+  { key: "unsafe/page.html", type: "text/html", body: "<script>alert(1)</script>" },
+  { key: "unsafe/vector.svg", type: "image/svg+xml", body: "<svg onload='alert(1)'/>" },
+  { key: "documents/sample.pdf", type: "application/pdf", body: "%PDF-1.4 fixture" },
+  { key: "images/pixel.png", type: "image/png", body: "fixture-png" },
+  { key: "binary/data.bin", type: "application/octet-stream", body: "\u0000\u0001\u0002" },
+  { key: "binary/oversized.bin", type: "application/octet-stream", body: "x".repeat(1_048_577) },
+  ...Array.from({ length: 51 }, (_, index) => ({
+    key: `seed/object-${String(index + 1).padStart(2, "0")}.txt`,
+    type: "text/plain",
+    body: `seed ${index + 1}`,
+  })),
+];
+const cacheFixtures = Array.from({ length: 55 }, (_, index) => ({
+  key: JSON.stringify(`price:${String(index + 1).padStart(2, "0")}`),
+  value: { cents: (index + 1) * 100 },
+  ttlMs: index === 0 ? 12_000 : null,
+}));
 
 const graph = {
-  contractVersion: 3,
+  contractVersion: 5,
   appId: "commerce-api",
   nodes: [
     {
@@ -200,6 +220,20 @@ const graph = {
       maxObjectBytes: 1_000_000,
       allowedContentTypes: ["application/json"],
       source: source("src/buckets/assets.bucket.ts", 3),
+    },
+    {
+      kind: "bucket",
+      id: "archive",
+      profile: "custom",
+      visibility: "private",
+      source: source("src/buckets/archive.bucket.ts", 3),
+    },
+    {
+      kind: "bucket",
+      id: "broken",
+      profile: "broken",
+      visibility: "private",
+      source: source("src/buckets/broken.bucket.ts", 3),
     },
     {
       kind: "cache",
@@ -539,6 +573,8 @@ export function createInspectorFixture(): InspectorFixture {
             state: "ready",
             capabilities: ["read", "write"],
           },
+          { id: "archive", bucketId: "archive", profile: "custom", state: "ready" },
+          { id: "broken", bucketId: "broken", profile: "broken", state: "failed" },
         ],
         cache: [
           {
@@ -579,6 +615,70 @@ export function createInspectorFixture(): InspectorFixture {
         { kind: "event.publish", from: FIXTURE_IDS.function, to: FIXTURE_IDS.event },
       ],
       actions: actionServices,
+      resources: {
+        buckets: {
+          supports: (bucketId) => bucketId === FIXTURE_IDS.bucket || bucketId === "broken",
+          list: ({ bucketId, prefix = "", cursor, limit }) => {
+            if (bucketId === "broken") throw new Error("seeded provider failure");
+            const items = bucketFixtures.filter((item) => item.key.startsWith(prefix));
+            const start = cursor === undefined ? 0 : Number(cursor);
+            const selected = items.slice(start, start + limit);
+            return {
+              items: selected.map((item) => ({
+                key: item.key,
+                metadata: {
+                  contentType: item.type,
+                  size: new TextEncoder().encode(item.body).byteLength,
+                },
+              })),
+              ...(start + selected.length < items.length
+                ? { nextCursor: String(start + selected.length) }
+                : {}),
+            };
+          },
+          preview: ({ key, offset, limit }) => {
+            const item = bucketFixtures.find((candidate) => candidate.key === key);
+            if (item === undefined) return undefined;
+            const bytes = new TextEncoder().encode(item.body);
+            return {
+              bytes: bytes.slice(offset, offset + limit),
+              metadata: { contentType: item.type, size: bytes.byteLength },
+              totalBytes: bytes.byteLength,
+            };
+          },
+        },
+        cache: {
+          supports: (cacheId) => cacheId === FIXTURE_IDS.cache,
+          scan: ({ search = "", cursor, limit }) => {
+            const items = cacheFixtures.filter((item) => item.key.includes(search));
+            const start = cursor === undefined ? 0 : Number(cursor);
+            const selected = items.slice(start, start + limit);
+            return {
+              items: selected.map((item) => ({
+                key: item.key,
+                type: "string",
+                ttlMs: item.ttlMs,
+                bytes: JSON.stringify(item.value).length,
+              })),
+              ...(start + selected.length < items.length
+                ? { nextCursor: String(start + selected.length) }
+                : {}),
+            };
+          },
+          value: ({ key, limit }) => {
+            const item = cacheFixtures.find((candidate) => candidate.key === key);
+            if (item === undefined) return undefined;
+            const bytes = JSON.stringify(item.value).length;
+            return {
+              key,
+              type: "string",
+              ttlMs: item.ttlMs,
+              bytes,
+              ...(bytes > limit ? { truncated: true } : { value: item.value, truncated: false }),
+            };
+          },
+        },
+      },
     };
   }
 
