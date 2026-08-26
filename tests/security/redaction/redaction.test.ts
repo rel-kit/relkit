@@ -10,7 +10,11 @@ import {
   type InvocationHooks,
   type InvocationTarget,
 } from "../../../packages/engine/src/index.ts";
-import { API_BASE_PATH } from "../../../packages/contracts/src/index.ts";
+import {
+  API_BASE_PATH,
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+} from "../../../packages/contracts/src/index.ts";
 import type { RegistrationPlan } from "../../../packages/graph/src/index.ts";
 import {
   createObservabilityCollector,
@@ -343,8 +347,8 @@ function createHttpRuntime(
       middlewares: [],
     } satisfies RegistrationPlan,
     manifest: {
-      contractVersion: 4,
-      generatorVersion: 1,
+      contractVersion: MANIFEST_VERSION,
+      generatorVersion: GENERATOR_VERSION,
       graphHash: "sha256:security",
       functions: {},
       middleware: {},

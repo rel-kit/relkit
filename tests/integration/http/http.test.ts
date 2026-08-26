@@ -29,6 +29,11 @@ import {
 } from "../../../packages/testing/src/index.ts";
 import { defineRoute, http } from "../../../packages/routes/src/index.ts";
 import { normalizeCompilation } from "../../../packages/compiler/src/index.ts";
+import {
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+} from "../../../packages/contracts/src/index.ts";
 import { z } from "../../../packages/schema/src/index.ts";
 
 const source = { file: "src/http.ts", line: 1, column: 1 } as const;
@@ -101,7 +106,7 @@ function planFor(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
 
 function orderedPlan(routes: readonly HttpTriggerRegistration[]): RegistrationPlan {
   const graph: ApplicationGraph = {
-    contractVersion: 4,
+    contractVersion: GRAPH_VERSION,
     nodes: routes as unknown as ApplicationGraph["nodes"],
     edges: [],
   };
@@ -120,8 +125,8 @@ function createHarness(options: HarnessOptions): Harness {
   const calls: HttpInvocationOptions[] = [];
   const observability = options.observability ?? createTestObservability();
   const manifest: RuntimeManifest = {
-    contractVersion: 4,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: options.plan.graphHash,
     functions: {},
     middleware: options.manifestMiddleware ?? {},
