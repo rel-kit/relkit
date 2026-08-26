@@ -1,6 +1,6 @@
 {
   "appId": "full-app",
-  "contractVersion": 4,
+  "contractVersion": 5,
   "edges": [
     {
       "from": "orders.handle-created",
@@ -134,6 +134,7 @@
         "required": ["answer"],
         "type": "object"
       },
+      "profile": "default",
       "source": {
         "column": 22,
         "file": "src/agents/order-support.agent.ts",
@@ -143,7 +144,11 @@
     },
     {
       "defaults": {
-        "currency": "USD"
+        "bucket": "default",
+        "cache": "default",
+        "event": "default",
+        "job": "default",
+        "model": "default"
       },
       "environment": {
         "CACHE_URL": {
@@ -170,11 +175,6 @@
       },
       "id": "full-app",
       "kind": "app",
-      "observability": {
-        "bodyCapture": {
-          "mode": "off"
-        }
-      },
       "providerBindings": [
         "provider.buckets.default",
         "provider.cache.default",
@@ -184,7 +184,7 @@
       ],
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -234,7 +234,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       },
       "type": "secret-string"
@@ -248,7 +248,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       },
       "type": "secret-string"
@@ -262,7 +262,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       },
       "type": "port"
@@ -282,6 +282,7 @@
         "required": ["orderId", "sku"],
         "type": "object"
       },
+      "profile": "default",
       "sensitiveFields": null,
       "source": {
         "column": 22,
@@ -893,7 +894,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -921,7 +922,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -939,7 +940,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -957,7 +958,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -989,7 +990,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 20
       }
     },
@@ -998,6 +999,7 @@
       "description": "Read one order",
       "id": "orders.lookup-tool",
       "kind": "tool",
+      "mcp": true,
       "sideEffect": "read",
       "source": {
         "column": 21,
