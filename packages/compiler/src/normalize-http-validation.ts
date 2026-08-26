@@ -16,6 +16,7 @@ export function validateHttpCompatibility(work: NormalizationWork): void {
     const path = typeof value.path === "string" ? value.path : "";
     if (path === "/_zsys" || path.startsWith("/_zsys/"))
       add(work, route, NORMALIZE_CODES.reservedRoute, RESERVED_ROUTE_MESSAGE);
+    if (value.raw === true) continue;
     const target = referenceFor(work, value.target, "function");
     const targetValue = isRecord(target?.value) ? target.value : undefined;
     const inputReason = mappingCompatible(value.request, targetValue?.input);

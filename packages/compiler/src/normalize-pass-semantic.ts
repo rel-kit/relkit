@@ -6,6 +6,11 @@ import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-
 import { validateEventCompatibility } from "./normalize-event-validation.js";
 import { readModelConfigurations, resolveCompiledModel } from "./normalize-model-selection.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
+import { selectedProviderProfile } from "./normalize-graph-app.js";
+import {
+  validateProviderSingletons,
+  validateUniqueBucketProfiles,
+} from "./normalize-provider-validation.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -85,6 +90,7 @@ export function passAgents(work: NormalizationWork): void {
 }
 
 export function passProviders(work: NormalizationWork): void {
+  validateProviderSingletons(work);
   validateUniqueBucketProfiles(work);
   if (!work.descriptors.some((entry) => entry.kind === "app")) return;
   const profiles = providerProfiles({
@@ -92,12 +98,22 @@ export function passProviders(work: NormalizationWork): void {
     descriptors: work.descriptors.map((entry) => entry.value),
   });
   const modelConfigurations = readModelConfigurations(work.descriptors);
+  const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     const profile = typeof value.profile === "string" ? value.profile : undefined;
     const profileCapability = capabilityFor(descriptor.kind);
     if (profileCapability !== undefined) {
-      const selected = profile ?? "default";
+      const selected = selectedProviderProfile(application, profileCapability, profile);
+      if (selected === undefined) {
+        add(
+          work,
+          descriptor,
+          NORMALIZE_CODES.providerProfile,
+          `Unqualified ${profileCapability} use requires a default when multiple profiles exist.`,
+        );
+        continue;
+      }
       const capabilities = profiles.get(selected);
       if (capabilities === undefined || !capabilities.includes(profileCapability)) {
         add(
@@ -109,13 +125,14 @@ export function passProviders(work: NormalizationWork): void {
       }
     }
     if (descriptor.kind !== "agent") continue;
-    const modelCapabilities = profiles.get("default");
+    const modelProfile = selectedProviderProfile(application, "models");
+    const modelCapabilities = modelProfile === undefined ? undefined : profiles.get(modelProfile);
     if (modelCapabilities === undefined || !modelCapabilities.includes("models")) {
       add(
         work,
         descriptor,
         NORMALIZE_CODES.providerProfile,
-        'Provider profile "default" does not provide models.',
+        "A model default is required before unqualified agent use.",
       );
       continue;
     }
@@ -127,26 +144,6 @@ export function passProviders(work: NormalizationWork): void {
       if (entry.configuration === undefined) continue;
       const error = resolveCompiledModel(value.model, entry.configuration);
       if (error !== undefined) add(work, descriptor, error.code, error.message);
-    }
-  }
-}
-
-function validateUniqueBucketProfiles(work: NormalizationWork): void {
-  const profiles = new Map<string, NormalizedDescriptor>();
-  for (const descriptor of work.descriptors.filter((entry) => entry.kind === "bucket")) {
-    const value = isRecord(descriptor.value) ? descriptor.value : {};
-    const profile = typeof value.profile === "string" ? value.profile : "default";
-    const previous = profiles.get(profile);
-    if (previous === undefined) profiles.set(profile, descriptor);
-    else {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.bucketProfileDuplicate,
-        `Bucket profile "${profile}" is already owned by "${previous.id}".`,
-        "error",
-        previous,
-      );
     }
   }
 }
@@ -191,6 +188,7 @@ function capabilityFor(kind: string): string | undefined {
       job: "jobs",
       event: "events",
       "event-trigger": "events",
+      agent: "models",
     } as Record<string, string>
   )[kind];
 }

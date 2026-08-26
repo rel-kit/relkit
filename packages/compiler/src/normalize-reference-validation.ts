@@ -16,6 +16,7 @@ export function passReferences(work: NormalizationWork): void {
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     for (const [name, kind] of targetFields(descriptor.kind)) {
+      if (descriptor.kind === "route" && value.raw === true) continue;
       if (referenceFor(work, value[name], kind) === undefined) {
         add(
           work,
