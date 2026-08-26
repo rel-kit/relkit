@@ -1,9 +1,9 @@
 import { afterAll, expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { createTestApplication } from "@zsys/testing";
-import app from "../src/app.js";
+import config from "../zsys.config.js";
 
-const application = await createTestApplication(app, {
+const application = await createTestApplication(config, {
   projectRoot: resolve(import.meta.dir, ".."),
 });
 
@@ -42,6 +42,12 @@ test("exercises file routes, inferred requests, middleware, methods, and uploads
     label: "receipts",
     files: ["primary.png", "detail.png"],
   });
+  const assetsBucket = application.fakes.buckets.assets;
+  if (assetsBucket === undefined) throw new Error("Assets bucket fake was not created");
+  expect(assetsBucket.inspect().map(({ key }) => key)).toEqual([
+    "detail.png",
+    "primary.png",
+  ]);
 });
 
 afterAll(() => application.close());
