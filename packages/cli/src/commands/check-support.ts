@@ -45,6 +45,8 @@ export function emptyCheckOutputs(diagnostics: readonly Diagnostic[]): Generated
     diagnostics: `${canonicalJson(diagnostics)}\n`,
     openapi: "",
     client: "",
+    contract: "",
+    clientContract: "",
   };
 }
 

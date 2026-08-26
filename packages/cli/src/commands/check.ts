@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson, normalizeId } from "@zsys/contracts";
 import {
   checkConventions,
   evaluateCandidates,
@@ -11,21 +11,20 @@ import {
   normalizeCompilation,
   prefilterSources,
   typecheckProject,
-  writeGeneratedArtifacts,
   type GeneratedOutputs,
-  type LoadedToolingConfig,
 } from "@zsys/compiler";
-import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@zsys/diagnostics";
+import { sortDiagnostics } from "@zsys/diagnostics";
 import { writeEventRegistry } from "./check-event-registry.js";
+import { writeContextRegistry } from "./check-context-registry.js";
+import { emitCheckResult, type CheckResult } from "./check-result.js";
 import {
   checkFailureDiagnostics,
   conventionDescriptor,
-  emptyCheckOutputs,
   evaluatorDiagnostics,
   isInside,
-  safeMessage,
   throwIfAborted,
 } from "./check-support.js";
+export type { CheckResult } from "./check-result.js";
 export interface CheckOptions {
   readonly projectRoot?: string;
   readonly configPath?: string;
@@ -36,16 +35,6 @@ export interface CheckOptions {
   readonly networkAllowlist?: readonly string[];
   readonly signal?: AbortSignal;
   readonly mode?: "development" | "test" | "production";
-}
-export interface CheckResult {
-  readonly ok: boolean;
-  readonly activatable: boolean;
-  readonly projectRoot: string;
-  readonly generatedDirectory: string;
-  readonly graphHash?: string;
-  readonly diagnostics: readonly Diagnostic[];
-  readonly outputs: GeneratedOutputs;
-  readonly config?: LoadedToolingConfig;
 }
 let checkSequence = 0;
 /** Compiles one project and writes only deterministic, content-aware artifacts. */
@@ -58,11 +47,21 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
     const config = loadConfig(input, projectRoot);
     const outputDirectory = join(projectRoot, config.generatedDirectory);
     const sources = await readSources(projectRoot, config.source);
-    const prefiltered = prefilterSources(sources, { projectRoot, exclude: config.exclude });
+    const configPath = resolve(projectRoot, options.configPath ?? "zsys.config.ts");
+    const configSource = relative(projectRoot, configPath).replaceAll("\\", "/");
+    const discoverySources = [
+      ...sources.filter((source) => source.fileName !== configSource),
+      { fileName: configSource, text: await readFile(configPath, "utf8") },
+    ];
+    const prefiltered = prefilterSources(discoverySources, {
+      projectRoot,
+      exclude: config.exclude,
+    });
+    const generationId = options.generationId ?? `cli-check-${++checkSequence}`;
     const evaluator = await evaluateCandidates({
       projectRoot,
-      candidates: prefiltered.candidates.map(({ fileName }) => fileName),
-      generationId: options.generationId ?? `cli-check-${++checkSequence}`,
+      candidates: prefiltered.candidates,
+      generationId,
       ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
       ...(options.environmentAllowlist === undefined
         ? {}
@@ -74,16 +73,24 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       sourceMaps: true,
     });
     if (evaluator.status !== "ok") {
-      return emitResult(projectRoot, outputDirectory, evaluatorDiagnostics(evaluator.failures));
+      return emitCheckResult(
+        projectRoot,
+        outputDirectory,
+        evaluatorDiagnostics(evaluator.failures),
+      );
     }
     throwIfAborted(options.signal);
-    const extracted = extractDescriptors(evaluator, { projectRoot, sources });
-    await writeEventRegistry(extracted, projectRoot, config.generatedDirectory);
+    const extracted = extractDescriptors(evaluator, { projectRoot, sources: discoverySources });
+    await Promise.all([
+      writeEventRegistry(extracted, projectRoot, config.generatedDirectory),
+      writeContextRegistry(extracted, projectRoot, config.generatedDirectory),
+    ]);
     const typeDiagnostics = typecheckProject(projectRoot);
     const normalization = normalizeCompilation({
       evaluator,
       projectRoot,
-      sources,
+      sources: discoverySources,
+      appId: await packageApplicationId(projectRoot),
       mode: options.mode ?? "development",
     });
     const diagnostics = sortDiagnostics([
@@ -104,7 +111,7 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       diagnostics: `${canonicalJson(diagnostics)}\n`,
       manifest: normalization.activatable ? normalization.outputs.manifest : "",
     } satisfies GeneratedOutputs;
-    return emitResult(
+    return emitCheckResult(
       projectRoot,
       outputDirectory,
       diagnostics,
@@ -113,7 +120,7 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       config,
     );
   } catch (error) {
-    return emitResult(
+    return emitCheckResult(
       projectRoot,
       generatedDirectory,
       await checkFailureDiagnostics(
@@ -123,6 +130,17 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       ),
     );
   }
+}
+
+async function packageApplicationId(projectRoot: string): Promise<string> {
+  const packageJson = JSON.parse(await readFile(join(projectRoot, "package.json"), "utf8")) as {
+    readonly name?: unknown;
+  };
+  if (typeof packageJson.name !== "string") {
+    throw new TypeError("package.json.name is required when config.id is omitted");
+  }
+  const name = packageJson.name.startsWith("@") ? packageJson.name.slice(1) : packageJson.name;
+  return normalizeId(name.replaceAll("/", "."));
 }
 export const runCheck = checkProject;
 async function readConfig(projectRoot: string, options: CheckOptions): Promise<unknown> {
@@ -154,42 +172,4 @@ async function readSources(
       text: await readFile(join(projectRoot, fileName), "utf8"),
     })),
   );
-}
-async function emitResult(
-  projectRoot: string,
-  generatedDirectory: string,
-  diagnostics: readonly Diagnostic[],
-  outputs: GeneratedOutputs = emptyCheckOutputs(diagnostics),
-  graphHash?: string,
-  config?: LoadedToolingConfig,
-): Promise<CheckResult> {
-  let stable = sortDiagnostics(diagnostics);
-  let nextOutputs =
-    outputs.diagnostics === ""
-      ? { ...outputs, diagnostics: `${canonicalJson(stable)}\n` }
-      : outputs;
-  try {
-    await writeGeneratedArtifacts(nextOutputs, { directory: generatedDirectory });
-  } catch (error) {
-    stable = sortDiagnostics([
-      ...stable,
-      createDiagnostic({
-        code: "ZSYS_ARTIFACT_WRITE_FAILED",
-        severity: "error",
-        message: safeMessage(error, projectRoot),
-      }),
-    ]);
-    nextOutputs = { ...nextOutputs, diagnostics: `${canonicalJson(stable)}\n` };
-  }
-  const hasErrors = stable.some((diagnostic) => diagnostic.severity === "error");
-  return Object.freeze({
-    ok: !hasErrors,
-    activatable: !hasErrors && nextOutputs.manifest !== "",
-    projectRoot,
-    generatedDirectory,
-    ...(graphHash === undefined ? {} : { graphHash }),
-    ...(config === undefined ? {} : { config }),
-    diagnostics: Object.freeze(stable),
-    outputs: nextOutputs,
-  });
 }
