@@ -3,6 +3,7 @@ import { normalizeSourcePath } from "@zsys/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
+import { providerMaps } from "./normalize-graph-app.js";
 
 export interface ImportBinding {
   readonly module: string;
@@ -101,9 +102,8 @@ export function providerFactoryKeys(
 ): readonly string[] {
   const keys = new Set<string>();
   const app = descriptors.find((descriptor) => descriptor.kind === "app");
-  const providers =
-    app && isRecord(app.value) && isRecord(app.value.providers) ? app.value.providers : {};
-  for (const [capability, profiles] of Object.entries(providers)) {
+  const value = app && isRecord(app.value) ? app.value : {};
+  for (const [capability, profiles] of providerMaps(value)) {
     if (!isRecord(profiles)) continue;
     for (const binding of Object.values(profiles)) {
       const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};

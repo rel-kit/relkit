@@ -18,6 +18,8 @@ const outputs: GeneratedOutputs = {
   diagnostics: "[]\n",
   openapi: "",
   client: "",
+  contract: "export const contract = {};\n",
+  clientContract: '{"protocol":"zsys.client-contract"}\n',
 };
 
 function descriptor(id: string, file: string, value: Record<string, unknown> = {}) {
@@ -39,6 +41,8 @@ describe("compiler generated artifacts", () => {
       expect(first.changed).toBe(true);
       expect(first.writes.map(({ fileName }) => fileName)).toEqual([
         GENERATED_ARTIFACT_FILES.graph,
+        GENERATED_ARTIFACT_FILES.clientContract,
+        GENERATED_ARTIFACT_FILES.contract,
         GENERATED_ARTIFACT_FILES.diagnostics,
         GENERATED_ARTIFACT_FILES.manifest,
       ]);
@@ -68,7 +72,9 @@ describe("compiler generated artifacts", () => {
       });
       expect(report.writes.map(({ fileName }) => fileName)).toEqual([
         "application.graph.json",
+        "client-contract.json",
         "client.ts",
+        "contract.ts",
         "deployment.plan.json",
         "diagnostics.json",
         "openapi.json",

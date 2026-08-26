@@ -13,6 +13,8 @@ export const GENERATED_ARTIFACT_FILES = Object.freeze({
   graph: "application.graph.json",
   manifest: "runtime.manifest.ts",
   diagnostics: "diagnostics.json",
+  contract: "contract.ts",
+  clientContract: "client-contract.json",
 } as const);
 
 export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
@@ -74,6 +76,8 @@ export function generatedArtifacts(outputs: GeneratedOutputs): readonly Generate
       outputs.diagnostics,
       GENERATED_ARTIFACT_VERSIONS.diagnostics,
     ),
+    artifact(GENERATED_ARTIFACT_FILES.contract, outputs.contract, CONTRACT_VERSION),
+    artifact(GENERATED_ARTIFACT_FILES.clientContract, outputs.clientContract, CONTRACT_VERSION),
   ]);
 }
 

@@ -80,6 +80,10 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const transforms = descriptorsOf(input.transforms ?? input.descriptors, "transform");
   const agents = descriptorsOf(input.descriptors, "agent");
   const tools = descriptorsOf(input.descriptors, "tool");
+  const routes = descriptorsOf(input.descriptors, "route");
+  const constants = descriptorsOf(input.descriptors, "constants");
+  const prompts = descriptorsOf(input.descriptors, "prompt");
+  const dataModel = descriptorsOf(input.descriptors, "data-model")[0];
   const services = descriptorsOf(input.descriptors, "service");
   const events = descriptorsOf(input.descriptors, "event");
   const functionById = uniqueById(functions, diagnostics);
@@ -102,6 +106,19 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const applicationExpression = applicationExpressionFor(application, bindings, input);
   const agentExpressions = descriptorExpressionsFor(agents, bindings, input);
   const toolExpressions = descriptorExpressionsFor(tools, bindings, input);
+  const routeExpressions = descriptorExpressionsFor(routes, bindings, input);
+  const constantExpressions = descriptorExpressionsFor(constants, bindings, input);
+  const promptExpressionsById = descriptorExpressionsFor(prompts, bindings, input);
+  const dataModelExpression =
+    dataModel === undefined
+      ? undefined
+      : descriptorExpressionsFor([dataModel], bindings, input).get(dataModel.id);
+  const promptExpressions = new Map(
+    prompts.flatMap((descriptor) => {
+      const expression = promptExpressionsById.get(descriptor.id);
+      return expression === undefined ? [] : [[descriptor.exportName, expression] as const];
+    }),
+  );
   const serviceExpressions = descriptorExpressionsFor(services, bindings, input);
   const transformExpressions = transformExpressionsFor(transforms, bindings, input, diagnostics);
   const middlewareExpressions = middlewareExpressionsFor(middleware, bindings, input, diagnostics);
@@ -123,6 +140,10 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       applicationExpression,
       agentExpressions,
       toolExpressions,
+      routeExpressions,
+      constantExpressions,
+      promptExpressions,
+      dataModelExpression,
       serviceExpressions,
       identityBindings,
     ),
