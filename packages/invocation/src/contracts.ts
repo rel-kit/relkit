@@ -43,6 +43,10 @@ export interface InvocationContext {
   readonly buckets: Readonly<Record<string, never>>;
   readonly cache: Readonly<Record<string, never>>;
   readonly agents: Readonly<Record<string, never>>;
+  readonly database: Readonly<Record<string, never>>;
+  readonly auth: { readonly getSession: () => Promise<unknown | null> };
+  readonly constants: Readonly<Record<string, never>>;
+  readonly prompts: Readonly<Record<string, never>>;
   readonly service: Readonly<Record<string, unknown>>;
 }
 

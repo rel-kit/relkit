@@ -8,4 +8,5 @@ export * from "./handler-bridge.js";
 export * from "./logger.js";
 export * from "./tracing.js";
 export * from "./failure.js";
+export * from "./failure-redaction.js";
 export * from "./failure-telemetry.js";

@@ -114,6 +114,7 @@ export function defineTool<const Id extends string, const Target extends Functio
     description,
     sideEffect,
     approval,
+    mcp: options.mcp ?? true,
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
     ...hooks,
   };
@@ -147,6 +148,7 @@ export function isToolDescriptor(value: unknown): value is ToolDescriptor<string
     isNonEmptyString(descriptor.description) &&
     isToolSideEffect(descriptor.sideEffect) &&
     isToolApproval(descriptor.approval) &&
+    typeof descriptor.mcp === "boolean" &&
     (descriptor.timeoutMs === undefined || isPositiveInteger(descriptor.timeoutMs))
   );
 }

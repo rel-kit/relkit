@@ -23,6 +23,10 @@ export function makeContext<Context extends { readonly signal: AbortSignal }>(
       buckets: Object.freeze({}),
       cache: Object.freeze({}),
       agents: Object.freeze({}),
+      database: Object.freeze({}),
+      auth: Object.freeze({ getSession: () => Promise.resolve(null) }),
+      constants: Object.freeze({}),
+      prompts: Object.freeze({}),
       service: Object.freeze({}),
     }) as unknown as Context,
   );

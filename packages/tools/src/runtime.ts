@@ -19,6 +19,7 @@ export interface ToolEngineInvocation {
   readonly signal?: AbortSignal;
   /** Forwarded structurally to the common engine's existing invocation hooks. */
   readonly hooks?: unknown;
+  readonly toolHooks?: unknown;
   /** Forwarded structurally to preserve the parent agent span/invocation. */
   readonly parent?: unknown;
 }
