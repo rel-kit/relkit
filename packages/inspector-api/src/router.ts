@@ -25,6 +25,7 @@ import {
 } from "./shared.js";
 import { resolveActiveGeneration } from "./generation.js";
 import type { Context, Hono } from "hono";
+import { installResourceExplorerEndpoints } from "./resource-routes.js";
 export const INSPECTOR_API_PATHS = Object.freeze([
   API_BASE_PATH,
   `${API_BASE_PATH}/health/live`,
@@ -46,6 +47,10 @@ export const INSPECTOR_API_PATHS = Object.freeze([
     `${API_BASE_PATH}/runtime/${collection}`,
     `${API_BASE_PATH}/runtime/${collection}/:id`,
   ]),
+  `${API_BASE_PATH}/runtime/buckets/:id/objects`,
+  `${API_BASE_PATH}/runtime/buckets/:id/objects/preview`,
+  `${API_BASE_PATH}/runtime/cache/:id/keys`,
+  `${API_BASE_PATH}/runtime/cache/:id/keys/value`,
   ...OBSERVABILITY_ENDPOINT_PATHS,
   ...INSPECTOR_ACTION_PATHS,
 ] as const);
@@ -62,6 +67,7 @@ export interface InspectorApiOptions extends ActiveGenerationOptions {
     readonly query: ObservabilityQuery;
     readonly stream: ObservabilityStream;
   };
+  readonly maxPreviewBytes?: number;
 }
 export { InspectorEndpointConfigurationError } from "./router-utils.js";
 export function installInspectorEndpoints(app: Hono, options: InspectorApiOptions = {}): void {
@@ -183,6 +189,7 @@ export function installInspectorEndpoints(app: Hono, options: InspectorApiOption
       ),
     );
   }
+  installResourceExplorerEndpoints(app, guard, options.maxPreviewBytes ?? 1_048_576);
   installObservability(app, options, mode);
   installInspectorActionEndpoints(app, {
     mode,
