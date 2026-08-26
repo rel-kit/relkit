@@ -7,3 +7,8 @@ export * from "./response-mapping.js";
 export * from "./internal-endpoints.js";
 export * from "./rate-limit.js";
 export * from "./rate-limit-store.js";
+export * from "./auth.js";
+export * from "./rpc.js";
+export * from "./mcp.js";
+export * from "./static-files.js";
+export * from "./client-contract.js";
