@@ -1,56 +1,25 @@
-import {
-  createDescriptorBase,
-  deepFreeze,
-  isRef,
-  type DescriptorBase,
-  type DescriptorMetadata,
-} from "@zsys/contracts";
+import { createDescriptorBase, deepFreeze, isRef } from "@zsys/contracts";
 import { createUnboundIdentity } from "@zsys/invocation";
 import type { FunctionRefAny } from "@zsys/functions";
 import type { StandardSchemaV1 } from "@zsys/schema";
 import {
   assertRequestMapping,
   assertResponse,
-  isHttpResponseMapping,
   type HttpMethod,
   type HttpRequestContentType,
   type HttpRequestMapping,
   type HttpResponseMapping,
 } from "./http-dsl.js";
-import { copyRateLimit, positive, successStatus, type RouteRateLimit } from "./route-options.js";
+import { copyRateLimit, positive, successStatus } from "./route-options.js";
+import type {
+  FunctionRouteDescriptor,
+  FunctionRouteOptions,
+  RawRouteDescriptor,
+  RawRouteOptions,
+  RouteDescriptor,
+} from "./route-types.js";
 
-export interface RouteDescriptor<
-  Id extends string,
-  Target extends FunctionRefAny = FunctionRefAny,
-  Request extends HttpRequestMapping | undefined = HttpRequestMapping | undefined,
-> extends DescriptorBase<"route", Id> {
-  readonly method?: HttpMethod;
-  readonly path?: string;
-  readonly runtimePaths?: readonly string[];
-  readonly target: Target;
-  readonly accept?: HttpRequestContentType;
-  readonly request?: Request;
-  readonly responses?: readonly HttpResponseMapping[];
-  readonly successStatus?: number;
-  readonly maxBodyBytes?: number;
-  readonly rateLimit?: RouteRateLimit;
-  readonly timeoutMs?: number;
-}
-export interface DefineRouteOptions<
-  Id extends string,
-  Target extends FunctionRefAny,
-  Request extends HttpRequestMapping | undefined = undefined,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly target: Target;
-  readonly accept?: HttpRequestContentType;
-  readonly request?: Request;
-  readonly responses?: readonly HttpResponseMapping[];
-  readonly successStatus?: number;
-  readonly maxBodyBytes?: number;
-  readonly rateLimit?: RouteRateLimit;
-  readonly timeoutMs?: number;
-}
+export type * from "./route-types.js";
 
 /**
  * Defines one HTTP method exported by a nested `route.ts` module.
@@ -81,22 +50,36 @@ export interface DefineRouteOptions<
  */
 export function defineRoute<
   const Id extends string,
+  const Handler extends RawRouteOptions<Id>["handler"],
+>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>;
+export function defineRoute<
+  const Id extends string,
   const Target extends FunctionRefAny,
   const Request extends HttpRequestMapping | undefined = undefined,
->(options: DefineRouteOptions<Id, Target, Request>): RouteDescriptor<Id, Target, Request> {
-  if (hasOwn(options, "handler")) throw new TypeError("Routes cannot own handlers");
-  if (!isFunctionTarget(options.target))
+>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>;
+export function defineRoute(
+  options:
+    | FunctionRouteOptions<string, FunctionRefAny, HttpRequestMapping | undefined>
+    | RawRouteOptions<string>,
+): RouteDescriptor<string> {
+  if (hasOwn(options, "handler")) return rawRoute(options as RawRouteOptions<string>);
+  const route = options as FunctionRouteOptions<
+    string,
+    FunctionRefAny,
+    HttpRequestMapping | undefined
+  >;
+  if (!isFunctionTarget(route.target))
     throw new TypeError("Route target must be a function reference");
-  if (options.request !== undefined) assertRequestMapping(options.request);
-  const responses = copyResponses(options.responses);
-  const accept = requestContentType(options.accept);
-  const timeoutMs = positive(options.timeoutMs, "timeoutMs");
-  const maxBodyBytes = positive(options.maxBodyBytes, "maxBodyBytes");
-  const status = successStatus(options.successStatus);
-  const rateLimit = copyRateLimit(options.rateLimit);
-  const id = options.id === undefined ? createUnboundIdentity() : options.id;
-  const base = createDescriptorBase("route", id, options);
-  const legacy = options as DefineRouteOptions<Id, Target, Request> & {
+  if (route.request !== undefined) assertRequestMapping(route.request);
+  const responses = copyResponses(route.responses);
+  const accept = requestContentType(route.accept);
+  const timeoutMs = positive(route.timeoutMs, "timeoutMs");
+  const maxBodyBytes = positive(route.maxBodyBytes, "maxBodyBytes");
+  const status = successStatus(route.successStatus);
+  const rateLimit = copyRateLimit(route.rateLimit);
+  const id = route.id === undefined ? createUnboundIdentity() : route.id;
+  const base = createDescriptorBase("route", id, route);
+  const legacy = route as typeof route & {
     readonly method?: HttpMethod;
     readonly path?: string;
   };
@@ -105,15 +88,45 @@ export function defineRoute<
     // Retained only so the compiler can emit a source-located migration diagnostic.
     ...(legacy.method === undefined ? {} : { method: legacy.method }),
     ...(legacy.path === undefined ? {} : { path: legacy.path }),
-    target: options.target,
+    target: route.target,
     ...(accept === undefined ? {} : { accept }),
-    ...(options.request === undefined ? {} : { request: options.request }),
+    ...(route.request === undefined ? {} : { request: route.request }),
     ...(responses === undefined ? {} : { responses }),
     ...(status === undefined ? {} : { successStatus: status }),
     ...(maxBodyBytes === undefined ? {} : { maxBodyBytes }),
     ...(rateLimit === undefined ? {} : { rateLimit }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
-  }) as RouteDescriptor<Id, Target, Request>;
+  }) as FunctionRouteDescriptor<string>;
+}
+
+function rawRoute(options: RawRouteOptions<string>): RawRouteDescriptor<string> {
+  if (typeof options.handler !== "function" || hasOwn(options, "target")) {
+    throw new TypeError("Raw routes require only a handler");
+  }
+  const base = createDescriptorBase("route", options.id ?? createUnboundIdentity(), options);
+  const registration = readBetterAuthRegistration(options.handler);
+  return deepFreeze({
+    ...base,
+    raw: true as const,
+    handler: options.handler,
+    ...(registration === undefined
+      ? {}
+      : { auth: { kind: "better-auth" as const, protected: registration.protected } }),
+  });
+}
+
+function readBetterAuthRegistration(
+  handler: RawRouteOptions<string>["handler"],
+): { readonly protected: readonly string[] } | undefined {
+  const value = (handler as unknown as Record<PropertyKey, unknown>)[
+    Symbol.for("zsys.better-auth.handler")
+  ];
+  return isRecord(value) &&
+    value.kind === "better-auth" &&
+    Array.isArray(value.protected) &&
+    value.protected.every((entry: unknown) => typeof entry === "string")
+    ? { protected: Object.freeze([...value.protected]) }
+    : undefined;
 }
 
 function requestContentType(value: unknown): HttpRequestContentType | undefined {

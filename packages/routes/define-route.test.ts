@@ -70,9 +70,9 @@ describe("defineRoute", () => {
     expect(() => defineRoute({ id: "bad-status", target, successStatus: 404 })).toThrow(
       "successStatus",
     );
-    expect(() =>
-      defineRoute({ id: "bad-accept", target, accept: "text/plain" as never }),
-    ).toThrow("Route accept");
+    expect(() => defineRoute({ id: "bad-accept", target, accept: "text/plain" as never })).toThrow(
+      "Route accept",
+    );
     expect(() =>
       defineRoute({
         id: "bad-store",
