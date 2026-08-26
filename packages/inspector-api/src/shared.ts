@@ -10,6 +10,7 @@ import type {
   InspectorCandidateGenerationSource,
   ResolvedCandidateGeneration,
 } from "./generation-types.js";
+import type { InspectorResourceExplorers } from "./resource-explorer.js";
 export type InspectorMode = "development" | "test" | "production";
 export type InspectorValueSource<T = unknown> = T | (() => MaybePromise<T>);
 export interface InspectorRuntimeServices {
@@ -32,6 +33,7 @@ export interface InspectorGenerationServices extends InspectorRuntimeServices {
   readonly observedEdges?: unknown;
   readonly runtime?: InspectorRuntimeServices;
   readonly actions?: InspectorValueSource<InspectorActionServices | undefined>;
+  readonly resources?: InspectorValueSource<InspectorResourceExplorers | undefined>;
 }
 export interface InspectorActiveGeneration extends InspectorGenerationServices {
   readonly generationId?: string;
@@ -57,6 +59,7 @@ export interface ResolvedActiveGeneration {
   readonly observedEdges?: unknown;
   readonly runtime?: InspectorRuntimeServices;
   readonly actions?: InspectorActionServices;
+  readonly resources?: InspectorResourceExplorers;
   readonly candidate?: ResolvedCandidateGeneration;
 }
 export class InspectorQueryError extends TypeError {

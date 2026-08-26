@@ -13,6 +13,7 @@ import type {
   InspectorCandidateGeneration,
   ResolvedCandidateGeneration,
 } from "./generation-types.js";
+import type { InspectorResourceExplorers } from "./resource-explorer.js";
 
 export async function resolveActiveGeneration(
   options: ActiveGenerationOptions,
@@ -37,6 +38,10 @@ export async function resolveActiveGeneration(
     (value.actions ?? services.actions) as
       InspectorValueSource<InspectorActionServices | undefined> | undefined,
   );
+  const resources = await resolveValue(
+    (value.resources ?? services.resources) as
+      InspectorValueSource<InspectorResourceExplorers | undefined> | undefined,
+  );
   const runtime = value.runtime ?? services.runtime ?? directRuntime(value, services);
   const candidateSource =
     value.candidateGeneration ??
@@ -53,6 +58,7 @@ export async function resolveActiveGeneration(
     ...(observedEdges === undefined ? {} : { observedEdges }),
     ...(runtime === undefined ? {} : { runtime: runtime as InspectorRuntimeServices }),
     ...(actions === undefined ? {} : { actions }),
+    ...(resources === undefined ? {} : { resources }),
     ...(candidate === undefined ? {} : { candidate }),
   };
 }

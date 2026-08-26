@@ -25,6 +25,7 @@ const graphIds: Record<string, string> = {
   tools: "orders.tool",
   agents: "orders.agent",
   services: "orders",
+  providers: "provider.buckets.default",
 };
 
 describe("inspector read-only contract matrix", () => {

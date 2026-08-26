@@ -62,6 +62,15 @@ export const graph = {
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
     { kind: "agent", id: "orders.agent", source: source("src/agents.ts") },
     {
+      kind: "provider",
+      id: "provider.buckets.default",
+      source: source("zsys.config.ts"),
+      capability: "buckets",
+      profile: "default",
+      adapter: "s3",
+      ownership: "external",
+    },
+    {
       kind: "service",
       id: "orders",
       source: source("src/services.ts"),

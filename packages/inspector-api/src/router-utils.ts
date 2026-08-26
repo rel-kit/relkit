@@ -47,6 +47,12 @@ export function validateConfiguration(
     throw new InspectorEndpointConfigurationError("bearerToken must not be empty");
   if ((options.query === undefined) !== (options.stream === undefined))
     throw new InspectorEndpointConfigurationError("query and stream must be configured together");
+  if (
+    options.maxPreviewBytes !== undefined &&
+    (!Number.isSafeInteger(options.maxPreviewBytes) || options.maxPreviewBytes < 1)
+  ) {
+    throw new InspectorEndpointConfigurationError("maxPreviewBytes must be a positive integer");
+  }
 }
 
 export async function authorized(request: Request, options: InspectorApiOptions): Promise<boolean> {
@@ -146,6 +152,7 @@ export function json(value: unknown, status = 200, headers: Record<string, strin
     headers: {
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",
+      "x-content-type-options": "nosniff",
       "x-zsys-api-version": String(API_VERSION),
       ...headers,
     },
