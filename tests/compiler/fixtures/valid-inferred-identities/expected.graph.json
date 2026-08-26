@@ -1,6 +1,6 @@
 {
   "appId": "inferred-app",
-  "contractVersion": 4,
+  "contractVersion": 5,
   "edges": [
     {
       "from": "orders",
@@ -101,6 +101,7 @@
         "required": ["ok", "orderId"],
         "type": "object"
       },
+      "profile": "default",
       "source": {
         "column": 16,
         "file": "src/agents/support.agent.ts",
@@ -109,7 +110,9 @@
       "toolIds": ["lookup-order"]
     },
     {
-      "defaults": null,
+      "defaults": {
+        "model": "default"
+      },
       "environment": {
         "MODEL_API_KEY": {
           "hasDefault": false,
@@ -128,11 +131,10 @@
       },
       "id": "inferred-app",
       "kind": "app",
-      "observability": null,
       "providerBindings": ["provider.models.default"],
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 8
       }
     },
@@ -145,7 +147,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 8
       },
       "type": "secret-string"
@@ -159,7 +161,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 8
       },
       "type": "port"
@@ -399,7 +401,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 8
       }
     },
@@ -428,6 +430,7 @@
       "description": "Look up one order",
       "id": "lookup-order",
       "kind": "tool",
+      "mcp": true,
       "sideEffect": "read",
       "source": {
         "column": 16,
