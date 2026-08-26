@@ -7,11 +7,11 @@ import {
 } from "./normalize-graph-app.js";
 import { eventConfig, httpConfig } from "./normalize-graph-config.js";
 import { providerNodes } from "./normalize-graph-providers.js";
+import { selectedProviderProfile } from "./normalize-graph-app.js";
 import { generatedAgentMarker, generatedFunctionNode } from "./normalize-generated-function.js";
 import { serviceNodeData } from "./normalize-graph-services.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
-
 export function buildGraphNodes(work: NormalizationWork): GraphNode[] {
   const nodes: GraphNode[] = [];
   const middlewareOrder = new Map(
@@ -29,7 +29,6 @@ export function buildGraphNodes(work: NormalizationWork): GraphNode[] {
   }
   return nodes;
 }
-
 function nodeFor(
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
@@ -37,14 +36,14 @@ function nodeFor(
 ): GraphNode | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const base = { id: descriptor.id, source: descriptor.source };
+  const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   switch (descriptor.kind) {
     case "app":
       return {
         ...base,
         kind: "app",
         environment: environmentMetadata(value.env),
-        providerBindings: providerBindingIds(value.providers),
-        observability: clean(value.observability),
+        providerBindings: providerBindingIds(value),
         defaults: clean(value.defaults),
       };
     case "route":
@@ -52,7 +51,7 @@ function nodeFor(
         ...base,
         kind: "trigger",
         triggerType: "http",
-        targetFunctionId: refId(value.target) ?? "",
+        targetFunctionId: value.raw === true ? descriptor.id : (refId(value.target) ?? ""),
         config: httpConfig(descriptor, value, work),
       };
     case "event-trigger":
@@ -81,7 +80,7 @@ function nodeFor(
         kind: "job",
         input: schema(work, descriptor, "input"),
         targetFunctionId: refId(value.target) ?? "",
-        profile: value.profile === undefined ? "default" : value.profile,
+        profile: selectedProviderProfile(application, "jobs", text(value.profile)) ?? "default",
         retry: clean(value.retry),
         timeoutMs: clean(value.timeoutMs),
         concurrency: clean(value.concurrency),
@@ -95,12 +94,13 @@ function nodeFor(
         version: typeof value.version === "number" ? value.version : 0,
         payload: schema(work, descriptor, "payload"),
         sensitiveFields: clean(value.sensitiveFields),
+        profile: selectedProviderProfile(application, "events", text(value.profile)) ?? "default",
       };
     case "bucket":
       return {
         ...base,
         kind: "bucket",
-        profile: value.profile === undefined ? "default" : value.profile,
+        profile: selectedProviderProfile(application, "buckets", text(value.profile)) ?? "default",
         visibility: value.visibility ?? "private",
         maxObjectBytes: clean(value.maxObjectBytes),
         allowedContentTypes: clean(value.allowedContentTypes),
@@ -111,7 +111,7 @@ function nodeFor(
         kind: "cache",
         key: schema(work, descriptor, "key"),
         value: schema(work, descriptor, "value"),
-        profile: value.profile === undefined ? "default" : value.profile,
+        profile: selectedProviderProfile(application, "cache", text(value.profile)) ?? "default",
         defaultTtlMs: clean(value.defaultTtlMs),
         maxTtlMs: clean(value.maxTtlMs),
       };
@@ -123,6 +123,7 @@ function nodeFor(
         description: typeof value.description === "string" ? value.description : "",
         sideEffect: value.sideEffect ?? "none",
         approval: value.approval ?? "never",
+        mcp: value.mcp !== false,
         timeoutMs: clean(value.timeoutMs),
       };
     case "agent":
@@ -132,10 +133,14 @@ function nodeFor(
         input: schema(work, descriptor, "input"),
         output: schema(work, descriptor, "output"),
         ...(typeof value.model === "string" ? { model: value.model } : {}),
-        instructions: clean(value.instructions),
+        instructions:
+          isRecord(value.instructions) && value.instructions.kind === "prompt"
+            ? { promptId: refId(value.instructions) ?? "" }
+            : clean(value.instructions),
         toolIds: toolIds(value.tools),
         limits: clean(value.limits),
         generatedFunction: generatedAgentMarker(descriptor.id),
+        profile: selectedProviderProfile(application, "models", text(value.profile)) ?? "default",
       };
     case "service":
       return { ...base, kind: "service", ...serviceNodeData(value) };
@@ -150,7 +155,9 @@ function nodeFor(
       return undefined;
   }
 }
-
+function text(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
 function hookNodes(descriptor: NormalizedDescriptor): GraphNode[] {
   if (descriptor.kind !== "function" && descriptor.kind !== "tool") return [];
   const value = isRecord(descriptor.value) ? descriptor.value : {};
@@ -169,11 +176,9 @@ function hookNodes(descriptor: NormalizedDescriptor): GraphNode[] {
     ];
   });
 }
-
 function isExecutableMarker(value: unknown): boolean {
   return typeof value === "function" || (isRecord(value) && value.$zsys === "function");
 }
-
 function schema(
   work: NormalizationWork,
   descriptor: NormalizedDescriptor,
@@ -181,7 +186,6 @@ function schema(
 ): JsonValue {
   return work.schemas.get(`${descriptor.id}:${field}`) ?? null;
 }
-
 function toolIds(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.flatMap((entry) => {

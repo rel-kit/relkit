@@ -1,10 +1,10 @@
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
+import { providerMaps } from "./normalize-graph-app.js";
 
 export function providerNodes(descriptor: NormalizedDescriptor): GraphNode[] {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
-  const providers = isRecord(value.providers) ? value.providers : {};
-  return Object.entries(providers)
+  return providerMaps(value)
     .sort(([left], [right]) => left.localeCompare(right))
     .flatMap(([capability, profiles]) => {
       if (!isRecord(profiles)) return [];

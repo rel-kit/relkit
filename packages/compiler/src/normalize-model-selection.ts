@@ -25,8 +25,7 @@ export function readModelConfigurations(descriptors: readonly NormalizedDescript
     .filter((descriptor) => descriptor.kind === "app")
     .flatMap((descriptor) => {
       const value = isRecord(descriptor.value) ? descriptor.value : {};
-      const providers = isRecord(value.providers) ? value.providers : {};
-      const models = isRecord(providers.models) ? providers.models : {};
+      const models = isRecord(value.models) ? value.models : {};
       return Object.values(models).flatMap((binding) => {
         const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
         if (adapter.adapter !== "ai-sdk" || !isRecord(adapter.configuration)) return [];

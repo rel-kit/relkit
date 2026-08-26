@@ -1,7 +1,7 @@
 import { isRecord, refId } from "./normalize-utils.js";
 import { middlewareForRoute } from "./middleware-coverage.js";
 import type { GraphEdge, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
-
+import { selectedProviderProfile } from "./normalize-graph-app.js";
 const dependencyEdges: Readonly<Record<string, string>> = {
   jobs: "enqueues-job",
   events: "publishes-event",
@@ -9,7 +9,6 @@ const dependencyEdges: Readonly<Record<string, string>> = {
   cache: "uses-cache",
   agents: "invokes-agent",
 };
-
 export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
@@ -30,7 +29,6 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
       ...(typeof metadata === "string" ? { role: metadata } : (metadata ?? {})),
     });
   };
-
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     const target = refId(value.target);
@@ -58,7 +56,6 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   }
   return edges;
 }
-
 function addProviderEdge(
   add: (
     kind: string,
@@ -72,13 +69,18 @@ function addProviderEdge(
 ): void {
   const capability = providerCapability(descriptor.kind);
   if (capability === undefined) return;
-  const profile = typeof value.profile === "string" ? value.profile : "default";
+  const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
+  const profile =
+    selectedProviderProfile(
+      application,
+      capability,
+      typeof value.profile === "string" ? value.profile : undefined,
+    ) ?? "default";
   const bindingId = `provider.${capability}.${profile}`;
   if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
     add("uses-provider-profile", descriptor.id, bindingId);
   }
 }
-
 function providerCapability(kind: string): string | undefined {
   return (
     {
@@ -91,11 +93,9 @@ function providerCapability(kind: string): string | undefined {
     } as Record<string, string>
   )[kind];
 }
-
 function isTargetingDescriptor(kind: string): boolean {
   return kind === "route" || kind === "event-trigger" || kind === "job" || kind === "tool";
 }
-
 function addHookEdges(
   add: (
     kind: string,
@@ -113,7 +113,6 @@ function addHookEdges(
     }
   }
 }
-
 function addEventEdges(
   add: (
     kind: string,
@@ -130,7 +129,6 @@ function addEventEdges(
     add("listens-to-event", descriptor.id, at < 0 ? pair : pair.slice(0, at));
   }
 }
-
 function addDependencyEdges(
   add: (
     kind: string,
@@ -151,7 +149,6 @@ function addDependencyEdges(
     }
   }
 }
-
 function addToolEdges(
   add: (
     kind: string,
@@ -168,7 +165,6 @@ function addToolEdges(
     if (toolId) add("uses-tool", agentId, toolId);
   }
 }
-
 function addServiceEdges(
   add: (
     kind: string,
