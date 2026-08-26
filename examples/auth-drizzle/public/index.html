@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>ZSYS auth showcase</title>
+  </head>
+  <body>
+    <main>
+      <h1>Better Auth + Drizzle</h1>
+      <input id="email" type="email" value="demo@example.com" aria-label="Email" />
+      <input id="password" type="password" value="password123" aria-label="Password" />
+      <button id="signup">Sign up</button><button id="signin">Sign in</button
+      ><button id="signout">Sign out</button> <button id="session">Read session</button>
+      <pre id="result" aria-live="polite"></pre>
+    </main>
+    <script>
+      const request = (path, body) =>
+        fetch(path, {
+          method: body ? "POST" : "GET",
+          credentials: "include",
+          headers: body ? { "content-type": "application/json" } : {},
+          body: body && JSON.stringify(body),
+        }).then((response) => response.json());
+      const credentials = () => ({
+        email: email.value,
+        password: password.value,
+        name: "Demo User",
+      });
+      signup.onclick = () => request("/api/auth/sign-up/email", credentials()).then(show);
+      signin.onclick = () => request("/api/auth/sign-in/email", credentials()).then(show);
+      signout.onclick = () => request("/api/auth/sign-out", {}).then(show);
+      session.onclick = () => request("/session").then(show);
+      const show = (value) => (result.textContent = JSON.stringify(value, null, 2));
+    </script>
+  </body>
+</html>
