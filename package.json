@@ -16,6 +16,8 @@
     "test:integration": "bun test ./tests/integration",
     "test:restart": "bun test ./tests/restart",
     "test:inspector": "bun test ./tests/inspector",
+    "test:inspector:browser": "bun run scripts/test-inspector-browser.ts",
+    "test:mcp:inspector": "ZSYS_MCP_INSPECTOR_CLI=1 bun test packages/runtime-hono/mcp.test.ts",
     "test:e2e": "playwright test",
     "test:generator": "bun test ./tests/generator",
     "test:examples": "bunx turbo run check typecheck test build --filter='./examples/*'",

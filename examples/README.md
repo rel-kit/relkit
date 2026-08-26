@@ -7,7 +7,7 @@ starts.
 
 | Feature                                           | Canonical source                                         | Verification                                                                     |
 | ------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Application, profiles, environment, secrets       | `commerce/src/app.ts`, `commerce/src/env.ts`             | `tests/integration/commerce-example-consistency.test.ts`                         |
+| Application, profiles, environment, secrets       | `commerce/zsys.config.ts`, `commerce/src/env.ts`         | `tests/integration/commerce-example-consistency.test.ts`                         |
 | Functions, descriptor calls, dependencies, errors | `commerce/src/functions`, `commerce/src/errors`          | `tests/integration/engine/fixture-functions.test.ts`                             |
 | All HTTP methods and multi-method files           | `commerce/src/routes/orders`                             | `commerce/tests/http.test.ts`, `tests/integration/http/commerce-example.test.ts` |
 | Static, dynamic, catch-all, optional catch-all    | `commerce/src/routes`                                    | `tests/compiler/commerce-example.test.ts`                                        |
@@ -21,7 +21,7 @@ starts.
 | Function-derived tools and AI SDK agents          | `commerce/src/tools`, `commerce/src/agents`              | `tests/integration/agents/commerce-example.test.ts`                              |
 | Generated client, OpenAPI, Scalar                 | generated from `commerce/src/routes`                     | `tests/integration/http/commerce-example.test.ts`                                |
 | Inspector and observability                       | compiled commerce graph                                  | `tests/integration/commerce-example-consistency.test.ts`, `tests/inspector`      |
-| AWS deploy profile                                | `commerce/src/app.ts`                                    | `tests/deployment/aws-integration.test.ts`                                       |
+| AWS deploy profile                                | `commerce/zsys.config.ts`                                | `tests/deployment/aws-integration.test.ts`                                       |
 
 Run the example from its directory after building the workspace:
 
