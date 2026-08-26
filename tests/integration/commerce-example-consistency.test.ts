@@ -30,7 +30,7 @@ import {
   createTestHttpClient,
 } from "../../packages/testing/src/index.ts";
 import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
-import app from "../../examples/commerce/src/app.ts";
+import app from "../../examples/commerce/zsys.config.ts";
 import orderCreated from "../../examples/commerce/src/events/order-created.event.ts";
 import orderReceipt from "../../examples/commerce/src/events/order-receipt.event.ts";
 import authorizeOrder from "../../examples/commerce/src/functions/authorize-order.function.ts";
@@ -41,6 +41,7 @@ import orderSupport from "../../examples/commerce/src/agents/order-support.agent
 import lookupOrder from "../../examples/commerce/src/tools/lookup-order.tool.ts";
 import normalizeOrderId from "../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
 import orderAuth from "../../examples/commerce/src/middleware/order-auth.middleware.ts";
+import { ALL as authRoute } from "../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../examples/commerce");
@@ -89,12 +90,12 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   expect(compiled.normalization.outputs.client).toBe(generateClient(graph));
 
   assertApplicationCoverage(graph, registration);
-  expect(app.providers.buckets?.default?.adapter.adapter).toBe("s3");
-  expect(app.providers.cache?.default?.adapter.adapter).toBe("redis");
-  expect(app.providers.models?.default?.ownership).toBe("external");
+  expect(app.buckets.default.adapter.adapter).toBe("s3");
+  expect(app.caches.default.adapter.adapter).toBe("redis");
+  expect(app.models.default.ownership).toBe("external");
   expect(app.env.OPENAI_API_KEY.sensitive).toBe(true);
   expect(app.env.metadata.OPENAI_API_KEY?.requiredIn).toEqual(["production"]);
-  expect(app.observability?.bodyCapture?.mode).toBe("off");
+  expect(app.telemetry?.bodyCapture?.mode).toBe("off");
 
   const observability = createInspectableObservabilityHooks();
   const requestRecords: RequestRecord[] = [];
@@ -265,7 +266,10 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
     ]),
   );
   expect(plan.httpTriggers.map(({ id }) => id).sort()).toEqual([
+    "route.all.api.auth.optional-catch-all-auth",
     "route.delete.orders.by-order-id",
+    "route.get.account.profile",
+    "route.get.database.users",
     "route.get.docs.optional-catch-all-parts",
     "route.get.files.catch-all-parts",
     "route.get.orders",
@@ -306,6 +310,9 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
+    routes: {
+      "route.all.api.auth.optional-catch-all-auth": { handler: authRoute.handler },
+    },
     middleware: { "order-auth": orderAuth },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },
   };

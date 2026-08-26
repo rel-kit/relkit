@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 import {
   API_BASE_PATH,
   API_VERSION,
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
   canonicalJson,
 } from "../../../packages/contracts/src/index.ts";
 import {
@@ -98,8 +100,8 @@ function service(plan: RegistrationPlan, calls: unknown[]) {
 
 function manifestFor(plan: RegistrationPlan): RuntimeManifest {
   return {
-    contractVersion: 4,
-    generatorVersion: 1,
+    contractVersion: MANIFEST_VERSION,
+    generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
     middleware: {},

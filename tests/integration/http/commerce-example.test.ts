@@ -24,6 +24,7 @@ import {
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import normalizeOrderId from "../../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
 import orderAuth from "../../../examples/commerce/src/middleware/order-auth.middleware.ts";
+import { ALL as authRoute } from "../../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
 import browsePath from "../../../examples/commerce/src/functions/browse-path.function.ts";
 import deleteOrder from "../../../examples/commerce/src/functions/orders/delete-order.function.ts";
 import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
@@ -46,6 +47,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
   const graph = JSON.parse(compiled.graphBytes) as ApplicationGraph;
   const plan = createRegistrationPlan(graph, { projectRoot: "/fixture" });
   const invocations: HttpInvocationOptions[] = [];
+  const uploadedKeys: string[] = [];
   const rateLimitCounter = memoryCounter();
   const app = createApp({
     plan,
@@ -56,7 +58,22 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
       invoke: async (invocation) => {
         invocations.push(invocation);
         const target = targets[invocation.functionId];
-        if (target !== undefined) return invokeFunction(target, invocation.input);
+        if (target !== undefined)
+          return invokeFunction(target, invocation.input, {
+            ...(invocation.functionId === "upload-assets"
+              ? {
+                  clients: {
+                    buckets: {
+                      assets: {
+                        put: async (key: string) => {
+                          uploadedKeys.push(key);
+                        },
+                      },
+                    },
+                  },
+                }
+              : {}),
+          });
         if (invocation.functionId === "orders.create-order")
           return createOrderResult(invocation.input);
         throw new Error(`Unexpected function ${invocation.functionId}`);
@@ -138,6 +155,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
       label: "receipts",
       files: ["primary.png", "one.png", "two.png"],
     });
+    expect(uploadedKeys).toEqual(["primary.png", "one.png", "two.png"]);
 
     const invalidUpload = new FormData();
     invalidUpload.append("label", "receipts");
@@ -207,6 +225,9 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
     functions: {},
+    routes: {
+      "route.all.api.auth.optional-catch-all-auth": { handler: authRoute.handler },
+    },
     middleware: {
       "order-auth": {
         path: orderAuth.path,

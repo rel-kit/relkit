@@ -1,4 +1,5 @@
 import type { ApplicationGraph } from "../../../packages/graph/src/index.ts";
+import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
 
 const input = {
   type: "object",
@@ -76,7 +77,7 @@ export function contractGraph(root = "/project", reverse = false): ApplicationGr
     },
   ];
   return {
-    contractVersion: 4,
+    contractVersion: GRAPH_VERSION,
     appId: "commerce",
     nodes: reverse ? nodes.reverse() : nodes,
     edges: [],
