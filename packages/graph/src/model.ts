@@ -53,6 +53,7 @@ export interface TransformProjection {
 export interface HttpTriggerConfig {
   readonly method: string;
   readonly path: string;
+  readonly rawHandler?: boolean;
   readonly title?: string;
   readonly description?: string;
   readonly tags?: readonly string[];
@@ -101,6 +102,7 @@ export interface EventNode extends GraphNodeBase<"event"> {
   readonly version: number;
   readonly payload: JsonValue;
   readonly sensitiveFields?: readonly string[];
+  readonly profile: string;
 }
 export interface BucketNode extends GraphNodeBase<"bucket"> {
   readonly profile: string;
@@ -121,6 +123,7 @@ export interface ToolNode extends GraphNodeBase<"tool"> {
   readonly sideEffect: "none" | "read" | "write" | "external";
   readonly approval: "never" | "on-write" | "always";
   readonly timeoutMs?: number;
+  readonly mcp: boolean;
 }
 export interface MiddlewareNode extends GraphNodeBase<"middleware"> {
   readonly path: string;
@@ -139,6 +142,7 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly toolIds: readonly string[];
   readonly limits: JsonValue;
   readonly generatedFunction: GeneratedAgentMarker;
+  readonly profile: string;
 }
 export interface ProviderProfileNode extends GraphNodeBase<"provider"> {
   readonly profile: string;
