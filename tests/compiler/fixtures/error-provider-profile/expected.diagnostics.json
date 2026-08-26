@@ -5,7 +5,7 @@
     "descriptorId": "archive",
     "file": "src/buckets/archive.bucket.ts",
     "line": 3,
-    "message": "Provider profile \"missing-profile\" does not provide buckets.",
+    "message": "Unqualified buckets use requires a default when multiple profiles exist.",
     "severity": "error"
   }
 ]
