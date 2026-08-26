@@ -32,7 +32,7 @@ export interface ExportIdInput {
 const KIND_RULES: Readonly<
   Record<SourceFactoryKind, { readonly directory: string; readonly suffixes: readonly string[] }>
 > = {
-  app: { directory: "src", suffixes: ["app"] },
+  app: { directory: ".", suffixes: ["zsys.config"] },
   function: { directory: "src/functions", suffixes: ["function"] },
   service: { directory: "src/services", suffixes: ["service"] },
   route: { directory: "src/routes", suffixes: ["route"] },
@@ -43,6 +43,9 @@ const KIND_RULES: Readonly<
   cache: { directory: "src/cache", suffixes: ["cache"] },
   tool: { directory: "src/tools", suffixes: ["tool"] },
   agent: { directory: "src/agents", suffixes: ["agent"] },
+  "data-model": { directory: "src/data", suffixes: ["data-model"] },
+  constants: { directory: "src/constants", suffixes: ["constants"] },
+  prompt: { directory: "src/prompts", suffixes: ["prompt"] },
   error: { directory: "src/errors", suffixes: ["error"] },
   middleware: { directory: "src/middleware", suffixes: ["middleware"] },
   "service-middleware": {

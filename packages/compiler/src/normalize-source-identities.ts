@@ -1,12 +1,17 @@
 import { encodeErrorId, encodeMemberId, encodeSourceId } from "./discovery/source-id.js";
 import { add } from "./normalize-pass-utils.js";
 import { id, isRecord, refId } from "./normalize-utils.js";
+import { rewriteIdentityRef, rewriteIdentityValues } from "./normalize-identity-rewrite.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
 const SOURCE_SCOPED_KINDS = new Set([
+  "app",
+  "constants",
+  "prompt",
+  "data-model",
   "function",
   "route",
   "service",
@@ -46,13 +51,13 @@ export function normalizeSourceIdentities(
   return descriptors.map((descriptor, index) => {
     const entry = candidates[index]!;
     const resolved = entry.resolved ?? descriptor.id;
-    const rewritten = rewrite(descriptor.value, identities, new Set());
+    const rewritten = rewriteIdentityValues(descriptor.value, identities, new Set());
     const value =
       isRecord(rewritten) && entry.resolved !== undefined
         ? {
             ...rewritten,
             id: resolved,
-            ref: rewriteRef(rewritten.ref, identities, descriptor.kind, resolved),
+            ref: rewriteIdentityRef(rewritten.ref, identities, descriptor.kind, resolved),
           }
         : rewritten;
     return {
@@ -77,7 +82,8 @@ function candidate(descriptor: NormalizedDescriptor): IdentityCandidate {
   const presence = descriptor.exportFact?.errorBinding?.id ?? factory?.id;
   const inferred =
     SOURCE_SCOPED_KINDS.has(descriptor.kind) &&
-    (presence === "omitted" ||
+    ((descriptor.kind === "data-model" && descriptor.id.startsWith("unbound.")) ||
+      presence === "omitted" ||
       ((presence === undefined || descriptor.kind === "middleware") &&
         descriptor.id.startsWith("unbound.")));
   return { descriptor, originalId: descriptor.id, inferred };
@@ -85,7 +91,16 @@ function candidate(descriptor: NormalizedDescriptor): IdentityCandidate {
 function derive(descriptor: NormalizedDescriptor, work: NormalizationWork): string | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const fact = descriptor.exportFact;
+  if (descriptor.kind === "data-model")
+    return encodeSourceId({
+      kind: "data-model",
+      source: descriptor.source.file,
+      ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
+      exportName: descriptor.exportName,
+      exportKind: descriptor.exportKind,
+    });
   if (fact === undefined) return undefined;
+  if (descriptor.kind === "app") return work.input.appId;
   const binding = fact?.binding ?? fact?.factory?.binding;
   if (descriptor.kind === "error" || fact?.errorBinding !== undefined) {
     const errorBinding = fact?.errorBinding?.binding ?? binding;
@@ -161,40 +176,4 @@ function collect(value: unknown, kind: string, active = new Set<object>()): Reco
   for (const child of Object.values(value)) result.push(...collect(child, kind, active));
   active.delete(value);
   return result;
-}
-function rewrite(
-  value: unknown,
-  identities: ReadonlyMap<string, string>,
-  active: Set<object>,
-): unknown {
-  if (Array.isArray(value)) {
-    const result = value.map((entry) => rewrite(entry, identities, active));
-    return result.some((entry, index) => entry !== value[index]) ? result : value;
-  }
-  if (!isRecord(value) || active.has(value)) return value;
-  active.add(value);
-  let changed = false;
-  const result: Record<string, unknown> = { ...value };
-  for (const [key, child] of Object.entries(value)) {
-    const mapped =
-      (key === "id" || key === "transformId" || key === "errorId") && typeof child === "string"
-        ? (identities.get(child) ?? child)
-        : rewrite(child, identities, active);
-    if (mapped !== child) {
-      result[key] = mapped;
-      changed = true;
-    }
-  }
-  active.delete(value);
-  return changed ? result : value;
-}
-function rewriteRef(
-  value: unknown,
-  identities: ReadonlyMap<string, string>,
-  kind: string,
-  fallback: string,
-): unknown {
-  const ref = rewrite(value, identities, new Set());
-  if (!isRecord(ref)) return { kind, id: fallback };
-  return { ...ref, kind: typeof ref.kind === "string" ? ref.kind : kind, id: ref.id ?? fallback };
 }

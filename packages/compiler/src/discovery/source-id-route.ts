@@ -1,6 +1,6 @@
 import { normalizeId } from "@zsys/contracts";
 
-const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
+const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"]);
 
 /** Encodes a route identity without placing slashes or transport punctuation in the ID. */
 export function encodeRouteId(
