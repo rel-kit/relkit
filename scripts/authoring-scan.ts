@@ -47,7 +47,8 @@ function scanCall(
       if (
         key === "handler" &&
         shortName !== "defineFunction" &&
-        shortName !== "defineServiceMiddleware"
+        shortName !== "defineServiceMiddleware" &&
+        shortName !== "defineRoute"
       )
         add(
           root,
@@ -128,12 +129,15 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
     ts.ScriptKind.TS,
   );
   const findings: AuthoringViolation[] = [];
+  const setupSource = /\/setup\.ts$/.test(fragment.path);
+  const runtimeDescriptor = /\/(?:auth|[^/]+\.data-model)\.ts$/.test(fragment.path);
   for (const reference of importReferences(source)) {
     if (
       isFixtureForbidden(reference.specifier) ||
-      /^(?:effect|hono|next|pulumi|aws-sdk|fs|node:fs(?:\/promises)?|node:process|dotenv|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare)\/)/.test(
-        reference.specifier,
-      )
+      (!setupSource &&
+        /^(?:effect|hono|next|pulumi|aws-sdk|fs|node:fs(?:\/promises)?|node:process|dotenv|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare)\/)/.test(
+          reference.specifier,
+        ))
     )
       add(
         root,
@@ -145,6 +149,7 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
       );
   }
   for (const pattern of [forbiddenSymbols, valueReads]) {
+    if (pattern === valueReads && runtimeDescriptor) continue;
     pattern.lastIndex = 0;
     for (const match of fragment.text.matchAll(pattern))
       add(

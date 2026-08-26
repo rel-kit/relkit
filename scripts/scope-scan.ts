@@ -8,12 +8,12 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app buckets cache cli client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
+  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );
 const approvedApps = new Set(["docs", "inspector"]);
-const approvedExamples = new Set(["README.md", "commerce"]);
+const approvedExamples = new Set(["README.md", "auth-drizzle", "commerce", "data-model"]);
 const approvedTemplates = new Set(["default"]);
 const forbiddenNames =
   "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";

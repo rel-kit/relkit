@@ -29,9 +29,12 @@ export type ImportReference = {
 export const publicApplicationPackages = new Set([
   "@zsys/agents",
   "@zsys/app",
+  "@zsys/better-auth",
   "@zsys/buckets",
   "@zsys/cache",
+  "@zsys/client",
   "@zsys/config",
+  "@zsys/drizzle",
   "@zsys/events",
   "@zsys/functions",
   "@zsys/jobs",
@@ -44,7 +47,15 @@ export const publicApplicationPackages = new Set([
 
 export const descriptorPackages = new Set(
   [...publicApplicationPackages].filter(
-    (name) => !["@zsys/config", "@zsys/schema", "@zsys/testing"].includes(name),
+    (name) =>
+      ![
+        "@zsys/better-auth",
+        "@zsys/client",
+        "@zsys/config",
+        "@zsys/drizzle",
+        "@zsys/schema",
+        "@zsys/testing",
+      ].includes(name),
   ),
 );
 

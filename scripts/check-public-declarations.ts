@@ -134,6 +134,10 @@ export function scanPublicDeclarations(root: string): DeclarationLeak[] {
 }
 
 function declarationSymbols(file: string): typeof forbiddenSymbols {
+  if (file.endsWith("/packages/routes/dist/define-middleware.d.ts"))
+    return forbiddenSymbols.filter(
+      ([symbol]) => symbol !== "Next.js" && symbol !== "framework-or-provider-import",
+    );
   return file.includes("/packages/testing/")
     ? forbiddenSymbols.filter(([symbol]) => symbol !== "internal-provider-sdk")
     : forbiddenSymbols;

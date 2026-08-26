@@ -12,7 +12,7 @@ export function nonFunctionHandlers(file: string, text: string): DeclarationLeak
         return;
       }
       const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
-      if (!/Function|ServiceMiddleware/.test(owner)) {
+      if (!/Function|Middleware|RawRoute/.test(owner)) {
         const location = lineAndColumn(text, node.getStart(source));
         leaks.push({
           file,
