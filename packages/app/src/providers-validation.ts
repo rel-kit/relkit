@@ -53,6 +53,7 @@ export function copyProviderTopology(value: unknown): ProviderTopology {
   if (!isPlainRecord(value)) throw new TypeError("App providers must be an object");
   const result: Record<string, Record<string, ProviderBinding>> = {};
   for (const [capability, profiles] of Object.entries(value)) {
+    if (profiles === undefined) continue;
     if (!PROVIDER_CAPABILITIES.includes(capability as ProviderCapability)) {
       throw new TypeError(`Unknown provider capability "${capability}"`);
     }
