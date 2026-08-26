@@ -96,6 +96,20 @@ describe("local bucket provider", () => {
       capability: "signedWriteUrl",
     });
   });
+
+  test("lists metadata and serves bounded range previews", async () => {
+    const provider = await makeProvider();
+    await provider.put("docs/readme.txt", new TextEncoder().encode("hello"), {
+      contentType: "text/plain",
+    });
+    const signal = new AbortController().signal;
+    expect(await provider.inspector.list({ prefix: "docs/", limit: 50, signal })).toMatchObject({
+      items: [{ key: "docs/readme.txt", metadata: { size: 5, contentType: "text/plain" } }],
+    });
+    expect(
+      await provider.inspector.preview({ key: "docs/readme.txt", offset: 1, limit: 2, signal }),
+    ).toMatchObject({ bytes: new Uint8Array([101, 108]), totalBytes: 5 });
+  });
 });
 
 async function makeProvider(

@@ -64,6 +64,30 @@ export type LocalBucketProvider = Omit<BucketProvider, "list"> & {
   ) => Promise<LocalBucketListPage>;
   readonly ready: () => Promise<void>;
   readonly close: () => Promise<void>;
+  readonly inspector: {
+    readonly list: (request: {
+      readonly prefix?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{
+      readonly items: readonly { readonly key: string; readonly metadata?: BucketObjectMetadata }[];
+      readonly nextCursor?: string;
+    }>;
+    readonly preview: (request: {
+      readonly key: string;
+      readonly offset: number;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<
+      | {
+          readonly bytes: Uint8Array;
+          readonly metadata: BucketObjectMetadata;
+          readonly totalBytes: number;
+        }
+      | undefined
+    >;
+  };
 };
 
 export class LocalBucketKeyError extends TypeError {

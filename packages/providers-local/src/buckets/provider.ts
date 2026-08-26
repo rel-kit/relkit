@@ -78,6 +78,45 @@ export function createLocalBucketProvider(
     await storage.ready();
   };
   const open = (): void => ensureOpen(closed);
+  const inspector = Object.freeze({
+    list: async (request: {
+      readonly prefix?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => {
+      if (request.signal.aborted) throw request.signal.reason;
+      const page = await listPage(request.prefix, {
+        limit: request.limit,
+        ...(request.cursor === undefined ? {} : { cursor: request.cursor }),
+      });
+      const items = await Promise.all(
+        page.items.map(async (key) => {
+          const metadata = await headObject(storage, key, undefined, open);
+          return { key, ...(metadata === undefined ? {} : { metadata }) };
+        }),
+      );
+      return { ...page, items };
+    },
+    preview: async (request: {
+      readonly key: string;
+      readonly offset: number;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => {
+      if (request.signal.aborted) throw request.signal.reason;
+      const [metadata, bytes] = await Promise.all([
+        headObject(storage, request.key, undefined, open),
+        getObject(storage, request.key, undefined, open),
+      ]);
+      if (metadata === undefined || bytes === undefined) return undefined;
+      return {
+        bytes: bytes.slice(request.offset, request.offset + request.limit),
+        metadata,
+        totalBytes: bytes.byteLength,
+      };
+    },
+  });
   return Object.freeze({
     capabilities: LOCAL_BUCKET_CAPABILITIES,
     root: storage.root,
@@ -103,6 +142,7 @@ export function createLocalBucketProvider(
       unsupported("signedWriteUrl", "createWriteUrl", key, context, open),
     ready,
     close,
+    inspector,
   });
 }
 
