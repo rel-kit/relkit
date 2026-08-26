@@ -6,6 +6,8 @@ import {
   type S3Credentials,
   type SignedRequestInit,
 } from "./signing.js";
+import { decodeS3Xml, s3XmlValue } from "./s3-xml.js";
+import { endpointFor, objectUrl, requiredText } from "./s3-url.js";
 
 export interface S3BucketOptions {
   readonly endpoint: string;
@@ -17,10 +19,29 @@ export interface S3BucketOptions {
   readonly fetch?: typeof globalThis.fetch;
 }
 
-export function createS3BucketProvider(options: S3BucketOptions): BucketProvider {
+export interface S3BucketProvider extends BucketProvider {
+  readonly inspector: {
+    readonly list: (request: {
+      readonly prefix?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{ readonly items: readonly unknown[]; readonly nextCursor?: string }>;
+    readonly preview: (request: {
+      readonly key: string;
+      readonly offset: number;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<
+      | { readonly bytes: Uint8Array; readonly metadata: unknown; readonly totalBytes: number }
+      | undefined
+    >;
+  };
+}
+export function createS3BucketProvider(options: S3BucketOptions): S3BucketProvider {
   const endpoint = endpointFor(options.endpoint);
-  const bucket = text(options.bucketName, "S3 bucketName");
-  const region = text(options.region, "S3 region");
+  const bucket = requiredText(options.bucketName, "S3 bucketName");
+  const region = requiredText(options.region, "S3 region");
   const forcePathStyle = options.forcePathStyle ?? false;
   const expires = options.signedUrlTtlSeconds ?? 900;
   if (!Number.isSafeInteger(expires) || expires < 1 || expires > 604_800) {
@@ -38,6 +59,56 @@ export function createS3BucketProvider(options: S3BucketOptions): BucketProvider
       ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
       init: { ...init, ...(context === undefined ? {} : { signal: context.signal }) },
     });
+  const inspector: S3BucketProvider["inspector"] = Object.freeze({
+    list: async (input) => {
+      const listUrl = new URL(url());
+      listUrl.searchParams.set("list-type", "2");
+      listUrl.searchParams.set("max-keys", String(input.limit));
+      if (input.prefix !== undefined) listUrl.searchParams.set("prefix", input.prefix);
+      if (input.cursor !== undefined) listUrl.searchParams.set("continuation-token", input.cursor);
+      const response = await signedRequest(listUrl.toString(), {
+        region,
+        ...(options.credentials === undefined ? {} : { credentials: options.credentials }),
+        ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
+        init: { method: "GET", signal: input.signal },
+      });
+      await assertResponse(response, "S3 inspector list");
+      const xml = await response.text();
+      const items = [...xml.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g)].map((match) => ({
+        key: decodeS3Xml(s3XmlValue(match[1]!, "Key") ?? ""),
+        size: Number(s3XmlValue(match[1]!, "Size") ?? 0),
+        etag: (s3XmlValue(match[1]!, "ETag") ?? "").replaceAll('"', ""),
+        lastModified: s3XmlValue(match[1]!, "LastModified") ?? undefined,
+      }));
+      const nextCursor = s3XmlValue(xml, "NextContinuationToken");
+      return {
+        items,
+        ...(nextCursor === undefined ? {} : { nextCursor: decodeS3Xml(nextCursor) }),
+      };
+    },
+    preview: async (input) => {
+      const response = await request(
+        input.key,
+        {
+          method: "GET",
+          headers: { range: `bytes=${input.offset}-${input.offset + input.limit - 1}` },
+        },
+        { operation: "get", signal: input.signal },
+      );
+      if (response.status === 404) return undefined;
+      await assertResponse(response, "S3 inspector preview");
+      const range = response.headers.get("content-range")?.match(/\/(\d+)$/);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      return {
+        bytes,
+        totalBytes: range === undefined || range === null ? bytes.byteLength : Number(range[1]),
+        metadata: {
+          contentType: response.headers.get("content-type") ?? "application/octet-stream",
+          etag: response.headers.get("etag")?.replaceAll('"', "") ?? "",
+        },
+      };
+    },
+  });
   return Object.freeze({
     capabilities: Object.freeze({ signedReadUrl: true, signedWriteUrl: true }),
     put: async (
@@ -102,7 +173,7 @@ export function createS3BucketProvider(options: S3BucketOptions): BucketProvider
       await assertResponse(response, "S3 list");
       return Object.freeze(
         [...(await response.text()).matchAll(/<Key>([^<]*)<\/Key>/g)].map((match) =>
-          decodeXml(match[1]!),
+          decodeS3Xml(match[1]!),
         ),
       );
     },
@@ -116,39 +187,6 @@ export function createS3BucketProvider(options: S3BucketOptions): BucketProvider
         ...(options.credentials === undefined ? {} : { credentials: options.credentials }),
         ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
       }),
+    inspector,
   });
-}
-
-function objectUrl(endpoint: string, bucket: string, key: string, pathStyle: boolean): string {
-  const parsed = new URL(endpoint);
-  const keySuffix = key === "" ? "" : `/${keyPath(key)}`;
-  if (pathStyle) {
-    parsed.pathname = `${parsed.pathname.replace(/\/$/, "")}/${encodeURIComponent(bucket)}${keySuffix}`;
-  } else {
-    parsed.hostname = `${bucket}.${parsed.hostname}`;
-    parsed.pathname = `${parsed.pathname.replace(/\/$/, "")}${keySuffix || "/"}`;
-  }
-  return parsed.toString().replace(/\/$/, key === "" ? "/" : "");
-}
-
-function endpointFor(value: string): string {
-  const endpoint = text(value, "S3 endpoint");
-  const parsed = new URL(endpoint);
-  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new TypeError("S3 endpoint must use http or https");
-  }
-  return parsed.toString().replace(/\/$/, "");
-}
-
-function keyPath(value: string): string {
-  return value.split("/").map(encodeURIComponent).join("/");
-}
-
-function decodeXml(value: string): string {
-  return value.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-}
-
-function text(value: unknown, label: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${label} is invalid`);
-  return value.trim();
 }

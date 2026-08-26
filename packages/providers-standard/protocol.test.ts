@@ -86,6 +86,21 @@ describe("S3-compatible provider", () => {
         metadata: { owner: "zsys" },
       });
       expect(await provider.list!("folder")).toEqual(["a.txt"]);
+      expect(
+        await provider.inspector.list({
+          prefix: "folder",
+          limit: 50,
+          signal: new AbortController().signal,
+        }),
+      ).toMatchObject({ items: [{ key: "a.txt" }] });
+      expect(
+        await provider.inspector.preview({
+          key: "folder/a.txt",
+          offset: 0,
+          limit: 2,
+          signal: new AbortController().signal,
+        }),
+      ).toMatchObject({ bytes: new Uint8Array([97, 98, 99]), totalBytes: 3 });
       const write = requests[0]!;
       expect(new Headers(write.init?.headers).get("authorization")).toStartWith("AWS4-HMAC-SHA256");
       expect(write.url).toContain(variant.path ? "/assets/folder/a.txt" : "assets.");
@@ -130,6 +145,12 @@ describe("Redis-compatible provider", () => {
     expect(await provider.has!("json", context)).toBe(true);
     expect(await provider.increment!("count", 2, { ttlMs: 500 }, context)).toBe(2);
     expect(await provider.increment!("count", 3, undefined, context)).toBe(5);
+    expect(
+      await provider.inspector.scan({ search: "json", limit: 50, signal: context.signal }),
+    ).toMatchObject({ items: [{ key: '"json"', type: "string" }] });
+    expect(
+      await provider.inspector.value({ key: '"json"', limit: 1_000, signal: context.signal }),
+    ).toMatchObject({ value: { ok: true }, truncated: false });
     await provider.delete!("json", context);
     expect(await provider.get!("json", context)).toBeUndefined();
     await provider.close();
@@ -165,5 +186,17 @@ function memoryRedisClient(): StandardRedisClient {
       values.set(key, String(value));
       return value;
     },
+    scan: async (cursor, pattern, count) => {
+      const first = pattern.indexOf("*");
+      const last = pattern.lastIndexOf("*");
+      const prefix = first < 0 ? pattern : pattern.slice(0, first);
+      const search = first < 0 ? "" : pattern.slice(first + 1, last).replace(/\\(.)/g, "$1");
+      const keys = [...values.keys()]
+        .filter((key) => key.startsWith(prefix) && key.includes(search))
+        .slice(0, count);
+      return [cursor === "0" ? "0" : cursor, keys];
+    },
+    type: async (key) => (values.has(key) ? "string" : "none"),
+    ttl: async (key) => (values.has(key) ? -1 : -2),
   };
 }
