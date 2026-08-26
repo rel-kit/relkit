@@ -41,7 +41,8 @@ my-app/
 └── zsys.config.ts
 ```
 
-ZSYS always discovers `src/**/*.ts`, starts from `src/app.ts`, and writes derived artifacts to
+ZSYS always discovers descriptors from `src/**/*.ts`, reads application settings from
+`zsys.config.ts`, and writes derived artifacts to
 `.zsys/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
 These conventions are intentionally not configurable.
 

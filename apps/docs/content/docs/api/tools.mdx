@@ -401,7 +401,7 @@ type ToolTarget<Target> = FunctionToolTarget<Target>;
 declare const assertToolDescriptor: (value: unknown) => asserts value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L154)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L156)
 
 ## isToolDescriptor
 
@@ -411,7 +411,7 @@ declare const assertToolDescriptor: (value: unknown) => asserts value is ToolDes
 declare const isToolDescriptor: (value: unknown) => value is ToolDescriptor<string>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L139)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L140)
 
 ## isToolRef
 
@@ -421,7 +421,7 @@ declare const isToolDescriptor: (value: unknown) => value is ToolDescriptor<stri
 declare const isToolRef: (value: unknown) => value is ToolRefAny;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L158)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/define-tool.ts#L160)
 
 ## `index.ts`
 
@@ -504,7 +504,7 @@ export interface ResolvedToolTarget {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L65)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L66)
 
 ## ToolAllowlistEntry (type alias)
 
@@ -514,7 +514,7 @@ export interface ResolvedToolTarget {
 type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L36)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L37)
 
 ## ToolArgumentValidationError
 
@@ -524,7 +524,7 @@ type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
 declare const ToolArgumentValidationError: typeof ToolArgumentValidationError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L90)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L91)
 
 ## ToolEngine (interface)
 
@@ -538,7 +538,7 @@ export interface ToolEngine {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L27)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L28)
 
 ## ToolEngineInvocation (interface)
 
@@ -556,6 +556,7 @@ export interface ToolEngineInvocation {
   readonly signal?: AbortSignal;
   /** Forwarded structurally to the common engine's existing invocation hooks. */
   readonly hooks?: unknown;
+  readonly toolHooks?: unknown;
   /** Forwarded structurally to preserve the parent agent span/invocation. */
   readonly parent?: unknown;
 }
@@ -573,7 +574,7 @@ export interface ToolInvocationContext {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L53)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L54)
 
 ## ToolInvocationRequest (interface)
 
@@ -590,7 +591,7 @@ export interface ToolInvocationRequest {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L44)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L45)
 
 ## ToolNotAllowedError (class)
 
@@ -600,7 +601,7 @@ export interface ToolInvocationRequest {
 declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L81)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L82)
 
 ### code (property)
 
@@ -610,7 +611,7 @@ declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 readonly code: "ZSYS_TOOL_NOT_ALLOWED"
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L82)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L83)
 
 ## ToolOperationCancelledError
 
@@ -620,7 +621,7 @@ readonly code: "ZSYS_TOOL_NOT_ALLOWED"
 declare const ToolOperationCancelledError: typeof ToolOperationCancelledError;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L90)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L91)
 
 ## ToolRuntime (interface)
 
@@ -636,7 +637,7 @@ export interface ToolRuntime {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L57)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L58)
 
 ## ToolRuntimeOptions (interface)
 
@@ -650,7 +651,7 @@ export interface ToolRuntimeOptions {
 }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L38)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L39)
 
 ## ToolSource (type alias)
 
@@ -663,7 +664,7 @@ type ToolSource =
   | Readonly<Record<string, ToolDescriptor<string>>>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L31)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L32)
 
 ## ToolUnknownError (class)
 
@@ -673,7 +674,7 @@ type ToolSource =
 declare class ToolUnknownError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L72)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L73)
 
 ### code (property)
 
@@ -683,7 +684,7 @@ declare class ToolUnknownError { constructor(readonly toolId: string) }
 readonly code: "ZSYS_TOOL_UNKNOWN"
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L73)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L74)
 
 ## createToolRuntime
 
@@ -693,7 +694,7 @@ readonly code: "ZSYS_TOOL_UNKNOWN"
 declare const createToolRuntime: (options: ToolRuntimeOptions) => ToolRuntime;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L134)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L135)
 
 ## invokeTool
 
@@ -705,7 +706,7 @@ Validates and invokes one allowlisted tool through the common engine.
 declare const invokeTool: (options: ToolRuntimeOptions & ToolInvocationRequest) => Promise<unknown>;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L104)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L105)
 
 ## resolveToolTarget
 
@@ -715,4 +716,4 @@ declare const invokeTool: (options: ToolRuntimeOptions & ToolInvocationRequest) 
 declare const resolveToolTarget: (tool: ToolDescriptor<string>) => ResolvedToolTarget;
 ```
 
-[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L92)
+[Source](https://github.com/zsys-dev/zsys/blob/main/packages/tools/src/runtime.ts#L93)

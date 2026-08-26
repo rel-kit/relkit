@@ -11,13 +11,12 @@ Buckets support bounded object reads/writes, metadata, listing, cancellation, an
 the provider contract. Cache keys and values are schema-backed; numeric caches can also back distributed
 route rate limiting.
 
-Bind each logical profile to one protocol adapter in `defineApp`:
+Bind each logical profile to one protocol adapter at the top level of `defineConfig`:
 
 ```ts
-providers: {
-  buckets: { assets: external(s3({ endpoint, bucketName, region, credentials })) },
-  cache: { default: external(redis({ url: env.CACHE_URL })) },
-}
+buckets: { assets: external(s3({ endpoint, bucketName, region, credentials })) },
+caches: { primary: external(redis({ url: env.CACHE_URL })) },
+defaults: { bucket: "assets", cache: "primary" },
 ```
 
 S3-compatible endpoints include AWS S3, R2, and MinIO. Redis-compatible endpoints include Redis,
