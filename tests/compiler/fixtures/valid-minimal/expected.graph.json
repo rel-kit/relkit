@@ -1,6 +1,6 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 4,
+  "contractVersion": 5,
   "edges": [
     {
       "from": "hello.route",
@@ -23,11 +23,10 @@
       },
       "id": "minimal-app",
       "kind": "app",
-      "observability": null,
       "providerBindings": [],
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 4
       }
     },
@@ -40,7 +39,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "src/app.ts",
+        "file": "zsys.config.ts",
         "line": 4
       },
       "type": "port"
