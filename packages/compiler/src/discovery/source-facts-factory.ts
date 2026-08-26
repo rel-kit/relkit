@@ -12,7 +12,10 @@ interface FactoryDefinition {
 }
 
 const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
-  defineApp: { kind: "app", idOptional: false },
+  defineConfig: { kind: "app", idOptional: true },
+  defineConstants: { kind: "constants", idOptional: true },
+  definePrompt: { kind: "prompt", idOptional: true },
+  defineDataModel: { kind: "data-model", idOptional: true },
   defineFunction: { kind: "function", idOptional: true },
   defineError: { kind: "error", idOptional: true },
   defineRoute: { kind: "route", idOptional: true },

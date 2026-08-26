@@ -1,9 +1,11 @@
 import * as ts from "typescript";
 import type { AstCandidateIndicator, AstPrefilterCandidate, AstReExport } from "./ast-prefilter.js";
 import { readFacts } from "./source-facts.js";
-
 const KNOWN_FACTORIES = new Set([
-  "defineApp",
+  "defineConfig",
+  "defineConstants",
+  "definePrompt",
+  "defineDataModel",
   "defineFunction",
   "defineError",
   "defineRoute",
@@ -20,7 +22,6 @@ const KNOWN_FACTORIES = new Set([
   "defineService",
   "defineServiceMiddleware",
 ]);
-
 const INDICATOR_ORDER: readonly AstCandidateIndicator[] = [
   "zsys-import",
   "factory",
@@ -28,11 +29,9 @@ const INDICATOR_ORDER: readonly AstCandidateIndicator[] = [
   "brand-access",
   "re-export",
 ];
-
 export function matchesExclude(fileName: string, patterns: readonly string[]): boolean {
   return patterns.some((pattern) => new Bun.Glob(pattern.replaceAll("\\", "/")).match(fileName));
 }
-
 export function scanSource(fileName: string, text: string): AstPrefilterCandidate {
   const source = ts.createSourceFile(
     fileName,
@@ -47,7 +46,6 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
   const reExports: AstReExport[] = [];
   const indicators = new Set<AstCandidateIndicator>();
   let brandAccess = false;
-
   const addImport = (specifier: string): void => {
     if (!specifier.startsWith("@zsys/")) return;
     imports.add(specifier);
@@ -93,7 +91,6 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
     ts.forEachChild(node, visit);
   };
   visit(source);
-
   return Object.freeze({
     fileName,
     imports: Object.freeze([...imports].sort()),
@@ -107,7 +104,6 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
     indicators: Object.freeze(INDICATOR_ORDER.filter((indicator) => indicators.has(indicator))),
   });
 }
-
 function isRuntimeImport(node: ts.ImportDeclaration): boolean {
   const clause = node.importClause;
   if (clause === undefined || clause.isTypeOnly) return clause === undefined;
@@ -116,13 +112,11 @@ function isRuntimeImport(node: ts.ImportDeclaration): boolean {
   }
   return true;
 }
-
 function isRuntimeExport(node: ts.ExportDeclaration): boolean {
   if (node.isTypeOnly) return false;
   if (!node.exportClause || ts.isNamespaceExport(node.exportClause)) return true;
   return node.exportClause.elements.some((element) => !element.isTypeOnly);
 }
-
 function readReExport(node: ts.ExportDeclaration): AstReExport | undefined {
   if (!node.moduleSpecifier || !ts.isStringLiteralLike(node.moduleSpecifier)) return undefined;
   if (!node.exportClause)
@@ -139,7 +133,6 @@ function readReExport(node: ts.ExportDeclaration): AstReExport | undefined {
         exportAll: false,
       };
 }
-
 function isDescriptorBrandCall(node: ts.CallExpression): boolean {
   const argument = node.arguments[0];
   return (
@@ -153,7 +146,6 @@ function isDescriptorBrandCall(node: ts.CallExpression): boolean {
     argument.text === "zsys.descriptor"
   );
 }
-
 function runtimeModuleSpecifier(node: ts.CallExpression): string | undefined {
   const argument = node.arguments[0];
   if (
@@ -168,7 +160,6 @@ function runtimeModuleSpecifier(node: ts.CallExpression): string | undefined {
     return undefined;
   return argument.text;
 }
-
 function expressionName(expression: ts.Expression): string {
   if (ts.isIdentifier(expression)) return expression.text;
   if (ts.isPropertyAccessExpression(expression)) {
@@ -177,12 +168,10 @@ function expressionName(expression: ts.Expression): string {
   }
   return "";
 }
-
 function lastSegment(value: string): string | undefined {
   const segment = value.split(".").at(-1);
   return segment === "" ? undefined : segment;
 }
-
 function hasDefaultModifier(node: ts.Node): boolean {
   return (
     ts.canHaveModifiers(node) &&
@@ -190,7 +179,6 @@ function hasDefaultModifier(node: ts.Node): boolean {
       true
   );
 }
-
 function scriptKind(fileName: string): ts.ScriptKind {
   if (fileName.endsWith(".tsx")) return ts.ScriptKind.TSX;
   if (fileName.endsWith(".jsx")) return ts.ScriptKind.JSX;

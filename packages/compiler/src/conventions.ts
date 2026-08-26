@@ -7,7 +7,6 @@ import {
   type SourceLocation,
 } from "@zsys/contracts";
 import { createDiagnostic, type Diagnostic } from "@zsys/diagnostics";
-
 export const CONVENTION_CODES = Object.freeze({
   directory: "ZSYS_CONVENTION_DIRECTORY",
   suffix: "ZSYS_CONVENTION_SUFFIX",
@@ -15,15 +14,12 @@ export const CONVENTION_CODES = Object.freeze({
   multipleKinds: "ZSYS_CONVENTION_MULTIPLE_KINDS",
   idStyle: "ZSYS_CONVENTION_ID_STYLE",
 } as const);
-
 export type ConventionCode = (typeof CONVENTION_CODES)[keyof typeof CONVENTION_CODES];
-
 export interface ConventionExport {
   readonly name?: string;
   readonly isDefault?: boolean;
   readonly defaultExport?: boolean;
 }
-
 export interface ConventionCheckInput {
   readonly descriptor: unknown;
   readonly sourcePath: string;
@@ -37,16 +33,13 @@ export interface ConventionCheckInput {
   readonly fileDescriptors?: readonly unknown[];
   readonly fileKinds?: readonly unknown[];
 }
-
 export type ConventionCheckOptions = Omit<ConventionCheckInput, "descriptor" | "sourcePath">;
-
 type KindRule = {
   readonly directory: string;
   readonly suffix: string;
 };
-
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
-  app: { directory: "src", suffix: "app.ts" },
+  app: { directory: ".", suffix: "zsys.config.ts" },
   function: { directory: "src/functions", suffix: ".function.ts" },
   service: { directory: "src/services", suffix: ".service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },
@@ -58,8 +51,10 @@ const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   cache: { directory: "src/cache", suffix: ".cache.ts" },
   tool: { directory: "src/tools", suffix: ".tool.ts" },
   agent: { directory: "src/agents", suffix: ".agent.ts" },
+  "data-model": { directory: "src/data", suffix: ".data-model.ts" },
+  constants: { directory: "src/constants", suffix: ".constants.ts" },
+  prompt: { directory: "src/prompts", suffix: ".prompt.ts" },
 };
-
 export function checkConventions(input: ConventionCheckInput): readonly Diagnostic[];
 export function checkConventions(
   descriptor: unknown,
@@ -73,7 +68,6 @@ export function checkConventions(
 ): readonly Diagnostic[] {
   const input = readInput(inputOrDescriptor, sourcePath, options);
   if (input === undefined || !isDescriptor(input.descriptor)) return Object.freeze([]);
-
   const path = normalizePath(input.sourcePath, input.projectRoot);
   const descriptor = input.descriptor;
   const rule = rules[descriptor.kind];
@@ -94,10 +88,13 @@ export function checkConventions(
       ),
     );
   };
-
   const fileName = path.split("/").pop() ?? "";
   const pattern = recommendedPattern(rule);
-  if (descriptor.kind !== "route" && !path.startsWith(`${rule.directory}/`)) {
+  if (
+    descriptor.kind !== "route" &&
+    descriptor.kind !== "app" &&
+    !path.startsWith(`${rule.directory}/`)
+  ) {
     add(
       CONVENTION_CODES.directory,
       `Descriptor "${descriptor.id}" has kind "${descriptor.kind}" outside its recommended directory.`,
@@ -118,7 +115,6 @@ export function checkConventions(
       `Export "${descriptor.id}" as the file's default descriptor`,
     );
   }
-
   const kinds = descriptorKinds(input, descriptor);
   if (kinds.length > 1) {
     add(
@@ -136,7 +132,6 @@ export function checkConventions(
   }
   return Object.freeze(diagnostics);
 }
-
 function readInput(
   value: ConventionCheckInput | unknown,
   sourcePath: string | undefined,
@@ -148,7 +143,6 @@ function readInput(
   if (!isRecord(value) || typeof value.descriptor === "undefined") return undefined;
   return value as unknown as ConventionCheckInput;
 }
-
 function normalizePath(value: string, projectRoot: string | undefined): string {
   try {
     return normalizeSourcePath(value, projectRoot);
@@ -156,7 +150,6 @@ function normalizePath(value: string, projectRoot: string | undefined): string {
     return value.replaceAll("\\", "/").replace(/^\.\//, "");
   }
 }
-
 function diagnosticLocation(path: string, input: ConventionCheckInput): SourceLocation | undefined {
   if (path === "" || /^(?:\/|[A-Za-z]:\/|\/\/)/.test(path)) return undefined;
   return {
@@ -165,11 +158,9 @@ function diagnosticLocation(path: string, input: ConventionCheckInput): SourceLo
     column: input.location?.column ?? 1,
   };
 }
-
 function recommendedPattern(rule: KindRule): string {
-  return rule.directory === "src" ? "src/app.ts" : `${rule.directory}/**/*${rule.suffix}`;
+  return rule.directory === "." ? rule.suffix : `${rule.directory}/**/*${rule.suffix}`;
 }
-
 function hasExportWarning(input: ConventionCheckInput): boolean {
   if (input.exports !== undefined) {
     return !input.exports.some(
@@ -182,7 +173,6 @@ function hasExportWarning(input: ConventionCheckInput): boolean {
   if (input.exportName !== undefined) return input.exportName !== "default";
   return false;
 }
-
 function descriptorKinds(input: ConventionCheckInput, descriptor: DescriptorAny): DescriptorKind[] {
   const kinds = new Set<DescriptorKind>([descriptor.kind]);
   for (const kind of input.fileKinds ?? []) {
@@ -193,7 +183,6 @@ function descriptorKinds(input: ConventionCheckInput, descriptor: DescriptorAny)
   }
   return [...kinds].sort();
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

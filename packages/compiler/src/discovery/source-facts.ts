@@ -21,7 +21,7 @@ export type {
   SourceFactoryKind,
 } from "./source-facts-types.js";
 
-const ROUTE_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
+const ROUTE_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"]);
 
 interface LocalBinding {
   readonly binding: string;
