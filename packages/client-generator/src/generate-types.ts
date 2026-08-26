@@ -163,7 +163,12 @@ type HttpGraphTrigger = Extract<GraphNode, { readonly kind: "trigger" }> & {
 };
 
 function isHttpTrigger(node: ApplicationGraph["nodes"][number]): node is HttpGraphTrigger {
-  return node.kind === "trigger" && node.triggerType === "http";
+  return (
+    node.kind === "trigger" &&
+    node.triggerType === "http" &&
+    isRecord(node.config) &&
+    (node.config as { readonly rawHandler?: unknown }).rawHandler !== true
+  );
 }
 
 function isParameter(value: string): boolean {

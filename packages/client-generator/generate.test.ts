@@ -1,11 +1,7 @@
 import { expect, test } from "bun:test";
 import { GRAPH_VERSION } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-import { generateClient } from "./src/index.ts";
+import { generateClient, generateClientContractDocument, generateContract } from "./src/index.ts";
 import { clientRoutes, responseType } from "./src/generate-types.ts";
 
 const stringSchema = { type: "string" };
@@ -20,38 +16,25 @@ const input = {
   },
 };
 
-test("generates stable typed methods from mapped HTTP routes", () => {
+test("generates a stable oRPC contract and shared client entry", () => {
   const first = generateClient(graph(false));
   const second = generateClient(graph(true));
 
   expect(first).toBe(second);
-  expect(first).toContain(
-    'export type OrdersGetInput = { "authorization": string; "id": string; "sku": string; "tag"?: string };',
+  expect(first).toContain('export { createClient, ORPCError } from "@zsys/client";');
+  const contract = generateContract(graph(false));
+  expect(contract).toBe(generateContract(graph(true)));
+  expect(contract).toContain('\"orders.get\": oc.errors({ \"orders.not-found\"');
+  expect(contract).toContain(
+    'schema<{ \"authorization\": string; \"id\": string; \"sku\": string; \"tag\"?: string }>()',
   );
-  expect(first).toContain("export type OrdersGetSuccess = OrdersGetResponse0;");
-  expect(first).toContain("export type OrdersGetError = OrdersGetResponse1 | OrdersGetResponse2;");
-  expect(first).toContain('export type OrdersGetStatus = OrdersGetResult["status"];');
-  expect(first).toContain("readonly baseUrl?: string;");
-  expect(first).toContain("readonly fetch?: typeof globalThis.fetch;");
-  expect(first).toContain('appendQuery(query, \"tag\"');
-  expect(first).toContain('setHeader(headers, \"authorization\"');
-  expect(first).toContain('setBodyValue(payload, [\"sku\"]');
-  expect(first).not.toContain("hono");
-  expect(first).not.toContain("@zsys/runtime");
 });
 
-test("types and encodes route parameters omitted from explicit request mappings", () => {
-  const generated = generateClient(unmappedPathGraph());
-
-  expect(generated).toContain(
-    'export type ReportsReadInput = { "payload": string; "reportId": string };',
-  );
-  expect(generated).toContain(
-    'path = path.replace(":reportId", encodeURIComponent(String(readPath(input, ["reportId"]))));',
-  );
-  expect(generated).toContain(
-    "readonly reportsRead: (input: ReportsReadInput) => Promise<ReportsReadResult>;",
-  );
+test("keeps REST-only path metadata out of the function-backed procedure input", () => {
+  const generated = generateContract(unmappedPathGraph());
+  const document = generateClientContractDocument(unmappedPathGraph(), "sha256:test");
+  expect(generated).toContain('\"reports.read\": oc.input(schema<{ \"payload\": string }>()');
+  expect(document).toContain('\"path\":\"/reports/:reportId\"');
 });
 
 test("keeps the envelope status optional when an error has no HTTP mapping", () => {
@@ -76,30 +59,10 @@ test("keeps the envelope status optional when an error has no HTTP mapping", () 
   expect(responseType(route, response)).toContain('"status"?: number');
 });
 
-test("encodes every catch-all segment and omits an absent optional catch-all", async () => {
-  const generated = generateClient(catchAllGraph());
-  const javascript = new Bun.Transpiler({ loader: "ts" }).transformSync(generated);
-  const root = await mkdtemp(join(tmpdir(), "zsys-client-catch-all-"));
-  try {
-    const file = join(root, "client.mjs");
-    await writeFile(file, javascript);
-    const module = (await import(pathToFileURL(file).href)) as {
-      createClient: (options: Record<string, unknown>) => Record<string, Function>;
-    };
-    const urls: string[] = [];
-    const client = module.createClient({
-      baseUrl: "https://example.test",
-      fetch: async (url: string) => (urls.push(url), new Response("{}", { status: 200 })),
-    });
-
-    await client.filesRead!({ parts: ["a/b", "c d"] });
-    await client.docsRead!();
-    expect(urls).toEqual(["https://example.test/files/a%2Fb/c%20d", "https://example.test/docs"]);
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-  expect(generated).toContain('export type FilesReadInput = { "parts": readonly string[] };');
-  expect(generated).toContain('export type DocsReadInput = { "parts"?: readonly string[] };');
+test("preserves catch-all REST metadata in the client-safe document", () => {
+  const document = generateClientContractDocument(catchAllGraph(), "sha256:test");
+  expect(document).toContain('\"path\":\"/files/*parts\"');
+  expect(document).toContain('\"path\":\"/docs/*parts?\"');
 });
 
 function catchAllGraph(): ApplicationGraph {
