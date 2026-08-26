@@ -1,6 +1,6 @@
 import {
   defineAgent,
-  defineApp,
+  defineConfig,
   defineBucket,
   defineCache,
   defineEnv,
@@ -87,9 +87,7 @@ void optionalServiceId;
 void optionalToolId;
 void optionalAgentId;
 
-// Durable application and managed-resource identities remain required.
-// @ts-expect-error app IDs are mandatory
-defineApp({ env: defineEnv({}), providers: {} });
+defineConfig({ env: defineEnv({}) });
 // @ts-expect-error event IDs are mandatory
 defineEvent({ version: 1, payload: input });
 // @ts-expect-error job IDs are mandatory

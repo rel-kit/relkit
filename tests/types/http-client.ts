@@ -1,41 +1,31 @@
-import type {
-  OrdersGetError,
-  OrdersGetInput,
-  OrdersGetResult,
-  OrdersGetStatus,
-  OrdersGetSuccess,
-} from "../integration/http/fixtures/orders.client.ts";
+import { oc } from "@orpc/contract";
+import { createClient } from "@zsys/client";
+import { z } from "@zsys/schema";
 
-const input: OrdersGetInput = { note: "gift", orderId: "order-1" };
-const success: OrdersGetSuccess = {
-  status: 200,
-  data: { orderId: input.orderId, totalCents: 100 },
-};
-const error: OrdersGetError = {
-  status: 404,
-  data: {
-    code: "orders.not-found",
-    data: { orderId: input.orderId },
-    kind: "application",
-    message: "Order not found",
-    outcome: "declared-error",
-    retry: "never",
-    status: 404,
-  },
-};
-const validation: OrdersGetResult = {
-  status: 422,
-  data: { error: "validation", issues: [] },
-};
-const status: OrdersGetStatus = validation.status;
+const contract = {
+  ordersGet: oc
+    .input(z.object({ note: z.string(), orderId: z.string() }))
+    .output(z.object({ orderId: z.string(), totalCents: z.number() })),
+} as const;
 
-void success;
-void error;
-void status;
+const headers = new Headers();
+const client = createClient<typeof contract>({ baseUrl: "https://example.test", headers });
+const output: Promise<{ orderId: string; totalCents: number }> = client.ordersGet({
+  note: "gift",
+  orderId: "order-1",
+});
 
-// @ts-expect-error status inference excludes undeclared HTTP outcomes
-const invalidStatus: OrdersGetStatus = 500;
-// @ts-expect-error a declared error is not a successful result
-const invalidSuccess: OrdersGetSuccess = error;
-void invalidStatus;
-void invalidSuccess;
+headers.set("authorization", "Bearer current");
+headers.delete("authorization");
+
+createClient<typeof contract>({
+  baseUrl: "https://example.test",
+  credentials: "same-origin",
+  headers: async () => ({ authorization: "Bearer future" }),
+});
+
+// @ts-expect-error required input is preserved from the contract
+void client.ordersGet({ orderId: "order-1" });
+// @ts-expect-error successful output is returned directly
+const legacy: Promise<{ status: number; data: unknown }> = output;
+void legacy;

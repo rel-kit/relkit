@@ -1,5 +1,5 @@
 import {
-  defineApp,
+  defineConfig,
   defineService,
   defineServiceMiddleware,
   type InvocationSource,
@@ -303,10 +303,9 @@ const environment = defineEnv({
   API_KEY: env.secret(),
 });
 const region: EnvRef<"AWS_REGION", string> = environment.AWS_REGION;
-const app = defineApp({
+const app = defineConfig({
   id: "types.app",
   env: environment,
-  providers: {},
 });
 void region;
 void app;

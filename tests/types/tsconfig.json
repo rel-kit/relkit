@@ -12,6 +12,7 @@
       "@zsys/app/config": ["packages/app/src/config.ts"],
       "@zsys/buckets": ["packages/buckets/src/index.ts"],
       "@zsys/cache": ["packages/cache/src/index.ts"],
+      "@zsys/client": ["packages/client/src/index.ts"],
       "@zsys/config": ["packages/config/src/index.ts"],
       "@zsys/contracts": ["packages/contracts/src/index.ts"],
       "@zsys/events": ["packages/events/src/index.ts"],
@@ -20,6 +21,7 @@
       "@zsys/routes": ["packages/routes/src/index.ts"],
       "@zsys/schema": ["packages/schema/src/index.ts"],
       "@zsys/tools": ["packages/tools/src/index.ts"],
+      "@orpc/contract": ["packages/client/node_modules/@orpc/contract/dist/index.d.ts"],
       "effect": ["packages/config/node_modules/effect/dist/index.d.ts"]
     },
     "types": ["bun"]
