@@ -1,7 +1,4 @@
-import {
-  InspectorApiError,
-  type InspectorObject,
-} from "./api-types";
+import { InspectorApiError, type InspectorObject } from "./api-types";
 
 export const GET_RETRY_DELAYS_MS = [250, 500, 1_000, 2_000, 4_000, 8_000] as const;
 

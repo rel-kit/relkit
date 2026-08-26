@@ -1,127 +1,32 @@
 import {
   INSPECTOR_API_BASE,
   INSPECTOR_API_PROTOCOL,
-  INSPECTOR_API_VERSION,
   OBSERVABILITY_QUERY_PROTOCOL,
-  InspectorApiError,
   type InspectorCollection,
   type InspectorDiagnosticsPage,
   type InspectorEnvironmentPage,
-  type InspectorFetch,
   type InspectorFetchOptions,
   type InspectorGraph,
-  type InspectorJson,
   type InspectorObject,
   type InspectorPage,
   type InspectorQuery,
-  type InspectorRequestOptions,
+  type InspectorBucketObject,
+  type InspectorBucketPreview,
+  type InspectorCacheKey,
+  type InspectorCacheValue,
+  type InspectorResourcePage,
   type ObservabilityPage,
   type RuntimeCollection,
   type SignalCollection,
 } from "./api-types";
+import { InspectorApiTransport } from "./api-transport";
 import {
   invokeActiveRoute,
   type RouteInvocationInput,
   type RouteInvocationResult,
 } from "./route-request";
-import {
-  delay,
-  errorCode,
-  GET_RETRY_DELAYS_MS,
-  readPayload,
-  shouldRetry,
-} from "./api-request-utils";
-import { assertEnvelope } from "./api-validation";
-import { resolveBackendUrl } from "./backend-url";
 export * from "./api-types";
-interface CacheEntry {
-  readonly value: unknown;
-  readonly expiresAt: number;
-  readonly tags: readonly string[];
-}
-export class InspectorApiClient {
-  readonly baseUrl: string;
-  private readonly fetcher: InspectorFetch;
-  private readonly headers: Headers;
-  private readonly cacheTtlMs: number;
-  private readonly signal: AbortSignal | undefined;
-  private readonly cache = new Map<string, CacheEntry>();
-  constructor(options: InspectorFetchOptions = {}) {
-    this.baseUrl = options.baseUrl === undefined ? "" : String(options.baseUrl).replace(/\/$/, "");
-    this.fetcher = options.fetch ?? ((input, init) => fetch(input, init));
-    this.headers = new Headers(options.headers);
-    this.headers.set("accept", `application/json; version=${INSPECTOR_API_VERSION}`);
-    this.headers.set("x-zsys-api-version", String(INSPECTOR_API_VERSION));
-    this.headers.set("x-zsys-api-protocol", INSPECTOR_API_PROTOCOL);
-    this.cacheTtlMs = Math.max(0, options.cacheTtlMs ?? 2_000);
-    this.signal = options.signal;
-  }
-  async request<T = InspectorJson>(
-    path: string,
-    options: InspectorRequestOptions = {},
-  ): Promise<T> {
-    const { cacheTags, responseProtocols, ...init } = options;
-    const method = init.method ?? "GET";
-    const url = this.url(path);
-    const key = `${method}:${url}`;
-    if (method === "GET" && this.cacheTtlMs > 0) {
-      const cached = this.cache.get(key);
-      if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
-      this.cache.delete(key);
-    }
-    let attempt = 0;
-    while (true) {
-      try {
-        const headers = new Headers(this.headers);
-        if (init.headers !== undefined)
-          new Headers(init.headers).forEach((value, key) => headers.set(key, value));
-        const requestInit: RequestInit = { ...init, headers };
-        if (init.signal !== undefined) requestInit.signal = init.signal;
-        else if (this.signal !== undefined) requestInit.signal = this.signal;
-        let response: Response;
-        try {
-          response = await this.fetcher(url, requestInit);
-        } catch {
-          throw new InspectorApiError(
-            "Inspector backend is disconnected",
-            "ZSYS_INSPECTOR_DISCONNECTED",
-            undefined,
-            "network",
-          );
-        }
-        const payload = await readPayload(response);
-        assertEnvelope(payload, response.headers, responseProtocols);
-        if (!response.ok) {
-          const code = errorCode(payload);
-          throw new InspectorApiError(
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            response.status,
-          );
-        }
-        if (method === "GET" && this.cacheTtlMs > 0)
-          this.cache.set(key, {
-            value: payload,
-            expiresAt: Date.now() + this.cacheTtlMs,
-            tags: cacheTags ?? [],
-          });
-        return payload as T;
-      } catch (error) {
-        if (!shouldRetry(method, error, attempt)) throw error;
-        await delay(GET_RETRY_DELAYS_MS[attempt]!);
-        attempt += 1;
-      }
-    }
-  }
-  clearCache(): void {
-    this.cache.clear();
-  }
-  invalidate(tags: readonly string[] = []): void {
-    if (tags.length === 0) return this.clearCache();
-    const selected = new Set(tags);
-    for (const [key, entry] of this.cache)
-      if (entry.tags.some((tag) => selected.has(tag))) this.cache.delete(key);
-  }
+export class InspectorApiClient extends InspectorApiTransport {
   health(kind: "live" | "ready" = "ready"): Promise<InspectorObject> {
     return this.request(`${INSPECTOR_API_BASE}/health/${kind}`, { cacheTags: ["health"] });
   }
@@ -148,6 +53,36 @@ export class InspectorApiClient {
     return this.request(`${INSPECTOR_API_BASE}/runtime/${collection}${this.queryString(query)}`, {
       cacheTags: [collection, "runtime"],
     });
+  }
+  bucketObjects(
+    bucketId: string,
+    query: InspectorQuery = {},
+  ): Promise<InspectorResourcePage<InspectorBucketObject>> {
+    return this.request(
+      `${INSPECTOR_API_BASE}/runtime/buckets/${encodeURIComponent(bucketId)}/objects${this.queryString(query)}`,
+      { cacheTags: ["buckets", "runtime"] },
+    );
+  }
+  bucketPreview(bucketId: string, key: string): Promise<InspectorBucketPreview> {
+    return this.request(
+      `${INSPECTOR_API_BASE}/runtime/buckets/${encodeURIComponent(bucketId)}/objects/preview?key=${encodeURIComponent(key)}`,
+      { cacheTags: ["buckets", "runtime"] },
+    );
+  }
+  cacheKeys(
+    cacheId: string,
+    query: InspectorQuery = {},
+  ): Promise<InspectorResourcePage<InspectorCacheKey>> {
+    return this.request(
+      `${INSPECTOR_API_BASE}/runtime/cache/${encodeURIComponent(cacheId)}/keys${this.queryString(query)}`,
+      { cacheTags: ["cache", "runtime"] },
+    );
+  }
+  cacheValue(cacheId: string, key: string): Promise<InspectorCacheValue> {
+    return this.request(
+      `${INSPECTOR_API_BASE}/runtime/cache/${encodeURIComponent(cacheId)}/keys/value?key=${encodeURIComponent(key)}`,
+      { cacheTags: ["cache", "runtime"] },
+    );
   }
   eventRuntime(query: InspectorQuery = {}): Promise<import("./api-types").InspectorEventRuntime> {
     return this.request(`${INSPECTOR_API_BASE}/runtime/events${this.queryString(query)}`, {
@@ -183,16 +118,6 @@ export class InspectorApiClient {
   }
   invokeRoute(input: RouteInvocationInput): Promise<RouteInvocationResult> {
     return invokeActiveRoute(this.fetcher, this.baseUrl, this.headers, input);
-  }
-  private url(path: string): string {
-    return resolveBackendUrl(this.baseUrl, path);
-  }
-  private queryString(input: InspectorQuery): string {
-    const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(input))
-      if (value !== undefined) params.set(key, String(value));
-    const encoded = params.toString();
-    return encoded === "" ? "" : `?${encoded}`;
   }
 }
 export const createInspectorApiClient = (options: InspectorFetchOptions = {}): InspectorApiClient =>

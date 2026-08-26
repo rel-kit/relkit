@@ -39,7 +39,7 @@ export function AgentDetailView({ view }: { readonly view: AgentView }) {
             <h2 id="agent-limits-heading">Model and execution limits</h2>
           </div>
         </div>
-        <pre className="json-panel">{format(view.limits)}</pre>
+        <pre className="json-panel">{JSON.stringify(view.limits ?? {}, null, 2)}</pre>
       </section>
       <ToolPanel ids={view.toolIds} />
       <TimelinePanel view={view} />

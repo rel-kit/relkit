@@ -42,6 +42,41 @@ export interface InspectorPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];
   readonly nextCursor?: string;
 }
+export interface InspectorResourcePage<T = InspectorObject> extends InspectorPage<T> {
+  readonly supported: boolean;
+  readonly reason?: string;
+}
+export interface InspectorBucketObject {
+  readonly key: string;
+  readonly metadata?: InspectorObject;
+  readonly size?: number;
+  readonly etag?: string;
+  readonly lastModified?: string;
+}
+export interface InspectorBucketPreview extends InspectorIdentity {
+  readonly supported: boolean;
+  readonly key: string;
+  readonly kind: "json" | "text" | "image" | "pdf" | "metadata-only";
+  readonly content?: string;
+  readonly metadata: InspectorObject;
+  readonly totalBytes: number;
+  readonly truncated: boolean;
+}
+export interface InspectorCacheKey {
+  readonly key: string;
+  readonly type: string;
+  readonly ttlMs: number | null;
+  readonly bytes: number;
+}
+export interface InspectorCacheValue extends InspectorIdentity {
+  readonly supported: boolean;
+  readonly key: string;
+  readonly type: string;
+  readonly ttlMs: number | null;
+  readonly bytes: number;
+  readonly value?: unknown;
+  readonly truncated?: boolean;
+}
 export interface InspectorGenerationPage<T = InspectorObject> extends InspectorIdentity {
   readonly role: "active" | "candidate";
   readonly items: readonly T[];
@@ -122,6 +157,7 @@ export interface InspectorQuery {
   readonly eventVersion?: number;
   readonly triggerId?: string;
   readonly state?: string;
+  readonly prefix?: string;
 }
 
 export type InspectorFetch = NonNullable<InspectorFetchOptions["fetch"]>;
