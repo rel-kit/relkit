@@ -52,16 +52,13 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
     animations: "disabled",
   });
 
-  await page.route("**/_zsys/backend/_zsys/v1/api-reference", (route) =>
-    route.fulfill({
-      contentType: "text/html",
-      body: "<!doctype html><style>body{font:16px system-ui;padding:32px;color:#172033}code{color:#6750a4}</style><h1>Fixture API Reference</h1><p><code>POST /orders</code></p>",
-    }),
-  );
   await page.goto("/api-reference");
-  const frame = page.frameLocator('iframe[title="Scalar API Reference"]');
-  await expect(frame.getByRole("heading", { name: "Fixture API Reference" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open in new tab" })).toHaveAttribute(
+  await expect(page.getByRole("heading", { name: "API Reference" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
+    "href",
+    "/_zsys/backend/_zsys/v1/api-reference",
+  );
+  await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "rel",
     "noreferrer",
   );
@@ -81,7 +78,7 @@ test("keeps the shell usable in dark mode and on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.getByRole("button", { name: "Toggle navigation" }).click();
-  await expect(page.locator(".inspector-shell")).toHaveAttribute("data-mobile-open", "true");
+  await expect(page.locator('[data-mobile="true"]')).toBeVisible();
   const routes = page.getByRole("link", { name: "Routes" });
   await routes.focus();
   await expect(routes).toBeFocused();
