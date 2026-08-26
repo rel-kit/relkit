@@ -4,16 +4,39 @@ import {
   booleanArgs,
   booleanFlag,
   document,
-  keyValueArgs,
   optionArgs,
-  optionalKeyValue,
   optionalString,
   stringArgument,
   type SelectInvocation,
 } from "./cli-command-shared.js";
+import { deployCommand } from "./cli-command-deploy.js";
 
 export function groupCommands(select: SelectInvocation) {
-  return [graphCommand(select), envCommand(select), deployCommand(select)] as const;
+  return [
+    graphCommand(select),
+    envCommand(select),
+    deployCommand(select),
+    clientCommand(select),
+  ] as const;
+}
+
+function clientCommand(select: SelectInvocation) {
+  const path = ["client", "pull"] as const;
+  const pull = document(
+    Command.make(
+      "pull",
+      {
+        baseUrl: stringArgument(path, "baseUrl"),
+        out: optionalString(path, "out"),
+      },
+      (value) =>
+        Effect.sync(() =>
+          select("client", ["pull", value.baseUrl, ...optionArgs("out", value.out)]),
+        ),
+    ),
+    path,
+  );
+  return document(Command.make("client").pipe(Command.withSubcommands([pull])), ["client"]);
 }
 
 function graphCommand(select: SelectInvocation) {
@@ -159,40 +182,6 @@ function envStatusCommand(select: SelectInvocation, name: "check" | "list") {
     ),
     path,
   );
-}
-
-function deployCommand(select: SelectInvocation) {
-  const operations = ["init", "preview", "up", "refresh", "outputs", "destroy"] as const;
-  const commands = operations.map((operation) => {
-    const path = ["deploy", operation] as const;
-    return document(
-      Command.make(
-        operation,
-        {
-          projectRoot: optionalString(path, "project-root"),
-          stack: optionalString(path, "stack"),
-          backend: optionalString(path, "backend"),
-          config: optionalKeyValue(path, "config"),
-          secrets: optionalKeyValue(path, "config-secret"),
-          nonInteractive: booleanFlag(path, "non-interactive"),
-        },
-        (value) =>
-          Effect.sync(() =>
-            select("deploy", [
-              operation,
-              ...optionArgs("project-root", value.projectRoot),
-              ...optionArgs("stack", value.stack),
-              ...optionArgs("backend", value.backend),
-              ...keyValueArgs("config", value.config),
-              ...keyValueArgs("config-secret", value.secrets),
-              ...booleanArgs("non-interactive", value.nonInteractive),
-            ]),
-          ),
-      ),
-      path,
-    );
-  });
-  return document(Command.make("deploy").pipe(Command.withSubcommands(commands)), ["deploy"]);
 }
 
 function optionalArgument(value: Option.Option<string>): readonly string[] {

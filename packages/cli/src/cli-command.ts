@@ -6,11 +6,22 @@ import { booleanFlag, document, type SelectInvocation } from "./cli-command-shar
 /** Builds the Effect CLI tree from the same metadata exported to documentation. */
 export function createCliCommand(select: SelectInvocation) {
   const [create, dev, check, build, start, doctor] = basicCommands(select);
-  const [graph, env, deploy] = groupCommands(select);
+  const [graph, env, deploy, client] = groupCommands(select);
   return document(
     Command.make("zsys").pipe(
       Command.withSharedFlags({ json: booleanFlag([], "json") }),
-      Command.withSubcommands([create, dev, check, build, start, graph, env, doctor, deploy]),
+      Command.withSubcommands([
+        create,
+        dev,
+        check,
+        build,
+        start,
+        graph,
+        env,
+        doctor,
+        deploy,
+        client,
+      ]),
     ),
     [],
   );

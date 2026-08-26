@@ -1,10 +1,6 @@
 import { deepFreeze } from "@zsys/contracts";
-import type {
-  CliHelpArgument,
-  CliHelpCommand,
-  CliHelpModel,
-  CliHelpOption,
-} from "./cli-help-types.js";
+import { argument, command, option, title } from "./cli-help-builders.js";
+import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
 
 export type * from "./cli-help-types.js";
 
@@ -85,6 +81,25 @@ const deploy = command("deploy", "Manage Pulumi deployments", "zsys deploy <comm
   ),
 });
 
+const client = command(
+  "client",
+  "Generate a client from a running application",
+  "zsys client <command>",
+  {
+    commands: [
+      command(
+        "pull",
+        "Pull a versioned client contract",
+        "zsys client pull <baseUrl> --out <directory>",
+        {
+          arguments: [argument("baseUrl", true, "Running ZSYS application URL")],
+          options: [option("out", "string", "Output directory")],
+        },
+      ),
+    ],
+  },
+);
+
 const root = command(
   "zsys",
   "Convention-first TypeScript application framework",
@@ -138,6 +153,7 @@ const root = command(
         ],
       }),
       deploy,
+      client,
     ],
   },
 );
@@ -155,42 +171,4 @@ export function findCliHelp(path: readonly string[]): CliHelpCommand | undefined
     current = next;
   }
   return current;
-}
-
-function command(
-  name: string,
-  description: string,
-  usage: string,
-  values: Partial<Pick<CliHelpCommand, "options" | "arguments" | "commands">> = {},
-): CliHelpCommand {
-  return {
-    name,
-    description,
-    usage,
-    examples: [{ command: usage.replace(/[<[].*$/, "").trim(), description }],
-    options: values.options ?? [],
-    arguments: values.arguments ?? [],
-    commands: values.commands ?? [],
-  };
-}
-function option(
-  name: string,
-  type: CliHelpOption["type"],
-  description: string,
-  aliases: readonly string[] = [],
-  values?: readonly string[],
-): CliHelpOption {
-  return {
-    name,
-    type,
-    description,
-    ...(aliases.length ? { aliases } : {}),
-    ...(values ? { values } : {}),
-  };
-}
-function argument(name: string, required: boolean, description: string): CliHelpArgument {
-  return { name, required, description };
-}
-function title(value: string): string {
-  return value.replaceAll("-", " ").replace(/^./, (character) => character.toUpperCase());
 }
