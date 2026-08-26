@@ -34,7 +34,10 @@ export type DescriptorKind =
   | "bucket"
   | "cache"
   | "tool"
-  | "agent";
+  | "agent"
+  | "data-model"
+  | "constants"
+  | "prompt";
 
 /** A typed reference to a descriptor identified by an explicit stable ID. */
 export interface Ref<Kind extends DescriptorKind, Id extends string = string> {

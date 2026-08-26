@@ -1,14 +1,14 @@
 /** Current version of the public contract payloads. */
-export const CONTRACT_VERSION = 1 as const;
+export const CONTRACT_VERSION = 2 as const;
 
 /** Current version of generated ZSys artifacts. */
-export const GENERATOR_VERSION = 1 as const;
+export const GENERATOR_VERSION = 2 as const;
 
 /** Current version of the canonical application graph. */
-export const GRAPH_VERSION = 4 as const;
+export const GRAPH_VERSION = 5 as const;
 
 /** Current version of the executable runtime manifest. */
-export const MANIFEST_VERSION = 4 as const;
+export const MANIFEST_VERSION = 5 as const;
 
 /** Current version of the internal inspector/API protocol. */
 export const API_VERSION = 1 as const;

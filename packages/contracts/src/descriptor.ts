@@ -37,6 +37,9 @@ const descriptorKinds: readonly DescriptorKind[] = [
   "cache",
   "tool",
   "agent",
+  "data-model",
+  "constants",
+  "prompt",
 ];
 
 /** Creates a normalized immutable reference without deriving identity from a path. */
