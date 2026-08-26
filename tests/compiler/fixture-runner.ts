@@ -78,7 +78,12 @@ export async function compileProject(
     await prepareRoot(projectRoot, temporaryRoot);
     const config = await loadFixtureConfig(temporaryRoot, name);
     const sources = await readSources(temporaryRoot, config.source);
-    const prefiltered = prefilterSources(sources, {
+    const configSource = "zsys.config.ts";
+    const discoverySources = [
+      ...sources.filter((source) => source.fileName !== configSource),
+      { fileName: configSource, text: await readFile(join(temporaryRoot, configSource), "utf8") },
+    ];
+    const prefiltered = prefilterSources(discoverySources, {
       projectRoot: temporaryRoot,
       exclude: config.exclude,
     });
@@ -88,7 +93,9 @@ export async function compileProject(
     );
     const evaluator = await evaluateCandidates({
       projectRoot: temporaryRoot,
-      candidates,
+      candidates: candidates.map((fileName) =>
+        prefiltered.candidates.find((candidate) => candidate.fileName === fileName)!,
+      ),
       generationId: options.generationId ?? `fixture-${name}-${order}`,
     });
     if (evaluator.status !== "ok") {
@@ -97,9 +104,12 @@ export async function compileProject(
     const normalization = normalizeCompilation({
       evaluator,
       projectRoot: temporaryRoot,
-      sources,
+      sources: discoverySources,
     });
-    const extracted = extractDescriptors(evaluator, { projectRoot: temporaryRoot, sources });
+    const extracted = extractDescriptors(evaluator, {
+      projectRoot: temporaryRoot,
+      sources: discoverySources,
+    });
     const diagnostics = sortDiagnostics([
       ...normalization.diagnostics,
       ...extracted.flatMap((descriptor) =>
@@ -174,6 +184,7 @@ export async function assertFixtureGoldens(run: FixtureCompilation): Promise<voi
 async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<void> {
   await cp(join(fixtureRoot, "src"), join(temporaryRoot, "src"), { recursive: true });
   await cp(join(fixtureRoot, "zsys.config.ts"), join(temporaryRoot, "zsys.config.ts"));
+  await linkFixtureDependencies(fixtureRoot, temporaryRoot);
   const scope = join(temporaryRoot, "node_modules", "@zsys");
   await mkdir(scope, { recursive: true });
   for (const entry of await readdir(resolve(import.meta.dir, "../../packages"), {
@@ -187,6 +198,24 @@ async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<
     if (manifest.name?.startsWith("@zsys/")) {
       await symlink(packageRoot, join(temporaryRoot, "node_modules", manifest.name), "dir");
     }
+  }
+}
+
+async function linkFixtureDependencies(fixtureRoot: string, temporaryRoot: string): Promise<void> {
+  const manifestPath = join(fixtureRoot, "package.json");
+  if (!existsSync(manifestPath)) return;
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as {
+    readonly dependencies?: Readonly<Record<string, string>>;
+    readonly devDependencies?: Readonly<Record<string, string>>;
+  };
+  const names = Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }).sort();
+  for (const name of names) {
+    if (name.startsWith("@zsys/")) continue;
+    const source = join(fixtureRoot, "node_modules", name);
+    if (!existsSync(source)) continue;
+    const target = join(temporaryRoot, "node_modules", name);
+    await mkdir(join(target, ".."), { recursive: true });
+    await symlink(source, target, "dir");
   }
 }
 

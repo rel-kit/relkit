@@ -20,13 +20,11 @@ describe("compiler semantic validation", () => {
       kind: "app",
       id: "app",
       ref: { kind: "app", id: "app" },
-      providers: {
-        models: {
-          default: {
-            kind: "provider-binding",
-            ownership: "external",
-            adapter: { adapter: "ai-sdk", configuration: modelProviders },
-          },
+      models: {
+        default: {
+          kind: "provider-binding",
+          ownership: "external",
+          adapter: { adapter: "ai-sdk", configuration: modelProviders },
         },
       },
     });
@@ -152,13 +150,11 @@ describe("compiler semantic validation", () => {
       kind: "app",
       id: "app",
       ref: { kind: "app", id: "app" },
-      providers: {
-        buckets: {
-          archive: {
-            kind: "provider-binding",
-            ownership: "external",
-            adapter: { adapter: "s3", configuration: {} },
-          },
+      buckets: {
+        archive: {
+          kind: "provider-binding",
+          ownership: "external",
+          adapter: { adapter: "s3", configuration: {} },
         },
       },
     };
@@ -183,13 +179,11 @@ describe("compiler semantic validation", () => {
       kind: "app",
       id: "app",
       ref: { kind: "app", id: "app" },
-      providers: {
-        buckets: {
-          default: {
-            kind: "provider-binding",
-            ownership: "managed",
-            adapter: { adapter: "s3", configuration: {} },
-          },
+      buckets: {
+        default: {
+          kind: "provider-binding",
+          ownership: "managed",
+          adapter: { adapter: "s3", configuration: {} },
         },
       },
     };
@@ -214,24 +208,22 @@ describe("compiler semantic validation", () => {
       kind: "app",
       id: "app",
       ref: { kind: "app", id: "app" },
-      providers: {
-        buckets: {
-          assets: {
-            kind: "provider-binding",
-            ownership: "external",
-            adapter: {
-              adapter: "s3",
-              configuration: {
-                endpoint: {
-                  kind: "env-ref",
-                  name: "BUCKET_ENDPOINT",
-                  type: "url",
-                  sensitive: false,
-                  metadata: { type: "url", sensitive: false },
-                },
+      buckets: {
+        assets: {
+          kind: "provider-binding",
+          ownership: "external",
+          adapter: {
+            adapter: "s3",
+            configuration: {
+              endpoint: {
+                kind: "env-ref",
+                name: "BUCKET_ENDPOINT",
+                type: "url",
+                sensitive: false,
+                metadata: { type: "url", sensitive: false },
               },
-              environment: [{ name: "BUCKET_ENDPOINT", type: "url", sensitive: false }],
             },
+            environment: [{ name: "BUCKET_ENDPOINT", type: "url", sensitive: false }],
           },
         },
       },

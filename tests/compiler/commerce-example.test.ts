@@ -7,6 +7,7 @@ const APP_ROOT = resolve(import.meta.dir, "../../examples/commerce");
 const forbiddenNode = ["sub", "scription"].join("");
 const DESCRIPTOR_IDS = [
   "commerce-api",
+  "application",
   "assets",
   "prices",
   "orders.created",
@@ -17,7 +18,9 @@ const DESCRIPTOR_IDS = [
   "orders.audit-changes",
   "telemetry.capture-events",
   "authorize-order",
+  "account-session",
   "browse-path",
+  "database-users",
   "orders.create-order",
   "orders.delete-order",
   "orders.get-order",
@@ -27,6 +30,9 @@ const DESCRIPTOR_IDS = [
   "upload-assets",
   "receipts.send-job",
   "order-auth",
+  "route.all.api.auth.optional-catch-all-auth",
+  "route.get.account.profile",
+  "route.get.database.users",
   "route.get.docs.optional-catch-all-parts",
   "route.get.files.catch-all-parts",
   "route.delete.orders.by-order-id",
@@ -76,9 +82,11 @@ describe("commerce-example compiler acceptance", () => {
         .filter((node) => DESCRIPTOR_IDS.includes(node.id))
         .map((node) => node.id)
         .sort(),
-    ).toEqual(DESCRIPTOR_IDS.filter((id) => id !== "orders.normalize-id").sort());
+    ).toEqual(
+      DESCRIPTOR_IDS.filter((id) => !["application", "orders.normalize-id"].includes(id)).sort(),
+    );
     expect(unique(edges.map(edgeKey))).toHaveLength(edges.length);
-    expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(16);
+    expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(19);
     expect(
       nodes
         .filter((node) => node.kind === "trigger")
@@ -87,6 +95,9 @@ describe("commerce-example compiler acceptance", () => {
     ).toEqual(
       [
         "route.post.uploads",
+        "route.all.api.auth.optional-catch-all-auth",
+        "route.get.account.profile",
+        "route.get.database.users",
         "route.get.docs.optional-catch-all-parts",
         "route.get.files.catch-all-parts",
         "orders.audit-changes",
@@ -119,6 +130,8 @@ describe("commerce-example compiler acceptance", () => {
         ["listens-to-event", "orders.audit-changes", "orders.updated"],
         ["publishes-event", "orders.create-order", "orders.created"],
         ["targets-function", "route.post.uploads", "upload-assets", "primary"],
+        ["targets-function", "route.get.account.profile", "account-session", "primary"],
+        ["targets-function", "route.get.database.users", "database-users", "primary"],
         ["targets-function", "route.get.docs.optional-catch-all-parts", "browse-path", "primary"],
         ["targets-function", "route.get.files.catch-all-parts", "browse-path", "primary"],
         ["targets-function", "route.delete.orders.by-order-id", "orders.delete-order", "primary"],
@@ -157,6 +170,7 @@ describe("commerce-example compiler acceptance", () => {
         ],
         ["targets-function", "receipts.send-job", "send-receipt", "primary"],
         ["uses-bucket", "send-receipt", "assets"],
+        ["uses-bucket", "upload-assets", "assets"],
         ["uses-cache", "orders.create-order", "prices"],
         ["uses-cache", "route.get.orders", "prices"],
         ["uses-provider-profile", "assets", "provider.buckets.default"],
@@ -266,6 +280,7 @@ describe("commerce-example compiler acceptance", () => {
 
     const httpRoutes = nodes.filter((node) => node.triggerType === "http");
     expect([...new Set(httpRoutes.map((node) => node.config.method))].sort()).toEqual([
+      "ALL",
       "DELETE",
       "GET",
       "HEAD",

@@ -50,9 +50,8 @@ describe("rate-limit compilation", () => {
       from: route.id,
       to: store.id,
     });
-    expect(result.outputs.client).toContain(
-      'ClientResult<429, { "error": "rate-limit"; "retryAfterMs": number }>',
-    );
+    expect(result.outputs.client).toContain("ORPCError");
+    expect(result.outputs.client).not.toContain("ClientResult");
   });
 
   test("allows generation-local memory only outside production", () => {

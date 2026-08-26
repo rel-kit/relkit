@@ -56,13 +56,11 @@ describe("runtime manifest generation", () => {
       schema: { $zsys: "schema" },
     });
     const app = descriptor("app", "app", undefined, "app", {
-      providers: {
-        buckets: {
-          default: {
-            kind: "provider-binding",
-            ownership: "external",
-            adapter: { adapter: "s3" },
-          },
+      buckets: {
+        default: {
+          kind: "provider-binding",
+          ownership: "external",
+          adapter: { adapter: "s3" },
         },
       },
     });
@@ -112,31 +110,29 @@ describe("runtime manifest generation", () => {
       source: { file: "src/app.ts", line: 1, column: 1 },
       exportName: "default",
       exportKind: "default" as const,
-      providers: {
-        buckets: {
-          default: {
-            kind: "provider-binding",
-            ownership: "external",
-            adapter: {
-              adapter: "s3",
-              environment: [
-                { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
-                { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
-              ],
-              configuration: {
-                endpoint: {
+      buckets: {
+        default: {
+          kind: "provider-binding",
+          ownership: "external",
+          adapter: {
+            adapter: "s3",
+            environment: [
+              { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
+              { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
+            ],
+            configuration: {
+              endpoint: {
+                kind: "env-ref",
+                name: "BUCKET_ENDPOINT",
+                type: "url",
+                sensitive: false,
+              },
+              credentials: {
+                accessKeyId: {
                   kind: "env-ref",
-                  name: "BUCKET_ENDPOINT",
-                  type: "url",
-                  sensitive: false,
-                },
-                credentials: {
-                  accessKeyId: {
-                    kind: "env-ref",
-                    name: "BUCKET_ACCESS_KEY_ID",
-                    type: "secret",
-                    sensitive: true,
-                  },
+                  name: "BUCKET_ACCESS_KEY_ID",
+                  type: "secret",
+                  sensitive: true,
                 },
               },
             },
@@ -188,9 +184,10 @@ describe("runtime manifest generation", () => {
       MANIFEST_CODES.handler,
     ]);
 
+    const mismatchHash = `${graphHash.slice(0, -1)}${graphHash.endsWith("0") ? "1" : "0"}`;
     const mismatch = generateManifest({
       graph,
-      graphHash: `${graphHash.slice(0, -1)}0`,
+      graphHash: mismatchHash,
       descriptors: [],
     });
     expect(mismatch.activatable).toBe(false);
