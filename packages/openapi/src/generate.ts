@@ -152,5 +152,14 @@ export function generateOpenApiJson(graph: ApplicationGraph): string {
 }
 
 function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
-  return node.kind === "trigger" && node.triggerType === "http";
+  return (
+    node.kind === "trigger" &&
+    node.triggerType === "http" &&
+    isRecord(node.config) &&
+    node.config.rawHandler !== true
+  );
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

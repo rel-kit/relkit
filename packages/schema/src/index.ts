@@ -26,6 +26,7 @@ export type {
   StandardSchemaOptions,
   StandardSchemaTypes,
   StandardSchemaV1,
+  StandardJSONSchemaV1,
   StandardSuccess,
   ZsysSchema,
 } from "./standard-schema.js";

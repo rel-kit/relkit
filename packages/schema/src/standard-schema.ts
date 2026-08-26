@@ -23,7 +23,7 @@ export type StandardResult<T> = StandardSuccess<T> | StandardFailure;
 
 /** Standard Schema v1 options accepted by compatible validators. */
 export interface StandardSchemaOptions {
-  readonly libraryOptions?: Record<string, unknown>;
+  readonly libraryOptions?: Record<string, unknown> | undefined;
 }
 
 /** Type-only input/output information advertised by Standard Schema. */
@@ -43,6 +43,26 @@ export interface StandardSchemaV1<TInput = unknown, TOutput = TInput> {
     ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
     readonly types?: StandardSchemaTypes<TInput, TOutput>;
   };
+}
+
+export interface StandardJSONSchemaV1<TInput = unknown, TOutput = TInput> {
+  readonly "~standard": StandardJSONSchemaV1.Props<TInput, TOutput>;
+}
+
+export namespace StandardJSONSchemaV1 {
+  export interface Props<Input = unknown, Output = Input> {
+    readonly version: 1;
+    readonly vendor: string;
+    readonly types?: StandardSchemaTypes<Input, Output>;
+    readonly jsonSchema: {
+      readonly input: (options: Options) => Record<string, unknown>;
+      readonly output: (options: Options) => Record<string, unknown>;
+    };
+  }
+  export interface Options {
+    readonly target: "draft-2020-12" | "draft-07" | "openapi-3.0" | ({} & string);
+    readonly libraryOptions?: Record<string, unknown> | undefined;
+  }
 }
 
 /** Namespace aliases matching the official Standard Schema v1 vocabulary. */
@@ -65,6 +85,8 @@ export interface ZsysSchema<TInput = unknown, TOutput = TInput> extends Standard
   TInput,
   TOutput
 > {
+  readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
+    StandardJSONSchemaV1<TInput, TOutput>["~standard"];
   readonly zsys?: {
     readonly jsonSchema?: () => JsonValue;
   };
