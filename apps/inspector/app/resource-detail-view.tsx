@@ -2,6 +2,7 @@ import type { OperationStatus, ResourceOperationView, ResourceView } from "../li
 import type { ReactNode } from "react";
 import { SourceLink } from "./source-link";
 import { SchemaPanel } from "./schema-panel";
+import { ResourceExplorer } from "./resource-explorer";
 
 export function ResourceDetailView({ view }: { readonly view: ResourceView }) {
   const label = view.kind === "bucket" ? "Bucket" : "Cache";
@@ -18,6 +19,7 @@ export function ResourceDetailView({ view }: { readonly view: ResourceView }) {
         <span className="badge">{view.id}</span>
       </header>
       <IdentityPanel view={view} />
+      <ResourceExplorer kind={view.kind} id={view.id} />
       <OperationPanel operations={view.operations} />
       <MetadataPanel view={view} />
       {Object.keys(view.stats).length > 0 && <StatsPanel stats={view.stats} />}
@@ -97,11 +99,7 @@ function MetadataPanel({ view }: { readonly view: ResourceView }) {
           <Meta label="Maximum TTL" value={formatNumber(descriptor.maxTtlMs)} />
         </dl>
       )}
-      {cache && (
-        <p className="supporting-copy">
-          Raw cache keys and values are never returned to the browser.
-        </p>
-      )}
+      {cache && <p className="supporting-copy">Cache inspection is bounded and read-only.</p>}
     </section>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Badge } from "../components/ui/badge";
@@ -9,32 +8,13 @@ import { Card } from "../components/ui/card";
 import { OverlayDialog } from "../components/ui/dialog";
 import { Field } from "../components/ui/field";
 import { Pagination } from "../components/ui/pagination";
-import { type Choice, SelectField } from "../components/ui/select";
+import { SelectField } from "../components/ui/select";
 import { ContentTabs } from "../components/ui/tabs";
-import type { InspectorPage, InspectorQuery } from "../lib/api-types";
+import type { InspectorQuery } from "../lib/api-types";
 import { INSPECTOR_BACKEND_CONNECTED_EVENT } from "../lib/client";
 import { ResourceTableBody } from "./resource-table-body";
-export interface ResourceTableItem {
-  readonly id: string;
-  readonly [key: string]: unknown;
-}
-export interface ResourceTableColumn<Item extends ResourceTableItem> {
-  readonly key: string;
-  readonly label: string;
-  readonly render: (item: Item) => ReactNode;
-}
-interface ResourceTableProps<Item extends ResourceTableItem> {
-  readonly title: string;
-  readonly description: string;
-  readonly noun: string;
-  readonly load: (query: InspectorQuery) => Promise<InspectorPage<Item>>;
-  readonly columns: readonly ResourceTableColumn<Item>[];
-  readonly href?: (item: Item) => string;
-  readonly openLabel?: string;
-  readonly kindOptions?: readonly Choice[];
-  readonly statusOptions?: readonly Choice[];
-  readonly details?: (item: Item) => ReactNode;
-}
+import type { ResourceTableItem, ResourceTableProps } from "./resource-table-types";
+export type { ResourceTableColumn, ResourceTableItem } from "./resource-table-types";
 export function ResourceTable<Item extends ResourceTableItem>({
   title,
   description,
