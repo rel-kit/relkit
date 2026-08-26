@@ -1,6 +1,7 @@
 import { canonicalJson, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
 import type { JsonValue } from "@zsys/contracts";
 import type { ApplicationGraph } from "@zsys/graph";
+import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
 
@@ -9,12 +10,24 @@ export function serverSource(
   graph: ApplicationGraph,
   graphHash: string,
   openapi: JsonValue = {},
+  clientContract: JsonValue = {},
   configuration: {
     readonly maxBodyBytes: number;
     readonly apiDocs: { readonly enabledInProduction: boolean };
-  } = { maxBodyBytes: 1_048_576, apiDocs: { enabledInProduction: false } },
+    readonly clientContract: boolean;
+    readonly mcp: boolean;
+    readonly maxPreviewBytes: number;
+  } = {
+    maxBodyBytes: 1_048_576,
+    apiDocs: { enabledInProduction: false },
+    clientContract: true,
+    mcp: true,
+    maxPreviewBytes: 1_048_576,
+  },
 ): string {
-  return `import { createGeneratedAgentFunction, invokeAgent } from "@zsys/agents";
+  return `import { AsyncLocalStorage } from "node:async_hooks";
+import { createGeneratedAgentFunction, invokeAgent } from "@zsys/agents";
+import { createApplicationContextResolver } from "@zsys/app";
 import { resolveEnv } from "@zsys/config";
 import { awsProviderFactories } from "@zsys/cloud-aws/runtime";
 import { createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs } from "@zsys/engine";
@@ -22,13 +35,14 @@ import { createRegistrationPlan } from "@zsys/graph";
 import { installInspectorEndpoints } from "@zsys/inspector-api";
 import { createObservabilityRuntime } from "@zsys/observability";
 import { standardProviderFactories } from "@zsys/providers-standard";
-import { consoleHumanSink, formatHumanLog } from "@zsys/runtime-effect";
-import { createApp } from "@zsys/runtime-hono";
+import { consoleHumanSink, formatHumanLog, redactFailureDetail } from "@zsys/runtime-effect";
+import { createApp, createHttpAuthRuntime } from "@zsys/runtime-hono";
 import { runtimeManifest } from "./runtime.manifest.ts";
 
 const graph = ${canonicalJson(graph)};
 const graphHash = ${JSON.stringify(graphHash)};
 const openapiDocument = ${canonicalJson(openapi)};
+const clientContractDocument = ${canonicalJson(clientContract)};
 const plan = createRegistrationPlan(graph);
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
 const environment = resolveEnvironment(process.env.ZSYS_ENV, process.env.NODE_ENV);
@@ -42,15 +56,25 @@ globalThis["__zsys_flush_telemetry"] = telemetry.flush;
 const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
 const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
+const authRequestStorage = new AsyncLocalStorage();
+const authRuntime = createAuthRegistration(graph, runtimeManifest.routes);
 const environmentResolution = resolveRuntimeEnvironment(application.env, environment, sourceValues);
 const values = environmentResolution.values;
+const sentry = await createSentry(application.sentry, values);
+globalThis["__zsys_flush_sentry"] = () => sentry?.flush(1_000);
+const contextResolver = createApplicationContextResolver({
+  constants: runtimeManifest.constants,
+  prompts: runtimeManifest.prompts,
+  env: values,
+});
+const databaseContext = createDatabaseRegistration(runtimeManifest.dataModel);
 bindAgents();
 const registry = createFunctionRegistry(graph, executableManifest);
 const providerFactories = { ...standardProviderFactories, ...awsProviderFactories };
 let materializedJobs;
 let jobWorker;
 const providerStartup = (environmentResolution.error === undefined
-  ? createProviderRegistry({ generationId, environment, providers: application.providers, graph, values, environmentMetadata: application.env.metadata, signal: shutdownController.signal, factories: providerFactories })
+  ? createProviderRegistry({ generationId, environment, providers: { buckets: application.buckets, cache: application.caches, jobs: application.jobs, events: application.events, models: application.models, observability: application.observability }, graph, values, environmentMetadata: application.env.metadata, signal: shutdownController.signal, factories: providerFactories })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context) });
@@ -85,7 +109,14 @@ const app = createApp({
       ? {}
       : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
   },
+  clientContract: {
+    enabled: ${String(configuration.clientContract)},
+    document: clientContractDocument,
+  },
+  mcp: { enabled: ${String(configuration.mcp)} },
+  staticFiles: { root: process.env.ZSYS_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
+  ...(authRuntime === undefined ? {} : { auth: authRuntime }),
   internalEndpoints: {
     mode: environment,
     enabled: internalEndpointsEnabled,
@@ -124,11 +155,25 @@ installInspectorEndpoints(app, {
         invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.signal === undefined ? {} : { signal: request.signal }) }),
       },
     },
+    resources: {
+      buckets: {
+        supports: (bucketId) => supportsInspector("buckets", plan.buckets, bucketId, "list", "preview"),
+        list: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).list(request),
+        preview: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).preview(request),
+      },
+      cache: {
+        supports: (cacheId) => supportsInspector("cache", plan.caches, cacheId, "scan", "value"),
+        scan: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).scan(request),
+        value: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).value(request),
+      },
+    },
   },
+  maxPreviewBytes: ${configuration.maxPreviewBytes},
   query: telemetry.query,
   stream: telemetry.stream,
 });
 const server = Bun.serve({
+  hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
   fetch: async (request) => {
     const path = new URL(request.url).pathname;
@@ -143,47 +188,7 @@ const server = Bun.serve({
     }
   },
 });
-async function invokeHttp(request) {
-  const providerRegistry = await providerStartup;
-  if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
-  const target = targetFor(request.functionId);
-  const task = invoke({
-    input: request.input,
-    source: request.source ?? "http",
-    registry,
-    functionId: request.functionId,
-    ...(target === undefined ? {} : { target }),
-    ...(request.signal === undefined
-      ? { signal: shutdownController.signal }
-      : { signal: AbortSignal.any([request.signal, shutdownController.signal]) }),
-    ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
-    ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
-    ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
-    clients: createDependencySources(providerRegistry),
-    servicePolicies: runtimeManifest.services,
-    ...(request.parent === undefined ? {} : { parent: request.parent }),
-    ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
-    ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
-    ...(request.errors === undefined ? {} : { errors: request.errors }),
-    hooks: { observability: telemetry, context: invocationContext },
-  });
-  activeInvocations.add(task);
-  try {
-    return await task;
-  } finally {
-    activeInvocations.delete(task);
-  }
-}
-
-function invocationContext({ invocation, signal, env, time }) {
-  const write = (level, message, fields = {}) => {
-    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId });
-    if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
-  };
-  const logger = (level) => (message, fields) => write(level, message, fields);
-  return { invocation, signal, env, time, log: Object.freeze({ trace: logger("trace"), debug: logger("debug"), info: logger("info"), warn: logger("warn"), error: logger("error") }) };
-}
-
+${SERVER_INVOCATION_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}
 `;
