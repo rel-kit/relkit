@@ -1,0 +1,5 @@
+{
+  "extends": "../commerce/tsconfig.json",
+  "files": [".zsys/generated/context-registry.d.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "zsys.config.ts"]
+}
