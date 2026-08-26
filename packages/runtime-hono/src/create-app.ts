@@ -17,6 +17,11 @@ import {
   type InternalEndpointOptions,
 } from "./internal-endpoints.js";
 import { installApiDocs, type ApiDocsOptions } from "./api-docs.js";
+import {
+  installClientContractEndpoint,
+  type ClientContractEndpointOptions,
+} from "./client-contract.js";
+import type { McpOptions } from "./mcp.js";
 
 export type FrameworkMiddlewareInput =
   | Partial<Record<(typeof FRAMEWORK_MIDDLEWARE_ORDER)[number], MiddlewareHandler>>
@@ -27,6 +32,8 @@ export interface CreateAppOptions extends RouteMaterializationOptions {
   readonly middleware?: HttpMiddlewareOptions;
   readonly internalEndpoints?: InternalEndpointOptions;
   readonly apiDocs?: ApiDocsOptions;
+  readonly clientContract?: ClientContractEndpointOptions;
+  readonly mcp?: McpOptions;
 }
 
 /** Creates the HTTP application from the already verified registration plan. */
@@ -48,6 +55,7 @@ export function createApp(options: CreateAppOptions): Hono {
     ...(options.internalEndpoints ?? {}),
   });
   installApiDocs(app, options.plan, apiDocsOptions(options));
+  installClientContractEndpoint(app, options.clientContract);
   const requestMapping =
     options.middleware?.maxBodyBytes === undefined
       ? options.requestMapping

@@ -56,6 +56,7 @@ async function handleRoute(
         ...(typeof trigger.config.timeoutMs !== "number"
           ? {}
           : { timeoutMs: trigger.config.timeoutMs }),
+        ...(options.auth === undefined ? {} : { auth: options.auth.contextFor(context.req.raw) }),
       },
       builder,
       "function",
