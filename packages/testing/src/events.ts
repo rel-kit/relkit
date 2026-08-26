@@ -119,7 +119,16 @@ function createPlan<Output>(
         ...(trigger.concurrency === undefined ? {} : { concurrency: trigger.concurrency }),
       },
     })),
-    events: [{ kind: "event", id: eventId, source, version, payload: {} }],
+    events: [
+      {
+        kind: "event",
+        id: eventId,
+        source,
+        version,
+        payload: {},
+        profile: triggers[0]?.profile ?? "default",
+      },
+    ],
     httpTriggers: [],
     queues: [],
     schedules: [],
