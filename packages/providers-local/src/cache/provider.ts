@@ -14,6 +14,7 @@ import {
 import { readCacheState, snapshotPath, writeCacheState } from "./persistence.js";
 import { ensureOwnedDirectory, quarantineStateFile } from "../state.js";
 import { writeCacheEntry } from "./write.js";
+import { createLocalCacheInspector } from "./inspector.js";
 
 export function createLocalCacheProvider(
   options: LocalCacheProviderOptions = {},
@@ -149,6 +150,7 @@ export function createLocalCacheProvider(
 
   const capabilities =
     stateRoot === undefined ? LOCAL_CACHE_CAPABILITIES : LOCAL_CACHE_DURABLE_CAPABILITIES;
+  const inspector = createLocalCacheInspector(store, () => readClock(clock));
 
   return Object.freeze({
     capabilities,
@@ -164,6 +166,7 @@ export function createLocalCacheProvider(
     has,
     getOrSet,
     increment,
+    inspector,
     close,
   });
 

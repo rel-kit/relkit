@@ -83,4 +83,20 @@ describe("local cache provider", () => {
       code: "ZSYS_CACHE_POLICY_INVALID",
     });
   });
+
+  test("scans bounded key metadata and reads values without KEYS", async () => {
+    const provider = createLocalCacheProviderForTest({ clock: () => 100 });
+    await provider.set("price:one", { cents: 100 }, { ttlMs: 500 });
+    await provider.set("price:two", { cents: 200 });
+    const signal = new AbortController().signal;
+    const first = await provider.inspector.scan({ search: "price", limit: 1, signal });
+    expect(first).toMatchObject({ items: [{ key: '"price:one"', type: "object", ttlMs: 500 }] });
+    expect(first.nextCursor).toBe("1");
+    expect(
+      await provider.inspector.value({ key: '"price:one"', limit: 100, signal }),
+    ).toMatchObject({ value: { cents: 100 }, truncated: false });
+    expect(
+      await provider.inspector.value({ key: '"missing"', limit: 100, signal }),
+    ).toBeUndefined();
+  });
 });

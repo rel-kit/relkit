@@ -92,6 +92,19 @@ export type LocalCacheProvider = Omit<CacheProvider, "capabilities"> & {
     options?: CacheOperationOptions,
     context?: CacheOperationContext,
   ) => Promise<number>;
+  readonly inspector: {
+    readonly scan: (request: {
+      readonly search?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{ readonly items: readonly unknown[]; readonly nextCursor?: string }>;
+    readonly value: (request: {
+      readonly key: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<unknown | undefined>;
+  };
 };
 
 export class LocalCacheKeyError extends TypeError {
