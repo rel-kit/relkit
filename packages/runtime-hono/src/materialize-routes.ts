@@ -12,15 +12,19 @@ import {
   type FrameworkMiddlewareName,
 } from "./middleware.js";
 import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
-
+import { registerAuthMiddleware, type HttpAuthInvocation, type HttpAuthRuntime } from "./auth.js";
+import { installRpc } from "./rpc.js";
+import { installMcp, type McpOptions } from "./mcp.js";
+import { installStaticFiles, type StaticFilesOptions } from "./static-files.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
-
 export interface RuntimeManifest {
   readonly contractVersion: typeof MANIFEST_VERSION;
   readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: ManifestEntries<unknown>;
   readonly targets?: ManifestEntries<unknown>;
+  readonly routes?: ManifestEntries<unknown>;
+  readonly tools?: ManifestEntries<unknown>;
   readonly services?: ManifestEntries<unknown>;
   readonly hooks?: ManifestEntries<unknown>;
   readonly application?: {
@@ -34,12 +38,17 @@ export interface RuntimeManifest {
 export interface HttpInvocationOptions {
   readonly functionId: string;
   readonly input: unknown;
-  readonly source: "http";
+  readonly source: "http" | "tool";
   readonly signal?: AbortSignal;
   readonly requestId?: string;
   readonly traceId?: string;
   readonly correlationId?: string;
   readonly timeoutMs?: number;
+  readonly auth?: HttpAuthInvocation;
+  readonly toolHooks?: {
+    readonly onBefore?: (value: unknown, context: unknown) => unknown;
+    readonly onAfter?: (value: unknown, context: unknown) => unknown;
+  };
 }
 export interface HttpEngine {
   readonly invoke: (options: HttpInvocationOptions) => Promise<unknown>;
@@ -68,6 +77,9 @@ export interface RouteMaterializationOptions {
   readonly generationId?: string;
   readonly observability?: RequestRecordSink;
   readonly rateLimitRuntime?: RateLimitRuntimeOptions;
+  readonly auth?: HttpAuthRuntime;
+  readonly mcp?: McpOptions;
+  readonly staticFiles?: StaticFilesOptions;
   readonly middlewareContext?: (options: {
     readonly middlewareId: string;
     readonly signal: AbortSignal;
@@ -81,12 +93,11 @@ export type RuntimeHonoManifestErrorCode =
   | "ZSYS_GRAPH_MANIFEST_MISMATCH"
   | "ZSYS_MANIFEST_MIDDLEWARE_MISSING"
   | "ZSYS_MANIFEST_MIDDLEWARE_MISMATCH"
+  | "ZSYS_MANIFEST_RAW_ROUTE_MISSING"
   | "ZSYS_MANIFEST_TRANSFORM_MISSING";
-
 export class RuntimeHonoManifestError extends Error {
   readonly code: RuntimeHonoManifestErrorCode;
   readonly referenceId?: string;
-
   constructor(code: RuntimeHonoManifestErrorCode, message: string, referenceId?: string) {
     super(message);
     this.name = "RuntimeHonoManifestError";
@@ -112,7 +123,6 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
       "ZSYS_GRAPH_MANIFEST_MISMATCH",
       `Manifest hash ${JSON.stringify(manifest.graphHash)} does not match plan hash ${JSON.stringify(plan.graphHash)}.`,
     );
-
   for (const middleware of plan.middlewares) {
     const entry = getEntry(manifest.middleware, middleware.id);
     if (!isRecord(entry) || entry.path !== middleware.path || typeof entry.handler !== "function")
@@ -125,6 +135,17 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
       );
   }
   for (const trigger of plan.httpTriggers) {
+    if (trigger.config.rawHandler === true) {
+      const route = getEntry(manifest.routes ?? {}, trigger.id);
+      if (!isRecord(route) || typeof route.handler !== "function") {
+        throw new RuntimeHonoManifestError(
+          "ZSYS_MANIFEST_RAW_ROUTE_MISSING",
+          `Manifest raw route "${trigger.id}" is missing its handler.`,
+          trigger.id,
+        );
+      }
+      continue;
+    }
     for (const transform of trigger.config.transforms) {
       if (getEntry(manifest.requestTransforms, transform.id) === undefined)
         throw new RuntimeHonoManifestError(
@@ -139,10 +160,15 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
 export function materializeRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
   registerRouteMiddleware(app, options);
+  registerAuthMiddleware(app, options.auth);
   const triggers = [...options.plan.httpTriggers].sort(
     (left, right) => Number(right.config.method === "HEAD") - Number(left.config.method === "HEAD"),
   );
   for (const trigger of triggers) {
+    if (trigger.config.rawHandler === true) {
+      registerRawRoute(app, trigger, options);
+      continue;
+    }
     const handler = withRateLimit(trigger, options, createRouteHandler(trigger, options));
     for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
       if (trigger.config.method === "HEAD") {
@@ -154,7 +180,21 @@ export function materializeRoutes(app: Hono, options: RouteMaterializationOption
       }
     }
   }
+  installRpc(app, options);
+  installMcp(app, options);
+  installStaticFiles(app, options.staticFiles);
 }
-
+function registerRawRoute(
+  app: Hono,
+  trigger: HttpTriggerRegistration,
+  options: RouteMaterializationOptions,
+): void {
+  const route = getEntry(options.manifest.routes ?? {}, trigger.id);
+  if (!isRecord(route) || typeof route.handler !== "function") return;
+  const handler = route.handler as (request: Request) => Response | Promise<Response>;
+  for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
+    app.all(path, (context) => Promise.resolve(handler(context.req.raw)));
+  }
+}
 export { FRAMEWORK_MIDDLEWARE_ORDER };
 export type { FrameworkMiddleware, FrameworkMiddlewareName };
