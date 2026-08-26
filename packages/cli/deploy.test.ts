@@ -122,7 +122,6 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
       },
       config: {
         projectRoot: root,
-        entry: "src/app.ts",
         source: ["src/**/*.ts"],
         exclude: [],
         generatedDirectory: ".zsys/generated",

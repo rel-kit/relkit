@@ -16,9 +16,12 @@
     }
   },
   "dependencies": {
+    "@zsys/agents": "workspace:*",
+    "@zsys/app": "workspace:*",
     "@zsys/config": "workspace:*",
     "@zsys/cloud-aws": "workspace:*",
     "@zsys/compiler": "workspace:*",
+    "@zsys/client-generator": "workspace:*",
     "@zsys/contracts": "workspace:*",
     "@zsys/deploy": "workspace:*",
     "@zsys/deploy-pulumi": "workspace:*",
@@ -27,6 +30,7 @@
     "@zsys/graph": "workspace:*",
     "@zsys/engine": "workspace:*",
     "@zsys/inspector-api": "workspace:*",
+    "@zsys/invocation": "workspace:*",
     "@zsys/observability": "workspace:*",
     "@zsys/providers-standard": "workspace:*",
     "@zsys/runtime-effect": "workspace:*",
@@ -36,6 +40,9 @@
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
+  },
+  "optionalDependencies": {
+    "@sentry/bun": "10.71.0"
   },
   "scripts": {
     "build": "tsc -b && bun run ../../scripts/package-inspector.ts",
