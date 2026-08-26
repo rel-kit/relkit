@@ -22,29 +22,24 @@ import {
   validateApproval,
   validateSideEffect,
 } from "./function-tool-validation.js";
-
 export { copyFunctionToolHooks } from "./function-tool-validation.js";
-
 export type FunctionToolSideEffect = "none" | "read" | "write" | "external";
 export type FunctionToolApproval = "never" | "on-write" | "always";
-
 export interface FunctionToolMetadata extends DescriptorMetadata {
   readonly description: string;
   readonly sideEffect: FunctionToolSideEffect;
   readonly approval: FunctionToolApproval;
   readonly timeoutMs?: number;
+  readonly mcp?: boolean;
 }
-
 export type FunctionToolContext = Pick<
   FunctionContext,
   "invocation" | "signal" | "env" | "log" | "time"
 >;
-
 export type FunctionToolHook<Value = unknown> = (
   value: Value,
   context: FunctionToolContext,
 ) => MaybePromise<Value>;
-
 export interface FunctionToolOptions<
   Id extends string = string,
   Input = unknown,
@@ -54,24 +49,19 @@ export interface FunctionToolOptions<
   readonly onBefore?: FunctionToolHook<Input>;
   readonly onAfter?: FunctionToolHook<Output>;
 }
-
 export interface FunctionToolApprovalRequest {
   readonly toolId: string;
   readonly sideEffect: FunctionToolSideEffect;
   readonly policy: FunctionToolApproval;
 }
-
 export type FunctionToolApprovalDecision = "approved" | "denied" | boolean;
-
 export type FunctionToolApprovalResolver = (
   approval: FunctionToolApprovalRequest,
 ) => MaybePromise<FunctionToolApprovalDecision>;
-
 export interface FunctionToolInvokeOptions {
   readonly signal?: AbortSignal;
   readonly approval?: FunctionToolApprovalResolver;
 }
-
 export type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
   Target["ref"]["id"],
   Target extends { readonly __input?: infer Input } ? Input : unknown,
@@ -80,7 +70,6 @@ export type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
   Target["input"],
   Target["output"]
 >;
-
 export interface FunctionToolDescriptor<
   Id extends string,
   Target extends FunctionRefAny = FunctionRefAny,
@@ -91,6 +80,7 @@ export interface FunctionToolDescriptor<
   readonly sideEffect: FunctionToolSideEffect;
   readonly approval: FunctionToolApproval;
   readonly timeoutMs?: number;
+  readonly mcp: boolean;
   readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
   readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
   /** Invokes the target through the common tool and function runtime. */
@@ -99,7 +89,6 @@ export interface FunctionToolDescriptor<
     options?: FunctionToolInvokeOptions,
   ) => Promise<InferOutput<Target["output"]>>;
 }
-
 type FunctionToolCreateOptions<
   Id extends string,
   Target extends FunctionRefAny,
@@ -107,7 +96,6 @@ type FunctionToolCreateOptions<
   readonly id?: Id;
   readonly target: Target;
 };
-
 export function createFunctionTool<const Id extends string, const Target extends FunctionRefAny>(
   options: FunctionToolCreateOptions<Id, Target>,
 ): FunctionToolDescriptor<Id, Target> {
@@ -124,6 +112,7 @@ export function createFunctionTool<const Id extends string, const Target extends
     description: metadata.description,
     sideEffect: metadata.sideEffect,
     approval: metadata.approval,
+    mcp: metadata.mcp ?? true,
     ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
     ...hooks,
   };
@@ -145,13 +134,15 @@ export function createFunctionTool<const Id extends string, const Target extends
   });
   return deepFreeze(descriptor) as FunctionToolDescriptor<Id, Target>;
 }
-
 export function copyFunctionToolMetadata(value: unknown): FunctionToolMetadata {
   if (!isRecord(value)) throw new TypeError("Function tool metadata must be an object");
   const description = requiredText(value.description, "Tool description");
   const sideEffect = validateSideEffect(value.sideEffect);
   const approval = validateApproval(value.approval);
   if (value.timeoutMs !== undefined) positiveInteger(value.timeoutMs, "timeoutMs");
+  if (value.mcp !== undefined && typeof value.mcp !== "boolean") {
+    throw new TypeError("Tool mcp must be a boolean");
+  }
   const title = value.title;
   if (title !== undefined && typeof title !== "string") {
     throw new TypeError("Tool title must be a string");
@@ -163,10 +154,10 @@ export function copyFunctionToolMetadata(value: unknown): FunctionToolMetadata {
     ...(tags === undefined ? {} : { tags }),
     sideEffect,
     approval,
+    ...(value.mcp === undefined ? {} : { mcp: value.mcp }),
     ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
   };
 }
-
 function copyFunctionTarget<Target extends FunctionRefAny>(
   target: Target,
 ): FunctionToolTarget<Target> {
@@ -182,12 +173,10 @@ function copyFunctionTarget<Target extends FunctionRefAny>(
     ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
   }) as FunctionToolTarget<Target>;
 }
-
 type TargetErrors<Target extends FunctionRefAny> =
   NonNullable<Target["errors"]> extends readonly ErrorDescriptorAny[]
     ? NonNullable<Target["errors"]>
     : readonly ErrorDescriptorAny[];
-
 function copyTags(value: unknown): readonly string[] | undefined {
   if (value === undefined) return undefined;
   if (!Array.isArray(value) || !value.every((tag) => typeof tag === "string")) {

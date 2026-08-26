@@ -27,7 +27,6 @@ import type {
   FunctionDescriptor,
   FunctionRefAny,
 } from "./types.js";
-
 type FunctionImplementationOptions = Omit<
   DefineFunctionOptions<
     string,
@@ -38,7 +37,6 @@ type FunctionImplementationOptions = Omit<
   >,
   "handler"
 > & { readonly handler: (...args: any[]) => unknown };
-
 export type {
   AgentClientFor,
   AgentClients,
@@ -84,7 +82,6 @@ export type {
   PublicLogger,
   ResolvedApplicationEnv,
 } from "./types.js";
-
 /**
  * Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
  *
@@ -193,7 +190,6 @@ export const defineFunction: DefineFunction = (
     readonly ErrorDescriptorAny[]
   >;
 };
-
 function copyErrors<E extends readonly ErrorDescriptorAny[]>(errors: E | undefined): E | undefined {
   if (errors === undefined) return undefined;
   if (!errors.every(isErrorDescriptor))

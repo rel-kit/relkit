@@ -7,11 +7,8 @@ import type {
 } from "@zsys/invocation";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
-import type {
-  FunctionToolDescriptor,
-  FunctionToolMetadata,
-  FunctionToolOptions,
-} from "./function-tool.js";
+import type { FunctionToolMetadata } from "./function-tool.js";
+import type { FunctionAsTool } from "./function-as-tool-types.js";
 import type { FunctionHandlerResult } from "./handler-result.js";
 import type {
   AgentClients,
@@ -44,68 +41,28 @@ export type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
 export type PublicLogger = SharedPublicLogger;
 export type PublicClock = SharedPublicClock;
 
+declare global {
+  namespace Zsys {
+    interface ApplicationContextRegistry {}
+  }
+}
+
+export type ApplicationContextRegistry = Zsys.ApplicationContextRegistry;
+
+type RegisteredContext<
+  Key extends PropertyKey,
+  Fallback,
+> = Key extends keyof Zsys.ApplicationContextRegistry
+  ? Zsys.ApplicationContextRegistry[Key]
+  : Fallback;
+
+export interface AuthContext<Session = unknown> {
+  readonly getSession: () => Promise<Session | null>;
+}
+
 type FunctionDependencyOptions<D extends FunctionDependencies> = "functions" extends keyof D
   ? never
   : D;
-
-type FunctionToolTarget<
-  Id extends string,
-  Input,
-  Output,
-  Errors extends readonly ErrorDescriptorAny[],
-  InputSchema extends StandardSchemaV1,
-  OutputSchema extends StandardSchemaV1,
-> = FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
-
-type FunctionToolView<
-  ToolId extends string,
-  FunctionId extends string,
-  Input,
-  Output,
-  Errors extends readonly ErrorDescriptorAny[],
-  InputSchema extends StandardSchemaV1,
-  OutputSchema extends StandardSchemaV1,
-> = FunctionToolDescriptor<
-  ToolId,
-  FunctionToolTarget<FunctionId, Input, Output, Errors, InputSchema, OutputSchema>
->;
-
-type FunctionAsTool<
-  FunctionId extends string,
-  Input,
-  Output,
-  Errors extends readonly ErrorDescriptorAny[],
-  InputSchema extends StandardSchemaV1,
-  OutputSchema extends StandardSchemaV1,
-  ToolMetadata extends FunctionToolMetadata | undefined,
-> = {
-  <const ToolId extends string>(
-    options: FunctionToolOptions<ToolId, Input, Output> & { readonly id: ToolId },
-  ): FunctionToolView<ToolId, FunctionId, Input, Output, Errors, InputSchema, OutputSchema>;
-  (
-    options: FunctionToolOptions<string, Input, Output>,
-  ): FunctionToolView<
-    `${FunctionId}.tool`,
-    FunctionId,
-    Input,
-    Output,
-    Errors,
-    InputSchema,
-    OutputSchema
-  >;
-} & ([ToolMetadata] extends [FunctionToolMetadata]
-  ? {
-      (): FunctionToolView<
-        `${FunctionId}.tool`,
-        FunctionId,
-        Input,
-        Output,
-        Errors,
-        InputSchema,
-        OutputSchema
-      >;
-    }
-  : {});
 
 export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly invocation: InvocationMetadata;
@@ -118,6 +75,10 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly buckets: BucketClients<D["buckets"]>;
   readonly cache: CacheClients<D["cache"]>;
   readonly agents: AgentClients<D["agents"]>;
+  readonly database: RegisteredContext<"database", Readonly<Record<string, never>>>;
+  readonly auth: RegisteredContext<"auth", AuthContext>;
+  readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
+  readonly prompts: RegisteredContext<"prompts", Readonly<Record<string, never>>>;
   /** Read-only context added by the owning service middleware for this invocation. */
   readonly service: Readonly<Record<string, unknown>>;
 }
