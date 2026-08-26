@@ -1,8 +1,8 @@
 import { afterAll, expect, test } from "bun:test";
 import { createTestApplication } from "@zsys/testing";
-import app from "../../src/app.js";
+import config from "../../zsys.config.js";
 
-const testApp = await createTestApplication(app);
+const testApp = await createTestApplication(config);
 
 test("GET /hello", async () => {
   const response = await testApp.http.request("/hello?name=Mustafa");
