@@ -111,13 +111,7 @@ export async function generateProject(
     await copyTemplate(template, staged);
     injectGenerateFailure(context, "substitute");
     await customizeProject(staged, options);
-    await requireFiles(staged, [
-      "package.json",
-      "zsys.config.ts",
-      "src/app.ts",
-      "src/env.ts",
-      ".env.example",
-    ]);
+    await requireFiles(staged, ["package.json", "zsys.config.ts", "src/env.ts", ".env.example"]);
 
     if (options.install) {
       await runProjectStep(

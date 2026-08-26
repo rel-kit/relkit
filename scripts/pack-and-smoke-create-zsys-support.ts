@@ -180,7 +180,6 @@ export async function verifyProject(
     "package.json",
     "bun.lock",
     "zsys.config.ts",
-    "src/app.ts",
     "src/env.ts",
     "src/functions/hello.function.ts",
     "src/routes/hello/route.ts",

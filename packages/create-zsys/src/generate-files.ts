@@ -38,9 +38,9 @@ export async function customizeProject(root: string, options: CreateOptions): Pr
   );
   await replaceOnce(join(root, "README.md"), "# my-app", `# ${options.name}`);
   await replaceOnce(
-    join(root, "src/app.ts"),
-    'id: "my-app"',
-    `id: ${JSON.stringify(projectId(options.name))}`,
+    join(root, "zsys.config.ts"),
+    "export default defineConfig({",
+    `export default defineConfig({\n  id: ${JSON.stringify(projectId(options.name))},`,
   );
   if (!options.examples) await removeExamples(root);
 }

@@ -29,6 +29,12 @@ async function main(): Promise<void> {
       return port;
     };
     process.env.PORT = String(await allocatePort());
+    Object.assign(process.env, {
+      ANTHROPIC_API_KEY: "zsys-smoke-anthropic",
+      EVENT_BUS_NAME: "zsys-smoke",
+      EVENT_ENDPOINT: "http://127.0.0.1:4566",
+      OPENAI_API_KEY: "zsys-smoke-openai",
+    });
     const inspectorPort = await allocatePort();
     for (const template of ["minimal", "api", "agent"]) {
       const config = join(temporary, "templates", "default", "v1", template, "zsys.config.ts");
