@@ -4,7 +4,8 @@
   "type": "module",
   "packageManager": "bun@1.3.10",
   "scripts": {
-    "dev": "zsys dev",
+    "dev": "bun run setup && zsys dev",
+    "setup": "bun src/setup.ts",
     "check": "zsys check",
     "typecheck": "zsys check && tsc --noEmit",
     "test": "bun test",
@@ -12,8 +13,13 @@
   },
   "dependencies": {
     "@zsys/app": "workspace:*",
+    "@zsys/better-auth": "workspace:*",
+    "@zsys/client": "workspace:*",
+    "@zsys/drizzle": "workspace:*",
     "@zsys/providers-standard": "workspace:*",
-    "@zsys/schema": "workspace:*"
+    "@zsys/schema": "workspace:*",
+    "better-auth": "1.7.1",
+    "drizzle-orm": "1.0.0-rc.4"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
