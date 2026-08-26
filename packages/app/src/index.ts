@@ -1,4 +1,7 @@
-export * from "./define-app.js";
+export * from "./config.js";
+export * from "./providers.js";
+export * from "./context-descriptors.js";
+export * from "./context-resolver.js";
 export { defineEnv, env, isEnvRef } from "@zsys/config";
 export type { EnvBuilder, EnvDefinition, EnvMetadata, EnvRef, EnvShape } from "@zsys/config";
 export * from "@zsys/agents";

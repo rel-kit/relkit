@@ -1,11 +1,11 @@
 # @zsys/app
 
-`@zsys/app` is the public entry point for value-free application descriptors and composable provider
-bindings. Applications declare one topology; deployment pipelines provide different values for the
-same environment schema.
+`@zsys/app` is the public entry point for application configuration, descriptors, and composable
+provider bindings. `zsys.config.ts` contains settings and provider profiles; database and auth are
+registered by their own discovered descriptors.
 
 ```ts
-import { defineApp, defineEnv, env, external, redis, s3 } from "@zsys/app";
+import { defineConfig, defineEnv, env, external, redis, s3 } from "@zsys/app";
 
 const values = defineEnv({
   BUCKET_ENDPOINT: env.url(),
@@ -16,25 +16,25 @@ const values = defineEnv({
   CACHE_URL: env.secret(),
 });
 
-export default defineApp({
-  id: "orders-app",
+export default defineConfig({
   env: values,
-  providers: {
-    buckets: {
-      default: external(
-        s3({
-          endpoint: values.BUCKET_ENDPOINT,
-          bucketName: values.BUCKET_NAME,
-          region: values.BUCKET_REGION,
-          credentials: {
-            accessKeyId: values.BUCKET_ACCESS_KEY_ID,
-            secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
-          },
-        }),
-      ),
-    },
-    cache: { default: external(redis({ url: values.CACHE_URL })) },
+  buckets: {
+    assets: external(
+      s3({
+        endpoint: values.BUCKET_ENDPOINT,
+        bucketName: values.BUCKET_NAME,
+        region: values.BUCKET_REGION,
+        credentials: {
+          accessKeyId: values.BUCKET_ACCESS_KEY_ID,
+          secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
+        },
+      }),
+    ),
   },
+  caches: { primary: external(redis({ url: values.CACHE_URL })) },
+  defaults: { bucket: "assets", cache: "primary" },
+  server: { port: 3000 },
+  inspector: { port: 3210 },
 });
 ```
 
@@ -42,7 +42,8 @@ Use MinIO and Redis values locally, R2 and Upstash values in a hosted pipeline, 
 Valkey bindings with an AWS deployment. `external()` resources are never provisioned and receive no
 deployment IAM statements. Secret adapter fields require secret environment references.
 
-`PORT` and `ZSYS_ENV` are framework-reserved. Hosting belongs in `zsys.config.ts`:
+`id` defaults to the normalized `package.json.name`. `PORT` and `ZSYS_ENV` are framework-reserved.
+Hosting remains in `zsys.config.ts`:
 
 ```ts
 export default defineConfig({
