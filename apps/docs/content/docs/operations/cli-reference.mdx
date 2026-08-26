@@ -345,3 +345,27 @@ Destroy the Pulumi stack
 ##### Examples
 
 `zsys deploy destroy` — Destroy the Pulumi stack
+
+### `zsys client <command>`
+
+Generate a client from a running application
+
+#### Examples
+
+`zsys client` — Generate a client from a running application
+
+#### `zsys client pull <baseUrl> --out <directory>`
+
+Pull a versioned client contract
+
+| Argument | Value    | Description                  |
+| -------- | -------- | ---------------------------- |
+| baseUrl  | required | Running ZSYS application URL |
+
+| Option | Value  | Description      |
+| ------ | ------ | ---------------- |
+| --out  | string | Output directory |
+
+##### Examples
+
+`zsys client pull` — Pull a versioned client contract

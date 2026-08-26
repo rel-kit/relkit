@@ -4,7 +4,6 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "../../..");
 const publicApis = [
   ["packages/app/src/config.ts", "defineConfig"],
-  ["packages/app/src/define-app.ts", "defineApp"],
   ["packages/schema/src/builder.ts", "z"],
   ["packages/schema/src/standard-schema.ts", "validate"],
   ["packages/functions/src/define-error.ts", "defineError"],
