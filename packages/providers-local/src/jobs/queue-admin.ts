@@ -1,4 +1,4 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { nextEntry, persist } from "./queue-entry.js";
 import { recoverQueueEntries } from "./queue-recovery.js";

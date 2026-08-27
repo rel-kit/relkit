@@ -1,6 +1,11 @@
-import type { EnvMetadata, ProviderBinding, ProviderCapability, ProviderTopology } from "@zsys/app";
-import type { MaybePromise, SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
+import type {
+  EnvMetadata,
+  ProviderBinding,
+  ProviderCapability,
+  ProviderTopology,
+} from "@relkit/app";
+import type { MaybePromise, SourceLocation } from "@relkit/contracts";
+import type { ApplicationGraph } from "@relkit/graph";
 
 export type ProviderEnvironment = "development" | "test" | "production";
 
@@ -74,23 +79,23 @@ export interface ProviderRegistry {
 }
 
 export type ProviderRegistryErrorCode =
-  | "ZSYS_PROVIDER_ENVIRONMENT_INVALID"
-  | "ZSYS_PROVIDER_METADATA_INVALID"
-  | "ZSYS_PROVIDER_PROFILE_UNKNOWN"
-  | "ZSYS_PROVIDER_FACTORY_MISSING"
-  | "ZSYS_PROVIDER_FACTORY_MISMATCH"
-  | "ZSYS_PROVIDER_CONSTRUCTION_FAILED"
-  | "ZSYS_PROVIDER_READINESS_FAILED"
-  | "ZSYS_PROVIDER_RELEASE_FAILED"
-  | "ZSYS_PROVIDER_ABORTED"
-  | "ZSYS_MODEL_PROVIDER_REGISTRY_INVALID"
-  | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
-  | "ZSYS_MODEL_PROVIDER_UNSUPPORTED"
-  | "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID"
-  | "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE"
-  | "ZSYS_MODEL_SELECTOR_INVALID"
-  | "ZSYS_MODEL_PROVIDER_UNKNOWN"
-  | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
+  | "RELKIT_PROVIDER_ENVIRONMENT_INVALID"
+  | "RELKIT_PROVIDER_METADATA_INVALID"
+  | "RELKIT_PROVIDER_PROFILE_UNKNOWN"
+  | "RELKIT_PROVIDER_FACTORY_MISSING"
+  | "RELKIT_PROVIDER_FACTORY_MISMATCH"
+  | "RELKIT_PROVIDER_CONSTRUCTION_FAILED"
+  | "RELKIT_PROVIDER_READINESS_FAILED"
+  | "RELKIT_PROVIDER_RELEASE_FAILED"
+  | "RELKIT_PROVIDER_ABORTED"
+  | "RELKIT_MODEL_PROVIDER_REGISTRY_INVALID"
+  | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
+  | "RELKIT_MODEL_PROVIDER_UNSUPPORTED"
+  | "RELKIT_MODEL_PROVIDER_ENVIRONMENT_INVALID"
+  | "RELKIT_MODEL_PROVIDER_MODEL_UNAVAILABLE"
+  | "RELKIT_MODEL_SELECTOR_INVALID"
+  | "RELKIT_MODEL_PROVIDER_UNKNOWN"
+  | "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING";
 
 export interface ProviderRegistryIssue {
   readonly code: ProviderRegistryErrorCode;
@@ -110,7 +115,7 @@ export class ProviderRegistryError extends Error {
     const stable = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
     super(stable.map((issue) => `${issue.code}: ${issue.message}`).join("; "));
     this.name = "ProviderRegistryError";
-    this.code = stable[0]?.code ?? "ZSYS_PROVIDER_METADATA_INVALID";
+    this.code = stable[0]?.code ?? "RELKIT_PROVIDER_METADATA_INVALID";
     this.issues = stable;
   }
 }

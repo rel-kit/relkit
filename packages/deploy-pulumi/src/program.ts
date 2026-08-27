@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { canonicalJson } from "@zsys/contracts";
-import type { DeploymentPlan } from "@zsys/deploy";
+import { canonicalJson } from "@relkit/contracts";
+import type { DeploymentPlan } from "@relkit/deploy";
 import * as pulumi from "@pulumi/pulumi";
 import type { PulumiFn } from "@pulumi/pulumi/automation";
 import { identity, snapshotPlan } from "./program-support.js";
@@ -9,7 +9,7 @@ import { createAwsPulumiResources, type AwsProgramOptions } from "./aws-program.
 
 export const PULUMI_PROGRAM_VERSION = 1 as const;
 const DEFAULT_STACK = "development";
-const DEFAULT_DIRECTORY = ".zsys/generated/pulumi";
+const DEFAULT_DIRECTORY = ".relkit/generated/pulumi";
 
 export interface PulumiProgramOptions {
   readonly stackName?: string;
@@ -45,7 +45,7 @@ export function renderPulumiProgram(
     directory,
     projectName,
     stackName,
-    pulumiYaml: `name: ${projectName}\nruntime: nodejs\nmain: .\ndescription: ZSys deterministic deployment program\n`,
+    pulumiYaml: `name: ${projectName}\nruntime: nodejs\nmain: .\ndescription: RelKit deterministic deployment program\n`,
     indexTs: renderIndex(snapshot, stackName),
     planJson,
   });
@@ -90,7 +90,7 @@ export function createPulumiProgram(
 export const createInlinePulumiProgram = createPulumiProgram;
 
 function renderIndex(plan: DeploymentPlan, stackName: string): string {
-  return `import { createAwsPulumiResources } from "@zsys/deploy-pulumi";
+  return `import { createAwsPulumiResources } from "@relkit/deploy-pulumi";
 
 const plan = ${canonicalJson(plan)} as const;
 const stackName = ${JSON.stringify(stackName)};
@@ -98,7 +98,7 @@ const resources = createAwsPulumiResources(plan, { stackName });
 export const endpoint = resources.service.loadBalancer.dnsName.apply((value) => \`http://\${value}\`);
 
 export const graphHash = plan.graphHash;
-export const zsysPulumiProgramVersion = ${PULUMI_PROGRAM_VERSION};
+export const relkitPulumiProgramVersion = ${PULUMI_PROGRAM_VERSION};
 `;
 }
 

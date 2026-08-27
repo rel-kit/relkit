@@ -1,5 +1,5 @@
-import { defineAgent } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineAgent } from "@relkit/app";
+import { z } from "@relkit/schema";
 import { lookup } from "../functions/hello.function.js";
 
 export default defineAgent({

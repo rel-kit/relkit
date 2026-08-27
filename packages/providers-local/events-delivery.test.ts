@@ -1,4 +1,4 @@
-import { applicationFailure } from "@zsys/runtime-effect";
+import { applicationFailure } from "@relkit/runtime-effect";
 import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -250,7 +250,7 @@ function envelope(instanceId: string) {
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-event-delivery-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-event-delivery-"));
   roots.push(root);
   return root;
 }

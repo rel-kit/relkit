@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import { hashGraph, type ApplicationGraph } from "@zsys/graph";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { hashGraph, type ApplicationGraph } from "@relkit/graph";
 import {
   createFunctionRegistry,
   type FunctionHandler,
@@ -49,14 +49,14 @@ describe("function registry", () => {
       contractVersion: GRAPH_VERSION - 1,
     } as unknown as ApplicationGraph;
     expect(() => createFunctionRegistry(staleGraph, manifest(staleGraph))).toThrow(
-      "ZSYS_GRAPH_VERSION_UNSUPPORTED",
+      "RELKIT_GRAPH_VERSION_UNSUPPORTED",
     );
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),
         contractVersion: MANIFEST_VERSION - 1,
       } as unknown as RuntimeManifestInput),
-    ).toThrow("ZSYS_MANIFEST_VERSION_UNSUPPORTED");
+    ).toThrow("RELKIT_MANIFEST_VERSION_UNSUPPORTED");
     const unboundGraph = {
       ...graph(),
       nodes: [
@@ -64,25 +64,25 @@ describe("function registry", () => {
         graph().nodes[1]!,
       ],
     } as ApplicationGraph;
-    expect(() => createFunctionRegistry(unboundGraph, manifest())).toThrow("ZSYS_GRAPH_INVALID");
+    expect(() => createFunctionRegistry(unboundGraph, manifest())).toThrow("RELKIT_GRAPH_INVALID");
     expect(() =>
       createFunctionRegistry(graph(), { ...manifest(), graphHash: "sha256:wrong" }),
-    ).toThrow("ZSYS_GRAPH_MANIFEST_MISMATCH");
+    ).toThrow("RELKIT_GRAPH_MANIFEST_MISMATCH");
     expect(() => createFunctionRegistry(graph(), { ...manifest(), generatorVersion: 99 })).toThrow(
-      "ZSYS_MANIFEST_GENERATOR_UNSUPPORTED",
+      "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
     );
   });
 
   test("rejects missing, extra, duplicate, and invalid handlers", () => {
     expect(() =>
       createFunctionRegistry(graph(), { ...manifest(), functions: { "orders.get": get } }),
-    ).toThrow("ZSYS_MANIFEST_HANDLER_MISSING");
+    ).toThrow("RELKIT_MANIFEST_HANDLER_MISSING");
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),
         functions: { "orders.create": create, "orders.get": get, "orders.other": get },
       }),
-    ).toThrow("ZSYS_MANIFEST_HANDLER_EXTRA");
+    ).toThrow("RELKIT_MANIFEST_HANDLER_EXTRA");
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),
@@ -92,12 +92,12 @@ describe("function registry", () => {
           ["orders.get", get],
         ],
       }),
-    ).toThrow("ZSYS_MANIFEST_HANDLER_DUPLICATE");
+    ).toThrow("RELKIT_MANIFEST_HANDLER_DUPLICATE");
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),
         functions: { "orders.create": "not-a-handler" } as never,
       }),
-    ).toThrow("ZSYS_MANIFEST_HANDLER_INVALID");
+    ).toThrow("RELKIT_MANIFEST_HANDLER_INVALID");
   });
 });

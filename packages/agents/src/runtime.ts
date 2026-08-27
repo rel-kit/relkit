@@ -1,4 +1,4 @@
-import { normalizeId, type MaybePromise } from "@zsys/contracts";
+import { normalizeId, type MaybePromise } from "@relkit/contracts";
 import { type AgentDescriptor } from "./define-agent.js";
 import { resolveRuntimeModel } from "./runtime-model.js";
 import {
@@ -31,8 +31,8 @@ export type AgentApprovalHandler = (
 
 interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
-  readonly tools: import("@zsys/tools").ToolSource;
-  readonly engine: import("@zsys/tools").ToolEngine;
+  readonly tools: import("@relkit/tools").ToolSource;
+  readonly engine: import("@relkit/tools").ToolEngine;
   readonly maxInputBytes?: number;
   readonly maxOutputBytes?: number;
   readonly approval?: AgentApprovalHandler;
@@ -86,12 +86,12 @@ export async function invokeAgent(
     agentId: options.agent.id,
     invocationId,
     functionId: generatedAgentFunctionId(options.agent.id),
-    name: `zsys.agent.${options.agent.id}.invoke`,
+    name: `relkit.agent.${options.agent.id}.invoke`,
     traceId,
     ...(options.parentSpanId === undefined ? {} : { parentSpanId: options.parentSpanId }),
     attributes: {
-      "zsys.agent.id": options.agent.id,
-      "zsys.model.id": runtimeModel.id,
+      "relkit.agent.id": options.agent.id,
+      "relkit.model.id": runtimeModel.id,
     },
   });
   emitAgentSpanStart(hooks, agentSpan);

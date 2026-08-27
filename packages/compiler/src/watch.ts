@@ -1,4 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { NormalizedDescriptor } from "./normalize-types.js";
 
 export const WATCH_ARTIFACTS = Object.freeze([

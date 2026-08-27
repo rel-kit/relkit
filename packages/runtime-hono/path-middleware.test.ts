@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Hono, type Context } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import { materializeRoutes, type RuntimeManifest } from "./src/materialize-routes";
 
 const source = { file: "middleware.test.ts", line: 1, column: 1 } as const;

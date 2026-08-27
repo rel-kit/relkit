@@ -3,7 +3,7 @@ import type {
   BucketObjectMetadata,
   BucketProvider,
   BucketPutOptions,
-} from "@zsys/buckets";
+} from "@relkit/buckets";
 import type { TestFailureControls } from "./fakes.js";
 
 export interface TestBucketFakeOptions {

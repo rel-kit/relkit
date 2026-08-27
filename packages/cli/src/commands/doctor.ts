@@ -21,8 +21,8 @@ export async function runDoctor(
     context.reporter.output(result, formatDoctor(result));
     return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
   } catch (error) {
-    const code = error instanceof DoctorCommandError ? error.code : "ZSYS_DOCTOR_FAILED";
+    const code = error instanceof DoctorCommandError ? error.code : "RELKIT_DOCTOR_FAILED";
     context.reporter.error(code, error instanceof Error ? error.message : String(error));
-    return code === "ZSYS_DOCTOR_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+    return code === "RELKIT_DOCTOR_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
   }
 }

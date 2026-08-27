@@ -16,8 +16,8 @@ export async function drainPreviousGeneration(
   ) {
     throw new SupervisorDrainError(
       snapshot.state === "draining-previous"
-        ? "ZSYS_DRAIN_TOKEN_MISMATCH"
-        : "ZSYS_DRAIN_STATE_INVALID",
+        ? "RELKIT_DRAIN_TOKEN_MISMATCH"
+        : "RELKIT_DRAIN_STATE_INVALID",
       "The state machine no longer owns the retired generation.",
     );
   }

@@ -11,50 +11,50 @@ afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-test("local create replaces only ZSYS package versions with Bun links", async () => {
-  const root = await mkdtemp(join(tmpdir(), "zsys-local-workspace-"));
+test("local create replaces only RELKIT package versions with Bun links", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-local-workspace-"));
   roots.push(root);
   await writeFile(
     join(root, "package.json"),
     `${JSON.stringify({
-      dependencies: { "@zsys/app": "0.0.0", hono: "4.11.7" },
-      devDependencies: { "@zsys/cli": "0.0.0", typescript: "5.9.2" },
+      dependencies: { "@relkit/app": "0.0.0", hono: "4.11.7" },
+      devDependencies: { "@relkit/cli": "0.0.0", typescript: "5.9.2" },
     })}\n`,
   );
 
   const names = await useWorkspaceDependencies(root);
   const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
 
-  expect(names).toContain("@zsys/app");
-  expect(names).toContain("@zsys/cli");
-  expect(names).toContain("@zsys/engine");
-  expect(manifest.dependencies).toEqual({ "@zsys/app": "link:@zsys/app", hono: "4.11.7" });
+  expect(names).toContain("@relkit/app");
+  expect(names).toContain("@relkit/cli");
+  expect(names).toContain("@relkit/engine");
+  expect(manifest.dependencies).toEqual({ "@relkit/app": "link:@relkit/app", hono: "4.11.7" });
   expect(manifest.devDependencies).toMatchObject({
-    "@zsys/cli": "link:@zsys/cli",
-    "@zsys/engine": "link:@zsys/engine",
+    "@relkit/cli": "link:@relkit/cli",
+    "@relkit/engine": "link:@relkit/engine",
     typescript: "5.9.2",
   });
 });
 
-test("doctor accepts local ZSYS package links", async () => {
+test("doctor accepts local RELKIT package links", async () => {
   const checks = await versionChecks(
     {
       packageManager: `bun@${Bun.version}`,
-      dependencies: { "@zsys/app": "link:@zsys/app" },
-      devDependencies: { "@zsys/cli": "link:@zsys/cli", typescript: "5.9.2" },
+      dependencies: { "@relkit/app": "link:@relkit/app" },
+      devDependencies: { "@relkit/cli": "link:@relkit/cli", typescript: "5.9.2" },
     },
     process.cwd(),
   );
 
-  expect(checks.find((check) => check.name === "zsys-packages")?.ok).toBe(true);
+  expect(checks.find((check) => check.name === "relkit-packages")?.ok).toBe(true);
 });
 
 test("local launcher and linked CLI hide workspace build output", async () => {
   const repository = join(import.meta.dir, "../..");
-  const external = await mkdtemp(join(tmpdir(), "zsys-linked-cli-"));
+  const external = await mkdtemp(join(tmpdir(), "relkit-linked-cli-"));
   roots.push(external);
   for (const [executable, cwd] of [
-    [join(repository, "scripts/zsys-local.ts"), repository],
+    [join(repository, "scripts/relkit-local.ts"), repository],
     [join(repository, "packages/cli/dist/index.js"), external],
   ]) {
     const child = Bun.spawn([process.execPath, executable, "--version"], {
@@ -68,7 +68,7 @@ test("local launcher and linked CLI hide workspace build output", async () => {
       child.exited,
     ]);
     expect(exitCode).toBe(0);
-    expect(stdout.trim()).toBe("zsys 0.0.0");
+    expect(stdout.trim()).toBe("relkit 0.0.0");
     expect(`${stdout}\n${stderr}`).not.toContain("turbo");
     expect(`${stdout}\n${stderr}`).not.toContain("Workspace build passed");
   }

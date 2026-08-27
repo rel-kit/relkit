@@ -1,5 +1,5 @@
-import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@zsys/contracts";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@relkit/contracts";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import type { JobRecord, JobStore } from "../jobs/store.js";
 
 export const EVENT_DELIVERY_VERSION = 1 as const;
@@ -23,7 +23,7 @@ interface DeliveryData {
 }
 
 export class EventRouterStateError extends Error {
-  readonly code = "ZSYS_EVENT_ROUTER_STATE_INVALID" as const;
+  readonly code = "RELKIT_EVENT_ROUTER_STATE_INVALID" as const;
 
   constructor(message: string) {
     super(message);

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { defineEnv, env } from "@zsys/config";
+import { defineEnv, env } from "@relkit/config";
 import { runEnv } from "./src/commands/env.js";
 
 const definition = defineEnv({
@@ -22,7 +22,7 @@ function reporter() {
   };
 }
 
-describe("zsys env commands", () => {
+describe("relkit env commands", () => {
   test("checks environment-specific requirements and keeps values out of output", async () => {
     const captured = reporter();
     expect(
@@ -40,7 +40,7 @@ describe("zsys env commands", () => {
   });
 
   test("generates deterministic redacted examples without overwriting edits", async () => {
-    const root = await mkdtemp(join(process.cwd(), ".zsys-env-test-"));
+    const root = await mkdtemp(join(process.cwd(), ".relkit-env-test-"));
     try {
       const path = join(root, ".env.example");
       await writeFile(path, "EDITED=1\n", "utf8");

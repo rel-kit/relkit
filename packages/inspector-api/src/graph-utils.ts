@@ -1,4 +1,4 @@
-import { deepFreeze, type JsonValue } from "@zsys/contracts";
+import { deepFreeze, type JsonValue } from "@relkit/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 
 const GRAPH_FIELDS = `

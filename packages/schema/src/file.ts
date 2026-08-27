@@ -28,8 +28,8 @@ export function fileSchema(options: FileSchemaOptions = {}): FileSchema {
       jsonSchema: () => ({
         type: "string",
         format: "binary",
-        ...(maxBytes === undefined ? {} : { "x-zsys-maxBytes": maxBytes }),
-        ...(mediaTypes === undefined ? {} : { "x-zsys-mediaTypes": mediaTypes }),
+        ...(maxBytes === undefined ? {} : { "x-relkit-maxBytes": maxBytes }),
+        ...(mediaTypes === undefined ? {} : { "x-relkit-mediaTypes": mediaTypes }),
       }),
     },
   );

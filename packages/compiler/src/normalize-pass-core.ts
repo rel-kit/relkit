@@ -104,7 +104,12 @@ export function passLocal(work: NormalizationWork): void {
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     if (!isDescriptorLike(descriptor)) {
-      add(work, descriptor, NORMALIZE_CODES.descriptor, "Exported value is not a ZSys descriptor.");
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.descriptor,
+        "Exported value is not a RelKit descriptor.",
+      );
       continue;
     }
     if (descriptor.kind === "route") {

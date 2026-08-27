@@ -30,7 +30,7 @@ test("paginates stable redacted logs and applies time/severity filters", async (
   expect(second.items.map((item) => item.message)).toEqual(["second"]);
   expect(filtered.items.map((item) => item.message)).toEqual(["second", "third"]);
   expect(JSON.stringify(first)).not.toContain("top-secret-token");
-  expect(first.protocol).toBe("zsys.observability.query");
+  expect(first.protocol).toBe("relkit.observability.query");
   await store.shutdown();
   await index.close();
 });
@@ -141,7 +141,7 @@ function request(requestId: string, traceId: string, routeId: string, outcome: "
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join("/tmp", "zsys-observability-query-"));
+  const root = await mkdtemp(join("/tmp", "relkit-observability-query-"));
   roots.push(root);
   return root;
 }

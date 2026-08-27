@@ -1,5 +1,5 @@
-import type { MaybePromise } from "@zsys/contracts";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
+import type { MaybePromise } from "@relkit/contracts";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import {
   CacheIncrementUnsupportedError,
   type CacheClient,

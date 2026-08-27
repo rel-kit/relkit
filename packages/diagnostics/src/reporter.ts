@@ -1,5 +1,5 @@
-import { canonicalJson } from "@zsys/contracts";
-import type { SourceLocation } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
+import type { SourceLocation } from "@relkit/contracts";
 import {
   createDiagnostic,
   sortDiagnostics,

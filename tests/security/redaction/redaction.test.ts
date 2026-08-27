@@ -76,20 +76,24 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
   await flushTelemetry();
 
   const runtime = createHttpRuntime(collector);
-  const publicResponse = await runtime.request("http://zsys.test/security?token=top-secret-token", {
-    method: "POST",
-    headers: {
-      authorization: secrets.authorization,
-      cookie: secrets.cookie,
-      "content-type": "application/json",
+  const publicResponse = await runtime.request(
+    "http://relkit.test/security?token=top-secret-token",
+    {
+      method: "POST",
+      headers: {
+        authorization: secrets.authorization,
+        cookie: secrets.cookie,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(flowInput),
     },
-    body: JSON.stringify(flowInput),
-  });
+  );
   assertNoSecrets("public HTTP response", await publicResponse.text());
   const flowRecords = collector.read();
   expect(
     flowRecords.some(
-      (record) => record.signal === "span" && record.functionId?.startsWith("zsys.agent.") === true,
+      (record) =>
+        record.signal === "span" && record.functionId?.startsWith("relkit.agent.") === true,
     ),
   ).toBe(true);
   expect(
@@ -100,7 +104,7 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
   ).toBe(true);
   expect(flowRecords.some((record) => record.signal === "request")).toBe(true);
 
-  const root = await mkdtemp(join("/tmp", "zsys-security-redaction-"));
+  const root = await mkdtemp(join("/tmp", "relkit-security-redaction-"));
   let index: Awaited<ReturnType<typeof createObservabilityIndex>> | undefined;
   try {
     index = await createObservabilityIndex({
@@ -167,7 +171,7 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
       `${API_BASE_PATH}/traces`,
       `${API_BASE_PATH}/stream`,
     ]) {
-      const response = await apiRuntime.request(`http://zsys.test${path}`);
+      const response = await apiRuntime.request(`http://relkit.test${path}`);
       assertNoSecrets(`runtime API ${path}`, await response.text());
     }
   } finally {

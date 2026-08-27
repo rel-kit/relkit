@@ -1,16 +1,16 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import {
-  ZsysApplicationService,
-  ZsysBuckets,
-  ZsysCaches,
-  ZsysContainerRegistry,
-  ZsysEventBus,
-  ZsysJobQueues,
-  ZsysNetwork,
-  ZsysObservability,
-} from "@zsys/cloud-aws";
-import type { DeploymentPlan } from "@zsys/deploy";
+  RelkitApplicationService,
+  RelkitBuckets,
+  RelkitCaches,
+  RelkitContainerRegistry,
+  RelkitEventBus,
+  RelkitJobQueues,
+  RelkitNetwork,
+  RelkitObservability,
+} from "@relkit/cloud-aws";
+import type { DeploymentPlan } from "@relkit/deploy";
 import {
   createServicePolicy,
   eventTriggerDefinition,
@@ -32,22 +32,22 @@ export interface AwsProgramOptions {
 }
 
 export interface AwsProgramEnvironmentResources {
-  readonly jobs: ZsysJobQueues;
-  readonly events: ZsysEventBus;
-  readonly buckets: ZsysBuckets;
-  readonly caches: ZsysCaches;
+  readonly jobs: RelkitJobQueues;
+  readonly events: RelkitEventBus;
+  readonly buckets: RelkitBuckets;
+  readonly caches: RelkitCaches;
 }
 
 export interface AwsProgramResources {
   readonly root: pulumi.ComponentResource;
-  readonly network: ZsysNetwork;
-  readonly registry: ZsysContainerRegistry;
-  readonly jobs: ZsysJobQueues;
-  readonly events: ZsysEventBus;
-  readonly buckets: ZsysBuckets;
-  readonly caches: ZsysCaches;
-  readonly observability?: ZsysObservability;
-  readonly service: ZsysApplicationService;
+  readonly network: RelkitNetwork;
+  readonly registry: RelkitContainerRegistry;
+  readonly jobs: RelkitJobQueues;
+  readonly events: RelkitEventBus;
+  readonly buckets: RelkitBuckets;
+  readonly caches: RelkitCaches;
+  readonly observability?: RelkitObservability;
+  readonly service: RelkitApplicationService;
   readonly policy?: aws.iam.RolePolicy;
 }
 
@@ -57,7 +57,7 @@ export function createAwsPulumiResources(
   options: AwsProgramOptions = {},
 ): AwsProgramResources {
   const durableEventTriggers = plan.eventTriggers.filter(({ delivery }) => delivery === "durable");
-  const root = new pulumi.ComponentResource("zsys:cloud-aws:application", plan.application.id);
+  const root = new pulumi.ComponentResource("relkit:cloud-aws:application", plan.application.id);
   const common = {
     appId: plan.application.id,
     stackName: options.stackName ?? pulumi.getStack(),
@@ -66,8 +66,8 @@ export function createAwsPulumiResources(
     ...(options.tags === undefined ? {} : { tags: options.tags }),
   } as const;
   const child = { parent: root } as const;
-  const network = new ZsysNetwork("network", { ...common, natGatewayStrategy: "Single" }, child);
-  const registry = new ZsysContainerRegistry(
+  const network = new RelkitNetwork("network", { ...common, natGatewayStrategy: "Single" }, child);
+  const registry = new RelkitContainerRegistry(
     "registry",
     {
       ...common,
@@ -75,7 +75,7 @@ export function createAwsPulumiResources(
     },
     child,
   );
-  const jobs = new ZsysJobQueues(
+  const jobs = new RelkitJobQueues(
     "jobs",
     {
       ...common,
@@ -84,17 +84,17 @@ export function createAwsPulumiResources(
     },
     child,
   );
-  const events = new ZsysEventBus(
+  const events = new RelkitEventBus(
     "events",
     {
       ...common,
       events: plan.events.map(({ id, version }) => ({ id, version })),
       eventTriggers: durableEventTriggers.map(eventTriggerDefinition),
-      eventSource: "zsys.application",
+      eventSource: "relkit.application",
     },
     child,
   );
-  const buckets = new ZsysBuckets(
+  const buckets = new RelkitBuckets(
     "buckets",
     {
       ...common,
@@ -106,7 +106,7 @@ export function createAwsPulumiResources(
     },
     child,
   );
-  const caches = new ZsysCaches(
+  const caches = new RelkitCaches(
     "caches",
     {
       ...common,
@@ -118,7 +118,7 @@ export function createAwsPulumiResources(
   const observability =
     plan.observability === undefined
       ? undefined
-      : new ZsysObservability(
+      : new RelkitObservability(
           "observability",
           { ...common, logs: plan.observability.logs, traces: plan.observability.traces },
           child,
@@ -126,7 +126,7 @@ export function createAwsPulumiResources(
   const environment = options.serviceEnvironment?.({ jobs, events, buckets, caches });
   const region = options.region ?? aws.config.region ?? "us-east-1";
   const generatedEnvironment = managedEnvironment(plan, { jobs, events, buckets, caches }, region);
-  const service = new ZsysApplicationService(
+  const service = new RelkitApplicationService(
     "service",
     {
       ...common,
@@ -137,7 +137,7 @@ export function createAwsPulumiResources(
       livenessPath: plan.application.image.health.livenessPath,
       readinessPath: plan.application.image.health.readinessPath,
       environment: {
-        ZSYS_APPLICATION_ID: plan.application.id,
+        RELKIT_APPLICATION_ID: plan.application.id,
         ...(environment === undefined ? {} : withoutManagedCredentials(plan, environment)),
         ...generatedEnvironment,
       },

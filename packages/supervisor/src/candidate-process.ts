@@ -12,7 +12,7 @@ export function candidateContext(options: CandidateOptions): {
 } {
   validateSupervisorToken(options.token);
   const projectRoot = resolve(options.projectRoot);
-  const directoryRoot = resolve(projectRoot, options.generatedDirectory ?? ".zsys/generated");
+  const directoryRoot = resolve(projectRoot, options.generatedDirectory ?? ".relkit/generated");
   const directory = join(directoryRoot, `generation-${options.token.generationToken}`);
   return { projectRoot, directoryRoot, directory };
 }
@@ -54,8 +54,8 @@ export function childEnvironment(
       ),
     ),
     PORT: String(port),
-    ZSYS_SOURCE_TOKEN: String(token.sourceToken),
-    ZSYS_GENERATION_TOKEN: String(token.generationToken),
+    RELKIT_SOURCE_TOKEN: String(token.sourceToken),
+    RELKIT_GENERATION_TOKEN: String(token.generationToken),
   };
 }
 

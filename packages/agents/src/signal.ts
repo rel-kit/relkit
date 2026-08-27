@@ -1,11 +1,11 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 
 export function signalFailure(signal: AbortSignal): AgentRuntimeError {
-  return signal.reason instanceof AgentRuntimeError && signal.reason.code === "ZSYS_AGENT_TIMEOUT"
+  return signal.reason instanceof AgentRuntimeError && signal.reason.code === "RELKIT_AGENT_TIMEOUT"
     ? signal.reason
-    : new AgentRuntimeError("ZSYS_AGENT_CANCELLED", "Agent invocation cancelled");
+    : new AgentRuntimeError("RELKIT_AGENT_CANCELLED", "Agent invocation cancelled");
 }
 
 export function createExecutionSignal(options: AgentRuntimeOptions & AgentInvocationOptions): {
@@ -20,12 +20,12 @@ export function createExecutionSignal(options: AgentRuntimeOptions & AgentInvoca
     options.timeoutMs !== undefined &&
     (!Number.isSafeInteger(options.timeoutMs) || options.timeoutMs < 0)
   )
-    throw new AgentRuntimeError("ZSYS_AGENT_DEADLINE_INVALID", "Agent timeout is invalid");
+    throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent timeout is invalid");
   if (options.timeoutMs !== undefined) deadlines.push(now + options.timeoutMs);
   if (deadlines.some((deadline) => deadline !== undefined && !Number.isFinite(deadline)))
-    throw new AgentRuntimeError("ZSYS_AGENT_DEADLINE_INVALID", "Agent deadline is invalid");
+    throw new AgentRuntimeError("RELKIT_AGENT_DEADLINE_INVALID", "Agent deadline is invalid");
   const deadline = Math.min(...deadlines.filter((value): value is number => value !== undefined));
-  const timeout = new AgentRuntimeError("ZSYS_AGENT_TIMEOUT", "Agent deadline exceeded");
+  const timeout = new AgentRuntimeError("RELKIT_AGENT_TIMEOUT", "Agent deadline exceeded");
   if (deadline <= now) controller.abort(timeout);
   const timer = setTimeout(() => controller.abort(timeout), Math.max(0, deadline - now));
   const signal = options.signal;

@@ -2,39 +2,39 @@ import { createHash } from "node:crypto";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
-export type ZsysTags = pulumi.Input<Record<string, pulumi.Input<string>>>;
+export type RelkitTags = pulumi.Input<Record<string, pulumi.Input<string>>>;
 
-export interface ZsysComponentArgs {
+export interface RelkitComponentArgs {
   readonly appId?: pulumi.Input<string>;
   readonly stackName?: pulumi.Input<string>;
   readonly graphHash?: pulumi.Input<string>;
   readonly region?: pulumi.Input<string>;
-  readonly tags?: ZsysTags;
+  readonly tags?: RelkitTags;
 }
 
-export interface ZsysEnvironmentVariable {
+export interface RelkitEnvironmentVariable {
   readonly name: string;
   readonly value: pulumi.Input<string>;
 }
 
-export interface ZsysSecretVariable {
+export interface RelkitSecretVariable {
   readonly name: string;
   readonly valueFrom: pulumi.Input<string>;
 }
 
-export type ZsysEnvironmentInput =
-  readonly ZsysEnvironmentVariable[] | Readonly<Record<string, pulumi.Input<string>>>;
-export type ZsysSecretInput =
-  readonly ZsysSecretVariable[] | Readonly<Record<string, pulumi.Input<string>>>;
+export type RelkitEnvironmentInput =
+  readonly RelkitEnvironmentVariable[] | Readonly<Record<string, pulumi.Input<string>>>;
+export type RelkitSecretInput =
+  readonly RelkitSecretVariable[] | Readonly<Record<string, pulumi.Input<string>>>;
 
 export const DEFAULT_SERVICE_PORT = 3000;
-export const DEFAULT_LIVENESS_PATH = "/_zsys/v1/health/live";
-export const DEFAULT_READINESS_PATH = "/_zsys/v1/health/ready";
+export const DEFAULT_LIVENESS_PATH = "/_relkit/v1/health/live";
+export const DEFAULT_READINESS_PATH = "/_relkit/v1/health/ready";
 
 export function resourceName(
   name: string,
   kind: string,
-  args: ZsysComponentArgs,
+  args: RelkitComponentArgs,
   maxLength = 255,
 ): string {
   const appId = typeof args.appId === "string" ? args.appId : name;
@@ -44,12 +44,12 @@ export function resourceName(
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return normalized.slice(0, maxLength).replace(/-+$/, "") || "zsys";
+  return normalized.slice(0, maxLength).replace(/-+$/, "") || "relkit";
 }
 
 export function tagsFor(
   name: string,
-  args: ZsysComponentArgs,
+  args: RelkitComponentArgs,
 ): pulumi.Output<Record<string, string>> {
   return pulumi
     .all({
@@ -63,19 +63,19 @@ export function tagsFor(
       app: String(app),
       stack: String(stack),
       graphHash: String(graphHash),
-      "managed-by": "zsys",
+      "managed-by": "relkit",
     }));
 }
 
-export function awsRegion(args: ZsysComponentArgs): pulumi.Output<string> {
+export function awsRegion(args: RelkitComponentArgs): pulumi.Output<string> {
   if (typeof args.region === "string" && args.region.trim() === "")
     throw new TypeError("AWS region must not be empty.");
   return args.region === undefined ? aws.getRegionOutput().name : pulumi.output(args.region);
 }
 
 export function environmentEntries(
-  input: ZsysEnvironmentInput | undefined,
-): readonly ZsysEnvironmentVariable[] {
+  input: RelkitEnvironmentInput | undefined,
+): readonly RelkitEnvironmentVariable[] {
   if (input === undefined) return [];
   return Array.isArray(input)
     ? [...input].sort((left, right) => left.name.localeCompare(right.name))
@@ -84,7 +84,9 @@ export function environmentEntries(
         .sort((left, right) => left.name.localeCompare(right.name));
 }
 
-export function secretEntries(input: ZsysSecretInput | undefined): readonly ZsysSecretVariable[] {
+export function secretEntries(
+  input: RelkitSecretInput | undefined,
+): readonly RelkitSecretVariable[] {
   if (input === undefined) return [];
   return Array.isArray(input)
     ? [...input].sort((left, right) => left.name.localeCompare(right.name))
@@ -94,8 +96,8 @@ export function secretEntries(input: ZsysSecretInput | undefined): readonly Zsys
 }
 
 export function validateMappings(
-  environment: readonly ZsysEnvironmentVariable[],
-  secrets: readonly ZsysSecretVariable[],
+  environment: readonly RelkitEnvironmentVariable[],
+  secrets: readonly RelkitSecretVariable[],
 ): void {
   const names = new Set<string>();
   for (const entry of environment) {
@@ -119,7 +121,7 @@ export function environmentName(prefix: string, id: string, suffix: string): str
     .toUpperCase()
     .replace(/[^A-Z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
-  return `ZSYS_${prefix.toUpperCase()}_${normalized}_${suffix}`;
+  return `RELKIT_${prefix.toUpperCase()}_${normalized}_${suffix}`;
 }
 
 export function iamRoleName(componentName: string, suffix: string): string {
@@ -131,7 +133,7 @@ export function boundedAwsName(value: string, maxLength: number): string {
     value
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "zsys";
+      .replace(/^-+|-+$/g, "") || "relkit";
   if (normalized.length <= maxLength) return normalized;
   const hash = createHash("sha256").update(normalized).digest("hex").slice(0, 8);
   const prefix = normalized.slice(0, maxLength - hash.length - 1).replace(/-+$/g, "");

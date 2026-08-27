@@ -1,5 +1,5 @@
-import type { UnknownEventEnvelope } from "@zsys/events";
-import type { RetryPolicy } from "@zsys/jobs";
+import type { UnknownEventEnvelope } from "@relkit/events";
+import type { RetryPolicy } from "@relkit/jobs";
 import type { JobFailureMetadata, JobQueueCounts } from "../jobs/queue-utils.js";
 import type { JobStoreBoundary } from "../jobs/store.js";
 import type { EventDeliveryRecord } from "./router-records.js";

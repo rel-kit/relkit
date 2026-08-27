@@ -62,7 +62,7 @@ export function implementationSizeOffenders(root: string): string[] {
       cwd: absolute,
       onlyFiles: true,
     })) {
-      if (/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path)) continue;
+      if (/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path)) continue;
       if (/(^|\/)[^/]+\.(?:test|spec)\.[^.]+$/.test(path)) continue;
       const file = resolve(absolute, path);
       const lines = lineCount(readFileSync(file, "utf8"));
@@ -146,7 +146,7 @@ async function main(): Promise<void> {
   await run("generator tests", bun, ["run", "test:generator"]);
   await run("executable examples", bun, ["run", "test:examples"]);
   await run("documentation", bun, ["run", "test:docs"]);
-  await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-zsys.ts"]);
+  await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-relkit.ts"]);
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
   await run("security and redaction tests", bun, ["run", "test:security"]);

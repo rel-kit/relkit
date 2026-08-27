@@ -1,4 +1,4 @@
-import { defineMiddleware } from "@zsys/app";
+import { defineMiddleware } from "@relkit/app";
 import authorize from "../functions/orders/authorize.function.js";
 
 export default defineMiddleware("/orders/*", async (context, next) => {

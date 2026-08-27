@@ -12,7 +12,7 @@ import {
   type LocalStructuredLogger,
   type InvocationTarget,
 } from "./src/index.ts";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 const empty = z.object({});
 
@@ -115,7 +115,7 @@ describe("invocation dispatch scope", () => {
     await expect(
       createStandaloneDispatcher().dispatch({ target, input: {} }),
     ).rejects.toMatchObject({
-      code: "ZSYS_DEPENDENCY_NOT_CONFIGURED",
+      code: "RELKIT_DEPENDENCY_NOT_CONFIGURED",
       kind: "provider",
       outcome: "provider-failure",
     });
@@ -138,7 +138,7 @@ describe("invocation dispatch scope", () => {
     await expect(
       createStandaloneDispatcher().dispatch({ target, input: {} }),
     ).rejects.toMatchObject({
-      code: "ZSYS_RECURSION_DENIED",
+      code: "RELKIT_RECURSION_DENIED",
       outcome: "defect",
     });
     expect(calls).toBe(1);

@@ -1,5 +1,5 @@
-import type { JsonValue, MaybePromise } from "@zsys/contracts";
-import type { JobQueueEntry } from "@zsys/providers-local";
+import type { JsonValue, MaybePromise } from "@relkit/contracts";
+import type { JobQueueEntry } from "@relkit/providers-local";
 import {
   createScheduler,
   type JobFailureMetadata,
@@ -7,9 +7,9 @@ import {
   type JobQueue,
   type JobQueueState,
   type Scheduler,
-} from "@zsys/providers-local";
-import type { QueueRegistration, RegistrationPlan } from "@zsys/graph";
-import type { RetryPolicy } from "@zsys/jobs";
+} from "@relkit/providers-local";
+import type { QueueRegistration, RegistrationPlan } from "@relkit/graph";
+import type { RetryPolicy } from "@relkit/jobs";
 import type { InvokeOptions } from "./invoke-types.js";
 import { createConcurrencyAdmission, effectiveConcurrencyLimit } from "./concurrency.js";
 import { bindSchedule, createAdmit } from "./materialize-jobs-utils.js";
@@ -93,7 +93,7 @@ export interface MaterializedJobs {
 }
 
 export class JobMaterializationError extends Error {
-  readonly code = "ZSYS_JOB_MATERIALIZATION_INVALID" as const;
+  readonly code = "RELKIT_JOB_MATERIALIZATION_INVALID" as const;
 
   constructor(message: string) {
     super(message);

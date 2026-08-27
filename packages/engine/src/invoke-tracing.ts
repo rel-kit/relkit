@@ -1,4 +1,4 @@
-import type { InvocationTraceOptions } from "@zsys/runtime-effect";
+import type { InvocationTraceOptions } from "@relkit/runtime-effect";
 import {
   emitObservabilityEvent,
   OBSERVABILITY_HOOK_PROTOCOL,
@@ -24,7 +24,7 @@ export function createInvocationSpanOptions<
   controller: AbortController,
 ): InvocationTraceOptions {
   return {
-    name: `zsys.invoke.${target.id}`,
+    name: `relkit.invoke.${target.id}`,
     invocationId: record.id,
     functionId: target.id,
     ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),
@@ -32,7 +32,7 @@ export function createInvocationSpanOptions<
     ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
     source: record.source,
     signal: controller.signal,
-    attributes: { "zsys.function.id": target.id },
+    attributes: { "relkit.function.id": target.id },
     observer: (event) => {
       const span = event.span;
       const parentSpanId = options.parent?.spanId;

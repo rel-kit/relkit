@@ -8,7 +8,7 @@ export {
   timeoutFailure,
   toPublicEnvelope,
   unexpectedDefect,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 export type {
   ApplicationFailure,
   ApplicationFailureOptions,
@@ -29,4 +29,4 @@ export type {
   RedactedFailureDetail,
   TimeoutFailure,
   UnexpectedDefect,
-} from "@zsys/invocation";
+} from "@relkit/invocation";

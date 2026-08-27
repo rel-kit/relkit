@@ -109,7 +109,7 @@ export function registerEventContractSuite(target: EventContractTarget): void {
     test("rejects invalid payload before acceptance or delivery", async () => {
       await withEvent(target, async ({ event, invocations }) => {
         await expect(event.publish({ orderId: 42 } as never)).rejects.toMatchObject({
-          code: "ZSYS_EVENT_PAYLOAD_VALIDATION",
+          code: "RELKIT_EVENT_PAYLOAD_VALIDATION",
         });
         expect(event.envelopes).toHaveLength(0);
         expect(event.pending()).toBe(0);

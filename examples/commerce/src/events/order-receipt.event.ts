@@ -1,4 +1,4 @@
-import { onEvent } from "@zsys/app";
+import { onEvent } from "@relkit/app";
 import orders from "../services/orders.service.js";
 import sendReceiptJob from "../jobs/send-receipt.job.js";
 import { receiptObjectName } from "../shared/receipt-object.js";

@@ -1,4 +1,4 @@
-import { type JsonValue } from "@zsys/contracts";
+import { type JsonValue } from "@relkit/contracts";
 import { isRecord, pick, safeJson } from "./shared.js";
 
 export const ACTION_REDACTION = Object.freeze({

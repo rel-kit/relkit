@@ -1,10 +1,10 @@
-import { deepFreeze, normalizeId } from "@zsys/contracts";
+import { deepFreeze, normalizeId } from "@relkit/contracts";
 import {
   createUnboundIdentity,
   normalizeFailure,
   unexpectedDefect,
   type InvocationFailure,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 import type {
   DefineServiceMiddleware,
   DefineServiceMiddlewareOptions,
@@ -15,7 +15,7 @@ import type {
 } from "./types.js";
 import { freezeServiceContextValue } from "./service-context.js";
 
-export const SERVICE_MIDDLEWARE_POLICY_CODE = "ZSYS_SERVICE_MIDDLEWARE_POLICY" as const;
+export const SERVICE_MIDDLEWARE_POLICY_CODE = "RELKIT_SERVICE_MIDDLEWARE_POLICY" as const;
 
 export type ServiceMiddlewarePolicyReason = "missing-next" | "duplicate-next" | "invalid-patch";
 
@@ -39,7 +39,7 @@ export class ServiceMiddlewarePolicyError extends TypeError {
  *
  * @example
  * ```ts
- * import { defineServiceMiddleware } from "@zsys/app"
+ * import { defineServiceMiddleware } from "@relkit/app"
  *
  * const tenantContext = defineServiceMiddleware({
  *   handler: async ({ input }, next) => {
@@ -55,7 +55,7 @@ export class ServiceMiddlewarePolicyError extends TypeError {
 export const defineServiceMiddleware: DefineServiceMiddleware = <
   const Id extends string,
   Input,
-  Context extends import("@zsys/functions").FunctionContext,
+  Context extends import("@relkit/functions").FunctionContext,
   Patch extends ServiceContextPatch,
 >(
   options: DefineServiceMiddlewareOptions<Id, Input, Context, Patch>,
@@ -93,7 +93,7 @@ export function normalizeServiceMiddlewareRejection(value: unknown): InvocationF
 
 function wrapMiddlewareHandler<
   Input,
-  Context extends import("@zsys/functions").FunctionContext,
+  Context extends import("@relkit/functions").FunctionContext,
   Patch extends ServiceContextPatch,
 >(
   handler: ServiceMiddlewareHandler<Input, Context, Patch>,

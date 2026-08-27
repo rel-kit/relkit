@@ -41,7 +41,7 @@ export function createSchema<TInput, TOutput>(
   setSchemaMetadata(schema, metadata);
   return schema;
 }
-/** Runs either a ZSys schema or a third-party Standard Schema at a nested path. */
+/** Runs either a RelKit schema or a third-party Standard Schema at a nested path. */
 export function runSchema<TOutput>(
   schema: StandardSchemaV1<unknown, TOutput>,
   value: unknown,
@@ -55,13 +55,13 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
   readonly _run: Check<TOutput>;
   readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
     StandardJSONSchemaV1<TInput, TOutput>["~standard"];
-  readonly zsys: { readonly jsonSchema?: () => JsonValue };
+  readonly relkit: { readonly jsonSchema?: () => JsonValue };
   constructor(check: Check<TOutput>, metadata: SchemaMetadata) {
     this._run = check;
-    this.zsys = metadata.jsonSchema ? { jsonSchema: metadata.jsonSchema } : {};
+    this.relkit = metadata.jsonSchema ? { jsonSchema: metadata.jsonSchema } : {};
     this["~standard"] = {
       version: 1,
-      vendor: "zsys",
+      vendor: "relkit",
       types: undefined as unknown as StandardSchemaTypes<TInput, TOutput>,
       validate: (value, options) => {
         void options;

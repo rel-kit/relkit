@@ -1,11 +1,11 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@zsys/contracts";
+import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@relkit/contracts";
 import type {
   InvocationMetadata as SharedInvocationMetadata,
   InvocationSource as SharedInvocationSource,
   PublicClock as SharedPublicClock,
   PublicLogger as SharedPublicLogger,
-} from "@zsys/invocation";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/invocation";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionAsTool } from "./function-as-tool-types.js";
@@ -42,18 +42,18 @@ export type PublicLogger = SharedPublicLogger;
 export type PublicClock = SharedPublicClock;
 
 declare global {
-  namespace Zsys {
+  namespace Relkit {
     interface ApplicationContextRegistry {}
   }
 }
 
-export type ApplicationContextRegistry = Zsys.ApplicationContextRegistry;
+export type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 
 type RegisteredContext<
   Key extends PropertyKey,
   Fallback,
-> = Key extends keyof Zsys.ApplicationContextRegistry
-  ? Zsys.ApplicationContextRegistry[Key]
+> = Key extends keyof Relkit.ApplicationContextRegistry
+  ? Relkit.ApplicationContextRegistry[Key]
   : Fallback;
 
 export interface AuthContext<Session = unknown> {

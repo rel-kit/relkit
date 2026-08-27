@@ -15,7 +15,7 @@ type StoredRecord = {
 
 describe.serial("child-process job restart recovery", () => {
   test("recovers an expired lease after the worker is killed", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-jobs-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-jobs-"));
     try {
       const crashed = await runWorker("after-lease", stateRoot, 0);
       expect(crashed.exitCode).not.toBe(0);
@@ -39,7 +39,7 @@ describe.serial("child-process job restart recovery", () => {
   });
 
   test("makes a handler-success acknowledgement gap duplicate visible after restart", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-jobs-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-jobs-"));
     try {
       const crashed = await runWorker("after-ack", stateRoot, 0);
       expect(crashed.exitCode).not.toBe(0);

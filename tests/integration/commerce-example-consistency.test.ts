@@ -30,7 +30,7 @@ import {
   createTestHttpClient,
 } from "../../packages/testing/src/index.ts";
 import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
-import app from "../../examples/commerce/zsys.config.ts";
+import app from "../../examples/commerce/relkit.config.ts";
 import orderCreated from "../../examples/commerce/src/events/order-created.event.ts";
 import orderReceipt from "../../examples/commerce/src/events/order-receipt.event.ts";
 import authorizeOrder from "../../examples/commerce/src/functions/authorize-order.function.ts";
@@ -68,8 +68,8 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
       name: "registry.example/commerce-example",
       tag: "acceptance",
       health: {
-        livenessPath: "/_zsys/v1/health/live",
-        readinessPath: "/_zsys/v1/health/ready",
+        livenessPath: "/_relkit/v1/health/live",
+        readinessPath: "/_relkit/v1/health/ready",
         port: 3000,
       },
     },
@@ -138,7 +138,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   const client = createTestHttpClient(http);
 
   try {
-    const graphResponse = await http.request("http://fixture/_zsys/v1/graph");
+    const graphResponse = await http.request("http://fixture/_relkit/v1/graph");
     expect(graphResponse.status).toBe(200);
     expect((await graphResponse.json()).graphHash).toBe(graphHash);
 
@@ -177,7 +177,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   ]);
   expect(requestRecords).toHaveLength(3);
   expect(requestRecords.map(({ rawPath }) => rawPath)).toEqual([
-    "/_zsys/v1/graph",
+    "/_relkit/v1/graph",
     "/orders",
     "/orders/order-1",
   ]);
@@ -190,7 +190,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
     target: createEventListenerTarget(
       orderReceipt,
       [orderCreated],
-      "zsys.event.receipts.on-order-created.handler",
+      "relkit.event.receipts.on-order-created.handler",
     ) as unknown as InvocationTarget,
     delivery: "durable",
     expansion: ["orders.created@1"],
@@ -299,7 +299,7 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
       "orders.create-order",
       "orders.get-order",
       "send-receipt",
-      "zsys.agent.order-support.invoke",
+      "relkit.agent.order-support.invoke",
     ]),
   );
 }

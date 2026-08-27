@@ -33,7 +33,7 @@ export interface TestApplication {
  *
  * @example
  * ```ts
- * import { createTestApplication } from "@zsys/testing"
+ * import { createTestApplication } from "@relkit/testing"
  *
  * if (typeof Bun !== "undefined") {
  *   const application = await createTestApplication({ env: {} }, { projectRoot: "examples/commerce" })
@@ -62,7 +62,7 @@ export async function createTestApplication(
           ? init === undefined
             ? input
             : new Request(input, init)
-          : new Request(new URL(input.toString(), "http://zsys.test").toString(), init),
+          : new Request(new URL(input.toString(), "http://relkit.test").toString(), init),
       ),
   };
   const http = createTestHttpClient(application);

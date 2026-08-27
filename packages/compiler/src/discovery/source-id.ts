@@ -1,4 +1,4 @@
-import { normalizeId, normalizeSourcePath } from "@zsys/contracts";
+import { normalizeId, normalizeSourcePath } from "@relkit/contracts";
 import { encodeRouteId } from "./source-id-route.js";
 import type { ExportFact, SourceFactoryKind } from "./source-facts-types.js";
 
@@ -32,7 +32,7 @@ export interface ExportIdInput {
 const KIND_RULES: Readonly<
   Record<SourceFactoryKind, { readonly directory: string; readonly suffixes: readonly string[] }>
 > = {
-  app: { directory: ".", suffixes: ["zsys.config"] },
+  app: { directory: ".", suffixes: ["relkit.config"] },
   function: { directory: "src/functions", suffixes: ["function"] },
   service: { directory: "src/services", suffixes: ["service"] },
   route: { directory: "src/routes", suffixes: ["route"] },

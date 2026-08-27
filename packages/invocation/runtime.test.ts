@@ -7,7 +7,7 @@ import {
   type InvocationRecord,
   type InvocationTarget,
 } from "./src/index.ts";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 const empty = z.object({});
 
@@ -15,7 +15,7 @@ function ids(prefix: string) {
   let sequence = 0;
   return {
     next: (kind: "trace" | "invocation" | "span") =>
-      `${prefix}-${kind}-${++sequence}` as import("@zsys/contracts").ProtocolId,
+      `${prefix}-${kind}-${++sequence}` as import("@relkit/contracts").ProtocolId,
   };
 }
 
@@ -38,7 +38,7 @@ describe("standalone descriptor runtime", () => {
       },
     };
     await expect(dispatcher.dispatch({ target: invalidInput, input: {} })).rejects.toMatchObject({
-      code: "ZSYS_INPUT_VALIDATION",
+      code: "RELKIT_INPUT_VALIDATION",
       phase: "input",
     });
     expect(inputCalled).toBe(false);
@@ -50,7 +50,7 @@ describe("standalone descriptor runtime", () => {
       handler: () => "wrong",
     };
     await expect(dispatcher.dispatch({ target: invalidOutput, input: {} })).rejects.toMatchObject({
-      code: "ZSYS_UNEXPECTED_DEFECT",
+      code: "RELKIT_UNEXPECTED_DEFECT",
       kind: "defect",
     });
 
@@ -90,7 +90,7 @@ describe("standalone descriptor runtime", () => {
       },
     };
     await expect(dispatcher.dispatch({ target: invalidError, input: {} })).rejects.toMatchObject({
-      code: "ZSYS_UNEXPECTED_DEFECT",
+      code: "RELKIT_UNEXPECTED_DEFECT",
       kind: "defect",
     });
 
@@ -230,7 +230,7 @@ describe("standalone descriptor runtime", () => {
     };
     await expect(
       createStandaloneDispatcher().dispatch({ target: providerTarget, input: {} }),
-    ).rejects.toMatchObject({ code: "ZSYS_DEPENDENCY_NOT_CONFIGURED" });
+    ).rejects.toMatchObject({ code: "RELKIT_DEPENDENCY_NOT_CONFIGURED" });
 
     let first!: InvocationTarget;
     let second!: InvocationTarget;
@@ -256,7 +256,7 @@ describe("standalone descriptor runtime", () => {
     };
     await expect(
       createStandaloneDispatcher().dispatch({ target: first, input: {} }),
-    ).rejects.toMatchObject({ code: "ZSYS_RECURSION_DENIED" });
+    ).rejects.toMatchObject({ code: "RELKIT_RECURSION_DENIED" });
     expect([firstCalls, secondCalls]).toEqual([1, 1]);
     expect(currentInvocationDispatcher()).toBeUndefined();
   });

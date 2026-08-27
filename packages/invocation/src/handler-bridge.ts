@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import { createAbortBridge } from "./abort.js";
 import { withDeadline, withTimeout } from "./deadline.js";
 import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";

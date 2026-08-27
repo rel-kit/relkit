@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import {
   CacheCapabilityError,
   CacheIncrementUnsupportedError,
@@ -14,7 +14,7 @@ import {
   type CacheOperationOptions,
   type CacheProvider,
 } from "./client-types.js";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 
 export function required<A>(
   value: ((...args: any[]) => MaybePromise<A>) | undefined,

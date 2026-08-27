@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_MISSING_TARGET",
+    "code": "RELKIT_MISSING_TARGET",
     "column": 20,
     "descriptorId": "missing.route",
     "file": "src/routes/missing/[id]/route.ts",

@@ -1,10 +1,10 @@
-import { GRAPH_VERSION } from "@zsys/contracts";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import {
   canonicalizeGraph,
   hashGraph,
   validateGraphShape,
   type ApplicationGraph,
-} from "@zsys/graph";
+} from "@relkit/graph";
 import { validateBoundary } from "./from-graph-boundary.js";
 import { buildPlan } from "./from-graph-plan.js";
 import {
@@ -31,21 +31,21 @@ export function fromGraph(graph: ApplicationGraph, options: FromGraphOptions = {
     validateGraphShape(graph);
   } catch (error) {
     throw new DeploymentPlanError(
-      "ZSYS_DEPLOY_GRAPH_INVALID",
+      "RELKIT_DEPLOY_GRAPH_INVALID",
       error instanceof Error ? error.message : "Graph shape is invalid.",
     );
   }
   const normalized = canonicalizeGraph(graph);
   if (normalized.contractVersion !== GRAPH_VERSION)
     throw new DeploymentPlanError(
-      "ZSYS_DEPLOY_GRAPH_INVALID",
+      "RELKIT_DEPLOY_GRAPH_INVALID",
       "Unsupported graph contract version.",
     );
   const app = onlyApp(normalized.nodes);
   const appId = normalized.appId ?? app.id;
   if (normalized.appId !== undefined && normalized.appId !== app.id)
     throw new DeploymentPlanError(
-      "ZSYS_DEPLOY_GRAPH_INVALID",
+      "RELKIT_DEPLOY_GRAPH_INVALID",
       "Graph appId does not match its app node.",
     );
   const providers = providerMap(normalized.nodes);

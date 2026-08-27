@@ -1,8 +1,8 @@
-# ZSYS-ADR-004: Global providers and logical profiles
+# RELKIT-ADR-004: Global providers and logical profiles
 
 - Status: Accepted — reviewed Phase 0 baseline
 - Date: 2026-08-12
-- Owner: ZSys maintainers
+- Owner: RelKit maintainers
 - Supersession: None; a future change must explicitly supersede this ADR.
 
 ## Context
@@ -41,7 +41,7 @@ generation-scoped lifecycle, capability failures, and bucket/cache conformance.
 
 ## References
 
-- `docs/zsys-typescript-poc-technical-spec-v3.md` §§3.5, 9, 10, 17.
-- `docs/zsys-typescript-poc-review-gates-v3.md` Gates 1, 2, 7, 15, and 16.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/public-authoring/spec.md` — Global logical provider configuration.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/managed-resources/spec.md` — Environment-scoped global providers and provider lifecycle.
+- `docs/relkit-typescript-poc-technical-spec-v3.md` §§3.5, 9, 10, 17.
+- `docs/relkit-typescript-poc-review-gates-v3.md` Gates 1, 2, 7, 15, and 16.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/public-authoring/spec.md` — Global logical provider configuration.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/managed-resources/spec.md` — Environment-scoped global providers and provider lifecycle.

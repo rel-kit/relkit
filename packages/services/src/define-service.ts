@@ -1,6 +1,6 @@
-import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
-import { createUnboundIdentity, SERVICE_POLICY } from "@zsys/invocation";
-import type { FunctionRefAny } from "@zsys/functions";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { createUnboundIdentity, SERVICE_POLICY } from "@relkit/invocation";
+import type { FunctionRefAny } from "@relkit/functions";
 import {
   assertServiceDescriptor,
   assertServiceMemberName,
@@ -29,8 +29,8 @@ import type {
  *
  * @example
  * ```ts
- * import { defineFunction, defineService } from "@zsys/app"
- * import { z } from "@zsys/schema"
+ * import { defineFunction, defineService } from "@relkit/app"
+ * import { z } from "@relkit/schema"
  *
  * const getOrder = defineFunction({
  *   input: z.object({ orderId: z.string() }),

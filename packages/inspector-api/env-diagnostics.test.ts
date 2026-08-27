@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 
@@ -29,7 +29,7 @@ test("projects active environment metadata and candidate diagnostics without val
       generationId: "active-1",
       graphHash: "sha256:active",
       graph: activeGraph,
-      diagnostics: [{ code: "ZSYS_ACTIVE", severity: "warning", message: "active warning" }],
+      diagnostics: [{ code: "RELKIT_ACTIVE", severity: "warning", message: "active warning" }],
       candidate: {
         generationId: "candidate-2",
         graphHash: "sha256:candidate",
@@ -37,7 +37,7 @@ test("projects active environment metadata and candidate diagnostics without val
         state: "compiling-candidate",
         diagnostics: [
           {
-            code: "ZSYS_CANDIDATE",
+            code: "RELKIT_CANDIDATE",
             severity: "error",
             message: "secret=hidden",
             file: "src/routes.ts",
@@ -81,7 +81,7 @@ test("projects active environment metadata and candidate diagnostics without val
       state: "compiling-candidate",
       items: [
         {
-          code: "ZSYS_CANDIDATE",
+          code: "RELKIT_CANDIDATE",
           file: "src/routes.ts",
           line: 8,
           column: 2,
@@ -116,7 +116,7 @@ test("drops absolute and executable-looking source paths at the API boundary", a
       },
       diagnostics: [
         {
-          code: "ZSYS_SOURCE",
+          code: "RELKIT_SOURCE",
           severity: "warning",
           message: "safe",
           file: "/srv/app/src/routes.ts",

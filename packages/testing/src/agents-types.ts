@@ -9,9 +9,9 @@ import type {
   AgentSpanKind,
   AgentSpanRecord,
   PendingApproval,
-} from "@zsys/agents";
-import type { JsonValue } from "@zsys/contracts";
-import type { InferInput, InferOutput } from "@zsys/schema";
+} from "@relkit/agents";
+import type { JsonValue } from "@relkit/contracts";
+import type { InferInput, InferOutput } from "@relkit/schema";
 import type { TestFailureControls } from "./fakes.js";
 
 export type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;

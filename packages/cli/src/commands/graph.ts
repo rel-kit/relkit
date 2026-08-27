@@ -1,4 +1,4 @@
-import { canonicalGraphJson } from "@zsys/graph";
+import { canonicalGraphJson } from "@relkit/graph";
 import { CLI_EXIT_CODES, type CliCommandContext } from "../main-support.js";
 import {
   checkGraph,
@@ -11,7 +11,7 @@ import {
 
 export * from "./graph-support.js";
 
-/** Runs `zsys graph print|check|diff` through the shared CLI reporter. */
+/** Runs `relkit graph print|check|diff` through the shared CLI reporter. */
 export async function runGraph(
   args: readonly string[],
   context: Pick<CliCommandContext, "json" | "reporter">,
@@ -36,9 +36,9 @@ export async function runGraph(
     return CLI_EXIT_CODES.success;
   } catch (error) {
     const code =
-      error instanceof Error && "code" in error ? String(error.code) : "ZSYS_GRAPH_FAILED";
+      error instanceof Error && "code" in error ? String(error.code) : "RELKIT_GRAPH_FAILED";
     context.reporter.error(code, error instanceof Error ? error.message : String(error));
-    return code === "ZSYS_GRAPH_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+    return code === "RELKIT_GRAPH_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
   }
 }
 
@@ -52,7 +52,10 @@ type ParsedArgs = {
 function parseArgs(args: readonly string[]): ParsedArgs {
   const command = args[0];
   if (command !== "print" && command !== "check" && command !== "diff")
-    throw new GraphCommandError("ZSYS_GRAPH_USAGE", "Usage: zsys graph print|check|diff [paths]");
+    throw new GraphCommandError(
+      "RELKIT_GRAPH_USAGE",
+      "Usage: relkit graph print|check|diff [paths]",
+    );
   const paths: string[] = [];
   let expectedHash: string | undefined;
   let projectRoot: string | undefined;
@@ -61,17 +64,17 @@ function parseArgs(args: readonly string[]): ParsedArgs {
     if (arg === "--hash" || arg === "--project-root") {
       const value = args[++i];
       if (value === undefined || value.startsWith("-"))
-        throw new GraphCommandError("ZSYS_GRAPH_USAGE", `${arg} requires a value.`);
+        throw new GraphCommandError("RELKIT_GRAPH_USAGE", `${arg} requires a value.`);
       if (arg === "--hash") expectedHash = value;
       else projectRoot = value;
     } else if (arg?.startsWith("-"))
-      throw new GraphCommandError("ZSYS_GRAPH_USAGE", `Unknown graph option: ${arg}`);
+      throw new GraphCommandError("RELKIT_GRAPH_USAGE", `Unknown graph option: ${arg}`);
     else if (arg !== undefined) paths.push(arg);
   }
   const count = command === "diff" ? 2 : 1;
   if (paths.length > count || (command === "diff" && paths.length !== count))
     throw new GraphCommandError(
-      "ZSYS_GRAPH_USAGE",
+      "RELKIT_GRAPH_USAGE",
       command === "diff"
         ? "Graph diff requires before and after paths."
         : `Expected at most ${count} graph path.`,

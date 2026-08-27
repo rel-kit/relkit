@@ -636,7 +636,7 @@ describe("HTTP integration", () => {
     expect(result.activatable).toBe(false);
     expect(result.diagnostics).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ code: "ZSYS_ROUTE_COLLISION", severity: "error" }),
+        expect.objectContaining({ code: "RELKIT_ROUTE_COLLISION", severity: "error" }),
       ]),
     );
     expect(result.outputs.manifest).toBe("");

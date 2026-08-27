@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { defineError, defineFunction, defineService, defineServiceMiddleware } from "@zsys/app";
-import { z } from "@zsys/schema";
-import type { LocalStructuredLogger } from "@zsys/invocation";
+import { defineError, defineFunction, defineService, defineServiceMiddleware } from "@relkit/app";
+import { z } from "@relkit/schema";
+import type { LocalStructuredLogger } from "@relkit/invocation";
 import { invokeFunction } from "./src/index.ts";
 
 describe("service runtime isolation", () => {
@@ -90,7 +90,7 @@ describe("service runtime isolation", () => {
       ],
     });
     await expect(invokeFunction(missingService.lookup, {})).rejects.toMatchObject({
-      code: "ZSYS_SERVICE_MIDDLEWARE_POLICY",
+      code: "RELKIT_SERVICE_MIDDLEWARE_POLICY",
     });
     expect(missingCalls).toBe(0);
 

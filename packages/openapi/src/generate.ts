@@ -4,8 +4,8 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   type JsonValue,
-} from "@zsys/contracts";
-import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@zsys/graph";
+} from "@relkit/contracts";
+import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@relkit/graph";
 import { buildOperation, openApiPath } from "./generate-utils.js";
 import { documentTags, type OpenApiTag } from "./generate-tags.js";
 import { serviceContext, serviceFor } from "./generate-services.js";
@@ -38,7 +38,7 @@ export interface OpenApiOperation {
     readonly content: Readonly<Record<string, OpenApiMediaType>>;
   };
   readonly responses: Readonly<Record<string, OpenApiResponse>>;
-  readonly "x-zsys": {
+  readonly "x-relkit": {
     readonly routeId: string;
     readonly functionId: string;
     readonly serviceId?: string;
@@ -61,7 +61,7 @@ export interface OpenApiDocument {
   readonly jsonSchemaDialect: string;
   readonly tags?: readonly OpenApiTag[];
   readonly paths: Readonly<Record<string, OpenApiPathItem>>;
-  readonly "x-zsys": {
+  readonly "x-relkit": {
     readonly version: number;
     readonly contractVersion: number;
     readonly graphVersion: number;
@@ -123,11 +123,11 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
   );
   return {
     openapi: "3.1.0",
-    info: { title: graph.appId ?? "ZSys application", version: String(CONTRACT_VERSION) },
+    info: { title: graph.appId ?? "RelKit application", version: String(CONTRACT_VERSION) },
     jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
     ...(tags.length === 0 ? {} : { tags }),
     paths,
-    "x-zsys": {
+    "x-relkit": {
       version: CONTRACT_VERSION,
       contractVersion: CONTRACT_VERSION,
       graphVersion: GRAPH_VERSION,

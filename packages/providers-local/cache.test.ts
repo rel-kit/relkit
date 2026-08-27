@@ -80,7 +80,7 @@ describe("local cache provider", () => {
     expect(await provider.has("count")).toBe(false);
     await provider.set("label", "ready");
     await expect(provider.increment("label", 1)).rejects.toMatchObject({
-      code: "ZSYS_CACHE_POLICY_INVALID",
+      code: "RELKIT_CACHE_POLICY_INVALID",
     });
   });
 

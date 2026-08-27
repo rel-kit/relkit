@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { readEntry } from "./queue-entry.js";
 import { createJobQueueMutations, type MutableQueueState } from "./queue-operations.js";

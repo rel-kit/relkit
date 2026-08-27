@@ -1,4 +1,4 @@
-import { canonicalJson, ZSYS_DESCRIPTOR } from "../../packages/contracts/src/index.ts";
+import { canonicalJson, RELKIT_DESCRIPTOR } from "../../packages/contracts/src/index.ts";
 import { canonicalGraphJson } from "../../packages/graph/src/index.ts";
 import {
   checkConventions,
@@ -66,19 +66,19 @@ export async function compileFixture(
   return compileProject(name, resolve(import.meta.dir, "fixtures", name), normalizedOptions);
 }
 
-/** Compiles an isolated application root using its checked-in zsys.config.ts. */
+/** Compiles an isolated application root using its checked-in relkit.config.ts. */
 export async function compileProject(
   name: string,
   projectRoot: string,
   options: FixtureCompilationOptions = {},
 ): Promise<FixtureCompilation> {
   const order = options.order ?? "sorted";
-  const temporaryRoot = await mkdtemp(join(tmpdir(), "zsys-compiler-fixture-"));
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "relkit-compiler-fixture-"));
   try {
     await prepareRoot(projectRoot, temporaryRoot);
     const config = await loadFixtureConfig(temporaryRoot, name);
     const sources = await readSources(temporaryRoot, config.source);
-    const configSource = "zsys.config.ts";
+    const configSource = "relkit.config.ts";
     const discoverySources = [
       ...sources.filter((source) => source.fileName !== configSource),
       { fileName: configSource, text: await readFile(join(temporaryRoot, configSource), "utf8") },
@@ -183,9 +183,9 @@ export async function assertFixtureGoldens(run: FixtureCompilation): Promise<voi
 
 async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<void> {
   await cp(join(fixtureRoot, "src"), join(temporaryRoot, "src"), { recursive: true });
-  await cp(join(fixtureRoot, "zsys.config.ts"), join(temporaryRoot, "zsys.config.ts"));
+  await cp(join(fixtureRoot, "relkit.config.ts"), join(temporaryRoot, "relkit.config.ts"));
   await linkFixtureDependencies(fixtureRoot, temporaryRoot);
-  const scope = join(temporaryRoot, "node_modules", "@zsys");
+  const scope = join(temporaryRoot, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
   for (const entry of await readdir(resolve(import.meta.dir, "../../packages"), {
     withFileTypes: true,
@@ -195,7 +195,7 @@ async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<
     const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as {
       readonly name?: string;
     };
-    if (manifest.name?.startsWith("@zsys/")) {
+    if (manifest.name?.startsWith("@relkit/")) {
       await symlink(packageRoot, join(temporaryRoot, "node_modules", manifest.name), "dir");
     }
   }
@@ -210,7 +210,7 @@ async function linkFixtureDependencies(fixtureRoot: string, temporaryRoot: strin
   };
   const names = Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }).sort();
   for (const name of names) {
-    if (name.startsWith("@zsys/")) continue;
+    if (name.startsWith("@relkit/")) continue;
     const source = join(fixtureRoot, "node_modules", name);
     if (!existsSync(source)) continue;
     const target = join(temporaryRoot, "node_modules", name);
@@ -220,7 +220,7 @@ async function linkFixtureDependencies(fixtureRoot: string, temporaryRoot: strin
 }
 
 async function loadFixtureConfig(root: string, name: string) {
-  const path = pathToFileURL(join(root, "zsys.config.ts")).href;
+  const path = pathToFileURL(join(root, "relkit.config.ts")).href;
   const module = (await import(`${path}?fixture=${name}`)) as { readonly default: unknown };
   return loadConfig(module.default, root);
 }
@@ -244,7 +244,7 @@ async function readSources(
 }
 
 function conventionDescriptor(kind: string, id: string): object {
-  return { [ZSYS_DESCRIPTOR]: true, kind, id, ref: { kind, id } };
+  return { [RELKIT_DESCRIPTOR]: true, kind, id, ref: { kind, id } };
 }
 
 function sortDiagnostics(diagnostics: readonly Diagnostic[]): readonly Diagnostic[] {

@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_ROUTE_COLLISION",
+    "code": "RELKIT_ROUTE_COLLISION",
     "column": 20,
     "descriptorId": "collision.second",
     "file": "src/routes/orders/[orderId]/route.ts",

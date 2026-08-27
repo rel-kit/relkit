@@ -1,7 +1,7 @@
-import type { InferOutput } from "@zsys/schema";
+import type { InferOutput } from "@relkit/schema";
 import type { EventDescriptorAny } from "./define-event.js";
 
-/** Augmented by `.zsys/generated/event-registry.d.ts` for application event names. */
+/** Augmented by `.relkit/generated/event-registry.d.ts` for application event names. */
 export interface EventRegistry {}
 
 export type EventName = Extract<keyof EventRegistry, string>;

@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { GRAPH_VERSION } from "@zsys/contracts";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
 import { startProject } from "./src/commands/start.js";
@@ -20,7 +20,7 @@ test("check emits activatable success and portable structured diagnostics on fai
   expect(valid.activatable).toBe(true);
   expect(valid.graphHash).toMatch(/^sha256:/);
   expect(await readFile(join(valid.generatedDirectory, "event-registry.d.ts"), "utf8")).toContain(
-    'declare module "@zsys/events"',
+    'declare module "@relkit/events"',
   );
   expect(JSON.parse(await readFile(join(valid.generatedDirectory, "diagnostics.json")))).toEqual(
     [],
@@ -33,7 +33,7 @@ test("check emits activatable success and portable structured diagnostics on fai
   expect(invalid.outputs.manifest).toBe("");
   expect(invalid.diagnostics).toContainEqual(
     expect.objectContaining({
-      code: "ZSYS_DUPLICATE_ID",
+      code: "RELKIT_DUPLICATE_ID",
       severity: "error",
       file: "src/functions/second.function.ts",
       related: [expect.objectContaining({ file: "src/functions/first.function.ts" })],
@@ -45,7 +45,7 @@ test("check emits activatable success and portable structured diagnostics on fai
 test("check locates removed config keys and shows the fixed replacement", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   await writeFile(
-    join(root, "zsys.config.ts"),
+    join(root, "relkit.config.ts"),
     'export default {\n  source: ["lib/**/*.ts"],\n};\n',
   );
 
@@ -53,11 +53,11 @@ test("check locates removed config keys and shows the fixed replacement", async 
   expect(result.ok).toBe(false);
   expect(result.diagnostics).toContainEqual(
     expect.objectContaining({
-      code: "ZSYS_CONFIG_LEGACY_KEY",
-      file: "zsys.config.ts",
+      code: "RELKIT_CONFIG_LEGACY_KEY",
+      file: "relkit.config.ts",
       line: 2,
       column: 3,
-      message: expect.stringContaining('ZSYS always discovers "src/**/*.ts"'),
+      message: expect.stringContaining('RELKIT always discovers "src/**/*.ts"'),
     }),
   );
   expect(result.diagnostics[0]?.message).toContain("defineConfig({ server:");
@@ -70,7 +70,7 @@ test("check refreshes generated event types before project typechecking", async 
     join(root, "tsconfig.json"),
     JSON.stringify({
       compilerOptions: { strict: true, noEmit: true },
-      files: ["src/type-error.ts", ".zsys/generated/event-registry.d.ts"],
+      files: ["src/type-error.ts", ".relkit/generated/event-registry.d.ts"],
     }),
   );
 
@@ -80,7 +80,7 @@ test("check refreshes generated event types before project typechecking", async 
     expect.objectContaining({ code: "TS2322", file: "src/type-error.ts", line: 1 }),
   );
   expect(result.diagnostics.some(({ code }) => code === "TS6053")).toBe(false);
-  expect(await readFile(join(root, ".zsys/generated/event-registry.d.ts"), "utf8")).toContain(
+  expect(await readFile(join(root, ".relkit/generated/event-registry.d.ts"), "utf8")).toContain(
     "interface EventRegistry",
   );
 });
@@ -116,7 +116,7 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(firstArtifacts[1]).toContain("COPY server/index.js ./server/index.js");
   expect(firstArtifacts[1]).not.toContain("COPY .");
   expect(firstArtifacts[0]).toContain(".env");
-  expect(firstArtifacts[0]).toContain(".zsys/state");
+  expect(firstArtifacts[0]).toContain(".relkit/state");
   expect(firstArtifacts[6]).toContain("createObservabilityRuntime");
   expect(firstArtifacts[6]).toContain("materializeEvents");
   expect(firstArtifacts[6]).toContain("materializeJobs");
@@ -140,15 +140,15 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(failed.ok).toBe(false);
   expect(failed.artifacts).toEqual([]);
   expect(failed.diagnostics).toContainEqual(
-    expect.objectContaining({ code: "ZSYS_ROUTE_COLLISION" }),
+    expect.objectContaining({ code: "RELKIT_ROUTE_COLLISION" }),
   );
 });
 
 test("build carries server port, body limit, and API docs settings into runtime artifacts", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   await writeFile(
-    join(root, "zsys.config.ts"),
-    'import { defineConfig } from "@zsys/app/config";\nexport default defineConfig({ server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
+    join(root, "relkit.config.ts"),
+    'import { defineConfig } from "@relkit/app/config";\nexport default defineConfig({ server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
   );
   const built = await buildProject({ projectRoot: root });
   expect(built.ok).toBe(true);
@@ -168,8 +168,8 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
   const built = await buildProject({ projectRoot: root });
   const started = await startProject({ projectRoot: root, port: 0, healthTimeoutMs: 3_000 });
   try {
-    const live = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/health/live`);
-    const graph = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/graph`);
+    const live = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/health/live`);
+    const graph = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/graph`);
     expect(live.status).toBe(200);
     expect(graph.status).toBe(200);
     expect((await graph.json()) as { graphHash: string }).toMatchObject({
@@ -177,8 +177,10 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
       graphHash: built.graphHash,
       graph: { nodes: expect.arrayContaining([expect.objectContaining({ id: "hello" })]) },
     });
-    const routes = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/routes`);
-    const functions = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/functions`);
+    const routes = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/routes`);
+    const functions = await fetch(
+      `http://${started.hostname}:${started.port}/_relkit/v1/functions`,
+    );
     expect(routes.status).toBe(200);
     expect(functions.status).toBe(200);
     expect((await routes.json()) as { items: unknown[] }).toMatchObject({
@@ -187,11 +189,11 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
     expect((await functions.json()) as { items: unknown[] }).toMatchObject({
       items: [expect.objectContaining({ id: "hello" })],
     });
-    const route = await fetch(`http://${started.hostname}:${started.port}/hello/ZSys`);
+    const route = await fetch(`http://${started.hostname}:${started.port}/hello/RelKit`);
     expect(route.status).toBe(200);
-    expect(await route.json()).toEqual({ message: "Hello, ZSys" });
+    expect(await route.json()).toEqual({ message: "Hello, RelKit" });
     const action = await fetch(
-      `http://${started.hostname}:${started.port}/_zsys/v1/actions/functions/hello/invoke`,
+      `http://${started.hostname}:${started.port}/_relkit/v1/actions/functions/hello/invoke`,
       {
         method: "POST",
         headers: { "content-type": "application/json", "idempotency-key": "hello-action" },
@@ -204,7 +206,7 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
     );
     expect(action.status).toBe(200);
     expect(await action.json()).toMatchObject({ output: { message: "Hello, Inspector" } });
-    const logUrl = `http://${started.hostname}:${started.port}/_zsys/v1/logs`;
+    const logUrl = `http://${started.hostname}:${started.port}/_relkit/v1/logs`;
     const logs = (await (
       await fetch(`${logUrl}?functionId=hello&severity=info&limit=1`)
     ).json()) as { items: Array<{ invocationId: string }>; nextCursor?: string };
@@ -225,7 +227,7 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
   expect(await started.exited).toBe(0);
 
   await expect(
-    startProject({ projectRoot: root, buildDirectory: join(root, ".zsys", "missing") }),
+    startProject({ projectRoot: root, buildDirectory: join(root, ".relkit", "missing") }),
   ).rejects.toThrow();
 });
 
@@ -253,8 +255,8 @@ test("production start keeps internal endpoints private", async () => {
     environment: { NODE_ENV: "production" },
   });
   try {
-    const live = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/health/live`);
-    const graph = await fetch(`http://${started.hostname}:${started.port}/_zsys/v1/graph`);
+    const live = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/health/live`);
+    const graph = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/graph`);
     expect(live.status).toBe(200);
     expect(graph.status).toBe(404);
     expect(await graph.text()).not.toContain("Runtime graph hash verification failed");
@@ -264,7 +266,7 @@ test("production start keeps internal endpoints private", async () => {
 });
 
 async function copyProject(relativePath: string): Promise<string> {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-cli-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-cli-test-"));
   roots.push(root);
   await cp(join(process.cwd(), relativePath), root, { recursive: true });
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
@@ -274,7 +276,7 @@ async function copyProject(relativePath: string): Promise<string> {
 }
 
 async function linkWorkspacePackages(root: string): Promise<void> {
-  const scope = join(root, "node_modules", "@zsys");
+  const scope = join(root, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
   for (const name of [
     "agents",

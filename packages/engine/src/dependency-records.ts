@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type { DependencyCategory, DependencyClientBuildOptions } from "./dependencies.js";
 import { DependencyNotConfiguredError, runDependency } from "./dependency-clients.js";
 

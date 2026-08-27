@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { authorizationInput, authorizationOutput } from "../shared/schemas.js";
 
 const authorizeOrder = defineFunction({

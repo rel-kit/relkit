@@ -26,7 +26,7 @@ export type {
   InspectorConfigInput,
   LoadedToolingConfig,
   ToolingConfigInput,
-  ZsysConfig,
+  RelkitConfig,
 } from "./config-loader-types.js";
 
 export class ConfigValidationError extends TypeError {
@@ -35,7 +35,7 @@ export class ConfigValidationError extends TypeError {
 
   constructor(issues: readonly ConfigIssue[]) {
     const normalized = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
-    super(`Invalid zsys.config.ts: ${normalized.map((issue) => issue.message).join("; ")}`);
+    super(`Invalid relkit.config.ts: ${normalized.map((issue) => issue.message).join("; ")}`);
     this.issues = normalized;
   }
 }
@@ -122,12 +122,12 @@ function parseConfig(
 function legacyMigration(key: string): string | undefined {
   return (
     {
-      entry: 'Remove "entry"; ZSYS discovers descriptors from "src/**/*.ts".',
-      source: 'Remove "source"; ZSYS always discovers "src/**/*.ts".',
+      entry: 'Remove "entry"; RELKIT discovers descriptors from "src/**/*.ts".',
+      source: 'Remove "source"; RELKIT always discovers "src/**/*.ts".',
       exclude:
         'Remove "exclude"; tests, fixtures, declarations, and generated content are excluded by convention.',
       generatedDirectory:
-        'Remove "generatedDirectory"; generated output is always ".zsys/generated".',
+        'Remove "generatedDirectory"; generated output is always ".relkit/generated".',
     } as Record<string, string>
   )[key];
 }

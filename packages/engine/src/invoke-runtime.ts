@@ -1,17 +1,17 @@
 import { Effect } from "effect";
-import type { MaybePromise, ProtocolId } from "@zsys/contracts";
-import { normalizeFailure, type InvocationRunner } from "@zsys/invocation";
+import type { MaybePromise, ProtocolId } from "@relkit/contracts";
+import { normalizeFailure, type InvocationRunner } from "@relkit/invocation";
 import {
   createPublicClockEffect,
   createInvocationBridge,
   captureInvocationTrace,
   withChildSpan,
   withRootSpan,
-  createZsysTracer,
+  createRelkitTracer,
   IdSource,
   InvocationTrace,
   type CapturedInvocationTrace,
-} from "@zsys/runtime-effect";
+} from "@relkit/runtime-effect";
 import type { DirectFunctionInvoker, DirectFunctionRequest } from "./dependencies.js";
 import { createContext } from "./context.js";
 import { callHook, makeContext } from "./invoke-utils.js";
@@ -101,7 +101,7 @@ export async function runHandler<
           options.hooks?.observability === undefined
             ? {}
             : {
-                onDeclaredEdge: (edge: import("@zsys/graph").GraphEdge) => {
+                onDeclaredEdge: (edge: import("@relkit/graph").GraphEdge) => {
                   void callHook(options.hooks?.onDeclaredEdge, edge);
                   void emitObservabilityEvent(options.hooks?.observability, {
                     protocol: OBSERVABILITY_HOOK_PROTOCOL,
@@ -115,7 +115,7 @@ export async function runHandler<
           options.hooks?.observability === undefined
             ? {}
             : {
-                onObservedEdge: (edge: import("@zsys/graph").ObservedEdge) => {
+                onObservedEdge: (edge: import("@relkit/graph").ObservedEdge) => {
                   void callHook(options.hooks?.onObservedEdge, edge);
                   void emitObservabilityEvent(options.hooks?.observability, {
                     protocol: OBSERVABILITY_HOOK_PROTOCOL,
@@ -150,7 +150,7 @@ export async function runHandler<
   });
   const spanOptions = createInvocationSpanOptions(target, record, options, controller);
   const capturedParent = options.parent?.trace as CapturedInvocationTrace | undefined;
-  const childTracerIds: import("@zsys/runtime-effect").IdSourceService = {
+  const childTracerIds: import("@relkit/runtime-effect").IdSourceService = {
     next: (kind) => (kind === "trace" ? (traceId as ProtocolId) : idSource.next("span")),
   };
   const traced =
@@ -165,7 +165,7 @@ export async function runHandler<
             ),
             capturedParent.parentSpan,
           ),
-          createZsysTracer(childTracerIds, spanOptions.observer),
+          createRelkitTracer(childTracerIds, spanOptions.observer),
         );
   return runner.run(Effect.provideService(traced, IdSource, spanSource), {
     signal: controller.signal,

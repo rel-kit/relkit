@@ -89,15 +89,15 @@ export function registerCacheContractSuite(target: CacheContractTarget): void {
           const key = { sku: "sku-3", region: "eu" };
           await client.set(key, 11);
           await expect(client.set({ sku: "bad" } as never, 12)).rejects.toMatchObject({
-            code: "ZSYS_CACHE_SCHEMA_VALIDATION",
+            code: "RELKIT_CACHE_SCHEMA_VALIDATION",
             phase: "key",
           });
           await expect(client.set(key, "bad" as never)).rejects.toMatchObject({
-            code: "ZSYS_CACHE_SCHEMA_VALIDATION",
+            code: "RELKIT_CACHE_SCHEMA_VALIDATION",
             phase: "value",
           });
           await expect(client.set(key, 12, { ttlMs: 21 })).rejects.toMatchObject({
-            code: "ZSYS_CACHE_TTL_POLICY",
+            code: "RELKIT_CACHE_TTL_POLICY",
           });
           expect(await client.get(key)).toBe(11);
         },
@@ -163,7 +163,7 @@ export function registerCacheContractSuite(target: CacheContractTarget): void {
             "key",
           ),
         ).rejects.toMatchObject({
-          code: "ZSYS_CACHE_CAPABILITY_UNSUPPORTED",
+          code: "RELKIT_CACHE_CAPABILITY_UNSUPPORTED",
           capability: "increment",
         });
         expect(called).toBe(false);
@@ -177,7 +177,7 @@ export function registerCacheContractSuite(target: CacheContractTarget): void {
         });
         await expect(
           (text as unknown as { increment: (key: string) => Promise<unknown> }).increment("key"),
-        ).rejects.toMatchObject({ code: "ZSYS_CACHE_INCREMENT_UNSUPPORTED" });
+        ).rejects.toMatchObject({ code: "RELKIT_CACHE_INCREMENT_UNSUPPORTED" });
         await close();
       });
     });

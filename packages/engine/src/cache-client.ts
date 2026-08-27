@@ -1,4 +1,4 @@
-import { createCacheClient } from "@zsys/cache";
+import { createCacheClient } from "@relkit/cache";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 
 export function createCacheDependencyClient(

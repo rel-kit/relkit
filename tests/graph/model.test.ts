@@ -68,7 +68,7 @@ describe("graph model", () => {
       generated: true as const,
       generatedBy: "agent" as const,
       agentId: "orders.support",
-      functionId: "zsys.agent.orders.support.invoke",
+      functionId: "relkit.agent.orders.support.invoke",
     };
     const agent: AgentNode = {
       kind: "agent",

@@ -1,5 +1,5 @@
-import type { InvocationFailure } from "@zsys/invocation";
-import { toPublicEnvelope } from "@zsys/invocation";
+import type { InvocationFailure } from "@relkit/invocation";
+import { toPublicEnvelope } from "@relkit/invocation";
 import { callHook, completeRecord } from "./invoke-utils.js";
 import {
   emitObservabilityEvent,

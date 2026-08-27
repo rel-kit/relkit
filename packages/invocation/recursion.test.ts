@@ -28,7 +28,7 @@ describe("shared invocation recursion policy", () => {
     try {
       stack.enterDescriptor(first);
     } catch (error) {
-      expect(error).toMatchObject({ code: "ZSYS_RECURSION_DENIED" });
+      expect(error).toMatchObject({ code: "RELKIT_RECURSION_DENIED" });
     }
   });
 });

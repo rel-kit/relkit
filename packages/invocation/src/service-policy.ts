@@ -1,7 +1,7 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import { getDescriptorIdentity } from "./identity.js";
 
-export const SERVICE_POLICY = Symbol.for("zsys.service.policy");
+export const SERVICE_POLICY = Symbol.for("relkit.service.policy");
 
 export interface InvocationServiceMiddlewareInvocation {
   readonly input: unknown;

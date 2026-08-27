@@ -1,5 +1,5 @@
-import { deepFreeze } from "@zsys/contracts";
-import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
+import { deepFreeze } from "@relkit/contracts";
+import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
 import { DEPLOYMENT_PLAN_VERSION, type ContainerImagePlan, type DeploymentPlan } from "./plan.js";
 import type { FromGraphOptions } from "./from-graph-validation.js";
 import { byLogical, envNames, isManaged, logicalName, nodes } from "./from-graph-validation.js";
@@ -119,8 +119,8 @@ function defaultImage(appId: string, port: number): ContainerImagePlan {
     name: appId,
     tag: "latest",
     health: {
-      livenessPath: "/_zsys/v1/health/live",
-      readinessPath: "/_zsys/v1/health/ready",
+      livenessPath: "/_relkit/v1/health/live",
+      readinessPath: "/_relkit/v1/health/ready",
       port,
     },
   };

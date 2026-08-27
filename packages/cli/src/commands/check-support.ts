@@ -1,6 +1,6 @@
-import { canonicalJson, ZSYS_DESCRIPTOR } from "@zsys/contracts";
-import { createDiagnostic, type Diagnostic } from "@zsys/diagnostics";
-import { ConfigValidationError, type GeneratedOutputs } from "@zsys/compiler";
+import { canonicalJson, RELKIT_DESCRIPTOR } from "@relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { ConfigValidationError, type GeneratedOutputs } from "@relkit/compiler";
 import { readFile } from "node:fs/promises";
 import { relative } from "node:path";
 
@@ -22,7 +22,7 @@ export function evaluatorDiagnostics(
 }
 
 export function conventionDescriptor(kind: string, id: string): object {
-  return { [ZSYS_DESCRIPTOR]: true, kind, id, ref: { kind, id } };
+  return { [RELKIT_DESCRIPTOR]: true, kind, id, ref: { kind, id } };
 }
 
 export function throwIfAborted(signal: AbortSignal | undefined): void {
@@ -58,7 +58,7 @@ export async function checkFailureDiagnostics(
   if (!(error instanceof ConfigValidationError)) {
     return [
       createDiagnostic({
-        code: "ZSYS_CHECK_FAILED",
+        code: "RELKIT_CHECK_FAILED",
         severity: "error",
         message: safeMessage(error, projectRoot),
       }),

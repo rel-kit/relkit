@@ -23,7 +23,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const stored = localStorage.getItem("zsys.inspector.theme");
+    const stored = localStorage.getItem("relkit.inspector.theme");
     const initial =
       stored === "dark" || stored === "light"
         ? stored
@@ -48,7 +48,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const toggleTheme = (): void => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    localStorage.setItem("zsys.inspector.theme", next);
+    localStorage.setItem("relkit.inspector.theme", next);
     document.documentElement.dataset.theme = next;
     document.documentElement.classList.toggle("dark", next === "dark");
   };
@@ -95,7 +95,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
               }
               items={[
                 { id: "api", label: "API Reference", description: "Open active Scalar docs" },
-                { id: "docs", label: "Framework docs", description: "Open ZSYS guides" },
+                { id: "docs", label: "Framework docs", description: "Open RELKIT guides" },
               ]}
               onAction={openUtility}
             />
@@ -122,7 +122,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
 
 function openUtility(id: string): void {
   window.open(
-    id === "docs" ? "https://zsys.dev/docs" : SCALAR_API_REFERENCE_URL,
+    id === "docs" ? "https://relkit.dev/docs" : SCALAR_API_REFERENCE_URL,
     "_blank",
     "noopener,noreferrer",
   );

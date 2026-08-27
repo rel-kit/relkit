@@ -80,7 +80,7 @@ type InvalidHandlerResult<Result, Output, AllowedError> = unknown extends Result
           ? Exclude<EffectError<Result>, AllowedError> extends never
             ? [EffectRequirements<Result>] extends [never]
               ? never
-              : "Effect requirements must be provided by ZSYS"
+              : "Effect requirements must be provided by RELKIT"
             : "undeclared Effect error"
           : "Effect output does not match the output schema"
       : Result extends globalThis.Error
@@ -104,10 +104,10 @@ export type FunctionHandlerValidation<
   ? [MissingDeclaredErrors<Result, Errors>] extends [never]
     ? {}
     : {
-        readonly __zsys_handler_error__: "Return every error declared in the function's errors list";
+        readonly __relkit_handler_error__: "Return every error declared in the function's errors list";
       }
   : {
-      readonly __zsys_handler_error__: "Return values and errors must match the function contract";
+      readonly __relkit_handler_error__: "Return values and errors must match the function contract";
     };
 
 /** Returns a typed application failure from a plain function handler. */

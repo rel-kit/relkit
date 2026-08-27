@@ -12,8 +12,8 @@ export function logDevReady(
     event: "dev.ready",
     fields: {
       backend,
-      openapi: `${backend}/_zsys/v1/openapi.json`,
-      apiReference: `${backend}/_zsys/v1/api-reference`,
+      openapi: `${backend}/_relkit/v1/openapi.json`,
+      apiReference: `${backend}/_relkit/v1/api-reference`,
       ...(inspectorPort === undefined ? {} : { inspector: `http://127.0.0.1:${inspectorPort}` }),
     },
   });

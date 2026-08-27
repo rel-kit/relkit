@@ -1,4 +1,4 @@
-export const MISSING = Symbol("zsys.mapping.missing");
+export const MISSING = Symbol("relkit.mapping.missing");
 export type Missing = typeof MISSING;
 export type BodyIssueCode =
   "content-type" | "body-too-large" | "malformed-json" | "malformed-multipart";

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, test } from "bun:test";
-import { defineEnv } from "@zsys/config";
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
+import { defineEnv } from "@relkit/config";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { ApplicationGraph } from "@relkit/graph";
 import { createGenerationRuntime, type GenerationRuntimeOptions } from "./src/runtime.js";
 import type { RuntimeManifest } from "./src/services.js";
 import type { GenerationServiceDefinition } from "./src/scope.js";

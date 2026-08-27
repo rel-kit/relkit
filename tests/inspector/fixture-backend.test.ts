@@ -4,14 +4,17 @@ import { createInspectorFixture, FIXTURE_GRAPH_HASH, FIXTURE_IDS } from "./fixtu
 describe("deterministic inspector fixture backend", () => {
   test("serves the versioned graph, collections, and redacted source metadata", async () => {
     const fixture = createInspectorFixture();
-    const headers = { "x-zsys-api-version": "1", "x-zsys-api-protocol": "zsys.inspector" };
-    const graph = await fixture.app.request("http://fixture/_zsys/v1/graph", { headers });
-    const routes = await fixture.app.request("http://fixture/_zsys/v1/routes", { headers });
-    const route = await fixture.app.request(`http://fixture/_zsys/v1/routes/${FIXTURE_IDS.route}`, {
-      headers,
-    });
+    const headers = { "x-relkit-api-version": "1", "x-relkit-api-protocol": "relkit.inspector" };
+    const graph = await fixture.app.request("http://fixture/_relkit/v1/graph", { headers });
+    const routes = await fixture.app.request("http://fixture/_relkit/v1/routes", { headers });
+    const route = await fixture.app.request(
+      `http://fixture/_relkit/v1/routes/${FIXTURE_IDS.route}`,
+      {
+        headers,
+      },
+    );
     const source = await fixture.app.request(
-      `http://fixture/_zsys/v1/source/${FIXTURE_IDS.route}`,
+      `http://fixture/_relkit/v1/source/${FIXTURE_IDS.route}`,
       { headers },
     );
     expect(graph.status).toBe(200);
@@ -23,13 +26,13 @@ describe("deterministic inspector fixture backend", () => {
 
   test("keeps active identity while exposing a deterministic invalid candidate", async () => {
     const fixture = createInspectorFixture();
-    const headers = { "x-zsys-api-version": "1", "x-zsys-api-protocol": "zsys.inspector" };
+    const headers = { "x-relkit-api-version": "1", "x-relkit-api-protocol": "relkit.inspector" };
     const control = await fixture.app.request("http://fixture/__fixture__/candidate", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ invalid: true }),
     });
-    const diagnostics = await fixture.app.request("http://fixture/_zsys/v1/diagnostics", {
+    const diagnostics = await fixture.app.request("http://fixture/_relkit/v1/diagnostics", {
       headers,
     });
     const value = await diagnostics.json();
@@ -38,14 +41,14 @@ describe("deterministic inspector fixture backend", () => {
     expect(value.status).toBe("candidate");
     expect(value.active.graphHash).toBe(FIXTURE_GRAPH_HASH);
     expect(value.candidate.status).toBe("invalid");
-    expect(value.candidate.items[0].code).toBe("ZSYS_FIXTURE_COMPILE_ERROR");
+    expect(value.candidate.items[0].code).toBe("RELKIT_FIXTURE_COMPILE_ERROR");
   });
 
   test("applies a local dead-letter retry through the protected action contract", async () => {
     const fixture = createInspectorFixture();
-    const headers = { "x-zsys-api-version": "1", "x-zsys-api-protocol": "zsys.inspector" };
+    const headers = { "x-relkit-api-version": "1", "x-relkit-api-protocol": "relkit.inspector" };
     const response = await fixture.app.request(
-      `http://fixture/_zsys/v1/actions/jobs/${FIXTURE_IDS.jobInstance}/retry`,
+      `http://fixture/_relkit/v1/actions/jobs/${FIXTURE_IDS.jobInstance}/retry`,
       {
         method: "POST",
         headers: {

@@ -60,14 +60,14 @@ describe("bucket Promise client", () => {
     await client.createWriteUrl("asset.bin");
 
     expect(bridgeNames).toEqual([
-      "zsys.bucket.assets.put",
-      "zsys.bucket.assets.get",
-      "zsys.bucket.assets.head",
-      "zsys.bucket.assets.delete",
-      "zsys.bucket.assets.exists",
-      "zsys.bucket.assets.list",
-      "zsys.bucket.assets.createReadUrl",
-      "zsys.bucket.assets.createWriteUrl",
+      "relkit.bucket.assets.put",
+      "relkit.bucket.assets.get",
+      "relkit.bucket.assets.head",
+      "relkit.bucket.assets.delete",
+      "relkit.bucket.assets.exists",
+      "relkit.bucket.assets.list",
+      "relkit.bucket.assets.createReadUrl",
+      "relkit.bucket.assets.createWriteUrl",
     ]);
     expect(edges).toHaveLength(8);
     expect(edges[0]).toEqual({ relationship: "uses-bucket", from: "orders.create", to: "assets" });

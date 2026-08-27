@@ -1,4 +1,4 @@
-import { getJsonSchema } from "@zsys/schema";
+import { getJsonSchema } from "@relkit/schema";
 import { ApprovalRequiredError } from "./approval.js";
 import type { AgentCapturePolicy } from "./observability.js";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
@@ -46,7 +46,7 @@ export async function runAgentLoop(
     toolCalls += 1;
     if (toolCalls > options.agent.limits.maxToolCalls) {
       fatalToolError = new AgentRuntimeError(
-        "ZSYS_AGENT_TOOL_LIMIT",
+        "RELKIT_AGENT_TOOL_LIMIT",
         "Agent tool-call limit reached",
       );
       throw fatalToolError;
@@ -68,7 +68,7 @@ export async function runAgentLoop(
   };
   const outputProjection = getJsonSchema(options.agent.output);
   if (!outputProjection.ok) {
-    throw new AgentRuntimeError("ZSYS_SCHEMA_UNAVAILABLE", "Agent output schema is unavailable");
+    throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Agent output schema is unavailable");
   }
   const agent = new sdk.ToolLoopAgent({
     id: options.agent.id,
@@ -97,7 +97,7 @@ export async function runAgentLoop(
       result.steps.length >= options.agent.limits.maxSteps &&
       result.finishReason === "tool-calls"
     ) {
-      throw new AgentRuntimeError("ZSYS_AGENT_STEP_LIMIT", "Agent step limit reached");
+      throw new AgentRuntimeError("RELKIT_AGENT_STEP_LIMIT", "Agent step limit reached");
     }
     return validateValue(
       options.agent.output,
@@ -110,7 +110,7 @@ export async function runAgentLoop(
     if (fatalToolError !== undefined) throw fatalToolError;
     if (cause instanceof AgentRuntimeError) throw cause;
     if (sdk.NoObjectGeneratedError.isInstance(cause)) {
-      throw new AgentRuntimeError("ZSYS_AGENT_OUTPUT_VALIDATION", "Output validation failed");
+      throw new AgentRuntimeError("RELKIT_AGENT_OUTPUT_VALIDATION", "Output validation failed");
     }
     throw modelFailure(cause, signal);
   }

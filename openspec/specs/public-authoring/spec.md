@@ -1,6 +1,6 @@
 ## Purpose
 
-Defines the plain-TypeScript application authoring surface, portable contracts, descriptor semantics, conventions, and global provider selection visible to ZSys developers.
+Defines the plain-TypeScript application authoring surface, portable contracts, descriptor semantics, conventions, and global provider selection visible to RelKit developers.
 
 ## Requirements
 
@@ -39,7 +39,7 @@ Functions SHALL be the only authored descriptors that own business handlers; rou
 
 ### Requirement: Standard Schema validation and projection
 
-ZSys SHALL provide `@zsys/schema` with a familiar `z` builder and SHALL accept other Standard Schema-compatible schemas when validation and deterministic JSON Schema projection are available.
+RelKit SHALL provide `@relkit/schema` with a familiar `z` builder and SHALL accept other Standard Schema-compatible schemas when validation and deterministic JSON Schema projection are available.
 
 #### Scenario: Supported schema validates
 
@@ -49,7 +49,7 @@ ZSys SHALL provide `@zsys/schema` with a familiar `z` builder and SHALL accept o
 #### Scenario: JSON Schema is unavailable
 
 - **WHEN** a third-party Standard Schema cannot supply or support the JSON Schema needed for graph/OpenAPI generation
-- **THEN** compilation fails with `ZSYS_SCHEMA_UNAVAILABLE` and a useful source location
+- **THEN** compilation fails with `RELKIT_SCHEMA_UNAVAILABLE` and a useful source location
 
 ### Requirement: Value-free environment contracts
 
@@ -100,7 +100,7 @@ The public authoring API SHALL support application, function, declared error, ro
 
 ### Requirement: Event listeners are generic trigger bindings
 
-Event authoring SHALL expose `defineEvent`, typed selector helpers, and `onEvent`; `onEvent(eventName, handler, options?)` SHALL accept an autocomplete-enabled known event-name string, infer the payload, and create a generic event trigger backed by an internal function. ZSYS SHALL NOT expose `defineSubscription`, a subscription graph node, or a `*.subscription.ts` convention.
+Event authoring SHALL expose `defineEvent`, typed selector helpers, and `onEvent`; `onEvent(eventName, handler, options?)` SHALL accept an autocomplete-enabled known event-name string, infer the payload, and create a generic event trigger backed by an internal function. RELKIT SHALL NOT expose `defineSubscription`, a subscription graph node, or a `*.subscription.ts` convention.
 
 #### Scenario: Single event listener is authored
 
@@ -157,7 +157,7 @@ Applications SHALL choose concrete capability providers once per environment in 
 #### Scenario: Logical profile is selected
 
 - **WHEN** a resource declares profile `archive`
-- **THEN** compilation links it to the environment's global `archive` capability profile or emits `ZSYS_PROVIDER_PROFILE_UNKNOWN`
+- **THEN** compilation links it to the environment's global `archive` capability profile or emits `RELKIT_PROVIDER_PROFILE_UNKNOWN`
 
 #### Scenario: Provider option references environment
 
@@ -190,12 +190,12 @@ Applications SHALL be able to declare typed errors with optional source-inferred
 
 ### Requirement: Ordinary application libraries remain opaque
 
-Application developers SHALL remain free to call ordinary libraries from function handlers, and ZSys SHALL NOT infer or add those libraries' persistence, identity, workflow, knowledge, or other internal concepts to the application graph.
+Application developers SHALL remain free to call ordinary libraries from function handlers, and RelKit SHALL NOT infer or add those libraries' persistence, identity, workflow, knowledge, or other internal concepts to the application graph.
 
 #### Scenario: Function uses an ordinary library
 
-- **WHEN** a function imports and calls a non-ZSys database or HTTP client library
-- **THEN** ZSys models only authored ZSys descriptors, explicitly declared managed resources, and observed ZSys descriptor calls, not the library's internal resources or behavior
+- **WHEN** a function imports and calls a non-RelKit database or HTTP client library
+- **THEN** RelKit models only authored RelKit descriptors, explicitly declared managed resources, and observed RelKit descriptor calls, not the library's internal resources or behavior
 
 ### Requirement: File-system route authoring
 
@@ -275,7 +275,7 @@ Routes SHALL support a serializable rate-limit policy containing a positive limi
 
 ### Requirement: Convention-based typed configuration
 
-ZSYS SHALL expose a typed configuration helper with nested server and inspector settings while fixing application entry, source discovery, exclusions, and generated-output locations as framework conventions.
+RELKIT SHALL expose a typed configuration helper with nested server and inspector settings while fixing application entry, source discovery, exclusions, and generated-output locations as framework conventions.
 
 #### Scenario: Ports are configured
 
@@ -308,7 +308,7 @@ A function descriptor SHALL expose typed Promise-based `invoke(input)` and `asTo
 #### Scenario: Function is invoked from ordinary application code
 
 - **WHEN** application code awaits `getOrder.invoke({ orderId })`
-- **THEN** TypeScript infers the function input and output and the call enters the common ZSYS invocation boundary
+- **THEN** TypeScript infers the function input and output and the call enters the common RELKIT invocation boundary
 
 #### Scenario: Function becomes a tool
 

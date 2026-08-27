@@ -1,8 +1,8 @@
-# @zsys/providers-local
+# @relkit/providers-local
 
-Local generations own `.zsys/state/buckets` and `.zsys/state/cache` (or the
+Local generations own `.relkit/state/buckets` and `.relkit/state/cache` (or the
 configured state root). Bucket objects and cache snapshots use atomic commits;
-malformed records are moved into a provider-owned `.zsys-quarantine` directory
+malformed records are moved into a provider-owned `.relkit-quarantine` directory
 and do not prevent the rest of the generation from starting.
 
 The local cache remains bounded and generation-local. Direct construction

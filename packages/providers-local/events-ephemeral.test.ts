@@ -38,7 +38,7 @@ describe("local ephemeral event delivery", () => {
   });
 
   test("drops newest overflow and never persists or claims recovery", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-event-ephemeral-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-event-ephemeral-"));
     roots.push(root);
     let release!: () => void;
     const gate = new Promise<void>((resolve) => {

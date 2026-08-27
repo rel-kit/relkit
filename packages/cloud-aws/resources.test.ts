@@ -2,12 +2,12 @@ import { expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
 import {
-  ZsysApplicationService,
-  ZsysBuckets,
-  ZsysCaches,
-  ZsysContainerRegistry,
-  ZsysNetwork,
-  ZsysObservability,
+  RelkitApplicationService,
+  RelkitBuckets,
+  RelkitCaches,
+  RelkitContainerRegistry,
+  RelkitNetwork,
+  RelkitObservability,
   createValkeyClient,
 } from "./src/index.js";
 
@@ -41,32 +41,32 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
       },
       call: () => ({ region: "us-east-1", name: "us-east-1" }),
     },
-    "zsys-resources-test",
+    "relkit-resources-test",
     "development",
   );
 
-  let buckets: ZsysBuckets | undefined;
-  let caches: ZsysCaches | undefined;
-  let observability: ZsysObservability | undefined;
-  let application: ZsysApplicationService | undefined;
+  let buckets: RelkitBuckets | undefined;
+  let caches: RelkitCaches | undefined;
+  let observability: RelkitObservability | undefined;
+  let application: RelkitApplicationService | undefined;
   await pulumi.runtime.runInPulumiStack(() => {
-    buckets = new ZsysBuckets("orders", {
+    buckets = new RelkitBuckets("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       buckets: [{ id: "uploads" }],
     });
-    caches = new ZsysCaches("orders", {
+    caches = new RelkitCaches("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       caches: [{ id: "sessions", subnetIds: ["private-1"], securityGroupIds: ["sg-cache"] }],
     });
-    new ZsysCaches("caches", {
+    new RelkitCaches("caches", {
       appId: "full-app",
-      stackName: "zsys-nightly-1787058311503-edb6a526",
+      stackName: "relkit-nightly-1787058311503-edb6a526",
       graphHash: "sha256:orders",
       caches: [{ id: "prices" }],
     });
-    observability = new ZsysObservability("orders", {
+    observability = new RelkitObservability("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       retentionDays: 14,
@@ -76,15 +76,15 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
         serviceName: "orders",
       },
     });
-    const network = new ZsysNetwork("orders", {
+    const network = new RelkitNetwork("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
     });
-    const registry = new ZsysContainerRegistry("orders", {
+    const registry = new RelkitContainerRegistry("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
     });
-    application = new ZsysApplicationService("orders", {
+    application = new RelkitApplicationService("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       network,
@@ -121,7 +121,7 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
   const observabilityLogGroup = resources.find(
     ({ type, inputs }) =>
       type === "aws:cloudwatch/logGroup:LogGroup" &&
-      inputs.name === "/zsys/development-orders-app-observability",
+      inputs.name === "/relkit/development-orders-app-observability",
   );
   expect(observabilityLogGroup?.inputs).toMatchObject({
     retentionInDays: 14,
@@ -155,17 +155,17 @@ test("AWS resource components reject an empty deployment region", async () => {
       newResource: (args: MockResourceArgs) => ({ id: args.name, state: args.inputs }),
       call: () => ({ region: "us-east-1", name: "us-east-1" }),
     },
-    "zsys-region-test",
+    "relkit-region-test",
     "development",
   );
   await pulumi.runtime.runInPulumiStack(() => {
-    expect(() => new ZsysBuckets("invalid", { region: "", buckets: [{ id: "files" }] })).toThrow(
+    expect(() => new RelkitBuckets("invalid", { region: "", buckets: [{ id: "files" }] })).toThrow(
       "AWS region must not be empty",
     );
-    expect(() => new ZsysCaches("invalid", { region: "", caches: [{ id: "sessions" }] })).toThrow(
+    expect(() => new RelkitCaches("invalid", { region: "", caches: [{ id: "sessions" }] })).toThrow(
       "AWS region must not be empty",
     );
-    expect(() => new ZsysObservability("invalid", { region: "" })).toThrow(
+    expect(() => new RelkitObservability("invalid", { region: "" })).toThrow(
       "AWS region must not be empty",
     );
   });

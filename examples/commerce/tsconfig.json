@@ -15,7 +15,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": [".zsys/generated/event-registry.d.ts", ".zsys/generated/context-registry.d.ts"],
-  "include": ["src/**/*.ts", "tests/**/*.ts", "zsys.config.ts"],
-  "exclude": ["node_modules", ".zsys"]
+  "files": [".relkit/generated/event-registry.d.ts", ".relkit/generated/context-registry.d.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
+  "exclude": ["node_modules", ".relkit"]
 }

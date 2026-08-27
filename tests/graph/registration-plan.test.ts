@@ -96,7 +96,7 @@ function graph(): ApplicationGraph {
           generated: true,
           generatedBy: "agent",
           agentId: "orders.agent",
-          functionId: "zsys.agent.orders.agent.invoke",
+          functionId: "relkit.agent.orders.agent.invoke",
         },
       },
       {

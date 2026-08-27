@@ -1,6 +1,6 @@
-import type { MaybePromise } from "@zsys/contracts";
-import { createBucketClient } from "@zsys/buckets";
-import type { GraphEdge, ObservedEdge } from "@zsys/graph";
+import type { MaybePromise } from "@relkit/contracts";
+import { createBucketClient } from "@relkit/buckets";
+import type { GraphEdge, ObservedEdge } from "@relkit/graph";
 import { createEventDependencyClient } from "./event-client.js";
 import type {
   DependencyBridgeOptions,
@@ -135,7 +135,7 @@ function wrapCallable(
       const dependency = dependencyId(category, name, declaration);
       return Promise.resolve(
         options.invokeFunction({
-          functionId: category === "agents" ? `zsys.agent.${dependency}.invoke` : dependency,
+          functionId: category === "agents" ? `relkit.agent.${dependency}.invoke` : dependency,
           name,
           declaration,
           source,
@@ -164,8 +164,8 @@ export function runDependency<A>(
     to: dependencyIdFromClient(options, category, name),
   });
   const bridgeOptions: DependencyBridgeOptions = {
-    name: `zsys.dependency.${category}.${name}.${operation}`,
-    attributes: { "zsys.dependency.category": category, "zsys.dependency.name": name },
+    name: `relkit.dependency.${category}.${name}.${operation}`,
+    attributes: { "relkit.dependency.category": category, "relkit.dependency.name": name },
   };
   return options.bridge === undefined
     ? Promise.resolve().then(work)

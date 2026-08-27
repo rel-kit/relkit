@@ -7,9 +7,9 @@ import {
   type DescriptorBase,
   type DescriptorMetadata,
   type JsonValue,
-} from "@zsys/contracts";
-import type { FunctionRefAny } from "@zsys/functions";
-import { type InferInput, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/contracts";
+import type { FunctionRefAny } from "@relkit/functions";
+import { type InferInput, type StandardSchemaV1 } from "@relkit/schema";
 import { validateRetry } from "./retry-policy.js";
 
 export type RetryJitter = "none" | "full" | "equal";
@@ -80,9 +80,9 @@ export interface DefineJobOptions<
  *
  * @example
  * ```ts
- * import { defineFunction } from "@zsys/functions"
- * import { defineJob } from "@zsys/jobs"
- * import { z } from "@zsys/schema"
+ * import { defineFunction } from "@relkit/functions"
+ * import { defineJob } from "@relkit/jobs"
+ * import { z } from "@relkit/schema"
  *
  * const target = defineFunction({ id: "email", input: z.string(), output: z.void(), handler: async () => undefined })
  * const job = defineJob({ id: "email", input: z.string(), target, retry: { maxAttempts: 3, initialDelayMs: 100, maxDelayMs: 1_000, multiplier: 2, jitter: "full" } })

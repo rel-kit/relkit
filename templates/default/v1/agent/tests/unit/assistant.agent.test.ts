@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createTestAgent, invokeFunction } from "@zsys/testing";
+import { createTestAgent, invokeFunction } from "@relkit/testing";
 import assistant from "../../src/agents/assistant.agent.js";
 import hello, { lookup } from "../../src/functions/hello.function.js";
 

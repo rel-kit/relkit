@@ -4,7 +4,7 @@
   "conventions": [
     {
       "name": "package-shell-files",
-      "description": "Every ZSys package owns one manifest, TypeScript project, and public entry file.",
+      "description": "Every RelKit package owns one manifest, TypeScript project, and public entry file.",
       "paths": "packages/{packageName}",
       "must": {
         "haveType": "directory",

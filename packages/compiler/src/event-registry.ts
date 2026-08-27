@@ -1,5 +1,5 @@
 import { relative, resolve } from "node:path";
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 
 export const EVENT_REGISTRY_FILE = "event-registry.d.ts";
@@ -15,7 +15,7 @@ export function generateEventRegistry(
   options: EventRegistryGenerationOptions,
 ): string {
   const root = resolve(options.projectRoot);
-  const output = resolve(root, options.generatedDirectory ?? ".zsys/generated");
+  const output = resolve(root, options.generatedDirectory ?? ".relkit/generated");
   const seen = new Set<string>();
   const entries = descriptors
     .filter(({ descriptor }) => descriptor.kind === "event")
@@ -34,9 +34,9 @@ export function generateEventRegistry(
       ];
     });
   return [
-    'import "@zsys/events";',
+    'import "@relkit/events";',
     "",
-    'declare module "@zsys/events" {',
+    'declare module "@relkit/events" {',
     "  interface EventRegistry {",
     ...entries,
     "  }",

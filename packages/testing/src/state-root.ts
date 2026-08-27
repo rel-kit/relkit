@@ -18,8 +18,8 @@ export function createTestStateRoot(requestedPath?: string): TestStateRoot {
     return Object.freeze({ path, cleanup: () => undefined });
   }
 
-  const workspaceRoot = mkdtempSync(join(tmpdir(), "zsys-test-"));
-  const path = join(workspaceRoot, ".zsys", "state");
+  const workspaceRoot = mkdtempSync(join(tmpdir(), "relkit-test-"));
+  const path = join(workspaceRoot, ".relkit", "state");
   mkdirSync(path, { recursive: true });
   let cleaned = false;
 
@@ -28,8 +28,8 @@ export function createTestStateRoot(requestedPath?: string): TestStateRoot {
     cleanup: (failed: boolean) => {
       if (cleaned) return;
       cleaned = true;
-      if (failed && process.env.ZSYS_KEEP_TEST_STATE === "1") {
-        console.warn(`ZSYS_KEEP_TEST_STATE=1 retained test state at ${path}`);
+      if (failed && process.env.RELKIT_KEEP_TEST_STATE === "1") {
+        console.warn(`RELKIT_KEEP_TEST_STATE=1 retained test state at ${path}`);
         return;
       }
       rmSync(workspaceRoot, { recursive: true, force: true });

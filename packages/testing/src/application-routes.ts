@@ -4,8 +4,8 @@ import {
   compareRouteFilePaths,
   parseRouteFilePath,
   type ParsedRouteFilePath,
-} from "@zsys/compiler";
-import { getJsonSchema, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/compiler";
+import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import type { TestRuntime } from "./runtime.js";
 
 const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
@@ -47,7 +47,7 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
     const sourcePath = `src/routes/${file.replaceAll("\\", "/")}`;
     const parsed = parseRouteFilePath(sourcePath);
     const module = (await import(
-      `${pathToFileURL(join(directory, file)).href}?zsys_test=1`
+      `${pathToFileURL(join(directory, file)).href}?relkit_test=1`
     )) as Readonly<Record<string, unknown>>;
     for (const method of methods) {
       const route = module[method];
@@ -136,7 +136,7 @@ function allowsArray(value: unknown): boolean {
 
 function inferResponses(route: AuthoredRoute): TestRoute["responses"] {
   const projection = getJsonSchema(route.target.output);
-  const noContent = projection.ok && projection.schema["x-zsys-void"] === true;
+  const noContent = projection.ok && projection.schema["x-relkit-void"] === true;
   return [
     { kind: "success", status: route.successStatus ?? (noContent ? 204 : 200) },
     ...(route.target.errors ?? []).flatMap((error) => {

@@ -1,5 +1,5 @@
 {
-  "name": "zsys-export-smoke-fixture",
+  "name": "relkit-export-smoke-fixture",
   "private": true,
   "type": "module"
 }

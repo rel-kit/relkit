@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { receiptInput, receiptOutput } from "../shared/schemas.js";
 
 const sendReceipt = defineFunction({

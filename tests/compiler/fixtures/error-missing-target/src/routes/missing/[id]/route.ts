@@ -1,5 +1,5 @@
-import { defineRoute, http } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineRoute, http } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const missingTarget = {
   ref: { kind: "function", id: "missing.function" },

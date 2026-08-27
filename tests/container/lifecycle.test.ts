@@ -14,7 +14,7 @@ import { join, relative } from "node:path";
 import { buildProject } from "../../packages/cli/src/commands/build.ts";
 import { startProject } from "../../packages/cli/src/commands/start.ts";
 
-const API = "/_zsys/v1";
+const API = "/_relkit/v1";
 const ARTIFACTS = [
   ".dockerignore",
   "Dockerfile",
@@ -35,11 +35,11 @@ test("builds reproducible production context without local env or state", async 
   const firstRoot = await copyProject();
   const secondRoot = await copyProject();
   for (const root of [firstRoot, secondRoot]) {
-    await writeFile(join(root, ".env"), "ZSYS_SYNTHETIC_SECRET=container-secret");
-    await mkdir(join(root, ".zsys", "state"), { recursive: true });
-    await writeFile(join(root, ".zsys", "state", "local.json"), "local-state");
-    await mkdir(join(root, ".zsys", "observability"), { recursive: true });
-    await writeFile(join(root, ".zsys", "observability", "request.ndjson"), "local-record");
+    await writeFile(join(root, ".env"), "RELKIT_SYNTHETIC_SECRET=container-secret");
+    await mkdir(join(root, ".relkit", "state"), { recursive: true });
+    await writeFile(join(root, ".relkit", "state", "local.json"), "local-state");
+    await mkdir(join(root, ".relkit", "observability"), { recursive: true });
+    await writeFile(join(root, ".relkit", "observability", "request.ndjson"), "local-record");
   }
 
   const first = await buildProject({ projectRoot: firstRoot });
@@ -55,14 +55,14 @@ test("builds reproducible production context without local env or state", async 
   const dockerignore = firstBytes.get(".dockerignore") ?? "";
   expect(dockerfile).toContain("FROM oven/bun:1.3.10");
   expect(dockerfile).toContain(
-    "RUN mkdir -p .zsys/state .zsys/observability && chown -R bun:bun .zsys",
+    "RUN mkdir -p .relkit/state .relkit/observability && chown -R bun:bun .relkit",
   );
   expect(dockerfile).toContain("USER bun");
   expect(dockerfile).toContain("STOPSIGNAL SIGTERM");
   expect(dockerfile).not.toContain("COPY .");
   expect(dockerignore).toContain(".env");
-  expect(dockerignore).toContain(".zsys/state");
-  expect(dockerignore).toContain(".zsys/observability");
+  expect(dockerignore).toContain(".relkit/state");
+  expect(dockerignore).toContain(".relkit/observability");
   expect([...firstBytes.values()].join("\n")).not.toContain("container-secret");
 });
 
@@ -81,7 +81,7 @@ test("keeps liveness available while provider readiness is pending", async () =>
     projectRoot: root,
     port: 0,
     healthTimeoutMs: 3_000,
-    environment: { ZSYS_PROVIDER_READY_DELAY_MS: "1000" },
+    environment: { RELKIT_PROVIDER_READY_DELAY_MS: "1000" },
     fetch: probe,
   });
   try {
@@ -117,11 +117,11 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
     port: 0,
     healthTimeoutMs: 3_000,
     environment: {
-      ZSYS_TEST_INFLIGHT_FILE: startedFile,
-      ZSYS_TEST_CANCEL_FILE: cancelledFile,
-      ZSYS_TEST_FLUSH_FILE: flushedFile,
-      ZSYS_DRAIN_TIMEOUT_MS: "50",
-      ZSYS_TELEMETRY_FLUSH_TIMEOUT_MS: "100",
+      RELKIT_TEST_INFLIGHT_FILE: startedFile,
+      RELKIT_TEST_CANCEL_FILE: cancelledFile,
+      RELKIT_TEST_FLUSH_FILE: flushedFile,
+      RELKIT_DRAIN_TIMEOUT_MS: "50",
+      RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS: "100",
     },
   });
 
@@ -150,7 +150,7 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
 });
 
 async function copyProject(): Promise<string> {
-  const root = await mkdtemp(join("/tmp", "zsys-container-test-"));
+  const root = await mkdtemp(join("/tmp", "relkit-container-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-minimal"), root, { recursive: true });
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
@@ -159,7 +159,7 @@ async function copyProject(): Promise<string> {
 }
 
 async function linkWorkspacePackages(root: string): Promise<void> {
-  const scope = join(root, "node_modules", "@zsys");
+  const scope = join(root, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
   for (const name of [
     "agents",
@@ -245,25 +245,25 @@ async function within<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 }
 
 function handlerSource(): string {
-  return `import { defineFunction } from "@zsys/app";
-import { z } from "@zsys/schema";
+  return `import { defineFunction } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const hello = defineFunction({
   id: "hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
   handler: async (input, context) => {
-    const started = process.env.ZSYS_TEST_INFLIGHT_FILE;
+    const started = process.env.RELKIT_TEST_INFLIGHT_FILE;
     if (started !== undefined) await Bun.write(started, "started");
-    const flushed = process.env.ZSYS_TEST_FLUSH_FILE;
-    (globalThis as Record<string, unknown>)["__zsys_flush_telemetry"] = async () => {
+    const flushed = process.env.RELKIT_TEST_FLUSH_FILE;
+    (globalThis as Record<string, unknown>)["__relkit_flush_telemetry"] = async () => {
       if (flushed !== undefined) await Bun.write(flushed, "flushed");
     };
     await new Promise<void>((resolve) => {
       if (context.signal.aborted) return resolve();
       context.signal.addEventListener("abort", () => resolve(), { once: true });
     });
-    const cancelled = process.env.ZSYS_TEST_CANCEL_FILE;
+    const cancelled = process.env.RELKIT_TEST_CANCEL_FILE;
     if (context.signal.aborted && cancelled !== undefined) await Bun.write(cancelled, "cancelled");
     return { message: \`Hello, \${input.name}\` };
   },

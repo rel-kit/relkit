@@ -2,7 +2,7 @@ import {
   BucketCapabilityError,
   type BucketOperationContext,
   type BucketPutOptions,
-} from "@zsys/buckets";
+} from "@relkit/buckets";
 import { normalizeBucketKey, normalizeBucketPrefix } from "./keys.js";
 import { paginateKeys } from "./pagination.js";
 import { normalizePolicy } from "./policy.js";

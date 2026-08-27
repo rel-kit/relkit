@@ -1,5 +1,5 @@
 import { relative, resolve } from "node:path";
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 
 export const CONTEXT_REGISTRY_FILE = "context-registry.d.ts";
@@ -9,7 +9,7 @@ export function generateContextRegistry(
   options: { readonly projectRoot: string; readonly generatedDirectory?: string },
 ): string {
   const root = resolve(options.projectRoot);
-  const output = resolve(root, options.generatedDirectory ?? ".zsys/generated");
+  const output = resolve(root, options.generatedDirectory ?? ".relkit/generated");
   const dataModel = descriptors.find((entry) => entry.descriptor.kind === "data-model");
   const auth = descriptors.find((entry) => isAuthRoute(entry));
   const constants = descriptors.filter((entry) => entry.descriptor.kind === "constants");
@@ -17,20 +17,20 @@ export function generateContextRegistry(
   const fields = [
     dataModel === undefined
       ? undefined
-      : `    readonly database: import("@zsys/drizzle").DatabaseContext<${importType(dataModel, output, root)}>;`,
+      : `    readonly database: import("@relkit/drizzle").DatabaseContext<${importType(dataModel, output, root)}>;`,
     auth === undefined
       ? undefined
-      : `    readonly auth: import("@zsys/functions").AuthContext<import("@zsys/better-auth").InferBetterAuthSession<${importType(auth, output, root)}["handler"]>>;`,
+      : `    readonly auth: import("@relkit/functions").AuthContext<import("@relkit/better-auth").InferBetterAuthSession<${importType(auth, output, root)}["handler"]>>;`,
     constants.length === 0
       ? undefined
-      : `    readonly constants: ${constants.map((entry) => `import("@zsys/app").ResolvedConstants<${importType(entry, output, root)}>`).join(" & ")};`,
+      : `    readonly constants: ${constants.map((entry) => `import("@relkit/app").ResolvedConstants<${importType(entry, output, root)}>`).join(" & ")};`,
     prompts.length === 0
       ? undefined
-      : `    readonly prompts: { ${prompts.map((entry) => `readonly ${JSON.stringify(entry.exportName)}: import("@zsys/app").ResolvedPrompt<${importType(entry, output, root)}>`).join("; ")} };`,
+      : `    readonly prompts: { ${prompts.map((entry) => `readonly ${JSON.stringify(entry.exportName)}: import("@relkit/app").ResolvedPrompt<${importType(entry, output, root)}>`).join("; ")} };`,
   ].filter((value): value is string => value !== undefined);
   return [
     "declare global {",
-    "  namespace Zsys {",
+    "  namespace Relkit {",
     "    interface ApplicationContextRegistry {",
     ...fields,
     "    }",

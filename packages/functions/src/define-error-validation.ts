@@ -1,6 +1,6 @@
-import { isStableId } from "@zsys/contracts";
-import { normalizeErrorRetry } from "@zsys/invocation";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import { isStableId } from "@relkit/contracts";
+import { normalizeErrorRetry } from "@relkit/invocation";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny, ErrorHttpMapping } from "./define-error.js";
 
 export function isErrorDescriptor(value: unknown): value is ErrorDescriptorAny {

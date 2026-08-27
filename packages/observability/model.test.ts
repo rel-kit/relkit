@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { OBSERVABILITY_MODEL_VERSION, REQUEST_OUTCOMES, type RequestRecord } from "./src/index.ts";
 
 test("model records are versioned, correlated, and JSON-safe", () => {

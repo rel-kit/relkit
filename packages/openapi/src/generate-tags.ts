@@ -1,4 +1,4 @@
-import type { ServiceNode } from "@zsys/graph";
+import type { ServiceNode } from "@relkit/graph";
 
 export interface OpenApiTag {
   readonly name: string;

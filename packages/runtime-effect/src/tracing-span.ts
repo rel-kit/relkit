@@ -8,7 +8,7 @@ export interface SpanLifecycle {
 
 export type SpanLifecycleObserver = (event: SpanLifecycle) => void;
 
-class ZsysSpan implements EffectTracer.Span {
+class RelkitSpan implements EffectTracer.Span {
   readonly _tag = "Span" as const;
   readonly spanId: string;
   readonly traceId: string;
@@ -58,11 +58,11 @@ class ZsysSpan implements EffectTracer.Span {
 }
 
 /** Creates an Effect tracer whose IDs come from the generation-owned source. */
-export function createZsysTracer(
+export function createRelkitTracer(
   ids: Pick<IdSourceService, "next">,
   observer?: SpanLifecycleObserver,
 ): EffectTracer.Tracer {
   return EffectTracer.make({
-    span: (options) => new ZsysSpan(options, ids, observer),
+    span: (options) => new RelkitSpan(options, ids, observer),
   });
 }

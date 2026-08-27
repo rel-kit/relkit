@@ -32,7 +32,7 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
 });
 
 test("keeps contracts available when observability is unavailable", async ({ page }) => {
-  await page.route(/\/_zsys\/v1\/(?:requests|logs|traces)(?:\?|$)/, (route) => route.abort());
+  await page.route(/\/_relkit\/v1\/(?:requests|logs|traces)(?:\?|$)/, (route) => route.abort());
 
   await page.goto("/routes/orders.create.http");
   await expect(page.getByRole("heading", { name: "Route detail" })).toBeVisible();
@@ -175,14 +175,14 @@ test("keeps critical controls usable on a narrow viewport", async ({ page }) => 
 test("scans inspector bundles and network payloads for boundary leaks", async ({ page }) => {
   const payloads: Array<Promise<{ readonly label: string; readonly body: string }>> = [];
   page.on("request", (request) => {
-    if (request.url().includes("/_zsys/v1/") && request.postData() !== null)
+    if (request.url().includes("/_relkit/v1/") && request.postData() !== null)
       payloads.push(
         Promise.resolve({ label: `request ${request.url()}`, body: request.postData()! }),
       );
   });
   page.on("response", (response) => {
     const contentType = response.headers()["content-type"] ?? "";
-    const apiResponse = response.url().includes("/_zsys/v1/") && contentType.includes("json");
+    const apiResponse = response.url().includes("/_relkit/v1/") && contentType.includes("json");
     const browserBundle = response.request().resourceType() === "script";
     if (apiResponse || browserBundle)
       payloads.push(
@@ -197,7 +197,9 @@ test("scans inspector bundles and network payloads for boundary leaks", async ({
   await expect(page.getByText(graphHash).first()).toBeVisible();
   const networkBodies = await Promise.all(payloads);
   expect(networkBodies.length).toBeGreaterThan(0);
-  expect(networkBodies.some(({ body }) => body.includes('"protocol":"zsys.inspector"'))).toBe(true);
+  expect(networkBodies.some(({ body }) => body.includes('"protocol":"relkit.inspector"'))).toBe(
+    true,
+  );
   assertNoRawSyntheticSecrets("browser network responses", networkBodies);
   assertNoRawSyntheticSecrets("inspector server-rendered HTML", await page.content());
   expect(networkBodies.flatMap(({ label, body }) => payloadViolations(label, body))).toEqual([]);

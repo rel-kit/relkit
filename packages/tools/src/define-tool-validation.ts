@@ -1,12 +1,12 @@
-import { deepFreeze, isRef } from "@zsys/contracts";
-import { resolveDescriptorIdentity } from "@zsys/invocation";
+import { deepFreeze, isRef } from "@relkit/contracts";
+import { resolveDescriptorIdentity } from "@relkit/invocation";
 import {
   isErrorDescriptor,
   type FunctionRefAny,
   type FunctionToolApproval,
   type FunctionToolSideEffect,
   type FunctionToolTarget,
-} from "@zsys/functions";
+} from "@relkit/functions";
 
 export function copyFunctionTarget<Target extends FunctionRefAny>(
   target: Target,

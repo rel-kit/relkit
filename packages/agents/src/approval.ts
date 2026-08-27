@@ -1,5 +1,5 @@
-import { normalizeId } from "@zsys/contracts";
-import type { ToolApproval, ToolSideEffect } from "@zsys/tools";
+import { normalizeId } from "@relkit/contracts";
+import type { ToolApproval, ToolSideEffect } from "@relkit/tools";
 
 export const APPROVAL_STATES = Object.freeze(["pending", "approved", "denied"] as const);
 export type ApprovalState = (typeof APPROVAL_STATES)[number];
@@ -35,7 +35,7 @@ export interface DeniedApproval extends ApprovalMetadata {
 export type ApprovalRecord = PendingApproval | ApprovedApproval | DeniedApproval;
 
 export class ApprovalStateError extends Error {
-  readonly code = "ZSYS_APPROVAL_STATE_INVALID" as const;
+  readonly code = "RELKIT_APPROVAL_STATE_INVALID" as const;
 
   constructor(message: string) {
     super(message);
@@ -44,7 +44,7 @@ export class ApprovalStateError extends Error {
 }
 
 export class ApprovalRequiredError extends Error {
-  readonly code = "ZSYS_APPROVAL_REQUIRED" as const;
+  readonly code = "RELKIT_APPROVAL_REQUIRED" as const;
 
   constructor(readonly approval: PendingApproval) {
     super(`Approval required for tool "${approval.toolId}"`);
@@ -53,7 +53,7 @@ export class ApprovalRequiredError extends Error {
 }
 
 export class ApprovalDeniedError extends Error {
-  readonly code = "ZSYS_APPROVAL_DENIED" as const;
+  readonly code = "RELKIT_APPROVAL_DENIED" as const;
 
   constructor(readonly approval: DeniedApproval) {
     super(`Approval denied for tool "${approval.toolId}"`);

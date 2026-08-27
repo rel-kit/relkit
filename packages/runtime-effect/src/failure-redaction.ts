@@ -1,5 +1,5 @@
 import { Cause } from "effect";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
 export function redactCause(cause: Cause.Cause<unknown>): JsonValue {
   return {

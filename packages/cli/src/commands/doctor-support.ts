@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { ConfigValidationError, loadConfig, type LoadedToolingConfig } from "@zsys/compiler";
+import { ConfigValidationError, loadConfig, type LoadedToolingConfig } from "@relkit/compiler";
 import {
   checkAws,
   checkLockfile,
@@ -85,7 +85,7 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
       inspectorPort = parsePort(requiredValue(args, ++index, arg), arg, false);
     else if (arg === "--pulumi") deploymentEnabled = true;
     else if (arg === "--no-pulumi") deploymentEnabled = false;
-    else throw new DoctorCommandError("ZSYS_DOCTOR_USAGE", `Unknown doctor option: ${arg}`);
+    else throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `Unknown doctor option: ${arg}`);
   }
   return {
     ...(projectRoot === undefined ? {} : { projectRoot }),
@@ -101,17 +101,17 @@ async function checkConfig(
 ): Promise<LoadedToolingConfig | undefined> {
   try {
     const loaded = await import(
-      `${pathToFileURL(join(root, "zsys.config.ts")).href}?zsys_doctor=1`
+      `${pathToFileURL(join(root, "relkit.config.ts")).href}?relkit_doctor=1`
     );
     const config = loadConfig((loaded as { readonly default?: unknown }).default ?? loaded, root);
-    checks.push({ name: "config", ok: true, message: "zsys.config.ts is valid." });
+    checks.push({ name: "config", ok: true, message: "relkit.config.ts is valid." });
     return config;
   } catch (error) {
     const detail =
       error instanceof ConfigValidationError
         ? error.issues.map((issue) => `${issue.path}:${issue.code}`).join(", ")
         : "file is missing or could not be loaded";
-    checks.push({ name: "config", ok: false, message: `Invalid zsys.config.ts (${detail}).` });
+    checks.push({ name: "config", ok: false, message: `Invalid relkit.config.ts (${detail}).` });
     return undefined;
   }
 }
@@ -130,8 +130,8 @@ async function checkApp(
     return undefined;
   }
   try {
-    const file = "zsys.config.ts";
-    const loaded = await import(`${pathToFileURL(resolve(root, file)).href}?zsys_doctor_app=1`);
+    const file = "relkit.config.ts";
+    const loaded = await import(`${pathToFileURL(resolve(root, file)).href}?relkit_doctor_app=1`);
     const app = (loaded as { readonly default?: unknown }).default;
     const ok = isAppDescriptor(app);
     checks.push({
@@ -141,7 +141,7 @@ async function checkApp(
     });
     return app;
   } catch {
-    checks.push({ name: "app", ok: false, message: "zsys.config.ts could not be loaded." });
+    checks.push({ name: "app", ok: false, message: "relkit.config.ts could not be loaded." });
     return undefined;
   }
 }
@@ -152,13 +152,13 @@ function validPort(value: number, dynamic: boolean): boolean {
 function parsePort(value: string, option: string, dynamic: boolean): number {
   const port = Number(value);
   if (!validPort(port, dynamic))
-    throw new DoctorCommandError("ZSYS_DOCTOR_USAGE", `${option} must be a valid port.`);
+    throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `${option} must be a valid port.`);
   return port;
 }
 function requiredValue(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
-    throw new DoctorCommandError("ZSYS_DOCTOR_USAGE", `${option} requires a value.`);
+    throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `${option} requires a value.`);
   return value;
 }
 export function formatDoctor(result: DoctorResult): string {

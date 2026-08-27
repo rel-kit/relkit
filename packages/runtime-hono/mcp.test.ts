@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan, ToolRegistration } from "@zsys/graph";
-import { z } from "@zsys/schema";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { RegistrationPlan, ToolRegistration } from "@relkit/graph";
+import { z } from "@relkit/schema";
 import { createApp } from "./src/index.js";
 
 const source = { file: "src/tools.ts", line: 1, column: 1 };
@@ -56,7 +56,7 @@ describe("MCP", () => {
     await client.close();
   });
 
-  const inspectorTest = process.env.ZSYS_MCP_INSPECTOR_CLI === "1" ? test : test.skip;
+  const inspectorTest = process.env.RELKIT_MCP_INSPECTOR_CLI === "1" ? test : test.skip;
   inspectorTest(
     "lists tools through the MCP Inspector CLI",
     async () => {

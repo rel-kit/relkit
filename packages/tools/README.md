@@ -1,4 +1,4 @@
-# @zsys/tools
+# @relkit/tools
 
 Tools are constrained, handler-free views of functions. They inherit the target
 function's input, output, and declared errors and add only approval and

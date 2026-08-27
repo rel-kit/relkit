@@ -1,2 +1,2 @@
-export { abortablePromise, createAbortBridge } from "@zsys/invocation";
-export type { AbortBridge } from "@zsys/invocation";
+export { abortablePromise, createAbortBridge } from "@relkit/invocation";
+export type { AbortBridge } from "@relkit/invocation";

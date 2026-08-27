@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
 
-export const CLIENT_CONTRACT_PATH = "/_zsys/v1/client-contract.json";
+export const CLIENT_CONTRACT_PATH = "/_relkit/v1/client-contract.json";
 
 export interface ClientContractEndpointOptions {
   readonly enabled?: boolean;

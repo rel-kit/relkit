@@ -1,4 +1,4 @@
-import { deepFreeze, normalizeId } from "@zsys/contracts";
+import { deepFreeze, normalizeId } from "@relkit/contracts";
 import type { EventDeliveryLedgerRecord } from "./delivery-types.js";
 import {
   EVENT_ADMIN_PROTOCOL,
@@ -124,7 +124,7 @@ export function afterCursor(value: EventDeliveryContract, cursor: string | undef
   const [raw, id] = cursor.split(":", 2);
   const sequence = Number(raw);
   if (!Number.isSafeInteger(sequence) || id === undefined)
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_CURSOR_INVALID", "Event query cursor is invalid");
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_CURSOR_INVALID", "Event query cursor is invalid");
   return value.cursor > sequence || (value.cursor === sequence && value.deliveryId > id);
 }
 
@@ -135,7 +135,7 @@ export function nextCursor(value: EventDeliveryContract): string {
 export function pageLimit(value: number | undefined): number {
   if (value === undefined) return 50;
   if (!Number.isSafeInteger(value) || value < 1)
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_QUERY_INVALID", "Event query limit is invalid");
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event query limit is invalid");
   return Math.min(value, 100);
 }
 
@@ -146,28 +146,31 @@ export function validateQuery(request: EventQueryRequest): void {
     request.eventVersion !== undefined &&
     (!Number.isSafeInteger(request.eventVersion) || request.eventVersion < 1)
   )
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_QUERY_INVALID", "Event version is invalid");
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event version is invalid");
   const states = request.states ?? (request.state === undefined ? [] : [request.state]);
   if (states.some((state) => !isState(state)))
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_QUERY_INVALID", "Event query state is invalid");
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_QUERY_INVALID", "Event query state is invalid");
 }
 
 export function assertVersion(value: unknown): void {
   if (!isRecord(value))
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_REQUEST_INVALID", "Event admin request is invalid");
+    throw new EventAdminError(
+      "RELKIT_EVENT_ADMIN_REQUEST_INVALID",
+      "Event admin request is invalid",
+    );
   if (
     (value.protocol !== undefined && value.protocol !== EVENT_ADMIN_PROTOCOL) ||
     (value.version !== undefined && value.version !== EVENT_ADMIN_VERSION)
   )
     throw new EventAdminError(
-      "ZSYS_EVENT_ADMIN_PROTOCOL_MISMATCH",
+      "RELKIT_EVENT_ADMIN_PROTOCOL_MISMATCH",
       "Unsupported event admin protocol",
     );
 }
 
 export function assertMode(value: string): asserts value is EventAdminMode {
   if (value !== "development" && value !== "test" && value !== "production")
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_MODE_INVALID", "Event admin mode is invalid");
+    throw new EventAdminError("RELKIT_EVENT_ADMIN_MODE_INVALID", "Event admin mode is invalid");
 }
 
 export function safeId(value: unknown): string | undefined {
@@ -181,7 +184,10 @@ export function safeId(value: unknown): string | undefined {
 export function readReason(value: unknown): string | undefined {
   if (!isRecord(value) || value.reason === undefined) return undefined;
   if (typeof value.reason !== "string" || value.reason.trim() === "")
-    throw new EventAdminError("ZSYS_EVENT_ADMIN_REQUEST_INVALID", "Event action reason is invalid");
+    throw new EventAdminError(
+      "RELKIT_EVENT_ADMIN_REQUEST_INVALID",
+      "Event action reason is invalid",
+    );
   return value.reason.trim().slice(0, 256);
 }
 

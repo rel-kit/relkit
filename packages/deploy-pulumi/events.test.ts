@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { expect, test } from "bun:test";
-import { createLoggerLayer, type LogRecord } from "@zsys/runtime-effect";
+import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
 import {
   createOutputReport,
   createPreviewReport,

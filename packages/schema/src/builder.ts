@@ -71,11 +71,11 @@ export interface ZBuilder {
 }
 
 /**
- * Builds ZSYS Standard Schema validators with familiar composition helpers.
+ * Builds RELKIT Standard Schema validators with familiar composition helpers.
  *
  * @example
  * ```ts
- * import { z } from "@zsys/schema"
+ * import { z } from "@relkit/schema"
  *
  * const order = z.object({ id: z.string(), quantity: z.number().int().positive() })
  * order.parse({ id: "order-1", quantity: 2 })
@@ -117,7 +117,7 @@ function literalSchema<T extends string | number | boolean | null | undefined>(
         : issue(`Expected ${String(expected)}`, path),
     {
       jsonSchema: () =>
-        expected === undefined ? { "x-zsys-void": true } : { const: expected as JsonValue },
+        expected === undefined ? { "x-relkit-void": true } : { const: expected as JsonValue },
     },
   );
 }
@@ -125,6 +125,6 @@ function literalSchema<T extends string | number | boolean | null | undefined>(
 function undefinedSchema(): Schema<undefined, undefined> {
   return createSchema(
     (value, path) => (value === undefined ? { value } : issue("Expected undefined", path)),
-    { jsonSchema: () => ({ "x-zsys-void": true }) },
+    { jsonSchema: () => ({ "x-relkit-void": true }) },
   );
 }

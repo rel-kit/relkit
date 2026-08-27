@@ -1,0 +1,3 @@
+command=bun run scripts/pack-and-smoke-create-relkit.ts
+exitCode=0
+durationSeconds=30.411

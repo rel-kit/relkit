@@ -2,10 +2,10 @@ import {
   generateClient,
   generateClientContractDocument,
   generateContract,
-} from "@zsys/client-generator";
-import { canonicalJson } from "@zsys/contracts";
-import { generateOpenApiJson } from "@zsys/openapi";
-import { canonicalGraphJson, type ApplicationGraph } from "@zsys/graph";
+} from "@relkit/client-generator";
+import { canonicalJson } from "@relkit/contracts";
+import { generateOpenApiJson } from "@relkit/openapi";
+import { canonicalGraphJson, type ApplicationGraph } from "@relkit/graph";
 import { generateManifest, type GeneratedManifest } from "./generate-manifest.js";
 import { isRecord } from "./normalize-utils.js";
 import type { GeneratedOutputs, NormalizedGraph, NormalizationWork } from "./normalize-types.js";
@@ -44,7 +44,7 @@ export function makeOutputs(
   });
 }
 
-function isDiagnostic(value: unknown): value is import("@zsys/diagnostics").Diagnostic {
+function isDiagnostic(value: unknown): value is import("@relkit/diagnostics").Diagnostic {
   return isRecord(value) && typeof value.code === "string" && typeof value.severity === "string";
 }
 

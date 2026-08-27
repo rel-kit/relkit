@@ -1,4 +1,4 @@
-import { admitObservabilityRecord, type ObservabilityRecord } from "@zsys/observability";
+import { admitObservabilityRecord, type ObservabilityRecord } from "@relkit/observability";
 import { recordsForTelemetry } from "./observability-records.js";
 import type { SupervisorCandidateToken, SupervisorTelemetry } from "./state-machine-types.js";
 import type {

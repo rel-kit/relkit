@@ -1,5 +1,5 @@
-import { isDescriptor, isRef, isStableId, deepFreeze } from "@zsys/contracts";
-import type { FunctionRefAny } from "@zsys/functions";
+import { isDescriptor, isRef, isStableId, deepFreeze } from "@relkit/contracts";
+import type { FunctionRefAny } from "@relkit/functions";
 import type {
   ServiceDescriptorAny,
   ServiceMiddlewareDescriptor,

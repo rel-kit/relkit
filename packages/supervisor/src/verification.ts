@@ -1,4 +1,4 @@
-import { API_VERSION } from "@zsys/contracts";
+import { API_VERSION } from "@relkit/contracts";
 import {
   pollHealth,
   readinessState,
@@ -47,7 +47,7 @@ export async function verifyCandidate(
     identitySeen ||= verifyIdentity(ready.payload, options.candidate.token);
     if (!identitySeen)
       throw new CandidateVerificationError(
-        "ZSYS_CANDIDATE_RESPONSE_INVALID",
+        "RELKIT_CANDIDATE_RESPONSE_INVALID",
         "Candidate health responses did not identify their generation.",
       );
     return Object.freeze({

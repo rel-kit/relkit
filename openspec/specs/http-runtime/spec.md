@@ -35,7 +35,7 @@ Routes SHALL be ordered by exact static path, dynamic path, required catch-all p
 #### Scenario: Normalized collision exists
 
 - **WHEN** two routes produce the same HTTP method and normalized runtime path
-- **THEN** compilation emits `ZSYS_ROUTE_COLLISION` and no server generation becomes activatable
+- **THEN** compilation emits `RELKIT_ROUTE_COLLISION` and no server generation becomes activatable
 
 ### Requirement: Serializable request mapping execution
 
@@ -106,7 +106,7 @@ HTTP handling SHALL create or propagate request and trace IDs, record route matc
 
 ### Requirement: Versioned internal endpoints
 
-The backend SHALL expose versioned liveness, readiness, graph, request, log, trace, stream, and diagnostics endpoints under `/_zsys/v1`, and SHALL disable or protect them in production according to deployment configuration.
+The backend SHALL expose versioned liveness, readiness, graph, request, log, trace, stream, and diagnostics endpoints under `/_relkit/v1`, and SHALL disable or protect them in production according to deployment configuration.
 
 #### Scenario: Readiness is queried during startup
 

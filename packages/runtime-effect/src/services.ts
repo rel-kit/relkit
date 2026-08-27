@@ -5,14 +5,14 @@ import {
   Tracer as EffectTracer,
 } from "effect";
 import type { Effect } from "effect";
-import type { ApplicationGraph } from "@zsys/graph";
+import type { ApplicationGraph } from "@relkit/graph";
 import {
   GENERATOR_VERSION,
   MANIFEST_VERSION,
   type JsonValue,
   type MaybePromise,
   type ProtocolId,
-} from "@zsys/contracts";
+} from "@relkit/contracts";
 
 /** Canonical graph and hash used by one runtime generation. */
 export interface GraphService {
@@ -20,7 +20,7 @@ export interface GraphService {
   readonly graphHash: string;
 }
 
-export class Graph extends Context.Service<Graph, GraphService>()("zsys/runtime/Graph") {}
+export class Graph extends Context.Service<Graph, GraphService>()("relkit/runtime/Graph") {}
 
 /** Executable references produced by the compiler for one graph hash. */
 export type RuntimeHandler = (...arguments_: readonly unknown[]) => MaybePromise<unknown>;
@@ -40,7 +40,7 @@ export interface ManifestService {
 }
 
 export class Manifest extends Context.Service<Manifest, ManifestService>()(
-  "zsys/runtime/Manifest",
+  "relkit/runtime/Manifest",
 ) {}
 
 export type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
@@ -56,7 +56,7 @@ export interface ProvidersService {
 }
 
 export class Providers extends Context.Service<Providers, ProvidersService>()(
-  "zsys/runtime/Providers",
+  "relkit/runtime/Providers",
 ) {}
 
 export type ObservabilitySignal =
@@ -85,7 +85,7 @@ export interface ObservabilityContract {
 }
 
 export class Observability extends Context.Service<Observability, ObservabilityContract>()(
-  "zsys/runtime/Observability",
+  "relkit/runtime/Observability",
 ) {}
 
 export type RuntimeIdKind =
@@ -96,7 +96,7 @@ export interface IdSourceService {
 }
 
 export class IdSource extends Context.Service<IdSource, IdSourceService>()(
-  "zsys/runtime/IdSource",
+  "relkit/runtime/IdSource",
 ) {}
 
 /** Reuse Effect's testable clock and tracing/logger context references. */
@@ -111,5 +111,5 @@ export interface ShutdownService {
 }
 
 export class Shutdown extends Context.Service<Shutdown, ShutdownService>()(
-  "zsys/runtime/Shutdown",
+  "relkit/runtime/Shutdown",
 ) {}

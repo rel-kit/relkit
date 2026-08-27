@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     internalEndpoints: { mode: "test", stream: streamEvents },
   });
   const requestStream = await measure(100, async () => {
-    const response = await streamApp.request("http://localhost/_zsys/v1/stream?limit=4");
+    const response = await streamApp.request("http://localhost/_relkit/v1/stream?limit=4");
     if (response.status !== 200 || !(await response.text()).includes("data:"))
       throw new Error("Stream fixture failed");
   });

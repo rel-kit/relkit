@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 
@@ -12,21 +12,21 @@ describe("inspector event runtime protocol", () => {
         graphHash: "sha256:one",
         runtime: {
           events: {
-            protocol: "zsys.events.admin",
+            protocol: "relkit.events.admin",
             version: 1,
             query: async (request: Record<string, unknown>) => {
               expect(request).toMatchObject({
-                protocol: "zsys.events.admin",
+                protocol: "relkit.events.admin",
                 version: 1,
                 eventId: "orders.created",
                 eventVersion: 2,
               });
               return {
-                protocol: "zsys.events.admin",
+                protocol: "relkit.events.admin",
                 version: 1,
                 events: [
                   {
-                    protocol: "zsys.events.admin",
+                    protocol: "relkit.events.admin",
                     protocolVersion: 1,
                     id: "orders.created",
                     version: 2,
@@ -36,7 +36,7 @@ describe("inspector event runtime protocol", () => {
                 ],
                 triggers: [
                   {
-                    protocol: "zsys.events.admin",
+                    protocol: "relkit.events.admin",
                     version: 1,
                     id: "orders.email",
                     targetFunctionId: "orders.send-email",
@@ -48,7 +48,7 @@ describe("inspector event runtime protocol", () => {
                 ],
                 capabilities: [
                   {
-                    protocol: "zsys.events.admin",
+                    protocol: "relkit.events.admin",
                     version: 1,
                     triggerId: "orders.email",
                     delivery: "durable",
@@ -69,7 +69,7 @@ describe("inspector event runtime protocol", () => {
                 ],
                 deliveries: [
                   {
-                    protocol: "zsys.events.admin",
+                    protocol: "relkit.events.admin",
                     version: 1,
                     deliveryId: "delivery-1",
                     eventInstanceId: "event-1",
@@ -95,8 +95,8 @@ describe("inspector event runtime protocol", () => {
     const body = await response.json();
     expect(response.status).toBe(200);
     expect(body).toMatchObject({
-      protocol: "zsys.inspector",
-      eventProtocol: "zsys.events.admin",
+      protocol: "relkit.inspector",
+      eventProtocol: "relkit.events.admin",
       events: [{ id: "orders.created", version: 2, payload: { type: "object" } }],
       triggers: [{ id: "orders.email", expansion: ["orders.created@2"] }],
       capabilities: [{ exactlyOnce: false, ordering: "unsupported" }],

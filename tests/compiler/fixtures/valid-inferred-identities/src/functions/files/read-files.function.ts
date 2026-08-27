@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { filesInput, filesOutput } from "../../shared/schemas.js";
 
 const readFiles = defineFunction({

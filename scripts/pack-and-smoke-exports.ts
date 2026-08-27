@@ -2,7 +2,6 @@ import { access, cp, mkdtemp, readFile, readdir, rm, mkdir } from "node:fs/promi
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-
 const rootExport = {
   types: "./dist/index.d.ts",
   import: "./dist/index.js",
@@ -43,16 +42,13 @@ async function readManifest(packageDirectory: string): Promise<PackageManifest> 
   const manifestPath = join(packageDirectory, "package.json");
   return JSON.parse(await readFile(manifestPath, "utf8")) as PackageManifest;
 }
-
 function assertPackageManifest(packageDirectory: string, manifest: PackageManifest): void {
   const packageDirectoryName = basename(packageDirectory);
   const expectedName =
-    packageDirectoryName === "create-zsys" ? "create-zsys" : `@zsys/${packageDirectoryName}`;
-
+    packageDirectoryName === "create-relkit" ? "create-relkit" : `@relkit/${packageDirectoryName}`;
   if (manifest.name !== expectedName) {
     throw new Error(`Unexpected package name in ${packageDirectory}: ${manifest.name}`);
   }
-
   const actualRoot = manifest.exports?.["."];
   const expectedExports =
     packageDirectoryName === "cloud-aws"
@@ -87,25 +83,31 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
                   import: "./dist/internal/config.js",
                 },
               }
-            : { ".": rootExport };
+            : packageDirectoryName === "client"
+              ? {
+                  ".": rootExport,
+                  "./tanstack-query": {
+                    types: "./dist/tanstack-query.d.ts",
+                    import: "./dist/tanstack-query.js",
+                  },
+                }
+              : { ".": rootExport };
   if (
     JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports) ||
     JSON.stringify(actualRoot) !== JSON.stringify(rootExport)
   ) {
     throw new Error(`Unsupported export map in ${packageDirectory}`);
   }
-
   const expectedBin =
     packageDirectoryName === "cli"
-      ? { zsys: "./dist/index.js" }
-      : packageDirectoryName === "create-zsys"
-        ? { "create-zsys": "./dist/index.js" }
+      ? { relkit: "./dist/index.js" }
+      : packageDirectoryName === "create-relkit"
+        ? { "create-relkit": "./dist/index.js" }
         : undefined;
   if (expectedBin && JSON.stringify(manifest.bin) !== JSON.stringify(expectedBin)) {
     throw new Error(`Unexpected bin entry in ${packageDirectory}`);
   }
 }
-
 async function packPackage(packageDirectory: string, artifactRoot: string): Promise<string> {
   const artifactDirectory = join(artifactRoot, basename(packageDirectory));
   await mkdir(artifactDirectory);
@@ -121,7 +123,6 @@ async function packPackage(packageDirectory: string, artifactRoot: string): Prom
   }
   return join(artifactDirectory, artifacts[0]);
 }
-
 async function main(): Promise<void> {
   const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const packageRoot = join(repositoryRoot, "packages");
@@ -130,21 +131,18 @@ async function main(): Promise<void> {
     .map((entry) => join(packageRoot, entry.name))
     .sort();
   const manifests = new Map<string, PackageManifest>();
-
   for (const packageDirectory of packageDirectories) {
     const manifest = await readManifest(packageDirectory);
     assertPackageManifest(packageDirectory, manifest);
     if (manifest.name) manifests.set(manifest.name, manifest);
   }
-
-  const requiredNames = new Set(["@zsys/app", "@zsys/compiler"]);
+  const requiredNames = new Set(["@relkit/app", "@relkit/compiler"]);
   for (const packageName of requiredNames) {
     for (const dependency of Object.keys(manifests.get(packageName)?.dependencies ?? {})) {
       if (manifests.has(dependency)) requiredNames.add(dependency);
     }
   }
-
-  const temporaryRoot = await mkdtemp(join(tmpdir(), "zsys-export-smoke-"));
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "relkit-export-smoke-"));
   try {
     const fixtureRoot = join(temporaryRoot, "fixture");
     const artifactRoot = join(temporaryRoot, "artifacts");

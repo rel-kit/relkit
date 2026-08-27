@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { defineAgent, isAgentDescriptor } from "./src/index.ts";
 import { parseModelProviderConfiguration, resolveModelSelector } from "./src/model-selection.ts";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 const configuration = parseModelProviderConfiguration({
   defaultProvider: "openai",

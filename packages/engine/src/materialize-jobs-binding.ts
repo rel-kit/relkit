@@ -3,8 +3,8 @@ import {
   classifyFailure,
   safeFailureMetadata,
   type JobQueueEntry,
-} from "@zsys/providers-local";
-import type { JsonValue } from "@zsys/contracts";
+} from "@relkit/providers-local";
+import type { JsonValue } from "@relkit/contracts";
 import type { InvocationAdmit } from "./invoke-types.js";
 import type {
   JobEnqueueOptions,

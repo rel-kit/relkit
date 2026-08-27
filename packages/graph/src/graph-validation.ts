@@ -1,4 +1,4 @@
-import { isStableId, normalizeSourceLocation } from "@zsys/contracts";
+import { isStableId, normalizeSourceLocation } from "@relkit/contracts";
 import { isGraphEdgeKind, isGraphNodeKind } from "./model.js";
 import { validateProviderNode } from "./provider-validation.js";
 

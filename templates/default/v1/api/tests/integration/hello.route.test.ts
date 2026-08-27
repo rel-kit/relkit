@@ -1,6 +1,6 @@
 import { afterAll, expect, test } from "bun:test";
-import { createTestApplication } from "@zsys/testing";
-import config from "../../zsys.config.js";
+import { createTestApplication } from "@relkit/testing";
+import config from "../../relkit.config.js";
 
 const testApp = await createTestApplication(config);
 

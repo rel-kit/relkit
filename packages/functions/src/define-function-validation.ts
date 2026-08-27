@@ -1,5 +1,5 @@
-import { isRef, type DescriptorKind } from "@zsys/contracts";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import { isRef, type DescriptorKind } from "@relkit/contracts";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type { FunctionDependencies, FunctionRefAny } from "./types.js";
 
 export function copyDependencies<D extends FunctionDependencies>(

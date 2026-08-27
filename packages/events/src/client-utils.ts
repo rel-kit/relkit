@@ -1,5 +1,9 @@
-import { validate, type StandardIssue, type StandardSchemaV1 } from "@zsys/schema";
-import type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@zsys/functions";
+import { validate, type StandardIssue, type StandardSchemaV1 } from "@relkit/schema";
+import type {
+  EventAttributeValue,
+  EventPublishOptions,
+  EventPublishResult,
+} from "@relkit/functions";
 import type {
   EventClientOptions,
   EventOperationContext,
@@ -8,7 +12,7 @@ import type {
 } from "./client.js";
 
 export class EventPayloadValidationError extends TypeError {
-  readonly code = "ZSYS_EVENT_PAYLOAD_VALIDATION" as const;
+  readonly code = "RELKIT_EVENT_PAYLOAD_VALIDATION" as const;
   constructor(readonly issues: readonly StandardIssue[]) {
     super("Event payload validation failed");
     this.name = "EventPayloadValidationError";
@@ -16,7 +20,7 @@ export class EventPayloadValidationError extends TypeError {
 }
 
 export class EventDependencyError extends Error {
-  readonly code = "ZSYS_EVENT_DEPENDENCY_UNDECLARED" as const;
+  readonly code = "RELKIT_EVENT_DEPENDENCY_UNDECLARED" as const;
   constructor(readonly eventId: string) {
     super(`Event dependency "${eventId}" is not declared on this function`);
     this.name = "EventDependencyError";
@@ -24,7 +28,7 @@ export class EventDependencyError extends Error {
 }
 
 export class EventProfileError extends Error {
-  readonly code = "ZSYS_EVENT_PROFILE_UNKNOWN" as const;
+  readonly code = "RELKIT_EVENT_PROFILE_UNKNOWN" as const;
   constructor(readonly profile: string) {
     super(`Event profile "${profile}" is not configured`);
     this.name = "EventProfileError";
@@ -32,7 +36,7 @@ export class EventProfileError extends Error {
 }
 
 export class EventProviderError extends Error {
-  readonly code = "ZSYS_EVENT_PROVIDER_UNAVAILABLE" as const;
+  readonly code = "RELKIT_EVENT_PROVIDER_UNAVAILABLE" as const;
   constructor() {
     super("Event provider does not implement publish");
     this.name = "EventProviderError";

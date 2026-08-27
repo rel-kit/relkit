@@ -17,7 +17,7 @@ for (const file of files) {
 if (missingMetadata.length)
   throw new Error(`Pages missing searchable title/description:\n${missingMetadata.join("\n")}`);
 const index = indexedText.join("\n");
-for (const term of ["defineRoute", "onEvent", "zsys graph diff", "defineAgent", "Scalar"]) {
+for (const term of ["defineRoute", "onEvent", "relkit graph diff", "defineAgent", "Scalar"]) {
   if (!index.includes(term)) throw new Error(`Search corpus is missing required term: ${term}`);
 }
 const route = await readFile(resolve(import.meta.dir, "../app/api/search/route.ts"), "utf8");

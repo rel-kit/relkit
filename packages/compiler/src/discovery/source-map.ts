@@ -1,4 +1,4 @@
-import { createSourceLocation, normalizeSourcePath, type SourceLocation } from "@zsys/contracts";
+import { createSourceLocation, normalizeSourcePath, type SourceLocation } from "@relkit/contracts";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import * as ts from "typescript";

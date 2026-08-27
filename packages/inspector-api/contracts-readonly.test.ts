@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
-import { createObservabilityStream } from "@zsys/observability";
+import { API_BASE_PATH } from "@relkit/contracts";
+import { createObservabilityStream } from "@relkit/observability";
 import { GRAPH_COLLECTIONS, RUNTIME_COLLECTIONS } from "./src/index.ts";
 import {
   expectResponse,
@@ -46,7 +46,7 @@ describe("inspector read-only contract matrix", () => {
       API_BASE_PATH + "/graph/descriptors/orders.create",
     ]) {
       const body = await json(app, path);
-      expect(body.protocol).toBe("zsys.inspector");
+      expect(body.protocol).toBe("relkit.inspector");
       expect(body.version).toBe(1);
     }
     for (const collection of GRAPH_COLLECTIONS) {
@@ -81,14 +81,14 @@ describe("inspector read-only contract matrix", () => {
       "&severity=error&routeId=orders.create.http&functionId=orders.create" +
       "&outcome=success&requestId=request-1&traceId=trace-1&generationId=generation-one" +
       "&graphHash=sha256%3Aone&serviceId=orders&cursor=7&limit=1000" +
-      "&protocol=zsys.observability.query&version=1";
+      "&protocol=relkit.observability.query&version=1";
     for (const path of [
       API_BASE_PATH + "/requests?" + filter,
       API_BASE_PATH + "/logs?" + filter,
       API_BASE_PATH + "/traces?" + filter,
     ]) {
       const body = await json(app, path);
-      expect(body.protocol).toBe("zsys.observability.query");
+      expect(body.protocol).toBe("relkit.observability.query");
       expect(body.version).toBe(1);
     }
     expect(seen.at(-1)).toMatchObject({
@@ -105,7 +105,7 @@ describe("inspector read-only contract matrix", () => {
       serviceId: "orders",
       cursor: "7",
       limit: 100,
-      protocol: "zsys.observability.query",
+      protocol: "relkit.observability.query",
       version: 1,
     });
     expect((await json(app, API_BASE_PATH + "/requests/request-1")).request).toEqual({

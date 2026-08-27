@@ -1,13 +1,13 @@
-# ZSYS-ADR-001: Function-only authored execution
+# RELKIT-ADR-001: Function-only authored execution
 
 - Status: Accepted — reviewed Phase 0 baseline
 - Date: 2026-08-12
-- Owner: ZSys maintainers
+- Owner: RelKit maintainers
 - Supersession: None; a future change must explicitly supersede this ADR.
 
 ## Context
 
-ZSys needs one executable abstraction that can be invoked directly, over HTTP,
+RelKit needs one executable abstraction that can be invoked directly, over HTTP,
 by jobs, by events, and by tools. Giving each trigger its own handler model
 would duplicate validation, lifecycle, error, and telemetry behavior.
 
@@ -42,7 +42,7 @@ the common engine.
 
 ## References
 
-- `docs/zsys-typescript-poc-technical-spec-v3.md` §§3.1, 7.5–7.16, 12, 13.
-- `docs/zsys-typescript-poc-review-gates-v3.md` Gates 0, 2, 3, 5, and 16.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/public-authoring/spec.md` — Plain TypeScript public boundary and Function-only authored execution.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/function-runtime/spec.md` — One common function engine.
+- `docs/relkit-typescript-poc-technical-spec-v3.md` §§3.1, 7.5–7.16, 12, 13.
+- `docs/relkit-typescript-poc-review-gates-v3.md` Gates 0, 2, 3, 5, and 16.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/public-authoring/spec.md` — Plain TypeScript public boundary and Function-only authored execution.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/function-runtime/spec.md` — One common function engine.

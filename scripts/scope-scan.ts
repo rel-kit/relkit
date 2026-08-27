@@ -8,7 +8,7 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-zsys deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
+  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );
@@ -19,8 +19,8 @@ const forbiddenNames =
   "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";
 const proseAllowlist = [
   /^AGENTS\.md$/,
-  /^docs\/(?:README\.md|briefs\/|records\/|zsys-typescript-poc-(?:technical-spec|review-gates)-v3\.md)/,
-  /^openspec\/changes\/implement-zsys-typescript-poc-v3\//,
+  /^docs\/(?:README\.md|briefs\/|records\/|relkit-typescript-poc-(?:technical-spec|review-gates)-v3\.md)/,
+  /^openspec\/changes\/implement-relkit-typescript-poc-v3\//,
 ];
 const implementationFiles = new Set(["apps/docs/tsconfig.json", "scripts/scope-scan.ts"]);
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
@@ -58,13 +58,13 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
   };
 
   if (parts[0] === "packages" && parts[1] && !approvedPackages.has(parts[1])) {
-    add("out-of-scope-package", `packages/${parts[1]} is not an approved ZSys package`);
+    add("out-of-scope-package", `packages/${parts[1]} is not an approved RelKit package`);
   }
   if (parts[0] === "apps" && parts[1] && !approvedApps.has(parts[1])) {
-    add("out-of-scope-package", `apps/${parts[1]} is not an approved ZSys app`);
+    add("out-of-scope-package", `apps/${parts[1]} is not an approved RelKit app`);
   }
   if (parts[0] === "examples" && parts[1] && !approvedExamples.has(parts[1])) {
-    add("out-of-scope-package", `examples/${parts[1]} is not an approved ZSYS example`);
+    add("out-of-scope-package", `examples/${parts[1]} is not an approved RELKIT example`);
   }
   if (parts[0] === "templates" && parts[1] && !approvedTemplates.has(parts[1])) {
     add("out-of-scope-template-name", `templates/${parts[1]} is not the approved template root`);
@@ -120,7 +120,7 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
     ],
     [
       "out-of-scope-package",
-      new RegExp(`@zsys/(?:${forbiddenNames})(?=[/"'\`]|$)`, "gi"),
+      new RegExp(`@relkit/(?:${forbiddenNames})(?=[/"'\`]|$)`, "gi"),
       "out-of-scope package name",
     ],
     [
@@ -179,7 +179,7 @@ function filesToScan(root: string): string[] {
     if (!existsSync(absolute)) continue;
     paths.push(
       ...[...new Bun.Glob("**/*").scanSync({ cwd: absolute, onlyFiles: true })]
-        .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path))
+        .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
         .map((path) => `${directory}/${path}`),
     );
   }

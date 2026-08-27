@@ -35,13 +35,13 @@ export function resolveRuntimeModel(options: {
 function boundedLimit(value: number | undefined, providerLimit: number): number {
   const limit = value ?? providerLimit;
   if (!Number.isSafeInteger(limit) || limit <= 0 || limit > providerLimit) {
-    throw new AgentRuntimeError("ZSYS_AGENT_LIMIT_INVALID", "Agent content limit is invalid");
+    throw new AgentRuntimeError("RELKIT_AGENT_LIMIT_INVALID", "Agent content limit is invalid");
   }
   return limit;
 }
 
 function unavailable(): never {
-  throw new AgentRuntimeError("ZSYS_AGENT_MODEL_UNAVAILABLE", "Agent model is unavailable");
+  throw new AgentRuntimeError("RELKIT_AGENT_MODEL_UNAVAILABLE", "Agent model is unavailable");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

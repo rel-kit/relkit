@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import {
   BucketCapabilityError,
   BucketDependencyError,
@@ -76,10 +76,10 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
     };
     const promise = options.bridge
       ? options.bridge.run(execute, {
-          name: `zsys.bucket.${options.bucketId}.${operation}`,
+          name: `relkit.bucket.${options.bucketId}.${operation}`,
           attributes: {
-            "zsys.bucket.id": options.bucketId,
-            "zsys.bucket.operation": operation,
+            "relkit.bucket.id": options.bucketId,
+            "relkit.bucket.operation": operation,
           },
           signal,
         })

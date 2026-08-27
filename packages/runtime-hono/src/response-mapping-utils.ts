@@ -1,5 +1,5 @@
-import type { HttpTriggerRegistration } from "@zsys/graph";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+import type { HttpTriggerRegistration } from "@relkit/graph";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import type { RequestMappingIssue } from "./request-mapping.js";
 
 export type ResponseSchemaEntries =

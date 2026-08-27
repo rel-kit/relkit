@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { setEventListenerSchemas } from "./normalize-event-listener.js";
 import { add } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";

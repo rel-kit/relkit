@@ -1,6 +1,6 @@
-import type { BucketClient } from "@zsys/buckets";
-import type { CacheClient } from "@zsys/cache";
-import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+import type { BucketClient } from "@relkit/buckets";
+import type { CacheClient } from "@relkit/cache";
+import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 
 export type JobState =
   "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
@@ -61,8 +61,8 @@ export interface EventPublishResult<
   readonly accepted: true;
 }
 
-export type { BucketClient, BucketObjectMetadata, BucketPutOptions } from "@zsys/buckets";
-export type { CacheClient, CacheOperationOptions } from "@zsys/cache";
+export type { BucketClient, BucketObjectMetadata, BucketPutOptions } from "@relkit/buckets";
+export type { CacheClient, CacheOperationOptions } from "@relkit/cache";
 
 type InputOf<T> = T extends { readonly input: infer S }
   ? S extends StandardSchemaV1

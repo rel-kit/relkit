@@ -7,7 +7,7 @@ exports[`renders focused help for every command and nested subcommand 1`] = `
   Build a deployable application
 
 USAGE
-  zsys build [flags]
+  relkit build [flags]
 
 FLAGS
   --json                   Emit machine-readable output
@@ -20,14 +20,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Build a deployable application
-  zsys build"
+  relkit build"
 ,
   "check": 
 "DESCRIPTION
   Compile and validate the application
 
 USAGE
-  zsys check [flags]
+  relkit check [flags]
 
 FLAGS
   --json                   Emit machine-readable output
@@ -40,14 +40,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Compile and validate the application
-  zsys check"
+  relkit check"
 ,
   "create": 
 "DESCRIPTION
-  Create a new ZSYS application
+  Create a new RELKIT application
 
 USAGE
-  zsys create [flags] <name>
+  relkit create [flags] <name>
 
 ARGUMENTS
   name string    npm package and application name
@@ -72,15 +72,15 @@ GLOBAL FLAGS
   --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
 
 EXAMPLES
-  # Create a new ZSYS application
-  zsys create"
+  # Create a new RELKIT application
+  relkit create"
 ,
   "deploy": 
 "DESCRIPTION
   Manage Pulumi deployments
 
 USAGE
-  zsys deploy <subcommand> [flags]
+  relkit deploy <subcommand> [flags]
 
 FLAGS
   --json    Emit machine-readable output
@@ -99,14 +99,14 @@ SUBCOMMANDS
   destroy    Destroy the Pulumi stack
 EXAMPLES
   # Manage Pulumi deployments
-  zsys deploy"
+  relkit deploy"
 ,
   "deploy destroy": 
 "DESCRIPTION
   Destroy the Pulumi stack
 
 USAGE
-  zsys deploy destroy [flags]
+  relkit deploy destroy [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -124,14 +124,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Destroy the Pulumi stack
-  zsys deploy destroy"
+  relkit deploy destroy"
 ,
   "deploy init": 
 "DESCRIPTION
   Init the Pulumi stack
 
 USAGE
-  zsys deploy init [flags]
+  relkit deploy init [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -149,14 +149,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Init the Pulumi stack
-  zsys deploy init"
+  relkit deploy init"
 ,
   "deploy outputs": 
 "DESCRIPTION
   Outputs the Pulumi stack
 
 USAGE
-  zsys deploy outputs [flags]
+  relkit deploy outputs [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -174,14 +174,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Outputs the Pulumi stack
-  zsys deploy outputs"
+  relkit deploy outputs"
 ,
   "deploy preview": 
 "DESCRIPTION
   Preview the Pulumi stack
 
 USAGE
-  zsys deploy preview [flags]
+  relkit deploy preview [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -199,14 +199,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Preview the Pulumi stack
-  zsys deploy preview"
+  relkit deploy preview"
 ,
   "deploy refresh": 
 "DESCRIPTION
   Refresh the Pulumi stack
 
 USAGE
-  zsys deploy refresh [flags]
+  relkit deploy refresh [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -224,14 +224,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Refresh the Pulumi stack
-  zsys deploy refresh"
+  relkit deploy refresh"
 ,
   "deploy up": 
 "DESCRIPTION
   Up the Pulumi stack
 
 USAGE
-  zsys deploy up [flags]
+  relkit deploy up [flags]
 
 FLAGS
   --json                       Emit machine-readable output
@@ -249,14 +249,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Up the Pulumi stack
-  zsys deploy up"
+  relkit deploy up"
 ,
   "dev": 
 "DESCRIPTION
   Run app, inspector, OpenAPI, and Scalar
 
 USAGE
-  zsys dev [flags]
+  relkit dev [flags]
 
 FLAGS
   --json                      Emit machine-readable output
@@ -271,14 +271,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Run app, inspector, OpenAPI, and Scalar
-  zsys dev"
+  relkit dev"
 ,
   "doctor": 
 "DESCRIPTION
   Check local prerequisites and ports
 
 USAGE
-  zsys doctor [flags]
+  relkit doctor [flags]
 
 FLAGS
   --json                      Emit machine-readable output
@@ -295,14 +295,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Check local prerequisites and ports
-  zsys doctor"
+  relkit doctor"
 ,
   "env": 
 "DESCRIPTION
   Inspect value-free environment contracts
 
 USAGE
-  zsys env <subcommand> [flags]
+  relkit env <subcommand> [flags]
 
 FLAGS
   --json    Emit machine-readable output
@@ -319,14 +319,14 @@ SUBCOMMANDS
   example    Render or write a safe .env example
 EXAMPLES
   # Inspect value-free environment contracts
-  zsys env"
+  relkit env"
 ,
   "env check": 
 "DESCRIPTION
   Validate environment values
 
 USAGE
-  zsys env check [flags]
+  relkit env check [flags]
 
 FLAGS
   --json                         Emit machine-readable output
@@ -340,14 +340,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Validate environment values
-  zsys env check"
+  relkit env check"
 ,
   "env example": 
 "DESCRIPTION
   Render or write a safe .env example
 
 USAGE
-  zsys env example [flags]
+  relkit env example [flags]
 
 FLAGS
   --json                         Emit machine-readable output
@@ -363,14 +363,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Render or write a safe .env example
-  zsys env example"
+  relkit env example"
 ,
   "env explain": 
 "DESCRIPTION
   Explain one environment variable
 
 USAGE
-  zsys env explain [flags] <name>
+  relkit env explain [flags] <name>
 
 ARGUMENTS
   name string    Environment variable name
@@ -387,14 +387,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Explain one environment variable
-  zsys env explain"
+  relkit env explain"
 ,
   "env list": 
 "DESCRIPTION
   List environment value status
 
 USAGE
-  zsys env list [flags]
+  relkit env list [flags]
 
 FLAGS
   --json                         Emit machine-readable output
@@ -408,14 +408,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # List environment value status
-  zsys env list"
+  relkit env list"
 ,
   "graph": 
 "DESCRIPTION
   Inspect deterministic application graphs
 
 USAGE
-  zsys graph <subcommand> [flags]
+  relkit graph <subcommand> [flags]
 
 FLAGS
   --json    Emit machine-readable output
@@ -431,14 +431,14 @@ SUBCOMMANDS
   diff     Compare graph compatibility
 EXAMPLES
   # Inspect deterministic application graphs
-  zsys graph"
+  relkit graph"
 ,
   "graph check": 
 "DESCRIPTION
   Validate a graph and optional hash
 
 USAGE
-  zsys graph check [flags] [<graph>]
+  relkit graph check [flags] [<graph>]
 
 ARGUMENTS
   graph string    Graph JSON path (optional)
@@ -455,14 +455,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Validate a graph and optional hash
-  zsys graph check"
+  relkit graph check"
 ,
   "graph diff": 
 "DESCRIPTION
   Compare graph compatibility
 
 USAGE
-  zsys graph diff [flags] <before> <after>
+  relkit graph diff [flags] <before> <after>
 
 ARGUMENTS
   before string    Previous graph path
@@ -479,14 +479,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Compare graph compatibility
-  zsys graph diff"
+  relkit graph diff"
 ,
   "graph print": 
 "DESCRIPTION
   Print a canonical graph
 
 USAGE
-  zsys graph print [flags] [<graph>]
+  relkit graph print [flags] [<graph>]
 
 ARGUMENTS
   graph string    Graph JSON path (optional)
@@ -502,14 +502,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Print a canonical graph
-  zsys graph print"
+  relkit graph print"
 ,
   "start": 
 "DESCRIPTION
   Start a built application
 
 USAGE
-  zsys start [flags]
+  relkit start [flags]
 
 FLAGS
   --json                   Emit machine-readable output
@@ -523,14 +523,14 @@ GLOBAL FLAGS
 
 EXAMPLES
   # Start a built application
-  zsys start"
+  relkit start"
 ,
-  "zsys": 
+  "relkit":
 "DESCRIPTION
   Convention-first TypeScript application framework
 
 USAGE
-  zsys <subcommand> [flags]
+  relkit <subcommand> [flags]
 
 FLAGS
   --json    Emit machine-readable output
@@ -541,7 +541,7 @@ GLOBAL FLAGS
   --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
 
 SUBCOMMANDS
-  create    Create a new ZSYS application
+  create    Create a new RELKIT application
   dev       Run app, inspector, OpenAPI, and Scalar
   check     Compile and validate the application
   build     Build a deployable application
@@ -552,7 +552,7 @@ SUBCOMMANDS
   deploy    Manage Pulumi deployments
 EXAMPLES
   # Convention-first TypeScript application framework
-  zsys"
+  relkit"
 ,
 }
 `;

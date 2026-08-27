@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import { invokeFunction, type InvocationTarget } from "@zsys/engine";
-import { z } from "@zsys/schema";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { invokeFunction, type InvocationTarget } from "@relkit/engine";
+import { z } from "@relkit/schema";
 import { createApp, type RuntimeManifest } from "./src/index.js";
 import type { HttpInvocationOptions } from "./src/materialize-routes.js";
-import type { RegistrationPlan } from "@zsys/graph";
+import type { RegistrationPlan } from "@relkit/graph";
 
 const input = z.object({});
 const output = z.object({ ok: z.literal(true) });

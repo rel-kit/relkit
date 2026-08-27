@@ -1,6 +1,6 @@
-import { deepFreeze, isRef } from "@zsys/contracts";
-import type { CacheRefAny } from "@zsys/functions";
-import { getJsonSchema } from "@zsys/schema";
+import { deepFreeze, isRef } from "@relkit/contracts";
+import type { CacheRefAny } from "@relkit/functions";
+import { getJsonSchema } from "@relkit/schema";
 import type {
   HttpConstantMapping,
   HttpCookieMapping,

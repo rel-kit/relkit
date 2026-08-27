@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION } from "@zsys/contracts";
+import { PROTOCOL_VERSION } from "@relkit/contracts";
 import type {
   LogLevel,
   LogRecord,
@@ -9,7 +9,7 @@ import type {
 } from "./model.js";
 import type { RedactionPolicy } from "./redaction.js";
 
-export const OBSERVABILITY_QUERY_PROTOCOL = "zsys.observability.query" as const;
+export const OBSERVABILITY_QUERY_PROTOCOL = "relkit.observability.query" as const;
 export const OBSERVABILITY_QUERY_VERSION = PROTOCOL_VERSION;
 export const DEFAULT_OBSERVABILITY_QUERY_LIMIT = 50;
 export const MAX_OBSERVABILITY_QUERY_LIMIT = 100;
@@ -81,7 +81,7 @@ export interface ObservabilityQuery {
 export class ObservabilityQueryError extends TypeError {
   constructor(
     readonly code:
-      "ZSYS_OBSERVABILITY_QUERY_INVALID" | "ZSYS_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
+      "RELKIT_OBSERVABILITY_QUERY_INVALID" | "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
     message: string,
   ) {
     super(message);

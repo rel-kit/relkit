@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { fail, secretName } from "./from-graph-validation.js";
 
 export function validateBoundary(value: unknown): void {
@@ -6,7 +6,7 @@ export function validateBoundary(value: unknown): void {
     canonicalJson(value);
   } catch (error) {
     fail(
-      "ZSYS_DEPLOY_GRAPH_INVALID",
+      "RELKIT_DEPLOY_GRAPH_INVALID",
       error instanceof Error ? error.message : "Boundary is not JSON-safe.",
     );
   }
@@ -18,11 +18,11 @@ function scan(value: unknown): void {
   for (const [key, child] of Object.entries(value)) {
     if (/^(pulumi|client|live(client|object)?|resource)$/i.test(key))
       fail(
-        "ZSYS_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
+        "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
         "Live deployment objects cannot cross the graph boundary.",
       );
     if (secretName(key) && (child === null || typeof child !== "object") && child !== true)
-      fail("ZSYS_DEPLOY_SECRET_UNSUPPORTED", "Secret values cannot cross the graph boundary.");
+      fail("RELKIT_DEPLOY_SECRET_UNSUPPORTED", "Secret values cannot cross the graph boundary.");
     scan(child);
   }
 }

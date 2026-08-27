@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { ZsysEventBus } from "./src/index.js";
-import { childResourceName } from "./src/components/ZsysEventBus/names.js";
+import { RelkitEventBus } from "./src/index.js";
+import { childResourceName } from "./src/components/RelkitEventBus/names.js";
 
 interface SeenResource {
   readonly type: string;
@@ -17,9 +17,9 @@ const retry = {
   jitter: "full",
 } as const;
 
-describe("ZsysEventBus", () => {
+describe("RelkitEventBus", () => {
   test("keeps truncated child resource names distinct", () => {
-    const prefix = "zsys-nightly-1787163689822-commerce-api-events";
+    const prefix = "relkit-nightly-1787163689822-commerce-api-events";
     const first = childResourceName(prefix, "orders.audit-changes-orders.created@1", "rule", 64);
     const second = childResourceName(prefix, "orders.audit-changes-orders.updated@1", "rule", 64);
 
@@ -47,13 +47,13 @@ describe("ZsysEventBus", () => {
         },
         call: () => ({ region: "us-east-1", name: "us-east-1" }),
       },
-      "zsys-event-bus-test",
+      "relkit-event-bus-test",
       "development",
     );
 
-    let component: ZsysEventBus | undefined;
+    let component: RelkitEventBus | undefined;
     await pulumi.runtime.runInPulumiStack(() => {
-      component = new ZsysEventBus("orders", {
+      component = new RelkitEventBus("orders", {
         appId: "orders.app",
         graphHash: "sha256:orders",
         events: [
@@ -85,7 +85,7 @@ describe("ZsysEventBus", () => {
 
     expect(resources.map(({ type }) => type)).toEqual(
       expect.arrayContaining([
-        "zsys:cloud-aws:ZsysEventBus",
+        "relkit:cloud-aws:RelkitEventBus",
         "aws:cloudwatch/eventBus:EventBus",
         "aws:cloudwatch/eventRule:EventRule",
         "aws:cloudwatch/eventTarget:EventTarget",
@@ -165,7 +165,7 @@ describe("ZsysEventBus", () => {
   test("rejects unknown versions and retry/redrive mismatches before resources", () => {
     expect(
       () =>
-        new ZsysEventBus("orders", {
+        new RelkitEventBus("orders", {
           events: [{ id: "orders.created", version: 1 }],
           eventTriggers: [
             {
@@ -178,7 +178,7 @@ describe("ZsysEventBus", () => {
     ).toThrow("unknown event");
     expect(
       () =>
-        new ZsysEventBus("orders", {
+        new RelkitEventBus("orders", {
           events: [{ id: "orders.created", version: 1 }],
           eventTriggers: [
             {

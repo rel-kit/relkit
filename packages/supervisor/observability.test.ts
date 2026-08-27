@@ -7,14 +7,14 @@ import {
   createObservabilityQuery,
   createObservabilitySegmentStore,
   createObservabilityStream,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import { createSupervisorObservability } from "./src/observability.js";
 import { createSupervisorStateMachine } from "./src/state-machine.js";
 
 const roots: string[] = [];
 
 test("publishes lifecycle and diagnostics with graph hashes across generations", async () => {
-  const root = await mkdtemp(join("/tmp", "zsys-supervisor-observability-"));
+  const root = await mkdtemp(join("/tmp", "relkit-supervisor-observability-"));
   roots.push(root);
   const index = await createObservabilityIndex({ root, maxEntries: 100 });
   const store = await createObservabilitySegmentStore({ root, index });
@@ -83,11 +83,11 @@ test("turns lifecycle failures into redacted diagnostic SSE records", () => {
   });
   const machine = createSupervisorStateMachine({ onTelemetry: observer.onTelemetry });
   const token = machine.requestSourceChange();
-  machine.compileFailed(token, { code: "ZSYS_COMPILE_FAILED", message: "password=hidden" });
+  machine.compileFailed(token, { code: "RELKIT_COMPILE_FAILED", message: "password=hidden" });
 
   const diagnostic = stream.replay().events.find((event) => event.type === "diagnostic.changed");
   expect(diagnostic?.data).toMatchObject({
-    code: "ZSYS_COMPILE_FAILED",
+    code: "RELKIT_COMPILE_FAILED",
     severity: "error",
     graphHash: "sha256:failure",
     message: "password=[REDACTED]",

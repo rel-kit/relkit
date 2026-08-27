@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import { createObservabilityCollector, type RequestRecord } from "@zsys/observability";
-import type { RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { createObservabilityCollector, type RequestRecord } from "@relkit/observability";
+import type { RegistrationPlan } from "@relkit/graph";
 import { createApp, type RuntimeManifest } from "./src/index.js";
 
 const source = { file: "src/request-record.test.ts", line: 1, column: 1 } as const;

@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_CONVENTION_DIRECTORY",
+    "code": "RELKIT_CONVENTION_DIRECTORY",
     "column": 26,
     "descriptorId": "warning.directory",
     "file": "src/misc/wrong-directory.function.ts",

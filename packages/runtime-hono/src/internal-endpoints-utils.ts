@@ -1,4 +1,4 @@
-import { canonicalJson, isJsonValue, type JsonValue, type MaybePromise } from "@zsys/contracts";
+import { canonicalJson, isJsonValue, type JsonValue, type MaybePromise } from "@relkit/contracts";
 import type { Context } from "hono";
 import {
   INTERNAL_ENDPOINT_PROTOCOL,
@@ -171,7 +171,7 @@ export function jsonResponse(
     headers: {
       "cache-control": "no-store",
       "content-type": "application/json",
-      "x-zsys-api-version": String(INTERNAL_ENDPOINT_VERSION),
+      "x-relkit-api-version": String(INTERNAL_ENDPOINT_VERSION),
       ...headers,
     },
   });

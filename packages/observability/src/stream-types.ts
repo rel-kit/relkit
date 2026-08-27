@@ -1,9 +1,9 @@
-import { PROTOCOL_VERSION, type JsonValue } from "@zsys/contracts";
+import { PROTOCOL_VERSION, type JsonValue } from "@relkit/contracts";
 import type { ObservabilityCollector } from "./collector.js";
 import type { ObservabilityRecord } from "./model.js";
 import type { RedactionPolicy } from "./redaction.js";
 
-export const OBSERVABILITY_STREAM_PROTOCOL = "zsys.observability.stream" as const;
+export const OBSERVABILITY_STREAM_PROTOCOL = "relkit.observability.stream" as const;
 export const OBSERVABILITY_STREAM_VERSION = PROTOCOL_VERSION;
 export const DEFAULT_STREAM_MAX_EVENTS = 1_024;
 export const DEFAULT_STREAM_QUEUE_SIZE = 64;
@@ -90,10 +90,10 @@ export interface ObservabilityStreamOptions {
   readonly collector?: Pick<ObservabilityCollector, "collect">;
 }
 export type ObservabilityStreamErrorCode =
-  | "ZSYS_OBSERVABILITY_STREAM_INVALID"
-  | "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED"
-  | "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE"
-  | "ZSYS_OBSERVABILITY_STREAM_CLOSED";
+  | "RELKIT_OBSERVABILITY_STREAM_INVALID"
+  | "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED"
+  | "RELKIT_OBSERVABILITY_STREAM_CURSOR_FUTURE"
+  | "RELKIT_OBSERVABILITY_STREAM_CLOSED";
 export class ObservabilityStreamError extends TypeError {
   constructor(
     readonly code: ObservabilityStreamErrorCode,

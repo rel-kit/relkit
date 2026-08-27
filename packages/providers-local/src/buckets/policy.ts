@@ -1,4 +1,4 @@
-import type { BucketPutOptions } from "@zsys/buckets";
+import type { BucketPutOptions } from "@relkit/buckets";
 import {
   LocalBucketPolicyError,
   type LocalBucketPolicy,

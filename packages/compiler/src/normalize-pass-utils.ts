@@ -1,5 +1,5 @@
-import { isDescriptor } from "@zsys/contracts";
-import { createDiagnostic } from "@zsys/diagnostics";
+import { isDescriptor } from "@relkit/contracts";
+import { createDiagnostic } from "@relkit/diagnostics";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 import {
   NORMALIZE_CODES,

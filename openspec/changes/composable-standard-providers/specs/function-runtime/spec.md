@@ -11,7 +11,7 @@ Environment resolution, graph-required binding construction, handler/resource/tr
 
 ### Requirement: Deterministic application test harness
 
-`@zsys/testing` SHALL provide isolated runtime/application helpers with validated test environment values, deterministic IDs and clock, in-memory HTTP, controlled job/event delivery, scripted models, bucket/cache fakes, telemetry queries, failure injection, and restart against shared test state. Configured external or managed adapters SHALL be replaced by fakes unless an integration test explicitly opts in.
+`@relkit/testing` SHALL provide isolated runtime/application helpers with validated test environment values, deterministic IDs and clock, in-memory HTTP, controlled job/event delivery, scripted models, bucket/cache fakes, telemetry queries, failure injection, and restart against shared test state. Configured external or managed adapters SHALL be replaced by fakes unless an integration test explicitly opts in.
 
 #### Scenario: Test runtime is created
 

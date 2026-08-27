@@ -32,7 +32,7 @@ export interface StandardSchemaTypes<TInput = unknown, TOutput = TInput> {
   readonly output: TOutput;
 }
 
-/** The Standard Schema v1 contract accepted by ZSys. */
+/** The Standard Schema v1 contract accepted by RelKit. */
 export interface StandardSchemaV1<TInput = unknown, TOutput = TInput> {
   readonly "~standard": {
     readonly version: 1;
@@ -80,14 +80,14 @@ export namespace StandardSchemaV1 {
     import("./standard-schema.js").InferOutput<S>;
 }
 
-/** ZSys's public schema boundary, including its future projection hook. */
-export interface ZsysSchema<TInput = unknown, TOutput = TInput> extends StandardSchemaV1<
+/** RelKit's public schema boundary, including its future projection hook. */
+export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends StandardSchemaV1<
   TInput,
   TOutput
 > {
   readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
     StandardJSONSchemaV1<TInput, TOutput>["~standard"];
-  readonly zsys?: {
+  readonly relkit?: {
     readonly jsonSchema?: () => JsonValue;
   };
 }
@@ -114,8 +114,8 @@ export type InferOutput<S extends StandardSchemaV1> = S["~standard"] extends {
     : unknown
   : unknown;
 
-/** A ZSys schema with familiar parsing and composition helpers. */
-export interface Schema<TInput = unknown, TOutput = TInput> extends ZsysSchema<TInput, TOutput> {
+/** A RelKit schema with familiar parsing and composition helpers. */
+export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema<TInput, TOutput> {
   optional(): Schema<TInput | undefined, TOutput | undefined>;
   nullable(): Schema<TInput | null, TOutput | null>;
   default(value: TInput | (() => TInput)): Schema<TInput | undefined, TOutput>;
@@ -134,7 +134,7 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends ZsysSchema<T
  *
  * @example
  * ```ts
- * import { validate, z } from "@zsys/schema"
+ * import { validate, z } from "@relkit/schema"
  *
  * const result = await validate(z.string(), "ready")
  * if (!("value" in result)) throw new Error("validation failed")

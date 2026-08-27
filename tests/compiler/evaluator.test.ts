@@ -4,15 +4,15 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { evaluateCandidates } from "../../packages/compiler/src/discovery/evaluator.ts";
 
-const brand = 'Symbol.for("zsys.descriptor")';
+const brand = 'Symbol.for("relkit.descriptor")';
 
 describe.serial("isolated evaluator", () => {
   test("returns snapshots and manifest references without corrupting output", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "zsys-evaluator-"));
-    const previousAllowed = process.env.ZSYS_EVALUATOR_ALLOWED;
-    const previousBlocked = process.env.ZSYS_EVALUATOR_BLOCKED;
-    process.env.ZSYS_EVALUATOR_ALLOWED = "allowed-value";
-    process.env.ZSYS_EVALUATOR_BLOCKED = "blocked-value";
+    const projectRoot = await mkdtemp(join(tmpdir(), "relkit-evaluator-"));
+    const previousAllowed = process.env.RELKIT_EVALUATOR_ALLOWED;
+    const previousBlocked = process.env.RELKIT_EVALUATOR_BLOCKED;
+    process.env.RELKIT_EVALUATOR_ALLOWED = "allowed-value";
+    process.env.RELKIT_EVALUATOR_BLOCKED = "blocked-value";
     try {
       await writeFile(
         join(projectRoot, "app.ts"),
@@ -23,8 +23,8 @@ describe.serial("isolated evaluator", () => {
             id: "orders.create",
             ref: Object.freeze({ kind: "function", id: "orders.create" }),
             env: {
-              allowed: process.env.ZSYS_EVALUATOR_ALLOWED ?? null,
-              blocked: process.env.ZSYS_EVALUATOR_BLOCKED ?? null,
+              allowed: process.env.RELKIT_EVALUATOR_ALLOWED ?? null,
+              blocked: process.env.RELKIT_EVALUATOR_BLOCKED ?? null,
             },
             handler: () => "not serialized",
           });
@@ -34,7 +34,7 @@ describe.serial("isolated evaluator", () => {
         projectRoot,
         candidates: ["app.ts"],
         generationId: "generation-test",
-        environmentAllowlist: ["ZSYS_EVALUATOR_ALLOWED"],
+        environmentAllowlist: ["RELKIT_EVALUATOR_ALLOWED"],
         timeoutMs: 1_000,
       });
       expect(response.status).toBe("ok");
@@ -49,7 +49,7 @@ describe.serial("isolated evaluator", () => {
       });
       expect(exported?.descriptor.metadata).toMatchObject({
         env: { allowed: "allowed-value", blocked: null },
-        handler: { $zsys: "function" },
+        handler: { $relkit: "function" },
       });
       expect(module?.manifestReferences).toEqual([
         {
@@ -61,14 +61,14 @@ describe.serial("isolated evaluator", () => {
         },
       ]);
     } finally {
-      restoreEnvironment("ZSYS_EVALUATOR_ALLOWED", previousAllowed);
-      restoreEnvironment("ZSYS_EVALUATOR_BLOCKED", previousBlocked);
+      restoreEnvironment("RELKIT_EVALUATOR_ALLOWED", previousAllowed);
+      restoreEnvironment("RELKIT_EVALUATOR_BLOCKED", previousBlocked);
       await rm(projectRoot, { recursive: true, force: true });
     }
   });
 
   test("reports supported side effects and keeps generated writes allowed", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "zsys-evaluator-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "relkit-evaluator-"));
     const cases = [
       [
         "listener.ts",
@@ -106,7 +106,7 @@ describe.serial("isolated evaluator", () => {
 
       await writeFile(
         join(projectRoot, "allowed.ts"),
-        'import fs from "node:fs"; fs.mkdirSync(".zsys/generated", { recursive: true }); fs.writeFileSync(".zsys/generated/ok.txt", "ok"); export const value = 1;',
+        'import fs from "node:fs"; fs.mkdirSync(".relkit/generated", { recursive: true }); fs.writeFileSync(".relkit/generated/ok.txt", "ok"); export const value = 1;',
       );
       const allowed = await evaluateCandidates({ projectRoot, candidates: ["allowed.ts"] });
       expect(allowed.status).toBe("ok");
@@ -117,13 +117,13 @@ describe.serial("isolated evaluator", () => {
   });
 
   test("returns source-mapped structured import failures", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "zsys-evaluator-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "relkit-evaluator-"));
     try {
       await writeFile(join(projectRoot, "bad.ts"), 'throw new Error("source-map-boom");\n');
       const response = await evaluateCandidates({ projectRoot, candidates: ["bad.ts"] });
       expect(response.status).toBe("failed");
       expect(response.failures[0]).toMatchObject({
-        code: "ZSYS_EVALUATOR_IMPORT_FAILED",
+        code: "RELKIT_EVALUATOR_IMPORT_FAILED",
         module: "bad.ts",
       });
       expect(response.failures[0]?.stack).toContain("bad.ts");
@@ -134,7 +134,7 @@ describe.serial("isolated evaluator", () => {
   });
 
   test("kills a candidate that exceeds the compilation timeout", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "zsys-evaluator-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "relkit-evaluator-"));
     try {
       await writeFile(join(projectRoot, "slow.ts"), "await new Promise(() => {});\n");
       const response = await evaluateCandidates({
@@ -144,7 +144,7 @@ describe.serial("isolated evaluator", () => {
       });
       expect(response.status).toBe("failed");
       expect(response.failures[0]).toMatchObject({
-        code: "ZSYS_EVALUATOR_TIMEOUT",
+        code: "RELKIT_EVALUATOR_TIMEOUT",
         timedOut: true,
       });
     } finally {
@@ -153,15 +153,15 @@ describe.serial("isolated evaluator", () => {
   });
 
   test("rejects candidates outside the fixed project root", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "zsys-evaluator-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "relkit-evaluator-"));
     try {
       const response = await evaluateCandidates({
         projectRoot,
-        candidates: ["/tmp/outside-zsys-evaluator.ts"],
+        candidates: ["/tmp/outside-relkit-evaluator.ts"],
       });
       expect(response).toMatchObject({
         status: "failed",
-        failures: [{ code: "ZSYS_EVALUATOR_REQUEST_INVALID" }],
+        failures: [{ code: "RELKIT_EVALUATOR_REQUEST_INVALID" }],
       });
     } finally {
       await rm(projectRoot, { recursive: true, force: true });

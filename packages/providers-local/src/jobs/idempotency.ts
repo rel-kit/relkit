@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import {
   assertTime,
   JobQueueStateError,

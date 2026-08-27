@@ -18,4 +18,4 @@ export type {
   RedactedFailureDetail,
   TimeoutFailure,
   UnexpectedDefect,
-} from "@zsys/invocation";
+} from "@relkit/invocation";

@@ -7,8 +7,8 @@ test("surfaces a missing trace detail backend without substituting list data", a
     cacheTtlMs: 0,
     fetch: async (url) =>
       String(url).endsWith("/traces/trace-1")
-        ? response("zsys.observability.query", { error: "not-found" }, 404)
-        : response("zsys.inspector", {
+        ? response("relkit.observability.query", { error: "not-found" }, 404)
+        : response("relkit.inspector", {
             items: [
               {
                 signal: "span",
@@ -27,6 +27,6 @@ test("surfaces a missing trace detail backend without substituting list data", a
 function response(protocol: string, payload: object, status = 200): Response {
   return new Response(JSON.stringify({ protocol, version: 1, ...payload }), {
     status,
-    headers: { "x-zsys-api-version": "1" },
+    headers: { "x-relkit-api-version": "1" },
   });
 }

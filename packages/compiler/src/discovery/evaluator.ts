@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
@@ -42,7 +42,7 @@ export async function evaluateCandidates(options: EvaluatorOptions): Promise<Eva
     return failedResponse(
       options.generationId ?? "unknown",
       options.sourceMaps ?? true,
-      failure("ZSYS_EVALUATOR_REQUEST_INVALID", errorMessage(error), options.generationId),
+      failure("RELKIT_EVALUATOR_REQUEST_INVALID", errorMessage(error), options.generationId),
     );
   }
   const childPath = evaluatorChildPath();
@@ -62,7 +62,7 @@ export async function evaluateCandidates(options: EvaluatorOptions): Promise<Eva
     return failedResponse(
       request.generationId,
       request.sourceMaps,
-      failure("ZSYS_EVALUATOR_PROCESS_FAILED", errorMessage(error), request.generationId),
+      failure("RELKIT_EVALUATOR_PROCESS_FAILED", errorMessage(error), request.generationId),
     );
   }
   const stdoutPromise = new Response(child.stdout).text();
@@ -85,7 +85,9 @@ export async function evaluateCandidates(options: EvaluatorOptions): Promise<Eva
       request.generationId,
       request.sourceMaps,
       failure(
-        outcome.kind === "timeout" ? "ZSYS_EVALUATOR_TIMEOUT" : "ZSYS_EVALUATOR_PROTOCOL_INVALID",
+        outcome.kind === "timeout"
+          ? "RELKIT_EVALUATOR_TIMEOUT"
+          : "RELKIT_EVALUATOR_PROTOCOL_INVALID",
         outcome.kind === "timeout"
           ? `Evaluator exceeded ${request.timeoutMs}ms and was killed.`
           : "Evaluator exited without a valid versioned response frame.",
@@ -109,7 +111,7 @@ export async function evaluateCandidates(options: EvaluatorOptions): Promise<Eva
       request.generationId,
       request.sourceMaps,
       failure(
-        "ZSYS_EVALUATOR_PROTOCOL_INVALID",
+        "RELKIT_EVALUATOR_PROTOCOL_INVALID",
         "Evaluator response identity or exit status was invalid.",
         request.generationId,
         {

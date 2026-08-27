@@ -8,7 +8,7 @@ const roots: string[] = [];
 
 test("the emitted server rejects missing production environment before provider startup", async () => {
   const root = await copyFullProject();
-  const appPath = join(root, "zsys.config.ts");
+  const appPath = join(root, "relkit.config.ts");
   const source = await readFile(appPath, "utf8");
   await writeFile(
     appPath,
@@ -31,11 +31,11 @@ test("the emitted server rejects missing production environment before provider 
 });
 
 async function copyFullProject(): Promise<string> {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-environment-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-environment-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-full"), root, { recursive: true });
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
-  const scope = join(root, "node_modules", "@zsys");
+  const scope = join(root, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
   for (const name of [
     "agents",

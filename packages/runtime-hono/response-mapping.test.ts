@@ -1,15 +1,15 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import { InvocationValidationError } from "@zsys/engine";
-import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { InvocationValidationError } from "@relkit/engine";
+import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import {
   applicationFailure,
   cancellationFailure,
   providerFailure,
   timeoutFailure,
   unexpectedDefect,
-} from "@zsys/runtime-effect";
-import { z } from "@zsys/schema";
+} from "@relkit/runtime-effect";
+import { z } from "@relkit/schema";
 import { createApp } from "./src/create-app.js";
 import {
   mapFailureResponse,
@@ -158,11 +158,7 @@ describe("HTTP response mapping", () => {
     const failure = providerFailure(
       new Error("S3 put failed with status 403: InvalidAccessKeyId: password=provider-secret"),
     );
-    const response = await mapFailureResponse(
-      trigger([]),
-      failure,
-      { mode: "development" },
-    );
+    const response = await mapFailureResponse(trigger([]), failure, { mode: "development" });
 
     expect(response.status).toBe(502);
     expect(await response.json()).toEqual({

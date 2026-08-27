@@ -1,6 +1,6 @@
 # Deployment
 
-ZSys deployment is generated from the checked application graph and runs
+RelKit deployment is generated from the checked application graph and runs
 through the Pulumi Automation API. AWS is the first supported cloud target;
 the application graph remains the input to the plan and no second deployment
 engine is introduced.
@@ -11,7 +11,7 @@ Before a deployment:
 
 1. Install Bun `1.3.10` and the project dependencies.
 2. Run `bun run check` and `bun run build`.
-3. Run `zsys doctor --pulumi` to check the project, ports, Pulumi, and visible
+3. Run `relkit doctor --pulumi` to check the project, ports, Pulumi, and visible
    AWS credential configuration.
 4. Select a Pulumi backend and stack. Use a separate stack for each isolated
    environment.
@@ -24,12 +24,12 @@ values in source, graph files, generated manifests, plans, or logs.
 Run these commands from the generated project:
 
 ```sh
-zsys deploy init --stack development
-zsys deploy preview --stack development
-zsys deploy up --stack development
-zsys deploy refresh --stack development
-zsys deploy outputs --stack development
-zsys deploy destroy --stack development
+relkit deploy init --stack development
+relkit deploy preview --stack development
+relkit deploy up --stack development
+relkit deploy refresh --stack development
+relkit deploy outputs --stack development
+relkit deploy destroy --stack development
 ```
 
 `init` creates or selects the stack. `preview` computes the plan without
@@ -41,7 +41,7 @@ non-interactive.
 Use the same options for every lifecycle command when needed:
 
 ```sh
-zsys deploy preview \
+relkit deploy preview \
   --project-root . \
   --stack staging \
   --backend cloud \
@@ -57,13 +57,13 @@ non-interactive confirmation path; still review the preview artifact first.
 
 ## Generated plan and resource model
 
-`zsys deploy preview` and `zsys deploy up` run `check` and `build` first, then
+`relkit deploy preview` and `relkit deploy up` run `check` and `build` first, then
 write the generated Pulumi program under:
 
 ```text
-.zsys/generated/pulumi/Pulumi.yaml
-.zsys/generated/pulumi/index.ts
-.zsys/generated/pulumi/plan.json
+.relkit/generated/pulumi/Pulumi.yaml
+.relkit/generated/pulumi/index.ts
+.relkit/generated/pulumi/plan.json
 ```
 
 The plan uses stable descriptor IDs for resource identity. Renaming or moving
@@ -88,7 +88,7 @@ bindings appear as provisioned resources in the deployment plan. An
 omitted along with their AWS IAM statements. Managed connection outputs take
 precedence over pipeline values and use workload identity when supported.
 
-Hosting is selected independently in `zsys.config.ts`:
+Hosting is selected independently in `relkit.config.ts`:
 
 ```ts
 export default defineConfig({
@@ -118,14 +118,14 @@ authorization mechanism and do not publish an unprotected inspector endpoint.
 Start with structured output and the diagnostic code:
 
 ```sh
-zsys --json doctor --pulumi
-zsys --json check
-zsys --json deploy preview --stack development --non-interactive
+relkit --json doctor --pulumi
+relkit --json check
+relkit --json deploy preview --stack development --non-interactive
 ```
 
-Common codes are `ZSYS_DEPLOY_CHECK_FAILED`,
-`ZSYS_DEPLOY_GRAPH_INVALID`, `ZSYS_DEPLOY_BUILD_FAILED`,
-`ZSYS_DEPLOY_CONFIGURATION_MISSING`, `ZSYS_DEPLOY_AWS_CAPABILITY_UNSUPPORTED`,
-`ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED`, and `ZSYS_DEPLOY_SECRET_UNSUPPORTED`.
+Common codes are `RELKIT_DEPLOY_CHECK_FAILED`,
+`RELKIT_DEPLOY_GRAPH_INVALID`, `RELKIT_DEPLOY_BUILD_FAILED`,
+`RELKIT_DEPLOY_CONFIGURATION_MISSING`, `RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED`,
+`RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED`, and `RELKIT_DEPLOY_SECRET_UNSUPPORTED`.
 Fix the first check or plan error, rerun `check`, and preview again. Do not
 edit the generated Pulumi program to bypass graph validation.

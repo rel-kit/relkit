@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { canonicalJson, normalizeSourceLocation, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, normalizeSourceLocation, type JsonValue } from "@relkit/contracts";
 
 export const GRAPH_HASH_ALGORITHM = "sha256" as const;
 export const GRAPH_HASH_PREFIX = `${GRAPH_HASH_ALGORITHM}:` as const;

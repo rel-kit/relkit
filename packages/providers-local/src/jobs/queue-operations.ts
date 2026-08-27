@@ -1,4 +1,4 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { acceptance, prepareIdempotency } from "./idempotency.js";
 import { makeEntry, nextEntry, persist } from "./queue-entry.js";

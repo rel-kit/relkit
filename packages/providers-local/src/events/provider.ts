@@ -5,7 +5,7 @@ import type {
   EventProvider,
   EventProviderResult,
   EventPublishOptions,
-} from "@zsys/events";
+} from "@relkit/events";
 import type { EventRouter, EventRouterTrigger } from "./router-types.js";
 import { createEventLog } from "./log.js";
 import { createEventRouter } from "./router.js";

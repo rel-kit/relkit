@@ -1,10 +1,10 @@
-import { PROTOCOL_VERSION, type MaybePromise } from "@zsys/contracts";
+import { PROTOCOL_VERSION, type MaybePromise } from "@relkit/contracts";
 import {
   createObservabilityCollector,
   type ObservabilityCollector,
   type ObservabilityRecord,
-} from "@zsys/observability";
-import type { GraphEdge, ObservedEdge } from "@zsys/graph";
+} from "@relkit/observability";
+import type { GraphEdge, ObservedEdge } from "@relkit/graph";
 import type {
   InvocationCompletion,
   InvocationRecord,
@@ -12,7 +12,7 @@ import type {
   SpanRecord,
 } from "./invoke-types.js";
 
-export const OBSERVABILITY_HOOK_PROTOCOL = "zsys.observability.hooks" as const;
+export const OBSERVABILITY_HOOK_PROTOCOL = "relkit.observability.hooks" as const;
 export const OBSERVABILITY_HOOK_VERSION = PROTOCOL_VERSION;
 
 export type ObservabilityHookEvent =

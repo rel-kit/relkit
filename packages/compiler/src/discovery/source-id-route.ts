@@ -1,4 +1,4 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 
 const HTTP_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"]);
 

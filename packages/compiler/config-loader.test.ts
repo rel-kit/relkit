@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { CONFIG_CODES, ConfigValidationError, loadConfig, validateConfig } from "./src/index.ts";
 
-describe("ZSYS configuration", () => {
+describe("RELKIT configuration", () => {
   test("uses fixed project conventions and typed server defaults", () => {
     const input = {
       server: {
@@ -16,7 +16,7 @@ describe("ZSYS configuration", () => {
     expect(config).toMatchObject({
       projectRoot: "/workspace/app",
       source: ["src/**/*.ts"],
-      generatedDirectory: ".zsys/generated",
+      generatedDirectory: ".relkit/generated",
       server: {
         port: 4100,
         maxBodyBytes: 2_000_000,
@@ -47,7 +47,7 @@ describe("ZSYS configuration", () => {
       CONFIG_CODES.legacy,
     ]);
     expect(issues.map(({ message }) => message).join("\n")).toContain(
-      'ZSYS discovers descriptors from "src/**/*.ts"',
+      'RELKIT discovers descriptors from "src/**/*.ts"',
     );
     expect(() => loadConfig({ server: { port: 0 } }, "/workspace/app")).toThrow(
       ConfigValidationError,

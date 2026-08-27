@@ -7,14 +7,14 @@ import {
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
-const RESERVED_ROUTE_MESSAGE = 'Routes under "/_zsys" are framework-reserved.';
+const RESERVED_ROUTE_MESSAGE = 'Routes under "/_relkit" are framework-reserved.';
 
 /** Checks route inputs, responses, and function-backed middleware contracts. */
 export function validateHttpCompatibility(work: NormalizationWork): void {
   for (const route of work.descriptors.filter((entry) => entry.kind === "route")) {
     const value = isRecord(route.value) ? route.value : {};
     const path = typeof value.path === "string" ? value.path : "";
-    if (path === "/_zsys" || path.startsWith("/_zsys/"))
+    if (path === "/_relkit" || path.startsWith("/_relkit/"))
       add(work, route, NORMALIZE_CODES.reservedRoute, RESERVED_ROUTE_MESSAGE);
     if (value.raw === true) continue;
     const target = referenceFor(work, value.target, "function");

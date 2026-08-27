@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { orderSearchInput, orderSearchOutput } from "../../shared/schemas.js";
 
 const searchOrders = defineFunction({

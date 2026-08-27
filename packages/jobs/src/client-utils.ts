@@ -1,4 +1,4 @@
-import { validate, type StandardSchemaV1 } from "@zsys/schema";
+import { validate, type StandardSchemaV1 } from "@relkit/schema";
 import {
   JobInputValidationError,
   JobOperationCancelledError,

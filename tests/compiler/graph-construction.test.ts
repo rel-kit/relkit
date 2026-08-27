@@ -175,7 +175,7 @@ describe("compiler graph construction", () => {
         {
           kind: "targets-function",
           from: "orders.listener",
-          to: "zsys.event.orders.listener.handler",
+          to: "relkit.event.orders.listener.handler",
           role: "primary",
         },
         { kind: "listens-to-event", from: "orders.listener", to: "orders.created" },
@@ -232,7 +232,7 @@ describe("compiler graph construction", () => {
       descriptors: [target, service("orders"), service("billing")],
     });
     expect(result.diagnostics).toContainEqual(
-      expect.objectContaining({ code: "ZSYS_SERVICE_OWNERSHIP", descriptorId: "billing" }),
+      expect.objectContaining({ code: "RELKIT_SERVICE_OWNERSHIP", descriptorId: "billing" }),
     );
   });
 });

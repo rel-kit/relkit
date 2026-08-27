@@ -85,7 +85,7 @@ export function isJsonMode(argv: readonly string[]): boolean {
 export function cliErrorMessage(error: CliError.CliError): string {
   if (
     error._tag === "ShowHelp" &&
-    error.commandPath.join(" ") === "zsys create" &&
+    error.commandPath.join(" ") === "relkit create" &&
     error.errors.some((entry) => entry._tag === "MissingArgument" && entry.argument === "name")
   )
     return "name is required";

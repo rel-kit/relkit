@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { createApp, materializeRoutes, type RuntimeManifest } from "./src/index.js";
-import type { RegistrationPlan } from "@zsys/graph";
+import type { RegistrationPlan } from "@relkit/graph";
 
 const source = { file: "src/app.ts", line: 1, column: 1 };
 
@@ -93,7 +93,7 @@ test("rejects missing transform before adding any route", () => {
     }),
   ).toThrowError(
     expect.objectContaining({
-      code: "ZSYS_MANIFEST_TRANSFORM_MISSING",
+      code: "RELKIT_MANIFEST_TRANSFORM_MISSING",
     }),
   );
   expect(app.routes).toHaveLength(0);

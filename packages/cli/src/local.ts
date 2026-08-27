@@ -6,7 +6,7 @@ import {
   normalizeCreateOptions,
   type CreateOptions,
   type GenerateCommandResult,
-} from "create-zsys";
+} from "create-relkit";
 import { runCli } from "./main.js";
 import type { CliCommandContext } from "./main-support.js";
 
@@ -26,7 +26,7 @@ export async function useWorkspaceDependencies(projectRoot: string): Promise<str
   for (const dependencies of [manifest.dependencies, manifest.devDependencies]) {
     if (dependencies === undefined) continue;
     for (const name of Object.keys(dependencies)) {
-      if (!name.startsWith("@zsys/")) continue;
+      if (!name.startsWith("@relkit/")) continue;
       direct.add(name);
     }
   }
@@ -46,10 +46,10 @@ async function workspaceDependencyClosure(direct: ReadonlySet<string>): Promise<
   while (pending.length > 0) {
     const name = pending.pop()!;
     const manifest = JSON.parse(
-      await readFile(join(root, "packages", name.slice("@zsys/".length), "package.json"), "utf8"),
+      await readFile(join(root, "packages", name.slice("@relkit/".length), "package.json"), "utf8"),
     ) as Manifest;
     for (const dependency of Object.keys(manifest.dependencies ?? {})) {
-      if (!dependency.startsWith("@zsys/") || names.has(dependency)) continue;
+      if (!dependency.startsWith("@relkit/") || names.has(dependency)) continue;
       names.add(dependency);
       pending.push(dependency);
     }
@@ -65,7 +65,7 @@ export async function prepareWorkspaceLinks(
   for (const name of names) {
     const result = await runCommand(
       [process.execPath, "link", "--silent"],
-      join(root, "packages", name.slice("@zsys/".length)),
+      join(root, "packages", name.slice("@relkit/".length)),
       signal,
     );
     if (result.exitCode !== 0) return result;
@@ -110,7 +110,7 @@ async function generateLocalProject(options: unknown, context: CliCommandContext
   return generateProject(options as CreateOptions, {
     signal: context.signal,
     bunExecutable: process.execPath,
-    zsysExecutable: cli,
+    relkitExecutable: cli,
     commandRunner: runLocalCommand,
     ...(context.onProgress === undefined ? {} : { onProgress: context.onProgress }),
   });
@@ -124,12 +124,12 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
           io: {
             stdout: (line: string) => process.stdout.write(`${line}\n`),
             stderr: (line: string) => {
-              if (!line.startsWith("ZSYS_INTERRUPTED:")) process.stderr.write(`${line}\n`);
+              if (!line.startsWith("RELKIT_INTERRUPTED:")) process.stderr.write(`${line}\n`);
             },
           },
         }
       : {}),
-    loadCreateZsys: async () => ({
+    loadCreateRelkit: async () => ({
       normalizeCreateOptions,
       generateProject: generateLocalProject,
     }),

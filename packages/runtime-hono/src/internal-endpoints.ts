@@ -1,5 +1,5 @@
-import * as contracts from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import * as contracts from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import type { Context, Hono } from "hono";
 import {
   isAuthorized,
@@ -12,7 +12,7 @@ import {
   streamBody,
 } from "./internal-endpoints-utils.js";
 
-export const INTERNAL_ENDPOINT_PROTOCOL = "zsys.inspector" as const;
+export const INTERNAL_ENDPOINT_PROTOCOL = "relkit.inspector" as const;
 export const INTERNAL_ENDPOINT_VERSION = contracts.API_VERSION;
 export const INTERNAL_ENDPOINT_PATHS = Object.freeze([
   `${contracts.API_BASE_PATH}/health/live`,
@@ -194,7 +194,7 @@ async function streamResponse(
       "cache-control": "no-store",
       "content-type": "text/event-stream; charset=utf-8",
       connection: "keep-alive",
-      "x-zsys-api-version": String(INTERNAL_ENDPOINT_VERSION),
+      "x-relkit-api-version": String(INTERNAL_ENDPOINT_VERSION),
     },
   });
 }

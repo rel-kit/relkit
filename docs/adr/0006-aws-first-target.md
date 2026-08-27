@@ -1,8 +1,8 @@
-# ZSYS-ADR-006: AWS-first target
+# RELKIT-ADR-006: AWS-first target
 
 - Status: Accepted — reviewed Phase 0 baseline
 - Date: 2026-08-12
-- Owner: ZSys maintainers
+- Owner: RelKit maintainers
 - Supersession: None; a future change must explicitly supersede this ADR.
 
 ## Context
@@ -42,7 +42,7 @@ destroy verification.
 
 ## References
 
-- `docs/zsys-typescript-poc-technical-spec-v3.md` §§2.1, 4.4, 6.3, 15.6, 22, 25.6.
-- `docs/zsys-typescript-poc-review-gates-v3.md` Gates 15 and 16.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/pulumi-aws-deployment/spec.md` — Complete initial AWS mapping and deployment verification.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/workspace-foundation/spec.md` — Explicit POC scope guardrails.
+- `docs/relkit-typescript-poc-technical-spec-v3.md` §§2.1, 4.4, 6.3, 15.6, 22, 25.6.
+- `docs/relkit-typescript-poc-review-gates-v3.md` Gates 15 and 16.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/pulumi-aws-deployment/spec.md` — Complete initial AWS mapping and deployment verification.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/workspace-foundation/spec.md` — Explicit POC scope guardrails.

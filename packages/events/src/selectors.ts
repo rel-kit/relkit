@@ -1,4 +1,4 @@
-import { deepFreeze } from "@zsys/contracts";
+import { deepFreeze } from "@relkit/contracts";
 import type { EventName } from "./event-registry.js";
 import {
   type AllEventPurpose,
@@ -55,7 +55,7 @@ export function all(options: {
  *
  * @example
  * ```ts
- * import { events } from "@zsys/events"
+ * import { events } from "@relkit/events"
  *
  * const orderEvents = events.match("orders.*")
  * void orderEvents

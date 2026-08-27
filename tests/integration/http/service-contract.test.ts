@@ -136,7 +136,7 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
     ],
   });
   expect(generateClient(graph)).toContain(
-    'export { createClient, ORPCError } from "@zsys/client";',
+    'export { createClient, ORPCError } from "@relkit/client";',
   );
   expect((await app.request(API_REFERENCE_PATH)).status).toBe(200);
   expect(hooks.read().some((event) => event.type === "invocation.started")).toBe(true);

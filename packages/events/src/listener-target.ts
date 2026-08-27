@@ -1,10 +1,10 @@
-import type { FunctionDescriptor } from "@zsys/functions";
+import type { FunctionDescriptor } from "@relkit/functions";
 import {
   validate,
   type StandardIssue,
   type StandardResult,
   type StandardSchemaV1,
-} from "@zsys/schema";
+} from "@relkit/schema";
 import type { EventDescriptorAny, UnknownEventEnvelope } from "./define-event.js";
 import type { EventTriggerDescriptor } from "./listener-types.js";
 
@@ -30,7 +30,7 @@ function envelopeSchema(
   return Object.freeze({
     "~standard": Object.freeze({
       version: 1 as const,
-      vendor: "zsys",
+      vendor: "relkit",
       validate: async (value: unknown): Promise<StandardResult<UnknownEventEnvelope>> => {
         const issue = envelopeIssue(value);
         if (issue !== undefined) return { issues: [issue] };

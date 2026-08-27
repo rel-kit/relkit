@@ -58,7 +58,7 @@ describe("commerce-example compiler acceptance", () => {
 
     expect(run.diagnostics).toEqual([
       expect.objectContaining({
-        code: "ZSYS_EVENT_WILDCARD_RESTRICTED",
+        code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
         severity: "warning",
         message: "Raw all-event selector is restricted to telemetry.",
       }),
@@ -119,7 +119,7 @@ describe("commerce-example compiler acceptance", () => {
     expect(edges.map(edgeKey).sort()).toEqual(
       [
         ["enqueues-job", "orders.create-order", "receipts.send-job"],
-        ["enqueues-job", "zsys.event.receipts.on-order-created.handler", "receipts.send-job"],
+        ["enqueues-job", "relkit.event.receipts.on-order-created.handler", "receipts.send-job"],
         ["exposes-as-tool", "orders.get-order", "lookup-order"],
         ["listens-to-event", "receipts.on-order-created", "orders.created"],
         ["listens-to-event", "orders.project-any-change", "orders.cancelled"],
@@ -147,25 +147,25 @@ describe("commerce-example compiler acceptance", () => {
         [
           "targets-function",
           "receipts.on-order-created",
-          "zsys.event.receipts.on-order-created.handler",
+          "relkit.event.receipts.on-order-created.handler",
           "primary",
         ],
         [
           "targets-function",
           "orders.project-any-change",
-          "zsys.event.orders.project-any-change.handler",
+          "relkit.event.orders.project-any-change.handler",
           "primary",
         ],
         [
           "targets-function",
           "orders.audit-changes",
-          "zsys.event.orders.audit-changes.handler",
+          "relkit.event.orders.audit-changes.handler",
           "primary",
         ],
         [
           "targets-function",
           "telemetry.capture-events",
-          "zsys.event.telemetry.capture-events.handler",
+          "relkit.event.telemetry.capture-events.handler",
           "primary",
         ],
         ["targets-function", "receipts.send-job", "send-receipt", "primary"],
@@ -222,12 +222,12 @@ describe("commerce-example compiler acceptance", () => {
       .filter(({ kind, identity }) => kind === "function" && identity !== undefined)
       .map(({ id }) => id)
       .sort();
-    const generatedFunctionId = "zsys.agent.order-support.invoke";
+    const generatedFunctionId = "relkit.agent.order-support.invoke";
     const eventFunctionIds = [
-      "zsys.event.orders.audit-changes.handler",
-      "zsys.event.orders.project-any-change.handler",
-      "zsys.event.receipts.on-order-created.handler",
-      "zsys.event.telemetry.capture-events.handler",
+      "relkit.event.orders.audit-changes.handler",
+      "relkit.event.orders.project-any-change.handler",
+      "relkit.event.receipts.on-order-created.handler",
+      "relkit.event.telemetry.capture-events.handler",
     ];
     expect(nodes.filter((node) => node.id === generatedFunctionId)).toHaveLength(1);
     expect(nodes.find((node) => node.id === generatedFunctionId)).toMatchObject({
@@ -242,15 +242,15 @@ describe("commerce-example compiler acceptance", () => {
     expect(mapIds(run.manifest, "functions")).toEqual(
       expect.arrayContaining([...functionIds, generatedFunctionId, ...eventFunctionIds]),
     );
-    expect(run.manifest.match(/__zsys_createGeneratedAgentFunction\(/g)).toHaveLength(1);
-    expect(run.manifest.match(/__zsys_createEventListenerTarget\(/g)).toHaveLength(4);
+    expect(run.manifest.match(/__relkit_createGeneratedAgentFunction\(/g)).toHaveLength(1);
+    expect(run.manifest.match(/__relkit_createEventListenerTarget\(/g)).toHaveLength(4);
     for (const functionId of eventFunctionIds) {
       expect(nodes.find((node) => node.id === functionId)).toMatchObject({
         kind: "function",
         generated: { generated: true, generatedBy: "event-listener", functionId },
       });
     }
-    expect(run.manifest.match(/^const __zsys_middleware_\d+ =/gm) ?? []).toHaveLength(0);
+    expect(run.manifest.match(/^const __relkit_middleware_\d+ =/gm) ?? []).toHaveLength(0);
     expect(mapIds(run.manifest, "middleware")).toEqual(["order-auth"]);
     expect(mapIds(run.manifest, "requestTransforms")).toEqual(["orders.normalize-id"]);
 
@@ -329,8 +329,8 @@ describe("commerce-example compiler acceptance", () => {
     expect(agentBoundaryViolations(nodes, run.manifest)).toEqual([]);
     expect(nodes.some((node) => node.kind === forbiddenNode)).toBe(false);
     expect(run.graphBytes.toLowerCase()).not.toContain(forbiddenNode);
-    expect(run.graphBytes).not.toContain("zsys-synthetic-openai-secret");
-    expect(run.manifest).not.toContain("zsys-synthetic-openai-secret");
+    expect(run.graphBytes).not.toContain("relkit-synthetic-openai-secret");
+    expect(run.manifest).not.toContain("relkit-synthetic-openai-secret");
   });
 });
 
@@ -390,7 +390,7 @@ function assertDataOnly(graph: unknown, manifest: string): void {
       throw new Error(`resolved secret at ${key}`);
     }
   });
-  expect(manifest).not.toMatch(/import \* as __zsys_module_\d+ from ["']\//);
+  expect(manifest).not.toMatch(/import \* as __relkit_module_\d+ from ["']\//);
   expect(manifest).not.toContain("[Function");
   expect(manifest).not.toContain("/Users/");
 }
@@ -412,7 +412,7 @@ function agentBoundaryViolations(
       if (forbidden.test(key)) findings.push(`${agent.id}:agent-provider-details:${key}`);
     }
     const marker = agent.generatedFunction;
-    const expectedId = `zsys.agent.${agent.id}.invoke`;
+    const expectedId = `relkit.agent.${agent.id}.invoke`;
     if (
       !isRecord(marker) ||
       marker.generated !== true ||
@@ -425,7 +425,7 @@ function agentBoundaryViolations(
     if (generated.length !== 1) findings.push(`${agent.id}:generated-function-count`);
     if (JSON.stringify(generated[0]?.generated) !== JSON.stringify(marker))
       findings.push(`${agent.id}:generated-function-marker`);
-    const expression = `__zsys_createGeneratedAgentFunction(${JSON.stringify(agent.id)})`;
+    const expression = `__relkit_createGeneratedAgentFunction(${JSON.stringify(agent.id)})`;
     if (manifest.split(expression).length - 1 !== 1) findings.push(`${agent.id}:manifest-handler`);
   }
   return findings;

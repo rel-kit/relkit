@@ -1,6 +1,6 @@
 ## Context
 
-See [proposal.md](./proposal.md) for motivation. Today `@zsys/app` selects a `ProviderSet` by development/test/production and hands the selected recipe to one provider factory. The AWS factory receives configuration for every capability, while graph provider nodes contain only logical profiles and the deployment planner assumes every bucket/cache is AWS-managed. The existing AWS runtime already contains useful S3 signing and RESP implementations, but their lifecycle and credentials are coupled to the AWS recipe.
+See [proposal.md](./proposal.md) for motivation. Today `@relkit/app` selects a `ProviderSet` by development/test/production and hands the selected recipe to one provider factory. The AWS factory receives configuration for every capability, while graph provider nodes contain only logical profiles and the deployment planner assumes every bucket/cache is AWS-managed. The existing AWS runtime already contains useful S3 signing and RESP implementations, but their lifecycle and credentials are coupled to the AWS recipe.
 
 The redesign must preserve function-facing clients, deterministic compilation, secret-free generated artifacts, and the prior middleware work in the dirty tree. It is a clean break at the application configuration boundary.
 
@@ -56,7 +56,7 @@ The AWS runtime keeps SQS, EventBridge, model, and observability adapter factori
 
 The runtime builds a required-binding set from graph dependency edges. It looks up a factory by `(capability, adapter)`, resolves only that binding's environment references, constructs it once per generation, and stores the resulting client by `(capability, profile)`. Acquisition failures release already-created bindings in reverse order. Factories receive no global provider configuration.
 
-`@zsys/testing` supplies an override factory matrix for all required bindings by default. Integration tests opt into configured adapter factories explicitly.
+`@relkit/testing` supplies an override factory matrix for all required bindings by default. Integration tests opt into configured adapter factories explicitly.
 
 ### Provider nodes are first-class graph nodes
 
@@ -66,13 +66,13 @@ Graph and manifest versions move together because runtime factory lookup semanti
 
 ### Deployment is a filter and binding override
 
-`zsys.config.ts` owns `deployment.target` and `deployment.adapter`. Planning filters provider nodes to `ownership === "managed"`; external bindings generate neither resources nor capability IAM statements. Supported managed bindings become target resources. Their outputs are injected at higher precedence than pipeline values for the referenced connection keys. Where the target can authenticate through workload identity, generated bindings omit static credentials.
+`relkit.config.ts` owns `deployment.target` and `deployment.adapter`. Planning filters provider nodes to `ownership === "managed"`; external bindings generate neither resources nor capability IAM statements. Supported managed bindings become target resources. Their outputs are injected at higher precedence than pipeline values for the referenced connection keys. Where the target can authenticate through workload identity, generated bindings omit static credentials.
 
 External bindings are not copied into the provider-resource portion of the plan. Their environment keys remain ordinary workload inputs supplied by the pipeline.
 
 ### Migration is source-driven and atomic at the contract boundary
 
-Public recipe exports and old signatures are removed in the same change as consumers migrate. Generated graph fixtures are regenerated through compiler commands rather than edited manually. The external `my-zsys-app-7` application is migrated after the repository packages are available through its workspace dependency setup.
+Public recipe exports and old signatures are removed in the same change as consumers migrate. Generated graph fixtures are regenerated through compiler commands rather than edited manually. The external `my-relkit-app-7` application is migrated after the repository packages are available through its workspace dependency setup.
 
 ## Risks / Trade-offs
 
@@ -91,5 +91,5 @@ Public recipe exports and old signatures are removed in the same change as consu
 3. Extract/register S3 and Redis runtime factories and refactor provider registry acquisition to independent bindings.
 4. Register remaining capability factories independently and update testing overrides.
 5. Update project deployment configuration, plan filtering, AWS provisioning, environment injection, and IAM generation.
-6. Migrate inspector, CLI/templates, commerce, fixtures, docs, and `my-zsys-app-7`.
+6. Migrate inspector, CLI/templates, commerce, fixtures, docs, and `my-relkit-app-7`.
 7. Run focused suites followed by repository verification; because this is unreleased framework work, rollback is reverting the change as a cohort rather than supporting mixed artifact versions.

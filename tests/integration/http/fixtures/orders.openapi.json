@@ -80,7 +80,7 @@
             "description": "Validation error"
           }
         },
-        "x-zsys": {
+        "x-relkit": {
           "functionId": "orders.get",
           "middleware": [],
           "routeId": "orders.get",
@@ -89,5 +89,5 @@
       }
     }
   },
-  "x-zsys": { "contractVersion": 2, "generatorVersion": 2, "graphVersion": 5, "version": 2 }
+  "x-relkit": { "contractVersion": 2, "generatorVersion": 2, "graphVersion": 5, "version": 2 }
 }

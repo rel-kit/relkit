@@ -9,7 +9,7 @@ WORKDIR /app
 COPY server/index.js ./server/index.js
 COPY application.graph.json manifest.json openapi.json ./
 COPY public/ ./public/
-RUN mkdir -p .zsys/state .zsys/observability && chown -R bun:bun .zsys
+RUN mkdir -p .relkit/state .relkit/observability && chown -R bun:bun .relkit
 USER bun
 ENV NODE_ENV=production
 EXPOSE 3000
@@ -31,8 +31,8 @@ export function dockerignore(): string {
 !server/index.js
 .env
 .env.*
-.zsys/state
-.zsys/observability
+.relkit/state
+.relkit/observability
 `;
 }
 

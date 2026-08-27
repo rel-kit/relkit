@@ -1,1 +1,1 @@
-export { readFailureDetail, rememberFailure } from "@zsys/invocation";
+export { readFailureDetail, rememberFailure } from "@relkit/invocation";

@@ -13,7 +13,7 @@ type Invocation = { readonly listener: string; readonly instanceId: string };
 
 describe.serial("child-process event recovery", () => {
   test("recovers a durable listener after process loss", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-events-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-events-"));
     try {
       const crashed = await runWorker("after-lease", stateRoot, 0);
       expect(crashed.exitCode).not.toBe(0);
@@ -33,7 +33,7 @@ describe.serial("child-process event recovery", () => {
   });
 
   test("makes a handler-success acknowledgement gap duplicate visible", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-events-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-events-"));
     try {
       const crashed = await runWorker("after-ack", stateRoot, 0);
       expect(crashed.exitCode).not.toBe(0);
@@ -53,7 +53,7 @@ describe.serial("child-process event recovery", () => {
   });
 
   test("does not claim recovery for an ephemeral listener lost with its process", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-events-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-events-"));
     try {
       const crashed = await runWorker("ephemeral-loss", stateRoot, 0);
       expect(crashed.exitCode).not.toBe(0);
@@ -81,7 +81,7 @@ describe.serial("child-process event recovery", () => {
   });
 
   test("keeps one listener completion when another listener fails", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-restart-events-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-restart-events-"));
     try {
       const result = await runWorker("fanout", stateRoot, 0);
       expect(result.exitCode).toBe(0);

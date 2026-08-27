@@ -1,5 +1,5 @@
-import { isProviderTopology, type ProviderCapability, type ProviderTopology } from "@zsys/app";
-import { getLocalProviderFactory } from "@zsys/providers-local";
+import { isProviderTopology, type ProviderCapability, type ProviderTopology } from "@relkit/app";
+import { getLocalProviderFactory } from "@relkit/providers-local";
 import {
   bindingFor,
   collectRequirements,
@@ -45,7 +45,7 @@ export async function createProviderRegistry(
         : options.factories?.[factoryKey(requirement.capability, binding.adapter.adapter)];
       if (factory === undefined) {
         throw error(
-          "ZSYS_PROVIDER_FACTORY_MISSING",
+          "RELKIT_PROVIDER_FACTORY_MISSING",
           `No factory is registered for ${requirement.capability}:${binding.adapter.adapter}.`,
           requirement.capability,
           requirement.profile,
@@ -53,7 +53,7 @@ export async function createProviderRegistry(
       }
       if (factory.capability !== requirement.capability) {
         throw error(
-          "ZSYS_PROVIDER_FACTORY_MISMATCH",
+          "RELKIT_PROVIDER_FACTORY_MISMATCH",
           "Provider factory capability does not match the binding.",
           requirement.capability,
           requirement.profile,
@@ -74,7 +74,7 @@ export async function createProviderRegistry(
       if (generation.modelRegistry !== undefined) modelRegistry = generation.modelRegistry;
       if (requirement.capability !== "models" && generation.value === undefined) {
         throw error(
-          "ZSYS_PROVIDER_CONSTRUCTION_FAILED",
+          "RELKIT_PROVIDER_CONSTRUCTION_FAILED",
           "Provider factory returned no client.",
           requirement.capability,
           requirement.profile,
@@ -92,7 +92,7 @@ export async function createProviderRegistry(
     await releaseAll(acquired).catch(() => undefined);
     if (cause instanceof ProviderRegistryError) throw cause;
     throw error(
-      "ZSYS_PROVIDER_CONSTRUCTION_FAILED",
+      "RELKIT_PROVIDER_CONSTRUCTION_FAILED",
       `Provider construction failed${
         activeRequirement === undefined
           ? ""
@@ -122,7 +122,7 @@ export async function createProviderRegistry(
       const handle = frozenHandles[key(capability, profile)];
       if (handle !== undefined) return handle;
       throw error(
-        "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+        "RELKIT_PROVIDER_PROFILE_UNKNOWN",
         "Provider profile is not available.",
         capability,
         profile,
@@ -147,7 +147,7 @@ async function construct(
   await generation.ready?.();
   await generation.readiness?.();
   if (context.signal?.aborted)
-    throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
+    throw error("RELKIT_PROVIDER_ABORTED", "Provider startup was aborted.");
   return generation;
 }
 
@@ -158,20 +158,20 @@ async function releaseAll(acquired: readonly Acquired[]): Promise<void> {
       else if (generation.release) await generation.release();
       else await generation.dispose?.();
     } catch {
-      throw error("ZSYS_PROVIDER_RELEASE_FAILED", "Provider release failed.");
+      throw error("RELKIT_PROVIDER_RELEASE_FAILED", "Provider release failed.");
     }
   }
 }
 
 function validateOptions(options: ProviderRegistryOptions): void {
   if (options.generationId.trim() === "") {
-    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Generation ID is required.");
+    throw error("RELKIT_PROVIDER_METADATA_INVALID", "Generation ID is required.");
   }
   if (!isProviderTopology(options.providers)) {
-    throw error("ZSYS_PROVIDER_METADATA_INVALID", "Provider topology is invalid.");
+    throw error("RELKIT_PROVIDER_METADATA_INVALID", "Provider topology is invalid.");
   }
   if (options.signal?.aborted)
-    throw error("ZSYS_PROVIDER_ABORTED", "Provider startup was aborted.");
+    throw error("RELKIT_PROVIDER_ABORTED", "Provider startup was aborted.");
 }
 
 function error(

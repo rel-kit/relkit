@@ -1,0 +1,207 @@
+
+▶ frozen install: /Users/mustafaelsayed/.bun/bin/bun install --frozen-lockfile
+bun install v1.3.10 (30e609e0)
+
+Checked 423 installs across 440 packages (no changes) [18.00ms]
+✓ frozen install
+✓ frozen install no-diff
+
+▶ format check: /Users/mustafaelsayed/.bun/bin/bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests
+Checking formatting...
+All matched files use Prettier code style!
+✓ format check
+
+▶ lint: /Users/mustafaelsayed/.bun/bin/bun run lint
+Public authoring scan passed (44 source/example fragments).
+✓ lint
+
+▶ ESLint configuration check: /Users/mustafaelsayed/.bun/bin/bun x eslint eslint.config.mjs
+✓ ESLint configuration check
+
+▶ boundaries and scope: /Users/mustafaelsayed/.bun/bin/bun run check
+Boundary check passed (34 roots, 768 TypeScript files).
+✓ boundaries and scope
+
+▶ observability sink source scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-observability-sinks.ts
+Observability sink source scan passed.
+✓ observability sink source scan
+✓ implementation-file limit (maximum 200 lines)
+
+▶ Konsistent configuration validation: /Users/mustafaelsayed/.bun/bin/bun run konsistent -- validate
+Configuration is valid.
+✓ Konsistent configuration validation
+
+▶ configured structural audit: bun run konsistent -- check --format=json
+[
+  {
+    "severity": "error",
+    "conventionName": "package-entry-barrel",
+    "filePath": "packages/cli/src/index.ts",
+    "predicateName": "importFromCurrentDir",
+    "message": "Import from current directory is not allowed",
+    "line": 5
+  },
+  {
+    "severity": "error",
+    "conventionName": "package-entry-barrel",
+    "filePath": "packages/create-relkit/src/index.ts",
+    "predicateName": "importFromCurrentDir",
+    "message": "Import from current directory is not allowed",
+    "line": 2
+  }
+]
+⚠ structural findings are advisory; configuration validation remains blocking
+
+▶ typecheck: /Users/mustafaelsayed/.bun/bin/bun run typecheck
+✓ typecheck
+
+▶ type fixtures: /Users/mustafaelsayed/.bun/bin/bun run test:types
+Type fixtures passed (public descriptor inference and boundary rejection).
+✓ type fixtures
+
+▶ unit and schema tests: /Users/mustafaelsayed/.bun/bin/bun run test:unit
+bun test v1.3.10 (30e609e0)
+✓ unit and schema tests
+
+▶ compiler and graph tests: /Users/mustafaelsayed/.bun/bin/bun run test:compiler
+bun test v1.3.10 (30e609e0)
+✓ compiler and graph tests
+
+▶ provider contracts: /Users/mustafaelsayed/.bun/bin/bun run test:contracts
+bun test v1.3.10 (30e609e0)
+✓ provider contracts
+
+▶ integration tests: /Users/mustafaelsayed/.bun/bin/bun run test:integration
+bun test v1.3.10 (30e609e0)
+✓ integration tests
+
+▶ restart tests: /Users/mustafaelsayed/.bun/bin/bun run test:restart
+bun test v1.3.10 (30e609e0)
+✓ restart tests
+
+▶ inspector API tests: /Users/mustafaelsayed/.bun/bin/bun run test:inspector
+bun test v1.3.10 (30e609e0)
+✓ inspector API tests
+
+▶ generator tests: /Users/mustafaelsayed/.bun/bin/bun run test:generator
+bun test v1.3.10 (30e609e0)
+✓ generator tests
+
+▶ packed generator smoke: /Users/mustafaelsayed/.bun/bin/bun run scripts/pack-and-smoke-create-relkit.ts
+packed create smoke passed (27 packages)
+✓ packed generator smoke
+
+▶ build: /Users/mustafaelsayed/.bun/bin/bun run build
+
+   • Packages in scope: @relkit/agents, @relkit/app, @relkit/buckets, @relkit/cache, @relkit/cli, @relkit/client-generator, @relkit/cloud-aws, @relkit/compiler, @relkit/config, @relkit/contracts, @relkit/deploy, @relkit/deploy-pulumi, @relkit/diagnostics, @relkit/engine, @relkit/events, @relkit/fixture-commerce, @relkit/functions, @relkit/graph, @relkit/inspector, @relkit/inspector-api, @relkit/jobs, @relkit/observability, @relkit/openapi, @relkit/providers-local, @relkit/routes, @relkit/runtime-effect, @relkit/runtime-hono, @relkit/schema, @relkit/supervisor, @relkit/testing, @relkit/tools, create-relkit
+   • Running build in 32 packages
+   • Remote caching disabled
+
+@relkit/contracts:build: cache hit, replaying logs 6420adb28d42db2a
+@relkit/contracts:build: $ tsc -b
+@relkit/schema:build: cache hit, replaying logs d5c2e3c3501909cf
+create-relkit:build: cache hit, replaying logs 32230cfe94d50f56
+@relkit/schema:build: $ tsc -b
+create-relkit:build: $ tsc -b
+@relkit/config:build: cache hit, replaying logs 2dd65704923d0bdc
+@relkit/config:build: $ tsc -b
+@relkit/buckets:build: cache hit, replaying logs 0990b9dfb6a9e101
+@relkit/buckets:build: $ tsc -b
+@relkit/cache:build: cache hit, replaying logs 33c815c241cdff9b
+@relkit/cache:build: $ tsc -b
+@relkit/diagnostics:build: cache hit, replaying logs 5b2d9a9da8a4ccf8
+@relkit/diagnostics:build: $ tsc -b
+@relkit/graph:build: cache hit, replaying logs 570f5bc0fc75fea8
+@relkit/graph:build: $ tsc -b
+@relkit/functions:build: cache hit, replaying logs 8f06ef6069509c37
+@relkit/functions:build: $ tsc -b
+@relkit/observability:build: cache hit, replaying logs 4083068e2146d570
+@relkit/observability:build: $ tsc -b
+@relkit/client-generator:build: cache hit, replaying logs 0a1491279df6d9a1
+@relkit/client-generator:build: $ tsc -b
+@relkit/openapi:build: cache hit, replaying logs c486a031c8cb1c37
+@relkit/openapi:build: $ tsc -b
+@relkit/routes:build: cache hit, replaying logs 899cb0788f856031
+@relkit/jobs:build: cache hit, replaying logs f2b056d7ffe37498
+@relkit/tools:build: cache hit, replaying logs 42da00a848b813bd
+@relkit/deploy:build: cache hit, replaying logs 1395b1b5aabf1567
+@relkit/jobs:build: $ tsc -b
+@relkit/routes:build: $ tsc -b
+@relkit/tools:build: $ tsc -b
+@relkit/deploy:build: $ tsc -b
+@relkit/runtime-effect:build: cache hit, replaying logs a01bcb1c6b6ecd90
+@relkit/runtime-effect:build: $ tsc -b
+@relkit/supervisor:build: cache hit, replaying logs f39f9bcc659f00d6
+@relkit/supervisor:build: $ tsc -b
+@relkit/agents:build: cache hit, replaying logs fd0703b8194e6dbd
+@relkit/agents:build: $ tsc -b
+@relkit/events:build: cache hit, replaying logs 1c3faf05b89492d5
+@relkit/events:build: $ tsc -b
+@relkit/inspector-api:build: cache hit, replaying logs a701e0b43bbb1c4f
+@relkit/inspector-api:build: $ tsc -b
+@relkit/deploy-pulumi:build: cache hit, replaying logs 656fa7d1da23ae20
+@relkit/deploy-pulumi:build: $ tsc -b
+@relkit/app:build: cache hit, replaying logs 557e8d4a948c20f1
+@relkit/app:build: $ tsc -b
+@relkit/compiler:build: cache hit, replaying logs 474fe1fc0ecfd2d6
+@relkit/compiler:build: $ tsc -b
+@relkit/cli:build: cache hit, replaying logs 23755b14957f9508
+@relkit/cli:build: $ tsc -b
+@relkit/providers-local:build: cache hit, replaying logs e89295b19ec8a331
+@relkit/providers-local:build: $ tsc -b
+@relkit/engine:build: cache hit, replaying logs 74d17e1fc571e470
+@relkit/engine:build: $ tsc -b
+@relkit/runtime-hono:build: cache hit, replaying logs fd4eca3b362df2bb
+@relkit/runtime-hono:build: $ tsc -b
+@relkit/testing:build: cache hit, replaying logs 8a1e43c9760cf9e9
+@relkit/testing:build: $ tsc -b
+@relkit/cloud-aws:build: cache hit, replaying logs a1a3e24d8fd7516d
+@relkit/cloud-aws:build: $ tsc -b
+
+ Tasks:    30 successful, 30 total
+Cached:    30 cached, 30 total
+  Time:    52ms >>> FULL TURBO
+
+Workspace build passed.
+✓ build
+✓ generated-file no-diff
+
+▶ recursive synthetic-secret artifact scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/secret-scan.ts
+{
+  "protocol": "relkit.synthetic-secret-scan",
+  "filesScanned": 2583,
+  "bytesScanned": 340513928,
+  "categories": {
+    "snapshots": 17,
+    "graph": 101,
+    "manifest": 16,
+    "generated-source": 1764,
+    "build-image": 0,
+    "plan": 6,
+    "pulumi-reports": 37,
+    "cloud-evidence": 37,
+    "browser": 605
+  },
+  "matches": [],
+  "image": {
+    "scanned": false
+  }
+}
+✓ recursive synthetic-secret artifact scan
+
+▶ whitespace check: git diff --check
+✓ whitespace check
+
+▶ security and redaction tests: /Users/mustafaelsayed/.bun/bin/bun run test:security
+bun test v1.3.10 (30e609e0)
+✓ security and redaction tests
+
+▶ public declaration leak scan: /Users/mustafaelsayed/.bun/bin/bun run scripts/check-public-declarations.ts
+Public declaration scan passed (14 packages).
+✓ public declaration leak scan
+
+▶ agent declaration/source/graph scans: /Users/mustafaelsayed/.bun/bin/bun test tests/agents/source-boundaries.test.ts tests/compiler/fixture-commerce.test.ts
+bun test v1.3.10 (30e609e0)
+✓ agent declaration/source/graph scans
+
+Verification passed in the fixed fail-fast order.

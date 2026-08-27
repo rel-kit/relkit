@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/better-auth",
+  "name": "@relkit/better-auth",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,7 +9,7 @@
     }
   },
   "dependencies": {
-    "@zsys/routes": "workspace:*",
+    "@relkit/routes": "workspace:*",
     "better-auth": "1.7.1"
   },
   "scripts": {

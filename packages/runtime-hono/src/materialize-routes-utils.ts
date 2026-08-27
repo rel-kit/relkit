@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import type { HttpTriggerRegistration } from "@zsys/graph";
+import type { HttpTriggerRegistration } from "@relkit/graph";
 import { mapRequest } from "./request-mapping.js";
 import { isRequestMappingFailure } from "./request-mapping.js";
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";

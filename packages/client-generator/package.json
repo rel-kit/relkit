@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/client-generator",
+  "name": "@relkit/client-generator",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,8 +9,8 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*",
-    "@zsys/graph": "workspace:*"
+    "@relkit/contracts": "workspace:*",
+    "@relkit/graph": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

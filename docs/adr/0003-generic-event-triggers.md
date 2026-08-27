@@ -1,8 +1,8 @@
-# ZSYS-ADR-003: Generic event triggers without a subscription primitive
+# RELKIT-ADR-003: Generic event triggers without a subscription primitive
 
 - Status: Accepted — reviewed Phase 0 baseline
 - Date: 2026-08-12
-- Owner: ZSys maintainers
+- Owner: RelKit maintainers
 - Supersession: None; a future change must explicitly supersede this ADR.
 
 ## Context
@@ -24,7 +24,7 @@ Choose option 3. Public authoring uses `defineEvent`, selectors, and `onEvent`.
 `onEvent` creates an immutable event-trigger descriptor with explicit delivery
 and retry policy, targeting a function. Compilation expands known selectors to
 explicit event ID/version pairs. Provider broker subscriptions, if needed,
-are implementation details. ZSys exposes no `defineSubscription`, subscription
+are implementation details. RelKit exposes no `defineSubscription`, subscription
 graph node, or `*.subscription.ts` convention.
 
 ## Consequences
@@ -42,7 +42,7 @@ primitive.
 
 ## References
 
-- `docs/zsys-typescript-poc-technical-spec-v3.md` §§2.5, 7.11–7.12, 16.
-- `docs/zsys-typescript-poc-review-gates-v3.md` Gates 2, 3, 9, 13, and 16.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/public-authoring/spec.md` — Generic event trigger bindings.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/jobs-events/spec.md` — Event selectors, fan-out, delivery, and recovery.
+- `docs/relkit-typescript-poc-technical-spec-v3.md` §§2.5, 7.11–7.12, 16.
+- `docs/relkit-typescript-poc-review-gates-v3.md` Gates 2, 3, 9, 13, and 16.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/public-authoring/spec.md` — Generic event trigger bindings.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/jobs-events/spec.md` — Event selectors, fan-out, delivery, and recovery.

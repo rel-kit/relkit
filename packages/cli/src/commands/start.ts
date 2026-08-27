@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
-import { API_BASE_PATH } from "@zsys/contracts";
-import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "@zsys/supervisor";
+import { API_BASE_PATH } from "@relkit/contracts";
+import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "@relkit/supervisor";
 import { resolveApplicationPort } from "./ports.js";
 import { readBuilt } from "./start-built.js";
 export interface StartOptions {
@@ -27,7 +27,7 @@ export interface StartedProject {
 /** Validates the built graph/manifest, waits for health/readiness, and owns shutdown. */
 export async function startProject(options: StartOptions = {}): Promise<StartedProject> {
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
-  const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".zsys", "build"));
+  const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".relkit", "build"));
   const built = await readBuilt(buildDirectory);
   const hostname = options.hostname ?? "127.0.0.1";
   const inherited = Object.fromEntries(
@@ -57,7 +57,7 @@ export async function startProject(options: StartOptions = {}): Promise<StartedP
   const environment = {
     ...source,
     PORT: String(port),
-    ZSYS_GRAPH_HASH: built.graphHash,
+    RELKIT_GRAPH_HASH: built.graphHash,
   };
   const entrypoint = join(buildDirectory, built.manifest.containerEntrypoint);
   const spawn = options.spawn ?? Bun.spawn;

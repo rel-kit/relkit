@@ -22,7 +22,7 @@ function readGolden(name: string): unknown {
   return JSON.parse(readFileSync(join(import.meta.dir, "golden", name), "utf8"));
 }
 
-describe.serial("@zsys/schema", () => {
+describe.serial("@relkit/schema", () => {
   test("validates sync and async Standard Schema values", async () => {
     const defaulted = validateSync(orderSchema, {
       orderId: "550e8400-e29b-41d4-a716-446655440000",
@@ -100,7 +100,7 @@ describe.serial("@zsys/schema", () => {
     expect(validateSync(z.void(), undefined)).toEqual({ value: undefined });
     expect(getJsonSchema(z.undefined())).toEqual({
       ok: true,
-      schema: { "x-zsys-void": true },
+      schema: { "x-relkit-void": true },
     });
   });
 
@@ -122,8 +122,8 @@ describe.serial("@zsys/schema", () => {
       schema: {
         type: "string",
         format: "binary",
-        "x-zsys-maxBytes": 5,
-        "x-zsys-mediaTypes": ["image/*", "text/plain"],
+        "x-relkit-maxBytes": 5,
+        "x-relkit-mediaTypes": ["image/*", "text/plain"],
       },
     });
   });

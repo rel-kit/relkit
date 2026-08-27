@@ -35,7 +35,7 @@ export function forwardProxyRequest(
 }
 
 export function drainResponse(): Response {
-  return new Response(JSON.stringify({ error: "ZSys generation is draining." }), {
+  return new Response(JSON.stringify({ error: "RelKit generation is draining." }), {
     status: 503,
     headers: { "cache-control": "no-store", "content-type": "application/json" },
   });

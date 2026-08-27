@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import {
   EVENT_ADMIN_PROTOCOL,
   EVENT_ADMIN_VERSION,
@@ -122,28 +122,28 @@ async function applyRetry(
     const reason = readReason(request);
     if (!options.enabled || options.mode === "production")
       throw new EventAdminError(
-        "ZSYS_EVENT_ADMIN_MUTATION_DISABLED",
+        "RELKIT_EVENT_ADMIN_MUTATION_DISABLED",
         "Local event mutations are disabled",
       );
     if (deliveryId === undefined)
       throw new EventAdminError(
-        "ZSYS_EVENT_ADMIN_DELIVERY_INVALID",
+        "RELKIT_EVENT_ADMIN_DELIVERY_INVALID",
         "Event delivery ID is invalid",
       );
     if (before === undefined)
       throw new EventAdminError(
-        "ZSYS_EVENT_ADMIN_NOT_FOUND",
+        "RELKIT_EVENT_ADMIN_NOT_FOUND",
         `Event delivery ${deliveryId} is unknown`,
       );
     if (before.state !== "dead-lettered")
       throw new EventAdminError(
-        "ZSYS_EVENT_ADMIN_STATE_INELIGIBLE",
+        "RELKIT_EVENT_ADMIN_STATE_INELIGIBLE",
         "Only dead-lettered event deliveries can be retried",
       );
     await options.router.retry(deliveryId);
     const after = findDelivery(options.router.snapshot(), deliveryId);
     if (after === undefined)
-      throw new EventAdminError("ZSYS_EVENT_ADMIN_ACTION_FAILED", "Retry state missing");
+      throw new EventAdminError("RELKIT_EVENT_ADMIN_ACTION_FAILED", "Retry state missing");
     const record = await recordAction(
       options,
       makeRecord(
@@ -164,7 +164,7 @@ async function applyRetry(
     const error =
       cause instanceof EventAdminError
         ? cause
-        : new EventAdminError("ZSYS_EVENT_ADMIN_ACTION_FAILED", "Event admin action failed");
+        : new EventAdminError("RELKIT_EVENT_ADMIN_ACTION_FAILED", "Event admin action failed");
     const record = await recordAction(
       options,
       makeRecord(

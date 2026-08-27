@@ -4,5 +4,5 @@ export {
   RecursionPolicyError,
   createInvocationCallStack,
   createInvocationChain,
-} from "@zsys/invocation";
-export type { InvocationCallFrame } from "@zsys/invocation";
+} from "@relkit/invocation";
+export type { InvocationCallFrame } from "@relkit/invocation";

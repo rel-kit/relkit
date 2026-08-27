@@ -1,5 +1,5 @@
-import { createDiagnostic, type Diagnostic } from "@zsys/diagnostics";
-import { normalizeSourcePath } from "@zsys/contracts";
+import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
@@ -53,7 +53,7 @@ export function uniqueById(
     if (previous !== undefined) {
       diagnostics.push(
         createDiagnostic({
-          code: "ZSYS_DUPLICATE_ID",
+          code: "RELKIT_DUPLICATE_ID",
           severity: "error",
           message: `Duplicate function ID "${descriptor.id}" cannot be registered twice.`,
           descriptorId: descriptor.id,
@@ -93,7 +93,7 @@ export function collectModules(
 
 export function importBindings(modules: readonly string[]): ReadonlyMap<string, ImportBinding> {
   return new Map(
-    modules.map((module, index) => [module, { module, alias: `__zsys_module_${index}` }]),
+    modules.map((module, index) => [module, { module, alias: `__relkit_module_${index}` }]),
   );
 }
 
@@ -142,10 +142,10 @@ export function missingReference(
   if (descriptor === undefined) return;
   const code =
     kind === "function"
-      ? "ZSYS_MANIFEST_HANDLER_MISSING"
+      ? "RELKIT_MANIFEST_HANDLER_MISSING"
       : kind === "transform"
-        ? "ZSYS_MANIFEST_TRANSFORM_MISSING"
-        : "ZSYS_MANIFEST_MIDDLEWARE_MISSING";
+        ? "RELKIT_MANIFEST_TRANSFORM_MISSING"
+        : "RELKIT_MANIFEST_MIDDLEWARE_MISSING";
   diagnostics.push(
     createDiagnostic({
       code,
@@ -171,6 +171,6 @@ export function generatedAgentMarker(agentId: string): {
     generated: true,
     generatedBy: "agent",
     agentId,
-    functionId: `zsys.agent.${agentId}.invoke`,
+    functionId: `relkit.agent.${agentId}.invoke`,
   };
 }

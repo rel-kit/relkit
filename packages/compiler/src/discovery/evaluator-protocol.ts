@@ -1,18 +1,18 @@
-import { canonicalJson } from "@zsys/contracts";
-import type { JsonValue } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
-export const EVALUATOR_PROTOCOL = "zsys.evaluator" as const;
+export const EVALUATOR_PROTOCOL = "relkit.evaluator" as const;
 export const EVALUATOR_PROTOCOL_VERSION = 1 as const;
-export const EVALUATOR_FRAME = "\u001ezsys-evaluator-response:";
+export const EVALUATOR_FRAME = "\u001erelkit-evaluator-response:";
 
 export type EvaluatorFailureCode =
-  | "ZSYS_EVALUATOR_REQUEST_INVALID"
-  | "ZSYS_EVALUATOR_ROOT_INVALID"
-  | "ZSYS_EVALUATOR_IMPORT_FAILED"
-  | "ZSYS_EVALUATOR_TIMEOUT"
-  | "ZSYS_EVALUATOR_PROCESS_FAILED"
-  | "ZSYS_EVALUATOR_PROTOCOL_INVALID"
-  | "ZSYS_EVALUATOR_SIDE_EFFECT";
+  | "RELKIT_EVALUATOR_REQUEST_INVALID"
+  | "RELKIT_EVALUATOR_ROOT_INVALID"
+  | "RELKIT_EVALUATOR_IMPORT_FAILED"
+  | "RELKIT_EVALUATOR_TIMEOUT"
+  | "RELKIT_EVALUATOR_PROCESS_FAILED"
+  | "RELKIT_EVALUATOR_PROTOCOL_INVALID"
+  | "RELKIT_EVALUATOR_SIDE_EFFECT";
 
 export type EvaluatorSideEffectKind =
   | "listening-socket"

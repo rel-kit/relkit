@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_EVENT_NAME_UNKNOWN",
+    "code": "RELKIT_EVENT_NAME_UNKNOWN",
     "column": 17,
     "descriptorId": "orders.created-trigger",
     "file": "src/events/order-created-trigger.event.ts",

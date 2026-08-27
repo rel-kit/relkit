@@ -27,58 +27,58 @@ export type ImportReference = {
 };
 
 export const publicApplicationPackages = new Set([
-  "@zsys/agents",
-  "@zsys/app",
-  "@zsys/better-auth",
-  "@zsys/buckets",
-  "@zsys/cache",
-  "@zsys/client",
-  "@zsys/config",
-  "@zsys/drizzle",
-  "@zsys/events",
-  "@zsys/functions",
-  "@zsys/jobs",
-  "@zsys/routes",
-  "@zsys/schema",
-  "@zsys/services",
-  "@zsys/testing",
-  "@zsys/tools",
+  "@relkit/agents",
+  "@relkit/app",
+  "@relkit/better-auth",
+  "@relkit/buckets",
+  "@relkit/cache",
+  "@relkit/client",
+  "@relkit/config",
+  "@relkit/drizzle",
+  "@relkit/events",
+  "@relkit/functions",
+  "@relkit/jobs",
+  "@relkit/routes",
+  "@relkit/schema",
+  "@relkit/services",
+  "@relkit/testing",
+  "@relkit/tools",
 ]);
 
 export const descriptorPackages = new Set(
   [...publicApplicationPackages].filter(
     (name) =>
       ![
-        "@zsys/better-auth",
-        "@zsys/client",
-        "@zsys/config",
-        "@zsys/drizzle",
-        "@zsys/schema",
-        "@zsys/testing",
+        "@relkit/better-auth",
+        "@relkit/client",
+        "@relkit/config",
+        "@relkit/drizzle",
+        "@relkit/schema",
+        "@relkit/testing",
       ].includes(name),
   ),
 );
 
 export const internalRuntimePackages = new Set([
-  "@zsys/cloud-aws",
-  "@zsys/deploy-pulumi",
-  "@zsys/engine",
-  "@zsys/inspector-api",
-  "@zsys/invocation",
-  "@zsys/observability",
-  "@zsys/providers-local",
-  "@zsys/providers-standard",
-  "@zsys/runtime-effect",
-  "@zsys/runtime-hono",
-  "@zsys/supervisor",
+  "@relkit/cloud-aws",
+  "@relkit/deploy-pulumi",
+  "@relkit/engine",
+  "@relkit/inspector-api",
+  "@relkit/invocation",
+  "@relkit/observability",
+  "@relkit/providers-local",
+  "@relkit/providers-standard",
+  "@relkit/runtime-effect",
+  "@relkit/runtime-hono",
+  "@relkit/supervisor",
 ]);
 
 /** Shared invocation contracts are internal, but descriptor packages may consume them. */
-export const dependencyNeutralPackages = new Set(["@zsys/invocation"]);
+export const dependencyNeutralPackages = new Set(["@relkit/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
-  ["@zsys/agents", new Set(["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"])],
-  ["@zsys/routes", new Set(["hono"])],
+  ["@relkit/agents", new Set(["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"])],
+  ["@relkit/routes", new Set(["hono"])],
 ]);
 
 export const nodeBuiltins = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));
@@ -182,10 +182,10 @@ export function isFrameworkRuntime(dependency: string): boolean {
 }
 
 export function isFixtureForbidden(dependency: string): boolean {
-  if (dependency === "@zsys/app/config") return false;
+  if (dependency === "@relkit/app/config") return false;
   return (
-    (dependency.startsWith("@zsys/") && !publicApplicationPackages.has(dependency)) ||
-    dependency === "create-zsys" ||
+    (dependency.startsWith("@relkit/") && !publicApplicationPackages.has(dependency)) ||
+    dependency === "create-relkit" ||
     isFrameworkRuntime(dependency) ||
     dependency === "aws-sdk" ||
     dependency.startsWith("@aws-sdk/")

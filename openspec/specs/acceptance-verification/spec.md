@@ -1,6 +1,6 @@
 ## Purpose
 
-Defines the deterministic evidence, layered tests, phase gates, documentation checks, and scope/security acceptance required before the ZSys POC can be released.
+Defines the deterministic evidence, layered tests, phase gates, documentation checks, and scope/security acceptance required before the RelKit POC can be released.
 
 ## Requirements
 
@@ -47,7 +47,7 @@ Each test SHALL use a unique temporary state root, deterministic IDs/time unless
 #### Scenario: Tests run concurrently
 
 - **WHEN** independent runtime/provider tests execute in parallel
-- **THEN** they do not share `.zsys/state`, observability files, provider instances, or fixed ports
+- **THEN** they do not share `.relkit/state`, observability files, provider instances, or fixed ports
 
 ### Requirement: Security verification covers every output
 

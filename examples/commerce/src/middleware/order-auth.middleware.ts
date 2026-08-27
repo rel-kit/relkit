@@ -1,4 +1,4 @@
-import { defineMiddleware } from "@zsys/app";
+import { defineMiddleware } from "@relkit/app";
 import authorizeOrder from "../functions/authorize-order.function.js";
 
 const orderAuth = defineMiddleware("/orders/*", async (context, next) => {

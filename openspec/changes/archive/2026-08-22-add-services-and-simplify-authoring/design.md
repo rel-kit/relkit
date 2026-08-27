@@ -45,7 +45,7 @@ Removing path values from reusable input entirely was rejected because a functio
 
 ### 2. Extract one dependency-neutral invocation kernel
 
-`@zsys/functions` cannot depend on `@zsys/engine` without creating workspace cycles through app, event, and job packages. The reusable portion of the existing engine invocation path will therefore move into one small internal invocation package consumed by both `@zsys/functions` and `@zsys/engine`. It owns:
+`@relkit/functions` cannot depend on `@relkit/engine` without creating workspace cycles through app, event, and job packages. The reusable portion of the existing engine invocation path will therefore move into one small internal invocation package consumed by both `@relkit/functions` and `@relkit/engine`. It owns:
 
 - structural invocation-target types;
 - Standard Schema input/output and declared-error validation;
@@ -97,13 +97,13 @@ The compiler extends its existing TypeScript source-fact pass to identify eligib
 
 The evaluator snapshot and normalizer carry source identity facts rather than asking runtime JavaScript to discover a variable name, which JavaScript cannot do reliably. The generated manifest emits identity-binding wrappers for imported descriptors and nested declared errors before registry creation. Runtime lookup, error instances, descriptor invocation, logs, and traces consult the bound canonical identity.
 
-A direct uncompiled standalone invocation of an ID-less descriptor uses a process-local non-persisted diagnostic identity until a ZSYS compiler/test loader binds it. It still validates and executes, but only compiled output claims canonical stable identity.
+A direct uncompiled standalone invocation of an ID-less descriptor uses a process-local non-persisted diagnostic identity until a RELKIT compiler/test loader binds it. It still validates and executes, but only compiled output claims canonical stable identity.
 
 Moving a descriptor with an inferred ID is an identity change and compatibility diff reports it. Moving a descriptor with an explicit ID is source-metadata-only. Ambiguous inference and collisions fail compilation with all origins and an explicit-ID suggestion.
 
 ### 5. Services are structural descriptors with service-scoped member facades
 
-Add `@zsys/services`, re-exported from `@zsys/app`, with the approved shape:
+Add `@relkit/services`, re-exported from `@relkit/app`, with the approved shape:
 
 ```ts
 export const OrderService = defineService({
@@ -153,7 +153,7 @@ Keeping the existing string forms makes this additive for current errors while a
 
 ### 7. AI SDK v7 replaces the custom model protocol behind serializable descriptors
 
-Add the pinned AI SDK v7 core plus official OpenAI and Anthropic provider adapters. Remove the public custom `ModelProvider`, custom turn protocol/loop, and handwritten OpenAI request adapter after their callers migrate. ZSYS keeps its bounded agent descriptor and generated-function boundary; the runtime implements it with AI SDK's provider registry, `ToolLoopAgent`, tool contracts, and version-matched `ai/test` models.
+Add the pinned AI SDK v7 core plus official OpenAI and Anthropic provider adapters. Remove the public custom `ModelProvider`, custom turn protocol/loop, and handwritten OpenAI request adapter after their callers migrate. RELKIT keeps its bounded agent descriptor and generated-function boundary; the runtime implements it with AI SDK's provider registry, `ToolLoopAgent`, tool contracts, and version-matched `ai/test` models.
 
 Each environment provider recipe accepts serializable model configuration shaped conceptually as:
 
@@ -177,9 +177,9 @@ Agent `model` resolution is deterministic:
 2. A configured provider name: that entry's `defaultModel`, otherwise a configuration failure.
 3. `provider:model`: the exact AI SDK registry ID after provider validation.
 
-Agent descriptors continue to store only strings, schemas, instructions/messages, tools, limits, and safe metadata. No first-class prompt descriptor is added. Existing ZSYS step/tool/time limits, output validation, cancellation, redaction, and telemetry wrap the AI SDK loop.
+Agent descriptors continue to store only strings, schemas, instructions/messages, tools, limits, and safe metadata. No first-class prompt descriptor is added. Existing RELKIT step/tool/time limits, output validation, cancellation, redaction, and telemetry wrap the AI SDK loop.
 
-Each ZSYS tool becomes an AI SDK tool using the projected input schema, an execution callback into the ZSYS tool runtime, and approval mapping that fails closed. ZSYS remains authoritative for side-effect policy and engine invocation. Tests use official AI SDK test models and never live network providers.
+Each RELKIT tool becomes an AI SDK tool using the projected input schema, an execution callback into the RELKIT tool runtime, and approval mapping that fails closed. RELKIT remains authoritative for side-effect policy and engine invocation. Tests use official AI SDK test models and never live network providers.
 
 ### 8. Templates demonstrate one concept each
 
@@ -195,8 +195,8 @@ The examples explain that event fan-out creates independent deliveries, not a tr
 - **Source-derived IDs make moves breaking by default** → Keep explicit overrides, emit compatibility changes, and document explicit IDs for identities that must survive refactors.
 - **The canonical graph no longer predicts every function call** → Keep all current functions in the generation registry, record observed edges, enforce cycles at runtime, and avoid claiming a complete static call graph.
 - **Service middleware could leak request-specific state** → Freeze patches, scope them per invocation, prohibit raw/shared mutation, and exclude context values from default telemetry.
-- **AI SDK and provider packages evolve quickly** → Pin compatible major/minor versions in the lockfile and keep ZSYS-facing contracts covered by provider, tool, limit, privacy, and offline test matrices.
-- **Approval semantics could differ between AI SDK and ZSYS** → Treat ZSYS policy as authoritative and fail closed when either layer requires approval.
+- **AI SDK and provider packages evolve quickly** → Pin compatible major/minor versions in the lockfile and keep RELKIT-facing contracts covered by provider, tool, limit, privacy, and offline test matrices.
+- **Approval semantics could differ between AI SDK and RELKIT** → Treat RELKIT policy as authoritative and fail closed when either layer requires approval.
 - **Graph/manifest shapes change** → Bump their contract versions together and retain fail-fast hash/version checks so mixed artifacts never activate.
 
 ## Migration Plan

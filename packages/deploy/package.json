@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/deploy",
+  "name": "@relkit/deploy",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -14,7 +14,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*",
-    "@zsys/graph": "workspace:*"
+    "@relkit/contracts": "workspace:*",
+    "@relkit/graph": "workspace:*"
   }
 }

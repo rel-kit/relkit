@@ -13,15 +13,15 @@ bun run start
 
 `check` refreshes the typed event registry and validates descriptors, references, schemas, collisions,
 and production requirements. `build` emits a graph, manifest, OpenAPI document, client, server, and
-container files under `.zsys/build`. `start` refuses a stale or hash-mismatched build.
+container files under `.relkit/build`. `start` refuses a stale or hash-mismatched build.
 
 Inspect compatibility before deployment:
 
 ```sh
-zsys graph print
-zsys graph check
-zsys graph diff before.json after.json
-zsys deploy preview --stack staging
+relkit graph print
+relkit graph check
+relkit graph diff before.json after.json
+relkit deploy preview --stack staging
 ```
 
 Deployment uses the checked graph through Pulumi. Review `preview` before `up`, isolate stacks by

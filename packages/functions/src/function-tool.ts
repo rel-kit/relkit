@@ -4,9 +4,9 @@ import {
   type MaybePromise,
   type DescriptorBase,
   type DescriptorMetadata,
-} from "@zsys/contracts";
-import { createUnboundIdentity, resolveDescriptorIdentity } from "@zsys/invocation";
-import { type InferInput, type InferOutput } from "@zsys/schema";
+} from "@relkit/contracts";
+import { createUnboundIdentity, resolveDescriptorIdentity } from "@relkit/invocation";
+import { type InferInput, type InferOutput } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionRef, FunctionRefAny } from "./types.js";
 import type { FunctionContext } from "./function-descriptor-types.js";

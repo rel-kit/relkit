@@ -1,4 +1,4 @@
-import { events, onEvent } from "@zsys/app";
+import { events, onEvent } from "@relkit/app";
 
 const telemetry = onEvent(
   events.all({ payload: "unknown", purpose: "telemetry" }),

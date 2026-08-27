@@ -4,7 +4,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "ZSYS Documentation", template: "%s | ZSYS" },
+  title: { default: "RELKIT Documentation", template: "%s | RELKIT" },
   description: "Build typed applications with convention-first routes, events, and operations.",
 };
 

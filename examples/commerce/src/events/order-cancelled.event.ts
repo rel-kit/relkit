@@ -1,4 +1,4 @@
-import { defineEvent } from "@zsys/app";
+import { defineEvent } from "@relkit/app";
 import { orderCancelledPayload } from "../shared/schemas.js";
 
 const orderCancelled = defineEvent({

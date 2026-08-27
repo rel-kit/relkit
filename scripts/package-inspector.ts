@@ -1,4 +1,4 @@
-import { access, cp, mkdir, rm } from "node:fs/promises";
+import { access, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
@@ -8,14 +8,20 @@ const build = join(inspector, distName);
 const standalone = join(build, "standalone");
 const standaloneApp = join(standalone, "apps/inspector");
 const output = join(root, "packages/cli/dist/inspector");
+const nextEnv = join(inspector, "next-env.d.ts");
+const nextEnvSource = (await readFile(nextEnv, "utf8")).replaceAll(
+  /import "\.\/[^\"]+\/types\//g,
+  'import "./.next/types/',
+);
 
 const child = Bun.spawn([process.execPath, "run", "build"], {
   cwd: inspector,
-  env: { ...process.env, ZSYS_INSPECTOR_DIST_DIR: distName },
+  env: { ...process.env, RELKIT_INSPECTOR_DIST_DIR: distName },
   stdout: "inherit",
   stderr: "inherit",
 });
 const exitCode = await child.exited;
+await writeFile(nextEnv, nextEnvSource, "utf8");
 if (exitCode !== 0) throw new Error(`Inspector build failed with exit code ${exitCode}.`);
 
 await rm(output, { recursive: true, force: true });

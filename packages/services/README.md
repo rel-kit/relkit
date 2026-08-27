@@ -1,4 +1,4 @@
-# @zsys/services
+# @relkit/services
 
 Services group named function descriptors under one identity and ordered
 invocation policy. They do not own another business handler or become a
@@ -6,8 +6,8 @@ workflow; member facades retain the original schemas, errors, and runtime
 capabilities.
 
 ```ts
-import { defineFunction, defineService, defineServiceMiddleware } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction, defineService, defineServiceMiddleware } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const getOrder = defineFunction({
   input: z.object({ orderId: z.string() }),

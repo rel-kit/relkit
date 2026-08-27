@@ -1,5 +1,5 @@
-import { normalizeSourcePath } from "@zsys/contracts";
-import type { Diagnostic } from "@zsys/diagnostics";
+import { normalizeSourcePath } from "@relkit/contracts";
+import type { Diagnostic } from "@relkit/diagnostics";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import {
@@ -29,7 +29,7 @@ export function functionExpressionsFor(
     if (generated !== undefined) {
       expressions.set(
         descriptor.id,
-        `__zsys_createGeneratedAgentFunction(${JSON.stringify(generated.agentId)})`,
+        `__relkit_createGeneratedAgentFunction(${JSON.stringify(generated.agentId)})`,
       );
       continue;
     }
@@ -44,7 +44,6 @@ export function functionExpressionsFor(
   for (const id of functionById.keys()) if (!expressions.has(id)) expressions.set(id, "undefined");
   return expressions;
 }
-
 export function functionTargetExpressionsFor(
   functions: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -96,7 +95,6 @@ function isGeneratedFunction(value: unknown): ReturnType<typeof generatedAgentMa
     return undefined;
   return value.generated as ReturnType<typeof generatedAgentMarker>;
 }
-
 export function transformExpressionsFor(
   transforms: readonly NormalizedDescriptor[],
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -196,5 +194,7 @@ function isExecutableSchema(value: unknown): boolean {
 function isExecutableProperty(value: unknown, property: string): boolean {
   if (!isRecord(value)) return false;
   const candidate = value[property];
-  return typeof candidate === "function" || (isRecord(candidate) && candidate.$zsys === "function");
+  return (
+    typeof candidate === "function" || (isRecord(candidate) && candidate.$relkit === "function")
+  );
 }

@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { isolateDataModels, prefilterSources } from "@zsys/compiler";
+import { isolateDataModels, prefilterSources } from "@relkit/compiler";
 
 test("keeps data-model modules out of compiler evaluation", () => {
   const source = `
-    import { defineDataModel } from "@zsys/drizzle";
+    import { defineDataModel } from "@relkit/drizzle";
     const database = (() => { throw new Error("must not execute"); })();
     export default defineDataModel(database, { users });
   `;

@@ -1,15 +1,15 @@
-# ZSYS-ADR-007: Warning-only source conventions
+# RELKIT-ADR-007: Warning-only source conventions
 
 - Status: Accepted — reviewed Phase 0 baseline
 - Date: 2026-08-12
-- Owner: ZSys maintainers
+- Owner: RelKit maintainers
 - Supersession: None; a future change must explicitly supersede this ADR.
 
 ## Context
 
 Recommended directories, suffixes, and export shapes help developers navigate a
 project, but making them discovery requirements would make valid descriptors
-depend on file layout. ZSys already has a stronger runtime-brand and semantic
+depend on file layout. RelKit already has a stronger runtime-brand and semantic
 validation model.
 
 ## Options
@@ -42,7 +42,7 @@ test, or deployment by themselves.
 
 ## References
 
-- `docs/zsys-typescript-poc-technical-spec-v3.md` §§5.2–5.4, 11.4–11.6, 25.1.
-- `docs/zsys-typescript-poc-review-gates-v3.md` Gates 0, 2, 3, and 16.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/workspace-foundation/spec.md` — Structural conventions are evidence-based.
-- `openspec/changes/implement-zsys-typescript-poc-v3/specs/public-authoring/spec.md` — Conventions warn without excluding descriptors.
+- `docs/relkit-typescript-poc-technical-spec-v3.md` §§5.2–5.4, 11.4–11.6, 25.1.
+- `docs/relkit-typescript-poc-review-gates-v3.md` Gates 0, 2, 3, and 16.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/workspace-foundation/spec.md` — Structural conventions are evidence-based.
+- `openspec/changes/implement-relkit-typescript-poc-v3/specs/public-authoring/spec.md` — Conventions warn without excluding descriptors.

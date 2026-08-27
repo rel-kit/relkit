@@ -1,4 +1,4 @@
-import { type MaybePromise } from "@zsys/contracts";
+import { type MaybePromise } from "@relkit/contracts";
 import {
   captureAgentContent,
   createAgentCapturePolicy,
@@ -15,7 +15,7 @@ export {
 } from "./capture.js";
 export type { AgentCapturePolicy, AgentCaptureRecord, AgentSpanCapture } from "./capture.js";
 
-export const AGENT_OBSERVABILITY_PROTOCOL = "zsys.observability.hooks" as const;
+export const AGENT_OBSERVABILITY_PROTOCOL = "relkit.observability.hooks" as const;
 export const AGENT_OBSERVABILITY_VERSION = 1 as const;
 
 export type AgentSpanKind = "agent" | "model" | "tool";

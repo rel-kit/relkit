@@ -4,11 +4,11 @@ import {
   GRAPH_VERSION,
   MANIFEST_VERSION,
   type ProtocolId,
-} from "@zsys/contracts";
-import { dispatchInvocation } from "@zsys/invocation";
-import { defineFunction } from "@zsys/app";
-import { hashGraph, type ApplicationGraph } from "@zsys/graph";
-import { z } from "@zsys/schema";
+} from "@relkit/contracts";
+import { dispatchInvocation } from "@relkit/invocation";
+import { defineFunction } from "@relkit/app";
+import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+import { z } from "@relkit/schema";
 import { createFunctionRegistry } from "./src/registry.ts";
 import {
   createInspectableObservabilityHooks,

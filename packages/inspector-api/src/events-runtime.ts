@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type JsonValue } from "@zsys/contracts";
+import { PROTOCOL_VERSION, type JsonValue } from "@relkit/contracts";
 import {
   InspectorQueryError,
   identity,
@@ -11,7 +11,7 @@ import {
   type ResolvedActiveGeneration,
 } from "./shared.js";
 
-export const INSPECTOR_EVENTS_PROTOCOL = "zsys.events.admin" as const;
+export const INSPECTOR_EVENTS_PROTOCOL = "relkit.events.admin" as const;
 export const INSPECTOR_EVENTS_VERSION = PROTOCOL_VERSION;
 
 export async function eventRuntimeList(

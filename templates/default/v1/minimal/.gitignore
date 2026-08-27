@@ -2,9 +2,9 @@ node_modules/
 .env
 .env.*
 !.env.example
-.zsys/generated/
-.zsys/build/
-.zsys/state/
-.zsys/observability/
+.relkit/generated/
+.relkit/build/
+.relkit/state/
+.relkit/observability/
 coverage/
 dist/

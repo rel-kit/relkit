@@ -1,5 +1,5 @@
-import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "@zsys/cache";
-import { canonicalJson } from "@zsys/contracts";
+import type { CacheOperationContext, CacheOperationOptions, CacheProvider } from "@relkit/cache";
+import { canonicalJson } from "@relkit/contracts";
 import { createRedisClient, type StandardRedisClient } from "./redis-client.js";
 
 export interface RedisCacheOptions {

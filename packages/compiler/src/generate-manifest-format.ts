@@ -1,4 +1,4 @@
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 
@@ -29,15 +29,15 @@ export function renderManifest(
     .join("\n");
   const generatedImports = [
     identityBindings.length > 0
-      ? 'import { bindDescriptorIdentity as __zsys_bindDescriptorIdentity } from "@zsys/invocation";'
+      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/invocation";'
       : "",
     [...functions.values()].some((value) =>
-      value.startsWith("__zsys_createGeneratedAgentFunction("),
+      value.startsWith("__relkit_createGeneratedAgentFunction("),
     )
-      ? 'import { createGeneratedAgentFunction as __zsys_createGeneratedAgentFunction } from "@zsys/agents";'
+      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/agents";'
       : "",
-    [...targets.values()].some((value) => value.startsWith("__zsys_createEventListenerTarget("))
-      ? 'import { createEventListenerTarget as __zsys_createEventListenerTarget } from "@zsys/events";'
+    [...targets.values()].some((value) => value.startsWith("__relkit_createEventListenerTarget("))
+      ? 'import { createEventListenerTarget as __relkit_createEventListenerTarget } from "@relkit/events";'
       : "",
   ]
     .filter(Boolean)
@@ -92,7 +92,7 @@ function renderProviders(keys: readonly string[]): string {
 }
 
 function importPath(module: string, input: ManifestGenerationInput): string {
-  const generated = (input.generatedDirectory ?? ".zsys/generated")
+  const generated = (input.generatedDirectory ?? ".relkit/generated")
     .replaceAll("\\", "/")
     .replace(/\/+$/, "");
   const depth = generated.split("/").filter(Boolean).length;

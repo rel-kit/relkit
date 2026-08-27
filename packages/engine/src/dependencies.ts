@@ -1,8 +1,8 @@
-import type { MaybePromise } from "@zsys/contracts";
-import type { BucketOperationObservation } from "@zsys/buckets";
-import type { CacheOperationObservation } from "@zsys/cache";
-import type { GraphEdge, ObservedEdge } from "@zsys/graph";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import type { MaybePromise } from "@relkit/contracts";
+import type { BucketOperationObservation } from "@relkit/buckets";
+import type { CacheOperationObservation } from "@relkit/cache";
+import type { GraphEdge, ObservedEdge } from "@relkit/graph";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type { InvocationErrorDefinition } from "./invoke-types.js";
 import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-clients.js";
 

@@ -8,8 +8,8 @@
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@zsys/app/config": ["../../packages/app/src/config.ts"],
-      "@zsys/*": ["../../packages/*/src/index.ts"]
+      "@relkit/app/config": ["../../packages/app/src/config.ts"],
+      "@relkit/*": ["../../packages/*/src/index.ts"]
     },
     "skipLibCheck": true,
     "strict": true,

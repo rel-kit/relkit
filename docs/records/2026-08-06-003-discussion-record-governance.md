@@ -1,16 +1,16 @@
-# ZSYS-DR-003: Discussion Record Governance
+# RELKIT-DR-003: Discussion Record Governance
 
 **Date:** 2026-08-06
 
 **Status:** Accepted
 
-**Owners:** ZSys maintainers
+**Owners:** RelKit maintainers
 
-**Related records:** [ZSYS-DR-001](./2026-08-06-001-foundational-architecture.md), [ZSYS-DR-002](./2026-08-06-002-filesystem-structure-resource-addressing-and-deployment.md)
+**Related records:** [RELKIT-DR-001](./2026-08-06-001-foundational-architecture.md), [RELKIT-DR-002](./2026-08-06-002-filesystem-structure-resource-addressing-and-deployment.md)
 
 ## Context
 
-ZSys is expected to evolve through architecture, product, compiler, runtime, deployment, and ecosystem discussions. Decisions made conversationally can become difficult to reconstruct after code, plugins, or migration behavior depend on them.
+RelKit is expected to evolve through architecture, product, compiler, runtime, deployment, and ecosystem discussions. Decisions made conversationally can become difficult to reconstruct after code, plugins, or migration behavior depend on them.
 
 A lightweight but durable record system is needed so humans and AI agents can locate the context, alternatives, current direction, consequences, and superseding decisions for each material discussion.
 
@@ -46,7 +46,7 @@ docs/records/YYYY-MM-DD-NNN-short-topic.md
 The document title includes the corresponding stable identifier:
 
 ```text
-ZSYS-DR-NNN
+RELKIT-DR-NNN
 ```
 
 Sequence numbers are not reused, even when a record is rejected or superseded.
@@ -98,7 +98,7 @@ Records should use stable IDs, explicit status values, resolvable relative links
 
 - Use [`_template.md`](./_template.md) for future material discussions.
 - Update `docs/README.md` whenever a record is created or changes status.
-- Begin the next material record at `ZSYS-DR-004`.
+- Begin the next material record at `RELKIT-DR-004`.
 - Evaluate machine-readable front matter after the documentation set grows beyond the initial records.
 
 ## Supersedes

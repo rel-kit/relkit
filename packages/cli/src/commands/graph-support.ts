@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { GRAPH_VERSION } from "@zsys/contracts";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import {
   canonicalGraphJson,
   canonicalizeGraph,
@@ -9,7 +9,7 @@ import {
   validateGraphShape,
   type ApplicationGraph,
   type GraphDiff,
-} from "@zsys/graph";
+} from "@relkit/graph";
 
 const GRAPH_FILE = "application.graph.json";
 const HASH_PATTERN = /^sha256:[0-9a-f]{64}$/;
@@ -53,22 +53,22 @@ export interface GraphDiffResult extends GraphDiff {
 /** Reads and canonicalizes a graph artifact without loading source or runtime code. */
 export async function readGraphFile(options: GraphFileOptions = {}) {
   const root = resolve(options.projectRoot ?? process.cwd());
-  const path = resolve(root, options.graphPath ?? join(".zsys", "generated", GRAPH_FILE));
+  const path = resolve(root, options.graphPath ?? join(".relkit", "generated", GRAPH_FILE));
   let value: unknown;
   try {
     value = JSON.parse(await readFile(path, "utf8"));
   } catch (error) {
     const code =
       error instanceof Error && "code" in error && error.code === "ENOENT"
-        ? "ZSYS_GRAPH_NOT_FOUND"
-        : "ZSYS_GRAPH_INVALID";
-    const detail = code === "ZSYS_GRAPH_NOT_FOUND" ? "was not found" : "is not valid JSON";
+        ? "RELKIT_GRAPH_NOT_FOUND"
+        : "RELKIT_GRAPH_INVALID";
+    const detail = code === "RELKIT_GRAPH_NOT_FOUND" ? "was not found" : "is not valid JSON";
     throw new GraphCommandError(code, `Graph file ${detail}: ${path}`);
   }
   if (!isRecord(value)) invalid(path, "the root must be an object");
   if (value.contractVersion !== GRAPH_VERSION) {
     throw new GraphCommandError(
-      "ZSYS_GRAPH_VERSION_UNSUPPORTED",
+      "RELKIT_GRAPH_VERSION_UNSUPPORTED",
       `Graph contract version ${String(value.contractVersion)} is unsupported; expected ${GRAPH_VERSION}: ${path}`,
     );
   }
@@ -100,7 +100,7 @@ export async function checkGraph(
     assertHash(options.expectedHash, "expected graph hash");
     if (options.expectedHash !== loaded.hash)
       throw new GraphCommandError(
-        "ZSYS_GRAPH_HASH_MISMATCH",
+        "RELKIT_GRAPH_HASH_MISMATCH",
         `Expected graph hash ${JSON.stringify(options.expectedHash)} but calculated ${JSON.stringify(loaded.hash)}.`,
       );
   }
@@ -135,13 +135,13 @@ export async function diffGraphFiles(
 function assertHash(value: string, label: string): void {
   if (!HASH_PATTERN.test(value))
     throw new GraphCommandError(
-      "ZSYS_GRAPH_HASH_INVALID",
+      "RELKIT_GRAPH_HASH_INVALID",
       `${label} must use sha256:<64 lowercase hex>.`,
     );
 }
 
 function invalid(path: string, detail: string): never {
-  throw new GraphCommandError("ZSYS_GRAPH_INVALID", `Invalid graph ${path}: ${detail}`);
+  throw new GraphCommandError("RELKIT_GRAPH_INVALID", `Invalid graph ${path}: ${detail}`);
 }
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);

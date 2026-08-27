@@ -20,13 +20,13 @@ const sourceDirectories = [
 ] as const;
 const bundleExtensions = new Set([".js", ".json", ".map"]);
 const networkFiles = new Set([
-  "apps/inspector/app/%5Fzsys/backend/[...path]/route.ts",
+  "apps/inspector/app/%5Frelkit/backend/[...path]/route.ts",
   "apps/inspector/lib/api-transport.ts",
   "apps/inspector/lib/stream.ts",
 ]);
 
 export const FORBIDDEN_PAYLOAD_MARKERS = Object.freeze([
-  "@zsys/",
+  "@relkit/",
   "examples/commerce",
   "packages/engine",
   "packages/providers-local",

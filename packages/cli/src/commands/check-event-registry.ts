@@ -4,7 +4,7 @@ import {
   generateEventRegistry,
   writeIfChanged,
   type ExtractedDescriptor,
-} from "@zsys/compiler";
+} from "@relkit/compiler";
 
 export async function writeEventRegistry(
   descriptors: readonly ExtractedDescriptor[],

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applicationFailure } from "@zsys/runtime-effect";
+import { applicationFailure } from "@relkit/runtime-effect";
 import { createEventAdmin } from "./src/events/admin.ts";
 import { createEventRouter } from "./src/events/router.ts";
 
@@ -10,7 +10,7 @@ const roots: string[] = [];
 
 describe("local event admin contracts", () => {
   test("projects selector and delivery state and safely retries a dead letter", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-event-admin-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-event-admin-"));
     roots.push(root);
     let attempts = 0;
     const router = await createEventRouter(join(root, "events"), { now: () => 100 });
@@ -47,7 +47,7 @@ describe("local event admin contracts", () => {
     });
     const query = admin.query({ eventId: "orders.created", limit: 10 });
     expect(query).toMatchObject({
-      protocol: "zsys.events.admin",
+      protocol: "relkit.events.admin",
       version: 1,
       events: [{ id: "orders.created", version: 1 }],
       triggers: [{ id: "orders.email", expansion: ["orders.created@1"] }],
@@ -68,7 +68,7 @@ describe("local event admin contracts", () => {
     });
     expect(attempts).toBe(2);
     await expect(admin.retry(deliveryId)).rejects.toMatchObject({
-      code: "ZSYS_EVENT_ADMIN_STATE_INELIGIBLE",
+      code: "RELKIT_EVENT_ADMIN_STATE_INELIGIBLE",
     });
     await router.close();
   });

@@ -1,6 +1,6 @@
-import { normalizeId } from "@zsys/contracts";
-import type { UnknownEventEnvelope } from "@zsys/events";
-import type { EventDeliveryResult, EventRouter } from "@zsys/providers-local";
+import { normalizeId } from "@relkit/contracts";
+import type { UnknownEventEnvelope } from "@relkit/events";
+import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
 import type { TestEventCloseOptions } from "./events-types.js";
 import type { TestStateRoot } from "./state-root.js";
 import type { TestFailureControls } from "./fakes.js";

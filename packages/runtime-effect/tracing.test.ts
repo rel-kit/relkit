@@ -85,7 +85,7 @@ describe("runtime tracing", () => {
               invocationId: "invoke-1",
               correlationId: "request-1",
               source: "http",
-              attributes: { "zsys.test": "trace" },
+              attributes: { "relkit.test": "trace" },
               observer: (event) => events.push(event),
             },
           ),
@@ -109,7 +109,7 @@ describe("runtime tracing", () => {
     const child = completed.find((event) => event.span.name === "ctx.cache");
     expect(root?.span.traceId).toBe(child?.span.traceId);
     expect(child?.span.parent._tag).toBe("Some");
-    expect(root?.span.attributes.get("zsys.invocation.id")).toBe("invoke-1");
-    expect(child?.span.attributes.get("zsys.correlation.id")).toBe("request-1");
+    expect(root?.span.attributes.get("relkit.invocation.id")).toBe("invoke-1");
+    expect(child?.span.attributes.get("relkit.correlation.id")).toBe("request-1");
   });
 });

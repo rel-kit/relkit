@@ -1,5 +1,5 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@zsys/contracts";
-import type { FunctionRefAny } from "@zsys/functions";
+import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@relkit/contracts";
+import type { FunctionRefAny } from "@relkit/functions";
 import type {
   HttpMethod,
   HttpRequestContentType,

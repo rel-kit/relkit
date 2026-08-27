@@ -63,7 +63,7 @@ async function readObject(
 
 async function writeObject(objectRoot: string, value: StoredLocalBucketObject): Promise<void> {
   const target = objectPath(objectRoot, value.key);
-  const temporary = join(objectRoot, `.zsys-tmp-${randomUUID()}${OBJECT_SUFFIX}`);
+  const temporary = join(objectRoot, `.relkit-tmp-${randomUUID()}${OBJECT_SUFFIX}`);
   try {
     await writeFile(temporary, JSON.stringify(value), {
       encoding: "utf8",
@@ -92,7 +92,11 @@ async function listObjects(objectRoot: string): Promise<readonly StoredLocalBuck
   }
   const values: StoredLocalBucketObject[] = [];
   for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith(OBJECT_SUFFIX) || entry.name.startsWith(".zsys-")) {
+    if (
+      !entry.isFile() ||
+      !entry.name.endsWith(OBJECT_SUFFIX) ||
+      entry.name.startsWith(".relkit-")
+    ) {
       continue;
     }
     const path = join(objectRoot, entry.name);

@@ -124,7 +124,7 @@ export const env: EnvBuilderFactory = Object.freeze({
 
 /** Creates an immutable environment declaration without reading runtime values. */
 export function defineEnv<const S extends EnvShape>(
-  shape: S & { readonly PORT?: never; readonly ZSYS_ENV?: never },
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
 ): EnvDefinition<S> {
   const entries = Object.keys(shape).map((name) => [name, shape[name]!] as const);
   if (entries.some(([, field]) => field.kind !== "env-builder")) {
@@ -140,7 +140,7 @@ export function defineEnv<const S extends EnvShape>(
     metadata,
   };
   for (const [name, field] of entries) {
-    if (name === "PORT" || name === "ZSYS_ENV") {
+    if (name === "PORT" || name === "RELKIT_ENV") {
       throw new TypeError(
         `Environment variable name "${name}" is framework-reserved${
           name === "PORT" ? "; configure server.port instead" : ""

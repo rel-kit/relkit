@@ -1,2 +1,8 @@
 tests/integration/http/fixtures/orders.client.ts
-**/.zsys/**
+**/.relkit/**
+**/.?sys/**
+**/.next-e2e/**
+openspec/changes/archive/**
+tests/compiler/fixtures/**/expected*.json
+tests/deployment/golden/**
+docs/*technical-spec*.md

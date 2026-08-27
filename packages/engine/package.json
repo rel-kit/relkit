@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/engine",
+  "name": "@relkit/engine",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,18 +9,18 @@
     }
   },
   "dependencies": {
-    "@zsys/app": "workspace:*",
-    "@zsys/buckets": "workspace:*",
-    "@zsys/cache": "workspace:*",
-    "@zsys/contracts": "workspace:*",
-    "@zsys/events": "workspace:*",
-    "@zsys/graph": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/jobs": "workspace:*",
-    "@zsys/observability": "workspace:*",
-    "@zsys/providers-local": "workspace:*",
-    "@zsys/runtime-effect": "workspace:*",
-    "@zsys/schema": "workspace:*",
+    "@relkit/app": "workspace:*",
+    "@relkit/buckets": "workspace:*",
+    "@relkit/cache": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/events": "workspace:*",
+    "@relkit/graph": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/jobs": "workspace:*",
+    "@relkit/observability": "workspace:*",
+    "@relkit/providers-local": "workspace:*",
+    "@relkit/runtime-effect": "workspace:*",
+    "@relkit/schema": "workspace:*",
     "effect": "4.0.0-beta.107"
   },
   "scripts": {

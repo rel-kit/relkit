@@ -1,4 +1,4 @@
-import { onEvent } from "@zsys/app";
+import { onEvent } from "@relkit/app";
 import receiptJob from "../jobs/send-receipt.job.js";
 
 const listener = onEvent(

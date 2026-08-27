@@ -3,8 +3,8 @@ import { createInspectorApiClient } from "./api";
 import { invokeToolApproval, supportsToolApproval, toolActionCapabilities } from "./tool-actions";
 
 const envelope = (value: Record<string, unknown>) =>
-  new Response(JSON.stringify({ protocol: "zsys.inspector", version: 1, ...value }), {
-    headers: { "content-type": "application/json", "x-zsys-api-version": "1" },
+  new Response(JSON.stringify({ protocol: "relkit.inspector", version: 1, ...value }), {
+    headers: { "content-type": "application/json", "x-relkit-api-version": "1" },
   });
 
 describe("inspector tool approval actions", () => {
@@ -17,8 +17,8 @@ describe("inspector tool approval actions", () => {
         url = String(requestUrl);
         init = requestInit;
         return envelope(
-          String(requestUrl).endsWith("/_zsys/v1")
-            ? { capabilities: ["/_zsys/v1/actions/tools/:id/approve"] }
+          String(requestUrl).endsWith("/_relkit/v1")
+            ? { capabilities: ["/_relkit/v1/actions/tools/:id/approve"] }
             : { approval: { state: "approved" } },
         );
       },
@@ -35,7 +35,7 @@ describe("inspector tool approval actions", () => {
       graphHash: "sha256:one",
       idempotencyKey: "approval-1",
     });
-    expect(url).toBe("/_zsys/v1/actions/tools/orders.tool/approve");
+    expect(url).toBe("/_relkit/v1/actions/tools/orders.tool/approve");
     expect(init?.method).toBe("POST");
     expect(JSON.parse(String(init?.body))).toMatchObject({
       generationId: "generation-one",

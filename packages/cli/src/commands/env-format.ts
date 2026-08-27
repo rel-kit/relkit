@@ -1,5 +1,5 @@
-import { canonicalJson } from "@zsys/contracts";
-import type { EnvIssue, EnvMetadata, EnvProjection, EnvValueType } from "@zsys/config";
+import { canonicalJson } from "@relkit/contracts";
+import type { EnvIssue, EnvMetadata, EnvProjection, EnvValueType } from "@relkit/config";
 
 export class EnvCommandError extends Error {
   readonly code: string;
@@ -22,8 +22,8 @@ export type ParsedEnvArgs = {
 };
 export type EnvCommandOptions = {
   readonly projectRoot?: string;
-  readonly definition?: import("@zsys/config").EnvDefinition<import("@zsys/config").EnvShape>;
-  readonly source?: import("@zsys/config").EnvSource;
+  readonly definition?: import("@relkit/config").EnvDefinition<import("@relkit/config").EnvShape>;
+  readonly source?: import("@relkit/config").EnvSource;
   readonly environment?: string;
   readonly envPath?: string;
   readonly examplePath?: string;
@@ -36,8 +36,8 @@ export function parseEnvArgs(args: readonly string[]): ParsedEnvArgs {
   const command = args[0];
   if (command !== "check" && command !== "example" && command !== "explain" && command !== "list")
     throw new EnvCommandError(
-      "ZSYS_ENV_USAGE",
-      "Usage: zsys env check|example|explain <NAME>|list [options]",
+      "RELKIT_ENV_USAGE",
+      "Usage: relkit env check|example|explain <NAME>|list [options]",
     );
   let name: string | undefined;
   let environment: string | undefined;
@@ -52,17 +52,20 @@ export function parseEnvArgs(args: readonly string[]): ParsedEnvArgs {
     else if (arg === "--project-root") projectRoot = requiredValue(args, ++index, arg);
     else if (arg === "--path" || arg === "--file") examplePath = requiredValue(args, ++index, arg);
     else if (arg.startsWith("-"))
-      throw new EnvCommandError("ZSYS_ENV_USAGE", `Unknown env option: ${arg}`);
+      throw new EnvCommandError("RELKIT_ENV_USAGE", `Unknown env option: ${arg}`);
     else if (name === undefined) name = arg;
     else
-      throw new EnvCommandError("ZSYS_ENV_USAGE", "Only one environment variable name is allowed.");
+      throw new EnvCommandError(
+        "RELKIT_ENV_USAGE",
+        "Only one environment variable name is allowed.",
+      );
   }
   if (command === "explain" && name === undefined)
-    throw new EnvCommandError("ZSYS_ENV_USAGE", "env explain requires a variable name.");
+    throw new EnvCommandError("RELKIT_ENV_USAGE", "env explain requires a variable name.");
   if (command !== "example" && write)
-    throw new EnvCommandError("ZSYS_ENV_USAGE", "--write is only valid for env example.");
+    throw new EnvCommandError("RELKIT_ENV_USAGE", "--write is only valid for env example.");
   if (command !== "example" && examplePath !== undefined)
-    throw new EnvCommandError("ZSYS_ENV_USAGE", "--path is only valid for env example.");
+    throw new EnvCommandError("RELKIT_ENV_USAGE", "--path is only valid for env example.");
   return {
     command,
     ...(name === undefined ? {} : { name }),
@@ -97,7 +100,7 @@ function envValue(value: unknown): string {
 function requiredValue(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
-    throw new EnvCommandError("ZSYS_ENV_USAGE", `${option} requires a value.`);
+    throw new EnvCommandError("RELKIT_ENV_USAGE", `${option} requires a value.`);
   return value;
 }
 export function isRequired(

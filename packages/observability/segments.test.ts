@@ -67,7 +67,7 @@ test("repairs a malformed tail and quarantines it on startup", async () => {
   const reopened = await createObservabilitySegmentStore({ root });
   await reopened.shutdown();
   expect((await readFile(segment, "utf8")).trim().split("\n")).toHaveLength(1);
-  expect(await readdir(join(root, ".zsys-quarantine"))).toHaveLength(1);
+  expect(await readdir(join(root, ".relkit-quarantine"))).toHaveLength(1);
 });
 
 test("exposes the named rotation failure point without losing the active segment", async () => {
@@ -105,7 +105,7 @@ afterEach(async () => {
 });
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join("/tmp", "zsys-observability-"));
+  const root = await mkdtemp(join("/tmp", "relkit-observability-"));
   roots.push(root);
   return root;
 }

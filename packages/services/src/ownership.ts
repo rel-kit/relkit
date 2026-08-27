@@ -1,4 +1,4 @@
-import type { FunctionRefAny } from "@zsys/functions";
+import type { FunctionRefAny } from "@relkit/functions";
 
 const serviceOwners = new WeakMap<object, string>();
 

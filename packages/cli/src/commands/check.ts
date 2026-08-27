@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { canonicalJson, normalizeId } from "@zsys/contracts";
+import { canonicalJson, normalizeId } from "@relkit/contracts";
 import {
   checkConventions,
   evaluateCandidates,
@@ -12,8 +12,8 @@ import {
   prefilterSources,
   typecheckProject,
   type GeneratedOutputs,
-} from "@zsys/compiler";
-import { sortDiagnostics } from "@zsys/diagnostics";
+} from "@relkit/compiler";
+import { sortDiagnostics } from "@relkit/diagnostics";
 import { writeEventRegistry } from "./check-event-registry.js";
 import { writeContextRegistry } from "./check-context-registry.js";
 import { emitCheckResult, type CheckResult } from "./check-result.js";
@@ -40,14 +40,14 @@ let checkSequence = 0;
 /** Compiles one project and writes only deterministic, content-aware artifacts. */
 export async function checkProject(options: CheckOptions = {}): Promise<CheckResult> {
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
-  const generatedDirectory = join(projectRoot, ".zsys", "generated");
+  const generatedDirectory = join(projectRoot, ".relkit", "generated");
   try {
     throwIfAborted(options.signal);
     const input = await readConfig(projectRoot, options);
     const config = loadConfig(input, projectRoot);
     const outputDirectory = join(projectRoot, config.generatedDirectory);
     const sources = await readSources(projectRoot, config.source);
-    const configPath = resolve(projectRoot, options.configPath ?? "zsys.config.ts");
+    const configPath = resolve(projectRoot, options.configPath ?? "relkit.config.ts");
     const configSource = relative(projectRoot, configPath).replaceAll("\\", "/");
     const discoverySources = [
       ...sources.filter((source) => source.fileName !== configSource),
@@ -126,7 +126,7 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       await checkFailureDiagnostics(
         error,
         projectRoot,
-        resolve(projectRoot, options.configPath ?? "zsys.config.ts"),
+        resolve(projectRoot, options.configPath ?? "relkit.config.ts"),
       ),
     );
   }
@@ -145,13 +145,13 @@ async function packageApplicationId(projectRoot: string): Promise<string> {
 export const runCheck = checkProject;
 async function readConfig(projectRoot: string, options: CheckOptions): Promise<unknown> {
   if (options.config !== undefined) return options.config;
-  const configPath = resolve(projectRoot, options.configPath ?? "zsys.config.ts");
+  const configPath = resolve(projectRoot, options.configPath ?? "relkit.config.ts");
   if (!isInside(projectRoot, configPath))
     throw new Error("Config path must remain inside project root.");
-  if (!existsSync(configPath)) throw new Error("zsys.config.ts was not found.");
+  if (!existsSync(configPath)) throw new Error("relkit.config.ts was not found.");
   const query = options.generationId ?? `cli-check-${++checkSequence}`;
   const loaded = (await import(
-    `${pathToFileURL(configPath).href}?zsys_check=${encodeURIComponent(query)}`
+    `${pathToFileURL(configPath).href}?relkit_check=${encodeURIComponent(query)}`
   )) as {
     readonly default?: unknown;
   };

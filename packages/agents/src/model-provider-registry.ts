@@ -44,7 +44,7 @@ export async function createModelProviderRegistry(
       const entry = record(configuration[name], `modelProviders.${name}`);
       if (name !== "openai" && name !== "anthropic") {
         throw new ModelProviderRegistryError(
-          "ZSYS_MODEL_PROVIDER_UNSUPPORTED",
+          "RELKIT_MODEL_PROVIDER_UNSUPPORTED",
           `Model provider "${name}" is unsupported.`,
         );
       }
@@ -73,7 +73,7 @@ export async function createModelProviderRegistry(
       });
     } catch {
       throw new ModelProviderRegistryError(
-        "ZSYS_MODEL_PROVIDER_MODEL_UNAVAILABLE",
+        "RELKIT_MODEL_PROVIDER_MODEL_UNAVAILABLE",
         `Configured model "${selection.id}" is unavailable.`,
       );
     }
@@ -123,7 +123,7 @@ function record(value: unknown, path: string): Record<string, unknown> {
 }
 
 function invalid(message: string): never {
-  throw new ModelProviderRegistryError("ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID", message);
+  throw new ModelProviderRegistryError("RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID", message);
 }
 
 function parseConfiguration(value: Record<string, unknown>): ModelProviderConfiguration {

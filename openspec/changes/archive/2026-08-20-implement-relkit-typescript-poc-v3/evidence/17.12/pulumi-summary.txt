@@ -1,0 +1,26 @@
+Pulumi CLI: v3.258.0
+Stack: relkit-nightly-1787078392190-14ac0016
+Backend: s3://relkit-gate15-state-701150241487-20260818154046/relkit-gate15
+
+Initial up:
+    + 66 created
+    Duration: 8m34s
+
+No-op up:
+    66 unchanged
+    Duration: 7s
+
+Source-move preview:
+    ~ 35 to update
+    31 unchanged
+    replacement count: 0
+
+Source-move up:
+    ~ 35 updated
+    31 unchanged
+    replacement count: 0
+    Duration: 1m40s
+
+Destroy:
+    - 66 deleted
+    Duration: 11m52s

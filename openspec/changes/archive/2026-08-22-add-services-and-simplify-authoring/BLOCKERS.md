@@ -1,7 +1,7 @@
 # Blockers
 
 - Resolved for task 9.2: the implementation-size guard reported 13 files over 200 lines; minimal behavior-preserving module splits reduced every reported file to the limit, and the final `bun run verify` passed. `bun run check`, `bun run typecheck`, `bun run test:all`, and standalone `bun run build` also pass. The direct Phase 0 sandbox child-install temp directory remains unwritable, so its recorded pass uses the `/private/tmp` Bun temp/cache workaround. Cloud acceptance and live model calls were intentionally not enabled; no authorized-cloud evidence is available. The remaining Konsistent barrel findings are advisory.
-- Resolved in this follow-up: the declaration scanner's 11 false positives for structural `Effect` protocol text and private `@zsys/functions` helper handler properties.
+- Resolved in this follow-up: the declaration scanner's 11 false positives for structural `Effect` protocol text and private `@relkit/functions` helper handler properties.
 - Resolved during task 5.1 validation: the job/event contract fixtures used a two-argument handler and treated the absent request as invocation context; both now name the unused request parameter and the contracts pass.
 - No new active blockers for task 5.5. The inspector and security gates pass; the known direct read-only service-projection expectation mismatch from earlier task 4.7 dirty work remains outside this unit and was not changed.
 - No new active blockers for task 6.4. The direct Phase 0 child-install temp path still requires the recorded `/private/tmp` workaround, which passed when used; all assigned focused checks pass. The known target-schema status expectation and real-port EADDRINUSE findings remain non-gating and outside this unit.

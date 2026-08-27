@@ -1,0 +1,118 @@
+{
+  "task": "17.19",
+  "runDate": "2026-08-19",
+  "recordStatus": "current-final-owner-waiver-local-verification",
+  "candidateCommit": "73a7e3c16e0add0fe4a984d450f1e1c65a4499be",
+  "currentRepair": {
+    "candidateCommitted": false,
+    "worktreeHasPreservedDirtyPaths": true,
+    "cleanCandidateReproducible": false,
+    "freshReleaseGatedAwsEvidence": false,
+    "gate16Eligible": false,
+    "gate16EligibilityBlocker": "The owner waived fresh AWS product acceptance after current product-image attempts timed out at service readiness; independent cleanup found zero live tagged resources. Clean-candidate reproducibility is also not claimed while the visible checkout remains dirty."
+  },
+  "branch": "fix/implement-relkit-typescript-poc-v3",
+  "runtime": {
+    "bun": "1.3.10",
+    "node": "v24.12.0",
+    "pulumi": "v3.258.0",
+    "os": "macOS 15.7.1 (24G309)",
+    "architecture": "arm64"
+  },
+  "commands": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "exitCode": 0,
+      "durationSeconds": 0.018,
+      "result": "423 installs across 440 packages; no changes"
+    },
+    {
+      "command": "bun run verify",
+      "exitCode": 0,
+      "durationSeconds": 50.411,
+      "generatedNoDiff": true
+    },
+    {
+      "command": "bun run test:e2e",
+      "exitCode": 0,
+      "durationSeconds": 14.867,
+      "reportedDurationSeconds": 14.4,
+      "passes": 6,
+      "failures": 0
+    },
+    {
+      "command": "bun run test:container",
+      "exitCode": 0,
+      "durationSeconds": 1.891,
+      "passes": 3,
+      "failures": 0,
+      "assertions": 19
+    },
+    {
+      "command": "bun run scripts/pack-and-smoke-create-relkit.ts",
+      "exitCode": 0,
+      "durationSeconds": 30.411,
+      "packages": 27
+    },
+    {
+      "command": "bun run test:deployment",
+      "environment": {
+        "RELKIT_AWS_INTEGRATION": "0"
+      },
+      "exitCode": 0,
+      "durationSeconds": 2.772,
+      "passes": 14,
+      "skips": 1,
+      "failures": 0,
+      "assertions": 108
+    }
+  ],
+  "releaseGatedAws": {
+    "command": "RELKIT_AWS_INTEGRATION=1 bun test --timeout 3000000 tests/deployment/aws-integration.test.ts",
+    "status": "owner-waived-not-passed",
+    "acceptance": false,
+    "failure": "Current product-image attempts timed out at service readiness before capability smoke.",
+    "destroy": true,
+    "independentCleanup": true,
+    "liveTaggedResources": 0
+  },
+  "diagnosticAttempts": [
+    {
+      "candidateCommit": "8e1a72fdc",
+      "exitCode": 1,
+      "durationSeconds": 2240.05,
+      "failure": "AWS integration service did not become ready before the deadline.",
+      "causeFixed": "The configured image already contained a tag; the mapper appended :latest."
+    },
+    {
+      "candidateCommit": "4b7f8b0ad",
+      "exitCode": 1,
+      "durationSeconds": 1464.98,
+      "failure": "Source-move preview reported one replacement.",
+      "causeFixed": "The graph hash in ECS task environment changed the task definition on source moves."
+    }
+  ],
+  "preservation": {
+    "generatedOutputsRestored": true,
+    "temporaryTypeLinksRemoved": true,
+    "temporaryTypePackageRemoved": true,
+    "manifestOrLockfileChanged": false
+  },
+  "postEvidenceChecks": {
+    "prettier": true,
+    "json": true,
+    "diffCheck": true,
+    "openSpecStrictValidation": true,
+    "secretScan": {
+      "filesScanned": 2604,
+      "bytesScanned": 340604821,
+      "matches": 0
+    }
+  },
+  "protectedSourceChecksums": {
+    "technicalSpec": "0720384575999c7472b703ef1abcf3fd84a21f62ac038bee2b1d018c887ba613",
+    "reviewGates": "d6341ce9da289695f47700a000d876bcbd8a6213661a381a42caae1223a75ef9"
+  },
+  "historicalReleaseNotesChecksum": "fb3bc63e40c506ab0f19a1f3e2ea83109e33aff6b971d3875c82ab3e08c4b916",
+  "finalGateDecisionRecorded": false
+}

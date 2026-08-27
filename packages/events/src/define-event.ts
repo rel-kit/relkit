@@ -4,9 +4,9 @@ import {
   isDescriptor,
   type DescriptorBase,
   type DescriptorMetadata,
-} from "@zsys/contracts";
-import type { EventPublishResult, EventRef } from "@zsys/functions";
-import { type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/contracts";
+import type { EventPublishResult, EventRef } from "@relkit/functions";
+import { type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 
 export type EventEnvelope<
   Id extends string = string,
@@ -52,8 +52,8 @@ export interface DefineEventOptions<
  *
  * @example
  * ```ts
- * import { defineEvent } from "@zsys/events"
- * import { z } from "@zsys/schema"
+ * import { defineEvent } from "@relkit/events"
+ * import { z } from "@relkit/schema"
  *
  * const created = defineEvent({ id: "orders.created", version: 1, payload: z.object({ orderId: z.string() }) })
  * void created

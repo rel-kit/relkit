@@ -1,11 +1,11 @@
-import { normalizeId } from "@zsys/contracts";
-import { getDescriptorIdentity, resolveDescriptorIdentity } from "@zsys/invocation";
+import { normalizeId } from "@relkit/contracts";
+import { getDescriptorIdentity, resolveDescriptorIdentity } from "@relkit/invocation";
 import {
   FunctionToolArgumentValidationError as ToolArgumentValidationError,
   FunctionToolOperationCancelledError as ToolOperationCancelledError,
   type ErrorDescriptorAny,
-} from "@zsys/functions";
-import { validate, type StandardIssue, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/functions";
+import { validate, type StandardIssue, type StandardSchemaV1 } from "@relkit/schema";
 import { isToolDescriptor, type ToolDescriptor, type ToolRefAny } from "./define-tool.js";
 
 export interface ToolEngineInvocation {
@@ -71,7 +71,7 @@ export interface ResolvedToolTarget {
 }
 
 export class ToolUnknownError extends TypeError {
-  readonly code = "ZSYS_TOOL_UNKNOWN" as const;
+  readonly code = "RELKIT_TOOL_UNKNOWN" as const;
 
   constructor(readonly toolId: string) {
     super(`Tool "${toolId}" is not registered`);
@@ -80,7 +80,7 @@ export class ToolUnknownError extends TypeError {
 }
 
 export class ToolNotAllowedError extends TypeError {
-  readonly code = "ZSYS_TOOL_NOT_ALLOWED" as const;
+  readonly code = "RELKIT_TOOL_NOT_ALLOWED" as const;
 
   constructor(readonly toolId: string) {
     super(`Tool "${toolId}" is not allowed for this invocation`);

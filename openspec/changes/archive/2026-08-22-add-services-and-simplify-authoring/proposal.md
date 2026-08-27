@@ -1,12 +1,14 @@
+> Rebrand note (2026-08-27): This archived record was mechanically rebranded for RelKit. Commit `7178a4b1d` remains the byte-authoritative pre-rebrand record; external artifact and image digests remain historical values.
+
 ## Why
 
-ZSYS currently makes reusable functions feel less like ordinary TypeScript by conflating HTTP transport data with invocation input, requiring repeated IDs and function dependency declarations, and wrapping function logic again for tools. Domain services and AI agents also lack a cohesive grouping and provider model, so related functions cannot share policy, documentation, context, and observability without manual repetition.
+RELKIT currently makes reusable functions feel less like ordinary TypeScript by conflating HTTP transport data with invocation input, requiring repeated IDs and function dependency declarations, and wrapping function logic again for tools. Domain services and AI agents also lack a cohesive grouping and provider model, so related functions cannot share policy, documentation, context, and observability without manual repetition.
 
 ## What Changes
 
 - Add first-class services that group named functions, expose members such as `OrderService.getOrder`, apply invocation-wide middleware and scoped context enrichment, and group operations in the graph, logs, traces, OpenAPI, and Scalar.
 - Separate immutable HTTP request parameters, query values, headers, and body metadata from reusable function input while retaining automatic route-to-input mapping for matching business fields.
-- **BREAKING** Replace declared function-client calls through `context.functions` with normal `await target.invoke(input)` calls. Calls use the active ZSYS engine automatically, fall back to the standalone engine outside an application invocation, retain validation/lifecycle/telemetry, and record observed call edges without a duplicate dependency declaration.
+- **BREAKING** Replace declared function-client calls through `context.functions` with normal `await target.invoke(input)` calls. Calls use the active RELKIT engine automatically, fall back to the standalone engine outside an application invocation, retain validation/lifecycle/telemetry, and record observed call edges without a duplicate dependency declaration.
 - Add `FunctionDescriptor.asTool(...)`; functions remain the only owner of business handlers, and tool safety metadata remains mandatory unless already declared by the function.
 - Add standalone `.invoke(...)` to function and tool descriptors while preserving tool validation, timeout, side-effect, and approval enforcement.
 - Make IDs optional for source-scoped functions, routes, services, tools, agents, errors, middleware, and transforms; infer filesystem-safe hierarchical IDs from source/export/member structure and keep explicit overrides. Durable application, event, job, bucket, and cache IDs remain mandatory.
@@ -34,7 +36,7 @@ ZSYS currently makes reusable functions feel less like ordinary TypeScript by co
 
 ## Impact
 
-- Affects public APIs in `@zsys/functions`, `@zsys/routes`, `@zsys/tools`, `@zsys/agents`, `@zsys/app`, and a new service authoring surface, plus compiler discovery/normalization, graph contracts, the common engine, Hono/OpenAPI materialization, observability, templates, documentation, and tests.
+- Affects public APIs in `@relkit/functions`, `@relkit/routes`, `@relkit/tools`, `@relkit/agents`, `@relkit/app`, and a new service authoring surface, plus compiler discovery/normalization, graph contracts, the common engine, Hono/OpenAPI materialization, observability, templates, documentation, and tests.
 - Adds AI SDK v7 and official provider packages in place of the custom model protocol and direct OpenAI HTTP adapter; application descriptors continue to store only serializable configuration and environment references.
 - Removes the function-to-function portion of declared dependency maps; jobs, events, buckets, caches, agents, and other provider-backed capabilities remain explicit dependencies.
 - Requires a pre-1.0 migration for `context.functions`, `modelProfile`, custom model providers, and affected generated agent projects. Existing explicit descriptor IDs and `defineTool({ target })` remain supported.

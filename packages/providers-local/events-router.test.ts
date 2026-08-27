@@ -85,7 +85,7 @@ describe("local event router", () => {
 });
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-event-router-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-event-router-"));
   roots.push(root);
   return root;
 }

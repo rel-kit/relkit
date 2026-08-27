@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
-import { createObservabilityStream } from "@zsys/observability";
+import { API_BASE_PATH } from "@relkit/contracts";
+import { createObservabilityStream } from "@relkit/observability";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 import {
@@ -16,17 +16,17 @@ describe("inspector invalid and unavailable contracts", () => {
   test("rejects version, malformed cursor, and malformed ID requests", async () => {
     const { app } = makeApp();
     for (const headers of [
-      { "x-zsys-api-version": "2" },
+      { "x-relkit-api-version": "2" },
       { accept: "application/json; version=2" },
     ]) {
       const response = await app.request(API_BASE_PATH + "/graph", { headers });
       expectResponse(response, 400);
-      expect((await response.json()).error).toBe("ZSYS_INSPECTOR_API_VERSION_UNSUPPORTED");
+      expect((await response.json()).error).toBe("RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED");
     }
     expectResponse(await app.request(API_BASE_PATH + "/graph?protocol=wrong"), 400);
     expectResponse(
       await app.request(API_BASE_PATH + "/logs", {
-        headers: { "x-zsys-api-version": "2" },
+        headers: { "x-relkit-api-version": "2" },
       }),
       400,
     );
@@ -46,7 +46,7 @@ describe("inspector invalid and unavailable contracts", () => {
       idempotencyKey: "malformed-id",
     });
     expectResponse(invalidAction, 400);
-    expect((await invalidAction.json()).error).toBe("ZSYS_INSPECTOR_ACTION_TARGET_INVALID");
+    expect((await invalidAction.json()).error).toBe("RELKIT_INSPECTOR_ACTION_TARGET_INVALID");
   });
 
   test("returns unavailable-generation contracts without invoking services", async () => {
@@ -71,6 +71,6 @@ describe("inspector invalid and unavailable contracts", () => {
       idempotencyKey: "unavailable-generation",
     });
     expectResponse(action, 503);
-    expect((await action.json()).error).toBe("ZSYS_INSPECTOR_ACTION_GENERATION_UNAVAILABLE");
+    expect((await action.json()).error).toBe("RELKIT_INSPECTOR_ACTION_GENERATION_UNAVAILABLE");
   });
 });

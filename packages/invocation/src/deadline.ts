@@ -4,7 +4,7 @@ import { Cause, Context, Effect } from "effect";
 export type Deadline = number;
 
 /** The effective deadline inherited by child effects in the current fiber. */
-export const Deadline = Context.Reference<Deadline | undefined>("zsys/runtime/Deadline", {
+export const Deadline = Context.Reference<Deadline | undefined>("relkit/runtime/Deadline", {
   defaultValue: () => undefined,
 });
 

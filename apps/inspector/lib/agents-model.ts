@@ -175,7 +175,7 @@ function makeAgentView(
 ): AgentView {
   const id = text(node.id) || "unknown-agent";
   const generated = record(node.generatedFunction);
-  const generatedFunctionId = text(generated?.functionId) || `zsys.agent.${id}.invoke`;
+  const generatedFunctionId = text(generated?.functionId) || `relkit.agent.${id}.invoke`;
   const runtimeViews = runtime.flatMap((item) => {
     if (text(item.agentId) !== id && text(item.id) !== id) return [];
     const value = runtimeView(item, id);

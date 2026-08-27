@@ -1,11 +1,11 @@
-import { diffDeploymentPlans } from "@zsys/deploy";
+import { diffDeploymentPlans } from "@relkit/deploy";
 import {
   createOutputReport,
   createPreviewReport,
   createUpdateReport,
   formatPulumiSummary,
   toPulumiLog,
-} from "@zsys/deploy-pulumi";
+} from "@relkit/deploy-pulumi";
 import {
   confirmDeployment,
   type DeployCommandOptions,

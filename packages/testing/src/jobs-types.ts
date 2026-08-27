@@ -3,17 +3,17 @@ import type {
   InvocationHooks,
   InvocationTarget,
   JobRunResult,
-} from "@zsys/engine";
-import type { JobClient, JobProvider, RetryPolicy } from "@zsys/jobs";
+} from "@relkit/engine";
+import type { JobClient, JobProvider, RetryPolicy } from "@relkit/jobs";
 import type {
   JobAdmin,
   JobIdempotencyDefinition,
   JobQueueCounts,
   JobQueueEntry,
-} from "@zsys/providers-local";
+} from "@relkit/providers-local";
 import type { TestClock } from "./runtime.js";
 import type { TestFailureControls } from "./fakes.js";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
 export interface TestJobOptions<Input = JsonValue, Output = unknown> {
   readonly jobId?: string;

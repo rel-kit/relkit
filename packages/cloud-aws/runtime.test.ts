@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { managed, sqs } from "@zsys/app";
-import type { JobQueueFactoryContext } from "@zsys/engine";
+import { managed, sqs } from "@relkit/app";
+import type { JobQueueFactoryContext } from "@relkit/engine";
 import { awsProviderFactories, createSqsJobProvider } from "./src/index.ts";
 
 describe("AWS runtime providers", () => {

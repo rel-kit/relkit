@@ -1,10 +1,10 @@
-import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@relkit/contracts";
 import {
   hashGraph,
   validateGraphShape,
   type ApplicationGraph,
   type GraphCanonicalizationOptions,
-} from "@zsys/graph";
+} from "@relkit/graph";
 import {
   collectHandlerEntries,
   compareIds,
@@ -33,16 +33,16 @@ export interface FunctionRegistryOptions extends GraphCanonicalizationOptions {
 }
 
 export type RegistryErrorCode =
-  | "ZSYS_GRAPH_INVALID"
-  | "ZSYS_GRAPH_VERSION_UNSUPPORTED"
-  | "ZSYS_MANIFEST_VERSION_UNSUPPORTED"
-  | "ZSYS_MANIFEST_GENERATOR_UNSUPPORTED"
-  | "ZSYS_GRAPH_MANIFEST_MISMATCH"
-  | "ZSYS_GRAPH_FUNCTION_DUPLICATE"
-  | "ZSYS_MANIFEST_HANDLER_MISSING"
-  | "ZSYS_MANIFEST_HANDLER_EXTRA"
-  | "ZSYS_MANIFEST_HANDLER_DUPLICATE"
-  | "ZSYS_MANIFEST_HANDLER_INVALID";
+  | "RELKIT_GRAPH_INVALID"
+  | "RELKIT_GRAPH_VERSION_UNSUPPORTED"
+  | "RELKIT_MANIFEST_VERSION_UNSUPPORTED"
+  | "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED"
+  | "RELKIT_GRAPH_MANIFEST_MISMATCH"
+  | "RELKIT_GRAPH_FUNCTION_DUPLICATE"
+  | "RELKIT_MANIFEST_HANDLER_MISSING"
+  | "RELKIT_MANIFEST_HANDLER_EXTRA"
+  | "RELKIT_MANIFEST_HANDLER_DUPLICATE"
+  | "RELKIT_MANIFEST_HANDLER_INVALID";
 
 export interface RegistryIssue {
   readonly code: RegistryErrorCode;
@@ -58,7 +58,7 @@ export class FunctionRegistryError extends Error {
     const stableIssues = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
     super(stableIssues.map((issue) => `${issue.code}: ${issue.message}`).join("; "));
     this.name = "FunctionRegistryError";
-    this.code = stableIssues[0]?.code ?? "ZSYS_GRAPH_INVALID";
+    this.code = stableIssues[0]?.code ?? "RELKIT_GRAPH_INVALID";
     this.issues = stableIssues;
   }
 }
@@ -103,13 +103,13 @@ export function createFunctionRegistry(
     graphHash = hashGraph(graph, input.hashOptions);
   } catch (error) {
     issues.push({
-      code: "ZSYS_GRAPH_INVALID",
+      code: "RELKIT_GRAPH_INVALID",
       message: error instanceof Error ? error.message : "Graph canonicalization failed.",
     });
   }
   if (graphHash !== undefined && runtimeManifest.graphHash !== graphHash) {
     issues.push({
-      code: "ZSYS_GRAPH_MANIFEST_MISMATCH",
+      code: "RELKIT_GRAPH_MANIFEST_MISMATCH",
       message: `Manifest hash ${JSON.stringify(runtimeManifest.graphHash)} does not match graph hash ${JSON.stringify(graphHash)}.`,
     });
   }

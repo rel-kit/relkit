@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import type { InspectorDiagnosticsPage, InspectorEnvironmentPage } from "./api-types";
 import { normalizeDiagnostics, normalizeEnvironment } from "./env-diagnostics-model";
 
-const identity = { protocol: "zsys.inspector" as const, version: 1 as const };
+const identity = { protocol: "relkit.inspector" as const, version: 1 as const };
 
 test("normalizes value-free environment metadata and keeps generation identity", () => {
   const payload = {
@@ -49,7 +49,7 @@ test("keeps active diagnostics while exposing candidate diagnostics separately",
     generationId: "active-1",
     graphHash: "sha256:active",
     status: "candidate" as const,
-    items: [{ code: "ZSYS_CANDIDATE", severity: "error", message: "candidate failed" }],
+    items: [{ code: "RELKIT_CANDIDATE", severity: "error", message: "candidate failed" }],
     active: {
       ...identity,
       role: "active" as const,
@@ -57,7 +57,7 @@ test("keeps active diagnostics while exposing candidate diagnostics separately",
       graphHash: "sha256:active",
       items: [
         {
-          code: "ZSYS_ACTIVE",
+          code: "RELKIT_ACTIVE",
           severity: "warning" as const,
           message: "active remains usable",
           file: "src/app.ts",
@@ -72,13 +72,13 @@ test("keeps active diagnostics while exposing candidate diagnostics separately",
       generationId: "candidate-2",
       graphHash: "sha256:candidate",
       state: "active",
-      items: [{ code: "ZSYS_CANDIDATE", severity: "error", message: "candidate failed" }],
+      items: [{ code: "RELKIT_CANDIDATE", severity: "error", message: "candidate failed" }],
     },
   } satisfies InspectorDiagnosticsPage;
   const snapshot = normalizeDiagnostics(payload);
-  expect(snapshot.active.items[0]).toMatchObject({ code: "ZSYS_ACTIVE" });
+  expect(snapshot.active.items[0]).toMatchObject({ code: "RELKIT_ACTIVE" });
   expect(snapshot.candidate?.identity.generationId).toBe("candidate-2");
-  expect(snapshot.visible[0]).toMatchObject({ code: "ZSYS_CANDIDATE" });
+  expect(snapshot.visible[0]).toMatchObject({ code: "RELKIT_CANDIDATE" });
   expect(snapshot.active.items).toHaveLength(1);
 });
 

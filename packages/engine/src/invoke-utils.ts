@@ -9,8 +9,8 @@ import {
   unknownSchema,
   validated,
   validateDeclaredError,
-} from "@zsys/invocation";
-import type { StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/invocation";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type {
   InvocationIdSource,
   InvocationMetadata,
@@ -29,7 +29,7 @@ export {
   unknownSchema,
   validated,
   validateDeclaredError,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 
 export function resolveTarget<Input, Output, Context extends { readonly signal: AbortSignal }>(
   options: InvokeOptions<Input, Output, Context>,

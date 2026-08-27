@@ -1,4 +1,4 @@
-import type { HttpTriggerRegistration } from "@zsys/graph";
+import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { Context } from "hono";
 import { rateLimiter, type RateLimitInfo } from "hono-rate-limiter";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
@@ -18,7 +18,7 @@ export interface RateLimitRuntimeOptions {
 }
 
 type RouteHandler = (context: Context) => Promise<Response>;
-const INFO_KEY = "zsys.rateLimit";
+const INFO_KEY = "relkit.rateLimit";
 
 export function withRateLimit(
   trigger: HttpTriggerRegistration,

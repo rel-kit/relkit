@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { toAwsScheduleExpression, ZsysJobQueues } from "./src/index.js";
+import { toAwsScheduleExpression, RelkitJobQueues } from "./src/index.js";
 
 interface SeenResource {
   readonly type: string;
@@ -9,7 +9,7 @@ interface SeenResource {
   readonly inputs: Record<string, any>;
 }
 
-describe("ZsysJobQueues", () => {
+describe("RelkitJobQueues", () => {
   test("maps queues, redrive policies, worker settings, and schedules", async () => {
     const resources: SeenResource[] = [];
     await pulumi.runtime.setMocks(
@@ -29,13 +29,13 @@ describe("ZsysJobQueues", () => {
         },
         call: () => ({ region: "us-east-1", name: "us-east-1" }),
       },
-      "zsys-queues-test",
+      "relkit-queues-test",
       "development",
     );
 
-    let component: ZsysJobQueues | undefined;
+    let component: RelkitJobQueues | undefined;
     await pulumi.runtime.runInPulumiStack(() => {
-      component = new ZsysJobQueues("orders", {
+      component = new RelkitJobQueues("orders", {
         appId: "orders.app",
         graphHash: "sha256:orders",
         jobs: [
@@ -68,7 +68,7 @@ describe("ZsysJobQueues", () => {
 
     expect(resources.map(({ type }) => type)).toEqual(
       expect.arrayContaining([
-        "zsys:cloud-aws:ZsysJobQueues",
+        "relkit:cloud-aws:RelkitJobQueues",
         "aws:sqs/queue:Queue",
         "aws:sqs/queuePolicy:QueuePolicy",
         "aws:sqs/redriveAllowPolicy:RedriveAllowPolicy",
@@ -124,7 +124,7 @@ describe("ZsysJobQueues", () => {
     expect(() => toAwsScheduleExpression("0 2 1 * MON")).toThrow();
     expect(
       () =>
-        new ZsysJobQueues("invalid", {
+        new RelkitJobQueues("invalid", {
           jobs: [
             {
               id: "job",

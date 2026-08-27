@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
-import { defineFunction } from "@zsys/functions";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { defineFunction } from "@relkit/functions";
 import {
   assertServiceDescriptor,
   assertServiceMemberName,
@@ -9,7 +9,7 @@ import {
   isServiceDescriptor,
   isServiceRef,
 } from "./src/index.ts";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 const member = defineFunction({
   id: "orders.get",

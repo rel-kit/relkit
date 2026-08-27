@@ -5,7 +5,7 @@ import {
   type SourceMapSource,
 } from "../../packages/compiler/src/index.ts";
 
-const source = `const brand = Symbol.for("zsys.descriptor");
+const source = `const brand = Symbol.for("relkit.descriptor");
 export const named = { [brand]: true, kind: "function", id: "orders.create", ref: { kind: "function", id: "orders.create" }, handler: () => undefined };
 const fallback = { [brand]: true, kind: "event", id: "orders.created", ref: { kind: "event", id: "orders.created" } };
 export { fallback as default };
@@ -47,7 +47,7 @@ describe("descriptor extraction", () => {
       },
     ] as const;
 
-    const locations = mapSourceLocations(modules, { projectRoot: "/tmp/zsys", sources });
+    const locations = mapSourceLocations(modules, { projectRoot: "/tmp/relkit", sources });
     expect(locations).toMatchObject([
       {
         exportName: "default",
@@ -62,7 +62,7 @@ describe("descriptor extraction", () => {
     ]);
 
     const extracted = extractDescriptors(modules, {
-      projectRoot: "/tmp/zsys",
+      projectRoot: "/tmp/relkit",
       sources,
       generationId: "generation-test",
     });
@@ -85,7 +85,7 @@ describe("descriptor extraction", () => {
       generationId: "generation-test",
     });
     expect(JSON.stringify(extracted)).not.toContain("function ()");
-    expect(JSON.stringify(extracted)).toContain('"$zsys":"function"');
+    expect(JSON.stringify(extracted)).toContain('"$relkit":"function"');
   });
 });
 
@@ -94,6 +94,6 @@ function descriptorSnapshot(kind: string, id: string) {
     kind,
     id,
     ref: { kind, id },
-    metadata: { handler: { $zsys: "function" } },
+    metadata: { handler: { $relkit: "function" } },
   } as const;
 }

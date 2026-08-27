@@ -53,7 +53,7 @@ export function schemaInput(
 
 export function unwrapSchema(value: unknown): unknown {
   const schema = schemaRecord(value);
-  if (schema?.$zsys === "schema" && schema.jsonSchema !== undefined)
+  if (schema?.$relkit === "schema" && schema.jsonSchema !== undefined)
     return unwrapSchema(schema.jsonSchema);
   return value;
 }

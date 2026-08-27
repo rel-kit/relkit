@@ -1,12 +1,12 @@
-# ZSys TypeScript POC — Revision 3 Documentation
+# RelKit TypeScript POC — Revision 3 Documentation
 
 Revision 3 is the approved implementation baseline.
 
 ## Start here
 
-1. Read `zsys-typescript-poc-technical-spec-v3.md` for the complete architecture, public APIs, runtime behavior, project generator, deployment, testing handbook, and 17 implementation phases.
-2. Use `zsys-typescript-poc-review-gates-v3.md` to approve each phase.
-3. Read `zsys-typescript-poc-v2-to-v3-change-log.md` for the exact refinement from Revision 2.
+1. Read `relkit-typescript-poc-technical-spec-v3.md` for the complete architecture, public APIs, runtime behavior, project generator, deployment, testing handbook, and 17 implementation phases.
+2. Use `relkit-typescript-poc-review-gates-v3.md` to approve each phase.
+3. Read `relkit-typescript-poc-v2-to-v3-change-log.md` for the exact refinement from Revision 2.
 
 ## Final architecture at a glance
 
@@ -63,7 +63,7 @@ The listener is a generic trigger binding, not a separate application subscripti
 ## New project
 
 ```bash
-bunx create-zsys@latest my-app
+bunx create-relkit@latest my-app
 cd my-app
 bun run dev
 ```
@@ -71,9 +71,9 @@ bun run dev
 ## Deployment
 
 ```bash
-zsys deploy init --stack development
-zsys deploy preview --stack development
-zsys deploy up --stack development
+relkit deploy init --stack development
+relkit deploy preview --stack development
+relkit deploy up --stack development
 ```
 
 Deployment also accepts `--backend cloud|local|s3://...|azblob://...|gs://...`,

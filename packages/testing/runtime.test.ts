@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, rmSync } from "node:fs";
-import { defineEnv, env } from "@zsys/config";
-import { z } from "@zsys/schema";
+import { defineEnv, env } from "@relkit/config";
+import { z } from "@relkit/schema";
 import { createTestRuntime, invokeFunction } from "./src/index.ts";
 
 let observedContext:
@@ -126,8 +126,8 @@ describe("testing runtime foundation", () => {
   });
 
   test("isolates state and fake clients, retaining failed state when requested", async () => {
-    const previous = process.env.ZSYS_KEEP_TEST_STATE;
-    process.env.ZSYS_KEEP_TEST_STATE = "1";
+    const previous = process.env.RELKIT_KEEP_TEST_STATE;
+    process.env.RELKIT_KEEP_TEST_STATE = "1";
     const first = createTestRuntime();
     const second = createTestRuntime();
     const retainedRoot = first.stateRoot;
@@ -142,8 +142,8 @@ describe("testing runtime foundation", () => {
       expect(existsSync(second.stateRoot)).toBe(false);
     } finally {
       rmSync(retainedRoot, { recursive: true, force: true });
-      if (previous === undefined) delete process.env.ZSYS_KEEP_TEST_STATE;
-      else process.env.ZSYS_KEEP_TEST_STATE = previous;
+      if (previous === undefined) delete process.env.RELKIT_KEEP_TEST_STATE;
+      else process.env.RELKIT_KEEP_TEST_STATE = previous;
     }
   });
 });

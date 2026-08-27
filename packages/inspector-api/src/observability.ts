@@ -4,20 +4,20 @@ import {
   canonicalJson,
   type JsonValue,
   type MaybePromise,
-} from "@zsys/contracts";
+} from "@relkit/contracts";
 import {
   ObservabilityQueryError,
   ObservabilityStreamError,
   type ObservabilityQuery,
   type ObservabilityStream,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import type { Context, Hono } from "hono";
 import { readObservabilityQuery, streamResponse } from "./observability-utils.js";
 import { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
 
 export { readObservabilityQuery } from "./observability-utils.js";
 
-export const INSPECTOR_API_PROTOCOL = "zsys.inspector" as const;
+export const INSPECTOR_API_PROTOCOL = "relkit.inspector" as const;
 export const INSPECTOR_API_VERSION = API_VERSION;
 export const OBSERVABILITY_ENDPOINT_PATHS = Object.freeze([
   `${API_BASE_PATH}/requests`,
@@ -61,7 +61,7 @@ export function installObservabilityEndpoints(
     (handler: (context: Context) => Promise<Response>) =>
     async (context: Context): Promise<Response> => {
       if (!(await authorized(context.req.raw, options)))
-        return errorResponse("ZSYS_OBSERVABILITY_UNAUTHORIZED", 401, {
+        return errorResponse("RELKIT_OBSERVABILITY_UNAUTHORIZED", 401, {
           "www-authenticate": "Bearer",
         });
       try {
@@ -82,9 +82,9 @@ export function installObservabilityEndpoints(
     `${API_BASE_PATH}/requests/:requestId`,
     guard(async (context) => {
       const requestId = context.req.param("requestId");
-      if (requestId === undefined) throw new EndpointError("ZSYS_OBSERVABILITY_NOT_FOUND", 404);
+      if (requestId === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
       const request = await options.query.request(requestId);
-      if (request === undefined) throw new EndpointError("ZSYS_OBSERVABILITY_NOT_FOUND", 404);
+      if (request === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
       return jsonResponse(request);
     }),
   );
@@ -104,9 +104,9 @@ export function installObservabilityEndpoints(
     `${API_BASE_PATH}/traces/:traceId`,
     guard(async (context) => {
       const traceId = context.req.param("traceId");
-      if (traceId === undefined) throw new EndpointError("ZSYS_OBSERVABILITY_NOT_FOUND", 404);
+      if (traceId === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
       const trace = await options.query.trace(traceId);
-      if (trace === undefined) throw new EndpointError("ZSYS_OBSERVABILITY_NOT_FOUND", 404);
+      if (trace === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
       return jsonResponse(trace);
     }),
   );
@@ -165,7 +165,7 @@ function jsonResponse(
     headers: {
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",
-      "x-zsys-api-version": String(INSPECTOR_API_VERSION),
+      "x-relkit-api-version": String(INSPECTOR_API_VERSION),
       ...headers,
     },
   });
@@ -188,7 +188,7 @@ function safeErrorResponse(error: unknown): Response {
   if (error instanceof InspectorEndpointError) return errorResponse(error.code, error.status);
   if (error instanceof ObservabilityQueryError) return errorResponse(error.code, 400);
   if (error instanceof ObservabilityStreamError) return errorResponse(error.code, 400);
-  return errorResponse("ZSYS_OBSERVABILITY_INTERNAL", 500);
+  return errorResponse("RELKIT_OBSERVABILITY_INTERNAL", 500);
 }
 class EndpointError extends Error {
   constructor(

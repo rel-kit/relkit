@@ -1,4 +1,4 @@
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import { canonicalizeGraph, type GraphCanonicalizationOptions } from "./hash.js";
 import type { ApplicationGraph, GraphNode } from "./model.js";
 import {

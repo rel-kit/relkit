@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import {
+  API_BASE_PATH,
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+} from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import {
   createApp,
   InternalEndpointConfigurationError,
@@ -54,7 +59,7 @@ describe("versioned internal endpoints", () => {
     const live = await service.request(`${API_BASE_PATH}/health/live`);
     expect(live.status).toBe(200);
     expect(await live.json()).toMatchObject({
-      protocol: "zsys.inspector",
+      protocol: "relkit.inspector",
       version: 1,
       status: "ok",
     });
@@ -65,7 +70,7 @@ describe("versioned internal endpoints", () => {
 
     const graph = await service.request(`${API_BASE_PATH}/graph`);
     expect(await graph.json()).toMatchObject({
-      protocol: "zsys.inspector",
+      protocol: "relkit.inspector",
       version: 1,
       graphHash: "sha256:internal",
       manifestGraphHash: "sha256:internal",

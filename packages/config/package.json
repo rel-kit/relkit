@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/config",
+  "name": "@relkit/config",
   "version": "0.0.0",
   "type": "module",
   "exports": {

@@ -1,13 +1,13 @@
-# @zsys/schema
+# @relkit/schema
 
-`@zsys/schema` provides the default `z` builder and a Standard Schema v1
+`@relkit/schema` provides the default `z` builder and a Standard Schema v1
 boundary for application validation. The public result keeps validation issues
 structured, including their nested paths.
 
 ## Validate values
 
 ```ts
-import { validateSync, z } from "@zsys/schema";
+import { validateSync, z } from "@relkit/schema";
 
 const user = z.object({
   email: z.string().email(),
@@ -26,7 +26,7 @@ if ("issues" in result) {
 Use `validate` for a schema that may perform asynchronous validation:
 
 ```ts
-import { validate, z } from "@zsys/schema";
+import { validate, z } from "@relkit/schema";
 
 const trimmed = z.string().transform(async (value) => value.trim());
 const result = await validate(trimmed, "  hello  ");
@@ -36,10 +36,10 @@ if ("value" in result) console.log(result.value); // "hello"
 
 Other Standard Schema-compatible values can be passed to the same validation
 helpers. `getJsonSchema` returns a deterministic projection when the schema
-provides one, or a structured `ZSYS_SCHEMA_UNAVAILABLE` result when it does not.
+provides one, or a structured `RELKIT_SCHEMA_UNAVAILABLE` result when it does not.
 
 ```ts
-import { getJsonSchema, z } from "@zsys/schema";
+import { getJsonSchema, z } from "@relkit/schema";
 
 const projection = getJsonSchema(z.object({ id: z.string().uuid() }));
 if (projection.ok) console.log(projection.schema);

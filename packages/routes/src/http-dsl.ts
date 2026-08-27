@@ -4,9 +4,9 @@ import {
   isStableId,
   normalizeId,
   type JsonValue,
-} from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
-import type { StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/contracts";
+import { createUnboundIdentity } from "@relkit/invocation";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type {
   ContinueMapping,
   DefineTransformOptions,
@@ -83,7 +83,7 @@ export function isTransformRef(value: unknown): value is HttpTransformRef {
  *
  * @example
  * ```ts
- * import { http } from "@zsys/routes"
+ * import { http } from "@relkit/routes"
  *
  * const request = http.input({ id: http.path("id"), token: http.header("authorization") })
  * void request

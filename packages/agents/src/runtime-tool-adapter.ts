@@ -4,8 +4,8 @@ import {
   runInInvocationScope,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
-} from "@zsys/invocation";
-import { getJsonSchema, validate, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/invocation";
+import { getJsonSchema, validate, type StandardSchemaV1 } from "@relkit/schema";
 import {
   assertApprovalGranted,
   approveApproval,
@@ -22,21 +22,21 @@ import type {
   ToolDescriptor,
   ToolEngine,
   ToolEngineInvocation,
-} from "@zsys/tools";
+} from "@relkit/tools";
 import type { FlexibleSchema } from "ai";
 
 export function createAiInputSchema(schema: StandardSchemaV1): FlexibleSchema<unknown> {
   const projection = getJsonSchema(schema);
   if (!projection.ok) {
-    throw new AgentRuntimeError("ZSYS_SCHEMA_UNAVAILABLE", "Tool input schema is unavailable");
+    throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Tool input schema is unavailable");
   }
   return {
     "~standard": {
       version: 1,
-      vendor: "zsys",
+      vendor: "relkit",
       validate: async (value: unknown) => {
         const result = await validate(schema, value as never);
-        // ZSYS tool.invoke owns canonical parsing, including transforms and defaults.
+        // RELKIT tool.invoke owns canonical parsing, including transforms and defaults.
         return "value" in result ? { value } : { issues: result.issues };
       },
       jsonSchema: {

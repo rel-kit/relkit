@@ -1,4 +1,4 @@
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import {
   createJobStorePaths,
   ensureJobRoot,
@@ -73,7 +73,7 @@ export interface JobStore {
 }
 
 export class JobStoreStateError extends Error {
-  readonly code = "ZSYS_JOB_STORE_STATE_INVALID" as const;
+  readonly code = "RELKIT_JOB_STORE_STATE_INVALID" as const;
 
   constructor(message: string) {
     super(message);

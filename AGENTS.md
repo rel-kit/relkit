@@ -1,12 +1,12 @@
 # AGENTS.md
 
-This is the working guide for agents in the ZSYS repository. User instructions
+This is the working guide for agents in the RELKIT repository. User instructions
 take precedence; a more-specific `AGENTS.md` in a subtree takes precedence
 over this file. Read it before editing.
 
 ## Repository
 
-ZSYS is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
+RELKIT is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
 | Path                   | Role                                                                                                                            |
@@ -23,9 +23,9 @@ The main product topology is:
 | `repos/effect`         | Vendored Effect reference source; never edit or install in it.                                                                  |
 
 Generated projects run a backend on `PORT=3000` and the real Next inspector on
-port `3210` by default. `.zsys/generated` contains graph and manifest outputs;
-`.zsys/build` contains server and deployment build output; `.zsys/state` and
-`.zsys/observability` contain local runtime data. Preserve user-owned output
+port `3210` by default. `.relkit/generated` contains graph and manifest outputs;
+`.relkit/build` contains server and deployment build output; `.relkit/state` and
+`.relkit/observability` contain local runtime data. Preserve user-owned output
 and dirty worktree changes.
 
 ## Commands
@@ -47,13 +47,13 @@ Use focused scripts such as `bun run test:compiler`,
 `bun run test:deployment` while iterating.
 The repository guardrail suite is `bun test tests/phase0.test.ts`.
 `test:all` is fail-fast and local by default. Cloud acceptance requires
-explicit `ZSYS_TEST_ALL_CLOUD=1`, `ZSYS_AWS_INTEGRATION_REGION`, and
-`ZSYS_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
+explicit `RELKIT_TEST_ALL_CLOUD=1`, `RELKIT_AWS_INTEGRATION_REGION`, and
+`RELKIT_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
 
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. The default generator
 configuration is AWS/Pulumi. Use `--cloud none --deploy none` for a local-only
-project. The CLI package contains the prebuilt inspector; `ZSYS_INSPECTOR_ROOT`
+project. The CLI package contains the prebuilt inspector; `RELKIT_INSPECTOR_ROOT`
 is only for framework contributors testing inspector source.
 
 ## Editing rules

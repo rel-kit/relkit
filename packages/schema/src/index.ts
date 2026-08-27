@@ -28,5 +28,5 @@ export type {
   StandardSchemaV1,
   StandardJSONSchemaV1,
   StandardSuccess,
-  ZsysSchema,
+  RelkitSchema,
 } from "./standard-schema.js";

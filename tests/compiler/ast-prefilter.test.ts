@@ -3,7 +3,7 @@ import { prefilterSources } from "../../packages/compiler/src/discovery/ast-pref
 
 describe("AST discovery prefilter", () => {
   test("finds syntax candidates without evaluating ordinary source", () => {
-    const marker = "__zsys_ast_prefilter_evaluated__";
+    const marker = "__relkit_ast_prefilter_evaluated__";
     delete (globalThis as Record<string, unknown>)[marker];
     const result = prefilterSources([
       {
@@ -12,7 +12,7 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/orders.function.ts",
-        text: `import { defineFunction } from "@zsys/functions";
+        text: `import { defineFunction } from "@relkit/functions";
           export default defineFunction({ id: "orders.create", handler: async () => ({}) });`,
       },
       {
@@ -21,15 +21,15 @@ describe("AST discovery prefilter", () => {
       },
       {
         fileName: "src/brand.ts",
-        text: `const brand = Symbol.for("zsys.descriptor"); export const isDescriptor = (value: object) => value[brand];`,
+        text: `const brand = Symbol.for("relkit.descriptor"); export const isDescriptor = (value: object) => value[brand];`,
       },
       {
         fileName: "src/ignored.test.ts",
-        text: `import { defineFunction } from "@zsys/functions"; throw new Error("must not run"); export default defineFunction({});`,
+        text: `import { defineFunction } from "@relkit/functions"; throw new Error("must not run"); export default defineFunction({});`,
       },
       {
         fileName: "src/a/__fixtures__/ignored.ts",
-        text: `import { defineRoute } from "@zsys/routes"; throw new Error("must not run"); export default defineRoute({});`,
+        text: `import { defineRoute } from "@relkit/routes"; throw new Error("must not run"); export default defineRoute({});`,
       },
     ]);
 
@@ -42,7 +42,7 @@ describe("AST discovery prefilter", () => {
       (candidate) => candidate.fileName === "src/orders.function.ts",
     );
     expect(functionCandidate).toMatchObject({
-      imports: ["@zsys/functions"],
+      imports: ["@relkit/functions"],
       factories: ["defineFunction"],
       defaultExports: ["default"],
       facts: {
@@ -54,7 +54,7 @@ describe("AST discovery prefilter", () => {
         ],
       },
       brandAccess: false,
-      indicators: ["zsys-import", "factory", "default-export"],
+      indicators: ["relkit-import", "factory", "default-export"],
     });
     expect(
       result.candidates.find((candidate) => candidate.fileName === "src/brand.ts"),
@@ -76,11 +76,11 @@ describe("AST discovery prefilter", () => {
     expect((globalThis as Record<string, unknown>)[marker]).toBeUndefined();
   });
 
-  test("ignores type-only ZSys references and uses default exclusions", () => {
+  test("ignores type-only RelKit references and uses default exclusions", () => {
     const result = prefilterSources([
       {
         fileName: "src/types.ts",
-        text: `import type { FunctionRef } from "@zsys/functions"; export type { FunctionRef };`,
+        text: `import type { FunctionRef } from "@relkit/functions"; export type { FunctionRef };`,
       },
       {
         fileName: "src/fixture.test.ts",

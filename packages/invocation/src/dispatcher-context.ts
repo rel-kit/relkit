@@ -11,7 +11,7 @@ import type {
 import type { ManagedDependencyCategory } from "./dispatcher-types.js";
 
 export class DependencyNotConfiguredError extends Error {
-  readonly code = "ZSYS_DEPENDENCY_NOT_CONFIGURED" as const;
+  readonly code = "RELKIT_DEPENDENCY_NOT_CONFIGURED" as const;
   readonly category: ManagedDependencyCategory;
   readonly dependencyName: string;
 

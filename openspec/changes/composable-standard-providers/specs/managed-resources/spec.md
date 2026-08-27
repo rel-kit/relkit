@@ -16,7 +16,7 @@ Each runtime generation SHALL resolve graph-required capability/profile bindings
 
 #### Scenario: Test generation starts
 
-- **WHEN** `@zsys/testing` creates a runtime without an explicit integration-adapter opt-in
+- **WHEN** `@relkit/testing` creates a runtime without an explicit integration-adapter opt-in
 - **THEN** every required binding uses deterministic in-memory fakes without external credentials or services
 
 ### Requirement: Provider metadata is safe and portable

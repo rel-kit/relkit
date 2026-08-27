@@ -1,11 +1,11 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@zsys/contracts";
+import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "@relkit/contracts";
 import type {
   EventAttributeValue,
   FunctionContext,
   FunctionDependencies,
   FunctionDescriptor,
-} from "@zsys/functions";
-import type { RetryPolicy } from "@zsys/jobs";
+} from "@relkit/functions";
+import type { RetryPolicy } from "@relkit/jobs";
 import type { UnknownEventEnvelope } from "./define-event.js";
 import type { EventSelectorAny, EventSelectorInput } from "./selector-types.js";
 

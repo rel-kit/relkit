@@ -11,7 +11,7 @@ const envelope = (value: Record<string, unknown>, status = 200) =>
     JSON.stringify({ protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, ...value }),
     {
       status,
-      headers: { "content-type": "application/json", "x-zsys-api-version": "1" },
+      headers: { "content-type": "application/json", "x-relkit-api-version": "1" },
     },
   );
 
@@ -19,7 +19,7 @@ describe("inspector API client", () => {
   test("preserves a same-origin proxy prefix", async () => {
     let requestedUrl = "";
     const client = createInspectorApiClient({
-      baseUrl: "http://127.0.0.1:9999/_zsys/backend",
+      baseUrl: "http://127.0.0.1:9999/_relkit/backend",
       fetch: async (url) => {
         requestedUrl = String(url);
         return envelope({ items: [] });
@@ -28,7 +28,7 @@ describe("inspector API client", () => {
 
     await client.list("routes");
 
-    expect(requestedUrl).toBe("http://127.0.0.1:9999/_zsys/backend/_zsys/v1/routes");
+    expect(requestedUrl).toBe("http://127.0.0.1:9999/_relkit/backend/_relkit/v1/routes");
   });
 
   test("negotiates the version and invalidates cached graph data", async () => {
@@ -44,7 +44,7 @@ describe("inspector API client", () => {
     await client.graph();
     await client.graph();
     expect(requests).toHaveLength(1);
-    expect(new Headers(requests[0]?.headers).get("x-zsys-api-version")).toBe("1");
+    expect(new Headers(requests[0]?.headers).get("x-relkit-api-version")).toBe("1");
     client.invalidate(["graph"]);
     await client.graph();
     expect(requests).toHaveLength(2);
@@ -57,7 +57,7 @@ describe("inspector API client", () => {
       fetch: async () => {
         attempts += 1;
         return attempts === 1
-          ? envelope({ error: "ZSYS_INSPECTOR_GRAPH_UNAVAILABLE" }, 503)
+          ? envelope({ error: "RELKIT_INSPECTOR_GRAPH_UNAVAILABLE" }, 503)
           : envelope({ items: [] });
       },
     });
@@ -75,7 +75,7 @@ describe("inspector API client", () => {
         }),
     });
     await expect(mismatch.graph()).rejects.toMatchObject({
-      code: "ZSYS_INSPECTOR_PROTOCOL_MISMATCH",
+      code: "RELKIT_INSPECTOR_PROTOCOL_MISMATCH",
       kind: "protocol",
     });
 
@@ -86,7 +86,7 @@ describe("inspector API client", () => {
     });
     await expect(disconnected.graph()).rejects.toBeInstanceOf(InspectorApiError);
     await expect(disconnected.graph()).rejects.toMatchObject({
-      code: "ZSYS_INSPECTOR_DISCONNECTED",
+      code: "RELKIT_INSPECTOR_DISCONNECTED",
       kind: "network",
     });
   });

@@ -1,6 +1,6 @@
-import { canonicalJson, deepFreeze } from "@zsys/contracts";
-import type { RetryPolicy } from "@zsys/jobs";
-import { normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
+import { canonicalJson, deepFreeze } from "@relkit/contracts";
+import type { RetryPolicy } from "@relkit/jobs";
+import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import {
   JobQueueStateError,
   assertTime,

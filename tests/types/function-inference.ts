@@ -2,14 +2,14 @@ import type {
   FunctionContext,
   FunctionDependencies,
   FunctionHandlerValidation,
-} from "@zsys/functions";
-import { defineError, defineFunction } from "@zsys/functions";
-import { defineBucket } from "@zsys/buckets";
-import { defineCache } from "@zsys/cache";
-import { defineEvent } from "@zsys/events";
-import { defineJob } from "@zsys/jobs";
-import { z, type InferInput, type InferOutput } from "@zsys/schema";
-import { defineTool } from "@zsys/tools";
+} from "@relkit/functions";
+import { defineError, defineFunction } from "@relkit/functions";
+import { defineBucket } from "@relkit/buckets";
+import { defineCache } from "@relkit/cache";
+import { defineEvent } from "@relkit/events";
+import { defineJob } from "@relkit/jobs";
+import { z, type InferInput, type InferOutput } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
 
 const transformedInput = z
   .object({ rawId: z.string() })
@@ -127,7 +127,7 @@ const inferredFunctionTool = lookup.asTool({
   approval: "never",
 });
 const inferredFunctionToolId: "types.inference-lookup.tool" = inferredFunctionTool.id;
-const functionToolContract: import("@zsys/tools").ToolDescriptor<string> = inferredFunctionTool;
+const functionToolContract: import("@relkit/tools").ToolDescriptor<string> = inferredFunctionTool;
 void inferredFunctionToolId;
 void functionToolContract;
 

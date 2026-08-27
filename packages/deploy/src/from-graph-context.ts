@@ -1,4 +1,4 @@
-import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
+import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
 import type { DeploymentCapabilityPlan } from "./plan.js";
 import type { Capability } from "./from-graph-validation.js";
 import { configNames, logicalName, providerId } from "./from-graph-validation.js";
@@ -25,7 +25,7 @@ export function base(
     profile,
     configurationNames: configNames(context.providers, name, profile),
     capabilities: [name],
-    tags: { app: context.appId, graphHash: context.graphHash, "managed-by": "zsys" },
+    tags: { app: context.appId, graphHash: context.graphHash, "managed-by": "relkit" },
     ...(actions.length === 0 ? {} : { metadata: { iamCapabilities: actions } }),
   };
 }

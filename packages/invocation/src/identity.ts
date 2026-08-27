@@ -1,4 +1,4 @@
-import { isStableId, normalizeId } from "@zsys/contracts";
+import { isStableId, normalizeId } from "@relkit/contracts";
 
 export const UNBOUND_DESCRIPTOR_ID_PREFIX = "unbound.";
 
@@ -13,7 +13,7 @@ export interface ResolvedDescriptorIdentity {
 }
 
 export class DescriptorIdentityError extends TypeError {
-  readonly code = "ZSYS_DESCRIPTOR_IDENTITY_CONFLICT" as const;
+  readonly code = "RELKIT_DESCRIPTOR_IDENTITY_CONFLICT" as const;
 
   constructor(message: string) {
     super(message);

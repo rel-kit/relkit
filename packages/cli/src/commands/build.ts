@@ -7,10 +7,10 @@ import {
   GRAPH_VERSION,
   MANIFEST_VERSION,
   type JsonValue,
-} from "@zsys/contracts";
-import { DEFAULT_TOOLING_CONFIG } from "@zsys/compiler";
-import { hashGraph, type ApplicationGraph } from "@zsys/graph";
-import { createDiagnostic, type Diagnostic } from "@zsys/diagnostics";
+} from "@relkit/contracts";
+import { DEFAULT_TOOLING_CONFIG } from "@relkit/compiler";
+import { hashGraph, type ApplicationGraph } from "@relkit/graph";
+import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
 import { checkProject, type CheckOptions, type CheckResult } from "./check.js";
 import { serverSource } from "./build-server.js";
 import {
@@ -37,11 +37,11 @@ export interface BuildResult {
 /** Builds a deterministic production directory from a successful compiler result. */
 export async function buildProject(options: BuildOptions = {}): Promise<BuildResult> {
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
-  const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".zsys", "build"));
+  const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".relkit", "build"));
   const checked = await (options.check ?? checkProject)({ ...options, mode: "production" });
   if (!checked.ok || checked.graphHash === undefined)
     return failure(projectRoot, buildDirectory, checked.diagnostics);
-  const stage = await mkdtemp(join(dirname(buildDirectory), ".zsys-build-"));
+  const stage = await mkdtemp(join(dirname(buildDirectory), ".relkit-build-"));
   try {
     const graph = JSON.parse(checked.outputs.graph) as ApplicationGraph;
     const graphHash = hashGraph(graph);
@@ -125,7 +125,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
     return failure(projectRoot, buildDirectory, [
       ...checked.diagnostics,
       createDiagnostic({
-        code: "ZSYS_BUILD_FAILED",
+        code: "RELKIT_BUILD_FAILED",
         severity: "error",
         message: errorMessage(error),
       }),

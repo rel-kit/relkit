@@ -1,5 +1,5 @@
-import { resolveEnv, type EnvDefinition, type EnvShape } from "@zsys/config";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+import { resolveEnv, type EnvDefinition, type EnvShape } from "@relkit/config";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import {
   invokeFunctionWithRunner,
   type FunctionContextOf,
@@ -170,7 +170,7 @@ function createIdSource() {
   let sequence = 0;
   return Object.freeze({
     next: (kind: "trace" | "invocation" | "span") =>
-      `test-${kind}-${++sequence}` as import("@zsys/contracts").ProtocolId,
+      `test-${kind}-${++sequence}` as import("@relkit/contracts").ProtocolId,
   });
 }
 

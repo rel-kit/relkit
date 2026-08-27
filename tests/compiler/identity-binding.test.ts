@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { generateManifest, type NormalizedDescriptor } from "../../packages/compiler/src/index.ts";
 
-const schema = { $zsys: "schema", jsonSchema: { type: "object" } };
+const schema = { $relkit: "schema", jsonSchema: { type: "object" } };
 
 test("manifest binds exported service facades and nested errors to canonical IDs", () => {
   const error = {
@@ -68,16 +68,16 @@ test("manifest binds exported service facades and nested errors to canonical IDs
 
   expect(manifest.activatable).toBe(true);
   expect(manifest.source).toContain(
-    '__zsys_bindDescriptorIdentity(__zsys_module_0["Orders"], "orders");',
+    '__relkit_bindDescriptorIdentity(__relkit_module_0["Orders"], "orders");',
   );
   expect(manifest.source).toContain(
-    '__zsys_bindDescriptorIdentity(__zsys_module_0["Orders"]["functions"]["getOrder"], "orders.get-order");',
+    '__relkit_bindDescriptorIdentity(__relkit_module_0["Orders"]["functions"]["getOrder"], "orders.get-order");',
   );
   expect(manifest.source).toContain(
-    '__zsys_bindDescriptorIdentity(__zsys_module_0["Orders"]["functions"]["getOrder"]["errors"][0], "orders.InvalidError");',
+    '__relkit_bindDescriptorIdentity(__relkit_module_0["Orders"]["functions"]["getOrder"]["errors"][0], "orders.InvalidError");',
   );
   expect(manifest.source).toContain(
-    '__zsys_bindDescriptorIdentity(__zsys_module_1["OrderTool"]["target"], "orders.get-order");',
+    '__relkit_bindDescriptorIdentity(__relkit_module_1["OrderTool"]["target"], "orders.get-order");',
   );
-  expect(manifest.source).toContain('services: { "orders": __zsys_module_0["Orders"] }');
+  expect(manifest.source).toContain('services: { "orders": __relkit_module_0["Orders"] }');
 });

@@ -1,11 +1,11 @@
-import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
 import {
   createUnboundIdentity,
   dispatchInvocation,
   getDescriptorIdentity,
   type InvocationTarget,
-} from "@zsys/invocation";
-import { type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/invocation";
+import { type StandardSchemaV1 } from "@relkit/schema";
 import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
 import type { DefineFunction } from "./define-function-types.js";
 import {
@@ -93,8 +93,8 @@ export type {
  *
  * @example
  * ```ts
- * import { defineFunction } from "@zsys/functions"
- * import { z } from "@zsys/schema"
+ * import { defineFunction } from "@relkit/functions"
+ * import { z } from "@relkit/schema"
  *
  * const greet = defineFunction({
  *   input: z.object({ name: z.string() }),

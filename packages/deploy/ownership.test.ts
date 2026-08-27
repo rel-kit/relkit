@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION, type SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
+import { GRAPH_VERSION, type SourceLocation } from "@relkit/contracts";
+import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
 import { fromGraph } from "./src/from-graph.ts";
 import { DEPLOYMENT_PLAN_VERSION } from "./src/plan.ts";
 

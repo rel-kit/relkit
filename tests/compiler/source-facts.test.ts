@@ -4,9 +4,9 @@ import { readFacts } from "../../packages/compiler/src/discovery/source-facts.ts
 import { mapSourceLocations } from "../../packages/compiler/src/discovery/source-map.ts";
 
 const source = `
-  import { defineError, defineFunction } from "@zsys/functions";
-  import { defineRoute } from "@zsys/routes";
-  import { defineService } from "@zsys/services";
+  import { defineError, defineFunction } from "@relkit/functions";
+  import { defineRoute } from "@relkit/routes";
+  import { defineService } from "@relkit/services";
   const getOrder = defineFunction({ input: schema, output: schema, handler: async () => ({}) });
   const named = defineFunction({ id: "orders.named", input: schema, output: schema, handler: async () => ({}) });
   const orders = defineService({ functions: { getOrder, lookup: named } });
@@ -75,7 +75,7 @@ describe("TypeScript discovery facts", () => {
         },
       ],
       {
-        projectRoot: "/tmp/zsys-facts",
+        projectRoot: "/tmp/relkit-facts",
         sources: [{ fileName: "src/routes/orders/route.ts", text: source }],
       },
     );

@@ -1,4 +1,4 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
 
@@ -10,10 +10,10 @@ export interface CompileModelConfiguration {
 
 export interface ModelSelectionDiagnostic {
   readonly code:
-    | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
-    | "ZSYS_MODEL_SELECTOR_INVALID"
-    | "ZSYS_MODEL_PROVIDER_UNKNOWN"
-    | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
+    | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
+    | "RELKIT_MODEL_SELECTOR_INVALID"
+    | "RELKIT_MODEL_PROVIDER_UNKNOWN"
+    | "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING";
   readonly message: string;
 }
 
@@ -40,7 +40,7 @@ export function resolveCompiledModel(
 ): ModelSelectionDiagnostic | undefined {
   const normalized = normalizeSelector(selector);
   if (selector !== undefined && normalized === undefined) {
-    return { code: "ZSYS_MODEL_SELECTOR_INVALID", message: "Model selector is invalid." };
+    return { code: "RELKIT_MODEL_SELECTOR_INVALID", message: "Model selector is invalid." };
   }
   const selected = normalized ?? `${configuration.defaultProvider}:${configuration.defaultModel}`;
   const separator = selected.indexOf(":");
@@ -48,13 +48,13 @@ export function resolveCompiledModel(
   const defaultModel = configuration.providers.get(provider);
   if (defaultModel === undefined && !configuration.providers.has(provider)) {
     return {
-      code: "ZSYS_MODEL_PROVIDER_UNKNOWN",
+      code: "RELKIT_MODEL_PROVIDER_UNKNOWN",
       message: `Model provider "${provider}" is not configured.`,
     };
   }
   if (separator < 0 && defaultModel === undefined) {
     return {
-      code: "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
+      code: "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING",
       message: `Model provider "${provider}" has no default model.`,
     };
   }
@@ -113,7 +113,7 @@ export function normalizeSelector(value: unknown): string | undefined {
 }
 
 function configurationError(message: string): { readonly error: ModelSelectionDiagnostic } {
-  return { error: { code: "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID", message } };
+  return { error: { code: "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID", message } };
 }
 
 function stableId(value: unknown): string | undefined {

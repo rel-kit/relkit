@@ -15,8 +15,8 @@ import {
   defineTool,
   defineTransform,
   http,
-} from "@zsys/app";
-import { z } from "@zsys/schema";
+} from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

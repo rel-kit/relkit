@@ -1,11 +1,11 @@
-# @zsys/app
+# @relkit/app
 
-`@zsys/app` is the public entry point for application configuration, descriptors, and composable
-provider bindings. `zsys.config.ts` contains settings and provider profiles; database and auth are
+`@relkit/app` is the public entry point for application configuration, descriptors, and composable
+provider bindings. `relkit.config.ts` contains settings and provider profiles; database and auth are
 registered by their own discovered descriptors.
 
 ```ts
-import { defineConfig, defineEnv, env, external, redis, s3 } from "@zsys/app";
+import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app";
 
 const values = defineEnv({
   BUCKET_ENDPOINT: env.url(),
@@ -42,8 +42,8 @@ Use MinIO and Redis values locally, R2 and Upstash values in a hosted pipeline, 
 Valkey bindings with an AWS deployment. `external()` resources are never provisioned and receive no
 deployment IAM statements. Secret adapter fields require secret environment references.
 
-`id` defaults to the normalized `package.json.name`. `PORT` and `ZSYS_ENV` are framework-reserved.
-Hosting remains in `zsys.config.ts`:
+`id` defaults to the normalized `package.json.name`. `PORT` and `RELKIT_ENV` are framework-reserved.
+Hosting remains in `relkit.config.ts`:
 
 ```ts
 export default defineConfig({

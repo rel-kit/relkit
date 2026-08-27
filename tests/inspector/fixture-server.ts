@@ -1,6 +1,6 @@
 import { createInspectorFixture } from "./fixture-backend.ts";
 
-const port = Number(process.env.ZSYS_FIXTURE_PORT ?? "3212");
+const port = Number(process.env.RELKIT_FIXTURE_PORT ?? "3212");
 const fixture = createInspectorFixture();
 Bun.serve({
   port,

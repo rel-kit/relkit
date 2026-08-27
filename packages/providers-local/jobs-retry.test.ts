@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { applicationFailure, cancellationFailure, timeoutFailure } from "@zsys/runtime-effect";
+import { applicationFailure, cancellationFailure, timeoutFailure } from "@relkit/runtime-effect";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -24,7 +24,7 @@ describe("local job retry policy", () => {
   });
 
   test("delays declared retryable failures and dead-letters exhausted attempts safely", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-retry-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-retry-"));
     roots.push(root);
     let now = 100;
     const store = await createJobStore(join(root, "jobs"), { now: () => now });

@@ -9,7 +9,7 @@ export function resolveApplicationPort(options: PortResolutionOptions = {}): num
 }
 
 export function resolveInspectorPort(options: PortResolutionOptions = {}): number {
-  return resolvePort(options, "ZSYS_INSPECTOR_PORT", 3210, false);
+  return resolvePort(options, "RELKIT_INSPECTOR_PORT", 3210, false);
 }
 
 function resolvePort(

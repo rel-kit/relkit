@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import {
   CacheCapabilityError,
   CacheDependencyError,
@@ -19,7 +19,7 @@ import {
   validatePolicy,
 } from "./client-utils.js";
 import { createCacheOperations } from "./client-operations.js";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 
 export {
   CacheCapabilityError,
@@ -87,8 +87,8 @@ export function createCacheClient<
       });
     }
     const bridgeOptions = {
-      name: `zsys.cache.${options.cacheId}.${operation}`,
-      attributes: { "zsys.cache.id": options.cacheId, "zsys.cache.operation": operation },
+      name: `relkit.cache.${options.cacheId}.${operation}`,
+      attributes: { "relkit.cache.id": options.cacheId, "relkit.cache.operation": operation },
       signal,
     };
     const promise = options.bridge ? options.bridge.run(execute, bridgeOptions) : execute();

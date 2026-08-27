@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
+import { GRAPH_VERSION } from "@relkit/contracts";
+import type { ApplicationGraph } from "@relkit/graph";
 import { generateOpenApi, generateOpenApiJson } from "./src/index.ts";
 
 const stringSchema = { type: "string" } as const;
@@ -32,7 +32,7 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
     { name: "orders", description: "Order operations" },
     { name: "read" },
   ]);
-  expect(document["x-zsys"].graphVersion).toBe(GRAPH_VERSION);
+  expect(document["x-relkit"].graphVersion).toBe(GRAPH_VERSION);
   expect(operation?.operationId).toBe("orders.get");
   expect(operation?.summary).toBe("Get order");
   expect(operation?.description).toBe("Returns one order.");
@@ -62,7 +62,7 @@ test("generates stable OpenAPI from route, function, error, mapping, and middlew
   expect(operation?.responses["422"]?.content?.["application/json"]?.schema).toMatchObject({
     properties: { error: { const: "validation" }, issues: { type: "array" } },
   });
-  expect(operation?.["x-zsys"].middleware).toEqual([
+  expect(operation?.["x-relkit"].middleware).toEqual([
     { id: "orders.auth", targetFunctionId: "orders.authorize" },
   ]);
   expect(generateOpenApiJson(first)).toBe(generateOpenApiJson(second));
@@ -145,7 +145,7 @@ test("documents rate-limit policy, safe body, and standard headers", () => {
   });
   const operation = generateOpenApi(inputGraph).paths["/orders/{id}"]?.get;
 
-  expect(operation?.["x-zsys"].rateLimit).toEqual(trigger.config.rateLimit);
+  expect(operation?.["x-relkit"].rateLimit).toEqual(trigger.config.rateLimit);
   expect(operation?.responses["429"]).toMatchObject({
     description: "Rate limit exceeded",
     headers: {
@@ -186,7 +186,7 @@ function graph(reverse: boolean): ApplicationGraph {
           kind: "error",
           id: "orders.not-found",
           ref: { kind: "error", id: "orders.not-found" },
-          data: { $zsys: "schema", jsonSchema: errorData },
+          data: { $relkit: "schema", jsonSchema: errorData },
           retry: "never",
           http: { status: 404 },
         },

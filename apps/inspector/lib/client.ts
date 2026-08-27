@@ -1,8 +1,8 @@
 import { createInspectorApiClient } from "./api";
 import { createInspectorStream, type InspectorStreamOptions } from "./stream";
 
-export const INSPECTOR_BACKEND_PROXY = "/_zsys/backend" as const;
-export const INSPECTOR_BACKEND_CONNECTED_EVENT = "zsys:inspector-connected" as const;
+export const INSPECTOR_BACKEND_PROXY = "/_relkit/backend" as const;
+export const INSPECTOR_BACKEND_CONNECTED_EVENT = "relkit:inspector-connected" as const;
 
 export function inspectorBackendUrl(): string {
   return configuredBackendUrl() ?? INSPECTOR_BACKEND_PROXY;
@@ -20,7 +20,7 @@ export function createInspectorBackendStream(options: InspectorStreamOptions = {
 }
 
 function configuredBackendUrl(): string | undefined {
-  const value = process.env.NEXT_PUBLIC_ZSYS_BACKEND_URL;
+  const value = process.env.NEXT_PUBLIC_RELKIT_BACKEND_URL;
   if (typeof value !== "string" || value.trim() === "") return undefined;
   if (typeof window === "undefined" || !isLocalInspectorProxy(value)) return value;
   return INSPECTOR_BACKEND_PROXY;

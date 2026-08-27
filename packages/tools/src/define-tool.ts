@@ -1,5 +1,5 @@
-import { createDescriptorBase, deepFreeze, isDescriptor, isRef } from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
+import { createDescriptorBase, deepFreeze, isDescriptor, isRef } from "@relkit/contracts";
+import { createUnboundIdentity } from "@relkit/invocation";
 import {
   createFunctionToolInvoker,
   copyFunctionToolHooks,
@@ -17,7 +17,7 @@ import {
   type FunctionToolSideEffect,
   type FunctionToolTarget,
   type FunctionRefAny,
-} from "@zsys/functions";
+} from "@relkit/functions";
 import {
   copyFunctionTarget,
   hasOwn,
@@ -68,11 +68,11 @@ export interface DefineToolOptions<
 > extends FunctionToolMetadata {
   readonly id?: Id;
   readonly target: Target;
-  readonly onBefore?: import("@zsys/functions").FunctionToolHook<
-    import("@zsys/schema").InferInput<Target["input"]>
+  readonly onBefore?: import("@relkit/functions").FunctionToolHook<
+    import("@relkit/schema").InferInput<Target["input"]>
   >;
-  readonly onAfter?: import("@zsys/functions").FunctionToolHook<
-    import("@zsys/schema").InferOutput<Target["output"]>
+  readonly onAfter?: import("@relkit/functions").FunctionToolHook<
+    import("@relkit/schema").InferOutput<Target["output"]>
   >;
 }
 
@@ -83,9 +83,9 @@ export interface DefineToolOptions<
  *
  * @example
  * ```ts
- * import { defineFunction } from "@zsys/functions"
- * import { z } from "@zsys/schema"
- * import { defineTool } from "@zsys/tools"
+ * import { defineFunction } from "@relkit/functions"
+ * import { z } from "@relkit/schema"
+ * import { defineTool } from "@relkit/tools"
  *
  * const target = defineFunction({ id: "lookup", input: z.string(), output: z.string(), handler: async (id) => id })
  * const tool = defineTool({ id: "lookup", target, description: "Look up an order", sideEffect: "read", approval: "never" })

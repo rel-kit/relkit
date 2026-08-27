@@ -1,11 +1,11 @@
-import type { MaybePromise, RequestId, TraceId } from "@zsys/contracts";
-import { toRequestId, toTraceId } from "@zsys/contracts";
-import type { RequestRecordBuilder, RequestRecordSink } from "@zsys/observability";
+import type { MaybePromise, RequestId, TraceId } from "@relkit/contracts";
+import { toRequestId, toTraceId } from "@relkit/contracts";
+import type { RequestRecordBuilder, RequestRecordSink } from "@relkit/observability";
 import type { Context } from "hono";
 
 export const REQUEST_ID_HEADER = "x-request-id" as const;
 export const TRACE_ID_HEADER = "x-trace-id" as const;
-export const REQUEST_CONTEXT_KEY = "zsys.request" as const;
+export const REQUEST_CONTEXT_KEY = "relkit.request" as const;
 
 export interface HttpRequestState {
   readonly requestId: RequestId;

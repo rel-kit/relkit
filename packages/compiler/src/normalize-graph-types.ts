@@ -1,4 +1,4 @@
-import { GRAPH_VERSION, type SourceLocation } from "@zsys/contracts";
+import { GRAPH_VERSION, type SourceLocation } from "@relkit/contracts";
 
 export interface GraphNode {
   readonly kind: string;

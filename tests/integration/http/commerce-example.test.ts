@@ -4,7 +4,7 @@ import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../../packages/contracts
 import {
   invokeFunction,
   type InvocationTarget,
-} from "../../../packages/runtime-hono/node_modules/@zsys/engine/dist/index.js";
+} from "../../../packages/runtime-hono/node_modules/@relkit/engine/dist/index.js";
 import { generateClient } from "../../../packages/client-generator/src/index.ts";
 import { compileProject } from "../../compiler/fixture-runner.ts";
 import {
@@ -189,7 +189,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
 
   expect(compiled.diagnostics).toEqual([
     expect.objectContaining({
-      code: "ZSYS_EVENT_WILDCARD_RESTRICTED",
+      code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
       severity: "warning",
       message: "Raw all-event selector is restricted to telemetry.",
     }),

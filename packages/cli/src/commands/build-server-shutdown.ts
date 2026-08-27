@@ -17,12 +17,12 @@ function bounded(task, milliseconds) {
 }
 
 function flushTelemetry() {
-  const flush = globalThis["__zsys_flush_telemetry"];
+  const flush = globalThis["__relkit_flush_telemetry"];
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
 }
 
 function flushSentry() {
-  const flush = globalThis["__zsys_flush_sentry"];
+  const flush = globalThis["__relkit_flush_sentry"];
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
 }
 
@@ -31,8 +31,8 @@ async function shutdown() {
   stopping = true;
   if (jobWorker !== undefined) clearInterval(jobWorker);
   shutdownController.abort(new Error("Runtime is stopping."));
-  const drainTimeoutMs = timeoutFrom(process.env.ZSYS_DRAIN_TIMEOUT_MS, 10_000);
-  const telemetryTimeoutMs = timeoutFrom(process.env.ZSYS_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
+  const drainTimeoutMs = timeoutFrom(process.env.RELKIT_DRAIN_TIMEOUT_MS, 10_000);
+  const telemetryTimeoutMs = timeoutFrom(process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
   await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
   await bounded(flushTelemetry(), telemetryTimeoutMs);
   await bounded(flushSentry(), telemetryTimeoutMs);

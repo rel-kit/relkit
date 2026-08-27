@@ -1,12 +1,12 @@
 ## Purpose
 
-Provides one searchable, generated, executable source of truth that teaches developers how to create, use, inspect, test, and operate every public ZSYS capability.
+Provides one searchable, generated, executable source of truth that teaches developers how to create, use, inspect, test, and operate every public RELKIT capability.
 
 ## Requirements
 
 ### Requirement: Searchable documentation application
 
-ZSYS SHALL provide a buildable documentation application with keyboard-accessible search across conceptual guides, generated API reference, CLI reference, migration guidance, and troubleshooting content.
+RELKIT SHALL provide a buildable documentation application with keyboard-accessible search across conceptual guides, generated API reference, CLI reference, migration guidance, and troubleshooting content.
 
 #### Scenario: Developer searches for route uploads
 

@@ -1,10 +1,10 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 
 export type ModelSelectionErrorCode =
-  | "ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID"
-  | "ZSYS_MODEL_SELECTOR_INVALID"
-  | "ZSYS_MODEL_PROVIDER_UNKNOWN"
-  | "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING";
+  | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
+  | "RELKIT_MODEL_SELECTOR_INVALID"
+  | "RELKIT_MODEL_PROVIDER_UNKNOWN"
+  | "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING";
 
 export interface ModelProviderConfiguration {
   readonly defaultProvider: string;
@@ -90,14 +90,14 @@ export function resolveModelSelector(
   const configured = configuration.providers[provider];
   if (configured === undefined) {
     throw new ModelSelectionError(
-      "ZSYS_MODEL_PROVIDER_UNKNOWN",
+      "RELKIT_MODEL_PROVIDER_UNKNOWN",
       `Model provider "${provider}" is not configured.`,
     );
   }
   const model = separator < 0 ? configured.defaultModel : selected.slice(separator + 1).trim();
   if (model === undefined || model === "") {
     throw new ModelSelectionError(
-      "ZSYS_MODEL_PROVIDER_DEFAULT_MISSING",
+      "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING",
       `Model provider "${provider}" has no default model.`,
     );
   }
@@ -128,11 +128,11 @@ function text(value: unknown, path: string): string {
 }
 
 function invalidSelector(message: string): never {
-  throw new ModelSelectionError("ZSYS_MODEL_SELECTOR_INVALID", message);
+  throw new ModelSelectionError("RELKIT_MODEL_SELECTOR_INVALID", message);
 }
 
 function invalidConfiguration(message: string): never {
-  throw new ModelSelectionError("ZSYS_MODEL_PROVIDER_CONFIGURATION_INVALID", message);
+  throw new ModelSelectionError("RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID", message);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -1,5 +1,5 @@
-import { createModelProviderRegistry } from "@zsys/agents";
-import type { ProviderFactories, ProviderFactory, ProviderFactoryContext } from "@zsys/engine";
+import { createModelProviderRegistry } from "@relkit/agents";
+import type { ProviderFactories, ProviderFactory, ProviderFactoryContext } from "@relkit/engine";
 import { createRedisCacheProvider } from "./redis.js";
 import { createS3BucketProvider, type S3BucketOptions } from "./s3.js";
 

@@ -1,4 +1,4 @@
-import { API_BASE_PATH, API_VERSION, PROTOCOL_VERSION, type MaybePromise } from "@zsys/contracts";
+import { API_BASE_PATH, API_VERSION, PROTOCOL_VERSION, type MaybePromise } from "@relkit/contracts";
 import { errorResponse, json, negotiate } from "./router-utils.js";
 import { executeInspectorAction, parseInspectorAction } from "./actions-runtime.js";
 import type { InspectorActionResult } from "./actions-runtime.js";
@@ -29,7 +29,7 @@ export interface InspectorFunctionActionService {
 }
 
 export interface InspectorJobActionRequest {
-  readonly protocol: "zsys.jobs.admin";
+  readonly protocol: "relkit.jobs.admin";
   readonly version: typeof PROTOCOL_VERSION;
   readonly instanceId: string;
   readonly reason?: string;
@@ -44,7 +44,7 @@ export interface InspectorJobActionService {
 }
 
 export interface InspectorEventActionRequest {
-  readonly protocol: "zsys.events.admin";
+  readonly protocol: "relkit.events.admin";
   readonly version: typeof PROTOCOL_VERSION;
   readonly deliveryId: string;
   readonly reason?: string;
@@ -86,7 +86,7 @@ export interface InspectorToolApprovalService {
 }
 
 export interface InspectorAuditRecord {
-  readonly protocol: "zsys.inspector.actions";
+  readonly protocol: "relkit.inspector.actions";
   readonly version: typeof API_VERSION;
   readonly actionId: string;
   readonly action: InspectorActionName;
@@ -167,7 +167,7 @@ async function handle(
   idempotency: Map<string, Promise<InspectorActionResult>>,
 ): Promise<Response> {
   if (!(await options.authorize(context.req.raw)))
-    return json({ error: "ZSYS_INSPECTOR_UNAUTHORIZED" }, 401, { "www-authenticate": "Bearer" });
+    return json({ error: "RELKIT_INSPECTOR_UNAUTHORIZED" }, 401, { "www-authenticate": "Bearer" });
   try {
     negotiate(context.req.raw);
     const body = await readBody(context.req.raw);
@@ -196,5 +196,5 @@ async function readBody(request: Request): Promise<Record<string, unknown>> {
   } catch {
     return {};
   }
-  throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_REQUEST_INVALID", 400);
+  throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_REQUEST_INVALID", 400);
 }

@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { add } from "./normalize-pass-utils.js";
 import { isRecord } from "./normalize-utils.js";
 import {
@@ -27,7 +27,7 @@ export function generatedEventListenerMarker(listenerId: string): GeneratedEvent
     generated: true,
     generatedBy: "event-listener",
     listenerId,
-    functionId: `zsys.event.${listenerId}.handler`,
+    functionId: `relkit.event.${listenerId}.handler`,
   };
 }
 

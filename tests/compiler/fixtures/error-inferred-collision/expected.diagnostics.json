@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_DUPLICATE_ID",
+    "code": "RELKIT_DUPLICATE_ID",
     "column": 16,
     "descriptorId": "orders.get-order",
     "file": "src/functions/override.function.ts",

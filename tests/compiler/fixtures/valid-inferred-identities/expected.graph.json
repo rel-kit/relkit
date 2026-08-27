@@ -72,7 +72,7 @@
     {
       "generatedFunction": {
         "agentId": "support",
-        "functionId": "zsys.agent.support.invoke",
+        "functionId": "relkit.agent.support.invoke",
         "generated": true,
         "generatedBy": "agent"
       },
@@ -98,7 +98,10 @@
             "type": "string"
           }
         },
-        "required": ["ok", "orderId"],
+        "required": [
+          "ok",
+          "orderId"
+        ],
         "type": "object"
       },
       "profile": "default",
@@ -107,7 +110,9 @@
         "file": "src/agents/support.agent.ts",
         "line": 5
       },
-      "toolIds": ["lookup-order"]
+      "toolIds": [
+        "lookup-order"
+      ]
     },
     {
       "defaults": {
@@ -131,10 +136,12 @@
       },
       "id": "inferred-app",
       "kind": "app",
-      "providerBindings": ["provider.models.default"],
+      "providerBindings": [
+        "provider.models.default"
+      ],
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 8
       }
     },
@@ -147,7 +154,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 8
       },
       "type": "secret-string"
@@ -161,7 +168,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 8
       },
       "type": "port"
@@ -181,7 +188,9 @@
             "type": "array"
           }
         },
-        "required": ["parts"],
+        "required": [
+          "parts"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -191,7 +200,9 @@
             "type": "number"
           }
         },
-        "required": ["count"],
+        "required": [
+          "count"
+        ],
         "type": "object"
       },
       "source": {
@@ -221,7 +232,10 @@
             "type": "string"
           }
         },
-        "required": ["ok", "orderId"],
+        "required": [
+          "ok",
+          "orderId"
+        ],
         "type": "object"
       },
       "source": {
@@ -243,7 +257,9 @@
             "type": "string"
           }
         },
-        "required": ["authorization"],
+        "required": [
+          "authorization"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -253,7 +269,9 @@
             "type": "boolean"
           }
         },
-        "required": ["allowed"],
+        "required": [
+          "allowed"
+        ],
         "type": "object"
       },
       "source": {
@@ -269,18 +287,20 @@
       "errors": [
         {
           "create": {
-            "$zsys": "function",
+            "$relkit": "function",
             "name": "create"
           },
           "data": {
-            "$zsys": "schema",
+            "$relkit": "schema",
             "jsonSchema": {
               "properties": {
                 "orderId": {
                   "type": "string"
                 }
               },
-              "required": ["orderId"],
+              "required": [
+                "orderId"
+              ],
               "type": "object"
             }
           },
@@ -290,7 +310,7 @@
           "id": "functions.orders.get-order-function.InvalidError",
           "kind": "error",
           "message": {
-            "$zsys": "function",
+            "$relkit": "function",
             "name": "message"
           },
           "ref": {
@@ -308,7 +328,9 @@
             "type": "string"
           }
         },
-        "required": ["orderId"],
+        "required": [
+          "orderId"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -321,7 +343,10 @@
             "type": "string"
           }
         },
-        "required": ["ok", "orderId"],
+        "required": [
+          "ok",
+          "orderId"
+        ],
         "type": "object"
       },
       "source": {
@@ -334,11 +359,11 @@
     {
       "generated": {
         "agentId": "support",
-        "functionId": "zsys.agent.support.invoke",
+        "functionId": "relkit.agent.support.invoke",
         "generated": true,
         "generatedBy": "agent"
       },
-      "id": "zsys.agent.support.invoke",
+      "id": "relkit.agent.support.invoke",
       "input": {
         "properties": {},
         "type": "object"
@@ -353,7 +378,10 @@
             "type": "string"
           }
         },
-        "required": ["ok", "orderId"],
+        "required": [
+          "ok",
+          "orderId"
+        ],
         "type": "object"
       },
       "source": {
@@ -401,7 +429,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 8
       }
     },
@@ -464,7 +492,10 @@
                   "type": "string"
                 }
               },
-              "required": ["ok", "orderId"],
+              "required": [
+                "ok",
+                "orderId"
+              ],
               "type": "object"
             },
             "status": 200
@@ -476,7 +507,9 @@
             "status": 422
           }
         ],
-        "runtimePaths": ["/custom"],
+        "runtimePaths": [
+          "/custom"
+        ],
         "timeoutMs": null,
         "transforms": []
       },
@@ -516,7 +549,9 @@
                   "type": "number"
                 }
               },
-              "required": ["count"],
+              "required": [
+                "count"
+              ],
               "type": "object"
             },
             "status": 200
@@ -528,7 +563,9 @@
             "status": 422
           }
         ],
-        "runtimePaths": ["/files/:parts{.+}"],
+        "runtimePaths": [
+          "/files/:parts{.+}"
+        ],
         "timeoutMs": null,
         "transforms": []
       },
@@ -582,7 +619,10 @@
                   "type": "string"
                 }
               },
-              "required": ["ok", "orderId"],
+              "required": [
+                "ok",
+                "orderId"
+              ],
               "type": "object"
             },
             "status": 200
@@ -597,7 +637,9 @@
                   "type": "string"
                 }
               },
-              "required": ["orderId"],
+              "required": [
+                "orderId"
+              ],
               "type": "object"
             },
             "status": 400
@@ -609,7 +651,9 @@
             "status": 422
           }
         ],
-        "runtimePaths": ["/orders/:orderId"],
+        "runtimePaths": [
+          "/orders/:orderId"
+        ],
         "timeoutMs": null,
         "transforms": [
           {
@@ -654,7 +698,10 @@
                   "type": "string"
                 }
               },
-              "required": ["ok", "orderId"],
+              "required": [
+                "ok",
+                "orderId"
+              ],
               "type": "object"
             },
             "status": 200
@@ -666,7 +713,9 @@
             "status": 422
           }
         ],
-        "runtimePaths": ["/"],
+        "runtimePaths": [
+          "/"
+        ],
         "timeoutMs": null,
         "transforms": []
       },

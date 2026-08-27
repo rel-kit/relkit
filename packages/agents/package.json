@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/agents",
+  "name": "@relkit/agents",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -11,11 +11,11 @@
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.0",
     "@ai-sdk/openai": "4.0.0",
-    "@zsys/contracts": "workspace:*",
-    "@zsys/functions": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/schema": "workspace:*",
-    "@zsys/tools": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/functions": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/schema": "workspace:*",
+    "@relkit/tools": "workspace:*",
     "ai": "7.0.0"
   },
   "scripts": {

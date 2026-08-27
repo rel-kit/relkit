@@ -19,15 +19,15 @@ describe("Pulumi workspace setup", () => {
   test("accepts Pulumi Cloud, object storage, and isolated local backends", () => {
     const root = resolve("tmp/pulumi-workspace");
     expect(resolvePulumiBackend()).toEqual({ kind: "cloud", url: PULUMI_CLOUD_BACKEND_URL });
-    expect(resolvePulumiBackend({ kind: "object-storage", url: "s3://bucket/zsys" }, root)).toEqual(
-      { kind: "object-storage", url: "s3://bucket/zsys" },
-    );
     expect(
-      resolvePulumiBackend({ kind: "object-storage", url: "azblob://container/zsys" }, root).url,
-    ).toBe("azblob://container/zsys");
+      resolvePulumiBackend({ kind: "object-storage", url: "s3://bucket/relkit" }, root),
+    ).toEqual({ kind: "object-storage", url: "s3://bucket/relkit" });
     expect(
-      resolvePulumiBackend({ kind: "object-storage", url: "gs://bucket/zsys" }, root).url,
-    ).toBe("gs://bucket/zsys");
+      resolvePulumiBackend({ kind: "object-storage", url: "azblob://container/relkit" }, root).url,
+    ).toBe("azblob://container/relkit");
+    expect(
+      resolvePulumiBackend({ kind: "object-storage", url: "gs://bucket/relkit" }, root).url,
+    ).toBe("gs://bucket/relkit");
     expect(resolvePulumiBackend({ kind: "local" }, root).url).toBe(`file://${root}/.pulumi`);
     expect(() =>
       resolvePulumiBackend({ kind: "object-storage", url: "https://example.test" }),
@@ -35,7 +35,7 @@ describe("Pulumi workspace setup", () => {
   });
 
   test("writes Pulumi project settings and uses explicit stack/config operations", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-pulumi-test-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-pulumi-test-"));
     roots.push(root);
     const log = join(root, "commands.log");
     const commandRoot = join(root, "cli");
@@ -77,6 +77,6 @@ describe("Pulumi workspace setup", () => {
     expect(commands).toContain("stack init development");
     expect(commands).toContain("config set-all --stack development");
     expect(commands).toContain("stack select --stack development");
-    expect(commands).not.toContain(".zsys/state");
+    expect(commands).not.toContain(".relkit/state");
   });
 });

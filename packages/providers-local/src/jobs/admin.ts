@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { JobQueue } from "./queue-utils.js";
 import { JobAdminError } from "./admin-errors.js";
 import {
@@ -129,22 +129,22 @@ async function applyAction(
     const reason = readReason(request);
     if (!options.enabled || options.mode === "production")
       throw new JobAdminError(
-        "ZSYS_JOB_ADMIN_MUTATION_DISABLED",
+        "RELKIT_JOB_ADMIN_MUTATION_DISABLED",
         "Local job mutations are disabled",
       );
     if (instanceId === undefined)
-      throw new JobAdminError("ZSYS_JOB_ADMIN_INSTANCE_INVALID", "Job instance ID is invalid");
+      throw new JobAdminError("RELKIT_JOB_ADMIN_INSTANCE_INVALID", "Job instance ID is invalid");
     if (before === undefined)
-      throw new JobAdminError("ZSYS_JOB_ADMIN_NOT_FOUND", `Job ${instanceId} is unknown`);
+      throw new JobAdminError("RELKIT_JOB_ADMIN_NOT_FOUND", `Job ${instanceId} is unknown`);
     if (action === "retry") {
       if (before.state !== "dead-lettered")
         throw new JobAdminError(
-          "ZSYS_JOB_ADMIN_STATE_INELIGIBLE",
+          "RELKIT_JOB_ADMIN_STATE_INELIGIBLE",
           "Only dead-lettered jobs can be retried",
         );
     } else if (before.state === "completed" || before.state === "dead-lettered") {
       throw new JobAdminError(
-        "ZSYS_JOB_ADMIN_STATE_INELIGIBLE",
+        "RELKIT_JOB_ADMIN_STATE_INELIGIBLE",
         "Job state cannot be changed by this action",
       );
     }

@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { defineDataModel } from "@zsys/drizzle";
+import { defineDataModel } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 

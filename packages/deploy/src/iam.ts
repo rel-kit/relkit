@@ -1,4 +1,4 @@
-import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@zsys/graph";
+import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@relkit/graph";
 import { logicalName } from "./from-graph-validation.js";
 import type {
   DeploymentFunctionCapability,

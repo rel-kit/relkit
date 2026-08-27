@@ -1,4 +1,4 @@
-import { isDescriptor } from "@zsys/contracts";
+import { isDescriptor } from "@relkit/contracts";
 import type {
   EvaluatorCandidate,
   EvaluatorFailure,
@@ -53,7 +53,7 @@ export function sideEffectFailure(
   request: EvaluatorRequest,
 ): EvaluatorFailure {
   return {
-    code: "ZSYS_EVALUATOR_SIDE_EFFECT",
+    code: "RELKIT_EVALUATOR_SIDE_EFFECT",
     message: `Candidate evaluation detected ${sideEffects.length} side effect(s).`,
     generationId: request.generationId,
     module,

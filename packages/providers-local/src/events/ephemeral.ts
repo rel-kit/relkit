@@ -1,4 +1,4 @@
-import type { UnknownEventEnvelope } from "@zsys/events";
+import type { UnknownEventEnvelope } from "@relkit/events";
 
 export const DEFAULT_EPHEMERAL_CAPACITY = 100;
 export const EPHEMERAL_DELIVERY_CAPABILITIES = Object.freeze({

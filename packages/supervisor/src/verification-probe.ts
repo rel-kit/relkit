@@ -1,4 +1,4 @@
-import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import {
   CandidateVerificationError,
   type CandidateProbeResponse,
@@ -18,7 +18,7 @@ export async function requiredProbe(
   assertEnvelope(probe);
   if (!probe.response.ok)
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_API_VERSION_UNSUPPORTED",
+      "RELKIT_CANDIDATE_API_VERSION_UNSUPPORTED",
       "Candidate does not expose the required internal endpoint.",
     );
   return probe;
@@ -44,12 +44,12 @@ export async function pollHealth(
     const readiness = readinessState(last.payload);
     if (!readiness.environmentReady)
       throw new CandidateVerificationError(
-        "ZSYS_CANDIDATE_ENVIRONMENT_NOT_READY",
+        "RELKIT_CANDIDATE_ENVIRONMENT_NOT_READY",
         "Candidate environment is not ready.",
       );
     if (!readiness.providerReady)
       throw new CandidateVerificationError(
-        "ZSYS_CANDIDATE_PROVIDER_NOT_READY",
+        "RELKIT_CANDIDATE_PROVIDER_NOT_READY",
         "Candidate providers are not ready.",
       );
   }
@@ -58,13 +58,13 @@ export async function pollHealth(
 
 export function assertEnvelope(probe: CandidateProbeResponse): void {
   if (
-    probe.payload.protocol !== "zsys.inspector" ||
+    probe.payload.protocol !== "relkit.inspector" ||
     probe.payload.version !== API_VERSION ||
-    (probe.response.headers.get("x-zsys-api-version") ?? String(API_VERSION)) !==
+    (probe.response.headers.get("x-relkit-api-version") ?? String(API_VERSION)) !==
       String(API_VERSION)
   )
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_API_VERSION_UNSUPPORTED",
+      "RELKIT_CANDIDATE_API_VERSION_UNSUPPORTED",
       "Candidate does not expose the supported v1 internal API.",
     );
 }
@@ -78,7 +78,7 @@ export function verifyIdentity(
   if (sourceToken === undefined && generationToken === undefined) return false;
   if (sourceToken !== expected.sourceToken || generationToken !== expected.generationToken)
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_GENERATION_MISMATCH",
+      "RELKIT_CANDIDATE_GENERATION_MISMATCH",
       "Candidate health responses identify a different generation.",
     );
   return true;
@@ -95,12 +95,12 @@ export function verifyGraph(
   const manifestGraphHash = stringValue(payload.manifestGraphHash ?? payload.manifestHash);
   if (graphHash !== options.graphHash || manifestGraphHash !== options.graphHash)
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_GRAPH_HASH_MISMATCH",
+      "RELKIT_CANDIDATE_GRAPH_HASH_MISMATCH",
       "Candidate graph and manifest hashes do not match the expected graph.",
     );
   if (graphHash !== manifestGraphHash)
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_GRAPH_HASH_MISMATCH",
+      "RELKIT_CANDIDATE_GRAPH_HASH_MISMATCH",
       "Candidate graph and manifest hashes differ.",
     );
   const graphContractVersion = numberValue(payload.graphContractVersion ?? payload.graphVersion);
@@ -115,7 +115,7 @@ export function verifyGraph(
     graphContractVersion !== (options.graphContractVersion ?? GRAPH_VERSION)
   )
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_GRAPH_VERSION_UNSUPPORTED",
+      "RELKIT_CANDIDATE_GRAPH_VERSION_UNSUPPORTED",
       "Candidate graph contract version is unsupported.",
     );
   if (
@@ -123,7 +123,7 @@ export function verifyGraph(
     manifestContractVersion !== (options.manifestContractVersion ?? MANIFEST_VERSION)
   )
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED",
+      "RELKIT_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED",
       "Candidate manifest contract version is unsupported.",
     );
   if (
@@ -131,7 +131,7 @@ export function verifyGraph(
     manifestGeneratorVersion !== (options.manifestGeneratorVersion ?? GENERATOR_VERSION)
   )
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_GENERATOR_VERSION_UNSUPPORTED",
+      "RELKIT_CANDIDATE_GENERATOR_VERSION_UNSUPPORTED",
       "Candidate manifest generator version is unsupported.",
     );
   return {
@@ -153,7 +153,7 @@ export function readinessState(payload: Record<string, unknown>): {
   );
   if (environmentReady === undefined || providerReady === undefined)
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_RESPONSE_INVALID",
+      "RELKIT_CANDIDATE_RESPONSE_INVALID",
       "Candidate readiness did not report environment and provider status.",
     );
   return { environmentReady, providerReady };
@@ -167,7 +167,7 @@ function readinessValue(value: unknown): boolean | undefined {
 function stringValue(value: unknown): string {
   if (typeof value !== "string" || value.trim() === "")
     throw new CandidateVerificationError(
-      "ZSYS_CANDIDATE_RESPONSE_INVALID",
+      "RELKIT_CANDIDATE_RESPONSE_INVALID",
       "Candidate health metadata contains an invalid hash.",
     );
   return value;
@@ -183,7 +183,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function timeoutError(): CandidateVerificationError {
   return new CandidateVerificationError(
-    "ZSYS_CANDIDATE_HEALTH_TIMEOUT",
+    "RELKIT_CANDIDATE_HEALTH_TIMEOUT",
     "Candidate health checks did not complete before the timeout.",
   );
 }

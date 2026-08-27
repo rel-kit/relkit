@@ -14,11 +14,11 @@ test("recursively scans values and release artifacts without exposing raw matche
   expect(scanValue("json", { status: "redacted", nested: [1, null] })).toEqual([]);
   expect(() => assertNoRawSyntheticSecrets("safe", { status: "redacted" })).not.toThrow();
 
-  const root = await mkdtemp(join("/tmp", "zsys-secret-scan-"));
+  const root = await mkdtemp(join("/tmp", "relkit-secret-scan-"));
   try {
-    await mkdir(join(root, ".zsys", "build"), { recursive: true });
+    await mkdir(join(root, ".relkit", "build"), { recursive: true });
     await mkdir(join(root, "tests", "compiler", "fixtures"), { recursive: true });
-    await writeFile(join(root, ".zsys", "build", "manifest.json"), '{"status":"safe"}\n');
+    await writeFile(join(root, ".relkit", "build", "manifest.json"), '{"status":"safe"}\n');
     await writeFile(join(root, "tests", "compiler", "fixtures", "expected.graph.json"), "{}\n");
 
     const clean = await scanReleaseArtifacts(root);
@@ -27,12 +27,12 @@ test("recursively scans values and release artifacts without exposing raw matche
     expect(clean.categories.graph).toBe(1);
 
     await writeFile(
-      join(root, ".zsys", "build", "manifest.json"),
+      join(root, ".relkit", "build", "manifest.json"),
       JSON.stringify({ token: SYNTHETIC_SECRETS.password }),
     );
     const dirty = await scanReleaseArtifacts(root);
     expect(dirty.matches).toEqual([
-      expect.objectContaining({ secretName: "password", source: ".zsys/build/manifest.json" }),
+      expect.objectContaining({ secretName: "password", source: ".relkit/build/manifest.json" }),
     ]);
     expect(JSON.stringify(dirty)).not.toContain(SYNTHETIC_SECRETS.password);
   } finally {

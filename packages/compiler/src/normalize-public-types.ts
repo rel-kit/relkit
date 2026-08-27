@@ -1,4 +1,4 @@
-import type { GenerationId } from "@zsys/contracts";
+import type { GenerationId } from "@relkit/contracts";
 import type { EvaluatorModuleResult, EvaluatorResponse } from "./discovery/evaluator-protocol.js";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 

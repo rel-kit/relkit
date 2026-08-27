@@ -1,12 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { fromGraph } from "@zsys/deploy";
+import { fromGraph } from "@relkit/deploy";
 import {
   createPulumiProgram,
   createPulumiWorkspace,
   writePulumiProgram,
-} from "@zsys/deploy-pulumi";
-import type { ApplicationGraph } from "@zsys/graph";
+} from "@relkit/deploy-pulumi";
+import type { ApplicationGraph } from "@relkit/graph";
 import { CLI_EXIT_CODES } from "../main-support.js";
 import { buildProject, type BuildOptions, type BuildResult } from "./build.js";
 import { checkProject, type CheckOptions, type CheckResult } from "./check.js";
@@ -49,7 +49,7 @@ export async function runDeploy(
     }
     const code = commandCode(error);
     context.reporter.error(code, safeErrorMessage(error, redactions));
-    return code === "ZSYS_DEPLOY_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+    return code === "RELKIT_DEPLOY_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
   }
 }
 
@@ -75,19 +75,22 @@ async function prepare(
   });
   throwIfAborted(signal);
   if (!checked.ok || checked.graphHash === undefined)
-    throw new DeployCommandError("ZSYS_DEPLOY_CHECK_FAILED", checkFailure(checked));
+    throw new DeployCommandError("RELKIT_DEPLOY_CHECK_FAILED", checkFailure(checked));
   let graph: ApplicationGraph;
   try {
     graph = JSON.parse(checked.outputs.graph) as ApplicationGraph;
   } catch {
-    throw new DeployCommandError("ZSYS_DEPLOY_GRAPH_INVALID", "The checked graph is invalid JSON.");
+    throw new DeployCommandError(
+      "RELKIT_DEPLOY_GRAPH_INVALID",
+      "The checked graph is invalid JSON.",
+    );
   }
   const plan = fromGraph(graph, {
     ...(checked.config?.server.port === undefined ? {} : { httpPort: checked.config.server.port }),
   });
   if (plan.graphHash !== checked.graphHash)
     throw new DeployCommandError(
-      "ZSYS_DEPLOY_CHECK_FAILED",
+      "RELKIT_DEPLOY_CHECK_FAILED",
       "The checked graph changed before planning.",
     );
   if (parsed.command === "preview" || parsed.command === "up") {
@@ -97,9 +100,9 @@ async function prepare(
       check: async () => checked,
     });
     throwIfAborted(signal);
-    if (!built.ok) throw new DeployCommandError("ZSYS_DEPLOY_BUILD_FAILED", checkFailure(built));
+    if (!built.ok) throw new DeployCommandError("RELKIT_DEPLOY_BUILD_FAILED", checkFailure(built));
   }
-  const directory = resolve(root, ".zsys/generated/pulumi");
+  const directory = resolve(root, ".relkit/generated/pulumi");
   const previousPlan = await readPlan(join(directory, "plan.json"));
   const files = await (options.writeProgram ?? writePulumiProgram)(plan, {
     projectRoot: root,
@@ -118,7 +121,7 @@ async function openWorkspace(
     projectName: prepared.plan.application.id,
     stackName: parsed.stack,
     projectRoot: prepared.root,
-    directory: ".zsys/generated/pulumi",
+    directory: ".relkit/generated/pulumi",
   });
   const config = Object.keys(parsed.config).length === 0 ? {} : { config: parsed.config };
   return (options.createWorkspace ?? createPulumiWorkspace)({
@@ -155,7 +158,7 @@ function commandCode(error: unknown): string {
         "code" in error &&
         typeof error.code === "string"
       ? error.code
-      : "ZSYS_DEPLOY_FAILED";
+      : "RELKIT_DEPLOY_FAILED";
 }
 
 function throwIfAborted(signal: AbortSignal): void {

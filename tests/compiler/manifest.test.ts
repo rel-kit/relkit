@@ -41,19 +41,19 @@ function descriptor(
 describe("runtime manifest generation", () => {
   test("sorts imports and emits handlers, middleware, validators, and provider slots", () => {
     const first = descriptor("function", "orders.get", "src/functions.ts", "get", {
-      handler: { $zsys: "function" },
-      onBefore: { $zsys: "function" },
-      onAfter: { $zsys: "function" },
+      handler: { $relkit: "function" },
+      onBefore: { $relkit: "function" },
+      onAfter: { $relkit: "function" },
     });
     const second = descriptor("function", "orders.save", "src/functions.ts", "save", {
-      handler: { $zsys: "function" },
+      handler: { $relkit: "function" },
     });
     const middleware = descriptor("middleware", "orders.auth", "src/middleware.ts", "auth", {
       path: "/orders/*",
-      handler: { $zsys: "function" },
+      handler: { $relkit: "function" },
     });
     const transform = descriptor("transform", "orders.id", "src/transforms.ts", "id", {
-      schema: { $zsys: "schema" },
+      schema: { $relkit: "schema" },
     });
     const app = descriptor("app", "app", undefined, "app", {
       buckets: {
@@ -71,23 +71,27 @@ describe("runtime manifest generation", () => {
       descriptors: [transform, app, second, middleware, first],
       middleware: [middleware],
       transforms: [transform],
-      generatedDirectory: ".zsys/generated",
+      generatedDirectory: ".relkit/generated",
     });
 
     expect(result.activatable).toBe(true);
     expect(result.diagnostics).toEqual([]);
-    expect(result.source).toContain('import * as __zsys_module_0 from "../../src/functions.ts";');
-    expect(result.source).toContain('import * as __zsys_module_1 from "../../src/middleware.ts";');
-    expect(result.source).toContain('import * as __zsys_module_2 from "../../src/transforms.ts";');
+    expect(result.source).toContain('import * as __relkit_module_0 from "../../src/functions.ts";');
     expect(result.source).toContain(
-      'functions: { "orders.get": __zsys_module_0["get"].handler, "orders.save": __zsys_module_0["save"].handler },',
-    );
-    expect(result.source).toContain('middleware: { "orders.auth": __zsys_module_1["auth"] },');
-    expect(result.source).toContain(
-      'hooks: { "orders.get.after": __zsys_module_0["get"].onAfter, "orders.get.before": __zsys_module_0["get"].onBefore },',
+      'import * as __relkit_module_1 from "../../src/middleware.ts";',
     );
     expect(result.source).toContain(
-      'requestTransforms: { "orders.id": __zsys_module_2["id"].schema },',
+      'import * as __relkit_module_2 from "../../src/transforms.ts";',
+    );
+    expect(result.source).toContain(
+      'functions: { "orders.get": __relkit_module_0["get"].handler, "orders.save": __relkit_module_0["save"].handler },',
+    );
+    expect(result.source).toContain('middleware: { "orders.auth": __relkit_module_1["auth"] },');
+    expect(result.source).toContain(
+      'hooks: { "orders.get.after": __relkit_module_0["get"].onAfter, "orders.get.before": __relkit_module_0["get"].onBefore },',
+    );
+    expect(result.source).toContain(
+      'requestTransforms: { "orders.id": __relkit_module_2["id"].schema },',
     );
     expect(result.source).toContain(
       'providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined } } as const;',
@@ -102,8 +106,8 @@ describe("runtime manifest generation", () => {
   });
 
   test("projects provider metadata as safe names and keeps factory slots out of graph data", () => {
-    const credential = "zsys-synthetic-credential-8.4";
-    const endpoint = "https://zsys-synthetic-endpoint.invalid";
+    const credential = "relkit-synthetic-credential-8.4";
+    const endpoint = "https://relkit-synthetic-endpoint.invalid";
     const app = {
       kind: "app",
       id: "commerce",

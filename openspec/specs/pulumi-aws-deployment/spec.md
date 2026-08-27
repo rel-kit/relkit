@@ -15,16 +15,16 @@ Deployment SHALL consume the canonical graph and produce a versioned determinist
 
 ### Requirement: Pulumi is the only POC deployment engine
 
-Deployment init, preview, up, refresh, outputs, and destroy SHALL be driven through Pulumi Automation API and the Pulumi CLI/backend; ZSys SHALL NOT introduce another infrastructure engine or state system.
+Deployment init, preview, up, refresh, outputs, and destroy SHALL be driven through Pulumi Automation API and the Pulumi CLI/backend; RelKit SHALL NOT introduce another infrastructure engine or state system.
 
 #### Scenario: Deployment stack is initialized
 
-- **WHEN** `zsys deploy init --stack development` succeeds
-- **THEN** it creates/selects a Pulumi project and explicit stack using the configured Pulumi backend without creating ZSys-owned infrastructure state
+- **WHEN** `relkit deploy init --stack development` succeeds
+- **THEN** it creates/selects a Pulumi project and explicit stack using the configured Pulumi backend without creating RelKit-owned infrastructure state
 
 ### Requirement: Stable resource identity
 
-Pulumi project, stack, logical resource names, parent relationships, and tags SHALL derive from normalized application/stable descriptor IDs and explicit stack, not source paths, with tags including app, stack, graph hash, and `managed-by=zsys`.
+Pulumi project, stack, logical resource names, parent relationships, and tags SHALL derive from normalized application/stable descriptor IDs and explicit stack, not source paths, with tags including app, stack, graph hash, and `managed-by=relkit`.
 
 #### Scenario: Source file moves
 
@@ -52,7 +52,7 @@ The AWS target SHALL map the Bun/Hono service to ECR plus ECS/Fargate and ALB, j
 
 ### Requirement: Production build artifact safety
 
-`zsys build` SHALL create deterministic server, manifest, graph, OpenAPI, and container files; the image SHALL pin Bun, run non-root, contain only production files, expose health endpoints, handle SIGTERM, drain traffic, flush bounded telemetry, and exclude `.env` and local `.zsys/state` data.
+`relkit build` SHALL create deterministic server, manifest, graph, OpenAPI, and container files; the image SHALL pin Bun, run non-root, contain only production files, expose health endpoints, handle SIGTERM, drain traffic, flush bounded telemetry, and exclude `.env` and local `.relkit/state` data.
 
 #### Scenario: Container receives SIGTERM
 
@@ -61,7 +61,7 @@ The AWS target SHALL map the Bun/Hono service to ECR plus ECS/Fargate and ALB, j
 
 ### Requirement: Preview makes no cloud changes
 
-`zsys deploy preview` SHALL run application checks, build or use a deterministic plan-test image placeholder, generate the plan/program, configure/select the stack, stream redacted Pulumi events through framework logging, summarize the resource diff, write a machine-readable report, and make no cloud mutation.
+`relkit deploy preview` SHALL run application checks, build or use a deterministic plan-test image placeholder, generate the plan/program, configure/select the stack, stream redacted Pulumi events through framework logging, summarize the resource diff, write a machine-readable report, and make no cloud mutation.
 
 #### Scenario: Preview includes destructive change
 
@@ -70,7 +70,7 @@ The AWS target SHALL map the Bun/Hono service to ECR plus ECS/Fargate and ALB, j
 
 ### Requirement: Controlled deployment changes
 
-`zsys deploy up` SHALL require successful compilation and SHALL require explicit interactive confirmation for destructive or security-sensitive changes unless a documented non-interactive CI flag grants that action.
+`relkit deploy up` SHALL require successful compilation and SHALL require explicit interactive confirmation for destructive or security-sensitive changes unless a documented non-interactive CI flag grants that action.
 
 #### Scenario: Destructive update lacks confirmation
 

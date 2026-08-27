@@ -1,12 +1,12 @@
-import { materializeEvents, type InvocationIdSource, type InvocationTarget } from "@zsys/engine";
+import { materializeEvents, type InvocationIdSource, type InvocationTarget } from "@relkit/engine";
 import {
   createEventClient,
   type EventClient,
   type EventProvider,
   type UnknownEventEnvelope,
-} from "@zsys/events";
-import type { EventDeliveryResult, EventRouter } from "@zsys/providers-local";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+} from "@relkit/events";
+import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestStateRoot } from "./state-root.js";

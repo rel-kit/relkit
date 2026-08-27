@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type { ClientRateLimitInfo, Store } from "hono-rate-limiter";
 
 export interface RateLimitCounter {
@@ -14,7 +14,7 @@ export interface RateLimitCounter {
 export type RateLimitStoreResolver = (storeId: string) => MaybePromise<RateLimitCounter>;
 
 export class RateLimitStoreError extends Error {
-  readonly code = "ZSYS_RATE_LIMIT_STORE_UNAVAILABLE" as const;
+  readonly code = "RELKIT_RATE_LIMIT_STORE_UNAVAILABLE" as const;
 
   constructor(message: string) {
     super(message);
@@ -22,7 +22,7 @@ export class RateLimitStoreError extends Error {
   }
 }
 
-/** Adapts a numeric ZSYS cache provider to hono-rate-limiter's fixed-window store contract. */
+/** Adapts a numeric RELKIT cache provider to hono-rate-limiter's fixed-window store contract. */
 export function createRateLimitStore(
   routeId: string,
   storeId: string,
@@ -40,7 +40,7 @@ export function createRateLimitStore(
     const resetAt = (Math.floor(current / windowMs) + 1) * windowMs;
     const digest = await sha256(key);
     return {
-      key: `zsys:rate-limit:${routeId}:${Math.floor(current / windowMs)}:${digest}`,
+      key: `relkit:rate-limit:${routeId}:${Math.floor(current / windowMs)}:${digest}`,
       resetAt,
       ttlMs: Math.max(1, resetAt - current),
     };
@@ -54,7 +54,7 @@ export function createRateLimitStore(
 
   return {
     localKeys: false,
-    prefix: `zsys:rate-limit:${routeId}:`,
+    prefix: `relkit:rate-limit:${routeId}:`,
     get: read,
     increment: async (key) => {
       const target = await location(key);

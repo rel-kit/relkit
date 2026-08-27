@@ -19,7 +19,7 @@ const outputs: GeneratedOutputs = {
   openapi: "",
   client: "",
   contract: "export const contract = {};\n",
-  clientContract: '{"protocol":"zsys.client-contract"}\n',
+  clientContract: '{"protocol":"relkit.client-contract"}\n',
 };
 
 function descriptor(id: string, file: string, value: Record<string, unknown> = {}) {
@@ -35,7 +35,7 @@ function descriptor(id: string, file: string, value: Record<string, unknown> = {
 
 describe("compiler generated artifacts", () => {
   test("writes core bytes once and preserves unchanged modification state", async () => {
-    const directory = await mkdtemp(join(tmpdir(), "zsys-artifacts-"));
+    const directory = await mkdtemp(join(tmpdir(), "relkit-artifacts-"));
     try {
       const first = await writeGeneratedArtifacts(outputs, { directory });
       expect(first.changed).toBe(true);
@@ -60,7 +60,7 @@ describe("compiler generated artifacts", () => {
   });
 
   test("accepts only versioned future artifact extensions", async () => {
-    const directory = await mkdtemp(join(tmpdir(), "zsys-artifacts-"));
+    const directory = await mkdtemp(join(tmpdir(), "relkit-artifacts-"));
     try {
       const report = await writeGeneratedArtifacts(outputs, {
         directory,

@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type { InspectorGenerationServices } from "./shared.js";
 
 export interface InspectorCandidateGeneration extends InspectorGenerationServices {

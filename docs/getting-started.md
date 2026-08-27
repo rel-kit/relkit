@@ -1,7 +1,7 @@
 # Getting started
 
-ZSys projects are TypeScript applications managed by Bun. The generated
-project is the supported starting point; its `zsys` commands compile the
+RelKit projects are TypeScript applications managed by Bun. The generated
+project is the supported starting point; its `relkit` commands compile the
 application graph, run the local supervisor, and build deployment artifacts.
 
 ## Prerequisites
@@ -14,30 +14,30 @@ application graph, run the local supervisor, and build deployment artifacts.
 Check the local toolchain from a generated project with:
 
 ```sh
-zsys doctor
+relkit doctor
 ```
 
 The doctor command reports missing tools and configuration without printing
-secret values. Use `zsys --json doctor` when a script needs structured output.
+secret values. Use `relkit --json doctor` when a script needs structured output.
 
 ## Create a project
 
 The release-supported generator command is:
 
 ```sh
-bunx create-zsys@latest my-app
+bunx create-relkit@latest my-app
 cd my-app
 ```
 
-When testing changes from a ZSys checkout, use its local launcher. It quietly
+When testing changes from a RelKit checkout, use its local launcher. It quietly
 syncs and links framework packages without publishing them, and a running local
 development session restarts after successful framework changes:
 
 ```sh
-bun run zsys:local -- create my-app --cloud none --deploy none
+bun run relkit:local -- create my-app --cloud none --deploy none
 ```
 
-The equivalent CLI form is `zsys create my-app`. The generator supports three
+The equivalent CLI form is `relkit create my-app`. The generator supports three
 templates:
 
 | Option                    | Values                            | Default         |
@@ -60,13 +60,13 @@ doctor, and check steps. For a project that does not need cloud prerequisites,
 opt out explicitly:
 
 ```sh
-bunx create-zsys@latest my-app --cloud none --deploy none
+bunx create-relkit@latest my-app --cloud none --deploy none
 ```
 
 For example, an API project is:
 
 ```sh
-bunx create-zsys@latest my-api --template api
+bunx create-relkit@latest my-api --template api
 ```
 
 Generation validates the destination before writing. A failed generation does
@@ -85,13 +85,13 @@ bun run dev
 The minimal project exposes:
 
 ```sh
-curl "http://localhost:3000/hello?name=ZSys"
+curl "http://localhost:3000/hello?name=RelKit"
 ```
 
 The response is:
 
 ```json
-{ "message": "Hello, ZSys!" }
+{ "message": "Hello, RelKit!" }
 ```
 
 The generated configuration starts the real Next.js inspector on port `3210`.
@@ -99,15 +99,15 @@ The portable development check is the versioned graph API on the active backend
 port:
 
 ```sh
-curl "http://localhost:3000/_zsys/v1/graph"
+curl "http://localhost:3000/_relkit/v1/graph"
 ```
 
 The graph response includes the active `graphHash`. The inspector at
 `http://localhost:3210` uses the same versioned API and displays that active
 graph, not a separately reconstructed source model. Stop both processes with
-`Ctrl-C`. When `@zsys/cli` is linked from this checkout, `zsys dev` prefers the
+`Ctrl-C`. When `@relkit/cli` is linked from this checkout, `relkit dev` prefers the
 workspace `apps/inspector` source automatically; published CLI installs use the
-packaged inspector. Set `ZSYS_INSPECTOR_ROOT` only when selecting another
+packaged inspector. Set `RELKIT_INSPECTOR_ROOT` only when selecting another
 inspector checkout.
 
 ## Check, test, and build
@@ -126,19 +126,19 @@ bun run start
 
 Run `bun run start` only after `bun run build`. The built server validates the
 generated graph and manifest hash before serving traffic. Build output is
-written under `.zsys/build` and includes the server, manifest, graph, OpenAPI
+written under `.relkit/build` and includes the server, manifest, graph, OpenAPI
 document, and production Dockerfile.
 
 Print or compare graph artifacts with:
 
 ```sh
 bun run graph
-zsys graph print
-zsys graph check
-zsys graph diff before-graph.json after-graph.json
+relkit graph print
+relkit graph check
+relkit graph diff before-graph.json after-graph.json
 ```
 
-`zsys graph check --hash <hash>` verifies an expected graph hash. Graph files
+`relkit graph check --hash <hash>` verifies an expected graph hash. Graph files
 and generated manifests are derived outputs; edit the source descriptors and
 run `bun run check` to regenerate them.
 
@@ -147,28 +147,28 @@ run `bun run check` to regenerate them.
 Inspect configuration without exposing values:
 
 ```sh
-zsys env check
-zsys env list
-zsys env explain PORT
-zsys env example
+relkit env check
+relkit env list
+relkit env explain PORT
+relkit env example
 ```
 
-`zsys env example` prints the generated example. Add `--write` when it should
+`relkit env example` prints the generated example. Add `--write` when it should
 write the example file; the command does not overwrite an existing file by
-default. Production-required fields are reported by `zsys env check`; set
+default. Production-required fields are reported by `relkit env check`; set
 their values through the environment or the deployment configuration rather
-than committing secrets. Do not declare `ZSYS_ENV`; it is framework-reserved.
+than committing secrets. Do not declare `RELKIT_ENV`; it is framework-reserved.
 Use identical keys in every pipeline—for example MinIO/Redis locally and
 R2/Upstash in production—while keeping one application provider topology.
 
 ## Authoring model
 
-Application source uses public ZSys descriptors. A function is the executable
+Application source uses public RelKit descriptors. A function is the executable
 unit and routes target function descriptors:
 
 ```ts
-import { defineFunction, defineRoute } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction, defineRoute } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const hello = defineFunction({
   input: z.object({ name: z.string().default("world") }),
@@ -189,14 +189,14 @@ move must preserve graph identity. Descriptors are pure metadata. The compiler
 discovers them, validates the canonical graph, and emits the runtime manifest.
 Use `target.invoke(input)` for nested calls; managed resources remain explicit
 dependencies. Do not put executable closures in graph mappings or edit
-`.zsys/generated` by hand.
+`.relkit/generated` by hand.
 
 ## Project directories
 
 - `src/` contains application descriptors and handlers.
-- `.zsys/generated/` contains checked graph, manifest, OpenAPI, client, and diagnostics output.
-- `.zsys/build/` contains production build output.
-- `.zsys/state/` and `.zsys/observability/` contain local development state and telemetry.
+- `.relkit/generated/` contains checked graph, manifest, OpenAPI, client, and diagnostics output.
+- `.relkit/build/` contains production build output.
+- `.relkit/state/` and `.relkit/observability/` contain local development state and telemetry.
 
 Keep `.env`, local state, and generated output out of commits. Tests replace
 graph-required bindings with deterministic fakes; normal runtimes resolve the

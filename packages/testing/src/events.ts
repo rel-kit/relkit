@@ -1,6 +1,6 @@
-import { normalizeId, type JsonValue } from "@zsys/contracts";
-import { materializeEvents } from "@zsys/engine";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+import { normalizeId, type JsonValue } from "@relkit/contracts";
+import { materializeEvents } from "@relkit/engine";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import { createFailures, createIdSource, createRandom } from "./jobs-utils.js";

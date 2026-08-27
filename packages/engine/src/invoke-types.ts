@@ -1,7 +1,7 @@
-import type { MaybePromise } from "@zsys/contracts";
-import type { BucketOperationObservation } from "@zsys/buckets";
-import type { CacheOperationObservation } from "@zsys/cache";
-import type { GraphEdge, ObservedEdge } from "@zsys/graph";
+import type { MaybePromise } from "@relkit/contracts";
+import type { BucketOperationObservation } from "@relkit/buckets";
+import type { CacheOperationObservation } from "@relkit/cache";
+import type { GraphEdge, ObservedEdge } from "@relkit/graph";
 import {
   InvocationValidationError,
   type InvocationContext as SharedInvocationContext,
@@ -16,9 +16,13 @@ import {
   type PublicLogger as SharedPublicLogger,
   type ServicePolicySource,
   type InvocationValueHooks,
-} from "@zsys/invocation";
-import type { InvocationFailure, InvocationRunner, PublicFailureEnvelope } from "@zsys/invocation";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/invocation";
+import type {
+  InvocationFailure,
+  InvocationRunner,
+  PublicFailureEnvelope,
+} from "@relkit/invocation";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import type { FunctionRegistry } from "./registry.js";
 import type { DependencyClientSources, DependencyDeclarations } from "./dependencies.js";
 
@@ -78,7 +82,7 @@ export type InvocationAdmit = (
   request: InvocationAdmissionRequest,
 ) => MaybePromise<InvocationLease | void>;
 
-export type InvocationContextOptions = import("@zsys/invocation").InvocationContextOptions;
+export type InvocationContextOptions = import("@relkit/invocation").InvocationContextOptions;
 
 export interface InvocationHooks<
   Context extends { readonly signal: AbortSignal } = InvocationContext,

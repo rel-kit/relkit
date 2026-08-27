@@ -1,10 +1,10 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type {
   ObservabilityCollector,
   ObservabilityRecord,
   ObservabilityStream,
   RedactionPolicy,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import type {
   SupervisorCandidateToken,
   SupervisorTelemetry,

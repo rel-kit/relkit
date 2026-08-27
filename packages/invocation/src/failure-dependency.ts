@@ -10,7 +10,7 @@ export function dependencyNotConfiguredFailure(cause: {
       _tag: "ProviderFailure",
       kind: "provider",
       outcome: "provider-failure",
-      code: "ZSYS_DEPENDENCY_NOT_CONFIGURED",
+      code: "RELKIT_DEPENDENCY_NOT_CONFIGURED",
       message: `Managed dependency "${cause.category}.${cause.dependencyName}" is not configured`,
       capability: cause.category,
       profile: cause.dependencyName,

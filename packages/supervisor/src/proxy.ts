@@ -99,7 +99,7 @@ export class SupervisorProxy {
     const target = this.target;
     if (target === undefined)
       return Promise.resolve(
-        new Response(JSON.stringify({ error: "No active ZSys generation." }), {
+        new Response(JSON.stringify({ error: "No active RelKit generation." }), {
           status: 503,
           headers: { "cache-control": "no-store", "content-type": "application/json" },
         }),

@@ -1,13 +1,13 @@
-# @zsys/config
+# @relkit/config
 
-`@zsys/config` declares typed environment rules and safe metadata. Declaration
+`@relkit/config` declares typed environment rules and safe metadata. Declaration
 modules are value-free: importing one creates builders and metadata but does
 not read process, file, or runtime environment values.
 
 ## Declare environment rules
 
 ```ts
-import { defineEnv, env } from "@zsys/config";
+import { defineEnv, env } from "@relkit/config";
 
 export default defineEnv({
   APP_MODE: env.literal("development", "test", "production").default("development"),
@@ -22,7 +22,7 @@ sensitivity. It does not resolve a value at module import time. Keep runtime
 resolution in an explicit startup function with an explicit source:
 
 ```ts
-import { projectEnv, resolveEnv } from "@zsys/config";
+import { projectEnv, resolveEnv } from "@relkit/config";
 import definition from "./env";
 
 export const environmentMetadata = projectEnv(definition);

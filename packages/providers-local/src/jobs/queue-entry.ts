@@ -1,4 +1,4 @@
-import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@relkit/contracts";
 import type { JobRecord, JobStore } from "./store.js";
 import { assertIdempotencyRecord, readIdempotencyRecord } from "./idempotency.js";
 import {

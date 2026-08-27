@@ -3,7 +3,7 @@ import type { InspectorGraph, InspectorObject } from "./api-types";
 import { agentView, toolView } from "./agents-model";
 
 const graph = {
-  protocol: "zsys.inspector",
+  protocol: "relkit.inspector",
   version: 1,
   generationId: "generation-one",
   graphHash: "sha256:one",
@@ -33,7 +33,7 @@ const graph = {
       model: "local-fast",
       toolIds: ["orders.tool"],
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
-      generatedFunction: { functionId: "zsys.agent.orders.agent.invoke" },
+      generatedFunction: { functionId: "relkit.agent.orders.agent.invoke" },
     },
   ],
 } as InspectorGraph;
@@ -81,7 +81,7 @@ const spans = [
     completedAt: "2026-08-17T10:00:04.000Z",
     durationMs: 1_000,
     attributes: {
-      "zsys.model.profile": "local-fast",
+      "relkit.model.profile": "local-fast",
       prompt: "raw prompt",
       result: "raw result",
     },
@@ -124,7 +124,7 @@ describe("inspector tool and agent projections", () => {
       model: "local-fast",
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
       toolIds: ["orders.tool"],
-      generatedFunctionId: "zsys.agent.orders.agent.invoke",
+      generatedFunctionId: "relkit.agent.orders.agent.invoke",
     });
     expect(view?.spans).toHaveLength(2);
     expect(view?.spans[0]).toMatchObject({

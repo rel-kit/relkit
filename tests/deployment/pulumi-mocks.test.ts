@@ -5,14 +5,14 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import * as pulumi from "../../packages/deploy-pulumi/node_modules/@pulumi/pulumi/index.js";
 import type {
-  ZsysApplicationService,
-  ZsysBuckets,
-  ZsysCaches,
-  ZsysContainerRegistry,
-  ZsysEventBus,
-  ZsysJobQueues,
-  ZsysNetwork,
-  ZsysObservability,
+  RelkitApplicationService,
+  RelkitBuckets,
+  RelkitCaches,
+  RelkitContainerRegistry,
+  RelkitEventBus,
+  RelkitJobQueues,
+  RelkitNetwork,
+  RelkitObservability,
 } from "../../packages/cloud-aws/src/index.ts";
 import { diffDeploymentPlans, fromGraph } from "../../packages/deploy/src/index.ts";
 import type { DeploymentPlan } from "../../packages/deploy/src/plan.ts";
@@ -51,20 +51,20 @@ await pulumi.runtime.setMocks(
     },
     call: () => ({ name: "us-east-1", region: "us-east-1" }),
   },
-  "zsys-deployment-mocks",
+  "relkit-deployment-mocks",
   "development",
 );
 
 const { renderPulumiProgram } = await import("../../packages/deploy-pulumi/src/program.ts");
 const {
-  ZsysApplicationService,
-  ZsysBuckets,
-  ZsysCaches,
-  ZsysContainerRegistry,
-  ZsysEventBus,
-  ZsysJobQueues,
-  ZsysNetwork,
-  ZsysObservability,
+  RelkitApplicationService,
+  RelkitBuckets,
+  RelkitCaches,
+  RelkitContainerRegistry,
+  RelkitEventBus,
+  RelkitJobQueues,
+  RelkitNetwork,
+  RelkitObservability,
 } = await import("../../packages/cloud-aws/src/index.ts");
 
 afterEach(async () => {
@@ -83,14 +83,14 @@ test("executes the generated plan with stable capability mappings and secret-saf
 
   expect([...types]).toEqual(
     expect.arrayContaining([
-      "zsys:cloud-aws:application",
-      "zsys:cloud-aws:ZsysNetwork",
-      "zsys:cloud-aws:ZsysContainerRegistry",
-      "zsys:cloud-aws:ZsysJobQueues",
-      "zsys:cloud-aws:ZsysEventBus",
-      "zsys:cloud-aws:ZsysBuckets",
-      "zsys:cloud-aws:ZsysCaches",
-      "zsys:cloud-aws:ZsysApplicationService",
+      "relkit:cloud-aws:application",
+      "relkit:cloud-aws:RelkitNetwork",
+      "relkit:cloud-aws:RelkitContainerRegistry",
+      "relkit:cloud-aws:RelkitJobQueues",
+      "relkit:cloud-aws:RelkitEventBus",
+      "relkit:cloud-aws:RelkitBuckets",
+      "relkit:cloud-aws:RelkitCaches",
+      "relkit:cloud-aws:RelkitApplicationService",
       "aws:sqs/queue:Queue",
       "aws:cloudwatch/eventRule:EventRule",
       "aws:s3/bucket:Bucket",
@@ -128,22 +128,22 @@ test("executes the generated plan with stable capability mappings and secret-saf
 });
 
 test("maps AWS resources with parents, tags, security rules, and secret injection", async () => {
-  let network: InstanceType<typeof ZsysNetwork> | undefined;
-  let registry: InstanceType<typeof ZsysContainerRegistry> | undefined;
-  let application: InstanceType<typeof ZsysApplicationService> | undefined;
-  let jobs: InstanceType<typeof ZsysJobQueues> | undefined;
-  let events: InstanceType<typeof ZsysEventBus> | undefined;
-  let buckets: InstanceType<typeof ZsysBuckets> | undefined;
-  let caches: InstanceType<typeof ZsysCaches> | undefined;
-  let observability: InstanceType<typeof ZsysObservability> | undefined;
+  let network: InstanceType<typeof RelkitNetwork> | undefined;
+  let registry: InstanceType<typeof RelkitContainerRegistry> | undefined;
+  let application: InstanceType<typeof RelkitApplicationService> | undefined;
+  let jobs: InstanceType<typeof RelkitJobQueues> | undefined;
+  let events: InstanceType<typeof RelkitEventBus> | undefined;
+  let buckets: InstanceType<typeof RelkitBuckets> | undefined;
+  let caches: InstanceType<typeof RelkitCaches> | undefined;
+  let observability: InstanceType<typeof RelkitObservability> | undefined;
 
   await pulumi.runtime.runInPulumiStack(() => {
-    network = new ZsysNetwork("orders", { appId: "orders.app", graphHash: "sha256:orders" });
-    registry = new ZsysContainerRegistry("orders", {
+    network = new RelkitNetwork("orders", { appId: "orders.app", graphHash: "sha256:orders" });
+    registry = new RelkitContainerRegistry("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
     });
-    application = new ZsysApplicationService("orders", {
+    application = new RelkitApplicationService("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       network,
@@ -152,7 +152,7 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
       environment: { APP_MODE: "test" },
       secrets: { API_TOKEN: "arn:test:api-token" },
     });
-    jobs = new ZsysJobQueues("orders", {
+    jobs = new RelkitJobQueues("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       jobs: [
@@ -180,7 +180,7 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
         },
       ],
     });
-    events = new ZsysEventBus("orders", {
+    events = new RelkitEventBus("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       events: [{ id: "orders.created", version: 1 }],
@@ -199,17 +199,17 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
         },
       ],
     });
-    buckets = new ZsysBuckets("orders", {
+    buckets = new RelkitBuckets("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       buckets: [{ id: "assets" }],
     });
-    caches = new ZsysCaches("orders", {
+    caches = new RelkitCaches("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       caches: [{ id: "prices", subnetIds: ["private-1"], securityGroupIds: ["sg-cache"] }],
     });
-    observability = new ZsysObservability("orders", {
+    observability = new RelkitObservability("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       otlp: { endpoint: "https://otel.test", headersSecretArn: "arn:test:otel-headers" },
@@ -221,7 +221,7 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
     app: "orders.app",
     stack: "development",
     graphHash: "sha256:orders",
-    "managed-by": "zsys",
+    "managed-by": "relkit",
   };
   expect(await resolveValue(application!.tags)).toEqual(tags);
   expect(await resolveValue(buckets!.tags)).toEqual(tags);
@@ -230,7 +230,7 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
 
   const target = resource(resources, "aws:lb/targetGroup:TargetGroup");
   expect(target.inputs.healthCheck).toMatchObject({
-    path: "/_zsys/v1/health/ready",
+    path: "/_relkit/v1/health/ready",
     protocol: "HTTP",
   });
   const albSecurity = resourceMatching(
@@ -307,19 +307,19 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
   });
 
   expect(await resolveValue(application!.service.urn)).toContain(
-    "zsys:cloud-aws:ZsysApplicationService$aws:ecs/service:Service",
+    "relkit:cloud-aws:RelkitApplicationService$aws:ecs/service:Service",
   );
   expect(await resolveValue(jobs!.queues[0]!.queue.urn)).toContain(
-    "zsys:cloud-aws:ZsysJobQueues$aws:sqs/queue:Queue",
+    "relkit:cloud-aws:RelkitJobQueues$aws:sqs/queue:Queue",
   );
   expect(await resolveValue(events!.triggers[0]!.rules[0]!.urn)).toContain(
-    "zsys:cloud-aws:ZsysEventBus$aws:cloudwatch/eventRule:EventRule",
+    "relkit:cloud-aws:RelkitEventBus$aws:cloudwatch/eventRule:EventRule",
   );
   expect(await resolveValue(buckets!.buckets[0]!.bucket.urn)).toContain(
-    "zsys:cloud-aws:ZsysBuckets$aws:s3/bucket:Bucket",
+    "relkit:cloud-aws:RelkitBuckets$aws:s3/bucket:Bucket",
   );
   expect(await resolveValue(caches!.caches[0]!.cache.urn)).toContain(
-    "zsys:cloud-aws:ZsysCaches$aws:elasticache/serverlessCache:ServerlessCache",
+    "relkit:cloud-aws:RelkitCaches$aws:elasticache/serverlessCache:ServerlessCache",
   );
   expect(network!.serviceSecurityGroup).toBeDefined();
 });
@@ -384,8 +384,8 @@ function deploymentOptions() {
       tag: "2026-08-18",
       digest: "sha256:orders-image",
       health: {
-        livenessPath: "/_zsys/v1/health/live",
-        readinessPath: "/_zsys/v1/health/ready",
+        livenessPath: "/_relkit/v1/health/live",
+        readinessPath: "/_relkit/v1/health/ready",
         port: 8080,
         intervalMs: 10_000,
         timeoutMs: 2_000,

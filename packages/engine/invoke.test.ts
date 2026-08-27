@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import type { ProtocolId } from "@zsys/contracts";
+import type { ProtocolId } from "@relkit/contracts";
 import { Effect } from "effect";
-import { defineError, defineFunction, fail } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineError, defineFunction, fail } from "@relkit/app";
+import { z } from "@relkit/schema";
 import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/invoke.ts";
 
 const ids = () => {

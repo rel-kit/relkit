@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import {
   invokeFunction as invokeEngineFunction,
   type DependencyClientSources,
@@ -6,9 +6,9 @@ import {
   type InvocationHooks,
   type InvocationIdSource,
   type InvocationTarget,
-} from "@zsys/engine";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+} from "@relkit/engine";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createTestFakes } from "./fakes.js";
 import { createTestStateRoot } from "./state-root.js";
 
@@ -17,7 +17,7 @@ export interface StandaloneFunctionTarget {
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
-  readonly dependencies?: import("@zsys/engine").DependencyDeclarations;
+  readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
@@ -53,9 +53,9 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
  *
  * @example
  * ```ts
- * import { defineFunction } from "@zsys/functions"
- * import { z } from "@zsys/schema"
- * import { invokeFunction } from "@zsys/testing"
+ * import { defineFunction } from "@relkit/functions"
+ * import { z } from "@relkit/schema"
+ * import { invokeFunction } from "@relkit/testing"
  *
  * const greet = defineFunction({ id: "greet", input: z.string(), output: z.string(), handler: async (name) => `Hello ${name}` })
  * const result = await invokeFunction(greet, "Ada")

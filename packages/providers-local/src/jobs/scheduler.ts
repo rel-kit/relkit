@@ -4,11 +4,11 @@ import {
   normalizeId,
   type JsonValue,
   type MaybePromise,
-} from "@zsys/contracts";
-import type { ScheduleDefinition, ScheduleOverlap } from "@zsys/jobs";
+} from "@relkit/contracts";
+import type { ScheduleDefinition, ScheduleOverlap } from "@relkit/jobs";
 import { nextCronFire } from "./cron.js";
 export class ScheduleValidationError extends TypeError {
-  readonly code = "ZSYS_SCHEDULE_INVALID" as const;
+  readonly code = "RELKIT_SCHEDULE_INVALID" as const;
 
   constructor(message: string) {
     super(message);

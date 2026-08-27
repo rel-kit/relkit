@@ -1,5 +1,5 @@
 import type { EngineEvent, OutputMap, PreviewResult, UpResult } from "@pulumi/pulumi/automation";
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type {
   PulumiEventLog,
   PulumiEventOptions,

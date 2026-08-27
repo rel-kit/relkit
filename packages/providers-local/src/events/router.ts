@@ -1,8 +1,8 @@
 import { join, resolve } from "node:path";
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogRecord } from "./log.js";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import { createEventDelivery, type EventDelivery, type EventDeliveryBoundary } from "./delivery.js";
 import { createEphemeralDelivery, type EphemeralDelivery } from "./ephemeral.js";
 import type {

@@ -1,7 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { canonicalJson } from "@zsys/contracts";
-import { createOutputReport, serializePulumiReport, type PulumiReport } from "@zsys/deploy-pulumi";
+import { canonicalJson } from "@relkit/contracts";
+import {
+  createOutputReport,
+  serializePulumiReport,
+  type PulumiReport,
+} from "@relkit/deploy-pulumi";
 import type { ParsedDeployArgs, Prepared, WorkspaceHandle } from "./deploy-support.js";
 
 export function initialized(
@@ -81,7 +85,7 @@ async function saveReport(
   await writeFile(
     path,
     `${canonicalJson({
-      protocol: "zsys.deployment-report",
+      protocol: "relkit.deployment-report",
       version: 1,
       command,
       stack: handle.stackName,

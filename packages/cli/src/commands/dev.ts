@@ -1,9 +1,9 @@
-import type { LoggerOptions } from "@zsys/runtime-effect";
+import type { LoggerOptions } from "@relkit/runtime-effect";
 import type {
   CandidateCompile,
   StartedCandidate,
   SupervisorObservabilityOptions,
-} from "@zsys/supervisor";
+} from "@relkit/supervisor";
 import { DevSession } from "./dev-session.js";
 import type { DevInspectorOptions } from "./dev-process.js";
 

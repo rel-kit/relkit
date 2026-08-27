@@ -12,14 +12,14 @@ export function resolveValue(
       values[value.name] === undefined
     )
       throw new ModelProviderRegistryError(
-        "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID",
+        "RELKIT_MODEL_PROVIDER_ENVIRONMENT_INVALID",
         `${path} environment reference is unresolved.`,
       );
     return values[value.name];
   }
   if (isSensitiveMarker(value)) {
     throw new ModelProviderRegistryError(
-      "ZSYS_MODEL_PROVIDER_ENVIRONMENT_INVALID",
+      "RELKIT_MODEL_PROVIDER_ENVIRONMENT_INVALID",
       `${path} contains an unresolved secret.`,
     );
   }

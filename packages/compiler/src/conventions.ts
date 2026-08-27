@@ -5,14 +5,14 @@ import {
   type DescriptorAny,
   type DescriptorKind,
   type SourceLocation,
-} from "@zsys/contracts";
-import { createDiagnostic, type Diagnostic } from "@zsys/diagnostics";
+} from "@relkit/contracts";
+import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
 export const CONVENTION_CODES = Object.freeze({
-  directory: "ZSYS_CONVENTION_DIRECTORY",
-  suffix: "ZSYS_CONVENTION_SUFFIX",
-  export: "ZSYS_CONVENTION_EXPORT",
-  multipleKinds: "ZSYS_CONVENTION_MULTIPLE_KINDS",
-  idStyle: "ZSYS_CONVENTION_ID_STYLE",
+  directory: "RELKIT_CONVENTION_DIRECTORY",
+  suffix: "RELKIT_CONVENTION_SUFFIX",
+  export: "RELKIT_CONVENTION_EXPORT",
+  multipleKinds: "RELKIT_CONVENTION_MULTIPLE_KINDS",
+  idStyle: "RELKIT_CONVENTION_ID_STYLE",
 } as const);
 export type ConventionCode = (typeof CONVENTION_CODES)[keyof typeof CONVENTION_CODES];
 export interface ConventionExport {
@@ -39,7 +39,7 @@ type KindRule = {
   readonly suffix: string;
 };
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
-  app: { directory: ".", suffix: "zsys.config.ts" },
+  app: { directory: ".", suffix: "relkit.config.ts" },
   function: { directory: "src/functions", suffix: ".function.ts" },
   service: { directory: "src/services", suffix: ".service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },

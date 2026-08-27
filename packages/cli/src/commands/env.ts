@@ -9,7 +9,7 @@ import {
   isRequired,
   type EnvCommandOptions,
 } from "./env-support.js";
-import { projectEnv } from "@zsys/config";
+import { projectEnv } from "@relkit/config";
 import { CLI_EXIT_CODES, type CliCommandContext } from "../main-support.js";
 
 export {
@@ -77,7 +77,10 @@ export async function runEnv(
 
     const field = fields.find(({ name }) => name === parsed.name);
     if (field === undefined)
-      throw new EnvCommandError("ZSYS_ENV_UNKNOWN", `Unknown environment variable: ${parsed.name}`);
+      throw new EnvCommandError(
+        "RELKIT_ENV_UNKNOWN",
+        `Unknown environment variable: ${parsed.name}`,
+      );
     const result = {
       ok: true as const,
       command: "explain" as const,
@@ -94,8 +97,8 @@ export async function runEnv(
     context.reporter.output(result, formatExplain(result));
     return CLI_EXIT_CODES.success;
   } catch (error) {
-    const code = error instanceof EnvCommandError ? error.code : "ZSYS_ENV_FAILED";
+    const code = error instanceof EnvCommandError ? error.code : "RELKIT_ENV_FAILED";
     context.reporter.error(code, error instanceof Error ? error.message : String(error));
-    return code === "ZSYS_ENV_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+    return code === "RELKIT_ENV_USAGE" ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
   }
 }

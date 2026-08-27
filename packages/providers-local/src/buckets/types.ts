@@ -4,14 +4,14 @@ import type {
   BucketObjectMetadata,
   BucketOperation,
   BucketProvider,
-} from "@zsys/buckets";
+} from "@relkit/buckets";
 
 export const LOCAL_BUCKET_CAPABILITIES: Readonly<BucketCapabilities> = Object.freeze({
   signedReadUrl: false,
   signedWriteUrl: false,
 });
 
-export const LOCAL_BUCKET_RESERVED_PREFIXES = Object.freeze([".zsys", "__zsys"]);
+export const LOCAL_BUCKET_RESERVED_PREFIXES = Object.freeze([".relkit", "__relkit"]);
 
 export interface LocalBucketPolicy {
   readonly maxObjectBytes?: number;
@@ -91,7 +91,7 @@ export type LocalBucketProvider = Omit<BucketProvider, "list"> & {
 };
 
 export class LocalBucketKeyError extends TypeError {
-  readonly code = "ZSYS_BUCKET_KEY_INVALID" as const;
+  readonly code = "RELKIT_BUCKET_KEY_INVALID" as const;
 
   constructor() {
     super("Bucket key is invalid");
@@ -100,7 +100,7 @@ export class LocalBucketKeyError extends TypeError {
 }
 
 export class LocalBucketPolicyError extends TypeError {
-  readonly code = "ZSYS_BUCKET_POLICY_INVALID" as const;
+  readonly code = "RELKIT_BUCKET_POLICY_INVALID" as const;
 
   constructor(message: string) {
     super(message);
@@ -109,7 +109,7 @@ export class LocalBucketPolicyError extends TypeError {
 }
 
 export class LocalBucketStateError extends Error {
-  readonly code = "ZSYS_BUCKET_STATE_INVALID" as const;
+  readonly code = "RELKIT_BUCKET_STATE_INVALID" as const;
 
   constructor(message = "Bucket state is invalid") {
     super(message);
@@ -118,7 +118,7 @@ export class LocalBucketStateError extends Error {
 }
 
 export class LocalBucketPaginationError extends TypeError {
-  readonly code = "ZSYS_BUCKET_CURSOR_INVALID" as const;
+  readonly code = "RELKIT_BUCKET_CURSOR_INVALID" as const;
 
   constructor() {
     super("Bucket list cursor or limit is invalid");

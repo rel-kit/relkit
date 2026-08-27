@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 
@@ -48,7 +48,7 @@ function generation(id: string, hash: string) {
     graphHash: hash,
     graph,
     environment: () => ({ DATABASE_URL: "database-secret" }),
-    diagnostics: [{ code: "ZSYS_TEST", severity: "warning", message: "safe diagnostic" }],
+    diagnostics: [{ code: "RELKIT_TEST", severity: "warning", message: "safe diagnostic" }],
     runtime: {
       functions: [
         {

@@ -8,7 +8,7 @@ import {
   type InvocationRunner,
   type InvocationValueHooks,
   type ServicePolicySource,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 import { runServiceHandler } from "./service-runtime.js";
 import type { InvocationTarget } from "./invoke-types.js";
 

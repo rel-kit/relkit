@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import receiptJob from "../jobs/send-receipt.job.js";
 import { eventEnvelope } from "../shared/schemas.js";
 

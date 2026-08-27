@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
-import type { DeploymentPlan } from "@zsys/deploy";
-import { hashGraph, type ApplicationGraph } from "@zsys/graph";
+import type { DeploymentPlan } from "@relkit/deploy";
+import { hashGraph, type ApplicationGraph } from "@relkit/graph";
 import { runDeploy } from "./src/commands/deploy.js";
 
 const graph = JSON.parse(
@@ -14,7 +14,7 @@ const graph = JSON.parse(
 const graphHash = hashGraph(graph);
 
 test("preview plans through Automation API without calling up and redacts config values", async () => {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-deploy-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-deploy-test-"));
   try {
     const state = fakeState({ create: 1 });
     const captured = capture();
@@ -54,7 +54,7 @@ test("preview plans through Automation API without calling up and redacts config
 });
 
 test("up declines destructive changes before mutation", async () => {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-deploy-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-deploy-test-"));
   try {
     const state = fakeState({ delete: 1 });
     const captured = capture();
@@ -72,7 +72,7 @@ test("up declines destructive changes before mutation", async () => {
 });
 
 test("destroy uses explicit non-interactive confirmation and outputs stay secret-safe", async () => {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-deploy-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-deploy-test-"));
   try {
     const state = fakeState({ delete: 1 });
     const destroyed = capture();
@@ -110,7 +110,7 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
       ok: true,
       activatable: true,
       projectRoot: root,
-      generatedDirectory: join(root, ".zsys", "generated"),
+      generatedDirectory: join(root, ".relkit", "generated"),
       graphHash,
       diagnostics: [],
       outputs: {
@@ -124,7 +124,7 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
         projectRoot: root,
         source: ["src/**/*.ts"],
         exclude: [],
-        generatedDirectory: ".zsys/generated",
+        generatedDirectory: ".relkit/generated",
         server: {
           port: 4321,
           maxBodyBytes: 1_048_576,
@@ -136,7 +136,7 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
     build: async () => ({
       ok: true,
       projectRoot: root,
-      buildDirectory: join(root, ".zsys", "build"),
+      buildDirectory: join(root, ".relkit", "build"),
       diagnostics: [],
       artifacts: [],
       graphHash,
@@ -144,7 +144,7 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
     writeProgram: async (plan: DeploymentPlan) => {
       state.plan = plan;
       return {
-        directory: join(root, ".zsys", "generated", "pulumi"),
+        directory: join(root, ".relkit", "generated", "pulumi"),
         projectName: "minimal-app",
         stackName: "development",
         pulumiYaml: "",

@@ -1,4 +1,4 @@
-import type { StandardIssue } from "@zsys/schema";
+import type { StandardIssue } from "@relkit/schema";
 
 /** Safe, bounded failures from the model/tool loop. No input or result is retained. */
 export class AgentRuntimeError extends Error {

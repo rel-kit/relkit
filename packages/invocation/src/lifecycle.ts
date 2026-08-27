@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import { invokeUserHandler } from "./handler-bridge.js";
 import type { InvocationTarget } from "./contracts.js";
 import type { InvocationValueHooks } from "./dispatcher-types.js";

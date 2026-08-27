@@ -23,7 +23,7 @@ const KNOWN_FACTORIES = new Set([
   "defineServiceMiddleware",
 ]);
 const INDICATOR_ORDER: readonly AstCandidateIndicator[] = [
-  "zsys-import",
+  "relkit-import",
   "factory",
   "default-export",
   "brand-access",
@@ -47,9 +47,9 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
   const indicators = new Set<AstCandidateIndicator>();
   let brandAccess = false;
   const addImport = (specifier: string): void => {
-    if (!specifier.startsWith("@zsys/")) return;
+    if (!specifier.startsWith("@relkit/")) return;
     imports.add(specifier);
-    indicators.add("zsys-import");
+    indicators.add("relkit-import");
   };
   const addDefaultExport = (): void => {
     defaultExports.add("default");
@@ -71,7 +71,7 @@ export function scanSource(fileName: string, text: string): AstPrefilterCandidat
     }
     if (ts.isExportAssignment(node) && !node.isExportEquals) addDefaultExport();
     if (hasDefaultModifier(node)) addDefaultExport();
-    if (ts.isIdentifier(node) && node.text === "ZSYS_DESCRIPTOR") {
+    if (ts.isIdentifier(node) && node.text === "RELKIT_DESCRIPTOR") {
       brandAccess = true;
       indicators.add("brand-access");
     }
@@ -143,7 +143,7 @@ function isDescriptorBrandCall(node: ts.CallExpression): boolean {
     node.arguments.length === 1 &&
     argument !== undefined &&
     ts.isStringLiteralLike(argument) &&
-    argument.text === "zsys.descriptor"
+    argument.text === "relkit.descriptor"
   );
 }
 function runtimeModuleSpecifier(node: ts.CallExpression): string | undefined {

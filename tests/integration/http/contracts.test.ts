@@ -54,8 +54,8 @@ test("keeps runtime, OpenAPI, and generated client contracts aligned", async () 
     );
 
     const live = await client.get(`${API_BASE_PATH}/health/live`);
-    expect(live.headers.get("x-zsys-api-version")).toBe(String(API_VERSION));
-    expect(await live.json()).toMatchObject({ protocol: "zsys.inspector", version: API_VERSION });
+    expect(live.headers.get("x-relkit-api-version")).toBe(String(API_VERSION));
+    expect(await live.json()).toMatchObject({ protocol: "relkit.inspector", version: API_VERSION });
   } finally {
     await client.close();
   }
@@ -71,7 +71,7 @@ test("keeps runtime, OpenAPI, and generated client contracts aligned", async () 
     headers: { authorization: "Bearer fixture-token" },
   });
   expect(authorized.status).toBe(200);
-  expect(authorized.headers.get("x-zsys-api-version")).toBe(String(API_VERSION));
+  expect(authorized.headers.get("x-relkit-api-version")).toBe(String(API_VERSION));
 });
 
 function service(plan: RegistrationPlan, calls: unknown[]) {

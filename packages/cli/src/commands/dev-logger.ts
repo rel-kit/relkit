@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { admitObservabilityRecord, OBSERVABILITY_MODEL_VERSION } from "@zsys/observability";
-import { createLoggerLayer } from "@zsys/runtime-effect";
+import { admitObservabilityRecord, OBSERVABILITY_MODEL_VERSION } from "@relkit/observability";
+import { createLoggerLayer } from "@relkit/runtime-effect";
 import type { DevLog, DevLogEvent, DevOptions } from "./dev.js";
 
 export function createDevLogger(options: DevOptions): DevLog {

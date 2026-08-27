@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { defineTool, ToolArgumentValidationError, invokeTool } from "@zsys/tools";
+import { defineTool, ToolArgumentValidationError, invokeTool } from "@relkit/tools";
 import {
   engineForTarget,
   harness,
@@ -38,7 +38,7 @@ describe("tool and agent tool matrix", () => {
     expect(unknown.invocations).toHaveLength(0);
     expect(toolMessage(unknownAgent)).toMatchObject({
       role: "tool",
-      content: { error: { code: "ZSYS_TOOL_NOT_ALLOWED" } },
+      content: { error: { code: "RELKIT_TOOL_NOT_ALLOWED" } },
     });
 
     const unlisted = makeFixture();
@@ -57,7 +57,7 @@ describe("tool and agent tool matrix", () => {
     });
     expect(unlisted.invocations).toHaveLength(0);
     expect(toolMessage(unlistedAgent)).toMatchObject({
-      content: { error: { code: "ZSYS_TOOL_NOT_ALLOWED" } },
+      content: { error: { code: "RELKIT_TOOL_NOT_ALLOWED" } },
     });
 
     const invalid = makeFixture();
@@ -80,7 +80,7 @@ describe("tool and agent tool matrix", () => {
     });
     expect(modelInvalid.invocations).toHaveLength(0);
     expect(toolMessage(modelAgent)).toMatchObject({
-      content: { error: { code: "ZSYS_TOOL_ARGUMENT_VALIDATION" } },
+      content: { error: { code: "RELKIT_TOOL_ARGUMENT_VALIDATION" } },
     });
   });
 
@@ -90,7 +90,7 @@ describe("tool and agent tool matrix", () => {
       { type: "tool-call", callId: "call-required", toolId: required.tool.id, input: { id: "1" } },
     ]);
     await expect(requiredAgent.invoke({ question: "change" })).rejects.toMatchObject({
-      code: "ZSYS_APPROVAL_REQUIRED",
+      code: "RELKIT_APPROVAL_REQUIRED",
     });
     expect(required.invocations).toHaveLength(0);
 
@@ -99,7 +99,7 @@ describe("tool and agent tool matrix", () => {
     await expect(deniedAgent.invoke({ question: "change" })).resolves.toEqual({ answer: "ready" });
     expect(denied.invocations).toHaveLength(0);
     expect(toolMessage(deniedAgent)).toMatchObject({
-      content: { error: { code: "ZSYS_APPROVAL_DENIED" } },
+      content: { error: { code: "RELKIT_APPROVAL_DENIED" } },
     });
 
     const approved = makeFixture({ sideEffect: "write", approval: "on-write" });
@@ -123,7 +123,7 @@ describe("tool and agent tool matrix", () => {
         role: "tool",
         content: {
           error: {
-            code: targetFailure === "declared" ? "orders.unavailable" : "ZSYS_UNEXPECTED_DEFECT",
+            code: targetFailure === "declared" ? "orders.unavailable" : "RELKIT_UNEXPECTED_DEFECT",
             message: "Tool call failed",
           },
         },

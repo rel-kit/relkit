@@ -64,7 +64,7 @@ export const graph = {
     {
       kind: "provider",
       id: "provider.buckets.default",
-      source: source("zsys.config.ts"),
+      source: source("relkit.config.ts"),
       capability: "buckets",
       profile: "default",
       adapter: "s3",

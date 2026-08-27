@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/inspector",
+  "name": "@relkit/inspector",
   "private": true,
   "type": "module",
   "scripts": {

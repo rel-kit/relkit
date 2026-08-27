@@ -1,5 +1,5 @@
 import type { Context, Hono, Next } from "hono";
-import type { MiddlewareContext, MiddlewareDescriptor } from "@zsys/routes";
+import type { MiddlewareContext, MiddlewareDescriptor } from "@relkit/routes";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import { getRequestState } from "./middleware.js";

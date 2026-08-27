@@ -1,8 +1,8 @@
 import { Context, Effect, Option, Tracer as EffectTracer } from "effect";
 import { IdSource } from "./services.js";
-import { createZsysTracer, type SpanLifecycleObserver } from "./tracing-span.js";
+import { createRelkitTracer, type SpanLifecycleObserver } from "./tracing-span.js";
 
-export { createZsysTracer } from "./tracing-span.js";
+export { createRelkitTracer } from "./tracing-span.js";
 export type { SpanLifecycle, SpanLifecycleObserver } from "./tracing-span.js";
 export * from "./tracing-bridge.js";
 
@@ -34,7 +34,7 @@ export interface InvocationTraceContext {
 }
 
 export const InvocationTrace = Context.Reference<InvocationTraceContext | undefined>(
-  "zsys/runtime/InvocationTrace",
+  "relkit/runtime/InvocationTrace",
   { defaultValue: () => undefined },
 );
 
@@ -52,16 +52,16 @@ function spanAttributes(
 ): Record<string, unknown> {
   return {
     ...(options.attributes ?? {}),
-    "zsys.invocation.id": options.invocationId,
-    ...(options.functionId === undefined ? {} : { "zsys.function.id": options.functionId }),
-    ...(options.serviceId === undefined ? {} : { "zsys.service.id": options.serviceId }),
+    "relkit.invocation.id": options.invocationId,
+    ...(options.functionId === undefined ? {} : { "relkit.function.id": options.functionId }),
+    ...(options.serviceId === undefined ? {} : { "relkit.service.id": options.serviceId }),
     ...(options.parentInvocationId === undefined
       ? {}
-      : { "zsys.invocation.parent_id": options.parentInvocationId }),
+      : { "relkit.invocation.parent_id": options.parentInvocationId }),
     ...(options.correlationId === undefined
       ? {}
-      : { "zsys.correlation.id": options.correlationId }),
-    ...(options.source === undefined ? {} : { "zsys.invocation.source": options.source }),
+      : { "relkit.correlation.id": options.correlationId }),
+    ...(options.source === undefined ? {} : { "relkit.invocation.source": options.source }),
   };
 }
 
@@ -105,7 +105,7 @@ export function withRootSpan<A, E, R>(
   return Effect.gen(function* () {
     const ids = yield* Effect.serviceOption(IdSource);
     if (Option.isSome(ids)) {
-      return yield* Effect.withTracer(traced, createZsysTracer(ids.value, options.observer));
+      return yield* Effect.withTracer(traced, createRelkitTracer(ids.value, options.observer));
     }
     return yield* traced;
   });

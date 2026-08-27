@@ -20,7 +20,7 @@ export function createStreamSubscriber(
 ): StreamSubscriber {
   if (!["drop-oldest", "drop-newest", "disconnect"].includes(overflow))
     throw new ObservabilityStreamError(
-      "ZSYS_OBSERVABILITY_STREAM_INVALID",
+      "RELKIT_OBSERVABILITY_STREAM_INVALID",
       "subscriber overflow mode is invalid",
     );
   const queue: ObservabilityStreamEvent[] = [];
@@ -63,7 +63,7 @@ export function createStreamSubscriber(
     if (waiter !== undefined)
       return Promise.reject(
         new ObservabilityStreamError(
-          "ZSYS_OBSERVABILITY_STREAM_INVALID",
+          "RELKIT_OBSERVABILITY_STREAM_INVALID",
           "only one pending subscriber read is supported",
         ),
       );

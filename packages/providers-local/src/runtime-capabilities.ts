@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { createJobQueue, type JobQueue } from "./jobs/queue.js";
 import type { JobIdempotencyDefinition } from "./jobs/queue-utils.js";
 import { createJobStore, type JobStore } from "./jobs/store.js";

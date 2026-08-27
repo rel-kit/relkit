@@ -1,5 +1,5 @@
-import { defineFunction } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const echo = defineFunction({
   input: z.object({ message: z.string().min(1) }),

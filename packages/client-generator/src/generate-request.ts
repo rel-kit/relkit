@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import type { ClientRoute, MappingLeaf } from "./generate-types.js";
 import { routeParameters } from "./route-parameters.js";
 

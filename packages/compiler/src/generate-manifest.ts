@@ -1,6 +1,6 @@
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@zsys/diagnostics";
-import { hashGraph } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@relkit/diagnostics";
+import { hashGraph } from "@relkit/graph";
 import type { NormalizedDescriptor, NormalizedGraph } from "./normalize-types.js";
 import {
   descriptorsOf,
@@ -24,10 +24,10 @@ import { renderManifest } from "./generate-manifest-format.js";
 import { identityBindingStatements } from "./generate-manifest-identities.js";
 
 export const MANIFEST_CODES = Object.freeze({
-  handler: "ZSYS_MANIFEST_HANDLER_MISSING",
-  middleware: "ZSYS_MANIFEST_MIDDLEWARE_MISSING",
-  transform: "ZSYS_MANIFEST_TRANSFORM_MISSING",
-  mismatch: "ZSYS_GRAPH_MANIFEST_MISMATCH",
+  handler: "RELKIT_MANIFEST_HANDLER_MISSING",
+  middleware: "RELKIT_MANIFEST_MIDDLEWARE_MISSING",
+  transform: "RELKIT_MANIFEST_TRANSFORM_MISSING",
+  mismatch: "RELKIT_GRAPH_MANIFEST_MISMATCH",
 });
 
 export interface ManifestGenerationInput {

@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 
 export type BucketOperation =
   "put" | "get" | "head" | "delete" | "exists" | "list" | "createReadUrl" | "createWriteUrl";
@@ -95,7 +95,7 @@ export interface BucketClientOptions {
 }
 
 export class BucketCapabilityError extends Error {
-  readonly code = "ZSYS_BUCKET_CAPABILITY_UNSUPPORTED" as const;
+  readonly code = "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED" as const;
   constructor(
     readonly capability: BucketCapability,
     readonly operation: BucketOperation,
@@ -105,14 +105,14 @@ export class BucketCapabilityError extends Error {
   }
 }
 export class BucketDependencyError extends Error {
-  readonly code = "ZSYS_BUCKET_DEPENDENCY_UNDECLARED" as const;
+  readonly code = "RELKIT_BUCKET_DEPENDENCY_UNDECLARED" as const;
   constructor(bucketId: string) {
     super(`Bucket dependency "${bucketId}" is not declared on this function`);
     this.name = "BucketDependencyError";
   }
 }
 export class BucketProviderError extends Error {
-  readonly code = "ZSYS_BUCKET_PROVIDER_UNAVAILABLE" as const;
+  readonly code = "RELKIT_BUCKET_PROVIDER_UNAVAILABLE" as const;
   constructor(operation: BucketOperation) {
     super(`Bucket provider does not implement "${operation}"`);
     this.name = "ProviderError";

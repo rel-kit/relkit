@@ -23,7 +23,7 @@ export function inspectTables(tables: TableMap): {
 
 export function runtimeOf(value: object): DataModelRuntime {
   const runtime = (value as { readonly [key: symbol]: unknown })[
-    Symbol.for("zsys.data-model.runtime")
+    Symbol.for("relkit.data-model.runtime")
   ];
   if (!isRecord(runtime)) throw new TypeError("Invalid data-model runtime");
   return runtime as unknown as DataModelRuntime;

@@ -1,4 +1,4 @@
-import { API_BASE_PATH, PROTOCOL_VERSION } from "@zsys/contracts";
+import { API_BASE_PATH, PROTOCOL_VERSION } from "@relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints, type InspectorActionServices } from "./src/index.ts";
 
@@ -47,7 +47,7 @@ export function setup(): ActionTestState {
       },
     },
     jobs: {
-      protocol: "zsys.jobs.admin",
+      protocol: "relkit.jobs.admin",
       version: PROTOCOL_VERSION,
       status: async (id: string) =>
         id === "job-ineligible"
@@ -68,7 +68,7 @@ export function setup(): ActionTestState {
       }),
     },
     events: {
-      protocol: "zsys.events.admin",
+      protocol: "relkit.events.admin",
       version: PROTOCOL_VERSION,
       status: async () => ({ state: eventState }),
       retry: async (request: { deliveryId: string }) => {

@@ -1,6 +1,6 @@
 {
   "contractVersion": 2,
-  "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
+  "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
   "application": {
     "id": "full-app",
     "image": {
@@ -8,14 +8,16 @@
       "tag": "2026-08-18",
       "digest": "sha256:orders-image",
       "health": {
-        "livenessPath": "/_zsys/v1/health/live",
-        "readinessPath": "/_zsys/v1/health/ready",
+        "livenessPath": "/_relkit/v1/health/live",
+        "readinessPath": "/_relkit/v1/health/ready",
         "port": 8080,
         "intervalMs": 10000,
         "timeoutMs": 2000
       }
     },
-    "environmentNames": ["SERVICE_PORT"]
+    "environmentNames": [
+      "SERVICE_PORT"
+    ]
   },
   "providerBindings": [
     {
@@ -60,8 +62,8 @@
     "logicalName": "full-app-http-public",
     "port": 8080,
     "health": {
-      "livenessPath": "/_zsys/v1/health/live",
-      "readinessPath": "/_zsys/v1/health/ready",
+      "livenessPath": "/_relkit/v1/health/live",
+      "readinessPath": "/_relkit/v1/health/ready",
       "port": 8080,
       "intervalMs": 10000,
       "timeoutMs": 2000
@@ -74,7 +76,9 @@
         "targetFunctionId": "orders.get"
       }
     ],
-    "configurationNames": ["SERVICE_PORT"]
+    "configurationNames": [
+      "SERVICE_PORT"
+    ]
   },
   "jobs": [
     {
@@ -83,11 +87,13 @@
       "bindingId": "provider.jobs.default",
       "profile": "default",
       "configurationNames": [],
-      "capabilities": ["jobs"],
+      "capabilities": [
+        "jobs"
+      ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
-        "managed-by": "zsys"
+        "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
+        "managed-by": "relkit"
       },
       "metadata": {
         "iamCapabilities": [
@@ -118,11 +124,13 @@
       "bindingId": "provider.jobs.default",
       "profile": "default",
       "configurationNames": [],
-      "capabilities": ["jobs"],
+      "capabilities": [
+        "jobs"
+      ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
-        "managed-by": "zsys"
+        "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
+        "managed-by": "relkit"
       },
       "jobId": "receipts.send-job",
       "schedule": {
@@ -143,14 +151,18 @@
       "bindingId": "provider.events.default",
       "profile": "default",
       "configurationNames": [],
-      "capabilities": ["events"],
+      "capabilities": [
+        "events"
+      ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
-        "managed-by": "zsys"
+        "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
+        "managed-by": "relkit"
       },
       "metadata": {
-        "iamCapabilities": ["events:PutEvents"]
+        "iamCapabilities": [
+          "events:PutEvents"
+        ]
       },
       "version": 1,
       "payload": {
@@ -162,7 +174,10 @@
             "type": "string"
           }
         },
-        "required": ["orderId", "sku"],
+        "required": [
+          "orderId",
+          "sku"
+        ],
         "type": "object"
       }
     }
@@ -174,11 +189,13 @@
       "bindingId": "provider.events.default",
       "profile": "default",
       "configurationNames": [],
-      "capabilities": ["events"],
+      "capabilities": [
+        "events"
+      ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
-        "managed-by": "zsys"
+        "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
+        "managed-by": "relkit"
       },
       "metadata": {
         "iamCapabilities": [
@@ -187,8 +204,10 @@
           "sqs:ChangeMessageVisibility"
         ]
       },
-      "targetFunctionId": "zsys.event.orders.listener.handler",
-      "expansion": ["orders.created@1"],
+      "targetFunctionId": "relkit.event.orders.listener.handler",
+      "expansion": [
+        "orders.created@1"
+      ],
       "delivery": "durable",
       "retry": {
         "initialDelayMs": 1,
@@ -206,15 +225,19 @@
       "bindingId": "provider.buckets.default",
       "profile": "default",
       "configurationNames": [],
-      "capabilities": ["buckets"],
+      "capabilities": [
+        "buckets"
+      ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:200cacd0eece3d57e5ef127e5f79eedfc9056919f052f44303d95b3702ca2557",
-        "managed-by": "zsys"
+        "graphHash": "sha256:8396c23e8da68a4a67d515d4f8ace574ef0b1a984be1c5e12da5ef3592beec51",
+        "managed-by": "relkit"
       },
       "visibility": "private",
       "maxObjectBytes": 10000,
-      "allowedContentTypes": ["application/json"]
+      "allowedContentTypes": [
+        "application/json"
+      ]
     }
   ],
   "caches": [],
@@ -223,13 +246,23 @@
       "statements": [
         {
           "capability": "events",
-          "actions": ["events:PutEvents"],
-          "resources": ["full-app-event-orders-created"]
+          "actions": [
+            "events:PutEvents"
+          ],
+          "resources": [
+            "full-app-event-orders-created"
+          ]
         },
         {
           "capability": "jobs",
-          "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"],
-          "resources": ["full-app-job-receipts-send-job"]
+          "actions": [
+            "sqs:ReceiveMessage",
+            "sqs:DeleteMessage",
+            "sqs:ChangeMessageVisibility"
+          ],
+          "resources": [
+            "full-app-job-receipts-send-job"
+          ]
         },
         {
           "capability": "jobs",
@@ -239,12 +272,18 @@
             "sqs:ChangeMessageVisibility",
             "sqs:GetQueueAttributes"
           ],
-          "resources": ["full-app-event-trigger-orders-listener"]
+          "resources": [
+            "full-app-event-trigger-orders-listener"
+          ]
         },
         {
           "capability": "jobs",
-          "actions": ["sqs:SendMessage"],
-          "resources": ["full-app-job-receipts-send-job"]
+          "actions": [
+            "sqs:SendMessage"
+          ],
+          "resources": [
+            "full-app-job-receipts-send-job"
+          ]
         }
       ]
     },
@@ -253,22 +292,30 @@
         "functionId": "orders.create",
         "capability": "events",
         "resourceId": "orders.created",
-        "actions": ["events:PutEvents"]
+        "actions": [
+          "events:PutEvents"
+        ]
       },
       {
         "functionId": "orders.handle-created",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
-        "actions": ["sqs:SendMessage"]
+        "actions": [
+          "sqs:SendMessage"
+        ]
       },
       {
         "functionId": "receipts.send",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
-        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+        "actions": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility"
+        ]
       },
       {
-        "functionId": "zsys.event.orders.listener.handler",
+        "functionId": "relkit.event.orders.listener.handler",
         "capability": "jobs",
         "resourceId": "orders.listener",
         "actions": [
@@ -279,10 +326,12 @@
         ]
       },
       {
-        "functionId": "zsys.event.orders.listener.handler",
+        "functionId": "relkit.event.orders.listener.handler",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
-        "actions": ["sqs:SendMessage"]
+        "actions": [
+          "sqs:SendMessage"
+        ]
       }
     ]
   }

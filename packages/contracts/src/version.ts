@@ -1,7 +1,7 @@
 /** Current version of the public contract payloads. */
 export const CONTRACT_VERSION = 2 as const;
 
-/** Current version of generated ZSys artifacts. */
+/** Current version of generated RelKit artifacts. */
 export const GENERATOR_VERSION = 2 as const;
 
 /** Current version of the canonical application graph. */
@@ -16,4 +16,4 @@ export const API_VERSION = 1 as const;
 /** Shared protocol version used by versioned internal contracts. */
 export const PROTOCOL_VERSION = API_VERSION;
 
-export const API_BASE_PATH = "/_zsys/v1" as const;
+export const API_BASE_PATH = "/_relkit/v1" as const;

@@ -1,5 +1,5 @@
-import { isEnvRef, type EnvDefinition, type EnvShape } from "@zsys/config";
-import { normalizeId } from "@zsys/contracts";
+import { isEnvRef, type EnvDefinition, type EnvShape } from "@relkit/config";
+import { normalizeId } from "@relkit/contracts";
 import type { ConfigProviderMaps } from "./config-types.js";
 import { copyProviderTopology, type ProviderTopology } from "./providers.js";
 

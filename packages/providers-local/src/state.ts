@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { lstatSync, mkdirSync, renameSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 
-const DEFAULT_STATE_ROOT = join(".zsys", "state");
+const DEFAULT_STATE_ROOT = join(".relkit", "state");
 
 export interface LocalProviderStateRoot {
   readonly root: string;
@@ -11,7 +11,7 @@ export interface LocalProviderStateRoot {
 }
 
 export class LocalProviderStateError extends Error {
-  readonly code = "ZSYS_LOCAL_PROVIDER_STATE_INVALID" as const;
+  readonly code = "RELKIT_LOCAL_PROVIDER_STATE_INVALID" as const;
 
   constructor(message = "Local provider state root is invalid") {
     super(message);
@@ -42,7 +42,7 @@ export function quarantineStateFile(file: string, ownerRoot: string): string {
   if (relation === "" || relation.startsWith("..") || isAbsolute(relation)) {
     throw new LocalProviderStateError("State quarantine path escapes its owner");
   }
-  const quarantine = join(root, ".zsys-quarantine");
+  const quarantine = join(root, ".relkit-quarantine");
   ensureDirectory(quarantine);
   const target = join(quarantine, `${basename(path)}.${randomUUID()}.bad`);
   try {

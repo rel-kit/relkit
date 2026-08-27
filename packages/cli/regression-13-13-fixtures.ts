@@ -7,7 +7,7 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
-} from "@zsys/contracts";
+} from "@relkit/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 
 export type CandidateFailure = "compile" | "start" | "hash" | "api" | "readiness";
@@ -24,7 +24,7 @@ export function baseOptions(root: string): Omit<DevOptions, "compile"> {
 }
 
 export async function makeRoot(): Promise<string> {
-  return mkdtemp(join(tmpdir(), "zsys-dev-13-13-"));
+  return mkdtemp(join(tmpdir(), "relkit-dev-13-13-"));
 }
 
 export async function startTrafficSession(root: string, marker: string): Promise<DevSession> {
@@ -34,7 +34,7 @@ export async function startTrafficSession(root: string, marker: string): Promise
     graphHash,
     drainTimeoutMs: 250,
     candidateStopTimeoutMs: 50,
-    environment: { ZSYS_HOLD_MARKER: marker },
+    environment: { RELKIT_HOLD_MARKER: marker },
     compile: async ({ outputDirectory, token }) => {
       const entrypoint = join(outputDirectory, "server.ts");
       await writeFile(
@@ -69,15 +69,15 @@ Bun.serve({ port: Number(process.env.PORT), async fetch(request) {
   const path = new URL(request.url).pathname;
   if (path === "/hello") return new Response("generation-" + generation);
   if (path === "/hold") {
-    if (process.env.ZSYS_HOLD_MARKER) await Bun.write(process.env.ZSYS_HOLD_MARKER, "started");
+    if (process.env.RELKIT_HOLD_MARKER) await Bun.write(process.env.RELKIT_HOLD_MARKER, "started");
     ${options.hold === "complete" ? "await Bun.sleep(80);" : ""}
     return new Response("generation-" + generation);
   }
-  const identity = { sourceToken: Number(process.env.ZSYS_SOURCE_TOKEN), generationToken: Number(process.env.ZSYS_GENERATION_TOKEN) };
-  const headers = { "content-type": "application/json", "x-zsys-api-version": String(apiVersion) };
-  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "zsys.inspector", version: apiVersion, status: "ok", ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: apiVersion, graphHash, manifestGraphHash: graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: apiVersion, status: "ready", environmentReady: ${ready}, providerReady: true, ...identity }, { headers });
+  const identity = { sourceToken: Number(process.env.RELKIT_SOURCE_TOKEN), generationToken: Number(process.env.RELKIT_GENERATION_TOKEN) };
+  const headers = { "content-type": "application/json", "x-relkit-api-version": String(apiVersion) };
+  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ok", ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "relkit.inspector", version: apiVersion, graphHash, manifestGraphHash: graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ready", environmentReady: ${ready}, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;
 }

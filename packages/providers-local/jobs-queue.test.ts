@@ -73,7 +73,7 @@ describe("local durable job queue", () => {
   });
 
   test("does not publish a transition in memory before durable append acknowledgement", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-queue-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-queue-"));
     roots.push(root);
     const initial = await createJobStore(join(root, "jobs"));
     const first = createJobQueue(initial, { now: () => 50 });
@@ -101,7 +101,7 @@ describe("local durable job queue", () => {
   });
 
   test("acquires, renews, and recovers leases with process ownership", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-lease-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-lease-"));
     roots.push(root);
     let now = 100;
     const store = await createJobStore(join(root, "jobs"), { now: () => now });
@@ -150,7 +150,7 @@ async function makeQueue(): Promise<{
   readonly store: Awaited<ReturnType<typeof createJobStore>>;
   readonly close: () => Promise<void>;
 }> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-queue-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-queue-"));
   roots.push(root);
   const store = await createJobStore(join(root, "jobs"), { now: () => 0 });
   const queue = createJobQueue(store, { now: () => 50 });

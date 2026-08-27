@@ -4,7 +4,7 @@ import {
   BucketOperationTimeoutError,
   type BucketOperationContext,
   type BucketPutOptions,
-} from "@zsys/buckets";
+} from "@relkit/buckets";
 import { normalizeBucketKey } from "./keys.js";
 import { validatePut } from "./policy.js";
 import type { LocalBucketStorage } from "./storage.js";

@@ -1,4 +1,4 @@
-import { defineService } from "@zsys/app";
+import { defineService } from "@relkit/app";
 import getOrder from "../functions/orders/get-order.function.js";
 import ordersContext from "./orders-context.service-middleware.js";
 

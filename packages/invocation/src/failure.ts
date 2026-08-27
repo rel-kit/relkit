@@ -1,5 +1,5 @@
 import { Cause } from "effect";
-import { isJsonValue } from "@zsys/contracts";
+import { isJsonValue } from "@relkit/contracts";
 import {
   isCancellation,
   isDependencyNotConfigured,
@@ -61,7 +61,7 @@ export function providerFailure(
       _tag: "ProviderFailure",
       kind: "provider",
       outcome: "provider-failure",
-      code: "ZSYS_PROVIDER_FAILURE",
+      code: "RELKIT_PROVIDER_FAILURE",
       message: "Provider operation failed",
       ...options,
     },
@@ -74,7 +74,7 @@ export const cancellationFailure = (cause?: unknown): CancellationFailure =>
       _tag: "Cancellation",
       kind: "cancellation",
       outcome: "cancelled",
-      code: "ZSYS_CANCELLED",
+      code: "RELKIT_CANCELLED",
       message: "Operation cancelled",
     },
     cause,
@@ -86,7 +86,7 @@ export const timeoutFailure = (cause?: unknown): TimeoutFailure =>
       _tag: "Timeout",
       kind: "timeout",
       outcome: "timeout",
-      code: "ZSYS_TIMEOUT",
+      code: "RELKIT_TIMEOUT",
       message: "Operation timed out",
     },
     cause,
@@ -101,7 +101,7 @@ export const unexpectedDefect = (
       _tag: "UnexpectedDefect",
       kind: "defect",
       outcome: "defect",
-      code: options?.code ?? "ZSYS_UNEXPECTED_DEFECT",
+      code: options?.code ?? "RELKIT_UNEXPECTED_DEFECT",
       message: options?.message ?? "Unexpected internal error",
     },
     cause,

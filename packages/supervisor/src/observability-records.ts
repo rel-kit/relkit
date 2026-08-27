@@ -3,7 +3,7 @@ import {
   type DiagnosticRecord,
   type GenerationEvent,
   type GenerationRecord,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import type {
   SupervisorCandidateToken,
   SupervisorOutcomeTelemetry,
@@ -41,7 +41,7 @@ export function recordsForTelemetry(
     version: OBSERVABILITY_MODEL_VERSION,
     signal: "diagnostic",
     code:
-      event.error?.code ?? `ZSYS_SUPERVISOR_${event.outcome.toUpperCase().replaceAll("-", "_")}`,
+      event.error?.code ?? `RELKIT_SUPERVISOR_${event.outcome.toUpperCase().replaceAll("-", "_")}`,
     severity:
       event.outcome === "candidate-stale" ? "warning" : lifecycle === "failed" ? "error" : "info",
     message: event.error?.message ?? `Supervisor ${event.phase} ${event.outcome}.`,

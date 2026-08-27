@@ -8,7 +8,7 @@ import {
 } from "./normalize-types.js";
 import { validateRateLimitStore } from "./normalize-rate-limit.js";
 
-const SERVICE_OWNERSHIP_CODE = "ZSYS_SERVICE_OWNERSHIP";
+const SERVICE_OWNERSHIP_CODE = "RELKIT_SERVICE_OWNERSHIP";
 
 /** Resolves descriptor, middleware, and named-transform references without importing code. */
 export function passReferences(work: NormalizationWork): void {

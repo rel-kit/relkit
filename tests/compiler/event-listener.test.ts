@@ -28,7 +28,7 @@ describe("callback event listener compilation", () => {
     expect(result.graph?.nodes).toContainEqual(
       expect.objectContaining({
         kind: "function",
-        id: "zsys.event.orders.created.sendReceipt.handler",
+        id: "relkit.event.orders.created.sendReceipt.handler",
         generated: expect.objectContaining({
           generatedBy: "event-listener",
           listenerId: "orders.created.sendReceipt",
@@ -36,13 +36,13 @@ describe("callback event listener compilation", () => {
       }),
     );
     expect(result.outputs.manifest).toContain(
-      "createEventListenerTarget as __zsys_createEventListenerTarget",
+      "createEventListenerTarget as __relkit_createEventListenerTarget",
     );
     expect(result.outputs.manifest).toContain(
-      '__zsys_createEventListenerTarget(__zsys_module_1["sendReceipt"], [__zsys_module_0["orderCreated"]], "zsys.event.orders.created.sendReceipt.handler")',
+      '__relkit_createEventListenerTarget(__relkit_module_1["sendReceipt"], [__relkit_module_0["orderCreated"]], "relkit.event.orders.created.sendReceipt.handler")',
     );
     expect(result.outputs.manifest).not.toContain(
-      '__zsys_bindDescriptorIdentity(__zsys_module_1["sendReceipt"], "zsys.event.orders.created.sendReceipt.handler");',
+      '__relkit_bindDescriptorIdentity(__relkit_module_1["sendReceipt"], "relkit.event.orders.created.sendReceipt.handler");',
     );
   });
 

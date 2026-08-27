@@ -1,6 +1,6 @@
 {
-  "name": "@zsys/docs",
-  "homepage": "https://github.com/zsys-dev/zsys",
+  "name": "@relkit/docs",
+  "homepage": "https://github.com/rel-kit/relkit",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@zsys/cli": "workspace:*",
+    "@relkit/cli": "workspace:*",
     "fumadocs-core": "16.14.5",
     "fumadocs-mdx": "15.3.0",
     "fumadocs-ui": "16.14.5",

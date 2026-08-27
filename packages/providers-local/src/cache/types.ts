@@ -3,7 +3,7 @@ import type {
   CacheOperationContext,
   CacheOperationOptions,
   CacheProvider,
-} from "@zsys/cache";
+} from "@relkit/cache";
 
 export const LOCAL_CACHE_CAPABILITIES = Object.freeze({
   increment: true,
@@ -108,7 +108,7 @@ export type LocalCacheProvider = Omit<CacheProvider, "capabilities"> & {
 };
 
 export class LocalCacheKeyError extends TypeError {
-  readonly code = "ZSYS_CACHE_KEY_INVALID" as const;
+  readonly code = "RELKIT_CACHE_KEY_INVALID" as const;
 
   constructor() {
     super("Cache key must be canonical JSON data");
@@ -117,7 +117,7 @@ export class LocalCacheKeyError extends TypeError {
 }
 
 export class LocalCacheValueError extends TypeError {
-  readonly code = "ZSYS_CACHE_VALUE_INVALID" as const;
+  readonly code = "RELKIT_CACHE_VALUE_INVALID" as const;
 
   constructor() {
     super("Cache value must be canonical JSON data");
@@ -126,7 +126,7 @@ export class LocalCacheValueError extends TypeError {
 }
 
 export class LocalCachePolicyError extends RangeError {
-  readonly code = "ZSYS_CACHE_POLICY_INVALID" as const;
+  readonly code = "RELKIT_CACHE_POLICY_INVALID" as const;
 
   constructor(message: string) {
     super(message);
@@ -135,7 +135,7 @@ export class LocalCachePolicyError extends RangeError {
 }
 
 export class LocalCacheStateError extends Error {
-  readonly code = "ZSYS_CACHE_STATE_INVALID" as const;
+  readonly code = "RELKIT_CACHE_STATE_INVALID" as const;
 
   constructor(message = "Cache provider state is invalid") {
     super(message);

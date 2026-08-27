@@ -8,7 +8,7 @@
       "to": "receipts.send-job"
     },
     {
-      "from": "zsys.event.orders.listener.handler",
+      "from": "relkit.event.orders.listener.handler",
       "kind": "enqueues-job",
       "to": "receipts.send-job"
     },
@@ -37,7 +37,7 @@
       "from": "orders.listener",
       "kind": "targets-function",
       "role": "primary",
-      "to": "zsys.event.orders.listener.handler"
+      "to": "relkit.event.orders.listener.handler"
     },
     {
       "from": "orders.lookup-tool",
@@ -103,7 +103,7 @@
     {
       "generatedFunction": {
         "agentId": "orders.support-agent",
-        "functionId": "zsys.agent.orders.support-agent.invoke",
+        "functionId": "relkit.agent.orders.support-agent.invoke",
         "generated": true,
         "generatedBy": "agent"
       },
@@ -114,7 +114,9 @@
             "type": "string"
           }
         },
-        "required": ["question"],
+        "required": [
+          "question"
+        ],
         "type": "object"
       },
       "instructions": "Answer order questions.",
@@ -131,7 +133,9 @@
             "type": "string"
           }
         },
-        "required": ["answer"],
+        "required": [
+          "answer"
+        ],
         "type": "object"
       },
       "profile": "default",
@@ -140,7 +144,9 @@
         "file": "src/agents/order-support.agent.ts",
         "line": 5
       },
-      "toolIds": ["orders.lookup-tool"]
+      "toolIds": [
+        "orders.lookup-tool"
+      ]
     },
     {
       "defaults": {
@@ -184,12 +190,14 @@
       ],
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
     {
-      "allowedContentTypes": ["application/json"],
+      "allowedContentTypes": [
+        "application/json"
+      ],
       "id": "assets",
       "kind": "bucket",
       "maxObjectBytes": 10000,
@@ -210,7 +218,9 @@
             "type": "string"
           }
         },
-        "required": ["sku"],
+        "required": [
+          "sku"
+        ],
         "type": "object"
       },
       "kind": "cache",
@@ -234,7 +244,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       },
       "type": "secret-string"
@@ -248,7 +258,7 @@
       "sensitive": true,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       },
       "type": "secret-string"
@@ -262,7 +272,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       },
       "type": "port"
@@ -279,7 +289,10 @@
             "type": "string"
           }
         },
-        "required": ["orderId", "sku"],
+        "required": [
+          "orderId",
+          "sku"
+        ],
         "type": "object"
       },
       "profile": "default",
@@ -303,7 +316,9 @@
             "type": "string"
           }
         },
-        "required": ["authorization"],
+        "required": [
+          "authorization"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -313,7 +328,9 @@
             "type": "boolean"
           }
         },
-        "required": ["allowed"],
+        "required": [
+          "allowed"
+        ],
         "type": "object"
       },
       "source": {
@@ -331,14 +348,16 @@
             "defaultTtlMs": 1000,
             "id": "prices",
             "key": {
-              "$zsys": "schema",
+              "$relkit": "schema",
               "jsonSchema": {
                 "properties": {
                   "sku": {
                     "type": "string"
                   }
                 },
-                "required": ["sku"],
+                "required": [
+                  "sku"
+                ],
                 "type": "object"
               }
             },
@@ -350,7 +369,7 @@
               "kind": "cache"
             },
             "value": {
-              "$zsys": "schema",
+              "$relkit": "schema",
               "jsonSchema": {
                 "type": "number"
               }
@@ -362,7 +381,7 @@
             "id": "orders.created",
             "kind": "event",
             "payload": {
-              "$zsys": "schema",
+              "$relkit": "schema",
               "jsonSchema": {
                 "properties": {
                   "orderId": {
@@ -372,7 +391,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["orderId", "sku"],
+                "required": [
+                  "orderId",
+                  "sku"
+                ],
                 "type": "object"
               }
             },
@@ -396,7 +418,10 @@
             "type": "string"
           }
         },
-        "required": ["orderId", "sku"],
+        "required": [
+          "orderId",
+          "sku"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -409,7 +434,10 @@
             "type": "number"
           }
         },
-        "required": ["orderId", "totalCents"],
+        "required": [
+          "orderId",
+          "totalCents"
+        ],
         "type": "object"
       },
       "source": {
@@ -431,7 +459,9 @@
             "type": "string"
           }
         },
-        "required": ["orderId"],
+        "required": [
+          "orderId"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -444,7 +474,10 @@
             "type": "number"
           }
         },
-        "required": ["orderId", "totalCents"],
+        "required": [
+          "orderId",
+          "totalCents"
+        ],
         "type": "object"
       },
       "source": {
@@ -465,14 +498,16 @@
               "retentionMs": 1000
             },
             "input": {
-              "$zsys": "schema",
+              "$relkit": "schema",
               "jsonSchema": {
                 "properties": {
                   "orderId": {
                     "type": "string"
                   }
                 },
-                "required": ["orderId"],
+                "required": [
+                  "orderId"
+                ],
                 "type": "object"
               }
             },
@@ -502,32 +537,36 @@
             ],
             "target": {
               "handler": {
-                "$zsys": "function",
+                "$relkit": "function",
                 "name": "handler"
               },
               "id": "receipts.send",
               "input": {
-                "$zsys": "schema",
+                "$relkit": "schema",
                 "jsonSchema": {
                   "properties": {
                     "orderId": {
                       "type": "string"
                     }
                   },
-                  "required": ["orderId"],
+                  "required": [
+                    "orderId"
+                  ],
                   "type": "object"
                 }
               },
               "kind": "function",
               "output": {
-                "$zsys": "schema",
+                "$relkit": "schema",
                 "jsonSchema": {
                   "properties": {
                     "receiptId": {
                       "type": "string"
                     }
                   },
-                  "required": ["receiptId"],
+                  "required": [
+                    "receiptId"
+                  ],
                   "type": "object"
                 }
               },
@@ -556,14 +595,21 @@
                 "type": "string"
               }
             },
-            "required": ["orderId", "sku"],
+            "required": [
+              "orderId",
+              "sku"
+            ],
             "type": "object"
           },
           "version": {
             "type": "number"
           }
         },
-        "required": ["eventId", "payload", "version"],
+        "required": [
+          "eventId",
+          "payload",
+          "version"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -581,14 +627,21 @@
                 "type": "string"
               }
             },
-            "required": ["orderId", "sku"],
+            "required": [
+              "orderId",
+              "sku"
+            ],
             "type": "object"
           },
           "version": {
             "type": "number"
           }
         },
-        "required": ["eventId", "payload", "version"],
+        "required": [
+          "eventId",
+          "payload",
+          "version"
+        ],
         "type": "object"
       },
       "source": {
@@ -610,7 +663,9 @@
             "type": "string"
           }
         },
-        "required": ["orderId"],
+        "required": [
+          "orderId"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -620,7 +675,9 @@
             "type": "string"
           }
         },
-        "required": ["receiptId"],
+        "required": [
+          "receiptId"
+        ],
         "type": "object"
       },
       "source": {
@@ -633,18 +690,20 @@
     {
       "generated": {
         "agentId": "orders.support-agent",
-        "functionId": "zsys.agent.orders.support-agent.invoke",
+        "functionId": "relkit.agent.orders.support-agent.invoke",
         "generated": true,
         "generatedBy": "agent"
       },
-      "id": "zsys.agent.orders.support-agent.invoke",
+      "id": "relkit.agent.orders.support-agent.invoke",
       "input": {
         "properties": {
           "question": {
             "type": "string"
           }
         },
-        "required": ["question"],
+        "required": [
+          "question"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -654,7 +713,9 @@
             "type": "string"
           }
         },
-        "required": ["answer"],
+        "required": [
+          "answer"
+        ],
         "type": "object"
       },
       "source": {
@@ -674,14 +735,16 @@
               "retentionMs": 1000
             },
             "input": {
-              "$zsys": "schema",
+              "$relkit": "schema",
               "jsonSchema": {
                 "properties": {
                   "orderId": {
                     "type": "string"
                   }
                 },
-                "required": ["orderId"],
+                "required": [
+                  "orderId"
+                ],
                 "type": "object"
               }
             },
@@ -711,32 +774,36 @@
             ],
             "target": {
               "handler": {
-                "$zsys": "function",
+                "$relkit": "function",
                 "name": "handler"
               },
               "id": "receipts.send",
               "input": {
-                "$zsys": "schema",
+                "$relkit": "schema",
                 "jsonSchema": {
                   "properties": {
                     "orderId": {
                       "type": "string"
                     }
                   },
-                  "required": ["orderId"],
+                  "required": [
+                    "orderId"
+                  ],
                   "type": "object"
                 }
               },
               "kind": "function",
               "output": {
-                "$zsys": "schema",
+                "$relkit": "schema",
                 "jsonSchema": {
                   "properties": {
                     "receiptId": {
                       "type": "string"
                     }
                   },
-                  "required": ["receiptId"],
+                  "required": [
+                    "receiptId"
+                  ],
                   "type": "object"
                 }
               },
@@ -750,12 +817,12 @@
       },
       "errors": null,
       "generated": {
-        "functionId": "zsys.event.orders.listener.handler",
+        "functionId": "relkit.event.orders.listener.handler",
         "generated": true,
         "generatedBy": "event-listener",
         "listenerId": "orders.listener"
       },
-      "id": "zsys.event.orders.listener.handler",
+      "id": "relkit.event.orders.listener.handler",
       "input": {
         "additionalProperties": false,
         "properties": {
@@ -790,7 +857,10 @@
                 "type": "string"
               }
             },
-            "required": ["orderId", "sku"],
+            "required": [
+              "orderId",
+              "sku"
+            ],
             "type": "object"
           },
           "publishedAt": {
@@ -837,7 +907,9 @@
             "type": "string"
           }
         },
-        "required": ["orderId"],
+        "required": [
+          "orderId"
+        ],
         "type": "object"
       },
       "kind": "job",
@@ -894,7 +966,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
@@ -922,7 +994,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
@@ -940,7 +1012,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
@@ -958,7 +1030,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
@@ -990,7 +1062,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 20
       }
     },
@@ -1049,13 +1121,18 @@
                   "type": "number"
                 }
               },
-              "required": ["orderId", "totalCents"],
+              "required": [
+                "orderId",
+                "totalCents"
+              ],
               "type": "object"
             },
             "status": 200
           }
         ],
-        "runtimePaths": ["/orders/:orderId"],
+        "runtimePaths": [
+          "/orders/:orderId"
+        ],
         "timeoutMs": null,
         "transforms": [
           {
@@ -1080,7 +1157,9 @@
       "config": {
         "concurrency": null,
         "delivery": "durable",
-        "expansion": ["orders.created@1"],
+        "expansion": [
+          "orders.created@1"
+        ],
         "profile": "default",
         "retry": {
           "initialDelayMs": 1,
@@ -1103,7 +1182,7 @@
         "file": "src/events/order-listener.event.ts",
         "line": 4
       },
-      "targetFunctionId": "zsys.event.orders.listener.handler",
+      "targetFunctionId": "relkit.event.orders.listener.handler",
       "triggerType": "event"
     }
   ]

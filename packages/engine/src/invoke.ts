@@ -4,7 +4,7 @@ import {
   normalizeFailure,
   resolveServicePolicy,
   runInInvocationScope,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 import {
   assertSource,
   callHook,

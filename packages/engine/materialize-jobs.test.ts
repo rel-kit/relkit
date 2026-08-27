@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { applicationFailure } from "@zsys/runtime-effect";
-import type { FunctionNode, JobNode, RegistrationPlan } from "@zsys/graph";
-import type { JobQueueEntry } from "@zsys/providers-local";
+import { applicationFailure } from "@relkit/runtime-effect";
+import type { FunctionNode, JobNode, RegistrationPlan } from "@relkit/graph";
+import type { JobQueueEntry } from "@relkit/providers-local";
 import type { JobInvocationOptions, JobQueueHandle } from "./src/materialize-jobs.ts";
 import { materializeJobs } from "./src/materialize-jobs.ts";
 

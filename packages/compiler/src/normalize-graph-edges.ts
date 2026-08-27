@@ -108,7 +108,7 @@ function addHookEdges(
 ): void {
   for (const phase of ["before", "after"] as const) {
     const hook = value[phase === "before" ? "onBefore" : "onAfter"];
-    if (typeof hook === "function" || (isRecord(hook) && hook.$zsys === "function")) {
+    if (typeof hook === "function" || (isRecord(hook) && hook.$relkit === "function")) {
       add("uses-hook", descriptor.id, `${descriptor.id}.${phase}`, { phase });
     }
   }

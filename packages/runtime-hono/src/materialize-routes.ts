@@ -1,8 +1,8 @@
 import type { Hono } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@zsys/contracts";
-import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
-import type { RequestRecordSink } from "@zsys/observability";
-import type { MiddlewareContext } from "@zsys/routes";
+import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@relkit/contracts";
+import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
+import type { RequestRecordSink } from "@relkit/observability";
+import type { MiddlewareContext } from "@relkit/routes";
 import type { MappingValue, RequestMappingOptions } from "./request-mapping.js";
 import { createRouteHandler, getEntry, isRecord } from "./materialize-routes-utils.js";
 import { registerRouteMiddleware } from "./route-middleware.js";
@@ -88,13 +88,13 @@ export interface RouteMaterializationOptions {
   }) => MaybePromise<MiddlewareContext>;
 }
 export type RuntimeHonoManifestErrorCode =
-  | "ZSYS_MANIFEST_VERSION_UNSUPPORTED"
-  | "ZSYS_MANIFEST_GENERATOR_UNSUPPORTED"
-  | "ZSYS_GRAPH_MANIFEST_MISMATCH"
-  | "ZSYS_MANIFEST_MIDDLEWARE_MISSING"
-  | "ZSYS_MANIFEST_MIDDLEWARE_MISMATCH"
-  | "ZSYS_MANIFEST_RAW_ROUTE_MISSING"
-  | "ZSYS_MANIFEST_TRANSFORM_MISSING";
+  | "RELKIT_MANIFEST_VERSION_UNSUPPORTED"
+  | "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED"
+  | "RELKIT_GRAPH_MANIFEST_MISMATCH"
+  | "RELKIT_MANIFEST_MIDDLEWARE_MISSING"
+  | "RELKIT_MANIFEST_MIDDLEWARE_MISMATCH"
+  | "RELKIT_MANIFEST_RAW_ROUTE_MISSING"
+  | "RELKIT_MANIFEST_TRANSFORM_MISSING";
 export class RuntimeHonoManifestError extends Error {
   readonly code: RuntimeHonoManifestErrorCode;
   readonly referenceId?: string;
@@ -110,17 +110,17 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
   const { manifest, plan } = options;
   if (manifest.contractVersion !== MANIFEST_VERSION)
     throw new RuntimeHonoManifestError(
-      "ZSYS_MANIFEST_VERSION_UNSUPPORTED",
+      "RELKIT_MANIFEST_VERSION_UNSUPPORTED",
       `Unsupported runtime manifest contract version ${String(manifest.contractVersion)}.`,
     );
   if (manifest.generatorVersion !== GENERATOR_VERSION)
     throw new RuntimeHonoManifestError(
-      "ZSYS_MANIFEST_GENERATOR_UNSUPPORTED",
+      "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
       `Unsupported runtime manifest generator version ${String(manifest.generatorVersion)}.`,
     );
   if (manifest.graphHash !== plan.graphHash)
     throw new RuntimeHonoManifestError(
-      "ZSYS_GRAPH_MANIFEST_MISMATCH",
+      "RELKIT_GRAPH_MANIFEST_MISMATCH",
       `Manifest hash ${JSON.stringify(manifest.graphHash)} does not match plan hash ${JSON.stringify(plan.graphHash)}.`,
     );
   for (const middleware of plan.middlewares) {
@@ -128,8 +128,8 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
     if (!isRecord(entry) || entry.path !== middleware.path || typeof entry.handler !== "function")
       throw new RuntimeHonoManifestError(
         entry === undefined
-          ? "ZSYS_MANIFEST_MIDDLEWARE_MISSING"
-          : "ZSYS_MANIFEST_MIDDLEWARE_MISMATCH",
+          ? "RELKIT_MANIFEST_MIDDLEWARE_MISSING"
+          : "RELKIT_MANIFEST_MIDDLEWARE_MISMATCH",
         `Manifest middleware "${middleware.id}" is missing or does not match its graph node.`,
         middleware.id,
       );
@@ -139,7 +139,7 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
       const route = getEntry(manifest.routes ?? {}, trigger.id);
       if (!isRecord(route) || typeof route.handler !== "function") {
         throw new RuntimeHonoManifestError(
-          "ZSYS_MANIFEST_RAW_ROUTE_MISSING",
+          "RELKIT_MANIFEST_RAW_ROUTE_MISSING",
           `Manifest raw route "${trigger.id}" is missing its handler.`,
           trigger.id,
         );
@@ -149,7 +149,7 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
     for (const transform of trigger.config.transforms) {
       if (getEntry(manifest.requestTransforms, transform.id) === undefined)
         throw new RuntimeHonoManifestError(
-          "ZSYS_MANIFEST_TRANSFORM_MISSING",
+          "RELKIT_MANIFEST_TRANSFORM_MISSING",
           `Manifest request transform "${transform.id}" is missing.`,
           transform.id,
         );

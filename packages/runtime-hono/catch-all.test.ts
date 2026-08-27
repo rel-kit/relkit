@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { HttpTriggerRegistration, RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import { createApp, type RuntimeManifest } from "./src/index.ts";
 
 const source = { file: "src/routes/docs/[[...parts]]/route.ts", line: 1, column: 14 };

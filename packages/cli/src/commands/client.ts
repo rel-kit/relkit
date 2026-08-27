@@ -3,9 +3,9 @@ import { resolve } from "node:path";
 import {
   generateContractFromDocument,
   type ContractProcedureDocument,
-} from "@zsys/client-generator";
-import { CONTRACT_VERSION, canonicalJson, type JsonValue } from "@zsys/contracts";
-import { writeIfChanged } from "@zsys/compiler";
+} from "@relkit/client-generator";
+import { CONTRACT_VERSION, canonicalJson, type JsonValue } from "@relkit/contracts";
+import { writeIfChanged } from "@relkit/compiler";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js";
 
 const MAX_CONTRACT_BYTES = 4 * 1_024 * 1_024;
@@ -15,7 +15,7 @@ export async function runClient(
   context: CliCommandContext,
 ): Promise<number> {
   if (args[0] !== "pull")
-    throw fail("ZSYS_CLIENT_USAGE", "Usage: zsys client pull <baseUrl> --out <directory>", 2);
+    throw fail("RELKIT_CLIENT_USAGE", "Usage: relkit client pull <baseUrl> --out <directory>", 2);
   const options = parse(args.slice(1));
   const document = await download(options.baseUrl, context.signal);
   const procedures = validate(document);
@@ -29,7 +29,7 @@ export async function runClient(
     writeIfChanged(`${directory}/contract.ts`, generateContractFromDocument(procedures)),
     writeIfChanged(
       `${directory}/client.ts`,
-      'export { createClient, ORPCError } from "@zsys/client";\nexport { contract } from "./contract.js";\n',
+      'export { createClient, ORPCError } from "@relkit/client";\nexport { contract } from "./contract.js";\n',
     ),
   ]);
   const result = {
@@ -46,38 +46,38 @@ function parse(args: readonly string[]): { readonly baseUrl: string; readonly ou
   let out: string | undefined;
   for (let index = 1; index < args.length; index += 1) {
     if (args[index] !== "--out" || args[index + 1] === undefined) {
-      throw fail("ZSYS_CLIENT_USAGE", `Unknown client pull option: ${args[index]}`, 2);
+      throw fail("RELKIT_CLIENT_USAGE", `Unknown client pull option: ${args[index]}`, 2);
     }
     out = args[++index];
   }
   if (baseUrl === undefined || out === undefined) {
-    throw fail("ZSYS_CLIENT_USAGE", "Usage: zsys client pull <baseUrl> --out <directory>", 2);
+    throw fail("RELKIT_CLIENT_USAGE", "Usage: relkit client pull <baseUrl> --out <directory>", 2);
   }
   const url = new URL(baseUrl);
   if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw fail("ZSYS_CLIENT_URL_INVALID", "Client pull requires an HTTP(S) base URL", 2);
+    throw fail("RELKIT_CLIENT_URL_INVALID", "Client pull requires an HTTP(S) base URL", 2);
   }
   return { baseUrl: url.toString(), out };
 }
 
 async function download(baseUrl: string, signal: AbortSignal): Promise<ContractDocument> {
-  const url = new URL("_zsys/v1/client-contract.json", ensureSlash(new URL(baseUrl)));
+  const url = new URL("_relkit/v1/client-contract.json", ensureSlash(new URL(baseUrl)));
   const headers = new Headers();
-  if (process.env.ZSYS_CLIENT_PULL_TOKEN) {
-    headers.set("authorization", `Bearer ${process.env.ZSYS_CLIENT_PULL_TOKEN}`);
+  if (process.env.RELKIT_CLIENT_PULL_TOKEN) {
+    headers.set("authorization", `Bearer ${process.env.RELKIT_CLIENT_PULL_TOKEN}`);
   }
   const response = await fetch(url, { headers, signal });
   if (!response.ok)
-    throw fail("ZSYS_CLIENT_PULL_FAILED", `Client contract returned HTTP ${response.status}`);
+    throw fail("RELKIT_CLIENT_PULL_FAILED", `Client contract returned HTTP ${response.status}`);
   const declared = Number(response.headers.get("content-length"));
   if (Number.isFinite(declared) && declared > MAX_CONTRACT_BYTES) {
-    throw fail("ZSYS_CLIENT_CONTRACT_TOO_LARGE", "Client contract exceeds the download limit");
+    throw fail("RELKIT_CLIENT_CONTRACT_TOO_LARGE", "Client contract exceeds the download limit");
   }
   const bytes = await boundedBytes(response);
   try {
     return JSON.parse(new TextDecoder().decode(bytes)) as ContractDocument;
   } catch {
-    throw fail("ZSYS_CLIENT_CONTRACT_INVALID", "Client contract is not valid JSON");
+    throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract is not valid JSON");
   }
 }
 
@@ -92,7 +92,7 @@ async function boundedBytes(response: Response): Promise<Uint8Array> {
     size += next.value.byteLength;
     if (size > MAX_CONTRACT_BYTES) {
       await reader.cancel();
-      throw fail("ZSYS_CLIENT_CONTRACT_TOO_LARGE", "Client contract exceeds the download limit");
+      throw fail("RELKIT_CLIENT_CONTRACT_TOO_LARGE", "Client contract exceeds the download limit");
     }
     chunks.push(next.value);
   }
@@ -113,22 +113,22 @@ interface ContractDocument {
 }
 
 function validate(document: ContractDocument): ContractProcedureDocument[] {
-  if (document.protocol !== "zsys.client-contract" || document.version !== CONTRACT_VERSION) {
+  if (document.protocol !== "relkit.client-contract" || document.version !== CONTRACT_VERSION) {
     throw fail(
-      "ZSYS_CLIENT_PROTOCOL_UNSUPPORTED",
+      "RELKIT_CLIENT_PROTOCOL_UNSUPPORTED",
       `Expected client contract version ${CONTRACT_VERSION}`,
     );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(document.graphHash) || !Array.isArray(document.procedures)) {
-    throw fail("ZSYS_CLIENT_CONTRACT_INVALID", "Client contract hash or procedures are invalid");
+    throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract hash or procedures are invalid");
   }
   return document.procedures.map((value) => {
     if (!isRecord(value) || typeof value.name !== "string" || !Array.isArray(value.errors)) {
-      throw fail("ZSYS_CLIENT_CONTRACT_INVALID", "Client contract procedure is invalid");
+      throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract procedure is invalid");
     }
     const errors = value.errors.map((error) => {
       if (!isRecord(error) || typeof error.id !== "string") {
-        throw fail("ZSYS_CLIENT_CONTRACT_INVALID", "Client contract error is invalid");
+        throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract error is invalid");
       }
       return { id: error.id, schema: error.schema };
     });

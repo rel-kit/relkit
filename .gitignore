@@ -32,8 +32,8 @@ build
 dist
 *.tsbuildinfo
 
-# ZSys generated and local runtime data
-.zsys/
+# RelKit generated and local runtime data
+.relkit/
 
 
 # Debug
@@ -44,7 +44,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
-examples/commerce/.zsys/generated/application.graph.json
-examples/commerce/.zsys/generated/client.ts
-examples/commerce/.zsys/generated/openapi.json
-examples/commerce/.zsys/generated/runtime.manifest.ts
+examples/commerce/.relkit/generated/application.graph.json
+examples/commerce/.relkit/generated/client.ts
+examples/commerce/.relkit/generated/openapi.json
+examples/commerce/.relkit/generated/runtime.manifest.ts

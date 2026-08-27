@@ -6,11 +6,11 @@ import {
   type InvocationIdSource,
   type InvocationTarget,
   type JobInvocationOptions,
-} from "@zsys/engine";
-import type { ProtocolId } from "@zsys/contracts";
-import type { RetryPolicy } from "@zsys/jobs";
-import { applicationFailure } from "@zsys/runtime-effect";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+} from "@relkit/engine";
+import type { ProtocolId } from "@relkit/contracts";
+import type { RetryPolicy } from "@relkit/jobs";
+import { applicationFailure } from "@relkit/runtime-effect";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestJobOptions } from "./jobs-types.js";
 

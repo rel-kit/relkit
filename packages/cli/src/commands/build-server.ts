@@ -1,10 +1,14 @@
-import { canonicalJson, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { JsonValue } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
+import {
+  canonicalJson,
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+} from "@relkit/contracts";
+import type { JsonValue } from "@relkit/contracts";
+import type { ApplicationGraph } from "@relkit/graph";
 import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
-
 /** Emits the one Bun entrypoint used by dev, start, and the production container. */
 export function serverSource(
   graph: ApplicationGraph,
@@ -26,17 +30,17 @@ export function serverSource(
   },
 ): string {
   return `import { AsyncLocalStorage } from "node:async_hooks";
-import { createGeneratedAgentFunction, invokeAgent } from "@zsys/agents";
-import { createApplicationContextResolver } from "@zsys/app";
-import { resolveEnv } from "@zsys/config";
-import { awsProviderFactories } from "@zsys/cloud-aws/runtime";
-import { createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs } from "@zsys/engine";
-import { createRegistrationPlan } from "@zsys/graph";
-import { installInspectorEndpoints } from "@zsys/inspector-api";
-import { createObservabilityRuntime } from "@zsys/observability";
-import { standardProviderFactories } from "@zsys/providers-standard";
-import { consoleHumanSink, formatHumanLog, redactFailureDetail } from "@zsys/runtime-effect";
-import { createApp, createHttpAuthRuntime } from "@zsys/runtime-hono";
+import { createGeneratedAgentFunction, invokeAgent } from "@relkit/agents";
+import { createApplicationContextResolver } from "@relkit/app";
+import { resolveEnv } from "@relkit/config";
+import { awsProviderFactories } from "@relkit/cloud-aws/runtime";
+import { createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs } from "@relkit/engine";
+import { createRegistrationPlan } from "@relkit/graph";
+import { installInspectorEndpoints } from "@relkit/inspector-api";
+import { createObservabilityRuntime } from "@relkit/observability";
+import { standardProviderFactories } from "@relkit/providers-standard";
+import { consoleHumanSink, formatHumanLog, redactFailureDetail } from "@relkit/runtime-effect";
+import { createApp, createHttpAuthRuntime } from "@relkit/runtime-hono";
 import { runtimeManifest } from "./runtime.manifest.ts";
 
 const graph = ${canonicalJson(graph)};
@@ -45,14 +49,14 @@ const openapiDocument = ${canonicalJson(openapi)};
 const clientContractDocument = ${canonicalJson(clientContract)};
 const plan = createRegistrationPlan(graph);
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
-const environment = resolveEnvironment(process.env.ZSYS_ENV, process.env.NODE_ENV);
-const generationId = process.env.ZSYS_GENERATION_ID ?? "generation.runtime";
-const sourceToken = tokenFrom(process.env.ZSYS_SOURCE_TOKEN);
-const generationToken = tokenFrom(process.env.ZSYS_GENERATION_TOKEN);
+const environment = resolveEnvironment(process.env.RELKIT_ENV, process.env.NODE_ENV);
+const generationId = process.env.RELKIT_GENERATION_ID ?? "generation.runtime";
+const sourceToken = tokenFrom(process.env.RELKIT_SOURCE_TOKEN);
+const generationToken = tokenFrom(process.env.RELKIT_GENERATION_TOKEN);
 const sourceValues = Object.fromEntries(Object.entries(process.env).filter((entry) => entry[1] !== undefined));
 const shutdownController = new AbortController();
-const telemetry = await createObservabilityRuntime({ root: process.env.ZSYS_OBSERVABILITY_ROOT ?? ".zsys/observability" });
-globalThis["__zsys_flush_telemetry"] = telemetry.flush;
+const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OBSERVABILITY_ROOT ?? ".relkit/observability" });
+globalThis["__relkit_flush_telemetry"] = telemetry.flush;
 const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
 const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
@@ -61,7 +65,7 @@ const authRuntime = createAuthRegistration(graph, runtimeManifest.routes);
 const environmentResolution = resolveRuntimeEnvironment(application.env, environment, sourceValues);
 const values = environmentResolution.values;
 const sentry = await createSentry(application.sentry, values);
-globalThis["__zsys_flush_sentry"] = () => sentry?.flush(1_000);
+globalThis["__relkit_flush_sentry"] = () => sentry?.flush(1_000);
 const contextResolver = createApplicationContextResolver({
   constants: runtimeManifest.constants,
   prompts: runtimeManifest.prompts,
@@ -93,7 +97,7 @@ let providerReady = false;
 let providerFailed = false;
 const activeInvocations = new Set();
 let stopping = false;
-const internalEndpointsEnabled = environment !== "production" || process.env.ZSYS_INTERNAL_ENDPOINTS === "1";
+const internalEndpointsEnabled = environment !== "production" || process.env.RELKIT_INTERNAL_ENDPOINTS === "1";
 const app = createApp({
   plan,
   manifest: executableManifest,
@@ -106,16 +110,16 @@ const app = createApp({
     mode: environment,
     document: openapiDocument,
     enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
-    ...(process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN === undefined
+    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}
-      : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
+      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
   },
   clientContract: {
     enabled: ${String(configuration.clientContract)},
     document: clientContractDocument,
   },
   mcp: { enabled: ${String(configuration.mcp)} },
-  staticFiles: { root: process.env.ZSYS_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
+  staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
   ...(authRuntime === undefined ? {} : { auth: authRuntime }),
   internalEndpoints: {
@@ -130,9 +134,9 @@ const app = createApp({
       manifestGeneratorVersion: ${GENERATOR_VERSION},
       graph,
     },
-    ...(process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN === undefined
+    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}
-      : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
+      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
     readiness: () => ({
       ready: providerReady && !stopping,
       ...(stopping ? { reason: "stopping" } : providerFailed ? { reason: "unavailable" } : {}),
@@ -142,9 +146,9 @@ const app = createApp({
 installInspectorEndpoints(app, {
   mode: environment,
   enabled: internalEndpointsEnabled,
-  ...(process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN === undefined
+  ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
     ? {}
-    : { bearerToken: process.env.ZSYS_INTERNAL_ENDPOINT_TOKEN }),
+    : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
   activeGeneration: {
     generationId,
     graphHash,
@@ -178,8 +182,8 @@ const server = Bun.serve({
   port: Number(process.env.PORT ?? 3000),
   fetch: async (request) => {
     const path = new URL(request.url).pathname;
-    if (path === "/_zsys/v1/health/live") return healthResponse("ok");
-    if (path === "/_zsys/v1/health/ready")
+    if (path === "/_relkit/v1/health/live") return healthResponse("ok");
+    if (path === "/_relkit/v1/health/ready")
       return healthResponse(providerReady && !stopping ? "ready" : "not-ready", providerReady && !stopping ? 200 : 503);
     if (stopping) return Response.json({ error: "draining" }, { status: 503 });
     try {

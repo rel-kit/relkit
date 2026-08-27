@@ -4,28 +4,28 @@
   "type": "module",
   "packageManager": "bun@1.3.10",
   "scripts": {
-    "dev": "zsys dev",
-    "check": "zsys check",
+    "dev": "relkit dev",
+    "check": "relkit check",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:unit": "bun test tests/unit",
     "test:integration": "bun test tests/integration",
-    "build": "zsys build",
-    "start": "zsys start",
-    "graph": "zsys graph print",
-    "deploy:preview": "zsys deploy preview",
-    "deploy": "zsys deploy up"
+    "build": "relkit build",
+    "start": "relkit start",
+    "graph": "relkit graph print",
+    "deploy:preview": "relkit deploy preview",
+    "deploy": "relkit deploy up"
   },
   "dependencies": {
-    "@zsys/app": "0.0.0",
-    "@zsys/config": "0.0.0",
-    "@zsys/providers-standard": "0.0.0",
-    "@zsys/schema": "0.0.0"
+    "@relkit/app": "0.0.0",
+    "@relkit/config": "0.0.0",
+    "@relkit/providers-standard": "0.0.0",
+    "@relkit/schema": "0.0.0"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@zsys/cli": "0.0.0",
-    "@zsys/testing": "0.0.0",
+    "@relkit/cli": "0.0.0",
+    "@relkit/testing": "0.0.0",
     "typescript": "5.9.2"
   }
 }

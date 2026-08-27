@@ -1,4 +1,4 @@
-import type { EventTriggerConfig, GraphNode } from "@zsys/graph";
+import type { EventTriggerConfig, GraphNode } from "@relkit/graph";
 import type { FromGraphOptions } from "./from-graph-validation.js";
 import { byLogical, isManaged, nodes } from "./from-graph-validation.js";
 import { iam } from "./from-graph-aws.js";

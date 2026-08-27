@@ -1,6 +1,6 @@
 import { oc } from "@orpc/contract";
-import { createClient } from "@zsys/client";
-import { z } from "@zsys/schema";
+import { createClient } from "@relkit/client";
+import { z } from "@relkit/schema";
 
 const contract = {
   ordersGet: oc

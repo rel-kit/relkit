@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/app",
+  "name": "@relkit/app",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -13,18 +13,18 @@
     }
   },
   "dependencies": {
-    "@zsys/agents": "workspace:*",
-    "@zsys/buckets": "workspace:*",
-    "@zsys/cache": "workspace:*",
-    "@zsys/config": "workspace:*",
-    "@zsys/contracts": "workspace:*",
-    "@zsys/events": "workspace:*",
-    "@zsys/functions": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/jobs": "workspace:*",
-    "@zsys/routes": "workspace:*",
-    "@zsys/services": "workspace:*",
-    "@zsys/tools": "workspace:*"
+    "@relkit/agents": "workspace:*",
+    "@relkit/buckets": "workspace:*",
+    "@relkit/cache": "workspace:*",
+    "@relkit/config": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/events": "workspace:*",
+    "@relkit/functions": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/jobs": "workspace:*",
+    "@relkit/routes": "workspace:*",
+    "@relkit/services": "workspace:*",
+    "@relkit/tools": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

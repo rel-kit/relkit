@@ -1,4 +1,4 @@
-import { canonicalJson, deepFreeze } from "@zsys/contracts";
+import { canonicalJson, deepFreeze } from "@relkit/contracts";
 import type { DeploymentPlan } from "./plan.js";
 import {
   changedFields,

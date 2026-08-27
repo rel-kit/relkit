@@ -7,7 +7,7 @@ import {
   type BucketOperationContext,
   type BucketProvider,
   type BucketPutOptions,
-} from "@zsys/buckets";
+} from "@relkit/buckets";
 import { createHash } from "node:crypto";
 import { isAbsolute } from "node:path";
 import { createFakeRoot, noFailures, text } from "./fake-utils.js";
@@ -150,8 +150,8 @@ function assertKey(value: string): void {
     isAbsolute(value) ||
     /^[A-Za-z]:/.test(value) ||
     value.split("/").some((segment) => segment === "" || segment === "." || segment === "..") ||
-    value.startsWith(".zsys") ||
-    value.startsWith("__zsys")
+    value.startsWith(".relkit") ||
+    value.startsWith("__relkit")
   ) {
     throw new TypeError("Bucket key is invalid");
   }

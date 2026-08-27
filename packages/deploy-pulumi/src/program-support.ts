@@ -1,5 +1,5 @@
-import { canonicalJson } from "@zsys/contracts";
-import type { DeploymentPlan } from "@zsys/deploy";
+import { canonicalJson } from "@relkit/contracts";
+import type { DeploymentPlan } from "@relkit/deploy";
 
 export interface ResourceEntry {
   readonly kind: string;
@@ -83,7 +83,7 @@ export function requiredTags(plan: DeploymentPlan, stackName: string): Record<st
     app: plan.application.id,
     stack: stackName,
     graphHash: plan.graphHash,
-    "managed-by": "zsys",
+    "managed-by": "relkit",
   };
 }
 

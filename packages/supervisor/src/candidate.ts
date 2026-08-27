@@ -27,7 +27,7 @@ export type {
   StartedCandidate,
 } from "./candidate-types.js";
 
-export const DEFAULT_CANDIDATE_GENERATED_DIRECTORY = ".zsys/generated";
+export const DEFAULT_CANDIDATE_GENERATED_DIRECTORY = ".relkit/generated";
 export const DEFAULT_CANDIDATE_OUTPUT_BYTES = 8 * 1024;
 export const DEFAULT_CANDIDATE_STOP_TIMEOUT_MS = 1_000;
 

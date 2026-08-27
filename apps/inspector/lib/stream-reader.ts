@@ -25,7 +25,7 @@ export async function connectStream(options: StreamConnectionOptions): Promise<v
   } catch {
     throw new InspectorApiError(
       "Inspector backend is disconnected",
-      "ZSYS_INSPECTOR_DISCONNECTED",
+      "RELKIT_INSPECTOR_DISCONNECTED",
       undefined,
       "network",
     );
@@ -43,11 +43,14 @@ export async function connectStream(options: StreamConnectionOptions): Promise<v
       code.includes("PROTOCOL") ? "protocol" : "http",
     );
   }
-  const headerVersion = response.headers.get("x-zsys-api-version");
+  const headerVersion = response.headers.get("x-relkit-api-version");
   if (headerVersion !== null && headerVersion !== String(STREAM_VERSION))
     throw protocolError("Inspector stream protocol is unsupported");
   if (!response.body)
-    throw new InspectorApiError("Inspector stream has no body", "ZSYS_INSPECTOR_INVALID_RESPONSE");
+    throw new InspectorApiError(
+      "Inspector stream has no body",
+      "RELKIT_INSPECTOR_INVALID_RESPONSE",
+    );
   options.connected();
   await consumeStream(response.body, options.active, options.event);
 }
@@ -124,5 +127,10 @@ function droppedCount(value: unknown): number {
 }
 
 function protocolError(message: string): InspectorApiError {
-  return new InspectorApiError(message, "ZSYS_INSPECTOR_PROTOCOL_MISMATCH", undefined, "protocol");
+  return new InspectorApiError(
+    message,
+    "RELKIT_INSPECTOR_PROTOCOL_MISMATCH",
+    undefined,
+    "protocol",
+  );
 }

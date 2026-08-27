@@ -1,4 +1,4 @@
-import type { InferOutput, StandardSchemaV1 } from "@zsys/schema";
+import type { InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionHandlerValidation } from "./handler-result.js";

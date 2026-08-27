@@ -130,7 +130,7 @@ const structuralKeys = new Set([
   "$schema",
   "$id",
   "$ref",
-  "$zsys",
+  "$relkit",
   "jsonSchema",
   "title",
   "description",

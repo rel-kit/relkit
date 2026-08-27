@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import assets from "../buckets/assets.bucket.js";
 import { assetUploadInput, assetUploadOutput } from "../shared/schemas.js";
 

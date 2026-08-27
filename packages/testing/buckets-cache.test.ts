@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 import { createTestRuntime } from "./src/index.ts";
 
 describe("testing bucket and cache fakes", () => {

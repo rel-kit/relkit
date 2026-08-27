@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { external, s3 } from "@zsys/app";
-import type { CacheOperationContext } from "@zsys/cache";
+import { external, s3 } from "@relkit/app";
+import type { CacheOperationContext } from "@relkit/cache";
 import { createRedisCacheProvider } from "./src/redis.ts";
 import type { StandardRedisClient } from "./src/redis-client.ts";
 import { createS3BucketProvider } from "./src/s3.ts";
@@ -59,7 +59,7 @@ describe("S3-compatible provider", () => {
               etag: '"etag"',
               "content-length": "3",
               "content-type": "text/plain",
-              "x-amz-meta-owner": "zsys",
+              "x-amz-meta-owner": "relkit",
             },
           });
         }
@@ -76,14 +76,14 @@ describe("S3-compatible provider", () => {
 
       await provider.put!("folder/a.txt", new TextEncoder().encode("abc"), {
         contentType: "text/plain",
-        metadata: { owner: "zsys" },
+        metadata: { owner: "relkit" },
       });
       expect(new TextDecoder().decode(await provider.get!("folder/a.txt"))).toBe("abc");
       expect(await provider.head!("folder/a.txt")).toMatchObject({
         etag: "etag",
         size: 3,
         contentType: "text/plain",
-        metadata: { owner: "zsys" },
+        metadata: { owner: "relkit" },
       });
       expect(await provider.list!("folder")).toEqual(["a.txt"]);
       expect(

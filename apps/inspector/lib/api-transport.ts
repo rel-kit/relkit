@@ -37,8 +37,8 @@ export class InspectorApiTransport {
     this.fetcher = options.fetch ?? ((input, init) => fetch(input, init));
     this.headers = new Headers(options.headers);
     this.headers.set("accept", `application/json; version=${INSPECTOR_API_VERSION}`);
-    this.headers.set("x-zsys-api-version", String(INSPECTOR_API_VERSION));
-    this.headers.set("x-zsys-api-protocol", INSPECTOR_API_PROTOCOL);
+    this.headers.set("x-relkit-api-version", String(INSPECTOR_API_VERSION));
+    this.headers.set("x-relkit-api-protocol", INSPECTOR_API_PROTOCOL);
     this.cacheTtlMs = Math.max(0, options.cacheTtlMs ?? 2_000);
     this.signal = options.signal;
   }
@@ -116,7 +116,7 @@ export class InspectorApiTransport {
     } catch {
       throw new InspectorApiError(
         "Inspector backend is disconnected",
-        "ZSYS_INSPECTOR_DISCONNECTED",
+        "RELKIT_INSPECTOR_DISCONNECTED",
         undefined,
         "network",
       );

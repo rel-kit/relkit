@@ -1,11 +1,11 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import {
   createInspectableObservabilityHooks,
   OBSERVABILITY_HOOK_PROTOCOL,
   OBSERVABILITY_HOOK_VERSION,
   type InspectableObservabilityHooks,
   type ObservabilityHookEvent,
-} from "@zsys/engine";
+} from "@relkit/engine";
 import {
   createTestHttpListener,
   type TestHttpListener,
@@ -43,7 +43,7 @@ export function createTestHttpClient(
   app: TestHttpApplication,
   options: TestHttpClientOptions = {},
 ): TestHttpClient {
-  const baseUrl = normalizeBaseUrl(options.baseUrl ?? "http://zsys.test");
+  const baseUrl = normalizeBaseUrl(options.baseUrl ?? "http://relkit.test");
   const listeners = new Set<TestHttpListener>();
   let closing: Promise<void> | undefined;
   const request: TestHttpRequest = (input, init) =>

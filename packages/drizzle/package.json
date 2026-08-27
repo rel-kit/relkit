@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/drizzle",
+  "name": "@relkit/drizzle",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,8 +9,8 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*",
-    "@zsys/invocation": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/invocation": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4",
     "zod": "4.4.3"
   },

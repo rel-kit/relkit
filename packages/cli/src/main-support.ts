@@ -1,5 +1,5 @@
-import { canonicalJson } from "@zsys/contracts";
-import type { LogLevel, LogRecord } from "@zsys/runtime-effect";
+import { canonicalJson } from "@relkit/contracts";
+import type { LogLevel, LogRecord } from "@relkit/runtime-effect";
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
 
 export const CLI_VERSION = "0.0.0" as const;
@@ -32,7 +32,7 @@ export interface CliCommandContext {
   readonly log: CliLogger;
   readonly onProgress?: (message: string) => void;
 }
-export interface CreateZsysGeneratorApi {
+export interface CreateRelkitGeneratorApi {
   readonly normalizeCreateOptions: (
     args: readonly string[],
     context: { readonly json: boolean },
@@ -49,7 +49,7 @@ export interface CliRuntime {
   readonly ci?: boolean;
   readonly signal?: AbortSignal;
   readonly installSignalHandlers?: boolean;
-  readonly loadCreateZsys?: () => Promise<CreateZsysGeneratorApi>;
+  readonly loadCreateRelkit?: () => Promise<CreateRelkitGeneratorApi>;
 }
 export type CliFailure = Error & {
   readonly code: string;
@@ -57,16 +57,16 @@ export type CliFailure = Error & {
   readonly signal?: "SIGINT" | "SIGTERM";
 };
 
-export async function loadCreateZsys(): Promise<CreateZsysGeneratorApi> {
-  let loaded: { readonly default?: unknown } & Partial<CreateZsysGeneratorApi>;
+export async function loadCreateRelkit(): Promise<CreateRelkitGeneratorApi> {
+  let loaded: { readonly default?: unknown } & Partial<CreateRelkitGeneratorApi>;
   try {
-    loaded = (await import("create-zsys")) as unknown as typeof loaded;
+    loaded = (await import("create-relkit")) as unknown as typeof loaded;
   } catch {
-    throw fail("ZSYS_CREATE_API_UNAVAILABLE", "The create-zsys generator API is unavailable.");
+    throw fail("RELKIT_CREATE_API_UNAVAILABLE", "The create-relkit generator API is unavailable.");
   }
   const value = loaded.default ?? loaded;
   if (!isGeneratorApi(value))
-    throw fail("ZSYS_CREATE_API_UNAVAILABLE", "The create-zsys generator API is unavailable.");
+    throw fail("RELKIT_CREATE_API_UNAVAILABLE", "The create-relkit generator API is unavailable.");
   return value;
 }
 
@@ -92,17 +92,17 @@ export function helpPayload(
   const path = typeof command === "string" ? [command] : (command ?? []);
   const selected = findCliHelp(path) ?? getCliHelpModel(version);
   return {
-    name: "zsys",
+    name: "relkit",
     version,
-    usage: path.length === 0 ? "zsys [--json] <command> [options]" : selected.usage,
+    usage: path.length === 0 ? "relkit [--json] <command> [options]" : selected.usage,
     commands: selected.commands.map(({ name }) => name),
   };
 }
 export function helpText(version: string, command: string | undefined): string {
   const selected = findCliHelp(command ? [command] : []) ?? getCliHelpModel(version);
-  const usage = command ? selected.usage : "zsys [--json] <command> [options]";
+  const usage = command ? selected.usage : "relkit [--json] <command> [options]";
   const lines = [
-    `zsys ${version}`,
+    `relkit ${version}`,
     `Usage: ${usage}`,
     "",
     "Commands:",
@@ -126,7 +126,7 @@ export function installSignals(controller: AbortController): () => void {
   };
 }
 export function failSignal(signal: "SIGINT" | "SIGTERM"): CliFailure {
-  return fail("ZSYS_INTERRUPTED", `Received ${signal}.`, signal === "SIGINT" ? 130 : 143, signal);
+  return fail("RELKIT_INTERRUPTED", `Received ${signal}.`, signal === "SIGINT" ? 130 : 143, signal);
 }
 export function fail(
   code: string,
@@ -142,13 +142,13 @@ export function toFailure(error: unknown, signal: AbortSignal): CliFailure {
   if (signal.aborted)
     return isFailure(signal.reason)
       ? signal.reason
-      : fail("ZSYS_INTERRUPTED", "Operation interrupted.", 130);
-  return isFailure(error) ? error : fail("ZSYS_INTERNAL_ERROR", errorMessage(error));
+      : fail("RELKIT_INTERRUPTED", "Operation interrupted.", 130);
+  return isFailure(error) ? error : fail("RELKIT_INTERNAL_ERROR", errorMessage(error));
 }
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
-export function isGeneratorApi(value: unknown): value is CreateZsysGeneratorApi {
+export function isGeneratorApi(value: unknown): value is CreateRelkitGeneratorApi {
   if (value === null || typeof value !== "object") return false;
   const candidate = value as Record<string, unknown>;
   return (

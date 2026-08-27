@@ -79,15 +79,15 @@ function reportImport(
     add("descriptor-runtime-import", `${ownerName} imports runtime package "${dependency}"`);
   }
   if (
-    ownerName === "@zsys/graph" &&
+    ownerName === "@relkit/graph" &&
     (dependency === "hono" ||
       dependency.startsWith("@hono/") ||
-      dependency === "@zsys/runtime-hono" ||
+      dependency === "@relkit/runtime-hono" ||
       dependency.startsWith("@pulumi/") ||
-      dependency === "@zsys/deploy-pulumi" ||
-      dependency === "@zsys/cloud-aws")
+      dependency === "@relkit/deploy-pulumi" ||
+      dependency === "@relkit/cloud-aws")
   ) {
-    add("graph-hono-pulumi-import", `@zsys/graph imports Hono/Pulumi package "${dependency}"`);
+    add("graph-hono-pulumi-import", `@relkit/graph imports Hono/Pulumi package "${dependency}"`);
   }
   const fixturePackage = scopes.find((scope) => scope.path === "examples/commerce")?.manifest?.name;
   if (
@@ -127,7 +127,7 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
 
   for (const owner of scopes) {
     const paths = [...new Bun.Glob("**/*.{ts,tsx,mts,cts}").scanSync({ cwd: owner.root })]
-      .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path))
+      .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
       .sort();
     for (const path of paths) {
       const file = resolve(owner.root, path);

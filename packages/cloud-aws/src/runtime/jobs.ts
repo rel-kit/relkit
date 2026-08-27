@@ -1,6 +1,6 @@
-import type { JsonValue } from "@zsys/contracts";
-import type { JobQueueFactoryContext, JobQueueHandle } from "@zsys/engine";
-import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@zsys/jobs";
+import type { JsonValue } from "@relkit/contracts";
+import type { JobQueueFactoryContext, JobQueueHandle } from "@relkit/engine";
+import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@relkit/jobs";
 import { type AwsCredentials, text } from "./config.js";
 import { assertResponse, awsRequest } from "./http.js";
 

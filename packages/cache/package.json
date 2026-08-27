@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/cache",
+  "name": "@relkit/cache",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,8 +9,8 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*",
-    "@zsys/schema": "workspace:*"
+    "@relkit/contracts": "workspace:*",
+    "@relkit/schema": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

@@ -1,13 +1,13 @@
-# @zsys/agents
+# @relkit/agents
 
 Agents use an optional serializable model selector, declared tools, and finite
 execution limits. Model credentials and live clients belong to per-environment
 provider configuration, not agent descriptors.
 
 ```ts
-import { defineAgent } from "@zsys/agents";
+import { defineAgent } from "@relkit/agents";
 import lookupOrder from "./lookup-order.tool";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 export default defineAgent({
   id: "orders.support-agent",
@@ -34,7 +34,7 @@ modelProviders: {
 An omitted `model` uses both defaults, a provider name selects that provider's
 default model, and `provider:model` selects an exact AI SDK v7 registry model.
 Development and test runs can use the `ai/test`-backed harness without network
-calls. Only allowlisted tools execute, and ZSYS approval remains authoritative.
+calls. Only allowlisted tools execute, and RELKIT approval remains authoritative.
 
 Runtime hooks expose agent, model, and tool span metadata plus observed edges.
 Prompt, instruction, result, secret, and full tool content are omitted unless

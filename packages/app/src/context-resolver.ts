@@ -1,5 +1,5 @@
-import { isEnvRef } from "@zsys/config";
-import type { PublicLogger } from "@zsys/invocation";
+import { isEnvRef } from "@relkit/config";
+import type { PublicLogger } from "@relkit/invocation";
 import type {
   ConstantResolver,
   ConstantsDescriptor,

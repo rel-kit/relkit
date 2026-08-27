@@ -2,12 +2,12 @@ import { afterEach, expect, test } from "bun:test";
 import { access, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { GenerateProjectError, generateProject } from "../../packages/create-zsys/src/index.ts";
+import { GenerateProjectError, generateProject } from "../../packages/create-relkit/src/index.ts";
 import type {
   GenerateFailurePoint,
   GenerateProjectContext,
-} from "../../packages/create-zsys/src/index.ts";
-import { cleanupStagedProject } from "../../packages/create-zsys/src/generate-files.ts";
+} from "../../packages/create-relkit/src/index.ts";
+import { cleanupStagedProject } from "../../packages/create-relkit/src/generate-files.ts";
 
 const roots: string[] = [];
 const failurePoints: readonly GenerateFailurePoint[] = [
@@ -26,11 +26,11 @@ for (const point of failurePoints) {
     const failure = await captureFailure(point, root);
 
     expect(failure).toBeInstanceOf(GenerateProjectError);
-    expect(failure.code).toBe(`ZSYS_CREATE_${point.toUpperCase()}_FAILED`);
+    expect(failure.code).toBe(`RELKIT_CREATE_${point.toUpperCase()}_FAILED`);
     expect(failure.temporaryPath).toBeString();
     expect(failure.message).toContain(`Temporary directory cleaned: ${failure.temporaryPath}.`);
     await expect(access(join(root, "generated-app"))).rejects.toThrow();
-    expect((await readdir(root)).some((name) => name.startsWith(".generated-app-zsys-"))).toBe(
+    expect((await readdir(root)).some((name) => name.startsWith(".generated-app-relkit-"))).toBe(
       false,
     );
   });
@@ -44,11 +44,11 @@ test("preserves an existing empty destination when publication fails", async () 
   const options = createOptions({ directory: "existing-app", forceEmptyDirectory: true });
 
   await expect(generateProject(options, contextFor(root, "rename"))).rejects.toMatchObject({
-    code: "ZSYS_CREATE_RENAME_FAILED",
+    code: "RELKIT_CREATE_RENAME_FAILED",
   });
   expect(await readdir(destination)).toEqual(before);
   expect(
-    (await readdir(root)).filter((name) => name.startsWith(".existing-app-zsys-")).length,
+    (await readdir(root)).filter((name) => name.startsWith(".existing-app-relkit-")).length,
   ).toBe(0);
 });
 
@@ -106,7 +106,7 @@ function contextFor(root: string, point: GenerateFailurePoint): GenerateProjectC
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-create-cleanup-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-create-cleanup-"));
   roots.push(root);
   return root;
 }

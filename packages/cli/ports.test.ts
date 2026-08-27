@@ -15,18 +15,18 @@ describe("framework port precedence", () => {
     expect(
       resolveInspectorPort({
         flag: 4201,
-        source: { ZSYS_INSPECTOR_PORT: "4202" },
+        source: { RELKIT_INSPECTOR_PORT: "4202" },
         configured: 4203,
       }),
     ).toBe(4201);
     expect(
-      resolveInspectorPort({ source: { ZSYS_INSPECTOR_PORT: "4202" }, configured: 4203 }),
+      resolveInspectorPort({ source: { RELKIT_INSPECTOR_PORT: "4202" }, configured: 4203 }),
     ).toBe(4202);
     expect(resolveInspectorPort({ source: {}, configured: 4203 })).toBe(4203);
     expect(resolveInspectorPort({ source: {} })).toBe(3210);
     expect(() => resolveApplicationPort({ source: { PORT: "invalid" } })).toThrow("PORT");
-    expect(() => resolveInspectorPort({ source: { ZSYS_INSPECTOR_PORT: "0" } })).toThrow(
-      "ZSYS_INSPECTOR_PORT",
+    expect(() => resolveInspectorPort({ source: { RELKIT_INSPECTOR_PORT: "0" } })).toThrow(
+      "RELKIT_INSPECTOR_PORT",
     );
   });
 });

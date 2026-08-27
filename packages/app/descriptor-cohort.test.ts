@@ -10,7 +10,7 @@ import {
   managed,
   redis,
   s3,
-} from "@zsys/app";
+} from "@relkit/app";
 
 describe("composable provider declarations", () => {
   test("keeps protocol bindings value-free", () => {

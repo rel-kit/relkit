@@ -244,6 +244,6 @@ describe("function tool views", () => {
       timeoutMs: 5,
     });
 
-    await expect(tool.invoke({ id: "order-1" })).rejects.toMatchObject({ code: "ZSYS_TIMEOUT" });
+    await expect(tool.invoke({ id: "order-1" })).rejects.toMatchObject({ code: "RELKIT_TIMEOUT" });
   });
 });

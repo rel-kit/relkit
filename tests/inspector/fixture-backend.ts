@@ -262,7 +262,7 @@ const graph = {
       input: { type: "object", properties: { question: schema("string") } },
       output: { type: "object", properties: { answer: schema("string") } },
       toolIds: ["orders.get.tool"],
-      generatedFunction: { functionId: "zsys.agent.support.order.invoke", generated: true },
+      generatedFunction: { functionId: "relkit.agent.support.order.invoke", generated: true },
       limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
       source: source("src/agents/order-support.agent.ts", 3),
     },
@@ -286,7 +286,7 @@ const graph = {
 
 const eventContracts = [
   ...["orders.created", "orders.updated", "orders.cancelled"].map((id) => ({
-    protocol: "zsys.events.admin",
+    protocol: "relkit.events.admin",
     protocolVersion: PROTOCOL_VERSION,
     id,
     version: 1,
@@ -297,7 +297,7 @@ const eventContracts = [
 ];
 
 const eventTrigger = {
-  protocol: "zsys.events.admin",
+  protocol: "relkit.events.admin",
   version: PROTOCOL_VERSION,
   id: FIXTURE_IDS.trigger,
   targetFunctionId: "orders.project-order-change",
@@ -311,7 +311,7 @@ const eventTrigger = {
 
 const eventPublications = [
   {
-    protocol: "zsys.events.admin",
+    protocol: "relkit.events.admin",
     protocolVersion: PROTOCOL_VERSION,
     sequence: 1,
     timestamp: now,
@@ -328,7 +328,7 @@ const eventPublications = [
 
 const eventDeliveries = [
   {
-    protocol: "zsys.events.admin",
+    protocol: "relkit.events.admin",
     version: PROTOCOL_VERSION,
     deliveryId: "delivery-dead-letter-1",
     eventInstanceId: "event-instance-1",
@@ -356,7 +356,7 @@ const initialTraces = [
     traceId: "agent-trace-1",
     name: "orders.agent.tool.orders.get.tool",
     kind: "tool",
-    functionId: "zsys.agent.support.order.invoke",
+    functionId: "relkit.agent.support.order.invoke",
     agentId: FIXTURE_IDS.agent,
     toolId: FIXTURE_IDS.tool,
     toolCallId: "tool-call-1",
@@ -393,7 +393,7 @@ export function createInspectorFixture(): InspectorFixture {
       invoke: async () => ({ ok: true, orderId: "order-100", totalCents: 1000 }),
     },
     jobs: {
-      protocol: "zsys.jobs.admin",
+      protocol: "relkit.jobs.admin",
       version: PROTOCOL_VERSION,
       status: async () => ({ state: jobState }),
       retry: async ({ instanceId }) => {
@@ -474,7 +474,7 @@ export function createInspectorFixture(): InspectorFixture {
         ? {
             version: 1,
             signal: "diagnostic",
-            code: "ZSYS_FIXTURE_COMPILE_ERROR",
+            code: "RELKIT_FIXTURE_COMPILE_ERROR",
             severity: "error",
             message: "Candidate source is invalid.",
             file: "src/routes/orders.route.ts",
@@ -484,7 +484,7 @@ export function createInspectorFixture(): InspectorFixture {
         : {
             version: 1,
             signal: "diagnostic",
-            code: "ZSYS_FIXTURE_CANDIDATE_READY",
+            code: "RELKIT_FIXTURE_CANDIDATE_READY",
             severity: "info",
             message: "Candidate is ready.",
           },
@@ -517,7 +517,7 @@ export function createInspectorFixture(): InspectorFixture {
               status: "invalid",
               diagnostics: [
                 {
-                  code: "ZSYS_FIXTURE_COMPILE_ERROR",
+                  code: "RELKIT_FIXTURE_COMPILE_ERROR",
                   severity: "error",
                   message: "Candidate source is invalid.",
                   file: "src/routes/orders.route.ts",
@@ -545,7 +545,7 @@ export function createInspectorFixture(): InspectorFixture {
         ],
         events: {
           query: async () => ({
-            protocol: "zsys.events.admin",
+            protocol: "relkit.events.admin",
             version: PROTOCOL_VERSION,
             events: eventContracts,
             triggers: [eventTrigger],
@@ -710,7 +710,7 @@ function makeQuery(
       return request === undefined
         ? undefined
         : ({
-            protocol: "zsys.observability.query",
+            protocol: "relkit.observability.query",
             version: 1,
             request,
             records: relatedRecords(read().traces, id),
@@ -720,7 +720,7 @@ function makeQuery(
       const log = read().logs.find((item) => item.cursor === cursor);
       return log === undefined
         ? undefined
-        : ({ protocol: "zsys.observability.query", version: 1, log } as never);
+        : ({ protocol: "relkit.observability.query", version: 1, log } as never);
     },
     trace: async (id) => {
       const records = read().traces.filter((item) => item.traceId === id);
@@ -728,7 +728,7 @@ function makeQuery(
       return trace === undefined
         ? undefined
         : ({
-            protocol: "zsys.observability.query",
+            protocol: "relkit.observability.query",
             version: 1,
             trace,
             spans: records.filter((item) => item.signal === "span"),
@@ -743,7 +743,7 @@ function page(items: readonly Record<string, unknown>[], query: ObservabilityQue
   const limit = Math.min(query.limit ?? 50, 100);
   const selected = items.slice(cursor, cursor + limit);
   return {
-    protocol: "zsys.observability.query" as const,
+    protocol: "relkit.observability.query" as const,
     version: 1 as const,
     items: selected,
     ...(cursor + selected.length < items.length

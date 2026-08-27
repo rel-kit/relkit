@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/buckets",
+  "name": "@relkit/buckets",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,7 +9,7 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*"
+    "@relkit/contracts": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

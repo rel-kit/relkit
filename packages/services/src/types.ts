@@ -1,5 +1,5 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise, Ref } from "@zsys/contracts";
-import type { FunctionContext, FunctionRefAny } from "@zsys/functions";
+import type { DescriptorBase, DescriptorMetadata, MaybePromise, Ref } from "@relkit/contracts";
+import type { FunctionContext, FunctionRefAny } from "@relkit/functions";
 
 export interface ServiceRef<Id extends string = string> {
   readonly ref: Ref<"service", Id>;

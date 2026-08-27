@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { defineEnv, env, external, redis, s3, type ProviderTopology } from "@zsys/app";
-import { GRAPH_VERSION, type SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph, ProviderProfileNode } from "@zsys/graph";
+import { defineEnv, env, external, redis, s3, type ProviderTopology } from "@relkit/app";
+import { GRAPH_VERSION, type SourceLocation } from "@relkit/contracts";
+import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
 import {
   createProviderRegistry,
   type ProviderFactories,
@@ -108,7 +108,7 @@ test("rejects missing required environment values before construction", async ()
       },
     }),
   ).rejects.toMatchObject({
-    code: "ZSYS_PROVIDER_ENVIRONMENT_INVALID",
+    code: "RELKIT_PROVIDER_ENVIRONMENT_INVALID",
     issues: [{ variable: "CACHE_URL" }],
   });
   expect(creates).toBe(0);

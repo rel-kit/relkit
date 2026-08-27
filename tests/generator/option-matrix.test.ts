@@ -12,12 +12,12 @@ import {
   type CreateOptions,
   type GenerateFailurePoint,
   type GenerateProjectContext,
-} from "../../packages/create-zsys/src/index.ts";
+} from "../../packages/create-relkit/src/index.ts";
 
 const roots: string[] = [];
 const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");
 const forbiddenImport =
-  /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/[^"']|@aws-sdk\/[^"']|@zsys\/(?:compiler|contracts|deploy|deploy-pulumi|diagnostics|engine|graph|inspector-api|openapi|providers-local|runtime-effect|runtime-hono|supervisor))["']/;
+  /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/[^"']|@aws-sdk\/[^"']|@relkit\/(?:compiler|contracts|deploy|deploy-pulumi|diagnostics|engine|graph|inspector-api|openapi|providers-local|runtime-effect|runtime-hono|supervisor))["']/;
 const forbiddenApis = [
   ["define", "Sub", "scription"].join(""),
   ["define", "Per", "sistence"].join(""),
@@ -47,7 +47,7 @@ const forbiddenInfrastructureNames = [
   ["bi", "cep"].join(""),
 ];
 const forbiddenScope = new RegExp(
-  `\\b(?:${forbiddenApis.join("|")})\\b|@zsys/(?:${forbiddenScopeNames.join("|")})\\b|(?:^|[/.])(?:${[
+  `\\b(?:${forbiddenApis.join("|")})\\b|@relkit/(?:${forbiddenScopeNames.join("|")})\\b|(?:^|[/.])(?:${[
     ...forbiddenScopeNames,
     ...forbiddenInfrastructureNames,
   ].join("|")}|[^/]+\\.rs)(?:[/.]|$)`,
@@ -77,14 +77,14 @@ test("covers every template and examples/install/Git combination", async () => {
           expect(result.gitInitialized).toBe(git);
           expect(manifest).toMatchObject({ packageManager: "bun@1.3.10" });
           expect(manifest.dependencies).toMatchObject({
-            "@zsys/app": "0.0.0",
-            "@zsys/config": "0.0.0",
-            "@zsys/schema": "0.0.0",
+            "@relkit/app": "0.0.0",
+            "@relkit/config": "0.0.0",
+            "@relkit/schema": "0.0.0",
           });
           expect(manifest.devDependencies).toMatchObject({
             "@types/bun": "1.3.10",
-            "@zsys/cli": "0.0.0",
-            "@zsys/testing": "0.0.0",
+            "@relkit/cli": "0.0.0",
+            "@relkit/testing": "0.0.0",
             typescript: "5.9.2",
           });
           expect(result.files.some((path) => path.startsWith("src/functions/"))).toBe(examples);
@@ -99,10 +99,10 @@ test("covers every template and examples/install/Git combination", async () => {
               .length,
           ).toBe(git ? 1 : 0);
           expect(commands.slice(-2).map((command) => command.slice(0, 2))).toEqual([
-            ["zsys", "doctor"],
-            ["zsys", "check"],
+            ["relkit", "doctor"],
+            ["relkit", "check"],
           ]);
-          expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-zsys-`))).toBe(
+          expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-relkit-`))).toBe(
             false,
           );
         }
@@ -136,7 +136,7 @@ test("accepts valid names and rejects invalid names without mutation", async () 
       createOptions("not a package", { directory: "untouched", install: false, git: false }),
       contextFor(root),
     ),
-  ).rejects.toMatchObject({ code: "ZSYS_CREATE_NAME_INVALID" });
+  ).rejects.toMatchObject({ code: "RELKIT_CREATE_NAME_INVALID" });
   expect(await readdir(root)).toEqual([]);
 });
 
@@ -152,7 +152,7 @@ test("handles absent, empty, and non-empty destinations atomically", async () =>
   await mkdir(empty);
   await expect(
     generateProject(createOptions("empty-app", { directory: "empty-app" }), contextFor(root)),
-  ).rejects.toMatchObject({ code: "ZSYS_CREATE_DESTINATION_EXISTS" });
+  ).rejects.toMatchObject({ code: "RELKIT_CREATE_DESTINATION_EXISTS" });
   expect(await readdir(empty)).toEqual([]);
   const forced = await generateProject(
     createOptions("empty-app", {
@@ -174,7 +174,7 @@ test("handles absent, empty, and non-empty destinations atomically", async () =>
         createOptions("non-empty-app", { directory: "non-empty-app", forceEmptyDirectory }),
         contextFor(root),
       ),
-    ).rejects.toMatchObject({ code: "ZSYS_CREATE_DESTINATION_NOT_EMPTY" });
+    ).rejects.toMatchObject({ code: "RELKIT_CREATE_DESTINATION_NOT_EMPTY" });
   }
   expect(await readFile(join(nonEmpty, "keep.txt"), "utf8")).toBe("keep");
 });
@@ -221,8 +221,8 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
   });
   expect(json.nextSteps.endpoints).not.toHaveProperty("route");
   expect(json.nextSteps.endpoints).toMatchObject({
-    openapi: "http://localhost:3000/_zsys/v1/openapi.json",
-    apiReference: "http://localhost:3000/_zsys/v1/api-reference",
+    openapi: "http://localhost:3000/_relkit/v1/openapi.json",
+    apiReference: "http://localhost:3000/_relkit/v1/api-reference",
   });
   expect(formatGenerateResult(json)).toContain("api docs:");
   expect(formatGenerateResult(json)).toContain(
@@ -239,7 +239,7 @@ test("reports only the create milestones that run", async () => {
     onProgress: (message) => full.push(message),
   });
   expect(full).toEqual([
-    `Creating a new ZSYS app in ${join(root, "full-progress")}.`,
+    `Creating a new RELKIT app in ${join(root, "full-progress")}.`,
     "Installing dependencies...",
     "Initializing Git repository...",
     "Checking generated project...",
@@ -251,7 +251,7 @@ test("reports only the create milestones that run", async () => {
     onProgress: (message) => minimal.push(message),
   });
   expect(minimal).toEqual([
-    `Creating a new ZSYS app in ${join(root, "minimal-progress")}.`,
+    `Creating a new RELKIT app in ${join(root, "minimal-progress")}.`,
     "Checking generated project...",
   ]);
 });
@@ -287,9 +287,9 @@ test("rolls back every pre-rename failure and removes its temporary sibling", as
           if (actual === point) throw new Error(`injected ${point}`);
         },
       }),
-    ).rejects.toMatchObject({ code: `ZSYS_CREATE_${point.toUpperCase()}_FAILED` });
+    ).rejects.toMatchObject({ code: `RELKIT_CREATE_${point.toUpperCase()}_FAILED` });
     expect(await readdir(root)).not.toContain(name);
-    expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-zsys-`))).toBe(false);
+    expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-relkit-`))).toBe(false);
   }
 });
 
@@ -317,7 +317,7 @@ function contextFor(root: string, commands: string[][] = []): GenerateProjectCon
     templateRoot,
     bunExecutable: "bun",
     gitExecutable: "git",
-    zsysExecutable: "zsys",
+    relkitExecutable: "relkit",
     commandRunner: async (command) => {
       commands.push([...command]);
       return { exitCode: 0 };
@@ -326,7 +326,7 @@ function contextFor(root: string, commands: string[][] = []): GenerateProjectCon
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-generator-matrix-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-generator-matrix-"));
   roots.push(root);
   return root;
 }

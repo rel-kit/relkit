@@ -1,4 +1,4 @@
-import type { AgentObservedEdge, AgentRuntimeHooks, AgentSpanRecord } from "@zsys/agents";
+import type { AgentObservedEdge, AgentRuntimeHooks, AgentSpanRecord } from "@relkit/agents";
 import type {
   TestAgentTrace,
   TestAgentTraceExpectation,

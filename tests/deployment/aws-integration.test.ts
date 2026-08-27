@@ -15,7 +15,8 @@ import {
 import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
-const enabled = process.env.ZSYS_TEST_ALL_CLOUD === "1" && process.env.ZSYS_AWS_INTEGRATION === "1";
+const enabled =
+  process.env.RELKIT_TEST_ALL_CLOUD === "1" && process.env.RELKIT_AWS_INTEGRATION === "1";
 const awsTest = enabled ? test : test.skip;
 const compiled = await compileProject(
   "aws-commerce-example",
@@ -27,8 +28,8 @@ const graph = JSON.parse(compiled.graphBytes) as ApplicationGraph;
 test("keeps source moves on stable deployment identities", () => {
   const moved = moveSources(graph);
   expect(JSON.stringify(moved)).not.toBe(JSON.stringify(graph));
-  expect(resourceNames(planFor(moved, "example.invalid/zsys/smoke:latest"))).toEqual(
-    resourceNames(planFor(graph, "example.invalid/zsys/smoke:latest")),
+  expect(resourceNames(planFor(moved, "example.invalid/relkit/smoke:latest"))).toEqual(
+    resourceNames(planFor(graph, "example.invalid/relkit/smoke:latest")),
   );
 });
 
@@ -51,9 +52,9 @@ interface SmokeOutputs {
 
 awsTest("creates, smokes, updates, and independently cleans an ephemeral AWS stack", async () => {
   const config = integrationConfig();
-  const root = await mkdtemp(join(tmpdir(), "zsys-aws-integration-"));
-  const stackName = `zsys-nightly-${Date.now()}-${randomUUID().slice(0, 8)}`;
-  const marker = `zsys-aws-smoke-${randomUUID()}`;
+  const root = await mkdtemp(join(tmpdir(), "relkit-aws-integration-"));
+  const stackName = `relkit-nightly-${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const marker = `relkit-aws-smoke-${randomUUID()}`;
   const appId = graph.appId ?? "commerce-api";
   const initialPlan = planFor(graph, config.image);
   let active: PulumiWorkspaceHandle | undefined;
@@ -97,15 +98,15 @@ awsTest("creates, smokes, updates, and independently cleans an ephemeral AWS sta
 
 function integrationConfig(): IntegrationConfig {
   const region =
-    process.env.ZSYS_AWS_INTEGRATION_REGION ??
+    process.env.RELKIT_AWS_INTEGRATION_REGION ??
     process.env.AWS_REGION ??
     process.env.AWS_DEFAULT_REGION;
-  const image = process.env.ZSYS_AWS_INTEGRATION_IMAGE;
+  const image = process.env.RELKIT_AWS_INTEGRATION_IMAGE;
   if (region === undefined || image === undefined || image.trim() === "")
     throw new Error(
-      "ZSYS_AWS_INTEGRATION_REGION/AWS_REGION and ZSYS_AWS_INTEGRATION_IMAGE are required.",
+      "RELKIT_AWS_INTEGRATION_REGION/AWS_REGION and RELKIT_AWS_INTEGRATION_IMAGE are required.",
     );
-  const backendValue = process.env.ZSYS_AWS_INTEGRATION_BACKEND ?? "cloud";
+  const backendValue = process.env.RELKIT_AWS_INTEGRATION_BACKEND ?? "cloud";
   const backend =
     backendValue === "cloud"
       ? ({ kind: "cloud" } as const)
@@ -114,8 +115,8 @@ function integrationConfig(): IntegrationConfig {
     region,
     image,
     backend,
-    operationTimeoutMs: duration("ZSYS_AWS_INTEGRATION_TIMEOUT_MS", 900_000),
-    cleanupTimeoutMs: duration("ZSYS_AWS_CLEANUP_TIMEOUT_MS", 600_000),
+    operationTimeoutMs: duration("RELKIT_AWS_INTEGRATION_TIMEOUT_MS", 900_000),
+    cleanupTimeoutMs: duration("RELKIT_AWS_CLEANUP_TIMEOUT_MS", 600_000),
   };
 }
 
@@ -124,8 +125,8 @@ function planFor(value: ApplicationGraph, image: string): DeploymentPlan {
     image: {
       name: image,
       health: {
-        livenessPath: "/_zsys/v1/health/live",
-        readinessPath: "/_zsys/v1/health/ready",
+        livenessPath: "/_relkit/v1/health/live",
+        readinessPath: "/_relkit/v1/health/ready",
         port: 3000,
       },
     },
@@ -153,10 +154,10 @@ async function openStack(
         region: config.region,
         forceDelete: true,
         forceDestroy: true,
-        tags: { "zsys-smoke": marker },
+        tags: { "relkit-smoke": marker },
         serviceEnvironment: ({ jobs, events, buckets, caches }) => ({
           NODE_ENV: "production",
-          ZSYS_ENV: "production",
+          RELKIT_ENV: "production",
           AWS_REGION: config.region,
           ASSETS_BUCKET_NAME: buckets.buckets[0]!.name,
           JOB_QUEUE_URL: jobs.queues[0]!.worker.queueUrl,
@@ -228,14 +229,14 @@ async function waitForObject(
       await delay(5_000);
     }
   }
-  throw new Error("AWS integration receipt was not written through the ZSys job worker.");
+  throw new Error("AWS integration receipt was not written through the RelKit job worker.");
 }
 
 async function waitForReadiness(endpoint: string, timeoutMs: number): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(`${endpoint}/_zsys/v1/health/ready`, {
+      const response = await fetch(`${endpoint}/_relkit/v1/health/ready`, {
         signal: AbortSignal.timeout(10_000),
       });
       if (response.ok) return;
@@ -279,7 +280,7 @@ async function waitForCleanup(
         "--region",
         config.region,
         "--tag-filters",
-        `Key=managed-by,Values=zsys`,
+        `Key=managed-by,Values=relkit`,
         `Key=app,Values=${appId}`,
         `Key=stack,Values=${stackName}`,
         "--output",
@@ -389,7 +390,7 @@ function pulumiUpdateOptions(timeoutMs: number) {
 }
 
 function pulumiOptions(timeoutMs: number) {
-  const logPath = process.env.ZSYS_AWS_PULUMI_DEBUG_LOG;
+  const logPath = process.env.RELKIT_AWS_PULUMI_DEBUG_LOG;
   const base = { signal: AbortSignal.timeout(timeoutMs) };
   if (logPath === undefined || logPath.trim() === "") return base;
   const log = (stream: string, line: string): void => {

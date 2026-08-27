@@ -1,11 +1,11 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import {
   abortablePromise,
   dispatchInvocation,
   getDescriptorIdentity,
   type InvocationTarget,
-} from "@zsys/invocation";
-import { validate, type InferInput, type InferOutput, type StandardIssue } from "@zsys/schema";
+} from "@relkit/invocation";
+import { validate, type InferInput, type InferOutput, type StandardIssue } from "@relkit/schema";
 import type { FunctionRefAny } from "./types.js";
 import type {
   FunctionToolApprovalRequest,
@@ -24,7 +24,7 @@ type FunctionToolRuntimeMetadata = Pick<
 };
 
 export class FunctionToolArgumentValidationError extends TypeError {
-  readonly code = "ZSYS_TOOL_ARGUMENT_VALIDATION" as const;
+  readonly code = "RELKIT_TOOL_ARGUMENT_VALIDATION" as const;
   readonly issues: readonly StandardIssue[];
 
   constructor(issues: readonly StandardIssue[]) {
@@ -44,7 +44,7 @@ export class FunctionToolOperationCancelledError extends Error {
 }
 
 export class FunctionToolApprovalRequiredError extends Error {
-  readonly code = "ZSYS_APPROVAL_REQUIRED" as const;
+  readonly code = "RELKIT_APPROVAL_REQUIRED" as const;
 
   constructor(readonly approval: FunctionToolApprovalRequest) {
     super(`Approval required for tool "${approval.toolId}"`);
@@ -53,7 +53,7 @@ export class FunctionToolApprovalRequiredError extends Error {
 }
 
 export class FunctionToolApprovalDeniedError extends Error {
-  readonly code = "ZSYS_APPROVAL_DENIED" as const;
+  readonly code = "RELKIT_APPROVAL_DENIED" as const;
 
   constructor(readonly approval: FunctionToolApprovalRequest) {
     super(`Approval denied for tool "${approval.toolId}"`);

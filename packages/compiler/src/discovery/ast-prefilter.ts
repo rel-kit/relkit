@@ -1,10 +1,10 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import { DEFAULT_TOOLING_CONFIG } from "../config-loader-types.js";
 import { matchesExclude, scanSource } from "./ast-prefilter-utils.js";
 import type { SourceFacts } from "./source-facts.js";
 
 export type AstCandidateIndicator =
-  "zsys-import" | "factory" | "default-export" | "brand-access" | "re-export";
+  "relkit-import" | "factory" | "default-export" | "brand-access" | "re-export";
 
 export interface AstSourceModule {
   readonly fileName: string;

@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import type { Context, Hono } from "hono";
 import { bucketObjects, bucketPreview, cacheKeys, cacheValue } from "./resource-explorer.js";
 import { json, required, requiredParam } from "./router-utils.js";

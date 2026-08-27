@@ -1,5 +1,5 @@
-import { defineEvent } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineEvent } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const orderCreated = defineEvent({
   id: "orders.created",

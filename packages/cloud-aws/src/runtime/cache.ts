@@ -1,2 +1,2 @@
-export { createRedisCacheProvider } from "@zsys/providers-standard";
-export type { RedisCacheOptions, RedisCacheProvider } from "@zsys/providers-standard";
+export { createRedisCacheProvider } from "@relkit/providers-standard";
+export type { RedisCacheOptions, RedisCacheProvider } from "@relkit/providers-standard";

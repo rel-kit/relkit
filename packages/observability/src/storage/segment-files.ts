@@ -12,7 +12,7 @@ import {
   type FileHandle,
 } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import {
   OBSERVABILITY_MODEL_VERSION,
   type ObservabilityRecord,
@@ -59,7 +59,7 @@ export async function ensureSegmentRoot(requestedRoot?: string): Promise<string>
   if (requestedRoot !== undefined && requestedRoot.trim() === "") {
     throw new TypeError("Observability root must not be empty");
   }
-  const root = resolve(requestedRoot ?? join(process.cwd(), ".zsys", "observability"));
+  const root = resolve(requestedRoot ?? join(process.cwd(), ".relkit", "observability"));
   if (root === resolve("/")) throw new TypeError("Observability root is too broad");
   await ensureDirectory(root);
   return root;
@@ -108,7 +108,7 @@ export async function appendLine(handle: FileHandle, line: string): Promise<void
 }
 
 export async function writeAtomic(path: string, value: string): Promise<void> {
-  const temporary = join(dirname(path), `.zsys-repair-${randomUUID()}.tmp`);
+  const temporary = join(dirname(path), `.relkit-repair-${randomUUID()}.tmp`);
   let handle: FileHandle | undefined;
   try {
     handle = await open(temporary, "wx", 0o600);
@@ -166,7 +166,7 @@ async function repairFile(path: string, directory: SegmentDirectory, policy?: Re
 }
 
 async function quarantine(path: string): Promise<void> {
-  const root = join(dirname(dirname(dirname(path))), ".zsys-quarantine");
+  const root = join(dirname(dirname(dirname(path))), ".relkit-quarantine");
   await ensureDirectory(root);
   await writeFile(
     join(root, `${basename(path)}.${randomUUID()}.bad`),

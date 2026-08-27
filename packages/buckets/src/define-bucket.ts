@@ -5,7 +5,7 @@ import {
   normalizeId,
   type DescriptorBase,
   type DescriptorMetadata,
-} from "@zsys/contracts";
+} from "@relkit/contracts";
 
 export type BucketVisibility = "private" | "public";
 
@@ -31,7 +31,7 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
  *
  * @example
  * ```ts
- * import { defineBucket } from "@zsys/buckets"
+ * import { defineBucket } from "@relkit/buckets"
  *
  * const assets = defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 })
  * void assets

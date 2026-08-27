@@ -1,4 +1,4 @@
-# ZSys Project Brief
+# RelKit Project Brief
 
 **Date:** 2026-08-06
 **Status:** Working brief
@@ -6,7 +6,7 @@
 
 ## Summary
 
-ZSys is a proposed filesystem-driven application compiler for building production full-stack applications from a consistent, high-level project structure.
+RelKit is a proposed filesystem-driven application compiler for building production full-stack applications from a consistent, high-level project structure.
 
 Its central model is:
 
@@ -14,11 +14,11 @@ Its central model is:
 
 The project should reduce repeated setup and integration work while preserving ordinary, editable TypeScript output. It should help teams build APIs, database models, authentication, organizations, teams, user interfaces, documentation, email, caching, workflows, AI agents, observability, and deployable infrastructure through one coherent system.
 
-ZSys should compile into established tools rather than replace them without a strong reason.
+RelKit should compile into established tools rather than replace them without a strong reason.
 
 ## Product goals
 
-ZSys should provide:
+RelKit should provide:
 
 - A predictable project structure similar in clarity to Next.js file conventions.
 - Contract-first APIs and generated typed clients.
@@ -59,8 +59,8 @@ ZSys should provide:
 Modules are the main ownership boundary. This keeps one business capability together instead of scattering it across global folders.
 
 ```text
-zsys-app/
-├─ zsys.config.ts
+relkit-app/
+├─ relkit.config.ts
 ├─ apps/
 │  ├─ api/
 │  ├─ web/
@@ -148,13 +148,13 @@ The compiler should produce ordinary framework projects and generated artifacts,
 
 ## Generation and detachment
 
-ZSys should support three ownership modes:
+RelKit should support three ownership modes:
 
 1. **Managed:** generated files are compiler-owned and reproducible.
 2. **Hybrid:** business logic is developer-owned while registries, contracts, wiring, docs, and infrastructure output remain generated. This should be the default.
 3. **Detached:** selected modules or applications are materialized as ordinary Hono, Next.js, Drizzle, oRPC, and infrastructure code and are no longer compiler-owned.
 
-Detachment should preserve integration through explicit external-module interfaces. ZSys should not promise unrestricted bidirectional synchronization after arbitrary edits to detached generated code.
+Detachment should preserve integration through explicit external-module interfaces. RelKit should not promise unrestricted bidirectional synchronization after arbitrary edits to detached generated code.
 
 ## Developer and agent experience
 
@@ -179,7 +179,7 @@ The application declares logical capabilities, while each stage binds them to pr
 
 The initial deployment target should be SST because it fits the TypeScript ecosystem and can provide an integrated development and deployment experience. Pulumi should be supported as a lower-level and broader provider target. Alchemy can be evaluated for selected targets as its production characteristics mature.
 
-ZSys should not create its own general cloud state engine. Planning, state, replacements, imports, and resource lifecycle should be delegated to established infrastructure engines.
+RelKit should not create its own general cloud state engine. Planning, state, replacements, imports, and resource lifecycle should be delegated to established infrastructure engines.
 
 ## MVP boundary
 
@@ -203,7 +203,7 @@ Native mobile and desktop renderers, multiple workflow engines, multiple infrast
 
 ## Current differentiator
 
-ZSys should not be positioned as another scaffold generator. Its differentiator is a continuously understood, typed full-stack application graph that can be rendered into familiar TypeScript frameworks, queried by humans and agents, validated before deployment, and detached without losing developer ownership.
+RelKit should not be positioned as another scaffold generator. Its differentiator is a continuously understood, typed full-stack application graph that can be rendered into familiar TypeScript frameworks, queried by humans and agents, validated before deployment, and detached without losing developer ownership.
 
 ## Open questions
 

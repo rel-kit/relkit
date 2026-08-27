@@ -26,7 +26,7 @@
       "providerBindings": [],
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 4
       }
     },
@@ -39,7 +39,7 @@
       "sensitive": false,
       "source": {
         "column": 16,
-        "file": "zsys.config.ts",
+        "file": "relkit.config.ts",
         "line": 4
       },
       "type": "port"
@@ -56,7 +56,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "kind": "function",
@@ -66,7 +68,9 @@
             "type": "string"
           }
         },
-        "required": ["message"],
+        "required": [
+          "message"
+        ],
         "type": "object"
       },
       "source": {
@@ -102,7 +106,9 @@
                   "type": "string"
                 }
               },
-              "required": ["message"],
+              "required": [
+                "message"
+              ],
               "type": "object"
             },
             "status": 200
@@ -114,7 +120,9 @@
             "status": 422
           }
         ],
-        "runtimePaths": ["/hello/:name"],
+        "runtimePaths": [
+          "/hello/:name"
+        ],
         "timeoutMs": null,
         "transforms": []
       },

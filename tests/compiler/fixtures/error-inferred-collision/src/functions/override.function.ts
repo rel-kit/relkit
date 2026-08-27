@@ -1,5 +1,5 @@
-import { defineFunction } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 export default defineFunction({
   id: "orders.get-order",

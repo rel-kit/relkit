@@ -10,7 +10,7 @@ import {
 import type { ExtractedDescriptor } from "../../packages/compiler/src/discovery/extract.ts";
 
 const objectSchema = (properties: Record<string, unknown> = {}) => ({
-  $zsys: "schema",
+  $relkit: "schema",
   jsonSchema: { type: "object", properties, required: Object.keys(properties) },
 });
 

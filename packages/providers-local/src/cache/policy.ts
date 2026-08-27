@@ -2,7 +2,7 @@ import {
   CacheOperationCancelledError,
   CacheOperationTimeoutError,
   type CacheOperationContext,
-} from "@zsys/cache";
+} from "@relkit/cache";
 import {
   LocalCachePolicyError,
   LocalCacheStateError,

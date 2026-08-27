@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { clean } from "./normalize-graph-utils.js";
 import {
   environmentMetadata,
@@ -177,7 +177,7 @@ function hookNodes(descriptor: NormalizedDescriptor): GraphNode[] {
   });
 }
 function isExecutableMarker(value: unknown): boolean {
-  return typeof value === "function" || (isRecord(value) && value.$zsys === "function");
+  return typeof value === "function" || (isRecord(value) && value.$relkit === "function");
 }
 function schema(
   work: NormalizationWork,

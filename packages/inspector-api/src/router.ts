@@ -1,5 +1,5 @@
-import { API_BASE_PATH, type MaybePromise } from "@zsys/contracts";
-import type { ObservabilityQuery, ObservabilityStream } from "@zsys/observability";
+import { API_BASE_PATH, type MaybePromise } from "@relkit/contracts";
+import type { ObservabilityQuery, ObservabilityStream } from "@relkit/observability";
 import { graphDetail, graphList, graphSnapshot, sourceDetail, GRAPH_COLLECTIONS } from "./graph.js";
 import { environmentMetadata } from "./environment.js";
 import { diagnostics } from "./diagnostics.js";
@@ -82,7 +82,7 @@ export function installInspectorEndpoints(app: Hono, options: InspectorApiOption
     ) =>
     async (context: Context): Promise<Response> => {
       if (!(await authorized(context.req.raw, options)))
-        return json({ error: "ZSYS_INSPECTOR_UNAUTHORIZED" }, 401, {
+        return json({ error: "RELKIT_INSPECTOR_UNAUTHORIZED" }, 401, {
           "www-authenticate": "Bearer",
         });
       try {

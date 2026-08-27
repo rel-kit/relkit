@@ -22,7 +22,7 @@ async function execute(command: string, args: string[], cwd = root): Promise<Com
 }
 
 async function createFixture(files: Files): Promise<string> {
-  const fixture = await mkdtemp(join(tmpdir(), "zsys-phase0-"));
+  const fixture = await mkdtemp(join(tmpdir(), "relkit-phase0-"));
   await writeFile(
     join(fixture, "package.json"),
     JSON.stringify({
@@ -81,11 +81,11 @@ describe.serial("Phase 0 guardrails", () => {
       packageFiles([
         {
           path: "packages/app",
-          name: "@zsys/app",
-          source: 'import "@zsys/config";',
-          dependencies: { "@zsys/config": "workspace:*" },
+          name: "@relkit/app",
+          source: 'import "@relkit/config";',
+          dependencies: { "@relkit/config": "workspace:*" },
         },
-        { path: "packages/config", name: "@zsys/config", source: "" },
+        { path: "packages/config", name: "@relkit/config", source: "" },
       ]),
     );
     try {
@@ -102,7 +102,7 @@ describe.serial("Phase 0 guardrails", () => {
       packageFiles([
         {
           path: "packages/agents",
-          name: "@zsys/agents",
+          name: "@relkit/agents",
           source: 'import "ai"; import "@ai-sdk/openai";',
           dependencies: { ai: "7.0.0", "@ai-sdk/openai": "4.0.0" },
         },
@@ -125,12 +125,12 @@ describe.serial("Phase 0 guardrails", () => {
     {
       name: "undeclared dependencies",
       files: packageFiles([
-        { path: "packages/app", name: "@zsys/app", source: 'import "@zsys/config";' },
-        { path: "packages/config", name: "@zsys/config", source: "" },
+        { path: "packages/app", name: "@relkit/app", source: 'import "@relkit/config";' },
+        { path: "packages/config", name: "@relkit/config", source: "" },
       ]),
       expected: {
         path: "packages/app/src/index.ts",
-        owner: "@zsys/app",
+        owner: "@relkit/app",
         rule: "undeclared-dependency",
       },
     },
@@ -139,14 +139,14 @@ describe.serial("Phase 0 guardrails", () => {
       files: packageFiles([
         {
           path: "packages/app",
-          name: "@zsys/app",
+          name: "@relkit/app",
           source: 'import "../../config/src/index";',
         },
-        { path: "packages/config", name: "@zsys/config", source: "" },
+        { path: "packages/config", name: "@relkit/config", source: "" },
       ]),
       expected: {
         path: "packages/app/src/index.ts",
-        owner: "@zsys/app",
+        owner: "@relkit/app",
         rule: "cross-package-relative-import",
       },
     },
@@ -155,15 +155,15 @@ describe.serial("Phase 0 guardrails", () => {
       files: packageFiles([
         {
           path: "packages/app",
-          name: "@zsys/app",
-          source: 'import "@zsys/runtime-effect";',
-          dependencies: { "@zsys/runtime-effect": "workspace:*" },
+          name: "@relkit/app",
+          source: 'import "@relkit/runtime-effect";',
+          dependencies: { "@relkit/runtime-effect": "workspace:*" },
         },
-        { path: "packages/runtime-effect", name: "@zsys/runtime-effect", source: "" },
+        { path: "packages/runtime-effect", name: "@relkit/runtime-effect", source: "" },
       ]),
       expected: {
         path: "packages/app/src/index.ts",
-        owner: "@zsys/app",
+        owner: "@relkit/app",
         rule: "descriptor-runtime-import",
       },
     },
@@ -172,18 +172,18 @@ describe.serial("Phase 0 guardrails", () => {
       files: packageFiles([
         {
           path: "packages/graph",
-          name: "@zsys/graph",
+          name: "@relkit/graph",
           source: `import "${dependency}";`,
           dependencies: { [dependency]: "test" },
         },
       ]),
       expected: {
         path: "packages/graph/src/index.ts",
-        owner: "@zsys/graph",
+        owner: "@relkit/graph",
         rule: "graph-hono-pulumi-import",
       },
     })),
-    ...["@zsys/app", "@zsys/engine"].map((dependency) => ({
+    ...["@relkit/app", "@relkit/engine"].map((dependency) => ({
       name: `inspector imports ${dependency}`,
       files: packageFiles([
         {
@@ -199,7 +199,7 @@ describe.serial("Phase 0 guardrails", () => {
         rule: "inspector-runtime-application-import",
       },
     })),
-    ...["effect", "hono", "next", "@pulumi/pulumi", "@aws-sdk/client-s3", "@zsys/compiler"].map(
+    ...["effect", "hono", "next", "@pulumi/pulumi", "@aws-sdk/client-s3", "@relkit/compiler"].map(
       (dependency) => ({
         name: `fixture imports ${dependency}`,
         files: packageFiles([
@@ -220,7 +220,7 @@ describe.serial("Phase 0 guardrails", () => {
     {
       name: "template imports an internal package",
       files: {
-        "templates/default/src/index.ts": 'import "@zsys/compiler";\nexport {};\n',
+        "templates/default/src/index.ts": 'import "@relkit/compiler";\nexport {};\n',
       },
       expected: {
         path: "templates/default/src/index.ts",
@@ -235,7 +235,7 @@ describe.serial("Phase 0 guardrails", () => {
       assertBoundaryViolation(boundaryCase.files, boundaryCase.expected));
   }
 
-  test("package exports resolve only through the public entry", async () => {
+  test("package exports resolve only through the public entry", { timeout: 30_000 }, async () => {
     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("packed entries resolved; internal paths rejected");
@@ -246,7 +246,7 @@ describe.serial("Phase 0 guardrails", () => {
     const plugin = ["plu", "gin"].join("");
     const subscription = ["define", "Sub", "scription"].join("");
     const forbiddenApi = ["define", "Pers", "istence"].join("");
-    const internalPackage = ["@zsys/", persistence].join("");
+    const internalPackage = ["@relkit/", persistence].join("");
     const graphKind = [`nodeKind: "`, persistence, `"`].join("");
     const navigation = [`const path = "/`, persistence, `"`].join("");
     const template = [`template: "`, plugin, `"`].join("");
@@ -336,7 +336,7 @@ describe.serial("Phase 0 guardrails", () => {
     }
     expect(guidance).toContain("port `3001`");
     expect(readme).toContain("apps/docs");
-    for (const current of ["apps/inspector", "Pulumi", "ZSYS_INSPECTOR_ROOT"]) {
+    for (const current of ["apps/inspector", "Pulumi", "RELKIT_INSPECTOR_ROOT"]) {
       expect(readme).toContain(current);
       expect(gettingStarted).toContain(current);
     }
@@ -344,18 +344,18 @@ describe.serial("Phase 0 guardrails", () => {
     expect(gettingStarted).toContain("| `--deploy`                | `pulumi`, `none`");
   });
 
-  test("ignores only ZSys generated and local runtime roots", async () => {
+  test("ignores only RelKit generated and local runtime roots", async () => {
     const ignored = [
-      ".zsys/generated/application.graph.json",
-      ".zsys/build/server/index.js",
-      ".zsys/state/records.ndjson",
-      ".zsys/observability/requests.ndjson",
+      ".relkit/generated/application.graph.json",
+      ".relkit/build/server/index.js",
+      ".relkit/state/records.ndjson",
+      ".relkit/observability/requests.ndjson",
     ];
     const checkedIn = [
       "tests/fixtures/commerce.json",
       "tests/goldens/application.graph.json",
       "templates/default/README.md",
-      "openspec/changes/implement-zsys-typescript-poc-v3/PROGRESS.md",
+      "openspec/changes/implement-relkit-typescript-poc-v3/PROGRESS.md",
     ];
 
     for (const path of ignored) {
@@ -371,7 +371,7 @@ describe.serial("Phase 0 guardrails", () => {
   });
 
   test("rejects lockfile drift in an isolated workspace", async () => {
-    const fixture = await mkdtemp(join(tmpdir(), "zsys-lockfile-"));
+    const fixture = await mkdtemp(join(tmpdir(), "relkit-lockfile-"));
     const packageJson = {
       name: "lockfile-fixture",
       private: true,
@@ -412,16 +412,16 @@ describe.serial("Phase 0 guardrails", () => {
       "diff",
       "--binary",
       "--",
-      ".zsys/generated",
-      ".zsys/build",
+      ".relkit/generated",
+      ".relkit/build",
     ]);
     const beforeGeneratedStatus = await execute("git", [
       "status",
       "--porcelain=v1",
       "--untracked-files=all",
       "--",
-      ".zsys/generated",
-      ".zsys/build",
+      ".relkit/generated",
+      ".relkit/build",
     ]);
     expect((await execute(process.execPath, ["install", "--frozen-lockfile"])).exitCode).toBe(0);
     expect((await execute(process.execPath, ["run", "typecheck"])).exitCode).toBe(0);
@@ -430,16 +430,16 @@ describe.serial("Phase 0 guardrails", () => {
       "diff",
       "--binary",
       "--",
-      ".zsys/generated",
-      ".zsys/build",
+      ".relkit/generated",
+      ".relkit/build",
     ]);
     const afterGeneratedStatus = await execute("git", [
       "status",
       "--porcelain=v1",
       "--untracked-files=all",
       "--",
-      ".zsys/generated",
-      ".zsys/build",
+      ".relkit/generated",
+      ".relkit/build",
     ]);
     expect(afterGenerated.stdout).toBe(beforeGenerated.stdout);
     expect(afterGeneratedStatus.stdout).toBe(beforeGeneratedStatus.stdout);

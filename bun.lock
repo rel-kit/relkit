@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "zsys",
+      "name": "relkit",
       "devDependencies": {
         "@playwright/test": "1.62.1",
         "@types/bun": "1.3.10",
@@ -17,9 +17,9 @@
       },
     },
     "apps/docs": {
-      "name": "@zsys/docs",
+      "name": "@relkit/docs",
       "dependencies": {
-        "@zsys/cli": "workspace:*",
+        "@relkit/cli": "workspace:*",
         "fumadocs-core": "16.14.5",
         "fumadocs-mdx": "15.3.0",
         "fumadocs-ui": "16.14.5",
@@ -40,7 +40,7 @@
       },
     },
     "apps/inspector": {
-      "name": "@zsys/inspector",
+      "name": "@relkit/inspector",
       "dependencies": {
         "@xyflow/react": "12.11.3",
         "class-variance-authority": "0.7.1",
@@ -58,129 +58,138 @@
       },
     },
     "examples/auth-drizzle": {
-      "name": "@zsys/example-auth-drizzle",
+      "name": "@relkit/example-auth-drizzle",
       "dependencies": {
-        "@zsys/app": "workspace:*",
-        "@zsys/better-auth": "workspace:*",
-        "@zsys/client": "workspace:*",
-        "@zsys/drizzle": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/better-auth": "workspace:*",
+        "@relkit/client": "workspace:*",
+        "@relkit/drizzle": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "better-auth": "1.7.1",
         "drizzle-orm": "1.0.0-rc.4",
       },
       "devDependencies": {
+        "@relkit/cli": "workspace:*",
         "@types/bun": "1.3.10",
-        "@zsys/cli": "workspace:*",
         "typescript": "5.9.2",
       },
     },
     "examples/commerce": {
-      "name": "@zsys/example-commerce",
+      "name": "@relkit/example-commerce",
       "dependencies": {
-        "@zsys/app": "workspace:*",
-        "@zsys/providers-standard": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/better-auth": "workspace:*",
+        "@relkit/client": "workspace:*",
+        "@relkit/drizzle": "workspace:*",
+        "@relkit/providers-standard": "workspace:*",
+        "@relkit/schema": "workspace:*",
+        "better-auth": "1.7.1",
+        "drizzle-orm": "1.0.0-rc.4",
       },
       "devDependencies": {
+        "@relkit/cli": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/testing": "workspace:*",
         "@types/bun": "1.3.10",
-        "@zsys/cli": "workspace:*",
-        "@zsys/testing": "workspace:*",
         "typescript": "5.9.2",
       },
     },
     "examples/data-model": {
-      "name": "@zsys/example-data-model",
+      "name": "@relkit/example-data-model",
       "dependencies": {
-        "@zsys/app": "workspace:*",
-        "@zsys/drizzle": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/drizzle": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "drizzle-orm": "1.0.0-rc.4",
       },
       "devDependencies": {
+        "@relkit/cli": "workspace:*",
         "@types/bun": "1.3.10",
-        "@zsys/cli": "workspace:*",
         "typescript": "5.9.2",
       },
     },
     "packages/agents": {
-      "name": "@zsys/agents",
+      "name": "@relkit/agents",
       "version": "0.0.0",
       "dependencies": {
         "@ai-sdk/anthropic": "4.0.0",
         "@ai-sdk/openai": "4.0.0",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/schema": "workspace:*",
-        "@zsys/tools": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/schema": "workspace:*",
+        "@relkit/tools": "workspace:*",
         "ai": "7.0.0",
       },
     },
     "packages/app": {
-      "name": "@zsys/app",
+      "name": "@relkit/app",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/agents": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/config": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/events": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/routes": "workspace:*",
-        "@zsys/services": "workspace:*",
-        "@zsys/tools": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/config": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/routes": "workspace:*",
+        "@relkit/services": "workspace:*",
+        "@relkit/tools": "workspace:*",
       },
     },
     "packages/better-auth": {
-      "name": "@zsys/better-auth",
+      "name": "@relkit/better-auth",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/routes": "workspace:*",
+        "@relkit/routes": "workspace:*",
         "better-auth": "1.7.1",
       },
     },
     "packages/buckets": {
-      "name": "@zsys/buckets",
+      "name": "@relkit/buckets",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
+        "@relkit/contracts": "workspace:*",
       },
     },
     "packages/cache": {
-      "name": "@zsys/cache",
+      "name": "@relkit/cache",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
     "packages/cli": {
-      "name": "@zsys/cli",
+      "name": "@relkit/cli",
       "version": "0.0.0",
       "bin": {
-        "zsys": "./dist/index.js",
+        "relkit": "./dist/index.js",
       },
       "dependencies": {
-        "@zsys/client-generator": "workspace:*",
-        "@zsys/cloud-aws": "workspace:*",
-        "@zsys/compiler": "workspace:*",
-        "@zsys/config": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/deploy": "workspace:*",
-        "@zsys/deploy-pulumi": "workspace:*",
-        "@zsys/diagnostics": "workspace:*",
-        "@zsys/engine": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/inspector-api": "workspace:*",
-        "@zsys/observability": "workspace:*",
-        "@zsys/providers-standard": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
-        "@zsys/runtime-hono": "workspace:*",
-        "@zsys/supervisor": "workspace:*",
-        "create-zsys": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/client-generator": "workspace:*",
+        "@relkit/cloud-aws": "workspace:*",
+        "@relkit/compiler": "workspace:*",
+        "@relkit/config": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/deploy": "workspace:*",
+        "@relkit/deploy-pulumi": "workspace:*",
+        "@relkit/diagnostics": "workspace:*",
+        "@relkit/engine": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/inspector-api": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/providers-standard": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
+        "@relkit/runtime-hono": "workspace:*",
+        "@relkit/supervisor": "workspace:*",
+        "create-relkit": "workspace:*",
         "effect": "4.0.0-beta.107",
         "next": "16.3.0",
         "react": "19.2.8",
@@ -191,7 +200,7 @@
       },
     },
     "packages/client": {
-      "name": "@zsys/client",
+      "name": "@relkit/client",
       "version": "0.0.0",
       "dependencies": {
         "@orpc/client": "2.0.0-beta.31",
@@ -203,260 +212,260 @@
       },
     },
     "packages/client-generator": {
-      "name": "@zsys/client-generator",
+      "name": "@relkit/client-generator",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/graph": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/graph": "workspace:*",
       },
     },
     "packages/cloud-aws": {
-      "name": "@zsys/cloud-aws",
+      "name": "@relkit/cloud-aws",
       "version": "0.0.0",
       "dependencies": {
         "@pulumi/aws": "7.42.0",
         "@pulumi/awsx": "3.8.0",
         "@pulumi/pulumi": "3.258.0",
-        "@zsys/agents": "workspace:*",
-        "@zsys/app": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/engine": "workspace:*",
-        "@zsys/events": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/observability": "workspace:*",
-        "@zsys/providers-standard": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/engine": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/providers-standard": "workspace:*",
       },
     },
     "packages/compiler": {
-      "name": "@zsys/compiler",
+      "name": "@relkit/compiler",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/client-generator": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/diagnostics": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/openapi": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/client-generator": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/diagnostics": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/openapi": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "typescript": "5.9.2",
       },
     },
     "packages/config": {
-      "name": "@zsys/config",
+      "name": "@relkit/config",
       "version": "0.0.0",
       "dependencies": {
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/contracts": {
-      "name": "@zsys/contracts",
+      "name": "@relkit/contracts",
       "version": "0.0.0",
     },
-    "packages/create-zsys": {
-      "name": "create-zsys",
+    "packages/create-relkit": {
+      "name": "create-relkit",
       "version": "0.0.0",
       "bin": {
-        "create-zsys": "./dist/index.js",
+        "create-relkit": "./dist/index.js",
       },
     },
     "packages/deploy": {
-      "name": "@zsys/deploy",
+      "name": "@relkit/deploy",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/graph": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/graph": "workspace:*",
       },
     },
     "packages/deploy-pulumi": {
-      "name": "@zsys/deploy-pulumi",
+      "name": "@relkit/deploy-pulumi",
       "version": "0.0.0",
       "dependencies": {
         "@pulumi/aws": "7.42.0",
         "@pulumi/pulumi": "3.258.0",
-        "@zsys/cloud-aws": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/deploy": "workspace:*",
-        "@zsys/observability": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
+        "@relkit/cloud-aws": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/deploy": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/diagnostics": {
-      "name": "@zsys/diagnostics",
+      "name": "@relkit/diagnostics",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
+        "@relkit/contracts": "workspace:*",
       },
     },
     "packages/drizzle": {
-      "name": "@zsys/drizzle",
+      "name": "@relkit/drizzle",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/invocation": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/invocation": "workspace:*",
         "drizzle-orm": "1.0.0-rc.4",
         "zod": "4.4.3",
       },
     },
     "packages/engine": {
-      "name": "@zsys/engine",
+      "name": "@relkit/engine",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/app": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/events": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/observability": "workspace:*",
-        "@zsys/providers-local": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/providers-local": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/events": {
-      "name": "@zsys/events",
+      "name": "@relkit/events",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
     "packages/functions": {
-      "name": "@zsys/functions",
+      "name": "@relkit/functions",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
     "packages/graph": {
-      "name": "@zsys/graph",
+      "name": "@relkit/graph",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
+        "@relkit/contracts": "workspace:*",
       },
     },
     "packages/inspector-api": {
-      "name": "@zsys/inspector-api",
+      "name": "@relkit/inspector-api",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/observability": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/observability": "workspace:*",
         "hono": "4.13.2",
       },
     },
     "packages/invocation": {
-      "name": "@zsys/invocation",
+      "name": "@relkit/invocation",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/jobs": {
-      "name": "@zsys/jobs",
+      "name": "@relkit/jobs",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
     "packages/observability": {
-      "name": "@zsys/observability",
+      "name": "@relkit/observability",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
+        "@relkit/contracts": "workspace:*",
       },
     },
     "packages/openapi": {
-      "name": "@zsys/openapi",
+      "name": "@relkit/openapi",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/graph": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/graph": "workspace:*",
       },
     },
     "packages/providers-local": {
-      "name": "@zsys/providers-local",
+      "name": "@relkit/providers-local",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/agents": "workspace:*",
-        "@zsys/app": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/events": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
         "cron-parser": "5.10.0",
       },
     },
     "packages/providers-standard": {
-      "name": "@zsys/providers-standard",
+      "name": "@relkit/providers-standard",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/agents": "workspace:*",
-        "@zsys/app": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/engine": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/app": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/engine": "workspace:*",
       },
     },
     "packages/routes": {
-      "name": "@zsys/routes",
+      "name": "@relkit/routes",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "hono": "4.13.2",
       },
     },
     "packages/runtime-effect": {
-      "name": "@zsys/runtime-effect",
+      "name": "@relkit/runtime-effect",
       "version": "0.0.0",
       "dependencies": {
         "@effect/platform-bun": "4.0.0-beta.107",
         "@effect/platform-node-shared": "4.0.0-beta.107",
-        "@zsys/config": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/observability": "workspace:*",
+        "@relkit/config": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/observability": "workspace:*",
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/runtime-hono": {
-      "name": "@zsys/runtime-hono",
+      "name": "@relkit/runtime-hono",
       "version": "0.0.0",
       "dependencies": {
         "@modelcontextprotocol/server": "2.0.0",
         "@orpc/contract": "2.0.0-beta.31",
         "@orpc/server": "2.0.0-beta.31",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/engine": "workspace:*",
+        "@relkit/graph": "workspace:*",
+        "@relkit/observability": "workspace:*",
+        "@relkit/openapi": "workspace:*",
+        "@relkit/routes": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
+        "@relkit/schema": "workspace:*",
         "@scalar/hono-api-reference": "0.11.11",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/engine": "workspace:*",
-        "@zsys/graph": "workspace:*",
-        "@zsys/observability": "workspace:*",
-        "@zsys/openapi": "workspace:*",
-        "@zsys/routes": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
-        "@zsys/schema": "workspace:*",
         "hono": "4.13.2",
         "hono-rate-limiter": "0.5.3",
       },
@@ -465,57 +474,57 @@
       },
     },
     "packages/schema": {
-      "name": "@zsys/schema",
+      "name": "@relkit/schema",
       "version": "0.0.0",
     },
     "packages/services": {
-      "name": "@zsys/services",
+      "name": "@relkit/services",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
     "packages/supervisor": {
-      "name": "@zsys/supervisor",
+      "name": "@relkit/supervisor",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/observability": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/observability": "workspace:*",
       },
     },
     "packages/testing": {
-      "name": "@zsys/testing",
+      "name": "@relkit/testing",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/agents": "workspace:*",
-        "@zsys/buckets": "workspace:*",
-        "@zsys/cache": "workspace:*",
-        "@zsys/compiler": "workspace:*",
-        "@zsys/config": "workspace:*",
-        "@zsys/contracts": "workspace:*",
-        "@zsys/engine": "workspace:*",
-        "@zsys/events": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/jobs": "workspace:*",
-        "@zsys/providers-local": "workspace:*",
-        "@zsys/runtime-effect": "workspace:*",
-        "@zsys/schema": "workspace:*",
-        "@zsys/tools": "workspace:*",
+        "@relkit/agents": "workspace:*",
+        "@relkit/buckets": "workspace:*",
+        "@relkit/cache": "workspace:*",
+        "@relkit/compiler": "workspace:*",
+        "@relkit/config": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/engine": "workspace:*",
+        "@relkit/events": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/providers-local": "workspace:*",
+        "@relkit/runtime-effect": "workspace:*",
+        "@relkit/schema": "workspace:*",
+        "@relkit/tools": "workspace:*",
         "ai": "7.0.0",
         "effect": "4.0.0-beta.107",
       },
     },
     "packages/tools": {
-      "name": "@zsys/tools",
+      "name": "@relkit/tools",
       "version": "0.0.0",
       "dependencies": {
-        "@zsys/contracts": "workspace:*",
-        "@zsys/functions": "workspace:*",
-        "@zsys/invocation": "workspace:*",
-        "@zsys/schema": "workspace:*",
+        "@relkit/contracts": "workspace:*",
+        "@relkit/functions": "workspace:*",
+        "@relkit/invocation": "workspace:*",
+        "@relkit/schema": "workspace:*",
       },
     },
   },
@@ -1073,6 +1082,86 @@
 
     "@redis/time-series": ["@redis/time-series@6.2.1", "", { "peerDependencies": { "@redis/client": "^6.2.1" } }, "sha512-kiYniph04dJOole+L359B6C9E+jYS2uDP7hca6Onj0xF38ZIpyxARO0Iq0W4ZRn1e8Q6vqW00QFZVSMRA/2Ijw=="],
 
+    "@relkit/agents": ["@relkit/agents@workspace:packages/agents"],
+
+    "@relkit/app": ["@relkit/app@workspace:packages/app"],
+
+    "@relkit/better-auth": ["@relkit/better-auth@workspace:packages/better-auth"],
+
+    "@relkit/buckets": ["@relkit/buckets@workspace:packages/buckets"],
+
+    "@relkit/cache": ["@relkit/cache@workspace:packages/cache"],
+
+    "@relkit/cli": ["@relkit/cli@workspace:packages/cli"],
+
+    "@relkit/client": ["@relkit/client@workspace:packages/client"],
+
+    "@relkit/client-generator": ["@relkit/client-generator@workspace:packages/client-generator"],
+
+    "@relkit/cloud-aws": ["@relkit/cloud-aws@workspace:packages/cloud-aws"],
+
+    "@relkit/compiler": ["@relkit/compiler@workspace:packages/compiler"],
+
+    "@relkit/config": ["@relkit/config@workspace:packages/config"],
+
+    "@relkit/contracts": ["@relkit/contracts@workspace:packages/contracts"],
+
+    "@relkit/deploy": ["@relkit/deploy@workspace:packages/deploy"],
+
+    "@relkit/deploy-pulumi": ["@relkit/deploy-pulumi@workspace:packages/deploy-pulumi"],
+
+    "@relkit/diagnostics": ["@relkit/diagnostics@workspace:packages/diagnostics"],
+
+    "@relkit/docs": ["@relkit/docs@workspace:apps/docs"],
+
+    "@relkit/drizzle": ["@relkit/drizzle@workspace:packages/drizzle"],
+
+    "@relkit/engine": ["@relkit/engine@workspace:packages/engine"],
+
+    "@relkit/events": ["@relkit/events@workspace:packages/events"],
+
+    "@relkit/example-auth-drizzle": ["@relkit/example-auth-drizzle@workspace:examples/auth-drizzle"],
+
+    "@relkit/example-commerce": ["@relkit/example-commerce@workspace:examples/commerce"],
+
+    "@relkit/example-data-model": ["@relkit/example-data-model@workspace:examples/data-model"],
+
+    "@relkit/functions": ["@relkit/functions@workspace:packages/functions"],
+
+    "@relkit/graph": ["@relkit/graph@workspace:packages/graph"],
+
+    "@relkit/inspector": ["@relkit/inspector@workspace:apps/inspector"],
+
+    "@relkit/inspector-api": ["@relkit/inspector-api@workspace:packages/inspector-api"],
+
+    "@relkit/invocation": ["@relkit/invocation@workspace:packages/invocation"],
+
+    "@relkit/jobs": ["@relkit/jobs@workspace:packages/jobs"],
+
+    "@relkit/observability": ["@relkit/observability@workspace:packages/observability"],
+
+    "@relkit/openapi": ["@relkit/openapi@workspace:packages/openapi"],
+
+    "@relkit/providers-local": ["@relkit/providers-local@workspace:packages/providers-local"],
+
+    "@relkit/providers-standard": ["@relkit/providers-standard@workspace:packages/providers-standard"],
+
+    "@relkit/routes": ["@relkit/routes@workspace:packages/routes"],
+
+    "@relkit/runtime-effect": ["@relkit/runtime-effect@workspace:packages/runtime-effect"],
+
+    "@relkit/runtime-hono": ["@relkit/runtime-hono@workspace:packages/runtime-hono"],
+
+    "@relkit/schema": ["@relkit/schema@workspace:packages/schema"],
+
+    "@relkit/services": ["@relkit/services@workspace:packages/services"],
+
+    "@relkit/supervisor": ["@relkit/supervisor@workspace:packages/supervisor"],
+
+    "@relkit/testing": ["@relkit/testing@workspace:packages/testing"],
+
+    "@relkit/tools": ["@relkit/tools@workspace:packages/tools"],
+
     "@scalar/client-side-rendering": ["@scalar/client-side-rendering@0.3.4", "", { "dependencies": { "@scalar/schemas": "0.7.4", "@scalar/types": "0.16.4", "@scalar/validation": "0.6.2" } }, "sha512-kb3B+FGjvAUr2DU0fe9dVKBLwot1TjOO+iHCTmY8r8FUJySmYKGQYCicRzzilOyTjvKspiZBCEr03PWaWW+1gw=="],
 
     "@scalar/helpers": ["@scalar/helpers@0.9.2", "", {}, "sha512-hjyMpMZjTBZQhyByZmz5oUgRKUQJO5V5AOiJxsVEGbUmgA7sJRQeTrXLB+BEwzaKS5nm2opJeNyMBYLFNK4hiQ=="],
@@ -1289,86 +1378,6 @@
 
     "@yuku-toolchain/types": ["@yuku-toolchain/types@0.8.7", "", {}, "sha512-2Z53dNxAJL6UvFoIrDZvYf3zlO8s4VJK4O2hhaB4mXVwwpX/7ajtss3cmfqKvamlNLWyt9FSWs4eoYdlbxpnHA=="],
 
-    "@zsys/agents": ["@zsys/agents@workspace:packages/agents"],
-
-    "@zsys/app": ["@zsys/app@workspace:packages/app"],
-
-    "@zsys/better-auth": ["@zsys/better-auth@workspace:packages/better-auth"],
-
-    "@zsys/buckets": ["@zsys/buckets@workspace:packages/buckets"],
-
-    "@zsys/cache": ["@zsys/cache@workspace:packages/cache"],
-
-    "@zsys/cli": ["@zsys/cli@workspace:packages/cli"],
-
-    "@zsys/client": ["@zsys/client@workspace:packages/client"],
-
-    "@zsys/client-generator": ["@zsys/client-generator@workspace:packages/client-generator"],
-
-    "@zsys/cloud-aws": ["@zsys/cloud-aws@workspace:packages/cloud-aws"],
-
-    "@zsys/compiler": ["@zsys/compiler@workspace:packages/compiler"],
-
-    "@zsys/config": ["@zsys/config@workspace:packages/config"],
-
-    "@zsys/contracts": ["@zsys/contracts@workspace:packages/contracts"],
-
-    "@zsys/deploy": ["@zsys/deploy@workspace:packages/deploy"],
-
-    "@zsys/deploy-pulumi": ["@zsys/deploy-pulumi@workspace:packages/deploy-pulumi"],
-
-    "@zsys/diagnostics": ["@zsys/diagnostics@workspace:packages/diagnostics"],
-
-    "@zsys/docs": ["@zsys/docs@workspace:apps/docs"],
-
-    "@zsys/drizzle": ["@zsys/drizzle@workspace:packages/drizzle"],
-
-    "@zsys/engine": ["@zsys/engine@workspace:packages/engine"],
-
-    "@zsys/events": ["@zsys/events@workspace:packages/events"],
-
-    "@zsys/example-auth-drizzle": ["@zsys/example-auth-drizzle@workspace:examples/auth-drizzle"],
-
-    "@zsys/example-commerce": ["@zsys/example-commerce@workspace:examples/commerce"],
-
-    "@zsys/example-data-model": ["@zsys/example-data-model@workspace:examples/data-model"],
-
-    "@zsys/functions": ["@zsys/functions@workspace:packages/functions"],
-
-    "@zsys/graph": ["@zsys/graph@workspace:packages/graph"],
-
-    "@zsys/inspector": ["@zsys/inspector@workspace:apps/inspector"],
-
-    "@zsys/inspector-api": ["@zsys/inspector-api@workspace:packages/inspector-api"],
-
-    "@zsys/invocation": ["@zsys/invocation@workspace:packages/invocation"],
-
-    "@zsys/jobs": ["@zsys/jobs@workspace:packages/jobs"],
-
-    "@zsys/observability": ["@zsys/observability@workspace:packages/observability"],
-
-    "@zsys/openapi": ["@zsys/openapi@workspace:packages/openapi"],
-
-    "@zsys/providers-local": ["@zsys/providers-local@workspace:packages/providers-local"],
-
-    "@zsys/providers-standard": ["@zsys/providers-standard@workspace:packages/providers-standard"],
-
-    "@zsys/routes": ["@zsys/routes@workspace:packages/routes"],
-
-    "@zsys/runtime-effect": ["@zsys/runtime-effect@workspace:packages/runtime-effect"],
-
-    "@zsys/runtime-hono": ["@zsys/runtime-hono@workspace:packages/runtime-hono"],
-
-    "@zsys/schema": ["@zsys/schema@workspace:packages/schema"],
-
-    "@zsys/services": ["@zsys/services@workspace:packages/services"],
-
-    "@zsys/supervisor": ["@zsys/supervisor@workspace:packages/supervisor"],
-
-    "@zsys/testing": ["@zsys/testing@workspace:packages/testing"],
-
-    "@zsys/tools": ["@zsys/tools@workspace:packages/tools"],
-
     "abbrev": ["abbrev@4.0.0", "", {}, "sha512-a1wflyaL0tHtJSmLSOVybYhy22vRih4eduhhrkcjgrWGnRfrZtovJ2FRjxuTtkkj47O/baf0R86QU5OuYpz8fA=="],
 
     "acorn": ["acorn@8.18.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ=="],
@@ -1479,7 +1488,7 @@
 
     "core-util-is": ["core-util-is@1.0.3", "", {}, "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="],
 
-    "create-zsys": ["create-zsys@workspace:packages/create-zsys"],
+    "create-relkit": ["create-relkit@workspace:packages/create-relkit"],
 
     "cron-parser": ["cron-parser@5.10.0", "", { "dependencies": { "luxon": "^3.7.2" } }, "sha512-izNAxJyRWUP8ljBoDSub5WyrVOUlT4SLGShswE7eoRBpp6QUsSycYxLBMJlbshgPBMcPT/nrfgjNY2918ayv2A=="],
 
@@ -2431,6 +2440,8 @@
 
     "@pulumi/docker/semver": ["semver@5.7.2", "", { "bin": { "semver": "bin/semver" } }, "sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g=="],
 
+    "@relkit/docs/@types/react": ["@types/react@19.2.2", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA=="],
+
     "@scalar/types/nanoid": ["nanoid@5.1.16", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-kVrnsrJqMR8+oLJnGEmSWw9BivK5mt7H3FZatVRjrc5wGqFYuBxX1yG7+A7Gi5AefkX6t/oCkizcQgpu0cY1dQ=="],
 
     "@tailwindcss/node/magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
@@ -2452,8 +2463,6 @@
     "@tufjs/models/minimatch": ["minimatch@10.2.6", "", { "dependencies": { "brace-expansion": "^5.0.8" } }, "sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A=="],
 
     "@types/ws/@types/node": ["@types/node@22.20.1", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q=="],
-
-    "@zsys/docs/@types/react": ["@types/react@19.2.2", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA=="],
 
     "better-call/@better-auth/utils": ["@better-auth/utils@0.5.0", "", { "dependencies": { "@noble/hashes": "^2.0.1" } }, "sha512-BL8W4EfIZFwlu0r54m3v1ztjDhu6dDe/amLTm0xybmbZaNgYUqhD3SjpAsnq0q8YD6/ki4iwIgxJNLP/N3TxiA=="],
 

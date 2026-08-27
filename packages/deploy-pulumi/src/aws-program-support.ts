@@ -1,18 +1,18 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import {
-  type ZsysApplicationService,
-  type ZsysBuckets,
-  type ZsysCaches,
-  type ZsysEventBus,
-  type ZsysJobQueues,
-  type ZsysEventTriggerDefinition,
-  type ZsysJobQueueDefinition,
-  type ZsysScheduleDefinition,
-} from "@zsys/cloud-aws";
-import type { DeploymentPlan } from "@zsys/deploy";
+  type RelkitApplicationService,
+  type RelkitBuckets,
+  type RelkitCaches,
+  type RelkitEventBus,
+  type RelkitJobQueues,
+  type RelkitEventTriggerDefinition,
+  type RelkitJobQueueDefinition,
+  type RelkitScheduleDefinition,
+} from "@relkit/cloud-aws";
+import type { DeploymentPlan } from "@relkit/deploy";
 
-export function jobDefinition(job: DeploymentPlan["jobs"][number]): ZsysJobQueueDefinition {
+export function jobDefinition(job: DeploymentPlan["jobs"][number]): RelkitJobQueueDefinition {
   return {
     id: job.id,
     retry: retryPolicy(job.retry),
@@ -23,7 +23,7 @@ export function jobDefinition(job: DeploymentPlan["jobs"][number]): ZsysJobQueue
 
 export function eventTriggerDefinition(
   trigger: DeploymentPlan["eventTriggers"][number],
-): ZsysEventTriggerDefinition {
+): RelkitEventTriggerDefinition {
   return {
     id: trigger.id,
     targetFunctionId: trigger.targetFunctionId,
@@ -35,7 +35,7 @@ export function eventTriggerDefinition(
 
 export function scheduleDefinition(
   schedule: DeploymentPlan["schedules"][number],
-): ZsysScheduleDefinition {
+): RelkitScheduleDefinition {
   const value = record(schedule.schedule);
   const cron = text(value.cron ?? value.expression);
   if (cron === undefined) throw new TypeError(`Schedule "${schedule.id}" has no cron expression.`);
@@ -51,11 +51,11 @@ export function scheduleDefinition(
 
 export function createServicePolicy(
   plan: DeploymentPlan,
-  service: ZsysApplicationService,
-  buckets: ZsysBuckets,
-  jobs: ZsysJobQueues,
-  events: ZsysEventBus,
-  caches: ZsysCaches,
+  service: RelkitApplicationService,
+  buckets: RelkitBuckets,
+  jobs: RelkitJobQueues,
+  events: RelkitEventBus,
+  caches: RelkitCaches,
   root: pulumi.ComponentResource,
 ): aws.iam.RolePolicy | undefined {
   if (plan.iam.serviceRole.statements.length === 0) return undefined;

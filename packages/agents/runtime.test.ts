@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
-import { defineTool } from "@zsys/tools";
+import { defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
 import {
   ApprovalRequiredError,
   defineAgent,
@@ -72,7 +72,7 @@ describe("bounded agent runtime", () => {
     expect(state.calls).toHaveLength(2);
 
     await expect(invokeAgent({ ...state.runtime, input: { question: 7 } })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_INPUT_VALIDATION",
+      code: "RELKIT_AGENT_INPUT_VALIDATION",
     });
   });
 
@@ -131,7 +131,7 @@ describe("bounded agent runtime", () => {
     await expect(
       invokeAgent({ ...invalid.runtime, input: { question: "Hi" } }),
     ).rejects.toMatchObject({
-      code: "ZSYS_AGENT_OUTPUT_VALIDATION",
+      code: "RELKIT_AGENT_OUTPUT_VALIDATION",
     });
 
     const limited = setup(
@@ -154,7 +154,7 @@ describe("bounded agent runtime", () => {
     await expect(
       invokeAgent({ ...limited.runtime, input: { question: "Hi" } }),
     ).rejects.toMatchObject({
-      code: "ZSYS_AGENT_STEP_LIMIT",
+      code: "RELKIT_AGENT_STEP_LIMIT",
     });
 
     const controller = new AbortController();
@@ -162,7 +162,7 @@ describe("bounded agent runtime", () => {
     const cancelled = setup([{ type: "final", output: { answer: "never" } }]);
     await expect(
       invokeAgent({ ...cancelled.runtime, input: { question: "Hi" }, signal: controller.signal }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_CANCELLED" });
+    ).rejects.toMatchObject({ code: "RELKIT_AGENT_CANCELLED" });
     expect(cancelled.calls).toHaveLength(0);
 
     const timeout = setup([]);
@@ -175,7 +175,7 @@ describe("bounded agent runtime", () => {
     };
     await expect(
       invokeAgent({ ...stalled, input: { question: "Hi" }, timeoutMs: 0 }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_TIMEOUT" });
+    ).rejects.toMatchObject({ code: "RELKIT_AGENT_TIMEOUT" });
   });
 
   test("resolves the active AI SDK model without exposing it on the descriptor", async () => {
@@ -202,7 +202,7 @@ describe("bounded agent runtime", () => {
       }),
     ).resolves.toEqual({ answer: "registry" });
     expect(spans.find((span) => span.kind === "model")?.attributes).toMatchObject({
-      "zsys.model.id": "test:default",
+      "relkit.model.id": "test:default",
     });
     expect("model" in state.runtime.agent).toBe(true);
     expect(typeof state.runtime.agent.model).toBe("string");

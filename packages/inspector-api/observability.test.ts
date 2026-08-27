@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import {
   createObservabilityStream,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import { Hono } from "hono";
 import {
   installObservabilityEndpoints,
   ObservabilityEndpointConfigurationError,
 } from "./src/index.ts";
 
-const queryProtocol = "zsys.observability.query" as const;
+const queryProtocol = "relkit.observability.query" as const;
 const query: ObservabilityQuery = {
   requests: async () => ({ protocol: queryProtocol, version: 1, items: [] }),
   logs: async () => ({ protocol: queryProtocol, version: 1, items: [] }),
@@ -59,7 +59,7 @@ describe("inspector observability endpoints", () => {
     const invalid = await service.request(`${API_BASE_PATH}/logs?cursor=not-a-cursor`);
     expect(invalid.status).toBe(400);
     expect(await invalid.json()).toMatchObject({
-      error: "ZSYS_OBSERVABILITY_QUERY_INVALID",
+      error: "RELKIT_OBSERVABILITY_QUERY_INVALID",
     });
   });
 
@@ -118,7 +118,7 @@ describe("inspector observability endpoints", () => {
     const text = new TextDecoder().decode(event.value);
     expect(text).toContain("id: 1");
     expect(text).toContain("event: log.emitted");
-    expect(text).toContain('"protocol":"zsys.observability.stream"');
+    expect(text).toContain('"protocol":"relkit.observability.stream"');
     await reader.cancel();
     expect(stream.stats().subscribers).toBe(0);
   });

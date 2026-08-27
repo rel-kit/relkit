@@ -41,7 +41,7 @@ Nested function descriptor calls SHALL create distinct child invocation IDs whil
 
 ### Requirement: Descriptor invocation selects the correct engine
 
-Function `invoke(input)` SHALL use the current asynchronous ZSYS invocation scope when present and SHALL otherwise execute through an isolated standalone instance of the common invocation kernel.
+Function `invoke(input)` SHALL use the current asynchronous RELKIT invocation scope when present and SHALL otherwise execute through an isolated standalone instance of the common invocation kernel.
 
 #### Scenario: Invoke runs inside an application invocation
 
@@ -50,7 +50,7 @@ Function `invoke(input)` SHALL use the current asynchronous ZSYS invocation scop
 
 #### Scenario: Invoke runs outside an application invocation
 
-- **WHEN** ordinary code or a unit test calls a function descriptor without an active ZSYS invocation
+- **WHEN** ordinary code or a unit test calls a function descriptor without an active RELKIT invocation
 - **THEN** the standalone kernel validates input/output/errors, supplies the public logging/time/signal context, applies descriptor limits and bound service policy, and returns the typed result
 
 #### Scenario: Standalone function needs an application provider

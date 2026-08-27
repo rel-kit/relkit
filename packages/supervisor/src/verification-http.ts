@@ -1,4 +1,4 @@
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import type { CandidateProbeResponse, CandidateVerificationOptions } from "./verification-types.js";
 import { CandidateVerificationError } from "./verification-types.js";
 
@@ -25,7 +25,7 @@ export async function requestProbe(
       const payload: unknown = await response.json();
       if (!isRecord(payload))
         throw new CandidateVerificationError(
-          "ZSYS_CANDIDATE_RESPONSE_INVALID",
+          "RELKIT_CANDIDATE_RESPONSE_INVALID",
           "Candidate health response must be a JSON object.",
         );
       return { response, payload };

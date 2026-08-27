@@ -1,6 +1,6 @@
-import { normalizeId, type MaybePromise } from "@zsys/contracts";
-import type { JobEnqueueOptions, JobEnqueueResult } from "@zsys/functions";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import type { JobEnqueueOptions, JobEnqueueResult } from "@relkit/functions";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import {
   assertOptions,
   assertOptionalText,
@@ -12,7 +12,7 @@ import {
   runAbortable,
 } from "./client-utils.js";
 
-export type { JobEnqueueOptions, JobEnqueueResult, JobState, JobStatus } from "@zsys/functions";
+export type { JobEnqueueOptions, JobEnqueueResult, JobState, JobStatus } from "@relkit/functions";
 
 export interface JobOperationContext {
   readonly operation: "enqueue";
@@ -89,7 +89,7 @@ export interface JobClient<Input = unknown> {
 }
 
 export class JobInputValidationError extends TypeError {
-  readonly code = "ZSYS_JOB_INPUT_VALIDATION" as const;
+  readonly code = "RELKIT_JOB_INPUT_VALIDATION" as const;
   constructor(readonly issues: readonly StandardIssue[]) {
     super("Job input validation failed");
     this.name = "JobInputValidationError";
@@ -97,7 +97,7 @@ export class JobInputValidationError extends TypeError {
 }
 
 export class JobProfileError extends Error {
-  readonly code = "ZSYS_JOB_PROFILE_UNKNOWN" as const;
+  readonly code = "RELKIT_JOB_PROFILE_UNKNOWN" as const;
   constructor(readonly profile: string) {
     super(`Job profile "${profile}" is not configured`);
     this.name = "JobProfileError";
@@ -105,7 +105,7 @@ export class JobProfileError extends Error {
 }
 
 export class JobProviderError extends Error {
-  readonly code = "ZSYS_JOB_PROVIDER_UNAVAILABLE" as const;
+  readonly code = "RELKIT_JOB_PROVIDER_UNAVAILABLE" as const;
   constructor() {
     super("Job provider does not implement enqueue");
     this.name = "JobProviderError";
@@ -113,7 +113,7 @@ export class JobProviderError extends Error {
 }
 
 export class JobDependencyError extends Error {
-  readonly code = "ZSYS_JOB_DEPENDENCY_UNDECLARED" as const;
+  readonly code = "RELKIT_JOB_DEPENDENCY_UNDECLARED" as const;
   constructor(readonly jobId: string) {
     super(`Job dependency "${jobId}" is not declared on this function`);
     this.name = "JobDependencyError";
@@ -179,8 +179,8 @@ export function createJobClient(options: JobClientOptions): JobClient {
       return normalizeResult(result, profile, correlationId);
     };
     const bridged = options.bridge?.run(work, {
-      name: `zsys.job.${jobId}.enqueue`,
-      attributes: { "zsys.job.id": jobId, "zsys.job.profile": profile },
+      name: `relkit.job.${jobId}.enqueue`,
+      attributes: { "relkit.job.id": jobId, "relkit.job.profile": profile },
       signal,
     });
     return bridged === undefined ? runAbortable(signal, deadlineMs, work) : bridged;

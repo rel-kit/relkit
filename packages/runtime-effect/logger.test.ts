@@ -1,6 +1,6 @@
 import { Cause, Effect, References } from "effect";
-import { normalizeProtocolId } from "@zsys/contracts";
-import { createObservabilityCollector } from "@zsys/observability";
+import { normalizeProtocolId } from "@relkit/contracts";
+import { createObservabilityCollector } from "@relkit/observability";
 import {
   createLoggerLayer,
   formatHumanLog,

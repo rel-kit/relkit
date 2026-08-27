@@ -1,4 +1,4 @@
-import type { JsonPrimitive, JsonValue } from "@zsys/contracts";
+import type { JsonPrimitive, JsonValue } from "@relkit/contracts";
 
 /** Version of the JSON-safe observability record contracts. */
 export const OBSERVABILITY_MODEL_VERSION = 1 as const;

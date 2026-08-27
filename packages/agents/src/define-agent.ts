@@ -4,11 +4,11 @@ import {
   isDescriptor,
   type DescriptorBase,
   type DescriptorMetadata,
-} from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
-import type { AgentRef } from "@zsys/functions";
-import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
-import { isToolRef, type ToolRefAny } from "@zsys/tools";
+} from "@relkit/contracts";
+import { createUnboundIdentity } from "@relkit/invocation";
+import type { AgentRef } from "@relkit/functions";
+import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
+import { isToolRef, type ToolRefAny } from "@relkit/tools";
 import {
   copyAgentInstructions,
   copyAgentTools,
@@ -75,8 +75,8 @@ export interface DefineAgentOptions<
  *
  * @example
  * ```ts
- * import { defineAgent } from "@zsys/agents"
- * import { z } from "@zsys/schema"
+ * import { defineAgent } from "@relkit/agents"
+ * import { z } from "@relkit/schema"
  *
  * const support = defineAgent({ id: "support", input: z.string(), output: z.string(), instructions: "Answer safely.", tools: [], limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 } })
  * void support

@@ -26,11 +26,11 @@ bodies return bounded `422` errors. Streaming upload APIs are not currently expo
 6. Target invocation through the common function engine.
 
 Define HTTP middleware independently from routes. It receives the native Hono context, `next`, and
-ZSYS `signal`, `env`, `log`, and `time` utilities:
+RELKIT `signal`, `env`, `log`, and `time` utilities:
 
 ```ts
-export default defineMiddleware("/orders/*", async (context, next, zsys) => {
-  zsys.log.info("checking order request");
+export default defineMiddleware("/orders/*", async (context, next, relkit) => {
+  relkit.log.info("checking order request");
   if (!context.req.header("authorization")) return context.json({ error: "unauthorized" }, 401);
   await next();
   context.header("x-orders-policy", "checked");

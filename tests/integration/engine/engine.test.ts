@@ -190,7 +190,7 @@ describe("engine integration matrix", () => {
       { value: 1 },
       { idSource: ids("output"), hooks: hooksFor(outputCapture) },
     ).catch((error) => error as { readonly kind: string; readonly code: string });
-    expect(outputFailure).toMatchObject({ kind: "defect", code: "ZSYS_UNEXPECTED_DEFECT" });
+    expect(outputFailure).toMatchObject({ kind: "defect", code: "RELKIT_UNEXPECTED_DEFECT" });
     expect(outputCapture.completions[0]?.outcome).toBe("defect");
     expect(eventTypes(outputCapture)).toContain("span.completed");
 
@@ -576,7 +576,7 @@ describe("engine integration matrix", () => {
       stack.enter("engine.recursive");
     } catch (error) {
       expect(error).toMatchObject({
-        code: "ZSYS_RECURSION_DENIED",
+        code: "RELKIT_RECURSION_DENIED",
         callStack: ["engine.recursive"],
         cycle: ["engine.recursive", "engine.recursive"],
       });
@@ -594,7 +594,7 @@ describe("engine integration matrix", () => {
         graphHash: "sha256:mismatch",
         functions: {},
       }),
-    ).toThrow("ZSYS_GRAPH_MANIFEST_MISMATCH");
+    ).toThrow("RELKIT_GRAPH_MANIFEST_MISMATCH");
     expect(hashGraph(graph)).not.toBe("sha256:mismatch");
     expect(CONTRACT_VERSION).not.toBe(GRAPH_VERSION);
   });

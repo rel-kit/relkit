@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { unexpectedDefect, type InvocationFailure } from "./failure.js";
-import { validate, type StandardResult, type StandardSchemaV1 } from "@zsys/schema";
+import { validate, type StandardResult, type StandardSchemaV1 } from "@relkit/schema";
 import type {
   InvocationErrorDefinition,
   InvocationIdSource,
@@ -62,7 +62,7 @@ export async function validateDeclaredError(
 }
 
 export const defaultIdSource: InvocationIdSource = {
-  next: (kind) => `${kind}-${crypto.randomUUID()}` as import("@zsys/contracts").ProtocolId,
+  next: (kind) => `${kind}-${crypto.randomUUID()}` as import("@relkit/contracts").ProtocolId,
 };
 
 export const defaultRunner = {
@@ -73,7 +73,7 @@ export const defaultRunner = {
 export const unknownSchema: StandardSchemaV1 = Object.freeze({
   "~standard": Object.freeze({
     version: 1,
-    vendor: "zsys",
+    vendor: "relkit",
     validate: (value: unknown) => ({ value }),
   }),
 });

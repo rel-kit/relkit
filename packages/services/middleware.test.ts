@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { defineError, defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
+import { defineError, defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
 import {
   defineService,
   defineServiceMiddleware,
@@ -52,7 +52,7 @@ describe("service middleware", () => {
       handler: async () => undefined,
     });
     await expect(missing.handler(invocation, async () => undefined)).rejects.toMatchObject({
-      code: "ZSYS_SERVICE_MIDDLEWARE_POLICY",
+      code: "RELKIT_SERVICE_MIDDLEWARE_POLICY",
     });
 
     const duplicate = defineServiceMiddleware({
@@ -63,7 +63,7 @@ describe("service middleware", () => {
       },
     });
     await expect(duplicate.handler(invocation, async () => undefined)).rejects.toMatchObject({
-      code: "ZSYS_SERVICE_MIDDLEWARE_POLICY",
+      code: "RELKIT_SERVICE_MIDDLEWARE_POLICY",
     });
   });
 
@@ -80,7 +80,7 @@ describe("service middleware", () => {
       middleware.handler(invocation, async () => {
         executions += 1;
       }),
-    ).rejects.toMatchObject({ code: "ZSYS_SERVICE_MIDDLEWARE_POLICY" });
+    ).rejects.toMatchObject({ code: "RELKIT_SERVICE_MIDDLEWARE_POLICY" });
     await new Promise((resolve) => setTimeout(resolve, 5));
     expect(executions).toBe(0);
   });

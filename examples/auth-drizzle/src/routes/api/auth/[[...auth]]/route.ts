@@ -1,5 +1,5 @@
-import { defineRoute } from "@zsys/app";
-import { betterAuthAdapter } from "@zsys/better-auth";
+import { defineRoute } from "@relkit/app";
+import { betterAuthAdapter } from "@relkit/better-auth";
 import { auth } from "../../../../auth.js";
 
 export const ALL = defineRoute({

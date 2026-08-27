@@ -1,4 +1,4 @@
-import { API_VERSION, canonicalJson } from "@zsys/contracts";
+import { API_VERSION, canonicalJson } from "@relkit/contracts";
 import type { Hono } from "hono";
 import { installObservabilityEndpoints, INSPECTOR_API_PROTOCOL } from "./observability.js";
 import { InspectorGraphError } from "./graph.js";
@@ -77,23 +77,23 @@ export function negotiate(request: Request): void {
     (value): value is string => value !== null,
   );
   if (requested.some((value) => !/^\d+$/.test(value) || Number(value) !== API_VERSION))
-    throw new InspectorEndpointError("ZSYS_INSPECTOR_API_VERSION_UNSUPPORTED", 400);
-  const protocol = url.searchParams.get("protocol") ?? request.headers.get("x-zsys-api-protocol");
+    throw new InspectorEndpointError("RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED", 400);
+  const protocol = url.searchParams.get("protocol") ?? request.headers.get("x-relkit-api-protocol");
   if (protocol !== null && protocol !== INSPECTOR_API_PROTOCOL)
-    throw new InspectorEndpointError("ZSYS_INSPECTOR_PROTOCOL_UNSUPPORTED", 400);
+    throw new InspectorEndpointError("RELKIT_INSPECTOR_PROTOCOL_UNSUPPORTED", 400);
 }
 
 export function negotiateHeaders(request: Request): void {
-  const requested = [request.headers.get("x-zsys-api-version")].filter(
+  const requested = [request.headers.get("x-relkit-api-version")].filter(
     (value): value is string => value !== null,
   );
   const accepted = request.headers.get("accept")?.match(/(?:^|[;,\s])version=(\d+)/)?.[1];
   if (accepted !== undefined) requested.push(accepted);
   if (requested.some((value) => !/^\d+$/.test(value) || Number(value) !== API_VERSION))
-    throw new InspectorEndpointError("ZSYS_INSPECTOR_API_VERSION_UNSUPPORTED", 400);
-  const protocol = request.headers.get("x-zsys-api-protocol");
+    throw new InspectorEndpointError("RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED", 400);
+  const protocol = request.headers.get("x-relkit-api-protocol");
   if (protocol !== null && protocol !== INSPECTOR_API_PROTOCOL)
-    throw new InspectorEndpointError("ZSYS_INSPECTOR_PROTOCOL_UNSUPPORTED", 400);
+    throw new InspectorEndpointError("RELKIT_INSPECTOR_PROTOCOL_UNSUPPORTED", 400);
 }
 
 export async function withGeneration<T>(
@@ -107,7 +107,7 @@ export function required(
   generation: ResolvedActiveGeneration | undefined,
 ): ResolvedActiveGeneration {
   if (generation === undefined)
-    throw new InspectorGraphError("ZSYS_INSPECTOR_GRAPH_UNAVAILABLE", 503);
+    throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   return generation;
 }
 
@@ -117,7 +117,7 @@ export function requiredParam(
 ): string {
   const value = context.req.param(name);
   if (value === undefined || value.length === 0)
-    throw new InspectorEndpointError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+    throw new InspectorEndpointError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   return value;
 }
 
@@ -153,7 +153,7 @@ export function json(value: unknown, status = 200, headers: Record<string, strin
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",
       "x-content-type-options": "nosniff",
-      "x-zsys-api-version": String(API_VERSION),
+      "x-relkit-api-version": String(API_VERSION),
       ...headers,
     },
   });
@@ -164,6 +164,6 @@ export function errorResponse(error: unknown): Response {
   if (error instanceof InspectorGraphError || error instanceof InspectorRuntimeError)
     return json({ error: error.code }, error.status);
   if (error instanceof InspectorQueryError)
-    return json({ error: "ZSYS_INSPECTOR_QUERY_INVALID" }, 400);
-  return json({ error: "ZSYS_INSPECTOR_INTERNAL" }, 500);
+    return json({ error: "RELKIT_INSPECTOR_QUERY_INVALID" }, 400);
+  return json({ error: "RELKIT_INSPECTOR_INTERNAL" }, 500);
 }

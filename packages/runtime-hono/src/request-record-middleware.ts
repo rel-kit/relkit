@@ -3,7 +3,7 @@ import {
   appendObservedRequestDetails,
   createRequestRecordBuilder,
   type RequestOutcome,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import {
   setRequestState,
   type HttpMiddlewareOptions,

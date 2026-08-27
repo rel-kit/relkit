@@ -1,4 +1,4 @@
-import type { SourceLocation } from "@zsys/contracts";
+import type { SourceLocation } from "@relkit/contracts";
 
 export interface ServiceMemberRef {
   readonly name: string;

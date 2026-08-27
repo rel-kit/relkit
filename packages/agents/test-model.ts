@@ -1,5 +1,5 @@
 import { MockLanguageModelV3 } from "ai/test";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
 export type TestModelTurn =
   | {

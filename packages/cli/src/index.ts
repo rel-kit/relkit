@@ -9,7 +9,7 @@ import { main } from "./main.js";
 
 async function run(): Promise<number> {
   const root = resolve(import.meta.dir, "../../..");
-  const launcher = join(root, "scripts/zsys-local.ts");
+  const launcher = join(root, "scripts/relkit-local.ts");
   const cwd = relative(root, process.cwd()).replaceAll("\\", "/");
   const workspace = cwd === "" || /^(?:apps|examples|packages)(?:\/|$)/.test(cwd);
   if (!existsSync(launcher) || workspace) return main();

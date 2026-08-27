@@ -1,5 +1,5 @@
-import { normalizeId } from "@zsys/contracts";
-import type { RetryPolicy } from "@zsys/jobs";
+import { normalizeId } from "@relkit/contracts";
+import type { RetryPolicy } from "@relkit/jobs";
 import type { EventDelivery } from "./listener-types.js";
 
 export function delivery(value: unknown): EventDelivery {

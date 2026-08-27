@@ -12,11 +12,11 @@ describe("function invocation client", () => {
         init = requestInit;
         return new Response(
           JSON.stringify({
-            protocol: "zsys.inspector",
+            protocol: "relkit.inspector",
             version: 1,
             output: { ok: true },
           }),
-          { headers: { "content-type": "application/json", "x-zsys-api-version": "1" } },
+          { headers: { "content-type": "application/json", "x-relkit-api-version": "1" } },
         );
       },
     });
@@ -29,7 +29,7 @@ describe("function invocation client", () => {
       idempotencyKey: "manual-1",
     });
 
-    expect(url).toBe("/_zsys/v1/actions/functions/orders.get/invoke");
+    expect(url).toBe("/_relkit/v1/actions/functions/orders.get/invoke");
     expect(init?.method).toBe("POST");
     expect(new Headers(init?.headers).get("idempotency-key")).toBe("manual-1");
     expect(JSON.parse(String(init?.body))).toMatchObject({

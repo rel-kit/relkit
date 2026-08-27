@@ -109,9 +109,9 @@ export function agentTurnRecord(value: RecordLike): AgentTurnRecord | undefined 
   const input = captureBytes(value.capture, "input");
   const output = captureBytes(value.capture, "output");
   const parentSpanId = text(value.parentSpanId);
-  const profile = text(attributes?.["zsys.model.profile"]);
-  const toolId = text(attributes?.["zsys.tool.id"]);
-  const toolCallId = text(attributes?.["zsys.tool.call.id"]);
+  const profile = text(attributes?.["relkit.model.profile"]);
+  const toolId = text(attributes?.["relkit.tool.id"]);
+  const toolCallId = text(attributes?.["relkit.tool.call.id"]);
   const completedAt = text(value.completedAt);
   const outcome = agentOutcome(value.outcome);
   return {
@@ -127,7 +127,7 @@ export function agentTurnRecord(value: RecordLike): AgentTurnRecord | undefined 
     ...(profile === undefined ? {} : { profile }),
     ...(toolId === undefined ? {} : { toolId }),
     ...(toolCallId === undefined ? {} : { toolCallId }),
-    step: integer(attributes?.["zsys.agent.step"], 0),
+    step: integer(attributes?.["relkit.agent.step"], 0),
     status: value.status === "completed" ? "completed" : "started",
     startedAt,
     ...(completedAt === undefined ? {} : { completedAt }),

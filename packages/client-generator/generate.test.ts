@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { GRAPH_VERSION } from "@zsys/contracts";
-import type { ApplicationGraph } from "@zsys/graph";
+import { GRAPH_VERSION } from "@relkit/contracts";
+import type { ApplicationGraph } from "@relkit/graph";
 import { generateClient, generateClientContractDocument, generateContract } from "./src/index.ts";
 import { clientRoutes, responseType } from "./src/generate-types.ts";
 
@@ -21,7 +21,7 @@ test("generates a stable oRPC contract and shared client entry", () => {
   const second = generateClient(graph(true));
 
   expect(first).toBe(second);
-  expect(first).toContain('export { createClient, ORPCError } from "@zsys/client";');
+  expect(first).toContain('export { createClient, ORPCError } from "@relkit/client";');
   const contract = generateContract(graph(false));
   expect(contract).toBe(generateContract(graph(true)));
   expect(contract).toContain('\"orders.get\": oc.errors({ \"orders.not-found\"');

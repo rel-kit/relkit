@@ -10,7 +10,7 @@ function response(
   observedEdges: readonly unknown[],
 ) {
   return {
-    protocol: "zsys.inspector",
+    protocol: "relkit.inspector",
     version: 1,
     generationId: "generation-one",
     graphHash: "sha256:fixture",

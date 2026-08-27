@@ -1,9 +1,9 @@
-import { API_BASE_PATH, PROTOCOL_VERSION } from "@zsys/contracts";
+import { API_BASE_PATH, PROTOCOL_VERSION } from "@relkit/contracts";
 import {
   createObservabilityStream,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import { Hono } from "hono";
 import {
   installInspectorEndpoints,
@@ -18,7 +18,7 @@ const runtimeItem = (id: string, state = "available"): Record<string, unknown> =
 
 export function queryFixture(seen: ObservabilityQueryRequest[] = []): ObservabilityQuery {
   const page = (items: readonly unknown[] = []) => ({
-    protocol: "zsys.observability.query" as const,
+    protocol: "relkit.observability.query" as const,
     version: 1 as const,
     items,
   });
@@ -60,7 +60,7 @@ function actionServices(): InspectorActionServices {
       invoke: async () => poison({ ok: true, password: secret }),
     },
     jobs: {
-      protocol: "zsys.jobs.admin",
+      protocol: "relkit.jobs.admin",
       version: PROTOCOL_VERSION,
       status: async () => ({ state: jobState }),
       retry: async ({ instanceId }) => {
@@ -73,7 +73,7 @@ function actionServices(): InspectorActionServices {
       },
     },
     events: {
-      protocol: "zsys.events.admin",
+      protocol: "relkit.events.admin",
       version: PROTOCOL_VERSION,
       status: async () => ({ state: eventState }),
       retry: async ({ deliveryId }) => {
@@ -119,7 +119,7 @@ export function makeGeneration(): InspectorActiveGeneration {
       tools: [runtimeItem("orders.tool")],
       agents: [runtimeItem("orders.agent")],
     },
-    diagnostics: [{ code: "ZSYS_TEST", severity: "warning", message: "safe diagnostic" }],
+    diagnostics: [{ code: "RELKIT_TEST", severity: "warning", message: "safe diagnostic" }],
     actions: actionServices(),
     environment: () => ({ DATABASE_URL: secret }),
   };

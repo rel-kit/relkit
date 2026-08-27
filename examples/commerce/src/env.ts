@@ -1,4 +1,4 @@
-import { defineEnv, env as envFactory } from "@zsys/app";
+import { defineEnv, env as envFactory } from "@relkit/app";
 
 const env = defineEnv({
   APP_ENV: envFactory.literal("development", "test", "production").default("development"),
@@ -17,7 +17,7 @@ const env = defineEnv({
   EVENT_BUS_NAME: envFactory.string().default("commerce-events"),
   OPENAI_API_KEY: envFactory.secret().requiredIn("production"),
   OBSERVABILITY_REGION: envFactory.string().default("us-east-1"),
-  DATABASE_PATH: envFactory.string().default(".zsys/commerce.sqlite"),
+  DATABASE_PATH: envFactory.string().default(".relkit/commerce.sqlite"),
   BETTER_AUTH_SECRET: envFactory.secret().default("development-only-auth-secret-32-characters"),
 });
 

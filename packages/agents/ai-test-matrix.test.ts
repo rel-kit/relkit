@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 import { defineAgent, invokeAgent } from "./src/index.ts";
 import { parseModelProviderConfiguration, resolveModelSelector } from "./src/model-selection.ts";
 import { createTestModel } from "./test-model.ts";

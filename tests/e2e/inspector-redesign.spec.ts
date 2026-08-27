@@ -56,7 +56,7 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
   await expect(page.getByRole("heading", { name: "API Reference" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "href",
-    "/_zsys/backend/_zsys/v1/api-reference",
+    "/_relkit/backend/_relkit/v1/api-reference",
   );
   await expect(page.getByRole("link", { name: "Open Scalar API Reference" })).toHaveAttribute(
     "rel",

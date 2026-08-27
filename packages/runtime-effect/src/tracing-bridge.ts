@@ -57,7 +57,7 @@ export function reenterInvocation<A, E>(
   }
   const context = captured.context;
   const tracedOptions: InvocationTraceOptions = {
-    name: options.name ?? "zsys.context",
+    name: options.name ?? "relkit.context",
     invocationId: context.invocationId,
     ...(context.functionId === undefined ? {} : { functionId: context.functionId }),
     ...(context.serviceId === undefined ? {} : { serviceId: context.serviceId }),

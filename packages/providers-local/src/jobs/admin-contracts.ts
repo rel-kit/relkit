@@ -1,7 +1,7 @@
-import { PROTOCOL_VERSION, type MaybePromise } from "@zsys/contracts";
+import { PROTOCOL_VERSION, type MaybePromise } from "@relkit/contracts";
 import type { JobFailureMetadata, JobQueueCounts, JobQueueState } from "./queue-utils.js";
 
-export const JOB_ADMIN_PROTOCOL = "zsys.jobs.admin" as const;
+export const JOB_ADMIN_PROTOCOL = "relkit.jobs.admin" as const;
 export const JOB_ADMIN_VERSION = PROTOCOL_VERSION;
 
 export type JobAdminMode = "development" | "test" | "production";

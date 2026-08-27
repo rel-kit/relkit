@@ -1,5 +1,5 @@
-import type { EnvDefinition, EnvRef, EnvShape } from "@zsys/config";
-import type { DescriptorBase, DescriptorMetadata, JsonValue } from "@zsys/contracts";
+import type { EnvDefinition, EnvRef, EnvShape } from "@relkit/config";
+import type { DescriptorBase, DescriptorMetadata, JsonValue } from "@relkit/contracts";
 import type { CapabilityBindings } from "./providers.js";
 
 export interface ApiDocsConfig {

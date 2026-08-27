@@ -133,7 +133,7 @@ export function printPerformanceReport(measurements: PerformanceRecord): void {
   console.log(
     JSON.stringify(
       {
-        protocol: "zsys.performance",
+        protocol: "relkit.performance",
         version: 1,
         environment: environment(),
         fixtures: { descriptorScales: scales, inspectorNodes: 1_000, eventFanOut: 8 },

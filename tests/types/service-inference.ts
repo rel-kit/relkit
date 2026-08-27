@@ -1,5 +1,5 @@
-import { defineFunction, defineService } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction, defineService } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 const getOrder = defineFunction({
   id: "orders.get",

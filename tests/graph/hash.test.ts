@@ -51,10 +51,10 @@ function makeGraph(root: string, reverse: boolean): TestGraph {
 
 describe("canonical graph hashing", () => {
   test("normalizes roots/separators, sorts nodes/edges, and excludes ephemeral metadata", () => {
-    const first = makeGraph("/tmp/zsys-a", false);
-    const second = makeGraph("C:\\zsys-b", true);
-    const firstOptions: GraphCanonicalizationOptions = { projectRoot: "/tmp/zsys-a" };
-    const secondOptions: GraphCanonicalizationOptions = { projectRoot: "C:\\zsys-b" };
+    const first = makeGraph("/tmp/relkit-a", false);
+    const second = makeGraph("C:\\relkit-b", true);
+    const firstOptions: GraphCanonicalizationOptions = { projectRoot: "/tmp/relkit-a" };
+    const secondOptions: GraphCanonicalizationOptions = { projectRoot: "C:\\relkit-b" };
     const firstJson = canonicalGraphJson(first, firstOptions);
     const secondJson = canonicalGraphJson(second, secondOptions);
 
@@ -65,7 +65,7 @@ describe("canonical graph hashing", () => {
     expect(firstJson).toContain('"timeoutMs":10');
     expect(firstJson).toContain('"timezone":"UTC"');
     expect(firstJson).not.toMatch(/"(?:generationId|timestamp|pid|randomId)"/);
-    expect(firstJson).not.toContain("/tmp/zsys-a");
+    expect(firstJson).not.toContain("/tmp/relkit-a");
   });
 
   test("keeps ordered service edges in declaration order", () => {

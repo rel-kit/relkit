@@ -1,5 +1,5 @@
-import type { JsonValue } from "@zsys/contracts";
-import type { FunctionNode } from "@zsys/graph";
+import type { JsonValue } from "@relkit/contracts";
+import type { FunctionNode } from "@relkit/graph";
 import type { OpenApiResponse, OpenApiSchema } from "./generate.js";
 
 const validationSchema: OpenApiSchema = {
@@ -164,7 +164,7 @@ function description(entry: Record<string, unknown>): string {
 
 function schemaValue(value: unknown): OpenApiSchema | undefined {
   if (!isRecord(value)) return undefined;
-  return value.$zsys === "schema" && isRecord(value.jsonSchema)
+  return value.$relkit === "schema" && isRecord(value.jsonSchema)
     ? (value.jsonSchema as OpenApiSchema)
     : (value as OpenApiSchema);
 }

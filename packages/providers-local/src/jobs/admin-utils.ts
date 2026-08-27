@@ -1,4 +1,4 @@
-import { deepFreeze, normalizeId } from "@zsys/contracts";
+import { deepFreeze, normalizeId } from "@relkit/contracts";
 import { JobAdminError } from "./admin-errors.js";
 import {
   JOB_ADMIN_PROTOCOL,
@@ -44,7 +44,7 @@ export function afterCursor(entry: JobQueueEntry, value: string | undefined): bo
   const [order, instanceId] = value.split(":", 2);
   const parsed = Number(order);
   if (!Number.isSafeInteger(parsed) || instanceId === undefined)
-    throw newAdminError("ZSYS_JOB_ADMIN_CURSOR_INVALID", "Job query cursor is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_CURSOR_INVALID", "Job query cursor is invalid");
   return entry.order > parsed || (entry.order === parsed && entry.instanceId > instanceId);
 }
 
@@ -55,25 +55,25 @@ export function cursor(entry: JobQueueEntry): string {
 export function pageLimit(value: number | undefined): number {
   if (value === undefined) return 50;
   if (!Number.isSafeInteger(value) || value < 1)
-    throw newAdminError("ZSYS_JOB_ADMIN_QUERY_INVALID", "Job query limit is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query limit is invalid");
   return Math.min(value, 100);
 }
 
 export function validateQuery(request: JobQueryRequest): void {
   if (request.state !== undefined && !isState(request.state))
-    throw newAdminError("ZSYS_JOB_ADMIN_QUERY_INVALID", "Job query state is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query state is invalid");
   if (
     request.states !== undefined &&
     (!Array.isArray(request.states) || request.states.some((state) => !isState(state)))
   )
-    throw newAdminError("ZSYS_JOB_ADMIN_QUERY_INVALID", "Job query states are invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_QUERY_INVALID", "Job query states are invalid");
 }
 
 export function failureFor(action: JobAdminAction) {
   return {
     kind: action === "cancel" ? "cancellation" : "provider",
     outcome: action === "cancel" ? "cancelled" : "provider-failure",
-    code: action === "cancel" ? "ZSYS_JOB_ADMIN_CANCELLED" : "ZSYS_JOB_ADMIN_DEAD_LETTERED",
+    code: action === "cancel" ? "RELKIT_JOB_ADMIN_CANCELLED" : "RELKIT_JOB_ADMIN_DEAD_LETTERED",
     message:
       action === "cancel"
         ? "Job cancelled by local development action"
@@ -127,17 +127,17 @@ export function versioned<T extends object>(value: T): T & JobAdminVersion {
 
 export function assertVersion(value: unknown): void {
   if (!isRecord(value))
-    throw newAdminError("ZSYS_JOB_ADMIN_REQUEST_INVALID", "Job admin request is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_REQUEST_INVALID", "Job admin request is invalid");
   if (
     (value.protocol !== undefined && value.protocol !== JOB_ADMIN_PROTOCOL) ||
     (value.version !== undefined && value.version !== JOB_ADMIN_VERSION)
   )
-    throw newAdminError("ZSYS_JOB_ADMIN_PROTOCOL_MISMATCH", "Unsupported job admin protocol");
+    throw newAdminError("RELKIT_JOB_ADMIN_PROTOCOL_MISMATCH", "Unsupported job admin protocol");
 }
 
 export function assertMode(value: string): asserts value is JobAdminMode {
   if (value !== "development" && value !== "test" && value !== "production")
-    throw newAdminError("ZSYS_JOB_ADMIN_MODE_INVALID", "Job admin mode is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_MODE_INVALID", "Job admin mode is invalid");
 }
 
 export function safeId(value: unknown): string | undefined {
@@ -151,7 +151,7 @@ export function safeId(value: unknown): string | undefined {
 export function readReason(value: unknown): string | undefined {
   if (!isRecord(value) || value.reason === undefined) return undefined;
   if (typeof value.reason !== "string" || value.reason.trim() === "")
-    throw newAdminError("ZSYS_JOB_ADMIN_REQUEST_INVALID", "Job action reason is invalid");
+    throw newAdminError("RELKIT_JOB_ADMIN_REQUEST_INVALID", "Job action reason is invalid");
   return value.reason.trim().slice(0, 256);
 }
 
@@ -166,7 +166,7 @@ export function safeReason(value: unknown): string | undefined {
 export function safeError(value: unknown): JobAdminError {
   return value instanceof JobAdminError
     ? value
-    : newAdminError("ZSYS_JOB_ADMIN_ACTION_FAILED", "Job admin action failed");
+    : newAdminError("RELKIT_JOB_ADMIN_ACTION_FAILED", "Job admin action failed");
 }
 
 function isState(value: unknown): value is JobQueueEntry["state"] {

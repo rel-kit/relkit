@@ -73,8 +73,8 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
             "C:/absolute",
             "nested\\escape",
             "nested/../escape",
-            ".zsys/internal",
-            "__zsys/internal",
+            ".relkit/internal",
+            "__relkit/internal",
             "null\0byte",
           ]) {
             await expect(client.put(key, new Uint8Array([1]))).rejects.toThrow();
@@ -93,12 +93,12 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
       await withBucket(target, async ({ client, capabilities }) => {
         expect(capabilities).toEqual({ signedReadUrl: false, signedWriteUrl: false });
         await expect(client.createReadUrl("asset.bin")).rejects.toMatchObject({
-          code: "ZSYS_BUCKET_CAPABILITY_UNSUPPORTED",
+          code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
           capability: "signedReadUrl",
           operation: "createReadUrl",
         });
         await expect(client.createWriteUrl("asset.bin")).rejects.toMatchObject({
-          code: "ZSYS_BUCKET_CAPABILITY_UNSUPPORTED",
+          code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
           capability: "signedWriteUrl",
           operation: "createWriteUrl",
         });

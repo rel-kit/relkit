@@ -2,7 +2,7 @@
 
 ### Requirement: Value-free environment contracts
 
-Environment declarations SHALL produce static resolved types, runtime parsing rules, defaults, optional environment-specific requirements, descriptions, examples, sensitivity metadata, and JSON-safe graph projections without resolving process or file values during descriptor evaluation. Applications SHALL declare one schema whose keys receive pipeline-specific values, and SHALL NOT declare the framework-reserved `ZSYS_ENV` key.
+Environment declarations SHALL produce static resolved types, runtime parsing rules, defaults, optional environment-specific requirements, descriptions, examples, sensitivity metadata, and JSON-safe graph projections without resolving process or file values during descriptor evaluation. Applications SHALL declare one schema whose keys receive pipeline-specific values, and SHALL NOT declare the framework-reserved `RELKIT_ENV` key.
 
 #### Scenario: Secret environment variable is compiled
 
@@ -21,7 +21,7 @@ Environment declarations SHALL produce static resolved types, runtime parsing ru
 
 #### Scenario: Application declares the reserved runtime key
 
-- **WHEN** an application environment schema declares `ZSYS_ENV`
+- **WHEN** an application environment schema declares `RELKIT_ENV`
 - **THEN** authoring or compilation rejects it as framework-reserved
 
 ### Requirement: Global logical provider configuration
@@ -31,7 +31,7 @@ Applications SHALL define one provider topology composed from capability adapter
 #### Scenario: Logical profile is selected
 
 - **WHEN** a resource declares profile `archive`
-- **THEN** compilation links it to the topology's `archive` binding for that capability or emits `ZSYS_PROVIDER_PROFILE_UNKNOWN`
+- **THEN** compilation links it to the topology's `archive` binding for that capability or emits `RELKIT_PROVIDER_PROFILE_UNKNOWN`
 
 #### Scenario: Provider option references environment
 

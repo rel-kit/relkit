@@ -1,4 +1,4 @@
-import { defineError, defineFunction } from "@zsys/app";
+import { defineError, defineFunction } from "@relkit/app";
 import { errorData, orderInput, orderOutput } from "../../shared/schemas.js";
 
 const InvalidError = defineError({

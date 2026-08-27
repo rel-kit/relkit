@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { open, readFile, rename, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { canonicalJson, deepFreeze, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, deepFreeze, type JsonValue } from "@relkit/contracts";
 import { ensureOwnedDirectory, quarantineStateFile } from "../state.js";
 import type { JobIndexEntry, JobRecord, JobStoreCheckpoint, JobStoreIndex } from "./store.js";
 export const STORE_VERSION = 1 as const;
@@ -159,7 +159,7 @@ export async function appendDurably(path: string, value: string): Promise<void> 
 
 async function writeDurably(path: string, value: string): Promise<void> {
   const directory = ensureOwnedDirectory(dirname(path));
-  const temporary = join(directory, `.zsys-tmp-${randomUUID()}`);
+  const temporary = join(directory, `.relkit-tmp-${randomUUID()}`);
   let handle;
   try {
     handle = await open(temporary, "wx", 0o600);

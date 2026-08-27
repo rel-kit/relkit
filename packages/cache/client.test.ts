@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 import {
   CacheCapabilityError,
   CacheDependencyError,
@@ -70,12 +70,12 @@ describe("cache Promise client", () => {
     await client.increment({ sku: "a" }, 2);
 
     expect(bridgeNames).toEqual([
-      "zsys.cache.prices.set",
-      "zsys.cache.prices.get",
-      "zsys.cache.prices.delete",
-      "zsys.cache.prices.has",
-      "zsys.cache.prices.getOrSet",
-      "zsys.cache.prices.increment",
+      "relkit.cache.prices.set",
+      "relkit.cache.prices.get",
+      "relkit.cache.prices.delete",
+      "relkit.cache.prices.has",
+      "relkit.cache.prices.getOrSet",
+      "relkit.cache.prices.increment",
     ]);
     expect(edges).toHaveLength(6);
     expect(edges[0]).toEqual({ relationship: "uses-cache", from: "orders.create", to: "prices" });

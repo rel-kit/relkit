@@ -14,7 +14,7 @@ test("collector admits redacted records and retains only its bounded newest wind
   collector.emit({
     version: 1,
     signal: "diagnostic",
-    code: "ZSYS_TEST",
+    code: "RELKIT_TEST",
     severity: "info",
     message: "first",
     occurredAt: "2026-08-16T00:00:00.001Z",
@@ -22,7 +22,7 @@ test("collector admits redacted records and retains only its bounded newest wind
   collector.emit({
     version: 1,
     signal: "diagnostic",
-    code: "ZSYS_TEST",
+    code: "RELKIT_TEST",
     severity: "info",
     message: "second",
     occurredAt: "2026-08-16T00:00:00.002Z",

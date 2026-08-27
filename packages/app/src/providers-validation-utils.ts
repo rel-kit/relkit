@@ -1,5 +1,5 @@
-import { isEnvRef, type EnvRef } from "@zsys/config";
-import { deepFreeze, isJsonValue, normalizeId, type JsonPrimitive } from "@zsys/contracts";
+import { isEnvRef, type EnvRef } from "@relkit/config";
+import { deepFreeze, isJsonValue, normalizeId, type JsonPrimitive } from "@relkit/contracts";
 import type { ProviderCapability, ProviderValue } from "./providers.js";
 
 export function normalizeValue(

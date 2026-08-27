@@ -1,6 +1,10 @@
 import { createInterface } from "node:readline/promises";
-import { createPulumiWorkspace, writePulumiProgram, type PulumiBackend } from "@zsys/deploy-pulumi";
-import type { DeploymentPlan } from "@zsys/deploy";
+import {
+  createPulumiWorkspace,
+  writePulumiProgram,
+  type PulumiBackend,
+} from "@relkit/deploy-pulumi";
+import type { DeploymentPlan } from "@relkit/deploy";
 import type { CliCommandContext, CliFailure } from "../main-support.js";
 import type { BuildOptions, BuildResult } from "./build.js";
 import type { CheckOptions, CheckResult } from "./check.js";
@@ -54,8 +58,8 @@ export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
   const command = args[0];
   if (!(DEPLOY_COMMANDS as readonly string[]).includes(command ?? ""))
     throw new DeployCommandError(
-      "ZSYS_DEPLOY_USAGE",
-      "Usage: zsys deploy init|preview|up|refresh|outputs|destroy [options]",
+      "RELKIT_DEPLOY_USAGE",
+      "Usage: relkit deploy init|preview|up|refresh|outputs|destroy [options]",
     );
   let projectRoot: string | undefined;
   let stack = "development";
@@ -71,9 +75,9 @@ export function parseDeployArgs(args: readonly string[]): ParsedDeployArgs {
     else if (argument === "--config-secret")
       addConfig(config, required(args, ++index, argument), true);
     else if (argument === "--non-interactive" || argument === "--yes") nonInteractive = true;
-    else throw new DeployCommandError("ZSYS_DEPLOY_USAGE", `Unknown deploy option: ${argument}`);
+    else throw new DeployCommandError("RELKIT_DEPLOY_USAGE", `Unknown deploy option: ${argument}`);
   }
-  if (stack.trim() === "") throw new DeployCommandError("ZSYS_DEPLOY_USAGE", "--stack is empty.");
+  if (stack.trim() === "") throw new DeployCommandError("RELKIT_DEPLOY_USAGE", "--stack is empty.");
   return {
     command: command as DeployOperation,
     ...(projectRoot === undefined ? {} : { projectRoot }),
@@ -89,7 +93,7 @@ export function parseBackend(value: string): PulumiBackend {
   if (value === "local") return { kind: "local" };
   if (/^(s3|azblob|gs):\/\/[^/].*/.test(value)) return { kind: "object-storage", url: value };
   throw new DeployCommandError(
-    "ZSYS_DEPLOY_USAGE",
+    "RELKIT_DEPLOY_USAGE",
     "--backend must be cloud, local, or an s3://, azblob://, or gs:// URL.",
   );
 }
@@ -117,7 +121,7 @@ export function safeErrorMessage(error: unknown, redactions: readonly string[] =
 function addConfig(config: ConfigMap, value: string, secret: boolean): void {
   const separator = value.indexOf("=");
   if (separator < 1)
-    throw new DeployCommandError("ZSYS_DEPLOY_USAGE", "--config requires name=value.");
+    throw new DeployCommandError("RELKIT_DEPLOY_USAGE", "--config requires name=value.");
   const name = value.slice(0, separator);
   config[name] = { value: value.slice(separator + 1), ...(secret ? { secret: true } : {}) };
 }
@@ -125,13 +129,13 @@ function addConfig(config: ConfigMap, value: string, secret: boolean): void {
 function required(args: readonly string[], index: number, option: string): string {
   const value = args[index];
   if (value === undefined || value.startsWith("-"))
-    throw new DeployCommandError("ZSYS_DEPLOY_USAGE", `${option} requires a value.`);
+    throw new DeployCommandError("RELKIT_DEPLOY_USAGE", `${option} requires a value.`);
   return value;
 }
 
 export function interrupted(signal: AbortSignal): CliFailure {
   const reason = signal.reason as Partial<CliFailure> | undefined;
-  const code = reason?.code === "ZSYS_INTERRUPTED" ? reason.code : "ZSYS_INTERRUPTED";
+  const code = reason?.code === "RELKIT_INTERRUPTED" ? reason.code : "RELKIT_INTERRUPTED";
   const exitCode = reason?.exitCode === 143 ? 143 : 130;
   return Object.assign(new Error(reason?.message ?? "Deployment interrupted."), {
     code,

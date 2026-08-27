@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
-const session = `zsys-inspector-${process.pid}`;
-const artifacts = resolve(root, ".zsys", "inspector-browser-artifacts");
+const session = `relkit-inspector-${process.pid}`;
+const artifacts = resolve(root, ".relkit", "inspector-browser-artifacts");
 const browserEnv = {
   ...process.env,
   AGENT_BROWSER_ALLOWED_DOMAINS: "127.0.0.1",
@@ -11,7 +11,7 @@ const browserEnv = {
 };
 const fixture = Bun.spawn([process.execPath, "tests/inspector/fixture-server.ts"], {
   cwd: root,
-  env: { ...process.env, ZSYS_FIXTURE_PORT: "3212" },
+  env: { ...process.env, RELKIT_FIXTURE_PORT: "3212" },
   stdout: "ignore",
   stderr: "inherit",
 });
@@ -19,7 +19,7 @@ const inspector = Bun.spawn(
   [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", "3210"],
   {
     cwd: root,
-    env: { ...process.env, ZSYS_BACKEND_URL: "http://127.0.0.1:3212" },
+    env: { ...process.env, RELKIT_BACKEND_URL: "http://127.0.0.1:3212" },
     stdout: "ignore",
     stderr: "inherit",
   },

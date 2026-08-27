@@ -1,8 +1,8 @@
-# ZSYS-DR-001: Foundational Architecture and Developer Experience
+# RELKIT-DR-001: Foundational Architecture and Developer Experience
 
 **Date:** 2026-08-06
 **Status:** Proposed
-**Owners:** ZSys maintainers
+**Owners:** RelKit maintainers
 **Related brief:** [`../briefs/2026-08-06-project-brief.md`](../briefs/2026-08-06-project-brief.md)
 
 ## Context
@@ -13,7 +13,7 @@ The proposed project should provide a well-defined structure comparable to the p
 
 ## Direction discussed
 
-ZSys should be a filesystem-driven application compiler rather than a one-time project generator. It should discover project declarations, construct a normalized application graph, validate cross-system relationships, and render the result through adapters into established TypeScript frameworks and infrastructure tools.
+RelKit should be a filesystem-driven application compiler rather than a one-time project generator. It should discover project declarations, construct a normalized application graph, validate cross-system relationships, and render the result through adapters into established TypeScript frameworks and infrastructure tools.
 
 ## Proposed decisions
 
@@ -31,7 +31,7 @@ The filesystem and TypeScript declarations are authoring formats. The versioned 
 
 ### D-004: Compile into established frameworks
 
-Initial adapters should target Hono, oRPC, Drizzle, Next.js, Better Auth, shadcn/ui, Fumadocs, Scalar, React Email, Resend, OpenTelemetry, Sentry, and SST. ZSys should not rebuild routing, authentication, ORM, or cloud state machinery without a demonstrated need.
+Initial adapters should target Hono, oRPC, Drizzle, Next.js, Better Auth, shadcn/ui, Fumadocs, Scalar, React Email, Resend, OpenTelemetry, Sentry, and SST. RelKit should not rebuild routing, authentication, ORM, or cloud state machinery without a demonstrated need.
 
 ### D-005: Separate capabilities from providers
 

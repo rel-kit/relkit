@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { invokeFunction } from "@zsys/testing";
+import { invokeFunction } from "@relkit/testing";
 import echo from "../../src/functions/echo.function.js";
 
 test("echo returns its input", async () => {

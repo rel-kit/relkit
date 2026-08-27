@@ -1,6 +1,10 @@
-import { normalizeId, type MaybePromise } from "@zsys/contracts";
-import type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@zsys/functions";
-import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import type {
+  EventAttributeValue,
+  EventPublishOptions,
+  EventPublishResult,
+} from "@relkit/functions";
+import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 import {
   EventDependencyError,
   EventOperationCancelledError,
@@ -14,7 +18,11 @@ import {
   resolveValue,
 } from "./client-utils.js";
 import { runAbortable } from "./client-operation.js";
-export type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@zsys/functions";
+export type {
+  EventAttributeValue,
+  EventPublishOptions,
+  EventPublishResult,
+} from "@relkit/functions";
 export {
   EventDependencyError,
   EventOperationCancelledError,
@@ -173,11 +181,11 @@ export function createEventClient<
       );
     };
     const bridged = options.bridge?.run(work, {
-      name: `zsys.event.${eventId}.publish`,
+      name: `relkit.event.${eventId}.publish`,
       attributes: {
-        "zsys.event.id": eventId,
-        "zsys.event.version": version,
-        "zsys.event.profile": profile,
+        "relkit.event.id": eventId,
+        "relkit.event.version": version,
+        "relkit.event.profile": profile,
       },
       signal,
     });

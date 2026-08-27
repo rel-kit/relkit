@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
 export const JOB_QUEUE_STATES = [
   "accepted",
@@ -123,7 +123,7 @@ export interface JobQueue {
 }
 
 export class JobQueueStateError extends Error {
-  readonly code = "ZSYS_JOB_QUEUE_STATE_INVALID" as const;
+  readonly code = "RELKIT_JOB_QUEUE_STATE_INVALID" as const;
 
   constructor(message: string) {
     super(message);

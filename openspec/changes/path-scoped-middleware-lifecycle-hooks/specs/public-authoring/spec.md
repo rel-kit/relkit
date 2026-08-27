@@ -12,7 +12,7 @@ Functions SHALL be the only authored descriptors that own business handlers; pat
 #### Scenario: Route middleware is declared
 
 - **WHEN** application code calls `defineMiddleware(path, handler)`
-- **THEN** it receives a stable middleware descriptor whose handler receives an HTTP context, continuation, and base ZSYS execution context without targeting a function
+- **THEN** it receives a stable middleware descriptor whose handler receives an HTTP context, continuation, and base RELKIT execution context without targeting a function
 
 #### Scenario: Function invokes another function
 

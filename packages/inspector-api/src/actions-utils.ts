@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { API_VERSION, PROTOCOL_VERSION, canonicalJson } from "@zsys/contracts";
+import { API_VERSION, PROTOCOL_VERSION, canonicalJson } from "@relkit/contracts";
 import { isRecord, safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import { ACTION_REDACTION } from "./actions-projection.js";
@@ -9,7 +9,7 @@ import type { InspectorMode } from "./shared.js";
 export function bounded(value: unknown, max = 128): string {
   const text = typeof value === "string" ? value.trim() : undefined;
   if (!text || text.length > max)
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_REQUEST_INVALID", 400);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_REQUEST_INVALID", 400);
   return text;
 }
 
@@ -22,24 +22,24 @@ export function assertProtocol(
   protocol: string,
 ): void {
   if (service === undefined)
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTIONS_UNAVAILABLE", 503);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTIONS_UNAVAILABLE", 503);
   if (
     (service.protocol !== undefined && service.protocol !== protocol) ||
     (service.version !== undefined && service.version !== PROTOCOL_VERSION)
   )
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_PROTOCOL_MISMATCH", 400);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_PROTOCOL_MISMATCH", 400);
 }
 
 export function assertActionState(action: string, value: unknown): void {
-  if (value === undefined) throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_NOT_FOUND", 404);
+  if (value === undefined) throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_NOT_FOUND", 404);
   if (!isRecord(value) || typeof value.state !== "string") return;
   if (action.endsWith(".retry") && value.state !== "dead-lettered")
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_STATE_INELIGIBLE", 409);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_STATE_INELIGIBLE", 409);
   if (
     action.endsWith(".cancel") &&
     ["completed", "dead-lettered", "cancelled"].includes(value.state)
   )
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_STATE_INELIGIBLE", 409);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_STATE_INELIGIBLE", 409);
 }
 
 export function requestFingerprint(
@@ -66,15 +66,16 @@ export function validateIdentity(
   generation: ResolvedActiveGeneration,
   mode: InspectorMode,
 ): void {
-  if (mode === "production") throw new InspectorActionError("ZSYS_INSPECTOR_ACTIONS_DISABLED", 403);
+  if (mode === "production")
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTIONS_DISABLED", 403);
   const requestedMode = request.body.environment ?? request.body.mode;
   if (requestedMode !== undefined && requestedMode !== mode)
-    throw new InspectorActionError("ZSYS_INSPECTOR_ENVIRONMENT_MISMATCH", 400);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ENVIRONMENT_MISMATCH", 400);
   if (
     request.generationId !== generation.generationId ||
     request.graphHash !== generation.graphHash
   )
-    throw new InspectorActionError("ZSYS_INSPECTOR_GENERATION_NOT_ACTIVE", 409);
+    throw new InspectorActionError("RELKIT_INSPECTOR_GENERATION_NOT_ACTIVE", 409);
 }
 
 export function makeAudit(
@@ -91,7 +92,7 @@ export function makeAudit(
       ? redactedReason.reason
       : undefined;
   return {
-    protocol: "zsys.inspector.actions",
+    protocol: "relkit.inspector.actions",
     version: API_VERSION,
     actionId: randomUUID(),
     action: request.action,
@@ -121,7 +122,9 @@ export async function writeAudit(
 export function toActionError(error: unknown): InspectorActionError {
   if (error instanceof InspectorActionError) return error;
   const code =
-    isRecord(error) && typeof error.code === "string" ? error.code : "ZSYS_INSPECTOR_ACTION_FAILED";
+    isRecord(error) && typeof error.code === "string"
+      ? error.code
+      : "RELKIT_INSPECTOR_ACTION_FAILED";
   const status = code.includes("NOT_FOUND")
     ? 404
     : code.includes("MUTATION_DISABLED")
@@ -130,7 +133,7 @@ export function toActionError(error: unknown): InspectorActionError {
         ? 400
         : 409;
   return new InspectorActionError(
-    code.startsWith("ZSYS_") ? code : "ZSYS_INSPECTOR_ACTION_FAILED",
+    code.startsWith("RELKIT_") ? code : "RELKIT_INSPECTOR_ACTION_FAILED",
     status,
   );
 }

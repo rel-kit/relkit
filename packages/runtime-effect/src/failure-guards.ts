@@ -5,5 +5,5 @@ export {
   isProviderError,
   isTimeout,
   requiredText,
-} from "@zsys/invocation";
-export type { DeclaredErrorLike, FunctionFailureLike } from "@zsys/invocation";
+} from "@relkit/invocation";
+export type { DeclaredErrorLike, FunctionFailureLike } from "@relkit/invocation";

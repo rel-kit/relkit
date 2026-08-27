@@ -6,7 +6,7 @@ import {
   normalizeSourcePath,
   type JsonValue,
   type SourceLocation,
-} from "@zsys/contracts";
+} from "@relkit/contracts";
 import type { NormalizeInput, NormalizedDescriptor } from "./normalize-types.js";
 
 export function isRecord(value: unknown): value is Record<string, any> {
@@ -82,7 +82,7 @@ export function profile(value: unknown): string | undefined {
 export function source(
   value: unknown,
   input: NormalizeInput,
-  fallback = "zsys.config.ts",
+  fallback = "relkit.config.ts",
 ): SourceLocation {
   const root = input.projectRoot;
   const location = isSourceLocation(value) ? value : isRecord(value) ? value.source : undefined;

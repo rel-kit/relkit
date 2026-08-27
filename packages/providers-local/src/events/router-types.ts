@@ -1,6 +1,6 @@
-import type { JsonValue } from "@zsys/contracts";
-import type { RetryPolicy } from "@zsys/jobs";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import type { JsonValue } from "@relkit/contracts";
+import type { RetryPolicy } from "@relkit/jobs";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogInput, EventLogRecord } from "./log.js";
 import type { EventDeliveryBoundary, EventDeliveryLedgerRecord } from "./delivery-types.js";

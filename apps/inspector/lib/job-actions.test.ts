@@ -3,8 +3,8 @@ import { createInspectorApiClient } from "./api";
 import { invokeJobAction, jobActionCapabilities, supportsJobAction } from "./job-actions";
 
 const envelope = (value: Record<string, unknown>) =>
-  new Response(JSON.stringify({ protocol: "zsys.inspector", version: 1, ...value }), {
-    headers: { "content-type": "application/json", "x-zsys-api-version": "1" },
+  new Response(JSON.stringify({ protocol: "relkit.inspector", version: 1, ...value }), {
+    headers: { "content-type": "application/json", "x-relkit-api-version": "1" },
   });
 
 describe("inspector job actions", () => {
@@ -17,8 +17,8 @@ describe("inspector job actions", () => {
         url = String(requestUrl);
         init = requestInit;
         return envelope(
-          String(requestUrl).endsWith("/_zsys/v1")
-            ? { capabilities: ["/_zsys/v1/actions/jobs/:id/retry"] }
+          String(requestUrl).endsWith("/_relkit/v1")
+            ? { capabilities: ["/_relkit/v1/actions/jobs/:id/retry"] }
             : { action: { outcome: "applied" } },
         );
       },
@@ -33,7 +33,7 @@ describe("inspector job actions", () => {
       graphHash: "sha256:one",
       idempotencyKey: "retry-1",
     });
-    expect(url).toBe("/_zsys/v1/actions/jobs/job-1/retry");
+    expect(url).toBe("/_relkit/v1/actions/jobs/job-1/retry");
     expect(init?.method).toBe("POST");
     expect(JSON.parse(String(init?.body))).toMatchObject({
       generationId: "generation-one",

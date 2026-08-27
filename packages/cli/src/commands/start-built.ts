@@ -5,8 +5,8 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
-} from "@zsys/contracts";
-import { assertProductionGraph, hashGraph, type ApplicationGraph } from "@zsys/graph";
+} from "@relkit/contracts";
+import { assertProductionGraph, hashGraph, type ApplicationGraph } from "@relkit/graph";
 
 export interface BuiltManifest {
   readonly contractVersion: number;

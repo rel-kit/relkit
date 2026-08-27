@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { defineAgent } from "@zsys/agents";
-import { defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
-import { defineTool } from "@zsys/tools";
+import { defineAgent } from "@relkit/agents";
+import { defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
 import { createTestAgent } from "./src/index.ts";
 
 function setup(approval?: "approved" | "pending") {

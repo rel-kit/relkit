@@ -1,6 +1,6 @@
 ## Purpose
 
-Defines the reproducible workspace, dependency boundaries, and scope guardrails that every ZSys POC package and contributor workflow relies on.
+Defines the reproducible workspace, dependency boundaries, and scope guardrails that every RelKit POC package and contributor workflow relies on.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ The workspace SHALL contain the public and internal package set, `apps/inspector
 
 ### Requirement: Enforced dependency direction
 
-The repository SHALL automatically reject undeclared workspace dependencies, cross-package relative imports, lower-layer imports of higher-layer runtimes, and fixture/generated-application imports of internal Effect, Hono, Next.js, Pulumi, or ZSys implementation packages.
+The repository SHALL automatically reject undeclared workspace dependencies, cross-package relative imports, lower-layer imports of higher-layer runtimes, and fixture/generated-application imports of internal Effect, Hono, Next.js, Pulumi, or RelKit implementation packages.
 
 #### Scenario: Invalid descriptor dependency is caught
 

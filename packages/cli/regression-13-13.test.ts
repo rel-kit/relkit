@@ -54,7 +54,7 @@ test("preserves active traffic across compile, start, hash, API, and readiness f
         `generation-${active!.token.generationToken}`,
       );
       expect(attempts).toBe(2);
-      expect(await readdir(join(root, ".zsys", "generated"))).toEqual([
+      expect(await readdir(join(root, ".relkit", "generated"))).toEqual([
         `generation-${active!.token.generationToken}`,
       ]);
     }
@@ -100,7 +100,7 @@ test("rapid saves obsolete stale candidates and activate only the latest generat
     expect(session.activeTarget?.token).toEqual({ sourceToken: 3, generationToken: 3 });
     expect(session.activeGraphHash).toBe("sha256:source-3");
     expect(await responseText(session, "/hello")).toBe("generation-3");
-    expect(await readdir(join(root, ".zsys", "generated"))).toEqual(["generation-3"]);
+    expect(await readdir(join(root, ".relkit", "generated"))).toEqual(["generation-3"]);
   } finally {
     await session?.stop();
     await rm(root, { recursive: true, force: true });
@@ -123,7 +123,7 @@ test("atomically switches traffic and drains the old request before cleanup", as
     expect(await (await oldRequest).text()).toBe("generation-1");
     expect(session.backendPort).toBe(stablePort);
     expect(session.activeTarget?.token).toEqual({ sourceToken: 2, generationToken: 2 });
-    expect(await readdir(join(root, ".zsys", "generated"))).toEqual(["generation-2"]);
+    expect(await readdir(join(root, ".relkit", "generated"))).toEqual(["generation-2"]);
   } finally {
     await session?.stop();
     await oldRequest?.catch(() => undefined);
@@ -155,7 +155,7 @@ test("shutdown cleans the active backend, inspector child, and generation direct
     expect(typeof (await backend?.process.exited)).toBe("number");
     expect(typeof (await inspector?.process.exited)).toBe("number");
     expect(session.activeTarget).toBeUndefined();
-    expect(await readdir(join(root, ".zsys", "generated"))).toEqual([]);
+    expect(await readdir(join(root, ".relkit", "generated"))).toEqual([]);
   } finally {
     await session?.stop();
     await rm(root, { recursive: true, force: true });

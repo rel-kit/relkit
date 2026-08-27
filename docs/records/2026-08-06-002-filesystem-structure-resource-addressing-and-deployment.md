@@ -1,18 +1,18 @@
-# ZSYS-DR-002: Filesystem Structure, Resource Addressing, and One-Command Deployment
+# RELKIT-DR-002: Filesystem Structure, Resource Addressing, and One-Command Deployment
 
 **Date:** 2026-08-06
 
 **Status:** Proposed
 
-**Owners:** ZSys maintainers
+**Owners:** RelKit maintainers
 
-**Related records:** [ZSYS-DR-001](./2026-08-06-001-foundational-architecture.md)
+**Related records:** [RELKIT-DR-001](./2026-08-06-001-foundational-architecture.md)
 
 **Related brief:** [`../briefs/2026-08-06-project-brief.md`](../briefs/2026-08-06-project-brief.md)
 
 ## Context
 
-ZSys needs a project structure as predictable as Next.js routing conventions, but capable of describing a complete application: API routes, views, entities, modules, realtime channels, caches, agents, workflows, tools, databases, deployment providers, UI surfaces, documentation, and observability.
+RelKit needs a project structure as predictable as Next.js routing conventions, but capable of describing a complete application: API routes, views, entities, modules, realtime channels, caches, agents, workflows, tools, databases, deployment providers, UI surfaces, documentation, and observability.
 
 The structure must serve TypeScript developers and AI agents, produce deterministic addresses for application resources, and support a single deployment command without hiding infrastructure changes or trapping developers in generated code.
 
@@ -82,7 +82,7 @@ The physical repository should be organized primarily under `modules/<module-id>
 
 ### D-012: Use deterministic filesystem conventions
 
-ZSys should reserve well-known files and path syntax, including:
+RelKit should reserve well-known files and path syntax, including:
 
 ```text
 module.ts       module declaration and public exports
@@ -207,8 +207,8 @@ None.
 
 ## References
 
-- [ZSYS-DR-001: Foundational Architecture and Developer Experience](./2026-08-06-001-foundational-architecture.md)
-- [ZSys Project Brief](../briefs/2026-08-06-project-brief.md)
+- [RELKIT-DR-001: Foundational Architecture and Developer Experience](./2026-08-06-001-foundational-architecture.md)
+- [RelKit Project Brief](../briefs/2026-08-06-project-brief.md)
 
 ## Change history
 

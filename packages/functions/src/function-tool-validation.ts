@@ -1,4 +1,4 @@
-import { isRef, isStableId } from "@zsys/contracts";
+import { isRef, isStableId } from "@relkit/contracts";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionRefAny } from "./types.js";
 import type { FunctionToolApproval, FunctionToolSideEffect } from "./function-tool.js";

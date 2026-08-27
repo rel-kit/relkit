@@ -1,4 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
@@ -37,7 +37,7 @@ export function identityBindingStatements(
           (expression, segment) => `${expression}[${JSON.stringify(segment)}]`,
           root,
         );
-        return `__zsys_bindDescriptorIdentity(${value}, ${JSON.stringify(entry.id)});`;
+        return `__relkit_bindDescriptorIdentity(${value}, ${JSON.stringify(entry.id)});`;
       })
       .filter(Boolean),
   );

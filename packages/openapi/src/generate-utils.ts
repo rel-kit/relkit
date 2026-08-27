@@ -1,4 +1,4 @@
-import type { FunctionNode, ServiceNode } from "@zsys/graph";
+import type { FunctionNode, ServiceNode } from "@relkit/graph";
 import type { HttpGraphTrigger, OpenApiOperation } from "./generate.js";
 import { buildRequest } from "./generate-request.js";
 import { buildResponses } from "./generate-response.js";
@@ -23,7 +23,7 @@ export function buildOperation(
     ...(request.parameters.length === 0 ? {} : { parameters: request.parameters }),
     ...(request.body === undefined ? {} : { requestBody: request.body }),
     responses: buildResponses(trigger.config.responses, target),
-    "x-zsys": {
+    "x-relkit": {
       routeId: trigger.id,
       functionId: target.id,
       ...(service === undefined ? {} : { serviceId: service.id }),

@@ -1,6 +1,6 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { LoadedToolingConfig } from "@zsys/compiler";
+import type { LoadedToolingConfig } from "@relkit/compiler";
 import type { DoctorCheck, DoctorOptions } from "./doctor-support.js";
 import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
 
@@ -52,11 +52,11 @@ export function checkAws(
 
 export async function checkRoots(root: string): Promise<DoctorCheck> {
   const paths = [
-    ".zsys",
-    ".zsys/generated",
-    ".zsys/build",
-    ".zsys/state",
-    ".zsys/observability",
+    ".relkit",
+    ".relkit/generated",
+    ".relkit/build",
+    ".relkit/state",
+    ".relkit/observability",
   ].map((path) => join(root, path));
   const failures: string[] = [];
   for (const path of paths) {
@@ -71,12 +71,12 @@ export async function checkRoots(root: string): Promise<DoctorCheck> {
     }
   }
   return {
-    name: "zsys-roots",
+    name: "relkit-roots",
     ok: failures.length === 0,
     message:
       failures.length === 0
-        ? ".zsys roots are writable."
-        : "One or more .zsys roots are not writable.",
+        ? ".relkit roots are writable."
+        : "One or more .relkit roots are not writable.",
     ...(failures.length === 0 ? {} : { details: { failed: failures } }),
   };
 }

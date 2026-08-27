@@ -5,8 +5,8 @@ import {
   type InvocationDispatchRequest,
   type InvocationDispatcher,
   type InvocationTarget as SharedInvocationTarget,
-} from "@zsys/invocation";
-import type { ObservedEdge } from "@zsys/graph";
+} from "@relkit/invocation";
+import type { ObservedEdge } from "@relkit/graph";
 import type { InvocationContext, InvocationTarget, InvokeOptions } from "./invoke-types.js";
 
 /** Adapts the generation-aware engine to the dependency-neutral dispatch scope. */

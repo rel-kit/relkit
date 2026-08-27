@@ -1,6 +1,6 @@
-import type { RawHttpHandler } from "@zsys/routes";
+import type { RawHttpHandler } from "@relkit/routes";
 
-export const BETTER_AUTH_HANDLER = Symbol.for("zsys.better-auth.handler");
+export const BETTER_AUTH_HANDLER = Symbol.for("relkit.better-auth.handler");
 
 export interface BetterAuthLike<Session = unknown> {
   readonly handler: (request: Request) => Promise<Response>;

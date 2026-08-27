@@ -1,11 +1,11 @@
-# @zsys/events
+# @relkit/events
 
 Events are versioned contracts. A listener is one typed callback; the compiler
 lowers it to the same function engine and durable trigger used by every runtime.
 
 ```ts
-import { defineEvent, onEvent } from "@zsys/events";
-import { z } from "@zsys/schema";
+import { defineEvent, onEvent } from "@relkit/events";
+import { z } from "@relkit/schema";
 export const orderCreated = defineEvent({
   id: "orders.created",
   version: 1,
@@ -25,8 +25,8 @@ export const sendReceipt = onEvent(
 );
 ```
 
-`zsys create`, `zsys check`, and `zsys dev` generate
-`.zsys/generated/event-registry.d.ts`, which supplies event-name autocomplete,
+`relkit create`, `relkit check`, and `relkit dev` generate
+`.relkit/generated/event-registry.d.ts`, which supplies event-name autocomplete,
 payload types, versions, and selector unions. Delivery defaults to `durable`;
 use `{ delivery: "ephemeral" }` explicitly for best-effort telemetry.
 

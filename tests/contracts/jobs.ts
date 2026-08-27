@@ -85,7 +85,7 @@ export function registerJobContractSuite(target: JobContractTarget): void {
     test("rejects invalid input before durable acceptance or target invocation", async () => {
       await withJob(target, async ({ job, invocations }) => {
         await expect(job.enqueue({ orderId: 42 } as never)).rejects.toMatchObject({
-          code: "ZSYS_JOB_INPUT_VALIDATION",
+          code: "RELKIT_JOB_INPUT_VALIDATION",
         });
         expect(job.status()).toMatchObject({
           accepted: 0,
@@ -391,7 +391,7 @@ export function registerJobContractSuite(target: JobContractTarget): void {
         await appendFile(join(root, "records.ndjson"), "not-json\n");
         await job.restart();
 
-        expect(await readdir(join(root, ".zsys-quarantine"))).toHaveLength(1);
+        expect(await readdir(join(root, ".relkit-quarantine"))).toHaveLength(1);
         expect(job.status()).toMatchObject({ available: 1 });
         await expect(job.drain()).resolves.toMatchObject([{ state: "completed" }]);
       });

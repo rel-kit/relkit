@@ -39,7 +39,7 @@ Compiler diagnostics SHALL include stable code, severity, message, optional proj
 #### Scenario: Duplicate ID is reported
 
 - **WHEN** two descriptors use the same stable ID
-- **THEN** `ZSYS_DUPLICATE_ID` identifies both project-relative source locations
+- **THEN** `RELKIT_DUPLICATE_ID` identifies both project-relative source locations
 
 ### Requirement: Canonical deterministic graph
 
@@ -71,7 +71,7 @@ Routes and event listeners SHALL remain distinct authoring and inspector concept
 #### Scenario: Pattern matches no known event
 
 - **WHEN** a syntactically valid event pattern expands to no known event/version pair
-- **THEN** compilation emits the `ZSYS_EVENT_SELECTOR_EMPTY` no-match warning and still distinguishes that warning from an invalid explicitly empty selector
+- **THEN** compilation emits the `RELKIT_EVENT_SELECTOR_EMPTY` no-match warning and still distinguishes that warning from an invalid explicitly empty selector
 
 #### Scenario: File route expands
 
@@ -85,12 +85,12 @@ The compiler SHALL generate a versioned runtime manifest containing executable f
 #### Scenario: Manifest and graph differ
 
 - **WHEN** a manifest graph hash does not equal the canonical graph hash
-- **THEN** activation is rejected with `ZSYS_GRAPH_MANIFEST_MISMATCH`
+- **THEN** activation is rejected with `RELKIT_GRAPH_MANIFEST_MISMATCH`
 
 #### Scenario: Handler reference is missing
 
 - **WHEN** a function graph node has no executable manifest handler
-- **THEN** compilation or activation fails with `ZSYS_MANIFEST_HANDLER_MISSING`
+- **THEN** compilation or activation fails with `RELKIT_MANIFEST_HANDLER_MISSING`
 
 #### Scenario: Middleware or transform reference is invalid
 
@@ -169,7 +169,7 @@ The compiler SHALL derive route methods and paths from named exports in `src/rou
 #### Scenario: Route variants collide
 
 - **WHEN** two authored routes normalize to the same method and runtime path variant
-- **THEN** compilation emits `ZSYS_ROUTE_COLLISION` with both source locations and emits no activatable manifest
+- **THEN** compilation emits `RELKIT_ROUTE_COLLISION` with both source locations and emits no activatable manifest
 
 ### Requirement: Generated typed event registry
 
@@ -177,7 +177,7 @@ Compilation SHALL generate a deterministic TypeScript declaration mapping discov
 
 #### Scenario: Event is added
 
-- **WHEN** a new event descriptor is discovered by `zsys dev`, `zsys check`, or project creation
+- **WHEN** a new event descriptor is discovered by `relkit dev`, `relkit check`, or project creation
 - **THEN** the registry is atomically refreshed and editor/type-checking consumers can autocomplete its ID
 
 #### Scenario: Event is removed
@@ -231,7 +231,7 @@ When an eligible source-scoped descriptor omits `id`, the compiler SHALL derive 
 #### Scenario: Two IDs collide
 
 - **WHEN** explicit and inferred identities normalize to the same global ID
-- **THEN** `ZSYS_DUPLICATE_ID` identifies every origin and no activatable output is emitted
+- **THEN** `RELKIT_DUPLICATE_ID` identifies every origin and no activatable output is emitted
 
 ### Requirement: Inferred identities are bound into executable output
 

@@ -92,13 +92,13 @@ describe("local durable job store", () => {
 
     const recovered = await createJobStore(root);
     expect(recovered.snapshot().records).toHaveLength(1);
-    expect(await readdir(join(root, ".zsys-quarantine"))).toHaveLength(2);
+    expect(await readdir(join(root, ".relkit-quarantine"))).toHaveLength(2);
     await recovered.close();
   });
 });
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-jobs-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-jobs-"));
   roots.push(root);
   return join(root, "jobs");
 }

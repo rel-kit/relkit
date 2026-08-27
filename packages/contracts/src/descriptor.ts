@@ -1,7 +1,7 @@
 import { type DescriptorKind, type Ref, isStableId, normalizeId } from "./id.js";
 
-/** The shared runtime brand used by every ZSys descriptor factory. */
-export const ZSYS_DESCRIPTOR: unique symbol = Symbol.for("zsys.descriptor");
+/** The shared runtime brand used by every RelKit descriptor factory. */
+export const RELKIT_DESCRIPTOR: unique symbol = Symbol.for("relkit.descriptor");
 
 /** Common serializable metadata shared by all public descriptors. */
 export interface DescriptorMetadata {
@@ -15,7 +15,7 @@ export interface DescriptorBase<
   Kind extends DescriptorKind,
   Id extends string = string,
 > extends DescriptorMetadata {
-  readonly [ZSYS_DESCRIPTOR]: true;
+  readonly [RELKIT_DESCRIPTOR]: true;
   readonly kind: Kind;
   readonly id: Id;
   readonly ref: Ref<Kind, Id>;
@@ -79,7 +79,7 @@ export function assertRef<Kind extends DescriptorKind>(
 ): asserts value is Ref<Kind, string>;
 export function assertRef(value: unknown, kind?: DescriptorKind): void {
   if (!isRef(value) || (kind !== undefined && value.kind !== kind)) {
-    throw new TypeError("Invalid ZSys descriptor reference");
+    throw new TypeError("Invalid RelKit descriptor reference");
   }
 }
 
@@ -90,7 +90,7 @@ export function isDescriptor<Kind extends DescriptorKind>(
   kind: Kind,
 ): value is DescriptorBase<Kind, string>;
 export function isDescriptor(value: unknown, kind?: DescriptorKind): value is DescriptorAny {
-  if (!isRecord(value) || !hasOwn(value, ZSYS_DESCRIPTOR) || value[ZSYS_DESCRIPTOR] !== true) {
+  if (!isRecord(value) || !hasOwn(value, RELKIT_DESCRIPTOR) || value[RELKIT_DESCRIPTOR] !== true) {
     return false;
   }
   if (!hasOwn(value, "kind") || !hasOwn(value, "id") || !hasOwn(value, "ref")) return false;
@@ -106,7 +106,7 @@ export function isDescriptor(value: unknown, kind?: DescriptorKind): value is De
 
 /** Asserts that a value is a branded descriptor with a valid stable reference. */
 export function assertDescriptor(value: unknown): asserts value is DescriptorAny {
-  if (!isDescriptor(value)) throw new TypeError("Invalid ZSys descriptor");
+  if (!isDescriptor(value)) throw new TypeError("Invalid RelKit descriptor");
 }
 
 /** Builds the shared descriptor fields used by later pure public factories. */
@@ -117,7 +117,7 @@ export function createDescriptorBase<Kind extends DescriptorKind, Id extends str
 ): DescriptorBase<Kind, Id> {
   const tags = metadata.tags === undefined ? undefined : Object.freeze([...metadata.tags]);
   const value = {
-    [ZSYS_DESCRIPTOR]: true as const,
+    [RELKIT_DESCRIPTOR]: true as const,
     kind,
     id: normalizeId(id) as unknown as Id,
     ...(metadata.title === undefined ? {} : { title: metadata.title }),

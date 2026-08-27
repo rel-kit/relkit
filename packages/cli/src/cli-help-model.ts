@@ -1,4 +1,4 @@
-import { deepFreeze } from "@zsys/contracts";
+import { deepFreeze } from "@relkit/contracts";
 import { argument, command, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
 
@@ -20,49 +20,54 @@ const deployOptions = [
   option("non-interactive", "boolean", "Approve protected operations", ["yes"]),
 ];
 
-const graph = command("graph", "Inspect deterministic application graphs", "zsys graph <command>", {
-  commands: [
-    command(
-      "print",
-      "Print a canonical graph with services and resolved source IDs",
-      "zsys graph print [graph]",
-      {
-        options: [projectRoot],
+const graph = command(
+  "graph",
+  "Inspect deterministic application graphs",
+  "relkit graph <command>",
+  {
+    commands: [
+      command(
+        "print",
+        "Print a canonical graph with services and resolved source IDs",
+        "relkit graph print [graph]",
+        {
+          options: [projectRoot],
+          arguments: [argument("graph", false, "Graph JSON path")],
+        },
+      ),
+      command("check", "Validate a graph and optional hash", "relkit graph check [graph]", {
+        options: [projectRoot, option("hash", "string", "Expected sha256 graph hash")],
         arguments: [argument("graph", false, "Graph JSON path")],
-      },
-    ),
-    command("check", "Validate a graph and optional hash", "zsys graph check [graph]", {
-      options: [projectRoot, option("hash", "string", "Expected sha256 graph hash")],
-      arguments: [argument("graph", false, "Graph JSON path")],
-    }),
-    command(
-      "diff",
-      "Compare graph compatibility, including inferred identity moves",
-      "zsys graph diff <before> <after>",
-      {
-        options: [projectRoot],
-        arguments: [
-          argument("before", true, "Previous graph path"),
-          argument("after", true, "Next graph path"),
-        ],
-      },
-    ),
-  ],
-});
+      }),
+      command(
+        "diff",
+        "Compare graph compatibility, including inferred identity moves",
+        "relkit graph diff <before> <after>",
+        {
+          options: [projectRoot],
+          arguments: [
+            argument("before", true, "Previous graph path"),
+            argument("after", true, "Next graph path"),
+          ],
+        },
+      ),
+    ],
+  },
+);
 
-const env = command("env", "Inspect value-free environment contracts", "zsys env <command>", {
+const env = command("env", "Inspect value-free environment contracts", "relkit env <command>", {
   commands: [
-    command("check", "Validate environment values", "zsys env check", {
+    command("check", "Validate environment values", "relkit env check", {
       options: [projectRoot, environment],
     }),
-    command("list", "List environment value status", "zsys env list", {
+    command("list", "List environment value status", "relkit env list", {
       options: [projectRoot, environment],
     }),
-    command("explain", "Explain one environment variable", "zsys env explain <name>", {
+    command("explain", "Explain one environment variable", "relkit env explain <name>", {
       options: [projectRoot, environment],
       arguments: [argument("name", true, "Environment variable name")],
     }),
-    command("example", "Render or write a safe .env example", "zsys env example", {
+    command("example", "Render or write a safe .env example", "relkit env example", {
       options: [
         projectRoot,
         environment,
@@ -73,9 +78,9 @@ const env = command("env", "Inspect value-free environment contracts", "zsys env
   ],
 });
 
-const deploy = command("deploy", "Manage Pulumi deployments", "zsys deploy <command>", {
+const deploy = command("deploy", "Manage Pulumi deployments", "relkit deploy <command>", {
   commands: ["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) =>
-    command(name, `${title(name)} the Pulumi stack`, `zsys deploy ${name}`, {
+    command(name, `${title(name)} the Pulumi stack`, `relkit deploy ${name}`, {
       options: deployOptions,
     }),
   ),
@@ -84,15 +89,15 @@ const deploy = command("deploy", "Manage Pulumi deployments", "zsys deploy <comm
 const client = command(
   "client",
   "Generate a client from a running application",
-  "zsys client <command>",
+  "relkit client <command>",
   {
     commands: [
       command(
         "pull",
         "Pull a versioned client contract",
-        "zsys client pull <baseUrl> --out <directory>",
+        "relkit client pull <baseUrl> --out <directory>",
         {
-          arguments: [argument("baseUrl", true, "Running ZSYS application URL")],
+          arguments: [argument("baseUrl", true, "Running RELKIT application URL")],
           options: [option("out", "string", "Output directory")],
         },
       ),
@@ -101,13 +106,13 @@ const client = command(
 );
 
 const root = command(
-  "zsys",
+  "relkit",
   "Convention-first TypeScript application framework",
-  "zsys <command>",
+  "relkit <command>",
   {
     options: [option("json", "boolean", "Emit machine-readable output")],
     commands: [
-      command("create", "Create a new ZSYS application", "zsys create <name>", {
+      command("create", "Create a new RELKIT application", "relkit create <name>", {
         arguments: [argument("name", true, "npm package and application name")],
         options: [
           option("template", "choice", "Starter template", [], ["minimal", "api", "agent"]),
@@ -120,7 +125,7 @@ const root = command(
           option("force-empty-directory", "boolean", "Allow an existing empty destination"),
         ],
       }),
-      command("dev", "Run app, inspector, OpenAPI, and Scalar", "zsys dev", {
+      command("dev", "Run app, inspector, OpenAPI, and Scalar", "relkit dev", {
         options: [
           projectRoot,
           option("port", "integer", "Application port"),
@@ -130,20 +135,20 @@ const root = command(
       command(
         "check",
         "Compile descriptors, infer eligible IDs, and validate the application",
-        "zsys check",
+        "relkit check",
         {
           options: [projectRoot],
         },
       ),
-      command("build", "Build the checked graph, manifest, OpenAPI, and client", "zsys build", {
+      command("build", "Build the checked graph, manifest, OpenAPI, and client", "relkit build", {
         options: [projectRoot],
       }),
-      command("start", "Start a built application", "zsys start", {
+      command("start", "Start a built application", "relkit start", {
         options: [projectRoot, option("port", "integer", "Application port")],
       }),
       graph,
       env,
-      command("doctor", "Check local prerequisites and ports", "zsys doctor", {
+      command("doctor", "Check local prerequisites and ports", "relkit doctor", {
         options: [
           projectRoot,
           option("port", "integer", "Application port"),

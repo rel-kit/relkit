@@ -1,4 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
@@ -29,7 +29,7 @@ export function eventListenerExecutableExpression(
   const listener = `${binding.alias}[${JSON.stringify(reference.exportName)}]`;
   if (property === "handler") return `${listener}.target.handler`;
   const contracts = eventContracts(generated.listenerId, input, bindings);
-  return `__zsys_createEventListenerTarget(${listener}, [${contracts.join(", ")}], ${JSON.stringify(generated.functionId)})`;
+  return `__relkit_createEventListenerTarget(${listener}, [${contracts.join(", ")}], ${JSON.stringify(generated.functionId)})`;
 }
 
 function eventContracts(

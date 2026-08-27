@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import type {
   OpenApiMediaType,
   OpenApiOperation,
@@ -119,7 +119,7 @@ function objectSchema(entries: readonly BodyEntry[]): OpenApiSchema {
 
 function schemaValue(value: unknown): OpenApiSchema | undefined {
   if (!isRecord(value)) return undefined;
-  return value.$zsys === "schema" && isRecord(value.jsonSchema)
+  return value.$relkit === "schema" && isRecord(value.jsonSchema)
     ? (value.jsonSchema as OpenApiSchema)
     : (value as OpenApiSchema);
 }

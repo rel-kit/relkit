@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@zsys/diagnostics";
+import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@relkit/diagnostics";
 import ts from "typescript";
 
 /** Type-checks a project with its own tsconfig after generated declarations exist. */

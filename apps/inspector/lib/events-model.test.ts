@@ -25,9 +25,9 @@ const graph = {
 } as unknown as InspectorGraph;
 
 const runtime = {
-  protocol: "zsys.inspector",
+  protocol: "relkit.inspector",
   version: 1,
-  eventProtocol: "zsys.events.admin",
+  eventProtocol: "relkit.events.admin",
   eventVersion: 1,
   events: [],
   triggers: [],

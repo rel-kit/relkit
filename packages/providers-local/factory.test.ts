@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { external, s3 } from "@zsys/app";
+import { external, s3 } from "@relkit/app";
 import { getLocalProviderFactory, localProviderFactories } from "./src/factory.ts";
 
 test("exports one deterministic memory factory for every provider capability", async () => {

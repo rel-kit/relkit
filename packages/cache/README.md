@@ -1,11 +1,11 @@
-# @zsys/cache
+# @relkit/cache
 
 Caches declare typed keys, values, logical profiles, and TTL policy. Runtime
 clients are available only to functions that declare the cache dependency.
 
 ```ts
-import { defineCache } from "@zsys/cache";
-import { z } from "@zsys/schema";
+import { defineCache } from "@relkit/cache";
+import { z } from "@relkit/schema";
 
 export default defineCache({
   id: "prices",

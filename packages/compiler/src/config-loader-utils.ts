@@ -19,7 +19,7 @@ export function readRecord(
   const safe = Reflect.ownKeys(value).every((key) => {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
     return (
-      (typeof key === "string" || key === Symbol.for("zsys.descriptor")) &&
+      (typeof key === "string" || key === Symbol.for("relkit.descriptor")) &&
       descriptor !== undefined &&
       "value" in descriptor
     );

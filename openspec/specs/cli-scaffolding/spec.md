@@ -1,21 +1,21 @@
 ## Purpose
 
-Defines deterministic ZSys command behavior and atomic project generation so a new developer can create, validate, run, inspect, build, and prepare deployment without manual wiring.
+Defines deterministic RelKit command behavior and atomic project generation so a new developer can create, validate, run, inspect, build, and prepare deployment without manual wiring.
 
 ## Requirements
 
-### Requirement: Stable ZSys CLI contract
+### Requirement: Stable RelKit CLI contract
 
-The `zsys` CLI SHALL provide command-local and nested help, examples, generated shell completions, deterministic exit codes, human and `--json` output, and commands for development, checking, building, starting, graph print/check/diff, environment operations, doctor, project creation, and deployment delegation.
+The `relkit` CLI SHALL provide command-local and nested help, examples, generated shell completions, deterministic exit codes, human and `--json` output, and commands for development, checking, building, starting, graph print/check/diff, environment operations, doctor, project creation, and deployment delegation.
 
 #### Scenario: Nested help is requested
 
-- **WHEN** a user runs `zsys create --help` or help for a deeper command such as `zsys graph diff`
+- **WHEN** a user runs `relkit create --help` or help for a deeper command such as `relkit graph diff`
 - **THEN** output contains that command's usage, flags, examples, and subcommands without unrelated root-only help
 
 #### Scenario: Check fails semantically
 
-- **WHEN** `zsys check` encounters compiler errors
+- **WHEN** `relkit check` encounters compiler errors
 - **THEN** it emits structured diagnostics, exits non-zero, and does not leave an activatable generated manifest
 
 #### Scenario: JSON mode is requested
@@ -30,21 +30,21 @@ The `zsys` CLI SHALL provide command-local and nested help, examples, generated 
 
 ### Requirement: Environment commands are secret-safe
 
-`zsys env check`, `example`, `explain`, and `list` SHALL validate the active contract, generate deterministic examples, explain metadata, and report names/status without revealing secrets or overwriting edited files unless explicitly requested.
+`relkit env check`, `example`, `explain`, and `list` SHALL validate the active contract, generate deterministic examples, explain metadata, and report names/status without revealing secrets or overwriting edited files unless explicitly requested.
 
 #### Scenario: Example file exists
 
-- **WHEN** `zsys env example` is run without `--write` against an edited `.env.example`
+- **WHEN** `relkit env example` is run without `--write` against an edited `.env.example`
 - **THEN** it reports deterministic proposed content without overwriting the file
 
 #### Scenario: Secret is explained
 
-- **WHEN** `zsys env explain OPENAI_API_KEY` runs
+- **WHEN** `relkit env explain OPENAI_API_KEY` runs
 - **THEN** it prints type, requirements, default presence, sensitivity, and description but not a resolved value
 
 ### Requirement: Project creation entry points and defaults
 
-`bunx create-zsys@latest <name>` and `zsys create <name>` SHALL generate a convention-based TypeScript/Bun project using internal Hono, `@zsys/schema`, built-in local/test providers, Pulumi/AWS defaults, a minimal function and named-method `src/routes/**/route.ts`, typed config, tests, Bun package management, and Git initialization when available unless flags override supported choices.
+`bunx create-relkit@latest <name>` and `relkit create <name>` SHALL generate a convention-based TypeScript/Bun project using internal Hono, `@relkit/schema`, built-in local/test providers, Pulumi/AWS defaults, a minimal function and named-method `src/routes/**/route.ts`, typed config, tests, Bun package management, and Git initialization when available unless flags override supported choices.
 
 #### Scenario: Default project is generated
 
@@ -53,8 +53,8 @@ The `zsys` CLI SHALL provide command-local and nested help, examples, generated 
 
 #### Scenario: Both creation entry points receive equivalent options
 
-- **WHEN** the packed `create-zsys` binary and `zsys create` run with the same normalized options in separate empty destinations
-- **THEN** `zsys create` delegates to the same generator API and both destinations are byte-identical apart from explicitly documented destination-derived values
+- **WHEN** the packed `create-relkit` binary and `relkit create` run with the same normalized options in separate empty destinations
+- **THEN** `relkit create` delegates to the same generator API and both destinations are byte-identical apart from explicitly documented destination-derived values
 
 ### Requirement: Supported non-interactive options
 
@@ -81,7 +81,7 @@ The generator SHALL validate package name/path, refuse a non-empty destination u
 
 ### Requirement: Generated application stays on public APIs
 
-Generated source SHALL use ordinary async handlers, Standard Schema via `@zsys/schema`, public `@zsys/*` descriptors/testing helpers, global providers, body capture off by default, and SHALL contain no internal Effect, Hono, Next.js, Pulumi, or cloud SDK import.
+Generated source SHALL use ordinary async handlers, Standard Schema via `@relkit/schema`, public `@relkit/*` descriptors/testing helpers, global providers, body capture off by default, and SHALL contain no internal Effect, Hono, Next.js, Pulumi, or cloud SDK import.
 
 #### Scenario: Generated source is scanned
 
@@ -99,7 +99,7 @@ After successful default generation, the printed `cd` and `bun run dev` commands
 
 ### Requirement: Doctor reports prerequisites safely
 
-`zsys doctor` SHALL check supported Bun/TypeScript/package versions, Pulumi availability when enabled, AWS credential visibility without printing credentials, writable state directories, ports, config/app validity, and frozen-lock consistency.
+`relkit doctor` SHALL check supported Bun/TypeScript/package versions, Pulumi availability when enabled, AWS credential visibility without printing credentials, writable state directories, ports, config/app validity, and frozen-lock consistency.
 
 #### Scenario: AWS credentials are missing
 
@@ -126,7 +126,7 @@ CLI operations SHALL use fixed application/source/generated conventions and SHAL
 
 #### Scenario: Inspector environment override is present
 
-- **WHEN** no inspector flag is passed and `ZSYS_INSPECTOR_PORT` is set
+- **WHEN** no inspector flag is passed and `RELKIT_INSPECTOR_PORT` is set
 - **THEN** it overrides `inspector.port` and the default
 
 ### Requirement: Self-contained packaged development
@@ -136,7 +136,7 @@ The packed CLI SHALL include or resolve a compatible prebuilt inspector without 
 #### Scenario: Packed development starts outside the monorepo
 
 - **WHEN** a generated project installs the packed CLI in a temporary directory and runs development
-- **THEN** the backend, inspector, OpenAPI, and API reference start and shut down without `ZSYS_INSPECTOR_ROOT`
+- **THEN** the backend, inspector, OpenAPI, and API reference start and shut down without `RELKIT_INSPECTOR_ROOT`
 
 #### Scenario: Port is occupied
 

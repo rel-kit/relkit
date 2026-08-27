@@ -1,4 +1,4 @@
-import { defineTool } from "@zsys/app";
+import { defineTool } from "@relkit/app";
 import getOrder from "../functions/orders/get-order.function.js";
 
 export default defineTool({

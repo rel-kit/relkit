@@ -19,7 +19,7 @@ export class JsonValueError extends TypeError {
   }
 }
 
-/** Returns whether a value is a JSON primitive accepted by ZSys. */
+/** Returns whether a value is a JSON primitive accepted by RelKit. */
 export function isJsonPrimitive(value: unknown): value is JsonPrimitive {
   return (
     value === null ||

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
 import { installInspectorEndpoints } from "./src/index.ts";
 

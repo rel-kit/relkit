@@ -1,4 +1,4 @@
-# ZSYS-DR-NNN: Title
+# RELKIT-DR-NNN: Title
 
 **Date:** YYYY-MM-DD
 **Status:** Proposed | Accepted | Implemented | Rejected | Superseded

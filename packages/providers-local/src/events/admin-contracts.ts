@@ -1,8 +1,8 @@
-import { PROTOCOL_VERSION, type JsonValue, type MaybePromise } from "@zsys/contracts";
-import type { RetryPolicy } from "@zsys/jobs";
+import { PROTOCOL_VERSION, type JsonValue, type MaybePromise } from "@relkit/contracts";
+import type { RetryPolicy } from "@relkit/jobs";
 import type { JobFailureMetadata, JobQueueState } from "../jobs/queue-utils.js";
 
-export const EVENT_ADMIN_PROTOCOL = "zsys.events.admin" as const;
+export const EVENT_ADMIN_PROTOCOL = "relkit.events.admin" as const;
 export const EVENT_ADMIN_VERSION = PROTOCOL_VERSION;
 
 export type EventAdminMode = "development" | "test" | "production";

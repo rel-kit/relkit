@@ -1,4 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import { realpathSync } from "node:fs";
 import { isAbsolute, resolve } from "node:path";
 import {
@@ -37,7 +37,7 @@ export function createEvaluatorRequest(options: EvaluatorOptions): EvaluatorRequ
   if (networkAllowlist.some((host) => host.trim() === "" || /[\s/]/.test(host)))
     throw new TypeError("networkAllowlist contains an invalid host");
   const generatedDirectory = normalizeSourcePath(
-    options.generatedDirectory ?? ".zsys/generated",
+    options.generatedDirectory ?? ".relkit/generated",
     projectRoot,
   );
   const candidates = options.candidates.map((candidate) => {

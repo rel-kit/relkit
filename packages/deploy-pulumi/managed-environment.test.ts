@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { DeploymentPlan } from "@zsys/deploy";
+import type { DeploymentPlan } from "@relkit/deploy";
 import { withoutManagedCredentials } from "./src/aws-program-environment.ts";
 
 test("managed bindings remove pipeline credentials in favor of workload identity", () => {

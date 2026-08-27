@@ -1,5 +1,5 @@
-import { createEventClient, type EventObservedEdge } from "@zsys/events";
-import type { ObservedEdge } from "@zsys/graph";
+import { createEventClient, type EventObservedEdge } from "@relkit/events";
+import type { ObservedEdge } from "@relkit/graph";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 
 export function createEventDependencyClient(

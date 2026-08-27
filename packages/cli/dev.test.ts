@@ -2,7 +2,12 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
-import { API_BASE_PATH, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import {
+  API_BASE_PATH,
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+} from "@relkit/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 import {
   configuredInspectorOptions,
@@ -33,8 +38,8 @@ test("owns a stable proxy, dynamic backend, candidate, and clean stop", async ()
     level: "info",
     event: "dev.ready",
     fields: expect.objectContaining({
-      openapi: `http://127.0.0.1:${session.backendPort}/_zsys/v1/openapi.json`,
-      apiReference: `http://127.0.0.1:${session.backendPort}/_zsys/v1/api-reference`,
+      openapi: `http://127.0.0.1:${session.backendPort}/_relkit/v1/openapi.json`,
+      apiReference: `http://127.0.0.1:${session.backendPort}/_relkit/v1/api-reference`,
     }),
   });
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
@@ -60,7 +65,7 @@ test("keeps the active backend when a later candidate fails", async () => {
   sessions.push(session);
   const target = session.activeTarget;
 
-  expect(await session.notifySourceChange(1, ["zsys.config.ts"])).toBe(false);
+  expect(await session.notifySourceChange(1, ["relkit.config.ts"])).toBe(false);
   expect(session.activeTarget).toEqual(target);
   expect(session.stateMachine.state).toBe("active");
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
@@ -193,15 +198,18 @@ test("prefers source when a compiled CLI also contains the packaged inspector", 
   expect(options.root).toBe(source);
 });
 
-test("reads the inspector port from zsys.config.ts unless the CLI overrides it", async () => {
+test("reads the inspector port from relkit.config.ts unless the CLI overrides it", async () => {
   const root = await makeRoot();
-  await writeFile(join(root, "zsys.config.ts"), "export default { inspector: { port: 4210 } };\n");
+  await writeFile(
+    join(root, "relkit.config.ts"),
+    "export default { inspector: { port: 4210 } };\n",
+  );
   expect((await configuredInspectorOptions(root)).port).toBe(4210);
   expect((await configuredInspectorOptions(root, 4211)).port).toBe(4211);
 });
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-dev-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-dev-"));
   roots.push(root);
   return root;
 }
@@ -227,12 +235,12 @@ function serverSource(graphHash: string): string {
   return `const hash = ${JSON.stringify(graphHash)};
 Bun.serve({ port: Number(process.env.PORT), fetch(request) {
   const path = new URL(request.url).pathname;
-  const identity = { sourceToken: Number(process.env.ZSYS_SOURCE_TOKEN), generationToken: Number(process.env.ZSYS_GENERATION_TOKEN) };
-  const headers = { "content-type": "application/json", "x-zsys-api-version": "1" };
+  const identity = { sourceToken: Number(process.env.RELKIT_SOURCE_TOKEN), generationToken: Number(process.env.RELKIT_GENERATION_TOKEN) };
+  const headers = { "content-type": "application/json", "x-relkit-api-version": "1" };
   if (path === "/hello") { console.log("backend hello"); return new Response("hello"); }
-  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ok", ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "zsys.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "zsys.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "relkit.inspector", version: 1, status: "ok", ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "relkit.inspector", version: 1, graphHash: hash, manifestGraphHash: hash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "relkit.inspector", version: 1, status: "ready", environmentReady: true, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;
 }

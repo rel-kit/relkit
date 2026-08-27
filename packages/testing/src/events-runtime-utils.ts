@@ -3,11 +3,11 @@ import {
   type EventInvocationOptions,
   type InvocationIdSource,
   type InvocationTarget,
-} from "@zsys/engine";
-import { canonicalJson } from "@zsys/contracts";
-import type { UnknownEventEnvelope } from "@zsys/events";
-import type { EventRouter } from "@zsys/providers-local";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+} from "@relkit/engine";
+import { canonicalJson } from "@relkit/contracts";
+import type { UnknownEventEnvelope } from "@relkit/events";
+import type { EventRouter } from "@relkit/providers-local";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestEventOptions } from "./events-types.js";
 

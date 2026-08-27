@@ -5,9 +5,9 @@ import { expect, test } from "bun:test";
 import { startCandidate } from "./src/candidate.js";
 
 test("starts a token-scoped Bun backend on a dynamic port and disposes only itself", async () => {
-  const root = await mkdtemp(join(tmpdir(), "zsys-candidate-"));
-  const active = join(root, ".zsys", "generated", "generation-7");
-  await mkdir(join(root, ".zsys", "generated"), { recursive: true });
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
+  const active = join(root, ".relkit", "generated", "generation-7");
+  await mkdir(join(root, ".relkit", "generated"), { recursive: true });
   await writeFile(active, "active", { encoding: "utf8" });
   const logs: string[] = [];
   const candidate = await startCandidate({
@@ -35,9 +35,9 @@ test("starts a token-scoped Bun backend on a dynamic port and disposes only itse
 });
 
 test("cleans a failed compile without touching the active generation", async () => {
-  const root = await mkdtemp(join(tmpdir(), "zsys-candidate-"));
-  const active = join(root, ".zsys", "generated", "generation-9");
-  await mkdir(join(root, ".zsys", "generated"), { recursive: true });
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
+  const active = join(root, ".relkit", "generated", "generation-9");
+  await mkdir(join(root, ".relkit", "generated"), { recursive: true });
   await writeFile(active, "active", { encoding: "utf8", flag: "w" });
 
   await expect(
@@ -51,13 +51,15 @@ test("cleans a failed compile without touching the active generation", async () 
   ).rejects.toThrow("compile failed");
 
   await expect(readFile(active, "utf8")).resolves.toBe("active");
-  await expect(readFile(join(root, ".zsys", "generated", "generation-10"))).rejects.toMatchObject({
-    code: "ENOENT",
-  });
+  await expect(readFile(join(root, ".relkit", "generated", "generation-10"))).rejects.toMatchObject(
+    {
+      code: "ENOENT",
+    },
+  );
 });
 
 test("bounds startup output before logging and retaining it", async () => {
-  const root = await mkdtemp(join(tmpdir(), "zsys-candidate-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
   const candidate = await startCandidate({
     projectRoot: root,
     token: { sourceToken: 3, generationToken: 11 },

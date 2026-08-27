@@ -1,6 +1,6 @@
-import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
-import { defineFunction, type FunctionContext, type FunctionDependencies } from "@zsys/functions";
-import { z } from "@zsys/schema";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { defineFunction, type FunctionContext, type FunctionDependencies } from "@relkit/functions";
+import { z } from "@relkit/schema";
 import type { UnknownEventEnvelope } from "./define-event.js";
 import type { EventName } from "./event-registry.js";
 import type {
@@ -18,7 +18,7 @@ import type {
   SingleEventSelector,
 } from "./selector-types.js";
 
-const pendingListenerId = "zsys.event.listener.pending";
+const pendingListenerId = "relkit.event.listener.pending";
 
 /**
  * Registers a typed callback for an event name or selector. Each matching
@@ -29,7 +29,7 @@ const pendingListenerId = "zsys.event.listener.pending";
  *
  * @example
  * ```ts
- * import { events, onEvent } from "@zsys/events"
+ * import { events, onEvent } from "@relkit/events"
  *
  * const audit = onEvent(events.all({ payload: "unknown", purpose: "audit" }), async (event, ctx) => {
  *   ctx.log.info("event received", { eventId: event.eventId })
@@ -106,7 +106,7 @@ export function onEvent(
 }
 
 export function eventListenerFunctionId(listenerId: string): string {
-  return `zsys.event.${listenerId}.handler`;
+  return `relkit.event.${listenerId}.handler`;
 }
 
 export function isEventTriggerDescriptor(value: unknown): value is EventTriggerDescriptor {

@@ -1,4 +1,4 @@
-import { createObservabilityCollector, type ObservabilityCollector } from "@zsys/observability";
+import { createObservabilityCollector, type ObservabilityCollector } from "@relkit/observability";
 
 export interface AwsObservabilityProvider extends ObservabilityCollector {
   readonly capabilities: Readonly<{

@@ -96,7 +96,7 @@ const rateLimitSchema = {
 
 function schemaDocument(value: unknown): SchemaRecord | undefined {
   if (!isRecord(value)) return undefined;
-  if (value.$zsys === "schema" && isRecord(value.jsonSchema)) return value.jsonSchema;
+  if (value.$relkit === "schema" && isRecord(value.jsonSchema)) return value.jsonSchema;
   return value;
 }
 

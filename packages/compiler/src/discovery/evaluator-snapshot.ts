@@ -1,5 +1,5 @@
-import type { JsonValue } from "@zsys/contracts";
-import { getJsonSchema, type StandardSchemaV1 } from "@zsys/schema";
+import type { JsonValue } from "@relkit/contracts";
+import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import type { EvaluatorDescriptorSnapshot } from "./evaluator-protocol.js";
 import { isErrorDescriptorLike } from "../normalize-utils.js";
 
@@ -72,8 +72,8 @@ function snapshotSchema(value: unknown): JsonValue | undefined {
   }
   const result = getJsonSchema(value as unknown as StandardSchemaV1);
   return result.ok
-    ? { $zsys: "schema", jsonSchema: result.schema }
-    : { $zsys: "schema-unavailable", reason: result.reason };
+    ? { $relkit: "schema", jsonSchema: result.schema }
+    : { $relkit: "schema-unavailable", reason: result.reason };
 }
 
 function dataProperty(value: object, key: string): unknown {
@@ -86,5 +86,5 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function marker(type: string, name?: string): JsonValue {
-  return name === undefined ? { $zsys: type } : { $zsys: type, name };
+  return name === undefined ? { $relkit: type } : { $relkit: type, name };
 }

@@ -1,26 +1,28 @@
 {
   "contractVersion": 2,
-  "graphHash": "sha256:372df7739c86e3a567c49f1877fbf1d429da5fead326e70266b471bd25309fa1",
+  "graphHash": "sha256:6c12be99b392c61bdbf99f00fe6e1a3c162b39d2dff7c66753c6aaae5b3e6b44",
   "application": {
     "id": "minimal-app",
     "image": {
       "name": "minimal-app",
       "tag": "latest",
       "health": {
-        "livenessPath": "/_zsys/v1/health/live",
-        "readinessPath": "/_zsys/v1/health/ready",
+        "livenessPath": "/_relkit/v1/health/live",
+        "readinessPath": "/_relkit/v1/health/ready",
         "port": 3000
       }
     },
-    "environmentNames": ["SERVICE_PORT"]
+    "environmentNames": [
+      "SERVICE_PORT"
+    ]
   },
   "providerBindings": [],
   "http": {
     "logicalName": "minimal-app-http-public",
     "port": 3000,
     "health": {
-      "livenessPath": "/_zsys/v1/health/live",
-      "readinessPath": "/_zsys/v1/health/ready",
+      "livenessPath": "/_relkit/v1/health/live",
+      "readinessPath": "/_relkit/v1/health/ready",
       "port": 3000
     },
     "routes": [
@@ -31,7 +33,9 @@
         "targetFunctionId": "hello"
       }
     ],
-    "configurationNames": ["SERVICE_PORT"]
+    "configurationNames": [
+      "SERVICE_PORT"
+    ]
   },
   "jobs": [],
   "schedules": [],

@@ -1,6 +1,6 @@
 # my-app
 
-A ZSys TypeScript/Bun project with the minimal HTTP example and a bounded
+A RelKit TypeScript/Bun project with the minimal HTTP example and a bounded
 agent backed by a function-derived read-only tool. Tests use deterministic AI
 SDK test models, while production uses the configured AWS provider set.
 
@@ -19,5 +19,5 @@ bun run typecheck
 bun run build
 ```
 
-The example route is `GET /hello?name=ZSys`. Agent prompt and result content
+The example route is `GET /hello?name=RelKit`. Agent prompt and result content
 are not captured by default.

@@ -1,5 +1,5 @@
-import { type DescriptorKind, type Ref } from "@zsys/contracts";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import { type DescriptorKind, type Ref } from "@relkit/contracts";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 
 export type {

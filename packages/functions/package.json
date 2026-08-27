@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/functions",
+  "name": "@relkit/functions",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,11 +9,11 @@
     }
   },
   "dependencies": {
-    "@zsys/buckets": "workspace:*",
-    "@zsys/cache": "workspace:*",
-    "@zsys/contracts": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/schema": "workspace:*"
+    "@relkit/buckets": "workspace:*",
+    "@relkit/cache": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/schema": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

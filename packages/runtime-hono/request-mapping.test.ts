@@ -1,8 +1,8 @@
-import { z } from "@zsys/schema";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { z } from "@relkit/schema";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { createApp } from "./src/index.js";
 import { mapRequest, type MappingRequest } from "./src/request-mapping.js";
-import type { RegistrationPlan } from "@zsys/graph";
+import type { RegistrationPlan } from "@relkit/graph";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 

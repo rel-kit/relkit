@@ -1,13 +1,13 @@
-import { InvocationValidationError } from "@zsys/engine";
-import type { HttpTriggerRegistration } from "@zsys/graph";
+import { InvocationValidationError } from "@relkit/engine";
+import type { HttpTriggerRegistration } from "@relkit/graph";
 import {
   isInvocationFailure,
   normalizeFailure,
   toFailureTelemetry,
   toPublicEnvelope,
   type InvocationFailure,
-} from "@zsys/runtime-effect";
-import { validate, type StandardIssue, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/runtime-effect";
+import { validate, type StandardIssue, type StandardSchemaV1 } from "@relkit/schema";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import {
   findError,

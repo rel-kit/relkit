@@ -20,22 +20,22 @@ test("covers human and JSON help/version/usage exits", async () => {
     CLI_EXIT_CODES.success,
   );
   expect(human.stdout[0]).toContain("USAGE");
-  expect(human.stdout[0]).toContain("zsys <subcommand> [flags]");
+  expect(human.stdout[0]).toContain("relkit <subcommand> [flags]");
   expect(human.stderr).toEqual([]);
 
   const commandHelp = io();
   expect(
     await runCli(["help", "check"], { io: commandHelp.io, installSignalHandlers: false }),
   ).toBe(CLI_EXIT_CODES.success);
-  expect(commandHelp.stdout[0]).toContain("zsys check [flags]");
+  expect(commandHelp.stdout[0]).toContain("relkit check [flags]");
 
   const json = io();
   expect(await runCli(["--json", "--help"], { io: json.io, installSignalHandlers: false })).toBe(
     CLI_EXIT_CODES.success,
   );
   expect(JSON.parse(json.stdout[0]!)).toMatchObject({
-    name: "zsys",
-    usage: "zsys [--json] <command> [options]",
+    name: "relkit",
+    usage: "relkit [--json] <command> [options]",
   });
   expect(json.stderr).toEqual([]);
 
@@ -44,7 +44,7 @@ test("covers human and JSON help/version/usage exits", async () => {
     CLI_EXIT_CODES.success,
   );
   expect(JSON.parse(emptyJson.stdout[0]!)).toMatchObject({
-    name: "zsys",
+    name: "relkit",
     commands: expect.any(Array),
   });
 
@@ -56,13 +56,13 @@ test("covers human and JSON help/version/usage exits", async () => {
       installSignalHandlers: false,
     }),
   ).toBe(CLI_EXIT_CODES.success);
-  expect(JSON.parse(version.stdout[0]!)).toEqual({ name: "zsys", version: "test-version" });
+  expect(JSON.parse(version.stdout[0]!)).toEqual({ name: "relkit", version: "test-version" });
 
   const versionCommand = io();
   expect(await runCli(["version"], { io: versionCommand.io, installSignalHandlers: false })).toBe(
     CLI_EXIT_CODES.success,
   );
-  expect(versionCommand.stdout[0]).toBe("zsys 0.0.0");
+  expect(versionCommand.stdout[0]).toBe("relkit 0.0.0");
 
   const usage = io();
   expect(
@@ -73,7 +73,7 @@ test("covers human and JSON help/version/usage exits", async () => {
   ).toBe(CLI_EXIT_CODES.usage);
   expect(JSON.parse(usage.stdout[0]!)).toMatchObject({
     ok: false,
-    error: { code: "ZSYS_CLI_USAGE" },
+    error: { code: "RELKIT_CLI_USAGE" },
   });
   expect(usage.stderr).toEqual([]);
 });
@@ -86,7 +86,7 @@ test("keeps command and create failures structured in JSON", async () => {
   expect(JSON.parse(unavailable.stdout[0]!)).toEqual({
     ok: false,
     error: {
-      code: "ZSYS_COMMAND_UNAVAILABLE",
+      code: "RELKIT_COMMAND_UNAVAILABLE",
       message: "Command is not implemented: unknown",
     },
   });
@@ -96,7 +96,7 @@ test("keeps command and create failures structured in JSON", async () => {
     await runCli(["--json", "create"], {
       io: createUsage.io,
       installSignalHandlers: false,
-      loadCreateZsys: async () => ({
+      loadCreateRelkit: async () => ({
         normalizeCreateOptions: () => {
           throw new Error("name is required");
         },
@@ -106,7 +106,7 @@ test("keeps command and create failures structured in JSON", async () => {
   ).toBe(CLI_EXIT_CODES.usage);
   expect(JSON.parse(createUsage.stdout[0]!)).toMatchObject({
     ok: false,
-    error: { code: "ZSYS_CLI_USAGE", message: "name is required" },
+    error: { code: "RELKIT_CLI_USAGE", message: "name is required" },
   });
 
   const createFailure = io();
@@ -114,11 +114,11 @@ test("keeps command and create failures structured in JSON", async () => {
     await runCli(["--json", "create", "demo"], {
       io: createFailure.io,
       installSignalHandlers: false,
-      loadCreateZsys: async () => ({
+      loadCreateRelkit: async () => ({
         normalizeCreateOptions: () => ({ name: "demo" }),
         generateProject: async () => {
           throw Object.assign(new Error("destination is unsafe"), {
-            code: "ZSYS_CREATE_VALIDATION_FAILED",
+            code: "RELKIT_CREATE_VALIDATION_FAILED",
             exitCode: 1,
           });
         },
@@ -127,7 +127,7 @@ test("keeps command and create failures structured in JSON", async () => {
   ).toBe(CLI_EXIT_CODES.failure);
   expect(JSON.parse(createFailure.stdout[0]!)).toEqual({
     ok: false,
-    error: { code: "ZSYS_CREATE_VALIDATION_FAILED", message: "destination is unsafe" },
+    error: { code: "RELKIT_CREATE_VALIDATION_FAILED", message: "destination is unsafe" },
   });
 
   const createSuccess = io();
@@ -152,7 +152,7 @@ test("keeps command and create failures structured in JSON", async () => {
     await runCli(["--json", "create", "demo"], {
       io: createSuccess.io,
       installSignalHandlers: false,
-      loadCreateZsys: async () => ({
+      loadCreateRelkit: async () => ({
         normalizeCreateOptions: () => ({ name: "demo" }),
         generateProject: async (_options, context) => {
           expect(context.onProgress).toBeUndefined();
@@ -183,7 +183,7 @@ test("renders focused help for every command and nested subcommand", async () =>
         installSignalHandlers: false,
       }),
     ).toBe(CLI_EXIT_CODES.success);
-    output[path.join(" ") || "zsys"] = captured.stdout[0]!;
+    output[path.join(" ") || "relkit"] = captured.stdout[0]!;
     expect(captured.stderr).toEqual([]);
   }
   expect(output).toMatchSnapshot();
@@ -198,7 +198,7 @@ test("generates completions, suggestions, help metadata, and command status", as
         installSignalHandlers: false,
       }),
     ).toBe(CLI_EXIT_CODES.success);
-    expect(captured.stdout[0]).toContain(`begin-zsys-completions`);
+    expect(captured.stdout[0]).toContain(`begin-relkit-completions`);
     expect(captured.stdout[0]).toContain("graph");
     expect(captured.stdout[0]).not.toContain("--wizard");
   }
@@ -222,7 +222,7 @@ test("generates completions, suggestions, help metadata, and command status", as
       tty: true,
       ci: false,
       installSignalHandlers: false,
-      loadCreateZsys: async () => ({
+      loadCreateRelkit: async () => ({
         normalizeCreateOptions: () => ({ name: "demo" }),
         generateProject: async (_options, context) => {
           context.onProgress?.("Checking generated project...");
@@ -244,7 +244,7 @@ test("removes signal handlers and reports interruption without corrupting JSON",
   const exitCode = await runCli(["--json", "create", "demo"], {
     io: captured.io,
     signal: controller.signal,
-    loadCreateZsys: async () => ({
+    loadCreateRelkit: async () => ({
       normalizeCreateOptions: () => ({ name: "demo" }),
       generateProject: async (_options, context) => {
         controller.abort();
@@ -259,7 +259,7 @@ test("removes signal handlers and reports interruption without corrupting JSON",
   expect(captured.stderr).toEqual([]);
   expect(JSON.parse(captured.stdout[0]!)).toMatchObject({
     ok: false,
-    error: { code: "ZSYS_INTERRUPTED" },
+    error: { code: "RELKIT_INTERRUPTED" },
   });
 });
 

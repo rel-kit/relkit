@@ -1,11 +1,11 @@
-import type { JsonValue, MaybePromise } from "@zsys/contracts";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import type { JsonValue, MaybePromise } from "@relkit/contracts";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import type {
   EventNode,
   EventTriggerConfig,
   EventTriggerRegistration,
   RegistrationPlan,
-} from "@zsys/graph";
+} from "@relkit/graph";
 import type { InvocationParent, InvokeOptions } from "./invoke-types.js";
 import type { ProviderRegistry } from "./provider-registry-types.js";
 
@@ -82,7 +82,7 @@ export interface MaterializedEvents {
 }
 
 export class EventMaterializationError extends TypeError {
-  readonly code = "ZSYS_EVENT_MATERIALIZATION_INVALID" as const;
+  readonly code = "RELKIT_EVENT_MATERIALIZATION_INVALID" as const;
 }
 
 export async function materializeEvents(

@@ -1,7 +1,7 @@
-export const INSPECTOR_API_PROTOCOL = "zsys.inspector" as const;
-export const OBSERVABILITY_QUERY_PROTOCOL = "zsys.observability.query" as const;
+export const INSPECTOR_API_PROTOCOL = "relkit.inspector" as const;
+export const OBSERVABILITY_QUERY_PROTOCOL = "relkit.observability.query" as const;
 export const INSPECTOR_API_VERSION = 1 as const;
-export const INSPECTOR_API_BASE = "/_zsys/v1" as const;
+export const INSPECTOR_API_BASE = "/_relkit/v1" as const;
 export type InspectorResponseProtocol =
   typeof INSPECTOR_API_PROTOCOL | typeof OBSERVABILITY_QUERY_PROTOCOL;
 
@@ -96,7 +96,7 @@ export interface InspectorDiagnosticsPage extends InspectorPage {
   readonly candidate?: InspectorGenerationPage;
 }
 export interface InspectorEventRuntime extends InspectorIdentity {
-  readonly eventProtocol: "zsys.events.admin";
+  readonly eventProtocol: "relkit.events.admin";
   readonly eventVersion: number;
   readonly events: readonly InspectorObject[];
   readonly triggers: readonly InspectorObject[];
@@ -174,15 +174,15 @@ export class InspectorApiError extends Error {
   }
   get isProtocolMismatch(): boolean {
     return [
-      "ZSYS_INSPECTOR_PROTOCOL_MISMATCH",
-      "ZSYS_INSPECTOR_PROTOCOL_UNSUPPORTED",
-      "ZSYS_INSPECTOR_API_VERSION_UNSUPPORTED",
+      "RELKIT_INSPECTOR_PROTOCOL_MISMATCH",
+      "RELKIT_INSPECTOR_PROTOCOL_UNSUPPORTED",
+      "RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED",
     ].includes(this.code);
   }
   get isCursorExpired(): boolean {
-    return this.code === "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED";
+    return this.code === "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED";
   }
   get isCursorResetRequired(): boolean {
-    return this.isCursorExpired || this.code === "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE";
+    return this.isCursorExpired || this.code === "RELKIT_OBSERVABILITY_STREAM_CURSOR_FUTURE";
   }
 }

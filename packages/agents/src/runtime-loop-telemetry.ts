@@ -4,7 +4,7 @@ import type {
   ToolExecutionEndEvent,
   ToolExecutionStartEvent,
 } from "ai";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import {
   captureAgentContent,
@@ -50,10 +50,13 @@ export function createLoopTelemetry(options: {
         agentId: runtime.agent.id,
         invocationId: options.invocationId,
         functionId: generatedAgentFunctionId(runtime.agent.id),
-        name: `zsys.agent.${runtime.agent.id}.model`,
+        name: `relkit.agent.${runtime.agent.id}.model`,
         traceId: options.traceId,
         parentSpanId: options.agentSpanId,
-        attributes: { "zsys.model.id": options.modelId, "zsys.agent.step": event.stepNumber + 1 },
+        attributes: {
+          "relkit.model.id": options.modelId,
+          "relkit.agent.step": event.stepNumber + 1,
+        },
       });
       modelSpanId = modelSpan.spanId;
       modelInput =
@@ -78,12 +81,12 @@ export function createLoopTelemetry(options: {
         agentId: runtime.agent.id,
         invocationId: options.invocationId,
         functionId: descriptor?.target.ref.id ?? event.toolCall.toolName,
-        name: `zsys.tool.${event.toolCall.toolName}`,
+        name: `relkit.tool.${event.toolCall.toolName}`,
         traceId: options.traceId,
         ...(modelSpanId === undefined ? {} : { parentSpanId: modelSpanId }),
         attributes: {
-          "zsys.tool.id": event.toolCall.toolName,
-          "zsys.tool.call.id": event.toolCall.toolCallId,
+          "relkit.tool.id": event.toolCall.toolName,
+          "relkit.tool.call.id": event.toolCall.toolCallId,
         },
       });
       toolSpans.set(event.toolCall.toolCallId, span);
@@ -158,9 +161,9 @@ function spanOutcome(cause: unknown, signal: AbortSignal): AgentSpanOutcome {
 function safeError(value: unknown): JsonValue {
   const code =
     value !== null && typeof value === "object" && "code" in value && typeof value.code === "string"
-      ? value.code.startsWith("ZSYS_")
+      ? value.code.startsWith("RELKIT_")
         ? value.code
-        : "ZSYS_TOOL_FAILED"
-      : "ZSYS_TOOL_FAILED";
+        : "RELKIT_TOOL_FAILED"
+      : "RELKIT_TOOL_FAILED";
   return { error: { code, message: "Tool call failed" } };
 }

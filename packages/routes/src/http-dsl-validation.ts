@@ -1,5 +1,5 @@
-import { assertJsonValue, isStableId, type JsonValue } from "@zsys/contracts";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import { assertJsonValue, isStableId, type JsonValue } from "@relkit/contracts";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type {
   HttpMappingNode,
   HttpRequestMapping,

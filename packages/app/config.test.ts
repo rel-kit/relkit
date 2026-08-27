@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { defineConfig } from "./src/config";
-import { defineEnv } from "@zsys/config";
+import { defineEnv } from "@relkit/config";
 import { external, s3 } from "./src/providers";
 
 const bucket = () =>

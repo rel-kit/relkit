@@ -29,7 +29,7 @@ export function openApiOperation(
     ...(parameters.length === 0 ? {} : { parameters }),
     ...(requestBody === undefined ? {} : { requestBody }),
     responses: buildRouteResponses(config?.responses, target),
-    "x-zsys": {
+    "x-relkit": {
       routeId: route.id,
       functionId: route.targetFunctionId,
       middleware: Array.isArray(config?.middleware) ? config.middleware : [],
@@ -91,7 +91,7 @@ function parameterName(value: string, index: number, fallback = "param"): string
 
 function schemaValue(value: unknown): Record<string, unknown> | undefined {
   const recordValue = record(value);
-  if (recordValue?.$zsys === "schema") return record(recordValue.jsonSchema);
+  if (recordValue?.$relkit === "schema") return record(recordValue.jsonSchema);
   return recordValue;
 }
 

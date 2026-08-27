@@ -1,6 +1,6 @@
-import type { EventOperationContext, EventProvider, EventProviderResult } from "@zsys/events";
-import type { EventRuntimeProvider, EventTriggerBinding } from "@zsys/engine";
-import type { EventNode } from "@zsys/graph";
+import type { EventOperationContext, EventProvider, EventProviderResult } from "@relkit/events";
+import type { EventRuntimeProvider, EventTriggerBinding } from "@relkit/engine";
+import type { EventNode } from "@relkit/graph";
 import { assertResponse, awsRequest } from "./http.js";
 import { type AwsCredentials, text } from "./config.js";
 
@@ -19,7 +19,7 @@ export interface AwsEventProvider extends EventProvider, EventRuntimeProvider {
 
 export function createEventBridgeProvider(options: AwsEventOptions): AwsEventProvider {
   const busName = text(options.busName, "AWS event busName");
-  const source = text(options.source, "AWS event source") ?? "zsys.application";
+  const source = text(options.source, "AWS event source") ?? "relkit.application";
   const endpoint =
     text(options.endpoint, "AWS EventBridge endpoint") ??
     `https://events.${options.region}.amazonaws.com`;

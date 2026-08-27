@@ -1,6 +1,6 @@
 import { existsSync, watch } from "node:fs";
 import { join, relative } from "node:path";
-import { createSupervisorWatcher } from "@zsys/supervisor";
+import { createSupervisorWatcher } from "@relkit/supervisor";
 import type { DevSession } from "./dev-session.js";
 
 export interface DevSourceWatcher {
@@ -34,5 +34,5 @@ export function startDevSourceWatcher(session: DevSession): DevSourceWatcher {
 }
 
 function ignored(file: string): boolean {
-  return file === "" || file.startsWith("node_modules/") || file.startsWith(".zsys/");
+  return file === "" || file.startsWith("node_modules/") || file.startsWith(".relkit/");
 }

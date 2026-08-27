@@ -78,18 +78,18 @@ export function spanView(value: InspectorObject): SpanView | undefined {
     ...(text(value.functionId) ? { functionId: text(value.functionId) } : {}),
     ...(text(value.traceId) ? { traceId: text(value.traceId) } : {}),
     ...(text(value.parentSpanId) ? { parentSpanId: text(value.parentSpanId) } : {}),
-    ...(text(value.toolId) || text(attributes?.["zsys.tool.id"])
-      ? { toolId: text(value.toolId) || text(attributes?.["zsys.tool.id"]) }
+    ...(text(value.toolId) || text(attributes?.["relkit.tool.id"])
+      ? { toolId: text(value.toolId) || text(attributes?.["relkit.tool.id"]) }
       : {}),
-    ...(text(value.toolCallId) || text(attributes?.["zsys.tool.call.id"])
-      ? { toolCallId: text(value.toolCallId) || text(attributes?.["zsys.tool.call.id"]) }
+    ...(text(value.toolCallId) || text(attributes?.["relkit.tool.call.id"])
+      ? { toolCallId: text(value.toolCallId) || text(attributes?.["relkit.tool.call.id"]) }
       : {}),
-    ...(text(value.profile) || text(attributes?.["zsys.model.profile"])
-      ? { profile: text(value.profile) || text(attributes?.["zsys.model.profile"]) }
+    ...(text(value.profile) || text(attributes?.["relkit.model.profile"])
+      ? { profile: text(value.profile) || text(attributes?.["relkit.model.profile"]) }
       : {}),
-    ...(number(value.step) === undefined && number(attributes?.["zsys.agent.step"]) === undefined
+    ...(number(value.step) === undefined && number(attributes?.["relkit.agent.step"]) === undefined
       ? {}
-      : { step: number(value.step) ?? number(attributes?.["zsys.agent.step"]) }),
+      : { step: number(value.step) ?? number(attributes?.["relkit.agent.step"]) }),
     ...(text(value.status) ? { status: text(value.status) } : {}),
     ...(text(value.outcome) ? { outcome: text(value.outcome) } : {}),
     ...(text(value.startedAt) ? { startedAt: text(value.startedAt) } : {}),

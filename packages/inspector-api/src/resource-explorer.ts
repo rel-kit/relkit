@@ -1,4 +1,4 @@
-import type { JsonValue, MaybePromise } from "@zsys/contracts";
+import type { JsonValue, MaybePromise } from "@relkit/contracts";
 import { InspectorEndpointError } from "./router-utils.js";
 import { identity, isRecord, safeJson, type ResolvedActiveGeneration } from "./shared.js";
 
@@ -72,7 +72,7 @@ export async function bucketPreview(
   const offset = integer(params.get("offset"), "offset", 0, Number.MAX_SAFE_INTEGER);
   const limit = integer(params.get("limit"), "limit", maximumBytes, maximumBytes);
   const result = await explorer.preview({ bucketId, key, offset, limit, signal: request.signal });
-  if (result === undefined) throw new InspectorEndpointError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+  if (result === undefined) throw new InspectorEndpointError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   const metadata = safeJson(result.metadata ?? {});
   const contentType = mediaType(metadata);
   const totalBytes = result.totalBytes ?? result.bytes.byteLength;
@@ -111,7 +111,7 @@ export async function cacheValue(
   const key = requiredText(params.get("key"), "key", 2_048);
   const limit = integer(params.get("limit"), "limit", maximumBytes, maximumBytes);
   const result = await explorer.value({ cacheId, key, limit, signal: request.signal });
-  if (result === undefined) throw new InspectorEndpointError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+  if (result === undefined) throw new InspectorEndpointError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   const projected = safeJson(result);
   return {
     ...identity(generation),
@@ -174,13 +174,13 @@ function optionalText(value: string | null, name: string, max: number): string |
 
 function requiredText(value: string | null, name: string, max: number): string {
   if (value === null || value === "" || value.length > max)
-    throw new InspectorEndpointError(`ZSYS_INSPECTOR_${name.toUpperCase()}_INVALID`, 400);
+    throw new InspectorEndpointError(`RELKIT_INSPECTOR_${name.toUpperCase()}_INVALID`, 400);
   return value;
 }
 
 function integer(value: string | null, name: string, fallback: number, max: number): number {
   if (value === null) return fallback;
   if (!/^\d+$/.test(value) || Number(value) > max)
-    throw new InspectorEndpointError(`ZSYS_INSPECTOR_${name.toUpperCase()}_INVALID`, 400);
+    throw new InspectorEndpointError(`RELKIT_INSPECTOR_${name.toUpperCase()}_INVALID`, 400);
   return Number(value);
 }

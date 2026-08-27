@@ -1,6 +1,6 @@
 # Testing
 
-ZSys tests exercise the same function engine and canonical graph used by
+RelKit tests exercise the same function engine and canonical graph used by
 development, the inspector, and deployment. Keep tests deterministic and use
 the smallest layer that proves the behavior.
 
@@ -18,13 +18,13 @@ bun run build
 ```
 
 The generated scripts map to `bun test`, `bun test tests/unit`,
-`bun test tests/integration`, `zsys check`, `tsc --noEmit`, and `zsys build`.
+`bun test tests/integration`, `relkit check`, `tsc --noEmit`, and `relkit build`.
 
 Unit tests invoke a function descriptor directly through `invokeFunction`:
 
 ```ts
 import { expect, test } from "bun:test";
-import { invokeFunction } from "@zsys/testing";
+import { invokeFunction } from "@relkit/testing";
 import hello from "../../src/functions/hello.function.js";
 
 test("hello returns a greeting", async () => {
@@ -42,7 +42,7 @@ Integration tests use `createTestApplication` and its in-process HTTP client:
 
 ```ts
 import { afterAll, expect, test } from "bun:test";
-import { createTestApplication } from "@zsys/testing";
+import { createTestApplication } from "@relkit/testing";
 import app from "../../src/app.js";
 
 const testApp = await createTestApplication(app);
@@ -55,7 +55,7 @@ test("GET /hello", async () => {
 afterAll(() => testApp.close());
 ```
 
-`@zsys/testing` replaces every graph-required provider binding with deterministic
+`@relkit/testing` replaces every graph-required provider binding with deterministic
 in-memory fakes by default, so configured S3, Redis, queue, event, model, and
 observability credentials are unnecessary. Explicit protocol integration tests
 may opt into configured adapters. Agent tests use the AI SDK v7 `ai/test` surface
@@ -65,7 +65,7 @@ duplicate behavior rather than relying on timing or arbitrary sleeps.
 
 ## Repository checks
 
-From the ZSys repository root, the shipped focused commands are:
+From the RelKit repository root, the shipped focused commands are:
 
 | Concern                          | Command                         |
 | -------------------------------- | ------------------------------- |
@@ -101,16 +101,16 @@ need external runtimes or credentials.
 For a packed generator smoke run and the reproducible performance baseline:
 
 ```sh
-bun run scripts/pack-and-smoke-create-zsys.ts
+bun run scripts/pack-and-smoke-create-relkit.ts
 bun run scripts/performance.ts
 ```
 
 For the release-wide synthetic-secret artifact scan, optionally set
-`ZSYS_SECURITY_IMAGE` to the locally built image reference so its saved bytes
+`RELKIT_SECURITY_IMAGE` to the locally built image reference so its saved bytes
 are scanned too:
 
 ```sh
-ZSYS_SECURITY_IMAGE=<image-reference> bun run scripts/secret-scan.ts
+RELKIT_SECURITY_IMAGE=<image-reference> bun run scripts/secret-scan.ts
 ```
 
 Release acceptance additionally uses:
@@ -129,7 +129,7 @@ From the repository root, check the documentation and OpenSpec change with:
 ```sh
 bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md
 git diff --check
-openspec validate make-zsys-developer-first --strict
+openspec validate make-relkit-developer-first --strict
 ```
 
 The final release reproduction follows the getting-started flow verbatim in a

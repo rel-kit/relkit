@@ -13,7 +13,7 @@ describe("invocation recursion policy", () => {
       stack.enter("orders.create");
     } catch (error) {
       expect(error).toMatchObject({
-        code: "ZSYS_RECURSION_DENIED",
+        code: "RELKIT_RECURSION_DENIED",
         functionId: "orders.create",
         callStack: ["orders.create"],
         cycle: ["orders.create", "orders.create"],

@@ -1,6 +1,11 @@
-import type { EnvMetadata, ProviderBinding, ProviderCapability, ProviderTopology } from "@zsys/app";
-import type { SourceLocation } from "@zsys/contracts";
-import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@zsys/graph";
+import type {
+  EnvMetadata,
+  ProviderBinding,
+  ProviderCapability,
+  ProviderTopology,
+} from "@relkit/app";
+import type { SourceLocation } from "@relkit/contracts";
+import type { ApplicationGraph, GraphNode, ProviderProfileNode } from "@relkit/graph";
 import { ProviderRegistryError } from "./provider-registry-types.js";
 import type { ProviderRequirement } from "./provider-registry-types.js";
 
@@ -42,7 +47,7 @@ export function bindingFor(
   const binding = profiles?.[requirement.profile];
   if (binding !== undefined) return binding;
   throw issue(
-    "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+    "RELKIT_PROVIDER_PROFILE_UNKNOWN",
     `Profile "${requirement.profile}" does not provide ${requirement.capability}.`,
     requirement.capability,
     requirement.profile,
@@ -62,7 +67,7 @@ export function validateEnvironment(
     if (!required || field.hasDefault || values?.[variable] !== undefined) continue;
     throw new ProviderRegistryError([
       {
-        code: "ZSYS_PROVIDER_ENVIRONMENT_INVALID",
+        code: "RELKIT_PROVIDER_ENVIRONMENT_INVALID",
         message: `Required environment variable "${variable}" is missing.`,
         variable,
       },
@@ -106,7 +111,7 @@ function isProviderNode(value: GraphNode | undefined): value is ProviderProfileN
 }
 
 function issue(
-  code: "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+  code: "RELKIT_PROVIDER_PROFILE_UNKNOWN",
   message: string,
   capability: ProviderCapability,
   profile: string,

@@ -101,7 +101,7 @@ function log(message: string, timestamp: string, fields: Record<string, string> 
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join("/tmp", "zsys-observability-index-"));
+  const root = await mkdtemp(join("/tmp", "relkit-observability-index-"));
   roots.push(root);
   return root;
 }

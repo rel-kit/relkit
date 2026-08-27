@@ -1,4 +1,4 @@
-import { toRequestId, toTraceId } from "@zsys/contracts";
+import { toRequestId, toTraceId } from "@relkit/contracts";
 import type { MiddlewareHandler } from "hono";
 import {
   createFallbackState,

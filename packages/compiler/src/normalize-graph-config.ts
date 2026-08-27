@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { selectorEntries } from "./normalize-compat.js";
 import { clean } from "./normalize-graph-utils.js";
 import { middlewareForRoute } from "./middleware-coverage.js";

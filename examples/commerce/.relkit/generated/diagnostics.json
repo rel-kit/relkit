@@ -1,0 +1,1 @@
+[{"code":"RELKIT_EVENT_WILDCARD_RESTRICTED","column":19,"descriptorId":"telemetry.capture-events","file":"src/events/telemetry.event.ts","line":3,"message":"Raw all-event selector is restricted to telemetry.","severity":"warning"}]

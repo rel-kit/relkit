@@ -2,14 +2,14 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import { createApp } from "./src/index.js";
 
 let root = "";
 
 beforeAll(async () => {
-  root = await mkdtemp(join(tmpdir(), "zsys-static-"));
+  root = await mkdtemp(join(tmpdir(), "relkit-static-"));
   await mkdir(join(root, "docs"));
   await writeFile(join(root, "hello.txt"), "hello world");
   await writeFile(join(root, "docs", "index.html"), "<h1>Docs</h1>");

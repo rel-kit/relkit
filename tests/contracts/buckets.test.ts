@@ -12,7 +12,7 @@ const localBuckets: BucketContractTarget = {
   name: "local provider",
   features: { atomicFailureInjection: false, pagination: true },
   create: async (options = {}) => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-contract-bucket-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-contract-bucket-"));
     const provider = createLocalBucketProviderForTest({ ...options, root });
     return localHarness(provider, () => rm(root, { recursive: true, force: true }));
   },

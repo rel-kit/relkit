@@ -94,7 +94,7 @@ describe("commerce example functions through the common engine", () => {
     expect(result).toBeUndefined();
     expect(records.map(({ functionId }) => functionId)).toEqual([
       "orders.get-order",
-      "zsys.event.receipts.on-order-created.handler",
+      "relkit.event.receipts.on-order-created.handler",
     ]);
     const child = records.find(({ functionId }) => functionId === "orders.get-order");
     expect(child?.source).toBe("direct");

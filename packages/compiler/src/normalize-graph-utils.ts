@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { isErrorDescriptorLike } from "./normalize-utils.js";
 
 /** Replaces executable/non-JSON fields with deterministic nulls for graph data. */

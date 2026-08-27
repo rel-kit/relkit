@@ -3,12 +3,12 @@ title: Application, providers, and configuration
 description: Define one provider topology and supply environment values from each pipeline.
 ---
 
-`zsys.config.ts` exports one `defineConfig` descriptor. It contains application and runtime settings
+`relkit.config.ts` exports one `defineConfig` descriptor. It contains application and runtime settings
 plus top-level provider profiles. Database and authentication register through discovered descriptors,
 not configuration.
 
 ```ts
-import { defineConfig, defineEnv, env, external, redis, s3 } from "@zsys/app";
+import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app";
 
 const values = defineEnv({
   BUCKET_ENDPOINT: env.url(),
@@ -47,7 +47,7 @@ Upstash's Redis protocol. `external(adapter)` connects without provisioning. `ma
 allows the selected deployment target to provision and bind the resource.
 
 Keep provider credentials as secret environment references. Literal secrets are rejected and values
-never enter the graph, manifest, plan, inspector, or logs. `PORT` and `ZSYS_ENV` are framework-reserved;
+never enter the graph, manifest, plan, inspector, or logs. `PORT` and `RELKIT_ENV` are framework-reserved;
 pipelines select values without adding environment branches to application source. `requiredIn()`
 remains available when a key is required only in selected runtime modes.
 
@@ -56,7 +56,7 @@ as `defaults.bucket` before unqualified use. If omitted, `id` comes from `packag
 
 Hosting is configured alongside the runtime settings:
 
-```ts title="zsys.config.ts"
+```ts title="relkit.config.ts"
 export default defineConfig({
   deployment: { target: "aws", adapter: "pulumi" },
 });

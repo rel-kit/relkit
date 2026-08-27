@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
-import { defineTool } from "@zsys/tools";
+import { defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
 import {
   defineAgent,
   invokeAgent,

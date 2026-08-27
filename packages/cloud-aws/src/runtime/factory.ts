@@ -1,4 +1,4 @@
-import type { ProviderFactories, ProviderFactory, ProviderFactoryContext } from "@zsys/engine";
+import type { ProviderFactories, ProviderFactory, ProviderFactoryContext } from "@relkit/engine";
 import type { AwsCredentials } from "./config.js";
 import { createEventBridgeProvider } from "./events.js";
 import { createSqsJobProvider } from "./jobs.js";

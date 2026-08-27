@@ -1,7 +1,7 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 
 /** Versioned, JSON-safe protocol name for deployment plans. */
-export const DEPLOYMENT_PLAN_PROTOCOL = "zsys.deployment-plan" as const;
+export const DEPLOYMENT_PLAN_PROTOCOL = "relkit.deployment-plan" as const;
 /** Current provider-neutral deployment-plan contract version. */
 export const DEPLOYMENT_PLAN_VERSION = 2 as const;
 export type DeploymentPlanVersion = typeof DEPLOYMENT_PLAN_VERSION;

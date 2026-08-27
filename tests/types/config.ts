@@ -1,6 +1,6 @@
-import { defineConfig } from "@zsys/app/config";
-import { external, s3 } from "@zsys/app";
-import { defineEnv, env } from "@zsys/config";
+import { defineConfig } from "@relkit/app/config";
+import { external, s3 } from "@relkit/app";
+import { defineEnv, env } from "@relkit/config";
 
 defineConfig({
   env: defineEnv({}),

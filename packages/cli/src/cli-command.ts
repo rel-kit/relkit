@@ -8,7 +8,7 @@ export function createCliCommand(select: SelectInvocation) {
   const [create, dev, check, build, start, doctor] = basicCommands(select);
   const [graph, env, deploy, client] = groupCommands(select);
   return document(
-    Command.make("zsys").pipe(
+    Command.make("relkit").pipe(
       Command.withSharedFlags({ json: booleanFlag([], "json") }),
       Command.withSubcommands([
         create,

@@ -1,4 +1,4 @@
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type { DeploymentOperation } from "./diff.js";
 import type { DeploymentPlan } from "./plan.js";
 

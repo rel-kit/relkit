@@ -86,14 +86,14 @@ export interface PublicFailureEnvelope {
   readonly outcome: FailureOutcome;
   readonly code: string;
   readonly message: string;
-  readonly data?: import("@zsys/contracts").JsonValue;
+  readonly data?: import("@relkit/contracts").JsonValue;
   readonly status?: number;
   readonly retry?: ErrorRetry;
   readonly afterMs?: number;
 }
 
 export interface RedactedFailureDetail {
-  readonly cause?: import("@zsys/contracts").JsonValue;
+  readonly cause?: import("@relkit/contracts").JsonValue;
   readonly stack?: string;
 }
 
@@ -103,5 +103,5 @@ export interface FailureTelemetry extends PublicFailureEnvelope {
 
 export interface FailureTelemetryOptions {
   readonly mode?: "development" | "test" | "production";
-  readonly redact?: (value: unknown) => import("@zsys/contracts").JsonValue;
+  readonly redact?: (value: unknown) => import("@relkit/contracts").JsonValue;
 }

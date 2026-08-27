@@ -1,4 +1,4 @@
-const packageNames = ["@zsys/app", "@zsys/compiler"];
+const packageNames = ["@relkit/app", "@relkit/compiler"];
 
 for (const packageName of packageNames) {
   const resolved = await import.meta.resolve(packageName);

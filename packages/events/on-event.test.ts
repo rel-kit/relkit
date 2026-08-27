@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { validate, z } from "@zsys/schema";
+import { validate, z } from "@relkit/schema";
 import { createEventListenerTarget, defineEvent, events, onEvent } from "./src/index.ts";
 
 const contract = defineEvent({
@@ -34,7 +34,7 @@ describe("onEvent", () => {
     const target = createEventListenerTarget(
       listener,
       [contract],
-      "zsys.event.orders.receipt.handler",
+      "relkit.event.orders.receipt.handler",
     );
 
     const validated = await validate(target.input, envelope);
@@ -64,7 +64,7 @@ describe("onEvent", () => {
       async (value) => value,
       { id: "telemetry.events", delivery: "ephemeral" },
     );
-    const target = createEventListenerTarget(listener, [], "zsys.event.telemetry.events.handler");
+    const target = createEventListenerTarget(listener, [], "relkit.event.telemetry.events.handler");
     await expect(
       validate(target.input, { ...envelope, eventId: "third-party.event" }),
     ).resolves.toMatchObject({ value: { eventId: "third-party.event" } });

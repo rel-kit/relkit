@@ -1,9 +1,9 @@
 import { ORPCError, os, type AnyProcedure, type ErrorMap, type Router } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import type { Context, Hono, Next } from "hono";
-import { normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
-import type { HttpTriggerRegistration } from "@zsys/graph";
-import type { MiddlewareContext, MiddlewareDescriptor } from "@zsys/routes";
+import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
+import type { HttpTriggerRegistration } from "@relkit/graph";
+import type { MiddlewareContext, MiddlewareDescriptor } from "@relkit/routes";
 import { getRequestState } from "./middleware.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
@@ -188,7 +188,7 @@ function errorStatuses(trigger: HttpTriggerRegistration): [string, number][] {
       )
     : [];
 }
-function isSchema(value: unknown): value is import("@zsys/schema").StandardSchemaV1 {
+function isSchema(value: unknown): value is import("@relkit/schema").StandardSchemaV1 {
   return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1;
 }
 function isMiddleware(value: unknown): value is MiddlewareDescriptor {

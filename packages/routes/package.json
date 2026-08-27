@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/routes",
+  "name": "@relkit/routes",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,10 +9,10 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*",
-    "@zsys/functions": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/schema": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/functions": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/schema": "workspace:*",
     "hono": "4.13.2"
   },
   "scripts": {

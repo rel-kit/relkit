@@ -1,12 +1,12 @@
-import { isEnvRef, type EnvRef } from "@zsys/config";
+import { isEnvRef, type EnvRef } from "@relkit/config";
 import {
   createDescriptorBase,
   deepFreeze,
   type DescriptorBase,
   type JsonValue,
   type MaybePromise,
-} from "@zsys/contracts";
-import { createUnboundIdentity, type PublicLogger } from "@zsys/invocation";
+} from "@relkit/contracts";
+import { createUnboundIdentity, type PublicLogger } from "@relkit/invocation";
 
 export interface ContextResolverOptions {
   readonly env: Readonly<Record<string, unknown>>;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { EventNode, FunctionNode, RegistrationPlan } from "@zsys/graph";
+import type { EventNode, FunctionNode, RegistrationPlan } from "@relkit/graph";
 import {
   materializeEvents,
   type EventEngine,

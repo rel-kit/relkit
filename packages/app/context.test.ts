@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { defineEnv, env } from "@zsys/config";
+import { defineEnv, env } from "@relkit/config";
 import { createApplicationContextResolver } from "./src/context-resolver.ts";
 import { defineConstants, definePrompt } from "./src/context-descriptors.ts";
 

@@ -69,7 +69,7 @@ describe("local durable event log", () => {
     const reopened = await createEventLog(root);
     expect(reopened.snapshot().records).toHaveLength(1);
     expect(reopened.snapshot().checkpoint.commit).toBe(1);
-    expect(await readdir(join(root, ".zsys-quarantine"))).toHaveLength(2);
+    expect(await readdir(join(root, ".relkit-quarantine"))).toHaveLength(2);
     await reopened.close();
   });
 });
@@ -90,7 +90,7 @@ function makeEnvelope() {
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-events-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-events-"));
   roots.push(root);
   return join(root, "events");
 }

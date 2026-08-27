@@ -1,4 +1,4 @@
-# @zsys/routes
+# @relkit/routes
 
 Routes describe transport metadata and target a function reference. Request
 mapping is a serializable DSL; arbitrary mapping callbacks are not accepted.
@@ -6,8 +6,8 @@ mapping is a serializable DSL; arbitrary mapping callbacks are not accepted.
 For `src/routes/orders/[orderId]/route.ts`:
 
 ```ts
-import { defineMiddleware, defineRoute, defineTransform, http } from "@zsys/routes";
-import { z } from "@zsys/schema";
+import { defineMiddleware, defineRoute, defineTransform, http } from "@relkit/routes";
+import { z } from "@relkit/schema";
 import getOrder from "./get-order.function";
 
 const orderId = defineTransform({

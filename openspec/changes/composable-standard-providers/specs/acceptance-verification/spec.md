@@ -20,8 +20,8 @@ Generated templates, the commerce application, canonical fixtures, and migration
 
 #### Scenario: Existing sample is migrated
 
-- **WHEN** `my-zsys-app-7` is checked after migration
-- **THEN** it uses `external(s3(...))` and `external(redis(...))`, has no misleading AWS provider wrapper around R2, and does not declare `ZSYS_ENV`
+- **WHEN** `my-relkit-app-7` is checked after migration
+- **THEN** it uses `external(s3(...))` and `external(redis(...))`, has no misleading AWS provider wrapper around R2, and does not declare `RELKIT_ENV`
 
 ## ADDED Requirements
 

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { createEventListenerTarget, eventListenerFunctionId } from "@zsys/app";
-import { createTestEvent, invokeFunction } from "@zsys/testing";
+import { createEventListenerTarget, eventListenerFunctionId } from "@relkit/app";
+import { createTestEvent, invokeFunction } from "@relkit/testing";
 import orderCreated from "../../src/events/order-created.event.js";
 import orderAudit from "../../src/events/order-audit.event.js";
 import orderConfirmation from "../../src/events/order-confirmation.event.js";

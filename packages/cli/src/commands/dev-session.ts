@@ -6,7 +6,7 @@ import {
   type StartedCandidate,
   type SupervisorCandidateToken,
   type SupervisorGenerationDrain,
-} from "@zsys/supervisor";
+} from "@relkit/supervisor";
 import { startInspector, type DevInspector } from "./dev-process.js";
 import type { DevLog, DevOptions } from "./dev.js";
 import { activateCandidate, drainCandidate } from "./dev-activation.js";

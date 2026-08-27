@@ -1,5 +1,5 @@
-import { normalizeId } from "@zsys/contracts";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import { normalizeId } from "@relkit/contracts";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import { applyRetry, safeFailureMetadata } from "../jobs/retry.js";
 import { createJobQueue } from "../jobs/queue.js";
 import type { JobQueueEntry } from "../jobs/queue-utils.js";

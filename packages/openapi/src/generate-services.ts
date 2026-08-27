@@ -1,4 +1,4 @@
-import type { ApplicationGraph, FunctionNode, GraphNode, ServiceNode } from "@zsys/graph";
+import type { ApplicationGraph, FunctionNode, GraphNode, ServiceNode } from "@relkit/graph";
 import type { HttpGraphTrigger } from "./generate.js";
 
 export interface OpenApiServiceContext {

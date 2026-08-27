@@ -19,7 +19,7 @@ const graph = JSON.parse(
 ) as ApplicationGraph;
 
 test("previews an isolated stack with redacted events, confirmation, and a no-op repeat", async () => {
-  const root = await mkdtemp(join(tmpdir(), "zsys-preview-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-preview-"));
   const stack = `preview-${randomUUID().replaceAll("-", "").slice(0, 16)}`;
   const state = createState(stack);
   try {
@@ -121,7 +121,7 @@ function createState(stack: string): PreviewState {
     exists: false,
   } as PreviewState;
   const command = {
-    command: "zsys-isolated-pulumi",
+    command: "relkit-isolated-pulumi",
     version: { toString: () => "3.204.0" },
     run: async (
       args: string[],
@@ -216,7 +216,7 @@ function options(root: string, state: PreviewState) {
       ok: true,
       activatable: true,
       projectRoot: root,
-      generatedDirectory: join(root, ".zsys", "generated"),
+      generatedDirectory: join(root, ".relkit", "generated"),
       graphHash: hashGraph(graph),
       diagnostics: [],
       outputs: {
@@ -230,7 +230,7 @@ function options(root: string, state: PreviewState) {
     build: async () => ({
       ok: true,
       projectRoot: root,
-      buildDirectory: join(root, ".zsys", "build"),
+      buildDirectory: join(root, ".relkit", "build"),
       diagnostics: [],
       artifacts: [],
       graphHash: hashGraph(graph),

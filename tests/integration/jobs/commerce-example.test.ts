@@ -36,7 +36,7 @@ describe("commerce receipt jobs", () => {
 
     expect(compiled.diagnostics).toEqual([
       expect.objectContaining({
-        code: "ZSYS_EVENT_WILDCARD_RESTRICTED",
+        code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
         severity: "warning",
         message: "Raw all-event selector is restricted to telemetry.",
       }),
@@ -65,7 +65,7 @@ describe("commerce receipt jobs", () => {
         { kind: "enqueues-job", from: "orders.create-order", to: "receipts.send-job" },
         {
           kind: "enqueues-job",
-          from: "zsys.event.receipts.on-order-created.handler",
+          from: "relkit.event.receipts.on-order-created.handler",
           to: "receipts.send-job",
         },
       ]),
@@ -83,7 +83,7 @@ describe("commerce receipt jobs", () => {
   });
 
   test("runs the scheduled receipt through the job engine and keeps query state after restart", async () => {
-    const stateRoot = await mkdtemp(join(tmpdir(), "zsys-commerce-jobs-"));
+    const stateRoot = await mkdtemp(join(tmpdir(), "relkit-commerce-jobs-"));
     let job: Awaited<ReturnType<typeof createTestJob>> | undefined;
     const logs: Array<{
       readonly message: string;
@@ -143,7 +143,7 @@ describe("commerce receipt jobs", () => {
         { scheduleId: "receipts.reconcile", status: "enqueued" },
       ]);
       expect(job.admin.query()).toMatchObject({
-        protocol: "zsys.jobs.admin",
+        protocol: "relkit.jobs.admin",
         version: 1,
         counts: { available: 1, completed: 0 },
         items: [{ state: "available", profile: "default", attempt: 0 }],
@@ -194,7 +194,7 @@ describe("commerce receipt jobs", () => {
 
       await job.restart();
       expect(job.admin.status(completed.instanceId)).toMatchObject({
-        protocol: "zsys.jobs.admin",
+        protocol: "relkit.jobs.admin",
         version: 1,
         state: "completed",
         attempt: 1,

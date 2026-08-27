@@ -1,5 +1,5 @@
 import type { ProviderValue } from "./providers.js";
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 
 /** Serializable settings for one named AI SDK provider recipe. */
 export interface ModelProviderOptions {

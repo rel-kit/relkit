@@ -8,7 +8,7 @@ export interface GenerationEnvironmentService {
 export class GenerationEnvironment extends Context.Service<
   GenerationEnvironment,
   GenerationEnvironmentService
->()("zsys/runtime/GenerationEnvironment") {}
+>()("relkit/runtime/GenerationEnvironment") {}
 
 export interface GenerationServiceContext {
   readonly environment: Readonly<Record<string, unknown>>;
@@ -32,7 +32,7 @@ export interface GenerationServiceRegistry {
 export class GenerationServices extends Context.Service<
   GenerationServices,
   GenerationServiceRegistry
->()("zsys/runtime/GenerationServices") {}
+>()("relkit/runtime/GenerationServices") {}
 
 /** Returns dependency-first order while preserving declaration order for ties. */
 export function orderGenerationServices(

@@ -1,0 +1,40 @@
+{
+  "stack": "relkit-nightly-1787078392190-14ac0016",
+  "backend": "s3://relkit-gate15-state-701150241487-20260818154046/relkit-gate15",
+  "region": "us-east-1",
+  "resourceIdentifiers": "redacted",
+  "initialUp": {
+    "created": 66,
+    "replacements": 0
+  },
+  "noOpUp": {
+    "changed": 0,
+    "unchanged": 66,
+    "replacements": 0
+  },
+  "sourceMovePreview": {
+    "updates": 35,
+    "unchanged": 31,
+    "replacements": 0
+  },
+  "sourceMoveUp": {
+    "updated": 35,
+    "unchanged": 31,
+    "replacements": 0
+  },
+  "destroy": {
+    "deleted": 66,
+    "replacements": 0,
+    "pulumiDuration": "11m52s"
+  },
+  "resourceFamilies": [
+    "VPC/NAT/ALB networking",
+    "ECR/ECS/Fargate service",
+    "SQS queues and DLQs",
+    "EventBridge bus/rule/target",
+    "S3 bucket",
+    "ElastiCache Serverless Valkey",
+    "CloudWatch logs",
+    "IAM roles and policies"
+  ]
+}

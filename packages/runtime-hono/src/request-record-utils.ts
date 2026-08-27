@@ -1,9 +1,9 @@
-import { InvocationValidationError } from "@zsys/engine";
-import { normalizeFailure } from "@zsys/runtime-effect";
+import { InvocationValidationError } from "@relkit/engine";
+import { normalizeFailure } from "@relkit/runtime-effect";
 import { isRequestMappingFailure } from "./request-mapping.js";
 import type { HttpEngine, HttpInvocationOptions } from "./materialize-routes.js";
-import type { RequestOutcome } from "@zsys/observability";
-import type { RequestRecordBuilder } from "@zsys/observability";
+import type { RequestOutcome } from "@relkit/observability";
+import type { RequestRecordBuilder } from "@relkit/observability";
 
 export function recordDetail(
   builder: RequestRecordBuilder | undefined,

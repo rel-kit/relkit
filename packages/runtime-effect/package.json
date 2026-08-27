@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/runtime-effect",
+  "name": "@relkit/runtime-effect",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -11,11 +11,11 @@
   "dependencies": {
     "@effect/platform-bun": "4.0.0-beta.107",
     "@effect/platform-node-shared": "4.0.0-beta.107",
-    "@zsys/config": "workspace:*",
-    "@zsys/contracts": "workspace:*",
-    "@zsys/graph": "workspace:*",
-    "@zsys/invocation": "workspace:*",
-    "@zsys/observability": "workspace:*",
+    "@relkit/config": "workspace:*",
+    "@relkit/contracts": "workspace:*",
+    "@relkit/graph": "workspace:*",
+    "@relkit/invocation": "workspace:*",
+    "@relkit/observability": "workspace:*",
     "effect": "4.0.0-beta.107"
   },
   "scripts": {

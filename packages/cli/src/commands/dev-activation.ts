@@ -1,14 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ApplicationGraph } from "@zsys/graph";
-import { hashGraph } from "@zsys/graph";
+import type { ApplicationGraph } from "@relkit/graph";
+import { hashGraph } from "@relkit/graph";
 import {
   createSupervisorDrain,
   startCandidate,
   verifyCandidate,
   type StartedCandidate,
   type SupervisorCandidateToken,
-} from "@zsys/supervisor";
+} from "@relkit/supervisor";
 import type { DevSession } from "./dev-session.js";
 
 export async function activateCandidate(

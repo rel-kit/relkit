@@ -74,12 +74,12 @@ Applications SHALL be able to declare typed errors with optional source-inferred
 
 ### Requirement: Ordinary application libraries remain opaque
 
-Application developers SHALL remain free to call ordinary libraries from function handlers, and ZSys SHALL NOT infer or add those libraries' persistence, identity, workflow, knowledge, or other internal concepts to the application graph.
+Application developers SHALL remain free to call ordinary libraries from function handlers, and RelKit SHALL NOT infer or add those libraries' persistence, identity, workflow, knowledge, or other internal concepts to the application graph.
 
 #### Scenario: Function uses an ordinary library
 
-- **WHEN** a function imports and calls a non-ZSys database or HTTP client library
-- **THEN** ZSys models only authored ZSys descriptors, explicitly declared managed resources, and observed ZSys descriptor calls, not the library's internal resources or behavior
+- **WHEN** a function imports and calls a non-RelKit database or HTTP client library
+- **THEN** RelKit models only authored RelKit descriptors, explicitly declared managed resources, and observed RelKit descriptor calls, not the library's internal resources or behavior
 
 ## ADDED Requirements
 
@@ -104,7 +104,7 @@ A function descriptor SHALL expose typed Promise-based `invoke(input)` and `asTo
 #### Scenario: Function is invoked from ordinary application code
 
 - **WHEN** application code awaits `getOrder.invoke({ orderId })`
-- **THEN** TypeScript infers the function input and output and the call enters the common ZSYS invocation boundary
+- **THEN** TypeScript infers the function input and output and the call enters the common RELKIT invocation boundary
 
 #### Scenario: Function becomes a tool
 

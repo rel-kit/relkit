@@ -5,7 +5,7 @@ import type {
   FunctionToolOptions,
 } from "./function-tool.js";
 import type { FunctionRef } from "./types.js";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import type { StandardSchemaV1 } from "@relkit/schema";
 
 type FunctionToolTarget<
   Id extends string,

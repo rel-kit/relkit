@@ -1,16 +1,16 @@
 import { join } from "node:path";
-import { normalizeId, type JsonValue } from "@zsys/contracts";
-import type { JobQueueHandle } from "@zsys/engine";
-import { materializeJobs } from "@zsys/engine";
-import { createJobClient, type JobClient, type JobProvider } from "@zsys/jobs";
+import { normalizeId, type JsonValue } from "@relkit/contracts";
+import type { JobQueueHandle } from "@relkit/engine";
+import { materializeJobs } from "@relkit/engine";
+import { createJobClient, type JobClient, type JobProvider } from "@relkit/jobs";
 import {
   createJobAdmin,
   createJobQueue,
   createJobStore,
   type JobAdmin,
   type JobQueue,
-} from "@zsys/providers-local";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+} from "@relkit/providers-local";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import type { TestJobCloseOptions, TestJobFake, TestJobOptions } from "./jobs-types.js";
@@ -151,7 +151,7 @@ export async function createTestJobFake<Input = JsonValue, Output = unknown>(
 
   async function drain() {
     ensureOpen();
-    const results: import("@zsys/engine").JobRunResult[] = [];
+    const results: import("@relkit/engine").JobRunResult[] = [];
     while (true) {
       await promoteDue();
       const next = queue.selectAvailable(1, deterministic.clock.currentTimeMs())[0];

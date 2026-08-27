@@ -1,4 +1,4 @@
-import { deepFreeze, type JsonValue, type SourceLocation } from "@zsys/contracts";
+import { deepFreeze, type JsonValue, type SourceLocation } from "@relkit/contracts";
 import { canonicalizeGraph, hashGraph, type GraphCanonicalizationOptions } from "./hash.js";
 import type {
   AgentNode,

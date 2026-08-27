@@ -18,8 +18,8 @@ const fullOptions = {
     tag: "2026-08-18",
     digest: "sha256:orders-image",
     health: {
-      livenessPath: "/_zsys/v1/health/live",
-      readinessPath: "/_zsys/v1/health/ready",
+      livenessPath: "/_relkit/v1/health/live",
+      readinessPath: "/_relkit/v1/health/ready",
       port: 8080,
       intervalMs: 10_000,
       timeoutMs: 2_000,
@@ -33,7 +33,7 @@ test("full deployment plan matches the stable golden contract", () => {
   expect(plan).toEqual(readGolden("plan-full.json", plan));
   expect(plan.application.environmentNames).toEqual(["SERVICE_PORT"]);
   expect(plan.http.health).toEqual(fullOptions.image.health);
-  expect(resourceTags(plan).every((tags) => tags["managed-by"] === "zsys")).toBe(true);
+  expect(resourceTags(plan).every((tags) => tags["managed-by"] === "relkit")).toBe(true);
 });
 
 test("minimal deployment plan omits optional capability resources", () => {
@@ -62,7 +62,7 @@ test("rejects a missing provider binding for a used capability", () => {
 
   expectDeploymentError(
     () => fromGraph(withoutCache, fullOptions),
-    "ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED",
+    "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED",
   );
 });
 
@@ -76,11 +76,11 @@ test("keeps plans secret-free and rejects secret/live deployment values", () => 
   expect(bytes).not.toContain("pulumiValue");
   expectDeploymentError(
     () => fromGraph(withRawField(loadGraph("valid-minimal"), "secretValue", "synthetic-secret")),
-    "ZSYS_DEPLOY_SECRET_UNSUPPORTED",
+    "RELKIT_DEPLOY_SECRET_UNSUPPORTED",
   );
   expectDeploymentError(
     () => fromGraph(withRawField(loadGraph("valid-minimal"), "pulumi", {})),
-    "ZSYS_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
+    "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
   );
 });
 
@@ -119,13 +119,16 @@ test("keeps deployment identities stable when descriptor source files move", () 
 
 test("renders deterministic Pulumi program bytes from distinct roots", () => {
   const plan = fromGraph(loadGraph("valid-full"), fullOptions);
-  const left = renderPulumiProgram(plan, { projectRoot: "/tmp/zsys-left", stackName: "CI/blue" });
-  const right = renderPulumiProgram(plan, { projectRoot: "/tmp/zsys-right", stackName: "CI/blue" });
+  const left = renderPulumiProgram(plan, { projectRoot: "/tmp/relkit-left", stackName: "CI/blue" });
+  const right = renderPulumiProgram(plan, {
+    projectRoot: "/tmp/relkit-right",
+    stackName: "CI/blue",
+  });
   const leftBytes = [left.pulumiYaml, left.indexTs, left.planJson].join("\0");
   const rightBytes = [right.pulumiYaml, right.indexTs, right.planJson].join("\0");
 
   expect(leftBytes).toBe(rightBytes);
-  expect(leftBytes).not.toContain("/tmp/zsys-");
+  expect(leftBytes).not.toContain("/tmp/relkit-");
   expect(leftBytes).not.toContain("OPENAI_API_KEY");
   expect(leftBytes).not.toContain("pulumiValue");
 });

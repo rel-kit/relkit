@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import {
   API_REFERENCE_PATH,
   ApiDocsConfigurationError,
@@ -87,7 +87,7 @@ describe("OpenAPI and Scalar endpoints", () => {
     });
     expect(reference.status).toBe(200);
     expect(reference.headers.get("content-type")).toContain("text/html");
-    expect(html).toContain("ZSYS API Reference");
+    expect(html).toContain("RELKIT API Reference");
     expect(html).toContain("./openapi.json");
   });
 
@@ -104,7 +104,7 @@ describe("OpenAPI and Scalar endpoints", () => {
       bearerToken: "secret",
       document: {
         openapi: "3.1.0",
-        info: { title: "Protected ZSYS API", version: "1" },
+        info: { title: "Protected RELKIT API", version: "1" },
         paths: {},
       },
     });
@@ -116,9 +116,9 @@ describe("OpenAPI and Scalar endpoints", () => {
     const html = await reference.text();
 
     expect(raw.status).toBe(200);
-    expect(await raw.json()).toMatchObject({ info: { title: "Protected ZSYS API" } });
+    expect(await raw.json()).toMatchObject({ info: { title: "Protected RELKIT API" } });
     expect(reference.status).toBe(200);
-    expect(html).toContain("Protected ZSYS API");
+    expect(html).toContain("Protected RELKIT API");
     expect(html).not.toContain(`\"url\":\"${OPENAPI_PATH}\"`);
   });
 });

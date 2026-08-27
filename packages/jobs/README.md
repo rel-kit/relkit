@@ -1,12 +1,12 @@
-# @zsys/jobs
+# @relkit/jobs
 
 Jobs declare typed input, a function target, retry policy, and optional
 schedule metadata. A job does not own a handler.
 
 ```ts
-import { defineJob } from "@zsys/jobs";
+import { defineJob } from "@relkit/jobs";
 import sendReceipt from "./send-receipt.function";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 export default defineJob({
   id: "receipts.send-job",

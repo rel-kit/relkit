@@ -1,20 +1,20 @@
 ---
-title: ZSYS
+title: RELKIT
 description: A convention-first TypeScript framework for HTTP, asynchronous work, resources, AI, and operations.
 ---
 
-ZSYS turns typed application descriptors into one deterministic graph used by local development,
+RELKIT turns typed application descriptors into one deterministic graph used by local development,
 tests, generated clients, OpenAPI, the inspector, and deployment.
 
 ## The short path
 
 ```sh
-bunx create-zsys@latest my-app --template api
+bunx create-relkit@latest my-app --template api
 cd my-app
 bun run dev
 ```
 
-Add a function with runtime schemas, export a method from `src/routes/**/route.ts`, and ZSYS derives
+Add a function with runtime schemas, export a method from `src/routes/**/route.ts`, and RELKIT derives
 the route path, request transport, response contract, client, and API reference.
 
 ## What to read
@@ -25,4 +25,4 @@ the route path, request transport, response contract, client, and API reference.
 - [Events](/docs/async/events) for typed callback listeners and durable delivery.
 - [CLI reference](/docs/operations/cli-reference) for every command and option.
 
-The complete, executable feature map lives in [`examples/commerce`](https://github.com/zsys-dev/zsys/tree/main/examples/commerce).
+The complete, executable feature map lives in [`examples/commerce`](https://github.com/rel-kit/relkit/tree/main/examples/commerce).

@@ -56,9 +56,9 @@ describe("route-file discovery", () => {
 
     expect(result.diagnostics.map(({ code }) => code)).toEqual(
       expect.arrayContaining([
-        "ZSYS_ROUTE_FILE_REQUIRED",
-        "ZSYS_ROUTE_EXPORT_METHOD",
-        "ZSYS_ROUTE_LEGACY_TRANSPORT",
+        "RELKIT_ROUTE_FILE_REQUIRED",
+        "RELKIT_ROUTE_EXPORT_METHOD",
+        "RELKIT_ROUTE_LEGACY_TRANSPORT",
       ]),
     );
     expect(result.diagnostics.every(({ file }) => file === "src/routes/orders.route.ts")).toBe(
@@ -85,11 +85,11 @@ describe("route-file discovery", () => {
 
     expect(result.diagnostics).toContainEqual(
       expect.objectContaining({
-        code: "ZSYS_ROUTE_COLLISION",
+        code: "RELKIT_ROUTE_COLLISION",
         message: expect.stringContaining("GET /docs"),
       }),
     );
-    expect(result.diagnostics.map(({ code }) => code).includes("ZSYS_PATH_INVALID")).toBe(false);
+    expect(result.diagnostics.map(({ code }) => code).includes("RELKIT_PATH_INVALID")).toBe(false);
   });
 });
 

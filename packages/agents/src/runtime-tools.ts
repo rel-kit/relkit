@@ -1,11 +1,11 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import type { ToolSet } from "ai";
 import { ApprovalRequiredError } from "./approval.js";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import { createAiInputSchema, invokeAgentTool } from "./runtime-tool-adapter.js";
 import { jsonValue, signalFailure, withSignal } from "./runtime-utils.js";
-import type { ToolDescriptor, ToolSource } from "@zsys/tools";
+import type { ToolDescriptor, ToolSource } from "@relkit/tools";
 
 export interface AgentToolCall {
   readonly callId: string;
@@ -24,7 +24,7 @@ export async function runTool(
 ): Promise<JsonValue> {
   const tool = findTool(options.tools, turn.toolId);
   if (tool === undefined || !options.agent.tools.some((entry) => entry.ref.id === turn.toolId))
-    return safeToolError("ZSYS_TOOL_NOT_ALLOWED");
+    return safeToolError("RELKIT_TOOL_NOT_ALLOWED");
   try {
     const result = await withSignal(
       invokeAgentTool(
@@ -57,7 +57,7 @@ export function modelTools(
     refs.map((ref) => {
       const tool = findTool(source, ref.ref.id);
       if (tool === undefined)
-        throw new AgentRuntimeError("ZSYS_TOOL_UNKNOWN", "Agent tool is not registered");
+        throw new AgentRuntimeError("RELKIT_TOOL_UNKNOWN", "Agent tool is not registered");
       return [
         tool.id,
         sdk.tool({
@@ -84,11 +84,11 @@ function safeToolError(code: string): JsonValue {
 }
 
 function safeCode(value: unknown, tool: ToolDescriptor<string>): string {
-  if (!isRecord(value) || typeof value.code !== "string") return "ZSYS_TOOL_FAILED";
-  if (value.code.startsWith("ZSYS_")) return value.code;
+  if (!isRecord(value) || typeof value.code !== "string") return "RELKIT_TOOL_FAILED";
+  if (value.code.startsWith("RELKIT_")) return value.code;
   return tool.target.errors?.some((error) => error.id === value.code)
     ? value.code
-    : "ZSYS_TOOL_FAILED";
+    : "RELKIT_TOOL_FAILED";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

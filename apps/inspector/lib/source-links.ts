@@ -50,14 +50,14 @@ export function sourceLink(
 
 export function configuredSourceLinks(): SourceLinkConfig {
   const editor = readEditor(
-    process.env.NEXT_PUBLIC_ZSYS_SOURCE_EDITOR ?? process.env.NEXT_PUBLIC_ZSYS_EDITOR,
+    process.env.NEXT_PUBLIC_RELKIT_SOURCE_EDITOR ?? process.env.NEXT_PUBLIC_RELKIT_EDITOR,
   );
   return {
     mode: process.env.NODE_ENV === "development" ? "development" : "production",
     ...(editor === undefined ? {} : { editor }),
-    ...(process.env.NEXT_PUBLIC_ZSYS_BACKEND_URL === undefined
+    ...(process.env.NEXT_PUBLIC_RELKIT_BACKEND_URL === undefined
       ? {}
-      : { backendUrl: process.env.NEXT_PUBLIC_ZSYS_BACKEND_URL }),
+      : { backendUrl: process.env.NEXT_PUBLIC_RELKIT_BACKEND_URL }),
   };
 }
 

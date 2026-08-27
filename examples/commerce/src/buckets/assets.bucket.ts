@@ -1,4 +1,4 @@
-import { defineBucket } from "@zsys/app";
+import { defineBucket } from "@relkit/app";
 
 const assets = defineBucket({
   id: "assets",

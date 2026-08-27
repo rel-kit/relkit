@@ -1,7 +1,7 @@
-import { createDescriptorBase, deepFreeze, isRef } from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
-import type { FunctionRefAny } from "@zsys/functions";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import { createDescriptorBase, deepFreeze, isRef } from "@relkit/contracts";
+import { createUnboundIdentity } from "@relkit/invocation";
+import type { FunctionRefAny } from "@relkit/functions";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import {
   assertRequestMapping,
   assertResponse,
@@ -32,8 +32,8 @@ export type * from "./route-types.js";
  *
  * @example A GET route with inferred path and query input
  * ```ts
- * import { defineFunction, defineRoute } from "@zsys/app"
- * import { z } from "@zsys/schema"
+ * import { defineFunction, defineRoute } from "@relkit/app"
+ * import { z } from "@relkit/schema"
  *
  * const listOrders = defineFunction({
  *   id: "orders.list",
@@ -119,7 +119,7 @@ function readBetterAuthRegistration(
   handler: RawRouteOptions<string>["handler"],
 ): { readonly protected: readonly string[] } | undefined {
   const value = (handler as unknown as Record<PropertyKey, unknown>)[
-    Symbol.for("zsys.better-auth.handler")
+    Symbol.for("relkit.better-auth.handler")
   ];
   return isRecord(value) &&
     value.kind === "better-auth" &&

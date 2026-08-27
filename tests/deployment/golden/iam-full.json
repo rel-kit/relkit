@@ -3,13 +3,23 @@
     "statements": [
       {
         "capability": "events",
-        "actions": ["events:PutEvents"],
-        "resources": ["full-app-event-orders-created"]
+        "actions": [
+          "events:PutEvents"
+        ],
+        "resources": [
+          "full-app-event-orders-created"
+        ]
       },
       {
         "capability": "jobs",
-        "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"],
-        "resources": ["full-app-job-receipts-send-job"]
+        "actions": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility"
+        ],
+        "resources": [
+          "full-app-job-receipts-send-job"
+        ]
       },
       {
         "capability": "jobs",
@@ -19,12 +29,18 @@
           "sqs:ChangeMessageVisibility",
           "sqs:GetQueueAttributes"
         ],
-        "resources": ["full-app-event-trigger-orders-listener"]
+        "resources": [
+          "full-app-event-trigger-orders-listener"
+        ]
       },
       {
         "capability": "jobs",
-        "actions": ["sqs:SendMessage"],
-        "resources": ["full-app-job-receipts-send-job"]
+        "actions": [
+          "sqs:SendMessage"
+        ],
+        "resources": [
+          "full-app-job-receipts-send-job"
+        ]
       }
     ]
   },
@@ -33,22 +49,30 @@
       "functionId": "orders.create",
       "capability": "events",
       "resourceId": "orders.created",
-      "actions": ["events:PutEvents"]
+      "actions": [
+        "events:PutEvents"
+      ]
     },
     {
       "functionId": "orders.handle-created",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
-      "actions": ["sqs:SendMessage"]
+      "actions": [
+        "sqs:SendMessage"
+      ]
     },
     {
       "functionId": "receipts.send",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
-      "actions": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:ChangeMessageVisibility"]
+      "actions": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:ChangeMessageVisibility"
+      ]
     },
     {
-      "functionId": "zsys.event.orders.listener.handler",
+      "functionId": "relkit.event.orders.listener.handler",
       "capability": "jobs",
       "resourceId": "orders.listener",
       "actions": [
@@ -59,10 +83,12 @@
       ]
     },
     {
-      "functionId": "zsys.event.orders.listener.handler",
+      "functionId": "relkit.event.orders.listener.handler",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
-      "actions": ["sqs:SendMessage"]
+      "actions": [
+        "sqs:SendMessage"
+      ]
     }
   ]
 }

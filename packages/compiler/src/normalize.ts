@@ -28,7 +28,7 @@ import {
   type NormalizationWork,
   type ValidationPass,
 } from "./normalize-types.js";
-import { createDiagnostic } from "@zsys/diagnostics";
+import { createDiagnostic } from "@relkit/diagnostics";
 import { createWatchDependencyIndex } from "./watch.js";
 
 export * from "./normalize-types.js";
@@ -79,7 +79,7 @@ export function normalizeCompilation(input: NormalizeInput = {}): NormalizationR
     } catch (error) {
       work.diagnostics.push(
         createDiagnostic({
-          code: "ZSYS_NORMALIZATION_FAILED",
+          code: "RELKIT_NORMALIZATION_FAILED",
           severity: "error",
           message: `${pass} failed: ${error instanceof Error ? error.message : String(error)}`,
         }),

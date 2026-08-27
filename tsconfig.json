@@ -15,7 +15,7 @@
     { "path": "./packages/compiler" },
     { "path": "./packages/config" },
     { "path": "./packages/contracts" },
-    { "path": "./packages/create-zsys" },
+    { "path": "./packages/create-relkit" },
     { "path": "./packages/deploy" },
     { "path": "./packages/deploy-pulumi" },
     { "path": "./packages/diagnostics" },

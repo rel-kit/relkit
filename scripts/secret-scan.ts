@@ -159,14 +159,14 @@ async function saveImage(reference: string): Promise<Uint8Array> {
 async function main(): Promise<void> {
   const root = resolve(process.argv[2] ?? join(import.meta.dir, ".."));
   const report = await scanReleaseArtifacts(root, {
-    imageReference: process.env.ZSYS_SECURITY_IMAGE,
+    imageReference: process.env.RELKIT_SECURITY_IMAGE,
   });
   if (report.matches.length > 0) {
     for (const match of report.matches)
       console.error(`${match.source}:${match.line}:${match.column} raw ${match.secretName}`);
     throw new Error(`Synthetic-secret scan failed with ${report.matches.length} raw match(es).`);
   }
-  console.log(JSON.stringify({ protocol: "zsys.synthetic-secret-scan", ...report }, null, 2));
+  console.log(JSON.stringify({ protocol: "relkit.synthetic-secret-scan", ...report }, null, 2));
 }
 
 if (import.meta.main) await main();

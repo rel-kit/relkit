@@ -5,9 +5,9 @@ import {
   CONTRACT_VERSION,
   canonicalJson,
   type JsonValue,
-} from "@zsys/contracts";
-import type { ApplicationGraph, RegistrationPlan } from "@zsys/graph";
-import { generateOpenApi, type OpenApiDocument } from "@zsys/openapi";
+} from "@relkit/contracts";
+import type { ApplicationGraph, RegistrationPlan } from "@relkit/graph";
+import { generateOpenApi, type OpenApiDocument } from "@relkit/openapi";
 import type { Context, Hono, Next } from "hono";
 import { isAuthorized, jsonResponse } from "./internal-endpoints-utils.js";
 import type { InternalEndpointMode, InternalEndpointOptions } from "./internal-endpoints.js";
@@ -48,7 +48,7 @@ export function installApiDocs(
     mode === "production" || auth.bearerToken !== undefined || auth.authorize !== undefined;
   const reference = Scalar({
     ...(embed ? { content: canonicalJson(document as JsonValue) } : { url: "./openapi.json" }),
-    pageTitle: "ZSYS API Reference",
+    pageTitle: "RELKIT API Reference",
   });
   const protect =
     (handler: (context: Context, next: Next) => Promise<Response | void>) =>
@@ -130,6 +130,6 @@ function responseHeaders(contentType: string): Record<string, string> {
   return {
     "cache-control": "no-store",
     "content-type": contentType,
-    "x-zsys-api-version": String(API_VERSION),
+    "x-relkit-api-version": String(API_VERSION),
   };
 }

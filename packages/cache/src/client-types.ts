@@ -1,5 +1,5 @@
-import type { MaybePromise } from "@zsys/contracts";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+import type { MaybePromise } from "@relkit/contracts";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 
 export type CacheOperation = "get" | "set" | "delete" | "has" | "getOrSet" | "increment";
 export type CacheCapability = "increment";
@@ -122,7 +122,7 @@ export interface CacheClientOptions<
 }
 
 export class CacheCapabilityError extends Error {
-  readonly code = "ZSYS_CACHE_CAPABILITY_UNSUPPORTED" as const;
+  readonly code = "RELKIT_CACHE_CAPABILITY_UNSUPPORTED" as const;
 
   constructor(
     readonly capability: CacheCapability,
@@ -134,7 +134,7 @@ export class CacheCapabilityError extends Error {
 }
 
 export class CacheDependencyError extends Error {
-  readonly code = "ZSYS_CACHE_DEPENDENCY_UNDECLARED" as const;
+  readonly code = "RELKIT_CACHE_DEPENDENCY_UNDECLARED" as const;
 
   constructor(cacheId: string) {
     super(`Cache dependency "${cacheId}" is not declared on this function`);
@@ -143,7 +143,7 @@ export class CacheDependencyError extends Error {
 }
 
 export class CacheProviderError extends Error {
-  readonly code = "ZSYS_CACHE_PROVIDER_UNAVAILABLE" as const;
+  readonly code = "RELKIT_CACHE_PROVIDER_UNAVAILABLE" as const;
 
   constructor(operation: CacheOperation) {
     super(`Cache provider does not implement "${operation}"`);
@@ -152,7 +152,7 @@ export class CacheProviderError extends Error {
 }
 
 export class CacheSchemaValidationError extends TypeError {
-  readonly code = "ZSYS_CACHE_SCHEMA_VALIDATION" as const;
+  readonly code = "RELKIT_CACHE_SCHEMA_VALIDATION" as const;
 
   constructor(
     readonly phase: "key" | "value",
@@ -164,7 +164,7 @@ export class CacheSchemaValidationError extends TypeError {
 }
 
 export class CacheTtlPolicyError extends RangeError {
-  readonly code = "ZSYS_CACHE_TTL_POLICY" as const;
+  readonly code = "RELKIT_CACHE_TTL_POLICY" as const;
 
   constructor(message: string) {
     super(message);
@@ -173,7 +173,7 @@ export class CacheTtlPolicyError extends RangeError {
 }
 
 export class CacheIncrementUnsupportedError extends Error {
-  readonly code = "ZSYS_CACHE_INCREMENT_UNSUPPORTED" as const;
+  readonly code = "RELKIT_CACHE_INCREMENT_UNSUPPORTED" as const;
 
   constructor() {
     super("Cache increment requires a numeric value contract");

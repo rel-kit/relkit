@@ -4,7 +4,7 @@ import {
   type StandardSchemaWithJSON,
 } from "@modelcontextprotocol/server";
 import type { Context, Hono } from "hono";
-import type { ToolRegistration } from "@zsys/graph";
+import type { ToolRegistration } from "@relkit/graph";
 import { getRequestState } from "./middleware.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
@@ -29,7 +29,7 @@ export function installMcp(app: Hono, options: RouteMaterializationOptions): voi
 
 function handlerFor(context: Context, options: RouteMaterializationOptions) {
   return createMcpHandler(() => {
-    const server = new McpServer({ name: "zsys", version: "2" });
+    const server = new McpServer({ name: "relkit", version: "2" });
     const tools = options.plan.tools
       .filter((entry) => entry.mcp)
       .sort((left, right) => left.id.localeCompare(right.id));

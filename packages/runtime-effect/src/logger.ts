@@ -1,12 +1,12 @@
 import { Context, Layer, Logger as EffectLogger, Option, References } from "effect";
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import {
   createObservabilityCollector,
   OBSERVABILITY_MODEL_VERSION,
   type RedactedObservabilityRecord,
   type LogRecord as ModelLogRecord,
   type ObservabilityCollector,
-} from "@zsys/observability";
+} from "@relkit/observability";
 import { redactCause, redactFailureDetail } from "./failure-redaction.js";
 import { formatHumanLog, formatMessage } from "./logger-format.js";
 import { InvocationTrace } from "./tracing.js";

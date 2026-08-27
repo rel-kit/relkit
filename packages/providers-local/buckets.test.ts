@@ -49,8 +49,8 @@ describe("local bucket provider", () => {
       "C:/absolute",
       "nested\\escape",
       "nested/../escape",
-      ".zsys/internal",
-      "__zsys/internal",
+      ".relkit/internal",
+      "__relkit/internal",
       "null\0byte",
     ];
     for (const key of unsafe) {
@@ -82,17 +82,17 @@ describe("local bucket provider", () => {
     const reopened = await createLocalBucketProviderForTest(provider.root);
     expect(await reopened.get("b")).toEqual(new Uint8Array([2]));
     const files = await readdir(join(provider.root, "objects"));
-    expect(files.every((file) => !file.startsWith(".zsys-tmp-"))).toBe(true);
+    expect(files.every((file) => !file.startsWith(".relkit-tmp-"))).toBe(true);
   });
 
   test("reports signed URL support explicitly instead of simulating it", async () => {
     const provider = await makeProvider();
     await expect(provider.createReadUrl("asset.bin")).rejects.toMatchObject({
-      code: "ZSYS_BUCKET_CAPABILITY_UNSUPPORTED",
+      code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
       capability: "signedReadUrl",
     });
     await expect(provider.createWriteUrl("asset.bin")).rejects.toMatchObject({
-      code: "ZSYS_BUCKET_CAPABILITY_UNSUPPORTED",
+      code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
       capability: "signedWriteUrl",
     });
   });
@@ -115,7 +115,7 @@ describe("local bucket provider", () => {
 async function makeProvider(
   options: Partial<LocalBucketProviderOptions> = {},
 ): Promise<LocalBucketProvider> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-bucket-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-bucket-"));
   roots.push(root);
   return createLocalBucketProviderForTest({ ...options, root });
 }

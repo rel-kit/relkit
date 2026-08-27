@@ -8,7 +8,7 @@ import {
   type EnvProjection,
   type EnvShape,
   type EnvSource,
-} from "@zsys/config";
+} from "@relkit/config";
 import {
   exampleValue,
   EnvCommandError,
@@ -38,15 +38,15 @@ export async function loadEnvDefinition(
   const path = resolve(root, options.envPath ?? join("src", "env.ts"));
   if (!inside(root, path))
     throw new EnvCommandError(
-      "ZSYS_ENV_USAGE",
+      "RELKIT_ENV_USAGE",
       "Environment path must remain inside the project root.",
     );
   let loaded: unknown;
   try {
-    loaded = await import(`${pathToFileURL(path).href}?zsys_env=1`);
+    loaded = await import(`${pathToFileURL(path).href}?relkit_env=1`);
   } catch {
     throw new EnvCommandError(
-      "ZSYS_ENV_NOT_FOUND",
+      "RELKIT_ENV_NOT_FOUND",
       `Environment contract was not found at ${relative(root, path)}.`,
     );
   }
@@ -60,7 +60,7 @@ export async function loadEnvDefinition(
         : undefined;
   if (!isRecord(definition) || definition.kind !== "env-definition")
     throw new EnvCommandError(
-      "ZSYS_ENV_INVALID",
+      "RELKIT_ENV_INVALID",
       "The environment module does not export an environment definition.",
     );
   return definition as EnvDefinition<EnvShape>;
@@ -76,7 +76,7 @@ export async function createExample(
   const path = resolve(root, options.examplePath ?? ".env.example");
   if (!inside(root, path))
     throw new EnvCommandError(
-      "ZSYS_ENV_USAGE",
+      "RELKIT_ENV_USAGE",
       "Example path must remain inside the project root.",
     );
   let existing = false;

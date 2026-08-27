@@ -1,5 +1,5 @@
-import { defineFunction } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction } from "@relkit/app";
+import { z } from "@relkit/schema";
 import orderCreated from "../../events/order-created.event.js";
 import priceOrder from "./price-order.function.js";
 

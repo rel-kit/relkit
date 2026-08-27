@@ -15,7 +15,7 @@ export function assertEnvelope(
     payload !== null && typeof payload === "object" && !Array.isArray(payload)
       ? (payload as InspectorObject)
       : undefined;
-  const headerVersion = headers.get("x-zsys-api-version");
+  const headerVersion = headers.get("x-relkit-api-version");
   if (
     !responseProtocols.includes(object?.protocol as InspectorResponseProtocol) ||
     object?.version !== INSPECTOR_API_VERSION ||
@@ -23,7 +23,7 @@ export function assertEnvelope(
   )
     throw new InspectorApiError(
       "Inspector protocol version is unsupported",
-      "ZSYS_INSPECTOR_PROTOCOL_MISMATCH",
+      "RELKIT_INSPECTOR_PROTOCOL_MISMATCH",
       undefined,
       "protocol",
     );

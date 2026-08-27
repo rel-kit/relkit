@@ -47,7 +47,7 @@ export interface PulumiWorkspaceHandle {
 }
 
 export class PulumiWorkspaceConfigurationError extends Error {
-  readonly code = "ZSYS_PULUMI_WORKSPACE_INVALID" as const;
+  readonly code = "RELKIT_PULUMI_WORKSPACE_INVALID" as const;
 
   constructor(message: string) {
     super(message);
@@ -120,7 +120,7 @@ async function workspaceDirectory(directory: string | undefined): Promise<string
   if (directory !== undefined && directory.trim() === "")
     throw new PulumiWorkspaceConfigurationError("Pulumi workDir must not be empty.");
   const path =
-    directory === undefined ? await mkdtemp(join(tmpdir(), "zsys-pulumi-")) : resolve(directory);
+    directory === undefined ? await mkdtemp(join(tmpdir(), "relkit-pulumi-")) : resolve(directory);
   await mkdir(path, { recursive: true });
   return path;
 }

@@ -1,4 +1,4 @@
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type { GraphNode } from "./model.js";
 import type {
   GraphDiffCategory,

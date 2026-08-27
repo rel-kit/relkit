@@ -23,12 +23,12 @@ export async function artifactFiles(root: string): Promise<SecretScanArtifact[]>
           category: classify(path, category),
         });
   };
-  await add(join(root, ".zsys", "generated"), "generated-source");
-  await add(join(root, ".zsys", "build"), "build-image");
+  await add(join(root, ".relkit", "generated"), "generated-source");
+  await add(join(root, ".relkit", "build"), "build-image");
   await add(join(root, "templates", "default"), "generated-source");
   await add(join(root, "apps", "inspector", ".next"), "browser");
   await add(
-    join(root, "openspec", "changes", "implement-zsys-typescript-poc-v3", "evidence"),
+    join(root, "openspec", "changes", "implement-relkit-typescript-poc-v3", "evidence"),
     "cloud-evidence",
   );
   await add(join(root, "tests"), "snapshots", (path) =>
@@ -43,7 +43,7 @@ export async function artifactFiles(root: string): Promise<SecretScanArtifact[]>
 
 function classify(path: string, fallback: SecretScanCategory): SecretScanCategory {
   const value = path.replaceAll("\\", "/").toLowerCase();
-  if (value.includes("/.zsys/build/")) return "build-image";
+  if (value.includes("/.relkit/build/")) return "build-image";
   if (value.includes(".next/")) return "browser";
   if (value.includes("pulumi") || value.includes("resource-report") || value.includes("iam-"))
     return "pulumi-reports";

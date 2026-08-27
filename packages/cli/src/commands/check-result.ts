@@ -1,10 +1,10 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import {
   writeGeneratedArtifacts,
   type GeneratedOutputs,
   type LoadedToolingConfig,
-} from "@zsys/compiler";
-import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@zsys/diagnostics";
+} from "@relkit/compiler";
+import { createDiagnostic, sortDiagnostics, type Diagnostic } from "@relkit/diagnostics";
 import { emptyCheckOutputs, safeMessage } from "./check-support.js";
 
 export interface CheckResult {
@@ -37,7 +37,7 @@ export async function emitCheckResult(
     stable = sortDiagnostics([
       ...stable,
       createDiagnostic({
-        code: "ZSYS_ARTIFACT_WRITE_FAILED",
+        code: "RELKIT_ARTIFACT_WRITE_FAILED",
         severity: "error",
         message: safeMessage(error, projectRoot),
       }),

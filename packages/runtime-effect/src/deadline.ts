@@ -1,1 +1,1 @@
-export { Deadline, composeDeadline, withDeadline, withTimeout } from "@zsys/invocation";
+export { Deadline, composeDeadline, withDeadline, withTimeout } from "@relkit/invocation";

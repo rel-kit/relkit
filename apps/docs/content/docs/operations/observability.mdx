@@ -3,7 +3,7 @@ title: Traces, logs, metrics, and redaction
 description: Follow context through the common engine without exposing sensitive application data.
 ---
 
-ZSYS uses OpenTelemetry-compatible trace, metric, and log concepts while keeping authored application
+RELKIT uses OpenTelemetry-compatible trace, metric, and log concepts while keeping authored application
 code independent of a specific backend. Every transport invokes the common function engine, which starts
 spans, records declared and observed edges, propagates trace/correlation/causation context, and reports
 completion outcomes.

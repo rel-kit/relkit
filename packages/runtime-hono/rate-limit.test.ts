@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import {
   createObservabilityCollector,
   type RequestRecord,
   type SpanRecord,
-} from "@zsys/observability";
-import type { RegistrationPlan } from "@zsys/graph";
+} from "@relkit/observability";
+import type { RegistrationPlan } from "@relkit/graph";
 import { createApp, type RateLimitCounter, type RuntimeManifest } from "./src/index.js";
 
 const source = { file: "src/routes/limited/route.ts", line: 1, column: 1 } as const;
@@ -102,7 +102,7 @@ describe("route rate limiting", () => {
       (record): record is SpanRecord =>
         record.signal === "span" &&
         record.status === "completed" &&
-        record.attributes?.["zsys.rate_limit.blocked"] === true,
+        record.attributes?.["relkit.rate_limit.blocked"] === true,
     );
     expect(blocked).toMatchObject({
       routeId: "limited.http",
@@ -111,11 +111,11 @@ describe("route rate limiting", () => {
       errorId: "rate-limit",
     });
     expect(span?.attributes).toMatchObject({
-      "zsys.route.id": "limited.http",
-      "zsys.rate_limit.limit": 1,
-      "zsys.rate_limit.remaining": 0,
-      "zsys.rate_limit.blocked": true,
-      "zsys.rate_limit.store": "shared",
+      "relkit.route.id": "limited.http",
+      "relkit.rate_limit.limit": 1,
+      "relkit.rate_limit.remaining": 0,
+      "relkit.rate_limit.blocked": true,
+      "relkit.rate_limit.store": "shared",
     });
     expect(JSON.stringify(records)).not.toContain('x-api-key":"a');
   });

@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { pathInput, pathOutput } from "../shared/schemas.js";
 
 const browsePath = defineFunction({

@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/diagnostics",
+  "name": "@relkit/diagnostics",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -9,7 +9,7 @@
     }
   },
   "dependencies": {
-    "@zsys/contracts": "workspace:*"
+    "@relkit/contracts": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_PROVIDER_PROFILE_UNKNOWN",
+    "code": "RELKIT_PROVIDER_PROFILE_UNKNOWN",
     "column": 17,
     "descriptorId": "archive",
     "file": "src/buckets/archive.bucket.ts",

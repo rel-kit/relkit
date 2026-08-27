@@ -1,6 +1,6 @@
 import type { EngineEvent, OpMap, OpType, OutputMap } from "@pulumi/pulumi/automation";
-import { redactRecord } from "@zsys/observability";
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
+import { redactRecord } from "@relkit/observability";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type {
   PulumiEventLog,
   PulumiEventOptions,

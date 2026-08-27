@@ -26,6 +26,6 @@ export function generatedAgentMarker(agentId: string): {
     generated: true,
     generatedBy: "agent",
     agentId,
-    functionId: `zsys.agent.${agentId}.invoke`,
+    functionId: `relkit.agent.${agentId}.invoke`,
   };
 }

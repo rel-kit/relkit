@@ -1,14 +1,14 @@
-import type { JsonValue } from "@zsys/contracts";
-import { defineAgent } from "@zsys/agents";
-import { invokeFunction, type InvocationParent, type InvocationTarget } from "@zsys/engine";
-import { defineError, defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
+import type { JsonValue } from "@relkit/contracts";
+import { defineAgent } from "@relkit/agents";
+import { invokeFunction, type InvocationParent, type InvocationTarget } from "@relkit/engine";
+import { defineError, defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
 import {
   defineTool,
   type ToolDescriptor,
   type ToolEngine,
   type ToolEngineInvocation,
-} from "@zsys/tools";
+} from "@relkit/tools";
 import { createTestAgent } from "./src/index.ts";
 import type { TestAgentModelOptions, TestModelTurn } from "./src/index.ts";
 

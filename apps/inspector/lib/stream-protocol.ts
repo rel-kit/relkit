@@ -1,4 +1,4 @@
-export const STREAM_PROTOCOL = "zsys.observability.stream" as const;
+export const STREAM_PROTOCOL = "relkit.observability.stream" as const;
 export const STREAM_VERSION = 1 as const;
 export const STREAM_EVENT_TYPES = [
   "request.started",

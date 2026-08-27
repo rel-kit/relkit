@@ -8,7 +8,7 @@ test("publishes authored, CLI, and application-facing API documentation", async 
   const files = await markdownFiles(content);
   expect(files.length).toBeGreaterThanOrEqual(34);
   expect(await readFile(resolve(content, "operations/cli-reference.mdx"), "utf8")).toContain(
-    "`zsys graph diff <before> <after>`",
+    "`relkit graph diff <before> <after>`",
   );
   for (const packageName of [
     "app",

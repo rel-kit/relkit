@@ -1,4 +1,4 @@
-import { API_VERSION, type JsonValue } from "@zsys/contracts";
+import { API_VERSION, type JsonValue } from "@relkit/contracts";
 import {
   identity,
   isRecord,
@@ -16,7 +16,7 @@ export function environmentMetadata(
 ): JsonValue {
   const activeItems = environmentItems(generation.graph);
   if (activeItems === undefined)
-    throw new InspectorGraphError("ZSYS_INSPECTOR_GRAPH_UNAVAILABLE", 503);
+    throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   const activePage = page(activeItems, request);
   const active = { ...identity(generation), role: "active", ...activePage };
   return {
@@ -58,7 +58,7 @@ export function candidateIdentity(
 ): Record<string, JsonValue> {
   const candidate = generation.candidate;
   return {
-    protocol: "zsys.inspector",
+    protocol: "relkit.inspector",
     version: API_VERSION,
     role,
     generationId: candidate?.generationId ?? generation.generationId,

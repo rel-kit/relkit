@@ -1,5 +1,5 @@
-import { GRAPH_VERSION } from "@zsys/contracts";
-import { canonicalizeGraph, hashGraph as hashCanonicalGraph } from "@zsys/graph";
+import { GRAPH_VERSION } from "@relkit/contracts";
+import { canonicalizeGraph, hashGraph as hashCanonicalGraph } from "@relkit/graph";
 import { buildGraphEdges } from "./normalize-graph-edges.js";
 import { buildGraphNodes } from "./normalize-graph-nodes.js";
 import type { NormalizedGraph, NormalizationWork } from "./normalize-types.js";

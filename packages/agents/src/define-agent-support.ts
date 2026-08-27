@@ -1,5 +1,5 @@
-import { deepFreeze } from "@zsys/contracts";
-import { isToolRef, type ToolRefAny } from "@zsys/tools";
+import { deepFreeze } from "@relkit/contracts";
+import { isToolRef, type ToolRefAny } from "@relkit/tools";
 import type { AgentInstructions, PromptInstructions, PromptTemplate } from "./define-agent.js";
 
 export function copyAgentInstructions(value: unknown): AgentInstructions {

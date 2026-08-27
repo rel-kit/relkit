@@ -15,7 +15,7 @@ import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineRoute, http } from "../../packages/routes/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 
-const WATCH_ROOT = "/tmp/zsys-determinism-watch";
+const WATCH_ROOT = "/tmp/relkit-determinism-watch";
 const input = z.object({ id: z.string() });
 
 describe.serial("compiler determinism", () => {
@@ -76,10 +76,10 @@ describe.serial("compiler determinism", () => {
   });
 
   test("normalizes Windows roots and excludes PID, clock, generation, and random metadata", () => {
-    const first = volatileGraph("/tmp/zsys-determinism-a", false, 101, "early");
-    const second = volatileGraph("C:\\zsys\\determinism-b", true, 202, "late");
-    const firstOptions = { projectRoot: "/tmp/zsys-determinism-a" };
-    const secondOptions = { projectRoot: "C:\\zsys\\determinism-b" };
+    const first = volatileGraph("/tmp/relkit-determinism-a", false, 101, "early");
+    const second = volatileGraph("C:\\relkit\\determinism-b", true, 202, "late");
+    const firstOptions = { projectRoot: "/tmp/relkit-determinism-a" };
+    const secondOptions = { projectRoot: "C:\\relkit\\determinism-b" };
 
     expect(canonicalGraphJson(second, secondOptions)).toBe(canonicalGraphJson(first, firstOptions));
     expect(hashGraph(second, secondOptions)).toBe(hashGraph(first, firstOptions));
@@ -135,7 +135,7 @@ describe.serial("compiler determinism", () => {
       artifactSnapshot(compileWatchState([...changedDescriptors].reverse())),
     );
 
-    const directory = await mkdtemp(join(tmpdir(), "zsys-watch-artifacts-"));
+    const directory = await mkdtemp(join(tmpdir(), "relkit-watch-artifacts-"));
     try {
       await writeGeneratedArtifacts(baseline.outputs, { directory });
       const report = await writeGeneratedArtifacts(changedIncremental.result.outputs, {

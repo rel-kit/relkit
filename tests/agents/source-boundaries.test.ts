@@ -11,7 +11,7 @@ describe("agent declaration/source boundaries", () => {
   });
 
   test("the shared authoring scan rejects vendor models and credentials on agents", async () => {
-    const root = await mkdtemp(join(process.env.TMPDIR ?? "/tmp", "zsys-agent-scan-"));
+    const root = await mkdtemp(join(process.env.TMPDIR ?? "/tmp", "relkit-agent-scan-"));
     try {
       const source = join(root, "examples/commerce/src/invalid.agent.ts");
       await mkdir(join(root, "packages"), { recursive: true });

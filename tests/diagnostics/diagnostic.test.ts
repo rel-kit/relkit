@@ -13,7 +13,7 @@ import type {
 } from "../../packages/diagnostics/src/index.ts";
 
 const repositoryRoot = resolve(import.meta.dir, "../..");
-const alternateRoot = "/tmp/zsys-diagnostics-root-2.12";
+const alternateRoot = "/tmp/relkit-diagnostics-root-2.12";
 const syntheticSecret = "synthetic-diagnostic-secret-2.12";
 
 const sourceByFile: Record<string, string> = {
@@ -40,7 +40,7 @@ function readGolden(name: string): unknown {
 function diagnostics(root: string): readonly DiagnosticInput[] {
   return [
     {
-      code: "ZSYS_CONVENTION_DIRECTORY",
+      code: "RELKIT_CONVENTION_DIRECTORY",
       severity: "warning",
       message: "Route is outside the recommended directory",
       file: join(root, "src/routes.ts"),
@@ -66,7 +66,7 @@ function diagnostics(root: string): readonly DiagnosticInput[] {
       documentationPath: join(root, "docs/diagnostics.md"),
     },
     {
-      code: "ZSYS_DUPLICATE_ID",
+      code: "RELKIT_DUPLICATE_ID",
       severity: "error",
       message: "Descriptor ID is already declared",
       file: join(root, "src/routes.ts"),
@@ -110,7 +110,7 @@ function assertPortable(value: unknown): void {
   expect(serialized).not.toContain(syntheticSecret);
 }
 
-describe.serial("@zsys/diagnostics", () => {
+describe.serial("@relkit/diagnostics", () => {
   test("keeps text and JSON output stable across absolute roots", () => {
     const rootOptions = options(repositoryRoot);
     const alternateOptions = options(alternateRoot);
@@ -151,9 +151,9 @@ describe.serial("@zsys/diagnostics", () => {
 
     expect(annotation).toEqual({
       level: "warning",
-      title: "ZSYS_CONVENTION_DIRECTORY",
+      title: "RELKIT_CONVENTION_DIRECTORY",
       message: "Route is outside the recommended directory",
-      code: "ZSYS_CONVENTION_DIRECTORY",
+      code: "RELKIT_CONVENTION_DIRECTORY",
       file: "src/routes.ts",
       line: 2,
       column: 7,

@@ -1,5 +1,5 @@
 {
-  "name": "@zsys/client",
+  "name": "@relkit/client",
   "version": "0.0.0",
   "type": "module",
   "exports": {

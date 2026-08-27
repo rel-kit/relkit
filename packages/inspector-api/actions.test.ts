@@ -44,8 +44,8 @@ describe("inspector function actions", () => {
       "/actions/functions/orders.create/invoke",
       { input: null },
       {
-        "x-zsys-generation-id": identity.generationId,
-        "x-zsys-graph-hash": identity.graphHash,
+        "x-relkit-generation-id": identity.generationId,
+        "x-relkit-graph-hash": identity.graphHash,
         "idempotency-key": "header-1",
       },
     );
@@ -65,6 +65,6 @@ describe("inspector function actions", () => {
       { authorization: "Bearer test-token" },
     );
     expect(response.status).toBe(403);
-    expect((await response.json()).error).toBe("ZSYS_INSPECTOR_ACTIONS_DISABLED");
+    expect((await response.json()).error).toBe("RELKIT_INSPECTOR_ACTIONS_DISABLED");
   });
 });

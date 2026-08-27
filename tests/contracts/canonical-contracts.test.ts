@@ -158,7 +158,7 @@ describe.serial("canonical contracts", () => {
     expect(normalizeSourcePath(relative)).toBe("src/routes/orders.ts");
     expect(normalizeSourcePath("src/../index.ts")).toBe("index.ts");
 
-    const roots = ["/tmp/zsys-project-one", "C:\\workspace\\zsys-project-two"];
+    const roots = ["/tmp/relkit-project-one", "C:\\workspace\\relkit-project-two"];
     for (const root of roots) {
       const separator = root.includes("\\") ? "\\" : "/";
       expect(normalizeSourcePath(`${root}${separator}src${separator}index.ts`, root)).toBe(
@@ -166,14 +166,14 @@ describe.serial("canonical contracts", () => {
       );
     }
 
-    expect(normalizeSourcePath("D:\\WORK\\zsys\\src\\index.ts", "d:/work/zsys")).toBe(
+    expect(normalizeSourcePath("D:\\WORK\\relkit\\src\\index.ts", "d:/work/relkit")).toBe(
       "src/index.ts",
     );
-    expect(normalizeSourcePath("src/index.ts", "/tmp/zsys-project-one")).toBe("src/index.ts");
-    expect(() => normalizeSourcePath("/tmp/other/src/index.ts", "/tmp/zsys-project-one")).toThrow(
+    expect(normalizeSourcePath("src/index.ts", "/tmp/relkit-project-one")).toBe("src/index.ts");
+    expect(() => normalizeSourcePath("/tmp/other/src/index.ts", "/tmp/relkit-project-one")).toThrow(
       "Invalid source location: file must be inside the project root",
     );
-    expect(() => normalizeSourcePath("/tmp/zsys-project-one/src/index.ts")).toThrow(
+    expect(() => normalizeSourcePath("/tmp/relkit-project-one/src/index.ts")).toThrow(
       "Invalid source location: an absolute file requires an absolute project root",
     );
     expect(() => normalizeSourcePath("../outside.ts")).toThrow(
@@ -188,12 +188,12 @@ describe.serial("canonical contracts", () => {
       column: 1,
     });
     expect(
-      createSourceLocation("/tmp/zsys-project-one/src/index.ts", 2, 3, "/tmp/zsys-project-one"),
+      createSourceLocation("/tmp/relkit-project-one/src/index.ts", 2, 3, "/tmp/relkit-project-one"),
     ).toEqual({ file: "src/index.ts", line: 2, column: 3 });
     expect(
       normalizeSourceLocation(
         { file: "src\\index.ts", line: 4, column: 5 },
-        "/tmp/zsys-project-one",
+        "/tmp/relkit-project-one",
       ),
     ).toEqual({ file: "src/index.ts", line: 4, column: 5 });
 
@@ -220,6 +220,6 @@ describe.serial("canonical contracts", () => {
       protocol: PROTOCOL_VERSION,
     }).toEqual({ contract: 2, generator: 2, graph: 5, manifest: 5, api: 1, protocol: 1 });
     expect(PROTOCOL_VERSION).toBe(API_VERSION);
-    expect(API_BASE_PATH).toBe("/_zsys/v1");
+    expect(API_BASE_PATH).toBe("/_relkit/v1");
   });
 });

@@ -42,10 +42,10 @@ export class InspectorStreamClient {
     this.fetcher = options.fetch ?? ((input, init) => fetch(input, init));
     this.headers = new Headers(options.headers);
     this.headers.set("accept", "text/event-stream");
-    this.headers.set("x-zsys-api-version", String(INSPECTOR_API_VERSION));
-    this.headers.set("x-zsys-api-protocol", INSPECTOR_API_PROTOCOL);
+    this.headers.set("x-relkit-api-version", String(INSPECTOR_API_VERSION));
+    this.headers.set("x-relkit-api-protocol", INSPECTOR_API_PROTOCOL);
     this.storage = options.storage ?? browserStorage();
-    this.storageKey = options.storageKey ?? "zsys.inspector.stream.cursor";
+    this.storageKey = options.storageKey ?? "relkit.inspector.stream.cursor";
     let cursor: string | null = null;
     try {
       cursor = this.storage?.getItem(this.storageKey) ?? null;
@@ -98,7 +98,7 @@ export class InspectorStreamClient {
         invalidCursorRetried = false;
         throw new InspectorApiError(
           "Inspector stream disconnected",
-          "ZSYS_INSPECTOR_DISCONNECTED",
+          "RELKIT_INSPECTOR_DISCONNECTED",
           undefined,
           "network",
         );
@@ -109,7 +109,7 @@ export class InspectorStreamClient {
             ? error
             : new InspectorApiError(
                 "Inspector stream failed",
-                "ZSYS_INSPECTOR_DISCONNECTED",
+                "RELKIT_INSPECTOR_DISCONNECTED",
                 undefined,
                 "network",
               );

@@ -1,4 +1,4 @@
-import type { JsonValue, SourceLocation } from "@zsys/contracts";
+import type { JsonValue, SourceLocation } from "@relkit/contracts";
 import type {
   AppNode,
   EnvironmentVariableNode,

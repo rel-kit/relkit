@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION } from "@zsys/contracts";
+import { PROTOCOL_VERSION } from "@relkit/contracts";
 import {
   OBSERVABILITY_MODEL_VERSION,
   type ObservabilityRecord,
@@ -9,7 +9,7 @@ import type { RedactionPolicy } from "./redaction.js";
 import type { RedactedObservabilityRecord } from "./record-admission.js";
 import { toObservabilityRecord } from "./collector-events.js";
 
-export const OBSERVABILITY_HOOK_PROTOCOL = "zsys.observability.hooks" as const;
+export const OBSERVABILITY_HOOK_PROTOCOL = "relkit.observability.hooks" as const;
 export const OBSERVABILITY_HOOK_VERSION = PROTOCOL_VERSION;
 export const DEFAULT_COLLECTOR_MAX_RECORDS = 1_024;
 const OBSERVABILITY_SIGNALS = new Set<ObservabilitySignal>([

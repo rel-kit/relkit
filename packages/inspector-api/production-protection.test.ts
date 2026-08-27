@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
-import { createObservabilityStream, type ObservabilityQuery } from "@zsys/observability";
+import { API_BASE_PATH } from "@relkit/contracts";
+import { createObservabilityStream, type ObservabilityQuery } from "@relkit/observability";
 import { Hono } from "hono";
 import {
   installInspectorEndpoints,
@@ -14,9 +14,9 @@ const generation = {
   graph: { contractVersion: 3, nodes: [], edges: [] },
 };
 const query: ObservabilityQuery = {
-  requests: async () => ({ protocol: "zsys.observability.query", version: 1, items: [] }),
-  logs: async () => ({ protocol: "zsys.observability.query", version: 1, items: [] }),
-  traces: async () => ({ protocol: "zsys.observability.query", version: 1, items: [] }),
+  requests: async () => ({ protocol: "relkit.observability.query", version: 1, items: [] }),
+  logs: async () => ({ protocol: "relkit.observability.query", version: 1, items: [] }),
+  traces: async () => ({ protocol: "relkit.observability.query", version: 1, items: [] }),
   request: async () => undefined,
   log: async () => undefined,
   trace: async () => undefined,
@@ -139,7 +139,7 @@ describe("production protection runtime enforcement", () => {
       }),
     });
     expect(response.status).toBe(403);
-    expect((await response.json()).error).toBe("ZSYS_INSPECTOR_ACTIONS_DISABLED");
+    expect((await response.json()).error).toBe("RELKIT_INSPECTOR_ACTIONS_DISABLED");
     expect(invoked).toBe(false);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 import {
   createJobClient,
   JobInputValidationError,
@@ -46,7 +46,7 @@ describe("job Promise client", () => {
       profile: "archive",
       correlationId: "request-1",
     });
-    expect(bridgeNames).toEqual(["zsys.job.orders.send.enqueue"]);
+    expect(bridgeNames).toEqual(["relkit.job.orders.send.enqueue"]);
     expect(declared).toEqual([{ kind: "enqueues-job", from: "orders.create", to: "orders.send" }]);
     expect(observed).toEqual([
       { relationship: "enqueues-job", from: "orders.create", to: "orders.send" },

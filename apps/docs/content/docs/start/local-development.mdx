@@ -12,18 +12,18 @@ default URLs are:
 
 - App: `http://localhost:3000`
 - Inspector: `http://localhost:3210`
-- OpenAPI: `http://localhost:3000/_zsys/v1/openapi.json`
-- Scalar: `http://localhost:3000/_zsys/v1/api-reference`
+- OpenAPI: `http://localhost:3000/_relkit/v1/openapi.json`
+- Scalar: `http://localhost:3000/_relkit/v1/api-reference`
 
 On a valid → invalid → valid edit, the last known good generation remains active until the new
 generation compiles and passes readiness. `Ctrl-C` shuts down every child process. A port conflict
 reports the occupied port, the owning process when discoverable, and the applicable override.
 
 Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Inspector precedence is
-`--inspector-port`, `ZSYS_INSPECTOR_PORT`, `inspector.port`, then `3210`.
+`--inspector-port`, `RELKIT_INSPECTOR_PORT`, `inspector.port`, then `3210`.
 
-```ts title="zsys.config.ts"
-import { defineConfig } from "@zsys/app/config";
+```ts title="relkit.config.ts"
+import { defineConfig } from "@relkit/app/config";
 
 export default defineConfig({
   server: { port: 3000, maxBodyBytes: 1_048_576 },
@@ -31,5 +31,5 @@ export default defineConfig({
 });
 ```
 
-Installed projects use the inspector bundled with the CLI. `ZSYS_INSPECTOR_ROOT` exists only for
+Installed projects use the inspector bundled with the CLI. `RELKIT_INSPECTOR_ROOT` exists only for
 framework contributors testing a compatible inspector checkout.

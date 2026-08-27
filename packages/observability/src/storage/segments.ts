@@ -1,6 +1,6 @@
 import { open, rename } from "node:fs/promises";
 import { join } from "node:path";
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import type { ObservabilityRecord } from "../model.js";
 import { admitObservabilityRecord } from "../record-admission.js";
 import type { RedactionPolicy } from "../redaction.js";

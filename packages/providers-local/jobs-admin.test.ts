@@ -10,7 +10,7 @@ const roots: string[] = [];
 
 describe("local job administration", () => {
   test("queries versioned status and audits local mutations", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-admin-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-admin-"));
     roots.push(root);
     const store = await createJobStore(join(root, "jobs"), { now: () => 50 });
     const queue = createJobQueue(store, { now: () => 50, ownerToken: "worker-a" });
@@ -37,7 +37,7 @@ describe("local job administration", () => {
       })(),
     });
     expect(admin.status("job-1")).toMatchObject({
-      protocol: "zsys.jobs.admin",
+      protocol: "relkit.jobs.admin",
       version: 1,
       state: "dead-lettered",
       failure: { code: "PROVIDER_FAILED" },
@@ -69,12 +69,12 @@ describe("local job administration", () => {
       createActionId: () => "action-production",
     });
     await expect(production.cancel("job-1")).rejects.toMatchObject({
-      code: "ZSYS_JOB_ADMIN_MUTATION_DISABLED",
+      code: "RELKIT_JOB_ADMIN_MUTATION_DISABLED",
     });
     expect(production.actions()[0]).toMatchObject({
       actionId: "action-production",
       outcome: "rejected",
-      errorCode: "ZSYS_JOB_ADMIN_MUTATION_DISABLED",
+      errorCode: "RELKIT_JOB_ADMIN_MUTATION_DISABLED",
     });
     expect(queue.get("job-1")?.state).toBe("dead-lettered");
     await store.close();

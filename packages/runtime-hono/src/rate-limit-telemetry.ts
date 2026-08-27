@@ -1,5 +1,5 @@
-import type { HttpTriggerRegistration } from "@zsys/graph";
-import type { RequestOutcome, SpanRecord } from "@zsys/observability";
+import type { HttpTriggerRegistration } from "@relkit/graph";
+import type { RequestOutcome, SpanRecord } from "@relkit/observability";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import type { HttpRequestState } from "./middleware.js";
 import type { RateLimitInfo } from "hono-rate-limiter";
@@ -20,7 +20,7 @@ export function recordRateLimitResult(
     kind: "middleware",
     at: startedAt,
     durationMs: Math.max(0, Date.now() - startedAt),
-    targetId: "zsys.rate-limit",
+    targetId: "relkit.rate-limit",
     status,
     outcome: blocked ? "declared-error" : "success",
   });
@@ -49,7 +49,7 @@ export function emitRateLimitSpan(
     graphHash: options.plan.graphHash,
     invocationId: `rate-limit:${state.requestId}`,
     spanId,
-    name: "zsys.http.rate_limit",
+    name: "relkit.http.rate_limit",
     source: "http",
     status,
     startedAt: new Date(startedAt).toISOString(),
@@ -61,11 +61,11 @@ export function emitRateLimitSpan(
         }
       : {}),
     attributes: {
-      "zsys.route.id": trigger.id,
-      "zsys.rate_limit.limit": policy.limit,
-      "zsys.rate_limit.remaining": info?.remaining ?? policy.limit,
-      "zsys.rate_limit.blocked": blocked,
-      "zsys.rate_limit.store": policy.storeId === undefined ? "memory" : "shared",
+      "relkit.route.id": trigger.id,
+      "relkit.rate_limit.limit": policy.limit,
+      "relkit.rate_limit.remaining": info?.remaining ?? policy.limit,
+      "relkit.rate_limit.blocked": blocked,
+      "relkit.rate_limit.store": policy.storeId === undefined ? "memory" : "shared",
     },
   };
   try {

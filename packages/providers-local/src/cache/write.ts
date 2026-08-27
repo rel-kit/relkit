@@ -1,4 +1,4 @@
-import type { CacheOperationOptions } from "@zsys/cache";
+import type { CacheOperationOptions } from "@relkit/cache";
 import { serializeLocalCacheValue } from "./keys.js";
 import { byteLength, normalizeTtl } from "./policy.js";
 import type { LocalCacheStore } from "./store.js";

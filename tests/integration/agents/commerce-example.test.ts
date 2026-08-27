@@ -76,7 +76,7 @@ describe("commerce-example support agent", () => {
       (edge) => edge.relationship === "targets-function" && edge.from === "lookup-order",
     );
 
-    expect(agentSpan?.functionId).toBe(`zsys.agent.${orderSupport.id}.invoke`);
+    expect(agentSpan?.functionId).toBe(`relkit.agent.${orderSupport.id}.invoke`);
     expect(modelSpans.map((span) => span.parentSpanId)).toEqual([
       agentSpan?.spanId,
       agentSpan?.spanId,

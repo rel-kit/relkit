@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { ensureOwnedDirectory, quarantineStateFile } from "../state.js";
 import { LocalCacheStateError } from "./types.js";
 import type { LocalCacheStoreState } from "./store.js";
@@ -50,7 +50,7 @@ export async function writeCacheState(
   schemaVersion: string | number,
 ): Promise<void> {
   const directory = ensureOwnedDirectory(dirname(path));
-  const temporary = join(directory, `.zsys-tmp-${randomUUID()}.json`);
+  const temporary = join(directory, `.relkit-tmp-${randomUUID()}.json`);
   const value = JSON.stringify({ version: SNAPSHOT_VERSION, cacheId, schemaVersion, ...state });
   try {
     await writeFile(temporary, value, { encoding: "utf8", flag: "wx", mode: 0o600 });

@@ -113,10 +113,10 @@ function toolOutput(value: unknown): unknown {
   }
   if (value.type === "error-text" && typeof value.value === "string") {
     const code = value.value.includes("AI_NoSuchToolError")
-      ? "ZSYS_TOOL_NOT_ALLOWED"
+      ? "RELKIT_TOOL_NOT_ALLOWED"
       : value.value.includes("AI_InvalidToolInputError")
-        ? "ZSYS_TOOL_ARGUMENT_VALIDATION"
-        : "ZSYS_TOOL_FAILED";
+        ? "RELKIT_TOOL_ARGUMENT_VALIDATION"
+        : "RELKIT_TOOL_FAILED";
     return { error: { code, message: "Tool call failed" } };
   }
   return value;

@@ -1,24 +1,24 @@
 {
-  "name": "@zsys/example-data-model",
+  "name": "@relkit/example-data-model",
   "private": true,
   "type": "module",
   "packageManager": "bun@1.3.10",
   "scripts": {
-    "dev": "zsys dev",
-    "check": "zsys check",
-    "typecheck": "zsys check && tsc --noEmit",
+    "dev": "relkit dev",
+    "check": "relkit check",
+    "typecheck": "relkit check && tsc --noEmit",
     "test": "bun test",
-    "build": "zsys build"
+    "build": "relkit build"
   },
   "dependencies": {
-    "@zsys/app": "workspace:*",
-    "@zsys/drizzle": "workspace:*",
-    "@zsys/schema": "workspace:*",
+    "@relkit/app": "workspace:*",
+    "@relkit/drizzle": "workspace:*",
+    "@relkit/schema": "workspace:*",
     "drizzle-orm": "1.0.0-rc.4"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@zsys/cli": "workspace:*",
+    "@relkit/cli": "workspace:*",
     "typescript": "5.9.2"
   }
 }

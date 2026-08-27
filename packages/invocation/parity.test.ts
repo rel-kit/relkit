@@ -10,7 +10,7 @@ import {
   type InvocationRecord,
   type InvocationTarget,
 } from "./src/index.ts";
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 const record: InvocationRecord = {
   id: "invocation-1",

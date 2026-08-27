@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { orderDeleteInput, orderDeleteOutput } from "../../shared/schemas.js";
 
 const deleteOrder = defineFunction({

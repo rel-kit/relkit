@@ -5,8 +5,8 @@ import {
   isDescriptor,
   type DescriptorBase,
   type MaybePromise,
-} from "@zsys/contracts";
-import { createUnboundIdentity, type PublicClock, type PublicLogger } from "@zsys/invocation";
+} from "@relkit/contracts";
+import { createUnboundIdentity, type PublicClock, type PublicLogger } from "@relkit/invocation";
 
 export interface MiddlewareContext {
   readonly signal: AbortSignal;
@@ -18,7 +18,7 @@ export interface MiddlewareContext {
 export type MiddlewareHandler = (
   context: Context,
   next: Next,
-  zsys: MiddlewareContext,
+  relkit: MiddlewareContext,
 ) => MaybePromise<Response | void>;
 
 export interface MiddlewareDescriptor<Id extends string = string> extends DescriptorBase<
@@ -34,7 +34,7 @@ export interface MiddlewareDescriptor<Id extends string = string> extends Descri
  *
  * @example
  * ```ts
- * import { defineMiddleware } from "@zsys/app"
+ * import { defineMiddleware } from "@relkit/app"
  *
  * export default defineMiddleware("/orders/*", async (context, next) => {
  *   if (context.req.header("authorization") === undefined) {

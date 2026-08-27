@@ -3,8 +3,8 @@ title: Events
 description: Declare typed events, publish them, and listen with payload-first callbacks.
 ---
 
-Declare an event with a stable ID, version, and payload schema. `zsys dev`, `check`, and `create` discover
-descriptors first and atomically refresh `.zsys/generated/event-registry.d.ts`, which gives listener
+Declare an event with a stable ID, version, and payload schema. `relkit dev`, `check`, and `create` discover
+descriptors first and atomically refresh `.relkit/generated/event-registry.d.ts`, which gives listener
 names autocomplete and payload inference.
 
 <include cwd lang="ts" meta='title="examples/commerce/src/events/order-receipt.event.ts"'>
@@ -20,7 +20,7 @@ dependencies.
 
 Delivery defaults to durable with one attempt. Use `delivery: "ephemeral"` explicitly. Options include
 Listener options include `id`, `retry`, `profile`, `concurrency`, `timeoutMs`, and managed-resource
-dependencies. When `id` is absent, ZSYS derives it from the source binding and rejects duplicates;
+dependencies. When `id` is absent, RELKIT derives it from the source binding and rejects duplicates;
 production listeners should pin IDs when rename stability matters. A declared error with omitted or
 `retry: "never"` stops a delivery. `retry: "later"` or `{ kind: "later", afterMs }` permits another
 policy-bounded attempt, with `afterMs` acting as a minimum delay.

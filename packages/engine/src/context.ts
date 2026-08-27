@@ -27,12 +27,12 @@ export interface ContextBuildOptions {
   readonly traceId?: () => string | undefined;
   readonly now?: () => Date;
   readonly invokeFunction?: DirectFunctionInvoker;
-  readonly onDeclaredEdge?: (edge: import("@zsys/graph").GraphEdge) => void;
-  readonly onObservedEdge?: (edge: import("@zsys/graph").ObservedEdge) => void;
+  readonly onDeclaredEdge?: (edge: import("@relkit/graph").GraphEdge) => void;
+  readonly onObservedEdge?: (edge: import("@relkit/graph").ObservedEdge) => void;
   readonly onOperation?: (
     operation:
-      | import("@zsys/buckets").BucketOperationObservation
-      | import("@zsys/cache").CacheOperationObservation,
+      | import("@relkit/buckets").BucketOperationObservation
+      | import("@relkit/cache").CacheOperationObservation,
   ) => void;
 }
 

@@ -1,4 +1,4 @@
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import {
   EVALUATOR_DETECTOR_COVERAGE,
   EVALUATOR_PROTOCOL,
@@ -32,7 +32,7 @@ async function evaluateFromStdin(): Promise<EvaluatorResponse> {
   }
   if (!isEvaluatorRequest(value)) {
     return failureResponse("unknown", false, {
-      code: "ZSYS_EVALUATOR_REQUEST_INVALID",
+      code: "RELKIT_EVALUATOR_REQUEST_INVALID",
       message: "Evaluator request does not match the supported protocol.",
       generationId: "unknown",
     });
@@ -40,7 +40,7 @@ async function evaluateFromStdin(): Promise<EvaluatorResponse> {
   const request = value;
   if (realpathSync(resolve(process.cwd())) !== realpathSync(resolve(request.projectRoot))) {
     return failureResponse(request.generationId, request.sourceMaps, {
-      code: "ZSYS_EVALUATOR_ROOT_INVALID",
+      code: "RELKIT_EVALUATOR_ROOT_INVALID",
       message: "Evaluator working directory does not match the requested project root.",
       generationId: request.generationId,
     });
@@ -84,7 +84,7 @@ async function evaluateCandidate(
     let module: Record<string, unknown>;
     try {
       module = (await import(
-        `${pathToFileURL(file).href}?zsys_generation=${request.generationId}`
+        `${pathToFileURL(file).href}?relkit_generation=${request.generationId}`
       )) as Record<string, unknown>;
     } catch (error) {
       const report = detector.finish();
@@ -129,7 +129,7 @@ function importFailure(
   request: EvaluatorRequest,
 ): EvaluatorFailure {
   return {
-    code: "ZSYS_EVALUATOR_IMPORT_FAILED",
+    code: "RELKIT_EVALUATOR_IMPORT_FAILED",
     message: error instanceof Error ? error.message : String(error),
     generationId: request.generationId,
     module,
@@ -141,7 +141,7 @@ function importFailure(
 
 function requestFailure(error: unknown): EvaluatorFailure {
   return {
-    code: "ZSYS_EVALUATOR_REQUEST_INVALID",
+    code: "RELKIT_EVALUATOR_REQUEST_INVALID",
     message: error instanceof Error ? error.message : String(error),
     generationId: "unknown",
   };

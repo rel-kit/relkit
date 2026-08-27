@@ -1,4 +1,4 @@
-import type { ApplicationGraph, GraphNode } from "@zsys/graph";
+import type { ApplicationGraph, GraphNode } from "@relkit/graph";
 import type { Capability } from "./from-graph-validation.js";
 
 export function iam(name: Capability, id: string, edges: ApplicationGraph["edges"]): string[] {

@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import type { ObservabilityRecord } from "./model.js";
 import { admitRecord } from "./redaction.js";
 import { admitObservabilityRecord } from "./record-admission.js";
@@ -61,10 +61,10 @@ export function createObservabilityStream(
     data: JsonValue,
   ): ObservabilityStreamEvent => {
     if (closed)
-      throw new ObservabilityStreamError("ZSYS_OBSERVABILITY_STREAM_CLOSED", "Stream is closed");
+      throw new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_CLOSED", "Stream is closed");
     if (sequence === Number.MAX_SAFE_INTEGER) throw invalid("stream cursor exhausted");
     const event = Object.freeze({
-      protocol: "zsys.observability.stream" as const,
+      protocol: "relkit.observability.stream" as const,
       version: 1 as const,
       cursor: String(++sequence),
       type,
@@ -114,7 +114,7 @@ export function createObservabilityStream(
     );
     const page = matched.slice(0, limit);
     return Object.freeze({
-      protocol: "zsys.observability.stream" as const,
+      protocol: "relkit.observability.stream" as const,
       version: 1 as const,
       events: Object.freeze(page),
       ...(page.length < matched.length ? { nextCursor: page.at(-1)!.cursor } : {}),
@@ -125,7 +125,7 @@ export function createObservabilityStream(
 
   const subscribe = (input: ObservabilityStreamSubscriptionOptions = {}) => {
     if (closed)
-      throw new ObservabilityStreamError("ZSYS_OBSERVABILITY_STREAM_CLOSED", "Stream is closed");
+      throw new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_CLOSED", "Stream is closed");
     if (subscribers.size >= maxSubscribers) throw invalid("stream subscriber limit reached");
     const cursor = resolveCursor(input);
     const page = replay({ ...(cursor === undefined ? {} : { cursor }), limit: maxEvents });

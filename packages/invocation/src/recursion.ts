@@ -6,7 +6,7 @@ export interface InvocationCallFrame {
 }
 
 export class RecursionPolicyError extends Error {
-  readonly code = "ZSYS_RECURSION_DENIED" as const;
+  readonly code = "RELKIT_RECURSION_DENIED" as const;
   readonly functionId: string;
   readonly callStack: readonly string[];
   readonly cycle: readonly string[];

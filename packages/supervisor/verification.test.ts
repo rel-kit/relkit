@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { API_VERSION, GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { createSupervisorStateMachine } from "./src/state-machine.js";
 import { verifyCandidate, type CandidateVerificationCandidate } from "./src/verification.js";
 
@@ -54,7 +54,7 @@ test("verification failure disposes only the candidate and preserves active stat
         candidateToken,
       ),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_GRAPH_HASH_MISMATCH" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_GRAPH_HASH_MISMATCH" });
   expect(machine.verificationFailed(candidateToken, "hash mismatch")).toBe(true);
   expect(machine.snapshot()).toMatchObject({
     state: "active",
@@ -73,7 +73,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
         generationToken: 99,
       }),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_GENERATION_MISMATCH" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_GENERATION_MISMATCH" });
 
   await expect(
     verifyCandidate({
@@ -81,7 +81,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
       graphHash,
       fetch: responseFor({ graphHash, manifestGraphHash: graphHash }, API_VERSION + 1),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_API_VERSION_UNSUPPORTED" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_API_VERSION_UNSUPPORTED" });
 
   await expect(
     verifyCandidate({
@@ -93,7 +93,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
         manifestContractVersion: MANIFEST_VERSION + 1,
       }),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED" });
 
   await expect(
     verifyCandidate({
@@ -107,7 +107,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
         providerReady: true,
       }),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_ENVIRONMENT_NOT_READY" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_ENVIRONMENT_NOT_READY" });
 
   await expect(
     verifyCandidate({
@@ -121,7 +121,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
         providerReady: false,
       }),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_PROVIDER_NOT_READY" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_PROVIDER_NOT_READY" });
 
   await expect(
     verifyCandidate({
@@ -135,7 +135,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
           }),
         ),
     }),
-  ).rejects.toMatchObject({ code: "ZSYS_CANDIDATE_HEALTH_TIMEOUT" });
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_HEALTH_TIMEOUT" });
 });
 
 function candidateFor(
@@ -169,10 +169,10 @@ function responseFor(
             providerReady: typeof graph.providerReady === "boolean" ? graph.providerReady : true,
             ...identity,
           };
-    return new Response(JSON.stringify({ protocol: "zsys.inspector", version, ...body }), {
+    return new Response(JSON.stringify({ protocol: "relkit.inspector", version, ...body }), {
       headers: {
         "content-type": "application/json",
-        "x-zsys-api-version": String(version),
+        "x-relkit-api-version": String(version),
       },
     });
   };

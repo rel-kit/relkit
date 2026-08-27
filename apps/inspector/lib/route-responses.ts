@@ -121,7 +121,7 @@ function responseDescription(entry: Record<string, unknown>): string {
 
 function schemaValue(value: unknown): Record<string, unknown> | undefined {
   const recordValue = record(value);
-  if (recordValue?.$zsys === "schema") return record(recordValue.jsonSchema);
+  if (recordValue?.$relkit === "schema") return record(recordValue.jsonSchema);
   return recordValue;
 }
 

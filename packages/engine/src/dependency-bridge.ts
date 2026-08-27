@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { MaybePromise } from "@zsys/contracts";
-import { normalizeFailure, type InvocationFailure } from "@zsys/invocation";
-import { type InvocationBridge } from "@zsys/runtime-effect";
+import type { MaybePromise } from "@relkit/contracts";
+import { normalizeFailure, type InvocationFailure } from "@relkit/invocation";
+import { type InvocationBridge } from "@relkit/runtime-effect";
 import type { DependencyBridge, DependencyBridgeOptions } from "./dependencies.js";
 
 export function createDependencyBridge(

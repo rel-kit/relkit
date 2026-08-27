@@ -68,7 +68,7 @@ describe("rate-limit compilation", () => {
 
     expect(development.diagnostics).toEqual([]);
     expect(production.diagnostics).toContainEqual(
-      expect.objectContaining({ code: "ZSYS_RATE_LIMIT_STORE_REQUIRED" }),
+      expect.objectContaining({ code: "RELKIT_RATE_LIMIT_STORE_REQUIRED" }),
     );
   });
 });

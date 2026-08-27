@@ -58,14 +58,14 @@ describe("inspector SSE client", () => {
     await waitFor(() => client.snapshot.cursor === "3");
     client.stop();
     expect(client.snapshot.droppedEvents).toBe(1);
-    expect(saved.getItem("zsys.inspector.stream.cursor")).toBe("3");
+    expect(saved.getItem("relkit.inspector.stream.cursor")).toBe("3");
     expect(invalidations).toContainEqual(["logs", "signals"]);
   });
 
   test("clears expired and future cursors before replay", async () => {
     for (const error of [
-      "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
-      "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE",
+      "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
+      "RELKIT_OBSERVABILITY_STREAM_CURSOR_FUTURE",
     ]) {
       const saved = storage("9");
       const urls: string[] = [];
@@ -83,7 +83,7 @@ describe("inspector SSE client", () => {
           urls.push(String(url));
           calls += 1;
           return calls === 1
-            ? new Response(JSON.stringify({ protocol: "zsys.inspector", version: 1, error }), {
+            ? new Response(JSON.stringify({ protocol: "relkit.inspector", version: 1, error }), {
                 status: 400,
                 headers: { "content-type": "application/json" },
               })
@@ -95,7 +95,7 @@ describe("inspector SSE client", () => {
       client.stop();
       expect(urls[0]).toContain("cursor=9");
       expect(urls[1]).not.toContain("cursor=");
-      expect(saved.getItem("zsys.inspector.stream.cursor")).toBeNull();
+      expect(saved.getItem("relkit.inspector.stream.cursor")).toBeNull();
       expect(states).toContain("reconnecting");
       expect(states).toContain("cursor-reset");
     }

@@ -107,6 +107,6 @@ describe("compiler normalization", () => {
     const result = normalizeCompilation({ descriptors: [{ kind: "function", id: "bad id" }] });
     const codes = result.diagnostics.map((diagnostic) => diagnostic.code);
     expect(codes).toContain(NORMALIZE_CODES.id);
-    expect(codes).not.toContain("ZSYS_NORMALIZATION_FAILED");
+    expect(codes).not.toContain("RELKIT_NORMALIZATION_FAILED");
   });
 });

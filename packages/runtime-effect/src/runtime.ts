@@ -1,7 +1,7 @@
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
-import { resolveEnvWithEffect } from "@zsys/config/internal/config";
-import type { EnvDefinition, EnvShape, EnvSource, ResolvedEnv } from "@zsys/config";
-import type { ApplicationGraph } from "@zsys/graph";
+import { resolveEnvWithEffect } from "@relkit/config/internal/config";
+import type { EnvDefinition, EnvShape, EnvSource, ResolvedEnv } from "@relkit/config";
+import type { ApplicationGraph } from "@relkit/graph";
 import { Graph, Manifest, type RuntimeManifest } from "./services.js";
 import {
   GenerationEnvironment,
@@ -32,7 +32,7 @@ export interface GenerationService {
 }
 
 export class Generation extends Context.Service<Generation, GenerationService>()(
-  "zsys/runtime/Generation",
+  "relkit/runtime/Generation",
 ) {}
 
 export type GenerationRuntimeServices =

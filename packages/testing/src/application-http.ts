@@ -1,5 +1,5 @@
 import type { TestRoute } from "./application-routes.js";
-import { normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
+import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 
 export async function handleTestRequest(

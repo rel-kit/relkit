@@ -107,7 +107,7 @@ async function makeQueue(now: number): Promise<{
 }
 
 async function makeRoot(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "zsys-idempotency-"));
+  const root = await mkdtemp(join(tmpdir(), "relkit-idempotency-"));
   roots.push(root);
   return join(root, "jobs");
 }

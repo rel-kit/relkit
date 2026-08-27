@@ -1,4 +1,4 @@
-import { type CacheOperationContext, type CacheOperationOptions } from "@zsys/cache";
+import { type CacheOperationContext, type CacheOperationOptions } from "@relkit/cache";
 import { createLocalCacheKey, normalizeCacheId, normalizeSchemaVersion } from "./keys.js";
 import { assertActive, clone, normalizePolicy, readClock } from "./policy.js";
 import { LocalCacheStore, MISSING } from "./store.js";

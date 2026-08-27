@@ -1,4 +1,4 @@
-import { GRAPH_VERSION } from "@zsys/contracts";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import type { GraphEdge, GraphEdgeKind, GraphNode } from "./model.js";
 
 export interface ObservedEdge {

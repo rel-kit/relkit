@@ -1,4 +1,4 @@
-import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@zsys/graph";
+import type { ApplicationGraph, FunctionNode, GraphNode, HttpTriggerConfig } from "@relkit/graph";
 import { responseSchema, schemaAt, schemaType } from "./generate-schema.js";
 import { addInputField, renderInputTree, type InputTree } from "./input-tree.js";
 import { routeParameters } from "./route-parameters.js";

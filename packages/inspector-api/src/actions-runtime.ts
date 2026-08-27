@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, normalizeId } from "@zsys/contracts";
+import { PROTOCOL_VERSION, normalizeId } from "@relkit/contracts";
 import { identity, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
 import {
@@ -33,10 +33,10 @@ export function parseInspectorAction(
   try {
     targetId = normalizeId(target).toString();
   } catch {
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_TARGET_INVALID", 400);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_TARGET_INVALID", 400);
   }
-  const generationId = bounded(body.generationId ?? headers?.get("x-zsys-generation-id"), 128);
-  const graphHash = bounded(body.graphHash ?? headers?.get("x-zsys-graph-hash"), 256);
+  const generationId = bounded(body.generationId ?? headers?.get("x-relkit-generation-id"), 128);
+  const graphHash = bounded(body.graphHash ?? headers?.get("x-relkit-graph-hash"), 256);
   const idempotencyKey = bounded(body.idempotencyKey ?? headers?.get("idempotency-key"), 128);
   if (body.reason !== undefined) bounded(body.reason, 256);
   const resolvedDecision = decision ?? readDecision(body.decision);
@@ -45,7 +45,7 @@ export function parseInspectorAction(
     bounded(body.invocationId, 128);
     bounded(body.toolCallId, 128);
     if (resolvedDecision === undefined)
-      throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_REQUEST_INVALID", 400);
+      throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_REQUEST_INVALID", 400);
   }
   return {
     action: resolvedAction,
@@ -68,7 +68,7 @@ export async function executeInspectorAction(
 ): Promise<InspectorActionResult> {
   const generation = await options.getGeneration();
   if (generation === undefined)
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_GENERATION_UNAVAILABLE", 503);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_GENERATION_UNAVAILABLE", 503);
   try {
     validateIdentity(request, generation, options.mode);
   } catch (error) {
@@ -88,7 +88,7 @@ export async function executeInspectorAction(
   if (existing !== undefined) {
     if ((await existing).fingerprint !== fingerprint)
       return await rejectAction(
-        new InspectorActionError("ZSYS_INSPECTOR_IDEMPOTENCY_CONFLICT", 409),
+        new InspectorActionError("RELKIT_INSPECTOR_IDEMPOTENCY_CONFLICT", 409),
         request,
         generation,
         options.mode,
@@ -125,7 +125,7 @@ async function perform(
   fingerprint: string,
 ): Promise<InspectorActionResult> {
   if (generation.actions === undefined)
-    throw new InspectorActionError("ZSYS_INSPECTOR_ACTIONS_UNAVAILABLE", 503);
+    throw new InspectorActionError("RELKIT_INSPECTOR_ACTIONS_UNAVAILABLE", 503);
   const result = await dispatchInspectorAction(request, generation, generation.actions);
   const record = makeAudit(generation, request, mode, "applied");
   await writeAudit(generation, record);
@@ -139,5 +139,5 @@ async function perform(
 function readDecision(value: unknown): "approve" | "deny" | undefined {
   if (value === "approve" || value === "deny") return value;
   if (value === undefined) return undefined;
-  throw new InspectorActionError("ZSYS_INSPECTOR_ACTION_REQUEST_INVALID", 400);
+  throw new InspectorActionError("RELKIT_INSPECTOR_ACTION_REQUEST_INVALID", 400);
 }

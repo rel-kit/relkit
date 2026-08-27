@@ -1,4 +1,4 @@
-import type { AppNode, ApplicationGraph, GraphNode, ProviderProfileNode } from "@zsys/graph";
+import type { AppNode, ApplicationGraph, GraphNode, ProviderProfileNode } from "@relkit/graph";
 import { usedCapabilities } from "./from-graph-aws.js";
 
 export const AWS_DEPLOYMENT_CAPABILITIES = [
@@ -27,12 +27,12 @@ export interface FromGraphOptions {
 }
 
 export type DeploymentPlanErrorCode =
-  | "ZSYS_DEPLOY_GRAPH_INVALID"
-  | "ZSYS_DEPLOY_SECRET_UNSUPPORTED"
-  | "ZSYS_DEPLOY_LIVE_OBJECT_UNSUPPORTED"
-  | "ZSYS_DEPLOY_AWS_CAPABILITY_UNSUPPORTED"
-  | "ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED"
-  | "ZSYS_DEPLOY_CONFIGURATION_MISSING";
+  | "RELKIT_DEPLOY_GRAPH_INVALID"
+  | "RELKIT_DEPLOY_SECRET_UNSUPPORTED"
+  | "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED"
+  | "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED"
+  | "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED"
+  | "RELKIT_DEPLOY_CONFIGURATION_MISSING";
 
 export class DeploymentPlanError extends Error {
   constructor(
@@ -61,7 +61,7 @@ export function validateProviders(
   for (const provider of providers.values()) {
     if (!(AWS_DEPLOYMENT_CAPABILITIES as readonly string[]).includes(provider.capability)) {
       fail(
-        "ZSYS_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
+        "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
         `AWS does not support capability ${provider.capability}.`,
       );
     }
@@ -70,14 +70,14 @@ export function validateProviders(
       !AWS_ADAPTERS[provider.capability as Capability].includes(provider.adapter)
     ) {
       fail(
-        "ZSYS_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
+        "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
         `AWS does not support managed ${provider.capability}:${provider.adapter}.`,
       );
     }
   }
   for (const id of app.providerBindings ?? []) {
     if (!providers.has(id)) {
-      fail("ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED", `Provider binding ${id} is missing.`);
+      fail("RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED", `Provider binding ${id} is missing.`);
     }
   }
   for (const { capability, profile } of usedCapabilities(nodes, edges)) {
@@ -93,7 +93,7 @@ export function requireProvider(
   const provider = providers.get(providerId(capability, profile));
   if (provider !== undefined) return provider;
   fail(
-    "ZSYS_DEPLOY_AWS_PROFILE_UNSUPPORTED",
+    "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED",
     `Provider profile ${profile} does not implement ${capability}.`,
   );
 }
@@ -127,7 +127,7 @@ export function onlyApp(nodes: readonly GraphNode[]): Extract<GraphNode, { kind:
     (node): node is Extract<GraphNode, { kind: "app" }> => node.kind === "app",
   );
   if (apps.length !== 1)
-    fail("ZSYS_DEPLOY_GRAPH_INVALID", "Graph must contain exactly one app node.");
+    fail("RELKIT_DEPLOY_GRAPH_INVALID", "Graph must contain exactly one app node.");
   return apps[0]!;
 }
 

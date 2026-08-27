@@ -1,8 +1,8 @@
-import { deepFreeze, isJsonValue, normalizeId } from "@zsys/contracts";
+import { deepFreeze, isJsonValue, normalizeId } from "@relkit/contracts";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogRecord } from "./log.js";
 import type { EventDelivery, EventDeliveryLedgerRecord } from "./delivery.js";
-import type { UnknownEventEnvelope } from "@zsys/events";
+import type { UnknownEventEnvelope } from "@relkit/events";
 import type {
   EventDeliveryResult,
   EventRouterInput,

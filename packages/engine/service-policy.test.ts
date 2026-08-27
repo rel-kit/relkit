@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { ProtocolId } from "@zsys/contracts";
-import { defineFunction, defineService, defineServiceMiddleware } from "@zsys/app";
-import { z } from "@zsys/schema";
+import type { ProtocolId } from "@relkit/contracts";
+import { defineFunction, defineService, defineServiceMiddleware } from "@relkit/app";
+import { z } from "@relkit/schema";
 import { invokeFunction } from "./src/index.ts";
 
 function ids() {
@@ -83,7 +83,7 @@ describe("service policy materialization", () => {
           },
         },
       ),
-    ).rejects.toMatchObject({ code: "ZSYS_INPUT_VALIDATION" });
+    ).rejects.toMatchObject({ code: "RELKIT_INPUT_VALIDATION" });
     expect(events).toHaveLength(beforeInvalid);
 
     await expect(

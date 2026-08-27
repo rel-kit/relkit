@@ -1,4 +1,4 @@
-import { normalizeId } from "@zsys/contracts";
+import { normalizeId } from "@relkit/contracts";
 import { assertTime, JobQueueStateError } from "./queue-utils.js";
 import type {
   JobQueueEntry,

@@ -13,9 +13,9 @@ describe("generated agent functions", () => {
       return { ok: true };
     });
 
-    expect(generatedAgentFunctionId(" support.order ")).toBe("zsys.agent.support.order.invoke");
+    expect(generatedAgentFunctionId(" support.order ")).toBe("relkit.agent.support.order.invoke");
     expect(isGeneratedAgentFunction(handler)).toBe(true);
-    expect(handler.functionId).toBe("zsys.agent.support.order.invoke");
+    expect(handler.functionId).toBe("relkit.agent.support.order.invoke");
     expect(Object.isFrozen(handler)).toBe(true);
     const context = { invocationId: "invocation-1" };
     expect(await handler({ id: "order-1" }, context)).toEqual({ ok: true });

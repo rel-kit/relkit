@@ -1,5 +1,5 @@
-import type { AgentApprovalHandler, AgentObservedEdge, PendingApproval } from "@zsys/agents";
-import { invokeAgent } from "@zsys/agents";
+import type { AgentApprovalHandler, AgentObservedEdge, PendingApproval } from "@relkit/agents";
+import { invokeAgent } from "@relkit/agents";
 import { createFailures } from "./jobs-utils.js";
 import { createTestModel } from "./agents-model.js";
 import type {
@@ -39,7 +39,7 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
     ...(options.model ?? {}),
     ...(options.script === undefined ? {} : { script: options.script }),
   });
-  const spans: import("@zsys/agents").AgentSpanRecord[] = [];
+  const spans: import("@relkit/agents").AgentSpanRecord[] = [];
   const edges: AgentObservedEdge[] = [];
   const pending = new Map<string, PendingApproval>();
   const resolvers = new Map<string, (decision: "approved" | "denied") => void>();
@@ -56,9 +56,9 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
   let invocationSequence = 0;
 
   const invoke = async (
-    input: import("@zsys/schema").InferInput<Agent["input"]>,
+    input: import("@relkit/schema").InferInput<Agent["input"]>,
     invocation: TestAgentInvocationOptions = {},
-  ): Promise<import("@zsys/schema").InferOutput<Agent["output"]>> => {
+  ): Promise<import("@relkit/schema").InferOutput<Agent["output"]>> => {
     const invocationId = invocation.invocationId ?? `test-agent-${++invocationSequence}`;
     return invokeAgent({
       agent: options.agent,
@@ -76,7 +76,7 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
       invocationId,
       traceId: invocation.traceId ?? invocationId,
       hooks,
-    }) as Promise<import("@zsys/schema").InferOutput<Agent["output"]>>;
+    }) as Promise<import("@relkit/schema").InferOutput<Agent["output"]>>;
   };
   const approvals = Object.freeze({
     pending: () => Object.freeze([...pending.values()]),

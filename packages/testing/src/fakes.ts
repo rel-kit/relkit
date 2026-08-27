@@ -1,4 +1,4 @@
-import type { DependencyCategory, DependencyClientSources } from "@zsys/engine";
+import type { DependencyCategory, DependencyClientSources } from "@relkit/engine";
 import {
   createTestBucketFake,
   type TestBucketFake,

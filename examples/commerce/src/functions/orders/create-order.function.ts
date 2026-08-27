@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import orderCreated from "../../events/order-created.event.js";
 import sendReceiptJob from "../../jobs/send-receipt.job.js";
 import prices from "../../cache/prices.cache.js";

@@ -1,5 +1,5 @@
-import type { MaybePromise, ProtocolId } from "@zsys/contracts";
-import type { StandardIssue, StandardSchemaV1 } from "@zsys/schema";
+import type { MaybePromise, ProtocolId } from "@relkit/contracts";
+import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import type { InvocationFailure, PublicFailureEnvelope } from "./failure-types.js";
 
@@ -154,14 +154,14 @@ export interface InvocationRelease {
 }
 
 export class InvocationValidationError extends TypeError {
-  readonly code: "ZSYS_INPUT_VALIDATION" | "ZSYS_OUTPUT_VALIDATION";
+  readonly code: "RELKIT_INPUT_VALIDATION" | "RELKIT_OUTPUT_VALIDATION";
   readonly phase: "input" | "output";
   readonly issues: readonly StandardIssue[];
 
   constructor(phase: "input" | "output", issues: readonly StandardIssue[]) {
     super(`${phase === "input" ? "Input" : "Output"} validation failed`);
     this.name = "InvocationValidationError";
-    this.code = phase === "input" ? "ZSYS_INPUT_VALIDATION" : "ZSYS_OUTPUT_VALIDATION";
+    this.code = phase === "input" ? "RELKIT_INPUT_VALIDATION" : "RELKIT_OUTPUT_VALIDATION";
     this.phase = phase;
     this.issues = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
   }

@@ -22,17 +22,17 @@ const localLayers = [
 export async function runAllTests(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
   await runScript("build", environment);
   for (const script of localLayers)
-    await runScript(script, { ...environment, ZSYS_AWS_INTEGRATION: "0" });
-  if (environment.ZSYS_TEST_ALL_CLOUD !== "1") {
-    console.log("Cloud deployment integration skipped; set ZSYS_TEST_ALL_CLOUD=1 to enable it.");
+    await runScript(script, { ...environment, RELKIT_AWS_INTEGRATION: "0" });
+  if (environment.RELKIT_TEST_ALL_CLOUD !== "1") {
+    console.log("Cloud deployment integration skipped; set RELKIT_TEST_ALL_CLOUD=1 to enable it.");
     return;
   }
-  for (const name of ["ZSYS_AWS_INTEGRATION_REGION", "ZSYS_AWS_INTEGRATION_IMAGE"])
+  for (const name of ["RELKIT_AWS_INTEGRATION_REGION", "RELKIT_AWS_INTEGRATION_IMAGE"])
     if (environment[name] === undefined || environment[name]!.trim() === "")
-      throw new Error(`${name} is required when ZSYS_TEST_ALL_CLOUD=1.`);
+      throw new Error(`${name} is required when RELKIT_TEST_ALL_CLOUD=1.`);
   await runScript("test:aws-integration", {
     ...environment,
-    ZSYS_AWS_INTEGRATION: "1",
+    RELKIT_AWS_INTEGRATION: "1",
   });
 }
 

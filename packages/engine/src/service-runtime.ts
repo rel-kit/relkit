@@ -2,8 +2,8 @@ import {
   runServicePolicy,
   type InvocationRunner,
   type InvocationServicePolicy,
-} from "@zsys/invocation";
-import type { invokeUserHandler } from "@zsys/invocation";
+} from "@relkit/invocation";
+import type { invokeUserHandler } from "@relkit/invocation";
 
 type HandlerEffect = ReturnType<typeof invokeUserHandler>;
 

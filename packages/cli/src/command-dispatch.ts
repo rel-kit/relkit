@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { buildProject } from "./commands/build.js";
@@ -58,7 +58,7 @@ export async function executeCommand(
     case "client":
       return runClient(invocation.args, context);
     default:
-      throw fail("ZSYS_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`);
+      throw fail("RELKIT_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`);
   }
 }
 
@@ -106,7 +106,7 @@ async function runDevCommand(args: readonly string[], context: CliCommandContext
 }
 
 async function createDevGeneratedDirectory(projectRoot: string): Promise<string> {
-  const generatedRoot = join(projectRoot, ".zsys", "generated");
+  const generatedRoot = join(projectRoot, ".relkit", "generated");
   await mkdir(generatedRoot, { recursive: true });
   return mkdtemp(join(generatedRoot, ".dev-"));
 }
@@ -130,7 +130,7 @@ function parseProjectArgs(args: readonly string[], command: string): ProjectArgs
       inspectorPort = portValue(value(args, ++index, argument, command), command);
     else
       throw fail(
-        `ZSYS_${command.toUpperCase()}_USAGE`,
+        `RELKIT_${command.toUpperCase()}_USAGE`,
         `Unknown ${command} option: ${argument}`,
         2,
       );
@@ -151,13 +151,13 @@ function optionalProjectRoot(
 function value(args: readonly string[], index: number, option: string, command: string): string {
   const result = args[index];
   if (result === undefined || result.startsWith("-"))
-    throw fail(`ZSYS_${command.toUpperCase()}_USAGE`, `${option} requires a value.`, 2);
+    throw fail(`RELKIT_${command.toUpperCase()}_USAGE`, `${option} requires a value.`, 2);
   return result;
 }
 
 function portValue(value: string, command: string): number {
   const port = Number(value);
   if (!Number.isSafeInteger(port) || port < 0 || port > 65_535)
-    throw fail(`ZSYS_${command.toUpperCase()}_USAGE`, "Port must be between 0 and 65535.", 2);
+    throw fail(`RELKIT_${command.toUpperCase()}_USAGE`, "Port must be between 0 and 65535.", 2);
   return port;
 }

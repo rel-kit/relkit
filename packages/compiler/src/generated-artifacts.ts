@@ -5,8 +5,8 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
-} from "@zsys/contracts";
-import type { Diagnostic } from "@zsys/diagnostics";
+} from "@relkit/contracts";
+import type { Diagnostic } from "@relkit/diagnostics";
 import type { GeneratedOutputs, NormalizedGraph } from "./normalize-types.js";
 
 export const GENERATED_ARTIFACT_FILES = Object.freeze({

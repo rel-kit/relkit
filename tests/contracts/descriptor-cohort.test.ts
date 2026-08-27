@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
-  ZSYS_DESCRIPTOR,
+  RELKIT_DESCRIPTOR,
   canonicalJson,
   createDescriptorBase,
   isDescriptor,
@@ -84,7 +84,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       handler: async () => ({ ok: true }),
     });
 
-    expect(descriptor[ZSYS_DESCRIPTOR]).toBe(true);
+    expect(descriptor[RELKIT_DESCRIPTOR]).toBe(true);
     expect(descriptor.id).toBe("orders.create");
     expect(descriptor.ref).toEqual({ kind: "function", id: "orders.create" });
     expect(isDescriptor(descriptor, "function")).toBe(true);
@@ -372,7 +372,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(trigger.selector.kind).toBe("anyOf");
     expect(trigger.target.ref).toEqual({
       kind: "function",
-      id: "zsys.event.orders.on-change.handler",
+      id: "relkit.event.orders.on-change.handler",
     });
     expect(isEventTriggerDescriptor(trigger)).toBe(true);
     expect(singleTrigger.selector.kind).toBe("single");
@@ -586,7 +586,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     const diagnostics = checkConventions({
       descriptor,
       sourcePath: "src/misc/assets.ts",
-      projectRoot: "/tmp/zsys-conventions",
+      projectRoot: "/tmp/relkit-conventions",
       isDefaultExport: false,
       fileKinds: ["bucket", "function"],
       location: { line: 4, column: 2 },

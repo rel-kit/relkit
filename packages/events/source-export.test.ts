@@ -22,7 +22,7 @@ const providerInternalFiles = new Set([
   "packages/inspector-api/src/observability-utils.ts",
   "packages/observability/src/stream-subscriber.ts",
 ]);
-const scanRoots = ["apps", "packages", "templates", "tests", ".zsys/generated", ".zsys/build"];
+const scanRoots = ["apps", "packages", "templates", "tests", ".relkit/generated", ".relkit/build"];
 const scanGuardFiles = new Set([
   "packages/events/source-export.test.ts",
   "tests/e2e/inspector.spec.ts",
@@ -44,7 +44,7 @@ function sourceFiles(directory: string): SourceFile[] {
       onlyFiles: true,
     }),
   ]
-    .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.zsys)(\/|$)/.test(path))
+    .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
     .sort()
     .map((path) => ({
       path: relative(repositoryRoot, join(directory, path)).replaceAll("\\", "/"),
@@ -76,11 +76,11 @@ test("event source and exports keep listeners as generic triggers", () => {
 });
 
 test("artifact scans reject application names in generated, graph, API, and inspector contracts", () => {
-  const generated = `.zsys/generated/application.graph.json`;
+  const generated = `.relkit/generated/application.graph.json`;
   const graph = "packages/graph/src/model.ts";
   const api = "packages/inspector-api/src/contracts.ts";
   const inspector = "apps/inspector/src/navigation.tsx";
-  const packageName = `@zsys/${term}s`;
+  const packageName = `@relkit/${term}s`;
   const navigation = `/${term}s`;
   const kind = `${term}Kind`;
   expect(

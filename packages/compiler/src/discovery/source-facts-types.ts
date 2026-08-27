@@ -1,4 +1,4 @@
-import type { DescriptorKind } from "@zsys/contracts";
+import type { DescriptorKind } from "@relkit/contracts";
 
 export type SourceFactoryKind =
   DescriptorKind | "error" | "middleware" | "service-middleware" | "transform";

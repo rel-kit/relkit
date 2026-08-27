@@ -1,5 +1,5 @@
-import { isEnvRef } from "@zsys/config";
-import { deepFreeze, normalizeId } from "@zsys/contracts";
+import { isEnvRef } from "@relkit/config";
+import { deepFreeze, normalizeId } from "@relkit/contracts";
 import { assertModelProviders } from "./model-providers.js";
 import type {
   ProviderAdapter,

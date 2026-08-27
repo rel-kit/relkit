@@ -3,11 +3,11 @@ import {
   defineService,
   defineServiceMiddleware,
   type InvocationSource,
-} from "@zsys/app";
-import { defineAgent } from "@zsys/agents";
-import { defineBucket } from "@zsys/buckets";
-import { defineCache } from "@zsys/cache";
-import { defineEnv, env, type EnvRef } from "@zsys/config";
+} from "@relkit/app";
+import { defineAgent } from "@relkit/agents";
+import { defineBucket } from "@relkit/buckets";
+import { defineCache } from "@relkit/cache";
+import { defineEnv, env, type EnvRef } from "@relkit/config";
 import {
   defineEvent,
   events,
@@ -15,12 +15,12 @@ import {
   type EventEnvelope,
   type EventSelectorInput,
   type UnknownEventEnvelope,
-} from "@zsys/events";
-import { defineError, defineFunction } from "@zsys/functions";
-import { defineJob } from "@zsys/jobs";
-import { defineRoute, http } from "@zsys/routes";
-import { z, type InferInput, type InferOutput } from "@zsys/schema";
-import { defineTool } from "@zsys/tools";
+} from "@relkit/events";
+import { defineError, defineFunction } from "@relkit/functions";
+import { defineJob } from "@relkit/jobs";
+import { defineRoute, http } from "@relkit/routes";
+import { z, type InferInput, type InferOutput } from "@relkit/schema";
+import { defineTool } from "@relkit/tools";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });

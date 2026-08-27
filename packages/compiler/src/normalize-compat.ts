@@ -1,5 +1,5 @@
-import { canonicalJson, type JsonValue } from "@zsys/contracts";
-import { getJsonSchema, type StandardSchemaV1 } from "@zsys/schema";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import { id, isRecord, json, refId, schemaKey } from "./normalize-utils.js";
 import type { NormalizedDescriptor, NormalizeInput } from "./normalize-types.js";
 import { providerMaps } from "./normalize-graph-app.js";
@@ -12,7 +12,7 @@ export interface SchemaResult {
 
 export function schema(value: unknown): SchemaResult {
   if (isSchemaSnapshot(value)) {
-    if (value.$zsys === "schema-unavailable") {
+    if (value.$relkit === "schema-unavailable") {
       return { ok: false, reason: typeof value.reason === "string" ? value.reason : "unavailable" };
     }
     return json(value.jsonSchema)
@@ -176,10 +176,12 @@ export function providerProfiles(input: NormalizeInput): ReadonlyMap<string, rea
   return new Map([...profiles.entries()].map(([name, values]) => [name, [...values].sort()]));
 }
 
-function isSchemaSnapshot(
-  value: unknown,
-): value is { readonly $zsys: string; readonly jsonSchema?: JsonValue; readonly reason?: string } {
-  return isRecord(value) && typeof value.$zsys === "string" && value.$zsys.startsWith("schema");
+function isSchemaSnapshot(value: unknown): value is {
+  readonly $relkit: string;
+  readonly jsonSchema?: JsonValue;
+  readonly reason?: string;
+} {
+  return isRecord(value) && typeof value.$relkit === "string" && value.$relkit.startsWith("schema");
 }
 
 export function isJsonMetadata(value: unknown): value is JsonValue {

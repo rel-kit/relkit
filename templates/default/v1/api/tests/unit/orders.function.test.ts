@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { invokeFunction } from "@zsys/testing";
+import { invokeFunction } from "@relkit/testing";
 import orders from "../../src/services/orders.service.js";
 
 test("createOrder invokes pricing and publishes the order event", async () => {

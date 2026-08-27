@@ -5,8 +5,8 @@ import {
   normalizeId,
   type DescriptorBase,
   type DescriptorMetadata,
-} from "@zsys/contracts";
-import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/contracts";
+import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 
 export interface CacheDescriptor<
   Id extends string,
@@ -44,8 +44,8 @@ export interface DefineCacheOptions<
  *
  * @example
  * ```ts
- * import { defineCache } from "@zsys/cache"
- * import { z } from "@zsys/schema"
+ * import { defineCache } from "@relkit/cache"
+ * import { z } from "@relkit/schema"
  *
  * const prices = defineCache({ id: "prices", key: z.string(), value: z.number(), defaultTtlMs: 60_000 })
  * void prices

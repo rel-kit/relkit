@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Effect } from "effect";
-import { z } from "@zsys/schema";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+import { z } from "@relkit/schema";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import {
   DependencyAccessError,
   buildDependencyClients,
@@ -156,7 +156,7 @@ describe("declared dependency clients", () => {
     await (clients.agents.support as (input: unknown) => Promise<unknown>)({ question: "status" });
     expect(calls).toEqual([
       expect.objectContaining({
-        functionId: "zsys.agent.orders.support.invoke",
+        functionId: "relkit.agent.orders.support.invoke",
         declaration: ref("agent", "orders.support"),
       }),
     ]);

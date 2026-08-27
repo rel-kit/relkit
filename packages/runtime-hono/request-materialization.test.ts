@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
-import type { RegistrationPlan } from "@zsys/graph";
+import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import type { RegistrationPlan } from "@relkit/graph";
 import { createApp } from "./src/index.ts";
 
 describe("framework-neutral HTTP request materialization", () => {

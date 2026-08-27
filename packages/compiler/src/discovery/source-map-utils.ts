@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
-import { normalizeSourcePath } from "@zsys/contracts";
+import { normalizeSourcePath } from "@relkit/contracts";
 import * as ts from "typescript";
 import type { ExportFacts } from "./source-facts.js";
 

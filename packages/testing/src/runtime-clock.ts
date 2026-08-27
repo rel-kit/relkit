@@ -1,5 +1,5 @@
 import { Clock as EffectClock, Duration, Effect } from "effect";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import type { TestClock } from "./runtime.js";
 
 export function createDeterministicClock(startTime: number): {

@@ -1,4 +1,4 @@
-import { GRAPH_VERSION, type JsonValue } from "@zsys/contracts";
+import { GRAPH_VERSION, type JsonValue } from "@relkit/contracts";
 import {
   identity,
   isRecord,
@@ -27,7 +27,7 @@ export type GraphCollection = (typeof GRAPH_COLLECTIONS)[number];
 
 export class InspectorGraphError extends Error {
   constructor(
-    readonly code: "ZSYS_INSPECTOR_GRAPH_UNAVAILABLE" | "ZSYS_INSPECTOR_NOT_FOUND",
+    readonly code: "RELKIT_INSPECTOR_GRAPH_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
     readonly status: 404 | 503,
   ) {
     super(code);
@@ -37,7 +37,7 @@ export class InspectorGraphError extends Error {
 
 export async function graphSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
   const data = graphData(generation.graph);
-  if (data === undefined) throw new InspectorGraphError("ZSYS_INSPECTOR_GRAPH_UNAVAILABLE", 503);
+  if (data === undefined) throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   const observedEdges = projectObservedEdges(generation.observedEdges);
   return {
     ...identity(generation),
@@ -56,7 +56,7 @@ export async function graphList(
     collection === "descriptors" && generation.descriptors !== undefined
       ? projectDescriptors(generation.descriptors)
       : graphItems(generation.graph, collection);
-  if (items === undefined) throw new InspectorGraphError("ZSYS_INSPECTOR_GRAPH_UNAVAILABLE", 503);
+  if (items === undefined) throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   return { ...identity(generation), ...page(items, request) } as JsonValue;
 }
 
@@ -70,7 +70,7 @@ export function graphDetail(
       ? projectDescriptors(generation.descriptors)
       : graphItems(generation.graph, collection);
   const item = items?.find((value) => isRecord(value) && value.id === id);
-  if (item === undefined) throw new InspectorGraphError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+  if (item === undefined) throw new InspectorGraphError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   const data = graphData(generation.graph);
   const declaredEdges = data?.edges.filter((edge) => edgeTouches(edge, id));
   const observedEdges = projectObservedEdges(generation.observedEdges).filter((edge) =>
@@ -90,7 +90,7 @@ export function sourceDetail(generation: ResolvedActiveGeneration, id: string): 
     (value) => isRecord(value) && value.id === id,
   );
   if (!isRecord(node) || node.source === undefined)
-    throw new InspectorGraphError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+    throw new InspectorGraphError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   return { ...identity(generation), id, source: node.source } as JsonValue;
 }
 

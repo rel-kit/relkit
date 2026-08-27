@@ -1,4 +1,4 @@
-import type { LogRecord } from "@zsys/observability";
+import type { LogRecord } from "@relkit/observability";
 import { redactFailureDetail } from "./failure-redaction.js";
 
 export function formatHumanLog(record: LogRecord): string {

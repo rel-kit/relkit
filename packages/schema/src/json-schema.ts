@@ -1,7 +1,7 @@
 import type { JsonValue, StandardSchemaV1 } from "./standard-schema.js";
 import { getSchemaMetadata } from "./schema-metadata.js";
 
-export const JSON_SCHEMA_UNAVAILABLE = "ZSYS_SCHEMA_UNAVAILABLE" as const;
+export const JSON_SCHEMA_UNAVAILABLE = "RELKIT_SCHEMA_UNAVAILABLE" as const;
 
 /** A JSON Schema document with JSON-safe values and deterministic key order. */
 export type JsonSchema = { readonly [key: string]: JsonValue };
@@ -25,8 +25,8 @@ export function getSchemaProjection(schema: StandardSchemaV1): JsonSchemaFactory
   const metadata = getSchemaMetadata(schema);
   if (metadata?.jsonSchema) return metadata.jsonSchema;
   return (
-    schema as StandardSchemaV1 & { readonly zsys?: { readonly jsonSchema?: JsonSchemaFactory } }
-  ).zsys?.jsonSchema;
+    schema as StandardSchemaV1 & { readonly relkit?: { readonly jsonSchema?: JsonSchemaFactory } }
+  ).relkit?.jsonSchema;
 }
 
 /** Returns whether a schema accepts an omitted object property. */

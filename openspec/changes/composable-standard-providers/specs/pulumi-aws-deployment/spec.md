@@ -36,5 +36,5 @@ Deployment target and infrastructure adapter SHALL be selected under project con
 
 #### Scenario: AWS hosts protocol resources from other vendors
 
-- **WHEN** `zsys.config.ts` selects AWS/Pulumi and the application selects external R2 and Upstash bindings
+- **WHEN** `relkit.config.ts` selects AWS/Pulumi and the application selects external R2 and Upstash bindings
 - **THEN** deployment hosts the service on AWS without treating either external binding as an AWS-managed resource

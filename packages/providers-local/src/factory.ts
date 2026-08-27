@@ -1,5 +1,5 @@
-import type { ProviderBinding, ProviderCapability } from "@zsys/app";
-import type { MaybePromise } from "@zsys/contracts";
+import type { ProviderBinding, ProviderCapability } from "@relkit/app";
+import type { MaybePromise } from "@relkit/contracts";
 import { join } from "node:path";
 import { createLocalBucketProvider } from "./buckets/index.js";
 import { createLocalCacheProvider } from "./cache/index.js";
@@ -93,7 +93,7 @@ function createModels(_context: LocalBindingFactoryContext): LocalBindingGenerat
     resolveModel: (selector?: string) => ({
       provider: "test",
       id: selector ?? "test:default",
-      model: Object.freeze({ provider: "zsys.test", modelId: "default" }),
+      model: Object.freeze({ provider: "relkit.test", modelId: "default" }),
     }),
   });
   return { modelRegistry };
@@ -102,7 +102,7 @@ function createModels(_context: LocalBindingFactoryContext): LocalBindingGenerat
 function stateRoot(context: LocalBindingFactoryContext) {
   check(context);
   return createLocalProviderStateRoot(
-    join(process.cwd(), ".zsys", "state", "testing", context.generationId),
+    join(process.cwd(), ".relkit", "state", "testing", context.generationId),
   );
 }
 

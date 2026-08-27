@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import { LocalCacheKeyError, LocalCacheValueError } from "./types.js";
 
 export function normalizeCacheId(value: unknown): string {

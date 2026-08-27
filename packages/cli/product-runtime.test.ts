@@ -49,7 +49,7 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
   });
   const base = `http://${started.hostname}:${started.port}`;
   const streamController = new AbortController();
-  const streamResponse = fetch(`${base}/_zsys/v1/stream`, { signal: streamController.signal });
+  const streamResponse = fetch(`${base}/_relkit/v1/stream`, { signal: streamController.signal });
   try {
     const route = await fetch(`${base}/orders/order-1`, {
       headers: { authorization: "allowed" },
@@ -72,14 +72,14 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
     expect(chunk).not.toContain("pre-sink-secret");
     streamController.abort();
 
-    const agent = await invoke(base, built.graphHash, "zsys.agent.orders.support-agent.invoke", {
+    const agent = await invoke(base, built.graphHash, "relkit.agent.orders.support-agent.invoke", {
       question: "Where is order-1?",
     });
     const agentBody = await agent.json();
     if (agent.status !== 200) throw new Error(JSON.stringify(agentBody));
     expect(agentBody).toMatchObject({ output: { answer: "local answer" } });
 
-    const detail = await fetch(`${base}/_zsys/v1/requests/${requestId}`);
+    const detail = await fetch(`${base}/_relkit/v1/requests/${requestId}`);
     expect(detail.status).toBe(200);
     expect(await detail.json()).toMatchObject({
       request: {
@@ -118,7 +118,7 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
 });
 
 async function invoke(base: string, graphHash: string, functionId: string, input: unknown) {
-  return fetch(`${base}/_zsys/v1/actions/functions/${functionId}/invoke`, {
+  return fetch(`${base}/_relkit/v1/actions/functions/${functionId}/invoke`, {
     method: "POST",
     headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() },
     body: JSON.stringify({ generationId: "generation.runtime", graphHash, input }),
@@ -126,7 +126,7 @@ async function invoke(base: string, graphHash: string, functionId: string, input
 }
 
 async function page(base: string, path: string) {
-  return (await (await fetch(`${base}/_zsys/v1${path}`)).json()) as {
+  return (await (await fetch(`${base}/_relkit/v1${path}`)).json()) as {
     items: unknown[];
     nextCursor?: string;
   };
@@ -150,7 +150,7 @@ async function eventually(check: () => Promise<boolean>): Promise<boolean> {
 }
 
 async function configureProductFixture(root: string, modelBaseUrl: string): Promise<void> {
-  const appPath = join(root, "zsys.config.ts");
+  const appPath = join(root, "relkit.config.ts");
   const app = await readFile(appPath, "utf8");
   await writeFile(
     appPath,
@@ -176,11 +176,11 @@ async function configureProductFixture(root: string, modelBaseUrl: string): Prom
 }
 
 async function copyFullProject(): Promise<string> {
-  const root = await mkdtemp(join(process.cwd(), ".zsys-product-test-"));
+  const root = await mkdtemp(join(process.cwd(), ".relkit-product-test-"));
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-full"), root, { recursive: true });
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
-  const scope = join(root, "node_modules", "@zsys");
+  const scope = join(root, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
   for (const name of [
     "agents",

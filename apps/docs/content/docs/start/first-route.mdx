@@ -6,8 +6,8 @@ description: Define a validated function and expose it through a convention-deri
 Create `src/functions/hello.function.ts`:
 
 ```ts
-import { defineFunction } from "@zsys/app";
-import { z } from "@zsys/schema";
+import { defineFunction } from "@relkit/app";
+import { z } from "@relkit/schema";
 
 export default defineFunction({
   input: z.object({ name: z.string().default("world") }),
@@ -19,7 +19,7 @@ export default defineFunction({
 Create `src/routes/hello/route.ts`:
 
 ```ts
-import { defineRoute } from "@zsys/app";
+import { defineRoute } from "@relkit/app";
 import hello from "../../functions/hello.function.js";
 
 export const GET = defineRoute({ target: hello });
@@ -30,9 +30,9 @@ object input property becomes `?name=`. Start everything and call it:
 
 ```sh
 bun run dev
-curl "http://localhost:3000/hello?name=ZSYS"
+curl "http://localhost:3000/hello?name=RELKIT"
 ```
 
-The response is `{ "message": "Hello, ZSYS!" }`. The compiler derives safe source-scoped IDs from the
+The response is `{ "message": "Hello, RELKIT!" }`. The compiler derives safe source-scoped IDs from the
 file and export. Add an explicit ID when a descriptor must keep its graph and deployment identity after
 a source move; durable application, event, job, bucket, and cache descriptors always keep explicit IDs.

@@ -1,12 +1,17 @@
 import * as pulumi from "@pulumi/pulumi";
-import type { ZsysBuckets, ZsysCaches, ZsysEventBus, ZsysJobQueues } from "@zsys/cloud-aws";
-import type { DeploymentPlan, ProviderDeploymentPlan } from "@zsys/deploy";
+import type {
+  RelkitBuckets,
+  RelkitCaches,
+  RelkitEventBus,
+  RelkitJobQueues,
+} from "@relkit/cloud-aws";
+import type { DeploymentPlan, ProviderDeploymentPlan } from "@relkit/deploy";
 
 export interface ManagedEnvironmentResources {
-  readonly jobs: ZsysJobQueues;
-  readonly events: ZsysEventBus;
-  readonly buckets: ZsysBuckets;
-  readonly caches: ZsysCaches;
+  readonly jobs: RelkitJobQueues;
+  readonly events: RelkitEventBus;
+  readonly buckets: RelkitBuckets;
+  readonly caches: RelkitCaches;
 }
 
 export function managedEnvironment(

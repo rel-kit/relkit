@@ -3,8 +3,8 @@ import {
   normalizeSourceLocation,
   type JsonValue,
   type MaybePromise,
-} from "@zsys/contracts";
-import { redactRecord, type RedactionPolicy } from "@zsys/observability";
+} from "@relkit/contracts";
+import { redactRecord, type RedactionPolicy } from "@relkit/observability";
 import type { InspectorActionServices } from "./actions.js";
 import type {
   InspectorCandidateGenerationSource,
@@ -175,7 +175,7 @@ export function pick(value: unknown, keys: readonly string[]): Record<string, un
 
 export function identity(generation: ResolvedActiveGeneration): Record<string, JsonValue> {
   return {
-    protocol: "zsys.inspector",
+    protocol: "relkit.inspector",
     version: API_VERSION,
     generationId: generation.generationId,
     graphHash: generation.graphHash,

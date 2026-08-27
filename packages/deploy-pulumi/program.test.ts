@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import type { DeploymentPlan } from "@zsys/deploy";
+import type { DeploymentPlan } from "@relkit/deploy";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
 import { createAwsPulumiResources } from "./src/aws-program.ts";
@@ -39,7 +39,7 @@ describe("Pulumi program generation", () => {
         },
         call: () => ({ region: "us-east-1", name: "us-east-1" }),
       },
-      "zsys-program-test",
+      "relkit-program-test",
       "development",
     );
     await pulumi.runtime.runInPulumiStack(() => {
@@ -138,11 +138,11 @@ describe("Pulumi program generation", () => {
 
   test("renders identical bytes from different project roots with stable identity metadata", () => {
     const left = renderPulumiProgram(plan(), {
-      projectRoot: "/tmp/zsys-left",
+      projectRoot: "/tmp/relkit-left",
       stackName: "CI/blue",
     });
     const right = renderPulumiProgram(plan(), {
-      projectRoot: "/tmp/zsys-right",
+      projectRoot: "/tmp/relkit-right",
       stackName: "CI/blue",
     });
 
@@ -151,9 +151,9 @@ describe("Pulumi program generation", () => {
     expect(left.planJson).toBe(right.planJson);
     expect(left.indexTs).toContain("createAwsPulumiResources");
     expect(left.indexTs).toContain('const stackName = "ci-blue";');
-    expect(left.indexTs).toContain("@zsys/deploy-pulumi");
-    expect(left.indexTs).not.toContain("zsys:deployment:application");
-    expect(left.indexTs).not.toContain("/tmp/zsys-");
+    expect(left.indexTs).toContain("@relkit/deploy-pulumi");
+    expect(left.indexTs).not.toContain("relkit:deployment:application");
+    expect(left.indexTs).not.toContain("/tmp/relkit-");
     expect(left.indexTs).not.toContain("source.ts");
     expect(left.indexTs).not.toContain("callback");
     expect(() =>
@@ -164,10 +164,10 @@ describe("Pulumi program generation", () => {
   });
 
   test("writes exactly the deterministic Pulumi project files", async () => {
-    const root = await mkdtemp(join(tmpdir(), "zsys-program-test-"));
+    const root = await mkdtemp(join(tmpdir(), "relkit-program-test-"));
     roots.push(root);
     const files = await writePulumiProgram(plan(), { projectRoot: root, stackName: "development" });
-    const directory = join(root, ".zsys", "generated", "pulumi");
+    const directory = join(root, ".relkit", "generated", "pulumi");
 
     expect(files.directory).toBe(directory);
     expect(await readFile(join(directory, "Pulumi.yaml"), "utf8")).toBe(files.pulumiYaml);
@@ -187,8 +187,8 @@ function plan(): DeploymentPlan {
         name: "orders",
         tag: "latest",
         health: {
-          livenessPath: "/_zsys/v1/health/live",
-          readinessPath: "/_zsys/v1/health/ready",
+          livenessPath: "/_relkit/v1/health/live",
+          readinessPath: "/_relkit/v1/health/ready",
           port: 3000,
         },
       },
@@ -198,8 +198,8 @@ function plan(): DeploymentPlan {
       logicalName: "orders-app-http-public",
       port: 3000,
       health: {
-        livenessPath: "/_zsys/v1/health/live",
-        readinessPath: "/_zsys/v1/health/ready",
+        livenessPath: "/_relkit/v1/health/live",
+        readinessPath: "/_relkit/v1/health/ready",
         port: 3000,
       },
       routes: [

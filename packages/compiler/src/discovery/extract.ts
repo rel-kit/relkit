@@ -1,4 +1,4 @@
-import { createSourceLocation, normalizeSourcePath, type SourceLocation } from "@zsys/contracts";
+import { createSourceLocation, normalizeSourcePath, type SourceLocation } from "@relkit/contracts";
 import type {
   EvaluatorDescriptorSnapshot,
   EvaluatorExportSnapshot,

@@ -1,6 +1,6 @@
-import type { QueueRegistration, ScheduleRegistration } from "@zsys/graph";
-import type { JobIdempotencyDefinition } from "@zsys/providers-local";
-import type { RetryPolicy, ScheduleDefinition } from "@zsys/jobs";
+import type { QueueRegistration, ScheduleRegistration } from "@relkit/graph";
+import type { JobIdempotencyDefinition } from "@relkit/providers-local";
+import type { RetryPolicy, ScheduleDefinition } from "@relkit/jobs";
 import type {
   JobMaterializationOptions,
   JobPolicy,
@@ -10,7 +10,7 @@ import type {
   MaterializedJob,
 } from "./materialize-jobs.js";
 import { JobMaterializationError } from "./materialize-jobs.js";
-import type { Scheduler } from "@zsys/providers-local";
+import type { Scheduler } from "@relkit/providers-local";
 import { createConcurrencyAdmission } from "./concurrency.js";
 import type { InvocationAdmit } from "./invoke-types.js";
 

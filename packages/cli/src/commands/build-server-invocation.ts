@@ -53,13 +53,13 @@ async function invocationContext({ invocation, signal, env, time }) {
 
 function createDatabaseRegistration(dataModel) {
   if (dataModel === undefined) return undefined;
-  const create = dataModel[Symbol.for("zsys.data-model.create-context")];
+  const create = dataModel[Symbol.for("relkit.data-model.create-context")];
   if (typeof create !== "function") throw new Error("Data-model runtime is unavailable.");
   return create;
 }
 
 function createAuthRegistration(applicationGraph, routes = {}) {
-  const brand = Symbol.for("zsys.better-auth.handler");
+  const brand = Symbol.for("relkit.better-auth.handler");
   for (const [routeId, route] of Object.entries(routes)) {
     if (route?.auth?.kind !== "better-auth") continue;
     const registration = route.handler?.[brand];
@@ -97,7 +97,7 @@ function captureRuntimeError(error, traceId) {
   const detail = redactFailureDetail(error);
   const safe = new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
   sentry.withScope((scope) => {
-    if (traceId !== undefined) scope.setTag("zsys.trace_id", traceId);
+    if (traceId !== undefined) scope.setTag("relkit.trace_id", traceId);
     sentry.captureException(safe);
   });
 }

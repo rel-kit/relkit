@@ -1,22 +1,22 @@
-import { deepFreeze, normalizeId, type DescriptorMetadata } from "@zsys/contracts";
+import { deepFreeze, normalizeId, type DescriptorMetadata } from "@relkit/contracts";
 import {
   createUnboundIdentity,
   getDescriptorIdentity,
   normalizeErrorRetry,
   type ErrorRetry,
   type ErrorRetryInput,
-} from "@zsys/invocation";
+} from "@relkit/invocation";
 import {
   validateSync,
   type InferInput,
   type InferOutput,
   type StandardSchemaV1,
-} from "@zsys/schema";
+} from "@relkit/schema";
 import { assertErrorSchema, validateErrorHttp } from "./define-error-validation.js";
 
 export { isErrorDescriptor } from "./define-error-validation.js";
 
-export type { ErrorRetry, ErrorRetryInput, NormalizedErrorRetry } from "@zsys/invocation";
+export type { ErrorRetry, ErrorRetryInput, NormalizedErrorRetry } from "@relkit/invocation";
 
 export interface ErrorHttpMapping {
   readonly status: number;
@@ -96,8 +96,8 @@ export interface DefineErrorOptions<
  *
  * @example
  * ```ts
- * import { defineError } from "@zsys/functions"
- * import { z } from "@zsys/schema"
+ * import { defineError } from "@relkit/functions"
+ * import { z } from "@relkit/schema"
  *
  * const notFound = defineError({
  *   id: "orders.not-found",

@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { loadConfig } from "@zsys/compiler";
+import { loadConfig } from "@relkit/compiler";
 import type { DevInspectorOptions } from "./dev-process.js";
 import { resolveApplicationPort, resolveInspectorPort } from "./ports.js";
 
@@ -30,8 +30,8 @@ export async function developmentPorts(
   inspectorPort?: number,
   source: Readonly<Record<string, string | undefined>> = process.env,
 ): Promise<{ readonly backend: number; readonly inspector: DevInspectorOptions }> {
-  const configPath = join(projectRoot, "zsys.config.ts");
-  const loaded = (await import(`${pathToFileURL(configPath).href}?zsys_dev=${Date.now()}`)) as {
+  const configPath = join(projectRoot, "relkit.config.ts");
+  const loaded = (await import(`${pathToFileURL(configPath).href}?relkit_dev=${Date.now()}`)) as {
     readonly default?: unknown;
   };
   const config = loadConfig(loaded.default ?? loaded, projectRoot);
@@ -59,14 +59,14 @@ export function resolveInspectorInstallation(
   baseDirectory: string = import.meta.dir,
   source: Readonly<Record<string, string | undefined>> = process.env,
 ): { readonly root: string; readonly command: readonly string[] } {
-  const configured = source.ZSYS_INSPECTOR_ROOT;
+  const configured = source.RELKIT_INSPECTOR_ROOT;
   if (configured !== undefined) return sourceInstallation(configured);
   const workspace = resolve(baseDirectory, "../../../../apps/inspector");
   if (existsSync(join(workspace, "package.json"))) return sourceInstallation(workspace);
   const packaged = resolve(baseDirectory, "../inspector");
   if (existsSync(join(packaged, "server.js")))
     return { root: packaged, command: ["node", "server.js"] };
-  throw new Error("The packaged ZSYS inspector is missing. Reinstall @zsys/cli.");
+  throw new Error("The packaged RELKIT inspector is missing. Reinstall @relkit/cli.");
 }
 
 function sourceInstallation(root: string): {
@@ -74,6 +74,6 @@ function sourceInstallation(root: string): {
   readonly command: readonly string[];
 } {
   if (!existsSync(join(root, "package.json")))
-    throw new Error(`ZSYS_INSPECTOR_ROOT does not contain an inspector app: ${root}`);
+    throw new Error(`RELKIT_INSPECTOR_ROOT does not contain an inspector app: ${root}`);
   return { root, command: [process.execPath, "run", "dev"] };
 }

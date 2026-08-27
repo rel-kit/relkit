@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_ID_INFERENCE_AMBIGUOUS",
+    "code": "RELKIT_ID_INFERENCE_AMBIGUOUS",
     "column": 16,
     "descriptorId": "unbound.fixture",
     "file": "src/functions/ambiguous.function.ts",

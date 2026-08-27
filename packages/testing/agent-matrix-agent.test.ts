@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { generatedAgentFunctionId } from "@zsys/agents";
+import { generatedAgentFunctionId } from "@relkit/agents";
 import { harness, makeFixture, scriptedToolCall } from "./agent-matrix-helpers.ts";
 
 describe("agent limit and privacy matrix", () => {
@@ -21,13 +21,13 @@ describe("agent limit and privacy matrix", () => {
     const invalid = makeFixture();
     const invalidAgent = harness(invalid, [{ type: "final", output: { wrong: true } }]);
     await expect(invalidAgent.invoke({ question: "invalid" })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_OUTPUT_VALIDATION",
+      code: "RELKIT_AGENT_OUTPUT_VALIDATION",
     });
 
     const steps = makeFixture({ maxSteps: 1 });
     const stepAgent = harness(steps, scriptedToolCall(steps.tool.id));
     await expect(stepAgent.invoke({ question: "steps" })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_STEP_LIMIT",
+      code: "RELKIT_AGENT_STEP_LIMIT",
     });
     expect(steps.invocations).toHaveLength(1);
     expect(stepAgent.model.calls).toHaveLength(1);
@@ -38,7 +38,7 @@ describe("agent limit and privacy matrix", () => {
       { type: "tool-call", callId: "call-2", toolId: tools.tool.id, input: { id: "2" } },
     ]);
     await expect(toolAgent.invoke({ question: "tools" })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_TOOL_LIMIT",
+      code: "RELKIT_AGENT_TOOL_LIMIT",
     });
     expect(tools.invocations).toHaveLength(1);
     expect(toolAgent.model.calls).toHaveLength(2);
@@ -50,7 +50,7 @@ describe("agent limit and privacy matrix", () => {
       maxInputBytes: 16,
     });
     await expect(inputAgent.invoke({ question: "x".repeat(100) })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_RESPONSE_LIMIT",
+      code: "RELKIT_AGENT_RESPONSE_LIMIT",
     });
     expect(inputAgent.model.calls).toHaveLength(0);
 
@@ -58,20 +58,20 @@ describe("agent limit and privacy matrix", () => {
       maxOutputBytes: 16,
     });
     await expect(outputAgent.invoke({ question: "size" })).rejects.toMatchObject({
-      code: "ZSYS_AGENT_RESPONSE_LIMIT",
+      code: "RELKIT_AGENT_RESPONSE_LIMIT",
     });
 
     const timeoutAgent = harness(size, [], { model: { hang: true } });
     await expect(
       timeoutAgent.invoke({ question: "timeout" }, { timeoutMs: 0 }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_TIMEOUT" });
+    ).rejects.toMatchObject({ code: "RELKIT_AGENT_TIMEOUT" });
 
     const controller = new AbortController();
     controller.abort();
     const cancelledAgent = harness(size, [{ type: "final", output: { answer: "never" } }]);
     await expect(
       cancelledAgent.invoke({ question: "cancel" }, { signal: controller.signal }),
-    ).rejects.toMatchObject({ code: "ZSYS_AGENT_CANCELLED" });
+    ).rejects.toMatchObject({ code: "RELKIT_AGENT_CANCELLED" });
     expect(cancelledAgent.model.calls).toHaveLength(0);
   });
 });

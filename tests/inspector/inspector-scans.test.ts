@@ -14,14 +14,14 @@ describe("inspector protocol boundary scans", () => {
     expect(result.files).toBeGreaterThan(0);
     expect(result.violations).toEqual([]);
     expect(result.networkFiles).toEqual([
-      "apps/inspector/app/%5Fzsys/backend/[...path]/route.ts",
+      "apps/inspector/app/%5Frelkit/backend/[...path]/route.ts",
       "apps/inspector/lib/api-transport.ts",
       "apps/inspector/lib/stream.ts",
     ]);
   });
 
   test("detects forbidden handler, provider, and secret payloads", () => {
-    const safe = '{"protocol":"zsys.inspector","graphHash":"sha256:fixture"}';
+    const safe = '{"protocol":"relkit.inspector","graphHash":"sha256:fixture"}';
     expect(payloadViolations("safe", safe)).toEqual([]);
     for (const marker of FORBIDDEN_PAYLOAD_MARKERS)
       expect(payloadViolations("unsafe", marker)).toContain(`unsafe: ${marker}`);

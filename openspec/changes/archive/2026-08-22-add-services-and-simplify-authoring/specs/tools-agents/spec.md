@@ -95,14 +95,14 @@ Each environment's model configuration SHALL declare both `defaultProvider` and 
 - **WHEN** OpenAI and Anthropic provider entries are both configured
 - **THEN** different agents can select either provider while an agent with no model consistently uses the two global defaults
 
-### Requirement: AI SDK tool-loop semantics preserve ZSYS boundaries
+### Requirement: AI SDK tool-loop semantics preserve RELKIT boundaries
 
-Agent execution SHALL use AI SDK v7 tool-loop and tool contracts behind the ZSYS descriptor boundary while retaining ZSYS input/output validation, limits, approval policy, cancellation, redaction, engine invocation, and correlated telemetry.
+Agent execution SHALL use AI SDK v7 tool-loop and tool contracts behind the RELKIT descriptor boundary while retaining RELKIT input/output validation, limits, approval policy, cancellation, redaction, engine invocation, and correlated telemetry.
 
 #### Scenario: AI SDK model requests function-derived tool
 
 - **WHEN** a model requests an allowed `function.asTool` entry with valid arguments
-- **THEN** AI SDK tool validation and approval resolve before the target enters the ZSYS engine with source `tool`
+- **THEN** AI SDK tool validation and approval resolve before the target enters the RELKIT engine with source `tool`
 
 #### Scenario: Prompt instructions are authored
 

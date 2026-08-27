@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { dispatchInvocation } from "@zsys/invocation";
-import { defineFunction, defineService } from "@zsys/app";
-import { z } from "@zsys/schema";
-import { createObservabilityCollector } from "@zsys/observability";
+import { dispatchInvocation } from "@relkit/invocation";
+import { defineFunction, defineService } from "@relkit/app";
+import { z } from "@relkit/schema";
+import { createObservabilityCollector } from "@relkit/observability";
 import {
   createInspectableObservabilityHooks,
   invokeFunction,

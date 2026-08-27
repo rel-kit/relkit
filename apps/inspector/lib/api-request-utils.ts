@@ -6,7 +6,7 @@ export function shouldRetry(method: string, error: unknown, attempt: number): bo
   if (method !== "GET" || attempt >= GET_RETRY_DELAYS_MS.length) return false;
   if (!(error instanceof InspectorApiError)) return false;
   return (
-    error.code === "ZSYS_INSPECTOR_INVALID_RESPONSE" ||
+    error.code === "RELKIT_INSPECTOR_INVALID_RESPONSE" ||
     (error.status !== undefined && error.status >= 500)
   );
 }
@@ -21,7 +21,7 @@ export async function readPayload(response: Response): Promise<unknown> {
   } catch {
     throw new InspectorApiError(
       "Inspector returned invalid JSON",
-      "ZSYS_INSPECTOR_INVALID_RESPONSE",
+      "RELKIT_INSPECTOR_INVALID_RESPONSE",
     );
   }
 }

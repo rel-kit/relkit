@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@zsys/contracts";
+import type { MaybePromise } from "@relkit/contracts";
 import type { InvocationContextOptions, InvocationRecord, PublicClock } from "./contracts.js";
 
 export function makeContext<Context extends { readonly signal: AbortSignal }>(

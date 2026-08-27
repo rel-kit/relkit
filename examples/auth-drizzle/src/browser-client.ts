@@ -1,4 +1,4 @@
-import { createClient } from "@zsys/client";
+import { createClient } from "@relkit/client";
 
 export const bearerHeaders = new Headers();
 export const client = createClient({ baseUrl: "http://127.0.0.1:3000", headers: bearerHeaders });

@@ -1,5 +1,5 @@
-import type { CacheClient, CacheOperationOptions, CacheProvider } from "@zsys/cache";
-import type { StandardSchemaV1 } from "@zsys/schema";
+import type { CacheClient, CacheOperationOptions, CacheProvider } from "@relkit/cache";
+import type { StandardSchemaV1 } from "@relkit/schema";
 import type { TestFailureControls } from "./fakes.js";
 
 export interface TestCacheFakeOptions<

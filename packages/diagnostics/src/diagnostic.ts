@@ -3,8 +3,8 @@ import {
   normalizeId,
   normalizeSourceLocation,
   normalizeSourcePath,
-} from "@zsys/contracts";
-import type { SourceLocation } from "@zsys/contracts";
+} from "@relkit/contracts";
+import type { SourceLocation } from "@relkit/contracts";
 
 export type DiagnosticSeverity = "info" | "warning" | "error";
 

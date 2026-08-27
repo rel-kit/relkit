@@ -1,6 +1,6 @@
 ## Purpose
 
-Defines the single invocation engine, internal lifecycle kernel, public context bridge, and deterministic test controls used by every ZSys execution source.
+Defines the single invocation engine, internal lifecycle kernel, public context bridge, and deterministic test controls used by every RelKit execution source.
 
 ## Requirements
 
@@ -125,7 +125,7 @@ Framework and CLI logs SHALL enter the internal structured logging service, and 
 
 ### Requirement: Deterministic application test harness
 
-`@zsys/testing` SHALL provide isolated function/runtime/application helpers with validated test environment values, deterministic IDs and clock, in-memory HTTP, controlled job/event delivery, scripted models, bucket/cache fakes, telemetry queries, named failure injection, and restart against shared test state.
+`@relkit/testing` SHALL provide isolated function/runtime/application helpers with validated test environment values, deterministic IDs and clock, in-memory HTTP, controlled job/event delivery, scripted models, bucket/cache fakes, telemetry queries, named failure injection, and restart against shared test state.
 
 #### Scenario: Test runtime is created
 
@@ -134,12 +134,12 @@ Framework and CLI logs SHALL enter the internal structured logging service, and 
 
 #### Scenario: Failed test state is retained
 
-- **WHEN** `ZSYS_KEEP_TEST_STATE=1` is set and a test fails
+- **WHEN** `RELKIT_KEEP_TEST_STATE=1` is set and a test fails
 - **THEN** the harness retains and reports its unique state directory for diagnosis
 
 ### Requirement: Descriptor invocation selects the correct engine
 
-Function `invoke(input)` SHALL use the current asynchronous ZSYS invocation scope when present and SHALL otherwise execute through an isolated standalone instance of the common invocation kernel.
+Function `invoke(input)` SHALL use the current asynchronous RELKIT invocation scope when present and SHALL otherwise execute through an isolated standalone instance of the common invocation kernel.
 
 #### Scenario: Invoke runs inside an application invocation
 
@@ -148,7 +148,7 @@ Function `invoke(input)` SHALL use the current asynchronous ZSYS invocation scop
 
 #### Scenario: Invoke runs outside an application invocation
 
-- **WHEN** ordinary code or a unit test calls a function descriptor without an active ZSYS invocation
+- **WHEN** ordinary code or a unit test calls a function descriptor without an active RELKIT invocation
 - **THEN** the standalone kernel validates input/output/errors, supplies the public logging/time/signal context, applies descriptor limits and bound service policy, and returns the typed result
 
 #### Scenario: Standalone function needs an application provider

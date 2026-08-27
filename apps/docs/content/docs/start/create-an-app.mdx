@@ -11,14 +11,14 @@ description: Install the prerequisites, choose a template, and understand the ge
 Create a project with the supported generator:
 
 ```sh
-bunx create-zsys@latest my-app
+bunx create-relkit@latest my-app
 cd my-app
 ```
 
 For a local-only API project:
 
 ```sh
-bunx create-zsys@latest my-api --template api --cloud none --deploy none
+bunx create-relkit@latest my-api --template api --cloud none --deploy none
 ```
 
 Templates are `minimal`, `api`, and `agent`. Use `--no-install`, `--no-git`, or `--no-examples`
@@ -38,17 +38,17 @@ my-app/
 ├── tests/
 ├── package.json
 ├── tsconfig.json
-└── zsys.config.ts
+└── relkit.config.ts
 ```
 
-ZSYS always discovers descriptors from `src/**/*.ts`, reads application settings from
-`zsys.config.ts`, and writes derived artifacts to
-`.zsys/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
+RELKIT always discovers descriptors from `src/**/*.ts`, reads application settings from
+`relkit.config.ts`, and writes derived artifacts to
+`.relkit/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
 These conventions are intentionally not configurable.
 
 The `api` template demonstrates a small service and independent event listeners; the `agent` template
 derives a tool with `function.asTool` and keeps development/test model calls offline. Both templates use
 the same inferred source-scoped IDs and common `invoke` boundary described in the guides.
 
-Run `zsys doctor` after creation to check Bun, project configuration, ports, and optional Pulumi
+Run `relkit doctor` after creation to check Bun, project configuration, ports, and optional Pulumi
 requirements without printing secret values.

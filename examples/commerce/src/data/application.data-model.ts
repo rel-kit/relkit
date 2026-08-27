@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { defineDataModel } from "@zsys/drizzle";
+import { defineDataModel } from "@relkit/drizzle";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
@@ -8,7 +8,7 @@ export const users = sqliteTable("users", {
   email: text().notNull().unique(),
 });
 
-export const sqlite = new Database(process.env.DATABASE_PATH ?? ".zsys/commerce.sqlite", {
+export const sqlite = new Database(process.env.DATABASE_PATH ?? ".relkit/commerce.sqlite", {
   create: true,
 });
 export const database = drizzle({ client: sqlite });

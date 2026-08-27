@@ -47,7 +47,7 @@ test("every collector consumer and sink receives an admitted record", async () =
   );
   for (const record of loggerRecords) assertAdmitted("logger sink", record);
 
-  const stateRoot = await mkdtemp("/tmp/zsys-observability-consumers-");
+  const stateRoot = await mkdtemp("/tmp/relkit-observability-consumers-");
   let index: Awaited<ReturnType<typeof createObservabilityIndex>> | undefined;
   try {
     index = await createObservabilityIndex({

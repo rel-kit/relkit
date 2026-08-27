@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { isDescriptor } from "@zsys/contracts";
+import { isDescriptor } from "@relkit/contracts";
 import type { DoctorCheck } from "./doctor-support.js";
 
 export type PackageJson = Record<string, any>;
@@ -29,7 +29,7 @@ export async function versionChecks(
   } catch {}
   const typeScriptOk =
     actualTypeScript !== undefined && satisfies(actualTypeScript, expectedTypeScript);
-  const zsys = zsysVersions(manifest);
+  const relkit = relkitVersions(manifest);
   return [
     {
       name: "bun",
@@ -45,7 +45,7 @@ export async function versionChecks(
         ? `TypeScript ${actualTypeScript} is compatible.`
         : "A compatible TypeScript installation was not found.",
     },
-    { name: "zsys-packages", ok: zsys.ok, message: zsys.message, details: zsys.details },
+    { name: "relkit-packages", ok: relkit.ok, message: relkit.message, details: relkit.details },
   ];
 }
 
@@ -60,7 +60,7 @@ function dependency(manifest: PackageJson, name: string): string | undefined {
     manifest.optionalDependencies?.[name]
   );
 }
-function zsysVersions(manifest: PackageJson): {
+function relkitVersions(manifest: PackageJson): {
   ok: boolean;
   message: string;
   details: Readonly<Record<string, unknown>>;
@@ -69,7 +69,7 @@ function zsysVersions(manifest: PackageJson): {
     ...manifest.dependencies,
     ...manifest.devDependencies,
     ...manifest.optionalDependencies,
-  }).filter(([name]) => name.startsWith("@zsys/"));
+  }).filter(([name]) => name.startsWith("@relkit/"));
   const versions = [
     ...new Set(
       entries
@@ -83,8 +83,8 @@ function zsysVersions(manifest: PackageJson): {
     ok: versions.length <= 1,
     message:
       versions.length <= 1
-        ? "ZSys package versions are compatible."
-        : "ZSys package versions do not match.",
+        ? "RelKit package versions are compatible."
+        : "RelKit package versions do not match.",
     details: { packages: entries.map(([name]) => name), versions },
   };
 }

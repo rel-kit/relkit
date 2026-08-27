@@ -1,4 +1,4 @@
-import { canonicalJson } from "@zsys/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import {
   MAX_OBSERVABILITY_QUERY_LIMIT,
   ObservabilityQueryError,
@@ -10,7 +10,7 @@ import {
   type ObservabilityStreamEventType,
   type ObservabilityStreamOverflow,
   type ObservabilityStreamSubscriptionOptions,
-} from "@zsys/observability";
+} from "@relkit/observability";
 
 export function readObservabilityQuery(request: Request): ObservabilityQueryRequest {
   const params = new URL(request.url).searchParams;
@@ -144,7 +144,7 @@ export function streamResponse(
       "cache-control": "no-cache, no-store",
       connection: "keep-alive",
       "content-type": "text/event-stream; charset=utf-8",
-      "x-zsys-api-version": String(apiVersion),
+      "x-relkit-api-version": String(apiVersion),
     },
   });
 }
@@ -161,11 +161,11 @@ function integer(value: string, name: string): number {
 
 function queryError(message: string): ObservabilityQueryError {
   return new ObservabilityQueryError(
-    "ZSYS_OBSERVABILITY_QUERY_INVALID",
+    "RELKIT_OBSERVABILITY_QUERY_INVALID",
     `Observability query ${message}`,
   );
 }
 
 function streamError(message: string): ObservabilityStreamError {
-  return new ObservabilityStreamError("ZSYS_OBSERVABILITY_STREAM_INVALID", message);
+  return new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_INVALID", message);
 }

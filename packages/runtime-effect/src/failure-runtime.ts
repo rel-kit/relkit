@@ -1,1 +1,1 @@
-export { makeFailure, RuntimeFailure } from "@zsys/invocation";
+export { makeFailure, RuntimeFailure } from "@relkit/invocation";

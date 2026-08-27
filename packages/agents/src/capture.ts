@@ -1,4 +1,4 @@
-import { canonicalJson, deepFreeze, type JsonValue } from "@zsys/contracts";
+import { canonicalJson, deepFreeze, type JsonValue } from "@relkit/contracts";
 
 export interface AgentCapturePolicy {
   readonly mode: "off" | "development-redacted";

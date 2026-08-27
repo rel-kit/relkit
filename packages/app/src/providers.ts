@@ -1,5 +1,5 @@
-import type { EnvRef } from "@zsys/config";
-import type { JsonPrimitive } from "@zsys/contracts";
+import type { EnvRef } from "@relkit/config";
+import type { JsonPrimitive } from "@relkit/contracts";
 import type { ModelProviders } from "./model-providers.js";
 import {
   copyProviderTopology,

@@ -1,4 +1,4 @@
-import { defineRoute } from "@zsys/app";
+import { defineRoute } from "@relkit/app";
 import uploadAssets from "../../functions/upload-assets.function.js";
 
 export const POST = defineRoute({

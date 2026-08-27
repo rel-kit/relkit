@@ -12,10 +12,10 @@ describe("route contract inference", () => {
       output: z.string(),
       handler: async () => "no",
     });
-    const result = compile(target, "GET", "src/routes/_zsys/v1/openapi.json/route.ts");
+    const result = compile(target, "GET", "src/routes/_relkit/v1/openapi.json/route.ts");
 
     expect(result.diagnostics).toContainEqual(
-      expect.objectContaining({ code: "ZSYS_ROUTE_RESERVED_PATH" }),
+      expect.objectContaining({ code: "RELKIT_ROUTE_RESERVED_PATH" }),
     );
   });
 
@@ -244,7 +244,7 @@ describe("route contract inference", () => {
       handler: async (value) => value,
     });
     const invalid = compile(scalar, "GET", "src/routes/[id]/route.ts");
-    expect(invalid.diagnostics.map(({ code }) => code)).toContain("ZSYS_MAPPING_INCOMPATIBLE");
+    expect(invalid.diagnostics.map(({ code }) => code)).toContain("RELKIT_MAPPING_INCOMPATIBLE");
     expect(invalid.diagnostics.some(({ message }) => message.includes("explicit request"))).toBe(
       true,
     );

@@ -1,4 +1,4 @@
-import type { DescriptorBase, MaybePromise } from "@zsys/contracts";
+import type { DescriptorBase, MaybePromise } from "@relkit/contracts";
 import type { InferInsertModel, InferSelectModel, Table } from "drizzle-orm";
 import type { ZodType } from "zod";
 

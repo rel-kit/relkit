@@ -1,6 +1,6 @@
 [
   {
-    "code": "ZSYS_CONVENTION_SUFFIX",
+    "code": "RELKIT_CONVENTION_SUFFIX",
     "column": 23,
     "descriptorId": "warning.suffix",
     "file": "src/functions/wrong-suffix.ts",

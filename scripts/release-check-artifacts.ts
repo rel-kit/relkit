@@ -19,7 +19,7 @@ async function readJsonFromTar(artifact: string): Promise<RecordValue> {
 }
 
 export async function packAll(items: PackageInfo[], version: string): Promise<RecordValue[]> {
-  const directory = await mkdtemp(join(tmpdir(), "zsys-release-artifacts-"));
+  const directory = await mkdtemp(join(tmpdir(), "relkit-release-artifacts-"));
   try {
     const artifacts: RecordValue[] = [];
     for (const item of items) {
@@ -59,29 +59,29 @@ export async function templateInputs(
 ): Promise<RecordValue[]> {
   const result: RecordValue[] = [];
   const forbidden =
-    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@zsys\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+    /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
   const scripts = {
-    dev: "zsys dev",
-    check: "zsys check",
+    dev: "relkit dev",
+    check: "relkit check",
     typecheck: "tsc --noEmit",
     test: "bun test",
     "test:unit": "bun test tests/unit",
     "test:integration": "bun test tests/integration",
-    build: "zsys build",
-    start: "zsys start",
-    graph: "zsys graph print",
-    "deploy:preview": "zsys deploy preview",
-    deploy: "zsys deploy up",
+    build: "relkit build",
+    start: "relkit start",
+    graph: "relkit graph print",
+    "deploy:preview": "relkit deploy preview",
+    deploy: "relkit deploy up",
   };
   for (const name of ["minimal", "api", "agent"]) {
     const directory = join(root, "templates/default/v1", name);
     const manifest = await readJson(join(directory, "package.json"));
     for (const dependency of [
-      "@zsys/app",
-      "@zsys/config",
-      "@zsys/schema",
-      "@zsys/cli",
-      "@zsys/testing",
+      "@relkit/app",
+      "@relkit/config",
+      "@relkit/schema",
+      "@relkit/cli",
+      "@relkit/testing",
     ])
       if (
         manifest.dependencies?.[dependency] !== version &&

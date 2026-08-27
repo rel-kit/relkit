@@ -5,7 +5,7 @@ export default [
       "**/.turbo/**",
       "**/node_modules/**",
       "**/dist/**",
-      "**/.zsys/**",
+      "**/.relkit/**",
       "repos/effect/**",
     ],
   },

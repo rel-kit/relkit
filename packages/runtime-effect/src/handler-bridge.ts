@@ -1,2 +1,2 @@
-export { invokeUserHandler } from "@zsys/invocation";
-export type { HandlerBridgeOptions } from "@zsys/invocation";
+export { invokeUserHandler } from "@relkit/invocation";
+export type { HandlerBridgeOptions } from "@relkit/invocation";

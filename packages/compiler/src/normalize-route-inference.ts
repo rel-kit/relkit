@@ -151,5 +151,5 @@ function schemaDefault(value: unknown): unknown {
 }
 
 function isVoidSchema(value: unknown): boolean {
-  return isRecord(value) && value["x-zsys-void"] === true;
+  return isRecord(value) && value["x-relkit-void"] === true;
 }

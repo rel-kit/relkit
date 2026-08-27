@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import * as pulumi from "@pulumi/pulumi";
 import type { MockResourceArgs } from "@pulumi/pulumi/runtime/mocks";
-import { ZsysApplicationService, ZsysContainerRegistry, ZsysNetwork } from "./src/index.js";
+import { RelkitApplicationService, RelkitContainerRegistry, RelkitNetwork } from "./src/index.js";
 import { iamRoleName } from "./src/components/common.js";
 
 interface SeenResource {
@@ -33,21 +33,21 @@ test("AWS components map the HTTP service with stable identity and safe defaults
       },
       call: () => ({ region: "us-east-1", name: "us-east-1" }),
     },
-    "zsys-test",
+    "relkit-test",
     "development",
   );
 
-  let application: ZsysApplicationService | undefined;
+  let application: RelkitApplicationService | undefined;
   await pulumi.runtime.runInPulumiStack(() => {
-    const network = new ZsysNetwork("orders", {
+    const network = new RelkitNetwork("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
     });
-    const registry = new ZsysContainerRegistry("orders", {
+    const registry = new RelkitContainerRegistry("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
     });
-    application = new ZsysApplicationService("orders", {
+    application = new RelkitApplicationService("orders", {
       appId: "orders.app",
       graphHash: "sha256:orders",
       network,
@@ -60,7 +60,7 @@ test("AWS components map the HTTP service with stable identity and safe defaults
   const typeSet = new Set(resources.map(({ type }) => type));
   expect([...typeSet]).toEqual(
     expect.arrayContaining([
-      "zsys:cloud-aws:ZsysNetwork",
+      "relkit:cloud-aws:RelkitNetwork",
       "awsx:ec2:Vpc",
       "aws:ecr/repository:Repository",
       "aws:ecs/cluster:Cluster",
@@ -76,7 +76,7 @@ test("AWS components map the HTTP service with stable identity and safe defaults
 
   const target = resource(resources, "aws:lb/targetGroup:TargetGroup");
   expect(target.inputs.healthCheck).toMatchObject({
-    path: "/_zsys/v1/health/ready",
+    path: "/_relkit/v1/health/ready",
     protocol: "HTTP",
   });
   const service = resource(resources, "aws:ecs/service:Service");
@@ -97,14 +97,14 @@ test("AWS components map the HTTP service with stable identity and safe defaults
     readonlyRootFilesystem: true,
     stopTimeout: 30,
   });
-  expect(definition[0].healthCheck.command.join(" ")).toContain("/_zsys/v1/health/live");
+  expect(definition[0].healthCheck.command.join(" ")).toContain("/_relkit/v1/health/live");
   expect(definition[0].logConfiguration.logDriver).toBe("awslogs");
   expect(application!.service.urn).toBeDefined();
   expect(resources.every(({ name }) => !name.includes("source.ts"))).toBe(true);
 });
 
 test("bounds generated IAM role names without dropping deterministic identity", () => {
-  const componentName = "zsys-nightly-1787057916281-b4480e17-full-app-service";
+  const componentName = "relkit-nightly-1787057916281-b4480e17-full-app-service";
   const executionRole = iamRoleName(componentName, "execution-role");
   const taskRole = iamRoleName(componentName, "task-role");
 

@@ -32,7 +32,7 @@ function assertSecretAbsent(value: unknown, forbidden: string, seen = new WeakSe
   }
 }
 
-describe.serial("@zsys/config environment", () => {
+describe.serial("@relkit/config environment", () => {
   test("reserves PORT for framework server selection", () => {
     const unsafeDefineEnv = defineEnv as (shape: Record<string, unknown>) => unknown;
     expect(() => unsafeDefineEnv({ PORT: env.port() })).toThrow(
@@ -40,10 +40,10 @@ describe.serial("@zsys/config environment", () => {
     );
   });
 
-  test("reserves ZSYS_ENV for framework runtime selection", () => {
+  test("reserves RELKIT_ENV for framework runtime selection", () => {
     const unsafeDefineEnv = defineEnv as (shape: Record<string, unknown>) => unknown;
-    expect(() => unsafeDefineEnv({ ZSYS_ENV: env.string() })).toThrow(
-      'Environment variable name "ZSYS_ENV" is framework-reserved.',
+    expect(() => unsafeDefineEnv({ RELKIT_ENV: env.string() })).toThrow(
+      'Environment variable name "RELKIT_ENV" is framework-reserved.',
     );
   });
 

@@ -24,13 +24,13 @@ export function AppSidebar({ status = "offline" }: { readonly status?: string })
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild tooltip="ZSYS Inspector">
-              <Link href="/" aria-label="ZSYS Inspector overview">
+            <SidebarMenuButton size="lg" asChild tooltip="RELKIT Inspector">
+              <Link href="/" aria-label="RELKIT Inspector overview">
                 <div className="brand-mark flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   Z
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">ZSYS</span>
+                  <span className="font-medium">RELKIT</span>
                   <span>Inspector</span>
                 </div>
               </Link>

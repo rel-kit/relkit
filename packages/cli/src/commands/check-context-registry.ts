@@ -4,7 +4,7 @@ import {
   generateContextRegistry,
   writeIfChanged,
   type ExtractedDescriptor,
-} from "@zsys/compiler";
+} from "@relkit/compiler";
 
 export function writeContextRegistry(
   descriptors: readonly ExtractedDescriptor[],

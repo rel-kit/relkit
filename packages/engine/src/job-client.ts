@@ -1,5 +1,5 @@
-import { createJobClient, type JobObservedEdge } from "@zsys/jobs";
-import type { ObservedEdge } from "@zsys/graph";
+import { createJobClient, type JobObservedEdge } from "@relkit/jobs";
+import type { ObservedEdge } from "@relkit/graph";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 
 export function createJobDependencyClient(

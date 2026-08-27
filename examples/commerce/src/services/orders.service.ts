@@ -1,4 +1,4 @@
-import { defineService } from "@zsys/app";
+import { defineService } from "@relkit/app";
 import createOrder from "../functions/orders/create-order.function.js";
 import deleteOrder from "../functions/orders/delete-order.function.js";
 import getOrder from "../functions/orders/get-order.function.js";

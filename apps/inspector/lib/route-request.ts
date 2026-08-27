@@ -28,7 +28,7 @@ export async function invokeActiveRoute(
   } catch {
     throw new InspectorApiError(
       "Active backend is disconnected",
-      "ZSYS_INSPECTOR_DISCONNECTED",
+      "RELKIT_INSPECTOR_DISCONNECTED",
       undefined,
       "network",
     );

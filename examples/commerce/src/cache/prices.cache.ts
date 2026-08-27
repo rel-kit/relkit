@@ -1,4 +1,4 @@
-import { defineCache } from "@zsys/app";
+import { defineCache } from "@relkit/app";
 import { priceKey, priceValue } from "../shared/schemas.js";
 
 const prices = defineCache({

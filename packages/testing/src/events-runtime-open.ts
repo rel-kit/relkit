@@ -1,9 +1,13 @@
 import { join } from "node:path";
-import { materializeEvents, type EventRuntimeProvider, type InvocationTarget } from "@zsys/engine";
-import type { UnknownEventEnvelope } from "@zsys/events";
-import type { RetryPolicy } from "@zsys/jobs";
-import { createEventLog, createEventRouter, type EventRouter } from "@zsys/providers-local";
-import type { InvocationRunner } from "@zsys/runtime-effect";
+import {
+  materializeEvents,
+  type EventRuntimeProvider,
+  type InvocationTarget,
+} from "@relkit/engine";
+import type { UnknownEventEnvelope } from "@relkit/events";
+import type { RetryPolicy } from "@relkit/jobs";
+import { createEventLog, createEventRouter, type EventRouter } from "@relkit/providers-local";
+import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createEventInvoker } from "./events-runtime-utils.js";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestStateRoot } from "./state-root.js";

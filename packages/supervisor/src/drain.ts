@@ -20,7 +20,7 @@ interface TrackedWork {
   readonly interrupt: SupervisorDrainWorkOptions["interrupt"];
 }
 export class SupervisorDrainError extends Error {
-  readonly code: "ZSYS_DRAIN_STATE_INVALID" | "ZSYS_DRAIN_TOKEN_MISMATCH";
+  readonly code: "RELKIT_DRAIN_STATE_INVALID" | "RELKIT_DRAIN_TOKEN_MISMATCH";
   constructor(code: SupervisorDrainError["code"], message: string) {
     super(message);
     this.name = "SupervisorDrainError";
@@ -44,7 +44,7 @@ export class SupervisorGenerationDrain {
     validateSupervisorToken(options.token);
     if (options.candidate !== undefined && !sameToken(options.candidate.token, options.token)) {
       throw new SupervisorDrainError(
-        "ZSYS_DRAIN_TOKEN_MISMATCH",
+        "RELKIT_DRAIN_TOKEN_MISMATCH",
         "The candidate token does not match the retired generation.",
       );
     }

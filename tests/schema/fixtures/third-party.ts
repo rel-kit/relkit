@@ -4,7 +4,7 @@ type Product = { readonly name: string };
 
 /** A small Standard Schema v1 fixture with its own deterministic projection hook. */
 export const thirdPartyProduct: StandardSchemaV1<unknown, Product> & {
-  readonly zsys: { readonly jsonSchema: () => Record<string, unknown> };
+  readonly relkit: { readonly jsonSchema: () => Record<string, unknown> };
 } = {
   "~standard": {
     version: 1,
@@ -16,7 +16,7 @@ export const thirdPartyProduct: StandardSchemaV1<unknown, Product> & {
       return { value: { name: value.name.trim() } };
     },
   },
-  zsys: {
+  relkit: {
     jsonSchema: () => ({
       type: "object",
       required: ["name"],

@@ -16,7 +16,7 @@ The compiler SHALL generate a versioned runtime manifest containing executable f
 #### Scenario: Manifest and graph differ
 
 - **WHEN** a manifest graph hash does not equal the canonical graph hash
-- **THEN** activation is rejected with `ZSYS_GRAPH_MANIFEST_MISMATCH`
+- **THEN** activation is rejected with `RELKIT_GRAPH_MANIFEST_MISMATCH`
 
 #### Scenario: Handler reference is missing
 

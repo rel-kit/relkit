@@ -2,14 +2,14 @@
 
 - [x] 1.1 Strictly validate the proposal, design, and all ten capability deltas; resolve every schema, delta-operation, and scenario error before implementation
 - [x] 1.2 Run the existing function-engine, compiler, HTTP, tools/agents, jobs/events, observability, generator, commerce, and phase-zero focused suites and record any pre-existing failures without modifying unrelated dirty work
-- [x] 1.3 Read the repository structural-export guidance, map the package dependency changes, and update workspace/TypeScript/Turborepo boundaries for one dependency-neutral invocation package and `@zsys/services` without introducing cycles
+- [x] 1.3 Read the repository structural-export guidance, map the package dependency changes, and update workspace/TypeScript/Turborepo boundaries for one dependency-neutral invocation package and `@relkit/services` without introducing cycles
 
 ## 2. Shared Invocation and Function Calls
 
 - [x] 2.1 Extract the existing validation, Effect handler lifecycle, failure normalization, default context, and structural invocation contracts into the shared invocation package with parity tests before changing public behavior
 - [x] 2.2 Add the `AsyncLocalStorage` dispatcher scope, isolated standalone dispatcher, local structured context, and explicit unconfigured-managed-dependency failure without a process-global default runtime
 - [x] 2.3 Add canonical descriptor identity binding, process-local unbound identities, invocation-chain tracking, and safe direct/dynamic-cycle rejection in the shared kernel
-- [x] 2.4 Rewire `@zsys/engine` through the shared kernel while preserving generation registry verification, provider clients, admission, deadlines, cancellation, hooks, parent identity, and current invocation outcomes
+- [x] 2.4 Rewire `@relkit/engine` through the shared kernel while preserving generation registry verification, provider clients, admission, deadlines, cancellation, hooks, parent identity, and current invocation outcomes
 - [x] 2.5 Add typed non-enumerable frozen `FunctionDescriptor.invoke(input)` and ensure active calls resolve through the current generation while standalone calls use the isolated kernel
 - [x] 2.6 Emit correlated child invocation records and observed `calls-function` edges for descriptor calls without mutating the canonical graph
 - [x] 2.7 Migrate repository handlers from `context.functions` to descriptor `invoke`, then remove function entries from public dependency maps/clients and remove compiler reliance on declared function-call cycles while retaining managed-resource dependency enforcement
@@ -17,7 +17,7 @@
 
 ## 3. Service and Tool Authoring
 
-- [x] 3.1 Add the `@zsys/services` package, public exports, strict descriptor/ref/type guards, reserved-member validation, deep-freeze behavior, and `@zsys/app` re-export
+- [x] 3.1 Add the `@relkit/services` package, public exports, strict descriptor/ref/type guards, reserved-member validation, deep-freeze behavior, and `@relkit/app` re-export
 - [x] 3.2 Implement `defineService({ functions, middleware })` with a non-empty typed function map and direct service-member facades that reuse original schemas, errors, targets, and handlers
 - [x] 3.3 Implement `defineServiceMiddleware` with a non-business policy callback, exactly-once `Promise<void>` continuation, immutable per-invocation context patches, around-`next` cleanup, declared rejection normalization, and single-service ownership validation
 - [x] 3.4 Add optional function tool metadata and typed `FunctionDescriptor.asTool(options?)` over the existing function-targeted tool contract, including zero-argument metadata checks and inferred/explicit tool identity
@@ -57,8 +57,8 @@
 - [x] 7.1 Add pinned AI SDK v7 core plus official OpenAI and Anthropic adapters, update dependency/boundary metadata, and add serializable per-environment `modelProviders` with required `defaultProvider` and `defaultModel`
 - [x] 7.2 Validate model-provider names/defaults/environment references without resolving secrets during discovery, and construct the active AI SDK provider registry only after environment resolution
 - [x] 7.3 Replace agent `modelProfile` with optional serializable `model` and implement omitted, provider-default, and exact `provider:model` resolution with compile/readiness diagnostics
-- [x] 7.4 Replace the custom agent turn loop with `ToolLoopAgent` while preserving ZSYS step/tool/time bounds, cancellation, output validation, safe failures, redaction, generated function identity, and correlated telemetry
-- [x] 7.5 Adapt ZSYS tools and Standard Schema projections to AI SDK tool contracts, route execution through `tool.invoke` and the common engine, and keep ZSYS side-effect/approval policy authoritative and fail-closed
+- [x] 7.4 Replace the custom agent turn loop with `ToolLoopAgent` while preserving RELKIT step/tool/time bounds, cancellation, output validation, safe failures, redaction, generated function identity, and correlated telemetry
+- [x] 7.5 Adapt RELKIT tools and Standard Schema projections to AI SDK tool contracts, route execution through `tool.invoke` and the common engine, and keep RELKIT side-effect/approval policy authoritative and fail-closed
 - [x] 7.6 Replace scripted custom model providers with the version-matched `ai/test` surface and add offline OpenAI/Anthropic default/model selection, tool, approval, invalid-output, cancellation, privacy, and limit matrices
 - [x] 7.7 Remove the public custom `ModelProvider`, custom turn protocol/runtime, handwritten OpenAI HTTP adapter, `modelProfile` paths, and obsolete tests only after all callers and generated artifacts migrate
 

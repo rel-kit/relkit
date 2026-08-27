@@ -6,9 +6,9 @@ import {
   type CacheOperationContext,
   type CacheOperationOptions,
   type CacheProvider,
-} from "@zsys/cache";
-import { canonicalJson } from "@zsys/contracts";
-import type { InferInput, InferOutput, StandardSchemaV1 } from "@zsys/schema";
+} from "@relkit/cache";
+import { canonicalJson } from "@relkit/contracts";
+import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import { clone, createFakeRoot, noFailures, positive, text } from "./fake-utils.js";
 import type { TestCacheFake, TestCacheFakeOptions, TestCacheSnapshot } from "./cache-types.js";
 

@@ -1,6 +1,6 @@
-import { createDescriptorBase, deepFreeze } from "@zsys/contracts";
-import { createUnboundIdentity } from "@zsys/invocation";
-import { isEnvRef } from "@zsys/config";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { createUnboundIdentity } from "@relkit/invocation";
+import { isEnvRef } from "@relkit/config";
 import { copyProviderMaps, isEnvDefinition, resolveDefaults } from "./config-validation.js";
 import type {
   ApplicationConfigDescriptor,
@@ -16,7 +16,7 @@ export { deriveApplicationId } from "./config-validation.js";
  *
  * @example
  * ```ts
- * import { defineConfig, defineEnv, env, external, s3 } from "@zsys/app"
+ * import { defineConfig, defineEnv, env, external, s3 } from "@relkit/app"
  *
  * const values = defineEnv({
  *   BUCKET_ENDPOINT: env.url(),
@@ -39,20 +39,20 @@ export { deriveApplicationId } from "./config-validation.js";
  * @since 0.2.0
  */
 export function defineConfig<
-  const S extends import("@zsys/config").EnvShape,
+  const S extends import("@relkit/config").EnvShape,
   const Maps extends ConfigProviderMaps,
 >(options: DefineConfigOptions<S, Maps>): ApplicationConfigDescriptor<string, S, Maps> {
   if (!isRecord(options) || !isEnvDefinition(options.env)) {
-    throw new TypeError("ZSYS config requires an environment definition");
+    throw new TypeError("RELKIT config requires an environment definition");
   }
   if (
     options.deployment !== undefined &&
     (options.deployment.target !== "aws" || options.deployment.adapter !== "pulumi")
   ) {
-    throw new TypeError("ZSYS deployment must select the aws target and pulumi adapter");
+    throw new TypeError("RELKIT deployment must select the aws target and pulumi adapter");
   }
   if (options.sentry?.sendDefaultPii !== undefined && options.sentry.sendDefaultPii !== false) {
-    throw new TypeError("Sentry PII collection cannot be enabled through ZSYS config");
+    throw new TypeError("Sentry PII collection cannot be enabled through RELKIT config");
   }
   if (
     options.sentry !== undefined &&

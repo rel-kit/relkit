@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import type { ProtocolId } from "@zsys/contracts";
-import { dispatchInvocation } from "@zsys/invocation";
-import { z } from "@zsys/schema";
+import type { ProtocolId } from "@relkit/contracts";
+import { dispatchInvocation } from "@relkit/invocation";
+import { z } from "@relkit/schema";
 import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/index.ts";
 const valueInput = z.object({ value: z.number() });
 const valueOutput = z.object({ value: z.number() });

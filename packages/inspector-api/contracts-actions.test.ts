@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { API_BASE_PATH } from "@zsys/contracts";
+import { API_BASE_PATH } from "@relkit/contracts";
 import { Hono } from "hono";
 import {
   INSPECTOR_ACTION_PATHS,
@@ -54,7 +54,7 @@ describe("inspector action and authorization contracts", () => {
       const response = await post(app, path, body);
       expect(response.status, path).toBe(200);
       const result = await response.json();
-      expect(result.protocol).toBe("zsys.inspector");
+      expect(result.protocol).toBe("relkit.inspector");
       expect(result.action ?? result.record ?? result.approval).toBeDefined();
       expect(JSON.stringify(result)).not.toContain(secret);
     }

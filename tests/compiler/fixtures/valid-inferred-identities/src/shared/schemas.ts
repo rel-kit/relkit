@@ -1,4 +1,4 @@
-import { z } from "@zsys/schema";
+import { z } from "@relkit/schema";
 
 export const emptyInput = z.object({});
 export const orderInput = z.object({ orderId: z.string() });

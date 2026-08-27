@@ -1,10 +1,10 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 export const SERVER_RUNTIME_SOURCE = `
 function bindAgents() {
   for (const node of plan.agents) {
     const agent = runtimeManifest.agents?.[node.id];
     if (agent === undefined) throw new Error(\`Agent descriptor "\${node.id}" is unavailable.\`);
-    const functionId = \`zsys.agent.\${node.id}.invoke\`;
+    const functionId = \`relkit.agent.\${node.id}.invoke\`;
     executableManifest.functions[functionId] = createGeneratedAgentFunction(
       node.id,
       (input, context) => invokeBoundAgent(node, agent, input, context),
@@ -69,7 +69,7 @@ function targetFor(functionId) {
 }
 function createDependencySources(providerRegistry) {
   return {
-    agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`zsys.agent.\${node.id}.invoke\`)])),
+    agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`relkit.agent.\${node.id}.invoke\`)])),
     buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "buckets", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
     jobs: Object.fromEntries(plan.queues.filter((node) => node.kind === "job").map((node) => [node.id, materializedJobs?.jobs.get(node.id)])),
@@ -129,7 +129,7 @@ function startJobWorker(jobs) {
 }
 function errorCode(error) {
   if (error !== null && typeof error === "object" && typeof error.code === "string") return error.code;
-  if (error !== null && typeof error === "object" && error.name === "EnvResolutionError") return "ZSYS_ENVIRONMENT_INVALID";
+  if (error !== null && typeof error === "object" && error.name === "EnvResolutionError") return "RELKIT_ENVIRONMENT_INVALID";
   return error instanceof Error ? error.name : "unknown";
 }
 function errorMessage(error) {
@@ -152,7 +152,7 @@ function recordRuntimeFailure(component, message, error, source) {
   if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "zsys.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-zsys-api-version": "1" } });
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
 function tokenFrom(value) {
   const parsed = Number(value);
@@ -179,7 +179,7 @@ function runtimeEnvironmentValue(value) {
   return value;
 }
 function waitForProviderReady() {
-  const milliseconds = timeoutFrom(process.env.ZSYS_PROVIDER_READY_DELAY_MS, 0);
+  const milliseconds = timeoutFrom(process.env.RELKIT_PROVIDER_READY_DELAY_MS, 0);
   if (milliseconds === 0) return Promise.resolve();
   return new Promise((resolve, reject) => { const timer = setTimeout(resolve, milliseconds); shutdownController.signal.addEventListener("abort", () => { clearTimeout(timer); reject(shutdownController.signal.reason ?? new Error("Provider startup was aborted.")); }, { once: true }); });
 }

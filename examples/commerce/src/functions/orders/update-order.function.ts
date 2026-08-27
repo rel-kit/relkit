@@ -1,4 +1,4 @@
-import { defineFunction } from "@zsys/app";
+import { defineFunction } from "@relkit/app";
 import { orderLookupOutput, orderMutationInput } from "../../shared/schemas.js";
 
 const updateOrder = defineFunction({

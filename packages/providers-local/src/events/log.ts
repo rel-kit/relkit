@@ -1,5 +1,5 @@
-import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@zsys/contracts";
-import type { EventPublishResult, UnknownEventEnvelope } from "@zsys/events";
+import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@relkit/contracts";
+import type { EventPublishResult, UnknownEventEnvelope } from "@relkit/events";
 import {
   createJobStore,
   type JobRecord,
@@ -42,7 +42,7 @@ export interface EventLog {
 export type EventLogInput = UnknownEventEnvelope | EventPublishResult<string, number, unknown>;
 
 export class EventLogStateError extends Error {
-  readonly code = "ZSYS_EVENT_LOG_STATE_INVALID" as const;
+  readonly code = "RELKIT_EVENT_LOG_STATE_INVALID" as const;
 
   constructor(message: string) {
     super(message);

@@ -1,4 +1,4 @@
-import type { JsonValue } from "@zsys/contracts";
+import type { JsonValue } from "@relkit/contracts";
 import { eventRuntimeList } from "./events-runtime.js";
 import {
   identity,
@@ -84,7 +84,7 @@ const RUNTIME_FIELDS = [
 
 export class InspectorRuntimeError extends Error {
   constructor(
-    readonly code: "ZSYS_INSPECTOR_RUNTIME_UNAVAILABLE" | "ZSYS_INSPECTOR_NOT_FOUND",
+    readonly code: "RELKIT_INSPECTOR_RUNTIME_UNAVAILABLE" | "RELKIT_INSPECTOR_NOT_FOUND",
     readonly status: 404 | 503,
   ) {
     super(code);
@@ -121,7 +121,7 @@ export async function runtimeDetail(
   let item = await resolveItem(source, id);
   if (item === undefined)
     item = (await runtimeItems(generation, collection)).find((value) => itemId(value) === id);
-  if (item === undefined) throw new InspectorRuntimeError("ZSYS_INSPECTOR_NOT_FOUND", 404);
+  if (item === undefined) throw new InspectorRuntimeError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   return { ...identity(generation), state: projectItem(item) } as JsonValue;
 }
 

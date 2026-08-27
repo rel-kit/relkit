@@ -23,12 +23,12 @@ export function validateCursor(value: string, latest: number, earliest?: string)
   const cursor = Number(value);
   if (cursor > latest)
     throw new ObservabilityStreamError(
-      "ZSYS_OBSERVABILITY_STREAM_CURSOR_FUTURE",
+      "RELKIT_OBSERVABILITY_STREAM_CURSOR_FUTURE",
       "Stream cursor is ahead of the retained stream",
     );
   if (earliest !== undefined && cursor < Number(earliest) - 1)
     throw new ObservabilityStreamError(
-      "ZSYS_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
+      "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED",
       "Stream cursor is older than retained events",
     );
 }
@@ -45,5 +45,5 @@ export function assertType(value: string): asserts value is ObservabilityStreamE
     throw invalid("stream event type is invalid");
 }
 export function invalid(message: string): ObservabilityStreamError {
-  return new ObservabilityStreamError("ZSYS_OBSERVABILITY_STREAM_INVALID", message);
+  return new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_INVALID", message);
 }

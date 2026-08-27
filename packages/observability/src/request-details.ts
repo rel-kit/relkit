@@ -107,7 +107,7 @@ function agentToolDetail(record: AgentTurnRecord): RequestDetailInput {
 
 function spanDetail(record: SpanRecord): RequestDetailInput | undefined {
   if (record.status !== "completed") return undefined;
-  const match = /^(?:zsys\.)?(bucket|cache|job|event|tool|agent)\.([^\.]+)(?:\.|$)/.exec(
+  const match = /^(?:relkit\.)?(bucket|cache|job|event|tool|agent)\.([^\.]+)(?:\.|$)/.exec(
     record.name,
   );
   if (match === null) return undefined;

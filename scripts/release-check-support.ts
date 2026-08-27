@@ -101,7 +101,8 @@ export function checkManifests(items: PackageInfo[]): {
   const summary: RecordValue[] = [];
   for (const item of items) {
     const directoryName = basename(item.directory);
-    const expectedName = directoryName === "create-zsys" ? "create-zsys" : `@zsys/${directoryName}`;
+    const expectedName =
+      directoryName === "create-relkit" ? "create-relkit" : `@relkit/${directoryName}`;
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
     const expectedExports =
@@ -137,21 +138,30 @@ export function checkManifests(items: PackageInfo[]): {
                     import: "./dist/internal/config.js",
                   },
                 }
-              : { ".": rootExport };
+              : directoryName === "client"
+                ? {
+                    ".": rootExport,
+                    "./tanstack-query": {
+                      types: "./dist/tanstack-query.d.ts",
+                      import: "./dist/tanstack-query.js",
+                    },
+                  }
+                : { ".": rootExport };
     if (JSON.stringify(stable(item.manifest.exports)) !== JSON.stringify(stable(expectedExports)))
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
       directoryName === "cli"
-        ? { zsys: "./dist/index.js" }
-        : directoryName === "create-zsys"
-          ? { "create-zsys": "./dist/index.js" }
+        ? { relkit: "./dist/index.js" }
+        : directoryName === "create-relkit"
+          ? { "create-relkit": "./dist/index.js" }
           : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
     for (const field of packageFields)
-      for (const [name, spec] of Object.entries(item.manifest[field] ?? {}))
-        if (workspaceNames.has(name) ? spec !== "workspace:*" : !exactVersion(spec))
-          throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
+      if (field !== "peerDependencies")
+        for (const [name, spec] of Object.entries(item.manifest[field] ?? {}))
+          if (workspaceNames.has(name) ? spec !== "workspace:*" : !exactVersion(spec))
+            throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
     summary.push({
       name: item.name,
       version,

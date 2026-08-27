@@ -99,7 +99,7 @@ Cache keys SHALL derive from cache ID, schema version, and canonical JSON so obj
 
 ### Requirement: Opaque bounded local state
 
-Local providers SHALL keep implementation state beneath `.zsys/state` and observability state beneath `.zsys/observability`, SHALL bound cache retention/eviction as configured, and SHALL treat these files as opaque to application code.
+Local providers SHALL keep implementation state beneath `.relkit/state` and observability state beneath `.relkit/observability`, SHALL bound cache retention/eviction as configured, and SHALL treat these files as opaque to application code.
 
 #### Scenario: Runtime restarts
 

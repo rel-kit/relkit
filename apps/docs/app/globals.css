@@ -3,11 +3,11 @@
 @import "fumadocs-ui/css/preset.css";
 
 :root {
-  --zsys-accent: oklch(0.64 0.18 262);
+  --relkit-accent: oklch(0.64 0.18 262);
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--zsys-accent) 28%, transparent);
+  background: color-mix(in oklab, var(--relkit-accent) 28%, transparent);
 }
 
 code {

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { defineError, defineFunction } from "@zsys/functions";
-import { z } from "@zsys/schema";
+import { defineError, defineFunction } from "@relkit/functions";
+import { z } from "@relkit/schema";
 import { handleTestRequest } from "./src/application-http.ts";
 import { createTestRuntime, type TestRuntime } from "./src/runtime.ts";
 import type { TestRoute } from "./src/application-routes.ts";
@@ -35,7 +35,7 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
     const response = await handleTestRequest(
       [route],
       runtime,
-      new Request("http://zsys.test/orders"),
+      new Request("http://relkit.test/orders"),
     );
 
     expect(response.status).toBe(500);
@@ -75,7 +75,7 @@ test("maps HTTP data into function input without exposing the request", async ()
     const response = await handleTestRequest(
       [route],
       runtime,
-      new Request("http://zsys.test/orders/order-1/a/b?tag=red&tag=blue", {
+      new Request("http://relkit.test/orders/order-1/a/b?tag=red&tag=blue", {
         method: "POST",
         headers: { "x-tags": "one, two", "content-type": "application/json" },
         body: '{"value":"ready"}',

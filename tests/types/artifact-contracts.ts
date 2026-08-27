@@ -1,4 +1,4 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@zsys/contracts";
+import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
 import type { RuntimeManifest } from "../../packages/runtime-effect/src/index.ts";
 

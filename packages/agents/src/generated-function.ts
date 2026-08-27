@@ -1,6 +1,6 @@
-import { normalizeId, type MaybePromise } from "@zsys/contracts";
+import { normalizeId, type MaybePromise } from "@relkit/contracts";
 
-export const GENERATED_AGENT_FUNCTION_PREFIX = "zsys.agent." as const;
+export const GENERATED_AGENT_FUNCTION_PREFIX = "relkit.agent." as const;
 export const GENERATED_AGENT_FUNCTION_SUFFIX = ".invoke" as const;
 
 /** Serializable identity attached to the internal function created for an agent. */
@@ -20,7 +20,7 @@ export type GeneratedAgentFunction = ((
 
 /** Raised when a generated identity is registered before the agent runtime binds an executor. */
 export class GeneratedAgentFunctionUnboundError extends Error {
-  readonly code = "ZSYS_GENERATED_FUNCTION_UNBOUND" as const;
+  readonly code = "RELKIT_GENERATED_FUNCTION_UNBOUND" as const;
 
   constructor(functionId: string) {
     super(`Generated agent function "${functionId}" has no runtime executor.`);

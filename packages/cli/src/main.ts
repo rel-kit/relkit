@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import { canonicalJson } from "@zsys/contracts";
-import { createLoggerLayer, type LogRecord } from "@zsys/runtime-effect";
-import { formatGenerateResult } from "create-zsys";
+import { canonicalJson } from "@relkit/contracts";
+import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
+import { formatGenerateResult } from "create-relkit";
 import { executeCommand } from "./command-dispatch.js";
 import {
   cliErrorMessage,
@@ -19,7 +19,7 @@ import {
   helpPayload,
   installSignals,
   isGeneratorApi,
-  loadCreateZsys,
+  loadCreateRelkit,
   toFailure,
   type CliIo,
   type CliLogger,
@@ -38,7 +38,7 @@ export async function runCli(
   const json = isJsonMode(argv);
   const reporter = createReporter(json, io);
   if (hasAction(argv, "help", "h") && hasAction(argv, "version", "v")) {
-    reporter.error("ZSYS_CLI_USAGE", "--help and --version are exclusive");
+    reporter.error("RELKIT_CLI_USAGE", "--help and --version are exclusive");
     return CLI_EXIT_CODES.usage;
   }
   const version = runtime.version ?? CLI_VERSION;
@@ -46,7 +46,7 @@ export async function runCli(
   try {
     parsed = await parseEffectCli(argv, version);
   } catch (error) {
-    reporter.error("ZSYS_INTERNAL_ERROR", errorMessage(error));
+    reporter.error("RELKIT_INTERNAL_ERROR", errorMessage(error));
     return CLI_EXIT_CODES.failure;
   }
   if (parsed.error !== undefined) {
@@ -56,20 +56,20 @@ export async function runCli(
     }
     const unknown = unknownCommandMessage(parsed.error);
     reporter.error(
-      unknown === undefined ? "ZSYS_CLI_USAGE" : "ZSYS_COMMAND_UNAVAILABLE",
+      unknown === undefined ? "RELKIT_CLI_USAGE" : "RELKIT_COMMAND_UNAVAILABLE",
       unknown ?? cliErrorMessage(parsed.error),
     );
     return unknown === undefined ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
   }
   if (hasAction(parsed.argv, "version", "v")) {
-    reporter.output({ name: "zsys", version }, `zsys ${version}`);
+    reporter.output({ name: "relkit", version }, `relkit ${version}`);
     return CLI_EXIT_CODES.success;
   }
   const completionShell = actionValue(parsed.argv, "completions");
   if (completionShell !== undefined) {
     reporter.output(
       {
-        name: "zsys",
+        name: "relkit",
         shell: completionShell === "sh" ? "bash" : completionShell,
         script: parsed.stdout,
       },
@@ -142,14 +142,14 @@ async function execute(
     ...(json ? {} : { onProgress: (message: string) => io.stderr(message) }),
   };
   if (invocation.command !== "create") return executeCommand(invocation, context);
-  const api = await (runtime.loadCreateZsys ?? loadCreateZsys)();
+  const api = await (runtime.loadCreateRelkit ?? loadCreateRelkit)();
   if (!isGeneratorApi(api))
-    throw fail("ZSYS_CREATE_API_UNAVAILABLE", "The create-zsys generator API is unavailable.");
+    throw fail("RELKIT_CREATE_API_UNAVAILABLE", "The create-relkit generator API is unavailable.");
   let options: unknown;
   try {
     options = api.normalizeCreateOptions(invocation.args, { json });
   } catch (error) {
-    throw fail("ZSYS_CLI_USAGE", errorMessage(error), CLI_EXIT_CODES.usage);
+    throw fail("RELKIT_CLI_USAGE", errorMessage(error), CLI_EXIT_CODES.usage);
   }
   const result = await api.generateProject(options, context);
   if (result !== undefined) reporter.output(result, formatGenerateResult(result));
@@ -186,8 +186,8 @@ function richStatus(runtime: CliRuntime, json: boolean, io: CliIo, command: stri
     !(runtime.ci ?? Boolean(process.env.CI)) &&
     (runtime.tty ?? process.stderr.isTTY) === true;
   return {
-    start: () => enabled && io.stderr(`● zsys ${command}`),
-    finish: (ok: boolean) => enabled && io.stderr(`${ok ? "✓" : "✗"} zsys ${command}`),
+    start: () => enabled && io.stderr(`● relkit ${command}`),
+    finish: (ok: boolean) => enabled && io.stderr(`${ok ? "✓" : "✗"} relkit ${command}`),
   };
 }
 

@@ -1,0 +1,4 @@
+command=bun run test:deployment
+environment=RELKIT_AWS_INTEGRATION=0 (process-local)
+exitCode=0
+durationSeconds=2.772

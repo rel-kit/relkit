@@ -71,7 +71,7 @@ When an eligible source-scoped descriptor omits `id`, the compiler SHALL derive 
 #### Scenario: Two IDs collide
 
 - **WHEN** explicit and inferred identities normalize to the same global ID
-- **THEN** `ZSYS_DUPLICATE_ID` identifies every origin and no activatable output is emitted
+- **THEN** `RELKIT_DUPLICATE_ID` identifies every origin and no activatable output is emitted
 
 ### Requirement: Inferred identities are bound into executable output
 

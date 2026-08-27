@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
-  ZSYS_DESCRIPTOR,
+  RELKIT_DESCRIPTOR,
   assertDescriptor,
   assertRef,
   createDescriptorBase,
@@ -17,7 +17,7 @@ describe("descriptor contracts", () => {
       tags: ["orders", "write"],
     });
 
-    expect(ZSYS_DESCRIPTOR).toBe(Symbol.for("zsys.descriptor"));
+    expect(RELKIT_DESCRIPTOR).toBe(Symbol.for("relkit.descriptor"));
     expect(descriptor.id).toBe("orders.create");
     expect(descriptor.ref).toEqual({ kind: "function", id: "orders.create" });
     expect(isDescriptor(descriptor)).toBe(true);
@@ -38,12 +38,12 @@ describe("descriptor contracts", () => {
     expect(isRef({ kind: "function", id: "bad id" })).toBe(false);
     expect(
       isDescriptor({
-        [ZSYS_DESCRIPTOR]: true,
+        [RELKIT_DESCRIPTOR]: true,
         kind: "function",
         id: "orders.create",
         ref: createRef("route", "orders.create"),
       }),
     ).toBe(false);
-    expect(() => assertDescriptor({})).toThrow("Invalid ZSys descriptor");
+    expect(() => assertDescriptor({})).toThrow("Invalid RelKit descriptor");
   });
 });

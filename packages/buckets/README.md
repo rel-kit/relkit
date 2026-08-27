@@ -1,10 +1,10 @@
-# @zsys/buckets
+# @relkit/buckets
 
 Buckets declare logical object-storage policy. The descriptor contains no
 credentials, filesystem paths, or provider client.
 
 ```ts
-import { defineBucket } from "@zsys/buckets";
+import { defineBucket } from "@relkit/buckets";
 
 export default defineBucket({
   id: "assets",
