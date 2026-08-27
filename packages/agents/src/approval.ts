@@ -76,13 +76,51 @@ export function createApproval(options: ApprovalOptions): ApprovalRecord {
   return makeApproval(options, required ? "pending" : "approved");
 }
 
-/** Moves a pending approval to the approved state. */
+/**
+ * Moves a pending approval to the approved state.
+ *
+ * @example
+ * ```ts
+ * import { approveApproval, createApproval } from "@relkit/agents"
+ *
+ * const pending = createApproval({
+ *   invocationId: "invocation-1",
+ *   toolCallId: "tool-call-1",
+ *   toolId: "cancel-order",
+ *   sideEffect: "write",
+ *   policy: "always"
+ * })
+ * const approved = approveApproval(pending)
+ * if (approved.state !== "approved") throw new Error("approval did not transition")
+ * ```
+ * @category Approvals
+ * @since 0.1.0
+ */
 export function approveApproval(approval: ApprovalRecord): ApprovedApproval {
   assertTransitionable(approval);
   return makeApproval(approval, "approved");
 }
 
-/** Moves a pending approval to the denied state. */
+/**
+ * Moves a pending approval to the denied state.
+ *
+ * @example
+ * ```ts
+ * import { createApproval, denyApproval } from "@relkit/agents"
+ *
+ * const pending = createApproval({
+ *   invocationId: "invocation-1",
+ *   toolCallId: "tool-call-1",
+ *   toolId: "cancel-order",
+ *   sideEffect: "write",
+ *   policy: "always"
+ * })
+ * const denied = denyApproval(pending)
+ * if (denied.state !== "denied") throw new Error("approval did not transition")
+ * ```
+ * @category Approvals
+ * @since 0.1.0
+ */
 export function denyApproval(approval: ApprovalRecord): DeniedApproval {
   assertTransitionable(approval);
   return makeApproval(approval, "denied");

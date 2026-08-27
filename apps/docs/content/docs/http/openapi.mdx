@@ -1,0 +1,77 @@
+---
+title: OpenAPI and Scalar
+description: Generate OpenAPI 3.1 from checked routes, inspect the human reference, and protect production documentation endpoints.
+---
+
+RELKIT generates OpenAPI from the same checked graph used by the runtime. Paths, methods, request locations,
+schemas, statuses, declared errors, rate limits, and operation IDs therefore come from authored descriptors
+rather than a separate annotation file.
+
+## Generate the document
+
+<Steps>
+  <Step>
+    ### Refresh checked artifacts
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    ```
+
+    Inspect `.relkit/generated/openapi.json` when no server is running. The file is generated; fix route or
+    schema source when it is wrong.
+
+  </Step>
+  <Step>
+    ### Inspect the runtime document
+
+    ```sh title="Terminal — relkit-orders"
+    curl "http://localhost:3000/_relkit/v1/openapi.json" > /tmp/relkit-openapi.json
+    ```
+
+    Confirm `openapi` is `3.1.0` and search for `/hello`, `/orders`, and `/orders/{orderId}`.
+
+  </Step>
+  <Step>
+    ### Open the interactive reference
+
+    ```sh title="Terminal — relkit-orders"
+    open "http://localhost:3000/_relkit/v1/api-reference"
+    ```
+
+    Scalar renders the same protected document. Select an operation and verify parameters, request body,
+    success response, declared errors, and validation response.
+
+  </Step>
+</Steps>
+
+## Trace a field back to source
+
+The dynamic order route demonstrates path mapping, a named transform, several HTTP methods, and declared
+responses:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
+  ../../examples/commerce/src/routes/orders/[orderId]/route.ts
+</include>
+
+If a path parameter is absent from OpenAPI, inspect the filesystem segment and the route request mapping. If
+a response is absent, inspect the target's declared errors or the route's explicit `responses` array. Use
+`bun run relkit graph print` to connect the operation back to its source file.
+
+## Operation identity and compatibility
+
+Generated clients key procedures by checked operation identity. Moving a route, renaming a method export, or
+changing an explicit ID can be a client-breaking change even when the handler stays the same. Compare generated
+contracts in review and treat removed paths, newly required inputs, and narrowed outputs as compatibility
+decisions.
+
+## Protect production documentation
+
+<Callout type="warn" title="Production documentation is opt-in">
+  Enable `server.apiDocs.enabledInProduction` only with internal-endpoint authorization. Scalar
+  embeds the protected OpenAPI document; protect the raw JSON endpoint as well as the UI.
+</Callout>
+
+Disabling the public reference does not remove the build-time `openapi.json` artifact. Release tooling can
+publish it to a controlled developer portal without exposing introspection from every application instance.
+
+<include cwd>content/generated/related/http-openapi.mdx</include>

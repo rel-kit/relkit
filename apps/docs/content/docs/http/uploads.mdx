@@ -1,0 +1,88 @@
+---
+title: File uploads
+description: Accept bounded multipart files, validate media and size limits, store content, and test valid and invalid requests.
+---
+
+File uploads are untrusted binary input. RELKIT maps multipart fields into the target function's schemas,
+enforces request and file ceilings, and invokes the function only after validation. Uploads are currently
+buffered, so limits protect memory as well as domain policy.
+
+## Model the upload operation
+
+The commerce example keeps storage behavior in a function and transport parsing in a route:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/functions/upload-assets.function.ts"'>
+  ../../examples/commerce/src/functions/upload-assets.function.ts
+</include>
+
+`z.file` values provide the validated file name, media type, size, and bytes. The function declares bucket
+access, writes through the provider-neutral client, and returns ordinary JSON metadata. It does not receive a
+multipart parser or raw HTTP request.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/uploads/route.ts"'>
+  ../../examples/commerce/src/routes/uploads/route.ts
+</include>
+
+The route opts into `multipart/form-data` and sets a route-specific body ceiling. The function schema decides
+which fields are single files, repeated files, or text values.
+
+## Send a complete multipart request
+
+<Steps>
+  <Step>
+    ### Prepare representative files
+
+    ```sh title="Terminal — relkit-orders"
+    printf 'primary' > /tmp/primary.png
+    printf 'detail' > /tmp/detail.png
+    ```
+
+  </Step>
+  <Step>
+    ### Upload every required field
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/uploads" \
+      -F "label=receipts" \
+      -F "primary=@/tmp/primary.png;type=image/png" \
+      -F "attachments=@/tmp/detail.png;type=image/png"
+    ```
+
+    Expect HTTP `200` and JSON listing `primary.png` and `detail.png`. The integration test can inspect the
+    fake bucket to prove the bytes were written without S3 credentials.
+
+  </Step>
+  <Step>
+    ### Prove invalid input is rejected
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/uploads" \
+      -F "label=receipts" \
+      -F "primary=@/tmp/primary.png;type=text/plain"
+    ```
+
+    Expect a bounded `422` response for the unsupported media type or missing repeated field. The storage
+    handler must not run.
+
+  </Step>
+</Steps>
+
+## Set every relevant limit
+
+Use the global `server.maxBodyBytes` as an application safety ceiling, `route.maxBodyBytes` for this endpoint,
+and `z.file` constraints for individual files and media types. The request ceiling includes multipart framing
+and all fields, so it must be slightly larger than the sum of accepted file payloads.
+
+For large media, streaming ingestion, resumable transfer, or direct-to-object-store uploads, use a purpose-built
+upload flow rather than raising a buffered route to unbounded sizes. A signed upload URL can keep large bytes
+off the application server while a later validated request records metadata.
+
+## Security checklist
+
+- Generate storage keys independently from untrusted file names when overwriting matters.
+- Treat reported media type as input, not proof of file content.
+- Keep private buckets private and return signed URLs only after authorization.
+- Avoid logging file bytes, access tokens, or multipart bodies.
+- Test missing fields, repeated fields, zero-byte files, media mismatch, and both size ceilings.
+
+<include cwd>content/generated/related/http-uploads.mdx</include>

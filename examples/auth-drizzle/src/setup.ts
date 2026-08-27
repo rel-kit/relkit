@@ -1,3 +1,3 @@
-import { initializeAuthDatabase } from "./data/auth.data-model.js";
+import { initializeAuthDatabase } from "@app/data/auth.data-model.js";
 
 initializeAuthDatabase();

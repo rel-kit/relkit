@@ -1,6 +1,33 @@
 ---
 title: Troubleshooting and diagnostics
-description: Use stable diagnostic codes and the smallest relevant command to recover safely.
+description: Start with a stable diagnostic code, repair the owning source or configuration, and verify the smallest failing command.
 ---
 
+Do not begin by deleting generated output. Preserve the first failing command, exit code, diagnostic code,
+and source location; those identify the owning layer and the safest repair.
+
+<Steps>
+  <Step>
+    ### Reproduce with structured output
+
+    Run `bun run relkit --json doctor`, then the smallest failing command such as
+    `bun run relkit --json check`.
+
+  </Step>
+  <Step>
+    ### Repair the source of truth
+
+    Change application source, configuration, or environment—not `.relkit/generated` or `.relkit/build`.
+
+  </Step>
+  <Step>
+    ### Verify from narrow to broad
+
+    Rerun the failing command, then test, check, build, and start only as needed.
+
+  </Step>
+</Steps>
+
 <include cwd>../../docs/troubleshooting.md</include>
+
+<include cwd>content/generated/related/operations-troubleshooting.mdx</include>

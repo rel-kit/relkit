@@ -1,0 +1,78 @@
+---
+title: HTTP responses
+description: Use safe inference for ordinary JSON, declare explicit status and media contracts, and test success and error bodies.
+---
+
+Routes turn function outcomes into HTTP responses. RELKIT can infer the common contract from function output,
+declared errors, validation, and rate limiting, or you can replace inference with an explicit response list
+when the transport needs different statuses or media types.
+
+## Understand response inference
+
+| Authored outcome                  | Inferred response                     |
+| --------------------------------- | ------------------------------------- |
+| Non-void function output          | JSON `200`                            |
+| `void` or `undefined` output      | Empty `204`                           |
+| Input or request mapping failure  | Safe validation JSON `422`            |
+| Declared error with `http.status` | That status and declared error schema |
+| Route rate-limit rejection        | Safe JSON `429`                       |
+
+`POST` does not imply `201`. Set `successStatus` for one ordinary success status, or use an explicit response
+array for a contract with redirects, multiple success shapes, or alternative media types.
+
+## Declare the orders response
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
+  ../../examples/commerce/src/routes/orders/route.ts
+</include>
+
+The `POST` route declares JSON `201` with the target output and includes the standard validation error. An
+explicit `responses` array replaces inference, so include every outcome the typed transport promises.
+
+## Verify success and failure
+
+<Steps>
+  <Step>
+    ### Create a valid order
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/orders" \
+      -H "content-type: application/json" \
+      -H "idempotency-key: order-1" \
+      -H "x-customer-email: buyer@example.com" \
+      -d '{"sku":"book","quantity":2}'
+    ```
+
+    Expect `201`, a JSON content type, and output matching the declared schema.
+
+  </Step>
+  <Step>
+    ### Trigger validation
+
+    Send quantity `0` or omit a required header. Expect `422` with bounded issues and no internal stack.
+
+  </Step>
+  <Step>
+    ### Trigger a declared error
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:3000/orders/missing" \
+      -H "authorization: Bearer example"
+    ```
+
+    Expect the error's declared status and stable code. Test the status and body together; a correct body with
+    the wrong status is still a broken HTTP contract.
+
+  </Step>
+</Steps>
+
+## Native responses and middleware
+
+HTTP middleware may return a native `Response` to short-circuit. That runtime response is valid, but it is not
+automatically part of every route's typed contract. If client developers must handle an authentication or
+policy response, document and model it explicitly instead of relying on middleware implementation knowledge.
+
+Response schemas also validate successful handler output. An output validation failure is an internal defect,
+not a caller `422`; the runtime records it and returns a safe server error.
+
+<include cwd>content/generated/related/http-responses.mdx</include>

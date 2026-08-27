@@ -1,54 +1,126 @@
 ---
 title: Create an application
-description: Install the prerequisites, choose a template, and understand the generated project.
+description: Verify the local toolchain, generate a credential-free orders API, and understand every file you receive.
 ---
 
-## Prerequisites
+This guide creates `relkit-orders`, the application used throughout the documentation. It uses the `api`
+template but explicitly disables cloud provisioning and deployment, so the complete Start journey runs
+without AWS credentials, Pulumi, or paid resources.
 
-- Bun 1.3.10.
-- Pulumi and AWS credentials only when you keep the default AWS/Pulumi choices.
+## Before you start
 
-Create a project with the supported generator:
+RELKIT projects use Bun for dependency installation, scripts, tests, and the development process. Install
+[Bun 1.3.10](https://bun.sh/docs/installation), then confirm the exact version:
 
-```sh
-bunx create-relkit@latest my-app
-cd my-app
+```sh title="Terminal"
+bun --version
 ```
 
-For a local-only API project:
+Expected output is `1.3.10`. If another version is active, switch before generating the project.
 
-```sh
-bunx create-relkit@latest my-api --template api --cloud none --deploy none
-```
+<Callout type="info" title="Cloud deployment is optional">
+  Pulumi and AWS credentials are needed only for the optional deployment guide. They are not
+  prerequisites for creating, developing, testing, checking, or building this application.
+</Callout>
 
-Templates are `minimal`, `api`, and `agent`. Use `--no-install`, `--no-git`, or `--no-examples`
-only when the surrounding automation owns that step. Generation validates its destination first and
-does not leave a partially created project after a failure.
+## Generate the project
 
-## Generated structure
+<Steps>
+  <Step>
+    ### Run the generator
 
-```text
-my-app/
-├── src/
-│   ├── app.ts
-│   ├── functions/
-│   └── routes/
-│       └── hello/
-│           └── route.ts
-├── tests/
-├── package.json
-├── tsconfig.json
-└── relkit.config.ts
-```
+    Execute this command from the directory that should contain the new project:
 
-RELKIT always discovers descriptors from `src/**/*.ts`, reads application settings from
-`relkit.config.ts`, and writes derived artifacts to
-`.relkit/generated`. Tests, fixtures, declarations, and generated files are excluded automatically.
-These conventions are intentionally not configurable.
+    ```sh title="Terminal"
+    bunx create-relkit@latest relkit-orders --template api --cloud none --deploy none
+    ```
 
-The `api` template demonstrates a small service and independent event listeners; the `agent` template
-derives a tool with `function.asTool` and keeps development/test model calls offline. Both templates use
-the same inferred source-scoped IDs and common `invoke` boundary described in the guides.
+    The generator validates the destination before writing, installs dependencies, runs initial checks,
+    and does not leave a partial project after a failure.
 
-Run `relkit doctor` after creation to check Bun, project configuration, ports, and optional Pulumi
-requirements without printing secret values.
+  </Step>
+  <Step>
+    ### Load the local defaults and run diagnostics
+
+    ```sh title="Terminal"
+    cd relkit-orders
+    cp .env.example .env
+    bun run relkit doctor --no-pulumi
+    bun run check
+    ```
+
+    The API template declares an event provider, so `.env.example` supplies its non-secret local endpoint,
+    bus name, region, and log level. `--no-pulumi` tells `doctor` this journey does not require Pulumi or AWS
+    credentials. `check` compiles descriptors and writes the checked graph and diagnostics under
+    `.relkit/generated`. Both commands must exit `0`.
+
+  </Step>
+</Steps>
+
+## Understand the generated files
+
+<Files>
+  <File name="relkit.config.ts" />
+  <File name=".env.example" />
+  <File name=".env" />
+  <Folder name="src" defaultOpen>
+    <File name="env.ts" />
+    <Folder name="functions" defaultOpen>
+      <File name="hello.function.ts" />
+      <File name="echo.function.ts" />
+      <Folder name="orders">
+        <File name="create-order.function.ts" />
+        <File name="price-order.function.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="routes" defaultOpen>
+      <Folder name="hello">
+        <File name="route.ts" />
+      </Folder>
+      <Folder name="echo">
+        <File name="route.ts" />
+      </Folder>
+      <Folder name="orders">
+        <File name="route.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="events">
+      <File name="order-created.event.ts" />
+    </Folder>
+    <Folder name="services">
+      <File name="orders.service.ts" />
+    </Folder>
+  </Folder>
+  <Folder name="tests">
+    <Folder name="unit" />
+    <Folder name="integration" />
+  </Folder>
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+- `relkit.config.ts` declares environment contracts, providers, server settings, and deployment choices.
+- `.env.example` documents safe local defaults; `.env` is your ignored runtime copy. Do not commit secrets.
+- `src/functions` contains validated behavior; functions do not receive HTTP request objects.
+- `src/routes` maps filesystem paths and HTTP method exports to function targets.
+- `tests/unit` invokes functions directly; `tests/integration` uses the in-process HTTP application.
+- `tsconfig.json` maps `@app/*` to `src/*`. Import application modules as
+  `@app/functions/hello.function.js` instead of counting `../` segments; keep `.js` for emitted ESM.
+- `.relkit/generated`, `.relkit/build`, `.relkit/state`, and `.relkit/observability` are derived or runtime
+  directories. Do not edit them by hand.
+
+## Generator options
+
+<include cwd>content/generated/create-options.mdx</include>
+
+Run `bunx create-relkit@latest --help` for the generated, version-specific command reference.
+
+<Accordions>
+  <Accordion title="If generation fails">
+    Read the first error and preserve its diagnostic code. Confirm the destination is absent or
+    empty, Bun is exactly 1.3.10, and the package registry is reachable. Add `--no-install` only if
+    you intend to run `bun install` yourself.
+  </Accordion>
+</Accordions>
+
+<include cwd>content/generated/related/start-create-an-app.mdx</include>

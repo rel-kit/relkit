@@ -1122,6 +1122,9 @@ declare const providerEnvironment: (
 
 ## Exports Grouped by Category
 
+- [Providers](#providers)
+  - [external](#external)
+  - [managed](#managed)
 - [utils](#utils)
   - [AwsProtocolOptions (interface)](#awsprotocoloptions-interface)
   - [CapabilityBindings (type alias)](#capabilitybindings-type-alias)
@@ -1145,10 +1148,8 @@ declare const providerEnvironment: (
   - [cloudWatch](#cloudwatch)
   - [copyProviderTopology](#copyprovidertopology)
   - [eventBridge](#eventbridge)
-  - [external](#external)
   - [isProviderBinding](#isproviderbinding)
   - [isProviderTopology](#isprovidertopology)
-  - [managed](#managed)
   - [otlp](#otlp)
   - [providerEnvironment](#providerenvironment)
   - [redis](#redis)
@@ -1156,6 +1157,62 @@ declare const providerEnvironment: (
   - [sqs](#sqs)
 
 ---
+
+# Providers
+
+## external
+
+Marks an adapter as connected to infrastructure owned outside the deployment stack.
+
+**Example**
+
+```ts
+import { external, redis } from "@relkit/app";
+import { defineEnv, env } from "@relkit/config";
+
+const applicationEnv = defineEnv({ CACHE_URL: env.secret() });
+const cache = external(redis({ url: applicationEnv.CACHE_URL }));
+void cache;
+```
+
+**Signature**
+
+```ts
+declare const external: <C extends ProviderCapability, N extends string>(
+  adapter: ProviderAdapter<C, N>,
+) => ProviderBinding<C, N>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L162)
+
+Since v0.1.0
+
+## managed
+
+Marks an adapter as infrastructure owned by the deployment stack.
+
+**Example**
+
+```ts
+import { managed, redis } from "@relkit/app";
+import { defineEnv, env } from "@relkit/config";
+
+const applicationEnv = defineEnv({ CACHE_URL: env.secret() });
+const cache = managed(redis({ url: applicationEnv.CACHE_URL }));
+void cache;
+```
+
+**Signature**
+
+```ts
+declare const managed: <C extends ProviderCapability, N extends string>(
+  adapter: ProviderAdapter<C, N>,
+) => ProviderBinding<C, N>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L183)
+
+Since v0.1.0
 
 # utils
 
@@ -1430,7 +1487,7 @@ declare const cloudWatch: (
 declare const copyProviderTopology: (value: unknown) => ProviderTopology;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L159)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L189)
 
 ## eventBridge
 
@@ -1444,18 +1501,6 @@ declare const eventBridge: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L125)
 
-## external
-
-**Signature**
-
-```ts
-declare const external: <C extends ProviderCapability, N extends string>(
-  adapter: ProviderAdapter<C, N>,
-) => ProviderBinding<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L147)
-
 ## isProviderBinding
 
 **Signature**
@@ -1464,7 +1509,7 @@ declare const external: <C extends ProviderCapability, N extends string>(
 declare const isProviderBinding: (value: unknown) => value is ProviderBinding;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L159)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L189)
 
 ## isProviderTopology
 
@@ -1474,19 +1519,7 @@ declare const isProviderBinding: (value: unknown) => value is ProviderBinding;
 declare const isProviderTopology: (value: unknown) => value is ProviderTopology;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L159)
-
-## managed
-
-**Signature**
-
-```ts
-declare const managed: <C extends ProviderCapability, N extends string>(
-  adapter: ProviderAdapter<C, N>,
-) => ProviderBinding<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L189)
 
 ## otlp
 
@@ -1508,7 +1541,7 @@ declare const providerEnvironment: (
 ) => readonly ProviderEnvironmentReference[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L159)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L189)
 
 ## redis
 

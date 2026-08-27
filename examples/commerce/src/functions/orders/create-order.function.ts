@@ -1,9 +1,9 @@
 import { defineFunction } from "@relkit/app";
-import orderCreated from "../../events/order-created.event.js";
-import sendReceiptJob from "../../jobs/send-receipt.job.js";
-import prices from "../../cache/prices.cache.js";
-import { receiptObjectName } from "../../shared/receipt-object.js";
-import { createOrderOutput, orderInput } from "../../shared/schemas.js";
+import orderCreated from "@app/events/order-created.event.js";
+import sendReceiptJob from "@app/jobs/send-receipt.job.js";
+import prices from "@app/cache/prices.cache.js";
+import { receiptObjectName } from "@app/shared/receipt-object.js";
+import { createOrderOutput, orderInput } from "@app/shared/schemas.js";
 
 const createOrder = defineFunction({
   input: orderInput,

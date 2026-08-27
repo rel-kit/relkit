@@ -1,5 +1,5 @@
 import { defineRoute } from "@relkit/app";
-import uploadAssets from "../../functions/upload-assets.function.js";
+import uploadAssets from "@app/functions/upload-assets.function.js";
 
 export const POST = defineRoute({
   target: uploadAssets,

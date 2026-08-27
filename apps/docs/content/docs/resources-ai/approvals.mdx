@@ -1,0 +1,80 @@
+---
+title: Tool approvals
+description: Pause sensitive tool execution, present a bounded decision, fail closed, and test approved, denied, and missing decisions.
+---
+
+Approval is a runtime safety boundary between a model's proposed action and function execution. It is not a
+prompt asking the model to approve itself. RELKIT creates a bounded approval record and requires a trusted
+caller or human workflow to decide before a protected tool can run.
+
+## Define a write that always requires approval
+
+<include cwd lang="ts" meta='title="examples/commerce/src/tools/cancel-order.tool.ts"'>
+  ../../examples/commerce/src/tools/cancel-order.tool.ts
+</include>
+
+The tool truthfully declares a write and uses `approval: "always"`. The underlying delete function still owns
+validation and behavior. The tool only adds the model execution boundary.
+
+## Choose a policy
+
+<Tabs items={["never", "on-write", "always"]}>
+  <Tab value="never">
+    Use only when the operation is safe to execute without a separate decision and disclosure is
+    already authorized.
+  </Tab>
+  <Tab value="on-write">
+    Require approval when side-effect metadata is `write` or `external`, while allowing non-mutating
+    tools.
+  </Tab>
+  <Tab value="always">
+    Require a decision for every invocation, including reads that expose sensitive information.
+  </Tab>
+</Tabs>
+
+## Implement the decision flow
+
+<Steps>
+  <Step>
+    ### Receive the pending record
+
+    The trusted approval handler receives the tool ID, side-effect classification, policy, invocation identity,
+    and bounded arguments permitted by the runtime. Present enough context for a real decision without exposing
+    secrets or unredacted prompts.
+
+  </Step>
+  <Step>
+    ### Bind the decision to this invocation
+
+    Approve or deny the exact pending record. Do not reuse approval from another tool call, user, tenant, or
+    changed argument set. Expired or mismatched records must be rejected.
+
+  </Step>
+  <Step>
+    ### Resume or stop execution
+
+    An approved record permits the tool target to enter the common function engine. A denied, missing, invalid,
+    or expired decision prevents the handler and its side effects from running.
+
+  </Step>
+  <Step>
+    ### Test every terminal path
+
+    Script the same tool call three times: approve it and assert one write; deny it and assert no write; omit the
+    handler and assert an approval-required failure. Also test cancellation while a decision is pending.
+
+  </Step>
+</Steps>
+
+## Audit and user experience
+
+Record who decided, when, which tool and invocation were involved, and the final state without logging secret
+arguments. The UI should explain the concrete action and consequence, not show a generic “Allow?” dialog.
+Approval must be an explicit act; timeout and closed browser sessions default to no execution.
+
+<Callout type="error" title="Approvals fail closed">
+  Missing infrastructure, handler errors, timeouts, malformed decisions, and unknown states must
+  prevent the tool call. Never convert an approval-system outage into implicit consent.
+</Callout>
+
+<include cwd>content/generated/related/resources-ai-approvals.mdx</include>

@@ -1,6 +1,6 @@
 import { defineFunction } from "@relkit/app";
-import orderNotFound from "../../errors/order-not-found.error.js";
-import { orderLookupInput, orderLookupOutput } from "../../shared/schemas.js";
+import orderNotFound from "@app/errors/order-not-found.error.js";
+import { orderLookupInput, orderLookupOutput } from "@app/shared/schemas.js";
 
 const getOrder = defineFunction({
   input: orderLookupInput,

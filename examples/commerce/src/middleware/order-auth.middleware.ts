@@ -1,5 +1,5 @@
 import { defineMiddleware } from "@relkit/app";
-import authorizeOrder from "../functions/authorize-order.function.js";
+import authorizeOrder from "@app/functions/authorize-order.function.js";
 
 const orderAuth = defineMiddleware("/orders/*", async (context, next) => {
   const result = await authorizeOrder.invoke({

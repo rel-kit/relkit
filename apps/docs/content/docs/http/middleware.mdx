@@ -1,0 +1,83 @@
+---
+title: HTTP middleware
+description: Apply path-scoped request policy, short-circuit safely, modify responses, and understand exact execution order.
+---
+
+HTTP middleware handles transport concerns that need the native request or response: authentication headers,
+cookies, CORS, request metadata, and early rejection. Domain behavior belongs in functions, while policy shared
+across service members may belong in service middleware.
+
+## Define path-scoped authorization
+
+<include cwd lang="ts" meta='title="examples/commerce/src/middleware/order-auth.middleware.ts"'>
+  ../../examples/commerce/src/middleware/order-auth.middleware.ts
+</include>
+
+This middleware applies to `/orders/*`, reads the authorization header, delegates the decision to a validated
+function, and returns `401` before the route target when access is denied. It does not duplicate order logic.
+
+## Choose a match scope
+
+Supported scopes include `*`, static segments, named `:param` segments, and a trailing wildcard. Prefer the
+narrowest pattern that expresses the policy. A global authentication middleware can accidentally protect
+health or callback endpoints; a route-specific pattern makes the boundary visible.
+
+Middleware is discovered from source independently from route modules. File location does not define its
+match scope—the declared pattern does.
+
+## Verify short-circuit and pass-through
+
+<Steps>
+  <Step>
+    ### Call without credentials
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:3000/orders/order-1"
+    ```
+
+    Expect HTTP `401` and the middleware's safe body. Request mapping, service middleware, and the function
+    should not run.
+
+  </Step>
+  <Step>
+    ### Call with accepted credentials
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:3000/orders/order-1" \
+      -H "authorization: Bearer example"
+    ```
+
+    Expect the route's normal response. Trace the request in the inspector to confirm the middleware and target
+    appear in order.
+
+  </Step>
+  <Step>
+    ### Check every matched route
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun test examples/commerce/tests/http.test.ts
+    ```
+
+    Add explicit tests for a protected static path, a dynamic path, and one path outside the scope.
+
+  </Step>
+</Steps>
+
+## Execution order
+
+The runtime performs framework request setup, rate limiting, matching HTTP middleware, request mapping and
+validation, service middleware, and finally function invocation. This determines what data is available: an
+HTTP middleware can read the raw body or headers, while a service middleware receives validated invocation
+input.
+
+`await next()` uses onion-style execution. Code before it runs on the way into the route; code after it can
+inspect or replace the response on the way out. Returning a native `Response` without calling `next()` is an
+intentional short circuit.
+
+<Callout type="warn" title="Document middleware-only responses">
+  A response returned only by middleware is not automatically added to a route's typed OpenAPI or
+  generated client error union. Add explicit contract documentation when callers must handle it.
+</Callout>
+
+<include cwd>content/generated/related/http-middleware.mdx</include>

@@ -122,7 +122,22 @@ export const env: EnvBuilderFactory = Object.freeze({
   secret: () => createBuilder("secret-string", (value) => value, true),
 });
 
-/** Creates an immutable environment declaration without reading runtime values. */
+/**
+ * Creates an immutable environment declaration without reading runtime values.
+ *
+ * @example
+ * ```ts
+ * import { defineEnv, env } from "@relkit/config"
+ *
+ * const applicationEnv = defineEnv({
+ *   API_URL: env.url(),
+ *   API_TOKEN: env.secret()
+ * })
+ * void applicationEnv
+ * ```
+ * @category Environment
+ * @since 0.1.0
+ */
 export function defineEnv<const S extends EnvShape>(
   shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
 ): EnvDefinition<S> {

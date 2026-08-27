@@ -1,41 +1,80 @@
 ---
-title: Request inference and mapping
-description: Understand the default transport projection and the explicit mapping escape hatch.
+title: Request inference and explicit mapping
+description: Learn where RELKIT reads path, query, body, header, cookie, and multipart values before validation.
 ---
 
-When `request` is omitted, RELKIT projects an object input schema as follows:
+A route maps transport data into reusable function input. The handler receives validated business data;
+it does not parse a framework request object.
 
-- Dynamic segment names map to matching object properties; unmatched path names remain available only
-  through `request.params`.
-- Remaining properties become query parameters for `GET`, `HEAD`, `DELETE`, and `OPTIONS`.
-- Remaining properties become a JSON body for `POST`, `PUT`, and `PATCH`.
+## Default inference
 
-The handler receives the mapped, validated business input separately from an immutable framework-neutral
-request view. `request.params` contains scalar or catch-all path values, `request.query` contains scalar
-or repeated query values, and `request.headers.getAll(name)` preserves repeated headers. Direct, job,
-event, tool, and agent calls receive no fabricated request. An input schema without a usable object
-projection still requires a complete explicit mapping.
+When `request` is omitted, RELKIT projects an object input schema by method:
 
-Headers, cookies, renamed fields, transforms, multipart bodies, and non-object inputs require a complete
-explicit mapping:
+<Tabs items={["Read methods", "Write methods"]}>
+  <Tab value="Read methods">
+    For `GET`, `HEAD`, `DELETE`, and `OPTIONS`, dynamic path names consume matching properties and remaining
+    properties become query parameters.
 
-```ts
-export const POST = defineRoute({
-  id: "orders.create.http",
-  target: createOrder,
-  request: http.input({
-    orderId: http.header("idempotency-key"),
-    customerEmail: http.header("x-customer-email"),
-    sku: http.body("sku"),
-    quantity: http.body("quantity"),
-  }),
-});
-```
+    ```sh title="Terminal"
+    curl "http://localhost:3000/hello?name=Ada"
+    ```
 
-Available sources are `http.path`, `pathSegments`, `query`, `header`, `cookie`, `body`, `wholeBody`,
-`multipart`, `multipartAll`, and `constant`. Compose nested objects with `http.input`/`http.nested`.
-Use `http.transform(descriptor, source)` for a serializable, compiler-known transform. An explicit
-mapping replaces inference entirely; it is never merged with inferred fields.
+  </Tab>
+  <Tab value="Write methods">
+    For `POST`, `PUT`, and `PATCH`, dynamic path names consume matching properties and remaining properties
+    come from a JSON body.
 
-Generated clients URL-encode each catch-all segment independently, so embedded `/` characters cannot
-silently change the route structure.
+    ```sh title="Terminal"
+    curl -X POST "http://localhost:3000/echo" \
+      -H "content-type: application/json" \
+      -d '{"message":"hello"}'
+    ```
+
+  </Tab>
+</Tabs>
+
+An input schema without a usable object projection requires a complete explicit mapping.
+
+## Map transport fields explicitly
+
+Headers, cookies, renamed fields, transforms, multipart bodies, and non-object input require `http.input`.
+The commerce route demonstrates an executable header/body mapping:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
+  ../../examples/commerce/src/routes/orders/route.ts
+</include>
+
+An explicit mapping replaces inference entirely; the two are never merged. Sources include `path`,
+`pathSegments`, `query`, `header`, `cookie`, `body`, `wholeBody`, `multipart`, `multipartAll`, and
+`constant`. Use `http.nested` for nested objects and `http.transform` only with a serializable,
+compiler-known transform descriptor.
+
+## Verify success and failure
+
+<Steps>
+  <Step>
+    ### Send all required sources
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/orders" \
+      -H "content-type: application/json" \
+      -H "idempotency-key: order-1" \
+      -H "x-customer-email: ada@example.com" \
+      -d '{"sku":"book","quantity":2}'
+    ```
+
+  </Step>
+  <Step>
+    ### Remove one required header
+
+    Repeat the request without `idempotency-key`. Expect `422`; mapping or validation fails before the
+    function handler runs.
+
+  </Step>
+</Steps>
+
+The optional request view preserves unmatched params, repeated query/header values, cookies, and native
+transport details for middleware. Direct, job, event, tool, and agent calls never receive a fabricated
+HTTP request.
+
+<include cwd>content/generated/related/http-requests.mdx</include>

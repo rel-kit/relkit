@@ -1,32 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { features } from "./feature-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
-const publicApis = [
-  ["packages/app/src/config.ts", "defineConfig"],
-  ["packages/schema/src/builder.ts", "z"],
-  ["packages/schema/src/standard-schema.ts", "validate"],
-  ["packages/functions/src/define-error.ts", "defineError"],
-  ["packages/functions/src/define-function.ts", "defineFunction"],
-  ["packages/services/src/define-service.ts", "defineService"],
-  ["packages/services/src/service-middleware.ts", "defineServiceMiddleware"],
-  ["packages/routes/src/define-route.ts", "defineRoute"],
-  ["packages/routes/src/define-middleware.ts", "defineMiddleware"],
-  ["packages/routes/src/http-dsl.ts", "http"],
-  ["packages/events/src/define-event.ts", "defineEvent"],
-  ["packages/events/src/on-event.ts", "onEvent"],
-  ["packages/events/src/selectors.ts", "events"],
-  ["packages/jobs/src/define-job.ts", "defineJob"],
-  ["packages/buckets/src/define-bucket.ts", "defineBucket"],
-  ["packages/cache/src/define-cache.ts", "defineCache"],
-  ["packages/tools/src/define-tool.ts", "defineTool"],
-  ["packages/agents/src/define-agent.ts", "defineAgent"],
-  ["packages/testing/src/invoke-function.ts", "invokeFunction"],
-  ["packages/testing/src/application.ts", "createTestApplication"],
-] as const;
+const publicApis = features.flatMap(({ entrypoints }) => entrypoints);
 
 const failures: string[] = [];
-for (const [path, name] of publicApis) {
+for (const { source: path, name } of publicApis) {
   const source = await readFile(resolve(root, path), "utf8");
   const match = new RegExp(
     `export\\s+(?:async\\s+)?(?:function|const|class)\\s+${escapeRegExp(name)}\\b`,

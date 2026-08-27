@@ -1,0 +1,80 @@
+---
+title: Object buckets
+description: Declare bounded object storage, authorize function access, test with an in-memory fake, and choose ownership safely.
+---
+
+A bucket descriptor is the application's logical object store. Functions use a provider-neutral client for
+bytes, metadata, listing, deletion, and signed access instead of importing an S3-compatible SDK. The provider
+binding can change between local tests, external storage, and managed infrastructure without changing domain
+code.
+
+## Define the storage boundary
+
+<include cwd lang="ts" meta='title="examples/commerce/src/buckets/assets.bucket.ts"'>
+  ../../examples/commerce/src/buckets/assets.bucket.ts
+</include>
+
+The stable `id` addresses durable storage and must survive source-file moves. `visibility` controls the default
+access model. `maxObjectBytes` and `allowedContentTypes` reject objects outside the application contract before
+provider-specific behavior can diverge.
+
+## Write from a function
+
+<include cwd lang="ts" meta='title="examples/commerce/src/functions/upload-assets.function.ts"'>
+  ../../examples/commerce/src/functions/upload-assets.function.ts
+</include>
+
+The function declares `assets` under `dependencies.buckets`, then receives a typed client at
+`context.buckets.assets`. It writes bytes and trusted metadata after the upload schema validates the files.
+
+## Implement and verify storage
+
+<Steps>
+  <Step>
+    ### Choose a stable object key
+
+    Use a domain identifier or generated opaque key. Do not let an untrusted filename decide which existing
+    object is overwritten. Store the display name as metadata when needed.
+
+  </Step>
+  <Step>
+    ### Declare access and write bytes
+
+    Add the bucket dependency to the function. Pass `context.signal` to operations that accept cancellation,
+    set content type deliberately, and keep each object below the descriptor ceiling.
+
+  </Step>
+  <Step>
+    ### Test with the deterministic fake
+
+    Invoke the function, inspect the fake bucket's keys and metadata, read bytes back, and assert rejection for
+    an oversized object or disallowed media type. No MinIO, R2, or AWS credentials are required.
+
+  </Step>
+  <Step>
+    ### Bind real storage only when needed
+
+    Add an S3-compatible adapter under `buckets` in `relkit.config.ts`, reference secret credentials through
+    the environment contract, and select `external()` or `managed()` ownership.
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run relkit deploy preview --stack development
+    ```
+
+  </Step>
+</Steps>
+
+## Private delivery and signed URLs
+
+Keep user content private by default. Authorize the request in a function, then return a short-lived signed URL
+when a client needs direct access. A signed URL is a bearer credential until expiry; redact it from logs and do
+not set a lifetime longer than the user action requires.
+
+## Ownership and deletion
+
+Use `external()` when the bucket already exists or its data must outlive the RELKIT stack. Use `managed()`
+only when previewed deployment should own creation, permissions, and eventual destruction. Before destroying a
+managed stack, confirm retention and backup policy—removing infrastructure may remove objects permanently.
+
+<include cwd>content/generated/related/resources-ai-buckets.mdx</include>

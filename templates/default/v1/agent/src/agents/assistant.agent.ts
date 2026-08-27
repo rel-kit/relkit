@@ -1,6 +1,6 @@
 import { defineAgent } from "@relkit/app";
 import { z } from "@relkit/schema";
-import { lookup } from "../functions/hello.function.js";
+import { lookup } from "@app/functions/hello.function.js";
 
 export default defineAgent({
   id: "assistant",

@@ -1,52 +1,85 @@
 ---
 title: Functions
-description: Define the validated executable unit shared by every transport and background trigger.
+description: Define validated domain behavior, invoke it through the common engine, compose nested calls, and test without HTTP.
 ---
 
-Every route, job, event listener, service member, tool, and agent ultimately
-invokes a function through the common engine.
+A RELKIT function is the reusable unit of application behavior. It owns input, output, declared errors,
+managed dependencies, and a handler. Routes, jobs, events, tools, and agents target the descriptor rather
+than copying the handler, so every transport uses the same validation and invocation semantics.
+
+## Read an executable function
 
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/functions/orders/create-order.function.ts"'
+  meta='title="templates/default/v1/api/src/functions/orders/create-order.function.ts"'
 >
-  ../../examples/commerce/src/functions/orders/create-order.function.ts
+  ../../templates/default/v1/api/src/functions/orders/create-order.function.ts
 </include>
 
-`input` and `output` remain required because TypeScript types disappear at runtime. Their Standard
-Schemas perform validation and provide graph metadata, OpenAPI shapes, generated client types, and
-inspector forms. A target handler receives validated reusable input and a context containing only its
-declared managed dependencies. HTTP request objects never enter a function.
+The handler receives already validated input. Its returned value is validated against `output`. Publishing
+the event is authorized by `dependencies`; importing the event descriptor alone does not grant a runtime
+client.
 
-IDs are optional for source-scoped functions, routes, services, tools, agents, errors, middleware, and
-transforms. The compiler derives filesystem-safe IDs from source and export/member structure. Keep
-explicit IDs when a refactor must preserve identity; application, event, job, bucket, and cache IDs
-remain explicit because they address durable or external state.
+## Invoke another function
 
-Use `await target.invoke(input)` for nested function calls. It enters the active generation when one is
-running and otherwise uses an isolated common kernel, preserving validation, service policy, limits,
-trace, correlation, causation, deadline, cancellation, and observed child-call telemetry. Function
-calls do not need a declared function dependency map; managed resources still do.
+The example calls `priceOrder.invoke(...)`, not `priceOrder.handler(...)`. `invoke` enters the common engine
+and preserves validation, trace/causation relationships, deadlines, cancellation, service policy, and child
+call telemetry.
 
-For HTTP, the route maps transport data into validated function input after matching middleware has
-completed. Direct, HTTP, job, event, tool, and agent calls therefore use the same handler signature.
+Calling a handler directly bypasses those guarantees and is unsupported. A nested function call does not
+need a managed dependency declaration because the target is an in-process descriptor; resources used by
+either function still require their own declarations.
 
-Use `onBefore(input, context)` to transform validated input and `onAfter(output, context)` to transform
-a successful result. Each returned value is validated against the function schema; `onAfter` does not
-run after a failure.
+## Build one complete operation
 
-Services group member functions and shared policy without owning another handler:
+<Steps>
+  <Step>
+    ### Define the contract first
 
-```ts
-const Orders = defineService({
-  functions: { getOrder, createOrder },
-  middleware: [ordersContext],
-});
+    Create the input and output schemas close to the function or in a shared domain schema module when more
+    than one descriptor owns the contract.
 
-export const GET = defineRoute({ target: Orders.getOrder });
-```
+  </Step>
+  <Step>
+    ### Add declared errors and dependencies
 
-Use `getOrder.asTool({ description, sideEffect, approval })` for a function-derived tool. The tool
-inherits the function schemas and errors, and `tool.invoke(input)` applies the same validation and
-approval boundary.
+    List only expected domain failures and only the managed clients the handler uses. This produces explicit
+    graph edges and a narrow context type.
+
+  </Step>
+  <Step>
+    ### Implement the handler
+
+    Keep transport parsing out of the function. Accept domain values, use context clients, honor cancellation,
+    and return the declared output. Let unexpected defects propagate to RELKIT's safe boundary.
+
+  </Step>
+  <Step>
+    ### Invoke it in a unit test
+
+    <include cwd lang="ts" meta='title="templates/default/v1/api/tests/unit/orders.function.test.ts"'>
+      ../../templates/default/v1/api/tests/unit/orders.function.test.ts
+    </include>
+
+    ```sh title="Terminal — relkit-orders"
+    bun test tests/unit/orders.function.test.ts
+    ```
+
+    Verify the returned value and the fake provider side effect. No HTTP server or cloud credentials are
+    required.
+
+  </Step>
+</Steps>
+
+## Hooks and transport policy
+
+`onBefore` transforms validated input before the handler. `onAfter` transforms successful output before
+final output validation. Use them for function policy that must apply to every invocation transport. They do
+not run as error recovery, and `onAfter` does not run after failure.
+
+Use HTTP middleware for cookies, headers, request-native authorization, or an early `Response`. Use service
+middleware for policy shared by a group of functions. Keeping those boundaries explicit makes direct and
+asynchronous invocation predictable.
+
+<include cwd>content/generated/related/fundamentals-functions.mdx</include>

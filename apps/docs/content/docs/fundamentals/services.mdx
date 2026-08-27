@@ -1,0 +1,86 @@
+---
+title: Services
+description: Group a domain's functions, apply ordered service middleware, expose scoped context, and target members from routes.
+---
+
+A service gives a related set of function descriptors one domain boundary. It does not create a new handler,
+dependency container, network server, or singleton. Each member keeps normal function invocation semantics
+while routes and callers gain a readable namespace such as `orders.getOrder`.
+
+## Group the orders domain
+
+<include cwd lang="ts" meta='title="examples/commerce/src/services/orders.service.ts"'>
+  ../../examples/commerce/src/services/orders.service.ts
+</include>
+
+The service exports five independently testable functions and one ordered service middleware. A route can
+target a member directly; graph and inspector views retain both the member identity and owning service.
+
+## Add service-scoped context
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/services/orders-context.service-middleware.ts"'
+>
+  ../../examples/commerce/src/services/orders-context.service-middleware.ts
+</include>
+
+Service middleware runs after HTTP request mapping and before the member function. Calling `next(patch)` adds
+an immutable value under `context.service` for the current invocation only. Use it for tenant identity,
+authenticated domain principals, feature policy, or other values shared across service members.
+
+Do not use service context as mutable shared storage. Each invocation receives its own frozen value, and a
+direct function outside the service does not automatically receive it.
+
+## Apply a service to a route
+
+<Steps>
+  <Step>
+    ### Define member functions normally
+
+    Give every function its own schemas, errors, dependencies, and tests. A service should not become a file
+    containing unrelated handlers.
+
+  </Step>
+  <Step>
+    ### Create the service descriptor
+
+    Add a stable property name for each member and order middleware from broad policy to narrow policy. A
+    member must not appear under conflicting service ownership.
+
+  </Step>
+  <Step>
+    ### Target a member
+
+    The commerce routes import `orders` and select `orders.createOrder`, `orders.getOrder`, or another member.
+    Request and response mapping remain route responsibilities.
+
+  </Step>
+  <Step>
+    ### Verify policy in two invocation modes
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun test examples/commerce/tests/http.test.ts
+    ```
+
+    Exercise one HTTP route and one direct member invocation. Assert service context only where the service
+    boundary is active, and confirm middleware order through observable domain behavior rather than timing.
+
+  </Step>
+</Steps>
+
+## When not to create a service
+
+Do not add a service for a single function merely to shorten an import. Do not group functions only because
+they share a provider; dependency declarations already express that. Create a service when the domain name,
+shared invocation policy, or member navigation is useful to developers and remains coherent as the
+application grows.
+
+<Callout title="Services do not replace nested invocation">
+  A member may still call another function through `.invoke()`. The service groups ownership and
+  middleware; it does not add an alternate execution engine.
+</Callout>
+
+<include cwd>content/generated/related/fundamentals-services.mdx</include>

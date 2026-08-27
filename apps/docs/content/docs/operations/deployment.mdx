@@ -1,6 +1,16 @@
 ---
 title: Deployment and AWS
-description: Build from the checked graph, preview Pulumi changes, and preserve stable resource identity.
+description: Preview and apply the checked graph through Pulumi, verify outputs, and clean up isolated resources safely.
 ---
 
+Deployment is an optional continuation after the local production build succeeds. It uses the checked graph
+as input to one generated Pulumi program; application code does not contain infrastructure callbacks.
+
+<Callout type="error" title="Authorization and cost required">
+  The commands in this guide can create billable AWS resources. Use an isolated account/stack,
+  confirm the target, review every preview, and proceed only when authorized to incur cost.
+</Callout>
+
 <include cwd>../../docs/deployment.md</include>
+
+<include cwd>content/generated/related/operations-deployment.mdx</include>

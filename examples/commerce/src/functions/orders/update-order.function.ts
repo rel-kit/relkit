@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app";
-import { orderLookupOutput, orderMutationInput } from "../../shared/schemas.js";
+import { orderLookupOutput, orderMutationInput } from "@app/shared/schemas.js";
 
 const updateOrder = defineFunction({
   input: orderMutationInput,

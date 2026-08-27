@@ -1,35 +1,83 @@
 ---
 title: Local development
-description: Run the app, inspector, OpenAPI, and Scalar together with reliable reload behavior.
+description: Use one development command for reloads, diagnostics, OpenAPI, Scalar, and the inspector.
 ---
 
-```sh
-bun run dev
-```
+`bun run dev` runs the complete local feedback loop. It watches application source, checks a candidate
+generation, starts it, verifies readiness, and only then makes it active.
 
-One command starts the application, inspector, raw OpenAPI document, and Scalar API reference. The
-default URLs are:
+## Development endpoints
 
-- App: `http://localhost:3000`
-- Inspector: `http://localhost:3210`
-- OpenAPI: `http://localhost:3000/_relkit/v1/openapi.json`
-- Scalar: `http://localhost:3000/_relkit/v1/api-reference`
+| Surface          | Default URL                                      | Use it for                                     |
+| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
+| Application      | `http://localhost:3000`                          | Calling authored routes                        |
+| Inspector        | `http://localhost:3210`                          | Graph, diagnostics, logs, requests, and traces |
+| OpenAPI JSON     | `http://localhost:3000/_relkit/v1/openapi.json`  | Tooling and client generation                  |
+| Scalar reference | `http://localhost:3000/_relkit/v1/api-reference` | Interactive HTTP documentation                 |
+| Readiness        | `http://localhost:3000/_relkit/v1/health/ready`  | Confirming the active generation can serve     |
 
-On a valid → invalid → valid edit, the last known good generation remains active until the new
-generation compiles and passes readiness. `Ctrl-C` shuts down every child process. A port conflict
-reports the occupied port, the owning process when discoverable, and the applicable override.
+## Follow a source change
+
+<Steps>
+  <Step>
+    ### Keep the supervisor running
+
+    ```sh title="Terminal — relkit-orders"
+    bun run dev
+    ```
+
+    Wait for both URLs before editing.
+
+  </Step>
+  <Step>
+    ### Make an invalid edit safely
+
+    Temporarily misspell `defineRoute` in `src/routes/status/route.ts` and save. The candidate fails with a
+    source-located diagnostic, while the last valid `/status` generation remains active.
+
+  </Step>
+  <Step>
+    ### Repair and verify activation
+
+    Restore `defineRoute`, save, and call:
+
+    ```sh title="Terminal — relkit-orders"
+    curl "http://localhost:3000/status"
+    curl "http://localhost:3000/_relkit/v1/health/ready"
+    ```
+
+    The status route returns `{ "message": "Hello, world!" }`; readiness succeeds for the new generation.
+
+  </Step>
+</Steps>
+
+## Configure ports and body limits
+
+The generated configuration is executable source and contains both settings:
+
+<include cwd lang="ts" meta='title="relkit.config.ts"'>
+  ../../templates/default/v1/api/relkit.config.ts
+</include>
 
 Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Inspector precedence is
 `--inspector-port`, `RELKIT_INSPECTOR_PORT`, `inspector.port`, then `3210`.
 
-```ts title="relkit.config.ts"
-import { defineConfig } from "@relkit/app/config";
+<Accordions type="multiple">
+  <Accordion title="The backend port is already in use">
+    Run `bun run relkit doctor --no-pulumi --port 3000 --inspector-port 3210`. Stop the reported
+    process or choose a different port.
+  </Accordion>
+  <Accordion title="A save does not activate">
+    Read the first candidate diagnostic and run `bun run check`. A schema, graph,
+    provider-readiness, or evaluation error prevents activation by design.
+  </Accordion>
+  <Accordion title="Stopping development">
+    Press `Ctrl-C` once in the supervisor terminal. RELKIT forwards shutdown to both child
+    processes.
+  </Accordion>
+</Accordions>
 
-export default defineConfig({
-  server: { port: 3000, maxBodyBytes: 1_048_576 },
-  inspector: { port: 3210 },
-});
-```
+Installed projects use the inspector bundled with `@relkit/cli`. `RELKIT_INSPECTOR_ROOT` is only for
+framework contributors selecting another compatible inspector checkout.
 
-Installed projects use the inspector bundled with the CLI. `RELKIT_INSPECTOR_ROOT` exists only for
-framework contributors testing a compatible inspector checkout.
+<include cwd>content/generated/related/start-local-development.mdx</include>

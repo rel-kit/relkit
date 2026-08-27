@@ -1,4 +1,4 @@
 {
   "title": "Resources and AI",
-  "pages": ["buckets-cache", "tools-agents"]
+  "pages": ["buckets", "cache", "tools", "approvals", "agents"]
 }

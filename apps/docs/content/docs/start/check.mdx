@@ -1,0 +1,89 @@
+---
+title: Check an application
+description: Compile descriptors into a validated graph, read diagnostics, and know what a successful check proves.
+---
+
+`relkit check` is the fastest complete validation of authored RELKIT source. Run it after changing a
+descriptor, route, provider binding, environment declaration, or configuration file. It evaluates source
+without starting the HTTP server, validates the whole application graph, and refreshes derived contracts.
+
+## What check validates
+
+The check is broader than TypeScript. TypeScript can prove that a route receives a function descriptor;
+RELKIT additionally proves that the route has a valid filesystem path, every referenced resource exists,
+provider profiles resolve, durable identifiers are unique, HTTP mappings are complete, and production-only
+requirements are satisfied for the selected mode.
+
+<Files>
+  <Folder name=".relkit" defaultOpen>
+    <Folder name="generated" defaultOpen>
+      <File name="application.graph.json" />
+      <File name="runtime.manifest.ts" />
+      <File name="openapi.json" />
+      <File name="contract.ts" />
+      <File name="client.ts" />
+      <File name="diagnostics.json" />
+    </Folder>
+  </Folder>
+</Files>
+
+These files are outputs, not an editing surface. Fix source and rerun the command when an output is wrong.
+
+## Run and interpret the check
+
+<Steps>
+  <Step>
+    ### Run the project command
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    ```
+
+    A successful command exits `0`, reports the graph hash, and writes the generated directory. Warnings
+    describe accepted but operationally important behavior; errors mean the application cannot activate.
+
+  </Step>
+  <Step>
+    ### Ask for machine-readable diagnostics
+
+    ```sh title="Terminal — relkit-orders"
+    bun run relkit check --json > /tmp/relkit-check.json
+    ```
+
+    Use JSON in CI or editor integrations. Check the `ok` field before reading outputs, then report each
+    diagnostic's code, source file, line, severity, and message. Do not parse terminal formatting.
+
+  </Step>
+  <Step>
+    ### Confirm a source change reached the graph
+
+    ```sh title="Terminal — relkit-orders"
+    bun run relkit graph print
+    ```
+
+    `print` lists active nodes, edges, resolved source locations, targets, dependencies, and policies. Search
+    the output for the route ID emitted by `check`.
+
+  </Step>
+</Steps>
+
+## Repair a failed check
+
+| Diagnostic shape             | What it usually means                                                   | Repair                                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Missing target or dependency | An import exists but the referenced descriptor is not part of the graph | Export the descriptor from discovered source and declare managed clients under `dependencies`      |
+| Duplicate stable ID          | Two durable or explicitly identified descriptors claim one identity     | Give each domain resource a unique stable ID; do not add random suffixes to existing durable state |
+| Invalid request mapping      | A required function input cannot be built from the HTTP request         | Map every required field or add an intentional schema default                                      |
+| Missing provider profile     | A descriptor requests a profile absent from `relkit.config.ts`          | Add the binding or select an existing profile/default                                              |
+| Production policy failure    | A local-only behavior would be unsafe across replicas or restarts       | Configure a shared provider, durable store, or protected production endpoint                       |
+
+Fix the first root diagnostic and rerun `bun run check`; later diagnostics often disappear with it. A
+successful check proves graph consistency, not business correctness, so follow it with the focused test
+that exercises the behavior you changed.
+
+<Callout type="warn" title="Generated output is replaceable">
+  Never place application state or hand-authored code in `.relkit/generated`. A later check can
+  replace the directory completely.
+</Callout>
+
+<include cwd>content/generated/related/start-check.mdx</include>

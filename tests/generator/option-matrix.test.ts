@@ -2,7 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import {
   CREATE_TEMPLATES,
   formatGenerateResult,
@@ -71,6 +71,11 @@ test("covers every template and examples/install/Git combination", async () => {
             dependencies: Record<string, string>;
             devDependencies: Record<string, string>;
           };
+          const tsconfig = JSON.parse(
+            await readFile(join(result.destination, "tsconfig.json"), "utf8"),
+          ) as {
+            compilerOptions: { baseUrl?: string; paths?: Record<string, string[]> };
+          };
 
           expect(result.template).toBe(template);
           expect(result.installed).toBe(install);
@@ -86,6 +91,10 @@ test("covers every template and examples/install/Git combination", async () => {
             "@relkit/cli": "0.0.0",
             "@relkit/testing": "0.0.0",
             typescript: "5.9.2",
+          });
+          expect(tsconfig.compilerOptions).toMatchObject({
+            baseUrl: ".",
+            paths: { "@app/*": ["src/*"] },
           });
           expect(result.files.some((path) => path.startsWith("src/functions/"))).toBe(examples);
           expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
@@ -356,12 +365,20 @@ async function projectFiles(root: string, current = root): Promise<string[]> {
 
 async function scanGeneratedProject(root: string): Promise<string[]> {
   const violations: string[] = [];
+  const sourceRoot = join(root, "src");
   for (const path of await projectFiles(root)) {
     if (forbiddenScope.test(path)) violations.push(`${path}:out-of-scope`);
     if (!/\.(?:ts|tsx|js|json|md|toml|yaml|yml)$/.test(path)) continue;
     const text = await readFile(join(root, path), "utf8");
     if (forbiddenImport.test(text)) violations.push(`${path}:forbidden-import`);
     if (forbiddenScope.test(text)) violations.push(`${path}:out-of-scope`);
+    for (const match of text.matchAll(/(?:from\s+|import\s*\()\s*["'](\.\.?\/[^"']+)["']/g)) {
+      const target = resolve(dirname(join(root, path)), match[1]!);
+      const sourcePath = relative(sourceRoot, target);
+      if (!sourcePath.startsWith("..") && !isAbsolute(sourcePath)) {
+        violations.push(`${path}:relative-app-import`);
+      }
+    }
   }
   return violations.sort();
 }

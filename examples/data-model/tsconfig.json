@@ -1,5 +1,9 @@
 {
   "extends": "../commerce/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@app/*": ["src/*"] }
+  },
   "files": [".relkit/generated/context-registry.d.ts"],
   "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"]
 }

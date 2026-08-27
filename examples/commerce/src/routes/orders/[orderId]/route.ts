@@ -1,7 +1,7 @@
 import { defineRoute, http } from "@relkit/app";
-import orders from "../../../services/orders.service.js";
-import orderNotFound from "../../../errors/order-not-found.error.js";
-import normalizeOrderId from "../../../transforms/orders/normalize-id.transform.js";
+import orders from "@app/services/orders.service.js";
+import orderNotFound from "@app/errors/order-not-found.error.js";
+import normalizeOrderId from "@app/transforms/orders/normalize-id.transform.js";
 
 export const GET = defineRoute({
   target: orders.getOrder,

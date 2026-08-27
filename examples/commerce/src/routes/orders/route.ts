@@ -1,6 +1,6 @@
 import { defineRoute, http } from "@relkit/app";
-import orders from "../../services/orders.service.js";
-import prices from "../../cache/prices.cache.js";
+import orders from "@app/services/orders.service.js";
+import prices from "@app/cache/prices.cache.js";
 
 export const GET = defineRoute({
   target: orders.searchOrders,

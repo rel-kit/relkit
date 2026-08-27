@@ -1,0 +1,86 @@
+---
+title: Start and verify production
+description: Run the built server exactly as it will run after release, verify readiness and contracts, and diagnose startup refusal.
+---
+
+The production command runs `.relkit/build`; it does not compile source on demand or watch files. Use this
+locally after `build` to catch missing environment values, occupied ports, stale artifacts, and startup
+policy failures before a release system encounters them.
+
+## Start the built application
+
+<Steps>
+  <Step>
+    ### Build the current source
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run build
+    ```
+
+    Keep the graph hash printed by the build when diagnosing a later mismatch.
+
+  </Step>
+  <Step>
+    ### Start without the development watcher
+
+    ```sh title="Terminal — relkit-orders"
+    bun run start
+    ```
+
+    The command resolves the environment contract, validates the artifact and graph hash, activates provider
+    bindings, and listens on the configured production port. Keep this terminal open.
+
+  </Step>
+  <Step>
+    ### Verify readiness before traffic
+
+    ```sh title="Second terminal — relkit-orders"
+    curl -i "http://localhost:3000/_relkit/v1/health/ready"
+    curl -i "http://localhost:3000/hello?name=production"
+    ```
+
+    Readiness must return a successful status before the application route is considered deployable. The
+    hello request should return `{ "message": "Hello, production!" }`.
+
+  </Step>
+  <Step>
+    ### Verify the published contract policy
+
+    ```sh title="Second terminal — relkit-orders"
+    curl -i "http://localhost:3000/_relkit/v1/openapi.json"
+    ```
+
+    The API template disables production API documentation unless you explicitly enable and protect it. A
+    denied or missing endpoint can therefore be correct. If enabled, verify authorization as well as content.
+
+  </Step>
+</Steps>
+
+## Readiness, liveness, and application routes
+
+Readiness answers whether this instance may receive traffic after configuration and provider activation.
+Liveness answers whether the process is still running. An application route proves the complete request
+path, including middleware and function invocation. Use all three at the appropriate layer; a process can be
+alive while a required provider prevents it from being ready.
+
+## Why startup refuses
+
+| Symptom                         | Meaning                                                               | Action                                                               |
+| ------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Graph or manifest hash mismatch | Build files came from different source generations                    | Run `check` and `build`; deploy the directory as one unit            |
+| Missing environment key         | A key is required in the active environment and has no default        | Supply it through the process or secret manager; do not hard-code it |
+| Port already in use             | Another process owns the configured server or inspector port          | Stop the process or intentionally override the port                  |
+| Provider activation failure     | Credentials, endpoint, permissions, or remote availability is invalid | Test the named binding and fix the first provider diagnostic         |
+| Production policy diagnostic    | Configuration relies on development-only behavior                     | Bind the required shared/durable provider or protect the endpoint    |
+
+Stop the process with `Ctrl-C` and confirm it exits cleanly. A deployment platform should send its normal
+termination signal and allow the configured grace period so active requests and provider clients can close.
+
+<Callout type="info" title="Starting is not deploying">
+  `bun run start` changes no cloud resources. Use it to validate the production artifact locally.
+  Provisioning and destructive teardown belong to the deployment guide and require explicit
+  credentials.
+</Callout>
+
+<include cwd>content/generated/related/start-production.mdx</include>

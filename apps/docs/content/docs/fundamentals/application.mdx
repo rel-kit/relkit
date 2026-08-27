@@ -1,66 +1,93 @@
 ---
-title: Application, providers, and configuration
-description: Define one provider topology and supply environment values from each pipeline.
+title: Application configuration
+description: Define one application boundary, understand each configuration section, and verify topology changes before runtime.
 ---
 
-`relkit.config.ts` exports one `defineConfig` descriptor. It contains application and runtime settings
-plus top-level provider profiles. Database and authentication register through discovered descriptors,
-not configuration.
+`relkit.config.ts` is the root of one RELKIT application. It connects authored descriptors to environment
+contracts, provider profiles, server policy, telemetry, the inspector, and deployment. Business handlers do
+not import this file; the compiler and runtime load it as the application boundary.
 
-```ts
-import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app";
+## Read the generated configuration
 
-const values = defineEnv({
-  BUCKET_ENDPOINT: env.url(),
-  BUCKET_NAME: env.string(),
-  BUCKET_REGION: env.string(),
-  BUCKET_ACCESS_KEY_ID: env.secret().optional(),
-  BUCKET_SECRET_ACCESS_KEY: env.secret().optional(),
-  CACHE_URL: env.secret(),
-});
+<include cwd lang="ts" meta='title="templates/default/v1/api/relkit.config.ts"'>
+  ../../templates/default/v1/api/relkit.config.ts
+</include>
 
-export default defineConfig({
-  env: values,
-  buckets: {
-    assets: external(
-      s3({
-        endpoint: values.BUCKET_ENDPOINT,
-        bucketName: values.BUCKET_NAME,
-        region: values.BUCKET_REGION,
-        credentials: {
-          accessKeyId: values.BUCKET_ACCESS_KEY_ID,
-          secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
-        },
-      }),
-    ),
-  },
-  caches: { primary: external(redis({ url: values.CACHE_URL })) },
-  defaults: { bucket: "assets", cache: "primary" },
-  server: { port: 3000 },
-  inspector: { port: 3210 },
-});
-```
+The generated API template contains deliberately small defaults:
 
-`s3()` speaks the S3 protocol and works with AWS S3, Cloudflare R2, MinIO, and compatible
-endpoints. `redis()` accepts `redis://` and `rediss://` URLs for Redis, Valkey, ElastiCache, and
-Upstash's Redis protocol. `external(adapter)` connects without provisioning. `managed(adapter)`
-allows the selected deployment target to provision and bind the resource.
+- `env` selects the only environment contract used by the application.
+- Resource maps such as `events` name provider profiles that descriptors may request.
+- `telemetry` controls capture policy, not arbitrary logging inside handlers.
+- `server` and `inspector` own separate listeners and limits.
+- `deployment` declares the intended target and adapter; it does not deploy during evaluation.
 
-Keep provider credentials as secret environment references. Literal secrets are rejected and values
-never enter the graph, manifest, plan, inspector, or logs. `PORT` and `RELKIT_ENV` are framework-reserved;
-pipelines select values without adding environment branches to application source. `requiredIn()`
-remains available when a key is required only in selected runtime modes.
+## Choose an application identity
 
-When only one profile exists its default is inferred. Multiple profiles need a singular default such
-as `defaults.bucket` before unqualified use. If omitted, `id` comes from `package.json.name`.
+An explicit application `id` is the stable identity used in graph and deployment state. Add one before the
+application owns durable cloud resources or multiple stacks. Changing it later can make deployment treat the
+application as a different owner.
 
-Hosting is configured alongside the runtime settings:
+For a generated local exercise, an inferred identity is enough. For a real orders service, use a domain name
+such as `orders-api`, not a developer name, branch name, or environment name. Environment isolation belongs
+to deployment stacks, so staging and production can share the application identity without sharing state.
 
-```ts title="relkit.config.ts"
-export default defineConfig({
-  deployment: { target: "aws", adapter: "pulumi" },
-});
-```
+## Apply a configuration change
 
-Tests replace required bindings with deterministic in-memory fakes by default. Explicit integration
-tests can opt into configured protocol adapters.
+<Steps>
+  <Step>
+    ### Change one runtime limit
+
+    Edit `relkit.config.ts` and set `server.maxBodyBytes` to the largest request the application should accept.
+    This is the global ceiling; an upload route may set a lower route-specific ceiling.
+
+  </Step>
+  <Step>
+    ### Validate without starting the server
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run relkit graph print
+    ```
+
+    Expect a successful check and one application node. Configuration is evaluated as data; opening a
+    network connection, reading a database, or creating cloud resources during module import is a defect.
+
+  </Step>
+  <Step>
+    ### Restart the affected runtime
+
+    Development reloads descriptor changes, but listener settings such as ports may require a process restart.
+    Stop `bun run dev`, start it again, and verify the configured endpoint.
+
+  </Step>
+</Steps>
+
+## Configuration boundaries
+
+Use source-controlled configuration for stable policy and topology. Use the environment contract for values
+that vary by machine, stack, or secret store. Put domain behavior in functions. This separation keeps graph
+generation deterministic and prevents credentials from entering generated artifacts.
+
+<Callout type="warn" title="Configuration is evaluated during checks">
+  Keep `relkit.config.ts` deterministic and side-effect free. Provider constructors describe
+  bindings; actual clients are created only when the runtime activates the checked graph.
+</Callout>
+
+## Diagnose common mistakes
+
+<Accordions>
+  <Accordion title="A descriptor cannot find its provider profile">
+    Confirm the resource map uses the plural configuration key, the descriptor's `profile` matches
+    the map key, and `defaults` selects a profile when more than one binding exists.
+  </Accordion>
+  <Accordion title="A secret appears in generated output">
+    Replace the literal with an `env.secret()` declaration and pass that reference into the adapter.
+    Rotate the exposed value before continuing.
+  </Accordion>
+  <Accordion title="Local configuration fails a production build">
+    Read the production diagnostic. Process-local queues, caches, rate limits, or unprotected
+    internal endpoints may be acceptable in development but invalid across replicas and restarts.
+  </Accordion>
+</Accordions>
+
+<include cwd>content/generated/related/fundamentals-application.mdx</include>

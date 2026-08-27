@@ -1,203 +1,179 @@
 # Getting started
 
-RelKit projects are TypeScript applications managed by Bun. The generated
-project is the supported starting point; its `relkit` commands compile the
-application graph, run the local supervisor, and build deployment artifacts.
+RELKIT projects are TypeScript applications managed by Bun. This walkthrough
+creates a credential-free orders API, changes it, tests it, and produces a
+production build. Pulumi and AWS are optional and are not required here.
 
-## Prerequisites
+## 1. Verify the prerequisite
 
-- Bun `1.3.10`.
-- A working TypeScript toolchain from the generated project.
-- Pulumi CLI and AWS credentials for the default AWS/Pulumi project. Use the
-  explicit `--cloud none --deploy none` options for local-only development.
-
-Check the local toolchain from a generated project with:
+RELKIT pins Bun `1.3.10`:
 
 ```sh
-relkit doctor
+bun --version
 ```
 
-The doctor command reports missing tools and configuration without printing
-secret values. Use `relkit --json doctor` when a script needs structured output.
+Install or switch Bun before continuing unless the output is `1.3.10`.
 
-## Create a project
+## 2. Create the application
 
-The release-supported generator command is:
+Run the supported generator from the directory that should contain the project:
 
 ```sh
-bunx create-relkit@latest my-app
-cd my-app
+bunx create-relkit@latest relkit-orders \
+  --template api \
+  --cloud none \
+  --deploy none
+cd relkit-orders
+cp .env.example .env
 ```
 
-When testing changes from a RelKit checkout, use its local launcher. It quietly
-syncs and links framework packages without publishing them, and a running local
-development session restarts after successful framework changes:
+The explicit local-only flags avoid Pulumi, AWS credentials, and cloud cost.
+The generator validates the destination, installs dependencies, and performs
+its initial checks without leaving a partial project after failure.
+
+Available templates are `minimal`, `api`, and `agent`. Use `--no-install`,
+`--no-git`, or `--no-examples` only when surrounding automation owns that step.
+See `bunx create-relkit@latest --help` for the current generated reference.
+
+Framework contributors can test the current checkout without publishing:
 
 ```sh
-bun run relkit:local -- create my-app --cloud none --deploy none
+bun run relkit:local -- create relkit-orders \
+  --template api \
+  --cloud none \
+  --deploy none
 ```
 
-The equivalent CLI form is `relkit create my-app`. The generator supports three
-templates:
+## 3. Inspect and check the project
 
-| Option                    | Values                            | Default         |
-| ------------------------- | --------------------------------- | --------------- |
-| `--template`              | `minimal`, `api`, `agent`         | `minimal`       |
-| `--cloud`                 | `aws`, `none`                     | `aws`           |
-| `--deploy`                | `pulumi`, `none`                  | `pulumi`        |
-| `--install`               | install dependencies              | enabled         |
-| `--no-install`            | skip dependency installation      | —               |
-| `--git`                   | initialize Git                    | enabled         |
-| `--no-git`                | skip Git initialization           | —               |
-| `--examples`              | include examples                  | enabled         |
-| `--no-examples`           | omit examples                     | —               |
-| `--directory`             | destination path                  | positional path |
-| `--force-empty-directory` | allow an existing empty directory | disabled        |
-| `--json`                  | print structured output           | disabled        |
+The important generated files are:
 
-The default command creates the AWS/Pulumi project and runs its install,
-doctor, and check steps. For a project that does not need cloud prerequisites,
-opt out explicitly:
-
-```sh
-bunx create-relkit@latest my-app --cloud none --deploy none
+```text
+relkit-orders/
+├── .env.example
+├── .env                  # ignored local runtime copy
+├── relkit.config.ts
+├── src/
+│   ├── env.ts
+│   ├── events/
+│   ├── functions/
+│   ├── routes/
+│   └── services/
+├── tests/
+│   ├── integration/
+│   └── unit/
+├── package.json
+└── tsconfig.json
 ```
 
-For example, an API project is:
+`tsconfig.json` maps `@app/*` to `src/*`. Use imports such as
+`@app/functions/hello.function.js` for application source; the `.js` extension
+is required by the emitted ESM even though the source file is TypeScript.
+
+Run diagnostics before starting development:
 
 ```sh
-bunx create-relkit@latest my-api --template api
+bun run relkit doctor --no-pulumi
+bun run check
 ```
 
-Generation validates the destination before writing. A failed generation does
-not leave a partial project.
+The API template declares an event provider, so `.env.example` supplies a
+non-secret local endpoint, bus name, region, and log level. `--no-pulumi`
+skips Pulumi and AWS credential checks for this local-only journey. `doctor`
+still verifies Bun, configuration, and ports. `check` discovers descriptors,
+validates the application graph, and writes graph, manifest, OpenAPI, client,
+event registry, and diagnostics output under `.relkit/generated`.
 
-## Run the first route
-
-Install dependencies if generation was run with `--no-install`, then start the
-development supervisor:
+## 4. Run the generated application
 
 ```sh
-bun install
 bun run dev
 ```
 
-The minimal project exposes:
+The backend starts on `http://localhost:3000` and the inspector starts on
+`http://localhost:3210`. In another terminal:
 
 ```sh
-curl "http://localhost:3000/hello?name=RelKit"
+curl "http://localhost:3000/hello?name=RELKIT"
 ```
 
-The response is:
+Expected response:
 
 ```json
-{ "message": "Hello, RelKit!" }
+{ "message": "Hello, RELKIT!" }
 ```
 
-The generated configuration starts the real Next.js inspector on port `3210`.
-The portable development check is the versioned graph API on the active backend
-port:
+The same process serves OpenAPI at
+`http://localhost:3000/_relkit/v1/openapi.json` and Scalar at
+`http://localhost:3000/_relkit/v1/api-reference`.
+
+## 5. Apply a source change
+
+Reuse the checked hello function through a second filesystem route:
 
 ```sh
-curl "http://localhost:3000/_relkit/v1/graph"
+mkdir -p src/routes/status
+cp src/routes/hello/route.ts src/routes/status/route.ts
 ```
 
-The graph response includes the active `graphHash`. The inspector at
-`http://localhost:3210` uses the same versioned API and displays that active
-graph, not a separately reconstructed source model. Stop both processes with
-`Ctrl-C`. When `@relkit/cli` is linked from this checkout, `relkit dev` prefers the
-workspace `apps/inspector` source automatically; published CLI installs use the
-packaged inspector. Set `RELKIT_INSPECTOR_ROOT` only when selecting another
-inspector checkout.
+The copied route remains executable source from the API template. Its new
+folder supplies `/status`; its `GET` export and hello function target stay the
+same. Verify the activated generation:
 
-## Check, test, and build
+```sh
+curl -i "http://localhost:3000/status?name=RELKIT"
+bun run check
+```
 
-Generated projects ship these scripts:
+Expect HTTP `200`, `{ "message": "Hello, RELKIT!" }`, and a successful check.
+Edit source to change behavior; never hand-edit `.relkit/generated`.
+
+## 6. Test and build
+
+Stop development with `Ctrl-C`, then run the smallest complete local proof:
 
 ```sh
 bun run test
-bun run test:unit
-bun run test:integration
 bun run check
 bun run typecheck
 bun run build
+```
+
+The build writes the runnable server, graph, manifest, OpenAPI, client, and
+container files under `.relkit/build`. Start it with:
+
+```sh
 bun run start
 ```
 
-Run `bun run start` only after `bun run build`. The built server validates the
-generated graph and manifest hash before serving traffic. Build output is
-written under `.relkit/build` and includes the server, manifest, graph, OpenAPI
-document, and production Dockerfile.
-
-Print or compare graph artifacts with:
+In another terminal, verify both application and readiness:
 
 ```sh
-bun run graph
-relkit graph print
-relkit graph check
-relkit graph diff before-graph.json after-graph.json
+curl -i "http://localhost:3000/status"
+curl -i "http://localhost:3000/_relkit/v1/health/ready"
 ```
 
-`relkit graph check --hash <hash>` verifies an expected graph hash. Graph files
-and generated manifests are derived outputs; edit the source descriptors and
-run `bun run check` to regenerate them.
+`start` refuses a stale or hash-mismatched build. If either request fails, fix
+the first diagnostic, rerun `check` and `build`, then start again.
 
-## Environment configuration
+## Environment and generated directories
 
-Inspect configuration without exposing values:
+Inspect declared environment keys without exposing values:
 
 ```sh
-relkit env check
-relkit env list
-relkit env explain PORT
-relkit env example
+bun run relkit env list
+bun run relkit env explain NAME
+bun run relkit env example
+bun run relkit env check
 ```
 
-`relkit env example` prints the generated example. Add `--write` when it should
-write the example file; the command does not overwrite an existing file by
-default. Production-required fields are reported by `relkit env check`; set
-their values through the environment or the deployment configuration rather
-than committing secrets. Do not declare `RELKIT_ENV`; it is framework-reserved.
-Use identical keys in every pipeline—for example MinIO/Redis locally and
-R2/Upstash in production—while keeping one application provider topology.
-
-## Authoring model
-
-Application source uses public RelKit descriptors. A function is the executable
-unit and routes target function descriptors:
-
-```ts
-import { defineFunction, defineRoute } from "@relkit/app";
-import { z } from "@relkit/schema";
-
-const hello = defineFunction({
-  input: z.object({ name: z.string().default("world") }),
-  output: z.object({ message: z.string() }),
-  handler: async ({ name }) => ({ message: `Hello, ${name}!` }),
-});
-
-// src/routes/hello/route.ts
-export const GET = defineRoute({
-  target: hello,
-});
-```
-
-The `route.ts` location supplies `/hello`, its `GET` export supplies the method,
-and the object input is inferred as query parameters. Source-scoped IDs are
-derived from file/export/member structure; add an explicit ID when a source
-move must preserve graph identity. Descriptors are pure metadata. The compiler
-discovers them, validates the canonical graph, and emits the runtime manifest.
-Use `target.invoke(input)` for nested calls; managed resources remain explicit
-dependencies. Do not put executable closures in graph mappings or edit
-`.relkit/generated` by hand.
-
-## Project directories
-
-- `src/` contains application descriptors and handlers.
-- `.relkit/generated/` contains checked graph, manifest, OpenAPI, client, and diagnostics output.
+- `.relkit/generated/` contains checked graph and developer artifacts.
 - `.relkit/build/` contains production build output.
-- `.relkit/state/` and `.relkit/observability/` contain local development state and telemetry.
+- `.relkit/state/` contains local durable runtime state.
+- `.relkit/observability/` contains local telemetry data.
 
-Keep `.env`, local state, and generated output out of commits. Tests replace
-graph-required bindings with deterministic fakes; normal runtimes resolve the
-single topology from pipeline-provided environment values.
+Keep secrets out of source and generated artifacts. Tests use deterministic
+provider fakes; normal runtimes resolve environment-backed provider bindings.
+
+Continue with `apps/docs/content/docs/fundamentals/application.mdx` for the
+authoring model or `docs/deployment.md` for the separately authorized AWS path.

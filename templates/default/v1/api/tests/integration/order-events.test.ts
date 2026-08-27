@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
 import { createEventListenerTarget, eventListenerFunctionId } from "@relkit/app";
 import { createTestEvent, invokeFunction } from "@relkit/testing";
-import orderCreated from "../../src/events/order-created.event.js";
-import orderAudit from "../../src/events/order-audit.event.js";
-import orderConfirmation from "../../src/events/order-confirmation.event.js";
-import orders from "../../src/services/orders.service.js";
+import orderCreated from "@app/events/order-created.event.js";
+import orderAudit from "@app/events/order-audit.event.js";
+import orderConfirmation from "@app/events/order-confirmation.event.js";
+import orders from "@app/services/orders.service.js";
 
 const retry = {
   maxAttempts: 1,

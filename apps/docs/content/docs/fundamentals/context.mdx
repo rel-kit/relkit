@@ -1,0 +1,77 @@
+---
+title: Invocation context
+description: Use scoped resource clients, logging, cancellation, identity, and time without introducing globals or transport coupling.
+---
+
+The second function-handler parameter is the invocation context for exactly one call. It carries bounded
+capabilities and metadata assembled from the checked graph. The available clients are inferred from the
+function's declared dependencies, so a handler cannot silently access an undeclared bucket, cache, job, or
+event provider.
+
+## Read context in a real handler
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/functions/orders/create-order.function.ts"'
+>
+  ../../examples/commerce/src/functions/orders/create-order.function.ts
+</include>
+
+This function uses a typed cache, publishes an event, and enqueues a job only because those dependencies are
+declared on the descriptor. The same context shape is supplied whether HTTP, a job, an event listener, a
+tool, an agent, or direct invocation reaches the function.
+
+## What context contains
+
+| Area                   | Use it for                                                                      | Do not use it for                                            |
+| ---------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `log`                  | Structured records automatically correlated with the invocation                 | Secrets, full request bodies, or ad hoc string concatenation |
+| `signal` and deadline  | Cancelling provider calls and stopping work that can no longer finish           | Ignoring cancellation while starting new side effects        |
+| `time`                 | Testable current time and delay behavior                                        | `Date.now()` scattered through business logic                |
+| Invocation identifiers | Correlation, causation, trace, source, and attempt analysis                     | Domain IDs that should live in validated input               |
+| Resource clients       | Bucket, cache, event, job, model, auth, or data access declared by the function | Importing provider SDK singletons directly                   |
+| Request view           | Optional transport metadata when the caller is HTTP                             | Making reusable domain behavior require an HTTP request      |
+| Service context        | Immutable values added by service middleware                                    | Mutating shared global state                                 |
+
+## Add a dependency safely
+
+<Steps>
+  <Step>
+    ### Define and bind the logical resource
+
+    Follow the resource-specific guide, then add its provider profile in `relkit.config.ts`.
+
+  </Step>
+  <Step>
+    ### Declare function access
+
+    Add the descriptor under the matching `dependencies` key. The property name becomes the typed context
+    client name, so choose a domain-readable name.
+
+  </Step>
+  <Step>
+    ### Use the scoped client
+
+    Call `context.cache`, `context.buckets`, `context.events`, or `context.jobs` inside the handler and pass
+    `context.signal` to lower-level operations that accept cancellation.
+
+  </Step>
+  <Step>
+    ### Verify authorization and fakes
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run test
+    ```
+
+    The graph should contain a dependency edge. Tests should receive a deterministic fake without remote
+    credentials and assert the resulting side effect through the fake's inspection API.
+
+  </Step>
+</Steps>
+
+Never store context in a module variable or reuse it after the invocation completes. Doing so mixes
+correlation IDs, cancellation, deadlines, and provider lifetimes between requests.
+
+<include cwd>content/generated/related/fundamentals-context.mdx</include>

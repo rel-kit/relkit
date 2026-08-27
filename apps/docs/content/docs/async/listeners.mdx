@@ -1,0 +1,73 @@
+---
+title: Event listeners
+description: React to events independently, declare listener dependencies, bound retry and concurrency, and make duplicate delivery safe.
+---
+
+A listener is an asynchronous consumer of an event contract. It can invoke functions and enqueue jobs without
+blocking the original publisher. Give each business reaction its own listener so failure, retry, concurrency,
+and deployment history remain independently visible.
+
+## Read the receipt listener
+
+<include cwd lang="ts" meta='title="examples/commerce/src/events/order-receipt.event.ts"'>
+  ../../examples/commerce/src/events/order-receipt.event.ts
+</include>
+
+The listener selects `orders.created`, loads the current order through normal function invocation, and enqueues
+receipt work through a declared job dependency. Its retry and concurrency policy belong to this reaction, not
+to the event declaration or publisher.
+
+## Implement a listener
+
+<Steps>
+  <Step>
+    ### Select the narrowest event
+
+    Prefer a specific event ID and compatible version. Wildcard selection is restricted to telemetry-style
+    consumers because ordinary business listeners should not silently receive unrelated future events.
+
+  </Step>
+  <Step>
+    ### Declare managed dependencies
+
+    Add every bucket, cache, event, or job client used by the handler. A nested function invocation uses
+    `.invoke()`; direct provider clients come from listener context.
+
+  </Step>
+  <Step>
+    ### Bound execution
+
+    Set retry attempts, delay, jitter, concurrency, and any timeout according to downstream capacity. Retrying
+    faster than a failing dependency can recover creates an outage amplifier.
+
+  </Step>
+  <Step>
+    ### Test delivery and recovery
+
+    Publish a representative event through the deterministic harness, run delivery, and assert the job fake.
+    Repeat the same event ID to prove duplicate safety, then inject one retryable and one terminal failure.
+
+    ```sh title="Terminal — relkit-orders"
+    bun run test:integration
+    bun run check
+    ```
+
+  </Step>
+</Steps>
+
+## At-least-once consequences
+
+A listener can complete a side effect and crash before the provider records acknowledgement. The same event
+may then be delivered again. Use event/domain IDs as idempotency keys, make writes conditional, or record
+processed IDs in durable state. In-memory sets do not survive restart and do not coordinate replicas.
+
+Ordering is also provider-specific. When correctness depends on order, use versioned state or sequence checks
+and define the partitioning guarantee explicitly. Do not infer global ordering from timestamps.
+
+## Diagnose a failed listener
+
+Use the inspector to locate the event delivery, listener attempt, correlation/causation IDs, declared error,
+and next retry. Confirm whether the event was rejected by schema, the listener failed, or a downstream enqueue
+failed. Replaying an event is a side-effecting operation; verify idempotency before doing it.
+
+<include cwd>content/generated/related/async-listeners.mdx</include>

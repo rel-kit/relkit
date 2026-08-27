@@ -24,6 +24,19 @@ export interface CreateClientOptions {
   readonly fetch?: typeof globalThis.fetch;
 }
 
+/**
+ * Creates a typed HTTP client for the generated application contract.
+ *
+ * @example
+ * ```ts
+ * import { createClient } from "@relkit/client"
+ *
+ * const client = createClient({ baseUrl: "http://127.0.0.1:3000" })
+ * void client
+ * ```
+ * @category Client
+ * @since 0.1.0
+ */
 export function createClient<Contract extends RouterContract = DefaultContract>(
   options: CreateClientOptions,
 ): RouterContractClient<Contract> {

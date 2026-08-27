@@ -2,6 +2,7 @@
   "title": "Generated API reference",
   "pages": [
     "app",
+    "config",
     "schema",
     "functions",
     "services",
@@ -12,6 +13,7 @@
     "cache",
     "tools",
     "agents",
+    "client",
     "testing"
   ]
 }

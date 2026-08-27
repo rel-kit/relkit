@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { events, type EventSelectorInput, type UnknownEventEnvelope } from "@relkit/app";
-import createOrder from "./functions/orders/create-order.function.js";
-import { receiptObjectName } from "./shared/receipt-object.js";
+import createOrder from "@app/functions/orders/create-order.function.js";
+import { receiptObjectName } from "@app/shared/receipt-object.js";
 
 /** Keeps ordinary helper calls opaque to the explicit RelKit dependency surface. */
 export function assertOrdinaryHelperIsOpaque(): void {

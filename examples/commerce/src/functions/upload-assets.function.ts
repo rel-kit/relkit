@@ -1,6 +1,6 @@
 import { defineFunction } from "@relkit/app";
-import assets from "../buckets/assets.bucket.js";
-import { assetUploadInput, assetUploadOutput } from "../shared/schemas.js";
+import assets from "@app/buckets/assets.bucket.js";
+import { assetUploadInput, assetUploadOutput } from "@app/shared/schemas.js";
 
 const uploadAssets = defineFunction({
   input: assetUploadInput,

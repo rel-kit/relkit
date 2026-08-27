@@ -36,8 +36,9 @@ import * as __relkit_module_31 from "../../src/routes/orders/route.ts";
 import * as __relkit_module_32 from "../../src/routes/orders/search/route.ts";
 import * as __relkit_module_33 from "../../src/routes/uploads/route.ts";
 import * as __relkit_module_34 from "../../src/services/orders.service.ts";
-import * as __relkit_module_35 from "../../src/tools/lookup-order.tool.ts";
-import * as __relkit_module_36 from "../../src/transforms/orders/normalize-id.transform.ts";
+import * as __relkit_module_35 from "../../src/tools/cancel-order.tool.ts";
+import * as __relkit_module_36 from "../../src/tools/lookup-order.tool.ts";
+import * as __relkit_module_37 from "../../src/transforms/orders/normalize-id.transform.ts";
 
 __relkit_bindDescriptorIdentity(__relkit_module_0["default"], "commerce-api");
 __relkit_bindDescriptorIdentity(__relkit_module_1["default"], "order-support");
@@ -140,14 +141,16 @@ __relkit_bindDescriptorIdentity(__relkit_module_34["default"]["getOrder"]["error
 __relkit_bindDescriptorIdentity(__relkit_module_34["default"]["middleware"][0], "orders.context");
 __relkit_bindDescriptorIdentity(__relkit_module_34["default"]["searchOrders"], "orders.search-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_34["default"]["updateOrder"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_35["default"], "lookup-order");
-__relkit_bindDescriptorIdentity(__relkit_module_35["default"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_35["default"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_36["default"], "orders.normalize-id");
+__relkit_bindDescriptorIdentity(__relkit_module_35["default"], "cancel-order");
+__relkit_bindDescriptorIdentity(__relkit_module_35["default"]["target"], "orders.delete-order");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"], "lookup-order");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_37["default"], "orders.normalize-id");
 
 export const manifestContractVersion = 5 as const;
 export const manifestGeneratorVersion = 2 as const;
-export const manifestGraphHash = "sha256:fd848d64e53edf20e9bfba6d5daeb839309d07cddbafe7ea1e95535f0ae506c7" as const;
+export const manifestGraphHash = "sha256:14ce6bfa036269949cc13a22619f794d0d3dd896d1d726435100cd84a6089719" as const;
 export const providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined }, "cache:redis": { capability: "cache", adapter: "redis", factory: undefined }, "events:eventbridge": { capability: "events", adapter: "eventbridge", factory: undefined }, "jobs:sqs": { capability: "jobs", adapter: "sqs", factory: undefined }, "models:ai-sdk": { capability: "models", adapter: "ai-sdk", factory: undefined }, "observability:cloudwatch": { capability: "observability", adapter: "cloudwatch", factory: undefined } } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
@@ -156,7 +159,7 @@ export const runtimeManifest = {
   functions: { "account-session": __relkit_module_12["default"].handler, "authorize-order": __relkit_module_13["default"].handler, "browse-path": __relkit_module_14["default"].handler, "database-users": __relkit_module_15["default"].handler, "orders.create-order": __relkit_module_16["default"].handler, "orders.delete-order": __relkit_module_17["default"].handler, "orders.get-order": __relkit_module_18["default"].handler, "orders.search-orders": __relkit_module_19["default"].handler, "orders.update-order": __relkit_module_20["default"].handler, "relkit.agent.order-support.invoke": __relkit_createGeneratedAgentFunction("order-support"), "relkit.event.orders.audit-changes.handler": __relkit_module_5["default"].target.handler, "relkit.event.orders.project-any-change.handler": __relkit_module_8["default"].target.handler, "relkit.event.receipts.on-order-created.handler": __relkit_module_9["default"].target.handler, "relkit.event.telemetry.capture-events.handler": __relkit_module_11["default"].target.handler, "send-receipt": __relkit_module_21["default"].handler, "upload-assets": __relkit_module_22["default"].handler },
   targets: { "account-session": __relkit_module_12["default"], "authorize-order": __relkit_module_13["default"], "browse-path": __relkit_module_14["default"], "database-users": __relkit_module_15["default"], "orders.create-order": __relkit_module_16["default"], "orders.delete-order": __relkit_module_17["default"], "orders.get-order": __relkit_module_18["default"], "orders.search-orders": __relkit_module_19["default"], "orders.update-order": __relkit_module_20["default"], "relkit.event.orders.audit-changes.handler": __relkit_createEventListenerTarget(__relkit_module_5["default"], [__relkit_module_6["default"], __relkit_module_7["default"], __relkit_module_10["default"]], "relkit.event.orders.audit-changes.handler"), "relkit.event.orders.project-any-change.handler": __relkit_createEventListenerTarget(__relkit_module_8["default"], [__relkit_module_6["default"], __relkit_module_7["default"], __relkit_module_10["default"]], "relkit.event.orders.project-any-change.handler"), "relkit.event.receipts.on-order-created.handler": __relkit_createEventListenerTarget(__relkit_module_9["default"], [__relkit_module_7["default"]], "relkit.event.receipts.on-order-created.handler"), "relkit.event.telemetry.capture-events.handler": __relkit_createEventListenerTarget(__relkit_module_11["default"], [__relkit_module_6["default"], __relkit_module_7["default"], __relkit_module_10["default"]], "relkit.event.telemetry.capture-events.handler"), "send-receipt": __relkit_module_21["default"], "upload-assets": __relkit_module_22["default"] },
   agents: { "order-support": __relkit_module_1["default"] },
-  tools: { "lookup-order": __relkit_module_35["default"] },
+  tools: { "cancel-order": __relkit_module_35["default"], "lookup-order": __relkit_module_36["default"] },
   routes: { "route.all.api.auth.optional-catch-all-auth": __relkit_module_26["ALL"], "route.delete.orders.by-order-id": __relkit_module_30["DELETE"], "route.get.account.profile": __relkit_module_25["GET"], "route.get.database.users": __relkit_module_27["GET"], "route.get.docs.optional-catch-all-parts": __relkit_module_28["GET"], "route.get.files.catch-all-parts": __relkit_module_29["GET"], "route.get.orders": __relkit_module_31["GET"], "route.get.orders.by-order-id": __relkit_module_30["GET"], "route.get.orders.search": __relkit_module_32["GET"], "route.head.orders.by-order-id": __relkit_module_30["HEAD"], "route.options.orders.by-order-id": __relkit_module_30["OPTIONS"], "route.patch.orders.by-order-id": __relkit_module_30["PATCH"], "route.post.orders": __relkit_module_31["POST"], "route.post.uploads": __relkit_module_33["POST"], "route.put.orders.by-order-id": __relkit_module_30["PUT"] },
   constants: {  },
   prompts: {  },
@@ -166,6 +169,6 @@ export const runtimeManifest = {
   providerFactories,
   middleware: { "order-auth": __relkit_module_24["default"] },
   hooks: {  },
-  requestTransforms: { "orders.normalize-id": __relkit_module_36["default"].schema },
+  requestTransforms: { "orders.normalize-id": __relkit_module_37["default"].schema },
   application: __relkit_module_0["default"],
 } as const;

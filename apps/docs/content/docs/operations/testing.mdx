@@ -3,4 +3,26 @@ title: Testing utilities and fakes
 description: Test functions, HTTP, jobs, events, resources, agents, and recovery with deterministic providers.
 ---
 
+Use the smallest layer that proves the behavior. Unit tests invoke one function; integration tests assemble
+the checked application and call its in-process HTTP client. Both use the same schemas and common engine as
+development.
+
+<Tabs items={["Unit", "Integration"]}>
+  <Tab value="Unit">
+    Use `invokeFunction` for handler behavior, validation, declared errors, and explicitly supplied
+    resource clients.
+  </Tab>
+  <Tab value="Integration">
+    Use `createTestApplication` for routing, request mapping, middleware, responses, provider
+    wiring, and OpenAPI behavior.
+  </Tab>
+</Tabs>
+
 <include cwd>../../docs/testing.md</include>
+
+<Callout title="Verification target">
+  A complete local project should pass `bun run test`, `bun run check`, and `bun run typecheck`
+  without network credentials. Live provider checks must be separate and explicitly enabled.
+</Callout>
+
+<include cwd>content/generated/related/operations-testing.mdx</include>

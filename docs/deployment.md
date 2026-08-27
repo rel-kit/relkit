@@ -1,6 +1,6 @@
 # Deployment
 
-RelKit deployment is generated from the checked application graph and runs
+RELKIT deployment is generated from the checked application graph and runs
 through the Pulumi Automation API. AWS is the first supported cloud target;
 the application graph remains the input to the plan and no second deployment
 engine is introduced.
@@ -15,6 +15,10 @@ Before a deployment:
    AWS credential configuration.
 4. Select a Pulumi backend and stack. Use a separate stack for each isolated
    environment.
+
+These commands can create billable cloud resources. Continue only with
+authorization to incur cost, review every preview, and use an isolated stack
+that can be destroyed after verification.
 
 The current release gate pins Pulumi CLI `3.258.0`. Do not put credential
 values in source, graph files, generated manifests, plans, or logs.

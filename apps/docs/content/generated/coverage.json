@@ -1,0 +1,429 @@
+{
+  "generated": "apps/docs/scripts/generate.ts; do not edit",
+  "features": [
+    {
+      "id": "application",
+      "title": "Application configuration",
+      "summary": "Define application identity and runtime topology.",
+      "guide": "fundamentals/application",
+      "apiPackage": "app",
+      "entrypoints": [{ "source": "packages/app/src/config.ts", "name": "defineConfig" }],
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
+    },
+    {
+      "id": "environment",
+      "title": "Environment contracts",
+      "summary": "Parse, default, and protect runtime configuration.",
+      "guide": "fundamentals/environment",
+      "apiPackage": "config",
+      "entrypoints": [{ "source": "packages/config/src/env.ts", "name": "defineEnv" }],
+      "examples": ["templates/default/v1/api/src/env.ts"]
+    },
+    {
+      "id": "providers",
+      "title": "Provider bindings",
+      "summary": "Choose local, external, or managed infrastructure without changing handlers.",
+      "guide": "fundamentals/providers",
+      "apiPackage": "app",
+      "entrypoints": [
+        { "source": "packages/app/src/providers.ts", "name": "managed" },
+        { "source": "packages/app/src/providers.ts", "name": "external" }
+      ],
+      "examples": ["examples/commerce/relkit.config.ts"]
+    },
+    {
+      "id": "schemas",
+      "title": "Runtime schemas",
+      "summary": "Validate untrusted values while retaining TypeScript inference.",
+      "guide": "fundamentals/schemas",
+      "apiPackage": "schema",
+      "entrypoints": [
+        { "source": "packages/schema/src/builder.ts", "name": "z" },
+        { "source": "packages/schema/src/standard-schema.ts", "name": "validate" }
+      ],
+      "examples": ["examples/commerce/src/shared/schemas.ts"]
+    },
+    {
+      "id": "functions",
+      "title": "Functions",
+      "summary": "Write one validated handler for every invocation transport.",
+      "guide": "fundamentals/functions",
+      "apiPackage": "functions",
+      "entrypoints": [
+        { "source": "packages/functions/src/define-function.ts", "name": "defineFunction" }
+      ],
+      "examples": ["examples/commerce/src/functions/orders/create-order.function.ts"]
+    },
+    {
+      "id": "errors",
+      "title": "Declared errors",
+      "summary": "Expose stable failures with transport and retry policy.",
+      "guide": "fundamentals/errors",
+      "apiPackage": "functions",
+      "entrypoints": [
+        { "source": "packages/functions/src/define-error.ts", "name": "defineError" }
+      ],
+      "examples": ["examples/commerce/src/errors/order-not-found.error.ts"]
+    },
+    {
+      "id": "services",
+      "title": "Services",
+      "summary": "Group related functions and apply shared invocation policy.",
+      "guide": "fundamentals/services",
+      "apiPackage": "services",
+      "entrypoints": [
+        { "source": "packages/services/src/define-service.ts", "name": "defineService" },
+        {
+          "source": "packages/services/src/service-middleware.ts",
+          "name": "defineServiceMiddleware"
+        }
+      ],
+      "examples": ["examples/commerce/src/services/orders.service.ts"]
+    },
+    {
+      "id": "http",
+      "title": "HTTP routes",
+      "summary": "Map filesystem routes to validated function calls.",
+      "guide": "http/routes",
+      "apiPackage": "routes",
+      "entrypoints": [{ "source": "packages/routes/src/define-route.ts", "name": "defineRoute" }],
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
+    },
+    {
+      "id": "middleware",
+      "title": "HTTP middleware",
+      "summary": "Apply request policy to explicit path scopes.",
+      "guide": "http/middleware",
+      "apiPackage": "routes",
+      "entrypoints": [
+        { "source": "packages/routes/src/define-middleware.ts", "name": "defineMiddleware" }
+      ],
+      "examples": ["examples/commerce/src/middleware/order-auth.middleware.ts"]
+    },
+    {
+      "id": "clients",
+      "title": "Generated clients",
+      "summary": "Call checked routes through the generated typed contract.",
+      "guide": "http/generated-clients",
+      "apiPackage": "client",
+      "entrypoints": [{ "source": "packages/client/src/index.ts", "name": "createClient" }],
+      "examples": ["examples/commerce/src/generated-client.ts"]
+    },
+    {
+      "id": "events",
+      "title": "Events",
+      "summary": "Publish typed facts and process them with independent listeners.",
+      "guide": "async/events",
+      "apiPackage": "events",
+      "entrypoints": [
+        { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
+        { "source": "packages/events/src/on-event.ts", "name": "onEvent" }
+      ],
+      "examples": ["examples/commerce/src/events/order-created.event.ts"]
+    },
+    {
+      "id": "jobs",
+      "title": "Jobs",
+      "summary": "Queue validated work with bounded retry and concurrency.",
+      "guide": "async/jobs",
+      "apiPackage": "jobs",
+      "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
+      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"]
+    },
+    {
+      "id": "schedules",
+      "title": "Schedules",
+      "summary": "Trigger a job from explicit cron and timezone rules.",
+      "guide": "async/schedules",
+      "apiPackage": "jobs",
+      "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
+      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"]
+    },
+    {
+      "id": "buckets",
+      "title": "Object buckets",
+      "summary": "Store bounded objects through provider-neutral clients.",
+      "guide": "resources-ai/buckets",
+      "apiPackage": "buckets",
+      "entrypoints": [
+        { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
+      ],
+      "examples": ["examples/commerce/src/buckets/assets.bucket.ts"]
+    },
+    {
+      "id": "cache",
+      "title": "Cache",
+      "summary": "Use schema-backed values, counters, TTLs, and rate-limit state.",
+      "guide": "resources-ai/cache",
+      "apiPackage": "cache",
+      "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
+      "examples": ["examples/commerce/src/cache/prices.cache.ts"]
+    },
+    {
+      "id": "tools",
+      "title": "AI tools",
+      "summary": "Expose existing functions to models through bounded metadata.",
+      "guide": "resources-ai/tools",
+      "apiPackage": "tools",
+      "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
+      "examples": ["examples/commerce/src/tools/lookup-order.tool.ts"]
+    },
+    {
+      "id": "approvals",
+      "title": "Tool approvals",
+      "summary": "Require an explicit decision before sensitive model actions.",
+      "guide": "resources-ai/approvals",
+      "apiPackage": "agents",
+      "entrypoints": [
+        { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
+        { "source": "packages/agents/src/approval.ts", "name": "denyApproval" }
+      ],
+      "examples": ["examples/commerce/src/tools/cancel-order.tool.ts"]
+    },
+    {
+      "id": "agents",
+      "title": "Agents",
+      "summary": "Run bounded model workflows with allowlisted tools and offline tests.",
+      "guide": "resources-ai/agents",
+      "apiPackage": "agents",
+      "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
+      "examples": ["examples/commerce/src/agents/order-support.agent.ts"]
+    },
+    {
+      "id": "testing",
+      "title": "Testing",
+      "summary": "Exercise the engine with HTTP helpers and deterministic fakes.",
+      "guide": "operations/testing",
+      "apiPackage": "testing",
+      "entrypoints": [
+        { "source": "packages/testing/src/invoke-function.ts", "name": "invokeFunction" },
+        { "source": "packages/testing/src/application.ts", "name": "createTestApplication" }
+      ],
+      "examples": ["templates/default/v1/api/tests/integration/orders.route.test.ts"]
+    }
+  ],
+  "guides": [
+    {
+      "path": "index",
+      "api": ["app", "routes", "testing"],
+      "examples": ["templates/default/v1/api/README.md"],
+      "next": "start/create-an-app"
+    },
+    {
+      "path": "start/create-an-app",
+      "api": ["app", "config"],
+      "examples": ["templates/default/v1/api/README.md"],
+      "next": "start/first-route"
+    },
+    {
+      "path": "start/first-route",
+      "api": ["functions", "routes"],
+      "examples": ["templates/default/v1/api/src/routes/hello/route.ts"],
+      "next": "start/local-development"
+    },
+    {
+      "path": "start/local-development",
+      "api": ["app", "routes"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "start/check"
+    },
+    {
+      "path": "start/check",
+      "api": ["app"],
+      "examples": ["templates/default/v1/api/package.json"],
+      "next": "start/build"
+    },
+    {
+      "path": "start/build",
+      "api": ["app"],
+      "examples": ["templates/default/v1/api/package.json"],
+      "next": "start/production"
+    },
+    {
+      "path": "start/production",
+      "api": ["app"],
+      "examples": ["templates/default/v1/api/package.json"],
+      "next": "fundamentals/application"
+    },
+    {
+      "path": "fundamentals/application",
+      "api": ["app"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "fundamentals/environment"
+    },
+    {
+      "path": "fundamentals/environment",
+      "api": ["config"],
+      "examples": ["templates/default/v1/api/src/env.ts"],
+      "next": "fundamentals/providers"
+    },
+    {
+      "path": "fundamentals/providers",
+      "api": ["app"],
+      "examples": ["examples/commerce/relkit.config.ts"],
+      "next": "fundamentals/schemas"
+    },
+    {
+      "path": "fundamentals/schemas",
+      "api": ["schema"],
+      "examples": ["examples/commerce/src/shared/schemas.ts"],
+      "next": "fundamentals/errors"
+    },
+    {
+      "path": "fundamentals/errors",
+      "api": ["functions"],
+      "examples": ["examples/commerce/src/errors/order-not-found.error.ts"],
+      "next": "fundamentals/context"
+    },
+    {
+      "path": "fundamentals/context",
+      "api": ["functions"],
+      "examples": ["examples/commerce/src/functions/orders/create-order.function.ts"],
+      "next": "fundamentals/functions"
+    },
+    {
+      "path": "fundamentals/functions",
+      "api": ["functions"],
+      "examples": ["templates/default/v1/api/src/functions/orders/create-order.function.ts"],
+      "next": "fundamentals/services"
+    },
+    {
+      "path": "fundamentals/services",
+      "api": ["services"],
+      "examples": ["examples/commerce/src/services/orders.service.ts"],
+      "next": "http/routes"
+    },
+    {
+      "path": "http/routes",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
+      "next": "http/requests"
+    },
+    {
+      "path": "http/requests",
+      "api": ["routes", "schema"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/uploads"
+    },
+    {
+      "path": "http/uploads",
+      "api": ["routes", "schema"],
+      "examples": ["examples/commerce/src/routes/uploads/route.ts"],
+      "next": "http/middleware"
+    },
+    {
+      "path": "http/middleware",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/middleware/order-auth.middleware.ts"],
+      "next": "http/rate-limits"
+    },
+    {
+      "path": "http/rate-limits",
+      "api": ["routes", "cache"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/responses"
+    },
+    {
+      "path": "http/responses",
+      "api": ["routes", "functions"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/openapi"
+    },
+    {
+      "path": "http/openapi",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
+      "next": "http/generated-clients"
+    },
+    {
+      "path": "http/generated-clients",
+      "api": ["client", "routes"],
+      "examples": ["examples/commerce/src/generated-client.ts"],
+      "next": "async/jobs"
+    },
+    {
+      "path": "async/jobs",
+      "api": ["jobs"],
+      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"],
+      "next": "async/schedules"
+    },
+    {
+      "path": "async/schedules",
+      "api": ["jobs"],
+      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"],
+      "next": "async/events"
+    },
+    {
+      "path": "async/events",
+      "api": ["events"],
+      "examples": ["examples/commerce/src/events/order-created.event.ts"],
+      "next": "async/listeners"
+    },
+    {
+      "path": "async/listeners",
+      "api": ["events"],
+      "examples": ["examples/commerce/src/events/order-receipt.event.ts"],
+      "next": "resources-ai/buckets"
+    },
+    {
+      "path": "resources-ai/buckets",
+      "api": ["buckets"],
+      "examples": ["examples/commerce/src/buckets/assets.bucket.ts"],
+      "next": "resources-ai/cache"
+    },
+    {
+      "path": "resources-ai/cache",
+      "api": ["cache"],
+      "examples": ["examples/commerce/src/cache/prices.cache.ts"],
+      "next": "resources-ai/tools"
+    },
+    {
+      "path": "resources-ai/tools",
+      "api": ["tools"],
+      "examples": ["examples/commerce/src/tools/lookup-order.tool.ts"],
+      "next": "resources-ai/approvals"
+    },
+    {
+      "path": "resources-ai/approvals",
+      "api": ["agents", "tools"],
+      "examples": ["examples/commerce/src/tools/cancel-order.tool.ts"],
+      "next": "resources-ai/agents"
+    },
+    {
+      "path": "resources-ai/agents",
+      "api": ["agents", "testing"],
+      "examples": ["examples/commerce/src/agents/order-support.agent.ts"],
+      "next": "operations/inspector"
+    },
+    {
+      "path": "operations/inspector",
+      "api": ["app", "routes"],
+      "examples": ["tests/e2e/inspector-redesign.spec.ts"],
+      "next": "operations/observability"
+    },
+    {
+      "path": "operations/observability",
+      "api": ["functions", "routes"],
+      "examples": ["templates/default/v1/api/src/functions/hello.function.ts"],
+      "next": "operations/testing"
+    },
+    {
+      "path": "operations/testing",
+      "api": ["testing"],
+      "examples": ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
+      "next": "operations/deployment"
+    },
+    {
+      "path": "operations/deployment",
+      "api": ["app", "jobs", "events", "buckets", "cache"],
+      "examples": ["examples/commerce/relkit.config.ts"],
+      "next": "operations/troubleshooting"
+    },
+    {
+      "path": "operations/troubleshooting",
+      "api": ["app", "testing"],
+      "examples": ["templates/default/v1/api/package.json"],
+      "next": "operations/cli-reference"
+    }
+  ]
+}

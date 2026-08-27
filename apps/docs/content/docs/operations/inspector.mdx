@@ -1,20 +1,81 @@
 ---
 title: Inspector and API explorer
-description: Explore the active generation, resources, relationships, traces, requests, and Scalar reference.
+description: Follow an active request through routes, functions, graph relationships, logs, traces, and the Scalar API reference.
 ---
 
-`relkit dev` starts the inspector on port 3210 by default. It reads the active backend's versioned internal
-API and shows the same generation ID and graph hash used by requests, clients, and deployment.
+import inspectorShell from "../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/shell-dark-darwin.png";
 
-Use global search or the sidebar to open routes, functions, jobs, events, buckets, cache, tools, agents,
-signals, environment contracts, logs, requests, traces, the graph, and the API reference. Filters and
-cursor pagination are server-backed. Detail URLs are canonical and shareable; sheets provide quick
-inspection without replacing those URLs.
+`bun run dev` starts the inspector on port 3210. It reads the active backend's versioned internal API and
+shows the same generation ID and graph hash used by requests, clients, tests, and deployment.
 
-The graph supports pan, zoom, fit view, minimap, search, kind filters, and node details. Its relationship
-table is the keyboard and screen-reader equivalent. Traces render an expandable span tree and waterfall
-with zoom, status, duration, available resource attributes/logs, and correlated request/job/event links.
+<ImageZoom
+  src={inspectorShell}
+  alt="RELKIT inspector overview with navigation and application summary"
+/>
+
+## Trace one request through the system
+
+<Steps>
+  <Step>
+    ### Start the application and inspector
+
+    ```sh title="Terminal — relkit-orders"
+    bun run dev
+    ```
+
+    Open `http://localhost:3210` and confirm the displayed backend is `http://localhost:3000`.
+
+  </Step>
+  <Step>
+    ### Issue an identifiable request
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:3000/hello?name=Inspector" \
+      -H "x-correlation-id: docs-inspector"
+    ```
+
+  </Step>
+  <Step>
+    ### Follow its relationships
+
+    Open **Requests**, select the latest `/hello` request, and note its route, function, status, duration,
+    graph hash, correlation ID, and trace link. Open the route and function detail pages, then follow the
+    trace to its span waterfall and available logs.
+
+  </Step>
+  <Step>
+    ### Compare graph and API contract
+
+    Open **Graph**, find the hello route, and inspect its edge to the target function. The relationship
+    table is the keyboard and screen-reader equivalent of the canvas. Open **API Reference** and confirm
+    the same operation appears in Scalar.
+
+  </Step>
+</Steps>
+
+## What the inspector contains
+
+Global search and the sidebar cover routes, functions, jobs, events, buckets, cache, tools, agents,
+middleware, providers, environment contracts, diagnostics, logs, requests, traces, graph relationships,
+and API reference. Filters and cursor pagination are server-backed; detail URLs are canonical and
+shareable.
+
+<Accordions type="multiple">
+  <Accordion title="The inspector is disconnected">
+    Call `http://localhost:3000/_relkit/v1/health/ready` and `/_relkit/v1/graph`. If the backend is
+    healthy, restart the inspector against that backend and compare the displayed graph hash.
+  </Accordion>
+  <Accordion title="The graph looks stale">
+    Confirm the source candidate activated successfully. The inspector intentionally keeps showing
+    the last known good generation while an invalid candidate is rejected.
+  </Accordion>
+  <Accordion title="Sensitive data is absent">
+    That is expected. Secret environment values, protected headers, disabled/redacted bodies, and
+    provider credentials are removed before crossing inspector or telemetry boundaries.
+  </Accordion>
+</Accordions>
 
 Inspector actions retain local-only authorization, production restrictions, source-link validation, and
-secret redaction. The API Reference page opens the same Scalar document exposed by the application and
-route details connect to the request composer.
+secret redaction. Do not publish an unprotected production inspector endpoint.
+
+<include cwd>content/generated/related/operations-inspector.mdx</include>

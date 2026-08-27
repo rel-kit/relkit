@@ -1,6 +1,6 @@
 import { defineAgent } from "@relkit/app";
-import { supportInput, supportOutput } from "../shared/schemas.js";
-import lookupOrder from "../tools/lookup-order.tool.js";
+import { supportInput, supportOutput } from "@app/shared/schemas.js";
+import lookupOrder from "@app/tools/lookup-order.tool.js";
 
 const orderSupport = defineAgent({
   input: supportInput,

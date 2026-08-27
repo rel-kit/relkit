@@ -1,35 +1,77 @@
 ---
-title: Events
-description: Declare typed events, publish them, and listen with payload-first callbacks.
+title: Domain events
+description: Define and publish versioned facts with validated payloads, sensitive-field policy, and stable identity.
 ---
 
-Declare an event with a stable ID, version, and payload schema. `relkit dev`, `check`, and `create` discover
-descriptors first and atomically refresh `.relkit/generated/event-registry.d.ts`, which gives listener
-names autocomplete and payload inference.
+An event is a fact that already happened, such as `orders.created`. Publishers do not choose or wait for every
+consumer. Independent listeners can react without adding their work to the publisher's request path.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/events/order-receipt.event.ts"'>
-  ../../examples/commerce/src/events/order-receipt.event.ts
+## Define the event contract
+
+<include cwd lang="ts" meta='title="examples/commerce/src/events/order-created.event.ts"'>
+  ../../examples/commerce/src/events/order-created.event.ts
 </include>
 
-The handler receives validated payload first and context second. `ctx.event` includes version, instance
-ID, key, attributes, occurrence time, trace, correlation, and causation metadata. Listeners may be
-exported from any scanned source file; the compiler lowers each callback to an internal function node
-plus an event-trigger node so it uses the common engine. Listener IDs may be inferred from the source
-binding. Function-to-function calls use `target.invoke(input)`; only managed resources remain declared
-dependencies.
+The stable ID is the topic contract. `version` allows consumers to distinguish incompatible payload shapes.
+The schema validates every publish and delivery. `sensitiveFields` marks payload paths for redaction in logs,
+traces, inspector previews, and diagnostics.
 
-Delivery defaults to durable with one attempt. Use `delivery: "ephemeral"` explicitly. Options include
-Listener options include `id`, `retry`, `profile`, `concurrency`, `timeoutMs`, and managed-resource
-dependencies. When `id` is absent, RELKIT derives it from the source binding and rejects duplicates;
-production listeners should pin IDs when rename stability matters. A declared error with omitted or
-`retry: "never"` stops a delivery. `retry: "later"` or `{ kind: "later", afterMs }` permits another
-policy-bounded attempt, with `afterMs` acting as a minimum delay.
+Name events in past tense. `orders.create` is a command; `orders.created` is a fact. Do not publish a broad
+“updated” event when consumers require specific business meaning.
 
-One published event creates an independent delivery for each matching listener. Durable delivery is
-at-least-once, not a transaction or promise of simultaneous execution: one listener can fail or enter
-its own retry/dead-letter path while another listener succeeds.
+## Publish from a function
 
-Use `events.anyOf(...)` for a discriminated union and `events.match("orders.*")` for a registry-expanded
-pattern. `events.all(...)` requires explicit unknown-payload and telemetry/audit purpose. Unknown or stale
-names fail TypeScript and compiler validation. Durable failure, redrive, and dead-letter details remain
-provider-owned.
+<Steps>
+  <Step>
+    ### Declare the event dependency
+
+    Add the event descriptor under `dependencies.events` on the publishing function. This authorizes the
+    context client and adds the graph edge used by deployment.
+
+  </Step>
+  <Step>
+    ### Publish validated data
+
+    The order function calls `context.events.orderCreated.publish(payload)`. Completion means the provider
+    accepted the event; it does not mean every listener finished.
+
+  </Step>
+  <Step>
+    ### Assert publication locally
+
+    Use `invokeFunction` with the deterministic event fake, then inspect the published event ID, version, and
+    payload. No EventBridge credentials are needed.
+
+  </Step>
+  <Step>
+    ### Inspect the graph
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run relkit graph print
+    ```
+
+    Confirm the publisher edge and every discovered listener before deployment.
+
+  </Step>
+</Steps>
+
+## Evolve payloads safely
+
+Consumers may deploy independently and durable providers may retain older payloads. Adding an optional field
+is often compatible; removing or reinterpreting a field is not. Increment the event version for an incompatible
+shape and migrate listeners deliberately. Do not reuse the same version for two meanings.
+
+## Delivery expectations
+
+Event acceptance is asynchronous. Providers may deliver at least once, out of order, or after delay. Put a
+stable domain identifier in the payload so listeners can deduplicate or reconcile. Do not assume that two
+events published consecutively will finish in that order unless the selected provider and partition key make
+that guarantee explicit.
+
+<Callout type="warn" title="Sensitive metadata is not encryption">
+  Redaction prevents common observability leaks. Use transport encryption, provider access control,
+  and minimal payloads for actual confidentiality.
+</Callout>
+
+<include cwd>content/generated/related/async-events.mdx</include>

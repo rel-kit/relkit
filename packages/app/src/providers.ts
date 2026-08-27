@@ -144,12 +144,42 @@ export function cloudWatch(
   return createAdapter("observability", "cloudwatch", options, []);
 }
 
+/**
+ * Marks an adapter as connected to infrastructure owned outside the deployment stack.
+ *
+ * @example
+ * ```ts
+ * import { external, redis } from "@relkit/app"
+ * import { defineEnv, env } from "@relkit/config"
+ *
+ * const applicationEnv = defineEnv({ CACHE_URL: env.secret() })
+ * const cache = external(redis({ url: applicationEnv.CACHE_URL }))
+ * void cache
+ * ```
+ * @category Providers
+ * @since 0.1.0
+ */
 export function external<C extends ProviderCapability, N extends string>(
   adapter: ProviderAdapter<C, N>,
 ): ProviderBinding<C, N> {
   return createBinding("external", adapter);
 }
 
+/**
+ * Marks an adapter as infrastructure owned by the deployment stack.
+ *
+ * @example
+ * ```ts
+ * import { managed, redis } from "@relkit/app"
+ * import { defineEnv, env } from "@relkit/config"
+ *
+ * const applicationEnv = defineEnv({ CACHE_URL: env.secret() })
+ * const cache = managed(redis({ url: applicationEnv.CACHE_URL }))
+ * void cache
+ * ```
+ * @category Providers
+ * @since 0.1.0
+ */
 export function managed<C extends ProviderCapability, N extends string>(
   adapter: ProviderAdapter<C, N>,
 ): ProviderBinding<C, N> {

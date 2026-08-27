@@ -1,4 +1,13 @@
 {
   "title": "Application fundamentals",
-  "pages": ["application", "functions", "schemas-errors-context"]
+  "pages": [
+    "application",
+    "environment",
+    "providers",
+    "schemas",
+    "errors",
+    "context",
+    "functions",
+    "services"
+  ]
 }

@@ -1,4 +1,4 @@
-import getOrder from "../functions/orders/get-order.function.js";
+import getOrder from "@app/functions/orders/get-order.function.js";
 
 const lookupOrder = getOrder.asTool({
   id: "lookup-order",

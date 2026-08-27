@@ -2,12 +2,15 @@ import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { basename, delimiter, join, relative, resolve } from "node:path";
 import { format } from "prettier";
 import { getCliHelpModel, type CliHelpCommand } from "@relkit/cli/help";
+import { generateGuides } from "./generate-guides.js";
+import { guideRelations } from "./guide-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const content = resolve(import.meta.dir, "../content/docs");
 const checkOnly = process.argv.includes("--check");
 const packages = [
   ["app", "Application"],
+  ["config", "Configuration"],
   ["schema", "Schema"],
   ["functions", "Functions"],
   ["services", "Services"],
@@ -18,6 +21,7 @@ const packages = [
   ["cache", "Cache"],
   ["tools", "Tools"],
   ["agents", "Agents"],
+  ["client", "Client"],
   ["testing", "Testing"],
 ] as const;
 
@@ -25,14 +29,10 @@ async function main(): Promise<void> {
   const cliPackage = JSON.parse(
     await readFile(resolve(root, "packages/cli/package.json"), "utf8"),
   ) as { readonly version: string };
-  await emit(
-    "operations/cli-reference.mdx",
-    renderCliReference(getCliHelpModel(cliPackage.version)),
-  );
-  await emit(
-    "api/meta.json",
-    `${JSON.stringify({ title: "Generated API reference", pages: packages.map(([slug]) => slug) }, null, 2)}\n`,
-  );
+  const cliModel = getCliHelpModel(cliPackage.version);
+  await pruneGeneratedRelations();
+  await generateGuides(root, content, cliModel, emit);
+  await emit("operations/cli-reference.mdx", renderCliReference(cliModel));
   for (const [slug, title] of packages) await emit(`api/${slug}.mdx`, await renderApi(slug, title));
   console.log(
     checkOnly ? "Generated documentation is current." : "Generated documentation updated.",
@@ -162,6 +162,17 @@ async function emit(path: string, value: string): Promise<void> {
   await writeFile(destination, formatted);
   if (!basename(destination).includes("meta"))
     console.log(`generated ${relative(root, destination)}`);
+}
+
+async function pruneGeneratedRelations(): Promise<void> {
+  const directory = resolve(content, "../generated/related");
+  const expected = new Set(guideRelations.map(({ path }) => `${path.replaceAll("/", "-")}.mdx`));
+  for (const file of await readdir(directory).catch(() => [])) {
+    if (expected.has(file)) continue;
+    if (checkOnly)
+      throw new Error(`Generated documentation is stale: content/generated/related/${file}`);
+    await rm(resolve(directory, file));
+  }
 }
 
 await main();

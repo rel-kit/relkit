@@ -1,5 +1,5 @@
 import { aiSdk, defineConfig, external } from "@relkit/app";
-import env from "./src/env.js";
+import env from "@app/env.js";
 
 export default defineConfig({
   env,

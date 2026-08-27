@@ -131,6 +131,7 @@ export function dependencyName(specifier: string): string | undefined {
     specifier.startsWith("/") ||
     specifier.startsWith("#") ||
     specifier.startsWith("@/") ||
+    specifier.startsWith("@app/") ||
     specifier.startsWith("~/") ||
     /^[a-z][a-z+.-]*:/.test(specifier)
   ) {

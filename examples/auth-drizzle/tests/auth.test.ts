@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { auth } from "../src/auth.js";
-import { initializeAuthDatabase } from "../src/data/auth.data-model.js";
+import { auth } from "@app/auth.js";
+import { initializeAuthDatabase } from "@app/data/auth.data-model.js";
 
 test("Better Auth serves its filesystem-mounted API and creates cookie sessions", async () => {
   initializeAuthDatabase();

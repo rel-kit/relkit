@@ -1,4 +1,4 @@
 {
   "title": "Start",
-  "pages": ["create-an-app", "first-route", "local-development", "check-build-deploy"]
+  "pages": ["create-an-app", "first-route", "local-development", "check", "build", "production"]
 }

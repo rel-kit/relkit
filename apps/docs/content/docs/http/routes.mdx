@@ -1,34 +1,66 @@
 ---
 title: File-system routes
-description: Map nested route.ts files and named method exports to deterministic HTTP operations.
+description: Turn route.ts files and named method exports into deterministic HTTP operations.
 ---
 
-Every `src/routes/**/route.ts` file defines a path. Export one or more of `GET`, `POST`, `PUT`,
-`PATCH`, `DELETE`, `HEAD`, and `OPTIONS`; helper exports are allowed.
+Every `src/routes/**/route.ts` file defines a URL path. Named exports define methods. You do not repeat
+`path` or `method` inside `defineRoute`.
 
-| File                                    | Runtime path               | Parameter type                   |
-| --------------------------------------- | -------------------------- | -------------------------------- |
-| `src/routes/route.ts`                   | `/`                        | none                             |
-| `src/routes/orders/route.ts`            | `/orders`                  | none                             |
-| `src/routes/orders/[orderId]/route.ts`  | `/orders/:orderId`         | `string`                         |
-| `src/routes/files/[...parts]/route.ts`  | `/files/*parts`            | `readonly string[]`              |
-| `src/routes/docs/[[...parts]]/route.ts` | `/docs` and `/docs/*parts` | `readonly string[] \| undefined` |
+## Path conventions
+
+| File                                    | Runtime path               | Matching input             |
+| --------------------------------------- | -------------------------- | -------------------------- |
+| `src/routes/route.ts`                   | `/`                        | none                       |
+| `src/routes/orders/route.ts`            | `/orders`                  | none                       |
+| `src/routes/orders/[orderId]/route.ts`  | `/orders/:orderId`         | `orderId: string`          |
+| `src/routes/files/[...parts]/route.ts`  | `/files/*parts`            | `parts: readonly string[]` |
+| `src/routes/docs/[[...parts]]/route.ts` | `/docs` and `/docs/*parts` | optional segment array     |
+
+Valid method exports are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`. Helper exports are
+allowed, but default route exports and legacy `*.route.ts` files fail with source-located migration advice.
+
+## Read a dynamic route
 
 <include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
   ../../examples/commerce/src/routes/orders/[orderId]/route.ts
 </include>
 
-`path` and `method` are not route options. Route IDs are source-scoped and may be omitted; for example,
-`src/routes/orders/[orderId]/route.ts` exporting `GET` derives a safe identity equivalent to
-`route.get.orders.by-order-id`. Explicit IDs remain useful when a file or export will move without
-changing graph and deployment identity. Default exports and legacy `*.route.ts` files fail with
-source-located migration guidance.
+The file contributes `/orders/:orderId`. Each named export creates a separate operation. Matching dynamic
+segment names can map directly into function input or be transformed through an explicit request mapping.
 
-Matching dynamic names become reusable function input and are represented as transport path parameters
-in OpenAPI and generated clients. Route mapping occurs after matching path middleware. Service-member
-targets retain their service identity and share the service's ordered middleware.
+## Add another method
+
+<Steps>
+  <Step>
+    ### Export the method from the existing file
+
+    In `src/routes/status/route.ts`, duplicate the existing `GET` export, rename the copy to `HEAD`, and
+    keep the target as `hello`. The two named exports now describe two HTTP operations in one route file.
+
+  </Step>
+  <Step>
+    ### Check route discovery
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    bun run graph
+    curl -I "http://localhost:3000/status"
+    ```
+
+    `HEAD` invokes the target normally but removes the response body. The graph and OpenAPI document should
+    contain both operations.
+
+  </Step>
+</Steps>
+
+## Matching and identity
 
 Static routes win over dynamic routes, then required catch-all, then optional catch-all. The compiler
-expands optional catch-all paths into two runtime registrations but keeps one authored descriptor and
-one generated client operation. It rejects collisions after normalization. Route groups, parallel
-routes, and intercepting routes are not supported.
+normalizes paths and rejects collisions before activation. Optional catch-all creates two runtime
+registrations but remains one authored descriptor and one generated-client operation.
+
+Route IDs are source-scoped when omitted. Add an explicit ID only when moving the file or export must not
+change graph and deployment identity. Route groups, parallel routes, and intercepting routes are not
+supported.
+
+<include cwd>content/generated/related/http-routes.mdx</include>

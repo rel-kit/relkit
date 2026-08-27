@@ -1,0 +1,78 @@
+---
+title: Rate limits
+description: Protect routes with stable request keys, shared production counters, predictable 429 responses, and deterministic tests.
+---
+
+Rate limiting bounds how often one key may reach a route during a window. Use it to protect expensive or
+abuse-sensitive operations, not as the only authorization control. The limiter runs before body parsing and
+function invocation so rejected requests consume minimal work.
+
+## Configure a route limit
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
+  ../../examples/commerce/src/routes/orders/route.ts
+</include>
+
+The orders search route allows two requests per minute for each `x-api-key` header value and stores counters
+in the numeric `prices` cache. A key may come from a path segment, query, header, cookie, or constant mapping.
+Body-dependent and callback keys are rejected because the limiter executes before request mapping.
+
+## Choose a meaningful key
+
+Use a stable authenticated account, tenant, or API key when available. IP addresses can group unrelated users
+behind a proxy and change between requests; use them only with a trusted proxy configuration and an understood
+abuse model. A constant key creates a global limit across all callers.
+
+Never put a secret itself into logs or responses. The limiter may hash or otherwise protect stored keys, but
+application telemetry should still treat authentication material as sensitive.
+
+## Verify the limit
+
+<Steps>
+  <Step>
+    ### Send requests with one key
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
+    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
+    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
+    ```
+
+    With the commerce configuration, the first two requests succeed and the third returns `429` until the
+    window resets. Use the port configured by your application.
+
+  </Step>
+  <Step>
+    ### Inspect response metadata
+
+    Confirm the rejection contains safe JSON and standard limit/retry headers. OpenAPI and the inspector should
+    also show the `429` contract and rate-limit attributes.
+
+  </Step>
+  <Step>
+    ### Prove key isolation
+
+    Repeat the request with `x-api-key: another-demo`; it should have an independent counter. In tests, use a
+    deterministic fake cache or clock rather than sleeping for the real window.
+
+  </Step>
+</Steps>
+
+## Local and production storage
+
+<Tabs items={["Development", "Production"]}>
+  <Tab value="Development">
+    Omit `store` for a process-local in-memory counter. It resets on reload and each process
+    enforces its own limit, which is convenient for local development only.
+  </Tab>
+  <Tab value="Production">
+    Bind a shared numeric cache so every replica observes the same counters and restarts do not
+    silently reset policy. Production checks reject process-local limiting.
+  </Tab>
+</Tabs>
+
+Choose `limit` and `windowMs` from measured capacity and product policy. A very high untested limit provides
+little protection; a low global limit can create an outage. Monitor rejection rate and latency, then revise
+with evidence.
+
+<include cwd>content/generated/related/http-rate-limits.mdx</include>

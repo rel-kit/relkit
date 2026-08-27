@@ -1,0 +1,77 @@
+---
+title: Declared errors
+description: Model expected domain failures, map them to stable HTTP contracts, and decide whether asynchronous work may retry.
+---
+
+A declared error is an expected outcome a caller can understand and handle. Examples include an unknown
+order, insufficient inventory, or a temporary upstream rejection. Unexpected exceptions and programmer
+defects are not declared errors; they remain internal and are redacted at public boundaries.
+
+## Define a stable domain failure
+
+<include cwd lang="ts" meta='title="examples/commerce/src/errors/order-not-found.error.ts"'>
+  ../../examples/commerce/src/errors/order-not-found.error.ts
+</include>
+
+The `id` is the durable contract used in graphs, clients, traces, and error matching. `data` contains the
+bounded details safe for callers. `message` may derive a readable explanation. `http.status` contributes a
+typed route response, and `retry` tells durable delivery whether another attempt may help.
+
+## Return and observe the error
+
+The order lookup function lists the descriptor under its errors and throws the constructed declared value
+when no order exists. Its dynamic route includes the error response in the checked contract.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/functions/orders/get-order.function.ts"'>
+  ../../examples/commerce/src/functions/orders/get-order.function.ts
+</include>
+
+<Steps>
+  <Step>
+    ### Check the contract
+
+    ```sh title="Terminal — relkit-orders"
+    bun run check
+    ```
+
+    Search `.relkit/generated/openapi.json` for `orders.not-found` and status `404`.
+
+  </Step>
+  <Step>
+    ### Exercise the failure
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i "http://localhost:3000/orders/missing"
+    ```
+
+    Expect HTTP `404` and safe JSON containing the stable code and validated `orderId`; no stack or provider
+    credentials may appear.
+
+  </Step>
+  <Step>
+    ### Test it as a contract
+
+    Assert the stable error code, structured data, and transport status. Do not assert a complete formatted
+    stack trace or incidental internal message.
+
+  </Step>
+</Steps>
+
+## Choose retry policy
+
+<Tabs items={["Never", "Later", "Delayed"]}>
+  <Tab value="Never">Use `retry: "never"` when identical input cannot succeed, such as a permanently invalid state.</Tab>
+  <Tab value="Later">Use `retry: "later"` for a transient condition when the provider's normal backoff is sufficient.</Tab>
+  <Tab value="Delayed">Use `{ kind: "later", afterMs }` to provide a minimum delay. The durable provider may wait longer.</Tab>
+</Tabs>
+
+HTTP and direct function invocation do not automatically retry. Jobs and event listeners combine declared
+retry metadata with their own bounded retry policy. A retryable declaration is therefore guidance, not an
+unbounded loop.
+
+<Callout type="warn" title="Do not declare arbitrary exceptions">
+  Converting every caught exception into a public error leaks implementation detail and makes
+  callers depend on unstable failures. Declare only outcomes the domain promises to handle.
+</Callout>
+
+<include cwd>content/generated/related/fundamentals-errors.mdx</include>

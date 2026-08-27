@@ -1,4 +1,4 @@
 {
   "title": "Asynchronous work",
-  "pages": ["jobs", "events"]
+  "pages": ["jobs", "schedules", "events", "listeners"]
 }

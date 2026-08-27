@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { createDatabaseContext } from "@relkit/drizzle";
-import model, { initializeDataModel, sqlite } from "../src/data/application.data-model.js";
+import model, { initializeDataModel, sqlite } from "@app/data/application.data-model.js";
 
 test("runs CRUD, custom methods, composite selectors, schemas, and rollback", async () => {
   initializeDataModel();

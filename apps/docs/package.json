@@ -9,7 +9,7 @@
     "check:jsdoc": "bun run scripts/check-jsdoc.ts",
     "check:links": "bun run scripts/check-links.ts",
     "check:search": "bun run scripts/check-search.ts",
-    "dev": "next dev --hostname 127.0.0.1 --port 3001",
+    "dev": "bun run generate && next dev --hostname 127.0.0.1 --port 3001",
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
     "test": "bun test tests",

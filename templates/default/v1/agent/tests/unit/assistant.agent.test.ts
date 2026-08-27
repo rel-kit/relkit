@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createTestAgent, invokeFunction } from "@relkit/testing";
-import assistant from "../../src/agents/assistant.agent.js";
-import hello, { lookup } from "../../src/functions/hello.function.js";
+import assistant from "@app/agents/assistant.agent.js";
+import hello, { lookup } from "@app/functions/hello.function.js";
 
 test("assistant uses a function-derived tool with an offline AI SDK model", async () => {
   expect(assistant.model).toBe("openai:gpt-5-mini");

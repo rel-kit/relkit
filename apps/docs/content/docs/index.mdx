@@ -1,28 +1,100 @@
 ---
 title: RELKIT
-description: A convention-first TypeScript framework for HTTP, asynchronous work, resources, AI, and operations.
+description: Build typed TypeScript backends from one application model, then use the same model in development, tests, documentation, inspection, and deployment.
 ---
 
-RELKIT turns typed application descriptors into one deterministic graph used by local development,
-tests, generated clients, OpenAPI, the inspector, and deployment.
+RELKIT is a convention-first framework for TypeScript backend applications. You describe functions,
+HTTP routes, asynchronous work, resources, and AI boundaries in ordinary source files. RELKIT compiles
+those descriptors into one deterministic application graph and uses that graph everywhere.
 
-## The short path
+<Callout title="Who these guides are for">
+  You only need basic TypeScript. The guides explain RELKIT, Bun commands, HTTP behavior, provider
+  configuration, testing, and deployment concepts when they first appear.
+</Callout>
 
-```sh
-bunx create-relkit@latest my-app --template api
-cd my-app
-bun run dev
+## Why RELKIT exists
+
+Backend projects often describe the same operation several times: once in a handler, again in a router,
+again in validation, again in OpenAPI, and again in deployment configuration. Those copies drift.
+RELKIT makes the validated function the reusable unit and derives the surrounding transport and
+operational artifacts from it.
+
+```text title="The RELKIT application model"
+TypeScript descriptors
+        ↓
+checked application graph
+        ↓
+development · tests · HTTP · jobs · events · OpenAPI · clients · inspector · deployment
 ```
 
-Add a function with runtime schemas, export a method from `src/routes/**/route.ts`, and RELKIT derives
-the route path, request transport, response contract, client, and API reference.
+The graph is not a second application that you maintain. It is generated output. You edit TypeScript
+source, run `relkit check`, and let every consumer use the same checked result.
 
-## What to read
+## What you can build
 
-- [Create an application](/docs/start/create-an-app) for prerequisites and generated structure.
-- [File-system routes](/docs/http/routes) for every path and method convention.
-- [Functions and schemas](/docs/fundamentals/functions) for the validated execution model.
-- [Events](/docs/async/events) for typed callback listeners and durable delivery.
-- [CLI reference](/docs/operations/cli-reference) for every command and option.
+<include cwd>content/generated/capabilities.mdx</include>
 
-The complete, executable feature map lives in [`examples/commerce`](https://github.com/rel-kit/relkit/tree/main/examples/commerce).
+## Choose a path
+
+<Cards>
+  <Card
+    title="Build your first application"
+    description="Create a local-only orders API, change it, test it, and produce a production build."
+    href="/docs/start/create-an-app"
+  />
+  <Card
+    title="Understand the authoring model"
+    description="Learn how configuration, functions, schemas, errors, and context fit together."
+    href="/docs/fundamentals/application"
+  />
+  <Card
+    title="Solve an HTTP task"
+    description="Find route, request, upload, middleware, response, OpenAPI, and client guidance."
+    href="/docs/http/routes"
+  />
+  <Card
+    title="Look up an API"
+    description="Use generated TypeScript signatures, descriptions, source links, and runnable examples."
+    href="/docs/api/app"
+  />
+</Cards>
+
+## The recommended sequence
+
+<Steps>
+  <Step>
+    ### Create and run an application
+
+    Follow [Start](/docs/start/create-an-app) from prerequisites through a local production build. This
+    path requires no cloud credentials and does not create paid resources.
+
+  </Step>
+  <Step>
+    ### Learn the reusable model
+
+    Read [Application fundamentals](/docs/fundamentals/application), then apply the HTTP and asynchronous
+    guides to the same orders domain.
+
+  </Step>
+  <Step>
+    ### Operate what you built
+
+    Use the inspector, traces, deterministic tests, diagnostics, and deployment preview only after the
+    application behavior is clear.
+
+  </Step>
+</Steps>
+
+## Documentation and source of truth
+
+Guide prose teaches when and why to use a feature. The [generated API reference](/docs/api/app) is the
+source for exact signatures, while the [CLI reference](/docs/operations/cli-reference) is generated from
+the same help model as `relkit --help`. Complete examples are included from tested template and commerce
+source files so the documentation cannot silently preserve an old copy.
+
+The canonical cross-feature application is
+[`examples/commerce`](https://github.com/rel-kit/relkit/tree/main/examples/commerce). To report a problem,
+open an issue in the [`rel-kit/relkit` repository](https://github.com/rel-kit/relkit/issues) with the
+command, diagnostic code, and a minimal reproduction.
+
+<include cwd>content/generated/related/index.mdx</include>

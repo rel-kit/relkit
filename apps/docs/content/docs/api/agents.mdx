@@ -11,6 +11,9 @@ description: Generated public TypeScript reference for @relkit/agents.
 
 ## Exports Grouped by Category
 
+- [Approvals](#approvals)
+  - [approveApproval](#approveapproval)
+  - [denyApproval](#denyapproval)
 - [utils](#utils)
   - [APPROVAL_STATES](#approval_states)
   - [ApprovalDeniedError (class)](#approvaldeniederror-class)
@@ -28,14 +31,74 @@ description: Generated public TypeScript reference for @relkit/agents.
   - [ApprovedApproval (interface)](#approvedapproval-interface)
   - [DeniedApproval (interface)](#deniedapproval-interface)
   - [PendingApproval (interface)](#pendingapproval-interface)
-  - [approveApproval](#approveapproval)
   - [assertApprovalGranted](#assertapprovalgranted)
   - [createApproval](#createapproval)
-  - [denyApproval](#denyapproval)
   - [isApprovalRecord](#isapprovalrecord)
   - [requiresApproval](#requiresapproval)
 
 ---
+
+# Approvals
+
+## approveApproval
+
+Moves a pending approval to the approved state.
+
+**Example**
+
+```ts
+import { approveApproval, createApproval } from "@relkit/agents";
+
+const pending = createApproval({
+  invocationId: "invocation-1",
+  toolCallId: "tool-call-1",
+  toolId: "cancel-order",
+  sideEffect: "write",
+  policy: "always",
+});
+const approved = approveApproval(pending);
+if (approved.state !== "approved") throw new Error("approval did not transition");
+```
+
+**Signature**
+
+```ts
+declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L99)
+
+Since v0.1.0
+
+## denyApproval
+
+Moves a pending approval to the denied state.
+
+**Example**
+
+```ts
+import { createApproval, denyApproval } from "@relkit/agents";
+
+const pending = createApproval({
+  invocationId: "invocation-1",
+  toolCallId: "tool-call-1",
+  toolId: "cancel-order",
+  sideEffect: "write",
+  policy: "always",
+});
+const denied = denyApproval(pending);
+if (denied.state !== "denied") throw new Error("approval did not transition");
+```
+
+**Signature**
+
+```ts
+declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L124)
+
+Since v0.1.0
 
 # utils
 
@@ -218,18 +281,6 @@ export interface PendingApproval extends ApprovalMetadata {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L23)
 
-## approveApproval
-
-Moves a pending approval to the approved state.
-
-**Signature**
-
-```ts
-declare const approveApproval: (approval: ApprovalRecord) => ApprovedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L80)
-
 ## assertApprovalGranted
 
 Rejects execution unless the record is approved.
@@ -242,7 +293,7 @@ declare const assertApprovalGranted: (
 ) => asserts approval is ApprovedApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L130)
 
 ## createApproval
 
@@ -256,18 +307,6 @@ declare const createApproval: (options: ApprovalOptions) => ApprovalRecord;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L74)
 
-## denyApproval
-
-Moves a pending approval to the denied state.
-
-**Signature**
-
-```ts
-declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L86)
-
 ## isApprovalRecord
 
 **Signature**
@@ -276,7 +315,7 @@ declare const denyApproval: (approval: ApprovalRecord) => DeniedApproval;
 declare const isApprovalRecord: (value: unknown) => value is ApprovalRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/approval.ts#L138)
 
 ## requiresApproval
 

@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app";
-import { orderDeleteInput, orderDeleteOutput } from "../../shared/schemas.js";
+import { orderDeleteInput, orderDeleteOutput } from "@app/shared/schemas.js";
 
 const deleteOrder = defineFunction({
   input: orderDeleteInput,

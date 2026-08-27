@@ -1,6 +1,6 @@
 # Testing
 
-RelKit tests exercise the same function engine and canonical graph used by
+RELKIT tests exercise the same function engine and canonical graph used by
 development, the inspector, and deployment. Keep tests deterministic and use
 the smallest layer that proves the behavior.
 
@@ -25,7 +25,7 @@ Unit tests invoke a function descriptor directly through `invokeFunction`:
 ```ts
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import hello from "../../src/functions/hello.function.js";
+import hello from "@app/functions/hello.function.js";
 
 test("hello returns a greeting", async () => {
   await expect(invokeFunction(hello, { name: "Mustafa" })).resolves.toEqual({
@@ -43,9 +43,9 @@ Integration tests use `createTestApplication` and its in-process HTTP client:
 ```ts
 import { afterAll, expect, test } from "bun:test";
 import { createTestApplication } from "@relkit/testing";
-import app from "../../src/app.js";
+import config from "../../relkit.config.js";
 
-const testApp = await createTestApplication(app);
+const testApp = await createTestApplication(config);
 
 test("GET /hello", async () => {
   const response = await testApp.http.request("/hello?name=Mustafa");
@@ -65,7 +65,7 @@ duplicate behavior rather than relying on timing or arbitrary sleeps.
 
 ## Repository checks
 
-From the RelKit repository root, the shipped focused commands are:
+From the RELKIT repository root, the shipped focused commands are:
 
 | Concern                          | Command                         |
 | -------------------------------- | ------------------------------- |

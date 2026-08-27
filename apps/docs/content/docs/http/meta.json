@@ -1,4 +1,13 @@
 {
   "title": "HTTP",
-  "pages": ["routes", "requests", "uploads-middleware-rate-limits", "responses-openapi-clients"]
+  "pages": [
+    "routes",
+    "requests",
+    "uploads",
+    "middleware",
+    "rate-limits",
+    "responses",
+    "openapi",
+    "generated-clients"
+  ]
 }

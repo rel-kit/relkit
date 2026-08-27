@@ -1,0 +1,79 @@
+---
+title: Runtime schemas
+description: Model trusted domain values, reject invalid boundary input, and reuse one contract across runtime, OpenAPI, and clients.
+---
+
+TypeScript types disappear at runtime. RELKIT schemas remain executable, so the same definition can validate
+HTTP input, job payloads, events, cache values, tool calls, function output, generated OpenAPI, and client
+contracts. Treat every value arriving from a transport or provider as unknown until a schema accepts it.
+
+## Build a domain schema
+
+<include cwd lang="ts" meta='title="examples/commerce/src/shared/schemas.ts"'>
+  ../../examples/commerce/src/shared/schemas.ts
+</include>
+
+Start with the shape the domain actually accepts. Use non-empty strings for identifiers, integer and range
+constraints for counts and money, literals for closed states, and object schemas for named fields. Optional
+means the caller may omit a value; default means omission produces a specific value. They are not
+interchangeable.
+
+## Apply validation at a boundary
+
+<Steps>
+  <Step>
+    ### Attach schemas to a descriptor
+
+    A function owns `input` and `output`. Routes, jobs, events, caches, and tools reuse those contracts or
+    declare their own boundary schema. Avoid copying a similar object shape into each descriptor.
+
+  </Step>
+  <Step>
+    ### Send a valid request
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/orders" \
+      -H "content-type: application/json" \
+      -H "idempotency-key: order-1" \
+      -H "x-customer-email: buyer@example.com" \
+      -d '{"sku":"book","quantity":2}'
+    ```
+
+    Expect the success status declared by the route and an output that has also passed runtime validation.
+
+  </Step>
+  <Step>
+    ### Prove invalid input never reaches the handler
+
+    ```sh title="Terminal — relkit-orders"
+    curl -i -X POST "http://localhost:3000/orders" \
+      -H "content-type: application/json" \
+      -H "idempotency-key: order-2" \
+      -H "x-customer-email: buyer@example.com" \
+      -d '{"sku":"book","quantity":0}'
+    ```
+
+    Expect HTTP `422` with bounded issues describing `quantity`. The function handler and its side effects do
+    not run.
+
+  </Step>
+</Steps>
+
+## Input and output failures differ
+
+Invalid input is a caller error and becomes a safe boundary response. Invalid function output is an
+application defect: the handler promised a contract and violated it. RELKIT records the defect with tracing
+and returns a safe error rather than leaking the invalid value or stack.
+
+Use `validate` directly only when your own code acquires an unowned unknown value. Normal descriptor
+boundaries validate automatically, so parsing again inside the handler creates duplicate work and divergent
+error behavior.
+
+## Evolve a schema safely
+
+Adding an optional input may be compatible; making an optional field required is not. Removing an output
+field can break generated clients. For events and durable jobs, remember that stored payloads may outlive the
+current release. Compare graph and contract changes, test an older representative payload, and version the
+event when consumers cannot migrate atomically.
+
+<include cwd>content/generated/related/fundamentals-schemas.mdx</include>
