@@ -7,6 +7,7 @@ const sendReceiptJob = defineJob({
   input: receiptInput,
   target: sendReceipt,
   profile: "default",
+  // Retry transient failures with bounded exponential backoff.
   retry: {
     maxAttempts: 3,
     initialDelayMs: 500,
@@ -16,6 +17,7 @@ const sendReceiptJob = defineJob({
   },
   timeoutMs: 5_000,
   concurrency: 4,
+  // The same target can also run on an hourly UTC schedule.
   schedule: [
     {
       id: "receipts.reconcile",
@@ -25,6 +27,7 @@ const sendReceiptJob = defineJob({
       overlap: "skip",
     },
   ],
+  // Suppress duplicate work for the same order for 24 hours.
   idempotency: { key: "orderId", retentionMs: 86_400_000 },
 });
 

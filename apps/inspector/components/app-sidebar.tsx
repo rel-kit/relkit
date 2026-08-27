@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import {
@@ -26,9 +27,14 @@ export function AppSidebar({ status = "offline" }: { readonly status?: string })
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild tooltip="RELKIT Inspector">
               <Link href="/" aria-label="RELKIT Inspector overview">
-                <div className="brand-mark flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  Z
-                </div>
+                <Image
+                  className="brand-mark aspect-square size-8 rounded-lg object-cover"
+                  src="/logo.svg"
+                  alt=""
+                  width={32}
+                  height={32}
+                  priority
+                />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">RELKIT</span>
                   <span>Inspector</span>

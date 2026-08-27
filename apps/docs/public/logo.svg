@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="RELKIT">
+  <rect width="40" height="40" rx="10" fill="#0a0a0a" />
+  <path
+    fill="#fff"
+    d="M10 8h11.5C27.3 8 31 11.4 31 16.4c0 3.5-1.8 6.2-5 7.6l6 8h-6.5l-5-7H16v7h-6V8Zm6 5v7h5c2.6 0 4-1.2 4-3.5S23.6 13 21 13h-5Z"
+  />
+</svg>
