@@ -45,6 +45,9 @@ export function formatGenerateResult(value: unknown): string {
   if (!isRecord(value) || !isNextSteps(value.nextSteps)) return JSON.stringify(value);
   const { commands, endpoints } = value.nextSteps;
   return [
+    ...(typeof value.name === "string" && typeof value.destination === "string"
+      ? [`Success! Created ${value.name} at ${value.destination}.`, ""]
+      : []),
     commands.cd,
     commands.dev,
     "",

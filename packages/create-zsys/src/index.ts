@@ -11,7 +11,11 @@ export * from "./generate-output.js";
 if (import.meta.main) {
   try {
     const options = normalizeCreateOptions(process.argv.slice(2));
-    const result = await generateProject(options);
+    const result = await generateProject(options, {
+      ...(options.json
+        ? {}
+        : { onProgress: (message: string) => process.stderr.write(`${message}\n`) }),
+    });
     process.stdout.write(
       `${options.json ? JSON.stringify(result) : formatGenerateResult(result)}\n`,
     );

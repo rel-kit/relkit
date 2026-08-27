@@ -48,3 +48,28 @@ test("doctor accepts local ZSYS package links", async () => {
 
   expect(checks.find((check) => check.name === "zsys-packages")?.ok).toBe(true);
 });
+
+test("local launcher and linked CLI hide workspace build output", async () => {
+  const repository = join(import.meta.dir, "../..");
+  const external = await mkdtemp(join(tmpdir(), "zsys-linked-cli-"));
+  roots.push(external);
+  for (const [executable, cwd] of [
+    [join(repository, "scripts/zsys-local.ts"), repository],
+    [join(repository, "packages/cli/dist/index.js"), external],
+  ]) {
+    const child = Bun.spawn([process.execPath, executable, "--version"], {
+      cwd,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const [stdout, stderr, exitCode] = await Promise.all([
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
+    expect(exitCode).toBe(0);
+    expect(stdout.trim()).toBe("zsys 0.0.0");
+    expect(`${stdout}\n${stderr}`).not.toContain("turbo");
+    expect(`${stdout}\n${stderr}`).not.toContain("Workspace build passed");
+  }
+}, 20_000);

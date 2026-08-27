@@ -225,7 +225,35 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
     apiReference: "http://localhost:3000/_zsys/v1/api-reference",
   });
   expect(formatGenerateResult(json)).toContain("api docs:");
+  expect(formatGenerateResult(json)).toContain(
+    `Success! Created @scope/json-app at ${result.destination}.`,
+  );
   expect(formatGenerateResult(json)).not.toContain("route:");
+});
+
+test("reports only the create milestones that run", async () => {
+  const root = await makeRoot();
+  const full: string[] = [];
+  await generateProject(createOptions("full-progress"), {
+    ...contextFor(root),
+    onProgress: (message) => full.push(message),
+  });
+  expect(full).toEqual([
+    `Creating a new ZSYS app in ${join(root, "full-progress")}.`,
+    "Installing dependencies...",
+    "Initializing Git repository...",
+    "Checking generated project...",
+  ]);
+
+  const minimal: string[] = [];
+  await generateProject(createOptions("minimal-progress", { install: false, git: false }), {
+    ...contextFor(root),
+    onProgress: (message) => minimal.push(message),
+  });
+  expect(minimal).toEqual([
+    `Creating a new ZSYS app in ${join(root, "minimal-progress")}.`,
+    "Checking generated project...",
+  ]);
 });
 
 test("produces byte-identical content from separate destinations", async () => {

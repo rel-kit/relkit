@@ -29,11 +29,11 @@ bunx create-zsys@latest my-app
 cd my-app
 ```
 
-When testing changes from a ZSys checkout, use its source-backed CLI after
-building the workspace; this does not publish packages:
+When testing changes from a ZSys checkout, use its local launcher. It quietly
+syncs and links framework packages without publishing them, and a running local
+development session restarts after successful framework changes:
 
 ```sh
-bun run build
 bun run zsys:local -- create my-app --cloud none --deploy none
 ```
 

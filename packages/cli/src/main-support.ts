@@ -30,6 +30,7 @@ export interface CliCommandContext {
   readonly signal: AbortSignal;
   readonly reporter: CliReporter;
   readonly log: CliLogger;
+  readonly onProgress?: (message: string) => void;
 }
 export interface CreateZsysGeneratorApi {
   readonly normalizeCreateOptions: (

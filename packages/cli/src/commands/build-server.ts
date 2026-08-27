@@ -99,6 +99,7 @@ const app = createApp({
   manifest: executableManifest,
   engine: { invoke: invokeHttp },
   observability: telemetry,
+  responseMapping: { mode: environment },
   middlewareContext: routeMiddlewareContext,
   middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes} },
   apiDocs: {

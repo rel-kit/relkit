@@ -1,3 +1,5 @@
+import { s3ErrorDetail } from "./s3-xml.js";
+
 export interface S3Credentials {
   readonly accessKeyId: string;
   readonly secretAccessKey: string;
@@ -102,7 +104,8 @@ async function workloadCredentials(
 
 export async function assertResponse(response: Response, operation: string): Promise<Response> {
   if (response.ok) return response;
-  throw new Error(`${operation} failed with status ${response.status}`);
+  const detail = s3ErrorDetail(await response.text());
+  throw new Error(`${operation} failed with status ${response.status}${detail ? `: ${detail}` : ""}`);
 }
 
 async function signHeaders(

@@ -154,6 +154,26 @@ describe("HTTP response mapping", () => {
     expect(body).not.toContain("secret");
   });
 
+  test("returns redacted provider response details in development", async () => {
+    const failure = providerFailure(
+      new Error("S3 put failed with status 403: InvalidAccessKeyId: password=provider-secret"),
+    );
+    const response = await mapFailureResponse(
+      trigger([]),
+      failure,
+      { mode: "development" },
+    );
+
+    expect(response.status).toBe(502);
+    expect(await response.json()).toEqual({
+      error: "provider-failure",
+      message: "S3 put failed with status 403: InvalidAccessKeyId: password=[REDACTED]",
+    });
+
+    const production = await mapFailureResponse(trigger([]), failure, { mode: "production" });
+    expect(await production.json()).toEqual({ error: "provider-failure" });
+  });
+
   test("maps engine failures through the materialized route", async () => {
     const route = trigger([{ kind: "response", id: "timeout", status: 504 }]);
     const app = createApp({

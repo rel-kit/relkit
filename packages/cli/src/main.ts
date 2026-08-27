@@ -105,7 +105,7 @@ async function executeInvocation(
   const status = richStatus(runtime, json, io, invocation.command);
   try {
     status.start();
-    const result = await execute(invocation, runtime, signal, reporter, log, json);
+    const result = await execute(invocation, runtime, signal, reporter, log, json, io);
     if (signal.aborted) {
       const failure = toFailure(signal.reason, signal);
       reporter.error(failure.code, failure.message);
@@ -130,6 +130,7 @@ async function execute(
   reporter: CliReporter,
   log: CliLogger,
   json: boolean,
+  io: CliIo,
 ): Promise<number> {
   const context = {
     command: invocation.command,
@@ -138,6 +139,7 @@ async function execute(
     signal,
     reporter,
     log,
+    ...(json ? {} : { onProgress: (message: string) => io.stderr(message) }),
   };
   if (invocation.command !== "create") return executeCommand(invocation, context);
   const api = await (runtime.loadCreateZsys ?? loadCreateZsys)();
@@ -180,6 +182,7 @@ function actionValue(argv: readonly string[], name: string): string | undefined 
 function richStatus(runtime: CliRuntime, json: boolean, io: CliIo, command: string) {
   const enabled =
     !json &&
+    command !== "create" &&
     !(runtime.ci ?? Boolean(process.env.CI)) &&
     (runtime.tty ?? process.stderr.isTTY) === true;
   return {

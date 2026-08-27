@@ -46,6 +46,7 @@ export interface GenerateProjectContext {
   readonly gitExecutable?: string;
   readonly zsysExecutable?: string;
   readonly signal?: AbortSignal;
+  readonly onProgress?: (message: string) => void;
   readonly failAt?: (point: GenerateFailurePoint) => void;
 }
 
@@ -93,6 +94,7 @@ export async function generateProject(
     throw generationError(error, "ZSYS_CREATE_VALIDATION_FAILED");
   }
   throwIfAborted(context.signal);
+  context.onProgress?.(`Creating a new ZSYS app in ${validated.destination}.`);
 
   const templateRoot = resolveTemplateRoot(context);
   const template = join(templateRoot, options.template);
@@ -114,6 +116,7 @@ export async function generateProject(
     await requireFiles(staged, ["package.json", "zsys.config.ts", "src/env.ts", ".env.example"]);
 
     if (options.install) {
+      context.onProgress?.("Installing dependencies...");
       await runProjectStep(
         context,
         [context.bunExecutable ?? process.execPath, "install"],
@@ -125,10 +128,14 @@ export async function generateProject(
 
     const git = context.gitExecutable ?? (context.commandRunner ? "git" : Bun.which("git"));
     const gitInitialized = options.git && git !== null;
-    if (gitInitialized) await runProjectStep(context, [git, "init"], staged, "git", "git");
+    if (gitInitialized) {
+      context.onProgress?.("Initializing Git repository...");
+      await runProjectStep(context, [git, "init"], staged, "git", "git");
+    }
 
     const zsys = await resolveZsysExecutable(context, staged);
     const deploymentCheck = options.cloud === "none" || options.deploy === "none";
+    context.onProgress?.("Checking generated project...");
     await runProjectStep(
       context,
       [zsys, "doctor", "--project-root", staged, ...(deploymentCheck ? ["--no-pulumi"] : [])],

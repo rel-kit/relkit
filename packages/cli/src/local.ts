@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   generateProject,
   normalizeCreateOptions,
@@ -10,7 +11,7 @@ import { runCli } from "./main.js";
 import type { CliCommandContext } from "./main-support.js";
 
 const root = resolve(import.meta.dir, "../../..");
-const cli = join(root, "packages/cli/dist/index.js");
+const cli = fileURLToPath(import.meta.url);
 
 type Manifest = {
   name?: string;
@@ -111,11 +112,23 @@ async function generateLocalProject(options: unknown, context: CliCommandContext
     bunExecutable: process.execPath,
     zsysExecutable: cli,
     commandRunner: runLocalCommand,
+    ...(context.onProgress === undefined ? {} : { onProgress: context.onProgress }),
   });
 }
 
 export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
+  const dev = argv.find((argument) => !argument.startsWith("-")) === "dev";
   return runCli(argv, {
+    ...(dev
+      ? {
+          io: {
+            stdout: (line: string) => process.stdout.write(`${line}\n`),
+            stderr: (line: string) => {
+              if (!line.startsWith("ZSYS_INTERRUPTED:")) process.stderr.write(`${line}\n`);
+            },
+          },
+        }
+      : {}),
     loadCreateZsys: async () => ({
       normalizeCreateOptions,
       generateProject: generateLocalProject,

@@ -1,6 +1,12 @@
 import { InvocationValidationError } from "@zsys/engine";
 import type { HttpTriggerRegistration } from "@zsys/graph";
-import { isInvocationFailure, normalizeFailure, toPublicEnvelope } from "@zsys/runtime-effect";
+import {
+  isInvocationFailure,
+  normalizeFailure,
+  toFailureTelemetry,
+  toPublicEnvelope,
+  type InvocationFailure,
+} from "@zsys/runtime-effect";
 import { validate, type StandardIssue, type StandardSchemaV1 } from "@zsys/schema";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import {
@@ -80,7 +86,7 @@ export async function mapFailureResponse(
         response.headers.set("Retry-After", String(Math.ceil(failure.afterMs / 1000)));
       return response;
     }
-    return genericFailureResponse(trigger, failure.kind, failure.outcome, options);
+    return genericFailureResponse(trigger, failure, options);
   } catch {
     return genericResponse("internal-error", 500);
   }
@@ -100,10 +106,10 @@ export async function mapInputValidationResponse(
 
 async function genericFailureResponse(
   trigger: HttpTriggerRegistration,
-  kind: string,
-  outcome: string,
+  failure: InvocationFailure,
   options: ResponseMappingOptions,
 ): Promise<Response> {
+  const { kind, outcome } = failure;
   const declaration = findResponse(trigger, [outcome, kind]);
   const details: Record<string, { readonly status: number; readonly error: string }> = {
     provider: { status: 502, error: "provider-failure" },
@@ -114,10 +120,21 @@ async function genericFailureResponse(
     defect: { status: 500, error: "internal-error" },
   };
   const detail = details[outcome] ?? details[kind] ?? { status: 500, error: "internal-error" };
-  const body = { error: detail.error };
+  const message = developmentProviderMessage(failure, options.mode);
+  const body = { error: detail.error, ...(message === undefined ? {} : { message }) };
   return (await responseIsValid(trigger, declaration, body, options))
     ? jsonResponse(body, responseStatus(declaration, detail.status))
     : genericResponse("internal-error", 500);
+}
+
+function developmentProviderMessage(
+  failure: InvocationFailure,
+  mode: ResponseMode | undefined,
+): string | undefined {
+  if (failure.kind !== "provider" || mode !== "development") return undefined;
+  const cause = toFailureTelemetry(failure, { mode: "development" }).internal?.cause;
+  if (cause === null || typeof cause !== "object" || !("message" in cause)) return undefined;
+  return typeof cause.message === "string" ? cause.message : undefined;
 }
 
 async function responseIsValid(

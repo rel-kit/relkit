@@ -154,7 +154,10 @@ test("keeps command and create failures structured in JSON", async () => {
       installSignalHandlers: false,
       loadCreateZsys: async () => ({
         normalizeCreateOptions: () => ({ name: "demo" }),
-        generateProject: async () => result,
+        generateProject: async (_options, context) => {
+          expect(context.onProgress).toBeUndefined();
+          return result;
+        },
       }),
     }),
   ).toBe(CLI_EXIT_CODES.success);
@@ -186,7 +189,7 @@ test("renders focused help for every command and nested subcommand", async () =>
   expect(output).toMatchSnapshot();
 });
 
-test("generates completions, suggestions, help metadata, and TTY-only status", async () => {
+test("generates completions, suggestions, help metadata, and command status", async () => {
   for (const shell of ["bash", "zsh", "fish"] as const) {
     const captured = io();
     expect(
@@ -221,11 +224,14 @@ test("generates completions, suggestions, help metadata, and TTY-only status", a
       installSignalHandlers: false,
       loadCreateZsys: async () => ({
         normalizeCreateOptions: () => ({ name: "demo" }),
-        generateProject: async () => undefined,
+        generateProject: async (_options, context) => {
+          context.onProgress?.("Checking generated project...");
+          return undefined;
+        },
       }),
     }),
   ).toBe(CLI_EXIT_CODES.success);
-  expect(status.stderr).toEqual(["● zsys create", "✓ zsys create"]);
+  expect(status.stderr).toEqual(["Checking generated project..."]);
 });
 
 test("removes signal handlers and reports interruption without corrupting JSON", async () => {

@@ -127,6 +127,25 @@ describe("S3-compatible provider", () => {
       provider.get!("cancelled", { operation: "get", signal: controller.signal }),
     ).rejects.toThrow("cancelled");
   });
+
+  test("includes the S3 response code and message in provider errors", async () => {
+    const provider = createS3BucketProvider({
+      endpoint: "https://project.storage.supabase.co/storage/v1/s3",
+      bucketName: "assets",
+      region: "eu-central-1",
+      credentials,
+      forcePathStyle: true,
+      fetch: (async () =>
+        new Response(
+          "<Error><Code>InvalidAccessKeyId</Code><Message>Access key not found</Message></Error>",
+          { status: 403 },
+        )) as typeof fetch,
+    });
+
+    await expect(provider.list!()).rejects.toThrow(
+      "S3 list failed with status 403: InvalidAccessKeyId: Access key not found",
+    );
+  });
 });
 
 describe("Redis-compatible provider", () => {
