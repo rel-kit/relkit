@@ -97,6 +97,12 @@
       "skillPath": "package-maintenance/skills/pulumi-upgrade-provider/SKILL.md",
       "computedHash": "9030e46d784020cd527f0f6fda3a25bdee9691f59347e20162224d196e5151f4"
     },
+    "radix-base-ui-sync": {
+      "source": "fuma-nama/fumadocs",
+      "sourceType": "github",
+      "skillPath": ".cursor/skills/radix-base-ui-sync/SKILL.md",
+      "computedHash": "7594fe0fddf63092d3c8b0af65184434b53ad481f0aab0a562c0dfbf600fb4be"
+    },
     "turborepo": {
       "source": "antfu/skills",
       "sourceType": "github",
