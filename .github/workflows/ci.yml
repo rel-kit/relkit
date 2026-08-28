@@ -227,7 +227,7 @@ jobs:
 
   version:
     name: Update release pull request
-    if: needs.select-release-mode.outputs.mode == 'version'
+    if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'version'
     needs: select-release-mode
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -257,7 +257,7 @@ jobs:
 
   pack:
     name: Build validated npm artifacts
-    if: needs.select-release-mode.outputs.mode == 'publish'
+    if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'publish'
     needs: select-release-mode
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -289,7 +289,7 @@ jobs:
   publish:
     name: Publish npm and GitHub release
     if: >-
-      needs.pack.result == 'success' &&
+      always() && needs.pack.result == 'success' &&
       vars.NPM_RELEASES_ENABLED == 'true' &&
       github.event.repository.visibility == 'public'
     needs: pack
