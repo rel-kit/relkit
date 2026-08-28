@@ -1,5 +1,5 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
-import { basename, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
 const packageRoot = join(root, "packages");
@@ -52,6 +52,8 @@ const dependencyFields = [
   "optionalDependencies",
   "peerDependencies",
 ] as const;
+type TemplateManifest = Record<string, unknown> &
+  Partial<Record<(typeof dependencyFields)[number], Record<string, string>>>;
 const write = process.argv.includes("--write");
 const stale: string[] = [];
 
@@ -106,10 +108,13 @@ if (versions.size !== 1)
 const version = [...versions][0]!;
 for (const template of ["agent", "api", "minimal"]) {
   const path = join(root, "templates", "default", "v1", template, "package.json");
-  const manifest = JSON.parse(await readFile(path, "utf8")) as Record<string, any>;
-  for (const field of dependencyFields)
-    for (const name of Object.keys(manifest[field] ?? {}))
-      if (name.startsWith("@relkit/") || name === "create-relkit") manifest[field][name] = version;
+  const manifest = JSON.parse(await readFile(path, "utf8")) as TemplateManifest;
+  for (const field of dependencyFields) {
+    const dependencies = manifest[field];
+    if (dependencies === undefined) continue;
+    for (const name of Object.keys(dependencies))
+      if (name.startsWith("@relkit/") || name === "create-relkit") dependencies[name] = version;
+  }
   await syncJson(path, manifest);
 }
 
@@ -126,5 +131,5 @@ if (readme !== nextReadme) {
 
 if (stale.length > 0)
   throw new Error(
-    `Release metadata is stale; run bun run release:sync:\n${stale.map((path) => (basename(path) === "package.json" ? path.replace(`${root}/`, "") : path.replace(`${root}/`, ""))).join("\n")}`,
+    `Release metadata is stale; run bun run release:sync:\n${stale.map((path) => path.replace(`${root}/`, "")).join("\n")}`,
   );
