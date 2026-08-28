@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { renderChangelog } from "../../scripts/version-packages.ts";
+import { renderActionChangelog, renderChangelog } from "../../scripts/version-packages.ts";
 
 test("the release train promotes Unreleased into one root changelog entry", () => {
   expect(
@@ -10,5 +10,11 @@ test("the release train promotes Unreleased into one root changelog entry", () =
     ),
   ).toBe(
     "# Changelog\n\n## Unreleased\n\n## 0.0.1 — Breaking\n\n- Existing change.\n\n### Changes\n\n- New public API.\n\n## 0.0.0\n\n- Bootstrap.\n",
+  );
+});
+
+test("the Changesets action receives an untracked package changelog", () => {
+  expect(renderActionChangelog("@relkit/app", "0.0.1")).toBe(
+    "# @relkit/app\n\n## 0.0.1\n\nSee the root CHANGELOG.md for this fixed release train.\n",
   );
 });
