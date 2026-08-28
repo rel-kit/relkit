@@ -82,6 +82,10 @@ jobs:
           bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/playwright-install.log"
           bun run test:inspector:browser 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/inspector-browser.log"
           bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/e2e.log"
+      - name: Generate Linux snapshot candidates
+        if: failure()
+        continue-on-error: true
+        run: bun run test:e2e -- --update-snapshots
       - name: Upload failure evidence
         if: failure()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
@@ -91,6 +95,7 @@ jobs:
             ${{ runner.temp }}/relkit-evidence
             .relkit/inspector-browser-artifacts
             test-results
+            tests/e2e/inspector-redesign.spec.ts-snapshots/*-linux.png
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 3
