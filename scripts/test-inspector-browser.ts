@@ -27,7 +27,7 @@ const inspector = Bun.spawn(
 try {
   await waitFor("http://127.0.0.1:3210/buckets/assets");
   await run("open", "http://127.0.0.1:3210/buckets/assets");
-  await run("wait", "500");
+  await run("wait", "--text", "docs/readme.txt");
   let tree = await snapshot();
   includes(tree, 'textbox "Object key prefix"');
   includes(tree, 'cell "docs/readme.txt"');
