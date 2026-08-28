@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased — Breaking
+## Unreleased
+
+## 0.0.1 — Breaking
 
 This pre-1.0 release intentionally breaks the previous authoring conventions:
 
@@ -11,3 +13,7 @@ This pre-1.0 release intentionally breaks the previous authoring conventions:
 - `examples/commerce` is the canonical executable example; the searchable Fumadocs application and redesigned inspector cover the public framework surface.
 
 There is no compatibility layer or codemod. Follow the [breaking-change migration guide](apps/docs/content/docs/operations/migration.mdx) and preserve explicit descriptor IDs while moving files.
+
+### Changes
+
+- Publish the first supported RELKIT release with protected CI, typed application subpaths, self-contained project templates, and trusted npm publishing.
