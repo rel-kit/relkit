@@ -33,7 +33,7 @@
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
-    "hono": "4.13.2"
+    "hono": "4.13.4"
   },
   "scripts": {
     "build": "tsc -b",
