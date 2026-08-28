@@ -4,7 +4,7 @@ Buckets declare logical object-storage policy. The descriptor contains no
 credentials, filesystem paths, or provider client.
 
 ```ts
-import { defineBucket } from "@relkit/buckets";
+import { defineBucket } from "@relkit/app/buckets";
 
 export default defineBucket({
   id: "assets",

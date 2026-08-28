@@ -1,4 +1,4 @@
-import { defineServiceMiddleware } from "@relkit/app";
+import { defineServiceMiddleware } from "@relkit/app/services";
 
 export default defineServiceMiddleware({
   id: "orders.context",

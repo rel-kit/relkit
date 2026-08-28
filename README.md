@@ -1,8 +1,46 @@
 # RELKIT
 
+[![CI](https://github.com/rel-kit/relkit/actions/workflows/ci.yml/badge.svg)](https://github.com/rel-kit/relkit/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/%40relkit%2Fapp.svg)](https://www.npmjs.com/package/@relkit/app)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 RELKIT is a Bun and TypeScript monorepo for generating applications whose source
 descriptors compile to one graph, local HTTP runtime, inspector protocol, and
 Pulumi deployment plan.
+
+## Install
+
+Create a project with the supported bootstrap command:
+
+```sh
+bunx create-relkit@latest my-app
+cd my-app
+bun run dev
+```
+
+For an existing Bun project, install the primary authoring API:
+
+```sh
+bun add @relkit/app
+```
+
+Application code can import the root API or focused typed paths:
+
+- `@relkit/app/schema`
+- `@relkit/app/config`
+- `@relkit/app/routes`
+- `@relkit/app/functions`
+- `@relkit/app/events`
+- `@relkit/app/agents`
+- `@relkit/app/jobs`
+- `@relkit/app/cache`
+- `@relkit/app/tools`
+- `@relkit/app/buckets`
+- `@relkit/app/services`
+
+Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
+`@relkit/better-auth`, providers, testing, and the CLI remain separate so the
+core API does not install the full AWS, Pulumi, Next.js, or testing stack.
 
 ## Develop the repository
 
@@ -12,7 +50,7 @@ The repository requires Bun `1.3.10`.
 bun install --frozen-lockfile
 bun run typecheck
 bun run check
-bun test
+bun run verify
 ```
 
 The root package scripts cover focused type, unit, compiler, contract,
@@ -97,3 +135,19 @@ authorization; local deployment tests use mocks. Production internal runtime
 endpoints are disabled unless `RELKIT_INTERNAL_ENDPOINTS=1` is set. The CLI ships
 the inspector; `RELKIT_INSPECTOR_ROOT` remains available when a different source
 checkout must be selected explicitly.
+
+## Releases and support
+
+All public packages ship together on one fixed version. User-visible pull
+requests add a Changeset with `bun run changeset`; automation opens the reviewed
+release pull request, and only its green merge can publish through npm trusted
+publishing. Documentation, tests, and internal chores may merge without a
+release.
+
+`@relkit/app`, `create-relkit`, and the explicitly documented optional
+integrations are supported public entry points. Packages described as
+unsupported internals are published only so workspace dependencies remain
+resolvable; application code should not depend on them directly.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the
+[MIT license](LICENSE).

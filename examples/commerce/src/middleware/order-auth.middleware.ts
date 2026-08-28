@@ -1,4 +1,4 @@
-import { defineMiddleware } from "@relkit/app";
+import { defineMiddleware } from "@relkit/app/routes";
 import authorizeOrder from "@app/functions/authorize-order.function.js";
 
 const orderAuth = defineMiddleware("/orders/*", async (context, next) => {

@@ -83,7 +83,7 @@ export function isTransformRef(value: unknown): value is HttpTransformRef {
  *
  * @example
  * ```ts
- * import { http } from "@relkit/routes"
+ * import { http } from "@relkit/app/routes"
  *
  * const request = http.input({ id: http.path("id"), token: http.header("authorization") })
  * void request

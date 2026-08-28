@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { events, type EventSelectorInput, type UnknownEventEnvelope } from "@relkit/app";
+import { events, type EventSelectorInput, type UnknownEventEnvelope } from "@relkit/app/events";
 import createOrder from "@app/functions/orders/create-order.function.js";
 import { receiptObjectName } from "@app/shared/receipt-object.js";
 

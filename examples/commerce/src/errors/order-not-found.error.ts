@@ -1,5 +1,5 @@
-import { defineError } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineError } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
 const orderNotFound = defineError({
   id: "orders.not-found",

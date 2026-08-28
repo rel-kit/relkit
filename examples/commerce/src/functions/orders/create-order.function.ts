@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import orderCreated from "@app/events/order-created.event.js";
 import sendReceiptJob from "@app/jobs/send-receipt.job.js";
 import prices from "@app/cache/prices.cache.js";

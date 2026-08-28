@@ -1,6 +1,26 @@
 {
   "name": "@relkit/client",
   "version": "0.0.0",
+  "description": "Typed RELKIT client helpers, including TanStack Query integration.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "packages/client"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
   "type": "module",
   "exports": {
     ".": {

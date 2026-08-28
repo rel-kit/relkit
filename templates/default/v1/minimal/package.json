@@ -18,9 +18,7 @@
   },
   "dependencies": {
     "@relkit/app": "0.0.0",
-    "@relkit/config": "0.0.0",
-    "@relkit/providers-standard": "0.0.0",
-    "@relkit/schema": "0.0.0"
+    "@relkit/providers-standard": "0.0.0"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",

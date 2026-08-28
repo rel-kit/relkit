@@ -6,8 +6,8 @@ mapping is a serializable DSL; arbitrary mapping callbacks are not accepted.
 For `src/routes/orders/[orderId]/route.ts`:
 
 ```ts
-import { defineMiddleware, defineRoute, defineTransform, http } from "@relkit/routes";
-import { z } from "@relkit/schema";
+import { defineMiddleware, defineRoute, defineTransform, http } from "@relkit/app/routes";
+import { z } from "@relkit/app/schema";
 import getOrder from "./get-order.function";
 
 const orderId = defineTransform({

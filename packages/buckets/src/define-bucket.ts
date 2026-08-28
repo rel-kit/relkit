@@ -31,7 +31,7 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
  *
  * @example
  * ```ts
- * import { defineBucket } from "@relkit/buckets"
+ * import { defineBucket } from "@relkit/app/buckets"
  *
  * const assets = defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 })
  * void assets

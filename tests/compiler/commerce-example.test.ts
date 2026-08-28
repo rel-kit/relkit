@@ -20,6 +20,7 @@ const DESCRIPTOR_IDS = [
   "authorize-order",
   "account-session",
   "browse-path",
+  "cancel-order",
   "database-users",
   "orders.create-order",
   "orders.delete-order",
@@ -120,6 +121,7 @@ describe("commerce-example compiler acceptance", () => {
       [
         ["enqueues-job", "orders.create-order", "receipts.send-job"],
         ["enqueues-job", "relkit.event.receipts.on-order-created.handler", "receipts.send-job"],
+        ["exposes-as-tool", "orders.delete-order", "cancel-order"],
         ["exposes-as-tool", "orders.get-order", "lookup-order"],
         ["listens-to-event", "receipts.on-order-created", "orders.created"],
         ["listens-to-event", "orders.project-any-change", "orders.cancelled"],
@@ -137,6 +139,7 @@ describe("commerce-example compiler acceptance", () => {
         ["targets-function", "route.delete.orders.by-order-id", "orders.delete-order", "primary"],
         ["targets-function", "route.get.orders.by-order-id", "orders.get-order", "primary"],
         ["targets-function", "route.post.orders", "orders.create-order", "primary"],
+        ["targets-function", "cancel-order", "orders.delete-order", "primary"],
         ["targets-function", "lookup-order", "orders.get-order", "primary"],
         ["targets-function", "route.head.orders.by-order-id", "orders.get-order", "primary"],
         ["targets-function", "route.get.orders", "orders.search-orders", "primary"],

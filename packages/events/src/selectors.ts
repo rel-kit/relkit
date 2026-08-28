@@ -55,7 +55,7 @@ export function all(options: {
  *
  * @example
  * ```ts
- * import { events } from "@relkit/events"
+ * import { events } from "@relkit/app/events"
  *
  * const orderEvents = events.match("orders.*")
  * void orderEvents

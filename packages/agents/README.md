@@ -5,9 +5,9 @@ execution limits. Model credentials and live clients belong to per-environment
 provider configuration, not agent descriptors.
 
 ```ts
-import { defineAgent } from "@relkit/agents";
+import { defineAgent } from "@relkit/app/agents";
 import lookupOrder from "./lookup-order.tool";
-import { z } from "@relkit/schema";
+import { z } from "@relkit/app/schema";
 
 export default defineAgent({
   id: "orders.support-agent",

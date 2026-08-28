@@ -8,7 +8,7 @@
     "noEmit": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@relkit/app/config": ["../../packages/app/src/config.ts"],
+      "@relkit/app/*": ["../../packages/app/src/*.ts"],
       "@relkit/*": ["../../packages/*/src/index.ts"]
     },
     "skipLibCheck": true,

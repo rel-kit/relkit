@@ -3,318 +3,364 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
-      - main
+    branches: [main]
   schedule:
-    - cron: "17 2 * * *"
+    - cron: "17 2 * * 1"
   workflow_dispatch:
+    inputs:
+      run_aws:
+        description: Run the cost-incurring AWS acceptance job
+        required: false
+        type: boolean
+        default: false
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  TURBO_TELEMETRY_DISABLED: "1"
 
 jobs:
-  quality:
-    name: Quality
-    runs-on: ubuntu-latest
+  verify:
+    name: Verify
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run quality checks
+      - name: Run authoritative verification
         run: |
+          mkdir -p "$RUNNER_TEMP/relkit-evidence"
           set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          git diff --exit-code -- bun.lock 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install-no-diff.log"
-          bun x prettier --check AGENTS.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .github/workflows/ci.yml apps packages scripts templates tests 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/format.log"
-          bun run lint 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/lint.log"
-          bun run check 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/boundaries.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run typecheck 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/typecheck.log"
-          bun x eslint eslint.config.mjs 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/eslint.log"
-          git diff --check 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/whitespace.log"
-      - name: Upload quality evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+          bun run verify 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/verify.log"
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: evidence-quality
+          name: evidence-verify-${{ github.run_attempt }}
           path: ${{ runner.temp }}/relkit-evidence
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 3
 
-  core-tests:
-    name: Core tests
-    runs-on: ubuntu-latest
+  browser:
+    name: Inspector browser and E2E
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run core tests
+      - name: Run browser acceptance
         run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:types 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/types.log"
-          bun run test:unit 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/unit-schema.log"
-          bun run test:compiler 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/compiler-graph.log"
-      - name: Upload core evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-core-tests
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  runtime-tests:
-    name: Runtime tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run runtime tests
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:contracts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/provider-contracts.log"
-          bun run test:integration 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/integration.log"
-      - name: Upload runtime evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-runtime-tests
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  recovery-tests:
-    name: Recovery tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run restart and recovery tests
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:restart 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/restart.log"
-      - name: Upload recovery evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-recovery-tests
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  inspector:
-    name: Inspector
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run inspector API and browser tests
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:inspector 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/inspector-api.log"
-          bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/playwright-install.log"
-          bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/playwright.log"
-      - name: Upload inspector evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-inspector
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  scaffolder:
-    name: Scaffolder
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run generator acceptance
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:generator 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/generator-tests.log"
-          bun run scripts/pack-and-smoke-create-relkit.ts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/generator-packed-smoke.log"
-      - name: Upload scaffolder evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-scaffolder
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Build and check generated-file no-diff
-        run: |
+          mkdir -p "$RUNNER_TEMP/relkit-evidence"
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
           bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
-          git diff --exit-code 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/generated-diff.log"
-          test -z "$(git status --short --untracked-files=all)" 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/generated-status.log"
-      - name: Upload build evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+          bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/playwright-install.log"
+          bun run test:inspector:browser 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/inspector-browser.log"
+          bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/e2e.log"
+      - name: Generate Linux snapshot candidates
+        if: failure()
+        continue-on-error: true
+        run: bun run test:e2e -- --update-snapshots
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: evidence-build
-          path: ${{ runner.temp }}/relkit-evidence
+          name: evidence-browser-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/relkit-evidence
+            .relkit/inspector-browser-artifacts
+            test-results
+            tests/e2e/inspector-redesign.spec.ts-snapshots/*-linux.png
+          include-hidden-files: true
           if-no-files-found: ignore
-          retention-days: 14
-
-  security:
-    name: Security
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run security and boundary scans
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:security 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/redaction.log"
-          bun run scripts/secret-scan.ts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/secret-scan.log"
-          bun run scripts/check-public-declarations.ts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/public-declarations.log"
-          bun run scripts/check-observability-sinks.ts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/observability-sinks.log"
-          bun test tests/agents/source-boundaries.test.ts 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/agent-boundaries.log"
-      - name: Upload security evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-security
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
-
-  pulumi:
-    name: Pulumi
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.10"
-      - name: Install Pulumi CLI
-        uses: pulumi/actions@v7
-        with:
-          pulumi-version: "3.258.0"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run Pulumi plan and mock tests
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          pulumi version 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/pulumi-version.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:deployment 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/pulumi.log"
-      - name: Upload Pulumi evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-pulumi
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 3
 
   container:
-    name: Container
-    runs-on: ubuntu-latest
+    name: Containers
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: "1.3.10"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Run container lifecycle tests
+      - name: Run container acceptance
         run: |
+          mkdir -p "$RUNNER_TEMP/relkit-evidence"
           set -o pipefail
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
           bun run test:container 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/container.log"
-      - name: Upload container evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: evidence-container
+          name: evidence-container-${{ github.run_attempt }}
           path: ${{ runner.temp }}/relkit-evidence
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 3
 
-  aws-nightly:
-    name: AWS nightly (release-gated)
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+  deployment:
+    name: Local Pulumi deployment
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7
+        with:
+          pulumi-version: "3.258.0"
+      - name: Run local deployment acceptance
+        run: |
+          mkdir -p "$RUNNER_TEMP/relkit-evidence"
+          set -o pipefail
+          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
+          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
+          bun run test:deployment 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/deployment.log"
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: evidence-deployment-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/relkit-evidence
+          if-no-files-found: ignore
+          retention-days: 3
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+
+  ci-gate:
+    name: CI Gate
+    if: always() && github.event_name != 'schedule'
+    needs: [verify, browser, container, deployment, dependency-review]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      VERIFY_RESULT: ${{ needs.verify.result }}
+      BROWSER_RESULT: ${{ needs.browser.result }}
+      CONTAINER_RESULT: ${{ needs.container.result }}
+      DEPLOYMENT_RESULT: ${{ needs.deployment.result }}
+      DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
+    steps:
+      - name: Require every safety job
+        run: |
+          test "$VERIFY_RESULT" = success
+          test "$BROWSER_RESULT" = success
+          test "$CONTAINER_RESULT" = success
+          test "$DEPLOYMENT_RESULT" = success
+          test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
+
+  select-release-mode:
+    name: Select release mode
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: ci-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.changesets.outputs.mode }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - id: changesets
+        uses: changesets/action/select-mode@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
+
+  version:
+    name: Update release pull request
+    if: needs.select-release-mode.outputs.mode == 'version'
+    needs: select-release-mode
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Create or update the reviewed release pull request
+        uses: changesets/action/version@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
+        with:
+          github-token: ${{ github.token }}
+          script: bun run version:packages
+          commit-message: "chore: version RELKIT packages"
+          pr-title: "chore: release RELKIT"
+          pr-base-branch: main
+
+  pack:
+    name: Build validated npm artifacts
+    if: needs.select-release-mode.outputs.mode == 'publish'
+    needs: select-release-mode
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Build, pack, and smoke the exact release archives
+        run: bun run scripts/release-check.ts --output "$RUNNER_TEMP/npm-release"
+      - name: Verify the release manifest independently
+        run: node --experimental-strip-types scripts/publish-release.ts --directory "$RUNNER_TEMP/npm-release"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: npm-release-${{ github.sha }}
+          path: ${{ runner.temp }}/npm-release
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    name: Publish npm and GitHub release
+    if: >-
+      needs.pack.result == 'success' &&
+      vars.NPM_RELEASES_ENABLED == 'true' &&
+      github.event.repository.visibility == 'public'
+    needs: pack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: npm-release-${{ github.sha }}
+          path: npm-release
+      - name: Pin the npm trusted-publishing client
+        run: npm install --global npm@11.19.0
+      - name: Publish missing archives in dependency order
+        env:
+          NPM_RELEASES_ENABLED: ${{ vars.NPM_RELEASES_ENABLED }}
+          GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+        run: node --experimental-strip-types scripts/publish-release.ts --directory npm-release --publish
+      - name: Publish the immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(jq -r .version npm-release/manifest.json)"
+          tag="v$version"
+          state="$(gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null || printf missing)"
+          if test "$state" = false; then
+            echo "$tag is already published"
+            exit 0
+          fi
+          if test "$state" = missing; then
+            gh release create "$tag" --draft --target "$GITHUB_SHA" --title "$tag" --notes-file npm-release/RELEASE_NOTES.md
+          fi
+          gh release upload "$tag" npm-release/*.tgz npm-release/SHA256SUMS npm-release/SHA512SUMS npm-release/manifest.json npm-release/RELEASE_NOTES.md --clobber
+          gh release edit "$tag" --draft=false
+
+  aws-cloud:
+    name: AWS cloud acceptance
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_aws)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     environment: aws-nightly
     permissions:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
           bun-version: "1.3.10"
-      - name: Install Pulumi CLI
-        uses: pulumi/actions@v7
+      - uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7
         with:
           pulumi-version: "3.258.0"
-      - name: Prepare evidence
-        run: mkdir -p "$RUNNER_TEMP/relkit-evidence"
-      - name: Install dependencies
-        run: |
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          pulumi version 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/pulumi-version.log"
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - run: bun install --frozen-lockfile
+      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
         with:
           role-to-assume: ${{ secrets.RELKIT_AWS_ROLE_ARN }}
           aws-region: ${{ secrets.RELKIT_AWS_INTEGRATION_REGION }}
-      - name: Run release-gated AWS integration
+      - name: Run cloud acceptance and guaranteed cleanup
         env:
           RELKIT_AWS_INTEGRATION: "1"
           RELKIT_AWS_INTEGRATION_REGION: ${{ secrets.RELKIT_AWS_INTEGRATION_REGION }}
@@ -324,14 +370,5 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
         run: |
-          set -o pipefail
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/prebuild.log"
-          bun run test:aws-integration 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/aws-nightly.log"
-      - name: Upload AWS evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidence-aws-nightly
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 30
+          bun run build
+          bun run test:aws-integration

@@ -2,10 +2,8 @@ import { access, cp, mkdtemp, readFile, readdir, rm, mkdir } from "node:fs/promi
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-const rootExport = {
-  types: "./dist/index.d.ts",
-  import: "./dist/index.js",
-};
+import { loadReleaseTarballs } from "./pack-and-smoke-create-relkit-pack.js";
+import { expectedExports } from "./release-package-contract.js";
 type PackageManifest = {
   name?: string;
   dependencies?: Record<string, string>;
@@ -49,53 +47,7 @@ function assertPackageManifest(packageDirectory: string, manifest: PackageManife
   if (manifest.name !== expectedName) {
     throw new Error(`Unexpected package name in ${packageDirectory}: ${manifest.name}`);
   }
-  const actualRoot = manifest.exports?.["."];
-  const expectedExports =
-    packageDirectoryName === "cloud-aws"
-      ? {
-          ".": rootExport,
-          "./runtime": {
-            types: "./dist/runtime/index.d.ts",
-            import: "./dist/runtime/index.js",
-          },
-        }
-      : packageDirectoryName === "app"
-        ? {
-            ".": rootExport,
-            "./config": {
-              types: "./dist/config.d.ts",
-              import: "./dist/config.js",
-            },
-          }
-        : packageDirectoryName === "cli"
-          ? {
-              ".": rootExport,
-              "./help": {
-                types: "./dist/cli-help-model.d.ts",
-                import: "./dist/cli-help-model.js",
-              },
-            }
-          : packageDirectoryName === "config"
-            ? {
-                ".": rootExport,
-                "./internal/config": {
-                  types: "./dist/internal/config.d.ts",
-                  import: "./dist/internal/config.js",
-                },
-              }
-            : packageDirectoryName === "client"
-              ? {
-                  ".": rootExport,
-                  "./tanstack-query": {
-                    types: "./dist/tanstack-query.d.ts",
-                    import: "./dist/tanstack-query.js",
-                  },
-                }
-              : { ".": rootExport };
-  if (
-    JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports) ||
-    JSON.stringify(actualRoot) !== JSON.stringify(rootExport)
-  ) {
+  if (JSON.stringify(manifest.exports) !== JSON.stringify(expectedExports(packageDirectoryName))) {
     throw new Error(`Unsupported export map in ${packageDirectory}`);
   }
   const expectedBin =
@@ -151,11 +103,21 @@ async function main(): Promise<void> {
     });
     await mkdir(artifactRoot);
 
+    const artifactIndex = process.argv.indexOf("--artifacts");
+    const artifactDirectory = artifactIndex === -1 ? undefined : process.argv[artifactIndex + 1];
+    if (artifactIndex !== -1 && artifactDirectory === undefined)
+      throw new Error("--artifacts requires a directory");
+    const releaseTarballs = artifactDirectory
+      ? await loadReleaseTarballs(resolve(artifactDirectory))
+      : undefined;
     const tarballs = new Map<string, string>();
     for (const packageDirectory of packageDirectories) {
       const manifest = manifests.get((await readManifest(packageDirectory)).name ?? "");
       if (manifest?.name && requiredNames.has(manifest.name)) {
-        tarballs.set(manifest.name, await packPackage(packageDirectory, artifactRoot));
+        const tarball = releaseTarballs?.get(manifest.name);
+        if (releaseTarballs && tarball === undefined)
+          throw new Error(`Missing release tarball for ${manifest.name}`);
+        tarballs.set(manifest.name, tarball ?? (await packPackage(packageDirectory, artifactRoot)));
       }
     }
     for (const [name, tarball] of tarballs) {

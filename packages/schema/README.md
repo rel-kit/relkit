@@ -7,7 +7,7 @@ structured, including their nested paths.
 ## Validate values
 
 ```ts
-import { validateSync, z } from "@relkit/schema";
+import { validateSync, z } from "@relkit/app/schema";
 
 const user = z.object({
   email: z.string().email(),
@@ -26,7 +26,7 @@ if ("issues" in result) {
 Use `validate` for a schema that may perform asynchronous validation:
 
 ```ts
-import { validate, z } from "@relkit/schema";
+import { validate, z } from "@relkit/app/schema";
 
 const trimmed = z.string().transform(async (value) => value.trim());
 const result = await validate(trimmed, "  hello  ");
@@ -39,7 +39,7 @@ helpers. `getJsonSchema` returns a deterministic projection when the schema
 provides one, or a structured `RELKIT_SCHEMA_UNAVAILABLE` result when it does not.
 
 ```ts
-import { getJsonSchema, z } from "@relkit/schema";
+import { getJsonSchema, z } from "@relkit/app/schema";
 
 const projection = getJsonSchema(z.object({ id: z.string().uuid() }));
 if (projection.ok) console.log(projection.schema);

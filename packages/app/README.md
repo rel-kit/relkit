@@ -5,7 +5,7 @@ provider bindings. `relkit.config.ts` contains settings and provider profiles; d
 registered by their own discovered descriptors.
 
 ```ts
-import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app";
+import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app/config";
 
 const values = defineEnv({
   BUCKET_ENDPOINT: env.url(),

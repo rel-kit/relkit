@@ -51,6 +51,13 @@ export async function packPackages(
   return result;
 }
 
+export async function loadReleaseTarballs(directory: string): Promise<Map<string, string>> {
+  const manifest = JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")) as {
+    packages: { name: string; file: string }[];
+  };
+  return new Map(manifest.packages.map((item) => [item.name, join(directory, item.file)]));
+}
+
 export async function startRegistry(
   root: string,
   tarballs: Map<string, string>,
@@ -83,14 +90,14 @@ export async function startRegistry(
       const dependencies = Object.fromEntries(
         Object.entries(manifest.dependencies ?? {}).map(([key, value]) => [
           key,
-          value.startsWith("workspace:") ? "0.0.0" : value,
+          value.startsWith("workspace:") ? manifest.version : value,
         ]),
       );
       return Response.json({
         name,
-        "dist-tags": { latest: "0.0.0" },
+        "dist-tags": { latest: manifest.version },
         versions: {
-          "0.0.0": {
+          [manifest.version]: {
             ...manifest,
             dependencies,
             dist: { tarball: `http://127.0.0.1:${port}/_tar/${encodeURIComponent(name)}` },

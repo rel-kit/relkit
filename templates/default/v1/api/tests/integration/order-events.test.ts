@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createEventListenerTarget, eventListenerFunctionId } from "@relkit/app";
+import { createEventListenerTarget, eventListenerFunctionId } from "@relkit/app/events";
 import { createTestEvent, invokeFunction } from "@relkit/testing";
 import orderCreated from "@app/events/order-created.event.js";
 import orderAudit from "@app/events/order-audit.event.js";

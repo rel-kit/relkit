@@ -2825,8 +2825,8 @@ Invokes a function descriptor through the engine's direct, transport-free path.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 import { invokeFunction } from "@relkit/testing";
 
 const greet = defineFunction({

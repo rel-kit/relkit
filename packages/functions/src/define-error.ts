@@ -96,8 +96,8 @@ export interface DefineErrorOptions<
  *
  * @example
  * ```ts
- * import { defineError } from "@relkit/functions"
- * import { z } from "@relkit/schema"
+ * import { defineError } from "@relkit/app/functions"
+ * import { z } from "@relkit/app/schema"
  *
  * const notFound = defineError({
  *   id: "orders.not-found",

@@ -1,6 +1,26 @@
 {
   "name": "@relkit/schema",
   "version": "0.0.0",
+  "description": "RELKIT schema API; prefer @relkit/app/schema in applications.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "packages/schema"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
   "type": "module",
   "exports": {
     ".": {

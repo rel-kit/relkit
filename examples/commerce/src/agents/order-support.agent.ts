@@ -1,4 +1,4 @@
-import { defineAgent } from "@relkit/app";
+import { defineAgent } from "@relkit/app/agents";
 import { supportInput, supportOutput } from "@app/shared/schemas.js";
 import lookupOrder from "@app/tools/lookup-order.tool.js";
 

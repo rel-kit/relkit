@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import { pathInput, pathOutput } from "@app/shared/schemas.js";
 
 const browsePath = defineFunction({

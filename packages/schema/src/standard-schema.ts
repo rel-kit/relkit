@@ -134,7 +134,7 @@ export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema
  *
  * @example
  * ```ts
- * import { validate, z } from "@relkit/schema"
+ * import { validate, z } from "@relkit/app/schema"
  *
  * const result = await validate(z.string(), "ready")
  * if (!("value" in result)) throw new Error("validation failed")

@@ -113,7 +113,13 @@ export async function generateProject(
     await copyTemplate(template, staged);
     injectGenerateFailure(context, "substitute");
     await customizeProject(staged, options);
-    await requireFiles(staged, ["package.json", "relkit.config.ts", "src/env.ts", ".env.example"]);
+    await requireFiles(staged, [
+      "package.json",
+      "relkit.config.ts",
+      "src/env.ts",
+      ".env.example",
+      ".gitignore",
+    ]);
 
     if (options.install) {
       context.onProgress?.("Installing dependencies...");
@@ -178,7 +184,9 @@ export async function generateProject(
 
 function resolveTemplateRoot(context: GenerateProjectContext): string {
   if (context.templateRoot !== undefined) return resolve(context.templateRoot);
-  const packaged = fileURLToPath(new URL("../../../templates/default/v1", import.meta.url));
+  const packaged = fileURLToPath(new URL("./templates/default/v1", import.meta.url));
   if (existsSync(packaged)) return resolve(packaged);
+  const source = fileURLToPath(new URL("../../../templates/default/v1", import.meta.url));
+  if (existsSync(source)) return resolve(source);
   return resolve(context.cwd ?? process.cwd(), "templates/default/v1");
 }

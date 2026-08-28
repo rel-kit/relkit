@@ -4,19 +4,18 @@
   "type": "module",
   "packageManager": "bun@1.3.10",
   "scripts": {
-    "dev": "bun run setup && relkit dev",
+    "dev": "bun run setup && bun ../../packages/cli/dist/index.js dev",
     "setup": "bun src/setup.ts",
-    "check": "relkit check",
-    "typecheck": "relkit check && tsc --noEmit",
+    "check": "bun ../../packages/cli/dist/index.js check",
+    "typecheck": "bun ../../packages/cli/dist/index.js check && tsc --noEmit",
     "test": "bun test",
-    "build": "relkit build"
+    "build": "bun ../../packages/cli/dist/index.js build"
   },
   "dependencies": {
     "@relkit/app": "workspace:*",
     "@relkit/better-auth": "workspace:*",
     "@relkit/client": "workspace:*",
     "@relkit/drizzle": "workspace:*",
-    "@relkit/schema": "workspace:*",
     "better-auth": "1.7.1",
     "drizzle-orm": "1.0.0-rc.4"
   },

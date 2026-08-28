@@ -117,7 +117,7 @@ Builds RELKIT Standard Schema validators with familiar composition helpers.
 **Example**
 
 ```ts
-import { z } from "@relkit/schema";
+import { z } from "@relkit/app/schema";
 
 const order = z.object({ id: z.string(), quantity: z.number().int().positive() });
 order.parse({ id: "order-1", quantity: 2 });
@@ -1046,7 +1046,7 @@ Validates a value with any Standard Schema v1-compatible validator.
 **Example**
 
 ```ts
-import { validate, z } from "@relkit/schema";
+import { validate, z } from "@relkit/app/schema";
 
 const result = await validate(z.string(), "ready");
 if (!("value" in result)) throw new Error("validation failed");

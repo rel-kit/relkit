@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a reproducible RELKIT defect.
+title: "bug: "
+body:
+  - type: markdown
+    attributes:
+      value: Do not report security vulnerabilities here; use private vulnerability reporting.
+  - type: input
+    id: version
+    attributes:
+      label: RELKIT version
+      placeholder: 0.0.1
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include commands, source, and the smallest repository or snippet that reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and logs
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Bun 1.3.10, operating system, architecture
+    validations:
+      required: true

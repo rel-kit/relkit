@@ -4,8 +4,8 @@ Events are versioned contracts. A listener is one typed callback; the compiler
 lowers it to the same function engine and durable trigger used by every runtime.
 
 ```ts
-import { defineEvent, onEvent } from "@relkit/events";
-import { z } from "@relkit/schema";
+import { defineEvent, onEvent } from "@relkit/app/events";
+import { z } from "@relkit/app/schema";
 export const orderCreated = defineEvent({
   id: "orders.created",
   version: 1,

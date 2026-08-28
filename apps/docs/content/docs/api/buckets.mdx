@@ -655,7 +655,7 @@ Defines a managed object store with explicit visibility and bounded upload polic
 **Example**
 
 ```ts
-import { defineBucket } from "@relkit/buckets";
+import { defineBucket } from "@relkit/app/buckets";
 
 const assets = defineBucket({ id: "assets", visibility: "public", maxObjectBytes: 1_048_576 });
 void assets;

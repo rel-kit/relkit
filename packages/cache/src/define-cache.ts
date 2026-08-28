@@ -44,8 +44,8 @@ export interface DefineCacheOptions<
  *
  * @example
  * ```ts
- * import { defineCache } from "@relkit/cache"
- * import { z } from "@relkit/schema"
+ * import { defineCache } from "@relkit/app/cache"
+ * import { z } from "@relkit/app/schema"
  *
  * const prices = defineCache({ id: "prices", key: z.string(), value: z.number(), defaultTtlMs: 60_000 })
  * void prices

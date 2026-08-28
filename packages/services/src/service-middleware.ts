@@ -39,7 +39,7 @@ export class ServiceMiddlewarePolicyError extends TypeError {
  *
  * @example
  * ```ts
- * import { defineServiceMiddleware } from "@relkit/app"
+ * import { defineServiceMiddleware } from "@relkit/app/services"
  *
  * const tenantContext = defineServiceMiddleware({
  *   handler: async ({ input }, next) => {

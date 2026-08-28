@@ -614,8 +614,8 @@ Defines a versioned event contract used by publishers and typed listeners.
 **Example**
 
 ```ts
-import { defineEvent } from "@relkit/events";
-import { z } from "@relkit/schema";
+import { defineEvent } from "@relkit/app/events";
+import { z } from "@relkit/app/schema";
 
 const created = defineEvent({
   id: "orders.created",
@@ -1175,7 +1175,7 @@ constrain durable redelivery without changing direct invocation behavior.
 **Example**
 
 ```ts
-import { events, onEvent } from "@relkit/events";
+import { events, onEvent } from "@relkit/app/events";
 
 const audit = onEvent(events.all({ payload: "unknown", purpose: "audit" }), async (event, ctx) => {
   ctx.log.info("event received", { eventId: event.eventId });
@@ -1423,7 +1423,7 @@ Builds typed selectors for one event, a list, a registry pattern, or every event
 **Example**
 
 ```ts
-import { events } from "@relkit/events";
+import { events } from "@relkit/app/events";
 
 const orderEvents = events.match("orders.*");
 void orderEvents;

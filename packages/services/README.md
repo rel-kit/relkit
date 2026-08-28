@@ -6,8 +6,9 @@ workflow; member facades retain the original schemas, errors, and runtime
 capabilities.
 
 ```ts
-import { defineFunction, defineService, defineServiceMiddleware } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+import { defineService, defineServiceMiddleware } from "@relkit/app/services";
 
 const getOrder = defineFunction({
   input: z.object({ orderId: z.string() }),

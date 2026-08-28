@@ -29,7 +29,7 @@ const pendingListenerId = "relkit.event.listener.pending";
  *
  * @example
  * ```ts
- * import { events, onEvent } from "@relkit/events"
+ * import { events, onEvent } from "@relkit/app/events"
  *
  * const audit = onEvent(events.all({ payload: "unknown", purpose: "audit" }), async (event, ctx) => {
  *   ctx.log.info("event received", { eventId: event.eventId })

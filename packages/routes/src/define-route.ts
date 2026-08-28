@@ -32,8 +32,9 @@ export type * from "./route-types.js";
  *
  * @example A GET route with inferred path and query input
  * ```ts
- * import { defineFunction, defineRoute } from "@relkit/app"
- * import { z } from "@relkit/schema"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { defineRoute } from "@relkit/app/routes"
+ * import { z } from "@relkit/app/schema"
  *
  * const listOrders = defineFunction({
  *   id: "orders.list",

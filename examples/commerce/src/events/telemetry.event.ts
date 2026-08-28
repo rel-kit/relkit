@@ -1,4 +1,4 @@
-import { events, onEvent } from "@relkit/app";
+import { events, onEvent } from "@relkit/app/events";
 
 const telemetry = onEvent(
   events.all({ payload: "unknown", purpose: "telemetry" }),

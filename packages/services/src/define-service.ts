@@ -29,8 +29,9 @@ import type {
  *
  * @example
  * ```ts
- * import { defineFunction, defineService } from "@relkit/app"
- * import { z } from "@relkit/schema"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { defineService } from "@relkit/app/services"
+ * import { z } from "@relkit/app/schema"
  *
  * const getOrder = defineFunction({
  *   input: z.object({ orderId: z.string() }),

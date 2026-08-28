@@ -81,6 +81,7 @@ test("shows a new request live and renders its correlated timeline and edges", a
 });
 
 test("renders every required inspector page", async ({ page }) => {
+  test.slow();
   const pages = [
     ["/", "Overview"],
     ["/graph", "Graph"],

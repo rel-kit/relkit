@@ -812,8 +812,8 @@ Defines a typed cache contract with validated key/value schemas and TTL bounds.
 **Example**
 
 ```ts
-import { defineCache } from "@relkit/cache";
-import { z } from "@relkit/schema";
+import { defineCache } from "@relkit/app/cache";
+import { z } from "@relkit/app/schema";
 
 const prices = defineCache({
   id: "prices",

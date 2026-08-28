@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import assets from "@app/buckets/assets.bucket.js";
 import { assetUploadInput, assetUploadOutput } from "@app/shared/schemas.js";
 

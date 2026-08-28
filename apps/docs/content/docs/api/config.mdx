@@ -376,13 +376,8 @@ Creates an immutable environment declaration without reading runtime values.
 **Example**
 
 ```ts
-import { defineEnv, env } from "@relkit/config";
-
-const applicationEnv = defineEnv({
-  API_URL: env.url(),
-  API_TOKEN: env.secret(),
-});
-void applicationEnv;
+import { defineEnv, env } from "@relkit/app/config";
+defineEnv({ API_URL: env.url(), API_TOKEN: env.secret() });
 ```
 
 **Signature**
@@ -393,7 +388,7 @@ declare const defineEnv: <const S extends EnvShape>(
 ) => EnvDefinition<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/env.ts#L136)
 
 Since v0.1.0
 

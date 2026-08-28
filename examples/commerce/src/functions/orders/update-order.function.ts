@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import { orderLookupOutput, orderMutationInput } from "@app/shared/schemas.js";
 
 const updateOrder = defineFunction({

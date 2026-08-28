@@ -93,8 +93,8 @@ export type {
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/functions"
- * import { z } from "@relkit/schema"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { z } from "@relkit/app/schema"
  *
  * const greet = defineFunction({
  *   input: z.object({ name: z.string() }),

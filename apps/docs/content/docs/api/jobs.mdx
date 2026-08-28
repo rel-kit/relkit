@@ -516,9 +516,9 @@ combines it with this job policy and direct function calls do not auto-retry.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/functions";
-import { defineJob } from "@relkit/jobs";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { defineJob } from "@relkit/app/jobs";
+import { z } from "@relkit/app/schema";
 
 const target = defineFunction({
   id: "email",

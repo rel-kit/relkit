@@ -34,7 +34,7 @@ export interface MiddlewareDescriptor<Id extends string = string> extends Descri
  *
  * @example
  * ```ts
- * import { defineMiddleware } from "@relkit/app"
+ * import { defineMiddleware } from "@relkit/app/routes"
  *
  * export default defineMiddleware("/orders/*", async (context, next) => {
  *   if (context.req.header("authorization") === undefined) {

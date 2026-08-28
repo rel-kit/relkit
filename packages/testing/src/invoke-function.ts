@@ -53,8 +53,8 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/functions"
- * import { z } from "@relkit/schema"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { z } from "@relkit/app/schema"
  * import { invokeFunction } from "@relkit/testing"
  *
  * const greet = defineFunction({ id: "greet", input: z.string(), output: z.string(), handler: async (name) => `Hello ${name}` })
