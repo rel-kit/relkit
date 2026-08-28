@@ -61,6 +61,32 @@ export function renderChangelog(
   return `${sections.join("\n\n")}\n`;
 }
 
+export function renderActionChangelog(name: string, version: string): string {
+  return `# ${name}\n\n## ${version}\n\nSee the root CHANGELOG.md for this fixed release train.\n`;
+}
+
+async function writeActionChangelogs(status: ChangesetStatus): Promise<void> {
+  if (process.env.GITHUB_ACTIONS !== "true") return;
+  await Promise.all(
+    status.releases.flatMap((release) => {
+      if (!release.newVersion) return [];
+      const directory =
+        release.name === "create-relkit"
+          ? release.name
+          : /^@relkit\/[a-z0-9-]+$/.test(release.name)
+            ? release.name.slice("@relkit/".length)
+            : undefined;
+      if (!directory) throw new Error(`Unsupported release package: ${release.name}`);
+      return [
+        writeFile(
+          join(root, "packages", directory, "CHANGELOG.md"),
+          renderActionChangelog(release.name, release.newVersion),
+        ),
+      ];
+    }),
+  );
+}
+
 async function main(): Promise<void> {
   const status = await readStatus();
   if (status.changesets.length === 0) throw new Error("No changesets are available to version");
@@ -85,6 +111,7 @@ async function main(): Promise<void> {
   await run("bun", ["install", "--lockfile-only"]);
   await writeFile(changelogPath, changelog);
   await run("bun", ["run", "scripts/release-check.ts", "--write-notes", "--allow-dirty"]);
+  await writeActionChangelogs(status);
 }
 
 if (import.meta.main)
