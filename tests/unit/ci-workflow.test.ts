@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-test("release mode runs after a green gate with skipped optional jobs", async () => {
+test("release jobs run after green dependencies with skipped optional jobs", async () => {
   const workflow = await readFile(
     resolve(import.meta.dir, "../../.github/workflows/ci.yml"),
     "utf8",
@@ -11,4 +11,11 @@ test("release mode runs after a green gate with skipped optional jobs", async ()
   expect(workflow).toContain(
     "if: always() && needs.ci-gate.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'",
   );
+  expect(workflow).toContain(
+    "if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'version'",
+  );
+  expect(workflow).toContain(
+    "if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'publish'",
+  );
+  expect(workflow).toContain("always() && needs.pack.result == 'success' &&");
 });
