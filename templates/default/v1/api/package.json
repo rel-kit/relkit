@@ -17,14 +17,14 @@
     "deploy": "relkit deploy up"
   },
   "dependencies": {
-    "@relkit/app": "0.0.0",
-    "@relkit/providers-standard": "0.0.0"
+    "@relkit/app": "0.0.1",
+    "@relkit/providers-standard": "0.0.1"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@relkit/cli": "0.0.0",
-    "@relkit/events": "0.0.0",
-    "@relkit/testing": "0.0.0",
+    "@relkit/cli": "0.0.1",
+    "@relkit/events": "0.0.1",
+    "@relkit/testing": "0.0.1",
     "typescript": "5.9.2"
   }
 }

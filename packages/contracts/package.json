@@ -1,6 +1,6 @@
 {
   "name": "@relkit/contracts",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Unsupported internal RELKIT contracts; use @relkit/app.",
   "license": "MIT",
   "repository": {
