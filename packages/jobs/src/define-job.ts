@@ -80,9 +80,9 @@ export interface DefineJobOptions<
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/functions"
- * import { defineJob } from "@relkit/jobs"
- * import { z } from "@relkit/schema"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { defineJob } from "@relkit/app/jobs"
+ * import { z } from "@relkit/app/schema"
  *
  * const target = defineFunction({ id: "email", input: z.string(), output: z.void(), handler: async () => undefined })
  * const job = defineJob({ id: "email", input: z.string(), target, retry: { maxAttempts: 3, initialDelayMs: 100, maxDelayMs: 1_000, multiplier: 2, jitter: "full" } })

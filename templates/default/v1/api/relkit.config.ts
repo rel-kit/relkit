@@ -1,4 +1,4 @@
-import { defineConfig, eventBridge, managed } from "@relkit/app";
+import { defineConfig, eventBridge, managed } from "@relkit/app/config";
 import env from "@app/env.js";
 
 export default defineConfig({

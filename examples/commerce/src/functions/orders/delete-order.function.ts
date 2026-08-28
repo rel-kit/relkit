@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import { orderDeleteInput, orderDeleteOutput } from "@app/shared/schemas.js";
 
 const deleteOrder = defineFunction({

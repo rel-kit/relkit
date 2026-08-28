@@ -36,7 +36,6 @@ export type ApprovalRecord = PendingApproval | ApprovedApproval | DeniedApproval
 
 export class ApprovalStateError extends Error {
   readonly code = "RELKIT_APPROVAL_STATE_INVALID" as const;
-
   constructor(message: string) {
     super(message);
     this.name = "ApprovalStateError";
@@ -45,7 +44,6 @@ export class ApprovalStateError extends Error {
 
 export class ApprovalRequiredError extends Error {
   readonly code = "RELKIT_APPROVAL_REQUIRED" as const;
-
   constructor(readonly approval: PendingApproval) {
     super(`Approval required for tool "${approval.toolId}"`);
     this.name = "ApprovalRequiredError";
@@ -54,7 +52,6 @@ export class ApprovalRequiredError extends Error {
 
 export class ApprovalDeniedError extends Error {
   readonly code = "RELKIT_APPROVAL_DENIED" as const;
-
   constructor(readonly approval: DeniedApproval) {
     super(`Approval denied for tool "${approval.toolId}"`);
     this.name = "ApprovalDeniedError";
@@ -81,17 +78,12 @@ export function createApproval(options: ApprovalOptions): ApprovalRecord {
  *
  * @example
  * ```ts
- * import { approveApproval, createApproval } from "@relkit/agents"
- *
+ * import { approveApproval, createApproval } from "@relkit/app/agents"
  * const pending = createApproval({
- *   invocationId: "invocation-1",
- *   toolCallId: "tool-call-1",
- *   toolId: "cancel-order",
- *   sideEffect: "write",
- *   policy: "always"
+ *   invocationId: "invocation-1", toolCallId: "tool-call-1", toolId: "cancel-order",
+ *   sideEffect: "write", policy: "always"
  * })
- * const approved = approveApproval(pending)
- * if (approved.state !== "approved") throw new Error("approval did not transition")
+ * void approveApproval(pending)
  * ```
  * @category Approvals
  * @since 0.1.0
@@ -106,17 +98,9 @@ export function approveApproval(approval: ApprovalRecord): ApprovedApproval {
  *
  * @example
  * ```ts
- * import { createApproval, denyApproval } from "@relkit/agents"
- *
- * const pending = createApproval({
- *   invocationId: "invocation-1",
- *   toolCallId: "tool-call-1",
- *   toolId: "cancel-order",
- *   sideEffect: "write",
- *   policy: "always"
- * })
- * const denied = denyApproval(pending)
- * if (denied.state !== "denied") throw new Error("approval did not transition")
+ * import { createApproval, denyApproval } from "@relkit/app/agents"
+ * const approval = createApproval({ invocationId: "invocation-1", toolCallId: "call-1", toolId: "cancel-order", sideEffect: "write", policy: "always" })
+ * void denyApproval(approval)
  * ```
  * @category Approvals
  * @since 0.1.0

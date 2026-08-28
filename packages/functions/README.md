@@ -4,8 +4,8 @@ Functions are the only authored descriptors that own executable handlers.
 Handlers are ordinary synchronous or asynchronous TypeScript functions.
 
 ```ts
-import { defineError, defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineError, defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
 const input = z.object({ name: z.string().min(1) });
 const output = z.object({ greeting: z.string() });

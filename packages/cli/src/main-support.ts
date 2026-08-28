@@ -1,8 +1,9 @@
 import { canonicalJson } from "@relkit/contracts";
 import type { LogLevel, LogRecord } from "@relkit/runtime-effect";
+import manifest from "../package.json" with { type: "json" };
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
 
-export const CLI_VERSION = "0.0.0" as const;
+export const CLI_VERSION = manifest.version;
 export const CLI_EXIT_CODES = Object.freeze({
   success: 0,
   failure: 1,

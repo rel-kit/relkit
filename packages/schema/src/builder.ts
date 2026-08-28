@@ -75,7 +75,7 @@ export interface ZBuilder {
  *
  * @example
  * ```ts
- * import { z } from "@relkit/schema"
+ * import { z } from "@relkit/app/schema"
  *
  * const order = z.object({ id: z.string(), quantity: z.number().int().positive() })
  * order.parse({ id: "order-1", quantity: 2 })

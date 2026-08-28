@@ -149,8 +149,7 @@ export function cloudWatch(
  *
  * @example
  * ```ts
- * import { external, redis } from "@relkit/app"
- * import { defineEnv, env } from "@relkit/config"
+ * import { defineEnv, env, external, redis } from "@relkit/app/config"
  *
  * const applicationEnv = defineEnv({ CACHE_URL: env.secret() })
  * const cache = external(redis({ url: applicationEnv.CACHE_URL }))
@@ -170,8 +169,7 @@ export function external<C extends ProviderCapability, N extends string>(
  *
  * @example
  * ```ts
- * import { managed, redis } from "@relkit/app"
- * import { defineEnv, env } from "@relkit/config"
+ * import { defineEnv, env, managed, redis } from "@relkit/app/config"
  *
  * const applicationEnv = defineEnv({ CACHE_URL: env.secret() })
  * const cache = managed(redis({ url: applicationEnv.CACHE_URL }))

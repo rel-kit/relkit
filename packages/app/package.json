@@ -1,15 +1,75 @@
 {
   "name": "@relkit/app",
   "version": "0.0.0",
+  "description": "The primary typed application-authoring API for RELKIT.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "packages/app"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    },
     "./config": {
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js"
+    },
+    "./routes": {
+      "types": "./dist/routes.d.ts",
+      "import": "./dist/routes.js"
+    },
+    "./functions": {
+      "types": "./dist/functions.d.ts",
+      "import": "./dist/functions.js"
+    },
+    "./events": {
+      "types": "./dist/events.d.ts",
+      "import": "./dist/events.js"
+    },
+    "./agents": {
+      "types": "./dist/agents.d.ts",
+      "import": "./dist/agents.js"
+    },
+    "./jobs": {
+      "types": "./dist/jobs.d.ts",
+      "import": "./dist/jobs.js"
+    },
+    "./cache": {
+      "types": "./dist/cache.d.ts",
+      "import": "./dist/cache.js"
+    },
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "import": "./dist/tools.js"
+    },
+    "./buckets": {
+      "types": "./dist/buckets.d.ts",
+      "import": "./dist/buckets.js"
+    },
+    "./services": {
+      "types": "./dist/services.d.ts",
+      "import": "./dist/services.js"
     }
   },
   "dependencies": {
@@ -23,6 +83,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/routes": "workspace:*",
+    "@relkit/schema": "workspace:*",
     "@relkit/services": "workspace:*",
     "@relkit/tools": "workspace:*"
   },

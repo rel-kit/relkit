@@ -52,8 +52,8 @@ export interface DefineEventOptions<
  *
  * @example
  * ```ts
- * import { defineEvent } from "@relkit/events"
- * import { z } from "@relkit/schema"
+ * import { defineEvent } from "@relkit/app/events"
+ * import { z } from "@relkit/app/schema"
  *
  * const created = defineEvent({ id: "orders.created", version: 1, payload: z.object({ orderId: z.string() }) })
  * void created

@@ -8,7 +8,7 @@ import {
   redis,
   s3,
   sqs,
-} from "@relkit/app";
+} from "@relkit/app/config";
 import env from "@app/env.js";
 
 export default defineConfig({

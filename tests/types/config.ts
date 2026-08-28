@@ -1,6 +1,5 @@
-import { defineConfig } from "@relkit/app/config";
+import { defineConfig, defineEnv, env } from "@relkit/app/config";
 import { external, s3 } from "@relkit/app";
-import { defineEnv, env } from "@relkit/config";
 
 defineConfig({
   env: defineEnv({}),

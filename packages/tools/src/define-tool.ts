@@ -83,9 +83,9 @@ export interface DefineToolOptions<
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/functions"
- * import { z } from "@relkit/schema"
- * import { defineTool } from "@relkit/tools"
+ * import { defineFunction } from "@relkit/app/functions"
+ * import { z } from "@relkit/app/schema"
+ * import { defineTool } from "@relkit/app/tools"
  *
  * const target = defineFunction({ id: "lookup", input: z.string(), output: z.string(), handler: async (id) => id })
  * const tool = defineTool({ id: "lookup", target, description: "Look up an order", sideEffect: "read", approval: "never" })

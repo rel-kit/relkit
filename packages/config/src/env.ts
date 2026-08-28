@@ -127,13 +127,8 @@ export const env: EnvBuilderFactory = Object.freeze({
  *
  * @example
  * ```ts
- * import { defineEnv, env } from "@relkit/config"
- *
- * const applicationEnv = defineEnv({
- *   API_URL: env.url(),
- *   API_TOKEN: env.secret()
- * })
- * void applicationEnv
+ * import { defineEnv, env } from "@relkit/app/config"
+ * defineEnv({ API_URL: env.url(), API_TOKEN: env.secret() })
  * ```
  * @category Environment
  * @since 0.1.0

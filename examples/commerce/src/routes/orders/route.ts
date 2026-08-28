@@ -1,4 +1,4 @@
-import { defineRoute, http } from "@relkit/app";
+import { defineRoute, http } from "@relkit/app/routes";
 import orders from "@app/services/orders.service.js";
 import prices from "@app/cache/prices.cache.js";
 

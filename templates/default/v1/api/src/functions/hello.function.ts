@@ -1,5 +1,5 @@
-import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
 const hello = defineFunction({
   input: z.object({ name: z.string().min(1).default("world") }),

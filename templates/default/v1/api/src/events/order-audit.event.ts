@@ -1,4 +1,4 @@
-import { onEvent } from "@relkit/app";
+import { onEvent } from "@relkit/app/events";
 
 const orderAudit = onEvent(
   "orders.created",

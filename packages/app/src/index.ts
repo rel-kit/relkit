@@ -1,9 +1,6 @@
 export * from "./config.js";
-export * from "./providers.js";
 export * from "./context-descriptors.js";
 export * from "./context-resolver.js";
-export { defineEnv, env, isEnvRef } from "@relkit/config";
-export type { EnvBuilder, EnvDefinition, EnvMetadata, EnvRef, EnvShape } from "@relkit/config";
 export * from "@relkit/agents";
 export * from "@relkit/buckets";
 export * from "@relkit/cache";

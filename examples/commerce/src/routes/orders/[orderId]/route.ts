@@ -1,4 +1,4 @@
-import { defineRoute, http } from "@relkit/app";
+import { defineRoute, http } from "@relkit/app/routes";
 import orders from "@app/services/orders.service.js";
 import orderNotFound from "@app/errors/order-not-found.error.js";
 import normalizeOrderId from "@app/transforms/orders/normalize-id.transform.js";

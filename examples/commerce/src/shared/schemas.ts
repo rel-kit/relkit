@@ -1,4 +1,4 @@
-import { z } from "@relkit/schema";
+import { z } from "@relkit/app/schema";
 
 export const orderInput = z.object({
   orderId: z.string().min(1),

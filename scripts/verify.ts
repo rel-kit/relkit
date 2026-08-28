@@ -110,6 +110,12 @@ async function main(): Promise<void> {
     "prettier",
     "--check",
     "AGENTS.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "RELEASE_NOTES.md",
     "package.json",
     "turbo.json",
     "tsconfig.base.json",
@@ -117,7 +123,8 @@ async function main(): Promise<void> {
     ".prettierrc.json",
     "eslint.config.mjs",
     "playwright.config.ts",
-    ".github/workflows/ci.yml",
+    ".changeset",
+    ".github",
     "apps",
     "examples",
     "packages",
@@ -143,10 +150,11 @@ async function main(): Promise<void> {
   await run("integration tests", bun, ["run", "test:integration"]);
   await run("restart tests", bun, ["run", "test:restart"]);
   await run("inspector API tests", bun, ["run", "test:inspector"]);
+  await run("MCP inspector tests", bun, ["run", "test:mcp:inspector"]);
   await run("generator tests", bun, ["run", "test:generator"]);
   await run("executable examples", bun, ["run", "test:examples"]);
   await run("documentation", bun, ["run", "test:docs"]);
-  await run("packed generator smoke", bun, ["run", "scripts/pack-and-smoke-create-relkit.ts"]);
+  await run("release readiness", bun, ["run", "release:check"]);
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
   await run("security and redaction tests", bun, ["run", "test:security"]);

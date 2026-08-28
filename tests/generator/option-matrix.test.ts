@@ -13,6 +13,7 @@ import {
   type GenerateFailurePoint,
   type GenerateProjectContext,
 } from "../../packages/create-relkit/src/index.ts";
+import appManifest from "../../packages/app/package.json" with { type: "json" };
 
 const roots: string[] = [];
 const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");
@@ -82,14 +83,13 @@ test("covers every template and examples/install/Git combination", async () => {
           expect(result.gitInitialized).toBe(git);
           expect(manifest).toMatchObject({ packageManager: "bun@1.3.10" });
           expect(manifest.dependencies).toMatchObject({
-            "@relkit/app": "0.0.0",
-            "@relkit/config": "0.0.0",
-            "@relkit/schema": "0.0.0",
+            "@relkit/app": appManifest.version,
+            "@relkit/providers-standard": appManifest.version,
           });
           expect(manifest.devDependencies).toMatchObject({
             "@types/bun": "1.3.10",
-            "@relkit/cli": "0.0.0",
-            "@relkit/testing": "0.0.0",
+            "@relkit/cli": appManifest.version,
+            "@relkit/testing": appManifest.version,
             typescript: "5.9.2",
           });
           expect(tsconfig.compilerOptions).toMatchObject({

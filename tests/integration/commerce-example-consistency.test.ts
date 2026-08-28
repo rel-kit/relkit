@@ -292,7 +292,7 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
   ]);
   expect(plan.buckets.map(({ id }) => id)).toEqual(["assets"]);
   expect(plan.caches.map(({ id }) => id)).toEqual(["prices"]);
-  expect(plan.tools.map(({ id }) => id)).toEqual(["lookup-order"]);
+  expect(plan.tools.map(({ id }) => id)).toEqual(["cancel-order", "lookup-order"]);
   expect(plan.agents.map(({ id }) => id)).toEqual(["order-support"]);
   expect(plan.functions.map(({ id }) => id)).toEqual(
     expect.arrayContaining([

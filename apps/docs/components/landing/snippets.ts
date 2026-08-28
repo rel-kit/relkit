@@ -1,5 +1,5 @@
-export const functionSnippet = `import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+export const functionSnippet = `import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 import orderCreated from "@app/events/order-created.event.js";
 import sendReceiptJob from "@app/jobs/send-receipt.job.js";
 import { orderInput } from "@app/shared/schemas.js";
@@ -16,7 +16,7 @@ const createOrder = defineFunction({
   },
 });`;
 
-export const jobSnippet = `import { defineJob } from "@relkit/app";
+export const jobSnippet = `import { defineJob } from "@relkit/app/jobs";
 import sendReceipt from "@app/functions/send-receipt.function.js";
 import { receiptInput } from "@app/shared/schemas.js";
 

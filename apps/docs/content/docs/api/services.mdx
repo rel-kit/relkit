@@ -28,8 +28,9 @@ identity, and use the member facade for routes, tools, or `invoke` calls.
 **Example**
 
 ```ts
-import { defineFunction, defineService } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { defineService } from "@relkit/app/services";
+import { z } from "@relkit/app/schema";
 
 const getOrder = defineFunction({
   input: z.object({ orderId: z.string() }),
@@ -46,7 +47,7 @@ void Orders.getOrder.invoke({ orderId: "order-1" });
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L47)
 
 Since v0.1.0
 
@@ -414,7 +415,7 @@ shared context.
 **Example**
 
 ```ts
-import { defineServiceMiddleware } from "@relkit/app";
+import { defineServiceMiddleware } from "@relkit/app/services";
 
 const tenantContext = defineServiceMiddleware({
   handler: async ({ input }, next) => {

@@ -1,4 +1,4 @@
-import { onEvent } from "@relkit/app";
+import { onEvent } from "@relkit/app/events";
 import orders from "@app/services/orders.service.js";
 import sendReceiptJob from "@app/jobs/send-receipt.job.js";
 import { receiptObjectName } from "@app/shared/receipt-object.js";

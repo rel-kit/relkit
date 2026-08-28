@@ -1,6 +1,26 @@
 {
   "name": "@relkit/client-generator",
   "version": "0.0.0",
+  "description": "Unsupported internal RELKIT client generator; use @relkit/app.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "packages/client-generator"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
   "type": "module",
   "exports": {
     ".": {

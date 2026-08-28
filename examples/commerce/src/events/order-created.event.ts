@@ -1,4 +1,4 @@
-import { defineEvent } from "@relkit/app";
+import { defineEvent } from "@relkit/app/events";
 import { orderCreatedPayload } from "@app/shared/schemas.js";
 
 const orderCreated = defineEvent({

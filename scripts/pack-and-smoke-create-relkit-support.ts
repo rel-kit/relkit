@@ -184,6 +184,7 @@ export async function verifyProject(
     "src/functions/hello.function.ts",
     "src/routes/hello/route.ts",
     "tests/integration/hello.route.test.ts",
+    ".gitignore",
   ])
     await access(join(root, file));
   await runCommand(

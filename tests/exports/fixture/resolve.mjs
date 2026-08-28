@@ -1,4 +1,26 @@
 const packageNames = ["@relkit/app", "@relkit/compiler"];
+const appSubpaths = [
+  "agents",
+  "buckets",
+  "cache",
+  "config",
+  "events",
+  "functions",
+  "jobs",
+  "routes",
+  "schema",
+  "services",
+  "tools",
+];
+
+for (const subpath of appSubpaths) {
+  const specifier = `@relkit/app/${subpath}`;
+  const resolved = await import.meta.resolve(specifier);
+  if (!resolved.endsWith(`/dist/${subpath}.js`)) {
+    throw new Error(`Unexpected package entry for ${specifier}: ${resolved}`);
+  }
+  await import(specifier);
+}
 
 for (const packageName of packageNames) {
   const resolved = await import.meta.resolve(packageName);

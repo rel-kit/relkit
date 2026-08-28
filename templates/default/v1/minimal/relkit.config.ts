@@ -1,4 +1,4 @@
-import { defineConfig } from "@relkit/app";
+import { defineConfig } from "@relkit/app/config";
 import env from "@app/env.js";
 
 export default defineConfig({

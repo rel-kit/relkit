@@ -1,4 +1,4 @@
-import { events, onEvent } from "@relkit/app";
+import { events, onEvent } from "@relkit/app/events";
 
 const orderProjector = onEvent(
   events.anyOf("orders.created", "orders.updated", "orders.cancelled"),

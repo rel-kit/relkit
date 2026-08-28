@@ -184,6 +184,9 @@ export async function assertFixtureGoldens(run: FixtureCompilation): Promise<voi
 async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<void> {
   await cp(join(fixtureRoot, "src"), join(temporaryRoot, "src"), { recursive: true });
   await cp(join(fixtureRoot, "relkit.config.ts"), join(temporaryRoot, "relkit.config.ts"));
+  if (existsSync(join(fixtureRoot, "tsconfig.json"))) {
+    await cp(join(fixtureRoot, "tsconfig.json"), join(temporaryRoot, "tsconfig.json"));
+  }
   await linkFixtureDependencies(fixtureRoot, temporaryRoot);
   const scope = join(temporaryRoot, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });

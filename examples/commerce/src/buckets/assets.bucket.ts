@@ -1,4 +1,4 @@
-import { defineBucket } from "@relkit/app";
+import { defineBucket } from "@relkit/app/buckets";
 
 const assets = defineBucket({
   id: "assets",

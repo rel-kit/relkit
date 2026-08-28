@@ -1,5 +1,5 @@
-import { defineFunction } from "@relkit/app";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 import orderCreated from "@app/events/order-created.event.js";
 import priceOrder from "@app/functions/orders/price-order.function.js";
 

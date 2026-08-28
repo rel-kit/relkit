@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
+import { expectedExports } from "./release-package-contract.js";
 
 export const root = resolve(import.meta.dir, "..");
 export const bun = process.execPath;
@@ -41,8 +42,8 @@ export function stable(value: any): any {
   return value;
 }
 
-export function digest(value: Uint8Array | string): string {
-  return createHash("sha256").update(value).digest("hex");
+export function digest(value: Uint8Array | string, algorithm = "sha256"): string {
+  return createHash(algorithm).update(value).digest("hex");
 }
 
 async function statusPaths(): Promise<string[]> {
@@ -97,7 +98,6 @@ export function checkManifests(items: PackageInfo[]): {
   if (versions.size !== 1 || !exactVersion(items[0]?.manifest.version))
     throw new Error("Package versions are not one exact release version.");
   const version = String(items[0]!.manifest.version);
-  const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
   const summary: RecordValue[] = [];
   for (const item of items) {
     const directoryName = basename(item.directory);
@@ -105,49 +105,10 @@ export function checkManifests(items: PackageInfo[]): {
       directoryName === "create-relkit" ? "create-relkit" : `@relkit/${directoryName}`;
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
-    const expectedExports =
-      directoryName === "cloud-aws"
-        ? {
-            ".": rootExport,
-            "./runtime": {
-              types: "./dist/runtime/index.d.ts",
-              import: "./dist/runtime/index.js",
-            },
-          }
-        : directoryName === "app"
-          ? {
-              ".": rootExport,
-              "./config": {
-                types: "./dist/config.d.ts",
-                import: "./dist/config.js",
-              },
-            }
-          : directoryName === "cli"
-            ? {
-                ".": rootExport,
-                "./help": {
-                  types: "./dist/cli-help-model.d.ts",
-                  import: "./dist/cli-help-model.js",
-                },
-              }
-            : directoryName === "config"
-              ? {
-                  ".": rootExport,
-                  "./internal/config": {
-                    types: "./dist/internal/config.d.ts",
-                    import: "./dist/internal/config.js",
-                  },
-                }
-              : directoryName === "client"
-                ? {
-                    ".": rootExport,
-                    "./tanstack-query": {
-                      types: "./dist/tanstack-query.d.ts",
-                      import: "./dist/tanstack-query.js",
-                    },
-                  }
-                : { ".": rootExport };
-    if (JSON.stringify(stable(item.manifest.exports)) !== JSON.stringify(stable(expectedExports)))
+    if (
+      JSON.stringify(stable(item.manifest.exports)) !==
+      JSON.stringify(stable(expectedExports(directoryName)))
+    )
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
       directoryName === "cli"
@@ -157,11 +118,28 @@ export function checkManifests(items: PackageInfo[]): {
           : undefined;
     if (JSON.stringify(stable(item.manifest.bin)) !== JSON.stringify(stable(expectedBin)))
       throw new Error(`Binary map mismatch: ${item.name}`);
+    if (
+      typeof item.manifest.description !== "string" ||
+      item.manifest.description.trim() === "" ||
+      item.manifest.license !== "MIT" ||
+      item.manifest.repository?.url !== "https://github.com/rel-kit/relkit.git" ||
+      item.manifest.repository?.directory !== `packages/${directoryName}` ||
+      item.manifest.homepage !== "https://github.com/rel-kit/relkit#readme" ||
+      item.manifest.bugs?.url !== "https://github.com/rel-kit/relkit/issues" ||
+      JSON.stringify(item.manifest.files) !== JSON.stringify(["dist"]) ||
+      item.manifest.publishConfig?.access !== "public" ||
+      item.manifest.engines?.bun !== ">=1.3.10" ||
+      item.manifest.private === true
+    )
+      throw new Error(`Release metadata mismatch: ${item.name}`);
     for (const field of packageFields)
-      if (field !== "peerDependencies")
-        for (const [name, spec] of Object.entries(item.manifest[field] ?? {}))
-          if (workspaceNames.has(name) ? spec !== "workspace:*" : !exactVersion(spec))
-            throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
+      for (const [name, spec] of Object.entries(item.manifest[field] ?? {})) {
+        const valid = workspaceNames.has(name)
+          ? spec === "workspace:*"
+          : field === "peerDependencies" || exactVersion(spec);
+        if (!valid)
+          throw new Error(`Dependency is not pinned correctly: ${item.name} -> ${name}@${spec}`);
+      }
     summary.push({
       name: item.name,
       version,

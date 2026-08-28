@@ -1,4 +1,4 @@
-import { defineRoute } from "@relkit/app";
+import { defineRoute } from "@relkit/app/routes";
 import uploadAssets from "@app/functions/upload-assets.function.js";
 
 export const POST = defineRoute({

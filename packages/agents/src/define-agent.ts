@@ -75,8 +75,8 @@ export interface DefineAgentOptions<
  *
  * @example
  * ```ts
- * import { defineAgent } from "@relkit/agents"
- * import { z } from "@relkit/schema"
+ * import { defineAgent } from "@relkit/app/agents"
+ * import { z } from "@relkit/app/schema"
  *
  * const support = defineAgent({ id: "support", input: z.string(), output: z.string(), instructions: "Answer safely.", tools: [], limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 30_000 } })
  * void support

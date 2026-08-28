@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import manifest from "./package.json" with { type: "json" };
 import { CLI_EXIT_CODES, getCliHelpModel, runCli, type CliHelpCommand } from "./src/main.js";
 
 function io() {
@@ -62,7 +63,7 @@ test("covers human and JSON help/version/usage exits", async () => {
   expect(await runCli(["version"], { io: versionCommand.io, installSignalHandlers: false })).toBe(
     CLI_EXIT_CODES.success,
   );
-  expect(versionCommand.stdout[0]).toBe("relkit 0.0.0");
+  expect(versionCommand.stdout[0]).toBe(`relkit ${manifest.version}`);
 
   const usage = io();
   expect(

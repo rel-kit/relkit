@@ -17,7 +17,7 @@ export async function copyTemplate(source: string, target: string): Promise<void
   const entries = (await readdir(source, { withFileTypes: true })).sort(compareNames);
   for (const entry of entries) {
     const from = join(source, entry.name);
-    const to = join(target, entry.name);
+    const to = join(target, entry.name === "gitignore" ? ".gitignore" : entry.name);
     if (entry.isDirectory()) await copyTemplate(from, to);
     else if (entry.isFile()) {
       await writeFile(to, await readFile(from), { mode: FILE_MODE });

@@ -183,7 +183,7 @@ export function isFrameworkRuntime(dependency: string): boolean {
 }
 
 export function isFixtureForbidden(dependency: string): boolean {
-  if (dependency === "@relkit/app/config") return false;
+  if (dependency.startsWith("@relkit/app/")) return false;
   return (
     (dependency.startsWith("@relkit/") && !publicApplicationPackages.has(dependency)) ||
     dependency === "create-relkit" ||

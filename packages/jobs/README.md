@@ -4,9 +4,9 @@ Jobs declare typed input, a function target, retry policy, and optional
 schedule metadata. A job does not own a handler.
 
 ```ts
-import { defineJob } from "@relkit/jobs";
+import { defineJob } from "@relkit/app/jobs";
 import sendReceipt from "./send-receipt.function";
-import { z } from "@relkit/schema";
+import { z } from "@relkit/app/schema";
 
 export default defineJob({
   id: "receipts.send-job",

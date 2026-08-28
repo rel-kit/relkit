@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { versionChecks } from "../../packages/cli/src/commands/doctor-compat.js";
 import { useWorkspaceDependencies } from "../../packages/cli/src/local.js";
+import appManifest from "../../packages/app/package.json" with { type: "json" };
 
 const roots: string[] = [];
 
@@ -17,8 +18,8 @@ test("local create replaces only RELKIT package versions with Bun links", async 
   await writeFile(
     join(root, "package.json"),
     `${JSON.stringify({
-      dependencies: { "@relkit/app": "0.0.0", hono: "4.11.7" },
-      devDependencies: { "@relkit/cli": "0.0.0", typescript: "5.9.2" },
+      dependencies: { "@relkit/app": appManifest.version, hono: "4.11.7" },
+      devDependencies: { "@relkit/cli": appManifest.version, typescript: "5.9.2" },
     })}\n`,
   );
 
@@ -68,7 +69,7 @@ test("local launcher and linked CLI hide workspace build output", async () => {
       child.exited,
     ]);
     expect(exitCode).toBe(0);
-    expect(stdout.trim()).toBe("relkit 0.0.0");
+    expect(stdout.trim()).toBe(`relkit ${appManifest.version}`);
     expect(`${stdout}\n${stderr}`).not.toContain("turbo");
     expect(`${stdout}\n${stderr}`).not.toContain("Workspace build passed");
   }

@@ -400,8 +400,8 @@ HTTP and direct calls never repeat the function automatically.
 **Example**
 
 ```ts
-import { defineError } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineError } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
 const notFound = defineError({
   id: "orders.not-found",
@@ -835,8 +835,8 @@ common engine preserves validation, service policy, limits, and telemetry.
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/functions";
-import { z } from "@relkit/schema";
+import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
 
 const greet = defineFunction({
   input: z.object({ name: z.string() }),

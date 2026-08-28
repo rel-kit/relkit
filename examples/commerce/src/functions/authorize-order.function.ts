@@ -1,4 +1,4 @@
-import { defineFunction } from "@relkit/app";
+import { defineFunction } from "@relkit/app/functions";
 import { authorizationInput, authorizationOutput } from "@app/shared/schemas.js";
 
 const authorizeOrder = defineFunction({

@@ -10,13 +10,15 @@ import type {
 
 export * from "./config-types.js";
 export { deriveApplicationId } from "./config-validation.js";
+export * from "./providers.js";
+export * from "@relkit/config";
 
 /**
  * Defines application, environment, provider, runtime, and deployment settings.
  *
  * @example
  * ```ts
- * import { defineConfig, defineEnv, env, external, s3 } from "@relkit/app"
+ * import { defineConfig, defineEnv, env, external, s3 } from "@relkit/app/config"
  *
  * const values = defineEnv({
  *   BUCKET_ENDPOINT: env.url(),

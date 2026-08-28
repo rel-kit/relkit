@@ -31,7 +31,7 @@ Defines one automatically discovered path-scoped HTTP middleware handler.
 **Example**
 
 ```ts
-import { defineMiddleware } from "@relkit/app";
+import { defineMiddleware } from "@relkit/app/routes";
 
 export default defineMiddleware("/orders/*", async (context, next) => {
   if (context.req.header("authorization") === undefined) {
@@ -151,8 +151,9 @@ function input.
 ````ts
 A GET route with inferred path and query input
 ```ts
-import { defineFunction, defineRoute } from "@relkit/app"
-import { z } from "@relkit/schema"
+import { defineFunction } from "@relkit/app/functions"
+import { defineRoute } from "@relkit/app/routes"
+import { z } from "@relkit/app/schema"
 
 const listOrders = defineFunction({
   id: "orders.list",
@@ -172,7 +173,7 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L61)
 
 Since v0.1.0
 
@@ -895,7 +896,7 @@ Creates serializable HTTP request, response, transform, and policy mappings.
 **Example**
 
 ```ts
-import { http } from "@relkit/routes";
+import { http } from "@relkit/app/routes";
 
 const request = http.input({ id: http.path("id"), token: http.header("authorization") });
 void request;

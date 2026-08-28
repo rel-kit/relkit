@@ -1,0 +1,16 @@
+# Reviewed release checksums and generated descriptor keys.
+f64b4ef2b45fa78cbf65f1f227b55c065d741231:openspec/changes/archive/2026-08-20-implement-relkit-typescript-poc-v3/evidence/17.15/metadata.json:generic-api-key:68
+f64b4ef2b45fa78cbf65f1f227b55c065d741231:openspec/changes/archive/2026-08-20-implement-relkit-typescript-poc-v3/evidence/17.15/metadata.json:generic-api-key:71
+40e7373c1d2b01df7827c71cd3ad9ed54c2ea424:examples/commerce/.zsys/generated/runtime.manifest.ts:generic-api-key:151
+6ce095a37c65a2dd039d990ee52b774746f5fd6c:examples/commerce/.zsys/generated/runtime.manifest.ts:generic-api-key:39
+af75ac35a205a1323f20c9ab43781045ee0695be:openspec/changes/implement-zsys-typescript-poc-v3/evidence/17.15/metadata.json:generic-api-key:68
+af75ac35a205a1323f20c9ab43781045ee0695be:openspec/changes/implement-zsys-typescript-poc-v3/evidence/17.15/metadata.json:generic-api-key:71
+5c5537a0f545393119ac26e4b2786166302689f6:tests/compiler/manifest.test.ts:generic-api-key:80
+
+# Reviewed synthetic redaction tests and vendored Effect examples/protocol values.
+6877e5021854c91e11b252eee3f7e2ed4df689fb:tests/config/env.test.ts:generic-api-key:12
+6877e5021854c91e11b252eee3f7e2ed4df689fb:tests/diagnostics/diagnostic.test.ts:generic-api-key:17
+2ac1c8d61279ef615b43069854a5add6fda5d519:packages/effect/HTTPAPI.md:curl-auth-header:1039
+2ac1c8d61279ef615b43069854a5add6fda5d519:packages/effect/src/Config.ts:generic-api-key:1484
+2ac1c8d61279ef615b43069854a5add6fda5d519:packages/effect/test/unstable/eventlog/EventLogIdentityDerivation.test.ts:generic-api-key:6
+2ac1c8d61279ef615b43069854a5add6fda5d519:packages/platform/node/test/NodeHttpServer.test.ts:generic-api-key:853
