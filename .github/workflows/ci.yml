@@ -90,6 +90,7 @@ jobs:
           path: |
             ${{ runner.temp }}/relkit-evidence
             .relkit/inspector-browser-artifacts
+            test-results
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 3
