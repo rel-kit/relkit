@@ -54,44 +54,8 @@ The package, packed-artifact, template, declaration, boundary, checksum, and cle
 
 ## Packed artifacts
 
-| Package                    | Artifact                            | SHA-256                                                            | npm integrity                                                                                     |
-| -------------------------- | ----------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| @relkit/client             | relkit-client-0.0.1.tgz             | `f60aabfdd7bb7fa17ae361147327bade74970f0a8387b53b6c561b30a5d6d485` | `sha512-n40ESMJUwr3Davvqyzr62XUfEhS4MgMdSeLAiIgoBkS1gwNrTe1WRLorZsHjF9ch52X/g4tKJqWC6uK4Q8h+Dg==` |
-| @relkit/config             | relkit-config-0.0.1.tgz             | `9b11bb5abf02987a77b1e8eba0b1cb589ffe293ae62d66d8a87d0ef7c7ac0ab9` | `sha512-AXTf3j9qOv1d1khf99jFLmNtubR4OGfiuUqarQeI5k3qW/m/+KySL4IJc/ahxUs6M8CWLQX3P9uTdd5/KxizLA==` |
-| @relkit/contracts          | relkit-contracts-0.0.1.tgz          | `05617fb7170a653c43fed6d4b707da98f1372b4376a33b10097e50d27c6435dd` | `sha512-qWjKb025OnrcpaTnbdt1T79HOq3OX6Mbr090cUHxxOBUfx/FVbOCAgbSOvaUSr2vFfH8BRyQ3RztSU3Vwgy6vQ==` |
-| @relkit/schema             | relkit-schema-0.0.1.tgz             | `ae274c42fa41af1c34c43ef87824627282e11242f5bd61855cea510dddc33a14` | `sha512-lU/kym4/Cs6TdWecXaHOx0aJYLtXMe0tbUNRKDryuufljWzcZ1j4kuA72IwohYe2o5YX8EH2P27ezMSdSICoTw==` |
-| create-relkit              | create-relkit-0.0.1.tgz             | `e3160b79e5c8c87e1948395ae12cc025e63d4af69af5685f677217b2f982fba2` | `sha512-4WyN0FjGsrvWtKVeQ0GAZ2GHBl4jJI5H3v8zGj/mV6cFX56ohgvFTURomJoDlLIIQmHWe7mWvHfiGgELrcYjtg==` |
-| @relkit/buckets            | relkit-buckets-0.0.1.tgz            | `601ccfed55e867d26d70bf46eb520ef25fa75f9681b6bb6a05ac3765910ff57a` | `sha512-8tRMIlHuBjl+mIkJThFHx40hKywPx+jk2Je3auLGm+akffAAumloefN639oH4ZHWS4RFEuqI6r5BlaliH0b6Uw==` |
-| @relkit/cache              | relkit-cache-0.0.1.tgz              | `3439464272b9e746737014b564c41b20ae5ec01ff9a1ff989628d1fb0b8c3fe5` | `sha512-f3dJBg4Ad+v/0jEppRxCQgWROheNXP0Haoho48trC7U8Nu24UhbBpmFF1M4wJS53vtBzl3ee45w94ZSmA/aU0A==` |
-| @relkit/diagnostics        | relkit-diagnostics-0.0.1.tgz        | `015f5c42abd14c669c469553e542501cd041135ed2658e3a95481f14be6c3aa4` | `sha512-CWn49kEsReCD9jKx0Vni4eCZEX46x9PbcjVoVS6KFrKQWxWV7U8hRe5K54Y84bWcKFyC6x3eYMWlsosYVGUdqw==` |
-| @relkit/graph              | relkit-graph-0.0.1.tgz              | `ccac0d4762f76a50f8767fcb2dd5c3d124afe783dee23b8e7682779f9815a27a` | `sha512-DnNek27I8QHTvlB2J/MVoRm19GK/F452AAbb7ntMHquavOJAu/cVuBqQ9TARH437tIKVzXPfPhcFwC3QEBlNYQ==` |
-| @relkit/invocation         | relkit-invocation-0.0.1.tgz         | `e6d11992d125aef70c434a2f0afa1e0254c86dd6f13085d1f00b9f4cc947bad5` | `sha512-OAYUhCEUeRPeG2EF3KVbYuRiLMKTRNUNz+NFiZd1fRtyAWIFMW1BNvD4Pdzu6IA2+a31hvN/S3dLaS34XXSK2A==` |
-| @relkit/observability      | relkit-observability-0.0.1.tgz      | `d830764a91d5b119e6f25d7536e1a04011a10e30cc3c14f0af07bd864bfa618a` | `sha512-9bKtfS2qW0/kdgohqq/QJeaYL3ozwjMcT7tdbFHxq9V6hteC3Bos9HxF5aBgszMoLGshWGojrNcN7EKTTeHvdQ==` |
-| @relkit/client-generator   | relkit-client-generator-0.0.1.tgz   | `6f5fca62aabdb8c02aeab9096335fac05ea6fce4e3283dab248417846c6b4737` | `sha512-yJRBWly4X+ZIXzlSHyNrfD+/WeAMa59tFLHfoxS+gLkX5Va1OcFH2VAQSoAvMfDyPBELXM+ApzJWss2vyq6Qmw==` |
-| @relkit/deploy             | relkit-deploy-0.0.1.tgz             | `c8a2fed901aaa39436015871dc81bca33cf41fe7f3a405971e6dec305288e6d4` | `sha512-8bj1x6pu6jXoPt45D5jqfoz2AO2a/8Lb+mwLBqj2wn1dXCsdgg7FDDiYU1ZfEa3bUx4c37HqPKq2GtwQeBpnjw==` |
-| @relkit/drizzle            | relkit-drizzle-0.0.1.tgz            | `6e7862c6eefd5bc44afa7483aa77620ad2d3daa1fa1ef5112f8bc7539a6e3853` | `sha512-AI79nz/NJGpbpPZRrtkDLlWOWYlpWa5kQu/c9ovbGd8UPWf2iSUd77rsb3hLsywWCfTxZJVwqL2aDurRLio1qg==` |
-| @relkit/functions          | relkit-functions-0.0.1.tgz          | `4fbe60d46a308bf87c98db6ff301a6b04dd12c93d8fc114a830256ea1024caa8` | `sha512-EAlvZk6zsoBm1e9CWLDU0/a3WLrozrJpAZNfrAj0HVJiaSPDcz4E3/P1+NETSJ1gmSSqm9euwQ9TYdLPsRuahQ==` |
-| @relkit/inspector-api      | relkit-inspector-api-0.0.1.tgz      | `e03bcf408fa91712722d56995706fa8966d1a3e7fa752373e604b381e5b0fc1c` | `sha512-qAAd1xsQIqevc9sf+6HD6E3BmGOh/PzBGsarqPu87B31IfctHjkZ4sOfnU4JRDhDBhd1BxsDotRXRreK7zOAtg==` |
-| @relkit/openapi            | relkit-openapi-0.0.1.tgz            | `377103e62c08c644598f61f9ba7c4ab45469618dda7d7d6e354d6700708a4587` | `sha512-7mA3LDtSry2Z0QPkkYUckTsPfEgRXs124wKasdn0lFzg9ANGNOoSZNmNolRlaSTvpiP6C0wx2B9DUV4mwa818g==` |
-| @relkit/runtime-effect     | relkit-runtime-effect-0.0.1.tgz     | `015c546cd30538477e863818d5558fc67d2d4c75841cb456256d5aa6225c9e3e` | `sha512-KUtXa0RXom3tRoL3HJYUo0ymOvpnTA6Vm3gfEUO/s/tFFeW9KL1q0wGqraQFxBTeg7wOUPPdsQ7D90HRhTLUUQ==` |
-| @relkit/supervisor         | relkit-supervisor-0.0.1.tgz         | `15ff2b5cff6dc5719998e44059195f380a9abdedf9d182f1c6d3ff086b2ec68c` | `sha512-1NdBIxUbXmi4bXhqD9F5w0pRlhKj6UDrUfzLEFvBAMVhGIgWZRFKcoFJ4ONpq4LStSMhFMwpm1Dsu+yr+wL+8Q==` |
-| @relkit/compiler           | relkit-compiler-0.0.1.tgz           | `0eccb142c5641e59994d620a4feab66e696dc1d97160592a2cbc90f970285369` | `sha512-Fz4DJSuq7MpCE7J2nO4aq7bGbrbN7ZkvwURXzCTgeUGdqj29m4AYYzaizbZ/ta/jmGrmcaz/IUYpq9tB1DqAGQ==` |
-| @relkit/jobs               | relkit-jobs-0.0.1.tgz               | `e9f32638edda4c750fc52c68e9c72f97d9414ddab583f5828fef26897ac4c38e` | `sha512-tkDDH04iZ/5CWkGqthuXnqbVtFaIJv08rtcz57f4wyWnsOq3k+efHIblI+bhtaeveLryoajJaPC0unQ0mhA40g==` |
-| @relkit/routes             | relkit-routes-0.0.1.tgz             | `4cb220543e4393f9068bcb70302478552a37bd15a8b8537e4be236fde233a58e` | `sha512-Cjv2F/C2xkgoRjBl2xuWMUrXy5Xsc12cEL/kKKa5/laGxe7Q2cT/CiYdJa+n0pXGstGzojPHVIfNtWxjDZZxdg==` |
-| @relkit/services           | relkit-services-0.0.1.tgz           | `0fca9c2084ec5aba179eabd4e8598c3f97f875a55e643d5146b0fab650b2ca52` | `sha512-712sv9IizfmgsoXB8gD/t8KeIFFr8ITXOKsAoVJu+bk/XySA+sfbmLZRcYRt+GW+QZij2KBmj/KLWZkUjcGhEw==` |
-| @relkit/tools              | relkit-tools-0.0.1.tgz              | `80c77343c5fd62d86a6941b0fbede56b99cf2391e8ee2437db23e1d843fdfe63` | `sha512-2G+rG39dIU7XLEWOJlVjPGi1WL1lSRf7d4wsP3fZKx/F77D/Q/QF2YcJrkCwIHVkDKBMx7fAe+HiBPq06KNH1Q==` |
-| @relkit/agents             | relkit-agents-0.0.1.tgz             | `0a0965adc96b78fee30609cdfbbdf24c45a7a325e073833a54c449bec28a4640` | `sha512-Flk6ZtxJfDxt9gYAE3kUV5TZz8muyqJyMnJf+pQwLEGt0fF2ijoqtCOJVVnfNwlNcJQi4W4bdZeaN6a3apn0cw==` |
-| @relkit/better-auth        | relkit-better-auth-0.0.1.tgz        | `528bb7777a4f941d3e3e844c3b1398e62f6bc010b3e7f03cf4ef8e3a6b4c89d7` | `sha512-AzCiI1+BQ++a7p5/QUyQGHJBTZybIu7aMxEFsmupa63bnoL81LmMlcpJB4Zl5GWZ71b81jqhG+sHujWMA7/4cA==` |
-| @relkit/events             | relkit-events-0.0.1.tgz             | `d77c00c38f04a07fc6bc90fe354d1e134737f16997f80e55b582f1cb338cfd3c` | `sha512-VADxYDz6uj1lMnWPSKHCZrMLUP37dDrGWSlWnLLBX7D9TkjBiNn+O1SEA3tE2toP2788V3fRW3emE2HpoUtdlQ==` |
-| @relkit/app                | relkit-app-0.0.1.tgz                | `717b069069e36989d9e6d5fe7138365fc7b8de9c5c7557a0c840de5bda2d5ead` | `sha512-YZ+KDEG9IN7jOEp7se08yrJ9dx6Nj3AjiufxIGI99QiF59s1JT3/iACN9jTc2fEhfkFtMcivpauBX6GGCitF/A==` |
-| @relkit/providers-local    | relkit-providers-local-0.0.1.tgz    | `6e5a414c1d763c013eb428e561e2424fcd86e0e8a434bc1db431c79e0993e680` | `sha512-A4Mp0fK3A+iTuzKAkGdH4SpRVm56m5dUijuKjZPcS9fMQL7V8TAFBOdCk+ifYTrjlT7S8Ex8tyQmCDmEXgVbmA==` |
-| @relkit/engine             | relkit-engine-0.0.1.tgz             | `95e4c6f28e93da391e6b887d61056a681928fb66b949ba6ee79845a1b1bf7dc8` | `sha512-XhooGy4OIdRV8YCJnZSUlnPnbFWzzoPo6gcUOl6UyVC6O7WS8CXiqcmybXKoCuY+8OjwqKQsAt+QZpEhgtxCsA==` |
-| @relkit/providers-standard | relkit-providers-standard-0.0.1.tgz | `9eb6b50f7d3a364c643ea101dec5af9406c04a5f05a1af838706380d0d24193d` | `sha512-wP53MJvj8ozwaytASXV/FYWhzRKDykIkaCW/Yr9GgxziD6ASoDhV0HLE9aemoDVRc+E9TJInyFWlITSiZi2N2A==` |
-| @relkit/runtime-hono       | relkit-runtime-hono-0.0.1.tgz       | `f19db544ca1c4b012bf1b1145246fc7a6228cd48bc4937d4491831224cb7e7dc` | `sha512-dTezjZT8UHUZIARvP2bI5Z2HobyMlXd9xuUF+Nclf+jTTsyjnwmP/AbdOZkIG+DSlX3ZgwOCCIMw/yEzdSzNMw==` |
-| @relkit/testing            | relkit-testing-0.0.1.tgz            | `a61ff4d396e3fa1cf24b9134565719587968181a7adc7a2b78404b2119e2c6a7` | `sha512-whXGw6cjmcQGl1EDIUw9mGD0nX1RYE+YW32nGA5a3cduLT5TQrH0DW/ZNY52zdRgOXLyPoJ2PTEtAYVjOi8LNQ==` |
-| @relkit/cloud-aws          | relkit-cloud-aws-0.0.1.tgz          | `e1b4b8d9a69ca9bed8b81f2e432ff2615903a32a1b11c01ef73ad5a930187e0e` | `sha512-nSiHmv5PxRsyeRn7Y9nPhEv95qO1/DUdQS0Yy6OhUbSGQ/1917Kvf0LUX6k496QnGMi7/Kt1pxplRVeMpI3GlQ==` |
-| @relkit/deploy-pulumi      | relkit-deploy-pulumi-0.0.1.tgz      | `81d0762c96631245ed603240af87ed7896aa8569d5bc9e50bb87a842cdb29271` | `sha512-07SjiJgcerb2DBA6wsgZW+RQCnGKSGrX1nuCqkwSCfdQcWSdxfS36er2gtWT+3qMLLMMX6FAda2w9MBJuvGW8A==` |
-| @relkit/cli                | relkit-cli-0.0.1.tgz                | `1246d2ffba505c058d9338ce516e871ef9d694ae660ae0abe60317b53eed6794` | `sha512-5nDopsVn8HKPWIa5DYkxxlxI2f3FhvD3IxwAjpx4/k0rMNSFfoFvqAL4a5JBpnyOL2faQYEsm0HV2Pe/6nTzXQ==` |
+The exact tarball hashes and npm integrity values are recorded in the attached
+release manifest and checksum files generated by the publication run.
 
 ## Template checksums
 
