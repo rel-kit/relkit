@@ -1,4 +1,4 @@
 import { defineRoute } from "@relkit/app/routes";
-import browsePath from "@app/functions/browse-path.function.js";
+import navigation from "@app/navigation/service.js";
 
-export const GET = defineRoute({ target: browsePath });
+export const GET = defineRoute({ target: navigation.browsePath });

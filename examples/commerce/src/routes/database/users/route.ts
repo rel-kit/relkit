@@ -1,4 +1,4 @@
 import { defineRoute } from "@relkit/app/routes";
-import databaseUsers from "@app/functions/database-users.function.js";
+import users from "@app/users/service.js";
 
-export const GET = defineRoute({ target: databaseUsers });
+export const GET = defineRoute({ target: users.databaseUsers });
