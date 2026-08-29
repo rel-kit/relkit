@@ -1,4 +1,4 @@
-import type { ServiceMemberEdge, ServiceMiddlewareEdge } from "./service-nodes.js";
+import type { ExposesEventEdge, ExposesFunctionEdge } from "./service-nodes.js";
 
 export const GRAPH_EDGE_KINDS = [
   "targets-function",
@@ -12,8 +12,11 @@ export const GRAPH_EDGE_KINDS = [
   "exposes-as-tool",
   "uses-tool",
   "uses-provider-profile",
-  "contains-function",
-  "uses-service-middleware",
+  "exposes-function",
+  "exposes-event",
+  "depends-on-service",
+  "mounts-service",
+  "declares-error",
   "uses-middleware",
   "uses-hook",
 ] as const;
@@ -45,8 +48,11 @@ export type GraphEdge =
   | GraphEdgeBase<"exposes-as-tool">
   | GraphEdgeBase<"uses-tool">
   | GraphEdgeBase<"uses-provider-profile">
-  | ServiceMemberEdge
-  | ServiceMiddlewareEdge
+  | ExposesFunctionEdge
+  | ExposesEventEdge
+  | GraphEdgeBase<"depends-on-service">
+  | GraphEdgeBase<"mounts-service">
+  | GraphEdgeBase<"declares-error">
   | UsesMiddlewareEdge
   | UsesHookEdge;
 

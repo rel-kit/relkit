@@ -1,6 +1,7 @@
 import { isStableId, normalizeSourceLocation } from "@relkit/contracts";
 import { isGraphEdgeKind, isGraphNodeKind } from "./model.js";
 import { validateProviderNode } from "./provider-validation.js";
+import { validateServiceNode } from "./service-validation.js";
 
 export function validateGraphShape(value: unknown, root?: string): void {
   if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
@@ -26,7 +27,12 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   if ("targetFunctionId" in value) {
     validateId(value.targetFunctionId, `Graph nodes[${index}].targetFunctionId`);
   }
-  if (value.kind === "function") validateGenerated(value.generated, index, "generated");
+  if (value.domainId !== undefined) validateId(value.domainId, `Graph nodes[${index}].domainId`);
+  if (value.kind === "function") {
+    validateGenerated(value.generated, index, "generated");
+    validateExposure(value.exposure, index);
+  }
+  if (value.kind === "event" || value.kind === "error") validateExposure(value.exposure, index);
   if (value.kind === "agent") {
     validateIds(value.toolIds, `Graph nodes[${index}].toolIds`);
     validateGenerated(value.generatedFunction, index, "generatedFunction");
@@ -34,7 +40,7 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   if (value.kind === "trigger" && value.triggerType === "http") {
     validateHttpIdentities(value.config, index);
   }
-  if (value.kind === "service") validateService(value, index);
+  if (value.kind === "service") validateServiceNode(value, index, validateId);
   if (value.kind === "provider") validateProviderNode(value, index, fail);
   if (value.kind === "middleware") {
     if (typeof value.path !== "string" || !Number.isSafeInteger(value.order)) {
@@ -49,6 +55,12 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
     if (!(value.phase === "before" || value.phase === "after")) {
       fail(`Graph nodes[${index}].phase is invalid.`);
     }
+  }
+}
+
+function validateExposure(value: unknown, index: number): void {
+  if (value !== undefined && value !== "public" && value !== "internal") {
+    fail(`Graph nodes[${index}].exposure is invalid.`);
   }
 }
 
@@ -89,32 +101,6 @@ function validateHttpIdentities(value: unknown, index: number): void {
   }
 }
 
-function validateService(value: Record<string, unknown>, index: number): void {
-  if (!Array.isArray(value.members) || value.members.length === 0) {
-    fail(`Graph nodes[${index}].members must be a non-empty array.`);
-  }
-  const names = new Set<string>();
-  value.members.forEach((member, memberIndex) => {
-    if (!isRecord(member) || !nonEmpty(member.name) || names.has(member.name)) {
-      fail(`Graph nodes[${index}].members[${memberIndex}] is invalid.`);
-    }
-    names.add(member.name);
-    validateId(member.functionId, `Graph nodes[${index}].members[${memberIndex}].functionId`);
-  });
-  if (!Array.isArray(value.middleware)) fail(`Graph nodes[${index}].middleware must be an array.`);
-  value.middleware.forEach((entry, middlewareIndex) => {
-    if (!isRecord(entry)) fail(`Graph nodes[${index}].middleware[${middlewareIndex}] is invalid.`);
-    validateId(entry.id, `Graph nodes[${index}].middleware[${middlewareIndex}].id`);
-  });
-  if (value.tags !== undefined && !textArray(value.tags))
-    fail(`Graph nodes[${index}].tags is invalid.`);
-  for (const field of ["title", "description"] as const) {
-    if (value[field] !== undefined && typeof value[field] !== "string") {
-      fail(`Graph nodes[${index}].${field} is invalid.`);
-    }
-  }
-}
-
 function validateEdge(value: unknown, index: number): void {
   if (!isRecord(value) || !isGraphEdgeKind(value.kind)) {
     fail(`Graph edges[${index}] has an invalid kind.`);
@@ -124,12 +110,15 @@ function validateEdge(value: unknown, index: number): void {
   if (value.kind === "targets-function" && value.role !== "primary") {
     fail(`Graph edges[${index}].role is invalid.`);
   }
-  if (value.kind === "contains-function" && !nonEmpty(value.member)) {
+  if (
+    (value.kind === "exposes-function" || value.kind === "exposes-event") &&
+    !nonEmpty(value.member)
+  ) {
     fail(`Graph edges[${index}].member is invalid.`);
   }
   if (
-    (value.kind === "contains-function" ||
-      value.kind === "uses-service-middleware" ||
+    (value.kind === "exposes-function" ||
+      value.kind === "exposes-event" ||
       value.kind === "uses-middleware") &&
     (!Number.isSafeInteger(value.order) || (value.order as number) < 0)
   ) {
@@ -157,10 +146,6 @@ function isCanonicalId(value: unknown): value is string {
 
 function nonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
-}
-
-function textArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((entry) => typeof entry === "string");
 }
 
 function rejectUnboundIdentities(value: unknown, path = "graph", identityField = false): void {

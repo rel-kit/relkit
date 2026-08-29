@@ -13,7 +13,7 @@ import {
   defineTransform,
   http,
 } from "../../packages/routes/src/index.ts";
-import { defineService, defineServiceMiddleware } from "../../packages/services/src/index.ts";
+import { defineService } from "../../packages/services/src/index.ts";
 import { defineTool } from "../../packages/tools/src/index.ts";
 import { defineAgent } from "../../packages/agents/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
@@ -32,8 +32,7 @@ describe("optional authoring IDs", () => {
     const route = defineRoute({ target });
     const middleware = defineMiddleware("/orders/*", async (_context, next) => next());
     const transform = defineTransform({ schema: z.string() });
-    const serviceMiddleware = defineServiceMiddleware({ handler: async (_value, next) => next() });
-    const service = defineService({ functions: { get: target }, middleware: [serviceMiddleware] });
+    const service = defineService({ functions: { get: target } });
     const tool = defineTool({
       target,
       description: "Read an order",
@@ -60,7 +59,6 @@ describe("optional authoring IDs", () => {
       route.id,
       middleware.id,
       transform.id,
-      serviceMiddleware.id,
       service.id,
       tool.id,
       derivedTool.id,
@@ -70,7 +68,7 @@ describe("optional authoring IDs", () => {
     expect(new Set(identities).size).toBe(identities.length);
     expect(target.ref.id).toBe(target.id);
     expect(service.ref.id).toBe(service.id);
-    expect(service.get.service.ref.id).toBe(service.id);
+    expect(service.get).toBe(target);
     expect(createUnboundIdentity()).not.toBe(target.id);
   });
 

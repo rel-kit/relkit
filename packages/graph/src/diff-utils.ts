@@ -126,8 +126,8 @@ function classifyAgent(fields: readonly string[]): GraphDiffClassification {
 }
 
 function classifyService(fields: readonly string[]): GraphDiffClassification {
-  if (fields.includes("members")) return "breaking";
-  if (fields.includes("middleware")) return "potentially-breaking";
+  if (fields.includes("functions") || fields.includes("events")) return "breaking";
+  if (fields.includes("capability")) return "potentially-breaking";
   return fields.length === 0 ? "informational" : "compatible";
 }
 

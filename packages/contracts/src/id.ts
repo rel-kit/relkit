@@ -35,7 +35,6 @@ export type DescriptorKind =
   | "cache"
   | "tool"
   | "agent"
-  | "data-model"
   | "constants"
   | "prompt";
 

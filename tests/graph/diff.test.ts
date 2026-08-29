@@ -117,10 +117,11 @@ describe("graph compatibility diff", () => {
     const service = {
       kind: "service" as const,
       id: "orders",
+      domainId: "orders",
       source,
       title: "Orders",
-      members: [{ name: "create", functionId: "orders.create" }],
-      middleware: [{ id: "orders.context" }],
+      functions: [{ name: "create", functionId: "orders.create" }],
+      events: [],
     };
     const before: ApplicationGraph = { contractVersion: 3, nodes: [service], edges: [] };
     const metadata = diffGraph(before, {
@@ -134,7 +135,10 @@ describe("graph compatibility diff", () => {
     const membership = diffGraph(before, {
       ...before,
       nodes: [
-        { ...service, members: [...service.members, { name: "save", functionId: "orders.save" }] },
+        {
+          ...service,
+          functions: [...service.functions, { name: "save", functionId: "orders.save" }],
+        },
       ],
     });
     expect(membership.changes[0]).toMatchObject({
