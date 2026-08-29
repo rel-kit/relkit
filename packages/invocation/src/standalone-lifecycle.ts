@@ -1,11 +1,6 @@
 import { baseExecutionContext, invokeFunctionLifecycle, invokeValueHook } from "./lifecycle.js";
 import type { InvocationRunner, InvocationTarget } from "./contracts.js";
 import type { InvocationValueHooks } from "./dispatcher-types.js";
-import {
-  resolveServicePolicy,
-  runServicePolicy,
-  type ServicePolicySource,
-} from "./service-policy.js";
 
 interface StandaloneLifecycleOptions<
   Input,
@@ -16,7 +11,6 @@ interface StandaloneLifecycleOptions<
   readonly input: unknown;
   readonly context: Context;
   readonly toolHooks?: InvocationValueHooks<Context>;
-  readonly servicePolicies?: ServicePolicySource;
   readonly deadline?: number;
   readonly runner: InvocationRunner;
   readonly signal: AbortSignal;
@@ -48,11 +42,7 @@ export async function runStandaloneLifecycle<
       }),
       { signal: options.signal },
     );
-  const policy = resolveServicePolicy(options.target, options.servicePolicies);
-  const output =
-    policy === undefined
-      ? await invokeHandler(options.context)
-      : await runServicePolicy(policy, input, options.context, invokeHandler);
+  const output = await invokeHandler(options.context);
   return options.runner.run(
     invokeValueHook({
       hook: options.toolHooks?.onAfter,

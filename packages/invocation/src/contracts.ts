@@ -47,7 +47,6 @@ export interface InvocationContext {
   readonly auth: { readonly getSession: () => Promise<unknown | null> };
   readonly constants: Readonly<Record<string, never>>;
   readonly prompts: Readonly<Record<string, never>>;
-  readonly service: Readonly<Record<string, unknown>>;
 }
 
 export interface InvocationErrorDefinition {

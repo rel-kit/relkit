@@ -12,7 +12,6 @@ export interface InvocationContextBase {
   readonly env: Readonly<Record<string, unknown>>;
   readonly log: unknown;
   readonly time: unknown;
-  readonly service?: Readonly<Record<string, unknown>>;
 }
 
 export interface ContextBuildOptions {
@@ -66,7 +65,6 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
     buckets: clients.buckets,
     cache: clients.cache,
     agents: clients.agents,
-    service: (base as unknown as InvocationContextBase).service ?? Object.freeze({}),
   }) as Context;
 }
 

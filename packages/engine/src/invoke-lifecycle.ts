@@ -3,13 +3,8 @@ import {
   baseExecutionContext,
   invokeFunctionLifecycle,
   invokeValueHook,
-  normalizeFailure,
-  resolveServicePolicy,
-  type InvocationRunner,
   type InvocationValueHooks,
-  type ServicePolicySource,
 } from "@relkit/invocation";
-import { runServiceHandler } from "./service-runtime.js";
 import type { InvocationTarget } from "./invoke-types.js";
 
 interface LifecycleOptions<Context extends { readonly signal: AbortSignal }> {
@@ -17,10 +12,7 @@ interface LifecycleOptions<Context extends { readonly signal: AbortSignal }> {
   readonly input: unknown;
   readonly context: Context;
   readonly toolHooks?: InvocationValueHooks<Context>;
-  readonly servicePolicies?: ServicePolicySource;
   readonly deadline?: number;
-  readonly runner: InvocationRunner;
-  readonly signal: AbortSignal;
   readonly onSignal: (signal: AbortSignal) => void;
 }
 
@@ -44,22 +36,7 @@ export const runConfiguredLifecycle = Effect.fnUntraced(function* <
       ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
       onSignal: options.onSignal,
     });
-  const policy = resolveServicePolicy(options.target, options.servicePolicies);
-  const output =
-    policy === undefined
-      ? yield* invokeHandler(options.context)
-      : yield* Effect.tryPromise({
-          try: () =>
-            runServiceHandler(
-              policy,
-              input,
-              options.context,
-              invokeHandler,
-              options.runner,
-              options.signal,
-            ),
-          catch: (cause) => normalizeFailure(cause, { signal: options.signal }),
-        });
+  const output = yield* invokeHandler(options.context);
   return yield* invokeValueHook({
     hook: options.toolHooks?.onAfter,
     value: output,
