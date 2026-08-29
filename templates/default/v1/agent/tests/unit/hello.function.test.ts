@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import hello from "@app/functions/hello.function.js";
+import hello from "@app/hello/functions/hello.function.js";
 
 test("hello returns a greeting", async () => {
   await expect(invokeFunction(hello, { name: "Mustafa" })).resolves.toEqual({

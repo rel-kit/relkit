@@ -1,9 +1,9 @@
 import { defineAgent } from "@relkit/app/agents";
 import { z } from "@relkit/app/schema";
-import { lookup } from "@app/functions/hello.function.js";
+import lookup from "@app/hello/tools/lookup.tool.js";
 
 export default defineAgent({
-  id: "assistant",
+  id: "hello.assistant",
   input: z.object({ question: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
   model: "openai:gpt-5-mini",
