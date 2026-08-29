@@ -1,6 +1,6 @@
 {
   "name": "@relkit/engine",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Unsupported internal RELKIT execution engine; use @relkit/app.",
   "license": "MIT",
   "repository": {
