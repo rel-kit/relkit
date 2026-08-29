@@ -1,6 +1,6 @@
 {
   "name": "@relkit/agents",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "RELKIT agent authoring API; prefer @relkit/app/agents in applications.",
   "license": "MIT",
   "repository": {
