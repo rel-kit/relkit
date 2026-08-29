@@ -1,5 +1,5 @@
 import { defineEvent } from "@relkit/app/events";
-import { orderUpdatedPayload } from "@app/shared/schemas.js";
+import { orderUpdatedPayload } from "@app/platform/schemas.js";
 
 const orderUpdated = defineEvent({
   id: "orders.updated",

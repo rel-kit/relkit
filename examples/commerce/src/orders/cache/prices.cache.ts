@@ -1,8 +1,8 @@
 import { defineCache } from "@relkit/app/cache";
-import { priceKey, priceValue } from "@app/shared/schemas.js";
+import { priceKey, priceValue } from "@app/platform/schemas.js";
 
 const prices = defineCache({
-  id: "prices",
+  id: "orders.prices",
   profile: "default",
   key: priceKey,
   value: priceValue,

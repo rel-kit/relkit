@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app/functions";
-import { orderSearchInput, orderSearchOutput } from "@app/shared/schemas.js";
+import { orderSearchInput, orderSearchOutput } from "@app/platform/schemas.js";
 
 const searchOrders = defineFunction({
   input: orderSearchInput,

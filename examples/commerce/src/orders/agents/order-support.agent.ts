@@ -1,6 +1,6 @@
 import { defineAgent } from "@relkit/app/agents";
-import { supportInput, supportOutput } from "@app/shared/schemas.js";
-import lookupOrder from "@app/tools/lookup-order.tool.js";
+import { supportInput, supportOutput } from "@app/platform/schemas.js";
+import lookupOrder from "@app/orders/tools/lookup-order.tool.js";
 
 const orderSupport = defineAgent({
   // Inputs and final answers remain schema checked around the model call.

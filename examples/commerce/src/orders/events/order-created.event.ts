@@ -1,5 +1,5 @@
 import { defineEvent } from "@relkit/app/events";
-import { orderCreatedPayload } from "@app/shared/schemas.js";
+import { orderCreatedPayload } from "@app/platform/schemas.js";
 
 const orderCreated = defineEvent({
   // Stable IDs and versions let publishers and listeners evolve deliberately.
