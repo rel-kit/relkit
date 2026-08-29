@@ -1,6 +1,6 @@
 import { defineFunction } from "@relkit/app/functions";
-import assets from "@app/buckets/assets.bucket.js";
-import { receiptInput, receiptOutput } from "@app/shared/schemas.js";
+import assets from "@app/assets/buckets/assets.bucket.js";
+import { receiptInput, receiptOutput } from "@app/platform/schemas.js";
 
 const sendReceipt = defineFunction({
   input: receiptInput,

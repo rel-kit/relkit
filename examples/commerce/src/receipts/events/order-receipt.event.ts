@@ -1,7 +1,7 @@
 import { onEvent } from "@relkit/app/events";
-import orders from "@app/services/orders.service.js";
-import sendReceiptJob from "@app/jobs/send-receipt.job.js";
-import { receiptObjectName } from "@app/shared/receipt-object.js";
+import orders from "@app/orders/service.js";
+import sendReceiptJob from "@app/receipts/jobs/send-receipt.job.js";
+import { receiptObjectName } from "@app/platform/receipt-object.js";
 
 const orderReceipt = onEvent(
   "orders.created",
