@@ -9,10 +9,10 @@
     "test": "bun test lib"
   },
   "dependencies": {
-    "@xyflow/react": "12.11.3",
+    "@xyflow/react": "12.11.5",
     "class-variance-authority": "0.7.1",
     "lucide-react": "1.34.0",
-    "next": "16.3.2",
+    "next": "16.3.3",
     "radix-ui": "1.6.7",
     "react": "19.2.8",
     "react-aria-components": "1.20.0",
