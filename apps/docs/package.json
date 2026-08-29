@@ -18,7 +18,7 @@
   "dependencies": {
     "@relkit/cli": "workspace:*",
     "@splinetool/react-spline": "4.1.0",
-    "@splinetool/runtime": "1.9.37",
+    "@splinetool/runtime": "2.0.8",
     "fumadocs-core": "16.15.1",
     "fumadocs-mdx": "15.3.1",
     "fumadocs-ui": "16.15.1",
