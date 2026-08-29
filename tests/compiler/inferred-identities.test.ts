@@ -23,7 +23,7 @@ describe("compiler source identity normalization", () => {
     const target = extracted(
       "function",
       targetId,
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
       "getOrder",
       functionSource,
       { input: objectSchema({ orderId: { type: "string" } }), output: objectSchema() },
@@ -70,7 +70,7 @@ describe("compiler source identity normalization", () => {
     const service = extracted(
       "service",
       "unbound.service",
-      "src/services/orders.service.ts",
+      "src/orders/service.ts",
       "Orders",
       serviceSource,
       {
@@ -106,7 +106,7 @@ describe("compiler source identity normalization", () => {
     const functionDescriptor = extracted(
       "function",
       memberId,
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
       "getOrder",
       "export const getOrder = defineFunction({ input: schema, output: schema, handler: async () => ({}) });",
       { input: objectSchema(), output: objectSchema() },
@@ -149,7 +149,7 @@ describe("compiler source identity normalization", () => {
     const explicit = extracted(
       "function",
       "orders.get-order",
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
       "getOrder",
       source,
       { input: objectSchema(), output: objectSchema() },
@@ -158,7 +158,7 @@ describe("compiler source identity normalization", () => {
     const inferred = extracted(
       "function",
       "unbound.inferred",
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
       "getOrder",
       inferredSource,
       { input: objectSchema(), output: objectSchema() },
@@ -167,32 +167,32 @@ describe("compiler source identity normalization", () => {
     const result = normalizeCompilation({ extracted: [explicit, inferred] });
     const diagnostic = result.diagnostics.find(({ code }) => code === NORMALIZE_CODES.duplicateId);
     expect(diagnostic).toMatchObject({
-      file: "src/functions/orders/get-order.function.ts",
+      file: "src/orders/functions/get-order.function.ts",
       line: 2,
       suggestion: expect.stringContaining("explicit id"),
-      related: [{ file: "src/functions/orders/get-order.function.ts", line: 1 }],
+      related: [{ file: "src/orders/functions/get-order.function.ts", line: 1 }],
     });
   });
 
   test("treats inferred source moves as identity changes and explicit moves as metadata-only", () => {
     const inferredBefore = normalizedFunction(
       "unbound.before",
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
     );
     const inferredAfter = normalizedFunction(
       "unbound.after",
-      "src/functions/renamed/get-order.function.ts",
+      "src/orders/functions/renamed/get-order.function.ts",
     );
     const inferredDiff = diffGraph(inferredBefore.graph!, inferredAfter.graph!);
     expect(inferredDiff.changes.map(({ change }) => change).sort()).toEqual(["added", "removed"]);
 
     const explicitBefore = normalizedFunction(
       "orders.get-order",
-      "src/functions/orders/get-order.function.ts",
+      "src/orders/functions/get-order.function.ts",
     );
     const explicitAfter = normalizedFunction(
       "orders.get-order",
-      "src/functions/renamed/get-order.function.ts",
+      "src/orders/functions/renamed/get-order.function.ts",
     );
     const explicitDiff = diffGraph(explicitBefore.graph!, explicitAfter.graph!);
     expect(explicitDiff.changes.every(({ change }) => change === "source-moved")).toBe(true);

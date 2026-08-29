@@ -5,8 +5,39 @@ export interface ServiceMemberRef {
   readonly functionId: string;
 }
 
-export interface ServiceMiddlewareRef {
-  readonly id: string;
+export interface DrizzleColumnMetadata {
+  readonly key: string;
+  readonly name: string;
+  readonly dataType: string;
+  readonly notNull: boolean;
+  readonly hasDefault: boolean;
+  readonly primaryKey: boolean;
+  readonly unique: boolean;
+}
+
+export interface DrizzleTableMetadata {
+  readonly name: string;
+  readonly databaseName: string;
+  readonly columns: readonly DrizzleColumnMetadata[];
+  readonly selectors: readonly (readonly string[])[];
+  readonly customMethods: readonly string[];
+}
+
+export type ServiceCapability =
+  | {
+      readonly kind: "drizzle";
+      readonly dialect: "pg" | "mysql" | "sqlite";
+      readonly tables: readonly DrizzleTableMetadata[];
+    }
+  | {
+      readonly kind: "better-auth";
+      readonly basePath: string;
+      readonly databaseServiceId: string;
+    };
+
+export interface ServiceEventRef {
+  readonly name: string;
+  readonly eventId: string;
 }
 
 export interface ServiceNode {
@@ -16,21 +47,23 @@ export interface ServiceNode {
   readonly title?: string;
   readonly description?: string;
   readonly tags?: readonly string[];
-  readonly members: readonly ServiceMemberRef[];
-  readonly middleware: readonly ServiceMiddlewareRef[];
+  readonly functions: readonly ServiceMemberRef[];
+  readonly events: readonly ServiceEventRef[];
+  readonly capability?: ServiceCapability;
 }
 
-export interface ServiceMemberEdge {
-  readonly kind: "contains-function";
+export interface ExposesFunctionEdge {
+  readonly kind: "exposes-function";
   readonly from: string;
   readonly to: string;
   readonly member: string;
   readonly order: number;
 }
 
-export interface ServiceMiddlewareEdge {
-  readonly kind: "uses-service-middleware";
+export interface ExposesEventEdge {
+  readonly kind: "exposes-event";
   readonly from: string;
   readonly to: string;
+  readonly member: string;
   readonly order: number;
 }

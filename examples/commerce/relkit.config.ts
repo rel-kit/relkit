@@ -9,7 +9,7 @@ import {
   s3,
   sqs,
 } from "@relkit/app/config";
-import env from "@app/env.js";
+import env from "@app/platform/env.js";
 
 export default defineConfig({
   id: "commerce-api",

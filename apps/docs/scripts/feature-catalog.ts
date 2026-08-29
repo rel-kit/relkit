@@ -17,7 +17,7 @@ export const features = [
     "fundamentals/environment",
     "config",
     [["packages/config/src/env.ts", "defineEnv"]],
-    ["templates/default/v1/api/src/env.ts"],
+    ["templates/default/v1/api/src/platform/env.ts"],
   ),
   feature(
     "providers",
@@ -41,7 +41,7 @@ export const features = [
       ["packages/schema/src/builder.ts", "z"],
       ["packages/schema/src/standard-schema.ts", "validate"],
     ],
-    ["examples/commerce/src/shared/schemas.ts"],
+    ["examples/commerce/src/platform/schemas.ts"],
   ),
   feature(
     "functions",
@@ -50,7 +50,7 @@ export const features = [
     "fundamentals/functions",
     "functions",
     [["packages/functions/src/define-function.ts", "defineFunction"]],
-    ["examples/commerce/src/functions/orders/create-order.function.ts"],
+    ["examples/commerce/src/orders/functions/create-order.function.ts"],
   ),
   feature(
     "errors",
@@ -59,19 +59,16 @@ export const features = [
     "fundamentals/errors",
     "functions",
     [["packages/functions/src/define-error.ts", "defineError"]],
-    ["examples/commerce/src/errors/order-not-found.error.ts"],
+    ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
   ),
   feature(
     "services",
     "Services",
-    "Group related functions and apply shared invocation policy.",
+    "Define a domain's public functions and events.",
     "fundamentals/services",
     "services",
-    [
-      ["packages/services/src/define-service.ts", "defineService"],
-      ["packages/services/src/service-middleware.ts", "defineServiceMiddleware"],
-    ],
-    ["examples/commerce/src/services/orders.service.ts"],
+    [["packages/services/src/define-service.ts", "defineService"]],
+    ["examples/commerce/src/orders/service.ts"],
   ),
   feature(
     "http",
@@ -89,7 +86,7 @@ export const features = [
     "http/middleware",
     "routes",
     [["packages/routes/src/define-middleware.ts", "defineMiddleware"]],
-    ["examples/commerce/src/middleware/order-auth.middleware.ts"],
+    ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
   ),
   feature(
     "clients",
@@ -98,7 +95,7 @@ export const features = [
     "http/generated-clients",
     "client",
     [["packages/client/src/index.ts", "createClient"]],
-    ["examples/commerce/src/generated-client.ts"],
+    ["examples/commerce/src/platform/generated-client.ts"],
   ),
   feature(
     "events",
@@ -110,7 +107,7 @@ export const features = [
       ["packages/events/src/define-event.ts", "defineEvent"],
       ["packages/events/src/on-event.ts", "onEvent"],
     ],
-    ["examples/commerce/src/events/order-created.event.ts"],
+    ["examples/commerce/src/orders/events/order-created.event.ts"],
   ),
   feature(
     "jobs",
@@ -119,7 +116,7 @@ export const features = [
     "async/jobs",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["examples/commerce/src/jobs/send-receipt.job.ts"],
+    ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
   ),
   feature(
     "schedules",
@@ -128,7 +125,7 @@ export const features = [
     "async/schedules",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["examples/commerce/src/jobs/send-receipt.job.ts"],
+    ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
   ),
   feature(
     "buckets",
@@ -137,7 +134,7 @@ export const features = [
     "resources-ai/buckets",
     "buckets",
     [["packages/buckets/src/define-bucket.ts", "defineBucket"]],
-    ["examples/commerce/src/buckets/assets.bucket.ts"],
+    ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
   ),
   feature(
     "cache",
@@ -146,7 +143,7 @@ export const features = [
     "resources-ai/cache",
     "cache",
     [["packages/cache/src/define-cache.ts", "defineCache"]],
-    ["examples/commerce/src/cache/prices.cache.ts"],
+    ["examples/commerce/src/orders/cache/prices.cache.ts"],
   ),
   feature(
     "tools",
@@ -155,7 +152,7 @@ export const features = [
     "resources-ai/tools",
     "tools",
     [["packages/tools/src/define-tool.ts", "defineTool"]],
-    ["examples/commerce/src/tools/lookup-order.tool.ts"],
+    ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
   ),
   feature(
     "approvals",
@@ -167,7 +164,7 @@ export const features = [
       ["packages/agents/src/approval.ts", "approveApproval"],
       ["packages/agents/src/approval.ts", "denyApproval"],
     ],
-    ["examples/commerce/src/tools/cancel-order.tool.ts"],
+    ["examples/commerce/src/orders/tools/cancel-order.tool.ts"],
   ),
   feature(
     "agents",
@@ -176,7 +173,7 @@ export const features = [
     "resources-ai/agents",
     "agents",
     [["packages/agents/src/define-agent.ts", "defineAgent"]],
-    ["examples/commerce/src/agents/order-support.agent.ts"],
+    ["examples/commerce/src/orders/agents/order-support.agent.ts"],
   ),
   feature(
     "testing",

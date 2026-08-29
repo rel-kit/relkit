@@ -5,11 +5,17 @@ export interface FilteredGraph {
   readonly edges: readonly GraphEdge[];
 }
 
-export function filterGraph(graph: GraphSnapshot, search: string, kind: string): FilteredGraph {
+export function filterGraph(
+  graph: GraphSnapshot,
+  search: string,
+  kind: string,
+  domain = "all",
+): FilteredGraph {
   const query = search.trim().toLowerCase();
   const nodes = graph.nodes.filter(
     (node) =>
       (kind === "all" || node.kind === kind) &&
+      (domain === "all" || node.domainId === domain) &&
       (query === "" || `${node.kind} ${node.id}`.toLowerCase().includes(query)),
   );
   const visible = new Set(nodes.map((node) => node.id));
@@ -17,6 +23,12 @@ export function filterGraph(graph: GraphSnapshot, search: string, kind: string):
     (edge) => visible.has(edge.from) && visible.has(edge.to),
   );
   return { nodes, edges };
+}
+
+export function graphDomains(graph: GraphSnapshot): readonly string[] {
+  return [
+    ...new Set(graph.nodes.flatMap((node) => (node.domainId === undefined ? [] : [node.domainId]))),
+  ].sort((a, b) => a.localeCompare(b));
 }
 
 export function graphKinds(graph: GraphSnapshot): readonly string[] {

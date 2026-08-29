@@ -24,6 +24,7 @@ export type InspectorCollection =
   | "cache"
   | "tools"
   | "agents"
+  | "errors"
   | "services"
   | "providers";
 export type RuntimeCollection = Exclude<
@@ -84,6 +85,8 @@ export interface InspectorGenerationPage<T = InspectorObject> extends InspectorI
   readonly sourceVersion?: number;
   readonly state?: string;
   readonly status?: string;
+  readonly domain?: string;
+  readonly layer?: string;
   readonly activeGenerationId?: string;
   readonly activeGraphHash?: string;
 }

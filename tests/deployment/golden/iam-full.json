@@ -30,7 +30,7 @@
           "sqs:GetQueueAttributes"
         ],
         "resources": [
-          "full-app-event-trigger-orders-listener"
+          "full-app-event-trigger-receipts-listener"
         ]
       },
       {
@@ -54,14 +54,6 @@
       ]
     },
     {
-      "functionId": "orders.handle-created",
-      "capability": "jobs",
-      "resourceId": "receipts.send-job",
-      "actions": [
-        "sqs:SendMessage"
-      ]
-    },
-    {
       "functionId": "receipts.send",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
@@ -72,9 +64,9 @@
       ]
     },
     {
-      "functionId": "relkit.event.orders.listener.handler",
+      "functionId": "relkit.event.receipts.listener.handler",
       "capability": "jobs",
-      "resourceId": "orders.listener",
+      "resourceId": "receipts.listener",
       "actions": [
         "sqs:ReceiveMessage",
         "sqs:DeleteMessage",
@@ -83,7 +75,7 @@
       ]
     },
     {
-      "functionId": "relkit.event.orders.listener.handler",
+      "functionId": "relkit.event.receipts.listener.handler",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
       "actions": [

@@ -1,11 +1,7 @@
-import {
-  canonicalJson,
-  GENERATOR_VERSION,
-  GRAPH_VERSION,
-  MANIFEST_VERSION,
-} from "@relkit/contracts";
+import { canonicalJson } from "@relkit/contracts";
 import type { JsonValue } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
+import { serverHttpSource, type ServerSourceConfiguration } from "./build-server-http.js";
 import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
@@ -15,13 +11,7 @@ export function serverSource(
   graphHash: string,
   openapi: JsonValue = {},
   clientContract: JsonValue = {},
-  configuration: {
-    readonly maxBodyBytes: number;
-    readonly apiDocs: { readonly enabledInProduction: boolean };
-    readonly clientContract: boolean;
-    readonly mcp: boolean;
-    readonly maxPreviewBytes: number;
-  } = {
+  configuration: ServerSourceConfiguration = {
     maxBodyBytes: 1_048_576,
     apiDocs: { enabledInProduction: false },
     clientContract: true,
@@ -29,10 +19,24 @@ export function serverSource(
     maxPreviewBytes: 1_048_576,
   },
 ): string {
+  const serviceCapabilities = graph.nodes
+    .filter((node) => node.kind === "service")
+    .map((node) => node.capability?.kind);
+  const specializedImports = [
+    serviceCapabilities.includes("better-auth")
+      ? 'import { activateBetterAuthService } from "@relkit/better-auth";'
+      : undefined,
+    serviceCapabilities.includes("drizzle")
+      ? 'import { activateDrizzleService } from "@relkit/drizzle/internal";'
+      : undefined,
+  ]
+    .filter((value) => value !== undefined)
+    .join("\n");
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createGeneratedAgentFunction, invokeAgent } from "@relkit/agents";
 import { createApplicationContextResolver } from "@relkit/app";
 import { resolveEnv } from "@relkit/config";
+${specializedImports}
 import { awsProviderFactories } from "@relkit/cloud-aws/runtime";
 import { createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs } from "@relkit/engine";
 import { createRegistrationPlan } from "@relkit/graph";
@@ -60,10 +64,14 @@ globalThis["__relkit_flush_telemetry"] = telemetry.flush;
 const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
 const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
-const authRequestStorage = new AsyncLocalStorage();
-const authRuntime = createAuthRegistration(graph, runtimeManifest.routes);
 const environmentResolution = resolveRuntimeEnvironment(application.env, environment, sourceValues);
 const values = environmentResolution.values;
+const databaseNode = plan.services?.find((service) => service.capability?.kind === "drizzle");
+const authNode = plan.services?.find((service) => service.capability?.kind === "better-auth");
+const databaseStartup = createDatabaseRegistration(databaseNode, runtimeManifest.services, values);
+const authStartup = createBetterAuthRegistration(authNode, runtimeManifest.services, databaseStartup);
+const authRequestStorage = new AsyncLocalStorage();
+const authRuntime = createAuthRegistration(graph, runtimeManifest.routes, authStartup);
 const sentry = await createSentry(application.sentry, values);
 globalThis["__relkit_flush_sentry"] = () => sentry?.flush(1_000);
 const contextResolver = createApplicationContextResolver({
@@ -71,7 +79,6 @@ const contextResolver = createApplicationContextResolver({
   prompts: runtimeManifest.prompts,
   env: values,
 });
-const databaseContext = createDatabaseRegistration(runtimeManifest.dataModel);
 bindAgents();
 const registry = createFunctionRegistry(graph, executableManifest);
 const providerFactories = { ...standardProviderFactories, ...awsProviderFactories };
@@ -95,104 +102,20 @@ const providerStartup = (environmentResolution.error === undefined
 let providers;
 let providerReady = false;
 let providerFailed = false;
+let databaseReady = databaseNode === undefined;
+let authReady = authNode === undefined;
+let specializedFailed = false;
+databaseStartup?.then(() => { databaseReady = true; }).catch((error) => {
+  specializedFailed = true;
+  recordRuntimeFailure("runtime.database", "Database startup failed", error, "direct");
+});
+authStartup?.then(() => { authReady = true; }).catch((error) => {
+  specializedFailed = true;
+  recordRuntimeFailure("runtime.auth", "Auth startup failed", error, "http");
+});
 const activeInvocations = new Set();
 let stopping = false;
-const internalEndpointsEnabled = environment !== "production" || process.env.RELKIT_INTERNAL_ENDPOINTS === "1";
-const app = createApp({
-  plan,
-  manifest: executableManifest,
-  engine: { invoke: invokeHttp },
-  observability: telemetry,
-  responseMapping: { mode: environment },
-  middlewareContext: routeMiddlewareContext,
-  middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes} },
-  apiDocs: {
-    mode: environment,
-    document: openapiDocument,
-    enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
-    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-      ? {}
-      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-  },
-  clientContract: {
-    enabled: ${String(configuration.clientContract)},
-    document: clientContractDocument,
-  },
-  mcp: { enabled: ${String(configuration.mcp)} },
-  staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
-  rateLimitRuntime: { resolveStore: resolveRateLimitStore },
-  ...(authRuntime === undefined ? {} : { auth: authRuntime }),
-  internalEndpoints: {
-    mode: environment,
-    enabled: internalEndpointsEnabled,
-    graph: {
-      generationId,
-      graphHash,
-      manifestGraphHash: runtimeManifest.graphHash,
-      graphContractVersion: ${GRAPH_VERSION},
-      manifestContractVersion: ${MANIFEST_VERSION},
-      manifestGeneratorVersion: ${GENERATOR_VERSION},
-      graph,
-    },
-    ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-      ? {}
-      : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-    readiness: () => ({
-      ready: providerReady && !stopping,
-      ...(stopping ? { reason: "stopping" } : providerFailed ? { reason: "unavailable" } : {}),
-    }),
-  },
-});
-installInspectorEndpoints(app, {
-  mode: environment,
-  enabled: internalEndpointsEnabled,
-  ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-    ? {}
-    : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-  activeGeneration: {
-    generationId,
-    graphHash,
-    graph,
-    diagnostics: [],
-    actions: {
-      functions: {
-        exists: (functionId) => registry.has(functionId),
-        invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.signal === undefined ? {} : { signal: request.signal }) }),
-      },
-    },
-    resources: {
-      buckets: {
-        supports: (bucketId) => supportsInspector("buckets", plan.buckets, bucketId, "list", "preview"),
-        list: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).list(request),
-        preview: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).preview(request),
-      },
-      cache: {
-        supports: (cacheId) => supportsInspector("cache", plan.caches, cacheId, "scan", "value"),
-        scan: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).scan(request),
-        value: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).value(request),
-      },
-    },
-  },
-  maxPreviewBytes: ${configuration.maxPreviewBytes},
-  query: telemetry.query,
-  stream: telemetry.stream,
-});
-const server = Bun.serve({
-  hostname: "0.0.0.0",
-  port: Number(process.env.PORT ?? 3000),
-  fetch: async (request) => {
-    const path = new URL(request.url).pathname;
-    if (path === "/_relkit/v1/health/live") return healthResponse("ok");
-    if (path === "/_relkit/v1/health/ready")
-      return healthResponse(providerReady && !stopping ? "ready" : "not-ready", providerReady && !stopping ? 200 : 503);
-    if (stopping) return Response.json({ error: "draining" }, { status: 503 });
-    try {
-      return await app.fetch(request);
-    } catch {
-      return Response.json({ error: "internal-error" }, { status: 500 });
-    }
-  },
-});
+${serverHttpSource(configuration)}
 ${SERVER_INVOCATION_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}

@@ -1,7 +1,6 @@
 import type { DescriptorKind } from "@relkit/contracts";
 
-export type SourceFactoryKind =
-  DescriptorKind | "error" | "middleware" | "service-middleware" | "transform";
+export type SourceFactoryKind = DescriptorKind | "error" | "middleware" | "transform";
 
 export type FactoryIdPresence = "explicit" | "omitted" | "unknown";
 

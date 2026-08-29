@@ -83,6 +83,8 @@ export interface RouteMaterializationOptions {
   readonly middlewareContext?: (options: {
     readonly middlewareId: string;
     readonly signal: AbortSignal;
+    readonly request: Request;
+    readonly auth?: HttpAuthInvocation;
     readonly requestId?: string;
     readonly traceId?: string;
   }) => MaybePromise<MiddlewareContext>;
@@ -105,7 +107,6 @@ export class RuntimeHonoManifestError extends Error {
     if (referenceId !== undefined) this.referenceId = referenceId;
   }
 }
-/** Verifies the immutable plan/manifest boundary before any route is added. */
 export function assertHttpManifest(options: RouteMaterializationOptions): void {
   const { manifest, plan } = options;
   if (manifest.contractVersion !== MANIFEST_VERSION)
@@ -156,11 +157,10 @@ export function assertHttpManifest(options: RouteMaterializationOptions): void {
     }
   }
 }
-/** Registers only the HTTP triggers already present in the immutable plan. */
 export function materializeRoutes(app: Hono, options: RouteMaterializationOptions): void {
   assertHttpManifest(options);
-  registerRouteMiddleware(app, options);
   registerAuthMiddleware(app, options.auth);
+  registerRouteMiddleware(app, options);
   const triggers = [...options.plan.httpTriggers].sort(
     (left, right) => Number(right.config.method === "HEAD") - Number(left.config.method === "HEAD"),
   );

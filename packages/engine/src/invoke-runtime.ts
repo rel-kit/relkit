@@ -137,12 +137,7 @@ export async function runHandler<
       input,
       context,
       ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
-      ...(options.servicePolicies === undefined
-        ? {}
-        : { servicePolicies: options.servicePolicies }),
       ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
-      runner,
-      signal: controller.signal,
       onSignal: (signal) => {
         signalRef.current = signal;
       },

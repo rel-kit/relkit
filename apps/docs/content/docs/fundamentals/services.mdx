@@ -1,86 +1,76 @@
 ---
-title: Services
-description: Group a domain's functions, apply ordered service middleware, expose scoped context, and target members from routes.
+title: Services and domains
+description: Use one service descriptor to define each domain's public functions and events.
 ---
 
-A service gives a related set of function descriptors one domain boundary. It does not create a new handler,
-dependency container, network server, or singleton. Each member keeps normal function invocation semantics
-while routes and callers gain a readable namespace such as `orders.getOrder`.
+Every top-level directory below `src/` is a domain and contains one `service.ts`.
+The service is the domain's public boundary: listed functions and events are public;
+other descriptors remain internal.
 
-## Group the orders domain
+## Define a domain
 
-<include cwd lang="ts" meta='title="examples/commerce/src/services/orders.service.ts"'>
-  ../../examples/commerce/src/services/orders.service.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
+  ../../examples/commerce/src/orders/service.ts
 </include>
 
-The service exports five independently testable functions and one ordered service middleware. A route can
-target a member directly; graph and inspector views retain both the member identity and owning service.
+Members are the original descriptors, so `orders.createOrder` has the same identity,
+schemas, errors, and `.invoke()` behavior as the imported `createOrder` value. Services
+do not clone members and do not add `.functions` or `.events` namespaces.
 
-## Add service-scoped context
+Keep each function, event, error, tool, or agent in its own file below the domain.
+`service.ts` should only assemble the public boundary; it should not grow into a file
+containing every handler.
 
-<include
-  cwd
-  lang="ts"
-  meta='title="examples/commerce/src/services/orders-context.service-middleware.ts"'
->
-  ../../examples/commerce/src/services/orders-context.service-middleware.ts
+## Use a service from routes
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
+  ../../examples/commerce/src/routes/orders/route.ts
 </include>
 
-Service middleware runs after HTTP request mapping and before the member function. Calling `next(patch)` adds
-an immutable value under `context.service` for the current invocation only. Use it for tenant identity,
-authenticated domain principals, feature policy, or other values shared across service members.
-
-Do not use service context as mutable shared storage. Each invocation receives its own frozen value, and a
-direct function outside the service does not automatically receive it.
-
-## Apply a service to a route
+`defineServiceRoutes` restricts each route entry to a public function member and
+returns the same immutable route descriptors as `defineRoute`. Request mapping,
+middleware, authentication, and response policy remain transport concerns under
+`src/routes`.
 
 <Steps>
   <Step>
-    ### Define member functions normally
+    ### Define focused artifacts
 
-    Give every function its own schemas, errors, dependencies, and tests. A service should not become a file
-    containing unrelated handlers.
-
-  </Step>
-  <Step>
-    ### Create the service descriptor
-
-    Add a stable property name for each member and order middleware from broad policy to narrow policy. A
-    member must not appear under conflicting service ownership.
+    Keep functions and events in their own domain files with their own contracts
+    and tests.
 
   </Step>
   <Step>
-    ### Target a member
+    ### Assemble the public boundary
 
-    The commerce routes import `orders` and select `orders.createOrder`, `orders.getOrder`, or another member.
-    Request and response mapping remain route responsibilities.
+    List only the functions and events that other domains or routes may use.
 
   </Step>
   <Step>
-    ### Verify policy in two invocation modes
+    ### Map transport explicitly
 
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    bun test examples/commerce/tests/http.test.ts
-    ```
-
-    Exercise one HTTP route and one direct member invocation. Assert service context only where the service
-    boundary is active, and confirm middleware order through observable domain behavior rather than timing.
+    Import the service from route files and map methods with
+    `defineServiceRoutes` or `defineRoute`.
 
   </Step>
 </Steps>
 
-## When not to create a service
+## Cross-domain dependencies
 
-Do not add a service for a single function merely to shorten an import. Do not group functions only because
-they share a provider; dependency declarations already express that. Create a service when the domain name,
-shared invocation policy, or member navigation is useful to developers and remains coherent as the
-application grows.
+Import another domain's `service.ts` with ordinary TypeScript imports. This creates a
+`depends-on-service` graph edge. Routes may import domain services, but never domain
+internals; platform files may not import domains or routes.
 
-<Callout title="Services do not replace nested invocation">
-  A member may still call another function through `.invoke()`. The service groups ownership and
-  middleware; it does not add an alternate execution engine.
-</Callout>
+Import the facade, then call `orders.getOrder.invoke({ orderId: "order-1" })`
+exactly as you would call the original function descriptor.
+
+There is no service dependency container, lifecycle API, middleware, or scoped
+`context.service`. Runtime resources remain explicit function dependencies, while
+HTTP policy belongs to routes.
+
+An event-only domain and an integration domain may have no public functions.
+`defineService({})` is therefore valid authoring syntax, but compilation rejects
+a domain that owns no other graph-visible artifact. This keeps the runtime API
+small without allowing empty placeholder domains into the application graph.
 
 <include cwd>content/generated/related/fundamentals-services.mdx</include>

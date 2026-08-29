@@ -1,18 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
 import { OverlayDialog } from "../components/ui/dialog";
-import { Field } from "../components/ui/field";
 import { Pagination } from "../components/ui/pagination";
-import { SelectField } from "../components/ui/select";
 import { ContentTabs } from "../components/ui/tabs";
 import type { InspectorQuery } from "../lib/api-types";
 import { INSPECTOR_BACKEND_CONNECTED_EVENT } from "../lib/client";
 import { ResourceTableBody } from "./resource-table-body";
+import { ResourceTableFilters } from "./resource-table-filters";
 import type { ResourceTableItem, ResourceTableProps } from "./resource-table-types";
 export type { ResourceTableColumn, ResourceTableItem } from "./resource-table-types";
 export function ResourceTable<Item extends ResourceTableItem>({
@@ -30,6 +27,8 @@ export function ResourceTable<Item extends ResourceTableItem>({
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
   const [status, setStatus] = useState("all");
+  const [domain, setDomain] = useState("");
+  const [layer, setLayer] = useState("");
   const [items, setItems] = useState<readonly Item[]>([]);
   const [cursors, setCursors] = useState<readonly (string | undefined)[]>([undefined]);
   const [page, setPage] = useState(0);
@@ -45,8 +44,10 @@ export function ResourceTable<Item extends ResourceTableItem>({
       ...(search.trim() ? { search: search.trim() } : {}),
       ...(kind !== "all" ? { kind } : {}),
       ...(status !== "all" ? { status } : {}),
+      ...(domain.trim() ? { domain: domain.trim() } : {}),
+      ...(layer.trim() ? { layer: layer.trim() } : {}),
     }),
-    [cursors, kind, page, search, status],
+    [cursors, domain, kind, layer, page, search, status],
   );
 
   useEffect(() => {
@@ -76,6 +77,8 @@ export function ResourceTable<Item extends ResourceTableItem>({
     setSearch("");
     setKind("all");
     setStatus("all");
+    setDomain("");
+    setLayer("");
     resetPage();
   };
 
@@ -89,49 +92,26 @@ export function ResourceTable<Item extends ResourceTableItem>({
         </div>
         <Badge>{items.length} visible</Badge>
       </header>
-      <Card className="resource-toolbar" aria-label={`${title} filters`}>
-        <div className="resource-filter-heading">
-          <SlidersHorizontal aria-hidden="true" className="size-4" />
-          <strong>Filters</strong>
-          <span>Search and narrow the active collection.</span>
-        </div>
-        <Field
-          label={`Search ${noun}`}
-          value={search}
-          onChange={(value) => {
-            setSearch(value);
-            resetPage();
-          }}
-          placeholder={`Search ${noun} IDs and metadata`}
-        />
-        {kindOptions.length > 0 && (
-          <SelectField
-            label="Kind"
-            items={[allChoice, ...kindOptions]}
-            value={kind}
-            onChange={(value) => {
-              setKind(value);
-              resetPage();
-            }}
-          />
-        )}
-        {statusOptions.length > 0 && (
-          <SelectField
-            label="Status"
-            items={[allChoice, ...statusOptions]}
-            value={status}
-            onChange={(value) => {
-              setStatus(value);
-              resetPage();
-            }}
-          />
-        )}
-        <div className="resource-filter-footer">
-          <Button variant="ghost" size="sm" onPress={clear}>
-            <RotateCcw aria-hidden="true" className="size-3.5" /> Reset filters
-          </Button>
-        </div>
-      </Card>
+      <ResourceTableFilters
+        {...{
+          title,
+          noun,
+          search,
+          kind,
+          status,
+          domain,
+          layer,
+          kindOptions,
+          statusOptions,
+          setSearch,
+          setKind,
+          setStatus,
+          setDomain,
+          setLayer,
+          resetPage,
+          clear,
+        }}
+      />
       <ResourceTableBody
         state={state}
         noun={noun}
@@ -192,4 +172,3 @@ export function ResourceTable<Item extends ResourceTableItem>({
     </div>
   );
 }
-const allChoice = { id: "all", label: "All" } as const;

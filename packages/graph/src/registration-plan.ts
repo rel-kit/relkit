@@ -84,8 +84,9 @@ export function createRegistrationPlan(
   };
   const serviceIds = new Map<string, string>();
   for (const node of canonical.nodes)
-    if (node.kind === "service")
-      for (const member of node.members) serviceIds.set(member.functionId, node.id);
+    if (node.kind === "function" && node.domainId !== undefined) {
+      serviceIds.set(node.id, node.domainId);
+    }
   for (const node of canonical.nodes) addNode(plan, node, serviceIds);
   plan.httpTriggers.sort(compareHttpTrigger);
   plan.schedules.sort(compareSchedule);

@@ -11,6 +11,8 @@ function graph(): ApplicationGraph {
       {
         kind: "function",
         id: "orders.create",
+        domainId: "orders",
+        exposure: "public",
         source,
         input: { type: "object" },
         output: { type: "object" },
@@ -113,10 +115,11 @@ function graph(): ApplicationGraph {
       {
         kind: "service",
         id: "orders",
+        domainId: "orders",
         source,
         title: "Orders",
-        members: [{ name: "create", functionId: "orders.create" }],
-        middleware: [{ id: "orders.context" }],
+        functions: [{ name: "create", functionId: "orders.create" }],
+        events: [],
       },
     ],
     edges: [],

@@ -3,10 +3,10 @@
     "code": "RELKIT_CONVENTION_DIRECTORY",
     "column": 26,
     "descriptorId": "warning.directory",
-    "file": "src/misc/wrong-directory.function.ts",
+    "file": "src/warning/misc/wrong-directory.function.ts",
     "line": 4,
     "message": "Descriptor \"warning.directory\" has kind \"function\" outside its recommended directory.",
     "severity": "warning",
-    "suggestion": "Move the descriptor under src/functions/**/*.function.ts"
+    "suggestion": "Move the descriptor under src/warning/functions/**/*.function.ts"
   }
 ]

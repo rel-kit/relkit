@@ -122,7 +122,7 @@ function compareGraphValues(left: JsonValue, right: JsonValue, kind: "node" | "e
 }
 
 function isOrderedServiceEdge(value: Record<string, JsonValue>): boolean {
-  return value.kind === "contains-function" || value.kind === "uses-service-middleware";
+  return value.kind === "exposes-function" || value.kind === "exposes-event";
 }
 
 function numberValue(value: JsonValue | undefined): number {

@@ -26,6 +26,7 @@ export const navigationGroups = [
     items: [
       { href: "/", label: "Overview", icon: LayoutDashboard },
       { href: "/graph", label: "Graph", icon: Network },
+      { href: "/domains", label: "Domains", icon: Layers3 },
       { href: "/routes", label: "Routes", icon: Route },
       { href: "/middlewares", label: "Middleware", icon: ShieldCheck },
       {
@@ -35,6 +36,7 @@ export const navigationGroups = [
         external: true,
       },
       { href: "/functions", label: "Functions", icon: SquareFunction },
+      { href: "/errors", label: "Errors", icon: ShieldCheck },
     ],
   },
   {

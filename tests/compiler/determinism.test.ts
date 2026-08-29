@@ -64,6 +64,7 @@ describe.serial("compiler determinism", () => {
     const inserted = normalizeCompilation({
       extracted: randomizedExtracted,
       projectRoot: sorted.temporaryRoot,
+      sources: sorted.sources,
     });
 
     expect(inserted.graphHash).toBe(sorted.graphHash);

@@ -13,7 +13,6 @@ import type {
   PublicLogger,
 } from "./contracts.js";
 import type { InvocationCallStack } from "./recursion.js";
-import type { ServicePolicySource } from "./service-policy.js";
 
 export const MANAGED_DEPENDENCY_CATEGORIES = [
   "jobs",
@@ -65,7 +64,6 @@ export interface InvocationDispatchOptions<
   readonly time?: PublicClock;
   readonly logger?: PublicLogger;
   readonly clients?: ManagedDependencySources;
-  readonly servicePolicies?: ServicePolicySource;
   readonly context?: InvocationContextFactory<Context>;
   readonly effectRunner?: InvocationRunner;
   readonly idSource?: InvocationIdSource;

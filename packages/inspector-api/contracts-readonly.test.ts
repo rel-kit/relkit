@@ -24,6 +24,7 @@ const graphIds: Record<string, string> = {
   cache: "orders.cache",
   tools: "orders.tool",
   agents: "orders.agent",
+  errors: "orders.invalid",
   services: "orders",
   providers: "provider.buckets.default",
 };
@@ -62,8 +63,8 @@ describe("inspector read-only contract matrix", () => {
         kind: "service",
         title: "Orders",
         tags: ["orders"],
-        members: [{ name: "create", functionId: "orders.create" }],
-        middleware: [{ id: "orders.context" }],
+        functions: [{ name: "create", functionId: "orders.create" }],
+        events: [{ name: "created", eventId: "orders.created" }],
       },
     });
     const page = await json(app, API_BASE_PATH + "/descriptors?cursor=1&limit=2");

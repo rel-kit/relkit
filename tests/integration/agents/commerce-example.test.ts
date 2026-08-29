@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import orderSupport from "../../../examples/commerce/src/agents/order-support.agent.ts";
-import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
-import getOrderTool from "../../../examples/commerce/src/tools/lookup-order.tool.ts";
+import orderSupport from "../../../examples/commerce/src/orders/agents/order-support.agent.ts";
+import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
+import getOrderTool from "../../../examples/commerce/src/orders/tools/lookup-order.tool.ts";
 import {
   invokeFunction,
   type InvocationCompletion,
@@ -41,7 +41,7 @@ describe("commerce-example support agent", () => {
         {
           type: "tool-call",
           callId: "call-1",
-          toolId: "lookup-order",
+          toolId: "orders.lookup-order",
           input: { orderId: "order-1" },
         },
         { type: "final", output: { answer: "raw-result-secret" } },
@@ -53,13 +53,13 @@ describe("commerce-example support agent", () => {
     });
 
     expect(orderSupport.model).toBe("openai:gpt-5-mini");
-    expect(getOrderTool.id).toBe("lookup-order");
+    expect(getOrderTool.id).toBe("orders.lookup-order");
     expect(agent.model.calls).toHaveLength(2);
     agent.trace.assert({
       spanKinds: ["agent", "model", "model", "tool", "tool", "model", "model", "agent"],
       edges: [
         { relationship: "uses-provider-profile", from: orderSupport.id, to: "default" },
-        { relationship: "uses-tool", from: orderSupport.id, to: "lookup-order" },
+        { relationship: "uses-tool", from: orderSupport.id, to: "orders.lookup-order" },
       ],
     });
 
@@ -73,7 +73,7 @@ describe("commerce-example support agent", () => {
     const toolSpan = trace.spans.find((span) => span.kind === "tool" && span.status === "started");
     const functionSpan = functionSpans.find((span) => span.status === "started");
     const targetEdge = trace.edges.find(
-      (edge) => edge.relationship === "targets-function" && edge.from === "lookup-order",
+      (edge) => edge.relationship === "targets-function" && edge.from === "orders.lookup-order",
     );
 
     expect(agentSpan?.functionId).toBe(`relkit.agent.${orderSupport.id}.invoke`);

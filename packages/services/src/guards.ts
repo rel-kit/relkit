@@ -1,26 +1,18 @@
-import { isDescriptor, isRef, isStableId, deepFreeze } from "@relkit/contracts";
+import { deepFreeze, isDescriptor, isRef } from "@relkit/contracts";
 import type { FunctionRefAny } from "@relkit/functions";
-import type {
-  ServiceDescriptorAny,
-  ServiceMiddlewareDescriptor,
-  ServiceMiddlewareRefAny,
-  ServiceRefAny,
-} from "./types.js";
+import type { ServiceDescriptorAny, ServiceRefAny } from "./types.js";
 
 export const SERVICE_RESERVED_MEMBER_NAMES = Object.freeze([
   "kind",
   "id",
   "ref",
   "functions",
-  "middleware",
-  "service",
+  "events",
+  "capability",
   "title",
   "description",
   "tags",
-  "invoke",
-  "asTool",
   "handler",
-  "target",
   "constructor",
   "prototype",
   "__proto__",
@@ -44,6 +36,8 @@ export function isReservedServiceMemberName(value: unknown): boolean {
 
 export function assertServiceMemberName(value: unknown): asserts value is string {
   const name = normalizeServiceMemberName(value);
+  if (name !== value)
+    throw new TypeError(`Service member name "${String(value)}" is not normalized`);
   if (isReservedServiceMemberName(name)) {
     throw new TypeError(`Service member name "${name}" is reserved`);
   }
@@ -57,65 +51,13 @@ export function assertServiceRef(value: unknown): asserts value is ServiceRefAny
   if (!isServiceRef(value)) throw new TypeError("Invalid service reference");
 }
 
-export function isServiceMiddlewareRef(value: unknown): value is ServiceMiddlewareRefAny {
-  if (!isRecord(value) || !isRecord(value.ref)) return false;
-  return (
-    Reflect.ownKeys(value.ref).length === 2 &&
-    value.ref.kind === "service-middleware" &&
-    isStableId(value.ref.id)
-  );
-}
-
-export function assertServiceMiddlewareRef(
-  value: unknown,
-): asserts value is ServiceMiddlewareRefAny {
-  if (!isServiceMiddlewareRef(value)) throw new TypeError("Invalid service middleware reference");
-}
-
-export function isServiceMiddlewareDescriptor(
-  value: unknown,
-): value is ServiceMiddlewareDescriptor {
-  if (!isServiceMiddlewareRef(value) || !isRecord(value)) return false;
-  const descriptor = value as ServiceMiddlewareRefAny & Record<PropertyKey, unknown>;
-  return (
-    descriptor.kind === "service-middleware" &&
-    descriptor.id === descriptor.ref.id &&
-    typeof descriptor.handler === "function"
-  );
-}
-
-export function assertServiceMiddlewareDescriptor(
-  value: unknown,
-): asserts value is ServiceMiddlewareDescriptor {
-  if (!isServiceMiddlewareDescriptor(value)) {
-    throw new TypeError("Invalid service middleware descriptor");
-  }
-}
-
 export function isServiceDescriptor(value: unknown): value is ServiceDescriptorAny {
-  if (!isRecord(value) || !isDescriptor(value, "service") || hasOwn(value, "handler")) {
-    return false;
+  if (!isRecord(value) || !isDescriptor(value, "service") || hasOwn(value, "handler")) return false;
+  for (const [name, member] of serviceMemberEntries(value)) {
+    if (isReservedServiceMemberName(name)) continue;
+    if (!isFunctionDescriptor(member) && !isEventDescriptor(member)) return false;
   }
-  const descriptor = value as ServiceDescriptorAny;
-  const functions = descriptor.functions;
-  if (!isRecord(functions) || Object.keys(functions).length === 0) return false;
-  const names = new Set<string>();
-  for (const [rawName, target] of Object.entries(functions)) {
-    let name: string;
-    try {
-      name = normalizeServiceMemberName(rawName);
-    } catch {
-      return false;
-    }
-    if (names.has(name) || isReservedServiceMemberName(name) || !isFunctionDescriptor(target)) {
-      return false;
-    }
-    names.add(name);
-  }
-  return (
-    descriptor.middleware === undefined ||
-    (Array.isArray(descriptor.middleware) && descriptor.middleware.every(isServiceMiddlewareEntry))
-  );
+  return true;
 }
 
 export function assertServiceDescriptor(value: unknown): asserts value is ServiceDescriptorAny {
@@ -127,28 +69,27 @@ export function freezeServiceDescriptor<T extends ServiceDescriptorAny>(value: T
   return deepFreeze(value);
 }
 
-function isFunctionDescriptor(value: unknown): value is FunctionRefAny {
+export function serviceMemberEntries(service: ServiceDescriptorAny): [string, unknown][] {
+  return Object.entries(service).filter(([name]) => !isReservedServiceMemberName(name));
+}
+
+export function isFunctionDescriptor(value: unknown): value is FunctionRefAny {
   if (!isRecord(value) || !isDescriptor(value, "function")) return false;
-  const descriptor = value as unknown as FunctionRefAny & Record<string, unknown>;
+  const descriptor = value as DescriptorRecord;
   return (
     isSchema(descriptor.input) &&
     isSchema(descriptor.output) &&
-    typeof descriptor.handler === "function" &&
-    typeof descriptor.invoke === "function"
+    typeof descriptor.handler === "function"
   );
+}
+
+function isEventDescriptor(value: unknown): boolean {
+  return isRecord(value) && isDescriptor(value, "event");
 }
 
 function isSchema(value: unknown): boolean {
   if (!isRecord(value) || !isRecord(value["~standard"])) return false;
   return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
-}
-
-function isServiceMiddlewareEntry(value: unknown): boolean {
-  if (!isServiceMiddlewareRef(value) || !isRecord(value)) return false;
-  if ("kind" in value || "id" in value || "handler" in value) {
-    return isServiceMiddlewareDescriptor(value);
-  }
-  return true;
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, any> {
@@ -158,3 +99,5 @@ function isRecord(value: unknown): value is Record<PropertyKey, any> {
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
 }
+
+type DescriptorRecord = Record<PropertyKey, any>;

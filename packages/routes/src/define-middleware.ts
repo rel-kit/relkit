@@ -7,10 +7,12 @@ import {
   type MaybePromise,
 } from "@relkit/contracts";
 import { createUnboundIdentity, type PublicClock, type PublicLogger } from "@relkit/invocation";
+import type { AuthContext, ResolvedApplicationEnv } from "@relkit/functions";
 
 export interface MiddlewareContext {
   readonly signal: AbortSignal;
-  readonly env: Readonly<Record<string, unknown>>;
+  readonly env: ResolvedApplicationEnv;
+  readonly auth: AuthContext;
   readonly log: PublicLogger;
   readonly time: PublicClock;
 }

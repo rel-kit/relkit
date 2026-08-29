@@ -38,7 +38,11 @@ export function snapshotModule(
 
 function isCompilerDescriptor(value: unknown): value is SnapshotDescriptorLike {
   if (isDescriptor(value)) return true;
-  if (!isRecord(value) || (value.kind !== "middleware" && value.kind !== "transform")) return false;
+  if (
+    !isRecord(value) ||
+    (value.kind !== "middleware" && value.kind !== "transform" && value.kind !== "error")
+  )
+    return false;
   return (
     typeof value.id === "string" &&
     isRecord(value.ref) &&

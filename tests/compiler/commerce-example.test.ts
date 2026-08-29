@@ -7,9 +7,15 @@ const APP_ROOT = resolve(import.meta.dir, "../../examples/commerce");
 const forbiddenNode = ["sub", "scription"].join("");
 const DESCRIPTOR_IDS = [
   "commerce-api",
-  "application",
+  "account",
+  "account.account-session",
   "assets",
-  "prices",
+  "assets.objects",
+  "assets.upload-assets",
+  "auth",
+  "database",
+  "navigation",
+  "navigation.browse-path",
   "orders.created",
   "orders.updated",
   "orders.cancelled",
@@ -17,19 +23,22 @@ const DESCRIPTOR_IDS = [
   "orders.project-any-change",
   "orders.audit-changes",
   "telemetry.capture-events",
-  "authorize-order",
-  "account-session",
-  "browse-path",
-  "cancel-order",
-  "database-users",
+  "orders.authorize-order",
+  "orders.cancel-order",
+  "orders.lookup-order",
+  "orders.order-support",
+  "orders.prices",
   "orders.create-order",
   "orders.delete-order",
   "orders.get-order",
   "orders.search-orders",
-  "send-receipt",
+  "receipts",
+  "receipts.send-receipt",
   "orders.update-order",
-  "upload-assets",
   "receipts.send-job",
+  "telemetry",
+  "users",
+  "users.database-users",
   "order-auth",
   "route.all.api.auth.optional-catch-all-auth",
   "route.get.account.profile",
@@ -46,10 +55,8 @@ const DESCRIPTOR_IDS = [
   "route.patch.orders.by-order-id",
   "route.post.orders",
   "route.post.uploads",
-  "orders",
   "orders.normalize-id",
-  "lookup-order",
-  "order-support",
+  "orders",
 ];
 
 describe("commerce-example compiler acceptance", () => {
@@ -83,9 +90,7 @@ describe("commerce-example compiler acceptance", () => {
         .filter((node) => DESCRIPTOR_IDS.includes(node.id))
         .map((node) => node.id)
         .sort(),
-    ).toEqual(
-      DESCRIPTOR_IDS.filter((id) => !["application", "orders.normalize-id"].includes(id)).sort(),
-    );
+    ).toEqual(DESCRIPTOR_IDS.filter((id) => id !== "orders.normalize-id").sort());
     expect(unique(edges.map(edgeKey))).toHaveLength(edges.length);
     expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(19);
     expect(
@@ -119,10 +124,9 @@ describe("commerce-example compiler acceptance", () => {
 
     expect(edges.map(edgeKey).sort()).toEqual(
       [
-        ["enqueues-job", "orders.create-order", "receipts.send-job"],
         ["enqueues-job", "relkit.event.receipts.on-order-created.handler", "receipts.send-job"],
-        ["exposes-as-tool", "orders.delete-order", "cancel-order"],
-        ["exposes-as-tool", "orders.get-order", "lookup-order"],
+        ["exposes-as-tool", "orders.delete-order", "orders.cancel-order"],
+        ["exposes-as-tool", "orders.get-order", "orders.lookup-order"],
         ["listens-to-event", "receipts.on-order-created", "orders.created"],
         ["listens-to-event", "orders.project-any-change", "orders.cancelled"],
         ["listens-to-event", "orders.project-any-change", "orders.created"],
@@ -131,16 +135,26 @@ describe("commerce-example compiler acceptance", () => {
         ["listens-to-event", "orders.audit-changes", "orders.created"],
         ["listens-to-event", "orders.audit-changes", "orders.updated"],
         ["publishes-event", "orders.create-order", "orders.created"],
-        ["targets-function", "route.post.uploads", "upload-assets", "primary"],
-        ["targets-function", "route.get.account.profile", "account-session", "primary"],
-        ["targets-function", "route.get.database.users", "database-users", "primary"],
-        ["targets-function", "route.get.docs.optional-catch-all-parts", "browse-path", "primary"],
-        ["targets-function", "route.get.files.catch-all-parts", "browse-path", "primary"],
+        ["targets-function", "route.post.uploads", "assets.upload-assets", "primary"],
+        ["targets-function", "route.get.account.profile", "account.account-session", "primary"],
+        ["targets-function", "route.get.database.users", "users.database-users", "primary"],
+        [
+          "targets-function",
+          "route.get.docs.optional-catch-all-parts",
+          "navigation.browse-path",
+          "primary",
+        ],
+        [
+          "targets-function",
+          "route.get.files.catch-all-parts",
+          "navigation.browse-path",
+          "primary",
+        ],
         ["targets-function", "route.delete.orders.by-order-id", "orders.delete-order", "primary"],
         ["targets-function", "route.get.orders.by-order-id", "orders.get-order", "primary"],
         ["targets-function", "route.post.orders", "orders.create-order", "primary"],
-        ["targets-function", "cancel-order", "orders.delete-order", "primary"],
-        ["targets-function", "lookup-order", "orders.get-order", "primary"],
+        ["targets-function", "orders.cancel-order", "orders.delete-order", "primary"],
+        ["targets-function", "orders.lookup-order", "orders.get-order", "primary"],
         ["targets-function", "route.head.orders.by-order-id", "orders.get-order", "primary"],
         ["targets-function", "route.get.orders", "orders.search-orders", "primary"],
         ["targets-function", "route.options.orders.by-order-id", "orders.get-order", "primary"],
@@ -171,14 +185,13 @@ describe("commerce-example compiler acceptance", () => {
           "relkit.event.telemetry.capture-events.handler",
           "primary",
         ],
-        ["targets-function", "receipts.send-job", "send-receipt", "primary"],
-        ["uses-bucket", "send-receipt", "assets"],
-        ["uses-bucket", "upload-assets", "assets"],
-        ["uses-cache", "orders.create-order", "prices"],
-        ["uses-cache", "route.get.orders", "prices"],
-        ["uses-provider-profile", "assets", "provider.buckets.default"],
-        ["uses-provider-profile", "order-support", "provider.models.default"],
-        ["uses-provider-profile", "prices", "provider.cache.default"],
+        ["targets-function", "receipts.send-job", "receipts.send-receipt", "primary"],
+        ["uses-bucket", "receipts.send-receipt", "assets.objects"],
+        ["uses-bucket", "assets.upload-assets", "assets.objects"],
+        ["uses-cache", "orders.create-order", "orders.prices"],
+        ["uses-provider-profile", "assets.objects", "provider.buckets.default"],
+        ["uses-provider-profile", "orders.order-support", "provider.models.default"],
+        ["uses-provider-profile", "orders.prices", "provider.cache.default"],
         ["uses-provider-profile", "orders.created", "provider.events.default"],
         ["uses-provider-profile", "orders.updated", "provider.events.default"],
         ["uses-provider-profile", "orders.cancelled", "provider.events.default"],
@@ -187,7 +200,7 @@ describe("commerce-example compiler acceptance", () => {
         ["uses-provider-profile", "orders.audit-changes", "provider.events.default"],
         ["uses-provider-profile", "telemetry.capture-events", "provider.events.default"],
         ["uses-provider-profile", "receipts.send-job", "provider.jobs.default"],
-        ["uses-tool", "order-support", "lookup-order"],
+        ["uses-tool", "orders.order-support", "orders.lookup-order"],
         ["uses-middleware", "route.delete.orders.by-order-id", "order-auth", "0"],
         ["uses-middleware", "route.get.orders.by-order-id", "order-auth", "0"],
         ["uses-middleware", "route.get.orders.search", "order-auth", "0"],
@@ -197,12 +210,23 @@ describe("commerce-example compiler acceptance", () => {
         ["uses-middleware", "route.patch.orders.by-order-id", "order-auth", "0"],
         ["uses-middleware", "route.post.orders", "order-auth", "0"],
         ["uses-middleware", "route.put.orders.by-order-id", "order-auth", "0"],
-        ["contains-function", "orders", "orders.create-order", "createOrder", "0"],
-        ["contains-function", "orders", "orders.delete-order", "deleteOrder", "1"],
-        ["contains-function", "orders", "orders.get-order", "getOrder", "2"],
-        ["contains-function", "orders", "orders.search-orders", "searchOrders", "3"],
-        ["contains-function", "orders", "orders.update-order", "updateOrder", "4"],
-        ["uses-service-middleware", "orders", "orders.context", "0"],
+        ["declares-error", "orders.get-order", "orders.not-found"],
+        ["depends-on-service", "auth", "database"],
+        ["mounts-service", "route.all.api.auth.optional-catch-all-auth", "auth"],
+        ["exposes-function", "account", "account.account-session", "accountSession", "0"],
+        ["exposes-function", "assets", "assets.upload-assets", "uploadAssets", "0"],
+        ["exposes-function", "navigation", "navigation.browse-path", "browsePath", "0"],
+        ["exposes-function", "orders", "orders.authorize-order", "authorizeOrder", "0"],
+        ["exposes-function", "orders", "orders.create-order", "createOrder", "1"],
+        ["exposes-function", "orders", "orders.delete-order", "deleteOrder", "2"],
+        ["exposes-function", "orders", "orders.get-order", "getOrder", "3"],
+        ["exposes-function", "orders", "orders.search-orders", "searchOrders", "4"],
+        ["exposes-function", "orders", "orders.update-order", "updateOrder", "5"],
+        ["exposes-function", "receipts", "receipts.send-receipt", "sendReceipt", "0"],
+        ["exposes-function", "users", "users.database-users", "databaseUsers", "0"],
+        ["exposes-event", "orders", "orders.cancelled", "orderCancelled", "0"],
+        ["exposes-event", "orders", "orders.created", "orderCreated", "1"],
+        ["exposes-event", "orders", "orders.updated", "orderUpdated", "2"],
       ].sort(),
     );
 
@@ -225,7 +249,7 @@ describe("commerce-example compiler acceptance", () => {
       .filter(({ kind, identity }) => kind === "function" && identity !== undefined)
       .map(({ id }) => id)
       .sort();
-    const generatedFunctionId = "relkit.agent.order-support.invoke";
+    const generatedFunctionId = "relkit.agent.orders.order-support.invoke";
     const eventFunctionIds = [
       "relkit.event.orders.audit-changes.handler",
       "relkit.event.orders.project-any-change.handler",
@@ -238,7 +262,7 @@ describe("commerce-example compiler acceptance", () => {
       generated: {
         generated: true,
         generatedBy: "agent",
-        agentId: "order-support",
+        agentId: "orders.order-support",
         functionId: generatedFunctionId,
       },
     });
@@ -314,12 +338,10 @@ describe("commerce-example compiler acceptance", () => {
       },
     });
     expect(nodes.find((node) => node.id === "route.get.orders")?.config).toMatchObject({
-      rateLimit: { limit: 2, windowMs: 60_000, storeId: "prices" },
-      responses: expect.arrayContaining([expect.objectContaining({ status: 429 })]),
+      method: "GET",
+      path: "/orders",
     });
-    expect(nodes.find((node) => node.id === "orders")?.middleware).toEqual([
-      { id: "orders.context" },
-    ]);
+    expect(nodes.find((node) => node.id === "orders")?.functions).toHaveLength(6);
     expect(nodes.find((node) => node.id === "orders.get-order")?.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: "orders.not-found", retry: "later", afterMs: 1_000 }),
@@ -351,7 +373,7 @@ function assertLogicalResourceDescriptors(
   });
   expect(
     resources.map(({ descriptor }) => (descriptor as { readonly id: string }).id).sort(),
-  ).toEqual(["assets", "prices"]);
+  ).toEqual(["assets.objects", "orders.prices"]);
   for (const resource of resources) {
     walk(resource.descriptor, (key, value) => {
       expect(key).not.toMatch(

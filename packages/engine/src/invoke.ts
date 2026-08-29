@@ -2,7 +2,6 @@ import {
   createInvocationCallStack,
   currentInvocationScope,
   normalizeFailure,
-  resolveServicePolicy,
   runInInvocationScope,
 } from "@relkit/invocation";
 import {
@@ -70,7 +69,6 @@ export async function invoke<
   const deadlineMs = calculateDeadline(target.timeoutMs, options, options.parent?.deadlineMs, now);
   const idSource = options.idSource ?? defaultIdSource;
   const traceId = options.traceId ?? options.parent?.traceId ?? idSource.next("trace");
-  const policy = resolveServicePolicy(target, options.servicePolicies);
   const record = createRecord(
     target.id,
     source,
@@ -79,7 +77,7 @@ export async function invoke<
     deadlineMs,
     now,
     idSource,
-    policy?.serviceId,
+    options.serviceId,
   );
   await callHook(options.hooks?.onInvocationStart, record);
   await emitObservabilityEvent(options.hooks?.observability, {
@@ -126,9 +124,7 @@ export async function invoke<
         parent,
         ...(options.env === undefined ? {} : { env: options.env }),
         ...(options.clients === undefined ? {} : { clients: options.clients }),
-        ...(options.servicePolicies === undefined
-          ? {}
-          : { servicePolicies: options.servicePolicies }),
+        ...(options.serviceId === undefined ? {} : { serviceId: options.serviceId }),
         ...(options.now === undefined ? {} : { now: options.now }),
         ...(options.admit === undefined ? {} : { admit: options.admit }),
         ...(options.admission === undefined ? {} : { admission: options.admission }),

@@ -5,10 +5,12 @@ const KNOWN_FACTORIES = new Set([
   "defineConfig",
   "defineConstants",
   "definePrompt",
-  "defineDataModel",
+  "defineDrizzleService",
+  "defineBetterAuthService",
   "defineFunction",
   "defineError",
   "defineRoute",
+  "defineServiceRoutes",
   "defineJob",
   "defineEvent",
   "onEvent",
@@ -20,7 +22,6 @@ const KNOWN_FACTORIES = new Set([
   "defineRequestTransform",
   "defineMiddleware",
   "defineService",
-  "defineServiceMiddleware",
 ]);
 const INDICATOR_ORDER: readonly AstCandidateIndicator[] = [
   "relkit-import",

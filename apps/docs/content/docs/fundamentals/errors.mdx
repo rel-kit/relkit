@@ -9,8 +9,8 @@ defects are not declared errors; they remain internal and are redacted at public
 
 ## Define a stable domain failure
 
-<include cwd lang="ts" meta='title="examples/commerce/src/errors/order-not-found.error.ts"'>
-  ../../examples/commerce/src/errors/order-not-found.error.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/errors/order-not-found.error.ts"'>
+  ../../examples/commerce/src/orders/errors/order-not-found.error.ts
 </include>
 
 The `id` is the durable contract used in graphs, clients, traces, and error matching. `data` contains the
@@ -22,8 +22,8 @@ typed route response, and `retry` tells durable delivery whether another attempt
 The order lookup function lists the descriptor under its errors and throws the constructed declared value
 when no order exists. Its dynamic route includes the error response in the checked contract.
 
-<include cwd lang="ts" meta='title="examples/commerce/src/functions/orders/get-order.function.ts"'>
-  ../../examples/commerce/src/functions/orders/get-order.function.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/functions/get-order.function.ts"'>
+  ../../examples/commerce/src/orders/functions/get-order.function.ts
 </include>
 
 <Steps>

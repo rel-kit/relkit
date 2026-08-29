@@ -50,7 +50,7 @@ declare const defineMiddleware: (
 ) => MiddlewareDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L51)
 
 Since v0.1.0
 
@@ -63,13 +63,14 @@ Since v0.1.0
 ```ts
 export interface MiddlewareContext {
   readonly signal: AbortSignal;
-  readonly env: Readonly<Record<string, unknown>>;
+  readonly env: ResolvedApplicationEnv;
+  readonly auth: AuthContext;
   readonly log: PublicLogger;
   readonly time: PublicClock;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L12)
 
 ## MiddlewareDescriptor (interface)
 
@@ -85,7 +86,7 @@ export interface MiddlewareDescriptor<Id extends string = string> extends Descri
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
 
 ## MiddlewareHandler (type alias)
 
@@ -99,7 +100,7 @@ type MiddlewareHandler = (
 ) => MaybePromise<Response | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L20)
 
 ## isMiddlewareDescriptor
 
@@ -109,7 +110,7 @@ type MiddlewareHandler = (
 declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L65)
 
 ## isMiddlewarePath
 
@@ -119,7 +120,7 @@ declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDes
 declare const isMiddlewarePath: (value: unknown) => value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L75)
 
 ## `define-route.ts`
 
@@ -173,7 +174,7 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L62)
 
 Since v0.1.0
 
@@ -189,7 +190,127 @@ Re-exports all named exports from the "./route-types.js" module.
 export * from "./route-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L23)
+
+## `define-service-routes.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [SERVICE_ROUTE_METHODS](#service_route_methods)
+  - [ServiceRouteEntry (type alias)](#servicerouteentry-type-alias)
+  - [ServiceRouteMethod (type alias)](#serviceroutemethod-type-alias)
+  - [ServiceRouteOptions (type alias)](#servicerouteoptions-type-alias)
+  - [ServiceRoutesOptions (type alias)](#serviceroutesoptions-type-alias)
+  - [ServiceRoutesResult (type alias)](#serviceroutesresult-type-alias)
+  - [defineServiceRoutes](#defineserviceroutes)
+
+---
+
+# utils
+
+## SERVICE_ROUTE_METHODS
+
+**Signature**
+
+```ts
+declare const SERVICE_ROUTE_METHODS: readonly [
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L11)
+
+## ServiceRouteEntry (type alias)
+
+**Signature**
+
+```ts
+type ServiceRouteEntry<Service> = {
+  [Name in ServiceFunctionName<Service>]:
+    Name | ServiceRouteOptions<Name, ServiceFunction<Service, Name>>;
+}[ServiceFunctionName<Service>];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L36)
+
+## ServiceRouteMethod (type alias)
+
+**Signature**
+
+```ts
+type ServiceRouteMethod = (typeof SERVICE_ROUTE_METHODS)[number];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L21)
+
+## ServiceRouteOptions (type alias)
+
+**Signature**
+
+```ts
+type ServiceRouteOptions<Name, Target> = Omit<
+  FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
+  "target"
+> & {
+  readonly member: Name;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L29)
+
+## ServiceRoutesOptions (type alias)
+
+**Signature**
+
+```ts
+type Partial<Readonly<Record<"GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS", ServiceRouteEntry<Service>>>> = Partial<
+  Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>
+>
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L41)
+
+## ServiceRoutesResult (type alias)
+
+**Signature**
+
+```ts
+type Readonly<{ [Method in keyof Options]: FunctionRouteDescriptor<string, Extract<ServiceFunctions<Service>[Extract<EntryName<Options[Method]>, Extract<keyof ServiceFunctions<Service>, string>>], FunctionRefAny>, HttpRequestMapping | undefined>; }> = Readonly<{
+  [Method in keyof Options]: FunctionRouteDescriptor<
+    string,
+    ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
+  >;
+}>
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L51)
+
+## defineServiceRoutes
+
+Creates explicit HTTP route descriptors aligned with a service's public functions.
+
+**Signature**
+
+```ts
+declare const defineServiceRoutes: <
+  const Service extends ServiceDescriptor<string, any, any>,
+  const Options extends ServiceRoutesOptions<Service>,
+>(
+  service: Service,
+  options: Options,
+) => ServiceRoutesResult<Service, Options>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L59)
 
 ## `http-dsl-types.ts`
 
@@ -1032,6 +1153,7 @@ declare const isTransformRef: (value: unknown) => value is HttpTransformRef;
 - [utils](#utils)
   - ["./define-middleware.js" (namespace export)](#define-middlewarejs-namespace-export)
   - ["./define-route.js" (namespace export)](#define-routejs-namespace-export)
+  - ["./define-service-routes.js" (namespace export)](#define-service-routesjs-namespace-export)
   - ["./http-dsl.js" (namespace export)](#http-dsljs-namespace-export)
   - ["./route-types.js" (namespace export)](#route-typesjs-namespace-export)
   - [HttpRateLimitKey](#httpratelimitkey)
@@ -1065,6 +1187,18 @@ export * from "./define-route.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L3)
 
+## "./define-service-routes.js" (namespace export)
+
+Re-exports all named exports from the "./define-service-routes.js" module.
+
+**Signature**
+
+```ts
+export * from "./define-service-routes.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L4)
+
 ## "./http-dsl.js" (namespace export)
 
 Re-exports all named exports from the "./http-dsl.js" module.
@@ -1087,7 +1221,7 @@ Re-exports all named exports from the "./route-types.js" module.
 export * from "./route-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L5)
 
 ## HttpRateLimitKey
 
@@ -1097,7 +1231,7 @@ export * from "./route-types.js";
 declare const HttpRateLimitKey: HttpRateLimitKey;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L6)
 
 ## RouteRateLimit
 
@@ -1107,7 +1241,57 @@ declare const HttpRateLimitKey: HttpRateLimitKey;
 declare const RouteRateLimit: RouteRateLimit;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/index.ts#L6)
+
+## `route-auth.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [BetterAuthRegistration (interface)](#betterauthregistration-interface)
+  - [copyProtectedPaths](#copyprotectedpaths)
+  - [readBetterAuthRegistration](#readbetterauthregistration)
+
+---
+
+# utils
+
+## BetterAuthRegistration (interface)
+
+**Signature**
+
+```ts
+export interface BetterAuthRegistration {
+  readonly kind: "better-auth";
+  readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L3)
+
+## copyProtectedPaths
+
+**Signature**
+
+```ts
+declare const copyProtectedPaths: (values: readonly string[] | undefined) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L24)
+
+## readBetterAuthRegistration
+
+**Signature**
+
+```ts
+declare const readBetterAuthRegistration: (
+  handler: RawRouteOptions<string>["handler"],
+) => BetterAuthRegistration | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L8)
 
 ## `route-options.ts`
 
@@ -1224,7 +1408,7 @@ export interface FunctionRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L44)
 
 ## FunctionRouteOptions (interface)
 
@@ -1277,11 +1461,12 @@ export interface RawRouteDescriptor<
   readonly auth?: {
     readonly kind: "better-auth";
     readonly protected: readonly string[];
+    readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L62)
 
 ## RawRouteOptions (interface)
 
@@ -1294,6 +1479,9 @@ export interface RawRouteOptions<
 > extends RouteSharedOptions<Id> {
   readonly handler: Handler;
   readonly target?: never;
+  readonly auth?: {
+    readonly protected?: readonly string[];
+  };
 }
 ```
 
@@ -1308,4 +1496,4 @@ type RouteDescriptor<Id, Target, Request> =
   FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L78)

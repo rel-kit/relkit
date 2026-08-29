@@ -27,14 +27,14 @@ describe("inspector graph model", () => {
     const edges = [
       { kind: "targets-function", from: "orders.create.http", to: "orders.create" },
       {
-        kind: "contains-function",
+        kind: "exposes-function",
         from: "orders",
         to: "orders.create",
         member: "create",
         order: 1,
       },
       {
-        kind: "contains-function",
+        kind: "exposes-function",
         from: "orders",
         to: "orders.get",
         member: "get",
@@ -52,7 +52,7 @@ describe("inspector graph model", () => {
     expect(first.declaredEdges[0]?.relationship).toBe("declared");
     expect(
       first.declaredEdges
-        .filter((edge) => edge.kind === "contains-function")
+        .filter((edge) => edge.kind === "exposes-function")
         .map((edge) => edge.order),
     ).toEqual([0, 1]);
     expect(first.observedEdges[0]?.relationship).toBe("observed");

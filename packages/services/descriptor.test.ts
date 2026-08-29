@@ -1,74 +1,49 @@
 import { describe, expect, test } from "bun:test";
-import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { defineEvent } from "@relkit/events";
 import { defineFunction } from "@relkit/functions";
-import {
-  assertServiceDescriptor,
-  assertServiceMemberName,
-  defineService,
-  freezeServiceDescriptor,
-  isServiceDescriptor,
-  isServiceRef,
-} from "./src/index.ts";
 import { z } from "@relkit/schema";
+import { defineService, isServiceDescriptor } from "./src/index.ts";
 
-const member = defineFunction({
-  id: "orders.get",
+const lookup = defineFunction({
+  id: "orders.lookup",
   input: z.object({ id: z.string() }),
-  output: z.object({ ok: z.boolean() }),
-  handler: async () => ({ ok: true }),
+  output: z.object({ id: z.string() }),
+  handler: async (input) => input,
 });
 
-function service(functions: Record<string, typeof member>) {
-  return freezeServiceDescriptor({
-    ...createDescriptorBase("service", "orders"),
-    functions,
-  });
-}
+const created = defineEvent({
+  id: "orders.created",
+  version: 1,
+  payload: z.object({ id: z.string() }),
+});
 
-function rawService(functions: Record<string, typeof member>) {
-  return {
-    ...createDescriptorBase("service", "orders"),
-    functions: deepFreeze(functions),
-  };
-}
-
-describe("service descriptor contracts", () => {
-  test("accepts branded frozen services and refs", () => {
-    const descriptor = service({ get: member });
-
-    expect(isServiceDescriptor(descriptor)).toBe(true);
-    expect(isServiceRef(descriptor)).toBe(true);
-    expect(Object.isFrozen(descriptor)).toBe(true);
-    expect(Object.isFrozen(descriptor.functions)).toBe(true);
-    expect(() => assertServiceDescriptor(descriptor)).not.toThrow();
-  });
-
-  test("rejects reserved and colliding member names", () => {
-    expect(() => assertServiceMemberName("functions")).toThrow("reserved");
-    expect(isServiceDescriptor(rawService({ " get ": member, get: member }))).toBe(false);
-    expect(isServiceDescriptor(rawService({ functions: member }))).toBe(false);
-  });
-
-  test("exposes frozen direct facades without cloning function capabilities", async () => {
-    const middleware = Object.freeze({
-      ref: Object.freeze({ kind: "service-middleware" as const, id: "orders.auth" }),
-    });
-    const descriptor = defineService({
+describe("defineService", () => {
+  test("preserves public member identity without namespaces", () => {
+    const orders = defineService({
       id: "orders",
-      functions: { get: member },
-      middleware: [middleware],
+      functions: { lookup },
+      events: { created },
     });
 
-    expect(descriptor.functions.get).toBe(member);
-    expect(descriptor.get).not.toBe(member);
-    expect(descriptor.get.input).toBe(member.input);
-    expect(descriptor.get.output).toBe(member.output);
-    expect(descriptor.get.handler).toBe(member.handler);
-    expect(descriptor.get.invoke).toBe(member.invoke);
-    expect(descriptor.get.service.ref).toBe(descriptor.ref);
-    expect(descriptor.middleware?.[0]).toBe(middleware);
-    expect(Object.isFrozen(descriptor)).toBe(true);
-    expect(Object.isFrozen(descriptor.get)).toBe(true);
-    await expect(descriptor.get.invoke({ id: "1" })).resolves.toEqual({ ok: true });
+    expect(orders.lookup).toBe(lookup);
+    expect(orders.created).toBe(created);
+    expect("functions" in orders).toBe(false);
+    expect("events" in orders).toBe(false);
+    expect(isServiceDescriptor(orders)).toBe(true);
+    expect(Object.isFrozen(orders)).toBe(true);
+  });
+
+  test("accepts empty and event-only services", () => {
+    expect(isServiceDescriptor(defineService({ id: "empty" }))).toBe(true);
+    expect(defineService({ id: "events", events: { created } }).created).toBe(created);
+  });
+
+  test("rejects invalid and reserved members", () => {
+    expect(() => defineService({ id: "bad", functions: { functions: lookup } })).toThrow(
+      "reserved",
+    );
+    expect(() => defineService({ id: "bad", functions: { lookup: {} as typeof lookup } })).toThrow(
+      "Invalid service function",
+    );
   });
 });

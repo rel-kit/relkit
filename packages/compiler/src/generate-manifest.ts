@@ -83,7 +83,6 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const routes = descriptorsOf(input.descriptors, "route");
   const constants = descriptorsOf(input.descriptors, "constants");
   const prompts = descriptorsOf(input.descriptors, "prompt");
-  const dataModel = descriptorsOf(input.descriptors, "data-model")[0];
   const services = descriptorsOf(input.descriptors, "service");
   const events = descriptorsOf(input.descriptors, "event");
   const functionById = uniqueById(functions, diagnostics);
@@ -109,10 +108,6 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const routeExpressions = descriptorExpressionsFor(routes, bindings, input);
   const constantExpressions = descriptorExpressionsFor(constants, bindings, input);
   const promptExpressionsById = descriptorExpressionsFor(prompts, bindings, input);
-  const dataModelExpression =
-    dataModel === undefined
-      ? undefined
-      : descriptorExpressionsFor([dataModel], bindings, input).get(dataModel.id);
   const promptExpressions = new Map(
     prompts.flatMap((descriptor) => {
       const expression = promptExpressionsById.get(descriptor.id);
@@ -143,7 +138,6 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       routeExpressions,
       constantExpressions,
       promptExpressions,
-      dataModelExpression,
       serviceExpressions,
       identityBindings,
     ),

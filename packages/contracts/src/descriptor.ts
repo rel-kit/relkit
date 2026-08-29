@@ -37,7 +37,6 @@ const descriptorKinds: readonly DescriptorKind[] = [
   "cache",
   "tool",
   "agent",
-  "data-model",
   "constants",
   "prompt",
 ];

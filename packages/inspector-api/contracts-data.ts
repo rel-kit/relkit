@@ -19,7 +19,7 @@ export function poison<T extends Record<string, unknown>>(value: T): T {
 }
 
 export const graph = {
-  contractVersion: 3,
+  contractVersion: 6,
   appId: "contract-fixture",
   nodes: [
     {
@@ -32,6 +32,8 @@ export const graph = {
     poison({
       kind: "function",
       id: "orders.create",
+      domainId: "orders",
+      exposure: "public",
       source: source("src/orders.ts"),
       input: { password: secret, orderId: { type: "string" } },
       output: { type: "object" },
@@ -56,7 +58,22 @@ export const graph = {
       order: 0,
     },
     { kind: "job", id: "orders.job", source: source("src/jobs.ts") },
-    { kind: "event", id: "orders.created", source: source("src/events.ts") },
+    {
+      kind: "event",
+      id: "orders.created",
+      domainId: "orders",
+      exposure: "public",
+      source: source("src/events.ts"),
+    },
+    {
+      kind: "error",
+      id: "orders.invalid",
+      domainId: "orders",
+      exposure: "public",
+      data: { type: "object" },
+      retry: "never",
+      source: source("src/orders/errors/invalid.error.ts"),
+    },
     { kind: "bucket", id: "orders.bucket", source: source("src/buckets.ts") },
     { kind: "cache", id: "orders.cache", source: source("src/cache.ts") },
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
@@ -73,11 +90,12 @@ export const graph = {
     {
       kind: "service",
       id: "orders",
-      source: source("src/services.ts"),
+      domainId: "orders",
+      source: source("src/orders/service.ts"),
       title: "Orders",
       tags: ["orders"],
-      members: [{ name: "create", functionId: "orders.create" }],
-      middleware: [{ id: "orders.context" }],
+      functions: [{ name: "create", functionId: "orders.create" }],
+      events: [{ name: "created", eventId: "orders.created" }],
     },
   ],
   edges: [
@@ -90,13 +108,13 @@ export const graph = {
       match: "always",
     },
     {
-      kind: "contains-function",
+      kind: "exposes-function",
       from: "orders",
       to: "orders.create",
       member: "create",
       order: 0,
     },
-    { kind: "uses-service-middleware", from: "orders", to: "orders.context", order: 0 },
+    { kind: "declares-error", from: "orders.create", to: "orders.invalid" },
   ],
 };
 

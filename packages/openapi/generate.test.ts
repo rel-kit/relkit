@@ -168,7 +168,7 @@ function graph(reverse: boolean): ApplicationGraph {
     {
       kind: "service",
       id: "orders",
-      source: { file: "src/services/orders.ts", line: 1, column: 1 },
+      source: { file: "src/orders/service.ts", line: 1, column: 1 },
       title: "Orders",
       description: "Order operations",
       tags: ["orders"],

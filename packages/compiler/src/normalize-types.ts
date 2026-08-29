@@ -76,7 +76,8 @@ export const NORMALIZE_CODES = Object.freeze({
   collision: "RELKIT_ROUTE_COLLISION",
   handler: "RELKIT_MANIFEST_HANDLER_MISSING",
   authDuplicate: "RELKIT_AUTH_DUPLICATE",
-  dataModelDuplicate: "RELKIT_DATA_MODEL_DUPLICATE",
+  domain: "RELKIT_DOMAIN_INVALID",
+  boundary: "RELKIT_DOMAIN_BOUNDARY",
   appDuplicate: "RELKIT_APP_DUPLICATE",
 } as const);
 /** The ordered pass names required by v3 Section 11.4. */
@@ -123,6 +124,8 @@ export interface NormalizedDescriptor {
   readonly exportName: string;
   readonly exportKind: "default" | "named";
   readonly identity?: "explicit" | "inferred";
+  readonly domainId?: string;
+  readonly exposure?: "public" | "internal";
   readonly facts?: ExportFacts;
   readonly exportFact?: ExportFact;
   readonly reference?: EvaluatorManifestReference;
@@ -161,6 +164,7 @@ export interface NormalizationWork {
   nodes: GraphNode[];
   edges: GraphEdge[];
   observedEdges: ObservedEdge[];
+  serviceDependencies: { readonly from: string; readonly to: string }[];
   diagnostics: Diagnostic[];
   passOrder: ValidationPass[];
   graph?: NormalizedGraph;
@@ -181,7 +185,6 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
     "cache",
     "tool",
     "agent",
-    "data-model",
     "constants",
     "prompt",
   ].includes(value as DescriptorKind);

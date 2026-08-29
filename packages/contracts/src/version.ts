@@ -1,14 +1,14 @@
 /** Current version of the public contract payloads. */
-export const CONTRACT_VERSION = 2 as const;
+export const CONTRACT_VERSION = 3 as const;
 
 /** Current version of generated RelKit artifacts. */
-export const GENERATOR_VERSION = 2 as const;
+export const GENERATOR_VERSION = 3 as const;
 
 /** Current version of the canonical application graph. */
-export const GRAPH_VERSION = 5 as const;
+export const GRAPH_VERSION = 6 as const;
 
 /** Current version of the executable runtime manifest. */
-export const MANIFEST_VERSION = 5 as const;
+export const MANIFEST_VERSION = 6 as const;
 
 /** Current version of the internal inspector/API protocol. */
 export const API_VERSION = 1 as const;

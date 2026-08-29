@@ -9,8 +9,8 @@ for slow or retryable work that should not hold an HTTP request open.
 
 ## Define the receipt job
 
-<include cwd lang="ts" meta='title="examples/commerce/src/jobs/send-receipt.job.ts"'>
-  ../../examples/commerce/src/jobs/send-receipt.job.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/receipts/jobs/send-receipt.job.ts"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
 </include>
 
 The stable `id` addresses durable queue state. `input` defines the enqueue contract and `target` selects the
@@ -22,9 +22,9 @@ and duplicate delivery. Schedules use the same descriptor but are explained sepa
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/functions/orders/create-order.function.ts"'
+  meta='title="examples/commerce/src/orders/functions/create-order.function.ts"'
 >
-  ../../examples/commerce/src/functions/orders/create-order.function.ts
+  ../../examples/commerce/src/orders/functions/create-order.function.ts
 </include>
 
 The function declares the job under `dependencies.jobs`, then calls the typed client on context. Importing a

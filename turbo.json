@@ -6,6 +6,24 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".relkit/build/**"]
     },
+    "create-relkit#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/templates/default/v1/**",
+        "$TURBO_ROOT$/scripts/package-create-relkit-templates.ts"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "create-relkit#typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/templates/default/v1/**",
+        "$TURBO_ROOT$/scripts/package-create-relkit-templates.ts"
+      ],
+      "outputs": ["dist/**", "*.tsbuildinfo"]
+    },
     "check": {
       "dependsOn": ["^check"]
     },

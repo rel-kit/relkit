@@ -53,7 +53,8 @@ export function isDescriptorLike(value: NormalizedDescriptor): boolean {
   return (
     (isDescriptorKindValue(value.kind) ||
       value.kind === "middleware" ||
-      value.kind === "transform") &&
+      value.kind === "transform" ||
+      value.kind === "error") &&
     (isDescriptor(value.value) || isRecord(value.value))
   );
 }

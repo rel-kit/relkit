@@ -8,7 +8,6 @@ import {
 } from "./validation.js";
 import { InvocationValidationError } from "./contracts.js";
 import { linkSignals } from "./context.js";
-import { resolveServicePolicy } from "./service-policy.js";
 import { normalizeFailure, toPublicEnvelope, type InvocationFailure } from "./failure.js";
 import { makeStandaloneContext, createLocalClock } from "./dispatcher-context.js";
 import { currentInvocationScope, runInInvocationScope } from "./dispatcher-scope.js";
@@ -59,7 +58,6 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
   const deadlineMs = calculateStandaloneDeadline(request.target.timeoutMs, options, parent, now);
   const idSource = options.idSource ?? defaultIdSource;
   const traceId = options.traceId ?? parent?.traceId ?? idSource.next("trace");
-  const policy = resolveServicePolicy(request.target, options.servicePolicies);
   const recordOptions =
     parent === undefined || parent === options.parent ? options : { ...options, parent };
   const identity = resolveDescriptorIdentity(request.target);
@@ -71,7 +69,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
     deadlineMs,
     now,
     idSource,
-    policy?.serviceId,
+    undefined,
   );
   await callHook(options.onInvocationStart, record);
 
@@ -119,9 +117,6 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
           input,
           context,
           ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
-          ...(options.servicePolicies === undefined
-            ? {}
-            : { servicePolicies: options.servicePolicies }),
           ...(deadlineMs === undefined ? {} : { deadline: deadlineMs }),
           runner,
           signal: controller.signal,

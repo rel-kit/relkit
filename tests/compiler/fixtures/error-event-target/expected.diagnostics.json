@@ -3,7 +3,7 @@
     "code": "RELKIT_EVENT_NAME_UNKNOWN",
     "column": 17,
     "descriptorId": "orders.created-trigger",
-    "file": "src/events/order-created-trigger.event.ts",
+    "file": "src/orders/events/order-created-trigger.event.ts",
     "line": 3,
     "message": "Event name \"orders.missing\" is not registered.",
     "severity": "error"

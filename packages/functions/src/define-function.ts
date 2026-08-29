@@ -42,6 +42,7 @@ export type {
   AgentClients,
   AgentRef,
   AgentRefAny,
+  AuthContext,
   BucketClient,
   BucketClientFor,
   BucketClients,

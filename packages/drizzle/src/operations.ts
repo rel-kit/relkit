@@ -34,7 +34,7 @@ async function baseOperation(binding: ModelBinding, name: string, args: unknown)
     case "upsert":
       return upsert(binding, selector(binding, value.where), value.create, value.update);
     default:
-      throw new TypeError(`Unknown data-model operation "${name}"`);
+      throw new TypeError(`Unknown model operation "${name}"`);
   }
 }
 async function findOne(binding: ModelBinding, where: Record<string, unknown>): Promise<unknown> {

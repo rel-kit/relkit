@@ -14,7 +14,6 @@ import {
   type InvocationTarget as SharedInvocationTarget,
   type PublicClock as SharedPublicClock,
   type PublicLogger as SharedPublicLogger,
-  type ServicePolicySource,
   type InvocationValueHooks,
 } from "@relkit/invocation";
 import type {
@@ -135,7 +134,7 @@ export interface InvokeOptions<
   readonly toolHooks?: InvocationValueHooks<Context>;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
-  readonly servicePolicies?: ServicePolicySource;
+  readonly serviceId?: string;
   readonly now?: () => number;
   readonly admit?: InvocationAdmit;
   readonly admission?: { readonly acquire: InvocationAdmit };

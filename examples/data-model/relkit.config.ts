@@ -1,7 +1,8 @@
-import { defineConfig, defineEnv, env } from "@relkit/app/config";
+import { defineConfig } from "@relkit/app/config";
+import env from "@app/platform/env.js";
 
 export default defineConfig({
-  env: defineEnv({ DATABASE_PATH: env.string().default(":memory:") }),
+  env,
   server: { port: 3000 },
   inspector: { port: 3210 },
 });

@@ -25,7 +25,7 @@ function createMiddlewareHandler(
       const result = await descriptor.handler(
         context,
         next,
-        await middlewareContext(middlewareId, state, options),
+        await middlewareContext(middlewareId, context.req.raw, state, options),
       );
       recordDetail(state?.requestRecord, {
         kind: "middleware",
@@ -49,6 +49,7 @@ function createMiddlewareHandler(
 
 async function middlewareContext(
   middlewareId: string,
+  request: Request,
   state: ReturnType<typeof getRequestState>,
   options: RouteMaterializationOptions,
 ): Promise<MiddlewareContext> {
@@ -57,6 +58,8 @@ async function middlewareContext(
     return options.middlewareContext({
       middlewareId,
       signal,
+      request,
+      ...(options.auth === undefined ? {} : { auth: options.auth.contextFor(request) }),
       ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
       ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
     });
@@ -65,6 +68,9 @@ async function middlewareContext(
   return {
     signal,
     env: Object.freeze({}),
+    auth:
+      options.auth?.contextFor(request) ??
+      Object.freeze({ getSession: () => Promise.resolve(null) }),
     log: Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop }),
     time: Object.freeze({
       now: () => new Date(),

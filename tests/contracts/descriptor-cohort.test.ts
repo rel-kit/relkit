@@ -31,9 +31,7 @@ import {
 } from "../../packages/tools/src/index.ts";
 import {
   defineService,
-  defineServiceMiddleware,
   isServiceDescriptor,
-  isServiceMiddlewareDescriptor,
   isServiceRef,
 } from "../../packages/services/src/index.ts";
 import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
@@ -444,7 +442,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     ).toThrow();
   });
 
-  test("keeps service members, middleware, and descriptor capabilities cohesive", async () => {
+  test("keeps service members identity-preserving and cohesive", async () => {
     let calls = 0;
     const member = defineFunction({
       id: "orders.service-member",
@@ -455,34 +453,14 @@ describe.serial("Phase 2 descriptor cohort", () => {
         return { ok: true };
       },
     });
-    const middleware = defineServiceMiddleware({
-      id: "orders.policy",
-      handler: async ({ input: value, context }, next) => {
-        expect(value).toEqual({ id: "order-1" });
-        expect(context).toBeDefined();
-        await next({ actorId: "actor-1" });
-      },
-    });
     const service = defineService({
       id: "orders",
       functions: { get: member },
-      middleware: [middleware],
     });
 
     expect(isServiceDescriptor(service)).toBe(true);
     expect(isServiceRef(service)).toBe(true);
-    expect(isServiceMiddlewareDescriptor(middleware)).toBe(true);
-    expect(Object.isFrozen(middleware)).toBe(true);
-    expect(service.functions.get).toBe(member);
-    expect(service.get.ref).toEqual(member.ref);
-    expect(service.get.input).toBe(member.input);
-    expect(service.get.output).toBe(member.output);
-    expect(service.get.handler).toBe(member.handler);
-    expect(service.get.invoke).toBe(member.invoke);
-    expect(service.get.asTool).toBe(member.asTool);
-    expect(service.get.service.ref).toBe(service.ref);
-    expect(service.middleware).toEqual([middleware]);
-    expect(Object.isFrozen(service.middleware)).toBe(true);
+    expect(service.get).toBe(member);
 
     await expect(service.get.invoke({ id: "order-1" })).resolves.toEqual({ ok: true });
     const derivedTool = service.get.asTool({
@@ -521,11 +499,11 @@ describe.serial("Phase 2 descriptor cohort", () => {
         id: "orders.invalid-member",
         functions: { broken: {} },
       } as never),
-    ).toThrow("Invalid service descriptor");
+    ).toThrow('Invalid service function member "broken"');
     expect(() =>
       defineService({
         id: "orders.reserved-member",
-        functions: { invoke: lookup },
+        functions: { functions: lookup },
       } as never),
     ).toThrow("reserved");
     expect(() =>
@@ -533,14 +511,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
         id: "orders.colliding-members",
         functions: { " get ": lookup, get: lookup },
       } as never),
-    ).toThrow("Duplicate service member");
-    expect(() =>
-      defineService({
-        id: "orders.invalid-middleware",
-        functions: { get: lookup },
-        middleware: [{}],
-      } as never),
-    ).toThrow("Invalid service middleware reference");
+    ).toThrow("not normalized");
     expect(() => lookup.asTool()).toThrow("complete tool metadata");
 
     const service = defineService({ id: "orders.immutable", functions: { get: lookup } });
@@ -550,9 +521,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       approval: "never",
     });
     expect(Object.isFrozen(service)).toBe(true);
-    expect(Object.isFrozen(service.functions)).toBe(true);
     expect(Object.isFrozen(service.get)).toBe(true);
-    expect(Object.isFrozen(service.get.service)).toBe(true);
     expect(Object.isFrozen(tool)).toBe(true);
     expect(Object.getOwnPropertyDescriptor(lookup, "invoke")).toMatchObject({
       enumerable: false,
@@ -573,10 +542,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
       (service as unknown as { id: string }).id = "changed";
     }).toThrow(TypeError);
     expect(() => {
-      (service.functions as Record<string, unknown>).get = lookup;
-    }).toThrow(TypeError);
-    expect(() => {
-      (service.get.service.ref as { id: string }).id = "changed";
+      (service as unknown as Record<string, unknown>).get = lookup;
     }).toThrow(TypeError);
     expect(service.id).toBe("orders.immutable");
   });
@@ -608,7 +574,7 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(
       checkConventions({
         descriptor: valid,
-        sourcePath: "src/buckets/assets.bucket.ts",
+        sourcePath: "src/assets/buckets/assets.bucket.ts",
         isDefaultExport: true,
       }),
     ).toEqual([]);

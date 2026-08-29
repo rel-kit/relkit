@@ -4,7 +4,7 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { Badge } from "../../components/ui/badge";
 import { Card } from "../../components/ui/card";
 import { Field } from "../../components/ui/field";
-import { filterGraph, graphKinds } from "../../lib/graph-filter";
+import { filterGraph, graphDomains, graphKinds } from "../../lib/graph-filter";
 import {
   edgeLabel,
   graphKindColor,
@@ -19,12 +19,17 @@ import { Button } from "../../components/ui/button";
 export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
+  const [domain, setDomain] = useState("all");
   const [selected, setSelected] = useState<GraphNode>();
-  const filtered = useMemo(() => filterGraph(graph, search, kind), [graph, kind, search]);
+  const filtered = useMemo(
+    () => filterGraph(graph, search, kind, domain),
+    [domain, graph, kind, search],
+  );
   const kinds = useMemo(
     () => graphKinds(graph).map((id) => ({ id, label: readable(id) })),
     [graph],
   );
+  const domains = useMemo(() => graphDomains(graph), [graph]);
   const selectedEdges = selected
     ? filtered.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id)
     : [];
@@ -53,6 +58,25 @@ export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
               count={graph.nodes.filter((node) => node.kind === item.id).length}
               active={kind === item.id}
               onSelect={setKind}
+            />
+          ))}
+        </div>
+        <div className="graph-kind-tabs" role="group" aria-label="Filter graph by domain">
+          <KindTab
+            id="all"
+            label="All domains"
+            count={graph.nodes.length}
+            active={domain === "all"}
+            onSelect={setDomain}
+          />
+          {domains.map((id) => (
+            <KindTab
+              key={id}
+              id={id}
+              label={readable(id)}
+              count={graph.nodes.filter((node) => node.domainId === id).length}
+              active={domain === id}
+              onSelect={setDomain}
             />
           ))}
         </div>
@@ -99,6 +123,10 @@ export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
             <div>
               <dt>Relationships</dt>
               <dd>{selectedEdges.length}</dd>
+            </div>
+            <div>
+              <dt>Domain</dt>
+              <dd>{selected.domainId ?? "Structural"}</dd>
             </div>
             <div>
               <dt>Labels</dt>

@@ -47,6 +47,7 @@ export function normalizeCompilation(input: NormalizeInput = {}): NormalizationR
     nodes: [],
     edges: [],
     observedEdges: [...(input.observedEdges ?? [])],
+    serviceDependencies: [],
     diagnostics: [],
     passOrder: [],
     outputs: EMPTY_OUTPUTS,

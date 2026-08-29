@@ -8,10 +8,10 @@ import {
 import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
 import type { TestRuntime } from "./runtime.js";
 
-const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
+const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"] as const;
 const queryMethods = new Set(["GET", "HEAD", "DELETE", "OPTIONS"]);
 
-export type TestRoute = {
+export type TestFunctionRoute = {
   readonly method: string;
   readonly path: string;
   readonly request: unknown;
@@ -32,10 +32,18 @@ export type TestRoute = {
   }[];
 };
 
-type AuthoredRoute = Omit<TestRoute, "method" | "path" | "request" | "responses"> & {
+export type TestRawRoute = {
+  readonly method: "ALL";
+  readonly path: string;
+  readonly handler: (request: Request) => Response | Promise<Response>;
+  readonly auth?: { readonly protected: readonly string[] };
+};
+
+export type TestRoute = TestFunctionRoute | TestRawRoute;
+type AuthoredRoute = Omit<TestFunctionRoute, "method" | "path" | "request" | "responses"> & {
   readonly accept?: "application/json" | "multipart/form-data";
   readonly request?: unknown;
-  readonly responses?: TestRoute["responses"];
+  readonly responses?: TestFunctionRoute["responses"];
   readonly successStatus?: number;
 };
 
@@ -51,8 +59,11 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
     )) as Readonly<Record<string, unknown>>;
     for (const method of methods) {
       const route = module[method];
-      if (!isRoute(route)) continue;
-      loaded.push({ route: normalizeRoute(route, method, parsed), parsed });
+      if (method === "ALL" && isRawRoute(route)) {
+        loaded.push({ route: normalizeRawRoute(route, parsed), parsed });
+      } else if (isRoute(route)) {
+        loaded.push({ route: normalizeRoute(route, method, parsed), parsed });
+      }
     }
   }
   loaded.sort(
@@ -64,11 +75,23 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
   return Object.freeze(loaded.map(({ route }) => route));
 }
 
+function normalizeRawRoute(
+  route: { readonly handler: TestRawRoute["handler"]; readonly auth?: TestRawRoute["auth"] },
+  parsed: ParsedRouteFilePath,
+): TestRawRoute {
+  return Object.freeze({
+    method: "ALL",
+    path: parsed.canonicalPath,
+    handler: route.handler,
+    ...(route.auth === undefined ? {} : { auth: route.auth }),
+  });
+}
+
 function normalizeRoute(
   route: AuthoredRoute,
   method: string,
   parsed: ParsedRouteFilePath,
-): TestRoute {
+): TestFunctionRoute {
   return Object.freeze({
     method,
     path: parsed.canonicalPath,
@@ -134,7 +157,7 @@ function allowsArray(value: unknown): boolean {
   );
 }
 
-function inferResponses(route: AuthoredRoute): TestRoute["responses"] {
+function inferResponses(route: AuthoredRoute): TestFunctionRoute["responses"] {
   const projection = getJsonSchema(route.target.output);
   const noContent = projection.ok && projection.schema["x-relkit-void"] === true;
   return [
@@ -159,10 +182,15 @@ function isRoute(value: unknown): value is AuthoredRoute {
   );
 }
 
+function isRawRoute(
+  value: unknown,
+): value is { readonly handler: TestRawRoute["handler"]; readonly auth?: TestRawRoute["auth"] } {
+  return isRecord(value) && value.raw === true && typeof value.handler === "function";
+}
+
 function isSchema(value: unknown): value is StandardSchemaV1 {
   return isRecord(value) && isRecord(value["~standard"]);
 }
-
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

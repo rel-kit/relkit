@@ -21,14 +21,14 @@ test("manifest binds exported service facades and nested errors to canonical IDs
   const service: NormalizedDescriptor = {
     kind: "service",
     id: "orders",
-    source: { file: "src/services/orders.service.ts", line: 1, column: 1 },
+    source: { file: "src/orders/service.ts", line: 1, column: 1 },
     exportName: "Orders",
     exportKind: "named",
     reference: {
       generationId: "test",
       descriptorId: "orders",
       kind: "service",
-      module: "src/services/orders.service.ts",
+      module: "src/orders/service.ts",
       exportName: "Orders",
     },
     value: {

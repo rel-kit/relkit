@@ -8,8 +8,12 @@ export async function handleTestRequest(
   request: Request,
 ): Promise<Response> {
   const url = new URL(request.url);
-  const matched = routes.find((route) => route.method === request.method && match(route.path, url));
+  const matched = routes.find(
+    (route) =>
+      (route.method === request.method || route.method === "ALL") && match(route.path, url),
+  );
   if (matched === undefined) return new Response("Not found", { status: 404 });
+  if ("handler" in matched) return matched.handler(request);
   const params = match(matched.path, url) ?? {};
   const body = await readBody(request);
   try {

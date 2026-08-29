@@ -16,7 +16,7 @@ async function invokeHttp(request) {
     ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
     ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
     clients: createDependencySources(providerRegistry),
-    servicePolicies: runtimeManifest.services,
+    serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
     ...(request.parent === undefined ? {} : { parent: request.parent }),
     ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
     ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
@@ -48,17 +48,28 @@ async function invocationContext({ invocation, signal, env, time }) {
   const auth = Object.freeze({ getSession: () => activeAuth?.getSession() ?? Promise.resolve(null) });
   const log = Object.freeze({ trace: logger("trace"), debug: logger("debug"), info: logger("info"), warn: logger("warn"), error: logger("error") });
   const resolved = await contextResolver.resolve({ signal, log });
-  return { invocation, signal, env, time, auth, log, database: databaseContext?.() ?? Object.freeze({}), ...resolved };
+  const database = databaseStartup === undefined
+    ? Object.freeze({})
+    : (await databaseStartup).context;
+  return { invocation, signal, env, time, auth, log, database, ...resolved };
 }
 
-function createDatabaseRegistration(dataModel) {
-  if (dataModel === undefined) return undefined;
-  const create = dataModel[Symbol.for("relkit.data-model.create-context")];
-  if (typeof create !== "function") throw new Error("Data-model runtime is unavailable.");
-  return create;
+function createDatabaseRegistration(node, services, env) {
+  if (node === undefined) return undefined;
+  const service = services?.[node.id];
+  if (service === undefined) return Promise.reject(new Error("Drizzle service is unavailable."));
+  return activateDrizzleService(service, env);
 }
 
-function createAuthRegistration(applicationGraph, routes = {}) {
+function createBetterAuthRegistration(node, services, database) {
+  if (node === undefined) return undefined;
+  if (database === undefined) return Promise.reject(new Error("Better Auth requires Drizzle."));
+  const service = services?.[node.id];
+  if (service === undefined) return Promise.reject(new Error("Better Auth service is unavailable."));
+  return database.then((active) => activateBetterAuthService(service, active, node.capability.basePath));
+}
+
+function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
   const brand = Symbol.for("relkit.better-auth.handler");
   for (const [routeId, route] of Object.entries(routes)) {
     if (route?.auth?.kind !== "better-auth") continue;
@@ -69,7 +80,10 @@ function createAuthRegistration(applicationGraph, routes = {}) {
     return createHttpAuthRuntime({
       protected: route.auth.protected,
       publicPaths,
-      getSession: async (headers) => (await registration.auth.api.getSession({ headers })) ?? null,
+      getSession: async (headers) => {
+        const auth = await authStartup;
+        return (await auth.api.getSession({ headers })) ?? null;
+      },
     });
   }
   return undefined;

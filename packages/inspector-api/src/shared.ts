@@ -71,7 +71,6 @@ export class InspectorQueryError extends TypeError {
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-
 export function stringValue(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
 }
@@ -102,11 +101,15 @@ export function page<T extends JsonValue>(items: readonly T[], request: Request)
   const search = readFilter(params.get("search"), "search");
   const kind = readFilter(params.get("kind"), "kind");
   const status = readFilter(params.get("status"), "status");
+  const domain = readFilter(params.get("domain"), "domain");
+  const layer = readFilter(params.get("layer"), "layer");
   const filtered = items.filter(
     (item) =>
       (search === undefined || includesText(item, search.toLowerCase())) &&
       (kind === undefined || matchesField(item, ["kind", "type", "method"], kind)) &&
-      (status === undefined || matchesField(item, ["status", "state", "outcome"], status)),
+      (status === undefined || matchesField(item, ["status", "state", "outcome"], status)) &&
+      (domain === undefined || matchesField(item, ["domainId"], domain)) &&
+      (layer === undefined || matchesField(item, ["kind", "triggerType"], layer)),
   );
   const cursor = readInteger(params.get("cursor"), "cursor", 0);
   const limit = Math.min(readInteger(params.get("limit"), "limit", 50), 100);

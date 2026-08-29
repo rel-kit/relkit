@@ -29,8 +29,14 @@
     }
   },
   "dependencies": {
+    "@relkit/contracts": "workspace:*",
+    "@relkit/drizzle": "workspace:*",
+    "@relkit/invocation": "workspace:*",
     "@relkit/routes": "workspace:*",
     "better-auth": "1.7.1"
+  },
+  "devDependencies": {
+    "drizzle-orm": "1.0.0-rc.5-169397b"
   },
   "scripts": {
     "build": "tsc -b",

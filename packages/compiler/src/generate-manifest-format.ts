@@ -17,7 +17,6 @@ export function renderManifest(
   routes: ReadonlyMap<string, string> = new Map(),
   constants: ReadonlyMap<string, string> = new Map(),
   prompts: ReadonlyMap<string, string> = new Map(),
-  dataModel?: string,
   services: ReadonlyMap<string, string> = new Map(),
   identityBindings: readonly string[] = [],
 ): string {
@@ -62,7 +61,6 @@ export function renderManifest(
     `  routes: ${renderMap(routes)},`,
     `  constants: ${renderMap(constants)},`,
     `  prompts: ${renderMap(prompts)},`,
-    ...(dataModel === undefined ? [] : [`  dataModel: ${dataModel},`]),
     `  services: ${renderMap(services)},`,
     "  providers: providerFactories,",
     "  providerFactories,",

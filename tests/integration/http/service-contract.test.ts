@@ -1,9 +1,5 @@
 import { expect, test } from "bun:test";
-import {
-  defineFunction,
-  defineService,
-  defineServiceMiddleware,
-} from "../../../packages/app/src/index.ts";
+import { defineFunction, defineService } from "../../../packages/app/src/index.ts";
 import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
@@ -29,17 +25,8 @@ import { z } from "../../../packages/schema/src/index.ts";
 
 const source = { file: "src/routes/orders.ts", line: 1, column: 1 } as const;
 
-test("keeps nested HTTP transport, service policy, docs, and client contracts aligned", async () => {
+test("keeps nested HTTP transport, domain attribution, docs, and client contracts aligned", async () => {
   const events: string[] = [];
-  const middleware = defineServiceMiddleware({
-    id: "orders.context",
-    handler: async ({ input }, next) => {
-      events.push("middleware:before");
-      expect(input).toMatchObject({ orderId: "order-1", productId: "product-2" });
-      await next({ tenant: "acme" });
-      events.push("middleware:after");
-    },
-  });
   const target = defineFunction({
     id: "orders.get",
     input: z.object({
@@ -54,7 +41,7 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
       tags: z.array(z.string()),
       tenant: z.string(),
     }),
-    handler: (input, context) => {
+    handler: (input) => {
       events.push("handler");
       expect(input).toEqual({
         orderId: "order-1",
@@ -62,15 +49,11 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
         note: "gift",
         tag: "red",
       });
-      expect(Object.isFrozen(context.service)).toBe(true);
-      expect(() =>
-        Object.defineProperty(context.service, "tenant", { value: "changed" }),
-      ).toThrow();
       return {
         orderId: input.orderId,
         productId: input.productId,
         tags: [input.tag],
-        tenant: String(context.service.tenant),
+        tenant: "acme",
       };
     },
   });
@@ -80,8 +63,8 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
     description: "Order operations",
     tags: ["orders"],
     functions: { get: target },
-    middleware: [middleware],
   });
+  expect(service.get).toBe(target);
   const graph = serviceGraph();
   const plan = createRegistrationPlan(graph, { projectRoot: "/project" });
   const hooks = createInspectableObservabilityHooks();
@@ -119,7 +102,7 @@ test("keeps nested HTTP transport, service policy, docs, and client contracts al
     tags: ["red"],
     tenant: "acme",
   });
-  expect(events).toEqual(["middleware:before", "handler", "middleware:after"]);
+  expect(events).toEqual(["handler"]);
 
   const expected = generateOpenApi(graph);
   const live = await app.request(OPENAPI_PATH);
@@ -149,16 +132,19 @@ function serviceGraph(): ApplicationGraph {
       {
         kind: "service",
         id: "orders",
+        domainId: "orders",
         source,
         title: "Orders",
         description: "Order operations",
         tags: ["orders"],
-        members: [{ name: "get", functionId: "orders.get" }],
-        middleware: [],
+        functions: [{ name: "get", functionId: "orders.get" }],
+        events: [],
       },
       {
         kind: "function",
         id: "orders.get",
+        domainId: "orders",
+        exposure: "public",
         source,
         input: {
           type: "object",

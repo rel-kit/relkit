@@ -75,17 +75,18 @@ describe("canonical graph hashing", () => {
         {
           kind: "service",
           id: "orders",
-          source: { file: "src/orders.ts", line: 1, column: 1 },
-          members: [
+          domainId: "orders",
+          source: { file: "src/orders/service.ts", line: 1, column: 1 },
+          functions: [
             { name: "get", functionId: "orders.get" },
             { name: "save", functionId: "orders.save" },
           ],
-          middleware: [],
+          events: [],
         },
       ],
       edges: [
-        { kind: "contains-function", from: "orders", to: "orders.save", member: "save", order: 1 },
-        { kind: "contains-function", from: "orders", to: "orders.get", member: "get", order: 0 },
+        { kind: "exposes-function", from: "orders", to: "orders.save", member: "save", order: 1 },
+        { kind: "exposes-function", from: "orders", to: "orders.get", member: "get", order: 0 },
       ],
     };
     const canonical = JSON.parse(canonicalGraphJson(graph)) as { edges: { order: number }[] };

@@ -1,8 +1,8 @@
 import { defineRoute } from "@relkit/app/routes";
-import uploadAssets from "@app/functions/upload-assets.function.js";
+import assets from "@app/assets/service.js";
 
 export const POST = defineRoute({
-  target: uploadAssets,
+  target: assets.uploadAssets,
   accept: "multipart/form-data",
   maxBodyBytes: 10 * 1024 * 1024,
 });

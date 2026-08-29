@@ -1,16 +1,13 @@
 import type { JsonValue, SourceLocation } from "@relkit/contracts";
-import type {
-  AppNode,
-  EnvironmentVariableNode,
-  GeneratedAgentMarker,
-  GeneratedFunctionMarker,
-} from "./foundation-nodes.js";
+import type { AppNode, EnvironmentVariableNode, GeneratedAgentMarker } from "./foundation-nodes.js";
+import type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
 import type { ServiceNode } from "./service-nodes.js";
 
 export const GRAPH_NODE_KINDS = [
   "app",
   "env",
   "function",
+  "error",
   "trigger",
   "job",
   "event",
@@ -29,16 +26,9 @@ export interface GraphNodeBase<Kind extends GraphNodeKind = GraphNodeKind> {
   readonly kind: Kind;
   readonly id: string;
   readonly source: SourceLocation;
+  readonly domainId?: string;
 }
-export interface FunctionNode extends GraphNodeBase<"function"> {
-  readonly input: JsonValue;
-  readonly output: JsonValue;
-  readonly errors?: JsonValue;
-  readonly dependencies?: JsonValue;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly generated?: GeneratedFunctionMarker;
-}
+export type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
 export type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
 export interface MiddlewareRouteRef {
   readonly id: string;
@@ -99,6 +89,7 @@ export interface JobNode extends GraphNodeBase<"job"> {
   readonly idempotency?: JsonValue;
 }
 export interface EventNode extends GraphNodeBase<"event"> {
+  readonly exposure?: DomainExposure;
   readonly version: number;
   readonly payload: JsonValue;
   readonly sensitiveFields?: readonly string[];
@@ -160,6 +151,7 @@ export type GraphNode =
   | AppNode
   | EnvironmentVariableNode
   | FunctionNode
+  | ErrorNode
   | TriggerNode
   | JobNode
   | EventNode

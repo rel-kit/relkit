@@ -17,7 +17,7 @@
       "guide": "fundamentals/environment",
       "apiPackage": "config",
       "entrypoints": [{ "source": "packages/config/src/env.ts", "name": "defineEnv" }],
-      "examples": ["templates/default/v1/api/src/env.ts"]
+      "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
       "id": "providers",
@@ -41,7 +41,7 @@
         { "source": "packages/schema/src/builder.ts", "name": "z" },
         { "source": "packages/schema/src/standard-schema.ts", "name": "validate" }
       ],
-      "examples": ["examples/commerce/src/shared/schemas.ts"]
+      "examples": ["examples/commerce/src/platform/schemas.ts"]
     },
     {
       "id": "functions",
@@ -52,7 +52,7 @@
       "entrypoints": [
         { "source": "packages/functions/src/define-function.ts", "name": "defineFunction" }
       ],
-      "examples": ["examples/commerce/src/functions/orders/create-order.function.ts"]
+      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"]
     },
     {
       "id": "errors",
@@ -63,22 +63,18 @@
       "entrypoints": [
         { "source": "packages/functions/src/define-error.ts", "name": "defineError" }
       ],
-      "examples": ["examples/commerce/src/errors/order-not-found.error.ts"]
+      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"]
     },
     {
       "id": "services",
       "title": "Services",
-      "summary": "Group related functions and apply shared invocation policy.",
+      "summary": "Define a domain's public functions and events.",
       "guide": "fundamentals/services",
       "apiPackage": "services",
       "entrypoints": [
-        { "source": "packages/services/src/define-service.ts", "name": "defineService" },
-        {
-          "source": "packages/services/src/service-middleware.ts",
-          "name": "defineServiceMiddleware"
-        }
+        { "source": "packages/services/src/define-service.ts", "name": "defineService" }
       ],
-      "examples": ["examples/commerce/src/services/orders.service.ts"]
+      "examples": ["examples/commerce/src/orders/service.ts"]
     },
     {
       "id": "http",
@@ -98,7 +94,7 @@
       "entrypoints": [
         { "source": "packages/routes/src/define-middleware.ts", "name": "defineMiddleware" }
       ],
-      "examples": ["examples/commerce/src/middleware/order-auth.middleware.ts"]
+      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"]
     },
     {
       "id": "clients",
@@ -107,7 +103,7 @@
       "guide": "http/generated-clients",
       "apiPackage": "client",
       "entrypoints": [{ "source": "packages/client/src/index.ts", "name": "createClient" }],
-      "examples": ["examples/commerce/src/generated-client.ts"]
+      "examples": ["examples/commerce/src/platform/generated-client.ts"]
     },
     {
       "id": "events",
@@ -119,7 +115,7 @@
         { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
         { "source": "packages/events/src/on-event.ts", "name": "onEvent" }
       ],
-      "examples": ["examples/commerce/src/events/order-created.event.ts"]
+      "examples": ["examples/commerce/src/orders/events/order-created.event.ts"]
     },
     {
       "id": "jobs",
@@ -128,7 +124,7 @@
       "guide": "async/jobs",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"]
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
     },
     {
       "id": "schedules",
@@ -137,7 +133,7 @@
       "guide": "async/schedules",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"]
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
     },
     {
       "id": "buckets",
@@ -148,7 +144,7 @@
       "entrypoints": [
         { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
       ],
-      "examples": ["examples/commerce/src/buckets/assets.bucket.ts"]
+      "examples": ["examples/commerce/src/assets/buckets/assets.bucket.ts"]
     },
     {
       "id": "cache",
@@ -157,7 +153,7 @@
       "guide": "resources-ai/cache",
       "apiPackage": "cache",
       "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
-      "examples": ["examples/commerce/src/cache/prices.cache.ts"]
+      "examples": ["examples/commerce/src/orders/cache/prices.cache.ts"]
     },
     {
       "id": "tools",
@@ -166,7 +162,7 @@
       "guide": "resources-ai/tools",
       "apiPackage": "tools",
       "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
-      "examples": ["examples/commerce/src/tools/lookup-order.tool.ts"]
+      "examples": ["examples/commerce/src/orders/tools/lookup-order.tool.ts"]
     },
     {
       "id": "approvals",
@@ -178,7 +174,7 @@
         { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
         { "source": "packages/agents/src/approval.ts", "name": "denyApproval" }
       ],
-      "examples": ["examples/commerce/src/tools/cancel-order.tool.ts"]
+      "examples": ["examples/commerce/src/orders/tools/cancel-order.tool.ts"]
     },
     {
       "id": "agents",
@@ -187,7 +183,7 @@
       "guide": "resources-ai/agents",
       "apiPackage": "agents",
       "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
-      "examples": ["examples/commerce/src/agents/order-support.agent.ts"]
+      "examples": ["examples/commerce/src/orders/agents/order-support.agent.ts"]
     },
     {
       "id": "testing",
@@ -254,7 +250,7 @@
     {
       "path": "fundamentals/environment",
       "api": ["config"],
-      "examples": ["templates/default/v1/api/src/env.ts"],
+      "examples": ["templates/default/v1/api/src/platform/env.ts"],
       "next": "fundamentals/providers"
     },
     {
@@ -266,31 +262,37 @@
     {
       "path": "fundamentals/schemas",
       "api": ["schema"],
-      "examples": ["examples/commerce/src/shared/schemas.ts"],
+      "examples": ["examples/commerce/src/platform/schemas.ts"],
       "next": "fundamentals/errors"
     },
     {
       "path": "fundamentals/errors",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/errors/order-not-found.error.ts"],
+      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
       "next": "fundamentals/context"
     },
     {
       "path": "fundamentals/context",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/functions/orders/create-order.function.ts"],
+      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"],
       "next": "fundamentals/functions"
     },
     {
       "path": "fundamentals/functions",
       "api": ["functions"],
-      "examples": ["templates/default/v1/api/src/functions/orders/create-order.function.ts"],
+      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
       "next": "fundamentals/services"
     },
     {
       "path": "fundamentals/services",
       "api": ["services"],
-      "examples": ["examples/commerce/src/services/orders.service.ts"],
+      "examples": ["examples/commerce/src/orders/service.ts"],
+      "next": "fundamentals/domain-first-migration"
+    },
+    {
+      "path": "fundamentals/domain-first-migration",
+      "api": ["services", "routes"],
+      "examples": ["examples/commerce/src/orders/service.ts"],
       "next": "http/routes"
     },
     {
@@ -314,7 +316,7 @@
     {
       "path": "http/middleware",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/middleware/order-auth.middleware.ts"],
+      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
       "next": "http/rate-limits"
     },
     {
@@ -338,61 +340,61 @@
     {
       "path": "http/generated-clients",
       "api": ["client", "routes"],
-      "examples": ["examples/commerce/src/generated-client.ts"],
+      "examples": ["examples/commerce/src/platform/generated-client.ts"],
       "next": "async/jobs"
     },
     {
       "path": "async/jobs",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"],
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
       "next": "async/schedules"
     },
     {
       "path": "async/schedules",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/jobs/send-receipt.job.ts"],
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
       "next": "async/events"
     },
     {
       "path": "async/events",
       "api": ["events"],
-      "examples": ["examples/commerce/src/events/order-created.event.ts"],
+      "examples": ["examples/commerce/src/orders/events/order-created.event.ts"],
       "next": "async/listeners"
     },
     {
       "path": "async/listeners",
       "api": ["events"],
-      "examples": ["examples/commerce/src/events/order-receipt.event.ts"],
+      "examples": ["examples/commerce/src/receipts/events/order-receipt.event.ts"],
       "next": "resources-ai/buckets"
     },
     {
       "path": "resources-ai/buckets",
       "api": ["buckets"],
-      "examples": ["examples/commerce/src/buckets/assets.bucket.ts"],
+      "examples": ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
       "next": "resources-ai/cache"
     },
     {
       "path": "resources-ai/cache",
       "api": ["cache"],
-      "examples": ["examples/commerce/src/cache/prices.cache.ts"],
+      "examples": ["examples/commerce/src/orders/cache/prices.cache.ts"],
       "next": "resources-ai/tools"
     },
     {
       "path": "resources-ai/tools",
       "api": ["tools"],
-      "examples": ["examples/commerce/src/tools/lookup-order.tool.ts"],
+      "examples": ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
       "next": "resources-ai/approvals"
     },
     {
       "path": "resources-ai/approvals",
       "api": ["agents", "tools"],
-      "examples": ["examples/commerce/src/tools/cancel-order.tool.ts"],
+      "examples": ["examples/commerce/src/orders/tools/cancel-order.tool.ts"],
       "next": "resources-ai/agents"
     },
     {
       "path": "resources-ai/agents",
       "api": ["agents", "testing"],
-      "examples": ["examples/commerce/src/agents/order-support.agent.ts"],
+      "examples": ["examples/commerce/src/orders/agents/order-support.agent.ts"],
       "next": "operations/inspector"
     },
     {
@@ -404,7 +406,7 @@
     {
       "path": "operations/observability",
       "api": ["functions", "routes"],
-      "examples": ["templates/default/v1/api/src/functions/hello.function.ts"],
+      "examples": ["templates/default/v1/api/src/hello/functions/hello.function.ts"],
       "next": "operations/testing"
     },
     {

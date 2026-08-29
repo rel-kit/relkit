@@ -44,12 +44,7 @@ function scanCall(
     for (const member of options.properties) {
       if (!ts.isPropertyAssignment(member)) continue;
       const key = propertyName(member.name);
-      if (
-        key === "handler" &&
-        shortName !== "defineFunction" &&
-        shortName !== "defineServiceMiddleware" &&
-        shortName !== "defineRoute"
-      )
+      if (key === "handler" && shortName !== "defineFunction" && shortName !== "defineRoute")
         add(
           root,
           fragment,
@@ -130,7 +125,6 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
   );
   const findings: AuthoringViolation[] = [];
   const setupSource = /\/setup\.ts$/.test(fragment.path);
-  const runtimeDescriptor = /\/(?:auth|[^/]+\.data-model)\.ts$/.test(fragment.path);
   for (const reference of importReferences(source)) {
     if (
       isFixtureForbidden(reference.specifier) ||
@@ -149,7 +143,6 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
       );
   }
   for (const pattern of [forbiddenSymbols, valueReads]) {
-    if (pattern === valueReads && runtimeDescriptor) continue;
     pattern.lastIndex = 0;
     for (const match of fragment.text.matchAll(pattern))
       add(

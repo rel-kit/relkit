@@ -1,12 +1,19 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 5,
+  "contractVersion": 6,
   "edges": [
+    {
+      "from": "hello",
+      "kind": "exposes-function",
+      "member": "sayHello",
+      "order": 0,
+      "to": "hello.say-hello"
+    },
     {
       "from": "hello.route",
       "kind": "targets-function",
       "role": "primary",
-      "to": "hello"
+      "to": "hello.say-hello"
     }
   ],
   "nodes": [
@@ -47,9 +54,11 @@
     {
       "concurrency": null,
       "dependencies": null,
+      "domainId": "hello",
       "errors": null,
+      "exposure": "public",
       "generated": null,
-      "id": "hello",
+      "id": "hello.say-hello",
       "input": {
         "properties": {
           "name": {
@@ -75,13 +84,31 @@
       },
       "source": {
         "column": 15,
-        "file": "src/functions/hello.function.ts",
+        "file": "src/hello/functions/hello.function.ts",
         "line": 4
       },
       "timeoutMs": null
     },
     {
+      "domainId": "hello",
+      "events": [],
+      "functions": [
+        {
+          "functionId": "hello.say-hello",
+          "name": "sayHello"
+        }
+      ],
+      "id": "hello",
+      "kind": "service",
+      "source": {
+        "column": 16,
+        "file": "src/hello/service.ts",
+        "line": 4
+      }
+    },
+    {
       "config": {
+        "auth": null,
         "maxBodyBytes": null,
         "method": "GET",
         "middleware": [],
@@ -133,7 +160,7 @@
         "file": "src/routes/hello/[name]/route.ts",
         "line": 4
       },
-      "targetFunctionId": "hello",
+      "targetFunctionId": "hello.say-hello",
       "triggerType": "http"
     }
   ]

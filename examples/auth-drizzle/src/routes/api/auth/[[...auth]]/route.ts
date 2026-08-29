@@ -1,7 +1,7 @@
 import { defineRoute } from "@relkit/app/routes";
-import { betterAuthAdapter } from "@relkit/better-auth";
-import { auth } from "@app/auth.js";
+import auth from "@app/auth/service.js";
 
 export const ALL = defineRoute({
-  handler: betterAuthAdapter(auth, { protected: ["/account/*", "/orders/*", "/mcp"] }),
+  handler: auth.handler,
+  auth: { protected: ["/account/*", "/orders/*", "/mcp"] },
 });

@@ -37,8 +37,17 @@ async function shutdown() {
   await bounded(flushTelemetry(), telemetryTimeoutMs);
   await bounded(flushSentry(), telemetryTimeoutMs);
   await bounded(providerStartup, drainTimeoutMs);
-  if (providers !== undefined) await providers.dispose().catch(() => undefined);
-  await bounded(telemetry.close(), telemetryTimeoutMs);
+  if (providers !== undefined) await providers.dispose().catch((error) => recordRuntimeFailure("runtime.provider", "Provider cleanup failed", error, "direct"));
+  if (databaseStartup !== undefined) await bounded(
+    databaseStartup.then((database) => database.close()).catch((error) =>
+      recordRuntimeFailure("runtime.database", "Database cleanup failed", error, "direct"),
+    ),
+    drainTimeoutMs,
+  );
+  await bounded(
+    telemetry.close().catch((error) => recordRuntimeFailure("runtime.telemetry", "Telemetry cleanup failed", error, "direct")),
+    telemetryTimeoutMs,
+  );
   await server.stop(true);
   process.exit(0);
 }

@@ -36,8 +36,9 @@ export function createEngineDispatcher<
         });
       }
       const target = resolveGenerationTarget(request.target, baseOptions.registry);
+      const { serviceId: _serviceId, ...dispatchBase } = baseOptions;
       return run({
-        ...baseOptions,
+        ...dispatchBase,
         ...engineOptions(requestOptions),
         target: target as unknown as InvocationTarget<BaseInput, BaseOutput, BaseContext>,
         input: request.input as BaseInput,
@@ -87,7 +88,6 @@ function engineOptions<Context extends { readonly signal: AbortSignal }>(
     ...(options.toolHooks === undefined ? {} : { toolHooks: options.toolHooks }),
     ...(options.env === undefined ? {} : { env: options.env }),
     ...(options.clients === undefined ? {} : { clients: options.clients }),
-    ...(options.servicePolicies === undefined ? {} : { servicePolicies: options.servicePolicies }),
     ...(options.effectRunner === undefined ? {} : { effectRunner: options.effectRunner }),
     ...(options.idSource === undefined ? {} : { idSource: options.idSource }),
   };

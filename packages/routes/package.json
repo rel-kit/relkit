@@ -33,7 +33,11 @@
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
+    "@relkit/services": "workspace:*",
     "hono": "4.13.5"
+  },
+  "devDependencies": {
+    "@relkit/events": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b",

@@ -36,6 +36,9 @@ export interface RawRouteOptions<
 > extends RouteSharedOptions<Id> {
   readonly handler: Handler;
   readonly target?: never;
+  readonly auth?: {
+    readonly protected?: readonly string[];
+  };
 }
 
 export interface FunctionRouteDescriptor<
@@ -68,6 +71,7 @@ export interface RawRouteDescriptor<
   readonly auth?: {
     readonly kind: "better-auth";
     readonly protected: readonly string[];
+    readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }
 

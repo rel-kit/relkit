@@ -110,7 +110,7 @@ test("stops admission, cancels in-flight work, flushes telemetry, and exits on t
   const startedFile = join(root, "in-flight.started");
   const cancelledFile = join(root, "in-flight.cancelled");
   const flushedFile = join(root, "telemetry.flushed");
-  await writeFile(join(root, "src", "functions", "hello.function.ts"), handlerSource());
+  await writeFile(join(root, "src", "hello", "functions", "hello.function.ts"), handlerSource());
   await buildProject({ projectRoot: root });
   const started = await startProject({
     projectRoot: root,
@@ -249,7 +249,7 @@ function handlerSource(): string {
 import { z } from "@relkit/schema";
 
 const hello = defineFunction({
-  id: "hello",
+  id: "hello.say-hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
   handler: async (input, context) => {

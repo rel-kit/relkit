@@ -2,8 +2,8 @@
   {
     "code": "RELKIT_PROVIDER_PROFILE_UNKNOWN",
     "column": 17,
-    "descriptorId": "archive",
-    "file": "src/buckets/archive.bucket.ts",
+    "descriptorId": "archive.objects",
+    "file": "src/archive/buckets/archive.bucket.ts",
     "line": 3,
     "message": "Unqualified buckets use requires a default when multiple profiles exist.",
     "severity": "error"

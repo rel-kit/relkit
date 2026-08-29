@@ -1,7 +1,6 @@
 import { defineRoute } from "@relkit/app/routes";
-import hello from "@app/functions/hello.function.js";
+import hello from "@app/hello/service.js";
 
 export const GET = defineRoute({
-  id: "hello.http",
-  target: hello,
+  target: hello.hello,
 });

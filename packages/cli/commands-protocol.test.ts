@@ -62,9 +62,10 @@ test("graph commands accept current services and reject stale or unbound identit
   const service = {
     kind: "service",
     id: "hello-service",
+    domainId: "hello-service",
     source,
-    members: [{ name: "hello", functionId: "hello" }],
-    middleware: [],
+    functions: [{ name: "hello", functionId: "hello.say-hello" }],
+    events: [],
   };
   await writeFile(
     graphPath,
@@ -74,9 +75,9 @@ test("graph commands accept current services and reject stale or unbound identit
       edges: [
         ...graph.edges,
         {
-          kind: "contains-function",
+          kind: "exposes-function",
           from: "hello-service",
-          to: "hello",
+          to: "hello.say-hello",
           member: "hello",
           order: 0,
         },

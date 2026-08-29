@@ -31,16 +31,16 @@ import {
 } from "../../packages/testing/src/index.ts";
 import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
 import app from "../../examples/commerce/relkit.config.ts";
-import orderCreated from "../../examples/commerce/src/events/order-created.event.ts";
-import orderReceipt from "../../examples/commerce/src/events/order-receipt.event.ts";
-import authorizeOrder from "../../examples/commerce/src/functions/authorize-order.function.ts";
-import createOrder from "../../examples/commerce/src/functions/orders/create-order.function.ts";
-import getOrder from "../../examples/commerce/src/functions/orders/get-order.function.ts";
-import orders from "../../examples/commerce/src/services/orders.service.ts";
-import orderSupport from "../../examples/commerce/src/agents/order-support.agent.ts";
-import lookupOrder from "../../examples/commerce/src/tools/lookup-order.tool.ts";
-import normalizeOrderId from "../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
-import orderAuth from "../../examples/commerce/src/middleware/order-auth.middleware.ts";
+import orderCreated from "../../examples/commerce/src/orders/events/order-created.event.ts";
+import orderReceipt from "../../examples/commerce/src/receipts/events/order-receipt.event.ts";
+import authorizeOrder from "../../examples/commerce/src/orders/functions/authorize-order.function.ts";
+import createOrder from "../../examples/commerce/src/orders/functions/create-order.function.ts";
+import getOrder from "../../examples/commerce/src/orders/functions/get-order.function.ts";
+import orders from "../../examples/commerce/src/orders/service.ts";
+import orderSupport from "../../examples/commerce/src/orders/agents/order-support.agent.ts";
+import lookupOrder from "../../examples/commerce/src/orders/tools/lookup-order.tool.ts";
+import normalizeOrderId from "../../examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts";
+import orderAuth from "../../examples/commerce/src/routes/middleware/order-auth.middleware.ts";
 import { ALL as authRoute } from "../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
 import { compileProject } from "../compiler/fixture-runner.ts";
 
@@ -52,7 +52,7 @@ const ORDER_INPUT = {
   customerEmail: "customer@example.com",
 };
 
-bindDescriptorIdentity(authorizeOrder, "authorize-order");
+bindDescriptorIdentity(authorizeOrder, "orders.authorize-order");
 bindDescriptorIdentity(createOrder, "orders.create-order");
 bindDescriptorIdentity(getOrder, "orders.get-order");
 bindDescriptorIdentity(orders.getOrder, "orders.get-order");
@@ -103,7 +103,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   const targets = new Map<string, InvocationTarget>([
     ["orders.create-order", createOrder],
     ["orders.get-order", getOrder],
-    ["authorize-order", authorizeOrder],
+    ["orders.authorize-order", authorizeOrder],
   ]);
   const calls: HttpInvocationOptions[] = [];
   const http = createApp({
@@ -247,16 +247,16 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
       "BUCKET_ENDPOINT",
       "CACHE_URL",
       "OPENAI_API_KEY",
-      "assets",
-      "prices",
+      "assets.objects",
+      "orders.prices",
       "orders",
       "orders.create-order",
       "orders.get-order",
       "receipts.send-job",
       "orders.created",
       "receipts.on-order-created",
-      "lookup-order",
-      "order-support",
+      "orders.lookup-order",
+      "orders.order-support",
       "provider.buckets.default",
       "provider.cache.default",
       "provider.events.default",
@@ -290,16 +290,16 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
     "receipts.on-order-created",
     "telemetry.capture-events",
   ]);
-  expect(plan.buckets.map(({ id }) => id)).toEqual(["assets"]);
-  expect(plan.caches.map(({ id }) => id)).toEqual(["prices"]);
-  expect(plan.tools.map(({ id }) => id)).toEqual(["cancel-order", "lookup-order"]);
-  expect(plan.agents.map(({ id }) => id)).toEqual(["order-support"]);
+  expect(plan.buckets.map(({ id }) => id)).toEqual(["assets.objects"]);
+  expect(plan.caches.map(({ id }) => id)).toEqual(["orders.prices"]);
+  expect(plan.tools.map(({ id }) => id)).toEqual(["orders.cancel-order", "orders.lookup-order"]);
+  expect(plan.agents.map(({ id }) => id)).toEqual(["orders.order-support"]);
   expect(plan.functions.map(({ id }) => id)).toEqual(
     expect.arrayContaining([
       "orders.create-order",
       "orders.get-order",
-      "send-receipt",
-      "relkit.agent.order-support.invoke",
+      "receipts.send-receipt",
+      "relkit.agent.orders.order-support.invoke",
     ]),
   );
 }

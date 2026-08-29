@@ -36,13 +36,16 @@ export interface FunctionDependencies {
 
 export type InvocationSource = SharedInvocationSource;
 export type InvocationMetadata = SharedInvocationMetadata;
-export type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
+export type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
+  ? Readonly<Record<string, unknown>>
+  : Readonly<Relkit.ApplicationEnv>;
 
 export type PublicLogger = SharedPublicLogger;
 export type PublicClock = SharedPublicClock;
 
 declare global {
   namespace Relkit {
+    interface ApplicationEnv {}
     interface ApplicationContextRegistry {}
   }
 }
@@ -79,8 +82,6 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly auth: RegisteredContext<"auth", AuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
   readonly prompts: RegisteredContext<"prompts", Readonly<Record<string, never>>>;
-  /** Read-only context added by the owning service middleware for this invocation. */
-  readonly service: Readonly<Record<string, unknown>>;
 }
 
 export interface FunctionDescriptor<

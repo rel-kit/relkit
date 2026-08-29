@@ -40,20 +40,19 @@ type KindRule = {
 };
 const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   app: { directory: ".", suffix: "relkit.config.ts" },
-  function: { directory: "src/functions", suffix: ".function.ts" },
-  service: { directory: "src/services", suffix: ".service.ts" },
+  function: { directory: "functions", suffix: ".function.ts" },
+  service: { directory: "", suffix: "service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },
-  middleware: { directory: "src/middleware", suffix: ".middleware.ts" },
-  job: { directory: "src/jobs", suffix: ".job.ts" },
-  event: { directory: "src/events", suffix: ".event.ts" },
-  "event-trigger": { directory: "src/events", suffix: ".event.ts" },
-  bucket: { directory: "src/buckets", suffix: ".bucket.ts" },
-  cache: { directory: "src/cache", suffix: ".cache.ts" },
-  tool: { directory: "src/tools", suffix: ".tool.ts" },
-  agent: { directory: "src/agents", suffix: ".agent.ts" },
-  "data-model": { directory: "src/data", suffix: ".data-model.ts" },
-  constants: { directory: "src/constants", suffix: ".constants.ts" },
-  prompt: { directory: "src/prompts", suffix: ".prompt.ts" },
+  middleware: { directory: "src/routes/middleware", suffix: ".middleware.ts" },
+  job: { directory: "jobs", suffix: ".job.ts" },
+  event: { directory: "events", suffix: ".event.ts" },
+  "event-trigger": { directory: "events", suffix: ".event.ts" },
+  bucket: { directory: "buckets", suffix: ".bucket.ts" },
+  cache: { directory: "cache", suffix: ".cache.ts" },
+  tool: { directory: "tools", suffix: ".tool.ts" },
+  agent: { directory: "agents", suffix: ".agent.ts" },
+  constants: { directory: "constants", suffix: ".constants.ts" },
+  prompt: { directory: "prompts", suffix: ".prompt.ts" },
 };
 export function checkConventions(input: ConventionCheckInput): readonly Diagnostic[];
 export function checkConventions(
@@ -70,7 +69,7 @@ export function checkConventions(
   if (input === undefined || !isDescriptor(input.descriptor)) return Object.freeze([]);
   const path = normalizePath(input.sourcePath, input.projectRoot);
   const descriptor = input.descriptor;
-  const rule = rules[descriptor.kind];
+  const rule = ruleFor(rules[descriptor.kind], descriptor.kind, path);
   const diagnostics: Diagnostic[] = [];
   const add = (code: ConventionCode, message: string, suggestion: string): void => {
     const location = diagnosticLocation(path, input);
@@ -131,6 +130,14 @@ export function checkConventions(
     );
   }
   return Object.freeze(diagnostics);
+}
+
+function ruleFor(rule: KindRule, kind: DescriptorKind, path: string): KindRule {
+  if (kind === "app" || kind === "route" || kind === "middleware") return rule;
+  const domain = path.split("/")[1] ?? "<domain>";
+  return kind === "service"
+    ? { ...rule, directory: `src/${domain}` }
+    : { ...rule, directory: `src/${domain}/${rule.directory}` };
 }
 function readInput(
   value: ConventionCheckInput | unknown,

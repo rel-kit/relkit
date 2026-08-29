@@ -15,8 +15,6 @@ import {
   createEvaluatorRequest,
   type EvaluatorOptions,
 } from "./evaluator-request.js";
-import { appendDataModels, isolateDataModels } from "./data-model-isolation.js";
-import type { AstPrefilterCandidate } from "./ast-prefilter.js";
 
 export * from "./evaluator-protocol.js";
 export {
@@ -29,14 +27,11 @@ export type { EvaluatorOptions } from "./evaluator-request.js";
 export async function evaluateCandidates(options: EvaluatorOptions): Promise<EvaluatorResponse> {
   let request: EvaluatorRequest;
   const generationId = options.generationId ?? crypto.randomUUID();
-  const isolated = areAstCandidates(options.candidates)
-    ? isolateDataModels(options.candidates, generationId)
-    : { evaluated: options.candidates, modules: [] };
   try {
     request = createEvaluatorRequest({
       ...options,
       generationId,
-      candidates: isolated.evaluated,
+      candidates: options.candidates,
     });
   } catch (error) {
     return failedResponse(
@@ -124,26 +119,14 @@ export async function evaluateCandidates(options: EvaluatorOptions): Promise<Eva
       response.stderr,
     );
   }
-  return appendDataModels(
-    {
-      ...response,
-      failures: response.failures.map((entry) => ({
-        ...entry,
-        ...(response.stdout === "" ? {} : { stdout: response.stdout }),
-        ...(response.stderr === "" ? {} : { stderr: response.stderr }),
-      })),
-    },
-    isolated.modules,
-  );
-}
-
-function areAstCandidates(
-  candidates: EvaluatorOptions["candidates"],
-): candidates is readonly AstPrefilterCandidate[] {
-  return candidates.every(
-    (candidate) =>
-      typeof candidate !== "string" && "factories" in candidate && "facts" in candidate,
-  );
+  return {
+    ...response,
+    failures: response.failures.map((entry) => ({
+      ...entry,
+      ...(response.stdout === "" ? {} : { stdout: response.stdout }),
+      ...(response.stderr === "" ? {} : { stderr: response.stderr }),
+    })),
+  };
 }
 
 function joinOutput(protocolOutput: string, rawOutput: string): string {

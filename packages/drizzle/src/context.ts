@@ -1,76 +1,75 @@
-import { bindModel } from "./model.js";
-import { runtimeOf } from "./metadata.js";
 import { sql } from "drizzle-orm";
-import type { DataModelRuntime, ModelBinding } from "./runtime-types.js";
-import type { DatabaseContext, DataModelDescriptor } from "./types.js";
+import { createBoundModel } from "./model.js";
+import type { DrizzleServiceRuntime, ModelBinding } from "./runtime-types.js";
+import type { DatabaseContext, DrizzleServiceDescriptor } from "./types.js";
 
-export function createDatabaseContext<Descriptor extends DataModelDescriptor<any, any, any>>(
-  dataModel: Descriptor,
-): DatabaseContext<Descriptor> {
-  return contextFor(dataModel, runtimeOf(dataModel), runtimeOf(dataModel).drizzle, false);
+export function createDatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any>>(
+  service: Service,
+  runtime: DrizzleServiceRuntime,
+  database: unknown,
+): DatabaseContext<Service> {
+  return contextFor(service, runtime, database, false);
 }
 
-function contextFor<Descriptor extends DataModelDescriptor<any, any, any>>(
-  descriptor: Descriptor,
-  runtime: DataModelRuntime,
-  drizzle: unknown,
+function contextFor<Service extends DrizzleServiceDescriptor<any, any, any, any>>(
+  service: Service,
+  runtime: DrizzleServiceRuntime,
+  database: unknown,
   inTransaction: boolean,
-): DatabaseContext<Descriptor> {
+): DatabaseContext<Service> {
   const models: Record<string, object> = {};
   for (const tableName of Object.keys(runtime.tables)) {
-    const Model = runtime.models[tableName]!;
     const binding: ModelBinding = Object.freeze({
-      drizzle,
+      drizzle: database,
       table: runtime.tables[tableName]!,
-      dialect: descriptor.dialect,
+      dialect: runtime.dialect,
       inTransaction,
       metadata: runtime.metadata[tableName]!,
       override: runtime.overrides[tableName] ?? {},
     });
-    models[tableName] = bindModel(new Model(), binding);
+    models[tableName] = createBoundModel(binding, runtime.models[tableName]);
   }
   return Object.freeze({
     ...models,
     zodSchemas: runtime.zodSchemas,
     transaction: async <Value>(
-      run: (context: DatabaseContext<Descriptor>) => Value,
+      run: (context: DatabaseContext<Service>) => Value | Promise<Value>,
     ): Promise<Value> => {
       if (inTransaction) throw new TypeError("Nested portable transactions are not supported");
-      if (descriptor.dialect === "sqlite") {
-        return sqliteTransaction(drizzle, () =>
-          Promise.resolve(run(contextFor(descriptor, runtime, drizzle, true))),
+      if (runtime.dialect === "sqlite") {
+        return sqliteTransaction(database, () =>
+          Promise.resolve(run(contextFor(service, runtime, database, true))),
         );
       }
-      return callTransaction(drizzle, (transaction) =>
-        Promise.resolve(run(contextFor(descriptor, runtime, transaction, true))),
+      return callTransaction(database, (transaction) =>
+        Promise.resolve(run(contextFor(service, runtime, transaction, true))),
       );
     },
-  }) as DatabaseContext<Descriptor>;
+  }) as DatabaseContext<Service>;
 }
 
 const sqliteTails = new WeakMap<object, Promise<void>>();
 
 async function sqliteTransaction<Value>(
-  drizzle: unknown,
+  database: unknown,
   run: () => Promise<Value>,
 ): Promise<Value> {
-  const key = drizzle as object;
+  const key = database as object;
   const previous = sqliteTails.get(key) ?? Promise.resolve();
   let release = (): void => undefined;
-  // ponytail: one queue per SQLite client; use a pool-aware lock if parallel writers are added.
   const current = new Promise<void>((resolve) => {
     release = resolve;
   });
   const tail = previous.then(() => current);
   sqliteTails.set(key, tail);
   await previous;
-  await runSql(drizzle, "begin");
+  await runSql(database, "begin");
   try {
     const value = await run();
-    await runSql(drizzle, "commit");
+    await runSql(database, "commit");
     return value;
   } catch (error) {
-    await runSql(drizzle, "rollback");
+    await runSql(database, "rollback");
     throw error;
   } finally {
     release();
@@ -78,17 +77,17 @@ async function sqliteTransaction<Value>(
   }
 }
 
-async function runSql(drizzle: unknown, statement: string): Promise<void> {
-  const method = (drizzle as { readonly run?: unknown }).run;
+async function runSql(database: unknown, statement: string): Promise<void> {
+  const method = (database as { readonly run?: unknown }).run;
   if (typeof method !== "function") throw new TypeError("SQLite transactions are unavailable");
-  await method.call(drizzle, sql.raw(statement));
+  await method.call(database, sql.raw(statement));
 }
 
 function callTransaction<Value>(
-  drizzle: unknown,
+  database: unknown,
   run: (transaction: unknown) => Promise<Value>,
 ): Promise<Value> {
-  const method = (drizzle as { readonly transaction?: unknown }).transaction;
+  const method = (database as { readonly transaction?: unknown }).transaction;
   if (typeof method !== "function") throw new TypeError("Drizzle transactions are unavailable");
-  return method.call(drizzle, run) as Promise<Value>;
+  return method.call(database, run) as Promise<Value>;
 }

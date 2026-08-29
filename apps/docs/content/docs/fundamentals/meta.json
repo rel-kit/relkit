@@ -8,6 +8,7 @@
     "errors",
     "context",
     "functions",
-    "services"
+    "services",
+    "domain-first-migration"
   ]
 }

@@ -27,7 +27,6 @@ export function makeContext<Context extends { readonly signal: AbortSignal }>(
       auth: Object.freeze({ getSession: () => Promise.resolve(null) }),
       constants: Object.freeze({}),
       prompts: Object.freeze({}),
-      service: Object.freeze({}),
     }) as unknown as Context,
   );
 }

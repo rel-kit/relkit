@@ -1,7 +1,15 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 5,
-  "edges": [],
+  "contractVersion": 6,
+  "edges": [
+    {
+      "from": "warning",
+      "kind": "exposes-function",
+      "member": "warningSuffix",
+      "order": 0,
+      "to": "warning.suffix"
+    }
+  ],
   "nodes": [
     {
       "defaults": null,
@@ -40,7 +48,9 @@
     {
       "concurrency": null,
       "dependencies": null,
+      "domainId": "warning",
       "errors": null,
+      "exposure": "public",
       "generated": null,
       "id": "warning.suffix",
       "input": {
@@ -68,10 +78,27 @@
       },
       "source": {
         "column": 23,
-        "file": "src/functions/wrong-suffix.ts",
+        "file": "src/warning/functions/wrong-suffix.ts",
         "line": 4
       },
       "timeoutMs": null
+    },
+    {
+      "domainId": "warning",
+      "events": [],
+      "functions": [
+        {
+          "functionId": "warning.suffix",
+          "name": "warningSuffix"
+        }
+      ],
+      "id": "warning",
+      "kind": "service",
+      "source": {
+        "column": 16,
+        "file": "src/warning/service.ts",
+        "line": 4
+      }
     }
   ]
 }

@@ -1,15 +1,12 @@
 import type { Table } from "drizzle-orm";
-import { MODEL_BINDING, type BoundModel, type ModelBinding } from "./runtime-types.js";
 import { runOperation } from "./operations.js";
+import { MODEL_RUNTIME, type ModelBinding, type ModelRuntime } from "./runtime-types.js";
 import type {
   BaseOperations,
-  DeleteArgs,
-  FindManyArgs,
-  FindOneArgs,
-  InsertArgs,
-  Row,
-  UpdateArgs,
-  UpsertArgs,
+  ModelDescriptor,
+  ModelDescriptorAny,
+  ModelExtensionMap,
+  NonEmptyExtensions,
 } from "./types.js";
 
 export const RESERVED_OPERATIONS = Object.freeze([
@@ -21,56 +18,61 @@ export const RESERVED_OPERATIONS = Object.freeze([
   "delete",
 ] as const);
 
-export abstract class RuntimeModel<Database, T extends Table>
-  implements BaseOperations<T>, BoundModel
-{
-  declare [MODEL_BINDING]?: ModelBinding;
-
-  get drizzle(): Database {
-    return bindingOf(this).drizzle as Database;
+export function defineModel<
+  const T extends Table,
+  const Extensions extends ModelExtensionMap<T>,
+>(options: {
+  readonly table: T;
+  readonly extend: NonEmptyExtensions<Extensions>;
+}): ModelDescriptor<T, Extensions> {
+  if (!isRecord(options) || !isRecord(options.extend) || Object.keys(options.extend).length === 0) {
+    throw new TypeError("A model needs at least one extension function");
   }
-
-  get table(): T {
-    return bindingOf(this).table as T;
+  for (const [name, extension] of Object.entries(options.extend)) {
+    if (RESERVED_OPERATIONS.includes(name as (typeof RESERVED_OPERATIONS)[number])) {
+      throw new TypeError(`Model extensions cannot replace reserved operation "${name}"`);
+    }
+    if (typeof extension !== "function") {
+      throw new TypeError(`Model extension "${name}" must be a function`);
+    }
   }
-
-  findOne(args: FindOneArgs<T>): Promise<Row<T> | null> {
-    return runOperation(bindingOf(this), "findOne", args) as Promise<Row<T> | null>;
-  }
-
-  findMany(args: FindManyArgs<T> = {}): Promise<Row<T>[]> {
-    return runOperation(bindingOf(this), "findMany", args) as Promise<Row<T>[]>;
-  }
-
-  insert(args: InsertArgs<T>): Promise<Row<T>> {
-    return runOperation(bindingOf(this), "insert", args) as Promise<Row<T>>;
-  }
-
-  update(args: UpdateArgs<T>): Promise<Row<T> | null> {
-    return runOperation(bindingOf(this), "update", args) as Promise<Row<T> | null>;
-  }
-
-  upsert(args: UpsertArgs<T>): Promise<Row<T>> {
-    return runOperation(bindingOf(this), "upsert", args) as Promise<Row<T>>;
-  }
-
-  delete(args: DeleteArgs<T>): Promise<Row<T> | null> {
-    return runOperation(bindingOf(this), "delete", args) as Promise<Row<T> | null>;
-  }
+  const runtime: ModelRuntime = { table: options.table, extend: options.extend as never };
+  const descriptor = {
+    table: options.table,
+    extensionNames: Object.freeze(Object.keys(options.extend)),
+  };
+  Object.defineProperty(descriptor, MODEL_RUNTIME, { value: runtime });
+  return Object.freeze(descriptor) as ModelDescriptor<T, Extensions>;
 }
 
-export function bindModel<Instance extends object>(
-  model: Instance,
-  binding: ModelBinding,
-): Instance {
-  Object.defineProperty(model, MODEL_BINDING, { value: binding });
-  return model;
+export function modelRuntimeOf(value: ModelDescriptorAny): ModelRuntime {
+  const runtime = (value as unknown as Record<PropertyKey, unknown>)[MODEL_RUNTIME];
+  if (!isRecord(runtime) || !isRecord(runtime.extend)) {
+    throw new TypeError("Invalid Drizzle model descriptor");
+  }
+  return runtime as unknown as ModelRuntime;
 }
 
-function bindingOf(value: BoundModel): ModelBinding {
-  const binding = value[MODEL_BINDING];
-  if (binding === undefined) {
-    throw new TypeError("Data-model runtime is unavailable during construction");
-  }
-  return binding;
+export function createBoundModel(binding: ModelBinding, model?: ModelDescriptorAny): object {
+  const base: BaseOperations<Table> = {
+    findOne: (args) => runOperation(binding, "findOne", args) as never,
+    findMany: (args = {}) => runOperation(binding, "findMany", args) as never,
+    insert: (args) => runOperation(binding, "insert", args) as never,
+    update: (args) => runOperation(binding, "update", args) as never,
+    upsert: (args) => runOperation(binding, "upsert", args) as never,
+    delete: (args) => runOperation(binding, "delete", args) as never,
+  };
+  if (model === undefined) return Object.freeze(base);
+  const extensions = Object.fromEntries(
+    Object.entries(modelRuntimeOf(model).extend).map(([name, extension]) => [
+      name,
+      (...args: unknown[]) =>
+        extension({ table: binding.table, database: binding.drizzle as any }, ...args),
+    ]),
+  );
+  return Object.freeze({ ...base, ...extensions });
+}
+
+function isRecord(value: unknown): value is Record<PropertyKey, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

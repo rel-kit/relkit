@@ -13,10 +13,10 @@ export function passIndex(work: NormalizationWork): void {
 
   for (const service of descriptors.filter((entry) => entry.kind === "service")) {
     const value = isRecord(service.value) ? service.value : {};
-    const functions = isRecord(value.functions) ? value.functions : {};
-    for (const [member, target] of Object.entries(functions)) {
-      if (!isRecord(target) || refKind(target) !== "function") continue;
-      const nested = nestedDescriptor(target, "function", service, work, member);
+    for (const [member, target] of Object.entries(value)) {
+      const kind = refKind(target);
+      if (!isRecord(target) || (kind !== "function" && kind !== "event")) continue;
+      const nested = nestedDescriptor(target, kind, service, work, member);
       if (nested !== undefined) register(work, nested, true);
     }
   }

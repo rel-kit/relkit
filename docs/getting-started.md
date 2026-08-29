@@ -54,11 +54,19 @@ relkit-orders/
 ├── .env                  # ignored local runtime copy
 ├── relkit.config.ts
 ├── src/
-│   ├── env.ts
-│   ├── events/
-│   ├── functions/
-│   ├── routes/
-│   └── services/
+│   ├── platform/
+│   │   └── env.ts
+│   ├── hello/
+│   │   ├── service.ts
+│   │   └── functions/
+│   ├── echo/
+│   │   ├── service.ts
+│   │   └── functions/
+│   ├── orders/
+│   │   ├── service.ts
+│   │   ├── functions/
+│   │   └── events/
+│   └── routes/
 ├── tests/
 │   ├── integration/
 │   └── unit/
@@ -66,9 +74,12 @@ relkit-orders/
 └── tsconfig.json
 ```
 
-`tsconfig.json` maps `@app/*` to `src/*`. Use imports such as
-`@app/functions/hello.function.js` for application source; the `.js` extension
-is required by the emitted ESM even though the source file is TypeScript.
+Each top-level application domain owns one `service.ts` descriptor and keeps its
+functions, events, errors, and other artifacts together. `routes` remains the
+transport layer and `platform` contains shared infrastructure configuration.
+`tsconfig.json` maps `@app/*` to `src/*`; use imports such as
+`@app/hello/service.js`. The `.js` extension is required by emitted ESM even
+though the source file is TypeScript.
 
 Run diagnostics before starting development:
 
