@@ -18,4 +18,6 @@ test("release jobs run after green dependencies with skipped optional jobs", asy
     "if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'publish'",
   );
   expect(workflow).toContain("always() && needs.pack.result == 'success' &&");
+  expect(workflow).toContain("github.ref == 'refs/heads/changeset-release/main'");
+  expect(workflow).toContain('gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA"');
 });
