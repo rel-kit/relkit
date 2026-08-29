@@ -9,8 +9,8 @@ redaction, and states which environments require each key.
 
 ## Read the API-template contract
 
-<include cwd lang="ts" meta='title="templates/default/v1/api/src/env.ts"'>
-  ../../templates/default/v1/api/src/env.ts
+<include cwd lang="ts" meta='title="templates/default/v1/api/src/platform/env.ts"'>
+  ../../templates/default/v1/api/src/platform/env.ts
 </include>
 
 Every process environment value begins as text. Builders such as `env.string()`, `env.url()`,
@@ -24,7 +24,7 @@ provided by the environment or secret manager.
   <Step>
     ### Declare the key
 
-    Edit `src/env.ts`. Name the key for the external contract, choose the narrowest parser, and use
+    Edit `src/platform/env.ts`. Name the key for the external contract, choose the narrowest parser, and use
     `requiredIn("production")` when local development has a safe default but production must make an explicit
     choice.
 

@@ -64,13 +64,31 @@ Expected output is `1.3.10`. If another version is active, switch before generat
   <File name=".env.example" />
   <File name=".env" />
   <Folder name="src" defaultOpen>
-    <File name="env.ts" />
-    <Folder name="functions" defaultOpen>
-      <File name="hello.function.ts" />
-      <File name="echo.function.ts" />
-      <Folder name="orders">
+    <Folder name="platform">
+      <File name="env.ts" />
+    </Folder>
+    <Folder name="hello" defaultOpen>
+      <File name="service.ts" />
+      <Folder name="functions">
+        <File name="hello.function.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="echo" defaultOpen>
+      <File name="service.ts" />
+      <Folder name="functions">
+        <File name="echo.function.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="orders" defaultOpen>
+      <File name="service.ts" />
+      <Folder name="functions">
         <File name="create-order.function.ts" />
         <File name="price-order.function.ts" />
+      </Folder>
+      <Folder name="events">
+        <File name="order-created.event.ts" />
+        <File name="order-confirmation.event.ts" />
+        <File name="order-audit.event.ts" />
       </Folder>
     </Folder>
     <Folder name="routes" defaultOpen>
@@ -84,12 +102,6 @@ Expected output is `1.3.10`. If another version is active, switch before generat
         <File name="route.ts" />
       </Folder>
     </Folder>
-    <Folder name="events">
-      <File name="order-created.event.ts" />
-    </Folder>
-    <Folder name="services">
-      <File name="orders.service.ts" />
-    </Folder>
   </Folder>
   <Folder name="tests">
     <Folder name="unit" />
@@ -101,11 +113,13 @@ Expected output is `1.3.10`. If another version is active, switch before generat
 
 - `relkit.config.ts` declares environment contracts, providers, server settings, and deployment choices.
 - `.env.example` documents safe local defaults; `.env` is your ignored runtime copy. Do not commit secrets.
-- `src/functions` contains validated behavior; functions do not receive HTTP request objects.
+- `src/hello`, `src/echo`, and `src/orders` are domains. Each domain has one `service.ts` boundary and
+  keeps its functions, events, errors, and other owned artifacts beneath that domain.
 - `src/routes` maps filesystem paths and HTTP method exports to function targets.
+- `src/platform` contains shared infrastructure configuration such as the environment contract.
 - `tests/unit` invokes functions directly; `tests/integration` uses the in-process HTTP application.
 - `tsconfig.json` maps `@app/*` to `src/*`. Import application modules as
-  `@app/functions/hello.function.js` instead of counting `../` segments; keep `.js` for emitted ESM.
+  `@app/hello/service.js` instead of counting `../` segments; keep `.js` for emitted ESM.
 - `.relkit/generated`, `.relkit/build`, `.relkit/state`, and `.relkit/observability` are derived or runtime
   directories. Do not edit them by hand.
 

@@ -1,12 +1,14 @@
-# RelKit TypeScript POC — Revision 3 Documentation
+# RelKit documentation
 
-Revision 3 is the approved implementation baseline.
+The current application model is domain-first. Revision 3 records the original
+POC baseline and is retained as historical design evidence.
 
 ## Start here
 
-1. Read `relkit-typescript-poc-technical-spec-v3.md` for the complete architecture, public APIs, runtime behavior, project generator, deployment, testing handbook, and 17 implementation phases.
-2. Use `relkit-typescript-poc-review-gates-v3.md` to approve each phase.
-3. Read `relkit-typescript-poc-v2-to-v3-change-log.md` for the exact refinement from Revision 2.
+1. Read `getting-started.md` for the current generated application layout and local workflow.
+2. Read `architecture.md`, `testing.md`, and `deployment.md` for current contributor guidance.
+3. Use `apps/docs/content/docs/fundamentals/domain-first-migration.mdx` when migrating a layer-first application.
+4. Consult `relkit-typescript-poc-technical-spec-v3.md` and its review gates only for the historical POC baseline.
 
 ## Final architecture at a glance
 
