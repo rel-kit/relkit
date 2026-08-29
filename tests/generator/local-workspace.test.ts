@@ -19,7 +19,7 @@ test("local create replaces only RELKIT package versions with Bun links", async 
     join(root, "package.json"),
     `${JSON.stringify({
       dependencies: { "@relkit/app": appManifest.version, hono: "4.11.7" },
-      devDependencies: { "@relkit/cli": appManifest.version, typescript: "5.9.2" },
+      devDependencies: { "@relkit/cli": appManifest.version, typescript: "5.9.3" },
     })}\n`,
   );
 
@@ -33,7 +33,7 @@ test("local create replaces only RELKIT package versions with Bun links", async 
   expect(manifest.devDependencies).toMatchObject({
     "@relkit/cli": "link:@relkit/cli",
     "@relkit/engine": "link:@relkit/engine",
-    typescript: "5.9.2",
+    typescript: "5.9.3",
   });
 });
 
@@ -42,7 +42,7 @@ test("doctor accepts local RELKIT package links", async () => {
     {
       packageManager: `bun@${Bun.version}`,
       dependencies: { "@relkit/app": "link:@relkit/app" },
-      devDependencies: { "@relkit/cli": "link:@relkit/cli", typescript: "5.9.2" },
+      devDependencies: { "@relkit/cli": "link:@relkit/cli", typescript: "5.9.3" },
     },
     process.cwd(),
   );

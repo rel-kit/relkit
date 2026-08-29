@@ -9,5 +9,5 @@ scaffolder:
 
 Each variant is self-contained and can be copied as a project root. It uses
 the current checked-in RelKit package version (`0.0.3`), Bun `1.3.10`, and
-TypeScript `5.9.2`. The generator owns project-name substitution and later
+TypeScript `5.9.3`. The generator owns project-name substitution and later
 installation/Git behavior.

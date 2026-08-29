@@ -90,7 +90,7 @@ test("covers every template and examples/install/Git combination", async () => {
             "@types/bun": "1.3.10",
             "@relkit/cli": appManifest.version,
             "@relkit/testing": appManifest.version,
-            typescript: "5.9.2",
+            typescript: "5.9.3",
           });
           expect(tsconfig.compilerOptions).toMatchObject({
             baseUrl: ".",
