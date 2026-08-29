@@ -1,6 +1,6 @@
 {
   "name": "@relkit/cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The RELKIT development, build, inspection, and deployment CLI.",
   "license": "MIT",
   "repository": {

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.0.5
+
+### Changes
+
+- Redesign services around domain-first applications
+
 ## 0.0.4
 
 ### Changes
