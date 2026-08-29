@@ -252,6 +252,31 @@ jobs:
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
 
+  release-pr-status:
+    name: Publish release PR gate
+    if: >-
+      always() &&
+      needs.ci-gate.result == 'success' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/changeset-release/main'
+    needs: ci-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+    steps:
+      - name: Attach CI Gate to the release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+            -f state=success \
+            -f context="CI Gate" \
+            -f description="Verified by dispatched release CI" \
+            -f target_url="$RUN_URL"
+
   select-release-mode:
     name: Select release mode
     if: always() && needs.ci-gate.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'
