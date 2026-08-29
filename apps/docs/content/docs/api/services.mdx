@@ -20,25 +20,15 @@ description: Generated public TypeScript reference for @relkit/services.
 
 ## defineService
 
-Groups typed functions under one service identity and ordered policy stack.
-Services expose member facades such as `Orders.getOrder`; they do not own a
-second handler or become a workflow. Omit the service ID for source-derived
-identity, and use the member facade for routes, tools, or `invoke` calls.
+Defines a domain's public functions and events as identity-preserving members.
 
 **Example**
 
 ```ts
-import { defineFunction } from "@relkit/app/functions";
 import { defineService } from "@relkit/app/services";
-import { z } from "@relkit/app/schema";
 
-const getOrder = defineFunction({
-  input: z.object({ orderId: z.string() }),
-  output: z.object({ orderId: z.string() }),
-  handler: async (input) => input,
-});
-const Orders = defineService({ functions: { getOrder } });
-void Orders.getOrder.invoke({ orderId: "order-1" });
+const orders = defineService({});
+void orders;
 ```
 
 **Signature**
@@ -47,7 +37,7 @@ void Orders.getOrder.invoke({ orderId: "order-1" });
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L31)
 
 Since v0.1.0
 
@@ -62,16 +52,14 @@ Since v0.1.0
   - [SERVICE_RESERVED_MEMBER_NAMES](#service_reserved_member_names)
   - [assertServiceDescriptor](#assertservicedescriptor)
   - [assertServiceMemberName](#assertservicemembername)
-  - [assertServiceMiddlewareDescriptor](#assertservicemiddlewaredescriptor)
-  - [assertServiceMiddlewareRef](#assertservicemiddlewareref)
   - [assertServiceRef](#assertserviceref)
   - [freezeServiceDescriptor](#freezeservicedescriptor)
+  - [isFunctionDescriptor](#isfunctiondescriptor)
   - [isReservedServiceMemberName](#isreservedservicemembername)
   - [isServiceDescriptor](#isservicedescriptor)
-  - [isServiceMiddlewareDescriptor](#isservicemiddlewaredescriptor)
-  - [isServiceMiddlewareRef](#isservicemiddlewareref)
   - [isServiceRef](#isserviceref)
   - [normalizeServiceMemberName](#normalizeservicemembername)
+  - [serviceMemberEntries](#servicememberentries)
 
 ---
 
@@ -87,22 +75,19 @@ declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
   "id",
   "ref",
   "functions",
-  "middleware",
-  "service",
+  "events",
+  "capability",
   "title",
   "description",
   "tags",
-  "invoke",
-  "asTool",
   "handler",
-  "target",
   "constructor",
   "prototype",
   "__proto__",
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L21)
 
 ## SERVICE_RESERVED_MEMBER_NAMES
 
@@ -114,22 +99,19 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
   "id",
   "ref",
   "functions",
-  "middleware",
-  "service",
+  "events",
+  "capability",
   "title",
   "description",
   "tags",
-  "invoke",
-  "asTool",
   "handler",
-  "target",
   "constructor",
   "prototype",
   "__proto__",
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L5)
 
 ## assertServiceDescriptor
 
@@ -139,7 +121,7 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
 declare const assertServiceDescriptor: (value: unknown) => asserts value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L63)
 
 ## assertServiceMemberName
 
@@ -149,31 +131,7 @@ declare const assertServiceDescriptor: (value: unknown) => asserts value is Serv
 declare const assertServiceMemberName: (value: unknown) => asserts value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L45)
-
-## assertServiceMiddlewareDescriptor
-
-**Signature**
-
-```ts
-declare const assertServiceMiddlewareDescriptor: (
-  value: unknown,
-) => asserts value is ServiceMiddlewareDescriptor;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L87)
-
-## assertServiceMiddlewareRef
-
-**Signature**
-
-```ts
-declare const assertServiceMiddlewareRef: (
-  value: unknown,
-) => asserts value is ServiceMiddlewareRefAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L37)
 
 ## assertServiceRef
 
@@ -183,7 +141,7 @@ declare const assertServiceMiddlewareRef: (
 declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L50)
 
 ## freezeServiceDescriptor
 
@@ -193,7 +151,17 @@ declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefA
 declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L67)
+
+## isFunctionDescriptor
+
+**Signature**
+
+```ts
+declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L76)
 
 ## isReservedServiceMemberName
 
@@ -203,7 +171,7 @@ declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T
 declare const isReservedServiceMemberName: (value: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L30)
 
 ## isServiceDescriptor
 
@@ -213,29 +181,7 @@ declare const isReservedServiceMemberName: (value: unknown) => boolean;
 declare const isServiceDescriptor: (value: unknown) => value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L95)
-
-## isServiceMiddlewareDescriptor
-
-**Signature**
-
-```ts
-declare const isServiceMiddlewareDescriptor: (
-  value: unknown,
-) => value is ServiceMiddlewareDescriptor;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L75)
-
-## isServiceMiddlewareRef
-
-**Signature**
-
-```ts
-declare const isServiceMiddlewareRef: (value: unknown) => value is ServiceMiddlewareRefAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L54)
 
 ## isServiceRef
 
@@ -245,7 +191,7 @@ declare const isServiceMiddlewareRef: (value: unknown) => value is ServiceMiddle
 declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L46)
 
 ## normalizeServiceMemberName
 
@@ -255,7 +201,17 @@ declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
 declare const normalizeServiceMemberName: (value: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L23)
+
+## serviceMemberEntries
+
+**Signature**
+
+```ts
+declare const serviceMemberEntries: (service: ServiceDescriptorAny) => [string, unknown][];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L72)
 
 ## `index.ts`
 
@@ -266,7 +222,6 @@ declare const normalizeServiceMemberName: (value: unknown) => string;
 - [utils](#utils)
   - ["./define-service.js" (namespace export)](#define-servicejs-namespace-export)
   - ["./guards.js" (namespace export)](#guardsjs-namespace-export)
-  - ["./service-middleware.js" (namespace export)](#service-middlewarejs-namespace-export)
   - ["./types.js" (namespace export)](#typesjs-namespace-export)
 
 ---
@@ -297,18 +252,6 @@ export * from "./guards.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L2)
 
-## "./service-middleware.js" (namespace export)
-
-Re-exports all named exports from the "./service-middleware.js" module.
-
-**Signature**
-
-```ts
-export * from "./service-middleware.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L3)
-
 ## "./types.js" (namespace export)
 
 Re-exports all named exports from the "./types.js" module.
@@ -319,47 +262,7 @@ Re-exports all named exports from the "./types.js" module.
 export * from "./types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L4)
-
-## `ownership.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [assertServiceFunctionOwnership](#assertservicefunctionownership)
-  - [claimServiceFunctionOwnership](#claimservicefunctionownership)
-
----
-
-# utils
-
-## assertServiceFunctionOwnership
-
-**Signature**
-
-```ts
-declare const assertServiceFunctionOwnership: (
-  functions: Readonly<Record<string, FunctionRefAny>>,
-  serviceId: string,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/ownership.ts#L5)
-
-## claimServiceFunctionOwnership
-
-**Signature**
-
-```ts
-declare const claimServiceFunctionOwnership: (
-  functions: Readonly<Record<string, FunctionRefAny>>,
-  serviceId: string,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/ownership.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/index.ts#L3)
 
 ## `service-context.ts`
 
@@ -384,122 +287,6 @@ declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, 
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-context.ts#L1)
 
-## `service-middleware.ts`
-
----
-
-## Exports Grouped by Category
-
-- [Services](#services)
-  - [defineServiceMiddleware](#defineservicemiddleware)
-- [utils](#utils)
-  - [SERVICE_MIDDLEWARE_POLICY_CODE](#service_middleware_policy_code)
-  - [ServiceMiddlewarePolicyError (class)](#servicemiddlewarepolicyerror-class)
-    - [code (property)](#code-property)
-    - [reason (property)](#reason-property)
-  - [ServiceMiddlewarePolicyReason (type alias)](#servicemiddlewarepolicyreason-type-alias)
-  - [normalizeServiceMiddlewareRejection](#normalizeservicemiddlewarerejection)
-
----
-
-# Services
-
-## defineServiceMiddleware
-
-Defines ordered, non-business policy for service members.
-
-The callback must call `next` exactly once. Its optional frozen patch enriches
-the current invocation's read-only `context.service` value and never mutates
-shared context.
-
-**Example**
-
-```ts
-import { defineServiceMiddleware } from "@relkit/app/services";
-
-const tenantContext = defineServiceMiddleware({
-  handler: async ({ input }, next) => {
-    const value = input as { readonly tenantId?: string };
-    await next({ tenantId: value.tenantId ?? "system" });
-  },
-});
-void tenantContext;
-```
-
-**Signature**
-
-```ts
-declare const defineServiceMiddleware: DefineServiceMiddleware;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L55)
-
-Since v0.1.0
-
-# utils
-
-## SERVICE_MIDDLEWARE_POLICY_CODE
-
-**Signature**
-
-```ts
-declare const SERVICE_MIDDLEWARE_POLICY_CODE: "RELKIT_SERVICE_MIDDLEWARE_POLICY";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L18)
-
-## ServiceMiddlewarePolicyError (class)
-
-**Signature**
-
-```ts
-declare class ServiceMiddlewarePolicyError {
-  constructor(reason: ServiceMiddlewarePolicyReason);
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L22)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_SERVICE_MIDDLEWARE_POLICY"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L23)
-
-### reason (property)
-
-**Signature**
-
-```ts
-readonly reason: ServiceMiddlewarePolicyReason
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L24)
-
-## ServiceMiddlewarePolicyReason (type alias)
-
-**Signature**
-
-```ts
-type ServiceMiddlewarePolicyReason = "missing-next" | "duplicate-next" | "invalid-patch";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L20)
-
-## normalizeServiceMiddlewareRejection
-
-**Signature**
-
-```ts
-declare const normalizeServiceMiddlewareRejection: (value: unknown) => InvocationFailure;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/service-middleware.ts#L84)
-
 ## `types.ts`
 
 ---
@@ -508,21 +295,13 @@ declare const normalizeServiceMiddlewareRejection: (value: unknown) => Invocatio
 
 - [utils](#utils)
   - [DefineService (interface)](#defineservice-interface)
-  - [DefineServiceMiddleware (interface)](#defineservicemiddleware-interface)
-  - [DefineServiceMiddlewareOptions (interface)](#defineservicemiddlewareoptions-interface)
   - [DefineServiceOptions (interface)](#defineserviceoptions-interface)
-  - [NonEmptyServiceFunctionMap (type alias)](#nonemptyservicefunctionmap-type-alias)
-  - [ServiceContextPatch (type alias)](#servicecontextpatch-type-alias)
   - [ServiceDescriptor (type alias)](#servicedescriptor-type-alias)
   - [ServiceDescriptorAny (type alias)](#servicedescriptorany-type-alias)
+  - [ServiceEventMap (type alias)](#serviceeventmap-type-alias)
+  - [ServiceEvents (type alias)](#serviceevents-type-alias)
   - [ServiceFunctionMap (type alias)](#servicefunctionmap-type-alias)
-  - [ServiceMember (type alias)](#servicemember-type-alias)
-  - [ServiceMiddlewareDescriptor (interface)](#servicemiddlewaredescriptor-interface)
-  - [ServiceMiddlewareHandler (type alias)](#servicemiddlewarehandler-type-alias)
-  - [ServiceMiddlewareInvocation (interface)](#servicemiddlewareinvocation-interface)
-  - [ServiceMiddlewareNext (type alias)](#servicemiddlewarenext-type-alias)
-  - [ServiceMiddlewareRef (interface)](#servicemiddlewareref-interface)
-  - [ServiceMiddlewareRefAny (type alias)](#servicemiddlewarerefany-type-alias)
+  - [ServiceFunctions (type alias)](#servicefunctions-type-alias)
   - [ServiceRef (interface)](#serviceref-interface)
   - [ServiceRefAny (type alias)](#servicerefany-type-alias)
 
@@ -538,53 +317,15 @@ declare const normalizeServiceMiddlewareRejection: (value: unknown) => Invocatio
 export interface DefineService {
   <
     const Id extends string,
-    const Functions extends ServiceFunctionMap,
-    const Middleware extends readonly ServiceMiddlewareRefAny[] =
-      readonly ServiceMiddlewareRefAny[],
+    const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+    const Events extends ServiceEventMap = Readonly<Record<never, never>>,
   >(
-    options: DefineServiceOptions<Id, Functions, Middleware>,
-  ): ServiceDescriptor<Id, Functions, Middleware>;
+    options: DefineServiceOptions<Id, Functions, Events>,
+  ): ServiceDescriptor<Id, Functions, Events>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L118)
-
-## DefineServiceMiddleware (interface)
-
-**Signature**
-
-```ts
-export interface DefineServiceMiddleware {
-  <
-    const Id extends string,
-    Input = unknown,
-    Context extends FunctionContext = FunctionContext,
-    Patch extends ServiceContextPatch = ServiceContextPatch,
-  >(
-    options: DefineServiceMiddlewareOptions<Id, Input, Context, Patch>,
-  ): ServiceMiddlewareDescriptor<Id, Input, Context, Patch>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L63)
-
-## DefineServiceMiddlewareOptions (interface)
-
-**Signature**
-
-```ts
-export interface DefineServiceMiddlewareOptions<
-  Id extends string,
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-  Patch extends ServiceContextPatch = ServiceContextPatch,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly handler: ServiceMiddlewareHandler<Input, Context, Patch>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L55)
 
 ## DefineServiceOptions (interface)
 
@@ -593,64 +334,66 @@ export interface DefineServiceMiddlewareOptions<
 ```ts
 export interface DefineServiceOptions<
   Id extends string,
-  Functions extends ServiceFunctionMap = ServiceFunctionMap,
-  Middleware extends readonly ServiceMiddlewareRefAny[] = readonly ServiceMiddlewareRefAny[],
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
 > extends DescriptorMetadata {
   readonly id?: Id;
-  readonly functions: NonEmptyServiceFunctionMap<Functions>;
-  readonly middleware?: Middleware;
+  readonly functions?: Functions;
+  readonly events?: Events;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L108)
-
-## NonEmptyServiceFunctionMap (type alias)
-
-**Signature**
-
-```ts
-type NonEmptyServiceFunctionMap<Functions> = keyof Functions extends never ? never : Functions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L76)
-
-## ServiceContextPatch (type alias)
-
-**Signature**
-
-```ts
-type ServiceContextPatch = Readonly<Record<string, unknown>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L45)
 
 ## ServiceDescriptor (type alias)
 
 **Signature**
 
 ```ts
-type ServiceDescriptor<Id, Functions, Middleware> = DescriptorBase<"service", Id> &
-  ServiceRef<Id> & {
-    readonly functions: Functions;
-    readonly middleware?: Middleware;
-  } & ServiceMemberMap<Id, Functions>;
+type ServiceDescriptor<Id, Functions, Events> = DescriptorBase<"service", Id> &
+  PublicMembers<Functions, Events> & {
+    readonly [serviceTypes]: {
+      readonly functions: Functions;
+      readonly events: Events;
+    };
+  };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L19)
 
 ## ServiceDescriptorAny (type alias)
 
 **Signature**
 
 ```ts
-type ServiceDescriptorAny = DescriptorBase<"service", string> &
-  ServiceRefAny & {
-    readonly functions: ServiceFunctionMap;
-    readonly middleware?: readonly ServiceMiddlewareRefAny[];
-  };
+type ServiceDescriptorAny = DescriptorBase<"service", string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L31)
+
+## ServiceEventMap (type alias)
+
+**Signature**
+
+```ts
+type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L11)
+
+## ServiceEvents (type alias)
+
+**Signature**
+
+```ts
+type ServiceEvents<Service> = Service extends {
+  readonly [serviceTypes]: { readonly events: infer Events };
+}
+  ? Events
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L39)
 
 ## ServiceFunctionMap (type alias)
 
@@ -660,102 +403,21 @@ type ServiceDescriptorAny = DescriptorBase<"service", string> &
 type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L10)
 
-## ServiceMember (type alias)
-
-**Signature**
-
-```ts
-type ServiceMember<ServiceId, Target> = Target & {
-  readonly service: ServiceRef<ServiceId>;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L79)
-
-## ServiceMiddlewareDescriptor (interface)
+## ServiceFunctions (type alias)
 
 **Signature**
 
 ```ts
-export interface ServiceMiddlewareDescriptor<
-  Id extends string = string,
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-  Patch extends ServiceContextPatch = ServiceContextPatch,
-> extends ServiceMiddlewareRef<Id> {
-  readonly kind: "service-middleware";
-  readonly id: Id;
-  readonly handler: ServiceMiddlewareHandler<Input, Context, Patch>;
+type ServiceFunctions<Service> = Service extends {
+  readonly [serviceTypes]: { readonly functions: infer Functions };
 }
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L42)
-
-## ServiceMiddlewareHandler (type alias)
-
-**Signature**
-
-```ts
-type ServiceMiddlewareHandler<Input, Context, Patch> = (
-  invocation: ServiceMiddlewareInvocation<Input, Context>,
-  next: ServiceMiddlewareNext<Patch>,
-) => MaybePromise<void>;
+  ? Functions
+  : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L33)
-
-## ServiceMiddlewareInvocation (interface)
-
-**Signature**
-
-```ts
-export interface ServiceMiddlewareInvocation<
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-> {
-  readonly input: Input;
-  readonly context: Context;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L21)
-
-## ServiceMiddlewareNext (type alias)
-
-**Signature**
-
-```ts
-type ServiceMiddlewareNext<Patch> = (patch?: Patch) => Promise<void>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L29)
-
-## ServiceMiddlewareRef (interface)
-
-**Signature**
-
-```ts
-export interface ServiceMiddlewareRef<Id extends string = string> {
-  readonly ref: {
-    readonly kind: "service-middleware";
-    readonly id: Id;
-  };
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L10)
-
-## ServiceMiddlewareRefAny (type alias)
-
-**Signature**
-
-```ts
-type ServiceMiddlewareRefAny = ServiceMiddlewareRef;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L17)
 
 ## ServiceRef (interface)
 
@@ -767,7 +429,7 @@ export interface ServiceRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L5)
 
 ## ServiceRefAny (type alias)
 
@@ -777,4 +439,4 @@ export interface ServiceRef<Id extends string = string> {
 type ServiceRefAny = ServiceRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L9)

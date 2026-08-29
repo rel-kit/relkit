@@ -778,6 +778,7 @@ declare const validateLimit: (value: number | undefined, name: string) => void;
   - [AgentClients](#agentclients)
   - [AgentRef](#agentref)
   - [AgentRefAny](#agentrefany)
+  - [AuthContext](#authcontext)
   - [BucketClient](#bucketclient)
   - [BucketClientFor](#bucketclientfor)
   - [BucketClients](#bucketclients)
@@ -857,7 +858,7 @@ void greet;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L114)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L115)
 
 Since v0.1.0
 
@@ -903,6 +904,16 @@ declare const AgentRefAny: AgentRefAny;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L44)
 
+## AuthContext
+
+**Signature**
+
+```ts
+declare const AuthContext: AuthContext<Session>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L45)
+
 ## BucketClient
 
 **Signature**
@@ -911,7 +922,7 @@ declare const AgentRefAny: AgentRefAny;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L46)
 
 ## BucketClientFor
 
@@ -921,7 +932,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L47)
 
 ## BucketClients
 
@@ -931,7 +942,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L48)
 
 ## BucketObjectMetadata
 
@@ -941,7 +952,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L49)
 
 ## BucketRef
 
@@ -951,7 +962,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketRef: BucketRef<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L50)
 
 ## BucketRefAny
 
@@ -961,7 +972,7 @@ declare const BucketRef: BucketRef<Id>;
 declare const BucketRefAny: BucketRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L51)
 
 ## CacheClient
 
@@ -971,7 +982,7 @@ declare const BucketRefAny: BucketRefAny;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L52)
 
 ## CacheClientFor
 
@@ -981,7 +992,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L53)
 
 ## CacheClients
 
@@ -991,7 +1002,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L54)
 
 ## CacheOperationOptions
 
@@ -1001,7 +1012,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L55)
 
 ## CacheRef
 
@@ -1011,7 +1022,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L56)
 
 ## CacheRefAny
 
@@ -1021,7 +1032,7 @@ declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
 declare const CacheRefAny: CacheRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L57)
 
 ## DefineFunctionOptions
 
@@ -1037,7 +1048,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L59)
 
 ## DescriptorRef
 
@@ -1047,7 +1058,7 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 declare const DescriptorRef: DescriptorRef<Kind, Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L58)
 
 ## EventAttributeValue
 
@@ -1057,7 +1068,7 @@ declare const DescriptorRef: DescriptorRef<Kind, Id>;
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L62)
 
 ## EventClientFor
 
@@ -1067,7 +1078,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L60)
 
 ## EventClients
 
@@ -1077,7 +1088,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L61)
 
 ## EventPublishOptions
 
@@ -1087,7 +1098,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L63)
 
 ## EventPublishResult
 
@@ -1097,7 +1108,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L64)
 
 ## EventRef
 
@@ -1107,7 +1118,7 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 declare const EventRef: EventRef<Id, PayloadSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L65)
 
 ## EventRefAny
 
@@ -1117,7 +1128,7 @@ declare const EventRef: EventRef<Id, PayloadSchema>;
 declare const EventRefAny: EventRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L66)
 
 ## FunctionContext
 
@@ -1127,7 +1138,7 @@ declare const EventRefAny: EventRefAny;
 declare const FunctionContext: FunctionContext<D>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L67)
 
 ## FunctionDependencies
 
@@ -1137,7 +1148,7 @@ declare const FunctionContext: FunctionContext<D>;
 declare const FunctionDependencies: FunctionDependencies;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L68)
 
 ## FunctionDescriptor
 
@@ -1156,7 +1167,7 @@ declare const FunctionDescriptor: FunctionDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L69)
 
 ## FunctionRef
 
@@ -1166,7 +1177,7 @@ declare const FunctionDescriptor: FunctionDescriptor<
 declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L70)
 
 ## FunctionRefAny
 
@@ -1176,7 +1187,7 @@ declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, O
 declare const FunctionRefAny: FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L71)
 
 ## InvocationMetadata
 
@@ -1186,7 +1197,7 @@ declare const FunctionRefAny: FunctionRefAny;
 declare const InvocationMetadata: InvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L72)
 
 ## InvocationSource
 
@@ -1196,7 +1207,7 @@ declare const InvocationMetadata: InvocationMetadata;
 declare const InvocationSource: InvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L73)
 
 ## JobClientFor
 
@@ -1206,7 +1217,7 @@ declare const InvocationSource: InvocationSource;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L75)
 
 ## JobClients
 
@@ -1216,7 +1227,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L76)
 
 ## JobEnqueueOptions
 
@@ -1226,7 +1237,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L74)
 
 ## JobEnqueueResult
 
@@ -1236,7 +1247,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L77)
 
 ## JobRef
 
@@ -1246,7 +1257,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare const JobRef: JobRef<Id, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L78)
 
 ## JobRefAny
 
@@ -1256,7 +1267,7 @@ declare const JobRef: JobRef<Id, InputSchema>;
 declare const JobRefAny: JobRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L79)
 
 ## JobState
 
@@ -1266,7 +1277,7 @@ declare const JobRefAny: JobRefAny;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L80)
 
 ## JobStatus
 
@@ -1276,7 +1287,7 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L81)
 
 ## PublicClock
 
@@ -1286,7 +1297,7 @@ declare const JobStatus: JobStatus;
 declare const PublicClock: PublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L82)
 
 ## PublicLogger
 
@@ -1296,7 +1307,7 @@ declare const PublicClock: PublicClock;
 declare const PublicLogger: PublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L83)
 
 ## ResolvedApplicationEnv
 
@@ -1306,7 +1317,7 @@ declare const PublicLogger: PublicLogger;
 declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L84)
 
 ## `function-as-tool-types.ts`
 
@@ -1391,7 +1402,7 @@ type FunctionAsTool<FunctionId, Input, Output, Errors, InputSchema, OutputSchema
 type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L53)
 
 ## AuthContext (interface)
 
@@ -1403,7 +1414,7 @@ export interface AuthContext<Session = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L62)
 
 ## DefineFunctionOptions (interface)
 
@@ -1436,7 +1447,7 @@ export interface DefineFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L121)
 
 ## FunctionContext (interface)
 
@@ -1458,12 +1469,10 @@ export interface FunctionContext<D extends FunctionDependencies = {}> {
   readonly auth: RegisteredContext<"auth", AuthContext>;
   readonly constants: RegisteredContext<"constants", Readonly<Record<string, never>>>;
   readonly prompts: RegisteredContext<"prompts", Readonly<Record<string, never>>>;
-  /** Read-only context added by the owning service middleware for this invocation. */
-  readonly service: Readonly<Record<string, unknown>>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L70)
 
 ## FunctionDependencies (interface)
 
@@ -1521,7 +1530,7 @@ export interface FunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L87)
 
 ## FunctionHandler (type alias)
 
@@ -1534,7 +1543,7 @@ type FunctionHandler<Input, Output, Dependencies, Errors> = (
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L146)
 
 ## FunctionLifecycleHook (type alias)
 
@@ -1547,7 +1556,7 @@ type FunctionLifecycleHook<Value, Dependencies> = (
 ) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L156)
 
 ## InvocationMetadata (type alias)
 
@@ -1577,7 +1586,7 @@ type InvocationSource = SharedInvocationSource;
 type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L44)
 
 ## PublicLogger (type alias)
 
@@ -1587,14 +1596,16 @@ type PublicClock = SharedPublicClock;
 type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L43)
 
 ## ResolvedApplicationEnv (type alias)
 
 **Signature**
 
 ```ts
-type ResolvedApplicationEnv = Readonly<Record<string, unknown>>;
+type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
+  ? Readonly<Record<string, unknown>>
+  : Readonly<Relkit.ApplicationEnv>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L39)

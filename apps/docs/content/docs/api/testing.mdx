@@ -542,6 +542,8 @@ declare const handleTestRequest: (
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [TestFunctionRoute (type alias)](#testfunctionroute-type-alias)
+  - [TestRawRoute (type alias)](#testrawroute-type-alias)
   - [TestRoute (type alias)](#testroute-type-alias)
   - [loadTestRoutes](#loadtestroutes)
 
@@ -549,12 +551,12 @@ declare const handleTestRequest: (
 
 # utils
 
-## TestRoute (type alias)
+## TestFunctionRoute (type alias)
 
 **Signature**
 
 ```ts
-type TestRoute = {
+type TestFunctionRoute = {
   readonly method: string;
   readonly path: string;
   readonly request: unknown;
@@ -578,6 +580,31 @@ type TestRoute = {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L14)
 
+## TestRawRoute (type alias)
+
+**Signature**
+
+```ts
+type TestRawRoute = {
+  readonly method: "ALL";
+  readonly path: string;
+  readonly handler: (request: Request) => Response | Promise<Response>;
+  readonly auth?: { readonly protected: readonly string[] };
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L35)
+
+## TestRoute (type alias)
+
+**Signature**
+
+```ts
+type TestRoute = TestFunctionRoute | TestRawRoute;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L42)
+
 ## loadTestRoutes
 
 **Signature**
@@ -586,7 +613,49 @@ type TestRoute = {
 declare const loadTestRoutes: (root: string) => Promise<readonly TestRoute[]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L50)
+
+## `application-services.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [TestApplicationServices (interface)](#testapplicationservices-interface)
+  - [activateTestServices](#activatetestservices)
+
+---
+
+# utils
+
+## TestApplicationServices (interface)
+
+**Signature**
+
+```ts
+export interface TestApplicationServices {
+  readonly context: Readonly<Record<string, unknown>>;
+  readonly auth?: HttpAuthRuntime;
+  readonly close: () => Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L8)
+
+## activateTestServices
+
+**Signature**
+
+```ts
+declare const activateTestServices: (
+  root: string,
+  env: Readonly<Record<string, unknown>>,
+  routes: readonly TestRoute[],
+) => Promise<TestApplicationServices>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L14)
 
 ## `application.ts`
 
@@ -631,7 +700,7 @@ declare const createTestApplication: (
 ) => Promise<TestApplication>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L47)
 
 Since v0.1.0
 
@@ -652,7 +721,7 @@ export interface TestApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L23)
 
 ## TestApplicationOptions (type alias)
 
@@ -664,7 +733,7 @@ type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L19)
 
 ## `buckets-types.ts`
 
@@ -3206,6 +3275,83 @@ declare const createDeterministicClock: (startTime: number) => {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-clock.ts#L5)
 
+## `runtime-close.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [closeRuntime](#closeruntime)
+
+---
+
+# utils
+
+## closeRuntime
+
+**Signature**
+
+```ts
+declare const closeRuntime: (
+  pending: Set<Promise<unknown>>,
+  timeoutMs: number,
+  cleanup: (failed: boolean) => void,
+  failed: () => boolean,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-close.ts#L1)
+
+## `runtime-context.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [createTestContextFactory](#createtestcontextfactory)
+
+---
+
+# utils
+
+## createTestContextFactory
+
+**Signature**
+
+```ts
+declare const createTestContextFactory: (patch: Readonly<Record<string, unknown>>) => ({
+  invocation,
+  signal,
+  env,
+  time,
+}: InvocationContextOptions) => Readonly<{
+  invocation: InvocationRecord;
+  signal: AbortSignal;
+  env: Readonly<Record<string, unknown>>;
+  time: PublicClock;
+  log: Readonly<{
+    trace: () => void;
+    debug: () => void;
+    info: () => void;
+    warn: () => void;
+    error: () => void;
+  }>;
+  jobs: Readonly<{}>;
+  events: Readonly<{}>;
+  buckets: Readonly<{}>;
+  cache: Readonly<{}>;
+  agents: Readonly<{}>;
+  database: Readonly<{}>;
+  auth: Readonly<{ getSession: () => Promise<null> }>;
+  constants: Readonly<{}>;
+  prompts: Readonly<{}>;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime-context.ts#L6)
+
 ## `runtime.ts`
 
 ---
@@ -3236,7 +3382,7 @@ export interface TestClock {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L32)
 
 ## TestRuntime (interface)
 
@@ -3257,7 +3403,7 @@ export interface TestRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L39)
 
 ## TestRuntimeCloseOptions (interface)
 
@@ -3269,7 +3415,7 @@ export interface TestRuntimeCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L28)
 
 ## TestRuntimeOptions (interface)
 
@@ -3282,12 +3428,13 @@ export interface TestRuntimeOptions {
   readonly env?: Readonly<Record<string, unknown>>;
   readonly startTimeMs?: number;
   readonly closeTimeoutMs?: number;
+  readonly context?: Readonly<Record<string, unknown>>;
   /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
   readonly stateRoot?: string;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L17)
 
 ## createTestRuntime
 
@@ -3299,7 +3446,7 @@ Creates a small deterministic runtime for direct function tests.
 declare const createTestRuntime: (options?: TestRuntimeOptions) => TestRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L53)
 
 ## `state-root.ts`
 

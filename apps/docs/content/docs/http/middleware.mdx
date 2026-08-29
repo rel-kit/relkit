@@ -9,8 +9,12 @@ across service members may belong in service middleware.
 
 ## Define path-scoped authorization
 
-<include cwd lang="ts" meta='title="examples/commerce/src/middleware/order-auth.middleware.ts"'>
-  ../../examples/commerce/src/middleware/order-auth.middleware.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/routes/middleware/order-auth.middleware.ts"'
+>
+  ../../examples/commerce/src/routes/middleware/order-auth.middleware.ts
 </include>
 
 This middleware applies to `/orders/*`, reads the authorization header, delegates the decision to a validated

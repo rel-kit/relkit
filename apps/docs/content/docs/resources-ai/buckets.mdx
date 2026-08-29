@@ -10,8 +10,8 @@ code.
 
 ## Define the storage boundary
 
-<include cwd lang="ts" meta='title="examples/commerce/src/buckets/assets.bucket.ts"'>
-  ../../examples/commerce/src/buckets/assets.bucket.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/assets/buckets/assets.bucket.ts"'>
+  ../../examples/commerce/src/assets/buckets/assets.bucket.ts
 </include>
 
 The stable `id` addresses durable storage and must survive source-file moves. `visibility` controls the default
@@ -20,8 +20,12 @@ provider-specific behavior can diverge.
 
 ## Write from a function
 
-<include cwd lang="ts" meta='title="examples/commerce/src/functions/upload-assets.function.ts"'>
-  ../../examples/commerce/src/functions/upload-assets.function.ts
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/assets/functions/upload-assets.function.ts"'
+>
+  ../../examples/commerce/src/assets/functions/upload-assets.function.ts
 </include>
 
 The function declares `assets` under `dependencies.buckets`, then receives a typed client at

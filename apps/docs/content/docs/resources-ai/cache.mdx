@@ -9,8 +9,8 @@ and Redis-compatible providers observe the same application contract.
 
 ## Define the prices cache
 
-<include cwd lang="ts" meta='title="examples/commerce/src/cache/prices.cache.ts"'>
-  ../../examples/commerce/src/cache/prices.cache.ts
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/orders/cache/prices.cache.ts
 </include>
 
 The key and value schemas prevent accidental cross-use. `defaultTtlMs` applies when a caller omits a TTL;
@@ -22,9 +22,9 @@ shared provider state.
 <include
   cwd
   lang="ts"
-  meta='title="examples/commerce/src/functions/orders/create-order.function.ts"'
+  meta='title="examples/commerce/src/orders/functions/create-order.function.ts"'
 >
-  ../../examples/commerce/src/functions/orders/create-order.function.ts
+  ../../examples/commerce/src/orders/functions/create-order.function.ts
 </include>
 
 `getOrSet` first reads the validated key and computes the price on a miss. Use it for values whose computation
