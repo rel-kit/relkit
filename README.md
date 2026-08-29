@@ -138,11 +138,12 @@ checkout must be selected explicitly.
 
 ## Releases and support
 
-All public packages ship together on one fixed version. User-visible pull
-requests add a Changeset with `bun run changeset`; automation opens the reviewed
-release pull request, and only its green merge can publish through npm trusted
-publishing. Documentation, tests, and internal chores may merge without a
-release.
+All public packages ship together on one fixed version. Repository pull
+requests that change publishable paths receive an automatic patch Changeset;
+forks and minor or major releases use `bun run changeset`. Automation opens the
+release pull request, auto-merges it after `CI Gate`, and publishes through npm
+trusted publishing. Documentation and internal chores outside release paths
+merge without a release.
 
 `@relkit/app`, `create-relkit`, and the explicitly documented optional
 integrations are supported public entry points. Packages described as

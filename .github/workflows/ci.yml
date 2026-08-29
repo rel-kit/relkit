@@ -25,6 +25,56 @@ env:
   TURBO_TELEMETRY_DISABLED: "1"
 
 jobs:
+  auto-changeset:
+    name: Automatic Changeset
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.ref != 'changeset-release/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      contents: write
+    env:
+      HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - name: Generate or require a path-based Changeset
+        run: |
+          args=(--base "$PR_BASE_SHA" --head "$PR_HEAD_SHA" --pr "$PR_NUMBER" --summary "$PR_TITLE")
+          if test "$HEAD_REPOSITORY" = "$GITHUB_REPOSITORY"; then
+            args+=(--write)
+          fi
+          node --experimental-strip-types scripts/auto-changeset.ts "${args[@]}"
+      - name: Commit the generated Changeset and verify the new head
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if ! git status --porcelain -- .changeset | grep -q .; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .changeset
+          git commit -m "chore: add automatic changeset"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "HEAD:${HEAD_REF}"
+          gh workflow run ci.yml --ref "$HEAD_REF"
+
   verify:
     name: Verify
     if: github.event_name != 'schedule'
@@ -181,7 +231,7 @@ jobs:
   ci-gate:
     name: CI Gate
     if: always() && github.event_name != 'schedule'
-    needs: [verify, browser, container, deployment, dependency-review]
+    needs: [auto-changeset, verify, browser, container, deployment, dependency-review]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions: {}
@@ -191,6 +241,7 @@ jobs:
       CONTAINER_RESULT: ${{ needs.container.result }}
       DEPLOYMENT_RESULT: ${{ needs.deployment.result }}
       DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
+      AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
     steps:
       - name: Require every safety job
         run: |
@@ -199,6 +250,7 @@ jobs:
           test "$CONTAINER_RESULT" = success
           test "$DEPLOYMENT_RESULT" = success
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
+          test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
 
   select-release-mode:
     name: Select release mode
@@ -232,6 +284,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:
@@ -254,6 +307,14 @@ jobs:
           commit-message: "chore: version RELKIT packages"
           pr-title: "chore: release RELKIT"
           pr-base-branch: main
+      - name: Verify and auto-merge the release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr_number="$(gh pr list --base main --head changeset-release/main --state open --json number --jq '.[0].number')"
+          test -n "$pr_number"
+          gh workflow run ci.yml --ref changeset-release/main
+          gh pr merge "$pr_number" --auto --squash
 
   pack:
     name: Build validated npm artifacts

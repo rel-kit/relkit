@@ -19,10 +19,17 @@ provides an isolated environment.
 
 ## Changesets
 
-Run `bun run changeset` for a user-visible package change and commit the
-generated Markdown file. Documentation, tests, and internal chores do not need
-a changeset. All public packages ship on one fixed version, so select the
-package whose public behavior changed rather than listing the whole workspace.
+Pull requests from this repository automatically receive a patch Changeset when
+they touch a publishable package, the bundled templates, or the bundled
+inspector. Documentation and internal chores outside those release paths do not
+produce a release. Forks must run `bun run changeset` and commit the generated
+Markdown file because GitHub does not grant their workflows write access.
+
+Automatic Changesets are intentionally patch-only. Run `bun run changeset`
+before pushing when a public change requires a minor or major bump; automation
+preserves that explicit release intent. All public packages ship on one fixed
+version, so select the package whose public behavior changed rather than the
+whole workspace.
 
 ## Pull requests
 
