@@ -3,10 +3,19 @@
     "code": "RELKIT_ID_INFERENCE_AMBIGUOUS",
     "column": 16,
     "descriptorId": "unbound.fixture",
-    "file": "src/functions/ambiguous.function.ts",
+    "file": "src/ambiguous/functions/ambiguous.function.ts",
     "line": 11,
     "message": "Cannot infer a stable function ID from this source binding.",
     "severity": "error",
     "suggestion": "Provide an explicit id or export/bind the descriptor in a statically identifiable form."
+  },
+  {
+    "code": "RELKIT_ID_INVALID",
+    "column": 16,
+    "descriptorId": "unbound.fixture",
+    "file": "src/ambiguous/functions/ambiguous.function.ts",
+    "line": 11,
+    "message": "Domain descriptor ID must start with \"ambiguous.\".",
+    "severity": "error"
   }
 ]
