@@ -11,6 +11,7 @@ import {
   type HttpResponseMapping,
 } from "./http-dsl.js";
 import { copyRateLimit, positive, successStatus } from "./route-options.js";
+import { copyProtectedPaths, readBetterAuthRegistration } from "./route-auth.js";
 import type {
   FunctionRouteDescriptor,
   FunctionRouteOptions,
@@ -106,28 +107,24 @@ function rawRoute(options: RawRouteOptions<string>): RawRouteDescriptor<string> 
   }
   const base = createDescriptorBase("route", options.id ?? createUnboundIdentity(), options);
   const registration = readBetterAuthRegistration(options.handler);
+  if (options.auth !== undefined && registration === undefined) {
+    throw new TypeError("Route auth options require a Better Auth service handler");
+  }
+  const protectedPaths = copyProtectedPaths(options.auth?.protected);
   return deepFreeze({
     ...base,
     raw: true as const,
     handler: options.handler,
     ...(registration === undefined
       ? {}
-      : { auth: { kind: "better-auth" as const, protected: registration.protected } }),
+      : {
+          auth: {
+            kind: "better-auth" as const,
+            protected: protectedPaths,
+            service: { ref: registration.service.ref },
+          },
+        }),
   });
-}
-
-function readBetterAuthRegistration(
-  handler: RawRouteOptions<string>["handler"],
-): { readonly protected: readonly string[] } | undefined {
-  const value = (handler as unknown as Record<PropertyKey, unknown>)[
-    Symbol.for("relkit.better-auth.handler")
-  ];
-  return isRecord(value) &&
-    value.kind === "better-auth" &&
-    Array.isArray(value.protected) &&
-    value.protected.every((entry: unknown) => typeof entry === "string")
-    ? { protected: Object.freeze([...value.protected]) }
-    : undefined;
 }
 
 function requestContentType(value: unknown): HttpRequestContentType | undefined {
