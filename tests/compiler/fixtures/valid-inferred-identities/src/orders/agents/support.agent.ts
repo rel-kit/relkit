@@ -1,6 +1,6 @@
 import { defineAgent } from "@relkit/app";
 import lookupOrder from "../tools/lookup-order.tool.js";
-import { emptyInput, orderOutput } from "../shared/schemas.js";
+import { emptyInput, orderOutput } from "../../platform/schemas.js";
 
 export default defineAgent({
   input: emptyInput,

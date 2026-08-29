@@ -1,5 +1,5 @@
 import { defineError, defineFunction } from "@relkit/app";
-import { errorData, orderInput, orderOutput } from "../../shared/schemas.js";
+import { errorData, orderInput, orderOutput } from "../../platform/schemas.js";
 
 const InvalidError = defineError({
   data: errorData,

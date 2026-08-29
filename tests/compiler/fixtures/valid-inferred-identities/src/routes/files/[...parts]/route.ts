@@ -1,4 +1,4 @@
 import { defineRoute } from "@relkit/app";
-import readFiles from "../../../functions/files/read-files.function.js";
+import files from "../../../files/service.js";
 
-export const GET = defineRoute({ target: readFiles });
+export const GET = defineRoute({ target: files.readFiles });

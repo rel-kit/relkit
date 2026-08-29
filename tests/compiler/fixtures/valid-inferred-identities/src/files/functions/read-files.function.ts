@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app";
-import { filesInput, filesOutput } from "../../shared/schemas.js";
+import { filesInput, filesOutput } from "../../platform/schemas.js";
 
 const readFiles = defineFunction({
   input: filesInput,

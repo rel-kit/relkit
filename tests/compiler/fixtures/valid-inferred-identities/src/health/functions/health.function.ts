@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app";
-import { emptyInput, orderOutput } from "../shared/schemas.js";
+import { emptyInput, orderOutput } from "../../platform/schemas.js";
 
 const health = defineFunction({
   id: "health.check",
