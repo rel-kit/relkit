@@ -1,7 +1,7 @@
 import { defineFunction } from "@relkit/app";
 import prices from "../cache/prices.cache.js";
 import orderCreated from "../events/order-created.event.js";
-import { orderInput, orderOutput } from "../shared/schemas.js";
+import { orderInput, orderOutput } from "../../platform/schemas.js";
 
 const createOrder = defineFunction({
   id: "orders.create",

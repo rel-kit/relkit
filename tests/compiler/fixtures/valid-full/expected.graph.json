@@ -1,14 +1,9 @@
 {
   "appId": "full-app",
-  "contractVersion": 5,
+  "contractVersion": 6,
   "edges": [
     {
-      "from": "orders.handle-created",
-      "kind": "enqueues-job",
-      "to": "receipts.send-job"
-    },
-    {
-      "from": "relkit.event.orders.listener.handler",
+      "from": "relkit.event.receipts.listener.handler",
       "kind": "enqueues-job",
       "to": "receipts.send-job"
     },
@@ -18,7 +13,42 @@
       "to": "orders.lookup-tool"
     },
     {
-      "from": "orders.listener",
+      "from": "orders",
+      "kind": "exposes-event",
+      "member": "orderCreated",
+      "order": 0,
+      "to": "orders.created"
+    },
+    {
+      "from": "orders",
+      "kind": "exposes-function",
+      "member": "authorize",
+      "order": 0,
+      "to": "orders.authorize"
+    },
+    {
+      "from": "receipts",
+      "kind": "exposes-function",
+      "member": "sendReceipt",
+      "order": 0,
+      "to": "receipts.send"
+    },
+    {
+      "from": "orders",
+      "kind": "exposes-function",
+      "member": "createOrder",
+      "order": 1,
+      "to": "orders.create"
+    },
+    {
+      "from": "orders",
+      "kind": "exposes-function",
+      "member": "getOrder",
+      "order": 2,
+      "to": "orders.get"
+    },
+    {
+      "from": "receipts.listener",
       "kind": "listens-to-event",
       "to": "orders.created"
     },
@@ -34,16 +64,16 @@
       "to": "orders.get"
     },
     {
-      "from": "orders.listener",
-      "kind": "targets-function",
-      "role": "primary",
-      "to": "relkit.event.orders.listener.handler"
-    },
-    {
       "from": "orders.lookup-tool",
       "kind": "targets-function",
       "role": "primary",
       "to": "orders.get"
+    },
+    {
+      "from": "receipts.listener",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "relkit.event.receipts.listener.handler"
     },
     {
       "from": "receipts.send-job",
@@ -54,7 +84,7 @@
     {
       "from": "orders.create",
       "kind": "uses-cache",
-      "to": "prices"
+      "to": "orders.prices"
     },
     {
       "from": "orders.get-route",
@@ -64,7 +94,7 @@
       "to": "order-auth"
     },
     {
-      "from": "assets",
+      "from": "assets.objects",
       "kind": "uses-provider-profile",
       "to": "provider.buckets.default"
     },
@@ -74,9 +104,9 @@
       "to": "provider.events.default"
     },
     {
-      "from": "orders.listener",
+      "from": "orders.prices",
       "kind": "uses-provider-profile",
-      "to": "provider.events.default"
+      "to": "provider.cache.default"
     },
     {
       "from": "orders.support-agent",
@@ -84,9 +114,9 @@
       "to": "provider.models.default"
     },
     {
-      "from": "prices",
+      "from": "receipts.listener",
       "kind": "uses-provider-profile",
-      "to": "provider.cache.default"
+      "to": "provider.events.default"
     },
     {
       "from": "receipts.send-job",
@@ -101,6 +131,7 @@
   ],
   "nodes": [
     {
+      "domainId": "orders",
       "generatedFunction": {
         "agentId": "orders.support-agent",
         "functionId": "relkit.agent.orders.support-agent.invoke",
@@ -141,7 +172,7 @@
       "profile": "default",
       "source": {
         "column": 22,
-        "file": "src/agents/order-support.agent.ts",
+        "file": "src/orders/agents/order-support.agent.ts",
         "line": 5
       },
       "toolIds": [
@@ -198,20 +229,22 @@
       "allowedContentTypes": [
         "application/json"
       ],
-      "id": "assets",
+      "domainId": "assets",
+      "id": "assets.objects",
       "kind": "bucket",
       "maxObjectBytes": 10000,
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/buckets/assets.bucket.ts",
+        "file": "src/assets/buckets/assets.bucket.ts",
         "line": 3
       },
       "visibility": "private"
     },
     {
       "defaultTtlMs": 1000,
-      "id": "prices",
+      "domainId": "orders",
+      "id": "orders.prices",
       "key": {
         "properties": {
           "sku": {
@@ -228,7 +261,7 @@
       "profile": "default",
       "source": {
         "column": 16,
-        "file": "src/cache/prices.cache.ts",
+        "file": "src/orders/cache/prices.cache.ts",
         "line": 4
       },
       "value": {
@@ -278,6 +311,8 @@
       "type": "port"
     },
     {
+      "domainId": "orders",
+      "exposure": "public",
       "id": "orders.created",
       "kind": "event",
       "payload": {
@@ -299,7 +334,7 @@
       "sensitiveFields": null,
       "source": {
         "column": 22,
-        "file": "src/events/order-created.event.ts",
+        "file": "src/orders/events/order-created.event.ts",
         "line": 4
       },
       "version": 1
@@ -307,7 +342,9 @@
     {
       "concurrency": null,
       "dependencies": null,
+      "domainId": "orders",
       "errors": null,
+      "exposure": "public",
       "generated": null,
       "id": "orders.authorize",
       "input": {
@@ -335,7 +372,7 @@
       },
       "source": {
         "column": 19,
-        "file": "src/functions/authorize.function.ts",
+        "file": "src/orders/functions/authorize.function.ts",
         "line": 4
       },
       "timeoutMs": null
@@ -346,7 +383,7 @@
         "cache": {
           "prices": {
             "defaultTtlMs": 1000,
-            "id": "prices",
+            "id": "orders.prices",
             "key": {
               "$relkit": "schema",
               "jsonSchema": {
@@ -365,7 +402,7 @@
             "maxTtlMs": 5000,
             "profile": "default",
             "ref": {
-              "id": "prices",
+              "id": "orders.prices",
               "kind": "cache"
             },
             "value": {
@@ -406,7 +443,9 @@
           }
         }
       },
+      "domainId": "orders",
       "errors": null,
+      "exposure": "public",
       "generated": null,
       "id": "orders.create",
       "input": {
@@ -442,7 +481,7 @@
       },
       "source": {
         "column": 21,
-        "file": "src/functions/create-order.function.ts",
+        "file": "src/orders/functions/create-order.function.ts",
         "line": 6
       },
       "timeoutMs": null
@@ -450,7 +489,9 @@
     {
       "concurrency": null,
       "dependencies": null,
+      "domainId": "orders",
       "errors": null,
+      "exposure": "public",
       "generated": null,
       "id": "orders.get",
       "input": {
@@ -482,103 +523,17 @@
       },
       "source": {
         "column": 18,
-        "file": "src/functions/get-order.function.ts",
+        "file": "src/orders/functions/get-order.function.ts",
         "line": 4
       },
       "timeoutMs": null
     },
     {
       "concurrency": null,
-      "dependencies": {
-        "jobs": {
-          "receiptJob": {
-            "id": "receipts.send-job",
-            "idempotency": {
-              "key": "orderId",
-              "retentionMs": 1000
-            },
-            "input": {
-              "$relkit": "schema",
-              "jsonSchema": {
-                "properties": {
-                  "orderId": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "orderId"
-                ],
-                "type": "object"
-              }
-            },
-            "kind": "job",
-            "profile": "default",
-            "ref": {
-              "id": "receipts.send-job",
-              "kind": "job"
-            },
-            "retry": {
-              "initialDelayMs": 1,
-              "jitter": "none",
-              "maxAttempts": 2,
-              "maxDelayMs": 5,
-              "multiplier": 2
-            },
-            "schedule": [
-              {
-                "cron": "0 * * * *",
-                "id": "receipts.reconcile",
-                "input": {
-                  "orderId": "scheduled"
-                },
-                "overlap": "skip",
-                "timezone": "UTC"
-              }
-            ],
-            "target": {
-              "handler": {
-                "$relkit": "function",
-                "name": "handler"
-              },
-              "id": "receipts.send",
-              "input": {
-                "$relkit": "schema",
-                "jsonSchema": {
-                  "properties": {
-                    "orderId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "orderId"
-                  ],
-                  "type": "object"
-                }
-              },
-              "kind": "function",
-              "output": {
-                "$relkit": "schema",
-                "jsonSchema": {
-                  "properties": {
-                    "receiptId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "receiptId"
-                  ],
-                  "type": "object"
-                }
-              },
-              "ref": {
-                "id": "receipts.send",
-                "kind": "function"
-              }
-            }
-          }
-        }
-      },
+      "dependencies": null,
+      "domainId": "orders",
       "errors": null,
+      "exposure": "internal",
       "generated": null,
       "id": "orders.handle-created",
       "input": {
@@ -646,15 +601,17 @@
       },
       "source": {
         "column": 23,
-        "file": "src/functions/handle-created.function.ts",
-        "line": 5
+        "file": "src/orders/functions/handle-created.function.ts",
+        "line": 4
       },
       "timeoutMs": null
     },
     {
       "concurrency": null,
       "dependencies": null,
+      "domainId": "receipts",
       "errors": null,
+      "exposure": "public",
       "generated": null,
       "id": "receipts.send",
       "input": {
@@ -682,12 +639,14 @@
       },
       "source": {
         "column": 21,
-        "file": "src/functions/send-receipt.function.ts",
+        "file": "src/receipts/functions/send-receipt.function.ts",
         "line": 4
       },
       "timeoutMs": null
     },
     {
+      "domainId": "orders",
+      "exposure": "internal",
       "generated": {
         "agentId": "orders.support-agent",
         "functionId": "relkit.agent.orders.support-agent.invoke",
@@ -720,7 +679,7 @@
       },
       "source": {
         "column": 22,
-        "file": "src/agents/order-support.agent.ts",
+        "file": "src/orders/agents/order-support.agent.ts",
         "line": 5
       }
     },
@@ -815,14 +774,16 @@
           }
         }
       },
+      "domainId": "receipts",
       "errors": null,
+      "exposure": "internal",
       "generated": {
-        "functionId": "relkit.event.orders.listener.handler",
+        "functionId": "relkit.event.receipts.listener.handler",
         "generated": true,
         "generatedBy": "event-listener",
-        "listenerId": "orders.listener"
+        "listenerId": "receipts.listener"
       },
-      "id": "relkit.event.orders.listener.handler",
+      "id": "relkit.event.receipts.listener.handler",
       "input": {
         "additionalProperties": false,
         "properties": {
@@ -889,13 +850,14 @@
       "output": {},
       "source": {
         "column": 18,
-        "file": "src/events/order-listener.event.ts",
+        "file": "src/receipts/events/order-listener.event.ts",
         "line": 4
       },
       "timeoutMs": null
     },
     {
       "concurrency": null,
+      "domainId": "receipts",
       "id": "receipts.send-job",
       "idempotency": {
         "key": "orderId",
@@ -934,7 +896,7 @@
       ],
       "source": {
         "column": 20,
-        "file": "src/jobs/send-receipt.job.ts",
+        "file": "src/receipts/jobs/send-receipt.job.ts",
         "line": 5
       },
       "targetFunctionId": "receipts.send",
@@ -947,7 +909,7 @@
       "path": "/orders/*",
       "source": {
         "column": 19,
-        "file": "src/middleware/order-auth.middleware.ts",
+        "file": "src/routes/middleware/order-auth.middleware.ts",
         "line": 4
       }
     },
@@ -1067,15 +1029,75 @@
       }
     },
     {
+      "domainId": "assets",
+      "events": [],
+      "functions": [],
+      "id": "assets",
+      "kind": "service",
+      "source": {
+        "column": 16,
+        "file": "src/assets/service.ts",
+        "line": 3
+      }
+    },
+    {
+      "domainId": "orders",
+      "events": [
+        {
+          "eventId": "orders.created",
+          "name": "orderCreated"
+        }
+      ],
+      "functions": [
+        {
+          "functionId": "orders.authorize",
+          "name": "authorize"
+        },
+        {
+          "functionId": "orders.create",
+          "name": "createOrder"
+        },
+        {
+          "functionId": "orders.get",
+          "name": "getOrder"
+        }
+      ],
+      "id": "orders",
+      "kind": "service",
+      "source": {
+        "column": 16,
+        "file": "src/orders/service.ts",
+        "line": 7
+      }
+    },
+    {
+      "domainId": "receipts",
+      "events": [],
+      "functions": [
+        {
+          "functionId": "receipts.send",
+          "name": "sendReceipt"
+        }
+      ],
+      "id": "receipts",
+      "kind": "service",
+      "source": {
+        "column": 16,
+        "file": "src/receipts/service.ts",
+        "line": 4
+      }
+    },
+    {
       "approval": "never",
       "description": "Read one order",
+      "domainId": "orders",
       "id": "orders.lookup-tool",
       "kind": "tool",
       "mcp": true,
       "sideEffect": "read",
       "source": {
         "column": 21,
-        "file": "src/tools/lookup-order.tool.ts",
+        "file": "src/orders/tools/lookup-order.tool.ts",
         "line": 4
       },
       "targetFunctionId": "orders.get",
@@ -1083,6 +1105,7 @@
     },
     {
       "config": {
+        "auth": null,
         "maxBodyBytes": null,
         "method": "GET",
         "middleware": [
@@ -1175,14 +1198,15 @@
           "kind": "single"
         }
       },
-      "id": "orders.listener",
+      "domainId": "receipts",
+      "id": "receipts.listener",
       "kind": "trigger",
       "source": {
         "column": 18,
-        "file": "src/events/order-listener.event.ts",
+        "file": "src/receipts/events/order-listener.event.ts",
         "line": 4
       },
-      "targetFunctionId": "relkit.event.orders.listener.handler",
+      "targetFunctionId": "relkit.event.receipts.listener.handler",
       "triggerType": "event"
     }
   ]

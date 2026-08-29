@@ -7,7 +7,7 @@ const listener = onEvent(
     await context.jobs.receiptJob.enqueue({ orderId: payload.orderId });
   },
   {
-    id: "orders.listener",
+    id: "receipts.listener",
     profile: "default",
     dependencies: { jobs: { receiptJob } },
     retry: {

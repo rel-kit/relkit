@@ -1,5 +1,5 @@
 import { defineFunction } from "@relkit/app";
-import { receiptInput, receiptOutput } from "../shared/schemas.js";
+import { receiptInput, receiptOutput } from "../../platform/schemas.js";
 
 const sendReceipt = defineFunction({
   id: "receipts.send",

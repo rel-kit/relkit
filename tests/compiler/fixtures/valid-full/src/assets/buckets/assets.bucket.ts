@@ -1,7 +1,7 @@
 import { defineBucket } from "@relkit/app";
 
 const assets = defineBucket({
-  id: "assets",
+  id: "assets.objects",
   profile: "default",
   visibility: "private",
   maxObjectBytes: 10_000,
