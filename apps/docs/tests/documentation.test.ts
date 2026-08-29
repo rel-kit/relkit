@@ -46,8 +46,8 @@ test("keeps guides backed by executable examples and self-hosted discovery", asy
   const events = await readFile(resolve(content, "async/events.mdx"), "utf8");
   const listeners = await readFile(resolve(content, "async/listeners.mdx"), "utf8");
   expect(routes).toContain("examples/commerce/src/routes/orders/[orderId]/route.ts");
-  expect(events).toContain("examples/commerce/src/events/order-created.event.ts");
-  expect(listeners).toContain("examples/commerce/src/events/order-receipt.event.ts");
+  expect(events).toContain("examples/commerce/src/orders/events/order-created.event.ts");
+  expect(listeners).toContain("examples/commerce/src/receipts/events/order-receipt.event.ts");
   expect(await Bun.file(resolve(import.meta.dir, "../app/api/search/route.ts")).text()).toContain(
     "createFromSource(source)",
   );
@@ -71,6 +71,51 @@ test("keeps guides backed by executable examples and self-hosted discovery", asy
   ]) {
     expect(files).not.toContain(resolve(content, removedBundle));
   }
+});
+
+test("keeps current guidance on the domain-first application layout", async () => {
+  const createPage = resolve(content, "start/create-an-app.mdx");
+  const currentSources = [
+    ...(await markdownFiles(content)).filter(
+      (file) =>
+        !file.includes("/api/") && !file.endsWith("/fundamentals/domain-first-migration.mdx"),
+    ),
+    resolve(import.meta.dir, "../components/landing/snippets.ts"),
+    resolve(import.meta.dir, "../../../docs/getting-started.md"),
+    resolve(import.meta.dir, "../../../docs/testing.md"),
+  ];
+  const legacyPath =
+    /(?:^|[\s"'`(])(?:src\/(?:env\.ts|(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|\b))|@app\/(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|\b))/m;
+
+  for (const file of currentSources) {
+    expect(await readFile(file, "utf8")).not.toMatch(legacyPath);
+  }
+
+  const createSource = await readFile(createPage, "utf8");
+  expect(createSource).toContain('<Folder name="hello" defaultOpen>');
+  expect(createSource).toContain('<File name="service.ts" />');
+  expect(createSource).not.toContain('    <Folder name="functions" defaultOpen>');
+  expect(createSource).not.toContain('    <Folder name="services"');
+});
+
+test("builds and starts from the repository root on Railway", async () => {
+  const manifest = (await Bun.file(resolve(import.meta.dir, "../package.json")).json()) as {
+    scripts: Record<string, string>;
+  };
+  const railway = (await Bun.file(resolve(import.meta.dir, "../../../railway.json")).json()) as {
+    build: { builder: string; buildCommand: string };
+    deploy: { startCommand: string; healthcheckPath: string };
+  };
+
+  expect(manifest.scripts.start).toBe("next start --hostname 0.0.0.0");
+  expect(railway.build).toEqual({
+    builder: "RAILPACK",
+    buildCommand: "bun --cwd=apps/docs run build",
+  });
+  expect(railway.deploy).toMatchObject({
+    startCommand: "bun --cwd=apps/docs run start",
+    healthcheckPath: "/docs",
+  });
 });
 
 test("derives capability and related-guide content from the typed catalogs", async () => {

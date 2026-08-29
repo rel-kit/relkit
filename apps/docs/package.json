@@ -12,6 +12,7 @@
     "dev": "bun run generate && next dev --hostname 127.0.0.1 --port 3001",
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
+    "start": "next start --hostname 0.0.0.0",
     "test": "bun test tests",
     "typecheck": "tsc --noEmit"
   },
