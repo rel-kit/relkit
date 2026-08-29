@@ -1,9 +1,9 @@
 import { defineRoute, http } from "@relkit/app";
-import getOrder from "../../../functions/get.function.js";
+import collision from "../../../collision/service.js";
 
 export const GET = defineRoute({
   id: "collision.first",
-  target: getOrder,
+  target: collision.getOrder,
   request: http.input({ id: http.path("id") }),
-  responses: [http.success(200, getOrder.output)],
+  responses: [http.success(200, collision.getOrder.output)],
 });
