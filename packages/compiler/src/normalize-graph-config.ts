@@ -26,6 +26,16 @@ export function httpConfig(
     rateLimit: rateLimit(value.rateLimit),
     maxBodyBytes: value.maxBodyBytes,
     timeoutMs: value.timeoutMs,
+    auth: authConfig(value.auth),
+  });
+}
+
+function authConfig(value: unknown): JsonValue | undefined {
+  if (!isRecord(value) || value.kind !== "better-auth") return undefined;
+  return clean({
+    kind: "better-auth",
+    serviceId: refId(value.service),
+    protected: value.protected,
   });
 }
 

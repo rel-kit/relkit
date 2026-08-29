@@ -10,6 +10,8 @@ export function generatedFunctionNode(
     kind: "function",
     id: generated.functionId,
     source: descriptor.source,
+    ...(descriptor.domainId === undefined ? {} : { domainId: descriptor.domainId }),
+    exposure: "internal",
     input: work.schemas.get(`${descriptor.id}:input`) ?? null,
     output: work.schemas.get(`${descriptor.id}:output`) ?? null,
     generated,

@@ -26,6 +26,7 @@ import { normalizeSourceIdentities } from "./normalize-source-identities.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 import { normalizeSelector } from "./normalize-model-selection.js";
 import { isMiddlewarePath } from "./middleware-coverage.js";
+import { validateDomains } from "./normalize-domains.js";
 
 export { passSchemas } from "./normalize-schema-validation.js";
 
@@ -101,6 +102,7 @@ export function passNormalize(work: NormalizationWork): void {
 }
 
 export function passLocal(work: NormalizationWork): void {
+  if (work.input.sources !== undefined) validateDomains(work);
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     if (!isDescriptorLike(descriptor)) {
