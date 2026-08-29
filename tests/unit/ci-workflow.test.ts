@@ -9,8 +9,9 @@ test("release jobs run after green dependencies with skipped optional jobs", asy
   );
 
   expect(workflow).toContain(
-    "if: always() && needs.ci-gate.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'",
+    "(github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
   );
+  expect(workflow).toContain("gh workflow run ci.yml --ref main");
   expect(workflow).toContain(
     "if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'version'",
   );
