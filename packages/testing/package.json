@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "ai": "7.0.0",
+    "ai": "7.0.79",
     "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",

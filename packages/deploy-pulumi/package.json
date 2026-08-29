@@ -29,9 +29,9 @@
     }
   },
   "dependencies": {
-    "@pulumi/aws": "7.42.0",
+    "@pulumi/aws": "7.43.0",
     "@relkit/cloud-aws": "workspace:*",
-    "@pulumi/pulumi": "3.258.0",
+    "@pulumi/pulumi": "3.259.0",
     "@relkit/contracts": "workspace:*",
     "@relkit/deploy": "workspace:*",
     "@relkit/observability": "workspace:*",
