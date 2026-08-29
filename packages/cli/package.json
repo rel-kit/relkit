@@ -56,7 +56,7 @@
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/runtime-hono": "workspace:*",
     "@relkit/supervisor": "workspace:*",
-    "effect": "4.0.0-beta.107",
+    "effect": "4.0.0-rc.112",
     "next": "16.3.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"
