@@ -14,6 +14,7 @@ import {
 import { type TestFakes } from "./fakes.js";
 import { loadTestRoutes } from "./application-routes.js";
 import { handleTestRequest } from "./application-http.js";
+import { activateTestServices } from "./application-services.js";
 
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
@@ -49,29 +50,62 @@ export async function createTestApplication(
 ): Promise<TestApplication> {
   const projectRoot = options.projectRoot ?? process.cwd();
   const routes = await loadTestRoutes(projectRoot);
+  const context: Record<string, unknown> = {};
   const runtime = createTestRuntime({
     app: app as NonNullable<TestRuntimeOptions["app"]>,
     ...options,
+    context,
+  });
+  const services = await activateTestServices(projectRoot, runtime.env, routes);
+  const requests = new AsyncLocalStorage<Request>();
+  Object.assign(context, services.context, {
+    auth: Object.freeze({
+      getSession: () => {
+        const request = requests.getStore();
+        return request === undefined || services.auth === undefined
+          ? Promise.resolve(null)
+          : services.auth.contextFor(request).getSession();
+      },
+    }),
   });
   const application = {
-    request: async (input: TestHttpInput, init: RequestInit | undefined) =>
-      handleTestRequest(
-        routes,
-        runtime,
+    request: async (input: TestHttpInput, init: RequestInit | undefined) => {
+      const request =
         input instanceof Request
           ? init === undefined
             ? input
             : new Request(input, init)
-          : new Request(new URL(input.toString(), "http://relkit.test").toString(), init),
-      ),
+          : new Request(new URL(input.toString(), "http://relkit.test").toString(), init);
+      return requests.run(request, async () => {
+        const path = new URL(request.url).pathname;
+        if (!isAuthEndpoint(routes, path) && services.auth?.protects(path)) {
+          const session = await services.auth.contextFor(request).getSession();
+          if (session === null) {
+            return Response.json(
+              { error: { id: "UNAUTHORIZED", message: "Authentication required" } },
+              { status: 401 },
+            );
+          }
+        }
+        return handleTestRequest(routes, runtime, request);
+      });
+    },
   };
   const http = createTestHttpClient(application);
   const observability = createTestObservability();
   let closing: Promise<void> | undefined;
   const close = (): Promise<void> =>
     (closing ??= (async () => {
-      await http.close();
-      await runtime.close();
+      const failures: unknown[] = [];
+      for (const cleanup of [() => http.close(), () => runtime.close(), () => services.close()]) {
+        try {
+          await cleanup();
+        } catch (error) {
+          failures.push(error);
+        }
+      }
+      if (failures.length > 0)
+        throw new AggregateError(failures, "Test application cleanup failed");
     })());
   return Object.freeze({
     runtime,
@@ -82,3 +116,14 @@ export async function createTestApplication(
     close,
   });
 }
+
+function isAuthEndpoint(
+  routes: readonly { readonly method: string; readonly path: string; readonly auth?: unknown }[],
+  path: string,
+): boolean {
+  const mount = routes.find((route) => route.method === "ALL" && route.auth !== undefined);
+  if (mount === undefined) return false;
+  const base = mount.path.replace(/\/\*[^/]+\??$/, "");
+  return path === base || path.startsWith(`${base}/`);
+}
+import { AsyncLocalStorage } from "node:async_hooks";

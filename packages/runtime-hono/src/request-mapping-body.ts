@@ -64,7 +64,7 @@ async function parseFormBody(state: BodyState): Promise<BodyValue<FormDataLike>>
     const request = new Request(state.request.url, {
       method: "POST",
       headers: state.request.headers,
-      body: body.bytes,
+      body: new Uint8Array(body.bytes),
     });
     return { value: await request.formData() };
   } catch {

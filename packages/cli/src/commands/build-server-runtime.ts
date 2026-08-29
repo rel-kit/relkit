@@ -11,7 +11,7 @@ function bindAgents() {
     );
   }
 }
-function routeMiddlewareContext({ middlewareId, signal }) {
+function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
   const time = Object.freeze({
     now: () => new Date(),
     sleep: (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
@@ -32,6 +32,7 @@ function routeMiddlewareContext({ middlewareId, signal }) {
   return {
     signal,
     env: values,
+    auth: auth ?? Object.freeze({ getSession: () => Promise.resolve(null) }),
     time,
     log: Object.freeze({
       trace: logger("trace"),
@@ -152,7 +153,7 @@ function recordRuntimeFailure(component, message, error, source) {
   if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
 function tokenFrom(value) {
   const parsed = Number(value);

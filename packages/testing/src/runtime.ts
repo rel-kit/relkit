@@ -11,6 +11,8 @@ import {
 import { createTestFakes, type TestFakes } from "./fakes.js";
 import { combineSignals, createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
+import { createTestContextFactory } from "./runtime-context.js";
+import { closeRuntime } from "./runtime-close.js";
 
 export interface TestRuntimeOptions {
   readonly app?: { readonly env: EnvDefinition<EnvShape> };
@@ -18,6 +20,7 @@ export interface TestRuntimeOptions {
   readonly env?: Readonly<Record<string, unknown>>;
   readonly startTimeMs?: number;
   readonly closeTimeoutMs?: number;
+  readonly context?: Readonly<Record<string, unknown>>;
   /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
   readonly stateRoot?: string;
 }
@@ -61,6 +64,8 @@ export function createTestRuntime(options: TestRuntimeOptions = {}): TestRuntime
   };
   const idSource = createIdSource();
   const runtimeSignal = new AbortController();
+  const context =
+    options.context === undefined ? undefined : createTestContextFactory(options.context);
   const pending = new Set<Promise<unknown>>();
   let closed = false;
   let failed = false;
@@ -69,16 +74,22 @@ export function createTestRuntime(options: TestRuntimeOptions = {}): TestRuntime
   const invoke: TestRuntime["invoke"] = (target, input, callOptions) => {
     if (closed) return Promise.reject(new Error("Test runtime is closed"));
     const signal = combineSignals(runtimeSignal.signal, callOptions?.signal);
+    const { context: callContext, ...invokeOptions } = callOptions ?? {};
     const result = invokeFunctionWithRunner(
       target,
       input,
       {
-        ...(callOptions ?? {}),
+        ...invokeOptions,
         env: resolvedEnv,
         ...(callOptions?.clients === undefined ? { clients: fakes.clients } : {}),
         now: deterministic.clock.currentTimeMs,
         idSource,
         signal: signal.signal,
+        ...(callContext === undefined
+          ? context === undefined
+            ? {}
+            : { context: context as never }
+          : { context: callContext }),
       },
       runner,
     );
@@ -172,29 +183,4 @@ function createIdSource() {
     next: (kind: "trace" | "invocation" | "span") =>
       `test-${kind}-${++sequence}` as import("@relkit/contracts").ProtocolId,
   });
-}
-
-async function closeRuntime(
-  pending: Set<Promise<unknown>>,
-  timeoutMs: number,
-  cleanup: (failed: boolean) => void,
-  failed: () => boolean,
-): Promise<void> {
-  const completed = await waitForPending(pending, timeoutMs);
-  cleanup(failed() || !completed);
-}
-
-async function waitForPending(pending: Set<Promise<unknown>>, timeoutMs: number): Promise<boolean> {
-  const all = Promise.allSettled([...pending]).then(() => undefined);
-  if (pending.size === 0) {
-    await all;
-    return true;
-  }
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<boolean>((resolve) => {
-    timer = setTimeout(() => resolve(false), timeoutMs);
-  });
-  const completed = await Promise.race([all.then(() => true), timeout]);
-  if (timer !== undefined) clearTimeout(timer);
-  return completed;
 }

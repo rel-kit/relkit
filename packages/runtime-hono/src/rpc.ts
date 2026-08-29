@@ -131,6 +131,8 @@ async function middlewareContext(
     return options.middlewareContext({
       middlewareId,
       signal: state?.signal ?? context.req.raw.signal,
+      request: context.req.raw,
+      ...(options.auth === undefined ? {} : { auth: options.auth.contextFor(context.req.raw) }),
       ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
       ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
     });
@@ -139,6 +141,7 @@ async function middlewareContext(
   return {
     signal: context.req.raw.signal,
     env: {},
+    auth: options.auth?.contextFor(context.req.raw) ?? { getSession: () => Promise.resolve(null) },
     log: { trace: noop, debug: noop, info: noop, warn: noop, error: noop },
     time: {
       now: () => new Date(),
