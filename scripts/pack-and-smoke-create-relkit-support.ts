@@ -170,7 +170,6 @@ async function assertPortReleased(port: number): Promise<void> {
   const probe = Bun.serve({ hostname: "127.0.0.1", port, fetch: () => new Response() });
   await probe.stop(true);
 }
-
 export async function verifyProject(
   root: string,
   registry: string,
@@ -180,8 +179,9 @@ export async function verifyProject(
     "package.json",
     "bun.lock",
     "relkit.config.ts",
-    "src/env.ts",
-    "src/functions/hello.function.ts",
+    "src/platform/env.ts",
+    "src/hello/functions/hello.function.ts",
+    "src/hello/service.ts",
     "src/routes/hello/route.ts",
     "tests/integration/hello.route.test.ts",
     ".gitignore",

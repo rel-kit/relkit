@@ -116,7 +116,7 @@ export async function generateProject(
     await requireFiles(staged, [
       "package.json",
       "relkit.config.ts",
-      "src/env.ts",
+      "src/platform/env.ts",
       ".env.example",
       ".gitignore",
     ]);

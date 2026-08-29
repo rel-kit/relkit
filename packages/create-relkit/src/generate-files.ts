@@ -111,7 +111,14 @@ export async function replaceOnce(path: string, before: string, after: string): 
 }
 
 export async function removeExamples(root: string): Promise<void> {
-  for (const directory of ["src/functions", "src/routes", "src/tools", "src/agents", "tests"])
+  for (const directory of [
+    "src/routes",
+    "src/orders",
+    "src/echo",
+    "src/hello/tools",
+    "src/hello/agents",
+    "tests",
+  ])
     await rm(join(root, directory), { recursive: true, force: true });
 }
 
