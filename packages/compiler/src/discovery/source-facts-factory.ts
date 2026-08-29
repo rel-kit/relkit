@@ -15,10 +15,12 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineConfig: { kind: "app", idOptional: true },
   defineConstants: { kind: "constants", idOptional: true },
   definePrompt: { kind: "prompt", idOptional: true },
-  defineDataModel: { kind: "data-model", idOptional: true },
+  defineDrizzleService: { kind: "service", idOptional: true },
+  defineBetterAuthService: { kind: "service", idOptional: true },
   defineFunction: { kind: "function", idOptional: true },
   defineError: { kind: "error", idOptional: true },
   defineRoute: { kind: "route", idOptional: true },
+  defineServiceRoutes: { kind: "route", idOptional: true },
   defineJob: { kind: "job", idOptional: false },
   defineEvent: { kind: "event", idOptional: false },
   onEvent: { kind: "event-trigger", idOptional: false },
@@ -28,7 +30,6 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineAgent: { kind: "agent", idOptional: true },
   defineMiddleware: { kind: "middleware", idOptional: true },
   defineService: { kind: "service", idOptional: true },
-  defineServiceMiddleware: { kind: "service-middleware", idOptional: true },
   defineTransform: { kind: "transform", idOptional: true },
   defineRequestTransform: { kind: "transform", idOptional: true },
 });
@@ -48,7 +49,7 @@ export function factoryFor(
     factory,
     kind: definition.kind,
     idOptional: definition.idOptional,
-    id: idPresence(call.arguments[0]),
+    id: factory === "defineServiceRoutes" ? "omitted" : idPresence(call.arguments[0]),
     position,
   });
 }

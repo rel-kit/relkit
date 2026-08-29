@@ -30,29 +30,24 @@ export interface ExportIdInput {
 }
 
 const KIND_RULES: Readonly<
-  Record<SourceFactoryKind, { readonly directory: string; readonly suffixes: readonly string[] }>
+  Record<SourceFactoryKind, { readonly category?: string; readonly suffixes: readonly string[] }>
 > = {
-  app: { directory: ".", suffixes: ["relkit.config"] },
-  function: { directory: "src/functions", suffixes: ["function"] },
-  service: { directory: "src/services", suffixes: ["service"] },
-  route: { directory: "src/routes", suffixes: ["route"] },
-  job: { directory: "src/jobs", suffixes: ["job"] },
-  event: { directory: "src/events", suffixes: ["event"] },
-  "event-trigger": { directory: "src/events", suffixes: ["event"] },
-  bucket: { directory: "src/buckets", suffixes: ["bucket"] },
-  cache: { directory: "src/cache", suffixes: ["cache"] },
-  tool: { directory: "src/tools", suffixes: ["tool"] },
-  agent: { directory: "src/agents", suffixes: ["agent"] },
-  "data-model": { directory: "src/data", suffixes: ["data-model"] },
-  constants: { directory: "src/constants", suffixes: ["constants"] },
-  prompt: { directory: "src/prompts", suffixes: ["prompt"] },
-  error: { directory: "src/errors", suffixes: ["error"] },
-  middleware: { directory: "src/middleware", suffixes: ["middleware"] },
-  "service-middleware": {
-    directory: "src/services",
-    suffixes: ["service-middleware", "middleware"],
-  },
-  transform: { directory: "src/transforms", suffixes: ["transform"] },
+  app: { suffixes: ["relkit.config"] },
+  function: { category: "functions", suffixes: ["function"] },
+  service: { suffixes: ["service"] },
+  route: { suffixes: ["route"] },
+  job: { category: "jobs", suffixes: ["job"] },
+  event: { category: "events", suffixes: ["event"] },
+  "event-trigger": { category: "events", suffixes: ["event"] },
+  bucket: { category: "buckets", suffixes: ["bucket"] },
+  cache: { category: "cache", suffixes: ["cache"] },
+  tool: { category: "tools", suffixes: ["tool"] },
+  agent: { category: "agents", suffixes: ["agent"] },
+  constants: { category: "constants", suffixes: ["constants"] },
+  prompt: { category: "prompts", suffixes: ["prompt"] },
+  error: { category: "errors", suffixes: ["error"] },
+  middleware: { category: "middleware", suffixes: ["middleware"] },
+  transform: { category: "transforms", suffixes: ["transform"] },
 };
 
 /** Returns the normalized source hierarchy after conventional path stripping. */
@@ -130,12 +125,18 @@ function sourceParts(
   const normalized = relativeSource(source, projectRoot);
   const parts = normalized.split("/").filter(Boolean);
   if (parts[0] === "src") parts.shift();
-  const directory = KIND_RULES[kind].directory.split("/").slice(1);
-  if (directory.every((part, index) => parts[index] === part)) parts.splice(0, directory.length);
+  const rule = KIND_RULES[kind];
+  if (kind === "route" && parts[0] === "routes") parts.shift();
+  if ((kind === "middleware" || kind === "transform") && parts[0] === "routes") {
+    parts.shift();
+    if (parts[0] === rule.category) parts.shift();
+  } else if (kind !== "app" && kind !== "route" && kind !== "service") {
+    if (parts[1] === rule.category) parts.splice(1, 1);
+  }
   const last = parts.at(-1);
   if (last === undefined) return [];
   const stem = last.replace(/\.(?:[cm]?[jt]sx?)$/i, "");
-  parts[parts.length - 1] = stripSuffix(stem, KIND_RULES[kind].suffixes);
+  parts[parts.length - 1] = stripSuffix(stem, rule.suffixes);
   if (parts.at(-1) === "index") parts.pop();
   return parts.flatMap((part) => {
     const value = kebab(part);

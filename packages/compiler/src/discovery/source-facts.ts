@@ -8,7 +8,6 @@ import type {
   RouteOperationFact,
   ServiceMemberFact,
 } from "./source-facts-types.js";
-
 export type {
   ErrorBindingFact,
   ExportFact,
@@ -20,7 +19,6 @@ export type {
   SourceFacts,
   SourceFactoryKind,
 } from "./source-facts-types.js";
-
 const ROUTE_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "ALL"]);
 
 interface LocalBinding {
@@ -43,6 +41,27 @@ export function readFacts(sourceFile: ts.SourceFile): ExportFacts {
   for (const statement of sourceFile.statements) {
     if (ts.isVariableStatement(statement)) {
       for (const declaration of statement.declarationList.declarations) {
+        if (ts.isObjectBindingPattern(declaration.name)) {
+          const factory = factoryFor(
+            declaration.initializer,
+            undefined,
+            declaration.initializer?.getStart(sourceFile) ?? declaration.name.getStart(sourceFile),
+          );
+          if (factory?.factory !== "defineServiceRoutes") continue;
+          for (const element of declaration.name.elements) {
+            if (element.dotDotDotToken !== undefined || !ts.isIdentifier(element.name)) continue;
+            const binding = element.name.text;
+            const position = element.getStart(sourceFile);
+            const routeFactory = Object.freeze({ ...factory, binding, position });
+            const local = { binding, position, factory: routeFactory } satisfies LocalBinding;
+            locals.set(binding, local);
+            factoryBindings.push(routeFactory);
+            if (hasModifier(statement, ts.SyntaxKind.ExportKeyword)) {
+              exports.set(binding, exportFact(local));
+            }
+          }
+          continue;
+        }
         if (!ts.isIdentifier(declaration.name)) continue;
         const position =
           declaration.initializer?.getStart(sourceFile) ?? declaration.name.getStart(sourceFile);

@@ -1,7 +1,6 @@
 export * from "./conventions.js";
 export * from "./config-loader.js";
 export * from "./discovery/ast-prefilter.js";
-export * from "./discovery/data-model-isolation.js";
 export * from "./discovery/evaluator.js";
 export * from "./discovery/extract.js";
 export * from "./discovery/source-map.js";
