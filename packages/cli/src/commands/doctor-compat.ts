@@ -21,7 +21,7 @@ export async function versionChecks(
     return [{ name: "packages", ok: false, message: "package.json was not found." }];
   const expectedBun = packageManagerVersion(manifest);
   const bunOk = expectedBun === undefined || satisfies(Bun.version, expectedBun);
-  const expectedTypeScript = dependency(manifest, "typescript") ?? "5.9.2";
+  const expectedTypeScript = dependency(manifest, "typescript") ?? "5.9.3";
   let actualTypeScript: string | undefined;
   try {
     const path = Bun.resolveSync("typescript/package.json", root);
