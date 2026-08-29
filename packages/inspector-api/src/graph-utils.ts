@@ -8,7 +8,7 @@ targetFunctionId config method path request responses middleware transforms sele
 delivery profile retry schedule idempotency version payload sensitiveFields visibility maxObjectBytes
 allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model toolIds limits
 generatedFunction capabilities capability adapter ownership configuration
-title tags members order ownerId ownerKind phase
+title tags members functions events order ownerId ownerKind phase domainId exposure data http retry
 `
   .trim()
   .split(/\s+/);

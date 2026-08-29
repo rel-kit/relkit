@@ -12,7 +12,7 @@ export function serviceContext(graph: ApplicationGraph): OpenApiServiceContext {
   const byId = new Map(sources.map((service) => [service.id, service]));
   const byFunction = new Map<string, ServiceNode>();
   for (const service of sources)
-    for (const member of service.members) byFunction.set(member.functionId, service);
+    for (const member of service.functions) byFunction.set(member.functionId, service);
   for (const node of graph.nodes)
     if (node.kind === "function") registerExplicitService(node, byId, byFunction, sources);
   return { byId, byFunction, sources };
@@ -55,7 +55,7 @@ function registerExplicitService(
 }
 
 function syntheticService(id: string, source: ServiceNode["source"]): ServiceNode {
-  return { kind: "service", id, source, members: [], middleware: [] };
+  return { kind: "service", id, source, functions: [], events: [] };
 }
 
 function serviceId(value: unknown): string | undefined {
