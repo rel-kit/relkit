@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.0.3
+
+### Changes
+
+- chore(deps): bump the bun-dependencies group with 6 updates
+
 ## 0.0.2
 
 ### Changes
