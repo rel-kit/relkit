@@ -2,7 +2,7 @@ import { getTableColumns, is, type Table } from "drizzle-orm";
 import { getTableConfig as getMySqlTableConfig, MySqlTable } from "drizzle-orm/mysql-core";
 import { getTableConfig as getPgTableConfig, PgTable } from "drizzle-orm/pg-core";
 import { getTableConfig as getSqliteTableConfig, SQLiteTable } from "drizzle-orm/sqlite-core";
-import type { TableMetadata, DataModelRuntime } from "./runtime-types.js";
+import type { TableMetadata } from "./runtime-types.js";
 import type { TableMap } from "./types.js";
 
 export function inspectTables(tables: TableMap): {
@@ -21,19 +21,28 @@ export function inspectTables(tables: TableMap): {
   };
 }
 
-export function runtimeOf(value: object): DataModelRuntime {
-  const runtime = (value as { readonly [key: symbol]: unknown })[
-    Symbol.for("relkit.data-model.runtime")
-  ];
-  if (!isRecord(runtime)) throw new TypeError("Invalid data-model runtime");
-  return runtime as unknown as DataModelRuntime;
+export function extractTables(schema: Readonly<Record<string, unknown>>): TableMap {
+  const tables = Object.fromEntries(
+    Object.entries(schema).filter(([, value]) => isSupportedTable(value)),
+  ) as TableMap;
+  if (Object.keys(tables).length === 0) throw new TypeError("A Drizzle service requires a table");
+  return Object.freeze(tables);
 }
 
-function dialectFor(table: Table): "pg" | "mysql" | "sqlite" {
+export function dialectFor(table: Table): "pg" | "mysql" | "sqlite" {
   if (is(table, PgTable)) return "pg";
   if (is(table, MySqlTable)) return "mysql";
   if (is(table, SQLiteTable)) return "sqlite";
   throw new TypeError("Only PostgreSQL, MySQL, and SQLite Drizzle tables are supported");
+}
+
+function isSupportedTable(value: unknown): value is Table {
+  try {
+    dialectFor(value as Table);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function tableMetadata(table: Table): TableMetadata {

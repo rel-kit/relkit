@@ -1,22 +1,29 @@
 import type { Table } from "drizzle-orm";
-import type { DataModelOverrides, ModelConstructor, TableMap, TableZodSchemas } from "./types.js";
+import type { DrizzleModelMap, DrizzleOverrides, TableMap, TableZodSchemas } from "./types.js";
 
-export const DATA_MODEL_RUNTIME = Symbol.for("relkit.data-model.runtime");
-export const CREATE_DATABASE_CONTEXT = Symbol.for("relkit.data-model.create-context");
-export const MODEL_BINDING = Symbol("relkit.model.binding");
+export const DRIZZLE_RUNTIME = Symbol.for("relkit.drizzle.runtime");
+export const MODEL_RUNTIME = Symbol.for("relkit.drizzle.model.runtime");
 
 export interface TableMetadata {
   readonly columns: Readonly<Record<string, unknown>>;
   readonly selectors: readonly (readonly string[])[];
 }
 
-export interface DataModelRuntime {
-  readonly drizzle: unknown;
+export interface ModelRuntime {
+  readonly table: Table;
+  readonly extend: Readonly<Record<string, (context: any, ...args: any[]) => unknown>>;
+}
+
+export interface DrizzleServiceRuntime {
+  readonly client: (context: { readonly env: Readonly<Record<string, unknown>> }) => unknown;
+  readonly dispose?: (database: any) => unknown;
+  readonly schema: Readonly<Record<string, unknown>>;
   readonly tables: TableMap;
-  readonly overrides: DataModelOverrides<TableMap>;
-  readonly models: Readonly<Record<string, ModelConstructor<object>>>;
+  readonly models: DrizzleModelMap<TableMap>;
+  readonly overrides: DrizzleOverrides<TableMap>;
   readonly metadata: Readonly<Record<string, TableMetadata>>;
   readonly zodSchemas: Readonly<Record<string, TableZodSchemas<Table>>>;
+  readonly dialect: "pg" | "mysql" | "sqlite";
 }
 
 export interface ModelBinding {
@@ -27,5 +34,3 @@ export interface ModelBinding {
   readonly metadata: TableMetadata;
   readonly override: Readonly<Record<string, unknown>>;
 }
-
-export type BoundModel = { [MODEL_BINDING]?: ModelBinding };
