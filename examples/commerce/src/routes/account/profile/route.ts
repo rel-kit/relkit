@@ -1,4 +1,4 @@
 import { defineRoute } from "@relkit/app/routes";
-import accountSession from "@app/functions/account-session.function.js";
+import account from "@app/account/service.js";
 
-export const GET = defineRoute({ target: accountSession });
+export const GET = defineRoute({ target: account.accountSession });

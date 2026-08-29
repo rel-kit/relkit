@@ -1,25 +1,17 @@
-import { defineRoute, http } from "@relkit/app/routes";
-import orders from "@app/services/orders.service.js";
-import orderNotFound from "@app/errors/order-not-found.error.js";
-import normalizeOrderId from "@app/transforms/orders/normalize-id.transform.js";
+import { defineServiceRoutes, http } from "@relkit/app/routes";
+import orders from "@app/orders/service.js";
+import normalizeOrderId from "@app/routes/transforms/orders/normalize-id.transform.js";
 
-export const GET = defineRoute({
-  target: orders.getOrder,
-  request: http.input({
-    orderId: http.transform(normalizeOrderId, http.path("orderId")),
-  }),
-  responses: [
-    http.success(200, orders.getOrder.output),
-    http.error(orderNotFound.id, 404, orderNotFound.data),
-    http.validationError(),
-  ],
+export const { GET, HEAD, PUT, PATCH, DELETE, OPTIONS } = defineServiceRoutes(orders, {
+  GET: {
+    member: "getOrder",
+    request: http.input({
+      orderId: http.transform(normalizeOrderId, http.path("orderId")),
+    }),
+  },
+  HEAD: "getOrder",
+  PUT: "updateOrder",
+  PATCH: "updateOrder",
+  DELETE: { member: "deleteOrder", successStatus: 202 },
+  OPTIONS: "getOrder",
 });
-
-export const HEAD = defineRoute({ target: orders.getOrder });
-export const PUT = defineRoute({ target: orders.updateOrder });
-export const PATCH = defineRoute({ target: orders.updateOrder });
-export const DELETE = defineRoute({
-  target: orders.deleteOrder,
-  successStatus: 202,
-});
-export const OPTIONS = defineRoute({ target: orders.getOrder });

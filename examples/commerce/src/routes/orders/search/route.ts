@@ -1,4 +1,4 @@
-import { defineRoute } from "@relkit/app/routes";
-import orders from "@app/services/orders.service.js";
+import { defineServiceRoutes } from "@relkit/app/routes";
+import orders from "@app/orders/service.js";
 
-export const GET = defineRoute({ target: orders.searchOrders });
+export const { GET } = defineServiceRoutes(orders, { GET: "searchOrders" });
