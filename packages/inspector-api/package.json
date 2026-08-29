@@ -31,7 +31,7 @@
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/observability": "workspace:*",
-    "hono": "4.13.4"
+    "hono": "4.13.5"
   },
   "scripts": {
     "build": "tsc -b",

@@ -41,7 +41,7 @@
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/routes": "workspace:*",
     "@relkit/schema": "workspace:*",
-    "hono": "4.13.4",
+    "hono": "4.13.5",
     "hono-rate-limiter": "0.5.3"
   },
   "devDependencies": {

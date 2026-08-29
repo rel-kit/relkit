@@ -14,7 +14,15 @@ updates:
         update-types: ["minor", "patch"]
     ignore:
       - dependency-name: "@types/bun"
-        versions: ["1.4.x"]
+        versions: [">1.3.10"]
+      - dependency-name: "effect"
+        versions: [">=4.0.0-rc.0"]
+      - dependency-name: "@effect/*"
+        versions: [">=4.0.0-rc.0"]
+      - dependency-name: "@splinetool/runtime"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
