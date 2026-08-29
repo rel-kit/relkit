@@ -2,7 +2,7 @@ import { defineFunction } from "@relkit/app";
 import { z } from "@relkit/schema";
 
 const hello = defineFunction({
-  id: "hello",
+  id: "hello.say-hello",
   input: z.object({ name: z.string() }),
   output: z.object({ message: z.string() }),
   handler: async (input, context) => {
