@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { createDatabaseContext } from "@relkit/drizzle";
-import model, { initializeDataModel, sqlite } from "@app/data/application.data-model.js";
+import { activateDrizzleService } from "@relkit/drizzle";
+import database from "@app/database/service.js";
 
 test("runs CRUD, custom methods, composite selectors, schemas, and rollback", async () => {
-  initializeDataModel();
-  const context = createDatabaseContext(model);
+  const active = await activateDrizzleService(database, { DATABASE_PATH: ":memory:" });
+  const context = active.context;
   const user = await context.users.insert({ data: { email: "one@example.com" } });
   expect(context.zodSchemas.users.select.parse(user)).toEqual(user);
   expect(await context.users.byEmailDomain("example.com")).toEqual([user]);
@@ -24,5 +24,5 @@ test("runs CRUD, custom methods, composite selectors, schemas, and rollback", as
     }),
   ).rejects.toThrow("rollback");
   expect(await context.users.findMany({ where: { email: "rollback@example.com" } })).toEqual([]);
-  sqlite.exec("delete from memberships; delete from users;");
+  await active.close();
 });
