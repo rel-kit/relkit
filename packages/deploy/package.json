@@ -1,6 +1,6 @@
 {
   "name": "@relkit/deploy",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Unsupported internal RELKIT deployment contracts; use @relkit/cli.",
   "license": "MIT",
   "repository": {
