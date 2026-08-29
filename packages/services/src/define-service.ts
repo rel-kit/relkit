@@ -1,142 +1,84 @@
 import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
-import { createUnboundIdentity, SERVICE_POLICY } from "@relkit/invocation";
+import { assertEventDescriptor } from "@relkit/events";
 import type { FunctionRefAny } from "@relkit/functions";
+import { createUnboundIdentity } from "@relkit/invocation";
 import {
   assertServiceDescriptor,
   assertServiceMemberName,
-  assertServiceMiddlewareDescriptor,
-  assertServiceMiddlewareRef,
-  freezeServiceDescriptor,
-  normalizeServiceMemberName,
+  isFunctionDescriptor,
 } from "./guards.js";
-import { assertServiceFunctionOwnership, claimServiceFunctionOwnership } from "./ownership.js";
 import type {
   DefineService,
   DefineServiceOptions,
-  NonEmptyServiceFunctionMap,
   ServiceDescriptor,
+  ServiceEventMap,
   ServiceFunctionMap,
-  ServiceMember,
-  ServiceMiddlewareRefAny,
-  ServiceRef,
 } from "./types.js";
 
 /**
- * Groups typed functions under one service identity and ordered policy stack.
- * Services expose member facades such as `Orders.getOrder`; they do not own a
- * second handler or become a workflow. Omit the service ID for source-derived
- * identity, and use the member facade for routes, tools, or `invoke` calls.
+ * Defines a domain's public functions and events as identity-preserving members.
  *
  * @example
  * ```ts
- * import { defineFunction } from "@relkit/app/functions"
  * import { defineService } from "@relkit/app/services"
- * import { z } from "@relkit/app/schema"
  *
- * const getOrder = defineFunction({
- *   input: z.object({ orderId: z.string() }),
- *   output: z.object({ orderId: z.string() }),
- *   handler: async (input) => input
- * })
- * const Orders = defineService({ functions: { getOrder } })
- * void Orders.getOrder.invoke({ orderId: "order-1" })
+ * const orders = defineService({})
+ * void orders
  * ```
  * @category Services
  * @since 0.1.0
  */
 export const defineService: DefineService = <
   const Id extends string,
-  const Functions extends ServiceFunctionMap,
-  const Middleware extends readonly ServiceMiddlewareRefAny[] = readonly ServiceMiddlewareRefAny[],
+  const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  const Events extends ServiceEventMap = Readonly<Record<never, never>>,
 >(
-  options: DefineServiceOptions<Id, Functions, Middleware>,
-): ServiceDescriptor<Id, Functions, Middleware> => {
-  const functions = copyFunctions(options.functions);
-  const middleware = copyMiddleware(options.middleware);
-  const id = (options.id === undefined ? createUnboundIdentity() : options.id) as Id;
-  const base = createDescriptorBase("service", id, options);
-  const policy = Object.freeze({
-    serviceId: base.id,
-    middleware: Object.freeze(
-      (middleware ?? []).filter(
-        (value) => typeof (value as { readonly handler?: unknown }).handler === "function",
-      ),
-    ),
-  });
-  const serviceRef: ServiceRef<Id> = Object.freeze(
-    Object.defineProperty({ ref: base.ref }, SERVICE_POLICY, { value: policy }),
-  );
-  const candidate = {
-    ...base,
-    functions,
-    ...(middleware === undefined ? {} : { middleware }),
-  } as unknown as import("./types.js").ServiceDescriptorAny;
-  assertServiceDescriptor(candidate);
-  assertServiceFunctionOwnership(functions, base.id);
-
-  const members: Record<string, unknown> = {};
-  for (const [name, target] of Object.entries(functions)) {
-    members[name] = createMember(target, serviceRef);
+  options: DefineServiceOptions<Id, Functions, Events>,
+): ServiceDescriptor<Id, Functions, Events> => {
+  if (options === null || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Service options must be an object");
   }
-  claimServiceFunctionOwnership(functions, base.id);
-
-  return freezeServiceDescriptor({ ...candidate, ...members }) as ServiceDescriptor<
-    Id,
-    Functions,
-    Middleware
-  >;
+  const functions = copyMembers(options.functions, isFunctionDescriptor, "function");
+  const events = copyMembers(options.events, isEvent, "event");
+  for (const name of Object.keys(events)) {
+    if (name in functions) throw new TypeError(`Duplicate service member "${name}"`);
+  }
+  const id = (options.id === undefined ? createUnboundIdentity() : options.id) as Id;
+  const descriptor = {
+    ...createDescriptorBase("service", id, options),
+    ...functions,
+    ...events,
+  };
+  assertServiceDescriptor(descriptor);
+  return deepFreeze(descriptor) as ServiceDescriptor<Id, Functions, Events>;
 };
 
-function copyFunctions<Functions extends ServiceFunctionMap>(
-  functions: NonEmptyServiceFunctionMap<Functions>,
-): Functions {
-  if (!isRecord(functions) || Object.keys(functions).length === 0) {
-    throw new TypeError("A service needs at least one function");
+function copyMembers<T>(
+  value: Readonly<Record<string, T>> | undefined,
+  validate: (value: unknown) => value is T,
+  kind: "function" | "event",
+): Readonly<Record<string, T>> {
+  if (value === undefined) return {};
+  if (!isRecord(value)) throw new TypeError(`Service ${kind}s must be an object`);
+  const members: Record<string, T> = {};
+  for (const [name, member] of Object.entries(value)) {
+    assertServiceMemberName(name);
+    if (!validate(member)) throw new TypeError(`Invalid service ${kind} member "${name}"`);
+    if (name in members) throw new TypeError(`Duplicate service member "${name}"`);
+    members[name] = member;
   }
-  const names = new Set<string>();
-  const result: Record<string, FunctionRefAny> = {};
-  for (const [rawName, target] of Object.entries(functions)) {
-    const name = normalizeServiceMemberName(rawName);
-    assertServiceMemberName(rawName);
-    if (names.has(name)) throw new TypeError(`Duplicate service member "${name}"`);
-    names.add(name);
-    result[rawName] = target;
-  }
-  return Object.freeze(result) as Functions;
+  return members;
 }
 
-function copyMiddleware(
-  values: readonly ServiceMiddlewareRefAny[] | undefined,
-): readonly ServiceMiddlewareRefAny[] | undefined {
-  if (values === undefined) return undefined;
-  if (!Array.isArray(values)) throw new TypeError("Service middleware must be an array");
-  return Object.freeze(
-    values.map((value) => {
-      assertServiceMiddlewareRef(value);
-      if (isMiddlewareDescriptorShape(value)) assertServiceMiddlewareDescriptor(value);
-      return value;
-    }),
-  );
-}
-
-function createMember<ServiceId extends string, Target extends FunctionRefAny>(
-  target: Target,
-  service: ServiceRef<ServiceId>,
-): ServiceMember<ServiceId, Target> {
-  const descriptors: PropertyDescriptorMap = Object.getOwnPropertyDescriptors(target);
-  descriptors.service = {
-    value: service,
-    enumerable: true,
-    writable: false,
-    configurable: false,
-  };
-  return deepFreeze(Object.defineProperties({}, descriptors)) as ServiceMember<ServiceId, Target>;
+function isEvent(value: unknown): value is ServiceEventMap[string] {
+  try {
+    assertEventDescriptor(value);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function isMiddlewareDescriptorShape(value: object): boolean {
-  return "kind" in value || "id" in value || "handler" in value;
 }

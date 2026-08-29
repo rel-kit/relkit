@@ -30,8 +30,11 @@
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
+    "@relkit/events": "workspace:*",
     "@relkit/functions": "workspace:*",
-    "@relkit/invocation": "workspace:*",
+    "@relkit/invocation": "workspace:*"
+  },
+  "devDependencies": {
     "@relkit/schema": "workspace:*"
   },
   "scripts": {

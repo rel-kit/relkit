@@ -11,7 +11,6 @@ import {
   defineMiddleware,
   defineRoute,
   defineService,
-  defineServiceMiddleware,
   defineTool,
   defineTransform,
   http,
@@ -32,12 +31,8 @@ const optionalDelayedError = defineError({
 const optionalRoute = defineRoute({ target });
 const optionalMiddleware = defineMiddleware("/orders/*", async (_context, next) => next());
 const optionalTransform = defineTransform({ schema: z.string() });
-const optionalServiceMiddleware = defineServiceMiddleware({
-  handler: async (_value, next) => next(),
-});
 const optionalService = defineService({
   functions: { get: target },
-  middleware: [optionalServiceMiddleware],
 });
 const optionalTool = defineTool({
   target,
@@ -69,7 +64,6 @@ const normalizedDelayedErrorAfterMs: number | undefined = optionalDelayedError.a
 const optionalRouteId: string = optionalRoute.id;
 const optionalMiddlewareId: string = optionalMiddleware.id;
 const optionalTransformId: string = optionalTransform.id;
-const optionalServiceMiddlewareId: string = optionalServiceMiddleware.id;
 const optionalServiceId: string = optionalService.id;
 const optionalToolId: string = optionalTool.id;
 const optionalAgentId: string = optionalAgent.id;
@@ -82,7 +76,6 @@ void normalizedDelayedErrorAfterMs;
 void optionalRouteId;
 void optionalMiddlewareId;
 void optionalTransformId;
-void optionalServiceMiddlewareId;
 void optionalServiceId;
 void optionalToolId;
 void optionalAgentId;

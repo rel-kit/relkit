@@ -1,9 +1,4 @@
-import {
-  defineConfig,
-  defineService,
-  defineServiceMiddleware,
-  type InvocationSource,
-} from "@relkit/app";
+import { defineConfig, defineService } from "@relkit/app";
 import { defineAgent } from "@relkit/agents";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
@@ -319,22 +314,9 @@ const toolOutput: InferOutput<typeof tool.target.output> = { ok: true };
 void toolInput;
 void toolOutput;
 
-const serviceMiddleware = defineServiceMiddleware({
-  id: "types.orders-policy",
-  handler: async ({ input: middlewareInput, context }, next) => {
-    const inputValue: unknown = middlewareInput;
-    const source: InvocationSource = context.invocation.source;
-    const continuation: Promise<void> = next({ actorId: "actor-1" });
-    await continuation;
-    void inputValue;
-    void source;
-  },
-});
-
 const service = defineService({
   id: "types.orders",
   functions: { lookup: child },
-  middleware: [serviceMiddleware],
 });
 const serviceInput: Parameters<typeof service.lookup.invoke>[0] = { id: "order-1" };
 const serviceOutput: Promise<InferOutput<typeof child.output>> =
@@ -349,11 +331,11 @@ const serviceToolOutput: Promise<InferOutput<typeof child.output>> = serviceTool
   id: "order-1",
 });
 const directToolOutput: Promise<InferOutput<typeof child.output>> = tool.invoke({ id: "order-1" });
-const serviceId: "types.orders" = service.lookup.service.ref.id;
+const originalMember: typeof child = service.lookup;
 void serviceOutput;
 void serviceToolOutput;
 void directToolOutput;
-void serviceId;
+void originalMember;
 
 // @ts-expect-error service members must be function descriptors
 defineService({ id: "types.invalid-service-member", functions: { broken: {} } });
@@ -361,7 +343,5 @@ defineService({ id: "types.invalid-service-member", functions: { broken: {} } })
 child.asTool();
 // @ts-expect-error service member invoke uses the original function input
 service.lookup.invoke({ orderId: "order-1" });
-// @ts-expect-error service declarations are immutable
-service.functions.lookup = child;
-// @ts-expect-error middleware declarations are immutable
-service.middleware?.push(serviceMiddleware);
+// @ts-expect-error direct service members are immutable
+service.lookup = child;

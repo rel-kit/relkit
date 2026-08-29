@@ -1,127 +1,63 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise, Ref } from "@relkit/contracts";
-import type { FunctionContext, FunctionRefAny } from "@relkit/functions";
+import type { DescriptorBase, DescriptorMetadata, Ref } from "@relkit/contracts";
+import type { EventDescriptorAny } from "@relkit/events";
+import type { FunctionRefAny } from "@relkit/functions";
 
 export interface ServiceRef<Id extends string = string> {
   readonly ref: Ref<"service", Id>;
 }
 
 export type ServiceRefAny = ServiceRef;
-
-export interface ServiceMiddlewareRef<Id extends string = string> {
-  readonly ref: {
-    readonly kind: "service-middleware";
-    readonly id: Id;
-  };
-}
-
-export type ServiceMiddlewareRefAny = ServiceMiddlewareRef;
-
-export type ServiceContextPatch = Readonly<Record<string, unknown>>;
-
-export interface ServiceMiddlewareInvocation<
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-> {
-  readonly input: Input;
-  readonly context: Context;
-}
-
-export type ServiceMiddlewareNext<Patch extends ServiceContextPatch = ServiceContextPatch> = (
-  patch?: Patch,
-) => Promise<void>;
-
-export type ServiceMiddlewareHandler<
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-  Patch extends ServiceContextPatch = ServiceContextPatch,
-> = (
-  invocation: ServiceMiddlewareInvocation<Input, Context>,
-  next: ServiceMiddlewareNext<Patch>,
-) => MaybePromise<void>;
-
-export interface ServiceMiddlewareDescriptor<
-  Id extends string = string,
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-  Patch extends ServiceContextPatch = ServiceContextPatch,
-> extends ServiceMiddlewareRef<Id> {
-  readonly kind: "service-middleware";
-  readonly id: Id;
-  readonly handler: ServiceMiddlewareHandler<Input, Context, Patch>;
-}
-
-export interface DefineServiceMiddlewareOptions<
-  Id extends string,
-  Input = unknown,
-  Context extends FunctionContext = FunctionContext,
-  Patch extends ServiceContextPatch = ServiceContextPatch,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly handler: ServiceMiddlewareHandler<Input, Context, Patch>;
-}
-
-export interface DefineServiceMiddleware {
-  <
-    const Id extends string,
-    Input = unknown,
-    Context extends FunctionContext = FunctionContext,
-    Patch extends ServiceContextPatch = ServiceContextPatch,
-  >(
-    options: DefineServiceMiddlewareOptions<Id, Input, Context, Patch>,
-  ): ServiceMiddlewareDescriptor<Id, Input, Context, Patch>;
-}
-
 export type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
+export type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
 
-export type NonEmptyServiceFunctionMap<Functions extends ServiceFunctionMap = ServiceFunctionMap> =
-  keyof Functions extends never ? never : Functions;
+declare const serviceTypes: unique symbol;
 
-export type ServiceMember<
-  ServiceId extends string = string,
-  Target extends FunctionRefAny = FunctionRefAny,
-> = Target & {
-  readonly service: ServiceRef<ServiceId>;
-};
-
-type ServiceMemberMap<ServiceId extends string, Functions extends ServiceFunctionMap> = {
-  readonly [Name in keyof Functions]: Functions[Name] extends FunctionRefAny
-    ? ServiceMember<ServiceId, Functions[Name]>
-    : never;
-};
+type PublicMembers<Functions extends ServiceFunctionMap, Events extends ServiceEventMap> = Readonly<
+  Functions & Events
+>;
 
 export type ServiceDescriptor<
   Id extends string,
   Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
-  Middleware extends readonly ServiceMiddlewareRefAny[] = readonly ServiceMiddlewareRefAny[],
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
 > = DescriptorBase<"service", Id> &
-  ServiceRef<Id> & {
-    readonly functions: Functions;
-    readonly middleware?: Middleware;
-  } & ServiceMemberMap<Id, Functions>;
-
-export type ServiceDescriptorAny = DescriptorBase<"service", string> &
-  ServiceRefAny & {
-    readonly functions: ServiceFunctionMap;
-    readonly middleware?: readonly ServiceMiddlewareRefAny[];
+  PublicMembers<Functions, Events> & {
+    readonly [serviceTypes]: {
+      readonly functions: Functions;
+      readonly events: Events;
+    };
   };
+
+export type ServiceDescriptorAny = DescriptorBase<"service", string>;
+
+export type ServiceFunctions<Service> = Service extends {
+  readonly [serviceTypes]: { readonly functions: infer Functions };
+}
+  ? Functions
+  : never;
+
+export type ServiceEvents<Service> = Service extends {
+  readonly [serviceTypes]: { readonly events: infer Events };
+}
+  ? Events
+  : never;
 
 export interface DefineServiceOptions<
   Id extends string,
-  Functions extends ServiceFunctionMap = ServiceFunctionMap,
-  Middleware extends readonly ServiceMiddlewareRefAny[] = readonly ServiceMiddlewareRefAny[],
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
 > extends DescriptorMetadata {
   readonly id?: Id;
-  readonly functions: NonEmptyServiceFunctionMap<Functions>;
-  readonly middleware?: Middleware;
+  readonly functions?: Functions;
+  readonly events?: Events;
 }
 
 export interface DefineService {
   <
     const Id extends string,
-    const Functions extends ServiceFunctionMap,
-    const Middleware extends readonly ServiceMiddlewareRefAny[] =
-      readonly ServiceMiddlewareRefAny[],
+    const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+    const Events extends ServiceEventMap = Readonly<Record<never, never>>,
   >(
-    options: DefineServiceOptions<Id, Functions, Middleware>,
-  ): ServiceDescriptor<Id, Functions, Middleware>;
+    options: DefineServiceOptions<Id, Functions, Events>,
+  ): ServiceDescriptor<Id, Functions, Events>;
 }
