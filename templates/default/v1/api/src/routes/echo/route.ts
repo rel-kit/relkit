@@ -1,6 +1,6 @@
 import { defineRoute } from "@relkit/app/routes";
-import echo from "@app/functions/echo.function.js";
+import echo from "@app/echo/service.js";
 
 export const POST = defineRoute({
-  target: echo,
+  target: echo.echo,
 });

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { invokeFunction } from "@relkit/testing";
-import orders from "@app/services/orders.service.js";
+import orders from "@app/orders/service.js";
 
 test("createOrder invokes pricing and publishes the order event", async () => {
   const published: unknown[] = [];

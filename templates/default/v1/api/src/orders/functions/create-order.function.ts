@@ -1,7 +1,7 @@
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import orderCreated from "@app/events/order-created.event.js";
-import priceOrder from "@app/functions/orders/price-order.function.js";
+import orderCreated from "@app/orders/events/order-created.event.js";
+import priceOrder from "@app/orders/functions/price-order.function.js";
 
 const orderInput = z.object({
   orderId: z.string().min(1),
