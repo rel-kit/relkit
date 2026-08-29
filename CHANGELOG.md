@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.0.2
+
+### Changes
+
+- chore(deps): bump the bun-dependencies group across 1 directory with 27 updates
+
 ## 0.0.1 — Breaking
 
 This pre-1.0 release intentionally breaks the previous authoring conventions:

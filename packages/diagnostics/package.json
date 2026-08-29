@@ -1,6 +1,6 @@
 {
   "name": "@relkit/diagnostics",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Unsupported internal RELKIT diagnostics; use @relkit/cli.",
   "license": "MIT",
   "repository": {
