@@ -1,6 +1,6 @@
 {
   "name": "@relkit/invocation",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Unsupported internal RELKIT invocation contracts; use @relkit/app.",
   "license": "MIT",
   "repository": {
