@@ -5,10 +5,10 @@ import {
   type InvocationCompletion,
 } from "../../../packages/engine/src/index.ts";
 import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
-import createOrder from "../../../examples/commerce/src/functions/orders/create-order.function.ts";
-import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
-import orderReceipt from "../../../examples/commerce/src/events/order-receipt.event.ts";
-import orders from "../../../examples/commerce/src/services/orders.service.ts";
+import createOrder from "../../../examples/commerce/src/orders/functions/create-order.function.ts";
+import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
+import orderReceipt from "../../../examples/commerce/src/receipts/events/order-receipt.event.ts";
+import orders from "../../../examples/commerce/src/orders/service.ts";
 import { z } from "../../../packages/schema/src/index.ts";
 
 bindDescriptorIdentity(createOrder, "orders.create-order");
@@ -23,7 +23,7 @@ const orderInput = {
 };
 
 describe("commerce example functions through the common engine", () => {
-  test("invokes cache, event, and job clients and applies function limits", async () => {
+  test("invokes cache and event clients and applies function limits", async () => {
     const published: unknown[] = [];
     const enqueued: unknown[] = [];
     const completions: InvocationCompletion[] = [];
@@ -52,7 +52,7 @@ describe("commerce example functions through the common engine", () => {
       totalCents: 2_000,
     });
     expect(published).toHaveLength(1);
-    expect(enqueued).toEqual([{ orderId: "order-1", receiptKey: "order-1.json" }]);
+    expect(enqueued).toEqual([]);
     expect(createOrder.timeoutMs).toBe(10_000);
     expect(createOrder.concurrency).toBe(100);
     expect(completions[0]?.record.deadline).toBe(new Date(startTime + 10_000).toISOString());

@@ -15,8 +15,8 @@ import {
 } from "../../../packages/graph/src/index.ts";
 import { createScheduler } from "../../../packages/providers-local/src/index.ts";
 import { createTestFakes, createTestJob } from "../../../packages/testing/src/index.ts";
-import sendReceiptJob from "../../../examples/commerce/src/jobs/send-receipt.job.ts";
-import sendReceipt from "../../../examples/commerce/src/functions/send-receipt.function.ts";
+import sendReceiptJob from "../../../examples/commerce/src/receipts/jobs/send-receipt.job.ts";
+import sendReceipt from "../../../examples/commerce/src/receipts/functions/send-receipt.function.ts";
 import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import { compileProject } from "../../compiler/fixture-runner.ts";
 
@@ -25,7 +25,7 @@ type ReceiptInput = { readonly orderId: string; readonly receiptKey: string };
 type ReceiptOutput = { readonly receiptId: string };
 type ReceiptTarget = InvocationTarget<ReceiptInput, ReceiptOutput>;
 
-bindDescriptorIdentity(sendReceipt, "send-receipt");
+bindDescriptorIdentity(sendReceipt, "receipts.send-receipt");
 
 describe("commerce receipt jobs", () => {
   test("projects the receipt queue, schedule, and target edges", async () => {
@@ -43,7 +43,7 @@ describe("commerce receipt jobs", () => {
     ]);
     expect(job).toMatchObject({
       kind: "job",
-      targetFunctionId: "send-receipt",
+      targetFunctionId: "receipts.send-receipt",
       schedule: [
         {
           id: "receipts.reconcile",
@@ -59,10 +59,9 @@ describe("commerce receipt jobs", () => {
         {
           kind: "targets-function",
           from: "receipts.send-job",
-          to: "send-receipt",
+          to: "receipts.send-receipt",
           role: "primary",
         },
-        { kind: "enqueues-job", from: "orders.create-order", to: "receipts.send-job" },
         {
           kind: "enqueues-job",
           from: "relkit.event.receipts.on-order-created.handler",
@@ -71,7 +70,10 @@ describe("commerce receipt jobs", () => {
       ]),
     );
     expect(plan.queues).toEqual([
-      expect.objectContaining({ id: "receipts.send-job", targetFunctionId: "send-receipt" }),
+      expect.objectContaining({
+        id: "receipts.send-job",
+        targetFunctionId: "receipts.send-receipt",
+      }),
     ]);
     expect(plan.schedules).toEqual([
       expect.objectContaining({
@@ -185,11 +187,11 @@ describe("commerce receipt jobs", () => {
       expect(events.find((event) => event.type === "invocation.completed")).toMatchObject({
         completion: {
           outcome: "success",
-          record: { functionId: "send-receipt", source: "job", attempt: 1 },
+          record: { functionId: "receipts.send-receipt", source: "job", attempt: 1 },
         },
       });
       expect(events.find((event) => event.type === "span.started")).toMatchObject({
-        record: { functionId: "send-receipt", source: "job" },
+        record: { functionId: "receipts.send-receipt", source: "job" },
       });
 
       await job.restart();

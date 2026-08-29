@@ -54,6 +54,8 @@ const forbiddenScope = new RegExp(
   ].join("|")}|[^/]+\\.rs)(?:[/.]|$)`,
   "i",
 );
+const legacyApplicationRoot =
+  /^src\/(?:env\.ts|(?:functions|events|services|agents|jobs|cache|buckets|tools|middleware|transforms|shared)(?:\/|$))/;
 
 test("covers every template and examples/install/Git combination", async () => {
   const root = await makeRoot();
@@ -96,7 +98,7 @@ test("covers every template and examples/install/Git combination", async () => {
             baseUrl: ".",
             paths: { "@app/*": ["src/*"] },
           });
-          expect(result.files.some((path) => path.startsWith("src/functions/"))).toBe(examples);
+          expect(result.files.some((path) => path.startsWith("src/hello/functions/"))).toBe(true);
           expect(result.files.some((path) => path.startsWith("tests/"))).toBe(examples);
           expect(await scanGeneratedProject(result.destination)).toEqual([]);
           expect(
@@ -367,6 +369,7 @@ async function scanGeneratedProject(root: string): Promise<string[]> {
   const violations: string[] = [];
   const sourceRoot = join(root, "src");
   for (const path of await projectFiles(root)) {
+    if (legacyApplicationRoot.test(path)) violations.push(`${path}:legacy-application-root`);
     if (forbiddenScope.test(path)) violations.push(`${path}:out-of-scope`);
     if (!/\.(?:ts|tsx|js|json|md|toml|yaml|yml)$/.test(path)) continue;
     const text = await readFile(join(root, path), "utf8");

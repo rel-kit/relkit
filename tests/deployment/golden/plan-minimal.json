@@ -1,6 +1,6 @@
 {
   "contractVersion": 2,
-  "graphHash": "sha256:6c12be99b392c61bdbf99f00fe6e1a3c162b39d2dff7c66753c6aaae5b3e6b44",
+  "graphHash": "sha256:4779e6e51a2a0e1116465122153de67d833809b18327aa878c5d7939555ac390",
   "application": {
     "id": "minimal-app",
     "image": {
@@ -30,7 +30,7 @@
         "id": "hello.route",
         "method": "GET",
         "path": "/hello/:name",
-        "targetFunctionId": "hello"
+        "targetFunctionId": "hello.say-hello"
       }
     ],
     "configurationNames": [

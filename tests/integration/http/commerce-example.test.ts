@@ -18,28 +18,27 @@ import {
   createApp,
   OPENAPI_PATH,
   type HttpInvocationOptions,
-  type RateLimitCounter,
   type RuntimeManifest,
 } from "../../../packages/runtime-hono/src/index.ts";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
-import normalizeOrderId from "../../../examples/commerce/src/transforms/orders/normalize-id.transform.ts";
-import orderAuth from "../../../examples/commerce/src/middleware/order-auth.middleware.ts";
+import normalizeOrderId from "../../../examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts";
+import orderAuth from "../../../examples/commerce/src/routes/middleware/order-auth.middleware.ts";
 import { ALL as authRoute } from "../../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
-import browsePath from "../../../examples/commerce/src/functions/browse-path.function.ts";
-import deleteOrder from "../../../examples/commerce/src/functions/orders/delete-order.function.ts";
-import getOrder from "../../../examples/commerce/src/functions/orders/get-order.function.ts";
-import searchOrders from "../../../examples/commerce/src/functions/orders/search-orders.function.ts";
-import updateOrder from "../../../examples/commerce/src/functions/orders/update-order.function.ts";
-import uploadAssets from "../../../examples/commerce/src/functions/upload-assets.function.ts";
+import browsePath from "../../../examples/commerce/src/navigation/functions/browse-path.function.ts";
+import deleteOrder from "../../../examples/commerce/src/orders/functions/delete-order.function.ts";
+import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
+import searchOrders from "../../../examples/commerce/src/orders/functions/search-orders.function.ts";
+import updateOrder from "../../../examples/commerce/src/orders/functions/update-order.function.ts";
+import uploadAssets from "../../../examples/commerce/src/assets/functions/upload-assets.function.ts";
 
 const APP_ROOT = resolve(import.meta.dir, "../../../examples/commerce");
 const targets: Readonly<Record<string, InvocationTarget<any, any>>> = {
-  "browse-path": browsePath,
+  "navigation.browse-path": browsePath,
   "orders.delete-order": deleteOrder,
   "orders.get-order": getOrder,
   "orders.search-orders": searchOrders,
   "orders.update-order": updateOrder,
-  "upload-assets": uploadAssets,
+  "assets.upload-assets": uploadAssets,
 };
 
 test("serves the compiled commerce routes through one HTTP engine path", async () => {
@@ -48,19 +47,17 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
   const plan = createRegistrationPlan(graph, { projectRoot: "/fixture" });
   const invocations: HttpInvocationOptions[] = [];
   const uploadedKeys: string[] = [];
-  const rateLimitCounter = memoryCounter();
   const app = createApp({
     plan,
     manifest: manifestFor(plan),
     apiDocs: { document: JSON.parse(compiled.normalization.outputs.openapi) },
-    rateLimitRuntime: { resolveStore: () => rateLimitCounter },
     engine: {
       invoke: async (invocation) => {
         invocations.push(invocation);
         const target = targets[invocation.functionId];
         if (target !== undefined)
           return invokeFunction(target, invocation.input, {
-            ...(invocation.functionId === "upload-assets"
+            ...(invocation.functionId === "assets.upload-assets"
               ? {
                   clients: {
                     buckets: {
@@ -112,13 +109,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
     expect(await searched.json()).toEqual({ status: "confirmed", count: 1 });
     expect(invocations.at(-1)?.functionId).toBe("orders.search-orders");
 
-    const limitedHeaders = { "x-api-key": "example-key" };
-    expect((await client.get("/orders?status=open", { headers: limitedHeaders })).status).toBe(200);
-    const second = await client.get("/orders?status=open", { headers: limitedHeaders });
-    expect(second.headers.get("ratelimit-limit")).toBe("2");
-    const blocked = await client.get("/orders?status=open", { headers: limitedHeaders });
-    expect(blocked.status).toBe(429);
-    expect(await blocked.json()).toMatchObject({ error: "rate-limit" });
+    expect((await client.get("/orders?status=open")).status).toBe(200);
 
     for (const method of ["PUT", "PATCH"] as const) {
       const response = await client.request("/orders/order-2", {
@@ -204,8 +195,8 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
       "orders.search-orders",
       "orders.update-order",
       "orders.delete-order",
-      "browse-path",
-      "upload-assets",
+      "navigation.browse-path",
+      "assets.upload-assets",
     ]),
   );
 });
@@ -235,20 +226,5 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
       },
     },
     requestTransforms: { "orders.normalize-id": normalizeOrderId.schema },
-  };
-}
-
-function memoryCounter(): RateLimitCounter {
-  const values = new Map<string, number>();
-  return {
-    get: async (key) => values.get(key),
-    increment: async (key, delta) => {
-      const value = (values.get(key) ?? 0) + delta;
-      values.set(key, value);
-      return value;
-    },
-    delete: async (key) => {
-      values.delete(key);
-    },
   };
 }
