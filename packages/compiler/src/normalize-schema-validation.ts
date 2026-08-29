@@ -43,6 +43,7 @@ function requiredSchemaFields(kind: string): readonly string[] {
         event: ["payload"],
         cache: ["key", "value"],
         agent: ["input", "output"],
+        error: ["data"],
       } as Readonly<Record<string, readonly string[]>>
     )[kind] ?? []
   );

@@ -11,7 +11,6 @@ const SOURCE_SCOPED_KINDS = new Set([
   "app",
   "constants",
   "prompt",
-  "data-model",
   "function",
   "route",
   "service",
@@ -20,7 +19,6 @@ const SOURCE_SCOPED_KINDS = new Set([
   "error",
   "middleware",
   "transform",
-  "service-middleware",
 ]);
 export function normalizeSourceIdentities(
   work: NormalizationWork,
@@ -82,8 +80,7 @@ function candidate(descriptor: NormalizedDescriptor): IdentityCandidate {
   const presence = descriptor.exportFact?.errorBinding?.id ?? factory?.id;
   const inferred =
     SOURCE_SCOPED_KINDS.has(descriptor.kind) &&
-    ((descriptor.kind === "data-model" && descriptor.id.startsWith("unbound.")) ||
-      presence === "omitted" ||
+    (presence === "omitted" ||
       ((presence === undefined || descriptor.kind === "middleware") &&
         descriptor.id.startsWith("unbound.")));
   return { descriptor, originalId: descriptor.id, inferred };
@@ -91,14 +88,6 @@ function candidate(descriptor: NormalizedDescriptor): IdentityCandidate {
 function derive(descriptor: NormalizedDescriptor, work: NormalizationWork): string | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const fact = descriptor.exportFact;
-  if (descriptor.kind === "data-model")
-    return encodeSourceId({
-      kind: "data-model",
-      source: descriptor.source.file,
-      ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
-      exportName: descriptor.exportName,
-      exportKind: descriptor.exportKind,
-    });
   if (fact === undefined) return undefined;
   if (descriptor.kind === "app") return work.input.appId;
   const binding = fact?.binding ?? fact?.factory?.binding;

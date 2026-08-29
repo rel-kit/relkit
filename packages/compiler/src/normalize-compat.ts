@@ -148,7 +148,7 @@ function readVersion(value: unknown): number {
 export function schemaEntries(descriptor: NormalizedDescriptor): readonly [string, unknown][] {
   const value = descriptor.value;
   if (!isRecord(value)) return [];
-  return ["input", "output", "payload", "key", "value"].flatMap((field) =>
+  return ["input", "output", "payload", "key", "value", "data"].flatMap((field) =>
     value[field] === undefined
       ? []
       : [[schemaKey(descriptor.id, field), value[field]] as [string, unknown]],

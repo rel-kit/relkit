@@ -1,6 +1,6 @@
 import { add, targetFields, validateDependencies } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";
-import { id, isRecord, refId, refKind } from "./normalize-utils.js";
+import { id, isRecord, refKind } from "./normalize-utils.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -8,11 +8,8 @@ import {
 } from "./normalize-types.js";
 import { validateRateLimitStore } from "./normalize-rate-limit.js";
 
-const SERVICE_OWNERSHIP_CODE = "RELKIT_SERVICE_OWNERSHIP";
-
 /** Resolves descriptor, middleware, and named-transform references without importing code. */
 export function passReferences(work: NormalizationWork): void {
-  const serviceOwners = new Map<string, NormalizedDescriptor>();
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     for (const [name, kind] of targetFields(descriptor.kind)) {
@@ -31,7 +28,7 @@ export function passReferences(work: NormalizationWork): void {
       collectTransforms(work, descriptor, value.request);
       validateRateLimitStore(work, descriptor, value.rateLimit);
     }
-    if (descriptor.kind === "service") validateService(work, descriptor, value, serviceOwners);
+    if (descriptor.kind === "service") validateService(work, descriptor, value);
   }
 
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "transform")) {
@@ -45,46 +42,19 @@ function validateService(
   work: NormalizationWork,
   service: NormalizedDescriptor,
   value: Record<string, unknown>,
-  owners: Map<string, NormalizedDescriptor>,
 ): void {
-  const functions = isRecord(value.functions) ? value.functions : undefined;
-  if (functions === undefined || Object.keys(functions).length === 0) {
-    add(work, service, NORMALIZE_CODES.descriptor, "A service must declare at least one function.");
-  } else {
-    for (const target of Object.values(functions)) {
-      const resolved = referenceFor(work, target, "function");
+  for (const target of Object.values(value)) {
+    const kind = refKind(target);
+    if (kind === "function" || kind === "event") {
+      const resolved = referenceFor(work, target, kind);
       if (resolved === undefined) {
         add(
           work,
           service,
           NORMALIZE_CODES.missingTarget,
-          "Service member does not resolve to a function.",
+          `Service member does not resolve to a ${kind}.`,
         );
-        continue;
       }
-      const previous = owners.get(resolved.id);
-      if (previous !== undefined && previous.id !== service.id) {
-        add(
-          work,
-          service,
-          SERVICE_OWNERSHIP_CODE,
-          `Function "${resolved.id}" is already owned by service "${previous.id}".`,
-          "error",
-          previous,
-        );
-      } else {
-        owners.set(resolved.id, service);
-      }
-    }
-  }
-  if (value.middleware === undefined) return;
-  if (!Array.isArray(value.middleware)) {
-    add(work, service, NORMALIZE_CODES.descriptor, "Service middleware must be an array.");
-    return;
-  }
-  for (const entry of value.middleware) {
-    if (refKind(entry) !== "service-middleware" || refId(entry) === undefined) {
-      add(work, service, NORMALIZE_CODES.descriptor, "Service middleware reference is invalid.");
     }
   }
 }

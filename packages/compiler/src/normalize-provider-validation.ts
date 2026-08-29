@@ -28,15 +28,6 @@ export function validateProviderSingletons(work: NormalizationWork): void {
       "At most one Better Auth capability may be registered.",
     );
   }
-  const dataModels = work.descriptors.filter((entry) => entry.kind === "data-model");
-  for (const descriptor of dataModels.slice(1)) {
-    add(
-      work,
-      descriptor,
-      NORMALIZE_CODES.dataModelDuplicate,
-      "Exactly one application data model may be exported.",
-    );
-  }
 }
 
 export function validateUniqueBucketProfiles(work: NormalizationWork): void {
