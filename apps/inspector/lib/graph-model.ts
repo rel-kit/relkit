@@ -5,6 +5,8 @@ export type GraphRelationship = "declared" | "observed";
 export interface GraphNode {
   readonly id: string;
   readonly kind: string;
+  readonly domainId?: string;
+  readonly exposure?: "public" | "internal";
 }
 
 export interface GraphEdge {
@@ -94,7 +96,19 @@ function readNodes(value: readonly unknown[]): readonly GraphNode[] {
       const node = record(item);
       const id = text(node?.id);
       const kind = text(node?.kind);
-      return id === undefined || kind === undefined ? [] : [{ id, kind }];
+      const domainId = text(node?.domainId);
+      const exposure =
+        node?.exposure === "public" || node?.exposure === "internal" ? node.exposure : undefined;
+      return id === undefined || kind === undefined
+        ? []
+        : [
+            {
+              id,
+              kind,
+              ...(domainId === undefined ? {} : { domainId }),
+              ...(exposure === undefined ? {} : { exposure }),
+            },
+          ];
     })
     .sort(compareNodes);
 }
