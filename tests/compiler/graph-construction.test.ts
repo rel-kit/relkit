@@ -70,10 +70,6 @@ describe("compiler graph construction", () => {
       description: "Order operations",
       tags: ["orders"],
       functions: { get: target, helper, authorize: auth },
-      middleware: [
-        { ref: { kind: "service-middleware", id: "orders.context" } },
-        { ref: { kind: "service-middleware", id: "orders.audit" } },
-      ],
     });
     const result = normalizeCompilation({
       descriptors: [
@@ -154,12 +150,12 @@ describe("compiler graph construction", () => {
       title: "Orders",
       description: "Order operations",
       tags: ["orders"],
-      members: [
+      functions: [
+        { name: "authorize", functionId: "orders.auth" },
         { name: "get", functionId: "orders.get" },
         { name: "helper", functionId: "orders.helper" },
-        { name: "authorize", functionId: "orders.auth" },
       ],
-      middleware: [{ id: "orders.context" }, { id: "orders.audit" }],
+      events: [],
     });
 
     expect(result.graph?.edges).toEqual(
@@ -184,28 +180,26 @@ describe("compiler graph construction", () => {
         { kind: "uses-hook", from: "orders.get", to: "orders.get.before", phase: "before" },
         { kind: "uses-hook", from: "orders.get", to: "orders.get.after", phase: "after" },
         {
-          kind: "contains-function",
-          from: "orders",
-          to: "orders.get",
-          member: "get",
-          order: 0,
-        },
-        {
-          kind: "contains-function",
-          from: "orders",
-          to: "orders.helper",
-          member: "helper",
-          order: 1,
-        },
-        {
-          kind: "contains-function",
+          kind: "exposes-function",
           from: "orders",
           to: "orders.auth",
           member: "authorize",
+          order: 0,
+        },
+        {
+          kind: "exposes-function",
+          from: "orders",
+          to: "orders.get",
+          member: "get",
+          order: 1,
+        },
+        {
+          kind: "exposes-function",
+          from: "orders",
+          to: "orders.helper",
+          member: "helper",
           order: 2,
         },
-        { kind: "uses-service-middleware", from: "orders", to: "orders.context", order: 0 },
-        { kind: "uses-service-middleware", from: "orders", to: "orders.audit", order: 1 },
       ]),
     );
     expect(result.graph?.edges).not.toContainEqual({
@@ -215,7 +209,7 @@ describe("compiler graph construction", () => {
     });
   });
 
-  test("rejects a function declared by two services", () => {
+  test("keeps direct descriptor normalization independent of source-domain validation", () => {
     const target = defineFunction({
       id: "orders.get",
       input,
@@ -231,8 +225,6 @@ describe("compiler graph construction", () => {
     const result = normalizeCompilation({
       descriptors: [target, service("orders"), service("billing")],
     });
-    expect(result.diagnostics).toContainEqual(
-      expect.objectContaining({ code: "RELKIT_SERVICE_OWNERSHIP", descriptorId: "billing" }),
-    );
+    expect(result.diagnostics).toEqual([]);
   });
 });

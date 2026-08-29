@@ -5,7 +5,7 @@ test("compiles every inferred declaration kind and binds canonical identities", 
   const sorted = await compileFixture("valid-inferred-identities");
   expect(sorted.diagnostics).toEqual([]);
   expect(sorted.normalization.descriptors.map(({ kind, id }) => `${kind}:${id}`).sort()).toEqual([
-    "agent:support",
+    "agent:orders.support",
     "app:inferred-app",
     "function:files.read-files",
     "function:health.check",
@@ -16,15 +16,17 @@ test("compiles every inferred declaration kind and binds canonical identities", 
     "route:route.get.files.catch-all-parts",
     "route:route.get.orders.by-order-id",
     "route:route.get.root",
+    "service:files",
+    "service:health",
     "service:orders",
-    "tool:lookup-order",
-    "transform:orders.normalize-id",
+    "tool:orders.lookup-order",
+    "transform:normalize-id",
   ]);
 
   const graph = sorted.normalization.graph!;
   expect(graph.nodes.find(({ kind, id }) => kind === "service" && id === "orders")).toMatchObject({
-    members: [{ name: "getOrder", functionId: "orders.get-order" }],
-    middleware: [{ id: "orders.context" }],
+    functions: [{ name: "getOrder", functionId: "orders.get-order" }],
+    events: [],
   });
   expect(graph.nodes.filter(({ kind }) => kind === "trigger").map(({ id }) => id)).toEqual([
     "health.custom-route",
@@ -39,19 +41,18 @@ test("compiles every inferred declaration kind and binds canonical identities", 
   for (const id of [
     "orders",
     "orders.get-order",
-    "orders.context",
     "orders-auth",
-    "orders.normalize-id",
-    "lookup-order",
+    "normalize-id",
+    "orders.lookup-order",
     "route.get.root",
     "route.get.orders.by-order-id",
     "route.get.files.catch-all-parts",
     "health.custom-route",
-    "functions.orders.get-order-function.InvalidError",
+    "orders.functions.get-order-function.InvalidError",
   ]) {
     expect(sorted.manifest).toContain(`, "${id}");`);
   }
-  expect(sorted.manifest).toContain('["functions"]["getOrder"]');
+  expect(sorted.manifest).toContain('["getOrder"]');
   expect(sorted.manifest).toContain('["errors"][0]');
   expect(sorted.manifest).toContain('["target"]');
 });

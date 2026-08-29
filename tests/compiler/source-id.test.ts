@@ -9,17 +9,17 @@ import {
 
 describe("source-scoped ID encoders", () => {
   test("strips conventional source structure and normalizes hierarchy", () => {
-    expect(encodeSourceHierarchy("src\\functions\\orders\\getOrder.function.ts", "function")).toBe(
+    expect(encodeSourceHierarchy("src\\orders\\functions\\getOrder.function.ts", "function")).toBe(
       "orders.get-order",
     );
-    expect(encodeSourceHierarchy("src/services/orders.service.ts", "service")).toBe("orders");
-    expect(encodeSourceHierarchy("src/functions/orders/index.ts", "function")).toBe("orders");
+    expect(encodeSourceHierarchy("src/orders/service.ts", "service")).toBe("orders");
+    expect(encodeSourceHierarchy("src/orders/functions/index.ts", "function")).toBe("orders");
   });
 
   test("uses named bindings, default file stems, and explicit IDs", () => {
     expect(
       encodeExportId({
-        source: "src/functions/orders/get-order.function.ts",
+        source: "src/orders/functions/get-order.function.ts",
         kind: "function",
         exportName: "getOrder",
         exportKind: "named",
@@ -28,7 +28,7 @@ describe("source-scoped ID encoders", () => {
     ).toBe("orders.get-order");
     expect(
       encodeExportId({
-        source: "src/functions/orders/get-order.function.ts",
+        source: "src/orders/functions/get-order.function.ts",
         kind: "function",
         exportName: "default",
         exportKind: "default",
@@ -36,7 +36,7 @@ describe("source-scoped ID encoders", () => {
     ).toBe("orders.get-order");
     expect(
       encodeExportId({
-        source: "src/functions/orders/get-order.function.ts",
+        source: "src/orders/functions/get-order.function.ts",
         kind: "function",
         exportName: "getOrder",
         exportKind: "named",
@@ -47,10 +47,12 @@ describe("source-scoped ID encoders", () => {
   });
 
   test("encodes errors and service members with explicit precedence", () => {
-    expect(encodeErrorId("src/errors/orders.error.ts", "InvalidError")).toBe("orders.InvalidError");
-    expect(encodeErrorId("src/errors/orders.error.ts", "InvalidError", "orders.invalid")).toBe(
-      "orders.invalid",
+    expect(encodeErrorId("src/orders/errors/order.error.ts", "InvalidError")).toBe(
+      "orders.order.InvalidError",
     );
+    expect(
+      encodeErrorId("src/orders/errors/order.error.ts", "InvalidError", "orders.invalid"),
+    ).toBe("orders.invalid");
     expect(encodeMemberId("orders", "getOrder")).toBe("orders.get-order");
     expect(encodeMemberId("orders", "getOrder", "orders.lookup")).toBe("orders.lookup");
   });

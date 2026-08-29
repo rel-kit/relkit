@@ -38,6 +38,7 @@ export interface FixtureCompilation {
   readonly temporaryRoot: string;
   readonly evaluator: EvaluatorResponse;
   readonly extracted: readonly ExtractedDescriptor[];
+  readonly sources: readonly { readonly fileName: string; readonly text: string }[];
   readonly diagnostics: readonly Diagnostic[];
   readonly diagnosticsBytes: string;
   readonly graphBytes: string;
@@ -132,6 +133,7 @@ export async function compileProject(
       temporaryRoot,
       evaluator,
       extracted,
+      sources: discoverySources,
       diagnostics: stableDiagnostics,
       diagnosticsBytes: `${canonicalJson(stableDiagnostics)}\n`,
       graphBytes,
