@@ -29,14 +29,14 @@
     }
   },
   "dependencies": {
-    "@effect/platform-bun": "4.0.0-rc.112",
-    "@effect/platform-node-shared": "4.0.0-rc.112",
+    "@effect/platform-bun": "4.0.0-beta.107",
+    "@effect/platform-node-shared": "4.0.0-beta.107",
     "@relkit/config": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/graph": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/observability": "workspace:*",
-    "effect": "4.0.0-rc.112"
+    "effect": "4.0.0-beta.107"
   },
   "scripts": {
     "build": "tsc -b",

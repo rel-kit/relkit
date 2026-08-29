@@ -6,8 +6,15 @@ updates:
       interval: weekly
       day: monday
     groups:
+      effect-dependencies:
+        patterns: ["effect", "@effect/*"]
       bun-dependencies:
         patterns: ["*"]
+        exclude-patterns: ["effect", "@effect/*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "@types/bun"
+        versions: ["1.4.x"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
