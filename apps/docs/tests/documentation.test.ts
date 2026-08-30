@@ -110,7 +110,7 @@ test("builds and starts from the repository root on Railway", async () => {
   expect(manifest.scripts.start).toBe("next start --hostname 0.0.0.0");
   expect(railway.build).toEqual({
     builder: "RAILPACK",
-    buildCommand: "bun --cwd=apps/docs run build",
+    buildCommand: "bunx turbo run build --filter=@relkit/docs",
   });
   expect(railway.deploy).toMatchObject({
     startCommand: "bun --cwd=apps/docs run start",
