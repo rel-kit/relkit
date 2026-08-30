@@ -1,8 +1,8 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "builder": "RAILPACK",
-    "buildCommand": "bunx turbo run build --filter=@relkit/docs"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.docs"
   },
   "deploy": {
     "startCommand": "bun --cwd=apps/docs run start",
