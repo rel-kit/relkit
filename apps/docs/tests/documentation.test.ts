@@ -103,14 +103,14 @@ test("builds and starts from the repository root on Railway", async () => {
     scripts: Record<string, string>;
   };
   const railway = (await Bun.file(resolve(import.meta.dir, "../../../railway.json")).json()) as {
-    build: { builder: string; buildCommand: string };
+    build: { builder: string; dockerfilePath: string };
     deploy: { startCommand: string; healthcheckPath: string };
   };
 
   expect(manifest.scripts.start).toBe("next start --hostname 0.0.0.0");
   expect(railway.build).toEqual({
-    builder: "RAILPACK",
-    buildCommand: "bunx turbo run build --filter=@relkit/docs",
+    builder: "DOCKERFILE",
+    dockerfilePath: "Dockerfile.docs",
   });
   expect(railway.deploy).toMatchObject({
     startCommand: "bun --cwd=apps/docs run start",
