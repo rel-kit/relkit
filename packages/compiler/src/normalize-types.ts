@@ -30,7 +30,6 @@ export type {
   NormalizationSource,
   RuntimeReference,
 } from "./normalize-public-types.js";
-/** Stable diagnostics emitted by the normalization stage. */
 export const NORMALIZE_CODES = Object.freeze({
   descriptor: "RELKIT_DESCRIPTOR_INVALID",
   id: "RELKIT_ID_INVALID",
@@ -58,11 +57,14 @@ export const NORMALIZE_CODES = Object.freeze({
   middlewareOutput: "RELKIT_MIDDLEWARE_OUTPUT_INCOMPATIBLE",
   response: "RELKIT_ROUTE_RESPONSE_INCOMPATIBLE",
   jobInput: "RELKIT_JOB_INPUT_INCOMPATIBLE",
-  selector: "RELKIT_EVENT_SELECTOR_EMPTY",
   eventName: "RELKIT_EVENT_NAME_UNKNOWN",
-  eventListenerId: "RELKIT_EVENT_LISTENER_ID_REQUIRED",
-  wildcard: "RELKIT_EVENT_WILDCARD_RESTRICTED",
   eventTarget: "RELKIT_EVENT_TARGET_INCOMPATIBLE",
+  eventTriggerCollision: "RELKIT_EVENT_TRIGGER_ID_COLLISION",
+  eventOnlyTarget: "RELKIT_EVENT_FUNCTION_TARGET_INVALID",
+  eventFunctionOption: "RELKIT_EVENT_FUNCTION_OPTION_INVALID",
+  eventFunctionResult: "RELKIT_EVENT_FUNCTION_RESULT_INVALID",
+  publishes: "RELKIT_EVENT_PUBLICATION_UNKNOWN",
+  publishesDuplicate: "RELKIT_EVENT_PUBLICATION_DUPLICATE",
   toolTarget: "RELKIT_TOOL_TARGET_INCOMPATIBLE",
   agentTool: "RELKIT_AGENT_TOOL_INVALID",
   model: "RELKIT_MODEL_SELECTOR_INVALID",
@@ -80,7 +82,6 @@ export const NORMALIZE_CODES = Object.freeze({
   boundary: "RELKIT_DOMAIN_BOUNDARY",
   appDuplicate: "RELKIT_APP_DUPLICATE",
 } as const);
-/** The ordered pass names required by v3 Section 11.4. */
 export const VALIDATION_PASSES = Object.freeze([
   "extract descriptor values",
   "assign source locations",
@@ -91,8 +92,8 @@ export const VALIDATION_PASSES = Object.freeze([
   "validate schema availability and JSON Schema generation",
   "validate route mapping compatibility",
   "validate job input compatibility",
-  "expand event selectors",
-  "validate event target compatibility",
+  "validate event functions and publications",
+  "validate exact event targets",
   "validate tool target compatibility",
   "validate agent tools and model selectors",
   "validate provider profiles",
@@ -160,7 +161,6 @@ export interface NormalizationWork {
   middlewareReferences: Map<string, NormalizedDescriptor>;
   transformReferences: Map<string, NormalizedDescriptor>;
   schemas: Map<string, JsonValue>;
-  selectorExpansions: Map<string, readonly string[]>;
   nodes: GraphNode[];
   edges: GraphEdge[];
   observedEdges: ObservedEdge[];

@@ -13,6 +13,19 @@ export function passSchemas(work: NormalizationWork): void {
       validateSchema(work, descriptor, key, value);
     }
     const value = isRecord(descriptor.value) ? descriptor.value : {};
+    if (
+      descriptor.kind === "function" &&
+      value.invocationMode === "event-only" &&
+      typeof value.event === "string"
+    ) {
+      const event = work.descriptors.find(
+        (entry) => entry.kind === "event" && entry.id === value.event,
+      );
+      const eventValue = isRecord(event?.value) ? event.value : {};
+      if (eventValue.input !== undefined) {
+        validateSchema(work, descriptor, schemaKey(descriptor.id, "input"), eventValue.input);
+      }
+    }
     for (const field of requiredSchemaFields(descriptor.kind)) {
       if (value[field] === undefined)
         validateSchema(work, descriptor, schemaKey(descriptor.id, field), value[field]);
@@ -40,7 +53,7 @@ function requiredSchemaFields(kind: string): readonly string[] {
       {
         function: ["input", "output"],
         job: ["input"],
-        event: ["payload"],
+        event: ["input"],
         cache: ["key", "value"],
         agent: ["input", "output"],
         error: ["data"],

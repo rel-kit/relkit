@@ -21,7 +21,7 @@ import { validateJob } from "./normalize-job-validation.js";
 import { bindRouteFile } from "./normalize-route-file.js";
 import { inferRouteContract } from "./normalize-route-inference.js";
 import { validateRateLimit } from "./normalize-rate-limit.js";
-import { normalizeEventListeners } from "./normalize-event-listener.js";
+import { normalizeEventFunctions } from "./normalize-event-function.js";
 import { normalizeSourceIdentities } from "./normalize-source-identities.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 import { normalizeSelector } from "./normalize-model-selection.js";
@@ -58,7 +58,7 @@ export function passNormalize(work: NormalizationWork): void {
     return { ...descriptor, value };
   });
   const identified = normalizeSourceIdentities(work, prepared);
-  work.descriptors = normalizeEventListeners(
+  work.descriptors = normalizeEventFunctions(
     work,
     identified.map((descriptor) => {
       const value = isRecord(descriptor.value) ? { ...descriptor.value } : {};
@@ -127,6 +127,21 @@ export function passLocal(work: NormalizationWork): void {
     if (descriptor.kind === "job" || descriptor.kind === "event-trigger")
       validateRetry(work, descriptor, value, descriptor.kind === "job");
     if (descriptor.kind === "job") validateJob(work, descriptor, value);
+    if (descriptor.kind === "function" && value.invocationMode === "event-only") {
+      for (const field of ["input", "output", "tool", "trigger"] as const) {
+        if (descriptor.exportFact?.factory?.options.includes(field)) {
+          add(
+            work,
+            descriptor,
+            NORMALIZE_CODES.eventFunctionOption,
+            `Event function "${descriptor.id}" cannot declare ${field}.`,
+            "error",
+            undefined,
+            `Remove ${field}; the event contract supplies input and successful output is void.`,
+          );
+        }
+      }
+    }
     if (descriptor.kind === "event" && !positive(value.version))
       add(
         work,
