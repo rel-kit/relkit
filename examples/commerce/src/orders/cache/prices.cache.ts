@@ -1,11 +1,12 @@
 import { defineCache } from "@relkit/app/cache";
-import { priceKey, priceValue } from "@app/platform/schemas.js";
+import { z } from "@relkit/app/schema";
 
 const prices = defineCache({
   id: "orders.prices",
   profile: "default",
-  key: priceKey,
-  value: priceValue,
+  key: z.object({ sku: z.string() }),
+  value: z.number().int().nonnegative(),
+
   defaultTtlMs: 60_000,
   maxTtlMs: 300_000,
 });

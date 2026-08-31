@@ -4,7 +4,7 @@ import { orderCancelledPayload } from "@app/platform/schemas.js";
 const orderCancelled = defineEvent({
   id: "orders.cancelled",
   version: 1,
-  payload: orderCancelledPayload,
+  input: orderCancelledPayload,
   title: "Order cancelled",
 });
 
