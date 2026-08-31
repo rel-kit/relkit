@@ -20,7 +20,7 @@ export function FunctionContract({
             <p className="eyebrow">FUNCTION CONTRACT</p>
             <h2 id="function-contract-heading">{text(node.id) || "Unknown function"}</h2>
           </div>
-          <span className="badge">{text(node.kind) || "function"}</span>
+          <span className="badge">{text(node.invocationMode) || "callable"}</span>
         </div>
         <dl className="route-meta">
           <div>

@@ -98,14 +98,18 @@ export function FunctionDetailClient() {
         <span className="badge">{text(snapshot.node.id) || id}</span>
       </header>
       <FunctionContract {...snapshot} />
-      <FunctionInvocation
-        functionId={id}
-        generationId={snapshot.generationId}
-        graphHash={snapshot.graphHash}
-        inputSchema={snapshot.node.input}
-        invoke={(input) => invokeFunction(api, input)}
-        onComplete={(_result: FunctionInvocationResult) => loadSignals()}
-      />
+      {snapshot.node.invocationMode === "event-only" ? (
+        <p className="supporting-copy">This function runs only through event delivery or replay.</p>
+      ) : (
+        <FunctionInvocation
+          functionId={id}
+          generationId={snapshot.generationId}
+          graphHash={snapshot.graphHash}
+          inputSchema={snapshot.node.input}
+          invoke={(input) => invokeFunction(api, input)}
+          onComplete={(_result: FunctionInvocationResult) => loadSignals()}
+        />
+      )}
       <FunctionSignals logs={logs} traces={traces} />
     </div>
   );

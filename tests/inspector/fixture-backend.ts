@@ -84,6 +84,7 @@ const graph = {
     },
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.create",
       input: {
         type: "object",
@@ -110,6 +111,7 @@ const graph = {
     },
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.get",
       input: { type: "object", properties: { orderId: schema("string") } },
       output: {
@@ -121,9 +123,10 @@ const graph = {
     },
     {
       kind: "function",
+      invocationMode: "event-only",
       id: "orders.project-order-change",
-      input: { type: "object", properties: { eventId: schema("string") } },
-      output: { type: "object" },
+      input: { type: "object", properties: { orderId: schema("string") } },
+      output: { "x-relkit-void": true },
       source: source("src/functions/project-order-change.function.ts", 4),
     },
     {
@@ -181,7 +184,7 @@ const graph = {
       kind: "event",
       id: "orders.created",
       version: 1,
-      payload: { type: "object", properties: { orderId: schema("string") } },
+      input: { type: "object", properties: { orderId: schema("string") } },
       sensitiveFields: ["customerEmail"],
       source: source("src/events/order-created.event.ts", 3),
     },
@@ -189,14 +192,14 @@ const graph = {
       kind: "event",
       id: "orders.updated",
       version: 1,
-      payload: { type: "object", properties: { orderId: schema("string") } },
+      input: { type: "object", properties: { orderId: schema("string") } },
       source: source("src/events/order-updated.event.ts", 3),
     },
     {
       kind: "event",
       id: "orders.cancelled",
       version: 1,
-      payload: { type: "object", properties: { orderId: schema("string") } },
+      input: { type: "object", properties: { orderId: schema("string") } },
       source: source("src/events/order-cancelled.event.ts", 3),
     },
     {
@@ -205,7 +208,8 @@ const graph = {
       triggerType: "event",
       targetFunctionId: "orders.project-order-change",
       config: {
-        expansion: ["orders.cancelled@1", "orders.created@1", "orders.updated@1"],
+        eventId: "orders.created",
+        eventVersion: 1,
         delivery: "durable",
         profile: "default",
         retry: { maxAttempts: 3 },
@@ -290,7 +294,7 @@ const eventContracts = [
     protocolVersion: PROTOCOL_VERSION,
     id,
     version: 1,
-    payload: { type: "object", properties: { orderId: schema("string") } },
+    input: { type: "object", properties: { orderId: schema("string") } },
     ...(id === "orders.created" ? { sensitiveFields: ["customerEmail"] } : {}),
     source: source(`src/events/${id.split(".").at(-1)}.event.ts`, 3),
   })),
@@ -301,8 +305,8 @@ const eventTrigger = {
   version: PROTOCOL_VERSION,
   id: FIXTURE_IDS.trigger,
   targetFunctionId: "orders.project-order-change",
-  selector: { kind: "anyOf" },
-  expansion: ["orders.cancelled@1", "orders.created@1", "orders.updated@1"],
+  eventId: "orders.created",
+  eventVersion: 1,
   delivery: "durable",
   profile: "default",
   retry: { maxAttempts: 3 },

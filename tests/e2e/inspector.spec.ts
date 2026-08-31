@@ -127,8 +127,8 @@ test("uses event terminology, local job actions, diagnostics, agent tools, and s
   await page.goto("/events");
   await page.getByRole("link", { name: "Open event" }).first().click();
   await expect(page.getByRole("heading", { name: "Event detail" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Listeners" })).toBeVisible();
-  await expect(page.getByText(/generic triggers/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Consumer functions" })).toBeVisible();
+  await expect(page.getByText(/event-only functions/)).toBeVisible();
   await expect(page.getByText(/subscription/i)).toHaveCount(0);
 
   await page.getByRole("link", { name: "Jobs" }).click();

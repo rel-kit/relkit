@@ -85,11 +85,11 @@ function projectContract(value: unknown): JsonValue[] {
   if (!isRecord(value) || typeof value.id !== "string" || typeof value.version !== "number")
     return [];
   const result = pick(value, ["protocol", "protocolVersion", "id", "version", "sensitiveFields"]);
-  const payload = safeSchema(value.payload);
+  const input = safeSchema(value.input);
   const source = safeSource(value.source);
   if (source !== undefined) result.source = source;
   const projected = safeJson(result);
-  return [payload === undefined || !isRecord(projected) ? projected : { ...projected, payload }];
+  return [input === undefined || !isRecord(projected) ? projected : { ...projected, input }];
 }
 
 function projectTrigger(value: unknown): JsonValue[] {
@@ -101,12 +101,13 @@ function projectTrigger(value: unknown): JsonValue[] {
         "version",
         "id",
         "targetFunctionId",
-        "selector",
-        "expansion",
+        "eventId",
+        "eventVersion",
         "delivery",
         "profile",
         "retry",
         "concurrency",
+        "timeoutMs",
       ]),
     ),
   ];
@@ -153,7 +154,6 @@ function projectDelivery(value: unknown): JsonValue[] {
     "deliveryId",
     "eventInstanceId",
     "eventId",
-    "version",
     "triggerId",
     "state",
     "attempt",

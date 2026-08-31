@@ -108,6 +108,7 @@ test("drops absolute and executable-looking source paths at the API boundary", a
           },
           {
             kind: "function",
+            invocationMode: "callable",
             id: "orders.create",
             source: { file: "vscode://file/src/orders.ts", line: 4, column: 3 },
           },
