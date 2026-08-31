@@ -74,7 +74,7 @@ describe("optional authoring IDs", () => {
 
   test("keeps durable identities mandatory at runtime", () => {
     expect(defineConfig({ env: defineEnv({}) }).kind).toBe("app");
-    expect(() => defineEvent({ version: 1, payload: input } as never)).toThrow("Invalid stable ID");
+    expect(() => defineEvent({ version: 1, input } as never)).toThrow("Invalid stable ID");
     expect(() =>
       defineJob({
         input,

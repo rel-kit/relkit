@@ -9,13 +9,7 @@ import { DeclaredError, defineError, defineFunction } from "../../packages/funct
 import { defineBucket, isBucketDescriptor } from "../../packages/buckets/src/index.ts";
 import { defineCache, isCacheDescriptor } from "../../packages/cache/src/index.ts";
 import { defineAgent, isAgentDescriptor } from "../../packages/agents/src/index.ts";
-import {
-  defineEvent,
-  isEventDescriptor,
-  isEventTriggerDescriptor,
-  onEvent,
-  events,
-} from "../../packages/events/src/index.ts";
+import { defineEvent, isEventDescriptor } from "../../packages/events/src/index.ts";
 import { defineJob } from "../../packages/jobs/src/index.ts";
 import {
   defineMiddleware,
@@ -63,14 +57,14 @@ const lookup = defineFunction({
 const created = defineEvent({
   id: "orders.created",
   version: 1,
-  payload: z.object({ orderId: z.string() }),
+  input: z.object({ orderId: z.string() }),
   sensitiveFields: ["email"],
 });
 
 const changed = defineEvent({
   id: "orders.changed",
   version: 2,
-  payload: z.object({ orderId: z.string(), state: z.string() }),
+  input: z.object({ orderId: z.string(), state: z.string() }),
 });
 
 describe.serial("Phase 2 descriptor cohort", () => {
@@ -142,11 +136,11 @@ describe.serial("Phase 2 descriptor cohort", () => {
 
     const dependent = defineFunction({
       id: "orders.dependent",
+      publishes: ["orders.created" as never],
       input,
       output,
       dependencies: {
         jobs: { reconcile: job },
-        events: { created },
         buckets: { assets: bucket },
         cache: { prices: cache },
         agents: { support: agent },
@@ -158,7 +152,6 @@ describe.serial("Phase 2 descriptor cohort", () => {
       "agents",
       "buckets",
       "cache",
-      "events",
       "jobs",
     ]);
 
@@ -333,49 +326,6 @@ describe.serial("Phase 2 descriptor cohort", () => {
     expect(() =>
       invalid({ maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 1, multiplier: 1, jitter: "bad" }),
     ).toThrow();
-  });
-
-  test("projects event selector unions and onEvent as event-trigger", () => {
-    const selector = events.anyOf("orders.created" as never, "orders.changed" as never);
-    expect(selector.kind).toBe("anyOf");
-    expect(selector.events).toEqual([{ eventId: "orders.created" }, { eventId: "orders.changed" }]);
-    expect(isEventDescriptor(created)).toBe(true);
-    expect(Object.isFrozen(selector)).toBe(true);
-    expect(() => events.anyOf("orders.created" as never, "orders.created" as never)).toThrow(
-      "unique",
-    );
-    expect(events.match("orders.*").pattern).toBe("orders.*");
-    expect(events.match("orders.**").pattern).toBe("orders.**");
-    expect(() => events.match("orders.*.bad*" as never)).toThrow("Event patterns");
-    expect(() => events.all({ payload: "known" } as never)).toThrow("payload");
-
-    const trigger = onEvent(selector, async () => ({ ok: true }), {
-      id: "orders.on-change",
-      profile: "default",
-      retry: {
-        maxAttempts: 3,
-        initialDelayMs: 10,
-        maxDelayMs: 100,
-        multiplier: 2,
-        jitter: "equal",
-      },
-      concurrency: 1,
-    });
-    const singleTrigger = onEvent("orders.created" as never, async () => ({ ok: true }), {
-      id: "orders.on-created",
-      delivery: "ephemeral",
-    });
-
-    expect(trigger.kind).toBe("event-trigger");
-    expect(trigger.selector.kind).toBe("anyOf");
-    expect(trigger.target.ref).toEqual({
-      kind: "function",
-      id: "relkit.event.orders.on-change.handler",
-    });
-    expect(isEventTriggerDescriptor(trigger)).toBe(true);
-    expect(singleTrigger.selector.kind).toBe("single");
-    expect(Object.prototype.hasOwnProperty.call(trigger, "handler")).toBe(false);
-    expect(Object.isFrozen(trigger.target)).toBe(true);
   });
 
   test("keeps bucket/cache contracts logical and tools/agents handler-free", () => {

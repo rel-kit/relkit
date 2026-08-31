@@ -1,26 +1,16 @@
 import { describe, expect, test } from "bun:test";
-import { diffGraph, type ApplicationGraph } from "../../packages/graph/src/index.ts";
-import {
-  defineEvent,
-  events,
-  onEvent,
-  type UnknownEventEnvelope,
-} from "../../packages/events/src/index.ts";
-import { defineFunction } from "../../packages/functions/src/index.ts";
+import type { UnknownEventEnvelope } from "../../packages/events/src/index.ts";
 import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import { NORMALIZE_CODES, normalizeCompilation } from "../../packages/compiler/src/index.ts";
 import type { RetryPolicy } from "../../packages/jobs/src/index.ts";
 import type { TestEventFake } from "../../packages/testing/src/index.ts";
-import { z, type StandardSchemaV1 } from "../../packages/schema/src/index.ts";
 
 export interface EventContractTrigger {
   readonly id: string;
   readonly delivery?: "ephemeral" | "durable";
-  readonly expansion?: readonly string[];
   readonly handler?: (
-    input: UnknownEventEnvelope,
+    input: { readonly orderId: string },
     context: InvocationContext,
-  ) => Promise<{ readonly handled: boolean }>;
+  ) => Promise<void>;
 }
 
 export interface EventContractCreateOptions {
@@ -35,13 +25,14 @@ export interface EventContractCreateOptions {
 
 export interface EventInvocationObservation {
   readonly target: string;
-  readonly input: UnknownEventEnvelope;
+  readonly input: { readonly orderId: string };
+  readonly trigger: unknown;
   readonly source: InvocationContext["invocation"]["source"];
   readonly attempt: number;
 }
 
 export interface EventContractHarness {
-  readonly event: TestEventFake<{ readonly orderId: string }, { readonly handled: boolean }>;
+  readonly event: TestEventFake<{ readonly orderId: string }, void>;
   readonly invocations: readonly EventInvocationObservation[];
 }
 
@@ -65,9 +56,6 @@ export interface EventContractTarget {
   readonly capabilities: EventContractCapabilities;
   readonly create: (options?: EventContractCreateOptions) => Promise<EventContractHarness>;
 }
-
-const payload = z.object({ orderId: z.string() });
-const output = z.object({ handled: z.boolean() });
 
 export function registerEventContractSuite(target: EventContractTarget): void {
   describe.serial(`event contract: ${target.name}`, () => {
@@ -93,13 +81,15 @@ export function registerEventContractSuite(target: EventContractTarget): void {
         expect(invocations).toEqual([
           expect.objectContaining({
             target: "orders.receipt",
-            source: "event",
+            source: "event-delivery",
             attempt: 1,
-            input: expect.objectContaining({
-              instanceId: published.instanceId,
-              payload: { orderId: "order-1" },
-              correlationId: "contract-correlation",
-              causationInvocationId: "contract-invocation",
+            input: { orderId: "order-1" },
+            trigger: expect.objectContaining({
+              event: expect.objectContaining({ instanceId: published.instanceId }),
+              trace: expect.objectContaining({
+                correlationId: "contract-correlation",
+                causationInvocationId: "contract-invocation",
+              }),
             }),
           }),
         ]);
@@ -129,164 +119,6 @@ export function registerEventContractSuite(target: EventContractTarget): void {
           orderedByKey: false,
         },
       });
-    });
-
-    test("expands single, anyOf, and pattern selectors to known pairs", () => {
-      const created = defineEvent({ id: "orders.created", version: 1, payload });
-      const updated = defineEvent({
-        id: "orders.updated",
-        version: 2,
-        payload: z.object({ orderId: z.string(), state: z.string() }),
-      });
-      const targetFunction = defineFunction({
-        id: "orders.listener",
-        input: z.union([
-          envelope("orders.created", 1, payload),
-          envelope("orders.updated", 2, z.object({ orderId: z.string(), state: z.string() })),
-        ]),
-        output,
-        handler: async () => ({ handled: true }),
-      });
-      const descriptors = [
-        created,
-        updated,
-        targetFunction,
-        onEvent("orders.created" as never, async () => ({ handled: true }), {
-          id: "orders.single",
-        }),
-        onEvent(
-          events.anyOf("orders.updated" as never, "orders.created" as never),
-          async () => ({ handled: true }),
-          { id: "orders.any" },
-        ),
-        onEvent(events.match("orders.*"), async () => ({ handled: true }), {
-          id: "orders.pattern",
-        }),
-      ];
-      const result = normalizeCompilation({ descriptors });
-      expect(result.diagnostics.filter(({ severity }) => severity === "error")).toEqual([]);
-      expect(triggerExpansion(result.graph, "orders.single")).toEqual(["orders.created@1"]);
-      expect(triggerExpansion(result.graph, "orders.any")).toEqual([
-        "orders.created@1",
-        "orders.updated@2",
-      ]);
-      expect(triggerExpansion(result.graph, "orders.pattern")).toEqual([
-        "orders.created@1",
-        "orders.updated@2",
-      ]);
-      const forbiddenKind = ["sub", "scription"].join("");
-      expect(result.graph?.nodes.some(({ kind }) => kind === forbiddenKind)).toBe(false);
-      expect(result.graph?.edges.some(({ kind }) => kind === forbiddenKind)).toBe(false);
-    });
-
-    test("warns on a pattern with no known event without rejecting the graph", () => {
-      const targetFunction = defineFunction({
-        id: "orders.listener",
-        input: z.unknown(),
-        output,
-        handler: async () => ({ handled: true }),
-      });
-      const result = normalizeCompilation({
-        descriptors: [
-          targetFunction,
-          onEvent(events.match("payments.*"), async () => ({ handled: true }), {
-            id: "payments.listener",
-          }),
-        ],
-      });
-      expect(result.diagnostics).toContainEqual(
-        expect.objectContaining({
-          code: NORMALIZE_CODES.selector,
-          severity: "warning",
-          message: 'Event selector "payments.*" matched no known event.',
-        }),
-      );
-      expect(result.activatable).toBe(true);
-    });
-
-    test("classifies a compatible pattern expansion change", () => {
-      const source = { file: "events.ts", line: 1, column: 1 } as const;
-      const before: ApplicationGraph = {
-        contractVersion: 3,
-        nodes: [
-          { kind: "function", id: "orders.listener", source, input: {}, output: {} },
-          {
-            kind: "trigger",
-            id: "orders.pattern",
-            source,
-            triggerType: "event",
-            targetFunctionId: "orders.listener",
-            config: {
-              selector: { kind: "match", pattern: "orders.*" },
-              expansion: ["orders.created@1"],
-              delivery: "durable",
-            },
-          },
-        ],
-        edges: [],
-      };
-      const after: ApplicationGraph = {
-        ...before,
-        nodes: [
-          before.nodes[0]!,
-          {
-            ...before.nodes[1]!,
-            config: {
-              ...(before.nodes[1] as { readonly config: Record<string, unknown> }).config,
-              expansion: ["orders.created@1", "orders.updated@1"],
-            },
-          } as unknown as ApplicationGraph["nodes"][number],
-        ],
-      };
-      expect(diffGraph(before, after).changes).toContainEqual(
-        expect.objectContaining({
-          category: "event/selector",
-          classification: "potentially-breaking",
-          selectorExpansion: { added: ["orders.updated@1"], removed: [] },
-        }),
-      );
-    });
-
-    test("restricts raw wildcard selectors to the declared audit purposes", () => {
-      const targetFunction = defineFunction({
-        id: "orders.audit",
-        input: z.unknown(),
-        output,
-        handler: async () => ({ handled: true }),
-      });
-      const rejected = normalizeCompilation({
-        descriptors: [
-          targetFunction,
-          onEvent(events.all({ payload: "unknown" }), async () => ({ handled: true }), {
-            id: "orders.raw",
-            delivery: "ephemeral",
-          }),
-        ],
-      });
-      expect(rejected.diagnostics).toContainEqual(
-        expect.objectContaining({
-          code: NORMALIZE_CODES.wildcard,
-          severity: "error",
-        }),
-      );
-
-      const allowed = normalizeCompilation({
-        descriptors: [
-          targetFunction,
-          onEvent(
-            events.all({ payload: "unknown", purpose: "telemetry" }),
-            async () => ({ handled: true }),
-            { id: "orders.telemetry", delivery: "ephemeral" },
-          ),
-        ],
-      });
-      expect(allowed.diagnostics).toContainEqual(
-        expect.objectContaining({
-          code: NORMALIZE_CODES.wildcard,
-          severity: "warning",
-        }),
-      );
-      expect(allowed.activatable).toBe(true);
     });
 
     test("fans out independently and invokes the selected target", async () => {
@@ -368,7 +200,6 @@ export function registerEventContractSuite(target: EventContractTarget): void {
               handler: async (_input, context) => {
                 retryAttempts += 1;
                 if (retryAttempts === 1) throw new Error("retryable");
-                return { handled: true };
               },
             },
           ],
@@ -415,7 +246,6 @@ export function registerEventContractSuite(target: EventContractTarget): void {
             handler: async () => {
               started();
               await gate;
-              return { handled: true };
             },
           },
         ],
@@ -464,47 +294,4 @@ async function withEvent(
   } finally {
     await harness.event.close();
   }
-}
-
-function triggerExpansion(
-  graph:
-    | {
-        readonly nodes: readonly {
-          readonly id: string;
-          readonly kind: string;
-          readonly triggerType?: unknown;
-          readonly config?: unknown;
-        }[];
-      }
-    | undefined,
-  id: string,
-): readonly string[] | undefined {
-  const node = graph?.nodes.find((entry) => entry.id === id);
-  if (node?.kind !== "trigger" || node.triggerType !== "event") return undefined;
-  if (!isRecord(node.config)) return undefined;
-  const expansion = node.config.expansion;
-  return Array.isArray(expansion)
-    ? expansion.filter((value): value is string => typeof value === "string")
-    : undefined;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function envelope<Id extends string, Version extends number>(
-  eventId: Id,
-  version: Version,
-  eventPayload: StandardSchemaV1,
-) {
-  return z.object({
-    instanceId: z.string(),
-    eventId: z.literal(eventId),
-    version: z.literal(version),
-    payload: eventPayload,
-    occurredAt: z.string(),
-    publishedAt: z.string(),
-    traceId: z.string(),
-    attributes: z.object({}),
-  });
 }
