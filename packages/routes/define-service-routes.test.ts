@@ -12,7 +12,7 @@ const target = defineFunction({
   handler: async () => ({ ok: true }),
 });
 
-const event = defineEvent({ id: "orders.created", version: 1, payload: z.object({}) });
+const event = defineEvent({ id: "orders.created", version: 1, input: z.object({}) });
 const orders = defineService({ functions: { create: target }, events: { created: event } });
 
 describe("defineServiceRoutes", () => {

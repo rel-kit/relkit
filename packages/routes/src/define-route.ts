@@ -152,6 +152,7 @@ function copyResponses(
 function isFunctionTarget(value: unknown): value is FunctionRefAny {
   return (
     isRecord(value) &&
+    value.invocationMode !== "event-only" &&
     isRef(value.ref, "function") &&
     isSchema(value.input) &&
     isSchema(value.output)

@@ -14,7 +14,7 @@ const lookup = defineFunction({
 const created = defineEvent({
   id: "orders.created",
   version: 1,
-  payload: z.object({ id: z.string() }),
+  input: z.object({ id: z.string() }),
 });
 
 describe("defineService", () => {

@@ -77,6 +77,7 @@ export function isFunctionDescriptor(value: unknown): value is FunctionRefAny {
   if (!isRecord(value) || !isDescriptor(value, "function")) return false;
   const descriptor = value as DescriptorRecord;
   return (
+    descriptor.invocationMode !== "event-only" &&
     isSchema(descriptor.input) &&
     isSchema(descriptor.output) &&
     typeof descriptor.handler === "function"

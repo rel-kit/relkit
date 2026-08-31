@@ -5,6 +5,7 @@ import type {
   InvocationErrorDefinition,
   InvocationIdSource,
   InvocationSource,
+  InvocationTarget,
 } from "./contracts.js";
 import { InvocationValidationError } from "./contracts.js";
 import { getDescriptorIdentity } from "./identity.js";
@@ -36,8 +37,23 @@ export async function callHook<T>(
 }
 
 export function assertSource(value: string): asserts value is InvocationSource {
-  if (!("direct http job event tool agent" as string).split(" ").includes(value)) {
+  if (
+    !("direct http job event-delivery event-replay tool agent" as string).split(" ").includes(value)
+  ) {
     throw new TypeError(`Unknown invocation source: ${value}`);
+  }
+}
+
+export function assertInvocationMode(
+  target: Pick<InvocationTarget, "id" | "invocationMode">,
+  source: InvocationSource,
+): void {
+  const eventSource = source === "event-delivery" || source === "event-replay";
+  if (target.invocationMode === "event-only" && !eventSource) {
+    throw new TypeError(`Event-only function "${target.id}" cannot be invoked from ${source}`);
+  }
+  if (target.invocationMode !== "event-only" && eventSource) {
+    throw new TypeError(`Event delivery cannot target callable function "${target.id}"`);
   }
 }
 

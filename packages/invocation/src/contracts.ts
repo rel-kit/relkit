@@ -3,7 +3,8 @@ import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import type { InvocationFailure, PublicFailureEnvelope } from "./failure-types.js";
 
-export type InvocationSource = "direct" | "http" | "job" | "event" | "tool" | "agent";
+export type InvocationSource =
+  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
 export type InvocationKind = "trace" | "invocation" | "span";
 export type InvocationIdSource = { readonly next: (kind: InvocationKind) => ProtocolId };
 
@@ -47,6 +48,7 @@ export interface InvocationContext {
   readonly auth: { readonly getSession: () => Promise<unknown | null> };
   readonly constants: Readonly<Record<string, never>>;
   readonly prompts: Readonly<Record<string, never>>;
+  readonly trigger?: unknown;
 }
 
 export interface InvocationErrorDefinition {
@@ -60,9 +62,12 @@ export interface InvocationTarget<
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 > {
   readonly id: string;
+  readonly invocationMode?: "callable" | "event-only";
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
   readonly errors?: readonly InvocationErrorDefinition[];
+  readonly publications?: Readonly<Record<string, unknown>>;
+  readonly publishes?: readonly string[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly onBefore?: (input: Input, context: Context) => MaybePromise<Input>;

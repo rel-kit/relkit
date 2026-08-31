@@ -1,5 +1,6 @@
 import {
   assertSource,
+  assertInvocationMode,
   callHook,
   defaultIdSource,
   defaultRunner,
@@ -54,6 +55,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
   const parent = options.parent ?? activeDispatcher?.parent;
   const source = options.source ?? "direct";
   assertSource(source);
+  assertInvocationMode(request.target, source);
   const now = options.now?.() ?? options.time?.now().getTime() ?? Date.now();
   const deadlineMs = calculateStandaloneDeadline(request.target.timeoutMs, options, parent, now);
   const idSource = options.idSource ?? defaultIdSource;
@@ -102,6 +104,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
       signal: controller.signal,
       env: options.env ?? {},
       time,
+      publishes: request.target.publishes ?? [],
       ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.clients === undefined ? {} : { clients: options.clients }),
     });
