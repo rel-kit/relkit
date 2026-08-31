@@ -1,45 +1,58 @@
 # @relkit/events
 
-Events are versioned contracts. A listener is one typed callback; the compiler
-lowers it to the same function engine and durable trigger used by every runtime.
+Events are asynchronous facts. Publishing returns acceptance, not consumer results.
+Each event function receives an independent delivery, with its own retry and dead-letter policy.
 
 ```ts
-import { defineEvent, onEvent } from "@relkit/app/events";
+import { defineEvent, defineEventFunction } from "@relkit/app/events";
+import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
+
 export const orderCreated = defineEvent({
   id: "orders.created",
-  version: 1,
-  payload: z.object({ orderId: z.string(), totalCents: z.number().int() }),
-  sensitiveFields: ["customerEmail"],
+  input: z.object({ orderId: z.string() }),
 });
 
-export const sendReceipt = onEvent(
-  "orders.created",
-  async (payload, ctx) => {
-    ctx.log.info("receipt.requested", {
-      orderId: payload.orderId,
-      instanceId: ctx.event.instanceId,
+export const createOrder = defineFunction({
+  id: "orders.create",
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ orderId: z.string() }),
+  publishes: ["orders.created"],
+  handler: async (input, context) => {
+    await context.events["orders.created"].publish(input);
+    return input;
+  },
+});
+
+export const sendReceipt = defineEventFunction({
+  id: "receipts.on-created",
+  event: "orders.created",
+  retry: { maxAttempts: 3 },
+  handler: async ({ orderId }, context) => {
+    context.log.info("Receipt requested", {
+      orderId,
+      instanceId: context.trigger.event.instanceId,
+      attempt: context.trigger.delivery.attempt,
     });
   },
-  { id: "orders.on-created" },
-);
+});
 ```
 
-`relkit create`, `relkit check`, and `relkit dev` generate
-`.relkit/generated/event-registry.d.ts`, which supplies event-name autocomplete,
-payload types, versions, and selector unions. Delivery defaults to `durable`;
-use `{ delivery: "ephemeral" }` explicitly for best-effort telemetry.
+`relkit check` generates `EventRegistry` for exact event IDs, input types, and
+versions. Event version defaults to `1`. Event functions require stable IDs;
+delivery defaults to durable, profile to `default`, and retry to one immediate
+attempt. Concurrency and timeout are unlimited unless supplied.
 
-Listener IDs may be inferred from source bindings. Function calls inside a
-listener use descriptor `invoke`; only jobs, events, buckets, cache, and agents
-remain explicit managed dependencies.
+Only IDs in `publishes` appear in `context.events`. The consumed event is not
+automatically publishable. Functions used by tools and jobs have the same
+publication capabilities. Consumers may invoke ordinary functions, enqueue
+jobs, and publish follow-up events.
 
-`events.anyOf("orders.created", "orders.updated")` and
-`events.match("orders.*")` pass a discriminated envelope to the callback.
-`events.all({ payload: "unknown", purpose: "telemetry" })` remains the explicit
-escape hatch for unrestricted listeners. Each matching listener receives its
-own delivery: durable fan-out is at-least-once and independent, not a
-transaction or simultaneous-execution guarantee. A failed listener cannot roll
-back a successful sibling. Durable retry, redrive, and dead-letter behavior
-belongs to the selected provider; declared `retry: { kind: "later", afterMs }`
-errors provide a minimum delay hint.
+Event contracts have no handler, output, or invocation method. Event functions
+have no authored input/output, `.invoke()`, or `.asTool()`. Successful handlers
+return void; declared errors and Effect error channels remain supported.
+
+The graph contains the authored event-only function and one generated trigger
+`relkit.event.<function-id>.trigger`, with exact event ID/version and delivery
+policy. Inspector derives consumers through those trigger edges. Durable
+delivery is at-least-once: make side effects idempotent before retry or replay.
