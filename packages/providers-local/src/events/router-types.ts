@@ -1,9 +1,12 @@
-import type { JsonValue } from "@relkit/contracts";
 import type { RetryPolicy } from "@relkit/jobs";
 import type { UnknownEventEnvelope } from "@relkit/events";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogInput, EventLogRecord } from "./log.js";
-import type { EventDeliveryBoundary, EventDeliveryLedgerRecord } from "./delivery-types.js";
+import type {
+  EventDeliveryBoundary,
+  EventDeliveryLedgerRecord,
+  EventDeliveryInvocationOptions,
+} from "./delivery-types.js";
 import type { EventDeliveryRecord } from "./router-records.js";
 
 export interface EventDeliveryResult {
@@ -29,13 +32,17 @@ export interface EventDeliveryResult {
 export interface EventRouterTrigger {
   readonly id: string;
   readonly targetFunctionId?: string;
-  readonly selector?: JsonValue;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: "ephemeral" | "durable";
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
-  readonly invoke: (envelope: UnknownEventEnvelope) => Promise<unknown>;
+  readonly timeoutMs?: number;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
 }
 
 export interface EventRouterOptions {
@@ -63,14 +70,16 @@ export interface EventRouterSnapshot {
 }
 
 export interface EventTriggerSnapshot {
+  readonly ephemeral?: import("./ephemeral.js").EphemeralDeliverySnapshot;
   readonly id: string;
   readonly targetFunctionId?: string;
-  readonly selector?: JsonValue;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: "ephemeral" | "durable";
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 
 export interface EventFanoutResult {

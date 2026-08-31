@@ -50,7 +50,8 @@ describe("local ephemeral event delivery", () => {
     });
     await router.registerTrigger({
       id: "telemetry.events",
-      expansion: ["orders.created@1"],
+      eventId: "orders.created",
+      eventVersion: 1,
       delivery: "ephemeral",
       invoke: async (envelope) => {
         calls.push(envelope.instanceId);

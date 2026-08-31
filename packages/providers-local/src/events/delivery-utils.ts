@@ -3,7 +3,8 @@ import type { RetryPolicy } from "@relkit/jobs";
 import type { JobStore, JobRecord } from "../jobs/store.js";
 import { readEntry } from "../jobs/queue-entry.js";
 import type { JobQueue, JobQueueEntry } from "../jobs/queue-utils.js";
-import { normalizeEnvelope, type EventDeliveryRecord } from "./router-records.js";
+import type { UnknownEventEnvelope } from "@relkit/events";
+import { makeDeliveryId, normalizeEnvelope, type EventDeliveryRecord } from "./router-records.js";
 import type { EventDeliveryLedgerRecord, EventDeliveryResult } from "./delivery-types.js";
 
 export const DEFAULT_RETRY: RetryPolicy = Object.freeze({
@@ -166,4 +167,25 @@ function nonNegative(value: number, name: string): number {
 
 function isRecord(value: JsonValue): value is { readonly [key: string]: JsonValue } {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+export async function admitDelivery(
+  queue: JobQueue,
+  envelope: UnknownEventEnvelope,
+  triggerId: string,
+  profile: string,
+): Promise<{ readonly entry: JobQueueEntry; readonly duplicate: boolean }> {
+  const deliveryId = makeDeliveryId(envelope.instanceId, triggerId);
+  const existing = queue.get(deliveryId);
+  if (existing !== undefined) return { entry: existing, duplicate: true };
+  const accepted = await queue.enqueue({
+    instanceId: deliveryId,
+    input: json(envelope),
+    profile,
+  });
+  const available = await queue.transition(deliveryId, "available", {
+    expectedState: "accepted",
+    availableAt: accepted.acceptedAt,
+  });
+  return { entry: available, duplicate: false };
 }

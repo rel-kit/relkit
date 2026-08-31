@@ -16,7 +16,6 @@ import {
 import { EventAdminError } from "./admin-errors.js";
 import type { EventTriggerSnapshot } from "./router-types.js";
 import type { EventLogRecord } from "./log.js";
-
 export function versioned<T extends object>(
   value: T,
 ): T & {
@@ -47,12 +46,13 @@ export function toTrigger(value: EventTriggerSnapshot): EventTriggerContract {
   return versioned({
     id: value.id,
     ...(value.targetFunctionId === undefined ? {} : { targetFunctionId: value.targetFunctionId }),
-    ...(value.selector === undefined ? {} : { selector: value.selector }),
-    expansion: value.expansion,
+    eventId: value.eventId,
+    eventVersion: value.eventVersion,
     delivery: value.delivery,
     ...(value.profile === undefined ? {} : { profile: value.profile }),
     ...(value.retry === undefined ? {} : { retry: value.retry }),
     ...(value.concurrency === undefined ? {} : { concurrency: value.concurrency }),
+    ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
   });
 }
 

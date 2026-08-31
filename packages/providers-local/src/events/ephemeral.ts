@@ -33,6 +33,7 @@ export interface EphemeralDeliverySnapshot {
 
 export interface EphemeralDelivery {
   readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EphemeralDeliveryResult>;
+  readonly drain: () => Promise<void>;
   readonly snapshot: () => EphemeralDeliverySnapshot;
 }
 
@@ -51,8 +52,9 @@ export function createEphemeralDelivery(
   let completed = 0;
   let failed = 0;
   let dropped = 0;
+  const pending = new Set<Promise<EphemeralDeliveryResult>>();
 
-  const deliver = async (envelope: UnknownEventEnvelope): Promise<EphemeralDeliveryResult> => {
+  const run = async (envelope: UnknownEventEnvelope): Promise<EphemeralDeliveryResult> => {
     // ponytail: no hidden backlog; add a bounded FIFO only if measured delivery needs it.
     if (inFlight >= capacity) {
       dropped += 1;
@@ -81,7 +83,16 @@ export function createEphemeralDelivery(
       dropped,
       ...EPHEMERAL_DELIVERY_CAPABILITIES,
     });
-  return Object.freeze({ deliver, snapshot });
+  const deliver = (envelope: UnknownEventEnvelope): Promise<EphemeralDeliveryResult> => {
+    const work = run(envelope);
+    pending.add(work);
+    void work.finally(() => pending.delete(work));
+    return work;
+  };
+  const drain = async (): Promise<void> => {
+    await Promise.all(pending);
+  };
+  return Object.freeze({ deliver, snapshot, drain });
 
   function outcome(
     result: Pick<EphemeralDeliveryResult, "accepted" | "status"> &

@@ -23,23 +23,24 @@ export interface EventVersioned {
 export interface EventContractInput {
   readonly id: string;
   readonly version: number;
-  readonly payload: JsonValue;
+  readonly input: JsonValue;
   readonly sensitiveFields?: readonly string[];
   readonly source?: JsonValue;
 }
 
 export interface EventContract extends EventVersioned, EventContractInput {}
 
-/** Selector and delivery metadata for one generic event trigger. */
+/** Exact event and delivery metadata for one generated event trigger. */
 export interface EventTriggerContract extends EventAdminVersion {
   readonly id: string;
   readonly targetFunctionId?: string;
-  readonly selector?: JsonValue;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: "ephemeral" | "durable";
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 
 /** Safe publication metadata; payload data is intentionally not projected. */
