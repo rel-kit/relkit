@@ -1,0 +1,32 @@
+---
+title: Define a bucket
+description: Name your bucket and choose which files it accepts.
+---
+
+## Define the bucket
+
+Use `defineBucket` in your app's domain directory. Create `src/assets/buckets/assets.bucket.ts`:
+
+<include cwd lang="ts" meta='title="src/assets/buckets/assets.bucket.ts"'>
+  ../../examples/commerce/src/assets/buckets/assets.bucket.ts
+</include>
+
+- `id` is the bucket's stable, unique name. Keep it unchanged when moving or renaming the file.
+- `visibility` is required. Start with `"private"` for user uploads.
+- `maxObjectBytes` sets the maximum size of one file: 5 MB here.
+- `allowedContentTypes` lists accepted media types. `image/*` allows image types; `application/json` allows JSON files.
+- `profile` selects a bucket configuration in `relkit.config.ts`. This example uses `"default"`.
+
+Size and content-type limits are optional. For HTTP uploads, also validate incoming files with `z.file()` as shown in [Upload files](/docs/storage/upload).
+
+## Check your bucket
+
+Make sure the `default` bucket profile exists in `relkit.config.ts`; the [tutorial's configuration step](/docs/storage/first-upload#configure-storage) shows how to add it.
+
+Then, from your app's root, run:
+
+```sh
+bun run check
+```
+
+Next, [give a function access to the bucket](/docs/storage/upload). For cloud storage, [configure a bucket provider](/docs/fundamentals/providers).

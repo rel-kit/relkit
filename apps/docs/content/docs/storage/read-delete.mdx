@@ -1,0 +1,36 @@
+---
+title: Read and delete files
+description: Find stored files, read their contents, and remove them when needed.
+---
+
+## Read a stored file
+
+Add your bucket to `dependencies.buckets`, just as in the [upload function](/docs/storage/upload). Inside the handler, await the method you need:
+
+| Call                                       | Result                                                                      |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| `context.buckets.assets.get(key)`          | File bytes as a `Uint8Array`, or `undefined` if the file is missing.        |
+| `context.buckets.assets.head(key)`         | Metadata such as size and content type, or `undefined` if missing.          |
+| `context.buckets.assets.exists(key)`       | `true` if the file exists.                                                  |
+| `context.buckets.assets.list("products/")` | Keys beginning with `products/`. Omit the prefix to list without filtering. |
+
+Check for `undefined` before using a file. For text or JSON, decode the returned bytes with `new TextDecoder().decode(bytes)`. `get()` loads the file into memory, so use it for files your application can comfortably hold.
+
+## Share a download link
+
+With an S3-compatible provider, `await context.buckets.assets.createReadUrl(key)` creates a temporary download URL. `createWriteUrl(key)` creates a temporary upload URL. Local storage does not support these methods.
+
+Check the current user's permission before issuing either URL. Anyone holding the URL can use it until it expires, so do not log it. Configure expiry through your storage provider, not as an argument to these methods.
+
+## Delete a file
+
+Call `await context.buckets.assets.delete(key)` after checking the user may delete that file. Deletion returns no value; use `exists(key)` if you need to check whether it remains.
+
+Treat deletion as permanent unless you have configured recovery in your storage service. Remove or update any database record that refers to the deleted key.
+
+After adding storage operations to your function, run from your app's root:
+
+```sh
+bun run check
+bun run test
+```
