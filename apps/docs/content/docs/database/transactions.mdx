@@ -1,0 +1,69 @@
+---
+title: Transactions
+description: Commit related database operations together, verify rollback, and understand transaction-bound models, isolation, and external side effects.
+---
+
+Call `context.database.transaction(async (tx) => ...)` when related database changes must succeed or
+fail together. The callback receives another database context with the same table methods, models,
+overrides, and validation schemas, bound to the transaction.
+
+## Use the callback's context
+
+Registering a new member creates two records: the user and their organization membership. Neither
+should remain without the other if a write fails:
+
+<include cwd lang="ts" meta='title="src/users/functions/register-member.function.ts"'>
+  ../../examples/data-model/src/users/functions/register-member.function.ts
+</include>
+
+The function validates input, builds the insert data with a generated schema, and awaits both writes
+inside the callback. If the membership insert fails after the user insert, neither new record is kept.
+If both succeed, the caller receives their IDs. The role is chosen by the application, not the caller.
+
+This example models persistence, not permission to invite members. Check the caller's organization
+access before invoking the workflow; it is intentionally not mounted as a public write route.
+
+If the callback resolves, the transaction commits and returns its value. If it rejects, the transaction
+rolls back and the error propagates. Catching an error inside the callback and returning normally can
+commit the preceding changes; throw when the whole operation must fail.
+
+Await every operation. Use `tx.users` rather than the outer database context inside the callback.
+Custom model methods invoked on `tx` receive the bound native Drizzle transaction client, and overrides
+that call `base` use that binding too.
+
+## Understand the portable limits
+
+Nested portable transactions are rejected; savepoints and isolation-level options are not exposed by
+this helper. PostgreSQL and MySQL delegate to the driver's transaction implementation. SQLite manages
+the transaction on its shared connection and serializes portable transaction callbacks per client object.
+
+That SQLite serialization is not a global lock: ordinary operations outside the helper are not gated
+by it. On a shared SQLite connection, unrelated work can interleave with an open transaction. Do not
+assume the helper provides per-request isolation under concurrent traffic. Use a driver/connection
+strategy appropriate to the workload and verify it with concurrency tests.
+
+A transaction does not automatically make a read-then-write sequence race-free at every isolation
+level. The portable `upsert` and the sample `findOneAndUpdate` both perform separate statements. Use
+database uniqueness, conditional writes, native conflict handling, and deliberate isolation where needed.
+
+## Keep transactions short and database-only
+
+Do not wait for an AI model, a remote HTTP call, or a long-running job inside a database transaction.
+Locks and connections remain occupied, and a function deadline does not guarantee cancellation of a
+query or rollback of an external effect. Configure driver-level timeouts and cancellation as supported.
+
+Publishing an [event](/docs/events), enqueueing a [job](/docs/jobs), or writing a [bucket object](/docs/storage)
+inside this callback does not enlist that system in the database transaction. A rollback cannot undo
+those effects. Use a suitable transactional outbox or reconciliation design when a committed change
+must reliably trigger follow-up work; RELKIT does not create that guarantee merely by awaiting both calls.
+
+## Test the failure path
+
+Assert that committed rows remain and rolled-back rows do not. Add tests for custom methods called through
+`tx`, constraint failures, and the concurrency behavior your application depends on. Use a real isolated
+database when testing transactions, not an object mock that only counts calls.
+
+Continue with [Migrations](/docs/database/migrations) for changes to the schema itself, or
+[Testing](/docs/database/testing) for activation and cleanup.
+
+<include cwd>content/generated/related/database-transactions.mdx</include>

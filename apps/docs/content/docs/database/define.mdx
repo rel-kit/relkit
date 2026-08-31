@@ -1,0 +1,101 @@
+---
+title: Define a Drizzle service
+description: Install compatible dependencies, configure a Drizzle client and environment, generate context types, and manage connection lifecycle.
+---
+
+This guide configures the [Drizzle integration](/docs/database/drizzle). Use `defineDrizzleService`
+from `@relkit/drizzle` in `src/database/service.ts`. Do not wrap it in an
+ordinary `defineService`, add a `database` member to another service, or add a database provider profile
+to `relkit.config.ts`. The specialized service is the registration.
+
+## Install compatible packages
+
+Use `@relkit/drizzle` from the same RELKIT release as the rest of the app. This repository pins
+`drizzle-orm` to `1.0.0-rc.5-169397b`; keep a compatible version and commit your lockfile. For this
+repository's release, an application can install:
+
+```sh
+bun add @relkit/drizzle@0.0.5 drizzle-orm@1.0.0-rc.5-169397b
+```
+
+Run that from the application root only if these dependencies are missing. Bun includes the SQLite
+driver used here. PostgreSQL and MySQL require the appropriate driver/client dependencies and a running
+database. Do not mix examples from older Drizzle APIs with this release candidate without checking types.
+
+## Configure environment and client creation
+
+The data-model example uses this environment contract:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts"'>
+  ../../examples/data-model/src/platform/env.ts
+</include>
+
+Merge `DATABASE_PATH` into your existing `defineEnv()` and keep that descriptor in `defineConfig({ env })`.
+The example defaults to `./data-model.sqlite`; ensure its parent directory exists and is writable.
+Use the same path for the app and [migration tooling](/docs/database/migrations). A test may explicitly
+use `:memory:`, which is isolated to a connection and disappears when it closes.
+
+The complete service includes optional models and overrides:
+
+<include cwd lang="ts" meta='title="src/database/service.ts"'>
+  ../../examples/data-model/src/database/service.ts
+</include>
+
+`schema` is the flat map of table exports. `client({ env })` returns the actual Drizzle database, or a
+promise for it. Open the connection inside this factory, not at module top level. Descriptor discovery
+inspects the schema without activating the factory; the generated server activates it during startup.
+
+There are no table-creation statements to write here. The client factory only opens the connection.
+Define the model in [Drizzle tables](/docs/database/schema), then use
+[Drizzle Kit](/docs/database/migrations) to generate and apply its migrations before starting the app.
+
+`models` and `overrides` are optional; omit both for base CRUD. `dispose(database)` closes the underlying
+driver or pool. RELKIT calls it during normal runtime shutdown. A process crash still requires normal
+database recovery; shutdown hooks are not backup or durability guarantees.
+
+## Choose and customize the driver
+
+| Dialect    | What changes                                                            | Important integration limit                                                                                                               |
+| ---------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| SQLite     | SQLite tables, Bun SQLite client, file path or memory database          | The portable transaction helper shares a connection; review its [concurrency limits](/docs/database/transactions).                        |
+| PostgreSQL | PostgreSQL table definitions and a compatible async Drizzle client/pool | Portable transactions delegate to the client's transaction implementation.                                                                |
+| MySQL      | MySQL tables and a compatible async Drizzle client/pool                 | Returned mutation rows need a recoverable primary/unique key; see [queries](/docs/database/queries#understand-dialect-and-upsert-limits). |
+
+Driver construction remains native Drizzle configuration. Configure TLS, connection limits, query
+timeouts, logging, and pool disposal there as appropriate for that driver. RELKIT does not add these as
+service options or translate tables between dialects. The executable guides here verify Bun SQLite;
+test other drivers against their actual database before deploying.
+
+Use secret environment fields for credentials or a credential-bearing connection URL. Do not log them or
+hard-code production values. `RELKIT_ENV=test` does not replace this custom client factory with an
+in-memory database: set a safe test database value explicitly.
+
+## Generate the typed application context
+
+From the app root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+The compiler emits `.relkit/generated/context-registry.d.ts`, which supplies `context.database` and
+typed application environment fields. Keep the generated declaration included by your TypeScript
+configuration, as generated projects do. Do not hand-edit it or add a competing global declaration.
+
+If the database or a model method is missing from editor types, check table exports and model registration,
+rerun the compiler, then confirm the declaration is included. The service has an inferred identity from
+its domain; an explicit `id` is optional and must follow the same domain identity rules.
+
+## Understand activation ownership
+
+Activation is cached by descriptor object within a process. Repeated activation shares the original
+client and environment; it is not a per-request or per-tenant connection factory. `close()` is idempotent,
+but currently does not evict that cached activation, so activating the same closed descriptor does not
+reopen it. Use fresh service objects or isolated processes for independent test lifetimes.
+
+The service is not a managed database provisioning request. Arrange durable storage or a database server,
+backups, credentials, network access, and migrations separately. For Better Auth, keep the auth tables
+in this same Drizzle schema and follow [Integrate Better Auth](/docs/database/better-auth).
+
+<include cwd>content/generated/related/database-define.mdx</include>

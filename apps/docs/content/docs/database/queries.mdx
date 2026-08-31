@@ -1,0 +1,78 @@
+---
+title: Query data
+description: Use the six portable table operations, complete unique selectors, equality filters, bounded pagination, and explicit domain contracts.
+---
+
+Inside a function, use `context.database.<table>` for portable operations. This context is not a raw
+Drizzle client: it exposes a deliberately small API whose return values are consistent across supported
+dialects. For more advanced Drizzle queries, add a [custom model method](/docs/database/models).
+
+## Choose an operation
+
+| Method     | Arguments                                                   | Result                  |
+| ---------- | ----------------------------------------------------------- | ----------------------- |
+| `findOne`  | `{ where }` with a complete unique selector                 | Row or `null`           |
+| `findMany` | Optional `{ where, orderBy, limit, offset }`                | Array of rows           |
+| `insert`   | `{ data }`                                                  | Inserted row            |
+| `update`   | `{ where, data }` with a complete unique selector           | Updated row or `null`   |
+| `upsert`   | `{ where, create, update }` with a complete unique selector | Inserted or updated row |
+| `delete`   | `{ where }` with a complete unique selector                 | Deleted row or `null`   |
+
+Mutations accept one record, not a bulk array. Handle a missing row explicitly in your business function;
+the database operation does not turn `null` into an HTTP `404`. Use a [declared error](/docs/fundamentals/errors)
+when that is part of your public contract.
+
+For example, this Users operation changes an email address, handles a missing row, and returns an
+explicit public shape. The generated update schema validates row data; the function contract validates
+the caller's input:
+
+<include cwd lang="ts" meta='title="src/users/functions/update-user-email.function.ts"'>
+  ../../examples/data-model/src/users/functions/update-user-email.function.ts
+</include>
+
+This internal example is not mounted as an HTTP write endpoint. Check the caller's permission to edit
+the selected user before exposing it. See [Generated CRUD and schemas](/docs/database/generated-schemas)
+for what the validators generate and what they do not enforce.
+
+## Use complete selectors for single rows
+
+The `where` type is a partial row, but runtime validation requires a complete detected primary or unique
+key for `findOne`, `update`, `upsert`, and `delete`. Additional equality fields are allowed; all supplied
+fields participate in the filter. Unknown columns and null/undefined selector values are rejected.
+
+For the example's membership table, use `memberships.findOne({ where: { organizationId, userId } })`:
+both fields form the unique identity. An organization-only selector fails instead of selecting or
+mutating an arbitrary member. Use `findMany` when multiple matches are intentional.
+
+## Filter and paginate lists
+
+Portable `where` combines equality comparisons: all supplied fields must match. In `findMany`, `null` matches null values and
+`undefined` is invalid. Omit a filter field instead of passing `undefined`. An omitted or empty `where`
+allows all rows, subject to pagination.
+
+`findMany` defaults to `limit: 100` and `offset: 0`. Limits are integers from zero through 1,000; offsets
+are nonnegative integers. `orderBy` accepts one column and `"asc"` or `"desc"`. Specify a stable ordering
+for pagination rather than relying on the database's incidental row order.
+
+Alternative-match filters, ranges, pattern matching, joins, cursors, bulk writes, counts, and selected-column projections are not
+portable options. Implement the needed query in a model, with its own input validation and result limits.
+Keep queries parameterized through Drizzle's query builder. For native statements, see the
+[Drizzle documentation](https://orm.drizzle.team/docs/sql).
+
+## Understand dialect and upsert limits
+
+The current portable `upsert` reads first, then inserts or updates. It is not a native atomic conflict
+statement. Concurrent writers can race; keep a unique database constraint and use a dialect-specific
+atomic operation or a tested concurrency strategy when required. Ensure `create` identifies the same
+logical row as `where`.
+
+SQLite and PostgreSQL normally return mutation rows using `returning()`. For MySQL, the integration wraps
+mutations in a transaction and reads back the row using a recoverable unique key. An insert that supplies
+only an unknown database-generated ID and no other unique value needs an override. Driver differences
+and isolation behavior still need real-database tests.
+
+Model calls are not function invocations of their own. They do not automatically receive function
+retry policy, a per-query abort signal, or declared-error normalization. Configure driver timeouts and
+translate expected database failures at the business boundary without exposing database internals or credentials.
+
+<include cwd>content/generated/related/database-queries.mdx</include>

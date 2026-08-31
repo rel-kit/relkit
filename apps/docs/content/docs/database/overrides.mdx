@@ -1,0 +1,63 @@
+---
+title: Override operations
+description: Wrap or replace portable CRUD methods with service-level overrides, while keeping security policy and custom queries explicit.
+---
+
+Use `overrides` on `defineDrizzleService` when the contract of an existing base operation needs to change.
+Use [models](/docs/database/models) when adding a new named operation instead. Overrides are registered
+by schema table key, then by one of the six reserved CRUD names.
+
+## Wrap the base behavior
+
+The data-model example hides inactive users from `findOne`:
+
+<include cwd lang="ts" meta='title="src/database/service.ts — overrides"'>
+  ../../examples/data-model/src/database/service.ts#user-overrides
+</include>
+
+The callback receives `{ args, base }`. `args` has that operation's argument shape. `base(args)` runs
+the original implementation directly, without calling the same override again. You may transform the
+arguments, inspect the result, or return a replacement result that respects the operation's contract.
+
+For example, `findOne` returns a row or `null`, while `findMany` returns an array. Do not change the
+return shape to an HTTP response or an unrelated DTO. Put that mapping in a public business function.
+
+## Know the scope of an override
+
+This override affects calls to `users.findOne`. It does not automatically filter `findMany`, mutations,
+custom model methods, or the internal helper reads used by other base operations such as `upsert`.
+An inactive user is hidden by `findOne` but is still returned by an explicit `findMany` query. This is a
+read-convenience example, not a complete soft-delete or access-control policy.
+
+If you need soft deletion, decide how every read, write, custom query, unique constraint, and restoration
+path behaves. If you need tenant isolation, enforce it at the business boundary and/or database layer;
+do not assume one filter override secures the whole table client.
+
+## Work within the callback contract
+
+Overrides receive neither request context nor the injected native client that model extensions receive.
+Do not store a current user or request-specific state in a module-level variable used by a shared service.
+Pass validated business facts through a suitable function or named operation instead.
+
+For advanced Drizzle queries, prefer a custom method using its injected client. Capturing an unrelated global
+client inside an override can escape the active transaction. Calling `base` uses the current binding.
+Keyless tables require replacements for `findOne`, `update`, `upsert`, and `delete`; delegating unchanged
+arguments to `base` does not remove its unique-selector requirement.
+
+## Verify the changed contract
+
+Test both the overridden operation and the paths it does not cover. Include missing rows, invalid input,
+and transaction behavior. Overrides bypass base checks when they do not call `base`, so replacement
+implementations own the equivalent validation and safety checks.
+
+From the data-model example root, run:
+
+```sh
+bun test tests/data-model.test.ts
+bun run typecheck
+```
+
+Use [Testing](/docs/database/testing) for safe database lifetimes and
+[Transactions](/docs/database/transactions) before composing multiple writes.
+
+<include cwd>content/generated/related/database-overrides.mdx</include>

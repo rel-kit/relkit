@@ -1,0 +1,123 @@
+---
+title: Migrations
+description: Use Drizzle Kit to generate and apply migrations from TypeScript tables, and evolve persistent data safely.
+---
+
+For the [Drizzle service](/docs/database/drizzle), define the model in TypeScript and let Drizzle Kit
+generate the migration artifacts. You do not write table-creation statements in `defineDrizzleService`
+or maintain a second handwritten copy of your schema.
+
+RELKIT's `check`, `build`, and `dev` commands do not apply migrations. Migrate the database before
+starting code that depends on its new shape.
+
+## Configure Drizzle Kit
+
+From the application root, install the version verified with this repository's pinned ORM:
+
+```sh
+bun add -d drizzle-kit@1.0.0-rc.5-ab785fc
+```
+
+The example uses `drizzle-orm@1.0.0-rc.5-169397b`. Keep compatible versions and the lockfile together;
+do not mix migration layouts from older releases.
+
+Add this application-root configuration, adjusting the schema path for your app:
+
+<include cwd lang="ts" meta='title="drizzle.config.ts"'>
+  ../../examples/data-model/drizzle.config.ts
+</include>
+
+`schema` points to the same table exports used by the service. `dialect` describes the database,
+`out` owns the generated migration history, and `dbCredentials` selects the migration target.
+The configuration deliberately requires an explicit persistent file path. A separate process cannot
+migrate the in-memory connection later opened by your application.
+
+The example's package scripts use `bun --bun drizzle-kit generate` and
+`bun --bun drizzle-kit migrate`. Running Kit under Bun lets this SQLite workflow use Bun's driver.
+
+## Generate, review, and apply
+
+For a new app and a new local file, run these commands from the application root:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=initial
+bun --bun drizzle-kit migrate
+bun run check
+bun run typecheck
+bun run dev
+```
+
+If you are running the repository example, its initial migration is already generated and checked in;
+start with `bun run db:migrate` after setting `DATABASE_PATH`. Use the same path for the migration
+command and the running server. A relative path is resolved from the process's working directory.
+
+`generate` compares TypeScript schema definitions with migration snapshots and creates migration
+artifacts; it does not modify your database. Review the generated changes before applying them.
+`migrate` applies pending migrations and records their history. See the official
+[Drizzle Kit generate guide](https://orm.drizzle.team/docs/drizzle-kit-generate) and
+[migrate guide](https://orm.drizzle.team/docs/drizzle-kit-migrate) for the tooling contract.
+
+Commit the generated migration directory, including snapshots, alongside the schema change. Let Kit
+own the output layout. Do not hand-edit generated snapshots or rewrite migrations already applied to
+shared environments. Native statements and advanced manual migrations belong in the
+[Drizzle documentation](https://orm.drizzle.team/docs/sql), not the normal service setup.
+
+## Change an existing model
+
+Edit the relevant Drizzle table, then generate a new named migration:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=users-change
+```
+
+Review the diff and test it on an isolated copy of the old schema with representative data. After
+verification, apply the pending migrations to the intended target with `bun run db:migrate`
+(or `bun --bun drizzle-kit migrate` if you have not added the script).
+
+Keep model changes, generated artifacts, and affected application contracts in the same change.
+Renames need particular attention so they are not mistaken for deleting and recreating data.
+
+A database created by older demo bootstrap code or by another tool has no matching Drizzle migration
+history. Do not blindly apply the initial migration to it. Establish a baseline using a workflow
+appropriate to your existing database and Drizzle version before continuing. Do not use a reset or
+force flag to make an existing database fit the tutorial.
+
+## Deploy without racing application replicas
+
+Run migrations as one coordinated deployment step, with deliberate credentials and the required
+Drizzle tooling/configuration/artifacts available. Do not run schema changes in a request handler
+or have every server replica migrate at startup.
+
+For changes used by running versions, prefer an additive field or table, a controlled backfill,
+a compatible application rollout, and only then removal of the old shape. Non-null fields may need
+defaults or a backfill; unique constraints may fail on existing duplicates.
+
+Before destructive changes, verify backups, restoration, the exact database target, and lock/downtime
+expectations. A rollback cannot necessarily recover discarded data. Keep seeding separate from
+migrations and normal server startup.
+
+For PostgreSQL or MySQL, use matching table definitions, Kit dialect/connection settings, and the
+appropriate driver. This executable workflow verifies Bun SQLite; it is not a test of other dialects.
+
+## Verify migrations separately from queries
+
+From the data-model example root:
+
+```sh
+bun test tests/migrations.test.ts
+bun test tests/data-model.test.ts
+bun run check
+bun run typecheck
+```
+
+The migration test invokes Drizzle Kit against a temporary file, writes data through Drizzle, and
+runs migrations again to verify that the data survives. Application tests apply the generated
+migration to their own isolated connection. As history grows, add upgrade tests from deployed
+versions, not just tests of an empty database.
+
+See [Testing](/docs/database/testing) for the executable tests and
+[Better Auth](/docs/database/better-auth) before adding authentication tables.
+
+<include cwd>content/generated/related/database-migrations.mdx</include>

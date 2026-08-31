@@ -1,0 +1,65 @@
+---
+title: Custom models
+description: Add typed, named queries with defineModel, use the injected Drizzle query builder, and preserve transaction and authorization boundaries.
+---
+
+Use `defineModel` when a table needs operations beyond base CRUD. A model extends the table client with
+named functions; it does not create a new table, require a class, or replace the owning business service.
+If the six base methods are sufficient, do not create an empty model file.
+
+## Define an extension beside the schema
+
+<include cwd lang="ts" meta='title="src/database/models/users.model.ts"'>
+  ../../examples/data-model/src/database/models/users.model.ts
+</include>
+
+`table` must be the exact table object exported by the service's schema. `extend` must contain at least
+one function. Names such as `byEmailDomain` and `findOneAndUpdate` become methods on the Users table client.
+
+The first extension argument is injected: `{ table, database }`. Additional arguments form the consumer
+API, and return types are preserved. Use this parameter instead of class state such as `this.drizzle`
+or `this.table`.
+
+## Register and call the model
+
+Import the model into `src/database/service.ts` and add `models: { users: usersModel }` to
+`defineDrizzleService`. The registration key must match the schema export key, and the model must use
+that same table object. A file under `models/` is not automatically registered just because it exists.
+
+After `bun run check` refreshes context types, functions call the method without supplying the injected
+first argument:
+
+<include cwd lang="ts" meta='title="src/users/functions/list-users.function.ts"'>
+  ../../examples/data-model/src/users/functions/list-users.function.ts
+</include>
+
+Keep business entry points in their owning domains and expose them through [Service](/docs/service).
+Do not make routes or other domains import private table files just to construct a query.
+
+## Use native Drizzle where it helps
+
+The injected `database` provides the dialect's query builder for joins, aggregations, projections, and
+native mutations. It is not the portable `context.database`, so do not expect `database.users.findOne`
+inside the extension. The public extension type intentionally omits Drizzle's relational `query` API;
+use the supported query-builder surface rather than assuming relation-loading types are present.
+
+An extension called through the context supplied by `transaction` receives the transaction-bound client.
+Use that injected client, not a separately imported connection. See [Transactions](/docs/database/transactions).
+
+## Make custom behavior explicit
+
+Custom methods bypass the portable CRUD implementation and its operation overrides. Add the validation,
+tenant restrictions, limits, and result checks the query needs. You cannot use an extension named
+`findOne`, `findMany`, `insert`, `update`, `upsert`, or `delete`; use
+[operation overrides](/docs/database/overrides) to customize those names.
+
+The sample `byEmailDomain` uses Drizzle's `like()` expression: values are parameterized, but `%` and `_`
+in the supplied domain still act as pattern wildcards. It also has no pagination. Validate or escape
+patterns and add an explicit limit before using it as a public search feature. For native statements
+beyond the query builder, refer to [Drizzle's documentation](https://orm.drizzle.team/docs/sql).
+
+Likewise, `findOneAndUpdate` performs a read followed by an update; its name does not make the sequence
+atomic. Protect concurrent state changes with an appropriate database operation and test it. The
+[model test](/docs/database/testing) verifies the demonstration behavior without implying stronger guarantees.
+
+<include cwd>content/generated/related/database-models.mdx</include>

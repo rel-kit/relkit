@@ -1,0 +1,90 @@
+---
+title: Getting started
+description: Organize durable application data, choose a database service, and keep persistence separate from business rules and public APIs.
+---
+
+A database stores the durable state your application needs after a request or process ends: accounts,
+orders, memberships, and other business records. A database service owns how the application connects
+to that data and exposes data operations to business domains. It is not the business domain itself.
+
+Start with the data your product needs, then choose the database and integration that fit it. The
+architecture below applies whether your model uses relational tables or documents; the concrete schema,
+query, and migration APIs belong to the chosen integration.
+
+## Keep the responsibilities separate
+
+| Responsibility      | What belongs here                                                          | Typical location                                          |
+| ------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Database service    | Connection configuration, lifecycle, and integration-specific registration | `src/database/service.ts`                                 |
+| Data model          | Stored record shapes, identities, relationships, and constraints           | `src/database/schema/` in the current Drizzle integration |
+| Data operations     | Reusable queries and persistence-specific customization                    | `src/database/models/` for Drizzle custom methods         |
+| Business domain     | Validation, authorization, and workflows such as registering a member      | `src/users/functions/` or another owning domain           |
+| Operational tooling | Schema migrations, backfills, backups, and recovery                        | Application-root tooling, outside business handlers       |
+| HTTP interface      | Which business operations callers can invoke                               | `src/routes/`                                             |
+
+A Users function decides whether someone may join an organization. The database stores the user and
+membership and enforces the configured constraints. A route exposes that workflow only when the product
+needs an HTTP endpoint. Keeping these responsibilities separate lets you change a query without moving
+routes, and evolve storage without duplicating business rules across transports.
+
+The database is a specialized [service](/docs/service). It does not replace domain services, and table
+access alone never grants permission to a caller. See [Service organization](/docs/service/organization)
+for where functions, tools, agents, jobs, and other domain members belong.
+
+## Choose an integration
+
+[Drizzle](/docs/database/drizzle) is the database service integration available today. It supports
+relational table definitions and adds typed CRUD operations, generated validation schemas, custom
+models, and transactions.
+
+MongoDB and Prisma integrations are planned, not available APIs in this release. Their guides will
+describe their own APIs as they are introduced; Drizzle's method names are not a universal contract
+for future integrations. Database concepts stay separate from the currently implemented Drizzle workflow.
+
+For the Drizzle path, start with [connection setup](/docs/database/define), then
+[Your first database](/docs/database/first-database). Other database clients should remain behind your
+domain's own operations until a supported integration is available; they are not automatically
+registered by naming a file `service.ts`.
+
+## Follow data through the application
+
+```text
+Route, job, tool, or other entry point
+  → owning domain's business function
+  → database service's data operations
+  → database
+
+Schema changes → migration tooling → database
+```
+
+The current Drizzle integration makes its typed client available through `context.database`.
+Business functions do not open a new connection for each call or declare `dependencies.database`.
+This injection and its exact types are documented in the [Drizzle service guide](/docs/database/drizzle).
+
+From an existing app's root, check service discovery and generated context types after changing registration:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+These commands check application structure and types; they do not provision a database or migrate it.
+
+## Find the guide for your task
+
+The following implementation guides use the current Drizzle integration:
+
+- Understand what the integration generates: [Drizzle database service](/docs/database/drizzle).
+- Connect and configure lifecycle: [Define a Drizzle service](/docs/database/define).
+- Define tables, keys, and relationships: [Define the schema](/docs/database/schema).
+- Reuse and customize generated validation: [Generated CRUD and schemas](/docs/database/generated-schemas).
+- Read and change records: [Query data](/docs/database/queries).
+- Add a named query: [Custom models](/docs/database/models).
+- Change a built-in operation: [Override operations](/docs/database/overrides).
+- Commit related writes together: [Transactions](/docs/database/transactions).
+- Evolve persistent data: [Migrations](/docs/database/migrations).
+- Share the database with authentication: [Integrate Better Auth](/docs/database/better-auth).
+- Verify behavior safely: [Testing](/docs/database/testing).
+- Follow the complete application workflow: [Your first database](/docs/database/first-database).
+
+<include cwd>content/generated/related/database-index.mdx</include>
