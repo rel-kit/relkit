@@ -15,7 +15,7 @@
     "@relkit/better-auth": "workspace:*",
     "@relkit/client": "workspace:*",
     "@relkit/drizzle": "workspace:*",
-    "better-auth": "1.7.1",
+    "better-auth": "1.7.2",
     "drizzle-orm": "1.0.0-rc.5-169397b"
   },
   "devDependencies": {
