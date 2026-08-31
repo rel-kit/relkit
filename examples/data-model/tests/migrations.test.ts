@@ -20,6 +20,7 @@ test("rejects empty and in-memory migration targets", async () => {
   }
 });
 
+// Two Drizzle CLI cold starts share CPU with the parallel example checks in CI.
 test("applies the initial migration once and keeps rows on a second run", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-database-migrations-"));
   const path = join(root, "test.sqlite");
@@ -63,4 +64,4 @@ test("applies the initial migration once and keeps rows on a second run", async 
   } finally {
     await rm(root, { recursive: true, force: true });
   }
-});
+}, 30_000);
