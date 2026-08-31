@@ -1,15 +1,26 @@
 import type { ApiPackage } from "./documentation-catalog.js";
+import { eventGuideGroup, eventGuideRelations } from "./event-guide-catalog.js";
+import { storageGuideGroup, storageGuideRelations } from "./storage-guide-catalog.js";
+import { cachingGuideGroup, cachingGuideRelations } from "./caching-guide-catalog.js";
+import { aiGuideGroup, aiGuideRelations } from "./ai-guide-catalog.js";
+import { serviceGuideGroup, serviceGuideRelations } from "./service-guide-catalog.js";
+import { httpGuideGroup, httpGuideRelations } from "./http-guide-catalog.js";
+import { jobsGuideGroup, jobsGuideRelations } from "./jobs-guide-catalog.js";
+import { databaseGuideGroup, databaseGuideRelations } from "./database-guide-catalog.js";
+import { authGuideGroup, authGuideRelations } from "./auth-guide-catalog.js";
 
 export const guideGroups = [
-  group("start", "Start", [
-    "create-an-app",
-    "first-route",
-    "local-development",
-    "check",
-    "build",
-    "production",
-  ]),
-  group("fundamentals", "Application fundamentals", [
+  group("start", "Start", "Rocket", ["create-an-app", "first-route", "local-development"]),
+  serviceGuideGroup,
+  httpGuideGroup,
+  eventGuideGroup,
+  jobsGuideGroup,
+  databaseGuideGroup,
+  authGuideGroup,
+  storageGuideGroup,
+  cachingGuideGroup,
+  aiGuideGroup,
+  group("fundamentals", "Application fundamentals", "Blocks", [
     "application",
     "environment",
     "providers",
@@ -20,19 +31,8 @@ export const guideGroups = [
     "services",
     "domain-first-migration",
   ]),
-  group("http", "HTTP", [
-    "routes",
-    "requests",
-    "uploads",
-    "middleware",
-    "rate-limits",
-    "responses",
-    "openapi",
-    "generated-clients",
-  ]),
-  group("async", "Asynchronous work", ["jobs", "schedules", "events", "listeners"]),
-  group("resources-ai", "Resources and AI", ["buckets", "cache", "tools", "approvals", "agents"]),
-  group("operations", "Tooling and operations", [
+  group("async", "Asynchronous work", "Timer", ["jobs", "schedules", "events", "listeners"]),
+  group("operations", "Tooling and operations", "Wrench", [
     "cli-reference",
     "inspector",
     "observability",
@@ -55,9 +55,15 @@ const relations = [
     ["app", "routes"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
-  relation("start/check", ["app"], ["templates/default/v1/api/package.json"]),
-  relation("start/build", ["app"], ["templates/default/v1/api/package.json"]),
-  relation("start/production", ["app"], ["templates/default/v1/api/package.json"]),
+  ...serviceGuideRelations,
+  ...httpGuideRelations,
+  ...eventGuideRelations,
+  ...jobsGuideRelations,
+  ...databaseGuideRelations,
+  ...authGuideRelations,
+  ...storageGuideRelations,
+  ...cachingGuideRelations,
+  ...aiGuideRelations,
   relation("fundamentals/application", ["app"], ["templates/default/v1/api/relkit.config.ts"]),
   relation(
     "fundamentals/environment",
@@ -87,30 +93,6 @@ const relations = [
     ["services", "routes"],
     ["examples/commerce/src/orders/service.ts"],
   ),
-  relation("http/routes", ["routes"], ["examples/commerce/src/routes/orders/[orderId]/route.ts"]),
-  relation("http/requests", ["routes", "schema"], ["examples/commerce/src/routes/orders/route.ts"]),
-  relation("http/uploads", ["routes", "schema"], ["examples/commerce/src/routes/uploads/route.ts"]),
-  relation(
-    "http/middleware",
-    ["routes"],
-    ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
-  ),
-  relation(
-    "http/rate-limits",
-    ["routes", "cache"],
-    ["examples/commerce/src/routes/orders/route.ts"],
-  ),
-  relation(
-    "http/responses",
-    ["routes", "functions"],
-    ["examples/commerce/src/routes/orders/route.ts"],
-  ),
-  relation("http/openapi", ["routes"], ["examples/commerce/src/routes/orders/[orderId]/route.ts"]),
-  relation(
-    "http/generated-clients",
-    ["client", "routes"],
-    ["examples/commerce/src/platform/generated-client.ts"],
-  ),
   relation("async/jobs", ["jobs"], ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]),
   relation(
     "async/schedules",
@@ -120,33 +102,12 @@ const relations = [
   relation(
     "async/events",
     ["events"],
-    ["examples/commerce/src/orders/events/order-created.event.ts"],
+    ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
   ),
   relation(
     "async/listeners",
     ["events"],
-    ["examples/commerce/src/receipts/events/order-receipt.event.ts"],
-  ),
-  relation(
-    "resources-ai/buckets",
-    ["buckets"],
-    ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
-  ),
-  relation("resources-ai/cache", ["cache"], ["examples/commerce/src/orders/cache/prices.cache.ts"]),
-  relation(
-    "resources-ai/tools",
-    ["tools"],
-    ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
-  ),
-  relation(
-    "resources-ai/approvals",
-    ["agents", "tools"],
-    ["examples/commerce/src/orders/tools/cancel-order.tool.ts"],
-  ),
-  relation(
-    "resources-ai/agents",
-    ["agents", "testing"],
-    ["examples/commerce/src/orders/agents/order-support.agent.ts"],
+    ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
   ),
   relation("operations/inspector", ["app", "routes"], ["tests/e2e/inspector-redesign.spec.ts"]),
   relation(
@@ -176,8 +137,8 @@ export const guideRelations = relations.map((item, index) => ({
   next: relations[index + 1]?.path ?? "operations/cli-reference",
 }));
 
-function group(directory: string, title: string, pages: readonly string[]) {
-  return { directory, title, pages };
+function group(directory: string, title: string, icon: string, pages: readonly string[]) {
+  return { directory, title, icon, pages };
 }
 
 function relation(path: string, api: readonly ApiPackage[], examples: readonly string[]) {

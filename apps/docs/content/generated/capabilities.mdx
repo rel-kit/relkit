@@ -33,13 +33,23 @@
   />
   <Card
     title="Services"
-    description="Define a domain's public functions and events."
-    href="/docs/fundamentals/services"
+    description="Organize capabilities by domain and expose a focused public service boundary."
+    href="/docs/service/define"
+  />
+  <Card
+    title="Database"
+    description="Organize application data, choose a database service, and customize persistence."
+    href="/docs/database/index"
+  />
+  <Card
+    title="Authentication"
+    description="Configure authentication, read request sessions, and protect application entry points."
+    href="/docs/auth/index"
   />
   <Card
     title="HTTP routes"
     description="Map filesystem routes to validated function calls."
-    href="/docs/http/routes"
+    href="/docs/http/define"
   />
   <Card
     title="HTTP middleware"
@@ -59,37 +69,37 @@
   <Card
     title="Jobs"
     description="Queue validated work with bounded retry and concurrency."
-    href="/docs/async/jobs"
+    href="/docs/jobs/define"
   />
   <Card
     title="Schedules"
     description="Trigger a job from explicit cron and timezone rules."
-    href="/docs/async/schedules"
+    href="/docs/jobs/schedules"
   />
   <Card
     title="Object buckets"
-    description="Store bounded objects through provider-neutral clients."
-    href="/docs/resources-ai/buckets"
+    description="Store, read, and share files from your app."
+    href="/docs/storage/define"
   />
   <Card
     title="Cache"
-    description="Use schema-backed values, counters, TTLs, and rate-limit state."
-    href="/docs/resources-ai/cache"
+    description="Reuse expensive lookups and keep cached values fresh."
+    href="/docs/caching/define"
   />
   <Card
     title="AI tools"
-    description="Expose existing functions to models through bounded metadata."
-    href="/docs/resources-ai/tools"
+    description="Let AI agents and MCP clients use your application's functions."
+    href="/docs/ai/tools"
   />
   <Card
     title="Tool approvals"
     description="Require an explicit decision before sensitive model actions."
-    href="/docs/resources-ai/approvals"
+    href="/docs/ai/approvals"
   />
   <Card
     title="Agents"
     description="Run bounded model workflows with allowlisted tools and offline tests."
-    href="/docs/resources-ai/agents"
+    href="/docs/ai/agents"
   />
   <Card
     title="Testing"
@@ -98,24 +108,26 @@
   />
 </Cards>
 
-| Capability                                 | What it gives you                                                            |
-| ------------------------------------------ | ---------------------------------------------------------------------------- |
-| [Application configuration](/docs/api/app) | Define application identity and runtime topology.                            |
-| [Environment contracts](/docs/api/config)  | Parse, default, and protect runtime configuration.                           |
-| [Provider bindings](/docs/api/app)         | Choose local, external, or managed infrastructure without changing handlers. |
-| [Runtime schemas](/docs/api/schema)        | Validate untrusted values while retaining TypeScript inference.              |
-| [Functions](/docs/api/functions)           | Write one validated handler for every invocation transport.                  |
-| [Declared errors](/docs/api/functions)     | Expose stable failures with transport and retry policy.                      |
-| [Services](/docs/api/services)             | Define a domain's public functions and events.                               |
-| [HTTP routes](/docs/api/routes)            | Map filesystem routes to validated function calls.                           |
-| [HTTP middleware](/docs/api/routes)        | Apply request policy to explicit path scopes.                                |
-| [Generated clients](/docs/api/client)      | Call checked routes through the generated typed contract.                    |
-| [Events](/docs/api/events)                 | Publish typed facts and process them with independent listeners.             |
-| [Jobs](/docs/api/jobs)                     | Queue validated work with bounded retry and concurrency.                     |
-| [Schedules](/docs/api/jobs)                | Trigger a job from explicit cron and timezone rules.                         |
-| [Object buckets](/docs/api/buckets)        | Store bounded objects through provider-neutral clients.                      |
-| [Cache](/docs/api/cache)                   | Use schema-backed values, counters, TTLs, and rate-limit state.              |
-| [AI tools](/docs/api/tools)                | Expose existing functions to models through bounded metadata.                |
-| [Tool approvals](/docs/api/agents)         | Require an explicit decision before sensitive model actions.                 |
-| [Agents](/docs/api/agents)                 | Run bounded model workflows with allowlisted tools and offline tests.        |
-| [Testing](/docs/api/testing)               | Exercise the engine with HTTP helpers and deterministic fakes.               |
+| Capability                                 | What it gives you                                                                      |
+| ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| [Application configuration](/docs/api/app) | Define application identity and runtime topology.                                      |
+| [Environment contracts](/docs/api/config)  | Parse, default, and protect runtime configuration.                                     |
+| [Provider bindings](/docs/api/app)         | Choose local, external, or managed infrastructure without changing handlers.           |
+| [Runtime schemas](/docs/api/schema)        | Validate untrusted values while retaining TypeScript inference.                        |
+| [Functions](/docs/api/functions)           | Write one validated handler for every invocation transport.                            |
+| [Declared errors](/docs/api/functions)     | Expose stable failures with transport and retry policy.                                |
+| [Services](/docs/api/services)             | Organize capabilities by domain and expose a focused public service boundary.          |
+| [Database](/docs/api/drizzle)              | Organize application data, choose a database service, and customize persistence.       |
+| [Authentication](/docs/api/better-auth)    | Configure authentication, read request sessions, and protect application entry points. |
+| [HTTP routes](/docs/api/routes)            | Map filesystem routes to validated function calls.                                     |
+| [HTTP middleware](/docs/api/routes)        | Apply request policy to explicit path scopes.                                          |
+| [Generated clients](/docs/api/client)      | Call checked routes through the generated typed contract.                              |
+| [Events](/docs/api/events)                 | Publish typed facts and process them with independent listeners.                       |
+| [Jobs](/docs/api/jobs)                     | Queue validated work with bounded retry and concurrency.                               |
+| [Schedules](/docs/api/jobs)                | Trigger a job from explicit cron and timezone rules.                                   |
+| [Object buckets](/docs/api/buckets)        | Store, read, and share files from your app.                                            |
+| [Cache](/docs/api/cache)                   | Reuse expensive lookups and keep cached values fresh.                                  |
+| [AI tools](/docs/api/tools)                | Let AI agents and MCP clients use your application's functions.                        |
+| [Tool approvals](/docs/api/agents)         | Require an explicit decision before sensitive model actions.                           |
+| [Agents](/docs/api/agents)                 | Run bounded model workflows with allowlisted tools and offline tests.                  |
+| [Testing](/docs/api/testing)               | Exercise the engine with HTTP helpers and deterministic fakes.                         |

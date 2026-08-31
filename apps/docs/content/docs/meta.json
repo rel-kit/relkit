@@ -1,4 +1,20 @@
 {
   "title": "RELKIT",
-  "pages": ["index", "start", "fundamentals", "http", "async", "resources-ai", "operations", "api"]
+  "pages": [
+    "index",
+    "start",
+    "service",
+    "http",
+    "events",
+    "jobs",
+    "database",
+    "auth",
+    "storage",
+    "caching",
+    "ai",
+    "fundamentals",
+    "async",
+    "operations",
+    "api"
+  ]
 }

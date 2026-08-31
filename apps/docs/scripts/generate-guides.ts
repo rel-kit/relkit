@@ -34,10 +34,13 @@ export async function generateGuides(
 }
 
 async function validateCatalog(root: string, content: string): Promise<void> {
+  const directories = new Set<string>(guideGroups.map(({ directory }) => directory));
   const authoredPages = new Set([
     "index",
     ...guideGroups.flatMap(({ directory, pages }) =>
-      pages.filter((page) => page !== "cli-reference").map((page) => `${directory}/${page}`),
+      pages
+        .filter((page) => page !== "cli-reference" && !directories.has(`${directory}/${page}`))
+        .map((page) => `${directory}/${page}`),
     ),
   ]);
   const relatedPages = new Set(guideRelations.map(({ path }) => path));
@@ -68,13 +71,13 @@ async function validateCatalog(root: string, content: string): Promise<void> {
 async function emitNavigation(emit: Emit): Promise<void> {
   await emit(
     "meta.json",
-    `${JSON.stringify({ title: "RELKIT", pages: ["index", ...guideGroups.map(({ directory }) => directory), "api"] }, null, 2)}\n`,
+    `${JSON.stringify({ title: "RELKIT", pages: ["index", ...guideGroups.map(({ directory }) => directory).filter((directory) => !directory.includes("/")), "api"] }, null, 2)}\n`,
   );
-  for (const { directory, title, pages } of guideGroups)
-    await emit(`${directory}/meta.json`, `${JSON.stringify({ title, pages }, null, 2)}\n`);
+  for (const { directory, title, icon, pages } of guideGroups)
+    await emit(`${directory}/meta.json`, `${JSON.stringify({ title, icon, pages }, null, 2)}\n`);
   await emit(
     "api/meta.json",
-    `${JSON.stringify({ title: "Generated API reference", pages: apiPackages }, null, 2)}\n`,
+    `${JSON.stringify({ title: "Generated API reference", icon: "Braces", pages: apiPackages }, null, 2)}\n`,
   );
 }
 
@@ -111,7 +114,7 @@ export function renderRelated(relation: (typeof guideRelations)[number]): string
 
 ## Continue learning
 
-**Next:** [${title(relation.next)}](/docs/${relation.next})
+**Next:** [${title(relation.next)}](/docs/${relation.next.replace(/\/index$/, "")})
 
 ### Related API
 
@@ -145,7 +148,10 @@ function command(root: CliHelpCommand, name: string): CliHelpCommand {
 }
 
 function title(path: string): string {
+  const group = guideGroups.find(({ directory }) => path === `${directory}/index`);
+  if (group !== undefined) return group.title;
   return path
+    .replace(/\/index$/, "")
     .split("/")
     .at(-1)!
     .split("-")

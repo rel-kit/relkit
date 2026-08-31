@@ -4,6 +4,8 @@ export const apiPackages = [
   "schema",
   "functions",
   "services",
+  "drizzle",
+  "better-auth",
   "routes",
   "events",
   "jobs",

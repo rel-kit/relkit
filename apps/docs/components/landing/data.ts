@@ -43,7 +43,7 @@ export const exampleDefinitions = [
     title: "Agents",
     description: "Give a model schema-checked input, allowlisted tools, and hard execution limits.",
     source: "examples/commerce/src/orders/agents/order-support.agent.ts",
-    guide: "/docs/resources-ai/agents",
+    guide: "/docs/ai/agents",
   },
   {
     id: "event",

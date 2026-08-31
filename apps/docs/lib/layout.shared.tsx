@@ -12,6 +12,12 @@ export function baseOptions(): BaseLayoutProps {
       ),
     },
     githubUrl: "https://github.com/rel-kit/relkit",
-    links: [{ text: "Examples", url: "/docs/start/create-an-app", active: "nested-url" }],
+    links: [
+      {
+        text: "Examples",
+        url: "https://github.com/rel-kit/relkit/tree/main/examples",
+        external: true,
+      },
+    ],
   };
 }
