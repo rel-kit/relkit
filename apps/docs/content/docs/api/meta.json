@@ -1,11 +1,14 @@
 {
   "title": "Generated API reference",
+  "icon": "Braces",
   "pages": [
     "app",
     "config",
     "schema",
     "functions",
     "services",
+    "drizzle",
+    "better-auth",
     "routes",
     "events",
     "jobs",
