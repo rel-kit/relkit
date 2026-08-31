@@ -1,7 +1,7 @@
-import "@relkit/events";
-
-declare module "@relkit/events" {
-  interface EventRegistry {
+declare global {
+  namespace Relkit {
+    interface EventRegistry {
+    }
   }
 }
 

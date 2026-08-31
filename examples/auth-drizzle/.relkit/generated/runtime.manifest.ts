@@ -20,9 +20,9 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["ALL"], "route.all.api.auth.op
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"], "route.get.session");
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"]["target"], "account.session");
 
-export const manifestContractVersion = 6 as const;
-export const manifestGeneratorVersion = 3 as const;
-export const manifestGraphHash = "sha256:ae09fba58a96e8353658603f2c24be7286dcef2d5942b97593478e945cd15112" as const;
+export const manifestContractVersion = 7 as const;
+export const manifestGeneratorVersion = 4 as const;
+export const manifestGraphHash = "sha256:7cab7bc0c0398a9a7560a63f9c5cddecccc24de0169219ba0d4e6f0b33c71b62" as const;
 export const providerFactories = {  } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
