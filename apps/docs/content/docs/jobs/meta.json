@@ -1,0 +1,5 @@
+{
+  "title": "Jobs",
+  "icon": "ListTodo",
+  "pages": ["index", "define", "enqueue", "retries", "idempotency", "schedules", "first-job"]
+}

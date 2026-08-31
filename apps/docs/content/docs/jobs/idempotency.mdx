@@ -1,0 +1,67 @@
+---
+title: Idempotency
+description: Choose a stable duplicate key, understand the retention window, and keep repeated worker side effects safe across provider differences.
+---
+
+Idempotency asks what should happen when the same logical request arrives again. Job admission and
+handler execution are different boundaries: preventing a second queue entry does not prevent the first
+entry from being delivered more than once.
+
+## Choose a key for one logical operation
+
+The receipt job declares:
+
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — idempotency"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-idempotency
+</include>
+
+For the local provider, `key` names a top-level input field. Its value must be a nonempty string; the
+provider trims it before comparison. It is not a dotted path, callback, or hash of the entire payload.
+Use a stable business key such as an order ID only if one receipt per order is the intended operation.
+
+Different operations on the same order may need different keys. Do not use a random value on every retry
+if retries should refer to the same logical request. Conversely, do not reuse a constant key for work
+that should happen independently each period.
+
+## Understand the local retention window
+
+Within the configured queue and retention window, another enqueue with the same key reuses the earlier
+instance and reports `duplicate: true`. The original input remains the work to execute; changing another
+field, such as `receiptKey`, does not update it or create a new job.
+
+The record is retained across local-provider restarts. Duplicate suppression still applies when the
+earlier job is completed or dead-lettered, until the window expires. It is not an automatic replay of a
+failed job. The expiry is based on admission, not completion; once expired, the same key can admit a new
+instance even if the old work has not finished.
+
+Choose `retentionMs` from the longest realistic retry or repeated-request window. A short window can
+allow unintended repeats; an overly broad key or long window can suppress legitimate work.
+
+## Make the side effect repeatable too
+
+The receipt target writes a deterministic object key:
+
+<include cwd lang="ts" meta='title="src/receipts/functions/send-receipt.function.ts"'>
+  ../../examples/commerce/src/receipts/functions/send-receipt.function.ts
+</include>
+
+Repeating that input writes the same receipt content to the same key instead of inventing a new file.
+This is useful for the example, but it is not a general transaction guarantee. Logs can still repeat,
+and multiple different inputs targeting the same object need their own conflict policy.
+
+For charges, emails, and other effects that cannot simply be overwritten, use the downstream system's
+idempotency facility or a durable business record and appropriate coordination. A queue key by itself
+does not make a payment or email exactly once.
+
+## Verify the selected provider
+
+The current SQS adapter does not enforce the descriptor's admission idempotency policy. Do not assume
+that passing local fake tests enables equivalent deduplication in SQS, including any FIFO feature you
+have not explicitly configured and verified.
+
+The [receipt test](/docs/jobs/first-job#test-admission-execution-and-restart) proves the local behavior:
+enqueue, complete, restart, enqueue the same input, and observe the original instance without another
+execution. Add provider contract tests and side-effect protection before relying on that property in
+production. For recurring work, also read the [constant-input schedule caveat](/docs/jobs/schedules#choose-input-and-idempotency-together).
+
+<include cwd>content/generated/related/jobs-idempotency.mdx</include>

@@ -1,0 +1,78 @@
+---
+title: Schedules
+description: Enqueue jobs on an explicit cron and timezone, with accurate overlap, static-input, idempotency, and restart expectations.
+---
+
+A schedule is a calendar-driven source of job input. It lives on the job descriptor, not in a separate
+service or handler file. Scheduled and manual admissions use the same target and execution policy.
+The clock triggers enqueueing; it does not call the target synchronously or promise an exact start time.
+
+## Declare the schedule
+
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — schedule"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-schedule
+</include>
+
+Each entry requires a stable `id`, a five-field `cron`, an explicit IANA `timezone`, JSON `input`, and
+`overlap`. IDs must be unique within the job. `0 * * * *` means the start of each hour in `UTC`.
+
+State the business rule first: for example, “at 09:00 each weekday in Asia/Riyadh.” Use that named zone
+when local time matters and UTC when the rule is globally fixed. Do not rely on the machine's timezone.
+Cron is not a holiday calendar; test the relevant date boundaries, including daylight-saving transitions
+for zones that observe them.
+
+## Know what overlap actually controls
+
+In the current runtime scheduler, `overlap: "skip"` skips a firing while the previous **enqueue callback**
+is still active. `"allow"` permits overlapping callbacks. Neither waits for the job target to finish.
+
+Once enqueue resolves, a later firing may submit more work even when an earlier receipt is still queued
+or executing. Do not use `skip` as a business-level “only one reconciliation at a time” lock. Use the
+job's [concurrency policy](/docs/jobs/retries#keep-timeouts-and-concurrency-in-perspective) and, when
+necessary, durable coordination in the owning domain.
+
+## Choose input and idempotency together
+
+Schedule input is static JSON. The descriptor does not interpolate the firing timestamp, generate a
+per-period key, or evaluate a payload callback. Supply input that the target accepts; do not mistake
+basic cron and JSON checks for a test of the entire scheduled execution.
+
+The example always supplies `orderId: "scheduled"`, while the job uses that field as its 24-hour
+idempotency key. With the local provider, hourly enqueue attempts therefore reuse the first instance
+throughout that window. This is **not** a new completed receipt every hour.
+
+If each period must do new work, design a suitable per-period business key or a separate scheduling
+operation that computes work from durable state. Alternatively, use a separate job and a duplicate
+policy that fits the intended recurrence. Simply adding an hourly cron does not override idempotency.
+See [Idempotency](/docs/jobs/idempotency) for provider differences.
+
+## Plan for late and missed firings
+
+The generated runtime starts scheduler ticks with its job worker. While that scheduler instance remains
+alive, a tick considers due times since its stored next firing; `allow` and `skip` affect how overlapping
+enqueue callbacks are handled.
+
+On restart, the current local scheduler computes its next firing from registration time. It does not
+persist a durable last-fired cursor and does not guarantee catch-up across downtime. If a missed period
+would lose business work, make the target reconcile durable outstanding state rather than assuming one
+delivery for every clock tick. Verify separately any scheduler supplied by deployment infrastructure.
+
+## Verify without waiting for the wall clock
+
+From the application root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+Inspect the job and schedule in `.relkit/generated/application.graph.json`. Then test the scheduled
+input through the job harness to verify validation, target behavior, and side effects. That proves what
+runs, not when it is triggered: `createTestJob` does not automatically register the descriptor's schedules.
+
+Scheduler tests need an explicit deterministic clock and assertions for next firing, enqueue overlap,
+and recreation after downtime. The repository's commerce job integration test exercises scheduled
+enqueueing alongside the worker; the [first-job tutorial](/docs/jobs/first-job) covers the simpler
+admission and execution test. Never wait for the next real hour in a test.
+
+<include cwd>content/generated/related/jobs-schedules.mdx</include>

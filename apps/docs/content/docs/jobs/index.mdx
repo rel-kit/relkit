@@ -1,0 +1,81 @@
+---
+title: Getting started
+description: Understand domain-owned background work, the difference between enqueueing and execution, and where jobs fit beside functions, events, and schedules.
+---
+
+A job is a named way to queue work for a function. The caller submits validated input and receives an
+acceptance; a worker invokes the target separately. Use it when the caller should not wait for the work
+to finish, or when that work needs its own delivery, retry, and concurrency policy.
+
+Jobs belong inside a [service domain](/docs/service), alongside the behavior they support. Receipts owns
+receipt generation whether it starts from an HTTP request, an order event, or a clock. It does not become
+a separate “background” domain just because it runs later.
+
+## Follow a job through the application
+
+```text
+Function, event subscriber, or schedule
+  ↓ enqueue validated JSON
+Job queue → acceptance returned to caller
+  ↓ worker acquires work
+Ordinary function target
+  ↓ result or classified failure
+Complete, delay for retry, or stop
+```
+
+The job descriptor owns delivery policy; the function owns business behavior and dependencies. Keeping
+them separate lets you test the function directly, reuse it from another entry point, and adjust retry
+or scheduling without duplicating the handler. A direct call to the function does not use the job queue
+or inherit its retry policy.
+
+Here is the Receipts job in the commerce example:
+
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+</include>
+
+Despite its name, this example's target stores a receipt JSON object; it does not send email. Its fixed
+scheduled input also shares the 24-hour duplicate window. Read [schedules](/docs/jobs/schedules) before
+using this demonstration as a recurring business process.
+
+## Choose the right entry point
+
+| Need                                                | Use                                              | Continue with                                                    |
+| --------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| Return a result to the current caller               | An ordinary function or public service operation | [Functions](/docs/fundamentals/functions)                        |
+| Accept specific work now and complete it separately | A job targeting a function                       | [Define a job](/docs/jobs/define)                                |
+| Announce a fact for independent consumers           | An event and event functions                     | [Events](/docs/events)                                           |
+| Enqueue work on a calendar                          | A schedule on a job                              | [Schedules](/docs/jobs/schedules)                                |
+| Let an HTTP client request background work          | A route targeting a public enqueue function      | [Enqueue work](/docs/jobs/enqueue) and [HTTP Routes](/docs/http) |
+
+Event delivery already has its own processing policy. Do not add a second queue solely because an event
+handler is asynchronous. Add a job when the resulting work needs a separate queue, retry policy, or
+scheduled/manual entry point. An event-only function cannot be a job target.
+
+## Put each file with its owner
+
+Keep the job in `src/receipts/jobs/*.job.ts` and its target in `src/receipts/functions/*.function.ts`.
+The domain still has `src/receipts/service.ts`. There is no `jobs` member map on `defineService` and no
+manual job registration array: the compiler discovers the default-exported descriptor.
+
+If another domain or an HTTP route needs to request the work, expose an ordinary enqueue function through
+the Receipts service. Keep queue policy private. A worker target used only within Receipts does not need
+to be a public service member. See [domain organization](/docs/service/organization).
+
+The target can declare [storage](/docs/storage), [caching](/docs/caching), or [agent](/docs/ai) dependencies
+like any other function. Enqueue small identifiers and facts, not those clients or live request objects.
+
+## Choose your next step
+
+- Build and test a complete flow: [Your first job](/docs/jobs/first-job).
+- Configure contracts and a queue profile: [Define a job](/docs/jobs/define).
+- Return an acceptance from domain behavior: [Enqueue work](/docs/jobs/enqueue).
+- Decide what happens on failure: [Retries and delivery](/docs/jobs/retries).
+- Make repeated requests safe: [Idempotency](/docs/jobs/idempotency).
+- Run calendar-driven work: [Schedules](/docs/jobs/schedules).
+
+The [Jobs API reference](/docs/api/jobs) lists the exact types. These guides distinguish runtime policy
+from provider guarantees: local durable state and SQS do not currently have identical deduplication or
+inspection behavior.
+
+<include cwd>content/generated/related/jobs-index.mdx</include>

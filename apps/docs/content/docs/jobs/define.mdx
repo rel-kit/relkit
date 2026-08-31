@@ -1,0 +1,89 @@
+---
+title: Define a job
+description: Give background work a stable identity, a compatible function target, explicit delivery limits, and a queue provider profile.
+---
+
+Create one default-exported `defineJob` descriptor in the owning domain's `jobs/` directory. The job
+points at a function; it cannot contain a `handler` of its own.
+
+## Start from the function contract
+
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+</include>
+
+`id`, `input`, `target`, and `retry` are required. In this example the job and target reuse `receiptInput`.
+You can also use the target's `input` directly. The compiler requires equivalent projected input schemas,
+not merely a job payload that happens to fit part of the target's shape.
+
+The target must be an ordinary function reference, not an event-only function, tool, or agent. To run an
+agent in a job, target an ordinary function that declares and invokes the agent; start with
+[AI](/docs/ai). Put validation, declared errors, logging, and managed dependencies in that function.
+
+## Understand the descriptor fields
+
+| Field         | Responsibility                                                                                                               |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | Required stable job identity, such as `receipts.send-job`. Keep it stable across deployments.                                |
+| `input`       | Standard Schema validator for queued input. Persistable values must be JSON.                                                 |
+| `target`      | The function the worker invokes. Its output belongs to execution, not the enqueue response.                                  |
+| `retry`       | Required attempt limit, exponential delay, and jitter policy. [Retries](/docs/jobs/retries) explains which failures qualify. |
+| `profile`     | Optional jobs provider profile; otherwise use the application's `defaults.job`.                                              |
+| `timeoutMs`   | Optional positive integer bounding an execution attempt. It does not roll back side effects.                                 |
+| `concurrency` | Optional positive integer limiting simultaneous invocations within the runtime's effective limits.                           |
+| `idempotency` | Optional key field and positive `retentionMs`. See [provider-specific guarantees](/docs/jobs/idempotency).                   |
+| `schedule`    | Optional array of calendar-driven enqueue definitions. See [schedules](/docs/jobs/schedules).                                |
+
+Changing an ID is not a queue migration. Existing queued inputs can outlive the version that created them;
+keep the target compatible while draining old work, or plan an explicit migration. Do not rename a job
+just to change its display title.
+
+Prefer stable identifiers and necessary facts in the payload. Do not enqueue `Request`, `File`, `Date`
+instances, functions, credentials, or provider clients. Store large files through [Storage](/docs/storage)
+and pass their object keys. Validate authorization before acceptance and recheck mutable business state
+inside the target when necessary.
+
+## Bind a jobs provider
+
+Provider configuration belongs in `relkit.config.ts`, not in the handler. Add this `jobs` entry directly
+inside `defineConfig()`:
+
+<include cwd lang="ts" meta='title="relkit.config.ts — jobs"'>
+  ../../examples/commerce/relkit.config.ts#jobs-profile
+</include>
+
+It imports `managed` and `sqs` from `@relkit/app/config`, and `env` from `@app/platform/env.js`. Set
+`defaults.job` to `"default"` if jobs should use this profile without declaring `profile` individually.
+Merge the entry into the existing configuration; do not replace other providers.
+
+Add these fields inside the application's `defineEnv()` call. The snippet uses `envFactory`; import
+`env as envFactory` from `@relkit/app/config` if that alias is not already present:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts — jobs fields"'>
+  ../../examples/commerce/src/platform/env.ts#jobs-environment
+</include>
+
+The localhost endpoint and queue URL are example configuration, not a provisioned queue. Test mode
+substitutes local providers; development or production using SQS needs a reachable queue and appropriate
+credentials. Profile names select bindings, not a guarantee of a separate physical queue per job.
+Use [Providers](/docs/fundamentals/providers) and [Deployment](/docs/operations/deployment) for environment
+and infrastructure ownership.
+
+## Check the domain and graph
+
+Keep the job and target in the domain that owns the work. Its service exposes callable operations,
+not the job descriptor. A same-domain job may target a private function; a cross-domain caller should
+use the owner's public enqueue operation. See [Service](/docs/service).
+
+From the application root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+Confirm that `.relkit/generated/application.graph.json` contains the job, its function target, and any
+schedules. Fix schema incompatibilities, missing profiles, and invalid references in source, not by
+editing generated artifacts. Next, [enqueue work](/docs/jobs/enqueue).
+
+<include cwd>content/generated/related/jobs-define.mdx</include>

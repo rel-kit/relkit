@@ -1,0 +1,84 @@
+---
+title: Retries and delivery
+description: Classify retryable failures, bound attempts and delays, and understand leases, timeouts, concurrency, and terminal failure.
+---
+
+A queued job can run more than once. A worker may complete the external side effect and stop before
+acknowledging it; recovery can deliver the same work again. Retry limits do not turn delivery into
+exactly-once execution. Make the target safe to repeat as well as configuring queue policy.
+
+## Understand the lifecycle
+
+```text
+accepted → available → leased
+                         ├─ success → completed
+                         ├─ retryable, attempts remain → delayed → available
+                         └─ terminal or exhausted → dead-lettered
+```
+
+A lease reserves work for a worker; expired leases can be recovered after a crash.
+These are runtime queue states. The enqueue response's `status: "accepted"` is only an acknowledgement.
+
+## Retry only classified transient failures
+
+The current job worker retries normalized declared application failures whose retry metadata says
+`later`. It does **not** automatically retry every thrown exception.
+
+| Failure                                                                          | Current worker behavior                                                                     |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Declared application error with `retry: "later"` or `{ kind: "later", afterMs }` | Retry while attempts remain.                                                                |
+| Declared error with `retry: "never"`, or without retry metadata                  | Stop.                                                                                       |
+| Unexpected exception or defect                                                   | Stop; it is not assumed to be transient.                                                    |
+| Input/output validation failure, timeout, cancellation, or provider failure      | Stop unless the application deliberately reports an appropriate retryable declared failure. |
+
+Define expected transient conditions as [declared errors](/docs/fundamentals/errors), list them on the
+target, and throw their constructed values. Do not catch every exception and relabel it as retryable:
+that can repeat permanent failures or unsafe side effects. The receipt-writing target currently declares
+no such errors, so its retry policy alone does not make arbitrary storage errors retryable.
+
+## Bound attempts and backoff
+
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — execution policy"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-retry
+</include>
+
+`maxAttempts` includes the first execution. This policy permits three attempts: the initial attempt,
+then up to two qualifying retries with policy delays of 500 ms and 1,000 ms.
+
+After failed attempt `n`, the policy computes `initialDelayMs × multiplier^(n − 1)`, capped at
+`maxDelayMs`. `jitter: "none"` keeps that delay; `"full"` randomizes from zero to the cap, and `"equal"`
+randomizes over its upper half. A declared error's `afterMs` is a minimum: the worker uses the larger
+of that minimum and the jittered policy delay. That minimum can exceed `maxDelayMs`.
+
+`maxAttempts` must be a positive integer. Delay values are nonnegative integers, `maxDelayMs` must be
+at least `initialDelayMs`, and `multiplier` must be finite and at least one. Waiting longer than the
+computed delay is possible when workers or providers are unavailable.
+
+## Keep timeouts and concurrency in perspective
+
+`timeoutMs` bounds an attempt, not the lifetime of the queued job. Forward `context.signal` to operations
+that support cancellation. A deadline does not undo a completed write, charge, or message, and code that
+ignores cancellation may keep running outside the intended window.
+
+The effective invocation concurrency respects job, function, and consumer limits. A value of four is a
+ceiling, not a promise that a worker will launch four attempts in parallel. It does not enforce a global
+cross-process quota, per-customer ordering, FIFO completion, or rate limiting. Use explicit domain
+coordination if those properties matter.
+
+## Inspect terminal work and test recovery
+
+The local provider persists job history and terminal `dead-lettered` entries for inspection. The current
+SQS adapter keeps its inspection map in memory and deletes the received message for both completion and
+terminal failure; it does not itself move that message into a durable separate dead-letter queue.
+Review the actual adapter and infrastructure before relying on replay or retained failures in production.
+
+Start with the executable test in [your first job](/docs/jobs/first-job). `createTestJob` uses deterministic
+time and exposes `runNext`, `drain`, `clock`, `failures`, and `restart`. Pass the authored retry policy
+explicitly. `drain()` processes available work; it does not advance time until future retries become due.
+
+Add tests for a retryable declared error, a terminal error, exhausted attempts, and a crash after the
+handler succeeds but before acknowledgement. Advance the harness clock rather than sleeping. Check both
+queue state and the external side effect, not just how many times a mock was called. See the
+[Testing API](/docs/api/testing) for the harness controls.
+
+<include cwd>content/generated/related/jobs-retries.mdx</include>
