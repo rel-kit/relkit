@@ -5,6 +5,8 @@ import type { GraphNodeBase } from "./model.js";
 export type DomainExposure = "public" | "internal";
 
 export interface FunctionNode extends GraphNodeBase<"function"> {
+  readonly invocationMode: "callable" | "event-only";
+  readonly publishes?: JsonValue;
   readonly exposure?: DomainExposure;
   readonly input: JsonValue;
   readonly output: JsonValue;

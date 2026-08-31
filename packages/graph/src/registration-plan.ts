@@ -1,5 +1,6 @@
 import { deepFreeze, type JsonValue, type SourceLocation } from "@relkit/contracts";
 import { canonicalizeGraph, hashGraph, type GraphCanonicalizationOptions } from "./hash.js";
+import { validateEventTargets } from "./event-validation.js";
 import type {
   AgentNode,
   ApplicationGraph,
@@ -67,6 +68,7 @@ export function createRegistrationPlan(
   options: GraphCanonicalizationOptions = {},
 ): RegistrationPlan {
   const canonical = canonicalizeGraph(graph, options);
+  validateEventTargets(canonical);
   const plan: MutableRegistrationPlan = {
     graphHash: hashGraph(canonical, options),
     functions: [],

@@ -61,14 +61,14 @@ export interface HttpTriggerConfig {
   readonly maxBodyBytes?: number;
   readonly timeoutMs?: number;
 }
-export type SelectorExpansion = `${string}@${number}`;
 export interface EventTriggerConfig {
-  readonly selector: JsonValue;
-  readonly expansion: readonly SelectorExpansion[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: "ephemeral" | "durable";
   readonly profile?: string;
   readonly retry?: JsonValue;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 export interface TriggerNode<
   Trigger extends GraphTriggerType = GraphTriggerType,
@@ -91,7 +91,7 @@ export interface JobNode extends GraphNodeBase<"job"> {
 export interface EventNode extends GraphNodeBase<"event"> {
   readonly exposure?: DomainExposure;
   readonly version: number;
-  readonly payload: JsonValue;
+  readonly input: JsonValue;
   readonly sensitiveFields?: readonly string[];
   readonly profile: string;
 }

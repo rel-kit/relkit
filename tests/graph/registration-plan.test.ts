@@ -10,6 +10,7 @@ function graph(): ApplicationGraph {
     nodes: [
       {
         kind: "function",
+        invocationMode: "callable",
         id: "orders.create",
         domainId: "orders",
         exposure: "public",
@@ -37,17 +38,25 @@ function graph(): ApplicationGraph {
         id: "orders.created",
         source,
         version: 1,
-        payload: { type: "object" },
+        input: { type: "object" },
+      },
+      {
+        kind: "function",
+        invocationMode: "event-only",
+        id: "orders.react",
+        source,
+        input: { type: "object" },
+        output: { "x-relkit-void": true },
       },
       {
         kind: "trigger",
         id: "orders.listener",
         source,
         triggerType: "event",
-        targetFunctionId: "orders.create",
+        targetFunctionId: "orders.react",
         config: {
-          selector: { kind: "match", pattern: "orders.*" },
-          expansion: ["orders.created@1"],
+          eventId: "orders.created",
+          eventVersion: 1,
           delivery: "durable",
         },
       },
@@ -133,7 +142,7 @@ describe("registration planning", () => {
     const second = createRegistrationPlan({ ...input, nodes: [...input.nodes].reverse() });
 
     expect(second).toEqual(first);
-    expect(first.functions.map(({ id }) => id)).toEqual(["orders.create"]);
+    expect(first.functions.map(({ id }) => id)).toEqual(["orders.create", "orders.react"]);
     expect(first.functions[0]).toMatchObject({ serviceId: "orders" });
     expect(first.httpTriggers.map(({ id }) => id)).toEqual(["orders.route"]);
     expect(first.httpTriggers[0]).toMatchObject({ serviceId: "orders" });

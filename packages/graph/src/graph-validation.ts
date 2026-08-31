@@ -2,6 +2,7 @@ import { isStableId, normalizeSourceLocation } from "@relkit/contracts";
 import { isGraphEdgeKind, isGraphNodeKind } from "./model.js";
 import { validateProviderNode } from "./provider-validation.js";
 import { validateServiceNode } from "./service-validation.js";
+import { validateEventTargets } from "./event-validation.js";
 
 export function validateGraphShape(value: unknown, root?: string): void {
   if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
@@ -11,6 +12,7 @@ export function validateGraphShape(value: unknown, root?: string): void {
   if (value.appId !== undefined && !isCanonicalId(value.appId)) fail("Graph appId is invalid.");
   value.nodes.forEach((node, index) => validateNode(node, root, index));
   value.edges.forEach((edge, index) => validateEdge(edge, index));
+  validateEventTargets(value as unknown as import("./model.js").ApplicationGraph);
 }
 
 function validateNode(value: unknown, root: string | undefined, index: number): void {
@@ -29,6 +31,8 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   }
   if (value.domainId !== undefined) validateId(value.domainId, `Graph nodes[${index}].domainId`);
   if (value.kind === "function") {
+    if (value.invocationMode !== "callable" && value.invocationMode !== "event-only")
+      fail(`Function "${value.id}" requires a valid invocationMode.`);
     validateGenerated(value.generated, index, "generated");
     validateExposure(value.exposure, index);
   }
@@ -67,7 +71,7 @@ function validateExposure(value: unknown, index: number): void {
 function validateGenerated(value: unknown, index: number, field: string): void {
   if (value === undefined || value === null) return;
   if (!isRecord(value)) fail(`Graph nodes[${index}].${field} is invalid.`);
-  for (const key of ["agentId", "listenerId", "functionId"] as const) {
+  for (const key of ["agentId", "functionId"] as const) {
     if (value[key] !== undefined) validateId(value[key], `Graph nodes[${index}].${field}.${key}`);
   }
 }
