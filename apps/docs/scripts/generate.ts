@@ -3,7 +3,7 @@ import { basename, delimiter, join, relative, resolve } from "node:path";
 import { format } from "prettier";
 import { getCliHelpModel, type CliHelpCommand } from "@relkit/cli/help";
 import { generateGuides } from "./generate-guides.js";
-import { guideRelations } from "./guide-catalog.js";
+import { guideGroups, guideRelations } from "./guide-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const content = resolve(import.meta.dir, "../content/docs");
@@ -14,6 +14,8 @@ const packages = [
   ["schema", "Schema"],
   ["functions", "Functions"],
   ["services", "Services"],
+  ["drizzle", "Drizzle"],
+  ["better-auth", "Better Auth"],
   ["routes", "Routes"],
   ["events", "Events"],
   ["jobs", "Jobs"],
@@ -30,6 +32,7 @@ async function main(): Promise<void> {
     await readFile(resolve(root, "packages/cli/package.json"), "utf8"),
   ) as { readonly version: string };
   const cliModel = getCliHelpModel(cliPackage.version);
+  await pruneEmptyNavigation();
   await pruneGeneratedRelations();
   await generateGuides(root, content, cliModel, emit);
   await emit("operations/cli-reference.mdx", renderCliReference(cliModel));
@@ -172,6 +175,18 @@ async function pruneGeneratedRelations(): Promise<void> {
     if (checkOnly)
       throw new Error(`Generated documentation is stale: content/generated/related/${file}`);
     await rm(resolve(directory, file));
+  }
+}
+
+async function pruneEmptyNavigation(): Promise<void> {
+  const active = new Set<string>(["api", ...guideGroups.map(({ directory }) => directory)]);
+  for (const entry of await readdir(content, { withFileTypes: true })) {
+    if (!entry.isDirectory() || active.has(entry.name)) continue;
+    const directory = resolve(content, entry.name);
+    const files = await readdir(directory);
+    if (files.length !== 1 || files[0] !== "meta.json") continue;
+    if (checkOnly) throw new Error(`Generated navigation is stale: ${entry.name}/meta.json`);
+    await rm(resolve(directory, "meta.json"));
   }
 }
 

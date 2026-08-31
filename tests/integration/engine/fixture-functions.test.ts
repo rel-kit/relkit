@@ -7,9 +7,12 @@ import {
 import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import createOrder from "../../../examples/commerce/src/orders/functions/create-order.function.ts";
 import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
-import orderReceipt from "../../../examples/commerce/src/receipts/events/order-receipt.event.ts";
+import orderReceipt from "../../../examples/commerce/src/receipts/functions/order-receipt.function.ts";
 import orders from "../../../examples/commerce/src/orders/service.ts";
 import { z } from "../../../packages/schema/src/index.ts";
+import { bindFunctionEvents } from "../../../packages/events/src/index.ts";
+import orderCreated from "../../../examples/commerce/src/orders/events/order-created.event.ts";
+import { createTestEvent } from "../../../packages/testing/src/index.ts";
 
 bindDescriptorIdentity(createOrder, "orders.create-order");
 bindDescriptorIdentity(getOrder, "orders.get-order");
@@ -28,23 +31,27 @@ describe("commerce example functions through the common engine", () => {
     const enqueued: unknown[] = [];
     const completions: InvocationCompletion[] = [];
     const startTime = Date.now();
-    const result = await invokeFunction(createOrder, orderInput, {
-      now: () => startTime,
-      clients: {
-        cache: {
-          prices: { getOrSet: async () => 1_000 },
+    const result = await invokeFunction(
+      bindFunctionEvents(createOrder, undefined, [orderCreated]),
+      orderInput,
+      {
+        now: () => startTime,
+        clients: {
+          cache: {
+            prices: { getOrSet: async () => 1_000 },
+          },
+          events: {
+            "orders.created": { publish: async (payload: unknown) => published.push(payload) },
+          },
+          jobs: {
+            sendReceiptJob: { enqueue: async (input: unknown) => enqueued.push(input) },
+          },
         },
-        events: {
-          orderCreated: { publish: async (payload: unknown) => published.push(payload) },
-        },
-        jobs: {
-          sendReceiptJob: { enqueue: async (input: unknown) => enqueued.push(input) },
+        hooks: {
+          onCompletion: (event) => completions.push(event),
         },
       },
-      hooks: {
-        onCompletion: (event) => completions.push(event),
-      },
-    });
+    );
 
     expect(result).toEqual({
       orderId: "order-1",
@@ -76,8 +83,10 @@ describe("commerce example functions through the common engine", () => {
       traceId: "trace-1",
       attributes: {},
     };
-    const result = await invokeFunction(orderReceipt.target, envelope, {
-      now: () => 0,
+    const event = await createTestEvent({
+      event: orderCreated,
+      target: orderReceipt,
+      startTimeMs: 0,
       clients: {
         jobs: { sendReceiptJob: { enqueue: async () => undefined } },
       },
@@ -91,10 +100,15 @@ describe("commerce example functions through the common engine", () => {
       },
     });
 
-    expect(result).toBeUndefined();
+    try {
+      await event.publish(envelope.payload);
+      await expect(event.drain()).resolves.toMatchObject([{ state: "completed" }]);
+    } finally {
+      await event.close();
+    }
     expect(records.map(({ functionId }) => functionId)).toEqual([
       "orders.get-order",
-      "relkit.event.receipts.on-order-created.handler",
+      "receipts.on-order-created",
     ]);
     const child = records.find(({ functionId }) => functionId === "orders.get-order");
     expect(child?.source).toBe("direct");

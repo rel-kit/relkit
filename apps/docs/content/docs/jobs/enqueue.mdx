@@ -1,0 +1,77 @@
+---
+title: Enqueue work
+description: Declare a typed job dependency, await acceptance, and expose background work without confusing queue admission with completion.
+---
+
+Enqueue from a function in the domain that owns the job. Declare the descriptor under `dependencies.jobs`,
+then use its named client on `context.jobs`. Importing the descriptor alone does not grant a client.
+
+## Add an enqueue function
+
+The tested Receipts producer is small:
+
+<include cwd lang="ts" meta='title="src/receipts/functions/queue-receipt.function.ts"'>
+  ../../examples/commerce/tests/fixtures/queue-receipt.function.ts
+</include>
+
+Copy it into `src/receipts/functions/` when adding it to an application. It reuses the job's input schema
+and returns only the acceptance fields its callers need. Always await `enqueue`: a detached promise can
+be interrupted before admission or fail after the caller has already received success.
+
+Expose `queueReceipt` in `src/receipts/service.ts` under `functions` when routes or other domains need
+it. They call that public operation instead of importing the private job. An HTTP route can target it
+and explicitly declare a `202` response; the job does not automatically create an endpoint or set an
+HTTP status. Follow [define a service](/docs/service/define) and [HTTP responses](/docs/http/responses).
+
+## Read the acceptance correctly
+
+The client validates input and returns after provider acceptance. It does not wait for the target.
+
+| Result field                             | Meaning                                                                           |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
+| `instanceId`                             | Identifier for this admitted instance, or an earlier one reused by deduplication. |
+| `accepted`                               | `true` on a successful acceptance.                                                |
+| `status`                                 | The literal `"accepted"`, not a live view of the queue state.                     |
+| `profile`                                | The selected provider profile.                                                    |
+| `correlationId`                          | Optional correlation metadata.                                                    |
+| `duplicate`                              | Optional provider indication that existing work was reused.                       |
+| `idempotencyKey`, `idempotencyExpiresAt` | Optional provider metadata about duplicate protection.                            |
+
+The second argument accepts `correlationId` when you need to supply one explicitly. It does not offer
+per-call delay, priority, queue URLs, or an idempotency-key override. Configure policy on the descriptor
+and provider instead.
+
+The application job client exposes `enqueue`, not `get`, `cancel`, `wait`, or the target's eventual result.
+Use the [Inspector](/docs/operations/inspector) and provider-supported administrative controls for
+operations. If users need a business-facing progress endpoint, store that status as domain data and
+expose a normal service function; do not promise an in-memory queue record as a durable product API.
+
+## Enqueue from an event subscriber
+
+The existing Receipts event function looks up an order through its public service, then queues the receipt:
+
+<include cwd lang="ts" meta='title="src/receipts/functions/order-receipt.function.ts"'>
+  ../../examples/commerce/src/receipts/functions/order-receipt.function.ts
+</include>
+
+Its subscription uses event delivery, while the receipt target uses job delivery. They are separate
+attempts with separate retry policies. Re-delivery of the event can enqueue again, so choose
+[idempotency](/docs/jobs/idempotency) deliberately. If a second queue adds no useful execution boundary,
+do the work in the event function instead. See [consume an event](/docs/events/consume).
+
+## Plan for uncertain acceptance
+
+The caller's cancellation signal or deadline bounds the enqueue operation. It does not cancel work that
+the provider already accepted. A timeout or lost acknowledgement can leave the caller uncertain whether
+work exists; a blind retry may create duplicates.
+
+A database update followed by `enqueue` is also not automatically one transaction. A process can stop
+between the two. If work must never be lost after a committed business change, use an appropriate
+transactional handoff or reconciliation design for your database and queue. Do not describe a sequence
+of two awaited calls as an outbox guarantee.
+
+Keep payloads small and avoid secrets or unnecessary personal data: queues and operational records can
+retain them longer than the initiating request. Test acceptance separately from worker completion in
+[your first job](/docs/jobs/first-job).
+
+<include cwd>content/generated/related/jobs-enqueue.mdx</include>

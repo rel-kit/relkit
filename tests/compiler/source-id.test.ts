@@ -21,6 +21,7 @@ describe("source-scoped ID encoders", () => {
       encodeExportId({
         source: "src/orders/functions/get-order.function.ts",
         kind: "function",
+        invocationMode: "callable",
         exportName: "getOrder",
         exportKind: "named",
         binding: "getOrder",
@@ -30,6 +31,7 @@ describe("source-scoped ID encoders", () => {
       encodeExportId({
         source: "src/orders/functions/get-order.function.ts",
         kind: "function",
+        invocationMode: "callable",
         exportName: "default",
         exportKind: "default",
       }),
@@ -38,6 +40,7 @@ describe("source-scoped ID encoders", () => {
       encodeExportId({
         source: "src/orders/functions/get-order.function.ts",
         kind: "function",
+        invocationMode: "callable",
         exportName: "getOrder",
         exportKind: "named",
         binding: "getOrder",

@@ -36,9 +36,9 @@ describe("declared dependency clients", () => {
     };
     const clients = buildDependencyClients({
       ownerId: "orders.handle",
+      publications: { "orders.created": ref("event", "orders.created") },
       dependencies: {
         jobs: { send: ref("job", "orders.send") },
-        events: { created: ref("event", "orders.created") },
         buckets: { files: ref("bucket", "orders.files") },
         cache: { prices: ref("cache", "orders.prices") },
         agents: { summarize: ref("agent", "orders.summarize") },
@@ -51,7 +51,9 @@ describe("declared dependency clients", () => {
     });
 
     await (clients.jobs.send as { enqueue: (input: unknown) => Promise<unknown> }).enqueue({});
-    await (clients.events.created as { publish: (input: unknown) => Promise<unknown> }).publish({});
+    await (
+      clients.events["orders.created"] as { publish: (input: unknown) => Promise<unknown> }
+    ).publish({});
     await (clients.buckets.files as { put: (...input: unknown[]) => Promise<unknown> }).put(
       "a",
       new Uint8Array(),

@@ -54,21 +54,21 @@ export function createTriggerResources(
     },
     { parent, dependsOn: [queue] },
   );
-  const rules = trigger.expansion.map(
-    (event) =>
-      new aws.cloudwatch.EventRule(
-        childResourceName(componentName, `${trigger.id}-${event.pair}`, "rule", 64),
-        {
-          name: childResourceName(componentName, `${trigger.id}-${event.pair}`, "rule", 64),
-          description: `RelKit event trigger ${trigger.id} routes ${event.pair}`,
-          eventBusName: busName,
-          eventPattern: eventPattern(source, event),
-          state: "ENABLED",
-          tags,
-        },
-        { parent },
-      ),
-  );
+  const event = trigger.event;
+  const rules = [
+    new aws.cloudwatch.EventRule(
+      childResourceName(componentName, `${trigger.id}-${event.pair}`, "rule", 64),
+      {
+        name: childResourceName(componentName, `${trigger.id}-${event.pair}`, "rule", 64),
+        description: `RelKit event trigger ${trigger.id} routes ${event.pair}`,
+        eventBusName: busName,
+        eventPattern: eventPattern(source, event),
+        state: "ENABLED",
+        tags,
+      },
+      { parent },
+    ),
+  ];
   const targets = rules.map(
     (rule, index) =>
       new aws.cloudwatch.EventTarget(
@@ -151,7 +151,11 @@ function workerConfiguration(
         RELKIT_EVENT_QUEUE_URL: String(queueUrl),
         RELKIT_EVENT_DLQ_ARN: String(deadLetterQueueArn),
         RELKIT_EVENT_BATCH_SIZE: String(trigger.workerBatchSize),
-        RELKIT_EVENT_CONCURRENCY: String(trigger.concurrency),
+        ...(trigger.concurrency === undefined
+          ? {}
+          : { RELKIT_EVENT_CONCURRENCY: String(trigger.concurrency) }),
+        RELKIT_EVENT_ID: trigger.event.id,
+        RELKIT_EVENT_VERSION: String(trigger.event.version),
         RELKIT_EVENT_WAIT_TIME_SECONDS: String(trigger.workerWaitTimeSeconds),
         RELKIT_EVENT_VISIBILITY_TIMEOUT_SECONDS: String(trigger.visibilityTimeoutSeconds),
         RELKIT_EVENT_DELIVERY_SEMANTICS: "at-least-once",
@@ -168,9 +172,10 @@ function workerConfiguration(
     queueArn: queue.arn,
     queueUrl: queue.url,
     deadLetterQueueArn: deadLetterQueue.arn,
-    expansion: trigger.expansion.map(({ pair }) => pair),
+    eventId: trigger.event.id,
+    eventVersion: trigger.event.version,
     batchSize: trigger.workerBatchSize,
-    concurrency: trigger.concurrency,
+    ...(trigger.concurrency === undefined ? {} : { concurrency: trigger.concurrency }),
     waitTimeSeconds: trigger.workerWaitTimeSeconds,
     visibilityTimeoutSeconds: trigger.visibilityTimeoutSeconds,
     deliverySemantics: "at-least-once",

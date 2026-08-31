@@ -4,6 +4,7 @@ export interface EventView {
   readonly event: InspectorObject;
   readonly publishers: readonly InspectorObject[];
   readonly listeners: readonly InspectorObject[];
+  readonly consumers: readonly InspectorObject[];
   readonly deliveries: readonly InspectorObject[];
   readonly deadLetters: readonly InspectorObject[];
   readonly publications: readonly InspectorObject[];
@@ -56,22 +57,37 @@ function makeView(
   runtime: InspectorEventRuntime,
 ): EventView {
   const id = text(event.id);
-  const pair = `${id}@${number(event.version)}`;
+  const triggerIds = new Set(
+    edges.flatMap((edge) =>
+      text(edge.kind) === "listens-to-event" && text(edge.to) === id ? [text(edge.from)] : [],
+    ),
+  );
   const listeners = nodes.filter((node) => {
     const config = record(node.config);
     return (
       text(node.kind) === "trigger" &&
       text(node.triggerType) === "event" &&
-      strings(config?.expansion).includes(pair)
+      triggerIds.has(text(node.id)) &&
+      config?.eventVersion === event.version
     );
   });
+  const consumerIds = new Set(
+    edges.flatMap((edge) =>
+      text(edge.kind) === "targets-function" && triggerIds.has(text(edge.from))
+        ? [text(edge.to)]
+        : [],
+    ),
+  );
+  const consumers = nodes.filter(
+    (node) => node.kind === "function" && consumerIds.has(text(node.id)),
+  );
   const publishers = edges.filter(
     (edge) => text(edge.kind) === "publishes-event" && text(edge.to) === id,
   );
   const deliveries = runtime.deliveries.filter((item) => text(item.eventId) === id);
   const deadLetters = runtime.deadLetters.filter((item) => text(item.eventId) === id);
   const publications = runtime.publications.filter((item) => text(item.eventId) === id);
-  return { event, publishers, listeners, deliveries, deadLetters, publications };
+  return { event, publishers, listeners, consumers, deliveries, deadLetters, publications };
 }
 
 function graphData(graph: InspectorGraph): { nodes: InspectorObject[]; edges: InspectorObject[] } {
@@ -86,12 +102,6 @@ function records(value: unknown): InspectorObject[] {
   return Array.isArray(value) ? value.filter(isRecord) : [];
 }
 
-function strings(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string")
-    : [];
-}
-
 function record(value: unknown): InspectorObject | undefined {
   return isRecord(value) ? value : undefined;
 }
@@ -102,8 +112,4 @@ function isRecord(value: unknown): value is InspectorObject {
 
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
-}
-
-function number(value: unknown): number {
-  return typeof value === "number" ? value : 0;
 }

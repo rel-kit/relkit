@@ -67,12 +67,13 @@ function violations(files: readonly SourceFile[]): string[] {
   });
 }
 
-test("event source and exports keep listeners as generic triggers", () => {
+test("event source and exports keep consumers as event functions", () => {
   expect(violations(repositorySources())).toEqual([]);
   expect(Object.keys(eventExports).some((name) => forbidden.test(name))).toBe(false);
   expect(eventExports).toHaveProperty("defineEvent");
-  expect(eventExports).toHaveProperty("onEvent");
-  expect(eventExports).toHaveProperty("events");
+  expect(eventExports).toHaveProperty("defineEventFunction");
+  expect(eventExports).not.toHaveProperty("onEvent");
+  expect(eventExports).not.toHaveProperty("events");
 });
 
 test("artifact scans reject application names in generated, graph, API, and inspector contracts", () => {

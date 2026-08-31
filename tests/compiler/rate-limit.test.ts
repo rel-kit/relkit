@@ -14,6 +14,7 @@ const target = defineFunction({
 
 describe("rate-limit compilation", () => {
   test("projects the policy, shared store, edge, and inferred 429", () => {
+    // #region shared-rate-limit
     const store = defineCache({
       id: "api-rate-limits",
       key: z.string(),
@@ -29,6 +30,7 @@ describe("rate-limit compilation", () => {
         store,
       },
     });
+    // #endregion shared-rate-limit
     const result = normalizeCompilation({
       descriptors: [target, store, extracted(route)],
       mode: "production",
@@ -55,11 +57,13 @@ describe("rate-limit compilation", () => {
   });
 
   test("allows generation-local memory only outside production", () => {
+    // #region local-rate-limit
     const route = defineRoute({
       id: "orders.local-rate-limit",
       target,
       rateLimit: { limit: 2, windowMs: 1_000, key: http.constant("global") },
     });
+    // #endregion local-rate-limit
     const development = normalizeCompilation({ descriptors: [target, extracted(route)] });
     const production = normalizeCompilation({
       descriptors: [target, extracted(route)],

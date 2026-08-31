@@ -5,6 +5,7 @@ import {
   addEventEdges,
   addHookEdges,
   addProviderEdge,
+  addPublicationEdges,
   addRouteEdges,
   addToolEdges,
   isTargetingDescriptor,
@@ -42,6 +43,7 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     if (descriptor.kind === "service") addServiceEdges(add, descriptor, value);
     if (descriptor.kind === "function") {
       addDependencyEdges(add, descriptor, value.dependencies);
+      addPublicationEdges(add, descriptor, value.publishes);
       if (Array.isArray(value.errors)) {
         for (const error of value.errors) {
           const errorId = refId(error);

@@ -31,11 +31,6 @@ export class EventRouterStateError extends Error {
   }
 }
 
-export function normalizeExpansion(value: readonly string[]): readonly string[] {
-  if (!Array.isArray(value)) throw new EventRouterStateError("Event expansion must be an array");
-  return Object.freeze([...new Set(value.map(normalizePair))].sort());
-}
-
 export function normalizeDelivery(value: unknown): "ephemeral" | "durable" {
   if (value !== "ephemeral" && value !== "durable") {
     throw new EventRouterStateError("Event delivery mode is invalid");
@@ -107,17 +102,6 @@ function readDeliveryData(value: JsonValue): DeliveryData {
     triggerId: requiredId(value.triggerId),
     envelope: normalizeEnvelope(value.envelope),
   };
-}
-
-function normalizePair(value: string): string {
-  if (typeof value !== "string") throw new EventRouterStateError("Event expansion is invalid");
-  const at = value.lastIndexOf("@");
-  const versionText = value.slice(at + 1);
-  const version = Number(versionText);
-  if (at < 1 || !/^[1-9]\d*$/.test(versionText) || !Number.isSafeInteger(version)) {
-    throw new EventRouterStateError(`Event expansion "${value}" is invalid`);
-  }
-  return `${normalizeId(value.slice(0, at))}@${version}`;
 }
 
 function requiredId(value: unknown): string {

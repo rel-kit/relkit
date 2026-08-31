@@ -5,7 +5,11 @@ export function nonFunctionHandlers(file: string, text: string): DeclarationLeak
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const leaks: DeclarationLeak[] = [];
   const visit = (node: ts.Node): void => {
-    if (ts.isPropertySignature(node) && node.name.getText(source) === "handler") {
+    if (
+      ts.isPropertySignature(node) &&
+      node.name.getText(source) === "handler" &&
+      node.type?.kind !== ts.SyntaxKind.NeverKeyword
+    ) {
       const declaration = nearestDeclaration(node);
       if (!declaration || ts.getModifiers(declaration)?.some(isExportModifier) !== true) {
         ts.forEachChild(node, visit);

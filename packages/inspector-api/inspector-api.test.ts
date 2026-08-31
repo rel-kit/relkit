@@ -19,6 +19,7 @@ const graph = {
     },
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.create",
       source: { file: "src/orders.ts", line: 4, column: 1 },
       input: {

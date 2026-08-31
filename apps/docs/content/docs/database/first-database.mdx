@@ -1,0 +1,169 @@
+---
+title: Your first database
+description: Add SQLite tables and a Drizzle service to an existing RELKIT app, customize the Users model, and verify the database and public query path.
+---
+
+Add a Users database to an existing RELKIT app using the executable data-model example. You will define
+tables, generate migrations, add a custom query and an override, and use the generated CRUD schemas
+in a member-registration transaction. You will expose a read operation and verify the result.
+
+Use an installed app with the standard `@app/*` alias. If needed, follow [Create an app](/docs/start/create-an-app).
+If a database service already exists, extend it instead of adding a second one. Preserve existing schema,
+environment fields, public service members, and routes.
+
+## Prepare SQLite and the environment
+
+Follow [Define a Drizzle service](/docs/database/define) to install compatible `@relkit/drizzle` and
+`drizzle-orm` versions. This tutorial uses Bun's built-in SQLite driver and requires no external server.
+
+Add `DATABASE_PATH` to your environment contract:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts"'>
+  ../../examples/data-model/src/platform/env.ts
+</include>
+
+Keep that contract referenced by `relkit.config.ts`. Do not overwrite an existing configuration with a
+new minimal one. This example defaults to `./data-model.sqlite`, which retains data after restart.
+Start with a new local file, not an existing database with unrelated tables or data.
+
+## Define tables and a custom model
+
+Create or extend `src/database/schema/index.ts`:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../examples/data-model/src/database/schema/index.ts
+</include>
+
+Users has an integer identity, unique email, and active flag. Memberships has its own identity and a
+composite unique key. Its `userId` is not a foreign-key constraint in this demonstration; add the
+[relationships and constraints](/docs/database/schema) your application needs.
+
+Add `src/database/models/users.model.ts`:
+
+<include cwd lang="ts" meta='title="src/database/models/users.model.ts"'>
+  ../../examples/data-model/src/database/models/users.model.ts
+</include>
+
+The custom methods receive `{ table, database }` automatically. Read [Custom models](/docs/database/models)
+for the sample's pattern-matching, pagination, and atomicity limits before adapting it for public search.
+
+## Register the database service
+
+Create or merge `src/database/service.ts`:
+
+<include cwd lang="ts" meta='title="src/database/service.ts"'>
+  ../../examples/data-model/src/database/service.ts
+</include>
+
+This connects the schema and model, adds an inactive-user override for `findOne`, and closes SQLite on
+disposal. It does not create tables. The `findOne` override is not a global soft-delete policy.
+
+## Generate and apply the initial migration
+
+Follow [Migrations](/docs/database/migrations) to install the pinned Drizzle Kit version, then add:
+
+<include cwd lang="ts" meta='title="drizzle.config.ts"'>
+  ../../examples/data-model/drizzle.config.ts
+</include>
+
+From your application's root, generate the migration from the table definitions and apply it:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=initial
+bun --bun drizzle-kit migrate
+```
+
+Review the generated migration before applying it. In the repository example, the initial migration
+already exists, so set `DATABASE_PATH` and run `bun run db:migrate` instead of creating another one.
+Keep this environment value for the server, and commit the generated migration history with the schema.
+
+Run the compiler now so the database context is available to the next function:
+
+```sh
+bun run check
+```
+
+## Create a member with generated CRUD
+
+Add the registration workflow:
+
+<include cwd lang="ts" meta='title="src/users/functions/register-member.function.ts"'>
+  ../../examples/data-model/src/users/functions/register-member.function.ts
+</include>
+
+The table service provides `users.insert`, `memberships.insert`, and the insert validator without
+requiring a custom model for either operation. The transaction commits both records together.
+See [Generated CRUD and schemas](/docs/database/generated-schemas) and
+[Transactions](/docs/database/transactions) for their contracts.
+
+Add the email-change workflow, which uses the generated update/select schemas:
+
+<include cwd lang="ts" meta='title="src/users/functions/update-user-email.function.ts"'>
+  ../../examples/data-model/src/users/functions/update-user-email.function.ts
+</include>
+
+These are trusted internal examples, not authorized public write APIs. Add ownership/organization
+checks before exposing them to callers. This tutorial mounts only a read route.
+
+## Expose a Users operation
+
+Add `src/users/functions/list-users.function.ts`:
+
+<include cwd lang="ts" meta='title="src/users/functions/list-users.function.ts"'>
+  ../../examples/data-model/src/users/functions/list-users.function.ts
+</include>
+
+Add it to the Users service:
+
+<include cwd lang="ts" meta='title="src/users/service.ts"'>
+  ../../examples/data-model/src/users/service.ts
+</include>
+
+Connect the public operation to HTTP if you want an endpoint:
+
+<include cwd lang="ts" meta='title="src/routes/users/route.ts"'>
+  ../../examples/data-model/src/routes/users/route.ts
+</include>
+
+The route invokes the Users service, not the private database model. Function validation and output
+contracts remain the public boundary; the database service does not automatically expose CRUD routes.
+
+## Verify database behavior
+
+Use [Database testing](/docs/database/testing) for the isolated test setup and executable regression
+tests. In the repository example, the tests already exist; if following this in your own app, add
+the tests from that guide before running the test command.
+
+From your application root:
+
+```sh
+bun test tests/data-model.test.ts
+bun run check
+bun run typecheck
+export DATABASE_PATH=./data-model.sqlite
+bun run dev
+```
+
+Tests use an independent in-memory connection; they do not seed the running server. In a second
+terminal, query the migrated application:
+
+```sh
+curl 'http://localhost:3000/users?domain=example.com'
+```
+
+Use the actual backend port if different. An empty, migrated database returns HTTP `200`
+with `[]`. In the local Inspector, invoke `registerMember` (function ID `users.register-member`) with
+`{ "email": "member@example.com", "organizationId": "demo" }`, then repeat the request. Expect a row
+containing that email, its generated numeric ID, and `active: true`. Use a different email for another
+registration; email uniqueness is enforced by the database.
+
+Inspect the checked `database` service and Users function in the Inspector, normally at
+`http://localhost:3210`, and inspect `.relkit/generated/context-registry.d.ts` for the typed table methods.
+The `listUsers` function is also directly invokable from the Inspector with `{ "domain": "example.com" }`.
+
+Before deployment, add application-specific authorization, bounded queries, driver configuration,
+and tested backup and migration procedures. Continue with [Integrate Better Auth](/docs/database/better-auth)
+to plan authentication tables and session wiring.
+
+<include cwd>content/generated/related/database-first-database.mdx</include>

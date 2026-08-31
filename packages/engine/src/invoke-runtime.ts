@@ -88,6 +88,7 @@ export async function runHandler<
         return createContext(base, {
           ownerId: target.id,
           ...(target.dependencies === undefined ? {} : { dependencies: target.dependencies }),
+          ...(target.publications === undefined ? {} : { publications: target.publications }),
           ...(options.clients === undefined ? {} : { clients: options.clients }),
           bridge,
           signal: () => signalRef.current,
@@ -128,6 +129,7 @@ export async function runHandler<
           ...(options.hooks?.onOperation === undefined
             ? {}
             : { onOperation: options.hooks.onOperation }),
+          ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
         });
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),

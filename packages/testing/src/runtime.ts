@@ -1,5 +1,6 @@
 import { resolveEnv, type EnvDefinition, type EnvShape } from "@relkit/config";
 import type { InvocationRunner } from "@relkit/runtime-effect";
+import type { FunctionRegistry } from "@relkit/engine";
 import {
   invokeFunctionWithRunner,
   type FunctionContextOf,
@@ -15,6 +16,7 @@ import { createTestContextFactory } from "./runtime-context.js";
 import { closeRuntime } from "./runtime-close.js";
 
 export interface TestRuntimeOptions {
+  readonly registry?: FunctionRegistry;
   readonly app?: { readonly env: EnvDefinition<EnvShape> };
   readonly environment?: string;
   readonly env?: Readonly<Record<string, unknown>>;
@@ -80,6 +82,7 @@ export function createTestRuntime(options: TestRuntimeOptions = {}): TestRuntime
       input,
       {
         ...invokeOptions,
+        ...(options.registry === undefined ? {} : { registry: options.registry }),
         env: resolvedEnv,
         ...(callOptions?.clients === undefined ? { clients: fakes.clients } : {}),
         now: deterministic.clock.currentTimeMs,

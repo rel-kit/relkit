@@ -40,6 +40,11 @@ isolated common kernel without borrowing another application's providers.
 
 Integration tests use `createTestApplication` and its in-process HTTP client:
 
+Run `bun run check` after changing event contracts or publications. The application
+harness validates and loads the generated registry so direct and nested function
+calls receive their declared event contracts. Register event fakes by exact event
+ID, for example `testApp.fakes.setClient("events", "orders.created", fake)`.
+
 ```ts
 import { afterAll, expect, test } from "bun:test";
 import { createTestApplication } from "@relkit/testing";

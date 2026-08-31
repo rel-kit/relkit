@@ -28,7 +28,12 @@ multipart parser or raw HTTP request.
 </include>
 
 The route opts into `multipart/form-data` and sets a route-specific body ceiling. The function schema decides
-which fields are single files, repeated files, or text values.
+which fields are single files, repeated files, or text values. No explicit `request` is needed for this
+matching object shape; use `http.multipart` and `http.multipartAll` inside `http.input` when names differ.
+
+To add this to your own app, follow [Storage's upload walkthrough](/docs/storage/first-upload) for the
+bucket, public Assets service, provider configuration, and tests. Copying only the route does not create
+its dependencies.
 
 ## Send a complete multipart request
 
@@ -36,46 +41,54 @@ which fields are single files, repeated files, or text values.
   <Step>
     ### Prepare representative files
 
-    ```sh title="Terminal — relkit-orders"
-    printf 'primary' > /tmp/primary.png
-    printf 'detail' > /tmp/detail.png
-    ```
+    Use two real, small PNG files named `primary.png` and `detail.png` in your terminal's working
+    directory. Keep their combined request below 1 MiB for the default commerce configuration.
+    These commands assume the commerce app is running locally in test mode on port `4000`, with its
+    local bucket provider available. Adjust the port for your own app.
 
   </Step>
   <Step>
     ### Upload every required field
 
     ```sh title="Terminal — relkit-orders"
-    curl -i -X POST "http://localhost:3000/uploads" \
+    curl -i -X POST "http://localhost:4000/uploads" \
       -F "label=receipts" \
-      -F "primary=@/tmp/primary.png;type=image/png" \
-      -F "attachments=@/tmp/detail.png;type=image/png"
+      -F "primary=@primary.png;type=image/png" \
+      -F "attachments=@detail.png;type=image/png"
     ```
 
-    Expect HTTP `200` and JSON listing `primary.png` and `detail.png`. The integration test can inspect the
-    fake bucket to prove the bytes were written without S3 credentials.
+    Expect HTTP `200` and JSON listing `primary.png` and `detail.png`. Repeat `attachments` for more files.
+    Let curl set the multipart Content-Type boundary; do not supply a bare Content-Type header yourself.
 
   </Step>
   <Step>
     ### Prove invalid input is rejected
 
     ```sh title="Terminal — relkit-orders"
-    curl -i -X POST "http://localhost:3000/uploads" \
+    curl -i -X POST "http://localhost:4000/uploads" \
       -F "label=receipts" \
-      -F "primary=@/tmp/primary.png;type=text/plain"
+      -F "primary=@primary.png;type=text/plain" \
+      -F "attachments=@detail.png;type=image/png"
     ```
 
-    Expect a bounded `422` response for the unsupported media type or missing repeated field. The storage
-    handler must not run.
+    Expect a bounded `422` response for the unsupported declared media type. The storage handler must
+    not run. Also test missing required fields and duplicate scalar fields.
 
   </Step>
 </Steps>
 
 ## Set every relevant limit
 
-Use the global `server.maxBodyBytes` as an application safety ceiling, `route.maxBodyBytes` for this endpoint,
-and `z.file` constraints for individual files and media types. The request ceiling includes multipart framing
-and all fields, so it must be slightly larger than the sum of accepted file payloads.
+Coordinate `server.maxBodyBytes`, the route's `maxBodyBytes`, and individual `z.file` constraints.
+The framework checks Content-Length against the server ceiling before the route runs; the request
+mapper then enforces the route-specific ceiling, or the server/default limit when omitted. Raising
+only the route limit does not bypass an earlier global rejection.
+
+The commerce server ceiling is 1 MiB, even though this route and each file schema declare 10 MiB.
+That is why the commands above use small files. A request ceiling includes multipart framing and all
+fields; accepting several maximum-size files requires a correspondingly larger total budget. Test
+oversized requests with and without Content-Length. See [Responses](/docs/http/responses) for `413`
+versus mapping-validation failures.
 
 For large media, streaming ingestion, resumable transfer, or direct-to-object-store uploads, use a purpose-built
 upload flow rather than raising a buffered route to unbounded sizes. A signed upload URL can keep large bytes
@@ -84,7 +97,7 @@ off the application server while a later validated request records metadata.
 ## Security checklist
 
 - Generate storage keys independently from untrusted file names when overwriting matters.
-- Treat reported media type as input, not proof of file content.
+- Treat reported media type as input, not proof of file content; the schema does not sniff file bytes.
 - Keep private buckets private and return signed URLs only after authorization.
 - Avoid logging file bytes, access tokens, or multipart bodies.
 - Test missing fields, repeated fields, zero-byte files, media mismatch, and both size ceilings.

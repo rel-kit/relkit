@@ -1,4 +1,6 @@
 import { feature, type Feature } from "./documentation-catalog.js";
+import { databaseFeature } from "./database-guide-catalog.js";
+import { authFeature } from "./auth-guide-catalog.js";
 
 export const features = [
   feature(
@@ -64,17 +66,19 @@ export const features = [
   feature(
     "services",
     "Services",
-    "Define a domain's public functions and events.",
-    "fundamentals/services",
+    "Organize capabilities by domain and expose a focused public service boundary.",
+    "service/define",
     "services",
     [["packages/services/src/define-service.ts", "defineService"]],
     ["examples/commerce/src/orders/service.ts"],
   ),
+  databaseFeature,
+  authFeature,
   feature(
     "http",
     "HTTP routes",
     "Map filesystem routes to validated function calls.",
-    "http/routes",
+    "http/define",
     "routes",
     [["packages/routes/src/define-route.ts", "defineRoute"]],
     ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
@@ -105,7 +109,7 @@ export const features = [
     "events",
     [
       ["packages/events/src/define-event.ts", "defineEvent"],
-      ["packages/events/src/on-event.ts", "onEvent"],
+      ["packages/events/src/define-event-function.ts", "defineEventFunction"],
     ],
     ["examples/commerce/src/orders/events/order-created.event.ts"],
   ),
@@ -113,7 +117,7 @@ export const features = [
     "jobs",
     "Jobs",
     "Queue validated work with bounded retry and concurrency.",
-    "async/jobs",
+    "jobs/define",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
     ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
@@ -122,7 +126,7 @@ export const features = [
     "schedules",
     "Schedules",
     "Trigger a job from explicit cron and timezone rules.",
-    "async/schedules",
+    "jobs/schedules",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
     ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
@@ -130,8 +134,8 @@ export const features = [
   feature(
     "buckets",
     "Object buckets",
-    "Store bounded objects through provider-neutral clients.",
-    "resources-ai/buckets",
+    "Store, read, and share files from your app.",
+    "storage/define",
     "buckets",
     [["packages/buckets/src/define-bucket.ts", "defineBucket"]],
     ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
@@ -139,8 +143,8 @@ export const features = [
   feature(
     "cache",
     "Cache",
-    "Use schema-backed values, counters, TTLs, and rate-limit state.",
-    "resources-ai/cache",
+    "Reuse expensive lookups and keep cached values fresh.",
+    "caching/define",
     "cache",
     [["packages/cache/src/define-cache.ts", "defineCache"]],
     ["examples/commerce/src/orders/cache/prices.cache.ts"],
@@ -148,8 +152,8 @@ export const features = [
   feature(
     "tools",
     "AI tools",
-    "Expose existing functions to models through bounded metadata.",
-    "resources-ai/tools",
+    "Let AI agents and MCP clients use your application's functions.",
+    "ai/tools",
     "tools",
     [["packages/tools/src/define-tool.ts", "defineTool"]],
     ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
@@ -158,7 +162,7 @@ export const features = [
     "approvals",
     "Tool approvals",
     "Require an explicit decision before sensitive model actions.",
-    "resources-ai/approvals",
+    "ai/approvals",
     "agents",
     [
       ["packages/agents/src/approval.ts", "approveApproval"],
@@ -170,7 +174,7 @@ export const features = [
     "agents",
     "Agents",
     "Run bounded model workflows with allowlisted tools and offline tests.",
-    "resources-ai/agents",
+    "ai/agents",
     "agents",
     [["packages/agents/src/define-agent.ts", "defineAgent"]],
     ["examples/commerce/src/orders/agents/order-support.agent.ts"],

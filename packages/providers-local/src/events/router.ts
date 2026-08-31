@@ -1,3 +1,4 @@
+import { deliver } from "./router-delivery.js";
 import { join, resolve } from "node:path";
 import { normalizeId } from "@relkit/contracts";
 import type { EventContractInput } from "./admin-contracts.js";
@@ -20,7 +21,6 @@ import {
   EventRouterStateError,
   normalizeDelivery,
   normalizeEnvelope,
-  normalizeExpansion,
   type EventDeliveryRecord,
 } from "./router-records.js";
 import {
@@ -46,7 +46,7 @@ export type {
 export { EVENT_DELIVERY_VERSION, EventRouterStateError } from "./router-records.js";
 export type { EventDeliveryRecord } from "./router-records.js";
 type RegisteredTrigger = RegisteredTriggerView & { readonly ephemeral?: EphemeralDelivery };
-/** Routes accepted envelopes using only the compiler's explicit expansions. */
+/** Routes accepted envelopes to independently delivered exact-event triggers. */
 export async function createEventRouter(
   requestedRoot: string,
   options: EventRouterOptions = {},
@@ -73,11 +73,13 @@ export async function createEventRouter(
     const delivery = normalizeDelivery(binding.delivery);
     if (typeof binding.invoke !== "function")
       throw new EventRouterStateError(`Event trigger ${id} has no invocation target`);
+    if (!Number.isSafeInteger(binding.eventVersion) || binding.eventVersion < 1)
+      throw new EventRouterStateError(`Event trigger ${id} has an invalid event version`);
     const normalized: EventRouterTrigger = Object.freeze({
       ...binding,
       id,
       delivery,
-      expansion: normalizeExpansion(binding.expansion),
+      eventId: normalizeId(binding.eventId),
     });
     const durable =
       delivery === "durable"
@@ -93,7 +95,15 @@ export async function createEventRouter(
         : undefined;
     const ephemeral =
       delivery === "ephemeral"
-        ? createEphemeralDelivery(normalized.invoke, options.ephemeralCapacity)
+        ? createEphemeralDelivery(
+            (envelope) =>
+              normalized.invoke(envelope, {
+                attempt: 1,
+                replayed: false,
+                ...(normalized.timeoutMs === undefined ? {} : { timeoutMs: normalized.timeoutMs }),
+              }),
+            options.ephemeralCapacity,
+          )
         : undefined;
     triggers.set(id, {
       binding: normalized,
@@ -108,9 +118,11 @@ export async function createEventRouter(
     ensureOpen();
     const event = normalizeEnvelope(input);
     publications.push(publication(input, event, ++publicationSequence, options.now ?? Date.now));
-    const pair = `${event.eventId}@${event.version}`;
     const matching = [...triggers.values()]
-      .filter(({ binding }) => binding.expansion.includes(pair))
+      .filter(
+        ({ binding }) =>
+          binding.eventId === event.eventId && binding.eventVersion === event.version,
+      )
       .sort((left, right) => left.binding.id.localeCompare(right.binding.id));
     const deliveries = await Promise.all(
       matching.map((trigger) => deliver(trigger, event, routeOptions.run !== false)),
@@ -127,6 +139,7 @@ export async function createEventRouter(
   };
   const drain = async (): Promise<readonly EventDeliveryResult[]> => {
     ensureOpen();
+    await Promise.all([...triggers.values()].map(({ ephemeral }) => ephemeral?.drain()));
     return drainDeliveries(triggers);
   };
   const retry = async (deliveryId: string): Promise<EventDeliveryResult> => {
@@ -157,44 +170,5 @@ export async function createEventRouter(
   });
   function ensureOpen(): void {
     if (closed) throw new EventRouterStateError("Event router is closed");
-  }
-}
-
-async function deliver(
-  { binding, durable, ephemeral }: RegisteredTrigger,
-  envelope: UnknownEventEnvelope,
-  run: boolean,
-): Promise<EventDeliveryResult> {
-  if (binding.delivery === "ephemeral") {
-    if (ephemeral === undefined)
-      throw new EventRouterStateError("Ephemeral trigger has no delivery limiter");
-    return Object.freeze({
-      triggerId: binding.id,
-      delivery: binding.delivery,
-      ...(await ephemeral.deliver(envelope)),
-    });
-  }
-  if (durable === undefined) {
-    return {
-      triggerId: binding.id,
-      delivery: binding.delivery,
-      accepted: false,
-      persisted: false,
-      status: "failed",
-      error: new EventRouterStateError("Durable trigger has no delivery"),
-    };
-  }
-  try {
-    const result = run ? await durable.deliver(envelope) : await durable.accept(envelope);
-    return Object.freeze({ delivery: binding.delivery, ...result });
-  } catch (error) {
-    return Object.freeze({
-      triggerId: binding.id,
-      delivery: binding.delivery,
-      accepted: false,
-      persisted: false,
-      status: "failed" as const,
-      error,
-    });
   }
 }

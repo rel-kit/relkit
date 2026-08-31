@@ -1,6 +1,7 @@
 import { createTestEvent } from "../../packages/testing/src/index.ts";
 import type { InvocationContext } from "../../packages/engine/src/index.ts";
 import { defineError } from "../../packages/functions/src/index.ts";
+import { defineEventFunction } from "../../packages/events/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import {
   registerEventContractSuite,
@@ -9,7 +10,6 @@ import {
 } from "./events.ts";
 
 const payload = z.object({ orderId: z.string() });
-const output = z.object({ handled: z.boolean() });
 const retryableError = defineError({
   id: "events.retryable",
   data: z.object({ reason: z.string() }),
@@ -36,23 +36,21 @@ const testingEvents: EventContractTarget = {
       readonly input: Parameters<NonNullable<EventContractTrigger["handler"]>>[0];
       readonly source: InvocationContext["invocation"]["source"];
       readonly attempt: number;
+      readonly trigger: unknown;
     }> = [];
     const specs: readonly EventContractTrigger[] = options.triggers ?? [
       {
         id: "orders.receipt",
         delivery: options.delivery ?? "durable",
-        expansion: ["orders.created@1"],
       },
     ];
     const triggers = specs.map((spec) => ({
       id: spec.id,
       delivery: spec.delivery ?? options.delivery ?? "durable",
-      ...(spec.expansion === undefined ? {} : { expansion: spec.expansion }),
       ...(options.retry === undefined ? {} : { retry: options.retry }),
-      target: {
+      target: defineEventFunction({
         id: `events.target.${spec.id}`,
-        input: z.unknown(),
-        output,
+        event: "orders.created" as never,
         errors: [retryableError],
         handler: async (
           input: Parameters<NonNullable<EventContractTrigger["handler"]>>[0],
@@ -63,21 +61,19 @@ const testingEvents: EventContractTarget = {
             input,
             source: context.invocation.source,
             attempt: context.invocation.attempt,
+            trigger: context.trigger,
           });
           try {
-            return (await spec.handler?.(input, context)) ?? { handled: true };
+            await spec.handler?.(input, context);
           } catch (error) {
             if (error instanceof Error && error.message === "retryable")
               throw retryableError.create({ reason: "retryable" });
             throw error;
           }
         },
-      },
+      }),
     }));
-    const event = await createTestEvent<
-      { readonly orderId: string },
-      { readonly handled: boolean }
-    >({
+    const event = await createTestEvent<{ readonly orderId: string }, void>({
       eventId: "orders.created",
       version: 1,
       payloadSchema: payload,

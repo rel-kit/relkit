@@ -11,7 +11,7 @@ export type GraphDiffClassification = (typeof GRAPH_DIFF_CLASSIFICATIONS)[number
 export type GraphDiffCategory =
   | "route"
   | "function/error"
-  | "event/selector"
+  | "event"
   | "job"
   | "bucket/cache"
   | "tool"
@@ -19,11 +19,6 @@ export type GraphDiffCategory =
   | "profile"
   | "service";
 export type GraphDiffChange = "added" | "removed" | "changed" | "source-moved";
-
-export interface SelectorExpansionDiff {
-  readonly added: readonly string[];
-  readonly removed: readonly string[];
-}
 
 export interface GraphChange {
   readonly category: GraphDiffCategory;
@@ -34,7 +29,6 @@ export interface GraphChange {
   readonly fields: readonly string[];
   readonly details: readonly string[];
   readonly source?: { readonly before: SourceLocation; readonly after: SourceLocation };
-  readonly selectorExpansion?: SelectorExpansionDiff;
   readonly before?: JsonValue;
   readonly after?: JsonValue;
 }

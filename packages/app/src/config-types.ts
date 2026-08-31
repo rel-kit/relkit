@@ -4,6 +4,7 @@ import type { CapabilityBindings } from "./providers.js";
 
 export interface ApiDocsConfig {
   readonly enabledInProduction?: boolean;
+  readonly excludeDomains?: readonly string[];
 }
 
 export interface ServerConfig {

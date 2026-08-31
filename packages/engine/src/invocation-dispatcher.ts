@@ -68,6 +68,9 @@ function resolveGenerationTarget<Input, Output, Context extends { readonly signa
   if (handler === undefined) {
     throw new TypeError(`Function handler is not registered: ${identity.id}`);
   }
+  const registered = registry.targets[identity.id];
+  if (registered !== undefined)
+    return registered as unknown as InvocationTarget<Input, Output, Context>;
   return {
     ...(target as InvocationTarget<Input, Output, Context>),
     id: identity.id,

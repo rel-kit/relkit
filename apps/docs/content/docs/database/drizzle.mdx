@@ -1,0 +1,71 @@
+---
+title: Drizzle database service
+description: Understand how the Drizzle integration turns table definitions into typed CRUD, validation schemas, model extensions, and a shared application context.
+---
+
+Drizzle is one database service integration in RELKIT, not the definition of the Database layer.
+Use `@relkit/drizzle` when you want relational tables and Drizzle's TypeScript query builder.
+This page describes that integration's behavior; return to [Database](/docs/database) for the
+adapter-neutral architecture.
+
+## Define once and reuse throughout the app
+
+Export `defineDrizzleService(...)` from `src/database/service.ts`:
+
+<include cwd lang="ts" meta='title="src/database/service.ts"'>
+  ../../examples/data-model/src/database/service.ts
+</include>
+
+The factory connects to the database. It does not require handwritten table-creation statements.
+Define the tables in TypeScript and apply their changes through [Drizzle Kit migrations](/docs/database/migrations)
+before starting the application.
+
+The optional `models` and `overrides` in this example customize behavior. Remove those two options and
+the model import if you only need the generated base operations.
+
+## Understand what is automatic
+
+For every table exported through `schema`, RELKIT provides:
+
+| Generated surface                                | Example                                        | Purpose                                                      |
+| ------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------ |
+| Six typed CRUD methods                           | `context.database.users.insert({ data })`      | Read and mutate records without writing a repository wrapper |
+| Select, insert, and update Zod schemas           | `context.database.zodSchemas.users.insert`     | Validate data against the table shape when explicitly called |
+| Model extension methods                          | `context.database.users.byEmailDomain(domain)` | Expose the custom methods you register                       |
+| Transaction-bound context                        | `context.database.transaction(callback)`       | Compose related database operations                          |
+| Compiler context declarations and graph metadata | `.relkit/generated/context-registry.d.ts`      | Give application code typed access to the discovered service |
+
+Base CRUD and schemas exist even for a table with no custom model file. Changing a table updates the
+derived TypeScript types and validation schemas; regenerate context declarations when registration
+changes, and migrate the physical database separately. See [Generated CRUD and schemas](/docs/database/generated-schemas)
+for the exact data shapes, customization, and validation boundaries.
+
+This does not generate HTTP CRUD endpoints, public function contracts, authorization rules, seed data,
+or database migrations. Add [business functions](/docs/fundamentals/functions) and
+[routes](/docs/http) deliberately.
+
+## Follow discovery and activation
+
+The compiler discovers the service, inspects its table metadata, and generates application context types.
+The runtime then invokes `client({ env })` during startup and injects the resulting database context
+into business functions. Normal shutdown calls `dispose`.
+
+There is no `dependencies.database` entry and no database provider profile to add to
+`relkit.config.ts`. Do not wrap this descriptor in `defineService`. The database service supplies
+persistence; the [Users service](/docs/service/define) still owns its business operations.
+
+Only one Drizzle service is currently supported per application. Its schema must contain at least one
+table and use one dialect: SQLite, PostgreSQL, or MySQL. These are current integration constraints,
+not promises about future MongoDB or Prisma integrations.
+
+## Choose the customization point
+
+Use [schema definitions](/docs/database/schema) for stored shapes and constraints,
+[custom models](/docs/database/models) for named Drizzle queries, and
+[overrides](/docs/database/overrides) to change an existing CRUD method. Keep caller permissions and
+public input/output in the owning business function.
+
+Continue to [Define a Drizzle service](/docs/database/define) for dependencies, environment, driver setup,
+and lifecycle. Exact signatures live in the [Drizzle API reference](/docs/api/drizzle).
+
+<include cwd>content/generated/related/database-drizzle.mdx</include>

@@ -1,0 +1,19 @@
+{
+  "title": "Database",
+  "icon": "Database",
+  "pages": [
+    "index",
+    "drizzle",
+    "define",
+    "schema",
+    "generated-schemas",
+    "queries",
+    "models",
+    "overrides",
+    "transactions",
+    "migrations",
+    "better-auth",
+    "testing",
+    "first-database"
+  ]
+}

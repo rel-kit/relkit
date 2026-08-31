@@ -3,7 +3,17 @@
     "code": "RELKIT_EVENT_NAME_UNKNOWN",
     "column": 17,
     "descriptorId": "orders.created-trigger",
-    "file": "src/orders/events/order-created-trigger.event.ts",
+    "file": "src/orders/functions/order-created-trigger.function.ts",
+    "line": 3,
+    "message": "Event function \"orders.created-trigger\" references unknown event \"orders.missing\".",
+    "severity": "error",
+    "suggestion": "Declare the event with defineEvent or use a registered event ID."
+  },
+  {
+    "code": "RELKIT_EVENT_NAME_UNKNOWN",
+    "column": 17,
+    "descriptorId": "relkit.event.orders.created-trigger.trigger",
+    "file": "src/orders/functions/order-created-trigger.function.ts",
     "line": 3,
     "message": "Event name \"orders.missing\" is not registered.",
     "severity": "error"

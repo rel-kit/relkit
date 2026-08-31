@@ -27,10 +27,14 @@ export function EventContract({ view }: { readonly view: EventView }) {
         </dl>
       </section>
       <div className="route-contract-grid">
-        <JsonPanel title="Payload schema" value={event.payload} />
+        <JsonPanel title="Input schema" value={event.input} />
         <JsonPanel
-          title="Selector and delivery summary"
+          title="Consumers and delivery summary"
           value={{
+            consumers: view.consumers.map((consumer) => ({
+              id: consumer.id,
+              invocationMode: consumer.invocationMode,
+            })),
             listeners: view.listeners.map((listener) => ({
               id: listener.id,
               targetFunctionId: listener.targetFunctionId,

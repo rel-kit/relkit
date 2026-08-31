@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".relkit/build/**"]
+      "outputs": ["dist/**", ".relkit/build/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "create-relkit#build": {
       "dependsOn": ["^build"],

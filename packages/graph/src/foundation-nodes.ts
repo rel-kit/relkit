@@ -24,11 +24,4 @@ export interface GeneratedAgentMarker {
   readonly functionId: string;
 }
 
-export interface GeneratedEventListenerMarker {
-  readonly generated: true;
-  readonly generatedBy: "event-listener";
-  readonly listenerId: string;
-  readonly functionId: string;
-}
-
-export type GeneratedFunctionMarker = GeneratedAgentMarker | GeneratedEventListenerMarker;
+export type GeneratedFunctionMarker = GeneratedAgentMarker;

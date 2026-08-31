@@ -1,0 +1,101 @@
+---
+title: Design your domains
+description: Choose business boundaries that keep changes local, make ownership clear, and let features grow without reorganizing the app.
+---
+
+A domain is an area of the product with a coherent responsibility and vocabulary. Orders knows what it
+means to create, price, update, or cancel an order. Receipts knows how to prepare and send a receipt.
+Both may use functions, events, and storage, but those technologies do not define their boundaries.
+
+In RelKit, a domain is represented by a top-level application directory such as `src/orders/`, with one
+`service.ts` describing what other domains and routes may use.
+
+## Why have domains?
+
+As a feature grows, its implementation spans several kinds of code. Order creation can require
+validation, a price lookup, a cache, an event, and an AI lookup tool. Grouping all functions together and
+all tools elsewhere makes you reconstruct that feature's ownership every time you change it.
+
+A domain keeps those related decisions together. Its public service tells a new contributor what the
+rest of the application depends on; its internal files show how the behavior is implemented. You can
+change the internals without teaching every caller about the new layout.
+
+The benefit is a shorter change path, not a promise that adding folders makes execution faster:
+
+- **Find the owner quickly.** A request about order pricing starts in Orders, even if the implementation
+  now uses a cache or an external provider.
+- **Reuse an operation.** An HTTP route and an AI tool can use the same validated function instead of
+  maintaining separate implementations.
+- **Review a smaller contract.** Callers depend on selected service members, not every helper file.
+- **Add independent reactions.** Receipts can subscribe to an order event without adding receipt logic
+  to the order-creation handler.
+- **Catch misplaced dependencies early.** `bun run check` reports invalid domain boundaries and public
+  members before the application activates.
+
+## Choose the owner before the file type
+
+Ask: “Which part of the product is responsible for this rule or result?”
+
+| Change                                           | Likely owner | Reason                                            |
+| ------------------------------------------------ | ------------ | ------------------------------------------------- |
+| Calculate an order total                         | Orders       | It defines order pricing behavior.                |
+| Add a tool that looks up an order                | Orders       | AI access does not change who owns the lookup.    |
+| React to an order by sending a receipt           | Receipts     | The reaction belongs to the receiving domain.     |
+| Parse an HTTP header                             | Routes       | It is a transport detail, not an order rule.      |
+| Declare a provider endpoint environment variable | Platform     | It supports runtime configuration across domains. |
+
+Start with the smallest boundary that has a useful responsibility. One domain can be enough for a small
+application. You do not need one domain per endpoint, database table, function, or developer.
+
+## Keep together what changes together
+
+Keep order-specific functions, schemas, errors, tools, and agents in Orders while they share the same
+business rules. A new file or subdirectory is often enough; a new service is not required for each
+feature. Nested directories remain part of the top-level domain, not independent child services.
+
+Consider a separate domain when it has a responsibility you can name independently, can expose a small
+useful contract, and evolves without requiring callers to understand its internal details. Receipts is
+a useful separation when receipt delivery has its own retry, scheduling, and formatting concerns.
+
+Do not create an empty domain for a future feature. A normal domain must own a graph-visible artifact
+in addition to its service, even if it has no public functions.
+
+## Call for a result; publish for a reaction
+
+Use a public service function when the caller needs a result before it can continue. Use an event when
+the originating operation should not wait for the follow-up work to finish. Events add delivery and
+retry considerations, so they are not a substitute for every function call.
+
+This Receipts subscriber illustrates both relationships:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/receipts/functions/order-receipt.function.ts"'
+>
+  ../../examples/commerce/src/receipts/functions/order-receipt.function.ts
+</include>
+
+Orders owns the `orders.created` event contract. Receipts owns this subscriber and its job. The
+subscriber calls `orders.getOrder.invoke(...)` through the public service because it needs the lookup
+result before enqueueing work. Its job dependency stays inside Receipts.
+
+Continue with [getting started with events](/docs/events) for publication and subscription, or
+[jobs](/docs/jobs) for queued execution. You do not add subscriber functions to the producer's
+service or call them directly; `defineEventFunction` is event-only.
+
+## Iterate without widening every boundary
+
+For a new order feature, first add or change the function inside Orders and test its behavior. Add it to
+the service only if a route or another domain needs to call it. Then attach the appropriate entry point:
+a route, tool, job, or event subscriber. Keep existing callers on the same public contract where possible.
+
+If two domains repeatedly need each other's private helpers, reconsider the boundary. Put the rule with
+its real owner and expose a meaningful operation, or keep the code in one domain if it cannot be
+separated coherently. Do not use Platform to bypass domain ownership.
+
+A domain is a source and application boundary, not an independently deployed microservice. Defining
+several services does not create several servers, network hops, or isolated databases. Domain separation
+also does not provide authentication or authorization by itself.
+
+<include cwd>content/generated/related/service-domains.mdx</include>

@@ -1,0 +1,26 @@
+---
+title: Getting started
+description: Store uploads, images, and generated files in your RelKit app.
+---
+
+A bucket stores files such as product photos, invoices, and exports. Each file has a **key**—a name such as `products/book/cover.png` that you use to find it again. Keep searchable records in your database and store their file keys alongside them.
+
+## The Storage API
+
+Usually, storing files means setting up a storage SDK, connecting credentials, and passing a client into your application code. With RelKit, configure storage once, define a bucket, and use it through your function's context.
+
+| API                                      | What you use it for                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------- |
+| `defineBucket`                           | Name a bucket and choose visibility, file-size limits, and content types. |
+| `dependencies.buckets`                   | Give a function access to a bucket.                                       |
+| `context.buckets.assets.put(key, bytes)` | Save a file.                                                              |
+| `context.buckets.assets.get(key)`        | Read a file's bytes.                                                      |
+| `context.buckets.assets.delete(key)`     | Remove a file.                                                            |
+
+Bucket access also works in event functions and in ordinary functions used by jobs and tools.
+
+## Try it in your app
+
+Start with [defining a bucket](/docs/storage/define), or follow the [image-upload example](/docs/storage/first-upload). You can run the example locally without cloud credentials.
+
+In the Inspector, open **Buckets** and select your bucket to browse its objects and inspect their metadata. See the [upload example](/docs/storage/first-upload#check-the-stored-files) for verification steps.

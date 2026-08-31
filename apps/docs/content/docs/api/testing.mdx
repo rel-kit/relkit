@@ -535,6 +535,31 @@ declare const handleTestRequest: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L5)
 
+## `application-registry.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [loadTestRegistry](#loadtestregistry)
+
+---
+
+# utils
+
+## loadTestRegistry
+
+Reuses generated bindings for event contracts and nested function calls.
+
+**Signature**
+
+```ts
+declare const loadTestRegistry: (root: string) => Promise<FunctionRegistry | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-registry.ts#L10)
+
 ## `application-routes.ts`
 
 ---
@@ -700,7 +725,7 @@ declare const createTestApplication: (
 ) => Promise<TestApplication>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L48)
 
 Since v0.1.0
 
@@ -721,7 +746,7 @@ export interface TestApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L24)
 
 ## TestApplicationOptions (type alias)
 
@@ -733,7 +758,7 @@ type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L20)
 
 ## `buckets-types.ts`
 
@@ -1056,10 +1081,13 @@ export interface TestEventControlState {
   readonly openFanout: (envelope: UnknownEventEnvelope) => Promise<void>;
   readonly owner: TestStateRoot;
   readonly failures: TestFailureControls;
-  readonly triggers: readonly { readonly id: string; readonly expansion: readonly string[] }[];
+  readonly triggers: readonly {
+    readonly id: string;
+    readonly eventId: string;
+    readonly eventVersion: number;
+  }[];
   readonly envelopes: readonly UnknownEventEnvelope[];
   readonly unfanned: Map<string, UnknownEventEnvelope>;
-  readonly ephemeralCompleted: Map<string, number>;
   readonly remember: (result: EventDeliveryResult, envelope: UnknownEventEnvelope) => void;
   readonly isClosed: () => boolean;
   readonly markClosed: () => void;
@@ -1083,7 +1111,7 @@ export interface TestEventControls {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L27)
 
 ## createTestEventControls
 
@@ -1093,7 +1121,7 @@ export interface TestEventControls {
 declare const createTestEventControls: (state: TestEventControlState) => TestEventControls;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L36)
 
 ## `events-runtime-open.ts`
 
@@ -1124,7 +1152,7 @@ export interface OpenTestEventRuntimeOptions {
   readonly failures: TestFailureControls;
   readonly runner: InvocationRunner;
   readonly idSource: Parameters<typeof createEventInvoker>[4];
-  readonly targets: ReadonlyMap<string, InvocationTarget<UnknownEventEnvelope, unknown>>;
+  readonly targets: ReadonlyMap<string, InvocationTarget<unknown, unknown>>;
   readonly generation: number;
 }
 ```
@@ -1167,7 +1195,7 @@ declare const openTestEventRuntime: (input: OpenTestEventRuntimeOptions) => Prom
 
 ```ts
 declare const createEventInvoker: (
-  targets: ReadonlyMap<string, InvocationTarget<UnknownEventEnvelope, unknown>>,
+  targets: ReadonlyMap<string, InvocationTarget<unknown, unknown>>,
   options: TestEventOptions<unknown, unknown>,
   now: () => number,
   runner: InvocationRunner,
@@ -1186,12 +1214,11 @@ declare const fanoutEvent: (
   router: EventRouter,
   envelope: UnknownEventEnvelope,
   unfanned: Map<string, UnknownEventEnvelope>,
-  ephemeralCompleted: Map<string, number>,
   failures: TestFailureControls,
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L49)
 
 ## toEnvelope
 
@@ -1238,7 +1265,7 @@ export interface TestEventRuntimeOptions<Payload, Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L34)
 
 ## createTestEventRuntime
 
@@ -1250,7 +1277,7 @@ declare const createTestEventRuntime: <Payload, Output>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L49)
 
 ## `events-types.ts`
 
@@ -1281,7 +1308,7 @@ export interface TestEventCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L60)
 
 ## TestEventDeliveryAttempt (interface)
 
@@ -1293,7 +1320,7 @@ export interface TestEventDeliveryAttempt extends EventDeliveryResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L64)
 
 ## TestEventFake (interface)
 
@@ -1326,7 +1353,7 @@ export interface TestEventFake<Payload = unknown, Output = unknown> extends Even
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L68)
 
 ## TestEventInvocation (type alias)
 
@@ -1336,7 +1363,7 @@ export interface TestEventFake<Payload = unknown, Output = unknown> extends Even
 type TestEventInvocation = EventInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L94)
 
 ## TestEventOptions (interface)
 
@@ -1345,15 +1372,14 @@ type TestEventInvocation = EventInvocationOptions;
 ```ts
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
   readonly event?: EventDescriptorAny;
+  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;
-  readonly target?: InvocationTarget<UnknownEventEnvelope, Output>;
+  readonly target?: EventFunctionDescriptorAny;
   readonly triggers?: readonly TestEventTriggerOptions<Output>[];
   readonly triggerId?: string;
   readonly delivery?: "ephemeral" | "durable";
-  readonly selector?: JsonValue;
-  readonly expansion?: readonly string[];
   readonly profile?: string;
   readonly ownerId?: string;
   readonly correlationId?: string;
@@ -1383,7 +1409,7 @@ export interface TestEventOptions<Payload = unknown, Output = unknown> {
 type TestEventPublishResult = EventPublishResult<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L93)
 
 ## TestEventTriggerOptions (interface)
 
@@ -1392,17 +1418,16 @@ type TestEventPublishResult = EventPublishResult<string, number, unknown>;
 ```ts
 export interface TestEventTriggerOptions<Output = unknown> {
   readonly id: string;
-  readonly target: InvocationTarget<UnknownEventEnvelope, Output>;
+  readonly target: EventFunctionDescriptorAny;
   readonly delivery?: "ephemeral" | "durable";
-  readonly selector?: JsonValue;
-  readonly expansion?: readonly string[];
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-types.ts#L22)
 
 ## `events.ts`
 
@@ -1430,7 +1455,7 @@ declare const createTestEvent: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.ts#L18)
 
 ## createTestEventFake
 
@@ -1442,7 +1467,7 @@ declare const createTestEventFake: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.ts#L49)
 
 ## `fake-utils.ts`
 
@@ -2921,7 +2946,7 @@ declare const invokeFunction: <
 ) => Promise<FunctionOutput<Target>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L70)
 
 Since v0.1.0
 
@@ -2940,7 +2965,7 @@ type FunctionContextOf<Target> =
     : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L36)
 
 ## FunctionInput (type alias)
 
@@ -2950,7 +2975,7 @@ type FunctionContextOf<Target> =
 type FunctionInput<Target> = InferInput<Target["input"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L28)
 
 ## FunctionOutput (type alias)
 
@@ -2960,7 +2985,7 @@ type FunctionInput<Target> = InferInput<Target["input"]>;
 type FunctionOutput<Target> = InferOutput<Target["output"]>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L32)
 
 ## InvokeFunctionOptions (interface)
 
@@ -2968,6 +2993,7 @@ type FunctionOutput<Target> = InferOutput<Target["output"]>;
 
 ```ts
 export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
+  readonly registry?: FunctionRegistry;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
   readonly signal?: AbortSignal;
@@ -2978,7 +3004,7 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L43)
 
 ## StandaloneFunctionTarget (interface)
 
@@ -2991,13 +3017,14 @@ export interface StandaloneFunctionTarget {
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
   readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
+  readonly publishes?: readonly string[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L16)
 
 ## invokeFunctionWithRunner
 
@@ -3015,7 +3042,7 @@ declare const invokeFunctionWithRunner: <
 ) => Promise<FunctionOutput<Target>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L90)
 
 ## `jobs-types.ts`
 
@@ -3382,7 +3409,7 @@ export interface TestClock {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L34)
 
 ## TestRuntime (interface)
 
@@ -3403,7 +3430,7 @@ export interface TestRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L41)
 
 ## TestRuntimeCloseOptions (interface)
 
@@ -3415,7 +3442,7 @@ export interface TestRuntimeCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L30)
 
 ## TestRuntimeOptions (interface)
 
@@ -3423,6 +3450,7 @@ export interface TestRuntimeCloseOptions {
 
 ```ts
 export interface TestRuntimeOptions {
+  readonly registry?: FunctionRegistry;
   readonly app?: { readonly env: EnvDefinition<EnvShape> };
   readonly environment?: string;
   readonly env?: Readonly<Record<string, unknown>>;
@@ -3434,7 +3462,7 @@ export interface TestRuntimeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L18)
 
 ## createTestRuntime
 
@@ -3446,7 +3474,7 @@ Creates a small deterministic runtime for direct function tests.
 declare const createTestRuntime: (options?: TestRuntimeOptions) => TestRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L55)
 
 ## `state-root.ts`
 

@@ -1,0 +1,116 @@
+---
+title: Customize authentication
+description: Configure Better Auth methods, email flows, plugins, data fields, and session security without moving business authorization into the auth adapter.
+---
+
+Customize the existing `defineBetterAuthService` options; do not create a second auth service for a
+social provider or plugin. Except for RELKIT's reserved `database` and `basePath`, the options follow
+the installed Better Auth API. The `drizzle` option configures its adapter separately.
+
+The executable example starts with email/password only:
+
+<include cwd lang="ts" meta='title="src/auth/service.ts"'>
+  ../../examples/auth-drizzle/src/auth/service.ts
+</include>
+
+This page identifies the configuration points and work each change requires. The example does not
+pretend to configure an email provider, OAuth credentials, organization management, or an admin system.
+Typecheck against your installed Better Auth version and test each enabled flow before publishing it.
+
+## Configure sign-in and email delivery
+
+| Requirement                         | Better Auth option                               | Additional work                                                                                 |
+| ----------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Enable email/password               | `emailAndPassword.enabled`                       | Sign-up/sign-in UI, password policy, abuse protection                                           |
+| Require verified email              | `emailAndPassword.requireEmailVerification`      | Verification delivery, callback page, expired-link handling                                     |
+| Send verification messages          | `emailVerification.sendVerificationEmail`        | Implement the async delivery callback using its supplied user and verification URL              |
+| Choose verification delivery timing | `emailVerification.sendOnSignUp`, `sendOnSignIn` | Ensure the UI explains the resulting flow                                                       |
+| Send password reset messages        | `emailAndPassword.sendResetPassword`             | Implement delivery and a reset page; test token expiry and reuse                                |
+| Social sign-in                      | `socialProviders`                                | Server-only provider credentials, registered callback URLs, client flow, account-linking policy |
+| Extend authentication behavior      | `plugins`                                        | Required tables/migrations, plugin options, and any matching client plugin                      |
+
+Enabling verified-email sign-in without delivering verification messages can lock users out. These
+callbacks are native Better Auth callbacks, not RELKIT function handlers: they do not receive a RELKIT
+invocation context or automatically inherit declared job/resource dependencies. Keep delivery failure
+handling explicit. Do not log verification/reset URLs or tokens as a substitute for sending them.
+
+For social providers, register the callback URL for the actual public base URL and mounted auth path,
+using the provider's required endpoint. An email match alone should not become an improvised
+account-linking rule in application code. Keep provider/client secrets on the server and test cancelled,
+denied, and failed callbacks as well as successful sign-in.
+
+## Customize the persisted data model
+
+The example's auth tables are ordinary Drizzle definitions owned by the database domain:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/database/schema/index.ts
+</include>
+
+For additional stored user/session fields, coordinate three changes: Better Auth's model
+`additionalFields` configuration, matching Drizzle columns, and a reviewed migration. Configure the
+field's type, required/default behavior, and whether clients may supply it using the native field
+options. Privileged fields such as roles must not be writable through public sign-up/profile input;
+use server-controlled assignment and verify it with a negative test.
+
+For renamed models or fields, align native `modelName`/`fields` settings with the adapter's schema
+mapping. `drizzle.schema` changes the tables seen by the adapter, not the tables registered by the
+database service or migrated by Kit. Preserve the auth model's required fields and constraints.
+
+In the existing repository example, choose the database and generate a change after editing the schema:
+
+```sh
+export DATABASE_PATH=./auth.sqlite
+bun run db:generate --name=auth-fields
+```
+
+Review the generated migration, test it on isolated data, and apply it with `bun run db:migrate`
+before deploying code that relies on those fields. Other apps can use the underlying
+[Drizzle Kit commands](/docs/database/migrations). Adding options does not migrate a database.
+
+Plugin requirements are additional to the four core tables. Use the plugin's installed types and
+schema requirements rather than guessing columns. Better Auth's own schema generator expects native
+configuration; the RELKIT service descriptor is not its activated `betterAuth()` instance. See
+[Database integration](/docs/database/better-auth) before choosing a schema-generation workflow.
+
+Application profiles can instead live in a separate domain table referencing the auth user ID. That
+keeps product-specific fields out of credential storage. Add the foreign keys and deletion policy your
+model needs: the example's `userId` columns alone do not declare foreign-key constraints.
+
+## Set session and revocation policy deliberately
+
+Native `session.expiresIn` and `session.updateAge` are measured in seconds. Choose a session lifetime
+and refresh policy appropriate to your application, and test them through the native session flow.
+They are not the same as RELKIT's request-scoped memoization of `getSession()`.
+
+Changing `session.cookieCache`, secondary storage, or session persistence can affect how quickly
+revocation and user changes become visible. Do not enable a cache and assume the uncached example's
+sign-out/revocation assertions still prove your chosen policy. Test old cookies, multiple sessions,
+and privileged changes under the actual configuration.
+
+Use auth-supported password, account, and session operations for lifecycle changes. Directly updating
+an account's password column or deleting arbitrary auth rows bypasses the auth system's expected
+hashing, linking, and cleanup behavior. RELKIT CRUD schemas and overrides do not enforce that behavior.
+
+## Review deployment security
+
+Before serving real users:
+
+- Supply a stable server secret and the actual public HTTPS `baseURL`; restrict `trustedOrigins` to
+  origins you control. Configure proxy trust only for your deployment's trusted proxy path.
+- Preserve secure-cookie and CSRF/origin protections. Verify browser cookie scope, credentialed CORS,
+  and callback destinations with the deployed hostnames.
+- Configure Better Auth's `rateLimit` and any upstream limits deliberately. The native limiter defaults
+  to production-only behavior; development tests do not establish production abuse protection. Choose
+  shared limiting/storage when requests can reach multiple replicas.
+- Keep authorization in business functions. An auth plugin's role model is not automatic authorization
+  for your Orders or Billing APIs.
+- Migrate first, use durable database storage, back up auth data securely, and test restores and upgrades.
+  A container's disposable SQLite file is not a persistent account store.
+- Keep credentials, reset links, session tokens, and provider tokens out of logs and generic CRUD APIs.
+  Do not bundle the server auth descriptor into a client application.
+
+See [Auth testing](/docs/auth/testing) for the checks the repository actually runs and the deployment
+cases you must add for your own policies.
+
+<include cwd>content/generated/related/auth-customization.mdx</include>

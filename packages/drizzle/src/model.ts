@@ -18,6 +18,25 @@ export const RESERVED_OPERATIONS = Object.freeze([
   "delete",
 ] as const);
 
+/**
+ * Adds named table methods with an injected table and transaction-aware Drizzle client.
+ * Use service overrides, not extensions, to replace the six reserved CRUD operations.
+ *
+ * @example
+ * ```ts
+ * import { defineModel } from "@relkit/drizzle"
+ * import { integer, sqliteTable } from "drizzle-orm/sqlite-core"
+ *
+ * const users = sqliteTable("users", { id: integer().primaryKey() })
+ * const model = defineModel({
+ *   table: users,
+ *   extend: { firstTen: ({ table, database }) => database.select().from(table).limit(10) },
+ * })
+ * console.assert(model.extensionNames.includes("firstTen"))
+ * ```
+ * @category Database
+ * @since 0.1.0
+ */
 export function defineModel<
   const T extends Table,
   const Extensions extends ModelExtensionMap<T>,

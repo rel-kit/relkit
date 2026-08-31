@@ -3,9 +3,9 @@ import { isRecord, pick, safeJson, safeSource } from "./shared.js";
 
 const GRAPH_FIELDS = `
 environment providerBindings observability defaults name type requiredIn hasDefault sensitive
-description input output errors dependencies timeoutMs concurrency generated triggerType
-targetFunctionId config method path request responses middleware transforms selector expansion
-delivery profile retry schedule idempotency version payload sensitiveFields visibility maxObjectBytes
+description input output errors dependencies timeoutMs concurrency generated triggerType invocationMode publishes
+targetFunctionId config method path request responses middleware transforms eventId eventVersion
+delivery profile retry schedule idempotency version sensitiveFields visibility maxObjectBytes
 allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model toolIds limits
 generatedFunction capabilities capability adapter ownership configuration
 title tags members functions events order ownerId ownerKind phase domainId exposure data http retry

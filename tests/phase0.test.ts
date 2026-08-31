@@ -340,8 +340,8 @@ describe.serial("Phase 0 guardrails", () => {
       expect(readme).toContain(current);
       expect(gettingStarted).toContain(current);
     }
-    expect(gettingStarted).toContain("| `--cloud`                 | `aws`, `none`");
-    expect(gettingStarted).toContain("| `--deploy`                | `pulumi`, `none`");
+    expect(gettingStarted).toContain("--cloud none");
+    expect(gettingStarted).toContain("--deploy none");
   });
 
   test("ignores only RelKit generated and local runtime roots", async () => {

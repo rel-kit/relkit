@@ -73,11 +73,10 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       sourceMaps: true,
     });
     if (evaluator.status !== "ok") {
-      return emitCheckResult(
-        projectRoot,
-        outputDirectory,
-        evaluatorDiagnostics(evaluator.failures),
-      );
+      return emitCheckResult(projectRoot, outputDirectory, [
+        ...typecheckProject(projectRoot),
+        ...evaluatorDiagnostics(evaluator.failures),
+      ]);
     }
     throwIfAborted(options.signal);
     const extracted = extractDescriptors(evaluator, { projectRoot, sources: discoverySources });

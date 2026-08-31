@@ -1,0 +1,196 @@
+---
+title: Your first auth flow
+description: Add email/password authentication to an existing RELKIT app, migrate the database, read a session, and verify protected access and sign-out.
+---
+
+Add authentication to an existing RELKIT app using the executable `examples/auth-drizzle` application.
+The result is a public auth API, a small session operation, and an application route that requires
+sign-in. This local tutorial uses Bun and SQLite, with no external identity or email provider.
+
+Use the standard `@app/*` alias. If needed, follow [Create an app](/docs/start/create-an-app) first.
+Preserve existing environment fields, service members, routes, and table exports. If your app already
+has a Drizzle or Better Auth service, extend it rather than adding a second one.
+
+## Prepare the database and environment
+
+Install the compatible packages listed in [Better Auth service](/docs/auth/better-auth#install-compatible-packages).
+Add the environment fields to your existing configuration:
+
+<include cwd lang="ts" meta='title="relkit.config.ts"'>
+  ../../examples/auth-drizzle/relkit.config.ts
+</include>
+
+From your application root, choose a fresh local database and supply a local secret:
+
+```sh
+export DATABASE_PATH=./auth.sqlite
+export BETTER_AUTH_URL=http://127.0.0.1:3000
+export BETTER_AUTH_SECRET="$(openssl rand -base64 32)"
+```
+
+Keep these values for the server commands below. The generated secret starts a fresh local exercise;
+store a stable secret securely for subsequent runs. Do not commit it or the SQLite file.
+
+Add the authentication tables to the database schema:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/database/schema/index.ts
+</include>
+
+Keep the direct `user`, `session`, `account`, and `verification` exports. These definitions match the
+example's installed Better Auth version, including the account `issuer` field. They are not a drop-in
+replacement for an existing business `users` table. Read [Database integration](/docs/database/better-auth)
+before adapting IDs, custom fields, or existing accounts. The example does not declare foreign keys.
+
+Add or extend the database service:
+
+<include cwd lang="ts" meta='title="src/database/service.ts"'>
+  ../../examples/auth-drizzle/src/database/service.ts
+</include>
+
+This service opens and closes the connection. Table creation belongs to migration tooling, not startup.
+
+## Generate and apply migrations
+
+Add the Drizzle Kit configuration, or merge its schema entry point into your existing configuration:
+
+<include cwd lang="ts" meta='title="drizzle.config.ts"'>
+  ../../examples/auth-drizzle/drizzle.config.ts
+</include>
+
+From your app root, with `DATABASE_PATH` still set:
+
+```sh
+bun --bun drizzle-kit generate --name=auth
+```
+
+Review the generated migration before applying it:
+
+```sh
+bun --bun drizzle-kit migrate
+```
+
+Commit the generated migration history with your schema. If running the repository's existing example,
+the initial migration is already present: use `bun run db:migrate` without generating another one.
+See [Migrations](/docs/database/migrations) for changes to an existing database and deployment sequencing.
+
+## Add the auth service and mount
+
+Create `src/auth/service.ts`:
+
+<include cwd lang="ts" meta='title="src/auth/service.ts"'>
+  ../../examples/auth-drizzle/src/auth/service.ts
+</include>
+
+Mount its raw handler:
+
+<include cwd lang="ts" meta='title="src/routes/api/auth/[[...auth]]/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
+</include>
+
+This creates the auth mount at `/api/auth` and requires sessions on the listed application paths.
+`/orders/*` and `/mcp` are examples of additional protected paths; they do not create those endpoints.
+Do not set `database` or `basePath` on the service itself.
+
+Run `bun run check` now to generate auth/database context types before adding the consuming function.
+
+## Add a session operation and application routes
+
+Create the function in the Account domain:
+
+<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+</include>
+
+Expose it through the owning service:
+
+<include cwd lang="ts" meta='title="src/account/service.ts"'>
+  ../../examples/auth-drizzle/src/account/service.ts
+</include>
+
+Add the public optional-session route:
+
+<include cwd lang="ts" meta='title="src/routes/session/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/session/route.ts
+</include>
+
+Add a protected route targeting the same operation:
+
+<include cwd lang="ts" meta='title="src/routes/account/profile/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/account/profile/route.ts
+</include>
+
+The operation handles `null`; HTTP admission makes `/account/profile` require a session while `/session`
+remains public. This example reports identity only. Add [business permission checks](/docs/auth/protect-routes#enforce-permissions-in-the-business-operation)
+before exposing real account or other protected data.
+
+## Check and run the application
+
+Use [Auth testing](/docs/auth/testing) to add the executable test to your app; it already exists in the
+repository example. Then run from the app root:
+
+```sh
+bun run check
+bun run typecheck
+bun test tests/auth.test.ts
+bun run dev
+```
+
+The test uses its own migrated temporary database; it does not create accounts in the running server.
+Use the backend's actual port if it differs from `3000`, and keep `BETTER_AUTH_URL` consistent.
+
+## Verify sign-up, protected access, and sign-out
+
+In a second terminal, start a temporary cookie jar and check the signed-out state:
+
+```sh
+auth_cookies=$(mktemp -t relkit-auth-cookies)
+curl -i http://127.0.0.1:3000/account/profile
+curl http://127.0.0.1:3000/session
+```
+
+Expect HTTP `401` for the profile and `{ "authenticated": false }` for the public operation.
+Create an account and save the response cookie:
+
+```sh
+curl -i -c "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-up/email \
+  -H 'content-type: application/json' \
+  -H 'origin: http://127.0.0.1:3000' \
+  --data '{"name":"Demo","email":"demo@example.com","password":"local-demo-password-123"}'
+curl -b "$auth_cookies" http://127.0.0.1:3000/account/profile
+```
+
+Expect sign-up HTTP `200` with a session cookie, then a profile containing `authenticated: true` and
+the generated user ID. This tutorial does not require email verification. The account persists across
+restarts; use a new email for another sign-up or sign in to the existing account.
+
+Sign out and confirm that the same previously issued cookie no longer admits the protected request:
+
+```sh
+curl -i -b "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-out \
+  -H 'content-type: application/json' \
+  -H 'origin: http://127.0.0.1:3000' --data '{}'
+curl -i -b "$auth_cookies" http://127.0.0.1:3000/account/profile
+```
+
+Expect sign-out HTTP `200`, then profile HTTP `401`. Sign in again and replace the cookie jar:
+
+```sh
+curl -i -c "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-in/email \
+  -H 'content-type: application/json' \
+  -H 'origin: http://127.0.0.1:3000' \
+  --data '{"email":"demo@example.com","password":"local-demo-password-123"}'
+curl -b "$auth_cookies" http://127.0.0.1:3000/account/profile
+rm "$auth_cookies"
+```
+
+Expect an authenticated profile again. The final command removes only this exercise's temporary cookie
+jar, not the account or database. These credentials and raw response displays are for an isolated local
+exercise; do not print real users' tokens in shared terminals or logs.
+
+For the browser flow, see [Clients](/docs/auth/clients). The repository example also serves a small
+page at `http://127.0.0.1:3000` with sign-up, sign-in, sign-out, and session buttons. Finish with
+[Customization](/docs/auth/customization) before deploying: configure delivery, providers, cookies,
+rate limiting, persistent storage, and the permission rules your product needs.
+
+<include cwd>content/generated/related/auth-first-auth.mdx</include>

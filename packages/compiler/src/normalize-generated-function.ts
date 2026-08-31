@@ -8,6 +8,8 @@ export function generatedFunctionNode(
   const generated = generatedAgentMarker(descriptor.id);
   return {
     kind: "function",
+    invocationMode: "callable",
+    publishes: [],
     id: generated.functionId,
     source: descriptor.source,
     ...(descriptor.domainId === undefined ? {} : { domainId: descriptor.domainId }),

@@ -30,7 +30,7 @@
           "sqs:GetQueueAttributes"
         ],
         "resources": [
-          "full-app-event-trigger-receipts-listener"
+          "full-app-event-trigger-relkit-event-receipts-listener-trigger"
         ]
       },
       {
@@ -54,19 +54,17 @@
       ]
     },
     {
-      "functionId": "receipts.send",
+      "functionId": "receipts.listener",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
       "actions": [
-        "sqs:ReceiveMessage",
-        "sqs:DeleteMessage",
-        "sqs:ChangeMessageVisibility"
+        "sqs:SendMessage"
       ]
     },
     {
-      "functionId": "relkit.event.receipts.listener.handler",
+      "functionId": "receipts.listener",
       "capability": "jobs",
-      "resourceId": "receipts.listener",
+      "resourceId": "relkit.event.receipts.listener.trigger",
       "actions": [
         "sqs:ReceiveMessage",
         "sqs:DeleteMessage",
@@ -75,11 +73,13 @@
       ]
     },
     {
-      "functionId": "relkit.event.receipts.listener.handler",
+      "functionId": "receipts.send",
       "capability": "jobs",
       "resourceId": "receipts.send-job",
       "actions": [
-        "sqs:SendMessage"
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:ChangeMessageVisibility"
       ]
     }
   ]

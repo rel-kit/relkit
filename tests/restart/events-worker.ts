@@ -1,14 +1,15 @@
 import { access, appendFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { UnknownEventEnvelope } from "../../packages/events/src/index.ts";
+import { defineEventFunction } from "../../packages/events/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { createTestEvent } from "../../packages/testing/src/index.ts";
+import { resolveRestartStateRoot } from "./state-root.ts";
 
 type EventWorkerMode =
   "after-lease" | "after-ack" | "recover" | "ephemeral-loss" | "ephemeral-recover" | "fanout";
 
 const mode = process.argv[2] as EventWorkerMode | undefined;
-const stateRoot = process.argv[3];
+const requestedStateRoot = process.argv[3];
 const startTimeMs = Number(process.argv[4]);
 const modes: readonly EventWorkerMode[] = [
   "after-lease",
@@ -21,11 +22,12 @@ const modes: readonly EventWorkerMode[] = [
 if (
   mode === undefined ||
   !modes.includes(mode) ||
-  stateRoot === undefined ||
+  requestedStateRoot === undefined ||
   !Number.isSafeInteger(startTimeMs)
 ) {
   throw new Error("Usage: events-worker.ts <mode> <state-root> <time>");
 }
+const stateRoot = resolveRestartStateRoot(requestedStateRoot);
 
 const retry = {
   maxAttempts: 1,
@@ -35,7 +37,6 @@ const retry = {
   jitter: "none" as const,
 };
 const payloadSchema = z.object({ orderId: z.string() });
-const outputSchema = z.object({ handled: z.boolean() });
 
 await run();
 
@@ -125,14 +126,13 @@ async function run(): Promise<void> {
 }
 
 function createTarget(listener: string, behavior: "complete" | "fail" | "kill") {
-  return {
+  return defineEventFunction({
     id: `tests.restart.events.${listener}`,
-    input: z.unknown(),
-    output: outputSchema,
-    handler: async (envelope: UnknownEventEnvelope) => {
+    event: "orders.created" as never,
+    handler: async (_, context) => {
       await appendFile(
         join(stateRoot, "invocations.ndjson"),
-        `${JSON.stringify({ listener, instanceId: envelope.instanceId })}\n`,
+        `${JSON.stringify({ listener, instanceId: context.trigger.event.instanceId })}\n`,
       );
       if (behavior === "kill") {
         // SIGKILL models process loss after durable lease acquisition or ephemeral admission.
@@ -140,9 +140,8 @@ function createTarget(listener: string, behavior: "complete" | "fail" | "kill") 
         throw new Error("unreachable");
       }
       if (behavior === "fail") throw new Error("listener failed");
-      return { handled: true };
     },
-  };
+  });
 }
 
 async function createEvent(options: {

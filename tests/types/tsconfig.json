@@ -30,6 +30,7 @@
       "@relkit/drizzle/internal": ["packages/drizzle/src/internal.ts"],
       "@relkit/events": ["packages/events/src/index.ts"],
       "@relkit/functions": ["packages/functions/src/index.ts"],
+      "@relkit/functions/internal": ["packages/functions/src/internal.ts"],
       "@relkit/jobs": ["packages/jobs/src/index.ts"],
       "@relkit/routes": ["packages/routes/src/index.ts"],
       "@relkit/schema": ["packages/schema/src/index.ts"],

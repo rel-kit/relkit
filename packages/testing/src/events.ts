@@ -10,7 +10,8 @@ import type { TestEventFake, TestEventOptions, TestEventTriggerOptions } from ".
 type NormalizedTrigger<Output> = TestEventTriggerOptions<Output> & {
   readonly delivery: "ephemeral" | "durable";
   readonly profile: string;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
 };
 
 /** Creates a deterministic event publication and delivery harness. */
@@ -18,7 +19,7 @@ export async function createTestEvent<Payload = unknown, Output = unknown>(
   options: TestEventOptions<Payload, Output>,
 ): Promise<TestEventFake<Payload, Output>> {
   const eventId = normalizeId(options.event?.ref.id ?? options.eventId ?? "");
-  const version = options.event?.version ?? options.version;
+  const version = options.event?.version ?? options.version ?? 1;
   if (typeof version !== "number" || !Number.isSafeInteger(version) || version < 1)
     throw new TypeError("Test event version must be a positive integer");
   const profile = normalizeId(options.profile ?? "default");
@@ -59,11 +60,9 @@ function normalizeTriggers<Output>(
       ? []
       : [
           {
-            id: options.triggerId ?? `${eventId}.trigger`,
+            id: options.triggerId ?? `relkit.event.${options.target.id}.trigger`,
             target: options.target,
             ...(options.delivery === undefined ? {} : { delivery: options.delivery }),
-            ...(options.selector === undefined ? {} : { selector: options.selector }),
-            ...(options.expansion === undefined ? {} : { expansion: options.expansion }),
             ...(options.profile === undefined ? {} : { profile: options.profile }),
             ...(options.retry === undefined ? {} : { retry: options.retry }),
             ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
@@ -71,19 +70,26 @@ function normalizeTriggers<Output>(
         ]);
   return Object.freeze(
     source.map((trigger) => {
-      const triggerProfile = normalizeId(trigger.profile ?? profile);
+      if (trigger.target.event !== eventId)
+        throw new TypeError(
+          `Event function ${trigger.target.id} consumes ${trigger.target.event}, not ${eventId}`,
+        );
+      const triggerProfile = normalizeId(trigger.profile ?? trigger.target.profile ?? profile);
       if (triggerProfile !== profile) throw new TypeError("Test event profiles must match");
       return Object.freeze({
         id: normalizeId(trigger.id),
         target: trigger.target,
-        delivery: trigger.delivery ?? "durable",
+        delivery: trigger.delivery ?? trigger.target.delivery,
         profile: triggerProfile,
-        expansion: Object.freeze(
-          [...(trigger.expansion ?? [`${eventId}@${version}`])].map(String).sort(),
-        ),
-        ...(trigger.selector === undefined ? {} : { selector: trigger.selector }),
-        ...(trigger.retry === undefined ? {} : { retry: trigger.retry }),
-        ...(trigger.concurrency === undefined ? {} : { concurrency: trigger.concurrency }),
+        eventId,
+        eventVersion: version,
+        retry: trigger.retry ?? trigger.target.retry,
+        ...((trigger.concurrency ?? trigger.target.concurrency) === undefined
+          ? {}
+          : { concurrency: trigger.concurrency ?? trigger.target.concurrency }),
+        ...((trigger.timeoutMs ?? trigger.target.timeoutMs) === undefined
+          ? {}
+          : { timeoutMs: trigger.timeoutMs ?? trigger.target.timeoutMs }),
       });
     }),
   );
@@ -99,6 +105,7 @@ function createPlan<Output>(
     graphHash: "sha256:test-events",
     functions: triggers.map(({ target }) => ({
       kind: "function",
+      invocationMode: "event-only",
       id: target.id,
       source,
       input: {},
@@ -111,12 +118,13 @@ function createPlan<Output>(
       triggerType: "event",
       targetFunctionId: trigger.target.id,
       config: {
-        selector: trigger.selector ?? { eventId, version },
-        expansion: trigger.expansion,
+        eventId,
+        eventVersion: version,
         delivery: trigger.delivery,
         profile: trigger.profile,
         ...(trigger.retry === undefined ? {} : { retry: trigger.retry as unknown as JsonValue }),
         ...(trigger.concurrency === undefined ? {} : { concurrency: trigger.concurrency }),
+        ...(trigger.timeoutMs === undefined ? {} : { timeoutMs: trigger.timeoutMs }),
       },
     })),
     events: [
@@ -125,7 +133,7 @@ function createPlan<Output>(
         id: eventId,
         source,
         version,
-        payload: {},
+        input: {},
         profile: triggers[0]?.profile ?? "default",
       },
     ],

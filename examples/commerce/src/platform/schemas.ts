@@ -54,26 +54,14 @@ export const orderSearchOutput = z.object({ status: z.string(), count: z.number(
 export const pathInput = z.object({ parts: z.array(z.string()).optional() });
 export const pathOutput = z.object({ path: z.string() });
 
-const uploadedFile = z.file({
-  maxBytes: 1024 * 1024 * 10,
-  mediaTypes: ["image/jpeg", "image/png"],
-});
-export const assetUploadInput = z.object({
-  label: z.string().min(1),
-  primary: uploadedFile,
-  attachments: z.array(uploadedFile),
-});
-export const assetUploadOutput = z.object({
-  label: z.string(),
-  files: z.array(z.string()),
-});
-
+// #region receipt-schemas
 export const receiptInput = z.object({
   orderId: z.string(),
   receiptKey: z.string(),
 });
 
 export const receiptOutput = z.object({ receiptId: z.string() });
+// #endregion receipt-schemas
 
 export const orderCreatedEnvelope = z.object({
   instanceId: z.string(),
@@ -139,6 +127,3 @@ export const authorizationOutput = z.object({ allowed: z.boolean() });
 
 export const supportInput = z.object({ question: z.string().min(1) });
 export const supportOutput = z.object({ answer: z.string() });
-
-export const priceKey = z.object({ sku: z.string() });
-export const priceValue = z.number().int().nonnegative();

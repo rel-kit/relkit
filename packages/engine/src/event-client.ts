@@ -8,13 +8,13 @@ export function createEventDependencyClient(
   options: DependencyClientBuildOptions,
   eventId: string,
 ): unknown {
-  const declaration = options.dependencies?.events?.[name];
+  const declaration = options.publications?.[name];
   return createEventClient({
     ownerId: options.ownerId,
     eventId,
     version: declaration?.version ?? 1,
     source,
-    ...(declaration?.payload === undefined ? {} : { payloadSchema: declaration.payload }),
+    ...(declaration?.input === undefined ? {} : { payloadSchema: declaration.input }),
     ...(declaration?.profile === undefined ? {} : { profile: declaration.profile }),
     ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),

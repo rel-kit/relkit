@@ -5,7 +5,6 @@ import { isRecord, refId } from "./normalize-utils.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
   jobs: "enqueues-job",
-  events: "publishes-event",
   buckets: "uses-bucket",
   cache: "uses-cache",
   agents: "invokes-agent",
@@ -57,10 +56,18 @@ export function addEventEdges(
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
 ): void {
-  const expansion = work.selectorExpansions.get(descriptor.id) ?? [];
-  for (const pair of expansion) {
-    const at = pair.lastIndexOf("@");
-    add("listens-to-event", descriptor.id, at < 0 ? pair : pair.slice(0, at));
+  const value = isRecord(descriptor.value) ? descriptor.value : {};
+  if (typeof value.eventId === "string") add("listens-to-event", descriptor.id, value.eventId);
+}
+
+export function addPublicationEdges(
+  add: GraphEdgeAdder,
+  descriptor: NormalizedDescriptor,
+  publishes: unknown,
+): void {
+  if (!Array.isArray(publishes)) return;
+  for (const eventId of publishes) {
+    if (typeof eventId === "string") add("publishes-event", descriptor.id, eventId);
   }
 }
 

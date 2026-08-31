@@ -1,77 +1,28 @@
 ---
-title: Domain events
-description: Define and publish versioned facts with validated payloads, sensitive-field policy, and stable identity.
+title: Events
+description: Define an event and publish it from a function.
 ---
 
-An event is a fact that already happened, such as `orders.created`. Publishers do not choose or wait for every
-consumer. Independent listeners can react without adding their work to the publisher's request path.
+Use events to react to something that happened in your app, such as an order being created. These files come from the runnable [Orders example](/docs/events/first-event).
 
-## Define the event contract
+## Define the event
 
-<include cwd lang="ts" meta='title="examples/commerce/src/orders/events/order-created.event.ts"'>
-  ../../examples/commerce/src/orders/events/order-created.event.ts
+<include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
+  ../../templates/default/v1/api/src/orders/events/order-created.event.ts
 </include>
 
-The stable ID is the topic contract. `version` allows consumers to distinguish incompatible payload shapes.
-The schema validates every publish and delivery. `sensitiveFields` marks payload paths for redaction in logs,
-traces, inspector previews, and diagnostics.
+`id` uniquely names the event. `input` defines the data sent with it. `version` is optional and defaults to `1`.
 
-Name events in past tense. `orders.create` is a command; `orders.created` is a fact. Do not publish a broad
-“updated” event when consumers require specific business meaning.
+## Publish it
 
-## Publish from a function
+Add the event ID to `publishes`, then call `.publish()` with the event data:
 
-<Steps>
-  <Step>
-    ### Declare the event dependency
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+</include>
 
-    Add the event descriptor under `dependencies.events` on the publishing function. This authorizes the
-    context client and adds the graph edge used by deployment.
+Only events listed in `publishes` are available through `context.events`. Use the event ID exactly as defined.
 
-  </Step>
-  <Step>
-    ### Publish validated data
+`await ...publish(...)` waits for the event to be accepted, not for the functions consuming it to finish.
 
-    The order function calls `context.events.orderCreated.publish(payload)`. Completion means the provider
-    accepted the event; it does not mean every listener finished.
-
-  </Step>
-  <Step>
-    ### Assert publication locally
-
-    Use `invokeFunction` with the deterministic event fake, then inspect the published event ID, version, and
-    payload. No EventBridge credentials are needed.
-
-  </Step>
-  <Step>
-    ### Inspect the graph
-
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    bun run relkit graph print
-    ```
-
-    Confirm the publisher edge and every discovered listener before deployment.
-
-  </Step>
-</Steps>
-
-## Evolve payloads safely
-
-Consumers may deploy independently and durable providers may retain older payloads. Adding an optional field
-is often compatible; removing or reinterpreting a field is not. Increment the event version for an incompatible
-shape and migrate listeners deliberately. Do not reuse the same version for two meanings.
-
-## Delivery expectations
-
-Event acceptance is asynchronous. Providers may deliver at least once, out of order, or after delay. Put a
-stable domain identifier in the payload so listeners can deduplicate or reconcile. Do not assume that two
-events published consecutively will finish in that order unless the selected provider and partition key make
-that guarantee explicit.
-
-<Callout type="warn" title="Sensitive metadata is not encryption">
-  Redaction prevents common observability leaks. Use transport encryption, provider access control,
-  and minimal payloads for actual confidentiality.
-</Callout>
-
-<include cwd>content/generated/related/async-events.mdx</include>
+After adding the files, run `bun run check` from your app's root. Next, [add a consumer](/docs/events/consume).

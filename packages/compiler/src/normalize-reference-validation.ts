@@ -22,6 +22,9 @@ export function passReferences(work: NormalizationWork): void {
           `${descriptor.kind} target ${name} does not resolve to a ${kind}.`,
         );
       }
+      if (kind === "function" && descriptor.kind !== "event-trigger") {
+        rejectEventOnlyTarget(work, descriptor, value[name]);
+      }
     }
     if (descriptor.kind === "function") validateDependencies(work, descriptor, value.dependencies);
     if (descriptor.kind === "route") {
@@ -55,8 +58,28 @@ function validateService(
           `Service member does not resolve to a ${kind}.`,
         );
       }
+      if (kind === "function") rejectEventOnlyTarget(work, service, target);
     }
   }
+}
+
+function rejectEventOnlyTarget(
+  work: NormalizationWork,
+  owner: NormalizedDescriptor,
+  reference: unknown,
+): void {
+  const target = referenceFor(work, reference, "function");
+  const value = isRecord(target?.value) ? target.value : {};
+  if (value.invocationMode !== "event-only") return;
+  add(
+    work,
+    owner,
+    NORMALIZE_CODES.eventOnlyTarget,
+    `${owner.kind} "${owner.id}" cannot target event-only function "${target?.id}".`,
+    "error",
+    target,
+    "Target a callable defineFunction instead.",
+  );
 }
 
 function collectTransforms(

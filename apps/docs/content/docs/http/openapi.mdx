@@ -7,6 +7,9 @@ RELKIT generates OpenAPI from the same checked graph used by the runtime. Paths,
 schemas, statuses, declared errors, rate limits, and operation IDs therefore come from authored descriptors
 rather than a separate annotation file.
 
+The document describes function-backed HTTP routes, not the generated client's `/rpc` protocol.
+[Raw handlers](/docs/http/raw-handlers) are excluded because their adapters own their contracts.
+
 ## Generate the document
 
 <Steps>
@@ -25,10 +28,12 @@ rather than a separate annotation file.
     ### Inspect the runtime document
 
     ```sh title="Terminal — relkit-orders"
-    curl "http://localhost:3000/_relkit/v1/openapi.json" > /tmp/relkit-openapi.json
+    curl "http://localhost:3000/_relkit/v1/openapi.json"
     ```
 
-    Confirm `openapi` is `3.1.0` and search for `/hello`, `/orders`, and `/orders/{orderId}`.
+    With the generated API app or [Echo walkthrough](/docs/http/first-route) running, confirm
+    `openapi` is `3.1.0` and find `POST /echo`. Use the configured backend port if it differs.
+    The commerce example uses `4000` and also includes `/orders/{orderId}`.
 
   </Step>
   <Step>
@@ -46,8 +51,8 @@ rather than a separate annotation file.
 
 ## Trace a field back to source
 
-The dynamic order route demonstrates path mapping, a named transform, several HTTP methods, and declared
-responses:
+The dynamic order route demonstrates path mapping, a named transform, several HTTP methods, and
+response-status overrides:
 
 <include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
   ../../examples/commerce/src/routes/orders/[orderId]/route.ts
@@ -59,17 +64,23 @@ a response is absent, inspect the target's declared errors or the route's explic
 
 ## Operation identity and compatibility
 
-Generated clients key procedures by checked operation identity. Moving a route, renaming a method export, or
-changing an explicit ID can be a client-breaking change even when the handler stays the same. Compare generated
-contracts in review and treat removed paths, newly required inputs, and narrowed outputs as compatibility
-decisions.
+OpenAPI's operation ID and the generated client's procedure key use the checked route ID. Changing a
+path or method changes the inferred ID unless it is pinned explicitly. Moving a private function
+without changing its route does not rename the endpoint. Compare generated contracts in review and
+treat removed paths, newly required inputs, and narrowed outputs as compatibility decisions.
 
 ## Protect production documentation
 
 <Callout type="warn" title="Production documentation is opt-in">
   Enable `server.apiDocs.enabledInProduction` only with internal-endpoint authorization. Scalar
-  embeds the protected OpenAPI document; protect the raw JSON endpoint as well as the UI.
+  embeds the protected OpenAPI document; protect the raw JSON endpoint as well as the UI. Enabling
+  production docs without the required authorization configuration causes a startup configuration
+  error.
 </Callout>
+
+In development and test, the endpoints are enabled unless `server.apiDocs.enabled` is false.
+`server.apiDocs.excludeDomains` filters the served document; it does not disable those domains'
+routes, revoke access, or remove generated-client operations. Documentation visibility is not authorization.
 
 Disabling the public reference does not remove the build-time `openapi.json` artifact. Release tooling can
 publish it to a controlled developer portal without exposing introspection from every application instance.

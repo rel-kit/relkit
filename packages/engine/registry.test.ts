@@ -15,8 +15,22 @@ function graph(): ApplicationGraph {
   return {
     contractVersion: GRAPH_VERSION,
     nodes: [
-      { kind: "function", id: "orders.get", source, input: null, output: null },
-      { kind: "function", id: "orders.create", source, input: null, output: null },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: "orders.get",
+        source,
+        input: null,
+        output: null,
+      },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: "orders.create",
+        source,
+        input: null,
+        output: null,
+      },
     ],
     edges: [],
   };

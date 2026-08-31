@@ -1,0 +1,122 @@
+---
+title: Define a service
+description: Expose selected functions and events, keep implementation details private, and use another domain through its service.
+---
+
+A domain's `service.ts` assembles its public contract. Keep handlers in their own files and list only the
+operations and event contracts that should form that boundary. `defineService` is available from
+`@relkit/app/services`.
+
+## Select public members
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
+  ../../examples/commerce/src/orders/service.ts
+</include>
+
+`functions` contains ordinary callable function descriptors. `events` contains handler-free event
+contracts. Both maps are optional. They are **definition options**, not namespaces on the resulting
+service: callers use `orders.createOrder` and `orders.orderCreated`, not
+`orders.functions.createOrder` or `orders.events.orderCreated`.
+
+Members are the original descriptors, not copies. A function exposed through a service retains its
+identity, input and output schemas, declared errors, and `.invoke()` behavior. Changing the local import
+name does not create a new operation.
+
+## Decide what stays internal
+
+Leave a function out of the service if only its own domain uses it. It is still discovered and can be
+called by other functions in that domain. A helper does not become public just because its module
+exports it in TypeScript.
+
+Do not put caches, buckets, jobs, tools, agents, or plain helper values into the member maps.
+`defineEventFunction` subscribers are event-only and cannot be public callable members either. Keep
+those artifacts in the domain; expose an ordinary function when another domain needs their behavior.
+
+For example, expose `askAssistant` as a function that calls a declared agent dependency, rather than
+trying to expose the agent descriptor itself. See [the agent placement example](/docs/service/organization#tools-and-agents-stay-with-their-business-domain).
+
+This boundary is about application dependencies. It is not user authorization, an HTTP registration,
+or a switch controlling MCP tool visibility.
+
+## Use another domain's service
+
+Import `@app/orders/service.js`, then invoke a member such as
+`orders.getOrder.invoke({ orderId: "order-1" })` from your function handler. Use `.invoke()`, not
+`.handler()`, so the call goes through the common validation and execution boundary.
+
+Within Orders, import other Orders modules directly rather than importing the service back into its
+own implementation. Across domains, import the service rather than a private function path.
+
+| Importing layer    | Allowed application imports                                  |
+| ------------------ | ------------------------------------------------------------ |
+| A domain           | Its own modules, other domains' `service.ts`, and Platform.  |
+| Routes             | Route modules, domain `service.ts` boundaries, and Platform. |
+| Platform           | Other Platform modules, not domains or routes.               |
+| `relkit.config.ts` | Platform support, not domains or routes.                     |
+
+Generated projects map `@app/*` to `src/*`. Keep the `.js` extension in imports for emitted ESM.
+An import of another domain's service records a `depends-on-service` graph edge; there is no service
+`imports` option or service dependency container to configure.
+
+A service may expose only its **own** functions and events. To compose another service's behavior,
+write an operation in the consuming domain that calls it. Do not re-export another domain's descriptor
+as your own service member.
+
+## Keep runtime access explicit
+
+Service membership does not provide a cache, bucket, job client, or agent client. Those remain explicit
+function dependencies. Event publication uses `publishes` and `context.events[eventId].publish(...)`.
+Exposing an event in `service.events` at definition time does not authorize a function to publish it.
+
+There is no general service lifecycle, service middleware, or `context.service` API. Put HTTP policy in
+[route middleware](/docs/http/middleware). Put rules that must apply to every invocation in function
+logic or [function hooks](/docs/fundamentals/functions#hooks-and-transport-policy). The specialized
+database and authentication services have their own integration APIs.
+
+## Naming and discovery rules
+
+Use a lowercase domain name beginning with a letter and containing only letters, digits, and hyphens,
+such as `orders` or `customer-support`. Technical layer names such as `functions`, `events`, and `tools`
+are reserved as legacy roots, not useful domain names.
+
+Each domain's `service.ts` must construct and export exactly one service runtime value. Follow the
+default-export form above; do not use it as a general barrel of unrelated exports.
+
+The service ID is inferred from its domain directory. If you set it explicitly, it must equal that
+directory name. IDs of owned descriptors must start with the domain prefix, such as `orders.`.
+Capabilities that support inferred IDs can omit them; follow each capability's guide for its ID rules.
+
+Public member names must be nonempty, normalized, and distinct across both maps. Descriptor fields such
+as `id`, `ref`, `functions`, `events`, and `handler` are reserved member names. See the
+[Services API](/docs/api/services) for the full type and validation reference.
+
+Moving a file with an inferred ID can change its graph identity. Review generated changes when
+refactoring. Renaming the domain changes its required ID prefix, so treat it as a contract migration,
+not just a cosmetic folder rename.
+
+## Can a service expose nothing?
+
+Yes. A domain consisting of internal event subscribers can use this boundary:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/telemetry/service.ts"'>
+  ../../examples/commerce/src/telemetry/service.ts
+</include>
+
+Telemetry owns actual subscriber functions even though it exposes no public members. A normal domain
+containing only this empty service and no graph-visible artifacts fails compilation. Conversely, a
+domain that only publishes event contracts can expose `events` without exposing any functions.
+
+## Verify the boundary
+
+From your application's root, run:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+The compiler reports missing or duplicate services, invalid domain IDs, foreign service members, and
+disallowed imports. Once the checks pass, [connect public functions to routes](/docs/service/routes)
+or [test a first service end to end](/docs/service/first-service).
+
+<include cwd>content/generated/related/service-define.mdx</include>

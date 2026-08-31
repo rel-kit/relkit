@@ -1,42 +1,16 @@
-import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
-import {
-  createUnboundIdentity,
-  dispatchInvocation,
-  getDescriptorIdentity,
-  type InvocationTarget,
-} from "@relkit/invocation";
-import { type StandardSchemaV1 } from "@relkit/schema";
-import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
+import { createUnboundIdentity } from "@relkit/invocation";
 import type { DefineFunction } from "./define-function-types.js";
 import {
-  copyFunctionToolMetadata,
-  copyFunctionToolHooks,
-  createFunctionTool,
-  type FunctionToolOptions,
-} from "./function-tool.js";
-import {
-  assertSchema,
-  assertHook,
-  copyDependencies,
-  functionTargetForReceiver,
-  validateLimit,
-} from "./define-function-validation.js";
-import type {
-  DefineFunctionOptions,
-  FunctionDependencies,
-  FunctionDescriptor,
-  FunctionRefAny,
-} from "./types.js";
+  createFunctionDescriptor,
+  type FunctionDescriptorFactoryOptions,
+} from "./function-descriptor-factory.js";
+import type { FunctionDependencies, FunctionDescriptor } from "./types.js";
+
 type FunctionImplementationOptions = Omit<
-  DefineFunctionOptions<
-    string,
-    StandardSchemaV1,
-    StandardSchemaV1,
-    FunctionDependencies,
-    readonly ErrorDescriptorAny[]
-  >,
-  "handler"
-> & { readonly handler: (...args: any[]) => unknown };
+  FunctionDescriptorFactoryOptions,
+  "id" | "invocationMode"
+> & { readonly id?: string };
+
 export type {
   AgentClientFor,
   AgentClients,
@@ -83,6 +57,7 @@ export type {
   PublicLogger,
   ResolvedApplicationEnv,
 } from "./types.js";
+
 /**
  * Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
  *
@@ -114,86 +89,11 @@ export type {
  */
 export const defineFunction: DefineFunction = (
   options: FunctionImplementationOptions,
-): FunctionDescriptor<
-  string,
-  unknown,
-  unknown,
-  FunctionDependencies,
-  readonly ErrorDescriptorAny[]
-> => {
-  assertSchema(options.input, "input");
-  assertSchema(options.output, "output");
-  if (typeof options.handler !== "function") {
-    throw new TypeError("Function handler must be a function");
-  }
-  assertHook(options.onBefore, "onBefore");
-  assertHook(options.onAfter, "onAfter");
-  validateLimit(options.timeoutMs, "timeoutMs");
-  validateLimit(options.concurrency, "concurrency");
+): FunctionDescriptor<string, unknown, unknown, FunctionDependencies> => {
   const id = options.id === undefined ? createUnboundIdentity() : options.id;
-  const base = createDescriptorBase("function", id, options);
-  const dependencies = copyDependencies(options.dependencies);
-  const errors = copyErrors(options.errors);
-  const tool = options.tool === undefined ? undefined : copyFunctionToolMetadata(options.tool);
-  const descriptor = {
-    ...base,
-    input: options.input,
-    output: options.output,
-    ...(errors === undefined ? {} : { errors }),
-    ...(dependencies === undefined ? {} : { dependencies }),
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
-    ...(tool === undefined ? {} : { tool }),
-    ...(options.onBefore === undefined ? {} : { onBefore: options.onBefore }),
-    ...(options.onAfter === undefined ? {} : { onAfter: options.onAfter }),
-    handler: options.handler,
-  };
-  Object.defineProperty(descriptor, "invoke", {
-    value: function (this: unknown, input: unknown) {
-      return dispatchInvocation({
-        target: functionTargetForReceiver(
-          this,
-          descriptor as unknown as FunctionRefAny,
-        ) as unknown as InvocationTarget,
-        input,
-      });
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  Object.defineProperty(descriptor, "asTool", {
-    value: function (this: unknown, toolOptions?: FunctionToolOptions<string>) {
-      const metadata = toolOptions === undefined ? tool : copyFunctionToolMetadata(toolOptions);
-      if (metadata === undefined) {
-        throw new TypeError(
-          `Function "${descriptor.id}" must declare complete tool metadata before calling asTool()`,
-        );
-      }
-      const target = functionTargetForReceiver(this, descriptor as unknown as FunctionRefAny);
-      const hooks = toolOptions === undefined ? {} : copyFunctionToolHooks(toolOptions);
-      return createFunctionTool({
-        ...metadata,
-        ...hooks,
-        id: toolOptions?.id ?? `${getDescriptorIdentity(target)}.tool`,
-        target,
-      });
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  return deepFreeze(descriptor) as unknown as FunctionDescriptor<
-    string,
-    unknown,
-    unknown,
-    FunctionDependencies,
-    readonly ErrorDescriptorAny[]
-  >;
+  return createFunctionDescriptor({
+    ...options,
+    id,
+    invocationMode: "callable",
+  }) as FunctionDescriptor<string, unknown, unknown, FunctionDependencies>;
 };
-function copyErrors<E extends readonly ErrorDescriptorAny[]>(errors: E | undefined): E | undefined {
-  if (errors === undefined) return undefined;
-  if (!errors.every(isErrorDescriptor))
-    throw new TypeError("Function errors must be declared errors");
-  return Object.freeze([...errors]) as E;
-}

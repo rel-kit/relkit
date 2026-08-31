@@ -18,13 +18,13 @@ than copying the handler, so every transport uses the same validation and invoca
 </include>
 
 The handler receives already validated input. Its returned value is validated against `output`. Publishing
-the event is authorized by `dependencies`; importing the event descriptor alone does not grant a runtime
-client.
+the event is authorized by `publishes`; importing the event descriptor alone does not grant publication
+access.
 
 ## Invoke another function
 
 The example calls `priceOrder.invoke(...)`, not `priceOrder.handler(...)`. `invoke` enters the common engine
-and preserves validation, trace/causation relationships, deadlines, cancellation, service policy, and child
+and preserves validation, trace/causation relationships, deadlines, cancellation, and child
 call telemetry.
 
 Calling a handler directly bypasses those guarantees and is unsupported. A nested function call does not
@@ -78,8 +78,9 @@ either function still require their own declarations.
 final output validation. Use them for function policy that must apply to every invocation transport. They do
 not run as error recovery, and `onAfter` does not run after failure.
 
-Use HTTP middleware for cookies, headers, request-native authorization, or an early `Response`. Use service
-middleware for policy shared by a group of functions. Keeping those boundaries explicit makes direct and
-asynchronous invocation predictable.
+Use HTTP middleware for cookies, headers, request-native authorization, or an early `Response`. Put policy
+that must apply across transports in explicit function logic or hooks; services do not have middleware.
+See [the service boundary](/docs/service/define) and [services and routes](/docs/service/routes) for how
+these responsibilities fit together.
 
 <include cwd>content/generated/related/fundamentals-functions.mdx</include>

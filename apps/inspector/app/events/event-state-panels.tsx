@@ -1,4 +1,5 @@
 import type { InspectorObject } from "../../lib/api-types";
+import Link from "next/link";
 import { deliveryCounts, type EventView } from "../../lib/events-model";
 
 export function EventPublisherPanel({
@@ -41,12 +42,12 @@ export function EventListenerPanel({
       <div className="section-heading">
         <div>
           <p className="eyebrow">EVENT TRIGGERS</p>
-          <h2 id="event-listeners-heading">Listeners</h2>
+          <h2 id="event-listeners-heading">Consumer functions</h2>
         </div>
         <span className="badge">{listeners.length}</span>
       </div>
       {listeners.length === 0 ? (
-        <p className="supporting-copy">No event-trigger listeners match this version.</p>
+        <p className="supporting-copy">No event functions consume this version.</p>
       ) : (
         <ul className="request-list">
           {listeners.map((listener) => (
@@ -63,15 +64,19 @@ function ListenerRow({ listener }: { readonly listener: InspectorObject }) {
   return (
     <li className="request-row">
       <span>
-        <strong>{text(listener.id) || "event trigger"}</strong>
+        <Link href={`/functions/${encodeURIComponent(text(listener.targetFunctionId))}`}>
+          {text(listener.targetFunctionId) || "function unavailable"}
+        </Link>
         <br />
-        <small>Target: {text(listener.targetFunctionId) || "function unavailable"}</small>
+        <small>Trigger: {text(listener.id)}</small>
       </span>
       <span>
         {text(config?.delivery) || "delivery unavailable"} ·{" "}
         {text(config?.profile) || "default profile"}
       </span>
-      <span>Expansion: {formatList(config?.expansion)}</span>
+      <span>
+        Event: {text(config?.eventId)}@{number(config?.eventVersion)}
+      </span>
       <span>Policy: {format(config?.retry)}</span>
     </li>
   );
@@ -162,11 +167,6 @@ function format(value: unknown): string {
   } catch {
     return "unavailable";
   }
-}
-function formatList(value: unknown): string {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string").join(", ") || "none"
-    : "none";
 }
 function number(value: unknown): string {
   return typeof value === "number" ? String(value) : "?";

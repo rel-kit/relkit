@@ -6,21 +6,26 @@ const graph = {
   graph: {
     nodes: [
       { kind: "function", id: "orders.publish" },
-      { kind: "event", id: "orders.created", version: 2, payload: { type: "object" } },
+      { kind: "function", id: "orders.send-email", invocationMode: "event-only" },
+      { kind: "event", id: "orders.created", version: 2, input: { type: "object" } },
       {
         kind: "trigger",
         id: "orders.email",
         triggerType: "event",
         targetFunctionId: "orders.send-email",
         config: {
-          selector: { kind: "match", pattern: "orders.*" },
-          expansion: ["orders.created@2"],
+          eventId: "orders.created",
+          eventVersion: 2,
           delivery: "durable",
           retry: { maxAttempts: 3 },
         },
       },
     ],
-    edges: [{ kind: "publishes-event", from: "orders.publish", to: "orders.created" }],
+    edges: [
+      { kind: "publishes-event", from: "orders.publish", to: "orders.created" },
+      { kind: "listens-to-event", from: "orders.email", to: "orders.created" },
+      { kind: "targets-function", from: "orders.email", to: "orders.send-email" },
+    ],
   },
 } as unknown as InspectorGraph;
 
@@ -49,6 +54,7 @@ describe("inspector event projections", () => {
       event: { id: "orders.created", version: 2 },
       publishers: [{ from: "orders.publish" }],
       listeners: [{ id: "orders.email", targetFunctionId: "orders.send-email" }],
+      consumers: [{ id: "orders.send-email", invocationMode: "event-only" }],
       deliveries: [{ state: "dead-lettered" }, { state: "completed" }],
       deadLetters: [{ state: "dead-lettered" }],
       publications: [{ instanceId: "event-1" }],
@@ -56,11 +62,11 @@ describe("inspector event projections", () => {
     expect(deliveryCounts(view.deliveries)).toMatchObject({ completed: 1, "dead-lettered": 1 });
   });
 
-  test("uses event-trigger/listener terminology without creating another resource kind", () => {
-    const terms = ["event", "event-trigger", "listener", "delivery", "publisher"];
-    const applicationResource = ["sub", "scription"].join("");
-    expect(terms).toContain("event-trigger");
-    expect(terms).toContain("listener");
-    expect(terms).not.toContain(applicationResource);
+  test("derives consumers only through exact-event trigger edges", () => {
+    const data = graph.graph as { nodes: unknown[]; edges: Array<{ kind: string }> };
+    const disconnected = {
+      graph: { ...data, edges: data.edges.filter((edge) => edge.kind !== "targets-function") },
+    } as InspectorGraph;
+    expect(eventView(disconnected, runtime, "orders.created")?.consumers).toEqual([]);
   });
 });

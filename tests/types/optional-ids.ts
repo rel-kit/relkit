@@ -82,7 +82,7 @@ void optionalAgentId;
 
 defineConfig({ env: defineEnv({}) });
 // @ts-expect-error event IDs are mandatory
-defineEvent({ version: 1, payload: input });
+defineEvent({ version: 1, input: input });
 // @ts-expect-error job IDs are mandatory
 defineJob({
   input,

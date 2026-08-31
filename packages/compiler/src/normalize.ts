@@ -43,7 +43,6 @@ export function normalizeCompilation(input: NormalizeInput = {}): NormalizationR
     middlewareReferences: new Map(),
     transformReferences: new Map(),
     schemas: new Map(),
-    selectorExpansions: new Map(),
     nodes: [],
     edges: [],
     observedEdges: [...(input.observedEdges ?? [])],

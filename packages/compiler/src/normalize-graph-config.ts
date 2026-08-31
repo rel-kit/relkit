@@ -1,5 +1,4 @@
 import type { JsonValue } from "@relkit/contracts";
-import { selectorEntries } from "./normalize-compat.js";
 import { clean } from "./normalize-graph-utils.js";
 import { middlewareForRoute } from "./middleware-coverage.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
@@ -54,11 +53,10 @@ export function eventConfig(
   value: Record<string, unknown>,
   work: NormalizationWork,
 ): JsonValue {
-  const expansion = work.selectorExpansions.get(descriptor.id) ?? selectorEntries(value.selector);
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   return clean({
-    selector: value.selector,
-    expansion: sortEventPairs(expansion),
+    eventId: value.eventId,
+    eventVersion: value.eventVersion,
     delivery: value.delivery,
     profile: selectedProviderProfile(
       application,
@@ -66,7 +64,8 @@ export function eventConfig(
       typeof value.profile === "string" ? value.profile : undefined,
     ),
     retry: value.retry,
-    concurrency: value.concurrency,
+    ...(value.concurrency === undefined ? {} : { concurrency: value.concurrency }),
+    ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
   });
 }
 
@@ -103,21 +102,4 @@ function collectTransforms(value: unknown, ids: string[]): void {
     return;
   }
   if (value.kind === "optional" || value.kind === "default") collectTransforms(value.value, ids);
-}
-
-function sortEventPairs(values: readonly string[]): readonly string[] {
-  return [...new Set(values)].sort((left, right) => {
-    const a = splitEventPair(left);
-    const b = splitEventPair(right);
-    return a.id.localeCompare(b.id) || a.version - b.version || left.localeCompare(right);
-  });
-}
-
-function splitEventPair(value: string): { readonly id: string; readonly version: number } {
-  const at = value.lastIndexOf("@");
-  const version = Number(value.slice(at + 1));
-  return {
-    id: at < 0 ? value : value.slice(0, at),
-    version: Number.isFinite(version) ? version : 0,
-  };
 }

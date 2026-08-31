@@ -30,7 +30,7 @@ metadata. Delivery is at-least-once, exactly-once is false, and per-key
 ordering is explicitly unsupported.
 
 The local event admin contract is versioned and inspector-safe: queries expose
-event contracts, selector expansions, publication metadata, delivery state,
+event contracts, exact event bindings, publication metadata, delivery state,
 dead letters, and honest capability flags without payload projection. Only a
 validated local dead-letter retry is mutating; it is disabled in production and
 records an audit action.

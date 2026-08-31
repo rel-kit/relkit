@@ -117,9 +117,13 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
       };
     }
   }
-  const tags = documentTags(
-    services.sources,
-    triggers.flatMap((trigger) => trigger.config.tags ?? []),
+  const usedTags = new Set(
+    Object.values(paths).flatMap((item) =>
+      Object.values(item).flatMap((operation) => operation?.tags ?? []),
+    ),
+  );
+  const tags = documentTags(services.sources, [...usedTags]).filter((tag) =>
+    usedTags.has(tag.name),
   );
   return {
     openapi: "3.1.0",

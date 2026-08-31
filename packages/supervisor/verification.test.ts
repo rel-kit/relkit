@@ -63,6 +63,36 @@ test("verification failure disposes only the candidate and preserves active stat
   expect(disposed).toBe(1);
 });
 
+test("waits for provider readiness before requesting the gated graph endpoint", async () => {
+  let readyProbes = 0;
+  const respond = responseFor({ graphHash, manifestGraphHash: graphHash });
+  const result = await verifyCandidate({
+    candidate: candidateFor(token),
+    graphHash,
+    fetch: async (input, init) => {
+      const path = new URL(input.toString()).pathname;
+      if (path.endsWith("/health/ready") && ++readyProbes === 1) {
+        return Response.json(
+          {
+            protocol: "relkit.inspector",
+            version: API_VERSION,
+            ...token,
+            status: "not-ready",
+            environmentReady: true,
+            providerReady: false,
+          },
+          { status: 503 },
+        );
+      }
+      if (path.endsWith("/graph") && readyProbes < 2)
+        return Response.json({ error: "not-ready" }, { status: 503 });
+      return respond(input, init);
+    },
+  });
+  expect(result.providerReady).toBe(true);
+  expect(readyProbes).toBe(2);
+});
+
 test("rejects generation, API, readiness, and health-timeout failures", async () => {
   await expect(
     verifyCandidate({

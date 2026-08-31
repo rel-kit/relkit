@@ -23,7 +23,10 @@ export interface ToolingConfigInput {
   readonly server?: {
     readonly port?: number;
     readonly maxBodyBytes?: number;
-    readonly apiDocs?: { readonly enabledInProduction?: boolean };
+    readonly apiDocs?: {
+      readonly enabledInProduction?: boolean;
+      readonly excludeDomains?: readonly string[];
+    };
     readonly clientContract?: boolean;
     readonly mcp?: boolean;
   };
@@ -46,7 +49,10 @@ export interface LoadedToolingConfig {
   readonly server: {
     readonly port: number;
     readonly maxBodyBytes: number;
-    readonly apiDocs: { readonly enabledInProduction: boolean };
+    readonly apiDocs: {
+      readonly enabledInProduction: boolean;
+      readonly excludeDomains?: readonly string[];
+    };
     readonly clientContract: boolean;
     readonly mcp: boolean;
   };

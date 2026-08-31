@@ -17,6 +17,7 @@ export interface InvocationContextBase {
 export interface ContextBuildOptions {
   readonly ownerId: string;
   readonly dependencies?: DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
   readonly clients?: DependencyClientSources;
   readonly bridge?: DependencyBridge;
   readonly signal?: () => AbortSignal;
@@ -33,6 +34,7 @@ export interface ContextBuildOptions {
       | import("@relkit/buckets").BucketOperationObservation
       | import("@relkit/cache").CacheOperationObservation,
   ) => void;
+  readonly trigger?: unknown;
 }
 
 /** Replaces the six client maps with frozen maps derived only from declarations. */
@@ -43,6 +45,7 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
   const clients = buildDependencyClients({
     ownerId: options.ownerId,
     ...(options.dependencies === undefined ? {} : { dependencies: options.dependencies }),
+    ...(options.publications === undefined ? {} : { publications: options.publications }),
     sources: options.clients ?? sourceMaps(base as unknown as InvocationContextBase),
     ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
@@ -65,6 +68,7 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
     buckets: clients.buckets,
     cache: clients.cache,
     agents: clients.agents,
+    ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
   }) as Context;
 }
 

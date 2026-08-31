@@ -242,6 +242,7 @@ function volatileGraph(root: string, windows: boolean, pid: number, clock: strin
       },
       {
         kind: "function",
+        invocationMode: "callable",
         id: "orders.get",
         source: { file: file("functions/get.ts"), line: 2, column: 1 },
         output: { properties: { message: { type: "string" } } },

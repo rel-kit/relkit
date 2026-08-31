@@ -44,7 +44,10 @@ function scanCall(
     for (const member of options.properties) {
       if (!ts.isPropertyAssignment(member)) continue;
       const key = propertyName(member.name);
-      if (key === "handler" && shortName !== "defineFunction" && shortName !== "defineRoute")
+      if (
+        key === "handler" &&
+        !["defineFunction", "defineEventFunction", "defineRoute"].includes(shortName)
+      )
         add(
           root,
           fragment,

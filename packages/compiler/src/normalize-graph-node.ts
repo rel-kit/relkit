@@ -52,11 +52,13 @@ export function graphNodeFor(
       return {
         ...base,
         kind: "function",
+        invocationMode: value.invocationMode === "event-only" ? "event-only" : "callable",
         ...(descriptor.exposure === undefined ? {} : { exposure: descriptor.exposure }),
         input: schema(work, descriptor, "input"),
         output: schema(work, descriptor, "output"),
         errors: clean(value.errors),
         dependencies: clean(value.dependencies),
+        publishes: clean(value.publishes ?? []),
         timeoutMs: clean(value.timeoutMs),
         concurrency: clean(value.concurrency),
         generated: clean(value.generated),
@@ -80,7 +82,7 @@ export function graphNodeFor(
         kind: "event",
         ...(descriptor.exposure === undefined ? {} : { exposure: descriptor.exposure }),
         version: typeof value.version === "number" ? value.version : 0,
-        payload: schema(work, descriptor, "payload"),
+        input: schema(work, descriptor, "input"),
         sensitiveFields: clean(value.sensitiveFields),
         profile: selectedProviderProfile(application, "events", text(value.profile)) ?? "default",
       };

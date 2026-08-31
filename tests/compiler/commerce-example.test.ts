@@ -20,9 +20,15 @@ const DESCRIPTOR_IDS = [
   "orders.updated",
   "orders.cancelled",
   "receipts.on-order-created",
-  "orders.project-any-change",
-  "orders.audit-changes",
-  "telemetry.capture-events",
+  "orders.audit-cancelled",
+  "orders.audit-created",
+  "orders.audit-updated",
+  "orders.project-cancelled",
+  "orders.project-created",
+  "orders.project-updated",
+  "telemetry.order-cancelled",
+  "telemetry.order-created",
+  "telemetry.order-updated",
   "orders.authorize-order",
   "orders.cancel-order",
   "orders.lookup-order",
@@ -64,13 +70,7 @@ describe("commerce-example compiler acceptance", () => {
     const run = await compileProject("commerce-example", APP_ROOT);
     const graph = JSON.parse(run.graphBytes) as Record<string, any>;
 
-    expect(run.diagnostics).toEqual([
-      expect.objectContaining({
-        code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
-        severity: "warning",
-        message: "Raw all-event selector is restricted to telemetry.",
-      }),
-    ]);
+    expect(run.diagnostics).toEqual([]);
     expect(run.exitCode).toBe(0);
     const authoredIds = run.normalization.descriptors
       .filter(({ identity }) => identity !== undefined)
@@ -92,48 +92,30 @@ describe("commerce-example compiler acceptance", () => {
         .sort(),
     ).toEqual(DESCRIPTOR_IDS.filter((id) => id !== "orders.normalize-id").sort());
     expect(unique(edges.map(edgeKey))).toHaveLength(edges.length);
-    expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(19);
+    expect(nodes.filter((node) => node.kind === "trigger")).toHaveLength(25);
     expect(
       nodes
-        .filter((node) => node.kind === "trigger")
+        .filter((node) => node.triggerType === "event")
         .map((node) => node.id)
         .sort(),
-    ).toEqual(
-      [
-        "route.post.uploads",
-        "route.all.api.auth.optional-catch-all-auth",
-        "route.get.account.profile",
-        "route.get.database.users",
-        "route.get.docs.optional-catch-all-parts",
-        "route.get.files.catch-all-parts",
-        "orders.audit-changes",
-        "orders.project-any-change",
-        "route.post.orders",
-        "route.delete.orders.by-order-id",
-        "route.get.orders.by-order-id",
-        "route.head.orders.by-order-id",
-        "route.get.orders",
-        "route.options.orders.by-order-id",
-        "route.put.orders.by-order-id",
-        "route.get.orders.search",
-        "route.patch.orders.by-order-id",
-        "receipts.on-order-created",
-        "telemetry.capture-events",
-      ].sort(),
-    );
+    ).toEqual([
+      "relkit.event.orders.audit-cancelled.trigger",
+      "relkit.event.orders.audit-created.trigger",
+      "relkit.event.orders.audit-updated.trigger",
+      "relkit.event.orders.project-cancelled.trigger",
+      "relkit.event.orders.project-created.trigger",
+      "relkit.event.orders.project-updated.trigger",
+      "relkit.event.receipts.on-order-created.trigger",
+      "relkit.event.telemetry.order-cancelled.trigger",
+      "relkit.event.telemetry.order-created.trigger",
+      "relkit.event.telemetry.order-updated.trigger",
+    ]);
 
     expect(edges.map(edgeKey).sort()).toEqual(
       [
-        ["enqueues-job", "relkit.event.receipts.on-order-created.handler", "receipts.send-job"],
+        ["enqueues-job", "receipts.on-order-created", "receipts.send-job"],
         ["exposes-as-tool", "orders.delete-order", "orders.cancel-order"],
         ["exposes-as-tool", "orders.get-order", "orders.lookup-order"],
-        ["listens-to-event", "receipts.on-order-created", "orders.created"],
-        ["listens-to-event", "orders.project-any-change", "orders.cancelled"],
-        ["listens-to-event", "orders.project-any-change", "orders.created"],
-        ["listens-to-event", "orders.project-any-change", "orders.updated"],
-        ["listens-to-event", "orders.audit-changes", "orders.cancelled"],
-        ["listens-to-event", "orders.audit-changes", "orders.created"],
-        ["listens-to-event", "orders.audit-changes", "orders.updated"],
         ["publishes-event", "orders.create-order", "orders.created"],
         ["targets-function", "route.post.uploads", "assets.upload-assets", "primary"],
         ["targets-function", "route.get.account.profile", "account.account-session", "primary"],
@@ -161,30 +143,6 @@ describe("commerce-example compiler acceptance", () => {
         ["targets-function", "route.put.orders.by-order-id", "orders.update-order", "primary"],
         ["targets-function", "route.get.orders.search", "orders.search-orders", "primary"],
         ["targets-function", "route.patch.orders.by-order-id", "orders.update-order", "primary"],
-        [
-          "targets-function",
-          "receipts.on-order-created",
-          "relkit.event.receipts.on-order-created.handler",
-          "primary",
-        ],
-        [
-          "targets-function",
-          "orders.project-any-change",
-          "relkit.event.orders.project-any-change.handler",
-          "primary",
-        ],
-        [
-          "targets-function",
-          "orders.audit-changes",
-          "relkit.event.orders.audit-changes.handler",
-          "primary",
-        ],
-        [
-          "targets-function",
-          "telemetry.capture-events",
-          "relkit.event.telemetry.capture-events.handler",
-          "primary",
-        ],
         ["targets-function", "receipts.send-job", "receipts.send-receipt", "primary"],
         ["uses-bucket", "receipts.send-receipt", "assets.objects"],
         ["uses-bucket", "assets.upload-assets", "assets.objects"],
@@ -195,10 +153,6 @@ describe("commerce-example compiler acceptance", () => {
         ["uses-provider-profile", "orders.created", "provider.events.default"],
         ["uses-provider-profile", "orders.updated", "provider.events.default"],
         ["uses-provider-profile", "orders.cancelled", "provider.events.default"],
-        ["uses-provider-profile", "receipts.on-order-created", "provider.events.default"],
-        ["uses-provider-profile", "orders.project-any-change", "provider.events.default"],
-        ["uses-provider-profile", "orders.audit-changes", "provider.events.default"],
-        ["uses-provider-profile", "telemetry.capture-events", "provider.events.default"],
         ["uses-provider-profile", "receipts.send-job", "provider.jobs.default"],
         ["uses-tool", "orders.order-support", "orders.lookup-order"],
         ["uses-middleware", "route.delete.orders.by-order-id", "order-auth", "0"],
@@ -227,20 +181,128 @@ describe("commerce-example compiler acceptance", () => {
         ["exposes-event", "orders", "orders.cancelled", "orderCancelled", "0"],
         ["exposes-event", "orders", "orders.created", "orderCreated", "1"],
         ["exposes-event", "orders", "orders.updated", "orderUpdated", "2"],
+        [
+          "targets-function",
+          "relkit.event.orders.audit-cancelled.trigger",
+          "orders.audit-cancelled",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.audit-cancelled.trigger", "orders.cancelled"],
+        [
+          "targets-function",
+          "relkit.event.orders.audit-created.trigger",
+          "orders.audit-created",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.audit-created.trigger", "orders.created"],
+        [
+          "targets-function",
+          "relkit.event.orders.audit-updated.trigger",
+          "orders.audit-updated",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.audit-updated.trigger", "orders.updated"],
+        [
+          "targets-function",
+          "relkit.event.orders.project-cancelled.trigger",
+          "orders.project-cancelled",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.project-cancelled.trigger", "orders.cancelled"],
+        [
+          "targets-function",
+          "relkit.event.orders.project-created.trigger",
+          "orders.project-created",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.project-created.trigger", "orders.created"],
+        [
+          "targets-function",
+          "relkit.event.orders.project-updated.trigger",
+          "orders.project-updated",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.orders.project-updated.trigger", "orders.updated"],
+        [
+          "targets-function",
+          "relkit.event.receipts.on-order-created.trigger",
+          "receipts.on-order-created",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.receipts.on-order-created.trigger", "orders.created"],
+        [
+          "targets-function",
+          "relkit.event.telemetry.order-cancelled.trigger",
+          "telemetry.order-cancelled",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.telemetry.order-cancelled.trigger", "orders.cancelled"],
+        [
+          "targets-function",
+          "relkit.event.telemetry.order-created.trigger",
+          "telemetry.order-created",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.telemetry.order-created.trigger", "orders.created"],
+        [
+          "targets-function",
+          "relkit.event.telemetry.order-updated.trigger",
+          "telemetry.order-updated",
+          "primary",
+        ],
+        ["listens-to-event", "relkit.event.telemetry.order-updated.trigger", "orders.updated"],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.audit-cancelled.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.audit-created.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.audit-updated.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.project-cancelled.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.project-created.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.orders.project-updated.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.receipts.on-order-created.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.telemetry.order-cancelled.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.telemetry.order-created.trigger",
+          "provider.events.default",
+        ],
+        [
+          "uses-provider-profile",
+          "relkit.event.telemetry.order-updated.trigger",
+          "provider.events.default",
+        ],
       ].sort(),
     );
-
-    expect(nodes.find((node) => node.id === "orders.project-any-change")?.config).toMatchObject({
-      expansion: ["orders.cancelled@1", "orders.created@1", "orders.updated@1"],
-    });
-    expect(nodes.find((node) => node.id === "orders.audit-changes")?.config).toMatchObject({
-      expansion: ["orders.cancelled@1", "orders.created@1", "orders.updated@1"],
-    });
-    expect(nodes.find((node) => node.id === "telemetry.capture-events")?.config).toMatchObject({
-      selector: { kind: "all", payload: "unknown", purpose: "telemetry" },
-      expansion: [],
-      delivery: "ephemeral",
-    });
 
     expect(hashGraph(graph)).toBe(run.graphHash);
     expect(run.manifest.match(/manifestGraphHash = "([^"]+)"/)?.[1]).toBe(run.graphHash);
@@ -251,10 +313,16 @@ describe("commerce-example compiler acceptance", () => {
       .sort();
     const generatedFunctionId = "relkit.agent.orders.order-support.invoke";
     const eventFunctionIds = [
-      "relkit.event.orders.audit-changes.handler",
-      "relkit.event.orders.project-any-change.handler",
-      "relkit.event.receipts.on-order-created.handler",
-      "relkit.event.telemetry.capture-events.handler",
+      "orders.audit-cancelled",
+      "orders.audit-created",
+      "orders.audit-updated",
+      "orders.project-cancelled",
+      "orders.project-created",
+      "orders.project-updated",
+      "receipts.on-order-created",
+      "telemetry.order-cancelled",
+      "telemetry.order-created",
+      "telemetry.order-updated",
     ];
     expect(nodes.filter((node) => node.id === generatedFunctionId)).toHaveLength(1);
     expect(nodes.find((node) => node.id === generatedFunctionId)).toMatchObject({
@@ -270,11 +338,11 @@ describe("commerce-example compiler acceptance", () => {
       expect.arrayContaining([...functionIds, generatedFunctionId, ...eventFunctionIds]),
     );
     expect(run.manifest.match(/__relkit_createGeneratedAgentFunction\(/g)).toHaveLength(1);
-    expect(run.manifest.match(/__relkit_createEventListenerTarget\(/g)).toHaveLength(4);
+    expect(run.manifest.match(/__relkit_bindFunctionEvents\(/g)).toHaveLength(11);
     for (const functionId of eventFunctionIds) {
       expect(nodes.find((node) => node.id === functionId)).toMatchObject({
         kind: "function",
-        generated: { generated: true, generatedBy: "event-listener", functionId },
+        invocationMode: "event-only",
       });
     }
     expect(run.manifest.match(/^const __relkit_middleware_\d+ =/gm) ?? []).toHaveLength(0);

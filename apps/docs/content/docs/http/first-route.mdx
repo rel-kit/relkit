@@ -1,0 +1,111 @@
+---
+title: Your first HTTP route
+description: Add a validated POST endpoint to an existing RELKIT app, test its JSON boundary, and inspect its generated contract.
+---
+
+Add `POST /echo` to an existing RELKIT app. By the end, a JSON request will reach a public service
+function, return validated output, and reject invalid input before its handler runs.
+
+Use an installed application with a working `relkit.config.ts` and the standard `@app/*` alias.
+If you need one, follow [Create an app](/docs/start/create-an-app) first. The API template already
+contains these files: inspect and test them instead of overwriting them. This endpoint adds no
+provider dependency; keep any existing application configuration intact.
+
+## Put behavior in the Echo domain
+
+Create `src/echo/functions/echo.function.ts`:
+
+<include cwd lang="ts" meta='title="src/echo/functions/echo.function.ts"'>
+  ../../templates/default/v1/api/src/echo/functions/echo.function.ts
+</include>
+
+The input requires a nonempty `message`. The output contract promises a string. The function knows
+nothing about HTTP methods, JSON parsing, or response status. See [Functions](/docs/fundamentals/functions)
+for dependencies and declared errors.
+
+Expose it through `src/echo/service.ts`:
+
+<include cwd lang="ts" meta='title="src/echo/service.ts"'>
+  ../../templates/default/v1/api/src/echo/service.ts
+</include>
+
+This is the domain's public boundary. Other domains and routes import this service rather than its
+private function file. See [Service](/docs/service) for choosing and organizing domains.
+
+## Add the HTTP entry point
+
+Create `src/routes/echo/route.ts`:
+
+<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
+  ../../templates/default/v1/api/src/routes/echo/route.ts
+</include>
+
+The path is `/echo`; the method is `POST`. Since there are no dynamic path parameters, RELKIT reads
+`message` from the JSON body. It infers a JSON `200` response and a validation `422` response.
+No registration array or manual server mount is needed.
+
+From your application's root:
+
+```sh
+bun run check
+bun run typecheck
+bun run dev
+```
+
+Keep the development process running. Use your configured backend port if it differs from `3000`.
+
+## Verify valid and invalid requests
+
+In another terminal:
+
+```sh
+curl -i -X POST 'http://localhost:3000/echo' \
+  -H 'content-type: application/json' \
+  -d '{"message":"hello"}'
+```
+
+Expect HTTP `200`, JSON content type, and `{ "message": "hello" }`.
+
+```sh
+curl -i -X POST 'http://localhost:3000/echo' \
+  -H 'content-type: application/json' \
+  -d '{"message":""}'
+```
+
+Expect HTTP `422` with a validation error and bounded issues, not a successful echo. A missing
+`message` or malformed JSON must also fail. Test those cases as the endpoint evolves.
+
+## Keep an HTTP regression test
+
+Add the API template's test at `tests/integration/echo.route.test.ts` if it is not already present:
+
+<include cwd lang="ts" meta='title="tests/integration/echo.route.test.ts"'>
+  ../../templates/default/v1/api/tests/integration/echo.route.test.ts
+</include>
+
+Run it from your application's root:
+
+```sh
+bun test tests/integration/echo.route.test.ts
+```
+
+The harness exercises this successful route call in process; it does not require the development server
+to stay running. It asserts status and body together. Follow [Testing](/docs/operations/testing) for
+function tests and provider fakes.
+
+The current helper uses a simplified HTTP adapter, not the full server pipeline. It does not reproduce
+all runtime validation responses, declared HTTP middleware, rate limiting, or RPC. Keep the running-backend
+checks above for `422`, and test authentication, limits, and alternate transports against the actual server.
+
+## Inspect what the compiler produced
+
+Read `.relkit/generated/openapi.json` or open the running app's `/_relkit/v1/api-reference` page.
+Find `POST /echo`, its required JSON `message`, and its success and validation responses.
+Inspect the route and its target in the Inspector as well.
+
+Change the source and rerun `bun run check` to refresh artifacts; never edit generated contracts.
+Continue with [request mapping](/docs/http/requests) for headers and cookies,
+[middleware](/docs/http/middleware) for HTTP policy, or [generated clients](/docs/http/generated-clients)
+for typed RPC calls to the same function.
+
+<include cwd>content/generated/related/http-first-route.mdx</include>

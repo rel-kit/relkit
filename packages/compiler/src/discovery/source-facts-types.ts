@@ -11,6 +11,7 @@ export interface FactoryBindingFact {
   readonly idOptional: boolean;
   readonly id: FactoryIdPresence;
   readonly position: number;
+  readonly options: readonly string[];
 }
 
 export interface RouteOperationFact {

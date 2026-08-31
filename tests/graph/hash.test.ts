@@ -21,6 +21,7 @@ function makeGraph(root: string, reverse: boolean): TestGraph {
   const file = (name: string) => (windows ? `${root}\\src\\${name}` : `${root}/src/${name}`);
   const functionNode = {
     kind: "function",
+    invocationMode: "callable",
     id: "orders.get",
     source: { file: file("functions.ts"), line: 8, column: 1 },
     output: { ok: true, timeoutMs: 10 },

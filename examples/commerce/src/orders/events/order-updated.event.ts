@@ -4,7 +4,7 @@ import { orderUpdatedPayload } from "@app/platform/schemas.js";
 const orderUpdated = defineEvent({
   id: "orders.updated",
   version: 1,
-  payload: orderUpdatedPayload,
+  input: orderUpdatedPayload,
   title: "Order updated",
 });
 

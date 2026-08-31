@@ -4,9 +4,9 @@ import { applyRetry, safeFailureMetadata } from "../jobs/retry.js";
 import { createJobQueue } from "../jobs/queue.js";
 import type { JobQueueEntry } from "../jobs/queue-utils.js";
 import { createJobStore } from "../jobs/store.js";
-import { makeDeliveryId, normalizeEnvelope } from "./router-records.js";
+import { normalizeEnvelope } from "./router-records.js";
 import {
-  json,
+  admitDelivery,
   ledger,
   normalizeRetry,
   positive,
@@ -45,7 +45,9 @@ export async function createEventDelivery(
   const triggerId = normalizeId(binding.id);
   if (typeof binding.invoke !== "function")
     throw new TypeError("Event delivery target is required");
-  const concurrency = positive(options.concurrency ?? binding.concurrency ?? 1, "concurrency");
+  const requestedConcurrency = options.concurrency ?? binding.concurrency;
+  const concurrency =
+    requestedConcurrency === undefined ? Infinity : positive(requestedConcurrency, "concurrency");
   const retryPolicy = normalizeRetry(options.retry ?? binding.retry);
   const clock = options.now ?? Date.now;
   const store = await createJobStore(requestedRoot, {
@@ -106,7 +108,16 @@ export async function createEventDelivery(
       const duplicate = leased.attempt > 1;
       let value: unknown;
       try {
-        value = await binding.invoke(normalizeEnvelope(leased.input));
+        value = await binding.invoke(normalizeEnvelope(leased.input), {
+          attempt: leased.attempt,
+          replayed: store
+            .snapshot()
+            .records.some(
+              (record) =>
+                record.instanceId === leased.instanceId && record.kind === "dead-lettered",
+            ),
+          ...(binding.timeoutMs === undefined ? {} : { timeoutMs: binding.timeoutMs }),
+        });
       } catch (error) {
         const entry = await applyRetry(queue, leased.instanceId, retryPolicy, error, {
           now: clock,
@@ -173,19 +184,7 @@ export async function createEventDelivery(
     readonly duplicate: boolean;
   }> {
     const result = admissionTail.then(async () => {
-      const deliveryId = makeDeliveryId(envelope.instanceId, triggerId);
-      const existing = queue.get(deliveryId);
-      if (existing !== undefined) return { entry: existing, duplicate: true };
-      const accepted = await queue.enqueue({
-        instanceId: deliveryId,
-        input: json(envelope),
-        profile: binding.profile ?? "default",
-      });
-      const available = await queue.transition(deliveryId, "available", {
-        expectedState: "accepted",
-        availableAt: accepted.acceptedAt,
-      });
-      return { entry: available, duplicate: false };
+      return admitDelivery(queue, envelope, triggerId, binding.profile ?? "default");
     });
     admissionTail = result.then(
       () => undefined,

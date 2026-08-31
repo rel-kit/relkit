@@ -95,7 +95,6 @@ function dependencyKind(category: string): string {
     (
       {
         jobs: "job",
-        events: "event",
         buckets: "bucket",
         cache: "cache",
         agents: "agent",

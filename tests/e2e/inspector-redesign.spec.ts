@@ -7,6 +7,36 @@ test.beforeEach(async ({ page, request }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
 });
 
+test("centers select labels before and after changing selection", async ({ page }) => {
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const [path, label, initial, selected] of [
+      ["/jobs", "Status", "All", "available"],
+      ["/routes", "Kind", "All", "POST"],
+      ["/traces/trace-initial", "Timeline zoom", "100%", "150%"],
+    ] as const) {
+      await page.goto(path);
+      const trigger = page.getByRole("button", { name: new RegExp(label) });
+      for (const value of [initial, selected]) {
+        if (value === selected) {
+          await trigger.click();
+          await page.getByRole("option", { name: value, exact: true }).click();
+        }
+        const text = trigger.getByText(value, { exact: true });
+        await expect(text).toBeVisible();
+        const textBox = await text.boundingBox();
+        const triggerBox = await trigger.boundingBox();
+        expect(textBox).not.toBeNull();
+        expect(triggerBox).not.toBeNull();
+        expect(
+          Math.abs(textBox!.y + textBox!.height / 2 - triggerBox!.y - triggerBox!.height / 2),
+        ).toBeLessThanOrEqual(1);
+        await expect(trigger.locator("svg")).toHaveCount(1);
+      }
+    }
+  }
+});
+
 test("supports keyboard search and accessible route table quick views", async ({ page }) => {
   await page.goto("/routes");
   await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();

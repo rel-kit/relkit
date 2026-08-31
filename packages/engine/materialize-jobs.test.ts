@@ -95,6 +95,7 @@ describe("job materialization", () => {
 function plan(options: { readonly schedule?: boolean } = {}): RegistrationPlan {
   const functionNode: FunctionNode = {
     kind: "function",
+    invocationMode: "callable",
     id: "orders.run",
     source,
     input: { kind: "object" },

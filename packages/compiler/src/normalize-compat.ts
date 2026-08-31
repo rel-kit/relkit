@@ -96,59 +96,10 @@ export function targetId(value: unknown): string | undefined {
   return refId(value);
 }
 
-export function selectorEntries(value: unknown): readonly string[] {
-  if (!isRecord(value)) return [];
-  if (value.kind === "single" && isRecord(value.event)) {
-    return eventPair(value.event);
-  }
-  if (value.kind === "anyOf" && Array.isArray(value.events)) {
-    return value.events.flatMap(eventPair).sort();
-  }
-  return [];
-}
-
-function eventPair(value: unknown): string[] {
-  if (!isRecord(value) || typeof value.eventId !== "string" || !Number.isInteger(value.version)) {
-    return [];
-  }
-  return [`${value.eventId}@${value.version}`];
-}
-
-export function matchingEvents(
-  pattern: string,
-  events: readonly NormalizedDescriptor[],
-): readonly string[] {
-  const segments = pattern.split(".");
-  return events
-    .filter((event) => event.kind === "event")
-    .filter((event) => matchSegments(segments, event.id.split(".")))
-    .map((event) => `${event.id}@${readVersion(event.value)}`)
-    .sort();
-}
-
-function matchSegments(pattern: readonly string[], value: readonly string[]): boolean {
-  if (pattern.length === 0) return value.length === 0;
-  if (pattern[0] === "**") {
-    return (
-      matchSegments(pattern.slice(1), value) ||
-      (value.length > 0 && matchSegments(pattern, value.slice(1)))
-    );
-  }
-  return (
-    value.length > 0 &&
-    (pattern[0] === "*" || pattern[0] === value[0]) &&
-    matchSegments(pattern.slice(1), value.slice(1))
-  );
-}
-
-function readVersion(value: unknown): number {
-  return isRecord(value) && typeof value.version === "number" ? value.version : 0;
-}
-
 export function schemaEntries(descriptor: NormalizedDescriptor): readonly [string, unknown][] {
   const value = descriptor.value;
   if (!isRecord(value)) return [];
-  return ["input", "output", "payload", "key", "value", "data"].flatMap((field) =>
+  return ["input", "output", "key", "value", "data"].flatMap((field) =>
     value[field] === undefined
       ? []
       : [[schemaKey(descriptor.id, field), value[field]] as [string, unknown]],

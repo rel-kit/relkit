@@ -1,0 +1,81 @@
+---
+title: Example — greeting assistant
+description: Add an agent and a reusable tool to an existing app, test offline, then try MCP or a live model.
+---
+
+Add a greeting assistant to your existing RelKit app. It will receive a question, use a greeting tool, and return an answer. The small example lets you learn the workflow without a database or paid model call.
+
+Create the files below, or update them if they already exist. Run commands from your app's root. The offline test uses `@relkit/testing`, included in generated RelKit apps.
+
+## Add the greeting function
+
+<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/agent/src/hello/functions/hello.function.ts
+</include>
+
+## Make it a tool
+
+<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/src/hello/tools/lookup.tool.ts
+</include>
+
+The tool tells the model what the function does. Its input and output come from the function.
+
+## Add the agent
+
+<include cwd lang="ts" meta='title="src/hello/agents/assistant.agent.ts"'>
+  ../../templates/default/v1/agent/src/hello/agents/assistant.agent.ts
+</include>
+
+The agent can use `hello.lookup`, and each run has limits on steps, calls, and time.
+
+## Call it from your app
+
+<include cwd lang="ts" meta='title="src/hello/functions/ask-assistant.function.ts"'>
+  ../../templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts
+</include>
+
+This gives your app a normal function to call with `{ "question": "greet Ada" }`.
+
+## Test without a model key
+
+The test scripts a tool call and a final answer, while running the real greeting function:
+
+<include cwd lang="ts" meta='title="tests/unit/assistant.agent.test.ts"'>
+  ../../templates/default/v1/agent/tests/unit/assistant.agent.test.ts
+</include>
+
+```sh
+bun test ./tests/unit/assistant.agent.test.ts
+```
+
+Expect a passing test with the answer `Hello, Ada!`. This checks that your function, agent, and tool work together; it does not measure how a real model interprets questions.
+
+## Try a live model
+
+Skip this step if you only want the offline test. Live model calls require a provider key and may cost money. For [MCP only](/docs/ai/mcp), you can use just the greeting function and tool without adding an agent.
+
+If your app already has a model profile, keep it and select a matching model in the agent. Otherwise, add this field inside `defineEnv()` in `src/platform/env.ts`. The snippet uses `env as envFactory` imported from `@relkit/app/config`:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts — field to add"'>
+  ../../examples/commerce/src/platform/env.ts#ai-environment
+</include>
+
+Import `aiSdk` and `external` from `@relkit/app/config` in `relkit.config.ts`. Add this entry inside `defineConfig()`, using your existing `env` import:
+
+<include cwd lang="ts" meta='title="relkit.config.ts — model configuration"'>
+  ../../examples/commerce/relkit.config.ts#ai-profile
+</include>
+
+Set `OPENAI_API_KEY` in your local environment or uncommitted `.env` file. Do not put the key in the agent's instructions or commit it to source control.
+
+Supply credentials for every model provider kept in your configuration, or remove providers you do not use.
+
+```sh
+bun run check
+bun run dev
+```
+
+Open your RelKit Inspector, normally at `http://localhost:3210`. Under **Functions**, select `hello.ask-assistant`, enter `greet Ada` in **question**, and click **Invoke locally**. Expect an `answer` containing a greeting; exact wording can vary with a live model.
+
+Use **Agents** to review `hello.assistant` and its tool list. To let an external AI client call the greeting function directly, follow [Tools over MCP](/docs/ai/mcp).

@@ -1,0 +1,72 @@
+---
+title: Example — cached prices
+description: Add a cached price lookup to an existing app and see hits and expiration in the Inspector.
+---
+
+Add a product-price lookup to your existing RelKit app. You'll load a price, reuse it for one minute, and see it load again after expiration. The example uses a fixed price instead of requiring a database.
+
+Create the two files below, or update them if they already exist. Run commands from your app's root.
+
+## Configure caching
+
+If your app already has a `default` cache profile, keep it and skip this step.
+
+In `src/platform/env.ts`, add this field inside `defineEnv()`. The snippet uses `env as envFactory` imported from `@relkit/app/config`:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts — field to add"'>
+  ../../examples/commerce/src/platform/env.ts#cache-environment
+</include>
+
+In `relkit.config.ts`, import `managed` and `redis` from `@relkit/app/config`. Add this entry inside `defineConfig()`, using your existing `env` import:
+
+<include cwd lang="ts" meta='title="relkit.config.ts — cache configuration"'>
+  ../../examples/commerce/relkit.config.ts#cache-profile
+</include>
+
+The configuration names a Redis connection. For this tutorial, `RELKIT_ENV=test` uses a local cache instead, so Redis does not need to be running.
+
+## Define the prices cache
+
+<include cwd lang="ts" meta='title="src/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/orders/cache/prices.cache.ts
+</include>
+
+Each product code has its own cached price, which expires one minute after it is saved.
+
+## Add the lookup function
+
+<include cwd lang="ts" meta='title="src/orders/functions/get-price.function.ts"'>
+  ../../examples/commerce/tests/fixtures/get-price.function.ts
+</include>
+
+The `price.loaded` log runs only when the callback loads a price. You do not need an HTTP route to try the function in the Inspector.
+
+## Try a miss and a hit
+
+Check and start the app:
+
+```sh
+bun run check
+```
+
+```sh
+RELKIT_ENV=test bun run dev
+```
+
+Open your Inspector, normally at `http://localhost:3210`. Select **Functions**, open `orders.get-price`, enter `book-demo` in the **sku** field, and click **Invoke locally**.
+
+Expect this output:
+
+```json
+{ "sku": "book-demo", "unitPriceCents": 1000 }
+```
+
+Look for `price.loaded` with `sku=book-demo` in the app terminal or the Inspector's **Logs** page. Invoke the same function again within one minute: the output stays the same, with no new `price.loaded` log for that call. Use a new SKU if this key was already cached from an earlier run.
+
+## Inspect expiration
+
+Open **Cache**, select `orders.prices`, and find the key containing `book-demo`. The list shows its remaining TTL. Click **View value** to see `1000`; use **Refresh** to update the list as time passes.
+
+Once the minute has passed, invoke `orders.get-price` with the same SKU. A new `price.loaded` log confirms the price was loaded again. Nothing refreshes in the background: the next request does the work.
+
+In your app, replace the fixed price with a database lookup and [invalidate the cached price after updates](/docs/caching/expiration). Before deploying, [configure a shared cache provider](/docs/fundamentals/providers).

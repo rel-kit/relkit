@@ -16,7 +16,6 @@ export interface DependencyRefLike {
   readonly kind?: string;
   readonly id?: string;
   readonly input?: StandardSchemaV1;
-  readonly payload?: StandardSchemaV1;
   readonly version?: number;
   readonly output?: StandardSchemaV1;
   readonly key?: StandardSchemaV1;
@@ -31,7 +30,9 @@ export interface DependencyRefLike {
 }
 
 export type DependencyDeclarations = Partial<{
-  readonly [Category in DependencyCategory]: Readonly<Record<string, DependencyRefLike>>;
+  readonly [Category in Exclude<DependencyCategory, "events">]: Readonly<
+    Record<string, DependencyRefLike>
+  >;
 }>;
 
 /** Runtime provider/client values keyed by names declared on a function. */
@@ -74,6 +75,7 @@ export type DirectFunctionInvoker = (request: DirectFunctionRequest) => MaybePro
 export interface DependencyClientBuildOptions {
   readonly ownerId: string;
   readonly dependencies?: DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, DependencyRefLike>>;
   readonly sources?: DependencyClientSources;
   readonly bridge?: DependencyBridge;
   readonly signal?: () => AbortSignal;
@@ -94,6 +96,9 @@ export interface DependencyClientBuildOptions {
 export function buildDependencyClients(
   options: DependencyClientBuildOptions,
 ): DependencyClientMaps {
+  if (options.dependencies !== undefined && Object.hasOwn(options.dependencies, "events")) {
+    throw new TypeError("Event dependencies are not supported; declare publishes instead");
+  }
   return Object.freeze({
     jobs: buildCategory("jobs", options),
     events: buildCategory("events", options),
@@ -107,9 +112,10 @@ function buildCategory(
   category: DependencyCategory,
   options: DependencyClientBuildOptions,
 ): Readonly<Record<string, unknown>> {
-  const declarations = options.dependencies?.[category] ?? {};
+  const declarations =
+    category === "events" ? (options.publications ?? {}) : (options.dependencies?.[category] ?? {});
   const sources = options.sources?.[category] ?? {};
-  const clients: Record<string, unknown> = {};
+  const clients: Record<string, unknown> = Object.create(null);
   for (const [name, declaration] of Object.entries(declarations)) {
     const targetId = dependencyId(category, name, declaration);
     notify(options.onDeclaredEdge, {

@@ -30,10 +30,6 @@ export async function verifyCandidate(
     });
     identitySeen ||= verifyIdentity(live.payload, options.candidate.token);
 
-    const graph = await requiredProbe(options, "/graph", deadline);
-    identitySeen ||= verifyIdentity(graph.payload, options.candidate.token);
-    const graphValues = verifyGraph(graph.payload, options);
-
     const ready = await pollHealth(options, "/health/ready", deadline, (probe) => {
       identitySeen ||= verifyIdentity(probe.payload, options.candidate.token);
       const readiness = readinessState(probe.payload);
@@ -45,6 +41,9 @@ export async function verifyCandidate(
       );
     });
     identitySeen ||= verifyIdentity(ready.payload, options.candidate.token);
+    const graph = await requiredProbe(options, "/graph", deadline);
+    identitySeen ||= verifyIdentity(graph.payload, options.candidate.token);
+    const graphValues = verifyGraph(graph.payload, options);
     if (!identitySeen)
       throw new CandidateVerificationError(
         "RELKIT_CANDIDATE_RESPONSE_INVALID",

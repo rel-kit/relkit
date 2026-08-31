@@ -1,5 +1,6 @@
 {
   "title": "Application fundamentals",
+  "icon": "Blocks",
   "pages": [
     "application",
     "environment",

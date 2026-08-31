@@ -1,0 +1,92 @@
+---
+title: Protect routes
+description: Mount Better Auth's public API, require sessions on selected application paths, and enforce resource permissions inside business operations.
+---
+
+Mount Better Auth once, then declare which application paths require a session. This HTTP admission
+check answers “is the caller signed in?” It does not answer “may this caller access this order?”
+
+## Mount the API and select protected paths
+
+<include cwd lang="ts" meta='title="src/routes/api/auth/[[...auth]]/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
+</include>
+
+The optional catch-all owns `/api/auth` and nested auth endpoints. The named export must be `ALL`, and
+the handler must be the registered service's `auth.handler`. It is a [raw handler](/docs/http/raw-handlers),
+not a typed function route. Native auth requests and responses do not become RELKIT OpenAPI/client
+operations, and raw routes do not accept the function-route `request`, `responses`, or `rateLimit` options.
+
+The `auth` option is accepted only for a recognized Better Auth handler. It cannot attach session
+authentication to an arbitrary raw integration. Ordinary application routes continue to target
+their owning service functions.
+
+## Match exact paths and subtrees
+
+Use absolute pathnames, without a query string or fragment:
+
+| Protected pattern | Matches                                              | Does not match                                |
+| ----------------- | ---------------------------------------------------- | --------------------------------------------- |
+| `/account/*`      | `/account`, `/account/profile`, nested account paths | `/accounting`, `/session`                     |
+| `/mcp`            | Exactly `/mcp`                                       | `/mcp/`, `/mcp/anything`                      |
+| `/*`              | Application paths generally                          | The mounted authentication API remains public |
+
+Use exact paths or a trailing `/*` for a subtree; this is not a general regular-expression language.
+Patterns apply across HTTP methods. Duplicate patterns are normalized. If `protected` is omitted or
+empty, the integration does not require sessions on other application paths. Unlisted paths remain
+public unless another policy protects them.
+
+`/orders/*` in the example does not create an Orders route. Likewise, protecting `/mcp` controls HTTP
+admission to that path; it does not change [which tools MCP exposes](/docs/ai/mcp).
+
+The mounted auth base path and its descendants remain reachable even with `protected: ["/*"]`, so
+callers can sign in. This exception is only the auth mount, not a configurable list of other public
+paths. With broad protection, do not assume a custom `/sign-in` page or health endpoint is exempt;
+choose explicit protected subtrees when those application paths need to stay public.
+
+## Handle an unauthenticated request
+
+The example protects this ordinary function route:
+
+<include cwd lang="ts" meta='title="src/routes/account/profile/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/account/profile/route.ts
+</include>
+
+A request without a valid session receives HTTP `401`:
+
+```json
+{ "error": { "id": "UNAUTHORIZED", "message": "Authentication required" } }
+```
+
+RELKIT does not redirect the browser to a login page. Your frontend handles the response and offers a
+sign-in flow. Preserve a safe, validated return destination if you redirect after authentication;
+do not turn arbitrary input into an open redirect.
+
+With the example running, verify admission from another terminal:
+
+```sh
+curl -i http://127.0.0.1:3000/account/profile
+curl -i http://127.0.0.1:3000/session
+```
+
+Expect `401` for the protected profile and `200` with `authenticated: false` for the public session
+operation. Then follow [Your first auth flow](/docs/auth/first-auth) to repeat the protected request
+with a valid cookie.
+
+## Enforce permissions in the business operation
+
+Inside the function, read the verified identity with [session lookup](/docs/auth/sessions), reject a
+missing session if the operation requires one, and check the resource's owner, organization membership,
+or applicable role before accessing it. Derive the caller's identity from the session, not from an
+input such as `userId`, `organizationId`, or `role`.
+
+For example, a request for another user's order still needs an ownership or membership check even
+when both users are signed in. Use a constrained query or transaction appropriate to the operation,
+and return an intentional declared error for denied access. Keep privileged role assignment server-owned.
+
+Route protection applies to HTTP requests, not every direct invocation of its target. Jobs, tools,
+agents, and other services can reach business operations through other entry points. A generated
+database client is not row-level authorization, and a service export is not an access-control rule.
+Do not publish an operation on another transport until its identity and permission boundary is defined.
+
+<include cwd>content/generated/related/auth-protect-routes.mdx</include>

@@ -12,10 +12,13 @@ export interface TestEventControlState {
   readonly openFanout: (envelope: UnknownEventEnvelope) => Promise<void>;
   readonly owner: TestStateRoot;
   readonly failures: TestFailureControls;
-  readonly triggers: readonly { readonly id: string; readonly expansion: readonly string[] }[];
+  readonly triggers: readonly {
+    readonly id: string;
+    readonly eventId: string;
+    readonly eventVersion: number;
+  }[];
   readonly envelopes: readonly UnknownEventEnvelope[];
   readonly unfanned: Map<string, UnknownEventEnvelope>;
-  readonly ephemeralCompleted: Map<string, number>;
   readonly remember: (result: EventDeliveryResult, envelope: UnknownEventEnvelope) => void;
   readonly isClosed: () => boolean;
   readonly markClosed: () => void;
@@ -46,7 +49,8 @@ export function createTestEventControls(state: TestEventControlState): TestEvent
       state.triggers.some(
         (trigger) =>
           (id === undefined || trigger.id === id) &&
-          trigger.expansion.includes(`${envelope.eventId}@${envelope.version}`),
+          trigger.eventId === envelope.eventId &&
+          trigger.eventVersion === envelope.version,
       ),
     ).length;
     return durable + unfanned;
@@ -67,7 +71,10 @@ export function createTestEventControls(state: TestEventControlState): TestEvent
     const results: EventDeliveryResult[] = [];
     while (true) {
       const result = await runNext();
-      if (result === undefined) return Object.freeze(results);
+      if (result === undefined) {
+        await state.router().drain();
+        return Object.freeze(results);
+      }
       results.push(result);
     }
   };
@@ -83,9 +90,11 @@ export function createTestEventControls(state: TestEventControlState): TestEvent
       ).length;
     return (
       durable +
-      (id === undefined
-        ? [...state.ephemeralCompleted.values()].reduce((sum, value) => sum + value, 0)
-        : (state.ephemeralCompleted.get(id) ?? 0))
+      state
+        .router()
+        .snapshot()
+        .triggers.filter((trigger) => id === undefined || trigger.id === id)
+        .reduce((sum, trigger) => sum + (trigger.ephemeral?.completed ?? 0), 0)
     );
   };
   const restart = async (): Promise<void> => {

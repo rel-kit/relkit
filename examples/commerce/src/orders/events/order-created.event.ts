@@ -6,7 +6,7 @@ const orderCreated = defineEvent({
   id: "orders.created",
   version: 1,
   // Every published payload is checked against this schema.
-  payload: orderCreatedPayload,
+  input: orderCreatedPayload,
   // Inspector and observability surfaces redact this field.
   sensitiveFields: ["customerEmail"],
   title: "Order created",

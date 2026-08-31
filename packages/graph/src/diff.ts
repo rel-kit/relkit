@@ -6,16 +6,9 @@ import {
   changedFields,
   classifyChange,
   contractValue,
-  hasExpansionChange,
   nodeKey,
-  selectorExpansionDiff,
 } from "./diff-utils.js";
-import type {
-  GraphChange,
-  GraphDiff,
-  GraphDiffClassification,
-  SelectorExpansionDiff,
-} from "./diff-types.js";
+import type { GraphChange, GraphDiff, GraphDiffClassification } from "./diff-types.js";
 
 /** Compares canonical graph contracts while ignoring source-only identity moves. */
 export function diffGraph(
@@ -53,25 +46,12 @@ function makeChanges(left: GraphNode | undefined, right: GraphNode | undefined):
   if (left === undefined) return [entry(category, right!, "added", [], undefined, right)];
   if (right === undefined) return [entry(category, left, "removed", [], left, undefined)];
 
-  const expansion = selectorExpansionDiff(left, right);
-  const expansionChanged = category === "event/selector" && hasExpansionChange(expansion);
   const fields = changedFields(contractValue(left), contractValue(right));
-  const allFields = expansionChanged ? [...new Set([...fields, "selector.expansion"])] : fields;
-  if (allFields.length === 0) {
+  if (fields.length === 0) {
     if (canonicalJson(left.source) === canonicalJson(right.source)) return [];
     return [entry(category, right, "source-moved", ["source"], left, right)];
   }
-  return [
-    entry(
-      category,
-      right,
-      "changed",
-      allFields,
-      left,
-      right,
-      expansionChanged ? expansion : undefined,
-    ),
-  ];
+  return [entry(category, right, "changed", fields, left, right)];
 }
 
 function entry(
@@ -81,7 +61,6 @@ function entry(
   fields: readonly string[],
   before: GraphNode | undefined,
   after: GraphNode | undefined,
-  selectorExpansion?: SelectorExpansionDiff,
 ): GraphChange {
   const source =
     before && after && !sameSource(before, after)
@@ -92,30 +71,21 @@ function entry(
     kind: node.kind,
     id: node.id,
     change,
-    classification: classifyChange(category, change, fields, before, after, selectorExpansion),
+    classification: classifyChange(category, change, fields, before, after),
     fields: [...fields].sort(),
-    details: details(change, fields, selectorExpansion),
+    details: details(change, fields),
     ...(source === undefined ? {} : { source }),
-    ...(selectorExpansion === undefined ? {} : { selectorExpansion }),
     ...(before === undefined ? {} : { before: before as unknown as JsonValue }),
     ...(after === undefined ? {} : { after: after as unknown as JsonValue }),
   };
   return result;
 }
 
-function details(
-  change: GraphChange["change"],
-  fields: readonly string[],
-  expansion: SelectorExpansionDiff | undefined,
-): readonly string[] {
+function details(change: GraphChange["change"], fields: readonly string[]): readonly string[] {
   const values = [...fields];
   if (change === "added") values.push("added");
   if (change === "removed") values.push("removed");
   if (change === "source-moved") values.push("source moved");
-  if (expansion !== undefined) {
-    values.push(...expansion.added.map((value) => `selector added ${value}`));
-    values.push(...expansion.removed.map((value) => `selector removed ${value}`));
-  }
   return [...new Set(values)].sort();
 }
 

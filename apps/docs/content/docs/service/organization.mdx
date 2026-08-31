@@ -1,0 +1,153 @@
+---
+title: Where to put your code
+description: Find the right home for functions, tools, agents, events, jobs, databases, storage, schemas, routes, and shared code.
+---
+
+Choose the domain that owns the behavior, then the kind of file. For example, an order lookup belongs to
+Orders whether it is reached from HTTP, another function, or an AI model. Its implementation stays in
+`src/orders/functions/`; the entry points reference it.
+
+## The placement map
+
+The paths below are patterns, not files you must create in every domain. Replace `orders` with the owner.
+
+| What you are adding                | Where it belongs                                                                                                  | Continue learning                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Public domain boundary             | `src/orders/service.ts`                                                                                           | [Define a service](/docs/service/define)                                                               |
+| Business operation                 | `src/orders/functions/create-order.function.ts`                                                                   | [Functions](/docs/fundamentals/functions)                                                              |
+| Event contract                     | `src/orders/events/order-created.event.ts`                                                                        | [Events: getting started](/docs/events)                                                                |
+| Event subscriber                   | `functions/*.function.ts` in the **receiving** domain, such as `src/receipts/functions/order-receipt.function.ts` | [Consume an event](/docs/events/consume)                                                               |
+| Job and its schedule               | `src/receipts/jobs/send-receipt.job.ts`; its target remains in `src/receipts/functions/`                          | [Jobs: getting started](/docs/jobs) and [schedules](/docs/jobs/schedules)                              |
+| AI tool                            | `src/orders/tools/lookup-order.tool.ts`                                                                           | [AI: getting started](/docs/ai), then [tools](/docs/ai/tools)                                          |
+| AI agent                           | `src/orders/agents/order-support.agent.ts`                                                                        | [AI: getting started](/docs/ai), then [your first agent](/docs/ai/first-agent)                         |
+| Cache                              | `src/orders/cache/prices.cache.ts`                                                                                | [Caching: getting started](/docs/caching)                                                              |
+| Object bucket                      | `src/assets/buckets/assets.bucket.ts` in the domain that owns the files                                           | [Storage: getting started](/docs/storage)                                                              |
+| Database service                   | `src/database/service.ts` using `defineDrizzleService`                                                            | [Database: getting started](/docs/database)                                                            |
+| Database table                     | `src/database/schema/`, exported through its `index.ts`                                                           | [Define the schema](/docs/database/schema)                                                             |
+| Custom data-model method           | `src/database/models/*.model.ts`, registered in the database service                                              | [Custom models](/docs/database/models)                                                                 |
+| Database migration                 | A reviewed migration directory and runner outside `src/`                                                          | [Migrations](/docs/database/migrations)                                                                |
+| Domain schema                      | Beside its sole consumer, or a domain module such as `src/orders/schemas.ts` when shared locally                  | [Schemas](/docs/fundamentals/schemas)                                                                  |
+| Declared domain error              | `src/orders/errors/order-not-found.error.ts`                                                                      | [Errors](/docs/fundamentals/errors)                                                                    |
+| Prompt, constant, or helper        | Beside its consumer or in a focused module within the same domain                                                 | [Agent instructions](/docs/ai/agents), [domain boundaries](/docs/service/define)                       |
+| URL and HTTP method                | `src/routes/orders/route.ts`                                                                                      | [Services and routes](/docs/service/routes)                                                            |
+| HTTP middleware or input transform | `src/routes/middleware/*.middleware.ts` or `src/routes/transforms/`                                               | [Middleware](/docs/http/middleware), [request mapping](/docs/http/requests)                            |
+| Environment contract               | `src/platform/env.ts`                                                                                             | [Environment](/docs/fundamentals/environment)                                                          |
+| Provider and server configuration  | `relkit.config.ts`, importing infrastructure support from Platform                                                | [Providers](/docs/fundamentals/providers), [application configuration](/docs/fundamentals/application) |
+| Function and application tests     | `tests/unit/` and `tests/integration/`                                                                            | [Testing](/docs/operations/testing)                                                                    |
+
+Default-export each ordinary descriptor from its own file, following its capability's guide. Route files
+are different: they export named HTTP methods. Plain helper modules are ordinary TypeScript; they do not
+need a RelKit descriptor or their own service.
+
+## Functions own behavior; dependencies grant clients
+
+A function is where validated business input becomes a result. Keep HTTP parsing in routes and model
+instructions in agents. The function declares the managed resources it uses; putting a cache or bucket
+in the same folder does not grant access automatically.
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/functions/create-order.function.ts"'
+>
+  ../../examples/commerce/src/orders/functions/create-order.function.ts
+</include>
+
+Here, `dependencies.cache` supplies `context.cache.prices`. Separately, `publishes` authorizes publication
+through `context.events["orders.created"]`. Neither is configured in `service.ts`. The price cache is an
+Orders implementation detail, while `createOrder` can be a public operation.
+
+Use [functions](/docs/fundamentals/functions) for the handler and validation model,
+[context](/docs/fundamentals/context) for execution resources, and
+[your first cache](/docs/caching/first-cache) for a complete resource-backed example.
+
+## Tools and agents stay with their business domain
+
+Put an order lookup tool in Orders, not in a separate application-wide AI domain just because a model
+calls it. A tool points at a function with `defineTool({ target: ... })` or adapts that function with
+`.asTool()`. The schemas and business behavior stay with the function. Start with
+[defining a tool](/docs/ai/tools) or [turning a function into a tool](/docs/ai/function-tools).
+
+An agent's `agents/` file owns its instructions, schemas, model, tool allowlist, and execution limits.
+Store long instructions in a local prompt module if that makes them easier to maintain. Plain text does
+not need a new service. See [defining an agent](/docs/ai/agents).
+
+To let a route or another domain run an agent, expose an ordinary function that declares the agent as a
+dependency. This existing example provides the callable operation:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts"'
+>
+  ../../templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts
+</include>
+
+Import that function into `src/hello/service.ts` and add it to `functions` when it needs to be public.
+Do not add an `agents` or `tools` map to `defineService`. A tool in another domain can target a public
+function from the owning service; it should not import that domain's private tool file.
+
+“Internal to the domain” does not mean “hidden from MCP.” Tools are exposed through MCP by default unless
+disabled. Review [MCP access](/docs/ai/mcp) and [tool approvals](/docs/ai/approvals) before exposing them.
+
+## Events and jobs belong to the work's owner
+
+Put the fact in the producing domain's `events/` directory and the reaction in the receiving domain's
+`functions/` directory. For example, Orders defines `orders.created`, while Receipts defines the
+`defineEventFunction` that reacts to it. The subscriber stays out of `service.functions`: it runs through
+event delivery or replay, not direct invocation.
+
+A job descriptor belongs to the domain responsible for completing the queued work. Its function target
+stays in that domain's `functions/` directory. A schedule is an option on the job, not a separate service
+or a reason to move the handler. Follow [your first event](/docs/events/first-event),
+[jobs](/docs/jobs), and [schedules](/docs/jobs/schedules) for the complete workflows.
+
+## Resources do not go in the service member list
+
+Caches and buckets live under their owning domains. Functions declare `dependencies.cache` or
+`dependencies.buckets`, and `relkit.config.ts` supplies provider bindings for the selected profiles.
+Changing the provider does not require moving the domain's business code.
+
+If another domain needs access, expose an operation on the owner—such as uploading or reading a file—
+instead of publishing the raw cache or bucket as a service member. See the
+[storage tutorial](/docs/storage/first-upload) for a bucket, function, service, and route working together.
+
+Database and authentication integrations have specialized boundaries: `src/database/service.ts` uses
+`defineDrizzleService`, with table schemas beneath that domain; `src/auth/service.ts` uses
+`defineBetterAuthService`. They are not `database` or `auth` options on `defineService`. Start with
+[Database](/docs/database) for setup, schemas, queries, and model customization. The compiler supplies
+`context.database`; functions do not add a `dependencies.database` entry. Ordinary business domains
+still expose operations through `defineService`. See the
+[integration guidance](/docs/fundamentals/domain-first-migration#replace-database-and-auth-adapters)
+when replacing older database or auth adapters, or [Integrate Better Auth](/docs/database/better-auth)
+to share the current database with authentication. Continue with [Auth](/docs/auth) for service setup,
+sessions, route protection, clients, and authentication customization.
+
+## Shared code is not a shortcut around ownership
+
+Keep domain-specific schemas, constants, errors, and helpers with their owner. Other domains consume
+public service operations instead of importing those private modules. A public function's declared
+errors are part of its checked contract; you do not add an `errors` member map to the service.
+
+Use `src/platform/` for genuinely shared, domain-independent support, such as the environment contract
+or common schema primitives. Platform cannot import domains or routes. If a “shared” helper knows how
+Orders calculates a total, it belongs to Orders.
+
+Tests live outside `src/` in the generated layout. Unit tests can import the specific function they
+exercise; integration tests verify the application's routes and runtime behavior. Do not add a domain
+service just to hold tests.
+
+## Let the compiler check the organization
+
+Run these commands from your generated application's root after adding or moving artifacts:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+Expect a successful graph check and type check. Fix missing services, invalid IDs, unresolved targets,
+and boundary errors before continuing. Do not register every file manually in `relkit.config.ts` or edit
+`.relkit/generated`; the compiler derives the model from source.
+
+<include cwd>content/generated/related/service-organization.mdx</include>

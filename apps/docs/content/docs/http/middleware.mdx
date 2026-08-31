@@ -1,13 +1,14 @@
 ---
 title: HTTP middleware
-description: Apply path-scoped request policy, short-circuit safely, modify responses, and understand exact execution order.
+description: Apply path-scoped HTTP policy, understand execution order, and test short-circuit and pass-through behavior.
 ---
 
-HTTP middleware handles transport concerns that need the native request or response: authentication headers,
-cookies, CORS, request metadata, and early rejection. Domain behavior belongs in functions, while policy shared
-across service members may belong in service middleware.
+HTTP middleware handles concerns that need a request or response: authentication headers, cookies,
+CORS, request metadata, and early rejection. Put it under `src/routes/middleware/`.
+Keep business authorization that must apply to jobs, tools, and direct calls in domain functions as well.
+There is no service-middleware layer or `middleware` option on `defineService`.
 
-## Define path-scoped authorization
+## Define path-scoped policy
 
 <include
   cwd
@@ -17,71 +18,74 @@ across service members may belong in service middleware.
   ../../examples/commerce/src/routes/middleware/order-auth.middleware.ts
 </include>
 
-This middleware applies to `/orders/*`, reads the authorization header, delegates the decision to a validated
-function, and returns `401` before the route target when access is denied. It does not duplicate order logic.
+The middleware reads a header, delegates the decision to a public function, and returns `401` when
+denied. It calls `next()` only when processing should continue.
 
-## Choose a match scope
+<Callout type="warn" title="This example is not token verification">
+  The commerce authorization function only checks for a `Bearer ` prefix. It demonstrates the
+  control flow, not production authentication. Use a verified session or credential validation for
+  real access control.
+</Callout>
 
-Supported scopes include `*`, static segments, named `:param` segments, and a trailing wildcard. Prefer the
-narrowest pattern that expresses the policy. A global authentication middleware can accidentally protect
-health or callback endpoints; a route-specific pattern makes the boundary visible.
+The handler receives the Hono `context`, `next`, and a RELKIT context containing `signal`, `env`,
+`auth`, `log`, and `time`. It does not receive the route target's validated input or its dependency clients.
+Call public service functions for domain behavior rather than importing their private implementation.
 
-Middleware is discovered from source independently from route modules. File location does not define its
-match scope—the declared pattern does.
+## Choose the match scope
+
+| Pattern            | Intended scope         |
+| ------------------ | ---------------------- |
+| `*`                | Global middleware      |
+| `/orders`          | The collection path    |
+| `/orders/:orderId` | A named path parameter |
+| `/orders/*`        | An Orders path subtree |
+
+Middleware patterns use `:parameter` and a trailing `*`, not the route directories' bracket syntax.
+The declared pattern controls matching; nesting a middleware file under a directory does not scope it.
+Use the narrowest pattern that covers the policy, and test both a subtree's base path and its children.
+Include callback and preflight requests in those tests so broad authentication does not block them accidentally.
+
+## Understand execution order
+
+For a function-backed HTTP endpoint, processing runs through framework request setup and limits,
+registered authentication, matching HTTP middleware, the route's rate limiter, request mapping,
+function input validation and invocation, then response mapping.
+
+Matching declared middleware is registered in normalized ID order, not service membership or import
+order. `await next()` uses onion-style execution: before-code runs inward, and after-code runs outward
+in reverse order. Returning a `Response` without `next()` skips the downstream route.
+
+Consequently, middleware can reject before mapping or read a header before the rate limiter, but it
+cannot assume function input has been validated. Avoid consuming the raw body stream in middleware
+when the route still needs to parse it. Use header/session policy where possible and test any body access.
 
 ## Verify short-circuit and pass-through
 
-<Steps>
-  <Step>
-    ### Call without credentials
+With the commerce app running locally in test mode on its configured port `4000`:
 
-    ```sh title="Terminal — relkit-orders"
-    curl -i "http://localhost:3000/orders/order-1"
-    ```
+```sh
+curl -i 'http://localhost:4000/orders/order-1'
+curl -i 'http://localhost:4000/orders/order-1' \
+  -H 'authorization: Bearer example'
+```
 
-    Expect HTTP `401` and the middleware's safe body. Request mapping, service middleware, and the function
-    should not run.
+The first request should return the middleware's `401`. The second passes this demo policy and reaches
+the normal route outcome; that may be a declared not-found error if the order does not exist.
+Use [local development](/docs/start/local-development) to start your own app and adjust its port.
 
-  </Step>
-  <Step>
-    ### Call with accepted credentials
+Add integration assertions for a denied request, an accepted request, a path outside the scope,
+and response headers after `next()`. Assert that denial prevents the target from running.
+Middleware-only statuses are not automatically included in the route's OpenAPI response contract;
+document them alongside [responses](/docs/http/responses).
 
-    ```sh title="Terminal — relkit-orders"
-    curl -i "http://localhost:3000/orders/order-1" \
-      -H "authorization: Bearer example"
-    ```
+Run middleware assertions against the actual server pipeline. The current `createTestApplication`
+HTTP helper does not execute declared HTTP middleware, so its success alone cannot verify this policy.
 
-    Expect the route's normal response. Trace the request in the inspector to confirm the middleware and target
-    appear in order.
+## Include alternate entry points in policy tests
 
-  </Step>
-  <Step>
-    ### Check every matched route
-
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    bun test examples/commerce/tests/http.test.ts
-    ```
-
-    Add explicit tests for a protected static path, a dynamic path, and one path outside the scope.
-
-  </Step>
-</Steps>
-
-## Execution order
-
-The runtime performs framework request setup, rate limiting, matching HTTP middleware, request mapping and
-validation, service middleware, and finally function invocation. This determines what data is available: an
-HTTP middleware can read the raw body or headers, while a service middleware receives validated invocation
-input.
-
-`await next()` uses onion-style execution. Code before it runs on the way into the route; code after it can
-inspect or replace the response on the way out. Returning a native `Response` without calling `next()` is an
-intentional short circuit.
-
-<Callout type="warn" title="Document middleware-only responses">
-  A response returned only by middleware is not automatically added to a route's typed OpenAPI or
-  generated client error union. Add explicit contract documentation when callers must handle it.
-</Callout>
+Generated clients call `/rpc`, not the original REST URL. The RPC runtime replays associated
+path-scoped middleware, but it sees the native RPC request, not reconstructed REST path or body values.
+Read [Generated clients](/docs/http/generated-clients) before relying on path/body-dependent policy.
+Test both transports if both are reachable.
 
 <include cwd>content/generated/related/http-middleware.mdx</include>

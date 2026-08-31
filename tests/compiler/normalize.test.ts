@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import { defineEvent, onEvent, events } from "../../packages/events/src/index.ts";
+import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineJob } from "../../packages/jobs/src/index.ts";
 import { defineRoute, http } from "../../packages/routes/src/index.ts";
@@ -22,7 +22,7 @@ function values() {
     output,
     handler: async () => ({ ok: true }),
   });
-  const event = defineEvent({ id: "orders.created", version: 1, payload: input });
+  const event = defineEvent({ id: "orders.created", version: 1, input: input });
   const job = defineJob({
     id: "orders.refresh",
     input,
@@ -37,8 +37,10 @@ function values() {
     request: http.input({ id: http.path("id") }),
     responses: [http.success(200, output)],
   });
-  const trigger = onEvent(events.single("orders.created" as never), async () => ({ ok: true }), {
+  const trigger = defineEventFunction({
     id: "orders.listener",
+    event: "orders.created" as never,
+    handler: async () => {},
     delivery: "ephemeral",
   });
   return [target, event, job, route, trigger] as const;

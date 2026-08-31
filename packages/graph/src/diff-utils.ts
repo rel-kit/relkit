@@ -1,11 +1,6 @@
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type { GraphNode } from "./model.js";
-import type {
-  GraphDiffCategory,
-  GraphDiffChange,
-  GraphDiffClassification,
-  SelectorExpansionDiff,
-} from "./diff-types.js";
+import type { GraphDiffCategory, GraphDiffChange, GraphDiffClassification } from "./diff-types.js";
 
 export function nodeKey(node: GraphNode): string {
   return `${categoryFor(node)}\0${node.id}`;
@@ -14,11 +9,11 @@ export function nodeKey(node: GraphNode): string {
 export function categoryFor(node: GraphNode): GraphDiffCategory | undefined {
   if (node.kind === "trigger") {
     if (node.triggerType === "http") return "route";
-    if (node.triggerType === "event") return "event/selector";
+    if (node.triggerType === "event") return "event";
     return "job";
   }
   if (node.kind === "function") return "function/error";
-  if (node.kind === "event") return "event/selector";
+  if (node.kind === "event") return "event";
   if (node.kind === "job") return "job";
   if (node.kind === "bucket" || node.kind === "cache") return "bucket/cache";
   if (node.kind === "tool") return "tool";
@@ -29,11 +24,7 @@ export function categoryFor(node: GraphNode): GraphDiffCategory | undefined {
 }
 
 export function contractValue(node: GraphNode): JsonValue {
-  if (node.kind !== "trigger" || node.triggerType !== "event" || !isRecord(node.config)) {
-    return withoutSource(node);
-  }
-  const { expansion: _expansion, ...config } = node.config;
-  return withoutSource({ ...node, config });
+  return withoutSource(node);
 }
 
 export function changedFields(before: JsonValue, after: JsonValue): readonly string[] {
@@ -42,33 +33,19 @@ export function changedFields(before: JsonValue, after: JsonValue): readonly str
   return [...keys].filter((key) => !same(before[key], after[key])).sort();
 }
 
-export function selectorExpansionDiff(before: GraphNode, after: GraphNode): SelectorExpansionDiff {
-  const left = expansion(before);
-  const right = expansion(after);
-  return {
-    added: right.filter((value) => !left.includes(value)),
-    removed: left.filter((value) => !right.includes(value)),
-  };
-}
-
-export function hasExpansionChange(value: SelectorExpansionDiff): boolean {
-  return value.added.length > 0 || value.removed.length > 0;
-}
-
 export function classifyChange(
   category: GraphDiffCategory,
   change: GraphDiffChange,
   fields: readonly string[],
   before: GraphNode | undefined,
   after: GraphNode | undefined,
-  expansion: SelectorExpansionDiff | undefined,
 ): GraphDiffClassification {
   if (change === "source-moved") return "informational";
   if (change === "added") return "compatible";
   if (change === "removed") return "breaking";
   if (category === "route") return "breaking";
   if (category === "function/error") return classifyFunction(fields, before, after);
-  if (category === "event/selector") return classifyEvent(fields, expansion);
+  if (category === "event") return fields.length === 0 ? "informational" : "breaking";
   if (category === "job") return classifyJob(fields);
   if (category === "bucket/cache") return classifyResource(fields, before, after);
   if (category === "tool") return classifyTool(fields);
@@ -82,18 +59,10 @@ function classifyFunction(
   before: GraphNode | undefined,
   after: GraphNode | undefined,
 ): GraphDiffClassification {
-  if (fields.includes("output") || fields.includes("errors")) return "breaking";
+  if (fields.includes("output") || fields.includes("errors") || fields.includes("invocationMode"))
+    return "breaking";
   if (fields.includes("input")) return inputSchemaClass(before, after);
   return fields.length === 0 ? "informational" : "potentially-breaking";
-}
-
-function classifyEvent(
-  fields: readonly string[],
-  expansion: SelectorExpansionDiff | undefined,
-): GraphDiffClassification {
-  if (expansion?.removed.length) return "breaking";
-  if (expansion?.added.length) return "potentially-breaking";
-  return fields.length === 0 ? "informational" : "breaking";
 }
 
 function classifyJob(fields: readonly string[]): GraphDiffClassification {
@@ -149,13 +118,6 @@ function objectSchema(value: JsonValue): { required: readonly string[] } | undef
     ? value.required.filter((entry): entry is string => typeof entry === "string")
     : [];
   return { required };
-}
-
-function expansion(node: GraphNode): readonly string[] {
-  if (node.kind !== "trigger" || node.triggerType !== "event" || !isRecord(node.config)) return [];
-  return Array.isArray(node.config.expansion)
-    ? node.config.expansion.filter((entry): entry is string => typeof entry === "string").sort()
-    : [];
 }
 
 function withoutSource(node: GraphNode): JsonValue {

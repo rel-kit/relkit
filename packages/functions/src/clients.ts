@@ -74,12 +74,12 @@ type OutputOf<T> = T extends { readonly output: infer S }
     ? InferOutput<S>
     : never
   : never;
-type PayloadOf<T> = T extends { readonly payload: infer S }
+type EventInputOf<T> = T extends { readonly input: infer S }
   ? S extends StandardSchemaV1
     ? InferInput<S>
     : never
   : never;
-type PayloadOutputOf<T> = T extends { readonly payload: infer S }
+type EventOutputOf<T> = T extends { readonly input: infer S }
   ? S extends StandardSchemaV1
     ? InferOutput<S>
     : never
@@ -111,9 +111,9 @@ export type JobClientFor<T> = {
 };
 export type EventClientFor<T> = {
   publish(
-    payload: PayloadOf<T>,
+    payload: EventInputOf<T>,
     options?: EventPublishOptions,
-  ): Promise<EventPublishResult<EventIdOf<T>, EventVersionOf<T>, PayloadOutputOf<T>>>;
+  ): Promise<EventPublishResult<EventIdOf<T>, EventVersionOf<T>, EventOutputOf<T>>>;
 };
 export type BucketClientFor<T> = BucketClient;
 export type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;

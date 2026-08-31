@@ -178,13 +178,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
     await client.close();
   }
 
-  expect(compiled.diagnostics).toEqual([
-    expect.objectContaining({
-      code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
-      severity: "warning",
-      message: "Raw all-event selector is restricted to telemetry.",
-    }),
-  ]);
+  expect(compiled.diagnostics).toEqual([]);
   expect(generateOpenApiJson(graph)).toBe(compiled.normalization.outputs.openapi);
   expect(generateClient(graph)).toBe(compiled.normalization.outputs.client);
   expect(invocations.every(({ source }) => source === "http")).toBe(true);

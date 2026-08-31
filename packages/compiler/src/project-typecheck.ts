@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { createDiagnostic, type Diagnostic, type DiagnosticSeverity } from "@relkit/diagnostics";
 import ts from "typescript";
+import { eventSourceDiagnostics } from "./event-source-diagnostics.js";
 
 /** Type-checks a project with its own tsconfig after generated declarations exist. */
 export function typecheckProject(projectRoot: string): readonly Diagnostic[] {
@@ -25,9 +26,12 @@ export function typecheckProject(projectRoot: string): readonly Diagnostic[] {
     options: parsed.options,
     ...(parsed.projectReferences ? { projectReferences: parsed.projectReferences } : {}),
   });
-  return [...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
-    typescriptDiagnostic(diagnostic, projectRoot),
-  );
+  return [
+    ...eventSourceDiagnostics(program, projectRoot),
+    ...[...parsed.errors, ...ts.getPreEmitDiagnostics(program)].map((diagnostic) =>
+      typescriptDiagnostic(diagnostic, projectRoot),
+    ),
+  ];
 }
 
 function typescriptDiagnostic(diagnostic: ts.Diagnostic, projectRoot: string): Diagnostic {

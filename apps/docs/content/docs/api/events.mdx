@@ -585,6 +585,69 @@ declare const createEventClient: <
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L121)
 
+## `define-event-function.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [Events](#events)
+  - [defineEventFunction](#defineeventfunction)
+- [utils](#utils)
+  - [isEventFunctionDescriptor](#iseventfunctiondescriptor)
+
+---
+
+# Events
+
+## defineEventFunction
+
+Defines an independent event-only consumer with inferred input and void success.
+Event IDs are supplied by the application's generated EventRegistry.
+
+**Example**
+
+```ts
+import { defineEventFunction } from "@relkit/app/events";
+
+// Pass { id, event, handler } after generating the application's event registry.
+// Consumers can publish only events explicitly listed in their publishes option.
+void defineEventFunction;
+```
+
+**Signature**
+
+```ts
+declare const defineEventFunction: <
+  const Id extends string,
+  const Event extends EventName,
+  const Publishes extends readonly EventName[] = readonly [],
+  const Dependencies extends FunctionDependencies = {},
+  const Options extends EventFunctionCallOptions<Id, Event, Publishes, Dependencies> =
+    EventFunctionCallOptions<Id, Event, Publishes, Dependencies>,
+>(
+  options: EventFunctionCallOptions<Id, Event, Publishes, Dependencies> &
+    Options &
+    EventFunctionValidation<NoInfer<Options>>,
+) => EventFunctionDescriptor<Id, Event, Publishes, Dependencies, ErrorListOf<Options>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L62)
+
+Since v0.1.0
+
+# utils
+
+## isEventFunctionDescriptor
+
+**Signature**
+
+```ts
+declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event-function.ts#L94)
+
 ## `define-event.ts`
 
 ---
@@ -609,7 +672,7 @@ declare const createEventClient: <
 
 ## defineEvent
 
-Defines a versioned event contract used by publishers and typed listeners.
+Defines a versioned event contract used by publishers and event functions.
 
 **Example**
 
@@ -617,11 +680,7 @@ Defines a versioned event contract used by publishers and typed listeners.
 import { defineEvent } from "@relkit/app/events";
 import { z } from "@relkit/app/schema";
 
-const created = defineEvent({
-  id: "orders.created",
-  version: 1,
-  payload: z.object({ orderId: z.string() }),
-});
+const created = defineEvent({ id: "orders.created", input: z.object({ orderId: z.string() }) });
 void created;
 ```
 
@@ -630,14 +689,14 @@ void created;
 ```ts
 declare const defineEvent: <
   const Id extends string,
-  const Version extends number,
-  const PayloadSchema extends StandardSchemaV1,
+  const Version extends number = 1,
+  const InputSchema extends StandardSchemaV1 = StandardSchemaV1<unknown, unknown>,
 >(
-  options: DefineEventOptions<Id, Version, PayloadSchema>,
-) => EventDescriptor<Id, Version, InferOutput<PayloadSchema>, PayloadSchema>;
+  options: DefineEventOptions<Id, Version, InputSchema>,
+) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L68)
 
 Since v0.1.0
 
@@ -651,16 +710,18 @@ Since v0.1.0
 export interface DefineEventOptions<
   Id extends string,
   Version extends number,
-  PayloadSchema extends StandardSchemaV1,
+  InputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
   readonly id: Id;
-  readonly version: Version;
-  readonly payload: PayloadSchema;
+  readonly version?: Version;
+  readonly input: InputSchema;
   readonly sensitiveFields?: readonly string[];
+  readonly handler?: never;
+  readonly output?: never;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L41)
 
 ## EventDescriptor (interface)
 
@@ -670,14 +731,16 @@ export interface DefineEventOptions<
 export interface EventDescriptor<
   Id extends string,
   Version extends number,
-  Payload,
-  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Input,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
 >
-  extends DescriptorBase<"event", Id>, EventRef<Id, PayloadSchema> {
+  extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
   readonly version: Version;
-  readonly payload: PayloadSchema;
+  readonly input: InputSchema;
   readonly sensitiveFields?: readonly string[];
-  readonly __payload?: Payload;
+  readonly handler?: never;
+  readonly output?: never;
+  readonly __input?: Input;
 }
 ```
 
@@ -691,7 +754,7 @@ export interface EventDescriptor<
 type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L39)
 
 ## EventEnvelope (type alias)
 
@@ -712,8 +775,8 @@ type EventEnvelope<Id, Version, Payload> = Omit<
 
 ```ts
 type EventEnvelopeFor<E> =
-  E extends EventDescriptor<infer Id, infer Version, infer Payload, StandardSchemaV1>
-    ? EventEnvelope<Id, Version, Payload>
+  E extends EventDescriptor<infer Id, infer Version, infer Input, StandardSchemaV1>
+    ? EventEnvelope<Id, Version, Input>
     : UnknownEventEnvelope;
 ```
 
@@ -737,7 +800,7 @@ type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 declare const assertEventDescriptor: (value: unknown) => asserts value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L103)
 
 ## isEventDescriptor
 
@@ -747,7 +810,258 @@ declare const assertEventDescriptor: (value: unknown) => asserts value is EventD
 declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L93)
+
+## `event-function-target.ts`
+
+---
+
+## Exports Grouped by Category
+
+---
+
+## `event-function-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [DefineEventFunctionOptions (interface)](#defineeventfunctionoptions-interface)
+  - [EventDelivery (type alias)](#eventdelivery-type-alias)
+  - [EventFunctionContext (interface)](#eventfunctioncontext-interface)
+  - [EventFunctionDescriptor (interface)](#eventfunctiondescriptor-interface)
+  - [EventFunctionDescriptorAny (interface)](#eventfunctiondescriptorany-interface)
+  - [EventFunctionHandler (type alias)](#eventfunctionhandler-type-alias)
+  - [EventFunctionTrigger (interface)](#eventfunctiontrigger-interface)
+  - [EventRetryPolicy (type alias)](#eventretrypolicy-type-alias)
+
+---
+
+# utils
+
+## DefineEventFunctionOptions (interface)
+
+**Signature**
+
+```ts
+export interface DefineEventFunctionOptions<
+  Id extends string,
+  Event extends EventName,
+  Publishes extends readonly EventName[] = readonly [],
+  Dependencies extends FunctionDependencies = {},
+  Errors extends readonly ErrorDescriptorAny[] = readonly [],
+> extends DescriptorMetadata {
+  readonly id: Id;
+  readonly event: Event;
+  readonly delivery?: EventDelivery;
+  readonly profile?: string;
+  readonly retry?: Partial<EventRetryPolicy>;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly publishes?: Publishes;
+  readonly dependencies?: Dependencies;
+  readonly errors?: Errors;
+  readonly onBefore?: (
+    input: EventInputByName<Event>,
+    context: EventFunctionContext<Event, Publishes, Dependencies>,
+  ) => MaybePromise<EventInputByName<Event>>;
+  readonly onAfter?: (
+    output: void,
+    context: EventFunctionContext<Event, Publishes, Dependencies>,
+  ) => MaybePromise<void>;
+  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly input?: never;
+  readonly output?: never;
+  readonly tool?: never;
+  readonly trigger?: never;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L57)
+
+## EventDelivery (type alias)
+
+**Signature**
+
+```ts
+type EventDelivery = "ephemeral" | "durable";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L17)
+
+## EventFunctionContext (interface)
+
+**Signature**
+
+```ts
+export interface EventFunctionContext<
+  Event extends EventName,
+  Publishes extends readonly EventName[] = readonly [],
+  Dependencies extends FunctionDependencies = {},
+> extends FunctionContext<Dependencies, Publishes> {
+  readonly trigger: EventFunctionTrigger<Event>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L39)
+
+## EventFunctionDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface EventFunctionDescriptor<
+  Id extends string = string,
+  Event extends EventName = EventName,
+  Publishes extends readonly EventName[] = readonly [],
+  Dependencies extends FunctionDependencies = {},
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+> extends DescriptorBase<"function", Id> {
+  readonly invocationMode: "event-only";
+  readonly event: Event;
+  readonly delivery: EventDelivery;
+  readonly profile: string;
+  readonly retry: EventRetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly publishes?: Publishes;
+  readonly dependencies?: Dependencies;
+  readonly errors?: Errors;
+  readonly handler: EventFunctionHandler<Event, Publishes, Dependencies, Errors>;
+  readonly invoke?: never;
+  readonly asTool?: never;
+  readonly __input?: InferOutput<EventDescriptorByName<Event>["input"]>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L89)
+
+## EventFunctionDescriptorAny (interface)
+
+**Signature**
+
+```ts
+export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
+  readonly invocationMode: "event-only";
+  readonly event: string;
+  readonly delivery: EventDelivery;
+  readonly profile: string;
+  readonly retry: EventRetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly publishes?: readonly string[];
+  readonly handler: (...args: never[]) => unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L112)
+
+## EventFunctionHandler (type alias)
+
+**Signature**
+
+```ts
+type EventFunctionHandler<Event, Publishes, Dependencies, Errors> = (
+  input: EventInputByName<Event>,
+  context: EventFunctionContext<Event, Publishes, Dependencies>,
+) => MaybePromise<FunctionHandlerResult<void, Errors>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L47)
+
+## EventFunctionTrigger (interface)
+
+**Signature**
+
+```ts
+export interface EventFunctionTrigger<Event extends EventName = EventName> {
+  readonly kind: "event";
+  readonly event: {
+    readonly id: Event;
+    readonly version: EventVersionByName<Event>;
+    readonly instanceId: string;
+    readonly occurredAt: string;
+    readonly publishedAt: string;
+    readonly key?: string;
+    readonly attributes: Readonly<Record<string, string | number | boolean>>;
+  };
+  readonly delivery: { readonly attempt: number; readonly replayed: boolean };
+  readonly trace: {
+    readonly traceId: string;
+    readonly correlationId?: string;
+    readonly causationInvocationId?: string;
+  };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L20)
+
+## EventRetryPolicy (type alias)
+
+**Signature**
+
+```ts
+type EventRetryPolicy = RetryPolicy;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-types.ts#L18)
+
+## `event-function-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [eventDelivery](#eventdelivery)
+  - [eventProfile](#eventprofile)
+  - [eventRetry](#eventretry)
+  - [rejectEventFunctionFields](#rejecteventfunctionfields)
+
+---
+
+# utils
+
+## eventDelivery
+
+**Signature**
+
+```ts
+declare const eventDelivery: (value: unknown) => EventDelivery;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L13)
+
+## eventProfile
+
+**Signature**
+
+```ts
+declare const eventProfile: (value: unknown) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L21)
+
+## eventRetry
+
+**Signature**
+
+```ts
+declare const eventRetry: (value: unknown) => RetryPolicy;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L27)
+
+## rejectEventFunctionFields
+
+**Signature**
+
+```ts
+declare const rejectEventFunctionFields: (options: Record<PropertyKey, unknown>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-function-validation.ts#L46)
 
 ## `event-registry.ts`
 
@@ -757,9 +1071,9 @@ declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny
 
 - [utils](#utils)
   - [EventDescriptorByName (type alias)](#eventdescriptorbyname-type-alias)
+  - [EventInputByName (type alias)](#eventinputbyname-type-alias)
   - [EventName (type alias)](#eventname-type-alias)
-  - [EventPayloadByName (type alias)](#eventpayloadbyname-type-alias)
-  - [EventRegistry (interface)](#eventregistry-interface)
+  - [EventRegistry (type alias)](#eventregistry-type-alias)
   - [EventVersionByName (type alias)](#eventversionbyname-type-alias)
 
 ---
@@ -776,7 +1090,17 @@ type EventDescriptorByName<Name> = EventRegistry[Name] extends EventDescriptorAn
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L15)
+
+## EventInputByName (type alias)
+
+**Signature**
+
+```ts
+type EventInputByName<Name> = InferOutput<EventDescriptorByName<Name>["input"]>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L18)
 
 ## EventName (type alias)
 
@@ -786,29 +1110,17 @@ type EventDescriptorByName<Name> = EventRegistry[Name] extends EventDescriptorAn
 type EventName = Extract<keyof EventRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L13)
 
-## EventPayloadByName (type alias)
-
-**Signature**
-
-```ts
-type EventPayloadByName<Name> = InferOutput<EventDescriptorByName<Name>["payload"]>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L12)
-
-## EventRegistry (interface)
-
-Augmented by `.relkit/generated/event-registry.d.ts` for application event names.
+## EventRegistry (type alias)
 
 **Signature**
 
 ```ts
-export interface EventRegistry {}
+type EventRegistry = Relkit.EventRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L11)
 
 ## EventVersionByName (type alias)
 
@@ -818,7 +1130,7 @@ export interface EventRegistry {}
 type EventVersionByName<Name> = EventDescriptorByName<Name>["version"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L22)
 
 ## `index.ts`
 
@@ -828,13 +1140,11 @@ type EventVersionByName<Name> = EventDescriptorByName<Name>["version"];
 
 - [utils](#utils)
   - ["./client.js" (namespace export)](#clientjs-namespace-export)
+  - ["./define-event-function.js" (namespace export)](#define-event-functionjs-namespace-export)
   - ["./define-event.js" (namespace export)](#define-eventjs-namespace-export)
+  - ["./event-function-target.js" (namespace export)](#event-function-targetjs-namespace-export)
+  - ["./event-function-types.js" (namespace export)](#event-function-typesjs-namespace-export)
   - ["./event-registry.js" (namespace export)](#event-registryjs-namespace-export)
-  - ["./listener-target.js" (namespace export)](#listener-targetjs-namespace-export)
-  - ["./listener-types.js" (namespace export)](#listener-typesjs-namespace-export)
-  - ["./on-event.js" (namespace export)](#on-eventjs-namespace-export)
-  - ["./selector-types.js" (namespace export)](#selector-typesjs-namespace-export)
-  - ["./selectors.js" (namespace export)](#selectorsjs-namespace-export)
 
 ---
 
@@ -852,6 +1162,18 @@ export * from "./client.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L2)
 
+## "./define-event-function.js" (namespace export)
+
+Re-exports all named exports from the "./define-event-function.js" module.
+
+**Signature**
+
+```ts
+export * from "./define-event-function.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L4)
+
 ## "./define-event.js" (namespace export)
 
 Re-exports all named exports from the "./define-event.js" module.
@@ -864,6 +1186,30 @@ export * from "./define-event.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L1)
 
+## "./event-function-target.js" (namespace export)
+
+Re-exports all named exports from the "./event-function-target.js" module.
+
+**Signature**
+
+```ts
+export * from "./event-function-target.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L6)
+
+## "./event-function-types.js" (namespace export)
+
+Re-exports all named exports from the "./event-function-types.js" module.
+
+**Signature**
+
+```ts
+export * from "./event-function-types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L5)
+
 ## "./event-registry.js" (namespace export)
 
 Re-exports all named exports from the "./event-registry.js" module.
@@ -875,677 +1221,3 @@ export * from "./event-registry.js";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L3)
-
-## "./listener-target.js" (namespace export)
-
-Re-exports all named exports from the "./listener-target.js" module.
-
-**Signature**
-
-```ts
-export * from "./listener-target.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L5)
-
-## "./listener-types.js" (namespace export)
-
-Re-exports all named exports from the "./listener-types.js" module.
-
-**Signature**
-
-```ts
-export * from "./listener-types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L4)
-
-## "./on-event.js" (namespace export)
-
-Re-exports all named exports from the "./on-event.js" module.
-
-**Signature**
-
-```ts
-export * from "./on-event.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L6)
-
-## "./selector-types.js" (namespace export)
-
-Re-exports all named exports from the "./selector-types.js" module.
-
-**Signature**
-
-```ts
-export * from "./selector-types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L7)
-
-## "./selectors.js" (namespace export)
-
-Re-exports all named exports from the "./selectors.js" module.
-
-**Signature**
-
-```ts
-export * from "./selectors.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/index.ts#L8)
-
-## `listener-target.ts`
-
----
-
-## Exports Grouped by Category
-
----
-
-## `listener-types.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [EventDelivery (type alias)](#eventdelivery-type-alias)
-  - [EventListenerContext (interface)](#eventlistenercontext-interface)
-  - [EventListenerHandler (type alias)](#eventlistenerhandler-type-alias)
-  - [EventListenerMetadata (interface)](#eventlistenermetadata-interface)
-  - [EventListenerTarget (type alias)](#eventlistenertarget-type-alias)
-  - [EventTriggerDescriptor (interface)](#eventtriggerdescriptor-interface)
-  - [OnEventOptions (interface)](#oneventoptions-interface)
-
----
-
-# utils
-
-## EventDelivery (type alias)
-
-**Signature**
-
-```ts
-type EventDelivery = "ephemeral" | "durable";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L12)
-
-## EventListenerContext (interface)
-
-**Signature**
-
-```ts
-export interface EventListenerContext<
-  Dependencies extends FunctionDependencies = {},
-> extends FunctionContext<Dependencies> {
-  readonly event: EventListenerMetadata;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L26)
-
-## EventListenerHandler (type alias)
-
-**Signature**
-
-```ts
-type EventListenerHandler<Input, Dependencies> = (
-  payload: Input,
-  context: EventListenerContext<Dependencies>,
-) => MaybePromise<unknown>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L32)
-
-## EventListenerMetadata (interface)
-
-**Signature**
-
-```ts
-export interface EventListenerMetadata {
-  readonly eventId: string;
-  readonly version: number;
-  readonly instanceId: string;
-  readonly key?: string;
-  readonly attributes: Readonly<Record<string, EventAttributeValue>>;
-  readonly occurredAt: string;
-  readonly traceId: string;
-  readonly correlationId?: string;
-  readonly causationInvocationId?: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L14)
-
-## EventListenerTarget (type alias)
-
-**Signature**
-
-```ts
-type EventListenerTarget<Dependencies> = FunctionDescriptor<
-  string,
-  UnknownEventEnvelope,
-  unknown,
-  Dependencies
->;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L37)
-
-## EventTriggerDescriptor (interface)
-
-**Signature**
-
-```ts
-export interface EventTriggerDescriptor<
-  Id extends string = string,
-  Selector extends EventSelectorAny = EventSelectorAny,
-  Dependencies extends FunctionDependencies = FunctionDependencies,
-> extends DescriptorBase<"event-trigger", Id> {
-  readonly selector: Selector;
-  readonly target: EventListenerTarget<Dependencies>;
-  readonly delivery: EventDelivery;
-  readonly profile?: string;
-  readonly retry?: RetryPolicy;
-  readonly concurrency?: number;
-  readonly timeoutMs?: number;
-  readonly callback: true;
-  readonly inferredId: boolean;
-  readonly __input?: EventSelectorInput<Selector>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L48)
-
-## OnEventOptions (interface)
-
-**Signature**
-
-```ts
-export interface OnEventOptions<
-  Id extends string = string,
-  Dependencies extends FunctionDependencies = {},
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly delivery?: EventDelivery;
-  readonly profile?: string;
-  readonly retry?: RetryPolicy;
-  readonly concurrency?: number;
-  readonly timeoutMs?: number;
-  readonly dependencies?: FunctionDependencyOptions<Dependencies>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-types.ts#L65)
-
-## `listener-validation.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [delivery](#delivery)
-  - [isRecord](#isrecord)
-  - [optionalId](#optionalid)
-  - [positive](#positive)
-  - [retryPolicy](#retrypolicy)
-
----
-
-# utils
-
-## delivery
-
-**Signature**
-
-```ts
-declare const delivery: (value: unknown) => EventDelivery;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-validation.ts#L5)
-
-## isRecord
-
-**Signature**
-
-```ts
-declare const isRecord: (value: unknown) => value is Record<string, any>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-validation.ts#L54)
-
-## optionalId
-
-**Signature**
-
-```ts
-declare const optionalId: (value: unknown) => string | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-validation.ts#L12)
-
-## positive
-
-**Signature**
-
-```ts
-declare const positive: (value: unknown, name: string) => number | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-validation.ts#L16)
-
-## retryPolicy
-
-**Signature**
-
-```ts
-declare const retryPolicy: (value: unknown) => RetryPolicy | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/listener-validation.ts#L23)
-
-## `on-event.ts`
-
----
-
-## Exports Grouped by Category
-
-- [Events](#events)
-  - [onEvent](#onevent)
-- [utils](#utils)
-  - [eventListenerFunctionId](#eventlistenerfunctionid)
-  - [isEventTriggerDescriptor](#iseventtriggerdescriptor)
-
----
-
-# Events
-
-## onEvent
-
-Registers a typed callback for an event name or selector. Each matching
-listener is an independent delivery: one listener may fail without rolling
-back another, and durable delivery is at-least-once rather than a transaction.
-Listener IDs may be inferred from source bindings; declared error retry hints
-constrain durable redelivery without changing direct invocation behavior.
-
-**Example**
-
-```ts
-import { events, onEvent } from "@relkit/app/events";
-
-const audit = onEvent(events.all({ payload: "unknown", purpose: "audit" }), async (event, ctx) => {
-  ctx.log.info("event received", { eventId: event.eventId });
-});
-void audit;
-```
-
-**Signature**
-
-```ts
-declare const onEvent: {
-  <
-    const Name extends EventName,
-    const Id extends string = string,
-    const Dependencies extends FunctionDependencies = {},
-  >(
-    name: Name,
-    handler: EventListenerHandler<EventSelectorInput<SingleEventSelector<Name>>, Dependencies>,
-    options?: OnEventOptions<Id, Dependencies>,
-  ): EventTriggerDescriptor<Id, SingleEventSelector<Name>, Dependencies>;
-  <
-    const Selector extends EventSelectorAny,
-    const Id extends string = string,
-    const Dependencies extends FunctionDependencies = {},
-  >(
-    selector: Selector,
-    handler: EventListenerHandler<EventSelectorInput<Selector>, Dependencies>,
-    options?: OnEventOptions<Id, Dependencies>,
-  ): EventTriggerDescriptor<Id, Selector, Dependencies>;
-};
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/on-event.ts#L60)
-
-Since v0.1.0
-
-# utils
-
-## eventListenerFunctionId
-
-**Signature**
-
-```ts
-declare const eventListenerFunctionId: (listenerId: string) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/on-event.ts#L108)
-
-## isEventTriggerDescriptor
-
-**Signature**
-
-```ts
-declare const isEventTriggerDescriptor: (value: unknown) => value is EventTriggerDescriptor;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/on-event.ts#L112)
-
-## `selector-types.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [AllEventPurpose (type alias)](#alleventpurpose-type-alias)
-  - [AllEventSelector (interface)](#alleventselector-interface)
-  - [AnyOfEventSelector (interface)](#anyofeventselector-interface)
-  - [EventSelector (type alias)](#eventselector-type-alias)
-  - [EventSelectorAny (type alias)](#eventselectorany-type-alias)
-  - [EventSelectorInput (type alias)](#eventselectorinput-type-alias)
-  - [EventSelectorReference (interface)](#eventselectorreference-interface)
-  - [MatchEventSelector (interface)](#matcheventselector-interface)
-  - [MatchingEventName (type alias)](#matchingeventname-type-alias)
-  - [SingleEventSelector (interface)](#singleeventselector-interface)
-
----
-
-# utils
-
-## AllEventPurpose (type alias)
-
-**Signature**
-
-```ts
-type AllEventPurpose = "audit" | "telemetry" | "development";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L44)
-
-## AllEventSelector (interface)
-
-**Signature**
-
-```ts
-export interface AllEventSelector {
-  readonly kind: "all";
-  readonly payload: "unknown";
-  readonly purpose?: AllEventPurpose;
-  readonly __input?: UnknownEventEnvelope;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L37)
-
-## AnyOfEventSelector (interface)
-
-**Signature**
-
-```ts
-export interface AnyOfEventSelector<Names extends readonly EventName[] = readonly EventName[]> {
-  readonly kind: "anyOf";
-  readonly events: readonly EventSelectorReference<Names[number]>[];
-  readonly __input?: EventEnvelopeFor<EventDescriptorByName<Names[number]>>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L20)
-
-## EventSelector (type alias)
-
-**Signature**
-
-```ts
-type EventSelector =
-  SingleEventSelector | AnyOfEventSelector | MatchEventSelector | AllEventSelector;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L45)
-
-## EventSelectorAny (type alias)
-
-**Signature**
-
-```ts
-type EventSelectorAny = EventSelector;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L47)
-
-## EventSelectorInput (type alias)
-
-**Signature**
-
-```ts
-type EventSelectorInput<Selector> =
-  Selector extends SingleEventSelector<infer Name>
-    ? EventPayloadByName<Name>
-    : Selector extends AnyOfEventSelector<infer Names>
-      ? EventEnvelopeFor<EventDescriptorByName<Names[number]>>
-      : Selector extends MatchEventSelector<string, infer Names>
-        ? [Names] extends [never]
-          ? UnknownEventEnvelope
-          : EventEnvelopeFor<EventDescriptorByName<Names>>
-        : UnknownEventEnvelope;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L49)
-
-## EventSelectorReference (interface)
-
-**Signature**
-
-```ts
-export interface EventSelectorReference<Name extends EventName = EventName> {
-  readonly eventId: Name;
-  readonly version?: EventVersionByName<Name>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L9)
-
-## MatchEventSelector (interface)
-
-**Signature**
-
-```ts
-export interface MatchEventSelector<
-  Pattern extends string = string,
-  Names extends EventName = MatchingEventName<Pattern>,
-> {
-  readonly kind: "match";
-  readonly pattern: Pattern;
-  readonly __input?: [Names] extends [never]
-    ? UnknownEventEnvelope
-    : EventEnvelopeFor<EventDescriptorByName<Names>>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L26)
-
-## MatchingEventName (type alias)
-
-**Signature**
-
-```ts
-type never = {
-  [Name in EventName]: MatchSegments<Name, Pattern> extends true ? Name : never;
-}[EventName];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L60)
-
-## SingleEventSelector (interface)
-
-**Signature**
-
-```ts
-export interface SingleEventSelector<Name extends EventName = EventName> {
-  readonly kind: "single";
-  readonly event: EventSelectorReference<Name>;
-  readonly __input?: EventPayloadByName<Name>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selector-types.ts#L14)
-
-## `selectors.ts`
-
----
-
-## Exports Grouped by Category
-
-- [Events](#events)
-  - [events](#events-1)
-- [utils](#utils)
-  - [all](#all)
-  - [anyOf](#anyof)
-  - [assertEventPattern](#asserteventpattern)
-  - [assertEventSelector](#asserteventselector)
-  - [copyEventSelector](#copyeventselector)
-  - [isEventPattern](#iseventpattern)
-  - [isEventSelector](#iseventselector)
-  - [match](#match)
-  - [single](#single)
-
----
-
-# Events
-
-## events
-
-Builds typed selectors for one event, a list, a registry pattern, or every event.
-
-**Example**
-
-```ts
-import { events } from "@relkit/app/events";
-
-const orderEvents = events.match("orders.*");
-void orderEvents;
-```
-
-**Signature**
-
-```ts
-declare const events: Readonly<{
-  single: <const Name extends EventName>(name: Name) => SingleEventSelector<Name>;
-  anyOf: <const Names extends readonly [EventName, ...EventName[]]>(
-    ...names: Names
-  ) => AnyOfEventSelector<Names>;
-  match: <const Pattern extends string>(
-    pattern: Pattern,
-  ) => MatchEventSelector<Pattern, MatchingEventName<Pattern>>;
-  all: (options: {
-    readonly payload: "unknown";
-    readonly purpose?: AllEventPurpose;
-  }) => AllEventSelector;
-}>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L66)
-
-Since v0.1.0
-
-# utils
-
-## all
-
-**Signature**
-
-```ts
-declare const all: (options: {
-  readonly payload: "unknown";
-  readonly purpose?: AllEventPurpose;
-}) => AllEventSelector;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L38)
-
-## anyOf
-
-**Signature**
-
-```ts
-declare const anyOf: <const Names extends readonly [EventName, ...EventName[]]>(
-  ...names: Names
-) => AnyOfEventSelector<Names>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L19)
-
-## assertEventPattern
-
-**Signature**
-
-```ts
-declare const assertEventPattern: (value: unknown) => asserts value is string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L115)
-
-## assertEventSelector
-
-**Signature**
-
-```ts
-declare const assertEventSelector: (value: unknown) => asserts value is EventSelectorAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L87)
-
-## copyEventSelector
-
-**Signature**
-
-```ts
-declare const copyEventSelector: (value: EventSelectorAny) => EventSelectorAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L91)
-
-## isEventPattern
-
-**Signature**
-
-```ts
-declare const isEventPattern: (value: unknown) => value is string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L104)
-
-## isEventSelector
-
-**Signature**
-
-```ts
-declare const isEventSelector: (value: unknown) => value is EventSelectorAny;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L68)
-
-## match
-
-**Signature**
-
-```ts
-declare const match: <const Pattern extends string>(
-  pattern: Pattern,
-) => MatchEventSelector<Pattern, MatchingEventName<Pattern>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L31)
-
-## single
-
-**Signature**
-
-```ts
-declare const single: <const Name extends EventName>(name: Name) => SingleEventSelector<Name>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/selectors.ts#L14)

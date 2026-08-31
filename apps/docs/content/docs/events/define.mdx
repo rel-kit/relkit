@@ -1,0 +1,26 @@
+---
+title: Define an event
+description: Name an event and choose the data it carries.
+---
+
+## Define the event
+
+Use `defineEvent` to name an event and describe its data. In your app, create `src/orders/events/order-created.event.ts`:
+
+<include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
+  ../../templates/default/v1/api/src/orders/events/order-created.event.ts
+</include>
+
+- `id` uniquely names the event. Use this same name when publishing and consuming it.
+- `input` describes the data to send with the event.
+- `version` is optional and defaults to `1`.
+
+Here, each order event carries an order ID, product code, and total.
+
+## Check your event
+
+After adding the file, run this from your app's root:
+
+```sh
+bun run check
+```

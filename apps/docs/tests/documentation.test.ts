@@ -24,6 +24,8 @@ test("publishes authored, CLI, and application-facing API documentation", async 
     "schema",
     "functions",
     "services",
+    "drizzle",
+    "better-auth",
     "routes",
     "events",
     "jobs",
@@ -46,8 +48,10 @@ test("keeps guides backed by executable examples and self-hosted discovery", asy
   const events = await readFile(resolve(content, "async/events.mdx"), "utf8");
   const listeners = await readFile(resolve(content, "async/listeners.mdx"), "utf8");
   expect(routes).toContain("examples/commerce/src/routes/orders/[orderId]/route.ts");
-  expect(events).toContain("examples/commerce/src/orders/events/order-created.event.ts");
-  expect(listeners).toContain("examples/commerce/src/receipts/events/order-receipt.event.ts");
+  expect(events).toContain("templates/default/v1/api/src/orders/events/order-created.event.ts");
+  expect(listeners).toContain(
+    "templates/default/v1/api/src/orders/functions/order-confirmation.function.ts",
+  );
   expect(await Bun.file(resolve(import.meta.dir, "../app/api/search/route.ts")).text()).toContain(
     "createFromSource(source)",
   );
@@ -152,15 +156,27 @@ test("derives capability and related-guide content from the typed catalogs", asy
 });
 
 test("keeps learning guides focused and actionable", async () => {
+  const directories = new Set<string>(guideGroups.map(({ directory }) => directory));
   for (const { directory, pages } of guideGroups.filter(
     ({ directory }) => directory !== "operations",
   )) {
     for (const page of pages) {
+      if (directories.has(`${directory}/${page}`)) continue;
       const source = await readFile(resolve(content, directory, `${page}.mdx`), "utf8");
-      expect(source.split(/\s+/).length).toBeGreaterThan(250);
-      expect(source).toContain("<Steps>");
-      expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
-      expect(source).toContain(`content/generated/related/${directory}-${page}.mdx`);
+      expect(source).toMatch(/^---\ntitle: .+\ndescription: .+\n---/);
+      if (!["events", "storage", "caching", "ai"].includes(directory) || page !== "index") {
+        expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
+      }
+      const focusedGuide =
+        ["events", "storage", "caching", "ai"].includes(directory) ||
+        (directory === "async" && ["events", "listeners"].includes(page));
+      if (focusedGuide) {
+        expect(source).not.toContain("content/generated/related/");
+      } else {
+        expect(source).toContain(
+          `content/generated/related/${directory.replaceAll("/", "-")}-${page}.mdx`,
+        );
+      }
     }
   }
 });

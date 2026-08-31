@@ -1,0 +1,159 @@
+---
+title: Integrate Better Auth
+description: Share a Drizzle database with Better Auth, define and migrate authentication tables, mount its API, and keep auth data boundaries explicit.
+---
+
+Better Auth can use the application's existing [Drizzle database service](/docs/database/drizzle).
+Keep database connectivity and table definitions in the database domain, authentication configuration
+in the auth domain, and business operations in their owning services. Do not open a second connection
+or build a second database service just for authentication.
+
+This guide covers the database side of integration and the minimum route/session wiring needed to
+verify it. Continue with [Auth getting started](/docs/auth) for the architecture,
+[Better Auth setup](/docs/auth/better-auth) for service configuration, and
+[Clients](/docs/auth/clients) for sign-up, sign-in, and sign-out.
+
+## Understand the shared connection
+
+```text
+src/database/service.ts → activated native Drizzle client
+  ├─ RELKIT table clients → business functions via context.database
+  └─ Better Auth Drizzle adapter → auth handler and session lookup
+
+src/routes/api/auth/[[...auth]]/route.ts → auth.handler at /api/auth
+```
+
+RELKIT activates Drizzle before Better Auth and supplies the native client to Better Auth's Drizzle
+adapter. The adapter uses the database service's schema by default and derives its provider from the
+service dialect. You do not call `drizzleAdapter()` yourself in a RELKIT auth service.
+
+The current integration requires one Drizzle service, one Better Auth service, and one filesystem
+`ALL` route mounting the auth handler. It does not support selecting a second database for auth.
+
+## Add the authentication tables
+
+The executable `examples/auth-drizzle` application uses Better Auth `1.7.1` and the repository's pinned
+Drizzle version. Its table definitions are:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../examples/auth-drizzle/src/database/schema/index.ts
+</include>
+
+The singular export keys `user`, `session`, `account`, and `verification` match the adapter's default
+model names. Preserve required fields, nullability, key types, and timestamp/boolean mappings for your
+installed Better Auth version. This version's account model includes `issuer` and the compound
+`issuer`/`accountId` identity; do not substitute an older four-table example without comparing it.
+
+Add these table exports to the schema map already passed to `defineDrizzleService`. If you split them
+into `src/database/schema/auth.ts`, re-export them from the schema entry point used by both the service
+and Drizzle Kit. Do not replace existing business table exports or nest the auth tables under an `auth`
+property: the service needs direct table exports.
+
+The Users tutorial's `users` table is not Better Auth's `user` model. Its numeric ID and fields are
+different. Decide whether you are adding separate domain profiles referencing auth user IDs or migrating
+an existing identity model. Do not silently repurpose existing user records or their foreign keys.
+
+## Generate and apply the schema changes
+
+Use the same [Drizzle Kit workflow](/docs/database/migrations) as the rest of the database. With the
+configuration from that guide and an explicitly selected database, run from your app root:
+
+```sh
+export DATABASE_PATH=./data-model.sqlite
+bun --bun drizzle-kit generate --name=better-auth
+```
+
+Review and test the generated change, then run `bun --bun drizzle-kit migrate` before enabling the auth
+service. A table export registers a model; it does not create or update the physical table. Adding
+Better Auth does not cause RELKIT to generate or apply migrations automatically.
+
+Auth plugins and additional fields can require further tables, columns, and indexes. Keep the Better
+Auth configuration, Drizzle definitions, and migrations aligned. If you use Better Auth's own schema
+generator, its input must be a native Better Auth configuration supported by that tool: a RELKIT
+service descriptor is not the activated `betterAuth()` instance. Do not point an unrelated CLI at the
+descriptor and assume it can discover this integration.
+
+## Define the auth service
+
+From an app using the matching RELKIT release, install the integration if missing:
+
+```sh
+bun add @relkit/better-auth@0.0.5
+```
+
+The local showcase enables email/password authentication:
+
+<include cwd lang="ts" meta='title="src/auth/service.ts — local demonstration"'>
+  ../../examples/auth-drizzle/src/auth/service.ts
+</include>
+
+The service uses Better Auth's native `BETTER_AUTH_SECRET` process-environment lookup and has no
+hard-coded secret. Supply a strong, stable server secret before startup; configure `BETTER_AUTH_URL`
+and trusted origins for the real application. The loopback URL is a local default only. The integration
+does not accept an `({ env })` factory for auth options, and merely declaring a field in `defineEnv`
+does not inject it into native options or populate the process environment. See
+[Auth environment setup](/docs/auth/better-auth#define-the-service-and-environment).
+
+Do not set `database` or `basePath` on `defineBetterAuthService`: both are reserved. RELKIT supplies the
+database and derives the base path from the mounting route. Optional `drizzle` adapter settings can
+customize behavior such as schema mapping; `provider` remains derived from the database dialect.
+
+If you use custom model/field names, align Better Auth's naming configuration with the adapter's schema
+mapping. An optional `drizzle.schema` map changes what the adapter sees, not what the database service
+registers or what Kit migrates. Keep those definitions and table identities consistent.
+
+## Mount the API and read the session
+
+Create the filesystem catch-all route:
+
+<include cwd lang="ts" meta='title="src/routes/api/auth/[[...auth]]/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts
+</include>
+
+This mounts the API at `/api/auth` and protects the listed application paths. Authentication endpoints
+must remain reachable so a caller can sign in. Use the registered raw handler rather than wrapping it
+in a JSON business function; auth owns its response headers and cookies. See
+[Raw HTTP handlers](/docs/http/raw-handlers) for mounting rules.
+See [Protect routes](/docs/auth/protect-routes) for path matching, public auth endpoints, and permission checks.
+
+A business function can read the request's session:
+
+<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+</include>
+
+Matching a protected route requires authentication, not permission to every row. Enforce ownership,
+organization membership, and roles in the business operation. Work without an HTTP request, such as
+a job, must not assume there is a caller cookie session.
+
+## Keep auth writes inside the auth system
+
+Better Auth talks to the native Drizzle client. Its writes do not pass through RELKIT's portable CRUD
+methods, generated Zod parsers, or operation overrides. A `users.findOne` override cannot enforce
+Better Auth's account policy or session behavior.
+
+Conversely, generated CRUD access to auth tables does not make it safe to expose them. Let Better Auth
+own password hashing, account linking, token/session lifecycle, and authentication-specific updates.
+Do not publish generic read/write routes for account, session, or verification records; their rows
+can contain credentials and tokens. A `context.database.transaction` callback also does not automatically
+enlist a separate Better Auth API call in its transaction.
+
+## Verify before adding clients
+
+From the repository's `examples/auth-drizzle` directory:
+
+```sh
+bun run check
+bun run typecheck
+bun test tests/auth.test.ts
+```
+
+The showcase test migrates a temporary database and checks public/protected requests, sign-up, session
+lookup, sign-out and old-cookie rejection, invalid credentials, and sign-in. Follow [Auth testing](/docs/auth/testing)
+for the executable test and environment setup. It is a local wiring/migration check, not proof that
+your custom fields/plugins, browser cookies, production dialect, or deployment policy are correct.
+
+For setup failures, first check that the auth tables are in the service's schema map, the migration
+and app use the same database, and the catch-all route mounts the registered `auth.handler` exactly once.
+
+<include cwd>content/generated/related/database-better-auth.mdx</include>

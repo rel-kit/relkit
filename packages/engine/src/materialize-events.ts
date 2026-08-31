@@ -1,3 +1,4 @@
+import { invokeEventFunction } from "./event-invocation.js";
 import type { JsonValue, MaybePromise } from "@relkit/contracts";
 import type { UnknownEventEnvelope } from "@relkit/events";
 import type {
@@ -18,12 +19,13 @@ export interface EventTriggerBinding {
   readonly id: string;
   readonly source: EventTriggerRegistration["source"];
   readonly targetFunctionId: string;
-  readonly selector: JsonValue;
-  readonly expansion: EventTriggerConfig["expansion"];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: EventTriggerConfig["delivery"];
   readonly profile: string;
   readonly retry?: JsonValue;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
   readonly invoke: (
     envelope: UnknownEventEnvelope,
     options?: EventInvocationContext,
@@ -42,18 +44,21 @@ export type EventInvocationContext = Omit<
   | "traceId"
   | "deadlineMs"
   | "signal"
+  | "trigger"
 > & {
   readonly signal?: AbortSignal;
   readonly deadlineMs?: number;
+  readonly replayed?: boolean;
 };
 
 export type EventInvocationOptions = EventInvocationContext & {
   readonly functionId: string;
-  readonly input: UnknownEventEnvelope;
-  readonly source: "event";
+  readonly input: unknown;
+  readonly source: "event-delivery" | "event-replay";
   readonly parent?: InvocationParent;
   readonly correlationId?: string;
   readonly traceId: string;
+  readonly trigger: unknown;
 };
 
 export interface EventEngine {
@@ -88,36 +93,57 @@ export class EventMaterializationError extends TypeError {
 export async function materializeEvents(
   options: EventMaterializationOptions,
 ): Promise<MaterializedEvents> {
-  const functionIds = new Set(options.plan.functions.map(({ id }) => id));
+  const functions = new Map(options.plan.functions.map((node) => [node.id, node]));
   const triggers = new Map<string, EventTriggerBinding>();
   const providers = new Map<string, EventRuntimeProvider>();
 
   for (const registration of options.plan.eventTriggers) {
     if (triggers.has(registration.id))
       throw new EventMaterializationError(`Duplicate event trigger ${registration.id}.`);
-    if (!functionIds.has(registration.targetFunctionId))
+    if (!functions.has(registration.targetFunctionId))
       throw new EventMaterializationError(
         `Event trigger ${registration.id} targets unknown function ${registration.targetFunctionId}.`,
       );
+    if (functions.get(registration.targetFunctionId)?.invocationMode !== "event-only") {
+      throw new EventMaterializationError(
+        `Event trigger ${registration.id} must target an event-only function.`,
+      );
+    }
     const profile = registration.config.profile ?? "default";
     providers.set(profile, resolveProvider(profile, options));
-    const expansion = Object.freeze([...registration.config.expansion]);
     triggers.set(
       registration.id,
       Object.freeze({
         id: registration.id,
         source: registration.source,
         targetFunctionId: registration.targetFunctionId,
-        selector: registration.config.selector,
-        expansion,
+        eventId: registration.config.eventId,
+        eventVersion: registration.config.eventVersion,
         delivery: registration.config.delivery,
         profile,
         ...(registration.config.retry === undefined ? {} : { retry: registration.config.retry }),
         ...(registration.config.concurrency === undefined
           ? {}
           : { concurrency: registration.config.concurrency }),
-        invoke: (envelope: UnknownEventEnvelope, context: EventInvocationContext = {}) =>
-          invokeListener(registration.targetFunctionId, envelope, context, options.engine),
+        ...(registration.config.timeoutMs === undefined
+          ? {}
+          : { timeoutMs: registration.config.timeoutMs }),
+        invoke: (envelope: UnknownEventEnvelope, context: EventInvocationContext = {}) => {
+          if (
+            envelope.eventId !== registration.config.eventId ||
+            envelope.version !== registration.config.eventVersion
+          ) {
+            throw new EventMaterializationError(
+              `Event trigger ${registration.id} received the wrong event contract.`,
+            );
+          }
+          return invokeEventFunction(
+            registration.targetFunctionId,
+            envelope,
+            context,
+            options.engine,
+          );
+        },
       }),
     );
   }
@@ -169,32 +195,4 @@ function isEventRuntimeProvider(value: unknown): value is EventRuntimeProvider {
     typeof (value as EventRuntimeProvider).registerContract === "function" &&
     typeof (value as EventRuntimeProvider).registerTrigger === "function"
   );
-}
-
-function invokeListener(
-  functionId: string,
-  envelope: UnknownEventEnvelope,
-  context: EventInvocationContext,
-  engine: EventEngine,
-): Promise<unknown> {
-  const parent: InvocationParent | undefined = envelope.causationInvocationId
-    ? {
-        id: envelope.causationInvocationId,
-        traceId: envelope.traceId,
-        ...(envelope.correlationId === undefined ? {} : { correlationId: envelope.correlationId }),
-        ...(context.deadlineMs === undefined ? {} : { deadlineMs: context.deadlineMs }),
-        ...(context.signal === undefined ? {} : { signal: context.signal }),
-      }
-    : undefined;
-  return engine.invoke({
-    ...context,
-    functionId,
-    input: envelope,
-    source: "event",
-    ...(envelope.correlationId === undefined ? {} : { correlationId: envelope.correlationId }),
-    traceId: envelope.traceId,
-    ...(context.deadlineMs === undefined ? {} : { deadlineMs: context.deadlineMs }),
-    ...(context.signal === undefined ? {} : { signal: context.signal }),
-    ...(parent === undefined ? {} : { parent }),
-  });
 }

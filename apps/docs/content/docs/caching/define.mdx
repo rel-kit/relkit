@@ -1,0 +1,33 @@
+---
+title: Define a cache
+description: Choose your cache's keys, value shape, and default lifetime.
+---
+
+## Define the cache
+
+Use `defineCache` in your app's domain directory. Create `src/orders/cache/prices.cache.ts`:
+
+<include cwd lang="ts" meta='title="src/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/orders/cache/prices.cache.ts
+</include>
+
+- `id` is the cache's stable, unique name.
+- `key` describes how to identify a value. Here, `{ sku: "book" }` identifies one product's price.
+- `value` describes what to store: a non-negative integer price in cents.
+- `defaultTtlMs` is the lifetime in milliseconds when a write does not specify one. `60_000` means one minute.
+- `maxTtlMs` is the longest allowed lifetime. Requests above this limit are rejected, not shortened.
+- `profile` selects a cache configuration in `relkit.config.ts`. This example uses `"default"`.
+
+Both lifetime settings are optional. Set a default when data should expire; setting only `maxTtlMs` does not choose a lifetime for every write.
+
+## Check your cache
+
+Make sure your app has a `default` cache profile. The [tutorial's configuration step](/docs/caching/first-cache#configure-caching) shows how to add one.
+
+From your app's root, run:
+
+```sh
+bun run check
+```
+
+Next, [read and write values from a function](/docs/caching/read-write).

@@ -1,9 +1,9 @@
 {
   "appId": "full-app",
-  "contractVersion": 6,
+  "contractVersion": 7,
   "edges": [
     {
-      "from": "relkit.event.receipts.listener.handler",
+      "from": "receipts.listener",
       "kind": "enqueues-job",
       "to": "receipts.send-job"
     },
@@ -48,7 +48,7 @@
       "to": "orders.get"
     },
     {
-      "from": "receipts.listener",
+      "from": "relkit.event.receipts.listener.trigger",
       "kind": "listens-to-event",
       "to": "orders.created"
     },
@@ -70,16 +70,16 @@
       "to": "orders.get"
     },
     {
-      "from": "receipts.listener",
-      "kind": "targets-function",
-      "role": "primary",
-      "to": "relkit.event.receipts.listener.handler"
-    },
-    {
       "from": "receipts.send-job",
       "kind": "targets-function",
       "role": "primary",
       "to": "receipts.send"
+    },
+    {
+      "from": "relkit.event.receipts.listener.trigger",
+      "kind": "targets-function",
+      "role": "primary",
+      "to": "receipts.listener"
     },
     {
       "from": "orders.create",
@@ -114,14 +114,14 @@
       "to": "provider.models.default"
     },
     {
-      "from": "receipts.listener",
-      "kind": "uses-provider-profile",
-      "to": "provider.events.default"
-    },
-    {
       "from": "receipts.send-job",
       "kind": "uses-provider-profile",
       "to": "provider.jobs.default"
+    },
+    {
+      "from": "relkit.event.receipts.listener.trigger",
+      "kind": "uses-provider-profile",
+      "to": "provider.events.default"
     },
     {
       "from": "orders.support-agent",
@@ -314,8 +314,7 @@
       "domainId": "orders",
       "exposure": "public",
       "id": "orders.created",
-      "kind": "event",
-      "payload": {
+      "input": {
         "properties": {
           "orderId": {
             "type": "string"
@@ -330,6 +329,7 @@
         ],
         "type": "object"
       },
+      "kind": "event",
       "profile": "default",
       "sensitiveFields": null,
       "source": {
@@ -358,6 +358,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -370,6 +371,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 19,
         "file": "src/orders/functions/authorize.function.ts",
@@ -412,35 +414,6 @@
               }
             }
           }
-        },
-        "events": {
-          "orderCreated": {
-            "id": "orders.created",
-            "kind": "event",
-            "payload": {
-              "$relkit": "schema",
-              "jsonSchema": {
-                "properties": {
-                  "orderId": {
-                    "type": "string"
-                  },
-                  "sku": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "orderId",
-                  "sku"
-                ],
-                "type": "object"
-              }
-            },
-            "ref": {
-              "id": "orders.created",
-              "kind": "event"
-            },
-            "version": 1
-          }
         }
       },
       "domainId": "orders",
@@ -463,6 +436,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -479,10 +453,13 @@
         ],
         "type": "object"
       },
+      "publishes": [
+        "orders.created"
+      ],
       "source": {
         "column": 21,
         "file": "src/orders/functions/create-order.function.ts",
-        "line": 6
+        "line": 5
       },
       "timeoutMs": null
     },
@@ -505,6 +482,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -521,6 +499,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 18,
         "file": "src/orders/functions/get-order.function.ts",
@@ -567,6 +546,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -599,89 +579,13 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 23,
         "file": "src/orders/functions/handle-created.function.ts",
         "line": 4
       },
       "timeoutMs": null
-    },
-    {
-      "concurrency": null,
-      "dependencies": null,
-      "domainId": "receipts",
-      "errors": null,
-      "exposure": "public",
-      "generated": null,
-      "id": "receipts.send",
-      "input": {
-        "properties": {
-          "orderId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "orderId"
-        ],
-        "type": "object"
-      },
-      "kind": "function",
-      "output": {
-        "properties": {
-          "receiptId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "receiptId"
-        ],
-        "type": "object"
-      },
-      "source": {
-        "column": 21,
-        "file": "src/receipts/functions/send-receipt.function.ts",
-        "line": 4
-      },
-      "timeoutMs": null
-    },
-    {
-      "domainId": "orders",
-      "exposure": "internal",
-      "generated": {
-        "agentId": "orders.support-agent",
-        "functionId": "relkit.agent.orders.support-agent.invoke",
-        "generated": true,
-        "generatedBy": "agent"
-      },
-      "id": "relkit.agent.orders.support-agent.invoke",
-      "input": {
-        "properties": {
-          "question": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "question"
-        ],
-        "type": "object"
-      },
-      "kind": "function",
-      "output": {
-        "properties": {
-          "answer": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "answer"
-        ],
-        "type": "object"
-      },
-      "source": {
-        "column": 22,
-        "file": "src/orders/agents/order-support.agent.ts",
-        "line": 5
-      }
     },
     {
       "concurrency": null,
@@ -751,6 +655,7 @@
                   "type": "object"
                 }
               },
+              "invocationMode": "callable",
               "kind": "function",
               "output": {
                 "$relkit": "schema",
@@ -777,83 +682,116 @@
       "domainId": "receipts",
       "errors": null,
       "exposure": "internal",
-      "generated": {
-        "functionId": "relkit.event.receipts.listener.handler",
-        "generated": true,
-        "generatedBy": "event-listener",
-        "listenerId": "receipts.listener"
-      },
-      "id": "relkit.event.receipts.listener.handler",
+      "generated": null,
+      "id": "receipts.listener",
       "input": {
-        "additionalProperties": false,
         "properties": {
-          "attributes": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "causationInvocationId": {
+          "orderId": {
             "type": "string"
           },
-          "correlationId": {
+          "sku": {
             "type": "string"
-          },
-          "eventId": {
-            "const": "orders.created"
-          },
-          "instanceId": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "occurredAt": {
-            "type": "string"
-          },
-          "payload": {
-            "properties": {
-              "orderId": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "orderId",
-              "sku"
-            ],
-            "type": "object"
-          },
-          "publishedAt": {
-            "type": "string"
-          },
-          "traceId": {
-            "type": "string"
-          },
-          "version": {
-            "const": 1
           }
         },
         "required": [
-          "instanceId",
-          "eventId",
-          "version",
-          "payload",
-          "occurredAt",
-          "publishedAt",
-          "traceId",
-          "attributes"
+          "orderId",
+          "sku"
         ],
         "type": "object"
       },
+      "invocationMode": "event-only",
       "kind": "function",
-      "output": {},
+      "output": {
+        "x-relkit-void": true
+      },
+      "publishes": [],
       "source": {
         "column": 18,
-        "file": "src/receipts/events/order-listener.event.ts",
+        "file": "src/receipts/functions/order-listener.function.ts",
         "line": 4
       },
       "timeoutMs": null
+    },
+    {
+      "concurrency": null,
+      "dependencies": null,
+      "domainId": "receipts",
+      "errors": null,
+      "exposure": "public",
+      "generated": null,
+      "id": "receipts.send",
+      "input": {
+        "properties": {
+          "orderId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "orderId"
+        ],
+        "type": "object"
+      },
+      "invocationMode": "callable",
+      "kind": "function",
+      "output": {
+        "properties": {
+          "receiptId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "receiptId"
+        ],
+        "type": "object"
+      },
+      "publishes": [],
+      "source": {
+        "column": 21,
+        "file": "src/receipts/functions/send-receipt.function.ts",
+        "line": 4
+      },
+      "timeoutMs": null
+    },
+    {
+      "domainId": "orders",
+      "exposure": "internal",
+      "generated": {
+        "agentId": "orders.support-agent",
+        "functionId": "relkit.agent.orders.support-agent.invoke",
+        "generated": true,
+        "generatedBy": "agent"
+      },
+      "id": "relkit.agent.orders.support-agent.invoke",
+      "input": {
+        "properties": {
+          "question": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "invocationMode": "callable",
+      "kind": "function",
+      "output": {
+        "properties": {
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer"
+        ],
+        "type": "object"
+      },
+      "publishes": [],
+      "source": {
+        "column": 22,
+        "file": "src/orders/agents/order-support.agent.ts",
+        "line": 5
+      }
     },
     {
       "concurrency": null,
@@ -1178,11 +1116,9 @@
     },
     {
       "config": {
-        "concurrency": null,
         "delivery": "durable",
-        "expansion": [
-          "orders.created@1"
-        ],
+        "eventId": "orders.created",
+        "eventVersion": 1,
         "profile": "default",
         "retry": {
           "initialDelayMs": 1,
@@ -1190,23 +1126,17 @@
           "maxAttempts": 2,
           "maxDelayMs": 5,
           "multiplier": 2
-        },
-        "selector": {
-          "event": {
-            "eventId": "orders.created"
-          },
-          "kind": "single"
         }
       },
       "domainId": "receipts",
-      "id": "receipts.listener",
+      "id": "relkit.event.receipts.listener.trigger",
       "kind": "trigger",
       "source": {
         "column": 18,
-        "file": "src/receipts/events/order-listener.event.ts",
+        "file": "src/receipts/functions/order-listener.function.ts",
         "line": 4
       },
-      "targetFunctionId": "relkit.event.receipts.listener.handler",
+      "targetFunctionId": "receipts.listener",
       "triggerType": "event"
     }
   ]

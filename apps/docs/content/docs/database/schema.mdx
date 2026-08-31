@@ -1,0 +1,83 @@
+---
+title: Define the schema
+description: Model tables, defaults, primary and unique keys, relationships, and validation without confusing TypeScript declarations with applied database changes.
+---
+
+Write ordinary Drizzle tables in `src/database/schema/` and export them from its `index.ts`. The service's
+`schema` map determines which tables appear on `context.database`. You do not need a custom model file
+for every table: base operations are provided automatically.
+
+## Model columns and defaults
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts — users"'>
+  ../../examples/data-model/src/database/schema/index.ts#users-table
+</include>
+
+The exported key `users` becomes `context.database.users`; `sqliteTable("users", ...)` names the stored
+table. Column object keys are the names you use in filters and data, even if you explicitly choose
+different database column names.
+
+Here, `id` is an auto-incrementing primary key, `email` is non-null and unique, and `active` is a boolean
+mapped to SQLite's integer storage with a default of `true`. Defaults allow those values to be omitted
+from inserts. Nullable columns and optional insert fields are different concepts; review both the
+selected row type and insert type after changing a column.
+
+Use one dialect throughout the service. Its schema export map must contain the table objects directly,
+not nested namespace objects. Non-table exports do not become portable table clients.
+
+## Define identities the portable API can use
+
+Single-row operations require a complete primary or unique selector. The example's membership identity
+is a pair, not just an organization ID:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts — memberships"'>
+  ../../examples/data-model/src/database/schema/index.ts#memberships-table
+</include>
+
+You can select a membership by its `id`, or by both `organizationId` and `userId`. A non-unique index
+helps query performance but does not make a safe single-row selector. Nullable key values are rejected
+by the portable selector check even when the database column allows null.
+
+A keyless table requires explicit overrides for `findOne`, `update`, `upsert`, and `delete` before the
+service can be defined. Prefer a real row identity when possible. Partial or expression indexes require
+care: do not assume their uniqueness can be represented by the portable selector metadata. Inspect the
+checked service and use a dedicated operation when necessary.
+
+## Model relationships and constraints explicitly
+
+A field named `userId` is not automatically a foreign key. The membership example declares uniqueness
+but no foreign-key constraint. Add native Drizzle references, indexes, checks, and delete/update policies
+for your actual model, then apply matching migrations. With SQLite, also configure and test foreign-key
+enforcement on the connection; a relationship type alone is not enforcement.
+
+The portable client does not provide relation loading, joins, projections, or aggregation options.
+Use [custom models](/docs/database/models) with Drizzle's query builder for those queries. Keep database
+constraints for durable integrity and function validation for actionable caller errors; neither replaces
+authorization or tenant scoping.
+
+## Use generated validation deliberately
+
+The service creates `context.database.zodSchemas.<table>.select`, `.insert`, and `.update` from Drizzle's
+table definitions. Use `.parse()` or `.safeParse()` explicitly where needed. The base operation layer
+does not automatically run these Zod schemas around every read or write.
+
+A text column named `email` produces string validation, not an email-address business rule. Define
+the public function's input with the required business validation, and expose only the output fields
+callers should receive. Do not accept an entire insert shape from an untrusted caller if it includes
+server-owned IDs, roles, tenant IDs, or account flags.
+
+Continue with [Generated CRUD and schemas](/docs/database/generated-schemas) for the complete
+select/insert/update shapes, runtime parsing, and customization examples. Apply table changes through
+[Drizzle Kit migrations](/docs/database/migrations); changing this file alone does not alter stored data.
+
+The public utility types include `Row`, `InsertArgs`, `Update`, `UpdateArgs`, and `DatabaseContext`.
+Use the [Drizzle API reference](/docs/api/drizzle) for their exact shapes and
+[Schemas](/docs/fundamentals/schemas) for function contracts.
+
+## Apply a schema change in both places
+
+Edit the table source, generate and review the Drizzle Kit migration, apply it to an isolated database, and rerun
+the application checks and focused tests. Adding a column in TypeScript does not alter an existing
+table, and `bun run check` does not run migrations. Continue with [Migrations](/docs/database/migrations).
+
+<include cwd>content/generated/related/database-schema.mdx</include>

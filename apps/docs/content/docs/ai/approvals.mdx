@@ -1,0 +1,82 @@
+---
+title: Tool approvals
+description: Require a trusted decision before a tool performs a sensitive action.
+---
+
+Use approvals when a tool can do something the user should confirm, such as cancel an order or send a message. The model may propose the action; it must not approve itself.
+
+AI SDK documents a separate [needsApproval flow](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#tool-execution-approval). `needsApproval` is not a RelKit tool option; use the policies and invocation callbacks below.
+
+## Choose a policy
+
+`defineTool.approval` and `.asTool({ approval })` accept exactly three policy strings:
+
+The examples below are alternatives: choose the policy that fits each tool.
+
+| `approval` | Behavior                                                                       |
+| ---------- | ------------------------------------------------------------------------------ |
+| `never`    | No separate approval decision is required.                                     |
+| `on-write` | Require approval for `write` and `external` actions, but not `none` or `read`. |
+| `always`   | Require approval for every call, including reads.                              |
+
+Declare `sideEffect` accurately. A write incorrectly marked as a read can skip an intended `on-write` approval.
+
+### No approval for a read
+
+Use `never` when the operation may run without a separate confirmation:
+
+<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/src/hello/tools/lookup.tool.ts
+</include>
+
+### Approval for writes
+
+This `defineTool` example requires confirmation because its side effect is `write`:
+
+<include cwd lang="ts" meta='title="src/orders/tools/cancel-order.tool.ts"'>
+  ../../examples/commerce/tests/fixtures/cancel-order-with-approval.ts#approval-tool
+</include>
+
+It uses the existing order-deletion function. `mcp: false` keeps this approval-required tool out of MCP.
+
+### Approval on every call
+
+This order-cancellation tool requires approval on every call:
+
+<include cwd lang="ts" meta='title="src/orders/tools/cancel-order.tool.ts"'>
+  ../../examples/commerce/src/orders/tools/cancel-order.tool.ts
+</include>
+
+The function must still check whether the caller may cancel that order. Approval does not replace authorization.
+
+## Use an approval callback
+
+The tool's `approval` policy is not a function. The callback goes in the second argument of **`tool.invoke()`**, where your application supplies the decision for that call.
+
+The callback may return `true` or `"approved"` to allow execution, and `false` or `"denied"` to stop it. It may also return a Promise of any of those values. It receives `{ toolId, sideEffect, policy }`; capture the specific action's arguments from your calling code.
+
+### Wait for a trusted confirmation
+
+For the `on-write` tool above, call your own confirmation flow before cancelling:
+
+<include cwd lang="ts" meta='title="Calling cancelOrder with an asynchronous decision"'>
+  ../../examples/commerce/tests/fixtures/cancel-order-with-approval.ts#approval-callback
+</include>
+
+Your app supplies `confirm` from a trusted UI or approval service. Bind the decision to the authenticated user and this specific order; do not take approval from model-generated arguments or an unchecked request field. Setting the tool policy alone does not create a confirmation screen.
+
+### Test synchronous decisions
+
+These unit-test examples show every supported decision value. The unconditional callbacks are test stubs, not a production approval flow:
+
+<include cwd lang="ts" meta='title="tests/tool-approvals.test.ts — decision values"'>
+  ../../examples/commerce/tests/tool-approvals.test.ts#sync-approvals
+</include>
+
+A missing callback on an approval-required call fails with `RELKIT_APPROVAL_REQUIRED`; a denied decision fails with `RELKIT_APPROVAL_DENIED`. A callback that throws also stops execution. A callback is not called when the policy does not require approval.
+
+## Agent and MCP limitations
+
+The standard `context.agents` call does not currently accept a custom approval callback or offer a built-in confirmation-and-resume flow. Do not expect adding an approval policy to a tool to create that flow for an agent. The [agent test helper](/docs/api/testing) can supply scripted approvals for tests.
+
+Over [MCP](/docs/ai/mcp#protect-access), approval-required calls are currently rejected; there is no MCP approval-and-resume flow. Keep these tools out of MCP with `mcp: false` if clients cannot use them.

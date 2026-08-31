@@ -99,6 +99,7 @@ export interface StandaloneContextOptions<Context extends { readonly signal: Abo
   readonly time: PublicClock;
   readonly logger?: PublicLogger;
   readonly clients?: ManagedDependencySources;
+  readonly publishes: readonly string[];
 }
 
 export async function makeStandaloneContext<Context extends { readonly signal: AbortSignal }>(
@@ -118,6 +119,17 @@ export async function makeStandaloneContext<Context extends { readonly signal: A
       ? {}
       : { log: options.logger ?? createLocalStructuredLogger(options.record, options.time) }),
     ...(installManagedMaps ? createManagedMaps(options.clients) : {}),
+    events: configuredMap(
+      "events",
+      Object.fromEntries(
+        options.publishes.flatMap((id) => {
+          const source =
+            options.clients?.events ??
+            (base as { events?: Readonly<Record<string, unknown>> }).events;
+          return source !== undefined && Object.hasOwn(source, id) ? [[id, source[id]]] : [];
+        }),
+      ),
+    ),
   }) as Context;
 }
 

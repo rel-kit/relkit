@@ -17,21 +17,23 @@ export type EventEnvelope<
 export type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 
 export type EventEnvelopeFor<E> =
-  E extends EventDescriptor<infer Id, infer Version, infer Payload, StandardSchemaV1>
-    ? EventEnvelope<Id, Version, Payload>
+  E extends EventDescriptor<infer Id, infer Version, infer Input, StandardSchemaV1>
+    ? EventEnvelope<Id, Version, Input>
     : UnknownEventEnvelope;
 
 export interface EventDescriptor<
   Id extends string,
   Version extends number,
-  Payload,
-  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Input,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
 >
-  extends DescriptorBase<"event", Id>, EventRef<Id, PayloadSchema> {
+  extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
   readonly version: Version;
-  readonly payload: PayloadSchema;
+  readonly input: InputSchema;
   readonly sensitiveFields?: readonly string[];
-  readonly __payload?: Payload;
+  readonly handler?: never;
+  readonly output?: never;
+  readonly __input?: Input;
 }
 
 export type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
@@ -39,23 +41,25 @@ export type EventDescriptorAny = EventDescriptor<string, number, unknown, Standa
 export interface DefineEventOptions<
   Id extends string,
   Version extends number,
-  PayloadSchema extends StandardSchemaV1,
+  InputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
   readonly id: Id;
-  readonly version: Version;
-  readonly payload: PayloadSchema;
+  readonly version?: Version;
+  readonly input: InputSchema;
   readonly sensitiveFields?: readonly string[];
+  readonly handler?: never;
+  readonly output?: never;
 }
 
 /**
- * Defines a versioned event contract used by publishers and typed listeners.
+ * Defines a versioned event contract used by publishers and event functions.
  *
  * @example
  * ```ts
  * import { defineEvent } from "@relkit/app/events"
  * import { z } from "@relkit/app/schema"
  *
- * const created = defineEvent({ id: "orders.created", version: 1, payload: z.object({ orderId: z.string() }) })
+ * const created = defineEvent({ id: "orders.created", input: z.object({ orderId: z.string() }) })
  * void created
  * ```
  * @category Events
@@ -63,30 +67,37 @@ export interface DefineEventOptions<
  */
 export function defineEvent<
   const Id extends string,
-  const Version extends number,
-  const PayloadSchema extends StandardSchemaV1,
+  const Version extends number = 1,
+  const InputSchema extends StandardSchemaV1 = StandardSchemaV1,
 >(
-  options: DefineEventOptions<Id, Version, PayloadSchema>,
-): EventDescriptor<Id, Version, InferOutput<PayloadSchema>, PayloadSchema> {
+  options: DefineEventOptions<Id, Version, InputSchema>,
+): EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema> {
   if (!isRecord(options)) throw new TypeError("Event options must be an object");
   if (hasOwn(options, "handler")) throw new TypeError("Events cannot own handlers");
-  if (!isSchema(options.payload))
-    throw new TypeError("Event payload must be a Standard Schema v1 validator");
-  validateVersion(options.version);
+  if (hasOwn(options, "output")) throw new TypeError("Events cannot own outputs");
+  if (!isSchema(options.input))
+    throw new TypeError("Event input must be a Standard Schema v1 validator");
+  const version = options.version ?? 1;
+  validateVersion(version);
   const sensitiveFields = copySensitiveFields(options.sensitiveFields);
   const base = createDescriptorBase("event", options.id, options);
 
   return deepFreeze({
     ...base,
-    version: options.version,
-    payload: options.payload,
+    version,
+    input: options.input,
     ...(sensitiveFields === undefined ? {} : { sensitiveFields }),
-  }) as EventDescriptor<Id, Version, InferOutput<PayloadSchema>, PayloadSchema>;
+  }) as EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 }
 
 export function isEventDescriptor(value: unknown): value is EventDescriptorAny {
   if (!isDescriptor(value, "event") || !isRecord(value)) return false;
-  return isSchema(value.payload) && isPositiveInteger(value.version);
+  return (
+    isSchema(value.input) &&
+    isPositiveInteger(value.version) &&
+    !hasOwn(value, "handler") &&
+    !hasOwn(value, "output")
+  );
 }
 
 export function assertEventDescriptor(value: unknown): asserts value is EventDescriptorAny {

@@ -1,13 +1,18 @@
 {
-  "title": "HTTP",
+  "title": "HTTP Routes",
+  "icon": "Globe",
   "pages": [
+    "index",
+    "define",
     "routes",
     "requests",
     "uploads",
     "middleware",
     "rate-limits",
     "responses",
+    "raw-handlers",
     "openapi",
-    "generated-clients"
+    "generated-clients",
+    "first-route"
   ]
 }

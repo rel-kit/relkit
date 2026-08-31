@@ -59,10 +59,10 @@ const sendReceipt = defineJob({
   target: lookup,
   retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
 });
-const orderCreated = defineEvent({
+export const orderCreated = defineEvent({
   id: "types.inference-event",
   version: 1,
-  payload: z.object({ orderId: z.string() }),
+  input: z.object({ orderId: z.string() }),
 });
 const receiptBucket = defineBucket({ id: "types.inference-bucket", visibility: "private" });
 const prices = defineCache({
@@ -73,7 +73,6 @@ const prices = defineCache({
 
 const dependencies = {
   jobs: { sendReceipt },
-  events: { orderCreated },
   buckets: { receiptBucket },
   cache: { prices },
 } satisfies FunctionDependencies;
@@ -83,6 +82,7 @@ const createOrder = defineFunction({
   input: z.object({ orderId: z.string(), sku: z.string() }),
   output: z.object({ totalCents: z.number() }),
   dependencies,
+  publishes: ["types.inference-event"],
   handler: async (input, context) => {
     const lookupResult: InferOutput<typeof lookup.output> = await lookup.invoke({
       rawId: input.orderId,
@@ -90,7 +90,7 @@ const createOrder = defineFunction({
     const price: number | undefined = await context.cache.prices.get({ sku: input.sku });
     const produced = await context.cache.prices.getOrSet({ sku: input.sku }, () => 100);
     await context.cache.prices.set({ sku: input.sku }, produced);
-    await context.events.orderCreated.publish({ orderId: input.orderId });
+    await context.events["types.inference-event"].publish({ orderId: input.orderId });
     await context.jobs.sendReceipt.enqueue({ rawId: input.orderId });
     await context.buckets.receiptBucket.put("orders/1.json", new Uint8Array());
     const names: readonly string[] = await context.buckets.receiptBucket.list();

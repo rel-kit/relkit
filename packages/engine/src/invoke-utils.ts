@@ -34,13 +34,18 @@ export {
 export function resolveTarget<Input, Output, Context extends { readonly signal: AbortSignal }>(
   options: InvokeOptions<Input, Output, Context>,
 ): InvocationTarget<Input, Output, Context> {
-  if (options.target !== undefined) return options.target;
+  if (options.target !== undefined) {
+    const registered = options.registry?.targets[getDescriptorIdentity(options.target)];
+    return (registered ?? options.target) as InvocationTarget<Input, Output, Context>;
+  }
   if (options.registry === undefined || options.functionId === undefined) {
     throw new TypeError("Invocation target is required");
   }
   const handler = options.registry.get(options.functionId);
   if (handler === undefined)
     throw new TypeError(`Function handler is not registered: ${options.functionId}`);
+  const target = options.registry.targets[options.functionId];
+  if (target !== undefined) return target as unknown as InvocationTarget<Input, Output, Context>;
   return {
     id: options.functionId,
     input: options.inputSchema ?? unknownSchema,
@@ -54,6 +59,13 @@ export function canonicalTarget<Input, Output, Context extends { readonly signal
   target: InvocationTarget<Input, Output, Context>,
 ): InvocationTarget<Input, Output, Context> {
   const id = getDescriptorIdentity(target);
+  for (const [eventId, event] of Object.entries(target.publications ?? {})) {
+    if (!target.publishes?.includes(eventId) || (event.ref?.id ?? event.id) !== eventId) {
+      throw new TypeError(
+        `Function "${id}" has an undeclared publication "${eventId}"; declare its exact ID in publishes.`,
+      );
+    }
+  }
   return target.id === id ? target : { ...target, id };
 }
 

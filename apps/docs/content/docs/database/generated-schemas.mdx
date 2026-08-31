@@ -1,0 +1,99 @@
+---
+title: Generated CRUD and schemas
+description: Learn what RELKIT derives from each Drizzle table, how select/insert/update validation differs, and how to customize public contracts safely.
+---
+
+You do not write a repository class or three duplicate validation schemas for every table.
+`defineDrizzleService` inspects each table in its `schema` map and derives both a typed CRUD client
+and Zod schemas. This also works for tables without a `defineModel` extension.
+
+## One table, several generated contracts
+
+The example's Users table is the source:
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts — users"'>
+  ../../examples/data-model/src/database/schema/index.ts#users-table
+</include>
+
+The schema export key `users` determines both `context.database.users` and
+`context.database.zodSchemas.users`. Each has a different job:
+
+| Surface                                                             | Shape for this table                                                    | When to use it                       |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------ |
+| `users.findOne`, `findMany`, `insert`, `update`, `upsert`, `delete` | Typed arguments and row results derived from the table                  | [Query data](/docs/database/queries) |
+| `zodSchemas.users.select`                                           | `{ id: number, email: string, active: boolean }`                        | Validate a complete selected row     |
+| `zodSchemas.users.insert`                                           | Required `email`; optional `id` and `active` because they have defaults | Validate the `data` of an insert     |
+| `zodSchemas.users.update`                                           | Optional fields for a partial update                                    | Validate the `data` of an update     |
+
+RELKIT uses Drizzle's `createSelectSchema`, `createInsertSchema`, and `createUpdateSchema`
+from `drizzle-orm/zod`. The schemas describe row data, not the complete CRUD argument wrapper.
+Parse the data object, then pass it as `{ data }`; do not parse `{ where, data }` with an update schema.
+
+A default makes a field optional on insert; it does not make the selected field optional. Here the
+database supplies the ID and active flag when omitted. Parsing the insert does not allocate an ID
+or insert a row. Nullable columns remain nullable according to their table definition, and a unique
+column is not checked for existing duplicates by Zod.
+
+## Use the generated insert schema in a workflow
+
+The member-registration function first validates its business input, then validates the row it builds:
+
+<include cwd lang="ts" meta='title="src/users/functions/register-member.function.ts"'>
+  ../../examples/data-model/src/users/functions/register-member.function.ts
+</include>
+
+The function's input requires an email address and an organization identifier. It does not let a caller
+supply a user ID, membership role, or active flag. The generated insert schema checks the persistence
+shape; the transaction creates both records. Read [Transactions](/docs/database/transactions) for
+the commit and rollback behavior.
+
+This is a data-workflow example for trusted internal callers, not an authorization implementation.
+Verify the caller's permission to add members before exposing it through HTTP, tools, or other clients.
+
+## Validate updates and selected rows
+
+<include cwd lang="ts" meta='title="src/users/functions/update-user-email.function.ts"'>
+  ../../examples/data-model/src/users/functions/update-user-email.function.ts
+</include>
+
+The update schema accepts a partial data object. The unique selector stays in `where`, and the
+operation may return `null` for a missing user. Only after checking that result does the function
+parse a full selected row. Its public output deliberately returns just the identifier and email.
+
+An update schema is not an allowlist for editable fields and does not enforce a nonempty patch.
+Construct data from approved fields, require the desired fields in the public input, and check
+authorization independently. These example write functions are registered on the service but are
+not mounted as public write routes.
+
+## Customize validation at the right boundary
+
+The generated schemas capture database types, nullability, and defaults; they do not infer product rules
+from column names. A text column called `email` accepts strings, not necessarily email addresses.
+The examples add `z.string().email()` to the function input for that reason.
+
+Use `.parse()` to throw on invalid data or `.safeParse()` to handle a validation result explicitly.
+You can apply `.refine()` to a generated schema for an additional runtime rule. There is no
+`zodSchemas` override option on `defineDrizzleService`; do not mutate the generated schema registry.
+
+The context exposes these values as typed `ZodType` instances, not a public `ZodObject` API.
+Do not assume object-specific methods such as `.pick()`, `.omit()`, or `.extend()` are available
+on their declared type. For a separately customized table-derived object schema, use the pinned
+Drizzle version's `createInsertSchema(table)` (or select/update counterpart) in the database domain.
+Keep public function contracts explicit rather than importing another domain's private table files.
+See [Schemas](/docs/fundamentals/schemas) for declaring those contracts.
+
+## Know what validation does not do
+
+The base CRUD layer does not automatically run these Zod schemas for every operation. TypeScript types
+help during development, but untrusted runtime input still needs explicit validation. Functions validate
+their declared input/output through RELKIT; that is separate from database schema parsing.
+
+Generated schemas do not enforce row ownership, tenant access, referential integrity, database
+uniqueness, or transaction isolation. Keep durable constraints in the database and business rules in
+functions. Custom models and overrides must preserve the checks their behavior requires.
+
+When the schema changes, update public contracts as needed, regenerate application types, generate and
+apply a migration, and verify both accepted and rejected input. None of these steps automatically
+replaces the others.
+
+<include cwd>content/generated/related/database-generated-schemas.mdx</include>

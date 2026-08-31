@@ -44,7 +44,9 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         options.onSignal,
       ),
     ),
-    Effect.flatMap((value) => validateOutput(options.target.output, value)),
+    Effect.flatMap((value) =>
+      validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+    ),
     Effect.flatMap((output) =>
       invokeValue(
         options.target.onAfter,
@@ -54,7 +56,9 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         options.onSignal,
       ),
     ),
-    Effect.flatMap((value) => validateOutput(options.target.output, value)),
+    Effect.flatMap((value) =>
+      validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+    ),
   );
 }
 
@@ -107,9 +111,14 @@ function invokeValue<Context extends { readonly signal: AbortSignal }>(
 function validateOutput(
   schema: StandardSchemaV1,
   value: unknown,
+  eventOnly = false,
 ): Effect.Effect<unknown, InvocationFailure> {
   return Effect.tryPromise({
-    try: () => validated(schema, value, "output"),
+    try: async () => {
+      if (eventOnly && value !== undefined)
+        throw new TypeError("Event-only functions must return void on success");
+      return validated(schema, value, "output");
+    },
     catch: (cause) => normalizeFailure(cause),
   });
 }

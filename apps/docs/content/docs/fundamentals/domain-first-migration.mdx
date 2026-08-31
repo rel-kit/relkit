@@ -72,6 +72,10 @@ The compiler reports legacy roots, missing or duplicate services, orphan
 descriptors, invalid domain IDs, and cross-domain boundary imports with source
 locations. There are no compatibility aliases or automatic migrations.
 
+For the current workflow, use [Database](/docs/database) for service setup,
+[custom models](/docs/database/models) for extensions, and
+[database migrations](/docs/database/migrations) for applying schema changes safely.
+
 Run `bun run check` after each domain move, then run type checking and focused
 tests once all route imports point at services. Commit generated graph and
 manifest updates only after diagnostics are clean, so review diffs describe the

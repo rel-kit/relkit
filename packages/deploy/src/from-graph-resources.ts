@@ -17,7 +17,7 @@ export function events(context: PlanContext) {
         iam("events", event.id, context.graph.edges),
       ),
       version: event.version,
-      payload: event.payload,
+      input: event.input,
     }))
     .sort(byLogical);
 }
@@ -45,10 +45,12 @@ export function eventTriggers(context: PlanContext) {
           config.delivery === "durable" ? iam("jobs", node.id, context.graph.edges) : [],
         ),
         targetFunctionId: node.targetFunctionId,
-        expansion: [...config.expansion].sort(),
+        eventId: config.eventId,
+        eventVersion: config.eventVersion,
         delivery: config.delivery,
         ...(defined(config.retry) ? { retry: config.retry } : {}),
         ...(defined(config.concurrency) ? { concurrency: config.concurrency } : {}),
+        ...(defined(config.timeoutMs) ? { timeoutMs: config.timeoutMs } : {}),
       };
     })
     .sort(byLogical);

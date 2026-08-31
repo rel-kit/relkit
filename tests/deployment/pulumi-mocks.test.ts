@@ -107,8 +107,8 @@ test("executes the generated plan with stable capability mappings and secret-saf
     visibilityTimeoutSeconds: 60,
   });
   expect(
-    resourceMatching(seen, "aws:cloudwatch/eventRule:EventRule", ({ name }) =>
-      name.includes("orders-created"),
+    resourceMatching(seen, "aws:cloudwatch/eventRule:EventRule", ({ inputs }) =>
+      String(inputs.eventPattern).includes("orders.created"),
     ).inputs,
   ).toMatchObject({ eventPattern: expect.any(String) });
   expect(resource(seen, "aws:s3/bucket:Bucket").inputs).toMatchObject({ acl: "private" });
@@ -188,7 +188,8 @@ test("maps AWS resources with parents, tags, security rules, and secret injectio
         {
           id: "orders.listener",
           targetFunctionId: "orders.handle",
-          expansion: ["orders.created@1"],
+          eventId: "orders.created",
+          eventVersion: 1,
           retry: {
             maxAttempts: 3,
             initialDelayMs: 100,

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { defineEvent, events, onEvent } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineAgent } from "../../packages/agents/src/index.ts";
 import { defineBucket } from "../../packages/buckets/src/index.ts";
@@ -135,16 +134,12 @@ describe("compiler semantic validation", () => {
     );
   });
 
-  test("validates raw selectors and provider capabilities without static function cycles", () => {
+  test("validates provider capabilities without static function cycles", () => {
     const target = defineFunction({
       id: "events.target",
       input,
       output,
       handler: async () => ({ ok: true }),
-    });
-    const trigger = onEvent(events.all({ payload: "unknown" }), async () => ({ ok: true }), {
-      id: "events.all",
-      delivery: "ephemeral",
     });
     const app = {
       kind: "app",
@@ -167,11 +162,9 @@ describe("compiler semantic validation", () => {
       value: z.string(),
     };
     const result = normalizeCompilation({
-      descriptors: [app, cache, target, trigger],
+      descriptors: [app, cache, target],
     });
-    expect(codes(result)).toEqual(
-      expect.arrayContaining([NORMALIZE_CODES.wildcard, NORMALIZE_CODES.providerProfile]),
-    );
+    expect(codes(result)).toEqual(expect.arrayContaining([NORMALIZE_CODES.providerProfile]));
   });
 
   test("rejects multiple bucket descriptors owning one profile", () => {
@@ -253,95 +246,6 @@ describe("compiler semantic validation", () => {
       kind: "uses-provider-profile",
       from: "assets",
       to: "provider.buckets.assets",
-    });
-  });
-
-  test("uses match expansion for typed envelopes and warns on restricted raw all", () => {
-    const createdPayload = z.object({ orderId: z.string() });
-    const updatedPayload = z.object({ orderId: z.string(), state: z.string() });
-    const created = defineEvent({
-      id: "orders.created",
-      version: 1,
-      payload: createdPayload,
-    });
-    const updated = defineEvent({
-      id: "orders.updated",
-      version: 2,
-      payload: updatedPayload,
-    });
-    const envelope = <
-      const Id extends string,
-      const Version extends number,
-      const Payload extends StandardSchemaV1,
-    >(
-      eventId: Id,
-      version: Version,
-      payload: Payload,
-    ) =>
-      z.object({
-        instanceId: z.string(),
-        eventId: z.literal(eventId),
-        version: z.literal(version),
-        payload,
-        occurredAt: z.string(),
-        publishedAt: z.string(),
-        traceId: z.string(),
-        attributes: z.object({}),
-      });
-    const typedTarget = defineFunction({
-      id: "orders.typed-target",
-      input: z.union([
-        envelope("orders.created", 1, createdPayload),
-        envelope("orders.updated", 2, updatedPayload),
-      ]),
-      output,
-      handler: async () => ({ ok: true }),
-    });
-    const matchTrigger = onEvent(events.match("orders.*"), async () => ({ ok: true }), {
-      id: "orders.match",
-    });
-    const anyTrigger = onEvent(
-      events.anyOf("orders.updated" as never, "orders.created" as never),
-      async () => ({ ok: true }),
-      { id: "orders.any" },
-    );
-    const rawTarget = defineFunction({
-      id: "orders.telemetry-target",
-      input: z.object({
-        instanceId: z.string(),
-        eventId: z.string(),
-        version: z.number(),
-        payload: z.unknown(),
-        occurredAt: z.string(),
-        publishedAt: z.string(),
-        traceId: z.string(),
-        attributes: z.object({}),
-      }),
-      output,
-      handler: async () => ({ ok: true }),
-    });
-    const rawTrigger = onEvent(
-      events.all({ payload: "unknown", purpose: "telemetry" }),
-      async () => ({ ok: true }),
-      { id: "orders.telemetry", delivery: "ephemeral" },
-    );
-    const result = normalizeCompilation({
-      descriptors: [created, updated, typedTarget, matchTrigger, anyTrigger, rawTarget, rawTrigger],
-    });
-
-    expect(codes(result)).not.toContain(NORMALIZE_CODES.eventTarget);
-    expect(result.graph?.nodes.find((node) => node.id === "orders.match")).toMatchObject({
-      config: { expansion: ["orders.created@1", "orders.updated@2"] },
-    });
-    expect(result.graph?.nodes.find((node) => node.id === "orders.any")).toMatchObject({
-      config: { expansion: ["orders.created@1", "orders.updated@2"] },
-    });
-    expect(
-      result.diagnostics.find((diagnostic) => diagnostic.code === NORMALIZE_CODES.wildcard),
-    ).toMatchObject({
-      code: NORMALIZE_CODES.wildcard,
-      severity: "warning",
-      message: "Raw all-event selector is restricted to telemetry.",
     });
   });
 });

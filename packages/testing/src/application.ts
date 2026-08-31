@@ -15,6 +15,7 @@ import { type TestFakes } from "./fakes.js";
 import { loadTestRoutes } from "./application-routes.js";
 import { handleTestRequest } from "./application-http.js";
 import { activateTestServices } from "./application-services.js";
+import { loadTestRegistry } from "./application-registry.js";
 
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
@@ -49,11 +50,13 @@ export async function createTestApplication(
   options: TestApplicationOptions = {},
 ): Promise<TestApplication> {
   const projectRoot = options.projectRoot ?? process.cwd();
+  const registry = options.registry ?? (await loadTestRegistry(projectRoot));
   const routes = await loadTestRoutes(projectRoot);
   const context: Record<string, unknown> = {};
   const runtime = createTestRuntime({
     app: app as NonNullable<TestRuntimeOptions["app"]>,
     ...options,
+    ...(registry === undefined ? {} : { registry }),
     context,
   });
   const services = await activateTestServices(projectRoot, runtime.env, routes);

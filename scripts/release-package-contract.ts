@@ -46,7 +46,7 @@ export function expectedExports(directoryName: string): Record<string, unknown> 
         import: "./dist/internal/config.js",
       },
     };
-  if (directoryName === "drizzle")
+  if (directoryName === "drizzle" || directoryName === "functions")
     return {
       ".": rootExport,
       "./internal": {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { defineEvent, events, onEvent } from "../../packages/events/src/index.ts";
+import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineService } from "../../packages/services/src/index.ts";
 import { defineRoute, defineTransform, http } from "../../packages/routes/src/index.ts";
@@ -57,13 +57,13 @@ describe("compiler graph construction", () => {
       request: http.input({ id: http.transform(transform, http.path("id")) }),
       responses: [http.success(200, output)],
     });
-    const first = defineEvent({ id: "orders.created", version: 1, payload: input });
-    const second = defineEvent({ id: "orders.updated", version: 2, payload: input });
-    const listener = onEvent(
-      events.anyOf("orders.updated" as never, "orders.created" as never),
-      async () => ({ ok: true }),
-      { id: "orders.listener" },
-    );
+    const first = defineEvent({ id: "orders.created", version: 1, input: input });
+    const second = defineEvent({ id: "orders.updated", version: 2, input: input });
+    const listener = defineEventFunction({
+      id: "orders.listener",
+      event: "orders.created" as never,
+      handler: async () => {},
+    });
     const service = defineService({
       id: "orders",
       title: "Orders",
@@ -116,7 +116,7 @@ describe("compiler graph construction", () => {
       expect.arrayContaining(["route", "event-trigger", "transform"]),
     );
     const routeNode = nodes.find((node) => node.id === "orders.route");
-    const listenerNode = nodes.find((node) => node.id === "orders.listener");
+    const listenerNode = nodes.find((node) => node.id === "relkit.event.orders.listener.trigger");
     expect(routeNode).toMatchObject({ kind: "trigger", triggerType: "http" });
     expect(listenerNode).toMatchObject({ kind: "trigger", triggerType: "event" });
     expect(nodes).toEqual(
@@ -141,10 +141,7 @@ describe("compiler graph construction", () => {
     expect(
       (routeNode?.config as { middleware: unknown[]; transforms: unknown[] }).transforms,
     ).toEqual([expect.objectContaining({ id: "orders.normalize" })]);
-    expect((listenerNode?.config as { expansion: readonly string[] }).expansion).toEqual([
-      "orders.created@1",
-      "orders.updated@2",
-    ]);
+    expect(listenerNode?.config).toMatchObject({ eventId: "orders.created", eventVersion: 1 });
     const serviceNode = nodes.find((node) => node.id === "orders" && node.kind === "service");
     expect(serviceNode).toMatchObject({
       title: "Orders",
@@ -170,12 +167,15 @@ describe("compiler graph construction", () => {
         },
         {
           kind: "targets-function",
-          from: "orders.listener",
-          to: "relkit.event.orders.listener.handler",
+          from: "relkit.event.orders.listener.trigger",
+          to: "orders.listener",
           role: "primary",
         },
-        { kind: "listens-to-event", from: "orders.listener", to: "orders.created" },
-        { kind: "listens-to-event", from: "orders.listener", to: "orders.updated" },
+        {
+          kind: "listens-to-event",
+          from: "relkit.event.orders.listener.trigger",
+          to: "orders.created",
+        },
         { kind: "uses-cache", from: "orders.get", to: "prices" },
         { kind: "uses-hook", from: "orders.get", to: "orders.get.before", phase: "before" },
         { kind: "uses-hook", from: "orders.get", to: "orders.get.after", phase: "after" },

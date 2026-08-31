@@ -84,15 +84,17 @@ export interface ScheduleDeploymentPlan extends DeploymentCapabilityPlan {
 
 export interface EventDeploymentPlan extends DeploymentCapabilityPlan {
   readonly version: number;
-  readonly payload: JsonValue;
+  readonly input: JsonValue;
 }
 
 export interface EventTriggerDeploymentPlan extends DeploymentCapabilityPlan {
   readonly targetFunctionId: string;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly delivery: "ephemeral" | "durable";
   readonly retry?: JsonValue;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 
 export interface BucketDeploymentPlan extends DeploymentCapabilityPlan {

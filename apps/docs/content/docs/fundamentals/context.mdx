@@ -4,9 +4,9 @@ description: Use scoped resource clients, logging, cancellation, identity, and t
 ---
 
 The second function-handler parameter is the invocation context for exactly one call. It carries bounded
-capabilities and metadata assembled from the checked graph. The available clients are inferred from the
-function's declared dependencies, so a handler cannot silently access an undeclared bucket, cache, job, or
-event provider.
+capabilities and metadata assembled from the checked graph. Resource clients are inferred from the
+function's declared dependencies; event publication access comes from `publishes`. A handler cannot
+silently access an undeclared bucket, cache, job, or event publication capability.
 
 ## Read context in a real handler
 
@@ -18,21 +18,34 @@ event provider.
   ../../examples/commerce/src/orders/functions/create-order.function.ts
 </include>
 
-This function uses a typed cache, publishes an event, and enqueues a job only because those dependencies are
-declared on the descriptor. The same context shape is supplied whether HTTP, a job, an event listener, a
+This function declares a cache in `dependencies.cache` and an event ID in `publishes`. Its context provides
+the typed cache client and that event's publication client. The same context shape is supplied whether HTTP, a job, an event listener, a
 tool, an agent, or direct invocation reaches the function.
 
 ## What context contains
 
-| Area                   | Use it for                                                                      | Do not use it for                                            |
-| ---------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `log`                  | Structured records automatically correlated with the invocation                 | Secrets, full request bodies, or ad hoc string concatenation |
-| `signal` and deadline  | Cancelling provider calls and stopping work that can no longer finish           | Ignoring cancellation while starting new side effects        |
-| `time`                 | Testable current time and delay behavior                                        | `Date.now()` scattered through business logic                |
-| Invocation identifiers | Correlation, causation, trace, source, and attempt analysis                     | Domain IDs that should live in validated input               |
-| Resource clients       | Bucket, cache, event, job, model, auth, or data access declared by the function | Importing provider SDK singletons directly                   |
-| Request view           | Optional transport metadata when the caller is HTTP                             | Making reusable domain behavior require an HTTP request      |
-| Service context        | Immutable values added by service middleware                                    | Mutating shared global state                                 |
+| Area                   | Use it for                                                                        | Do not use it for                                            |
+| ---------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `log`                  | Structured records automatically correlated with the invocation                   | Secrets, full request bodies, or ad hoc string concatenation |
+| `signal` and deadline  | Cancelling provider calls and stopping work that can no longer finish             | Ignoring cancellation while starting new side effects        |
+| `time`                 | Testable current time and delay behavior                                          | `Date.now()` scattered through business logic                |
+| Invocation identifiers | Correlation, causation, trace, source, and attempt analysis                       | Domain IDs that should live in validated input               |
+| Resource clients       | Declared bucket, cache, job, and agent clients, plus authorized event publication | Importing provider SDK singletons directly                   |
+| `database`             | Typed table operations from the application's Drizzle service                     | Treating database access as row-level authorization          |
+| `auth`                 | Request-bound session lookup from the registered auth integration                 | Assuming a session grants permission to every record         |
+| Request view           | Optional transport metadata when the caller is HTTP                               | Making reusable domain behavior require an HTTP request      |
+
+There is no `context.service` or service middleware API. [Services](/docs/service/define) select public
+functions and events; they do not inject context values.
+
+The specialized [Database service](/docs/database) is different: the compiler generates its context
+types and the runtime activates its client. Functions use `context.database` without declaring
+`dependencies.database`. See [database setup](/docs/database/define) and
+[custom models](/docs/database/models) for this integration.
+
+The specialized [Auth service](/docs/auth) similarly supplies `context.auth.getSession()` without a
+`dependencies.auth` entry. See [Sessions](/docs/auth/sessions) for nullable identity, request-scoped
+lookup, generated types, and non-HTTP behavior.
 
 ## Add a dependency safely
 
@@ -46,8 +59,8 @@ tool, an agent, or direct invocation reaches the function.
   <Step>
     ### Declare function access
 
-    Add the descriptor under the matching `dependencies` key. The property name becomes the typed context
-    client name, so choose a domain-readable name.
+    Add the resource descriptor under the matching `dependencies` key. The property name becomes the typed
+    context client name. For event publication, list exact event IDs in `publishes` instead.
 
   </Step>
   <Step>

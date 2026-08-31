@@ -41,8 +41,8 @@ export function EventDetailClient() {
           <p className="eyebrow">ACTIVE WORKSPACE</p>
           <h1>Event detail</h1>
           <p className="lede">
-            Event listeners are generic triggers. The active graph has no application-owned resource
-            for them.
+            Event consumers are authored event-only functions connected through exact-event
+            triggers.
           </p>
         </div>
         <span className="badge">

@@ -1,5 +1,6 @@
 import {
   createInvocationCallStack,
+  assertInvocationMode,
   currentInvocationScope,
   normalizeFailure,
   runInInvocationScope,
@@ -65,6 +66,7 @@ export async function invoke<
   const target = canonicalTarget(resolveTarget(options));
   const source = options.source ?? "direct";
   assertSource(source);
+  assertInvocationMode(target, source);
   const now = options.now?.() ?? Date.now();
   const deadlineMs = calculateDeadline(target.timeoutMs, options, options.parent?.deadlineMs, now);
   const idSource = options.idSource ?? defaultIdSource;

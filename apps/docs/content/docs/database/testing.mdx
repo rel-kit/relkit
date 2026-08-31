@@ -1,0 +1,79 @@
+---
+title: Testing
+description: Activate an isolated database, test portable and custom operations, verify migrations, and avoid cached-connection and environment surprises.
+---
+
+Test data behavior against an isolated database with the actual schema. Portable method mocks are useful
+for narrow business tests, but they do not prove constraints, query semantics, rollback, or driver behavior.
+Never point a test at a production connection or an existing developer database by default.
+
+## Activate and close a service explicitly
+
+`activateDrizzleService(service, env)` returns `{ client, context, close }`. `client` is the native Drizzle
+client, `context` is the portable database API, and `close()` invokes the service's disposal hook.
+Direct activation takes resolved environment values; it does not parse your environment contract for you.
+
+The executable data-model test uses SQLite in memory and applies the generated Drizzle migration to
+that same connection before making queries. The application service does not create tables:
+
+<include cwd lang="ts" meta='title="tests/data-model.test.ts"'>
+  ../../examples/data-model/tests/data-model.test.ts
+</include>
+
+Run it from the example or application root:
+
+```sh
+bun test tests/data-model.test.ts
+```
+
+It checks generated validation, all six CRUD operations, custom methods, override scope, composite
+selectors, pagination limits, and rollback. It also invokes the actual member-registration and email-change
+functions with an injected database context, testing both their generated schemas and public input
+validation. `finally` closes the database even when an assertion fails.
+
+## Isolate activation lifetimes
+
+Repeated activation of the same descriptor object shares one cached activation. Changing the environment
+on a later call does not create a different database, and closing it does not currently remove the cache.
+Use one shared lifetime deliberately, a fresh descriptor for each independent test, or process isolation.
+Do not close the shared descriptor after one test and expect a second activation to reopen it.
+
+An in-memory SQLite database belongs to its connection, not to the whole test suite or development server.
+A test that inserts a row does not seed a separately running application. For persistence and restart
+tests, use an explicit temporary file and close all connections before cleaning up that test-owned path.
+
+## Test migrations separately
+
+The migration regression test launches Drizzle Kit twice against a temporary file and inserts rows
+through Drizzle between runs. A successful repeat verifies that the initial migration is not applied
+again and that the existing rows remain:
+
+<include cwd lang="ts" meta='title="tests/migrations.test.ts"'>
+  ../../examples/data-model/tests/migrations.test.ts
+</include>
+
+```sh
+bun test tests/migrations.test.ts
+```
+
+Add upgrade fixtures for existing data, constraints, and backfills as migrations accumulate. A bootstrap
+test on an empty database is not a replacement for testing upgrades from deployed schema versions.
+
+## Choose the right application harness
+
+`createTestApplication` discovers the Drizzle service and activates its real client factory with the test
+environment. Set an isolated temporary path explicitly, migrate that file before starting the harness,
+and close the application afterward. The environment name alone does not make a custom database factory safe.
+For an in-memory database, migrations must run on the harness's actual connection; a separate process
+or another in-memory connection cannot initialize it. Direct activation as shown above gives the test
+control over that client.
+
+A standalone `invokeFunction` test does not automatically discover and activate the app's Drizzle service.
+Provide a database context through its context hook, or use the application harness when you need service
+discovery and HTTP together. See [Testing](/docs/operations/testing) and the [Testing API](/docs/api/testing).
+
+Run additional contract tests on the production dialect for transaction isolation, concurrent writes,
+native model methods, and MySQL row recovery. The repository-backed database tutorial tests SQLite; it
+does not claim PostgreSQL or MySQL behavior was exercised by those tests.
+
+<include cwd>content/generated/related/database-testing.mdx</include>

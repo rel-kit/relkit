@@ -1,0 +1,53 @@
+---
+title: Define a tool
+description: Let a model call an existing function with a clear description and execution policy.
+---
+
+A tool is an action an AI client can ask your app to perform. Use `defineTool` to name the action, explain when to use it, and point it at an existing function.
+
+## Define the input and output
+
+Declare `input` and `output` on the function the tool will call:
+
+<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/agent/src/hello/functions/hello.function.ts
+</include>
+
+Here, the tool will accept `{ "name": "Ada" }` and return `{ "message": "Hello, Ada!" }`. Input defaults and validation come from the same function schemas.
+
+## Define the tool
+
+This tool calls the [greeting function](/docs/ai/function-tools#define-the-function). Save it under your domain's `tools` directory:
+
+<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/tests/fixtures/lookup.tool.ts
+</include>
+
+`defineTool` has no separate `input` or `output` options: it inherits both from `target`. You do not repeat the schemas in the tool definition. To expose a different input or output, define a function with those schemas and use it as the target.
+
+The [AI SDK tool() reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool) uses a different API, including `inputSchema` and `execute`. Those are not `defineTool` options. Use the [RelKit tool reference](/docs/api/tools#definetool) for the supported fields, and the [AI SDK tool-calling guide](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling) for the broader concepts.
+
+Give the tool a stable `id` and a specific `description`: explain what it does, when to use it, and what it returns. “Look up an order by ID” is more useful than “Handle orders.”
+
+If you prefer to start from the function, [`hello.asTool(...)`](/docs/ai/function-tools) creates the same kind of tool. Choose one form for each tool.
+
+## Describe the action accurately
+
+| `sideEffect` | Use it for                                                 |
+| ------------ | ---------------------------------------------------------- |
+| `none`       | A calculation that does not read or change external state. |
+| `read`       | Reading data without changing it.                          |
+| `write`      | Changing application data.                                 |
+| `external`   | An external action, such as sending a message.             |
+
+`approval` is also required. Use `never` for an operation that may run without a separate decision, `on-write` to require approval for `write` and `external`, or `always` to require approval on every call. See [tool approvals](/docs/ai/approvals) before exposing sensitive actions.
+
+The `approval` option on `defineTool` is a policy string, not a function. For a custom decision, pass a synchronous or asynchronous callback to [`tool.invoke(input, { approval })`](/docs/ai/approvals#use-an-approval-callback).
+
+Set `timeoutMs` to limit how long the tool can run. It is optional in the tool API, but the current [MCP runtime requires an explicit value](/docs/ai/mcp#choose-which-tools-to-expose). Check permissions inside the target function even for read-only tools.
+
+## Make the tool available
+
+Add the tool to an [agent's `tools` array](/docs/ai/agents) to let that agent call it.
+
+Tools are also available through [MCP](/docs/ai/mcp) by default. Set `mcp: false` in the tool options to keep a tool out of MCP; it can still be used by your RelKit agents.

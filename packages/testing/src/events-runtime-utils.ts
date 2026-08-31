@@ -16,7 +16,7 @@ export function toEnvelope(value: Record<string, unknown>): UnknownEventEnvelope
 }
 
 export function createEventInvoker(
-  targets: ReadonlyMap<string, InvocationTarget<UnknownEventEnvelope, unknown>>,
+  targets: ReadonlyMap<string, InvocationTarget<unknown, unknown>>,
   options: TestEventOptions<unknown, unknown>,
   now: () => number,
   runner: InvocationRunner,
@@ -28,7 +28,9 @@ export function createEventInvoker(
     return invoke({
       target,
       input: request.input,
-      source: "event",
+      source: request.source,
+      trigger: request.trigger,
+      ...(request.attempt === undefined ? {} : { attempt: request.attempt }),
       traceId: request.traceId,
       ...(request.parent === undefined ? {} : { parent: request.parent }),
       ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
@@ -48,17 +50,9 @@ export async function fanoutEvent(
   router: EventRouter,
   envelope: UnknownEventEnvelope,
   unfanned: Map<string, UnknownEventEnvelope>,
-  ephemeralCompleted: Map<string, number>,
   failures: TestFailureControls,
 ): Promise<void> {
-  const result = await router.route(envelope, { run: false });
+  await router.route(envelope, { run: false });
   unfanned.delete(envelope.instanceId);
-  for (const delivery of result.deliveries) {
-    if (delivery.delivery === "ephemeral" && delivery.status === "completed")
-      ephemeralCompleted.set(
-        delivery.triggerId,
-        (ephemeralCompleted.get(delivery.triggerId) ?? 0) + 1,
-      );
-  }
   failures.check("event.after-fan-out");
 }

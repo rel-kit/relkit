@@ -4,6 +4,7 @@ import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { Hono } from "../../../packages/inspector-api/node_modules/hono/dist/index.js";
 import { z } from "../../../packages/schema/src/index.ts";
+import { defineEventFunction } from "../../../packages/events/src/index.ts";
 import { defineAgent } from "../../../packages/agents/src/index.ts";
 import {
   type InvocationContextOptions,
@@ -100,7 +101,9 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
     flowRecords.some((record) => record.signal === "invocation" && record.source === "job"),
   ).toBe(true);
   expect(
-    flowRecords.some((record) => record.signal === "invocation" && record.source === "event"),
+    flowRecords.some(
+      (record) => record.signal === "invocation" && record.source === "event-delivery",
+    ),
   ).toBe(true);
   expect(flowRecords.some((record) => record.signal === "request")).toBe(true);
 
@@ -260,10 +263,13 @@ async function runEvent(collector: ObservabilityCollector): Promise<void> {
       cookie: z.string(),
       OPENAI_API_KEY: z.string(),
     }),
-    target: {
-      ...flowTarget("security.event-handler"),
-      input: z.unknown(),
-    },
+    target: defineEventFunction({
+      id: "security.event-handler",
+      event: "security.event" as never,
+      handler: async (input, context) => {
+        await flowTarget("security.event-handler").handler(input, context);
+      },
+    }),
     retry,
     hooks: hooks(collector),
   });

@@ -1,0 +1,28 @@
+---
+title: Upload files
+description: Give a function bucket access and save uploaded files.
+---
+
+## Save files from a function
+
+Import your [bucket](/docs/storage/define) and add it to `dependencies.buckets`. The name `assets` makes it available as `context.buckets.assets`.
+
+This function accepts a primary image and attachments, writes their bytes, and returns their keys:
+
+<include cwd lang="ts" meta='title="src/assets/functions/upload-assets.function.ts"'>
+  ../../examples/commerce/src/assets/functions/upload-assets.function.ts
+</include>
+
+`put()` takes a key, a `Uint8Array`, and optional settings such as `contentType` and `metadata`. Await it before reporting a successful upload.
+
+## Choose keys safely
+
+This example uses filenames as keys. Uploading `cover.png` again replaces the existing file. In a multi-user app, generate keys on the server—for example, `users/<user-id>/<random-id>.png`—and save the original display name separately.
+
+Authorize uploads before writing. A declared content type does not prove a file is safe; inspect its contents when your app requires it.
+
+## Connect an upload endpoint
+
+Use a route with `accept: "multipart/form-data"`. The [image-upload tutorial](/docs/storage/first-upload) includes the service, route, and curl request.
+
+The HTTP body limit covers the whole request; file-schema and bucket limits apply to individual files. Keep uploads below all applicable limits. See [HTTP uploads](/docs/http/uploads) for request validation details.

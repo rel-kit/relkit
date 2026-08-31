@@ -1,6 +1,6 @@
 {
   "appId": "inferred-app",
-  "contractVersion": 6,
+  "contractVersion": 7,
   "edges": [
     {
       "from": "orders.get-order",
@@ -209,6 +209,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -221,6 +222,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 19,
         "file": "src/files/functions/read-files.function.ts",
@@ -240,6 +242,7 @@
         "properties": {},
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -256,6 +259,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 16,
         "file": "src/health/functions/health.function.ts",
@@ -282,6 +286,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -294,6 +299,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 19,
         "file": "src/orders/functions/authorize.function.ts",
@@ -355,6 +361,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -371,6 +378,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 18,
         "file": "src/orders/functions/get-order.function.ts",
@@ -392,6 +400,7 @@
         "properties": {},
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -408,6 +417,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 16,
         "file": "src/orders/agents/support.agent.ts",

@@ -16,12 +16,22 @@ export type EventDeliveryCapabilities = typeof EVENT_DELIVERY_CAPABILITIES;
 
 export type EventDeliveryBoundary = JobStoreBoundary | "handler-success-before-ack";
 
+export interface EventDeliveryInvocationOptions {
+  readonly attempt: number;
+  readonly replayed: boolean;
+  readonly timeoutMs?: number;
+}
+
 export interface EventDeliveryBinding {
   readonly id: string;
-  readonly invoke: (envelope: UnknownEventEnvelope) => Promise<unknown>;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 
 export interface EventDeliveryOptions {

@@ -6,17 +6,9 @@ import usersModel from "./models/users.model.js";
 
 export default defineDrizzleService({
   schema,
-  client: ({ env }) => {
-    const sqlite = new Database(env.DATABASE_PATH);
-    sqlite.exec(
-      "create table if not exists users (id integer primary key autoincrement, email text not null unique, active integer not null default 1)",
-    );
-    sqlite.exec(
-      "create table if not exists memberships (id integer primary key autoincrement, organizationId text not null, userId integer not null, role text not null, unique (organizationId, userId))",
-    );
-    return drizzle({ client: sqlite });
-  },
+  client: ({ env }) => drizzle({ client: new Database(env.DATABASE_PATH) }),
   models: { users: usersModel },
+  // #region user-overrides
   overrides: {
     users: {
       findOne: async ({ args, base }) => {
@@ -25,5 +17,6 @@ export default defineDrizzleService({
       },
     },
   },
+  // #endregion user-overrides
   dispose: (database) => database.$client.close(),
 });

@@ -20,7 +20,8 @@ describe("local event router", () => {
     });
     await router.registerTrigger({
       id: "orders.ok",
-      expansion: ["orders.created@1"],
+      eventId: "orders.created",
+      eventVersion: 1,
       delivery: "durable",
       invoke: async () => {
         calls.push("ok");
@@ -28,7 +29,8 @@ describe("local event router", () => {
     });
     await router.registerTrigger({
       id: "orders.invoke-fails",
-      expansion: ["orders.created@1"],
+      eventId: "orders.created",
+      eventVersion: 1,
       delivery: "durable",
       invoke: async () => {
         calls.push("invoke-fails");
@@ -37,7 +39,8 @@ describe("local event router", () => {
     });
     await router.registerTrigger({
       id: "orders.persist-fails",
-      expansion: ["orders.created@1"],
+      eventId: "orders.created",
+      eventVersion: 1,
       delivery: "durable",
       invoke: async () => {
         calls.push("persist-fails");
@@ -45,7 +48,8 @@ describe("local event router", () => {
     });
     await router.registerTrigger({
       id: "orders.other-version",
-      expansion: ["orders.created@2"],
+      eventId: "orders.created",
+      eventVersion: 2,
       delivery: "durable",
       invoke: async () => {
         calls.push("other-version");

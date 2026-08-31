@@ -1,0 +1,75 @@
+---
+title: Getting started
+description: Understand authentication, sessions, and authorization, and decide where each responsibility belongs in a RELKIT application.
+---
+
+Authentication establishes who is calling your application. A session lets that caller make subsequent
+requests without entering credentials again. Authorization decides what that identity may do: read an
+order, join an organization, or change another user's settings. Signing in does not grant those permissions.
+
+Keep these concepts separate from the authentication library you choose. An auth service owns identity
+and session integration; business domains own permission checks and product behavior. Your routes and
+clients connect those responsibilities without becoming a second authentication system.
+
+## Organize authentication by responsibility
+
+| What you need to add                          | Where it belongs                                                      | Continue with                                                                                       |
+| --------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Sign-in methods, session policy, auth plugins | `src/auth/service.ts`, using the chosen integration                   | [Better Auth service](/docs/auth/better-auth)                                                       |
+| Auth tables, connection, schema changes       | The existing database domain and migration tooling                    | [Database integration](/docs/database/better-auth)                                                  |
+| Public authentication endpoints               | A filesystem route under `src/routes/`                                | [Protect routes](/docs/auth/protect-routes)                                                         |
+| The current caller in a business operation    | The owning domain's function                                          | [Read sessions](/docs/auth/sessions)                                                                |
+| Ownership, roles, organization access         | The business operation that reads or changes the resource             | [Authorization boundaries](/docs/auth/protect-routes#enforce-permissions-in-the-business-operation) |
+| Sign-up forms and sign-in state               | Your frontend and auth client's public configuration                  | [Clients](/docs/auth/clients)                                                                       |
+| Background work on behalf of a user           | The owning job/function, with an explicit trusted identity and policy | [Sessions outside HTTP](/docs/auth/sessions#work-without-an-http-request)                           |
+
+This separation keeps identity plumbing out of every domain. Changing an auth provider's settings does
+not require moving Orders functions; changing an Orders permission rule does not require rewriting the
+login route. See [Service organization](/docs/service/organization) for the wider application layout.
+
+## Understand the request boundary
+
+```text
+Browser → auth endpoint → authentication service → persisted identity/session
+Browser → application endpoint → session check → business function → permission check → data
+```
+
+The auth endpoint owns credential validation and session cookies. Application endpoints either allow
+anonymous callers or require a session. A business function uses the verified identity to enforce its
+own rules. Never treat an arbitrary input field, header, or client-side “logged in” flag as verified identity.
+
+Public service functions can also be called outside HTTP. Protecting a route does not secure every job,
+tool, or direct invocation of the same function. Put the permission decision at the operation boundary
+and explicitly define which trusted non-HTTP callers may invoke it.
+
+## Choose the current integration
+
+[Better Auth](/docs/auth/better-auth) is the supported auth service integration today. It uses the
+application's [Drizzle service](/docs/database/drizzle), mounts a native HTTP handler, and supplies
+`context.auth.getSession()` to application functions. Other auth libraries do not gain this wiring just
+because their file is named `service.ts`; these guides do not promise a universal provider API.
+
+The getting-started concepts apply generally. Better Auth options, cookie behavior, plugins, and table
+requirements belong to the integration guides. For a complete local flow, follow
+[Your first auth flow](/docs/auth/first-auth).
+
+After changing service or route registration, run from your app root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+These check discovery and types, not real credentials, schema migrations, or browser cookie behavior.
+
+## Find the guide for your task
+
+- Configure the integration and secrets: [Better Auth service](/docs/auth/better-auth).
+- Read a nullable, request-bound identity: [Sessions](/docs/auth/sessions).
+- Require authentication and enforce permissions: [Protect routes](/docs/auth/protect-routes).
+- Build sign-up, sign-in, and sign-out flows: [Clients](/docs/auth/clients).
+- Add providers, plugins, fields, and production policy: [Customize authentication](/docs/auth/customization).
+- Verify sessions and failure cases: [Testing](/docs/auth/testing).
+- Add authentication to an existing app: [Your first auth flow](/docs/auth/first-auth).
+
+<include cwd>content/generated/related/auth-index.mdx</include>

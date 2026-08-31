@@ -15,15 +15,23 @@ type FunctionCallOptions<
   InputSchema extends StandardSchemaV1,
   OutputSchema extends StandardSchemaV1,
   Dependencies extends FunctionDependencies,
+  Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[],
 > = Omit<
-  DefineFunctionOptions<Id, InputSchema, OutputSchema, Dependencies, readonly ErrorDescriptorAny[]>,
+  DefineFunctionOptions<
+    Id,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    readonly ErrorDescriptorAny[],
+    Publishes
+  >,
   "handler" | "onBefore" | "onAfter"
 > & {
-  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies>;
-  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies>;
+  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, Publishes>;
+  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, Publishes>;
   readonly handler: (
     input: InferOutput<InputSchema>,
-    context: FunctionContext<Dependencies>,
+    context: FunctionContext<Dependencies, Publishes>,
   ) => unknown;
 };
 
@@ -58,9 +66,11 @@ export interface DefineFunction {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}>,
+    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
+    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes> =
+      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -73,7 +83,8 @@ export interface DefineFunction {
     ErrorListOf<Options>,
     InputSchema,
     OutputSchema,
-    ToolMetadataOf<Options>
+    ToolMetadataOf<Options>,
+    Publishes
   >;
 
   <
@@ -81,9 +92,16 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies>,
+    const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
+    const Options extends FunctionCallOptions<
+      Id,
+      InputSchema,
+      OutputSchema,
+      Dependencies,
+      Publishes
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): FunctionDescriptor<
@@ -94,6 +112,7 @@ export interface DefineFunction {
     ErrorListOf<Options>,
     InputSchema,
     OutputSchema,
-    ToolMetadataOf<Options>
+    ToolMetadataOf<Options>,
+    Publishes
   >;
 }

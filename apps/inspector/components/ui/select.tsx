@@ -36,7 +36,9 @@ export function SelectField({ label, items, value, onChange }: ChoiceFieldProps)
     >
       <Label className="text-xs font-semibold">{label}</Label>
       <Button className="flex h-9 items-center justify-between rounded-lg border border-[var(--line)] bg-[var(--panel)] px-3 text-sm outline-none focus:border-[var(--accent)]">
-        <SelectValue />
+        <SelectValue className="font-medium">
+          {({ selectedText, defaultChildren }) => selectedText || defaultChildren}
+        </SelectValue>
         <ChevronDown aria-hidden="true" className="size-4 text-[var(--muted)]" />
       </Button>
       <ChoicePopover items={items} />

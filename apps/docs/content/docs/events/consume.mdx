@@ -1,0 +1,24 @@
+---
+title: Consume an event
+description: Run your code when an event is published.
+---
+
+## Create a subscriber
+
+Use `defineEventFunction` to run work when an event is published. After [defining `orders.created`](/docs/events/define), create `src/orders/functions/order-confirmation.function.ts`:
+
+<include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/order-confirmation.function.ts
+</include>
+
+- `id` uniquely names this function.
+- `event` is the exact ID of the event to consume.
+- `handler` receives the event data. This example logs a confirmation; replace the log with your own work, such as sending an email.
+
+Run `bun run check` from your app's root. RelKit runs the handler when `orders.created` is published; you do not call it yourself.
+
+Use `defineFunction` when the caller needs a result, such as the created order. Use `defineEventFunction` for a reaction that runs separately, without returning a result to the publisher.
+
+## Add another subscriber
+
+To run multiple reactions, add another event function with a different `id` and the same `event`.

@@ -1,11 +1,16 @@
 ---
 title: Create an application
-description: Verify the local toolchain, generate a credential-free orders API, and understand every file you receive.
+description: Generate a local-only API, understand its domain-first layout, and prepare to run your first route.
 ---
 
-This guide creates `relkit-orders`, the application used throughout the documentation. It uses the `api`
-template but explicitly disables cloud provisioning and deployment, so the complete Start journey runs
-without AWS credentials, Pulumi, or paid resources.
+This guide creates `relkit-orders`, the local application used in the Start guides. It uses the `api`
+template with Hello, Echo, and Orders domains and skips deployment prerequisites during generation.
+No Start command provisions cloud resources: you need no AWS credentials, Pulumi, or paid resources.
+
+You will create the app here, [run and add a route](/docs/start/first-route), then learn the
+[local development loop](/docs/start/local-development). After that, [Service](/docs/service) explains
+the architecture and the capability guides show how to extend your own application. Their examples
+may come from other repository applications; they are not all generated into this starter.
 
 ## Before you start
 
@@ -54,6 +59,10 @@ Expected output is `1.3.10`. If another version is active, switch before generat
     credentials. `check` compiles descriptors and writes the checked graph and diagnostics under
     `.relkit/generated`. Both commands must exit `0`.
 
+    `--cloud none --deploy none` skips deployment prerequisites; it does not remove the template's
+    optional AWS/Pulumi configuration. That declaration does not provision anything. Do not run
+    deployment commands as part of this local exercise.
+
   </Step>
 </Steps>
 
@@ -84,11 +93,11 @@ Expected output is `1.3.10`. If another version is active, switch before generat
       <Folder name="functions">
         <File name="create-order.function.ts" />
         <File name="price-order.function.ts" />
+        <File name="order-confirmation.function.ts" />
+        <File name="order-audit.function.ts" />
       </Folder>
       <Folder name="events">
         <File name="order-created.event.ts" />
-        <File name="order-confirmation.event.ts" />
-        <File name="order-audit.event.ts" />
       </Folder>
     </Folder>
     <Folder name="routes" defaultOpen>
@@ -114,8 +123,9 @@ Expected output is `1.3.10`. If another version is active, switch before generat
 - `relkit.config.ts` declares environment contracts, providers, server settings, and deployment choices.
 - `.env.example` documents safe local defaults; `.env` is your ignored runtime copy. Do not commit secrets.
 - `src/hello`, `src/echo`, and `src/orders` are domains. Each domain has one `service.ts` boundary and
-  keeps its functions, events, errors, and other owned artifacts beneath that domain.
-- `src/routes` maps filesystem paths and HTTP method exports to function targets.
+  keeps its functions, events, errors, and other owned artifacts beneath that domain. The service
+  selects the operations other code may consume; it is not a second copy of the handlers.
+- `src/routes` maps filesystem paths and HTTP method exports to public service operations.
 - `src/platform` contains shared infrastructure configuration such as the environment contract.
 - `tests/unit` invokes functions directly; `tests/integration` uses the in-process HTTP application.
 - `tsconfig.json` maps `@app/*` to `src/*`. Import application modules as
@@ -123,7 +133,15 @@ Expected output is `1.3.10`. If another version is active, switch before generat
 - `.relkit/generated`, `.relkit/build`, `.relkit/state`, and `.relkit/observability` are derived or runtime
   directories. Do not edit them by hand.
 
+For the architecture behind this layout, start with [Service](/docs/service). Learn
+[what a domain owns](/docs/service/domains) and [where to add each kind of code](/docs/service/organization)
+before expanding the app with more capabilities.
+
 ## Generator options
+
+The `api` template is the path followed here. Choose `minimal` for a smaller starting point or `agent`
+for the AI starter; use the matching capability tutorial after generation. The flags below describe
+available choices, not additional setup steps required for this local app.
 
 <include cwd>content/generated/create-options.mdx</include>
 

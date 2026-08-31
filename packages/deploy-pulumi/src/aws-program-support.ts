@@ -27,9 +27,11 @@ export function eventTriggerDefinition(
   return {
     id: trigger.id,
     targetFunctionId: trigger.targetFunctionId,
-    expansion: trigger.expansion,
+    eventId: trigger.eventId,
+    eventVersion: trigger.eventVersion,
     ...(trigger.retry === undefined ? {} : { retry: retryPolicy(trigger.retry) }),
     ...(trigger.concurrency === undefined ? {} : { concurrency: trigger.concurrency }),
+    ...(trigger.timeoutMs === undefined ? {} : { timeoutMs: trigger.timeoutMs }),
   };
 }
 

@@ -1,66 +1,78 @@
 ---
 title: File-system routes
-description: Turn route.ts files and named method exports into deterministic HTTP operations.
+description: Choose URLs, dynamic segments, method exports, matching precedence, and stable operation identities.
 ---
 
-Every `src/routes/**/route.ts` file defines a URL path. Named exports define methods. You do not repeat
-`path` or `method` inside `defineRoute`.
+Every `src/routes/**/route.ts` file defines a URL path. Named exports define its HTTP methods.
+The domain directory does not supply a URL prefix: `/uploads` can call the Assets service, and
+several paths can call the same public function. See [Define a route](/docs/http/define) for the factories.
 
-## Path conventions
+## Choose a path
 
-| File                                    | Runtime path               | Matching input             |
-| --------------------------------------- | -------------------------- | -------------------------- |
-| `src/routes/route.ts`                   | `/`                        | none                       |
-| `src/routes/orders/route.ts`            | `/orders`                  | none                       |
-| `src/routes/orders/[orderId]/route.ts`  | `/orders/:orderId`         | `orderId: string`          |
-| `src/routes/files/[...parts]/route.ts`  | `/files/*parts`            | `parts: readonly string[]` |
-| `src/routes/docs/[[...parts]]/route.ts` | `/docs` and `/docs/*parts` | optional segment array     |
+| File                                    | Route pattern              | Matching input                                 |
+| --------------------------------------- | -------------------------- | ---------------------------------------------- |
+| `src/routes/route.ts`                   | `/`                        | None                                           |
+| `src/routes/orders/route.ts`            | `/orders`                  | None                                           |
+| `src/routes/orders/[orderId]/route.ts`  | `/orders/:orderId`         | `orderId` string                               |
+| `src/routes/files/[...parts]/route.ts`  | `/files/*parts`            | `parts` array of strings; at least one segment |
+| `src/routes/docs/[[...parts]]/route.ts` | `/docs` and `/docs/*parts` | Optional `parts` array                         |
 
-Valid method exports are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`. Helper exports are
-allowed, but default route exports and legacy `*.route.ts` files fail with source-located migration advice.
+These are normalized route patterns, not literal URLs to request. For example, `/files/images/logo.png`
+maps `parts` to `["images", "logo.png"]`. A catch-all must be the final segment; an optional catch-all
+also matches the base path without any segments. Use an array input schema for catch-all values.
 
-## Read a dynamic route
+Parameter names must be valid identifiers and cannot repeat in one path. Route groups, parallel
+routes, intercepting routes, and single optional segments such as `[[id]]` are not supported.
+Keep layout or domain names out of the route tree unless they should appear in the URL.
+
+## Export the methods you support
+
+Function-backed routes support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`:
 
 <include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/[orderId]/route.ts"'>
   ../../examples/commerce/src/routes/orders/[orderId]/route.ts
 </include>
 
-The file contributes `/orders/:orderId`. Each named export creates a separate operation. Matching dynamic
-segment names can map directly into function input or be transformed through an explicit request mapping.
+Each export is a separate operation, even when several exports select the same function.
+The `GET` above maps the dynamic parameter through an explicit transform; other methods use inference.
+Path properties map first, then remaining properties come from query or body according to the method.
+See [Requests](/docs/http/requests).
 
-## Add another method
+Export `HEAD` explicitly when it is part of the contract. It invokes the target but removes the response
+body, so it still performs the target's work. An `OPTIONS` export also invokes its selected target;
+it is not an automatic CORS policy. Use [middleware](/docs/http/middleware) for CORS behavior.
 
-<Steps>
-  <Step>
-    ### Export the method from the existing file
+Helper exports are allowed. A default route export, legacy `*.route.ts` layout, or explicit `path`/`method`
+configuration produces migration diagnostics. `ALL` is reserved for [raw handlers](/docs/http/raw-handlers).
 
-    In `src/routes/status/route.ts`, duplicate the existing `GET` export, rename the copy to `HEAD`, and
-    keep the target as `hello`. The two named exports now describe two HTTP operations in one route file.
+## Understand matching precedence
 
-  </Step>
-  <Step>
-    ### Check route discovery
+Static segments match before dynamic segments, then required catch-all, then optional catch-all.
+For example, `/orders/search` takes precedence over `/orders/[orderId]`. The compiler checks ambiguous
+or duplicate registrations before activation; do not depend on module import order to choose a route.
 
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    bun run graph
-    curl -I "http://localhost:3000/status"
-    ```
+An optional catch-all has base and expanded runtime registrations but remains one authored operation.
+Test both forms, especially when middleware or authentication depends on the path.
 
-    `HEAD` invokes the target normally but removes the response body. The graph and OpenAPI document should
-    contain both operations.
+## Treat route identity as a public contract
 
-  </Step>
-</Steps>
+When `id` is omitted, RELKIT derives it from the method and normalized URL. For example,
+`GET /orders/:orderId` becomes `route.get.orders.by-order-id`, and `GET /` becomes `route.get.root`.
+Changing a path or method changes that inferred identity. Route IDs also name generated-client operations.
 
-## Matching and identity
+An explicit `id` can preserve operation identity during a move, but it does not preserve the old URL.
+Review both URL compatibility and generated-client compatibility when renaming routes.
 
-Static routes win over dynamic routes, then required catch-all, then optional catch-all. The compiler
-normalizes paths and rejects collisions before activation. Optional catch-all creates two runtime
-registrations but remains one authored descriptor and one generated-client operation.
+## Verify discovery and matching
 
-Route IDs are source-scoped when omitted. Add an explicit ID only when moving the file or export must not
-change graph and deployment identity. Route groups, parallel routes, and intercepting routes are not
-supported.
+From your application's root:
+
+```sh
+bun run check
+```
+
+Inspect the checked graph and `.relkit/generated/openapi.json` for every intended method and path.
+Use HTTP integration tests for a static path beside a dynamic path, an unknown path, and both forms of
+an optional catch-all. The [first-route walkthrough](/docs/http/first-route) shows the test harness.
 
 <include cwd>content/generated/related/http-routes.mdx</include>

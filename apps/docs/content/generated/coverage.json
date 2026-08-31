@@ -68,8 +68,8 @@
     {
       "id": "services",
       "title": "Services",
-      "summary": "Define a domain's public functions and events.",
-      "guide": "fundamentals/services",
+      "summary": "Organize capabilities by domain and expose a focused public service boundary.",
+      "guide": "service/define",
       "apiPackage": "services",
       "entrypoints": [
         { "source": "packages/services/src/define-service.ts", "name": "defineService" }
@@ -77,10 +77,34 @@
       "examples": ["examples/commerce/src/orders/service.ts"]
     },
     {
+      "id": "database",
+      "title": "Database",
+      "summary": "Organize application data, choose a database service, and customize persistence.",
+      "guide": "database/index",
+      "apiPackage": "drizzle",
+      "entrypoints": [
+        { "source": "packages/drizzle/src/service.ts", "name": "defineDrizzleService" },
+        { "source": "packages/drizzle/src/model.ts", "name": "defineModel" },
+        { "source": "packages/drizzle/src/activation.ts", "name": "activateDrizzleService" }
+      ],
+      "examples": ["examples/data-model/src/database/service.ts"]
+    },
+    {
+      "id": "auth",
+      "title": "Authentication",
+      "summary": "Configure authentication, read request sessions, and protect application entry points.",
+      "guide": "auth/index",
+      "apiPackage": "better-auth",
+      "entrypoints": [
+        { "source": "packages/better-auth/src/index.ts", "name": "defineBetterAuthService" }
+      ],
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
+    },
+    {
       "id": "http",
       "title": "HTTP routes",
       "summary": "Map filesystem routes to validated function calls.",
-      "guide": "http/routes",
+      "guide": "http/define",
       "apiPackage": "routes",
       "entrypoints": [{ "source": "packages/routes/src/define-route.ts", "name": "defineRoute" }],
       "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
@@ -113,7 +137,7 @@
       "apiPackage": "events",
       "entrypoints": [
         { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
-        { "source": "packages/events/src/on-event.ts", "name": "onEvent" }
+        { "source": "packages/events/src/define-event-function.ts", "name": "defineEventFunction" }
       ],
       "examples": ["examples/commerce/src/orders/events/order-created.event.ts"]
     },
@@ -121,7 +145,7 @@
       "id": "jobs",
       "title": "Jobs",
       "summary": "Queue validated work with bounded retry and concurrency.",
-      "guide": "async/jobs",
+      "guide": "jobs/define",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
       "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
@@ -130,7 +154,7 @@
       "id": "schedules",
       "title": "Schedules",
       "summary": "Trigger a job from explicit cron and timezone rules.",
-      "guide": "async/schedules",
+      "guide": "jobs/schedules",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
       "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
@@ -138,8 +162,8 @@
     {
       "id": "buckets",
       "title": "Object buckets",
-      "summary": "Store bounded objects through provider-neutral clients.",
-      "guide": "resources-ai/buckets",
+      "summary": "Store, read, and share files from your app.",
+      "guide": "storage/define",
       "apiPackage": "buckets",
       "entrypoints": [
         { "source": "packages/buckets/src/define-bucket.ts", "name": "defineBucket" }
@@ -149,8 +173,8 @@
     {
       "id": "cache",
       "title": "Cache",
-      "summary": "Use schema-backed values, counters, TTLs, and rate-limit state.",
-      "guide": "resources-ai/cache",
+      "summary": "Reuse expensive lookups and keep cached values fresh.",
+      "guide": "caching/define",
       "apiPackage": "cache",
       "entrypoints": [{ "source": "packages/cache/src/define-cache.ts", "name": "defineCache" }],
       "examples": ["examples/commerce/src/orders/cache/prices.cache.ts"]
@@ -158,8 +182,8 @@
     {
       "id": "tools",
       "title": "AI tools",
-      "summary": "Expose existing functions to models through bounded metadata.",
-      "guide": "resources-ai/tools",
+      "summary": "Let AI agents and MCP clients use your application's functions.",
+      "guide": "ai/tools",
       "apiPackage": "tools",
       "entrypoints": [{ "source": "packages/tools/src/define-tool.ts", "name": "defineTool" }],
       "examples": ["examples/commerce/src/orders/tools/lookup-order.tool.ts"]
@@ -168,7 +192,7 @@
       "id": "approvals",
       "title": "Tool approvals",
       "summary": "Require an explicit decision before sensitive model actions.",
-      "guide": "resources-ai/approvals",
+      "guide": "ai/approvals",
       "apiPackage": "agents",
       "entrypoints": [
         { "source": "packages/agents/src/approval.ts", "name": "approveApproval" },
@@ -180,7 +204,7 @@
       "id": "agents",
       "title": "Agents",
       "summary": "Run bounded model workflows with allowlisted tools and offline tests.",
-      "guide": "resources-ai/agents",
+      "guide": "ai/agents",
       "apiPackage": "agents",
       "entrypoints": [{ "source": "packages/agents/src/define-agent.ts", "name": "defineAgent" }],
       "examples": ["examples/commerce/src/orders/agents/order-support.agent.ts"]
@@ -221,24 +245,483 @@
       "path": "start/local-development",
       "api": ["app", "routes"],
       "examples": ["templates/default/v1/api/relkit.config.ts"],
-      "next": "start/check"
+      "next": "service/index"
     },
     {
-      "path": "start/check",
-      "api": ["app"],
-      "examples": ["templates/default/v1/api/package.json"],
-      "next": "start/build"
+      "path": "service/index",
+      "api": ["services", "functions"],
+      "examples": ["examples/commerce/src/orders/service.ts"],
+      "next": "service/domains"
     },
     {
-      "path": "start/build",
-      "api": ["app"],
-      "examples": ["templates/default/v1/api/package.json"],
-      "next": "start/production"
+      "path": "service/domains",
+      "api": ["services", "events"],
+      "examples": ["examples/commerce/src/receipts/functions/order-receipt.function.ts"],
+      "next": "service/organization"
     },
     {
-      "path": "start/production",
-      "api": ["app"],
-      "examples": ["templates/default/v1/api/package.json"],
+      "path": "service/organization",
+      "api": ["services", "functions", "tools", "agents", "jobs", "events", "cache", "buckets"],
+      "examples": [
+        "examples/commerce/src/orders/functions/create-order.function.ts",
+        "templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts"
+      ],
+      "next": "service/define"
+    },
+    {
+      "path": "service/define",
+      "api": ["services", "functions"],
+      "examples": ["examples/commerce/src/orders/service.ts"],
+      "next": "service/routes"
+    },
+    {
+      "path": "service/routes",
+      "api": ["services", "routes"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "service/first-service"
+    },
+    {
+      "path": "service/first-service",
+      "api": ["services", "functions", "routes", "testing"],
+      "examples": [
+        "templates/default/v1/minimal/src/hello/service.ts",
+        "templates/default/v1/minimal/tests/unit/hello.function.test.ts"
+      ],
+      "next": "http/index"
+    },
+    {
+      "path": "http/index",
+      "api": ["routes", "services"],
+      "examples": ["templates/default/v1/api/src/routes/echo/route.ts"],
+      "next": "http/define"
+    },
+    {
+      "path": "http/define",
+      "api": ["routes", "services"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/routes"
+    },
+    {
+      "path": "http/routes",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
+      "next": "http/requests"
+    },
+    {
+      "path": "http/requests",
+      "api": ["routes", "schema"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/uploads"
+    },
+    {
+      "path": "http/uploads",
+      "api": ["routes", "schema", "buckets"],
+      "examples": ["examples/commerce/src/routes/uploads/route.ts"],
+      "next": "http/middleware"
+    },
+    {
+      "path": "http/middleware",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
+      "next": "http/rate-limits"
+    },
+    {
+      "path": "http/rate-limits",
+      "api": ["routes", "cache"],
+      "examples": ["tests/compiler/rate-limit.test.ts"],
+      "next": "http/responses"
+    },
+    {
+      "path": "http/responses",
+      "api": ["routes", "functions"],
+      "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/raw-handlers"
+    },
+    {
+      "path": "http/raw-handlers",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"],
+      "next": "http/openapi"
+    },
+    {
+      "path": "http/openapi",
+      "api": ["routes"],
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
+      "next": "http/generated-clients"
+    },
+    {
+      "path": "http/generated-clients",
+      "api": ["client", "routes"],
+      "examples": ["examples/commerce/src/platform/generated-client.ts"],
+      "next": "http/first-route"
+    },
+    {
+      "path": "http/first-route",
+      "api": ["routes", "functions", "services", "testing"],
+      "examples": ["templates/default/v1/api/tests/integration/echo.route.test.ts"],
+      "next": "events/index"
+    },
+    {
+      "path": "events/index",
+      "api": ["events", "functions"],
+      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+      "next": "events/define"
+    },
+    {
+      "path": "events/define",
+      "api": ["events"],
+      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+      "next": "events/publish"
+    },
+    {
+      "path": "events/publish",
+      "api": ["events", "functions"],
+      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+      "next": "events/consume"
+    },
+    {
+      "path": "events/consume",
+      "api": ["events"],
+      "examples": ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
+      "next": "events/first-event"
+    },
+    {
+      "path": "events/first-event",
+      "api": ["events", "functions"],
+      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+      "next": "jobs/index"
+    },
+    {
+      "path": "jobs/index",
+      "api": ["jobs", "services", "functions"],
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "next": "jobs/define"
+    },
+    {
+      "path": "jobs/define",
+      "api": ["jobs", "functions", "config"],
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "next": "jobs/enqueue"
+    },
+    {
+      "path": "jobs/enqueue",
+      "api": ["jobs", "functions", "events"],
+      "examples": ["examples/commerce/tests/fixtures/queue-receipt.function.ts"],
+      "next": "jobs/retries"
+    },
+    {
+      "path": "jobs/retries",
+      "api": ["jobs", "functions", "testing"],
+      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "next": "jobs/idempotency"
+    },
+    {
+      "path": "jobs/idempotency",
+      "api": ["jobs", "testing"],
+      "examples": ["examples/commerce/tests/jobs.test.ts"],
+      "next": "jobs/schedules"
+    },
+    {
+      "path": "jobs/schedules",
+      "api": ["jobs"],
+      "examples": [
+        "examples/commerce/src/receipts/jobs/send-receipt.job.ts",
+        "tests/integration/jobs/commerce-example.test.ts"
+      ],
+      "next": "jobs/first-job"
+    },
+    {
+      "path": "jobs/first-job",
+      "api": ["jobs", "functions", "buckets", "testing"],
+      "examples": ["examples/commerce/tests/jobs.test.ts"],
+      "next": "database/index"
+    },
+    {
+      "path": "database/index",
+      "api": ["services"],
+      "examples": ["examples/data-model/src/users/service.ts"],
+      "next": "database/drizzle"
+    },
+    {
+      "path": "database/drizzle",
+      "api": ["drizzle", "services"],
+      "examples": ["examples/data-model/src/database/service.ts"],
+      "next": "database/define"
+    },
+    {
+      "path": "database/define",
+      "api": ["drizzle", "config"],
+      "examples": ["examples/data-model/src/database/service.ts"],
+      "next": "database/schema"
+    },
+    {
+      "path": "database/schema",
+      "api": ["drizzle", "schema"],
+      "examples": ["examples/data-model/src/database/schema/index.ts"],
+      "next": "database/queries"
+    },
+    {
+      "path": "database/queries",
+      "api": ["drizzle", "functions"],
+      "examples": ["examples/data-model/src/users/functions/update-user-email.function.ts"],
+      "next": "database/generated-schemas"
+    },
+    {
+      "path": "database/generated-schemas",
+      "api": ["drizzle", "schema"],
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
+      "next": "database/models"
+    },
+    {
+      "path": "database/models",
+      "api": ["drizzle"],
+      "examples": ["examples/data-model/src/database/models/users.model.ts"],
+      "next": "database/overrides"
+    },
+    {
+      "path": "database/overrides",
+      "api": ["drizzle"],
+      "examples": ["examples/data-model/src/database/service.ts"],
+      "next": "database/transactions"
+    },
+    {
+      "path": "database/transactions",
+      "api": ["drizzle"],
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
+      "next": "database/migrations"
+    },
+    {
+      "path": "database/migrations",
+      "api": ["drizzle"],
+      "examples": ["examples/data-model/drizzle.config.ts"],
+      "next": "database/better-auth"
+    },
+    {
+      "path": "database/better-auth",
+      "api": ["drizzle", "routes"],
+      "examples": [
+        "examples/auth-drizzle/src/auth/service.ts",
+        "examples/auth-drizzle/src/database/schema/index.ts"
+      ],
+      "next": "database/testing"
+    },
+    {
+      "path": "database/testing",
+      "api": ["drizzle", "testing"],
+      "examples": ["examples/data-model/tests/data-model.test.ts"],
+      "next": "database/first-database"
+    },
+    {
+      "path": "database/first-database",
+      "api": ["drizzle", "functions", "routes"],
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
+      "next": "auth/index"
+    },
+    {
+      "path": "auth/index",
+      "api": ["better-auth", "services"],
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
+      "next": "auth/better-auth"
+    },
+    {
+      "path": "auth/better-auth",
+      "api": ["better-auth", "drizzle", "config"],
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
+      "next": "auth/sessions"
+    },
+    {
+      "path": "auth/sessions",
+      "api": ["better-auth", "functions"],
+      "examples": ["examples/auth-drizzle/src/account/functions/session.function.ts"],
+      "next": "auth/protect-routes"
+    },
+    {
+      "path": "auth/protect-routes",
+      "api": ["better-auth", "routes"],
+      "examples": ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"],
+      "next": "auth/clients"
+    },
+    {
+      "path": "auth/clients",
+      "api": ["better-auth", "client"],
+      "examples": [
+        "examples/auth-drizzle/src/platform/auth-client.ts",
+        "examples/auth-drizzle/public/index.html"
+      ],
+      "next": "auth/customization"
+    },
+    {
+      "path": "auth/customization",
+      "api": ["better-auth", "drizzle"],
+      "examples": [
+        "examples/auth-drizzle/src/auth/service.ts",
+        "examples/auth-drizzle/src/database/schema/index.ts"
+      ],
+      "next": "auth/testing"
+    },
+    {
+      "path": "auth/testing",
+      "api": ["testing", "better-auth"],
+      "examples": ["examples/auth-drizzle/tests/auth.test.ts"],
+      "next": "auth/first-auth"
+    },
+    {
+      "path": "auth/first-auth",
+      "api": ["better-auth", "drizzle", "routes"],
+      "examples": ["examples/auth-drizzle/README.md"],
+      "next": "storage/index"
+    },
+    {
+      "path": "storage/index",
+      "api": ["buckets", "functions"],
+      "examples": [
+        "examples/commerce/src/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+      ],
+      "next": "storage/define"
+    },
+    {
+      "path": "storage/define",
+      "api": ["buckets", "functions"],
+      "examples": [
+        "examples/commerce/src/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+      ],
+      "next": "storage/upload"
+    },
+    {
+      "path": "storage/upload",
+      "api": ["buckets", "functions"],
+      "examples": [
+        "examples/commerce/src/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+      ],
+      "next": "storage/read-delete"
+    },
+    {
+      "path": "storage/read-delete",
+      "api": ["buckets", "functions"],
+      "examples": [
+        "examples/commerce/src/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+      ],
+      "next": "storage/first-upload"
+    },
+    {
+      "path": "storage/first-upload",
+      "api": ["buckets", "functions"],
+      "examples": [
+        "examples/commerce/src/assets/buckets/assets.bucket.ts",
+        "examples/commerce/src/assets/functions/upload-assets.function.ts"
+      ],
+      "next": "caching/index"
+    },
+    {
+      "path": "caching/index",
+      "api": ["cache", "functions"],
+      "examples": [
+        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/tests/fixtures/get-price.function.ts"
+      ],
+      "next": "caching/define"
+    },
+    {
+      "path": "caching/define",
+      "api": ["cache", "functions"],
+      "examples": [
+        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/tests/fixtures/get-price.function.ts"
+      ],
+      "next": "caching/read-write"
+    },
+    {
+      "path": "caching/read-write",
+      "api": ["cache", "functions"],
+      "examples": [
+        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/tests/fixtures/get-price.function.ts"
+      ],
+      "next": "caching/expiration"
+    },
+    {
+      "path": "caching/expiration",
+      "api": ["cache", "functions"],
+      "examples": [
+        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/tests/fixtures/get-price.function.ts"
+      ],
+      "next": "caching/first-cache"
+    },
+    {
+      "path": "caching/first-cache",
+      "api": ["cache", "functions"],
+      "examples": [
+        "examples/commerce/src/orders/cache/prices.cache.ts",
+        "examples/commerce/tests/fixtures/get-price.function.ts"
+      ],
+      "next": "ai/index"
+    },
+    {
+      "path": "ai/index",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/agents"
+    },
+    {
+      "path": "ai/agents",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/tools"
+    },
+    {
+      "path": "ai/tools",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/function-tools"
+    },
+    {
+      "path": "ai/function-tools",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/mcp"
+    },
+    {
+      "path": "ai/mcp",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/approvals"
+    },
+    {
+      "path": "ai/approvals",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/first-agent"
+    },
+    {
+      "path": "ai/first-agent",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
       "next": "fundamentals/application"
     },
     {
@@ -293,54 +776,6 @@
       "path": "fundamentals/domain-first-migration",
       "api": ["services", "routes"],
       "examples": ["examples/commerce/src/orders/service.ts"],
-      "next": "http/routes"
-    },
-    {
-      "path": "http/routes",
-      "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
-      "next": "http/requests"
-    },
-    {
-      "path": "http/requests",
-      "api": ["routes", "schema"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/uploads"
-    },
-    {
-      "path": "http/uploads",
-      "api": ["routes", "schema"],
-      "examples": ["examples/commerce/src/routes/uploads/route.ts"],
-      "next": "http/middleware"
-    },
-    {
-      "path": "http/middleware",
-      "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
-      "next": "http/rate-limits"
-    },
-    {
-      "path": "http/rate-limits",
-      "api": ["routes", "cache"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/responses"
-    },
-    {
-      "path": "http/responses",
-      "api": ["routes", "functions"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/openapi"
-    },
-    {
-      "path": "http/openapi",
-      "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
-      "next": "http/generated-clients"
-    },
-    {
-      "path": "http/generated-clients",
-      "api": ["client", "routes"],
-      "examples": ["examples/commerce/src/platform/generated-client.ts"],
       "next": "async/jobs"
     },
     {
@@ -358,43 +793,13 @@
     {
       "path": "async/events",
       "api": ["events"],
-      "examples": ["examples/commerce/src/orders/events/order-created.event.ts"],
+      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
       "next": "async/listeners"
     },
     {
       "path": "async/listeners",
       "api": ["events"],
-      "examples": ["examples/commerce/src/receipts/events/order-receipt.event.ts"],
-      "next": "resources-ai/buckets"
-    },
-    {
-      "path": "resources-ai/buckets",
-      "api": ["buckets"],
-      "examples": ["examples/commerce/src/assets/buckets/assets.bucket.ts"],
-      "next": "resources-ai/cache"
-    },
-    {
-      "path": "resources-ai/cache",
-      "api": ["cache"],
-      "examples": ["examples/commerce/src/orders/cache/prices.cache.ts"],
-      "next": "resources-ai/tools"
-    },
-    {
-      "path": "resources-ai/tools",
-      "api": ["tools"],
-      "examples": ["examples/commerce/src/orders/tools/lookup-order.tool.ts"],
-      "next": "resources-ai/approvals"
-    },
-    {
-      "path": "resources-ai/approvals",
-      "api": ["agents", "tools"],
-      "examples": ["examples/commerce/src/orders/tools/cancel-order.tool.ts"],
-      "next": "resources-ai/agents"
-    },
-    {
-      "path": "resources-ai/agents",
-      "api": ["agents", "testing"],
-      "examples": ["examples/commerce/src/orders/agents/order-support.agent.ts"],
+      "examples": ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
       "next": "operations/inspector"
     },
     {

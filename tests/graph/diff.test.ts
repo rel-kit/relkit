@@ -10,6 +10,7 @@ function baseGraph(): ApplicationGraph {
     nodes: [
       {
         kind: "function",
+        invocationMode: "callable",
         id: "orders.create",
         source,
         input: { type: "object", required: ["id"] },
@@ -22,8 +23,8 @@ function baseGraph(): ApplicationGraph {
         triggerType: "event",
         targetFunctionId: "orders.create",
         config: {
-          selector: { kind: "match", pattern: "orders.*" },
-          expansion: ["orders.created@1"],
+          eventId: "orders.created",
+          eventVersion: 1,
           delivery: "durable",
         },
       },
@@ -67,7 +68,7 @@ describe("graph compatibility diff", () => {
     );
   });
 
-  test("classifies selector expansion separately and deterministically", () => {
+  test("classifies exact event contract changes as breaking", () => {
     const before = baseGraph();
     const listener = before.nodes[1]!;
     const after: ApplicationGraph = {
@@ -78,7 +79,7 @@ describe("graph compatibility diff", () => {
           ...listener,
           config: {
             ...(listener as { config: Record<string, unknown> }).config,
-            expansion: ["orders.created@1", "orders.updated@1"],
+            eventId: "orders.updated",
           },
         },
       ],
@@ -86,10 +87,9 @@ describe("graph compatibility diff", () => {
     const result = diffGraph(before, after);
     expect(result.changes).toContainEqual(
       expect.objectContaining({
-        category: "event/selector",
-        fields: ["selector.expansion"],
-        classification: "potentially-breaking",
-        selectorExpansion: { added: ["orders.updated@1"], removed: [] },
+        category: "event",
+        fields: ["config"],
+        classification: "breaking",
       }),
     );
   });

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
   API_BASE_PATH,
@@ -44,8 +44,12 @@ test("keeps runtime, OpenAPI, and generated client contracts aligned", async () 
     expect(await invalid.json()).toMatchObject({ error: "validation" });
     expect(calls).toHaveLength(2);
 
-    expect(generateOpenApiJson(graph)).toBe(await readFixture("orders.openapi.json"));
-    expect(generateClient(graph)).toBe(await readFixture("orders.client.ts"));
+    expect(generateOpenApiJson(graph)).toBe(
+      await readFixture("orders.openapi.json", generateOpenApiJson(graph)),
+    );
+    expect(generateClient(graph)).toBe(
+      await readFixture("orders.client.ts", generateClient(graph)),
+    );
     expect(generateOpenApiJson(contractGraph("/root-a"))).toBe(
       generateOpenApiJson(contractGraph("/root-b", true)),
     );
@@ -109,7 +113,8 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
   };
 }
 
-async function readFixture(name: string): Promise<string> {
+async function readFixture(name: string, generated: string): Promise<string> {
+  if (process.env.UPDATE_GOLDEN === "1") await writeFile(resolve(fixtureRoot, name), generated);
   const text = await readFile(resolve(fixtureRoot, name), "utf8");
   return name.endsWith(".json") ? `${canonicalJson(JSON.parse(text))}\n` : text;
 }

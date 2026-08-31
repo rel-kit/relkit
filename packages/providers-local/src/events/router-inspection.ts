@@ -11,11 +11,12 @@ import type {
   EventTriggerSnapshot,
 } from "./router-types.js";
 import { EventRouterStateError } from "./router-records.js";
+import type { EphemeralDelivery } from "./ephemeral.js";
 
 export interface RegisteredTriggerView {
   readonly binding: EventRouterTrigger;
   readonly durable?: EventDelivery;
-  readonly ephemeral?: unknown;
+  readonly ephemeral?: EphemeralDelivery;
 }
 
 export function normalizeContract(value: unknown): EventContractInput {
@@ -24,7 +25,7 @@ export function normalizeContract(value: unknown): EventContractInput {
   const id = normalizeId(value.id);
   if (!Number.isSafeInteger(value.version) || (value.version as number) < 1)
     throw new EventRouterStateError(`Event contract ${id} has an invalid version`);
-  if (!isJsonValue(value.payload))
+  if (!isJsonValue(value.input))
     throw new EventRouterStateError(`Event contract ${id} is not JSON-safe`);
   if (value.source !== undefined && !isJsonValue(value.source))
     throw new EventRouterStateError(`Event contract ${id} has an invalid source`);
@@ -37,7 +38,7 @@ export function normalizeContract(value: unknown): EventContractInput {
   return deepFreeze({
     id,
     version: value.version,
-    payload: value.payload,
+    input: value.input,
     ...(sensitiveFields === undefined ? {} : { sensitiveFields }),
     ...(value.source === undefined ? {} : { source: value.source }),
   });
@@ -66,12 +67,13 @@ export function triggerSnapshot(binding: EventRouterTrigger): EventTriggerSnapsh
     ...(binding.targetFunctionId === undefined
       ? {}
       : { targetFunctionId: binding.targetFunctionId }),
-    ...(binding.selector === undefined ? {} : { selector: binding.selector }),
-    expansion: binding.expansion,
+    eventId: binding.eventId,
+    eventVersion: binding.eventVersion,
     delivery: binding.delivery,
     ...(binding.profile === undefined ? {} : { profile: binding.profile }),
     ...(binding.retry === undefined ? {} : { retry: binding.retry }),
     ...(binding.concurrency === undefined ? {} : { concurrency: binding.concurrency }),
+    ...(binding.timeoutMs === undefined ? {} : { timeoutMs: binding.timeoutMs }),
   });
 }
 
@@ -103,7 +105,10 @@ export function createSnapshot(
     contracts: Object.freeze([...contracts.values()]),
     triggers: Object.freeze(
       [...triggers.values()]
-        .map(({ binding }) => triggerSnapshot(binding))
+        .map(({ binding, ephemeral }) => ({
+          ...triggerSnapshot(binding),
+          ...(ephemeral === undefined ? {} : { ephemeral: ephemeral.snapshot() }),
+        }))
         .sort((left, right) => left.id.localeCompare(right.id)),
     ),
     publications: Object.freeze([...publications]),

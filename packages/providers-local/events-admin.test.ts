@@ -9,26 +9,28 @@ import { createEventRouter } from "./src/events/router.ts";
 const roots: string[] = [];
 
 describe("local event admin contracts", () => {
-  test("projects selector and delivery state and safely retries a dead letter", async () => {
+  test("projects exact event and delivery state and safely retries a dead letter", async () => {
     const root = await mkdtemp(join(tmpdir(), "relkit-event-admin-"));
     roots.push(root);
     let attempts = 0;
+    const replayed: boolean[] = [];
     const router = await createEventRouter(join(root, "events"), { now: () => 100 });
     await router.registerContract({
       kind: "event",
       id: "orders.created",
       version: 1,
-      payload: { type: "object" },
+      input: { type: "object" },
       source: { file: "events.ts", line: 1, column: 1 },
     });
     await router.registerTrigger({
       id: "orders.email",
       targetFunctionId: "send-email",
-      selector: { region: "eu" },
-      expansion: ["orders.created@1"],
+      eventId: "orders.created",
+      eventVersion: 1,
       delivery: "durable",
       retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-      invoke: async () => {
+      invoke: async (_, context) => {
+        replayed.push(context?.replayed ?? false);
         attempts += 1;
         if (attempts === 1)
           throw applicationFailure({ id: "email.failed", message: "failed", data: null });
@@ -50,7 +52,7 @@ describe("local event admin contracts", () => {
       protocol: "relkit.events.admin",
       version: 1,
       events: [{ id: "orders.created", version: 1 }],
-      triggers: [{ id: "orders.email", expansion: ["orders.created@1"] }],
+      triggers: [{ id: "orders.email", eventId: "orders.created", eventVersion: 1 }],
       capabilities: [{ exactlyOnce: false, ordering: "unsupported" }],
       publications: [{ eventId: "orders.created", version: 1 }],
       deadLetters: [{ state: "dead-lettered" }],
@@ -67,6 +69,7 @@ describe("local event admin contracts", () => {
       deliveries: [{ deliveryId, state: "completed", duplicate: true }],
     });
     expect(attempts).toBe(2);
+    expect(replayed).toEqual([false, true]);
     await expect(admin.retry(deliveryId)).rejects.toMatchObject({
       code: "RELKIT_EVENT_ADMIN_STATE_INELIGIBLE",
     });

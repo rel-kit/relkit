@@ -1,0 +1,71 @@
+---
+title: Getting started
+description: Understand HTTP Routes as the transport layer around domain services, then choose the guide for your endpoint.
+---
+
+HTTP Routes make selected service operations reachable over HTTP. A domain owns the business behavior;
+its [service](/docs/service) exposes public functions; a route connects a URL and method to one of those
+functions. Adding a public function alone does not publish an endpoint.
+
+Keep these responsibilities separate so the same operation can serve an HTTP request, a scheduled job,
+or an AI tool without copying its validation and business rules into each entry point.
+
+## Follow a request through the application
+
+For a function-backed route, the normal request flow is:
+
+```text
+HTTP request
+  ↓ URL + method
+Route (src/routes/)
+  ↓ policy + input mapping
+Public function (src/<domain>/)
+  ↓ validated output
+HTTP response
+```
+
+The route does not contain another business handler. It selects a public function and describes how
+HTTP values become that function's input. RELKIT checks the descriptors, generates transport artifacts,
+and registers the checked routes with the runtime.
+
+The API template's Echo endpoint is a complete minimal route:
+
+<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
+  ../../templates/default/v1/api/src/routes/echo/route.ts
+</include>
+
+The directory supplies `/echo`, the named export supplies `POST`, and `target` selects the public Echo
+function. Its object input comes from JSON; its validated output becomes a JSON response. Follow
+[your first HTTP route](/docs/http/first-route) to add the function, service, route, and test to an existing app.
+
+## Know where each change belongs
+
+| You want to change…                             | Edit…                                                | Continue with…                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Business behavior, schemas, or declared errors  | `src/<domain>/functions/` and domain-local contracts | [Functions](/docs/fundamentals/functions)                                         |
+| Which functions other code may call             | `src/<domain>/service.ts`                            | [Define a service](/docs/service/define)                                          |
+| Which function a method invokes                 | `src/routes/**/route.ts`                             | [Define a route](/docs/http/define)                                               |
+| A URL or path parameter                         | Directories underneath `src/routes/`                 | [File-system routes](/docs/http/routes)                                           |
+| Headers, cookies, query fields, or body mapping | The route's `request` descriptor                     | [Requests](/docs/http/requests)                                                   |
+| Multipart parsing and upload limits             | The route plus the domain's file schema              | [Uploads](/docs/http/uploads)                                                     |
+| HTTP authentication, CORS, or response headers  | `src/routes/middleware/`                             | [Middleware](/docs/http/middleware)                                               |
+| Request frequency limits                        | The function-backed route's `rateLimit`              | [Rate limits](/docs/http/rate-limits)                                             |
+| Success status or error-to-HTTP mapping         | The route and declared domain errors                 | [Responses](/docs/http/responses)                                                 |
+| A native HTTP adapter                           | An `ALL` raw route                                   | [Raw handlers](/docs/http/raw-handlers)                                           |
+| Public API documentation or a typed caller      | Checked artifacts, generated from source             | [OpenAPI](/docs/http/openapi) · [Generated clients](/docs/http/generated-clients) |
+
+Business rules that must apply to every caller belong in the function, not only in HTTP middleware.
+For agents, tools, jobs, events, caching, and storage, use the [domain organization guide](/docs/service/organization)
+to choose an owner and continue into that capability's getting-started guide.
+
+## Choose a starting point
+
+- New to the application layout? Start with [Service](/docs/service).
+- Ready to ship an endpoint? Follow [your first HTTP route](/docs/http/first-route).
+- Already have a public function? Go directly to [defining a route](/docs/http/define).
+- Need the exact descriptor types and helpers? Open the [Routes API reference](/docs/api/routes).
+
+These guides describe function-backed HTTP endpoints first. Raw handlers opt out of that typed pipeline;
+generated clients use a separate RPC transport. Their dedicated guides explain those boundaries.
+
+<include cwd>content/generated/related/http-index.mdx</include>
