@@ -14,6 +14,7 @@ import env from "@app/platform/env.js";
 export default defineConfig({
   id: "commerce-api",
   env,
+  // #region storage-profile
   buckets: {
     default: managed(
       s3({
@@ -28,7 +29,11 @@ export default defineConfig({
       }),
     ),
   },
+  // #endregion storage-profile
+  // #region cache-profile
   caches: { default: managed(redis({ url: env.CACHE_URL })) },
+  // #endregion cache-profile
+  // #region jobs-profile
   jobs: {
     default: managed(
       sqs({
@@ -38,6 +43,7 @@ export default defineConfig({
       }),
     ),
   },
+  // #endregion jobs-profile
   events: {
     default: managed(
       eventBridge({
@@ -47,6 +53,7 @@ export default defineConfig({
       }),
     ),
   },
+  // #region ai-profile
   models: {
     default: external(
       aiSdk({
@@ -56,6 +63,7 @@ export default defineConfig({
       }),
     ),
   },
+  // #endregion ai-profile
   observability: {
     default: managed(cloudWatch({ region: env.OBSERVABILITY_REGION })),
   },
@@ -72,7 +80,10 @@ export default defineConfig({
   server: {
     port: 4000,
     maxBodyBytes: 1_048_576,
-    apiDocs: { enabledInProduction: false },
+    apiDocs: {
+      enabledInProduction: false,
+      excludeDomains: ["database", "navigation", "telemetry", "auth"],
+    },
   },
   inspector: { port: 4001 },
 });
