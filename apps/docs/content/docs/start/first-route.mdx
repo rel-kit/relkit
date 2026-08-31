@@ -3,8 +3,14 @@ title: Run and add your first route
 description: Start the generated API, understand the existing hello operation, then add and verify a new status endpoint.
 ---
 
-You will first prove that the generated application works unchanged. Then you will add a new function and
-route so the compiler, reload loop, OpenAPI document, and inspector all receive a real source change.
+You will first prove that the generated application works unchanged. Then you will reuse its Hello
+function through a new route so the compiler, reload loop, OpenAPI document, and inspector all receive
+a real source change. To add a new domain function and validated POST endpoint together, follow
+[Your first HTTP route](/docs/http/first-route).
+
+Start in the `relkit-orders` directory from [Create an application](/docs/start/create-an-app), with
+dependencies installed and `.env` copied from `.env.example`. The commands below run inside that app,
+not the RELKIT monorepo root.
 
 ## Run the generated route
 
@@ -38,9 +44,30 @@ route so the compiler, reload loop, OpenAPI document, and inspector all receive 
   </Step>
 </Steps>
 
-The existing `src/hello/functions/hello.function.ts` defines validated input, validated output, and the handler.
-`src/routes/hello/route.ts` exports that function as `GET`. The folder supplies `/hello`, the export name
-supplies the HTTP method, and the remaining input property becomes the `name` query parameter.
+## Follow the domain operation
+
+The Hello function owns validation and behavior:
+
+<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/api/src/hello/functions/hello.function.ts
+</include>
+
+The owning service exposes it as `hello`:
+
+<include cwd lang="ts" meta='title="src/hello/service.ts"'>
+  ../../templates/default/v1/api/src/hello/service.ts
+</include>
+
+The route imports that service and targets `hello.hello`. Its folder supplies `/hello`, its named `GET`
+export supplies the HTTP method, and the input schema supplies the `name` query parameter and its
+`world` default. The request reaches the same function through this boundary:
+
+```text
+GET /hello?name=RELKIT → route → Hello service's hello operation → function → validated response
+```
+
+Keep business logic in the owning domain, not the route file. See [Service organization](/docs/service/organization)
+for where to add functions and other capabilities, and [HTTP Routes](/docs/http) for transport details.
 
 ## Add a second route
 
@@ -59,6 +86,9 @@ supplies the HTTP method, and the remaining input property becomes the `name` qu
     ### Create the route directory
 
     Reuse the checked hello function through a second transport descriptor:
+
+    This tutorial assumes `src/routes/status/route.ts` does not already exist. If your app already has
+    that route, choose another unused path rather than overwriting it.
 
     ```sh title="Terminal — relkit-orders"
     mkdir -p src/routes/status
@@ -98,5 +128,10 @@ supplies the HTTP method, and the remaining input property becomes the `name` qu
   Route identity, OpenAPI, the client, and graph files are derived from source. Correct the
   descriptor and rerun `check`; never patch `.relkit/generated`.
 </Callout>
+
+You now have two HTTP paths to one domain operation, without duplicating its handler or schemas.
+Continue with [Local development](/docs/start/local-development) to inspect reloads and verify changes.
+When you need a new business operation rather than another path, follow
+[Your first service](/docs/service/first-service) and [Your first HTTP route](/docs/http/first-route).
 
 <include cwd>content/generated/related/start-first-route.mdx</include>

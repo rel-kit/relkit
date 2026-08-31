@@ -1,10 +1,14 @@
 ---
 title: Local development
-description: Use one development command for reloads, diagnostics, OpenAPI, Scalar, and the inspector.
+description: Iterate on a running app, inspect routes and diagnostics, verify changes, and choose the next capability to add.
 ---
 
 `bun run dev` runs the complete local feedback loop. It watches application source, checks a candidate
 generation, starts it, verifies readiness, and only then makes it active.
+
+This guide continues in the app created by [Create an application](/docs/start/create-an-app). The reload
+exercise uses `/status` from [Run and add your first route](/docs/start/first-route); add that route first,
+or use the existing `/hello` route and its source file instead. Keep `.env` loaded with the local defaults.
 
 ## Development endpoints
 
@@ -53,14 +57,26 @@ generation, starts it, verifies readiness, and only then makes it active.
 
 ## Configure ports and body limits
 
-The generated configuration is executable source and contains both settings:
+The API template's configuration shows the server port, maximum request body size, and inspector port:
 
-<include cwd lang="ts" meta='title="relkit.config.ts"'>
+<include cwd lang="ts" meta='title="API template — relkit.config.ts"'>
   ../../templates/default/v1/api/relkit.config.ts
 </include>
 
+The generator's `--cloud none --deploy none` flags skip deployment prerequisites; they do not remove
+the template's AWS/Pulumi declaration. Keeping that optional configuration does not provision resources.
+This Start workflow does not run deployment commands. Change only the settings you need.
+
 Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Inspector precedence is
 `--inspector-port`, `RELKIT_INSPECTOR_PORT`, `inspector.port`, then `3210`.
+
+To choose different ports for one local run, stop the current development process and run:
+
+```sh title="Terminal — relkit-orders"
+bun run dev --port 3002 --inspector-port 3212
+```
+
+Use the printed URLs for subsequent requests. For request-size behavior, see [HTTP requests](/docs/http/requests).
 
 <Accordions type="multiple">
   <Accordion title="The backend port is already in use">
@@ -79,5 +95,50 @@ Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Ins
 
 Installed projects use the inspector bundled with `@relkit/cli`. `RELKIT_INSPECTOR_ROOT` is only for
 framework contributors selecting another compatible inspector checkout.
+
+## Verify changes
+
+From the application root, run these checks after changing a function, service, route, or configuration:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run typecheck
+bun run test
+```
+
+`check` validates RELKIT's application graph and refreshes generated contracts; `typecheck` checks
+project-wide TypeScript types; tests exercise behavior. Fix the first source-located diagnostic and
+rerun the checks. A valid graph alone does not prove business correctness or provision external services.
+
+Inspect `.relkit/generated/application.graph.json` and `diagnostics.json` when troubleshooting, but
+change the authored source rather than generated files. For command flags, see
+[`relkit check`](/docs/operations/cli-reference#relkit-check). For focused tests and fakes, see
+[Testing](/docs/operations/testing); for runtime investigation, see [Inspector](/docs/operations/inspector)
+and [Troubleshooting](/docs/operations/troubleshooting).
+
+When you need to check a release locally, stop `dev`, run `bun run build`, then `bun run start`. Building
+and starting are not cloud deployment. Use the CLI reference for
+[`build`](/docs/operations/cli-reference#relkit-build) and [`start`](/docs/operations/cli-reference#relkit-start),
+and [Deployment](/docs/operations/deployment) only when you are ready to configure cloud resources.
+
+## Continue with your application's capabilities
+
+Start with [Service](/docs/service) to understand domains, public boundaries, and where code belongs.
+Then choose the guide for your next product requirement:
+
+| What you want to add                    | Getting started            |
+| --------------------------------------- | -------------------------- |
+| A new endpoint or request mapping       | [HTTP Routes](/docs/http)  |
+| Facts other operations react to         | [Events](/docs/events)     |
+| Deferred or scheduled work              | [Jobs](/docs/jobs)         |
+| Durable records and data models         | [Database](/docs/database) |
+| Sign-in, sessions, and protected access | [Auth](/docs/auth)         |
+| File upload and retrieval               | [Storage](/docs/storage)   |
+| Reusable cached results                 | [Caching](/docs/caching)   |
+| Tools and agents                        | [AI](/docs/ai)             |
+
+Add each capability to its owning domain as the product needs it; completing Start does not require
+configuring every integration. Use [Service organization](/docs/service/organization) when deciding
+where a new function, tool, agent, event, or resource should live.
 
 <include cwd>content/generated/related/start-local-development.mdx</include>
