@@ -1,6 +1,5 @@
 import { defineFunction } from "@relkit/app/functions";
 import { z } from "@relkit/app/schema";
-import orderCreated from "@app/orders/events/order-created.event.js";
 import priceOrder from "@app/orders/functions/price-order.function.js";
 
 const orderInput = z.object({
@@ -8,6 +7,7 @@ const orderInput = z.object({
   sku: z.string().min(1),
   quantity: z.number().int().positive(),
 });
+
 const orderOutput = z.object({
   orderId: z.string(),
   sku: z.string(),
@@ -17,11 +17,21 @@ const orderOutput = z.object({
 const createOrder = defineFunction({
   input: orderInput,
   output: orderOutput,
-  dependencies: { events: { orderCreated } },
+
+  // Events this function is allowed to publish.
+  publishes: ["orders.created"],
+
   handler: async (input, context) => {
     const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
-    const order = { orderId: input.orderId, sku: input.sku, totalCents };
-    await context.events.orderCreated.publish(order);
+    const order = {
+      orderId: input.orderId,
+      sku: input.sku,
+      totalCents,
+    };
+
+    // Let subscribers react to the new order.
+    await context.events["orders.created"].publish(order);
+
     return order;
   },
 });

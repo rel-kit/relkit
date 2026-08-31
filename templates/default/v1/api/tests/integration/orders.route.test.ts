@@ -3,7 +3,7 @@ import { createTestApplication } from "@relkit/testing";
 import config from "../../relkit.config.js";
 
 const testApp = await createTestApplication(config);
-testApp.fakes.setClient("events", "orderCreated", {
+testApp.fakes.setClient("events", "orders.created", {
   publish: async () => ({ accepted: true, instanceId: "event-1" }),
 });
 

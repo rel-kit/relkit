@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { createEventListenerTarget, eventListenerFunctionId } from "@relkit/app/events";
+import { bindFunctionEvents } from "@relkit/app/events";
 import { createTestEvent, invokeFunction } from "@relkit/testing";
 import orderCreated from "@app/orders/events/order-created.event.js";
-import orderAudit from "@app/orders/events/order-audit.event.js";
-import orderConfirmation from "@app/orders/events/order-confirmation.event.js";
+import orderAudit from "@app/orders/functions/order-audit.function.js";
+import orderConfirmation from "@app/orders/functions/order-confirmation.function.js";
 import orders from "@app/orders/service.js";
 
 const retry = {
@@ -15,16 +15,8 @@ const retry = {
 };
 
 test("order.created fans out deterministic independent deliveries", async () => {
-  const confirmationTarget = createEventListenerTarget(
-    orderConfirmation,
-    [orderCreated],
-    eventListenerFunctionId(orderConfirmation.id),
-  );
-  const auditTarget = createEventListenerTarget(
-    orderAudit,
-    [orderCreated],
-    eventListenerFunctionId(orderAudit.id),
-  );
+  const confirmationTarget = orderConfirmation;
+  const auditTarget = orderAudit;
   const failingAuditTarget = {
     ...auditTarget,
     handler: async (...args: Parameters<typeof auditTarget.handler>) => {
@@ -43,9 +35,9 @@ test("order.created fans out deterministic independent deliveries", async () => 
   try {
     await expect(
       invokeFunction(
-        orders.createOrder,
+        bindFunctionEvents(orders.createOrder, undefined, [orderCreated]),
         { orderId: "order-1", sku: "book", quantity: 3 },
-        { clients: { events: { orderCreated: event.provider } } },
+        { clients: { events: { "orders.created": event.provider } } },
       ),
     ).resolves.toEqual({ orderId: "order-1", sku: "book", totalCents: 300 });
 
