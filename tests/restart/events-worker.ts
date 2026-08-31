@@ -3,12 +3,13 @@ import { join } from "node:path";
 import { defineEventFunction } from "../../packages/events/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { createTestEvent } from "../../packages/testing/src/index.ts";
+import { resolveRestartStateRoot } from "./state-root.ts";
 
 type EventWorkerMode =
   "after-lease" | "after-ack" | "recover" | "ephemeral-loss" | "ephemeral-recover" | "fanout";
 
 const mode = process.argv[2] as EventWorkerMode | undefined;
-const stateRoot = process.argv[3];
+const requestedStateRoot = process.argv[3];
 const startTimeMs = Number(process.argv[4]);
 const modes: readonly EventWorkerMode[] = [
   "after-lease",
@@ -21,11 +22,12 @@ const modes: readonly EventWorkerMode[] = [
 if (
   mode === undefined ||
   !modes.includes(mode) ||
-  stateRoot === undefined ||
+  requestedStateRoot === undefined ||
   !Number.isSafeInteger(startTimeMs)
 ) {
   throw new Error("Usage: events-worker.ts <mode> <state-root> <time>");
 }
+const stateRoot = resolveRestartStateRoot(requestedStateRoot);
 
 const retry = {
   maxAttempts: 1,

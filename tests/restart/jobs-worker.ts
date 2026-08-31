@@ -3,16 +3,18 @@ import { join } from "node:path";
 import type { InvocationContext } from "../../packages/engine/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { createTestJob } from "../../packages/testing/src/index.ts";
+import { resolveRestartStateRoot } from "./state-root.ts";
 
-const [mode, stateRoot, startTimeText] = process.argv.slice(2);
+const [mode, requestedStateRoot, startTimeText] = process.argv.slice(2);
 const startTimeMs = Number(startTimeText);
 if (
   (mode !== "after-lease" && mode !== "after-ack" && mode !== "recover") ||
-  stateRoot === undefined ||
+  requestedStateRoot === undefined ||
   !Number.isSafeInteger(startTimeMs)
 ) {
   throw new Error("Usage: jobs-worker.ts <after-lease|after-ack|recover> <state-root> <time>");
 }
+const stateRoot = resolveRestartStateRoot(requestedStateRoot);
 
 const input = z.object({ orderId: z.string() });
 const output = z.object({ processed: z.boolean() });
