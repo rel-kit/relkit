@@ -1,0 +1,35 @@
+---
+title: Read and write values
+description: Load a value once, reuse it, and write directly when needed.
+---
+
+## Load on a cache miss
+
+Import your [cache](/docs/caching/define) and add it to `dependencies.cache`. The name `prices` makes it available as `context.cache.prices`.
+
+<include cwd lang="ts" meta='title="src/orders/functions/get-price.function.ts"'>
+  ../../examples/commerce/tests/fixtures/get-price.function.ts
+</include>
+
+`getOrSet()` returns the saved price when it exists—a **cache hit**. Otherwise, it runs the callback, saves the result, and returns it—a **cache miss**. In a real app, replace the demo's `1_000` with a database or API lookup.
+
+Keep the callback safe to repeat. Do not use it to charge a customer or send an email; concurrent requests on different app instances may run it more than once.
+
+## Read or write directly
+
+Inside a handler with the same cache dependency, await the operation you need:
+
+| Call                                              | Result                                                   |
+| ------------------------------------------------- | -------------------------------------------------------- |
+| `context.cache.prices.get({ sku: "book" })`       | The saved price, or `undefined` when missing or expired. |
+| `context.cache.prices.has({ sku: "book" })`       | Whether an unexpired value exists.                       |
+| `context.cache.prices.set({ sku: "book" }, 1200)` | Saves or replaces the price. Returns no value.           |
+| `context.cache.prices.delete({ sku: "book" })`    | Removes the saved price. Returns no value.               |
+
+Check for `undefined`, not truthiness: `0` can be a valid cached price. Keys and values must match your schemas.
+
+## Use a numeric counter
+
+A cache with a numeric value schema also exposes `increment(key, delta, options)`. The default increment is `1`. Use a separate cache for counters rather than changing product prices this way.
+
+For limiting HTTP requests, use RelKit's [route rate limits](/docs/http/rate-limits). Keep the cache shared across app instances when a limit must apply to all of them.

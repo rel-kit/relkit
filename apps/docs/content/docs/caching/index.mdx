@@ -1,0 +1,28 @@
+---
+title: Getting started
+description: Avoid repeated lookups by reusing values your app has already loaded.
+---
+
+A cache keeps a temporary copy of data so your app can reuse it. Product prices, search results, and calculated summaries are common examples. Keep the original data in your database or another source you can read again.
+
+Use caching when a lookup is expensive and a slightly older result is acceptable. Skip it when every request must see the latest value.
+
+## The Caching API
+
+Usually, caching means connecting a Redis client, choosing keys, serializing values, and checking for missing entries. With RelKit, define the key and value shapes, give your function access, and use `getOrSet()` to load missing values.
+
+| API                                        | What you use it for                                    |
+| ------------------------------------------ | ------------------------------------------------------ |
+| `defineCache`                              | Define the cache's keys, values, and expiration time.  |
+| `dependencies.cache`                       | Give a function access to a cache.                     |
+| `context.cache.prices.getOrSet(key, load)` | Reuse a saved value or load and save it when missing.  |
+| `context.cache.prices.set(key, value)`     | Save or replace a value.                               |
+| `context.cache.prices.delete(key)`         | Remove a value so the next lookup can load fresh data. |
+
+You can use caches in event functions too, and in ordinary functions called by jobs and tools.
+
+## Try it in your app
+
+Start with [defining a cache](/docs/caching/define), or follow the [cached-price example](/docs/caching/first-cache). The example runs locally without Redis or cloud credentials.
+
+In the Inspector, open **Cache** and select your cache to see keys and their remaining lifetime. Choose **View value** to inspect a saved value.

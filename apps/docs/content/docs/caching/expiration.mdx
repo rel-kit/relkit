@@ -1,0 +1,36 @@
+---
+title: Expiration and invalidation
+description: Decide how long values stay useful and remove them when the original data changes.
+---
+
+## Set a lifetime
+
+A time to live (**TTL**) is how long a cached value can be reused. The prices cache uses one minute by default:
+
+<include cwd lang="ts" meta='title="src/orders/cache/prices.cache.ts"'>
+  ../../examples/commerce/src/orders/cache/prices.cache.ts
+</include>
+
+To use a shorter lifetime for one write, call `await context.cache.prices.set({ sku: "book" }, 1200, { ttlMs: 10_000 })`. `getOrSet()` accepts the same options as its third argument when saving a newly loaded value.
+
+TTL values must be positive integers in milliseconds. Here, a value above `300_000` is rejected. Reading a cached value does not restart its lifetime, and `getOrSet()` does not change an existing entry's TTL on a hit.
+
+## Remove stale values after a change
+
+When a product price changes, save the new price to your database first. Then call `await context.cache.prices.delete({ sku: "book" })`. The next `getOrSet()` call loads the new price.
+
+This is **invalidation**: removing a cached copy because you know it may be outdated. It complements TTL; you do not have to wait for expiration after a known change. An event function can invalidate the cache after a product-update event too.
+
+If results depend on a user, tenant, currency, or permissions, include those details in your key. Otherwise, one request can reuse another request's data.
+
+## Test freshness
+
+Test a missing entry, a hit, expiration, and deletion. Use a controllable clock in tests instead of waiting for a real minute.
+
+After adding those tests, run from your app's root:
+
+```sh
+bun run test
+```
+
+Keep your database as the source of truth. A cache error is not a cache miss: decide whether your app should fail the request or read the original data when caching is unavailable.
