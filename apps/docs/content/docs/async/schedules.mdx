@@ -1,75 +1,33 @@
 ---
 title: Job schedules
-description: Trigger a durable job with explicit cron, timezone, input, and overlap policy, then verify the next run safely.
+description: Continue to the Jobs schedule guide for cron, timezone, static input, enqueue overlap, and recovery expectations.
 ---
 
-A schedule is a repeatable source of job input. It belongs to a job descriptor, so scheduled and manually
-enqueued work share validation, target behavior, retry, timeout, concurrency, and idempotency. Use a schedule
-for calendar-driven work; use direct enqueue when a domain event or user action determines timing.
+A schedule is an option on a job that enqueues input on a calendar. The complete guide now lives under
+[Jobs → Schedules](/docs/jobs/schedules), alongside job definition, retries, and idempotency.
 
-## Read the canonical schedule
+## Read the schedule contract
 
-<include cwd lang="ts" meta='title="examples/commerce/src/receipts/jobs/send-receipt.job.ts"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+<include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — schedule"'>
+  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-schedule
 </include>
 
-`receipts.reconcile` runs at minute zero in UTC, supplies a complete validated input, and skips overlap. The
-schedule ID is stable because deployment and operational history refer to it independently from the job ID.
+Each entry supplies a stable ID, five-field cron, explicit timezone, static JSON input, and overlap policy.
+In the current runtime, overlap controls enqueue callbacks, not the lifetime of the target execution.
+The example's constant order ID also shares the job's 24-hour local idempotency window, so hourly
+enqueue attempts do not imply a fresh receipt every hour.
 
-## Define a business-time schedule
+## Verify timing and recovery separately
 
-<Steps>
-  <Step>
-    ### Write the business rule in words
+Run the application checks after editing the descriptor:
 
-    State “run at 09:00 every business day in Asia/Riyadh,” not “use this cron.” Decide how daylight-saving
-    changes, missed runs, holidays, and long executions should behave before encoding fields.
+```sh
+bun run check
+bun run typecheck
+```
 
-  </Step>
-  <Step>
-    ### Add a stable schedule entry
-
-    Supply `id`, five-field `cron`, an IANA `timezone`, complete JSON `input`, and `overlap`. Use `skip` when a
-    second run would duplicate or compete with the first; use `allow` only when concurrent runs are safe.
-
-  </Step>
-  <Step>
-    ### Validate the graph and deployment preview
-
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    bun run relkit graph print
-    bun run relkit deploy preview --stack development
-    ```
-
-    The graph should show the schedule under the job. Preview should show the scheduler resource or binding
-    without applying it.
-
-  </Step>
-  <Step>
-    ### Test the target without waiting for the clock
-
-    Invoke the job target or schedule harness with the scheduled input and a deterministic clock. Assert the
-    job result and side effects. A test that waits until the next wall-clock minute is slow and flaky.
-
-  </Step>
-</Steps>
-
-## Timezones and deployment clocks
-
-Always set the timezone from the business rule. Do not rely on the developer laptop, container, AWS account,
-or provider default. UTC is appropriate for globally fixed intervals; a named regional timezone is appropriate
-when people expect a local clock time.
-
-Cron describes when a provider should trigger; it does not promise an exact start millisecond. Capacity,
-provider delivery, retries, and maintenance can delay execution. Handlers must use the invocation's actual
-time and remain safe when a run arrives late.
-
-## Missed and overlapping work
-
-RELKIT's descriptor makes overlap explicit, but missed-run catch-up can depend on the provider. Document that
-behavior for the chosen adapter and test recovery. Idempotency keys should distinguish intended schedule
-occurrences when each period must run once; a constant key can suppress legitimate later periods throughout
-the retention window.
+Then follow [Schedules](/docs/jobs/schedules) to test input, clock boundaries, overlap, and missed firings.
+The local scheduler does not guarantee catch-up across a restart. The [first-job test](/docs/jobs/first-job)
+proves queue execution and local duplicate protection; it does not start schedules automatically.
 
 <include cwd>content/generated/related/async-schedules.mdx</include>

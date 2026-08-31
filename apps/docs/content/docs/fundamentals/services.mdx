@@ -3,7 +3,11 @@ title: Services and domains
 description: Use one service descriptor to define each domain's public functions and events.
 ---
 
-Every top-level directory below `src/` is a domain and contains one `service.ts`.
+For the complete architecture and learning path, start with [Service](/docs/service),
+[domain design](/docs/service/domains), and [where to put your code](/docs/service/organization).
+
+Every top-level application domain below `src/` contains one `service.ts`; `routes` and `platform`
+are separate layers, not domains.
 The service is the domain's public boundary: listed functions and events are public;
 other descriptors remain internal.
 
@@ -13,7 +17,8 @@ other descriptors remain internal.
   ../../examples/commerce/src/orders/service.ts
 </include>
 
-Members are the original descriptors, so `orders.createOrder` has the same identity,
+Public functions are ordinary callable functions, not event-only subscribers. Members are the original
+descriptors, so `orders.createOrder` has the same identity,
 schemas, errors, and `.invoke()` behavior as the imported `createOrder` value. Services
 do not clone members and do not add `.functions` or `.events` namespaces.
 

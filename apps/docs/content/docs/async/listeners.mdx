@@ -1,73 +1,26 @@
 ---
-title: Event listeners
-description: React to events independently, declare listener dependencies, bound retry and concurrency, and make duplicate delivery safe.
+title: Event functions
+description: Run a function when an event is published.
 ---
 
-A listener is an asynchronous consumer of an event contract. It can invoke functions and enqueue jobs without
-blocking the original publisher. Give each business reaction its own listener so failure, retry, concurrency,
-and deployment history remain independently visible.
+Use `defineEventFunction` for work that should happen after an event, such as sending an order confirmation.
 
-## Read the receipt listener
+## Add a consumer
 
-<include cwd lang="ts" meta='title="examples/commerce/src/receipts/events/order-receipt.event.ts"'>
-  ../../examples/commerce/src/receipts/events/order-receipt.event.ts
+After [defining `orders.created`](/docs/events/define), create `src/orders/functions/order-confirmation.function.ts`:
+
+<include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/order-confirmation.function.ts
 </include>
 
-The listener selects `orders.created`, loads the current order through normal function invocation, and enqueues
-receipt work through a declared job dependency. Its retry and concurrency policy belong to this reaction, not
-to the event declaration or publisher.
+- `id` uniquely names this function.
+- `event` is the exact ID of the event to consume.
+- `handler` receives the event data and performs the work.
 
-## Implement a listener
+Run `bun run check` from your app's root. RelKit runs the handler when `orders.created` is published; you do not call it yourself.
 
-<Steps>
-  <Step>
-    ### Select the narrowest event
+To add another reaction, create another event function with a different `id` and the same `event`. For example, confirmation and analytics can both react to an order being created.
 
-    Prefer a specific event ID and compatible version. Wildcard selection is restricted to telemetry-style
-    consumers because ordinary business listeners should not silently receive unrelated future events.
+Use `defineFunction` when the caller needs a result, such as the created order. Use `defineEventFunction` for a reaction that runs separately, without returning a result to the publisher.
 
-  </Step>
-  <Step>
-    ### Declare managed dependencies
-
-    Add every bucket, cache, event, or job client used by the handler. A nested function invocation uses
-    `.invoke()`; direct provider clients come from listener context.
-
-  </Step>
-  <Step>
-    ### Bound execution
-
-    Set retry attempts, delay, jitter, concurrency, and any timeout according to downstream capacity. Retrying
-    faster than a failing dependency can recover creates an outage amplifier.
-
-  </Step>
-  <Step>
-    ### Test delivery and recovery
-
-    Publish a representative event through the deterministic harness, run delivery, and assert the job fake.
-    Repeat the same event ID to prove duplicate safety, then inject one retryable and one terminal failure.
-
-    ```sh title="Terminal — relkit-orders"
-    bun run test:integration
-    bun run check
-    ```
-
-  </Step>
-</Steps>
-
-## At-least-once consequences
-
-A listener can complete a side effect and crash before the provider records acknowledgement. The same event
-may then be delivered again. Use event/domain IDs as idempotency keys, make writes conditional, or record
-processed IDs in durable state. In-memory sets do not survive restart and do not coordinate replicas.
-
-Ordering is also provider-specific. When correctness depends on order, use versioned state or sequence checks
-and define the partitioning guarantee explicitly. Do not infer global ordering from timestamps.
-
-## Diagnose a failed listener
-
-Use the inspector to locate the event delivery, listener attempt, correlation/causation IDs, declared error,
-and next retry. Confirm whether the event was rejected by schema, the listener failed, or a downstream enqueue
-failed. Replaying an event is a side-effecting operation; verify idempotency before doing it.
-
-<include cwd>content/generated/related/async-listeners.mdx</include>
+Try the complete [Orders example](/docs/events/first-event).
