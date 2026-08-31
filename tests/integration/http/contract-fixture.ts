@@ -30,6 +30,7 @@ export function contractGraph(root = "/project", reverse = false): ApplicationGr
   const nodes = [
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.get",
       source: { file: `${root}/src/functions/get.ts`, line: 1, column: 1 },
       input,

@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
 import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
-import { createEventListenerTarget } from "../../packages/events/src/index.ts";
 import { fromGraph } from "../../packages/deploy/src/index.ts";
+import { bindFunctionEvents } from "../../packages/events/src/index.ts";
 import { renderPulumiProgram } from "../../packages/deploy-pulumi/src/program.ts";
 import {
   invokeFunction,
@@ -32,7 +32,7 @@ import {
 import { bindDescriptorIdentity } from "../../packages/invocation/dist/index.js";
 import app from "../../examples/commerce/relkit.config.ts";
 import orderCreated from "../../examples/commerce/src/orders/events/order-created.event.ts";
-import orderReceipt from "../../examples/commerce/src/receipts/events/order-receipt.event.ts";
+import orderReceipt from "../../examples/commerce/src/receipts/functions/order-receipt.function.ts";
 import authorizeOrder from "../../examples/commerce/src/orders/functions/authorize-order.function.ts";
 import createOrder from "../../examples/commerce/src/orders/functions/create-order.function.ts";
 import getOrder from "../../examples/commerce/src/orders/functions/get-order.function.ts";
@@ -101,7 +101,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   const requestRecords: RequestRecord[] = [];
   const clients = fixtureClients();
   const targets = new Map<string, InvocationTarget>([
-    ["orders.create-order", createOrder],
+    ["orders.create-order", bindFunctionEvents(createOrder, undefined, [orderCreated])],
     ["orders.get-order", getOrder],
     ["orders.authorize-order", authorizeOrder],
   ]);
@@ -143,7 +143,7 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
     expect((await graphResponse.json()).graphHash).toBe(graphHash);
 
     await expect(
-      invokeFunction(createOrder, ORDER_INPUT, {
+      invokeFunction(bindFunctionEvents(createOrder, undefined, [orderCreated]), ORDER_INPUT, {
         source: "direct",
         now: () => Date.now(),
         clients,
@@ -187,17 +187,12 @@ test("commerce-example keeps one graph and hash across every acceptance consumer
   const event = await createTestEvent({
     event: orderCreated,
     triggerId: "receipts.on-order-created",
-    target: createEventListenerTarget(
-      orderReceipt,
-      [orderCreated],
-      "relkit.event.receipts.on-order-created.handler",
-    ) as unknown as InvocationTarget,
+    target: orderReceipt,
     delivery: "durable",
-    expansion: ["orders.created@1"],
     clients: {
       jobs: { sendReceiptJob: { enqueue: async () => ({ accepted: true, instanceId: "job-1" }) } },
     },
-    payloadSchema: orderCreated.payload,
+    payloadSchema: orderCreated.input,
   });
   try {
     await event.publish({ ...ORDER_INPUT, totalCents: 2_000 });
@@ -285,10 +280,16 @@ function assertApplicationCoverage(graph: ApplicationGraph, plan: RegistrationPl
   expect(plan.queues.map(({ id }) => id)).toEqual(["receipts.send-job"]);
   expect(plan.schedules.map(({ id }) => id)).toEqual(["receipts.send-job:receipts.reconcile"]);
   expect(plan.eventTriggers.map(({ id }) => id).sort()).toEqual([
-    "orders.audit-changes",
-    "orders.project-any-change",
-    "receipts.on-order-created",
-    "telemetry.capture-events",
+    "relkit.event.orders.audit-cancelled.trigger",
+    "relkit.event.orders.audit-created.trigger",
+    "relkit.event.orders.audit-updated.trigger",
+    "relkit.event.orders.project-cancelled.trigger",
+    "relkit.event.orders.project-created.trigger",
+    "relkit.event.orders.project-updated.trigger",
+    "relkit.event.receipts.on-order-created.trigger",
+    "relkit.event.telemetry.order-cancelled.trigger",
+    "relkit.event.telemetry.order-created.trigger",
+    "relkit.event.telemetry.order-updated.trigger",
   ]);
   expect(plan.buckets.map(({ id }) => id)).toEqual(["assets.objects"]);
   expect(plan.caches.map(({ id }) => id)).toEqual(["orders.prices"]);
@@ -322,7 +323,7 @@ function fixtureClients(): DependencyClientSources {
   return {
     cache: { prices: { getOrSet: async () => 1_000 } },
     events: {
-      orderCreated: {
+      "orders.created": {
         publish: async () => ({ accepted: true, instanceId: "event-1" }),
       },
     },

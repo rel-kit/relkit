@@ -34,13 +34,7 @@ describe("commerce receipt jobs", () => {
     const plan = createRegistrationPlan(graph, { projectRoot: "/fixture" });
     const job = graph.nodes.find((node) => node.kind === "job" && node.id === "receipts.send-job");
 
-    expect(compiled.diagnostics).toEqual([
-      expect.objectContaining({
-        code: "RELKIT_EVENT_WILDCARD_RESTRICTED",
-        severity: "warning",
-        message: "Raw all-event selector is restricted to telemetry.",
-      }),
-    ]);
+    expect(compiled.diagnostics).toEqual([]);
     expect(job).toMatchObject({
       kind: "job",
       targetFunctionId: "receipts.send-receipt",
@@ -64,7 +58,7 @@ describe("commerce receipt jobs", () => {
         },
         {
           kind: "enqueues-job",
-          from: "relkit.event.receipts.on-order-created.handler",
+          from: "receipts.on-order-created",
           to: "receipts.send-job",
         },
       ]),

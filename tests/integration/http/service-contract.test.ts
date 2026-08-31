@@ -142,6 +142,7 @@ function serviceGraph(): ApplicationGraph {
       },
       {
         kind: "function",
+        invocationMode: "callable",
         id: "orders.get",
         domainId: "orders",
         exposure: "public",
