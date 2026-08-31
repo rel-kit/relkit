@@ -7,6 +7,7 @@ import type {
 import type {
   EventClient,
   EventDescriptorAny,
+  EventFunctionDescriptorAny,
   EventProvider,
   EventPublishResult,
   UnknownEventEnvelope,
@@ -20,26 +21,24 @@ import type { TestClock } from "./runtime.js";
 
 export interface TestEventTriggerOptions<Output = unknown> {
   readonly id: string;
-  readonly target: InvocationTarget<UnknownEventEnvelope, Output>;
+  readonly target: EventFunctionDescriptorAny;
   readonly delivery?: "ephemeral" | "durable";
-  readonly selector?: JsonValue;
-  readonly expansion?: readonly string[];
   readonly profile?: string;
   readonly retry?: RetryPolicy;
   readonly concurrency?: number;
+  readonly timeoutMs?: number;
 }
 
 export interface TestEventOptions<Payload = unknown, Output = unknown> {
   readonly event?: EventDescriptorAny;
+  readonly events?: readonly EventDescriptorAny[];
   readonly eventId?: string;
   readonly version?: number;
   readonly payloadSchema?: StandardSchemaV1;
-  readonly target?: InvocationTarget<UnknownEventEnvelope, Output>;
+  readonly target?: EventFunctionDescriptorAny;
   readonly triggers?: readonly TestEventTriggerOptions<Output>[];
   readonly triggerId?: string;
   readonly delivery?: "ephemeral" | "durable";
-  readonly selector?: JsonValue;
-  readonly expansion?: readonly string[];
   readonly profile?: string;
   readonly ownerId?: string;
   readonly correlationId?: string;

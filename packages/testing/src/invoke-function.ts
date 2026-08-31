@@ -2,6 +2,7 @@ import type { MaybePromise } from "@relkit/contracts";
 import {
   invokeFunction as invokeEngineFunction,
   type DependencyClientSources,
+  type FunctionRegistry,
   type InvocationContext,
   type InvocationHooks,
   type InvocationIdSource,
@@ -18,6 +19,7 @@ export interface StandaloneFunctionTarget {
   readonly output: StandardSchemaV1;
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
   readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
+  readonly publishes?: readonly string[];
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
@@ -39,6 +41,7 @@ export type FunctionContextOf<Target> =
     : InvocationContext;
 
 export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
+  readonly registry?: FunctionRegistry;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
   readonly signal?: AbortSignal;
@@ -103,6 +106,7 @@ export function invokeFunctionWithRunner<
   return invokeEngineFunction(invocationTarget, input, {
     source: "direct",
     env,
+    ...(options?.registry === undefined ? {} : { registry: options.registry }),
     ...(options?.clients === undefined ? {} : { clients: options.clients }),
     ...(options?.signal === undefined ? {} : { signal: options.signal }),
     ...(options?.now === undefined ? {} : { now: options.now }),
@@ -131,7 +135,10 @@ function freezeEnv(
 }
 
 function hasDependencies(target: StandaloneFunctionTarget): boolean {
-  return Object.values(target.dependencies ?? {}).some(
-    (category) => category !== undefined && Object.keys(category).length > 0,
+  return (
+    (target.publishes?.length ?? 0) > 0 ||
+    Object.values(target.dependencies ?? {}).some(
+      (category) => category !== undefined && Object.keys(category).length > 0,
+    )
   );
 }

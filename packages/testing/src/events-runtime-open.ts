@@ -23,7 +23,7 @@ export interface OpenTestEventRuntimeOptions {
   readonly failures: TestFailureControls;
   readonly runner: InvocationRunner;
   readonly idSource: Parameters<typeof createEventInvoker>[4];
-  readonly targets: ReadonlyMap<string, InvocationTarget<UnknownEventEnvelope, unknown>>;
+  readonly targets: ReadonlyMap<string, InvocationTarget<unknown, unknown>>;
   readonly generation: number;
 }
 
@@ -55,13 +55,14 @@ export async function openTestEventRuntime(input: OpenTestEventRuntimeOptions): 
       router.registerTrigger({
         id: binding.id,
         targetFunctionId: binding.targetFunctionId,
-        selector: binding.selector,
-        expansion: binding.expansion,
+        eventId: binding.eventId,
+        eventVersion: binding.eventVersion,
         delivery: binding.delivery,
         profile: binding.profile,
         invoke: binding.invoke,
         ...(binding.retry === undefined ? {} : { retry: binding.retry as unknown as RetryPolicy }),
         ...(binding.concurrency === undefined ? {} : { concurrency: binding.concurrency }),
+        ...(binding.timeoutMs === undefined ? {} : { timeoutMs: binding.timeoutMs }),
       }),
   };
   await materializeEvents({

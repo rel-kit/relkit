@@ -36,8 +36,22 @@ test("engine dispatch uses the verified generation registry in its shared scope"
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,
     nodes: [
-      { kind: "function", id: parent.id, source, input: null, output: null },
-      { kind: "function", id: child.id, source, input: null, output: null },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: parent.id,
+        source,
+        input: null,
+        output: null,
+      },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: child.id,
+        source,
+        input: null,
+        output: null,
+      },
     ],
     edges: [],
   };
@@ -104,8 +118,22 @@ test("function invoke uses standalone and active generation dispatch", async () 
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,
     nodes: [
-      { kind: "function", id: parent.id, source, input: null, output: null },
-      { kind: "function", id: child.id, source, input: null, output: null },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: parent.id,
+        source,
+        input: null,
+        output: null,
+      },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: child.id,
+        source,
+        input: null,
+        output: null,
+      },
     ],
     edges: [],
   };
@@ -168,8 +196,22 @@ test("keeps concurrent generation runtimes isolated", async () => {
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,
     nodes: [
-      { kind: "function", id: parent.id, source, input: null, output: null },
-      { kind: "function", id: child.id, source, input: null, output: null },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: parent.id,
+        source,
+        input: null,
+        output: null,
+      },
+      {
+        kind: "function",
+        invocationMode: "callable",
+        id: child.id,
+        source,
+        input: null,
+        output: null,
+      },
     ],
     edges: [],
   };

@@ -1,10 +1,13 @@
 import { materializeEvents, type InvocationIdSource, type InvocationTarget } from "@relkit/engine";
 import {
   createEventClient,
+  defineEvent,
+  bindFunctionEvents,
   type EventClient,
   type EventProvider,
   type UnknownEventEnvelope,
 } from "@relkit/events";
+import { z } from "@relkit/schema";
 import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
 import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
@@ -23,7 +26,8 @@ import type {
 type TestTrigger<Output> = TestEventTriggerOptions<Output> & {
   readonly delivery: "ephemeral" | "durable";
   readonly profile: string;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
 };
 type OpenedEventRuntime = Awaited<ReturnType<typeof openTestEventRuntime>>;
 
@@ -59,16 +63,23 @@ export async function createTestEventRuntime<Payload, Output>(
     idSource,
     options,
   } = input;
+  const contract =
+    options.event ??
+    defineEvent({ id: eventId, version, input: options.payloadSchema ?? z.unknown() });
+  const contracts = [contract, ...(options.events ?? [])];
   const targets = new Map(
     triggers.map(({ target }) => [
       target.id,
-      target as InvocationTarget<UnknownEventEnvelope, unknown>,
+      bindFunctionEvents(
+        target,
+        contract,
+        contracts.filter((event) => target.publishes?.includes(event.id)),
+      ) as unknown as InvocationTarget<unknown, unknown>,
     ]),
   );
   const envelopes: UnknownEventEnvelope[] = [];
   const attempts: TestEventDeliveryAttempt[] = [];
   const unfanned = new Map<string, UnknownEventEnvelope>();
-  const ephemeralCompleted = new Map<string, number>();
   let log!: OpenedEventRuntime["log"];
   let router!: EventRouter;
   let generation = 0;
@@ -119,11 +130,11 @@ export async function createTestEventRuntime<Payload, Output>(
       envelopes.push(record.envelope);
       unfanned.set(record.envelope.instanceId, record.envelope);
       failures.check("event.after-persist-before-fanout");
-      await fanoutEvent(router, record.envelope, unfanned, ephemeralCompleted, failures);
+      await fanoutEvent(router, record.envelope, unfanned, failures);
       return { accepted: true, ...record.envelope };
     },
   };
-  const payloadSchema = options.payloadSchema ?? options.event?.payload;
+  const payloadSchema = options.payloadSchema ?? options.event?.input;
   const client = createEventClient({
     ownerId: options.ownerId ?? `test-owner-${eventId}`,
     eventId,
@@ -149,8 +160,7 @@ export async function createTestEventRuntime<Payload, Output>(
     triggers,
     envelopes,
     unfanned,
-    ephemeralCompleted,
-    openFanout: (envelope) => fanoutEvent(router, envelope, unfanned, ephemeralCompleted, failures),
+    openFanout: (envelope) => fanoutEvent(router, envelope, unfanned, failures),
     remember,
     isClosed: () => closed,
     markClosed: () => (closed = true),

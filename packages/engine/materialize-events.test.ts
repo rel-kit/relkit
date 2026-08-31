@@ -40,7 +40,10 @@ describe("event materialization", () => {
     });
 
     expect(calls).toEqual(["orders.created@1", "orders.listener"]);
-    expect(materialized.triggers.get("orders.listener")?.expansion).toEqual(["orders.created@1"]);
+    expect(materialized.triggers.get("orders.listener")).toMatchObject({
+      eventId: "orders.created",
+      eventVersion: 1,
+    });
 
     const controller = new AbortController();
     const envelope = {
@@ -63,8 +66,8 @@ describe("event materialization", () => {
 
     expect(invocation).toMatchObject({
       functionId: "orders.handle",
-      input: envelope,
-      source: "event",
+      input: envelope.payload,
+      source: "event-delivery",
       correlationId: "corr-1",
       traceId: "trace-1",
       signal: controller.signal,
@@ -100,6 +103,7 @@ describe("event materialization", () => {
 function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
   const functionNode: FunctionNode = {
     kind: "function",
+    invocationMode: "event-only",
     id: "orders.handle",
     source,
     input: { type: "object" },
@@ -110,7 +114,7 @@ function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
     id: "orders.created",
     source,
     version: 1,
-    payload: { type: "object" },
+    input: { type: "object" },
   };
   return {
     graphHash: "sha256:events",
@@ -127,8 +131,8 @@ function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
         triggerType: "event",
         targetFunctionId,
         config: {
-          selector: { kind: "single", eventId: "orders.created", version: 1 },
-          expansion: ["orders.created@1"],
+          eventId: "orders.created",
+          eventVersion: 1,
           delivery: "durable",
         },
       },

@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "@relkit/schema";
+import { defineEventFunction } from "@relkit/events";
 import { createTestEvent } from "./src/index.ts";
 
-const target = {
+const target = defineEventFunction({
   id: "orders.receipt",
-  input: z.unknown(),
-  output: z.object({ handled: z.boolean() }),
-  handler: async () => ({ handled: true }),
-};
+  event: "orders.created" as never,
+  handler: async () => {},
+});
 
 const retry = {
   maxAttempts: 1,
@@ -28,7 +28,6 @@ describe("testing event fake", () => {
         ...target,
         handler: async (input) => {
           received = input;
-          return { handled: true };
         },
       },
       startTimeMs: 100,
@@ -44,15 +43,12 @@ describe("testing event fake", () => {
         publishedAt: new Date(100).toISOString(),
         traceId: "test-trace-1",
       });
-      expect(event.pending("orders.created.trigger")).toBe(1);
+      expect(event.pending("relkit.event.orders.receipt.trigger")).toBe(1);
       expect(event.envelopes).toHaveLength(1);
       await expect(event.drain()).resolves.toMatchObject([{ state: "completed", attempt: 1 }]);
-      expect(received).toMatchObject({
-        instanceId: published.instanceId,
-        payload: { orderId: "order-1" },
-      });
+      expect(received).toEqual({ orderId: "order-1" });
       expect(event.pending()).toBe(0);
-      expect(event.completed("orders.created.trigger")).toBe(1);
+      expect(event.completed("relkit.event.orders.receipt.trigger")).toBe(1);
       expect(event.attempts).toHaveLength(1);
       expect(event.deliveries[0]).toMatchObject({ state: "completed", attempt: 1 });
     } finally {
