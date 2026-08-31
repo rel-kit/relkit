@@ -96,6 +96,27 @@ test("expands optional catch-all routes without duplicating the authored route",
   });
 });
 
+test("omits domain tags without documented HTTP operations", () => {
+  const inputGraph = graph(false);
+  const source = { file: "src/receipts/service.ts", line: 1, column: 1 };
+  const document = generateOpenApi({
+    ...inputGraph,
+    nodes: [
+      ...inputGraph.nodes,
+      ...["receipts", "database", "telemetry", "auth"].map((id) => ({
+        kind: "service" as const,
+        id,
+        source,
+        functions: [],
+        events: [],
+      })),
+    ],
+  });
+
+  expect(document.tags?.map((tag) => tag.name)).toEqual(["orders", "read"]);
+  expect(document.paths).toHaveProperty("/orders/{id}");
+});
+
 test("projects single and repeated file fields as multipart binary schemas", () => {
   const inputGraph = graph(false);
   const target = inputGraph.nodes.find((node) => node.kind === "function")! as any;
@@ -172,11 +193,12 @@ function graph(reverse: boolean): ApplicationGraph {
       title: "Orders",
       description: "Order operations",
       tags: ["orders"],
-      members: [{ name: "get", functionId: "orders.get" }],
-      middleware: [],
+      functions: [{ name: "get", functionId: "orders.get" }],
+      events: [],
     },
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.get",
       source: { file: "src/functions/get.ts", line: 1, column: 1 },
       input,

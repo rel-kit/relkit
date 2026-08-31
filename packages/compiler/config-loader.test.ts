@@ -7,7 +7,7 @@ describe("RELKIT configuration", () => {
       server: {
         port: 4100,
         maxBodyBytes: 2_000_000,
-        apiDocs: { enabledInProduction: true },
+        apiDocs: { enabledInProduction: true, excludeDomains: ["navigation", "auth"] },
       },
       inspector: { port: 4210 },
     } as const;
@@ -20,7 +20,7 @@ describe("RELKIT configuration", () => {
       server: {
         port: 4100,
         maxBodyBytes: 2_000_000,
-        apiDocs: { enabledInProduction: true },
+        apiDocs: { enabledInProduction: true, excludeDomains: ["navigation", "auth"] },
       },
       inspector: { port: 4210 },
     });
@@ -52,5 +52,13 @@ describe("RELKIT configuration", () => {
     expect(() => loadConfig({ server: { port: 0 } }, "/workspace/app")).toThrow(
       ConfigValidationError,
     );
+  });
+
+  test("rejects invalid API docs domain exclusions", () => {
+    for (const excludeDomains of ["navigation", [""], ["  "], [1], null]) {
+      expect(
+        validateConfig({ server: { apiDocs: { excludeDomains } } }, "/workspace/app"),
+      ).toContainEqual(expect.objectContaining({ path: "server.apiDocs.excludeDomains" }));
+    }
   });
 });

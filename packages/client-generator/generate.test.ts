@@ -117,6 +117,7 @@ function unmappedPathGraph(): ApplicationGraph {
     nodes: [
       {
         kind: "function",
+        invocationMode: "callable",
         id: "reports.read",
         source: { file: "src/functions/read.ts", line: 1, column: 1 },
         input: {
@@ -153,6 +154,7 @@ function graph(reverse: boolean): ApplicationGraph {
   const nodes = [
     {
       kind: "function",
+      invocationMode: "callable",
       id: "orders.get",
       source: { file: "src/functions/get.ts", line: 1, column: 1 },
       input,

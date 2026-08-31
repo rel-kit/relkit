@@ -2,7 +2,10 @@ import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/cont
 
 export interface ServerSourceConfiguration {
   readonly maxBodyBytes: number;
-  readonly apiDocs: { readonly enabledInProduction: boolean };
+  readonly apiDocs: {
+    readonly enabledInProduction: boolean;
+    readonly excludeDomains?: readonly string[];
+  };
   readonly clientContract: boolean;
   readonly mcp: boolean;
   readonly maxPreviewBytes: number;
@@ -22,6 +25,7 @@ const app = createApp({
     mode: environment,
     document: openapiDocument,
     enabledInProduction: ${String(configuration.apiDocs.enabledInProduction)},
+    excludeDomains: ${JSON.stringify(configuration.apiDocs.excludeDomains ?? [])},
     ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),

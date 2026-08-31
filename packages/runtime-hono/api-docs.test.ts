@@ -15,6 +15,7 @@ const plan: RegistrationPlan = {
   functions: [
     {
       kind: "function",
+      invocationMode: "callable",
       id: "hello",
       serviceId: "hello-service",
       source,
@@ -56,8 +57,8 @@ const plan: RegistrationPlan = {
       title: "Hello",
       description: "Hello operations",
       tags: ["hello"],
-      members: [{ name: "hello", functionId: "hello" }],
-      middleware: [],
+      functions: [{ name: "hello", functionId: "hello" }],
+      events: [],
     },
   ],
 };
@@ -120,6 +121,44 @@ describe("OpenAPI and Scalar endpoints", () => {
     expect(reference.status).toBe(200);
     expect(html).toContain("Protected RELKIT API");
     expect(html).not.toContain(`\"url\":\"${OPENAPI_PATH}\"`);
+  });
+
+  test("excludes domain operations and empty tags without disabling routes", async () => {
+    const document = {
+      openapi: "3.1.0",
+      info: { title: "Commerce", version: "1" },
+      tags: ["orders", "navigation", "receipts"].map((name) => ({ name })),
+      paths: {
+        "/hello": {
+          summary: "Mixed domains",
+          get: { tags: ["navigation"], "x-relkit": { serviceId: "navigation" } },
+          post: { tags: ["orders"], "x-relkit": { serviceId: "orders" } },
+        },
+        "/docs": { get: { tags: ["navigation"], "x-relkit": { serviceId: "navigation" } } },
+      },
+    };
+    const service = app({ document, excludeDomains: ["navigation"] });
+    const response = await service.request(OPENAPI_PATH);
+    const filtered = await response.json();
+    expect(filtered.tags).toEqual([{ name: "orders" }]);
+    expect(filtered.paths).toEqual({
+      "/hello": {
+        summary: "Mixed domains",
+        post: document.paths["/hello"].post,
+      },
+    });
+    expect((await service.request("/hello")).status).toBe(200);
+    expect(document.paths["/hello"].get).toBeDefined();
+
+    const protectedService = app({
+      document,
+      excludeDomains: ["navigation"],
+      bearerToken: "secret",
+    });
+    const reference = await protectedService.request(API_REFERENCE_PATH, {
+      headers: { authorization: "Bearer secret" },
+    });
+    expect(await reference.text()).not.toContain("navigation");
   });
 });
 

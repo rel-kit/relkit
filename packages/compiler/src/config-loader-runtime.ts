@@ -81,7 +81,7 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
   if (value === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
   const record = readRecord(value, "server.apiDocs", issues);
   if (record === undefined) return DEFAULT_TOOLING_CONFIG.server.apiDocs;
-  rejectUnknown(record, "server.apiDocs", ["enabledInProduction"], issues);
+  rejectUnknown(record, "server.apiDocs", ["enabledInProduction", "excludeDomains"], issues);
   if (record.enabledInProduction !== undefined && typeof record.enabledInProduction !== "boolean") {
     issues.push({
       code: CONFIG_CODES.behavior,
@@ -89,9 +89,29 @@ function readApiDocs(value: unknown, issues: ConfigIssue[]) {
       message: "server.apiDocs.enabledInProduction must be a boolean.",
     });
   }
+  const excludeDomains = record.excludeDomains;
+  const validDomains =
+    Array.isArray(excludeDomains) &&
+    excludeDomains.every(
+      (domain): domain is string => typeof domain === "string" && domain.trim().length > 0,
+    );
+  if (excludeDomains !== undefined && !validDomains) {
+    issues.push({
+      code: CONFIG_CODES.behavior,
+      path: "server.apiDocs.excludeDomains",
+      message: "server.apiDocs.excludeDomains must be an array of non-empty domain IDs.",
+    });
+  }
   return {
     enabledInProduction:
       typeof record.enabledInProduction === "boolean" ? record.enabledInProduction : false,
+    ...(validDomains
+      ? {
+          excludeDomains: Object.freeze([
+            ...new Set(excludeDomains.map((domain) => domain.trim())),
+          ]),
+        }
+      : {}),
   };
 }
 
