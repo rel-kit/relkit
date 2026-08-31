@@ -25,6 +25,7 @@ const outputs: GeneratedOutputs = {
 function descriptor(id: string, file: string, value: Record<string, unknown> = {}) {
   return {
     kind: "function",
+    invocationMode: "callable",
     id,
     source: { file, line: 1, column: 1 },
     exportName: id,
