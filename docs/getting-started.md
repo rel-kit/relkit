@@ -108,6 +108,10 @@ The backend starts on `http://localhost:3000` and the inspector starts on
 curl "http://localhost:3000/hello?name=RELKIT"
 ```
 
+The CLI includes the prebuilt inspector. Framework contributors testing inspector
+source can set `RELKIT_INSPECTOR_ROOT` to `apps/inspector`; generated applications
+do not need that override.
+
 Expected response:
 
 ```json

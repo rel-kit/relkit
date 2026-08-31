@@ -42,9 +42,10 @@ deployment planning.
 ## Authoring boundary
 
 The executable primitive is a function. Routes, jobs, event triggers, tools,
-and agents reference function descriptors. Mapping and event selectors are
-serializable descriptor data, not arbitrary callbacks. Event handling uses the
-generic `onEvent` trigger model; there is no separate subscription primitive.
+and agents reference callable function descriptors. `defineEventFunction` authors
+an event-only function plus a generated exact-event trigger. Event contracts stay
+handler-free; `publishes` declares exact publication capabilities. Delivery and
+replay are the only allowed invocation sources for event-only functions.
 
 Providers are selected by logical profile (`development`, `test`, or
 `production`) and supplied through the handler context. Application code does

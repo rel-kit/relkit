@@ -51,16 +51,20 @@ No application Effect imports are required.
 ## Event model
 
 ```ts
-export const orderCreated = defineEvent({ ... });
+export const orderCreated = defineEvent({ id: "orders.created", input: orderSchema });
 
-export default onEvent(orderCreated, {
+export default defineEventFunction({
   id: "receipts.on-order-created",
-  target: sendReceipt,
+  event: "orders.created",
   delivery: "durable",
+  handler: async (input, context) => {
+    await sendReceipt.invoke(input);
+  },
 });
 ```
 
-The listener is a generic trigger binding, not a separate application subscription primitive.
+The authored event-only function receives independent deliveries through a generated exact-event trigger.
+Publishers declare `publishes: ["orders.created"]` and use `context.events["orders.created"].publish(input)`.
 
 ## New project
 
