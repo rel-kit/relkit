@@ -1,0 +1,90 @@
+---
+title: Test authentication
+description: Verify migrated auth storage, public and protected requests, sign-in failures, and session invalidation without touching development accounts.
+---
+
+Use an isolated database and the real mounted auth handler to verify the integration. A mocked
+session is useful for a business permission test, but it does not prove sign-in, cookies, migrations,
+or route protection work together.
+
+## Test the complete local flow
+
+The executable test migrates a temporary SQLite file before starting the application. It supplies
+both RELKIT's parsed environment and Better Auth's process environment, then restores process values
+and removes only its temporary directory after closing the application:
+
+<include cwd lang="ts" meta='title="tests/auth.test.ts"'>
+  ../../examples/auth-drizzle/tests/auth.test.ts
+</include>
+
+Run from the repository's `examples/auth-drizzle` directory:
+
+```sh
+bun test tests/auth.test.ts
+```
+
+The assertions cover:
+
+- Applying the checked-in migration and safely applying it again.
+- Anonymous access to public `/session` and rejection at protected `/account/profile`.
+- Email/password sign-up, the resulting cookie, and authenticated application/native session reads.
+- Sign-out followed by rejection of the old session cookie on a new request.
+- Rejection of a wrong password and successful subsequent sign-in.
+
+The HTTP harness does not store browser cookies automatically; the test forwards the returned cookie
+explicitly. It does not read the developer's cookie jar or mutate `./auth.sqlite`.
+
+## Keep test state isolated
+
+Create the environment before loading the auth service: its `baseURL` option is evaluated when the
+module loads, while the omitted secret uses Better Auth's process-environment lookup at activation.
+Passing only `createTestApplication(..., { env: ... })` does not update that native process environment.
+
+Service activation is cached by descriptor. Closing an activated service does not currently clear
+that cache. Reuse one application for a connected auth lifecycle test; do not repeatedly activate the
+same imported descriptor with different database paths and expect fresh clients. Use separate processes
+or independently constructed descriptors when a test genuinely needs separate applications. Do not
+run process-environment mutations concurrently within the same process.
+
+The harness clock is not a promise that native Better Auth time or browser expiry is simulated. For
+expiry/refresh policy tests, use a controlled configuration and time strategy appropriate to the native
+library, then check the resulting HTTP behavior.
+
+## Test business permissions separately
+
+For a domain function, use [function testing](/docs/operations/testing) with an explicit
+`context.auth.getSession` result. Test at least an anonymous caller, the resource owner, and another
+authenticated caller. Assert that denied requests do not read or mutate protected data.
+
+Do not let a fake “authenticated” result bypass ownership or membership checks. If the operation is
+reachable through jobs, tools, or direct invocation, test that transport's identity contract as well;
+HTTP route protection is not the only entry point.
+
+## Verify browser and deployment behavior
+
+The native library relaxes origin checks in its test environment, and this harness is not a browser.
+A passing Bun test does not prove production origin validation, HTTPS cookies, CORS, or OAuth redirects.
+Run the application and exercise sign-up, sign-in, sign-out, and protected access in a real browser.
+
+For your deployment, add checks for hostile origins, expired/revoked sessions, stable secrets across
+replicas, password-reset and verification links, rate limits, and any enabled providers/plugins.
+Run migration tests against the production dialect and an isolated database. Never point these tests
+at live customer accounts.
+
+## Diagnose common failures
+
+| Symptom                                    | Check first                                                                                    |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Compiler rejects auth registration         | One Drizzle service, one auth service, and one recognized `ALL` catch-all mount                |
+| Auth tables are missing                    | Same database path/schema for app and migrations; migration ran before startup                 |
+| Service handler returns `503`              | Use runtime activation through the app, not the descriptor as a standalone server              |
+| Sign-in succeeds but profile returns `401` | Cookie sent on the next request, consistent hostname, correct public URL and cookie policy     |
+| Auth callback/origin is rejected           | Actual `baseURL`, mounted path, exact trusted origins, and provider callback registration      |
+| `/session` reports signed out              | This is a public optional-session function; inspect whether the request carries a valid cookie |
+| Session type is missing                    | Run `bun run check`, inspect the generated registry, then typecheck                            |
+| A signed-in user sees another user's data  | Add/test business authorization; route protection only checks authentication                   |
+
+Use status codes and redacted diagnostics during investigation. Do not print passwords, auth tokens,
+or entire request headers to troubleshoot a cookie problem.
+
+<include cwd>content/generated/related/auth-testing.mdx</include>

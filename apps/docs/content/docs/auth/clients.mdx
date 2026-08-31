@@ -1,0 +1,95 @@
+---
+title: Clients and sign-in flows
+description: Use Better Auth's browser client for authentication, preserve session cookies, and distinguish auth endpoints from RELKIT's generated client.
+---
+
+Use Better Auth's client for sign-up, sign-in, sign-out, and native session management. Use the
+[RELKIT generated client](/docs/http/generated-clients) for your application's function-backed routes.
+They serve different APIs; mounting auth does not generate typed RELKIT methods for its raw endpoints.
+
+## Create a browser auth client
+
+In the frontend package, install the same Better Auth version used by the backend. The repository
+example uses `better-auth@1.7.1`:
+
+```sh
+bun add better-auth@1.7.1
+```
+
+The framework-independent client and a sign-in action are:
+
+<include cwd lang="ts" meta='title="src/platform/auth-client.ts — browser code"'>
+  ../../examples/auth-drizzle/src/platform/auth-client.ts
+</include>
+
+Use your actual public backend origin instead of the loopback URL. `basePath` on this **client** must
+match the filesystem auth mount; it is not the reserved server-service option. Do not import
+`src/auth/service.ts`, database code, or server secrets into the browser. A public backend URL is
+configuration, not a credential.
+
+The action checks Better Auth's returned `error` before using `data`. Your UI should also handle
+rejected requests, display an appropriate failure, and clear loading state after both success and
+failure. Do not log passwords, cookies, or the complete auth response.
+
+## Build the account flow
+
+With email/password enabled, the native client maps these operations to the mounted API:
+
+| User action             | Client method             | Native endpoint under `/api/auth` | Main input                  |
+| ----------------------- | ------------------------- | --------------------------------- | --------------------------- |
+| Create an account       | `authClient.signUp.email` | `POST /sign-up/email`             | `name`, `email`, `password` |
+| Sign in                 | `authClient.signIn.email` | `POST /sign-in/email`             | `email`, `password`         |
+| Read the native session | `authClient.getSession`   | `GET /get-session`                | No credentials in the body  |
+| Sign out                | `authClient.signOut`      | `POST /sign-out`                  | No account password         |
+
+The example enables automatic sign-in after a successful sign-up and does not require email
+verification. If you change those policies, show the verification/sign-in step instead of assuming
+every successful sign-up already has an active session. See [Customization](/docs/auth/customization).
+
+Let the browser store and send the session cookie. Do not copy the session token into local storage
+or manually construct a `Cookie` header in browser JavaScript. Use Better Auth's sign-out endpoint to
+invalidate the session; clearing a UI flag alone does not sign a user out on the server.
+
+After sign-in, call your public `/session` operation or protected `/account/profile` route to verify
+the application sees the same identity. `GET /session` is the example's small application response;
+`GET /api/auth/get-session` is Better Auth's native session response. They are not interchangeable shapes.
+
+## Keep cookies and origins aligned
+
+The simplest local flow serves the page and API from `http://127.0.0.1:3000`. Use that hostname
+consistently: switching between `localhost` and `127.0.0.1` changes the host to which cookies belong.
+
+For a separate frontend origin, configure all three boundaries:
+
+1. The client sends requests to the public backend URL with credentials included.
+2. Better Auth's `trustedOrigins` allows the exact frontend origin for the auth flow.
+3. The HTTP server or gateway supplies credentialed CORS for that origin, including preflight handling.
+
+`trustedOrigins` is not CORS configuration, and CORS does not override cookie domain, `SameSite`, or
+secure-cookie rules. Do not use a wildcard allowed origin with credentialed requests or disable
+CSRF/origin checks to work around a configuration error. Test real browser requests over your intended
+HTTPS domains; the in-process harness does not enforce browser cookie policy.
+
+When using server-side rendering, forward only the current incoming request's relevant credentials
+to the correct backend. A server-side fetch does not inherit the user's browser cookie jar. Likewise,
+any auth response cookies must reach the browser through your framework's supported response handling.
+Never share a mutable cookie/header object across users in a long-lived server client.
+
+## Do not confuse bearer headers with authentication
+
+The existing RELKIT transport example can mutate request headers:
+
+<include cwd lang="ts" meta='title="src/platform/browser-client.ts — transport headers only"'>
+  ../../examples/auth-drizzle/src/platform/browser-client.ts
+</include>
+
+This example does **not** enable Better Auth bearer-token support. Adding an `Authorization` header
+does not teach the server to validate it, and a Better Auth session is not automatically a JWT.
+If you need non-cookie clients, configure and test the corresponding native auth capability on the
+server and its client integration. Keep cookie authentication as the verified flow in this example.
+
+For a framework-free browser demonstration, run `examples/auth-drizzle` using its README and open the
+served page. The page uses the same native HTTP endpoints. For a reproducible command-line flow,
+continue with [Your first auth flow](/docs/auth/first-auth).
+
+<include cwd>content/generated/related/auth-clients.mdx</include>

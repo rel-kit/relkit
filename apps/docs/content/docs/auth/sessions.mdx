@@ -1,0 +1,79 @@
+---
+title: Read sessions
+description: Read the request's verified identity in a business function, handle anonymous callers, and understand session types and non-HTTP limits.
+---
+
+Use `await context.auth.getSession()` inside a function when its behavior depends on the caller.
+It returns the Better Auth session result or `null`. The result contains both the session record and
+the user; the verified user ID is `session.user.id`, not a user-supplied request field.
+
+## Read an optional session
+
+The example's account operation supports anonymous and authenticated requests:
+
+<include cwd lang="ts" meta='title="src/account/functions/session.function.ts"'>
+  ../../examples/auth-drizzle/src/account/functions/session.function.ts
+</include>
+
+Its output deliberately returns only an authentication flag and user ID. Do not return the complete
+session object simply because it is available: auth records can contain tokens, IP addresses, and
+other private data. Define the response your caller needs.
+
+The compiler generates auth context types from the registered service's handler. Functions do not add
+a `dependencies.auth` entry, import a global auth instance, or open a database connection. Run
+`bun run check` after changing registration or type-affecting auth options, then `bun run typecheck`.
+Inspect `.relkit/generated/context-registry.d.ts` if the expected auth type is missing; do not edit it.
+
+## Choose public or authenticated access
+
+The operation is registered by an ordinary domain service:
+
+<include cwd lang="ts" meta='title="src/account/service.ts"'>
+  ../../examples/auth-drizzle/src/account/service.ts
+</include>
+
+Its public route is:
+
+<include cwd lang="ts" meta='title="src/routes/session/route.ts"'>
+  ../../examples/auth-drizzle/src/routes/session/route.ts
+</include>
+
+`GET /session` returns HTTP `200` with `{ "authenticated": false }` when signed out. The same function
+is also mounted at `/account/profile`, which the auth mount protects; there, an anonymous request
+receives `401` before the function runs. See [Protect routes](/docs/auth/protect-routes).
+
+Even behind a protected route, keep function behavior safe for a missing session. That function may
+later have another caller or transport. For operations that require identity, reject a missing
+session using an application [declared error](/docs/fundamentals/errors), then verify permission before
+reading or modifying protected records. A non-null session is not a role or ownership check.
+
+## Understand request-scoped lookup
+
+Session resolution uses the incoming request headers. It is lazy: a public operation that never
+calls `getSession()` does not need that lookup. The HTTP runtime memoizes the lookup promise for the
+request, including the lookup used by route protection. Concurrent reads within that request share
+the result; this is not an application-wide identity cache.
+
+Do not save the session in module state or reuse it for another request. A lookup already completed
+in a request is not a fresh authorization check after revocation or account changes within that same
+request. Use separate requests to verify lifecycle changes such as sign-out.
+
+`context.auth.getSession()` returns data, not a native HTTP `Response`. Do not assume it forwards
+Better Auth's `Set-Cookie` headers to the browser. Use the native [auth endpoints and client](/docs/auth/clients)
+for sign-in, sign-out, and session lifecycle flows.
+
+## Work without an HTTP request
+
+Jobs and direct invocations do not acquire a browser session merely because an auth service exists.
+Without an active HTTP auth context, session lookup resolves to `null`. The Inspector is not a way
+to impersonate a signed-in browser by supplying a `userId` input.
+
+For deferred work, authorize the enqueue operation, record the relevant actor/resource identifiers
+in the job's validated input, and define which permissions must be rechecked at execution time.
+Do not put cookies, passwords, or session tokens in queued payloads. A client-supplied actor ID is
+untrusted until the authenticated entry point validates it.
+
+For unit tests, inject an explicit auth context; for request behavior, use the real HTTP harness in
+[Auth testing](/docs/auth/testing). Neither approach requires reading a developer's browser cookies.
+
+<include cwd>content/generated/related/auth-sessions.mdx</include>

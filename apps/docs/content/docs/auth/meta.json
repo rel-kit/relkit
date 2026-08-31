@@ -1,0 +1,14 @@
+{
+  "title": "Auth",
+  "icon": "ShieldCheck",
+  "pages": [
+    "index",
+    "better-auth",
+    "sessions",
+    "protect-routes",
+    "clients",
+    "customization",
+    "testing",
+    "first-auth"
+  ]
+}
