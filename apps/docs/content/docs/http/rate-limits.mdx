@@ -1,78 +1,89 @@
 ---
 title: Rate limits
-description: Protect routes with stable request keys, shared production counters, predictable 429 responses, and deterministic tests.
+description: Add keyed request limits, understand local versus shared counters, and verify 429 responses without confusing rate limits with authorization.
 ---
 
-Rate limiting bounds how often one key may reach a route during a window. Use it to protect expensive or
-abuse-sensitive operations, not as the only authorization control. The limiter runs before body parsing and
-function invocation so rejected requests consume minimal work.
+Use `rateLimit` on a function-backed route to bound requests for one key during a time window.
+Matching HTTP middleware runs first; the route limiter then runs before input mapping and function invocation.
+Rate limiting is transport policy, not authentication or a guarantee that a business operation executes once.
 
-## Configure a route limit
+## Add a local policy
 
-<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
-  ../../examples/commerce/src/routes/orders/route.ts
+This source-backed compiler test demonstrates a process-local policy:
+
+<include cwd lang="ts" meta='title="Local rate-limit options — checked compiler example"'>
+  ../../tests/compiler/rate-limit.test.ts#local-rate-limit
 </include>
 
-The orders search route allows two requests per minute for each `x-api-key` header value and stores counters
-in the numeric `prices` cache. A key may come from a path segment, query, header, cookie, or constant mapping.
-Body-dependent and callback keys are rejected because the limiter executes before request mapping.
+In your route file, add that `rateLimit` object to the existing `defineRoute` options, keeping your
+public service target and named method export. With `defineServiceRoutes`, add it to the object
+containing `member`. Import `http` from `@relkit/app/routes` for the key mapping.
 
-## Choose a meaningful key
+Here, `limit: 2` permits two requests per `windowMs: 1_000` for the constant key. It is a shared bucket
+for callers of that route within one process, not a separate bucket per user. Both values must be
+positive safe integers. Omitted `store` uses memory that resets with the runtime generation.
 
-Use a stable authenticated account, tenant, or API key when available. IP addresses can group unrelated users
-behind a proxy and change between requests; use them only with a trusted proxy configuration and an understood
-abuse model. A constant key creates a global limit across all callers.
+## Choose a trustworthy key
 
-Never put a secret itself into logs or responses. The limiter may hash or otherwise protect stored keys, but
-application telemetry should still treat authentication material as sensitive.
+Supported key sources are a scalar `http.path`, `http.query`, `http.header`, `http.cookie`, or
+`http.constant`. Body fields, catch-all arrays, transforms, optional/default wrappers, and callbacks
+are not supported key mappings.
 
-## Verify the limit
+Choose a stable identity whose provenance you can verify. A client-controlled account header alone is
+not a verified account: callers can rotate it to evade a limit. Enforce trusted proxy/header boundaries
+or validate credentials in middleware. An absent key shares a missing-value bucket; it does not
+automatically reject an unauthenticated request.
 
-<Steps>
-  <Step>
-    ### Send requests with one key
+Key values are serialized into counter keys; they are **not hashed** by the limiter. Avoid putting raw
+secrets in the key, logs, or metrics. Counter storage needs the same access controls as the identifiers it holds.
 
-    ```sh title="Terminal — relkit-orders"
-    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
-    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
-    curl -i "http://localhost:4000/orders?status=open" -H "x-api-key: demo"
-    ```
+## Plan production counter storage
 
-    With the commerce configuration, the first two requests succeed and the third returns `429` until the
-    window resets. Use the port configured by your application.
+Local counters are independent per process. A production compilation rejects a rate-limited route
+without an explicit `store`. The reference must resolve to a checked cache with numeric values, and
+its provider must offer shared counters appropriate for the deployed replicas.
 
-  </Step>
-  <Step>
-    ### Inspect response metadata
+The compiler's production test checks the store reference and inferred `429` contract:
 
-    Confirm the rejection contains safe JSON and standard limit/retry headers. OpenAPI and the inspector should
-    also show the `429` contract and rate-limit attributes.
+<include cwd lang="ts" meta='title="Shared store descriptor — compiler test setup"'>
+  ../../tests/compiler/rate-limit.test.ts#shared-rate-limit
+</include>
 
-  </Step>
-  <Step>
-    ### Prove key isolation
+This is compiler-level setup, not a complete domain layout or provider deployment recipe. It shows
+the `store` contract; do not copy its `x-api-key` choice as advice to store secrets. Follow
+[Caching](/docs/caching) for cache ownership and provider configuration. Do not reach into another
+domain's private cache from a route just to satisfy the reference.
 
-    Repeat the request with `x-api-key: another-demo`; it should have an independent counter. In tests, use a
-    deterministic fake cache or clock rather than sleeping for the real window.
+An explicit store is a prerequisite, not proof of a deployment-wide quota. Verify the provider's
+counter behavior under concurrency, process restarts, and multiple replicas before relying on the limit.
 
-  </Step>
-</Steps>
+## Verify the response
 
-## Local and production storage
+After adding the two-per-second policy above to the [Echo endpoint](/docs/http/first-route), run the
+app in development and send three requests within one window:
 
-<Tabs items={["Development", "Production"]}>
-  <Tab value="Development">
-    Omit `store` for a process-local in-memory counter. It resets on reload and each process
-    enforces its own limit, which is convenient for local development only.
-  </Tab>
-  <Tab value="Production">
-    Bind a shared numeric cache so every replica observes the same counters and restarts do not
-    silently reset policy. Production checks reject process-local limiting.
-  </Tab>
-</Tabs>
+```sh
+for attempt in 1 2 3; do
+  curl -i -X POST 'http://localhost:3000/echo' \
+    -H 'content-type: application/json' \
+    -d '{"message":"hello"}'
+done
+```
 
-Choose `limit` and `windowMs` from measured capacity and product policy. A very high untested limit provides
-little protection; a low global limit can create an outage. Monitor rejection rate and latency, then revise
-with evidence.
+Expect two `200` responses followed by `429` if all three arrive before the window resets.
+The rejection body contains `error: "rate-limit"` and `retryAfterMs`. Inspect `RateLimit-Policy`,
+`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`, and `Retry-After`; reset/retry header values
+use seconds. A subsequent request can succeed after the window resets.
+
+For repeatable tests, exercise the actual server pipeline with controlled counter storage. The current
+`createTestApplication` HTTP helper does not apply route rate limits. Test key isolation for nonconstant
+keys and confirm rejected requests do not invoke the target. See [Testing](/docs/operations/testing).
+
+## Check which entry points are actually limited
+
+The route limiter wraps the original HTTP method/path. It does not wrap a [raw handler](/docs/http/raw-handlers)
+or the generated client's `/rpc` invocation of the target. If RPC is reachable, enforce equivalent
+policy at that entry point or in shared business authorization; do not assume the REST limit protects it.
+See [Generated clients](/docs/http/generated-clients#test-security-at-both-entry-points).
 
 <include cwd>content/generated/related/http-rate-limits.mdx</include>

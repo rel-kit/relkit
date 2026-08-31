@@ -1,0 +1,62 @@
+---
+title: Raw handlers
+description: Mount native Request-to-Response adapters with ALL and understand what bypasses the typed function-route pipeline.
+---
+
+Use a raw route when an integration already owns the HTTP protocol and exposes a native
+`Request`-to-`Response` handler. Use a [function-backed route](/docs/http/define) for ordinary domain
+operations that need RELKIT input validation, declared errors, and generated contracts.
+
+## Mount an HTTP integration
+
+A raw route uses `defineRoute({ handler: ... })` and the named export `ALL`:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"'>
+  ../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts
+</include>
+
+This optional catch-all mounts the auth adapter at `/api/auth` and its nested paths. `ALL` delegates
+every HTTP method at those paths; the adapter decides which operations it accepts.
+The handler accepts a native `Request` and returns a `Response`, synchronously or asynchronously.
+
+Do not combine `handler` and `target`, export a raw handler as `GET` or `POST`, or pass `ALL` to
+`defineServiceRoutes`. Route file naming and collision checks still apply.
+
+## Understand the boundary
+
+| Behavior                                              | Function-backed route                              | Raw route                               |
+| ----------------------------------------------------- | -------------------------------------------------- | --------------------------------------- |
+| Entry point                                           | Public service function                            | Native HTTP handler                     |
+| Input parsing and validation                          | Inferred or explicit mapping, then function schema | Owned by the adapter                    |
+| Response construction                                 | Function output and declared response contract     | Adapter returns the complete `Response` |
+| Function invocation context and declared dependencies | Available inside the target                        | No automatic function invocation        |
+| Route `rateLimit`, `request`, and `responses` options | Supported                                          | Not part of the raw-handler API         |
+| OpenAPI and generated-client operation                | Generated                                          | Excluded                                |
+
+Framework request setup and matching HTTP middleware still surround raw routes. Do not assume this
+makes arbitrary adapter body reads bounded or validates their payloads: configure the adapter's own
+limits, signature checks, session security, and error handling. Use middleware or an upstream gateway
+for transport policy that the raw-route API does not provide.
+
+## Keep Better Auth protection explicit
+
+The example's `auth.protected` list protects `/account/*` and `/mcp` using the registered Better Auth
+service. It is not a list of routes created by the auth handler. The adapter owns the `/api/auth`
+endpoints; protected paths select other application entry points that require a session.
+
+The `auth` option is accepted only when `handler` belongs to a recognized Better Auth service.
+It cannot add authentication to an arbitrary raw handler. This route also needs the corresponding
+auth service and database configuration; copying only the route is not a complete auth setup.
+See the [specialized service guidance](/docs/service/organization#resources-do-not-go-in-the-service-member-list)
+for the owning domain and the [Routes API reference](/docs/api/routes) for raw-route options.
+Use [Better Auth service](/docs/auth/better-auth) for a complete setup and
+[Protect routes](/docs/auth/protect-routes) for exact path matching and authorization boundaries.
+
+## Verify the adapter separately
+
+From the application root, run `bun run check`. Then test the base catch-all path, a nested path,
+an unsupported method, a protected request without a session, and one with a valid session.
+Assert the adapter's actual statuses, headers, and cookies; there is no generated route contract
+to supply those assertions. Use the [testing guide](/docs/operations/testing) for the application harness.
+
+<include cwd>content/generated/related/http-raw-handlers.mdx</include>

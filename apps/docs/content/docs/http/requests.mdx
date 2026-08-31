@@ -1,80 +1,101 @@
 ---
-title: Request inference and explicit mapping
-description: Learn where RELKIT reads path, query, body, header, cookie, and multipart values before validation.
+title: Request mapping
+description: Map HTTP path, query, header, cookie, JSON, and multipart values into validated domain input.
 ---
 
-A route maps transport data into reusable function input. The handler receives validated business data;
-it does not parse a framework request object.
+A function-backed route maps transport data into its target's input. The handler receives validated
+business data, not a framework request object. Keep parsing choices on the route and reusable constraints
+in the [function's schema](/docs/fundamentals/schemas).
 
-## Default inference
+## Start with inference
 
-When `request` is omitted, RELKIT projects an object input schema by method:
+When `request` is omitted, RELKIT projects the target's object input schema:
 
-<Tabs items={["Read methods", "Write methods"]}>
-  <Tab value="Read methods">
-    For `GET`, `HEAD`, `DELETE`, and `OPTIONS`, dynamic path names consume matching properties and remaining
-    properties become query parameters.
+| Method                             | Properties matching path parameters | Remaining properties       |
+| ---------------------------------- | ----------------------------------- | -------------------------- |
+| `GET`, `HEAD`, `DELETE`, `OPTIONS` | Read from the path                  | Read from query parameters |
+| `POST`, `PUT`, `PATCH`             | Read from the path                  | Read from the JSON body    |
 
-    ```sh title="Terminal"
-    curl "http://localhost:3000/hello?name=Ada"
-    ```
+For a write route with `accept: "multipart/form-data"`, remaining properties map from multipart fields
+instead. Array properties use repeated fields; scalar properties use one field. See [Uploads](/docs/http/uploads).
 
-  </Tab>
-  <Tab value="Write methods">
-    For `POST`, `PUT`, and `PATCH`, dynamic path names consume matching properties and remaining properties
-    come from a JSON body.
+Thus `POST /echo` maps a JSON `message` into the Echo function without an explicit descriptor:
 
-    ```sh title="Terminal"
-    curl -X POST "http://localhost:3000/echo" \
-      -H "content-type: application/json" \
-      -d '{"message":"hello"}'
-    ```
+<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
+  ../../templates/default/v1/api/src/routes/echo/route.ts
+</include>
 
-  </Tab>
-</Tabs>
+Path, query, header, and cookie scalar values arrive as strings. Use a schema that intentionally
+coerces a number when needed; do not assume `?quantity=2` is already a JavaScript number.
+Catch-all path values are arrays of decoded segments, not slash-joined strings.
 
-An input schema without a usable object projection requires a complete explicit mapping.
+## Replace inference when the HTTP contract differs
 
-## Map transport fields explicitly
-
-Headers, cookies, renamed fields, transforms, multipart bodies, and non-object input require `http.input`.
-The commerce route demonstrates an executable header/body mapping:
+Use `http.input` for headers, cookies, renamed fields, nesting, or explicit transformations:
 
 <include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
   ../../examples/commerce/src/routes/orders/route.ts
 </include>
 
-An explicit mapping replaces inference entirely; the two are never merged. Sources include `path`,
-`pathSegments`, `query`, `header`, `cookie`, `body`, `wholeBody`, `multipart`, `multipartAll`, and
-`constant`. Use `http.nested` for nested objects and `http.transform` only with a serializable,
-compiler-known transform descriptor.
+The public Create Order input remains independent of HTTP. This route chooses to obtain `orderId`
+and `customerEmail` from headers, and `sku` and `quantity` from the JSON body.
 
-## Verify success and failure
+An explicit `request` replaces inference completely. Include every required input field, including
+matching path properties; RELKIT does not merge omitted fields back into the mapping.
+If the input schema cannot be projected as an object, the compiler asks for an explicit mapping.
+The mapping root is still `http.input`, which constructs an object: wrap a scalar or array body in a
+named function-input property rather than expecting arbitrary non-object root input.
 
-<Steps>
-  <Step>
-    ### Send all required sources
+## Choose a source for each input property
 
-    ```sh title="Terminal — relkit-orders"
-    curl -i -X POST "http://localhost:3000/orders" \
-      -H "content-type: application/json" \
-      -H "idempotency-key: order-1" \
-      -H "x-customer-email: ada@example.com" \
-      -d '{"sku":"book","quantity":2}'
-    ```
+| Helper                              | Value supplied                                     |
+| ----------------------------------- | -------------------------------------------------- |
+| `http.path(name)`                   | One path parameter                                 |
+| `http.pathSegments(name)`           | Catch-all segment array                            |
+| `http.query(name)`                  | One query parameter                                |
+| `http.header(name)`                 | One header, matched case-insensitively             |
+| `http.cookie(name)`                 | One cookie                                         |
+| `http.body(name)`                   | One top-level JSON body field                      |
+| `http.body()` or `http.wholeBody()` | The whole parsed JSON body, assigned to a property |
+| `http.multipart(name)`              | One multipart text field or file                   |
+| `http.multipartAll(name)`           | Repeated multipart fields or files                 |
+| `http.constant(value)`              | A declared constant                                |
+| `http.nested(fields)`               | An object assembled from nested mappings           |
 
-  </Step>
-  <Step>
-    ### Remove one required header
+`http.optional(source)` permits absence; `http.default(source, value)` supplies a fallback for absence.
+Neither makes malformed or duplicated scalar input valid. Keep the resulting optional/default shape
+consistent with the function schema.
 
-    Repeat the request without `idempotency-key`. Expect `422`; mapping or validation fails before the
-    function handler runs.
+Use `http.transform(transform, source)` with a compiler-known `defineTransform` descriptor, not an
+inline callback. Put HTTP transforms under `src/routes/transforms/`. The commerce transform is schema-based:
 
-  </Step>
-</Steps>
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts"'
+>
+  ../../examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts
+</include>
 
-The optional request view preserves unmatched params, repeated query/header values, cookies, and native
-transport details for middleware. Direct, job, event, tool, and agent calls never receive a fabricated
-HTTP request.
+The [dynamic Orders route](/docs/http/routes#export-the-methods-you-support) applies it to `http.path("orderId")`.
+See the [Routes API reference](/docs/api/routes) for helper signatures.
+
+## Verify the transport boundary
+
+For an app containing the [Echo tutorial](/docs/http/first-route), with the backend running on port `3000`:
+
+```sh
+curl -i -X POST 'http://localhost:3000/echo' \
+  -H 'content-type: application/json' \
+  -d '{"message":"hello"}'
+```
+
+Expect `200`. Repeat with an empty message, a missing field, and malformed JSON; expect validation
+`422` before the function handler. For explicit mappings, also test a missing header, repeated scalar
+query fields, and each optional/default branch. Unsupported body content types are mapping failures,
+not automatically a `415` response.
+
+HTTP middleware can inspect native request details, but function calls from jobs, events, tools,
+or other domains do not receive a fabricated HTTP request. Pass business data explicitly.
 
 <include cwd>content/generated/related/http-requests.mdx</include>

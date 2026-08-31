@@ -1,0 +1,75 @@
+---
+title: Define a route
+description: Connect named HTTP methods to public service functions with defineRoute or defineServiceRoutes.
+---
+
+Create route descriptors in `src/routes/**/route.ts`. Import the target through its domain's
+`service.ts`; never reach into another domain's private function directory from a route.
+The [file-system conventions](/docs/http/routes) determine the URL and allowed method exports.
+
+## Expose one public function
+
+Use `defineRoute` for one method-to-function mapping:
+
+<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
+  ../../templates/default/v1/api/src/routes/echo/route.ts
+</include>
+
+This is `POST /echo`. Omit `request` and `responses` when the input schema and output describe ordinary
+JSON correctly. The descriptor selects behavior; it does not call `echo.echo.invoke()` at module load.
+
+A target must be an ordinary callable function exposed by a service. An event contract, event-only
+subscriber, tool, or agent is not a route target. To expose agent behavior, use a public
+[function that calls the agent](/docs/service/organization#tools-and-agents-stay-with-their-business-domain).
+
+## Group methods that use one service
+
+Use `defineServiceRoutes` to select public function members by name:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/route.ts"'>
+  ../../examples/commerce/src/routes/orders/route.ts
+</include>
+
+`GET: "searchOrders"` uses inference. The `POST` object selects `createOrder` and adds HTTP-specific
+mapping and a `201` success status. Both forms produce the same kind of checked function route.
+
+Keep the exported destructuring form. Supported keys are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`,
+`HEAD`, and `OPTIONS`; do not rename the bindings, add a rest binding, or use a default export.
+`ALL` is reserved for [raw handlers](/docs/http/raw-handlers), not `defineServiceRoutes`.
+
+Several route files can use the same service. Individual `defineRoute` exports in one file can target
+different public services. Put reusable cross-domain orchestration in a domain function instead of
+creating business logic inside the route module.
+
+## Add only the transport options you need
+
+| Option                               | Use it when…                                                                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                            | Inference cannot express headers, cookies, names, or nesting. It replaces all inferred input mapping. See [requests](/docs/http/requests). |
+| `accept`                             | The route consumes `multipart/form-data` instead of JSON. See [uploads](/docs/http/uploads).                                               |
+| `successStatus`                      | One successful JSON operation needs a different `2xx` status, such as `201`.                                                               |
+| `responses`                          | You need a complete explicit response contract. It replaces inference; see [responses](/docs/http/responses).                              |
+| `maxBodyBytes`                       | Parsing this route needs a specific positive byte ceiling.                                                                                 |
+| `timeoutMs`                          | The function invocation needs a route-specific positive timeout.                                                                           |
+| `rateLimit`                          | Requests need a keyed limit before mapping and invocation. See [rate limits](/docs/http/rate-limits).                                      |
+| `id`, `title`, `description`, `tags` | You need stable operation identity or human-facing metadata.                                                                               |
+
+Do not add `path` or `method`: the compiler derives both from source. There is no service-level URL
+prefix or middleware property. The `auth` option is specific to a recognized Better Auth raw handler,
+not a generic authorization flag for a function route.
+
+## Check the new operation
+
+From the application root:
+
+```sh
+bun run check
+bun run typecheck
+```
+
+Resolve diagnostics before starting the server. Check the generated route method, path, target,
+input mapping, and responses. Then test the endpoint itself: a direct function test does not exercise
+HTTP parsing or policy. The [first-route walkthrough](/docs/http/first-route) includes both the source
+and an in-process HTTP test.
+
+<include cwd>content/generated/related/http-define.mdx</include>

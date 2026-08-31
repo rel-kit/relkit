@@ -1,77 +1,103 @@
 ---
 title: Generated clients
-description: Build a typed client from the checked route contract, configure transport safely, and handle declared failures without copying types.
+description: Generate typed RPC callers from checked function routes, configure transport, and test the differences from REST endpoints.
 ---
 
-The generated client is a consumer of the checked HTTP contract. It derives operation names, input types,
-output types, and declared transport errors from routes and schemas. Do not hand-write a second interface for
-the same API; it will drift when request mapping or response contracts change.
+RELKIT generates a typed client from checked function-backed routes. Operation names come from route
+IDs; input, output, and declared application errors come from the target functions.
+Raw handlers do not become generated-client operations.
 
-## Generate and instantiate the client
+The client uses **RPC over `/rpc`**, not HTTP request mapping to the original REST URL. Use the
+[OpenAPI document](/docs/http/openapi) or an ordinary HTTP caller when you need that exact REST contract.
 
-<Steps>
-  <Step>
-    ### Refresh the contract
+## Generate the contract
 
-    ```sh title="Terminal — relkit-orders"
-    bun run check
-    ```
+From your application's root:
 
-    This writes `.relkit/generated/contract.ts` and `.relkit/generated/client.ts`. Both are generated and must
-    be committed or packaged according to the repository's release policy, never edited directly.
+```sh
+bun run check
+```
 
-  </Step>
-  <Step>
-    ### Configure one transport instance
+This writes `.relkit/generated/contract.ts` and `.relkit/generated/client.ts`, alongside graph,
+OpenAPI, and JSON client-contract artifacts. Never hand-edit them.
 
-    <include cwd lang="ts" meta='title="examples/commerce/src/platform/generated-client.ts"'>
-      ../../examples/commerce/src/platform/generated-client.ts
-    </include>
+Make the generated contract part of the caller's TypeScript program: import the generated client
+entry point, or explicitly include the generated contract when using `@relkit/client` directly.
+The contract augments the default client registry so operation names and inputs are typed. Merely
+installing `@relkit/client` in another app does not teach it your server's operations.
 
-    Set `baseUrl` to the deployed API origin. Add authentication through a controlled header provider or
-    request boundary rather than embedding a token in generated source.
+Package or share the generated client and contract together with the dependencies they import.
+Regenerate and review them when route identities, input, output, or errors change.
 
-  </Step>
-  <Step>
-    ### Call a generated procedure
+## Configure the transport
 
-    Use editor completion on the generated contract to select the route operation and supply its inferred
-    input. The client maps path, query, header, cookie, and body fields according to the route descriptor.
+This repository example configures a client instance:
 
-  </Step>
-  <Step>
-    ### Test against the in-process application
+<include cwd lang="ts" meta='title="examples/commerce/src/platform/generated-client.ts"'>
+  ../../examples/commerce/src/platform/generated-client.ts
+</include>
 
-    Point the client transport at a test server or use `createTestApplication` for route-level integration.
-    Assert one success, one validation failure, and one declared application error.
+Set `baseUrl` to the backend origin, without appending `/rpc`; the client adds that transport path.
+The snippet uses port `3000`, the generated-app default. Change it to `4000` when calling the commerce
+app with its default configuration.
 
-  </Step>
-</Steps>
+`headers` accepts a header collection or a provider, including an asynchronous provider.
+Use request-scoped headers or a provider for credentials; do not mutate one shared instance with
+different users' credentials in a server process. The example's mutable `liveHeaders` is not a
+multi-user session store. Browser credentials default to `include`; cross-origin cookies still
+require appropriate browser, cookie, and server CORS configuration. A custom `fetch` is supported.
 
-## Handle errors by contract
+## Call with domain input
 
-Transport failures use `ORPCError`; declared application errors retain stable codes and validated data. Match
-the stable code and status your application contract promises. Do not branch on a formatted message that may
-change for clarity or localization.
+Select the checked route ID with editor completion. For the unmodified Echo tutorial, the operation
+is `route.post.echo` and the input is `{ message: "hello" }`. It resolves to the function's validated
+output, not a native `Response`.
 
-A middleware-only native response is not automatically included in the generated error union. If consumers
-must handle it, add it to the route contract and test that the runtime and generated types agree.
+| Original REST route                                     | Generated RPC call                                        |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| Maps path, query, headers, cookies, and body into input | Accepts the target function's input directly              |
+| Uses the route's `request` mappings and transforms      | Does not replay those mappings or transforms              |
+| Returns the selected HTTP success status and body       | Resolves to typed function output                         |
+| Returns an HTTP error envelope                          | Rejects with an RPC error                                 |
+| Handles multipart according to the route                | Does not automatically reconstruct that multipart request |
 
-## Route-shape edge cases
+For example, the Orders REST route obtains `orderId` from `idempotency-key`; an RPC caller supplies
+the function's `orderId` input property. Sending that header alone does not fill the RPC input.
+Likewise, catch-all input is an array supplied to the function, not a REST path the client constructs.
 
-Catch-all values are arrays of path segments. The client URL-encodes each segment independently, so a value
-containing `/` cannot escape its position and alter route structure. Optional catch-all routes may register
-both the base and expanded runtime paths while remaining one client operation.
+## Handle failures by contract
 
-## Keep consumers current
+RPC failures use `ORPCError`. Declared application errors retain their stable error code and data;
+unexpected failures use transport-level codes. Branch on the code and validated data, not a formatted
+message. Do not expect a REST validation `422` body to be the RPC error shape.
 
-Run `check` whenever a route or schema changes, review the generated contract diff, and publish the client
-artifact with a compatible version. A newly required field, removed operation, changed stable error code, or
-narrowed output is a consumer migration even if the server still compiles.
+A response returned by HTTP middleware is not automatically a declared function error. The RPC
+middleware bridge maps a returned `401` to `UNAUTHORIZED`, a `429` to `TOO_MANY_REQUESTS`, and other
+returned responses to `INTERNAL_SERVER_ERROR`. Test these cases if middleware protects the operation.
 
-<Callout title="Generated does not mean unreviewed">
-  Review generated contract changes as carefully as authored API changes. Automation prevents drift;
-  it does not decide whether a breaking change is acceptable.
-</Callout>
+## Test security at both entry points
+
+Registered Better Auth protection checks the operation's original route path for RPC session
+requirements. Associated path-scoped middleware is also replayed, while global middleware surrounds
+the RPC request. The middleware sees the native `/rpc` request, not synthetic REST parameters or body.
+
+The route's `rateLimit` wrapper is **not applied to RPC calls**. A REST-only limit or middleware that
+assumes the original URL is therefore insufficient to protect every caller. Apply equivalent policy
+at the RPC boundary or in shared domain authorization, and test both reachable transports.
+
+Point the client at a running local test server. The current `createTestApplication` HTTP helper does
+not serve `/rpc`, so connecting it through a custom `fetch` is not an RPC integration test.
+Cover success, invalid input, a declared error, missing credentials, and any quota policy.
+Keep REST tests too; RPC tests do not exercise request mapping. See [Testing](/docs/operations/testing)
+for the other available test layers.
+
+## Review compatibility changes
+
+Changing an inferred route ID renames the client operation. A required input field, a removed error
+code, or a narrowed output can break consumers even if the server compiles. Compare generated
+artifacts in review and version shared contracts with their callers.
+
+For a complete first endpoint and HTTP integration test, return to
+[Your first HTTP route](/docs/http/first-route).
 
 <include cwd>content/generated/related/http-generated-clients.mdx</include>
