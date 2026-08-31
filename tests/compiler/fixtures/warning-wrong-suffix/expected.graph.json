@@ -1,6 +1,6 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 6,
+  "contractVersion": 7,
   "edges": [
     {
       "from": "warning",
@@ -64,6 +64,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -76,6 +77,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 23,
         "file": "src/warning/functions/wrong-suffix.ts",

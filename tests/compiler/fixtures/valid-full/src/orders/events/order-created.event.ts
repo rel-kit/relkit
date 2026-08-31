@@ -4,7 +4,7 @@ import { eventPayload } from "../../platform/schemas.js";
 const orderCreated = defineEvent({
   id: "orders.created",
   version: 1,
-  payload: eventPayload,
+  input: eventPayload,
 });
 
 export default orderCreated;

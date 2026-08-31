@@ -1,6 +1,6 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 6,
+  "contractVersion": 7,
   "edges": [
     {
       "from": "hello",
@@ -70,6 +70,7 @@
         ],
         "type": "object"
       },
+      "invocationMode": "callable",
       "kind": "function",
       "output": {
         "properties": {
@@ -82,6 +83,7 @@
         ],
         "type": "object"
       },
+      "publishes": [],
       "source": {
         "column": 15,
         "file": "src/hello/functions/hello.function.ts",
