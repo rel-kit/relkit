@@ -1,6 +1,6 @@
 {
   "name": "@relkit/compiler",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Unsupported internal RELKIT source compiler; use @relkit/cli.",
   "license": "MIT",
   "repository": {
