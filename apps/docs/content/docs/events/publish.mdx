@@ -1,0 +1,25 @@
+---
+title: Publish an event
+description: Send event data from your application code.
+---
+
+## Publish from a function
+
+First, [define `orders.created`](/docs/events/define). Then publish it from the `defineFunction` that creates the order:
+
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+</include>
+
+This function uses the [Orders example's](/docs/events/first-event) `priceOrder` helper. To publish the event:
+
+1. Add `publishes: ["orders.created"]` to allow this function to publish the event.
+2. Call `await context.events["orders.created"].publish(order)` to send the order data.
+
+Use the exact event ID in both places. The data must match the event's `input` schema. Only events listed in `publishes` are available through `context.events`.
+
+Publishing waits for the event to be accepted, not for its consumers to finish. Your function can return the order while confirmation runs separately.
+
+## Publish from an event function
+
+A `defineEventFunction` can publish events the same way: list each ID in `publishes`, then call `.publish()`.

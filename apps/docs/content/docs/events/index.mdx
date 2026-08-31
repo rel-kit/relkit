@@ -1,0 +1,29 @@
+---
+title: Getting started
+description: Publish what happened in your app and let other functions react.
+---
+
+import eventSubscribers from "../../../public/inspector-event-subscribers.jpg";
+
+An event tells your app that something happened: an order was created, a payment succeeded, or a user signed up. Other functions can subscribe and react—for example, sending a confirmation and recording analytics after an order is created.
+
+The original operation does not wait for these reactions to finish. Use events for follow-up work; use a normal function call when you need the result before continuing.
+
+## The Events API
+
+| API                   | What you use it for                                                                                             |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `defineEvent`         | Name the event and define the data it carries.                                                                  |
+| `defineFunction`      | Perform an operation, then publish with `context.events[eventId].publish(data)`. List the event in `publishes`. |
+| `defineEventFunction` | Subscribe with `event: "orders.created"` and run your handler when it is published.                             |
+
+## See your subscribers
+
+While your app is running, open the Inspector at `http://localhost:3210`, select **Events & listeners**, then open an event. **Publishers** shows which functions send it; **Consumer functions** shows its subscribers.
+
+<ImageZoom
+  src={eventSubscribers}
+  alt="Inspector showing orders.created, its publisher, and its subscribing functions"
+/>
+
+Start with [defining an event](/docs/events/define), or follow the [order confirmation example](/docs/events/first-event) in your existing app.

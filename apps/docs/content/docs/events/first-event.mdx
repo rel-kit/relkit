@@ -1,0 +1,113 @@
+---
+title: Example — order confirmations
+description: Create an order, publish an event, and run a confirmation function.
+---
+
+Add order confirmations to your existing RelKit app. This example logs a confirmation without sending email or saving orders to a database.
+
+Create the files shown below. If your app already has the Orders example, update those files instead. Run all commands from your app's root.
+
+<Steps>
+  <Step>
+    ### Define the event
+
+    <include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
+      ../../templates/default/v1/api/src/orders/events/order-created.event.ts
+    </include>
+
+    `orders.created` carries the order ID, product code, and total.
+
+  </Step>
+  <Step>
+    ### Publish after creating the order
+
+    Add a pricing function. For this example, each item costs 100 cents:
+
+    <include cwd lang="ts" meta='title="src/orders/functions/price-order.function.ts"'>
+      ../../templates/default/v1/api/src/orders/functions/price-order.function.ts
+    </include>
+
+    Create the order and publish its details:
+
+    <include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+      ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+    </include>
+
+    `publishes` allows this function to send `orders.created`. The handler returns the order without waiting for the confirmation.
+
+  </Step>
+  <Step>
+    ### Consume the event
+
+    <include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+      ../../templates/default/v1/api/src/orders/functions/order-confirmation.function.ts
+    </include>
+
+    `event: "orders.created"` subscribes this function to the event. Its handler receives the order details.
+
+  </Step>
+  <Step>
+    ### Add an endpoint
+
+    Expose the order-creating function through an Orders service. If you already have this service, add these members alongside your existing ones:
+
+    <include cwd lang="ts" meta='title="src/orders/service.ts"'>
+      ../../templates/default/v1/api/src/orders/service.ts
+    </include>
+
+    Connect it to `POST /orders`:
+
+    <include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
+      ../../templates/default/v1/api/src/routes/orders/route.ts
+    </include>
+
+  </Step>
+  <Step>
+    ### Run locally
+
+    Check the app:
+
+    ```sh
+    bun run check
+    ```
+
+    Once the check passes, start the app:
+
+    ```sh
+    RELKIT_ENV=test bun run dev
+    ```
+
+    `RELKIT_ENV=test` lets you try events locally without AWS credentials. For deployment, [configure an event provider](/docs/fundamentals/providers).
+
+    Keep the app running. In another terminal, create an order:
+
+    ```sh
+    curl -i http://localhost:3000/orders \
+      -H 'Content-Type: application/json' \
+      -d '{"orderId":"order-100","sku":"book","quantity":3}'
+    ```
+
+    Expect HTTP 201:
+
+    ```json
+    { "orderId": "order-100", "sku": "book", "totalCents": 300 }
+    ```
+
+    In the app terminal, look for `order.confirmation.requested` with `orderId=order-100`. The response does not wait for the confirmation to finish.
+
+  </Step>
+</Steps>
+
+## Add another reaction
+
+In a second terminal, open your app's root directory and copy the consumer:
+
+```sh
+cp src/orders/functions/order-confirmation.function.ts src/orders/functions/order-analytics.function.ts
+```
+
+Change the copy's `id` to `orders.analytics` and its log message to `order.analytics.recorded`. Keep `event: "orders.created"`.
+
+Run `bun run check` and wait for the app to reload. Repeat the curl request with `orderId` set to `order-101`. Look for both `order.confirmation.requested` and `order.analytics.recorded` with that ID. You added a reaction without changing the publishing function.
+
+Open `orders.created` in the Inspector at `http://localhost:3210` to see both subscribers under **Consumer functions**.
