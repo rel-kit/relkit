@@ -111,7 +111,7 @@ export function createClient(
 }
 
 function wrapCallable(
-  category: DependencyCategory,
+  category: "agents",
   name: string,
   source: unknown,
   options: DependencyClientBuildOptions,
@@ -177,7 +177,8 @@ function dependencyIdFromClient(
   category: DependencyCategory,
   name: string,
 ): string {
-  const declaration = options.dependencies?.[category]?.[name];
+  const declaration =
+    category === "events" ? options.publications?.[name] : options.dependencies?.[category]?.[name];
   return declaration === undefined ? name : dependencyId(category, name, declaration);
 }
 export function guardedMap(

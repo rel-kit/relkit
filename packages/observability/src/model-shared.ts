@@ -29,7 +29,8 @@ export type ObservabilitySignal =
   | "trace"
   | "diagnostic"
   | "generation";
-export type InvocationSource = "direct" | "http" | "job" | "event" | "tool" | "agent";
+export type InvocationSource =
+  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
 export type InvocationOutcome = RequestOutcome | "provider-failure";
 export type SafeFields = Readonly<Record<string, JsonValue>>;
 export type SafeAttributes = Readonly<Record<string, JsonPrimitive>>;

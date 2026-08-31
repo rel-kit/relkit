@@ -45,6 +45,7 @@ export interface InvocationTarget<
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 > extends SharedInvocationTarget<Input, Output, Context> {
   readonly dependencies?: DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
 }
 export type InvocationMetadata = SharedInvocationMetadata;
 export type InvocationRecord = SharedInvocationRecord;
@@ -142,6 +143,7 @@ export interface InvokeOptions<
   readonly effectRunner?: InvocationRunner;
   readonly bridge?: InvocationRunner;
   readonly idSource?: InvocationIdSource;
+  readonly trigger?: unknown;
 }
 
 export { InvocationValidationError };

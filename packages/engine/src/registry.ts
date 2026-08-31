@@ -9,9 +9,11 @@ import {
   collectHandlerEntries,
   compareIds,
   validateHandlers,
+  validateTargets,
   versionIssues,
   type HandlerEntry,
 } from "./registry-validation.js";
+import type { InvocationTarget } from "./invoke-types.js";
 
 export type FunctionHandler = (...arguments_: readonly unknown[]) => MaybePromise<unknown>;
 
@@ -25,6 +27,7 @@ export interface RuntimeManifestInput {
   readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
   readonly functions: RuntimeHandlerEntries;
+  readonly targets?: Readonly<Record<string, unknown>>;
 }
 
 export interface FunctionRegistryOptions extends GraphCanonicalizationOptions {
@@ -67,6 +70,7 @@ export interface FunctionRegistry extends ReadonlyMap<string, FunctionHandler> {
   readonly graphHash: string;
   readonly functionIds: readonly string[];
   readonly handlers: Readonly<Record<string, FunctionHandler>>;
+  readonly targets: Readonly<Record<string, InvocationTarget>>;
 }
 
 /** Verifies one graph/manifest pair before exposing executable handlers. */
@@ -121,13 +125,18 @@ export function createFunctionRegistry(
     .sort(compareIds);
   const entries = collectHandlerEntries(runtimeManifest.functions, issues);
   validateHandlers(functionIds, entries, issues);
+  const targets = validateTargets(graph, runtimeManifest.targets, issues);
   if (issues.length > 0) throw new FunctionRegistryError(issues);
-  return makeRegistry(graphHash as string, entries);
+  return makeRegistry(graphHash as string, entries, targets);
 }
 
 export const createRegistry = createFunctionRegistry;
 
-function makeRegistry(graphHash: string, entries: readonly HandlerEntry[]): FunctionRegistry {
+function makeRegistry(
+  graphHash: string,
+  entries: readonly HandlerEntry[],
+  targets: Readonly<Record<string, InvocationTarget>>,
+): FunctionRegistry {
   const sorted = [...entries].sort((left, right) => compareIds(String(left.id), String(right.id)));
   const functionIds = Object.freeze(sorted.map((entry) => String(entry.id)));
   const handlers = Object.freeze(
@@ -137,6 +146,7 @@ function makeRegistry(graphHash: string, entries: readonly HandlerEntry[]): Func
     graphHash,
     functionIds,
     handlers,
+    targets,
     size: functionIds.length,
     get: (id) => handlers[id],
     has: (id) => Object.prototype.hasOwnProperty.call(handlers, id),

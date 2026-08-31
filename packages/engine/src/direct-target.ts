@@ -6,6 +6,9 @@ export function resolveDirectTarget<Context extends { readonly signal: AbortSign
   request: DirectFunctionRequest,
   registry: InvokeOptions["registry"],
 ): InvocationTarget<unknown, unknown, Context> {
+  const registered = registry?.targets[request.functionId];
+  if (registered !== undefined)
+    return registered as unknown as InvocationTarget<unknown, unknown, Context>;
   if (isInvocationTarget(request.source)) {
     if (request.source.id !== request.functionId) {
       throw new TypeError(`Function client "${request.name}" targets the wrong function`);

@@ -176,9 +176,8 @@ function captureBytes(value: unknown, key: string): number | undefined {
 }
 
 function sourceValue(value: unknown): SpanRecord["source"] | undefined {
-  return ["direct", "http", "job", "event", "tool", "agent"].includes(String(value))
-    ? (value as SpanRecord["source"])
-    : undefined;
+  const sources = "direct http job event-delivery event-replay tool agent".split(" ");
+  return sources.includes(String(value)) ? (value as SpanRecord["source"]) : undefined;
 }
 
 function outcome(value: unknown): SpanRecord["outcome"] | undefined {
