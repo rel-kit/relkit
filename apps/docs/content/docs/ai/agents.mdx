@@ -1,0 +1,54 @@
+---
+title: Define an agent
+description: Give a model a clear task, the tools it needs, and limits on each run.
+---
+
+Use `defineAgent` when a model needs to interpret a request and decide which tools to call. For a fixed sequence of steps, use [a function](/docs/fundamentals/functions).
+
+The [AI SDK ToolLoopAgent reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent) covers the underlying agent API. For options you can pass to `defineAgent`, use the [RelKit reference](/docs/api/agents#defineagent). AI SDK settings such as `temperature` and `prepareStep` are not currently exposed by `defineAgent`.
+
+## Define the task
+
+This agent answers greeting questions using a single tool. Create it after [defining the lookup tool](/docs/ai/function-tools).
+
+<include cwd lang="ts" meta='title="src/hello/agents/assistant.agent.ts"'>
+  ../../templates/default/v1/agent/src/hello/agents/assistant.agent.ts
+</include>
+
+`input` describes what your app sends; `output` describes the answer your app expects. RelKit validates both. Output validation checks the shape, not whether the model's answer is factually correct.
+
+Write `instructions` that explain when to use each tool and how to answer. The agent can call only tools in its `tools` array. Start with the smallest set needed for the task.
+
+## Set limits
+
+All three `limits` are required positive integers:
+
+| Option         | What it limits                  |
+| -------------- | ------------------------------- |
+| `maxSteps`     | Model steps in a run.           |
+| `maxToolCalls` | Total tool calls in a run.      |
+| `timeoutMs`    | Total run time in milliseconds. |
+
+If a run exceeds a limit, it fails rather than continuing indefinitely. Set limits that fit your task and handle failures in the calling application.
+
+## Choose a model
+
+`model: "openai:gpt-5-mini"` selects a provider and model. Omit `model` to use your app's configured default. Configure the provider and API key in your app before running a live model; the [tutorial shows the configuration](/docs/ai/first-agent#try-a-live-model).
+
+## Call the agent from a function
+
+Declare the agent under `dependencies.agents`, then call it through the matching context name:
+
+<include cwd lang="ts" meta='title="src/hello/functions/ask-assistant.function.ts"'>
+  ../../templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts
+</include>
+
+The result is the agent's validated output. You can expose this function through [an HTTP route](/docs/http/routes) or try it from **Functions** in the Inspector.
+
+Keep authorization in your application functions. Model instructions are not a replacement for checking whether the current user may read or change data.
+
+## Streaming
+
+RelKit agents do not currently support streaming responses. `context.agents.assistant(input)` returns a Promise that resolves to the complete validated answer. Show a loading state while you await it, then display the result.
+
+There is no supported agent `.stream()` method or token callback in `defineAgent` yet. MCP's **Streamable HTTP** transport does not change this: it is not an API for streaming a RelKit agent's answer.

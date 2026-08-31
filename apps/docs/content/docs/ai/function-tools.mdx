@@ -1,0 +1,32 @@
+---
+title: Functions as tools
+description: Reuse a function as an AI tool without duplicating its schemas or business logic.
+---
+
+Use `.asTool()` when you already have a function that an AI agent or MCP client should be able to call. Keep the business logic in the function and add a description and execution policy for AI callers.
+
+## Define the function
+
+This small function returns a greeting. In a real app, the function might look up a product or fetch an order the current user is allowed to see.
+
+<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/agent/src/hello/functions/hello.function.ts
+</include>
+
+## Turn it into a tool
+
+Import the function into a tool file and call `.asTool()`:
+
+<include cwd lang="ts" meta='title="src/hello/tools/lookup.tool.ts"'>
+  ../../templates/default/v1/agent/src/hello/tools/lookup.tool.ts
+</include>
+
+The tool accepts the same input and returns the same output as `hello`. The function remains callable by the rest of your app.
+
+Use a normal `defineFunction` here. Event-only functions created with `defineEventFunction` cannot become tools.
+
+## Use the tool
+
+Add `lookup` to an [agent's tools](/docs/ai/agents), or call `hello.lookup` from [an MCP client](/docs/ai/mcp). Both use the same greeting function.
+
+`.asTool()` and [`defineTool({ target: hello, ... })`](/docs/ai/tools) are alternatives; you do not need both. Both expose the tool to MCP by default. Set `mcp: false` if the tool should be available only inside your app.

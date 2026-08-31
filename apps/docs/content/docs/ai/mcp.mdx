@@ -1,0 +1,86 @@
+---
+title: Tools over MCP
+description: Connect an external AI client to your RelKit tools through the built-in MCP endpoint.
+---
+
+Model Context Protocol (MCP) lets AI clients discover and call tools in your app. RelKit serves tools at `/mcp` using **Streamable HTTP**. You do not need to define an agent or write a separate MCP server.
+
+## Choose which tools to expose
+
+**Yes—all discovered tools created with `defineTool` or `.asTool()` are exposed by default.** Omitting `mcp` is equivalent to `mcp: true`, and the app's MCP endpoint is enabled by default. For example, the [greeting tool](/docs/ai/function-tools) appears as `hello.lookup`, with a `name` argument and a `message` result.
+
+Set an explicit `timeoutMs` on tools you expose through MCP. The current runtime fails MCP calls when this option is omitted; the greeting example uses `2_000` milliseconds.
+
+An agent's `tools` array controls that agent only. It does not limit which tools MCP clients can discover or call.
+
+## Disable MCP for one tool
+
+Set `mcp: false` in either `defineTool` or `.asTool()`:
+
+<include cwd lang="ts" meta='title="src/hello/tools/private-lookup.tool.ts"'>
+  ../../templates/default/v1/agent/tests/fixtures/mcp-options.ts#private-tool
+</include>
+
+`hello.private-lookup` will not appear in MCP's tool list or be callable over MCP. You can still add it to a RelKit agent's `tools` array.
+
+## Disable the MCP endpoint
+
+Set `server.mcp` to `false` in your existing `relkit.config.ts`, preserving your other server settings:
+
+<include cwd lang="ts" meta='title="relkit.config.ts — inside defineConfig()"'>
+  ../../templates/default/v1/agent/tests/fixtures/mcp-options.ts#disable-mcp
+</include>
+
+This disables `/mcp` for the entire app. It does not disable ordinary tool calls or your agents' declared tools.
+
+## Connect a client
+
+Start your existing app from its root:
+
+```sh
+bun run check
+bun run dev
+```
+
+If your app configures model providers, supply their credentials before starting it. For a key-free local MCP check, use `RELKIT_ENV=test bun run dev` instead; this uses test providers. Calling the greeting tool itself does not need a model.
+
+In a client that supports Streamable HTTP, add your backend's MCP URL. With the default backend port, use `http://localhost:3000/mcp`, not the RelKit Inspector port `3210`.
+
+You can also list tools with the MCP Inspector CLI. Run this in a second terminal:
+
+```sh
+bunx @modelcontextprotocol/inspector@2.3.0 --cli \
+  http://localhost:3000/mcp \
+  --transport http \
+  --method tools/list
+```
+
+With the greeting example installed, the response includes `hello.lookup` and its input schema. This command does not call a language model.
+
+## Call a tool
+
+Invoke the greeting tool directly through MCP:
+
+```sh
+bunx @modelcontextprotocol/inspector@2.3.0 --cli \
+  http://localhost:3000/mcp \
+  --transport http \
+  --method tools/call \
+  --tool-name hello.lookup \
+  --tool-arg name=Ada
+```
+
+The result includes `structuredContent` with `{ "message": "Hello, Ada!" }`. RelKit validates the arguments against the function's input schema before calling it.
+
+## Protect access
+
+Before exposing the backend outside your machine, authenticate requests to `/mcp` and authorize actions in each target function. Hiding a tool from an agent is not access control for MCP. Your MCP client must send the credentials your app expects.
+
+<Callout type="warn" title="Approval-required tools cannot run over MCP yet">
+  MCP currently rejects tools with `approval: "always"`, and tools with `approval: "on-write"` when
+  their side effect is `write` or `external`. It returns an approval-required error without running
+  the function. A client's confirmation dialog does not satisfy this policy. Do not remove a
+  required approval just to make a call succeed.
+</Callout>
+
+If no tools appear, check that the files are exported under your domain's `tools` directory, `mcp` is not disabled on the tool or server, and the app has reloaded.

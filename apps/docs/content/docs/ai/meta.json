@@ -1,0 +1,5 @@
+{
+  "title": "AI",
+  "icon": "Bot",
+  "pages": ["index", "agents", "tools", "function-tools", "mcp", "approvals", "first-agent"]
+}

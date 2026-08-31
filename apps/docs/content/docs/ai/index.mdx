@@ -1,0 +1,54 @@
+---
+title: Getting started
+description: Build AI agents that use your app's functions, and share tools with MCP clients.
+---
+
+An AI agent uses a language model to decide how to complete a task. Tools let it do useful work in your app: look up an order, search a catalog, or prepare a response using current data.
+
+**RelKit's AI agents and agent tool calling are built on Vercel's AI SDK.** RelKit connects that model workflow to your application's functions, validation, permissions, and execution limits. You use `defineAgent`, `defineTool`, and `.asTool()` to describe the work.
+
+Use an agent when the next step depends on a user's question. Use an ordinary function when you already know the steps, such as calculating a total or saving an order.
+
+## The AI APIs
+
+Usually, adding tools to a model means writing argument schemas, dispatching tool calls, handling results, and controlling how long the model can keep working. RelKit lets you reuse validated functions as tools, choose which tools an agent can use, and set limits on each run.
+
+| API                   | What you use it for                                                       |
+| --------------------- | ------------------------------------------------------------------------- |
+| `defineAgent`         | Set the agent's task, input, output, model, tools, and limits.            |
+| `defineTool`          | Give an existing function a tool name, description, and execution policy. |
+| `function.asTool()`   | Turn a function into a tool directly.                                     |
+| `dependencies.agents` | Give a function access to an agent through `context.agents`.              |
+| `mcp`                 | Choose whether a tool is available to external MCP clients.               |
+
+The same tool can serve a RelKit agent and an external AI client through **Model Context Protocol (MCP)**. You do not need a RelKit agent just to expose tools over MCP.
+
+## AI SDK references
+
+Use Vercel's documentation to explore the underlying concepts and full AI SDK APIs:
+
+- [Tool calling](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling): how models choose tools and use their results.
+- [ToolLoopAgent reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent): the AI SDK's agent API.
+- [tool() reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool): the AI SDK's tool options.
+
+**RelKit does not accept every AI SDK option.** Its APIs are not drop-in replacements for `ToolLoopAgent` or `tool()`, and extra SDK options are not automatically forwarded. Use the [RelKit agent reference](/docs/api/agents#defineagent) and [RelKit tool reference](/docs/api/tools#definetool) for supported options in your app.
+
+## Does RelKit support streaming?
+
+Not yet for agents. An agent call returns one completed, validated result; it does not stream tokens or partial answers. RelKit does not currently expose an agent `.stream()` API.
+
+See [calling an agent](/docs/ai/agents#call-the-agent-from-a-function) for the supported request-and-response usage.
+
+## Choose where to start
+
+Follow the [greeting-assistant tutorial](/docs/ai/first-agent) to add an agent to an existing app and test it without a model API key.
+
+Already have application functions? [Turn one into a tool](/docs/ai/function-tools), then [give it to an agent](/docs/ai/agents) or [connect an MCP client](/docs/ai/mcp).
+
+In the Inspector, open **Agents** to review an agent's tools and limits, or **Tools** to review the functions each tool calls.
+
+<Callout type="warn" title="Review MCP access">
+  MCP is enabled by default, and tools are exposed unless you set `mcp: false`. Before making your
+  app reachable by other users, review tool visibility and protect `/mcp`. An agent's tools list
+  does not restrict the MCP endpoint.
+</Callout>
