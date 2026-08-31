@@ -43,7 +43,28 @@ interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
   activation: Promise<Auth<any>> | undefined;
 }
 
-/** Defines a Better Auth domain service without eagerly constructing Better Auth. */
+/**
+ * Defines a lazy Better Auth domain service using the application's Drizzle database.
+ *
+ * Mount `handler` with a filesystem `ALL` catch-all route. RELKIT supplies `database`
+ * and derives `basePath` from that route; neither option can be set here. Other
+ * options follow Better Auth, with optional `drizzle` adapter settings. The
+ * descriptor is not the native auth instance and does not expose `auth.api`.
+ * Supply BETTER_AUTH_SECRET through the server process environment before startup.
+ *
+ * @example
+ * ```ts
+ * import { defineBetterAuthService } from "@relkit/better-auth"
+ *
+ * const auth = defineBetterAuthService({
+ *   baseURL: "http://127.0.0.1:3000",
+ *   emailAndPassword: { enabled: true },
+ * })
+ * const handler = auth.handler
+ * ```
+ * @category Services
+ * @since 0.0.5
+ */
 export function defineBetterAuthService<const Options extends BetterAuthServiceOptions>(
   options: Options,
 ): BetterAuthServiceDescriptor<Options> {

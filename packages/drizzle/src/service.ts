@@ -26,7 +26,25 @@ export interface DefineDrizzleServiceOptions<
   readonly dispose?: (database: Client) => unknown | Promise<unknown>;
 }
 
-/** Defines the application's lazily activated Drizzle domain service. */
+/**
+ * Defines the application's Drizzle service, table operations, and model customizations.
+ * The client factory runs at activation, not during descriptor discovery.
+ *
+ * @example
+ * ```ts
+ * import { defineDrizzleService } from "@relkit/drizzle"
+ * import { integer, sqliteTable } from "drizzle-orm/sqlite-core"
+ *
+ * const users = sqliteTable("users", { id: integer().primaryKey() })
+ * const service = defineDrizzleService({
+ *   schema: { users },
+ *   client: () => { throw new Error("Configure a Drizzle driver before activation") },
+ * })
+ * console.assert(service.capability.dialect === "sqlite")
+ * ```
+ * @category Database
+ * @since 0.1.0
+ */
 export function defineDrizzleService<
   Client,
   const Schema extends Readonly<Record<string, unknown>>,
