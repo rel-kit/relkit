@@ -3,14 +3,7 @@ import { defineAgent } from "@relkit/agents";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
 import { defineEnv, env, type EnvRef } from "@relkit/config";
-import {
-  defineEvent,
-  events,
-  onEvent,
-  type EventEnvelope,
-  type EventSelectorInput,
-  type UnknownEventEnvelope,
-} from "@relkit/events";
+import { defineEvent, defineEventFunction, type EventEnvelope } from "@relkit/events";
 import { defineError, defineFunction } from "@relkit/functions";
 import { defineJob } from "@relkit/jobs";
 import { defineRoute, http } from "@relkit/routes";
@@ -36,12 +29,12 @@ const changedPayload = z.object({ orderId: z.string(), state: z.string() });
 export const eventCreated = defineEvent({
   id: "types.created",
   version: 1,
-  payload: createdPayload,
+  input: createdPayload,
 });
 export const eventChanged = defineEvent({
   id: "types.changed",
   version: 2,
-  payload: changedPayload,
+  input: changedPayload,
 });
 const createdEnvelope = z.object({
   instanceId: z.string(),
@@ -135,9 +128,9 @@ const parent = defineFunction({
   id: "types.parent",
   input,
   output,
+  publishes: ["types.created"],
   dependencies: {
     jobs: { job },
-    events: { created: eventCreated },
     buckets: { bucket },
     cache: { cache, numericCache },
     agents: { agent },
@@ -145,7 +138,7 @@ const parent = defineFunction({
   handler: async (value, context) => {
     const childResult: InferOutput<typeof output> = await child.invoke({ id: value.id });
     const queued = await context.jobs.job.enqueue({ id: value.id });
-    const published = await context.events.created.publish({ orderId: value.id });
+    const published = await context.events["types.created"].publish({ orderId: value.id });
     const object = await context.buckets.bucket.get("orders/1");
     const cached: { price: number } | undefined = await context.cache.cache.get({ sku: value.id });
     // @ts-expect-error increment is not exposed for object-valued caches
@@ -177,121 +170,18 @@ const mapped: { id: string; limit: string } = {
 void route;
 void mapped;
 
-const selector = events.anyOf("types.created", "types.changed");
-const selected: EventSelectorInput<typeof selector> = {
-  instanceId: "event-1",
-  eventId: "types.created",
-  version: 1,
-  payload: { orderId: "order-1" },
-  occurredAt: "2026-01-01T00:00:00.000Z",
-  publishedAt: "2026-01-01T00:00:00.000Z",
-  traceId: "trace-1",
-  attributes: {},
-};
-void selected;
-function assertSelectedEnvelope(value: EventSelectorInput<typeof selector>): void {
-  if (value.eventId === "types.created") {
-    const version: 1 = value.version;
-    const orderId: string = value.payload.orderId;
-    void version;
-    void orderId;
-  } else {
-    const version: 2 = value.version;
-    const state: string = value.payload.state;
-    void version;
-    void state;
-  }
-}
-assertSelectedEnvelope(selected);
-const invalidSelected: EventSelectorInput<typeof selector> = {
-  ...selected,
-  // @ts-expect-error the selector union rejects an unknown event ID
-  eventId: "types.unknown",
-};
-void invalidSelected;
-
-const singleTrigger = onEvent(
-  "types.created",
-  async (payload, context) => {
-    const orderId: string = payload.orderId;
-    const eventId: string = context.event.eventId;
-    void orderId;
+const reaction = defineEventFunction({
+  id: "types.reaction",
+  event: "types.created",
+  handler: async (input, context) => {
+    const orderId: string = input.orderId;
+    const eventId: "types.created" = context.trigger.event.id;
+    await child.invoke({ id: orderId });
     void eventId;
   },
-  { id: "types.single-trigger" },
-);
-const anyTrigger = onEvent(
-  selector,
-  async (envelope) => {
-    assertSelectedEnvelope(envelope);
-  },
-  { id: "types.any-trigger" },
-);
-const matchTrigger = onEvent(
-  events.match("types.*"),
-  async (envelope) => {
-    assertSelectedEnvelope(envelope);
-  },
-  { id: "types.match-trigger" },
-);
-const rawSelector = events.all({ payload: "unknown", purpose: "telemetry" });
-const rawEnvelope: UnknownEventEnvelope = {
-  instanceId: "event-raw",
-  eventId: "types.any",
-  version: 1,
-  payload: { orderId: "order-1" },
-  occurredAt: "2026-01-01T00:00:00.000Z",
-  publishedAt: "2026-01-01T00:00:00.000Z",
-  traceId: "trace-raw",
-  attributes: {},
-};
-const rawInput: EventSelectorInput<typeof rawSelector> = rawEnvelope;
-const rawTarget = defineFunction({
-  id: "types.raw-envelope",
-  input: z.object({
-    instanceId: z.string(),
-    eventId: z.string(),
-    version: z.number(),
-    payload: z.unknown(),
-    occurredAt: z.string(),
-    publishedAt: z.string(),
-    traceId: z.string(),
-    attributes: z.object({}),
-  }),
-  output,
-  handler: async (value) => {
-    const payload: unknown = value.payload;
-    void payload;
-    return { ok: true };
-  },
 });
-const rawTrigger = onEvent(
-  rawSelector,
-  async (envelope) => {
-    const payload: unknown = envelope.payload;
-    void payload;
-  },
-  { id: "types.raw-trigger", delivery: "ephemeral" },
-);
-void singleTrigger;
-void anyTrigger;
-void matchTrigger;
-void rawInput;
-void rawTrigger;
-
-const trigger = onEvent(
-  "types.created",
-  async (payload, context) => {
-    const orderId: string = payload.orderId;
-    const result: { ok: boolean } = await child.invoke({ id: orderId });
-    void result;
-  },
-  { id: "types.trigger" },
-);
-// @ts-expect-error event names come from the generated registry
-onEvent("types.missing", async () => undefined);
-const triggerKind: "event-trigger" = trigger.kind;
-void triggerKind;
+const reactionKind: "function" = reaction.kind;
+void reactionKind;
 
 const environment = defineEnv({
   AWS_REGION: env.string(),

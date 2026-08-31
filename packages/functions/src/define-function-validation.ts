@@ -9,10 +9,12 @@ export function copyDependencies<D extends FunctionDependencies>(
   if (Object.hasOwn(dependencies, "functions")) {
     throw new TypeError("Function dependencies are not supported; use descriptor.invoke");
   }
+  if (Object.hasOwn(dependencies, "events")) {
+    throw new TypeError("Event dependencies are not supported; declare publishes instead");
+  }
   const result: Record<string, unknown> = {};
   const kinds: Readonly<Record<string, DescriptorKind>> = {
     jobs: "job",
-    events: "event",
     buckets: "bucket",
     cache: "cache",
     agents: "agent",
@@ -31,6 +33,23 @@ export function copyDependencies<D extends FunctionDependencies>(
     result[name] = Object.freeze(copied);
   }
   return Object.freeze(result) as D;
+}
+
+export function copyPublishes<Names extends readonly string[]>(
+  publishes: Names | undefined,
+): Names | undefined {
+  if (publishes === undefined) return undefined;
+  if (!Array.isArray(publishes)) throw new TypeError("Function publishes must be an array");
+  const values = publishes.map((eventId) => {
+    if (typeof eventId !== "string" || eventId.trim() === "") {
+      throw new TypeError("Function publishes entries must be non-empty event IDs");
+    }
+    return eventId.trim();
+  });
+  if (new Set(values).size !== values.length) {
+    throw new TypeError("Function publishes entries must be unique");
+  }
+  return Object.freeze(values) as unknown as Names;
 }
 
 export function validateLimit(value: number | undefined, name: string): void {
@@ -57,6 +76,9 @@ export function functionTargetForReceiver(
   receiver: unknown,
   fallback: FunctionRefAny,
 ): FunctionRefAny {
+  if (isRecord(receiver) && receiver.invocationMode === "event-only") {
+    throw new TypeError("Event-only functions cannot be invoked or converted to tools");
+  }
   if (
     isRecord(receiver) &&
     isRef(receiver.ref, "function") &&

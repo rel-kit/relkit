@@ -38,6 +38,7 @@ export interface FunctionRef<
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
 > extends DescriptorRef<"function", Id> {
+  readonly invocationMode?: "callable";
   readonly input: InputSchema;
   readonly output: OutputSchema;
   readonly errors?: Errors;
@@ -55,10 +56,10 @@ export interface JobRef<
 
 export interface EventRef<
   Id extends string = string,
-  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
 > extends DescriptorRef<"event", Id> {
   readonly version: number;
-  readonly payload: PayloadSchema;
+  readonly input: InputSchema;
 }
 
 export type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
