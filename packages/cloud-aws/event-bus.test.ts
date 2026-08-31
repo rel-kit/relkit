@@ -64,14 +64,16 @@ describe("RelkitEventBus", () => {
           {
             id: "receipts.on-created",
             targetFunctionId: "receipts.send",
-            expansion: ["orders.created@2", "orders.created@1"],
+            eventId: "orders.created",
+            eventVersion: 1,
             retry,
             concurrency: 2,
           },
           {
             id: "audit.on-created",
             targetFunctionId: "audit.record",
-            expansion: ["orders.created@1", "orders.created@2"],
+            eventId: "orders.created",
+            eventVersion: 2,
             retry,
           },
         ],
@@ -97,12 +99,13 @@ describe("RelkitEventBus", () => {
       ]),
     );
     expect(component?.triggers).toHaveLength(2);
-    expect(component?.rules).toHaveLength(4);
+    expect(component?.rules).toHaveLength(2);
     expect(new Set(component?.triggers.map(({ queue }) => queue.urn)).size).toBe(2);
     expect(component?.workerConfigurations[0]).toMatchObject({
       eventTriggerId: "receipts.on-created",
       targetFunctionId: "receipts.send",
-      expansion: ["orders.created@1", "orders.created@2"],
+      eventId: "orders.created",
+      eventVersion: 1,
       deliverySemantics: "at-least-once",
       envelopePath: "$.envelope",
       tracePath: "$.envelope.traceId",
@@ -119,14 +122,7 @@ describe("RelkitEventBus", () => {
       };
       return `${pattern.detail.eventId[0]}@${pattern.detail.version[0]}`;
     });
-    expect(pairs).toEqual(
-      expect.arrayContaining([
-        "orders.created@1",
-        "orders.created@2",
-        "orders.created@1",
-        "orders.created@2",
-      ]),
-    );
+    expect(pairs).toEqual(expect.arrayContaining(["orders.created@1", "orders.created@2"]));
 
     const targets = resources.filter(
       ({ type }) => type === "aws:cloudwatch/eventTarget:EventTarget",
@@ -171,7 +167,8 @@ describe("RelkitEventBus", () => {
             {
               id: "orders.listener",
               targetFunctionId: "orders.handle",
-              expansion: ["orders.created@2"],
+              eventId: "orders.created",
+              eventVersion: 2,
             },
           ],
         }),
@@ -184,7 +181,8 @@ describe("RelkitEventBus", () => {
             {
               id: "orders.listener",
               targetFunctionId: "orders.handle",
-              expansion: ["orders.created@1"],
+              eventId: "orders.created",
+              eventVersion: 1,
               maxReceiveCount: 2,
             },
           ],

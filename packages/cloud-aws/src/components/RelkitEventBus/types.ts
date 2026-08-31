@@ -20,7 +20,8 @@ export interface RelkitEventDefinition {
 export interface RelkitEventTriggerDefinition {
   readonly id: string;
   readonly targetFunctionId: string;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly retry?: RelkitEventRetryPolicy;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
@@ -55,9 +56,10 @@ export interface RelkitEventWorkerConfiguration {
   readonly queueArn: pulumi.Output<string>;
   readonly queueUrl: pulumi.Output<string>;
   readonly deadLetterQueueArn: pulumi.Output<string>;
-  readonly expansion: readonly string[];
+  readonly eventId: string;
+  readonly eventVersion: number;
   readonly batchSize: number;
-  readonly concurrency: number;
+  readonly concurrency?: number;
   readonly waitTimeSeconds: number;
   readonly visibilityTimeoutSeconds: number;
   readonly deliverySemantics: "at-least-once";

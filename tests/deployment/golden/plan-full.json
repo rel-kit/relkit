@@ -1,6 +1,6 @@
 {
   "contractVersion": 2,
-  "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+  "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
   "application": {
     "id": "full-app",
     "image": {
@@ -92,7 +92,7 @@
       ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
         "managed-by": "relkit"
       },
       "metadata": {
@@ -129,7 +129,7 @@
       ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
         "managed-by": "relkit"
       },
       "jobId": "receipts.send-job",
@@ -156,7 +156,7 @@
       ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
         "managed-by": "relkit"
       },
       "metadata": {
@@ -165,7 +165,7 @@
         ]
       },
       "version": 1,
-      "payload": {
+      "input": {
         "properties": {
           "orderId": {
             "type": "string"
@@ -184,8 +184,8 @@
   ],
   "eventTriggers": [
     {
-      "id": "receipts.listener",
-      "logicalName": "full-app-event-trigger-receipts-listener",
+      "id": "relkit.event.receipts.listener.trigger",
+      "logicalName": "full-app-event-trigger-relkit-event-receipts-listener-trigger",
       "bindingId": "provider.events.default",
       "profile": "default",
       "configurationNames": [],
@@ -194,7 +194,7 @@
       ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
         "managed-by": "relkit"
       },
       "metadata": {
@@ -204,10 +204,9 @@
           "sqs:ChangeMessageVisibility"
         ]
       },
-      "targetFunctionId": "relkit.event.receipts.listener.handler",
-      "expansion": [
-        "orders.created@1"
-      ],
+      "targetFunctionId": "receipts.listener",
+      "eventId": "orders.created",
+      "eventVersion": 1,
       "delivery": "durable",
       "retry": {
         "initialDelayMs": 1,
@@ -230,7 +229,7 @@
       ],
       "tags": {
         "app": "full-app",
-        "graphHash": "sha256:e7682e8b4058aaa1f7ef380955ad049c68f0d2ce369c17cd724f15d593653c67",
+        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
         "managed-by": "relkit"
       },
       "visibility": "private",
@@ -273,7 +272,7 @@
             "sqs:GetQueueAttributes"
           ],
           "resources": [
-            "full-app-event-trigger-receipts-listener"
+            "full-app-event-trigger-relkit-event-receipts-listener-trigger"
           ]
         },
         {
@@ -297,19 +296,17 @@
         ]
       },
       {
-        "functionId": "receipts.send",
+        "functionId": "receipts.listener",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
         "actions": [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:ChangeMessageVisibility"
+          "sqs:SendMessage"
         ]
       },
       {
-        "functionId": "relkit.event.receipts.listener.handler",
+        "functionId": "receipts.listener",
         "capability": "jobs",
-        "resourceId": "receipts.listener",
+        "resourceId": "relkit.event.receipts.listener.trigger",
         "actions": [
           "sqs:ReceiveMessage",
           "sqs:DeleteMessage",
@@ -318,11 +315,13 @@
         ]
       },
       {
-        "functionId": "relkit.event.receipts.listener.handler",
+        "functionId": "receipts.send",
         "capability": "jobs",
         "resourceId": "receipts.send-job",
         "actions": [
-          "sqs:SendMessage"
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility"
         ]
       }
     ]

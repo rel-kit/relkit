@@ -1,5 +1,14 @@
-import type { EventOperationContext, EventProvider, EventProviderResult } from "@relkit/events";
-import type { EventRuntimeProvider, EventTriggerBinding } from "@relkit/engine";
+import type {
+  EventOperationContext,
+  EventProvider,
+  EventProviderResult,
+  EventPublishOptions,
+} from "@relkit/events";
+import type {
+  EventInvocationContext,
+  EventRuntimeProvider,
+  EventTriggerBinding,
+} from "@relkit/engine";
 import type { EventNode } from "@relkit/graph";
 import { assertResponse, awsRequest } from "./http.js";
 import { type AwsCredentials, text } from "./config.js";
@@ -14,7 +23,11 @@ export interface AwsEventOptions {
 }
 
 export interface AwsEventProvider extends EventProvider, EventRuntimeProvider {
-  readonly deliver: (triggerId: string, envelope: unknown) => Promise<unknown>;
+  readonly deliver: (
+    triggerId: string,
+    envelope: unknown,
+    context?: EventInvocationContext,
+  ) => Promise<unknown>;
 }
 
 export function createEventBridgeProvider(options: AwsEventOptions): AwsEventProvider {
@@ -27,22 +40,28 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
   const triggers = new Map<string, EventTriggerBinding>();
   const publish = async (
     payload: unknown,
-    request: { readonly key?: string; readonly attributes?: Record<string, unknown> },
+    request: EventPublishOptions,
     context: EventOperationContext,
   ): Promise<EventProviderResult> => {
     if (context.signal.aborted)
       throw context.signal.reason ?? new Error("Event operation cancelled");
     if (busName === undefined) throw new Error("AWS event busName is not configured");
-    const detail = JSON.stringify({
+    const timestamp = new Date().toISOString();
+    const envelope = {
+      instanceId: `event-${crypto.randomUUID()}`,
       eventId: context.eventId,
       version: context.version,
       payload,
-      key: request.key,
-      attributes: request.attributes,
+      occurredAt: timestamp,
+      publishedAt: timestamp,
+      ...(request.key === undefined ? {} : { key: request.key }),
+      attributes: request.attributes ?? {},
       traceId: context.traceId,
-      correlationId: context.correlationId,
-      causationInvocationId: context.causationInvocationId,
-    });
+      ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
+      ...(context.causationInvocationId === undefined
+        ? {}
+        : { causationInvocationId: context.causationInvocationId }),
+    };
     const response = await awsRequest(endpoint, {
       service: "events",
       region: options.region,
@@ -50,6 +69,7 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
       fetch: options.fetch,
       init: {
         method: "POST",
+        signal: context.signal,
         headers: {
           "content-type": "application/x-amz-json-1.1",
           "x-amz-target": "AWSEvents.PutEvents",
@@ -60,7 +80,7 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
               EventBusName: busName,
               Source: source,
               DetailType: `${context.eventId}@${context.version}`,
-              Detail: detail,
+              Detail: JSON.stringify(envelope),
             },
           ],
         }),
@@ -68,12 +88,16 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
     });
     await assertResponse(response, "EventBridge publish");
     const result = (await response.json()) as {
-      readonly Entries?: readonly { readonly EventId?: string }[];
+      readonly FailedEntryCount?: number;
+      readonly Entries?: readonly { readonly EventId?: string; readonly ErrorCode?: string }[];
     };
-    return {
-      instanceId: result.Entries?.[0]?.EventId ?? `event-${crypto.randomUUID()}`,
-      accepted: true,
-    };
+    const entry = result.Entries?.[0];
+    if (result.FailedEntryCount || entry?.ErrorCode || !entry?.EventId) {
+      throw new Error(
+        `EventBridge rejected event publication: ${entry?.ErrorCode ?? "invalid response"}`,
+      );
+    }
+    return { ...envelope, accepted: true };
   };
   return Object.freeze({
     publish,
@@ -81,11 +105,11 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
     registerTrigger: async (binding: EventTriggerBinding) => {
       triggers.set(binding.id, binding);
     },
-    deliver: async (triggerId: string, envelope: unknown) => {
+    deliver: async (triggerId: string, envelope: unknown, context: EventInvocationContext = {}) => {
       const binding = triggers.get(triggerId);
       if (binding === undefined)
         throw new Error(`AWS event trigger ${triggerId} is not registered`);
-      return binding.invoke(envelope as never);
+      return binding.invoke(envelope as never, context);
     },
   });
 }

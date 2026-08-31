@@ -7,7 +7,6 @@ import type {
   RelkitEventTriggerDefinition,
 } from "./types.js";
 
-const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_VISIBILITY_SECONDS = 60;
 const DEFAULT_RETENTION_SECONDS = 345_600;
 const DEFAULT_DLQ_RETENTION_SECONDS = 1_209_600;
@@ -16,10 +15,10 @@ const DEFAULT_WAIT_SECONDS = 20;
 const DEFAULT_EVENTBRIDGE_RETRIES = 3;
 const DEFAULT_EVENTBRIDGE_AGE = 86_400;
 const DEFAULT_TRIGGER_RETRY: RelkitEventRetryPolicy = {
-  maxAttempts: 3,
-  initialDelayMs: 100,
-  maxDelayMs: 30_000,
-  multiplier: 2,
+  maxAttempts: 1,
+  initialDelayMs: 0,
+  maxDelayMs: 0,
+  multiplier: 1,
   jitter: "none",
 };
 
@@ -32,10 +31,10 @@ export interface NormalizedEvent {
 export interface NormalizedEventTrigger {
   readonly id: string;
   readonly targetFunctionId: string;
-  readonly expansion: readonly NormalizedEvent[];
+  readonly event: NormalizedEvent;
   readonly retry: RelkitEventRetryPolicy;
-  readonly timeoutMs: number;
-  readonly concurrency: number;
+  readonly timeoutMs?: number;
+  readonly concurrency?: number;
   readonly visibilityTimeoutSeconds: number;
   readonly messageRetentionSeconds: number;
   readonly deadLetterRetentionSeconds: number;
@@ -75,23 +74,18 @@ export function normalizeTriggers(
     const id = normalizeId(trigger.id);
     if (ids.has(id)) throw new TypeError(`Duplicate AWS event trigger "${id}".`);
     ids.add(id);
-    const expansion = [...new Set(trigger.expansion.map(parsePair))]
-      .map((pair) => {
-        const event = known.get(pair);
-        if (event === undefined)
-          throw new TypeError(`AWS event trigger "${id}" references unknown event "${pair}".`);
-        return event;
-      })
-      .sort((left, right) => left.pair.localeCompare(right.pair));
-    if (expansion.length === 0)
-      throw new TypeError(`AWS event trigger "${id}" must route at least one event version.`);
+    const event = known.get(`${trigger.eventId}@${trigger.eventVersion}`);
+    if (event === undefined)
+      throw new TypeError(
+        `AWS event trigger "${id}" references unknown event "${trigger.eventId}@${trigger.eventVersion}".`,
+      );
     const retry = trigger.retry ?? DEFAULT_TRIGGER_RETRY;
     validateRetry(retry, id);
     if (retry.maxAttempts > 1000)
       throw new RangeError(`Event trigger "${id}" retry.maxAttempts cannot exceed 1000.`);
-    const timeoutMs = trigger.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-    positive(timeoutMs, `Event trigger "${id}" timeoutMs`);
-    const requiredVisibility = Math.ceil(timeoutMs / 1000);
+    const timeoutMs = trigger.timeoutMs;
+    if (timeoutMs !== undefined) positive(timeoutMs, `Event trigger "${id}" timeoutMs`);
+    const requiredVisibility = Math.ceil((timeoutMs ?? 0) / 1000);
     const visibility =
       trigger.visibilityTimeoutSeconds ?? Math.max(DEFAULT_VISIBILITY_SECONDS, requiredVisibility);
     range(visibility, 0, 43_200, `Event trigger "${id}" visibilityTimeoutSeconds`);
@@ -113,15 +107,15 @@ export function normalizeTriggers(
     range(batchSize, 1, 10, `Event trigger "${id}" workerBatchSize`);
     const waitSeconds = trigger.workerWaitTimeSeconds ?? DEFAULT_WAIT_SECONDS;
     range(waitSeconds, 0, 20, `Event trigger "${id}" workerWaitTimeSeconds`);
-    const concurrency = trigger.concurrency ?? 1;
-    positive(concurrency, `Event trigger "${id}" concurrency`);
+    const concurrency = trigger.concurrency;
+    if (concurrency !== undefined) positive(concurrency, `Event trigger "${id}" concurrency`);
     return {
       id,
       targetFunctionId: normalizeId(trigger.targetFunctionId),
-      expansion,
+      event,
       retry,
-      timeoutMs,
-      concurrency,
+      ...(timeoutMs === undefined ? {} : { timeoutMs }),
+      ...(concurrency === undefined ? {} : { concurrency }),
       visibilityTimeoutSeconds: visibility,
       messageRetentionSeconds: retention,
       deadLetterRetentionSeconds: dlqRetention,
@@ -155,15 +149,6 @@ export function eventPattern(source: string, event: NormalizedEvent): string {
     detail: { eventId: [event.id], version: [event.version] },
     source: [source],
   });
-}
-
-function parsePair(value: string): string {
-  const at = value.lastIndexOf("@");
-  const versionText = value.slice(at + 1);
-  if (at < 1 || !/^[1-9]\d*$/.test(versionText))
-    throw new TypeError(`Event expansion "${value}" must use id@version.`);
-  const version = Number(versionText);
-  return `${normalizeId(value.slice(0, at))}@${version}`;
 }
 
 function validateRetry(policy: RelkitEventRetryPolicy, id: string): void {
