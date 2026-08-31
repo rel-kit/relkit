@@ -35,8 +35,8 @@ export function renderManifest(
     )
       ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/agents";'
       : "",
-    [...targets.values()].some((value) => value.startsWith("__relkit_createEventListenerTarget("))
-      ? 'import { createEventListenerTarget as __relkit_createEventListenerTarget } from "@relkit/events";'
+    [...targets.values()].some((value) => value.startsWith("__relkit_bindFunctionEvents("))
+      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/events";'
       : "",
   ]
     .filter(Boolean)

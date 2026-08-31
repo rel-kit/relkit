@@ -13,7 +13,7 @@ const KNOWN_FACTORIES = new Set([
   "defineServiceRoutes",
   "defineJob",
   "defineEvent",
-  "onEvent",
+  "defineEventFunction",
   "defineBucket",
   "defineCache",
   "defineTool",

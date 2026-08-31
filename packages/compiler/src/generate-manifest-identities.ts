@@ -48,7 +48,6 @@ function descriptorBindings(
   bindings: ReadonlyMap<string, ImportBinding>,
   input: ManifestGenerationInput,
 ): IdentityBinding[] {
-  if (isGeneratedEventListener(descriptor.value)) return [];
   const reference = descriptor.reference;
   if (reference === undefined) return [];
   const module = modulePath(reference.module, input);
@@ -120,15 +119,6 @@ function isFunctionTarget(value: object): value is {
     isObjectLike(ref) &&
     (ref as Record<string, unknown>).kind === "function" &&
     typeof (ref as Record<string, unknown>).id === "string"
-  );
-}
-
-function isGeneratedEventListener(value: unknown): boolean {
-  if (!isObjectLike(value)) return false;
-  const generated = (value as Record<string, unknown>).generated;
-  return (
-    isObjectLike(generated) &&
-    (generated as Record<string, unknown>).generatedBy === "event-listener"
   );
 }
 

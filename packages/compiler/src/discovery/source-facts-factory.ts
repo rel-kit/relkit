@@ -18,12 +18,12 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineDrizzleService: { kind: "service", idOptional: true },
   defineBetterAuthService: { kind: "service", idOptional: true },
   defineFunction: { kind: "function", idOptional: true },
+  defineEventFunction: { kind: "function", idOptional: false },
   defineError: { kind: "error", idOptional: true },
   defineRoute: { kind: "route", idOptional: true },
   defineServiceRoutes: { kind: "route", idOptional: true },
   defineJob: { kind: "job", idOptional: false },
   defineEvent: { kind: "event", idOptional: false },
-  onEvent: { kind: "event-trigger", idOptional: false },
   defineBucket: { kind: "bucket", idOptional: false },
   defineCache: { kind: "cache", idOptional: false },
   defineTool: { kind: "tool", idOptional: true },
@@ -51,7 +51,20 @@ export function factoryFor(
     idOptional: definition.idOptional,
     id: factory === "defineServiceRoutes" ? "omitted" : idPresence(call.arguments[0]),
     position,
+    options: optionNames(call.arguments[0]),
   });
+}
+
+function optionNames(argument: ts.Expression | undefined): readonly string[] {
+  const value = unwrap(argument);
+  if (!value || !ts.isObjectLiteralExpression(value)) return [];
+  return Object.freeze(
+    value.properties.flatMap((property) => {
+      if (ts.isSpreadAssignment(property)) return [];
+      const name = propertyName(property.name);
+      return name === undefined ? [] : [name];
+    }),
+  );
 }
 
 export function membersFor(

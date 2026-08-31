@@ -9,7 +9,7 @@ export interface EventRegistryGenerationOptions {
   readonly generatedDirectory?: string;
 }
 
-/** Generates the module augmentation used by event-name autocomplete and callback inference. */
+/** Generates the dependency-neutral registry used by event capability inference. */
 export function generateEventRegistry(
   descriptors: readonly ExtractedDescriptor[],
   options: EventRegistryGenerationOptions,
@@ -34,11 +34,11 @@ export function generateEventRegistry(
       ];
     });
   return [
-    'import "@relkit/events";',
-    "",
-    'declare module "@relkit/events" {',
-    "  interface EventRegistry {",
+    "declare global {",
+    "  namespace Relkit {",
+    "    interface EventRegistry {",
     ...entries,
+    "    }",
     "  }",
     "}",
     "",

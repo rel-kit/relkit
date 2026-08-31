@@ -9,7 +9,7 @@ import {
   type ImportBinding,
 } from "./generate-manifest-utils.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
-import { eventListenerExecutableExpression } from "./generate-manifest-event.js";
+import { functionEventTargetExpression } from "./generate-manifest-event.js";
 
 export function functionExpressionsFor(
   functions: readonly NormalizedDescriptor[],
@@ -20,11 +20,6 @@ export function functionExpressionsFor(
 ): ReadonlyMap<string, string> {
   const expressions = new Map<string, string>();
   for (const descriptor of functions) {
-    const listener = eventListenerExecutableExpression(descriptor, bindings, input, "handler");
-    if (listener !== undefined) {
-      expressions.set(descriptor.id, listener);
-      continue;
-    }
     const generated = isGeneratedFunction(descriptor.value);
     if (generated !== undefined) {
       expressions.set(
@@ -51,9 +46,9 @@ export function functionTargetExpressionsFor(
 ): ReadonlyMap<string, string> {
   const expressions = new Map<string, string>();
   for (const descriptor of functions) {
-    const listener = eventListenerExecutableExpression(descriptor, bindings, input, "target");
-    if (listener !== undefined) {
-      expressions.set(descriptor.id, listener);
+    const functionEvents = functionEventTargetExpression(descriptor, bindings, input);
+    if (functionEvents !== undefined) {
+      expressions.set(descriptor.id, functionEvents);
       continue;
     }
     const expression = executableExpression(descriptor, "descriptor", bindings, input);
