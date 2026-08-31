@@ -1,0 +1,89 @@
+---
+title: Getting started
+description: Understand the service layer that organizes your app's functions, events, resources, tools, and agents by domain.
+---
+
+The service layer is the organizing center of a RelKit application. Start with the part of the product
+you are building—orders, receipts, accounts—not with the technology you will use to build it. Give that
+area a domain folder, keep its behavior and resources together, and expose its public operations through
+one `service.ts`.
+
+This gives every new function, event, tool, and agent an owner. Before learning an individual capability,
+understand where it belongs and how the rest of the app should reach it.
+
+## Domain, service, and function
+
+These three terms describe different things:
+
+| Term     | Meaning                                                                              | Example                                                                            |
+| -------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Domain   | A cohesive area of application responsibility, including its private implementation. | `src/orders/` owns order creation, pricing, order events, and order-support tools. |
+| Service  | The domain's public boundary, assembled in one `service.ts`.                         | `orders.createOrder` and `orders.orderCreated` are selected public members.        |
+| Function | A validated operation that does the work.                                            | `create-order.function.ts` calculates a total and publishes an event.              |
+
+When we say a service contains tools, agents, caches, or jobs, we mean they belong to its **domain**.
+`defineService` itself accepts public `functions` and `events`; it is not a registry of every file or a
+container that injects resources. A function remains the execution unit.
+
+## The application architecture
+
+```text
+relkit.config.ts              application settings and provider bindings
+src/
+├── platform/                 shared environment and infrastructure support
+├── orders/                   an application domain
+│   ├── service.ts            public functions and event contracts
+│   ├── functions/            business operations and event subscribers
+│   ├── events/               facts this domain publishes
+│   ├── tools/                model-callable operations
+│   ├── agents/               bounded model workflows
+│   └── cache/                domain-owned cached data
+├── receipts/                 another domain, with its own service.ts
+│   ├── service.ts
+│   ├── functions/
+│   └── jobs/
+└── routes/                   URL paths, HTTP methods, and request policy
+```
+
+This is an ownership map, not a checklist of folders to create. Start with a service and one useful
+function. Add the other directories only when the domain needs those capabilities. `routes` and
+`platform` are special layers, not application domains, and do not need a domain `service.ts`.
+
+The compiler discovers exported descriptors, checks their relationships, and produces an application
+graph and runtime manifest. The runtime, Inspector, and deployment tooling use that checked model.
+Application authors use ordinary TypeScript descriptors; no Effect imports are required.
+
+## Follow an operation through the layers
+
+In the commerce example, an HTTP route selects `orders.createOrder`. The function validates domain input,
+reads the Orders price cache, and publishes `orders.created`. A Receipts event function reacts, looks up
+the order through the Orders service, and enqueues receipt work.
+
+Each part has a different job:
+
+- The route handles HTTP input and response mapping.
+- The service makes selected domain operations available to callers.
+- The function owns business behavior and declares the resources it needs.
+- The event contract describes what happened; subscriber functions own the reactions.
+- Tools and agents reuse domain behavior without relocating it into an AI-specific application layer.
+
+A service does not create an HTTP endpoint automatically. Nor does adding a member grant a user
+permission to call it. Transport exposure and authorization remain explicit.
+
+## Read a real public boundary
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
+  ../../examples/commerce/src/orders/service.ts
+</include>
+
+Notice what is absent: the Orders cache, support agent, tools, and event subscribers. They still belong
+to Orders and are discovered from their own files. They are not public service members.
+
+## Choose your next step
+
+Read [what a domain is and when to split one](/docs/service/domains), then use
+[where to put your code](/docs/service/organization) as the map for each capability.
+For implementation, follow [define a service](/docs/service/define),
+[expose it through routes](/docs/service/routes), or the [first-service example](/docs/service/first-service).
+
+<include cwd>content/generated/related/service-index.mdx</include>

@@ -1,0 +1,115 @@
+---
+title: Example — your first service
+description: Add one domain function, expose it through a service and route, and verify both the behavior and HTTP boundary.
+---
+
+Build the smallest complete service in an existing RelKit app: a Hello domain with one function, one
+public member, and one HTTP route. No resource provider, cloud deployment, or model API key is needed
+for this operation.
+
+Use an app with its dependencies installed and local environment configured. If you need one, follow
+[Create an application](/docs/start/create-an-app) first. Run the commands below from your app's root,
+not the RELKIT repository root.
+
+The generated templates already contain Hello. If these files exist, read and verify them instead of
+overwriting them. Otherwise, add the files shown below. If you already have a customized Hello service
+or route, merge only the missing operation and preserve your existing behavior.
+
+## 1. Put behavior in a domain function
+
+Create `src/hello/functions/hello.function.ts`:
+
+<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
+  ../../templates/default/v1/minimal/src/hello/functions/hello.function.ts
+</include>
+
+The function validates its input and output and records a structured log. It contains no HTTP request
+parsing. The explicit `hello.greet` ID starts with the `hello` domain prefix.
+
+## 2. Expose the public operation
+
+Create `src/hello/service.ts`:
+
+<include cwd lang="ts" meta='title="src/hello/service.ts"'>
+  ../../templates/default/v1/minimal/src/hello/service.ts
+</include>
+
+This single export is the domain's boundary. The service ID is inferred as `hello`. Its public member is
+also named `hello`, so the example route uses `hello.hello`: service variable first, member second.
+Neither name changes the original function's `hello.greet` identity.
+
+There is no registration array to update in `relkit.config.ts`. The compiler discovers the service and
+function from source.
+
+## 3. Add the HTTP entry point
+
+Create `src/routes/hello/route.ts`:
+
+<include cwd lang="ts" meta='title="src/routes/hello/route.ts"'>
+  ../../templates/default/v1/minimal/src/routes/hello/route.ts
+</include>
+
+The import goes through the public service, not the private function file. The path supplies `/hello`
+and the named export supplies `GET`. Input mapping is inferred from the function's schema.
+
+## 4. Test the function without HTTP
+
+Add `tests/unit/hello.function.test.ts` if your app does not already have the generated test:
+
+<include cwd lang="ts" meta='title="tests/unit/hello.function.test.ts"'>
+  ../../templates/default/v1/minimal/tests/unit/hello.function.test.ts
+</include>
+
+```sh
+bun run check
+bun run typecheck
+bun test tests/unit/hello.function.test.ts
+```
+
+Expect all three commands to succeed. `check` validates the domain and route and generates the checked
+application artifacts. The test invokes the function through the test runtime and verifies its result;
+it does not start a server.
+
+## 5. Verify the route boundary
+
+Add `tests/integration/hello.route.test.ts` if it is not already present:
+
+<include cwd lang="ts" meta='title="tests/integration/hello.route.test.ts"'>
+  ../../templates/default/v1/minimal/tests/integration/hello.route.test.ts
+</include>
+
+```sh
+bun test tests/integration/hello.route.test.ts
+```
+
+Expect the in-process HTTP test to return status `200` and the greeting. This check exercises route
+discovery and input mapping in addition to the function behavior.
+
+For a manual request, start the app:
+
+```sh
+bun run dev
+```
+
+In another terminal, run:
+
+```sh
+curl -i 'http://localhost:3000/hello?name=RELKIT'
+```
+
+Expect HTTP `200` and `{ "message": "Hello, RELKIT!" }`. Use your app's configured backend port if it
+differs. The Inspector normally runs at `http://localhost:3210`; use it to inspect the function and its
+invocations. If startup fails because of another capability in your existing app, resolve that provider
+configuration first; Hello itself declares no managed dependencies.
+
+## Grow the domain one capability at a time
+
+Add more functions under `src/hello/functions/`, then expose only those that need public callers. To
+add another capability, return to [the placement map](/docs/service/organization):
+[events](/docs/events), [caching](/docs/caching), [storage](/docs/storage), and [AI](/docs/ai) each have
+their own getting-started guides. Keep HTTP work in the [Routes topics](/docs/service/routes#continue-with-the-routes-topics).
+
+You now have the complete organization pattern: a domain owns the work, a service selects the public
+contract, and a route makes one operation reachable over HTTP.
+
+<include cwd>content/generated/related/service-first-service.mdx</include>
