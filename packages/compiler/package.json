@@ -33,6 +33,7 @@
     "@relkit/client-generator": "workspace:*",
     "@relkit/diagnostics": "workspace:*",
     "@relkit/graph": "workspace:*",
+    "@relkit/local-service": "workspace:*",
     "@relkit/openapi": "workspace:*",
     "@relkit/schema": "workspace:*",
     "typescript": "5.9.3"
