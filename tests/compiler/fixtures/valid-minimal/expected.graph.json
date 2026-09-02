@@ -1,6 +1,6 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 7,
+  "contractVersion": 8,
   "edges": [
     {
       "from": "hello",
@@ -18,7 +18,8 @@
   ],
   "nodes": [
     {
-      "defaults": null,
+      "defaults": {},
+      "deploymentRoles": [],
       "environment": {
         "SERVICE_PORT": {
           "hasDefault": true,
@@ -30,7 +31,6 @@
       },
       "id": "minimal-app",
       "kind": "app",
-      "providerBindings": [],
       "source": {
         "column": 16,
         "file": "relkit.config.ts",

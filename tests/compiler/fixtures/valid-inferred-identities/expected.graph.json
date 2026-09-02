@@ -1,6 +1,6 @@
 {
   "appId": "inferred-app",
-  "contractVersion": 7,
+  "contractVersion": 8,
   "edges": [
     {
       "from": "orders.get-order",
@@ -73,7 +73,7 @@
     {
       "from": "orders.support",
       "kind": "uses-provider-profile",
-      "to": "provider.models.default"
+      "to": "provider.model.openai"
     },
     {
       "from": "orders.support",
@@ -118,7 +118,7 @@
         ],
         "type": "object"
       },
-      "profile": "default",
+      "profile": "openai",
       "source": {
         "column": 16,
         "file": "src/orders/agents/support.agent.ts",
@@ -129,17 +129,9 @@
       ]
     },
     {
-      "defaults": {
-        "model": "default"
-      },
+      "defaults": {},
+      "deploymentRoles": [],
       "environment": {
-        "MODEL_API_KEY": {
-          "hasDefault": false,
-          "optional": true,
-          "requiredIn": [],
-          "sensitive": true,
-          "type": "secret-string"
-        },
         "SERVICE_PORT": {
           "hasDefault": true,
           "optional": false,
@@ -150,28 +142,11 @@
       },
       "id": "inferred-app",
       "kind": "app",
-      "providerBindings": [
-        "provider.models.default"
-      ],
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
         "line": 8
       }
-    },
-    {
-      "hasDefault": false,
-      "id": "MODEL_API_KEY",
-      "kind": "env",
-      "name": "MODEL_API_KEY",
-      "requiredIn": [],
-      "sensitive": true,
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 8
-      },
-      "type": "secret-string"
     },
     {
       "hasDefault": true,
@@ -436,31 +411,55 @@
       }
     },
     {
-      "adapter": "ai-sdk",
-      "capability": "models",
-      "configuration": {
-        "defaultModel": "gpt-5-mini",
-        "defaultProvider": "openai",
-        "openai": {
+      "adapter": {
+        "adapterId": "ai-sdk",
+        "behavior": {
+          "defaultModel": "gpt-5-mini",
+          "provider": "openai"
+        },
+        "connection": {},
+        "connectionContract": {
           "apiKey": {
-            "kind": "env-ref",
-            "name": "MODEL_API_KEY",
-            "sensitive": true,
-            "type": "secret-string"
+            "authoredValue": "fixed",
+            "required": true,
+            "sensitive": true
+          },
+          "baseURL": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "organization": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "project": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
           }
-        }
+        },
+        "features": [],
+        "integrationId": "ai-sdk",
+        "protocolVersion": 1
       },
-      "environment": [
+      "capability": "model",
+      "deploymentRoles": [],
+      "id": "provider.model.openai",
+      "kind": "provider",
+      "namedValues": [
         {
+          "field": "apiKey",
           "name": "MODEL_API_KEY",
           "sensitive": true,
           "type": "secret-string"
         }
       ],
-      "id": "provider.models.default",
-      "kind": "provider",
-      "ownership": "external",
-      "profile": "default",
+      "profile": "openai",
+      "providerSource": {
+        "kind": "connected"
+      },
       "source": {
         "column": 16,
         "file": "relkit.config.ts",

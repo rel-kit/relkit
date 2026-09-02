@@ -1,20 +1,18 @@
-import { aiSdk, defineConfig, defineEnv, env as envFactory, external } from "@relkit/app";
+import { aiSdk } from "@relkit/ai-sdk";
+import { defineApp, defineEnv, env as envFactory } from "@relkit/app";
 
 const env = defineEnv({
   SERVICE_PORT: envFactory.port().default(3000),
-  MODEL_API_KEY: envFactory.secret().optional(),
 });
 
-export default defineConfig({
+export default defineApp({
   id: "inferred-app",
   env,
-  models: {
-    default: external(
-      aiSdk({
-        defaultProvider: "openai",
-        defaultModel: "gpt-5-mini",
-        openai: { apiKey: env.MODEL_API_KEY },
-      }),
-    ),
+  model: {
+    openai: aiSdk({
+      provider: "openai",
+      defaultModel: "gpt-5-mini",
+      apiKey: envFactory.secret("MODEL_API_KEY"),
+    }),
   },
 });
