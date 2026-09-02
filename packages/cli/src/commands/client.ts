@@ -113,10 +113,15 @@ interface ContractDocument {
 }
 
 function validate(document: ContractDocument): ContractProcedureDocument[] {
-  if (document.protocol !== "relkit.client-contract" || document.version !== CONTRACT_VERSION) {
+  if (document.protocol !== "relkit.client-contract")
     throw fail(
       "RELKIT_CLIENT_PROTOCOL_UNSUPPORTED",
-      `Expected client contract version ${CONTRACT_VERSION}`,
+      `Client contract protocol ${JSON.stringify(document.protocol)} is unsupported`,
+    );
+  if (document.version !== CONTRACT_VERSION) {
+    throw fail(
+      "RELKIT_CLIENT_PROTOCOL_UNSUPPORTED",
+      `Client contract version ${String(document.version)} is unsupported; expected ${CONTRACT_VERSION}. Regenerate the server with \`relkit build\``,
     );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(document.graphHash) || !Array.isArray(document.procedures)) {

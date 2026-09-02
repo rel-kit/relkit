@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { fromGraph } from "@relkit/deploy";
+import { assertDeploymentPlanVersion, fromGraph } from "@relkit/deploy";
 import {
   createPulumiProgram,
   createPulumiWorkspace,
@@ -11,6 +11,10 @@ import { CLI_EXIT_CODES } from "../main-support.js";
 import { buildProject, type BuildOptions, type BuildResult } from "./build.js";
 import { checkProject, type CheckOptions, type CheckResult } from "./check.js";
 import { execute } from "./deploy-operations.js";
+import {
+  deploymentIntegrationEntries,
+  loadDeploymentIntegrations,
+} from "./deployment-integrations.js";
 import {
   DeployCommandError,
   interrupted,
@@ -60,7 +64,6 @@ export type {
   DeployOperation,
   ParsedDeployArgs,
 } from "./deploy-support.js";
-
 async function prepare(
   root: string,
   parsed: ParsedDeployArgs,
@@ -93,6 +96,7 @@ async function prepare(
       "RELKIT_DEPLOY_CHECK_FAILED",
       "The checked graph changed before planning.",
     );
+  const integrations = await (options.loadIntegrations ?? loadDeploymentIntegrations)(root, plan);
   if (parsed.command === "preview" || parsed.command === "up") {
     const built = await (options.build ?? buildProject)({
       projectRoot: root,
@@ -104,12 +108,27 @@ async function prepare(
   }
   const directory = resolve(root, ".relkit/generated/pulumi");
   const previousPlan = await readPlan(join(directory, "plan.json"));
+  const entries = deploymentIntegrationEntries(integrations);
   const files = await (options.writeProgram ?? writePulumiProgram)(plan, {
     projectRoot: root,
     projectName: plan.application.id,
     stackName: parsed.stack,
+    integrations: entries.map((entry) => entry.metadata),
+    integrationImports: entries.map(({ metadata, packageName, packageVersion, exportName }) => ({
+      integrationId: metadata.integrationId,
+      role: metadata.role,
+      packageName,
+      packageVersion,
+      exportName,
+    })),
   });
-  return { root, plan, ...(previousPlan === undefined ? {} : { previousPlan }), files };
+  return {
+    root,
+    plan,
+    ...(previousPlan === undefined ? {} : { previousPlan }),
+    files,
+    integrations,
+  };
 }
 
 async function openWorkspace(
@@ -117,11 +136,13 @@ async function openWorkspace(
   parsed: ParsedDeployArgs,
   options: DeployCommandOptions,
 ): Promise<WorkspaceHandle> {
+  const entries = deploymentIntegrationEntries(prepared.integrations);
   const program = createPulumiProgram(prepared.plan, {
     projectName: prepared.plan.application.id,
     stackName: parsed.stack,
     projectRoot: prepared.root,
     directory: ".relkit/generated/pulumi",
+    integrations: entries.map((entry) => entry.metadata),
   });
   const config = Object.keys(parsed.config).length === 0 ? {} : { config: parsed.config };
   return (options.createWorkspace ?? createPulumiWorkspace)({
@@ -136,11 +157,24 @@ async function openWorkspace(
 }
 
 async function readPlan(path: string): Promise<Prepared["plan"] | undefined> {
+  let source: string;
   try {
-    return JSON.parse(await readFile(path, "utf8")) as Prepared["plan"];
-  } catch {
-    return undefined;
+    source = await readFile(path, "utf8");
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") return undefined;
+    throw error;
   }
+  let value: unknown;
+  try {
+    value = JSON.parse(source);
+  } catch {
+    throw new DeployCommandError(
+      "RELKIT_DEPLOY_PLAN_INVALID",
+      `Deployment plan is invalid JSON; regenerate with \`relkit deploy preview\`: ${path}`,
+    );
+  }
+  assertDeploymentPlanVersion(value);
+  return value;
 }
 
 function checkFailure(result: CheckResult | BuildResult): string {

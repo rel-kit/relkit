@@ -5,12 +5,26 @@ import type { DeploymentPlan } from "@relkit/deploy";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
 import { runDeploy } from "./src/commands/deploy.js";
 
-const graph = JSON.parse(
+const fixtureGraph = JSON.parse(
   await readFile(
     join(process.cwd(), "tests/compiler/fixtures/valid-minimal/expected.graph.json"),
     "utf8",
   ),
 ) as ApplicationGraph;
+const graph: ApplicationGraph = {
+  ...fixtureGraph,
+  nodes: fixtureGraph.nodes.map((node) =>
+    node.kind === "app"
+      ? {
+          ...node,
+          deploymentRoles: [
+            { role: "engine", integrationId: "pulumi", protocolVersion: 1, configuration: {} },
+            { role: "host", integrationId: "aws", protocolVersion: 1, configuration: {} },
+          ],
+        }
+      : node,
+  ),
+};
 const graphHash = hashGraph(graph);
 
 test("preview plans through Automation API without calling up and redacts config values", async () => {
@@ -106,6 +120,7 @@ test("destroy uses explicit non-interactive confirmation and outputs stay secret
 
 function fakes(root: string, state: ReturnType<typeof fakeState>) {
   return {
+    loadIntegrations: async () => fakeIntegrations(),
     check: async () => ({
       ok: true,
       activatable: true,
@@ -163,6 +178,31 @@ function fakes(root: string, state: ReturnType<typeof fakeState>) {
         backend: { kind: "local", url: "file:///tmp/pulumi" },
       } as never;
     },
+  };
+}
+
+function fakeIntegrations() {
+  const selected = (role: "engine" | "host", integrationId: string) => {
+    const metadata = {
+      kind: "deployment-integration" as const,
+      protocolVersion: 1 as const,
+      integrationId,
+      role,
+    };
+    return {
+      metadata,
+      packageName: `@relkit/${integrationId}`,
+      packageVersion: "0.1.0",
+      exportName: role === "engine" ? "./engine" : "./host",
+      resolvedPath: `/test/${integrationId}/${role}.js`,
+      module: { deploymentIntegration: metadata },
+    };
+  };
+  return {
+    engine: selected("engine", "pulumi"),
+    host: selected("host", "aws"),
+    infrastructure: new Map(),
+    access: new Map(),
   };
 }
 

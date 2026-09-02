@@ -69,7 +69,7 @@ export async function readGraphFile(options: GraphFileOptions = {}) {
   if (value.contractVersion !== GRAPH_VERSION) {
     throw new GraphCommandError(
       "RELKIT_GRAPH_VERSION_UNSUPPORTED",
-      `Graph contract version ${String(value.contractVersion)} is unsupported; expected ${GRAPH_VERSION}: ${path}`,
+      `Graph contract version ${String(value.contractVersion)} is unsupported; expected ${GRAPH_VERSION}. Regenerate with \`relkit check\`: ${path}`,
     );
   }
   try {
