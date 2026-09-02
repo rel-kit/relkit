@@ -1,0 +1,71 @@
+---
+title: Core concepts
+description: Understand the application graph, validated functions, runtime contracts, invocation context, and environment before adding capabilities.
+---
+
+RELKIT has one authoring model: TypeScript descriptors compile into a checked application graph. Development,
+tests, HTTP, events, jobs, the Inspector, generated clients, and deployment all consume that graph instead of
+maintaining separate descriptions of the application.
+
+## Learn the model in order
+
+<Cards>
+  <Card
+    title="Application model"
+    description="See what belongs in relkit.config.ts and what becomes graph data."
+    href="/docs/fundamentals/application"
+  />
+  <Card
+    title="Functions"
+    description="Define reusable behavior with validated input, output, errors, and dependencies."
+    href="/docs/fundamentals/functions"
+  />
+  <Card
+    title="Schemas and errors"
+    description="Keep runtime boundaries explicit and failures safe for callers."
+    href="/docs/fundamentals/schemas"
+  />
+  <Card
+    title="Context and environment"
+    description="Use invocation-scoped capabilities and typed runtime configuration."
+    href="/docs/fundamentals/context"
+  />
+</Cards>
+
+Start with the application model and functions. Schemas define values crossing a boundary; declared errors
+define expected failures. Context grants one invocation access to its approved capabilities, while the
+environment contract resolves process configuration before handlers run.
+
+## One source, many consumers
+
+The generated API template keeps the root configuration intentionally small:
+
+<include cwd lang="ts" meta='title="templates/default/v1/api/relkit.config.ts"'>
+  ../../templates/default/v1/api/relkit.config.ts
+</include>
+
+Source files are the application. `.relkit/generated` and `.relkit/build` are derived artifacts; inspect them
+when diagnosing a problem, but repair the descriptor, configuration, or environment that produced them.
+
+```text title="Application flow"
+TypeScript descriptors → relkit check → application graph
+                                      ↘ dev · tests · build · inspector · deployment
+```
+
+## Check your understanding
+
+From a generated application, run:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run relkit graph print
+```
+
+`check` evaluates configuration, discovers descriptors, validates graph relationships, and refreshes generated
+contracts. `graph print` lets you inspect the resulting IDs and edges without starting the server or creating
+external resources.
+
+Continue with [Service](/docs/service) after these concepts to organize behavior by domain and choose the
+public operations other domains and transports may call.
+
+<include cwd>content/generated/related/fundamentals-index.mdx</include>

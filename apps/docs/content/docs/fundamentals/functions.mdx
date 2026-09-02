@@ -1,13 +1,13 @@
 ---
 title: Functions
-description: Define validated domain behavior, invoke it through the common engine, compose nested calls, and test without HTTP.
+description: Define reusable behavior once, invoke it through the common engine, and test it without a transport.
 ---
 
-A RELKIT function is the reusable unit of application behavior. It owns input, output, declared errors,
-managed dependencies, and a handler. Routes, jobs, events, tools, and agents target the descriptor rather
-than copying the handler, so every transport uses the same validation and invocation semantics.
+A function is RELKIT's reusable unit of application behavior. It declares runtime input and output schemas,
+expected errors, provider-backed dependencies, optional publication access, and one handler. Routes, jobs,
+event consumers, tools, agents, and direct calls all enter the same invocation engine.
 
-## Read an executable function
+## Read a complete function
 
 <include
   cwd
@@ -17,70 +17,51 @@ than copying the handler, so every transport uses the same validation and invoca
   ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
 </include>
 
-The handler receives already validated input. Its returned value is validated against `output`. Publishing
-the event is authorized by `publishes`; importing the event descriptor alone does not grant publication
-access.
+The handler receives validated input. Its return value is validated before the invocation succeeds. The example
+calls `priceOrder.invoke(...)`, so the nested operation keeps validation, deadlines, cancellation, tracing, and
+causation. Calling another descriptor's handler directly bypasses that contract.
 
-## Invoke another function
-
-The example calls `priceOrder.invoke(...)`, not `priceOrder.handler(...)`. `invoke` enters the common engine
-and preserves validation, trace/causation relationships, deadlines, cancellation, and child
-call telemetry.
-
-Calling a handler directly bypasses those guarantees and is unsupported. A nested function call does not
-need a managed dependency declaration because the target is an in-process descriptor; resources used by
-either function still require their own declarations.
-
-## Build one complete operation
+## Define the boundary
 
 <Steps>
   <Step>
-    ### Define the contract first
+    ### Start with input and output
 
-    Create the input and output schemas close to the function or in a shared domain schema module when more
-    than one descriptor owns the contract.
-
-  </Step>
-  <Step>
-    ### Add declared errors and dependencies
-
-    List only expected domain failures and only the managed clients the handler uses. This produces explicit
-    graph edges and a narrow context type.
+    Put a schema beside its only consumer, or in the owning domain when several descriptors share it. Keep
+    transport fields such as cookies and raw headers in the route unless they are genuine domain input.
 
   </Step>
   <Step>
-    ### Implement the handler
+    ### Declare failures and capabilities
 
-    Keep transport parsing out of the function. Accept domain values, use context clients, honor cancellation,
-    and return the declared output. Let unexpected defects propagate to RELKIT's safe boundary.
+    List only errors callers are expected to handle. Declare only the jobs, buckets, caches, and agents the
+    handler uses. Event publication is separate: list exact event IDs in `publishes`.
 
   </Step>
   <Step>
-    ### Invoke it in a unit test
+    ### Implement transport-independent behavior
 
-    <include cwd lang="ts" meta='title="templates/default/v1/api/tests/unit/orders.function.test.ts"'>
-      ../../templates/default/v1/api/tests/unit/orders.function.test.ts
-    </include>
-
-    ```sh title="Terminal — relkit-orders"
-    bun test tests/unit/orders.function.test.ts
-    ```
-
-    Verify the returned value and the fake provider side effect. No HTTP server or cloud credentials are
-    required.
+    Use the supplied context, honor its abort signal, and return the declared output. Let unexpected defects
+    cross RELKIT's safe boundary rather than converting them into unstable public errors.
 
   </Step>
 </Steps>
 
-## Hooks and transport policy
+`onBefore` transforms validated input before the handler. `onAfter` transforms successful output before final
+output validation. Use hooks only for function policy that must apply to every invocation source; use HTTP
+middleware for request-native policy.
 
-`onBefore` transforms validated input before the handler. `onAfter` transforms successful output before
-final output validation. Use them for function policy that must apply to every invocation transport. They do
-not run as error recovery, and `onAfter` does not run after failure.
+## Test the operation directly
 
-Use HTTP middleware for cookies, headers, request-native authorization, or an early `Response`. Put policy
-that must apply across transports in explicit function logic or hooks; services do not have middleware.
-See [the service boundary](/docs/service/define) and [services and routes](/docs/service/routes) for how
-these responsibilities fit together.
+<include cwd lang="ts" meta='title="templates/default/v1/api/tests/unit/orders.function.test.ts"'>
+  ../../templates/default/v1/api/tests/unit/orders.function.test.ts
+</include>
+
+```sh title="Terminal — relkit-orders"
+bun test tests/unit/orders.function.test.ts
+```
+
+`invokeFunction` runs the descriptor through an isolated engine. A function that needs provider clients receives
+explicit test fakes; tests do not infer production replacements from `RELKIT_ENV`.
 
 <include cwd>content/generated/related/fundamentals-functions.mdx</include>

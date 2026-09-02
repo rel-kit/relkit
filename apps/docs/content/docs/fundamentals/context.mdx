@@ -1,14 +1,13 @@
 ---
 title: Invocation context
-description: Use scoped resource clients, logging, cancellation, identity, and time without introducing globals or transport coupling.
+description: Use invocation metadata, cancellation, time, logging, environment, and declared clients without globals.
 ---
 
-The second function-handler parameter is the invocation context for exactly one call. It carries bounded
-capabilities and metadata assembled from the checked graph. Resource clients are inferred from the
-function's declared dependencies; event publication access comes from `publishes`. A handler cannot
-silently access an undeclared bucket, cache, job, or event publication capability.
+The second handler parameter belongs to one invocation. RELKIT builds it from the checked graph, so a function
+receives common runtime capabilities plus typed clients for only the resources it declares. Never store context
+in a module variable or reuse it after the invocation completes.
 
-## Read context in a real handler
+## Use declared clients
 
 <include
   cwd
@@ -18,73 +17,60 @@ silently access an undeclared bucket, cache, job, or event publication capabilit
   ../../examples/commerce/src/orders/functions/create-order.function.ts
 </include>
 
-This function declares a cache in `dependencies.cache` and an event ID in `publishes`. Its context provides
-the typed cache client and that event's publication client. The same context shape is supplied whether HTTP, a job, an event listener, a
-tool, an agent, or direct invocation reaches the function.
+This function declares the `prices` cache, so its handler receives `context.cache.prices`. Merely importing a
+cache or putting it in the same domain does not grant access.
 
-## What context contains
+Event publication uses an explicit `publishes` list rather than `dependencies`:
 
-| Area                   | Use it for                                                                        | Do not use it for                                            |
-| ---------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `log`                  | Structured records automatically correlated with the invocation                   | Secrets, full request bodies, or ad hoc string concatenation |
-| `signal` and deadline  | Cancelling provider calls and stopping work that can no longer finish             | Ignoring cancellation while starting new side effects        |
-| `time`                 | Testable current time and delay behavior                                          | `Date.now()` scattered through business logic                |
-| Invocation identifiers | Correlation, causation, trace, source, and attempt analysis                       | Domain IDs that should live in validated input               |
-| Resource clients       | Declared bucket, cache, job, and agent clients, plus authorized event publication | Importing provider SDK singletons directly                   |
-| `database`             | Typed table operations from the application's Drizzle service                     | Treating database access as row-level authorization          |
-| `auth`                 | Request-bound session lookup from the registered auth integration                 | Assuming a session grants permission to every record         |
-| Request view           | Optional transport metadata when the caller is HTTP                               | Making reusable domain behavior require an HTTP request      |
+<include cwd lang="ts" meta='title="apps/docs/examples/events/create-order.function.ts"'>
+  ../../apps/docs/examples/events/create-order.function.ts
+</include>
 
-There is no `context.service` or service middleware API. [Services](/docs/service/define) select public
-functions and events; they do not inject context values.
+The exact event ID becomes available under `context.events`; publishing any undeclared ID fails the checked edge.
 
-The specialized [Database service](/docs/database) is different: the compiler generates its context
-types and the runtime activates its client. Functions use `context.database` without declaring
-`dependencies.database`. See [database setup](/docs/database/define) and
-[custom models](/docs/database/models) for this integration.
+## Know the common context
 
-The specialized [Auth service](/docs/auth) similarly supplies `context.auth.getSession()` without a
-`dependencies.auth` entry. See [Sessions](/docs/auth/sessions) for nullable identity, request-scoped
-lookup, generated types, and non-HTTP behavior.
+| Value                                          | Use it for                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `invocation`                                   | ID, trace, correlation, source, attempt, timing, deadline, and service metadata |
+| `signal`                                       | Cancelling work and passing cancellation to lower-level calls                   |
+| `env`                                          | Values resolved by the application's typed environment contract                 |
+| `log`                                          | Structured, invocation-correlated records                                       |
+| `time`                                         | Testable `now()` and abort-aware `sleep()` behavior                             |
+| `jobs`, `events`, `buckets`, `cache`, `agents` | Clients authorized by declarations on the function                              |
+| `database`, `auth`, `constants`, `prompts`     | Registered application context supplied by specialized integrations             |
 
-## Add a dependency safely
+There is no service middleware or `context.service`. A service exposes public functions and events; it does not
+inject handler state. Database and Auth are specialized application context integrations, documented in
+[Database](/docs/database) and [Auth sessions](/docs/auth/sessions).
+
+## Add access safely
 
 <Steps>
   <Step>
-    ### Define and bind the logical resource
+    ### Define and bind the capability
 
-    Follow the resource-specific guide, then add its provider profile in `relkit.config.ts`.
-
-  </Step>
-  <Step>
-    ### Declare function access
-
-    Add the resource descriptor under the matching `dependencies` key. The property name becomes the typed
-    context client name. For event publication, list exact event IDs in `publishes` instead.
+    Follow its guide and choose the integration profile in `relkit.config.ts`.
 
   </Step>
   <Step>
-    ### Use the scoped client
+    ### Declare the graph edge
 
-    Call `context.cache`, `context.buckets`, `context.events`, or `context.jobs` inside the handler and pass
-    `context.signal` to lower-level operations that accept cancellation.
+    Add the descriptor under the matching `dependencies` key. For publication, add the exact event ID to
+    `publishes`.
 
   </Step>
   <Step>
-    ### Verify authorization and fakes
+    ### Verify the edge and fake
 
     ```sh title="Terminal — relkit-orders"
     bun run check
     bun run test
     ```
 
-    The graph should contain a dependency edge. Tests should receive a deterministic fake without remote
-    credentials and assert the resulting side effect through the fake's inspection API.
+    Provider-backed unit and application tests should receive explicit deterministic fakes.
 
   </Step>
 </Steps>
-
-Never store context in a module variable or reuse it after the invocation completes. Doing so mixes
-correlation IDs, cancellation, deadlines, and provider lifetimes between requests.
 
 <include cwd>content/generated/related/fundamentals-context.mdx</include>

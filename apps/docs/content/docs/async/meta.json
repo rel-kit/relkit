@@ -1,5 +1,0 @@
-{
-  "title": "Asynchronous work",
-  "icon": "Timer",
-  "pages": ["jobs", "schedules", "events", "listeners"]
-}
