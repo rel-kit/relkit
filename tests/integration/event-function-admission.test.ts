@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 import {
   createFunctionRegistry,
@@ -27,6 +26,7 @@ import {
   createTestRuntime,
   invokeFunction as invokeTestFunction,
 } from "../../packages/testing/src/index.ts";
+import { runtimeCohort } from "./runtime-cohort.ts";
 
 const event = defineEvent({ id: "created", input: z.object({ id: z.string() }) });
 const consumer = defineEventFunction({
@@ -37,9 +37,7 @@ const consumer = defineEventFunction({
 const target = bindFunctionEvents(consumer, event, []) as unknown as InvocationTarget;
 const graph = normalizeCompilation({ descriptors: [event, consumer] }).graph! as ApplicationGraph;
 const manifest = {
-  contractVersion: MANIFEST_VERSION,
-  generatorVersion: GENERATOR_VERSION,
-  graphHash: hashGraph(graph),
+  ...runtimeCohort(hashGraph(graph)),
   functions: { reaction: consumer.handler },
   targets: { reaction: target },
 };
@@ -61,9 +59,7 @@ test("event binding and registration preserve inferred function identities", () 
     ],
   }).graph! as ApplicationGraph;
   const registry = createFunctionRegistry(graph, {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: hashGraph(graph),
+    ...runtimeCohort(hashGraph(graph)),
     functions: { inferred: inferred.handler },
     targets: { inferred: bound },
   });
@@ -93,9 +89,7 @@ test("the test runtime resolves publication contracts for direct and nested call
   const publicationGraph = normalizeCompilation({ descriptors: [event, publisher, caller] })
     .graph! as ApplicationGraph;
   const registry = createFunctionRegistry(publicationGraph, {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: hashGraph(publicationGraph),
+    ...runtimeCohort(hashGraph(publicationGraph)),
     functions: { publisher: publisher.handler as never, caller: caller.handler as never },
     targets: { publisher: bindFunctionEvents(publisher, undefined, [event]), caller },
   });

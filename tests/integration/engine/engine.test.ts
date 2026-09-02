@@ -27,13 +27,12 @@ import { createDeterministicClock } from "../../../packages/testing/src/runtime-
 import { createTestRuntime } from "../../../packages/testing/src/index.ts";
 import {
   CONTRACT_VERSION,
-  GENERATOR_VERSION,
   GRAPH_VERSION,
-  MANIFEST_VERSION,
   type ProtocolId,
 } from "../../../packages/contracts/src/index.ts";
 import { hashGraph, type ApplicationGraph } from "../../../packages/graph/src/index.ts";
 import { z } from "../../../packages/schema/src/index.ts";
+import { runtimeCohort } from "../runtime-cohort.ts";
 
 type Value = { readonly value: number };
 type EngineContext = {
@@ -589,9 +588,7 @@ describe("engine integration matrix", () => {
     };
     expect(() =>
       createFunctionRegistry(graph, {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: "sha256:mismatch",
+        ...runtimeCohort("sha256:mismatch"),
         functions: {},
       }),
     ).toThrow("RELKIT_GRAPH_MANIFEST_MISMATCH");
@@ -602,9 +599,7 @@ describe("engine integration matrix", () => {
   test("releases generation providers in reverse order and cleans up construction failure", async () => {
     const graph: ApplicationGraph = { contractVersion: GRAPH_VERSION, nodes: [], edges: [] };
     const manifest: RuntimeManifest = {
-      contractVersion: MANIFEST_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-      graphHash: "sha256:engine-generation",
+      ...runtimeCohort("sha256:engine-generation"),
       functions: {},
       providers: {},
       middleware: {},

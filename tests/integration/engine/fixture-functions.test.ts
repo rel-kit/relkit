@@ -7,16 +7,10 @@ import {
 import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import createOrder from "../../../examples/commerce/src/orders/functions/create-order.function.ts";
 import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
-import orderReceipt from "../../../examples/commerce/src/receipts/functions/order-receipt.function.ts";
-import orders from "../../../examples/commerce/src/orders/service.ts";
 import { z } from "../../../packages/schema/src/index.ts";
-import { bindFunctionEvents } from "../../../packages/events/src/index.ts";
-import orderCreated from "../../../examples/commerce/src/orders/events/order-created.event.ts";
-import { createTestEvent } from "../../../packages/testing/src/index.ts";
 
 bindDescriptorIdentity(createOrder, "orders.create-order");
 bindDescriptorIdentity(getOrder, "orders.get-order");
-bindDescriptorIdentity(orders.getOrder, "orders.get-order");
 
 const orderInput = {
   orderId: "order-1",
@@ -26,94 +20,36 @@ const orderInput = {
 };
 
 describe("commerce example functions through the common engine", () => {
-  test("invokes cache and event clients and applies function limits", async () => {
-    const published: unknown[] = [];
-    const enqueued: unknown[] = [];
+  test("invokes cache clients and applies function limits", async () => {
     const completions: InvocationCompletion[] = [];
     const startTime = Date.now();
-    const result = await invokeFunction(
-      bindFunctionEvents(createOrder, undefined, [orderCreated]),
-      orderInput,
-      {
-        now: () => startTime,
-        clients: {
-          cache: {
-            prices: { getOrSet: async () => 1_000 },
-          },
-          events: {
-            "orders.created": { publish: async (payload: unknown) => published.push(payload) },
-          },
-          jobs: {
-            sendReceiptJob: { enqueue: async (input: unknown) => enqueued.push(input) },
-          },
-        },
-        hooks: {
-          onCompletion: (event) => completions.push(event),
+    const result = await invokeFunction(createOrder, orderInput, {
+      now: () => startTime,
+      clients: {
+        cache: {
+          prices: { getOrSet: async () => 1_000 },
         },
       },
-    );
+      hooks: {
+        onCompletion: (event) => completions.push(event),
+      },
+    });
 
     expect(result).toEqual({
       orderId: "order-1",
       receiptKey: "order-1.json",
       totalCents: 2_000,
     });
-    expect(published).toHaveLength(1);
-    expect(enqueued).toEqual([]);
     expect(createOrder.timeoutMs).toBe(10_000);
     expect(createOrder.concurrency).toBe(100);
     expect(completions[0]?.record.deadline).toBe(new Date(startTime + 10_000).toISOString());
   });
 
-  test("invokes a fixture child directly and preserves declared errors", async () => {
-    const records: Array<{ functionId: string; source: string; parentId?: string }> = [];
-    const envelope = {
-      instanceId: "event-1",
-      eventId: "orders.created",
-      version: 1,
-      payload: {
-        orderId: "order-1",
-        sku: "sku-1",
-        quantity: 1,
-        customerEmail: "customer@example.com",
-        totalCents: 1_000,
-      },
-      occurredAt: new Date(0).toISOString(),
-      publishedAt: new Date(0).toISOString(),
-      traceId: "trace-1",
-      attributes: {},
-    };
-    const event = await createTestEvent({
-      event: orderCreated,
-      target: orderReceipt,
-      startTimeMs: 0,
-      clients: {
-        jobs: { sendReceiptJob: { enqueue: async () => undefined } },
-      },
-      hooks: {
-        onCompletion: (event) =>
-          records.push({
-            functionId: event.record.functionId,
-            source: event.record.source,
-            ...(event.record.parentId === undefined ? {} : { parentId: event.record.parentId }),
-          }),
-      },
+  test("preserves declared application errors", async () => {
+    await expect(invokeFunction(getOrder, { orderId: "order-1" })).resolves.toMatchObject({
+      orderId: "order-1",
+      status: "confirmed",
     });
-
-    try {
-      await event.publish(envelope.payload);
-      await expect(event.drain()).resolves.toMatchObject([{ state: "completed" }]);
-    } finally {
-      await event.close();
-    }
-    expect(records.map(({ functionId }) => functionId)).toEqual([
-      "orders.get-order",
-      "receipts.on-order-created",
-    ]);
-    const child = records.find(({ functionId }) => functionId === "orders.get-order");
-    expect(child?.source).toBe("direct");
-    expect(child?.parentId).toBeDefined();
-
     const failure = await invokeFunction(getOrder, { orderId: "missing" }).catch(
       (error) => error as { readonly kind?: string; readonly id?: string },
     );

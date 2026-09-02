@@ -29,12 +29,9 @@ import {
 } from "../../../packages/testing/src/index.ts";
 import { defineRoute, http } from "../../../packages/routes/src/index.ts";
 import { normalizeCompilation } from "../../../packages/compiler/src/index.ts";
-import {
-  GENERATOR_VERSION,
-  GRAPH_VERSION,
-  MANIFEST_VERSION,
-} from "../../../packages/contracts/src/index.ts";
+import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
 import { z } from "../../../packages/schema/src/index.ts";
+import { runtimeCohort } from "../runtime-cohort.ts";
 
 const source = { file: "src/http.ts", line: 1, column: 1 } as const;
 
@@ -125,9 +122,7 @@ function createHarness(options: HarnessOptions): Harness {
   const calls: HttpInvocationOptions[] = [];
   const observability = options.observability ?? createTestObservability();
   const manifest: RuntimeManifest = {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: options.plan.graphHash,
+    ...runtimeCohort(options.plan.graphHash),
     functions: {},
     middleware: options.manifestMiddleware ?? {},
     requestTransforms: options.transforms ?? {},
