@@ -1,4 +1,5 @@
-import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/invocation";
+import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
+import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";
 import * as __relkit_module_0 from "../../relkit.config.ts";
 import * as __relkit_module_1 from "../../src/database/service.ts";
 import * as __relkit_module_2 from "../../src/routes/users/route.ts";
@@ -19,14 +20,15 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["listUsers"], "user
 __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["registerMember"], "users.register-member");
 __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["updateUserEmail"], "users.update-user-email");
 
-export const manifestContractVersion = 7 as const;
-export const manifestGeneratorVersion = 4 as const;
-export const manifestGraphHash = "sha256:5aa5396dff50fcbd3dd42f25d0d0f7cd2e5b13da03d6a6041e569d137e3a4331" as const;
-export const providerFactories = {  } as const;
+export const manifestContractVersion = 8 as const;
+export const manifestGeneratorVersion = 5 as const;
+export const manifestGraphHash = "sha256:138042228b50443a1221fd1d5f7f610d7309e6eb9b8019725a00a49d266ca54e" as const;
+export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
   generatorVersion: manifestGeneratorVersion,
   graphHash: manifestGraphHash,
+  activationFingerprint: runtimeActivationFingerprint,
   functions: { "users.list-users": __relkit_module_3["default"].handler, "users.register-member": __relkit_module_4["default"].handler, "users.update-user-email": __relkit_module_5["default"].handler },
   targets: { "users.list-users": __relkit_module_3["default"], "users.register-member": __relkit_module_4["default"], "users.update-user-email": __relkit_module_5["default"] },
   agents: {  },
@@ -35,8 +37,7 @@ export const runtimeManifest = {
   constants: {  },
   prompts: {  },
   services: { "database": __relkit_module_1["default"], "users": __relkit_module_6["default"] },
-  providers: providerFactories,
-  providerFactories,
+  runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,
   middleware: {  },
   hooks: {  },
   requestTransforms: {  },
