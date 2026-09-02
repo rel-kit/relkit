@@ -65,6 +65,7 @@ describe.serial("compiler determinism", () => {
       extracted: randomizedExtracted,
       projectRoot: sorted.temporaryRoot,
       sources: sorted.sources,
+      runtimeIntegrationPackages: sorted.runtimeIntegrationPackages,
     });
 
     expect(inserted.graphHash).toBe(sorted.graphHash);
@@ -156,6 +157,10 @@ function artifactSnapshot(run: FixtureCompilation | ReturnType<typeof compileWat
     diagnostics: "diagnosticsBytes" in run ? run.diagnosticsBytes : outputs.diagnostics,
     graph: "graphBytes" in run ? run.graphBytes : outputs.graph,
     manifest: "manifest" in run ? run.manifest : outputs.manifest,
+    runtimeActivation: outputs.runtimeActivation,
+    runtimeIntegrations: outputs.runtimeIntegrations,
+    runtimeIntegrationImports: outputs.runtimeIntegrationImports,
+    localServices: outputs.localServices,
     hash: run.graphHash ?? "",
     openapi: outputs.openapi,
     client: outputs.client,

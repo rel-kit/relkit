@@ -1,6 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { GRAPH_VERSION, MANIFEST_VERSION } from "../../packages/contracts/src/index.ts";
+import { defineApp } from "../../packages/app/src/define-app.ts";
+import { defineEnv, env } from "../../packages/config/src/index.ts";
+import {
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "../../packages/contracts/src/index.ts";
 import { hashGraph } from "../../packages/graph/src/index.ts";
+import { redis } from "../../integrations/packages/redis/src/index.ts";
 import {
   generateManifest,
   MANIFEST_CODES,
@@ -39,7 +47,7 @@ function descriptor(
 }
 
 describe("runtime manifest generation", () => {
-  test("sorts imports and emits handlers, middleware, validators, and provider slots", () => {
+  test("sorts imports and emits handlers plus the runtime-integration plan reference", () => {
     const first = descriptor("function", "orders.get", "src/functions.ts", "get", {
       handler: { $relkit: "function" },
       onBefore: { $relkit: "function" },
@@ -55,15 +63,7 @@ describe("runtime manifest generation", () => {
     const transform = descriptor("transform", "orders.id", "src/transforms.ts", "id", {
       schema: { $relkit: "schema" },
     });
-    const app = descriptor("app", "app", undefined, "app", {
-      buckets: {
-        default: {
-          kind: "provider-binding",
-          ownership: "external",
-          adapter: { adapter: "s3" },
-        },
-      },
-    });
+    const app = descriptor("app", "app", undefined, "app");
 
     const result = generateManifest({
       graph,
@@ -93,11 +93,16 @@ describe("runtime manifest generation", () => {
     expect(result.source).toContain(
       'requestTransforms: { "orders.id": __relkit_module_2["id"].schema },',
     );
+    expect(result.source).not.toContain("providerFactories");
+    expect(result.source).not.toContain("providers:");
     expect(result.source).toContain(
-      'providerFactories = { "buckets:s3": { capability: "buckets", adapter: "s3", factory: undefined } } as const;',
+      `runtimeIntegrationsPlanReference = { version: ${RUNTIME_INTEGRATION_PLAN_VERSION}, fileName: "${RUNTIME_INTEGRATION_PLAN_FILE}", graphHash: manifestGraphHash } as const;`,
     );
-    expect(result.source).toContain("providers: providerFactories,");
-    expect(result.source).toContain("providerFactories,");
+    expect(result.source).toContain("runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,");
+    expect(result.source).toContain(
+      'import runtimeActivationFingerprint from "./runtime-activation.json"',
+    );
+    expect(result.source).toContain("activationFingerprint: runtimeActivationFingerprint,");
     expect(result.source).toContain(
       `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
     );
@@ -105,76 +110,39 @@ describe("runtime manifest generation", () => {
     expect(result.source).toContain(`manifestGraphHash = "${graphHash}"`);
   });
 
-  test("projects provider metadata as safe names and keeps factory slots out of graph data", () => {
-    const credential = "relkit-synthetic-credential-8.4";
-    const endpoint = "https://relkit-synthetic-endpoint.invalid";
-    const app = {
-      kind: "app",
+  test("keeps provider topology in graph data and factories out of executable manifest", () => {
+    const app = defineApp({
       id: "commerce",
-      source: { file: "src/app.ts", line: 1, column: 1 },
-      exportName: "default",
-      exportKind: "default" as const,
-      buckets: {
-        default: {
-          kind: "provider-binding",
-          ownership: "external",
-          adapter: {
-            adapter: "s3",
-            environment: [
-              { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
-              { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
-            ],
-            configuration: {
-              endpoint: {
-                kind: "env-ref",
-                name: "BUCKET_ENDPOINT",
-                type: "url",
-                sensitive: false,
-              },
-              credentials: {
-                accessKeyId: {
-                  kind: "env-ref",
-                  name: "BUCKET_ACCESS_KEY_ID",
-                  type: "secret",
-                  sensitive: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    };
+      env: defineEnv({}),
+      cache: redis({ url: env.secret("CACHE_URL") }),
+    });
     const result = normalizeCompilation({ descriptors: [app] });
     const graphValue = result.graph;
     const provider = graphValue?.nodes.find((node) => node.kind === "provider");
 
     expect(result.diagnostics).toEqual([]);
     expect(provider).toMatchObject({
-      id: "provider.buckets.default",
+      id: "provider.cache.default",
       profile: "default",
-      capability: "buckets",
-      adapter: "s3",
-      ownership: "external",
-      configuration: {
-        endpoint: {
-          kind: "env-ref",
-          name: "BUCKET_ENDPOINT",
-          type: "url",
-          sensitive: false,
-        },
-      },
-      environment: [
-        { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
-        { name: "BUCKET_ACCESS_KEY_ID", type: "secret", sensitive: true },
-      ],
-      source: { file: "src/app.ts", line: 1, column: 1 },
+      capability: "cache",
+      adapter: { integrationId: "redis", adapterId: "redis", connection: {} },
+      providerSource: { kind: "connected" },
+      namedValues: [{ field: "url", name: "CACHE_URL", type: "secret-string", sensitive: true }],
     });
     expect(graphValue).toBeDefined();
-    const browserContract = JSON.parse(JSON.stringify(graphValue));
-    assertSafeContract(browserContract, [credential, endpoint]);
-    expect(result.outputs.manifest).not.toContain(credential);
-    expect(result.outputs.manifest).not.toContain(endpoint);
-    expect(result.outputs.manifest).toContain("providerFactories");
+    expect(result.outputs.manifest).not.toContain("providerFactories");
+    expect(result.outputs.manifest).not.toContain("factory:");
+    expect(result.outputs.manifest).toContain("runtimeIntegrationsPlanReference");
+    expect(JSON.parse(result.outputs.runtimeIntegrations)).toEqual({
+      graphHash: result.graphHash,
+      integrations: [],
+      version: 1,
+    });
+    expect(JSON.parse(result.outputs.runtimeActivation)).toMatchObject({
+      graphHash: result.graphHash,
+      manifestHash: expect.stringMatching(/^sha256:/),
+      runtimeIntegrationsPlanHash: expect.stringMatching(/^sha256:/),
+    });
   });
 
   test("does not activate without executable references or with a hash mismatch", () => {
@@ -201,33 +169,3 @@ describe("runtime manifest generation", () => {
     ]);
   });
 });
-
-function assertSafeContract(value: unknown, forbidden: readonly string[]): void {
-  const seen = new WeakSet<object>();
-  walk(value, "", seen, (key, item) => {
-    if (typeof item === "string") {
-      forbidden.forEach((entry) => expect(item).not.toContain(entry));
-    }
-    expect(key).not.toBe("handler");
-    expect(key).not.toBe("client");
-    if (key === "factory") expect(item).toBeUndefined();
-  });
-}
-
-function walk(
-  value: unknown,
-  key: string,
-  seen: WeakSet<object>,
-  visit: (key: string, value: unknown) => void,
-): void {
-  visit(key, value);
-  if (value === null || typeof value !== "object" || seen.has(value)) return;
-  seen.add(value);
-  if (Array.isArray(value)) {
-    value.forEach((entry) => walk(entry, key, seen, visit));
-    return;
-  }
-  Object.entries(value).forEach(([childKey, childValue]) =>
-    walk(childValue, childKey, seen, visit),
-  );
-}

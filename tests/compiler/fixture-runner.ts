@@ -7,12 +7,15 @@ import {
   loadConfig,
   normalizeCompilation,
   prefilterSources,
+  resolveRuntimeIntegrationPackages,
   type NormalizationResult,
+  type RuntimeIntegrationPackage,
 } from "../../packages/compiler/src/index.ts";
+import { workspacePackageDirectories } from "../../scripts/workspace-packages.ts";
 import type { ExtractedDescriptor } from "../../packages/compiler/src/discovery/extract.ts";
 import type { EvaluatorResponse } from "../../packages/compiler/src/discovery/evaluator-protocol.ts";
 import type { Diagnostic } from "../../packages/diagnostics/src/index.ts";
-import { cp, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -45,6 +48,7 @@ export interface FixtureCompilation {
   readonly graphHash: string;
   readonly exitCode: number;
   readonly manifest: string;
+  readonly runtimeIntegrationPackages: readonly RuntimeIntegrationPackage[];
   readonly normalization: NormalizationResult;
 }
 
@@ -102,10 +106,15 @@ export async function compileProject(
     if (evaluator.status !== "ok") {
       throw new Error(canonicalJson({ fixture: name, failures: evaluator.failures }));
     }
+    const runtimeIntegrationPackages = resolveRuntimeIntegrationPackages({
+      projectRoot: temporaryRoot,
+      imports: prefiltered.candidates.flatMap((candidate) => candidate.imports),
+    });
     const normalization = normalizeCompilation({
       evaluator,
       projectRoot: temporaryRoot,
       sources: discoverySources,
+      runtimeIntegrationPackages,
     });
     const extracted = extractDescriptors(evaluator, {
       projectRoot: temporaryRoot,
@@ -140,6 +149,7 @@ export async function compileProject(
       graphHash: normalization.graphHash ?? "",
       exitCode: diagnostics.some((diagnostic) => diagnostic.severity === "error") ? 1 : 0,
       manifest: normalization.outputs.manifest,
+      runtimeIntegrationPackages,
       normalization,
     };
   } finally {
@@ -192,11 +202,7 @@ async function prepareRoot(fixtureRoot: string, temporaryRoot: string): Promise<
   await linkFixtureDependencies(fixtureRoot, temporaryRoot);
   const scope = join(temporaryRoot, "node_modules", "@relkit");
   await mkdir(scope, { recursive: true });
-  for (const entry of await readdir(resolve(import.meta.dir, "../../packages"), {
-    withFileTypes: true,
-  })) {
-    if (!entry.isDirectory()) continue;
-    const packageRoot = resolve(import.meta.dir, "../../packages", entry.name);
+  for (const packageRoot of workspacePackageDirectories(resolve(import.meta.dir, "../.."))) {
     const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8")) as {
       readonly name?: string;
     };
