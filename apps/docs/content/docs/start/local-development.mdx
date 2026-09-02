@@ -63,9 +63,9 @@ The API template's configuration shows the server port, maximum request body siz
   ../../templates/default/v1/api/relkit.config.ts
 </include>
 
-The generator's `--cloud none --deploy none` flags skip deployment prerequisites; they do not remove
-the template's AWS/Pulumi declaration. Keeping that optional configuration does not provision resources.
-This Start workflow does not run deployment commands. Change only the settings you need.
+Cloud and deployment default to `none`; the generated configuration therefore contains no AWS or Pulumi
+selection. Passing `--cloud aws --deploy pulumi` adds those explicit imports and roles, but still provisions
+nothing until a deployment command runs.
 
 Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Inspector precedence is
 `--inspector-port`, `RELKIT_INSPECTOR_PORT`, `inspector.port`, then `3210`.
@@ -96,6 +96,23 @@ Use the printed URLs for subsequent requests. For request-size behavior, see [HT
 Installed projects use the inspector bundled with `@relkit/cli`. `RELKIT_INSPECTOR_ROOT` is only for
 framework contributors selecting another compatible inspector checkout.
 
+## Control declared local services
+
+`check` writes a deterministic local-service plan without probing Docker. During `dev`, RELKIT starts only
+the graph-required `docker(adapter)` recipes and waits for their protocol health checks before activation.
+Unchanged healthy services and persistent volumes survive candidate reloads.
+
+```sh title="Terminal — relkit-orders"
+bun run relkit local status
+bun run relkit local up --detach
+bun run dev --local=off
+bun run relkit local stop
+```
+
+Use `--local=off` when you want every required binding to resolve from its connected or infrastructure
+values. `local reset --yes` also removes this project's labelled volumes and override state; it refuses a
+live attached lease and never targets another checkout.
+
 ## Verify changes
 
 From the application root, run these checks after changing a function, service, route, or configuration:
@@ -123,8 +140,9 @@ and [Deployment](/docs/operations/deployment) only when you are ready to configu
 
 ## Continue with your application's capabilities
 
-Start with [Service](/docs/service) to understand domains, public boundaries, and where code belongs.
-Then choose the guide for your next product requirement:
+Read [Core concepts](/docs/fundamentals) to understand the application graph and function runtime, then
+use [Service](/docs/service) for domain ownership and public boundaries. Choose the guide for your next
+product requirement:
 
 | What you want to add                    | Getting started            |
 | --------------------------------------- | -------------------------- |

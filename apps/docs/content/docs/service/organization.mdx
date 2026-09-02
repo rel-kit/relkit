@@ -11,29 +11,29 @@ Orders whether it is reached from HTTP, another function, or an AI model. Its im
 
 The paths below are patterns, not files you must create in every domain. Replace `orders` with the owner.
 
-| What you are adding                | Where it belongs                                                                                                  | Continue learning                                                                                      |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Public domain boundary             | `src/orders/service.ts`                                                                                           | [Define a service](/docs/service/define)                                                               |
-| Business operation                 | `src/orders/functions/create-order.function.ts`                                                                   | [Functions](/docs/fundamentals/functions)                                                              |
-| Event contract                     | `src/orders/events/order-created.event.ts`                                                                        | [Events: getting started](/docs/events)                                                                |
-| Event subscriber                   | `functions/*.function.ts` in the **receiving** domain, such as `src/receipts/functions/order-receipt.function.ts` | [Consume an event](/docs/events/consume)                                                               |
-| Job and its schedule               | `src/receipts/jobs/send-receipt.job.ts`; its target remains in `src/receipts/functions/`                          | [Jobs: getting started](/docs/jobs) and [schedules](/docs/jobs/schedules)                              |
-| AI tool                            | `src/orders/tools/lookup-order.tool.ts`                                                                           | [AI: getting started](/docs/ai), then [tools](/docs/ai/tools)                                          |
-| AI agent                           | `src/orders/agents/order-support.agent.ts`                                                                        | [AI: getting started](/docs/ai), then [your first agent](/docs/ai/first-agent)                         |
-| Cache                              | `src/orders/cache/prices.cache.ts`                                                                                | [Caching: getting started](/docs/caching)                                                              |
-| Object bucket                      | `src/assets/buckets/assets.bucket.ts` in the domain that owns the files                                           | [Storage: getting started](/docs/storage)                                                              |
-| Database service                   | `src/database/service.ts` using `defineDrizzleService`                                                            | [Database: getting started](/docs/database)                                                            |
-| Database table                     | `src/database/schema/`, exported through its `index.ts`                                                           | [Define the schema](/docs/database/schema)                                                             |
-| Custom data-model method           | `src/database/models/*.model.ts`, registered in the database service                                              | [Custom models](/docs/database/models)                                                                 |
-| Database migration                 | A reviewed migration directory and runner outside `src/`                                                          | [Migrations](/docs/database/migrations)                                                                |
-| Domain schema                      | Beside its sole consumer, or a domain module such as `src/orders/schemas.ts` when shared locally                  | [Schemas](/docs/fundamentals/schemas)                                                                  |
-| Declared domain error              | `src/orders/errors/order-not-found.error.ts`                                                                      | [Errors](/docs/fundamentals/errors)                                                                    |
-| Prompt, constant, or helper        | Beside its consumer or in a focused module within the same domain                                                 | [Agent instructions](/docs/ai/agents), [domain boundaries](/docs/service/define)                       |
-| URL and HTTP method                | `src/routes/orders/route.ts`                                                                                      | [Services and routes](/docs/service/routes)                                                            |
-| HTTP middleware or input transform | `src/routes/middleware/*.middleware.ts` or `src/routes/transforms/`                                               | [Middleware](/docs/http/middleware), [request mapping](/docs/http/requests)                            |
-| Environment contract               | `src/platform/env.ts`                                                                                             | [Environment](/docs/fundamentals/environment)                                                          |
-| Provider and server configuration  | `relkit.config.ts`, importing infrastructure support from Platform                                                | [Providers](/docs/fundamentals/providers), [application configuration](/docs/fundamentals/application) |
-| Function and application tests     | `tests/unit/` and `tests/integration/`                                                                            | [Testing](/docs/operations/testing)                                                                    |
+| What you are adding                | Where it belongs                                                                                                  | Continue learning                                                                               |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Public domain boundary             | `src/orders/service.ts`                                                                                           | [Define a service](/docs/service/define)                                                        |
+| Business operation                 | `src/orders/functions/create-order.function.ts`                                                                   | [Functions](/docs/fundamentals/functions)                                                       |
+| Event contract                     | `src/orders/events/order-created.event.ts`                                                                        | [Events: getting started](/docs/events)                                                         |
+| Event subscriber                   | `functions/*.function.ts` in the **receiving** domain, such as `src/receipts/functions/order-receipt.function.ts` | [Consume an event](/docs/events/consume)                                                        |
+| Job and its schedule               | `src/receipts/jobs/send-receipt.job.ts`; its target remains in `src/receipts/functions/`                          | [Jobs: getting started](/docs/jobs) and [schedules](/docs/jobs/schedules)                       |
+| AI tool                            | `src/orders/tools/lookup-order.tool.ts`                                                                           | [AI: getting started](/docs/ai), then [tools](/docs/ai/tools)                                   |
+| AI agent                           | `src/orders/agents/order-support.agent.ts`                                                                        | [AI: getting started](/docs/ai), then [your first agent](/docs/ai/first-agent)                  |
+| Cache                              | `src/orders/cache/prices.cache.ts`                                                                                | [Caching: getting started](/docs/caching)                                                       |
+| Object bucket                      | `src/assets/buckets/assets.bucket.ts` in the domain that owns the files                                           | [Storage: getting started](/docs/storage)                                                       |
+| Database service                   | `src/database/service.ts` using `defineDrizzleService`                                                            | [Database: getting started](/docs/database)                                                     |
+| Database table                     | `src/database/schema/`, exported through its `index.ts`                                                           | [Define the schema](/docs/database/schema)                                                      |
+| Custom data-model method           | `src/database/models/*.model.ts`, registered in the database service                                              | [Custom models](/docs/database/models)                                                          |
+| Database migration                 | A reviewed migration directory and runner outside `src/`                                                          | [Migrations](/docs/database/migrations)                                                         |
+| Domain schema                      | Beside its sole consumer, or a domain module such as `src/orders/schemas.ts` when shared locally                  | [Schemas](/docs/fundamentals/schemas)                                                           |
+| Declared domain error              | `src/orders/errors/order-not-found.error.ts`                                                                      | [Errors](/docs/fundamentals/errors)                                                             |
+| Prompt, constant, or helper        | Beside its consumer or in a focused module within the same domain                                                 | [Agent instructions](/docs/ai/agents), [domain boundaries](/docs/service/define)                |
+| URL and HTTP method                | `src/routes/orders/route.ts`                                                                                      | [Services and routes](/docs/service/routes)                                                     |
+| HTTP middleware or input transform | `src/routes/middleware/*.middleware.ts` or `src/routes/transforms/`                                               | [Middleware](/docs/http/middleware), [request mapping](/docs/http/requests)                     |
+| Environment contract               | `src/platform/env.ts`                                                                                             | [Environment](/docs/fundamentals/environment)                                                   |
+| Provider and server configuration  | `relkit.config.ts`, importing infrastructure support from Platform                                                | [Integrations](/docs/integrations), [application configuration](/docs/fundamentals/application) |
+| Function and application tests     | `tests/unit/` and `tests/integration/`                                                                            | [Testing](/docs/operations/testing)                                                             |
 
 Default-export each ordinary descriptor from its own file, following its capability's guide. Route files
 are different: they export named HTTP methods. Plain helper modules are ordinary TypeScript; they do not
@@ -42,7 +42,7 @@ need a RelKit descriptor or their own service.
 ## Functions own behavior; dependencies grant clients
 
 A function is where validated business input becomes a result. Keep HTTP parsing in routes and model
-instructions in agents. The function declares the managed resources it uses; putting a cache or bucket
+instructions in agents. The function declares the provider-backed resources it uses; putting a cache or bucket
 in the same folder does not grant access automatically.
 
 <include
@@ -118,8 +118,8 @@ Database and authentication integrations have specialized boundaries: `src/datab
 [Database](/docs/database) for setup, schemas, queries, and model customization. The compiler supplies
 `context.database`; functions do not add a `dependencies.database` entry. Ordinary business domains
 still expose operations through `defineService`. See the
-[integration guidance](/docs/fundamentals/domain-first-migration#replace-database-and-auth-adapters)
-when replacing older database or auth adapters, or [Integrate Better Auth](/docs/database/better-auth)
+[Database](/docs/database) and [Auth](/docs/auth) guidance when replacing older adapters, or
+[Integrate Better Auth](/docs/database/better-auth)
 to share the current database with authentication. Continue with [Auth](/docs/auth) for service setup,
 sessions, route protection, clients, and authentication customization.
 

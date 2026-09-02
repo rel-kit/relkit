@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",
@@ -12,8 +13,7 @@
     "storage",
     "caching",
     "ai",
-    "fundamentals",
-    "async",
+    "integrations",
     "operations",
     "api"
   ]
