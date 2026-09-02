@@ -11,11 +11,7 @@ import {
   type InvocationHooks,
   type InvocationTarget,
 } from "../../../packages/engine/src/index.ts";
-import {
-  API_BASE_PATH,
-  GENERATOR_VERSION,
-  MANIFEST_VERSION,
-} from "../../../packages/contracts/src/index.ts";
+import { API_BASE_PATH } from "../../../packages/contracts/src/index.ts";
 import type { RegistrationPlan } from "../../../packages/graph/src/index.ts";
 import {
   createObservabilityCollector,
@@ -44,6 +40,7 @@ import {
 } from "../../../packages/runtime-effect/src/logger.ts";
 import { installObservabilityEndpoints } from "../../../packages/inspector-api/src/index.ts";
 import { assertNoRawSyntheticSecrets } from "../../../scripts/secret-scan.ts";
+import { runtimeCohort } from "../../integration/runtime-cohort.ts";
 
 const secrets = Object.freeze({
   password: "super-secret-password",
@@ -357,9 +354,7 @@ function createHttpRuntime(
       middlewares: [],
     } satisfies RegistrationPlan,
     manifest: {
-      contractVersion: MANIFEST_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-      graphHash: "sha256:security",
+      ...runtimeCohort("sha256:security"),
       functions: {},
       middleware: {},
       requestTransforms: {},

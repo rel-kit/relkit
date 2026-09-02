@@ -78,6 +78,7 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
   await page.getByRole("button", { name: "Collapse all" }).click();
   await expect(page.getByText("1 of 2 spans")).toBeVisible();
   await page.getByRole("button", { name: "Expand all" }).click();
+  await page.mouse.move(0, 0);
   await expect(page.locator(".trace-panel")).toHaveScreenshot("trace-waterfall.png", {
     animations: "disabled",
   });
