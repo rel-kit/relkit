@@ -34,7 +34,6 @@
   },
   "dependencies": {
     "@relkit/agents": "workspace:*",
-    "@relkit/app": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
     "@relkit/contracts": "workspace:*",
@@ -42,8 +41,6 @@
     "@relkit/events": "workspace:*",
     "@relkit/graph": "workspace:*",
     "@relkit/jobs": "workspace:*",
-    "@relkit/observability": "workspace:*",
-    "@relkit/providers-standard": "workspace:*",
     "@pulumi/aws": "7.43.0",
     "@pulumi/awsx": "3.8.0",
     "@pulumi/pulumi": "3.259.0"

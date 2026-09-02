@@ -7,7 +7,6 @@ import {
   RelkitCaches,
   RelkitContainerRegistry,
   RelkitNetwork,
-  RelkitObservability,
   createValkeyClient,
 } from "./src/index.js";
 
@@ -17,7 +16,7 @@ interface SeenResource {
   readonly inputs: Record<string, any>;
 }
 
-test("AWS storage, Valkey, observability, and deployment mappings are wired", async () => {
+test("AWS storage, Valkey, and deployment mappings are wired", async () => {
   const resources: SeenResource[] = [];
   await pulumi.runtime.setMocks(
     {
@@ -47,7 +46,6 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
 
   let buckets: RelkitBuckets | undefined;
   let caches: RelkitCaches | undefined;
-  let observability: RelkitObservability | undefined;
   let application: RelkitApplicationService | undefined;
   await pulumi.runtime.runInPulumiStack(() => {
     buckets = new RelkitBuckets("orders", {
@@ -65,16 +63,6 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
       stackName: "relkit-nightly-1787058311503-edb6a526",
       graphHash: "sha256:orders",
       caches: [{ id: "prices" }],
-    });
-    observability = new RelkitObservability("orders", {
-      appId: "orders.app",
-      graphHash: "sha256:orders",
-      retentionDays: 14,
-      otlp: {
-        endpoint: "https://otel.test",
-        headersSecretArn: "arn:test:otel-headers",
-        serviceName: "orders",
-      },
     });
     const network = new RelkitNetwork("orders", {
       appId: "orders.app",
@@ -118,23 +106,16 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
       .filter(({ type }) => type === "aws:elasticache/serverlessCache:ServerlessCache")
       .every(({ inputs }) => inputs.name.length <= 40),
   ).toBe(true);
-  const observabilityLogGroup = resources.find(
+  const serviceLogGroup = resources.find(
     ({ type, inputs }) =>
       type === "aws:cloudwatch/logGroup:LogGroup" &&
-      inputs.name === "/relkit/development-orders-app-observability",
+      inputs.name === "/relkit/development-orders-app-service",
   );
-  expect(observabilityLogGroup?.inputs).toMatchObject({
-    retentionInDays: 14,
+  expect(serviceLogGroup?.inputs).toMatchObject({
+    retentionInDays: 30,
   });
   expect(await resolveOutput(caches!.caches[0].url)).toBe("rediss://cache.test:6379");
   expect(await resolveOutput(buckets!.buckets[0].environment.value)).toContain("uploads");
-  expect(observability!.environment.map(({ name }) => name)).toEqual([
-    "AWS_REGION",
-    "OTEL_EXPORTER_OTLP_ENDPOINT",
-    "OTEL_SERVICE_NAME",
-  ]);
-  expect(observability!.secrets.map(({ name }) => name)).toEqual(["OTEL_EXPORTER_OTLP_HEADERS"]);
-
   const definition = JSON.parse(
     await resolveOutput(application!.taskDefinition.containerDefinitions),
   )[0];
@@ -143,6 +124,14 @@ test("AWS storage, Valkey, observability, and deployment mappings are wired", as
     { name: "AWS_REGION", value: "us-east-1" },
   ]);
   expect(definition.secrets).toEqual([{ name: "API_TOKEN", valueFrom: "arn:test:api-token" }]);
+  expect(definition.logConfiguration).toEqual({
+    logDriver: "awslogs",
+    options: {
+      "awslogs-group": "/relkit/development-orders-app-service",
+      "awslogs-region": "us-east-1",
+      "awslogs-stream-prefix": "relkit",
+    },
+  });
 
   const client = createValkeyClient({ url: "rediss://cache.test:6379" });
   expect(client.connected).toBe(false);
@@ -163,9 +152,6 @@ test("AWS resource components reject an empty deployment region", async () => {
       "AWS region must not be empty",
     );
     expect(() => new RelkitCaches("invalid", { region: "", caches: [{ id: "sessions" }] })).toThrow(
-      "AWS region must not be empty",
-    );
-    expect(() => new RelkitObservability("invalid", { region: "" })).toThrow(
       "AWS region must not be empty",
     );
   });

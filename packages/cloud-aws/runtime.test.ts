@@ -1,41 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { managed, sqs } from "@relkit/app";
 import type { JobQueueFactoryContext } from "@relkit/engine";
-import { awsProviderFactories, createSqsJobProvider } from "./src/index.ts";
+import { createSqsJobProvider } from "./src/index.ts";
 
 describe("AWS runtime providers", () => {
-  test("registers AWS capabilities independently from buckets and cache", async () => {
-    expect(Object.keys(awsProviderFactories)).toEqual([
-      "jobs:sqs",
-      "events:eventbridge",
-      "observability:cloudwatch",
-    ]);
-    const factory = awsProviderFactories["jobs:sqs"]!;
-    const binding = managed(
-      sqs({
-        region: "us-east-1",
-        queueUrl: "https://sqs.us-east-1.amazonaws.com/123/receipts",
-      }),
-    );
-    const generation = await factory.create({
-      generationId: "aws-generation-1",
-      environment: "production",
-      capability: "jobs",
-      profile: "default",
-      binding,
-      configuration: {
-        region: "us-east-1",
-        queueUrl: "https://sqs.us-east-1.amazonaws.com/123/receipts",
-      },
-    });
-
-    expect(factory.capability).toBe("jobs");
-    expect(factory.adapter).toBe("sqs");
-    expect(generation.value).toMatchObject({ createQueue: expect.any(Function) });
-    expect(Object.prototype.hasOwnProperty.call(generation, "buckets")).toBe(false);
-    expect(Object.prototype.hasOwnProperty.call(generation, "cache")).toBe(false);
-  });
-
   test("maps the materialized job queue contract to SQS send, receive, and acknowledge", async () => {
     const actions: string[] = [];
     const provider = createSqsJobProvider({

@@ -157,7 +157,7 @@ function createQueue(
     enqueue,
     acquire,
     transition,
-    get: (id) => entries.get(id),
+    get: (id: string) => entries.get(id),
   });
 }
 
