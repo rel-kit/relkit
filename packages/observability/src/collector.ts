@@ -30,6 +30,7 @@ const OBSERVABILITY_SIGNALS = new Set<ObservabilitySignal>([
 export interface ObservabilityCollectorOptions {
   readonly maxRecords?: number;
   readonly redaction?: RedactionPolicy;
+  readonly signals?: readonly ObservabilitySignal[];
 }
 
 export interface ObservabilityCollector {
@@ -37,6 +38,9 @@ export interface ObservabilityCollector {
   readonly version: typeof OBSERVABILITY_HOOK_VERSION;
   readonly emit: (event: unknown) => RedactedObservabilityRecord | undefined;
   readonly collect: (record: ObservabilityRecord) => RedactedObservabilityRecord | undefined;
+  readonly collectRequired: (
+    record: ObservabilityRecord,
+  ) => RedactedObservabilityRecord | undefined;
   readonly read: () => readonly RedactedObservabilityRecord[];
   readonly clear: () => void;
   readonly dropped: () => number;
@@ -52,10 +56,15 @@ export function createObservabilityCollector(
   const maxRecords = options.maxRecords ?? DEFAULT_COLLECTOR_MAX_RECORDS;
   if (!Number.isSafeInteger(maxRecords) || maxRecords < 1)
     throw new TypeError("Observability collector maxRecords must be a positive safe integer");
+  const capturedSignals = options.signals === undefined ? undefined : new Set(options.signals);
+  if (capturedSignals?.size !== options.signals?.length)
+    throw new TypeError("Observability collector signals must be unique");
+  if ([...(capturedSignals ?? [])].some((signal) => !OBSERVABILITY_SIGNALS.has(signal)))
+    throw new TypeError("Observability collector signal is invalid");
   const retained: RedactedObservabilityRecord[] = [];
   let dropped = 0;
 
-  const collect = (record: ObservabilityRecord): RedactedObservabilityRecord | undefined => {
+  const retain = (record: ObservabilityRecord): RedactedObservabilityRecord | undefined => {
     const admitted = admitObservabilityRecord(record, options.redaction);
     if (!isAdmittedRecord(admitted)) return undefined;
     if (retained.length >= maxRecords) {
@@ -66,6 +75,10 @@ export function createObservabilityCollector(
     retained.push(admitted);
     return admitted;
   };
+  const collect = (record: ObservabilityRecord): RedactedObservabilityRecord | undefined => {
+    if (capturedSignals !== undefined && !capturedSignals.has(record.signal)) return undefined;
+    return retain(record);
+  };
   const emit = (event: unknown): RedactedObservabilityRecord | undefined => {
     const record = toObservabilityRecord(event);
     return record === undefined ? undefined : collect(record);
@@ -75,6 +88,7 @@ export function createObservabilityCollector(
     version: OBSERVABILITY_HOOK_VERSION,
     emit,
     collect,
+    collectRequired: retain,
     read: () => Object.freeze([...retained]),
     clear: () => {
       retained.length = 0;
