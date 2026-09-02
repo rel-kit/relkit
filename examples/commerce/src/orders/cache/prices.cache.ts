@@ -3,7 +3,7 @@ import { z } from "@relkit/app/schema";
 
 const prices = defineCache({
   id: "orders.prices",
-  profile: "default",
+  profile: "requests",
   key: z.object({ sku: z.string() }),
   value: z.number().int().nonnegative(),
 

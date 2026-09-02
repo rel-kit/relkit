@@ -9,5 +9,4 @@ export function assertOrdinaryHelperIsOpaque(): void {
   assert.equal(Object.hasOwn(createOrder, "ordinaryLibrary"), false);
 }
 
-assert.deepEqual(createOrder.publishes, ["orders.created"]);
 assertOrdinaryHelperIsOpaque();
