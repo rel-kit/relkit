@@ -1,4 +1,10 @@
 import { INSPECTOR_API_PROTOCOL, INSPECTOR_API_VERSION, type InspectorGraph } from "./api-types";
+import {
+  readActivationFingerprint,
+  readIntegrationProvenance,
+  type ActivationFingerprint,
+  type IntegrationProvenance,
+} from "./graph-topology-model";
 
 export type GraphRelationship = "declared" | "observed";
 
@@ -22,6 +28,8 @@ export interface GraphEdge {
 export interface GraphSnapshot {
   readonly generationId: string;
   readonly graphHash: string;
+  readonly activationFingerprint?: ActivationFingerprint;
+  readonly integrations: readonly IntegrationProvenance[];
   readonly appId?: string;
   readonly nodes: readonly GraphNode[];
   readonly declaredEdges: readonly GraphEdge[];
@@ -60,9 +68,12 @@ export function normalizeGraphResponse(payload: InspectorGraph): GraphSnapshot {
 
   const appId = text(graph.appId);
   const observed = root.observedEdges ?? graph.observedEdges;
+  const activationFingerprint = readActivationFingerprint(root.activationFingerprint);
   return {
     generationId,
     graphHash,
+    ...(activationFingerprint === undefined ? {} : { activationFingerprint }),
+    integrations: readIntegrationProvenance(root.integrations ?? graph.integrations),
     ...(appId === undefined ? {} : { appId }),
     nodes: readNodes(graph.nodes),
     declaredEdges: readEdges(graph.edges, "declared"),

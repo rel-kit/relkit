@@ -1,4 +1,7 @@
 import type { GraphSummary } from "../lib/graph-model";
+import type { ReactNode } from "react";
+import type { ActivationFingerprint } from "../lib/graph-topology-model";
+import { ActivationCohort } from "./activation-cohort";
 
 export type ConnectionState = "connecting" | "connected" | "reconnecting" | "offline";
 
@@ -8,6 +11,7 @@ export interface OverviewSnapshot {
   readonly connection?: ConnectionState;
   readonly droppedEvents?: number;
   readonly graphSummary?: GraphSummary;
+  readonly activationFingerprint?: ActivationFingerprint;
 }
 
 const EMPTY_SNAPSHOT: OverviewSnapshot = Object.freeze({ connection: "connecting" });
@@ -49,8 +53,10 @@ export function ConnectionStatus({
 
 export function OverviewShell({
   snapshot = EMPTY_SNAPSHOT,
+  runtime,
 }: {
   readonly snapshot?: OverviewSnapshot;
+  readonly runtime?: ReactNode;
 }) {
   const generationId = boundedLabel(snapshot.generationId, "Awaiting active generation");
   const graphHash = boundedLabel(snapshot.graphHash, "Graph hash unavailable");
@@ -92,6 +98,14 @@ export function OverviewShell({
         </p>
       </section>
 
+      <ActivationCohort
+        graphHash={snapshot.graphHash ?? ""}
+        {...(snapshot.activationFingerprint === undefined
+          ? {}
+          : { fingerprint: snapshot.activationFingerprint })}
+      />
+      {runtime}
+
       <section className="panel graph-overview" aria-labelledby="graph-overview-heading">
         <div className="section-heading">
           <div>
@@ -132,7 +146,8 @@ export function OverviewShell({
           <p className="eyebrow">OBSERVABILITY</p>
           <h2 id="signals-heading">Signals stay correlated</h2>
           <p className="supporting-copy">
-            Requests, logs, traces, and generation changes are read from bounded protocol APIs.
+            Complete redacted requests, logs, traces, and generation changes are retained before
+            external sampling.
           </p>
           <a className="text-link" href="/requests">
             View recent requests <span aria-hidden="true">→</span>

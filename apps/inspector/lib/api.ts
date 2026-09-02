@@ -33,6 +33,9 @@ export class InspectorApiClient extends InspectorApiTransport {
   graph(): Promise<InspectorGraph> {
     return this.request(`${INSPECTOR_API_BASE}/graph`, { cacheTags: ["graph"] });
   }
+  runtime(): Promise<InspectorObject> {
+    return this.request(`${INSPECTOR_API_BASE}/runtime`, { cacheTags: ["runtime"] });
+  }
   list<T = InspectorObject>(
     collection: InspectorCollection,
     query: InspectorQuery = {},

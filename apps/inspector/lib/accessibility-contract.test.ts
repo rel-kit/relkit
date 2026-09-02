@@ -67,4 +67,19 @@ describe("inspector accessibility contract", () => {
     expect(navigation).toContain("SCALAR_API_REFERENCE_URL");
     expect(navigation).toContain("external: true");
   });
+
+  test("provider and runtime topology panels expose accessible headings", async () => {
+    const [provider, runtime, cohort] = await Promise.all([
+      source("provider-detail.tsx"),
+      source("runtime-status.tsx"),
+      source("activation-cohort.tsx"),
+    ]);
+
+    expect(provider).toContain('aria-labelledby="provider-topology-heading"');
+    expect(provider).toContain('aria-labelledby="provider-local-heading"');
+    expect(runtime).toContain('aria-labelledby="local-services-heading"');
+    expect(runtime).toContain('aria-labelledby="telemetry-export-heading"');
+    expect(cohort).toContain('aria-labelledby="activation-cohort-heading"');
+    expect(cohort).toContain('role="alert"');
+  });
 });
