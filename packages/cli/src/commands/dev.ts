@@ -1,4 +1,5 @@
 import type { LoggerOptions } from "@relkit/runtime-effect";
+import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type {
   CandidateCompile,
   StartedCandidate,
@@ -13,12 +14,20 @@ export interface DevLogEvent {
   readonly fields?: Readonly<Record<string, string | number | boolean>>;
 }
 export type DevLog = (event: DevLogEvent) => void;
-export type DevGraphHash = string | ((candidate: StartedCandidate) => string | PromiseLike<string>);
+export type DevActivationFingerprint =
+  | RuntimeActivationFingerprint
+  | ((
+      candidate: StartedCandidate,
+    ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
+
+export interface DevLocalServices {
+  readonly close: () => Promise<void>;
+}
 
 export interface DevOptions {
   readonly projectRoot?: string;
   readonly compile: CandidateCompile;
-  readonly graphHash?: DevGraphHash;
+  readonly activationFingerprint?: DevActivationFingerprint;
   readonly hostname?: string;
   readonly candidateHostname?: string;
   readonly stablePort?: number;
@@ -34,7 +43,8 @@ export interface DevOptions {
   readonly installSignalHandlers?: boolean;
   readonly logger?: Omit<LoggerOptions, "component">;
   readonly onLog?: DevLog;
-  readonly observability?: Omit<SupervisorObservabilityOptions, "graphHash">;
+  readonly observability?: Omit<SupervisorObservabilityOptions, "activationFingerprint">;
+  readonly localServices?: DevLocalServices;
 }
 
 export { DevSession } from "./dev-session.js";

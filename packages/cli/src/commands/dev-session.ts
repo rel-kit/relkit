@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import {
   createSupervisorObservability,
   createSupervisorProxy,
@@ -23,7 +24,7 @@ export class DevSession {
   readonly projectRoot: string;
   readonly options: DevOptions;
   readonly abortController = new AbortController();
-  readonly hashes = new Map<number, string>();
+  readonly fingerprints = new Map<number, RuntimeActivationFingerprint>();
   readonly drains = new Map<string, SupervisorGenerationDrain>();
   readonly controllers = new Set<AbortController>();
   readonly log: DevLog;
@@ -32,7 +33,7 @@ export class DevSession {
   private resolveShutdown!: () => void;
   private activationTail: Promise<boolean> = Promise.resolve(true);
   private activeCandidate: StartedCandidate | undefined;
-  private activeHash: string | undefined;
+  private activeFingerprint: RuntimeActivationFingerprint | undefined;
   private inspector: DevInspector | undefined;
   private removeSignals: (() => void) | undefined;
   private latestVersion = -1;
@@ -46,7 +47,8 @@ export class DevSession {
     this.log = createDevLogger(options);
     this.observability = createSupervisorObservability({
       ...(options.observability ?? {}),
-      graphHash: (token) => this.hashes.get(token.generationToken) ?? this.activeHash,
+      activationFingerprint: (token) =>
+        this.fingerprints.get(token.generationToken) ?? this.activeFingerprint,
     });
     this.stateMachine = createSupervisorStateMachine({
       onTelemetry: (event) => {
@@ -77,11 +79,9 @@ export class DevSession {
   get backendPort(): number {
     return this.proxy.port;
   }
-
   get inspectorPort(): number | undefined {
     return this.inspector?.port;
   }
-
   get activeTarget() {
     return this.proxy.activeTarget;
   }
@@ -167,12 +167,12 @@ export class DevSession {
     this.activeCandidate = candidate;
   }
 
-  get activeGraphHash(): string | undefined {
-    return this.activeHash;
+  get activeActivationFingerprint(): RuntimeActivationFingerprint | undefined {
+    return this.activeFingerprint;
   }
 
-  set activeGraphHash(value: string | undefined) {
-    this.activeHash = value;
+  set activeActivationFingerprint(value: RuntimeActivationFingerprint | undefined) {
+    this.activeFingerprint = value;
   }
 
   get isStopping(): boolean {

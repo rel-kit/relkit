@@ -1,7 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ApplicationGraph } from "@relkit/graph";
-import { hashGraph } from "@relkit/graph";
+import {
+  RUNTIME_ACTIVATION_FILE,
+  isRuntimeActivationFingerprint,
+  type RuntimeActivationFingerprint,
+} from "@relkit/contracts";
 import {
   createSupervisorDrain,
   startCandidate,
@@ -62,11 +65,11 @@ export async function activateCandidate(
       await candidate.dispose();
       return false;
     }
-    const graphHash = await resolveGraphHash(session, candidate);
-    session.hashes.set(token.generationToken, graphHash);
+    const activationFingerprint = await resolveActivationFingerprint(session, candidate);
+    session.fingerprints.set(token.generationToken, activationFingerprint);
     await verifyCandidate({
       candidate,
-      graphHash,
+      activationFingerprint,
       signal,
       ...(session.options.healthTimeoutMs === undefined
         ? {}
@@ -100,7 +103,7 @@ export async function activateCandidate(
     }
     session.stateMachine.switchSucceeded(token);
     session.active = candidate;
-    session.activeGraphHash = graphHash;
+    session.activeActivationFingerprint = activationFingerprint;
     watchCandidate(session, candidate);
     if (previous !== undefined) await session.drain(previous, token);
     session.log({
@@ -124,21 +127,22 @@ export async function activateCandidate(
   }
 }
 
-async function resolveGraphHash(session: DevSession, candidate: StartedCandidate): Promise<string> {
-  const value = session.options.graphHash;
-  const graphHash =
+async function resolveActivationFingerprint(
+  session: DevSession,
+  candidate: StartedCandidate,
+): Promise<RuntimeActivationFingerprint> {
+  const value = session.options.activationFingerprint;
+  const fingerprint =
     value === undefined
-      ? hashGraph(
-          JSON.parse(
-            await readFile(join(candidate.directory, "application.graph.json"), "utf8"),
-          ) as ApplicationGraph,
+      ? JSON.parse(
+          await readFile(join(candidate.directory, "server", RUNTIME_ACTIVATION_FILE), "utf8"),
         )
       : typeof value === "function"
         ? await value(candidate)
         : value;
-  if (typeof graphHash !== "string" || graphHash.trim() === "")
-    throw new TypeError("Development candidates require a graph hash.");
-  return graphHash;
+  if (!isRuntimeActivationFingerprint(fingerprint))
+    throw new TypeError("Development candidates require an activation fingerprint.");
+  return Object.freeze({ ...fingerprint });
 }
 
 export async function drainCandidate(
