@@ -1,4 +1,5 @@
 import { add } from "./normalize-pass-utils.js";
+import { providerMaps } from "./normalize-graph-app.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -27,6 +28,31 @@ export function validateProviderSingletons(work: NormalizationWork): void {
       NORMALIZE_CODES.authDuplicate,
       "At most one Better Auth capability may be registered.",
     );
+  }
+}
+
+export function validateProviderReleaseSources(work: NormalizationWork): void {
+  if (work.input.mode !== "production") return;
+  for (const descriptor of work.descriptors.filter((entry) => entry.kind === "app")) {
+    const application = isRecord(descriptor.value) ? descriptor.value : {};
+    for (const [capability, profiles] of providerMaps(application)) {
+      if (!isRecord(profiles)) continue;
+      for (const [profile, candidate] of Object.entries(profiles)) {
+        if (
+          !isRecord(candidate) ||
+          !isRecord(candidate.source) ||
+          candidate.source.kind !== "local-only"
+        )
+          continue;
+        const bindingId = `provider.${capability}.${profile}`;
+        add(
+          work,
+          descriptor,
+          NORMALIZE_CODES.providerReleaseSource,
+          `Provider binding "${bindingId}" is local-only; configure a connected or infrastructure release source.`,
+        );
+      }
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import {
   normalizeId,
   normalizeSourceLocation,
   normalizeSourcePath,
+  type DescriptorKind,
   type JsonValue,
   type SourceLocation,
 } from "@relkit/contracts";
@@ -11,6 +12,25 @@ import type { NormalizeInput, NormalizedDescriptor } from "./normalize-types.js"
 
 export function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+export function isDescriptorKindValue(value: string): value is DescriptorKind {
+  return [
+    "app",
+    "function",
+    "middleware",
+    "service",
+    "route",
+    "job",
+    "event",
+    "event-trigger",
+    "bucket",
+    "cache",
+    "tool",
+    "agent",
+    "constants",
+    "prompt",
+  ].includes(value as DescriptorKind);
 }
 
 export function isErrorDescriptorLike(value: unknown): value is Record<string, any> {

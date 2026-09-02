@@ -4,10 +4,10 @@ import { add } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";
 import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-validation.js";
 import { validateEventCompatibility } from "./normalize-event-validation.js";
-import { readModelConfigurations, resolveCompiledModel } from "./normalize-model-selection.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
-import { selectedProviderProfile } from "./normalize-graph-app.js";
+import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
 import {
+  validateProviderReleaseSources,
   validateProviderSingletons,
   validateUniqueBucketProfiles,
 } from "./normalize-provider-validation.js";
@@ -91,20 +91,23 @@ export function passAgents(work: NormalizationWork): void {
 
 export function passProviders(work: NormalizationWork): void {
   validateProviderSingletons(work);
+  validateProviderReleaseSources(work);
   validateUniqueBucketProfiles(work);
   if (!work.descriptors.some((entry) => entry.kind === "app")) return;
   const profiles = providerProfiles({
     ...work.input,
     descriptors: work.descriptors.map((entry) => entry.value),
   });
-  const modelConfigurations = readModelConfigurations(work.descriptors);
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
-    const profile = typeof value.profile === "string" ? value.profile : undefined;
     const profileCapability = capabilityFor(descriptor.kind);
     if (profileCapability !== undefined) {
-      const selected = selectedProviderProfile(application, profileCapability, profile);
+      const selected = selectedProviderProfile(
+        application,
+        profileCapability,
+        requestedProviderProfile(descriptor.kind, value),
+      );
       if (selected === undefined) {
         add(
           work,
@@ -123,27 +126,6 @@ export function passProviders(work: NormalizationWork): void {
           `Provider profile "${selected}" does not provide ${profileCapability}.`,
         );
       }
-    }
-    if (descriptor.kind !== "agent") continue;
-    const modelProfile = selectedProviderProfile(application, "models");
-    const modelCapabilities = modelProfile === undefined ? undefined : profiles.get(modelProfile);
-    if (modelCapabilities === undefined || !modelCapabilities.includes("models")) {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.providerProfile,
-        "A model default is required before unqualified agent use.",
-      );
-      continue;
-    }
-    for (const entry of modelConfigurations) {
-      if (entry.error !== undefined) {
-        add(work, descriptor, entry.error.code, entry.error.message);
-        continue;
-      }
-      if (entry.configuration === undefined) continue;
-      const error = resolveCompiledModel(value.model, entry.configuration);
-      if (error !== undefined) add(work, descriptor, error.code, error.message);
     }
   }
 }
@@ -183,12 +165,12 @@ function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescrip
 function capabilityFor(kind: string): string | undefined {
   return (
     {
-      bucket: "buckets",
+      bucket: "bucket",
       cache: "cache",
-      job: "jobs",
-      event: "events",
-      "event-trigger": "events",
-      agent: "models",
+      job: "job",
+      event: "event",
+      "event-trigger": "event",
+      agent: "model",
     } as Record<string, string>
   )[kind];
 }
