@@ -5,13 +5,15 @@ import {
   Tracer as EffectTracer,
 } from "effect";
 import type { Effect } from "effect";
-import type { ApplicationGraph } from "@relkit/graph";
+import type { ApplicationGraph, ProviderBindingNode } from "@relkit/graph";
 import {
   GENERATOR_VERSION,
   MANIFEST_VERSION,
   type JsonValue,
   type MaybePromise,
   type ProtocolId,
+  type RuntimeActivationFingerprint,
+  type RuntimeIntegrationPlanReference,
 } from "@relkit/contracts";
 
 /** Canonical graph and hash used by one runtime generation. */
@@ -29,8 +31,9 @@ export interface RuntimeManifest {
   readonly contractVersion: typeof MANIFEST_VERSION;
   readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
+  readonly activationFingerprint: RuntimeActivationFingerprint;
+  readonly runtimeIntegrationsPlan: RuntimeIntegrationPlanReference;
   readonly functions: Readonly<Record<string, RuntimeHandler>>;
-  readonly providers: Readonly<Record<string, unknown>>;
   readonly middleware: Readonly<Record<string, RuntimeHandler>>;
   readonly requestTransforms: Readonly<Record<string, RuntimeHandler>>;
 }
@@ -43,7 +46,7 @@ export class Manifest extends Context.Service<Manifest, ManifestService>()(
   "relkit/runtime/Manifest",
 ) {}
 
-export type ProviderCapability = "buckets" | "cache" | "jobs" | "events" | "observability";
+export type ProviderCapability = ProviderBindingNode["capability"];
 
 export interface ProviderHandle {
   readonly capability: ProviderCapability;
