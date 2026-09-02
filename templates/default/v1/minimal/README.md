@@ -14,6 +14,5 @@ bun run typecheck
 bun run build
 ```
 
-The example route is `GET /hello?name=RelKit`. Development uses the local
-provider set, tests use deterministic test providers, and production selects
-the configured AWS provider set.
+The example route is `GET /hello?name=RelKit`. The default project needs no
+Docker daemon, cloud account, or deployment credentials.
