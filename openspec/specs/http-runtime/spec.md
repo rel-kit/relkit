@@ -1,22 +1,25 @@
 ## Purpose
 
 Defines observable HTTP routing, request/response conversion, internal endpoints, OpenAPI generation, and typed client behavior derived from the application graph.
-
 ## Requirements
-
 ### Requirement: Graph-driven HTTP materialization
 
-The HTTP runtime SHALL create its route table exclusively from planned HTTP trigger nodes and hash-matched function-backed middleware adapters, and application handlers SHALL never receive or depend on the underlying HTTP framework context.
+The HTTP runtime SHALL create its route table from planned HTTP trigger nodes, register discovered path-scoped middleware before routes in canonical middleware-ID order, and keep the HTTP framework context inside the route layer.
 
 #### Scenario: Route starts successfully
 
 - **WHEN** a valid HTTP trigger targets a registered function
 - **THEN** the runtime registers the method/path and invokes that function through the common engine with source `http`
 
-#### Scenario: Declared middleware runs
+#### Scenario: Matching middleware continues
 
-- **WHEN** a route contains ordered middleware references
-- **THEN** each adapter invokes its declared function through the common engine with framework-neutral validated input and applies only its declared continue-or-respond decision
+- **WHEN** path-scoped middleware matches a request and awaits its continuation
+- **THEN** the next matching middleware or route runs with standard onion ordering
+
+#### Scenario: Matching middleware responds
+
+- **WHEN** path-scoped middleware returns a response without continuing
+- **THEN** later middleware, request mapping, and the route target do not run
 
 ### Requirement: Deterministic route precedence and collision rejection
 
@@ -39,12 +42,17 @@ Routes SHALL be ordered by exact static path, dynamic path, required catch-all p
 
 ### Requirement: Serializable request mapping execution
 
-The runtime SHALL execute the compiled mapping model for path, query, header, cookie, JSON body, whole body, multipart, constants, nested objects, optional/default values, and named transforms, SHALL keep transport values distinct from body fields, and SHALL enforce content type, body size, parsing, and target input validation before handler invocation.
+The runtime SHALL execute the compiled mapping model after route middleware continuation for path, query, header, cookie, JSON body, whole body, multipart, constants, nested objects, optional/default values, Hono validated values, and named transforms, and SHALL enforce content type, body size, parsing, and target input validation before function invocation.
 
 #### Scenario: Valid mapped request arrives
 
 - **WHEN** request values satisfy the route mapping and target function schema
-- **THEN** the target receives exactly the mapped reusable input plus a separate immutable framework-neutral request view
+- **THEN** the target receives exactly the mapped reusable input and no transport request argument
+
+#### Scenario: Middleware supplies validated data
+
+- **WHEN** matching middleware changes Hono validated parameter, query, header, cookie, JSON, or form data before continuing
+- **THEN** route mapping uses the validated value in preference to the corresponding raw request value
 
 #### Scenario: Matching path field is inferred
 
@@ -54,7 +62,7 @@ The runtime SHALL execute the compiled mapping model for path, query, header, co
 #### Scenario: Path field is not part of business input
 
 - **WHEN** a path parameter has no matching target-input property
-- **THEN** compilation does not require an artificial input field and the value remains available through `request.params`
+- **THEN** compilation does not require an artificial function input field and request-only behavior may inspect it in route middleware
 
 #### Scenario: Named transform executes
 
@@ -64,7 +72,21 @@ The runtime SHALL execute the compiled mapping model for path, query, header, co
 #### Scenario: Malformed body arrives
 
 - **WHEN** JSON is malformed, content type is wrong, the body is too large, or mapped values fail validation
-- **THEN** the runtime returns the declared safe validation response, records the failure, and does not call the handler
+- **THEN** the runtime returns the declared safe validation response, records the failure, and does not call the function
+
+### Requirement: Path-scoped middleware matching
+
+Middleware paths SHALL support global `*`, static segments, named `:param` segments, and a trailing `*`, and unsupported patterns SHALL fail authoring or compilation.
+
+#### Scenario: Middleware path covers a route
+
+- **WHEN** a middleware pattern covers every runtime path represented by a route
+- **THEN** the compiled relationship is classified as `always`
+
+#### Scenario: Middleware partially covers a catch-all route
+
+- **WHEN** a middleware pattern covers only some runtime paths represented by a catch-all route
+- **THEN** runtime matching remains request-specific and the compiled relationship is classified as `conditional`
 
 ### Requirement: Declared response mapping
 
@@ -228,3 +250,17 @@ When an HTTP route maps a retryable declared error with `afterMs`, the response 
 
 - **WHEN** a route target throws a mapped retryable error with `afterMs: 1500`
 - **THEN** the response includes `Retry-After` rounded up to whole seconds, the handler ran once, and the client decides whether to make another request
+
+### Requirement: Better Auth protection precedes authored route middleware
+The HTTP runtime SHALL register declarative Better Auth session protection before authored route middleware, exclude auth endpoint paths, and reuse one memoized session lookup through route middleware and function invocation context.
+
+#### Scenario: Protected request has no session
+- **WHEN** a protected application path is requested without a session
+- **THEN** the standard unauthorized response is returned and authored route middleware and the target function do not run
+
+### Requirement: Application traffic follows complete readiness
+Liveness SHALL remain available during startup, while readiness and non-internal application traffic SHALL remain unavailable until environment, providers, Drizzle, and Better Auth have completed activation.
+
+#### Scenario: Request arrives during auth startup
+- **WHEN** an application request arrives before Better Auth activation completes
+- **THEN** the runtime returns a not-ready response rather than invoking a raw or function route

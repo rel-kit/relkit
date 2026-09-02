@@ -15,7 +15,7 @@ Application developers SHALL author normal synchronous or asynchronous TypeScrip
 
 ### Requirement: Function-only authored execution
 
-Functions SHALL be the only authored descriptors that own business handlers; routes, route middleware declarations, jobs, schedules, event listeners, tools, and service members SHALL target function references, services SHALL group functions and invocation policy, and agents SHALL compile to generated internal function identities.
+Functions SHALL be the only authored descriptors that own business handlers; path-scoped route middleware MAY own HTTP handlers, routes, jobs, schedules, event listeners, tools, and service members SHALL target function references, services SHALL group functions and invocation policy, and agents SHALL compile to generated internal function identities.
 
 #### Scenario: Non-function handler is declared
 
@@ -24,8 +24,8 @@ Functions SHALL be the only authored descriptors that own business handlers; rou
 
 #### Scenario: Route middleware is declared
 
-- **WHEN** application code creates middleware metadata for a route
-- **THEN** it receives a stable `MiddlewareRef` that targets a normal function through serializable request/decision mappings, constrains any short-circuit to a schema-compatible route-declared response, and exposes neither a middleware handler nor an HTTP-framework context
+- **WHEN** application code calls `defineMiddleware(path, handler)`
+- **THEN** it receives a stable middleware descriptor whose handler receives an HTTP context, continuation, and base RELKIT execution context without targeting a function
 
 #### Scenario: Function invokes another function
 
@@ -35,7 +35,7 @@ Functions SHALL be the only authored descriptors that own business handlers; rou
 #### Scenario: Managed dependency is declared
 
 - **WHEN** a function declares a job, event, bucket, cache, or agent dependency
-- **THEN** its handler context exposes only the correspondingly named and typed Promise-based clients
+- **THEN** its handler and lifecycle hooks expose only the correspondingly named and typed Promise-based clients
 
 ### Requirement: Standard Schema validation and projection
 
@@ -53,7 +53,7 @@ RelKit SHALL provide `@relkit/schema` with a familiar `z` builder and SHALL acce
 
 ### Requirement: Value-free environment contracts
 
-Environment declarations SHALL produce static resolved types, runtime parsing rules, defaults, environment-specific requirements, descriptions, examples, sensitivity metadata, and JSON-safe graph projections without resolving process or file values during descriptor evaluation.
+Environment declarations SHALL produce static resolved types, runtime parsing rules, defaults, optional environment-specific requirements, descriptions, examples, sensitivity metadata, and JSON-safe graph projections without resolving process or file values during descriptor evaluation. Applications SHALL declare one schema whose keys receive pipeline-specific values, and SHALL NOT declare the framework-reserved `RELKIT_ENV` key.
 
 #### Scenario: Secret environment variable is compiled
 
@@ -64,6 +64,16 @@ Environment declarations SHALL produce static resolved types, runtime parsing ru
 
 - **WHEN** a runtime generation resolves a missing or malformed required value
 - **THEN** readiness fails before provider construction or traffic activation and identifies the variable without revealing secret content
+
+#### Scenario: Identical keys receive pipeline-specific values
+
+- **WHEN** local and production pipelines launch the same application topology with different endpoint and credential values
+- **THEN** both value sets are validated against the same environment schema without provider branches
+
+#### Scenario: Application declares the reserved runtime key
+
+- **WHEN** an application environment schema declares `RELKIT_ENV`
+- **THEN** authoring or compilation rejects it as framework-reserved
 
 ### Requirement: Stable immutable descriptors
 
@@ -89,37 +99,23 @@ Every compiled application descriptor SHALL have a stable ID, kind, global descr
 - **WHEN** two descriptors derive the same stable ID
 - **THEN** compilation fails with a collision diagnostic identifying both source bindings and suggests an explicit override
 
-### Requirement: Complete v3 descriptor surface
+### Requirement: Transport-independent function lifecycle
 
-The public authoring API SHALL support application, function, declared error, route, function-backed middleware metadata, job/schedule, event, event-trigger, bucket, cache, tool, and agent descriptors with the fields and constraints defined by the approved v3 baseline.
+Function handlers and their optional `onBefore` and `onAfter` hooks SHALL receive typed values and execution context without an HTTP request argument.
 
-#### Scenario: Full fixture is authored
+#### Scenario: Function is invoked from different transports
 
-- **WHEN** the commerce fixture declares every in-scope concept through public packages
-- **THEN** the source contains pure descriptor values and no direct registration with runtime frameworks or providers
+- **WHEN** the same function is invoked directly, over HTTP, by a job, event, tool, or agent
+- **THEN** its handler and hooks have identical signatures and receive transport data only when explicitly mapped into function input
 
-### Requirement: Event listeners are generic trigger bindings
+#### Scenario: Function hooks transform values
 
-Event authoring SHALL expose `defineEvent`, typed selector helpers, and `onEvent`; `onEvent(eventName, handler, options?)` SHALL accept an autocomplete-enabled known event-name string, infer the payload, and create a generic event trigger backed by an internal function. RELKIT SHALL NOT expose `defineSubscription`, a subscription graph node, or a `*.subscription.ts` convention.
-
-#### Scenario: Single event listener is authored
-
-- **WHEN** `onEvent("orders.created", handler)` is exported
-- **THEN** it returns an immutable event-trigger descriptor whose handler receives the event payload and framework-neutral event context
-
-#### Scenario: Unknown event name is authored
-
-- **WHEN** `onEvent` receives a string absent from the generated event registry
-- **THEN** type checking and compilation reject it with the known event names
-
-#### Scenario: Subscription primitive is searched
-
-- **WHEN** public exports, generated projects, graph nodes, and conventions are scanned
-- **THEN** no separate application subscription primitive exists
+- **WHEN** `onBefore` returns input or `onAfter` returns successful output
+- **THEN** the returned value becomes the validated value for the next lifecycle stage
 
 ### Requirement: Serializable route and selector DSLs
 
-HTTP request/response mappings and event selectors SHALL be declarative and serializable, SHALL preserve type relationships to their target functions, and SHALL reject arbitrary executable mapping or selector closures.
+HTTP request/response mappings SHALL be declarative and serializable, SHALL preserve type relationships to their target functions, and SHALL reject arbitrary executable mapping closures; business event functions SHALL name one exact generated-registry event rather than expose a selector DSL.
 
 #### Scenario: Route mapping is projected
 
@@ -133,8 +129,8 @@ HTTP request/response mappings and event selectors SHALL be declarative and seri
 
 #### Scenario: Event selector combines known events
 
-- **WHEN** `anyOf`, `match`, or restricted `all` selectors are declared
-- **THEN** the selector carries enough metadata for deterministic compile-time expansion and typed target input
+- **WHEN** `defineEventFunction` names a known event ID
+- **THEN** its input is inferred from that exact event and no wildcard or multi-event selector is authored
 
 ### Requirement: Conventions warn without excluding descriptors
 
@@ -149,20 +145,6 @@ Recommended directories, suffixes, grouping, and ID style SHALL continue to prod
 
 - **WHEN** a route descriptor is exported outside `src/routes/**/route.ts`
 - **THEN** compilation rejects it with a migration diagnostic because its method/path cannot be derived from the required convention
-
-### Requirement: Global logical provider configuration
-
-Applications SHALL choose concrete capability providers once per environment in the application descriptor, while resource and trigger descriptors reference only logical profiles and never contain vendor credentials, SDK clients, or implementation paths.
-
-#### Scenario: Logical profile is selected
-
-- **WHEN** a resource declares profile `archive`
-- **THEN** compilation links it to the environment's global `archive` capability profile or emits `RELKIT_PROVIDER_PROFILE_UNKNOWN`
-
-#### Scenario: Provider option references environment
-
-- **WHEN** provider metadata uses a token such as `env.AWS_REGION`
-- **THEN** descriptor evaluation records a typed variable reference without reading its value, graph projection contains only permitted non-secret metadata, and generation startup resolves the value after environment validation
 
 ### Requirement: Declared public errors
 
@@ -273,34 +255,6 @@ Routes SHALL support a serializable rate-limit policy containing a positive limi
 - **WHEN** a development route declares a rate limit without a store
 - **THEN** a generation-local in-memory limit is allowed and clearly reported as non-distributed
 
-### Requirement: Convention-based typed configuration
-
-RELKIT SHALL expose a typed configuration helper with nested server and inspector settings while fixing application entry, source discovery, exclusions, and generated-output locations as framework conventions.
-
-#### Scenario: Ports are configured
-
-- **WHEN** configuration declares server and inspector ports
-- **THEN** development uses them unless a documented CLI flag or environment variable has higher precedence
-
-#### Scenario: Legacy path key is supplied
-
-- **WHEN** configuration contains `entry`, `source`, `exclude`, or `generatedDirectory`
-- **THEN** loading fails with migration guidance instead of silently accepting the key
-
-### Requirement: Structured transport request is separate from invocation input
-
-Function handlers SHALL receive reusable validated invocation input separately from an optional immutable framework-neutral request containing transport-derived parameters, query values, headers, method, URL, body access, and request metadata.
-
-#### Scenario: HTTP route invokes a function
-
-- **WHEN** a route maps `request.params.orderId` to a matching business input field
-- **THEN** the handler receives validated `{ orderId }` input and can independently inspect the immutable request parameters without treating them as body fields
-
-#### Scenario: Non-HTTP source invokes a function
-
-- **WHEN** a function is invoked directly, by a job, event, tool, or agent without an HTTP transport
-- **THEN** its business input remains available and its request argument is absent rather than a fabricated HTTP request
-
 ### Requirement: Functions expose invocation and tool views
 
 A function descriptor SHALL expose typed Promise-based `invoke(input)` and `asTool(options?)` operations without exposing internal engine types or duplicating the function handler.
@@ -314,3 +268,58 @@ A function descriptor SHALL expose typed Promise-based `invoke(input)` and `asTo
 
 - **WHEN** `getOrder.asTool(...)` is declared
 - **THEN** the resulting tool inherits the function schemas, errors, and handler target while adding only tool metadata
+
+### Requirement: Domain-first source authoring
+
+Application descriptors SHALL be recursively discovered beneath `src/<domain>`, with deterministic domain-prefixed source identities and one service composition point, while routes and platform configuration remain in their reserved layers.
+
+#### Scenario: Source identity is omitted
+
+- **WHEN** `src/orders/functions/create-order.function.ts` omits its ID
+- **THEN** its ID is `orders.create-order` regardless of project root or discovery order
+
+### Requirement: Service and integration factories are immutable public descriptors
+
+The public API SHALL provide `defineService`, `defineServiceRoutes`, `defineDrizzleService`, `defineModel`, and `defineBetterAuthService` with inferred immutable types and SHALL reject removed service middleware, eager data-model, and Better Auth adapter forms.
+
+#### Scenario: Removed authoring API is used
+
+- **WHEN** application source uses `defineServiceMiddleware`, `defineDataModel`, or `betterAuthAdapter`
+- **THEN** type checking or compilation fails and migration documentation identifies the replacement
+
+### Requirement: Event contracts, publishers, and event functions are distinct
+
+RELKIT SHALL expose contract-only `defineEvent`, callable `defineFunction`, and event-only `defineEventFunction` primitives; normal and event functions SHALL declare exact publishable event IDs through `publishes`, and only those IDs SHALL appear in `context.events`.
+
+#### Scenario: Event relationship is authored
+
+- **WHEN** an application defines an event, a publisher, and an event function using known registry IDs
+- **THEN** the publisher can publish through its narrowed context and the event function receives the parsed event input without exposing direct invocation or tool conversion
+
+#### Scenario: Invalid event-only fields are authored
+
+- **WHEN** `defineEventFunction` declares `input`, `output`, `tool`, or `trigger`
+- **THEN** type checking and compilation reject the field with a source-located correction
+
+### Requirement: defineApp is the canonical application contract
+
+`defineApp` SHALL be the sole application configuration constructor and SHALL accept application identity, handler-visible environment, singular provider capability inputs, profile defaults, telemetry, server, Inspector, and deployment descriptors as one immutable plain-TypeScript topology.
+
+#### Scenario: Direct cache binding is authored
+
+- **WHEN** an application passes `docker(redis())` to singular key `cache`
+- **THEN** type inference retains the Redis adapter contract and normalization creates profile `default`
+
+#### Scenario: Multiple cache bindings are authored
+
+- **WHEN** `cache` is a map containing `requests` and `timeline`
+- **THEN** logical cache descriptors can select either profile and no environment-specific provider branch is needed
+
+### Requirement: Complete application descriptor surface
+
+The public authoring API SHALL support the existing application concepts plus provider bindings, local sources, infrastructure sources, static integration descriptors, telemetry exporters, deployment engine/host descriptors, and explicit test replacements without exposing runtime clients or implementation import paths.
+
+#### Scenario: Full canonical fixture is authored
+
+- **WHEN** the commerce fixture declares application, domain, HTTP, async, resource, model, telemetry, local, and deployment concepts
+- **THEN** every declaration is a branded value-free descriptor and application code performs no runtime registration

@@ -52,12 +52,17 @@ The compiler SHALL produce byte-identical canonical graph JSON and graph hashes 
 
 ### Requirement: Complete serializable application model
 
-The graph SHALL describe app/environment metadata, services and ordered membership, functions, generic triggers (including ordered middleware targets and named transform metadata), jobs, events, buckets, cache, tools, agents, provider profiles, declared managed-resource and membership edges, source locations, selector expansions, and generated agent identities without executable closures, resolved environment values, credentials, or live clients.
+The graph SHALL describe app/environment metadata, services and ordered membership, functions, triggers, jobs, events, buckets, cache, tools, agents, provider bindings by capability/profile/adapter/ownership, value-free environment references, declared dependency and membership edges, source locations, selector expansions, and generated identities without executable closures, resolved environment values, credentials, or live clients.
 
 #### Scenario: Graph is inspected as JSON
 
 - **WHEN** a full fixture graph is recursively inspected
-- **THEN** all managed concepts, service relationships, and required declared managed-resource edge kinds are present and every value is JSON-safe and secret-free
+- **THEN** every required provider binding and relationship is present, all content is JSON-safe, and no resolved environment or credential value appears
+
+#### Scenario: Bucket profile is reused
+
+- **WHEN** normalization finds multiple bucket descriptors linked to one profile
+- **THEN** compilation emits a deterministic error before graph activation
 
 ### Requirement: Generic trigger compilation
 
@@ -78,24 +83,14 @@ Routes and event listeners SHALL remain distinct authoring and inspector concept
 - **WHEN** a required or optional catch-all route is compiled
 - **THEN** its graph trigger retains one logical ID and deterministic runtime/OpenAPI variants derived from the source path
 
-### Requirement: Hash-matched runtime manifest
+### Requirement: Middleware relationships are deterministic
 
-The compiler SHALL generate a versioned runtime manifest containing executable function handlers, provider factories, function-backed middleware adapters, and named request-transform validators plus the expected graph hash, and runtime activation SHALL fail on a version, hash, missing reference, or required-handler mismatch.
+The compiler SHALL sort middleware by canonical ID and classify every known route relationship as `always`, `conditional`, or absent using the supported middleware path grammar.
 
-#### Scenario: Manifest and graph differ
+#### Scenario: Discovery order changes
 
-- **WHEN** a manifest graph hash does not equal the canonical graph hash
-- **THEN** activation is rejected with `RELKIT_GRAPH_MANIFEST_MISMATCH`
-
-#### Scenario: Handler reference is missing
-
-- **WHEN** a function graph node has no executable manifest handler
-- **THEN** compilation or activation fails with `RELKIT_MANIFEST_HANDLER_MISSING`
-
-#### Scenario: Middleware or transform reference is invalid
-
-- **WHEN** an HTTP trigger names an absent middleware adapter or request transform, or two named transforms collide
-- **THEN** compilation emits a stable source-located diagnostic and no activatable manifest
+- **WHEN** equivalent middleware modules are enumerated or evaluated in a different order
+- **THEN** graph bytes, manifest registration order, route relationships, and graph hash remain identical
 
 ### Requirement: Deterministic generated artifacts
 
@@ -173,7 +168,7 @@ The compiler SHALL derive route methods and paths from named exports in `src/rou
 
 ### Requirement: Generated typed event registry
 
-Compilation SHALL generate a deterministic TypeScript declaration mapping discovered event IDs to payload, version, and descriptor types before project type checking, and SHALL use the same registry to validate callback listener names and selectors.
+Compilation SHALL generate a deterministic TypeScript declaration mapping discovered event IDs to input, version, and descriptor types before project type checking, and SHALL use the same registry to validate `publishes` and event-function event names.
 
 #### Scenario: Event is added
 
@@ -182,22 +177,8 @@ Compilation SHALL generate a deterministic TypeScript declaration mapping discov
 
 #### Scenario: Event is removed
 
-- **WHEN** a listener still names a removed event
+- **WHEN** a publisher or event function still names a removed event
 - **THEN** stale generated declarations cannot make compilation succeed and an unknown-event diagnostic is emitted
-
-### Requirement: Callback listeners lower through the common engine
-
-The compiler SHALL lower each event callback into a generated internal function and a generic event trigger while preserving explicit or derived listener identity, dependencies, delivery policy, source metadata, and deterministic graph output.
-
-#### Scenario: Listener omits an ID
-
-- **WHEN** a named listener export omits `options.id`
-- **THEN** compilation derives a stable ID from the event name and export name and rejects global duplicates
-
-#### Scenario: Listener declares dependencies
-
-- **WHEN** a callback listener declares typed dependencies
-- **THEN** the generated function receives only those clients and all delivery invocations pass through the common engine with source `event`
 
 ### Requirement: Source-scoped IDs are derived deterministically
 
@@ -255,3 +236,71 @@ The compiler SHALL emit each service as a graph node with ordered member and mid
 
 - **WHEN** the same function descriptor is declared as a member of two services
 - **THEN** compilation rejects ambiguous service ownership and identifies both declarations
+
+### Requirement: Domain ownership and exposure are canonical graph data
+
+Every domain-owned graph node SHALL carry its domain ID, functions/events/errors SHALL declare public or internal exposure, and service nodes SHALL contain serializable public membership and optional Drizzle or Better Auth capability metadata.
+
+#### Scenario: Graph is serialized
+
+- **WHEN** a compiled application graph is encoded as JSON
+- **THEN** it contains no live clients, handlers, callbacks, credentials, raw Drizzle objects, or filesystem-root-dependent identities
+
+### Requirement: Domain relationships use explicit graph edges
+
+The graph SHALL represent public function/event exposure, service dependencies, auth mounts, and function-declared errors using versioned deterministic edges while preserving runtime-observed invocation edges separately.
+
+#### Scenario: Domain imports another service
+
+- **WHEN** one or more files in `billing` import `orders/service.ts`
+- **THEN** the graph contains one deterministic `billing` to `orders` service dependency edge without inventing exact function-call edges
+
+### Requirement: Errors are first-class graph nodes
+
+Declared errors SHALL be deduplicated as graph nodes with safe schema, HTTP, retry, source, domain, and exposure metadata and SHALL remain projected into function contracts for HTTP and client generation.
+
+#### Scenario: Error is shared
+
+- **WHEN** several functions declare the same error descriptor
+- **THEN** the graph contains one error node and one declaration edge from each function
+
+### Requirement: Event functions lower to authored functions and exact triggers
+
+The compiler SHALL emit one authored function node marked `event-only` and one deterministic `relkit.event.<function-id>.trigger` node for each event function, with one target edge and one exact listener edge, without a hidden generated function or duplicate consumer edge.
+
+#### Scenario: Event function compiles
+
+- **WHEN** a valid event function names a known event
+- **THEN** its function input matches the event schema, its output is void, and its trigger stores the exact event ID/version and normalized delivery configuration
+
+### Requirement: Event-only and publication diagnostics are source located
+
+Compilation SHALL diagnose unknown consumer events, unknown or duplicate publications, forbidden event-function fields/results/targets, non-event invocation paths, and generated-trigger identity collisions with the authored ID, invalid target, source location, and correction.
+
+#### Scenario: Route targets an event function
+
+- **WHEN** a route references an event-only function
+- **THEN** compilation emits a source-located error and no activatable manifest
+
+### Requirement: Generated activation cohort is complete and deterministic
+
+Compilation SHALL emit graph v8, manifest v8, runtime-integration plan v1, local-service plan v1 when declared, deployment plan v3 when requested, and non-secret activation metadata whose individual hashes form one composite activation fingerprint.
+
+#### Scenario: Equivalent projects compile in different roots
+
+- **WHEN** input order, absolute root, process identity, and time differ while authored topology is equivalent
+- **THEN** graph, manifest, plan bytes, static import order, individual hashes, and activation fingerprint remain identical
+
+#### Scenario: Previous artifact is activated
+
+- **WHEN** runtime receives graph v7, manifest v7, deployment plan v2, or a missing required v1 plan
+- **THEN** activation fails with a precise rebuild or regeneration diagnostic
+
+### Requirement: Runtime integrations are statically planned
+
+The compiler SHALL derive selected integration IDs and package exports from branded descriptors, emit deterministic static runtime references only for graph-required integrations, and reject application-authored import paths, duplicate registrations, package-root escapes, and protocol mismatches.
+
+#### Scenario: Application contains a runtime import path
+
+- **WHEN** an authored descriptor attempts to select an implementation by arbitrary module path
+- **THEN** compilation fails before generating executable output

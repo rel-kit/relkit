@@ -42,20 +42,6 @@ The `relkit` CLI SHALL provide command-local and nested help, examples, generate
 - **WHEN** `relkit env explain OPENAI_API_KEY` runs
 - **THEN** it prints type, requirements, default presence, sensitivity, and description but not a resolved value
 
-### Requirement: Project creation entry points and defaults
-
-`bunx create-relkit@latest <name>` and `relkit create <name>` SHALL generate a convention-based TypeScript/Bun project using internal Hono, `@relkit/schema`, built-in local/test providers, Pulumi/AWS defaults, a minimal function and named-method `src/routes/**/route.ts`, typed config, tests, Bun package management, and Git initialization when available unless flags override supported choices.
-
-#### Scenario: Default project is generated
-
-- **WHEN** a valid name and empty destination are supplied with default options
-- **THEN** the generated tree, scripts, exact compatible package versions, configuration, app/env descriptors, route files, examples, tests, README, ignore rules, and lockfile match the documented baseline
-
-#### Scenario: Both creation entry points receive equivalent options
-
-- **WHEN** the packed `create-relkit` binary and `relkit create` run with the same normalized options in separate empty destinations
-- **THEN** `relkit create` delegates to the same generator API and both destinations are byte-identical apart from explicitly documented destination-derived values
-
 ### Requirement: Supported non-interactive options
 
 The generator SHALL support template `minimal|api|agent`, cloud `aws|none`, deploy `pulumi|none`, install, Git, examples, directory, explicit empty-directory override, and JSON flags, and SHALL expose no persistence or identity flags.
@@ -78,15 +64,6 @@ The generator SHALL validate package name/path, refuse a non-empty destination u
 
 - **WHEN** the destination contains files and no explicit empty-directory override is valid
 - **THEN** the generator refuses before modifying either existing files or package state
-
-### Requirement: Generated application stays on public APIs
-
-Generated source SHALL use ordinary async handlers, Standard Schema via `@relkit/schema`, public `@relkit/*` descriptors/testing helpers, global providers, body capture off by default, and SHALL contain no internal Effect, Hono, Next.js, Pulumi, or cloud SDK import.
-
-#### Scenario: Generated source is scanned
-
-- **WHEN** each supported template is generated
-- **THEN** the forbidden-import scan passes and functions remain the only authored handlers
 
 ### Requirement: First-run workflow works as printed
 
@@ -145,17 +122,17 @@ The packed CLI SHALL include or resolve a compatible prebuilt inspector without 
 
 ### Requirement: Generated templates teach service composition
 
-The non-minimal generated templates SHALL demonstrate the revised authoring model using public APIs, inferred source-scoped IDs, service members, and direct function invocation without retaining legacy `context.functions` examples.
+Every generated template SHALL use domain-first source layout and public service APIs. The API and agent templates SHALL demonstrate public service functions, direct invocation, and applicable events/tools; the minimal template SHALL contain one small `hello` domain without speculative integrations.
 
 #### Scenario: API template is generated
 
 - **WHEN** a developer creates the API template
-- **THEN** its route targets a service member, its nested function call uses `target.invoke(input)`, and its checks compile without function dependency declarations
+- **THEN** its route maps to a public service function, nested calls use service members, and all source descriptors live beneath owned domains or the routes/platform layers
 
 #### Scenario: Minimal template is generated
 
 - **WHEN** a developer creates the minimal template
-- **THEN** it remains a small single-function example and does not acquire speculative service, agent, or event scaffolding
+- **THEN** it contains one service and one function under `src/hello` and does not scaffold empty categories, agents, events, database, or auth
 
 ### Requirement: Agent template derives a tool from a function
 
@@ -168,9 +145,41 @@ The agent template SHALL expose one useful function through `asTool`, configure 
 
 ### Requirement: API template explains independent event fan-out
 
-The API template SHALL include one small domain event published after a successful operation and at least two independently testable listeners with distinct responsibilities, and its documentation SHALL state at-least-once and independent-failure semantics without implying a transaction or simultaneous execution.
+The API template SHALL include one contract-only domain event, one normal function that declares it in `publishes`, and at least two independently testable `defineEventFunction` reactions with distinct responsibilities; its documentation SHALL state at-least-once and independent-failure semantics without selectors, callback listeners, or compatibility APIs.
 
 #### Scenario: Template event is published
 
 - **WHEN** the example publishes its domain event
-- **THEN** both listeners become eligible, one listener's failure cannot roll back the other's success, and deterministic tests can deliver and inspect each listener separately
+- **THEN** both event functions become eligible, one function's failure cannot roll back the other's success, and deterministic tests can deliver and inspect each independently
+
+### Requirement: Default generated projects are cloud free
+
+Both creation entry points SHALL default to no cloud host and no deployment engine, SHALL omit AWS and Pulumi packages and configuration, and SHALL start the default route without Docker or cloud credentials. Explicit cloud and deployment options SHALL add only their selected integration packages and declarations.
+
+#### Scenario: Default API project is generated
+
+- **WHEN** a developer accepts all defaults
+- **THEN** the project can install, check, test, build, and run locally without Docker, AWS, Pulumi, or cloud environment values
+
+#### Scenario: AWS and Pulumi are selected
+
+- **WHEN** generation receives `--cloud aws --deploy pulumi`
+- **THEN** the project imports `@relkit/aws` and `@relkit/pulumi` and includes their deployment declaration
+
+### Requirement: Local service commands are explicit
+
+The CLI SHALL provide `local up`, `local status`, `local stop`, and `local reset`, detached startup where requested, and `dev --local=off`; command output SHALL identify bindings and health without printing credentials or resolved secret values.
+
+#### Scenario: Developer starts all local services detached
+
+- **WHEN** `relkit local up --detach` succeeds
+- **THEN** all declared local bindings remain running, become adoptable by a later development session, and are reported without secrets
+
+### Requirement: Doctor validates integrations and local prerequisites
+
+Doctor SHALL validate installed selected integration exports and protocols, required binding value names, Docker availability only when local execution is requested, source compatibility, duplicate identities, and deployment-role compatibility without executing unselected integration code or resolving secrets.
+
+#### Scenario: Docker is unavailable for local development
+
+- **WHEN** a required Docker-backed binding is checked for `relkit dev`
+- **THEN** doctor reports the binding and Docker prerequisite without silently using its remote source
