@@ -28,14 +28,6 @@
       "import": "./dist/index.js"
     }
   },
-  "dependencies": {
-    "@relkit/agents": "workspace:*",
-    "@relkit/app": "workspace:*",
-    "@relkit/buckets": "workspace:*",
-    "@relkit/cache": "workspace:*",
-    "@relkit/contracts": "workspace:*",
-    "@relkit/engine": "workspace:*"
-  },
   "scripts": {
     "build": "tsc -b",
     "check": "tsc -b --pretty false",

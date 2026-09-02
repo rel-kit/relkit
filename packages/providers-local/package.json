@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@relkit/agents": "workspace:*",
-    "@relkit/app": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
     "@relkit/contracts": "workspace:*",

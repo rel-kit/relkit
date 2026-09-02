@@ -1,4 +1,3 @@
-export * from "./factory.js";
 export * from "./buckets/index.js";
 export * from "./cache/index.js";
 export * from "./jobs/queue.js";
