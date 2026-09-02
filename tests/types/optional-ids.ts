@@ -1,6 +1,6 @@
 import {
   defineAgent,
-  defineConfig,
+  defineApp,
   defineBucket,
   defineCache,
   defineEnv,
@@ -80,7 +80,7 @@ void optionalServiceId;
 void optionalToolId;
 void optionalAgentId;
 
-defineConfig({ env: defineEnv({}) });
+defineApp({ env: defineEnv({}) });
 // @ts-expect-error event IDs are mandatory
 defineEvent({ version: 1, input: input });
 // @ts-expect-error job IDs are mandatory

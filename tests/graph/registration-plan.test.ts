@@ -1,11 +1,12 @@
 import { describe, expect, test } from "bun:test";
+import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
 import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
 function graph(): ApplicationGraph {
   return {
-    contractVersion: 3,
+    contractVersion: GRAPH_VERSION,
     appId: "orders",
     nodes: [
       {
@@ -112,14 +113,22 @@ function graph(): ApplicationGraph {
       },
       {
         kind: "provider",
-        id: "provider.buckets.default",
+        id: "provider.bucket.default",
         source,
         profile: "default",
-        capability: "buckets",
-        adapter: "s3",
-        ownership: "managed",
-        configuration: {},
-        environment: [],
+        capability: "bucket",
+        adapter: {
+          integrationId: "s3",
+          adapterId: "s3",
+          protocolVersion: 1,
+          behavior: {},
+          connectionContract: {},
+          connection: {},
+          features: [],
+        },
+        providerSource: { kind: "connected" },
+        namedValues: [],
+        deploymentRoles: [],
       },
       {
         kind: "service",
