@@ -34,8 +34,13 @@ describe("defineService", () => {
   });
 
   test("accepts empty and event-only services", () => {
+    const eventOnly = defineEvent({
+      id: "events.created",
+      version: 1,
+      input: z.object({ id: z.string() }),
+    });
     expect(isServiceDescriptor(defineService({ id: "empty" }))).toBe(true);
-    expect(defineService({ id: "events", events: { created } }).created).toBe(created);
+    expect(defineService({ id: "events", events: { created: eventOnly } }).created).toBe(eventOnly);
   });
 
   test("rejects invalid and reserved members", () => {
@@ -44,6 +49,16 @@ describe("defineService", () => {
     );
     expect(() => defineService({ id: "bad", functions: { lookup: {} as typeof lookup } })).toThrow(
       "Invalid service function",
+    );
+    const member = defineFunction({
+      id: "shared.member",
+      input: z.object({}),
+      output: z.object({}),
+      handler: () => ({}),
+    });
+    defineService({ id: "first", functions: { member } });
+    expect(() => defineService({ id: "second", functions: { member } })).toThrow(
+      "already belongs to another service",
     );
   });
 });

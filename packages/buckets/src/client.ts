@@ -18,6 +18,7 @@ import {
 } from "./client-types.js";
 import {
   assertKey,
+  assertPrefix,
   assertText,
   asProvider,
   classify,
@@ -145,7 +146,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       );
     },
     list: (prefix?: string) => {
-      if (prefix !== undefined) assertKey(prefix);
+      if (prefix !== undefined) assertPrefix(prefix);
       return call(
         "list",
         (context) => required(provider.list, "list")(prefix, context),

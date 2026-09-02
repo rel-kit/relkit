@@ -104,7 +104,10 @@ export function validateText(value: string): string {
   return value;
 }
 export function assertKey(value: string): void {
-  if (typeof value !== "string") throw new TypeError("Bucket key must be a string");
+  assertPortableKey(value, false);
+}
+export function assertPrefix(value: string): void {
+  assertPortableKey(value, true);
 }
 export function assertText(value: string, name: string): void {
   if (typeof value !== "string" || value.trim() === "")
@@ -115,5 +118,29 @@ export function notify<T>(hook: ((value: T) => void) | undefined, value: T): voi
     hook?.(Object.freeze(value));
   } catch {
     // Hooks are advisory and cannot change provider behavior.
+  }
+}
+
+function assertPortableKey(value: string, prefix: boolean): void {
+  if (typeof value !== "string") throw new TypeError("Bucket key must be a string");
+  if (prefix && value === "") return;
+  const segments = value.split("/");
+  const invalidSegment = segments.some(
+    (segment, index) =>
+      (segment === "" && !(prefix && index === segments.length - 1)) ||
+      segment === "." ||
+      segment === "..",
+  );
+  if (
+    value.includes("\0") ||
+    value.includes("\\") ||
+    value.startsWith("/") ||
+    /^[A-Za-z]:/.test(value) ||
+    new TextEncoder().encode(value).byteLength > 4_096 ||
+    invalidSegment ||
+    segments[0]?.startsWith(".relkit") ||
+    segments[0]?.startsWith("__relkit")
+  ) {
+    throw new TypeError("Bucket key is invalid");
   }
 }
