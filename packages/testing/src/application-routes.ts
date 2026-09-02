@@ -54,9 +54,9 @@ export async function loadTestRoutes(root: string): Promise<readonly TestRoute[]
   for (const file of files.sort()) {
     const sourcePath = `src/routes/${file.replaceAll("\\", "/")}`;
     const parsed = parseRouteFilePath(sourcePath);
-    const module = (await import(
-      `${pathToFileURL(join(directory, file)).href}?relkit_test=1`
-    )) as Readonly<Record<string, unknown>>;
+    const module = (await import(pathToFileURL(join(directory, file)).href)) as Readonly<
+      Record<string, unknown>
+    >;
     for (const method of methods) {
       const route = module[method];
       if (method === "ALL" && isRawRoute(route)) {

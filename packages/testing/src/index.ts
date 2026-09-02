@@ -17,6 +17,7 @@ export { createTestApplication } from "./application.js";
 export type { TestApplication, TestApplicationOptions } from "./application.js";
 export { createTestFakes } from "./fakes.js";
 export type { TestFailureControls, TestFakes, TestFakesOptions } from "./fakes.js";
+export type { TestProviderReplacements } from "./provider-replacements.js";
 export { createTestBucket, createTestBucketFake } from "./buckets.js";
 export type { TestBucketFake, TestBucketFakeOptions, TestBucketObject } from "./buckets.js";
 export { createTestCache, createTestCacheFake } from "./cache.js";

@@ -58,12 +58,13 @@ describe("testing runtime foundation", () => {
         buckets: {
           assets: { ref: { kind: "bucket", id: "testing.assets" } },
         },
-        events: {
-          notice: {
-            ref: { kind: "event", id: "testing.notice" },
-            version: 1,
-            payload: z.object({ message: z.string() }),
-          },
+      },
+      publishes: ["testing.notice"],
+      publications: {
+        "testing.notice": {
+          ref: { kind: "event", id: "testing.notice" },
+          version: 1,
+          input: z.object({ message: z.string() }),
         },
       },
       handler: async (
@@ -74,10 +75,12 @@ describe("testing runtime foundation", () => {
               put(key: string, bytes: Uint8Array, options: unknown): Promise<void>;
             };
           };
-          readonly events: { readonly notice: { publish(value: unknown): Promise<unknown> } };
+          readonly events: {
+            readonly "testing.notice": { publish(value: unknown): Promise<unknown> };
+          };
         },
       ) => {
-        const result = (await context.events.notice.publish(input)) as {
+        const result = (await context.events["testing.notice"].publish(input)) as {
           readonly accepted: boolean;
         };
         await context.buckets.assets.put(
@@ -105,6 +108,16 @@ describe("testing runtime foundation", () => {
     expect(runtime.env).toEqual({ port: 0, required: "ok" });
     expect(Object.isFrozen(runtime.env)).toBe(true);
     expect(() => createTestRuntime({ app, env: { port: "bad", required: "ok" } })).toThrow();
+  });
+
+  test("retains only explicitly named provider replacements", async () => {
+    const replacement = Object.freeze({ fake: true });
+    const runtime = createTestRuntime({
+      providers: { cache: { requests: replacement } },
+    });
+    expect(runtime.providers).toEqual({ cache: { requests: replacement } });
+    expect(runtime.fakes.providers.cache?.requests).toBe(replacement);
+    await runtime.close();
   });
 
   test("uses deterministic time and closes pending work within its bound", async () => {

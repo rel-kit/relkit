@@ -14,6 +14,7 @@ import { combineSignals, createDeterministicClock } from "./runtime-clock.js";
 import { createTestStateRoot } from "./state-root.js";
 import { createTestContextFactory } from "./runtime-context.js";
 import { closeRuntime } from "./runtime-close.js";
+import type { TestProviderReplacements } from "./provider-replacements.js";
 
 export interface TestRuntimeOptions {
   readonly registry?: FunctionRegistry;
@@ -23,6 +24,7 @@ export interface TestRuntimeOptions {
   readonly startTimeMs?: number;
   readonly closeTimeoutMs?: number;
   readonly context?: Readonly<Record<string, unknown>>;
+  readonly providers?: TestProviderReplacements;
   /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
   readonly stateRoot?: string;
 }
@@ -41,6 +43,7 @@ export interface TestClock {
 export interface TestRuntime {
   readonly stateRoot: string;
   readonly fakes: TestFakes;
+  readonly providers: TestProviderReplacements;
   readonly env: Readonly<Record<string, unknown>>;
   readonly clock: TestClock;
   readonly invoke: <Target extends StandaloneFunctionTarget>(
@@ -60,6 +63,7 @@ export function createTestRuntime(options: TestRuntimeOptions = {}): TestRuntime
   const stateRoot = createTestStateRoot(options.stateRoot);
   const fakes = createTestFakes(stateRoot.path, {
     clock: deterministic.clock.currentTimeMs,
+    ...(options.providers === undefined ? {} : { providers: options.providers }),
   });
   const runner: InvocationRunner = {
     run: (effect, runOptions) => deterministic.run(effect, runOptions),
@@ -131,6 +135,7 @@ export function createTestRuntime(options: TestRuntimeOptions = {}): TestRuntime
   return Object.freeze({
     stateRoot: stateRoot.path,
     fakes,
+    providers: fakes.providers,
     env: resolvedEnv,
     clock: deterministic.clock,
     invoke,
