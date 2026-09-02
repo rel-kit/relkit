@@ -1,10 +1,26 @@
 import { afterAll, expect, test } from "bun:test";
 import { resolve } from "node:path";
-import { createTestApplication } from "@relkit/testing";
+import { createTestApplication, createTestBucketFake, createTestCacheFake } from "@relkit/testing";
 import config from "../relkit.config.js";
 
+const assets = createTestBucketFake({ bucketId: "assets" });
 const application = await createTestApplication(config, {
   projectRoot: resolve(import.meta.dir, ".."),
+  providers: {
+    bucket: {
+      assets,
+      receipts: createTestBucketFake({ bucketId: "receipts" }),
+    },
+    cache: {
+      requests: createTestCacheFake({ cacheId: "requests" }),
+      timeline: createTestCacheFake({ cacheId: "timeline" }),
+    },
+    model: {
+      openai: {
+        resolveModel: (selector = "openai:gpt-5-mini") => ({ id: selector, model: {} }),
+      },
+    },
+  },
 });
 
 test("exercises file routes, inferred requests, middleware, methods, and uploads", async () => {
@@ -42,9 +58,7 @@ test("exercises file routes, inferred requests, middleware, methods, and uploads
     label: "receipts",
     files: ["primary.png", "detail.png"],
   });
-  const assetsBucket = application.fakes.buckets.assets;
-  if (assetsBucket === undefined) throw new Error("Assets bucket fake was not created");
-  expect(assetsBucket.inspect().map(({ key }) => key)).toEqual(["detail.png", "primary.png"]);
+  expect(assets.inspect().map(({ key }) => key)).toEqual(["detail.png", "primary.png"]);
 });
 
 afterAll(() => application.close());

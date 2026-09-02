@@ -1,17 +1,17 @@
 import { defineFunction } from "@relkit/app/functions";
-import assets from "@app/assets/buckets/assets.bucket.js";
+import receipts from "@app/receipts/buckets/receipts.bucket.js";
 import { receiptInput, receiptOutput } from "@app/platform/schemas.js";
 
 const sendReceipt = defineFunction({
   input: receiptInput,
   output: receiptOutput,
-  dependencies: { buckets: { assets } },
+  dependencies: { buckets: { receipts } },
   handler: async (input, context) => {
     context.log.info("receipt.sent", {
       orderId: input.orderId,
       receiptKey: input.receiptKey,
     });
-    await context.buckets.assets.put(
+    await context.buckets.receipts.put(
       input.receiptKey,
       new TextEncoder().encode(JSON.stringify({ orderId: input.orderId })),
       { contentType: "application/json" },
