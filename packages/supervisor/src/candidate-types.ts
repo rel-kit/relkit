@@ -9,6 +9,7 @@ export interface CandidateCompileRequest {
 
 export interface CandidateCompileResult {
   readonly entrypoint: string;
+  readonly environment?: Readonly<Record<string, string | undefined>>;
 }
 
 export type CandidateCompile = (
@@ -54,6 +55,7 @@ export interface CompiledCandidate {
   readonly token: SupervisorCandidateToken;
   readonly directory: string;
   readonly entrypoint: string;
+  readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly cleanup: () => Promise<void>;
 }
 

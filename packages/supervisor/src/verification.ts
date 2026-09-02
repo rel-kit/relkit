@@ -1,4 +1,5 @@
-import { API_VERSION } from "@relkit/contracts";
+import { API_VERSION, isRuntimeActivationFingerprint } from "@relkit/contracts";
+import { verifyActivationFingerprint } from "./verification-fingerprint.js";
 import {
   pollHealth,
   readinessState,
@@ -26,12 +27,14 @@ export async function verifyCandidate(
   try {
     const live = await pollHealth(options, "/health/live", deadline, (probe) => {
       identitySeen ||= verifyIdentity(probe.payload, options.candidate.token);
+      verifyActivationFingerprint(probe.payload, options.activationFingerprint);
       return probe.response.ok && probe.payload.status === "ok";
     });
     identitySeen ||= verifyIdentity(live.payload, options.candidate.token);
 
     const ready = await pollHealth(options, "/health/ready", deadline, (probe) => {
       identitySeen ||= verifyIdentity(probe.payload, options.candidate.token);
+      verifyActivationFingerprint(probe.payload, options.activationFingerprint);
       const readiness = readinessState(probe.payload);
       return (
         probe.response.ok &&
@@ -43,6 +46,10 @@ export async function verifyCandidate(
     identitySeen ||= verifyIdentity(ready.payload, options.candidate.token);
     const graph = await requiredProbe(options, "/graph", deadline);
     identitySeen ||= verifyIdentity(graph.payload, options.candidate.token);
+    const activationFingerprint = verifyActivationFingerprint(
+      graph.payload,
+      options.activationFingerprint,
+    );
     const graphValues = verifyGraph(graph.payload, options);
     if (!identitySeen)
       throw new CandidateVerificationError(
@@ -52,6 +59,7 @@ export async function verifyCandidate(
     return Object.freeze({
       token: options.candidate.token,
       ...graphValues,
+      activationFingerprint,
       apiVersion: API_VERSION,
       environmentReady: true,
       providerReady: true,
@@ -65,7 +73,8 @@ export async function verifyCandidate(
 function validateOptions(options: CandidateVerificationOptions, timeout: number): void {
   if (!Number.isSafeInteger(options.candidate.port) || options.candidate.port < 1)
     throw new TypeError("Candidate verification requires a valid backend port.");
-  if (options.graphHash.trim() === "") throw new TypeError("Candidate graph hash is required.");
+  if (!isRuntimeActivationFingerprint(options.activationFingerprint))
+    throw new TypeError("Candidate activation fingerprint is required.");
   if (!Number.isSafeInteger(timeout) || timeout < 1)
     throw new RangeError("healthTimeoutMs must be a positive safe integer.");
   if (options.signal?.aborted)

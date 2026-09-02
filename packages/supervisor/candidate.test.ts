@@ -18,9 +18,9 @@ test("starts a token-scoped Bun backend on a dynamic port and disposes only itse
       const entrypoint = join(outputDirectory, "server.ts");
       await writeFile(
         entrypoint,
-        'Bun.serve({ port: Number(process.env.PORT), fetch: () => new Response("candidate") });',
+        "Bun.serve({ port: Number(process.env.PORT), fetch: () => new Response(process.env.CANDIDATE_VALUE) });",
       );
-      return { entrypoint };
+      return { entrypoint, environment: { CANDIDATE_VALUE: "candidate" } };
     },
   });
 

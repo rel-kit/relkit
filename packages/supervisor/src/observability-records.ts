@@ -4,6 +4,7 @@ import {
   type GenerationEvent,
   type GenerationRecord,
 } from "@relkit/observability";
+import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type {
   SupervisorCandidateToken,
   SupervisorOutcomeTelemetry,
@@ -17,14 +18,15 @@ export interface SupervisorTelemetryRecord {
 
 export function recordsForTelemetry(
   event: SupervisorTelemetry,
-  graphHash: (token: SupervisorCandidateToken) => string,
+  activationFingerprint: (token: SupervisorCandidateToken) => RuntimeActivationFingerprint,
   now: () => number,
 ): readonly SupervisorTelemetryRecord[] {
   if (event.type !== "outcome") return [];
   const occurredAt = new Date(now()).toISOString();
   const target = event.phase === "drain" ? event.previousGeneration : undefined;
   const token = target ?? tokenFor(event);
-  const hash = graphHash(token);
+  const fingerprint = activationFingerprint(token);
+  const hash = fingerprint.graphHash;
   const generationId = generationIdFor(token);
   const lifecycle = lifecycleFor(event);
   const generation: GenerationRecord = {
@@ -32,6 +34,7 @@ export function recordsForTelemetry(
     signal: "generation",
     generationId,
     graphHash: hash,
+    activationFingerprint: fingerprint,
     event: lifecycle,
     occurredAt,
     sourceVersion: token.sourceToken,
@@ -61,7 +64,8 @@ export function recordsForTelemetry(
         version: OBSERVABILITY_MODEL_VERSION,
         signal: "generation",
         generationId: generationIdFor(previous),
-        graphHash: graphHash(previous),
+        graphHash: activationFingerprint(previous).graphHash,
+        activationFingerprint: activationFingerprint(previous),
         event: "draining",
         occurredAt,
         sourceVersion: previous.sourceToken,

@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise, RuntimeActivationFingerprint } from "@relkit/contracts";
 import type {
   ObservabilityCollector,
   ObservabilityRecord,
@@ -11,11 +11,15 @@ import type {
   SupervisorTelemetryListener,
 } from "./state-machine-types.js";
 
-export type SupervisorGraphHash =
-  string | ((token: SupervisorCandidateToken, event: SupervisorTelemetry) => string | undefined);
+export type SupervisorActivationFingerprint =
+  | RuntimeActivationFingerprint
+  | ((
+      token: SupervisorCandidateToken,
+      event: SupervisorTelemetry,
+    ) => RuntimeActivationFingerprint | undefined);
 
 export interface SupervisorObservabilityOptions {
-  readonly graphHash: SupervisorGraphHash;
+  readonly activationFingerprint: SupervisorActivationFingerprint;
   readonly collector?: Pick<ObservabilityCollector, "collect">;
   readonly stream?: Pick<ObservabilityStream, "publishRecord">;
   readonly append?: (record: ObservabilityRecord) => MaybePromise<unknown>;

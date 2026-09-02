@@ -5,6 +5,11 @@ import { verifyCandidate, type CandidateVerificationCandidate } from "./src/veri
 
 const token = { sourceToken: 2, generationToken: 3 } as const;
 const graphHash = "sha256:candidate";
+const activationFingerprint = {
+  graphHash,
+  manifestHash: "sha256:manifest",
+  runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+} as const;
 
 test("verifies v1 API, generation, graph/manifest identity, and readiness", async () => {
   let disposed = 0;
@@ -13,7 +18,7 @@ test("verifies v1 API, generation, graph/manifest identity, and readiness", asyn
       disposed += 1;
       return Promise.resolve();
     }),
-    graphHash,
+    activationFingerprint,
     fetch: responseFor({ graphHash, manifestGraphHash: graphHash }),
   });
 
@@ -21,6 +26,7 @@ test("verifies v1 API, generation, graph/manifest identity, and readiness", asyn
     token,
     graphHash,
     manifestGraphHash: graphHash,
+    activationFingerprint,
     graphContractVersion: GRAPH_VERSION,
     manifestContractVersion: MANIFEST_VERSION,
     manifestGeneratorVersion: GENERATOR_VERSION,
@@ -47,7 +53,7 @@ test("verification failure disposes only the candidate and preserves active stat
   await expect(
     verifyCandidate({
       candidate,
-      graphHash,
+      activationFingerprint,
       fetch: responseFor(
         { graphHash, manifestGraphHash: "sha256:other" },
         API_VERSION,
@@ -68,7 +74,7 @@ test("waits for provider readiness before requesting the gated graph endpoint", 
   const respond = responseFor({ graphHash, manifestGraphHash: graphHash });
   const result = await verifyCandidate({
     candidate: candidateFor(token),
-    graphHash,
+    activationFingerprint,
     fetch: async (input, init) => {
       const path = new URL(input.toString()).pathname;
       if (path.endsWith("/health/ready") && ++readyProbes === 1) {
@@ -78,6 +84,7 @@ test("waits for provider readiness before requesting the gated graph endpoint", 
             version: API_VERSION,
             ...token,
             status: "not-ready",
+            activationFingerprint,
             environmentReady: true,
             providerReady: false,
           },
@@ -97,7 +104,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       fetch: responseFor({ graphHash, manifestGraphHash: graphHash }, API_VERSION, {
         sourceToken: token.sourceToken,
         generationToken: 99,
@@ -108,7 +115,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       fetch: responseFor({ graphHash, manifestGraphHash: graphHash }, API_VERSION + 1),
     }),
   ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_API_VERSION_UNSUPPORTED" });
@@ -116,7 +123,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       fetch: responseFor({
         graphHash,
         manifestGraphHash: graphHash,
@@ -128,7 +135,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       healthTimeoutMs: 5,
       fetch: responseFor({
         graphHash,
@@ -142,7 +149,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       healthTimeoutMs: 5,
       fetch: responseFor({
         graphHash,
@@ -156,7 +163,7 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
   await expect(
     verifyCandidate({
       candidate: candidateFor(token),
-      graphHash,
+      activationFingerprint,
       healthTimeoutMs: 10,
       fetch: (_input, init) =>
         new Promise<Response>((_, reject) =>
@@ -166,6 +173,41 @@ test("rejects generation, API, readiness, and health-timeout failures", async ()
         ),
     }),
   ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_HEALTH_TIMEOUT" });
+
+  await expect(
+    verifyCandidate({
+      candidate: candidateFor(token),
+      activationFingerprint,
+      fetch: responseFor({
+        graphHash,
+        manifestGraphHash: graphHash,
+        activationFingerprint: { ...activationFingerprint, manifestHash: "sha256:other" },
+      }),
+    }),
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_ACTIVATION_MISMATCH" });
+});
+
+test("rejects a stale provider override generation before activation", async () => {
+  const expected = {
+    ...activationFingerprint,
+    localServicesPlanHash: "sha256:local-services",
+    providerOverridesGeneration: "generation-2",
+  };
+
+  await expect(
+    verifyCandidate({
+      candidate: candidateFor(token),
+      activationFingerprint: expected,
+      fetch: responseFor({
+        graphHash,
+        manifestGraphHash: graphHash,
+        activationFingerprint: {
+          ...expected,
+          providerOverridesGeneration: "generation-1",
+        },
+      }),
+    }),
+  ).rejects.toMatchObject({ code: "RELKIT_CANDIDATE_ACTIVATION_MISMATCH" });
 });
 
 function candidateFor(
@@ -199,11 +241,19 @@ function responseFor(
             providerReady: typeof graph.providerReady === "boolean" ? graph.providerReady : true,
             ...identity,
           };
-    return new Response(JSON.stringify({ protocol: "relkit.inspector", version, ...body }), {
-      headers: {
-        "content-type": "application/json",
-        "x-relkit-api-version": String(version),
+    return new Response(
+      JSON.stringify({
+        protocol: "relkit.inspector",
+        version,
+        activationFingerprint: graph.activationFingerprint ?? activationFingerprint,
+        ...body,
+      }),
+      {
+        headers: {
+          "content-type": "application/json",
+          "x-relkit-api-version": String(version),
+        },
       },
-    });
+    );
   };
 }
