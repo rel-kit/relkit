@@ -23,6 +23,7 @@ export class DescriptorIdentityError extends TypeError {
 
 const canonicalIdentities = new WeakMap<object, string>();
 const unboundIdentities = new WeakMap<object, string>();
+const descriptorServices = new WeakMap<object, object & DescriptorIdentitySource>();
 
 /** Creates a process-local diagnostic identity that is not a canonical address. */
 export function createUnboundIdentity(): string {
@@ -51,6 +52,29 @@ export function bindDescriptorIdentity<T extends object>(descriptor: T, id: stri
 
 export function isDescriptorIdentityBound(descriptor: object): boolean {
   return canonicalIdentities.has(descriptor);
+}
+
+/** Associates identity-preserving members with one service without mutating them. */
+export function bindDescriptorServiceMembers<T extends object>(
+  descriptors: readonly T[],
+  service: object & DescriptorIdentitySource,
+): readonly T[] {
+  assertObject(service);
+  for (const descriptor of descriptors) {
+    assertObject(descriptor);
+    const existing = descriptorServices.get(descriptor);
+    if (existing !== undefined && existing !== service) {
+      throw new DescriptorIdentityError("Descriptor already belongs to another service");
+    }
+  }
+  for (const descriptor of descriptors) descriptorServices.set(descriptor, service);
+  return descriptors;
+}
+
+export function getDescriptorServiceIdentity(descriptor: object): string | undefined {
+  assertObject(descriptor);
+  const service = descriptorServices.get(descriptor);
+  return service === undefined ? undefined : getDescriptorIdentity(service);
 }
 
 export function resolveDescriptorIdentity(
