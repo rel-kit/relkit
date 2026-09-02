@@ -37,6 +37,7 @@ export const publicApplicationPackages = new Set([
   "@relkit/drizzle",
   "@relkit/events",
   "@relkit/functions",
+  "@relkit/integrations",
   "@relkit/jobs",
   "@relkit/routes",
   "@relkit/schema",
@@ -77,7 +78,8 @@ export const internalRuntimePackages = new Set([
 export const dependencyNeutralPackages = new Set(["@relkit/invocation"]);
 
 export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>>([
-  ["@relkit/agents", new Set(["ai", "@ai-sdk/anthropic", "@ai-sdk/openai"])],
+  ["@relkit/agents", new Set(["ai"])],
+  ["@relkit/app", new Set(["@relkit/observability/telemetry"])],
   ["@relkit/routes", new Set(["hono"])],
 ]);
 

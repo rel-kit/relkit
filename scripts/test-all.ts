@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
 const localLayers = [
   "test:types",
+  "test:packages",
   "test:unit",
   "test:compiler",
   "test:contracts",
