@@ -9,7 +9,7 @@ points at a function; it cannot contain a `handler` of its own.
 ## Start from the function contract
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+  ../../apps/docs/examples/jobs/send-receipt.job.ts
 </include>
 
 `id`, `input`, `target`, and `retry` are required. In this example the job and target reuse `receiptInput`.
@@ -43,31 +43,21 @@ instances, functions, credentials, or provider clients. Store large files throug
 and pass their object keys. Validate authorization before acceptance and recheck mutable business state
 inside the target when necessary.
 
-## Bind a jobs provider
+## Bind a job integration
 
-Provider configuration belongs in `relkit.config.ts`, not in the handler. Add this `jobs` entry directly
-inside `defineConfig()`:
+Provider configuration belongs in `relkit.config.ts`, not in the handler. Add a compatible queue adapter
+under singular `job`; use a profile map when the application has multiple physical queues. This example
+selects profile `queue`, so the application must expose that exact profile or choose it through
+`defaults.job`.
 
-<include cwd lang="ts" meta='title="relkit.config.ts — jobs"'>
-  ../../examples/commerce/relkit.config.ts#jobs-profile
-</include>
+Connection values belong to the adapter's binding contract. Use named binding references for queue URLs
+and credentials instead of adding them to handler-visible `ctx.env`. A direct configured adapter is a
+connected resource; an infrastructure wrapper owns lifecycle only when that integration explicitly
+supports the adapter. No `RELKIT_ENV` branch or test mode silently replaces it.
 
-It imports `managed` and `sqs` from `@relkit/app/config`, and `env` from `@app/platform/env.js`. Set
-`defaults.job` to `"default"` if jobs should use this profile without declaring `profile` individually.
-Merge the entry into the existing configuration; do not replace other providers.
-
-Add these fields inside the application's `defineEnv()` call. The snippet uses `envFactory`; import
-`env as envFactory` from `@relkit/app/config` if that alias is not already present:
-
-<include cwd lang="ts" meta='title="src/platform/env.ts — jobs fields"'>
-  ../../examples/commerce/src/platform/env.ts#jobs-environment
-</include>
-
-The localhost endpoint and queue URL are example configuration, not a provisioned queue. Test mode
-substitutes local providers; development or production using SQS needs a reachable queue and appropriate
-credentials. Profile names select bindings, not a guarantee of a separate physical queue per job.
-Use [Providers](/docs/fundamentals/providers) and [Deployment](/docs/operations/deployment) for environment
-and infrastructure ownership.
+The bundled deterministic harness can test job behavior without a production queue. A full development or
+deployment run still needs a selected job integration. See [Integrations](/docs/integrations)
+for source forms and [Testing](/docs/operations/testing) for explicit replacements.
 
 ## Check the domain and graph
 

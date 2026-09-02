@@ -12,7 +12,7 @@ Create the files shown below. If your app already has the Orders example, update
     ### Define the event
 
     <include cwd lang="ts" meta='title="src/orders/events/order-created.event.ts"'>
-      ../../templates/default/v1/api/src/orders/events/order-created.event.ts
+      ../../apps/docs/examples/events/order-created.event.ts
     </include>
 
     `orders.created` carries the order ID, product code, and total.
@@ -30,7 +30,7 @@ Create the files shown below. If your app already has the Orders example, update
     Create the order and publish its details:
 
     <include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
-      ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+      ../../apps/docs/examples/events/create-order.function.ts
     </include>
 
     `publishes` allows this function to send `orders.created`. The handler returns the order without waiting for the confirmation.
@@ -40,7 +40,7 @@ Create the files shown below. If your app already has the Orders example, update
     ### Consume the event
 
     <include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
-      ../../templates/default/v1/api/src/orders/functions/order-confirmation.function.ts
+      ../../apps/docs/examples/events/order-confirmation.function.ts
     </include>
 
     `event: "orders.created"` subscribes this function to the event. Its handler receives the order details.
@@ -63,37 +63,25 @@ Create the files shown below. If your app already has the Orders example, update
 
   </Step>
   <Step>
-    ### Run locally
+    ### Check and test delivery
 
-    Check the app:
+    Configure a compatible event adapter under singular `event`, then check the graph:
 
     ```sh
     bun run check
+    bun run typecheck
     ```
 
-    Once the check passes, start the app:
+    No environment mode silently substitutes an event provider. For a credential-free behavior test, use
+    the deterministic event harness:
 
-    ```sh
-    RELKIT_ENV=test bun run dev
-    ```
+    <include cwd lang="ts" meta='title="packages/testing/events.test.ts"'>
+      ../../packages/testing/events.test.ts
+    </include>
 
-    `RELKIT_ENV=test` lets you try events locally without AWS credentials. For deployment, [configure an event provider](/docs/fundamentals/providers).
-
-    Keep the app running. In another terminal, create an order:
-
-    ```sh
-    curl -i http://localhost:3000/orders \
-      -H 'Content-Type: application/json' \
-      -d '{"orderId":"order-100","sku":"book","quantity":3}'
-    ```
-
-    Expect HTTP 201:
-
-    ```json
-    { "orderId": "order-100", "sku": "book", "totalCents": 300 }
-    ```
-
-    In the app terminal, look for `order.confirmation.requested` with `orderId=order-100`. The response does not wait for the confirmation to finish.
+    Run `bun test` and verify publication acceptance separately from consumer completion. A full local or
+    deployed run needs the explicitly selected event integration described in
+    [Integrations](/docs/integrations).
 
   </Step>
 </Steps>
@@ -108,6 +96,8 @@ cp src/orders/functions/order-confirmation.function.ts src/orders/functions/orde
 
 Change the copy's `id` to `orders.analytics` and its log message to `order.analytics.recorded`. Keep `event: "orders.created"`.
 
-Run `bun run check` and wait for the app to reload. Repeat the curl request with `orderId` set to `order-101`. Look for both `order.confirmation.requested` and `order.analytics.recorded` with that ID. You added a reaction without changing the publishing function.
+After configuring an event binding and starting the app, call the publishing route with `orderId` set to
+`order-101`. Look for both `order.confirmation.requested` and `order.analytics.recorded` with that ID. You
+added a reaction without changing the publishing function.
 
 Open `orders.created` in the Inspector at `http://localhost:3210` to see both subscribers under **Consumer functions**.

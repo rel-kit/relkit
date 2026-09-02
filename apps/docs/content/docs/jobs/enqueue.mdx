@@ -11,7 +11,7 @@ then use its named client on `context.jobs`. Importing the descriptor alone does
 The tested Receipts producer is small:
 
 <include cwd lang="ts" meta='title="src/receipts/functions/queue-receipt.function.ts"'>
-  ../../examples/commerce/tests/fixtures/queue-receipt.function.ts
+  ../../apps/docs/examples/jobs/queue-receipt.function.ts
 </include>
 
 Copy it into `src/receipts/functions/` when adding it to an application. It reuses the job's input schema
@@ -48,16 +48,10 @@ expose a normal service function; do not promise an in-memory queue record as a 
 
 ## Enqueue from an event subscriber
 
-The existing Receipts event function looks up an order through its public service, then queues the receipt:
-
-<include cwd lang="ts" meta='title="src/receipts/functions/order-receipt.function.ts"'>
-  ../../examples/commerce/src/receipts/functions/order-receipt.function.ts
-</include>
-
-Its subscription uses event delivery, while the receipt target uses job delivery. They are separate
-attempts with separate retry policies. Re-delivery of the event can enqueue again, so choose
-[idempotency](/docs/jobs/idempotency) deliberately. If a second queue adds no useful execution boundary,
-do the work in the event function instead. See [consume an event](/docs/events/consume).
+An event function can declare the same job dependency and await `enqueue`. Event delivery and job delivery
+remain separate attempts with separate profiles and retry policies. Re-delivery of the event can enqueue
+again, so choose [idempotency](/docs/jobs/idempotency) deliberately. If a second queue adds no useful
+execution boundary, do the work in the event function instead. See [consume an event](/docs/events/consume).
 
 ## Plan for uncertain acceptance
 
