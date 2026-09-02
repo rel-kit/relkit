@@ -1,5 +1,5 @@
 import { canonicalJson } from "@relkit/contracts";
-import type { DeploymentPlan } from "@relkit/deploy";
+import { assertDeploymentPlanVersion, type DeploymentPlan } from "@relkit/deploy";
 
 export interface ResourceEntry {
   readonly kind: string;
@@ -8,6 +8,7 @@ export interface ResourceEntry {
 }
 
 export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
+  assertDeploymentPlanVersion(plan);
   const value = JSON.parse(canonicalJson(plan)) as DeploymentPlan;
   return {
     ...value,
@@ -42,29 +43,12 @@ export function snapshotPlan(plan: DeploymentPlan): DeploymentPlan {
           left.resourceId.localeCompare(right.resourceId),
       ),
     },
-    ...(value.observability === undefined
-      ? {}
-      : {
-          observability: {
-            ...value.observability,
-            configurationNames: [...value.observability.configurationNames].sort(),
-          },
-        }),
   };
 }
 
 export function resourceEntries(plan: DeploymentPlan): readonly ResourceEntry[] {
   return [
     { kind: "http", logicalName: plan.http.logicalName, value: plan.http },
-    ...(plan.observability === undefined
-      ? []
-      : [
-          {
-            kind: "observability",
-            logicalName: plan.observability.logicalName,
-            value: plan.observability,
-          },
-        ]),
     ...plan.jobs.map((value) => ({ kind: "job", logicalName: value.logicalName, value })),
     ...plan.schedules.map((value) => ({ kind: "schedule", logicalName: value.logicalName, value })),
     ...plan.events.map((value) => ({ kind: "event", logicalName: value.logicalName, value })),
