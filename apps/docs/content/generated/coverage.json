@@ -7,7 +7,7 @@
       "summary": "Define application identity and runtime topology.",
       "guide": "fundamentals/application",
       "apiPackage": "app",
-      "entrypoints": [{ "source": "packages/app/src/config.ts", "name": "defineConfig" }],
+      "entrypoints": [{ "source": "packages/app/src/define-app.ts", "name": "defineApp" }],
       "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
@@ -22,12 +22,12 @@
     {
       "id": "providers",
       "title": "Provider bindings",
-      "summary": "Choose local, external, or managed infrastructure without changing handlers.",
-      "guide": "fundamentals/providers",
+      "summary": "Choose connected, local, or infrastructure-owned adapters without changing handlers.",
+      "guide": "integrations/index",
       "apiPackage": "app",
       "entrypoints": [
-        { "source": "packages/app/src/providers.ts", "name": "managed" },
-        { "source": "packages/app/src/providers.ts", "name": "external" }
+        { "source": "integrations/packages/docker/src/index.ts", "name": "docker" },
+        { "source": "integrations/packages/aws/src/aws.ts", "name": "aws" }
       ],
       "examples": ["examples/commerce/relkit.config.ts"]
     },
@@ -133,13 +133,13 @@
       "id": "events",
       "title": "Events",
       "summary": "Publish typed facts and process them with independent listeners.",
-      "guide": "async/events",
+      "guide": "events/index",
       "apiPackage": "events",
       "entrypoints": [
         { "source": "packages/events/src/define-event.ts", "name": "defineEvent" },
         { "source": "packages/events/src/define-event-function.ts", "name": "defineEventFunction" }
       ],
-      "examples": ["examples/commerce/src/orders/events/order-created.event.ts"]
+      "examples": ["apps/docs/examples/events/order-created.event.ts"]
     },
     {
       "id": "jobs",
@@ -148,7 +148,7 @@
       "guide": "jobs/define",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"]
     },
     {
       "id": "schedules",
@@ -157,7 +157,7 @@
       "guide": "jobs/schedules",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"]
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"]
     },
     {
       "id": "buckets",
@@ -245,6 +245,48 @@
       "path": "start/local-development",
       "api": ["app", "routes"],
       "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "fundamentals/index"
+    },
+    {
+      "path": "fundamentals/index",
+      "api": ["app", "functions", "schema"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "fundamentals/application"
+    },
+    {
+      "path": "fundamentals/application",
+      "api": ["app"],
+      "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "fundamentals/functions"
+    },
+    {
+      "path": "fundamentals/functions",
+      "api": ["functions"],
+      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+      "next": "fundamentals/schemas"
+    },
+    {
+      "path": "fundamentals/schemas",
+      "api": ["schema"],
+      "examples": ["examples/commerce/src/platform/schemas.ts"],
+      "next": "fundamentals/errors"
+    },
+    {
+      "path": "fundamentals/errors",
+      "api": ["functions"],
+      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
+      "next": "fundamentals/context"
+    },
+    {
+      "path": "fundamentals/context",
+      "api": ["functions"],
+      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"],
+      "next": "fundamentals/environment"
+    },
+    {
+      "path": "fundamentals/environment",
+      "api": ["config"],
+      "examples": ["templates/default/v1/api/src/platform/env.ts"],
       "next": "service/index"
     },
     {
@@ -256,7 +298,7 @@
     {
       "path": "service/domains",
       "api": ["services", "events"],
-      "examples": ["examples/commerce/src/receipts/functions/order-receipt.function.ts"],
+      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"],
       "next": "service/organization"
     },
     {
@@ -364,76 +406,73 @@
     {
       "path": "events/index",
       "api": ["events", "functions"],
-      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+      "examples": ["apps/docs/examples/events/order-created.event.ts"],
       "next": "events/define"
     },
     {
       "path": "events/define",
       "api": ["events"],
-      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+      "examples": ["apps/docs/examples/events/order-created.event.ts"],
       "next": "events/publish"
     },
     {
       "path": "events/publish",
       "api": ["events", "functions"],
-      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+      "examples": ["apps/docs/examples/events/create-order.function.ts"],
       "next": "events/consume"
     },
     {
       "path": "events/consume",
       "api": ["events"],
-      "examples": ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
+      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"],
       "next": "events/first-event"
     },
     {
       "path": "events/first-event",
       "api": ["events", "functions"],
-      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+      "examples": ["apps/docs/examples/events/create-order.function.ts"],
       "next": "jobs/index"
     },
     {
       "path": "jobs/index",
       "api": ["jobs", "services", "functions"],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
       "next": "jobs/define"
     },
     {
       "path": "jobs/define",
       "api": ["jobs", "functions", "config"],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
       "next": "jobs/enqueue"
     },
     {
       "path": "jobs/enqueue",
       "api": ["jobs", "functions", "events"],
-      "examples": ["examples/commerce/tests/fixtures/queue-receipt.function.ts"],
+      "examples": ["apps/docs/examples/jobs/queue-receipt.function.ts"],
       "next": "jobs/retries"
     },
     {
       "path": "jobs/retries",
       "api": ["jobs", "functions", "testing"],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
       "next": "jobs/idempotency"
     },
     {
       "path": "jobs/idempotency",
       "api": ["jobs", "testing"],
-      "examples": ["examples/commerce/tests/jobs.test.ts"],
+      "examples": ["packages/testing/jobs.test.ts"],
       "next": "jobs/schedules"
     },
     {
       "path": "jobs/schedules",
       "api": ["jobs"],
-      "examples": [
-        "examples/commerce/src/receipts/jobs/send-receipt.job.ts",
-        "tests/integration/jobs/commerce-example.test.ts"
-      ],
+      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts", "packages/testing/jobs.test.ts"],
       "next": "jobs/first-job"
     },
     {
       "path": "jobs/first-job",
       "api": ["jobs", "functions", "buckets", "testing"],
-      "examples": ["examples/commerce/tests/jobs.test.ts"],
+      "examples": ["packages/testing/jobs.test.ts"],
       "next": "database/index"
     },
     {
@@ -722,96 +761,39 @@
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
       ],
-      "next": "fundamentals/application"
+      "next": "integrations/index"
     },
     {
-      "path": "fundamentals/application",
-      "api": ["app"],
-      "examples": ["templates/default/v1/api/relkit.config.ts"],
-      "next": "fundamentals/environment"
+      "path": "integrations/index",
+      "api": ["integrations/docker", "integrations/redis", "integrations/s3"],
+      "examples": ["apps/docs/examples/landing/catalog.ts"],
+      "next": "integrations/local-docker"
     },
     {
-      "path": "fundamentals/environment",
-      "api": ["config"],
-      "examples": ["templates/default/v1/api/src/platform/env.ts"],
-      "next": "fundamentals/providers"
+      "path": "integrations/local-docker",
+      "api": ["integrations/docker", "integrations/redis", "integrations/s3"],
+      "examples": [
+        "integrations/packages/redis/src/local-recipe/index.ts",
+        "integrations/packages/s3/src/local-recipe/index.ts"
+      ],
+      "next": "operations/index"
     },
     {
-      "path": "fundamentals/providers",
-      "api": ["app"],
-      "examples": ["examples/commerce/relkit.config.ts"],
-      "next": "fundamentals/schemas"
-    },
-    {
-      "path": "fundamentals/schemas",
-      "api": ["schema"],
-      "examples": ["examples/commerce/src/platform/schemas.ts"],
-      "next": "fundamentals/errors"
-    },
-    {
-      "path": "fundamentals/errors",
-      "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
-      "next": "fundamentals/context"
-    },
-    {
-      "path": "fundamentals/context",
-      "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"],
-      "next": "fundamentals/functions"
-    },
-    {
-      "path": "fundamentals/functions",
-      "api": ["functions"],
-      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
-      "next": "fundamentals/services"
-    },
-    {
-      "path": "fundamentals/services",
-      "api": ["services"],
-      "examples": ["examples/commerce/src/orders/service.ts"],
-      "next": "fundamentals/domain-first-migration"
-    },
-    {
-      "path": "fundamentals/domain-first-migration",
-      "api": ["services", "routes"],
-      "examples": ["examples/commerce/src/orders/service.ts"],
-      "next": "async/jobs"
-    },
-    {
-      "path": "async/jobs",
-      "api": ["jobs"],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
-      "next": "async/schedules"
-    },
-    {
-      "path": "async/schedules",
-      "api": ["jobs"],
-      "examples": ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
-      "next": "async/events"
-    },
-    {
-      "path": "async/events",
-      "api": ["events"],
-      "examples": ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
-      "next": "async/listeners"
-    },
-    {
-      "path": "async/listeners",
-      "api": ["events"],
-      "examples": ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
-      "next": "operations/inspector"
-    },
-    {
-      "path": "operations/inspector",
-      "api": ["app", "routes"],
-      "examples": ["tests/e2e/inspector-redesign.spec.ts"],
+      "path": "operations/index",
+      "api": ["app", "testing"],
+      "examples": ["templates/default/v1/api/package.json"],
       "next": "operations/observability"
     },
     {
       "path": "operations/observability",
       "api": ["functions", "routes"],
       "examples": ["templates/default/v1/api/src/hello/functions/hello.function.ts"],
+      "next": "operations/inspector"
+    },
+    {
+      "path": "operations/inspector",
+      "api": ["app", "routes"],
+      "examples": ["tests/e2e/inspector-redesign.spec.ts"],
       "next": "operations/testing"
     },
     {
