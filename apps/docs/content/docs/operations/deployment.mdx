@@ -1,16 +1,77 @@
 ---
-title: Deployment and AWS
-description: Preview and apply the checked graph through Pulumi, verify outputs, and clean up isolated resources safely.
+title: Deployment
+description: Generate, preview, apply, inspect, and destroy Pulumi stacks from the checked application graph.
 ---
 
-Deployment is an optional continuation after the local production build succeeds. It uses the checked graph
-as input to one generated Pulumi program; application code does not contain infrastructure callbacks.
+Deployment is optional and begins only after the application passes its local checks and build. Pulumi is the
+deployment engine and AWS is the first host integration, but engine, host, application resources, access, and
+runtime wiring remain separate roles.
 
 <Callout type="error" title="Authorization and cost required">
-  The commands in this guide can create billable AWS resources. Use an isolated account/stack,
-  confirm the target, review every preview, and proceed only when authorized to incur cost.
+  These commands can create billable resources. Use an isolated account and stack, confirm the
+  target, review every preview, and continue only when authorized to incur cost.
 </Callout>
 
-<include cwd>../../docs/deployment.md</include>
+## Configure deployment roles
+
+The commerce application imports its integrations, binds local, connected, and infrastructure-owned profiles,
+then selects Pulumi and AWS explicitly:
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+Cloud and deployment default to `none`. A project created with `--cloud aws --deploy pulumi` receives the
+required packages and configuration, but creation, checking, and building still provision nothing.
+
+## Preview before applying
+
+From the generated project:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run test
+bun run build
+bun run relkit doctor --pulumi
+bun run relkit deploy init --stack development
+bun run relkit deploy preview --stack development
+```
+
+Use a separate stack for each isolated environment. Supported backends are Pulumi Cloud, local state, and object
+storage URLs. Use repeatable `--config key=value` options for non-secret values and `--config-secret key=value`
+for Pulumi secrets.
+
+Preview generates and validates the Pulumi program from the graph. Review create, update, replace, and delete
+operations before applying:
+
+```sh title="Terminal — relkit-orders"
+bun run relkit deploy up --stack development
+bun run relkit deploy outputs --stack development
+```
+
+`--non-interactive` (alias `--yes`) approves protected operations for automation; it does not replace review or
+authorization.
+
+## Understand resource ownership
+
+An infrastructure wrapper such as `aws(s3(...))` or `aws(redis(...))` may contribute supported lifecycle and
+least-privilege access operations. A configured adapter passed directly to `defineApp` contributes runtime wiring
+but no resource lifecycle. `docker(adapter)` is development-only and never becomes cloud infrastructure.
+
+The AWS host owns ECS/Fargate hosting, networking, the workload role, load balancing, and CloudWatch routing for
+redacted structured stdout. It does not implicitly own application jobs, events, model providers, Sentry, or
+OTLP.
+
+## Reconcile and clean up
+
+For an isolated temporary stack:
+
+```sh title="Terminal — relkit-orders"
+bun run relkit deploy refresh --stack development
+bun run relkit deploy destroy --stack development
+```
+
+Confirm the stack before destruction and verify cleanup independently. Never edit the generated Pulumi program
+to bypass graph or role validation; repair configuration or integration support, run `check`, and preview again.
 
 <include cwd>content/generated/related/operations-deployment.mdx</include>

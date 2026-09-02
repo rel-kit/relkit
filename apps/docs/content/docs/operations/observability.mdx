@@ -1,73 +1,76 @@
 ---
-title: Traces, logs, metrics, and redaction
-description: Add useful telemetry, correlate it across the common engine, and prevent sensitive values from leaving trust boundaries.
+title: Observability
+description: Capture correlated local evidence, redact it before storage, and export sampled telemetry without coupling handlers to a vendor.
 ---
 
-RELKIT uses OpenTelemetry-compatible trace, metric, and log concepts while keeping application handlers
-independent of a specific backend. Every transport enters the common function engine, which creates spans,
-propagates context, records observed calls, and reports completion outcomes.
+RELKIT records HTTP requests and common-engine invocations with shared graph, trace, correlation, and invocation
+identities. Handlers write structured records through `context.log`; functions, providers, jobs, events, tools,
+and agents contribute correlated spans without importing a telemetry SDK.
 
-## Follow a log into a trace
+## Configure one pipeline
 
-<Steps>
-  <Step>
-    ### Add structured context
+The commerce application combines redacted local capture, bounded retention, export sampling, Sentry, and OTLP:
 
-    The generated hello function demonstrates the recommended logger in executable source:
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts — telemetry"'>
+  ../../examples/commerce/relkit.config.ts#telemetry
+</include>
 
-    <include cwd lang="ts" meta='title="templates/default/v1/api/src/hello/functions/hello.function.ts"'>
-      ../../templates/default/v1/api/src/hello/functions/hello.function.ts
-    </include>
+Sentry and OTLP are independent integrations. Their credentials and endpoints use named binding references, so
+resolved values do not enter the application graph or Inspector payloads.
 
-    Use stable event names and small structured fields. Do not interpolate secrets or entire request bodies.
+## Understand capture order
 
-  </Step>
-  <Step>
-    ### Send a correlated request
-
-    ```sh title="Terminal — relkit-orders"
-    curl "http://localhost:3000/hello?name=Telemetry" \
-      -H "x-correlation-id: docs-telemetry"
-    ```
-
-  </Step>
-  <Step>
-    ### Locate the request, trace, and log
-
-    In the inspector, filter Requests by `/hello`, open the latest record, follow its trace, and expand the
-    function span. The structured log should carry the trace and correlation context without manual IDs in
-    the handler.
-
-  </Step>
-</Steps>
-
-## Understand recorded relationships
-
-HTTP records include route/function identity, graph hash, status, duration, rate-limit outcome, and bounded
-metadata. Jobs and events add instance and attempt identity. Resource, model, tool, and child-function calls
-appear as correlated spans when available.
-
-Descriptor `invoke` calls are observed relationships, not changes to the canonical graph. The graph remains
-deterministic; runtime telemetry describes what actually happened during an invocation.
-
-## Redaction boundary
-
-<Callout type="error" title="Redact before export">
-  Environment secrets, authorization/cookie headers, protected provider configuration, and request
-  bodies under an off or redacted capture policy must be removed before inspector or sink output.
-  Presentation-only masking is not sufficient.
-</Callout>
-
-Use `telemetry.bodyCapture` deliberately. Start with `mode: "off"`; enable bounded capture only for fields
-that are safe and operationally necessary. Verify redaction using synthetic secret values before attaching
-logs or JSON diagnostics to an issue.
-
-```sh title="Terminal — relkit-orders"
-bun run check
-bun run test
+```text title="Telemetry flow"
+runtime event
+→ canonical record
+→ capture policy
+→ redaction
+→ bounded local persistence and live Inspector stream
+→ root trace-consistent sampling
+→ independent exporters
 ```
 
-Successful checks prove the telemetry configuration is graph-valid; tests should assert behavior and safe
-metadata rather than unstable console formatting.
+Local persistence happens before external sampling. With `traceRate: 0.25`, the bounded Inspector store can keep
+a complete redacted local trace even when that trace is not selected for remote export. Child spans inherit the
+root trace decision. Log export follows `minimumLogLevel`; errors and diagnostics are exported unsampled by
+default.
+
+`localRetention` bounds record count, age, and bytes. It is diagnostic evidence, not durable business storage.
+
+## Redact before storage or export
+
+`development-redacted` allows bounded content capture while replacing protected keys and known secret values.
+`maxBytes` is required and prevents oversized content from being retained. Mode `off` omits protected payload
+content entirely.
+
+<Callout type="error" title="UI masking is too late">
+  Authorization and cookie headers, environment secrets, provider credentials, request bodies,
+  prompts, and model results must be removed or redacted before persistence, streaming, or exporter
+  queues.
+</Callout>
+
+Use synthetic secrets in tests and assert that they do not appear in records, diagnostics, generated artifacts,
+or exporter payloads. Redaction is a safety boundary, not permission to log credentials.
+
+## Diagnose exporter health
+
+Exporter fan-out is isolated. A failed Sentry or OTLP exporter cannot block application work or the other
+exporter. Failures increment health counters and create redacted local-only diagnostics that are not sent back
+through the failed exporter.
+
+Start the app and follow one identifiable request:
+
+```sh title="Terminal — relkit-orders"
+bun run dev
+curl "http://localhost:3000/hello?name=Telemetry" \
+  -H "x-correlation-id: docs-telemetry"
+```
+
+Open the Inspector's **Requests** view, select `/hello`, and follow its trace, logs, graph hash, generation, and
+activation fingerprint. If remote telemetry is silent, inspect exporter health, queue depth, failure count, and
+drop count before assuming application capture failed.
+
+AWS hosting routes redacted structured stdout to CloudWatch through the host integration. CloudWatch is host
+logging, not an application exporter, so it does not belong under `telemetry.exporters`.
 
 <include cwd>content/generated/related/operations-observability.mdx</include>

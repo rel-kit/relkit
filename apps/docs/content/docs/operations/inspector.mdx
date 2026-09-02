@@ -1,33 +1,33 @@
 ---
-title: Inspector and API explorer
-description: Follow an active request through routes, functions, graph relationships, logs, traces, and the Scalar API reference.
+title: Inspector
+description: Follow an active request through routes, functions, graph relationships, diagnostics, logs, traces, and the HTTP API reference.
 ---
 
 import inspectorShell from "../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/shell-dark-darwin.png";
 
-`bun run dev` starts the inspector on port 3210. It reads the active backend's versioned internal API and
-shows the same generation ID and graph hash used by requests, clients, tests, and deployment.
+`bun run dev` starts the application on port 3000 and the Inspector on port 3210 by default. The Inspector reads
+the active backend's versioned internal API and displays the generation ID and graph hash serving requests.
 
 <ImageZoom
   src={inspectorShell}
-  alt="RELKIT inspector overview with navigation and application summary"
+  alt="RELKIT Inspector overview with navigation and application summary"
 />
 
-## Trace one request through the system
+## Follow a request
 
 <Steps>
   <Step>
-    ### Start the application and inspector
+    ### Start the development runtime
 
     ```sh title="Terminal — relkit-orders"
     bun run dev
     ```
 
-    Open `http://localhost:3210` and confirm the displayed backend is `http://localhost:3000`.
+    Open `http://localhost:3210` and confirm that it is connected to `http://localhost:3000`.
 
   </Step>
   <Step>
-    ### Issue an identifiable request
+    ### Send an identifiable request
 
     ```sh title="Terminal — relkit-orders"
     curl -i "http://localhost:3000/hello?name=Inspector" \
@@ -36,46 +36,54 @@ shows the same generation ID and graph hash used by requests, clients, tests, an
 
   </Step>
   <Step>
-    ### Follow its relationships
+    ### Inspect the complete path
 
-    Open **Requests**, select the latest `/hello` request, and note its route, function, status, duration,
-    graph hash, correlation ID, and trace link. Open the route and function detail pages, then follow the
-    trace to its span waterfall and available logs.
+    In **Requests**, select `/hello` and inspect its route, target function, status, duration, graph hash,
+    correlation ID, logs, and trace. Follow the route and function links to their descriptor details.
 
   </Step>
   <Step>
-    ### Compare graph and API contract
+    ### Compare graph and HTTP contract
 
-    Open **Graph**, find the hello route, and inspect its edge to the target function. The relationship
-    table is the keyboard and screen-reader equivalent of the canvas. Open **API Reference** and confirm
-    the same operation appears in Scalar.
+    In **Graph**, find the route-to-function edge. The relationship table provides the keyboard and screen-reader
+    equivalent of the canvas. Open **API Reference** to inspect the same operation in Scalar.
 
   </Step>
 </Steps>
 
-## What the inspector contains
+## Inspect runtime state
 
-Global search and the sidebar cover routes, functions, jobs, events, buckets, cache, tools, agents,
-middleware, providers, environment contracts, diagnostics, logs, requests, traces, graph relationships,
-and API reference. Filters and cursor pagination are server-backed; detail URLs are canonical and
-shareable.
+Search and detail views cover services, routes, functions, jobs, events, storage, cache, AI, middleware,
+integrations, environment contracts, diagnostics, requests, logs, traces, graph relationships, and API contracts.
+Provider pages show profile, source kind, integration provenance, local recipe state, and infrastructure roles
+without exposing connection values.
+
+Generation views expose the composite activation fingerprint. If a new candidate fails graph, manifest,
+integration-plan, local-service, readiness, or override validation, traffic remains on the last known good
+generation and the Inspector continues to show that active state.
+
+## Resolve common Inspector problems
 
 <Accordions type="multiple">
-  <Accordion title="The inspector is disconnected">
+  <Accordion title="The Inspector is disconnected">
     Call `http://localhost:3000/_relkit/v1/health/ready` and `/_relkit/v1/graph`. If the backend is
-    healthy, restart the inspector against that backend and compare the displayed graph hash.
+    healthy, restart the Inspector and compare its graph hash with the backend response.
   </Accordion>
   <Accordion title="The graph looks stale">
-    Confirm the source candidate activated successfully. The inspector intentionally keeps showing
-    the last known good generation while an invalid candidate is rejected.
+    Read the rejected candidate diagnostic. The Inspector intentionally shows the last valid
+    generation until a replacement passes activation.
   </Accordion>
-  <Accordion title="Sensitive data is absent">
-    That is expected. Secret environment values, protected headers, disabled/redacted bodies, and
-    provider credentials are removed before crossing inspector or telemetry boundaries.
+  <Accordion title="A local integration is waiting">
+    Inspect its recipe, plan hash, lease, and override generation, then run `bun run relkit local
+    status` from the same project root.
+  </Accordion>
+  <Accordion title="Sensitive content is absent">
+    That is expected. Secret values and protected content are removed before local persistence and
+    Inspector transport.
   </Accordion>
 </Accordions>
 
-Inspector actions retain local-only authorization, production restrictions, source-link validation, and
-secret redaction. Do not publish an unprotected production inspector endpoint.
+Inspector actions are local-only and production-restricted. Do not expose an unprotected production Inspector
+endpoint.
 
 <include cwd>content/generated/related/operations-inspector.mdx</include>
