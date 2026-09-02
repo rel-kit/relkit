@@ -1,5 +1,5 @@
 export function decodeS3Xml(value: string): string {
-  return value.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+  return value.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
 }
 
 export function s3XmlValue(xml: string, name: string): string | undefined {

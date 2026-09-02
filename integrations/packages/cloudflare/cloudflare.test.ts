@@ -98,7 +98,7 @@ test("Cloudflare R2 runtime signs S3-compatible operations", async () => {
     requests.push({ url, init });
     if (url.includes("list-type=2"))
       return new Response(
-        "<ListBucketResult><Contents><Key>a.txt</Key></Contents></ListBucketResult>",
+        "<ListBucketResult><Contents><Key>&amp;lt;a&amp;gt;</Key></Contents></ListBucketResult>",
       );
     if (init?.method === "HEAD")
       return new Response(null, { headers: { etag: '"etag"', "content-length": "3" } });
@@ -114,7 +114,7 @@ test("Cloudflare R2 runtime signs S3-compatible operations", async () => {
 
   await provider.put!("folder/a.txt", new TextEncoder().encode("abc"));
   expect(new TextDecoder().decode(await provider.get!("folder/a.txt"))).toBe("abc");
-  expect(await provider.list!("folder")).toEqual(["a.txt"]);
+  expect(await provider.list!("folder")).toEqual(["&lt;a&gt;"]);
   expect(requests[0]?.url).toContain("account.r2.cloudflarestorage.com/assets/folder/a.txt");
   expect(new Headers(requests[0]?.init?.headers).get("authorization")).toStartWith(
     "AWS4-HMAC-SHA256",

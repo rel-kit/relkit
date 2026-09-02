@@ -17,7 +17,7 @@ describe("AWS runtime providers", () => {
           );
         if (action === "ReceiveMessage")
           return new Response(
-            "<ReceiveMessageResponse><Message><MessageId>message-1</MessageId><ReceiptHandle>receipt-1</ReceiptHandle><Body>{&quot;input&quot;:{&quot;orderId&quot;:&quot;order-1&quot;}}</Body><ApproximateReceiveCount>1</ApproximateReceiveCount></Message></ReceiveMessageResponse>",
+            "<ReceiveMessageResponse><Message><MessageId>message-1</MessageId><ReceiptHandle>receipt-1</ReceiptHandle><Body>{&quot;input&quot;:{&quot;orderId&quot;:&quot;order-1&quot;,&quot;label&quot;:&quot;&amp;lt;&quot;}}</Body><ApproximateReceiveCount>1</ApproximateReceiveCount></Message></ReceiveMessageResponse>",
           );
         return new Response("<ok/>");
       },
@@ -32,7 +32,10 @@ describe("AWS runtime providers", () => {
 
     await queue.enqueue({ input: { orderId: "order-1" }, profile: "default" });
     const leased = await queue.acquire();
-    expect(leased).toMatchObject({ instanceId: "message-1", input: { orderId: "order-1" } });
+    expect(leased).toMatchObject({
+      instanceId: "message-1",
+      input: { orderId: "order-1", label: "&lt;" },
+    });
     await queue.transition("message-1", "completed", { expectedState: "leased" });
     expect(actions).toEqual(["SendMessage", "ReceiveMessage", "DeleteMessage"]);
   });

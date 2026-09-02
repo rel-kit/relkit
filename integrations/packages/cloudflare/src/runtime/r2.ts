@@ -126,5 +126,5 @@ function keyPath(value: string): string {
 }
 
 function decodeXml(value: string): string {
-  return value.replaceAll("&amp;", "&").replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+  return value.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
 }

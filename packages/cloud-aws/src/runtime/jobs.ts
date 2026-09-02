@@ -169,7 +169,7 @@ function field(xml: string, name: string): string | undefined {
 function decodeXml(value: string): string {
   return value
     .replaceAll("&quot;", '"')
-    .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
 }

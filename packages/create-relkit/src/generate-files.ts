@@ -179,7 +179,7 @@ export function projectId(name: string): string {
     .replace(/^@/, "")
     .replace("/", "-")
     .replace(/[^A-Za-z0-9._-]+/g, "-");
-  return value.replace(/^[._-]+|[._-]+$/g, "") || "app";
+  return value.replace(/^[._-]+/, "").replace(/[._-]+$/, "") || "app";
 }
 
 function compareNames(left: { name: string }, right: { name: string }): number {

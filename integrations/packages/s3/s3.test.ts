@@ -109,7 +109,7 @@ describe("S3-compatible runtime", () => {
         requests.push({ url, init });
         if (url.includes("list-type=2")) {
           return new Response(
-            "<ListBucketResult><Contents><Key>a.txt</Key></Contents></ListBucketResult>",
+            "<ListBucketResult><Contents><Key>&amp;lt;a&amp;gt;</Key></Contents></ListBucketResult>",
           );
         }
         if (init?.method === "HEAD") {
@@ -144,7 +144,7 @@ describe("S3-compatible runtime", () => {
         contentType: "text/plain",
         metadata: { owner: "relkit" },
       });
-      expect(await provider.list!("folder")).toEqual(["a.txt"]);
+      expect(await provider.list!("folder")).toEqual(["&lt;a&gt;"]);
       const write = requests[0]!;
       expect(new Headers(write.init?.headers).get("authorization")).toStartWith("AWS4-HMAC-SHA256");
       expect(write.url).toContain(variant.path ? "/assets/folder/a.txt" : "assets.");

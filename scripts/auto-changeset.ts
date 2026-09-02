@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
-import { workspacePackageDirectories } from "./workspace-packages.js";
+import { workspacePackageDirectories } from "./workspace-packages.ts";
 
 const exec = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
