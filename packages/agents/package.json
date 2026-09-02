@@ -29,8 +29,6 @@
     }
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "4.0.42",
-    "@ai-sdk/openai": "4.0.47",
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",

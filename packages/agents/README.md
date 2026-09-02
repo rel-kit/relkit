@@ -1,13 +1,12 @@
 # @relkit/agents
 
-Agents use an optional serializable model selector, declared tools, and finite
-execution limits. Model credentials and live clients belong to per-environment
-provider configuration, not agent descriptors.
+Agents use a serializable model selector, declared tools, and finite execution limits. Model credentials
+and live clients belong to application model bindings, not agent descriptors.
 
 ```ts
 import { defineAgent } from "@relkit/app/agents";
-import lookupOrder from "./lookup-order.tool";
 import { z } from "@relkit/app/schema";
+import lookupOrder from "./lookup-order.tool.js";
 
 export default defineAgent({
   id: "orders.support-agent",
@@ -20,22 +19,29 @@ export default defineAgent({
 });
 ```
 
-Configure model defaults on the active provider set:
+Configure the selected AI SDK profile in `relkit.config.ts`:
 
 ```ts
-modelProviders: {
-  defaultProvider: "openai",
-  defaultModel: "gpt-5-mini",
-  openai: { apiKey: env.OPENAI_API_KEY },
-  anthropic: { defaultModel: "claude-sonnet-4-5", apiKey: env.ANTHROPIC_API_KEY },
-}
+import { aiSdk } from "@relkit/ai-sdk";
+import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+
+export default defineApp({
+  env: defineEnv({}),
+  model: {
+    openai: aiSdk({
+      provider: "openai",
+      defaultModel: "gpt-5-mini",
+      apiKey: binding.secret("OPENAI_API_KEY"),
+    }),
+  },
+  defaults: { model: "openai" },
+});
 ```
 
-An omitted `model` uses both defaults, a provider name selects that provider's
-default model, and `provider:model` selects an exact AI SDK v7 registry model.
-Development and test runs can use the `ai/test`-backed harness without network
-calls. Only allowlisted tools execute, and RELKIT approval remains authoritative.
+An omitted agent model uses the default profile and model. A profile name uses that profile's default;
+`profile:model` selects an exact model. Tests must supply scripted model replacements explicitly, so
+offline runs never acquire a model key or make a network call by environment convention.
 
-Runtime hooks expose agent, model, and tool span metadata plus observed edges.
-Prompt, instruction, result, secret, and full tool content are omitted unless
-the caller explicitly selects `development-redacted` capture with a byte bound.
+Only allowlisted tools execute, and RELKIT approval remains authoritative. Runtime hooks expose safe
+agent, model, and tool span metadata; prompts, results, secrets, and full tool content remain omitted
+unless bounded development-redacted capture is selected.
