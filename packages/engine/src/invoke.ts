@@ -2,6 +2,7 @@ import {
   createInvocationCallStack,
   assertInvocationMode,
   currentInvocationScope,
+  getDescriptorServiceIdentity,
   normalizeFailure,
   runInInvocationScope,
 } from "@relkit/invocation";
@@ -64,6 +65,7 @@ export async function invoke<
   );
   const parentChain = activeScope?.chain ?? createInvocationCallStack();
   const target = canonicalTarget(resolveTarget(options));
+  const serviceId = getDescriptorServiceIdentity(target) ?? options.serviceId;
   const source = options.source ?? "direct";
   assertSource(source);
   assertInvocationMode(target, source);
@@ -79,7 +81,7 @@ export async function invoke<
     deadlineMs,
     now,
     idSource,
-    options.serviceId,
+    serviceId,
   );
   await callHook(options.hooks?.onInvocationStart, record);
   await emitObservabilityEvent(options.hooks?.observability, {
@@ -126,7 +128,7 @@ export async function invoke<
         parent,
         ...(options.env === undefined ? {} : { env: options.env }),
         ...(options.clients === undefined ? {} : { clients: options.clients }),
-        ...(options.serviceId === undefined ? {} : { serviceId: options.serviceId }),
+        ...(serviceId === undefined ? {} : { serviceId }),
         ...(options.now === undefined ? {} : { now: options.now }),
         ...(options.admit === undefined ? {} : { admit: options.admit }),
         ...(options.admission === undefined ? {} : { admission: options.admission }),

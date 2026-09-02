@@ -15,18 +15,24 @@ const modelCodes = new Set<ModelReadinessCode>([
   "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING",
 ]);
 
-export function validateModelReadiness(graph: ApplicationGraph, registry: unknown): void {
+export function validateModelReadiness(
+  graph: ApplicationGraph,
+  registryFor: (profile: string) => unknown,
+): void {
   const agents = graph.nodes.filter((node) => node.kind === "agent");
   if (agents.length === 0) return;
-  if (!isRegistry(registry)) {
-    throw new ProviderRegistryError([
-      {
-        code: "RELKIT_MODEL_PROVIDER_REGISTRY_INVALID",
-        message: "Configured agent models have no active model registry.",
-      },
-    ]);
-  }
   const issues = agents.flatMap((agent) => {
+    const registry = registryFor(agent.profile);
+    if (!isRegistry(registry)) {
+      return [
+        {
+          code: "RELKIT_MODEL_PROVIDER_REGISTRY_INVALID" as const,
+          message: `Agent model profile "${agent.profile}" has no active model registry.`,
+          agentId: agent.id,
+          source: agent.source,
+        },
+      ];
+    }
     try {
       registry.resolveModel(agent.model);
       return [];

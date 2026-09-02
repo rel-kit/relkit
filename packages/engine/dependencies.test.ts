@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Effect } from "effect";
+import { bindDescriptorIdentity, createUnboundIdentity } from "@relkit/invocation";
 import { z } from "@relkit/schema";
 import type { InvocationRunner } from "@relkit/runtime-effect";
 import {
@@ -8,11 +9,41 @@ import {
   type DependencyBridge,
   type DependencyClientSources,
 } from "./src/dependencies.ts";
+import { dependencyId } from "./src/dependency-clients.ts";
 import { invokeFunction, type InvocationContext, type InvocationTarget } from "./src/index.ts";
 
 const ref = (kind: string, id: string) => ({ ref: { kind, id } });
 
 describe("declared dependency clients", () => {
+  test("uses a manifest-bound identity for descriptor dependencies", async () => {
+    const bucket = { kind: "bucket", id: createUnboundIdentity() };
+    bindDescriptorIdentity(bucket, "assets.objects");
+    expect(dependencyId("buckets", "assets", bucket)).toBe("assets.objects");
+
+    const selected: string[] = [];
+    const sources = new Proxy(
+      { "assets.objects": { put: async () => void selected.push("replacement") } },
+      {
+        get: (target, property, receiver) =>
+          property === "assets"
+            ? { put: async () => void selected.push("implicit") }
+            : Reflect.get(target, property, receiver),
+      },
+    );
+    const clients = buildDependencyClients({
+      ownerId: "assets.upload",
+      dependencies: { buckets: { assets: bucket } },
+      sources: { buckets: sources },
+    });
+    await expect(
+      (clients.buckets.assets as { put: (key: string, bytes: Uint8Array) => Promise<void> }).put(
+        "asset.png",
+        new Uint8Array(),
+      ),
+    ).resolves.toBeUndefined();
+    expect(selected).toEqual(["replacement"]);
+  });
+
   test("exposes declared names, bridges every operation, and separates edge hooks", async () => {
     const bridged: string[] = [];
     const declared: unknown[] = [];

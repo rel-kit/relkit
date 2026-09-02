@@ -1,6 +1,7 @@
 import type { MaybePromise } from "@relkit/contracts";
 import { createBucketClient } from "@relkit/buckets";
 import type { GraphEdge, ObservedEdge } from "@relkit/graph";
+import { getDescriptorIdentity } from "@relkit/invocation";
 import { createEventDependencyClient } from "./event-client.js";
 import type {
   DependencyBridgeOptions,
@@ -56,14 +57,11 @@ export function dependencyId(
   value: DependencyRefLike,
 ): string {
   const reference = value.ref ?? value;
-  if (
-    reference.kind !== refKinds[category] ||
-    typeof reference.id !== "string" ||
-    reference.id.length === 0
-  ) {
+  const id = value.ref === undefined ? getDescriptorIdentity(value) : reference.id;
+  if (reference.kind !== refKinds[category] || typeof id !== "string" || id.length === 0) {
     throw new TypeError(`Invalid ${category} dependency "${name}"`);
   }
-  return reference.id;
+  return id;
 }
 
 export function createClient(

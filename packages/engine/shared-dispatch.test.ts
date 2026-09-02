@@ -3,6 +3,8 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
   type ProtocolId,
 } from "@relkit/contracts";
 import { dispatchInvocation } from "@relkit/invocation";
@@ -55,10 +57,12 @@ test("engine dispatch uses the verified generation registry in its shared scope"
     ],
     edges: [],
   };
+  const graphHash = hashGraph(graph);
   const registry = createFunctionRegistry(graph, {
     contractVersion: MANIFEST_VERSION,
     generatorVersion: GENERATOR_VERSION,
-    graphHash: hashGraph(graph),
+    graphHash,
+    ...runtimeCohort(graphHash),
     functions: {
       [parent.id]: parent.handler,
       [child.id]: (value: number) => value + 1,
@@ -137,16 +141,17 @@ test("function invoke uses standalone and active generation dispatch", async () 
     ],
     edges: [],
   };
+  const graphHash = hashGraph(graph);
   const registry = createFunctionRegistry(graph, {
     contractVersion: MANIFEST_VERSION,
     generatorVersion: GENERATOR_VERSION,
-    graphHash: hashGraph(graph),
+    graphHash,
+    ...runtimeCohort(graphHash),
     functions: {
       [parent.id]: parent.handler,
       [child.id]: (value: number) => value + 1,
     },
   });
-  const graphHash = hashGraph(graph);
   const hooks = createInspectableObservabilityHooks();
 
   await expect(
@@ -221,6 +226,7 @@ test("keeps concurrent generation runtimes isolated", async () => {
       contractVersion: MANIFEST_VERSION,
       generatorVersion: GENERATOR_VERSION,
       graphHash,
+      ...runtimeCohort(graphHash),
       functions: {
         [parent.id]: parent.handler,
         [child.id]: () => value,
@@ -244,3 +250,18 @@ test("keeps concurrent generation runtimes isolated", async () => {
 
   expect(await Promise.all([first, second])).toEqual([11, 22]);
 });
+
+function runtimeCohort(graphHash: string) {
+  return {
+    activationFingerprint: {
+      graphHash,
+      manifestHash: "sha256:test-manifest",
+      runtimeIntegrationsPlanHash: "sha256:test-runtime-integrations",
+    },
+    runtimeIntegrationsPlan: {
+      version: RUNTIME_INTEGRATION_PLAN_VERSION,
+      fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+      graphHash,
+    },
+  };
+}
