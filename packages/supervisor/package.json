@@ -1,6 +1,6 @@
 {
   "name": "@relkit/supervisor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Unsupported internal RELKIT process supervisor; use @relkit/cli.",
   "license": "MIT",
   "repository": {

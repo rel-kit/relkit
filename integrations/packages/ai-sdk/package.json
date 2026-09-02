@@ -1,6 +1,6 @@
 {
   "name": "@relkit/ai-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI SDK model integration for RELKIT.",
   "license": "MIT",
   "repository": {
