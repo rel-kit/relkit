@@ -6,8 +6,9 @@ import { guideGroups } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 
 test("places AI beside Caching and keeps practical table-of-contents headings", async () => {
-  expect(guideGroups.map(({ directory }) => directory).slice(0, 10)).toEqual([
+  expect(guideGroups.map(({ directory }) => directory).slice(0, 11)).toEqual([
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",

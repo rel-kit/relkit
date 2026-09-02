@@ -6,7 +6,7 @@ import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `start/${page}.mdx`), "utf8");
 
-test("keeps Start to three local onboarding guides before Service", () => {
+test("keeps Start to three local onboarding guides before Core concepts", () => {
   const pages = ["create-an-app", "first-route", "local-development"];
   expect(guideGroups.find(({ directory }) => directory === "start")?.pages).toEqual(pages);
   expect(JSON.parse(readFileSync(resolve(content, "start/meta.json"), "utf8"))).toEqual({
@@ -21,7 +21,7 @@ test("keeps Start to three local onboarding guides before Service", () => {
     "meta.json",
   ]);
   expect(guideRelations.find(({ path }) => path === "start/local-development")?.next).toBe(
-    "service/index",
+    "fundamentals/index",
   );
   for (const page of ["check", "build", "production"]) {
     expect(guideRelations.some(({ path }) => path === `start/${page}`)).toBe(false);
@@ -30,8 +30,8 @@ test("keeps Start to three local onboarding guides before Service", () => {
 });
 
 test("connects the existing-app workflow to public service operations and capability guides", () => {
-  expect(read("create-an-app")).toContain("--template api --cloud none --deploy none");
-  expect(read("create-an-app")).toContain("does not remove the template's");
+  expect(read("create-an-app")).toContain("--template api");
+  expect(read("create-an-app")).toContain("Cloud and deployment default to `none`");
   expect(read("first-route")).toContain("../../templates/default/v1/api/src/hello/service.ts");
   expect(read("first-route")).toContain(
     "../../templates/default/v1/api/src/hello/functions/hello.function.ts",
@@ -58,7 +58,7 @@ test("connects the existing-app workflow to public service operations and capabi
     expect(local).toContain(`/docs/operations/cli-reference#relkit-${command}`);
   }
   const landing = readFileSync(resolve(content, "index.mdx"), "utf8");
-  expect(landing).toContain('href="/docs/service"');
+  expect(landing).toContain('href="/docs/fundamentals"');
   expect(landing).not.toContain("through a local production build");
 });
 
