@@ -1,7 +1,7 @@
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { CliHelpCommand } from "@relkit/cli/help";
-import { apiPackages } from "./documentation-catalog.js";
+import { apiPackageDefinitions, apiPackageName } from "./documentation-catalog.js";
 import { features } from "./feature-catalog.js";
 import { guideGroups, guideRelations } from "./guide-catalog.js";
 
@@ -77,7 +77,32 @@ async function emitNavigation(emit: Emit): Promise<void> {
     await emit(`${directory}/meta.json`, `${JSON.stringify({ title, icon, pages }, null, 2)}\n`);
   await emit(
     "api/meta.json",
-    `${JSON.stringify({ title: "Generated API reference", icon: "Braces", pages: apiPackages }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        title: "API Reference",
+        icon: "Braces",
+        pages: [
+          ...apiPackageDefinitions.filter(({ group }) => group === "core").map(({ slug }) => slug),
+          "integrations",
+        ],
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  await emit(
+    "api/integrations/meta.json",
+    `${JSON.stringify(
+      {
+        title: "Integrations",
+        icon: "Plug",
+        pages: apiPackageDefinitions
+          .filter(({ group }) => group === "integrations")
+          .map(({ slug }) => slug.replace("integrations/", "")),
+      },
+      null,
+      2,
+    )}\n`,
   );
 }
 
@@ -105,7 +130,7 @@ ${rows}
 
 export function renderRelated(relation: (typeof guideRelations)[number]): string {
   const api = relation.api
-    .map((name) => `- [\`@relkit/${name}\` API](/docs/api/${name})`)
+    .map((name) => `- [\`${apiPackageName(name)}\` API](/docs/api/${name})`)
     .join("\n");
   const examples = relation.examples
     .map((path) => `- [\`${path}\`](https://github.com/rel-kit/relkit/blob/main/${path})`)

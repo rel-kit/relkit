@@ -11,27 +11,27 @@ export const eventGuideRelations = [
   {
     path: "events/index",
     api: ["events", "functions"],
-    examples: ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+    examples: ["apps/docs/examples/events/order-created.event.ts"],
   },
   {
     path: "events/define",
     api: ["events"],
-    examples: ["templates/default/v1/api/src/orders/events/order-created.event.ts"],
+    examples: ["apps/docs/examples/events/order-created.event.ts"],
   },
   {
     path: "events/publish",
     api: ["events", "functions"],
-    examples: ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+    examples: ["apps/docs/examples/events/create-order.function.ts"],
   },
   {
     path: "events/consume",
     api: ["events"],
-    examples: ["templates/default/v1/api/src/orders/functions/order-confirmation.function.ts"],
+    examples: ["apps/docs/examples/events/order-confirmation.function.ts"],
   },
   {
     path: "events/first-event",
     api: ["events", "functions"],
-    examples: ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
+    examples: ["apps/docs/examples/events/create-order.function.ts"],
   },
 ] satisfies readonly {
   path: string;

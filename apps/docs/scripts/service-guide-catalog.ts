@@ -16,7 +16,7 @@ export const serviceGuideRelations = [
   {
     path: "service/domains",
     api: ["services", "events"],
-    examples: ["examples/commerce/src/receipts/functions/order-receipt.function.ts"],
+    examples: ["apps/docs/examples/events/order-confirmation.function.ts"],
   },
   {
     path: "service/organization",
