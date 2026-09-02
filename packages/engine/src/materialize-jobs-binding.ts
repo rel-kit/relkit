@@ -1,9 +1,3 @@
-import {
-  applyRetry,
-  classifyFailure,
-  safeFailureMetadata,
-  type JobQueueEntry,
-} from "@relkit/providers-local";
 import type { JsonValue } from "@relkit/contracts";
 import type { InvocationAdmit } from "./invoke-types.js";
 import type {
@@ -11,10 +5,12 @@ import type {
   JobInvocationOptions,
   JobMaterializationOptions,
   JobPolicy,
+  JobQueueEntry,
   JobQueueHandle,
   JobRunResult,
   MaterializedJob,
-} from "./materialize-jobs.js";
+} from "./materialize-jobs-types.js";
+import { transitionJobFailure } from "./materialize-jobs-retry.js";
 
 export function createBinding(
   queue: JobQueueHandle,
@@ -55,19 +51,19 @@ export function createBinding(
         ...({ admit } satisfies Pick<JobInvocationOptions, "admit">),
       });
     } catch (cause) {
-      const entry = await applyRetry(queue, leased.instanceId, policy.retry, cause, {
+      const failed = await transitionJobFailure(queue, leased, policy.retry, cause, {
         ...(options.now === undefined ? {} : { now: options.now }),
         ...(options.random === undefined ? {} : { random: options.random }),
       });
-      if (entry.state !== "delayed" && entry.state !== "dead-lettered")
+      if (failed.entry.state !== "delayed" && failed.entry.state !== "dead-lettered")
         throw new Error("Retry did not produce a terminal queue outcome");
       return {
         instanceId: leased.instanceId,
         attempt: leased.attempt,
-        state: entry.state,
-        entry,
-        classification: classifyFailure(cause),
-        failure: safeFailureMetadata(cause),
+        state: failed.entry.state,
+        entry: failed.entry,
+        classification: failed.classification,
+        failure: failed.failure,
       };
     }
     const entry = await queue.transition(leased.instanceId, "completed", {

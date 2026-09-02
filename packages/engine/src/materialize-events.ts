@@ -9,12 +9,10 @@ import type {
 } from "@relkit/graph";
 import type { InvocationParent, InvokeOptions } from "./invoke-types.js";
 import type { ProviderRegistry } from "./provider-registry-types.js";
-
 export interface EventRuntimeProvider {
   readonly registerContract: (contract: EventNode) => MaybePromise<void>;
   readonly registerTrigger: (binding: EventTriggerBinding) => MaybePromise<void>;
 }
-
 export interface EventTriggerBinding {
   readonly id: string;
   readonly source: EventTriggerRegistration["source"];
@@ -31,7 +29,6 @@ export interface EventTriggerBinding {
     options?: EventInvocationContext,
   ) => Promise<unknown>;
 }
-
 export type EventInvocationContext = Omit<
   InvokeOptions<unknown, unknown>,
   | "target"
@@ -110,7 +107,6 @@ export async function materializeEvents(
       );
     }
     const profile = registration.config.profile ?? "default";
-    providers.set(profile, resolveProvider(profile, options));
     triggers.set(
       registration.id,
       Object.freeze({
@@ -154,8 +150,14 @@ export async function materializeEvents(
     if (contracts.has(key)) throw new EventMaterializationError(`Duplicate event contract ${key}.`);
     contracts.set(key, contract);
   }
-  for (const provider of providers.values())
-    for (const contract of contracts.values()) await provider.registerContract(contract);
+  const profiles = new Set([
+    ...[...contracts.values()].map((contract) => contract.profile),
+    ...[...triggers.values()].map((trigger) => trigger.profile),
+  ]);
+  for (const profile of [...profiles].sort())
+    providers.set(profile, resolveProvider(profile, options));
+  for (const contract of contracts.values())
+    await providers.get(contract.profile)!.registerContract(contract);
   for (const binding of triggers.values())
     await providers.get(binding.profile)!.registerTrigger(binding);
 
@@ -176,7 +178,7 @@ function resolveProvider(
   options: EventMaterializationOptions,
 ): EventRuntimeProvider {
   const value = options.providerRegistry
-    ? options.providerRegistry.resolve("events", profile).value
+    ? options.providerRegistry.resolve("event", profile).value
     : lookupProvider(options.eventProviders, profile);
   if (!isEventRuntimeProvider(value))
     throw new EventMaterializationError(`Event provider ${profile} is not registerable.`);

@@ -1,8 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { applicationFailure } from "@relkit/runtime-effect";
 import type { FunctionNode, JobNode, RegistrationPlan } from "@relkit/graph";
-import type { JobQueueEntry } from "@relkit/providers-local";
-import type { JobInvocationOptions, JobQueueHandle } from "./src/materialize-jobs.ts";
+import type {
+  JobInvocationOptions,
+  JobQueueEntry,
+  JobQueueHandle,
+  JobScheduler,
+} from "./src/materialize-jobs.ts";
 import { materializeJobs } from "./src/materialize-jobs.ts";
 
 const source = { file: "src/jobs.ts", line: 1, column: 1 } as const;
@@ -16,7 +20,7 @@ describe("job materialization", () => {
       plan: plan({ schedule: true }),
       queues: new Map([["orders.send", queue]]),
       consumerConcurrency: 2,
-      schedulerOptions: { now: () => now },
+      scheduler: makeScheduler(),
       engine: {
         invoke: async (options) => {
           calls.push(options);
@@ -52,6 +56,16 @@ describe("job materialization", () => {
       input: { orderId: "scheduled" },
     });
     expect(queue.get(accepted.instanceId)?.state).toBe("completed");
+  });
+
+  test("requires an explicit scheduler when schedules are planned", async () => {
+    await expect(
+      materializeJobs({
+        plan: plan({ schedule: true }),
+        queues: new Map([["orders.send", makeQueue(() => 0, "scheduled-1")]]),
+        engine: { invoke: async () => undefined },
+      }),
+    ).rejects.toThrow("No scheduler provider is bound");
   });
 
   test("classifies handler failure and acknowledges the retry transition", async () => {
@@ -188,5 +202,33 @@ function makeQueue(now: () => number, instanceId: string): JobQueueHandle {
       return next;
     },
     get: (id) => (entry?.instanceId === id ? entry : undefined),
+  };
+}
+
+function makeScheduler(): JobScheduler {
+  let registration:
+    | {
+        readonly id: string;
+        readonly input: unknown;
+        readonly enqueue: Parameters<JobScheduler["register"]>[1];
+      }
+    | undefined;
+  const runDue: JobScheduler["runDue"] = async (currentDate = new Date()) => {
+    if (registration === undefined) return [];
+    const fireAt = typeof currentDate === "number" ? new Date(currentDate) : currentDate;
+    const result = await registration.enqueue(registration.input as never, {
+      scheduleId: registration.id,
+      fireAt,
+    });
+    return [{ scheduleId: registration.id, fireAt, status: "enqueued", result }];
+  };
+  return {
+    register: (schedule, enqueue) => {
+      registration = { id: schedule.id, input: schedule.input, enqueue };
+      return schedule;
+    },
+    nextFire: () => undefined,
+    runDue,
+    tick: runDue,
   };
 }
