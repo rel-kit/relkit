@@ -9,10 +9,7 @@
     "noUncheckedIndexedAccess": true,
     "paths": {
       "@relkit/app/*": ["../../packages/app/src/*.ts"],
-      "@relkit/*": [
-        "../../packages/*/src/index.ts",
-        "../../integrations/packages/*/src/index.ts"
-      ],
+      "@relkit/*": ["../../packages/*/src/index.ts", "../../integrations/packages/*/src/index.ts"],
       "drizzle-orm/*": ["../../packages/drizzle/node_modules/drizzle-orm/*"]
     },
     "skipLibCheck": true,
