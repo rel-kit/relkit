@@ -1,8 +1,8 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
+import { join, relative, resolve } from "node:path";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 const root = resolve(import.meta.dir, "..");
-const packageRoot = join(root, "packages");
 const repository = "https://github.com/rel-kit/relkit";
 const descriptions: Record<string, string> = {
   "@relkit/agents": "RELKIT agent authoring API; prefer @relkit/app/agents in applications.",
@@ -30,10 +30,13 @@ const descriptions: Record<string, string> = {
     "RELKIT function authoring API; prefer @relkit/app/functions in applications.",
   "@relkit/graph": "Unsupported internal RELKIT graph model; use @relkit/app.",
   "@relkit/inspector-api": "Unsupported internal API for the RELKIT inspector; use @relkit/cli.",
+  "@relkit/integrations": "Optional catalog of standalone RELKIT integrations.",
   "@relkit/invocation": "Unsupported internal RELKIT invocation contracts; use @relkit/app.",
   "@relkit/jobs": "RELKIT job authoring API; prefer @relkit/app/jobs in applications.",
+  "@relkit/local-service": "Unsupported internal RELKIT local-service protocol; use @relkit/cli.",
   "@relkit/observability": "Unsupported internal RELKIT observability contracts; use @relkit/app.",
   "@relkit/openapi": "Unsupported internal OpenAPI generator for RELKIT; use @relkit/cli.",
+  "@relkit/provider": "Portable provider authoring and binding protocol for RELKIT.",
   "@relkit/providers-local": "Local runtime providers for RELKIT development and testing.",
   "@relkit/providers-standard": "Standard provider adapters for RELKIT applications.",
   "@relkit/routes": "RELKIT route authoring API; prefer @relkit/app/routes in applications.",
@@ -44,6 +47,16 @@ const descriptions: Record<string, string> = {
   "@relkit/supervisor": "Unsupported internal RELKIT process supervisor; use @relkit/cli.",
   "@relkit/testing": "Testing utilities and local providers for RELKIT applications.",
   "@relkit/tools": "RELKIT tool authoring API; prefer @relkit/app/tools in applications.",
+  "@relkit/ai-sdk": "AI SDK model integration for RELKIT.",
+  "@relkit/aws": "AWS host and infrastructure integration for RELKIT.",
+  "@relkit/cloudflare": "Cloudflare integration for RELKIT.",
+  "@relkit/docker": "Docker local-service integration for RELKIT.",
+  "@relkit/local": "Local-service orchestration integration for RELKIT.",
+  "@relkit/otlp": "OTLP telemetry integration for RELKIT.",
+  "@relkit/pulumi": "Pulumi deployment-engine integration for RELKIT.",
+  "@relkit/redis": "Redis integration for RELKIT.",
+  "@relkit/s3": "S3-compatible storage integration for RELKIT.",
+  "@relkit/sentry": "Sentry telemetry integration for RELKIT.",
   "create-relkit": "Create a RELKIT application from a supported project template.",
 };
 const dependencyFields = [
@@ -65,11 +78,8 @@ async function syncJson(path: string, value: Record<string, unknown>): Promise<v
 }
 
 const versions = new Set<string>();
-for (const entry of (await readdir(packageRoot, { withFileTypes: true })).sort((a, b) =>
-  a.name.localeCompare(b.name),
-)) {
-  if (!entry.isDirectory()) continue;
-  const path = join(packageRoot, entry.name, "package.json");
+for (const directory of workspacePackageDirectories(root)) {
+  const path = join(directory, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
   const name = String(manifest.name);
   const description = descriptions[name];
@@ -93,7 +103,7 @@ for (const entry of (await readdir(packageRoot, { withFileTypes: true })).sort((
     version,
     description,
     license: "MIT",
-    repository: { type: "git", url: `${repository}.git`, directory: `packages/${entry.name}` },
+    repository: { type: "git", url: `${repository}.git`, directory: relative(root, directory) },
     homepage: `${repository}#readme`,
     bugs: { url: `${repository}/issues` },
     files: ["dist"],

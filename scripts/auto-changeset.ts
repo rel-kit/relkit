@@ -1,7 +1,9 @@
 import { execFile } from "node:child_process";
-import { readdir, readFile, writeFile } from "node:fs/promises";
-import { basename, join, resolve } from "node:path";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+import { basename, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 const exec = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
@@ -50,9 +52,8 @@ export function affectedPackages(
 ): string[] {
   const affected = new Set<string>();
   for (const path of paths) {
-    const packagePath = /^packages\/([^/]+)\//.exec(path);
-    const packageName = packagePath ? packages.get(packagePath[1]!) : undefined;
-    if (packageName) affected.add(packageName);
+    for (const [directory, packageName] of packages)
+      if (path === directory || path.startsWith(`${directory}/`)) affected.add(packageName);
     if (
       path.startsWith("templates/default/v1/") ||
       path === "scripts/package-create-relkit-templates.ts"
@@ -72,31 +73,43 @@ export function renderChangeset(packages: readonly string[], summary: string): s
   return `---\n${release.join("\n")}\n---\n\n${summary.trim()}\n`;
 }
 
+export function changedPathArguments(base: string, head: string): string[] {
+  return ["diff", "--no-renames", "--name-only", "-z", `${base}...${head}`];
+}
+
+export function hasCurrentChangeset(
+  paths: readonly string[],
+  exists: (path: string) => boolean,
+): boolean {
+  return paths.some((path) => isChangeset(path) && exists(path));
+}
+
 async function publishablePackages(): Promise<Map<string, string>> {
   const result = new Map<string, string>();
-  for (const entry of await readdir(join(root, "packages"), { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const manifest = JSON.parse(
-      await readFile(join(root, "packages", entry.name, "package.json"), "utf8"),
-    ) as { name?: string; private?: boolean };
-    if (manifest.private !== true && manifest.name) result.set(entry.name, manifest.name);
+  for (const directory of workspacePackageDirectories(root)) {
+    const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8")) as {
+      name?: string;
+      private?: boolean;
+    };
+    if (manifest.private !== true && manifest.name)
+      result.set(relative(root, directory), manifest.name);
   }
   return result;
 }
 
 async function changedPaths(base: string, head: string): Promise<string[]> {
-  const { stdout } = await exec(
-    "git",
-    ["diff", "--diff-filter=AM", "--name-only", "-z", `${base}...${head}`],
-    { cwd: root, encoding: "buffer", maxBuffer: 10 * 1024 * 1024 },
-  );
+  const { stdout } = await exec("git", changedPathArguments(base, head), {
+    cwd: root,
+    encoding: "buffer",
+    maxBuffer: 10 * 1024 * 1024,
+  });
   return stdout.toString("utf8").split("\0").filter(Boolean);
 }
 
 async function main(): Promise<void> {
   const input = options(process.argv.slice(2));
   const paths = await changedPaths(input.base, input.head);
-  if (paths.some(isChangeset)) {
+  if (hasCurrentChangeset(paths, (path) => existsSync(join(root, path)))) {
     console.log(JSON.stringify({ created: false, reason: "changeset-present" }));
     return;
   }
