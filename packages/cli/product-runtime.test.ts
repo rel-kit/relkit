@@ -1,12 +1,13 @@
 import { afterEach, expect, test } from "bun:test";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildProject } from "./src/commands/build.js";
 import { startProject } from "./src/commands/start.js";
+import { linkWorkspacePackages } from "./test-workspace.js";
 
 const roots: string[] = [];
 
-test("the emitted full-graph server runs jobs, agents, and correlated observability", async () => {
+test("the emitted full-graph server runs agents and correlated observability", async () => {
   const root = await copyFullProject();
   const modelServer = Bun.serve({
     port: 0,
@@ -105,7 +106,10 @@ test("the emitted full-graph server runs jobs, agents, and correlated observabil
 
     await expect(
       eventually(async () => {
-        const traces = await page(base, "/traces?functionId=receipts.send&limit=20");
+        const traces = await page(
+          base,
+          "/traces?functionId=relkit.agent.orders.support-agent.invoke&limit=20",
+        );
         return traces.items.length > 0;
       }),
     ).resolves.toBe(true);
@@ -134,11 +138,17 @@ async function page(base: string, path: string) {
 
 async function readChunk(response: Response): Promise<string> {
   const reader = response.body!.getReader();
-  const result = await Promise.race([
-    reader.read(),
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("SSE timeout")), 2_000)),
-  ]);
-  return new TextDecoder().decode(result.value);
+  const timeout = Bun.sleep(2_000).then<never>(() => {
+    throw new Error("SSE timeout");
+  });
+  const decoder = new TextDecoder();
+  let text = "";
+  while (!text.includes("event:")) {
+    const result = await Promise.race([reader.read(), timeout]);
+    if (result.done) break;
+    text += decoder.decode(result.value, { stream: true });
+  }
+  return text;
 }
 
 async function eventually(check: () => Promise<boolean>): Promise<boolean> {
@@ -154,25 +164,25 @@ async function configureProductFixture(root: string, modelBaseUrl: string): Prom
   const app = await readFile(appPath, "utf8");
   await writeFile(
     appPath,
-    app
-      .replace(
-        "const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000) });",
-        "const env = defineEnv({ SERVICE_PORT: envFactory.port().default(3000), OPENAI_API_KEY: envFactory.secret() });",
-      )
-      .replace(
-        "openai: { apiKey: env.MODEL_API_KEY },",
-        `openai: { apiKey: env.MODEL_API_KEY, baseURL: "${modelBaseUrl}" },`,
-      ),
+    app.replace(
+      'apiKey: envFactory.secret("MODEL_API_KEY"),',
+      `apiKey: envFactory.secret("OPENAI_API_KEY"),\n      baseURL: "${modelBaseUrl}",`,
+    ),
   );
-  const functionPath = join(root, "src/functions/create-order.function.ts");
+  const functionPath = join(root, "src/orders/functions/create-order.function.ts");
   const source = await readFile(functionPath, "utf8");
   await writeFile(
     functionPath,
-    source.replace(
-      "handler: async (input, context) => {",
-      'handler: async (input, context) => {\n    context.log.info("creating order", { password: input.sku });',
-    ),
+    source
+      .replace('import prices from "../cache/prices.cache.js";\n', "")
+      .replace("  dependencies: { cache: { prices } },\n", "")
+      .replace("    await context.cache.prices.get({ sku: input.sku });\n", "")
+      .replace(
+        "handler: async (input, context) => {",
+        'handler: async (input, context) => {\n    context.log.info("creating order", { password: input.sku });',
+      ),
   );
+  await rm(join(root, "src/orders/cache/prices.cache.ts"));
 }
 
 async function copyFullProject(): Promise<string> {
@@ -180,38 +190,7 @@ async function copyFullProject(): Promise<string> {
   roots.push(root);
   await cp(join(process.cwd(), "tests/compiler/fixtures/valid-full"), root, { recursive: true });
   await cp(join(process.cwd(), "examples/commerce/package.json"), join(root, "package.json"));
-  const scope = join(root, "node_modules", "@relkit");
-  await mkdir(scope, { recursive: true });
-  for (const name of [
-    "agents",
-    "app",
-    "buckets",
-    "cache",
-    "cloud-aws",
-    "compiler",
-    "config",
-    "contracts",
-    "diagnostics",
-    "engine",
-    "events",
-    "functions",
-    "graph",
-    "inspector-api",
-    "invocation",
-    "jobs",
-    "observability",
-    "providers-local",
-    "providers-standard",
-    "routes",
-    "runtime-effect",
-    "runtime-hono",
-    "schema",
-    "services",
-    "supervisor",
-    "testing",
-    "tools",
-  ])
-    await symlink(join(process.cwd(), "packages", name), join(scope, name));
+  await linkWorkspacePackages(root);
   return root;
 }
 

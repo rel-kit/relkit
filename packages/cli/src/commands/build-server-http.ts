@@ -44,6 +44,7 @@ const app = createApp({
     graph: {
       generationId,
       graphHash,
+      activationFingerprint,
       manifestGraphHash: runtimeManifest.graphHash,
       graphContractVersion: ${GRAPH_VERSION},
       manifestContractVersion: ${MANIFEST_VERSION},
@@ -68,8 +69,16 @@ installInspectorEndpoints(app, {
   activeGeneration: {
     generationId,
     graphHash,
+    activationFingerprint,
     graph,
     diagnostics: [],
+    integrations: runtimeIntegrationsPlan,
+    localServices: localServicesInspector,
+    telemetry: () => ({
+      sampling: telemetryConfiguration?.exportSampling ?? {},
+      counters: telemetry.exportCounters(),
+      exporters: telemetry.exporterStats(),
+    }),
     actions: {
       functions: {
         exists: (functionId) => registry.has(functionId),
@@ -78,9 +87,9 @@ installInspectorEndpoints(app, {
     },
     resources: {
       buckets: {
-        supports: (bucketId) => supportsInspector("buckets", plan.buckets, bucketId, "list", "preview"),
-        list: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).list(request),
-        preview: async ({ bucketId, ...request }) => (await resourceInspector("buckets", plan.buckets, bucketId)).preview(request),
+        supports: (bucketId) => supportsInspector("bucket", plan.buckets, bucketId, "list", "preview"),
+        list: async ({ bucketId, ...request }) => (await resourceInspector("bucket", plan.buckets, bucketId)).list(request),
+        preview: async ({ bucketId, ...request }) => (await resourceInspector("bucket", plan.buckets, bucketId)).preview(request),
       },
       cache: {
         supports: (cacheId) => supportsInspector("cache", plan.caches, cacheId, "scan", "value"),

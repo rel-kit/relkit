@@ -26,7 +26,7 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
       message,
       fields,
     });
-    if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
+    writeRuntimeLog(record);
   };
   const logger = (level) => (message, fields) => write(level, message, fields);
   return {
@@ -46,7 +46,7 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
 async function invokeBoundAgent(node, agent, input, context) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
-  const modelRegistry = provider(providerRegistry, "models", node.profile);
+  const modelRegistry = provider(providerRegistry, "model", node.profile);
   if (modelRegistry === undefined)
     throw new Error("Model provider registry unavailable.");
   return invokeAgent({
@@ -71,10 +71,10 @@ function targetFor(functionId) {
 function createDependencySources(providerRegistry) {
   return {
     agents: Object.fromEntries(plan.agents.map((node) => [node.id, registry.get(\`relkit.agent.\${node.id}.invoke\`)])),
-    buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "buckets", node.profile)])),
+    buckets: Object.fromEntries(plan.buckets.map((node) => [node.id, provider(providerRegistry, "bucket", node.profile)])),
     cache: Object.fromEntries(plan.caches.map((node) => [node.id, provider(providerRegistry, "cache", node.profile)])),
     jobs: Object.fromEntries(plan.queues.filter((node) => node.kind === "job").map((node) => [node.id, materializedJobs?.jobs.get(node.id)])),
-    events: Object.fromEntries((plan.events ?? []).map((node) => [node.id, provider(providerRegistry, "events", node.profile)])),
+    events: Object.fromEntries((plan.events ?? []).map((node) => [node.id, provider(providerRegistry, "event", node.profile)])),
   };
 }
 function provider(providerRegistry, capability, profile) {
@@ -106,7 +106,7 @@ async function resolveRateLimitStore(storeId) {
   return provider(providerRegistry, "cache", cache.profile);
 }
 function queueProvider(providerRegistry, context) {
-  const value = provider(providerRegistry, "jobs", context.profile);
+  const value = provider(providerRegistry, "job", context.profile);
   if (value === null || typeof value !== "object" || typeof value.createQueue !== "function")
     throw new Error(\`Job provider profile "\${context.profile}" cannot materialize queues.\`);
   return value.createQueue(context);
@@ -137,7 +137,6 @@ function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 function recordRuntimeFailure(component, message, error, source) {
-  captureRuntimeError(error);
   const record = telemetry.collect({
     version: 1,
     signal: "log",
@@ -150,14 +149,27 @@ function recordRuntimeFailure(component, message, error, source) {
     graphHash,
     source,
   });
-  if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
+  writeRuntimeLog(record);
+}
+function writeRuntimeLog(record) {
+  if (record?.signal !== "log") return;
+  if (environment === "production") stdoutJsonSink.write(record);
+  else consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
 function tokenFrom(value) {
   const parsed = Number(value);
   return Number.isSafeInteger(parsed) ? parsed : undefined;
+}
+function readLocalServiceInspectorState(value) {
+  if (value === undefined) return undefined;
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+  } catch {}
+  return { lease: { status: "blocked" } };
 }
 function resolveEnvironment(value, nodeEnvironment) {
   if (value === "development" || value === "test" || value === "production") return value;
