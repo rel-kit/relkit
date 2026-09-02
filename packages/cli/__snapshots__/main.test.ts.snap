@@ -2,557 +2,666 @@
 
 exports[`renders focused help for every command and nested subcommand 1`] = `
 {
-  "build": 
-"DESCRIPTION
-  Build a deployable application
-
-USAGE
-  relkit build [flags]
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Build a deployable application
-  relkit build"
-,
-  "check": 
-"DESCRIPTION
-  Compile and validate the application
-
-USAGE
-  relkit check [flags]
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Compile and validate the application
-  relkit check"
-,
-  "create": 
-"DESCRIPTION
-  Create a new RELKIT application
-
-USAGE
-  relkit create [flags] <name>
-
-ARGUMENTS
-  name string    npm package and application name
-
-FLAGS
-  --json                     Emit machine-readable output
-  --template choice          Starter template (choices: minimal, api, agent)
-  --cloud choice             Cloud provider (choices: aws, none)
-  --deploy choice            Deployment adapter (choices: pulumi, none)
-  --directory string         Destination directory
-  --install                  Install generated project setup
-  --no-install               No install generated project setup
-  --git                      Git generated project setup
-  --no-git                   No git generated project setup
-  --examples                 Examples generated project setup
-  --no-examples              No examples generated project setup
-  --force-empty-directory    Allow an existing empty destination
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Create a new RELKIT application
-  relkit create"
-,
-  "deploy": 
-"DESCRIPTION
-  Manage Pulumi deployments
-
-USAGE
-  relkit deploy <subcommand> [flags]
-
-FLAGS
-  --json    Emit machine-readable output
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-SUBCOMMANDS
-  init       Init the Pulumi stack
-  preview    Preview the Pulumi stack
-  up         Up the Pulumi stack
-  refresh    Refresh the Pulumi stack
-  outputs    Outputs the Pulumi stack
-  destroy    Destroy the Pulumi stack
-EXAMPLES
-  # Manage Pulumi deployments
-  relkit deploy"
-,
-  "deploy destroy": 
-"DESCRIPTION
-  Destroy the Pulumi stack
-
-USAGE
-  relkit deploy destroy [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Destroy the Pulumi stack
-  relkit deploy destroy"
-,
-  "deploy init": 
-"DESCRIPTION
-  Init the Pulumi stack
-
-USAGE
-  relkit deploy init [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Init the Pulumi stack
-  relkit deploy init"
-,
-  "deploy outputs": 
-"DESCRIPTION
-  Outputs the Pulumi stack
-
-USAGE
-  relkit deploy outputs [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Outputs the Pulumi stack
-  relkit deploy outputs"
-,
-  "deploy preview": 
-"DESCRIPTION
-  Preview the Pulumi stack
-
-USAGE
-  relkit deploy preview [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Preview the Pulumi stack
-  relkit deploy preview"
-,
-  "deploy refresh": 
-"DESCRIPTION
-  Refresh the Pulumi stack
-
-USAGE
-  relkit deploy refresh [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Refresh the Pulumi stack
-  relkit deploy refresh"
-,
-  "deploy up": 
-"DESCRIPTION
-  Up the Pulumi stack
-
-USAGE
-  relkit deploy up [flags]
-
-FLAGS
-  --json                       Emit machine-readable output
-  --project-root string        Application directory (defaults to cwd)
-  --stack string               Pulumi stack name (default: development)
-  --backend string             cloud, local, or object-storage URL
-  --config key=value           Set a non-secret Pulumi value; repeatable
-  --config-secret key=value    Set a secret Pulumi value; repeatable
-  --non-interactive, --yes     Approve protected operations
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Up the Pulumi stack
-  relkit deploy up"
-,
-  "dev": 
-"DESCRIPTION
-  Run app, inspector, OpenAPI, and Scalar
-
-USAGE
-  relkit dev [flags]
-
-FLAGS
-  --json                      Emit machine-readable output
-  --project-root string       Application directory (defaults to cwd)
-  --port integer              Application port
-  --inspector-port integer    Inspector port
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Run app, inspector, OpenAPI, and Scalar
-  relkit dev"
-,
-  "doctor": 
-"DESCRIPTION
-  Check local prerequisites and ports
-
-USAGE
-  relkit doctor [flags]
-
-FLAGS
-  --json                      Emit machine-readable output
-  --project-root string       Application directory (defaults to cwd)
-  --port integer              Application port
-  --inspector-port integer    Inspector port
-  --pulumi                    Require Pulumi
-  --no-pulumi                 Skip Pulumi requirements
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Check local prerequisites and ports
-  relkit doctor"
-,
-  "env": 
-"DESCRIPTION
-  Inspect value-free environment contracts
-
-USAGE
-  relkit env <subcommand> [flags]
-
-FLAGS
-  --json    Emit machine-readable output
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-SUBCOMMANDS
-  check      Validate environment values
-  list       List environment value status
-  explain    Explain one environment variable
-  example    Render or write a safe .env example
-EXAMPLES
-  # Inspect value-free environment contracts
-  relkit env"
-,
-  "env check": 
-"DESCRIPTION
-  Validate environment values
-
-USAGE
-  relkit env check [flags]
-
-FLAGS
-  --json                         Emit machine-readable output
-  --project-root string          Application directory (defaults to cwd)
-  --environment, --env string    Provider environment
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Validate environment values
-  relkit env check"
-,
-  "env example": 
-"DESCRIPTION
-  Render or write a safe .env example
-
-USAGE
-  relkit env example [flags]
-
-FLAGS
-  --json                         Emit machine-readable output
-  --project-root string          Application directory (defaults to cwd)
-  --environment, --env string    Provider environment
-  --path, --file string          Output path
-  --write                        Write the rendered example
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Render or write a safe .env example
-  relkit env example"
-,
-  "env explain": 
-"DESCRIPTION
-  Explain one environment variable
-
-USAGE
-  relkit env explain [flags] <name>
-
-ARGUMENTS
-  name string    Environment variable name
-
-FLAGS
-  --json                         Emit machine-readable output
-  --project-root string          Application directory (defaults to cwd)
-  --environment, --env string    Provider environment
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Explain one environment variable
-  relkit env explain"
-,
-  "env list": 
-"DESCRIPTION
-  List environment value status
-
-USAGE
-  relkit env list [flags]
-
-FLAGS
-  --json                         Emit machine-readable output
-  --project-root string          Application directory (defaults to cwd)
-  --environment, --env string    Provider environment
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # List environment value status
-  relkit env list"
-,
-  "graph": 
-"DESCRIPTION
-  Inspect deterministic application graphs
-
-USAGE
-  relkit graph <subcommand> [flags]
-
-FLAGS
-  --json    Emit machine-readable output
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-SUBCOMMANDS
-  print    Print a canonical graph
-  check    Validate a graph and optional hash
-  diff     Compare graph compatibility
-EXAMPLES
-  # Inspect deterministic application graphs
-  relkit graph"
-,
-  "graph check": 
-"DESCRIPTION
-  Validate a graph and optional hash
-
-USAGE
-  relkit graph check [flags] [<graph>]
-
-ARGUMENTS
-  graph string    Graph JSON path (optional)
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-  --hash string            Expected sha256 graph hash
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Validate a graph and optional hash
-  relkit graph check"
-,
-  "graph diff": 
-"DESCRIPTION
-  Compare graph compatibility
-
-USAGE
-  relkit graph diff [flags] <before> <after>
-
-ARGUMENTS
-  before string    Previous graph path
-  after string     Next graph path
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Compare graph compatibility
-  relkit graph diff"
-,
-  "graph print": 
-"DESCRIPTION
-  Print a canonical graph
-
-USAGE
-  relkit graph print [flags] [<graph>]
-
-ARGUMENTS
-  graph string    Graph JSON path (optional)
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Print a canonical graph
-  relkit graph print"
-,
-  "start": 
-"DESCRIPTION
-  Start a built application
-
-USAGE
-  relkit start [flags]
-
-FLAGS
-  --json                   Emit machine-readable output
-  --project-root string    Application directory (defaults to cwd)
-  --port integer           Application port
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-EXAMPLES
-  # Start a built application
-  relkit start"
-,
-  "relkit":
-"DESCRIPTION
-  Convention-first TypeScript application framework
-
-USAGE
-  relkit <subcommand> [flags]
-
-FLAGS
-  --json    Emit machine-readable output
-
-GLOBAL FLAGS
-  --help, -h                          Show help information
-  --version, -v                       Show version information
-  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)
-
-SUBCOMMANDS
-  create    Create a new RELKIT application
-  dev       Run app, inspector, OpenAPI, and Scalar
-  check     Compile and validate the application
-  build     Build a deployable application
-  start     Start a built application
-  graph     Inspect deterministic application graphs
-  env       Inspect value-free environment contracts
-  doctor    Check local prerequisites and ports
-  deploy    Manage Pulumi deployments
-EXAMPLES
-  # Convention-first TypeScript application framework
-  relkit"
-,
+  "build": [
+    "DESCRIPTION",
+    "  Build the checked graph, manifest, OpenAPI, and client",
+    "",
+    "USAGE",
+    "  relkit build [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Build the checked graph, manifest, OpenAPI, and client",
+    "  relkit build",
+  ],
+  "check": [
+    "DESCRIPTION",
+    "  Compile descriptors, infer eligible IDs, and validate the application",
+    "",
+    "USAGE",
+    "  relkit check [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Compile descriptors, infer eligible IDs, and validate the application",
+    "  relkit check",
+  ],
+  "create": [
+    "DESCRIPTION",
+    "  Create a new RELKIT application",
+    "",
+    "USAGE",
+    "  relkit create [flags] <name>",
+    "",
+    "ARGUMENTS",
+    "  name string    npm package and application name",
+    "",
+    "FLAGS",
+    "  --json                     Emit machine-readable output",
+    "  --template choice          Starter template (choices: minimal, api, agent)",
+    "  --cloud choice             Cloud provider (choices: aws, none)",
+    "  --deploy choice            Deployment adapter (choices: pulumi, none)",
+    "  --directory string         Destination directory",
+    "  --install                  Install generated project setup",
+    "  --no-install               No install generated project setup",
+    "  --git                      Git generated project setup",
+    "  --no-git                   No git generated project setup",
+    "  --examples                 Examples generated project setup",
+    "  --no-examples              No examples generated project setup",
+    "  --force-empty-directory    Allow an existing empty destination",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Create a new RELKIT application",
+    "  relkit create",
+  ],
+  "deploy": [
+    "DESCRIPTION",
+    "  Manage Pulumi deployments",
+    "",
+    "USAGE",
+    "  relkit deploy <subcommand> [flags]",
+    "",
+    "FLAGS",
+    "  --json    Emit machine-readable output",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "SUBCOMMANDS",
+    "  init       Init the Pulumi stack",
+    "  preview    Preview the Pulumi stack",
+    "  up         Up the Pulumi stack",
+    "  refresh    Refresh the Pulumi stack",
+    "  outputs    Outputs the Pulumi stack",
+    "  destroy    Destroy the Pulumi stack",
+    "EXAMPLES",
+    "  # Manage Pulumi deployments",
+    "  relkit deploy",
+  ],
+  "deploy destroy": [
+    "DESCRIPTION",
+    "  Destroy the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy destroy [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Destroy the Pulumi stack",
+    "  relkit deploy destroy",
+  ],
+  "deploy init": [
+    "DESCRIPTION",
+    "  Init the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy init [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Init the Pulumi stack",
+    "  relkit deploy init",
+  ],
+  "deploy outputs": [
+    "DESCRIPTION",
+    "  Outputs the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy outputs [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Outputs the Pulumi stack",
+    "  relkit deploy outputs",
+  ],
+  "deploy preview": [
+    "DESCRIPTION",
+    "  Preview the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy preview [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Preview the Pulumi stack",
+    "  relkit deploy preview",
+  ],
+  "deploy refresh": [
+    "DESCRIPTION",
+    "  Refresh the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy refresh [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Refresh the Pulumi stack",
+    "  relkit deploy refresh",
+  ],
+  "deploy up": [
+    "DESCRIPTION",
+    "  Up the Pulumi stack",
+    "",
+    "USAGE",
+    "  relkit deploy up [flags]",
+    "",
+    "FLAGS",
+    "  --json                       Emit machine-readable output",
+    "  --project-root string        Application directory (defaults to cwd)",
+    "  --stack string               Pulumi stack name (default: development)",
+    "  --backend string             cloud, local, or object-storage URL",
+    "  --config key=value           Set a non-secret Pulumi value; repeatable",
+    "  --config-secret key=value    Set a secret Pulumi value; repeatable",
+    "  --non-interactive, --yes     Approve protected operations",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Up the Pulumi stack",
+    "  relkit deploy up",
+  ],
+  "dev": [
+    "DESCRIPTION",
+    "  Run app, inspector, OpenAPI, and Scalar",
+    "",
+    "USAGE",
+    "  relkit dev [flags]",
+    "",
+    "FLAGS",
+    "  --json                      Emit machine-readable output",
+    "  --project-root string       Application directory (defaults to cwd)",
+    "  --port integer              Application port",
+    "  --inspector-port integer    Inspector port",
+    "  --local choice              Start required local services (choices: on, off)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Run app, inspector, OpenAPI, and Scalar",
+    "  relkit dev",
+  ],
+  "doctor": [
+    "DESCRIPTION",
+    "  Check local prerequisites and ports",
+    "",
+    "USAGE",
+    "  relkit doctor [flags]",
+    "",
+    "FLAGS",
+    "  --json                      Emit machine-readable output",
+    "  --project-root string       Application directory (defaults to cwd)",
+    "  --port integer              Application port",
+    "  --inspector-port integer    Inspector port",
+    "  --pulumi                    Require Pulumi",
+    "  --no-pulumi                 Skip Pulumi requirements",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Check local prerequisites and ports",
+    "  relkit doctor",
+  ],
+  "env": [
+    "DESCRIPTION",
+    "  Inspect value-free environment contracts",
+    "",
+    "USAGE",
+    "  relkit env <subcommand> [flags]",
+    "",
+    "FLAGS",
+    "  --json    Emit machine-readable output",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "SUBCOMMANDS",
+    "  check      Validate environment values",
+    "  list       List environment value status",
+    "  explain    Explain one environment variable",
+    "  example    Render or write a safe .env example",
+    "EXAMPLES",
+    "  # Inspect value-free environment contracts",
+    "  relkit env",
+  ],
+  "env check": [
+    "DESCRIPTION",
+    "  Validate environment values",
+    "",
+    "USAGE",
+    "  relkit env check [flags]",
+    "",
+    "FLAGS",
+    "  --json                         Emit machine-readable output",
+    "  --project-root string          Application directory (defaults to cwd)",
+    "  --environment, --env string    Provider environment, including value-free model-provider configuration",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Validate environment values",
+    "  relkit env check",
+  ],
+  "env example": [
+    "DESCRIPTION",
+    "  Render or write a safe .env example",
+    "",
+    "USAGE",
+    "  relkit env example [flags]",
+    "",
+    "FLAGS",
+    "  --json                         Emit machine-readable output",
+    "  --project-root string          Application directory (defaults to cwd)",
+    "  --environment, --env string    Provider environment, including value-free model-provider configuration",
+    "  --path, --file string          Output path",
+    "  --write                        Write the rendered example",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Render or write a safe .env example",
+    "  relkit env example",
+  ],
+  "env explain": [
+    "DESCRIPTION",
+    "  Explain one environment variable",
+    "",
+    "USAGE",
+    "  relkit env explain [flags] <name>",
+    "",
+    "ARGUMENTS",
+    "  name string    Environment variable name",
+    "",
+    "FLAGS",
+    "  --json                         Emit machine-readable output",
+    "  --project-root string          Application directory (defaults to cwd)",
+    "  --environment, --env string    Provider environment, including value-free model-provider configuration",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Explain one environment variable",
+    "  relkit env explain",
+  ],
+  "env list": [
+    "DESCRIPTION",
+    "  List environment value status",
+    "",
+    "USAGE",
+    "  relkit env list [flags]",
+    "",
+    "FLAGS",
+    "  --json                         Emit machine-readable output",
+    "  --project-root string          Application directory (defaults to cwd)",
+    "  --environment, --env string    Provider environment, including value-free model-provider configuration",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # List environment value status",
+    "  relkit env list",
+  ],
+  "graph": [
+    "DESCRIPTION",
+    "  Inspect deterministic application graphs",
+    "",
+    "USAGE",
+    "  relkit graph <subcommand> [flags]",
+    "",
+    "FLAGS",
+    "  --json    Emit machine-readable output",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "SUBCOMMANDS",
+    "  print    Print a canonical graph with services and resolved source IDs",
+    "  check    Validate a graph and optional hash",
+    "  diff     Compare graph compatibility, including inferred identity moves",
+    "EXAMPLES",
+    "  # Inspect deterministic application graphs",
+    "  relkit graph",
+  ],
+  "graph check": [
+    "DESCRIPTION",
+    "  Validate a graph and optional hash",
+    "",
+    "USAGE",
+    "  relkit graph check [flags] [<graph>]",
+    "",
+    "ARGUMENTS",
+    "  graph string    Graph JSON path (optional)",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "  --hash string            Expected sha256 graph hash",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Validate a graph and optional hash",
+    "  relkit graph check",
+  ],
+  "graph diff": [
+    "DESCRIPTION",
+    "  Compare graph compatibility, including inferred identity moves",
+    "",
+    "USAGE",
+    "  relkit graph diff [flags] <before> <after>",
+    "",
+    "ARGUMENTS",
+    "  before string    Previous graph path",
+    "  after string     Next graph path",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Compare graph compatibility, including inferred identity moves",
+    "  relkit graph diff",
+  ],
+  "graph print": [
+    "DESCRIPTION",
+    "  Print a canonical graph with services and resolved source IDs",
+    "",
+    "USAGE",
+    "  relkit graph print [flags] [<graph>]",
+    "",
+    "ARGUMENTS",
+    "  graph string    Graph JSON path (optional)",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Print a canonical graph with services and resolved source IDs",
+    "  relkit graph print",
+  ],
+  "local": [
+    "DESCRIPTION",
+    "  Manage project-scoped local services",
+    "",
+    "USAGE",
+    "  relkit local <subcommand> [flags]",
+    "",
+    "FLAGS",
+    "  --json    Emit machine-readable output",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "SUBCOMMANDS",
+    "  up        Start all declared local services",
+    "  status    Show local service and lease status",
+    "  stop      Stop project local containers and preserve volumes",
+    "  reset     Remove project local containers, volumes, and state",
+    "EXAMPLES",
+    "  # Manage project-scoped local services",
+    "  relkit local",
+  ],
+  "local reset": [
+    "DESCRIPTION",
+    "  Remove project local containers, volumes, and state",
+    "",
+    "USAGE",
+    "  relkit local reset [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "  --yes                    Confirm reset without prompting",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Remove project local containers, volumes, and state",
+    "  relkit local reset",
+  ],
+  "local status": [
+    "DESCRIPTION",
+    "  Show local service and lease status",
+    "",
+    "USAGE",
+    "  relkit local status [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Show local service and lease status",
+    "  relkit local status",
+  ],
+  "local stop": [
+    "DESCRIPTION",
+    "  Stop project local containers and preserve volumes",
+    "",
+    "USAGE",
+    "  relkit local stop [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Stop project local containers and preserve volumes",
+    "  relkit local stop",
+  ],
+  "local up": [
+    "DESCRIPTION",
+    "  Start all declared local services",
+    "",
+    "USAGE",
+    "  relkit local up [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "  --detach                 Keep services running after exit",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Start all declared local services",
+    "  relkit local up",
+  ],
+  "relkit": [
+    "DESCRIPTION",
+    "  Convention-first TypeScript application framework",
+    "",
+    "USAGE",
+    "  relkit <subcommand> [flags]",
+    "",
+    "FLAGS",
+    "  --json    Emit machine-readable output",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "SUBCOMMANDS",
+    "  create    Create a new RELKIT application",
+    "  dev       Run app, inspector, OpenAPI, and Scalar",
+    "  check     Compile descriptors, infer eligible IDs, and validate the application",
+    "  build     Build the checked graph, manifest, OpenAPI, and client",
+    "  start     Start a built application",
+    "  graph     Inspect deterministic application graphs",
+    "  env       Inspect value-free environment contracts",
+    "  local     Manage project-scoped local services",
+    "  doctor    Check local prerequisites and ports",
+    "  deploy    Manage Pulumi deployments",
+    "  client    Generate a client from a running application",
+    "EXAMPLES",
+    "  # Convention-first TypeScript application framework",
+    "  relkit",
+  ],
+  "start": [
+    "DESCRIPTION",
+    "  Start a built application",
+    "",
+    "USAGE",
+    "  relkit start [flags]",
+    "",
+    "FLAGS",
+    "  --json                   Emit machine-readable output",
+    "  --project-root string    Application directory (defaults to cwd)",
+    "  --port integer           Application port",
+    "",
+    "GLOBAL FLAGS",
+    "  --help, -h                          Show help information",
+    "  --version, -v                       Show version information",
+    "  --completions <bash|zsh|fish|sh>    Print shell completion script (choices: bash, zsh, fish, sh)",
+    "",
+    "EXAMPLES",
+    "  # Start a built application",
+    "  relkit start",
+  ],
 }
 `;

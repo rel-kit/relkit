@@ -5,11 +5,13 @@ import { buildProject } from "./commands/build.js";
 import { checkProject } from "./commands/check.js";
 import { startDev } from "./commands/dev.js";
 import { developmentPorts } from "./commands/dev-inspector.js";
+import { createDevLocalCompiler } from "./commands/dev-local.js";
 import { startDevSourceWatcher } from "./commands/dev-watch.js";
 import { runDeploy } from "./commands/deploy.js";
 import { runDoctor } from "./commands/doctor.js";
 import { runEnv } from "./commands/env.js";
 import { runGraph } from "./commands/graph.js";
+import { runLocal } from "./commands/local.js";
 import { runStart } from "./commands/start.js";
 import { runClient } from "./commands/client.js";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "./main-support.js";
@@ -53,6 +55,8 @@ export async function executeCommand(
       return runGraph(invocation.args, context);
     case "env":
       return runEnv(invocation.args, context);
+    case "local":
+      return runLocal(invocation.args, context);
     case "deploy":
       return runDeploy(invocation.args, context);
     case "client":
@@ -72,6 +76,7 @@ async function runDevCommand(args: readonly string[], context: CliCommandContext
     process.env,
   );
   const generatedDirectory = await createDevGeneratedDirectory(projectRoot);
+  const compiler = createDevLocalCompiler(projectRoot, options.local !== "off");
   try {
     const session = await startDev({
       projectRoot,
@@ -79,16 +84,8 @@ async function runDevCommand(args: readonly string[], context: CliCommandContext
       generatedDirectory,
       signal: context.signal,
       inspector: ports.inspector,
-      compile: async (request) => {
-        const result = await buildProject({
-          projectRoot: request.projectRoot,
-          buildDirectory: request.outputDirectory,
-          signal: request.signal,
-        });
-        if (!result.ok)
-          throw new Error(result.diagnostics.map((diagnostic) => diagnostic.message).join("\n"));
-        return { entrypoint: "server/index.js" };
-      },
+      compile: compiler.compile,
+      localServices: compiler,
     });
     try {
       const watcher = startDevSourceWatcher(session);
@@ -115,12 +112,14 @@ type ProjectArgs = {
   readonly projectRoot?: string;
   readonly port?: number;
   readonly inspectorPort?: number;
+  readonly local?: "on" | "off";
 };
 
 function parseProjectArgs(args: readonly string[], command: string): ProjectArgs {
   let projectRoot: string | undefined;
   let port: number | undefined;
   let inspectorPort: number | undefined;
+  let local: "on" | "off" | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index]!;
     if (argument === "--project-root") projectRoot = value(args, ++index, argument, command);
@@ -128,7 +127,12 @@ function parseProjectArgs(args: readonly string[], command: string): ProjectArgs
       port = portValue(value(args, ++index, argument, command), command);
     else if (argument === "--inspector-port")
       inspectorPort = portValue(value(args, ++index, argument, command), command);
-    else
+    else if (argument === "--local" && command === "dev") {
+      const selected = value(args, ++index, argument, command);
+      if (selected !== "on" && selected !== "off")
+        throw fail("RELKIT_DEV_USAGE", "--local must be on or off.", 2);
+      local = selected;
+    } else
       throw fail(
         `RELKIT_${command.toUpperCase()}_USAGE`,
         `Unknown ${command} option: ${argument}`,
@@ -139,6 +143,7 @@ function parseProjectArgs(args: readonly string[], command: string): ProjectArgs
     ...(projectRoot === undefined ? {} : { projectRoot }),
     ...(port === undefined ? {} : { port }),
     ...(inspectorPort === undefined ? {} : { inspectorPort }),
+    ...(local === undefined ? {} : { local }),
   };
 }
 

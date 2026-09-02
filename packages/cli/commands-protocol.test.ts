@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { defineEnv, env } from "@relkit/config";
 import { GRAPH_VERSION } from "@relkit/contracts";
@@ -7,6 +7,8 @@ import { checkProject } from "./src/commands/check.js";
 import { runDoctor } from "./src/commands/doctor.js";
 import { runEnv } from "./src/commands/env.js";
 import { runGraph } from "./src/commands/graph.js";
+import { runLocal } from "./src/commands/local.js";
+import { linkWorkspacePackages } from "./test-workspace.js";
 
 const roots: string[] = [];
 const cliEnv = defineEnv({
@@ -89,7 +91,10 @@ test("graph commands accept current services and reject stale or unbound identit
   await writeFile(graphPath, JSON.stringify({ ...graph, contractVersion: GRAPH_VERSION - 1 }));
   const stale = capture();
   expect(await runGraph(["print", graphPath], stale.context)).toBe(1);
-  expect(stale.errors[0]).toMatchObject({ code: "RELKIT_GRAPH_VERSION_UNSUPPORTED" });
+  expect(stale.errors[0]).toMatchObject({
+    code: "RELKIT_GRAPH_VERSION_UNSUPPORTED",
+    message: expect.stringContaining("Regenerate with `relkit check`"),
+  });
 
   await writeFile(
     graphPath,
@@ -137,7 +142,7 @@ test("env and doctor cover safe success, failure, and usage paths", async () => 
   expect(await runEnv(["check", "--unknown"], envUsage.context)).toBe(2);
   expect(envUsage.errors[0]).toMatchObject({ code: "RELKIT_ENV_USAGE" });
 
-  const doctorRoot = await copyProject("examples/commerce");
+  const doctorRoot = await copyProject("tests/compiler/fixtures/valid-minimal");
   const doctorSuccess = capture();
   expect(
     await runDoctor(["--project-root", doctorRoot, "--no-pulumi"], doctorSuccess.context, {
@@ -164,6 +169,39 @@ test("env and doctor cover safe success, failure, and usage paths", async () => 
   expect(doctorUsage.errors[0]).toMatchObject({ code: "RELKIT_DOCTOR_USAGE" });
 });
 
+test("local up is Docker-free without declarations and reset requires confirmation", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  const up = capture();
+  expect(
+    await runLocal(["up", "--detach", "--project-root", root], {
+      ...up.context,
+      signal: new AbortController().signal,
+      tty: false,
+    }),
+  ).toBe(0);
+  expect(up.outputs[0]).toEqual({ ok: true, command: "up", detached: true, services: [] });
+
+  const unconfirmed = capture();
+  expect(
+    await runLocal(["reset", "--project-root", root], {
+      ...unconfirmed.context,
+      signal: new AbortController().signal,
+      tty: false,
+    }),
+  ).toBe(2);
+  expect(unconfirmed.errors[0]).toMatchObject({ code: "RELKIT_LOCAL_USAGE" });
+
+  const declined = capture();
+  expect(
+    await runLocal(
+      ["reset", "--project-root", root],
+      { ...declined.context, signal: new AbortController().signal, tty: true },
+      { confirm: async () => false },
+    ),
+  ).toBe(0);
+  expect(declined.outputs[0]).toEqual({ ok: true, command: "reset", cancelled: true });
+});
+
 async function copyProject(relativePath: string): Promise<string> {
   const root = await mkdtemp(join(process.cwd(), ".relkit-cli-test-"));
   roots.push(root);
@@ -172,36 +210,6 @@ async function copyProject(relativePath: string): Promise<string> {
   await rm(join(root, "node_modules"), { recursive: true, force: true });
   await linkWorkspacePackages(root);
   return root;
-}
-
-async function linkWorkspacePackages(root: string): Promise<void> {
-  const scope = join(root, "node_modules", "@relkit");
-  await mkdir(scope, { recursive: true });
-  for (const name of [
-    "agents",
-    "app",
-    "buckets",
-    "cache",
-    "compiler",
-    "config",
-    "contracts",
-    "diagnostics",
-    "engine",
-    "events",
-    "functions",
-    "graph",
-    "jobs",
-    "observability",
-    "providers-local",
-    "providers-standard",
-    "routes",
-    "runtime-effect",
-    "schema",
-    "supervisor",
-    "testing",
-    "tools",
-  ])
-    await symlink(join(process.cwd(), "packages", name), join(scope, name));
 }
 
 function capture() {

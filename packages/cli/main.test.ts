@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import manifest from "./package.json" with { type: "json" };
 import { CLI_EXIT_CODES, getCliHelpModel, runCli, type CliHelpCommand } from "./src/main.js";
+import { parseEffectCli } from "./src/cli-effect-runtime.js";
 
 function io() {
   const stdout: string[] = [];
@@ -168,12 +169,22 @@ test("keeps command and create failures structured in JSON", async () => {
 test("renders focused help for every command and nested subcommand", async () => {
   const paths = [
     [],
-    ...["create", "dev", "check", "build", "start", "graph", "env", "doctor", "deploy"].map(
-      (name) => [name],
-    ),
+    ...[
+      "create",
+      "dev",
+      "check",
+      "build",
+      "start",
+      "graph",
+      "env",
+      "local",
+      "doctor",
+      "deploy",
+    ].map((name) => [name]),
     ...["print", "check", "diff"].map((name) => ["graph", name]),
     ...["check", "list", "explain", "example"].map((name) => ["env", name]),
     ...["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) => ["deploy", name]),
+    ...["up", "status", "stop", "reset"].map((name) => ["local", name]),
   ];
   const output: Record<string, string> = {};
   for (const path of paths) {
@@ -187,7 +198,20 @@ test("renders focused help for every command and nested subcommand", async () =>
     output[path.join(" ") || "relkit"] = captured.stdout[0]!;
     expect(captured.stderr).toEqual([]);
   }
-  expect(output).toMatchSnapshot();
+  expect(
+    Object.fromEntries(Object.entries(output).map(([name, value]) => [name, value.split("\n")])),
+  ).toMatchSnapshot();
+});
+
+test("parses local lifecycle commands and disables dev reconciliation explicitly", async () => {
+  expect((await parseEffectCli(["dev", "--local=off"], "test")).invocation).toEqual({
+    command: "dev",
+    args: ["--local", "off"],
+  });
+  expect((await parseEffectCli(["local", "up", "--detach"], "test")).invocation).toEqual({
+    command: "local",
+    args: ["up", "--detach"],
+  });
 });
 
 test("generates completions, suggestions, help metadata, and command status", async () => {

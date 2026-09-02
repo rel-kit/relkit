@@ -105,6 +105,23 @@ const client = command(
   },
 );
 
+const local = command("local", "Manage project-scoped local services", "relkit local <command>", {
+  commands: [
+    command("up", "Start all declared local services", "relkit local up", {
+      options: [projectRoot, option("detach", "boolean", "Keep services running after exit")],
+    }),
+    command("status", "Show local service and lease status", "relkit local status", {
+      options: [projectRoot],
+    }),
+    command("stop", "Stop project local containers and preserve volumes", "relkit local stop", {
+      options: [projectRoot],
+    }),
+    command("reset", "Remove project local containers, volumes, and state", "relkit local reset", {
+      options: [projectRoot, option("yes", "boolean", "Confirm reset without prompting")],
+    }),
+  ],
+});
+
 const root = command(
   "relkit",
   "Convention-first TypeScript application framework",
@@ -130,6 +147,7 @@ const root = command(
           projectRoot,
           option("port", "integer", "Application port"),
           option("inspector-port", "integer", "Inspector port"),
+          option("local", "choice", "Start required local services", [], ["on", "off"]),
         ],
       }),
       command(
@@ -148,6 +166,7 @@ const root = command(
       }),
       graph,
       env,
+      local,
       command("doctor", "Check local prerequisites and ports", "relkit doctor", {
         options: [
           projectRoot,

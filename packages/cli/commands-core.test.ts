@@ -1,11 +1,12 @@
 import { afterEach, expect, test } from "bun:test";
-import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { GRAPH_VERSION } from "@relkit/contracts";
 import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
 import { startProject } from "./src/commands/start.js";
 import { readBuilt } from "./src/commands/start-built.js";
+import { linkWorkspacePackages } from "./test-workspace.js";
 
 const roots: string[] = [];
 
@@ -20,7 +21,7 @@ test("check emits activatable success and portable structured diagnostics on fai
   expect(valid.activatable).toBe(true);
   expect(valid.graphHash).toMatch(/^sha256:/);
   expect(await readFile(join(valid.generatedDirectory, "event-registry.d.ts"), "utf8")).toContain(
-    'declare module "@relkit/events"',
+    "interface EventRegistry",
   );
   expect(JSON.parse(await readFile(join(valid.generatedDirectory, "diagnostics.json")))).toEqual(
     [],
@@ -35,8 +36,8 @@ test("check emits activatable success and portable structured diagnostics on fai
     expect.objectContaining({
       code: "RELKIT_DUPLICATE_ID",
       severity: "error",
-      file: "src/functions/second.function.ts",
-      related: [expect.objectContaining({ file: "src/functions/first.function.ts" })],
+      file: "src/duplicate/functions/second.function.ts",
+      related: [expect.objectContaining({ file: "src/duplicate/functions/first.function.ts" })],
     }),
   );
   expect(JSON.stringify(invalid.diagnostics)).not.toContain(invalidRoot);
@@ -60,7 +61,7 @@ test("check locates removed config keys and shows the fixed replacement", async 
       message: expect.stringContaining('RELKIT always discovers "src/**/*.ts"'),
     }),
   );
-  expect(result.diagnostics[0]?.message).toContain("defineConfig({ server:");
+  expect(result.diagnostics[0]?.message).toContain("defineApp({ env: defineEnv({})");
 });
 
 test("check refreshes generated event types before project typechecking", async () => {
@@ -93,6 +94,7 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   const manifest = JSON.parse(await readFile(join(built.buildDirectory, "manifest.json")));
   expect(manifest).toMatchObject({
     graphHash: built.graphHash,
+    activationFingerprint: built.activationFingerprint,
     entrypoint: "server/index.ts",
     containerEntrypoint: "server/index.js",
     contextIgnoreFile: ".dockerignore",
@@ -105,7 +107,10 @@ test("build succeeds from a checked graph and reports failed checks", async () =
     "openapi.json",
     "server/index.js",
     "server/index.ts",
+    "server/runtime-activation.json",
+    "server/runtime-integrations.plan.json",
     "server/runtime.manifest.ts",
+    "server/runtime-integrations.ts",
   ];
   const readArtifacts = (): Promise<readonly string[]> =>
     Promise.all(artifactPaths.map((path) => readFile(join(built.buildDirectory, path), "utf8")));
@@ -124,15 +129,28 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(firstArtifacts[6]).toContain("formatHumanLog(record)");
   expect(firstArtifacts[6]).toContain('source: request.source ?? "http"');
   expect(firstArtifacts[6]).toContain("SIGTERM");
+  expect(firstArtifacts[6]).not.toContain("@sentry/bun");
+  expect(firstArtifacts[6]).not.toContain("__relkit_flush_sentry");
+  expect(firstArtifacts.at(-1)).toContain("runtimeIntegrationModules = []");
   await rm(built.buildDirectory, { recursive: true, force: true });
   const rebuilt = await buildProject({ projectRoot: validRoot });
   expect(rebuilt.ok).toBe(true);
   expect(await readArtifacts()).toEqual(firstArtifacts);
+  const runtimeIntegrationsPath = join(
+    rebuilt.buildDirectory,
+    "server/runtime-integrations.plan.json",
+  );
+  const runtimeIntegrations = await readFile(runtimeIntegrationsPath, "utf8");
+  await writeFile(runtimeIntegrationsPath, `${runtimeIntegrations} `);
+  await expect(readBuilt(rebuilt.buildDirectory)).rejects.toThrow(
+    "Built activation fingerprint does not match its artifacts.",
+  );
+  await writeFile(runtimeIntegrationsPath, runtimeIntegrations);
   const graphPath = join(rebuilt.buildDirectory, "application.graph.json");
   const staleGraph = JSON.parse(await readFile(graphPath, "utf8")) as Record<string, unknown>;
   await writeFile(graphPath, JSON.stringify({ ...staleGraph, contractVersion: GRAPH_VERSION - 1 }));
   await expect(readBuilt(rebuilt.buildDirectory)).rejects.toThrow(
-    "Built graph or manifest version is unsupported.",
+    "Built graph contract version 7 is unsupported; expected 8. Rebuild with `relkit build`.",
   );
 
   const invalidRoot = await copyProject("tests/compiler/fixtures/error-route-collision");
@@ -148,7 +166,7 @@ test("build carries server port, body limit, and API docs settings into runtime 
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   await writeFile(
     join(root, "relkit.config.ts"),
-    'import { defineConfig } from "@relkit/app/config";\nexport default defineConfig({ server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
+    'import { defineApp, defineEnv } from "@relkit/app/config";\nexport default defineApp({ env: defineEnv({}), server: { port: 4321, maxBodyBytes: 2048, apiDocs: { enabledInProduction: true } } });\n',
   );
   const built = await buildProject({ projectRoot: root });
   expect(built.ok).toBe(true);
@@ -157,6 +175,8 @@ test("build carries server port, body limit, and API docs settings into runtime 
     port: 4321,
     maxBodyBytes: 2048,
     apiDocs: { enabledInProduction: true },
+    clientContract: true,
+    mcp: true,
   });
   const server = await readFile(join(built.buildDirectory, "server/index.ts"), "utf8");
   expect(server).toContain("maxBodyBytes: 2048");
@@ -175,6 +195,7 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
     expect((await graph.json()) as { graphHash: string }).toMatchObject({
       generationId: "generation.runtime",
       graphHash: built.graphHash,
+      activationFingerprint: built.activationFingerprint,
       graph: { nodes: expect.arrayContaining([expect.objectContaining({ id: "hello" })]) },
     });
     const routes = await fetch(`http://${started.hostname}:${started.port}/_relkit/v1/routes`);
@@ -187,13 +208,13 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
       items: [expect.objectContaining({ id: "hello.route" })],
     });
     expect((await functions.json()) as { items: unknown[] }).toMatchObject({
-      items: [expect.objectContaining({ id: "hello" })],
+      items: [expect.objectContaining({ id: "hello.say-hello" })],
     });
     const route = await fetch(`http://${started.hostname}:${started.port}/hello/RelKit`);
     expect(route.status).toBe(200);
     expect(await route.json()).toEqual({ message: "Hello, RelKit" });
     const action = await fetch(
-      `http://${started.hostname}:${started.port}/_relkit/v1/actions/functions/hello/invoke`,
+      `http://${started.hostname}:${started.port}/_relkit/v1/actions/functions/hello.say-hello/invoke`,
       {
         method: "POST",
         headers: { "content-type": "application/json", "idempotency-key": "hello-action" },
@@ -208,17 +229,19 @@ test("start serves health, graph, inspector collections, and rejects an invalid 
     expect(await action.json()).toMatchObject({ output: { message: "Hello, Inspector" } });
     const logUrl = `http://${started.hostname}:${started.port}/_relkit/v1/logs`;
     const logs = (await (
-      await fetch(`${logUrl}?functionId=hello&severity=info&limit=1`)
+      await fetch(`${logUrl}?functionId=hello.say-hello&severity=info&limit=1`)
     ).json()) as { items: Array<{ invocationId: string }>; nextCursor?: string };
     expect(logs.items).toEqual([
-      expect.objectContaining({ component: "hello", message: "hello invoked" }),
+      expect.objectContaining({ component: "hello.say-hello", message: "hello invoked" }),
     ]);
     expect(logs.nextCursor).toBeDefined();
     const continued = (await (
-      await fetch(`${logUrl}?functionId=hello&severity=info&limit=1&cursor=${logs.nextCursor}`)
+      await fetch(
+        `${logUrl}?functionId=hello.say-hello&severity=info&limit=1&cursor=${logs.nextCursor}`,
+      )
     ).json()) as { items: Array<{ invocationId: string }> };
     expect(continued.items).toEqual([
-      expect.objectContaining({ component: "hello", message: "hello invoked" }),
+      expect.objectContaining({ component: "hello.say-hello", message: "hello invoked" }),
     ]);
     expect(continued.items[0]?.invocationId).not.toBe(logs.items[0]?.invocationId);
   } finally {
@@ -273,39 +296,4 @@ async function copyProject(relativePath: string): Promise<string> {
   await rm(join(root, "node_modules"), { recursive: true, force: true });
   await linkWorkspacePackages(root);
   return root;
-}
-
-async function linkWorkspacePackages(root: string): Promise<void> {
-  const scope = join(root, "node_modules", "@relkit");
-  await mkdir(scope, { recursive: true });
-  for (const name of [
-    "agents",
-    "app",
-    "buckets",
-    "cache",
-    "cloud-aws",
-    "compiler",
-    "config",
-    "contracts",
-    "diagnostics",
-    "engine",
-    "events",
-    "functions",
-    "graph",
-    "inspector-api",
-    "invocation",
-    "jobs",
-    "observability",
-    "providers-local",
-    "providers-standard",
-    "routes",
-    "runtime-effect",
-    "runtime-hono",
-    "schema",
-    "services",
-    "supervisor",
-    "testing",
-    "tools",
-  ])
-    await symlink(join(process.cwd(), "packages", name), join(scope, name));
 }
