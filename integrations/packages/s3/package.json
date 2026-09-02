@@ -1,0 +1,68 @@
+{
+  "name": "@relkit/s3",
+  "version": "0.1.0",
+  "description": "S3-compatible storage integration for RELKIT.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "integrations/packages/s3"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.js"
+    },
+    "./local-recipe": {
+      "types": "./dist/local-recipe/index.d.ts",
+      "import": "./dist/local-recipe/index.js"
+    }
+  },
+  "relkit": {
+    "integration": {
+      "id": "s3",
+      "exports": {
+        "authoring": ".",
+        "runtime": {
+          "export": "./runtime",
+          "registrations": [
+            {
+              "capability": "bucket",
+              "adapterId": "s3",
+              "protocolVersion": 1
+            }
+          ]
+        },
+        "localRecipe": "./local-recipe"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@relkit/buckets": "workspace:*",
+    "@relkit/local-service": "workspace:*",
+    "@relkit/provider": "workspace:*"
+  }
+}
