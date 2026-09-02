@@ -12,13 +12,10 @@
     "test:integration": "bun test tests/integration",
     "build": "relkit build",
     "start": "relkit start",
-    "graph": "relkit graph print",
-    "deploy:preview": "relkit deploy preview",
-    "deploy": "relkit deploy up"
+    "graph": "relkit graph print"
   },
   "dependencies": {
-    "@relkit/app": "0.1.0",
-    "@relkit/providers-standard": "0.1.0"
+    "@relkit/app": "0.1.0"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",

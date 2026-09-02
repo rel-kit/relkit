@@ -1,4 +1,10 @@
-import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  type MaybePromise,
+  type RuntimeActivationFingerprint,
+  type RuntimeIntegrationPlanReference,
+} from "@relkit/contracts";
 import {
   hashGraph,
   validateGraphShape,
@@ -26,6 +32,8 @@ export interface RuntimeManifestInput {
   readonly contractVersion: typeof MANIFEST_VERSION;
   readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
+  readonly activationFingerprint: RuntimeActivationFingerprint;
+  readonly runtimeIntegrationsPlan: RuntimeIntegrationPlanReference;
   readonly functions: RuntimeHandlerEntries;
   readonly targets?: Readonly<Record<string, unknown>>;
 }
@@ -40,6 +48,8 @@ export type RegistryErrorCode =
   | "RELKIT_GRAPH_VERSION_UNSUPPORTED"
   | "RELKIT_MANIFEST_VERSION_UNSUPPORTED"
   | "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED"
+  | "RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID"
+  | "RELKIT_RUNTIME_ACTIVATION_FINGERPRINT_INVALID"
   | "RELKIT_GRAPH_MANIFEST_MISMATCH"
   | "RELKIT_GRAPH_FUNCTION_DUPLICATE"
   | "RELKIT_MANIFEST_HANDLER_MISSING"

@@ -75,6 +75,7 @@ function projectCommand(
         projectRoot: optionalString(path, "project-root"),
         ...(port ? { port: optionalInteger(path, "port", true) } : {}),
         ...(inspectorPort ? { inspectorPort: optionalInteger(path, "inspector-port") } : {}),
+        ...(name === "dev" ? { local: optionalChoice(path, "local") } : {}),
       },
       (value) =>
         Effect.sync(() =>
@@ -84,6 +85,7 @@ function projectCommand(
             ...(value && "inspectorPort" in value
               ? optionArgs("inspector-port", value.inspectorPort)
               : []),
+            ...(value && "local" in value ? optionArgs("local", value.local) : []),
           ]),
         ),
     ),

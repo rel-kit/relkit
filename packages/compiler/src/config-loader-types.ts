@@ -36,8 +36,8 @@ export interface ToolingConfigInput {
     readonly maxPreviewBytes?: number;
   };
   readonly deployment?: {
-    readonly target: "aws";
-    readonly adapter: "pulumi";
+    readonly engine: string;
+    readonly host: string;
   };
 }
 
@@ -62,8 +62,8 @@ export interface LoadedToolingConfig {
     readonly maxPreviewBytes: number;
   };
   readonly deployment?: {
-    readonly target: "aws";
-    readonly adapter: "pulumi";
+    readonly engine: string;
+    readonly host: string;
   };
 }
 

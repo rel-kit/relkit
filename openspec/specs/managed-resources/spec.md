@@ -4,34 +4,6 @@ Defines global provider resolution and portable bucket/cache behavior, including
 
 ## Requirements
 
-### Requirement: Environment-scoped global providers
-
-Each runtime generation SHALL resolve one provider set from the active application environment, use the `default` logical profile unless a descriptor names another profile, and construct each required provider once within generation scope.
-
-#### Scenario: Active environment starts
-
-- **WHEN** the application selects development, test, or production
-- **THEN** only that environment's globally configured capability providers and referenced logical profiles are constructed
-
-#### Scenario: Profile is missing
-
-- **WHEN** the graph references a logical profile absent from the selected provider set
-- **THEN** readiness fails with a structured profile diagnostic before traffic activation
-
-### Requirement: Provider metadata is safe and portable
-
-The graph SHALL record logical capability/profile names, supported features, non-secret configuration names, and selection source location, while executable factories remain in the runtime manifest and credentials/live clients remain outside both graph and browser APIs.
-
-#### Scenario: Provider graph projection is inspected
-
-- **WHEN** global provider configuration includes credentials and endpoints
-- **THEN** graph JSON contains only permitted non-secret metadata and never resolved credential values or clients
-
-#### Scenario: Provider declaration uses an environment token
-
-- **WHEN** a provider option references a field from the environment descriptor
-- **THEN** application evaluation remains value-free, the graph records only the required variable name and sensitivity metadata, and the manifest factory receives its resolved value only inside generation startup
-
 ### Requirement: Provider readiness and release
 
 Every required provider SHALL validate configuration, construct resources, perform safe health/connectivity and capability checks where applicable, register shutdown, and release in reverse dependency order; any failure SHALL keep the generation non-ready.
@@ -114,3 +86,48 @@ Bucket and cache implementations SHALL run shared provider contract suites, with
 
 - **WHEN** a provider contract suite encounters an unsupported signed URL or distributed single-flight feature
 - **THEN** the suite verifies the provider's explicit capability report and does not mark the behavior as passing
+
+### Requirement: Standard S3-compatible bucket adapter
+
+The standard S3 adapter SHALL accept endpoint, bucket name, region, optional secret credential references, path-style selection, cancellation, metadata, listing, and signed URL operations compatible with AWS S3, R2, MinIO, and conforming S3 endpoints.
+
+#### Scenario: S3-compatible endpoint is configured
+
+- **WHEN** endpoint, region, bucket name, credentials, and path-style values describe an R2 or MinIO bucket
+- **THEN** the normal bucket client contract operates against that endpoint without selecting an AWS provider recipe
+
+### Requirement: Standard Redis-compatible cache adapter
+
+The standard Redis adapter SHALL accept a secret environment reference containing a `redis://` or `rediss://` URL and provide the cache contract against Redis, Valkey, ElastiCache, and Upstash Redis protocol endpoints.
+
+#### Scenario: Redis-compatible endpoint is configured
+
+- **WHEN** a TLS/authenticated Upstash URL or local Redis URL is supplied by the pipeline
+- **THEN** cache JSON values, TTL, deletion, existence, and numeric increment use the same application cache client contract
+
+### Requirement: Bucket profiles have unique physical ownership
+
+Each bucket logical profile SHALL belong to exactly one bucket descriptor.
+
+#### Scenario: Two buckets reuse a profile
+
+- **WHEN** two bucket descriptors reference the same profile
+- **THEN** compilation fails with a diagnostic naming both descriptors and the duplicate profile
+
+### Requirement: Logical resources consume provider profiles
+
+Bucket and cache descriptors SHALL retain their portable typed contracts while selecting a physical provider profile through the common provider-binding model; direct bindings SHALL remain profile `default`, and resource requirements SHALL be validated against adapter features before runtime.
+
+#### Scenario: Two logical caches share one server
+
+- **WHEN** two cache descriptors select the same Redis profile
+- **THEN** they retain distinct logical namespaces while using one constructed physical binding
+
+### Requirement: Resource conformance follows declared features
+
+Bucket and cache conformance suites SHALL exercise common behavior and each adapter's declared feature variants without silently skipping unsupported behavior.
+
+#### Scenario: S3-compatible endpoint lacks one optional feature
+
+- **WHEN** its conformance suite reaches that feature
+- **THEN** the adapter reports an explicit unsupported result while all common object-safety behavior still runs

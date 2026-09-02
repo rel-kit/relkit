@@ -17,7 +17,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": [".relkit/generated/event-registry.d.ts"],
   "include": ["src/**/*.ts", "tests/**/*.ts", "relkit.config.ts"],
   "exclude": ["node_modules", ".relkit"]
 }

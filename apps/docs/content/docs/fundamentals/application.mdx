@@ -1,11 +1,11 @@
 ---
-title: Application configuration
-description: Define one application boundary, understand each configuration section, and verify topology changes before runtime.
+title: Application model
+description: Keep application identity, runtime policy, integrations, observability, and deployment roles in one deterministic configuration.
 ---
 
-`relkit.config.ts` is the root of one RELKIT application. It connects authored descriptors to environment
-contracts, provider profiles, server policy, telemetry, the inspector, and deployment. Business handlers do
-not import this file; the compiler and runtime load it as the application boundary.
+`relkit.config.ts` is the root of one RELKIT application. The compiler evaluates it to connect the environment
+contract, integration bindings, server policy, telemetry, Inspector, and optional deployment roles. Domain
+handlers do not import this file.
 
 ## Read the generated configuration
 
@@ -13,81 +13,61 @@ not import this file; the compiler and runtime load it as the application bounda
   ../../templates/default/v1/api/relkit.config.ts
 </include>
 
-The generated API template contains deliberately small defaults:
+The API template starts local-only: one environment contract, bounded telemetry capture, an application
+listener, and a separate Inspector listener. Cloud and deployment remain unselected unless the project was
+created with those options.
 
-- `env` selects the only environment contract used by the application.
-- Resource maps such as `events` name provider profiles that descriptors may request.
-- `telemetry` controls capture policy, not arbitrary logging inside handlers.
-- `server` and `inspector` own separate listeners and limits.
-- `deployment` declares the intended target and adapter; it does not deploy during evaluation.
+Add an explicit application `id` before the application owns durable deployment state. Keep the same ID across
+staging and production; stacks isolate environments. Changing a deployed application ID can make its resources
+appear to have a new owner.
 
-## Choose an application identity
+## Keep evaluation deterministic
 
-An explicit application `id` is the stable identity used in graph and deployment state. Add one before the
-application owns durable cloud resources or multiple stacks. Changing it later can make deployment treat the
-application as a different owner.
+Configuration describes topology. It must not open a database connection, call a remote API, start a server,
+or create cloud resources during module import. Integration constructors describe bindings; runtimes activate
+their clients only after the graph has passed validation.
 
-For a generated local exercise, an inferred identity is enough. For a real orders service, use a domain name
-such as `orders-api`, not a developer name, branch name, or environment name. Environment isolation belongs
-to deployment stacks, so staging and production can share the application identity without sharing state.
+Use each layer for one responsibility:
 
-## Apply a configuration change
+| Concern                                                          | Source of truth                                            |
+| ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| Stable identity, ports, limits, telemetry, and binding selection | `relkit.config.ts`                                         |
+| Runtime values and secrets                                       | The [environment contract](/docs/fundamentals/environment) |
+| Business behavior                                                | [Functions](/docs/fundamentals/functions)                  |
+| Public domain boundary                                           | [Services](/docs/service/define)                           |
+| Adapter and infrastructure selection                             | [Integrations](/docs/integrations)                         |
+
+## Verify a topology change
 
 <Steps>
   <Step>
-    ### Change one runtime limit
+    ### Change one setting
 
-    Edit `relkit.config.ts` and set `server.maxBodyBytes` to the largest request the application should accept.
-    This is the global ceiling; an upload route may set a lower route-specific ceiling.
+    Edit `server.maxBodyBytes`, a provider profile, or another configuration value. Keep credentials out of
+    literals and pass named secret bindings to integrations.
 
   </Step>
   <Step>
-    ### Validate without starting the server
+    ### Validate without starting the app
 
     ```sh title="Terminal — relkit-orders"
     bun run check
     bun run relkit graph print
     ```
 
-    Expect a successful check and one application node. Configuration is evaluated as data; opening a
-    network connection, reading a database, or creating cloud resources during module import is a defect.
+    Expect one application graph with the configured bindings and no external provisioning.
 
   </Step>
   <Step>
-    ### Restart the affected runtime
+    ### Restart listener changes
 
-    Development reloads descriptor changes, but listener settings such as ports may require a process restart.
-    Stop `bun run dev`, start it again, and verify the configured endpoint.
+    Development can activate descriptor changes without dropping the last valid generation. Port and listener
+    changes may require stopping and restarting `bun run dev`.
 
   </Step>
 </Steps>
 
-## Configuration boundaries
-
-Use source-controlled configuration for stable policy and topology. Use the environment contract for values
-that vary by machine, stack, or secret store. Put domain behavior in functions. This separation keeps graph
-generation deterministic and prevents credentials from entering generated artifacts.
-
-<Callout type="warn" title="Configuration is evaluated during checks">
-  Keep `relkit.config.ts` deterministic and side-effect free. Provider constructors describe
-  bindings; actual clients are created only when the runtime activates the checked graph.
-</Callout>
-
-## Diagnose common mistakes
-
-<Accordions>
-  <Accordion title="A descriptor cannot find its provider profile">
-    Confirm the resource map uses the plural configuration key, the descriptor's `profile` matches
-    the map key, and `defaults` selects a profile when more than one binding exists.
-  </Accordion>
-  <Accordion title="A secret appears in generated output">
-    Replace the literal with an `env.secret()` declaration and pass that reference into the adapter.
-    Rotate the exposed value before continuing.
-  </Accordion>
-  <Accordion title="Local configuration fails a production build">
-    Read the production diagnostic. Process-local queues, caches, rate limits, or unprotected
-    internal endpoints may be acceptable in development but invalid across replicas and restarts.
-  </Accordion>
-</Accordions>
+If a release check rejects a `docker(adapter)` binding, add a connected or supported infrastructure source.
+Docker recipes are local development services and never become deployment resources.
 
 <include cwd>content/generated/related/fundamentals-application.mdx</include>

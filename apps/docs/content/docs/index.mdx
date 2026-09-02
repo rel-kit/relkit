@@ -4,7 +4,7 @@ description: Build typed TypeScript backends from one application model, then us
 ---
 
 RELKIT is a convention-first framework for TypeScript backend applications. You describe functions,
-HTTP routes, asynchronous work, resources, and AI boundaries in ordinary source files. RELKIT compiles
+HTTP routes, events, jobs, resources, and AI boundaries in ordinary source files. RELKIT compiles
 those descriptors into one deterministic application graph and uses that graph everywhere.
 
 <Callout title="Who these guides are for">
@@ -44,8 +44,8 @@ source, run `relkit check`, and let every consumer use the same checked result.
   />
   <Card
     title="Understand the authoring model"
-    description="Learn domains, service boundaries, and where each application capability belongs."
-    href="/docs/service"
+    description="Learn the application graph, functions, schemas, errors, context, and environment contracts."
+    href="/docs/fundamentals"
   />
   <Card
     title="Solve an HTTP task"
@@ -72,9 +72,9 @@ source, run `relkit check`, and let every consumer use the same checked result.
   <Step>
     ### Learn the reusable model
 
-    Read [Service](/docs/service) for domains and public boundaries, then choose the HTTP, Events, Jobs,
-    Database, Auth, Storage, Caching, or AI guide for the capability you need. Use
-    [Application fundamentals](/docs/fundamentals/application) for configuration, schemas, errors, and context.
+    Read [Core concepts](/docs/fundamentals) for the application graph, functions, schemas, errors,
+    context, and environment contracts. Continue with [Service](/docs/service) for domain ownership and
+    public boundaries, then choose the capability guide you need.
 
   </Step>
   <Step>

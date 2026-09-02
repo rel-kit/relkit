@@ -60,7 +60,7 @@ export function eventConfig(
     delivery: value.delivery,
     profile: selectedProviderProfile(
       application,
-      "events",
+      "event",
       typeof value.profile === "string" ? value.profile : undefined,
     ),
     retry: value.retry,

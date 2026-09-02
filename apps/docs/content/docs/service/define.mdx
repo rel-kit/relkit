@@ -98,13 +98,14 @@ not just a cosmetic folder rename.
 
 Yes. A domain consisting of internal event subscribers can use this boundary:
 
-<include cwd lang="ts" meta='title="examples/commerce/src/telemetry/service.ts"'>
-  ../../examples/commerce/src/telemetry/service.ts
+<include cwd lang="ts" meta='title="src/notifications/service.ts"'>
+  ../../apps/docs/examples/events/order-confirmation.service.ts
 </include>
 
-Telemetry owns actual subscriber functions even though it exposes no public members. A normal domain
-containing only this empty service and no graph-visible artifacts fails compilation. Conversely, a
-domain that only publishes event contracts can expose `events` without exposing any functions.
+The receiving domain owns actual subscriber functions even though it exposes no public members. A
+normal domain containing only this empty service and no graph-visible artifacts fails compilation.
+Conversely, a domain that only publishes event contracts can expose `events` without exposing any
+functions.
 
 ## Verify the boundary
 

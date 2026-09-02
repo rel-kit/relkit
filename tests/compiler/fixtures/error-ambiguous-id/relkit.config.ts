@@ -1,3 +1,3 @@
-import { defineConfig, defineEnv } from "@relkit/app";
+import { defineApp, defineEnv } from "@relkit/app";
 
-export default defineConfig({ id: "ambiguous-app", env: defineEnv({}) });
+export default defineApp({ id: "ambiguous-app", env: defineEnv({}) });

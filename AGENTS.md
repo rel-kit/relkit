@@ -9,18 +9,20 @@ over this file. Read it before editing.
 RELKIT is a strict TypeScript monorepo managed by Bun `1.3.10` and Turborepo.
 The main product topology is:
 
-| Path                   | Role                                                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/docs`            | Searchable Next.js/Fumadocs guides and generated API/CLI reference, normally served on port `3001`.                             |
-| `apps/inspector`       | Next.js inspector app, normally served on port `3210`.                                                                          |
-| `examples/commerce`    | Canonical executable example and cross-feature acceptance application.                                                          |
-| `packages/`            | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
-| `templates/default/v1` | Generated `minimal`, `api`, and `agent` projects.                                                                               |
-| `tests/`               | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
-| `scripts/`             | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
-| `docs/`                | User documentation, technical specifications, decisions, and evidence.                                                          |
-| `openspec/`            | Change proposals, tasks, delta specifications, and change evidence.                                                             |
-| `repos/effect`         | Vendored Effect reference source; never edit or install in it.                                                                  |
+| Path                    | Role                                                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/docs`             | Searchable Next.js/Fumadocs guides and generated API/CLI reference, normally served on port `3001`.                             |
+| `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
+| `examples/commerce`     | Canonical executable example and cross-feature acceptance application.                                                          |
+| `integrations/catalog`  | Optional side-effect-free `@relkit/integrations` catalog.                                                                       |
+| `integrations/packages` | Independently publishable Redis, S3, Docker, local, Cloudflare, AI SDK, telemetry, AWS, and Pulumi integrations.                |
+| `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
+| `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
+| `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
+| `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
+| `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
+| `openspec/`             | Change proposals, tasks, delta specifications, and change evidence.                                                             |
+| `repos/effect`          | Vendored Effect reference source; never edit or install in it.                                                                  |
 
 Generated projects run a backend on `PORT=3000` and the real Next inspector on
 port `3210` by default. `.relkit/generated` contains graph and manifest outputs;
@@ -39,22 +41,28 @@ bun run check
 bun run test:all
 bun run build
 bun run verify
+bun run prepush
 ```
 
-Use focused scripts such as `bun run test:compiler`,
+Use focused scripts such as `bun run test:packages`, `bun run test:compiler`,
 `bun run test:integration`, `bun run test:inspector`,
 `bun run test:generator`, `bun run test:examples`, `bun run test:docs`, and
-`bun run test:deployment` while iterating.
+`bun run test:deployment` while iterating. Use `bun run test:local-docker` for
+the opt-in Redis/MinIO Docker lifecycle.
 The repository guardrail suite is `bun test tests/phase0.test.ts`.
 `test:all` is fail-fast and local by default. Cloud acceptance requires
 explicit `RELKIT_TEST_ALL_CLOUD=1`, `RELKIT_AWS_INTEGRATION_REGION`, and
 `RELKIT_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
+Before any authorized push, run `bun run prepush` with Docker running. It covers
+every required CI job that is reproducible locally; dependency review and the
+opt-in AWS cloud job remain CI-only.
 
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
-`bun run typecheck`, `bun run build`, and `bun run start`. The default generator
-configuration is AWS/Pulumi. Use `--cloud none --deploy none` for a local-only
-project. The CLI package contains the prebuilt inspector; `RELKIT_INSPECTOR_ROOT`
-is only for framework contributors testing inspector source.
+`bun run typecheck`, `bun run build`, and `bun run start`. Cloud and deployment
+default to `none`; use `--cloud aws --deploy pulumi` when AWS deployment is
+required. The CLI package contains the prebuilt inspector;
+`RELKIT_INSPECTOR_ROOT` is only for framework contributors testing inspector
+source.
 
 ## Editing rules
 

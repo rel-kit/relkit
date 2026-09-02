@@ -70,16 +70,21 @@ The Next.js inspector SHALL consume versioned backend APIs/SSE and SHALL NOT sca
 
 ### Requirement: Complete inspector navigation
 
-The inspector SHALL provide overview, graph, routes, functions, jobs, events/listeners, buckets, cache, tools, agents, requests, logs, traces, environment metadata, diagnostics, and API reference list/detail destinations.
+The inspector SHALL provide overview, graph, routes, middleware, functions, jobs, events/listeners, buckets, cache, tools, agents, requests, logs, traces, environment metadata, diagnostics, and API reference list/detail destinations.
 
 #### Scenario: Full fixture is inspected
 
 - **WHEN** the deterministic commerce example is active
 - **THEN** every required navigation destination renders its matching graph/API data, the active graph hash is visible, and the API reference represents the same generation
 
-### Requirement: Route, function, and request workflows
+### Requirement: Route, middleware, function, and request workflows
 
-Route pages SHALL show mapping/schema/OpenAPI/source/recent requests and a schema-driven composer; function pages SHALL show schemas, declared and observed edges, limits, source, invocation, logs, and traces; request detail SHALL show its complete correlated timeline.
+Route pages SHALL link matching middleware and show coverage; middleware pages SHALL show path, execution order, source, and linked matching routes; function pages SHALL show schemas, declared and observed edges, limits, source, invocation, logs, and traces; request detail SHALL show its complete correlated timeline.
+
+#### Scenario: Route middleware is inspected
+
+- **WHEN** a developer opens a route with matching middleware
+- **THEN** each `always` or `conditional` relationship links to a canonical middleware detail page and displays its execution order
 
 #### Scenario: Request composer succeeds
 
@@ -90,15 +95,6 @@ Route pages SHALL show mapping/schema/OpenAPI/source/recent requests and a schem
 
 - **WHEN** submitted values violate the route contract
 - **THEN** the UI shows safe field-level or response validation feedback and links any resulting request record
-
-### Requirement: Managed capability and agent workflows
-
-Job/event/resource/tool/agent pages SHALL show declared contracts and safe current state, including job retry/dead-letter controls in local mode, event selector expansions/deliveries, capability metadata, and agent model/tool/approval timelines.
-
-#### Scenario: Event detail renders
-
-- **WHEN** an event has publishers and matching `onEvent` bindings
-- **THEN** the page uses event/listener/trigger terminology, shows versioned schemas and delivery state, and exposes no separate application subscription resource
 
 ### Requirement: Live resilient diagnostics and telemetry
 
@@ -167,3 +163,66 @@ Trace detail SHALL present an expandable span hierarchy and aligned waterfall wi
 
 - **WHEN** a trace contains a failed nested span
 - **THEN** the developer can locate it by hierarchy or error filter, inspect safe attributes/logs, and navigate to correlated records
+
+### Requirement: Inspector presents the domain model
+
+The Inspector SHALL provide domain list and detail views backed by service graph nodes and SHALL group all domain-owned public and internal functions, events, errors, jobs, tools, agents, caches, buckets, generated artifacts, dependencies, and routes.
+
+#### Scenario: Developer inspects a domain
+
+- **WHEN** the developer opens the orders domain
+- **THEN** the Inspector distinguishes public and internal artifacts and links its routes and service dependencies
+
+### Requirement: Specialized services expose safe details
+
+Database and authentication domains SHALL display only serializable schema/model, dialect, base-path, protected-route, and dependency metadata and SHALL not expose clients, credentials, handlers, callbacks, or secrets.
+
+#### Scenario: Database service is inspected
+
+- **WHEN** the database domain detail is loaded
+- **THEN** tables, safe column metadata, selectors, and custom method names are visible without a live database object
+
+### Requirement: Inspector presents authored event functions
+
+Event views SHALL join generated trigger-to-event and trigger-to-function edges to show authored event functions as consumers, and function views SHALL distinguish callable and event-only invocation modes while retaining publisher, delivery, retry, replay, and dead-letter state.
+
+#### Scenario: Event detail renders consumers
+
+- **WHEN** an event has publishers and multiple event functions
+- **THEN** the page links each authored function, shows its independent runtime state, and exposes no selector expansion or hidden listener function
+
+### Requirement: Inspector presents integration topology safely
+
+Inspector SHALL show each logical resource, capability, physical profile, adapter, connected/local/infrastructure source, declared features, required binding value names, selected integration package/version, and deployment role without displaying resolved values, credentials, implementation objects, or arbitrary module paths.
+
+#### Scenario: Mixed cache topology is inspected
+
+- **WHEN** an application has local/connected Redis and connected Cloudflare profiles
+- **THEN** their logical relationships and source behavior are distinct and no view implies that the host owns connected services
+
+### Requirement: Inspector presents local service lifecycle
+
+Local Inspector APIs and views SHALL show planned, starting, healthy, unhealthy, stopped, detached, and blocked lease states plus binding, recipe, plan-hash, and safe health metadata; non-local Inspector access SHALL expose no local control operations.
+
+#### Scenario: Local service health fails
+
+- **WHEN** a required Redis recipe does not become healthy
+- **THEN** Inspector shows the binding-scoped diagnostic while the last-known-good application generation remains active
+
+### Requirement: Inspector presents complete telemetry before export sampling
+
+Request, log, trace, diagnostic, and generation views SHALL use the complete redacted local store and SHALL separately display exporter selection, health, dropped-export counters, and sampling decisions.
+
+#### Scenario: Trace is not exported
+
+- **WHEN** external sampling excludes a trace
+- **THEN** its complete local timeline remains navigable and the view indicates only that external export was skipped
+
+### Requirement: Inspector verifies activation cohorts
+
+Generation state and readiness APIs SHALL report the composite activation fingerprint, and the supervisor SHALL refuse a candidate whose graph, manifest, runtime-integration, local-service, or override identity differs from the expected cohort.
+
+#### Scenario: Candidate has stale local overrides
+
+- **WHEN** readiness reports an override generation from another local plan
+- **THEN** activation fails safely and Inspector identifies the mismatched cohort member

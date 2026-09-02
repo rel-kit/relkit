@@ -5,7 +5,7 @@
     {
       "name": "package-shell-files",
       "description": "Every RelKit package owns one manifest, TypeScript project, and public entry file.",
-      "paths": "packages/{packageName}",
+      "paths": ["packages/{packageName}", "integrations/packages/{packageName}"],
       "must": {
         "haveType": "directory",
         "haveFiles": ["package.json", "tsconfig.json", "src/index.ts"]
@@ -14,7 +14,29 @@
     {
       "name": "package-entry-barrel",
       "description": "Package entry files stay pure barrels as package APIs grow.",
-      "paths": "packages/{packageName}/src/index.ts",
+      "paths": [
+        "packages/{packageName}/src/index.ts",
+        "integrations/packages/{packageName}/src/**/index.ts"
+      ],
+      "must": {
+        "areBarrelFiles": true,
+        "importFromCurrentDir": false,
+        "importFromParents": false
+      }
+    },
+    {
+      "name": "integration-catalog-shell-files",
+      "description": "The integration catalog owns one manifest, TypeScript project, and public entry file.",
+      "paths": "integrations/catalog",
+      "must": {
+        "haveType": "directory",
+        "haveFiles": ["package.json", "tsconfig.json", "src/index.ts"]
+      }
+    },
+    {
+      "name": "integration-catalog-entry-barrel",
+      "description": "The integration catalog public entry stays a pure barrel.",
+      "paths": "integrations/catalog/src/index.ts",
       "must": {
         "areBarrelFiles": true,
         "importFromCurrentDir": false,

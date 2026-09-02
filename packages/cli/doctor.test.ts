@@ -21,7 +21,7 @@ test("doctor validates the fixture without deployment prerequisites", async () =
   expect(commands[0]).toEqual([process.execPath, "install", "--frozen-lockfile", "--dry-run"]);
   expect(result.checks.find((check) => check.name === "ports")?.details).toEqual({
     backend: 0,
-    inspector: 3210,
+    inspector: 4001,
   });
 });
 

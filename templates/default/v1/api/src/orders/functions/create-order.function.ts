@@ -18,19 +18,13 @@ const createOrder = defineFunction({
   input: orderInput,
   output: orderOutput,
 
-  // Events this function is allowed to publish.
-  publishes: ["orders.created"],
-
-  handler: async (input, context) => {
+  handler: async (input) => {
     const { totalCents } = await priceOrder.invoke({ quantity: input.quantity });
     const order = {
       orderId: input.orderId,
       sku: input.sku,
       totalCents,
     };
-
-    // Let subscribers react to the new order.
-    await context.events["orders.created"].publish(order);
 
     return order;
   },

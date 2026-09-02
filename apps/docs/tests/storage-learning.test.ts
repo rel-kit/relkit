@@ -6,8 +6,9 @@ import { storageGuideGroup } from "../scripts/storage-guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 
 test("places Storage beside Auth with focused pages and right-side TOC headings", async () => {
-  expect(guideGroups.map(({ directory }) => directory).slice(0, 8)).toEqual([
+  expect(guideGroups.map(({ directory }) => directory).slice(0, 9)).toEqual([
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",
@@ -35,9 +36,9 @@ test("teaches an existing-app upload with source-backed examples and local verif
   const tutorial = await Bun.file(resolve(content, "storage/first-upload.mdx")).text();
   expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
-  expect(tutorial).toContain("RELKIT_ENV=test bun run dev");
   expect(tutorial).toContain("relkit.config.ts#storage-profile");
-  expect(tutorial).toContain("platform/env.ts#storage-environment");
+  expect(tutorial).toContain("bun run dev --local=off");
+  expect(tutorial).toContain("explicit replacements for profile `assets`");
   for (const source of [
     "assets/buckets/assets.bucket.ts",
     "assets/functions/upload-assets.function.ts",

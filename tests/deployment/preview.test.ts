@@ -11,12 +11,26 @@ import { createPulumiWorkspace } from "../../packages/deploy-pulumi/src/workspac
 import { hashGraph, type ApplicationGraph } from "../../packages/graph/src/index.ts";
 import { runDeploy } from "../../packages/cli/src/commands/deploy.ts";
 
-const graph = JSON.parse(
+const fixtureGraph = JSON.parse(
   await readFile(
     join(import.meta.dir, "../compiler/fixtures/valid-minimal/expected.graph.json"),
     "utf8",
   ),
 ) as ApplicationGraph;
+const graph: ApplicationGraph = {
+  ...fixtureGraph,
+  nodes: fixtureGraph.nodes.map((node) =>
+    node.kind === "app"
+      ? {
+          ...node,
+          deploymentRoles: [
+            { role: "engine", integrationId: "pulumi", protocolVersion: 1, configuration: {} },
+            { role: "host", integrationId: "aws", protocolVersion: 1, configuration: {} },
+          ],
+        }
+      : node,
+  ),
+};
 
 test("previews an isolated stack with redacted events, confirmation, and a no-op repeat", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-preview-"));
@@ -212,6 +226,7 @@ function valueAfter(args: readonly string[], flag: string): string | undefined {
 
 function options(root: string, state: PreviewState) {
   return {
+    loadIntegrations: async () => fakeIntegrations(),
     check: async () => ({
       ok: true,
       activatable: true,
@@ -239,6 +254,31 @@ function options(root: string, state: PreviewState) {
       state.backendKinds.push(workspaceOptions.backend?.kind ?? "cloud");
       return createPulumiWorkspace({ ...workspaceOptions, pulumiCommand: state.command });
     },
+  };
+}
+
+function fakeIntegrations() {
+  const selected = (role: "engine" | "host", integrationId: string) => {
+    const metadata = {
+      kind: "deployment-integration" as const,
+      protocolVersion: 1 as const,
+      integrationId,
+      role,
+    };
+    return {
+      metadata,
+      packageName: `@relkit/${integrationId}`,
+      packageVersion: "0.1.0",
+      exportName: role === "engine" ? "./engine" : "./host",
+      resolvedPath: `/test/${integrationId}/${role}.js`,
+      module: { deploymentIntegration: metadata },
+    };
+  };
+  return {
+    engine: selected("engine", "pulumi"),
+    host: selected("host", "aws"),
+    infrastructure: new Map(),
+    access: new Map(),
   };
 }
 

@@ -1,6 +1,7 @@
 import { readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import type { SecretScanCategory } from "./secret-scan.ts";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 export interface SecretScanArtifact {
   readonly path: string;
@@ -34,8 +35,8 @@ export async function artifactFiles(root: string): Promise<SecretScanArtifact[]>
   await add(join(root, "tests"), "snapshots", (path) =>
     /\.(?:json|ndjson|html?|snap|snapshot|log|txt)$/i.test(path),
   );
-  for (const entry of await directoryEntries(join(root, "packages")))
-    await add(join(root, "packages", entry, "dist"), "generated-source");
+  for (const directory of workspacePackageDirectories(root))
+    await add(join(directory, "dist"), "generated-source");
   for (const path of ["RELEASE_CHECKLIST.md", "RELEASE_NOTES.md"])
     await add(join(root, path), "cloud-evidence");
   return result.sort((left, right) => left.source.localeCompare(right.source));
@@ -70,15 +71,4 @@ async function files(directory: string): Promise<string[]> {
     else if (entry.isFile()) result.push(path);
   }
   return result;
-}
-
-async function directoryEntries(directory: string): Promise<string[]> {
-  try {
-    return (await readdir(directory, { withFileTypes: true }))
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name);
-  } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "ENOENT") return [];
-    throw error;
-  }
 }

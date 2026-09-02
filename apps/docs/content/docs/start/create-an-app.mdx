@@ -37,7 +37,7 @@ Expected output is `1.3.10`. If another version is active, switch before generat
     Execute this command from the directory that should contain the new project:
 
     ```sh title="Terminal"
-    bunx create-relkit@latest relkit-orders --template api --cloud none --deploy none
+    bunx create-relkit@latest relkit-orders --template api
     ```
 
     The generator validates the destination before writing, installs dependencies, runs initial checks,
@@ -54,14 +54,12 @@ Expected output is `1.3.10`. If another version is active, switch before generat
     bun run check
     ```
 
-    The API template declares an event provider, so `.env.example` supplies its non-secret local endpoint,
-    bus name, region, and log level. `--no-pulumi` tells `doctor` this journey does not require Pulumi or AWS
-    credentials. `check` compiles descriptors and writes the checked graph and diagnostics under
-    `.relkit/generated`. Both commands must exit `0`.
+    `.env.example` supplies only a safe log-level default. `--no-pulumi` tells `doctor` this journey does
+    not require Pulumi or AWS credentials. `check` compiles descriptors and writes the checked graph and
+    diagnostics under `.relkit/generated`. Both commands must exit `0`.
 
-    `--cloud none --deploy none` skips deployment prerequisites; it does not remove the template's
-    optional AWS/Pulumi configuration. That declaration does not provision anything. Do not run
-    deployment commands as part of this local exercise.
+    Cloud and deployment default to `none`, so the generated package and `defineApp` configuration omit AWS
+    and Pulumi. Add `--cloud aws --deploy pulumi` only for an explicitly authorized deployment path.
 
   </Step>
 </Steps>
@@ -93,11 +91,6 @@ Expected output is `1.3.10`. If another version is active, switch before generat
       <Folder name="functions">
         <File name="create-order.function.ts" />
         <File name="price-order.function.ts" />
-        <File name="order-confirmation.function.ts" />
-        <File name="order-audit.function.ts" />
-      </Folder>
-      <Folder name="events">
-        <File name="order-created.event.ts" />
       </Folder>
     </Folder>
     <Folder name="routes" defaultOpen>

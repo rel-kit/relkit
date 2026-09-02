@@ -1,5 +1,6 @@
 import type { JsonValue } from "@relkit/contracts";
 import { eventRuntimeList } from "./events-runtime.js";
+import { projectRuntimeMetadata } from "./runtime-metadata.js";
 import {
   identity,
   isRecord,
@@ -99,7 +100,11 @@ export async function runtimeSnapshot(generation: ResolvedActiveGeneration): Pro
       return [collection, { count: items.length, items }] as const;
     }),
   );
-  return { ...identity(generation), state: Object.fromEntries(entries) } as JsonValue;
+  return {
+    ...identity(generation),
+    state: Object.fromEntries(entries),
+    ...projectRuntimeMetadata(generation),
+  } as JsonValue;
 }
 
 export async function runtimeList(

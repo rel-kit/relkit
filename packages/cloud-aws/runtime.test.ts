@@ -1,41 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { managed, sqs } from "@relkit/app";
 import type { JobQueueFactoryContext } from "@relkit/engine";
-import { awsProviderFactories, createSqsJobProvider } from "./src/index.ts";
+import { createSqsJobProvider } from "./src/index.ts";
 
 describe("AWS runtime providers", () => {
-  test("registers AWS capabilities independently from buckets and cache", async () => {
-    expect(Object.keys(awsProviderFactories)).toEqual([
-      "jobs:sqs",
-      "events:eventbridge",
-      "observability:cloudwatch",
-    ]);
-    const factory = awsProviderFactories["jobs:sqs"]!;
-    const binding = managed(
-      sqs({
-        region: "us-east-1",
-        queueUrl: "https://sqs.us-east-1.amazonaws.com/123/receipts",
-      }),
-    );
-    const generation = await factory.create({
-      generationId: "aws-generation-1",
-      environment: "production",
-      capability: "jobs",
-      profile: "default",
-      binding,
-      configuration: {
-        region: "us-east-1",
-        queueUrl: "https://sqs.us-east-1.amazonaws.com/123/receipts",
-      },
-    });
-
-    expect(factory.capability).toBe("jobs");
-    expect(factory.adapter).toBe("sqs");
-    expect(generation.value).toMatchObject({ createQueue: expect.any(Function) });
-    expect(Object.prototype.hasOwnProperty.call(generation, "buckets")).toBe(false);
-    expect(Object.prototype.hasOwnProperty.call(generation, "cache")).toBe(false);
-  });
-
   test("maps the materialized job queue contract to SQS send, receive, and acknowledge", async () => {
     const actions: string[] = [];
     const provider = createSqsJobProvider({
@@ -50,7 +17,7 @@ describe("AWS runtime providers", () => {
           );
         if (action === "ReceiveMessage")
           return new Response(
-            "<ReceiveMessageResponse><Message><MessageId>message-1</MessageId><ReceiptHandle>receipt-1</ReceiptHandle><Body>{&quot;input&quot;:{&quot;orderId&quot;:&quot;order-1&quot;}}</Body><ApproximateReceiveCount>1</ApproximateReceiveCount></Message></ReceiveMessageResponse>",
+            "<ReceiveMessageResponse><Message><MessageId>message-1</MessageId><ReceiptHandle>receipt-1</ReceiptHandle><Body>{&quot;input&quot;:{&quot;orderId&quot;:&quot;order-1&quot;,&quot;label&quot;:&quot;&amp;lt;&quot;}}</Body><ApproximateReceiveCount>1</ApproximateReceiveCount></Message></ReceiveMessageResponse>",
           );
         return new Response("<ok/>");
       },
@@ -65,7 +32,10 @@ describe("AWS runtime providers", () => {
 
     await queue.enqueue({ input: { orderId: "order-1" }, profile: "default" });
     const leased = await queue.acquire();
-    expect(leased).toMatchObject({ instanceId: "message-1", input: { orderId: "order-1" } });
+    expect(leased).toMatchObject({
+      instanceId: "message-1",
+      input: { orderId: "order-1", label: "&lt;" },
+    });
     await queue.transition("message-1", "completed", { expectedState: "leased" });
     expect(actions).toEqual(["SendMessage", "ReceiveMessage", "DeleteMessage"]);
   });

@@ -171,6 +171,7 @@ jobs:
           bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
           bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
           bun run test:container 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/container.log"
+          bun run test:local-docker 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/local-docker.log"
       - name: Upload failure evidence
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -5,6 +5,7 @@ import { startDev } from "./src/commands/dev.js";
 import {
   baseOptions,
   candidateSource,
+  fingerprint,
   makeRoot,
   responseText,
   startTrafficSession,
@@ -24,7 +25,7 @@ test("preserves active traffic across compile, start, hash, API, and readiness f
       let attempts = 0;
       const session = await startDev({
         ...baseOptions(root),
-        graphHash,
+        activationFingerprint: fingerprint(graphHash),
         healthTimeoutMs: 40,
         compile: async ({ outputDirectory, token }) => {
           attempts += 1;
@@ -74,7 +75,8 @@ test("rapid saves obsolete stale candidates and activate only the latest generat
   try {
     session = await startDev({
       ...baseOptions(root),
-      graphHash: (candidate) => `sha256:source-${candidate.token.sourceToken}`,
+      activationFingerprint: (candidate) =>
+        fingerprint(`sha256:source-${candidate.token.sourceToken}`),
       compile: async ({ outputDirectory, signal, token }) => {
         if (token.sourceToken === 2) {
           firstStarted();
@@ -98,7 +100,7 @@ test("rapid saves obsolete stale candidates and activate only the latest generat
     expect(await stale).toBe(false);
     expect(await latest).toBe(true);
     expect(session.activeTarget?.token).toEqual({ sourceToken: 3, generationToken: 3 });
-    expect(session.activeGraphHash).toBe("sha256:source-3");
+    expect(session.activeActivationFingerprint?.graphHash).toBe("sha256:source-3");
     expect(await responseText(session, "/hello")).toBe("generation-3");
     expect(await readdir(join(root, ".relkit", "generated"))).toEqual(["generation-3"]);
   } finally {
@@ -137,7 +139,7 @@ test("shutdown cleans the active backend, inspector child, and generation direct
   try {
     session = await startDev({
       ...baseOptions(root),
-      graphHash: "sha256:shutdown",
+      activationFingerprint: fingerprint("sha256:shutdown"),
       inspector: { command: [process.execPath, "-e", "setTimeout(() => {}, 10000)"], port: 0 },
       compile: async ({ outputDirectory, token }) => {
         const entrypoint = join(outputDirectory, "server.ts");

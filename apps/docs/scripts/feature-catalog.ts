@@ -9,7 +9,7 @@ export const features = [
     "Define application identity and runtime topology.",
     "fundamentals/application",
     "app",
-    [["packages/app/src/config.ts", "defineConfig"]],
+    [["packages/app/src/define-app.ts", "defineApp"]],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   feature(
@@ -24,12 +24,12 @@ export const features = [
   feature(
     "providers",
     "Provider bindings",
-    "Choose local, external, or managed infrastructure without changing handlers.",
-    "fundamentals/providers",
+    "Choose connected, local, or infrastructure-owned adapters without changing handlers.",
+    "integrations/index",
     "app",
     [
-      ["packages/app/src/providers.ts", "managed"],
-      ["packages/app/src/providers.ts", "external"],
+      ["integrations/packages/docker/src/index.ts", "docker"],
+      ["integrations/packages/aws/src/aws.ts", "aws"],
     ],
     ["examples/commerce/relkit.config.ts"],
   ),
@@ -105,13 +105,13 @@ export const features = [
     "events",
     "Events",
     "Publish typed facts and process them with independent listeners.",
-    "async/events",
+    "events/index",
     "events",
     [
       ["packages/events/src/define-event.ts", "defineEvent"],
       ["packages/events/src/define-event-function.ts", "defineEventFunction"],
     ],
-    ["examples/commerce/src/orders/events/order-created.event.ts"],
+    ["apps/docs/examples/events/order-created.event.ts"],
   ),
   feature(
     "jobs",
@@ -120,7 +120,7 @@ export const features = [
     "jobs/define",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+    ["apps/docs/examples/jobs/send-receipt.job.ts"],
   ),
   feature(
     "schedules",
@@ -129,7 +129,7 @@ export const features = [
     "jobs/schedules",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+    ["apps/docs/examples/jobs/send-receipt.job.ts"],
   ),
   feature(
     "buckets",

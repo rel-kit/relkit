@@ -1,6 +1,7 @@
 import type { JsonValue, SourceLocation } from "@relkit/contracts";
 import type { AppNode, EnvironmentVariableNode, GeneratedAgentMarker } from "./foundation-nodes.js";
 import type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
+import type { ProviderBindingNode } from "./provider-nodes.js";
 import type { ServiceNode } from "./service-nodes.js";
 
 export const GRAPH_NODE_KINDS = [
@@ -135,18 +136,6 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly generatedFunction: GeneratedAgentMarker;
   readonly profile: string;
 }
-export interface ProviderProfileNode extends GraphNodeBase<"provider"> {
-  readonly profile: string;
-  readonly capability: string;
-  readonly adapter: string;
-  readonly ownership: "external" | "managed";
-  readonly configuration: JsonValue;
-  readonly environment: readonly {
-    readonly name: string;
-    readonly type: string;
-    readonly sensitive: boolean;
-  }[];
-}
 export type GraphNode =
   | AppNode
   | EnvironmentVariableNode
@@ -159,7 +148,7 @@ export type GraphNode =
   | CacheNode
   | ToolNode
   | AgentNode
-  | ProviderProfileNode
+  | ProviderBindingNode
   | ServiceNode
   | MiddlewareNode
   | HookNode;

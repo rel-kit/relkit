@@ -15,10 +15,12 @@ import { type TestFakes } from "./fakes.js";
 import { loadTestRoutes } from "./application-routes.js";
 import { handleTestRequest } from "./application-http.js";
 import { activateTestServices } from "./application-services.js";
-import { loadTestRegistry } from "./application-registry.js";
+import { loadTestApplicationArtifacts } from "./application-registry.js";
+import { activateTestProviders } from "./provider-replacements.js";
 
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
+  readonly bindingValues?: Readonly<Record<string, JsonValue>>;
 };
 
 export interface TestApplication {
@@ -49,16 +51,30 @@ export async function createTestApplication(
   app: { readonly env: object },
   options: TestApplicationOptions = {},
 ): Promise<TestApplication> {
-  const projectRoot = options.projectRoot ?? process.cwd();
-  const registry = options.registry ?? (await loadTestRegistry(projectRoot));
+  const { projectRoot: configuredRoot, bindingValues, ...runtimeOptions } = options;
+  const projectRoot = configuredRoot ?? process.cwd();
+  const artifacts = await loadTestApplicationArtifacts(projectRoot);
+  const registry = runtimeOptions.registry ?? artifacts?.registry;
   const routes = await loadTestRoutes(projectRoot);
   const context: Record<string, unknown> = {};
   const runtime = createTestRuntime({
     app: app as NonNullable<TestRuntimeOptions["app"]>,
-    ...options,
+    ...runtimeOptions,
     ...(registry === undefined ? {} : { registry }),
     context,
   });
+  let providers;
+  try {
+    providers = await activateTestProviders(
+      artifacts,
+      runtime.providers,
+      bindingValues,
+      runtime.fakes,
+    );
+  } catch (error) {
+    await runtime.close({ failed: true });
+    throw error;
+  }
   const services = await activateTestServices(projectRoot, runtime.env, routes);
   const requests = new AsyncLocalStorage<Request>();
   Object.assign(context, services.context, {
@@ -100,7 +116,12 @@ export async function createTestApplication(
   const close = (): Promise<void> =>
     (closing ??= (async () => {
       const failures: unknown[] = [];
-      for (const cleanup of [() => http.close(), () => runtime.close(), () => services.close()]) {
+      for (const cleanup of [
+        () => http.close(),
+        () => runtime.close(),
+        () => providers?.release(),
+        () => services.close(),
+      ]) {
         try {
           await cleanup();
         } catch (error) {
@@ -130,3 +151,4 @@ function isAuthEndpoint(
   return path === base || path.startsWith(`${base}/`);
 }
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { JsonValue } from "@relkit/contracts";

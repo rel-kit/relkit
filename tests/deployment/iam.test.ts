@@ -23,9 +23,23 @@ test("omits every unused cloud action from a capability-free graph", () => {
 });
 
 function snapshot(fixture: string): DeploymentIamPlan {
-  const graph = JSON.parse(
+  const source = JSON.parse(
     readFileSync(join(fixtureRoot, fixture, "expected.graph.json"), "utf8"),
   ) as ApplicationGraph;
+  const graph: ApplicationGraph = {
+    ...source,
+    nodes: source.nodes.map((node) =>
+      node.kind === "app"
+        ? {
+            ...node,
+            deploymentRoles: [
+              { role: "engine", integrationId: "pulumi", protocolVersion: 1, configuration: {} },
+              { role: "host", integrationId: "aws", protocolVersion: 1, configuration: {} },
+            ],
+          }
+        : node,
+    ),
+  };
   return fromGraph(graph).iam;
 }
 

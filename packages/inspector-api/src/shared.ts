@@ -3,6 +3,7 @@ import {
   normalizeSourceLocation,
   type JsonValue,
   type MaybePromise,
+  type RuntimeActivationFingerprint,
 } from "@relkit/contracts";
 import { redactRecord, type RedactionPolicy } from "@relkit/observability";
 import type { InspectorActionServices } from "./actions.js";
@@ -28,6 +29,9 @@ export interface InspectorGenerationServices extends InspectorRuntimeServices {
   readonly descriptors?: unknown;
   readonly environment?: unknown;
   readonly diagnostics?: unknown;
+  readonly integrations?: unknown;
+  readonly localServices?: unknown;
+  readonly telemetry?: unknown;
   readonly candidate?: unknown;
   readonly candidateGeneration?: unknown;
   readonly observedEdges?: unknown;
@@ -39,6 +43,7 @@ export interface InspectorActiveGeneration extends InspectorGenerationServices {
   readonly generationId?: string;
   readonly id?: string;
   readonly graphHash?: string;
+  readonly activationFingerprint?: RuntimeActivationFingerprint;
   readonly services?: InspectorGenerationServices;
   readonly candidate?: InspectorCandidateGenerationSource;
   readonly candidateGeneration?: InspectorCandidateGenerationSource;
@@ -53,10 +58,14 @@ export interface ActiveGenerationOptions {
 export interface ResolvedActiveGeneration {
   readonly generationId: string;
   readonly graphHash: string;
+  readonly activationFingerprint?: RuntimeActivationFingerprint;
   readonly graph?: unknown;
   readonly descriptors?: unknown;
   readonly diagnostics?: unknown;
   readonly observedEdges?: unknown;
+  readonly integrations?: unknown;
+  readonly localServices?: unknown;
+  readonly telemetry?: unknown;
   readonly runtime?: InspectorRuntimeServices;
   readonly actions?: InspectorActionServices;
   readonly resources?: InspectorResourceExplorers;
@@ -74,7 +83,6 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 export function stringValue(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
 }
-
 export async function resolveValue<T>(
   source: InspectorValueSource<T> | undefined,
 ): Promise<T | undefined> {
@@ -84,18 +92,15 @@ export async function resolveValue<T>(
       ? await (source as () => MaybePromise<T>)()
       : source;
 }
-
 export async function resolveService(source: unknown): Promise<unknown> {
   const value = await resolveValue(source);
   if (isRecord(value) && typeof value.snapshot === "function") return await value.snapshot();
   return value;
 }
-
 export interface Page<T extends JsonValue = JsonValue> {
   readonly items: readonly T[];
   readonly nextCursor?: string;
 }
-
 export function page<T extends JsonValue>(items: readonly T[], request: Request): Page<T> {
   const params = new URL(request.url).searchParams;
   const search = readFilter(params.get("search"), "search");
@@ -119,13 +124,11 @@ export function page<T extends JsonValue>(items: readonly T[], request: Request)
     ? { items: selected, nextCursor: String(next) }
     : { items: selected };
 }
-
 function readFilter(value: string | null, name: string): string | undefined {
   if (value === null || value.trim() === "") return undefined;
   if (value.length > 128) throw new InspectorQueryError(`${name} is invalid`);
   return value.trim();
 }
-
 function matchesField(value: JsonValue, names: readonly string[], expected: string): boolean {
   if (!isRecord(value)) return false;
   return names.some(
@@ -133,7 +136,6 @@ function matchesField(value: JsonValue, names: readonly string[], expected: stri
       value[name] === expected || (isRecord(value.config) && value.config[name] === expected),
   );
 }
-
 function includesText(value: JsonValue, query: string): boolean {
   if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
     return String(value).toLowerCase().includes(query);
@@ -143,7 +145,6 @@ function includesText(value: JsonValue, query: string): boolean {
     isRecord(value) && Object.values(value).some((item) => includesText(item as JsonValue, query))
   );
 }
-
 function readInteger(value: string | null, name: string, fallback: number): number {
   if (value === null) return fallback;
   if (!/^\d+$/.test(value)) throw new InspectorQueryError(`${name} is invalid`);
@@ -152,7 +153,6 @@ function readInteger(value: string | null, name: string, fallback: number): numb
     throw new InspectorQueryError(`${name} is invalid`);
   return parsed;
 }
-
 export function safeSource(value: unknown): JsonValue | undefined {
   if (!isRecord(value) || typeof value.file !== "string") return undefined;
   if (!Number.isInteger(value.line) || !Number.isInteger(value.column)) return undefined;
@@ -164,27 +164,26 @@ export function safeSource(value: unknown): JsonValue | undefined {
     return undefined;
   }
 }
-
 export function safeJson(value: unknown, policy?: RedactionPolicy): JsonValue {
   return redactRecord(value, policy);
 }
-
 export function pick(value: unknown, keys: readonly string[]): Record<string, unknown> {
   if (!isRecord(value)) return {};
   const result: Record<string, unknown> = {};
   for (const key of keys) if (value[key] !== undefined) result[key] = value[key];
   return result;
 }
-
 export function identity(generation: ResolvedActiveGeneration): Record<string, JsonValue> {
   return {
     protocol: "relkit.inspector",
     version: API_VERSION,
     generationId: generation.generationId,
     graphHash: generation.graphHash,
+    ...(generation.activationFingerprint === undefined
+      ? {}
+      : { activationFingerprint: safeJson(generation.activationFingerprint) }),
   };
 }
-
 export async function resolveCollection(source: unknown): Promise<unknown> {
   const value = await resolveService(source);
   if (isRecord(value) && typeof value.list === "function") return await value.list();

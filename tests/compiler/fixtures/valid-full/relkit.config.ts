@@ -1,58 +1,35 @@
-import {
-  aiSdk,
-  defineConfig,
-  defineEnv,
-  env as envFactory,
-  eventBridge,
-  external,
-  managed,
-  redis,
-  s3,
-  sqs,
-} from "@relkit/app";
+import { aiSdk } from "@relkit/ai-sdk";
+import { defineApp, defineEnv, env as envFactory } from "@relkit/app";
+import { docker } from "@relkit/docker";
+import { redis } from "@relkit/redis";
+import { s3 } from "@relkit/s3";
 
 const env = defineEnv({
   SERVICE_PORT: envFactory.port().default(3000),
-  CACHE_URL: envFactory.secret().optional(),
-  MODEL_API_KEY: envFactory.secret().optional(),
 });
 
-export default defineConfig({
+export default defineApp({
   id: "full-app",
   env,
-  buckets: {
-    default: managed(
-      s3({
-        endpoint: "https://s3.us-east-1.amazonaws.com",
-        bucketName: "assets",
-        region: "us-east-1",
-      }),
-    ),
+  bucket: {
+    default: s3({
+      endpoint: "https://s3.us-east-1.amazonaws.com",
+      bucketName: "assets",
+      region: "us-east-1",
+    }),
   },
-  caches: { default: external(redis({ url: env.CACHE_URL })) },
-  jobs: {
-    default: managed(
-      sqs({ region: "us-east-1", queueUrl: "https://sqs.us-east-1.amazonaws.com/1/jobs" }),
-    ),
-  },
-  events: {
-    default: managed(eventBridge({ region: "us-east-1", busName: "events" })),
-  },
-  models: {
-    default: external(
-      aiSdk({
-        defaultProvider: "openai",
-        defaultModel: "gpt-5-mini",
-        openai: { apiKey: env.MODEL_API_KEY },
-      }),
-    ),
+  cache: { default: docker(redis({ url: envFactory.secret("CACHE_URL") })) },
+  model: {
+    openai: aiSdk({
+      provider: "openai",
+      defaultModel: "gpt-5-mini",
+      apiKey: envFactory.secret("MODEL_API_KEY"),
+    }),
   },
   defaults: {
     bucket: "default",
     cache: "default",
-    job: "default",
-    event: "default",
-    model: "default",
+    model: "openai",
   },
-  telemetry: { bodyCapture: { mode: "off" } },
+  telemetry: { redaction: { mode: "off" } },
 });

@@ -1,5 +1,5 @@
 import { canonicalJson, deepFreeze } from "@relkit/contracts";
-import type { DeploymentPlan } from "./plan.js";
+import { assertDeploymentPlanVersion, type DeploymentPlan } from "./plan.js";
 import {
   changedFields,
   isSecuritySensitive,
@@ -55,6 +55,8 @@ export interface DeploymentDiff {
 
 /** Compares deployment resources; this is intentionally separate from graph contract diffing. */
 export function diffDeploymentPlans(before: DeploymentPlan, after: DeploymentPlan): DeploymentDiff {
+  assertDeploymentPlanVersion(before);
+  assertDeploymentPlanVersion(after);
   const left = resources(before);
   const right = resources(after);
   const beforeById = new Map(left.map((resource) => [resource.stableId, resource]));
@@ -81,7 +83,9 @@ export function summarizeDeploymentChanges(
   const counts = { create: 0, update: 0, delete: 0, replace: 0 };
   for (const change of changes) counts[change.operation] += 1;
   const securitySensitive = changes.filter((change) => change.securitySensitive).length;
-  const destructive = counts.delete + counts.replace;
+  const destructive = changes.filter((change) =>
+    change.confirmationReasons.includes("destructive"),
+  ).length;
   const requiresConfirmation = changes.some((change) => change.confirmation === "required");
   const highestRisk = changes.reduce<DeploymentRisk | undefined>(
     (current, change) =>
@@ -115,7 +119,7 @@ function change(
       ? "create"
       : after === undefined
         ? "delete"
-        : before.logicalName !== after.logicalName
+        : before.replacementKey !== after.replacementKey
           ? "replace"
           : "update";
   const fields =
@@ -132,7 +136,11 @@ function change(
     after?.value,
   );
   const reasons: ConfirmationReason[] = [];
-  if (operation === "delete" || operation === "replace") reasons.push("destructive");
+  const destructive =
+    (operation === "delete" || operation === "replace") &&
+    resource.kind !== "connected-binding" &&
+    resource.kind !== "access-operation";
+  if (destructive) reasons.push("destructive");
   if (securitySensitive) reasons.push("security-sensitive");
   const confirmationClassification = reasons.includes("destructive")
     ? reasons.includes("security-sensitive")
@@ -148,7 +156,7 @@ function change(
       kind: resource.kind,
       logicalName: resource.logicalName,
       operation,
-      risk: risk(operation, securitySensitive),
+      risk: risk(operation, securitySensitive, destructive),
       securitySensitive,
       confirmation: confirmationClassification === "none" ? "none" : "required",
       confirmationClassification,
@@ -158,9 +166,13 @@ function change(
   ];
 }
 
-function risk(operation: DeploymentOperation, securitySensitive: boolean): DeploymentRisk {
-  if (operation === "replace") return "critical";
-  if (operation === "delete") return securitySensitive ? "critical" : "high";
+function risk(
+  operation: DeploymentOperation,
+  securitySensitive: boolean,
+  destructive: boolean,
+): DeploymentRisk {
+  if (destructive && operation === "replace") return "critical";
+  if (destructive && operation === "delete") return securitySensitive ? "critical" : "high";
   if (securitySensitive) return "high";
   return operation === "update" ? "medium" : "low";
 }

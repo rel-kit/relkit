@@ -5,4 +5,3 @@ export * from "./RelkitContainerRegistry/index.js";
 export * from "./RelkitEventBus/index.js";
 export * from "./RelkitJobQueues/index.js";
 export * from "./RelkitNetwork/index.js";
-export * from "./RelkitObservability/index.js";

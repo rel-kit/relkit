@@ -9,7 +9,8 @@ interface ProviderItem extends ResourceTableItem {
   readonly capability: string;
   readonly profile: string;
   readonly adapter: string;
-  readonly ownership: string;
+  readonly source: string;
+  readonly features: number;
   readonly references: number;
   readonly metadata: InspectorObject;
 }
@@ -32,8 +33,9 @@ export function ProviderList() {
         { key: "capability", label: "Capability", render: (item) => item.capability },
         { key: "profile", label: "Profile", render: (item) => item.profile },
         { key: "adapter", label: "Adapter", render: (item) => item.adapter },
-        { key: "ownership", label: "Ownership", render: (item) => item.ownership },
-        { key: "references", label: "Environment", render: (item) => item.references },
+        { key: "source", label: "Source", render: (item) => item.source },
+        { key: "features", label: "Features", render: (item) => item.features },
+        { key: "references", label: "Binding values", render: (item) => item.references },
       ]}
       href={(item) => `/providers/${encodeURIComponent(item.id)}`}
       openLabel="Open provider"
@@ -43,15 +45,24 @@ export function ProviderList() {
 }
 
 function providerItem(value: InspectorObject): ProviderItem {
+  const adapter = record(value.adapter);
+  const source = record(value.providerSource);
   return {
     id: text(value.id),
     capability: text(value.capability),
     profile: text(value.profile),
-    adapter: text(value.adapter),
-    ownership: text(value.ownership),
-    references: Array.isArray(value.environment) ? value.environment.length : 0,
+    adapter: text(adapter?.adapterId),
+    source: text(source?.kind),
+    features: Array.isArray(adapter?.features) ? adapter.features.length : 0,
+    references: Array.isArray(value.namedValues) ? value.namedValues.length : 0,
     metadata: value,
   };
+}
+
+function record(value: unknown): InspectorObject | undefined {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as InspectorObject)
+    : undefined;
 }
 
 function text(value: unknown): string {

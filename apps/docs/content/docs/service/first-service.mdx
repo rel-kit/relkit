@@ -100,7 +100,7 @@ curl -i 'http://localhost:3000/hello?name=RELKIT'
 Expect HTTP `200` and `{ "message": "Hello, RELKIT!" }`. Use your app's configured backend port if it
 differs. The Inspector normally runs at `http://localhost:3210`; use it to inspect the function and its
 invocations. If startup fails because of another capability in your existing app, resolve that provider
-configuration first; Hello itself declares no managed dependencies.
+configuration first; Hello itself declares no provider-backed dependencies.
 
 ## Grow the domain one capability at a time
 

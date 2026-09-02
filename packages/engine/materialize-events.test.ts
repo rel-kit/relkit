@@ -32,7 +32,7 @@ describe("event materialization", () => {
       engine,
       providerRegistry: {
         resolve: (capability, profile) => {
-          expect(capability).toBe("events");
+          expect(capability).toBe("event");
           expect(profile).toBe("default");
           return { capability, profile, value: provider };
         },
@@ -98,6 +98,42 @@ describe("event materialization", () => {
     ).rejects.toThrow("unknown function missing");
     expect(resolved).toBe(0);
   });
+
+  test("registers each event contract only with its selected profile", async () => {
+    const registrations: string[] = [];
+    const base = plan();
+    const eventPlan: RegistrationPlan = {
+      ...base,
+      events: [
+        ...base.events!,
+        {
+          kind: "event",
+          id: "audit.recorded",
+          source,
+          version: 1,
+          input: null,
+          profile: "audit",
+        },
+      ],
+    };
+    await materializeEvents({
+      plan: eventPlan,
+      engine: { invoke: async () => undefined },
+      providerRegistry: {
+        resolve: (capability, profile) => ({
+          capability,
+          profile,
+          value: {
+            registerContract: (contract: EventNode) =>
+              registrations.push(`${profile}:${contract.id}`),
+            registerTrigger: () => undefined,
+          },
+        }),
+      },
+    });
+
+    expect(registrations).toEqual(["default:orders.created", "audit:audit.recorded"]);
+  });
 });
 
 function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
@@ -115,6 +151,7 @@ function plan(targetFunctionId = "orders.handle"): RegistrationPlan {
     source,
     version: 1,
     input: { type: "object" },
+    profile: "default",
   };
   return {
     graphHash: "sha256:events",

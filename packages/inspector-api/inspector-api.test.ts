@@ -8,6 +8,31 @@ const graph = {
   appId: "test-app",
   nodes: [
     {
+      kind: "app",
+      id: "test-app",
+      source: { file: "src/app.ts", line: 1, column: 1 },
+      telemetry: {
+        exportSampling: { traceRate: 0.25, minimumLogLevel: "warn" },
+        exporters: {
+          errors: {
+            kind: "telemetry-exporter",
+            protocolVersion: 1,
+            integrationId: "sentry",
+            adapterId: "sentry",
+            configuration: { dsn: "must-not-cross" },
+          },
+        },
+      },
+      deploymentRoles: [
+        {
+          role: "host",
+          integrationId: "aws",
+          protocolVersion: 1,
+          configuration: { region: "secret" },
+        },
+      ],
+    },
+    {
       kind: "env",
       id: "DATABASE_URL",
       source: { file: "src/app.ts", line: 1, column: 1 },
@@ -37,6 +62,24 @@ const graph = {
       targetFunctionId: "orders.create",
       config: { method: "POST", path: "/orders" },
     },
+    {
+      kind: "provider",
+      id: "provider.cache.default",
+      source: { file: "src/app.ts", line: 2, column: 1 },
+      capability: "cache",
+      profile: "default",
+      adapter: {
+        integrationId: "redis",
+        adapterId: "redis",
+        protocolVersion: 1,
+        features: ["atomicIncrement"],
+        connection: { url: "redis://must-not-cross" },
+      },
+      providerSource: { kind: "connected" },
+      namedValues: [{ field: "url", name: "CACHE_URL", type: "secret-string", sensitive: true }],
+      local: { integrationId: "redis", recipeId: "redis-docker", recipeVersion: 1 },
+      deploymentRoles: [],
+    },
   ],
   edges: [
     { kind: "targets-function", from: "orders.create.http", to: "orders.create", role: "primary" },
@@ -47,7 +90,64 @@ function generation(id: string, hash: string) {
   return {
     generationId: id,
     graphHash: hash,
+    activationFingerprint: {
+      graphHash: hash,
+      manifestHash: `${hash}:manifest`,
+      runtimeIntegrationsPlanHash: `${hash}:runtime-integrations`,
+      localServicesPlanHash: `${hash}:local-services`,
+      providerOverridesGeneration: `${hash}:overrides`,
+    },
     graph,
+    integrations: {
+      integrations: [
+        {
+          integrationId: "redis",
+          capability: "cache",
+          adapterId: "redis",
+          protocolVersion: 1,
+          packageName: "@relkit/redis",
+          packageVersion: "0.2.0",
+          exportName: "./runtime",
+        },
+      ],
+    },
+    localServices: {
+      plan: {
+        services: [
+          {
+            bindingId: "provider.cache.default",
+            capability: "cache",
+            profile: "default",
+            materializerId: "docker",
+            recipe: { integrationId: "redis", recipeId: "redis-docker", recipeVersion: 1 },
+            configuration: { password: "must-not-cross" },
+            requiredBy: ["cache.sessions"],
+          },
+        ],
+      },
+      runtime: {
+        lease: { mode: "detached", status: "adopted", sessionId: "must-not-cross" },
+        state: {
+          applicationId: "test-app",
+          planHash: `${hash}:local-services`,
+          services: [{ bindingId: "provider.cache.default", phase: "healthy" }],
+        },
+      },
+    },
+    telemetry: () => ({
+      sampling: { traceRate: 0.25, minimumLogLevel: "warn", token: "must-not-cross" },
+      counters: { persisted: 5, sampledOut: 2, credential: "must-not-cross" },
+      exporters: [
+        {
+          name: "errors",
+          integrationId: "sentry",
+          adapterId: "sentry",
+          healthy: true,
+          exported: 3,
+          dsn: "must-not-cross",
+        },
+      ],
+    }),
     environment: () => ({ DATABASE_URL: "database-secret" }),
     diagnostics: [{ code: "RELKIT_TEST", severity: "warning", message: "safe diagnostic" }],
     runtime: {
@@ -89,9 +189,58 @@ describe("versioned inspector router", () => {
     const graphResponse = await app.request(`${API_BASE_PATH}/graph`);
     const graphBody = await graphResponse.json();
     expect(graphResponse.status).toBe(200);
-    expect(graphBody).toMatchObject({ graphHash: "sha256:one", graph: { appId: "test-app" } });
+    expect(graphBody).toMatchObject({
+      graphHash: "sha256:one",
+      activationFingerprint: {
+        graphHash: "sha256:one",
+        manifestHash: "sha256:one:manifest",
+        runtimeIntegrationsPlanHash: "sha256:one:runtime-integrations",
+      },
+      graph: { appId: "test-app" },
+      integrations: [
+        {
+          integrationId: "redis",
+          packageName: "@relkit/redis",
+          packageVersion: "0.2.0",
+        },
+      ],
+    });
     expect(JSON.stringify(graphBody)).not.toContain("raw-secret");
     expect(JSON.stringify(graphBody)).not.toContain("must-not-cross");
+    expect(JSON.stringify(graphBody)).not.toContain("./runtime");
+
+    const providers = await (await app.request(`${API_BASE_PATH}/providers`)).json();
+    expect(providers.items).toMatchObject([
+      {
+        id: "provider.cache.default",
+        capability: "cache",
+        profile: "default",
+        adapter: { integrationId: "redis", adapterId: "redis", features: ["atomicIncrement"] },
+        providerSource: { kind: "connected" },
+        namedValues: [{ name: "CACHE_URL", sensitive: true }],
+        local: { recipeId: "redis-docker" },
+      },
+    ]);
+
+    const runtimeMetadata = await (await app.request(`${API_BASE_PATH}/runtime`)).json();
+    expect(runtimeMetadata).toMatchObject({
+      localServices: {
+        planHash: "sha256:one:local-services",
+        lease: { mode: "detached", status: "adopted" },
+        items: [{ bindingId: "provider.cache.default", phase: "healthy" }],
+      },
+      telemetry: {
+        sampling: {
+          traceRate: 0.25,
+          minimumLogLevel: "warn",
+          errors: "always",
+          diagnostics: "always",
+        },
+        counters: { persisted: 5, sampledOut: 2 },
+        exporters: [{ name: "errors", healthy: true, exported: 3 }],
+      },
+    });
+    expect(JSON.stringify(runtimeMetadata)).not.toContain("must-not-cross");
 
     const functions = await app.request(`${API_BASE_PATH}/functions?limit=1`);
     expect((await functions.json()).items).toHaveLength(1);

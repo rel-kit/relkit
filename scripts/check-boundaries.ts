@@ -15,6 +15,7 @@ import {
   publicApplicationPackages,
   readManifest,
 } from "./boundary-imports";
+import { dependencyDirectionViolations, integrationPackageNames } from "./boundary-directions";
 import { scanScope } from "./scope-scan";
 import type { ImportReference, Scope } from "./boundary-imports";
 
@@ -29,6 +30,7 @@ type Violation = {
 function reportImport(
   root: string,
   scopes: Scope[],
+  integrationNames: ReadonlySet<string>,
   owner: Scope,
   file: string,
   sourceFile: ts.SourceFile,
@@ -74,7 +76,8 @@ function reportImport(
   if (
     descriptorPackages.has(ownerName) &&
     isFrameworkRuntime(dependency) &&
-    !descriptorRuntimeDependencies.get(ownerName)?.has(dependency)
+    !descriptorRuntimeDependencies.get(ownerName)?.has(dependency) &&
+    !descriptorRuntimeDependencies.get(ownerName)?.has(reference.specifier)
   ) {
     add("descriptor-runtime-import", `${ownerName} imports runtime package "${dependency}"`);
   }
@@ -94,6 +97,7 @@ function reportImport(
     owner.path === "apps/inspector" &&
     (publicApplicationPackages.has(dependency) ||
       internalRuntimePackages.has(dependency) ||
+      integrationNames.has(dependency) ||
       dependency === fixturePackage ||
       dependency === "effect" ||
       dependency.startsWith("@effect/") ||
@@ -108,7 +112,8 @@ function reportImport(
   }
   if (
     (owner.path === "examples/commerce" || owner.path.startsWith("templates/")) &&
-    isFixtureForbidden(dependency)
+    isFixtureForbidden(dependency) &&
+    !integrationNames.has(dependency)
   ) {
     add(
       "fixture-template-internal-import",
@@ -122,7 +127,8 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
   const rootManifest = readManifest(resolve(root, "package.json"));
   if (!rootManifest?.workspaces) throw new Error(`No workspace manifest found at ${root}`);
   const scopes = discoverScopes(root, rootManifest);
-  const violations: Violation[] = [];
+  const integrationNames = integrationPackageNames(scopes);
+  const violations: Violation[] = dependencyDirectionViolations(root, scopes);
   let files = 0;
 
   for (const owner of scopes) {
@@ -140,7 +146,9 @@ function checkBoundaries(root: string): { files: number; roots: number; violatio
       );
       files += 1;
       for (const reference of importReferences(sourceFile)) {
-        violations.push(...reportImport(root, scopes, owner, file, sourceFile, reference));
+        violations.push(
+          ...reportImport(root, scopes, integrationNames, owner, file, sourceFile, reference),
+        );
       }
     }
   }

@@ -10,6 +10,7 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 import { deployCommand } from "./cli-command-deploy.js";
+import { localCommand } from "./cli-command-local.js";
 
 export function groupCommands(select: SelectInvocation) {
   return [
@@ -17,6 +18,7 @@ export function groupCommands(select: SelectInvocation) {
     envCommand(select),
     deployCommand(select),
     clientCommand(select),
+    localCommand(select),
   ] as const;
 }
 

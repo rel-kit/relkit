@@ -7,7 +7,6 @@ const createOrder = defineFunction({
   // RELKIT validates these schemas before the handler runs.
   input: orderInput,
   output: createOrderOutput,
-  publishes: ["orders.created"],
   dependencies: {
     cache: { prices },
   },
@@ -17,7 +16,6 @@ const createOrder = defineFunction({
     // Dependencies are accessed through the checked execution context.
     const unitPrice = await context.cache.prices.getOrSet({ sku: input.sku }, async () => 1_000);
     const totalCents = unitPrice * input.quantity;
-    await context.events["orders.created"].publish({ ...input, totalCents });
     return {
       orderId: input.orderId,
       receiptKey: receiptObjectName(input.orderId),

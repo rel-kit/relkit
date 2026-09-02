@@ -23,7 +23,7 @@ change the internals without teaching every caller about the new layout.
 The benefit is a shorter change path, not a promise that adding folders makes execution faster:
 
 - **Find the owner quickly.** A request about order pricing starts in Orders, even if the implementation
-  now uses a cache or an external provider.
+  now uses a cache or a connected provider.
 - **Reuse an operation.** An HTTP route and an AI tool can use the same validated function instead of
   maintaining separate implementations.
 - **Review a smaller contract.** Callers depend on selected service members, not every helper file.
@@ -66,19 +66,15 @@ Use a public service function when the caller needs a result before it can conti
 the originating operation should not wait for the follow-up work to finish. Events add delivery and
 retry considerations, so they are not a substitute for every function call.
 
-This Receipts subscriber illustrates both relationships:
+This subscriber illustrates the receiving side of that relationship:
 
-<include
-  cwd
-  lang="ts"
-  meta='title="examples/commerce/src/receipts/functions/order-receipt.function.ts"'
->
-  ../../examples/commerce/src/receipts/functions/order-receipt.function.ts
+<include cwd lang="ts" meta='title="src/orders/functions/order-confirmation.function.ts"'>
+  ../../apps/docs/examples/events/order-confirmation.function.ts
 </include>
 
-Orders owns the `orders.created` event contract. Receipts owns this subscriber and its job. The
-subscriber calls `orders.getOrder.invoke(...)` through the public service because it needs the lookup
-result before enqueueing work. Its job dependency stays inside Receipts.
+Orders owns the `orders.created` event contract. The receiving domain owns this subscriber and any
+follow-up work it starts. If a subscriber needs a synchronous result from another domain, call that
+domain's public service function rather than reaching into its private implementation.
 
 Continue with [getting started with events](/docs/events) for publication and subscription, or
 [jobs](/docs/jobs) for queued execution. You do not add subscriber functions to the producer's

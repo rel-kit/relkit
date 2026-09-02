@@ -12,10 +12,10 @@ export const privateLookup = hello.asTool({
 });
 // #endregion private-tool
 
-import { defineConfig } from "@relkit/app/config";
+import { defineApp } from "@relkit/app/config";
 import env from "@app/platform/env.js";
 
-export const mcpDisabled = defineConfig({
+export const mcpDisabled = defineApp({
   env,
   // #region disable-mcp
   server: {

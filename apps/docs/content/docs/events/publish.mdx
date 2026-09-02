@@ -8,7 +8,7 @@ description: Send event data from your application code.
 First, [define `orders.created`](/docs/events/define). Then publish it from the `defineFunction` that creates the order:
 
 <include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
-  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
+  ../../apps/docs/examples/events/create-order.function.ts
 </include>
 
 This function uses the [Orders example's](/docs/events/first-event) `priceOrder` helper. To publish the event:

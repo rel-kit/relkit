@@ -10,6 +10,7 @@ import {
   loadConfig,
   normalizeCompilation,
   prefilterSources,
+  resolveRuntimeIntegrationPackages,
   typecheckProject,
   type GeneratedOutputs,
 } from "@relkit/compiler";
@@ -85,12 +86,17 @@ export async function checkProject(options: CheckOptions = {}): Promise<CheckRes
       writeContextRegistry(extracted, projectRoot, config.generatedDirectory),
     ]);
     const typeDiagnostics = typecheckProject(projectRoot);
+    const runtimeIntegrationPackages = resolveRuntimeIntegrationPackages({
+      projectRoot,
+      imports: prefiltered.candidates.flatMap((candidate) => candidate.imports),
+    });
     const normalization = normalizeCompilation({
       evaluator,
       projectRoot,
       sources: discoverySources,
       appId: await packageApplicationId(projectRoot),
       mode: options.mode ?? "development",
+      runtimeIntegrationPackages,
     });
     const diagnostics = sortDiagnostics([
       ...typeDiagnostics,

@@ -16,11 +16,16 @@ import { registerAuthMiddleware, type HttpAuthInvocation, type HttpAuthRuntime }
 import { installRpc } from "./rpc.js";
 import { installMcp, type McpOptions } from "./mcp.js";
 import { installStaticFiles, type StaticFilesOptions } from "./static-files.js";
+import { assertManifestCohort, RuntimeHonoManifestError } from "./manifest-validation.js";
+export { RuntimeHonoManifestError } from "./manifest-validation.js";
+export type { RuntimeHonoManifestErrorCode } from "./manifest-validation.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
 export interface RuntimeManifest {
   readonly contractVersion: typeof MANIFEST_VERSION;
   readonly generatorVersion: typeof GENERATOR_VERSION;
   readonly graphHash: string;
+  readonly activationFingerprint: import("@relkit/contracts").RuntimeActivationFingerprint;
+  readonly runtimeIntegrationsPlan: import("@relkit/contracts").RuntimeIntegrationPlanReference;
   readonly functions: ManifestEntries<unknown>;
   readonly targets?: ManifestEntries<unknown>;
   readonly routes?: ManifestEntries<unknown>;
@@ -29,7 +34,6 @@ export interface RuntimeManifest {
   readonly hooks?: ManifestEntries<unknown>;
   readonly application?: {
     readonly env: unknown;
-    readonly providers: unknown;
   };
   readonly middleware: ManifestEntries<unknown>;
   readonly requestTransforms: ManifestEntries<unknown>;
@@ -89,36 +93,9 @@ export interface RouteMaterializationOptions {
     readonly traceId?: string;
   }) => MaybePromise<MiddlewareContext>;
 }
-export type RuntimeHonoManifestErrorCode =
-  | "RELKIT_MANIFEST_VERSION_UNSUPPORTED"
-  | "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED"
-  | "RELKIT_GRAPH_MANIFEST_MISMATCH"
-  | "RELKIT_MANIFEST_MIDDLEWARE_MISSING"
-  | "RELKIT_MANIFEST_MIDDLEWARE_MISMATCH"
-  | "RELKIT_MANIFEST_RAW_ROUTE_MISSING"
-  | "RELKIT_MANIFEST_TRANSFORM_MISSING";
-export class RuntimeHonoManifestError extends Error {
-  readonly code: RuntimeHonoManifestErrorCode;
-  readonly referenceId?: string;
-  constructor(code: RuntimeHonoManifestErrorCode, message: string, referenceId?: string) {
-    super(message);
-    this.name = "RuntimeHonoManifestError";
-    this.code = code;
-    if (referenceId !== undefined) this.referenceId = referenceId;
-  }
-}
 export function assertHttpManifest(options: RouteMaterializationOptions): void {
   const { manifest, plan } = options;
-  if (manifest.contractVersion !== MANIFEST_VERSION)
-    throw new RuntimeHonoManifestError(
-      "RELKIT_MANIFEST_VERSION_UNSUPPORTED",
-      `Unsupported runtime manifest contract version ${String(manifest.contractVersion)}.`,
-    );
-  if (manifest.generatorVersion !== GENERATOR_VERSION)
-    throw new RuntimeHonoManifestError(
-      "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
-      `Unsupported runtime manifest generator version ${String(manifest.generatorVersion)}.`,
-    );
+  assertManifestCohort(manifest);
   if (manifest.graphHash !== plan.graphHash)
     throw new RuntimeHonoManifestError(
       "RELKIT_GRAPH_MANIFEST_MISMATCH",

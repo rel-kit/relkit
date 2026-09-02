@@ -7,6 +7,7 @@ import {
   TimelinePanel,
   WaterfallPanel,
 } from "./signal-detail-sections";
+import { RuntimeStatus } from "./runtime-status";
 
 interface SignalDetailViewProps {
   readonly kind: SignalKind;
@@ -32,12 +33,16 @@ export function SignalDetailView(props: SignalDetailViewProps) {
         <div>
           <p className="eyebrow">ACTIVE WORKSPACE</p>
           <h1>{title}</h1>
-          <p className="lede">Correlated telemetry is rendered from redacted versioned records.</p>
+          <p className="lede">
+            Complete local telemetry is rendered from redacted versioned records before export
+            sampling.
+          </p>
         </div>
         <div className="signal-status" role="status" aria-live="polite">
           <span className="badge">Live: {props.liveState}</span>
         </div>
       </header>
+      <RuntimeStatus telemetryOnly />
       <IdentityPanel
         kind={props.kind}
         id={props.id}

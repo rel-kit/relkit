@@ -11,40 +11,37 @@ export const jobsGuideRelations = [
   {
     path: "jobs/index",
     api: ["jobs", "services", "functions"],
-    examples: ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+    examples: ["apps/docs/examples/jobs/send-receipt.job.ts"],
   },
   {
     path: "jobs/define",
     api: ["jobs", "functions", "config"],
-    examples: ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+    examples: ["apps/docs/examples/jobs/send-receipt.job.ts"],
   },
   {
     path: "jobs/enqueue",
     api: ["jobs", "functions", "events"],
-    examples: ["examples/commerce/tests/fixtures/queue-receipt.function.ts"],
+    examples: ["apps/docs/examples/jobs/queue-receipt.function.ts"],
   },
   {
     path: "jobs/retries",
     api: ["jobs", "functions", "testing"],
-    examples: ["examples/commerce/src/receipts/jobs/send-receipt.job.ts"],
+    examples: ["apps/docs/examples/jobs/send-receipt.job.ts"],
   },
   {
     path: "jobs/idempotency",
     api: ["jobs", "testing"],
-    examples: ["examples/commerce/tests/jobs.test.ts"],
+    examples: ["packages/testing/jobs.test.ts"],
   },
   {
     path: "jobs/schedules",
     api: ["jobs"],
-    examples: [
-      "examples/commerce/src/receipts/jobs/send-receipt.job.ts",
-      "tests/integration/jobs/commerce-example.test.ts",
-    ],
+    examples: ["apps/docs/examples/jobs/send-receipt.job.ts", "packages/testing/jobs.test.ts"],
   },
   {
     path: "jobs/first-job",
     api: ["jobs", "functions", "buckets", "testing"],
-    examples: ["examples/commerce/tests/jobs.test.ts"],
+    examples: ["packages/testing/jobs.test.ts"],
   },
 ] satisfies readonly {
   path: string;

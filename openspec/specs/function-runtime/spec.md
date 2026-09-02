@@ -24,17 +24,41 @@ The engine SHALL verify supported contract versions, graph hash equality, and a 
 
 ### Requirement: Validated invocation boundary
 
-The engine SHALL validate input before handler admission, validate successful output before returning it, validate declared error data before exposure, and treat invalid handler output as an internal defect rather than client input failure.
+The engine SHALL validate input before `onBefore`, validate the value returned by `onBefore` before handler admission, validate handler output before `onAfter`, validate the value returned by `onAfter` before returning it, validate declared error data before exposure, and treat invalid handler or hook output as an internal defect rather than client input failure.
 
 #### Scenario: Invalid input arrives
 
 - **WHEN** invocation input does not satisfy the function schema
-- **THEN** the handler is not called and the caller receives the source-appropriate validation failure
+- **THEN** no hook or handler is called and the caller receives the source-appropriate validation failure
+
+#### Scenario: Before hook returns invalid input
+
+- **WHEN** `onBefore` resolves to a value outside the declared input schema
+- **THEN** the handler is not called and the invocation is recorded as a safe unexpected defect
 
 #### Scenario: Handler returns invalid output
 
 - **WHEN** a handler resolves to a value outside its declared output schema
+- **THEN** `onAfter` is not called and the invocation is recorded as a safe unexpected defect
+
+#### Scenario: After hook returns invalid output
+
+- **WHEN** `onAfter` resolves to a value outside the declared output schema
 - **THEN** the invocation is recorded as a safe unexpected defect and raw internal detail is not exposed
+
+### Requirement: Function lifecycle hooks use the common engine
+
+Optional function `onBefore` and `onAfter` hooks SHALL run once within the owning function invocation, use its context and declared dependencies, and apply for every invocation source.
+
+#### Scenario: Successful service member invocation
+
+- **WHEN** a service member with both hooks completes successfully
+- **THEN** execution order is service-before, function-before, handler, function-after, service-after
+
+#### Scenario: Function execution fails
+
+- **WHEN** `onBefore` or the handler fails
+- **THEN** `onAfter` does not run and the common engine normalizes the failure
 
 ### Requirement: Internal Effect execution without public leakage
 
@@ -107,12 +131,12 @@ Nested function descriptor calls SHALL create distinct child invocation IDs whil
 
 ### Requirement: Managed generation lifecycle
 
-Environment resolution, provider construction, handler/resource/trigger registration, internal APIs, readiness, traffic activation, draining, and provider release SHALL occur in dependency order, and shutdown SHALL stop new work before releasing resources in reverse dependency order.
+Environment resolution, graph-required binding construction, handler/resource/trigger registration, internal APIs, readiness, traffic activation, draining, and binding release SHALL occur in dependency order, and shutdown SHALL stop new work before releasing acquired bindings in reverse order. Failure of one binding SHALL not construct or expose unrelated bindings.
 
 #### Scenario: Provider construction fails
 
-- **WHEN** any required generation provider fails validation, construction, capability check, or safe health check
-- **THEN** the generation never becomes ready and all already acquired resources are released
+- **WHEN** a required bucket binding fails validation or connectivity
+- **THEN** the generation never becomes ready, acquired bindings are released, and cache, jobs, events, models, and observability credentials are not supplied to it
 
 ### Requirement: Framework logging uses approved sinks
 
@@ -122,20 +146,6 @@ Framework and CLI logs SHALL enter the internal structured logging service, and 
 
 - **WHEN** a handler calls `ctx.log.info` with fields
 - **THEN** the record receives invocation, trace, component, and redaction annotations before any configured sink sees it
-
-### Requirement: Deterministic application test harness
-
-`@relkit/testing` SHALL provide isolated function/runtime/application helpers with validated test environment values, deterministic IDs and clock, in-memory HTTP, controlled job/event delivery, scripted models, bucket/cache fakes, telemetry queries, named failure injection, and restart against shared test state.
-
-#### Scenario: Test runtime is created
-
-- **WHEN** a test creates an application runtime without requesting real time or external services
-- **THEN** it receives a unique temporary directory, isolated providers and observability, deterministic IDs/time, and bounded cleanup
-
-#### Scenario: Failed test state is retained
-
-- **WHEN** `RELKIT_KEEP_TEST_STATE=1` is set and a test fails
-- **THEN** the harness retains and reports its unique state directory for diagnosis
 
 ### Requirement: Descriptor invocation selects the correct engine
 
@@ -178,3 +188,77 @@ Each successful attempt to invoke one function descriptor from another SHALL emi
 
 - **WHEN** `getOrder` invokes `getProduct`
 - **THEN** telemetry and the inspector can show the caller, callee, parent/child invocations, and service identities while the application graph hash remains unchanged
+
+### Requirement: Specialized services share the managed generation lifecycle
+
+Runtime startup SHALL resolve environment values, activate the sole Drizzle service once, activate the sole Better Auth service after its database and route metadata are available, and SHALL not report readiness until providers and specialized services are ready.
+
+#### Scenario: Database startup fails
+
+- **WHEN** the lazy Drizzle client factory rejects
+- **THEN** the generation remains not ready, application traffic is not admitted, and no disposal callback is invoked for the failed activation
+
+#### Scenario: Generation shuts down
+
+- **WHEN** an activated generation drains and stops
+- **THEN** the Drizzle disposal callback runs at most once and failure does not prevent remaining cleanup attempts
+
+### Requirement: Generated application context reflects active services
+
+Function context SHALL expose the resolved application environment type, the Drizzle service's typed database models and transactions, and the Better Auth service's inferred session through `auth.getSession` without a service-context patch field.
+
+#### Scenario: Function uses application capabilities
+
+- **WHEN** a compiled function reads an environment key, custom database model, and authentication session
+- **THEN** all three are statically typed and resolve from the active generation at runtime
+
+### Requirement: Event functions are enforced event-only functions
+
+Event functions SHALL use the common function engine with `invocationMode: "event-only"`, SHALL accept only event delivery or replay sources, and SHALL reject direct, nested, HTTP, service, job, schedule, tool, agent, conversion, or forged-reference invocation paths at type, compilation, registration, and runtime boundaries.
+
+#### Scenario: Event delivery invokes an event function
+
+- **WHEN** a provider delivers or replays the configured event
+- **THEN** the common engine validates the payload, supplies event delivery context, and accepts a successful void result or declared error result
+
+#### Scenario: Non-event path targets an event function
+
+- **WHEN** any callable or trigger path other than event delivery/replay targets an event-only function
+- **THEN** the nearest trusted boundary rejects it without running the handler
+
+### Requirement: Publication clients are explicitly narrowed
+
+Normal and event functions SHALL receive event publisher clients only for unique known IDs declared in `publishes`, and runtime access SHALL enforce the same permission when static typing is bypassed.
+
+#### Scenario: Event function republishes its consumed event
+
+- **WHEN** an event function lists its consumed event in `publishes`
+- **THEN** the matching context client is available and publishes with preserved invocation causation
+
+#### Scenario: Consumed event is not declared for publication
+
+- **WHEN** an event function does not list its consumed event in `publishes`
+- **THEN** that event is absent from its typed context and runtime access is rejected
+
+### Requirement: Runtime resolves only required static integrations
+
+Generation startup SHALL validate the complete activation fingerprint, resolve binding-local configuration by the provider precedence contract, load only graph-required statically planned integrations, construct each selected binding once, and preserve readiness, cancellation, draining, and reverse-order release.
+
+#### Scenario: Unused binding is misconfigured
+
+- **WHEN** the graph does not require that binding
+- **THEN** its integration is not imported or constructed and its missing values do not affect readiness
+
+#### Scenario: Integration identity differs at runtime
+
+- **WHEN** a loaded module reports metadata inconsistent with its plan entry
+- **THEN** the generation never becomes ready and already acquired bindings are released
+
+### Requirement: Test provider behavior is explicit
+
+`@relkit/testing` SHALL apply only provider replacements named by capability and profile, and ordinary production registry behavior SHALL be identical regardless of environment-name strings.
+
+#### Scenario: Required real binding lacks a replacement
+
+- **WHEN** a test application requires a configured binding that cannot start and no fake is supplied
+- **THEN** test startup fails with the binding identity instead of silently substituting an in-memory provider

@@ -3,7 +3,6 @@ import { normalizeSourcePath } from "@relkit/contracts";
 import type { EvaluatorManifestReference } from "./discovery/evaluator-protocol.js";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { NormalizedDescriptor } from "./normalize-types.js";
-import { providerMaps } from "./normalize-graph-app.js";
 
 export interface ImportBinding {
   readonly module: string;
@@ -95,22 +94,6 @@ export function importBindings(modules: readonly string[]): ReadonlyMap<string, 
   return new Map(
     modules.map((module, index) => [module, { module, alias: `__relkit_module_${index}` }]),
   );
-}
-
-export function providerFactoryKeys(
-  descriptors: readonly NormalizedDescriptor[],
-): readonly string[] {
-  const keys = new Set<string>();
-  const app = descriptors.find((descriptor) => descriptor.kind === "app");
-  const value = app && isRecord(app.value) ? app.value : {};
-  for (const [capability, profiles] of providerMaps(value)) {
-    if (!isRecord(profiles)) continue;
-    for (const binding of Object.values(profiles)) {
-      const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
-      if (typeof adapter.adapter === "string") keys.add(`${capability}:${adapter.adapter}`);
-    }
-  }
-  return [...keys].sort();
 }
 
 function modulePath(

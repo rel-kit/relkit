@@ -1,4 +1,5 @@
 import type { JsonValue } from "@relkit/contracts";
+import type { DeploymentRoleProjection } from "@relkit/graph";
 import { clean } from "./normalize-graph-utils.js";
 import type { GraphNode, NormalizedDescriptor } from "./normalize-types.js";
 import { isRecord } from "./normalize-utils.js";
@@ -7,36 +8,20 @@ export function environmentMetadata(value: unknown): JsonValue {
   return isRecord(value) && isRecord(value.metadata) ? clean(value.metadata) : {};
 }
 
-export function providerBindingIds(value: unknown): readonly string[] {
-  if (!isRecord(value)) return [];
-  return providerMaps(value)
-    .flatMap(([capability, profiles]) =>
-      isRecord(profiles)
-        ? Object.keys(profiles).map((profile) => `provider.${capability}.${profile}`)
-        : [],
-    )
-    .sort();
-}
-
 export function providerMaps(value: Record<string, unknown>): [string, unknown][] {
-  return [
-    ["buckets", value.buckets],
-    ["cache", value.caches],
-    ["jobs", value.jobs],
-    ["events", value.events],
-    ["models", value.models],
-    ["observability", value.observability],
-  ].filter((entry): entry is [string, unknown] => entry[1] !== undefined);
+  return ["bucket", "cache", "job", "event", "model"].flatMap((capability) => {
+    const normalized = value[capability];
+    if (
+      !isRecord(normalized) ||
+      normalized.kind !== "normalized-provider-profiles" ||
+      normalized.capability !== capability ||
+      !isRecord(normalized.profiles)
+    ) {
+      return [];
+    }
+    return [[capability, normalized.profiles]];
+  });
 }
-
-const PROVIDER_DEFAULT_KEYS: Readonly<Record<string, string>> = Object.freeze({
-  buckets: "bucket",
-  cache: "cache",
-  jobs: "job",
-  events: "event",
-  models: "model",
-  observability: "observability",
-});
 
 export function selectedProviderProfile(
   application: unknown,
@@ -48,10 +33,45 @@ export function selectedProviderProfile(
   if (!isRecord(profiles)) return requested;
   if (requested !== undefined) return profiles[requested] === undefined ? undefined : requested;
   const defaults = isRecord(application.defaults) ? application.defaults : {};
-  const selected = defaults[PROVIDER_DEFAULT_KEYS[capability] ?? ""];
+  const selected = defaults[capability];
   if (typeof selected === "string" && profiles[selected] !== undefined) return selected;
   const names = Object.keys(profiles);
   return names.length === 1 ? names[0] : undefined;
+}
+
+export function requestedProviderProfile(
+  descriptorKind: string,
+  value: Record<string, unknown>,
+): string | undefined {
+  const selected = descriptorKind === "agent" ? value.model : value.profile;
+  return typeof selected === "string" ? selected.split(":", 1)[0] : undefined;
+}
+
+export function deploymentRoleProjections(value: unknown): readonly DeploymentRoleProjection[] {
+  if (!isRecord(value)) return [];
+  return (["engine", "host"] as const).flatMap((role) => {
+    const selected = value[role];
+    if (typeof selected === "string") {
+      return [{ role, integrationId: selected, protocolVersion: 1 as const, configuration: {} }];
+    }
+    if (
+      !isRecord(selected) ||
+      selected.kind !== "deployment-integration" ||
+      selected.role !== role ||
+      typeof selected.integrationId !== "string" ||
+      selected.protocolVersion !== 1
+    ) {
+      return [];
+    }
+    return [
+      {
+        role,
+        integrationId: selected.integrationId,
+        protocolVersion: 1 as const,
+        configuration: clean(selected.configuration ?? {}),
+      },
+    ];
+  });
 }
 
 export function environmentNodes(descriptor: NormalizedDescriptor): GraphNode[] {

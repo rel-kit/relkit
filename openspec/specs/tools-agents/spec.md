@@ -6,22 +6,22 @@ Defines function-backed tool exposure and bounded, validated agent execution usi
 
 ### Requirement: Tools are constrained function views
 
-A tool SHALL target one function, inherit that function's input, output, and declared errors, and add only a description, side-effect classification, approval policy, optional timeout, and its own optional or inferred identity; it SHALL NOT own another handler, whether created with `defineTool` or `function.asTool`.
+A tool SHALL target one function, inherit that function's input, output, and declared errors, and add description, side-effect classification, approval policy, optional timeout, optional `onBefore` and `onAfter` hooks, and its own optional or inferred identity; it SHALL NOT duplicate the target handler.
 
 #### Scenario: Tool contract is compiled
 
 - **WHEN** a tool references a valid function
-- **THEN** its graph/API schema matches the target function contracts and its invocation path resolves to that function
+- **THEN** its graph/API schema matches the target contracts and its invocation path resolves to that function
 
 #### Scenario: Function creates a tool view
 
-- **WHEN** `getOrder.asTool({ description, sideEffect, approval })` is exported or included in an agent
-- **THEN** the result is equivalent to a `defineTool` view of `getOrder` and does not duplicate its handler
+- **WHEN** `getOrder.asTool({ description, sideEffect, approval, onBefore, onAfter })` is exported or included in an agent
+- **THEN** the resulting hooks belong to the tool view and the target function's own hooks still run through its pipeline
 
-#### Scenario: Zero-argument tool view lacks metadata
+#### Scenario: Zero-argument tool view is created
 
-- **WHEN** `asTool()` is called on a function that did not declare complete tool metadata
-- **THEN** the public type contract or descriptor validation rejects it rather than guessing side-effect or approval policy
+- **WHEN** `asTool()` uses complete function tool metadata
+- **THEN** it creates the tool view without copying the function's lifecycle hooks
 
 ### Requirement: Validated and allowlisted tool calls
 
@@ -39,17 +39,31 @@ Agent execution SHALL validate requested tool identity and JSON arguments, rejec
 
 ### Requirement: Enforced side-effect approval
 
-Tool side effects SHALL be classified as none, read, write, or external, and approval policy SHALL be enforced as never, on-write, or always before target invocation from either an agent or direct `tool.invoke` call.
+Tool side effects SHALL be classified as none, read, write, or external, and approval policy SHALL be enforced as never, on-write, or always before tool hooks or target invocation from either an agent or direct `tool.invoke` call.
 
 #### Scenario: Required approval is denied
 
-- **WHEN** a write/external tool requires approval and the approval response is denied
-- **THEN** the target function is not invoked and the caller receives a bounded denial result
+- **WHEN** a write or external tool requires approval and the approval response is denied
+- **THEN** neither tool hook nor target function is invoked and the caller receives a bounded denial result
 
 #### Scenario: Required approval has no resolver
 
 - **WHEN** a standalone tool invocation requires approval but no approval resolver is active
-- **THEN** invocation fails closed before its target function runs
+- **THEN** invocation fails closed before any hook or target function runs
+
+### Requirement: Tool lifecycle hooks wrap target execution
+
+Optional tool hooks SHALL transform typed target values without receiving an HTTP request and SHALL run in approval, before, target, after order.
+
+#### Scenario: Tool succeeds
+
+- **WHEN** an approved tool has both lifecycle hooks
+- **THEN** its validated input passes through tool `onBefore`, the target function pipeline, and tool `onAfter`, with each transformed value validated against the inherited schema
+
+#### Scenario: Tool target fails
+
+- **WHEN** tool `onBefore` or the target function fails
+- **THEN** tool `onAfter` does not run
 
 ### Requirement: Generated agent functions use the common engine
 
@@ -92,49 +106,6 @@ The test provider SHALL use the AI SDK v7 testing surface to support scripted mo
 - **WHEN** a test scripts a valid tool call followed by a final output
 - **THEN** the expected target function runs once and the deterministic validated output and trace can be asserted
 
-### Requirement: Agents use configured AI SDK models
-
-An agent SHALL declare validated input/output, serializable instructions, allowed tools, finite step/tool/time limits, and an optional serializable model selector resolved through the active environment's AI SDK v7 provider registry; credentials and live model objects SHALL remain outside agent descriptors.
-
-#### Scenario: Agent omits model
-
-- **WHEN** an agent does not declare `model`
-- **THEN** runtime resolution uses the configured `defaultProvider` and `defaultModel`
-
-#### Scenario: Agent selects provider default
-
-- **WHEN** an agent's `model` equals a configured provider name
-- **THEN** runtime resolution uses that provider's declared default model or fails readiness when it has none
-
-#### Scenario: Agent selects exact model
-
-- **WHEN** an agent supplies an AI SDK registry ID in `provider:model` form
-- **THEN** the named provider and exact model are used after configuration validation
-
-#### Scenario: Agent embeds live model
-
-- **WHEN** an agent attempts to store an AI SDK model instance, provider closure, or credential in its descriptor
-- **THEN** authoring or compilation rejects the non-serializable value
-
-### Requirement: Model provider defaults are explicit
-
-Each environment's model configuration SHALL declare both `defaultProvider` and `defaultModel` plus one or more named `modelProviders`; the default provider SHALL exist, credentials SHALL use environment references, and unknown or incomplete providers SHALL fail before readiness.
-
-#### Scenario: Defaults resolve
-
-- **WHEN** `defaultProvider` names `openai`, `defaultModel` names a valid OpenAI model, and the OpenAI provider has a valid environment-backed API key
-- **THEN** model startup creates the official provider adapter without exposing the resolved key in graph or diagnostics
-
-#### Scenario: Default provider is absent
-
-- **WHEN** `defaultProvider` does not name an entry in `modelProviders`
-- **THEN** compilation or readiness fails with a safe configuration diagnostic before any model request
-
-#### Scenario: Multiple providers are configured
-
-- **WHEN** OpenAI and Anthropic provider entries are both configured
-- **THEN** different agents can select either provider while an agent with no model consistently uses the two global defaults
-
 ### Requirement: AI SDK tool-loop semantics preserve RELKIT boundaries
 
 Agent execution SHALL use AI SDK v7 tool-loop and tool contracts behind the RELKIT descriptor boundary while retaining RELKIT input/output validation, limits, approval policy, cancellation, redaction, engine invocation, and correlated telemetry.
@@ -162,3 +133,26 @@ A tool descriptor SHALL expose typed `invoke(input, options?)` that applies inhe
 
 - **WHEN** a direct tool invocation receives input outside its inherited function schema
 - **THEN** validation rejects it before approval or target execution
+
+### Requirement: Model integrations use provider profiles
+
+The singular model capability SHALL accept a direct binding or named profile map using statically resolved AI SDK integrations; agent model selectors SHALL choose a profile and optional model ID, while credentials, runtime implementations, and live model objects remain outside descriptors and browser artifacts.
+
+#### Scenario: Agent omits a model profile
+
+- **WHEN** exactly one model profile exists or `defaults.model` names one
+- **THEN** runtime uses that profile and its declared default model
+
+#### Scenario: Multiple model profiles are ambiguous
+
+- **WHEN** an agent omits selection and no default resolves among multiple profiles
+- **THEN** compilation fails before any model integration is loaded
+
+### Requirement: Model fakes are explicit
+
+Deterministic scripted model providers SHALL be supplied as named test replacements and SHALL NOT be selected because runtime is in a test environment.
+
+#### Scenario: Agent test supplies a scripted profile
+
+- **WHEN** `createTestApplication` replaces the selected model profile
+- **THEN** the agent runs deterministically without network or real credentials

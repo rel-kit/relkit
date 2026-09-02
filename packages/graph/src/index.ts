@@ -1,6 +1,7 @@
 export * from "./model.js";
 export * from "./graph-types.js";
 export * from "./foundation-nodes.js";
+export * from "./provider-nodes.js";
 export * from "./service-nodes.js";
 export * from "./hash.js";
 export * from "./graph-validation.js";

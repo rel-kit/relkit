@@ -8,7 +8,6 @@ import {
   checkManifests,
   command,
   digest,
-  iteratorSkill,
   packages,
   readJson,
   root,
@@ -65,7 +64,7 @@ ${templateRows}
 - \`bun run check\` passed for internal imports and scope.
 - \`bun run scripts/check-public-declarations.ts\` passed.
 - \`bun run scripts/pack-and-smoke-create-relkit.ts\` passed from packed artifacts, including second-generation reproducibility.
-- The default release check enforces a clean worktree, excluding only \`${iteratorSkill}\`.
+- The default release check enforces a clean worktree.
 `;
 }
 
@@ -82,7 +81,7 @@ async function main(): Promise<void> {
   const configuredOutput = option("--output");
   if (process.argv.includes("--output") && configuredOutput === undefined)
     throw new Error("--output requires a directory");
-  const allow = new Set([iteratorSkill]);
+  const allow = new Set<string>();
   if (writeNotes) allow.add("RELEASE_NOTES.md");
   if (!allowDirty) await assertClean(allow);
   await command(bun, ["run", "scripts/sync-release.ts"]);

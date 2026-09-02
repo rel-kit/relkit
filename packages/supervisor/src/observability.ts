@@ -1,14 +1,15 @@
+import { isRuntimeActivationFingerprint } from "@relkit/contracts";
 import { admitObservabilityRecord, type ObservabilityRecord } from "@relkit/observability";
 import { recordsForTelemetry } from "./observability-records.js";
 import type { SupervisorCandidateToken, SupervisorTelemetry } from "./state-machine-types.js";
 import type {
-  SupervisorGraphHash,
+  SupervisorActivationFingerprint,
   SupervisorObservability,
   SupervisorObservabilityOptions,
 } from "./observability-types.js";
 
 export type {
-  SupervisorGraphHash,
+  SupervisorActivationFingerprint,
   SupervisorObservability,
   SupervisorObservabilityOptions,
 } from "./observability-types.js";
@@ -19,10 +20,10 @@ export function createSupervisorObservability(
 ): SupervisorObservability {
   const now = options.now ?? Date.now;
   let tail = Promise.resolve();
-  const resolveHash = createHashResolver(options.graphHash);
+  const resolveFingerprint = createFingerprintResolver(options.activationFingerprint);
 
   const emit = (event: SupervisorTelemetry): void => {
-    const records = recordsForTelemetry(event, (token) => resolveHash(token, event), now);
+    const records = recordsForTelemetry(event, (token) => resolveFingerprint(token, event), now);
     for (const item of records) publish(item.record, item.streamType);
   };
 
@@ -57,15 +58,18 @@ export function createSupervisorObservability(
   });
 }
 
-function createHashResolver(
-  value: SupervisorGraphHash,
-): (token: SupervisorCandidateToken, event: SupervisorTelemetry) => string {
+function createFingerprintResolver(
+  value: SupervisorActivationFingerprint,
+): (
+  token: SupervisorCandidateToken,
+  event: SupervisorTelemetry,
+) => import("@relkit/contracts").RuntimeActivationFingerprint {
   return (token, event) => {
-    const hash = typeof value === "string" ? value : value(token, event);
-    if (hash === undefined || hash.trim() === "")
+    const fingerprint = typeof value === "function" ? value(token, event) : value;
+    if (!isRuntimeActivationFingerprint(fingerprint))
       throw new TypeError(
-        `Supervisor observability requires an explicit graph hash for generation-${token.generationToken}.`,
+        `Supervisor observability requires an activation fingerprint for generation-${token.generationToken}.`,
       );
-    return hash;
+    return fingerprint;
   };
 }

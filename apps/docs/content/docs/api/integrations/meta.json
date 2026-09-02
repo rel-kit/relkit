@@ -1,0 +1,16 @@
+{
+  "title": "Integrations",
+  "icon": "Plug",
+  "pages": [
+    "ai-sdk",
+    "aws",
+    "cloudflare",
+    "docker",
+    "local",
+    "otlp",
+    "pulumi",
+    "redis",
+    "s3",
+    "sentry"
+  ]
+}

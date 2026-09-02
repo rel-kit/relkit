@@ -42,6 +42,10 @@ export function emptyCheckOutputs(diagnostics: readonly Diagnostic[]): Generated
   return {
     graph: "",
     manifest: "",
+    runtimeActivation: "",
+    runtimeIntegrations: "",
+    runtimeIntegrationImports: "",
+    localServices: "",
     diagnostics: `${canonicalJson(diagnostics)}\n`,
     openapi: "",
     client: "",
@@ -72,7 +76,7 @@ export async function checkFailureDiagnostics(
     return createDiagnostic({
       code: issue.code,
       severity: "error",
-      message: `${issue.message} Example: export default defineConfig({ server: { port: 3000 }, inspector: { port: 3210 } });`,
+      message: `${issue.message} Example: export default defineApp({ env: defineEnv({}), server: { port: 3000 }, inspector: { port: 3210 } });`,
       file,
       ...location,
     });

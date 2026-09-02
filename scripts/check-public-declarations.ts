@@ -7,6 +7,7 @@ const publicPackages = [
   "packages/contracts",
   "packages/schema",
   "packages/config",
+  "packages/provider",
   "packages/diagnostics",
   "packages/functions",
   "packages/services",
@@ -37,7 +38,7 @@ const forbiddenSymbols = [
   ["provider-client", /\b[A-Z][A-Za-z0-9]*ProviderClient\b/g],
   [
     "internal-provider-sdk",
-    /from ["']@relkit\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability|supervisor|inspector-api)(?:\/|["'])/g,
+    /from ["']@relkit\/(?:providers-local|providers-standard|cloud-aws|deploy-pulumi|runtime-effect|runtime-hono|engine|observability(?!\/telemetry["'])|supervisor|inspector-api)(?:\/|["'])/g,
   ],
   [
     "framework-or-provider-import",

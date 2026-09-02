@@ -1,13 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "@relkit/contracts";
+import { mkdtemp, rm } from "node:fs/promises";
+import { join } from "node:path";
 import {
+  createObservabilityRuntime,
   createObservabilityStream,
+  createTelemetryExporterFanout,
+  defineTelemetryExporter,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
 } from "@relkit/observability";
 import { Hono } from "hono";
 import {
   installObservabilityEndpoints,
+  installInspectorEndpoints,
   ObservabilityEndpointConfigurationError,
 } from "./src/index.ts";
 
@@ -150,5 +156,135 @@ describe("inspector observability endpoints", () => {
     expect(text).toContain('"graphHash":"sha256:two"');
     expect(text).not.toContain("hidden");
     await reader.cancel();
+  });
+
+  test("keeps sampled and failed exports complete, redacted, and live in Inspector", async () => {
+    const root = await mkdtemp(join("/tmp", "relkit-inspector-telemetry-"));
+    const secret = "must-not-cross-inspector";
+    const fanout = await createTelemetryExporterFanout({
+      exporters: { broken: defineTelemetryExporter("broken", "broken", {}) },
+      modules: [
+        {
+          module: {
+            runtimeIntegration: {
+              kind: "runtime-integration",
+              integrationId: "broken",
+              registrations: [{ capability: "telemetry", adapterId: "broken", protocolVersion: 1 }],
+            },
+            createTelemetryExporter: async () => ({
+              exportRecord: () => {
+                throw new Error(secret);
+              },
+              flush: () => Promise.resolve(),
+              close: () => Promise.resolve(),
+            }),
+          },
+        },
+      ],
+    });
+    const runtime = await createObservabilityRuntime({
+      root,
+      configuration: { exportSampling: { traceRate: 0 } },
+      exporter: fanout,
+    });
+    try {
+      const common = {
+        version: 1 as const,
+        traceId: "trace-sampled-out",
+        requestId: "request-complete",
+      };
+      expect(
+        runtime.collect({
+          ...common,
+          signal: "request",
+          generationId: "generation-one",
+          graphHash: "sha256:one",
+          invocationId: "invocation-one",
+          startedAt: "2026-09-02T00:00:00.000Z",
+          completedAt: "2026-09-02T00:00:00.001Z",
+          durationMs: 1,
+          method: "GET",
+          rawPath: "/orders",
+          normalizedRoute: "/orders",
+          routeId: "orders.list",
+          functionId: "orders.list",
+          status: 200,
+          outcome: "success",
+          timeline: [],
+        }),
+      ).toBeDefined();
+      runtime.collect({
+        ...common,
+        signal: "span",
+        spanId: "span-one",
+        invocationId: "invocation-one",
+        name: "orders.list",
+        status: "completed",
+        outcome: "success",
+        startedAt: "2026-09-02T00:00:00.000Z",
+        completedAt: "2026-09-02T00:00:00.001Z",
+        durationMs: 1,
+        attributes: { token: secret },
+      });
+      runtime.collect({
+        ...common,
+        signal: "log",
+        timestamp: "2026-09-02T00:00:00.000Z",
+        level: "info",
+        component: "orders.list",
+        message: "local evidence",
+        fields: { token: secret },
+      });
+      await runtime.flush();
+
+      const app = new Hono();
+      installInspectorEndpoints(app, {
+        activeGeneration: {
+          generationId: "generation-one",
+          graphHash: "sha256:one",
+          telemetry: () => ({
+            sampling: { traceRate: 0 },
+            counters: runtime.exportCounters(),
+            exporters: runtime.exporterStats(),
+          }),
+        },
+        query: runtime.query,
+        stream: runtime.stream,
+      });
+      const [requests, traces, logs, metadata] = await Promise.all(
+        ["requests", "traces", "logs", "runtime"].map(async (path) =>
+          (await app.request(`${API_BASE_PATH}/${path}`)).json(),
+        ),
+      );
+      expect(requests.items).toHaveLength(1);
+      expect(traces.items).toHaveLength(1);
+      expect(logs.items).toHaveLength(1);
+      expect(metadata.telemetry).toMatchObject({
+        counters: { persisted: 4, sampledOut: 2, exportSelected: 1 },
+        exporters: [{ name: "broken", healthy: false, received: 3, failures: 1 }],
+      });
+      expect(runtime.readRecords().map((record) => record.signal)).toEqual([
+        "request",
+        "span",
+        "log",
+        "diagnostic",
+      ]);
+      expect(runtime.exporterStats()[0]).toMatchObject({ received: 3, failures: 1 });
+      expect(
+        JSON.stringify({ requests, traces, logs, metadata, records: runtime.readRecords() }),
+      ).not.toContain(secret);
+
+      const response = await app.request(`${API_BASE_PATH}/stream?type=log.emitted`);
+      const reader = response.body!.getReader();
+      await reader.read();
+      const event = new TextDecoder().decode((await reader.read()).value);
+      expect(event).toContain("local evidence");
+      expect(event).toContain('"fields":{}');
+      expect(event).not.toContain(secret);
+      await reader.cancel();
+    } finally {
+      await runtime.close();
+      await rm(root, { recursive: true, force: true });
+    }
   });
 });

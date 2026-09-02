@@ -205,14 +205,22 @@ describe("graph compatibility diff", () => {
         },
         {
           kind: "provider",
-          id: "provider.jobs.default",
+          id: "provider.job.default",
           source,
           profile: "default",
-          capability: "jobs",
-          adapter: "sqs",
-          ownership: "managed",
-          configuration: {},
-          environment: [],
+          capability: "job",
+          adapter: {
+            integrationId: "aws",
+            adapterId: "sqs",
+            protocolVersion: 1,
+            behavior: {},
+            connectionContract: {},
+            connection: {},
+            features: [],
+          },
+          providerSource: { kind: "connected" },
+          namedValues: [],
+          deploymentRoles: [],
         },
       ],
       edges: [],
@@ -227,7 +235,8 @@ describe("graph compatibility diff", () => {
         if (node.kind === "cache") return { ...node, profile: "archive" };
         if (node.kind === "tool") return { ...node, approval: "always" as const };
         if (node.kind === "agent") return { ...node, model: "fast" };
-        if (node.kind === "provider") return { ...node, adapter: "memory" };
+        if (node.kind === "provider")
+          return { ...node, adapter: { ...node.adapter, adapterId: "memory" } };
         return node;
       }),
     };

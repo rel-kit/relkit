@@ -137,6 +137,7 @@ async function execute(
     args: invocation.args,
     json,
     signal,
+    tty: runtime.tty ?? process.stdin.isTTY,
     reporter,
     log,
     ...(json ? {} : { onProgress: (message: string) => io.stderr(message) }),

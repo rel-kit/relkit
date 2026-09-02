@@ -6,8 +6,9 @@ import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 
 test("places Caching beside Storage and preserves useful TOC headings", async () => {
-  expect(guideGroups.map(({ directory }) => directory).slice(0, 9)).toEqual([
+  expect(guideGroups.map(({ directory }) => directory).slice(0, 10)).toEqual([
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",
@@ -37,9 +38,9 @@ test("teaches caching in an existing app with a tested lookup and local Inspecto
   expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
   expect(tutorial).toContain("relkit.config.ts#cache-profile");
-  expect(tutorial).toContain("platform/env.ts#cache-environment");
   expect(tutorial).toContain("examples/commerce/tests/fixtures/get-price.function.ts");
-  expect(tutorial).toContain("RELKIT_ENV=test bun run dev");
+  expect(tutorial).toContain("bun run dev --local=off");
+  expect(tutorial).toContain("explicit replacements for both physical profiles");
   expect(tutorial).toContain("**Invoke locally**");
   expect(tutorial).toContain("## Inspect expiration");
 });

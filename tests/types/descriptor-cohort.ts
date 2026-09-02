@@ -1,4 +1,4 @@
-import { defineConfig, defineService } from "@relkit/app";
+import { defineApp, defineService } from "@relkit/app";
 import { defineAgent } from "@relkit/agents";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
@@ -188,7 +188,7 @@ const environment = defineEnv({
   API_KEY: env.secret(),
 });
 const region: EnvRef<"AWS_REGION", string> = environment.AWS_REGION;
-const app = defineConfig({
+const app = defineApp({
   id: "types.app",
   env: environment,
 });

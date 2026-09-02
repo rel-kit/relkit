@@ -159,8 +159,6 @@ export async function templateInputs(
     build: "relkit build",
     start: "relkit start",
     graph: "relkit graph print",
-    "deploy:preview": "relkit deploy preview",
-    deploy: "relkit deploy up",
   };
   for (const name of ["minimal", "api", "agent"]) {
     const directory = join(root, "templates/default/v1", name);
@@ -176,7 +174,7 @@ export async function templateInputs(
     )
       throw new Error(`Template ${name} tooling versions differ from the workspace`);
     if (JSON.stringify(stable(manifest.scripts)) !== JSON.stringify(stable(scripts)))
-      throw new Error(`Template ${name} scripts differ from the v3 contract`);
+      throw new Error(`Template ${name} scripts differ from the template contract`);
     const files = [...new Bun.Glob("**/*").scanSync({ cwd: directory, onlyFiles: true })].sort();
     for (const file of files) {
       const text = await readFile(join(directory, file), "utf8");

@@ -29,6 +29,12 @@ import {
   type ValidationPass,
 } from "./normalize-types.js";
 import { createDiagnostic } from "@relkit/diagnostics";
+import type { RuntimeIntegrationPlan } from "@relkit/contracts";
+import { generateLocalServicePlan } from "./local-service-plan.js";
+import {
+  generateRuntimeIntegrationPlan,
+  RuntimeIntegrationPlanError,
+} from "./runtime-integration-plan.js";
 import { createWatchDependencyIndex } from "./watch.js";
 
 export * from "./normalize-types.js";
@@ -110,6 +116,23 @@ function passOutputs(work: NormalizationWork): void {
   if (work.graph === undefined) return;
   const hash = hashGraph(work.graph);
   work.graphHash = hash;
+  let runtimeIntegrations: RuntimeIntegrationPlan | undefined;
+  try {
+    runtimeIntegrations = generateRuntimeIntegrationPlan(
+      work.graph,
+      hash,
+      work.input.runtimeIntegrationPackages,
+    );
+  } catch (error) {
+    if (!(error instanceof RuntimeIntegrationPlanError)) throw error;
+    work.diagnostics.push(
+      createDiagnostic({
+        code: error.code,
+        severity: "error",
+        message: error.message,
+      }),
+    );
+  }
   const manifest = generateManifest({
     graph: work.graph,
     graphHash: hash,
@@ -120,9 +143,25 @@ function passOutputs(work: NormalizationWork): void {
     ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
   });
   work.diagnostics.push(...manifest.diagnostics);
-  work.outputs = makeOutputs(work.graph, hash, sortDiagnostics(work.diagnostics), work, manifest);
+  const localServices = generateLocalServicePlan(work.graph, hash);
+  work.outputs = makeOutputs(
+    work.graph,
+    hash,
+    sortDiagnostics(work.diagnostics),
+    work,
+    manifest,
+    runtimeIntegrations,
+    localServices,
+  );
   if (work.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
-    work.outputs = Object.freeze({ ...work.outputs, manifest: "" });
+    work.outputs = Object.freeze({
+      ...work.outputs,
+      manifest: "",
+      runtimeActivation: "",
+      runtimeIntegrations: "",
+      runtimeIntegrationImports: "",
+      localServices: "",
+    });
   }
 }
 

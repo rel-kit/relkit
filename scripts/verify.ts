@@ -55,7 +55,14 @@ function lineCount(text: string): number {
 
 export function implementationSizeOffenders(root: string): string[] {
   const offenders: string[] = [];
-  for (const directory of ["apps", "examples", "packages", "scripts", "templates"]) {
+  for (const directory of [
+    "apps",
+    "examples",
+    "integrations",
+    "packages",
+    "scripts",
+    "templates",
+  ]) {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     for (const path of new Bun.Glob("**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}").scanSync({
@@ -127,6 +134,7 @@ async function main(): Promise<void> {
     ".github",
     "apps",
     "examples",
+    "integrations",
     "packages",
     "scripts",
     "templates",
@@ -144,6 +152,7 @@ async function main(): Promise<void> {
   assertNoGitStateChange("generated-file no-diff", buildState, await gitState());
   await run("typecheck", bun, ["run", "typecheck"]);
   await run("type fixtures", bun, ["run", "test:types"]);
+  await run("package tests", bun, ["run", "test:packages"]);
   await run("unit and schema tests", bun, ["run", "test:unit"]);
   await run("compiler and graph tests", bun, ["run", "test:compiler"]);
   await run("provider contracts", bun, ["run", "test:contracts"]);

@@ -7,6 +7,7 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
+  type RuntimeActivationFingerprint,
 } from "@relkit/contracts";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 
@@ -31,7 +32,7 @@ export async function startTrafficSession(root: string, marker: string): Promise
   const graphHash = "sha256:traffic";
   return startDev({
     ...baseOptions(root),
-    graphHash,
+    activationFingerprint: fingerprint(graphHash),
     drainTimeoutMs: 250,
     candidateStopTimeoutMs: 50,
     environment: { RELKIT_HOLD_MARKER: marker },
@@ -64,6 +65,7 @@ export function candidateSource(options: {
   return `${startFailure}
 const generation = ${options.generation};
 const graphHash = ${JSON.stringify(graphHash)};
+const activationFingerprint = ${JSON.stringify(fingerprint(options.graphHash))};
 const apiVersion = ${apiVersion};
 Bun.serve({ port: Number(process.env.PORT), async fetch(request) {
   const path = new URL(request.url).pathname;
@@ -75,11 +77,19 @@ Bun.serve({ port: Number(process.env.PORT), async fetch(request) {
   }
   const identity = { sourceToken: Number(process.env.RELKIT_SOURCE_TOKEN), generationToken: Number(process.env.RELKIT_GENERATION_TOKEN) };
   const headers = { "content-type": "application/json", "x-relkit-api-version": String(apiVersion) };
-  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ok", ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "relkit.inspector", version: apiVersion, graphHash, manifestGraphHash: graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
-  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ready", environmentReady: ${ready}, providerReady: true, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/health/live") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ok", activationFingerprint, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/graph") return Response.json({ protocol: "relkit.inspector", version: apiVersion, graphHash, activationFingerprint, manifestGraphHash: graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, ...identity }, { headers });
+  if (path === "${API_BASE_PATH}/health/ready") return Response.json({ protocol: "relkit.inspector", version: apiVersion, status: "ready", activationFingerprint, environmentReady: ${ready}, providerReady: true, ...identity }, { headers });
   return new Response("not found", { status: 404 });
 }});`;
+}
+
+export function fingerprint(graphHash: string): RuntimeActivationFingerprint {
+  return {
+    graphHash,
+    manifestHash: `${graphHash}:manifest`,
+    runtimeIntegrationsPlanHash: `${graphHash}:runtime-integrations`,
+  };
 }
 
 export async function responseText(session: DevSession, path: string): Promise<string> {

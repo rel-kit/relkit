@@ -10,7 +10,7 @@ The clock triggers enqueueing; it does not call the target synchronously or prom
 ## Declare the schedule
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — schedule"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-schedule
+  ../../apps/docs/examples/jobs/send-receipt.job.ts#receipt-schedule
 </include>
 
 Each entry requires a stable `id`, a five-field `cron`, an explicit IANA `timezone`, JSON `input`, and
@@ -38,7 +38,7 @@ per-period key, or evaluate a payload callback. Supply input that the target acc
 basic cron and JSON checks for a test of the entire scheduled execution.
 
 The example always supplies `orderId: "scheduled"`, while the job uses that field as its 24-hour
-idempotency key. With the local provider, hourly enqueue attempts therefore reuse the first instance
+idempotency key. With the deterministic harness, hourly enqueue attempts therefore reuse the first instance
 throughout that window. This is **not** a new completed receipt every hour.
 
 If each period must do new work, design a suitable per-period business key or a separate scheduling
@@ -71,8 +71,7 @@ input through the job harness to verify validation, target behavior, and side ef
 runs, not when it is triggered: `createTestJob` does not automatically register the descriptor's schedules.
 
 Scheduler tests need an explicit deterministic clock and assertions for next firing, enqueue overlap,
-and recreation after downtime. The repository's commerce job integration test exercises scheduled
-enqueueing alongside the worker; the [first-job tutorial](/docs/jobs/first-job) covers the simpler
-admission and execution test. Never wait for the next real hour in a test.
+and recreation after downtime. The [first-job tutorial](/docs/jobs/first-job) covers the simpler admission
+and execution test. Never wait for the next real hour in a test.
 
 <include cwd>content/generated/related/jobs-schedules.mdx</include>

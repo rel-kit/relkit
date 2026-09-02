@@ -57,6 +57,8 @@ export function candidateIdentity(
   role: "candidate",
 ): Record<string, JsonValue> {
   const candidate = generation.candidate;
+  const activationFingerprint =
+    candidate?.activationFingerprint ?? generation.activationFingerprint;
   return {
     protocol: "relkit.inspector",
     version: API_VERSION,
@@ -65,6 +67,9 @@ export function candidateIdentity(
     graphHash: candidate?.graphHash ?? generation.graphHash,
     activeGenerationId: generation.generationId,
     activeGraphHash: generation.graphHash,
+    ...(activationFingerprint === undefined
+      ? {}
+      : { activationFingerprint: safeJson(activationFingerprint) }),
     ...(candidate?.sourceVersion === undefined ? {} : { sourceVersion: candidate.sourceVersion }),
     ...(candidate?.state === undefined ? {} : { state: candidate.state }),
     ...(candidate?.status === undefined ? {} : { status: candidate.status }),

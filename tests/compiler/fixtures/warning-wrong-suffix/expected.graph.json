@@ -1,6 +1,6 @@
 {
   "appId": "warning-suffix-app",
-  "contractVersion": 7,
+  "contractVersion": 8,
   "edges": [
     {
       "from": "warning",
@@ -12,7 +12,8 @@
   ],
   "nodes": [
     {
-      "defaults": null,
+      "defaults": {},
+      "deploymentRoles": [],
       "environment": {
         "SERVICE_PORT": {
           "hasDefault": true,
@@ -24,7 +25,6 @@
       },
       "id": "warning-suffix-app",
       "kind": "app",
-      "providerBindings": [],
       "source": {
         "column": 16,
         "file": "relkit.config.ts",

@@ -1,25 +1,11 @@
-import type { AppNode, ApplicationGraph, GraphNode, ProviderProfileNode } from "@relkit/graph";
-import { usedCapabilities } from "./from-graph-aws.js";
-
-export const AWS_DEPLOYMENT_CAPABILITIES = [
-  "buckets",
-  "cache",
-  "events",
-  "jobs",
-  "models",
-  "observability",
-] as const;
-export type Capability = (typeof AWS_DEPLOYMENT_CAPABILITIES)[number];
+import type {
+  ApplicationGraph,
+  GraphNode,
+  ProviderBindingNode,
+  ProviderCapability,
+} from "@relkit/graph";
+import { usedCapabilities } from "./from-graph-providers.js";
 type EnvNode = Extract<GraphNode, { kind: "env" }>;
-
-const AWS_ADAPTERS: Readonly<Record<Capability, readonly string[]>> = {
-  buckets: ["s3"],
-  cache: ["redis"],
-  events: ["eventbridge"],
-  jobs: ["sqs"],
-  models: [],
-  observability: ["cloudwatch"],
-};
 
 export interface FromGraphOptions {
   readonly image?: import("./plan.js").ContainerImagePlan;
@@ -28,10 +14,12 @@ export interface FromGraphOptions {
 
 export type DeploymentPlanErrorCode =
   | "RELKIT_DEPLOY_GRAPH_INVALID"
+  | "RELKIT_DEPLOY_GRAPH_VERSION_UNSUPPORTED"
   | "RELKIT_DEPLOY_SECRET_UNSUPPORTED"
   | "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED"
-  | "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED"
-  | "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED"
+  | "RELKIT_DEPLOY_PROFILE_UNSUPPORTED"
+  | "RELKIT_DEPLOY_ROLE_MISSING"
+  | "RELKIT_DEPLOY_ROLE_INVALID"
   | "RELKIT_DEPLOY_CONFIGURATION_MISSING";
 
 export class DeploymentPlanError extends Error {
@@ -44,78 +32,55 @@ export class DeploymentPlanError extends Error {
   }
 }
 
-export function providerMap(nodes: readonly GraphNode[]): Map<string, ProviderProfileNode> {
+export function providerMap(nodes: readonly GraphNode[]): Map<string, ProviderBindingNode> {
   return new Map(
     nodes
-      .filter((node): node is ProviderProfileNode => node.kind === "provider")
+      .filter((node): node is ProviderBindingNode => node.kind === "provider")
       .map((node) => [node.id, node]),
   );
 }
 
 export function validateProviders(
-  app: AppNode,
-  providers: Map<string, ProviderProfileNode>,
+  providers: Map<string, ProviderBindingNode>,
   nodes: readonly GraphNode[],
   edges: ApplicationGraph["edges"],
 ): void {
-  for (const provider of providers.values()) {
-    if (!(AWS_DEPLOYMENT_CAPABILITIES as readonly string[]).includes(provider.capability)) {
-      fail(
-        "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
-        `AWS does not support capability ${provider.capability}.`,
-      );
-    }
-    if (
-      provider.ownership === "managed" &&
-      !AWS_ADAPTERS[provider.capability as Capability].includes(provider.adapter)
-    ) {
-      fail(
-        "RELKIT_DEPLOY_AWS_CAPABILITY_UNSUPPORTED",
-        `AWS does not support managed ${provider.capability}:${provider.adapter}.`,
-      );
-    }
-  }
-  for (const id of app.providerBindings ?? []) {
-    if (!providers.has(id)) {
-      fail("RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED", `Provider binding ${id} is missing.`);
-    }
-  }
   for (const { capability, profile } of usedCapabilities(nodes, edges)) {
     requireProvider(providers, capability, profile);
   }
 }
 
 export function requireProvider(
-  providers: Map<string, ProviderProfileNode>,
-  capability: Capability,
+  providers: Map<string, ProviderBindingNode>,
+  capability: ProviderCapability,
   profile: string,
-): ProviderProfileNode {
+): ProviderBindingNode {
   const provider = providers.get(providerId(capability, profile));
   if (provider !== undefined) return provider;
   fail(
-    "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED",
+    "RELKIT_DEPLOY_PROFILE_UNSUPPORTED",
     `Provider profile ${profile} does not implement ${capability}.`,
   );
 }
 
 export function configNames(
-  providers: Map<string, ProviderProfileNode>,
-  name: Capability,
+  providers: Map<string, ProviderBindingNode>,
+  name: ProviderCapability,
   profile: string,
 ): string[] {
   const provider = requireProvider(providers, name, profile);
-  return provider.environment
+  return provider.namedValues
     .filter((entry) => !entry.sensitive && !secretName(entry.name))
     .map((entry) => entry.name)
     .sort();
 }
 
 export function isManaged(
-  providers: Map<string, ProviderProfileNode>,
-  capability: Capability,
+  providers: Map<string, ProviderBindingNode>,
+  capability: ProviderCapability,
   profile: string,
 ): boolean {
-  return requireProvider(providers, capability, profile).ownership === "managed";
+  return requireProvider(providers, capability, profile).providerSource.kind === "infrastructure";
 }
 
 export function providerId(capability: string, profile: string): string {

@@ -379,6 +379,7 @@ export interface BucketPutOptions extends Readonly<Record<string, unknown>> {
 - [utils](#utils)
   - [asProvider](#asprovider)
   - [assertKey](#assertkey)
+  - [assertPrefix](#assertprefix)
   - [assertText](#asserttext)
   - [classify](#classify)
   - [notify](#notify)
@@ -415,6 +416,16 @@ declare const assertKey: (value: string) => void;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L106)
 
+## assertPrefix
+
+**Signature**
+
+```ts
+declare const assertPrefix: (value: string) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L109)
+
 ## assertText
 
 **Signature**
@@ -423,7 +434,7 @@ declare const assertKey: (value: string) => void;
 declare const assertText: (value: string, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L112)
 
 ## classify
 
@@ -443,7 +454,7 @@ declare const classify: (value: unknown) => BucketOperationOutcome;
 declare const notify: <T>(hook: ((value: T) => void) | undefined, value: T) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client-utils.ts#L116)
 
 ## required
 
@@ -566,7 +577,7 @@ Re-exports all named exports from the "./client-types.js" module.
 export * from "./client-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L43)
 
 ## BucketCapabilityError
 
@@ -576,7 +587,7 @@ export * from "./client-types.js";
 declare const BucketCapabilityError: typeof BucketCapabilityError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L37)
 
 ## BucketDependencyError
 
@@ -586,7 +597,7 @@ declare const BucketCapabilityError: typeof BucketCapabilityError;
 declare const BucketDependencyError: typeof BucketDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L38)
 
 ## BucketOperationCancelledError
 
@@ -596,7 +607,7 @@ declare const BucketDependencyError: typeof BucketDependencyError;
 declare const BucketOperationCancelledError: typeof BucketOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L39)
 
 ## BucketOperationTimeoutError
 
@@ -606,7 +617,7 @@ declare const BucketOperationCancelledError: typeof BucketOperationCancelledErro
 declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L40)
 
 ## BucketProviderError
 
@@ -616,7 +627,7 @@ declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 declare const BucketProviderError: typeof BucketProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L41)
 
 ## createBucketClient
 
@@ -626,7 +637,7 @@ declare const BucketProviderError: typeof BucketProviderError;
 declare const createBucketClient: (options: BucketClientOptions) => BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/buckets/src/client.ts#L45)
 
 ## `define-bucket.ts`
 

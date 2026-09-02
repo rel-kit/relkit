@@ -11,8 +11,8 @@ export function LandingHero() {
         </Link>
         <h1 id="landing-title">Relkit</h1>
         <p className="landing-lede">
-          Build typed backend workflows from one checked application graph. Use the same model for
-          HTTP, async work, tests, OpenAPI, inspection, and deployment.
+          Build typed backend workflows from one checked application graph. Run selected services
+          locally, replace them explicitly in tests, and deploy only the resources you own.
         </p>
         <div className="landing-actions">
           <Link className="landing-button" href="/docs/start/create-an-app">

@@ -71,6 +71,7 @@ describe("inspector graph model", () => {
     const graph: GraphSnapshot = {
       generationId: "generation-one",
       graphHash: "sha256:fixture",
+      integrations: [],
       nodes,
       declaredEdges: edges.map((edge) => ({ ...edge, relationship: "declared" as const })),
       observedEdges: [],

@@ -3,11 +3,20 @@ import { createDiagnostic } from "@relkit/diagnostics";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 import {
   NORMALIZE_CODES,
-  isDescriptorKindValue,
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
-import { id, isRecord, refId, refKind, source, text, positive, json } from "./normalize-utils.js";
+import {
+  id,
+  isDescriptorKindValue,
+  isRecord,
+  refId,
+  refKind,
+  source,
+  text,
+  positive,
+  json,
+} from "./normalize-utils.js";
 
 export function toDescriptor(
   entry: unknown,

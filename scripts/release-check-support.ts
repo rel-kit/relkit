@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { basename, join, relative, resolve } from "node:path";
 import { expectedExports } from "./release-package-contract.js";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 export const root = resolve(import.meta.dir, "..");
 export const bun = process.execPath;
-export const iteratorSkill = ".agents/skills/openspec-iterator/SKILL.md";
 export const packageFields = [
   "dependencies",
   "devDependencies",
@@ -61,16 +61,11 @@ export async function assertClean(allow: ReadonlySet<string>): Promise<void> {
 }
 
 export async function packages(): Promise<PackageInfo[]> {
-  const entries = await readdir(join(root, "packages"), { withFileTypes: true });
   return Promise.all(
-    entries
-      .filter((entry) => entry.isDirectory())
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(async (entry) => {
-        const directory = join(root, "packages", entry.name);
-        const manifest = await readJson(join(directory, "package.json"));
-        return { directory, name: String(manifest.name), manifest };
-      }),
+    workspacePackageDirectories(root).map(async (directory) => {
+      const manifest = await readJson(join(directory, "package.json"));
+      return { directory, name: String(manifest.name), manifest };
+    }),
   );
 }
 
@@ -102,12 +97,16 @@ export function checkManifests(items: PackageInfo[]): {
   for (const item of items) {
     const directoryName = basename(item.directory);
     const expectedName =
-      directoryName === "create-relkit" ? "create-relkit" : `@relkit/${directoryName}`;
+      relative(root, item.directory) === "integrations/catalog"
+        ? "@relkit/integrations"
+        : directoryName === "create-relkit"
+          ? "create-relkit"
+          : `@relkit/${directoryName}`;
     if (item.name !== expectedName)
       throw new Error(`Package name mismatch: ${relative(root, item.directory)}`);
     if (
       JSON.stringify(stable(item.manifest.exports)) !==
-      JSON.stringify(stable(expectedExports(directoryName)))
+      JSON.stringify(stable(expectedExports(directoryName, item.name)))
     )
       throw new Error(`Export map mismatch: ${item.name}`);
     const expectedBin =
@@ -123,7 +122,7 @@ export function checkManifests(items: PackageInfo[]): {
       item.manifest.description.trim() === "" ||
       item.manifest.license !== "MIT" ||
       item.manifest.repository?.url !== "https://github.com/rel-kit/relkit.git" ||
-      item.manifest.repository?.directory !== `packages/${directoryName}` ||
+      item.manifest.repository?.directory !== relative(root, item.directory) ||
       item.manifest.homepage !== "https://github.com/rel-kit/relkit#readme" ||
       item.manifest.bugs?.url !== "https://github.com/rel-kit/relkit/issues" ||
       JSON.stringify(item.manifest.files) !== JSON.stringify(["dist"]) ||

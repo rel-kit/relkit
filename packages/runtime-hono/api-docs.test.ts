@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import {
   API_REFERENCE_PATH,
@@ -8,6 +7,7 @@ import {
   OPENAPI_PATH,
   type RuntimeManifest,
 } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/hello/route.ts", line: 1, column: 1 } as const;
 const plan: RegistrationPlan = {
@@ -63,9 +63,7 @@ const plan: RegistrationPlan = {
   ],
 };
 const manifest: RuntimeManifest = {
-  contractVersion: MANIFEST_VERSION,
-  generatorVersion: GENERATOR_VERSION,
-  graphHash: plan.graphHash,
+  ...runtimeCohort(plan.graphHash),
   functions: {},
   middleware: {},
   requestTransforms: {},

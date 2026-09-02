@@ -8,9 +8,10 @@ import { serviceGuideGroup } from "../scripts/service-guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `service/${page}.mdx`), "utf8");
 
-test("introduces Service before capabilities with source-backed, connected guides", () => {
-  expect(guideGroups.map(({ directory }) => directory).slice(0, 4)).toEqual([
+test("introduces Service after Core concepts with source-backed, connected guides", () => {
+  expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",
@@ -20,7 +21,7 @@ test("introduces Service before capabilities with source-backed, connected guide
     icon: "Boxes",
     pages: serviceGuideGroup.pages,
   });
-  expect(guideRelations.find(({ path }) => path === "start/local-development")?.next).toBe(
+  expect(guideRelations.find(({ path }) => path === "fundamentals/environment")?.next).toBe(
     "service/index",
   );
   expect(features.find(({ id }) => id === "services")?.guide).toBe("service/define");

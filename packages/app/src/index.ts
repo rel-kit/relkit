@@ -6,6 +6,7 @@ export * from "@relkit/buckets";
 export * from "@relkit/cache";
 export * from "@relkit/events";
 export * from "@relkit/functions";
+export { bindDescriptorIdentity } from "@relkit/invocation";
 export type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@relkit/events";
 export * from "@relkit/jobs";
 export * from "@relkit/routes";

@@ -1,14 +1,13 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { runCommand, type Manifest } from "./pack-and-smoke-create-relkit-support.js";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 export async function readManifests(
   root: string,
 ): Promise<Map<string, { directory: string; manifest: Manifest }>> {
   const result = new Map<string, { directory: string; manifest: Manifest }>();
-  for (const entry of await readdir(join(root, "packages"), { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const directory = join(root, "packages", entry.name);
+  for (const directory of workspacePackageDirectories(root)) {
     const manifest = JSON.parse(
       await readFile(join(directory, "package.json"), "utf8"),
     ) as Manifest;

@@ -5,6 +5,8 @@ import {
   EnvResolutionError,
   defineEnv,
   env,
+  isBindingValueRef,
+  isEnvRef,
   projectEnv,
   resolveEnv,
 } from "../../packages/config/src/index.ts";
@@ -33,6 +35,26 @@ function assertSecretAbsent(value: unknown, forbidden: string, seen = new WeakSe
 }
 
 describe.serial("@relkit/config environment", () => {
+  test("keeps named binding values separate from application environment fields", () => {
+    const cacheUrl = env.secret("CACHE_URL");
+    const definition = defineEnv({ CACHE_URL: env.secret() });
+
+    expect(cacheUrl).toEqual({
+      kind: "binding-value-ref",
+      name: "CACHE_URL",
+      type: "secret-string",
+      sensitive: true,
+    });
+    expect(Object.isFrozen(cacheUrl)).toBe(true);
+    expect(isBindingValueRef(cacheUrl)).toBe(true);
+    expect(isEnvRef(cacheUrl)).toBe(false);
+    expect(isEnvRef(definition.CACHE_URL)).toBe(true);
+    expect(isBindingValueRef(definition.CACHE_URL)).toBe(false);
+    expect(() =>
+      (defineEnv as (shape: Record<string, unknown>) => unknown)({ CACHE_URL: cacheUrl }),
+    ).toThrow("Environment definitions must contain env builders");
+  });
+
   test("reserves PORT for framework server selection", () => {
     const unsafeDefineEnv = defineEnv as (shape: Record<string, unknown>) => unknown;
     expect(() => unsafeDefineEnv({ PORT: env.port() })).toThrow(
@@ -201,7 +223,7 @@ describe.serial("@relkit/config environment", () => {
 
     expect(processReads).toBe(0);
     expect(fileReads).toBe(0);
-    for (const source of ["env.ts", "env-json.ts", "index.ts", "resolve.ts"]) {
+    for (const source of ["env.ts", "env-builder.ts", "env-json.ts", "index.ts", "resolve.ts"]) {
       const contents = readFileSync(
         join(import.meta.dir, "../../packages/config/src", source),
         "utf8",

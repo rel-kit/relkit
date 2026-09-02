@@ -23,6 +23,9 @@ const ARTIFACTS = [
   "openapi.json",
   "server/index.js",
   "server/index.ts",
+  "server/runtime-activation.json",
+  "server/runtime-integrations.plan.json",
+  "server/runtime-integrations.ts",
   "server/runtime.manifest.ts",
 ] as const;
 const roots: string[] = [];

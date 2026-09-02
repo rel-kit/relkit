@@ -15,6 +15,10 @@ import {
 const outputs: GeneratedOutputs = {
   graph: '{"contractVersion":1}\n',
   manifest: 'export const manifestGraphHash = "sha256:test";\n',
+  runtimeActivation: '{"graphHash":"sha256:test"}\n',
+  runtimeIntegrations: '{"graphHash":"sha256:test","integrations":[],"version":1}\n',
+  runtimeIntegrationImports: "export const runtimeIntegrationModules = [] as const;\n",
+  localServices: '{"graphHash":"sha256:test","services":[],"version":1}\n',
   diagnostics: "[]\n",
   openapi: "",
   client: "",
@@ -45,6 +49,10 @@ describe("compiler generated artifacts", () => {
         GENERATED_ARTIFACT_FILES.clientContract,
         GENERATED_ARTIFACT_FILES.contract,
         GENERATED_ARTIFACT_FILES.diagnostics,
+        GENERATED_ARTIFACT_FILES.localServices,
+        GENERATED_ARTIFACT_FILES.runtimeActivation,
+        GENERATED_ARTIFACT_FILES.runtimeIntegrations,
+        GENERATED_ARTIFACT_FILES.runtimeIntegrationImports,
         GENERATED_ARTIFACT_FILES.manifest,
       ]);
       const before = await stat(join(directory, GENERATED_ARTIFACT_FILES.graph));
@@ -78,7 +86,11 @@ describe("compiler generated artifacts", () => {
         "contract.ts",
         "deployment.plan.json",
         "diagnostics.json",
+        "local-services.plan.json",
         "openapi.json",
+        "runtime-activation.json",
+        "runtime-integrations.plan.json",
+        "runtime-integrations.ts",
         "runtime.manifest.ts",
       ]);
       expect(GENERATED_EXTENSION_VERSIONS.deploymentPlan.version).toBe(1);
@@ -121,7 +133,7 @@ describe("compiler generated artifacts", () => {
       "src/page.ts",
       "src/routes.ts",
     ]);
-    expect(result.invalidatedArtifacts).toHaveLength(3);
+    expect(result.invalidatedArtifacts).toHaveLength(7);
     expect(invalidateWatchDependencies(index, ["src/unchanged.ts"]).affectedDescriptorIds).toEqual(
       [],
     );

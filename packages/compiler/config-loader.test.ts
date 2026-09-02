@@ -61,4 +61,32 @@ describe("RELKIT configuration", () => {
       ).toContainEqual(expect.objectContaining({ path: "server.apiDocs.excludeDomains" }));
     }
   });
+
+  test("accepts singular provider keys and rejects removed plural keys", () => {
+    expect(
+      validateConfig({ bucket: {}, cache: {}, job: {}, event: {}, model: {} }, "/workspace/app"),
+    ).toEqual([]);
+    expect(validateConfig({ buckets: {} }, "/workspace/app")).toContainEqual(
+      expect.objectContaining({ code: CONFIG_CODES.key, path: "buckets" }),
+    );
+    expect(validateConfig({ observability: {} }, "/workspace/app")).toContainEqual(
+      expect.objectContaining({ code: CONFIG_CODES.key, path: "observability" }),
+    );
+  });
+
+  test("accepts generic deployment roles and rejects the removed AWS/Pulumi shape", () => {
+    expect(
+      loadConfig({ deployment: { engine: "pulumi", host: "aws" } }, "/workspace/app").deployment,
+    ).toEqual({ engine: "pulumi", host: "aws" });
+    expect(
+      validateConfig({ deployment: { target: "aws", adapter: "pulumi" } }, "/workspace/app"),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: "deployment.target", code: CONFIG_CODES.key }),
+        expect.objectContaining({ path: "deployment.adapter", code: CONFIG_CODES.key }),
+        expect.objectContaining({ path: "deployment.engine", code: CONFIG_CODES.behavior }),
+        expect.objectContaining({ path: "deployment.host", code: CONFIG_CODES.behavior }),
+      ]),
+    );
+  });
 });

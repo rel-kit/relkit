@@ -1,16 +1,16 @@
 import type { QueueRegistration, ScheduleRegistration } from "@relkit/graph";
-import type { JobIdempotencyDefinition } from "@relkit/providers-local";
 import type { RetryPolicy, ScheduleDefinition } from "@relkit/jobs";
 import type {
+  JobIdempotencyDefinition,
   JobMaterializationOptions,
   JobPolicy,
   JobQueueFactoryContext,
   JobQueueHandle,
   JobQueueSource,
+  JobScheduler,
   MaterializedJob,
-} from "./materialize-jobs.js";
-import { JobMaterializationError } from "./materialize-jobs.js";
-import type { Scheduler } from "@relkit/providers-local";
+} from "./materialize-jobs-types.js";
+import { JobMaterializationError } from "./materialize-jobs-types.js";
 import { createConcurrencyAdmission } from "./concurrency.js";
 import type { InvocationAdmit } from "./invoke-types.js";
 
@@ -65,7 +65,7 @@ export async function resolveQueue(
 }
 
 export function bindSchedule(
-  scheduler: Scheduler,
+  scheduler: JobScheduler,
   registration: ScheduleRegistration,
   jobs: ReadonlyMap<string, MaterializedJob>,
 ): void {

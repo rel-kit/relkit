@@ -1,15 +1,5 @@
 {
-  "title": "Application fundamentals",
+  "title": "Core concepts",
   "icon": "Blocks",
-  "pages": [
-    "application",
-    "environment",
-    "providers",
-    "schemas",
-    "errors",
-    "context",
-    "functions",
-    "services",
-    "domain-first-migration"
-  ]
+  "pages": ["index", "application", "functions", "schemas", "errors", "context", "environment"]
 }

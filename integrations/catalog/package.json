@@ -1,0 +1,102 @@
+{
+  "name": "@relkit/integrations",
+  "version": "0.1.0",
+  "description": "Optional catalog of standalone RELKIT integrations.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "integrations/catalog"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./redis": {
+      "types": "./dist/redis.d.ts",
+      "import": "./dist/redis.js"
+    },
+    "./s3": {
+      "types": "./dist/s3.d.ts",
+      "import": "./dist/s3.js"
+    },
+    "./docker": {
+      "types": "./dist/docker.d.ts",
+      "import": "./dist/docker.js"
+    },
+    "./local": {
+      "types": "./dist/local.d.ts",
+      "import": "./dist/local.js"
+    },
+    "./cloudflare": {
+      "types": "./dist/cloudflare.d.ts",
+      "import": "./dist/cloudflare.js"
+    },
+    "./ai-sdk": {
+      "types": "./dist/ai-sdk.d.ts",
+      "import": "./dist/ai-sdk.js"
+    },
+    "./sentry": {
+      "types": "./dist/sentry.d.ts",
+      "import": "./dist/sentry.js"
+    },
+    "./otlp": {
+      "types": "./dist/otlp.d.ts",
+      "import": "./dist/otlp.js"
+    },
+    "./aws": {
+      "types": "./dist/aws.d.ts",
+      "import": "./dist/aws.js"
+    },
+    "./pulumi": {
+      "types": "./dist/pulumi.d.ts",
+      "import": "./dist/pulumi.js"
+    }
+  },
+  "relkit": {
+    "catalog": {
+      "./ai-sdk": "@relkit/ai-sdk",
+      "./aws": "@relkit/aws",
+      "./cloudflare": "@relkit/cloudflare",
+      "./docker": "@relkit/docker",
+      "./local": "@relkit/local",
+      "./otlp": "@relkit/otlp",
+      "./pulumi": "@relkit/pulumi",
+      "./redis": "@relkit/redis",
+      "./s3": "@relkit/s3",
+      "./sentry": "@relkit/sentry"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@relkit/ai-sdk": "workspace:*",
+    "@relkit/aws": "workspace:*",
+    "@relkit/cloudflare": "workspace:*",
+    "@relkit/docker": "workspace:*",
+    "@relkit/local": "workspace:*",
+    "@relkit/otlp": "workspace:*",
+    "@relkit/pulumi": "workspace:*",
+    "@relkit/redis": "workspace:*",
+    "@relkit/s3": "workspace:*",
+    "@relkit/sentry": "workspace:*"
+  }
+}

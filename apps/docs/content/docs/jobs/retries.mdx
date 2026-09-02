@@ -39,7 +39,7 @@ no such errors, so its retry policy alone does not make arbitrary storage errors
 ## Bound attempts and backoff
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — execution policy"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-retry
+  ../../apps/docs/examples/jobs/send-receipt.job.ts#receipt-retry
 </include>
 
 `maxAttempts` includes the first execution. This policy permits three attempts: the initial attempt,
@@ -67,10 +67,9 @@ coordination if those properties matter.
 
 ## Inspect terminal work and test recovery
 
-The local provider persists job history and terminal `dead-lettered` entries for inspection. The current
-SQS adapter keeps its inspection map in memory and deletes the received message for both completion and
-terminal failure; it does not itself move that message into a durable separate dead-letter queue.
-Review the actual adapter and infrastructure before relying on replay or retained failures in production.
+The deterministic harness persists job history and terminal `dead-lettered` entries for inspection.
+Production retention, replay, and dead-letter behavior belong to the selected integration; verify those
+guarantees before relying on them.
 
 Start with the executable test in [your first job](/docs/jobs/first-job). `createTestJob` uses deterministic
 time and exposes `runNext`, `drain`, `clock`, `failures`, and `restart`. Pass the authored retry policy

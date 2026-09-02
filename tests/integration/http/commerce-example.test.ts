@@ -1,6 +1,11 @@
 import { expect, test } from "bun:test";
 import { resolve } from "node:path";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "../../../packages/contracts/src/index.ts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "../../../packages/contracts/src/index.ts";
 import {
   invokeFunction,
   type InvocationTarget,
@@ -47,6 +52,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
   const plan = createRegistrationPlan(graph, { projectRoot: "/fixture" });
   const invocations: HttpInvocationOptions[] = [];
   const uploadedKeys: string[] = [];
+  const rateLimitValues = new Map<string, number>();
   const app = createApp({
     plan,
     manifest: manifestFor(plan),
@@ -75,6 +81,19 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
           return createOrderResult(invocation.input);
         throw new Error(`Unexpected function ${invocation.functionId}`);
       },
+    },
+    rateLimitRuntime: {
+      resolveStore: () => ({
+        get: (key) => rateLimitValues.get(key),
+        increment: (key, delta) => {
+          const value = (rateLimitValues.get(key) ?? 0) + delta;
+          rateLimitValues.set(key, value);
+          return value;
+        },
+        delete: (key) => {
+          rateLimitValues.delete(key);
+        },
+      }),
     },
   });
   const client = createTestHttpClient(app);
@@ -209,6 +228,16 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     contractVersion: MANIFEST_VERSION,
     generatorVersion: GENERATOR_VERSION,
     graphHash: plan.graphHash,
+    activationFingerprint: {
+      graphHash: plan.graphHash,
+      manifestHash: "sha256:commerce-http-manifest",
+      runtimeIntegrationsPlanHash: "sha256:commerce-http-runtime-integrations",
+    },
+    runtimeIntegrationsPlan: {
+      version: RUNTIME_INTEGRATION_PLAN_VERSION,
+      fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+      graphHash: plan.graphHash,
+    },
     functions: {},
     routes: {
       "route.all.api.auth.optional-catch-all-auth": { handler: authRoute.handler },

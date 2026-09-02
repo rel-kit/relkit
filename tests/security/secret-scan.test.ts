@@ -17,22 +17,37 @@ test("recursively scans values and release artifacts without exposing raw matche
   const root = await mkdtemp(join("/tmp", "relkit-secret-scan-"));
   try {
     await mkdir(join(root, ".relkit", "build"), { recursive: true });
+    await mkdir(join(root, "integrations", "packages", "redis", "dist"), { recursive: true });
     await mkdir(join(root, "tests", "compiler", "fixtures"), { recursive: true });
     await writeFile(join(root, ".relkit", "build", "manifest.json"), '{"status":"safe"}\n');
+    await writeFile(
+      join(root, "integrations", "packages", "redis", "package.json"),
+      '{"name":"@relkit/redis"}\n',
+    );
+    await writeFile(join(root, "integrations", "packages", "redis", "dist", "index.js"), "");
     await writeFile(join(root, "tests", "compiler", "fixtures", "expected.graph.json"), "{}\n");
 
     const clean = await scanReleaseArtifacts(root);
     expect(clean.matches).toEqual([]);
     expect(clean.categories["build-image"]).toBe(1);
+    expect(clean.categories["generated-source"]).toBe(1);
     expect(clean.categories.graph).toBe(1);
 
     await writeFile(
       join(root, ".relkit", "build", "manifest.json"),
       JSON.stringify({ token: SYNTHETIC_SECRETS.password }),
     );
+    await writeFile(
+      join(root, "integrations", "packages", "redis", "dist", "index.js"),
+      SYNTHETIC_SECRETS.password,
+    );
     const dirty = await scanReleaseArtifacts(root);
     expect(dirty.matches).toEqual([
       expect.objectContaining({ secretName: "password", source: ".relkit/build/manifest.json" }),
+      expect.objectContaining({
+        secretName: "password",
+        source: "integrations/packages/redis/dist/index.js",
+      }),
     ]);
     expect(JSON.stringify(dirty)).not.toContain(SYNTHETIC_SECRETS.password);
   } finally {

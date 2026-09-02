@@ -55,21 +55,20 @@ Expect a passing test with the answer `Hello, Ada!`. This checks that your funct
 
 Skip this step if you only want the offline test. Live model calls require a provider key and may cost money. For [MCP only](/docs/ai/mcp), you can use just the greeting function and tool without adding an agent.
 
-If your app already has a model profile, keep it and select a matching model in the agent. Otherwise, add this field inside `defineEnv()` in `src/platform/env.ts`. The snippet uses `env as envFactory` imported from `@relkit/app/config`:
-
-<include cwd lang="ts" meta='title="src/platform/env.ts — field to add"'>
-  ../../examples/commerce/src/platform/env.ts#ai-environment
-</include>
-
-Import `aiSdk` and `external` from `@relkit/app/config` in `relkit.config.ts`. Add this entry inside `defineConfig()`, using your existing `env` import:
+If your app already has a model profile, keep it and select a matching model in the agent. Otherwise,
+install `@relkit/ai-sdk`, import `aiSdk` from that standalone package, and import `env as binding` from
+`@relkit/app/config`. Add this singular `model` entry inside `defineApp()`:
 
 <include cwd lang="ts" meta='title="relkit.config.ts — model configuration"'>
   ../../examples/commerce/relkit.config.ts#ai-profile
 </include>
 
-Set `OPENAI_API_KEY` in your local environment or uncommitted `.env` file. Do not put the key in the agent's instructions or commit it to source control.
+`binding.secret("OPENAI_API_KEY")` is private to the model binding and does not add a field to handler-visible
+`ctx.env`. Set the value in your local environment or uncommitted `.env` file. Do not put the key in the
+agent's instructions or commit it to source control.
 
-Supply credentials for every model provider kept in your configuration, or remove providers you do not use.
+Only graph-required model profiles are constructed. Tests still provide explicit scripted model replacements;
+no environment name silently installs one.
 
 ```sh
 bun run check

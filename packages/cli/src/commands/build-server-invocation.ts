@@ -30,9 +30,6 @@ async function invokeHttp(request) {
   activeInvocations.add(task);
   try {
     return await task;
-  } catch (error) {
-    captureRuntimeError(error, request.traceId);
-    throw error;
   } finally {
     activeInvocations.delete(task);
   }
@@ -41,7 +38,7 @@ async function invokeHttp(request) {
 async function invocationContext({ invocation, signal, env, time }) {
   const write = (level, message, fields = {}) => {
     const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId });
-    if (record?.signal === "log") consoleHumanSink.write(formatHumanLog(record), record);
+    writeRuntimeLog(record);
   };
   const logger = (level) => (message, fields) => write(level, message, fields);
   const activeAuth = authRequestStorage.getStore();
@@ -89,30 +86,4 @@ function createAuthRegistration(applicationGraph, routes = {}, authStartup) {
   return undefined;
 }
 
-async function createSentry(configuration, env) {
-  if (configuration === undefined) return undefined;
-  const dsn = typeof configuration.dsn === "string"
-    ? configuration.dsn
-    : env[configuration.dsn?.name];
-  if (typeof dsn !== "string" || dsn === "") return undefined;
-  const sdk = await import("@sentry/bun");
-  sdk.init({
-    dsn,
-    sendDefaultPii: false,
-    ...(configuration.tracesSampleRate === undefined
-      ? {}
-      : { tracesSampleRate: configuration.tracesSampleRate }),
-  });
-  return sdk;
-}
-
-function captureRuntimeError(error, traceId) {
-  if (sentry === undefined) return;
-  const detail = redactFailureDetail(error);
-  const safe = new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
-  sentry.withScope((scope) => {
-    if (traceId !== undefined) scope.setTag("relkit.trace_id", traceId);
-    sentry.captureException(safe);
-  });
-}
 `;

@@ -8,13 +8,14 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs observability openapi providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
+  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );
 const approvedApps = new Set(["docs", "inspector"]);
 const approvedExamples = new Set(["README.md", "auth-drizzle", "commerce", "data-model"]);
 const approvedTemplates = new Set(["default"]);
+const integrationPath = /^integrations\/(?:catalog(?:\/|$)|packages\/[^/]+(?:\/|$))/;
 const forbiddenNames =
   "persistence|identity|workflow|knowledge(?:-store)?|plugin|marketplace|subscription|entity|relation";
 const proseAllowlist = [
@@ -76,10 +77,11 @@ function pathViolations(root: string, file: string): ScopeViolation[] {
     add("rust-source", `Rust source or project metadata is forbidden: ${path}`);
   }
   if (
-    /(?:^|\/)(?:terraform|opentofu|cloudformation|cdk|sst|alchemy|serverless|bicep)(?:\/|\.|$)/i.test(
+    !integrationPath.test(path) &&
+    (/(?:^|\/)(?:terraform|opentofu|cloudformation|cdk|sst|alchemy|serverless|bicep)(?:\/|\.|$)/i.test(
       path,
     ) ||
-    /\.(?:tf|tf\.json)$/i.test(path)
+      /\.(?:tf|tf\.json)$/i.test(path))
   ) {
     add("alternate-iac", `alternate infrastructure-engine path or file is forbidden: ${path}`);
   }
@@ -151,7 +153,7 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
       findings.push(violation(root, file, rule, message, text, offset));
     }
   }
-  if (alternateIac.test(text)) {
+  if (!integrationPath.test(path) && alternateIac.test(text)) {
     findings.push(
       violation(
         root,
@@ -167,14 +169,10 @@ function contentViolations(root: string, file: string): ScopeViolation[] {
 }
 
 function filesToScan(root: string): string[] {
-  const paths = [
-    "package.json",
-    "bunfig.toml",
-    "turbo.json",
-    "tsconfig.json",
-    "tsconfig.base.json",
-  ];
-  for (const directory of "apps examples packages templates scripts tests .github".split(" ")) {
+  const paths = "package.json bunfig.toml turbo.json tsconfig.json tsconfig.base.json".split(" ");
+  for (const directory of "apps examples integrations packages templates scripts tests .github".split(
+    " ",
+  )) {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     paths.push(

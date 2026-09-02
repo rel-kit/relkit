@@ -1,4 +1,5 @@
 export * from "./conventions.js";
+export * from "./activation-fingerprint.js";
 export * from "./config-loader.js";
 export * from "./discovery/ast-prefilter.js";
 export * from "./discovery/evaluator.js";
@@ -9,7 +10,11 @@ export * from "./generate-manifest.js";
 export * from "./event-registry.js";
 export * from "./context-registry.js";
 export * from "./generated-artifacts.js";
+export * from "./integration-package-resolution.js";
+export * from "./local-service-plan.js";
 export * from "./normalize.js";
 export * from "./project-typecheck.js";
 export * from "./route-file.js";
+export * from "./runtime-integration-plan.js";
+export * from "./runtime-integration-imports.js";
 export * from "./watch.js";

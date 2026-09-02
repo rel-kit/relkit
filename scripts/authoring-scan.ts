@@ -1,5 +1,6 @@
 import * as ts from "typescript";
-import { importReferences, isFixtureForbidden } from "./boundary-imports";
+import { dependencyName, importReferences, isFixtureForbidden } from "./boundary-imports";
+import { repositoryIntegrationPackageNames } from "./boundary-directions";
 import {
   add,
   authoringFragments,
@@ -10,7 +11,6 @@ import {
   type AuthoringViolation,
   type Fragment,
 } from "./authoring-scan-utils";
-
 const vendorProfile =
   /^(?:aws|amazon|azure|gcp|google|openai|anthropic|s3|sqs|sns|dynamodb|redis|postgres|mysql|pulumi|hono|effect|next)(?:[./_-].*)?$/i;
 const vendorModel =
@@ -24,7 +24,6 @@ const valueReads =
 const clientConstruction = /(?:Client|Provider|Redis|DynamoDB|S3|Hono|Pulumi)$/i;
 const registrationCall =
   /^(?:register(?:[A-Z].*)?|listen|serve|start|startServer|createServer|mount|setInterval|setTimeout)$/i;
-
 function scanCall(
   root: string,
   fragment: Fragment,
@@ -117,8 +116,11 @@ function scanCall(
       call.getStart(source),
     );
 }
-
-function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
+function scanFragment(
+  root: string,
+  fragment: Fragment,
+  integrations: ReadonlySet<string>,
+): AuthoringViolation[] {
   const source = ts.createSourceFile(
     fragment.path,
     fragment.text,
@@ -129,8 +131,9 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
   const findings: AuthoringViolation[] = [];
   const setupSource = /\/setup\.ts$/.test(fragment.path);
   for (const reference of importReferences(source)) {
+    const dependency = dependencyName(reference.specifier);
     if (
-      isFixtureForbidden(reference.specifier) ||
+      (isFixtureForbidden(reference.specifier) && !integrations.has(dependency ?? "")) ||
       (!setupSource &&
         /^(?:effect|hono|next|pulumi|aws-sdk|fs|node:fs(?:\/promises)?|node:process|dotenv|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare)\/)/.test(
           reference.specifier,
@@ -186,8 +189,9 @@ function scanFragment(root: string, fragment: Fragment): AuthoringViolation[] {
 }
 
 export function scanAuthoring(root: string): AuthoringViolation[] {
+  const integrations = repositoryIntegrationPackageNames(root);
   return authoringFragments(root)
-    .flatMap((fragment) => scanFragment(root, fragment))
+    .flatMap((fragment) => scanFragment(root, fragment, integrations))
     .sort((left, right) =>
       `${left.file}:${left.line}:${left.column}:${left.rule}`.localeCompare(
         `${right.file}:${right.line}:${right.column}:${right.rule}`,

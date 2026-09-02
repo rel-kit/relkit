@@ -1,5 +1,5 @@
 import { middlewareForRoute } from "./middleware-coverage.js";
-import { selectedProviderProfile } from "./normalize-graph-app.js";
+import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 
@@ -30,7 +30,7 @@ export function addProviderEdge(
     selectedProviderProfile(
       application,
       capability,
-      typeof value.profile === "string" ? value.profile : undefined,
+      requestedProviderProfile(descriptor.kind, value),
     ) ?? "default";
   const bindingId = `provider.${capability}.${profile}`;
   if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
@@ -120,12 +120,12 @@ export function isTargetingDescriptor(kind: string): boolean {
 function providerCapability(kind: string): string | undefined {
   return (
     {
-      bucket: "buckets",
+      bucket: "bucket",
       cache: "cache",
-      job: "jobs",
-      event: "events",
-      "event-trigger": "events",
-      agent: "models",
+      job: "job",
+      event: "event",
+      "event-trigger": "event",
+      agent: "model",
     } as Record<string, string>
   )[kind];
 }

@@ -71,36 +71,17 @@ Schedules SHALL validate cron expression, timezone, static input, and overlap po
 
 ### Requirement: Versioned event contracts and envelopes
 
-An event SHALL have an explicit stable ID, integer version, validated payload, and optional sensitive-field metadata; publishing SHALL create a validated envelope with instance/event/version/time, key, attributes, correlation, causation invocation, and trace information.
+An event SHALL have an explicit stable ID, an optional positive integer version defaulting to `1`, validated `input`, and optional sensitive-field metadata; publishing SHALL create a validated envelope with instance/event/version/time, key, attributes, correlation, causation invocation, and trace information.
 
 #### Scenario: Event is published from a function
 
-- **WHEN** a declared function publishes a valid event payload
-- **THEN** the provider validates it, creates one correlated envelope, and returns acceptance metadata
+- **WHEN** a function declares the event ID in `publishes` and publishes valid input
+- **THEN** the provider validates it, creates one correlated envelope, and returns acceptance metadata without waiting for consumers
 
 #### Scenario: Event payload is invalid
 
-- **WHEN** a payload violates the event schema
+- **WHEN** publication input violates the event schema
 - **THEN** publication is rejected before any delivery is accepted
-
-### Requirement: Compile-time event selector expansion
-
-Known event-name strings, `anyOf`, `match`, and restricted raw-all selectors SHALL compile from the generated event registry into sorted known event ID/version pairs and corresponding callback payload contracts; runtime providers SHALL route those explicit pairs rather than reinterpret source patterns.
-
-#### Scenario: One event name is selected
-
-- **WHEN** a listener names a known event string
-- **THEN** its callback receives that event's payload type and the graph stores its exact ID/version pair
-
-#### Scenario: Any-of selector expands
-
-- **WHEN** a listener selects several known event names
-- **THEN** its callback input can narrow a discriminated union by event ID/version and the graph stores the sorted expansion
-
-#### Scenario: Raw all-event listener is used
-
-- **WHEN** a listener opts into raw unknown payload capture for audit, telemetry, or development tooling
-- **THEN** compilation emits the required volume/sensitive-data warning and rejects use outside the restricted policy
 
 ### Requirement: Independent event fan-out
 
@@ -139,20 +120,6 @@ Providers SHALL expose whether per-key ordering is supported, and application-vi
 - **WHEN** the provider reports no ordered-by-key capability
 - **THEN** the runtime and inspector do not promise ordered delivery for equal event keys
 
-### Requirement: Event listeners remain trigger concepts
-
-Graph output, generated source, public exports, APIs, inspector terminology, and tests SHALL represent callback listeners as event triggers targeting generated internal functions and SHALL contain no separate subscription descriptor or graph resource.
-
-#### Scenario: Full event fixture compiles
-
-- **WHEN** events and callback `onEvent` bindings are compiled
-- **THEN** the graph contains event nodes, generated function nodes, and generic trigger nodes only, and a source scan finds no generated `*.subscription.ts`
-
-#### Scenario: One listener fails during fan-out
-
-- **WHEN** independently lowered callback listeners receive the same event and one fails
-- **THEN** each trigger retains independent retry/dead-letter state and other accepted deliveries are not revoked
-
 ### Requirement: Deterministic async test controls
 
 The testing harness SHALL let tests enqueue/run/drain jobs and publish/deliver events one item at a time, advance time explicitly, inspect state, inject named failure points, and restart against shared state without arbitrary sleeps.
@@ -161,20 +128,6 @@ The testing harness SHALL let tests enqueue/run/drain jobs and publish/deliver e
 
 - **WHEN** a test causes a retryable job or event failure
 - **THEN** it observes delayed state, advances the deterministic clock by the required duration, and then runs the next attempt
-
-### Requirement: Typed callback listener context
-
-An event callback SHALL receive the validated event payload followed by a framework-neutral context containing envelope identity, version, key, attributes, occurrence time, trace, correlation, causation, cancellation, logging, and only declared dependency clients.
-
-#### Scenario: Callback receives an event
-
-- **WHEN** a known event is delivered to a callback listener
-- **THEN** its payload type matches the registered event and its context preserves the accepted envelope metadata
-
-#### Scenario: Callback invokes a dependency
-
-- **WHEN** a listener declares and calls another framework capability
-- **THEN** that call is typed, correlated, and executed through the same engine/provider boundary as a normal function dependency
 
 ### Requirement: Declared-error retry hints constrain asynchronous delivery
 
@@ -208,3 +161,35 @@ When a retryable declared error supplies `afterMs`, the next job or durable even
 
 - **WHEN** the same retryable error is thrown from an ordinary direct function invocation
 - **THEN** the engine returns the normalized failure without automatically repeating the invocation
+
+### Requirement: Exact event functions consume independently
+
+Each `defineEventFunction` SHALL bind one exact known event ID to one authored event-only function and one generated trigger; accepted events SHALL still fan out to zero, one, or many matching triggers whose acknowledgement, retry, replay, and dead-letter state remain independent.
+
+#### Scenario: Two event functions receive one event
+
+- **WHEN** two durable event functions name the same event and one handler fails
+- **THEN** the successful delivery completes while the failed delivery follows only its own retry and dead-letter policy
+
+### Requirement: Event function context preserves delivery metadata
+
+An event function SHALL receive parsed event input and a context separating event identity, one-based delivery attempt/replay state, and trace/correlation/causation metadata while retaining ordinary declared managed capabilities.
+
+#### Scenario: Retried delivery reaches a handler
+
+- **WHEN** a durable delivery is retried
+- **THEN** `context.trigger.delivery.attempt` increases, replay state is accurate, and the accepted envelope identity remains available
+
+### Requirement: Job and event runtimes use provider bindings
+
+Job and event execution SHALL resolve independent physical profiles through the common provider-binding and runtime-integration plans, construct only graph-required bindings, and isolate each binding's configuration, credentials, health, and lifecycle from every other capability.
+
+#### Scenario: Connected queue and infrastructure event bus coexist
+
+- **WHEN** jobs select a configured queue adapter and events select an infrastructure-owned event adapter
+- **THEN** runtime wires each independently and deployment creates lifecycle operations only for the infrastructure-owned binding
+
+#### Scenario: One async integration is unavailable
+
+- **WHEN** an unused event profile lacks required values while the graph requires only jobs
+- **THEN** job readiness is unaffected and the event runtime is not loaded

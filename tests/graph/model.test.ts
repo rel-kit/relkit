@@ -1,9 +1,11 @@
 import { describe, expect, test } from "bun:test";
+import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
 import {
   GRAPH_EDGE_KINDS,
   GRAPH_NODE_KINDS,
   isGraphEdgeKind,
   isGraphNodeKind,
+  validateGraphShape,
   type AgentNode,
   type ApplicationGraph,
   type HttpTriggerConfig,
@@ -93,7 +95,7 @@ describe("graph model", () => {
       role: "primary",
     };
     const graph: ApplicationGraph = {
-      contractVersion: 3,
+      contractVersion: GRAPH_VERSION,
       appId: "orders",
       nodes: [agent],
       edges: [edge],
@@ -102,5 +104,51 @@ describe("graph model", () => {
     expect(config.transforms[0]?.id).toBe("orders.normalize");
     expect(graph.nodes[0]?.kind).toBe("agent");
     expect(graph.edges[0]?.kind).toBe("targets-function");
+  });
+
+  test("validates safe provider projections and rejects legacy ownership metadata", () => {
+    const provider = {
+      kind: "provider" as const,
+      id: "provider.cache.default",
+      source,
+      capability: "cache" as const,
+      profile: "default",
+      adapter: {
+        integrationId: "redis",
+        adapterId: "redis",
+        protocolVersion: 1 as const,
+        behavior: {},
+        connectionContract: {
+          url: { required: true, sensitive: true, authoredValue: "fixed" as const },
+        },
+        connection: {},
+        features: ["atomicIncrement"],
+      },
+      providerSource: { kind: "connected" as const },
+      namedValues: [{ field: "url", name: "CACHE_URL", type: "secret-string", sensitive: true }],
+      deploymentRoles: [],
+    };
+    expect(() =>
+      validateGraphShape({ contractVersion: GRAPH_VERSION, nodes: [provider], edges: [] }),
+    ).not.toThrow();
+    expect(() =>
+      validateGraphShape({
+        contractVersion: GRAPH_VERSION,
+        nodes: [{ ...provider, ownership: "external" }],
+        edges: [],
+      }),
+    ).toThrow("provider metadata is invalid");
+    expect(() =>
+      validateGraphShape({
+        contractVersion: GRAPH_VERSION,
+        nodes: [
+          {
+            ...provider,
+            namedValues: [{ ...provider.namedValues[0]!, value: "must-not-cross-graph" }],
+          },
+        ],
+        edges: [],
+      }),
+    ).toThrow("namedValues[0] is invalid");
   });
 });

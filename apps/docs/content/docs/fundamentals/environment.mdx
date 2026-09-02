@@ -1,83 +1,52 @@
 ---
 title: Environment contracts
-description: Declare runtime values once, distinguish public values from secrets, and diagnose configuration before handlers run.
+description: Parse runtime values once, mark secrets for redaction, and fail before handlers run when configuration is invalid.
 ---
 
-Environment variables enter a RELKIT application through a typed contract, not scattered `process.env`
-reads. The contract parses strings into bounded values, supplies intentional defaults, marks secrets for
-redaction, and states which environments require each key.
+Environment variables enter a RELKIT application through one typed contract rather than scattered `process.env`
+reads. Every process value starts as text; the contract parses it, applies intentional defaults, identifies
+secrets, and controls the values available through `context.env`.
 
-## Read the API-template contract
+## Define application values
 
 <include cwd lang="ts" meta='title="templates/default/v1/api/src/platform/env.ts"'>
   ../../templates/default/v1/api/src/platform/env.ts
 </include>
 
-Every process environment value begins as text. Builders such as `env.string()`, `env.url()`,
-`env.boolean()`, and numeric variants define the value application code is allowed to observe. A default is
-appropriate for harmless local policy such as a log level; credentials and remote resource names should be
-provided by the environment or secret manager.
+Builders such as `env.string()`, `env.url()`, `env.boolean()`, numeric variants, and `env.literal(...)` define
+the accepted runtime value. Defaults are useful for harmless local policy such as log level. Credentials and
+other required production values should fail clearly when absent instead of receiving placeholder defaults.
 
-## Add a required orders setting
+`env.secret()` marks a value as sensitive so generated output, diagnostics, telemetry, and Inspector payloads
+can redact it. Secret marking is a safety boundary, not permission to log the value.
 
-<Steps>
-  <Step>
-    ### Declare the key
+## Separate environment from binding references
 
-    Edit `src/platform/env.ts`. Name the key for the external contract, choose the narrowest parser, and use
-    `requiredIn("production")` when local development has a safe default but production must make an explicit
-    choice.
+The contract passed as `defineApp({ env })` resolves values available to application handlers. Integration
+configuration also uses named binding references such as `binding.string(...)` and `binding.secret(...)`.
+Those references describe runtime wiring for an adapter; they are not additional `context.env` fields unless
+the application environment contract declares them too.
 
-  </Step>
-  <Step>
-    ### Document the local value
+Use source-controlled configuration for stable topology and policy. Use environment values for machine-, stack-,
+or secret-specific data. Never place resolved credentials in source, graphs, manifests, deployment plans, or
+test snapshots.
 
-    Add a non-secret example to `.env.example`, then copy it to the ignored `.env` used on your machine.
-    Never place a real token, password, private endpoint credential, or account identifier in the example.
+## Inspect configuration safely
 
-  </Step>
-  <Step>
-    ### Consume the typed reference
+```sh title="Terminal — relkit-orders"
+bun run relkit env check
+bun run relkit env list
+bun run relkit env explain LOG_LEVEL
+bun run relkit env example
+```
 
-    Import the contract into `relkit.config.ts` and pass `env.KEY` to the provider or setting that owns it.
-    Functions receive only declared environment dependencies through invocation context; do not fall back to
-    an unvalidated `process.env.KEY` read.
+`check` validates the active values, `list` reports value status without printing secret contents, `explain`
+describes one declaration, and `example` renders a safe template. Run `bun run check` after changing the contract
+so generated types and graph metadata stay current.
 
-  </Step>
-  <Step>
-    ### Verify each mode
-
-    ```sh title="Terminal — relkit-orders"
-    bun run relkit env list
-    bun run relkit doctor --no-pulumi
-    bun run check
-    ```
-
-    `env list` reports names, types, requirements, and whether a value is present without printing secret
-    values. Remove the new key from `.env` once to confirm the missing-value diagnostic, then restore it.
-
-  </Step>
-</Steps>
-
-## Public values and secrets
-
-Mark credentials with `env.secret()`. Secret metadata flows into diagnostics, inspector payloads,
-observability redaction, and deployment wiring. Redaction reduces accidental disclosure; it is not a reason to
-log secrets or include them in error messages.
-
-Use separate keys when two systems rotate independently. Reusing one generic `API_KEY` for unrelated
-providers makes ownership, deployment permissions, and incident response ambiguous.
-
-## Failure behavior
-
-Environment resolution happens before the application becomes ready. Invalid URLs, malformed numbers,
-missing required values, and disallowed literals prevent activation with a source-linked diagnostic. This is
-intentional: a request handler should never discover halfway through a call that required configuration was
-unparseable.
-
-<Callout type="error" title="Do not commit runtime secrets">
-  `.env` must remain ignored. In production, supply secrets through the platform's secret manager or
-  protected environment injection and verify that `relkit env list` reports presence without values.
+<Callout type="warn" title="RELKIT_ENV is reserved">
+  Select a provider environment with the CLI's `--environment` option. Do not declare or branch
+  application behavior on a custom `RELKIT_ENV` field.
 </Callout>
 
 <include cwd>content/generated/related/fundamentals-environment.mdx</include>

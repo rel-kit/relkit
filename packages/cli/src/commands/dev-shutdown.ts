@@ -17,6 +17,13 @@ export async function shutdownDev(session: DevSession, reason: unknown): Promise
     ...[...session.drains.values()].map((drain) => drain.drain()),
   ].filter((task) => task !== undefined);
   await Promise.allSettled(tasks);
+  await session.options.localServices?.close().catch((error) => {
+    session.log({
+      level: "error",
+      event: "dev.local-services.cleanup-failed",
+      fields: { message: errorMessage(error) },
+    });
+  });
   await session.observability.flush().catch(() => undefined);
   session.clearSignals();
   session.resolveShutdownPromise();

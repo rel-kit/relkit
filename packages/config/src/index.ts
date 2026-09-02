@@ -1,5 +1,7 @@
 export { defineEnv, env, isEnvRef } from "./env.js";
+export { isBindingValueRef } from "@relkit/provider";
 export type {
+  BindingValueRef,
   EnvBuilder,
   EnvBuilderBase,
   EnvBuilderFactory,

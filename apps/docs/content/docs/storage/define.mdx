@@ -15,13 +15,13 @@ Use `defineBucket` in your app's domain directory. Create `src/assets/buckets/as
 - `visibility` is required. Start with `"private"` for user uploads.
 - `maxObjectBytes` sets the maximum size of one file: 5 MB here.
 - `allowedContentTypes` lists accepted media types. `image/*` allows image types; `application/json` allows JSON files.
-- `profile` selects a bucket configuration in `relkit.config.ts`. This example uses `"default"`.
+- `profile` selects a physical bucket configuration in `relkit.config.ts`. This example uses `"assets"`.
 
 Size and content-type limits are optional. For HTTP uploads, also validate incoming files with `z.file()` as shown in [Upload files](/docs/storage/upload).
 
 ## Check your bucket
 
-Make sure the `default` bucket profile exists in `relkit.config.ts`; the [tutorial's configuration step](/docs/storage/first-upload#configure-storage) shows how to add it.
+Make sure the `assets` bucket profile exists in `relkit.config.ts`; the [tutorial's configuration step](/docs/storage/first-upload#configure-storage) shows how to add it.
 
 Then, from your app's root, run:
 
@@ -29,4 +29,4 @@ Then, from your app's root, run:
 bun run check
 ```
 
-Next, [give a function access to the bucket](/docs/storage/upload). For cloud storage, [configure a bucket provider](/docs/fundamentals/providers).
+Next, [give a function access to the bucket](/docs/storage/upload). For cloud storage, [configure an integration](/docs/integrations).

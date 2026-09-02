@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { InvocationValidationError } from "@relkit/engine";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import {
@@ -16,6 +15,7 @@ import {
   mapInputValidationResponse,
   mapSuccessResponse,
 } from "./src/response-mapping.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes.ts", line: 1, column: 1 };
 
@@ -175,9 +175,7 @@ describe("HTTP response mapping", () => {
     const app = createApp({
       plan: plan(route),
       manifest: {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: "sha256:test",
+        ...runtimeCohort("sha256:test"),
         functions: {},
         middleware: {},
         requestTransforms: {},
@@ -198,9 +196,7 @@ describe("HTTP response mapping", () => {
     const app = createApp({
       plan: plan(route),
       manifest: {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: "sha256:test",
+        ...runtimeCohort("sha256:test"),
         functions: {},
         middleware: {},
         requestTransforms: {},

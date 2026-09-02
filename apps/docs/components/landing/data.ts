@@ -1,12 +1,9 @@
-import { functionSnippet, jobSnippet } from "./snippets";
-
 export interface LandingExample {
   readonly id: string;
   readonly title: string;
   readonly description: string;
   readonly source: string;
   readonly guide: string;
-  readonly snippet?: string;
 }
 
 export interface RenderedLandingExample extends LandingExample {
@@ -15,100 +12,106 @@ export interface RenderedLandingExample extends LandingExample {
 
 export const exampleDefinitions = [
   {
+    id: "service",
+    title: "Service",
+    description: "Organize a domain around one focused public boundary.",
+    source: "examples/commerce/src/orders/service.ts",
+    guide: "/docs/service",
+  },
+  {
     id: "route",
-    title: "HTTP Routes",
-    description:
-      "Map a filesystem route to a validated function without rewriting transport logic.",
-    source: "templates/default/v1/api/src/routes/orders/route.ts",
+    title: "Routes",
+    description: "Map HTTP requests to a service's validated functions.",
+    source: "examples/commerce/src/routes/orders/route.ts",
     guide: "/docs/http/routes",
   },
   {
     id: "function",
     title: "Functions",
-    description: "Compose cache, events, and jobs behind one schema-checked operation.",
+    description: "Run schema-checked business logic with explicit dependencies.",
     source: "examples/commerce/src/orders/functions/create-order.function.ts",
     guide: "/docs/fundamentals/functions",
-    snippet: functionSnippet,
-  },
-  {
-    id: "job",
-    title: "Jobs",
-    description: "Add retries, concurrency, scheduling, and idempotency to background work.",
-    source: "examples/commerce/src/receipts/jobs/send-receipt.job.ts",
-    guide: "/docs/async/jobs",
-    snippet: jobSnippet,
-  },
-  {
-    id: "agent",
-    title: "Agents",
-    description: "Give a model schema-checked input, allowlisted tools, and hard execution limits.",
-    source: "examples/commerce/src/orders/agents/order-support.agent.ts",
-    guide: "/docs/ai/agents",
   },
   {
     id: "event",
     title: "Events",
-    description:
-      "Publish a versioned fact while declaring payload validation and sensitive fields.",
-    source: "examples/commerce/src/orders/events/order-created.event.ts",
-    guide: "/docs/async/events",
+    description: "Define typed facts that independent functions can publish and consume.",
+    source: "apps/docs/examples/events/order-created.event.ts",
+    guide: "/docs/events",
   },
   {
-    id: "drizzle",
-    title: "Drizzle",
-    description: "Activate a checked Drizzle service backed by Bun SQLite.",
-    source: "examples/commerce/src/database/service.ts",
-    guide: "/docs/fundamentals/context",
-  },
-  {
-    id: "better-auth",
-    title: "Better Auth",
-    description: "Mount Better Auth on a Relkit route and protect selected application paths.",
-    source: "examples/commerce/src/routes/api/auth/[[...auth]]/route.ts",
-    guide: "/docs/http/middleware",
+    id: "observability",
+    title: "Observability",
+    description: "Keep complete redacted local evidence before sampling Sentry and OTLP exports.",
+    source: "apps/docs/examples/landing/telemetry.ts",
+    guide: "/docs/operations/observability",
   },
 ] as const satisfies readonly LandingExample[];
 
-export const featuredCapabilityIds = [
-  "functions",
-  "http",
-  "events",
-  "jobs",
-  "agents",
-  "testing",
+export const primaryCapabilities = [
+  {
+    id: "service",
+    title: "Service",
+    summary: "Organize functions and resources behind a focused domain boundary.",
+    guide: "service",
+  },
+  {
+    id: "routes",
+    title: "Routes",
+    summary: "Expose service functions through explicit, validated HTTP mappings.",
+    guide: "http",
+  },
+  {
+    id: "functions",
+    title: "Functions",
+    summary: "Write transport-independent business logic with checked input and output.",
+    guide: "fundamentals/functions",
+  },
+  {
+    id: "events",
+    title: "Events",
+    summary: "Publish typed facts and process them with independent functions.",
+    guide: "events",
+  },
+  {
+    id: "observability",
+    title: "Observability",
+    summary: "Correlate requests, logs, spans, events, and failures in one timeline.",
+    guide: "operations/observability",
+  },
 ] as const;
 
 export const productStages = [
   {
     number: "01",
     title: "Describe",
-    copy: "Write TypeScript descriptors for functions, routes, events, jobs, resources, tools, and agents.",
+    copy: "Write TypeScript descriptors and bind only the integrations your application needs.",
     detail: "Your application code remains the source of truth.",
   },
   {
     number: "02",
     title: "Check",
-    copy: "Relkit resolves conventions, schemas, providers, dependencies, and policies into one graph.",
+    copy: "Relkit resolves schemas, profiles, local recipes, dependencies, and policies into one graph.",
     detail: "Invalid applications fail before a runtime starts.",
   },
   {
     number: "03",
     title: "Run everywhere",
-    copy: "Development, tests, HTTP, async work, OpenAPI, clients, inspection, and deployment use that graph.",
+    copy: "Development, explicit test replacements, inspection, and deployment use that graph.",
     detail: "One model; no parallel configuration story.",
   },
 ] as const;
 
 export const developerWorkflows = [
   [
-    "AGENT",
-    "Agents",
-    "Run model workflows with typed input, allowlisted tools, approvals, and hard execution budgets.",
+    "LOCAL",
+    "Docker overlays",
+    "Start pinned Redis and MinIO recipes only for graph-required bindings, with project-scoped state.",
   ],
   [
-    "TOOL",
-    "AI tools",
-    "Expose existing functions to models without bypassing schemas, permissions, or application context.",
+    "BIND",
+    "Mixed ownership",
+    "Combine connected services with infrastructure-owned AWS resources without environment branches.",
   ],
   [
     "TRACE",
@@ -136,8 +139,8 @@ export const observabilityFeatures = [
     label: "Logs",
     title: "Correlate structured logs",
     description:
-      "Locate logs by request and execution identity without manually joining unrelated identifiers.",
-    points: ["Structured fields", "Automatic correlation", "Sensitive-field redaction"],
+      "Keep complete bounded local logs before minimum-level filtering sends records to exporters.",
+    points: ["Structured fields", "Automatic correlation", "Redaction before persistence"],
     href: "/docs/operations/observability",
     action: "Explore logs",
   },
@@ -145,8 +148,8 @@ export const observabilityFeatures = [
     label: "Traces",
     title: "Trace async work",
     description:
-      "Follow spans from an HTTP request through functions, events, jobs, and provider calls.",
-    points: ["Parent-child spans", "Events and jobs", "Failure location"],
+      "Follow complete local spans even when root-consistent sampling omits a remote trace.",
+    points: ["Parent-child spans", "Exporter health", "Failure isolation"],
     href: "/docs/operations/observability",
     action: "Explore traces",
   },

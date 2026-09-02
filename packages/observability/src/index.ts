@@ -9,3 +9,8 @@ export * from "./storage/index.js";
 export * from "./query.js";
 export * from "./stream.js";
 export * from "./runtime.js";
+export * from "./telemetry-config.js";
+export * from "./telemetry-sampling.js";
+export * from "./telemetry-export-queue.js";
+export * from "./telemetry-exporters.js";
+export * from "./telemetry-exporter-types.js";

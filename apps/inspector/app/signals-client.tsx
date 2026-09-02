@@ -19,6 +19,7 @@ import { defaultSignalFilters } from "../lib/signal-defaults";
 import { Pagination } from "../components/ui/pagination";
 import { SignalsFilters } from "./signals-filters";
 import { SignalRows } from "./signal-rows";
+import { RuntimeStatus } from "./runtime-status";
 
 export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
   const [draft, setDraft] = useState<SignalFilters>(() => defaultSignalFilters(kind));
@@ -105,7 +106,9 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
         <div>
           <p className="eyebrow">ACTIVE WORKSPACE</p>
           <h1>{title}</h1>
-          <p className="lede">Bounded, correlated telemetry from the active generation.</p>
+          <p className="lede">
+            Complete redacted local telemetry; external sampling happens afterward.
+          </p>
         </div>
         <div className="signal-status" role="status" aria-live="polite">
           <span className="badge">{items.length} visible</span>
@@ -113,6 +116,7 @@ export function SignalsClient({ kind }: { readonly kind: SignalKind }) {
           <span className="sr-only">{announcement}</span>
         </div>
       </header>
+      <RuntimeStatus telemetryOnly />
       <SignalsFilters
         kind={kind}
         value={draft}

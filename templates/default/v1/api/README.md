@@ -19,7 +19,5 @@ bun run build
 The example routes are `GET /hello?name=RelKit`, `POST /echo` with a JSON
 `message` field, and `POST /orders` with `{ orderId, sku, quantity }`.
 
-Creating an order publishes `orders.created`. Its confirmation and audit
-listeners are independent durable, at-least-once deliveries: one listener can
-fail without rolling back the other, and delivery is not a transaction or a
-promise of simultaneous execution.
+The default project needs no Docker daemon, cloud account, or deployment
+credentials.

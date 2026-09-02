@@ -28,7 +28,13 @@ async function createFixture(files: Files): Promise<string> {
     JSON.stringify({
       private: true,
       type: "module",
-      workspaces: ["apps/*", "examples/*", "packages/*"],
+      workspaces: [
+        "apps/*",
+        "examples/*",
+        "integrations/catalog",
+        "integrations/packages/*",
+        "packages/*",
+      ],
     }),
   );
   for (const [path, contents] of Object.entries(files)) {
@@ -97,14 +103,65 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
-  test("allows AI SDK runtime dependencies only in agents", async () => {
+  test("allows AI SDK vendor dependencies in their integration", async () => {
     const fixture = await createFixture(
       packageFiles([
         {
-          path: "packages/agents",
-          name: "@relkit/agents",
-          source: 'import "ai"; import "@ai-sdk/openai";',
-          dependencies: { ai: "7.0.0", "@ai-sdk/openai": "4.0.0" },
+          path: "integrations/packages/ai-sdk",
+          name: "@relkit/ai-sdk",
+          source: 'import "@ai-sdk/openai";',
+          dependencies: { "@ai-sdk/openai": "4.0.0" },
+        },
+      ]),
+    );
+    try {
+      const result = await execute(process.execPath, ["run", boundaryScript, fixture]);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("Boundary check passed");
+    } finally {
+      await rm(fixture, { recursive: true, force: true });
+    }
+  });
+
+  test("allows integration, catalog, and application dependency direction", async () => {
+    const fixture = await createFixture(
+      packageFiles([
+        { path: "packages/provider", name: "@relkit/provider", source: "" },
+        {
+          path: "integrations/packages/redis",
+          name: "@relkit/redis",
+          source:
+            'import "@relkit/cache"; import "@relkit/contracts"; import "@relkit/provider"; import "ioredis";',
+          dependencies: {
+            "@relkit/cache": "workspace:*",
+            "@relkit/contracts": "workspace:*",
+            "@relkit/provider": "workspace:*",
+            ioredis: "5.0.0",
+          },
+        },
+        {
+          path: "integrations/packages/s3",
+          name: "@relkit/s3",
+          source: 'import "@relkit/buckets"; import "@relkit/provider";',
+          dependencies: {
+            "@relkit/buckets": "workspace:*",
+            "@relkit/provider": "workspace:*",
+          },
+        },
+        {
+          path: "integrations/catalog",
+          name: "@relkit/integrations",
+          source: 'export * from "@relkit/redis";',
+          dependencies: { "@relkit/redis": "workspace:*" },
+        },
+        {
+          path: "examples/commerce",
+          name: "commerce-example",
+          source: 'import "@relkit/integrations/redis"; import "@relkit/redis/runtime";',
+          dependencies: {
+            "@relkit/integrations": "workspace:*",
+            "@relkit/redis": "workspace:*",
+          },
         },
       ]),
     );
@@ -165,6 +222,78 @@ describe.serial("Phase 0 guardrails", () => {
         path: "packages/app/src/index.ts",
         owner: "@relkit/app",
         rule: "descriptor-runtime-import",
+      },
+    },
+    {
+      name: "core dependencies on standalone integrations",
+      files: packageFiles([
+        {
+          path: "packages/app",
+          name: "@relkit/app",
+          source: 'import "@relkit/redis";',
+          dependencies: { "@relkit/redis": "workspace:*" },
+        },
+        { path: "integrations/packages/redis", name: "@relkit/redis", source: "" },
+      ]),
+      expected: {
+        path: "packages/app/package.json",
+        owner: "@relkit/app",
+        rule: "core-integration-dependency",
+      },
+    },
+    {
+      name: "engine dependencies on local provider implementations",
+      files: packageFiles([
+        {
+          path: "packages/engine",
+          name: "@relkit/engine",
+          source: 'import "@relkit/providers-local";',
+          dependencies: { "@relkit/providers-local": "workspace:*" },
+        },
+        {
+          path: "packages/providers-local",
+          name: "@relkit/providers-local",
+          source: "",
+        },
+      ]),
+      expected: {
+        path: "packages/engine/package.json",
+        owner: "@relkit/engine",
+        rule: "engine-local-provider-dependency",
+      },
+    },
+    {
+      name: "integration dependencies on non-protocol core packages",
+      files: packageFiles([
+        {
+          path: "integrations/packages/redis",
+          name: "@relkit/redis",
+          source: 'import "@relkit/app";',
+          dependencies: { "@relkit/app": "workspace:*" },
+        },
+        { path: "packages/app", name: "@relkit/app", source: "" },
+      ]),
+      expected: {
+        path: "integrations/packages/redis/package.json",
+        owner: "@relkit/redis",
+        rule: "integration-non-protocol-dependency",
+      },
+    },
+    {
+      name: "catalog dependencies on core protocols",
+      files: packageFiles([
+        {
+          path: "integrations/catalog",
+          name: "@relkit/integrations",
+          source: 'import "@relkit/provider";',
+          dependencies: { "@relkit/provider": "workspace:*" },
+        },
+        { path: "packages/provider", name: "@relkit/provider", source: "" },
+      ]),
+      expected: {
+        path: "integrations/catalog/package.json",
+        owner: "@relkit/integrations",
+        rule: "catalog-non-integration-dependency",
       },
     },
     ...["hono", "@pulumi/pulumi"].map((dependency) => ({
@@ -238,6 +367,7 @@ describe.serial("Phase 0 guardrails", () => {
   test("package exports resolve only through the public entry", { timeout: 30_000 }, async () => {
     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
     expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("10 packages loaded without unrelated integrations or SDKs");
     expect(result.stdout).toContain("packed entries resolved; internal paths rejected");
   });
 
@@ -306,6 +436,7 @@ describe.serial("Phase 0 guardrails", () => {
     const guidance = readFileSync(join(root, "AGENTS.md"), "utf8");
     const readme = readFileSync(join(root, "README.md"), "utf8");
     const gettingStarted = readFileSync(join(root, "docs/getting-started.md"), "utf8");
+    const konsistent = readFileSync(join(root, "konsistent.json"), "utf8");
     for (const stale of [
       "apps/web",
       "packages/ui",
@@ -325,6 +456,8 @@ describe.serial("Phase 0 guardrails", () => {
       "apps/docs",
       "apps/inspector",
       "examples/commerce",
+      "integrations/catalog",
+      "integrations/packages",
       "templates/default",
       "bun run typecheck",
       "tests/phase0.test.ts",
@@ -335,13 +468,16 @@ describe.serial("Phase 0 guardrails", () => {
       expect(guidance).toContain(current);
     }
     expect(guidance).toContain("port `3001`");
-    expect(readme).toContain("apps/docs");
+    for (const current of ["apps/docs", "integrations/catalog", "integrations/packages"]) {
+      expect(readme).toContain(current);
+    }
+    expect(konsistent).toContain("integrations/packages/{packageName}");
+    expect(konsistent).toContain("integrations/catalog");
     for (const current of ["apps/inspector", "Pulumi", "RELKIT_INSPECTOR_ROOT"]) {
       expect(readme).toContain(current);
       expect(gettingStarted).toContain(current);
     }
-    expect(gettingStarted).toContain("--cloud none");
-    expect(gettingStarted).toContain("--deploy none");
+    expect(gettingStarted).toContain("Cloud and deployment default to `none`");
   });
 
   test("ignores only RelKit generated and local runtime roots", async () => {
@@ -406,42 +542,46 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
-  test("frozen install and typecheck leave lockfile/generated state unchanged", async () => {
-    const beforeLockfile = readFileSync(join(root, "bun.lock"), "utf8");
-    const beforeGenerated = await execute("git", [
-      "diff",
-      "--binary",
-      "--",
-      ".relkit/generated",
-      ".relkit/build",
-    ]);
-    const beforeGeneratedStatus = await execute("git", [
-      "status",
-      "--porcelain=v1",
-      "--untracked-files=all",
-      "--",
-      ".relkit/generated",
-      ".relkit/build",
-    ]);
-    expect((await execute(process.execPath, ["install", "--frozen-lockfile"])).exitCode).toBe(0);
-    expect((await execute(process.execPath, ["run", "typecheck"])).exitCode).toBe(0);
-    expect(readFileSync(join(root, "bun.lock"), "utf8")).toBe(beforeLockfile);
-    const afterGenerated = await execute("git", [
-      "diff",
-      "--binary",
-      "--",
-      ".relkit/generated",
-      ".relkit/build",
-    ]);
-    const afterGeneratedStatus = await execute("git", [
-      "status",
-      "--porcelain=v1",
-      "--untracked-files=all",
-      "--",
-      ".relkit/generated",
-      ".relkit/build",
-    ]);
-    expect(afterGenerated.stdout).toBe(beforeGenerated.stdout);
-    expect(afterGeneratedStatus.stdout).toBe(beforeGeneratedStatus.stdout);
-  });
+  test(
+    "frozen install and typecheck leave lockfile/generated state unchanged",
+    { timeout: 30_000 },
+    async () => {
+      const beforeLockfile = readFileSync(join(root, "bun.lock"), "utf8");
+      const beforeGenerated = await execute("git", [
+        "diff",
+        "--binary",
+        "--",
+        ".relkit/generated",
+        ".relkit/build",
+      ]);
+      const beforeGeneratedStatus = await execute("git", [
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all",
+        "--",
+        ".relkit/generated",
+        ".relkit/build",
+      ]);
+      expect((await execute(process.execPath, ["install", "--frozen-lockfile"])).exitCode).toBe(0);
+      expect((await execute(process.execPath, ["run", "typecheck"])).exitCode).toBe(0);
+      expect(readFileSync(join(root, "bun.lock"), "utf8")).toBe(beforeLockfile);
+      const afterGenerated = await execute("git", [
+        "diff",
+        "--binary",
+        "--",
+        ".relkit/generated",
+        ".relkit/build",
+      ]);
+      const afterGeneratedStatus = await execute("git", [
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all",
+        "--",
+        ".relkit/generated",
+        ".relkit/build",
+      ]);
+      expect(afterGenerated.stdout).toBe(beforeGenerated.stdout);
+      expect(afterGeneratedStatus.stdout).toBe(beforeGeneratedStatus.stdout);
+    },
+  );
 });

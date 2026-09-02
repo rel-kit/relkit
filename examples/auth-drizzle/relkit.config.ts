@@ -1,6 +1,6 @@
-import { defineConfig, defineEnv, env } from "@relkit/app/config";
+import { defineApp, defineEnv, env } from "@relkit/app/config";
 
-export default defineConfig({
+export default defineApp({
   env: defineEnv({
     DATABASE_PATH: env.string().default("./auth.sqlite"),
     BETTER_AUTH_SECRET: env.secret(),

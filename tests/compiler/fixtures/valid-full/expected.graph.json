@@ -1,23 +1,11 @@
 {
   "appId": "full-app",
-  "contractVersion": 7,
+  "contractVersion": 8,
   "edges": [
-    {
-      "from": "receipts.listener",
-      "kind": "enqueues-job",
-      "to": "receipts.send-job"
-    },
     {
       "from": "orders.get",
       "kind": "exposes-as-tool",
       "to": "orders.lookup-tool"
-    },
-    {
-      "from": "orders",
-      "kind": "exposes-event",
-      "member": "orderCreated",
-      "order": 0,
-      "to": "orders.created"
     },
     {
       "from": "orders",
@@ -48,16 +36,6 @@
       "to": "orders.get"
     },
     {
-      "from": "relkit.event.receipts.listener.trigger",
-      "kind": "listens-to-event",
-      "to": "orders.created"
-    },
-    {
-      "from": "orders.create",
-      "kind": "publishes-event",
-      "to": "orders.created"
-    },
-    {
       "from": "orders.get-route",
       "kind": "targets-function",
       "role": "primary",
@@ -68,18 +46,6 @@
       "kind": "targets-function",
       "role": "primary",
       "to": "orders.get"
-    },
-    {
-      "from": "receipts.send-job",
-      "kind": "targets-function",
-      "role": "primary",
-      "to": "receipts.send"
-    },
-    {
-      "from": "relkit.event.receipts.listener.trigger",
-      "kind": "targets-function",
-      "role": "primary",
-      "to": "receipts.listener"
     },
     {
       "from": "orders.create",
@@ -96,12 +62,7 @@
     {
       "from": "assets.objects",
       "kind": "uses-provider-profile",
-      "to": "provider.buckets.default"
-    },
-    {
-      "from": "orders.created",
-      "kind": "uses-provider-profile",
-      "to": "provider.events.default"
+      "to": "provider.bucket.default"
     },
     {
       "from": "orders.prices",
@@ -111,17 +72,7 @@
     {
       "from": "orders.support-agent",
       "kind": "uses-provider-profile",
-      "to": "provider.models.default"
-    },
-    {
-      "from": "receipts.send-job",
-      "kind": "uses-provider-profile",
-      "to": "provider.jobs.default"
-    },
-    {
-      "from": "relkit.event.receipts.listener.trigger",
-      "kind": "uses-provider-profile",
-      "to": "provider.events.default"
+      "to": "provider.model.openai"
     },
     {
       "from": "orders.support-agent",
@@ -169,7 +120,7 @@
         ],
         "type": "object"
       },
-      "profile": "default",
+      "profile": "openai",
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
@@ -183,25 +134,10 @@
       "defaults": {
         "bucket": "default",
         "cache": "default",
-        "event": "default",
-        "job": "default",
-        "model": "default"
+        "model": "openai"
       },
+      "deploymentRoles": [],
       "environment": {
-        "CACHE_URL": {
-          "hasDefault": false,
-          "optional": true,
-          "requiredIn": [],
-          "sensitive": true,
-          "type": "secret-string"
-        },
-        "MODEL_API_KEY": {
-          "hasDefault": false,
-          "optional": true,
-          "requiredIn": [],
-          "sensitive": true,
-          "type": "secret-string"
-        },
         "SERVICE_PORT": {
           "hasDefault": true,
           "optional": false,
@@ -212,17 +148,15 @@
       },
       "id": "full-app",
       "kind": "app",
-      "providerBindings": [
-        "provider.buckets.default",
-        "provider.cache.default",
-        "provider.events.default",
-        "provider.jobs.default",
-        "provider.models.default"
-      ],
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 20
+        "line": 11
+      },
+      "telemetry": {
+        "redaction": {
+          "mode": "off"
+        }
       }
     },
     {
@@ -269,34 +203,6 @@
       }
     },
     {
-      "hasDefault": false,
-      "id": "CACHE_URL",
-      "kind": "env",
-      "name": "CACHE_URL",
-      "requiredIn": [],
-      "sensitive": true,
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 20
-      },
-      "type": "secret-string"
-    },
-    {
-      "hasDefault": false,
-      "id": "MODEL_API_KEY",
-      "kind": "env",
-      "name": "MODEL_API_KEY",
-      "requiredIn": [],
-      "sensitive": true,
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 20
-      },
-      "type": "secret-string"
-    },
-    {
       "hasDefault": true,
       "id": "SERVICE_PORT",
       "kind": "env",
@@ -306,38 +212,9 @@
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 20
+        "line": 11
       },
       "type": "port"
-    },
-    {
-      "domainId": "orders",
-      "exposure": "public",
-      "id": "orders.created",
-      "input": {
-        "properties": {
-          "orderId": {
-            "type": "string"
-          },
-          "sku": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "orderId",
-          "sku"
-        ],
-        "type": "object"
-      },
-      "kind": "event",
-      "profile": "default",
-      "sensitiveFields": null,
-      "source": {
-        "column": 22,
-        "file": "src/orders/events/order-created.event.ts",
-        "line": 4
-      },
-      "version": 1
     },
     {
       "concurrency": null,
@@ -453,9 +330,7 @@
         ],
         "type": "object"
       },
-      "publishes": [
-        "orders.created"
-      ],
+      "publishes": [],
       "source": {
         "column": 21,
         "file": "src/orders/functions/create-order.function.ts",
@@ -503,211 +378,6 @@
       "source": {
         "column": 18,
         "file": "src/orders/functions/get-order.function.ts",
-        "line": 4
-      },
-      "timeoutMs": null
-    },
-    {
-      "concurrency": null,
-      "dependencies": null,
-      "domainId": "orders",
-      "errors": null,
-      "exposure": "internal",
-      "generated": null,
-      "id": "orders.handle-created",
-      "input": {
-        "properties": {
-          "eventId": {
-            "type": "string"
-          },
-          "payload": {
-            "properties": {
-              "orderId": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "orderId",
-              "sku"
-            ],
-            "type": "object"
-          },
-          "version": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "eventId",
-          "payload",
-          "version"
-        ],
-        "type": "object"
-      },
-      "invocationMode": "callable",
-      "kind": "function",
-      "output": {
-        "properties": {
-          "eventId": {
-            "type": "string"
-          },
-          "payload": {
-            "properties": {
-              "orderId": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "orderId",
-              "sku"
-            ],
-            "type": "object"
-          },
-          "version": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "eventId",
-          "payload",
-          "version"
-        ],
-        "type": "object"
-      },
-      "publishes": [],
-      "source": {
-        "column": 23,
-        "file": "src/orders/functions/handle-created.function.ts",
-        "line": 4
-      },
-      "timeoutMs": null
-    },
-    {
-      "concurrency": null,
-      "dependencies": {
-        "jobs": {
-          "receiptJob": {
-            "id": "receipts.send-job",
-            "idempotency": {
-              "key": "orderId",
-              "retentionMs": 1000
-            },
-            "input": {
-              "$relkit": "schema",
-              "jsonSchema": {
-                "properties": {
-                  "orderId": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "orderId"
-                ],
-                "type": "object"
-              }
-            },
-            "kind": "job",
-            "profile": "default",
-            "ref": {
-              "id": "receipts.send-job",
-              "kind": "job"
-            },
-            "retry": {
-              "initialDelayMs": 1,
-              "jitter": "none",
-              "maxAttempts": 2,
-              "maxDelayMs": 5,
-              "multiplier": 2
-            },
-            "schedule": [
-              {
-                "cron": "0 * * * *",
-                "id": "receipts.reconcile",
-                "input": {
-                  "orderId": "scheduled"
-                },
-                "overlap": "skip",
-                "timezone": "UTC"
-              }
-            ],
-            "target": {
-              "handler": {
-                "$relkit": "function",
-                "name": "handler"
-              },
-              "id": "receipts.send",
-              "input": {
-                "$relkit": "schema",
-                "jsonSchema": {
-                  "properties": {
-                    "orderId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "orderId"
-                  ],
-                  "type": "object"
-                }
-              },
-              "invocationMode": "callable",
-              "kind": "function",
-              "output": {
-                "$relkit": "schema",
-                "jsonSchema": {
-                  "properties": {
-                    "receiptId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "receiptId"
-                  ],
-                  "type": "object"
-                }
-              },
-              "ref": {
-                "id": "receipts.send",
-                "kind": "function"
-              }
-            }
-          }
-        }
-      },
-      "domainId": "receipts",
-      "errors": null,
-      "exposure": "internal",
-      "generated": null,
-      "id": "receipts.listener",
-      "input": {
-        "properties": {
-          "orderId": {
-            "type": "string"
-          },
-          "sku": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "orderId",
-          "sku"
-        ],
-        "type": "object"
-      },
-      "invocationMode": "event-only",
-      "kind": "function",
-      "output": {
-        "x-relkit-void": true
-      },
-      "publishes": [],
-      "source": {
-        "column": 18,
-        "file": "src/receipts/functions/order-listener.function.ts",
         "line": 4
       },
       "timeoutMs": null
@@ -794,53 +464,6 @@
       }
     },
     {
-      "concurrency": null,
-      "domainId": "receipts",
-      "id": "receipts.send-job",
-      "idempotency": {
-        "key": "orderId",
-        "retentionMs": 1000
-      },
-      "input": {
-        "properties": {
-          "orderId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "orderId"
-        ],
-        "type": "object"
-      },
-      "kind": "job",
-      "profile": "default",
-      "retry": {
-        "initialDelayMs": 1,
-        "jitter": "none",
-        "maxAttempts": 2,
-        "maxDelayMs": 5,
-        "multiplier": 2
-      },
-      "schedule": [
-        {
-          "cron": "0 * * * *",
-          "id": "receipts.reconcile",
-          "input": {
-            "orderId": "scheduled"
-          },
-          "overlap": "skip",
-          "timezone": "UTC"
-        }
-      ],
-      "source": {
-        "column": 20,
-        "file": "src/receipts/jobs/send-receipt.job.ts",
-        "line": 5
-      },
-      "targetFunctionId": "receipts.send",
-      "timeoutMs": null
-    },
-    {
       "id": "order-auth",
       "kind": "middleware",
       "order": 0,
@@ -852,118 +475,170 @@
       }
     },
     {
-      "adapter": "s3",
-      "capability": "buckets",
-      "configuration": {
-        "bucketName": "assets",
-        "endpoint": "https://s3.us-east-1.amazonaws.com",
-        "region": "us-east-1"
+      "adapter": {
+        "adapterId": "s3",
+        "behavior": {
+          "forcePathStyle": true,
+          "signedUrlTtlSeconds": 900
+        },
+        "connection": {
+          "bucketName": "assets",
+          "endpoint": "https://s3.us-east-1.amazonaws.com",
+          "region": "us-east-1"
+        },
+        "connectionContract": {
+          "accessKeyId": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          },
+          "bucketName": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "endpoint": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "region": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "secretAccessKey": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          },
+          "sessionToken": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          }
+        },
+        "features": [
+          "signedReadUrl",
+          "signedWriteUrl"
+        ],
+        "integrationId": "s3",
+        "protocolVersion": 1
       },
-      "environment": [],
-      "id": "provider.buckets.default",
+      "capability": "bucket",
+      "deploymentRoles": [],
+      "id": "provider.bucket.default",
       "kind": "provider",
-      "ownership": "managed",
+      "namedValues": [],
       "profile": "default",
+      "providerSource": {
+        "kind": "connected"
+      },
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 20
+        "line": 11
       }
     },
     {
-      "adapter": "redis",
-      "capability": "cache",
-      "configuration": {
-        "url": {
-          "kind": "env-ref",
-          "name": "CACHE_URL",
-          "sensitive": true,
-          "type": "secret-string"
-        }
+      "adapter": {
+        "adapterId": "redis",
+        "behavior": {},
+        "connection": {},
+        "connectionContract": {
+          "url": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": true
+          }
+        },
+        "features": [
+          "atomicIncrement"
+        ],
+        "integrationId": "redis",
+        "protocolVersion": 1
       },
-      "environment": [
+      "capability": "cache",
+      "deploymentRoles": [],
+      "id": "provider.cache.default",
+      "kind": "provider",
+      "local": {
+        "integrationId": "redis",
+        "recipeId": "redis-docker",
+        "recipeVersion": 1
+      },
+      "namedValues": [
         {
+          "field": "url",
           "name": "CACHE_URL",
           "sensitive": true,
           "type": "secret-string"
         }
       ],
-      "id": "provider.cache.default",
-      "kind": "provider",
-      "ownership": "external",
       "profile": "default",
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 20
-      }
-    },
-    {
-      "adapter": "eventbridge",
-      "capability": "events",
-      "configuration": {
-        "busName": "events",
-        "region": "us-east-1"
+      "providerSource": {
+        "kind": "connected"
       },
-      "environment": [],
-      "id": "provider.events.default",
-      "kind": "provider",
-      "ownership": "managed",
-      "profile": "default",
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 20
+        "line": 11
       }
     },
     {
-      "adapter": "sqs",
-      "capability": "jobs",
-      "configuration": {
-        "queueUrl": "https://sqs.us-east-1.amazonaws.com/1/jobs",
-        "region": "us-east-1"
-      },
-      "environment": [],
-      "id": "provider.jobs.default",
-      "kind": "provider",
-      "ownership": "managed",
-      "profile": "default",
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 20
-      }
-    },
-    {
-      "adapter": "ai-sdk",
-      "capability": "models",
-      "configuration": {
-        "defaultModel": "gpt-5-mini",
-        "defaultProvider": "openai",
-        "openai": {
+      "adapter": {
+        "adapterId": "ai-sdk",
+        "behavior": {
+          "defaultModel": "gpt-5-mini",
+          "provider": "openai"
+        },
+        "connection": {},
+        "connectionContract": {
           "apiKey": {
-            "kind": "env-ref",
-            "name": "MODEL_API_KEY",
-            "sensitive": true,
-            "type": "secret-string"
+            "authoredValue": "fixed",
+            "required": true,
+            "sensitive": true
+          },
+          "baseURL": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "organization": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "project": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
           }
-        }
+        },
+        "features": [],
+        "integrationId": "ai-sdk",
+        "protocolVersion": 1
       },
-      "environment": [
+      "capability": "model",
+      "deploymentRoles": [],
+      "id": "provider.model.openai",
+      "kind": "provider",
+      "namedValues": [
         {
+          "field": "apiKey",
           "name": "MODEL_API_KEY",
           "sensitive": true,
           "type": "secret-string"
         }
       ],
-      "id": "provider.models.default",
-      "kind": "provider",
-      "ownership": "external",
-      "profile": "default",
+      "profile": "openai",
+      "providerSource": {
+        "kind": "connected"
+      },
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 20
+        "line": 11
       }
     },
     {
@@ -980,12 +655,7 @@
     },
     {
       "domainId": "orders",
-      "events": [
-        {
-          "eventId": "orders.created",
-          "name": "orderCreated"
-        }
-      ],
+      "events": [],
       "functions": [
         {
           "functionId": "orders.authorize",
@@ -1005,7 +675,7 @@
       "source": {
         "column": 16,
         "file": "src/orders/service.ts",
-        "line": 7
+        "line": 6
       }
     },
     {
@@ -1113,31 +783,6 @@
       },
       "targetFunctionId": "orders.get",
       "triggerType": "http"
-    },
-    {
-      "config": {
-        "delivery": "durable",
-        "eventId": "orders.created",
-        "eventVersion": 1,
-        "profile": "default",
-        "retry": {
-          "initialDelayMs": 1,
-          "jitter": "none",
-          "maxAttempts": 2,
-          "maxDelayMs": 5,
-          "multiplier": 2
-        }
-      },
-      "domainId": "receipts",
-      "id": "relkit.event.receipts.listener.trigger",
-      "kind": "trigger",
-      "source": {
-        "column": 18,
-        "file": "src/receipts/functions/order-listener.function.ts",
-        "line": 4
-      },
-      "targetFunctionId": "receipts.listener",
-      "triggerType": "event"
     }
   ]
 }

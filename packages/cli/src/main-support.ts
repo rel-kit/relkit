@@ -29,6 +29,7 @@ export interface CliCommandContext {
   readonly args: readonly string[];
   readonly json: boolean;
   readonly signal: AbortSignal;
+  readonly tty?: boolean;
   readonly reporter: CliReporter;
   readonly log: CliLogger;
   readonly onProgress?: (message: string) => void;

@@ -1,12 +1,13 @@
 {
-  "title": "Tooling and operations",
+  "title": "Operations",
   "icon": "Wrench",
   "pages": [
-    "cli-reference",
-    "inspector",
+    "index",
     "observability",
+    "inspector",
     "testing",
     "deployment",
-    "troubleshooting"
+    "troubleshooting",
+    "cli-reference"
   ]
 }

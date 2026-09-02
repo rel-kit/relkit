@@ -1,34 +1,17 @@
-const packageNames = ["@relkit/app", "@relkit/compiler"];
-const appSubpaths = [
-  "agents",
-  "buckets",
-  "cache",
-  "config",
-  "events",
-  "functions",
-  "jobs",
-  "routes",
-  "schema",
-  "services",
-  "tools",
-];
+import { readFile } from "node:fs/promises";
 
-for (const subpath of appSubpaths) {
-  const specifier = `@relkit/app/${subpath}`;
-  const resolved = await import.meta.resolve(specifier);
-  if (!resolved.endsWith(`/dist/${subpath}.js`)) {
-    throw new Error(`Unexpected package entry for ${specifier}: ${resolved}`);
+const expected = JSON.parse(await readFile(new URL("./expected-exports.json", import.meta.url)));
+
+for (const [packageName, exports] of Object.entries(expected)) {
+  for (const [subpath, target] of Object.entries(exports)) {
+    const specifier = subpath === "." ? packageName : `${packageName}${subpath.slice(1)}`;
+    const importTarget = typeof target === "string" ? target : target.import;
+    const resolved = await import.meta.resolve(specifier);
+    if (!importTarget || !resolved.endsWith(importTarget.slice(1))) {
+      throw new Error(`Unexpected package entry for ${specifier}: ${resolved}`);
+    }
+    await import(specifier);
   }
-  await import(specifier);
-}
-
-for (const packageName of packageNames) {
-  const resolved = await import.meta.resolve(packageName);
-  if (!resolved.endsWith("/dist/index.js")) {
-    throw new Error(`Unexpected package entry for ${packageName}: ${resolved}`);
-  }
-
-  await import(packageName);
 
   for (const internalPath of ["src/index.ts", "dist/index.js"]) {
     const specifier = `${packageName}/${internalPath}`;

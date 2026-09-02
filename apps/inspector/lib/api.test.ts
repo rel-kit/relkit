@@ -120,4 +120,17 @@ describe("inspector API client", () => {
     expect(urls[0]).not.toBe(urls[1]);
     expect(new URL(urls[1]!).searchParams.get("cursor")).toBe("1");
   });
+
+  test("loads safe runtime status metadata", async () => {
+    let requestedUrl = "";
+    const client = createInspectorApiClient({
+      fetch: async (url) => {
+        requestedUrl = String(url);
+        return envelope({ telemetry: { exporters: [] } });
+      },
+    });
+
+    await expect(client.runtime()).resolves.toMatchObject({ telemetry: { exporters: [] } });
+    expect(requestedUrl).toEndWith("/_relkit/v1/runtime");
+  });
 });

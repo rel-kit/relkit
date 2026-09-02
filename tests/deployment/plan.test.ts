@@ -26,6 +26,22 @@ const fullOptions = {
     },
   },
 } as const;
+const integrationImports = [
+  {
+    integrationId: "pulumi",
+    role: "engine" as const,
+    packageName: "@relkit/pulumi",
+    packageVersion: "0.1.0",
+    exportName: "./engine",
+  },
+  {
+    integrationId: "aws",
+    role: "host" as const,
+    packageName: "@relkit/aws",
+    packageVersion: "0.1.0",
+    exportName: "./host",
+  },
+];
 
 test("full deployment plan matches the stable golden contract", () => {
   const plan = fromGraph(loadGraph("valid-full"), fullOptions);
@@ -62,7 +78,7 @@ test("rejects a missing provider binding for a used capability", () => {
 
   expectDeploymentError(
     () => fromGraph(withoutCache, fullOptions),
-    "RELKIT_DEPLOY_AWS_PROFILE_UNSUPPORTED",
+    "RELKIT_DEPLOY_PROFILE_UNSUPPORTED",
   );
 });
 
@@ -119,10 +135,15 @@ test("keeps deployment identities stable when descriptor source files move", () 
 
 test("renders deterministic Pulumi program bytes from distinct roots", () => {
   const plan = fromGraph(loadGraph("valid-full"), fullOptions);
-  const left = renderPulumiProgram(plan, { projectRoot: "/tmp/relkit-left", stackName: "CI/blue" });
+  const left = renderPulumiProgram(plan, {
+    projectRoot: "/tmp/relkit-left",
+    stackName: "CI/blue",
+    integrationImports,
+  });
   const right = renderPulumiProgram(plan, {
     projectRoot: "/tmp/relkit-right",
     stackName: "CI/blue",
+    integrationImports,
   });
   const leftBytes = [left.pulumiYaml, left.indexTs, left.planJson].join("\0");
   const rightBytes = [right.pulumiYaml, right.indexTs, right.planJson].join("\0");
@@ -134,9 +155,23 @@ test("renders deterministic Pulumi program bytes from distinct roots", () => {
 });
 
 function loadGraph(name: string): ApplicationGraph {
-  return JSON.parse(
+  const graph = JSON.parse(
     readFileSync(join(fixtureRoot, name, "expected.graph.json"), "utf8"),
   ) as ApplicationGraph;
+  return {
+    ...graph,
+    nodes: graph.nodes.map((node) =>
+      node.kind === "app"
+        ? {
+            ...node,
+            deploymentRoles: [
+              { role: "engine", integrationId: "pulumi", protocolVersion: 1, configuration: {} },
+              { role: "host", integrationId: "aws", protocolVersion: 1, configuration: {} },
+            ],
+          }
+        : node,
+    ),
+  };
 }
 
 function readGolden(name: string, value?: unknown): unknown {
@@ -168,22 +203,22 @@ function withSecretConfiguration(graph: ApplicationGraph): ApplicationGraph {
     sensitive: true,
     source: { file: "src/env.ts", line: 1, column: 1 },
   };
-  return mapProvider({ ...graph, nodes: [...graph.nodes, secret] }, (provider) => ({
-    ...provider,
-    environment: [
-      ...provider.environment,
-      { name: "OPENAI_API_KEY", type: "secret", sensitive: true },
-    ],
-    configuration: {
-      ...provider.configuration,
-      apiKey: {
-        kind: "env-ref",
-        name: "OPENAI_API_KEY",
-        type: "secret",
-        sensitive: true,
-      },
-    },
-  }));
+  return mapProvider({ ...graph, nodes: [...graph.nodes, secret] }, (provider) =>
+    provider.capability === "bucket"
+      ? {
+          ...provider,
+          namedValues: [
+            ...provider.namedValues,
+            {
+              field: "accessKeyId",
+              name: "OPENAI_API_KEY",
+              type: "secret-string",
+              sensitive: true,
+            },
+          ],
+        }
+      : provider,
+  );
 }
 
 function withRawField(graph: ApplicationGraph, key: string, value: unknown): ApplicationGraph {
@@ -209,7 +244,6 @@ function resourceIdentity(plan: DeploymentPlan): unknown {
   const resources = [
     plan.application,
     plan.http,
-    ...(plan.observability === undefined ? [] : [plan.observability]),
     ...plan.jobs,
     ...plan.schedules,
     ...plan.events,

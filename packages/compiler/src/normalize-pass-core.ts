@@ -82,7 +82,7 @@ export function passNormalize(work: NormalizationWork): void {
           } else value[key] = nextProfile;
         }
       }
-      if (value.model !== undefined) {
+      if (descriptor.kind === "agent" && value.model !== undefined) {
         const model = normalizeSelector(value.model);
         if (model === undefined) {
           add(work, descriptor, NORMALIZE_CODES.model, "Model selector is invalid.");

@@ -53,9 +53,9 @@ bun run check
 bun run verify
 ```
 
-The root package scripts cover focused type, unit, compiler, contract,
-integration, restart, inspector, generator, deployment, container, security,
-and browser layers. Run the local fail-fast sequence with:
+The root package scripts cover focused type, package, integration-package, unit,
+compiler, contract, integration, restart, inspector, generator, deployment,
+container, security, and browser layers. Run the local fail-fast sequence with:
 
 ```sh
 bun run test:all
@@ -64,8 +64,20 @@ bun run test:all
 `test:all` skips cloud mutation by default. Set
 `RELKIT_TEST_ALL_CLOUD=1`, `RELKIT_AWS_INTEGRATION_REGION`, and
 `RELKIT_AWS_INTEGRATION_IMAGE` only when an AWS acceptance run is explicitly
-authorized. `bun run build` builds the workspace and `bun run verify` checks
-boundaries, scope, declarations, generated artifacts, and release invariants.
+authorized. `bun run test:local-docker` runs the Redis/MinIO lifecycle acceptance
+against a local Docker daemon. `bun run build` builds the workspace and `bun run
+verify` checks package tests, boundaries, scope, declarations, generated
+artifacts, and release invariants.
+
+Before pushing, run the complete local CI equivalent with Docker running:
+
+```sh
+bun run prepush
+```
+
+It runs `verify` followed by the container, Redis/MinIO, local deployment,
+Inspector browser, and end-to-end acceptance checks. GitHub dependency review
+and the explicitly authorized AWS cloud acceptance remain CI-only.
 
 To exercise the current checkout without publishing packages, use the local
 launcher. It quietly syncs framework packages, links the generated project's
@@ -83,6 +95,9 @@ bun run relkit:local -- create my-app --cloud none --deploy none
 - `apps/inspector` is the Next.js inspector served on port `3210` by a project
   development session.
 - `examples/commerce` is the canonical executable, cross-feature example.
+- `integrations/catalog` contains the optional side-effect-free integration
+  catalog; `integrations/packages` contains independently publishable
+  standalone integrations.
 - `packages/` contains the public authoring APIs, compiler, graph, engine,
   runtime, inspector API, providers, CLI, generator, and Pulumi deployment
   packages.
@@ -97,7 +112,7 @@ Run `bunx turbo run dev --filter=@relkit/docs` for documentation development and
 
 ## Generate and run an application
 
-From a checkout with Pulumi and AWS credentials configured:
+Create a cloud-free application:
 
 ```sh
 bunx create-relkit@latest my-app
@@ -105,7 +120,7 @@ cd my-app
 bun run dev
 ```
 
-The default is AWS with Pulumi deployment. `bun run dev` starts the generated
+Cloud and deployment both default to `none`. `bun run dev` starts the generated
 backend on `http://localhost:3000` and the real Next inspector on
 `http://localhost:3210`; source saves keep the last-known-good backend active.
 When the generated project links `@relkit/cli` from this checkout, development
@@ -117,10 +132,10 @@ The example route is:
 curl 'http://localhost:3000/hello?name=RelKit'
 ```
 
-For a local-only project without cloud prerequisites, opt out explicitly:
+Add AWS hosting through Pulumi only when you intend to deploy it:
 
 ```sh
-bunx create-relkit@latest my-app --cloud none --deploy none
+bunx create-relkit@latest my-app --cloud aws --deploy pulumi
 ```
 
 Useful generated commands are `bun run test`, `bun run check`, `bun run

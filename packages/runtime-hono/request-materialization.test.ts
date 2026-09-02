@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createApp } from "./src/index.ts";
+import { runtimeCohort } from "./test-cohort.ts";
 
 describe("framework-neutral HTTP request materialization", () => {
   test("keeps params, repeated values, and headers inside HTTP input mapping", async () => {
@@ -10,9 +10,7 @@ describe("framework-neutral HTTP request materialization", () => {
     const app = createApp({
       plan,
       manifest: {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: plan.graphHash,
+        ...runtimeCohort(plan.graphHash),
         functions: {},
         middleware: {},
         requestTransforms: {},

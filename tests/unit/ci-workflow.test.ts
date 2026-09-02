@@ -3,10 +3,12 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 test("release jobs run after green dependencies with skipped optional jobs", async () => {
-  const workflow = await readFile(
-    resolve(import.meta.dir, "../../.github/workflows/ci.yml"),
-    "utf8",
-  );
+  const root = resolve(import.meta.dir, "../..");
+  const [workflow, verify, testAll] = await Promise.all([
+    readFile(resolve(root, ".github/workflows/ci.yml"), "utf8"),
+    readFile(resolve(root, "scripts/verify.ts"), "utf8"),
+    readFile(resolve(root, "scripts/test-all.ts"), "utf8"),
+  ]);
 
   expect(workflow).toContain(
     "(github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
@@ -21,4 +23,7 @@ test("release jobs run after green dependencies with skipped optional jobs", asy
   expect(workflow).toContain("always() && needs.pack.result == 'success' &&");
   expect(workflow).toContain("github.ref == 'refs/heads/changeset-release/main'");
   expect(workflow).toContain('gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA"');
+  expect(workflow).toContain("bun run test:local-docker");
+  expect(verify).toContain('await run("package tests", bun, ["run", "test:packages"]);');
+  expect(testAll).toContain('"test:packages"');
 });

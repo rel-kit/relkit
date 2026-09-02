@@ -89,11 +89,14 @@ export function verifyGraph(
   options: CandidateVerificationOptions,
 ): Omit<
   CandidateVerificationResult,
-  "token" | "apiVersion" | "environmentReady" | "providerReady"
+  "token" | "apiVersion" | "environmentReady" | "providerReady" | "activationFingerprint"
 > {
   const graphHash = stringValue(payload.graphHash);
   const manifestGraphHash = stringValue(payload.manifestGraphHash ?? payload.manifestHash);
-  if (graphHash !== options.graphHash || manifestGraphHash !== options.graphHash)
+  if (
+    graphHash !== options.activationFingerprint.graphHash ||
+    manifestGraphHash !== options.activationFingerprint.graphHash
+  )
     throw new CandidateVerificationError(
       "RELKIT_CANDIDATE_GRAPH_HASH_MISMATCH",
       "Candidate graph and manifest hashes do not match the expected graph.",
@@ -116,7 +119,7 @@ export function verifyGraph(
   )
     throw new CandidateVerificationError(
       "RELKIT_CANDIDATE_GRAPH_VERSION_UNSUPPORTED",
-      "Candidate graph contract version is unsupported.",
+      `Candidate graph contract version ${String(graphContractVersion)} is unsupported; rebuild the candidate with graph v${options.graphContractVersion ?? GRAPH_VERSION}.`,
     );
   if (
     manifestContractVersion === undefined ||
@@ -124,7 +127,7 @@ export function verifyGraph(
   )
     throw new CandidateVerificationError(
       "RELKIT_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED",
-      "Candidate manifest contract version is unsupported.",
+      `Candidate manifest contract version ${String(manifestContractVersion)} is unsupported; rebuild the candidate with manifest v${options.manifestContractVersion ?? MANIFEST_VERSION}.`,
     );
   if (
     manifestGeneratorVersion === undefined ||
@@ -132,7 +135,7 @@ export function verifyGraph(
   )
     throw new CandidateVerificationError(
       "RELKIT_CANDIDATE_GENERATOR_VERSION_UNSUPPORTED",
-      "Candidate manifest generator version is unsupported.",
+      `Candidate manifest generator version ${String(manifestGeneratorVersion)} is unsupported; rebuild the candidate with generator v${options.manifestGeneratorVersion ?? GENERATOR_VERSION}.`,
     );
   return {
     graphHash,

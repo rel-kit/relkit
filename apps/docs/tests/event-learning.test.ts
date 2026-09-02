@@ -18,7 +18,14 @@ test("places Events after HTTP Routes and gives every section a supported icon",
   );
 
   const sections: string[] = JSON.parse(output.get("meta.json")!).pages;
-  expect(sections.slice(0, 5)).toEqual(["index", "start", "service", "http", "events"]);
+  expect(sections.slice(0, 6)).toEqual([
+    "index",
+    "start",
+    "fundamentals",
+    "service",
+    "http",
+    "events",
+  ]);
   expect(JSON.parse(output.get("start/meta.json")!).pages).not.toContain("events");
   expect(output.has("start/events/meta.json")).toBe(false);
   expect(JSON.parse(output.get("events/meta.json")!)).toEqual({
@@ -66,7 +73,7 @@ test("introduces the Events API and shows subscribers before the existing-app tu
   expect(definition).toContain("title: Define an event");
   expect(definition).toContain("Use `defineEvent`");
   expect(definition).toContain('<include cwd lang="ts"');
-  expect(definition).toContain("templates/default/v1/api/src/orders/events/order-created.event.ts");
+  expect(definition).toContain("apps/docs/examples/events/order-created.event.ts");
   expect(definition).toContain("bun run check");
   expect(definition).not.toContain("<ImageZoom");
 

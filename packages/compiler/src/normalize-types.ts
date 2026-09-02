@@ -1,4 +1,4 @@
-import { type DescriptorKind, type JsonValue, type SourceLocation } from "@relkit/contracts";
+import { type JsonValue, type SourceLocation } from "@relkit/contracts";
 import type { Diagnostic } from "@relkit/diagnostics";
 import type {
   EvaluatorModuleResult,
@@ -72,6 +72,7 @@ export const NORMALIZE_CODES = Object.freeze({
   modelDefault: "RELKIT_MODEL_PROVIDER_DEFAULT_MISSING",
   modelConfiguration: "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID",
   providerProfile: "RELKIT_PROVIDER_PROFILE_UNKNOWN",
+  providerReleaseSource: "RELKIT_PROVIDER_RELEASE_SOURCE_REQUIRED",
   bucketProfileDuplicate: "RELKIT_BUCKET_PROFILE_DUPLICATE",
   identityAmbiguous: "RELKIT_ID_INFERENCE_AMBIGUOUS",
   source: "RELKIT_SOURCE_LOCATION_INVALID",
@@ -113,10 +114,18 @@ export interface NormalizeInput {
   readonly generationId?: string;
   readonly mode?: "development" | "test" | "production";
   readonly sources?: readonly SourceMapSource[];
+  readonly runtimeIntegrationPackages?: readonly RuntimeIntegrationPackage[];
   readonly sourceMap?: readonly SourceMapEntry[];
   readonly locations?:
     ReadonlyMap<string, SourceLocation> | Readonly<Record<string, SourceLocation>>;
   readonly onPass?: (pass: ValidationPass, index: number) => void;
+}
+export interface RuntimeIntegrationPackage {
+  readonly integrationId: string;
+  readonly packageName: string;
+  readonly packageVersion: string;
+  readonly exportName: string;
+  readonly registrations: readonly import("@relkit/contracts").RuntimeIntegrationRegistrationMetadata[];
 }
 export interface NormalizedDescriptor {
   readonly kind: string;
@@ -135,6 +144,10 @@ export interface NormalizedDescriptor {
 export interface GeneratedOutputs {
   readonly graph: string;
   readonly manifest: string;
+  readonly runtimeActivation: string;
+  readonly runtimeIntegrations: string;
+  readonly runtimeIntegrationImports: string;
+  readonly localServices: string;
   readonly diagnostics: string;
   readonly openapi: string;
   readonly client: string;
@@ -171,27 +184,13 @@ export interface NormalizationWork {
   graphHash?: string;
   outputs: GeneratedOutputs;
 }
-export function isDescriptorKindValue(value: string): value is DescriptorKind {
-  return [
-    "app",
-    "function",
-    "middleware",
-    "service",
-    "route",
-    "job",
-    "event",
-    "event-trigger",
-    "bucket",
-    "cache",
-    "tool",
-    "agent",
-    "constants",
-    "prompt",
-  ].includes(value as DescriptorKind);
-}
 export const EMPTY_OUTPUTS: GeneratedOutputs = Object.freeze({
   graph: "",
   manifest: "",
+  runtimeActivation: "",
+  runtimeIntegrations: "",
+  runtimeIntegrationImports: "",
+  localServices: "",
   diagnostics: "",
   openapi: "",
   client: "",

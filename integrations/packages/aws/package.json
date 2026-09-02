@@ -1,0 +1,64 @@
+{
+  "name": "@relkit/aws",
+  "version": "0.1.0",
+  "description": "AWS host and infrastructure integration for RELKIT.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rel-kit/relkit.git",
+    "directory": "integrations/packages/aws"
+  },
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./host": {
+      "types": "./dist/host/index.d.ts",
+      "import": "./dist/host/index.js"
+    },
+    "./infrastructure": {
+      "types": "./dist/infrastructure/index.d.ts",
+      "import": "./dist/infrastructure/index.js"
+    },
+    "./access": {
+      "types": "./dist/access/index.d.ts",
+      "import": "./dist/access/index.js"
+    }
+  },
+  "relkit": {
+    "integration": {
+      "id": "aws",
+      "exports": {
+        "authoring": ".",
+        "host": "./host",
+        "infrastructure": "./infrastructure",
+        "access": "./access"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "check": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@pulumi/aws": "7.43.0",
+    "@relkit/deploy": "workspace:*",
+    "@relkit/provider": "workspace:*"
+  }
+}

@@ -1,6 +1,11 @@
 import { Hono } from "hono";
 import type { MiddlewareHandler } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "@relkit/contracts";
 import { createApp, materializeRoutes, type RuntimeManifest } from "./src/index.js";
 import type { RegistrationPlan } from "@relkit/graph";
 
@@ -43,6 +48,16 @@ function manifest(): RuntimeManifest {
     contractVersion: MANIFEST_VERSION,
     generatorVersion: GENERATOR_VERSION,
     graphHash: "sha256:test",
+    activationFingerprint: {
+      graphHash: "sha256:test",
+      manifestHash: "sha256:manifest",
+      runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+    },
+    runtimeIntegrationsPlan: {
+      version: RUNTIME_INTEGRATION_PLAN_VERSION,
+      fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+      graphHash: "sha256:test",
+    },
     functions: {},
     middleware: {},
     requestTransforms: { name: {} },
@@ -97,4 +112,40 @@ test("rejects missing transform before adding any route", () => {
     }),
   );
   expect(app.routes).toHaveLength(0);
+});
+
+test("rejects a stale or missing runtime-integration plan before adding routes", () => {
+  for (const [broken, code] of [
+    [{ runtimeIntegrationsPlan: undefined }, "RELKIT_RUNTIME_INTEGRATION_PLAN_VERSION_UNSUPPORTED"],
+    [
+      {
+        runtimeIntegrationsPlan: {
+          ...manifest().runtimeIntegrationsPlan,
+          version: RUNTIME_INTEGRATION_PLAN_VERSION - 1,
+        },
+      },
+      "RELKIT_RUNTIME_INTEGRATION_PLAN_VERSION_UNSUPPORTED",
+    ],
+    [
+      { runtimeIntegrationsPlan: { ...manifest().runtimeIntegrationsPlan, graphHash: "stale" } },
+      "RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID",
+    ],
+    [
+      { activationFingerprint: { ...manifest().activationFingerprint, graphHash: "stale" } },
+      "RELKIT_RUNTIME_ACTIVATION_FINGERPRINT_INVALID",
+    ],
+  ] as const) {
+    expect(() =>
+      materializeRoutes(new Hono(), {
+        plan: plan(),
+        manifest: { ...manifest(), ...broken } as unknown as RuntimeManifest,
+        engine: { invoke: async () => undefined },
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code,
+        message: expect.stringContaining("Rebuild with `relkit build`"),
+      }),
+    );
+  }
 });

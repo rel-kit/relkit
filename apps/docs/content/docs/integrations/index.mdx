@@ -1,0 +1,51 @@
+---
+title: Integration catalog
+description: Choose the standalone adapters, local runtimes, exporters, hosts, and deployment engines your application needs.
+---
+
+RELKIT keeps product code separate from physical infrastructure. Services, functions, routes, and events
+depend on checked capability contracts; integrations connect those contracts to Redis, S3, model providers,
+telemetry exporters, local Docker services, and deployment platforms.
+
+## Choose packages by role
+
+| Package              | Role                                                           | Continue with                                               |
+| -------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| `@relkit/redis`      | Redis cache adapter and pinned local recipe                    | [Caching](/docs/caching)                                    |
+| `@relkit/s3`         | S3-compatible bucket adapter and pinned MinIO recipe           | [Storage](/docs/storage)                                    |
+| `@relkit/ai-sdk`     | AI SDK model runtime                                           | [AI](/docs/ai)                                              |
+| `@relkit/sentry`     | Error telemetry exporter                                       | [Observability](/docs/operations/observability)             |
+| `@relkit/otlp`       | OTLP trace exporter                                            | [Observability](/docs/operations/observability)             |
+| `@relkit/docker`     | Local-recipe selector and Docker materializer                  | [Local Docker](/docs/integrations/local-docker)             |
+| `@relkit/local`      | Local-service reconciliation runtime used by the CLI           | [Local development](/docs/start/local-development)          |
+| `@relkit/aws`        | AWS host, infrastructure ownership, and access materialization | [Deployment](/docs/operations/deployment)                   |
+| `@relkit/pulumi`     | Pulumi deployment engine                                       | [Deployment](/docs/operations/deployment)                   |
+| `@relkit/cloudflare` | Cloudflare runtime adapters                                    | [Application configuration](/docs/fundamentals/application) |
+
+Install standalone packages when you want the smallest dependency surface:
+
+```sh
+bun add @relkit/redis @relkit/docker
+```
+
+The optional `@relkit/integrations` catalog exposes the same public packages through side-effect-free
+subpaths. Its root intentionally exports nothing:
+
+<include cwd lang="ts" meta='title="Catalog subpath imports"'>
+  ../../apps/docs/examples/landing/catalog.ts
+</include>
+
+Both import styles describe the same adapter identities. Do not install a standalone package and its catalog
+subpath for the same role in one app.
+
+## Understand ownership
+
+Connected adapters wire a resource that already exists. `docker(adapter)` selects the adapter's local recipe
+for development only. Infrastructure wrappers such as `aws(adapter)` let the deployment stack own a resource.
+The deployment engine and host are separate roles, so selecting AWS hosting does not claim every connected
+Redis, S3-compatible, Cloudflare, or model resource.
+
+Run `bun run check` to validate package registration, source wrappers, profile selection, and deployment-role
+compatibility before starting a runtime or previewing infrastructure.
+
+<include cwd>content/generated/related/integrations-index.mdx</include>

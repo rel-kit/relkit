@@ -1,7 +1,7 @@
 import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
 import { assertEventDescriptor } from "@relkit/events";
 import type { FunctionRefAny } from "@relkit/functions";
-import { createUnboundIdentity } from "@relkit/invocation";
+import { bindDescriptorServiceMembers, createUnboundIdentity } from "@relkit/invocation";
 import {
   assertServiceDescriptor,
   assertServiceMemberName,
@@ -50,6 +50,7 @@ export const defineService: DefineService = <
     ...events,
   };
   assertServiceDescriptor(descriptor);
+  bindDescriptorServiceMembers([...Object.values(functions), ...Object.values(events)], descriptor);
   return deepFreeze(descriptor) as ServiceDescriptor<Id, Functions, Events>;
 };
 

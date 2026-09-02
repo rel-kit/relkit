@@ -1,12 +1,11 @@
 # my-app
 
 A RelKit TypeScript/Bun project with the minimal HTTP example and a bounded
-agent backed by a function-derived read-only tool. Tests use deterministic AI
-SDK test models, while production uses the configured AWS provider set.
+agent backed by a function-derived read-only tool. Tests use a deterministic
+scripted model, while production resolves the selected AI SDK profile.
 
-The agent may omit `model` to use the configured `defaultProvider` and
-`defaultModel`; production keeps OpenAI and Anthropic credentials as
-environment references in `modelProviders`.
+The agent may omit `model` to use the configured default profile. OpenAI and
+Anthropic credentials remain named binding-local values.
 
 ## Commands
 

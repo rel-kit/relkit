@@ -1,6 +1,14 @@
 import { Context, Effect, Layer, ManagedRuntime } from "effect";
 import { resolveEnvWithEffect } from "@relkit/config/internal/config";
 import type { EnvDefinition, EnvShape, EnvSource, ResolvedEnv } from "@relkit/config";
+import {
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+  isRuntimeActivationFingerprint,
+} from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
 import { Graph, Manifest, type RuntimeManifest } from "./services.js";
 import {
@@ -108,7 +116,33 @@ function validateOptions<S extends EnvShape>(options: GenerationRuntimeOptions<S
   if (options.environment === "production" && options.allowImplicitDotEnv === true) {
     throw new TypeError("Production generations require explicit environment values");
   }
-  if (options.manifest.graphHash !== options.graphHash) {
+  version(options.graph.contractVersion, GRAPH_VERSION, "graph contract");
+  version(options.manifest.contractVersion, MANIFEST_VERSION, "runtime manifest");
+  version(options.manifest.generatorVersion, GENERATOR_VERSION, "runtime manifest generator");
+  version(
+    options.manifest.runtimeIntegrationsPlan?.version,
+    RUNTIME_INTEGRATION_PLAN_VERSION,
+    "runtime-integration plan",
+  );
+  if (
+    options.manifest.runtimeIntegrationsPlan.fileName !== RUNTIME_INTEGRATION_PLAN_FILE ||
+    options.manifest.runtimeIntegrationsPlan.graphHash !== options.graphHash
+  )
+    throw new TypeError(
+      "Runtime-integration plan reference does not match the application graph; rebuild with `relkit build`.",
+    );
+  if (
+    !isRuntimeActivationFingerprint(options.manifest.activationFingerprint) ||
+    options.manifest.activationFingerprint.graphHash !== options.graphHash
+  )
+    throw new TypeError("Runtime activation fingerprint is invalid; rebuild with `relkit build`.");
+  if (options.manifest.graphHash !== options.graphHash)
     throw new TypeError("Runtime manifest graph hash does not match the application graph");
-  }
+}
+
+function version(actual: unknown, expected: number, label: string): void {
+  if (actual !== expected)
+    throw new TypeError(
+      `${label} version ${String(actual)} is unsupported; expected ${expected}. Rebuild with \`relkit build\`.`,
+    );
 }

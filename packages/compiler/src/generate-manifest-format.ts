@@ -1,4 +1,9 @@
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "@relkit/contracts";
 import type { ManifestGenerationInput } from "./generate-manifest.js";
 import type { ImportBinding } from "./generate-manifest-utils.js";
 
@@ -10,7 +15,6 @@ export function renderManifest(
   middleware: ReadonlyMap<string, string>,
   hooks: ReadonlyMap<string, string>,
   transforms: ReadonlyMap<string, string>,
-  providers: readonly string[],
   application?: string,
   agents: ReadonlyMap<string, string> = new Map(),
   tools: ReadonlyMap<string, string> = new Map(),
@@ -27,16 +31,17 @@ export function renderManifest(
     )
     .join("\n");
   const generatedImports = [
+    'import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };',
     identityBindings.length > 0
-      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/invocation";'
+      ? 'import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";'
       : "",
     [...functions.values()].some((value) =>
       value.startsWith("__relkit_createGeneratedAgentFunction("),
     )
-      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/agents";'
+      ? 'import { createGeneratedAgentFunction as __relkit_createGeneratedAgentFunction } from "@relkit/app";'
       : "",
     [...targets.values()].some((value) => value.startsWith("__relkit_bindFunctionEvents("))
-      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/events";'
+      ? 'import { bindFunctionEvents as __relkit_bindFunctionEvents } from "@relkit/app";'
       : "",
   ]
     .filter(Boolean)
@@ -49,11 +54,12 @@ export function renderManifest(
     `export const manifestContractVersion = ${MANIFEST_VERSION} as const;`,
     `export const manifestGeneratorVersion = ${GENERATOR_VERSION} as const;`,
     `export const manifestGraphHash = ${JSON.stringify(input.graphHash)} as const;`,
-    `export const providerFactories = ${renderProviders(providers)} as const;`,
+    `export const runtimeIntegrationsPlanReference = { version: ${RUNTIME_INTEGRATION_PLAN_VERSION}, fileName: ${JSON.stringify(RUNTIME_INTEGRATION_PLAN_FILE)}, graphHash: manifestGraphHash } as const;`,
     "export const runtimeManifest = {",
     "  contractVersion: manifestContractVersion,",
     "  generatorVersion: manifestGeneratorVersion,",
     "  graphHash: manifestGraphHash,",
+    "  activationFingerprint: runtimeActivationFingerprint,",
     `  functions: ${renderMap(functions)},`,
     `  targets: ${renderMap(targets)},`,
     `  agents: ${renderMap(agents)},`,
@@ -62,8 +68,7 @@ export function renderManifest(
     `  constants: ${renderMap(constants)},`,
     `  prompts: ${renderMap(prompts)},`,
     `  services: ${renderMap(services)},`,
-    "  providers: providerFactories,",
-    "  providerFactories,",
+    "  runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,",
     `  middleware: ${renderMap(middleware)},`,
     `  hooks: ${renderMap(hooks)},`,
     `  requestTransforms: ${renderMap(transforms)},`,
@@ -76,17 +81,6 @@ export function renderManifest(
 function renderMap(values: ReadonlyMap<string, string>): string {
   const entries = [...values.entries()].sort(([left], [right]) => left.localeCompare(right));
   return `{ ${entries.map(([key, value]) => `${JSON.stringify(key)}: ${value}`).join(", ")} }`;
-}
-
-function renderProviders(keys: readonly string[]): string {
-  return `{ ${keys
-    .map((key) => {
-      const separator = key.indexOf(":");
-      const capability = key.slice(0, separator);
-      const adapter = key.slice(separator + 1);
-      return `${JSON.stringify(key)}: { capability: ${JSON.stringify(capability)}, adapter: ${JSON.stringify(adapter)}, factory: undefined }`;
-    })
-    .join(", ")} }`;
 }
 
 function importPath(module: string, input: ManifestGenerationInput): string {

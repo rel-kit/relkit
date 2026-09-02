@@ -5,6 +5,10 @@ import {
   type TestBucketFakeOptions,
 } from "./buckets.js";
 import { createTestCacheFake, type TestCacheFake, type TestCacheFakeOptions } from "./cache.js";
+import {
+  copyTestProviderReplacements,
+  type TestProviderReplacements,
+} from "./provider-replacements.js";
 
 export interface TestFailureControls {
   readonly failAt: (point: string, cause?: unknown) => void;
@@ -15,6 +19,7 @@ export interface TestFailureControls {
 
 export interface TestFakesOptions {
   readonly clock?: () => number;
+  readonly providers?: TestProviderReplacements;
 }
 
 export interface TestFakes {
@@ -22,6 +27,7 @@ export interface TestFakes {
   readonly clients: DependencyClientSources;
   readonly buckets: Readonly<Record<string, TestBucketFake>>;
   readonly cache: Readonly<Record<string, TestCacheFake<unknown, unknown>>>;
+  readonly providers: TestProviderReplacements;
   readonly createBucket: (
     id: string,
     options?: Omit<TestBucketFakeOptions, "bucketId" | "stateRoot" | "failures" | "clock">,
@@ -38,6 +44,7 @@ export interface TestFakes {
 /** Creates fresh dependency sources and failure controls for one test runtime. */
 export function createTestFakes(stateRoot: string, options: TestFakesOptions = {}): TestFakes {
   if (stateRoot.length === 0) throw new TypeError("Test fake state root must not be empty");
+  const providers = copyTestProviderReplacements(options.providers);
   const clients = Object.fromEntries(
     ["jobs", "events", "buckets", "cache", "agents"].map((category) => [
       category,
@@ -145,6 +152,7 @@ export function createTestFakes(stateRoot: string, options: TestFakesOptions = {
     clients: clients as DependencyClientSources,
     buckets,
     cache,
+    providers,
     createBucket,
     createCache,
     setClient: (category: DependencyCategory, name: string, client: unknown) => {

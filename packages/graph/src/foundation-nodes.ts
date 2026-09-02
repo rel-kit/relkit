@@ -1,11 +1,12 @@
 import type { JsonValue } from "@relkit/contracts";
 import type { GraphNodeBase } from "./model.js";
+import type { DeploymentRoleProjection } from "./provider-nodes.js";
 
 export interface AppNode extends GraphNodeBase<"app"> {
   readonly environment?: JsonValue;
-  readonly providerBindings?: readonly string[];
-  readonly observability?: JsonValue;
+  readonly telemetry?: JsonValue;
   readonly defaults?: JsonValue;
+  readonly deploymentRoles?: readonly DeploymentRoleProjection[];
 }
 
 export interface EnvironmentVariableNode extends GraphNodeBase<"env"> {

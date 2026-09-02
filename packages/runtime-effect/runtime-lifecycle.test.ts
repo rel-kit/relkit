@@ -1,7 +1,13 @@
 import { Effect } from "effect";
 import { describe, expect, test } from "bun:test";
 import { defineEnv } from "@relkit/config";
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
 import { createGenerationRuntime, type GenerationRuntimeOptions } from "./src/runtime.js";
 import type { RuntimeManifest } from "./src/services.js";
@@ -17,8 +23,17 @@ const manifest = {
   contractVersion: MANIFEST_VERSION,
   generatorVersion: GENERATOR_VERSION,
   graphHash: "graph-hash",
+  activationFingerprint: {
+    graphHash: "graph-hash",
+    manifestHash: "sha256:manifest",
+    runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+  },
+  runtimeIntegrationsPlan: {
+    version: RUNTIME_INTEGRATION_PLAN_VERSION,
+    fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+    graphHash: "graph-hash",
+  },
   functions: {},
-  providers: {},
   middleware: {},
   requestTransforms: {},
 } satisfies RuntimeManifest;
@@ -67,6 +82,15 @@ async function rejects(promise: Promise<unknown>): Promise<void> {
 }
 
 describe("generation runtime resource ownership", () => {
+  test("rejects a previous runtime cohort before acquiring resources", async () => {
+    await expect(
+      createGenerationRuntime({
+        ...options([]),
+        manifest: { ...manifest, contractVersion: MANIFEST_VERSION - 1 } as never,
+      }),
+    ).rejects.toThrow("Rebuild with `relkit build`");
+  });
+
   test("releases acquired resources in reverse order after success", async () => {
     const events: string[] = [];
     const generation = await createGenerationRuntime(

@@ -41,6 +41,7 @@
     "@relkit/events": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "@relkit/functions": "workspace:*",
+    "@relkit/graph": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/providers-local": "workspace:*",

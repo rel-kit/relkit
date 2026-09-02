@@ -8,6 +8,8 @@ import type { DeploymentPlan } from "@relkit/deploy";
 import type { CliCommandContext, CliFailure } from "../main-support.js";
 import type { BuildOptions, BuildResult } from "./build.js";
 import type { CheckOptions, CheckResult } from "./check.js";
+import type { LoadedDeploymentIntegrations } from "./deployment-integrations.js";
+import type { loadDeploymentIntegrations } from "./deployment-integrations.js";
 
 export const DEPLOY_COMMANDS = ["init", "preview", "up", "refresh", "outputs", "destroy"] as const;
 export type DeployOperation = (typeof DEPLOY_COMMANDS)[number];
@@ -24,6 +26,7 @@ export interface Prepared {
   readonly plan: DeploymentPlan;
   readonly previousPlan?: DeploymentPlan;
   readonly files: ProgramFiles;
+  readonly integrations: LoadedDeploymentIntegrations;
 }
 
 export interface DeployCommandOptions {
@@ -32,6 +35,7 @@ export interface DeployCommandOptions {
   readonly build?: (options: BuildOptions) => Promise<BuildResult>;
   readonly createWorkspace?: typeof createPulumiWorkspace;
   readonly writeProgram?: typeof writePulumiProgram;
+  readonly loadIntegrations?: typeof loadDeploymentIntegrations;
   readonly confirm?: (question: string, signal: AbortSignal) => Promise<boolean>;
 }
 

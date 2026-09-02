@@ -20,9 +20,9 @@ test("publishes lifecycle and diagnostics with graph hashes across generations",
   const store = await createObservabilitySegmentStore({ root, index });
   const collector = createObservabilityCollector({ maxRecords: 100 });
   const stream = createObservabilityStream({ maxEvents: 100 });
-  const hashes = new Map<number, string>();
+  const fingerprints = new Map<number, ReturnType<typeof fingerprint>>();
   const observability = createSupervisorObservability({
-    graphHash: (token) => hashes.get(token.generationToken),
+    activationFingerprint: (token) => fingerprints.get(token.generationToken),
     collector,
     stream,
     append: store.append,
@@ -31,14 +31,14 @@ test("publishes lifecycle and diagnostics with graph hashes across generations",
   const machine = createSupervisorStateMachine({ onTelemetry: observability.onTelemetry });
 
   const first = machine.requestSourceChange();
-  hashes.set(first.generationToken, "sha256:first");
+  fingerprints.set(first.generationToken, fingerprint("sha256:first"));
   machine.compileSucceeded(first);
   machine.startSucceeded(first);
   machine.verificationSucceeded(first);
   machine.switchSucceeded(first);
 
   const second = machine.requestSourceChange();
-  hashes.set(second.generationToken, "sha256:second");
+  fingerprints.set(second.generationToken, fingerprint("sha256:second"));
   machine.compileSucceeded(second);
   machine.startSucceeded(second);
   machine.verificationSucceeded(second);
@@ -51,9 +51,21 @@ test("publishes lifecycle and diagnostics with graph hashes across generations",
   expect(events.some((event) => event.type === "diagnostic.changed")).toBe(true);
   const generationData = events
     .filter((event) => event.type === "generation.changed")
-    .map((event) => event.data as { graphHash: string; event: string });
+    .map(
+      (event) =>
+        event.data as {
+          graphHash: string;
+          activationFingerprint: ReturnType<typeof fingerprint>;
+          event: string;
+        },
+    );
   expect(generationData.some((record) => record.graphHash === "sha256:first")).toBe(true);
   expect(generationData.some((record) => record.graphHash === "sha256:second")).toBe(true);
+  expect(
+    generationData.some(
+      (record) => record.activationFingerprint.manifestHash === "sha256:second:manifest",
+    ),
+  ).toBe(true);
   expect(
     generationData.some(
       (record) => record.graphHash === "sha256:second" && record.event === "activated",
@@ -77,7 +89,7 @@ test("publishes lifecycle and diagnostics with graph hashes across generations",
 test("turns lifecycle failures into redacted diagnostic SSE records", () => {
   const stream = createObservabilityStream();
   const observer = createSupervisorObservability({
-    graphHash: "sha256:failure",
+    activationFingerprint: fingerprint("sha256:failure"),
     stream,
     now: () => Date.parse("2026-08-16T12:00:00.000Z"),
   });
@@ -120,4 +132,12 @@ function request(requestId: string, generationId: string, graphHash: string) {
     outcome: "success" as const,
     timeline: [],
   };
+}
+
+function fingerprint(graphHash: string) {
+  return {
+    graphHash,
+    manifestHash: `${graphHash}:manifest`,
+    runtimeIntegrationsPlanHash: `${graphHash}:runtime-integrations`,
+  } as const;
 }

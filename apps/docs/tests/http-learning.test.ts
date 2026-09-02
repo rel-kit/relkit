@@ -10,8 +10,9 @@ const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `http/${page}.mdx`), "utf8");
 
 test("connects Service to HTTP Routes without changing existing HTTP guide URLs", () => {
-  expect(guideGroups.map(({ directory }) => directory).slice(0, 4)).toEqual([
+  expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
     "start",
+    "fundamentals",
     "service",
     "http",
     "events",

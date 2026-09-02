@@ -1,9 +1,17 @@
 import type { JsonValue } from "@relkit/contracts";
+import type {
+  AccessOperationPlan,
+  ConnectedBindingPlan,
+  DeploymentIntegrationPlan,
+  InfrastructureOperationPlan,
+} from "./plan-integrations.js";
+import { assertDeploymentPlanShape } from "./plan-validation.js";
+export { DeploymentPlanValidationError } from "./plan-validation.js";
 
 /** Versioned, JSON-safe protocol name for deployment plans. */
 export const DEPLOYMENT_PLAN_PROTOCOL = "relkit.deployment-plan" as const;
 /** Current provider-neutral deployment-plan contract version. */
-export const DEPLOYMENT_PLAN_VERSION = 2 as const;
+export const DEPLOYMENT_PLAN_VERSION = 3 as const;
 export type DeploymentPlanVersion = typeof DEPLOYMENT_PLAN_VERSION;
 
 export interface DeploymentHealthPlan {
@@ -37,20 +45,6 @@ export interface DeploymentCapabilityPlan {
   readonly capabilities?: readonly string[];
   readonly tags?: Readonly<Record<string, string>>;
   readonly metadata?: JsonValue;
-}
-
-export interface ProviderDeploymentPlan {
-  readonly id: string;
-  readonly capability: string;
-  readonly profile: string;
-  readonly adapter: string;
-  readonly ownership: "managed";
-  readonly configuration: JsonValue;
-  readonly environment: readonly {
-    readonly name: string;
-    readonly type: string;
-    readonly sensitive: boolean;
-  }[];
 }
 
 export interface HttpRouteDeploymentPlan {
@@ -110,18 +104,6 @@ export interface CacheDeploymentPlan extends DeploymentCapabilityPlan {
   readonly maxTtlMs?: number;
 }
 
-export interface ObservabilityDeploymentPlan {
-  readonly logicalName: string;
-  readonly configurationNames: readonly string[];
-  readonly logs: boolean;
-  readonly traces: boolean;
-  readonly retentionDays?: number;
-  readonly export?: {
-    readonly enabled: boolean;
-    readonly configurationNames: readonly string[];
-  };
-}
-
 /** One safe, logical-resource IAM statement for the shared application role. */
 export interface DeploymentIamStatement {
   readonly capability: string;
@@ -150,7 +132,11 @@ export interface DeploymentPlan {
   readonly contractVersion: number;
   readonly graphHash: string;
   readonly application: ApplicationDeploymentPlan;
-  readonly providerBindings: readonly ProviderDeploymentPlan[];
+  readonly engine: DeploymentIntegrationPlan<"engine">;
+  readonly host: DeploymentIntegrationPlan<"host">;
+  readonly connectedBindings: readonly ConnectedBindingPlan[];
+  readonly infrastructureOperations: readonly InfrastructureOperationPlan[];
+  readonly accessOperations: readonly AccessOperationPlan[];
   readonly http: HttpDeploymentPlan;
   readonly jobs: readonly JobDeploymentPlan[];
   readonly schedules: readonly ScheduleDeploymentPlan[];
@@ -159,5 +145,25 @@ export interface DeploymentPlan {
   readonly buckets: readonly BucketDeploymentPlan[];
   readonly caches: readonly CacheDeploymentPlan[];
   readonly iam: DeploymentIamPlan;
-  readonly observability?: ObservabilityDeploymentPlan;
+}
+
+export class DeploymentPlanVersionError extends TypeError {
+  readonly code = "RELKIT_DEPLOYMENT_PLAN_VERSION_UNSUPPORTED" as const;
+
+  constructor(version: unknown) {
+    super(
+      `Deployment plan version ${String(version)} is unsupported; expected ${DEPLOYMENT_PLAN_VERSION}. Regenerate with \`relkit deploy preview\`.`,
+    );
+    this.name = "DeploymentPlanVersionError";
+  }
+}
+
+export function assertDeploymentPlanVersion(value: unknown): asserts value is DeploymentPlan {
+  if (!isRecord(value) || value.contractVersion !== DEPLOYMENT_PLAN_VERSION)
+    throw new DeploymentPlanVersionError(isRecord(value) ? value.contractVersion : undefined);
+  assertDeploymentPlanShape(value);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

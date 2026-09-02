@@ -30,6 +30,40 @@ export * from "@relkit/agents";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/agents.ts#L1)
 
+## `app-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [deriveApplicationId](#deriveapplicationid)
+  - [isEnvDefinition](#isenvdefinition)
+
+---
+
+# utils
+
+## deriveApplicationId
+
+**Signature**
+
+```ts
+declare const deriveApplicationId: (packageName: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L19)
+
+## isEnvDefinition
+
+**Signature**
+
+```ts
+declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L4)
+
 ## `buckets.ts`
 
 ---
@@ -80,344 +114,32 @@ export * from "@relkit/cache";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/cache.ts#L1)
 
-## `config-types.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [ApiDocsConfig (interface)](#apidocsconfig-interface)
-  - [ApplicationConfigDescriptor (type alias)](#applicationconfigdescriptor-type-alias)
-  - [CapabilityDefaults (type alias)](#capabilitydefaults-type-alias)
-  - [ConfigProviderMaps (interface)](#configprovidermaps-interface)
-  - [DefineConfigOptions (type alias)](#defineconfigoptions-type-alias)
-  - [DeploymentConfig (interface)](#deploymentconfig-interface)
-  - [InspectorConfig (interface)](#inspectorconfig-interface)
-  - [SentryConfig (interface)](#sentryconfig-interface)
-  - [ServerConfig (interface)](#serverconfig-interface)
-  - [TelemetryConfig (type alias)](#telemetryconfig-type-alias)
-
----
-
-# utils
-
-## ApiDocsConfig (interface)
-
-**Signature**
-
-```ts
-export interface ApiDocsConfig {
-  readonly enabledInProduction?: boolean;
-  readonly excludeDomains?: readonly string[];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L5)
-
-## ApplicationConfigDescriptor (type alias)
-
-**Signature**
-
-```ts
-type ApplicationConfigDescriptor<Id, S, Maps> = DescriptorBase<"app", Id> &
-  Omit<DefineConfigOptions<S, Maps>, keyof DescriptorMetadata | "id">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L72)
-
-## CapabilityDefaults (type alias)
-
-**Signature**
-
-```ts
-type Readonly<{ bucket?: Profile<Maps["buckets"]>; cache?: Profile<Maps["caches"]>; job?: Profile<Maps["jobs"]>; event?: Profile<Maps["events"]>; model?: Profile<Maps["models"]>; observability?: Profile<Maps["observability"]>; }> = Readonly<{
-  bucket?: Profile<Maps["buckets"]>;
-  cache?: Profile<Maps["caches"]>;
-  job?: Profile<Maps["jobs"]>;
-  event?: Profile<Maps["events"]>;
-  model?: Profile<Maps["models"]>;
-  observability?: Profile<Maps["observability"]>;
-}>
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L46)
-
-## ConfigProviderMaps (interface)
-
-**Signature**
-
-```ts
-export interface ConfigProviderMaps {
-  readonly buckets?: CapabilityBindings<"buckets">;
-  readonly caches?: CapabilityBindings<"cache">;
-  readonly jobs?: CapabilityBindings<"jobs">;
-  readonly events?: CapabilityBindings<"events">;
-  readonly models?: CapabilityBindings<"models">;
-  readonly observability?: CapabilityBindings<"observability">;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L35)
-
-## DefineConfigOptions (type alias)
-
-**Signature**
-
-```ts
-type DefineConfigOptions<S, Maps> = DescriptorMetadata &
-  Maps & {
-    readonly id?: string;
-    readonly env: EnvDefinition<S>;
-    readonly defaults?: CapabilityDefaults<Maps>;
-    readonly sentry?: SentryConfig;
-    readonly telemetry?: TelemetryConfig;
-    readonly server?: ServerConfig;
-    readonly inspector?: InspectorConfig;
-    readonly deployment?: DeploymentConfig;
-  };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L57)
-
-## DeploymentConfig (interface)
-
-**Signature**
-
-```ts
-export interface DeploymentConfig {
-  readonly target: "aws";
-  readonly adapter: "pulumi";
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L24)
-
-## InspectorConfig (interface)
-
-**Signature**
-
-```ts
-export interface InspectorConfig {
-  readonly port?: number;
-  readonly enabledInProduction?: boolean;
-  readonly maxPreviewBytes?: number;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L18)
-
-## SentryConfig (interface)
-
-**Signature**
-
-```ts
-export interface SentryConfig {
-  readonly dsn: string | EnvRef;
-  readonly tracesSampleRate?: number;
-  readonly sendDefaultPii?: false;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L29)
-
-## ServerConfig (interface)
-
-**Signature**
-
-```ts
-export interface ServerConfig {
-  readonly port?: number;
-  readonly maxBodyBytes?: number;
-  readonly apiDocs?: ApiDocsConfig;
-  readonly clientContract?: boolean;
-  readonly mcp?: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L10)
-
-## TelemetryConfig (type alias)
-
-**Signature**
-
-```ts
-type TelemetryConfig = Readonly<Record<string, JsonValue | EnvRef>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-types.ts#L55)
-
-## `config-validation.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [copyProviderMaps](#copyprovidermaps)
-  - [deriveApplicationId](#deriveapplicationid)
-  - [isEnvDefinition](#isenvdefinition)
-  - [providerTopology](#providertopology)
-  - [resolveDefaults](#resolvedefaults)
-  - [validateDefaults](#validatedefaults)
-
----
-
-# utils
-
-## copyProviderMaps
-
-**Signature**
-
-```ts
-declare const copyProviderMaps: (value: ConfigProviderMaps) => ConfigProviderMaps;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L16)
-
-## deriveApplicationId
-
-**Signature**
-
-```ts
-declare const deriveApplicationId: (packageName: string) => string;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L91)
-
-## isEnvDefinition
-
-**Signature**
-
-```ts
-declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L76)
-
-## providerTopology
-
-**Signature**
-
-```ts
-declare const providerTopology: (value: ConfigProviderMaps) => ProviderTopology;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L28)
-
-## resolveDefaults
-
-**Signature**
-
-```ts
-declare const resolveDefaults: (
-  maps: ConfigProviderMaps,
-  defaults: Readonly<Record<string, unknown>> | undefined,
-) => Readonly<Record<string, string>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L61)
-
-## validateDefaults
-
-**Signature**
-
-```ts
-declare const validateDefaults: (
-  maps: ConfigProviderMaps,
-  defaults: Readonly<Record<string, unknown>> | undefined,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config-validation.ts#L39)
-
 ## `config.ts`
 
 ---
 
 ## Exports Grouped by Category
 
-- [Application](#application)
-  - [defineConfig](#defineconfig)
 - [utils](#utils)
-  - ["./config-types.js" (namespace export)](#config-typesjs-namespace-export)
-  - ["./providers.js" (namespace export)](#providersjs-namespace-export)
+  - ["./define-app.js" (namespace export)](#define-appjs-namespace-export)
   - ["@relkit/config" (namespace export)](#relkitconfig-namespace-export)
   - [deriveApplicationId](#deriveapplicationid)
 
 ---
 
-# Application
-
-## defineConfig
-
-Defines application, environment, provider, runtime, and deployment settings.
-
-**Example**
-
-```ts
-import { defineConfig, defineEnv, env, external, s3 } from "@relkit/app/config";
-
-const values = defineEnv({
-  BUCKET_ENDPOINT: env.url(),
-  BUCKET_NAME: env.string(),
-});
-
-export default defineConfig({
-  env: values,
-  buckets: {
-    assets: external(
-      s3({
-        endpoint: values.BUCKET_ENDPOINT,
-        bucketName: values.BUCKET_NAME,
-        region: "us-east-1",
-      }),
-    ),
-  },
-  defaults: { bucket: "assets" },
-});
-```
-
-**Signature**
-
-```ts
-declare const defineConfig: <
-  const S extends import("@relkit/config").EnvShape,
-  const Maps extends ConfigProviderMaps,
->(
-  options: DefineConfigOptions<S, Maps>,
-) => ApplicationConfigDescriptor<string, S, Maps>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L43)
-
-Since v0.2.0
-
 # utils
 
-## "./config-types.js" (namespace export)
+## "./define-app.js" (namespace export)
 
-Re-exports all named exports from the "./config-types.js" module.
-
-**Signature**
-
-```ts
-export * from "./config-types.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L11)
-
-## "./providers.js" (namespace export)
-
-Re-exports all named exports from the "./providers.js" module.
+Re-exports all named exports from the "./define-app.js" module.
 
 **Signature**
 
 ```ts
-export * from "./providers.js";
+export * from "./define-app.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L2)
 
 ## "@relkit/config" (namespace export)
 
@@ -429,7 +151,7 @@ Re-exports all named exports from the "@relkit/config" module.
 export * from "@relkit/config";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L3)
 
 ## deriveApplicationId
 
@@ -439,7 +161,7 @@ export * from "@relkit/config";
 declare const deriveApplicationId: (packageName: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/config.ts#L1)
 
 ## `context-descriptors.ts`
 
@@ -639,6 +361,242 @@ declare const createApplicationContextResolver: (options: {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-resolver.ts#L20)
 
+## `define-app-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [APP_PROVIDER_CAPABILITIES](#app_provider_capabilities)
+  - [ApiDocsConfig (interface)](#apidocsconfig-interface)
+  - [AppDeploymentConfig (type alias)](#appdeploymentconfig-type-alias)
+  - [AppProviderCapability (type alias)](#appprovidercapability-type-alias)
+  - [AppProviderDefaults (type alias)](#appproviderdefaults-type-alias)
+  - [AppProviderInputs (interface)](#appproviderinputs-interface)
+  - [AppTelemetryConfig (type alias)](#apptelemetryconfig-type-alias)
+  - [ApplicationDescriptor (type alias)](#applicationdescriptor-type-alias)
+  - [DefineAppOptions (type alias)](#defineappoptions-type-alias)
+  - [InspectorConfig (interface)](#inspectorconfig-interface)
+  - [ServerConfig (interface)](#serverconfig-interface)
+
+---
+
+# utils
+
+## APP_PROVIDER_CAPABILITIES
+
+**Signature**
+
+```ts
+declare const APP_PROVIDER_CAPABILITIES: readonly ["bucket", "cache", "job", "event", "model"];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L31)
+
+## ApiDocsConfig (interface)
+
+**Signature**
+
+```ts
+export interface ApiDocsConfig {
+  readonly enabledInProduction?: boolean;
+  readonly excludeDomains?: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L12)
+
+## AppDeploymentConfig (type alias)
+
+**Signature**
+
+```ts
+type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L57)
+
+## AppProviderCapability (type alias)
+
+**Signature**
+
+```ts
+type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L33)
+
+## AppProviderDefaults (type alias)
+
+**Signature**
+
+```ts
+type Readonly<{ bucket?: "bucket" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "bucket"]>> : never; cache?: "cache" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "cache"]>> : never; job?: "job" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "job"]>> : never; event?: "event" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "event"]>> : never; model?: "model" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "model"]>> : never; }> = Readonly<{
+  [Capability in AppProviderCapability]?: Capability extends keyof Providers
+    ? Profile<NonNullable<Providers[Capability]>>
+    : never;
+}>
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L49)
+
+## AppProviderInputs (interface)
+
+**Signature**
+
+```ts
+export interface AppProviderInputs {
+  readonly bucket?: CapabilityInput<"bucket">;
+  readonly cache?: CapabilityInput<"cache">;
+  readonly job?: CapabilityInput<"job">;
+  readonly event?: CapabilityInput<"event">;
+  readonly model?: CapabilityInput<"model">;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L39)
+
+## AppTelemetryConfig (type alias)
+
+**Signature**
+
+```ts
+type AppTelemetryConfig<Exporters> = TelemetryConfiguration<Exporters>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L55)
+
+## ApplicationDescriptor (type alias)
+
+**Signature**
+
+```ts
+type ApplicationDescriptor<Shape, Providers, Exporters> = DescriptorBase<"app", string> &
+  NormalizedProviders<Providers> & {
+    readonly env: EnvDefinition<Shape>;
+    readonly defaults: AppProviderDefaults<Providers>;
+    readonly telemetry?: AppTelemetryConfig<Exporters>;
+    readonly server?: ServerConfig;
+    readonly inspector?: InspectorConfig;
+    readonly deployment?: AppDeploymentConfig;
+  };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L89)
+
+## DefineAppOptions (type alias)
+
+**Signature**
+
+```ts
+type DefineAppOptions<Shape, Providers, Exporters> = DescriptorMetadata &
+  Providers & {
+    readonly id?: string;
+    readonly env: EnvDefinition<Shape>;
+    readonly defaults?: AppProviderDefaults<Providers>;
+    readonly telemetry?: AppTelemetryConfig<Exporters>;
+    readonly server?: ServerConfig;
+    readonly inspector?: InspectorConfig;
+    readonly deployment?: AppDeploymentConfig;
+  };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L59)
+
+## InspectorConfig (interface)
+
+**Signature**
+
+```ts
+export interface InspectorConfig {
+  readonly port?: number;
+  readonly enabledInProduction?: boolean;
+  readonly maxPreviewBytes?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L25)
+
+## ServerConfig (interface)
+
+**Signature**
+
+```ts
+export interface ServerConfig {
+  readonly port?: number;
+  readonly maxBodyBytes?: number;
+  readonly apiDocs?: ApiDocsConfig;
+  readonly clientContract?: boolean;
+  readonly mcp?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L17)
+
+## `define-app.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [Application](#application)
+  - [defineApp](#defineapp)
+- [utils](#utils)
+  - ["./define-app-types.js" (namespace export)](#define-app-typesjs-namespace-export)
+
+---
+
+# Application
+
+## defineApp
+
+Defines one immutable application topology.
+
+**Example**
+
+```ts
+import { defineApp, defineEnv } from "@relkit/app";
+export default defineApp({
+  id: "orders-api",
+  env: defineEnv({}),
+  server: { port: 3000 },
+  inspector: { port: 3210 },
+});
+```
+
+**Signature**
+
+```ts
+declare const defineApp: <
+  const Shape extends EnvShape,
+  const Providers extends AppProviderInputs,
+  const Exporters extends TelemetryExporterMap = Readonly<
+    Record<string, TelemetryExporterDescriptor<string, string, object>>
+  >,
+>(
+  options: DefineAppOptions<Shape, Providers, Exporters>,
+) => ApplicationDescriptor<Shape, Providers, Exporters>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L56)
+
+Since v0.2.0
+
+# utils
+
+## "./define-app-types.js" (namespace export)
+
+Re-exports all named exports from the "./define-app-types.js" module.
+
+**Signature**
+
+```ts
+export * from "./define-app-types.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L24)
+
 ## `events.ts`
 
 ---
@@ -711,6 +669,7 @@ export * from "@relkit/functions";
   - [EventAttributeValue](#eventattributevalue)
   - [EventPublishOptions](#eventpublishoptions)
   - [EventPublishResult](#eventpublishresult)
+  - [bindDescriptorIdentity](#binddescriptoridentity)
 
 ---
 
@@ -822,7 +781,7 @@ Re-exports all named exports from the "@relkit/jobs" module.
 export * from "@relkit/jobs";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
 
 ## "@relkit/routes" (namespace export)
 
@@ -834,7 +793,7 @@ Re-exports all named exports from the "@relkit/routes" module.
 export * from "@relkit/routes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
 
 ## "@relkit/services" (namespace export)
 
@@ -846,7 +805,7 @@ Re-exports all named exports from the "@relkit/services" module.
 export * from "@relkit/services";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## "@relkit/tools" (namespace export)
 
@@ -858,7 +817,7 @@ Re-exports all named exports from the "@relkit/tools" module.
 export * from "@relkit/tools";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
 
 ## EventAttributeValue
 
@@ -868,7 +827,7 @@ export * from "@relkit/tools";
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
 
 ## EventPublishOptions
 
@@ -878,7 +837,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
 
 ## EventPublishResult
 
@@ -886,6 +845,16 @@ declare const EventPublishOptions: EventPublishOptions;
 
 ```ts
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+
+## bindDescriptorIdentity
+
+**Signature**
+
+```ts
+declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: string) => T;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
@@ -914,736 +883,6 @@ export * from "@relkit/jobs";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L1)
-
-## `model-providers.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [ModelProviderOptions (interface)](#modelprovideroptions-interface)
-  - [ModelProviders (interface)](#modelproviders-interface)
-  - [assertModelProviders](#assertmodelproviders)
-
----
-
-# utils
-
-## ModelProviderOptions (interface)
-
-Serializable settings for one named AI SDK provider recipe.
-
-**Signature**
-
-```ts
-export interface ModelProviderOptions {
-  readonly defaultModel?: string;
-  readonly [key: string]: ProviderValue;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/model-providers.ts#L5)
-
-## ModelProviders (interface)
-
-Value-free per-environment AI SDK provider configuration. Both defaults are
-required; credentials should be environment references and are resolved only
-when a runtime provider registry is constructed.
-
-**Signature**
-
-```ts
-export interface ModelProviders {
-  readonly defaultProvider: string;
-  readonly defaultModel: string;
-  readonly [provider: string]: string | ModelProviderOptions;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/model-providers.ts#L15)
-
-## assertModelProviders
-
-**Signature**
-
-```ts
-declare const assertModelProviders: (value: unknown) => asserts value is ModelProviders;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/model-providers.ts#L21)
-
-## `providers-validation-utils.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [isCapabilityList](#iscapabilitylist)
-  - [isPlainRecord](#isplainrecord)
-  - [isProviderValue](#isprovidervalue)
-  - [isSensitiveKey](#issensitivekey)
-  - [isStableProfile](#isstableprofile)
-  - [isStringEnvRef](#isstringenvref)
-  - [isValueFreeEnvRef](#isvaluefreeenvref)
-  - [normalizeValue](#normalizevalue)
-  - [sameCapabilities](#samecapabilities)
-  - [walk](#walk)
-
----
-
-# utils
-
-## isCapabilityList
-
-**Signature**
-
-```ts
-declare const isCapabilityList: (
-  value: unknown,
-  capabilities: readonly ProviderCapability[],
-) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L109)
-
-## isPlainRecord
-
-**Signature**
-
-```ts
-declare const isPlainRecord: (value: unknown) => value is Record<string, any>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L91)
-
-## isProviderValue
-
-**Signature**
-
-```ts
-declare const isProviderValue: (value: unknown, active?: Set<object>) => value is ProviderValue;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L44)
-
-## isSensitiveKey
-
-**Signature**
-
-```ts
-declare const isSensitiveKey: (key: string | undefined) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L128)
-
-## isStableProfile
-
-**Signature**
-
-```ts
-declare const isStableProfile: (value: string) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L100)
-
-## isStringEnvRef
-
-**Signature**
-
-```ts
-declare const isStringEnvRef: (value: unknown) => value is EnvRef<string, string>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L87)
-
-## isValueFreeEnvRef
-
-**Signature**
-
-```ts
-declare const isValueFreeEnvRef: (value: unknown) => value is EnvRef;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L75)
-
-## normalizeValue
-
-**Signature**
-
-```ts
-declare const normalizeValue: (value: unknown, path: string, active?: Set<object>) => ProviderValue;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L5)
-
-## sameCapabilities
-
-**Signature**
-
-```ts
-declare const sameCapabilities: (
-  value: unknown,
-  expected: readonly ProviderCapability[],
-) => boolean;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L120)
-
-## walk
-
-**Signature**
-
-```ts
-declare const walk: (value: ProviderValue, visit: (reference: EnvRef) => void) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation-utils.ts#L132)
-
-## `providers-validation.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [copyProviderTopology](#copyprovidertopology)
-  - [createAdapter](#createadapter)
-  - [createBinding](#createbinding)
-  - [isProviderBinding](#isproviderbinding)
-  - [isProviderTopology](#isprovidertopology)
-  - [providerEnvironment](#providerenvironment)
-
----
-
-# utils
-
-## copyProviderTopology
-
-**Signature**
-
-```ts
-declare const copyProviderTopology: (value: unknown) => ProviderTopology;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L52)
-
-## createAdapter
-
-**Signature**
-
-```ts
-declare const createAdapter: <C extends ProviderCapability, N extends string>(
-  capability: C,
-  adapter: N,
-  options: object,
-  secretPaths: readonly string[],
-  rejectSensitiveLiterals?: boolean,
-) => ProviderAdapter<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L22)
-
-## createBinding
-
-**Signature**
-
-```ts
-declare const createBinding: <C extends ProviderCapability, N extends string>(
-  ownership: ProviderOwnership,
-  adapter: ProviderAdapter<C, N>,
-) => ProviderBinding<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L44)
-
-## isProviderBinding
-
-**Signature**
-
-```ts
-declare const isProviderBinding: (value: unknown) => value is ProviderBinding;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L85)
-
-## isProviderTopology
-
-**Signature**
-
-```ts
-declare const isProviderTopology: (value: unknown) => value is ProviderTopology;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L76)
-
-## providerEnvironment
-
-**Signature**
-
-```ts
-declare const providerEnvironment: (
-  value: ProviderValue,
-) => readonly ProviderEnvironmentReference[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers-validation.ts#L94)
-
-## `providers.ts`
-
----
-
-## Exports Grouped by Category
-
-- [Providers](#providers)
-  - [external](#external)
-  - [managed](#managed)
-- [utils](#utils)
-  - [AwsProtocolOptions (interface)](#awsprotocoloptions-interface)
-  - [CapabilityBindings (type alias)](#capabilitybindings-type-alias)
-  - [EventBridgeOptions (interface)](#eventbridgeoptions-interface)
-  - [ModelProviderOptions](#modelprovideroptions)
-  - [ModelProviders](#modelproviders)
-  - [OtlpOptions (interface)](#otlpoptions-interface)
-  - [PROVIDER_CAPABILITIES](#provider_capabilities)
-  - [ProviderAdapter (interface)](#provideradapter-interface)
-  - [ProviderBinding (interface)](#providerbinding-interface)
-  - [ProviderCapability (type alias)](#providercapability-type-alias)
-  - [ProviderConfig (type alias)](#providerconfig-type-alias)
-  - [ProviderEnvironmentReference (interface)](#providerenvironmentreference-interface)
-  - [ProviderOwnership (type alias)](#providerownership-type-alias)
-  - [ProviderTopology (interface)](#providertopology-interface)
-  - [ProviderValue (type alias)](#providervalue-type-alias)
-  - [RedisOptions (interface)](#redisoptions-interface)
-  - [S3Options (interface)](#s3options-interface)
-  - [SqsOptions (interface)](#sqsoptions-interface)
-  - [aiSdk](#aisdk)
-  - [cloudWatch](#cloudwatch)
-  - [copyProviderTopology](#copyprovidertopology)
-  - [eventBridge](#eventbridge)
-  - [isProviderBinding](#isproviderbinding)
-  - [isProviderTopology](#isprovidertopology)
-  - [otlp](#otlp)
-  - [providerEnvironment](#providerenvironment)
-  - [redis](#redis)
-  - [s3](#s3)
-  - [sqs](#sqs)
-
----
-
-# Providers
-
-## external
-
-Marks an adapter as connected to infrastructure owned outside the deployment stack.
-
-**Example**
-
-```ts
-import { defineEnv, env, external, redis } from "@relkit/app/config";
-
-const applicationEnv = defineEnv({ CACHE_URL: env.secret() });
-const cache = external(redis({ url: applicationEnv.CACHE_URL }));
-void cache;
-```
-
-**Signature**
-
-```ts
-declare const external: <C extends ProviderCapability, N extends string>(
-  adapter: ProviderAdapter<C, N>,
-) => ProviderBinding<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L161)
-
-Since v0.1.0
-
-## managed
-
-Marks an adapter as infrastructure owned by the deployment stack.
-
-**Example**
-
-```ts
-import { defineEnv, env, managed, redis } from "@relkit/app/config";
-
-const applicationEnv = defineEnv({ CACHE_URL: env.secret() });
-const cache = managed(redis({ url: applicationEnv.CACHE_URL }));
-void cache;
-```
-
-**Signature**
-
-```ts
-declare const managed: <C extends ProviderCapability, N extends string>(
-  adapter: ProviderAdapter<C, N>,
-) => ProviderBinding<C, N>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L181)
-
-Since v0.1.0
-
-# utils
-
-## AwsProtocolOptions (interface)
-
-**Signature**
-
-```ts
-export interface AwsProtocolOptions {
-  readonly region: string | EnvRef;
-  readonly endpoint?: string | URL | EnvRef;
-  readonly credentials?: S3Options["credentials"];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L85)
-
-## CapabilityBindings (type alias)
-
-**Signature**
-
-```ts
-type Readonly<Record<string, ProviderBinding<C, string>>> = Readonly<
-  Record<string, ProviderBinding<C>>
->
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L56)
-
-## EventBridgeOptions (interface)
-
-**Signature**
-
-```ts
-export interface EventBridgeOptions extends AwsProtocolOptions {
-  readonly busName: string | EnvRef;
-  readonly source?: string | EnvRef;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L95)
-
-## ModelProviderOptions
-
-**Signature**
-
-```ts
-declare const ModelProviderOptions: ModelProviderOptions;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L13)
-
-## ModelProviders
-
-**Signature**
-
-```ts
-declare const ModelProviders: ModelProviders;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L13)
-
-## OtlpOptions (interface)
-
-**Signature**
-
-```ts
-export interface OtlpOptions {
-  readonly endpoint: string | URL | EnvRef;
-  readonly headers?: Readonly<Record<string, EnvRef>>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L100)
-
-## PROVIDER_CAPABILITIES
-
-**Signature**
-
-```ts
-declare const PROVIDER_CAPABILITIES: readonly [
-  "buckets",
-  "cache",
-  "jobs",
-  "events",
-  "models",
-  "observability",
-];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L15)
-
-## ProviderAdapter (interface)
-
-**Signature**
-
-```ts
-export interface ProviderAdapter<
-  Capability extends ProviderCapability = ProviderCapability,
-  Name extends string = string,
-> {
-  readonly kind: "provider-adapter";
-  readonly capability: Capability;
-  readonly adapter: Name;
-  readonly configuration: ProviderConfig;
-  readonly environment: readonly ProviderEnvironmentReference[];
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L36)
-
-## ProviderBinding (interface)
-
-**Signature**
-
-```ts
-export interface ProviderBinding<
-  Capability extends ProviderCapability = ProviderCapability,
-  Name extends string = string,
-> {
-  readonly kind: "provider-binding";
-  readonly ownership: ProviderOwnership;
-  readonly adapter: ProviderAdapter<Capability, Name>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L47)
-
-## ProviderCapability (type alias)
-
-**Signature**
-
-```ts
-type ProviderCapability = (typeof PROVIDER_CAPABILITIES)[number];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L24)
-
-## ProviderConfig (type alias)
-
-**Signature**
-
-```ts
-type ProviderConfig = Readonly<Record<string, ProviderValue>>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L28)
-
-## ProviderEnvironmentReference (interface)
-
-**Signature**
-
-```ts
-export interface ProviderEnvironmentReference {
-  readonly name: string;
-  readonly type: string;
-  readonly sensitive: boolean;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L30)
-
-## ProviderOwnership (type alias)
-
-**Signature**
-
-```ts
-type ProviderOwnership = "external" | "managed";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L25)
-
-## ProviderTopology (interface)
-
-**Signature**
-
-```ts
-export interface ProviderTopology {
-  readonly buckets?: CapabilityBindings<"buckets">;
-  readonly cache?: CapabilityBindings<"cache">;
-  readonly jobs?: CapabilityBindings<"jobs">;
-  readonly events?: CapabilityBindings<"events">;
-  readonly models?: CapabilityBindings<"models">;
-  readonly observability?: CapabilityBindings<"observability">;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L60)
-
-## ProviderValue (type alias)
-
-**Signature**
-
-```ts
-type ProviderValue =
-  JsonPrimitive | EnvRef | readonly ProviderValue[] | { readonly [key: string]: ProviderValue };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L26)
-
-## RedisOptions (interface)
-
-**Signature**
-
-```ts
-export interface RedisOptions {
-  readonly url: EnvRef;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L81)
-
-## S3Options (interface)
-
-**Signature**
-
-```ts
-export interface S3Options {
-  readonly endpoint: string | URL | EnvRef;
-  readonly bucketName: string | EnvRef;
-  readonly region: string | EnvRef;
-  readonly credentials?: {
-    readonly accessKeyId?: EnvRef;
-    readonly secretAccessKey?: EnvRef;
-    readonly sessionToken?: EnvRef;
-  };
-  readonly forcePathStyle?: boolean | EnvRef;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L69)
-
-## SqsOptions (interface)
-
-**Signature**
-
-```ts
-export interface SqsOptions extends AwsProtocolOptions {
-  readonly queueUrl: string | URL | EnvRef;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L91)
-
-## aiSdk
-
-**Signature**
-
-```ts
-declare const aiSdk: (options: ModelProviders) => ProviderAdapter<"models", "ai-sdk">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L133)
-
-## cloudWatch
-
-**Signature**
-
-```ts
-declare const cloudWatch: (
-  options: Pick<AwsProtocolOptions, "region">,
-) => ProviderAdapter<"observability", "cloudwatch">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L141)
-
-## copyProviderTopology
-
-**Signature**
-
-```ts
-declare const copyProviderTopology: (value: unknown) => ProviderTopology;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L187)
-
-## eventBridge
-
-**Signature**
-
-```ts
-declare const eventBridge: (
-  options: EventBridgeOptions,
-) => ProviderAdapter<"events", "eventbridge">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L125)
-
-## isProviderBinding
-
-**Signature**
-
-```ts
-declare const isProviderBinding: (value: unknown) => value is ProviderBinding;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L187)
-
-## isProviderTopology
-
-**Signature**
-
-```ts
-declare const isProviderTopology: (value: unknown) => value is ProviderTopology;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L187)
-
-## otlp
-
-**Signature**
-
-```ts
-declare const otlp: (options: OtlpOptions) => ProviderAdapter<"observability", "otlp">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L137)
-
-## providerEnvironment
-
-**Signature**
-
-```ts
-declare const providerEnvironment: (
-  value: ProviderValue,
-) => readonly ProviderEnvironmentReference[];
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L187)
-
-## redis
-
-**Signature**
-
-```ts
-declare const redis: (options: RedisOptions) => ProviderAdapter<"cache", "redis">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L113)
-
-## s3
-
-**Signature**
-
-```ts
-declare const s3: (options: S3Options) => ProviderAdapter<"buckets", "s3">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L105)
-
-## sqs
-
-**Signature**
-
-```ts
-declare const sqs: (options: SqsOptions) => ProviderAdapter<"jobs", "sqs">;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/providers.ts#L117)
 
 ## `routes.ts`
 

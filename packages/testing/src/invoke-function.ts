@@ -20,6 +20,7 @@ export interface StandaloneFunctionTarget {
   readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
   readonly dependencies?: import("@relkit/engine").DependencyDeclarations;
   readonly publishes?: readonly string[];
+  readonly publications?: Readonly<Record<string, import("@relkit/engine").DependencyRefLike>>;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;

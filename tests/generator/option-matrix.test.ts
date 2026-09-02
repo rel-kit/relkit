@@ -84,9 +84,9 @@ test("covers every template and examples/install/Git combination", async () => {
           expect(result.installed).toBe(install);
           expect(result.gitInitialized).toBe(git);
           expect(manifest).toMatchObject({ packageManager: "bun@1.3.10" });
-          expect(manifest.dependencies).toMatchObject({
+          expect(manifest.dependencies).toEqual({
+            ...(template === "agent" ? { "@relkit/ai-sdk": appManifest.version } : {}),
             "@relkit/app": appManifest.version,
-            "@relkit/providers-standard": appManifest.version,
           });
           expect(manifest.devDependencies).toMatchObject({
             "@types/bun": "1.3.10",
@@ -113,6 +113,7 @@ test("covers every template and examples/install/Git combination", async () => {
             ["relkit", "doctor"],
             ["relkit", "check"],
           ]);
+          expect(commands.at(-2)).toContain("--no-pulumi");
           expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-relkit-`))).toBe(
             false,
           );
@@ -191,6 +192,10 @@ test("handles absent, empty, and non-empty destinations atomically", async () =>
 });
 
 test("normalizes JSON options and keeps generated results JSON-safe", async () => {
+  expect(normalizeCreateOptions(["default-app"])).toMatchObject({
+    cloud: "none",
+    deploy: "none",
+  });
   const options = normalizeCreateOptions(
     [
       "@scope/json-app",
@@ -240,6 +245,36 @@ test("normalizes JSON options and keeps generated results JSON-safe", async () =
     `Success! Created @scope/json-app at ${result.destination}.`,
   );
   expect(formatGenerateResult(json)).not.toContain("route:");
+});
+
+test("adds AWS and Pulumi only when explicitly selected", async () => {
+  const root = await makeRoot();
+  const result = await generateProject(
+    createOptions("deployed-app", {
+      cloud: "aws",
+      deploy: "pulumi",
+      install: false,
+      git: false,
+    }),
+    contextFor(root),
+  );
+  const manifest = JSON.parse(await readFile(join(result.destination, "package.json"), "utf8")) as {
+    scripts: Record<string, string>;
+    dependencies: Record<string, string>;
+  };
+  const config = await readFile(join(result.destination, "relkit.config.ts"), "utf8");
+  expect(manifest.dependencies).toMatchObject({
+    "@relkit/app": appManifest.version,
+    "@relkit/aws": appManifest.version,
+    "@relkit/pulumi": appManifest.version,
+  });
+  expect(manifest.scripts).toMatchObject({
+    "deploy:preview": "relkit deploy preview",
+    deploy: "relkit deploy up",
+  });
+  expect(config).toContain('import "@relkit/aws";');
+  expect(config).toContain('import "@relkit/pulumi";');
+  expect(config).toContain('deployment: { engine: "pulumi", host: "aws" }');
 });
 
 test("reports only the create milestones that run", async () => {
@@ -311,8 +346,8 @@ function createOptions(
   return {
     name,
     template: "minimal",
-    cloud: "aws",
-    deploy: "pulumi",
+    cloud: "none",
+    deploy: "none",
     install: true,
     git: true,
     examples: true,

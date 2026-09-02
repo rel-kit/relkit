@@ -806,7 +806,6 @@ declare const isGeneratedAgentFunction: (value: unknown) => value is GeneratedAg
   - ["./approval.js" (namespace export)](#approvaljs-namespace-export)
   - ["./define-agent.js" (namespace export)](#define-agentjs-namespace-export)
   - ["./generated-function.js" (namespace export)](#generated-functionjs-namespace-export)
-  - ["./model-provider-registry.js" (namespace export)](#model-provider-registryjs-namespace-export)
   - ["./model-selection.js" (namespace export)](#model-selectionjs-namespace-export)
   - ["./observability.js" (namespace export)](#observabilityjs-namespace-export)
   - ["./runtime.js" (namespace export)](#runtimejs-namespace-export)
@@ -851,18 +850,6 @@ export * from "./generated-function.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L3)
 
-## "./model-provider-registry.js" (namespace export)
-
-Re-exports all named exports from the "./model-provider-registry.js" module.
-
-**Signature**
-
-```ts
-export * from "./model-provider-registry.js";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L6)
-
 ## "./model-selection.js" (namespace export)
 
 Re-exports all named exports from the "./model-selection.js" module.
@@ -873,7 +860,7 @@ Re-exports all named exports from the "./model-selection.js" module.
 export * from "./model-selection.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L6)
 
 ## "./observability.js" (namespace export)
 
@@ -898,177 +885,6 @@ export * from "./runtime.js";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/index.ts#L4)
-
-## `model-provider-registry-errors.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [ModelProviderRegistryError (class)](#modelproviderregistryerror-class)
-    - [name (property)](#name-property)
-  - [ModelProviderRegistryErrorCode (type alias)](#modelproviderregistryerrorcode-type-alias)
-
----
-
-# utils
-
-## ModelProviderRegistryError (class)
-
-**Signature**
-
-```ts
-declare class ModelProviderRegistryError { constructor(
-    readonly code: ModelProviderRegistryErrorCode,
-    message: string,
-  ) }
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry-errors.ts#L10)
-
-### name (property)
-
-**Signature**
-
-```ts
-readonly name: "ModelProviderRegistryError"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry-errors.ts#L11)
-
-## ModelProviderRegistryErrorCode (type alias)
-
-**Signature**
-
-```ts
-type ModelProviderRegistryErrorCode =
-  | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
-  | "RELKIT_MODEL_PROVIDER_UNSUPPORTED"
-  | "RELKIT_MODEL_PROVIDER_ENVIRONMENT_INVALID"
-  | "RELKIT_MODEL_PROVIDER_MODEL_UNAVAILABLE"
-  | ModelSelectionErrorCode;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry-errors.ts#L3)
-
-## `model-provider-registry.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [ActiveModelProviderRegistry (interface)](#activemodelproviderregistry-interface)
-  - [ModelProviderRegistryError](#modelproviderregistryerror)
-  - [ModelProviderRegistryErrorCode](#modelproviderregistryerrorcode)
-  - [ModelProviderRegistryOptions (interface)](#modelproviderregistryoptions-interface)
-  - [createModelProviderRegistry](#createmodelproviderregistry)
-
----
-
-# utils
-
-## ActiveModelProviderRegistry (interface)
-
-**Signature**
-
-```ts
-export interface ActiveModelProviderRegistry {
-  readonly languageModel: (modelId: string) => unknown;
-  readonly resolveModel: (
-    selector?: string,
-  ) => Omit<ResolvedModelSelection, "model"> & { readonly model: unknown };
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry.ts#L27)
-
-## ModelProviderRegistryError
-
-**Signature**
-
-```ts
-declare const ModelProviderRegistryError: typeof ModelProviderRegistryError;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry.ts#L14)
-
-## ModelProviderRegistryErrorCode
-
-**Signature**
-
-```ts
-declare const ModelProviderRegistryErrorCode: ModelProviderRegistryErrorCode;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry.ts#L15)
-
-## ModelProviderRegistryOptions (interface)
-
-**Signature**
-
-```ts
-export interface ModelProviderRegistryOptions {
-  readonly configuration: unknown;
-  /** Resolved environment values. The constructor never reads process.env. */
-  readonly values?: Readonly<Record<string, unknown>>;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry.ts#L21)
-
-## createModelProviderRegistry
-
-Creates live AI SDK providers from already-resolved runtime configuration.
-
-**Signature**
-
-```ts
-declare const createModelProviderRegistry: (
-  options: ModelProviderRegistryOptions,
-) => Promise<ActiveModelProviderRegistry | undefined>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-registry.ts#L35)
-
-## `model-provider-values.ts`
-
----
-
-## Exports Grouped by Category
-
-- [utils](#utils)
-  - [isRecord](#isrecord)
-  - [resolveValue](#resolvevalue)
-
----
-
-# utils
-
-## isRecord
-
-**Signature**
-
-```ts
-declare const isRecord: (value: unknown) => value is Record<string, unknown>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-values.ts#L39)
-
-## resolveValue
-
-**Signature**
-
-```ts
-declare const resolveValue: (
-  value: unknown,
-  values: Readonly<Record<string, unknown>> | undefined,
-  path: string,
-) => unknown;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/model-provider-values.ts#L3)
 
 ## `model-selection.ts`
 

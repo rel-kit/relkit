@@ -7,10 +7,8 @@ const createOrder = defineFunction({
   input: orderInput,
   output: orderOutput,
   dependencies: { cache: { prices } },
-  publishes: ["orders.created"],
   handler: async (input, context) => {
     await context.cache.prices.get({ sku: input.sku });
-    await context.events["orders.created"].publish(input);
     return { orderId: input.orderId, totalCents: 100 };
   },
 });

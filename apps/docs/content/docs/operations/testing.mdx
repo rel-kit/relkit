@@ -1,28 +1,65 @@
 ---
-title: Testing utilities and fakes
-description: Test functions, HTTP, jobs, events, resources, agents, and recovery with deterministic providers.
+title: Testing
+description: Test function behavior and complete HTTP boundaries with the same schemas, engine, and explicit provider replacements used by the application.
 ---
 
-Use the smallest layer that proves the behavior. Unit tests invoke one function; integration tests assemble
-the checked application and call its in-process HTTP client. Both use the same schemas and common engine as
-development.
+Use the smallest layer that proves the behavior. Function tests exercise one descriptor without a server.
+Application tests load checked configuration and call an in-process HTTP client. Neither layer needs remote
+credentials when provider-backed capabilities receive explicit fakes.
 
-<Tabs items={["Unit", "Integration"]}>
-  <Tab value="Unit">
-    Use `invokeFunction` for handler behavior, validation, declared errors, and explicitly supplied
-    resource clients.
-  </Tab>
-  <Tab value="Integration">
-    Use `createTestApplication` for routing, request mapping, middleware, responses, provider
-    wiring, and OpenAPI behavior.
-  </Tab>
-</Tabs>
+## Test one function
 
-<include cwd>../../docs/testing.md</include>
+Use `invokeFunction` for input and output validation, declared errors, nested invocation, and handler behavior:
 
-<Callout title="Verification target">
-  A complete local project should pass `bun run test`, `bun run check`, and `bun run typecheck`
-  without network credentials. Live provider checks must be separate and explicitly enabled.
-</Callout>
+<include cwd lang="ts" meta='title="templates/default/v1/api/tests/unit/orders.function.test.ts"'>
+  ../../templates/default/v1/api/tests/unit/orders.function.test.ts
+</include>
+
+```sh title="Terminal — relkit-orders"
+bun test tests/unit/orders.function.test.ts
+```
+
+Pass test clients when the function declares cache, bucket, job, event, or model capabilities. Keep these fakes
+deterministic and inspect their recorded effects instead of sleeping or calling a live service.
+
+## Test the application boundary
+
+Use `createTestApplication` for routing, request mapping, middleware, response contracts, OpenAPI behavior, and
+provider wiring:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="templates/default/v1/api/tests/integration/orders.route.test.ts"'
+>
+  ../../templates/default/v1/api/tests/integration/orders.route.test.ts
+</include>
+
+The harness runs in process and exposes `application.http`. Close it in `afterAll` so runtime state and handles do
+not leak into another test.
+
+## Replace provider profiles explicitly
+
+The commerce suite shows the complete shape for multiple cache, bucket, and model profiles:
+
+<include cwd lang="ts" meta='title="examples/commerce/tests/http.test.ts"'>
+  ../../examples/commerce/tests/http.test.ts
+</include>
+
+Every graph-required capability and profile must have a replacement. `RELKIT_ENV=test` does not silently select
+fakes. Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource behavior, and dedicated
+test event, job, or agent utilities for those contracts.
+
+## Run the application gate
+
+```sh title="Terminal — relkit-orders"
+bun run test
+bun run check
+bun run typecheck
+bun run build
+```
+
+Keep live integration and cloud tests separate and opt-in. In the RELKIT repository, `bun run prepush` runs all
+locally reproducible required CI jobs and expects Docker to be available.
 
 <include cwd>content/generated/related/operations-testing.mdx</include>

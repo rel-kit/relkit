@@ -102,6 +102,7 @@ export type GenerationEvent =
 export interface GenerationRecord extends VersionedRecord<"generation"> {
   readonly generationId: string;
   readonly graphHash: string;
+  readonly activationFingerprint: import("@relkit/contracts").RuntimeActivationFingerprint;
   readonly event: GenerationEvent;
   readonly occurredAt: string;
   readonly completedAt?: string;

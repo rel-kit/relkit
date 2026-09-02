@@ -1,4 +1,10 @@
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "@relkit/contracts";
 import type { ApplicationGraph } from "../../packages/graph/src/index.ts";
 import type { RuntimeManifest } from "../../packages/runtime-effect/src/index.ts";
 
@@ -12,8 +18,17 @@ const manifest: RuntimeManifest = {
   contractVersion: MANIFEST_VERSION,
   generatorVersion: GENERATOR_VERSION,
   graphHash: "sha256:current",
+  activationFingerprint: {
+    graphHash: "sha256:current",
+    manifestHash: "sha256:manifest",
+    runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+  },
+  runtimeIntegrationsPlan: {
+    version: RUNTIME_INTEGRATION_PLAN_VERSION,
+    fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+    graphHash: "sha256:current",
+  },
   functions: {},
-  providers: {},
   middleware: {},
   requestTransforms: {},
 };
@@ -30,8 +45,17 @@ const staleManifest: RuntimeManifest = {
   contractVersion: 1,
   generatorVersion: GENERATOR_VERSION,
   graphHash: "sha256:stale",
+  activationFingerprint: {
+    graphHash: "sha256:stale",
+    manifestHash: "sha256:manifest",
+    runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+  },
+  runtimeIntegrationsPlan: {
+    version: RUNTIME_INTEGRATION_PLAN_VERSION,
+    fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+    graphHash: "sha256:stale",
+  },
   functions: {},
-  providers: {},
   middleware: {},
   requestTransforms: {},
 };

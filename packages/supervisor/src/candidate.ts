@@ -64,6 +64,7 @@ export async function compileCandidate(options: CandidateOptions): Promise<Compi
       token: options.token,
       directory: context.directory,
       entrypoint,
+      ...(result.environment === undefined ? {} : { environment: result.environment }),
       cleanup: () => cleanupCandidate(context.directory, context.directoryRoot),
     });
   } catch (error) {
@@ -85,7 +86,11 @@ export async function startCandidate(options: CandidateOptions): Promise<Started
   try {
     throwIfAborted(options.signal);
     const port = await resolvePort(options, hostname);
-    const environment = childEnvironment(options.environment, options.token, port);
+    const environment = childEnvironment(
+      { ...options.environment, ...compiled.environment },
+      options.token,
+      port,
+    );
     emit(options.logger, {
       level: "info",
       event: "candidate.start.started",

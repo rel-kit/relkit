@@ -1,4 +1,4 @@
-import { API_VERSION } from "@relkit/contracts";
+import { API_VERSION, type RuntimeActivationFingerprint } from "@relkit/contracts";
 import type { SupervisorCandidateToken } from "./state-machine-types.js";
 
 export const DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS = 10_000;
@@ -10,6 +10,7 @@ export type CandidateVerificationCode =
   | "RELKIT_CANDIDATE_MANIFEST_VERSION_UNSUPPORTED"
   | "RELKIT_CANDIDATE_GENERATOR_VERSION_UNSUPPORTED"
   | "RELKIT_CANDIDATE_GRAPH_HASH_MISMATCH"
+  | "RELKIT_CANDIDATE_ACTIVATION_MISMATCH"
   | "RELKIT_CANDIDATE_ENVIRONMENT_NOT_READY"
   | "RELKIT_CANDIDATE_PROVIDER_NOT_READY"
   | "RELKIT_CANDIDATE_RESPONSE_INVALID"
@@ -33,7 +34,7 @@ export interface CandidateVerificationCandidate {
 
 export interface CandidateVerificationOptions {
   readonly candidate: CandidateVerificationCandidate;
-  readonly graphHash: string;
+  readonly activationFingerprint: RuntimeActivationFingerprint;
   readonly graphContractVersion?: number;
   readonly manifestContractVersion?: number;
   readonly manifestGeneratorVersion?: number;
@@ -47,6 +48,7 @@ export interface CandidateVerificationResult {
   readonly token: SupervisorCandidateToken;
   readonly graphHash: string;
   readonly manifestGraphHash: string;
+  readonly activationFingerprint: RuntimeActivationFingerprint;
   readonly graphContractVersion: number;
   readonly manifestContractVersion: number;
   readonly manifestGeneratorVersion: number;

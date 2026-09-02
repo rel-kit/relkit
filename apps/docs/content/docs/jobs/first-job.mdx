@@ -1,131 +1,71 @@
 ---
 title: Your first job
-description: Add receipt background work to an existing RELKIT app, test queue acceptance and stored output, then verify duplicate protection after restart.
+description: Define receipt work, enqueue it through a typed dependency, and test admission separately from completion.
 ---
 
-Add a receipt job to an existing RELKIT app. One function will accept the request; a worker will write
-a receipt JSON object. You will test that acceptance happens before execution and that local duplicate
-protection survives a restart.
+Add a receipt job to an existing RELKIT app. The producer receives queue acceptance; the target runs
+separately. These source-backed examples are typechecked with the documentation app.
 
-Use an installed app with the standard `@app/*` alias. Follow [Create an app](/docs/start/create-an-app)
-if needed. The commerce example already has the receipt target, job, bucket, and provider configuration:
-inspect those files instead of replacing them. The enqueue function below is kept as an executable test
-fixture in that example and must be placed under `src/` to become an application operation.
+## Define the target and job
 
-## Prepare the queue and bucket
-
-Follow [Define a job](/docs/jobs/define#bind-a-jobs-provider) to merge the `jobs.default` binding
-and jobs environment fields into your application. Set `defaults.job` to `"default"`.
-
-The target also uses `assets.objects` from the Assets domain. If your app does not have that domain yet,
-follow [Storage setup](/docs/storage/first-upload) through its provider, environment, bucket, function,
-and service setup. You do not need its upload route for this job. The commerce bucket accepts JSON:
-
-<include cwd lang="ts" meta='title="src/assets/buckets/assets.bucket.ts"'>
-  ../../examples/commerce/src/assets/buckets/assets.bucket.ts
-</include>
-
-Keep unrelated configuration intact. The automated test below supplies local fakes and needs no cloud
-credentials. For an interactive run, `RELKIT_ENV=test` also selects local providers.
-
-## Define the receipt behavior
-
-The example shares these contracts in `src/platform/schemas.ts`. If only Receipts needs them in your
-app, a domain-local schema module is also appropriate; update its imports consistently.
-
-<include cwd lang="ts" meta='title="src/platform/schemas.ts — receipt contracts"'>
-  ../../examples/commerce/src/platform/schemas.ts#receipt-schemas
-</include>
-
-The schema module imports `z` from `@relkit/app/schema`. Add the target at
-`src/receipts/functions/send-receipt.function.ts`:
+Create the ordinary function that owns the behavior:
 
 <include cwd lang="ts" meta='title="src/receipts/functions/send-receipt.function.ts"'>
-  ../../examples/commerce/src/receipts/functions/send-receipt.function.ts
+  ../../apps/docs/examples/jobs/send-receipt.function.ts
 </include>
 
-It declares its bucket dependency and writes `{ "orderId": "order-1" }` at the requested object key.
-It returns a receipt identifier, not a mail delivery confirmation. The job worker validates that output;
-the enqueue caller does not receive it.
-
-## Add the job and enqueue operation
-
-Create `src/receipts/jobs/send-receipt.job.ts`:
+Then point a job descriptor at that function:
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+  ../../apps/docs/examples/jobs/send-receipt.job.ts
 </include>
 
-This includes the canonical optional schedule. You can omit `schedule` for a manual-only job. With
-the example's static input and local idempotency, scheduled attempts share one instance during the
-24-hour window; read [Schedules](/docs/jobs/schedules) before changing recurrence.
+The job owns retry, timeout, concurrency, scheduling, and admission idempotency policy. The function owns
+validation and business side effects. Keep the job ID stable while queued inputs can still exist.
 
-Add the producer as `src/receipts/functions/queue-receipt.function.ts`:
+## Add the producer
+
+Declare the job under `dependencies.jobs`, await admission, and return only the acceptance data your caller
+needs:
 
 <include cwd lang="ts" meta='title="src/receipts/functions/queue-receipt.function.ts"'>
-  ../../examples/commerce/tests/fixtures/queue-receipt.function.ts
+  ../../apps/docs/examples/jobs/queue-receipt.function.ts
 </include>
 
-The domain needs a service. Commerce already has this one:
+Expose this producer through the Receipts service when routes or other domains need it. Keep the worker
+target private when nothing else calls it directly.
 
-<include cwd lang="ts" meta='title="src/receipts/service.ts"'>
-  ../../examples/commerce/src/receipts/service.ts
+## Bind and verify the profile
+
+The example selects job profile `queue`. Configure a compatible adapter at `defineApp({ job: { queue: … } })`,
+or change the descriptor and `defaults.job` together. Binding connection names are private to that adapter;
+they do not become handler-visible environment fields.
+
+No `RELKIT_ENV` value installs a hidden queue. A full `dev`, build, or deployment run must resolve the
+selected integration. The bundled harness below remains credential-free and is the fastest proof of worker
+behavior.
+
+## Test admission and execution
+
+The repository harness enqueues, inspects, drains, restarts, and advances time without sleeping:
+
+<include cwd lang="ts" meta='title="packages/testing/jobs.test.ts"'>
+  ../../packages/testing/jobs.test.ts
 </include>
 
-Import `queueReceipt` from `@app/receipts/functions/queue-receipt.function.js` and add it to the service's
-`functions` map. Keep existing public operations. Exposing `sendReceipt` is optional if only the same-domain
-job uses it; exposing `queueReceipt` lets routes and other domains request work through the owner.
-There is no `jobs` service member map. See [Service](/docs/service/define).
-
-## Test admission, execution, and restart
-
-Add `tests/jobs.test.ts` using the executable commerce test. Change its `queueReceipt` import from the
-test fixture path to `@app/receipts/functions/queue-receipt.function.js` in your app:
-
-<include cwd lang="ts" meta='title="tests/jobs.test.ts"'>
-  ../../examples/commerce/tests/jobs.test.ts
-</include>
-
-The generic harness target type requires a type-only cast for this dependency-bearing descriptor; the
-explicit bucket client supplies the dependency at runtime. The non-null assertions read optional fields
-that this particular job defines. Copy the job's policy explicitly: `createTestJob` takes a target and
-options, not the whole descriptor, and does not start its schedules.
-
-From your application's root:
+Run the smallest checks from your application root:
 
 ```sh
-bun test tests/jobs.test.ts
+bun test
 bun run check
 bun run typecheck
 ```
 
-The test asserts acceptance with no stored file, drains the worker, checks the receipt, restarts the
-local queue, and proves that the same key reuses the completed instance. It closes both fakes afterward.
-This proves the local provider contract, not production SQS deduplication.
+Assert acceptance before draining, then assert the eventual side effect or result. Add restart and
+redelivery cases for non-repeatable work. Passing the harness does not prove a production integration's
+deduplication, dead-letter, or schedule guarantees; run that integration's contract tests separately.
 
-## Inspect an interactive run
-
-Start the app with local providers:
-
-```sh
-RELKIT_ENV=test bun run dev
-```
-
-Open the Inspector at the URL printed by the development command, normally `http://localhost:3210`.
-Find the public `receipts.queue-receipt` function and choose **Invoke locally** with:
-
-```json
-{ "orderId": "order-1", "receiptKey": "receipts/order-1.json" }
-```
-
-Expect `accepted: true` and an `instanceId`, not a `receiptId`. The running job worker processes accepted
-work independently. Inspect `receipts.send-job` in Jobs and `receipts/order-1.json` in the Assets bucket;
-the stored JSON should contain `orderId: "order-1"`. Calling `sendReceipt` directly only tests the function,
-not queue delivery.
-
-Run the producer again with the same input during the retention window: the local queue should reuse
-the instance. Use a new order ID **and** a new receipt key to demonstrate distinct work without overwriting
-the previous receipt. For failure cases, continue with [Retries and delivery](/docs/jobs/retries); for
-HTTP admission, target the public producer from an [HTTP route](/docs/http/define).
+Continue with [Retries and delivery](/docs/jobs/retries), [Idempotency](/docs/jobs/idempotency), and
+[Schedules](/docs/jobs/schedules).
 
 <include cwd>content/generated/related/jobs-first-job.mdx</include>

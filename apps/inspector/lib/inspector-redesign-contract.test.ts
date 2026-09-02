@@ -37,4 +37,21 @@ describe("inspector redesign contracts", () => {
     expect(trace).toContain("Attributes & logs");
     expect(model).toContain('return "[redacted]"');
   });
+
+  test("renders provider topology and complete local observability status", async () => {
+    const [provider, runtime, cohort, signals] = await Promise.all([
+      app("provider-detail.tsx"),
+      app("runtime-status.tsx"),
+      app("activation-cohort.tsx"),
+      app("signals-client.tsx"),
+    ]);
+    expect(provider).toContain("BINDING TOPOLOGY");
+    expect(provider).toContain("Package");
+    expect(provider).toContain("LOCAL LIFECYCLE");
+    expect(provider).not.toContain("node.configuration");
+    expect(runtime).toContain("COMPLETE LOCAL EVIDENCE");
+    expect(runtime).toContain("External exporters");
+    expect(cohort).toContain('role="alert"');
+    expect(signals).toContain("external sampling happens afterward");
+  });
 });

@@ -21,11 +21,6 @@ function flushTelemetry() {
   return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
 }
 
-function flushSentry() {
-  const flush = globalThis["__relkit_flush_sentry"];
-  return typeof flush === "function" ? Promise.resolve(flush()) : Promise.resolve();
-}
-
 async function shutdown() {
   if (stopping) return;
   stopping = true;
@@ -35,7 +30,6 @@ async function shutdown() {
   const telemetryTimeoutMs = timeoutFrom(process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
   await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
   await bounded(flushTelemetry(), telemetryTimeoutMs);
-  await bounded(flushSentry(), telemetryTimeoutMs);
   await bounded(providerStartup, drainTimeoutMs);
   if (providers !== undefined) await providers.dispose().catch((error) => recordRuntimeFailure("runtime.provider", "Provider cleanup failed", error, "direct"));
   if (databaseStartup !== undefined) await bounded(

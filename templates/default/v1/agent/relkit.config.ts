@@ -1,23 +1,25 @@
-import { aiSdk, defineConfig, external } from "@relkit/app/config";
+import { aiSdk } from "@relkit/ai-sdk";
+import { defineApp, env as binding } from "@relkit/app/config";
 import env from "@app/platform/env.js";
+// relkit:create:deployment-imports
 
-export default defineConfig({
+export default defineApp({
   env,
-  models: {
-    default: external(
-      aiSdk({
-        defaultProvider: "openai",
-        defaultModel: "gpt-5-mini",
-        openai: { apiKey: env.OPENAI_API_KEY },
-        anthropic: {
-          defaultModel: "claude-sonnet-4-5",
-          apiKey: env.ANTHROPIC_API_KEY,
-        },
-      }),
-    ),
+  model: {
+    openai: aiSdk({
+      provider: "openai",
+      defaultModel: "gpt-5-mini",
+      apiKey: binding.secret("OPENAI_API_KEY"),
+    }),
+    anthropic: aiSdk({
+      provider: "anthropic",
+      defaultModel: "claude-sonnet-4-5",
+      apiKey: binding.secret("ANTHROPIC_API_KEY"),
+    }),
   },
-  telemetry: { bodyCapture: { mode: "off" } },
+  defaults: { model: "openai" },
+  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
   server: { port: 3000, maxBodyBytes: 1_048_576 },
   inspector: { port: 3210 },
-  deployment: { target: "aws", adapter: "pulumi" },
+  // relkit:create:deployment
 });

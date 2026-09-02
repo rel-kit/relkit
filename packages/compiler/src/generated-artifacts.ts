@@ -5,13 +5,19 @@ import {
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
 } from "@relkit/contracts";
-import type { Diagnostic } from "@relkit/diagnostics";
-import type { GeneratedOutputs, NormalizedGraph } from "./normalize-types.js";
+import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
+import type { GeneratedOutputs } from "./normalize-types.js";
 
 export const GENERATED_ARTIFACT_FILES = Object.freeze({
   graph: "application.graph.json",
   manifest: "runtime.manifest.ts",
+  runtimeActivation: "runtime-activation.json",
+  runtimeIntegrations: RUNTIME_INTEGRATION_PLAN_FILE,
+  runtimeIntegrationImports: "runtime-integrations.ts",
+  localServices: LOCAL_SERVICE_PLAN_FILE,
   diagnostics: "diagnostics.json",
   contract: "contract.ts",
   clientContract: "client-contract.json",
@@ -20,9 +26,27 @@ export const GENERATED_ARTIFACT_FILES = Object.freeze({
 export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
   graph: GRAPH_VERSION,
   manifest: MANIFEST_VERSION,
+  runtimeActivation: GENERATOR_VERSION,
+  runtimeIntegrations: RUNTIME_INTEGRATION_PLAN_VERSION,
+  runtimeIntegrationImports: GENERATOR_VERSION,
+  localServices: LOCAL_SERVICE_PLAN_VERSION,
   diagnostics: CONTRACT_VERSION,
+  contract: CONTRACT_VERSION,
+  clientContract: CONTRACT_VERSION,
   generator: GENERATOR_VERSION,
 } as const);
+
+const GENERATED_ARTIFACT_KINDS = [
+  "graph",
+  "manifest",
+  "runtimeActivation",
+  "runtimeIntegrations",
+  "runtimeIntegrationImports",
+  "localServices",
+  "diagnostics",
+  "contract",
+  "clientContract",
+] as const;
 
 export const GENERATED_EXTENSION_VERSIONS = Object.freeze({
   openapi: Object.freeze({ fileName: "openapi.json", version: 1 }),
@@ -62,23 +86,13 @@ export interface GeneratedArtifactsWriteReport {
   readonly changed: boolean;
 }
 
-/** Builds the three compiler-owned artifacts without adding time or process metadata. */
+/** Builds compiler-owned artifacts without adding time or process metadata. */
 export function generatedArtifacts(outputs: GeneratedOutputs): readonly GeneratedArtifact[] {
-  return Object.freeze([
-    artifact(GENERATED_ARTIFACT_FILES.graph, outputs.graph, GENERATED_ARTIFACT_VERSIONS.graph),
-    artifact(
-      GENERATED_ARTIFACT_FILES.manifest,
-      outputs.manifest,
-      GENERATED_ARTIFACT_VERSIONS.manifest,
+  return Object.freeze(
+    GENERATED_ARTIFACT_KINDS.map((kind) =>
+      artifact(GENERATED_ARTIFACT_FILES[kind], outputs[kind], GENERATED_ARTIFACT_VERSIONS[kind]),
     ),
-    artifact(
-      GENERATED_ARTIFACT_FILES.diagnostics,
-      outputs.diagnostics,
-      GENERATED_ARTIFACT_VERSIONS.diagnostics,
-    ),
-    artifact(GENERATED_ARTIFACT_FILES.contract, outputs.contract, CONTRACT_VERSION),
-    artifact(GENERATED_ARTIFACT_FILES.clientContract, outputs.clientContract, CONTRACT_VERSION),
-  ]);
+  );
 }
 
 /** Creates the future OpenAPI/client/deployment extension seam with its pinned version. */
@@ -139,7 +153,7 @@ export async function writeGeneratedArtifacts(
         if (extensionKinds.has(kind)) return undefined;
         const content = outputs[kind];
         const filePath = join(options.directory, GENERATED_EXTENSION_VERSIONS[kind].fileName);
-        if (content === "" && !(await fileExists(filePath))) return undefined;
+        if (content === "" && !(await Bun.file(filePath).exists())) return undefined;
         return createGeneratedOutputExtension(kind, content);
       }),
     )
@@ -168,7 +182,7 @@ function extensionArtifact(extension: GeneratedOutputExtension): GeneratedArtifa
   const expected = GENERATED_EXTENSION_VERSIONS[extension.kind];
   if (extension.version !== expected.version) {
     throw new TypeError(
-      `Generated ${extension.kind} version ${extension.version} is unsupported; expected ${expected.version}.`,
+      `Generated ${extension.kind} version ${extension.version} is unsupported; expected ${expected.version}. Regenerate with \`relkit check\`.`,
     );
   }
   if (typeof extension.content !== "string") {
@@ -179,20 +193,4 @@ function extensionArtifact(extension: GeneratedOutputExtension): GeneratedArtifa
 
 function isMissingFile(error: unknown): boolean {
   return error instanceof Error && "code" in error && error.code === "ENOENT";
-}
-
-async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    await readFile(filePath);
-    return true;
-  } catch (error) {
-    if (isMissingFile(error)) return false;
-    throw error;
-  }
-}
-
-export interface GeneratedOutputExtensionContext {
-  readonly graph: NormalizedGraph;
-  readonly graphHash: string;
-  readonly diagnostics: readonly Diagnostic[];
 }

@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { workspacePackageDirectories } from "./workspace-packages.js";
 
 type ChangesetStatus = {
   changesets: { summary: string }[];
@@ -67,19 +68,21 @@ export function renderActionChangelog(name: string, version: string): string {
 
 async function writeActionChangelogs(status: ChangesetStatus): Promise<void> {
   if (process.env.GITHUB_ACTIONS !== "true") return;
+  const directories = new Map<string, string>();
+  for (const directory of workspacePackageDirectories(root)) {
+    const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8")) as {
+      name: string;
+    };
+    directories.set(manifest.name, directory);
+  }
   await Promise.all(
     status.releases.flatMap((release) => {
       if (!release.newVersion) return [];
-      const directory =
-        release.name === "create-relkit"
-          ? release.name
-          : /^@relkit\/[a-z0-9-]+$/.test(release.name)
-            ? release.name.slice("@relkit/".length)
-            : undefined;
+      const directory = directories.get(release.name);
       if (!directory) throw new Error(`Unsupported release package: ${release.name}`);
       return [
         writeFile(
-          join(root, "packages", directory, "CHANGELOG.md"),
+          join(directory, "CHANGELOG.md"),
           renderActionChangelog(release.name, release.newVersion),
         ),
       ];

@@ -24,12 +24,22 @@ Type fixtures SHALL assert the complete public inference boundary and expected f
 
 ### Requirement: Honest reusable provider contracts
 
-Every local/cloud implementation of buckets, cache, jobs, and events SHALL run the shared logical contract for its declared capabilities, and no unsupported behavior SHALL be silently skipped.
+Every standard bucket/cache implementation SHALL run shared logical contracts against supported protocol variants, and unsupported behavior SHALL be explicitly represented. S3 contracts SHALL cover AWS-style, R2-style, and MinIO-style endpoints; Redis contracts SHALL cover Redis/Valkey-compatible endpoints with TLS/authentication where applicable.
 
 #### Scenario: Provider capability differs
 
 - **WHEN** two providers differ on signed URLs, ordering, durability, or distributed coordination
 - **THEN** each suite asserts the declared capability and common behavior while explicitly testing the unsupported result
+
+#### Scenario: Bucket protocol matrix runs
+
+- **WHEN** shared bucket tests run against AWS-style, R2-style, and MinIO-style endpoints
+- **THEN** credentials, metadata, listing, cancellation, and signed URLs satisfy or explicitly reject the same declared contract
+
+#### Scenario: Cache protocol matrix runs
+
+- **WHEN** shared cache tests run against Redis, Valkey, and Upstash-compatible URLs
+- **THEN** TLS/authentication, TTL, JSON values, deletion, and numeric increment satisfy the same declared contract
 
 ### Requirement: Failure injection and recovery proof
 
@@ -85,39 +95,6 @@ Searchable getting-started, feature, CLI, testing, deployment, architecture, mig
 - **WHEN** a reviewer uses only the documentation to create, test, inspect, use the API reference, build, preview, and clean up an application
 - **THEN** each command and documented code example succeeds as written or the release gate is rejected
 
-### Requirement: Phases map one-to-one to review gates
-
-Implementation SHALL proceed through phases 0–16 in dependency order, and each phase SHALL be approved only by reproducing the corresponding gate 0–16 commands/evidence and checking its explicit rejection conditions from a clean checkout.
-
-#### Scenario: Later phase requests approval early
-
-- **WHEN** a phase's prerequisite gate lacks reproducible passing evidence
-- **THEN** work that depends on that phase is not approved or merged
-
-#### Scenario: Phase review packet is complete
-
-- **WHEN** a phase is submitted for review
-- **THEN** it records phase/goal, files/packages, public inputs/outputs, failure behavior, generated changes, commands/results, limitations, and non-blocking follow-ups
-
-#### Scenario: Fresh-task iterator reaches a phase boundary
-
-- **WHEN** the last implementation unit in a phase finishes on the shared change branch
-- **THEN** a fresh read-only gate task reviews a committed candidate from a clean worktree, records base/candidate identities and exact results, and blocks the next phase until the prerequisite and evidence are merged
-
-### Requirement: Fresh implementation tasks have durable handoffs
-
-Each OpenSpec checkbox SHALL run as one bounded fresh Luna (max) task and SHALL use repository change notes, exact task/spec references, current files/diff, decisions, blockers, and checks as its durable input instead of relying on prior chat context.
-
-#### Scenario: One task hands off to the next
-
-- **WHEN** a verified checkbox completes and another task in the same approved phase is pending
-- **THEN** progress records the fresh task identity, files, checks, decisions, blockers, and exact next checkbox before a new same-directory task is dispatched
-
-#### Scenario: Git authority or prerequisite merge is missing
-
-- **WHEN** a clean phase review or next phase would require a commit, pull request, or merge that has not been explicitly authorized or completed
-- **THEN** the iterator records the concrete blocker and stops without approving the gate or weakening the merged-prerequisite rule
-
 ### Requirement: Final cross-role release approval
 
 The final gate SHALL include clean install/verify, browser, container, packed generator, deployment, secret/declaration/scope scans, artifact checksums, release notes, performance results, AWS destroy evidence, and recorded approval by compiler/graph, runtime/reliability, developer-experience, observability/security, inspector/frontend, cloud/deployment, and release owners.
@@ -135,15 +112,6 @@ The released graph, manifest, runtime APIs, inspector, generated project, OpenAP
 
 - **WHEN** an acceptance test detects that a displayed graph contract differs from active runtime or deployment behavior
 - **THEN** Gate 16 fails until the inconsistency is fixed and regression evidence is added
-
-### Requirement: Scope integrity remains enforced at release
-
-No plugin/marketplace, alternate infrastructure engine, Rust component, separate application subscription primitive, or persistence/identity/workflow/knowledge-store graph concept SHALL be present in the POC release.
-
-#### Scenario: Release artifacts are scanned
-
-- **WHEN** source, public declarations, generated project, graph node kinds, inspector navigation, docs, and package list are inspected
-- **THEN** only approved v3 concepts are present
 
 ### Requirement: Developer-first contract matrix
 
@@ -206,16 +174,56 @@ The repository SHALL provide type, unit, compiler, runtime, HTTP, template, docu
 - **WHEN** OpenAI and Anthropic configuration, default resolution, exact model selection, tool calls, approvals, invalid output, cancellation, and limits are tested
 - **THEN** official AI SDK test doubles provide deterministic evidence with no network or resolved secret in any artifact
 
-### Requirement: Generated and migrated applications prove the new workflow
+### Requirement: Domain-first services have layered release evidence
 
-Generated minimal, API, and agent projects plus the canonical commerce example SHALL pass their documented check/test/build paths, and migration evidence SHALL cover every removed public pattern.
+Release verification SHALL cover service identity and typing, domain discovery and boundaries, graph/manifest contracts, Drizzle and Better Auth lifecycle, route protection order, Inspector presentation, generated templates, canonical examples, documentation, and migration diagnostics without cloud credentials or paid calls.
 
-#### Scenario: Templates are packed and generated
+#### Scenario: Breaking release is verified
 
-- **WHEN** packed CLI artifacts generate all templates in isolated temporary roots
-- **THEN** the minimal project stays minimal, the API project proves service/event fan-out, and the agent project proves `asTool` and both model defaults using only packed public artifacts
+- **WHEN** focused and full repository verification run against migrated source and legacy fixtures
+- **THEN** new domain applications pass, legacy patterns fail with actionable diagnostics, runtime resources drain safely, and generated artifacts contain no live values or secrets
 
-#### Scenario: Legacy authoring is scanned
+### Requirement: Event-function authoring has layered acceptance evidence
 
-- **WHEN** migration verification scans public examples, templates, and documentation
-- **THEN** no active example uses `context.functions`, required IDs on eligible source-scoped descriptors, `modelProfile`, the custom `ModelProvider`, or the handwritten OpenAI protocol adapter
+Acceptance SHALL verify event registry inference, narrowed publication clients, event-only restrictions, authored-function graph lowering, provider fan-out/recovery, Inspector projections, exact deployment permissions, and clean generated projects without legacy event APIs.
+
+#### Scenario: Breaking event API is accepted
+
+- **WHEN** repository type, compiler, contract, runtime, Inspector, deployment, example, generator, and documentation cohorts run
+- **THEN** valid event functions pass, all forbidden invocation/target paths fail, and source/export scans find no listener or selector compatibility surface
+
+### Requirement: Provider architecture has layered cohort evidence
+
+Acceptance SHALL combine type tests, protocol and normalization unit tests, compiler determinism and stale-artifact tests, runtime lifecycle and explicit-replacement tests, generated-project smoke tests, integration package packing, Docker integration tests, deployment plan/mocks, Inspector tests, and full repository verification.
+
+#### Scenario: Contract cohort is partially stale
+
+- **WHEN** graph, manifest, runtime-integration plan, local-service plan, deployment plan, or override generation does not match the expected fingerprint
+- **THEN** the relevant build, runtime, supervisor, Inspector, and deployment tests prove rejection before activation or mutation
+
+### Requirement: Local service isolation has executable evidence
+
+Tests SHALL cover separate profiles, required-only startup, all-binding startup, `--local=off`, pinned recipe health, random loopback ports, hot-reload reuse, changed-plan reconciliation, detached adoption, stop/reset protection, worktree isolation, stale-lease recovery, secure state, and secret-free output.
+
+#### Scenario: Docker integration suite is opted in
+
+- **WHEN** `RELKIT_TEST_DOCKER=1` enables Redis and MinIO tests
+- **THEN** real containers prove health, persistence, isolated outputs, cleanup, and bounded failure behavior
+
+### Requirement: Telemetry and documentation are release evidence
+
+Acceptance SHALL prove complete redacted Inspector persistence despite export sampling, independent Sentry/OTLP failure behavior, CloudWatch host routing, executable examples, generated API/CLI reference freshness, search/link correctness, docs build, landing accessibility/responsiveness, and visual inspection of changed product surfaces.
+
+#### Scenario: External exporter drops a trace
+
+- **WHEN** export sampling or failure prevents remote delivery
+- **THEN** tests still find the complete redacted local timeline and safe exporter diagnostic in Inspector
+
+### Requirement: Cloud acceptance remains separately authorized
+
+Local implementation gates SHALL use pure plan tests, Pulumi mocks, generated-program tests, and containers; paid or mutating cloud acceptance SHALL remain a separately authorized release gate and completion of this change SHALL NOT constitute final cloud release approval.
+
+#### Scenario: Implementation verification runs without cloud authorization
+
+- **WHEN** the change reaches local completion
+- **THEN** no paid cloud resource is created and required release-gate cloud evidence remains explicitly outstanding

@@ -157,7 +157,7 @@ function createQueue(
     enqueue,
     acquire,
     transition,
-    get: (id) => entries.get(id),
+    get: (id: string) => entries.get(id),
   });
 }
 
@@ -169,7 +169,7 @@ function field(xml: string, name: string): string | undefined {
 function decodeXml(value: string): string {
   return value
     .replaceAll("&quot;", '"')
-    .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
 }

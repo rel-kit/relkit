@@ -31,7 +31,7 @@ or inherit its retry policy.
 Here is the Receipts job in the commerce example:
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts
+  ../../apps/docs/examples/jobs/send-receipt.job.ts
 </include>
 
 Despite its name, this example's target stores a receipt JSON object; it does not send email. Its fixed
@@ -74,8 +74,7 @@ like any other function. Enqueue small identifiers and facts, not those clients 
 - Make repeated requests safe: [Idempotency](/docs/jobs/idempotency).
 - Run calendar-driven work: [Schedules](/docs/jobs/schedules).
 
-The [Jobs API reference](/docs/api/jobs) lists the exact types. These guides distinguish runtime policy
-from provider guarantees: local durable state and SQS do not currently have identical deduplication or
-inspection behavior.
+The [Jobs API reference](/docs/api/jobs) lists the exact types. These guides distinguish descriptor and
+harness policy from the selected production integration's deduplication and inspection guarantees.
 
 <include cwd>content/generated/related/jobs-index.mdx</include>

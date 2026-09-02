@@ -2,9 +2,9 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createApp } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 let root = "";
 
@@ -23,9 +23,7 @@ describe("static files", () => {
     const app = createApp({
       plan: routePlan(),
       manifest: {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: "sha256:static",
+        ...runtimeCohort("sha256:static"),
         functions: {},
         middleware: {},
         requestTransforms: {},

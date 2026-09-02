@@ -1,6 +1,6 @@
 {
-  "contractVersion": 2,
-  "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
+  "contractVersion": 3,
+  "graphHash": "sha256:faeb79e4cfa069ecb2e063b4da7e4a4a4392238a139d9ce93a031a9016d573cb",
   "application": {
     "id": "full-app",
     "image": {
@@ -19,45 +19,157 @@
       "SERVICE_PORT"
     ]
   },
-  "providerBindings": [
+  "engine": {
+    "role": "engine",
+    "integrationId": "pulumi",
+    "protocolVersion": 1,
+    "configuration": {}
+  },
+  "host": {
+    "role": "host",
+    "integrationId": "aws",
+    "protocolVersion": 1,
+    "configuration": {}
+  },
+  "connectedBindings": [
     {
-      "id": "provider.buckets.default",
-      "capability": "buckets",
+      "kind": "connected-binding",
+      "bindingId": "provider.bucket.default",
+      "capability": "bucket",
       "profile": "default",
-      "adapter": "s3",
-      "ownership": "managed",
-      "configuration": {
-        "bucketName": "assets",
-        "endpoint": "https://s3.us-east-1.amazonaws.com",
-        "region": "us-east-1"
+      "adapter": {
+        "integrationId": "s3",
+        "adapterId": "s3",
+        "protocolVersion": 1,
+        "behavior": {
+          "forcePathStyle": true,
+          "signedUrlTtlSeconds": 900
+        },
+        "connectionContract": {
+          "accessKeyId": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          },
+          "bucketName": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "endpoint": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "region": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": false
+          },
+          "secretAccessKey": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          },
+          "sessionToken": {
+            "authoredValue": "fallback",
+            "required": false,
+            "sensitive": true
+          }
+        },
+        "connection": {
+          "bucketName": "assets",
+          "endpoint": "https://s3.us-east-1.amazonaws.com",
+          "region": "us-east-1"
+        },
+        "features": [
+          "signedReadUrl",
+          "signedWriteUrl"
+        ]
       },
-      "environment": []
+      "namedValues": []
     },
     {
-      "id": "provider.events.default",
-      "capability": "events",
+      "kind": "connected-binding",
+      "bindingId": "provider.cache.default",
+      "capability": "cache",
       "profile": "default",
-      "adapter": "eventbridge",
-      "ownership": "managed",
-      "configuration": {
-        "busName": "events",
-        "region": "us-east-1"
+      "adapter": {
+        "integrationId": "redis",
+        "adapterId": "redis",
+        "protocolVersion": 1,
+        "behavior": {},
+        "connectionContract": {
+          "url": {
+            "authoredValue": "fallback",
+            "required": true,
+            "sensitive": true
+          }
+        },
+        "connection": {},
+        "features": [
+          "atomicIncrement"
+        ]
       },
-      "environment": []
+      "namedValues": [
+        {
+          "field": "url",
+          "name": "CACHE_URL",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      ]
     },
     {
-      "id": "provider.jobs.default",
-      "capability": "jobs",
-      "profile": "default",
-      "adapter": "sqs",
-      "ownership": "managed",
-      "configuration": {
-        "queueUrl": "https://sqs.us-east-1.amazonaws.com/1/jobs",
-        "region": "us-east-1"
+      "kind": "connected-binding",
+      "bindingId": "provider.model.openai",
+      "capability": "model",
+      "profile": "openai",
+      "adapter": {
+        "integrationId": "ai-sdk",
+        "adapterId": "ai-sdk",
+        "protocolVersion": 1,
+        "behavior": {
+          "defaultModel": "gpt-5-mini",
+          "provider": "openai"
+        },
+        "connectionContract": {
+          "apiKey": {
+            "authoredValue": "fixed",
+            "required": true,
+            "sensitive": true
+          },
+          "baseURL": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "organization": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          },
+          "project": {
+            "authoredValue": "fixed",
+            "required": false,
+            "sensitive": false
+          }
+        },
+        "connection": {},
+        "features": []
       },
-      "environment": []
+      "namedValues": [
+        {
+          "field": "apiKey",
+          "name": "MODEL_API_KEY",
+          "sensitive": true,
+          "type": "secret-string"
+        }
+      ]
     }
   ],
+  "infrastructureOperations": [],
+  "accessOperations": [],
   "http": {
     "logicalName": "full-app-http-public",
     "port": 8080,
@@ -80,250 +192,16 @@
       "SERVICE_PORT"
     ]
   },
-  "jobs": [
-    {
-      "id": "receipts.send-job",
-      "logicalName": "full-app-job-receipts-send-job",
-      "bindingId": "provider.jobs.default",
-      "profile": "default",
-      "configurationNames": [],
-      "capabilities": [
-        "jobs"
-      ],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
-        "managed-by": "relkit"
-      },
-      "metadata": {
-        "iamCapabilities": [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:ChangeMessageVisibility",
-          "sqs:SendMessage"
-        ]
-      },
-      "targetFunctionId": "receipts.send",
-      "retry": {
-        "initialDelayMs": 1,
-        "jitter": "none",
-        "maxAttempts": 2,
-        "maxDelayMs": 5,
-        "multiplier": 2
-      },
-      "idempotency": {
-        "key": "orderId",
-        "retentionMs": 1000
-      }
-    }
-  ],
-  "schedules": [
-    {
-      "id": "receipts.reconcile",
-      "logicalName": "full-app-schedule-receipts-reconcile",
-      "bindingId": "provider.jobs.default",
-      "profile": "default",
-      "configurationNames": [],
-      "capabilities": [
-        "jobs"
-      ],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
-        "managed-by": "relkit"
-      },
-      "jobId": "receipts.send-job",
-      "schedule": {
-        "cron": "0 * * * *",
-        "id": "receipts.reconcile",
-        "input": {
-          "orderId": "scheduled"
-        },
-        "overlap": "skip",
-        "timezone": "UTC"
-      }
-    }
-  ],
-  "events": [
-    {
-      "id": "orders.created",
-      "logicalName": "full-app-event-orders-created",
-      "bindingId": "provider.events.default",
-      "profile": "default",
-      "configurationNames": [],
-      "capabilities": [
-        "events"
-      ],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
-        "managed-by": "relkit"
-      },
-      "metadata": {
-        "iamCapabilities": [
-          "events:PutEvents"
-        ]
-      },
-      "version": 1,
-      "input": {
-        "properties": {
-          "orderId": {
-            "type": "string"
-          },
-          "sku": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "orderId",
-          "sku"
-        ],
-        "type": "object"
-      }
-    }
-  ],
-  "eventTriggers": [
-    {
-      "id": "relkit.event.receipts.listener.trigger",
-      "logicalName": "full-app-event-trigger-relkit-event-receipts-listener-trigger",
-      "bindingId": "provider.events.default",
-      "profile": "default",
-      "configurationNames": [],
-      "capabilities": [
-        "events"
-      ],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
-        "managed-by": "relkit"
-      },
-      "metadata": {
-        "iamCapabilities": [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:ChangeMessageVisibility"
-        ]
-      },
-      "targetFunctionId": "receipts.listener",
-      "eventId": "orders.created",
-      "eventVersion": 1,
-      "delivery": "durable",
-      "retry": {
-        "initialDelayMs": 1,
-        "jitter": "none",
-        "maxAttempts": 2,
-        "maxDelayMs": 5,
-        "multiplier": 2
-      }
-    }
-  ],
-  "buckets": [
-    {
-      "id": "assets.objects",
-      "logicalName": "full-app-bucket-assets-objects",
-      "bindingId": "provider.buckets.default",
-      "profile": "default",
-      "configurationNames": [],
-      "capabilities": [
-        "buckets"
-      ],
-      "tags": {
-        "app": "full-app",
-        "graphHash": "sha256:a332fa52d414abe4f8628d998fa6759c72af59accedee5f50f15b827e423f17e",
-        "managed-by": "relkit"
-      },
-      "visibility": "private",
-      "maxObjectBytes": 10000,
-      "allowedContentTypes": [
-        "application/json"
-      ]
-    }
-  ],
+  "jobs": [],
+  "schedules": [],
+  "events": [],
+  "eventTriggers": [],
+  "buckets": [],
   "caches": [],
   "iam": {
     "serviceRole": {
-      "statements": [
-        {
-          "capability": "events",
-          "actions": [
-            "events:PutEvents"
-          ],
-          "resources": [
-            "full-app-event-orders-created"
-          ]
-        },
-        {
-          "capability": "jobs",
-          "actions": [
-            "sqs:ReceiveMessage",
-            "sqs:DeleteMessage",
-            "sqs:ChangeMessageVisibility"
-          ],
-          "resources": [
-            "full-app-job-receipts-send-job"
-          ]
-        },
-        {
-          "capability": "jobs",
-          "actions": [
-            "sqs:ReceiveMessage",
-            "sqs:DeleteMessage",
-            "sqs:ChangeMessageVisibility",
-            "sqs:GetQueueAttributes"
-          ],
-          "resources": [
-            "full-app-event-trigger-relkit-event-receipts-listener-trigger"
-          ]
-        },
-        {
-          "capability": "jobs",
-          "actions": [
-            "sqs:SendMessage"
-          ],
-          "resources": [
-            "full-app-job-receipts-send-job"
-          ]
-        }
-      ]
+      "statements": []
     },
-    "perFunction": [
-      {
-        "functionId": "orders.create",
-        "capability": "events",
-        "resourceId": "orders.created",
-        "actions": [
-          "events:PutEvents"
-        ]
-      },
-      {
-        "functionId": "receipts.listener",
-        "capability": "jobs",
-        "resourceId": "receipts.send-job",
-        "actions": [
-          "sqs:SendMessage"
-        ]
-      },
-      {
-        "functionId": "receipts.listener",
-        "capability": "jobs",
-        "resourceId": "relkit.event.receipts.listener.trigger",
-        "actions": [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:ChangeMessageVisibility",
-          "sqs:GetQueueAttributes"
-        ]
-      },
-      {
-        "functionId": "receipts.send",
-        "capability": "jobs",
-        "resourceId": "receipts.send-job",
-        "actions": [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:ChangeMessageVisibility"
-        ]
-      }
-    ]
+    "perFunction": []
   }
 }

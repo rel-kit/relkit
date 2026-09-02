@@ -9,21 +9,22 @@ Create the two files below, or update them if they already exist. Run commands f
 
 ## Configure caching
 
-If your app already has a `default` cache profile, keep it and skip this step.
-
-In `src/platform/env.ts`, add this field inside `defineEnv()`. The snippet uses `env as envFactory` imported from `@relkit/app/config`:
-
-<include cwd lang="ts" meta='title="src/platform/env.ts — field to add"'>
-  ../../examples/commerce/src/platform/env.ts#cache-environment
-</include>
-
-In `relkit.config.ts`, import `managed` and `redis` from `@relkit/app/config`. Add this entry inside `defineConfig()`, using your existing `env` import:
+Install `@relkit/redis` and `@relkit/docker`, then import `redis`, `docker`, and `env as binding`
+from their standalone packages and `@relkit/app/config`. Add this singular `cache` entry inside
+`defineApp()`:
 
 <include cwd lang="ts" meta='title="relkit.config.ts — cache configuration"'>
   ../../examples/commerce/relkit.config.ts#cache-profile
 </include>
 
-The configuration names a Redis connection. For this tutorial, `RELKIT_ENV=test` uses a local cache instead, so Redis does not need to be running.
+Profile `requests` is a connected Redis binding with a Docker overlay. Development starts its pinned Redis
+recipe and supplies the binding-local URL; release builds resolve `REQUESTS_REDIS_URL` instead. Profile
+`timeline` is a second physical Redis/Valkey server owned by AWS in deployment and also has a local recipe.
+The two profiles do not share state.
+
+`defaults.cache` chooses `requests` for unqualified descriptors. `orders.prices` selects it explicitly.
+`orders.rate-limits` selects `timeline`; the route's `x-customer-email` projection derives a counter key
+inside that cache and does not choose the server.
 
 ## Define the prices cache
 
@@ -50,8 +51,11 @@ bun run check
 ```
 
 ```sh
-RELKIT_ENV=test bun run dev
+bun run dev
 ```
+
+Docker is contacted only after the checked plan exists. To prove there is no hidden fallback, use
+`bun run dev --local=off`; startup then requires the named connected/infrastructure values.
 
 Open your Inspector, normally at `http://localhost:3210`. Select **Functions**, open `orders.get-price`, enter `book-demo` in the **sku** field, and click **Invoke locally**.
 
@@ -69,4 +73,7 @@ Open **Cache**, select `orders.prices`, and find the key containing `book-demo`.
 
 Once the minute has passed, invoke `orders.get-price` with the same SKU. A new `price.loaded` log confirms the price was loaded again. Nothing refreshes in the background: the next request does the work.
 
-In your app, replace the fixed price with a database lookup and [invalidate the cached price after updates](/docs/caching/expiration). Before deploying, [configure a shared cache provider](/docs/fundamentals/providers).
+Tests must pass explicit replacements for both physical profiles; no test environment selects fakes for
+you. In your app, replace the fixed price with a database lookup and
+[invalidate the cached price after updates](/docs/caching/expiration). Before deploying, review which
+profiles are connected and which are infrastructure-owned in [Integrations](/docs/integrations).

@@ -54,6 +54,7 @@ Run app, inspector, OpenAPI, and Scalar
 | --project-root   | string  | Application directory (defaults to cwd) |
 | --port           | integer | Application port                        |
 | --inspector-port | integer | Inspector port                          |
+| --local          | on, off | Start required local services           |
 
 #### Examples
 
@@ -219,6 +220,64 @@ Render or write a safe .env example
 ##### Examples
 
 `relkit env example` — Render or write a safe .env example
+
+### `relkit local <command>`
+
+Manage project-scoped local services
+
+#### Examples
+
+`relkit local` — Manage project-scoped local services
+
+#### `relkit local up`
+
+Start all declared local services
+
+| Option         | Value   | Description                             |
+| -------------- | ------- | --------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd) |
+| --detach       | boolean | Keep services running after exit        |
+
+##### Examples
+
+`relkit local up` — Start all declared local services
+
+#### `relkit local status`
+
+Show local service and lease status
+
+| Option         | Value  | Description                             |
+| -------------- | ------ | --------------------------------------- |
+| --project-root | string | Application directory (defaults to cwd) |
+
+##### Examples
+
+`relkit local status` — Show local service and lease status
+
+#### `relkit local stop`
+
+Stop project local containers and preserve volumes
+
+| Option         | Value  | Description                             |
+| -------------- | ------ | --------------------------------------- |
+| --project-root | string | Application directory (defaults to cwd) |
+
+##### Examples
+
+`relkit local stop` — Stop project local containers and preserve volumes
+
+#### `relkit local reset`
+
+Remove project local containers, volumes, and state
+
+| Option         | Value   | Description                             |
+| -------------- | ------- | --------------------------------------- |
+| --project-root | string  | Application directory (defaults to cwd) |
+| --yes          | boolean | Confirm reset without prompting         |
+
+##### Examples
+
+`relkit local reset` — Remove project local containers, volumes, and state
 
 ### `relkit doctor`
 

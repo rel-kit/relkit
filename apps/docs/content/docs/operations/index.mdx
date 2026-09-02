@@ -1,0 +1,78 @@
+---
+title: Operations
+description: Observe, inspect, test, build, diagnose, and deploy the same checked application graph.
+---
+
+Operations begin with the checked application graph, not a second production configuration. Use local telemetry
+and the Inspector while developing, deterministic tests for behavior, a reproducible build before release, and
+deployment preview only when cloud infrastructure is intentionally configured.
+
+## Choose the operational task
+
+<Cards>
+  <Card
+    title="Observability"
+    description="Configure redaction, local evidence, sampling, Sentry, and OTLP."
+    href="/docs/operations/observability"
+  />
+  <Card
+    title="Inspector"
+    description="Follow requests through graph nodes, logs, traces, diagnostics, and API contracts."
+    href="/docs/operations/inspector"
+  />
+  <Card
+    title="Testing"
+    description="Test functions and the in-process application with explicit provider fakes."
+    href="/docs/operations/testing"
+  />
+  <Card
+    title="Deployment"
+    description="Preview a checked Pulumi plan and apply it only with cloud authorization."
+    href="/docs/operations/deployment"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Use stable diagnostics to repair the owning source of truth."
+    href="/docs/operations/troubleshooting"
+  />
+  <Card
+    title="CLI reference"
+    description="Look up generated command syntax and options."
+    href="/docs/operations/cli-reference"
+  />
+</Cards>
+
+## Use the generated project commands
+
+The templates expose the normal application lifecycle as package scripts:
+
+<include cwd lang="json" meta='title="templates/default/v1/api/package.json"'>
+  ../../templates/default/v1/api/package.json
+</include>
+
+During development, run the narrowest check that proves the change. Before releasing an application, run the
+complete local sequence:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run typecheck
+bun run test
+bun run build
+bun run start
+```
+
+Building and starting do not create cloud resources. Deployment is a separate, explicit lifecycle.
+
+## Match the repository gate before pushing
+
+RELKIT contributors can run the same locally reproducible CI coverage before a push:
+
+```sh title="Terminal — relkit repository"
+bun run prepush
+```
+
+That command requires Docker and runs `verify`, container and local-service tests, deployment tests, Inspector
+browser checks, and end-to-end tests. The opt-in AWS integration job and GitHub-hosted dependency review remain
+CI-only because they require external credentials or platform context.
+
+<include cwd>content/generated/related/operations-index.mdx</include>

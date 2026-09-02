@@ -12,24 +12,24 @@ entry from being delivered more than once.
 The receipt job declares:
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts — idempotency"'>
-  ../../examples/commerce/src/receipts/jobs/send-receipt.job.ts#receipt-idempotency
+  ../../apps/docs/examples/jobs/send-receipt.job.ts#receipt-idempotency
 </include>
 
-For the local provider, `key` names a top-level input field. Its value must be a nonempty string; the
-provider trims it before comparison. It is not a dotted path, callback, or hash of the entire payload.
+`key` names a top-level input field. The deterministic test harness requires a nonempty string value and
+trims it before comparison. It is not a dotted path, callback, or hash of the entire payload.
 Use a stable business key such as an order ID only if one receipt per order is the intended operation.
 
 Different operations on the same order may need different keys. Do not use a random value on every retry
 if retries should refer to the same logical request. Conversely, do not reuse a constant key for work
 that should happen independently each period.
 
-## Understand the local retention window
+## Understand the harness retention window
 
-Within the configured queue and retention window, another enqueue with the same key reuses the earlier
+Within the test queue and retention window, another enqueue with the same key reuses the earlier
 instance and reports `duplicate: true`. The original input remains the work to execute; changing another
 field, such as `receiptKey`, does not update it or create a new job.
 
-The record is retained across local-provider restarts. Duplicate suppression still applies when the
+The record is retained across harness restarts. Duplicate suppression still applies when the
 earlier job is completed or dead-lettered, until the window expires. It is not an automatic replay of a
 failed job. The expiry is based on admission, not completion; once expired, the same key can admit a new
 instance even if the old work has not finished.
@@ -55,11 +55,10 @@ does not make a payment or email exactly once.
 
 ## Verify the selected provider
 
-The current SQS adapter does not enforce the descriptor's admission idempotency policy. Do not assume
-that passing local fake tests enables equivalent deduplication in SQS, including any FIFO feature you
-have not explicitly configured and verified.
+Do not assume that passing harness tests enables equivalent deduplication in a selected production
+integration. Verify its admission key, retention, restart, and redelivery behavior explicitly.
 
-The [receipt test](/docs/jobs/first-job#test-admission-execution-and-restart) proves the local behavior:
+The [receipt test](/docs/jobs/first-job#test-admission-and-execution) proves the harness behavior:
 enqueue, complete, restart, enqueue the same input, and observe the original instance without another
 execution. Add provider contract tests and side-effect protection before relying on that property in
 production. For recurring work, also read the [constant-input schedule caveat](/docs/jobs/schedules#choose-input-and-idempotency-together).

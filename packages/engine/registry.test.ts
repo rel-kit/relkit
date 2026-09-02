@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import {
+  GENERATOR_VERSION,
+  GRAPH_VERSION,
+  MANIFEST_VERSION,
+  RUNTIME_INTEGRATION_PLAN_FILE,
+  RUNTIME_INTEGRATION_PLAN_VERSION,
+} from "@relkit/contracts";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
 import {
   createFunctionRegistry,
@@ -37,10 +43,21 @@ function graph(): ApplicationGraph {
 }
 
 function manifest(currentGraph = graph()): RuntimeManifestInput {
+  const graphHash = hashGraph(currentGraph);
   return {
     contractVersion: MANIFEST_VERSION,
     generatorVersion: GENERATOR_VERSION,
-    graphHash: hashGraph(currentGraph),
+    graphHash,
+    activationFingerprint: {
+      graphHash,
+      manifestHash: "sha256:manifest",
+      runtimeIntegrationsPlanHash: "sha256:runtime-integrations",
+    },
+    runtimeIntegrationsPlan: {
+      version: RUNTIME_INTEGRATION_PLAN_VERSION,
+      fileName: RUNTIME_INTEGRATION_PLAN_FILE,
+      graphHash,
+    },
     functions: { "orders.get": get, "orders.create": create },
   };
 }
@@ -63,14 +80,18 @@ describe("function registry", () => {
       contractVersion: GRAPH_VERSION - 1,
     } as unknown as ApplicationGraph;
     expect(() => createFunctionRegistry(staleGraph, manifest(staleGraph))).toThrow(
-      "RELKIT_GRAPH_VERSION_UNSUPPORTED",
+      expect.objectContaining({ message: expect.stringContaining("Rebuild with `relkit build`") }),
     );
     expect(() =>
       createFunctionRegistry(graph(), {
         ...manifest(),
         contractVersion: MANIFEST_VERSION - 1,
       } as unknown as RuntimeManifestInput),
-    ).toThrow("RELKIT_MANIFEST_VERSION_UNSUPPORTED");
+    ).toThrow(
+      expect.objectContaining({
+        message: expect.stringContaining("RELKIT_MANIFEST_VERSION_UNSUPPORTED"),
+      }),
+    );
     const unboundGraph = {
       ...graph(),
       nodes: [
@@ -85,6 +106,18 @@ describe("function registry", () => {
     expect(() => createFunctionRegistry(graph(), { ...manifest(), generatorVersion: 99 })).toThrow(
       "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
     );
+    expect(() =>
+      createFunctionRegistry(graph(), {
+        ...manifest(),
+        runtimeIntegrationsPlan: { ...manifest().runtimeIntegrationsPlan, graphHash: "sha256:old" },
+      }),
+    ).toThrow("RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID");
+    expect(() =>
+      createFunctionRegistry(graph(), {
+        ...manifest(),
+        activationFingerprint: { ...manifest().activationFingerprint, graphHash: "sha256:old" },
+      }),
+    ).toThrow("RELKIT_RUNTIME_ACTIVATION_FINGERPRINT_INVALID");
   });
 
   test("rejects missing, extra, duplicate, and invalid handlers", () => {

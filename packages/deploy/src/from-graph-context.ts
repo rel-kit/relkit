@@ -1,20 +1,19 @@
-import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
+import type { ApplicationGraph, ProviderBindingNode, ProviderCapability } from "@relkit/graph";
 import type { DeploymentCapabilityPlan } from "./plan.js";
-import type { Capability } from "./from-graph-validation.js";
 import { configNames, logicalName, providerId } from "./from-graph-validation.js";
 
 export interface PlanContext {
   readonly appId: string;
   readonly graphHash: string;
   readonly graph: ApplicationGraph;
-  readonly providers: Map<string, ProviderProfileNode>;
+  readonly providers: Map<string, ProviderBindingNode>;
 }
 
 export function base(
   context: PlanContext,
   id: string,
   kind: string,
-  name: Capability,
+  name: ProviderCapability,
   profile: string,
   actions: readonly string[] = [],
 ): DeploymentCapabilityPlan {

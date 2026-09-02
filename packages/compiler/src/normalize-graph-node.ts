@@ -1,8 +1,9 @@
 import type { JsonValue } from "@relkit/contracts";
 import { generatedAgentMarker } from "./normalize-generated-function.js";
 import {
+  deploymentRoleProjections,
   environmentMetadata,
-  providerBindingIds,
+  requestedProviderProfile,
   selectedProviderProfile,
 } from "./normalize-graph-app.js";
 import { eventConfig, httpConfig } from "./normalize-graph-config.js";
@@ -29,8 +30,9 @@ export function graphNodeFor(
         ...base,
         kind: "app",
         environment: environmentMetadata(value.env),
-        providerBindings: providerBindingIds(value),
         defaults: clean(value.defaults),
+        ...(value.telemetry === undefined ? {} : { telemetry: clean(value.telemetry) }),
+        deploymentRoles: deploymentRoleProjections(value.deployment),
       };
     case "route":
       return {
@@ -69,7 +71,7 @@ export function graphNodeFor(
         kind: "job",
         input: schema(work, descriptor, "input"),
         targetFunctionId: refId(value.target) ?? "",
-        profile: selectedProviderProfile(application, "jobs", text(value.profile)) ?? "default",
+        profile: selectedProviderProfile(application, "job", text(value.profile)) ?? "default",
         retry: clean(value.retry),
         timeoutMs: clean(value.timeoutMs),
         concurrency: clean(value.concurrency),
@@ -84,13 +86,13 @@ export function graphNodeFor(
         version: typeof value.version === "number" ? value.version : 0,
         input: schema(work, descriptor, "input"),
         sensitiveFields: clean(value.sensitiveFields),
-        profile: selectedProviderProfile(application, "events", text(value.profile)) ?? "default",
+        profile: selectedProviderProfile(application, "event", text(value.profile)) ?? "default",
       };
     case "bucket":
       return {
         ...base,
         kind: "bucket",
-        profile: selectedProviderProfile(application, "buckets", text(value.profile)) ?? "default",
+        profile: selectedProviderProfile(application, "bucket", text(value.profile)) ?? "default",
         visibility: value.visibility ?? "private",
         maxObjectBytes: clean(value.maxObjectBytes),
         allowedContentTypes: clean(value.allowedContentTypes),
@@ -130,7 +132,12 @@ export function graphNodeFor(
         toolIds: toolIds(value.tools),
         limits: clean(value.limits),
         generatedFunction: generatedAgentMarker(descriptor.id),
-        profile: selectedProviderProfile(application, "models", text(value.profile)) ?? "default",
+        profile:
+          selectedProviderProfile(
+            application,
+            "model",
+            requestedProviderProfile(descriptor.kind, value),
+          ) ?? "default",
       };
     case "service":
       return { ...base, kind: "service", ...serviceNodeData(value, descriptor, work) };

@@ -1,10 +1,6 @@
 import { expect, test } from "bun:test";
 import { defineFunction, defineService } from "../../../packages/app/src/index.ts";
-import {
-  GENERATOR_VERSION,
-  GRAPH_VERSION,
-  MANIFEST_VERSION,
-} from "../../../packages/contracts/src/index.ts";
+import { GRAPH_VERSION } from "../../../packages/contracts/src/index.ts";
 import {
   invokeFunction,
   createInspectableObservabilityHooks,
@@ -22,6 +18,7 @@ import {
   type RuntimeManifest,
 } from "../../../packages/runtime-hono/src/index.ts";
 import { z } from "../../../packages/schema/src/index.ts";
+import { runtimeCohort } from "../runtime-cohort.ts";
 
 const source = { file: "src/routes/orders.ts", line: 1, column: 1 } as const;
 
@@ -69,9 +66,7 @@ test("keeps nested HTTP transport, domain attribution, docs, and client contract
   const plan = createRegistrationPlan(graph, { projectRoot: "/project" });
   const hooks = createInspectableObservabilityHooks();
   const manifest: RuntimeManifest = {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: plan.graphHash,
+    ...runtimeCohort(plan.graphHash),
     functions: {},
     middleware: {},
     requestTransforms: {},

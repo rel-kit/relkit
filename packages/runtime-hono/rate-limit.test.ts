@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import {
   createObservabilityCollector,
   type RequestRecord,
@@ -7,6 +6,7 @@ import {
 } from "@relkit/observability";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createApp, type RateLimitCounter, type RuntimeManifest } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/limited/route.ts", line: 1, column: 1 } as const;
 
@@ -161,9 +161,7 @@ function plan(
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: "sha256:rate-limit",
+    ...runtimeCohort("sha256:rate-limit"),
     functions: {},
     middleware: {},
     requestTransforms: {},
