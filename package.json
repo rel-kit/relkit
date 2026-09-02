@@ -10,6 +10,7 @@
     "lint": "bun run scripts/lint.ts",
     "test": "bun run scripts/test-all.ts",
     "test:types": "bun run scripts/test-types.ts",
+    "test:packages": "bun run scripts/test-packages.ts",
     "test:unit": "bun test ./tests/unit ./tests/schema",
     "test:compiler": "bun test ./tests/compiler ./tests/graph",
     "test:contracts": "bun test ./tests/contracts",
@@ -25,14 +26,16 @@
     "test:deployment": "bun test ./tests/deployment",
     "test:aws-integration": "bun test ./tests/deployment/aws-integration.test.ts",
     "test:container": "bun test ./tests/container",
+    "test:local-docker": "RELKIT_TEST_DOCKER=1 bun test ./tests/integration/local-docker-services.test.ts",
     "test:security": "bun test ./tests/security",
     "test:all": "bun run scripts/test-all.ts",
     "relkit:local": "bun scripts/relkit-local.ts",
     "build": "bun run scripts/build.ts",
     "verify": "bun run scripts/verify.ts",
+    "prepush": "docker info >/dev/null && bun run verify && bun run test:container && bun run test:local-docker && bun run test:deployment && bun run test:inspector:browser && bun run test:e2e",
     "konsistent": "konsistent",
     "changeset": "node ./node_modules/@changesets/cli/bin.js",
-    "version:packages": "node --experimental-strip-types scripts/version-packages.ts",
+    "version:packages": "bun run scripts/version-packages.ts",
     "release:sync": "bun run scripts/sync-release.ts --write",
     "release:check": "bun run scripts/release-check.ts --readiness --allow-dirty --skip-build",
     "release:pack": "bun run scripts/release-check.ts"
@@ -60,6 +63,8 @@
   "workspaces": [
     "apps/*",
     "examples/*",
+    "integrations/catalog",
+    "integrations/packages/*",
     "packages/*"
   ]
 }
