@@ -1,0 +1,52 @@
+---
+title: Local Docker services
+description: Run graph-required Redis and MinIO recipes with immutable image versions and project-scoped lifecycle commands.
+---
+
+`@relkit/docker` is a local-service materializer, not a deployment target. `check` writes a deterministic plan
+without contacting Docker. `dev` then starts only the recipes required by the checked graph, waits for their
+health checks, and supplies their outputs to the matching binding.
+
+## Current bundled images
+
+The integration packages pin both a readable tag and an immutable digest. A RELKIT package release therefore
+selects an exact local-service image rather than whatever a mutable tag points to later.
+
+| Adapter    | Image tag                                  | Immutable digest                                                          |
+| ---------- | ------------------------------------------ | ------------------------------------------------------------------------- |
+| Redis      | `redis:7.4.2-alpine`                       | `sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952` |
+| S3 / MinIO | `minio/minio:RELEASE.2025-04-22T22-12-26Z` | `sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e` |
+
+RELKIT discovers the Docker server version at startup but does not currently enforce a minimum engine
+version. Use a maintained Docker Engine or Docker Desktop release with the `docker` CLI available on `PATH`:
+
+```sh
+docker version
+bun run relkit local status
+```
+
+## Select local recipes
+
+Use `docker(redis())` or `docker(s3())` for a local-only binding. Wrap a configured connected adapter when
+development should use Docker while release builds resolve named binding values. The Redis and storage guides
+show both forms in the commerce application.
+
+Docker starts Redis with a persistent `/data` volume and waits for `redis-cli PING`. MinIO receives generated
+project-local credentials, persists `/data`, waits for its readiness endpoint, and initializes the `relkit`
+bucket. Both publish random loopback ports instead of claiming fixed host ports.
+
+## Control the project lifecycle
+
+```sh
+bun run relkit local up --detach
+bun run relkit local status
+bun run dev --local=off
+bun run relkit local stop
+bun run relkit local reset --yes
+```
+
+Healthy services and volumes survive source reloads. `stop` stops this project's labelled services; `reset`
+also removes its validated volumes and override state. It refuses a live attached lease and never targets
+another checkout. Docker is not contacted by `build`, deployment preview, or deployment apply.
+
+<include cwd>content/generated/related/integrations-local-docker.mdx</include>

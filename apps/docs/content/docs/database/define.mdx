@@ -30,7 +30,7 @@ The data-model example uses this environment contract:
   ../../examples/data-model/src/platform/env.ts
 </include>
 
-Merge `DATABASE_PATH` into your existing `defineEnv()` and keep that descriptor in `defineConfig({ env })`.
+Merge `DATABASE_PATH` into your existing `defineEnv()` and keep that descriptor in `defineApp({ env })`.
 The example defaults to `./data-model.sqlite`; ensure its parent directory exists and is writable.
 Use the same path for the app and [migration tooling](/docs/database/migrations). A test may explicitly
 use `:memory:`, which is isolated to a connection and disappears when it closes.
