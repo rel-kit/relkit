@@ -82,6 +82,8 @@
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
+    "@relkit/observability": "workspace:*",
+    "@relkit/provider": "workspace:*",
     "@relkit/routes": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/services": "workspace:*",

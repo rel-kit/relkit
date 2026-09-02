@@ -1,54 +1,33 @@
 # @relkit/app
 
-`@relkit/app` is the public entry point for application configuration, descriptors, and composable
-provider bindings. `relkit.config.ts` contains settings and provider profiles; database and auth are
-registered by their own discovered descriptors.
+`@relkit/app` is the public entry point for application configuration and descriptors. Provider
+implementations live in independently installable integration packages.
 
 ```ts
-import { defineConfig, defineEnv, env, external, redis, s3 } from "@relkit/app/config";
+import "@relkit/pulumi";
+import { defineApp, defineEnv, env as binding } from "@relkit/app/config";
+import { aws } from "@relkit/aws";
+import { docker } from "@relkit/docker";
+import { redis } from "@relkit/redis";
+import { s3 } from "@relkit/s3";
 
-const values = defineEnv({
-  BUCKET_ENDPOINT: env.url(),
-  BUCKET_NAME: env.string(),
-  BUCKET_REGION: env.string(),
-  BUCKET_ACCESS_KEY_ID: env.secret().optional(),
-  BUCKET_SECRET_ACCESS_KEY: env.secret().optional(),
-  CACHE_URL: env.secret(),
-});
-
-export default defineConfig({
-  env: values,
-  buckets: {
-    assets: external(
-      s3({
-        endpoint: values.BUCKET_ENDPOINT,
-        bucketName: values.BUCKET_NAME,
-        region: values.BUCKET_REGION,
-        credentials: {
-          accessKeyId: values.BUCKET_ACCESS_KEY_ID,
-          secretAccessKey: values.BUCKET_SECRET_ACCESS_KEY,
-        },
-      }),
-    ),
+export default defineApp({
+  env: defineEnv({}),
+  cache: {
+    requests: docker(redis({ url: binding.secret("REQUESTS_REDIS_URL") })),
+    timeline: aws(redis(), { engine: "valkey" }),
   },
-  caches: { primary: external(redis({ url: values.CACHE_URL })) },
-  defaults: { bucket: "assets", cache: "primary" },
+  bucket: { receipts: aws(s3(), { versioning: true }) },
+  defaults: { cache: "requests", bucket: "receipts" },
+  deployment: { engine: "pulumi", host: "aws" },
   server: { port: 3000 },
   inspector: { port: 3210 },
 });
 ```
 
-Use MinIO and Redis values locally, R2 and Upstash values in a hosted pipeline, or `managed()` S3 and
-Valkey bindings with an AWS deployment. `external()` resources are never provisioned and receive no
-deployment IAM statements. Secret adapter fields require secret environment references.
+Direct adapters describe connected services. `docker(adapter)` adds a local development recipe, and
+`aws(adapter)` makes AWS own that resource in deployment. Named binding values are private to their
+provider binding and do not become handler-visible `ctx.env` fields.
 
-`id` defaults to the normalized `package.json.name`. `PORT` and `RELKIT_ENV` are framework-reserved.
-Hosting remains in `relkit.config.ts`:
-
-```ts
-export default defineConfig({
-  deployment: { target: "aws", adapter: "pulumi" },
-  server: { port: 3000 },
-  inspector: { port: 3210 },
-});
-```
+Cloud and deployment default to `none`. Tests provide replacements explicitly by capability and
+profile; environment names never swap providers.
