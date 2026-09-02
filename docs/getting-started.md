@@ -20,14 +20,13 @@ Run the supported generator from the directory that should contain the project:
 
 ```sh
 bunx create-relkit@latest relkit-orders \
-  --template api \
-  --cloud none \
-  --deploy none
+  --template api
 cd relkit-orders
 cp .env.example .env
 ```
 
-The explicit local-only flags avoid Pulumi, AWS credentials, and cloud cost.
+Cloud and deployment default to `none`, so this path avoids Pulumi, AWS
+credentials, and cloud cost.
 The generator validates the destination, installs dependencies, and performs
 its initial checks without leaving a partial project after failure.
 
@@ -39,9 +38,7 @@ Framework contributors can test the current checkout without publishing:
 
 ```sh
 bun run relkit:local -- create relkit-orders \
-  --template api \
-  --cloud none \
-  --deploy none
+  --template api
 ```
 
 ## 3. Inspect and check the project
@@ -64,8 +61,7 @@ relkit-orders/
 │   │   └── functions/
 │   ├── orders/
 │   │   ├── service.ts
-│   │   ├── functions/
-│   │   └── events/
+│   │   └── functions/
 │   └── routes/
 ├── tests/
 │   ├── integration/
@@ -88,12 +84,11 @@ bun run relkit doctor --no-pulumi
 bun run check
 ```
 
-The API template declares an event provider, so `.env.example` supplies a
-non-secret local endpoint, bus name, region, and log level. `--no-pulumi`
-skips Pulumi and AWS credential checks for this local-only journey. `doctor`
-still verifies Bun, configuration, and ports. `check` discovers descriptors,
-validates the application graph, and writes graph, manifest, OpenAPI, client,
-event registry, and diagnostics output under `.relkit/generated`.
+The API template needs no provider credentials. `--no-pulumi` skips Pulumi and
+AWS credential checks for this local-only journey. `doctor` still verifies Bun,
+configuration, and ports. `check` discovers descriptors, validates the
+application graph, and writes graph, manifest, OpenAPI, client, event registry,
+and diagnostics output under `.relkit/generated`.
 
 ## 4. Run the generated application
 
@@ -187,8 +182,9 @@ bun run relkit env check
 - `.relkit/state/` contains local durable runtime state.
 - `.relkit/observability/` contains local telemetry data.
 
-Keep secrets out of source and generated artifacts. Tests use deterministic
-provider fakes; normal runtimes resolve environment-backed provider bindings.
+Keep secrets out of source and generated artifacts. Provider-backed tests pass
+explicit profile replacements; normal runtimes resolve only graph-required
+binding sources.
 
 Continue with `apps/docs/content/docs/fundamentals/application.mdx` for the
 authoring model or `docs/deployment.md` for the separately authorized AWS path.

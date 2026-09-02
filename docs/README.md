@@ -7,7 +7,7 @@ POC baseline and is retained as historical design evidence.
 
 1. Read `getting-started.md` for the current generated application layout and local workflow.
 2. Read `architecture.md`, `testing.md`, and `deployment.md` for current contributor guidance.
-3. Use `apps/docs/content/docs/fundamentals/domain-first-migration.mdx` when migrating a layer-first application.
+3. Use `apps/docs/content/docs/service/organization.mdx` when migrating a layer-first application.
 4. Consult `relkit-typescript-poc-technical-spec-v3.md` and its review gates only for the historical POC baseline.
 
 ## Final architecture at a glance

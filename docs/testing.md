@@ -42,8 +42,7 @@ Integration tests use `createTestApplication` and its in-process HTTP client:
 
 Run `bun run check` after changing event contracts or publications. The application
 harness validates and loads the generated registry so direct and nested function
-calls receive their declared event contracts. Register event fakes by exact event
-ID, for example `testApp.fakes.setClient("events", "orders.created", fake)`.
+calls receive their declared event contracts.
 
 ```ts
 import { afterAll, expect, test } from "bun:test";
@@ -60,13 +59,19 @@ test("GET /hello", async () => {
 afterAll(() => testApp.close());
 ```
 
-`@relkit/testing` replaces every graph-required provider binding with deterministic
-in-memory fakes by default, so configured S3, Redis, queue, event, model, and
-observability credentials are unnecessary. Explicit protocol integration tests
-may opt into configured adapters. Agent tests use the AI SDK v7 `ai/test` surface
-and never call live model providers by default. Tests that exercise restart
-and recovery should use a disposable state directory and assert durable
-duplicate behavior rather than relying on timing or arbitrary sleeps.
+Provider-backed applications must replace every graph-required capability/profile
+explicitly through the `providers` option. For example, the commerce suite supplies
+separate fakes for cache profiles `requests` and `timeline`, bucket profiles
+`assets` and `receipts`, and model profile `openai`. Missing replacements fail
+before the test application becomes ready; `RELKIT_ENV=test` does not change
+provider selection.
+
+Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource
+behavior, `createTestJob` and `createTestEvent` for async delivery contracts, and a
+scripted model replacement for agents. Explicit protocol integration tests may
+instead opt into configured adapters. Tests that exercise restart and recovery
+should use a disposable state directory and assert durable duplicate behavior
+rather than relying on timing or arbitrary sleeps.
 
 ## Repository checks
 
@@ -78,8 +83,8 @@ From the RELKIT repository root, the shipped focused commands are:
 | Boundaries and scope             | `bun run check`                 |
 | TypeScript project references    | `bun run typecheck`             |
 | Lint                             | `bun run lint`                  |
-| All Bun tests                    | `bun test`                      |
 | Type fixtures                    | `bun run test:types`            |
+| Package and integration packages | `bun run test:packages`         |
 | Unit and schema tests            | `bun run test:unit`             |
 | Compiler and graph tests         | `bun run test:compiler`         |
 | Provider contracts               | `bun run test:contracts`        |
@@ -93,15 +98,21 @@ From the RELKIT repository root, the shipped focused commands are:
 | Deployment plan and Pulumi tests | `bun run test:deployment`       |
 | Release-gated AWS integration    | `bun run test:aws-integration`  |
 | Container lifecycle              | `bun run test:container`        |
+| Redis/MinIO Docker lifecycle     | `bun run test:local-docker`     |
 | Redaction and security           | `bun run test:security`         |
+| All local test layers            | `bun run test:all`              |
 | Build                            | `bun run build`                 |
 | Merge-blocking pipeline          | `bun run verify`                |
+| Complete local pre-push gate     | `bun run prepush`               |
 
 `bun run verify` is fail-fast and includes frozen-install/no-diff, formatting,
-lint, boundaries, type checks, compiler and runtime layers, restart,
-inspector, packed generator smoke, build reproducibility, and security scans.
-Browser, container, and real AWS checks are separate commands because they
-need external runtimes or credentials.
+lint, boundaries, type checks, co-located package tests, compiler and runtime
+layers, restart, inspector, packed generator smoke, build reproducibility, and
+security scans. Browser, container, Redis/MinIO Docker, and real AWS checks are
+separate commands because they need external runtimes or credentials.
+Run `bun run prepush` with Docker running before pushing to execute `verify`
+and every locally reproducible required CI job. GitHub dependency review and
+the opt-in AWS cloud job are not reproducible by that command.
 
 For a packed generator smoke run and the reproducible performance baseline:
 
@@ -124,8 +135,8 @@ Release acceptance additionally uses:
 bun run scripts/release-check.ts
 ```
 
-That command expects a clean worktree except for the intentional local
-iterator skill. Run it from a clean checkout or after committing the change.
+That command expects a clean worktree. Run it from a clean checkout or after
+committing the change.
 
 ## Verification of these guides
 
@@ -134,7 +145,7 @@ From the repository root, check the documentation and OpenSpec change with:
 ```sh
 bunx prettier --check docs/getting-started.md docs/testing.md docs/deployment.md docs/architecture.md docs/troubleshooting.md
 git diff --check
-openspec validate make-relkit-developer-first --strict
+openspec validate define-app-provider-architecture --strict
 ```
 
 The final release reproduction follows the getting-started flow verbatim in a

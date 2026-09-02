@@ -15,12 +15,13 @@ isolated discovery and evaluation
         |
         v
 normalized descriptors -> canonical graph -> graph hash
-                                      |             |
-                                      v             v
-                         runtime manifest     OpenAPI/client/diagnostics
-                                      |
-                                      v
-                         shared function engine
+                 |                 |                  |
+                 v                 v                  v
+       runtime manifest   integration/local plans   OpenAPI/client/diagnostics
+                 |                 |
+                 +--------+--------+
+                          v
+               shared function engine
                                       |
                   +-------------------+-------------------+
                   |                   |                   |
@@ -30,14 +31,16 @@ normalized descriptors -> canonical graph -> graph hash
 `relkit check` is the compilation boundary. It discovers source descriptors,
 validates schemas and references, sorts the graph canonically, computes its
 hash, and writes `.relkit/generated/application.graph.json`,
-`runtime.manifest.ts`, `openapi.json`, `client.ts`, and `diagnostics.json`.
+`runtime.manifest.ts`, runtime-integration and local-service plans, `openapi.json`,
+`client.ts`, and `diagnostics.json`.
 Errors do not produce an activatable manifest. Convention warnings can still
 produce a graph when compilation remains valid.
 
 The runtime manifest contains executable references resolved from the graph;
-the graph itself contains serializable metadata only. The same graph hash is
-checked at development activation, build/start, inspector access, and
-deployment planning.
+the graph itself contains serializable metadata only. A composite activation
+fingerprint covers the graph, manifest, runtime-integration plan, local-service
+plan, and provider overrides. Development, build/start, and the Inspector reject
+stale or mismatched members before activation.
 
 ## Authoring boundary
 
@@ -47,10 +50,16 @@ an event-only function plus a generated exact-event trigger. Event contracts sta
 handler-free; `publishes` declares exact publication capabilities. Delivery and
 replay are the only allowed invocation sources for event-only functions.
 
-Providers are selected by logical profile (`development`, `test`, or
-`production`) and supplied through the handler context. Application code does
-not import AWS SDK types, Pulumi types, or the internal Effect runtime. Effect
-is an implementation detail of the engine and runtime packages.
+`defineApp` binds singular capabilities to direct adapters or named physical
+profiles. Source forms are connected, local-only, local overlays such as
+`docker(redis())`, or infrastructure wrappers such as `aws(s3())`. Logical
+profile selection is independent of environment names. Tests supply explicit
+capability/profile replacements.
+
+Named provider connection values are distinct from `defineEnv` and never become
+handler-visible `ctx.env`. Application code does not import AWS SDK types,
+Pulumi types, or the internal Effect runtime. Effect is an implementation detail
+of the engine and runtime packages.
 
 ## Development supervisor
 
@@ -59,6 +68,11 @@ it behind a stable development server. If a later compile or candidate
 startup fails, the last known good candidate remains active and the diagnostic
 is reported. Candidate activation drains the old server before shutdown and
 flushes telemetry within bounded time.
+
+Compilation writes local recipe data without probing Docker. Development
+reconciles only graph-required recipes, scopes containers and volumes to the
+canonical project identity, and waits for health before readiness. `--local=off`
+disables recipes and requires normal binding values instead.
 
 The backend serves the versioned inspector protocol under `/_relkit/v1`. The
 graph endpoint is:
@@ -100,18 +114,24 @@ state is the deployment state system. Resource names and identities use
 stable descriptor IDs, so a source-file move does not replace an unchanged
 resource and an unchanged graph produces a no-op update.
 
-The deployment plan is data first: it contains managed resource metadata, dependency
-edges, health, environment references, and IAM decisions, but not raw secret
-values or Pulumi output objects. External bindings are omitted from provisioning
-and IAM. AWS capability and configuration failures are reported before an apply.
+The deployment plan is data first and separates engine, host, connected wiring,
+infrastructure operations, and access operations. It contains no raw secret values
+or Pulumi output objects. Connected bindings create no lifecycle or implicit access;
+only an infrastructure wrapper can emit those operations. Docker recipes never
+participate in deployment.
+
+Pulumi consumes generic deployment operations. AWS independently implements ECS
+hosting, S3 and Redis/Valkey infrastructure, least-privilege access, and CloudWatch
+stdout routing. Unsupported role or adapter combinations fail before preview.
 
 ## Observability and security
 
-The runtime emits structured logs, metrics, traces, request records, and
-durable job/event records through the configured provider and observability
-interfaces. Body capture is off by default in generated projects. Diagnostic,
-inspector, deployment, and generated artifacts redact secret values and keep
-only safe environment status.
+The runtime emits structured logs, metrics, traces, request records, and durable
+job/event records. Capture and redaction precede bounded local Inspector
+persistence; root-consistent trace sampling and minimum log severity apply only
+to external exporter fan-out. Sentry and OTLP fail independently, and exporter
+failures become redacted local-only diagnostics. AWS routes redacted stdout to
+CloudWatch as a host concern rather than an application exporter.
 
 The graph, manifest, OpenAPI document, inspector API, and deployment plan are
 cross-checked by their graph hash. A mismatch is a failure to diagnose, not a
