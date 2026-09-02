@@ -5,7 +5,7 @@
     "descriptorId": "archive.objects",
     "file": "src/archive/buckets/archive.bucket.ts",
     "line": 3,
-    "message": "Unqualified buckets use requires a default when multiple profiles exist.",
+    "message": "Unqualified bucket use requires a default when multiple profiles exist.",
     "severity": "error"
   }
 ]
