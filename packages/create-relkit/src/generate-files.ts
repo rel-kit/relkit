@@ -39,10 +39,50 @@ export async function customizeProject(root: string, options: CreateOptions): Pr
   await replaceOnce(join(root, "README.md"), "# my-app", `# ${options.name}`);
   await replaceOnce(
     join(root, "relkit.config.ts"),
-    "export default defineConfig({",
-    `export default defineConfig({\n  id: ${JSON.stringify(projectId(options.name))},`,
+    "export default defineApp({",
+    `export default defineApp({\n  id: ${JSON.stringify(projectId(options.name))},`,
   );
+  await customizeDeployment(root, options);
   if (!options.examples) await removeExamples(root);
+}
+
+async function customizeDeployment(root: string, options: CreateOptions): Promise<void> {
+  const configPath = join(root, "relkit.config.ts");
+  const imports = [
+    ...(options.cloud === "aws" ? ['import "@relkit/aws";'] : []),
+    ...(options.deploy === "pulumi" ? ['import "@relkit/pulumi";'] : []),
+  ].join("\n");
+  await replaceOnce(configPath, "// relkit:create:deployment-imports", imports);
+  await replaceOnce(
+    configPath,
+    "  // relkit:create:deployment",
+    options.cloud === "aws" && options.deploy === "pulumi"
+      ? '  deployment: { engine: "pulumi", host: "aws" },'
+      : "",
+  );
+
+  const manifestPath = join(root, "package.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as {
+    scripts: Record<string, string>;
+    dependencies: Record<string, string>;
+  };
+  const version = manifest.dependencies["@relkit/app"]!;
+  if (options.cloud === "aws") manifest.dependencies["@relkit/aws"] = version;
+  if (options.deploy === "pulumi") manifest.dependencies["@relkit/pulumi"] = version;
+  if (options.cloud === "aws" && options.deploy === "pulumi") {
+    manifest.scripts["deploy:preview"] = "relkit deploy preview";
+    manifest.scripts.deploy = "relkit deploy up";
+  }
+  manifest.scripts = sorted(manifest.scripts);
+  manifest.dependencies = sorted(manifest.dependencies);
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  await chmod(manifestPath, FILE_MODE);
+}
+
+function sorted(values: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(values).sort(([left], [right]) => left.localeCompare(right)),
+  );
 }
 
 /** Removes only a verified mkdtemp sibling; broad or unresolved paths are never recursed. */

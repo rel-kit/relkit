@@ -9,8 +9,8 @@ export type CreateDeployment = (typeof CREATE_DEPLOYMENTS)[number];
 
 export const CREATE_OPTION_DEFAULTS = Object.freeze({
   template: "minimal" as CreateTemplate,
-  cloud: "aws" as CreateCloud,
-  deploy: "pulumi" as CreateDeployment,
+  cloud: "none" as CreateCloud,
+  deploy: "none" as CreateDeployment,
   install: true as boolean,
   git: true as boolean,
   examples: true as boolean,
@@ -44,7 +44,7 @@ export class CreateOptionsError extends Error {
   }
 }
 
-/** Parses the non-interactive create flags and applies the v3 defaults. */
+/** Parses non-interactive create flags and applies the cloud-free defaults. */
 export function normalizeCreateOptions(
   args: readonly string[],
   context: CreateOptionsContext = {},
