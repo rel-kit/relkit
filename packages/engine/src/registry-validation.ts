@@ -4,6 +4,7 @@ import { isEventFunctionDescriptor } from "@relkit/events";
 import { getDescriptorIdentity } from "@relkit/invocation";
 import type { RegistryIssue, RuntimeManifestInput } from "./registry.js";
 import type { InvocationTarget } from "./invoke-types.js";
+import { artifactIssues } from "./registry-artifacts.js";
 
 export function versionIssues(
   graph: ApplicationGraph,
@@ -13,21 +14,22 @@ export function versionIssues(
   if (graph.contractVersion !== GRAPH_VERSION) {
     issues.push({
       code: "RELKIT_GRAPH_VERSION_UNSUPPORTED",
-      message: `Graph version ${String(graph.contractVersion)} is not supported.`,
+      message: `Graph contract version ${String(graph.contractVersion)} is unsupported; expected ${GRAPH_VERSION}. Rebuild with \`relkit build\`.`,
     });
   }
   if (manifest.contractVersion !== MANIFEST_VERSION) {
     issues.push({
       code: "RELKIT_MANIFEST_VERSION_UNSUPPORTED",
-      message: `Manifest version ${String(manifest.contractVersion)} is not supported.`,
+      message: `Runtime manifest version ${String(manifest.contractVersion)} is unsupported; expected ${MANIFEST_VERSION}. Rebuild with \`relkit build\`.`,
     });
   }
   if (manifest.generatorVersion !== GENERATOR_VERSION) {
     issues.push({
       code: "RELKIT_MANIFEST_GENERATOR_UNSUPPORTED",
-      message: `Manifest generator version ${String(manifest.generatorVersion)} is not supported.`,
+      message: `Runtime manifest generator version ${String(manifest.generatorVersion)} is unsupported; expected ${GENERATOR_VERSION}. Rebuild with \`relkit build\`.`,
     });
   }
+  issues.push(...artifactIssues(manifest));
   return issues;
 }
 

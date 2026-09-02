@@ -7,5 +7,8 @@ export * from "./concurrency.js";
 export * from "./recursion.js";
 export * from "./observability.js";
 export * from "./provider-registry.js";
+export * from "./infrastructure-binding-values.js";
+export * from "./provider-binding-resolution.js";
 export * from "./materialize-jobs.js";
 export * from "./materialize-events.js";
+export * from "./runtime-integrations.js";

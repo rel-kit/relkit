@@ -38,7 +38,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/observability": "workspace:*",
-    "@relkit/providers-local": "workspace:*",
+    "@relkit/provider": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/schema": "workspace:*",
     "effect": "4.0.0-beta.107"
