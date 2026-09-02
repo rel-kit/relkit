@@ -63,7 +63,7 @@ export function name(value: string, max = 63): string {
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, "-")
       .replace(/^-+/, "")
-      .replace(/-+$/, "")
+      .replace(/(?<!-)-+$/, "")
       .slice(0, max)
       .replace(/-+$/g, "") || "relkit"
   );

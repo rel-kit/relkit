@@ -91,7 +91,7 @@ export function identity(value: string, label: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+/, "")
-    .replace(/-+$/, "");
+    .replace(/(?<!-)-+$/, "");
   if (normalized === "") throw new TypeError(`Pulumi ${label} must not be empty.`);
   return normalized;
 }
