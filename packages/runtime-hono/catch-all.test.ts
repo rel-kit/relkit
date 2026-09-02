@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import { createApp, type RuntimeManifest } from "./src/index.ts";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/routes/docs/[[...parts]]/route.ts", line: 1, column: 14 };
 
@@ -111,9 +111,7 @@ function plan(...triggers: readonly HttpTriggerRegistration[]): RegistrationPlan
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: "sha256:catch-all",
+    ...runtimeCohort("sha256:catch-all"),
     functions: {},
     middleware: {},
     requestTransforms: {},

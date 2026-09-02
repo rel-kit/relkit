@@ -1,8 +1,8 @@
 import { z } from "@relkit/schema";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { createApp } from "./src/index.js";
 import { mapRequest, type MappingRequest } from "./src/request-mapping.js";
 import type { RegistrationPlan } from "@relkit/graph";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
@@ -175,9 +175,7 @@ test("maps multipart fields and stops before engine invocation on failure", asyn
   const app = createApp({
     plan,
     manifest: {
-      contractVersion: MANIFEST_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-      graphHash: plan.graphHash,
+      ...runtimeCohort(plan.graphHash),
       functions: {},
       middleware: {},
       requestTransforms: {},
@@ -218,9 +216,7 @@ test("applies a route body limit before invoking its target", async () => {
   const app = createApp({
     plan,
     manifest: {
-      contractVersion: MANIFEST_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-      graphHash: plan.graphHash,
+      ...runtimeCohort(plan.graphHash),
       functions: {},
       middleware: {},
       requestTransforms: {},

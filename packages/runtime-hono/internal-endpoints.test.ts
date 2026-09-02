@@ -12,6 +12,7 @@ import {
   type InternalQuery,
   type RuntimeManifest,
 } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const plan: RegistrationPlan = {
   graphHash: "sha256:internal",
@@ -27,9 +28,7 @@ const plan: RegistrationPlan = {
   middlewares: [],
 };
 const manifest: RuntimeManifest = {
-  contractVersion: MANIFEST_VERSION,
-  generatorVersion: GENERATOR_VERSION,
-  graphHash: plan.graphHash,
+  ...runtimeCohort(plan.graphHash),
   functions: {},
   middleware: {},
   requestTransforms: {},

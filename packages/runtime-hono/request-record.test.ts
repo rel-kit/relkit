@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { createObservabilityCollector, type RequestRecord } from "@relkit/observability";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createApp, type RuntimeManifest } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/request-record.test.ts", line: 1, column: 1 } as const;
 
@@ -106,9 +106,7 @@ function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: "sha256:request-record",
+    ...runtimeCohort("sha256:request-record"),
     functions: {},
     middleware: {},
     requestTransforms: {},

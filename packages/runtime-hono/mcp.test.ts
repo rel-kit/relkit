@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { RegistrationPlan, ToolRegistration } from "@relkit/graph";
 import { z } from "@relkit/schema";
 import { createApp } from "./src/index.js";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "src/tools.ts", line: 1, column: 1 };
 const input = z.object({ value: z.string() });
@@ -20,9 +20,7 @@ describe("MCP", () => {
     const app = createApp({
       plan,
       manifest: {
-        contractVersion: MANIFEST_VERSION,
-        generatorVersion: GENERATOR_VERSION,
-        graphHash: plan.graphHash,
+        ...runtimeCohort(plan.graphHash),
         functions: {},
         middleware: {},
         requestTransforms: {},
@@ -64,9 +62,7 @@ describe("MCP", () => {
       const app = createApp({
         plan,
         manifest: {
-          contractVersion: MANIFEST_VERSION,
-          generatorVersion: GENERATOR_VERSION,
-          graphHash: plan.graphHash,
+          ...runtimeCohort(plan.graphHash),
           functions: {},
           middleware: {},
           requestTransforms: {},

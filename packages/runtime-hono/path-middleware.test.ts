@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { Hono, type Context } from "hono";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import type { RegistrationPlan } from "@relkit/graph";
 import { materializeRoutes, type RuntimeManifest } from "./src/materialize-routes";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const source = { file: "middleware.test.ts", line: 1, column: 1 } as const;
 
@@ -49,9 +49,7 @@ function options(calls: string[]) {
   return {
     plan: plan(),
     manifest: {
-      contractVersion: MANIFEST_VERSION,
-      generatorVersion: GENERATOR_VERSION,
-      graphHash: "sha256:middleware",
+      ...runtimeCohort("sha256:middleware"),
       functions: {},
       middleware,
       requestTransforms: {},

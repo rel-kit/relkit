@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { GENERATOR_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
 import { invokeFunction, type InvocationTarget } from "@relkit/engine";
 import { z } from "@relkit/schema";
 import { createApp, type RuntimeManifest } from "./src/index.js";
 import type { HttpInvocationOptions } from "./src/materialize-routes.js";
 import type { RegistrationPlan } from "@relkit/graph";
+import { runtimeCohort } from "./test-cohort.ts";
 
 const input = z.object({});
 const output = z.object({ ok: z.literal(true) });
@@ -168,9 +168,7 @@ function plan(): RegistrationPlan {
 
 function manifest(): RuntimeManifest {
   return {
-    contractVersion: MANIFEST_VERSION,
-    generatorVersion: GENERATOR_VERSION,
-    graphHash: "sha256:middleware",
+    ...runtimeCohort("sha256:middleware"),
     functions: {},
     middleware: {},
     requestTransforms: {},
