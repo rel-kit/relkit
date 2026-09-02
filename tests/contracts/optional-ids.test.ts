@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { defineEnv } from "../../packages/config/src/index.ts";
-import { defineConfig } from "../../packages/app/src/index.ts";
+import { defineApp } from "../../packages/app/src/index.ts";
 import { defineBucket } from "../../packages/buckets/src/index.ts";
 import { defineCache } from "../../packages/cache/src/index.ts";
 import { defineEvent } from "../../packages/events/src/index.ts";
@@ -73,7 +73,7 @@ describe("optional authoring IDs", () => {
   });
 
   test("keeps durable identities mandatory at runtime", () => {
-    expect(defineConfig({ env: defineEnv({}) }).kind).toBe("app");
+    expect(defineApp({ env: defineEnv({}) }).kind).toBe("app");
     expect(() => defineEvent({ version: 1, input } as never)).toThrow("Invalid stable ID");
     expect(() =>
       defineJob({

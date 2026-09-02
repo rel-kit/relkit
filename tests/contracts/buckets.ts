@@ -41,7 +41,7 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
         const original = new Uint8Array([1, 2, 3]);
         await client.put("assets/item.bin", original, {
           contentType: "application/octet-stream",
-          metadata: { uploadedBy: "contract", visibility: "private" },
+          metadata: { "uploaded-by": "contract", visibility: "private" },
         });
         original[0] = 9;
 
@@ -51,7 +51,7 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
           contentType: "application/octet-stream",
           contentHash: expect.stringMatching(/^sha256:/),
           etag: expect.stringMatching(/^sha256:/),
-          metadata: { uploadedBy: "contract", visibility: "private" },
+          metadata: { "uploaded-by": "contract", visibility: "private" },
           size: 3,
         });
         expect(await client.list("assets/")).toEqual(["assets/item.bin"]);
@@ -77,31 +77,38 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
             "__relkit/internal",
             "null\0byte",
           ]) {
-            await expect(client.put(key, new Uint8Array([1]))).rejects.toThrow();
-            await expect(client.get(key)).rejects.toThrow();
-            await expect(client.head(key)).rejects.toThrow();
-            await expect(client.exists(key)).rejects.toThrow();
-            await expect(client.delete(key)).rejects.toThrow();
+            await expectFailure(() => client.put(key, new Uint8Array([1])));
+            await expectFailure(() => client.get(key));
+            await expectFailure(() => client.head(key));
+            await expectFailure(() => client.exists(key));
+            await expectFailure(() => client.delete(key));
           }
-          await expect(client.list("../")).rejects.toThrow();
+          await expectFailure(() => client.list("../"));
         },
         { maxObjectBytes: 3, allowedContentTypes: ["image/png"] },
       );
     });
 
-    test("reports unsupported signed URLs through capabilities", async () => {
+    test("reports signed URL support through capabilities", async () => {
       await withBucket(target, async ({ client, capabilities }) => {
-        expect(capabilities).toEqual({ signedReadUrl: false, signedWriteUrl: false });
-        await expect(client.createReadUrl("asset.bin")).rejects.toMatchObject({
-          code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
-          capability: "signedReadUrl",
-          operation: "createReadUrl",
-        });
-        await expect(client.createWriteUrl("asset.bin")).rejects.toMatchObject({
-          code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
-          capability: "signedWriteUrl",
-          operation: "createWriteUrl",
-        });
+        if (capabilities.signedReadUrl) {
+          expect(typeof (await client.createReadUrl("asset.bin"))).toBe("string");
+        } else {
+          await expect(client.createReadUrl("asset.bin")).rejects.toMatchObject({
+            code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
+            capability: "signedReadUrl",
+            operation: "createReadUrl",
+          });
+        }
+        if (capabilities.signedWriteUrl) {
+          expect(typeof (await client.createWriteUrl("asset.bin"))).toBe("string");
+        } else {
+          await expect(client.createWriteUrl("asset.bin")).rejects.toMatchObject({
+            code: "RELKIT_BUCKET_CAPABILITY_UNSUPPORTED",
+            capability: "signedWriteUrl",
+            operation: "createWriteUrl",
+          });
+        }
       });
     });
 
@@ -146,6 +153,10 @@ export function registerBucketContractSuite(target: BucketContractTarget): void 
       });
     }
   });
+}
+
+async function expectFailure(work: () => unknown): Promise<void> {
+  await expect(Promise.resolve().then(work)).rejects.toThrow();
 }
 
 async function withBucket(

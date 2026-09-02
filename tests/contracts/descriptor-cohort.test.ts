@@ -30,7 +30,14 @@ import {
 } from "../../packages/services/src/index.ts";
 import { defineEnv, env, isEnvRef } from "../../packages/config/src/index.ts";
 import { CONVENTION_CODES, checkConventions } from "../../packages/compiler/src/index.ts";
-import { aiSdk, external, managed, redis, s3 } from "../../packages/app/src/index.ts";
+import { defineApp } from "../../packages/app/src/index.ts";
+import {
+  defineConnectionContract,
+  defineIntegrationReference,
+  defineProviderAdapter,
+  defineProviderBehavior,
+  defineProviderCapability,
+} from "../../packages/provider/src/index.ts";
 import { getJsonSchema, z } from "../../packages/schema/src/index.ts";
 
 const input = z.object({ id: z.string() });
@@ -234,48 +241,32 @@ describe.serial("Phase 2 descriptor cohort", () => {
     );
   });
 
-  test("keeps environment and provider references value-free", () => {
+  test("keeps application environment and binding references value-free", () => {
     const definition = defineEnv({
       AWS_REGION: env.string().requiredIn("production"),
-      BUCKET_ENDPOINT: env.url(),
-      BUCKET_NAME: env.string(),
-      CACHE_URL: env.secret(),
       API_KEY: env.secret().requiredIn("production").example("synthetic-secret"),
     });
-    const bucket = managed(
-      s3({
-        endpoint: definition.BUCKET_ENDPOINT,
-        bucketName: definition.BUCKET_NAME,
-        region: definition.AWS_REGION,
+    const cacheUrl = env.secret("CACHE_URL");
+    const app = defineApp({
+      env: definition,
+      cache: defineProviderAdapter({
+        integration: defineIntegrationReference("redis"),
+        capability: defineProviderCapability("cache"),
+        adapterId: "redis",
+        connectionContract: defineConnectionContract({ url: { sensitive: true } }),
+        connection: { url: cacheUrl },
+        behavior: defineProviderBehavior({}),
       }),
-    );
-    const providers = {
-      buckets: { default: bucket },
-      cache: { default: external(redis({ url: definition.CACHE_URL })) },
-      models: {
-        default: external(
-          aiSdk({
-            defaultProvider: "openai",
-            defaultModel: "gpt-5-mini",
-            openai: { apiKey: definition.API_KEY },
-          }),
-        ),
-      },
-    };
+    });
 
     expect(isEnvRef(definition.AWS_REGION)).toBe(true);
     expect(Object.keys(definition)).toEqual(["kind", "shape", "metadata"]);
     expect(Object.getOwnPropertyDescriptor(definition, "API_KEY")?.enumerable).toBe(false);
-    expect(bucket.ownership).toBe("managed");
-    expect(bucket.adapter.environment).toEqual([
-      { name: "AWS_REGION", type: "string", sensitive: false },
-      { name: "BUCKET_ENDPOINT", type: "url", sensitive: false },
-      { name: "BUCKET_NAME", type: "string", sensitive: false },
-    ]);
-    expect(JSON.stringify(providers)).not.toContain("synthetic-secret");
-    expect(JSON.stringify(providers)).toContain("BUCKET_ENDPOINT");
-    expect(Object.isFrozen(bucket)).toBe(true);
-    expect(Object.isFrozen(bucket.adapter)).toBe(true);
+    expect(cacheUrl.kind).toBe("binding-value-ref");
+    expect(JSON.stringify(app)).not.toContain("synthetic-secret");
+    expect(JSON.stringify(app.cache)).toContain("CACHE_URL");
+    expect(Object.isFrozen(app)).toBe(true);
+    expect(Object.isFrozen(app.cache.profiles.default)).toBe(true);
   });
 
   test("validates job policies and omits executable handlers", () => {
