@@ -1,20 +1,20 @@
 import type { EventTriggerConfig, GraphNode } from "@relkit/graph";
 import type { FromGraphOptions } from "./from-graph-validation.js";
 import { byLogical, isManaged, nodes } from "./from-graph-validation.js";
-import { iam } from "./from-graph-aws.js";
+import { accessActions } from "./from-graph-providers.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 
 export function events(context: PlanContext) {
   return nodes(context.graph.nodes, "event")
-    .filter(() => isManaged(context.providers, "events", "default"))
+    .filter((event) => isManaged(context.providers, "event", event.profile))
     .map((event) => ({
       ...base(
         context,
         event.id,
         "event",
-        "events",
-        "default",
-        iam("events", event.id, context.graph.edges),
+        "event",
+        event.profile,
+        actions(context, "event", event.profile),
       ),
       version: event.version,
       input: event.input,
@@ -30,7 +30,7 @@ export function eventTriggers(context: PlanContext) {
     )
     .filter((node) => {
       const config = node.config as unknown as EventTriggerConfig;
-      return isManaged(context.providers, "events", config.profile ?? "default");
+      return isManaged(context.providers, "event", config.profile ?? "default");
     })
     .map((node) => {
       const config = node.config as unknown as EventTriggerConfig;
@@ -40,9 +40,9 @@ export function eventTriggers(context: PlanContext) {
           context,
           node.id,
           "event-trigger",
-          "events",
+          "event",
           profile,
-          config.delivery === "durable" ? iam("jobs", node.id, context.graph.edges) : [],
+          config.delivery === "durable" ? actions(context, "job", "default") : [],
         ),
         targetFunctionId: node.targetFunctionId,
         eventId: config.eventId,
@@ -58,15 +58,15 @@ export function eventTriggers(context: PlanContext) {
 
 export function buckets(context: PlanContext) {
   return nodes(context.graph.nodes, "bucket")
-    .filter((bucket) => isManaged(context.providers, "buckets", bucket.profile))
+    .filter((bucket) => isManaged(context.providers, "bucket", bucket.profile))
     .map((bucket) => ({
       ...base(
         context,
         bucket.id,
         "bucket",
-        "buckets",
+        "bucket",
         bucket.profile,
-        iam("buckets", bucket.id, context.graph.edges),
+        actions(context, "bucket", bucket.profile),
       ),
       profile: bucket.profile,
       visibility: bucket.visibility,
@@ -88,7 +88,7 @@ export function caches(context: PlanContext) {
         "cache",
         "cache",
         cache.profile,
-        iam("cache", cache.id, context.graph.edges),
+        actions(context, "cache", cache.profile),
       ),
       profile: cache.profile,
       ...(defined(cache.defaultTtlMs) ? { defaultTtlMs: cache.defaultTtlMs } : {}),
@@ -117,4 +117,9 @@ export function routes(graphNodes: readonly GraphNode[]) {
 
 function defined<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined;
+}
+
+function actions(context: PlanContext, capability: string, profile: string): readonly string[] {
+  const provider = context.providers.get(`provider.${capability}.${profile}`);
+  return provider === undefined ? [] : accessActions(provider);
 }

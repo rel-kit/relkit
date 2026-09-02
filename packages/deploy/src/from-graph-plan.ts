@@ -1,19 +1,27 @@
 import { deepFreeze } from "@relkit/contracts";
-import type { ApplicationGraph, ProviderProfileNode } from "@relkit/graph";
+import type { AppNode, ApplicationGraph, ProviderBindingNode } from "@relkit/graph";
 import { DEPLOYMENT_PLAN_VERSION, type ContainerImagePlan, type DeploymentPlan } from "./plan.js";
 import type { FromGraphOptions } from "./from-graph-validation.js";
 import { byLogical, envNames, isManaged, logicalName, nodes } from "./from-graph-validation.js";
-import { iam } from "./from-graph-aws.js";
+import { accessActions } from "./from-graph-providers.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 import { createIamPlan } from "./iam.js";
 import { buckets, caches, eventTriggers, events, routes } from "./from-graph-resources.js";
+import {
+  accessOperations,
+  connectedBindings,
+  engine,
+  host,
+  infrastructureOperations,
+} from "./from-graph-integrations.js";
 
 export function buildPlan(
   graph: ApplicationGraph,
+  app: AppNode,
   appId: string,
   graphHash: string,
   options: FromGraphOptions,
-  providers: Map<string, ProviderProfileNode>,
+  providers: Map<string, ProviderBindingNode>,
 ): DeploymentPlan {
   const context: PlanContext = { appId, graphHash, graph, providers };
   const image = options.image ?? defaultImage(appId, options.httpPort ?? 3000);
@@ -23,18 +31,11 @@ export function buildPlan(
     contractVersion: DEPLOYMENT_PLAN_VERSION,
     graphHash,
     application: { id: appId, image, environmentNames },
-    providerBindings: [...providers.values()]
-      .filter((provider) => provider.ownership === "managed")
-      .map((provider) => ({
-        id: provider.id,
-        capability: provider.capability,
-        profile: provider.profile,
-        adapter: provider.adapter,
-        ownership: "managed" as const,
-        configuration: provider.configuration,
-        environment: provider.environment,
-      }))
-      .sort((left, right) => left.id.localeCompare(right.id)),
+    engine: engine(app),
+    host: host(app),
+    connectedBindings: connectedBindings(providers, graph.edges),
+    infrastructureOperations: infrastructureOperations(providers, graph.edges),
+    accessOperations: accessOperations(providers, graph.edges),
     http: {
       logicalName: logicalName(appId, "http", "public"),
       port: image.health.port,
@@ -49,40 +50,20 @@ export function buildPlan(
     buckets: buckets(context),
     caches: caches(context),
     iam: createIamPlan(appId, graph, providers),
-    ...managedObservability(providers, appId, environmentNames),
   } as DeploymentPlan);
-}
-
-function managedObservability(
-  providers: Map<string, ProviderProfileNode>,
-  appId: string,
-  environmentNames: readonly string[],
-): { readonly observability?: DeploymentPlan["observability"] } {
-  const binding = [...providers.values()].find(
-    (provider) => provider.capability === "observability" && provider.ownership === "managed",
-  );
-  if (binding === undefined) return {};
-  return {
-    observability: {
-      logicalName: logicalName(appId, "observability", binding.profile),
-      configurationNames: environmentNames.filter((name) => /log|trace|otlp/i.test(name)),
-      logs: true,
-      traces: true,
-    },
-  };
 }
 
 function jobs(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
-    .filter((job) => isManaged(context.providers, "jobs", job.profile))
+    .filter((job) => isManaged(context.providers, "job", job.profile))
     .map((job) => ({
       ...base(
         context,
         job.id,
         "job",
-        "jobs",
+        "job",
         job.profile,
-        iam("jobs", job.id, context.graph.edges),
+        accessActions(context.providers.get(`provider.job.${job.profile}`)!),
       ),
       targetFunctionId: job.targetFunctionId,
       profile: job.profile,
@@ -96,7 +77,7 @@ function jobs(context: PlanContext) {
 
 function schedules(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
-    .filter((job) => isManaged(context.providers, "jobs", job.profile))
+    .filter((job) => isManaged(context.providers, "job", job.profile))
     .flatMap((job) => {
       if (!Array.isArray(job.schedule)) return [];
       return job.schedule.map((schedule, index) => ({
@@ -104,7 +85,7 @@ function schedules(context: PlanContext) {
           context,
           descriptorId(schedule, `${job.id}:schedule:${index}`),
           "schedule",
-          "jobs",
+          "job",
           job.profile,
         ),
         jobId: job.id,

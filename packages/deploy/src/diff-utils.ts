@@ -7,27 +7,41 @@ export interface Resource {
   readonly stableId: string;
   readonly kind: string;
   readonly logicalName: string;
+  readonly replacementKey: string;
   readonly value: JsonValue;
 }
 
 export function resources(plan: DeploymentPlan): readonly Resource[] {
   const result: Resource[] = [
+    integration("deployment-engine", "engine", plan.engine),
+    integration("application-host", "host", plan.host),
+    ...plan.connectedBindings.map((value) =>
+      resource("connected-binding", value.bindingId, value.bindingId, value, adapterKey(value)),
+    ),
+    ...plan.infrastructureOperations.map((value) =>
+      resource(
+        "infrastructure-operation",
+        value.id,
+        value.bindingId,
+        value,
+        `${integrationKey(value.integration)}\0${adapterKey(value)}`,
+      ),
+    ),
+    ...plan.accessOperations.map((value) =>
+      resource(
+        "access-operation",
+        value.id,
+        value.bindingId,
+        value,
+        integrationKey(value.integration),
+      ),
+    ),
     resource("application", plan.application.id, plan.application.id, {
       ...plan.application,
       contractVersion: plan.contractVersion,
       graphHash: plan.graphHash,
     }),
     resource("http", plan.http.logicalName, plan.http.logicalName, plan.http),
-    ...(plan.observability === undefined
-      ? []
-      : [
-          resource(
-            "observability",
-            plan.observability.logicalName,
-            plan.observability.logicalName,
-            plan.observability,
-          ),
-        ]),
     ...entries("job", plan.jobs),
     ...entries("schedule", plan.schedules),
     ...entries("event", plan.events),
@@ -45,14 +59,43 @@ function entries(
   return values.map((value) => resource(kind, value.id, value.logicalName, value));
 }
 
-function resource(kind: string, id: string, logicalName: string, value: unknown): Resource {
+function resource(
+  kind: string,
+  id: string,
+  logicalName: string,
+  value: unknown,
+  replacementKey = logicalName,
+): Resource {
   return {
     id,
     stableId: `${kind}:${id}`,
     kind,
     logicalName,
+    replacementKey,
     value: value as JsonValue,
   };
+}
+
+function integration(
+  kind: string,
+  id: string,
+  value: DeploymentPlan["engine"] | DeploymentPlan["host"],
+): Resource {
+  return resource(kind, id, value.integrationId, value, integrationKey(value));
+}
+
+function integrationKey(value: { readonly integrationId: string; readonly protocolVersion: 1 }) {
+  return `${value.integrationId}\0${value.protocolVersion}`;
+}
+
+function adapterKey(value: {
+  readonly adapter: {
+    readonly integrationId: string;
+    readonly adapterId: string;
+    readonly protocolVersion: 1;
+  };
+}) {
+  return `${value.adapter.integrationId}\0${value.adapter.adapterId}\0${value.adapter.protocolVersion}`;
 }
 
 export function changedFields(before: JsonValue, after: JsonValue): readonly string[] {
@@ -74,7 +117,13 @@ export function isSecuritySensitive(
   after: JsonValue | undefined,
 ): boolean {
   const changed = operation === "create" || operation === "delete" ? [] : fields;
-  if (changed.some((field) => /configurationNames|environmentNames|provider|profile/i.test(field)))
+  if (
+    changed.some((field) =>
+      /configurationNames|environmentNames|provider|profile|adapter|namedValues|integration|connection/i.test(
+        field,
+      ),
+    )
+  )
     return true;
   if (changed.includes("visibility") && [before, after].some((value) => hasPublicVisibility(value)))
     return true;
