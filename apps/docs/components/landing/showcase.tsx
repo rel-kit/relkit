@@ -4,13 +4,34 @@ import type { CSSProperties } from "react";
 import { SectionHeading } from "./sections";
 import { landingCommunityStack, StackIcon } from "./stack-icons";
 
+const guides = [
+  {
+    eyebrow: "Start",
+    title: "Create, change, verify, build, and start your first app",
+    href: "/docs/start/create-an-app",
+    visual: "bunx create-relkit@latest relkit-orders",
+  },
+  {
+    eyebrow: "HTTP",
+    title: "Map validated functions to filesystem routes and OpenAPI",
+    href: "/docs/http/routes",
+    visual: "POST /orders  →  createOrder",
+  },
+  {
+    eyebrow: "Operations",
+    title: "Test failure paths and trace one request end to end",
+    href: "/docs/operations/testing",
+    visual: "request → log → span → graph",
+  },
+] as const;
+
 export function InspectorShowcase() {
   return (
     <section id="inspector" className="landing-container landing-section">
       <SectionHeading
         eyebrow="Inspector"
         title="Visualize everything running in your application."
-        description="Open the local inspector, choose a route or function, then follow its graph identity through diagnostics, requests, logs, and spans."
+        description="Open the local inspector, follow a graph identity through requests and traces, and inspect provider profiles, local recipes, exporter health, and activation fingerprints."
       />
       <Link className="landing-inspector" href="/docs/operations/inspector">
         <Image
@@ -83,26 +104,6 @@ export function Community() {
 }
 
 export function GuideCards() {
-  const guides = [
-    {
-      eyebrow: "Start",
-      title: "Create, change, verify, build, and start your first app",
-      href: "/docs/start/create-an-app",
-      visual: "bunx create-relkit@latest relkit-orders",
-    },
-    {
-      eyebrow: "HTTP",
-      title: "Map validated functions to filesystem routes and OpenAPI",
-      href: "/docs/http/routes",
-      visual: "POST /orders  →  createOrder",
-    },
-    {
-      eyebrow: "Operations",
-      title: "Test failure paths and trace one request end to end",
-      href: "/docs/operations/testing",
-      visual: "request → log → span → graph",
-    },
-  ] as const;
   return (
     <section className="landing-container landing-section">
       <SectionHeading

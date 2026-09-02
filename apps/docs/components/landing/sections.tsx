@@ -1,4 +1,4 @@
-import { Bot, Braces, RadioTower, RefreshCw, Route, TestTube2 } from "lucide-react";
+import { Activity, Boxes, Braces, RadioTower, Route } from "lucide-react";
 import Link from "next/link";
 
 interface Capability {
@@ -7,6 +7,8 @@ interface Capability {
   readonly summary: string;
   readonly guide: string;
 }
+
+const capabilityIcons = [Boxes, Route, Braces, RadioTower, Activity];
 
 export function SectionHeading({
   eyebrow,
@@ -27,29 +29,23 @@ export function SectionHeading({
 }
 
 export function Capabilities({ features }: { readonly features: readonly Capability[] }) {
-  const icons = [Braces, Route, RadioTower, RefreshCw, Bot, TestTube2];
   return (
     <section className="landing-container landing-section">
       <SectionHeading
         eyebrow="Features"
-        title="Build more from one model."
-        description="Start with a typed function, then expose it through HTTP, events, jobs, agents, and deterministic tests without duplicating contracts."
+        title="The five parts of a Relkit application."
+        description="Organize a service, implement functions, expose routes, publish events, and observe the complete execution path."
       />
       <div className="landing-capability-grid">
         {features.map((feature, index) => {
-          const Icon = icons[index]!;
-          const isAgents = feature.id === "agents";
+          const Icon = capabilityIcons[index]!;
           return (
             <Link key={feature.id} href={`/docs/${feature.guide}`}>
               <span className="landing-feature-mark">
                 <Icon aria-hidden="true" />
               </span>
-              <h3>{isAgents ? "AI agents and workflows" : feature.title}</h3>
-              <p>
-                {isAgents
-                  ? "Build bounded model workflows with typed input, allowlisted tools, approvals, and execution limits."
-                  : feature.summary}
-              </p>
+              <h3>{feature.title}</h3>
+              <p>{feature.summary}</p>
               <small>Learn more &gt;</small>
             </Link>
           );

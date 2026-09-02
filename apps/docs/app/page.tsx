@@ -12,20 +12,16 @@ import {
   GuideCards,
   InspectorShowcase,
 } from "../components/landing/showcase";
-import { exampleDefinitions, featuredCapabilityIds } from "../components/landing/data";
-import coverage from "../content/generated/coverage.json";
+import { exampleDefinitions, primaryCapabilities } from "../components/landing/data";
 
 export default async function HomePage() {
   const repositoryRoot = resolve(process.cwd(), "../..");
   const examples = await Promise.all(
     exampleDefinitions.map(async (example) => {
-      const source =
-        "snippet" in example
-          ? example.snippet
-          : await readFile(
-              resolve(/* turbopackIgnore: true */ repositoryRoot, example.source),
-              "utf8",
-            );
+      const source = await readFile(
+        resolve(/* turbopackIgnore: true */ repositoryRoot, example.source),
+        "utf8",
+      );
       return {
         ...example,
         highlightedCode: await codeToHtml(source.trim(), {
@@ -36,18 +32,12 @@ export default async function HomePage() {
       };
     }),
   );
-  const capabilities = featuredCapabilityIds.map((id) => {
-    const capability = coverage.features.find((item) => item.id === id);
-    if (capability === undefined) throw new Error(`Generated documentation is missing ${id}`);
-    return capability;
-  });
-
   return (
     <main className="landing-root">
       <LandingHeader />
       <LandingHero />
       <LandingExamples examples={examples} />
-      <Capabilities features={capabilities} />
+      <Capabilities features={primaryCapabilities} />
       <Statistics />
       <DeveloperWorkflows />
       <ObservabilityFeatures />

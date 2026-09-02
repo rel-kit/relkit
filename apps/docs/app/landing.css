@@ -277,7 +277,7 @@
 
 .landing-example-tabs {
   display: grid;
-  grid-template-columns: repeat(7, minmax(7.5rem, 1fr));
+  grid-template-columns: repeat(5, minmax(7.5rem, 1fr));
   overflow-x: auto;
   border-bottom: 1px solid var(--landing-line);
 }
