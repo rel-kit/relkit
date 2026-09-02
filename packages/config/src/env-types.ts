@@ -1,4 +1,7 @@
 import type { JsonValue } from "./env-json.js";
+import type { BindingValueRef } from "@relkit/provider";
+
+export type { BindingValueRef } from "@relkit/provider";
 
 export type LiteralValue = string | number | boolean;
 export type EnvValueType =
@@ -66,13 +69,20 @@ export type EnvDefinition<S extends EnvShape> = {
 
 export interface EnvBuilderFactory {
   string(): EnvBuilder<string>;
+  string<const Name extends string>(name: Name): BindingValueRef<Name, string, "string">;
   number(): EnvBuilder<number>;
+  number<const Name extends string>(name: Name): BindingValueRef<Name, number, "number">;
   boolean(): EnvBuilder<boolean>;
+  boolean<const Name extends string>(name: Name): BindingValueRef<Name, boolean, "boolean">;
   port(): EnvBuilder<number>;
+  port<const Name extends string>(name: Name): BindingValueRef<Name, number, "port">;
   literal<const Values extends readonly [LiteralValue, ...LiteralValue[]]>(
     ...values: Values
   ): EnvBuilder<Values[number]>;
   url(): EnvBuilder<URL>;
+  url<const Name extends string>(name: Name): BindingValueRef<Name, URL, "url">;
   json(): EnvBuilder<JsonValue>;
+  json<const Name extends string>(name: Name): BindingValueRef<Name, JsonValue, "json">;
   secret(): EnvBuilder<string>;
+  secret<const Name extends string>(name: Name): BindingValueRef<Name, string, "secret-string">;
 }
