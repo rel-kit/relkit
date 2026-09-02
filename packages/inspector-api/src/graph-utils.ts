@@ -1,5 +1,6 @@
 import { deepFreeze, type JsonValue } from "@relkit/contracts";
 import { isRecord, pick, safeJson, safeSource } from "./shared.js";
+import { projectAppNode, projectProviderNode } from "./topology.js";
 
 const GRAPH_FIELDS = `
 environment providerBindings observability defaults name type requiredIn hasDefault sensitive
@@ -16,6 +17,8 @@ title tags members functions events order ownerId ownerKind phase domainId expos
 export function projectNode(value: unknown): JsonValue | undefined {
   if (!isRecord(value) || typeof value.kind !== "string" || typeof value.id !== "string")
     return undefined;
+  if (value.kind === "provider") return projectProviderNode(value);
+  if (value.kind === "app") return projectAppNode(value);
   const result: Record<string, unknown> = { kind: value.kind, id: value.id };
   const source = safeSource(value.source);
   if (source !== undefined) result.source = source;

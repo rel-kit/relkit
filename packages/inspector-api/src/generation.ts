@@ -1,3 +1,4 @@
+import { isRuntimeActivationFingerprint } from "@relkit/contracts";
 import type { InspectorActionServices } from "./actions.js";
 import {
   isRecord,
@@ -26,14 +27,26 @@ export async function resolveActiveGeneration(
   const sourceGraphHash = isRecord(graphSource) ? stringValue(graphSource.graphHash) : undefined;
   const graphService = await resolveService(graphSource);
   const generationId = stringValue(value.generationId) ?? stringValue(value.id);
+  if (
+    value.activationFingerprint !== undefined &&
+    !isRuntimeActivationFingerprint(value.activationFingerprint)
+  )
+    return undefined;
+  const activationFingerprint = value.activationFingerprint;
   const graphHash =
     stringValue(value.graphHash) ??
     sourceGraphHash ??
-    (isRecord(graphService) ? stringValue(graphService.graphHash) : undefined);
+    (isRecord(graphService) ? stringValue(graphService.graphHash) : undefined) ??
+    activationFingerprint?.graphHash;
   if (generationId === undefined || graphHash === undefined) return undefined;
+  if (activationFingerprint !== undefined && graphHash !== activationFingerprint.graphHash)
+    return undefined;
   const descriptors = await resolveService(value.descriptors ?? services.descriptors);
   const diagnostics = await resolveService(value.diagnostics ?? services.diagnostics);
   const observedEdges = await resolveService(value.observedEdges ?? services.observedEdges);
+  const integrations = await resolveService(value.integrations ?? services.integrations);
+  const localServices = await resolveService(value.localServices ?? services.localServices);
+  const telemetry = await resolveService(value.telemetry ?? services.telemetry);
   const actions = await resolveValue(
     (value.actions ?? services.actions) as
       InspectorValueSource<InspectorActionServices | undefined> | undefined,
@@ -52,10 +65,14 @@ export async function resolveActiveGeneration(
   return {
     generationId,
     graphHash,
+    ...(activationFingerprint === undefined ? {} : { activationFingerprint }),
     ...(unwrapGraph(graphService) === undefined ? {} : { graph: unwrapGraph(graphService) }),
     ...(descriptors === undefined ? {} : { descriptors }),
     ...(diagnostics === undefined ? {} : { diagnostics }),
     ...(observedEdges === undefined ? {} : { observedEdges }),
+    ...(integrations === undefined ? {} : { integrations }),
+    ...(localServices === undefined ? {} : { localServices }),
+    ...(telemetry === undefined ? {} : { telemetry }),
     ...(runtime === undefined ? {} : { runtime: runtime as InspectorRuntimeServices }),
     ...(actions === undefined ? {} : { actions }),
     ...(resources === undefined ? {} : { resources }),
@@ -74,13 +91,26 @@ async function resolveCandidate(source: unknown): Promise<ResolvedCandidateGener
   const graphService = await resolveService(graphSource);
   const diagnostics = await resolveService(value.diagnostics ?? services.diagnostics);
   const generationId = stringValue(value.generationId) ?? stringValue(value.id);
+  if (
+    value.activationFingerprint !== undefined &&
+    !isRuntimeActivationFingerprint(value.activationFingerprint)
+  )
+    return undefined;
+  const activationFingerprint = value.activationFingerprint;
   const graphHash =
     stringValue(value.graphHash) ??
     sourceGraphHash ??
-    (isRecord(graphService) ? stringValue(graphService.graphHash) : undefined);
+    (isRecord(graphService) ? stringValue(graphService.graphHash) : undefined) ??
+    activationFingerprint?.graphHash;
   const sourceVersion = safeInteger(value.sourceVersion);
   const state = stringValue(value.state);
   const status = stringValue(value.status);
+  if (
+    activationFingerprint !== undefined &&
+    graphHash !== undefined &&
+    graphHash !== activationFingerprint.graphHash
+  )
+    return undefined;
   if (
     generationId === undefined &&
     graphHash === undefined &&
@@ -94,6 +124,7 @@ async function resolveCandidate(source: unknown): Promise<ResolvedCandidateGener
   return {
     ...(generationId === undefined ? {} : { generationId }),
     ...(graphHash === undefined ? {} : { graphHash }),
+    ...(activationFingerprint === undefined ? {} : { activationFingerprint }),
     ...(sourceVersion === undefined ? {} : { sourceVersion }),
     ...(state === undefined ? {} : { state }),
     ...(status === undefined ? {} : { status }),

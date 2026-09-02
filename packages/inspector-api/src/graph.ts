@@ -8,6 +8,7 @@ import {
   type ResolvedActiveGeneration,
 } from "./shared.js";
 import { projectDescriptors, projectNode, projectObservedEdges } from "./graph-utils.js";
+import { projectIntegrationProvenance } from "./topology.js";
 
 export const GRAPH_COLLECTIONS = Object.freeze([
   "descriptors",
@@ -40,11 +41,17 @@ export async function graphSnapshot(generation: ResolvedActiveGeneration): Promi
   const data = graphData(generation.graph);
   if (data === undefined) throw new InspectorGraphError("RELKIT_INSPECTOR_GRAPH_UNAVAILABLE", 503);
   const observedEdges = projectObservedEdges(generation.observedEdges);
+  const integrations = projectIntegrationProvenance(generation.integrations);
   return {
     ...identity(generation),
-    graph: { ...data, ...(observedEdges.length === 0 ? {} : { observedEdges }) },
+    graph: {
+      ...data,
+      ...(observedEdges.length === 0 ? {} : { observedEdges }),
+      ...(integrations.length === 0 ? {} : { integrations }),
+    },
     ...data,
     ...(observedEdges.length === 0 ? {} : { observedEdges }),
+    ...(integrations.length === 0 ? {} : { integrations }),
   } as JsonValue;
 }
 
