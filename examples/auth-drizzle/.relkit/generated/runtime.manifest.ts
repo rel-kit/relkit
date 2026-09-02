@@ -1,4 +1,5 @@
-import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/invocation";
+import runtimeActivationFingerprint from "./runtime-activation.json" with { type: "json" };
+import { bindDescriptorIdentity as __relkit_bindDescriptorIdentity } from "@relkit/app";
 import * as __relkit_module_0 from "../../relkit.config.ts";
 import * as __relkit_module_1 from "../../src/account/functions/session.function.ts";
 import * as __relkit_module_2 from "../../src/account/service.ts";
@@ -20,14 +21,15 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["ALL"], "route.all.api.auth.op
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"], "route.get.session");
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"]["target"], "account.session");
 
-export const manifestContractVersion = 7 as const;
-export const manifestGeneratorVersion = 4 as const;
-export const manifestGraphHash = "sha256:7cab7bc0c0398a9a7560a63f9c5cddecccc24de0169219ba0d4e6f0b33c71b62" as const;
-export const providerFactories = {  } as const;
+export const manifestContractVersion = 8 as const;
+export const manifestGeneratorVersion = 5 as const;
+export const manifestGraphHash = "sha256:9d12949fea4129657bfd838940ee1597080c3e78ba98268488647c079ca0e7a5" as const;
+export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
   generatorVersion: manifestGeneratorVersion,
   graphHash: manifestGraphHash,
+  activationFingerprint: runtimeActivationFingerprint,
   functions: { "account.session": __relkit_module_1["default"].handler },
   targets: { "account.session": __relkit_module_1["default"] },
   agents: {  },
@@ -36,8 +38,7 @@ export const runtimeManifest = {
   constants: {  },
   prompts: {  },
   services: { "account": __relkit_module_2["default"], "auth": __relkit_module_3["default"], "database": __relkit_module_4["default"] },
-  providers: providerFactories,
-  providerFactories,
+  runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,
   middleware: {  },
   hooks: {  },
   requestTransforms: {  },
