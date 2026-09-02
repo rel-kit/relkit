@@ -1,13 +1,18 @@
-import { isStableId, normalizeSourceLocation } from "@relkit/contracts";
+import { GRAPH_VERSION, isStableId, normalizeSourceLocation } from "@relkit/contracts";
 import { isGraphEdgeKind, isGraphNodeKind } from "./model.js";
-import { validateProviderNode } from "./provider-validation.js";
+import { validateDeploymentRoles, validateProviderNode } from "./provider-validation.js";
 import { validateServiceNode } from "./service-validation.js";
 import { validateEventTargets } from "./event-validation.js";
+import { validateTelemetryConfiguration } from "./telemetry-validation.js";
 
 export function validateGraphShape(value: unknown, root?: string): void {
   if (!isRecord(value) || !Array.isArray(value.nodes) || !Array.isArray(value.edges)) {
     fail("A graph must contain nodes and edges arrays.");
   }
+  if (value.contractVersion !== GRAPH_VERSION)
+    fail(
+      `Graph contract version ${String(value.contractVersion)} is unsupported; expected ${GRAPH_VERSION}. Regenerate with \`relkit check\`.`,
+    );
   rejectUnboundIdentities(value);
   if (value.appId !== undefined && !isCanonicalId(value.appId)) fail("Graph appId is invalid.");
   value.nodes.forEach((node, index) => validateNode(node, root, index));
@@ -46,6 +51,12 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   }
   if (value.kind === "service") validateServiceNode(value, index, validateId);
   if (value.kind === "provider") validateProviderNode(value, index, fail);
+  if (value.kind === "app") {
+    if ("providerBindings" in value || "observability" in value)
+      fail(`Graph nodes[${index}] contains legacy provider data.`);
+    validateDeploymentRoles(value.deploymentRoles, index, "app", fail);
+    validateTelemetryConfiguration(value.telemetry, index, fail);
+  }
   if (value.kind === "middleware") {
     if (typeof value.path !== "string" || !Number.isSafeInteger(value.order)) {
       fail(`Graph nodes[${index}] middleware metadata is invalid.`);
