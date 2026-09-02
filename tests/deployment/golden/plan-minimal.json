@@ -1,6 +1,6 @@
 {
-  "contractVersion": 2,
-  "graphHash": "sha256:c9ce9d75ec4264b52ce1dd0c21f8f8a9cc0c3270538bc83dc2de51d5a2cde6bb",
+  "contractVersion": 3,
+  "graphHash": "sha256:a8a59a7ce8acd24b6e9e940b9505132c09bc7ed83374692d860c378819a64f18",
   "application": {
     "id": "minimal-app",
     "image": {
@@ -16,7 +16,21 @@
       "SERVICE_PORT"
     ]
   },
-  "providerBindings": [],
+  "engine": {
+    "role": "engine",
+    "integrationId": "pulumi",
+    "protocolVersion": 1,
+    "configuration": {}
+  },
+  "host": {
+    "role": "host",
+    "integrationId": "aws",
+    "protocolVersion": 1,
+    "configuration": {}
+  },
+  "connectedBindings": [],
+  "infrastructureOperations": [],
+  "accessOperations": [],
   "http": {
     "logicalName": "minimal-app-http-public",
     "port": 3000,
