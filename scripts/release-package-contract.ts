@@ -118,6 +118,10 @@ export function expectedExports(
         types: "./dist/telemetry.d.ts",
         import: "./dist/telemetry.js",
       },
+      "./local": {
+        types: "./dist/local/index.d.ts",
+        import: "./dist/local/index.js",
+      },
     };
   return { ".": rootExport };
 }
