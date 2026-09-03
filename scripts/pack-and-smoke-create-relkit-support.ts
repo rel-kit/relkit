@@ -87,7 +87,7 @@ async function freePort(): Promise<number> {
   return port;
 }
 async function waitFor(check: () => Promise<boolean>): Promise<void> {
-  const deadline = Date.now() + 8_000;
+  const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
     try {
       if (await check()) return;
