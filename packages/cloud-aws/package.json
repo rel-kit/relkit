@@ -1,6 +1,6 @@
 {
   "name": "@relkit/cloud-aws",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Unsupported internal AWS deployment components for RELKIT; use @relkit/cli.",
   "license": "MIT",
   "repository": {

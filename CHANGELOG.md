@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.2.0
+
+### Changes
+
+- Replace the pre-1.0 provider ownership contract and legacy provider package exports with `defineApp` bindings, explicit test replacements, and independently installable integration packages. This breaking cohort intentionally ships without compatibility aliases, old artifact readers, or migration tooling.
+
 ## 0.1.0
 
 ### Changes

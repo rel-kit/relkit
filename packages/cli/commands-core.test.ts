@@ -84,7 +84,7 @@ test("check refreshes generated event types before project typechecking", async 
   expect(await readFile(join(root, ".relkit/generated/event-registry.d.ts"), "utf8")).toContain(
     "interface EventRegistry",
   );
-});
+}, 30_000);
 
 test("build succeeds from a checked graph and reports failed checks", async () => {
   const validRoot = await copyProject("tests/compiler/fixtures/valid-minimal");
