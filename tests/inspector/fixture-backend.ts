@@ -447,7 +447,7 @@ export function createInspectorFixture(): InspectorFixture {
     const records = makeTraceRecords(traceId, id, now);
     traces = [...records, ...traces];
     const log = makeLog(
-      String(requestSequence + 1),
+      String(Math.max(0, ...logs.map((record) => Number(record.cursor))) + 1),
       traceId,
       FIXTURE_IDS.function,
       "Order request completed.",
@@ -469,6 +469,38 @@ export function createInspectorFixture(): InspectorFixture {
     reset();
     return context.json({ ok: true });
   });
+  app.post("/__fixture__/logs", (context) => {
+    logs = Array.from({ length: 65 }, (_, index) => ({
+      ...makeLog(
+        String(100 + index),
+        "trace-initial",
+        "orders.create",
+        index % 2 ? "Order processed" : "Cache lookup",
+      ),
+      level: ["debug", "info", "warn", "error"][index % 4]!,
+      fields: {
+        customer: "Alice",
+        detail: "Retained metadata ".repeat(30),
+        ...(index % 4 === 3
+          ? {
+              error: {
+                name: "Error",
+                message: "Connection refused",
+                cause: { message: "Upstream unavailable" },
+              },
+            }
+          : {}),
+      },
+    }));
+    return context.json({ ok: true });
+  });
+  app.get("/_relkit/v1/storage", (context) =>
+    context.json(
+      { protocol: "relkit.observability.query", version: 1, state: "ready", failed: 0, dropped: 0 },
+      200,
+      { "x-relkit-api-version": "1" },
+    ),
+  );
   app.post("/__fixture__/candidate", async (context) => {
     const body = await context.req.json<{ invalid?: boolean }>();
     invalidCandidate = body.invalid === true;
@@ -707,7 +739,21 @@ function makeQuery(
 ): ObservabilityQuery {
   return {
     requests: async (query = {}) => page(filter(read().requests, query), query),
-    logs: async (query = {}) => page(filter(read().logs, query), query),
+    logs: async (query = {}) => {
+      const items = filter(read().logs, query).filter(
+        (item) =>
+          (!query.search ||
+            JSON.stringify(item).toLowerCase().includes(query.search.toLowerCase())) &&
+          (!query.severity || item.level === query.severity) &&
+          (!query.source || item.origin === query.source),
+      );
+      items.sort((a, b) =>
+        query.order === "desc"
+          ? Number(b.cursor) - Number(a.cursor)
+          : Number(a.cursor) - Number(b.cursor),
+      );
+      return page(items, query);
+    },
     traces: async (query = {}) => page(filter(read().traces, query), query),
     request: async (id) => {
       const request = read().requests.find((item) => item.requestId === id);
@@ -876,8 +922,10 @@ function makeLog(cursor: string, traceId: string, functionId: string, message: s
     version: 1,
     signal: "log",
     cursor,
-    timestamp: now,
+    timestamp: new Date().toISOString(),
     level: "info",
+    origin: "application",
+    spanId: `${traceId}:function`,
     component: "fixture",
     message,
     fields: {},

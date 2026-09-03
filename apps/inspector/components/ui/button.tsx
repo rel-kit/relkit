@@ -9,7 +9,7 @@ export interface ButtonProps extends AriaButtonProps {
 }
 
 const variants = {
-  default: "bg-[var(--accent)] text-white hover:bg-[var(--accent-strong)]",
+  default: "bg-[var(--accent)] text-[var(--accent-foreground)] hover:bg-[var(--accent-strong)]",
   secondary:
     "border border-[var(--line)] bg-[var(--panel)] text-[var(--ink)] hover:bg-[var(--panel-muted)]",
   ghost: "text-[var(--muted)] hover:bg-[var(--panel-muted)] hover:text-[var(--ink)]",
