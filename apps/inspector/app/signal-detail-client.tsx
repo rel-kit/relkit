@@ -7,8 +7,10 @@ import { createInspectorBackendStream, createInspectorClient } from "../lib/clie
 import { requestDetail, traceDetail } from "../lib/observability-api";
 import { eventRecord, records, text } from "../lib/observability-model";
 import { SignalDetailView } from "./signal-detail-view";
+import { Button } from "../components/ui/button";
 
 interface SignalDetailData {
+  readonly nextCursor?: string;
   readonly request?: InspectorObject;
   readonly trace?: InspectorObject;
   readonly records: readonly InspectorObject[];
@@ -23,7 +25,31 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
   const [data, setData] = useState<SignalDetailData>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [liveState, setLiveState] = useState("connecting");
-
+  const [paging, setPaging] = useState("ready");
+  const loadMore = async () => {
+    if (!data?.nextCursor) return;
+    setPaging("loading");
+    try {
+      const page = await createInspectorClient().query("traces", {
+        traceId: id,
+        cursor: data.nextCursor,
+        limit: 100,
+      });
+      setData((current) => {
+        if (current !== data) return current;
+        const { nextCursor: _, ...rest } = current;
+        return {
+          ...rest,
+          records: [...rest.records, ...page.items],
+          spans: [...rest.spans, ...page.items.filter((item) => item.signal === "span")],
+          ...(page.nextCursor ? { nextCursor: page.nextCursor } : {}),
+        };
+      });
+      setPaging("ready");
+    } catch {
+      setPaging("error");
+    }
+  };
   useEffect(() => {
     if (id === "") return;
     let mounted = true;
@@ -81,7 +107,26 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
         The {kind === "requests" ? "request" : "trace"} API is unavailable.
       </p>
     );
-  return <SignalDetailView kind={kind} id={id} {...data} liveState={liveState} />;
+  return (
+    <>
+      {data.nextCursor && (
+        <div className="panel supporting-copy" role="status">
+          Partial trace: more records are retained.{" "}
+          <Button
+            variant="secondary"
+            isDisabled={paging === "loading"}
+            onPress={() => void loadMore()}
+          >
+            Load more trace records
+          </Button>
+          {paging === "error" && (
+            <p role="alert">More records could not be loaded. Retry when connected.</p>
+          )}
+        </div>
+      )}
+      <SignalDetailView kind={kind} id={id} {...data} liveState={liveState} />
+    </>
+  );
 }
 
 async function loadRequest(
@@ -128,6 +173,7 @@ async function loadTrace(
   ]);
   return {
     ...(detail.trace === undefined ? {} : { trace: detail.trace }),
+    ...(detail.nextCursor ? { nextCursor: detail.nextCursor } : {}),
     records: traceRecords,
     spans,
     logs: logs.items,

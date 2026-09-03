@@ -20,17 +20,24 @@ const zooms = [
   { id: "3", label: "300%" },
 ] as const;
 
-export function TraceWaterfall({ spans }: { readonly spans: readonly InspectorObject[] }) {
-  const items = useMemo(() => waterfall(spans), [spans]);
+export function TraceWaterfall({
+  spans,
+  requests,
+  compact = false,
+  highlightedSpanId,
+}: {
+  readonly spans: readonly InspectorObject[];
+  readonly requests?: readonly InspectorObject[];
+  readonly compact?: boolean;
+  readonly highlightedSpanId?: string;
+}) {
+  const items = useMemo(() => waterfall(spans, requests), [spans, requests]);
   const [query, setQuery] = useState("");
   const [errorsOnly, setErrorsOnly] = useState(false);
   const [zoom, setZoom] = useState("1");
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
   const [selected, setSelected] = useState<WaterfallSpan>();
-  const parentIds = useMemo(
-    () => new Set(items.flatMap((item) => item.parentSpanId ?? [])),
-    [items],
-  );
+  const parentIds = useMemo(() => new Set(items.flatMap((item) => item.parentId ?? [])), [items]);
   const visible = useMemo(
     () =>
       items.filter((item) => matches(item, query, errorsOnly) && !hidden(item, items, collapsed)),
@@ -44,37 +51,56 @@ export function TraceWaterfall({ spans }: { readonly spans: readonly InspectorOb
       return next;
     });
   return (
-    <section className="panel trace-panel" aria-labelledby="trace-waterfall-heading">
+    <section
+      className={`panel trace-panel${compact ? " trace-compact" : ""}`}
+      aria-label="Span hierarchy and timing"
+    >
       <div className="section-heading">
         <div>
-          <p className="eyebrow">TRACE WATERFALL</p>
-          <h2 id="trace-waterfall-heading">Span hierarchy and timing</h2>
+          <h2 id="trace-waterfall-heading">
+            {requests?.length ? "Request lifecycle" : "Span hierarchy and timing"}
+          </h2>
         </div>
         <Badge>
-          {visible.length} of {items.length} spans
+          {visible.length} of {items.length} {requests?.length ? "steps" : "spans"}
         </Badge>
       </div>
       <Card className="trace-toolbar" aria-label="Trace filters">
-        <Field
-          label="Search spans"
-          value={query}
-          onChange={setQuery}
-          placeholder="Name, ID, kind, or status"
-        />
-        <SelectField label="Timeline zoom" items={zooms} value={zoom} onChange={setZoom} />
-        <Button
-          variant={errorsOnly ? "default" : "secondary"}
-          size="sm"
-          aria-pressed={errorsOnly}
-          onPress={() => setErrorsOnly((value) => !value)}
-        >
-          <TriangleAlert aria-hidden="true" className="size-3.5" /> Errors only
-        </Button>
+        {compact ? (
+          <input
+            aria-label="Search spans"
+            placeholder="Search lifecycle…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        ) : (
+          <Field
+            label="Search spans"
+            value={query}
+            onChange={setQuery}
+            placeholder="Name, ID, kind, or status"
+          />
+        )}
+        {!compact && (
+          <SelectField label="Timeline zoom" items={zooms} value={zoom} onChange={setZoom} />
+        )}
+        {!compact && (
+          <Button
+            variant={errorsOnly ? "default" : "secondary"}
+            size="sm"
+            aria-pressed={errorsOnly}
+            onPress={() => setErrorsOnly((value) => !value)}
+          >
+            <TriangleAlert aria-hidden="true" className="size-3.5" /> Errors only
+          </Button>
+        )}
         <Button variant="ghost" size="sm" onPress={() => setCollapsed(new Set())}>
-          <ChevronsUpDown aria-hidden="true" className="size-3.5" /> Expand all
+          <ChevronsUpDown aria-hidden="true" className="size-3.5" />{" "}
+          <span className={compact ? "sr-only" : undefined}>Expand all</span>
         </Button>
         <Button variant="ghost" size="sm" onPress={() => setCollapsed(new Set(parentIds))}>
-          <ChevronsDownUp aria-hidden="true" className="size-3.5" /> Collapse all
+          <ChevronsDownUp aria-hidden="true" className="size-3.5" />{" "}
+          <span className={compact ? "sr-only" : undefined}>Collapse all</span>
         </Button>
       </Card>
       {items.length === 0 ? (
@@ -89,6 +115,7 @@ export function TraceWaterfall({ spans }: { readonly spans: readonly InspectorOb
           zoom={Number(zoom)}
           onToggle={toggle}
           onSelect={setSelected}
+          {...(highlightedSpanId ? { highlightedSpanId } : {})}
         />
       )}
       <OverlayDialog
@@ -99,11 +126,7 @@ export function TraceWaterfall({ spans }: { readonly spans: readonly InspectorOb
           : {})}
         isOpen={selected !== undefined}
         onOpenChange={(open) => !open && setSelected(undefined)}
-        trigger={
-          <Button className="sr-only" tabIndex={-1}>
-            Inspect span
-          </Button>
-        }
+        trigger={<Button style={{ display: "none" }}>Inspect span</Button>}
       >
         {selected && <ContentTabs label="Span details" items={detailTabs(selected)} />}
       </OverlayDialog>
@@ -119,12 +142,12 @@ function detailTabs(span: WaterfallSpan) {
       content: (
         <dl className="identity-grid">
           <div>
-            <dt>Span ID</dt>
-            <dd>{span.spanId}</dd>
+            <dt>{span.recordType === "span" ? "Span ID" : "Record"}</dt>
+            <dd>{span.spanId || `${span.recordType} · ${span.name}`}</dd>
           </div>
           <div>
             <dt>Parent</dt>
-            <dd>{span.parentSpanId ?? "Root"}</dd>
+            <dd>{span.parentId ?? "Root"}</dd>
           </div>
           <div>
             <dt>Status</dt>
@@ -161,9 +184,11 @@ function hidden(
   items: readonly WaterfallSpan[],
   collapsed: ReadonlySet<string>,
 ): boolean {
-  const parents = new Map(items.map((item) => [item.spanId, item.parentSpanId]));
-  let parent = span.parentSpanId;
-  while (parent) {
+  const parents = new Map(items.map((item) => [item.id, item.parentId]));
+  const seen = new Set<string>();
+  let parent = span.parentId;
+  while (parent && !seen.has(parent)) {
+    seen.add(parent);
     if (collapsed.has(parent)) return true;
     parent = parents.get(parent);
   }

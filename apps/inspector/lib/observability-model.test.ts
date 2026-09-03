@@ -71,4 +71,89 @@ describe("inspector observability model", () => {
     expect(JSON.stringify(spans[1]?.details)).not.toContain("raw-secret");
     expect(traceGroups([{ signal: "trace", traceId: "trace-1", spanCount: 1 }])).toHaveLength(1);
   });
+
+  test("merges span updates and renders measured request phases with contiguous subtrees", () => {
+    const at = (ms: number) => new Date(Date.UTC(2026, 8, 3, 0, 0, 0, ms)).toISOString();
+    const root = {
+      signal: "span",
+      spanId: "root",
+      invocationId: "invoke-1",
+      traceId: "trace-1",
+      name: "orders.create",
+      startedAt: at(10),
+      status: "started",
+    };
+    const complete = { ...root, status: "completed", completedAt: at(40) };
+    const sibling = {
+      ...root,
+      spanId: "sibling",
+      parentSpanId: "root",
+      startedAt: at(12),
+      completedAt: at(30),
+    };
+    const child = {
+      ...root,
+      spanId: "child",
+      parentSpanId: "root",
+      startedAt: at(11),
+      completedAt: at(35),
+    };
+    const nested = {
+      ...root,
+      spanId: "nested",
+      parentSpanId: "child",
+      startedAt: at(15),
+      completedAt: at(20),
+    };
+    const request = {
+      signal: "request",
+      requestId: "r1",
+      invocationId: "invoke-1",
+      traceId: "trace-1",
+      method: "POST",
+      rawPath: "/orders",
+      startedAt: at(0),
+      completedAt: at(50),
+      timeline: [
+        { kind: "accepted", at: at(0) },
+        { kind: "mapping", at: at(9), durationMs: 5 },
+        { kind: "function", at: at(45), durationMs: 35 },
+        { kind: "response", at: at(50), status: 201 },
+      ],
+    };
+    const nodes = waterfall([complete, root, sibling, nested, child], [request]);
+    expect(nodes.filter((node) => node.recordType === "span").map((node) => node.spanId)).toEqual([
+      "root",
+      "child",
+      "nested",
+      "sibling",
+    ]);
+    expect(nodes.find((node) => node.spanId === "root")).toMatchObject({
+      durationMs: 30,
+      depth: 2,
+    });
+    expect(nodes.find((node) => node.kind === "mapping")).toMatchObject({
+      startedAt: at(4),
+      durationMs: 5,
+    });
+    expect(nodes[0]).toMatchObject({
+      name: "POST /orders",
+      recordType: "request",
+      spanId: "",
+      durationMs: 50,
+    });
+    expect(nodes.at(-1)).toMatchObject({ name: "response", offsetPercent: 100, widthPercent: 0 });
+    expect(traceGroups([root, complete, request])[0]).toMatchObject({
+      name: "POST /orders",
+      durationMs: 50,
+      spans: [expect.objectContaining({ spanId: "root", completedAt: at(40) })],
+    });
+    expect(waterfall([{ ...root, parentSpanId: "child" }, child])).toHaveLength(2);
+    expect(
+      mergeLiveItems([{ signal: "log", cursor: "1", requestId: "r1" }], {
+        data: { signal: "log", cursor: "2", requestId: "r1" },
+      }),
+    ).toHaveLength(2);
+    expect(mergeLiveItems([root], { data: { ...child, requestId: "r1" } })).toHaveLength(2);
+  });
 });

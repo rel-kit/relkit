@@ -42,8 +42,14 @@ function TimelineRow({ entry }: { readonly entry: TimelineEntry }) {
   );
 }
 
-export function WaterfallPanel({ spans }: { readonly spans: readonly InspectorObject[] }) {
-  return <TraceWaterfall spans={spans} />;
+export function WaterfallPanel({
+  spans,
+  requests,
+}: {
+  readonly spans: readonly InspectorObject[];
+  readonly requests: readonly InspectorObject[];
+}) {
+  return <TraceWaterfall spans={spans} requests={requests} />;
 }
 
 export function RequestExchangePanel({ request }: { readonly request: InspectorObject }) {

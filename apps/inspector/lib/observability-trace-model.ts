@@ -1,16 +1,10 @@
 import type { InspectorObject } from "./api-types";
-
-export interface TraceGroup {
-  readonly traceId: string;
-  readonly trace?: InspectorObject;
-  readonly spans: readonly InspectorObject[];
-  readonly startedAt?: string;
-  readonly completedAt?: string;
-  readonly durationMs?: number;
-  readonly outcome?: string;
-}
+import { orderTraceNodes, traceDuration, traceLifecycle } from "./trace-lifecycle";
 
 export interface WaterfallSpan {
+  readonly id: string;
+  readonly parentId?: string;
+  readonly recordType: string;
   readonly spanId: string;
   readonly name: string;
   readonly parentSpanId?: string;
@@ -34,38 +28,11 @@ export interface TraceCorrelation {
   readonly href: string;
 }
 
-export function traceGroups(items: readonly InspectorObject[]): readonly TraceGroup[] {
-  const groups = new Map<string, { trace?: InspectorObject; spans: InspectorObject[] }>();
-  for (const item of items) {
-    const traceId = text(item.traceId);
-    if (traceId === "") continue;
-    const group = groups.get(traceId) ?? { spans: [] };
-    if (item.signal === "trace") group.trace = item;
-    if (item.signal === "span" || text(item.spanId) !== "") group.spans.push(item);
-    groups.set(traceId, group);
-  }
-  return [...groups.entries()]
-    .map(([traceId, group]) => {
-      const trace = group.trace;
-      const startedAt = text(trace?.startedAt);
-      const completedAt = text(trace?.completedAt);
-      const durationMs = number(trace?.durationMs);
-      const outcome = text(trace?.outcome);
-      return {
-        traceId,
-        ...(trace === undefined ? {} : { trace }),
-        spans: group.spans.sort(byTime),
-        ...(startedAt === "" ? {} : { startedAt }),
-        ...(completedAt === "" ? {} : { completedAt }),
-        ...(durationMs === undefined ? {} : { durationMs }),
-        ...(outcome === "" ? {} : { outcome }),
-      };
-    })
-    .sort((left, right) => left.traceId.localeCompare(right.traceId));
-}
-
-export function waterfall(spans: readonly InspectorObject[]): readonly WaterfallSpan[] {
-  const valid = spans.filter((span) => text(span.spanId) !== "");
+export function waterfall(
+  spans: readonly InspectorObject[],
+  requests: readonly InspectorObject[] = [],
+): readonly WaterfallSpan[] {
+  const valid = traceLifecycle(spans, requests);
   let origin = Number.POSITIVE_INFINITY;
   for (const span of valid) {
     const start = Date.parse(text(span.startedAt));
@@ -75,58 +42,39 @@ export function waterfall(spans: readonly InspectorObject[]): readonly Waterfall
   let total = 1;
   for (const span of valid) {
     const start = Date.parse(text(span.startedAt));
-    const end = (Number.isFinite(start) ? start : origin) + (number(span.durationMs) ?? 0);
+    const end = (Number.isFinite(start) ? start : origin) + (traceDuration(span) ?? 0);
     total = Math.max(total, end - origin);
   }
-  const parents = new Map(valid.map((span) => [text(span.spanId), text(span.parentSpanId)]));
-  const depthOf = (id: string, seen = new Set<string>()): number => {
-    const parent = parents.get(id);
-    if (parent === undefined || parent === "" || seen.has(parent)) return 0;
-    seen.add(parent);
-    return Math.min(8, depthOf(parent, seen) + 1);
-  };
-  const isAncestor = (ancestor: string, descendant: string): boolean => {
-    const seen = new Set<string>();
-    let parent = parents.get(descendant);
-    while (parent && !seen.has(parent)) {
-      if (parent === ancestor) return true;
-      seen.add(parent);
-      parent = parents.get(parent);
-    }
-    return false;
-  };
-  return valid
-    .sort((left, right) => {
-      const leftId = text(left.spanId);
-      const rightId = text(right.spanId);
-      if (isAncestor(leftId, rightId)) return -1;
-      if (isAncestor(rightId, leftId)) return 1;
-      return byTime(left, right);
-    })
-    .map((span) => {
-      const start = Date.parse(text(span.startedAt));
-      const duration = Math.max(0, number(span.durationMs) ?? 0);
-      const offset = Number.isFinite(start) ? ((start - origin) / total) * 100 : 0;
-      const status = text(span.status);
-      const outcome = text(span.outcome);
-      return {
-        spanId: text(span.spanId),
-        name: text(span.name) || "span",
-        ...(text(span.parentSpanId) ? { parentSpanId: text(span.parentSpanId) } : {}),
-        depth: depthOf(text(span.spanId)),
-        ...(text(span.startedAt) ? { startedAt: text(span.startedAt) } : {}),
-        ...(text(span.completedAt) ? { completedAt: text(span.completedAt) } : {}),
-        ...(number(span.durationMs) === undefined ? {} : { durationMs: duration }),
-        ...(status ? { status } : {}),
-        ...(outcome ? { outcome } : {}),
-        kind: spanKind(span),
-        error: /error|fail/i.test(`${status} ${outcome}`),
-        details: safeDetails(span),
-        correlations: correlations(span),
-        offsetPercent: Math.max(0, Math.min(96, offset)),
-        widthPercent: Math.max(4, Math.min(100 - Math.max(0, offset), (duration / total) * 100)),
-      };
-    });
+  return orderTraceNodes(valid).map((span) => {
+    const start = Date.parse(text(span.startedAt));
+    const duration = traceDuration(span);
+    const offset = Number.isFinite(start) ? ((start - origin) / total) * 100 : 0;
+    const status = typeof span.status === "number" ? `HTTP ${span.status}` : text(span.status);
+    const outcome = text(span.outcome);
+    return {
+      id: text(span.nodeId),
+      ...(text(span.nodeParentId) ? { parentId: text(span.nodeParentId) } : {}),
+      recordType: text(span.recordType),
+      spanId: text(span.spanId),
+      name: text(span.name) || "span",
+      ...(text(span.parentSpanId) ? { parentSpanId: text(span.parentSpanId) } : {}),
+      depth: number(span.depth) ?? 0,
+      ...(text(span.startedAt) ? { startedAt: text(span.startedAt) } : {}),
+      ...(text(span.completedAt) ? { completedAt: text(span.completedAt) } : {}),
+      ...(duration === undefined ? {} : { durationMs: duration }),
+      ...(status ? { status } : {}),
+      ...(outcome ? { outcome } : {}),
+      kind: spanKind(span),
+      error: /error|fail|defect|timeout|cancelled|HTTP [45]/i.test(`${status} ${outcome}`),
+      details: safeDetails(span),
+      correlations: correlations(span),
+      offsetPercent: Math.max(0, Math.min(100, offset)),
+      widthPercent: Math.max(
+        0,
+        Math.min(100 - Math.max(0, offset), ((duration ?? 0) / total) * 100),
+      ),
+    };
+  });
 }
 
 function spanKind(span: InspectorObject): string {
@@ -191,10 +139,4 @@ function number(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
-function byTime(left: InspectorObject, right: InspectorObject): number {
-  return (
-    (Date.parse(text(left.startedAt) || text(left.timestamp) || text(left.occurredAt)) || 0) -
-      (Date.parse(text(right.startedAt) || text(right.timestamp) || text(right.occurredAt)) || 0) ||
-    text(left.spanId).localeCompare(text(right.spanId))
-  );
-}
+export { traceGroups, type TraceGroup } from "./trace-groups";
