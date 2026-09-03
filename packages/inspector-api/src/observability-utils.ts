@@ -16,6 +16,9 @@ export function readObservabilityQuery(request: Request): ObservabilityQueryRequ
   const params = new URL(request.url).searchParams;
   const value: Record<string, string | number> = {};
   for (const name of [
+    "search",
+    "source",
+    "order",
     "from",
     "to",
     "severity",

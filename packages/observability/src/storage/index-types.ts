@@ -42,6 +42,7 @@ export interface ObservabilityIndexEntry {
 }
 
 export interface ObservabilityIndexPageOptions {
+  readonly order?: "asc" | "desc";
   readonly signal?: ObservabilitySignal;
   readonly cursor?: string;
   readonly limit?: number;

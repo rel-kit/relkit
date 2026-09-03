@@ -72,7 +72,11 @@ export function createObservabilityQuery(
       const log =
         entry === undefined ? undefined : await safeRead(index, entry, options.redaction, "log");
       return log?.signal === "log"
-        ? { protocol: OBSERVABILITY_QUERY_PROTOCOL, version: OBSERVABILITY_QUERY_VERSION, log }
+        ? {
+            protocol: OBSERVABILITY_QUERY_PROTOCOL,
+            version: OBSERVABILITY_QUERY_VERSION,
+            log: { ...log, cursor },
+          }
         : undefined;
     },
     trace: async (traceId: string): Promise<TraceDetailResponse | undefined> => {

@@ -38,7 +38,9 @@ export async function readPage<T extends ObservabilityRecord>(
       const record = await safeRead(index, entry, redaction);
       if (record === undefined || !accept(record) || !matches(record, query)) continue;
       if (items.length === query.limit) return response(items, lastCursor);
-      items.push(record as unknown as T);
+      items.push(
+        (record.signal === "log" ? { ...record, cursor: entry.cursor } : record) as unknown as T,
+      );
       lastCursor = entry.cursor;
     }
     if (page.nextCursor === undefined || page.nextCursor === cursor) break;
@@ -110,6 +112,7 @@ function indexOptions(
     ...(signal === undefined ? {} : { signal }),
     ...(cursor === undefined ? {} : { cursor }),
     limit: maxPageSize,
+    ...(query.order === undefined ? {} : { order: query.order }),
     ...(query.severity === undefined ? {} : { severity: query.severity }),
     ...(query.routeId === undefined ? {} : { routeId: query.routeId }),
     ...(query.functionId === undefined ? {} : { functionId: query.functionId }),
