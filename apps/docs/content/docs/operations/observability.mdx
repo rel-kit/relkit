@@ -30,12 +30,40 @@ runtime event
 → independent exporters
 ```
 
-Local persistence happens before external sampling. With `traceRate: 0.25`, the bounded Inspector store can keep
+Local capture is independent of external sampling. With `traceRate: 0.25`, the bounded Inspector store can keep
 a complete redacted local trace even when that trace is not selected for remote export. Child spans inherit the
 root trace decision. Log export follows `minimumLogLevel`; errors and diagnostics are exported unsampled by
 default.
 
 `localRetention` bounds record count, age, and bytes. It is diagnostic evidence, not durable business storage.
+
+## Read development logs
+
+`bun run dev` prints startup URLs, compilation and reload outcomes, HTTP completions, and application output.
+The default terminal level is INFO. Use `bun run dev -- --verbose` for DEBUG events and retained error details,
+`--log-level warn` to select an explicit threshold, `--no-color` for plain text, or `--json` for newline-delimited
+records on stderr. An explicit level overrides verbose's DEBUG selection. `NO_COLOR` and redirected output also
+disable color. Terminal filtering does not reduce captured history.
+
+Development history is stored in `.relkit/observability/observability.duckdb`. `RELKIT_OBSERVABILITY_ROOT`
+changes the directory. Node.js must be available on PATH: the CLI owns a separate Node worker running the DuckDB
+driver, while generated applications continue to run on Bun. History and streaming survive backend reloads.
+Only one dev session can own a database at a time.
+
+In development, exporter delivery runs independently of collector acknowledgments. Live Inspector notifications
+are published only after the local database commits the batch.
+
+The default retention is seven days and 256 MB of retained record payloads, with oldest records removed first.
+Explicit `localRetention.maxAgeMs`, `maxBytes`, and `maxEntries` override those limits. `maxRecords` bounds the
+in-memory cache; it does not limit database history. The data budget excludes database metadata and temporary
+database/WAL overhead. Cleanup checkpoints and normal shutdown reclaim reusable space and flush pending writes.
+
+Existing NDJSON segments are imported automatically without changing the source files. Import provenance makes
+restarts safe and preserves repeated log messages; malformed lines are counted and reported. Production retains
+its existing storage and export behavior.
+
+If storage fails, application requests continue. The Logs workspace reports degraded storage and failed or
+dropped records. Restart the dev session after fixing the cause; records that failed to commit are not saved.
 
 ## Redact before storage or export
 
