@@ -144,7 +144,7 @@ function recordRuntimeFailure(component, message, error, source) {
     level: "error",
     component,
     message,
-    fields: { code: errorCode(error), detail: errorMessage(error) },
+    fields: { code: errorCode(error), detail: errorMessage(error), ...(environment !== "production" && process.env.RELKIT_DEV_LOGS === "1" ? { error: redactFailureDetail(error, undefined, 0, true) } : {}) },
     generationId,
     graphHash,
     source,
@@ -154,6 +154,7 @@ function recordRuntimeFailure(component, message, error, source) {
 function writeRuntimeLog(record) {
   if (record?.signal !== "log") return;
   if (environment === "production") stdoutJsonSink.write(record);
+  else if (process.env.RELKIT_DEV_LOGS === "1") process.stdout.write("\\u001e" + JSON.stringify(record) + "\\n");
   else consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
