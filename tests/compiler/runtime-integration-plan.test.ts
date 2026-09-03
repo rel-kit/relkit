@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import redisManifest from "../../integrations/packages/redis/package.json";
+import s3Manifest from "../../integrations/packages/s3/package.json";
 import { GRAPH_VERSION, type RuntimeIntegrationPlan } from "../../packages/contracts/src/index.ts";
 import {
   generateRuntimeIntegrationImports,
@@ -68,7 +70,10 @@ describe("runtime integration plan", () => {
       projectRoot: resolve(process.cwd(), "integrations/catalog"),
       imports: ["@relkit/integrations/s3", "@relkit/integrations/redis"],
     });
-    expect(packages).toEqual([runtimePackage("redis"), runtimePackage("s3")]);
+    expect(packages).toEqual([
+      { ...runtimePackage("redis"), packageVersion: redisManifest.version },
+      { ...runtimePackage("s3"), packageVersion: s3Manifest.version },
+    ]);
     expect(
       resolveIntegrationPackageRole({
         projectRoot: resolve(process.cwd(), "integrations/catalog"),
