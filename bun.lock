@@ -60,6 +60,7 @@
     "apps/inspector": {
       "name": "@relkit/inspector",
       "dependencies": {
+        "@swc/helpers": "0.5.23",
         "@xyflow/react": "12.11.5",
         "class-variance-authority": "0.7.1",
         "lucide-react": "1.34.0",
