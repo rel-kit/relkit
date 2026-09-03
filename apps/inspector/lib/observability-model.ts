@@ -154,10 +154,10 @@ export function requestTimeline(
 export function signalKey(value: InspectorObject): string {
   const signal = text(value.signal);
   const id =
-    text(value.requestId) ||
-    text(value.cursor) ||
-    text(value.spanId) ||
-    text(value.traceId) ||
+    (signal === "span" ? text(value.spanId) : "") ||
+    (signal === "trace" ? text(value.traceId) : "") ||
+    (signal === "request" ? text(value.requestId) : "") ||
+    (signal === "log" ? text(value.cursor) : "") ||
     text(value.id);
   return `${signal}:${id || JSON.stringify(value)}`;
 }

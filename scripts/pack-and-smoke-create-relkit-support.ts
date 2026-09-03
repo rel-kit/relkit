@@ -157,12 +157,12 @@ async function devSmoke(root: string): Promise<void> {
     if (child.exitCode === null) child.kill("SIGTERM");
     await Promise.race([child.exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
     if (child.exitCode === null) child.kill("SIGKILL");
-    await child.exited;
   }
+  const exitCode = await child.exited;
   const [stdout, stderr] = await output;
   if (failure !== undefined) throw new Error(`${failure}\n${stdout}${stderr}`);
-  if (child.exitCode !== 0 && child.exitCode !== 143)
-    throw new Error(`Development process exited with ${child.exitCode}.\n${stdout}${stderr}`);
+  if (exitCode !== 0 && exitCode !== 143)
+    throw new Error(`Development process exited with ${exitCode}.\n${stdout}${stderr}`);
   await assertPortReleased(port);
   await assertPortReleased(inspector);
 }

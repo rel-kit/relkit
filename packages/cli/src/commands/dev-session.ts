@@ -66,6 +66,7 @@ export class DevSession {
       },
     });
     this.proxy = createSupervisorProxy({
+      ...(options.intercept === undefined ? {} : { intercept: options.intercept }),
       ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
       ...(options.stablePort === undefined ? {} : { port: options.stablePort }),
       track: (token) =>
@@ -91,6 +92,7 @@ export class DevSession {
     if (this.options.signal?.aborted)
       throw this.options.signal.reason ?? new Error("Development startup was aborted.");
     this.started = true;
+    this.log({ level: "info", event: "dev.starting" });
     this.removeSignals = installDevSignals(this.options, this.log, (reason) => this.stop(reason));
     try {
       await assertPortAvailable(this.backendPort, this.options.hostname ?? "127.0.0.1", "--port");
@@ -170,11 +172,9 @@ export class DevSession {
   get activeActivationFingerprint(): RuntimeActivationFingerprint | undefined {
     return this.activeFingerprint;
   }
-
   set activeActivationFingerprint(value: RuntimeActivationFingerprint | undefined) {
     this.activeFingerprint = value;
   }
-
   get isStopping(): boolean {
     return this.stopping;
   }

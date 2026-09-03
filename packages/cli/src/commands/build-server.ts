@@ -77,7 +77,7 @@ import { assertRuntimeIntegrationModules, createFunctionRegistry, createProvider
 import { createRegistrationPlan } from "@relkit/graph";
 import { installInspectorEndpoints } from "@relkit/inspector-api";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
-import { consoleHumanSink, formatHumanLog, stdoutJsonSink } from "@relkit/runtime-effect";
+import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
 import { createApp, createHttpAuthRuntime } from "@relkit/runtime-hono";
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
@@ -109,7 +109,10 @@ const shutdownController = new AbortController();
 const telemetryConfiguration = graph.nodes.find((node) => node.kind === "app")?.telemetry;
 assertRuntimeIntegrationModules(runtimeIntegrationsPlan, runtimeIntegrationModules);
 const telemetryExporters = await createTelemetryExporterFanout({ exporters: telemetryConfiguration?.exporters, modules: runtimeIntegrationModules, values: sourceValues, signal: shutdownController.signal });
-const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OBSERVABILITY_ROOT ?? ".relkit/observability", configuration: telemetryConfiguration, exporter: telemetryExporters });
+const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OBSERVABILITY_ROOT ?? ".relkit/observability", configuration: telemetryConfiguration, exporter: telemetryExporters,
+  ...(environment !== "production" && process.env.RELKIT_TELEMETRY_URL && process.env.RELKIT_TELEMETRY_TOKEN ? {
+    remote: { url: process.env.RELKIT_TELEMETRY_URL, token: process.env.RELKIT_TELEMETRY_TOKEN }
+  } : {}) });
 globalThis["__relkit_flush_telemetry"] = telemetry.flush;
 const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
 const application = runtimeManifest.application;

@@ -30,9 +30,14 @@
     "./telemetry": {
       "types": "./dist/telemetry.d.ts",
       "import": "./dist/telemetry.js"
+    },
+    "./local": {
+      "types": "./dist/local/index.d.ts",
+      "import": "./dist/local/index.js"
     }
   },
   "dependencies": {
+    "@duckdb/node-api": "1.5.5-r.4",
     "@relkit/contracts": "workspace:*"
   },
   "scripts": {

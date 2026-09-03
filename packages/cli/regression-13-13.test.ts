@@ -26,7 +26,7 @@ test("preserves active traffic across compile, start, hash, API, and readiness f
       const session = await startDev({
         ...baseOptions(root),
         activationFingerprint: fingerprint(graphHash),
-        healthTimeoutMs: 40,
+        healthTimeoutMs: 1_000,
         compile: async ({ outputDirectory, token }) => {
           attempts += 1;
           if (token.sourceToken > 1 && failure === "compile")

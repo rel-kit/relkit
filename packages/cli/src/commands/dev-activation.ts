@@ -1,10 +1,4 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-import {
-  RUNTIME_ACTIVATION_FILE,
-  isRuntimeActivationFingerprint,
-  type RuntimeActivationFingerprint,
-} from "@relkit/contracts";
+import { resolveActivationFingerprint } from "./dev-activation-fingerprint.js";
 import {
   createSupervisorDrain,
   startCandidate,
@@ -13,6 +7,7 @@ import {
   type SupervisorCandidateToken,
 } from "@relkit/supervisor";
 import type { DevSession } from "./dev-session.js";
+import { redactFailureDetail } from "@relkit/runtime-effect";
 
 export async function activateCandidate(
   session: DevSession,
@@ -20,6 +15,13 @@ export async function activateCandidate(
   changedFiles: readonly string[],
 ): Promise<boolean> {
   const token = session.stateMachine.requestSourceChange();
+  const startedAt = performance.now();
+  const initial = session.active === undefined;
+  session.log({
+    level: "info",
+    event: "dev.build.started",
+    fields: { initial, files: [...changedFiles] },
+  });
   const controller = new AbortController();
   session.controllers.add(controller);
   const signal = AbortSignal.any([session.abortController.signal, controller.signal]);
@@ -109,7 +111,12 @@ export async function activateCandidate(
     session.log({
       level: "info",
       event: "dev.generation.active",
-      fields: { version, changedFiles: changedFiles.length },
+      fields: {
+        version,
+        changedFiles: changedFiles.length,
+        initial,
+        durationMs: performance.now() - startedAt,
+      },
     });
     return true;
   } catch (error) {
@@ -117,32 +124,18 @@ export async function activateCandidate(
     session.drains.delete(tokenKey(token));
     failState(session, token, error);
     session.log({
-      level: "error",
+      level: signal.aborted ? "debug" : "error",
       event: "dev.generation.failed",
-      fields: { message: errorMessage(error) },
+      fields: {
+        message: errorMessage(error),
+        error: redactFailureDetail(error, undefined, 0, true),
+        previousActive: session.active !== undefined,
+      },
     });
     return false;
   } finally {
     session.controllers.delete(controller);
   }
-}
-
-async function resolveActivationFingerprint(
-  session: DevSession,
-  candidate: StartedCandidate,
-): Promise<RuntimeActivationFingerprint> {
-  const value = session.options.activationFingerprint;
-  const fingerprint =
-    value === undefined
-      ? JSON.parse(
-          await readFile(join(candidate.directory, "server", RUNTIME_ACTIVATION_FILE), "utf8"),
-        )
-      : typeof value === "function"
-        ? await value(candidate)
-        : value;
-  if (!isRuntimeActivationFingerprint(fingerprint))
-    throw new TypeError("Development candidates require an activation fingerprint.");
-  return Object.freeze({ ...fingerprint });
 }
 
 export async function drainCandidate(

@@ -14,6 +14,21 @@ export interface NormalizedQuery extends ObservabilityQueryRequest {
 }
 
 export function validate(value: ObservabilityQueryRequest, maximum: number): NormalizedQuery {
+  if (value.search !== undefined && (typeof value.search !== "string" || value.search.length > 512))
+    throw new ObservabilityQueryError(
+      "RELKIT_OBSERVABILITY_QUERY_INVALID",
+      "Search must contain at most 512 characters",
+    );
+  if (value.source !== undefined && !["application", "relkit", "inspector"].includes(value.source))
+    throw new ObservabilityQueryError(
+      "RELKIT_OBSERVABILITY_QUERY_INVALID",
+      "Log source is invalid",
+    );
+  if (value.order !== undefined && value.order !== "asc" && value.order !== "desc")
+    throw new ObservabilityQueryError(
+      "RELKIT_OBSERVABILITY_QUERY_INVALID",
+      "Query order is invalid",
+    );
   if (value.protocol !== undefined && value.protocol !== "relkit.observability.query")
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
@@ -44,7 +59,9 @@ export function validate(value: ObservabilityQueryRequest, maximum: number): Nor
     );
   if (
     value.cursor !== undefined &&
-    (!Number.isSafeInteger(Number(value.cursor)) || Number(value.cursor) < 0)
+    (!/^\d+$/.test(value.cursor) ||
+      !Number.isSafeInteger(Number(value.cursor)) ||
+      Number(value.cursor) < 0)
   )
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
@@ -85,6 +102,15 @@ export function validate(value: ObservabilityQueryRequest, maximum: number): Nor
 export function matches(record: ObservabilityRecord, query: NormalizedQuery): boolean {
   const value = record as ObservabilityRecord & { readonly correlationId?: string };
   return (
+    (query.search === undefined ||
+      JSON.stringify(record).toLowerCase().includes(query.search.trim().toLowerCase())) &&
+    (query.source === undefined ||
+      (record.signal === "log" &&
+        (record.component.startsWith("cli.")
+          ? "relkit"
+          : record.component === "inspector"
+            ? "inspector"
+            : "application") === query.source)) &&
     (query.requestId === undefined ||
       value.requestId === query.requestId ||
       value.correlationId === query.requestId) &&

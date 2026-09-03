@@ -49,12 +49,15 @@ Create a new RELKIT application
 
 Run app, inspector, OpenAPI, and Scalar
 
-| Option           | Value   | Description                             |
-| ---------------- | ------- | --------------------------------------- |
-| --project-root   | string  | Application directory (defaults to cwd) |
-| --port           | integer | Application port                        |
-| --inspector-port | integer | Inspector port                          |
-| --local          | on, off | Start required local services           |
+| Option           | Value                                             | Description                                     |
+| ---------------- | ------------------------------------------------- | ----------------------------------------------- |
+| --project-root   | string                                            | Application directory (defaults to cwd)         |
+| --port           | integer                                           | Application port                                |
+| --inspector-port | integer                                           | Inspector port                                  |
+| --local          | on, off                                           | Start required local services                   |
+| --log-level      | all, trace, debug, info, warn, error, fatal, none | Minimum terminal severity (default: info)       |
+| --verbose        | boolean                                           | Show debug events and full retained diagnostics |
+| --no-color       | boolean                                           | Disable terminal colors                         |
 
 #### Examples
 

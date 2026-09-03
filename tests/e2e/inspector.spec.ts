@@ -71,12 +71,15 @@ test("shows a new request live and renders its correlated timeline and edges", a
   await page.getByRole("link", { name: "Logs" }).click();
   await expect(page.getByRole("heading", { name: "Logs" })).toBeVisible();
   await expect(page.getByText("Order request completed.")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Trace" }).last()).toBeVisible();
+  await page.getByRole("button", { name: "Order request completed." }).click();
+  await expect(page.getByRole("link", { name: "Open full trace" })).toBeVisible();
+  await page.getByRole("button", { name: "Close log details" }).click();
 
   await page.getByRole("link", { name: "Traces" }).click();
   await expect(page.getByRole("heading", { name: "Traces" })).toBeVisible();
-  await expect(page.getByText("trace-live-0002")).toBeVisible();
-  await page.locator('a[href="/traces/trace-live-0002"]').click();
+  await page.locator('[data-trace-id="trace-live-0002"]').click();
+  await expect(page.getByRole("link", { name: "Open full trace" })).toBeVisible();
+  await page.getByRole("link", { name: "Open full trace" }).click();
   await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
 });
 

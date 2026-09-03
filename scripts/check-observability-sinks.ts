@@ -18,8 +18,12 @@ export const OBSERVABILITY_DIRECT_OUTPUT_ADAPTERS = Object.freeze([
 ] as const);
 
 export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
+  "packages/cli/src/commands/dev-logger.ts",
   "packages/observability/src/redaction.ts",
   "packages/observability/src/record-admission.ts",
+  // Byte accounting and search operate on admitted, redacted records.
+  "packages/observability/src/local/batch-queue.ts",
+  "packages/observability/src/query-validation.ts",
   "packages/observability/src/storage/segments.ts",
   "packages/observability/src/storage/index.ts",
   "packages/observability/src/storage/index-files.ts",

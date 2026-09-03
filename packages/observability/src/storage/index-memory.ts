@@ -105,12 +105,20 @@ export function readPage(
   options: ObservabilityIndexPageOptions,
 ): ObservabilityIndexPage {
   const limit = boundedLimit(options.limit, config.pageSize, config.pageSize);
-  const after = options.cursor === undefined ? 0 : parseCursor(options.cursor);
+  const descending = options.order === "desc";
+  const after =
+    options.cursor === undefined ? (descending ? Infinity : 0) : parseCursor(options.cursor);
   // ponytail: filtered pages scan the bounded index; add field maps only if measured growth needs them.
   const entries: ObservabilityIndexEntry[] = [];
   let nextCursor: string | undefined;
-  for (const entry of state.records.values()) {
-    if (Number(entry.cursor) <= after || !matches(entry, options)) continue;
+  const values = [...state.records.values()];
+  if (descending) values.reverse();
+  for (const entry of values) {
+    if (
+      (descending ? Number(entry.cursor) >= after : Number(entry.cursor) <= after) ||
+      !matches(entry, options)
+    )
+      continue;
     if (entries.length < limit) entries.push(entry);
     else {
       nextCursor = entries[entries.length - 1]?.cursor;

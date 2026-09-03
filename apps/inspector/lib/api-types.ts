@@ -143,6 +143,8 @@ export interface InspectorQuery {
   readonly cursor?: string;
   readonly limit?: number;
   readonly search?: string;
+  readonly source?: string;
+  readonly order?: "asc" | "desc";
   readonly kind?: string;
   readonly status?: string;
   readonly from?: string;

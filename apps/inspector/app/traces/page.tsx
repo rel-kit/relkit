@@ -1,5 +1,10 @@
-import { SignalsClient } from "../signals-client";
+import { Suspense } from "react";
+import { TracesClient } from "./traces-client";
 
 export default function TracesPage() {
-  return <SignalsClient kind="traces" />;
+  return (
+    <Suspense fallback={<p role="status">Loading traces…</p>}>
+      <TracesClient />
+    </Suspense>
+  );
 }

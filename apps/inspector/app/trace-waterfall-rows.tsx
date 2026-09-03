@@ -11,11 +11,13 @@ export function TraceWaterfallRows({
   zoom,
   onToggle,
   onSelect,
+  highlightedSpanId,
 }: {
   readonly items: readonly WaterfallSpan[];
   readonly parentIds: ReadonlySet<string>;
   readonly collapsed: ReadonlySet<string>;
   readonly zoom: number;
+  readonly highlightedSpanId?: string;
   readonly onToggle: (id: string) => void;
   readonly onSelect: (span: WaterfallSpan) => void;
 }) {
@@ -27,18 +29,24 @@ export function TraceWaterfallRows({
         style={{ minWidth: `${zoom * 100}%` }}
       >
         {items.map((span) => (
-          <li className="waterfall-row" data-error={span.error} key={span.spanId}>
+          <li
+            className="waterfall-row"
+            data-error={span.error}
+            data-highlighted={span.spanId === highlightedSpanId}
+            key={span.id}
+            data-record-type={span.recordType}
+          >
             <div className="waterfall-label" style={{ paddingLeft: `${span.depth * 1.1}rem` }}>
               <span className="span-title">
-                {parentIds.has(span.spanId) ? (
+                {parentIds.has(span.id) ? (
                   <button
                     type="button"
                     className="span-toggle"
-                    aria-label={`${collapsed.has(span.spanId) ? "Expand" : "Collapse"} ${span.name}`}
-                    aria-expanded={!collapsed.has(span.spanId)}
-                    onClick={() => onToggle(span.spanId)}
+                    aria-label={`${collapsed.has(span.id) ? "Expand" : "Collapse"} ${span.name}`}
+                    aria-expanded={!collapsed.has(span.id)}
+                    onClick={() => onToggle(span.id)}
                   >
-                    {collapsed.has(span.spanId) ? (
+                    {collapsed.has(span.id) ? (
                       <ChevronRight aria-hidden="true" />
                     ) : (
                       <ChevronDown aria-hidden="true" />
@@ -47,7 +55,7 @@ export function TraceWaterfallRows({
                 ) : (
                   <span className="span-toggle" aria-hidden="true" />
                 )}
-                <strong>{bounded(span.name)}</strong>
+                <strong title={span.name}>{bounded(span.name)}</strong>
               </span>
               <small>
                 {span.kind} · {span.outcome || span.status || "recorded"} ·{" "}
@@ -69,7 +77,11 @@ export function TraceWaterfallRows({
             >
               <span
                 data-error={span.error}
-                style={{ marginLeft: `${span.offsetPercent}%`, width: `${span.widthPercent}%` }}
+                style={{
+                  marginLeft: `min(${span.offsetPercent}%, calc(100% - 2px))`,
+                  width: `${span.widthPercent}%`,
+                  minWidth: 2,
+                }}
               />
             </div>
             <Button

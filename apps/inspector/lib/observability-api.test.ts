@@ -1,6 +1,14 @@
 import { expect, test } from "bun:test";
 import { createInspectorApiClient } from "./api";
-import { traceDetail } from "./observability-api";
+import { logDetail, traceDetail } from "./observability-api";
+
+test("preserves the log-detail 404 status from the shared inspector error envelope", async () => {
+  const client = createInspectorApiClient({
+    fetch: async () =>
+      response("relkit.inspector", { error: "RELKIT_OBSERVABILITY_NOT_FOUND" }, 404),
+  });
+  await expect(logDetail(client, "42")).rejects.toMatchObject({ status: 404 });
+});
 
 test("surfaces a missing trace detail backend without substituting list data", async () => {
   const client = createInspectorApiClient({

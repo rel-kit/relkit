@@ -53,6 +53,19 @@ the active backend's versioned internal API and displays the generation ID and g
 
 ## Inspect runtime state
 
+The **Logs** workspace defaults to application and runtime logs at every level from the last 24 hours. Search
+redacted messages, components, identifiers, and metadata across retained history. Use **Filter** to narrow by
+level, service, function, request, trace, or source; RelKit lifecycle and Inspector process diagnostics are
+available through the source filter.
+
+Select a row to read the full message, structured error, copyable correlation IDs, metadata, and associated trace.
+Desktop layouts keep details beside the table; smaller screens open a detail drawer. Arrow keys move between
+rows and Escape closes details. Missing or expired records are identified explicitly.
+
+Filters and the selected log are saved in the URL. Live replacement pauses while inspecting a record, scrolling
+away from the top, or viewing an older page. **New logs available** returns to the newest results. Backend reloads
+and dev restarts preserve committed history within the configured retention limits.
+
 Search and detail views cover services, routes, functions, jobs, events, storage, cache, AI, middleware,
 integrations, environment contracts, diagnostics, requests, logs, traces, graph relationships, and API contracts.
 Provider pages show profile, source kind, integration provenance, local recipe state, and infrastructure roles

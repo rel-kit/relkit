@@ -36,7 +36,11 @@ export function dockerignore(): string {
 `;
 }
 
-export async function bundleServer(serverDirectory: string, projectRoot: string): Promise<void> {
+export async function bundleServer(
+  serverDirectory: string,
+  projectRoot: string,
+  development = false,
+): Promise<void> {
   const runtimeModules = resolve(dirname(fileURLToPath(import.meta.url)), "../../node_modules");
   const moduleLink = join(serverDirectory, "node_modules");
   await symlink(runtimeModules, moduleLink, "dir");
@@ -47,8 +51,7 @@ export async function bundleServer(serverDirectory: string, projectRoot: string)
         "build",
         "--target=bun",
         "--format=esm",
-        "--minify",
-        "--sourcemap=none",
+        ...(development ? ["--sourcemap=inline"] : ["--minify", "--sourcemap=none"]),
         "--env=disable",
         `--outfile=${join(serverDirectory, "index.js")}`,
         join(serverDirectory, "index.ts"),

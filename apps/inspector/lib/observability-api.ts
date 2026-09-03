@@ -11,9 +11,20 @@ export interface RequestDetailPayload {
 }
 
 export interface TraceDetailPayload {
+  readonly nextCursor?: string;
   readonly trace?: InspectorObject;
   readonly spans?: readonly InspectorObject[];
   readonly records?: readonly InspectorObject[];
+}
+
+export function logDetail(
+  api: InspectorApiClient,
+  cursor: string,
+): Promise<{ readonly log?: InspectorObject }> {
+  return api.request(`${INSPECTOR_API_BASE}/logs/${encodeURIComponent(cursor)}`, {
+    responseProtocols: [OBSERVABILITY_QUERY_PROTOCOL],
+    cacheTags: ["logs", "signals"],
+  });
 }
 
 export function requestDetail(

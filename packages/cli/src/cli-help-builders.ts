@@ -1,5 +1,17 @@
 import type { CliHelpArgument, CliHelpCommand, CliHelpOption } from "./cli-help-types.js";
 
+export const devLogOptions = [
+  option(
+    "log-level",
+    "choice",
+    "Minimum terminal severity (default: info)",
+    [],
+    ["all", "trace", "debug", "info", "warn", "error", "fatal", "none"],
+  ),
+  option("verbose", "boolean", "Show debug events and full retained diagnostics"),
+  option("no-color", "boolean", "Disable terminal colors"),
+];
+
 export function command(
   name: string,
   description: string,

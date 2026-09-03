@@ -3,6 +3,7 @@ async function invokeHttp(request) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   const target = targetFor(request.functionId);
+  let invocationSpanId;
   const execute = () => invoke({
     input: request.input,
     source: request.source ?? "http",
@@ -22,7 +23,12 @@ async function invokeHttp(request) {
     ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
     ...(request.errors === undefined ? {} : { errors: request.errors }),
     ...(request.toolHooks === undefined ? {} : { toolHooks: request.toolHooks }),
-    hooks: { observability: telemetry, context: invocationContext },
+    hooks: { observability: telemetry, context: invocationContext,
+      ...(environment !== "production" && process.env.RELKIT_DEV_LOGS === "1" ? {
+        onSpanStart: (span) => { invocationSpanId = span.spanId; },
+        context: (context) => invocationContext(context, invocationSpanId),
+      } : {}),
+    },
   });
   const task = request.auth === undefined
     ? execute()
@@ -35,9 +41,10 @@ async function invokeHttp(request) {
   }
 }
 
-async function invocationContext({ invocation, signal, env, time }) {
+async function invocationContext({ invocation, signal, env, time }, spanId) {
   const write = (level, message, fields = {}) => {
-    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId });
+    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId,
+      ...(environment !== "production" && process.env.RELKIT_DEV_LOGS === "1" ? { spanId, correlationId: invocation.correlationId, generationId, graphHash, source: invocation.source } : {}) });
     writeRuntimeLog(record);
   };
   const logger = (level) => (message, fields) => write(level, message, fields);

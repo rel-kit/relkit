@@ -18,13 +18,18 @@ import {
   loadLocalRecipe,
   type DevLocalServiceOwner,
 } from "./dev-local-runtime.js";
+import type { TelemetryConfiguration } from "@relkit/observability";
 
 export interface DevLocalCompiler {
   readonly compile: CandidateCompile;
   readonly close: () => Promise<void>;
 }
 
-export function createDevLocalCompiler(projectRoot: string, localEnabled = true): DevLocalCompiler {
+export function createDevLocalCompiler(
+  projectRoot: string,
+  localEnabled = true,
+  configureTelemetry?: (configuration: TelemetryConfiguration) => Promise<void> | undefined,
+): DevLocalCompiler {
   let owner: DevLocalServiceOwner | undefined;
   const recipes = new Map<string, LocalServiceRecipe>();
   return Object.freeze({
@@ -36,12 +41,19 @@ export function createDevLocalCompiler(projectRoot: string, localEnabled = true)
         signal: request.signal,
       });
       if (!checked.ok) throw new Error(messages(checked));
+      if (configureTelemetry) {
+        const graph = JSON.parse(checked.outputs.graph) as {
+          nodes: { kind: string; telemetry?: TelemetryConfiguration }[];
+        };
+        await configureTelemetry(graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {});
+      }
       const local = localEnabled
         ? await reconcile(projectRoot, checked, recipes, owner, request.signal)
         : undefined;
       owner = local?.owner ?? owner;
       const built = await buildProject({
         projectRoot,
+        mode: "development",
         buildDirectory: request.outputDirectory,
         signal: request.signal,
         check: async () => checked,

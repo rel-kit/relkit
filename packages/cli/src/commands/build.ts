@@ -119,7 +119,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         { ...tooling.server, maxPreviewBytes: tooling.inspector.maxPreviewBytes },
       ),
     );
-    await bundleServer(serverDirectory, projectRoot);
+    await bundleServer(serverDirectory, projectRoot, options.mode === "development");
     await writeFile(
       join(stage, "manifest.json"),
       `${canonicalJson({

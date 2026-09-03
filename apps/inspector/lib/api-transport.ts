@@ -67,7 +67,11 @@ export class InspectorApiTransport {
         else if (this.signal !== undefined) requestInit.signal = this.signal;
         const response = await this.fetch(url, requestInit);
         const payload = await readPayload(response);
-        assertEnvelope(payload, response.headers, responseProtocols);
+        assertEnvelope(
+          payload,
+          response.headers,
+          response.ok ? responseProtocols : ["relkit.inspector", ...(responseProtocols ?? [])],
+        );
         if (!response.ok) {
           const code = errorCode(payload);
           throw new InspectorApiError(

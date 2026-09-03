@@ -21,6 +21,7 @@ export function redactFailureDetail(
   value: unknown,
   seen = new WeakSet<object>(),
   depth = 0,
+  includeCauses = false,
 ): JsonValue {
   if (depth > 6) return "[truncated]";
   if (value === null || typeof value === "boolean") return value;
@@ -33,16 +34,36 @@ export function redactFailureDetail(
       name: redactText(value.name),
       message: redactText(value.message),
       ...(typeof value.stack === "string" ? { stack: redactText(value.stack) } : {}),
+      ...(!includeCauses || Object.getOwnPropertyDescriptor(value, "code")?.value === undefined
+        ? {}
+        : {
+            code: redactFailureDetail(
+              Object.getOwnPropertyDescriptor(value, "code")?.value,
+              seen,
+              depth + 1,
+              includeCauses,
+            ),
+          }),
+      ...(!includeCauses || Object.getOwnPropertyDescriptor(value, "cause")?.value === undefined
+        ? {}
+        : {
+            cause: redactFailureDetail(
+              Object.getOwnPropertyDescriptor(value, "cause")?.value,
+              seen,
+              depth + 1,
+              includeCauses,
+            ),
+          }),
     };
   if (Array.isArray(value))
-    return value.map((entry) => redactFailureDetail(entry, seen, depth + 1));
+    return value.map((entry) => redactFailureDetail(entry, seen, depth + 1, includeCauses));
   const output: Record<string, JsonValue> = {};
   for (const key of Object.keys(value).sort()) {
     const property = Object.getOwnPropertyDescriptor(value, key);
     output[key] = isSensitiveKey(key)
       ? "[REDACTED]"
       : property && "value" in property
-        ? redactFailureDetail(property.value, seen, depth + 1)
+        ? redactFailureDetail(property.value, seen, depth + 1, includeCauses)
         : "[unavailable]";
   }
   return output;

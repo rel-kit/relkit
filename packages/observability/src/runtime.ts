@@ -1,4 +1,8 @@
 import type { ObservabilityRecord } from "./model.js";
+import {
+  createRemoteObservabilityRuntime,
+  type RemoteObservabilityOptions,
+} from "./remote-runtime.js";
 import { createObservabilityCollector, type ObservabilityCollectorOptions } from "./collector.js";
 import { createObservabilityQuery, type ObservabilityQuery } from "./query.js";
 import { createObservabilityStream, type ObservabilityStreamEventType } from "./stream.js";
@@ -26,6 +30,7 @@ export interface TelemetryPipelineCounters {
 }
 
 export interface ObservabilityRuntimeOptions extends ObservabilityCollectorOptions {
+  readonly remote?: RemoteObservabilityOptions;
   readonly root?: string;
   readonly configuration?: TelemetryConfiguration;
   readonly exportRecord?: TelemetryExportRecord;
@@ -33,6 +38,8 @@ export interface ObservabilityRuntimeOptions extends ObservabilityCollectorOptio
 }
 
 export async function createObservabilityRuntime(options: ObservabilityRuntimeOptions = {}) {
+  if (options.remote !== undefined)
+    return createRemoteObservabilityRuntime(options, options.remote);
   const configuration = normalizeTelemetryConfiguration(options.configuration);
   const redaction = options.redaction ?? configuration.redaction;
   const collector = createObservabilityCollector({

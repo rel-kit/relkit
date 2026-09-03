@@ -15,6 +15,9 @@ export const DEFAULT_OBSERVABILITY_QUERY_LIMIT = 50;
 export const MAX_OBSERVABILITY_QUERY_LIMIT = 100;
 
 export interface ObservabilityQueryRequest {
+  readonly search?: string;
+  readonly source?: "application" | "relkit" | "inspector";
+  readonly order?: "asc" | "desc";
   readonly protocol?: typeof OBSERVABILITY_QUERY_PROTOCOL;
   readonly version?: typeof OBSERVABILITY_QUERY_VERSION;
   readonly cursor?: string;
@@ -43,8 +46,12 @@ export interface ObservabilityQueryPage<T> extends ObservabilityQueryVersion {
 }
 
 export type RequestQueryResponse = ObservabilityQueryPage<RequestRecord>;
-export type LogQueryResponse = ObservabilityQueryPage<LogRecord>;
-export type TraceQueryItem = TraceRecord | SpanRecord;
+export interface LogQueryItem extends LogRecord {
+  readonly cursor?: string;
+  readonly origin?: "application" | "relkit" | "inspector";
+}
+export type LogQueryResponse = ObservabilityQueryPage<LogQueryItem>;
+export type TraceQueryItem = TraceRecord | SpanRecord | RequestRecord;
 export type TraceQueryResponse = ObservabilityQueryPage<TraceQueryItem>;
 
 export interface RequestDetailResponse extends ObservabilityQueryVersion {
@@ -53,10 +60,11 @@ export interface RequestDetailResponse extends ObservabilityQueryVersion {
 }
 
 export interface LogDetailResponse extends ObservabilityQueryVersion {
-  readonly log: LogRecord;
+  readonly log: LogQueryItem;
 }
 
 export interface TraceDetailResponse extends ObservabilityQueryVersion {
+  readonly nextCursor?: string;
   readonly trace?: TraceRecord;
   readonly spans: readonly SpanRecord[];
   readonly records: readonly TraceQueryItem[];

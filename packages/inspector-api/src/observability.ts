@@ -11,7 +11,7 @@ import {
   type ObservabilityQuery,
   type ObservabilityStream,
 } from "@relkit/observability";
-import type { Context, Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { readObservabilityQuery, streamResponse } from "./observability-utils.js";
 import { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
 
@@ -23,12 +23,19 @@ export const OBSERVABILITY_ENDPOINT_PATHS = Object.freeze([
   `${API_BASE_PATH}/requests`,
   `${API_BASE_PATH}/requests/:requestId`,
   `${API_BASE_PATH}/logs`,
+  `${API_BASE_PATH}/logs/:cursor`,
   `${API_BASE_PATH}/traces`,
   `${API_BASE_PATH}/traces/:traceId`,
   `${API_BASE_PATH}/stream`,
 ] as const);
 
 export type ObservabilityEndpointMode = "development" | "test" | "production";
+
+export function createObservabilityHandler(options: ObservabilityEndpointOptions) {
+  const app = new Hono();
+  installObservabilityEndpoints(app, options);
+  return async (request: Request): Promise<Response> => app.fetch(request);
+}
 
 export interface ObservabilityEndpointOptions {
   readonly query: ObservabilityQuery;
@@ -72,44 +79,30 @@ export function installObservabilityEndpoints(
       }
     };
 
-  app.get(
-    `${API_BASE_PATH}/requests`,
-    guard(async (context) =>
-      jsonResponse(await options.query.requests(readObservabilityQuery(context.req.raw))),
-    ),
-  );
-  app.get(
-    `${API_BASE_PATH}/requests/:requestId`,
-    guard(async (context) => {
-      const requestId = context.req.param("requestId");
-      if (requestId === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
-      const request = await options.query.request(requestId);
-      if (request === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
-      return jsonResponse(request);
-    }),
-  );
-  app.get(
-    `${API_BASE_PATH}/logs`,
-    guard(async (context) =>
-      jsonResponse(await options.query.logs(readObservabilityQuery(context.req.raw))),
-    ),
-  );
-  app.get(
-    `${API_BASE_PATH}/traces`,
-    guard(async (context) =>
-      jsonResponse(await options.query.traces(readObservabilityQuery(context.req.raw))),
-    ),
-  );
-  app.get(
-    `${API_BASE_PATH}/traces/:traceId`,
-    guard(async (context) => {
-      const traceId = context.req.param("traceId");
-      if (traceId === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
-      const trace = await options.query.trace(traceId);
-      if (trace === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
-      return jsonResponse(trace);
-    }),
-  );
+  for (const kind of ["requests", "logs", "traces"] as const) {
+    app.get(
+      `${API_BASE_PATH}/${kind}`,
+      guard(async (context) =>
+        jsonResponse(await options.query[kind](readObservabilityQuery(context.req.raw))),
+      ),
+    );
+  }
+  for (const [path, parameter, method] of [
+    ["requests", "requestId", "request"],
+    ["logs", "cursor", "log"],
+    ["traces", "traceId", "trace"],
+  ] as const) {
+    app.get(
+      `${API_BASE_PATH}/${path}/:${parameter}`,
+      guard(async (context) => {
+        const id = context.req.param(parameter);
+        if (id === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
+        const detail = await options.query[method](id);
+        if (detail === undefined) throw new EndpointError("RELKIT_OBSERVABILITY_NOT_FOUND", 404);
+        return jsonResponse(detail);
+      }),
+    );
+  }
   app.get(
     `${API_BASE_PATH}/stream`,
     guard(async (context) =>

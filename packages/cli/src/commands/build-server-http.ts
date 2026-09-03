@@ -20,7 +20,17 @@ const app = createApp({
   observability: telemetry,
   responseMapping: { mode: environment },
   middlewareContext: routeMiddlewareContext,
-  middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes} },
+  middleware: { generationId, observability: telemetry, maxBodyBytes: ${configuration.maxBodyBytes},
+    ...(environment === "production" || process.env.RELKIT_DEV_LOGS !== "1" ? {} : { onLifecycleEvent(event) {
+      if (event.type === "request.started") return;
+      const internal = event.path.startsWith("/_relkit/");
+      const level = event.status >= 500 ? "error" : event.status >= 400 ? "warn" : internal || event.type === "request.cancelled" ? "debug" : "info";
+      writeRuntimeLog(telemetry.collect({ version: 1, signal: "log", timestamp: event.completedAt,
+        level, component: "runtime.http", message: event.type,
+        requestId: event.requestId, traceId: event.traceId, generationId, graphHash,
+        fields: { method: event.method, path: event.path, status: event.status, durationMs: event.durationMs } }));
+    } }),
+  },
   apiDocs: {
     mode: environment,
     document: openapiDocument,

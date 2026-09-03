@@ -24,7 +24,7 @@ interface SignalDetailViewProps {
 export function SignalDetailView(props: SignalDetailViewProps) {
   const isRequest = props.kind === "requests";
   const request = props.request;
-  const trace = props.trace;
+  const trace = props.trace ?? props.requests[0];
   const traceId = text(request?.traceId) || text(trace?.traceId);
   const title = isRequest ? "Request detail" : "Trace detail";
   return (
@@ -53,7 +53,7 @@ export function SignalDetailView(props: SignalDetailViewProps) {
       {isRequest && request !== undefined && (
         <TimelinePanel request={request} records={props.records} />
       )}
-      {!isRequest && <WaterfallPanel spans={props.spans} />}
+      {!isRequest && <WaterfallPanel spans={props.spans} requests={props.requests} />}
       {isRequest && traceId !== "" && (
         <p className="panel supporting-copy">
           Correlated trace:{" "}

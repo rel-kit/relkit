@@ -1,12 +1,8 @@
+import { runDevCommand } from "./commands/dev-command.js";
+import { parseProjectArgs } from "./commands/project-args.js";
 import { canonicalJson } from "@relkit/contracts";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
-import { join, resolve } from "node:path";
 import { buildProject } from "./commands/build.js";
 import { checkProject } from "./commands/check.js";
-import { startDev } from "./commands/dev.js";
-import { developmentPorts } from "./commands/dev-inspector.js";
-import { createDevLocalCompiler } from "./commands/dev-local.js";
-import { startDevSourceWatcher } from "./commands/dev-watch.js";
 import { runDeploy } from "./commands/deploy.js";
 import { runDoctor } from "./commands/doctor.js";
 import { runEnv } from "./commands/env.js";
@@ -66,103 +62,8 @@ export async function executeCommand(
   }
 }
 
-async function runDevCommand(args: readonly string[], context: CliCommandContext): Promise<void> {
-  const options = parseProjectArgs(args, "dev");
-  const projectRoot = resolve(options.projectRoot ?? process.cwd());
-  const ports = await developmentPorts(
-    projectRoot,
-    options.port,
-    options.inspectorPort,
-    process.env,
-  );
-  const generatedDirectory = await createDevGeneratedDirectory(projectRoot);
-  const compiler = createDevLocalCompiler(projectRoot, options.local !== "off");
-  try {
-    const session = await startDev({
-      projectRoot,
-      stablePort: ports.backend,
-      generatedDirectory,
-      signal: context.signal,
-      inspector: ports.inspector,
-      compile: compiler.compile,
-      localServices: compiler,
-    });
-    try {
-      const watcher = startDevSourceWatcher(session);
-      try {
-        await session.waitForShutdown();
-      } finally {
-        watcher.close();
-      }
-    } finally {
-      await session.stop();
-    }
-  } finally {
-    await rm(generatedDirectory, { recursive: true, force: true }).catch(() => undefined);
-  }
-}
-
-async function createDevGeneratedDirectory(projectRoot: string): Promise<string> {
-  const generatedRoot = join(projectRoot, ".relkit", "generated");
-  await mkdir(generatedRoot, { recursive: true });
-  return mkdtemp(join(generatedRoot, ".dev-"));
-}
-
-type ProjectArgs = {
-  readonly projectRoot?: string;
-  readonly port?: number;
-  readonly inspectorPort?: number;
-  readonly local?: "on" | "off";
-};
-
-function parseProjectArgs(args: readonly string[], command: string): ProjectArgs {
-  let projectRoot: string | undefined;
-  let port: number | undefined;
-  let inspectorPort: number | undefined;
-  let local: "on" | "off" | undefined;
-  for (let index = 0; index < args.length; index += 1) {
-    const argument = args[index]!;
-    if (argument === "--project-root") projectRoot = value(args, ++index, argument, command);
-    else if (argument === "--port")
-      port = portValue(value(args, ++index, argument, command), command);
-    else if (argument === "--inspector-port")
-      inspectorPort = portValue(value(args, ++index, argument, command), command);
-    else if (argument === "--local" && command === "dev") {
-      const selected = value(args, ++index, argument, command);
-      if (selected !== "on" && selected !== "off")
-        throw fail("RELKIT_DEV_USAGE", "--local must be on or off.", 2);
-      local = selected;
-    } else
-      throw fail(
-        `RELKIT_${command.toUpperCase()}_USAGE`,
-        `Unknown ${command} option: ${argument}`,
-        2,
-      );
-  }
-  return {
-    ...(projectRoot === undefined ? {} : { projectRoot }),
-    ...(port === undefined ? {} : { port }),
-    ...(inspectorPort === undefined ? {} : { inspectorPort }),
-    ...(local === undefined ? {} : { local }),
-  };
-}
-
 function optionalProjectRoot(
   projectRoot: string | undefined,
 ): { readonly projectRoot?: never } | { readonly projectRoot: string } {
   return projectRoot === undefined ? {} : { projectRoot };
-}
-
-function value(args: readonly string[], index: number, option: string, command: string): string {
-  const result = args[index];
-  if (result === undefined || result.startsWith("-"))
-    throw fail(`RELKIT_${command.toUpperCase()}_USAGE`, `${option} requires a value.`, 2);
-  return result;
-}
-
-function portValue(value: string, command: string): number {
-  const port = Number(value);
-  if (!Number.isSafeInteger(port) || port < 0 || port > 65_535)
-    throw fail(`RELKIT_${command.toUpperCase()}_USAGE`, "Port must be between 0 and 65535.", 2);
-  return port;
 }
