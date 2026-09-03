@@ -1,8 +1,19 @@
+import { canonicalJson } from "@relkit/contracts";
 import { admitObservabilityRecord } from "@relkit/observability";
 import { isLogLevelEnabled } from "@relkit/runtime-effect";
 import type { DevLog, DevOptions } from "./dev.js";
 import { devLogRecord } from "./dev-log-record.js";
 import { formatDevLog } from "./dev-log-format.js";
+
+export function devLogSinks(
+  json: boolean,
+  write: (line: string) => void = (line) => process.stderr.write(`${line}\n`),
+): Pick<NonNullable<DevOptions["logger"]>, "human" | "json"> {
+  return {
+    human: json ? false : { write },
+    json: json ? { write: (record) => write(canonicalJson(record)) } : false,
+  };
+}
 
 export function createDevLogger(options: DevOptions): DevLog {
   return (event) => {

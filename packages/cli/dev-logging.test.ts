@@ -1,11 +1,23 @@
 import { expect, test } from "bun:test";
 import { captureOutputLines } from "@relkit/supervisor";
-import { createDevLogger } from "./src/commands/dev-logger";
+import { createDevLogger, devLogSinks } from "./src/commands/dev-logger";
 import { formatDevLog } from "./src/commands/dev-log-format";
 import { parseProjectArgs } from "./src/commands/project-args";
 import type { LogRecord } from "@relkit/runtime-effect";
 import { redactFailureDetail } from "@relkit/runtime-effect";
 import type { DevLogEvent } from "./src/commands/dev";
+
+test("dev JSON uses only the supplied stderr sink after redaction", () => {
+  const lines: string[] = [];
+  const log = createDevLogger({
+    compile: async () => undefined,
+    logger: devLogSinks(true, (line) => lines.push(line)),
+  });
+  log({ level: "info", event: "candidate.startup-output", fields: { output: "password=secret" } });
+  expect(lines).toHaveLength(1);
+  expect(lines[0]).not.toContain("\n");
+  expect(JSON.parse(lines[0]!)).toMatchObject({ component: "app", message: "password=[REDACTED]" });
+});
 
 test("dev severity is presentation only; raw and structured child logs are distinct", () => {
   const stored: LogRecord[] = [];

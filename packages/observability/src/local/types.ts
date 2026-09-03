@@ -35,6 +35,7 @@ export type LocalWorkerCommand =
 
 export interface LocalWorkerResponse {
   readonly id: number;
+  readonly fatal?: boolean;
   readonly value?: unknown;
   readonly error?: string;
   readonly code?: import("../query-types.js").ObservabilityQueryError["code"];

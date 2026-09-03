@@ -1,10 +1,9 @@
-import { canonicalJson } from "@relkit/contracts";
 import { admitObservabilityRecord, type TelemetryConfiguration } from "@relkit/observability";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { checkProject } from "./check.js";
 import { startDev, type DevOptions } from "./dev.js";
-import { createDevLogger } from "./dev-logger.js";
+import { createDevLogger, devLogSinks } from "./dev-logger.js";
 import { developmentPorts } from "./dev-inspector.js";
 import { createDevLocalCompiler } from "./dev-local.js";
 import { startDevSourceWatcher } from "./dev-watch.js";
@@ -24,15 +23,13 @@ export async function runDevCommand(
     options.inspectorPort,
     process.env,
   );
-  const write = context.io?.stderr ?? ((line: string) => process.stderr.write(`${line}\n`));
   const logger: NonNullable<DevOptions["logger"]> = {
     redact: (record) => {
       const safe = admitObservabilityRecord(record, configuration.redaction);
       return safe?.signal === "log" ? safe : record;
     },
     minimumLevel: options.logLevel ?? (options.verbose ? "debug" : "info"),
-    human: context.json ? false : { write },
-    json: context.json ? { write: (record) => write(canonicalJson(record)) } : false,
+    ...devLogSinks(context.json, context.io?.stderr),
   };
   const terminal = {
     verbose: options.verbose ?? false,

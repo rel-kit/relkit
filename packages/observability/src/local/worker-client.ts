@@ -45,6 +45,10 @@ export function startLocalWorker(onFailure: (error: Error) => void = () => undef
     if (!closed) fail(new Error(`Telemetry worker exited (${code}): ${diagnostic}`));
   });
   child.on("message", (message: LocalWorkerResponse) => {
+    if (message.fatal) {
+      fail(new Error(message.error ?? "Telemetry worker failed; restart dev to recover"));
+      return;
+    }
     const item = pending.get(message.id);
     if (!item) return;
     clearTimeout(item.timer);

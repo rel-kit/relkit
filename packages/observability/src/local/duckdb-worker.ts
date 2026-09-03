@@ -8,7 +8,7 @@ const cleanup = setInterval(() => {
   tail = tail
     .then(() => database?.flush())
     .catch((error: unknown) => {
-      process.stderr.write(`Telemetry cleanup failed: ${String(error)}\n`);
+      process.send?.({ id: 0, fatal: true, error: `Telemetry cleanup failed: ${String(error)}` });
       process.exitCode = 1;
       process.disconnect?.();
     });
