@@ -1,4 +1,5 @@
-import type { LoggerOptions } from "@relkit/runtime-effect";
+import type { LoggerOptions, LogLevel, LogRecord } from "@relkit/runtime-effect";
+import type { JsonValue } from "@relkit/contracts";
 import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 import type {
   CandidateCompile,
@@ -9,9 +10,9 @@ import { DevSession } from "./dev-session.js";
 import type { DevInspectorOptions } from "./dev-process.js";
 
 export interface DevLogEvent {
-  readonly level: "info" | "warn" | "error";
+  readonly level: LogLevel;
   readonly event: string;
-  readonly fields?: Readonly<Record<string, string | number | boolean>>;
+  readonly fields?: Readonly<Record<string, JsonValue>>;
 }
 export type DevLog = (event: DevLogEvent) => void;
 export type DevActivationFingerprint =
@@ -43,6 +44,14 @@ export interface DevOptions {
   readonly installSignalHandlers?: boolean;
   readonly logger?: Omit<LoggerOptions, "component">;
   readonly onLog?: DevLog;
+  readonly onRecord?: (record: LogRecord, origin: "application" | "relkit" | "inspector") => void;
+  readonly intercept?: (request: Request) => Promise<Response> | undefined;
+  readonly onStopping?: () => void;
+  readonly terminal?: {
+    readonly verbose?: boolean;
+    readonly color?: boolean;
+    readonly columns?: number;
+  };
   readonly observability?: Omit<SupervisorObservabilityOptions, "activationFingerprint">;
   readonly localServices?: DevLocalServices;
 }

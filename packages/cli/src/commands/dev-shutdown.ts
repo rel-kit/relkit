@@ -8,6 +8,7 @@ export async function shutdownDev(session: DevSession, reason: unknown): Promise
     fields: { message: errorMessage(reason) },
   });
   session.abortController.abort(reason);
+  session.options.onStopping?.();
   for (const controller of session.controllers) controller.abort(reason);
   await session.proxy.stop().catch(() => undefined);
   const tasks = [
@@ -26,6 +27,7 @@ export async function shutdownDev(session: DevSession, reason: unknown): Promise
   });
   await session.observability.flush().catch(() => undefined);
   session.clearSignals();
+  session.log({ level: "info", event: "dev.stopped" });
   session.resolveShutdownPromise();
 }
 

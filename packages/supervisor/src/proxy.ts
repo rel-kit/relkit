@@ -20,6 +20,7 @@ export interface ActiveSupervisorProxyTarget {
 }
 
 export interface SupervisorProxyOptions {
+  readonly intercept?: (request: Request) => Promise<Response> | undefined;
   readonly hostname?: string;
   readonly port?: number;
   readonly targetHostname?: string;
@@ -34,6 +35,7 @@ export class SupervisorProxy {
   private readonly targetHostname: string;
   private readonly fetcher: typeof fetch;
   private readonly track: SupervisorProxyOptions["track"];
+  private readonly intercept: SupervisorProxyOptions["intercept"];
   private server: Bun.Server<undefined> | undefined;
   private stopping: Promise<void> | undefined;
   private target: ActiveSupervisorProxyTarget | undefined;
@@ -46,6 +48,7 @@ export class SupervisorProxy {
     validateHostname(this.targetHostname, "targetHostname");
     this.fetcher = options.fetch ?? fetch;
     this.track = options.track;
+    this.intercept = options.intercept;
   }
 
   get port(): number {
@@ -96,6 +99,8 @@ export class SupervisorProxy {
 
   /** Reads the active reference before awaiting, so switched traffic cannot select a retired target. */
   handle(request: Request): Promise<Response> {
+    const intercepted = this.intercept?.(request);
+    if (intercepted !== undefined) return intercepted;
     const target = this.target;
     if (target === undefined)
       return Promise.resolve(

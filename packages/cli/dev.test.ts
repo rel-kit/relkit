@@ -155,7 +155,7 @@ test("forwards backend console output through dev logs", async () => {
         String(event.fields?.output).includes("backend hello"),
     ),
   );
-  expect(output).toContain("backend hello");
+  expect(output.some((line) => /INFO\s+app\s+backend hello/.test(line))).toBe(true);
   expect(output.some((line) => line.includes("candidate.startup-output"))).toBe(false);
 });
 
@@ -177,7 +177,8 @@ test("redacts candidate output before callbacks and human sinks", () => {
     fields: { stream: "stdout", output: `backend ready password=${secret}` },
   });
 
-  expect(output).toEqual(["backend ready password=[REDACTED]"]);
+  expect(output).toHaveLength(1);
+  expect(output[0]).toMatch(/INFO\s+app\s+backend ready password=\[REDACTED\]/);
   expect(JSON.stringify({ callbacks, output })).not.toContain(secret);
 });
 
