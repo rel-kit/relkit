@@ -1,5 +1,6 @@
 import type { DevLogEvent, DevLog } from "./dev.js";
 import { assertPortAvailable } from "./port-availability.js";
+import { captureOutputLines } from "@relkit/supervisor";
 
 export interface DevInspectorOptions {
   readonly command: readonly string[];
@@ -36,11 +37,7 @@ export async function startInspector(
         (entry): entry is [string, string] => entry[1] !== undefined,
       ),
     ),
-    ...Object.fromEntries(
-      Object.entries(options.environment ?? {}).filter(
-        (entry): entry is [string, string] => entry[1] !== undefined,
-      ),
-    ),
+    ...options.environment,
     PORT: String(port),
     HOSTNAME: hostname,
     RELKIT_INSPECTOR_PORT: String(port),
@@ -56,8 +53,8 @@ export async function startInspector(
     stderr: "pipe",
   });
   const output = Promise.all([
-    capture(child.stdout, "stdout", options.maxOutputBytes ?? 8 * 1024, log),
-    capture(child.stderr, "stderr", options.maxOutputBytes ?? 8 * 1024, log),
+    capture(child.stdout, "stdout", options.maxOutputBytes ?? 64 * 1024, log),
+    capture(child.stderr, "stderr", options.maxOutputBytes ?? 64 * 1024, log),
   ]).then(() => undefined);
   const stop = createStopper(child, stopTimeoutMs);
   return Object.freeze({ port, process: child, output, stop });
@@ -83,30 +80,23 @@ async function capture(
   limit: number,
   log: DevLog,
 ): Promise<void> {
-  const reader = stream.getReader();
-  let remaining = limit;
   try {
-    while (true) {
-      const next = await reader.read();
-      if (next.done) return;
-      const bytes = next.value.subarray(0, Math.max(0, remaining));
-      if (bytes.byteLength > 0) {
-        remaining -= bytes.byteLength;
+    await captureOutputLines(
+      stream,
+      (output) =>
         log({
           level: channel === "stderr" ? "warn" : "info",
           event: "inspector.output",
-          fields: { channel, output: new TextDecoder().decode(bytes) },
-        });
-      }
-    }
+          fields: { channel, output },
+        }),
+      { maxBytes: limit },
+    );
   } catch (error) {
     log({
       level: "warn",
       event: "inspector.output.failed",
       fields: { message: errorMessage(error) },
     });
-  } finally {
-    reader.releaseLock();
   }
 }
 

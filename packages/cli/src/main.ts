@@ -29,7 +29,6 @@ import {
 
 export * from "./cli-help-model.js";
 export * from "./main-support.js";
-
 export async function runCli(
   argv: readonly string[] = process.argv.slice(2),
   runtime: CliRuntime = {},
@@ -140,6 +139,7 @@ async function execute(
     tty: runtime.tty ?? process.stdin.isTTY,
     reporter,
     log,
+    io,
     ...(json ? {} : { onProgress: (message: string) => io.stderr(message) }),
   };
   if (invocation.command !== "create") return executeCommand(invocation, context);
@@ -184,6 +184,7 @@ function richStatus(runtime: CliRuntime, json: boolean, io: CliIo, command: stri
   const enabled =
     !json &&
     command !== "create" &&
+    command !== "dev" &&
     !(runtime.ci ?? Boolean(process.env.CI)) &&
     (runtime.tty ?? process.stderr.isTTY) === true;
   return {
@@ -196,5 +197,4 @@ const processIo: CliIo = Object.freeze({
   stdout: (line: string) => process.stdout.write(`${line}\n`),
   stderr: (line: string) => process.stderr.write(`${line}\n`),
 });
-
 if (import.meta.main) process.exitCode = await main();

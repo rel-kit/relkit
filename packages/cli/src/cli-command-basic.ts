@@ -75,7 +75,14 @@ function projectCommand(
         projectRoot: optionalString(path, "project-root"),
         ...(port ? { port: optionalInteger(path, "port", true) } : {}),
         ...(inspectorPort ? { inspectorPort: optionalInteger(path, "inspector-port") } : {}),
-        ...(name === "dev" ? { local: optionalChoice(path, "local") } : {}),
+        ...(name === "dev"
+          ? {
+              local: optionalChoice(path, "local"),
+              logLevel: optionalChoice(path, "log-level"),
+              verbose: booleanFlag(path, "verbose"),
+              noColor: booleanFlag(path, "no-color"),
+            }
+          : {}),
       },
       (value) =>
         Effect.sync(() =>
@@ -86,6 +93,9 @@ function projectCommand(
               ? optionArgs("inspector-port", value.inspectorPort)
               : []),
             ...(value && "local" in value ? optionArgs("local", value.local) : []),
+            ...("logLevel" in value ? optionArgs("log-level", value.logLevel) : []),
+            ...("verbose" in value ? booleanArgs("verbose", value.verbose) : []),
+            ...("noColor" in value ? booleanArgs("no-color", value.noColor) : []),
           ]),
         ),
     ),

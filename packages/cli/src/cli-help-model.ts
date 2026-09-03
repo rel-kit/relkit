@@ -1,5 +1,5 @@
 import { deepFreeze } from "@relkit/contracts";
-import { argument, command, option, title } from "./cli-help-builders.js";
+import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
 
 export type * from "./cli-help-types.js";
@@ -148,6 +148,7 @@ const root = command(
           option("port", "integer", "Application port"),
           option("inspector-port", "integer", "Inspector port"),
           option("local", "choice", "Start required local services", [], ["on", "off"]),
+          ...devLogOptions,
         ],
       }),
       command(

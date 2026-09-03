@@ -1,5 +1,6 @@
 import type { CandidateLogEvent, CandidateLogger, CandidateOutput } from "./candidate-types.js";
 import type { SupervisorCandidateToken } from "./state-machine-types.js";
+import { captureOutputLines } from "./output-lines.js";
 
 export function captureOutput(
   child: Bun.ReadableSubprocess,
@@ -27,33 +28,30 @@ async function captureStream(
   directory: string,
   budget: { remaining: number; truncated: boolean },
 ): Promise<{ readonly text: string; readonly truncated: boolean }> {
-  const reader = stream.getReader();
-  const decoder = new TextDecoder();
-  let text = "";
+  const retained: Uint8Array[] = [];
   let truncated = false;
   try {
-    while (true) {
-      const next = await reader.read();
-      if (next.done) break;
-      const part = next.value.subarray(0, Math.max(0, budget.remaining));
-      if (part.byteLength > 0) {
-        const chunk = decoder.decode(part, { stream: part.byteLength < next.value.byteLength });
-        text += chunk;
-        budget.remaining -= part.byteLength;
-        logOutput(logger, token, directory, channel, chunk);
-      }
-      if (part.byteLength < next.value.byteLength) {
-        truncated = true;
-        budget.truncated = true;
-      }
-    }
-    text += decoder.decode();
+    await captureOutputLines(
+      stream,
+      (output) => logOutput(logger, token, directory, channel, output),
+      {
+        retain: (bytes) => {
+          const part = bytes.subarray(0, Math.max(0, budget.remaining));
+          if (part.byteLength > 0) retained.push(part.slice());
+          budget.remaining -= part.byteLength;
+          if (part.byteLength < bytes.byteLength) truncated = budget.truncated = true;
+        },
+      },
+    );
   } catch {
     truncated = true;
-  } finally {
-    reader.releaseLock();
   }
-  return { text, truncated };
+  return {
+    text: Buffer.concat(retained)
+      .toString("utf8")
+      .replace(/\uFFFD$/, ""),
+    truncated,
+  };
 }
 
 function logOutput(
