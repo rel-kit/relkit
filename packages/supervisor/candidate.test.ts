@@ -4,6 +4,27 @@ import { tmpdir } from "node:os";
 import { expect, test } from "bun:test";
 import { startCandidate } from "./src/candidate.js";
 
+test("completed candidate shutdown releases its long kill timer", async () => {
+  const child = Bun.spawn(
+    [
+      process.execPath,
+      "-e",
+      `import { terminate } from ${JSON.stringify(join(import.meta.dir, "src/candidate-process.ts"))};
+     const backend = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], { stdout: "ignore", stderr: "ignore" });
+     await terminate(backend, 30_000);`,
+    ],
+    { stdout: "ignore", stderr: "pipe" },
+  );
+  const timer = setTimeout(() => child.kill("SIGKILL"), 2_000);
+  try {
+    expect(await child.exited).toBe(0);
+    expect(await new Response(child.stderr).text()).toBe("");
+  } finally {
+    clearTimeout(timer);
+    if (child.exitCode === null) child.kill("SIGKILL");
+  }
+});
+
 test("starts a token-scoped Bun backend on a dynamic port and disposes only itself", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-candidate-"));
   const active = join(root, ".relkit", "generated", "generation-7");

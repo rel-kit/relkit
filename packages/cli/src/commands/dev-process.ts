@@ -110,10 +110,13 @@ function createStopper(child: Bun.ReadableSubprocess, timeoutMs: number): () => 
 
 async function stopChild(child: Bun.ReadableSubprocess, timeoutMs: number): Promise<void> {
   if (child.exitCode === null) child.kill("SIGTERM");
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const exited = await Promise.race([
     child.exited.then(() => true),
-    new Promise<boolean>((resolve) => setTimeout(() => resolve(false), timeoutMs)),
-  ]);
+    new Promise<boolean>((resolve) => {
+      timer = setTimeout(() => resolve(false), timeoutMs);
+    }),
+  ]).finally(() => clearTimeout(timer));
   if (!exited && child.exitCode === null) {
     child.kill("SIGKILL");
     await child.exited;

@@ -72,10 +72,13 @@ export function createStopper(
 
 export async function terminate(child: Bun.ReadableSubprocess, timeoutMs: number): Promise<void> {
   if (child.exitCode === null) child.kill("SIGTERM");
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const exited = await Promise.race([
     child.exited.then(() => true),
-    delay(timeoutMs).then(() => false),
-  ]);
+    new Promise<boolean>((resolve) => {
+      timer = setTimeout(() => resolve(false), timeoutMs);
+    }),
+  ]).finally(() => clearTimeout(timer));
   if (!exited && child.exitCode === null) {
     child.kill("SIGKILL");
     await child.exited;
@@ -135,8 +138,4 @@ async function allocatePort(hostname: string): Promise<number> {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
-}
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
 }
