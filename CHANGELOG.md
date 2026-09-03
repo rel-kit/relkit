@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.3.0
+
+### Changes
+
+- Make development terminal logs readable and persist local telemetry in a CLI-owned DuckDB store. Add searchable inspector logs with stable live updates and request lifecycle traces that keep correlated details beside the list.
+
 ## 0.2.0
 
 ### Changes
