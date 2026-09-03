@@ -1,7 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
-const port = process.env.RELKIT_INSPECTOR_BROWSER_PORT ?? "3210";
+const port = Number(process.env.RELKIT_INSPECTOR_BROWSER_PORT ?? "3210");
+if (!Number.isInteger(port) || port < 1 || port > 65_535)
+  throw new RangeError("RELKIT_INSPECTOR_BROWSER_PORT must be a TCP port from 1 through 65535.");
 const baseUrl = `http://127.0.0.1:${port}`;
 const session = `relkit-inspector-${process.pid}`;
 const artifacts = resolve(root, ".relkit", "inspector-browser-artifacts");
@@ -18,7 +20,7 @@ const fixture = Bun.spawn([process.execPath, "tests/inspector/fixture-server.ts"
   stderr: "inherit",
 });
 const inspector = Bun.spawn(
-  [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", port],
+  [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", String(port)],
   {
     cwd: root,
     env: { ...process.env, RELKIT_BACKEND_URL: "http://127.0.0.1:3212" },
