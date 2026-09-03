@@ -1,6 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 const root = resolve(import.meta.dir, "..");
+const port = process.env.RELKIT_INSPECTOR_BROWSER_PORT ?? "3210";
+const baseUrl = `http://127.0.0.1:${port}`;
 const session = `relkit-inspector-${process.pid}`;
 const artifacts = resolve(root, ".relkit", "inspector-browser-artifacts");
 const browserEnv = {
@@ -16,7 +18,7 @@ const fixture = Bun.spawn([process.execPath, "tests/inspector/fixture-server.ts"
   stderr: "inherit",
 });
 const inspector = Bun.spawn(
-  [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", "3210"],
+  [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", port],
   {
     cwd: root,
     env: { ...process.env, RELKIT_BACKEND_URL: "http://127.0.0.1:3212" },
@@ -25,8 +27,8 @@ const inspector = Bun.spawn(
   },
 );
 try {
-  await waitFor("http://127.0.0.1:3210/buckets/assets");
-  await run("open", "http://127.0.0.1:3210/buckets/assets");
+  await waitFor(`${baseUrl}/buckets/assets`);
+  await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   let tree = await snapshot();
   includes(tree, 'textbox "Object key prefix"');
@@ -53,7 +55,7 @@ try {
   await run("wait", "--text", '{"enabled":true}');
   await run("press", "Escape");
   await run("wait", "--fn", "!document.querySelector('dialog[open]')");
-  await run("open", "http://127.0.0.1:3210/buckets/assets");
+  await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "images/");
@@ -71,7 +73,7 @@ try {
   );
   await run("press", "Escape");
   await run("wait", "--fn", "!document.querySelector('dialog[open]')");
-  await run("open", "http://127.0.0.1:3210/buckets/assets");
+  await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "documents/");
@@ -97,7 +99,7 @@ try {
   includes(tree, 'cell "unsafe/page.html"');
   await run("click", reference(tree, 'button "Preview"'));
   await run("wait", "--text", "metadata-only");
-  await run("open", "http://127.0.0.1:3210/buckets/assets");
+  await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "binary/oversized.bin");
@@ -106,17 +108,17 @@ try {
   tree = await snapshot();
   await run("click", reference(tree, 'button "Preview"'));
   await run("wait", "--text", "metadata-only");
-  await run("open", "http://127.0.0.1:3210/buckets/assets");
+  await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "does-not-exist/");
   await run("click", reference(tree, 'button "Search"'));
   await run("wait", "--text", "No objects found.");
-  await run("open", "http://127.0.0.1:3210/buckets/archive");
+  await run("open", `${baseUrl}/buckets/archive`);
   await run("wait", "--text", "does not support inspection");
-  await run("open", "http://127.0.0.1:3210/buckets/broken");
+  await run("open", `${baseUrl}/buckets/broken`);
   await run("wait", "--text", "Provider explorer failed.");
-  await run("open", "http://127.0.0.1:3210/cache/prices");
+  await run("open", `${baseUrl}/cache/prices`);
   await run("wait", "--text", "price:01");
   tree = await snapshot();
   includes(tree, 'textbox "Cache key search"');
