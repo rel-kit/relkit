@@ -35,6 +35,7 @@ async function main(): Promise<void> {
       return port;
     };
     process.env.PORT = String(await allocatePort());
+    process.env.RELKIT_INSPECTOR_PORT = String(await allocatePort());
     Object.assign(process.env, {
       ANTHROPIC_API_KEY: "relkit-smoke-anthropic",
       EVENT_BUS_NAME: "relkit-smoke",
