@@ -7,6 +7,8 @@ export type PerformanceRecord = Record<string, any>;
 export const root = resolve(import.meta.dir, "..");
 export const scales = [100, 1_000, 10_000] as const;
 export const round = (value: number): number => Number(value.toFixed(3));
+export const percent = (baseline: number, candidate: number): number =>
+  round(((candidate - baseline) / baseline) * 100);
 export const load = async (path: string): Promise<PerformanceRecord> =>
   (await import(pathToFileURL(resolve(root, path)).href)) as PerformanceRecord;
 
@@ -69,15 +71,6 @@ export function makeDescriptors(
   );
 }
 
-export const manifest = (graphHash: string): PerformanceRecord => ({
-  contractVersion: 2,
-  generatorVersion: 1,
-  graphHash,
-  functions: {},
-  middleware: {},
-  requestTransforms: {},
-});
-
 export function makeRoutePlan(targetFunctionId: string): PerformanceRecord {
   const source = { file: "scripts/performance.ts", line: 1, column: 1 };
   return {
@@ -107,11 +100,44 @@ export function makeRoutePlan(targetFunctionId: string): PerformanceRecord {
     caches: [],
     tools: [],
     agents: [],
+    middlewares: [],
+  };
+}
+
+export function makeManifest(contracts: PerformanceRecord, graphHash: string): PerformanceRecord {
+  return {
+    contractVersion: contracts.MANIFEST_VERSION,
+    generatorVersion: contracts.GENERATOR_VERSION,
+    graphHash,
+    activationFingerprint: {
+      graphHash,
+      manifestHash: "sha256:performance-manifest",
+      runtimeIntegrationsPlanHash: "sha256:performance-runtime-integrations",
+    },
+    runtimeIntegrationsPlan: {
+      version: contracts.RUNTIME_INTEGRATION_PLAN_VERSION,
+      fileName: contracts.RUNTIME_INTEGRATION_PLAN_FILE,
+      graphHash,
+    },
+    functions: {},
+    middleware: {},
+    requestTransforms: {},
   };
 }
 
 export function invocationOptions(source: string): PerformanceRecord {
-  return { source, now: () => 0, idSource: { next: (kind: string) => `${kind}-1` } };
+  return {
+    source,
+    now: () => 0,
+    idSource: {
+      next: (kind: string) =>
+        kind === "trace"
+          ? "10000000000000000000000000000001"
+          : kind === "span"
+            ? "1000000000000001"
+            : "invocation-1",
+    },
+  };
 }
 
 export function environment(): PerformanceRecord {
@@ -138,7 +164,7 @@ export function printPerformanceReport(measurements: PerformanceRecord): void {
         environment: environment(),
         fixtures: { descriptorScales: scales, inspectorNodes: 1_000, eventFanOut: 8 },
         measurements,
-        thresholds: null,
+        thresholds: { p50ReviewPercent: 5, p95ReviewPercent: 10 },
       },
       null,
       2,
