@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.4.0
+
+### Changes
+
+- Add request-centric runtime instrumentation, canonical model v2 execution records, live Inspector span details, strict W3C propagation, and OTLP/HTTP JSON trace and log export.
+
 ## 0.3.0
 
 ### Changes

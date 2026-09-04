@@ -1,6 +1,6 @@
 {
   "name": "@relkit/functions",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "RELKIT function authoring API; prefer @relkit/app/functions in applications.",
   "license": "MIT",
   "repository": {

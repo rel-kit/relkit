@@ -15,12 +15,12 @@
     "graph": "relkit graph print"
   },
   "dependencies": {
-    "@relkit/app": "0.3.0"
+    "@relkit/app": "0.4.0"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@relkit/cli": "0.3.0",
-    "@relkit/testing": "0.3.0",
+    "@relkit/cli": "0.4.0",
+    "@relkit/testing": "0.4.0",
     "typescript": "5.9.3"
   }
 }
