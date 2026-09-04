@@ -12,7 +12,7 @@ test("collector admits redacted records and retains only its bounded newest wind
     fields: { token: "top-secret-token", visible: "yes" },
   });
   collector.emit({
-    version: 1,
+    version: 2,
     signal: "diagnostic",
     code: "RELKIT_TEST",
     severity: "info",
@@ -20,7 +20,7 @@ test("collector admits redacted records and retains only its bounded newest wind
     occurredAt: "2026-08-16T00:00:00.001Z",
   });
   collector.emit({
-    version: 1,
+    version: 2,
     signal: "diagnostic",
     code: "RELKIT_TEST",
     severity: "info",

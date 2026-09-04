@@ -75,11 +75,8 @@ export function redactRecord(value: unknown, policy?: RedactionPolicy): JsonValu
   return safeValue(redact(value, normalized, false, [], new Set<object>()));
 }
 
-export const admitRecord = redactRecord;
-
-export function redactValue(value: unknown, policy?: RedactionPolicy): JsonValue {
-  return redactRecord(value, policy);
-}
+export const admitRecord = redactRecord,
+  redactValue = redactRecord;
 
 export function captureRedacted(
   value: unknown,
@@ -87,6 +84,9 @@ export function captureRedacted(
 ): RedactedCapture | undefined {
   const normalized = createRedactionPolicy(policy);
   if (normalized.mode !== "development-redacted") return undefined;
+  if (value === undefined) {
+    return Object.freeze({ mode: normalized.mode, bytes: 0, truncated: false });
+  }
   const content = safeValue(redact(value, normalized, true, [], new Set<object>()));
   const bytes = new TextEncoder().encode(canonicalJson(content)).byteLength;
   if (bytes > normalized.maxBytes!) {
@@ -125,8 +125,10 @@ function redact(
       const descriptor = Object.getOwnPropertyDescriptor(value, name);
       if (descriptor === undefined || !("value" in descriptor)) continue;
       const protectedContent = contentKey(name);
+      const admittedCapture =
+        protectedContent && path.some((segment) => normalizeKey(segment).endsWith("capture"));
       const protectedValue = sensitiveObject && ["value", "default", "example"].includes(name);
-      if ((!capture && protectedContent) || protectedValue) continue;
+      if ((!capture && protectedContent && !admittedCapture) || protectedValue) continue;
       const result = redact(
         descriptor.value,
         policy,

@@ -37,6 +37,14 @@ test("truncates capture before admission when the byte bound is exceeded", () =>
   expect(capture).toEqual({ mode: "development-redacted", bytes: 16, truncated: true });
 });
 
+test("records an explicitly captured undefined result without inventing a value", () => {
+  expect(captureRedacted(undefined, { mode: "development-redacted", maxBytes: 16 })).toEqual({
+    mode: "development-redacted",
+    bytes: 0,
+    truncated: false,
+  });
+});
+
 test("keeps request bodies off by default and redacted when explicitly captured", () => {
   const request = {
     method: "POST",

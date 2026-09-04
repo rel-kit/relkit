@@ -21,7 +21,7 @@ export function isModelRecord(value: RecordLike): boolean {
       "invocation",
       "job",
       "event",
-      "resource",
+      "operation",
       "tool",
       "agent",
       "log",
@@ -41,10 +41,6 @@ export function isInvocation(value: RecordLike): boolean {
     text(value.startedAt) !== undefined &&
     text(value.source) !== undefined
   );
-}
-
-export function isAgentSpan(value: RecordLike): boolean {
-  return text(value.agentId) !== undefined && text(value.spanId) !== undefined;
 }
 
 export function isRuntimeLog(value: RecordLike): boolean {

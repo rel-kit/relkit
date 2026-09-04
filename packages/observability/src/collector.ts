@@ -5,7 +5,7 @@ import {
   type ObservabilitySignal,
 } from "./model.js";
 import { admitObservabilityRecord } from "./record-admission.js";
-import type { RedactionPolicy } from "./redaction.js";
+import { captureRedacted, type RedactedCapture, type RedactionPolicy } from "./redaction.js";
 import type { RedactedObservabilityRecord } from "./record-admission.js";
 import { toObservabilityRecord } from "./collector-events.js";
 
@@ -17,7 +17,7 @@ const OBSERVABILITY_SIGNALS = new Set<ObservabilitySignal>([
   "invocation",
   "job",
   "event",
-  "resource",
+  "operation",
   "tool",
   "agent",
   "log",
@@ -44,6 +44,7 @@ export interface ObservabilityCollector {
   readonly read: () => readonly RedactedObservabilityRecord[];
   readonly clear: () => void;
   readonly dropped: () => number;
+  readonly capture: (value: unknown) => RedactedCapture | undefined;
 }
 
 /**
@@ -95,6 +96,7 @@ export function createObservabilityCollector(
       dropped = 0;
     },
     dropped: () => dropped,
+    capture: (value: unknown) => captureRedacted(value, options.redaction ?? {}),
   });
 }
 
