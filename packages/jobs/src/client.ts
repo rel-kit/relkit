@@ -1,4 +1,5 @@
-import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import { normalizeId, type MaybePromise, type TracePropagation } from "@relkit/contracts";
+import { currentTracePropagation, frameworkTrace } from "@relkit/invocation";
 import type { JobEnqueueOptions, JobEnqueueResult } from "@relkit/functions";
 import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import {
@@ -13,15 +14,14 @@ import {
 } from "./client-utils.js";
 
 export type { JobEnqueueOptions, JobEnqueueResult, JobState, JobStatus } from "@relkit/functions";
-
 export interface JobOperationContext {
   readonly operation: "enqueue";
   readonly signal: AbortSignal;
   readonly profile: string;
   readonly deadlineMs?: number;
   readonly correlationId?: string;
+  readonly propagation?: TracePropagation;
 }
-
 export interface JobProvider {
   readonly enqueue: (
     input: unknown,
@@ -29,7 +29,6 @@ export interface JobProvider {
     context: JobOperationContext,
   ) => MaybePromise<JobProviderResult>;
 }
-
 export type JobProviderResult = Pick<JobEnqueueResult, "instanceId" | "accepted"> &
   Partial<
     Pick<
@@ -42,32 +41,29 @@ export type JobProviderResult = Pick<JobEnqueueResult, "instanceId" | "accepted"
       | "idempotencyExpiresAt"
     >
   >;
-
 export interface JobInvocationBridgeOptions {
   readonly name: string;
   readonly attributes: Readonly<Record<string, unknown>>;
   readonly signal: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
 }
-
 export interface JobInvocationBridge {
   readonly run: <A>(
     operation: () => MaybePromise<A>,
     options?: JobInvocationBridgeOptions,
   ) => Promise<A>;
 }
-
 export interface JobDeclaredEdge {
   readonly kind: "enqueues-job";
   readonly from: string;
   readonly to: string;
 }
-
 export interface JobObservedEdge {
   readonly relationship: "enqueues-job";
   readonly from: string;
   readonly to: string;
 }
-
 export interface JobClientOptions {
   readonly ownerId: string;
   readonly jobId: string;
@@ -83,7 +79,6 @@ export interface JobClientOptions {
   readonly onDeclaredEdge?: (edge: JobDeclaredEdge) => void;
   readonly onObservedEdge?: (edge: JobObservedEdge) => void;
 }
-
 export interface JobClient<Input = unknown> {
   readonly enqueue: (input: Input, options?: JobEnqueueOptions) => Promise<JobEnqueueResult>;
 }
@@ -95,7 +90,6 @@ export class JobInputValidationError extends TypeError {
     this.name = "JobInputValidationError";
   }
 }
-
 export class JobProfileError extends Error {
   readonly code = "RELKIT_JOB_PROFILE_UNKNOWN" as const;
   constructor(readonly profile: string) {
@@ -103,7 +97,6 @@ export class JobProfileError extends Error {
     this.name = "JobProfileError";
   }
 }
-
 export class JobProviderError extends Error {
   readonly code = "RELKIT_JOB_PROVIDER_UNAVAILABLE" as const;
   constructor() {
@@ -160,17 +153,23 @@ export function createJobClient(options: JobClientOptions): JobClient {
       { relationship: "enqueues-job", from: ownerId, to: jobId },
       declared,
     );
-    const context = Object.freeze({
-      operation: "enqueue" as const,
-      signal,
-      profile,
-      ...(deadlineMs === undefined ? {} : { deadlineMs }),
-      ...(correlationId === undefined ? {} : { correlationId }),
-    });
     const work = async (): Promise<JobEnqueueResult> => {
       if (!declared) throw new JobDependencyError(jobId);
       if (signal.aborted) throw new JobOperationCancelledError();
       const value = await parseInput(options.inputSchema, input);
+      const base = currentTracePropagation();
+      const propagation =
+        base === undefined || correlationId === undefined
+          ? base
+          : Object.freeze({ ...base, correlationId });
+      const context = Object.freeze({
+        operation: "enqueue" as const,
+        signal,
+        profile,
+        ...(deadlineMs === undefined ? {} : { deadlineMs }),
+        ...(correlationId === undefined ? {} : { correlationId }),
+        ...(propagation === undefined ? {} : { propagation }),
+      });
       const result = await provider.enqueue(
         value,
         Object.freeze({ ...request, ...(correlationId === undefined ? {} : { correlationId }) }),
@@ -181,9 +180,21 @@ export function createJobClient(options: JobClientOptions): JobClient {
     const bridged = options.bridge?.run(work, {
       name: `relkit.job.${jobId}.enqueue`,
       attributes: { "relkit.job.id": jobId, "relkit.job.profile": profile },
+      input,
       signal,
+      kind: "producer",
     });
-    return bridged === undefined ? runAbortable(signal, deadlineMs, work) : bridged;
+    return bridged === undefined
+      ? frameworkTrace.span(
+          `relkit.job.${jobId}.enqueue`,
+          {
+            input,
+            kind: "producer",
+            attributes: { "relkit.job.id": jobId, "relkit.job.profile": profile },
+          },
+          () => runAbortable(signal, deadlineMs, work),
+        )
+      : bridged;
   };
   return Object.freeze({ enqueue });
 }
