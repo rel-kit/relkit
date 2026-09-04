@@ -1,11 +1,16 @@
-import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@relkit/contracts";
+import {
+  canonicalJson,
+  normalizeId,
+  parseTracePropagation,
+  type JsonValue,
+} from "@relkit/contracts";
 import type { JobRecord, JobStore } from "./store.js";
-import { assertIdempotencyRecord, readIdempotencyRecord } from "./idempotency.js";
+import { readIdempotencyRecord } from "./idempotency.js";
+import { assertFailure, makeEntry } from "./queue-entry-create.js";
 import {
   JOB_QUEUE_STATES,
   JobQueueStateError,
   assertTime,
-  type JobIdempotencyRecord,
   type JobQueueEntry,
   type JobFailureMetadata,
   type JobQueueState,
@@ -59,51 +64,13 @@ export function nextEntry(
     current.acceptedAt,
     current.order,
     attempt,
+    current.propagation,
     availableAt,
     leaseExpiresAt,
     leaseOwner,
     idempotency,
     failure,
   );
-}
-
-export function makeEntry(
-  instanceId: string,
-  state: JobQueueState,
-  input: JsonValue,
-  profile: string,
-  acceptedAt: number,
-  order: number,
-  attempt: number,
-  availableAt?: number,
-  leaseExpiresAt?: number,
-  leaseOwner?: string,
-  idempotency?: JobIdempotencyRecord,
-  failure?: JobFailureMetadata,
-): JobQueueEntry {
-  assertTime(acceptedAt, "accepted time");
-  if (!Number.isSafeInteger(order) || order < 1)
-    throw new JobQueueStateError("Queue order is invalid");
-  if (!Number.isSafeInteger(attempt) || attempt < 0)
-    throw new JobQueueStateError("Attempt is invalid");
-  if (failure !== undefined) assertFailure(failure);
-  if (idempotency !== undefined) assertIdempotencyRecord(idempotency);
-  return deepFreeze({
-    instanceId: normalizeId(instanceId),
-    state,
-    input: JSON.parse(canonicalJson(input)) as JsonValue,
-    profile: normalizeId(profile),
-    attempt,
-    acceptedAt,
-    order,
-    ...(availableAt === undefined ? {} : { availableAt }),
-    ...(leaseOwner === undefined ? {} : { leaseOwner: normalizeId(leaseOwner) }),
-    ...(leaseExpiresAt === undefined ? {} : { leaseExpiresAt }),
-    ...(idempotency === undefined ? {} : { idempotency: { ...idempotency } }),
-    ...(failure === undefined
-      ? {}
-      : { failure: JSON.parse(canonicalJson(failure)) as JobFailureMetadata }),
-  });
 }
 
 export function readEntry(record: JobRecord): JobQueueEntry | undefined {
@@ -127,6 +94,7 @@ export function readEntry(record: JobRecord): JobQueueEntry | undefined {
     numberValue(data.acceptedAt, "accepted time"),
     numberValue(data.order, "queue order"),
     numberValue(data.attempt, "attempt"),
+    parseTracePropagation(data.propagation),
     optionalNumber(data.availableAt, "available time"),
     optionalNumber(data.leaseExpiresAt, "lease expiry"),
     optionalOwner(data.leaseOwner),
@@ -161,33 +129,6 @@ function optionalFailure(value: JsonValue | undefined): JobFailureMetadata | und
   const failure = value as unknown as JobFailureMetadata;
   assertFailure(failure);
   return failure;
-}
-
-function assertFailure(value: JobFailureMetadata): void {
-  if (
-    !isFailureKind(value.kind) ||
-    !isFailureOutcome(value.outcome) ||
-    typeof value.code !== "string" ||
-    value.code.trim() === "" ||
-    typeof value.message !== "string" ||
-    value.message.trim() === ""
-  )
-    throw new JobQueueStateError("Job failure metadata is invalid");
-  if (value.status !== undefined && !Number.isSafeInteger(value.status))
-    throw new JobQueueStateError("Job failure status is invalid");
-  if (value.retry !== undefined && value.retry !== "never" && value.retry !== "later")
-    throw new JobQueueStateError("Job failure retry classification is invalid");
-  if (value.afterMs !== undefined && (!Number.isSafeInteger(value.afterMs) || value.afterMs < 0))
-    throw new JobQueueStateError("Job failure retry delay is invalid");
-  if (value.data !== undefined) canonicalJson(value.data);
-}
-
-function isFailureKind(value: string): value is JobFailureMetadata["kind"] {
-  return ["application", "provider", "cancellation", "timeout", "defect"].includes(value);
-}
-
-function isFailureOutcome(value: string): value is JobFailureMetadata["outcome"] {
-  return ["declared-error", "provider-failure", "cancelled", "timeout", "defect"].includes(value);
 }
 
 function numberValue(value: JsonValue, label: string): number {
