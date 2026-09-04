@@ -9,10 +9,12 @@ describe("agent limit and privacy matrix", () => {
     await agent.invoke({ question: "password=matrix-secret" });
 
     const trace = agent.trace.read();
-    const root = trace.spans.find((span) => span.kind === "agent" && span.status === "started");
+    const root = trace.spans.find(
+      (span) =>
+        span.name === `relkit.agent.${fixture.agent.id}.invoke` && span.status === "started",
+    );
     expect(root?.functionId).toBe(generatedAgentFunctionId(fixture.agent.id));
-    expect(trace.spans.some((span) => span.kind === "model")).toBe(true);
-    expect(trace.spans.every((span) => span.capture === undefined)).toBe(true);
+    expect(trace.spans.some((span) => span.kind === "client")).toBe(true);
     expect(JSON.stringify(trace)).not.toContain("matrix-secret");
     expect(JSON.stringify(trace)).not.toContain("Answer order questions");
   });

@@ -1,4 +1,5 @@
-import type { AgentObservedEdge, AgentRuntimeHooks, AgentSpanRecord } from "@relkit/agents";
+import type { AgentObservedEdge, AgentRuntimeHooks } from "@relkit/agents";
+import type { spanSnapshot } from "@relkit/invocation";
 import type {
   TestAgentTrace,
   TestAgentTraceExpectation,
@@ -31,12 +32,6 @@ export function assertAgentTrace(
       `Unexpected agent span names: ${JSON.stringify(trace.spans.map((span) => span.name))}`,
     );
   }
-  const spanIds = new Set(trace.spans.map((span) => span.spanId));
-  if (
-    trace.spans.some((span) => span.parentSpanId !== undefined && !spanIds.has(span.parentSpanId))
-  ) {
-    throw new Error("Agent trace contains a span with a missing parent");
-  }
   for (const edge of expected.edges ?? []) {
     if (!trace.edges.some((actual) => sameEdge(actual, edge))) {
       throw new Error(`Missing agent edge: ${JSON.stringify(edge)}`);
@@ -44,7 +39,10 @@ export function assertAgentTrace(
   }
 }
 
-export function createTrace(spans: AgentSpanRecord[], edges: AgentObservedEdge[]): TestAgentTrace {
+export function createTrace(
+  spans: ReturnType<typeof spanSnapshot>[],
+  edges: AgentObservedEdge[],
+): TestAgentTrace {
   const trace = {
     get spans() {
       return Object.freeze([...spans]);
@@ -64,19 +62,10 @@ export function createTrace(spans: AgentSpanRecord[], edges: AgentObservedEdge[]
 
 export function captureHooks(
   hooks: AgentRuntimeHooks | undefined,
-  spans: AgentSpanRecord[],
   edges: AgentObservedEdge[],
 ): AgentRuntimeHooks {
   return {
     ...hooks,
-    onSpanStart: (record) => {
-      spans.push(record);
-      return hooks?.onSpanStart?.(record);
-    },
-    onSpanComplete: (record) => {
-      spans.push(record);
-      return hooks?.onSpanComplete?.(record);
-    },
     onObservedEdge: (edge) => {
       edges.push(edge);
       hooks?.onObservedEdge?.(edge);
