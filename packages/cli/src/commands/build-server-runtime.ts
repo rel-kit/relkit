@@ -17,14 +17,13 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
     sleep: (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
   });
   const write = (level, message, fields = {}) => {
+    const execution = currentExecutionContext();
     const record = telemetry.collect({
-      version: 1,
-      signal: "log",
-      timestamp: time.now().toISOString(),
-      level,
-      component: middlewareId,
-      message,
-      fields,
+      version: 2, signal: "log", timestamp: time.now().toISOString(),
+      level, component: middlewareId, message, fields,
+      requestId: execution?.requestId, originRequestId: execution?.originRequestId,
+      traceId: execution?.span.traceId, spanId: execution?.span.spanId,
+      invocationId: execution?.invocationId, correlationId: execution?.correlationId,
     });
     writeRuntimeLog(record);
   };
@@ -34,6 +33,7 @@ function routeMiddlewareContext({ middlewareId, signal, request, auth }) {
     env: values,
     auth: auth ?? Object.freeze({ getSession: () => Promise.resolve(null) }),
     time,
+    trace: publicTrace,
     log: Object.freeze({
       trace: logger("trace"),
       debug: logger("debug"),
@@ -138,7 +138,7 @@ function errorMessage(error) {
 }
 function recordRuntimeFailure(component, message, error, source) {
   const record = telemetry.collect({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: new Date().toISOString(),
     level: "error",

@@ -76,9 +76,10 @@ ${specializedImports}
 import { assertRuntimeIntegrationModules, createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs, parseInfrastructureBindingValues } from "@relkit/engine";
 import { createRegistrationPlan } from "@relkit/graph";
 import { installInspectorEndpoints } from "@relkit/inspector-api";
+import { currentExecutionContext, publicTrace } from "@relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
 import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
-import { createApp, createHttpAuthRuntime } from "@relkit/runtime-hono";
+import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
@@ -114,6 +115,7 @@ const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OB
     remote: { url: process.env.RELKIT_TELEMETRY_URL, token: process.env.RELKIT_TELEMETRY_TOKEN }
   } : {}) });
 globalThis["__relkit_flush_telemetry"] = telemetry.flush;
+const spanRuntime = createHttpSpanRuntime({ generationId, graphHash, observability: telemetry });
 const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
 const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
@@ -138,7 +140,7 @@ const providerStartup = (environmentResolution.error === undefined
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
-  materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context) });
+  materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
   jobWorker = startJobWorker(materializedJobs);
   await waitForProviderReady();
   providerReady = true;

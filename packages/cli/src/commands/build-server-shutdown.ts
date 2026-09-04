@@ -29,6 +29,7 @@ async function shutdown() {
   const drainTimeoutMs = timeoutFrom(process.env.RELKIT_DRAIN_TIMEOUT_MS, 10_000);
   const telemetryTimeoutMs = timeoutFrom(process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
   await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
+  spanRuntime.close();
   await bounded(flushTelemetry(), telemetryTimeoutMs);
   await bounded(providerStartup, drainTimeoutMs);
   if (providers !== undefined) await providers.dispose().catch((error) => recordRuntimeFailure("runtime.provider", "Provider cleanup failed", error, "direct"));

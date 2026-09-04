@@ -23,11 +23,9 @@ async function invokeHttp(request) {
     ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
     ...(request.errors === undefined ? {} : { errors: request.errors }),
     ...(request.toolHooks === undefined ? {} : { toolHooks: request.toolHooks }),
-    hooks: { observability: telemetry, context: invocationContext,
-      ...(environment !== "production" && process.env.RELKIT_DEV_LOGS === "1" ? {
-        onSpanStart: (span) => { invocationSpanId = span.spanId; },
-        context: (context) => invocationContext(context, invocationSpanId),
-      } : {}),
+    hooks: { observability: telemetry,
+      onSpanStart: (span) => { invocationSpanId = span.spanId; },
+      context: (context) => invocationContext(context, invocationSpanId),
     },
   });
   const task = request.auth === undefined
@@ -43,8 +41,11 @@ async function invokeHttp(request) {
 
 async function invocationContext({ invocation, signal, env, time }, spanId) {
   const write = (level, message, fields = {}) => {
-    const record = telemetry.collect({ version: 1, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId,
-      ...(environment !== "production" && process.env.RELKIT_DEV_LOGS === "1" ? { spanId, correlationId: invocation.correlationId, generationId, graphHash, source: invocation.source } : {}) });
+    const execution = currentExecutionContext();
+    const record = telemetry.collect({ version: 2, signal: "log", timestamp: time.now().toISOString(), level, component: invocation.functionId, message, fields, functionId: invocation.functionId, serviceId: invocation.serviceId, invocationId: invocation.id, traceId: invocation.traceId,
+      spanId: execution?.span.spanId ?? spanId, requestId: execution?.requestId,
+      originRequestId: execution?.originRequestId, correlationId: execution?.correlationId ?? invocation.correlationId,
+      generationId, graphHash, source: invocation.source });
     writeRuntimeLog(record);
   };
   const logger = (level) => (message, fields) => write(level, message, fields);
@@ -55,7 +56,7 @@ async function invocationContext({ invocation, signal, env, time }, spanId) {
   const database = databaseStartup === undefined
     ? Object.freeze({})
     : (await databaseStartup).context;
-  return { invocation, signal, env, time, auth, log, database, ...resolved };
+  return { invocation, signal, env, time, auth, log, trace: publicTrace, database, ...resolved };
 }
 
 function createDatabaseRegistration(node, services, env) {
