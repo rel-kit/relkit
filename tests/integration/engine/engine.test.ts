@@ -62,9 +62,16 @@ const emptyInput = z.object({});
 const emptyOutput = z.object({ ok: z.literal(true) });
 
 function ids(prefix = "engine"): InvocationIdSource {
-  let sequence = 0;
+  let invocation = 0;
+  let span = 0;
+  let trace = 0;
   return {
-    next: (kind) => `${prefix}-${kind}-${++sequence}` as ProtocolId,
+    next: (kind) =>
+      (kind === "trace"
+        ? (++trace).toString(16).padStart(32, "0")
+        : kind === "span"
+          ? (++span).toString(16).padStart(16, "0")
+          : `${prefix}-invocation-${++invocation}`) as ProtocolId,
   };
 }
 
@@ -148,6 +155,7 @@ describe("engine integration matrix", () => {
     expect(eventTypes(successCapture)).toEqual([
       "invocation.started",
       "span.started",
+      "span.updated",
       "span.completed",
       "invocation.completed",
       "invocation.released",
@@ -173,7 +181,8 @@ describe("engine integration matrix", () => {
     expect(inputCalled).toBe(false);
     expect(inputCapture.completions[0]?.outcome).toBe("validation-error");
     expect(inputCapture.releases).toEqual([false]);
-    expect(eventTypes(inputCapture)).not.toContain("span.started");
+    expect(eventTypes(inputCapture)).toContain("span.started");
+    expect(eventTypes(inputCapture)).toContain("span.completed");
 
     const outputCapture = capture();
     const outputFailure = await invokeFunction(
@@ -274,7 +283,7 @@ describe("engine integration matrix", () => {
     const childRecord = records.find((record) => record.functionId === "engine.child");
     expect(root).toMatchObject({
       source: "direct",
-      traceId: "parent-trace-1",
+      traceId: "00000000000000000000000000000001",
       correlationId: "request-1",
     });
     expect(childRecord).toMatchObject({

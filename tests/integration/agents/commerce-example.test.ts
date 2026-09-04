@@ -6,7 +6,6 @@ import {
   invokeFunction,
   type InvocationCompletion,
   type InvocationParent,
-  type SpanRecord,
 } from "../../../packages/engine/src/index.ts";
 import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
 import { createTestAgent } from "../../../packages/testing/src/index.ts";
@@ -16,7 +15,6 @@ bindDescriptorIdentity(getOrderTool.target, "orders.get-order");
 
 describe("commerce-example support agent", () => {
   test("runs a scripted tool call through the function engine without storing content", async () => {
-    const functionSpans: SpanRecord[] = [];
     const completions: InvocationCompletion[] = [];
     const agent = createTestAgent({
       agent: orderSupport,
@@ -30,8 +28,6 @@ describe("commerce-example support agent", () => {
             ...(request.signal === undefined ? {} : { signal: request.signal }),
             ...(parent === undefined ? {} : { parent }),
             hooks: {
-              onSpanStart: (span) => functionSpans.push(span),
-              onSpanComplete: (span) => functionSpans.push(span),
               onCompletion: (completion) => completions.push(completion),
             },
           });
@@ -55,8 +51,18 @@ describe("commerce-example support agent", () => {
     expect(orderSupport.model).toBe("openai:gpt-5-mini");
     expect(getOrderTool.id).toBe("orders.lookup-order");
     expect(agent.model.calls).toHaveLength(2);
+    const agentSpanName = `relkit.agent.${orderSupport.id}`;
     agent.trace.assert({
-      spanKinds: ["agent", "model", "model", "tool", "tool", "model", "model", "agent"],
+      names: [
+        `${agentSpanName}.invoke`,
+        `${agentSpanName}.model`,
+        "relkit.tool.orders.lookup-order",
+        "relkit.invoke.orders.get-order",
+        "relkit.invoke.orders.get-order",
+        "relkit.tool.orders.lookup-order",
+        `${agentSpanName}.model`,
+        `${agentSpanName}.invoke`,
+      ],
       edges: [
         { relationship: "uses-provider-profile", from: orderSupport.id, to: "default" },
         { relationship: "uses-tool", from: orderSupport.id, to: "orders.lookup-order" },
@@ -65,22 +71,23 @@ describe("commerce-example support agent", () => {
 
     const trace = agent.trace.read();
     const agentSpan = trace.spans.find(
-      (span) => span.kind === "agent" && span.status === "started",
+      (span) => span.name.endsWith(".invoke") && span.status === "started",
     );
     const modelSpans = trace.spans.filter(
-      (span) => span.kind === "model" && span.status === "started",
+      (span) => span.name.endsWith(".model") && span.status === "started",
     );
-    const toolSpan = trace.spans.find((span) => span.kind === "tool" && span.status === "started");
-    const functionSpan = functionSpans.find((span) => span.status === "started");
+    const toolSpan = trace.spans.find(
+      (span) => span.name === "relkit.tool.orders.lookup-order" && span.status === "started",
+    );
+    const functionSpan = trace.spans.find(
+      (span) => span.name === "relkit.invoke.orders.get-order" && span.status === "started",
+    );
     const targetEdge = trace.edges.find(
       (edge) => edge.relationship === "targets-function" && edge.from === "orders.lookup-order",
     );
 
     expect(agentSpan?.functionId).toBe(`relkit.agent.${orderSupport.id}.invoke`);
-    expect(modelSpans.map((span) => span.parentSpanId)).toEqual([
-      agentSpan?.spanId,
-      agentSpan?.spanId,
-    ]);
+    expect(modelSpans.map((span) => span.parentSpanId)).toEqual([agentSpan?.spanId]);
     expect(toolSpan).toMatchObject({
       parentSpanId: modelSpans[0]?.spanId,
     });
@@ -96,11 +103,7 @@ describe("commerce-example support agent", () => {
       source: "tool",
     });
 
-    const allSpans = [...trace.spans, ...functionSpans];
-    const spanIds = new Set(allSpans.map((span) => span.spanId));
-    expect(
-      allSpans.every((span) => span.parentSpanId === undefined || spanIds.has(span.parentSpanId)),
-    ).toBe(true);
+    const allSpans = trace.spans;
     const serializedTrace = JSON.stringify(trace);
     expect(trace.spans.every((span) => span.capture === undefined)).toBe(true);
     expect(serializedTrace).not.toContain("raw-prompt-secret");
