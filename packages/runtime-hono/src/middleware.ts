@@ -1,8 +1,9 @@
-import { toRequestId, toTraceId } from "@relkit/contracts";
+import { parseTraceParent, toRequestId } from "@relkit/contracts";
 import type { MiddlewareHandler } from "hono";
 import {
   createFallbackState,
   emitLifecycle,
+  emitTerminalLifecycle,
   getRequestState,
   lifecycleEvent,
   readId,
@@ -16,9 +17,11 @@ import {
   type RequestLifecycleHooks,
   type RequestLifecycleType,
 } from "./middleware-utils.js";
-import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
+import { ensureRequestRecord } from "./request-record-middleware.js";
 import { limitsMiddleware } from "./middleware-limits.js";
 import { failureOutcome } from "./request-record-utils.js";
+import { createHttpSpanRuntime, httpSpanMiddleware, outerHttpState } from "./http-span.js";
+import { isRelkitControlPlanePath } from "./control-plane.js";
 
 export {
   REQUEST_CONTEXT_KEY,
@@ -49,11 +52,12 @@ export interface FrameworkMiddleware {
 export function createFrameworkMiddleware(
   options: HttpMiddlewareOptions = {},
 ): readonly FrameworkMiddleware[] {
+  options = { ...options, spanRuntime: createHttpSpanRuntime(options) };
   return Object.freeze([
-    { name: "request-id", handler: requestIdMiddleware(options) },
-    { name: "trace", handler: traceMiddleware(options) },
+    { name: "request-id", handler: applicationOnly(requestIdMiddleware(options)) },
+    { name: "trace", handler: applicationOnly(traceMiddleware(options)) },
     { name: "limits", handler: limitsMiddleware(options) },
-    { name: "request-record", handler: requestLifecycleMiddleware(options) },
+    { name: "request-record", handler: applicationOnly(requestLifecycleMiddleware(options)) },
   ]);
 }
 
@@ -63,29 +67,32 @@ export { limitsMiddleware } from "./middleware-limits.js";
 
 export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return async (context, next) => {
-    const requestId = readId(
-      context.req.header(options.requestIdHeader ?? REQUEST_ID_HEADER),
-      options.requestId,
-      "request",
-      toRequestId,
+    const outer = outerHttpState(context.req.raw);
+    if (outer !== undefined) {
+      setRequestState(context, outer);
+      context.header(options.requestIdHeader ?? REQUEST_ID_HEADER, outer.requestId);
+      await next();
+      setResponseHeader(context, options.requestIdHeader ?? REQUEST_ID_HEADER, outer.requestId);
+      return;
+    }
+    const requestId = readId(undefined, options.requestId, "request", toRequestId);
+    const remoteParent = parseTraceParent(
+      context.req.header("traceparent"),
+      context.req.header("tracestate"),
     );
-    const traceId = readId(
-      context.req.header(options.traceIdHeader ?? TRACE_ID_HEADER),
-      options.traceId,
-      "trace",
-      toTraceId,
-    );
+    const traceId = remoteParent?.traceId ?? createFallbackState(context, options).traceId;
     const startedAt = options.now?.() ?? Date.now();
     const state: HttpRequestState = Object.freeze({
       requestId,
       traceId,
       signal: context.req.raw.signal,
+      runtimeSignal: { current: context.req.raw.signal },
       startedAt,
+      ...(remoteParent === undefined ? {} : { remoteParent }),
     });
     setRequestState(context, state);
     ensureRequestRecord(context, state, options);
     context.header(options.requestIdHeader ?? REQUEST_ID_HEADER, requestId);
-    context.header(options.traceIdHeader ?? TRACE_ID_HEADER, traceId);
     try {
       await next();
     } finally {
@@ -95,27 +102,7 @@ export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): Middle
 }
 
 export function traceMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
-  return async (context, next) => {
-    const current = ensureRequestRecord(
-      context,
-      getRequestState(context) ?? createFallbackState(context, options),
-      options,
-    );
-    const traceId = readId(
-      context.req.header(options.traceIdHeader ?? TRACE_ID_HEADER),
-      options.traceId,
-      "trace",
-      toTraceId,
-    );
-    current.requestRecord?.setTraceId(traceId);
-    setRequestState(context, Object.freeze({ ...current, traceId }));
-    context.header(options.traceIdHeader ?? TRACE_ID_HEADER, traceId);
-    try {
-      await next();
-    } finally {
-      setResponseHeader(context, options.traceIdHeader ?? TRACE_ID_HEADER, traceId);
-    }
-  };
+  return httpSpanMiddleware(options);
 }
 
 export function requestLifecycleMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
@@ -125,45 +112,41 @@ export function requestLifecycleMiddleware(options: HttpMiddlewareOptions = {}):
       getRequestState(context) ?? createFallbackState(context, options),
       options,
     );
-    const started = lifecycleEvent(context, state, "request.started");
-    await emitLifecycle(options, started, "onStart");
-    let failure: unknown;
-    let cancelled = state.signal.aborted;
-    let cancellation: Promise<void> | undefined;
-    const onAbort = (): void => {
-      cancelled = true;
-      cancellation = emitLifecycle(
+    if (!state.lifecycleStarted) {
+      const started = lifecycleEvent(context, state, "request.started");
+      await emitLifecycle(options, started, "onStart");
+    }
+    const signal = state.runtimeSignal?.current ?? state.signal;
+    const cancelled = (): void => {
+      void emitTerminalLifecycle(
         options,
+        state,
         lifecycleEvent(context, state, "request.cancelled"),
         "onCancel",
       );
     };
-    if (state.signal.aborted) onAbort();
-    else state.signal.addEventListener("abort", onAbort, { once: true });
+    signal.addEventListener("abort", cancelled, { once: true });
+    let failure: unknown;
     try {
       await next();
     } catch (cause) {
       failure = cause;
       throw cause;
     } finally {
-      state.signal.removeEventListener("abort", onAbort);
-      if (cancellation !== undefined) await cancellation;
-      if (cancelled) {
+      signal.removeEventListener("abort", cancelled);
+      if (state.signal.aborted) {
         state.requestRecord?.setOutcome("cancelled");
-        finishRequestRecord(context, state, options, "cancelled");
         return;
       }
       const outcome = failure === undefined ? undefined : failureOutcome(failure, state.signal);
       if (outcome !== undefined) state.requestRecord?.setOutcome(outcome.outcome, outcome.errorId);
-      if (failure !== undefined) finishRequestRecord(context, state, options, outcome!.outcome);
-      else finishRequestRecord(context, state, options, "success");
-      const type: RequestLifecycleType =
-        failure === undefined ? "request.completed" : "request.failed";
-      await emitLifecycle(
-        options,
-        lifecycleEvent(context, state, type, failure),
-        failure === undefined ? "onComplete" : "onError",
-      );
     }
+  };
+}
+
+function applicationOnly(handler: MiddlewareHandler): MiddlewareHandler {
+  return async (context, next) => {
+    if (isRelkitControlPlanePath(context.req.path)) return next();
+    return handler(context, next);
   };
 }

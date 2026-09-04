@@ -79,10 +79,11 @@ describe("route rate limiting", () => {
       (await firstRuntime.request("http://localhost/limited", { headers: { "x-api-key": "a" } }))
         .status,
     ).toBe(200);
-    expect(
-      (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "a" } }))
-        .status,
-    ).toBe(429);
+    const blockedResponse = await secondRuntime.request("http://localhost/limited", {
+      headers: { "x-api-key": "a" },
+    });
+    expect(blockedResponse.status).toBe(429);
+    await blockedResponse.text();
     expect(
       (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "b" } }))
         .status,

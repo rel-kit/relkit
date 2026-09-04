@@ -1,7 +1,8 @@
-import type { MaybePromise, RequestId, TraceId } from "@relkit/contracts";
-import { toRequestId, toTraceId } from "@relkit/contracts";
+import type { MaybePromise, RequestId, SpanContext, TraceId } from "@relkit/contracts";
+import { createTraceId, parseTraceParent, toRequestId, toTraceId } from "@relkit/contracts";
 import type { RequestRecordBuilder, RequestRecordSink } from "@relkit/observability";
 import type { Context } from "hono";
+import type { RelkitSpan, SpanRuntime } from "@relkit/invocation";
 
 export const REQUEST_ID_HEADER = "x-request-id" as const;
 export const TRACE_ID_HEADER = "x-trace-id" as const;
@@ -10,10 +11,14 @@ export const REQUEST_CONTEXT_KEY = "relkit.request" as const;
 export interface HttpRequestState {
   readonly requestId: RequestId;
   readonly traceId: TraceId;
+  readonly remoteParent?: SpanContext;
+  readonly serverSpan?: RelkitSpan;
   readonly signal: AbortSignal;
   readonly startedAt: number;
   readonly deadlineMs?: number;
   readonly requestRecord?: RequestRecordBuilder;
+  readonly lifecycleStarted?: true;
+  readonly runtimeSignal?: { current: AbortSignal; terminalLifecycle?: boolean };
 }
 
 export type RequestLifecycleType =
@@ -40,6 +45,8 @@ export interface RequestLifecycleHooks {
   readonly onCancel?: (event: RequestLifecycleEvent) => MaybePromise<void>;
 }
 
+const terminalLifecycleStates = new WeakSet<HttpRequestState>();
+
 export interface HttpMiddlewareOptions {
   readonly requestIdHeader?: string;
   readonly traceIdHeader?: string;
@@ -53,6 +60,7 @@ export interface HttpMiddlewareOptions {
   readonly observability?: RequestRecordSink;
   readonly lifecycle?: RequestLifecycleHooks;
   readonly onLifecycleEvent?: (event: RequestLifecycleEvent) => MaybePromise<void>;
+  readonly spanRuntime?: SpanRuntime;
 }
 
 export function getRequestState(context: Context): HttpRequestState | undefined {
@@ -66,6 +74,7 @@ export function setRequestState(context: Context, state: HttpRequestState): void
   target.set("requestId", state.requestId);
   target.set("traceId", state.traceId);
   target.set("signal", state.signal);
+  if (state.runtimeSignal !== undefined) state.runtimeSignal.current = state.signal;
 }
 
 export function setResponseHeader(context: Context, name: string, value: string): void {
@@ -84,19 +93,12 @@ export function createFallbackState(
   options: HttpMiddlewareOptions,
 ): HttpRequestState {
   return Object.freeze({
-    requestId: readId(
-      context.req.header(options.requestIdHeader ?? REQUEST_ID_HEADER),
-      options.requestId,
-      "request",
-      toRequestId,
-    ),
-    traceId: readId(
-      context.req.header(options.traceIdHeader ?? TRACE_ID_HEADER),
-      options.traceId,
-      "trace",
-      toTraceId,
-    ),
+    requestId: readId(undefined, options.requestId, "request", toRequestId),
+    traceId:
+      parseTraceParent(context.req.header("traceparent"), context.req.header("tracestate"))
+        ?.traceId ?? readId(undefined, options.traceId, "trace", toTraceId),
     signal: context.req.raw.signal,
+    runtimeSignal: { current: context.req.raw.signal },
     startedAt: Date.now(),
   });
 }
@@ -107,10 +109,12 @@ export function readId<T extends RequestId | TraceId>(
   prefix: string,
   normalize: (value: unknown) => T,
 ): T {
+  const fallback = () =>
+    prefix === "trace" ? createTraceId() : `${prefix}-${crypto.randomUUID()}`;
   try {
-    return normalize(incoming ?? generate?.() ?? `${prefix}-${crypto.randomUUID()}`);
+    return normalize(incoming ?? generate?.() ?? fallback());
   } catch {
-    return normalize(`${prefix}-${crypto.randomUUID()}`);
+    return normalize(fallback());
   }
 }
 
@@ -148,6 +152,18 @@ export async function emitLifecycle(
   await call(options.onLifecycleEvent, event);
   await call(options.lifecycle?.emit, event);
   await call(options.lifecycle?.[hook], event);
+}
+
+export async function emitTerminalLifecycle(
+  options: HttpMiddlewareOptions,
+  state: HttpRequestState,
+  event: RequestLifecycleEvent,
+  hook: keyof RequestLifecycleHooks,
+): Promise<void> {
+  if (state.runtimeSignal?.terminalLifecycle === true || terminalLifecycleStates.has(state)) return;
+  if (state.runtimeSignal !== undefined) state.runtimeSignal.terminalLifecycle = true;
+  terminalLifecycleStates.add(state);
+  await emitLifecycle(options, event, hook);
 }
 
 export function validateLimit(value: number | undefined, name: string): void {

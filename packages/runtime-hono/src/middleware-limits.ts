@@ -9,16 +9,15 @@ import {
   type HttpMiddlewareOptions,
 } from "./middleware-utils.js";
 import { ensureRequestRecord, finishRequestRecord } from "./request-record-middleware.js";
+import { isRelkitControlPlanePath } from "./control-plane.js";
 
 export function limitsMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   validateLimit(options.maxBodyBytes, "maxBodyBytes");
   validateLimit(options.timeoutMs, "timeoutMs");
   return async (context, next) => {
-    const current = ensureRequestRecord(
-      context,
-      getRequestState(context) ?? createFallbackState(context, options),
-      options,
-    );
+    const controlPlane = isRelkitControlPlanePath(context.req.path);
+    const state = getRequestState(context) ?? createFallbackState(context, options);
+    const current = controlPlane ? state : ensureRequestRecord(context, state, options);
     const length = Number(context.req.header("content-length"));
     if (
       options.maxBodyBytes !== undefined &&
@@ -37,13 +36,19 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
       current.requestRecord?.setOutcome("validation-error");
       setRequestState(context, Object.freeze({ ...current, signal: context.req.raw.signal }));
       context.res = response;
-      finishRequestRecord(context, current, options, "validation-error");
-      await emitLifecycle(options, lifecycleEvent(context, current, "request.started"), "onStart");
-      await emitLifecycle(
-        options,
-        lifecycleEvent(context, current, "request.completed", undefined, response.status),
-        "onComplete",
-      );
+      if (!controlPlane) {
+        finishRequestRecord(context, current, options, "validation-error");
+        await emitLifecycle(
+          options,
+          lifecycleEvent(context, current, "request.started"),
+          "onStart",
+        );
+        await emitLifecycle(
+          options,
+          lifecycleEvent(context, current, "request.completed", undefined, response.status),
+          "onComplete",
+        );
+      }
       return response;
     }
     const controller = new AbortController();
