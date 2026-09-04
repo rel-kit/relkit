@@ -4,9 +4,14 @@ export function streamTypeForRecord(
   record: ObservabilityRecord,
 ): ObservabilityStreamEventType | undefined {
   if (record.signal === "log") return "log.emitted";
-  if (record.signal === "request") return "request.completed";
+  if (record.signal === "request")
+    return record.phase === "started" ? "request.started" : "request.completed";
   if (record.signal === "span")
-    return record.status === "started" ? "span.started" : "span.completed";
+    return record.status === "started"
+      ? "span.started"
+      : record.status === "updated"
+        ? "span.updated"
+        : "span.completed";
   if (record.signal === "job") return "job.changed";
   if (record.signal === "event")
     return record.kind === "publication" ? "event.published" : "event.delivery.changed";

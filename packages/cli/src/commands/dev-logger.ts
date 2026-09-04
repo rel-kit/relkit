@@ -18,11 +18,11 @@ export function devLogSinks(
 export function createDevLogger(options: DevOptions): DevLog {
   return (event) => {
     try {
-      const { record, origin, forwarded } = devLogRecord(event);
+      const { record, origin, forwarded, transient } = devLogRecord(event);
       const safe = admitObservabilityRecord(options.logger?.redact?.(record) ?? record);
       if (safe?.signal !== "log") return;
-      if (!forwarded) options.onRecord?.(safe, origin);
-      options.logger?.collector?.collect(safe);
+      if (!forwarded && !transient) options.onRecord?.(safe, origin);
+      if (!transient) options.logger?.collector?.collect(safe);
       options.onLog?.({
         ...event,
         level: safe.level,

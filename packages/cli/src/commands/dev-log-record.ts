@@ -19,6 +19,7 @@ export function devLogRecord(event: DevLogEvent) {
     if (forwarded) return { record: forwarded, origin, forwarded: true };
   }
   let level = event.level;
+  let transient = false;
   if ((event.event.startsWith("candidate.") && !child) || event.event.startsWith("supervisor."))
     level =
       event.event === "supervisor.outcome" &&
@@ -30,19 +31,25 @@ export function devLogRecord(event: DevLogEvent) {
     const status = /^(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\S+\s+(\d{3})\b/.exec(
       output.trim(),
     );
-    if (status)
-      level = Number(status[1]) >= 500 ? "error" : Number(status[1]) >= 400 ? "warn" : "debug";
-    else if (
+    if (status) {
+      if (Number(status[1]) >= 500) level = "error";
+      else {
+        level = "debug";
+        transient = true;
+      }
+    } else if (
       /^(?:▲ Next\.js\b|[✓✔]\s+(?:Ready in\b|Running next\.config\b)|[-–]\s+(?:Local|Network):|\$ next (?:dev|start)\b)/.test(
         output.trim(),
       )
-    )
+    ) {
       level = "debug";
+      transient = true;
+    }
   }
   const fields = { ...event.fields };
   delete fields.output;
   const record: LogRecord = {
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: new Date().toISOString(),
     level,
@@ -50,7 +57,7 @@ export function devLogRecord(event: DevLogEvent) {
     message: child ? output : event.event,
     fields,
   };
-  return { record, origin, forwarded: presentation };
+  return { record, origin, forwarded: presentation, transient };
 }
 
 function parseRuntimeLog(output: string): LogRecord | undefined {
@@ -58,7 +65,7 @@ function parseRuntimeLog(output: string): LogRecord | undefined {
     const value = JSON.parse(output) as Partial<LogRecord>;
     if (
       value === null ||
-      value.version !== 1 ||
+      value.version !== 2 ||
       value.signal !== "log" ||
       typeof value.timestamp !== "string" ||
       typeof value.component !== "string" ||
