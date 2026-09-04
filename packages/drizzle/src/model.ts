@@ -8,6 +8,7 @@ import type {
   ModelExtensionMap,
   NonEmptyExtensions,
 } from "./types.js";
+import { frameworkTrace } from "@relkit/invocation";
 
 export const RESERVED_OPERATIONS = Object.freeze([
   "findOne",
@@ -86,7 +87,17 @@ export function createBoundModel(binding: ModelBinding, model?: ModelDescriptorA
     Object.entries(modelRuntimeOf(model).extend).map(([name, extension]) => [
       name,
       (...args: unknown[]) =>
-        extension({ table: binding.table, database: binding.drizzle as any }, ...args),
+        frameworkTrace.span(
+          `relkit.database.${name}`,
+          {
+            input: args,
+            attributes: {
+              "db.system.name": binding.dialect,
+              "db.operation.name": name,
+            },
+          },
+          () => extension({ table: binding.table, database: binding.drizzle as any }, ...args),
+        ),
     ]),
   );
   return Object.freeze({ ...base, ...extensions });

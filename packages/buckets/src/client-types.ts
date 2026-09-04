@@ -66,6 +66,7 @@ export interface BucketBridgeOptions {
   readonly name: string;
   readonly attributes: Readonly<Record<string, unknown>>;
   readonly signal: AbortSignal;
+  readonly input?: unknown;
 }
 export interface BucketInvocationBridge {
   readonly run: <A>(operation: () => MaybePromise<A>, options?: BucketBridgeOptions) => Promise<A>;

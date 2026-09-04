@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { createBoundModel } from "./model.js";
 import type { DrizzleServiceRuntime, ModelBinding } from "./runtime-types.js";
 import type { DatabaseContext, DrizzleServiceDescriptor } from "./types.js";
+import { publicTrace } from "@relkit/invocation";
 
 export function createDatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any>>(
   service: Service,
@@ -35,14 +36,25 @@ function contextFor<Service extends DrizzleServiceDescriptor<any, any, any, any>
     transaction: async <Value>(
       run: (context: DatabaseContext<Service>) => Value | Promise<Value>,
     ): Promise<Value> => {
-      if (inTransaction) throw new TypeError("Nested portable transactions are not supported");
-      if (runtime.dialect === "sqlite") {
-        return sqliteTransaction(database, () =>
-          Promise.resolve(run(contextFor(service, runtime, database, true))),
-        );
-      }
-      return callTransaction(database, (transaction) =>
-        Promise.resolve(run(contextFor(service, runtime, transaction, true))),
+      return publicTrace.span(
+        "relkit.database.transaction",
+        {
+          attributes: {
+            "db.system.name": runtime.dialect,
+            "db.operation.name": "transaction",
+          },
+        },
+        async () => {
+          if (inTransaction) throw new TypeError("Nested portable transactions are not supported");
+          if (runtime.dialect === "sqlite") {
+            return sqliteTransaction(database, () =>
+              Promise.resolve(run(contextFor(service, runtime, database, true))),
+            );
+          }
+          return callTransaction(database, (transaction) =>
+            Promise.resolve(run(contextFor(service, runtime, transaction, true))),
+          );
+        },
       );
     },
   }) as DatabaseContext<Service>;
