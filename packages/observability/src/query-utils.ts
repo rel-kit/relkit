@@ -16,7 +16,7 @@ import {
   validate,
 } from "./query-validation.js";
 
-type Index = Pick<ObservabilityIndex, "page" | "read">;
+type Index = Pick<ObservabilityIndex, "page" | "tracePage" | "read">;
 
 export async function readPage<T extends ObservabilityRecord>(
   index: Index,
@@ -26,13 +26,16 @@ export async function readPage<T extends ObservabilityRecord>(
   signal?: ObservabilitySignal,
   accept: (record: ObservabilityRecord) => boolean = (record) =>
     signal === undefined || record.signal === signal,
+  pageKind: "records" | "traces" = "records",
 ): Promise<ObservabilityQueryPage<T>> {
   const query = validate(input, maxPageSize);
   const items: T[] = [];
   let cursor = query.cursor;
   let lastCursor: string | undefined;
   while (true) {
-    const page = index.page(indexOptions(query, cursor, maxPageSize, signal));
+    const page = (pageKind === "traces" ? index.tracePage : index.page)(
+      indexOptions(query, cursor, maxPageSize, signal),
+    );
     for (const entry of page.entries) {
       if (!inTimeRange(entry.timestamp, query) || entry.cursor === cursor) continue;
       const record = await safeRead(index, entry, redaction);
@@ -117,7 +120,10 @@ function indexOptions(
     ...(query.routeId === undefined ? {} : { routeId: query.routeId }),
     ...(query.functionId === undefined ? {} : { functionId: query.functionId }),
     ...(query.outcome === undefined ? {} : { outcome: query.outcome }),
+    ...(query.requestId === undefined ? {} : { requestId: query.requestId }),
+    ...(query.originRequestId === undefined ? {} : { originRequestId: query.originRequestId }),
     ...(query.traceId === undefined ? {} : { traceId: query.traceId }),
+    ...(query.spanId === undefined ? {} : { spanId: query.spanId }),
     ...(query.serviceId === undefined ? {} : { serviceId: query.serviceId }),
     ...(query.generationId === undefined ? {} : { generationId: query.generationId }),
     ...(query.graphHash === undefined ? {} : { graphHash: query.graphHash }),
