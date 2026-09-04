@@ -5,8 +5,9 @@ import { Button } from "../../components/ui/button";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { traceDetail } from "../../lib/observability-api";
-import { text } from "../../lib/observability-model";
 import { TraceWaterfall } from "../trace-waterfall";
+import { attachLogs } from "../signal-detail-live";
+import { TraceSummary } from "./log-trace-summary";
 
 export function LogTrace({
   traceId,
@@ -32,12 +33,16 @@ export function LogTrace({
     void Promise.all([
       traceDetail(client, traceId).catch(() => undefined),
       client.query("requests", { traceId, limit: 100 }).catch(() => undefined),
+      client.query("logs", { traceId, limit: 100 }).catch(() => undefined),
     ])
-      .then(([detail, page]) => {
+      .then(([detail, page, logs]) => {
         if (disposed) return;
-        setSpans(detail?.spans ?? []);
-        setRequests(page?.items ?? []);
-        setSummary(page?.items[0] ?? detail?.trace);
+        const requests = page?.items ?? [];
+        setSpans(attachLogs(detail?.spans ?? [], logs?.items ?? []));
+        setRequests(requests);
+        setSummary(
+          requests.find((item) => item.phase === "completed") ?? requests[0] ?? detail?.trace,
+        );
         setMissingSpans(!detail);
         setRequestState(
           !page
@@ -64,12 +69,18 @@ export function LogTrace({
   const loadMore = async () => {
     setState("loading-more");
     try {
-      const page = await createInspectorClient().query("traces", {
-        traceId,
-        cursor: cursor!,
-        limit: 100,
-      });
-      setSpans((current) => [...current, ...page.items.filter((item) => item.signal === "span")]);
+      const client = createInspectorClient();
+      const [page, logs] = await Promise.all([
+        client.query("traces", { traceId, cursor: cursor!, limit: 100 }),
+        client.query("logs", { traceId, limit: 100 }),
+      ]);
+      setSpans((current) => [
+        ...current,
+        ...attachLogs(
+          page.items.filter((item) => item.signal === "span"),
+          logs.items,
+        ),
+      ]);
       setCursor(page.nextCursor);
       setState("ready");
     } catch {
@@ -98,36 +109,7 @@ export function LogTrace({
             <p>Trace unavailable. It may not have been captured or may have expired.</p>
           )}
           {requestState && <p role="status">{requestState}</p>}
-          {summary && (
-            <dl className="trace-summary">
-              {[
-                [
-                  "Request",
-                  [text(summary.method), text(summary.rawPath)].filter(Boolean).join(" "),
-                ],
-                ["Function", text(summary.functionId)],
-                [
-                  "Outcome",
-                  [text(summary.outcome), summary.status ? `HTTP ${summary.status}` : ""]
-                    .filter(Boolean)
-                    .join(" · "),
-                ],
-                [
-                  "Duration",
-                  typeof summary.durationMs === "number" ? `${summary.durationMs} ms` : "",
-                ],
-                ["Started", text(summary.startedAt)],
-                ["Completed", text(summary.completedAt)],
-              ]
-                .filter(([, value]) => value)
-                .map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-            </dl>
-          )}
+          {summary && <TraceSummary summary={summary} />}
           {cursor && <p role="status">Partial trace: more records are retained.</p>}
           {!cursor &&
             expectedSpans !== undefined &&

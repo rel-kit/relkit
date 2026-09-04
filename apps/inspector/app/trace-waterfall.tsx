@@ -7,18 +7,12 @@ import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { OverlayDialog } from "../components/ui/dialog";
 import { Field } from "../components/ui/field";
-import { SelectField } from "../components/ui/select";
 import { ContentTabs } from "../components/ui/tabs";
 import type { InspectorObject } from "../lib/api-types";
 import { waterfall, type WaterfallSpan } from "../lib/observability-model";
+import { visibleTraceStepCount } from "../lib/trace-timeline";
 import { TraceWaterfallRows } from "./trace-waterfall-rows";
-
-const zooms = [
-  { id: "1", label: "100%" },
-  { id: "1.5", label: "150%" },
-  { id: "2", label: "200%" },
-  { id: "3", label: "300%" },
-] as const;
+import { detailTabs, duration } from "./trace-waterfall-detail";
 
 export function TraceWaterfall({
   spans,
@@ -34,55 +28,50 @@ export function TraceWaterfall({
   const items = useMemo(() => waterfall(spans, requests), [spans, requests]);
   const [query, setQuery] = useState("");
   const [errorsOnly, setErrorsOnly] = useState(false);
-  const [zoom, setZoom] = useState("1");
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() => new Set());
-  const [selected, setSelected] = useState<WaterfallSpan>();
+  const [selectedId, setSelectedId] = useState<string>();
+  const selected = items.find((item) => item.id === selectedId);
   const parentIds = useMemo(() => new Set(items.flatMap((item) => item.parentId ?? [])), [items]);
   const visible = useMemo(
     () =>
       items.filter((item) => matches(item, query, errorsOnly) && !hidden(item, items, collapsed)),
     [collapsed, errorsOnly, items, query],
   );
-  const toggle = (id: string): void =>
-    setCollapsed((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const visibleSteps = visibleTraceStepCount(visible, collapsed);
+  const totalSteps = visibleTraceStepCount(items);
   return (
     <section
       className={`panel trace-panel${compact ? " trace-compact" : ""}`}
-      aria-label="Span hierarchy and timing"
+      aria-label="Ordered trace timeline"
     >
       <div className="section-heading">
         <div>
           <h2 id="trace-waterfall-heading">
-            {requests?.length ? "Request lifecycle" : "Span hierarchy and timing"}
+            {requests?.length ? "Request timeline" : "Trace timeline"}
           </h2>
+          <p className="supporting-copy">
+            Numbered by recorded time. Events branch from operations.
+          </p>
         </div>
         <Badge>
-          {visible.length} of {items.length} {requests?.length ? "steps" : "spans"}
+          {visibleSteps} of {totalSteps} steps
         </Badge>
       </div>
       <Card className="trace-toolbar" aria-label="Trace filters">
         {compact ? (
           <input
-            aria-label="Search spans"
+            aria-label="Search steps"
             placeholder="Search lifecycle…"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
         ) : (
           <Field
-            label="Search spans"
+            label="Search steps"
             value={query}
             onChange={setQuery}
-            placeholder="Name, ID, kind, or status"
+            placeholder="Step, event, ID, kind, or status"
           />
-        )}
-        {!compact && (
-          <SelectField label="Timeline zoom" items={zooms} value={zoom} onChange={setZoom} />
         )}
         {!compact && (
           <Button
@@ -104,17 +93,14 @@ export function TraceWaterfall({
         </Button>
       </Card>
       {items.length === 0 ? (
-        <p className="supporting-copy">No spans are retained for this trace.</p>
+        <p className="supporting-copy">No steps are retained for this trace.</p>
       ) : visible.length === 0 ? (
-        <p className="supporting-copy">No spans match the active filters.</p>
+        <p className="supporting-copy">No steps match the active filters.</p>
       ) : (
         <TraceWaterfallRows
           items={visible}
-          parentIds={parentIds}
           collapsed={collapsed}
-          zoom={Number(zoom)}
-          onToggle={toggle}
-          onSelect={setSelected}
+          onSelect={(span) => setSelectedId(span.id)}
           {...(highlightedSpanId ? { highlightedSpanId } : {})}
         />
       )}
@@ -125,7 +111,7 @@ export function TraceWaterfall({
           ? { description: `${selected.kind} · ${duration(selected.durationMs)}` }
           : {})}
         isOpen={selected !== undefined}
-        onOpenChange={(open) => !open && setSelected(undefined)}
+        onOpenChange={(open) => !open && setSelectedId(undefined)}
         trigger={<Button style={{ display: "none" }}>Inspect span</Button>}
       >
         {selected && <ContentTabs label="Span details" items={detailTabs(selected)} />}
@@ -134,46 +120,12 @@ export function TraceWaterfall({
   );
 }
 
-function detailTabs(span: WaterfallSpan) {
-  return [
-    {
-      id: "summary",
-      label: "Summary",
-      content: (
-        <dl className="identity-grid">
-          <div>
-            <dt>{span.recordType === "span" ? "Span ID" : "Record"}</dt>
-            <dd>{span.spanId || `${span.recordType} · ${span.name}`}</dd>
-          </div>
-          <div>
-            <dt>Parent</dt>
-            <dd>{span.parentId ?? "Root"}</dd>
-          </div>
-          <div>
-            <dt>Status</dt>
-            <dd>{span.outcome || span.status || "recorded"}</dd>
-          </div>
-          <div>
-            <dt>Duration</dt>
-            <dd>{duration(span.durationMs)}</dd>
-          </div>
-        </dl>
-      ),
-    },
-    {
-      id: "metadata",
-      label: "Attributes & logs",
-      content: <pre className="safe-json">{JSON.stringify(span.details, null, 2)}</pre>,
-    },
-  ];
-}
-
 function matches(span: WaterfallSpan, query: string, errorsOnly: boolean): boolean {
   if (errorsOnly && !span.error) return false;
   const value = query.trim().toLowerCase();
   return (
     value === "" ||
-    `${span.name} ${span.spanId} ${span.kind} ${span.status ?? ""} ${span.outcome ?? ""}`
+    `${span.name} ${span.spanId} ${span.kind} ${span.status ?? ""} ${span.outcome ?? ""} ${span.events.map((event) => event.name).join(" ")}`
       .toLowerCase()
       .includes(value)
   );
@@ -193,8 +145,4 @@ function hidden(
     parent = parents.get(parent);
   }
   return false;
-}
-
-function duration(value: number | undefined): string {
-  return value === undefined ? "duration unavailable" : `${value.toLocaleString("en-US")} ms`;
 }
