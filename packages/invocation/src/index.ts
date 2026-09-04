@@ -16,3 +16,16 @@ export * from "./context.js";
 export * from "./validation.js";
 export * from "./identity.js";
 export * from "./recursion.js";
+export * from "./trace-limits.js";
+export * from "./execution-context.js";
+export * from "./span-runtime.js";
+export * from "./tracing-span.js";
+export * from "./public-trace.js";
+export * from "./trace-propagation.js";
+export * from "./span-snapshot.js";
+export * from "./root-span.js";
+export {
+  currentExecutionContext,
+  runInExecutionContext,
+  runDetachedExecution,
+} from "./dispatcher-scope.js";
