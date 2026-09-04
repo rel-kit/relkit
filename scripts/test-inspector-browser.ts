@@ -47,7 +47,7 @@ try {
   await run("wait", "--text", "Hello from the bucket inspector.");
   tree = await snapshot();
   await run("click", reference(tree, 'button "Close dialog"'));
-  await run("wait", "--fn", "!document.querySelector('dialog[open]')");
+  await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "docs/config.json");
   await run("click", reference(tree, 'button "Search"'));
@@ -56,7 +56,7 @@ try {
   await run("click", reference(tree, 'button "Preview"'));
   await run("wait", "--text", '{"enabled":true}');
   await run("press", "Escape");
-  await run("wait", "--fn", "!document.querySelector('dialog[open]')");
+  await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
@@ -74,7 +74,7 @@ try {
     "true",
   );
   await run("press", "Escape");
-  await run("wait", "--fn", "!document.querySelector('dialog[open]')");
+  await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
@@ -92,7 +92,7 @@ try {
     "true",
   );
   await run("press", "Escape");
-  await run("wait", "--fn", "!document.querySelector('dialog[open]')");
+  await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   tree = await snapshot();
   await run("fill", reference(tree, 'textbox "Object key prefix"'), "unsafe/");
   await run("click", reference(tree, 'button "Search"'));
@@ -132,7 +132,7 @@ try {
   await run("click", reference(tree, 'button "View value"'));
   await run("wait", "--text", '"cents": 100');
   await run("press", "Escape");
-  await run("wait", "--fn", "!document.querySelector('dialog[open]')");
+  await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   if ((await snapshot()).includes('button "Close dialog"'))
     throw new Error("Escape did not close the dialog");
   await run("set", "viewport", "390", "844");

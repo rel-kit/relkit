@@ -62,3 +62,33 @@ test("ignores an out-of-order source version", async () => {
   expect(compiled).toBe(1);
   expect(watcher.version).toBe(2);
 });
+
+test("runs a queued change after its debounce expires during compilation", async () => {
+  const resolvers = new Map<number, () => void>();
+  const watcher = createSupervisorWatcher({
+    compile: ({ version }) =>
+      new Promise<void>((resolve) => {
+        resolvers.set(version, resolve);
+      }),
+  });
+
+  watcher.notify({ version: 1 });
+  await waitFor(() => resolvers.has(1));
+  watcher.notify({ version: 2 });
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  resolvers.get(1)?.();
+  await waitFor(() => resolvers.has(2));
+  resolvers.get(2)?.();
+  await waitFor(() => watcher.stateMachine.snapshot().candidate?.sourceToken === 2);
+
+  expect(watcher.version).toBe(2);
+  watcher.dispose();
+});
+
+async function waitFor(check: () => boolean): Promise<void> {
+  const deadline = Date.now() + 500;
+  while (!check()) {
+    if (Date.now() >= deadline) throw new Error("Timed out waiting for queued compilation.");
+    await new Promise((resolve) => setTimeout(resolve, 1));
+  }
+}

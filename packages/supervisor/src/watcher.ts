@@ -137,6 +137,7 @@ export class SupervisorWatcher {
       if (this.active?.token === pending.token) {
         this.active = undefined;
         this.activeRun = undefined;
+        if (!this.disposed && this.pending !== undefined) this.schedule();
       }
     }
   }

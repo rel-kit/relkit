@@ -158,7 +158,7 @@ describe("inspector observability endpoints", () => {
     await reader.cancel();
   });
 
-  test("keeps sampled and failed exports complete, redacted, and live in Inspector", async () => {
+  test("keeps sampled records redacted and live in Inspector without forced error exports", async () => {
     const root = await mkdtemp(join("/tmp", "relkit-inspector-telemetry-"));
     const secret = "must-not-cross-inspector";
     const fanout = await createTelemetryExporterFanout({
@@ -189,14 +189,15 @@ describe("inspector observability endpoints", () => {
     });
     try {
       const common = {
-        version: 1 as const,
-        traceId: "trace-sampled-out",
+        version: 2 as const,
+        traceId: "10000000000000000000000000000001",
         requestId: "request-complete",
       };
       expect(
         runtime.collect({
           ...common,
           signal: "request",
+          phase: "completed",
           generationId: "generation-one",
           graphHash: "sha256:one",
           invocationId: "invocation-one",
@@ -210,16 +211,17 @@ describe("inspector observability endpoints", () => {
           functionId: "orders.list",
           status: 200,
           outcome: "success",
-          timeline: [],
         }),
       ).toBeDefined();
       runtime.collect({
         ...common,
         signal: "span",
-        spanId: "span-one",
+        spanId: "2000000000000001",
         invocationId: "invocation-one",
         name: "orders.list",
+        kind: "internal",
         status: "completed",
+        revision: 1,
         outcome: "success",
         startedAt: "2026-09-02T00:00:00.000Z",
         completedAt: "2026-09-02T00:00:00.001Z",
@@ -260,16 +262,15 @@ describe("inspector observability endpoints", () => {
       expect(traces.items).toHaveLength(1);
       expect(logs.items).toHaveLength(1);
       expect(metadata.telemetry).toMatchObject({
-        counters: { persisted: 4, sampledOut: 2, exportSelected: 1 },
-        exporters: [{ name: "broken", healthy: false, received: 3, failures: 1 }],
+        counters: { persisted: 3, sampledOut: 3, exportSelected: 0 },
+        exporters: [{ name: "broken", healthy: true, received: 3, failures: 0 }],
       });
       expect(runtime.readRecords().map((record) => record.signal)).toEqual([
         "request",
         "span",
         "log",
-        "diagnostic",
       ]);
-      expect(runtime.exporterStats()[0]).toMatchObject({ received: 3, failures: 1 });
+      expect(runtime.exporterStats()[0]).toMatchObject({ received: 3, failures: 0 });
       expect(
         JSON.stringify({ requests, traces, logs, metadata, records: runtime.readRecords() }),
       ).not.toContain(secret);
