@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "@relkit/schema";
+import { createSpanId, createTraceId } from "@relkit/contracts";
+import {
+  completeSpan,
+  runInExecutionContext,
+  SpanRuntime,
+  startRootSpan,
+} from "@relkit/invocation";
 import {
   createEventClient,
   EventPayloadValidationError,
@@ -26,16 +33,29 @@ describe("event Promise client", () => {
       version: 1,
       payloadSchema: payload,
       source: provider,
-      correlationId: () => "request-1",
-      causationInvocationId: () => "invocation-1",
-      traceId: () => "trace-1",
       now: () => new Date(1_000),
     });
 
-    const result = await client.publish(
-      { orderId: "order-1", totalCents: 100 },
-      { key: "order-1", attributes: { source: "checkout" } },
+    const runtime = new SpanRuntime({
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+    });
+    const root = startRootSpan(runtime, "request", "server");
+    const result = await runInExecutionContext(
+      {
+        span: root,
+        runtime,
+        requestId: "request-1",
+        originRequestId: "request-1",
+        correlationId: "correlation-1",
+        invocationId: "invocation-1",
+      },
+      () =>
+        client.publish(
+          { orderId: "order-1", totalCents: 100 },
+          { key: "order-1", attributes: { source: "checkout" } },
+        ),
     );
+    completeSpan(root);
 
     expect(result).toEqual({
       instanceId: "event-1",
@@ -46,9 +66,7 @@ describe("event Promise client", () => {
       occurredAt: new Date(1_000).toISOString(),
       publishedAt: new Date(1_000).toISOString(),
       key: "order-1",
-      correlationId: "request-1",
-      causationInvocationId: "invocation-1",
-      traceId: "trace-1",
+      propagation: context.propagation,
       attributes: { source: "checkout" },
     });
     const version: 1 = result.version;
@@ -57,10 +75,16 @@ describe("event Promise client", () => {
       operation: "publish",
       eventId: "orders.created",
       version: 1,
-      correlationId: "request-1",
-      causationInvocationId: "invocation-1",
-      traceId: "trace-1",
+      propagation: {
+        version: 2,
+        requestId: "request-1",
+        originRequestId: "request-1",
+        correlationId: "correlation-1",
+        invocationId: "invocation-1",
+        producer: { traceId: root.traceId },
+      },
     });
+    expect(context.propagation?.producer.spanId).not.toBe(root.spanId);
   });
 
   test("rejects invalid payload before provider acceptance", async () => {

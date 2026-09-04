@@ -1,9 +1,6 @@
-import { normalizeId, type MaybePromise } from "@relkit/contracts";
-import type {
-  EventAttributeValue,
-  EventPublishOptions,
-  EventPublishResult,
-} from "@relkit/functions";
+import { normalizeId, type MaybePromise, type TracePropagation } from "@relkit/contracts";
+import { currentTracePropagation, frameworkTrace } from "@relkit/invocation";
+import type { EventPublishOptions, EventPublishResult } from "@relkit/functions";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 import {
   EventDependencyError,
@@ -38,9 +35,7 @@ export interface EventOperationContext {
   readonly signal: AbortSignal;
   readonly profile: string;
   readonly deadlineMs?: number;
-  readonly correlationId?: string;
-  readonly causationInvocationId?: string;
-  readonly traceId: string;
+  readonly propagation?: TracePropagation;
 }
 export type EventProviderResult<
   Id extends string = string,
@@ -48,7 +43,6 @@ export type EventProviderResult<
   Payload = unknown,
 > = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
   Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
-
 export interface EventProvider {
   readonly publish: (
     payload: unknown,
@@ -56,20 +50,19 @@ export interface EventProvider {
     context: EventOperationContext,
   ) => MaybePromise<EventProviderResult>;
 }
-
 export interface EventInvocationBridgeOptions {
   readonly name?: string;
   readonly attributes?: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
 }
-
 export interface EventInvocationBridge {
   readonly run: <A>(
     operation: () => MaybePromise<A>,
     options?: EventInvocationBridgeOptions,
   ) => Promise<A>;
 }
-
 export interface EventClientOptions<
   Id extends string = string,
   Version extends number = number,
@@ -86,14 +79,11 @@ export interface EventClientOptions<
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
   readonly correlationId?: string | (() => string | undefined);
-  readonly causationInvocationId?: string | (() => string | undefined);
-  readonly traceId?: string | (() => string | undefined);
   readonly now?: () => Date;
   readonly declared?: boolean;
   readonly onDeclaredEdge?: (edge: EventDeclaredEdge) => void;
   readonly onObservedEdge?: (edge: EventObservedEdge) => void;
 }
-
 export interface EventClient<
   Input = unknown,
   Id extends string = string,
@@ -105,19 +95,16 @@ export interface EventClient<
     options?: EventPublishOptions,
   ) => Promise<EventPublishResult<Id, Version, Payload>>;
 }
-
 export interface EventDeclaredEdge {
   readonly kind: "publishes-event";
   readonly from: string;
   readonly to: string;
 }
-
 export interface EventObservedEdge {
   readonly relationship: "publishes-event";
   readonly from: string;
   readonly to: string;
 }
-
 export function createEventClient<
   const Id extends string,
   const Version extends number,
@@ -135,7 +122,6 @@ export function createEventClient<
     ? resolveProvider(options.source, profile, options.resolveProfile)
     : ({} as EventProvider);
   notify(options.onDeclaredEdge, { kind: "publishes-event", from: ownerId, to: eventId }, declared);
-
   const publish = async (
     payload: InferInput<PayloadSchema>,
     request: EventPublishOptions = {},
@@ -144,31 +130,26 @@ export function createEventClient<
     const signal = options.signal?.() ?? new AbortController().signal;
     const deadlineMs = options.deadline?.();
     const correlationId = resolveValue(options.correlationId);
-    const causationInvocationId = resolveValue(options.causationInvocationId);
-    const traceId = resolveValue(options.traceId) ?? `trace-${crypto.randomUUID()}`;
     assertOptionalText(correlationId, "correlationId");
-    assertOptionalText(causationInvocationId, "causationInvocationId");
-    assertOptionalText(traceId, "traceId");
     notify(
       options.onObservedEdge,
       { relationship: "publishes-event", from: ownerId, to: eventId },
       declared,
     );
-    const context = Object.freeze({
-      operation: "publish" as const,
-      eventId,
-      version,
-      signal,
-      profile,
-      ...(deadlineMs === undefined ? {} : { deadlineMs }),
-      ...(correlationId === undefined ? {} : { correlationId }),
-      ...(causationInvocationId === undefined ? {} : { causationInvocationId }),
-      traceId,
-    });
     const work = async (): Promise<EventPublishResult<Id, Version, InferOutput<PayloadSchema>>> => {
       if (!declared) throw new EventDependencyError(eventId);
       if (signal.aborted) throw new EventOperationCancelledError();
       const value = await parsePayload(options.payloadSchema, payload);
+      const propagation = currentTracePropagation();
+      const context = Object.freeze({
+        operation: "publish" as const,
+        eventId,
+        version,
+        signal,
+        profile,
+        ...(deadlineMs === undefined ? {} : { deadlineMs }),
+        ...(propagation === undefined ? {} : { propagation }),
+      });
       const result = await provider.publish(value, publishOptions, context);
       return normalizeResult(
         result,
@@ -187,9 +168,25 @@ export function createEventClient<
         "relkit.event.version": version,
         "relkit.event.profile": profile,
       },
+      input: payload,
       signal,
+      kind: "producer",
     });
-    return bridged === undefined ? runAbortable(signal, deadlineMs, work) : bridged;
+    return bridged === undefined
+      ? frameworkTrace.span(
+          `relkit.event.${eventId}.publish`,
+          {
+            input: payload,
+            kind: "producer",
+            attributes: {
+              "relkit.event.id": eventId,
+              "relkit.event.version": version,
+              "relkit.event.profile": profile,
+            },
+          },
+          () => runAbortable(signal, deadlineMs, work),
+        )
+      : bridged;
   };
   return Object.freeze({ publish }) as EventClient<
     InferInput<PayloadSchema>,

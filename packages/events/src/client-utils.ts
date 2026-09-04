@@ -103,11 +103,7 @@ export function normalizeResult<Id extends string, Version extends number, Paylo
     occurredAt: text(metadata.occurredAt) ?? timestamp,
     publishedAt: text(metadata.publishedAt) ?? timestamp,
     ...(key === undefined ? {} : { key }),
-    ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
-    ...(context.causationInvocationId === undefined
-      ? {}
-      : { causationInvocationId: context.causationInvocationId }),
-    traceId: context.traceId,
+    ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
     attributes: normalizeAttributes(metadata.attributes ?? options.attributes ?? {}),
   });
 }
