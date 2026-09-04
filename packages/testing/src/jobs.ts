@@ -60,7 +60,11 @@ export async function createTestJobFake<Input = JsonValue, Output = unknown>(
   const provider: JobProvider = {
     enqueue: async (input, _request, context) => {
       if (context.signal.aborted) throw new Error("Job operation cancelled");
-      const accepted = await queue.enqueue({ input: input as JsonValue, profile });
+      const accepted = await queue.enqueue({
+        input: input as JsonValue,
+        profile,
+        ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
+      });
       if (!accepted.duplicate) {
         await queue.transition(accepted.instanceId, "available", { expectedState: "accepted" });
       }

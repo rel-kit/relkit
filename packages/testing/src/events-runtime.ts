@@ -11,6 +11,7 @@ import { z } from "@relkit/schema";
 import type { EventDeliveryResult, EventRouter } from "@relkit/providers-local";
 import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createDeterministicClock } from "./runtime-clock.js";
+import { createEventTraceBridge } from "./events-runtime-utils.js";
 import type { TestFailureControls } from "./fakes.js";
 import type { TestStateRoot } from "./state-root.js";
 import { createEventInvoker, fanoutEvent, toEnvelope } from "./events-runtime-utils.js";
@@ -84,7 +85,6 @@ export async function createTestEventRuntime<Payload, Output>(
   let router!: EventRouter;
   let generation = 0;
   let sequence = 0;
-  let traceSequence = 0;
   let closed = false;
 
   const open = async (): Promise<void> => {
@@ -118,13 +118,9 @@ export async function createTestEventRuntime<Payload, Output>(
         payload,
         occurredAt: timestamp,
         publishedAt: timestamp,
-        traceId: context.traceId,
+        ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
         attributes: publishOptions.attributes ?? {},
         ...(publishOptions.key === undefined ? {} : { key: publishOptions.key }),
-        ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
-        ...(context.causationInvocationId === undefined
-          ? {}
-          : { causationInvocationId: context.causationInvocationId }),
       });
       const record = await log.append(envelope);
       envelopes.push(record.envelope);
@@ -142,7 +138,7 @@ export async function createTestEventRuntime<Payload, Output>(
     source: provider,
     profile,
     now: deterministic.clock.now,
-    traceId: () => `test-trace-${++traceSequence}`,
+    bridge: createEventTraceBridge(eventId, options),
     ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
     ...(options.causationInvocationId === undefined
       ? {}

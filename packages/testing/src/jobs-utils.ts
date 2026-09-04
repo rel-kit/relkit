@@ -81,6 +81,11 @@ export function createJobInvoker<Input, Output>(
       input: request.input,
       source: "job",
       attempt: request.attempt,
+      ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
+      ...(request.originRequestId === undefined
+        ? {}
+        : { originRequestId: request.originRequestId }),
+      ...(request.links === undefined ? {} : { links: request.links }),
       ...(request.triggerLimit === undefined ? {} : { triggerLimit: request.triggerLimit }),
       ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
       ...(request.admit === undefined ? {} : { admit: request.admit }),
@@ -96,7 +101,18 @@ export function createJobInvoker<Input, Output>(
 
 export function createIdSource(): InvocationIdSource {
   let sequence = 0;
-  return { next: (kind) => `test-${kind}-${++sequence}` as ProtocolId };
+  return {
+    next: (kind) => {
+      const value = ++sequence;
+      return (
+        kind === "trace"
+          ? value.toString(16).padStart(32, "0")
+          : kind === "span"
+            ? value.toString(16).padStart(16, "0")
+            : `test-invocation-${value}`
+      ) as ProtocolId;
+    },
+  };
 }
 
 export function createRandom(
