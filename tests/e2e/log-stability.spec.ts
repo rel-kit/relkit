@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const backend = "http://127.0.0.1:3212";
+const initialTraceId = "11111111111111111111111111111111";
 test.beforeEach(async ({ request }) => {
   await request.post(`${backend}/__fixture__/reset`);
   await request.post(`${backend}/__fixture__/logs`);
@@ -51,21 +52,21 @@ for (const width of [1600, 1024, 390])
         (value) => localStorage.setItem("relkit.inspector.theme", value),
         theme,
       );
-      await page.goto("/traces?trace=trace-initial");
+      await page.goto(`/traces?trace=${initialTraceId}`);
       await expect(page.getByRole("link", { name: "Open full trace" })).toBeVisible();
-      await expect(page.locator('.waterfall-row[data-record-type="request"]')).toHaveCount(1);
-      await expect(page.locator('.waterfall-row[data-record-type="span"]')).toHaveCount(2);
-      await page.getByRole("button", { name: "Collapse POST /orders", exact: true }).click();
+      await expect(page.locator('.waterfall-row[data-record-type="event"]')).toHaveCount(6);
+      await expect(page.locator('.waterfall-row[data-record-type="span"]')).toHaveCount(3);
+      await page.getByRole("button", { name: "Collapse all", exact: true }).click();
       await expect(page.locator(".waterfall-row")).toHaveCount(1);
-      await page.getByRole("button", { name: "Expand POST /orders", exact: true }).click();
-      await expect(page.locator(".waterfall-row")).toHaveCount(7);
+      await page.getByRole("button", { name: "Expand all", exact: true }).click();
+      await expect(page.locator(".waterfall-row")).toHaveCount(9);
       await page.screenshot({ path: info.outputPath(`traces-${theme}-${width}.png`) });
       if (width < 1200)
         await expect(page.getByRole("dialog", { name: "Trace details" })).toBeVisible();
       await page.keyboard.press("Escape");
       await expect(page).not.toHaveURL(/trace=/);
-      await page.locator('[data-trace-id="trace-initial"]').focus();
+      await page.locator(`[data-trace-id="${initialTraceId}"]`).focus();
       await page.keyboard.press("Enter");
-      await expect(page).toHaveURL(/trace=trace-initial/);
+      await expect(page).toHaveURL(new RegExp(`trace=${initialTraceId}`));
     });
   }

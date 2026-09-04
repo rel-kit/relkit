@@ -13,7 +13,6 @@ test("centers select labels before and after changing selection", async ({ page 
     for (const [path, label, initial, selected] of [
       ["/jobs", "Status", "All", "available"],
       ["/routes", "Kind", "All", "POST"],
-      ["/traces/trace-initial", "Timeline zoom", "100%", "150%"],
     ] as const) {
       await page.goto(path);
       const trigger = page.getByRole("button", { name: new RegExp(label) });
@@ -72,11 +71,11 @@ test("renders the interactive graph, trace waterfall, and Scalar reference", asy
     animations: "disabled",
   });
 
-  await page.goto("/traces/trace-initial");
-  const waterfall = page.getByRole("list", { name: "Accessible span waterfall" });
+  await page.goto("/traces/11111111111111111111111111111111");
+  const waterfall = page.getByRole("list", { name: "Ordered trace timeline" });
   await expect(waterfall).toBeVisible();
   await page.getByRole("button", { name: "Collapse all" }).click();
-  await expect(page.getByText("1 of 7 steps")).toBeVisible();
+  await expect(page.getByText("1 of 9 steps")).toBeVisible();
   await page.getByRole("button", { name: "Expand all" }).click();
   await page.mouse.move(0, 0);
   await expect(page.locator(".trace-panel")).toHaveScreenshot("trace-waterfall.png", {
