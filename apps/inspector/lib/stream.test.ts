@@ -51,7 +51,7 @@ describe("inspector SSE client", () => {
       storage: saved,
       reconnectDelayMs: 0,
       maxReconnectAttempts: 0,
-      fetch: async () => response(`${event(1)}${event(3)}`),
+      fetch: async () => response(`${event(1, "span.updated")}${event(3)}`),
       onInvalidate: (tags) => invalidations.push(tags),
     });
     client.start();
@@ -59,6 +59,7 @@ describe("inspector SSE client", () => {
     client.stop();
     expect(client.snapshot.droppedEvents).toBe(1);
     expect(saved.getItem("relkit.inspector.stream.cursor")).toBe("3");
+    expect(invalidations).toContainEqual(["traces", "requests", "signals"]);
     expect(invalidations).toContainEqual(["logs", "signals"]);
   });
 

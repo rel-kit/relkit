@@ -1,4 +1,4 @@
-import type { JsonValue, MaybePromise } from "@relkit/contracts";
+import type { JsonValue, MaybePromise, TracePropagation } from "@relkit/contracts";
 import type {
   IdempotencyDefinition,
   JobState,
@@ -8,6 +8,7 @@ import type {
 import type { PublicFailureEnvelope } from "@relkit/runtime-effect";
 import type { QueueRegistration, RegistrationPlan } from "@relkit/graph";
 import type { InvokeOptions } from "./invoke-types.js";
+import type { SpanRuntime } from "@relkit/invocation";
 
 export type JobIdempotencyDefinition = IdempotencyDefinition<Record<string, unknown>>;
 export type JobFailureMetadata = PublicFailureEnvelope;
@@ -25,6 +26,7 @@ export interface JobQueueEntry {
   readonly leaseOwner?: string;
   readonly leaseExpiresAt?: number;
   readonly failure?: JobFailureMetadata;
+  readonly propagation?: TracePropagation;
 }
 
 export interface JobQueueAcceptance extends JobQueueEntry {
@@ -42,6 +44,7 @@ export interface JobQueueHandle {
     readonly instanceId?: string;
     readonly acceptedAt?: number;
     readonly idempotency?: JobIdempotencyDefinition;
+    readonly propagation?: TracePropagation;
   }) => Promise<JobQueueAcceptance>;
   readonly acquire: (
     instanceId?: string,
@@ -126,6 +129,7 @@ export interface JobMaterializationOptions {
   readonly consumerConcurrency?: number | Readonly<Record<string, number>>;
   readonly now?: () => number;
   readonly random?: () => number;
+  readonly spanRuntime?: SpanRuntime;
 }
 
 export interface JobEnqueueOptions {
@@ -148,7 +152,11 @@ export interface MaterializedJob {
   readonly targetFunctionId: string;
   readonly queue: JobQueueHandle;
   readonly policy: JobPolicy;
-  readonly enqueue: (input: JsonValue, options?: JobEnqueueOptions) => Promise<JobQueueEntry>;
+  readonly enqueue: (
+    input: JsonValue,
+    options?: JobEnqueueOptions,
+    context?: import("@relkit/jobs").JobOperationContext,
+  ) => Promise<JobQueueEntry>;
   readonly runNext: (instanceId?: string) => Promise<JobRunResult | undefined>;
 }
 

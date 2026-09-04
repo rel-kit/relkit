@@ -4,6 +4,9 @@ import {
   type RuntimeIntegrationPlan,
 } from "@relkit/contracts";
 import { hashGeneratedArtifact } from "@relkit/compiler";
+import { formatDiagnostics, type Diagnostic } from "@relkit/diagnostics";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   assertLocalServicePlanVersion,
   type LocalServicePlan,
@@ -29,6 +32,7 @@ export function createDevLocalCompiler(
   projectRoot: string,
   localEnabled = true,
   configureTelemetry?: (configuration: TelemetryConfiguration) => Promise<void> | undefined,
+  color = false,
 ): DevLocalCompiler {
   let owner: DevLocalServiceOwner | undefined;
   const recipes = new Map<string, LocalServiceRecipe>();
@@ -40,7 +44,8 @@ export function createDevLocalCompiler(
         generationId: `dev-${request.token.sourceToken}-${request.token.generationToken}`,
         signal: request.signal,
       });
-      if (!checked.ok) throw new Error(messages(checked));
+      if (!checked.ok)
+        throw new Error(formatDevDiagnostics(projectRoot, checked.diagnostics, color));
       if (configureTelemetry) {
         const graph = JSON.parse(checked.outputs.graph) as {
           nodes: { kind: string; telemetry?: TelemetryConfiguration }[];
@@ -61,7 +66,7 @@ export function createDevLocalCompiler(
           ? {}
           : { providerOverridesGeneration: local.generationId }),
       });
-      if (!built.ok) throw new Error(built.diagnostics.map((entry) => entry.message).join("\n"));
+      if (!built.ok) throw new Error(formatDevDiagnostics(projectRoot, built.diagnostics, color));
       return {
         entrypoint: "server/index.js",
         ...(local === undefined
@@ -147,6 +152,21 @@ export function checkedLocalArtifacts(
   return { graph, localPlan, runtimePlan };
 }
 
-function messages(checked: CheckResult): string {
-  return checked.diagnostics.map((entry) => entry.message).join("\n") || "Project check failed.";
+export function formatDevDiagnostics(
+  projectRoot: string,
+  diagnostics: readonly Diagnostic[],
+  color = false,
+): string {
+  if (diagnostics.length === 0) return "Project check failed.";
+  return formatDiagnostics(diagnostics, {
+    projectRoot,
+    color,
+    source: (file) => {
+      try {
+        return readFileSync(resolve(projectRoot, file), "utf8");
+      } catch {
+        return undefined;
+      }
+    },
+  });
 }

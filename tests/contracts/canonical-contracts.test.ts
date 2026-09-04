@@ -146,7 +146,7 @@ describe.serial("canonical contracts", () => {
       toGraphHash("graph.v1"),
       toGenerationId("generation.v1"),
       toRequestId("request.v1"),
-      toTraceId("trace.v1"),
+      toTraceId("10000000000000000000000000000001"),
       toInvocationId("invocation.v1"),
       toEventInstanceId("event.v1"),
     ];

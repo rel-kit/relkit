@@ -49,6 +49,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
   const declared = options.declared !== false;
   const run = <A>(
     operation: BucketOperation,
+    input: unknown,
     capability: BucketCapability | undefined,
     work: (context: BucketOperationContext) => MaybePromise<A>,
     validate: (value: A) => A,
@@ -83,6 +84,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
             "relkit.bucket.operation": operation,
           },
           signal,
+          input,
         })
       : execute();
     return Promise.resolve(promise)
@@ -102,10 +104,11 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
   };
   const call = <A>(
     operation: BucketOperation,
+    input: unknown,
     work: (context: BucketOperationContext) => MaybePromise<A>,
     validate: (value: A) => A,
     capability?: BucketCapability,
-  ): Promise<A> => run(operation, capability, work, validate);
+  ): Promise<A> => run(operation, input, capability, work, validate);
   return Object.freeze({
     put: (key: string, bytes: Uint8Array, putOptions?: BucketPutOptions) => {
       assertKey(key);
@@ -113,18 +116,25 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
         return Promise.reject(new TypeError("Bucket bytes must be a Uint8Array"));
       return call(
         "put",
+        { key, bytes, options: putOptions },
         (context) => required(provider.put, "put")(key, bytes, putOptions, context),
         () => undefined,
       );
     },
     get: (key: string) => {
       assertKey(key);
-      return call("get", (context) => required(provider.get, "get")(key, context), validateBytes);
+      return call(
+        "get",
+        { key },
+        (context) => required(provider.get, "get")(key, context),
+        validateBytes,
+      );
     },
     head: (key: string) => {
       assertKey(key);
       return call(
         "head",
+        { key },
         (context) => required(provider.head, "head")(key, context),
         validateMetadata,
       );
@@ -133,6 +143,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       assertKey(key);
       return call(
         "delete",
+        { key },
         (context) => required(provider.delete, "delete")(key, context),
         () => undefined,
       );
@@ -141,6 +152,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       assertKey(key);
       return call(
         "exists",
+        { key },
         (context) => required(provider.exists, "exists")(key, context),
         validateBoolean,
       );
@@ -149,6 +161,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       if (prefix !== undefined) assertPrefix(prefix);
       return call(
         "list",
+        { prefix },
         (context) => required(provider.list, "list")(prefix, context),
         validateKeys,
       );
@@ -157,6 +170,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       assertKey(key);
       return call(
         "createReadUrl",
+        { key },
         (context) => required(provider.createReadUrl, "createReadUrl")(key, context),
         validateText,
         "signedReadUrl",
@@ -166,6 +180,7 @@ export function createBucketClient(options: BucketClientOptions): BucketClient {
       assertKey(key);
       return call(
         "createWriteUrl",
+        { key },
         (context) => required(provider.createWriteUrl, "createWriteUrl")(key, context),
         validateText,
         "signedWriteUrl",

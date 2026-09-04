@@ -111,7 +111,7 @@ function assertAdmitted(
 
 function unsafeLog(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info",
@@ -123,10 +123,11 @@ function unsafeLog(): ObservabilityRecord {
 
 function unsafeRequest(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "request",
+    phase: "completed",
     requestId: "consumer.request",
-    traceId: "consumer.trace",
+    traceId: "10000000000000000000000000000001",
     generationId: "consumer.generation",
     graphHash: "sha256:consumer",
     invocationId: "consumer.invocation",
@@ -140,16 +141,15 @@ function unsafeRequest(): ObservabilityRecord {
     functionId: "consumer.function",
     status: 200,
     outcome: "success",
-    timeline: [],
     requestBody: { password: secret },
   } as unknown as ObservabilityRecord;
 }
 
 function unsafeTrace(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "trace",
-    traceId: "consumer.trace",
+    traceId: "10000000000000000000000000000001",
     startedAt: "2026-08-16T00:00:00.000Z",
     spanCount: 1,
     outcome: "success",

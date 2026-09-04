@@ -53,7 +53,7 @@ test("persists and streams captured records before root-consistent export sampli
       configuration: {
         capture: { signals: ["log", "span"] },
         redaction: { redactKeys: ["tenant"] },
-        exportSampling: { traceRate: 0.5 },
+        exportSampling: { traceRate: 1 },
       },
       exportRecord: async (record, decision) => {
         if (decision !== "export") return;
@@ -67,33 +67,35 @@ test("persists and streams captured records before root-consistent export sampli
       },
     });
     runtime.collect({
-      version: 1,
+      version: 2,
       signal: "log",
       timestamp: "2026-09-02T00:00:00.000Z",
       level: "info",
       component: "test",
       message: "kept locally",
       fields: { tenant: "secret-tenant" },
-      traceId: "trace-2",
+      traceId: "20000000000000000000000000000002",
     });
     for (const [spanId, parentSpanId] of [
-      ["root", undefined],
-      ["child", "root"],
+      ["2000000000000001", undefined],
+      ["2000000000000002", "2000000000000001"],
     ] as const) {
       runtime.collect({
-        version: 1,
+        version: 2,
         signal: "span",
         spanId,
         invocationId: "invocation-1",
-        traceId: "trace-2",
+        traceId: "20000000000000000000000000000002",
         name: spanId,
+        kind: "internal",
         ...(parentSpanId === undefined ? {} : { parentSpanId }),
         status: "started",
+        revision: 0,
         startedAt: "2026-09-02T00:00:00.000Z",
       });
     }
     runtime.collect({
-      version: 1,
+      version: 2,
       signal: "diagnostic",
       code: "RELKIT_CAPTURED_OUT",
       severity: "error",
@@ -108,15 +110,15 @@ test("persists and streams captured records before root-consistent export sampli
       "span.started",
       "span.started",
     ]);
-    expect(traceIsSampled("trace-1", 0.5)).toBe(true);
-    expect(traceIsSampled("trace-2", 0.5)).toBe(false);
-    expect((await runtime.query.trace("trace-2"))?.spans).toHaveLength(2);
-    expect(exported).toEqual(["log"]);
+    expect(traceIsSampled("00000000000000000000000000000003", 0.5)).toBe(true);
+    expect(traceIsSampled("00000000000000000000000000000001", 0.5)).toBe(false);
+    expect((await runtime.query.trace("20000000000000000000000000000002"))?.spans).toHaveLength(2);
+    expect(exported).toEqual(["log", "span", "span"]);
     expect(runtime.exportCounters()).toEqual({
       persisted: 3,
       streamed: 3,
-      exportSelected: 1,
-      sampledOut: 2,
+      exportSelected: 3,
+      sampledOut: 0,
       severityFiltered: 0,
       exportFailures: 0,
     });
@@ -128,11 +130,11 @@ test("persists and streams captured records before root-consistent export sampli
   }
 });
 
-test("filters log severity deterministically and never samples errors or diagnostics", () => {
+test("filters log severity and samples every trace-associated record consistently", () => {
   expect(
     telemetryExportDecision(
       {
-        version: 1,
+        version: 2,
         signal: "log",
         timestamp: "2026-09-02T00:00:00.000Z",
         level: "debug",
@@ -144,13 +146,15 @@ test("filters log severity deterministically and never samples errors or diagnos
     ),
   ).toBe("severity-filtered");
   const span = {
-    version: 1 as const,
+    version: 2 as const,
     signal: "span" as const,
-    spanId: "span-1",
+    spanId: "2000000000000001",
     invocationId: "invocation-1",
-    traceId: "trace-2",
+    traceId: "20000000000000000000000000000002",
     name: "test",
+    kind: "internal" as const,
     status: "completed" as const,
+    revision: 1,
     startedAt: "2026-09-02T00:00:00.000Z",
     completedAt: "2026-09-02T00:00:00.001Z",
     durationMs: 1,
@@ -158,11 +162,13 @@ test("filters log severity deterministically and never samples errors or diagnos
   expect(telemetryExportDecision({ ...span, outcome: "success" }, { traceRate: 0 })).toBe(
     "sampled-out",
   );
-  expect(telemetryExportDecision({ ...span, outcome: "defect" }, { traceRate: 0 })).toBe("export");
+  expect(telemetryExportDecision({ ...span, outcome: "defect" }, { traceRate: 0 })).toBe(
+    "sampled-out",
+  );
   expect(
     telemetryExportDecision(
       {
-        version: 1,
+        version: 2,
         signal: "diagnostic",
         code: "RELKIT_TEST",
         severity: "info",
@@ -186,7 +192,7 @@ test("applies configured redaction and bounded local memory retention", async ()
     });
     for (const message of ["first", "second"]) {
       runtime.collect({
-        version: 1,
+        version: 2,
         signal: "log",
         timestamp: "2026-09-02T00:00:00.000Z",
         level: "info",

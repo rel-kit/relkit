@@ -31,6 +31,7 @@
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
+    "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*"
   },
   "scripts": {

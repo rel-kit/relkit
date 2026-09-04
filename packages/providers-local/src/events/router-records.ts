@@ -50,7 +50,9 @@ export function normalizeEnvelope(input: unknown): UnknownEventEnvelope {
     source = envelope;
   }
   if (!isRecord(source)) throw new EventRouterStateError("Accepted event envelope is invalid");
-  return deepFreeze(JSON.parse(canonicalJson(source)) as JsonValue) as UnknownEventEnvelope;
+  return deepFreeze(
+    JSON.parse(canonicalJson(source)) as JsonValue,
+  ) as unknown as UnknownEventEnvelope;
 }
 
 export function toDeliveryRecord(record: JobRecord): EventDeliveryRecord {

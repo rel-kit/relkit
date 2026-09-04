@@ -1,4 +1,4 @@
-import type { ObservabilityRecord } from "../model.js";
+import { OBSERVABILITY_MODEL_VERSION, type ObservabilityRecord } from "../model.js";
 import type { ObservabilityQueryRequest } from "../query-types.js";
 import type { TelemetryLocalRetentionPolicy } from "../telemetry-config.js";
 
@@ -49,7 +49,7 @@ const signals = new Set([
   "invocation",
   "job",
   "event",
-  "resource",
+  "operation",
   "tool",
   "agent",
   "diagnostic",
@@ -72,7 +72,7 @@ export function validateLocalRecord(value: unknown): asserts value is LocalRecor
   if (
     record === null ||
     typeof record !== "object" ||
-    record.version !== 1 ||
+    record.version !== OBSERVABILITY_MODEL_VERSION ||
     !signals.has(record.signal)
   )
     throw new TypeError("Invalid telemetry record");

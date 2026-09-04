@@ -1,10 +1,13 @@
 import type { InspectorObject } from "./api-types";
+import { requestForSpan, traceIo } from "./trace-io";
+import { traceOperationType } from "./trace-operation-type";
 import { orderTraceNodes, traceDuration, traceLifecycle } from "./trace-lifecycle";
 
 export interface WaterfallSpan {
   readonly id: string;
   readonly parentId?: string;
   readonly recordType: string;
+  readonly traceId: string;
   readonly spanId: string;
   readonly name: string;
   readonly parentSpanId?: string;
@@ -15,11 +18,21 @@ export interface WaterfallSpan {
   readonly status?: string;
   readonly outcome?: string;
   readonly kind: string;
+  readonly operationType: string;
   readonly error: boolean;
   readonly details: InspectorObject;
   readonly correlations: readonly TraceCorrelation[];
+  readonly events: readonly WaterfallEvent[];
   readonly offsetPercent: number;
   readonly widthPercent: number;
+}
+
+export interface WaterfallEvent {
+  readonly name: string;
+  readonly timestamp: string;
+  readonly attributes?: InspectorObject;
+  readonly droppedAttributes?: number;
+  readonly offsetPercent: number;
 }
 
 export interface TraceCorrelation {
@@ -55,6 +68,7 @@ export function waterfall(
       id: text(span.nodeId),
       ...(text(span.nodeParentId) ? { parentId: text(span.nodeParentId) } : {}),
       recordType: text(span.recordType),
+      traceId: text(span.traceId),
       spanId: text(span.spanId),
       name: text(span.name) || "span",
       ...(text(span.parentSpanId) ? { parentSpanId: text(span.parentSpanId) } : {}),
@@ -65,9 +79,11 @@ export function waterfall(
       ...(status ? { status } : {}),
       ...(outcome ? { outcome } : {}),
       kind: spanKind(span),
+      operationType: traceOperationType(span),
       error: /error|fail|defect|timeout|cancelled|HTTP [45]/i.test(`${status} ${outcome}`),
-      details: safeDetails(span),
+      details: safeDetails(span, requestForSpan(span, requests)),
       correlations: correlations(span),
+      events: spanEvents(span, origin, total),
       offsetPercent: Math.max(0, Math.min(100, offset)),
       widthPercent: Math.max(
         0,
@@ -99,13 +115,51 @@ function link(
   return id === "" ? undefined : { kind, id, href: `${prefix}${encodeURIComponent(id)}` };
 }
 
-function safeDetails(span: InspectorObject): InspectorObject {
+function safeDetails(span: InspectorObject, request?: InspectorObject): InspectorObject {
+  const io = traceIo(span, request);
   const details = redact({
+    input: io.input,
+    output: io.output,
+    inputCapture: io.inputCapture,
+    outputCapture: io.outputCapture,
+    metadata: io.metadata,
     attributes: span.attributes,
     resourceAttributes: span.resourceAttributes ?? span.resource,
-    logs: span.logs ?? span.events,
+    events: span.events,
+    links: span.links,
+    logs: span.logs,
+    source: span.descriptorSource,
+    error: span.error,
+    dropped: span.dropped,
   });
   return isRecord(details) ? details : {};
+}
+
+function spanEvents(
+  span: InspectorObject,
+  origin: number,
+  total: number,
+): readonly WaterfallEvent[] {
+  if (!Array.isArray(span.events)) return [];
+  return span.events.flatMap((value) => {
+    if (!isRecord(value)) return [];
+    const timestamp = text(value.timestamp);
+    const at = Date.parse(timestamp);
+    if (!Number.isFinite(at)) return [];
+    return [
+      {
+        name: text(value.name) || "event",
+        timestamp,
+        ...(isRecord(value.attributes)
+          ? { attributes: redact(value.attributes) as InspectorObject }
+          : {}),
+        ...(number(value.droppedAttributes) === undefined
+          ? {}
+          : { droppedAttributes: number(value.droppedAttributes) }),
+        offsetPercent: Math.max(0, Math.min(100, ((at - origin) / total) * 100)),
+      },
+    ];
+  });
 }
 
 function redact(value: unknown, key = "", depth = 0): unknown {
@@ -114,10 +168,10 @@ function redact(value: unknown, key = "", depth = 0): unknown {
   ) {
     return "[redacted]";
   }
-  if (depth > 5) return "[truncated]";
-  if (typeof value === "string") return value.length > 4_096 ? `${value.slice(0, 4_096)}…` : value;
+  if (depth > 12) return "[truncated]";
+  if (typeof value === "string") return value;
   if (value === null || typeof value === "number" || typeof value === "boolean") return value;
-  if (Array.isArray(value)) return value.slice(0, 100).map((item) => redact(item, key, depth + 1));
+  if (Array.isArray(value)) return value.map((item) => redact(item, key, depth + 1));
   if (!isRecord(value)) return undefined;
   const entries: [string, unknown][] = [];
   for (const [name, item] of Object.entries(value)) {

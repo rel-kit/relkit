@@ -8,6 +8,9 @@ import type { InspectorApiClient } from "./api";
 export interface RequestDetailPayload {
   readonly request?: InspectorObject;
   readonly records?: readonly InspectorObject[];
+  readonly continuations?: readonly InspectorObject[];
+  readonly incomplete?: readonly string[];
+  readonly counts?: InspectorObject;
 }
 
 export interface TraceDetailPayload {

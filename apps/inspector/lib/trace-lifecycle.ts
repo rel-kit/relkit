@@ -3,7 +3,7 @@ import type { InspectorObject } from "./api-types";
 /** Presentation nodes keep request/phase IDs separate from real span IDs. */
 export function traceLifecycle(
   spans: readonly InspectorObject[],
-  requests: readonly InspectorObject[] = [],
+  _requests: readonly InspectorObject[] = [],
 ): readonly InspectorObject[] {
   const merged = new Map<string, InspectorObject>();
   for (const span of spans) {
@@ -19,54 +19,6 @@ export function traceLifecycle(
     nodeParentId: span.parentSpanId,
     recordType: "span",
   }));
-  for (const request of requests) {
-    const requestId = text(request.requestId);
-    if (!requestId) continue;
-    const id = `request:${requestId}`;
-    nodes.push({
-      ...request,
-      nodeId: id,
-      recordType: "request",
-      name: `${text(request.method) || "HTTP"} ${text(request.rawPath) || text(request.normalizedRoute)}`,
-      kind: "request",
-      attributes: {
-        route: request.routeId,
-        status: request.status,
-        functionId: request.functionId,
-      },
-    });
-    const phases = Array.isArray(request.timeline) ? request.timeline : [];
-    let dispatch = id;
-    for (const [index, value] of phases.entries()) {
-      if (!value || typeof value !== "object" || Array.isArray(value)) continue;
-      const phase = value as InspectorObject;
-      const end = Date.parse(text(phase.at));
-      if (!Number.isFinite(end)) continue;
-      const duration = typeof phase.durationMs === "number" ? phase.durationMs : undefined;
-      const phaseId = `${id}:phase:${index}`;
-      if (phase.kind === "function") dispatch = phaseId;
-      nodes.push({
-        ...phase,
-        nodeId: phaseId,
-        nodeParentId: id,
-        recordType: "phase",
-        name: `${phase.kind === "function" ? "Function dispatch" : text(phase.kind)}${phase.targetId ? ` · ${text(phase.targetId)}` : ""}`,
-        startedAt: new Date(end - (duration ?? 0)).toISOString(),
-        ...(duration === undefined ? {} : { completedAt: phase.at, durationMs: duration }),
-        requestId,
-        attributes: phase,
-      });
-    }
-    for (const [index, node] of nodes.entries()) {
-      if (node.recordType !== "span" || node.nodeParentId) continue;
-      if (
-        node.requestId === requestId ||
-        (request.invocationId && node.invocationId === request.invocationId)
-      ) {
-        nodes[index] = { ...node, nodeParentId: dispatch };
-      }
-    }
-  }
   return nodes;
 }
 

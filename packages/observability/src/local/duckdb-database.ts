@@ -6,7 +6,6 @@ import { admitObservabilityRecord } from "../record-admission.js";
 import type { TelemetryLocalRetentionPolicy } from "../telemetry-config.js";
 import type { RedactionPolicy } from "../redaction.js";
 import { createDuckdbQuery } from "./duckdb-query.js";
-import { importLocalHistory } from "./import-history.js";
 import {
   recordTime,
   validateLocalRecord,
@@ -30,13 +29,22 @@ export async function openDuckdbDatabase(
     CREATE TABLE IF NOT EXISTS records (
       id BIGINT PRIMARY KEY DEFAULT nextval('record_ids'), origin VARCHAR NOT NULL,
       signal VARCHAR NOT NULL, recorded_at BIGINT NOT NULL, received_at BIGINT NOT NULL,
-      request_id VARCHAR, trace_id VARCHAR, bytes BIGINT NOT NULL, payload JSON NOT NULL
+      request_id VARCHAR, origin_request_id VARCHAR, trace_id VARCHAR, span_id VARCHAR,
+      bytes BIGINT NOT NULL, payload JSON NOT NULL
     );
     CREATE TABLE IF NOT EXISTS receipts (key VARCHAR PRIMARY KEY, received_at BIGINT NOT NULL);
-    CREATE TABLE IF NOT EXISTS imports (source VARCHAR PRIMARY KEY, malformed BIGINT NOT NULL);
     CREATE INDEX IF NOT EXISTS records_trace ON records(trace_id);
     CREATE INDEX IF NOT EXISTS records_request ON records(request_id);
+    CREATE INDEX IF NOT EXISTS records_origin_request ON records(origin_request_id);
+    CREATE INDEX IF NOT EXISTS records_span ON records(trace_id, span_id);
   `);
+  const columns = (await connection.runAndReadAll("SELECT name FROM pragma_table_info('records')"))
+    .getRowObjectsJson()
+    .map((row) => String(row.name));
+  for (const required of ["origin_request_id", "span_id"]) {
+    if (!columns.includes(required))
+      throw new Error("RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE: use fresh development state");
+  }
   const query = createDuckdbQuery(connection);
   const retain = async (): Promise<void> => {
     const age = retention.maxAgeMs ?? 7 * 24 * 60 * 60 * 1000;
@@ -50,10 +58,9 @@ export async function openDuckdbDatabase(
     )`,
       [maximum, entries],
     );
-    await connection.run(
-      "DELETE FROM receipts WHERE received_at < ? AND NOT starts_with(key, 'legacy:')",
-      [Date.now() - 7 * 24 * 60 * 60 * 1000],
-    );
+    await connection.run("DELETE FROM receipts WHERE received_at < ?", [
+      Date.now() - 7 * 24 * 60 * 60 * 1000,
+    ]);
   };
   const append = async (records: readonly LocalRecord[]): Promise<StoredLocalRecord[]> => {
     if (records.length > 256) throw new RangeError("Telemetry batches contain at most 256 records");
@@ -72,15 +79,17 @@ export async function openDuckdbDatabase(
         const payload = canonicalJson(safe);
         const result = await connection.runAndReadAll(
           `INSERT INTO records
-          (origin, signal, recorded_at, received_at, request_id, trace_id, bytes, payload)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id::VARCHAR AS id`,
+          (origin, signal, recorded_at, received_at, request_id, origin_request_id, trace_id, span_id, bytes, payload)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id::VARCHAR AS id`,
           [
             item.origin,
             safe.signal,
             recordTime(safe),
             Date.now(),
             safe.requestId ?? null,
+            safe.originRequestId ?? null,
             safe.traceId ?? null,
+            "spanId" in safe ? (safe.spanId ?? null) : null,
             Buffer.byteLength(payload),
             payload,
           ],
@@ -100,13 +109,11 @@ export async function openDuckdbDatabase(
     }
   };
   try {
-    const imported = await importLocalHistory(root, connection, append);
     await retain();
     await connection.run("CHECKPOINT");
     return {
       ...query,
       append,
-      imported,
       configure: async (value: TelemetryLocalRetentionPolicy, nextRedaction?: RedactionPolicy) => {
         retention = value;
         redaction = nextRedaction;

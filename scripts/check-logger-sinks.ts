@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { relative, resolve } from "node:path";
+import { readFileSync, realpathSync } from "node:fs";
+import { relative, resolve, sep } from "node:path";
 import * as ts from "typescript";
 
 export interface LoggerSinkViolation {
@@ -11,11 +11,19 @@ export interface LoggerSinkViolation {
 
 const sinkFile = "packages/runtime-effect/src/logger.ts";
 
+export function resolveOwnedSourceFile(directory: string, path: string): string {
+  const sourceRoot = realpathSync(directory);
+  const file = realpathSync(resolve(sourceRoot, path));
+  if (!file.startsWith(`${sourceRoot}${sep}`))
+    throw new Error(`Refusing to scan file outside ${sourceRoot}.`);
+  return file;
+}
+
 export function scanLoggerSinks(root: string): LoggerSinkViolation[] {
-  const sourceRoot = resolve(root, "packages/runtime-effect/src");
+  const sourceRoot = realpathSync(resolve(root, "packages/runtime-effect/src"));
   const violations: LoggerSinkViolation[] = [];
   for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: sourceRoot, onlyFiles: true })) {
-    const file = resolve(sourceRoot, path);
+    const file = resolveOwnedSourceFile(sourceRoot, path);
     const text = readFileSync(file, "utf8");
     const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
     const visit = (node: ts.Node): void => {

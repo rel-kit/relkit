@@ -122,6 +122,33 @@ declare const ORPCError: typeof ORPCError;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L5)
 
+## `server.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [createServerClient](#createserverclient)
+
+---
+
+# utils
+
+## createServerClient
+
+Bun server client with operation-time W3C propagation. Response bodies remain untouched.
+
+**Signature**
+
+```ts
+declare const createServerClient: <Contract extends RouterContract = RouterContract>(
+  options: CreateClientOptions,
+) => RouterContractClient<Contract>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server.ts#L7)
+
 ## `tanstack-query.ts`
 
 ---

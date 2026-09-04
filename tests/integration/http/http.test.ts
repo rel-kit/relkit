@@ -41,6 +41,8 @@ interface HarnessOptions {
   readonly plan: RegistrationPlan;
   readonly handlers?: Readonly<Record<string, Behavior>>;
   readonly manifestMiddleware?: Readonly<Record<string, unknown>>;
+  readonly manifestRoutes?: Readonly<Record<string, unknown>>;
+  readonly manifestTargets?: Readonly<Record<string, unknown>>;
   readonly transforms?: Readonly<Record<string, unknown>>;
   readonly responseMapping?: ResponseMappingOptions;
   readonly requestMapping?: RequestMappingOptions;
@@ -125,6 +127,8 @@ function createHarness(options: HarnessOptions): Harness {
     ...runtimeCohort(options.plan.graphHash),
     functions: {},
     middleware: options.manifestMiddleware ?? {},
+    routes: options.manifestRoutes ?? {},
+    targets: options.manifestTargets ?? {},
     requestTransforms: options.transforms ?? {},
   };
   const app = createApp({
@@ -144,6 +148,7 @@ function createHarness(options: HarnessOptions): Harness {
       : { frameworkMiddleware: options.frameworkMiddleware }),
     ...(options.requestMapping === undefined ? {} : { requestMapping: options.requestMapping }),
     ...(options.responseMapping === undefined ? {} : { responseMapping: options.responseMapping }),
+    ...(options.observability === undefined ? {} : { observability: options.observability.hooks }),
   });
   const client = createTestHttpClient(app);
   return { client, calls, observability, close: client.close };
@@ -294,6 +299,43 @@ describe("HTTP integration", () => {
       const multipart = await harness.client.post("/uploads", { body: form });
       expect(multipart.status).toBe(200);
       expect(harness.calls[1]?.input).toEqual({ file: "contents" });
+    } finally {
+      await harness.close();
+    }
+  });
+
+  test("decodes inferred URL inputs from the target schema", async () => {
+    const target = defineFunction({
+      id: "users.read",
+      input: z.object({ id: z.number().int(), active: z.boolean() }),
+      output: z.object({ id: z.number(), active: z.boolean() }),
+      handler: async (input) => input,
+    });
+    const descriptor = defineRoute({ target });
+    const trigger = route("users.read.route", {
+      path: "/users/:id",
+      targetFunctionId: target.id,
+      request: {
+        kind: "input",
+        fields: {
+          id: { kind: "path", name: "id" },
+          active: { kind: "query", name: "active" },
+        },
+      },
+      responses: [success(), validation()],
+    });
+    const observed = createTestObservability();
+    const harness = createHarness({
+      plan: planFor([trigger]),
+      manifestRoutes: { [trigger.id]: descriptor },
+      manifestTargets: { [target.id]: target },
+      observability: observed,
+      handlers: { [target.id]: targetBehavior(target, observed) },
+    });
+    try {
+      const response = await harness.client.get("/users/10?active=true");
+      expect(response.status).toBe(200);
+      expect(harness.calls[0]?.input).toEqual({ id: 10, active: true });
     } finally {
       await harness.close();
     }
@@ -548,7 +590,7 @@ describe("HTTP integration", () => {
       observability: observed,
       middleware: {
         requestId: () => "request.generated",
-        traceId: () => "trace.generated",
+        traceId: () => "10000000000000000000000000000001",
         onLifecycleEvent: (event) => lifecycle.push(event.type),
       },
       handlers: { hooks: targetBehavior(target, observed) },
@@ -557,26 +599,31 @@ describe("HTTP integration", () => {
       const response = await harness.client.get("/hooks", {
         headers: { "x-request-id": "request.incoming", "x-trace-id": "trace.incoming" },
       });
-      expect(response.headers.get("x-request-id")).toBe("request.incoming");
-      expect(response.headers.get("x-trace-id")).toBe("trace.incoming");
+      await response.text();
+      expect(response.headers.get("x-request-id")).toBe("request.generated");
+      expect(response.headers.get("x-trace-id")).toBeNull();
       expect(harness.calls[0]).toMatchObject({
-        requestId: "request.incoming",
-        correlationId: "request.incoming",
-        traceId: "trace.incoming",
+        requestId: "request.generated",
+        traceId: "10000000000000000000000000000001",
       });
+      expect(harness.calls[0]?.correlationId).toBeUndefined();
       expect(lifecycle).toEqual(["request.started", "request.completed"]);
       expect(observed.types()).toEqual(
         expect.arrayContaining([
           "invocation.started",
-          "span.started",
-          "span.completed",
           "invocation.completed",
           "invocation.released",
         ]),
       );
+      expect(observed.hooks.readRecords()).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ signal: "span", status: "started" }),
+          expect.objectContaining({ signal: "span", status: "completed" }),
+        ]),
+      );
       const completion = observed.read().find((event) => event.type === "invocation.completed");
       if (completion?.type === "invocation.completed")
-        expect(completion.completion.record.traceId).toBe("trace.incoming");
+        expect(completion.completion.record.traceId).toBe("10000000000000000000000000000001");
     } finally {
       await harness.close();
     }
@@ -641,6 +688,7 @@ describe("HTTP integration", () => {
     const started = createBarrier<void>();
     const aborted = createBarrier<void>();
     const completed = createBarrier<InvocationCompletion>();
+    const cancelledLifecycle = createBarrier<void>();
     const lifecycle: string[] = [];
     const observed = createTestObservability();
     let contextSignal: AbortSignal | undefined;
@@ -669,7 +717,12 @@ describe("HTTP integration", () => {
           responses: [{ kind: "response", id: "cancelled", status: 499 }],
         }),
       ]),
-      middleware: { onLifecycleEvent: (event) => lifecycle.push(event.type) },
+      middleware: {
+        onLifecycleEvent: (event) => {
+          lifecycle.push(event.type);
+          if (event.type === "request.cancelled") cancelledLifecycle.resolve();
+        },
+      },
       observability: observed,
       handlers: {
         [target.id]: (input, invocation) =>
@@ -705,6 +758,7 @@ describe("HTTP integration", () => {
         expect(requestOutcome.error).toMatchObject({ name: "AbortError" });
       expect(contextSignal?.aborted).toBe(true);
       expect(completion.outcome).toBe("cancelled");
+      await within(cancelledLifecycle.promise, 1_000, "cancelled lifecycle");
       expect(lifecycle).toEqual(["request.started", "request.cancelled"]);
     } finally {
       await harness.close();

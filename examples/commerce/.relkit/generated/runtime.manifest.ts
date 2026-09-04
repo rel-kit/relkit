@@ -83,9 +83,11 @@ __relkit_bindDescriptorIdentity(__relkit_module_21["default"]["target"]["errors"
 __relkit_bindDescriptorIdentity(__relkit_module_22["default"], "receipts.objects");
 __relkit_bindDescriptorIdentity(__relkit_module_23["default"], "receipts.send-receipt");
 __relkit_bindDescriptorIdentity(__relkit_module_23["default"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_23["default"]["errors"][0], "receipts.storage-unavailable");
 __relkit_bindDescriptorIdentity(__relkit_module_24["default"], "receipts");
 __relkit_bindDescriptorIdentity(__relkit_module_24["default"]["sendReceipt"], "receipts.send-receipt");
 __relkit_bindDescriptorIdentity(__relkit_module_24["default"]["sendReceipt"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_24["default"]["sendReceipt"]["errors"][0], "receipts.storage-unavailable");
 __relkit_bindDescriptorIdentity(__relkit_module_25["GET"], "route.get.account.profile");
 __relkit_bindDescriptorIdentity(__relkit_module_25["GET"]["target"], "account.account-session");
 __relkit_bindDescriptorIdentity(__relkit_module_26["ALL"], "route.all.api.auth.optional-catch-all-auth");
@@ -129,7 +131,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_37["default"]["databaseUsers"], 
 
 export const manifestContractVersion = 8 as const;
 export const manifestGeneratorVersion = 5 as const;
-export const manifestGraphHash = "sha256:908c961587733d698d205e170b8313bf8afbd5673f63b20bbf7366b5798eac61" as const;
+export const manifestGraphHash = "sha256:982ed1af87240555e94589cfd19e3976ba5b0aac6bc35260c5adafeca5bd28b3" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,

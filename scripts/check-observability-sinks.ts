@@ -1,7 +1,7 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import * as ts from "typescript";
-import { scanLoggerSinks } from "./check-logger-sinks.ts";
+import { resolveOwnedSourceFile, scanLoggerSinks } from "./check-logger-sinks.ts";
 
 export const OBSERVABILITY_SOURCE_ROOTS = Object.freeze([
   "packages/observability/src",
@@ -23,6 +23,7 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   "packages/observability/src/record-admission.ts",
   // Byte accounting and search operate on admitted, redacted records.
   "packages/observability/src/local/batch-queue.ts",
+  "packages/observability/src/query.ts",
   "packages/observability/src/query-validation.ts",
   "packages/observability/src/storage/segments.ts",
   "packages/observability/src/storage/index.ts",
@@ -47,9 +48,9 @@ export function scanObservabilitySinks(root: string): ObservabilitySinkViolation
     rule: "direct-output" as const,
   }));
   for (const sourceRoot of OBSERVABILITY_SOURCE_ROOTS) {
-    const directory = resolve(root, sourceRoot);
+    const directory = realpathSync(resolve(root, sourceRoot));
     for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: directory, onlyFiles: true })) {
-      const file = resolve(directory, path);
+      const file = resolveOwnedSourceFile(directory, path);
       const relativeFile = relative(root, file).replaceAll("\\", "/");
       if (relativeFile === "packages/runtime-effect/src/logger.ts") continue;
       const source = ts.createSourceFile(

@@ -1,4 +1,5 @@
 import { Effect, Tracer as EffectTracer } from "effect";
+import { currentExecutionContext } from "@relkit/invocation";
 import {
   InvocationTrace,
   withChildSpan,
@@ -34,6 +35,8 @@ export interface InvocationBridgeOptions {
   readonly name?: string;
   readonly attributes?: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
+  readonly kind?: InvocationTraceOptions["kind"];
+  readonly input?: unknown;
 }
 
 export interface InvocationBridge {
@@ -67,6 +70,8 @@ export function reenterInvocation<A, E>(
     ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
     ...(context.source === undefined ? {} : { source: context.source }),
     ...(options.attributes === undefined ? {} : { attributes: options.attributes }),
+    ...(options.kind === undefined ? {} : { kind: options.kind }),
+    ...(options.input === undefined ? {} : { input: options.input }),
   };
   return Effect.withTracer(
     Effect.withParentSpan(withChildSpan(effect, tracedOptions), captured.parentSpan),
@@ -80,7 +85,16 @@ export function createInvocationBridge(
 ): InvocationBridge {
   const execute = <A, E>(effect: Effect.Effect<A, E, never>, options?: InvocationBridgeOptions) => {
     const signal = options?.signal ?? captured.context?.signal;
-    return runner.run(reenterInvocation(effect, captured, options), {
+    const active = currentExecutionContext();
+    const current =
+      active?.tracer === undefined
+        ? captured
+        : {
+            ...captured,
+            parentSpan: active.span,
+            tracer: active.tracer,
+          };
+    return runner.run(reenterInvocation(effect, current, options), {
       ...(signal === undefined ? {} : { signal }),
     });
   };

@@ -28,6 +28,7 @@ export interface DoctorOptions {
   readonly source?: Readonly<Record<string, string | undefined>>;
   readonly backendPort?: number;
   readonly inspectorPort?: number;
+  readonly skipPorts?: boolean;
   readonly deploymentEnabled?: boolean;
   readonly commandRunner?: DoctorCommandRunner;
   readonly portProbe?: (port: number) => Promise<boolean>;
@@ -47,6 +48,7 @@ export class DoctorCommandError extends Error {
 }
 
 type ParsedDoctorArgs = Pick<DoctorOptions, "projectRoot" | "backendPort" | "inspectorPort"> & {
+  readonly skipPorts?: boolean;
   readonly deploymentEnabled?: boolean;
 };
 
@@ -61,7 +63,11 @@ export async function doctorProject(options: DoctorOptions = {}): Promise<Doctor
   checks.push(await checkPulumi(enabled, root, options.commandRunner));
   checks.push(checkAws(enabled, options.source ?? process.env));
   checks.push(await checkRoots(root));
-  checks.push(await checkPorts(config, options, options.portProbe ?? availablePort));
+  checks.push(
+    options.skipPorts
+      ? { name: "ports", ok: true, message: "Port availability check skipped." }
+      : await checkPorts(config, options, options.portProbe ?? availablePort),
+  );
   checks.push(await checkLockfile(root, options.commandRunner));
   return Object.freeze({
     ok: checks.every((check) => check.ok),
@@ -75,6 +81,7 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
   let projectRoot: string | undefined;
   let backendPort: number | undefined;
   let inspectorPort: number | undefined;
+  let skipPorts: boolean | undefined;
   let deploymentEnabled: boolean | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index]!;
@@ -83,6 +90,7 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
       backendPort = parsePort(requiredValue(args, ++index, arg), arg, true);
     else if (arg === "--inspector-port")
       inspectorPort = parsePort(requiredValue(args, ++index, arg), arg, false);
+    else if (arg === "--no-ports") skipPorts = true;
     else if (arg === "--pulumi") deploymentEnabled = true;
     else if (arg === "--no-pulumi") deploymentEnabled = false;
     else throw new DoctorCommandError("RELKIT_DOCTOR_USAGE", `Unknown doctor option: ${arg}`);
@@ -91,6 +99,7 @@ export function parseDoctorArgs(args: readonly string[]): ParsedDoctorArgs {
     ...(projectRoot === undefined ? {} : { projectRoot }),
     ...(backendPort === undefined ? {} : { backendPort }),
     ...(inspectorPort === undefined ? {} : { inspectorPort }),
+    ...(skipPorts === undefined ? {} : { skipPorts }),
     ...(deploymentEnabled === undefined ? {} : { deploymentEnabled }),
   };
 }

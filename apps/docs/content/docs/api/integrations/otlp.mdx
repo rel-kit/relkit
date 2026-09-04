@@ -110,7 +110,7 @@ declare const otlp: (options: OtlpOptions) => OtlpTelemetryExporter;
 declare const combinedSignal: (first: AbortSignal, second: AbortSignal | undefined) => AbortSignal;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L30)
 
 ## nonNegative
 
@@ -120,7 +120,7 @@ declare const combinedSignal: (first: AbortSignal, second: AbortSignal | undefin
 declare const nonNegative: (value: number, name: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L68)
 
 ## otlpPayload
 
@@ -130,6 +130,7 @@ declare const nonNegative: (value: number, name: string) => number;
 declare const otlpPayload: (
   serviceName: string | undefined,
   records: readonly RedactedObservabilityRecord[],
+  signal: OtlpSignal,
 ) => JsonValue;
 ```
 
@@ -140,10 +141,10 @@ declare const otlpPayload: (
 **Signature**
 
 ```ts
-declare const otlpSignalFor: (record: RedactedObservabilityRecord) => OtlpSignal;
+declare const otlpSignalFor: (record: RedactedObservabilityRecord) => OtlpSignal | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L19)
 
 ## otlpUnitId
 
@@ -153,7 +154,7 @@ declare const otlpSignalFor: (record: RedactedObservabilityRecord) => OtlpSignal
 declare const otlpUnitId: (record: RedactedObservabilityRecord, sequence: number) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L24)
 
 ## positive
 
@@ -163,7 +164,7 @@ declare const otlpUnitId: (record: RedactedObservabilityRecord, sequence: number
 declare const positive: (value: number, name: string) => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L63)
 
 ## text
 
@@ -173,7 +174,7 @@ declare const positive: (value: number, name: string) => number;
 declare const text: (value: unknown, name: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L49)
 
 ## textMap
 
@@ -183,7 +184,7 @@ declare const text: (value: unknown, name: string) => string;
 declare const textMap: (value: unknown) => Readonly<Record<string, string>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L55)
 
 ## within
 
@@ -193,7 +194,7 @@ declare const textMap: (value: unknown) => Readonly<Record<string, string>>;
 declare const within: (operation: Promise<unknown>, timeoutMs: number) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter-support.ts#L34)
 
 ## `exporter.ts`
 
@@ -265,7 +266,7 @@ declare const createTelemetryExporter: (
 ) => Promise<TelemetryExporterRuntime>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter.ts#L157)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/otlp/src/exporter.ts#L159)
 
 ## `index.ts`
 

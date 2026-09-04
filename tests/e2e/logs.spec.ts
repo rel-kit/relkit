@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const initialTraceId = "11111111111111111111111111111111";
+
 test.beforeEach(async ({ request }) => {
   await request.post("http://127.0.0.1:3212/__fixture__/reset");
   await request.post("http://127.0.0.1:3212/__fixture__/logs");
@@ -20,9 +22,7 @@ test("keeps selected rows stable, navigates with keys, searches, and resumes liv
   await expect(page.getByRole("complementary", { name: "Log details" })).toBeVisible();
   await expect(page.locator("[data-highlighted='true']")).toHaveCount(1);
   await page.getByRole("button", { name: "Copy traceId" }).click();
-  await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-    .toBe("trace-initial");
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(initialTraceId);
   await page.locator("[data-log-cursor='164']").focus();
   await page.keyboard.press("ArrowDown");
   await expect(page).toHaveURL(/log=163/);
@@ -58,6 +58,10 @@ for (const width of [1600, 1024, 390])
       await expect(page.locator("[data-highlighted='true']")).toHaveCount(1);
       if (width < 1200)
         await expect(page.getByRole("dialog", { name: "Log details" })).toBeVisible();
+      if (process.platform === "darwin" && width === 1600 && theme === "light")
+        await expect(page.locator(".logs-workspace")).toHaveScreenshot("logs-workspace.png", {
+          animations: "disabled",
+        });
       await page.screenshot({ path: info.outputPath(`logs-${theme}-${width}.png`) });
       await page.locator("[data-highlighted='true']").scrollIntoViewIfNeeded();
       await page.screenshot({ path: info.outputPath(`logs-trace-${theme}-${width}.png`) });
@@ -73,7 +77,7 @@ test("reports expired logs and unavailable traces without inventing relationship
   await expect(
     page.getByText("This log is no longer retained. It may have expired."),
   ).toBeVisible();
-  await page.route(/\/_relkit\/v1\/traces\/trace-initial/, (route) =>
+  await page.route(new RegExp(`/_relkit/v1/traces/${initialTraceId}`), (route) =>
     route.fulfill({
       status: 404,
       json: { protocol: "relkit.inspector", version: 1, error: "RELKIT_OBSERVABILITY_NOT_FOUND" },
@@ -91,11 +95,11 @@ test("loads additional trace pages in the log pane and full trace view", async (
   request,
 }) => {
   const detail = await (
-    await request.get("http://127.0.0.1:3212/_relkit/v1/traces/trace-initial")
+    await request.get(`http://127.0.0.1:3212/_relkit/v1/traces/${initialTraceId}`)
   ).json();
   const first = detail.spans.slice(0, 1);
   const rest = detail.spans.slice(1);
-  await page.route(/\/_relkit\/v1\/traces\/trace-initial/, (route) =>
+  await page.route(new RegExp(`/_relkit/v1/traces/${initialTraceId}`), (route) =>
     route.fulfill({
       json: { ...detail, spans: first, records: first, nextCursor: "1" },
       headers: { "x-relkit-api-version": "1" },
@@ -107,7 +111,7 @@ test("loads additional trace pages in the log pane and full trace view", async (
       headers: { "x-relkit-api-version": "1" },
     }),
   );
-  for (const path of ["/logs?log=164", "/traces/trace-initial"]) {
+  for (const path of ["/logs?log=164", `/traces/${initialTraceId}`]) {
     await page.goto(path);
     await expect(
       page.getByText("Partial trace: more records are retained.", { exact: false }),
@@ -116,7 +120,7 @@ test("loads additional trace pages in the log pane and full trace view", async (
     await expect(page.locator('.waterfall-row[data-record-type="span"]')).toHaveCount(
       detail.spans.length,
     );
-    await expect(page.locator('.waterfall-row[data-record-type="request"]')).toHaveCount(1);
+    await expect(page.locator('.waterfall-row[data-record-type="event"]')).toHaveCount(6);
     await expect(page.getByRole("button", { name: "Load more trace records" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Inspect span", exact: true })).toHaveCount(0);
   }

@@ -36,6 +36,7 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/engine": "workspace:*",
     "@relkit/graph": "workspace:*",
+    "@relkit/invocation": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/openapi": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",

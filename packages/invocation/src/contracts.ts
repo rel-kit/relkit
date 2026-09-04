@@ -2,6 +2,7 @@ import type { MaybePromise, ProtocolId } from "@relkit/contracts";
 import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import { Effect } from "effect";
 import type { InvocationFailure, PublicFailureEnvelope } from "./failure-types.js";
+import type { PublicTrace } from "./public-trace.js";
 
 export type InvocationSource =
   "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
@@ -34,6 +35,7 @@ export interface InvocationMetadata {
 }
 
 export interface InvocationContext {
+  readonly trace: PublicTrace;
   readonly invocation: InvocationMetadata;
   readonly signal: AbortSignal;
   readonly env: Readonly<Record<string, unknown>>;

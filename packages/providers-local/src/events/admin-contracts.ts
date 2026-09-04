@@ -55,8 +55,8 @@ export interface EventPublicationContract extends EventVersioned {
   readonly publishedAt: string;
   readonly key?: string;
   readonly correlationId?: string;
-  readonly causationInvocationId?: string;
-  readonly traceId: string;
+  readonly originRequestId?: string;
+  readonly producerTraceId?: string;
   readonly attributes: Readonly<Record<string, string | number | boolean>>;
 }
 

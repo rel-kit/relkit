@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { OverlayDialog } from "../../components/ui/dialog";
 import { logQueryKey } from "../../lib/log-query";
@@ -23,7 +23,6 @@ export function TracesClient() {
   const cursor = params.get("cursor") ?? "";
   const [paused, setPaused] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [wide, setWide] = useState(false);
   const [revision, setRevision] = useState(0);
   const scroll = useRef<HTMLDivElement>(null);
   const blocked = paused || scrolled || !!selected || !!cursor;
@@ -51,15 +50,8 @@ export function TracesClient() {
     scroll.current?.scrollTo({ top: 0 });
     setRevision((value) => value + 1);
   };
-  useEffect(() => {
-    const query = matchMedia("(min-width: 1200px)");
-    const change = () => setWide(query.matches);
-    change();
-    query.addEventListener("change", change);
-    return () => query.removeEventListener("change", change);
-  }, []);
   const detail = selected && (
-    <div className="log-details">
+    <div className="log-details trace-details">
       <header className="log-detail-heading">
         <strong>Trace {selected}</strong>
         <div>
@@ -81,24 +73,13 @@ export function TracesClient() {
           >
             <ArrowDown size={16} />
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Close trace details" onPress={close}>
-            <X size={16} />
-          </Button>
         </div>
       </header>
       <LogTrace key={selected} traceId={selected} spanId="" />
     </div>
   );
   return (
-    <div
-      className="logs-workspace traces-workspace"
-      onKeyDown={(event) => {
-        if (event.key === "Escape" && selected && wide) {
-          event.preventDefault();
-          close();
-        }
-      }}
-    >
+    <div className="logs-workspace traces-workspace">
       <header className="logs-heading">
         <h1>Traces</h1>
         <span role="status">
@@ -116,7 +97,7 @@ export function TracesClient() {
           setScrolled(false);
         }}
       />
-      <div className="log-split" data-selected={!!selected}>
+      <div className="log-split">
         <section className="log-list-panel" aria-label="Traces">
           <div
             className="log-scroll"
@@ -154,7 +135,7 @@ export function TracesClient() {
                 New traces available
               </Button>
             ) : (
-              <span>50 records per page</span>
+              <span>100 traces per page</span>
             )}
             <Button
               variant="ghost"
@@ -169,23 +150,16 @@ export function TracesClient() {
             </Button>
           </footer>
         </section>
-        {wide && selected && (
-          <aside className="log-detail-pane" aria-label="Trace details">
-            {detail}
-          </aside>
-        )}
       </div>
-      {!wide && (
-        <OverlayDialog
-          placement="right"
-          title="Trace details"
-          isOpen={!!selected}
-          onOpenChange={(open) => !open && close()}
-          trigger={<Button style={{ display: "none" }}>Inspect trace</Button>}
-        >
-          {detail}
-        </OverlayDialog>
-      )}
+      <OverlayDialog
+        placement="right"
+        title="Trace details"
+        isOpen={!!selected}
+        onOpenChange={(open) => !open && close()}
+        trigger={<Button style={{ display: "none" }}>Inspect trace</Button>}
+      >
+        {detail}
+      </OverlayDialog>
     </div>
   );
 }

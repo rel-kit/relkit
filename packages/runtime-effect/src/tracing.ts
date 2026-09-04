@@ -1,4 +1,5 @@
 import { Context, Effect, Option, Tracer as EffectTracer } from "effect";
+import { RelkitSpan } from "@relkit/invocation";
 import { IdSource } from "./services.js";
 import { createRelkitTracer, type SpanLifecycleObserver } from "./tracing-span.js";
 
@@ -18,6 +19,7 @@ export interface InvocationTraceOptions {
   readonly attributes?: Readonly<Record<string, unknown>>;
   readonly kind?: EffectTracer.SpanKind;
   readonly observer?: SpanLifecycleObserver;
+  readonly input?: unknown;
 }
 
 export interface InvocationTraceContext {
@@ -93,7 +95,14 @@ export function withRootSpan<A, E, R>(
   const traced = Effect.withSpan(
     Effect.gen(function* () {
       const span = yield* Effect.currentSpan.pipe(Effect.orDie);
-      return yield* Effect.provideService(effect, InvocationTrace, contextFromSpan(span, options));
+      if (span instanceof RelkitSpan && "input" in options) span.capture("input", options.input);
+      const value = yield* Effect.provideService(
+        effect,
+        InvocationTrace,
+        contextFromSpan(span, options),
+      );
+      if (span instanceof RelkitSpan) span.capture("output", value);
+      return value;
     }),
     options.name,
     {
@@ -156,7 +165,14 @@ export function withChildSpan<A, E, R>(
     return yield* Effect.withSpan(
       Effect.gen(function* () {
         const span = yield* Effect.currentSpan.pipe(Effect.orDie);
-        return yield* Effect.provideService(effect, InvocationTrace, contextFromSpan(span, next));
+        if (span instanceof RelkitSpan && "input" in next) span.capture("input", next.input);
+        const value = yield* Effect.provideService(
+          effect,
+          InvocationTrace,
+          contextFromSpan(span, next),
+        );
+        if (span instanceof RelkitSpan) span.capture("output", value);
+        return value;
       }),
       next.name,
       { kind: next.kind ?? "internal", attributes: spanAttributes(next) },

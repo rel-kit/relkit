@@ -53,9 +53,17 @@ describe("event materialization", () => {
       payload: { orderId: "order-1" },
       occurredAt: "2026-08-15T00:00:00.000Z",
       publishedAt: "2026-08-15T00:00:01.000Z",
-      correlationId: "corr-1",
-      causationInvocationId: "invocation-1",
-      traceId: "trace-1",
+      propagation: {
+        version: 2,
+        producer: {
+          traceId: "10000000000000000000000000000001",
+          spanId: "1000000000000001",
+          traceFlags: 1,
+        },
+        originRequestId: "request-1",
+        correlationId: "corr-1",
+        invocationId: "invocation-1",
+      },
       attributes: { source: "test" },
     } as const;
 
@@ -69,16 +77,10 @@ describe("event materialization", () => {
       input: envelope.payload,
       source: "event-delivery",
       correlationId: "corr-1",
-      traceId: "trace-1",
+      originRequestId: "request-1",
+      links: [envelope.propagation.producer],
       signal: controller.signal,
       deadlineMs: 500,
-      parent: {
-        id: "invocation-1",
-        traceId: "trace-1",
-        correlationId: "corr-1",
-        deadlineMs: 500,
-        signal: controller.signal,
-      },
     });
   });
 

@@ -198,7 +198,7 @@ readonly code: "RELKIT_EVENT_PROVIDER_UNAVAILABLE"
 declare const assertOptionalText: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L135)
 
 ## assertVersion
 
@@ -208,7 +208,7 @@ declare const assertOptionalText: (value: unknown, name: string) => void;
 declare const assertVersion: (value: unknown) => asserts value is number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L144)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L140)
 
 ## normalizeOptions
 
@@ -250,7 +250,7 @@ declare const notify: <T>(
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L122)
 
 ## parsePayload
 
@@ -277,7 +277,7 @@ declare const resolveProvider: (
 ) => EventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L111)
 
 ## resolveValue
 
@@ -287,7 +287,7 @@ declare const resolveProvider: (
 declare const resolveValue: (value: EventClientOptions["correlationId"]) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client-utils.ts#L131)
 
 ## `client.ts`
 
@@ -328,7 +328,7 @@ declare const resolveValue: (value: EventClientOptions["correlationId"]) => stri
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L19)
 
 ## EventClient (interface)
 
@@ -348,7 +348,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L87)
 
 ## EventClientOptions (interface)
 
@@ -371,8 +371,6 @@ export interface EventClientOptions<
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
   readonly correlationId?: string | (() => string | undefined);
-  readonly causationInvocationId?: string | (() => string | undefined);
-  readonly traceId?: string | (() => string | undefined);
   readonly now?: () => Date;
   readonly declared?: boolean;
   readonly onDeclaredEdge?: (edge: EventDeclaredEdge) => void;
@@ -380,7 +378,7 @@ export interface EventClientOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L66)
 
 ## EventDeclaredEdge (interface)
 
@@ -394,7 +392,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L98)
 
 ## EventDependencyError
 
@@ -404,7 +402,7 @@ export interface EventDeclaredEdge {
 declare const EventDependencyError: typeof EventDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L24)
 
 ## EventInvocationBridge (interface)
 
@@ -419,7 +417,7 @@ export interface EventInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L60)
 
 ## EventInvocationBridgeOptions (interface)
 
@@ -430,10 +428,12 @@ export interface EventInvocationBridgeOptions {
   readonly name?: string;
   readonly attributes?: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L53)
 
 ## EventObservedEdge (interface)
 
@@ -447,7 +447,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L103)
 
 ## EventOperationCancelledError
 
@@ -457,7 +457,7 @@ export interface EventObservedEdge {
 declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L25)
 
 ## EventOperationContext (interface)
 
@@ -471,13 +471,11 @@ export interface EventOperationContext {
   readonly signal: AbortSignal;
   readonly profile: string;
   readonly deadlineMs?: number;
-  readonly correlationId?: string;
-  readonly causationInvocationId?: string;
-  readonly traceId: string;
+  readonly propagation?: TracePropagation;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L31)
 
 ## EventOperationTimeoutError
 
@@ -487,7 +485,7 @@ export interface EventOperationContext {
 declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L26)
 
 ## EventPayloadValidationError
 
@@ -497,7 +495,7 @@ declare const EventOperationTimeoutError: typeof EventOperationTimeoutError;
 declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L27)
 
 ## EventProfileError
 
@@ -507,7 +505,7 @@ declare const EventPayloadValidationError: typeof EventPayloadValidationError;
 declare const EventProfileError: typeof EventProfileError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L28)
 
 ## EventProvider (interface)
 
@@ -523,7 +521,7 @@ export interface EventProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L46)
 
 ## EventProviderError
 
@@ -533,7 +531,7 @@ export interface EventProvider {
 declare const EventProviderError: typeof EventProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L29)
 
 ## EventProviderResult (type alias)
 
@@ -547,7 +545,7 @@ type EventProviderResult<Id, Version, Payload> = Pick<
   Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L40)
 
 ## EventPublishOptions
 
@@ -557,7 +555,7 @@ type EventProviderResult<Id, Version, Payload> = Pick<
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L20)
 
 ## EventPublishResult
 
@@ -567,7 +565,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L21)
 
 ## createEventClient
 
@@ -583,7 +581,7 @@ declare const createEventClient: <
 ) => EventClient<InferInput<PayloadSchema>, Id, Version, InferOutput<PayloadSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L121)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/client.ts#L108)
 
 ## `define-event-function.ts`
 

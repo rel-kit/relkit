@@ -55,6 +55,8 @@ const flowInput = Object.freeze({
   OPENAI_API_KEY: secrets.apiKey,
 });
 const source = { file: "tests/security/redaction/redaction.test.ts", line: 1, column: 1 } as const;
+const securityTraceId = "70000000000000000000000000000007";
+const securitySpanId = "7000000000000007";
 const retry = {
   maxAttempts: 1,
   initialDelayMs: 0,
@@ -68,7 +70,7 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
   const terminal: string[] = [];
   const jsonLogs: LogRecord[] = [];
   await emitLoggerRecord(collector, terminal, jsonLogs);
-  await runAgent(collector);
+  const agentTrace = await runAgent(collector);
   await runJob(collector);
   await runEvent(collector);
   await flushTelemetry();
@@ -88,12 +90,9 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
   );
   assertNoSecrets("public HTTP response", await publicResponse.text());
   const flowRecords = collector.read();
-  expect(
-    flowRecords.some(
-      (record) =>
-        record.signal === "span" && record.functionId?.startsWith("relkit.agent.") === true,
-    ),
-  ).toBe(true);
+  expect(agentTrace.spans.some((span) => span.name.startsWith("relkit.agent.security.agent"))).toBe(
+    true,
+  );
   expect(
     flowRecords.some((record) => record.signal === "invocation" && record.source === "job"),
   ).toBe(true);
@@ -129,7 +128,7 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
     assertNoSecrets("in-memory collector", collector.read());
     const requestPage = await query.requests({ requestId: "security.request" });
     const logPage = await query.logs();
-    const traceDetails = await query.trace("security.trace");
+    const traceDetails = await query.trace(securityTraceId);
     expect(requestPage.items.length).toBeGreaterThan(0);
     expect(logPage.items.length).toBeGreaterThan(0);
     expect(traceDetails).toBeDefined();
@@ -154,7 +153,7 @@ test("recursively finds no synthetic secret in observable flows or sinks", async
       `${API_BASE_PATH}/requests?requestId=security.request`,
       `${API_BASE_PATH}/requests/security.request`,
       `${API_BASE_PATH}/logs`,
-      `${API_BASE_PATH}/traces/security.trace`,
+      `${API_BASE_PATH}/traces/${securityTraceId}`,
     ])
       assertNoSecrets(`inspector API ${path}`, await (await inspector.request(path)).text());
     const sse = await inspector.request(`${API_BASE_PATH}/stream`, {
@@ -207,7 +206,7 @@ async function flushTelemetry(): Promise<void> {
   await Promise.resolve();
 }
 
-async function runAgent(collector: ObservabilityCollector): Promise<void> {
+async function runAgent(collector: ObservabilityCollector) {
   const agent = defineAgent({
     id: "security.agent",
     input: z.object({
@@ -231,7 +230,9 @@ async function runAgent(collector: ObservabilityCollector): Promise<void> {
     hooks: { observability: collector },
   });
   await harness.invoke(flowInput);
-  assertNoSecrets("agent trace capture", harness.trace.read());
+  const trace = harness.trace.read();
+  assertNoSecrets("agent trace capture", trace);
+  return trace;
 }
 
 async function runJob(collector: ObservabilityCollector): Promise<void> {
@@ -362,7 +363,7 @@ function createHttpRuntime(
     generationId: "security-generation",
     observability: collector,
     internalEndpoints,
-    middleware: { requestId: () => "security.request", traceId: () => "security.trace" },
+    middleware: { requestId: () => "security.request", traceId: () => securityTraceId },
     engine: { invoke: async () => ({ ok: true }) },
   });
 }
@@ -373,7 +374,7 @@ function secretLog(
   fields: Readonly<Record<string, unknown>> = flowInput,
 ): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info",
@@ -392,10 +393,11 @@ function unsafeLog(): ObservabilityRecord {
 
 function unsafeRequest(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "request",
+    phase: "completed",
     requestId: "security.request",
-    traceId: "security.trace",
+    traceId: securityTraceId,
     generationId: "security-generation",
     graphHash: "sha256:security",
     invocationId: "security.invocation",
@@ -409,7 +411,6 @@ function unsafeRequest(): ObservabilityRecord {
     functionId: "security.handler",
     status: 200,
     outcome: "success",
-    timeline: [],
     headers: { authorization: secrets.authorization, cookie: secrets.cookie },
     requestBody: flowInput,
   } as unknown as ObservabilityRecord;
@@ -417,9 +418,9 @@ function unsafeRequest(): ObservabilityRecord {
 
 function unsafeTrace(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "trace",
-    traceId: "security.trace",
+    traceId: securityTraceId,
     startedAt: "2026-08-16T00:00:00.000Z",
     spanCount: 1,
     outcome: "success",
@@ -429,12 +430,14 @@ function unsafeTrace(): ObservabilityRecord {
 
 function unsafeSpan(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "span",
-    spanId: "security.span",
+    spanId: securitySpanId,
     invocationId: "security.invocation",
-    traceId: "security.trace",
+    traceId: securityTraceId,
     name: "security.handler",
+    kind: "internal",
+    revision: 1,
     status: "completed",
     startedAt: "2026-08-16T00:00:00.000Z",
     completedAt: "2026-08-16T00:00:00.001Z",
@@ -444,7 +447,7 @@ function unsafeSpan(): ObservabilityRecord {
 
 function unsafeJob(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "job",
     jobId: "security.job",
     instanceId: "security.job.1",
@@ -459,7 +462,7 @@ function unsafeJob(): ObservabilityRecord {
 
 function unsafeEvent(): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "event",
     kind: "publication",
     eventId: "security.event",

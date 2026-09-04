@@ -6,6 +6,7 @@ import { buildProject } from "./src/commands/build.js";
 import { checkProject } from "./src/commands/check.js";
 import { startProject } from "./src/commands/start.js";
 import { readBuilt } from "./src/commands/start-built.js";
+import { runCli } from "./src/main.js";
 import { linkWorkspacePackages } from "./test-workspace.js";
 
 const roots: string[] = [];
@@ -41,6 +42,41 @@ test("check emits activatable success and portable structured diagnostics on fai
     }),
   );
   expect(JSON.stringify(invalid.diagnostics)).not.toContain(invalidRoot);
+});
+
+test("failed checks preserve the last valid graph and update diagnostics", async () => {
+  const root = await copyProject("tests/compiler/fixtures/valid-minimal");
+  const valid = await checkProject({ projectRoot: root });
+  const graphPath = join(valid.generatedDirectory, "application.graph.json");
+  const graph = await readFile(graphPath, "utf8");
+  await writeFile(
+    join(root, "src/routes/hello/[name]/route.ts"),
+    'import { defineRoute } from "@relkit/app";\nexport default defineRoute({});\n',
+  );
+
+  const invalid = await checkProject({ projectRoot: root });
+
+  expect(invalid.ok).toBe(false);
+  expect(await readFile(graphPath, "utf8")).toBe(graph);
+  expect(
+    JSON.parse(await readFile(join(valid.generatedDirectory, "diagnostics.json"), "utf8")),
+  ).toEqual(expect.arrayContaining([expect.objectContaining({ severity: "error" })]));
+});
+
+test("dev compile failures identify the source and suggested fix", async () => {
+  const root = await copyProject("tests/compiler/fixtures/error-ambiguous-id");
+  const stderr: string[] = [];
+  const exitCode = await runCli(["dev", "--project-root", root, "--no-color"], {
+    installSignalHandlers: false,
+    io: { stdout: () => undefined, stderr: (line) => stderr.push(line) },
+  });
+
+  expect(exitCode).toBe(1);
+  expect(stderr.join("\n")).toContain(
+    "src/ambiguous/functions/ambiguous.function.ts:11:16 - error RELKIT_ID_INFERENCE_AMBIGUOUS",
+  );
+  expect(stderr.join("\n")).toContain("suggestion: Provide an explicit id");
+  expect(stderr.join("\n")).toContain("> 11 |");
 });
 
 test("check locates removed config keys and shows the fixed replacement", async () => {

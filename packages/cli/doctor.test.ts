@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { doctorProject, runDoctor } from "./src/commands/doctor.js";
+import { doctorProject, parseDoctorArgs, runDoctor } from "./src/commands/doctor.js";
 
 const projectRoot = `${process.cwd()}/examples/commerce`;
 
@@ -22,6 +22,25 @@ test("doctor validates the fixture without deployment prerequisites", async () =
   expect(result.checks.find((check) => check.name === "ports")?.details).toEqual({
     backend: 0,
     inspector: 4001,
+  });
+});
+
+test("doctor can skip transient port availability during project generation", async () => {
+  expect(parseDoctorArgs(["--no-ports"])).toEqual({ skipPorts: true });
+  const result = await doctorProject({
+    projectRoot,
+    deploymentEnabled: false,
+    skipPorts: true,
+    commandRunner: async () => ({ exitCode: 0 }),
+    portProbe: async () => {
+      throw new Error("port probe should not run");
+    },
+  });
+
+  expect(result.ok).toBe(true);
+  expect(result.checks.find((check) => check.name === "ports")).toMatchObject({
+    ok: true,
+    message: "Port availability check skipped.",
   });
 });
 

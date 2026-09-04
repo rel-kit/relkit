@@ -1,6 +1,8 @@
 import { and, asc, desc, eq, isNull, type Column, type SQL } from "drizzle-orm";
 import type { ModelBinding } from "./runtime-types.js";
-export async function runOperation(
+import { withOperationTracing } from "./operation-tracing.js";
+export const runOperation = withOperationTracing(runLogicalOperation);
+async function runLogicalOperation(
   binding: ModelBinding,
   name: string,
   args: unknown,
@@ -11,7 +13,7 @@ export async function runOperation(
     ["insert", "update", "upsert", "delete"].includes(name)
   ) {
     return transaction(binding.drizzle, (drizzle) =>
-      runOperation({ ...binding, drizzle, inTransaction: true }, name, args),
+      runLogicalOperation({ ...binding, drizzle, inTransaction: true }, name, args),
     );
   }
   const base = (next: unknown): Promise<unknown> => baseOperation(binding, name, next);

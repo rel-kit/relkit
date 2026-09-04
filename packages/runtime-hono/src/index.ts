@@ -12,3 +12,4 @@ export * from "./rpc.js";
 export * from "./mcp.js";
 export * from "./static-files.js";
 export * from "./client-contract.js";
+export * from "./http-span.js";

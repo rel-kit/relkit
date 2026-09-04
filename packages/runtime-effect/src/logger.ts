@@ -10,6 +10,7 @@ import {
 import { redactCause, redactFailureDetail } from "./failure-redaction.js";
 import { formatHumanLog, formatMessage } from "./logger-format.js";
 import { InvocationTrace } from "./tracing.js";
+import { currentExecutionContext } from "@relkit/invocation";
 export { formatHumanLog } from "./logger-format.js";
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 export type MinimumLogLevel = LogLevel | "all" | "none";
@@ -45,6 +46,7 @@ const reservedAnnotations = new Set([
   "functionId",
   "serviceId",
   "requestId",
+  "originRequestId",
   "invocationId",
   "traceId",
   "spanId",
@@ -94,6 +96,7 @@ export function createLoggerLayer(options: LoggerOptions = {}): Layer.Layer<neve
 function makeRecord(event: EffectLogger.Options<unknown>, component: string): LogRecord {
   const annotations = event.fiber.getRef(References.CurrentLogAnnotations);
   const trace = Option.getOrUndefined(Context.getOption(event.fiber.context, InvocationTrace));
+  const active = currentExecutionContext();
   const fields: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(annotations))
     if (!reservedAnnotations.has(key)) fields[key] = value;
@@ -107,13 +110,20 @@ function makeRecord(event: EffectLogger.Options<unknown>, component: string): Lo
     message: formatMessage(event.message),
     fields: jsonObject(fields),
     ...optional("functionId", trace?.functionId ?? annotations.functionId),
-    ...optional("requestId", annotations.requestId),
-    ...optional("invocationId", trace?.invocationId ?? annotations.invocationId),
-    ...optional("traceId", trace?.traceId ?? annotations.traceId),
-    ...optional("spanId", trace?.spanId ?? annotations.spanId),
-    ...optional("correlationId", trace?.correlationId ?? annotations.correlationId),
-    ...optional("generationId", annotations.generationId),
-    ...optional("graphHash", annotations.graphHash),
+    ...optional("requestId", active?.requestId ?? annotations.requestId),
+    ...optional("originRequestId", active?.originRequestId ?? annotations.originRequestId),
+    ...optional(
+      "invocationId",
+      active?.invocationId ?? trace?.invocationId ?? annotations.invocationId,
+    ),
+    ...optional("traceId", active?.span.traceId ?? trace?.traceId ?? annotations.traceId),
+    ...optional("spanId", active?.span.spanId ?? trace?.spanId ?? annotations.spanId),
+    ...optional(
+      "correlationId",
+      active?.correlationId ?? trace?.correlationId ?? annotations.correlationId,
+    ),
+    ...optional("generationId", active?.generationId ?? annotations.generationId),
+    ...optional("graphHash", active?.graphHash ?? annotations.graphHash),
     ...optional("source", trace?.source ?? annotations.source),
     ...optional("serviceId", trace?.serviceId ?? annotations.serviceId),
   });
@@ -145,6 +155,7 @@ function safeRecord(record: LogRecord): LogRecord {
     fields: jsonObject(record.fields),
     ...optional("functionId", record.functionId),
     ...optional("requestId", record.requestId),
+    ...optional("originRequestId", record.originRequestId),
     ...optional("invocationId", record.invocationId),
     ...optional("traceId", record.traceId),
     ...optional("spanId", record.spanId),

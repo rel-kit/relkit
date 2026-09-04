@@ -31,7 +31,7 @@ declare const createCacheOperations: <
 ) => CacheClient<InferInput<KeySchema>, InferOutput<ValueSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operations.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-operations.ts#L37)
 
 ## `client-types.ts`
 
@@ -86,10 +86,11 @@ export interface CacheBridgeOptions {
   readonly name: string;
   readonly attributes: Readonly<Record<string, unknown>>;
   readonly signal: AbortSignal;
+  readonly input?: unknown;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-types.ts#L70)
 
 ## CacheCapabilities (interface)
 
@@ -138,8 +139,6 @@ readonly code: "RELKIT_CACHE_CAPABILITY_UNSUPPORTED"
 
 ## CacheClient (type alias)
 
-Numeric increment is intentionally absent from non-numeric value contracts.
-
 **Signature**
 
 ```ts
@@ -147,7 +146,7 @@ type CacheClient<Key, Value> = CacheClientBase<Key, Value> &
   ([Value] extends [number] ? CacheNumericClient<Key, Value> : object);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cache/src/client-types.ts#L67)
 
 ## CacheClientBase (interface)
 

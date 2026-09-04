@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "@relkit/schema";
+import { createSpanId, createTraceId } from "@relkit/contracts";
+import {
+  completeSpan,
+  runInExecutionContext,
+  SpanRuntime,
+  startRootSpan,
+} from "@relkit/invocation";
 import {
   createJobClient,
   JobInputValidationError,
@@ -32,6 +39,7 @@ describe("job Promise client", () => {
       bridge: {
         run: async (operation, options) => {
           bridgeNames.push(options?.name ?? "");
+          expect(options?.kind).toBe("producer");
           return operation();
         },
       },
@@ -57,6 +65,36 @@ describe("job Promise client", () => {
       correlationId: "request-1",
     });
     expect(context.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  test("captures propagation inside the producer span", async () => {
+    let context!: JobOperationContext;
+    const client = createJobClient({
+      ownerId: "orders.create",
+      jobId: "orders.send",
+      source: {
+        enqueue: async (_input, _options, current) => {
+          context = current;
+          return { instanceId: "job-1", accepted: true };
+        },
+      },
+    });
+    const runtime = new SpanRuntime({
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+    });
+    const root = startRootSpan(runtime, "request", "server");
+    await runInExecutionContext(
+      { span: root, runtime, originRequestId: "request-1", invocationId: "invocation-1" },
+      () => client.enqueue({ id: "order-1" }),
+    );
+    completeSpan(root);
+    expect(context.propagation).toMatchObject({
+      version: 2,
+      originRequestId: "request-1",
+      invocationId: "invocation-1",
+      producer: { traceId: root.traceId },
+    });
+    expect(context.propagation?.producer.spanId).not.toBe(root.spanId);
   });
 
   test("rejects invalid input before provider work and propagates cancellation", async () => {

@@ -25,6 +25,9 @@ export interface IndexState {
   readonly records: Map<string, ObservabilityIndexEntry>;
   readonly locations: Map<string, string>;
   readonly segments: Map<string, MutableSegment>;
+  readonly fields: Readonly<
+    Record<"requestId" | "originRequestId" | "traceId" | "spanId", Map<string, Set<string>>>
+  >;
   sequence: number;
 }
 
@@ -38,7 +41,18 @@ export interface IndexConfig {
 }
 
 export function createIndexState(): IndexState {
-  return { records: new Map(), locations: new Map(), segments: new Map(), sequence: 0 };
+  return {
+    records: new Map(),
+    locations: new Map(),
+    segments: new Map(),
+    sequence: 0,
+    fields: {
+      requestId: new Map(),
+      originRequestId: new Map(),
+      traceId: new Map(),
+      spanId: new Map(),
+    },
+  };
 }
 
 export function normalizeOptions(options: ObservabilityIndexOptions): IndexConfig {
@@ -74,7 +88,9 @@ export function makeEntry(
     bytes,
     timestamp: timestampFor(record),
     ...optionalText(value, "requestId"),
+    ...optionalText(value, "originRequestId"),
     ...optionalText(value, "traceId"),
+    ...optionalText(value, "spanId"),
     ...optionalText(value, "routeId"),
     ...optionalText(value, "functionId"),
     ...optionalText(value, "serviceId"),
@@ -149,7 +165,9 @@ export function matches(
     (options.functionId === undefined || entry.functionId === options.functionId) &&
     (options.outcome === undefined || entry.outcome === options.outcome) &&
     (options.requestId === undefined || entry.requestId === options.requestId) &&
+    (options.originRequestId === undefined || entry.originRequestId === options.originRequestId) &&
     (options.traceId === undefined || entry.traceId === options.traceId) &&
+    (options.spanId === undefined || entry.spanId === options.spanId) &&
     (options.serviceId === undefined || entry.serviceId === options.serviceId) &&
     (options.generationId === undefined || entry.generationId === options.generationId) &&
     (options.graphHash === undefined || entry.graphHash === options.graphHash) &&

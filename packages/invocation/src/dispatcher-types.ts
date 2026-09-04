@@ -1,4 +1,5 @@
 import type { MaybePromise } from "@relkit/contracts";
+import type { ExecutionContext } from "./execution-context.js";
 import type {
   InvocationCompletion,
   InvocationContext,
@@ -42,6 +43,10 @@ export interface StructuredLogRecord {
   readonly functionId: string;
   readonly source: InvocationSource;
   readonly serviceId?: string;
+  readonly requestId?: string;
+  readonly originRequestId?: string;
+  readonly spanId?: string;
+  readonly correlationId?: string;
 }
 
 export interface LocalStructuredLogger extends PublicLogger {
@@ -105,7 +110,8 @@ export interface InvocationDispatcher {
 }
 
 export interface InvocationDispatchScope {
-  readonly dispatcher: InvocationDispatcher;
+  readonly dispatcher?: InvocationDispatcher;
   readonly parent?: InvocationParent;
   readonly chain?: InvocationCallStack;
+  readonly execution?: ExecutionContext;
 }

@@ -64,7 +64,6 @@ export type CacheNumericClient<Key, Value extends number> = {
   increment(key: Key, delta?: number, options?: CacheOperationOptions): Promise<Value>;
 };
 
-/** Numeric increment is intentionally absent from non-numeric value contracts. */
 export type CacheClient<Key, Value> = CacheClientBase<Key, Value> &
   ([Value] extends [number] ? CacheNumericClient<Key, Value> : object);
 
@@ -72,6 +71,7 @@ export interface CacheBridgeOptions {
   readonly name: string;
   readonly attributes: Readonly<Record<string, unknown>>;
   readonly signal: AbortSignal;
+  readonly input?: unknown;
 }
 
 export interface CacheInvocationBridge {

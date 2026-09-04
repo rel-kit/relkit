@@ -5,7 +5,7 @@ import { checkProject } from "./check.js";
 import { startDev, type DevOptions } from "./dev.js";
 import { createDevLogger, devLogSinks } from "./dev-logger.js";
 import { developmentPorts } from "./dev-inspector.js";
-import { createDevLocalCompiler } from "./dev-local.js";
+import { createDevLocalCompiler, formatDevDiagnostics } from "./dev-local.js";
 import { startDevSourceWatcher } from "./dev-watch.js";
 import { parseProjectArgs } from "./project-args.js";
 import { startDevTelemetry } from "./dev-telemetry.js";
@@ -44,17 +44,22 @@ export async function runDevCommand(
   if (!checked.ok)
     throw fail(
       "RELKIT_DEV_COMPILE_FAILED",
-      checked.diagnostics.map((item) => item.message).join("\n"),
+      formatDevDiagnostics(projectRoot, checked.diagnostics, terminal.color),
     );
   const graph = JSON.parse(checked.outputs.graph) as {
     nodes: { kind: string; telemetry?: TelemetryConfiguration }[];
   };
   let configuration = graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {};
   let telemetry: Awaited<ReturnType<typeof startDevTelemetry>> | undefined;
-  const compiler = createDevLocalCompiler(projectRoot, options.local !== "off", (next) => {
-    configuration = next;
-    return telemetry?.configure(next);
-  });
+  const compiler = createDevLocalCompiler(
+    projectRoot,
+    options.local !== "off",
+    (next) => {
+      configuration = next;
+      return telemetry?.configure(next);
+    },
+    terminal.color,
+  );
   const log = createDevLogger({ compile: compiler.compile, logger, terminal });
   telemetry = await startDevTelemetry(projectRoot, configuration, (error) =>
     log({ level: "error", event: "dev.storage.failed", fields: { message: error.message } }),

@@ -301,6 +301,7 @@
 }
 .log-trace-heading {
   font-size: 12px;
+  justify-content: flex-start;
 }
 .log-inline-trace p,
 .log-trace-state {
@@ -342,13 +343,12 @@
   gap: 3px;
   margin-top: 0;
 }
-.trace-compact .waterfall-track,
-.trace-compact .waterfall-track span {
-  min-height: 16px;
-}
 .trace-compact .waterfall-row {
-  grid-template-columns: minmax(160px, 2fr) minmax(50px, 0.8fr) 28px;
+  grid-template-columns: 44px minmax(180px, 1fr) 28px;
   gap: 6px;
+}
+.trace-compact .trace-step-meta time {
+  font-size: 9px;
 }
 .trace-compact .waterfall-label {
   font-size: 11px;
@@ -358,15 +358,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.trace-compact .waterfall-label small {
-  padding-left: 1.55rem;
+.trace-compact .trace-step-meta small {
   font-size: 10px;
-}
-.waterfall-row[data-record-type="request"] .waterfall-track span {
-  background: var(--accent);
-}
-.waterfall-row[data-record-type="phase"] .waterfall-track span {
-  background: var(--muted);
 }
 .trace-summary {
   display: grid;
@@ -384,6 +377,15 @@
   font-size: 12px;
   font-weight: 400;
   overflow-wrap: anywhere;
+}
+.trace-outcome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trace-details {
+  padding-inline: 0;
+  text-align: start;
 }
 .traces-workspace .log-inline-trace {
   border-top: 0;

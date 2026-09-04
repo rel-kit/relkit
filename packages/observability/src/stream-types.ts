@@ -14,6 +14,7 @@ export const OBSERVABILITY_STREAM_EVENT_TYPES = [
   "request.completed",
   "log.emitted",
   "span.started",
+  "span.updated",
   "span.completed",
   "job.changed",
   "event.published",

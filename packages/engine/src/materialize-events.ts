@@ -7,7 +7,7 @@ import type {
   EventTriggerRegistration,
   RegistrationPlan,
 } from "@relkit/graph";
-import type { InvocationParent, InvokeOptions } from "./invoke-types.js";
+import type { InvokeOptions } from "./invoke-types.js";
 import type { ProviderRegistry } from "./provider-registry-types.js";
 export interface EventRuntimeProvider {
   readonly registerContract: (contract: EventNode) => MaybePromise<void>;
@@ -52,9 +52,9 @@ export type EventInvocationOptions = EventInvocationContext & {
   readonly functionId: string;
   readonly input: unknown;
   readonly source: "event-delivery" | "event-replay";
-  readonly parent?: InvocationParent;
   readonly correlationId?: string;
-  readonly traceId: string;
+  readonly originRequestId?: string;
+  readonly links?: InvokeOptions<unknown, unknown>["links"];
   readonly trigger: unknown;
 };
 

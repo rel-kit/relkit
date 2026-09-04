@@ -59,6 +59,7 @@ export function createCacheClient<
 
   const run = <A>(
     operation: CacheOperation,
+    input: unknown,
     capability: CacheCapability | undefined,
     work: (context: CacheOperationContext) => MaybePromise<A>,
     validate: (value: A) => MaybePromise<A>,
@@ -90,6 +91,7 @@ export function createCacheClient<
       name: `relkit.cache.${options.cacheId}.${operation}`,
       attributes: { "relkit.cache.id": options.cacheId, "relkit.cache.operation": operation },
       signal,
+      input,
     };
     const promise = options.bridge ? options.bridge.run(execute, bridgeOptions) : execute();
     return Promise.resolve(promise)
@@ -114,7 +116,8 @@ export function createCacheClient<
     valueSchema,
     defaultTtlMs,
     maxTtlMs,
-    call: (operation, work, validate, capability) => run(operation, capability, work, validate),
+    call: (operation, input, work, validate, capability) =>
+      run(operation, input, capability, work, validate),
   });
   return client;
 }

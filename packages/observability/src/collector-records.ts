@@ -1,6 +1,5 @@
 import {
   OBSERVABILITY_MODEL_VERSION,
-  type AgentTurnRecord,
   type InvocationRecord,
   type LogRecord,
   type SpanRecord,
@@ -48,6 +47,9 @@ export function invocationRecord(value: RecordLike): InvocationRecord | undefine
   };
 }
 export function spanRecord(value: RecordLike): SpanRecord | undefined {
+  if (value.version === OBSERVABILITY_MODEL_VERSION && value.signal === "span") {
+    return value as unknown as SpanRecord;
+  }
   const spanId = text(value.spanId);
   const invocationId = text(value.invocationId);
   const traceId = text(value.traceId);
@@ -55,7 +57,6 @@ export function spanRecord(value: RecordLike): SpanRecord | undefined {
   const startedAt = text(value.startedAt);
   if (
     spanId === undefined ||
-    invocationId === undefined ||
     traceId === undefined ||
     name === undefined ||
     startedAt === undefined
@@ -73,7 +74,7 @@ export function spanRecord(value: RecordLike): SpanRecord | undefined {
     version: OBSERVABILITY_MODEL_VERSION,
     signal: "span",
     spanId,
-    invocationId,
+    ...(invocationId === undefined ? {} : { invocationId }),
     traceId,
     ...(requestId === undefined ? {} : { requestId }),
     name,
@@ -81,62 +82,22 @@ export function spanRecord(value: RecordLike): SpanRecord | undefined {
     ...(serviceId === undefined ? {} : { serviceId }),
     ...(parentSpanId === undefined ? {} : { parentSpanId }),
     ...(sourceValueResult === undefined ? {} : { source: sourceValueResult }),
-    status: value.status === "completed" ? "completed" : "started",
+    kind: ["server", "client", "producer", "consumer"].includes(String(value.kind))
+      ? (value.kind as SpanRecord["kind"])
+      : "internal",
+    status:
+      value.status === "completed"
+        ? "completed"
+        : value.status === "updated"
+          ? "updated"
+          : "started",
+    revision: integer(value.revision, value.status === "completed" ? 1 : 0),
     startedAt,
     ...(completedAt === undefined ? {} : { completedAt }),
     ...(duration === undefined ? {} : { durationMs: duration }),
     ...(outcomeValue === undefined ? {} : { outcome: outcomeValue }),
   };
 }
-export function agentTurnRecord(value: RecordLike): AgentTurnRecord | undefined {
-  const agentId = text(value.agentId);
-  const turnId = text(value.spanId);
-  const invocationId = text(value.invocationId);
-  const traceId = text(value.traceId);
-  const functionId = text(value.functionId);
-  const startedAt = text(value.startedAt);
-  if (
-    agentId === undefined ||
-    turnId === undefined ||
-    invocationId === undefined ||
-    traceId === undefined ||
-    functionId === undefined ||
-    startedAt === undefined
-  )
-    return undefined;
-  const attributes = isRecord(value.attributes) ? value.attributes : undefined;
-  const kind = value.kind === "model" || value.kind === "tool" ? value.kind : "agent";
-  const input = captureBytes(value.capture, "input");
-  const output = captureBytes(value.capture, "output");
-  const parentSpanId = text(value.parentSpanId);
-  const profile = text(attributes?.["relkit.model.profile"]);
-  const toolId = text(attributes?.["relkit.tool.id"]);
-  const toolCallId = text(attributes?.["relkit.tool.call.id"]);
-  const completedAt = text(value.completedAt);
-  const outcome = agentOutcome(value.outcome);
-  return {
-    version: OBSERVABILITY_MODEL_VERSION,
-    signal: "agent",
-    kind,
-    agentId,
-    turnId,
-    invocationId,
-    traceId,
-    functionId,
-    ...(parentSpanId === undefined ? {} : { parentSpanId }),
-    ...(profile === undefined ? {} : { profile }),
-    ...(toolId === undefined ? {} : { toolId }),
-    ...(toolCallId === undefined ? {} : { toolCallId }),
-    step: integer(attributes?.["relkit.agent.step"], 0),
-    status: value.status === "completed" ? "completed" : "started",
-    startedAt,
-    ...(completedAt === undefined ? {} : { completedAt }),
-    ...(outcome === undefined ? {} : { outcome }),
-    ...(input === undefined ? {} : { inputBytes: input }),
-    ...(output === undefined ? {} : { outputBytes: output }),
-  };
-}
-
 export function logRecord(value: RecordLike): LogRecord | undefined {
   const timestamp = text(value.timestamp);
   const component = text(value.component);
@@ -171,10 +132,6 @@ function correlation(value: RecordLike): Record<string, string> {
   return result;
 }
 
-function captureBytes(value: unknown, key: string): number | undefined {
-  return isRecord(value) && isRecord(value[key]) ? numberValue(value[key].bytes) : undefined;
-}
-
 function sourceValue(value: unknown): SpanRecord["source"] | undefined {
   const sources = "direct http job event-delivery event-replay tool agent".split(" ");
   return sources.includes(String(value)) ? (value as SpanRecord["source"]) : undefined;
@@ -182,12 +139,6 @@ function sourceValue(value: unknown): SpanRecord["source"] | undefined {
 
 function outcome(value: unknown): SpanRecord["outcome"] | undefined {
   return INVOCATION_OUTCOMES.has(String(value)) ? (value as SpanRecord["outcome"]) : undefined;
-}
-
-function agentOutcome(value: unknown): AgentTurnRecord["outcome"] | undefined {
-  return ["success", "error", "cancelled", "limit"].includes(String(value))
-    ? (value as AgentTurnRecord["outcome"])
-    : undefined;
 }
 
 function integer(value: unknown, fallback: number): number {

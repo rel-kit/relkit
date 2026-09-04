@@ -31,7 +31,9 @@ export interface ObservabilityIndexEntry {
   readonly bytes: number;
   readonly timestamp: string;
   readonly requestId?: string;
+  readonly originRequestId?: string;
   readonly traceId?: string;
+  readonly spanId?: string;
   readonly routeId?: string;
   readonly functionId?: string;
   readonly serviceId?: string;
@@ -50,7 +52,9 @@ export interface ObservabilityIndexPageOptions {
   readonly functionId?: string;
   readonly outcome?: string;
   readonly requestId?: string;
+  readonly originRequestId?: string;
   readonly traceId?: string;
+  readonly spanId?: string;
   readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
@@ -86,6 +90,7 @@ export interface ObservabilityIndex {
   readonly rebuild: () => Promise<void>;
   readonly retain: () => Promise<ObservabilityRetentionReport>;
   readonly page: (options?: ObservabilityIndexPageOptions) => ObservabilityIndexPage;
+  readonly tracePage: (options?: ObservabilityIndexPageOptions) => ObservabilityIndexPage;
   readonly read: (
     entry: ObservabilityIndexEntry,
   ) => Promise<RedactedObservabilityRecord | undefined>;

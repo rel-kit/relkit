@@ -1016,22 +1016,14 @@ declare const resolveModelSelector: (
   - [AgentCapturePolicy](#agentcapturepolicy)
   - [AgentCaptureRecord](#agentcapturerecord)
   - [AgentEdgeRelationship (type alias)](#agentedgerelationship-type-alias)
-  - [AgentObservabilityEvent (type alias)](#agentobservabilityevent-type-alias)
   - [AgentObservabilitySink (interface)](#agentobservabilitysink-interface)
   - [AgentObservedEdge (interface)](#agentobservededge-interface)
   - [AgentRuntimeHooks (interface)](#agentruntimehooks-interface)
   - [AgentSpanCapture](#agentspancapture)
-  - [AgentSpanKind (type alias)](#agentspankind-type-alias)
-  - [AgentSpanOutcome (type alias)](#agentspanoutcome-type-alias)
-  - [AgentSpanRecord (interface)](#agentspanrecord-interface)
   - [captureAgentContent](#captureagentcontent)
-  - [completeAgentSpan](#completeagentspan)
   - [createAgentCapturePolicy](#createagentcapturepolicy)
   - [createAgentSpanCapture](#createagentspancapture)
   - [emitAgentEdge](#emitagentedge)
-  - [emitAgentSpanComplete](#emitagentspancomplete)
-  - [emitAgentSpanStart](#emitagentspanstart)
-  - [startAgentSpan](#startagentspan)
 
 ---
 
@@ -1045,7 +1037,7 @@ declare const resolveModelSelector: (
 declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L10)
 
 ## AGENT_OBSERVABILITY_VERSION
 
@@ -1055,7 +1047,7 @@ declare const AGENT_OBSERVABILITY_PROTOCOL: "relkit.observability.hooks";
 declare const AGENT_OBSERVABILITY_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L11)
 
 ## AgentCapturePolicy
 
@@ -1065,7 +1057,7 @@ declare const AGENT_OBSERVABILITY_VERSION: 1;
 declare const AgentCapturePolicy: AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
 
 ## AgentCaptureRecord
 
@@ -1075,7 +1067,7 @@ declare const AgentCapturePolicy: AgentCapturePolicy;
 declare const AgentCaptureRecord: AgentCaptureRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
 
 ## AgentEdgeRelationship (type alias)
 
@@ -1096,35 +1088,7 @@ type AgentEdgeRelationship =
   | "uses-provider-profile";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L23)
-
-## AgentObservabilityEvent (type alias)
-
-**Signature**
-
-```ts
-type AgentObservabilityEvent =
-  | {
-      readonly protocol: typeof AGENT_OBSERVABILITY_PROTOCOL;
-      readonly version: typeof AGENT_OBSERVABILITY_VERSION;
-      readonly type: "span.started";
-      readonly record: AgentSpanRecord;
-    }
-  | {
-      readonly protocol: typeof AGENT_OBSERVABILITY_PROTOCOL;
-      readonly version: typeof AGENT_OBSERVABILITY_VERSION;
-      readonly type: "span.completed";
-      readonly record: AgentSpanRecord;
-    }
-  | {
-      readonly protocol: typeof AGENT_OBSERVABILITY_PROTOCOL;
-      readonly version: typeof AGENT_OBSERVABILITY_VERSION;
-      readonly type: "edge.observed";
-      readonly edge: AgentObservedEdge;
-    };
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L13)
 
 ## AgentObservabilitySink (interface)
 
@@ -1132,13 +1096,16 @@ type AgentObservabilityEvent =
 
 ```ts
 export interface AgentObservabilitySink {
-  readonly protocol?: typeof AGENT_OBSERVABILITY_PROTOCOL;
-  readonly version?: typeof AGENT_OBSERVABILITY_VERSION;
-  readonly emit: (event: AgentObservabilityEvent) => MaybePromise<void>;
+  readonly emit: (event: {
+    readonly protocol: typeof AGENT_OBSERVABILITY_PROTOCOL;
+    readonly version: typeof AGENT_OBSERVABILITY_VERSION;
+    readonly type: "edge.observed";
+    readonly edge: AgentObservedEdge;
+  }) => MaybePromise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L32)
 
 ## AgentObservedEdge (interface)
 
@@ -1152,7 +1119,7 @@ export interface AgentObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L26)
 
 ## AgentRuntimeHooks (interface)
 
@@ -1160,14 +1127,12 @@ export interface AgentObservedEdge {
 
 ```ts
 export interface AgentRuntimeHooks {
-  readonly onSpanStart?: (record: AgentSpanRecord) => MaybePromise<void>;
-  readonly onSpanComplete?: (record: AgentSpanRecord) => MaybePromise<void>;
   readonly onObservedEdge?: (edge: AgentObservedEdge) => void;
   readonly observability?: AgentObservabilitySink;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L41)
 
 ## AgentSpanCapture
 
@@ -1177,53 +1142,7 @@ export interface AgentRuntimeHooks {
 declare const AgentSpanCapture: AgentSpanCapture;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L16)
-
-## AgentSpanKind (type alias)
-
-**Signature**
-
-```ts
-type AgentSpanKind = "agent" | "model" | "tool";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L21)
-
-## AgentSpanOutcome (type alias)
-
-**Signature**
-
-```ts
-type AgentSpanOutcome = "success" | "error" | "cancelled" | "limit";
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L22)
-
-## AgentSpanRecord (interface)
-
-**Signature**
-
-```ts
-export interface AgentSpanRecord {
-  readonly kind?: AgentSpanKind;
-  readonly agentId: string;
-  readonly invocationId: string;
-  readonly functionId: string;
-  readonly name: string;
-  readonly spanId: string;
-  readonly parentSpanId?: string;
-  readonly traceId: string;
-  readonly source: "agent" | "tool";
-  readonly status: "started" | "completed";
-  readonly startedAt: string;
-  readonly completedAt?: string;
-  readonly outcome?: AgentSpanOutcome;
-  readonly attributes?: Readonly<Record<string, string | number | boolean>>;
-  readonly capture?: AgentSpanCapture;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L8)
 
 ## captureAgentContent
 
@@ -1236,21 +1155,7 @@ declare const captureAgentContent: (
 ) => AgentCaptureRecord | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L12)
-
-## completeAgentSpan
-
-**Signature**
-
-```ts
-declare const completeAgentSpan: (
-  span: AgentSpanRecord,
-  outcome: AgentSpanOutcome,
-  capture?: AgentSpanCapture,
-) => AgentSpanRecord;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L4)
 
 ## createAgentCapturePolicy
 
@@ -1262,7 +1167,7 @@ declare const createAgentCapturePolicy: (
 ) => AgentCapturePolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L5)
 
 ## createAgentSpanCapture
 
@@ -1275,7 +1180,7 @@ declare const createAgentSpanCapture: (
 ) => AgentSpanCapture | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L6)
 
 ## emitAgentEdge
 
@@ -1288,52 +1193,7 @@ declare const emitAgentEdge: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L154)
-
-## emitAgentSpanComplete
-
-**Signature**
-
-```ts
-declare const emitAgentSpanComplete: (
-  hooks: AgentRuntimeHooks | undefined,
-  record: AgentSpanRecord,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L141)
-
-## emitAgentSpanStart
-
-**Signature**
-
-```ts
-declare const emitAgentSpanStart: (
-  hooks: AgentRuntimeHooks | undefined,
-  record: AgentSpanRecord,
-) => void;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L128)
-
-## startAgentSpan
-
-**Signature**
-
-```ts
-declare const startAgentSpan: (options: {
-  readonly kind: AgentSpanKind;
-  readonly agentId: string;
-  readonly invocationId: string;
-  readonly functionId: string;
-  readonly name: string;
-  readonly traceId: string;
-  readonly parentSpanId?: string;
-  readonly attributes?: Readonly<Record<string, string | number | boolean>>;
-}) => AgentSpanRecord;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/observability.ts#L46)
 
 ## `runtime-errors.ts`
 
@@ -1389,13 +1249,10 @@ declare const createLoopTelemetry: (options: {
   readonly modelId: string;
   readonly invocationId: string;
   readonly traceId: string;
-  readonly agentSpanId: string;
   readonly capture: AgentCapturePolicy;
   readonly signal: AbortSignal;
 }) => {
-  modelSpanId: () => string | undefined;
-  toolSpanId: (callId: string) => string | undefined;
-  close: (cause: unknown, signal: AbortSignal) => void;
+  close: () => undefined;
   onStepStart: (event: GenerateTextStepStartEvent) => void;
   onToolExecutionStart: (event: ToolExecutionStartEvent) => void;
   onToolExecutionEnd: (event: ToolExecutionEndEvent) => void;
@@ -1403,7 +1260,7 @@ declare const createLoopTelemetry: (options: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-telemetry.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop-telemetry.ts#L12)
 
 ## `runtime-loop.ts`
 
@@ -1433,12 +1290,11 @@ declare const runAgentLoop: (
   maxOutputBytes: number,
   invocationId: string,
   traceId: string,
-  agentSpanId: string,
   capture: AgentCapturePolicy,
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-loop.ts#L19)
 
 ## `runtime-model.ts`
 
@@ -1495,7 +1351,7 @@ declare const resolveRuntimeModel: (options: {
 declare const createAiInputSchema: (schema: StandardSchemaV1) => FlexibleSchema<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L30)
 
 ## invokeAgentTool
 
@@ -1514,7 +1370,7 @@ declare const invokeAgentTool: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime-tool-adapter.ts#L52)
 
 ## `runtime-tools.ts`
 
@@ -1704,7 +1560,7 @@ type AgentApprovalHandler = (
 ) => MaybePromise<ApprovalDecision>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L22)
 
 ## AgentInvocationOptions (interface)
 
@@ -1725,7 +1581,7 @@ export interface AgentInvocationOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L41)
 
 ## AgentRuntime (interface)
 
@@ -1740,7 +1596,7 @@ export interface AgentRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L54)
 
 ## AgentRuntimeError
 
@@ -1750,7 +1606,7 @@ export interface AgentRuntime {
 declare const AgentRuntimeError: typeof AgentRuntimeError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L61)
 
 ## AgentRuntimeOptions (type alias)
 
@@ -1762,7 +1618,7 @@ type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L37)
 
 ## createAgentRuntime
 
@@ -1774,7 +1630,7 @@ Creates a reusable runtime for one immutable agent/provider/tool catalog.
 declare const createAgentRuntime: (options: AgentRuntimeOptions) => AgentRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L116)
 
 ## invokeAgent
 
@@ -1788,7 +1644,7 @@ declare const invokeAgent: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L64)
 
 ## runAgent
 
@@ -1798,7 +1654,7 @@ declare const invokeAgent: (
 declare const runAgent: (options: AgentRuntimeOptions & AgentInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/runtime.ts#L123)
 
 ## `signal.ts`
 

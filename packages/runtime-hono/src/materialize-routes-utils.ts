@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import type { HttpTriggerRegistration } from "@relkit/graph";
 import { mapRequest } from "./request-mapping.js";
 import { isRequestMappingFailure } from "./request-mapping.js";
+import { decodeInferredInput } from "./request-inference.js";
 import type { HttpRouteRequest, RouteMaterializationOptions } from "./materialize-routes.js";
 import {
   mapFailureResponse,
@@ -12,6 +13,7 @@ import {
 import { getRequestState } from "./middleware.js";
 import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-record-utils.js";
 import { requestFromContext } from "./request-context.js";
+import { frameworkTrace } from "@relkit/invocation";
 
 export function createRouteHandler(
   trigger: HttpTriggerRegistration,
@@ -30,6 +32,15 @@ async function handleRoute(
   const builder = state?.requestRecord;
   builder?.setRoute(trigger.id, trigger.targetFunctionId);
   builder?.setServiceId(trigger.serviceId);
+  frameworkTrace.rename(`${context.req.method} ${trigger.config.path}`);
+  frameworkTrace.setAttributes({
+    "http.route": trigger.config.path,
+    "relkit.route.id": trigger.id,
+    "relkit.function.id": trigger.targetFunctionId,
+    "code.function.name": trigger.targetFunctionId,
+    ...(trigger.serviceId === undefined ? {} : { "relkit.service.id": trigger.serviceId }),
+  });
+  frameworkTrace.event("http.route.matched", { "http.route": trigger.config.path });
   recordDetail(builder, { kind: "match", targetId: trigger.id, outcome: "success" });
   const responseOptions = responseOptionsFor(options, state?.signal);
 
@@ -39,9 +50,11 @@ async function handleRoute(
     trigger.targetFunctionId,
   );
   if (isRequestMappingFailure(input)) {
+    frameworkTrace.event("http.validation.failed");
     builder?.setOutcome("validation-error");
     return mapInputValidationResponse(trigger, input.issues, responseOptions);
   }
+  frameworkTrace.event("http.validation.completed");
   try {
     const value = await invokeWithRecord(
       options.engine,
@@ -51,7 +64,6 @@ async function handleRoute(
         source: "http",
         ...(state?.signal === undefined ? {} : { signal: state.signal }),
         ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
-        ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
         ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
         ...(typeof trigger.config.timeoutMs !== "number"
           ? {}
@@ -105,7 +117,13 @@ export async function routeInput(
       : { maxBodyBytes: trigger.config.maxBodyBytes }),
     transforms: options.manifest.requestTransforms,
   });
-  return isRequestMappingFailure(result) ? result : result.value;
+  return isRequestMappingFailure(result)
+    ? result
+    : decodeInferredInput(
+        result.value,
+        getEntry(options.manifest.routes ?? {}, trigger.id),
+        getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId),
+      );
 }
 
 export function getEntry<T>(

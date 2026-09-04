@@ -98,12 +98,17 @@ Route pages SHALL link matching middleware and show coverage; middleware pages S
 
 ### Requirement: Live resilient diagnostics and telemetry
 
-The inspector SHALL reconnect SSE by cursor, update live requests/logs/generation/diagnostics, and keep the active application UI usable when a candidate is invalid.
+The inspector SHALL reconnect SSE by cursor, update live requests/logs/generation/diagnostics, and keep the active application UI usable when a candidate is invalid. Routine Inspector server banners and HTTP access output SHALL be transient, verbose-only diagnostics that are not persisted. Inspector HTTP 5xx responses, compilation failures and crashes SHALL remain visible as safe diagnostics.
 
 #### Scenario: Invalid candidate follows valid traffic
 
 - **WHEN** compilation diagnostics arrive while the active generation continues handling requests
 - **THEN** the UI shows both current diagnostics and the still-active graph/request stream
+
+#### Scenario: Inspector navigation emits access output
+
+- **WHEN** routine Inspector page or backend-proxy requests complete below status 500
+- **THEN** default terminal and persisted logs remain unchanged while verbose mode can display the transient output
 
 ### Requirement: Safe project-relative source links
 
@@ -157,7 +162,7 @@ The graph SHALL support pan, zoom, fit, minimap, controls, search, kind filters,
 
 ### Requirement: Trace tree and waterfall
 
-Trace detail SHALL present an expandable span hierarchy and aligned waterfall with status, duration, available span/resource metadata, correlated logs/work links, search, error filtering, and timeline zoom using only redacted API data.
+Trace detail SHALL open from the trace list in a half-width sheet with reduced horizontal padding and present spans and lifecycle events as numbered steps ordered by their recorded timestamps. Each title SHALL be followed by one metadata row containing absolute date/time, concise non-redundant context, and duration text where applicable, plus a single-line ellipsized JSON input preview and expandable span hierarchy. A continuous neutral main connector SHALL show primary execution while lifecycle events branch from it with aligned elbow connectors, terminating at the final step without a trailing connection. The timeline SHALL not render duration-track backgrounds. Error steps SHALL use a non-color-only highlighted treatment. Selected spans SHALL open in a smoothly animated nested sheet and display captured redacted input, output, execution outcome, and metadata as separate sections. It SHALL also provide available resource metadata, correlated logs/work links, search, and error filtering using only redacted API data. Disabled, empty, or truncated capture SHALL be identified explicitly rather than inferred from metadata or outcome.
 
 #### Scenario: Failed trace is inspected
 
@@ -226,3 +231,30 @@ Generation state and readiness APIs SHALL report the composite activation finger
 
 - **WHEN** readiness reports an override generation from another local plan
 - **THEN** activation fails safely and Inspector identifies the mismatched cohort member
+
+### Requirement: Live request execution inspection
+
+Inspector SHALL support request to trace to selected-span navigation while execution is active and afterward. Waterfalls SHALL show nesting, timestamp offsets, durations and parallel branches; instantaneous events SHALL appear distinct from timed spans. A completed trace header SHALL prefer the authoritative request-completion record and show start time, end time and full duration. Retained redacted input and output SHALL appear on their corresponding steps, including the terminal HTTP outcome. HTTP outcome SHALL be separate from child-operation outcome and middleware duration labeled inclusive.
+
+#### Scenario: Developer opens paused HTTP request
+
+- **WHEN** a request is paused during execution
+- **THEN** Inspector shows HTTP arrival and active work immediately, then updates through response completion, failure, timeout, cancellation or explicit incomplete/abandoned state without losing prior steps
+
+### Requirement: Complete selected span panel
+
+A selected span SHALL show identity, name/kind, parent, times, duration, status/outcome, captured redacted attributes, resource attributes, events, links, correlated logs and safe errors. Logs and events SHALL remain separate. Missing/truncated/dropped data SHALL be explicit; source links SHALL resolve only against matching generation/graph data or show source unavailable.
+
+#### Scenario: Span selection survives refresh
+
+- **WHEN** a relevant trace/origin update arrives or the browser reconnects
+- **THEN** selected identity is preserved, current details reload without duplicates, and unrelated updates do not trigger refresh
+
+### Requirement: Independent trace and continuation browsing
+
+Trace browsing SHALL remain available without an HTTP request, including schedules, standalone invocations, event deliveries and job attempts. Producer/consumer links SHALL navigate separately displayed asynchronous continuations, fan-out, retry attempts and work active after HTTP completion, using accessible labels/icons rather than color alone.
+
+#### Scenario: Request enqueues retrying work
+
+- **WHEN** HTTP completes and a job fails then retries
+- **THEN** both attempt traces are navigable from the request without extending the HTTP duration

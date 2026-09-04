@@ -56,11 +56,7 @@ export function createEventBridgeProvider(options: AwsEventOptions): AwsEventPro
       publishedAt: timestamp,
       ...(request.key === undefined ? {} : { key: request.key }),
       attributes: request.attributes ?? {},
-      traceId: context.traceId,
-      ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
-      ...(context.causationInvocationId === undefined
-        ? {}
-        : { causationInvocationId: context.causationInvocationId }),
+      ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
     };
     const response = await awsRequest(endpoint, {
       service: "events",

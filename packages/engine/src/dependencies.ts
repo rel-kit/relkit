@@ -48,6 +48,8 @@ export interface DependencyBridgeOptions {
   readonly name?: string;
   readonly attributes?: Readonly<Record<string, unknown>>;
   readonly signal?: AbortSignal;
+  readonly kind?: "internal" | "server" | "client" | "producer" | "consumer";
+  readonly input?: unknown;
 }
 
 export interface DependencyBridge {

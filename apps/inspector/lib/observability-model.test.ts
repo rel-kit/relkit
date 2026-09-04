@@ -2,12 +2,19 @@ import { describe, expect, test } from "bun:test";
 import {
   mergeLiveItems,
   queryFromFilters,
-  requestTimeline,
   traceGroups,
   waterfall,
   EMPTY_SIGNAL_FILTERS,
 } from "./observability-model";
 import { defaultSignalFilters } from "./signal-defaults";
+import { attachLogs, attachSources } from "../app/signal-detail-live";
+import {
+  stepDescription,
+  stepInput,
+  stepOutcome,
+  stepOutput,
+  traceTimeline,
+} from "./trace-timeline";
 
 describe("inspector observability model", () => {
   test("defaults logs to the previous 24 hours", () => {
@@ -32,17 +39,6 @@ describe("inspector observability model", () => {
   });
 
   test("builds request timelines and parent-aware span waterfalls", () => {
-    const request = {
-      requestId: "request-1",
-      startedAt: "2026-08-16T00:00:00.000Z",
-      completedAt: "2026-08-16T00:00:00.010Z",
-      timeline: [{ kind: "function", at: "2026-08-16T00:00:00.005Z", targetId: "orders" }],
-    };
-    expect(requestTimeline(request, []).map((entry) => entry.kind)).toEqual([
-      "accepted",
-      "function",
-      "response",
-    ]);
     const spans = waterfall([
       {
         signal: "span",
@@ -72,7 +68,49 @@ describe("inspector observability model", () => {
     expect(traceGroups([{ signal: "trace", traceId: "trace-1", spanCount: 1 }])).toHaveLength(1);
   });
 
-  test("merges span updates and renders measured request phases with contiguous subtrees", () => {
+  test("attaches correlated logs and generation-safe descriptor sources to spans", () => {
+    const spans = attachSources(
+      attachLogs(
+        [{ signal: "span", traceId: "trace-1", spanId: "span-1", functionId: "orders.read" }],
+        [{ signal: "log", spanId: "span-1", message: "done" }],
+      ),
+      {
+        protocol: "relkit.inspector",
+        version: 1,
+        generationId: "generation-1",
+        graphHash: "sha256:one",
+        nodes: [
+          {
+            id: "orders.read",
+            source: { file: "src/orders/read.function.ts", line: 4, column: 1 },
+          },
+        ],
+      },
+      { generationId: "generation-1", graphHash: "sha256:one" },
+    );
+    const detail = waterfall(spans)[0]?.details;
+    expect(detail?.logs).toEqual([expect.objectContaining({ message: "done" })]);
+    expect(detail?.source).toEqual({
+      file: "src/orders/read.function.ts",
+      line: 4,
+      column: 1,
+    });
+    expect(
+      attachSources(
+        spans,
+        {
+          protocol: "relkit.inspector",
+          version: 1,
+          generationId: "generation-2",
+          graphHash: "sha256:two",
+          nodes: [],
+        },
+        { generationId: "generation-1", graphHash: "sha256:one" },
+      ),
+    ).toBe(spans);
+  });
+
+  test("merges span updates and renders canonical parent-aware spans", () => {
     const at = (ms: number) => new Date(Date.UTC(2026, 8, 3, 0, 0, 0, ms)).toISOString();
     const root = {
       signal: "span",
@@ -130,19 +168,10 @@ describe("inspector observability model", () => {
     ]);
     expect(nodes.find((node) => node.spanId === "root")).toMatchObject({
       durationMs: 30,
-      depth: 2,
+      depth: 0,
     });
-    expect(nodes.find((node) => node.kind === "mapping")).toMatchObject({
-      startedAt: at(4),
-      durationMs: 5,
-    });
-    expect(nodes[0]).toMatchObject({
-      name: "POST /orders",
-      recordType: "request",
-      spanId: "",
-      durationMs: 50,
-    });
-    expect(nodes.at(-1)).toMatchObject({ name: "response", offsetPercent: 100, widthPercent: 0 });
+    expect(nodes.find((node) => node.spanId === "child")).toMatchObject({ depth: 1 });
+    expect(nodes.find((node) => node.spanId === "nested")).toMatchObject({ depth: 2 });
     expect(traceGroups([root, complete, request])[0]).toMatchObject({
       name: "POST /orders",
       durationMs: 50,
@@ -155,5 +184,101 @@ describe("inspector observability model", () => {
       }),
     ).toHaveLength(2);
     expect(mergeLiveItems([root], { data: { ...child, requestId: "r1" } })).toHaveLength(2);
+  });
+
+  test("numbers spans and lifecycle events by recorded time with safe input and results", () => {
+    const items = waterfall(
+      [
+        {
+          signal: "span",
+          traceId: "trace-1",
+          spanId: "root",
+          name: "HTTP POST /orders",
+          startedAt: "2026-09-03T00:00:00.000Z",
+          completedAt: "2026-09-03T00:00:00.010Z",
+          outcome: "success",
+          attributes: {
+            "http.request.method": "POST",
+            "http.response.status_code": 201,
+            "relkit.request.id": "request-1",
+          },
+          events: [
+            { name: "http.request.received", timestamp: "2026-09-03T00:00:00.001Z" },
+            {
+              name: "http.response.headers",
+              timestamp: "2026-09-03T00:00:00.009Z",
+              attributes: { "http.response.status_code": 201 },
+            },
+            { name: "http.success", timestamp: "2026-09-03T00:00:00.010Z" },
+          ],
+        },
+        {
+          signal: "span",
+          traceId: "trace-1",
+          spanId: "child",
+          parentSpanId: "root",
+          name: "relkit.invoke.orders.create",
+          inputCapture: {
+            mode: "development-redacted",
+            bytes: 18,
+            truncated: false,
+            content: { orderId: "order-1" },
+          },
+          outputCapture: {
+            mode: "development-redacted",
+            bytes: 11,
+            truncated: false,
+            content: { ok: true },
+          },
+          startedAt: "2026-09-03T00:00:00.002Z",
+          completedAt: "2026-09-03T00:00:00.008Z",
+          outcome: "success",
+        },
+      ],
+      [
+        {
+          signal: "request",
+          phase: "completed",
+          requestId: "request-1",
+          traceId: "trace-1",
+          method: "POST",
+          normalizedRoute: "/orders",
+          requestBytes: 42,
+          status: 201,
+          responseBytes: 12,
+          outcome: "success",
+        },
+      ],
+    );
+    const steps = traceTimeline(items);
+    expect(steps.map((step) => step.name)).toEqual([
+      "HTTP POST /orders",
+      "http.request.received",
+      "relkit.invoke.orders.create",
+      "http.response.headers",
+      "http.success",
+    ]);
+    expect(stepInput(steps[0]!)).toMatchObject({
+      method: "POST",
+      route: "/orders",
+      bytes: 42,
+    });
+    expect(stepOutput(steps[0]!)).toMatchObject({
+      statusCode: 201,
+      bytes: 12,
+    });
+    expect(stepInput(steps[0]!)).not.toHaveProperty("id");
+    expect(steps[0]?.span.details.metadata).toMatchObject({
+      "relkit.request.id": "request-1",
+    });
+    expect(stepOutcome(steps[0]!)).toMatchObject({ outcome: "success" });
+    expect(stepDescription(steps[1]!)).toBe("HTTP POST /orders");
+    expect(steps[2]?.span.operationType).toBe("function");
+    expect(stepInput(steps[2]!)).toEqual({ orderId: "order-1" });
+    expect(stepOutput(steps[2]!)).toEqual({ ok: true });
+    expect(stepInput(steps[3]!)).toMatchObject({
+      "http.response.status_code": 201,
+    });
+    expect(stepOutput(steps[4]!)).toEqual({ statusCode: 201, bytes: 12 });
   });
 });

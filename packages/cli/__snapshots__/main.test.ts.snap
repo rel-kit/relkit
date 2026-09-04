@@ -289,6 +289,7 @@ exports[`renders focused help for every command and nested subcommand 1`] = `
     "  --project-root string       Application directory (defaults to cwd)",
     "  --port integer              Application port",
     "  --inspector-port integer    Inspector port",
+    "  --no-ports                  Skip port availability checks",
     "  --pulumi                    Require Pulumi",
     "  --no-pulumi                 Skip Pulumi requirements",
     "",

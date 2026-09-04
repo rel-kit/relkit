@@ -1,13 +1,8 @@
-import type {
-  ObservabilityRecord,
-  RequestDetail,
-  RequestDetailKind,
-  RequestOutcome,
-  RequestRecord,
-} from "./model.js";
+import type { ObservabilityRecord, RequestOutcome, RequestRecord } from "./model.js";
 
 export interface RequestRecordSink {
   readonly collect: (record: ObservabilityRecord) => unknown;
+  readonly capture?: (value: unknown) => import("./redaction.js").RedactedCapture | undefined;
   readonly read?: () => readonly ObservabilityRecord[];
   readonly readRecords?: () => readonly ObservabilityRecord[];
 }
@@ -26,15 +21,16 @@ export interface RequestRecordBuilderOptions {
 }
 
 export interface RequestDetailInput {
-  readonly kind: RequestDetailKind;
+  readonly kind: string;
   readonly at?: number | string;
   readonly durationMs?: number;
   readonly targetId?: string;
   readonly status?: number;
-  readonly outcome?: RequestDetail["outcome"];
+  readonly outcome?: RequestOutcome;
 }
 
 export interface RequestRecordBuilder {
+  readonly started: RequestRecord;
   readonly add: (detail: RequestDetailInput) => void;
   readonly setTraceId: (traceId: string) => void;
   readonly setRoute: (routeId: string, functionId: string) => void;
@@ -54,13 +50,7 @@ export function createRequestRecordBuilder(
 ): RequestRecordBuilder {
   const now = options.now ?? Date.now;
   const startedAt = options.startedAt ?? now();
-  const details: Array<{
-    readonly at: number;
-    readonly order: number;
-    readonly value: RequestDetail;
-  }> = [];
   let traceId = options.traceId;
-  let order = 0;
   let routeId = "unknown";
   let functionId = "unknown";
   let serviceId = options.serviceId;
@@ -68,19 +58,25 @@ export function createRequestRecordBuilder(
   let requestOutcome: RequestOutcome = "success";
   let errorId: string | undefined;
   let finished: RequestRecord | undefined;
+  const started = Object.freeze({
+    version: 2,
+    signal: "request",
+    phase: "started",
+    requestId: options.requestId,
+    originRequestId: options.requestId,
+    traceId,
+    generationId: options.generationId,
+    graphHash: options.graphHash,
+    startedAt: new Date(startedAt).toISOString(),
+    method: options.method,
+    rawPath: options.rawPath,
+    ...(serviceId === undefined ? {} : { serviceId }),
+    ...(validBytes(options.requestBytes) ? { requestBytes: options.requestBytes } : {}),
+  } as const satisfies RequestRecord);
 
   const add = (detail: RequestDetailInput): void => {
     if (finished !== undefined) return;
-    const at = toMillis(detail.at, now());
-    const value: RequestDetail = Object.freeze({
-      kind: detail.kind,
-      at: new Date(at).toISOString(),
-      ...(validDuration(detail.durationMs) ? { durationMs: detail.durationMs } : {}),
-      ...(text(detail.targetId) === undefined ? {} : { targetId: detail.targetId }),
-      ...(validStatus(detail.status) ? { status: detail.status } : {}),
-      ...(detail.outcome === undefined ? {} : { outcome: detail.outcome }),
-    });
-    details.push({ at, order: order++, value });
+    void detail;
   };
   const finish = (finishOptions: {
     readonly status: number;
@@ -89,16 +85,12 @@ export function createRequestRecordBuilder(
   }): RequestRecord => {
     if (finished !== undefined) return finished;
     const completedAt = finishOptions.completedAt ?? now();
-    const timeline = Object.freeze(
-      details
-        .slice()
-        .sort((left, right) => left.at - right.at || left.order - right.order)
-        .map(({ value }) => value),
-    );
     finished = Object.freeze({
-      version: 1,
+      version: 2,
       signal: "request",
+      phase: "completed",
       requestId: options.requestId,
+      originRequestId: options.requestId,
       traceId,
       generationId: options.generationId,
       graphHash: options.graphHash,
@@ -119,11 +111,11 @@ export function createRequestRecordBuilder(
         : {}),
       outcome: requestOutcome,
       ...(errorId === undefined ? {} : { errorId }),
-      timeline,
     });
     return finished;
   };
   return Object.freeze({
+    started,
     add,
     setTraceId: (value: string): void => {
       if (finished === undefined && text(value) !== undefined) traceId = value;

@@ -1,6 +1,5 @@
 import { OBSERVABILITY_MODEL_VERSION, type LogRecord, type ObservabilityRecord } from "./model.js";
 import {
-  isAgentSpan,
   isInvocation,
   isModelRecord,
   isRecord,
@@ -8,7 +7,7 @@ import {
   type RecordLike,
   text,
 } from "./collector-values.js";
-import { agentTurnRecord, invocationRecord, logRecord, spanRecord } from "./collector-records.js";
+import { invocationRecord, logRecord, spanRecord } from "./collector-records.js";
 
 export function toObservabilityRecord(value: unknown): ObservabilityRecord | undefined {
   if (!isRecord(value)) return undefined;
@@ -24,12 +23,10 @@ export function toObservabilityRecord(value: unknown): ObservabilityRecord | und
   if (type === "invocation.started" || type === "invocation.completed") {
     return record === undefined ? undefined : invocationRecord(record);
   }
-  if (type === "span.started" || type === "span.completed") {
+  if (type === "span.started" || type === "span.updated" || type === "span.completed") {
     return record === undefined ? undefined : spanRecord(record);
   }
   if (type?.startsWith("request.") === true) return requestLifecycleLog(value);
-  if (record !== undefined && isAgentSpan(record)) return agentTurnRecord(record);
-  if (isAgentSpan(value)) return agentTurnRecord(value);
   if (isInvocation(value)) return invocationRecord(value);
   if (isRuntimeLog(value)) return logRecord(value);
   return undefined;

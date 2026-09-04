@@ -1,31 +1,26 @@
-import type {
-  InvocationSource,
-  RequestDetail,
-  RequestOutcome,
-  VersionedRecord,
-} from "./model-shared.js";
+import type { InvocationSource, RequestOutcome, VersionedRecord } from "./model-shared.js";
 
 /** Completed accepted HTTP request metadata; bodies and protected headers are absent by design. */
 export interface RequestRecord extends VersionedRecord<"request"> {
+  readonly phase: "started" | "completed";
   readonly requestId: string;
   readonly traceId: string;
   readonly generationId: string;
   readonly graphHash: string;
-  readonly invocationId: string;
+  readonly invocationId?: string;
   readonly startedAt: string;
-  readonly completedAt: string;
-  readonly durationMs: number;
+  readonly completedAt?: string;
+  readonly durationMs?: number;
   readonly method: string;
   readonly rawPath: string;
-  readonly normalizedRoute: string;
-  readonly routeId: string;
-  readonly functionId: string;
-  readonly status: number;
+  readonly normalizedRoute?: string;
+  readonly routeId?: string;
+  readonly functionId?: string;
+  readonly status?: number;
   readonly requestBytes?: number;
   readonly responseBytes?: number;
-  readonly outcome: RequestOutcome;
+  readonly outcome?: RequestOutcome;
   readonly errorId?: string;
-  readonly timeline: readonly RequestDetail[];
 }
 
 /** Invocation metadata compatible with the Phase 4–10 engine hook record. */
@@ -82,8 +77,8 @@ export interface EventRecord extends VersionedRecord<"event"> {
   readonly errorId?: string;
 }
 
-export type ResourceKind = "bucket" | "cache";
-export type ResourceOperation =
+export type OperationKind = "bucket" | "cache" | "database";
+export type OperationName =
   | "put"
   | "get"
   | "head"
@@ -96,14 +91,14 @@ export type ResourceOperation =
   | "getOrSet"
   | "has"
   | "increment";
-export type ResourceOutcome =
+export type OperationOutcome =
   "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported" | "validation-error";
-export interface ResourceRecord extends VersionedRecord<"resource"> {
-  readonly kind: ResourceKind;
-  readonly resourceId: string;
-  readonly operation: ResourceOperation;
+export interface OperationRecord extends VersionedRecord<"operation"> {
+  readonly kind: OperationKind;
+  readonly operationId: string;
+  readonly operation: OperationName | string;
   readonly ownerId: string;
-  readonly outcome: ResourceOutcome;
+  readonly outcome: OperationOutcome;
   readonly startedAt: string;
   readonly completedAt?: string;
   readonly durationMs?: number;

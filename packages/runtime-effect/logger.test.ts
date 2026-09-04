@@ -48,7 +48,7 @@ test("filters levels and writes human/json records", async () => {
 
 test("formats correlated human and structured JSON logs", () => {
   const record: LogRecord = {
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info",
@@ -72,7 +72,10 @@ test("formats correlated human and structured JSON logs", () => {
 test("projects invocation and trace annotations", async () => {
   const output = capture();
   const ids = {
-    next: (kind: string) => normalizeProtocolId(`${kind}-1`),
+    next: (kind: string) =>
+      normalizeProtocolId(
+        kind === "trace" ? "10000000000000000000000000000001" : "1000000000000001",
+      ),
   };
   await Effect.runPromise(
     withRootSpan(Effect.logInfo("started").pipe(Effect.annotateLogs({ requestId: "request-1" })), {
@@ -94,7 +97,7 @@ test("projects invocation and trace annotations", async () => {
   expect(output.records[0]).toMatchObject({
     requestId: "request-1",
     invocationId: "invocation-1",
-    traceId: "trace-1",
+    traceId: "10000000000000000000000000000001",
     correlationId: "correlation-1",
     source: "direct",
     functionId: "orders.get",
@@ -113,7 +116,7 @@ test("admits versioned records and projects causes before sinks", async () => {
     ),
   );
   const [record] = collector.read();
-  expect(record).toMatchObject({ version: 1, signal: "log", level: "error" });
+  expect(record).toMatchObject({ version: 2, signal: "log", level: "error" });
   expect(record?.fields.cause).toMatchObject({
     reasons: [{ kind: "defect", detail: { message: "password=[REDACTED]" } }],
   });
@@ -142,7 +145,7 @@ test("runs redaction before either sink", async () => {
   expect(seen).toEqual(["raw secret"]);
   expect(output.records.every((record) => record.message === "[REDACTED]")).toBe(true);
   expect(output.records.every((record) => !("token" in record.fields))).toBe(true);
-  expect(output.records.every((record) => record.version === 1 && record.signal === "log")).toBe(
+  expect(output.records.every((record) => record.version === 2 && record.signal === "log")).toBe(
     true,
   );
 });

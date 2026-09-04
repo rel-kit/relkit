@@ -81,7 +81,7 @@ test("accepts every required event type and exposes drop counters", () => {
 
 function log(message: string) {
   return {
-    version: 1 as const,
+    version: 2 as const,
     signal: "log" as const,
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info" as const,

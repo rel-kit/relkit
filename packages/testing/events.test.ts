@@ -41,7 +41,13 @@ describe("testing event fake", () => {
         version: 1,
         occurredAt: new Date(100).toISOString(),
         publishedAt: new Date(100).toISOString(),
-        traceId: "test-trace-1",
+        propagation: {
+          version: 2,
+          producer: {
+            traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
+            spanId: expect.stringMatching(/^[0-9a-f]{16}$/),
+          },
+        },
       });
       expect(event.pending("relkit.event.orders.receipt.trigger")).toBe(1);
       expect(event.envelopes).toHaveLength(1);

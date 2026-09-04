@@ -4,6 +4,7 @@ import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import { getRequestState } from "./middleware.js";
 import { failureOutcome, recordDetail } from "./request-record-utils.js";
+import { publicTrace } from "@relkit/invocation";
 
 export function registerRouteMiddleware(app: Hono, options: RouteMaterializationOptions): void {
   for (const middleware of [...options.plan.middlewares].sort((a, b) => a.id.localeCompare(b.id))) {
@@ -22,10 +23,12 @@ function createMiddlewareHandler(
     const state = getRequestState(context);
     const startedAt = Date.now();
     try {
-      const result = await descriptor.handler(
-        context,
-        next,
-        await middlewareContext(middlewareId, context.req.raw, state, options),
+      const result = await publicTrace.span(`relkit.middleware.${middlewareId}`, async () =>
+        descriptor.handler(
+          context,
+          next,
+          await middlewareContext(middlewareId, context.req.raw, state, options),
+        ),
       );
       recordDetail(state?.requestRecord, {
         kind: "middleware",
@@ -72,6 +75,7 @@ async function middlewareContext(
       options.auth?.contextFor(request) ??
       Object.freeze({ getSession: () => Promise.resolve(null) }),
     log: Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop }),
+    trace: publicTrace,
     time: Object.freeze({
       now: () => new Date(),
       sleep: (milliseconds: number) =>

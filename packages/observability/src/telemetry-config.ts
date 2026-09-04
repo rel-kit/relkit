@@ -49,7 +49,7 @@ const signals = new Set<ObservabilitySignal>([
   "invocation",
   "job",
   "event",
-  "resource",
+  "operation",
   "tool",
   "agent",
   "log",

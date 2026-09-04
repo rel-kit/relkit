@@ -86,8 +86,10 @@ test("the emitted full-graph server runs agents and correlated observability", a
       request: {
         requestId,
         functionId: "orders.get",
-        timeline: expect.arrayContaining([expect.objectContaining({ kind: "function" })]),
       },
+      spans: expect.arrayContaining([
+        expect.objectContaining({ functionId: "orders.get", status: "completed" }),
+      ]),
     });
 
     await invoke(base, built.graphHash, "orders.create", {
@@ -113,6 +115,9 @@ test("the emitted full-graph server runs agents and correlated observability", a
         return traces.items.length > 0;
       }),
     ).resolves.toBe(true);
+    const requests = await page(base, "/requests?limit=100");
+    expect(requests.items).toHaveLength(1);
+    expect(requests.items[0]).toMatchObject({ requestId });
   } finally {
     streamController.abort();
     await started.stop();

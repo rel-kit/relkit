@@ -20,10 +20,6 @@ export function createEventDependencyClient(
     ...(options.signal === undefined ? {} : { signal: options.signal }),
     ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
     ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
-    ...(options.causationInvocationId === undefined
-      ? {}
-      : { causationInvocationId: options.causationInvocationId }),
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
     ...(options.now === undefined ? {} : { now: options.now }),
     ...(options.onObservedEdge === undefined
       ? {}

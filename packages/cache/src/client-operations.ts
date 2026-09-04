@@ -27,6 +27,7 @@ interface CacheOperationDependencies<
   readonly maxTtlMs: number | undefined;
   readonly call: <A>(
     operation: CacheOperation,
+    input: unknown,
     work: (context: CacheOperationContext) => MaybePromise<A>,
     validate: (value: A) => MaybePromise<A>,
     capability?: "increment",
@@ -51,6 +52,7 @@ export function createCacheOperations<
     get: (key: InferInput<KeySchema>) =>
       call(
         "get",
+        { key },
         async (context) => required(provider.get, "get")(await parseKey(key), context),
         async (value) => (value === undefined ? undefined : await parseValue(value)),
       ),
@@ -61,6 +63,7 @@ export function createCacheOperations<
     ) =>
       call(
         "set",
+        { key, value, options: optionsValue },
         async (context) =>
           required(provider.set, "set")(
             await parseKey(key),
@@ -73,12 +76,14 @@ export function createCacheOperations<
     delete: (key: InferInput<KeySchema>) =>
       call(
         "delete",
+        { key },
         async (context) => required(provider.delete, "delete")(await parseKey(key), context),
         () => undefined,
       ),
     has: (key: InferInput<KeySchema>) =>
       call(
         "has",
+        { key },
         async (context) => required(provider.has, "has")(await parseKey(key), context),
         validateBoolean,
       ),
@@ -89,6 +94,7 @@ export function createCacheOperations<
     ) =>
       call(
         "getOrSet",
+        { key, options: optionsValue },
         async (context) =>
           required(provider.getOrSet, "getOrSet")(
             await parseKey(key),
@@ -101,6 +107,7 @@ export function createCacheOperations<
     increment: (key: InferInput<KeySchema>, delta = 1, optionsValue?: CacheOperationOptions) =>
       call(
         "increment",
+        { key, delta, options: optionsValue },
         async (context) => {
           const amount = validateIncrementDelta(delta);
           if (valueSchema !== undefined) {

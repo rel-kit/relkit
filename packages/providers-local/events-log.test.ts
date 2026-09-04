@@ -82,9 +82,17 @@ function makeEnvelope() {
     payload: { orderId: "order-1", totalCents: 100 },
     occurredAt: "2026-08-15T00:00:00.000Z",
     publishedAt: "2026-08-15T00:00:01.000Z",
-    correlationId: "request-1",
-    causationInvocationId: "invocation-1",
-    traceId: "trace-1",
+    propagation: {
+      version: 2,
+      producer: {
+        traceId: "10000000000000000000000000000001",
+        spanId: "1000000000000001",
+        traceFlags: 1,
+        remote: true,
+      },
+      correlationId: "request-1",
+      invocationId: "invocation-1",
+    },
     attributes: { source: "checkout" },
   } as const;
 }

@@ -1,5 +1,6 @@
 import { createConcurrencyAdmission, effectiveConcurrencyLimit } from "./concurrency.js";
-import { bindSchedule, createAdmit } from "./materialize-jobs-utils.js";
+import { createAdmit } from "./materialize-jobs-utils.js";
+import { bindSchedule } from "./materialize-jobs-schedule.js";
 import { createBinding } from "./materialize-jobs-binding.js";
 import { consumerLimit, readPolicy, resolveQueue } from "./materialize-jobs-utils.js";
 import type {
@@ -44,7 +45,8 @@ export async function materializeJobs(
     queues.set(policy.jobId, queue);
   }
 
-  for (const registration of options.plan.schedules) bindSchedule(scheduler, registration, jobs);
+  for (const registration of options.plan.schedules)
+    bindSchedule(scheduler, registration, jobs, options.spanRuntime);
   const runNext = (jobId: string, instanceId?: string) => {
     const job = jobs.get(jobId);
     if (job === undefined) throw new JobMaterializationError(`Unknown job "${jobId}"`);

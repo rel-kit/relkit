@@ -1,126 +1,33 @@
 import { expect, test } from "bun:test";
-import {
-  appendObservedRequestDetails,
-  createRequestRecordBuilder,
-  REQUEST_OUTCOMES,
-  type ObservabilityRecord,
-} from "./src/index.ts";
+import { createRequestRecordBuilder, REQUEST_OUTCOMES } from "./src/index.ts";
 
-test("appends correlated child and dependency records in timeline order", () => {
-  const requestId = "request.test";
-  const traceId = "trace.test";
-  const at = "2026-08-16T00:00:00.000Z";
-  const completed = "2026-08-16T00:00:00.001Z";
-  const records: ObservabilityRecord[] = [
-    {
-      version: 1,
-      signal: "invocation",
-      id: "invocation.root",
-      functionId: "hello",
-      traceId,
-      correlationId: requestId,
-      startedAt: at,
-      attempt: 1,
-      source: "http",
-      status: "success",
-      completedAt: completed,
-      durationMs: 1,
-    },
-    {
-      version: 1,
-      signal: "invocation",
-      id: "invocation.child",
-      functionId: "child",
-      traceId,
-      correlationId: requestId,
-      parentId: "invocation.root",
-      startedAt: at,
-      attempt: 1,
-      source: "direct",
-      status: "success",
-      completedAt: completed,
-      durationMs: 1,
-    },
-    {
-      version: 1,
-      signal: "resource",
-      kind: "bucket",
-      resourceId: "uploads",
-      operation: "get",
-      ownerId: "hello",
-      outcome: "success",
-      traceId,
-      correlationId: requestId,
-      startedAt: at,
-      completedAt: completed,
-      durationMs: 1,
-    },
-    {
-      version: 1,
-      signal: "job",
-      jobId: "email.send",
-      instanceId: "job-1",
-      functionId: "sendEmail",
-      profile: "default",
-      state: "completed",
-      attempt: 1,
-      acceptedAt: at,
-      startedAt: at,
-      completedAt: completed,
-      durationMs: 1,
-      traceId,
-      correlationId: requestId,
-    },
-    {
-      version: 1,
-      signal: "event",
-      kind: "publication",
-      eventId: "order.created",
-      eventVersion: 1,
-      instanceId: "event-1",
-      state: "published",
-      occurredAt: at,
-      traceId,
-      correlationId: requestId,
-    },
-    {
-      version: 1,
-      signal: "tool",
-      toolId: "search",
-      functionId: "search",
-      sideEffect: "none",
-      approval: "not-required",
-      outcome: "success",
-      startedAt: at,
-      completedAt: completed,
-      durationMs: 1,
-      traceId,
-      correlationId: requestId,
-    },
-  ];
+test("emits discoverable starts and one authoritative completion without a stored timeline", () => {
   const builder = createRequestRecordBuilder({
-    requestId,
-    traceId,
+    requestId: "request.test",
+    traceId: "10000000000000000000000000000001",
     generationId: "generation.test",
     graphHash: "sha256:test",
     method: "GET",
     rawPath: "/hello",
-    startedAt: Date.parse(at),
-    now: () => Date.parse(completed),
+    startedAt: 0,
+    now: () => 1,
   });
-  builder.add({ kind: "accepted", at });
-  appendObservedRequestDetails(builder, records, requestId, traceId);
-  const record = builder.finish({ status: 200, completedAt: Date.parse(completed) });
+  builder.setRoute("hello.route", "hello");
+  builder.setInvocationId("invocation.root");
+  builder.add({ kind: "accepted", at: 0 });
+  const completed = builder.finish({ status: 200, completedAt: 1 });
 
-  expect(record.invocationId).toBe("invocation.root");
-  expect(record.timeline.map(({ kind }) => kind)).toEqual([
-    "accepted",
-    "event",
-    "child",
-    "resource",
-    "job",
-    "tool",
-  ]);
+  expect(builder.started).toMatchObject({ phase: "started", requestId: "request.test" });
+  expect(builder.started).not.toHaveProperty("completedAt");
+  expect(completed).toMatchObject({
+    phase: "completed",
+    routeId: "hello.route",
+    functionId: "hello",
+    invocationId: "invocation.root",
+    outcome: "success",
+  });
+  expect(completed).not.toHaveProperty("timeline");
+  expect(builder.finish({ status: 500 })).toBe(completed);
 });
 
 test("records every request outcome and preserves declared error identity", () => {
@@ -135,7 +42,7 @@ test("records every request outcome and preserves declared error identity", () =
   const records = cases.map(([outcome, status], index) => {
     const builder = createRequestRecordBuilder({
       requestId: `request.${index}`,
-      traceId: `trace.${index}`,
+      traceId: `${index + 1}`.padStart(32, "0"),
       generationId: "generation.test",
       graphHash: "sha256:test",
       method: "GET",
@@ -150,43 +57,4 @@ test("records every request outcome and preserves declared error identity", () =
   expect(records.map(({ outcome }) => outcome)).toEqual([...REQUEST_OUTCOMES]);
   expect(records[1]).toMatchObject({ outcome: "declared-error", errorId: "orders.conflict" });
   expect(records.map(({ status }) => status)).toEqual(cases.map(([, status]) => status));
-});
-
-test("preserves cross-signal parent and child trace correlation", () => {
-  const records: ObservabilityRecord[] = [
-    {
-      version: 1,
-      signal: "span",
-      spanId: "span.root",
-      invocationId: "invocation.root",
-      traceId: "trace.parent-child",
-      requestId: "request.parent-child",
-      name: "http.orders",
-      status: "completed",
-      startedAt: "2026-08-16T00:00:00.000Z",
-      completedAt: "2026-08-16T00:00:00.001Z",
-    },
-    {
-      version: 1,
-      signal: "span",
-      spanId: "span.child",
-      invocationId: "invocation.child",
-      traceId: "trace.parent-child",
-      correlationId: "request.parent-child",
-      parentSpanId: "span.root",
-      name: "cache.orders.get",
-      status: "completed",
-      startedAt: "2026-08-16T00:00:00.000Z",
-      completedAt: "2026-08-16T00:00:00.001Z",
-      outcome: "success",
-    },
-  ];
-  const spans = records.filter((record) => record.signal === "span");
-
-  expect(spans[0]).toMatchObject({ traceId: "trace.parent-child", spanId: "span.root" });
-  expect(spans[1]).toMatchObject({
-    traceId: "trace.parent-child",
-    correlationId: "request.parent-child",
-    parentSpanId: "span.root",
-  });
 });

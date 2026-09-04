@@ -144,7 +144,14 @@ export async function generateProject(
     context.onProgress?.("Checking generated project...");
     await runProjectStep(
       context,
-      [relkit, "doctor", "--project-root", staged, ...(deploymentCheck ? ["--no-pulumi"] : [])],
+      [
+        relkit,
+        "doctor",
+        "--project-root",
+        staged,
+        "--no-ports",
+        ...(deploymentCheck ? ["--no-pulumi"] : []),
+      ],
       staged,
       "doctor",
       "doctor",

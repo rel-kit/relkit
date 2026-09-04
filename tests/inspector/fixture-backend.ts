@@ -3,6 +3,7 @@ import { Hono } from "../../packages/inspector-api/node_modules/hono";
 import { cors } from "../../packages/inspector-api/node_modules/hono/dist/middleware/cors/index.js";
 import { PROTOCOL_VERSION } from "../../packages/contracts/src/index.ts";
 import {
+  assembleRequestExecution,
   createObservabilityStream,
   type ObservabilityQuery,
   type ObservabilityQueryRequest,
@@ -17,6 +18,8 @@ import {
 export const FIXTURE_GRAPH_HASH = "sha256:commerce-inspector-fixture-v1";
 export const FIXTURE_GENERATION_ID = "commerce-generation-1";
 export const FIXTURE_BASE_URL = "http://127.0.0.1:3212";
+const INITIAL_TRACE_ID = "11111111111111111111111111111111";
+const AGENT_TRACE_ID = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 export const FIXTURE_IDS = Object.freeze({
   route: "orders.create.http",
   function: "orders.create",
@@ -325,7 +328,7 @@ const eventPublications = [
     version: 1,
     occurredAt: now,
     publishedAt: now,
-    traceId: "trace-initial",
+    traceId: INITIAL_TRACE_ID,
     attributes: {},
   },
 ];
@@ -346,31 +349,40 @@ const eventDeliveries = [
   },
 ];
 
-const initialRequests = [makeRequest("request-initial", "trace-initial", now)];
+const initialRequests = [makeRequest("request-initial", INITIAL_TRACE_ID, now)];
 const initialLogs = [
-  makeLog("1", "trace-initial", "orders.create", "Initial fixture request recorded."),
+  makeLog(
+    "1",
+    INITIAL_TRACE_ID,
+    "orders.create",
+    "Initial fixture request recorded.",
+    "request-initial",
+  ),
 ];
 const initialTraces = [
-  ...makeTraceRecords("trace-initial", "request-initial", now),
+  ...makeTraceRecords(INITIAL_TRACE_ID, "request-initial", now),
   {
-    version: 1,
+    version: 2,
     signal: "span",
-    spanId: "agent-trace-1:tool",
+    spanId: "aaaaaaaaaaaaaaaa",
     invocationId: "agent-invocation-1",
-    traceId: "agent-trace-1",
-    name: "orders.agent.tool.orders.get.tool",
-    kind: "tool",
+    traceId: AGENT_TRACE_ID,
+    name: "relkit.agent.support.order.tool.orders.get.tool",
+    kind: "internal",
+    revision: 1,
     functionId: "relkit.agent.support.order.invoke",
-    agentId: FIXTURE_IDS.agent,
-    toolId: FIXTURE_IDS.tool,
-    toolCallId: "tool-call-1",
-    profile: "default",
-    step: 1,
     status: "completed",
     outcome: "success",
     startedAt: now,
     completedAt: now,
     durationMs: 4,
+    attributes: {
+      "relkit.agent.id": FIXTURE_IDS.agent,
+      "relkit.tool.id": FIXTURE_IDS.tool,
+      "relkit.tool.call.id": "tool-call-1",
+      "relkit.model.profile": "default",
+      "relkit.agent.step": 1,
+    },
   },
 ];
 
@@ -390,6 +402,7 @@ export function createInspectorFixture(): InspectorFixture {
   let requests = [...initialRequests];
   let logs = [...initialLogs];
   let traces = [...initialTraces];
+  let releasePaused: (() => void) | undefined;
   const stream = createObservabilityStream({ maxEvents: 100 });
   const actionServices: InspectorActionServices = {
     functions: {
@@ -441,7 +454,7 @@ export function createInspectorFixture(): InspectorFixture {
   app.post("/orders", async (context) => {
     const body = await context.req.json<Record<string, unknown>>();
     const id = `request-live-${String(++requestSequence).padStart(4, "0")}`;
-    const traceId = `trace-live-${String(requestSequence).padStart(4, "0")}`;
+    const traceId = requestSequence.toString(16).padStart(32, "0");
     const request = makeRequest(id, traceId, now, body);
     requests = [request, ...requests];
     const records = makeTraceRecords(traceId, id, now);
@@ -451,6 +464,7 @@ export function createInspectorFixture(): InspectorFixture {
       traceId,
       FIXTURE_IDS.function,
       "Order request completed.",
+      id,
     );
     logs = [log, ...logs];
     stream.publish({ type: "request.completed", data: request });
@@ -459,12 +473,64 @@ export function createInspectorFixture(): InspectorFixture {
     return context.json(
       { orderId: "order-100", receiptKey: "receipts/order-100.json", totalCents: 1000 },
       201,
-      { "x-request-id": id, "x-trace-id": traceId },
+      { "x-request-id": id },
     );
   });
   app.get("/orders/:orderId", (context) =>
     context.json({ orderId: context.req.param("orderId"), status: "confirmed", totalCents: 1000 }),
   );
+  app.post("/__fixture__/paused", async (context) => {
+    const requestId = "request-paused-0001";
+    const traceId = "22222222222222222222222222222222";
+    const activeRequest = makeActiveRequest(requestId, traceId, now);
+    const activeRecords = makeActiveTraceRecords(traceId, requestId, now);
+    requests = [activeRequest, ...requests.filter((item) => item.requestId !== requestId)];
+    traces = [...activeRecords, ...traces.filter((item) => item.traceId !== traceId)];
+    stream.publish({ type: "request.started", data: activeRequest });
+    for (const record of activeRecords.filter((item) => item.signal === "span"))
+      stream.publish({ type: "span.started", data: record });
+    await new Promise<void>((resolve) => {
+      releasePaused = resolve;
+    });
+    releasePaused = undefined;
+    const completedRequest = makeRequest(requestId, traceId, now);
+    const completedRecords = makeTraceRecords(traceId, requestId, now);
+    const continuation = makeContinuationRecords(requestId, traceId, now);
+    requests = [completedRequest, ...requests.filter((item) => item.requestId !== requestId)];
+    traces = [
+      ...completedRecords,
+      ...continuation,
+      ...traces.filter(
+        (item) => item.traceId !== traceId && item.traceId !== continuation[0]!.traceId,
+      ),
+    ];
+    stream.publish({ type: "request.completed", data: completedRequest });
+    for (const record of completedRecords.filter((item) => item.signal === "span"))
+      stream.publish({ type: "span.completed", data: record });
+    return context.json({ ok: true, requestId }, 201, { "x-request-id": requestId });
+  });
+  app.post("/__fixture__/release", (context) => {
+    releasePaused?.();
+    return context.json({ released: releasePaused !== undefined });
+  });
+  app.post("/__fixture__/outcome/:outcome", (context) => {
+    const outcome = context.req.param("outcome");
+    if (!isFixtureOutcome(outcome)) return context.json({ error: "unsupported outcome" }, 400);
+    const requestId = `request-${outcome}`;
+    const traceId =
+      outcome === "defect"
+        ? "44444444444444444444444444444444"
+        : outcome === "timeout"
+          ? "55555555555555555555555555555555"
+          : "66666666666666666666666666666666";
+    const fixture = makeOutcomeRecords(requestId, traceId, outcome, now);
+    requests = [fixture.request, ...requests.filter((item) => item.requestId !== requestId)];
+    traces = [...fixture.records, ...traces.filter((item) => item.traceId !== traceId)];
+    stream.publish({ type: "request.completed", data: fixture.request });
+    for (const record of fixture.records.filter((item) => item.signal === "span"))
+      stream.publish({ type: "span.completed", data: record });
+    return context.json({ requestId, traceId });
+  });
   app.post("/__fixture__/reset", (context) => {
     reset();
     return context.json({ ok: true });
@@ -473,10 +539,11 @@ export function createInspectorFixture(): InspectorFixture {
     logs = Array.from({ length: 65 }, (_, index) => ({
       ...makeLog(
         String(100 + index),
-        "trace-initial",
+        INITIAL_TRACE_ID,
         "orders.create",
         index % 2 ? "Order processed" : "Cache lookup",
       ),
+      timestamp: now,
       level: ["debug", "info", "warn", "error"][index % 4]!,
       fields: {
         customer: "Alice",
@@ -529,6 +596,8 @@ export function createInspectorFixture(): InspectorFixture {
   });
 
   function reset(): void {
+    releasePaused?.();
+    releasePaused = undefined;
     invalidCandidate = false;
     jobState = "dead-lettered";
     requestSequence = 1;
@@ -757,13 +826,18 @@ function makeQuery(
     traces: async (query = {}) => page(filter(read().traces, query), query),
     request: async (id) => {
       const request = read().requests.find((item) => item.requestId === id);
-      return request === undefined
+      if (request === undefined) return undefined;
+      const related = [...read().requests, ...read().traces, ...read().logs].filter(
+        (item) =>
+          item.requestId === id || item.originRequestId === id || item.traceId === request.traceId,
+      );
+      const detail = assembleRequestExecution(related as never, id);
+      return detail === undefined
         ? undefined
         : ({
             protocol: "relkit.observability.query",
             version: 1,
-            request,
-            records: relatedRecords(read().traces, id),
+            ...detail,
           } as never);
     },
     log: async (cursor) => {
@@ -818,18 +892,15 @@ function filter(items: readonly Record<string, unknown>[], query: ObservabilityQ
   );
 }
 
-function relatedRecords(items: readonly Record<string, unknown>[], requestId: string) {
-  return items.filter((item) => item.requestId === requestId || item.correlationId === requestId);
-}
-
 function integer(value: unknown): number | undefined {
   return typeof value === "string" && /^\d+$/.test(value) ? Number(value) : undefined;
 }
 
 function makeRequest(id: string, traceId: string, at: string, input: Record<string, unknown> = {}) {
   return {
-    version: 1,
+    version: 2,
     signal: "request",
+    phase: "completed",
     requestId: id,
     traceId,
     generationId: FIXTURE_GENERATION_ID,
@@ -847,22 +918,144 @@ function makeRequest(id: string, traceId: string, at: string, input: Record<stri
     requestBytes: JSON.stringify(input).length,
     responseBytes: 72,
     outcome: "success",
-    timeline: [
-      { kind: "match", at, targetId: FIXTURE_IDS.route, status: 201 },
-      { kind: "function", at, targetId: FIXTURE_IDS.function, outcome: "success" },
-      { kind: "child", at, targetId: "prices.getOrSet", outcome: "success" },
-      { kind: "response", at, status: 201, outcome: "success" },
-    ],
   };
 }
 
-function makeTraceRecords(traceId: string, requestId: string, at: string) {
+function makeActiveRequest(id: string, traceId: string, at: string) {
+  return {
+    version: 2,
+    signal: "request",
+    phase: "started",
+    requestId: id,
+    traceId,
+    generationId: FIXTURE_GENERATION_ID,
+    graphHash: FIXTURE_GRAPH_HASH,
+    startedAt: at,
+    method: "POST",
+    rawPath: "/orders",
+  };
+}
+
+function makeActiveTraceRecords(traceId: string, requestId: string, at: string) {
+  return makeTraceRecords(traceId, requestId, at).map((record) => {
+    const {
+      completedAt: _completedAt,
+      durationMs: _durationMs,
+      outcome: _outcome,
+      ...active
+    } = record;
+    if (record.signal === "trace") return { ...active, spanCount: 2 };
+    if (record.signal === "invocation") return { ...active, status: "started" };
+    return {
+      ...active,
+      status: "started",
+      revision: 0,
+      ...(record.name === "HTTP POST /orders" ? { events: record.events?.slice(0, 4) } : {}),
+    };
+  });
+}
+
+function makeContinuationRecords(originRequestId: string, parentTraceId: string, at: string) {
+  const traceId = "33333333333333333333333333333333";
+  const spanId = fixtureSpanId(traceId, "1");
   return [
     {
-      version: 1,
+      version: 2,
+      signal: "trace",
+      traceId,
+      rootSpanId: spanId,
+      startedAt: at,
+      completedAt: at,
+      durationMs: 3,
+      spanCount: 1,
+      outcome: "success",
+      originRequestId,
+    },
+    {
+      version: 2,
+      signal: "span",
+      traceId,
+      spanId,
+      originRequestId,
+      name: "relkit.event.orders.created.deliver",
+      kind: "consumer",
+      status: "completed",
+      revision: 1,
+      startedAt: at,
+      completedAt: at,
+      durationMs: 3,
+      outcome: "success",
+      links: [{ traceId: parentTraceId, spanId: fixtureSpanId(parentTraceId, "1") }],
+      attributes: { "relkit.event.id": "orders.created", "relkit.delivery.attempt": 1 },
+    },
+  ];
+}
+
+type FixtureOutcome = "defect" | "timeout" | "cancelled";
+
+function isFixtureOutcome(value: string): value is FixtureOutcome {
+  return value === "defect" || value === "timeout" || value === "cancelled";
+}
+
+function makeOutcomeRecords(
+  requestId: string,
+  traceId: string,
+  outcome: FixtureOutcome,
+  at: string,
+) {
+  const status = outcome === "timeout" ? 504 : outcome === "cancelled" ? 499 : 500;
+  const request = { ...makeRequest(requestId, traceId, at), outcome, status };
+  const records = makeTraceRecords(traceId, requestId, at).map((record) => {
+    if (record.signal === "trace") return { ...record, outcome };
+    if (record.signal === "invocation") return { ...record, status: outcome };
+    if (record.signal !== "span") return record;
+    return {
+      ...record,
+      outcome,
+      ...(record.name === "HTTP POST /orders"
+        ? {
+            attributes: {
+              ...record.attributes,
+              "http.response.status_code": status,
+              "error.type": outcome === "timeout" ? "TimeoutError" : "RequestError",
+              "error.message": `safe ${outcome} fixture`,
+            },
+            events: [...(record.events ?? []), { name: `http.${outcome}`, timestamp: at }],
+            dropped: { attributes: 2, events: 1, links: 0, updates: 0 },
+          }
+        : {}),
+    };
+  });
+  records.push({
+    version: 2,
+    signal: "span",
+    traceId,
+    spanId: fixtureSpanId(traceId, "4"),
+    parentSpanId: "ffffffffffffffff",
+    requestId,
+    name: "retained.orphan",
+    kind: "internal",
+    revision: 1,
+    status: "completed",
+    startedAt: at,
+    completedAt: at,
+    durationMs: 1,
+    outcome,
+  });
+  return { request, records };
+}
+
+function makeTraceRecords(traceId: string, requestId: string, at: string) {
+  const rootSpanId = fixtureSpanId(traceId, "1");
+  const invocationSpanId = fixtureSpanId(traceId, "2");
+  const operationSpanId = fixtureSpanId(traceId, "3");
+  return [
+    {
+      version: 2,
       signal: "trace",
       traceId,
       rootInvocationId: `${requestId}:invocation`,
+      rootSpanId,
       startedAt: at,
       completedAt: at,
       durationMs: 12,
@@ -871,14 +1064,56 @@ function makeTraceRecords(traceId: string, requestId: string, at: string) {
       requestId,
     },
     {
-      version: 1,
+      version: 2,
       signal: "span",
-      spanId: `${traceId}:function`,
+      spanId: rootSpanId,
+      traceId,
+      requestId,
+      name: "HTTP POST /orders",
+      kind: "server",
+      revision: 1,
+      status: "completed",
+      startedAt: at,
+      completedAt: at,
+      durationMs: 12,
+      outcome: "success",
+      attributes: {
+        "http.request.method": "POST",
+        "http.route": "/orders",
+        "http.response.status_code": 201,
+        "relkit.request.id": requestId,
+      },
+      resourceAttributes: { "service.name": "commerce-api" },
+      events: [
+        { name: "http.request.received", timestamp: at },
+        {
+          name: "http.route.matched",
+          timestamp: at,
+          attributes: { "relkit.route.id": FIXTURE_IDS.route },
+        },
+        { name: "http.request.mapped", timestamp: at },
+        { name: "http.request.validated", timestamp: at },
+        {
+          name: "http.response.headers",
+          timestamp: at,
+          attributes: { "http.response.status_code": 201 },
+        },
+        { name: "http.response.completed", timestamp: at },
+      ],
+      dropped: { attributes: 0, events: 0, links: 0, updates: 0 },
+    },
+    {
+      version: 2,
+      signal: "span",
+      spanId: invocationSpanId,
       invocationId: `${requestId}:invocation`,
       traceId,
       requestId,
-      name: "orders.create",
+      name: "relkit.invoke.orders.create",
       functionId: FIXTURE_IDS.function,
+      parentSpanId: rootSpanId,
+      kind: "internal",
+      revision: 1,
       status: "completed",
       startedAt: at,
       completedAt: at,
@@ -886,14 +1121,16 @@ function makeTraceRecords(traceId: string, requestId: string, at: string) {
       outcome: "success",
     },
     {
-      version: 1,
+      version: 2,
       signal: "span",
-      spanId: `${traceId}:cache`,
+      spanId: operationSpanId,
       invocationId: `${requestId}:invocation`,
       traceId,
       requestId,
       name: "prices.getOrSet",
-      parentSpanId: `${traceId}:function`,
+      parentSpanId: invocationSpanId,
+      kind: "client",
+      revision: 1,
       status: "completed",
       startedAt: at,
       completedAt: at,
@@ -901,7 +1138,7 @@ function makeTraceRecords(traceId: string, requestId: string, at: string) {
       outcome: "success",
     },
     {
-      version: 1,
+      version: 2,
       signal: "invocation",
       id: `${requestId}:invocation`,
       requestId,
@@ -917,19 +1154,30 @@ function makeTraceRecords(traceId: string, requestId: string, at: string) {
   ];
 }
 
-function makeLog(cursor: string, traceId: string, functionId: string, message: string) {
+function fixtureSpanId(traceId: string, prefix: string): string {
+  return `${prefix}${traceId.slice(-15)}`;
+}
+
+function makeLog(
+  cursor: string,
+  traceId: string,
+  functionId: string,
+  message: string,
+  requestId?: string,
+) {
   return {
-    version: 1,
+    version: 2,
     signal: "log",
     cursor,
     timestamp: new Date().toISOString(),
     level: "info",
     origin: "application",
-    spanId: `${traceId}:function`,
+    spanId: fixtureSpanId(traceId, "2"),
     component: "fixture",
     message,
     fields: {},
     traceId,
     functionId,
+    ...(requestId === undefined ? {} : { requestId }),
   };
 }

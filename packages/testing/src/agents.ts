@@ -1,5 +1,12 @@
 import type { AgentApprovalHandler, AgentObservedEdge, PendingApproval } from "@relkit/agents";
 import { invokeAgent } from "@relkit/agents";
+import {
+  completeSpan,
+  runInExecutionContext,
+  spanSnapshot,
+  SpanRuntime,
+  startRootSpan,
+} from "@relkit/invocation";
 import { createFailures } from "./jobs-utils.js";
 import { createTestModel } from "./agents-model.js";
 import type {
@@ -39,12 +46,25 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
     ...(options.model ?? {}),
     ...(options.script === undefined ? {} : { script: options.script }),
   });
-  const spans: import("@relkit/agents").AgentSpanRecord[] = [];
+  const spans: ReturnType<typeof spanSnapshot>[] = [];
   const edges: AgentObservedEdge[] = [];
   const pending = new Map<string, PendingApproval>();
   const resolvers = new Map<string, (decision: "approved" | "denied") => void>();
   const trace = createTrace(spans, edges);
-  const hooks = captureHooks(options.hooks, spans, edges);
+  const hooks = captureHooks(options.hooks, edges);
+  const spanRuntime = new SpanRuntime({
+    ids: {
+      next: (kind) =>
+        kind === "trace"
+          ? crypto.randomUUID().replaceAll("-", "")
+          : crypto.randomUUID().replaceAll("-", "").slice(0, 16),
+    },
+    observer: (event) => {
+      if (event.span.name !== "relkit.testing.agent" && event.type !== "updated") {
+        spans.push(spanSnapshot(event));
+      }
+    },
+  });
   const engine = {
     invoke: async (request: Parameters<typeof options.engine.invoke>[0]) => {
       const result = await options.engine.invoke(request);
@@ -60,23 +80,31 @@ export function createTestAgent<Agent extends TestAgentDescriptor>(
     invocation: TestAgentInvocationOptions = {},
   ): Promise<import("@relkit/schema").InferOutput<Agent["output"]>> => {
     const invocationId = invocation.invocationId ?? `test-agent-${++invocationSequence}`;
-    return invokeAgent({
-      agent: options.agent,
-      tools: options.tools,
-      engine,
-      modelRegistry: {
-        resolveModel: () => ({ id: model.modelId, model: model.languageModel }),
-      },
-      ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
-      ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
-      ...(approval === undefined ? {} : { approval }),
-      ...(options.capture === undefined ? {} : { capture: options.capture }),
-      ...invocation,
-      input,
-      invocationId,
-      traceId: invocation.traceId ?? invocationId,
-      hooks,
-    }) as Promise<import("@relkit/schema").InferOutput<Agent["output"]>>;
+    const root = startRootSpan(spanRuntime, "relkit.testing.agent", "internal");
+    try {
+      return (await runInExecutionContext({ span: root, runtime: spanRuntime }, () =>
+        invokeAgent({
+          agent: options.agent,
+          tools: options.tools,
+          engine,
+          modelRegistry: {
+            resolveModel: () => ({ id: model.modelId, model: model.languageModel }),
+          },
+          ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
+          ...(options.maxOutputBytes === undefined
+            ? {}
+            : { maxOutputBytes: options.maxOutputBytes }),
+          ...(approval === undefined ? {} : { approval }),
+          ...(options.capture === undefined ? {} : { capture: options.capture }),
+          ...invocation,
+          input,
+          invocationId,
+          hooks,
+        }),
+      )) as import("@relkit/schema").InferOutput<Agent["output"]>;
+    } finally {
+      completeSpan(root);
+    }
   };
   const approvals = Object.freeze({
     pending: () => Object.freeze([...pending.values()]),

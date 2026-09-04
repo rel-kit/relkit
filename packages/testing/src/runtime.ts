@@ -28,7 +28,6 @@ export interface TestRuntimeOptions {
   /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
   readonly stateRoot?: string;
 }
-
 export interface TestRuntimeCloseOptions {
   readonly failed?: boolean;
 }
@@ -39,7 +38,6 @@ export interface TestClock {
   readonly advance: (milliseconds: number) => Promise<void>;
   readonly setTime: (timestamp: number) => Promise<void>;
 }
-
 export interface TestRuntime {
   readonly stateRoot: string;
   readonly fakes: TestFakes;
@@ -188,7 +186,15 @@ function validateTimeout(value: number): void {
 function createIdSource() {
   let sequence = 0;
   return Object.freeze({
-    next: (kind: "trace" | "invocation" | "span") =>
-      `test-${kind}-${++sequence}` as import("@relkit/contracts").ProtocolId,
+    next: (kind: "trace" | "invocation" | "span") => {
+      const value = ++sequence;
+      return (
+        kind === "trace"
+          ? value.toString(16).padStart(32, "0")
+          : kind === "span"
+            ? value.toString(16).padStart(16, "0")
+            : `test-invocation-${value}`
+      ) as import("@relkit/contracts").ProtocolId;
+    },
   });
 }

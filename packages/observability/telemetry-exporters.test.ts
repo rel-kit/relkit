@@ -180,7 +180,7 @@ function sink(exportRecord: TelemetryExporterRuntime["exportRecord"]): Telemetry
 
 function admitted(): RedactedObservabilityRecord {
   return admitObservabilityRecord({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-09-02T00:00:00.000Z",
     level: "info",

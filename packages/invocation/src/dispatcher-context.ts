@@ -9,6 +9,7 @@ import type {
   StructuredLogRecord,
 } from "./dispatcher-types.js";
 import type { ManagedDependencyCategory } from "./dispatcher-types.js";
+import { currentExecutionContext } from "./dispatcher-scope.js";
 
 export class DependencyNotConfiguredError extends Error {
   readonly code = "RELKIT_DEPENDENCY_NOT_CONFIGURED" as const;
@@ -60,14 +61,21 @@ export function createLocalStructuredLogger(
     message: string,
     fields: Readonly<Record<string, unknown>> | undefined,
   ): void => {
+    const active = currentExecutionContext();
     entries.push(
       Object.freeze({
         level,
         message,
         fields: Object.freeze({ ...(fields ?? {}) }),
         timestamp: time.now().toISOString(),
-        invocationId: record.id,
-        traceId: record.traceId,
+        invocationId: active?.invocationId ?? record.id,
+        traceId: active?.span.traceId ?? record.traceId,
+        ...(active?.span.spanId === undefined ? {} : { spanId: active.span.spanId }),
+        ...(active?.requestId === undefined ? {} : { requestId: active.requestId }),
+        ...(active?.originRequestId === undefined
+          ? {}
+          : { originRequestId: active.originRequestId }),
+        ...(active?.correlationId === undefined ? {} : { correlationId: active.correlationId }),
         functionId: record.functionId,
         source: record.source,
         ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),

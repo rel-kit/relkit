@@ -40,7 +40,7 @@ test("dev severity is presentation only; raw and structured child logs are disti
       output:
         "\u001e" +
         JSON.stringify({
-          version: 1,
+          version: 2,
           signal: "log",
           timestamp: new Date().toISOString(),
           level: "warn",
@@ -59,6 +59,61 @@ test("dev severity is presentation only; raw and structured child logs are disti
   });
   expect(stored).toHaveLength(count + 1);
   expect(stored.at(-1)?.component).toBe("app");
+});
+
+test("routine Inspector output is verbose-only and never persisted", () => {
+  const stored: LogRecord[] = [];
+  const visible: string[] = [];
+  const log = createDevLogger({
+    compile: async () => undefined,
+    logger: { human: { write: (line) => visible.push(line) } },
+    onRecord: (record) => stored.push(record),
+  });
+  log({
+    level: "warn",
+    event: "inspector.output",
+    fields: {
+      channel: "stderr",
+      output: "GET /_relkit/backend/_relkit/v1/traces/missing 404 in 64ms",
+    },
+  });
+  log({
+    level: "info",
+    event: "inspector.output",
+    fields: { channel: "stdout", output: "▲ Next.js 16" },
+  });
+  expect(stored).toEqual([]);
+  expect(visible).toEqual([]);
+
+  const verbose: string[] = [];
+  const verboseLog = createDevLogger({
+    compile: async () => undefined,
+    logger: { human: { write: (line) => verbose.push(line) } },
+    terminal: { verbose: true },
+    onRecord: (record) => stored.push(record),
+  });
+  verboseLog({
+    level: "warn",
+    event: "inspector.output",
+    fields: {
+      channel: "stderr",
+      output: "GET /_relkit/backend/_relkit/v1/traces/missing 404 in 64ms",
+    },
+  });
+  expect(verbose.join("\n")).toContain("traces/missing 404");
+  expect(stored).toEqual([]);
+
+  log({
+    level: "warn",
+    event: "inspector.output",
+    fields: {
+      channel: "stderr",
+      output: "GET /_relkit/backend/_relkit/v1/graph 500 in 64ms",
+    },
+  });
+  expect(stored).toHaveLength(1);
+  expect(stored[0]).toMatchObject({ component: "inspector", level: "error" });
+  expect(visible.join("\n")).toContain("graph 500");
 });
 
 test("truncated runtime presentation copies are never persisted a second time", async () => {
@@ -107,7 +162,7 @@ test("UTF-8, split secrets, final output, and oversized diagnostics remain conti
 
 test("narrow formatting preserves complete URLs, errors, local milliseconds, and flags", () => {
   const record: LogRecord = {
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-09-03T00:00:00.123Z",
     level: "info",

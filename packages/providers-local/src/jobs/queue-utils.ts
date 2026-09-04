@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import type { JsonValue, TracePropagation } from "@relkit/contracts";
 
 export const JOB_QUEUE_STATES = [
   "accepted",
@@ -33,6 +33,12 @@ export interface JobQueueEntry {
   readonly leaseExpiresAt?: number;
   readonly idempotency?: JobIdempotencyRecord;
   readonly failure?: JobFailureMetadata;
+  readonly propagation?: TracePropagation;
+}
+
+export interface MutableQueueState {
+  readonly entries: Map<string, JobQueueEntry>;
+  nextOrder: number;
 }
 
 /** Durable acceptance information returned by queue admission. */
@@ -65,6 +71,7 @@ export interface JobQueueEnqueue {
   readonly instanceId?: string;
   readonly acceptedAt?: number;
   readonly idempotency?: JobIdempotencyDefinition;
+  readonly propagation?: TracePropagation;
 }
 export interface JobQueueLeaseOptions {
   readonly leaseDurationMs?: number;

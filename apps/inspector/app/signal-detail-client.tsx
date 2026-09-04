@@ -8,6 +8,7 @@ import { requestDetail, traceDetail } from "../lib/observability-api";
 import { eventRecord, records, text } from "../lib/observability-model";
 import { SignalDetailView } from "./signal-detail-view";
 import { Button } from "../components/ui/button";
+import { attachLogs, attachSources, isSignalDetailEvent } from "./signal-detail-live";
 
 interface SignalDetailData {
   readonly nextCursor?: string;
@@ -17,6 +18,8 @@ interface SignalDetailData {
   readonly spans: readonly InspectorObject[];
   readonly logs: readonly InspectorObject[];
   readonly requests: readonly InspectorObject[];
+  readonly continuations?: readonly InspectorObject[];
+  readonly incomplete?: readonly string[];
 }
 
 export function SignalDetailClient({ kind }: { readonly kind: "requests" | "traces" }) {
@@ -74,14 +77,17 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
     const stream = createInspectorBackendStream({
       onStateChange: (snapshot) => mounted && setLiveState(snapshot.state),
       onEvent: (event) => {
-        if (!detailEvent(kind, event.type)) return;
+        if (!isSignalDetailEvent(event.type)) return;
         const signal = eventRecord(event);
         const correlations =
           signal === undefined
             ? []
-            : [text(signal.requestId), text(signal.traceId), text(signal.correlationId)].filter(
-                (value) => value !== "",
-              );
+            : [
+                text(signal.requestId),
+                text(signal.originRequestId),
+                text(signal.traceId),
+                text(signal.correlationId),
+              ].filter((value) => value !== "");
         if (signal !== undefined && (correlations.length === 0 || !correlations.includes(id)))
           return;
         api.invalidate([kind, "signals"]);
@@ -137,7 +143,7 @@ async function loadRequest(
   const request = detail.request;
   if (request === undefined) throw new Error("Request unavailable");
   const traceId = text(request.traceId);
-  const [logs, traces] = await Promise.all([
+  const [logs, traces, graph] = await Promise.all([
     api.query<InspectorObject>(
       "logs",
       traceId === "" ? { requestId: id, limit: 100 } : { traceId, limit: 100 },
@@ -146,11 +152,21 @@ async function loadRequest(
       "traces",
       traceId === "" ? { requestId: id, limit: 100 } : { traceId, limit: 100 },
     ),
+    api.graph(),
   ]);
   return {
     request,
+    ...(detail.continuations ? { continuations: detail.continuations } : {}),
+    ...(detail.incomplete ? { incomplete: detail.incomplete } : {}),
     records: records(detail.records),
-    spans: traces.items.filter((item) => item.signal === "span" || text(item.spanId) !== ""),
+    spans: attachSources(
+      attachLogs(
+        traces.items.filter((item) => item.signal === "span" || text(item.spanId) !== ""),
+        logs.items,
+      ),
+      graph,
+      request,
+    ),
     logs: logs.items,
     requests: [],
   };
@@ -167,34 +183,17 @@ async function loadTrace(
     detailSpans.length > 0
       ? detailSpans
       : traceRecords.filter((item) => item.signal === "span" || text(item.spanId) !== "");
-  const [logs, requests] = await Promise.all([
+  const [logs, requests, graph] = await Promise.all([
     api.query<InspectorObject>("logs", { traceId: id, limit: 100 }),
     api.query<InspectorObject>("requests", { traceId: id, limit: 100 }),
+    api.graph(),
   ]);
   return {
     ...(detail.trace === undefined ? {} : { trace: detail.trace }),
     ...(detail.nextCursor ? { nextCursor: detail.nextCursor } : {}),
     records: traceRecords,
-    spans,
+    spans: attachSources(attachLogs(spans, logs.items), graph, detail.trace ?? requests.items[0]),
     logs: logs.items,
     requests: requests.items,
   };
-}
-
-function detailEvent(kind: "requests" | "traces", type: string): boolean {
-  return kind === "requests"
-    ? [
-        "request.started",
-        "request.completed",
-        "span.started",
-        "span.completed",
-        "log.emitted",
-      ].includes(type)
-    : [
-        "request.started",
-        "request.completed",
-        "span.started",
-        "span.completed",
-        "log.emitted",
-      ].includes(type);
 }

@@ -72,7 +72,16 @@ export function registerEventContractSuite(target: EventContractTarget): void {
           payload: { orderId: "order-1" },
           key: "order-1",
           attributes: { source: "contract" },
-          traceId: "test-trace-1",
+          propagation: {
+            version: 2,
+            correlationId: "contract-correlation",
+            invocationId: "contract-invocation",
+            producer: {
+              traceId: expect.any(String),
+              spanId: expect.any(String),
+              traceFlags: 1,
+            },
+          },
         });
         expect(event.envelopes).toHaveLength(1);
         expect(event.pending()).toBe(1);

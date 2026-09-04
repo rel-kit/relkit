@@ -106,6 +106,10 @@ export function expectedExports(
   if (directoryName === "client")
     return {
       ".": rootExport,
+      "./server": {
+        types: "./dist/server.d.ts",
+        bun: "./dist/server.js",
+      },
       "./tanstack-query": {
         types: "./dist/tanstack-query.d.ts",
         import: "./dist/tanstack-query.js",

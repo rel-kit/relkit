@@ -11,7 +11,7 @@ import type {
   InvocationRecord,
   JobRecord,
   RequestRecord,
-  ResourceRecord,
+  OperationRecord,
   ToolRecord,
 } from "./model-records.js";
 
@@ -51,18 +51,41 @@ export interface LogRecord extends VersionedRecord<"log"> {
 
 export interface SpanRecord extends VersionedRecord<"span"> {
   readonly spanId: string;
-  readonly invocationId: string;
+  readonly invocationId?: string;
   readonly traceId: string;
   readonly name: string;
   readonly functionId?: string;
   readonly parentSpanId?: string;
   readonly source?: InvocationSource;
-  readonly status: "started" | "completed";
+  readonly kind: "internal" | "server" | "client" | "producer" | "consumer";
+  readonly status: "started" | "updated" | "completed";
+  readonly revision: number;
   readonly startedAt: string;
   readonly completedAt?: string;
   readonly durationMs?: number;
   readonly outcome?: InvocationOutcome;
+  readonly inputCapture?: import("./redaction.js").RedactedCapture;
+  readonly outputCapture?: import("./redaction.js").RedactedCapture;
   readonly attributes?: SafeAttributes;
+  readonly resourceAttributes?: SafeAttributes;
+  readonly events?: readonly {
+    readonly name: string;
+    readonly timestamp: string;
+    readonly attributes?: SafeAttributes;
+    readonly droppedAttributes?: number;
+  }[];
+  readonly links?: readonly {
+    readonly traceId: string;
+    readonly spanId: string;
+    readonly attributes?: SafeAttributes;
+  }[];
+  readonly error?: { readonly type?: string; readonly message?: string };
+  readonly dropped?: {
+    readonly attributes: number;
+    readonly events: number;
+    readonly links: number;
+    readonly updates: number;
+  };
 }
 
 export interface TraceRecord extends VersionedRecord<"trace"> {
@@ -116,7 +139,7 @@ export type ObservabilityRecord =
   | InvocationRecord
   | JobRecord
   | EventRecord
-  | ResourceRecord
+  | OperationRecord
   | ToolRecord
   | AgentTurnRecord
   | LogRecord

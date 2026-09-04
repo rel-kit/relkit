@@ -6,10 +6,9 @@ import type {
   AgentObservedEdge,
   AgentRuntimeHooks,
   AgentRuntimeOptions,
-  AgentSpanKind,
-  AgentSpanRecord,
   PendingApproval,
 } from "@relkit/agents";
+import type { spanSnapshot } from "@relkit/invocation";
 import type { JsonValue } from "@relkit/contracts";
 import type { InferInput, InferOutput } from "@relkit/schema";
 import type { TestFailureControls } from "./fakes.js";
@@ -72,7 +71,7 @@ export type TestAgentInvocationOptions = Omit<
 >;
 
 export interface TestAgentTraceSnapshot {
-  readonly spans: readonly AgentSpanRecord[];
+  readonly spans: readonly ReturnType<typeof spanSnapshot>[];
   readonly edges: readonly AgentObservedEdge[];
 }
 
@@ -83,7 +82,7 @@ export interface TestAgentTrace extends TestAgentTraceSnapshot {
 }
 
 export interface TestAgentTraceExpectation {
-  readonly spanKinds?: readonly AgentSpanKind[];
+  readonly spanKinds?: readonly ReturnType<typeof spanSnapshot>["kind"][];
   readonly names?: readonly string[];
   readonly edges?: readonly AgentObservedEdge[];
 }

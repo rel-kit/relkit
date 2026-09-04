@@ -1,5 +1,6 @@
 import { getJsonSchema } from "@relkit/schema";
 import { ApprovalRequiredError } from "./approval.js";
+import { frameworkTrace } from "@relkit/invocation";
 import type { AgentCapturePolicy } from "./observability.js";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import {
@@ -25,7 +26,6 @@ export async function runAgentLoop(
   maxOutputBytes: number,
   invocationId: string,
   traceId: string,
-  agentSpanId: string,
   capture: AgentCapturePolicy,
 ): Promise<unknown> {
   const sdk = await import("ai");
@@ -38,7 +38,6 @@ export async function runAgentLoop(
     modelId,
     invocationId,
     traceId,
-    agentSpanId,
     capture,
     signal,
   });
@@ -52,14 +51,16 @@ export async function runAgentLoop(
       throw fatalToolError;
     }
     try {
-      return await runTool(
-        options,
-        turn,
-        signal,
-        maxOutputBytes,
-        invocationId,
-        traceId,
-        telemetry.toolSpanId(turn.callId),
+      return await frameworkTrace.span(
+        `relkit.tool.${turn.toolId}`,
+        {
+          input: turn.input,
+          attributes: {
+            "relkit.tool.id": turn.toolId,
+            "relkit.tool.call.id": turn.callId,
+          },
+        },
+        () => runTool(options, turn, signal, maxOutputBytes, invocationId, traceId),
       );
     } catch (cause) {
       if (cause instanceof ApprovalRequiredError) fatalToolError = cause;
@@ -85,12 +86,24 @@ export async function runAgentLoop(
     onStepEnd: telemetry.onStepEnd,
   });
   try {
-    const result = await withSignal(
-      agent.generate({
-        prompt: JSON.stringify(jsonValue(input, maxInputBytes, "agent input")),
-        abortSignal: signal,
-      }),
-      signal,
+    const result = await frameworkTrace.span(
+      `relkit.agent.${options.agent.id}.model`,
+      {
+        input,
+        kind: "client",
+        attributes: {
+          "relkit.agent.id": options.agent.id,
+          "relkit.model.id": modelId,
+        },
+      },
+      () =>
+        withSignal(
+          agent.generate({
+            prompt: JSON.stringify(jsonValue(input, maxInputBytes, "agent input")),
+            abortSignal: signal,
+          }),
+          signal,
+        ),
     );
     if (fatalToolError !== undefined) throw fatalToolError;
     if (
@@ -105,7 +118,7 @@ export async function runAgentLoop(
       "output",
     );
   } catch (cause) {
-    telemetry.close(cause, signal);
+    telemetry.close();
     if (signal.aborted) throw signalFailure(signal);
     if (fatalToolError !== undefined) throw fatalToolError;
     if (cause instanceof AgentRuntimeError) throw cause;

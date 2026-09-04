@@ -11,7 +11,7 @@ interface OverlayDialogProps {
   readonly title: string;
   readonly description?: string;
   readonly children: ReactNode;
-  readonly placement?: "center" | "right";
+  readonly placement?: "center" | "right" | "right-wide";
   readonly isOpen?: boolean;
   readonly onOpenChange?: (open: boolean) => void;
 }
@@ -28,19 +28,25 @@ export function OverlayDialog({
   return (
     <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
       {trigger}
-      <ModalOverlay className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[2px] entering:animate-in exiting:animate-out">
+      <ModalOverlay className="overlay-dialog-backdrop fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[2px]">
         <Modal
+          data-placement={placement}
           className={cx(
-            "fixed overflow-auto border border-[var(--line)] bg-[var(--panel)] shadow-2xl outline-none entering:animate-in entering:duration-200 exiting:animate-out exiting:duration-150",
-            placement === "right"
-              ? "inset-y-0 right-0 h-full w-[min(32rem,94vw)] rounded-l-xl border-y-0 border-r-0 entering:slide-in-from-right exiting:slide-out-to-right"
-              : "left-1/2 top-[12vh] max-h-[90vh] w-[min(42rem,92vw)] -translate-x-1/2 rounded-xl entering:zoom-in-95 exiting:zoom-out-95",
+            "overlay-dialog-panel fixed overflow-auto border border-[var(--line)] bg-[var(--panel)] shadow-2xl outline-none",
+            placement !== "center"
+              ? `inset-y-0 right-0 h-full ${placement === "right-wide" ? "w-[min(64rem,96vw)]" : "w-[min(32rem,94vw)]"} rounded-l-xl border-y-0 border-r-0`
+              : "left-1/2 top-[12vh] max-h-[90vh] w-[min(42rem,92vw)] -translate-x-1/2 rounded-xl",
           )}
         >
           <Dialog className="outline-none">
             {({ close }) => (
               <>
-                <header className="flex items-start justify-between gap-4 border-b border-[var(--line)] p-5">
+                <header
+                  className={cx(
+                    "flex items-start justify-between gap-4 border-b border-[var(--line)]",
+                    placement === "center" ? "p-5" : "px-1 py-4 text-start",
+                  )}
+                >
                   <div>
                     <Heading slot="title" className="text-lg font-semibold">
                       {title}
@@ -53,7 +59,9 @@ export function OverlayDialog({
                     <X aria-hidden="true" className="size-4" />
                   </Button>
                 </header>
-                <div className="p-5">{children}</div>
+                <div className={placement === "center" ? "p-5" : "px-1 py-4 text-start"}>
+                  {children}
+                </div>
               </>
             )}
           </Dialog>

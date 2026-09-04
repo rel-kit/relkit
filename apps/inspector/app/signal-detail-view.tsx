@@ -19,6 +19,8 @@ interface SignalDetailViewProps {
   readonly logs: readonly InspectorObject[];
   readonly requests: readonly InspectorObject[];
   readonly liveState: string;
+  readonly continuations?: readonly InspectorObject[];
+  readonly incomplete?: readonly string[];
 }
 
 export function SignalDetailView(props: SignalDetailViewProps) {
@@ -51,7 +53,10 @@ export function SignalDetailView(props: SignalDetailViewProps) {
       />
       {isRequest && request !== undefined && <RequestExchangePanel request={request} />}
       {isRequest && request !== undefined && (
-        <TimelinePanel request={request} records={props.records} />
+        <TimelinePanel request={request} spans={props.spans} />
+      )}
+      {isRequest && (
+        <ContinuationsPanel items={props.continuations ?? []} incomplete={props.incomplete ?? []} />
       )}
       {!isRequest && <WaterfallPanel spans={props.spans} requests={props.requests} />}
       {isRequest && traceId !== "" && (
@@ -65,6 +70,51 @@ export function SignalDetailView(props: SignalDetailViewProps) {
       {!isRequest && props.requests.length > 0 && <RequestsPanel items={props.requests} />}
       <LogsPanel items={props.logs} />
     </div>
+  );
+}
+
+function ContinuationsPanel({
+  items,
+  incomplete,
+}: {
+  readonly items: readonly InspectorObject[];
+  readonly incomplete: readonly string[];
+}) {
+  return (
+    <section className="panel" aria-labelledby="continuations-heading">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">LINKED ASYNC WORK</p>
+          <h2 id="continuations-heading">Continuations</h2>
+        </div>
+        <span className="badge">{items.length}</span>
+      </div>
+      {items.length === 0 ? (
+        <p className="supporting-copy">No linked event or job traces are retained.</p>
+      ) : (
+        <ul className="request-list">
+          {items.map((item) => {
+            const traceId = text(item.traceId);
+            return (
+              <li className="request-row" key={traceId}>
+                <span>
+                  <strong>{item.active === true ? "Running" : "Recorded"}</strong> ·{" "}
+                  {bounded(traceId)}
+                </span>
+                <a className="text-link" href={`/traces/${encodeURIComponent(traceId)}`}>
+                  Open trace →
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {incomplete.length > 0 && (
+        <p className="supporting-copy" role="status">
+          Incomplete telemetry: {incomplete.join(", ")}.
+        </p>
+      )}
+    </section>
   );
 }
 

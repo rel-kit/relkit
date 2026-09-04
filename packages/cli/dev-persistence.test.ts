@@ -171,7 +171,7 @@ async function checkCliJsonSession(projectRoot: string, root: string) {
     await request;
     expect(exit).toBe(130);
     const records = stderr.map((line) => JSON.parse(line));
-    expect(records.every((record) => record.version === 1 && record.signal === "log")).toBe(true);
+    expect(records.every((record) => record.version === 2 && record.signal === "log")).toBe(true);
     expect(records.some((record) => record.component === "runtime.http")).toBe(true);
     expect(
       records.some(
@@ -205,7 +205,7 @@ test("remote capture redacts before transport and reports dropped records withou
   });
   try {
     const base = {
-      version: 1,
+      version: 2,
       signal: "log",
       timestamp: new Date().toISOString(),
       level: "debug",

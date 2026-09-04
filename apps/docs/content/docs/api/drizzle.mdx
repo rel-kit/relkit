@@ -107,7 +107,7 @@ declare const createDatabaseContext: <Service extends DrizzleServiceDescriptor<a
 ) => DatabaseContext<Service>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/context.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/context.ts#L7)
 
 ## `index.ts`
 
@@ -608,7 +608,7 @@ declare const defineModel: <
 }) => ModelDescriptor<T, Extensions>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L41)
 
 Since v0.1.0
 
@@ -629,7 +629,7 @@ declare const RESERVED_OPERATIONS: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L13)
 
 ## createBoundModel
 
@@ -639,7 +639,7 @@ declare const RESERVED_OPERATIONS: readonly [
 declare const createBoundModel: (binding: ModelBinding, model?: ModelDescriptorAny) => object;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L76)
 
 ## modelRuntimeOf
 
@@ -649,7 +649,32 @@ declare const createBoundModel: (binding: ModelBinding, model?: ModelDescriptorA
 declare const modelRuntimeOf: (value: ModelDescriptorAny) => ModelRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.ts#L68)
+
+## `operation-tracing.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [withOperationTracing](#withoperationtracing)
+
+---
+
+# utils
+
+## withOperationTracing
+
+**Signature**
+
+```ts
+declare const withOperationTracing: (
+  operation: (binding: ModelBinding, name: string, args: unknown) => Promise<unknown>,
+) => (binding: ModelBinding, name: string, args: unknown) => Promise<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operation-tracing.ts#L4)
 
 ## `operations.ts`
 
@@ -676,7 +701,7 @@ declare const runOperation: (
 ) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.ts#L4)
 
 ## `runtime-types.ts`
 

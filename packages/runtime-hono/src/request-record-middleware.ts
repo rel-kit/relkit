@@ -1,9 +1,5 @@
 import type { Context } from "hono";
-import {
-  appendObservedRequestDetails,
-  createRequestRecordBuilder,
-  type RequestOutcome,
-} from "@relkit/observability";
+import { createRequestRecordBuilder, type RequestOutcome } from "@relkit/observability";
 import {
   setRequestState,
   type HttpMiddlewareOptions,
@@ -28,6 +24,7 @@ export function ensureRequestRecord(
     ...(requestBytes === undefined ? {} : { requestBytes }),
     ...(options.now === undefined ? {} : { now: options.now }),
   });
+  options.observability.collect(requestRecord.started);
   requestRecord.add({ kind: "accepted", at: state.startedAt });
   const next = Object.freeze({ ...state, requestRecord });
   setRequestState(context, next);
@@ -39,12 +36,10 @@ export function finishRequestRecord(
   state: HttpRequestState,
   options: HttpMiddlewareOptions,
   outcome: RequestOutcome,
-): void {
+): import("@relkit/observability").RequestRecord | undefined {
   const builder = state.requestRecord;
   const sink = options.observability;
-  if (builder === undefined || sink === undefined) return;
-  const records = sink.read?.() ?? sink.readRecords?.() ?? [];
-  appendObservedRequestDetails(builder, records, state.requestId, state.traceId);
+  if (builder === undefined || sink === undefined) return undefined;
   const responseStatus = context.res.status;
   const effectiveOutcome = builder.setOutcome(
     outcome === "success" && responseStatus >= 500 ? "defect" : outcome,
@@ -53,12 +48,12 @@ export function finishRequestRecord(
     responseStatus >= 400 ? responseStatus : fallbackStatus(effectiveOutcome, responseStatus);
   builder.add({ kind: "response", status, outcome: effectiveOutcome });
   const responseBytes = contentLength(context.res);
-  sink.collect(
-    builder.finish({
-      status,
-      ...(responseBytes === undefined ? {} : { responseBytes }),
-    }),
-  );
+  const record = builder.finish({
+    status,
+    ...(responseBytes === undefined ? {} : { responseBytes }),
+  });
+  sink.collect(record);
+  return record;
 }
 
 function contentLength(value: Request | Response): number | undefined {

@@ -14,6 +14,13 @@ import {
 } from "../../packages/events/src/index.ts";
 import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
+import { createSpanId, createTraceId } from "../../packages/contracts/src/index.ts";
+import {
+  completeSpan,
+  runInExecutionContext,
+  SpanRuntime,
+  startRootSpan,
+} from "../../packages/invocation/dist/index.js";
 
 test("EventBridge keeps the published envelope and delivery/replay metadata", async () => {
   const requests: Array<{ Entries: Array<{ Detail: string }> }> = [];
@@ -52,11 +59,16 @@ test("EventBridge keeps the published envelope and delivery/replay metadata", as
     version: event.version,
     payloadSchema: event.input,
     source: provider,
-    correlationId: "correlation",
-    causationInvocationId: "parent",
-    traceId: "trace",
   });
-  const receipt = await client.publish({ id: "1" });
+  const runtime = new SpanRuntime({
+    ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+  });
+  const root = startRootSpan(runtime, "request", "server");
+  const receipt = await runInExecutionContext(
+    { span: root, runtime, correlationId: "correlation", invocationId: "parent" },
+    () => client.publish({ id: "1" }),
+  );
+  completeSpan(root);
   const envelope = JSON.parse(requests[0]!.Entries[0]!.Detail);
   expect(envelope).toMatchObject({
     instanceId: receipt.instanceId,
@@ -71,7 +83,12 @@ test("EventBridge keeps the published envelope and delivery/replay metadata", as
     expect.objectContaining({
       event: expect.objectContaining({ instanceId: receipt.instanceId }),
       delivery: { attempt: 2, replayed: true },
-      trace: { traceId: "trace", correlationId: "correlation", causationInvocationId: "parent" },
+      trace: {
+        producerTraceId: root.traceId,
+        producerSpanId: receipt.propagation?.producer.spanId,
+        correlationId: "correlation",
+        causationInvocationId: "parent",
+      },
     }),
   ]);
   await expect(

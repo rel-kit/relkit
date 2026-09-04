@@ -21,14 +21,13 @@ import {
 import { admitObservabilityRecord } from "../record-admission.js";
 import type { RedactionPolicy } from "../redaction.js";
 import type { RedactedObservabilityRecord } from "../record-admission.js";
-
 export const SEGMENT_DIRECTORIES = ["requests", "logs", "traces"] as const;
 export type SegmentDirectory = (typeof SEGMENT_DIRECTORIES)[number];
 const TRACE_SIGNALS = new Set<ObservabilitySignal>([
   "invocation",
   "job",
   "event",
-  "resource",
+  "operation",
   "tool",
   "agent",
   "span",
@@ -36,7 +35,6 @@ const TRACE_SIGNALS = new Set<ObservabilitySignal>([
   "diagnostic",
   "generation",
 ]);
-
 export interface SegmentFile {
   readonly path: string;
   readonly number: number;
@@ -148,8 +146,17 @@ async function repairFile(path: string, directory: SegmentDirectory, policy?: Re
   let changed = !contents.endsWith("\n") && contents.length > 0;
   for (const line of contents.split("\n")) {
     if (line === "") continue;
+    let value: unknown;
     try {
-      const value = JSON.parse(line) as unknown;
+      value = JSON.parse(line) as unknown;
+    } catch {
+      malformed = true;
+      break;
+    }
+    if (isRecord(value) && value.version !== OBSERVABILITY_MODEL_VERSION) {
+      throw new Error("RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE: use fresh development state");
+    }
+    try {
       const safe = isRecord(value) ? admitObservabilityRecord(value, policy) : undefined;
       if (!isStoredRecord(safe, directory)) throw new Error("invalid segment record");
       const canonical = canonicalJson(safe);
@@ -188,6 +195,6 @@ function isStoredRecord(
   );
 }
 
-function isRecord(value: unknown): value is ObservabilityRecord {
+function isRecord(value: unknown): value is ObservabilityRecord & { readonly version?: unknown } {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

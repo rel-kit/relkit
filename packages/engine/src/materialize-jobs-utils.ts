@@ -1,5 +1,5 @@
-import type { QueueRegistration, ScheduleRegistration } from "@relkit/graph";
-import type { RetryPolicy, ScheduleDefinition } from "@relkit/jobs";
+import type { QueueRegistration } from "@relkit/graph";
+import type { RetryPolicy } from "@relkit/jobs";
 import type {
   JobIdempotencyDefinition,
   JobMaterializationOptions,
@@ -7,8 +7,6 @@ import type {
   JobQueueFactoryContext,
   JobQueueHandle,
   JobQueueSource,
-  JobScheduler,
-  MaterializedJob,
 } from "./materialize-jobs-types.js";
 import { JobMaterializationError } from "./materialize-jobs-types.js";
 import { createConcurrencyAdmission } from "./concurrency.js";
@@ -62,29 +60,6 @@ export async function resolveQueue(
   if (queue === undefined)
     throw new JobMaterializationError(`Queue provider returned no queue for "${policy.jobId}"`);
   return queue;
-}
-
-export function bindSchedule(
-  scheduler: JobScheduler,
-  registration: ScheduleRegistration,
-  jobs: ReadonlyMap<string, MaterializedJob>,
-): void {
-  const job = jobs.get(registration.jobId);
-  if (job === undefined)
-    throw new JobMaterializationError(`Schedule "${registration.id}" targets an unknown job`);
-  scheduler.register(scheduleDefinition(registration), (input, context) =>
-    job.enqueue(input, { acceptedAt: context.fireAt.getTime() }),
-  );
-}
-
-function scheduleDefinition(registration: ScheduleRegistration): ScheduleDefinition {
-  if (!isRecord(registration.schedule))
-    throw new JobMaterializationError(`Schedule "${registration.id}" is not an object`);
-  const scheduleId =
-    typeof registration.schedule.id === "string"
-      ? `${registration.jobId}.${registration.schedule.id}`
-      : registration.id.replaceAll(":", ".");
-  return { ...registration.schedule, id: scheduleId } as unknown as ScheduleDefinition;
 }
 
 const DEFAULT_RETRY: RetryPolicy = Object.freeze({

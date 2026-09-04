@@ -57,7 +57,7 @@ describe("testing agent harness", () => {
     expect(first.agent.model.calls).toHaveLength(2);
     expect(second.agent.model.calls).toHaveLength(0);
     first.agent.trace.assert({
-      spanKinds: ["agent", "model", "model", "tool", "tool", "model", "model", "agent"],
+      spanKinds: ["internal", "client", "internal", "internal", "client", "internal"],
       edges: [{ relationship: "uses-tool", from: "support.order", to: "orders.lookup.tool" }],
     });
     expect(first.invocations).toHaveLength(1);

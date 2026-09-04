@@ -161,9 +161,9 @@ function workerConfiguration(
         RELKIT_EVENT_DELIVERY_SEMANTICS: "at-least-once",
         RELKIT_EVENT_ROUTING: "eventId+version",
         RELKIT_EVENT_ENVELOPE_PATH: "$.envelope",
-        RELKIT_EVENT_TRACE_PATH: "$.envelope.traceId",
-        RELKIT_EVENT_CORRELATION_PATH: "$.envelope.correlationId",
-        RELKIT_EVENT_CAUSATION_PATH: "$.envelope.causationInvocationId",
+        RELKIT_EVENT_TRACE_PATH: "$.envelope.propagation.producer.traceId",
+        RELKIT_EVENT_CORRELATION_PATH: "$.envelope.propagation.correlationId",
+        RELKIT_EVENT_CAUSATION_PATH: "$.envelope.propagation.invocationId",
       }),
     );
   return {
@@ -180,9 +180,9 @@ function workerConfiguration(
     visibilityTimeoutSeconds: trigger.visibilityTimeoutSeconds,
     deliverySemantics: "at-least-once",
     envelopePath: "$.envelope",
-    tracePath: "$.envelope.traceId",
-    correlationPath: "$.envelope.correlationId",
-    causationPath: "$.envelope.causationInvocationId",
+    tracePath: "$.envelope.propagation.producer.traceId",
+    correlationPath: "$.envelope.propagation.correlationId",
+    causationPath: "$.envelope.propagation.invocationId",
     environment,
   };
 }

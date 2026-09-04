@@ -19,7 +19,6 @@ import {
   type TelemetryExportDecision,
   type TelemetryExportRecord,
 } from "./telemetry-sampling.js";
-
 export interface TelemetryPipelineCounters {
   readonly persisted: number;
   readonly streamed: number;
@@ -28,7 +27,6 @@ export interface TelemetryPipelineCounters {
   readonly severityFiltered: number;
   readonly exportFailures: number;
 }
-
 export interface ObservabilityRuntimeOptions extends ObservabilityCollectorOptions {
   readonly remote?: RemoteObservabilityOptions;
   readonly root?: string;
@@ -36,7 +34,6 @@ export interface ObservabilityRuntimeOptions extends ObservabilityCollectorOptio
   readonly exportRecord?: TelemetryExportRecord;
   readonly exporter?: TelemetryExporterFanout;
 }
-
 export async function createObservabilityRuntime(options: ObservabilityRuntimeOptions = {}) {
   if (options.remote !== undefined)
     return createRemoteObservabilityRuntime(options, options.remote);
@@ -155,6 +152,7 @@ export async function createObservabilityRuntime(options: ObservabilityRuntimeOp
     },
     read: collector.read,
     readRecords: collector.read,
+    capture: collector.capture,
     query,
     stream,
     exporterStats: () => options.exporter?.stats() ?? Object.freeze([]),
@@ -170,7 +168,6 @@ export async function createObservabilityRuntime(options: ObservabilityRuntimeOp
     },
   });
 }
-
 function countDecision(
   counters: { exportSelected: number; sampledOut: number; severityFiltered: number },
   decision: TelemetryExportDecision,
@@ -186,10 +183,15 @@ function retention(value: NonNullable<TelemetryConfiguration["localRetention"]>)
 }
 
 function streamType(record: ObservabilityRecord): ObservabilityStreamEventType | undefined {
-  if (record.signal === "request") return "request.completed";
+  if (record.signal === "request")
+    return record.phase === "started" ? "request.started" : "request.completed";
   if (record.signal === "log") return "log.emitted";
   if (record.signal === "span")
-    return record.status === "started" ? "span.started" : "span.completed";
+    return record.status === "started"
+      ? "span.started"
+      : record.status === "updated"
+        ? "span.updated"
+        : "span.completed";
   if (record.signal === "job") return "job.changed";
   if (record.signal === "event")
     return record.kind === "publication" ? "event.published" : "event.delivery.changed";

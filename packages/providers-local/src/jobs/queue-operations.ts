@@ -1,7 +1,8 @@
 import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { acceptance, prepareIdempotency } from "./idempotency.js";
-import { makeEntry, nextEntry, persist } from "./queue-entry.js";
+import { nextEntry, persist } from "./queue-entry.js";
+import { makeEntry } from "./queue-entry-create.js";
 import {
   assertTime,
   JobQueueStateError,
@@ -9,6 +10,7 @@ import {
   type JobQueueAcceptance,
   type JobQueueEntry,
   type JobQueue,
+  type MutableQueueState,
   type JobQueueLeaseOptions,
   type JobQueueState,
   type JobQueueTransitionOptions,
@@ -18,10 +20,6 @@ import { assertLeaseOwner, leaseTransitionOptions } from "./lease-utils.js";
 import { acquireQueueLease } from "./queue-lease.js";
 import { createJobQueueAdminMutations, type JobQueueAdminMutations } from "./queue-admin.js";
 import { orderedQueueEntries, recoverQueueEntries } from "./queue-recovery.js";
-export interface MutableQueueState {
-  readonly entries: Map<string, JobQueueEntry>;
-  nextOrder: number;
-}
 export type JobQueueMutations = Pick<
   JobQueue,
   "ready" | "enqueue" | "acquire" | "renew" | "transition" | "recover" | "expire"
@@ -72,6 +70,7 @@ export function createJobQueueMutations(
         acceptedAt,
         state.nextOrder + 1,
         0,
+        input.propagation,
         undefined,
         undefined,
         undefined,

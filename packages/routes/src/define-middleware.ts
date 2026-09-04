@@ -6,7 +6,12 @@ import {
   type DescriptorBase,
   type MaybePromise,
 } from "@relkit/contracts";
-import { createUnboundIdentity, type PublicClock, type PublicLogger } from "@relkit/invocation";
+import {
+  createUnboundIdentity,
+  type PublicClock,
+  type PublicLogger,
+  type PublicTrace,
+} from "@relkit/invocation";
 import type { AuthContext, ResolvedApplicationEnv } from "@relkit/functions";
 
 export interface MiddlewareContext {
@@ -15,6 +20,7 @@ export interface MiddlewareContext {
   readonly auth: AuthContext;
   readonly log: PublicLogger;
   readonly time: PublicClock;
+  readonly trace: PublicTrace;
 }
 
 export type MiddlewareHandler = (

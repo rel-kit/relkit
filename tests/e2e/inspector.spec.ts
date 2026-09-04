@@ -28,7 +28,7 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
   await page.getByRole("button", { name: "Send request" }).click();
   await expect(page.getByRole("heading", { name: "Active backend result" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open request record" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open trace" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open trace" })).toHaveCount(0);
 });
 
 test("keeps contracts available when observability is unavailable", async ({ page }) => {
@@ -77,10 +77,56 @@ test("shows a new request live and renders its correlated timeline and edges", a
 
   await page.getByRole("link", { name: "Traces" }).click();
   await expect(page.getByRole("heading", { name: "Traces" })).toBeVisible();
-  await page.locator('[data-trace-id="trace-live-0002"]').click();
+  await page.locator('[data-trace-id="00000000000000000000000000000002"]').click();
   await expect(page.getByRole("link", { name: "Open full trace" })).toBeVisible();
   await page.getByRole("link", { name: "Open full trace" }).click();
   await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+});
+
+test("follows a paused request through completion and linked work", async ({ page, request }) => {
+  await page.goto("/requests");
+  const pending = request.post(`${backend}/__fixture__/paused`);
+  await expect(page.getByText("request-paused-0001")).toBeVisible();
+  await page.getByRole("link", { name: "Open request" }).first().click();
+
+  await expect(page.getByRole("heading", { name: "Request detail" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Request timeline" })).toBeVisible();
+  await expect(page.getByText("In progress").first()).toBeVisible();
+  await page.getByRole("button", { name: "Inspect HTTP POST /orders" }).click();
+  const spanDialog = page.getByRole("dialog", { name: "HTTP POST /orders" });
+  await expect(spanDialog).toBeVisible();
+  await spanDialog.getByRole("tab", { name: "Metadata" }).click();
+  await expect(spanDialog.getByText(/relkit\.request\.id/)).toBeVisible();
+  await spanDialog.getByRole("tab", { name: "Events" }).click();
+  await expect(spanDialog.getByText(/http\.request\.received/)).toBeVisible();
+
+  await request.post(`${backend}/__fixture__/release`);
+  await pending;
+  await expect(page.getByText("http.response.completed", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Continuations" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open trace" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("request-paused-0001").first()).toBeVisible();
+  await expect(page.getByText("http.request.received", { exact: false })).toHaveCount(1);
+  await page.getByRole("link", { name: /222222222222/ }).click();
+  await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+});
+
+test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({
+  page,
+  request,
+}) => {
+  for (const outcome of ["defect", "timeout", "cancelled"] as const) {
+    await request.post(`${backend}/__fixture__/outcome/${outcome}`);
+    await page.goto(`/requests/request-${outcome}`);
+    await expect(page.getByRole("heading", { name: "Request detail" })).toBeVisible();
+    await expect(page.getByText(outcome, { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Incomplete telemetry: missing-parent/)).toBeVisible();
+    await page.getByRole("button", { name: "Inspect HTTP POST /orders" }).click();
+    await page.getByRole("tab", { name: "Metadata" }).click();
+    await expect(page.getByText(/"attributes": 2/)).toBeVisible();
+  }
 });
 
 test("renders every required inspector page", async ({ page }) => {

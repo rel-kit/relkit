@@ -8,6 +8,7 @@ import type {
   TraceRecord,
 } from "./model.js";
 import type { RedactionPolicy } from "./redaction.js";
+import type { RequestExecutionDetail } from "./execution-assembly.js";
 
 export const OBSERVABILITY_QUERY_PROTOCOL = "relkit.observability.query" as const;
 export const OBSERVABILITY_QUERY_VERSION = PROTOCOL_VERSION;
@@ -29,7 +30,9 @@ export interface ObservabilityQueryRequest {
   readonly functionId?: string;
   readonly outcome?: string;
   readonly requestId?: string;
+  readonly originRequestId?: string;
   readonly traceId?: string;
+  readonly spanId?: string;
   readonly serviceId?: string;
   readonly generationId?: string;
   readonly graphHash?: string;
@@ -54,10 +57,7 @@ export type LogQueryResponse = ObservabilityQueryPage<LogQueryItem>;
 export type TraceQueryItem = TraceRecord | SpanRecord | RequestRecord;
 export type TraceQueryResponse = ObservabilityQueryPage<TraceQueryItem>;
 
-export interface RequestDetailResponse extends ObservabilityQueryVersion {
-  readonly request: RequestRecord;
-  readonly records: readonly ObservabilityRecord[];
-}
+export interface RequestDetailResponse extends ObservabilityQueryVersion, RequestExecutionDetail {}
 
 export interface LogDetailResponse extends ObservabilityQueryVersion {
   readonly log: LogQueryItem;

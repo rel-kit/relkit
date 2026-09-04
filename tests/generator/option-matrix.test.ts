@@ -113,6 +113,7 @@ test("covers every template and examples/install/Git combination", async () => {
             ["relkit", "doctor"],
             ["relkit", "check"],
           ]);
+          expect(commands.at(-2)).toContain("--no-ports");
           expect(commands.at(-2)).toContain("--no-pulumi");
           expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-relkit-`))).toBe(
             false,

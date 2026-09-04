@@ -113,10 +113,13 @@ afterEach(async () => {
 
 function request(requestId: string, generationId: string, graphHash: string) {
   return {
-    version: 1 as const,
+    version: 2 as const,
     signal: "request" as const,
+    phase: "completed" as const,
     requestId,
-    traceId: `trace-${requestId}`,
+    traceId: requestId.endsWith("first")
+      ? "10000000000000000000000000000001"
+      : "10000000000000000000000000000002",
     generationId,
     graphHash,
     invocationId: `invocation-${requestId}`,
@@ -130,7 +133,6 @@ function request(requestId: string, generationId: string, graphHash: string) {
     functionId: "health.check",
     status: 200,
     outcome: "success" as const,
-    timeline: [],
   };
 }
 

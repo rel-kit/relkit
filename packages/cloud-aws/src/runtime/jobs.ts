@@ -1,4 +1,4 @@
-import type { JsonValue } from "@relkit/contracts";
+import { parseTracePropagation, type JsonValue, type TracePropagation } from "@relkit/contracts";
 import type { JobQueueFactoryContext, JobQueueHandle } from "@relkit/engine";
 import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@relkit/jobs";
 import { type AwsCredentials, text } from "./config.js";
@@ -41,9 +41,9 @@ export function createSqsJobProvider(options: AwsJobOptions): AwsJobProvider {
     await assertResponse(response, operation);
     return response.text();
   };
-  const send = async (input: unknown, correlationId?: string) => {
+  const send = async (input: unknown, correlationId?: string, propagation?: TracePropagation) => {
     const xml = await request(
-      { Action: "SendMessage", MessageBody: JSON.stringify({ input, correlationId }) },
+      { Action: "SendMessage", MessageBody: JSON.stringify({ input, correlationId, propagation }) },
       "SQS enqueue",
     );
     return decodeXml(
@@ -59,7 +59,11 @@ export function createSqsJobProvider(options: AwsJobOptions): AwsJobProvider {
       if (context.signal.aborted)
         throw context.signal.reason ?? new Error("Job operation cancelled");
       return {
-        instanceId: await send(input, requestOptions.correlationId ?? context.correlationId),
+        instanceId: await send(
+          input,
+          requestOptions.correlationId ?? context.correlationId,
+          context.propagation,
+        ),
         accepted: true as const,
       };
     },
@@ -70,14 +74,14 @@ export function createSqsJobProvider(options: AwsJobOptions): AwsJobProvider {
 function createQueue(
   context: JobQueueFactoryContext,
   request: (values: Record<string, string>, operation: string) => Promise<string>,
-  send: (input: unknown, correlationId?: string) => Promise<string>,
+  send: (input: unknown, correlationId?: string, propagation?: TracePropagation) => Promise<string>,
 ): JobQueueHandle {
   type Entry = Awaited<ReturnType<JobQueueHandle["enqueue"]>>;
   const entries = new Map<string, Entry>();
   const receipts = new Map<string, string>();
   let order = 0;
   const enqueue = async (value: Parameters<JobQueueHandle["enqueue"]>[0]): Promise<Entry> => {
-    const instanceId = await send(value.input);
+    const instanceId = await send(value.input, undefined, value.propagation);
     const acceptedAt = value.acceptedAt ?? Date.now();
     const entry = Object.freeze({
       instanceId,
@@ -90,6 +94,7 @@ function createQueue(
       acceptedAt,
       availableAt: acceptedAt,
       order: ++order,
+      ...(value.propagation === undefined ? {} : { propagation: value.propagation }),
     });
     entries.set(instanceId, entry);
     return entry;
@@ -107,7 +112,14 @@ function createQueue(
     if (message === undefined) return undefined;
     const instanceId = field(message, "MessageId") ?? `job-${crypto.randomUUID()}`;
     const body = field(message, "Body");
-    const parsed = body === undefined ? {} : (JSON.parse(body) as { readonly input?: JsonValue });
+    const parsed =
+      body === undefined
+        ? {}
+        : (JSON.parse(body) as {
+            readonly input?: JsonValue;
+            readonly propagation?: unknown;
+          });
+    const propagation = parseTracePropagation(parsed.propagation);
     const receipt = field(message, "ReceiptHandle");
     if (receipt !== undefined) receipts.set(instanceId, receipt);
     const entry = Object.freeze({
@@ -120,6 +132,7 @@ function createQueue(
       attempt: Number(field(message, "ApproximateReceiveCount") ?? "1"),
       acceptedAt: Date.now(),
       order: ++order,
+      ...(propagation === undefined ? {} : { propagation }),
     });
     entries.set(instanceId, entry);
     return entry;

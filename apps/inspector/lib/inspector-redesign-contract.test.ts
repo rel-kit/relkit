@@ -23,10 +23,27 @@ describe("inspector redesign contracts", () => {
   });
 
   test("provides React Flow and an interactive redacted trace waterfall", async () => {
-    const [flow, relationships, trace, model] = await Promise.all([
+    const [
+      flow,
+      relationships,
+      trace,
+      rows,
+      traceList,
+      logTrace,
+      traceSummary,
+      signalPage,
+      styles,
+      model,
+    ] = await Promise.all([
       app("graph/graph-flow.tsx"),
       app("graph/graph-relationships.tsx"),
       app("trace-waterfall.tsx"),
+      app("trace-waterfall-rows.tsx"),
+      app("traces/traces-client.tsx"),
+      app("logs/log-trace.tsx"),
+      app("logs/log-trace-summary.tsx"),
+      Bun.file(`${import.meta.dir}/use-signal-page.ts`).text(),
+      app("globals.css"),
       Bun.file(`${import.meta.dir}/observability-trace-model.ts`).text(),
     ]);
     for (const feature of ["ReactFlow", "MiniMap", "Controls", "fitView"])
@@ -34,7 +51,30 @@ describe("inspector redesign contracts", () => {
     expect(relationships).toContain("Relationship table");
     expect(trace).toContain("Errors only");
     expect(trace).toContain("Collapse all");
-    expect(trace).toContain("Attributes & logs");
+    expect(trace).toContain("Numbered by recorded time");
+    expect(trace).not.toContain("Timeline zoom");
+    expect(rows).toContain('data-branch={event ? "true" : "false"}');
+    expect(rows).not.toContain("trace-step-summary");
+    expect(rows).not.toContain("waterfall-track");
+    expect(rows).toContain("valuePreview(stepInput(step))");
+    expect(rows).toContain("valuePreview(stepOutput(step))");
+    expect(rows).toContain('className="trace-step-meta"');
+    expect(rows).not.toContain("timeline-event-icon");
+    expect(rows).not.toContain("span.depth * 1.1");
+    expect(rows).not.toContain("onToggle");
+    expect(traceList).toContain('placement="right"');
+    expect(traceList).toContain("100 traces per page");
+    expect(signalPage).toContain('kind === "traces" ? 100 : 50');
+    expect(logTrace).toContain('item.phase === "completed"');
+    expect(logTrace).toContain('client.query("logs", { traceId, limit: 100 })');
+    expect(logTrace).toContain("attachLogs");
+    expect(traceSummary).toContain('{ label: "Ended at"');
+    expect(traceSummary).toContain("/routes/${encodeURIComponent(routeId)}");
+    expect(traceSummary).toContain("/functions/${encodeURIComponent(functionId)}");
+    expect(traceSummary).toContain('outcome === "success"');
+    expect(styles).toContain('.timeline-sequence[data-branch="true"]::before');
+    expect(styles).toContain(".trace-panel .waterfall-row:last-child::before");
+    expect(styles).toContain('.overlay-dialog-panel[data-placement="right"][data-entering]');
     expect(model).toContain('return "[redacted]"');
   });
 

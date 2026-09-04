@@ -119,12 +119,17 @@ The HTTP runtime SHALL convert successful values, declared application errors, v
 
 ### Requirement: Request lifecycle propagation
 
-HTTP handling SHALL create or propagate request and trace IDs, record route matching and function invocation, honor middleware order, cancel work when a real client disconnects, and emit one correlated request record and trace for every accepted request.
+Every inbound application request SHALL receive a fresh local request ID and origin request ID, accept only valid W3C parent context, ignore incoming request/origin identity headers, and return x-request-id without x-trace-id. Correlation ID SHALL remain application-defined. One outermost server span SHALL cover HTTP arrival through runtime-observable response-body termination across generated host and nested routing integrations.
 
 #### Scenario: Client disconnects
 
 - **WHEN** a connected client closes before the response completes
-- **THEN** the function's `ctx.signal` is aborted and the request outcome is recorded as cancelled
+- **THEN** the function signal is aborted and the request completes exactly once as cancelled
+
+#### Scenario: Remote parent is supplied
+
+- **WHEN** a request supplies valid traceparent and arbitrary request identity headers
+- **THEN** the server span has the remote trace parent, fresh local request identity and no inferred business correlation ID
 
 ### Requirement: Versioned internal endpoints
 
@@ -264,3 +269,40 @@ Liveness SHALL remain available during startup, while readiness and non-internal
 #### Scenario: Request arrives during auth startup
 - **WHEN** an application request arrives before Better Auth activation completes
 - **THEN** the runtime returns a not-ready response rather than invoking a raw or function route
+
+### Requirement: Complete HTTP boundary coverage
+
+Raw/compiled routes, RPC, MCP, static files, startup/draining rejection, auth/limits and unmatched application requests SHALL be observed. Requests under the reserved `/_relkit` control-plane prefix, telemetry ingestion and exporter transport SHALL be excluded from application request, span and log recording. Application work initiated by an Inspector action SHALL remain observable at its function, job, event, tool or resource boundary. Middleware SHALL be inclusive child spans. Arrival, route match, mapping, validation, hooks, headers and terminal markers SHALL describe only executed stages.
+
+#### Scenario: Middleware short circuits
+
+- **WHEN** middleware returns without invoking its continuation
+- **THEN** its inclusive span and HTTP outcome are shown without fabricated route/handler stages
+
+#### Scenario: Inspector reads runtime metadata
+
+- **WHEN** Inspector repeatedly reads health, graph, descriptor, runtime, API documentation or telemetry endpoints
+- **THEN** those control-plane requests add no application request, span or log records
+
+#### Scenario: Inspector initiates application work
+
+- **WHEN** an Inspector action invokes a function or controls asynchronous work
+- **THEN** the control-plane HTTP wrapper is omitted while the resulting application operation remains observable
+
+### Requirement: Response lifecycle preserves semantics
+
+HEAD and bodyless responses SHALL complete immediately. Other responses SHALL complete once on body EOF, error, cancellation, abort or shutdown without changing backpressure, bytes, headers, status or cancellation semantics. HTTP completion SHALL NOT wait for asynchronous event/job work.
+
+#### Scenario: Streaming response pauses
+
+- **WHEN** a response body remains open after headers
+- **THEN** the request remains active until its observed body terminates, without claiming proof of remote socket delivery
+
+### Requirement: Server RELKIT client propagation
+
+Server-side RELKIT client calls SHALL create client spans, inject W3C headers from the active span, and finish on headers or failure without consuming the body. Browser/default client exports SHALL remain free of server runtime imports.
+
+#### Scenario: Client is reused across requests
+
+- **WHEN** a cached client is called under two concurrent parent spans
+- **THEN** each request propagates its own current parent and global fetch is unchanged

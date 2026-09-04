@@ -81,10 +81,10 @@ test("uses one bounded batching queue with retries and complete-unit overflow", 
     retryDelayMs: 0,
     delay: async () => undefined,
   });
-  exporter.exportRecord(span("trace-a", "root"));
-  exporter.exportRecord(span("trace-a", "child"));
+  exporter.exportRecord(span("10000000000000000000000000000001", "1000000000000001"));
+  exporter.exportRecord(span("10000000000000000000000000000001", "1000000000000002"));
   exporter.exportRecord(log("one"));
-  exporter.exportRecord(span("trace-b", "root"));
+  exporter.exportRecord(span("20000000000000000000000000000002", "2000000000000001"));
   await exporter.flush();
 
   expect(sent).toEqual(["logs", "traces", "traces", "traces"]);
@@ -96,6 +96,38 @@ test("uses one bounded batching queue with retries and complete-unit overflow", 
     droppedUnits: 1,
     queuedRecords: 0,
   });
+  await exporter.close();
+});
+
+test("emits OTLP JSON spans and logs and skips intermediate span revisions", async () => {
+  const payloads: unknown[] = [];
+  const exporter = createOtlpExporter({
+    serviceName: "orders",
+    transport: fakeTransport(async (_signal, payload) => {
+      payloads.push(payload);
+    }),
+  });
+  const completed = span("10000000000000000000000000000001", "1000000000000001");
+  exporter.exportRecord(
+    admitObservabilityRecord({
+      ...completed,
+      status: "updated",
+      revision: 0,
+      completedAt: undefined,
+      durationMs: undefined,
+      outcome: undefined,
+    })!,
+  );
+  exporter.exportRecord(completed);
+  exporter.exportRecord(log("done"));
+  await exporter.flush();
+
+  expect(payloads).toHaveLength(2);
+  expect(JSON.stringify(payloads)).toContain('"resourceSpans"');
+  expect(JSON.stringify(payloads)).toContain('"service.name"');
+  expect(JSON.stringify(payloads)).toContain('"startTimeUnixNano":"1788307200000000000"');
+  expect(JSON.stringify(payloads)).toContain('"resourceLogs"');
+  expect(exporter.stats().exportedRecords).toBe(2);
   await exporter.close();
 });
 
@@ -121,7 +153,7 @@ function fakeTransport(send: OtlpTransport["send"]): OtlpTransport {
 
 function log(message: string): RedactedObservabilityRecord {
   return admitObservabilityRecord({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-09-02T00:00:00.000Z",
     level: "info",
@@ -133,13 +165,15 @@ function log(message: string): RedactedObservabilityRecord {
 
 function span(traceId: string, spanId: string): RedactedObservabilityRecord {
   return admitObservabilityRecord({
-    version: 1,
+    version: 2,
     signal: "span",
     spanId,
     invocationId: "invocation-1",
     traceId,
     name: spanId,
+    kind: "internal",
     status: "completed",
+    revision: 1,
     startedAt: "2026-09-02T00:00:00.000Z",
     completedAt: "2026-09-02T00:00:00.001Z",
     durationMs: 1,

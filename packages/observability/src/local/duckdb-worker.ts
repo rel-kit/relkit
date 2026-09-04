@@ -38,7 +38,7 @@ process.on("disconnect", () => {
 async function execute(command: LocalWorkerCommand): Promise<unknown> {
   if (command.type === "open") {
     database = await openDuckdbDatabase(command.root, command.retention, command.redaction);
-    return database.imported;
+    return { records: 0, malformed: 0 };
   }
   if (!database) throw new Error("Telemetry database is not open");
   switch (command.type) {

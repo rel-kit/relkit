@@ -6,8 +6,10 @@ test("model records are versioned, correlated, and JSON-safe", () => {
   const record = {
     version: OBSERVABILITY_MODEL_VERSION,
     signal: "request",
+    phase: "completed",
     requestId: "request-1",
-    traceId: "trace-1",
+    originRequestId: "request-1",
+    traceId: "10000000000000000000000000000001",
     generationId: "generation-1",
     graphHash: "sha256:graph",
     invocationId: "invocation-1",
@@ -21,7 +23,6 @@ test("model records are versioned, correlated, and JSON-safe", () => {
     functionId: "health.check",
     status: 200,
     outcome: "success",
-    timeline: [{ kind: "accepted", at: "2026-08-16T00:00:00.000Z" }],
   } satisfies RequestRecord;
 
   expect(JSON.parse(canonicalJson(record))).toMatchObject({

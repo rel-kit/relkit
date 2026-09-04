@@ -9,6 +9,7 @@ import { runtimeCohort } from "./test-cohort.ts";
 const input = z.object({});
 const output = z.object({ ok: z.literal(true) });
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
+const traceId = "10000000000000000000000000000001";
 
 test("default middleware assigns IDs, forwards them to the engine, and records lifecycle", async () => {
   const events: string[] = [];
@@ -18,7 +19,7 @@ test("default middleware assigns IDs, forwards them to the engine, and records l
     manifest: manifest(),
     middleware: {
       requestId: () => "request.fixed",
-      traceId: () => "trace.fixed",
+      traceId: () => traceId,
       onLifecycleEvent: (event) => events.push(event.type),
     },
     mapInput: () => ({}),
@@ -31,15 +32,15 @@ test("default middleware assigns IDs, forwards them to the engine, and records l
   });
 
   const response = await app.request("http://localhost/hello", { method: "POST" });
+  await response.text();
 
   expect(response.status).toBe(200);
   expect(response.headers.get("x-request-id")).toBe("request.fixed");
-  expect(response.headers.get("x-trace-id")).toBe("trace.fixed");
+  expect(response.headers.has("x-trace-id")).toBe(false);
   expect(events).toEqual(["request.started", "request.completed"]);
   expect(calls[0]).toMatchObject({
     requestId: "request.fixed",
-    correlationId: "request.fixed",
-    traceId: "trace.fixed",
+    traceId,
     source: "http",
   });
 });
@@ -66,7 +67,7 @@ test("invalid incoming IDs are replaced and a body limit short-circuits the rout
 
   expect(response.status).toBe(413);
   expect(response.headers.get("x-request-id")).toMatch(/^request-/);
-  expect(response.headers.get("x-trace-id")).toMatch(/^trace-/);
+  expect(response.headers.has("x-trace-id")).toBe(false);
   expect(calls).toBe(0);
   expect(events).toEqual(["request.started", "request.completed"]);
 });
@@ -89,7 +90,7 @@ test("HTTP cancellation reaches the engine signal and emits one cancellation eve
     },
   });
 
-  await app.request("http://localhost/hello", { method: "POST" });
+  await (await app.request("http://localhost/hello", { method: "POST" })).text();
 
   expect(events).toEqual(["request.started", "request.cancelled"]);
 });
@@ -112,7 +113,7 @@ test("the engine receives function input and the public context, never Hono cont
   const app = createApp({
     plan: plan(),
     manifest: manifest(),
-    middleware: { requestId: () => "request.fixed", traceId: () => "trace.fixed" },
+    middleware: { requestId: () => "request.fixed", traceId: () => traceId },
     mapInput: () => ({}),
     engine: {
       invoke: (options) =>
@@ -130,8 +131,8 @@ test("the engine receives function input and the public context, never Hono cont
   expect(await response.json()).toEqual({ ok: true });
   expect(observedInput).toEqual({});
   expect((observedContext as Record<string, unknown>).req).toBeUndefined();
-  expect(observedContext?.invocation.correlationId).toBe("request.fixed");
-  expect(observedContext?.invocation.traceId).toBe("trace.fixed");
+  expect(observedContext?.invocation.correlationId).toBeUndefined();
+  expect(observedContext?.invocation.traceId).toBe(traceId);
 });
 
 function plan(): RegistrationPlan {

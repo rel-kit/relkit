@@ -1,3 +1,5 @@
+import { isTraceId } from "./trace-context.js";
+
 const STABLE_ID_PATTERN = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$/;
 
 declare const StableIdBrand: unique symbol;
@@ -103,8 +105,10 @@ export const toGenerationId = (value: unknown): GenerationId =>
   normalizeProtocolId(value) as unknown as GenerationId;
 export const toRequestId = (value: unknown): RequestId =>
   normalizeProtocolId(value) as unknown as RequestId;
-export const toTraceId = (value: unknown): TraceId =>
-  normalizeProtocolId(value) as unknown as TraceId;
+export const toTraceId = (value: unknown): TraceId => {
+  if (!isTraceId(value)) throw new TypeError("Invalid W3C trace ID");
+  return value;
+};
 export const toInvocationId = (value: unknown): InvocationId =>
   normalizeProtocolId(value) as unknown as InvocationId;
 export const toEventInstanceId = (value: unknown): EventInstanceId =>

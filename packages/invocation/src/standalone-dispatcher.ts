@@ -7,6 +7,7 @@ import {
   validateDeclaredError,
   validated,
 } from "./validation.js";
+import { createTraceId, isTraceId } from "@relkit/contracts";
 import { InvocationValidationError } from "./contracts.js";
 import { linkSignals } from "./context.js";
 import { normalizeFailure, toPublicEnvelope, type InvocationFailure } from "./failure.js";
@@ -59,7 +60,8 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
   const now = options.now?.() ?? options.time?.now().getTime() ?? Date.now();
   const deadlineMs = calculateStandaloneDeadline(request.target.timeoutMs, options, parent, now);
   const idSource = options.idSource ?? defaultIdSource;
-  const traceId = options.traceId ?? parent?.traceId ?? idSource.next("trace");
+  const candidateTraceId = options.traceId ?? parent?.traceId ?? idSource.next("trace");
+  const traceId = isTraceId(candidateTraceId) ? candidateTraceId : createTraceId();
   const recordOptions =
     parent === undefined || parent === options.parent ? options : { ...options, parent };
   const identity = resolveDescriptorIdentity(request.target);

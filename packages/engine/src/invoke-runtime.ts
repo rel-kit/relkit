@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 import type { MaybePromise, ProtocolId } from "@relkit/contracts";
-import { normalizeFailure, type InvocationRunner } from "@relkit/invocation";
+import {
+  currentExecutionContext,
+  normalizeFailure,
+  type InvocationRunner,
+} from "@relkit/invocation";
 import {
   createPublicClockEffect,
   createInvocationBridge,
@@ -151,19 +155,43 @@ export async function runHandler<
     next: (kind) => (kind === "trace" ? (traceId as ProtocolId) : idSource.next("span")),
   };
   const traced =
-    capturedParent?.context === undefined || capturedParent.parentSpan === undefined
-      ? withRootSpan(program, spanOptions)
-      : Effect.withTracer(
+    currentExecutionContext() !== undefined
+      ? Effect.withTracer(
           Effect.withParentSpan(
-            Effect.provideService(
-              withChildSpan(program, spanOptions),
-              InvocationTrace,
-              capturedParent.context,
-            ),
-            capturedParent.parentSpan,
+            Effect.provideService(program, InvocationTrace, {
+              invocationId: record.id,
+              functionId: target.id,
+              traceId,
+              spanId: currentExecutionContext()!.span.spanId,
+              ...(record.parentId === undefined ? {} : { parentInvocationId: record.parentId }),
+              ...(record.correlationId === undefined
+                ? {}
+                : { correlationId: record.correlationId }),
+              ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),
+              source: record.source,
+              signal: controller.signal,
+            }),
+            currentExecutionContext()!.span,
           ),
-          createRelkitTracer(childTracerIds, spanOptions.observer),
-        );
+          createRelkitTracer(
+            childTracerIds,
+            spanOptions.observer,
+            currentExecutionContext()!.runtime,
+          ),
+        )
+      : capturedParent?.context === undefined || capturedParent.parentSpan === undefined
+        ? withRootSpan(program, spanOptions)
+        : Effect.withTracer(
+            Effect.withParentSpan(
+              Effect.provideService(
+                withChildSpan(program, spanOptions),
+                InvocationTrace,
+                capturedParent.context,
+              ),
+              capturedParent.parentSpan,
+            ),
+            createRelkitTracer(childTracerIds, spanOptions.observer),
+          );
   return runner.run(Effect.provideService(traced, IdSource, spanSource), {
     signal: controller.signal,
   });

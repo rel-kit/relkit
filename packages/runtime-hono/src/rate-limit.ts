@@ -1,10 +1,11 @@
 import type { HttpTriggerRegistration } from "@relkit/graph";
+import { frameworkTrace } from "@relkit/invocation";
 import type { Context } from "hono";
 import { rateLimiter, type RateLimitInfo } from "hono-rate-limiter";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { getRequestState } from "./middleware.js";
 import { createRateLimitStore, type RateLimitStoreResolver } from "./rate-limit-store.js";
-import { emitRateLimitSpan, recordRateLimitResult } from "./rate-limit-telemetry.js";
+import { recordRateLimitResult } from "./rate-limit-telemetry.js";
 
 export const ROUTE_MIDDLEWARE_ORDER = Object.freeze([
   "rate-limit",
@@ -56,44 +57,34 @@ export function withRateLimit(
   return async (context) => {
     const startedAt = Date.now();
     const state = getRequestState(context);
-    const spanId = `rate-limit:${crypto.randomUUID()}`;
-    let continued = false;
-    emitRateLimitSpan(options, trigger, state, spanId, startedAt, "started", false);
-    try {
-      const result = await middleware(context, async () => {
-        continued = true;
-        context.res = await handler(context);
-      });
-      const response = result instanceof Response ? result : context.res;
-      const blocked = !continued && response.status === 429;
-      const finalResponse = withStandardHeaders(response, policy, rateInfo(context), blocked);
-      context.res = finalResponse;
-      recordRateLimitResult(trigger, state, startedAt, finalResponse.status, blocked, continued);
-      emitRateLimitSpan(
-        options,
-        trigger,
-        state,
-        spanId,
-        startedAt,
-        "completed",
-        blocked,
-        rateInfo(context),
-      );
-      return finalResponse;
-    } catch (cause) {
-      emitRateLimitSpan(
-        options,
-        trigger,
-        state,
-        spanId,
-        startedAt,
-        "completed",
-        false,
-        undefined,
-        "defect",
-      );
-      throw cause;
-    }
+    return frameworkTrace.span(
+      "relkit.http.rate_limit",
+      {
+        attributes: {
+          "relkit.route.id": trigger.id,
+          "relkit.rate_limit.limit": policy.limit,
+          "relkit.rate_limit.store": policy.storeId === undefined ? "memory" : "shared",
+        },
+      },
+      async () => {
+        let continued = false;
+        const result = await middleware(context, async () => {
+          continued = true;
+          context.res = await handler(context);
+        });
+        const response = result instanceof Response ? result : context.res;
+        const blocked = !continued && response.status === 429;
+        const info = rateInfo(context);
+        const finalResponse = withStandardHeaders(response, policy, info, blocked);
+        context.res = finalResponse;
+        frameworkTrace.setAttributes({
+          "relkit.rate_limit.remaining": info?.remaining ?? policy.limit,
+          "relkit.rate_limit.blocked": blocked,
+        });
+        recordRateLimitResult(trigger, state, startedAt, finalResponse.status, blocked, continued);
+        return finalResponse;
+      },
+    );
   };
 }
 

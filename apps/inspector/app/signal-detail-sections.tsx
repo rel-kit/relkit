@@ -1,45 +1,15 @@
 import type { InspectorObject } from "../lib/api-types";
-import { requestTimeline, signalKey, text, type TimelineEntry } from "../lib/observability-model";
+import { signalKey, text } from "../lib/observability-model";
 import { TraceWaterfall } from "./trace-waterfall";
 
 export function TimelinePanel({
   request,
-  records,
+  spans,
 }: {
   readonly request: InspectorObject;
-  readonly records: readonly InspectorObject[];
+  readonly spans: readonly InspectorObject[];
 }) {
-  const entries = requestTimeline(request, records);
-  return (
-    <section className="panel" aria-labelledby="request-timeline-heading">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">REQUEST TIMELINE</p>
-          <h2 id="request-timeline-heading">Correlated work</h2>
-        </div>
-        <span className="badge">{entries.length} steps</span>
-      </div>
-      <ol className="request-list signal-timeline">
-        {entries.map((entry) => (
-          <TimelineRow entry={entry} key={entry.id} />
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-function TimelineRow({ entry }: { readonly entry: TimelineEntry }) {
-  return (
-    <li className="request-row">
-      <span>
-        <strong>{entry.kind}</strong>
-        {entry.targetId ? ` · ${bounded(entry.targetId)}` : ""}
-      </span>
-      <span>
-        {entry.outcome || entry.status || "recorded"} · {bounded(entry.at)}
-      </span>
-    </li>
-  );
+  return <TraceWaterfall spans={spans} requests={[request]} />;
 }
 
 export function WaterfallPanel({
@@ -114,6 +84,13 @@ function safeJson(value: unknown): string {
 }
 
 export function RequestsPanel({ items }: { readonly items: readonly InspectorObject[] }) {
+  const current = new Map<string, InspectorObject>();
+  for (const item of items) {
+    const id = text(item.requestId);
+    const prior = current.get(id);
+    if (!prior || (prior.phase !== "completed" && item.phase === "completed"))
+      current.set(id, item);
+  }
   return (
     <section className="panel" aria-labelledby="trace-requests-heading">
       <div className="section-heading">
@@ -121,10 +98,10 @@ export function RequestsPanel({ items }: { readonly items: readonly InspectorObj
           <p className="eyebrow">CORRELATED REQUESTS</p>
           <h2 id="trace-requests-heading">HTTP records</h2>
         </div>
-        <span className="badge">{items.length}</span>
+        <span className="badge">{current.size}</span>
       </div>
       <ul className="request-list">
-        {items.map((item) => {
+        {[...current.values()].map((item) => {
           const id = text(item.requestId);
           return (
             <li className="request-row" key={signalKey(item)}>

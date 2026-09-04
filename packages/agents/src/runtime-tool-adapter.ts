@@ -1,5 +1,7 @@
 import {
   currentInvocationScope,
+  currentExecutionContext,
+  frameworkTrace,
   resolveDescriptorIdentity,
   runInInvocationScope,
   type InvocationDispatchRequest,
@@ -63,7 +65,7 @@ export async function invokeAgentTool(
       approval: (request) =>
         resolveAgentApproval(options, request, turn.callId, invocationId, signal),
     });
-  if (currentInvocationScope() !== undefined) return invoke();
+  if (currentInvocationScope()?.dispatcher !== undefined) return invoke();
   return runInInvocationScope(
     {
       dispatcher: createAgentToolDispatcher(
@@ -100,6 +102,10 @@ async function resolveAgentApproval(
     policy: request.policy,
   });
   if (approval.state !== "pending") return true;
+  frameworkTrace.event("agent.tool.approval.requested", {
+    "relkit.tool.id": request.toolId,
+    "relkit.tool.call.id": toolCallId,
+  });
   const handler = options.approval;
   if (handler === undefined) {
     assertApprovalGranted(approval);
@@ -112,6 +118,11 @@ async function resolveAgentApproval(
       : response === "denied" || response === false
         ? denyApproval(approval)
         : response;
+  frameworkTrace.event("agent.tool.approval.resolved", {
+    "relkit.tool.id": request.toolId,
+    "relkit.tool.call.id": toolCallId,
+    "relkit.tool.approval": decision.state,
+  });
   assertApprovalGranted(decision);
   return true;
 }
@@ -124,11 +135,14 @@ function createAgentToolDispatcher(
   parentSpanId: string | undefined,
   signal: AbortSignal,
 ): InvocationDispatcher {
+  const active = currentExecutionContext();
   const parent = {
     id: invocationId,
-    traceId: traceId ?? invocationId,
+    traceId: active?.span.traceId ?? traceId ?? invocationId,
     signal,
-    ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
+    ...(active?.span.spanId === undefined && parentSpanId === undefined
+      ? {}
+      : { spanId: active?.span.spanId ?? parentSpanId }),
   };
   return Object.freeze({
     dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(

@@ -80,7 +80,9 @@ export function validate(value: ObservabilityQueryRequest, maximum: number): Nor
     ["functionId", value.functionId],
     ["outcome", value.outcome],
     ["requestId", value.requestId],
+    ["originRequestId", value.originRequestId],
     ["traceId", value.traceId],
+    ["spanId", value.spanId],
     ["serviceId", value.serviceId],
     ["generationId", value.generationId],
     ["graphHash", value.graphHash],
@@ -111,9 +113,9 @@ export function matches(record: ObservabilityRecord, query: NormalizedQuery): bo
           : record.component === "inspector"
             ? "inspector"
             : "application") === query.source)) &&
-    (query.requestId === undefined ||
-      value.requestId === query.requestId ||
-      value.correlationId === query.requestId) &&
+    (query.requestId === undefined || value.requestId === query.requestId) &&
+    (query.originRequestId === undefined ||
+      ("originRequestId" in value && value.originRequestId === query.originRequestId)) &&
     (query.generationId === undefined || value.generationId === query.generationId) &&
     (query.graphHash === undefined || value.graphHash === query.graphHash) &&
     (query.serviceId === undefined || value.serviceId === query.serviceId)

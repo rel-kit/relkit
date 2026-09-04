@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { normalizeId } from "@relkit/contracts";
 import type { JobStore } from "./store.js";
 import { readEntry } from "./queue-entry.js";
-import { createJobQueueMutations, type MutableQueueState } from "./queue-operations.js";
+import { createJobQueueMutations } from "./queue-operations.js";
+import type { MutableQueueState } from "./queue-utils.js";
 import { validateIdempotencyDefinition } from "./idempotency.js";
 import {
   JOB_QUEUE_STATES,
