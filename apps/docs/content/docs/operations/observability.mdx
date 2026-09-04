@@ -3,6 +3,9 @@ title: Observability
 description: Capture correlated local evidence, redact it before storage, and export sampled telemetry without coupling handlers to a vendor.
 ---
 
+import inspectorLogs from "../../../../../tests/e2e/logs.spec.ts-snapshots/logs-workspace-darwin.png";
+import inspectorTrace from "../../../../../tests/e2e/inspector-redesign.spec.ts-snapshots/trace-waterfall-darwin.png";
+
 RELKIT records HTTP requests and common-engine invocations with shared graph, trace, correlation, and invocation
 identities. Handlers write structured records through `context.log`; functions, providers, jobs, events, tools,
 and agents contribute correlated spans without importing a telemetry SDK.
@@ -31,9 +34,10 @@ runtime event
 ```
 
 Local capture is independent of external sampling. With `traceRate: 0.25`, the bounded Inspector store can keep
-a complete redacted local trace even when that trace is not selected for remote export. Child spans inherit the
-root trace decision. Log export follows `minimumLogLevel`; errors and diagnostics are exported unsampled by
-default.
+a complete redacted local trace even when that trace is not selected for remote export. Spans, logs, and errors
+with the same trace use the same deterministic trace decision. Log export also follows `minimumLogLevel`.
+Configure `traceRate: 1` when a Collector performs tail sampling and needs complete failed traces; RELKIT does
+not keep a second in-process tail-sampling buffer.
 
 `localRetention` bounds record count, age, and bytes. It is diagnostic evidence, not durable business storage.
 
@@ -58,16 +62,15 @@ Explicit `localRetention.maxAgeMs`, `maxBytes`, and `maxEntries` override those 
 in-memory cache; it does not limit database history. The data budget excludes database metadata and temporary
 database/WAL overhead. Cleanup checkpoints and normal shutdown reclaim reusable space and flush pending writes.
 
-Existing NDJSON segments are imported automatically without changing the source files. Import provenance makes
-restarts safe and preserves repeated log messages; malformed lines are counted and reported. Production retains
-its existing storage and export behavior.
+The current store uses observability model v2. Incompatible development state is not migrated automatically;
+RELKIT reports `RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE` and requires a fresh development store.
 
 If storage fails, application requests continue. The Logs workspace reports degraded storage and failed or
 dropped records. Restart the dev session after fixing the cause; records that failed to commit are not saved.
 
 ## Redact before storage or export
 
-`development-redacted` allows bounded content capture while replacing protected keys and known secret values.
+`development-redacted` allows bounded invocation and operation input/output capture while replacing protected keys and known secret values.
 `maxBytes` is required and prevents oversized content from being retained. Mode `off` omits protected payload
 content entirely.
 
@@ -95,8 +98,64 @@ curl "http://localhost:3000/hello?name=Telemetry" \
 ```
 
 Open the Inspector's **Requests** view, select `/hello`, and follow its trace, logs, graph hash, generation, and
-activation fingerprint. If remote telemetry is silent, inspect exporter health, queue depth, failure count, and
-drop count before assuming application capture failed.
+activation fingerprint. The trace timeline numbers and connects spans and lifecycle events by their recorded
+date/time, labels each operation type, and keeps overlapping duration bars visible for concurrent work. Select
+a span to open the expanded sheet with separate input, output, outcome, and metadata sections alongside its
+resource attributes, events, links, correlated logs,
+and safe error details. Event and job continuations remain separate links because they can outlive the HTTP
+response. If remote telemetry is silent, inspect exporter health, queue depth, failure count, and drop count
+before assuming application capture failed.
+
+## Add application trace detail
+
+RELKIT already creates spans for routes, functions, declared client operations, jobs, events, tools, and agents.
+Use `context.trace` only for application work that those boundaries do not describe:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/functions/create-order.function.ts — explicit tracing"'
+>
+  ../../examples/commerce/src/orders/functions/create-order.function.ts#explicit-tracing
+</include>
+
+| Operation                                    | What it records                                                      |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| `span(name, callback)`                       | An `internal` child span around the callback                         |
+| `span(name, { attributes, kind }, callback)` | A child span with initial attributes and kind `internal` or `client` |
+| `event(name, attributes?)`                   | A point-in-time event on the active span                             |
+| `setAttributes({ key: value })`              | Additional attributes on the active span                             |
+
+The callback passed to `span` runs with a child span as the active span. RELKIT ends it on success or failure and
+returns or rethrows the callback result unchanged. The default kind is `internal`; use `client` only for a custom
+outbound dependency RELKIT does not already instrument. Nested and parallel callbacks keep the correct parent.
+
+`event` adds a point-in-time event to the active span. `setAttributes` adds facts to that same active span, so a
+call directly in a handler annotates the handler's invocation span while a call inside `span` annotates the child.
+There is no manual start or end API.
+
+Attribute values are limited to strings, finite numbers, and booleans. Names beginning with `relkit.` and identity
+keys such as `traceId`, `spanId`, and `requestId` are reserved for the runtime. Recording is bounded; Inspector
+reports dropped or truncated data instead of implying that omitted telemetry was observed. Do not put secrets,
+payloads, or high-cardinality values such as random IDs into attributes.
+
+## Inspect a trace and its logs
+
+The trace view keeps nesting and overlapping work visible. Open a span to inspect its attributes, events, links,
+correlated logs, captured redacted input/output, outcome, and safe error details.
+
+<ImageZoom
+  src={inspectorTrace}
+  alt="RELKIT Inspector trace waterfall showing the nested HTTP request, function, and cache spans"
+/>
+
+The Logs workspace preserves structured fields and correlation identities. Selecting a record keeps its associated
+trace beside it so developers and operations teams can move from a symptom to the surrounding execution.
+
+<ImageZoom
+  src={inspectorLogs}
+  alt="RELKIT Inspector Logs workspace with a selected structured log and its associated trace"
+/>
 
 AWS hosting routes redacted structured stdout to CloudWatch through the host integration. CloudWatch is host
 logging, not an application exporter, so it does not belong under `telemetry.exporters`.

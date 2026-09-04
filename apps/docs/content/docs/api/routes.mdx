@@ -50,7 +50,7 @@ declare const defineMiddleware: (
 ) => MiddlewareDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L57)
 
 Since v0.1.0
 
@@ -67,10 +67,11 @@ export interface MiddlewareContext {
   readonly auth: AuthContext;
   readonly log: PublicLogger;
   readonly time: PublicClock;
+  readonly trace: PublicTrace;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L17)
 
 ## MiddlewareDescriptor (interface)
 
@@ -86,7 +87,7 @@ export interface MiddlewareDescriptor<Id extends string = string> extends Descri
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L32)
 
 ## MiddlewareHandler (type alias)
 
@@ -100,7 +101,7 @@ type MiddlewareHandler = (
 ) => MaybePromise<Response | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L26)
 
 ## isMiddlewareDescriptor
 
@@ -110,7 +111,7 @@ type MiddlewareHandler = (
 declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L71)
 
 ## isMiddlewarePath
 
@@ -120,7 +121,7 @@ declare const isMiddlewareDescriptor: (value: unknown) => value is MiddlewareDes
 declare const isMiddlewarePath: (value: unknown) => value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-middleware.ts#L81)
 
 ## `define-route.ts`
 

@@ -76,7 +76,7 @@ export interface TestAgent<Agent extends TestAgentDescriptor = TestAgentDescript
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L96)
 
 ## TestAgentApproval (type alias)
 
@@ -86,7 +86,7 @@ export interface TestAgent<Agent extends TestAgentDescriptor = TestAgentDescript
 type TestAgentApproval = TestAgentApprovalMode | AgentApprovalHandler;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L18)
 
 ## TestAgentApprovalMode (type alias)
 
@@ -96,7 +96,7 @@ type TestAgentApproval = TestAgentApprovalMode | AgentApprovalHandler;
 type TestAgentApprovalMode = "approved" | "denied" | "pending";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L17)
 
 ## TestAgentApprovals (interface)
 
@@ -110,7 +110,7 @@ export interface TestAgentApprovals {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L90)
 
 ## TestAgentDescriptor (type alias)
 
@@ -120,7 +120,7 @@ export interface TestAgentApprovals {
 type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L16)
 
 ## TestAgentInvocationOptions (type alias)
 
@@ -130,7 +130,7 @@ type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
 type TestAgentInvocationOptions = Omit<AgentInvocationOptions, "input" | "approval" | "hooks">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L68)
 
 ## TestAgentModel (interface)
 
@@ -146,7 +146,7 @@ export interface TestAgentModel {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L46)
 
 ## TestAgentModelCall (interface)
 
@@ -163,7 +163,7 @@ export interface TestAgentModelCall {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L37)
 
 ## TestAgentModelOptions (interface)
 
@@ -177,7 +177,7 @@ export interface TestAgentModelOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L31)
 
 ## TestAgentOptions (interface)
 
@@ -199,7 +199,7 @@ export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentD
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L54)
 
 ## TestAgentTrace (interface)
 
@@ -213,7 +213,7 @@ export interface TestAgentTrace extends TestAgentTraceSnapshot {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L78)
 
 ## TestAgentTraceExpectation (interface)
 
@@ -221,13 +221,13 @@ export interface TestAgentTrace extends TestAgentTraceSnapshot {
 
 ```ts
 export interface TestAgentTraceExpectation {
-  readonly spanKinds?: readonly AgentSpanKind[];
+  readonly spanKinds?: readonly ReturnType<typeof spanSnapshot>["kind"][];
   readonly names?: readonly string[];
   readonly edges?: readonly AgentObservedEdge[];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L84)
 
 ## TestAgentTraceSnapshot (interface)
 
@@ -235,12 +235,12 @@ export interface TestAgentTraceExpectation {
 
 ```ts
 export interface TestAgentTraceSnapshot {
-  readonly spans: readonly AgentSpanRecord[];
+  readonly spans: readonly ReturnType<typeof spanSnapshot>[];
   readonly edges: readonly AgentObservedEdge[];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L73)
 
 ## TestModelTurn (type alias)
 
@@ -259,7 +259,7 @@ type TestModelTurn =
   | { readonly type: "cancelled"; readonly reason?: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-types.ts#L20)
 
 ## `agents-utils.ts`
 
@@ -287,7 +287,7 @@ declare const assertAgentTrace: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L9)
 
 ## captureHooks
 
@@ -296,22 +296,24 @@ declare const assertAgentTrace: (
 ```ts
 declare const captureHooks: (
   hooks: AgentRuntimeHooks | undefined,
-  spans: AgentSpanRecord[],
   edges: AgentObservedEdge[],
 ) => AgentRuntimeHooks;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L63)
 
 ## createTrace
 
 **Signature**
 
 ```ts
-declare const createTrace: (spans: AgentSpanRecord[], edges: AgentObservedEdge[]) => TestAgentTrace;
+declare const createTrace: (
+  spans: ReturnType<typeof spanSnapshot>[],
+  edges: AgentObservedEdge[],
+) => TestAgentTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-utils.ts#L42)
 
 ## `agents.ts`
 
@@ -349,7 +351,7 @@ declare const createTrace: (spans: AgentSpanRecord[], edges: AgentObservedEdge[]
 declare const TestAgent: TestAgent<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L23)
 
 ## TestAgentApproval
 
@@ -359,7 +361,7 @@ declare const TestAgent: TestAgent<Agent>;
 declare const TestAgentApproval: TestAgentApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L24)
 
 ## TestAgentApprovalMode
 
@@ -369,7 +371,7 @@ declare const TestAgentApproval: TestAgentApproval;
 declare const TestAgentApprovalMode: TestAgentApprovalMode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L25)
 
 ## TestAgentApprovals
 
@@ -379,7 +381,7 @@ declare const TestAgentApprovalMode: TestAgentApprovalMode;
 declare const TestAgentApprovals: TestAgentApprovals;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L26)
 
 ## TestAgentDescriptor
 
@@ -389,7 +391,7 @@ declare const TestAgentApprovals: TestAgentApprovals;
 declare const TestAgentDescriptor: TestAgentDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L27)
 
 ## TestAgentInvocationOptions
 
@@ -399,7 +401,7 @@ declare const TestAgentDescriptor: TestAgentDescriptor;
 declare const TestAgentInvocationOptions: TestAgentInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L28)
 
 ## TestAgentModel
 
@@ -409,7 +411,7 @@ declare const TestAgentInvocationOptions: TestAgentInvocationOptions;
 declare const TestAgentModel: TestAgentModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L29)
 
 ## TestAgentModelCall
 
@@ -419,7 +421,7 @@ declare const TestAgentModel: TestAgentModel;
 declare const TestAgentModelCall: TestAgentModelCall;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L30)
 
 ## TestAgentModelOptions
 
@@ -429,7 +431,7 @@ declare const TestAgentModelCall: TestAgentModelCall;
 declare const TestAgentModelOptions: TestAgentModelOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L31)
 
 ## TestAgentOptions
 
@@ -439,7 +441,7 @@ declare const TestAgentModelOptions: TestAgentModelOptions;
 declare const TestAgentOptions: TestAgentOptions<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L32)
 
 ## TestAgentTrace
 
@@ -449,7 +451,7 @@ declare const TestAgentOptions: TestAgentOptions<Agent>;
 declare const TestAgentTrace: TestAgentTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L33)
 
 ## TestAgentTraceExpectation
 
@@ -459,7 +461,7 @@ declare const TestAgentTrace: TestAgentTrace;
 declare const TestAgentTraceExpectation: TestAgentTraceExpectation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L34)
 
 ## TestAgentTraceSnapshot
 
@@ -469,7 +471,7 @@ declare const TestAgentTraceExpectation: TestAgentTraceExpectation;
 declare const TestAgentTraceSnapshot: TestAgentTraceSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L35)
 
 ## TestModelTurn
 
@@ -479,7 +481,7 @@ declare const TestAgentTraceSnapshot: TestAgentTraceSnapshot;
 declare const TestModelTurn: TestModelTurn;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L36)
 
 ## assertAgentTrace
 
@@ -492,7 +494,7 @@ declare const assertAgentTrace: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L38)
 
 ## createTestAgent
 
@@ -506,7 +508,7 @@ declare const createTestAgent: <Agent extends TestAgentDescriptor>(
 ) => TestAgent<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L41)
 
 ## `application-http.ts`
 
@@ -1200,6 +1202,7 @@ declare const openTestEventRuntime: (input: OpenTestEventRuntimeOptions) => Prom
 
 - [utils](#utils)
   - [createEventInvoker](#createeventinvoker)
+  - [createEventTraceBridge](#createeventtracebridge)
   - [fanoutEvent](#fanoutevent)
   - [toEnvelope](#toenvelope)
 
@@ -1221,7 +1224,25 @@ declare const createEventInvoker: (
 ) => (request: EventInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L66)
+
+## createEventTraceBridge
+
+**Signature**
+
+```ts
+declare const createEventTraceBridge: (
+  eventId: string,
+  options: Pick<TestEventOptions<unknown, unknown>, "correlationId" | "causationInvocationId">,
+) => {
+  run: <A>(
+    operation: () => MaybePromise<A>,
+    bridgeOptions?: { readonly name?: string },
+  ) => Promise<A>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L24)
 
 ## fanoutEvent
 
@@ -1236,7 +1257,7 @@ declare const fanoutEvent: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L99)
 
 ## toEnvelope
 
@@ -1246,7 +1267,7 @@ declare const fanoutEvent: (
 declare const toEnvelope: (value: Record<string, unknown>) => UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-utils.ts#L20)
 
 ## `events-runtime.ts`
 
@@ -1283,7 +1304,7 @@ export interface TestEventRuntimeOptions<Payload, Output> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L35)
 
 ## createTestEventRuntime
 
@@ -1295,7 +1316,7 @@ declare const createTestEventRuntime: <Payload, Output>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L50)
 
 ## `events-types.ts`
 
@@ -3185,7 +3206,7 @@ export interface TestJobOptions<Input = JsonValue, Output = unknown> {
 declare const createFailures: () => TestFailureControls;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L132)
 
 ## createIdSource
 
@@ -3195,7 +3216,7 @@ declare const createFailures: () => TestFailureControls;
 declare const createIdSource: () => InvocationIdSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L97)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L102)
 
 ## createJobInvoker
 
@@ -3243,7 +3264,7 @@ declare const createRandom: (
 ) => () => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L118)
 
 ## defaultRetry
 
@@ -3279,7 +3300,7 @@ declare const createTestJob: <Input = JsonValue, Output = unknown>(
 ) => Promise<TestJobFake<Input, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L195)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs.ts#L199)
 
 ## createTestJobFake
 
@@ -3497,7 +3518,7 @@ export interface TestClock {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L35)
 
 ## TestRuntime (interface)
 
@@ -3519,7 +3540,7 @@ export interface TestRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L41)
 
 ## TestRuntimeCloseOptions (interface)
 
@@ -3531,7 +3552,7 @@ export interface TestRuntimeCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L31)
 
 ## TestRuntimeOptions (interface)
 
@@ -3564,7 +3585,7 @@ Creates a small deterministic runtime for direct function tests.
 declare const createTestRuntime: (options?: TestRuntimeOptions) => TestRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L56)
 
 ## `state-root.ts`
 

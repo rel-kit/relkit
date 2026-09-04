@@ -174,7 +174,7 @@ export interface JobClient<Input = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L82)
 
 ## JobClientOptions (interface)
 
@@ -198,7 +198,7 @@ export interface JobClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L67)
 
 ## JobDeclaredEdge (interface)
 
@@ -212,7 +212,7 @@ export interface JobDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L57)
 
 ## JobDependencyError (class)
 
@@ -222,7 +222,7 @@ export interface JobDeclaredEdge {
 declare class JobDependencyError { constructor(readonly jobId: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L108)
 
 ### code (property)
 
@@ -232,7 +232,7 @@ declare class JobDependencyError { constructor(readonly jobId: string) }
 readonly code: "RELKIT_JOB_DEPENDENCY_UNDECLARED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L109)
 
 ## JobEnqueueOptions
 
@@ -242,7 +242,7 @@ readonly code: "RELKIT_JOB_DEPENDENCY_UNDECLARED"
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L16)
 
 ## JobEnqueueResult
 
@@ -252,7 +252,7 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L16)
 
 ## JobInputValidationError (class)
 
@@ -262,7 +262,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 declare class JobInputValidationError { constructor(readonly issues: readonly StandardIssue[]) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L86)
 
 ### code (property)
 
@@ -272,7 +272,7 @@ declare class JobInputValidationError { constructor(readonly issues: readonly St
 readonly code: "RELKIT_JOB_INPUT_VALIDATION"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L87)
 
 ## JobInvocationBridge (interface)
 
@@ -287,7 +287,7 @@ export interface JobInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L51)
 
 ## JobInvocationBridgeOptions (interface)
 
@@ -298,10 +298,12 @@ export interface JobInvocationBridgeOptions {
   readonly name: string;
   readonly attributes: Readonly<Record<string, unknown>>;
   readonly signal: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L44)
 
 ## JobObservedEdge (interface)
 
@@ -315,7 +317,7 @@ export interface JobObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L62)
 
 ## JobOperationCancelledError (class)
 
@@ -327,7 +329,7 @@ declare class JobOperationCancelledError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L116)
 
 ### code (property)
 
@@ -337,7 +339,7 @@ declare class JobOperationCancelledError {
 readonly code: "ABORT_ERR"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L124)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L117)
 
 ## JobOperationContext (interface)
 
@@ -350,6 +352,7 @@ export interface JobOperationContext {
   readonly profile: string;
   readonly deadlineMs?: number;
   readonly correlationId?: string;
+  readonly propagation?: TracePropagation;
 }
 ```
 
@@ -365,7 +368,7 @@ declare class JobOperationTimeoutError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L124)
 
 ### code (property)
 
@@ -375,7 +378,7 @@ declare class JobOperationTimeoutError {
 readonly code: "ETIMEDOUT"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L125)
 
 ## JobProfileError (class)
 
@@ -385,7 +388,7 @@ readonly code: "ETIMEDOUT"
 declare class JobProfileError { constructor(readonly profile: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L93)
 
 ### code (property)
 
@@ -395,7 +398,7 @@ declare class JobProfileError { constructor(readonly profile: string) }
 readonly code: "RELKIT_JOB_PROFILE_UNKNOWN"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L94)
 
 ## JobProvider (interface)
 
@@ -423,7 +426,7 @@ declare class JobProviderError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L100)
 
 ### code (property)
 
@@ -433,7 +436,7 @@ declare class JobProviderError {
 readonly code: "RELKIT_JOB_PROVIDER_UNAVAILABLE"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L101)
 
 ## JobProviderResult (type alias)
 
@@ -454,7 +457,7 @@ type JobProviderResult = Pick<JobEnqueueResult, "instanceId" | "accepted"> &
   >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L32)
 
 ## JobState
 
@@ -464,7 +467,7 @@ type JobProviderResult = Pick<JobEnqueueResult, "instanceId" | "accepted"> &
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L16)
 
 ## JobStatus
 
@@ -474,7 +477,7 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L16)
 
 ## createJobClient
 
@@ -484,7 +487,7 @@ declare const JobStatus: JobStatus;
 declare const createJobClient: (options: JobClientOptions) => JobClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/jobs/src/client.ts#L132)
 
 ## `define-job.ts`
 

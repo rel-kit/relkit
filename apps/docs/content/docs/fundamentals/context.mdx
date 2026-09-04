@@ -36,6 +36,7 @@ The exact event ID becomes available under `context.events`; publishing any unde
 | `signal`                                       | Cancelling work and passing cancellation to lower-level calls                   |
 | `env`                                          | Values resolved by the application's typed environment contract                 |
 | `log`                                          | Structured, invocation-correlated records                                       |
+| `trace`                                        | Child spans, point-in-time events, and attributes on the active span            |
 | `time`                                         | Testable `now()` and abort-aware `sleep()` behavior                             |
 | `jobs`, `events`, `buckets`, `cache`, `agents` | Clients authorized by declarations on the function                              |
 | `database`, `auth`, `constants`, `prompts`     | Registered application context supplied by specialized integrations             |
@@ -43,6 +44,10 @@ The exact event ID becomes available under `context.events`; publishing any unde
 There is no service middleware or `context.service`. A service exposes public functions and events; it does not
 inject handler state. Database and Auth are specialized application context integrations, documented in
 [Database](/docs/database) and [Auth sessions](/docs/auth/sessions).
+
+RELKIT traces routes, functions, declared clients, jobs, events, tools, and agents automatically. Use
+`context.trace` only for application work the runtime cannot infer. See [Observability](/docs/operations/observability#add-application-trace-detail)
+for the three tracing operations and an executable example.
 
 ## Add access safely
 
