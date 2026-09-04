@@ -43,7 +43,7 @@ export function useSignalPage(
       dirty = false;
       client.invalidate([kind, "signals"]);
       try {
-        const query = logQuery(params);
+        const query = { ...logQuery(params), limit: kind === "traces" ? 100 : 50 };
         const { cursor: _, ...headQuery } = query;
         const held = !initial && hold.current;
         const page = await client.query(kind, held ? { ...headQuery, limit: 1 } : query);

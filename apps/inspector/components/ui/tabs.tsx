@@ -18,10 +18,10 @@ export function ContentTabs({
 }) {
   return (
     <Tabs className="grid gap-4">
-      <TabList aria-label={label} className="flex gap-1 border-b border-[var(--line)]">
+      <TabList aria-label={label} className="flex overflow-x-auto border-b border-[var(--line)]">
         {items.map((item) => (
           <Tab
-            className="cursor-default border-b-2 border-transparent px-3 py-2 text-sm font-medium text-[var(--muted)] outline-none selected:border-[var(--accent)] selected:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            className="cursor-default whitespace-nowrap border-b-2 border-transparent px-2 py-2 text-xs font-medium text-[var(--muted)] outline-none selected:border-[var(--accent)] selected:text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             id={item.id}
             key={item.id}
           >
