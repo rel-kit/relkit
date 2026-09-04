@@ -12,7 +12,10 @@ import { IdSource } from "./src/services.js";
 
 function ids() {
   let next = 0;
-  return { next: (kind: string) => `${kind}-${++next}` as never };
+  return {
+    next: (kind: string) =>
+      (++next).toString(16).padStart(kind === "trace" ? 32 : 16, "0") as never,
+  };
 }
 
 describe("runtime tracing", () => {
@@ -95,7 +98,7 @@ describe("runtime tracing", () => {
       );
 
       expect(runnerCalls).toBe(1);
-      expect(result.traceId).toBe("trace-1");
+      expect(result.traceId).toBe("00000000000000000000000000000001");
       expect(result.correlationId).toBe("request-1");
       expect(result.invocationId).toBe("invoke-1");
     } finally {
