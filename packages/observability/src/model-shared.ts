@@ -1,7 +1,7 @@
 import type { JsonPrimitive, JsonValue } from "@relkit/contracts";
 
 /** Version of the JSON-safe observability record contracts. */
-export const OBSERVABILITY_MODEL_VERSION = 1 as const;
+export const OBSERVABILITY_MODEL_VERSION = 2 as const;
 export const OBSERVABILITY_VERSION = OBSERVABILITY_MODEL_VERSION;
 export type ObservabilityModelVersion = typeof OBSERVABILITY_MODEL_VERSION;
 
@@ -21,7 +21,7 @@ export type ObservabilitySignal =
   | "invocation"
   | "job"
   | "event"
-  | "resource"
+  | "operation"
   | "tool"
   | "agent"
   | "log"
@@ -38,6 +38,7 @@ export type SafeAttributes = Readonly<Record<string, JsonPrimitive>>;
 /** Correlation fields shared by every signal without carrying executable values. */
 export interface ObservabilityCorrelation {
   readonly requestId?: string;
+  readonly originRequestId?: string;
   readonly traceId?: string;
   readonly invocationId?: string;
   readonly serviceId?: string;
@@ -51,25 +52,4 @@ export interface VersionedRecord<
 > extends ObservabilityCorrelation {
   readonly version: ObservabilityModelVersion;
   readonly signal: Signal;
-}
-
-export type RequestDetailKind =
-  | "accepted"
-  | "match"
-  | "mapping"
-  | "middleware"
-  | "function"
-  | "child"
-  | "resource"
-  | "job"
-  | "event"
-  | "tool"
-  | "response";
-export interface RequestDetail {
-  readonly kind: RequestDetailKind;
-  readonly at: string;
-  readonly durationMs?: number;
-  readonly targetId?: string;
-  readonly status?: number;
-  readonly outcome?: RequestOutcome | InvocationOutcome;
 }

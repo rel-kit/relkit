@@ -31,7 +31,7 @@ test("packed observability installs and starts its managed Node/native worker", 
       const worker = startLocalWorker();
       try {
         await worker.call({ type: "open", root: "./history" });
-        const records = await worker.call({ type: "append", records: [{ key: "packed", origin: "application", record: { version: 1, signal: "log", level: "info", timestamp: new Date().toISOString(), component: "smoke", message: "Native package works", fields: {} } }] });
+        const records = await worker.call({ type: "append", records: [{ key: "packed", origin: "application", record: { version: 2, signal: "log", level: "info", timestamp: new Date().toISOString(), component: "smoke", message: "Native package works", fields: {} } }] });
         if (records[0]?.cursor !== "1") throw new Error("Missing committed cursor");
       } finally { await worker.close(); }
     `;

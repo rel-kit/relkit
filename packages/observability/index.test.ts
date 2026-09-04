@@ -90,7 +90,7 @@ afterEach(async () => {
 
 function log(message: string, timestamp: string, fields: Record<string, string> = {}) {
   return {
-    version: 1 as const,
+    version: 2 as const,
     signal: "log" as const,
     timestamp,
     level: "info" as const,
