@@ -1,5 +1,6 @@
 import type { MaybePromise } from "@relkit/contracts";
 import type { InvocationContextOptions, InvocationRecord, PublicClock } from "./contracts.js";
+import { publicTrace } from "./public-trace.js";
 
 export function makeContext<Context extends { readonly signal: AbortSignal }>(
   factory: ((options: InvocationContextOptions) => MaybePromise<Context>) | undefined,
@@ -9,11 +10,15 @@ export function makeContext<Context extends { readonly signal: AbortSignal }>(
   time: PublicClock,
 ): Promise<Context> {
   const options = { invocation: record, signal, env: Object.freeze({ ...env }), time };
-  if (factory !== undefined) return Promise.resolve(factory(options) as Context);
+  if (factory !== undefined)
+    return Promise.resolve(factory(options)).then(
+      (context) => Object.freeze({ ...context, trace: publicTrace }) as Context,
+    );
   const noop = (): void => undefined;
   return Promise.resolve(
     Object.freeze({
       invocation: record,
+      trace: publicTrace,
       signal,
       env: options.env,
       log: Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop }),

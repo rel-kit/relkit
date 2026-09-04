@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { createSpanId, createTraceId } from "@relkit/contracts";
 import { unexpectedDefect, type InvocationFailure } from "./failure.js";
 import { validate, type StandardResult, type StandardSchemaV1 } from "@relkit/schema";
 import type {
@@ -78,7 +79,12 @@ export async function validateDeclaredError(
 }
 
 export const defaultIdSource: InvocationIdSource = {
-  next: (kind) => `${kind}-${crypto.randomUUID()}` as import("@relkit/contracts").ProtocolId,
+  next: (kind) =>
+    (kind === "trace"
+      ? createTraceId()
+      : kind === "span"
+        ? createSpanId()
+        : `invocation-${crypto.randomUUID()}`) as import("@relkit/contracts").ProtocolId,
 };
 
 export const defaultRunner = {
