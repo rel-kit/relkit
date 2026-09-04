@@ -64,9 +64,9 @@ export interface RelkitEventWorkerConfiguration {
   readonly visibilityTimeoutSeconds: number;
   readonly deliverySemantics: "at-least-once";
   readonly envelopePath: "$.envelope";
-  readonly tracePath: "$.envelope.traceId";
-  readonly correlationPath: "$.envelope.correlationId";
-  readonly causationPath: "$.envelope.causationInvocationId";
+  readonly tracePath: "$.envelope.propagation.producer.traceId";
+  readonly correlationPath: "$.envelope.propagation.correlationId";
+  readonly causationPath: "$.envelope.propagation.invocationId";
   readonly environment: pulumi.Output<Record<string, string>>;
 }
 

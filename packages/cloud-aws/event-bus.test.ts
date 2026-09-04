@@ -108,8 +108,8 @@ describe("RelkitEventBus", () => {
       eventVersion: 1,
       deliverySemantics: "at-least-once",
       envelopePath: "$.envelope",
-      tracePath: "$.envelope.traceId",
-      correlationPath: "$.envelope.correlationId",
+      tracePath: "$.envelope.propagation.producer.traceId",
+      correlationPath: "$.envelope.propagation.correlationId",
     });
 
     const rules = resources.filter(({ type }) => type === "aws:cloudwatch/eventRule:EventRule");
