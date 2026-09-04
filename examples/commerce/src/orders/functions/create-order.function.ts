@@ -13,8 +13,16 @@ const createOrder = defineFunction({
   timeoutMs: 10_000,
   concurrency: 100,
   handler: async (input, context) => {
+    // #region explicit-tracing
     // Dependencies are accessed through the checked execution context.
-    const unitPrice = await context.cache.prices.getOrSet({ sku: input.sku }, async () => 1_000);
+    const unitPrice = await context.trace.span(
+      "pricing.calculate",
+      { attributes: { "pricing.strategy": "catalog" } },
+      () => context.cache.prices.getOrSet({ sku: input.sku }, async () => 1_000),
+    );
+    context.trace.event("pricing.calculated", { "pricing.unit_cents": unitPrice });
+    context.trace.setAttributes({ "pricing.quantity": input.quantity });
+    // #endregion explicit-tracing
     const totalCents = unitPrice * input.quantity;
     return {
       orderId: input.orderId,
