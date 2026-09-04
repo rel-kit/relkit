@@ -59,11 +59,7 @@ export async function createLocalEventProvider(root: string): Promise<LocalEvent
         occurredAt: timestamp,
         publishedAt: timestamp,
         ...(options.key === undefined ? {} : { key: options.key }),
-        ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
-        ...(context.causationInvocationId === undefined
-          ? {}
-          : { causationInvocationId: context.causationInvocationId }),
-        traceId: context.traceId,
+        ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
         attributes: options.attributes ?? {},
       });
       const fanout = await router.route(record, { run: false });

@@ -1,4 +1,10 @@
-import { canonicalJson, deepFreeze, normalizeId, type JsonValue } from "@relkit/contracts";
+import {
+  canonicalJson,
+  deepFreeze,
+  normalizeId,
+  parseTracePropagation,
+  type JsonValue,
+} from "@relkit/contracts";
 import type { EventPublishResult, UnknownEventEnvelope } from "@relkit/events";
 import {
   createJobStore,
@@ -110,8 +116,7 @@ function normalizeEnvelope(value: unknown): UnknownEventEnvelope {
   const attributes = normalizeAttributes(value.attributes);
   const payload = JSON.parse(canonicalJson(value.payload)) as JsonValue;
   const key = optionalText(value.key, "key");
-  const correlationId = optionalText(value.correlationId, "correlationId");
-  const causationInvocationId = optionalText(value.causationInvocationId, "causationInvocationId");
+  const propagation = parseTracePropagation(value.propagation);
   const result = {
     instanceId: normalizeId(text(value.instanceId, "instanceId")),
     eventId: normalizeId(text(value.eventId, "eventId")),
@@ -120,9 +125,7 @@ function normalizeEnvelope(value: unknown): UnknownEventEnvelope {
     occurredAt: text(value.occurredAt, "occurredAt"),
     publishedAt: text(value.publishedAt, "publishedAt"),
     ...(key === undefined ? {} : { key }),
-    ...(correlationId === undefined ? {} : { correlationId }),
-    ...(causationInvocationId === undefined ? {} : { causationInvocationId }),
-    traceId: text(value.traceId, "traceId"),
+    ...(propagation === undefined ? {} : { propagation }),
     attributes,
   };
   return deepFreeze(result) as UnknownEventEnvelope;

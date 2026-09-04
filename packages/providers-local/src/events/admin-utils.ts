@@ -1,4 +1,4 @@
-import { deepFreeze, normalizeId } from "@relkit/contracts";
+import { deepFreeze, normalizeId, parseTracePropagation } from "@relkit/contracts";
 import type { EventDeliveryLedgerRecord } from "./delivery-types.js";
 import {
   EVENT_ADMIN_PROTOCOL,
@@ -16,6 +16,7 @@ import {
 import { EventAdminError } from "./admin-errors.js";
 import type { EventTriggerSnapshot } from "./router-types.js";
 import type { EventLogRecord } from "./log.js";
+
 export function versioned<T extends object>(
   value: T,
 ): T & {
@@ -24,7 +25,6 @@ export function versioned<T extends object>(
 } {
   return deepFreeze({ protocol: EVENT_ADMIN_PROTOCOL, version: EVENT_ADMIN_VERSION, ...value });
 }
-
 export function eventVersioned<T extends object>(
   value: T,
 ): T & {
@@ -37,11 +37,9 @@ export function eventVersioned<T extends object>(
     ...value,
   });
 }
-
 export function toEvent(value: EventContractInput): EventContract {
   return eventVersioned({ ...value });
 }
-
 export function toTrigger(value: EventTriggerSnapshot): EventTriggerContract {
   return versioned({
     id: value.id,
@@ -55,7 +53,6 @@ export function toTrigger(value: EventTriggerSnapshot): EventTriggerContract {
     ...(value.timeoutMs === undefined ? {} : { timeoutMs: value.timeoutMs }),
   });
 }
-
 export function toCapability(value: EventTriggerSnapshot): EventTriggerCapabilityContract {
   const durable = value.delivery === "durable";
   return versioned({
@@ -72,6 +69,7 @@ export function toCapability(value: EventTriggerSnapshot): EventTriggerCapabilit
 
 export function toPublication(value: EventLogRecord): EventPublicationContract {
   const envelope = value.envelope;
+  const propagation = parseTracePropagation(envelope.propagation);
   return eventVersioned({
     sequence: value.sequence,
     timestamp: value.timestamp,
@@ -82,11 +80,13 @@ export function toPublication(value: EventLogRecord): EventPublicationContract {
     occurredAt: envelope.occurredAt,
     publishedAt: envelope.publishedAt,
     ...(envelope.key === undefined ? {} : { key: envelope.key }),
-    ...(envelope.correlationId === undefined ? {} : { correlationId: envelope.correlationId }),
-    ...(envelope.causationInvocationId === undefined
+    ...(propagation?.correlationId === undefined
       ? {}
-      : { causationInvocationId: envelope.causationInvocationId }),
-    traceId: envelope.traceId,
+      : { correlationId: propagation.correlationId }),
+    ...(propagation?.originRequestId === undefined
+      ? {}
+      : { originRequestId: propagation.originRequestId }),
+    ...(propagation === undefined ? {} : { producerTraceId: propagation.producer.traceId }),
     attributes: envelope.attributes,
   });
 }
