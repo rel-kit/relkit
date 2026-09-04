@@ -27,17 +27,14 @@ export function telemetryExportDecision(
   record: ObservabilityRecord,
   policy: TelemetryExportSamplingPolicy = {},
 ): TelemetryExportDecision {
-  if (record.signal === "diagnostic" || isTelemetryError(record)) return "export";
-  if (record.signal === "log")
-    return logLevelEnabled(record.level, policy.minimumLogLevel ?? "info")
-      ? "export"
-      : "severity-filtered";
   if (
     record.traceId !== undefined &&
     record.signal !== "generation" &&
     !traceIsSampled(record.traceId, policy.traceRate)
   )
     return "sampled-out";
+  if (record.signal === "log" && !logLevelEnabled(record.level, policy.minimumLogLevel ?? "info"))
+    return "severity-filtered";
   return "export";
 }
 
@@ -50,7 +47,8 @@ export function isTelemetryError(record: ObservabilityRecord): boolean {
   if (record.signal === "job") return record.state === "dead-lettered";
   if (record.signal === "event")
     return record.state === "failed" || record.state === "dead-lettered";
-  if (record.signal === "resource" || record.signal === "tool") return record.outcome !== "success";
+  if (record.signal === "operation" || record.signal === "tool")
+    return record.outcome !== "success";
   if (record.signal === "agent")
     return record.outcome !== undefined && record.outcome !== "success";
   if (record.signal === "span" || record.signal === "trace")

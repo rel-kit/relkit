@@ -5,7 +5,7 @@ export function telemetryExporterDiagnostic(
   failure: TelemetryExporterFailure,
 ): ObservabilityRecord {
   return {
-    version: 1,
+    version: 2,
     signal: "diagnostic",
     code: failure.code,
     severity: "error",

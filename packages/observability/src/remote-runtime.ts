@@ -125,6 +125,7 @@ export async function createRemoteObservabilityRuntime(
     emit: (event: unknown) => publish(collector.emit(event)),
     read: collector.read,
     readRecords: collector.read,
+    capture: collector.capture,
     query,
     stream,
     flush,

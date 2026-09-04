@@ -40,7 +40,7 @@ function unit(id: string, records: readonly RedactedObservabilityRecord[]) {
 
 function record(message: string): RedactedObservabilityRecord {
   return admitObservabilityRecord({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-09-02T00:00:00.000Z",
     level: "info",
