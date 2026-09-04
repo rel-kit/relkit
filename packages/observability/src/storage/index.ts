@@ -21,6 +21,7 @@ import {
   trimEntries,
 } from "./index-memory.js";
 import { enforceRetention } from "./index-retention.js";
+import { readTracePage } from "./index-traces.js";
 import {
   createIndexState,
   normalizeOptions,
@@ -106,6 +107,8 @@ export async function createObservabilityIndex(
     });
   const page = (value: ObservabilityIndexPageOptions = {}): ObservabilityIndexPage =>
     readPage(state, config, value);
+  const tracePage = (value: ObservabilityIndexPageOptions = {}): ObservabilityIndexPage =>
+    readTracePage(state, config, value);
   const read = (entry: ObservabilityIndexEntry) => readRecord(root, config, state, entry);
   const currentStats = (): ObservabilityIndexStats => stats(state);
   const flush = () => queue(() => persist(root, state));
@@ -122,6 +125,7 @@ export async function createObservabilityIndex(
     rebuild,
     retain,
     page,
+    tracePage,
     read,
     stats: currentStats,
     flush,
@@ -185,6 +189,7 @@ function reset(state: IndexState): void {
   state.records.clear();
   state.locations.clear();
   state.segments.clear();
+  for (const index of Object.values(state.fields)) index.clear();
   state.sequence = 0;
 }
 

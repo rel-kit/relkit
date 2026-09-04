@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { appendFile, mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { appendFile, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createObservabilitySegmentStore } from "./src/index.ts";
 
@@ -9,7 +9,7 @@ test("writes redacted versioned records, rotates atomically, and shuts down clea
   const root = await makeRoot();
   const store = await createObservabilitySegmentStore({ root, maxRecordsPerSegment: 1 });
   await store.append({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info",
@@ -18,7 +18,7 @@ test("writes redacted versioned records, rotates atomically, and shuts down clea
     fields: { token: "not-written" },
   });
   await store.append({
-    version: 1,
+    version: 2,
     signal: "log",
     timestamp: "2026-08-16T00:00:00.001Z",
     level: "info",
@@ -34,17 +34,19 @@ test("writes redacted versioned records, rotates atomically, and shuts down clea
     files.map((file) => readFile(join(root, "logs", "2026-08-16", file), "utf8")),
   );
   expect(contents.join("")).not.toContain("not-written");
-  expect(contents.join("")).toContain('"version":1');
+  expect(contents.join("")).toContain('"version":2');
 });
 
 test("repairs a malformed tail and quarantines it on startup", async () => {
   const root = await makeRoot();
   const store = await createObservabilitySegmentStore({ root });
   await store.append({
-    version: 1,
+    version: 2,
     signal: "request",
+    phase: "completed",
     requestId: "request-1",
-    traceId: "trace-1",
+    originRequestId: "request-1",
+    traceId: "10000000000000000000000000000001",
     generationId: "generation-1",
     graphHash: "sha256:test",
     invocationId: "invocation-1",
@@ -58,7 +60,6 @@ test("repairs a malformed tail and quarantines it on startup", async () => {
     functionId: "health.check",
     status: 200,
     outcome: "success",
-    timeline: [],
   });
   await store.shutdown();
   const segment = join(root, "requests", "2026-08-16", "segment-000001.ndjson");
@@ -68,6 +69,19 @@ test("repairs a malformed tail and quarantines it on startup", async () => {
   await reopened.shutdown();
   expect((await readFile(segment, "utf8")).trim().split("\n")).toHaveLength(1);
   expect(await readdir(join(root, ".relkit-quarantine"))).toHaveLength(1);
+});
+
+test("reports incompatible state without rewriting the segment", async () => {
+  const root = await makeRoot();
+  const day = join(root, "requests", "2026-08-16");
+  const segment = join(day, "segment-000001.ndjson");
+  await mkdir(day, { recursive: true });
+  await writeFile(segment, '{"version":1,"signal":"request"}\n');
+
+  await expect(createObservabilitySegmentStore({ root })).rejects.toThrow(
+    "RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE",
+  );
+  expect(await readFile(segment, "utf8")).toBe('{"version":1,"signal":"request"}\n');
 });
 
 test("exposes the named rotation failure point without losing the active segment", async () => {
@@ -85,7 +99,7 @@ test("exposes the named rotation failure point without losing the active segment
     },
   });
   const record = (message: string) => ({
-    version: 1 as const,
+    version: 2 as const,
     signal: "log" as const,
     timestamp: "2026-08-16T00:00:00.000Z",
     level: "info" as const,

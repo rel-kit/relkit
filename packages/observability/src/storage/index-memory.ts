@@ -65,6 +65,7 @@ export function addRecord(
   if (previous !== undefined) removeEntry(state, root, previous);
   const entry = makeEntry(record, relativeSegmentPath(root, path), offset, bytes, ++state.sequence);
   state.records.set(entry.cursor, entry);
+  indexEntry(state, entry);
   state.locations.set(location, entry.cursor);
   segment.entries.add(entry.cursor);
   if (countBytes) segment.bytes += bytes;
@@ -108,10 +109,21 @@ export function readPage(
   const descending = options.order === "desc";
   const after =
     options.cursor === undefined ? (descending ? Infinity : 0) : parseCursor(options.cursor);
-  // ponytail: filtered pages scan the bounded index; add field maps only if measured growth needs them.
   const entries: ObservabilityIndexEntry[] = [];
   let nextCursor: string | undefined;
-  const values = [...state.records.values()];
+  const indexed = (["requestId", "originRequestId", "traceId", "spanId"] as const)
+    .flatMap((field) =>
+      options[field] === undefined
+        ? []
+        : [state.fields[field].get(options[field]!) ?? new Set<string>()],
+    )
+    .sort((left, right) => left.size - right.size)[0];
+  const values = [
+    ...(indexed === undefined
+      ? state.records.values()
+      : [...indexed].flatMap((cursor) => state.records.get(cursor) ?? [])),
+  ];
+  values.sort((left, right) => Number(left.cursor) - Number(right.cursor));
   if (descending) values.reverse();
   for (const entry of values) {
     if (
@@ -135,8 +147,29 @@ export function removeEntry(state: IndexState, root: string, cursor: string): vo
   const entry = state.records.get(cursor);
   if (entry === undefined) return;
   state.records.delete(cursor);
+  unindexEntry(state, entry);
   state.locations.delete(`${safeSegmentPath(root, entry.segment)}:${entry.offset}`);
   state.segments.get(safeSegmentPath(root, entry.segment))?.entries.delete(cursor);
+}
+
+function indexEntry(state: IndexState, entry: ObservabilityIndexEntry): void {
+  for (const field of ["requestId", "originRequestId", "traceId", "spanId"] as const) {
+    const value = entry[field];
+    if (value === undefined) continue;
+    const cursors = state.fields[field].get(value) ?? new Set<string>();
+    cursors.add(entry.cursor);
+    state.fields[field].set(value, cursors);
+  }
+}
+
+function unindexEntry(state: IndexState, entry: ObservabilityIndexEntry): void {
+  for (const field of ["requestId", "originRequestId", "traceId", "spanId"] as const) {
+    const value = entry[field];
+    if (value === undefined) continue;
+    const cursors = state.fields[field].get(value);
+    cursors?.delete(entry.cursor);
+    if (cursors?.size === 0) state.fields[field].delete(value);
+  }
 }
 
 export function trimEntries(state: IndexState, root: string, maxEntries: number): void {
