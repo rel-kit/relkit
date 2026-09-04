@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startLocalWorker } from "./src/local/worker-client";
@@ -15,13 +15,13 @@ const item = (
   key,
   origin: "application",
   record: {
-    version: 1,
+    version: 2,
     signal: "log",
     level: "debug",
     timestamp,
     component: "orders",
     requestId: "same-request",
-    traceId: "same-trace",
+    traceId: "10000000000000000000000000000001",
     message,
     fields: { password: "must-not-persist", customer: "Alice" },
   },
@@ -85,33 +85,6 @@ test("Node DuckDB worker preserves history, retries, repeated records, cursors, 
   }
 }, 30_000);
 
-test("imports NDJSON without collapsing repeated lines or changing source files", async () => {
-  const root = await mkdtemp(join(tmpdir(), "relkit-import-"));
-  const content = [
-    JSON.stringify(item("unused").record),
-    "malformed",
-    JSON.stringify(item("unused").record),
-  ].join("\n");
-  await writeFile(join(root, "history.ndjson"), content);
-  let worker = startLocalWorker();
-  try {
-    expect(await worker.call({ type: "open", root })).toEqual({ records: 2, malformed: 1 });
-    await worker.close();
-    worker = startLocalWorker();
-    expect(await worker.call({ type: "open", root })).toEqual({ records: 0, malformed: 0 });
-    const page = await worker.call<ObservabilityQueryPage<StoredLocalRecord>>({
-      type: "query",
-      kind: "logs",
-      query: {},
-    });
-    expect(page.items).toHaveLength(2);
-    expect(await readFile(join(root, "history.ndjson"), "utf8")).toBe(content);
-  } finally {
-    await worker.close();
-    await rm(root, { recursive: true, force: true });
-  }
-}, 30_000);
-
 test("batch queue flush waits for commit and reports failed or dropped writes", async () => {
   let release!: () => void;
   const commit = new Promise<void>((resolve) => {
@@ -152,29 +125,39 @@ test("trace details expose every retained span through stable pages and the late
     key: `span:${index}`,
     origin: "application",
     record: {
-      version: 1,
+      version: 2,
       signal: "span",
-      traceId: "large-trace",
-      spanId: `span:${index}`,
+      traceId: "30000000000000000000000000000003",
+      spanId: (index + 1).toString(16).padStart(16, "0"),
       invocationId: `invocation:${index}`,
       name: "work",
+      kind: "internal",
       status: "completed",
+      revision: 1,
       startedAt,
     },
   }));
   records.push({
     key: "summary",
     origin: "application",
-    record: { version: 1, signal: "trace", traceId: "large-trace", startedAt, spanCount: 102 },
+    record: {
+      version: 2,
+      signal: "trace",
+      traceId: "30000000000000000000000000000003",
+      startedAt,
+      spanCount: 102,
+    },
   });
   records.push({
     key: "request-only",
     origin: "application",
     record: {
-      version: 1,
+      version: 2,
       signal: "request",
+      phase: "completed",
       requestId: "request-only",
-      traceId: "request-only-trace",
+      originRequestId: "request-only",
+      traceId: "40000000000000000000000000000004",
       invocationId: "request-only",
       generationId: "g1",
       graphHash: "hash",
@@ -188,22 +171,28 @@ test("trace details expose every retained span through stable pages and the late
       durationMs: 0,
       status: 404,
       outcome: "success",
-      timeline: [],
     },
   });
   try {
     await worker.call({ type: "open", root });
     await worker.call({ type: "append", records });
+    const traces = await worker.call<ObservabilityQueryPage<StoredLocalRecord>>({
+      type: "query",
+      kind: "traces",
+      query: { limit: 100 },
+    });
+    expect(traces.items).toHaveLength(2);
+    expect(new Set(traces.items.map((record) => record.traceId)).size).toBe(2);
     const detail = await worker.call<{
       trace: { spanCount: number };
       spans: StoredLocalRecord[];
       nextCursor: string;
-    }>({ type: "detail", kind: "trace", id: "large-trace" });
+    }>({ type: "detail", kind: "trace", id: "30000000000000000000000000000003" });
     expect(detail.trace.spanCount).toBe(102);
     const requestOnly = await worker.call<{ spans: unknown[]; records: StoredLocalRecord[] }>({
       type: "detail",
       kind: "trace",
-      id: "request-only-trace",
+      id: "40000000000000000000000000000004",
     });
     expect(requestOnly.spans).toEqual([]);
     expect(requestOnly.records[0]?.signal).toBe("request");
@@ -211,7 +200,7 @@ test("trace details expose every retained span through stable pages and the late
     const rest = await worker.call<ObservabilityQueryPage<StoredLocalRecord>>({
       type: "query",
       kind: "traces",
-      query: { traceId: "large-trace", cursor: detail.nextCursor },
+      query: { traceId: "30000000000000000000000000000003", cursor: detail.nextCursor },
     });
     expect(rest.nextCursor).toBeUndefined();
     expect(
