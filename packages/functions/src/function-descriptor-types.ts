@@ -4,6 +4,7 @@ import type {
   InvocationSource as SharedInvocationSource,
   PublicClock as SharedPublicClock,
   PublicLogger as SharedPublicLogger,
+  PublicTrace as SharedPublicTrace,
 } from "@relkit/invocation";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
@@ -28,6 +29,7 @@ export type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
 
 export type PublicLogger = SharedPublicLogger;
 export type PublicClock = SharedPublicClock;
+export type PublicTrace = SharedPublicTrace;
 
 declare global {
   namespace Relkit {
@@ -68,6 +70,7 @@ export interface FunctionContext<
   readonly env: ResolvedApplicationEnv;
   readonly log: PublicLogger;
   readonly time: PublicClock;
+  readonly trace: PublicTrace;
   readonly jobs: JobClients<D["jobs"]>;
   readonly events: import("./clients.js").EventClients<PublishedEventMap<Publishes>>;
   readonly buckets: BucketClients<D["buckets"]>;

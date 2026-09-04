@@ -27,12 +27,18 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "bun": "./dist/server.js"
+    },
     "./tanstack-query": {
       "types": "./dist/tanstack-query.d.ts",
       "import": "./dist/tanstack-query.js"
     }
   },
   "dependencies": {
+    "@relkit/contracts": "workspace:*",
+    "@relkit/invocation": "workspace:*",
     "@orpc/client": "2.0.0-beta.31",
     "@orpc/contract": "2.0.0-beta.31",
     "@orpc/tanstack-query": "2.0.0-beta.31"

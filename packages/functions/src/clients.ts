@@ -1,6 +1,7 @@
 import type { BucketClient } from "@relkit/buckets";
 import type { CacheClient } from "@relkit/cache";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
+import type { TracePropagation } from "@relkit/contracts";
 
 export type JobState =
   "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
@@ -42,9 +43,7 @@ interface EventEnvelope<
   readonly occurredAt: string;
   readonly publishedAt: string;
   readonly key?: string;
-  readonly correlationId?: string;
-  readonly causationInvocationId?: string;
-  readonly traceId: string;
+  readonly propagation?: TracePropagation;
   readonly attributes: Readonly<Record<string, EventAttributeValue>>;
 }
 
