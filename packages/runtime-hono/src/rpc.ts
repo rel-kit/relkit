@@ -4,9 +4,12 @@ import type { Context, Hono, Next } from "hono";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import type { HttpTriggerRegistration } from "@relkit/graph";
 import type { MiddlewareContext, MiddlewareDescriptor } from "@relkit/routes";
-import { getRequestState } from "./middleware.js";
 import { getEntry, isRecord } from "./materialize-routes-utils.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
+import {
+  createRpcMiddlewareContext,
+  runRpcMiddleware as runTracedMiddleware,
+} from "./rpc-middleware-trace.js";
 interface RpcContext {
   readonly hono: Context;
   readonly auth:
@@ -110,44 +113,19 @@ async function runMiddleware(
       continued = true;
       output = await run(index + 1);
     };
-    const response = await descriptor.handler(
+    const middlewareId = ids[index]!;
+    const response = await runTracedMiddleware(
+      descriptor,
+      middlewareId,
       context,
       next,
-      await middlewareContext(ids[index]!, context, options),
+      createRpcMiddlewareContext(middlewareId, context, options),
     );
     if (response instanceof Response) throw await responseError(response);
     if (!continued) throw new ORPCError("INTERNAL_SERVER_ERROR");
     return output;
   };
   return run(0);
-}
-async function middlewareContext(
-  middlewareId: string,
-  context: Context,
-  options: RouteMaterializationOptions,
-): Promise<MiddlewareContext> {
-  const state = getRequestState(context);
-  if (options.middlewareContext !== undefined) {
-    return options.middlewareContext({
-      middlewareId,
-      signal: state?.signal ?? context.req.raw.signal,
-      request: context.req.raw,
-      ...(options.auth === undefined ? {} : { auth: options.auth.contextFor(context.req.raw) }),
-      ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
-      ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
-    });
-  }
-  const noop = (): void => undefined;
-  return {
-    signal: context.req.raw.signal,
-    env: {},
-    auth: options.auth?.contextFor(context.req.raw) ?? { getSession: () => Promise.resolve(null) },
-    log: { trace: noop, debug: noop, info: noop, warn: noop, error: noop },
-    time: {
-      now: () => new Date(),
-      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-    },
-  };
 }
 function rpcError(cause: unknown, signal: AbortSignal | undefined): ORPCError<string, unknown> {
   if (cause instanceof ORPCError) return cause;

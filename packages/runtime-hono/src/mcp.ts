@@ -82,7 +82,6 @@ async function invoke(
       source: "tool",
       ...(state?.signal === undefined ? {} : { signal: state.signal }),
       ...(state?.requestId === undefined ? {} : { requestId: state.requestId }),
-      ...(state?.requestId === undefined ? {} : { correlationId: state.requestId }),
       ...(state?.traceId === undefined ? {} : { traceId: state.traceId }),
       ...(tool.timeoutMs === undefined ? {} : { timeoutMs: tool.timeoutMs }),
       ...(options.auth === undefined ? {} : { auth: options.auth.contextFor(context.req.raw) }),
