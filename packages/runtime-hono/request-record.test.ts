@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { createObservabilityCollector, type RequestRecord } from "@relkit/observability";
+import {
+  createObservabilityCollector,
+  type RequestRecord,
+  type SpanRecord,
+} from "@relkit/observability";
 import type { RegistrationPlan } from "@relkit/graph";
 import { createApp, type RuntimeManifest } from "./src/index.js";
 import { runtimeCohort } from "./test-cohort.ts";
@@ -13,21 +17,29 @@ test("records a correlated HTTP timeline without request values", async () => {
     manifest: manifest(),
     generationId: "generation.test",
     observability: collector,
-    middleware: { requestId: () => "request.test", traceId: () => "trace.test" },
+    middleware: {
+      requestId: () => "request.test",
+      traceId: () => "10000000000000000000000000000001",
+    },
     engine: { invoke: async () => ({ ok: true }) },
   });
 
   const response = await app.request("http://localhost/hello?token=secret-value", {
     headers: { authorization: "Bearer secret-value" },
   });
+  await response.text();
   const record = collector
     .read()
-    .find((value): value is RequestRecord => value.signal === "request");
+    .find(
+      (value): value is RequestRecord => value.signal === "request" && value.phase === "completed",
+    );
+  const spans = collector.read().filter((value): value is SpanRecord => value.signal === "span");
 
   expect(response.status).toBe(200);
   expect(record).toMatchObject({
     requestId: "request.test",
-    traceId: "trace.test",
+    phase: "completed",
+    traceId: "10000000000000000000000000000001",
     generationId: "generation.test",
     graphHash: "sha256:request-record",
     routeId: "hello.route",
@@ -36,12 +48,16 @@ test("records a correlated HTTP timeline without request values", async () => {
     status: 200,
     outcome: "success",
   });
-  expect(record?.timeline.map(({ kind }) => kind)).toEqual([
-    "accepted",
-    "match",
-    "mapping",
-    "function",
-    "response",
+  expect(
+    spans.find((span) => span.status === "completed")?.events?.map((event) => event.name),
+  ).toEqual([
+    "http.received",
+    "http.route.matched",
+    "http.mapping.started",
+    "http.mapping.completed",
+    "http.validation.completed",
+    "http.response.headers",
+    "http.success",
   ]);
   expect(JSON.stringify(record)).not.toContain("secret-value");
 });
@@ -56,19 +72,15 @@ test("records mapping failures as validation outcomes", async () => {
   });
 
   const response = await app.request("http://localhost/hello");
+  await response.text();
   const record = collector
     .read()
-    .find((value): value is RequestRecord => value.signal === "request");
+    .find(
+      (value): value is RequestRecord => value.signal === "request" && value.phase === "completed",
+    );
 
   expect(response.status).toBe(422);
   expect(record).toMatchObject({ status: 422, outcome: "validation-error" });
-  expect(record?.timeline.map(({ kind }) => kind)).toEqual([
-    "accepted",
-    "match",
-    "mapping",
-    "response",
-  ]);
-  expect(record?.timeline.at(-1)?.outcome).toBe("validation-error");
 });
 
 function plan(options: { readonly request?: unknown } = {}): RegistrationPlan {

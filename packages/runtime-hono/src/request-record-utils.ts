@@ -4,6 +4,7 @@ import { isRequestMappingFailure } from "./request-mapping.js";
 import type { HttpEngine, HttpInvocationOptions } from "./materialize-routes.js";
 import type { RequestOutcome } from "@relkit/observability";
 import type { RequestRecordBuilder } from "@relkit/observability";
+import { publicTrace } from "@relkit/invocation";
 
 export function recordDetail(
   builder: RequestRecordBuilder | undefined,
@@ -36,6 +37,7 @@ export async function mapInputWithRecord(
   targetId: string,
 ): Promise<unknown> {
   const startedAt = Date.now();
+  publicTrace.event("http.mapping.started", { "code.function.name": targetId });
   try {
     const input = await map();
     const failure = isRequestMappingFailure(input);
@@ -45,6 +47,7 @@ export async function mapInputWithRecord(
       durationMs: Math.max(0, Date.now() - startedAt),
       outcome: failure ? "validation-error" : "success",
     });
+    publicTrace.event("http.mapping.completed", { "code.function.name": targetId });
     return input;
   } catch (cause) {
     const failure = failureOutcome(cause);
@@ -55,6 +58,7 @@ export async function mapInputWithRecord(
       outcome: failure.outcome,
     });
     builder?.setOutcome(failure.outcome, failure.errorId);
+    publicTrace.event("http.mapping.failed", { "code.function.name": targetId });
     throw cause;
   }
 }
