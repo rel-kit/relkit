@@ -1,4 +1,5 @@
 import { normalizeId, type MaybePromise } from "@relkit/contracts";
+import { frameworkTrace } from "@relkit/invocation";
 import { type AgentDescriptor } from "./define-agent.js";
 import { resolveRuntimeModel } from "./runtime-model.js";
 import {
@@ -9,16 +10,9 @@ import {
 } from "./runtime-utils.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
 import {
-  captureAgentContent,
-  createAgentSpanCapture,
-  completeAgentSpan,
   createAgentCapturePolicy,
-  emitAgentSpanComplete,
-  emitAgentSpanStart,
-  startAgentSpan,
   type AgentCapturePolicy,
   type AgentRuntimeHooks,
-  type AgentSpanOutcome,
 } from "./observability.js";
 import { generatedAgentFunctionId } from "./generated-function.js";
 import { runAgentLoop } from "./runtime-loop.js";
@@ -81,57 +75,41 @@ export async function invokeAgent(
     ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
   });
   const execution = createExecutionSignal(options);
-  const agentSpan = startAgentSpan({
-    kind: "agent",
-    agentId: options.agent.id,
-    invocationId,
-    functionId: generatedAgentFunctionId(options.agent.id),
-    name: `relkit.agent.${options.agent.id}.invoke`,
-    traceId,
-    ...(options.parentSpanId === undefined ? {} : { parentSpanId: options.parentSpanId }),
-    attributes: {
-      "relkit.agent.id": options.agent.id,
-      "relkit.model.id": runtimeModel.id,
+  return frameworkTrace.span(
+    `relkit.agent.${options.agent.id}.invoke`,
+    {
+      input: options.input,
+      attributes: {
+        "relkit.agent.id": options.agent.id,
+        "relkit.function.id": generatedAgentFunctionId(options.agent.id),
+        "relkit.invocation.id": invocationId,
+        "relkit.model.id": runtimeModel.id,
+      },
     },
-  });
-  emitAgentSpanStart(hooks, agentSpan);
-  let outcome: AgentSpanOutcome = "error";
-  try {
-    if (execution.signal.aborted) throw signalFailure(execution.signal);
-    const input = await withSignal(
-      validateValue(options.agent.input, options.input, "input"),
-      execution.signal,
-    );
-    const result = await runAgentLoop(
-      options,
-      runtimeModel.model,
-      runtimeModel.id,
-      execution.signal,
-      input,
-      runtimeModel.maxInputBytes,
-      runtimeModel.maxOutputBytes,
-      invocationId,
-      traceId,
-      agentSpan.spanId,
-      capture,
-    );
-    outcome = "success";
-    return result;
-  } catch (cause) {
-    if (execution.signal.aborted) outcome = "cancelled";
-    else if (cause instanceof AgentRuntimeError && cause.code.includes("LIMIT")) outcome = "limit";
-    throw cause;
-  } finally {
-    execution.close();
-    emitAgentSpanComplete(
-      hooks,
-      completeAgentSpan(
-        agentSpan,
-        outcome,
-        createAgentSpanCapture(captureAgentContent(options.input, capture), undefined),
-      ),
-    );
-  }
+    async () => {
+      try {
+        if (execution.signal.aborted) throw signalFailure(execution.signal);
+        const input = await withSignal(
+          validateValue(options.agent.input, options.input, "input"),
+          execution.signal,
+        );
+        return await runAgentLoop(
+          options,
+          runtimeModel.model,
+          runtimeModel.id,
+          execution.signal,
+          input,
+          runtimeModel.maxInputBytes,
+          runtimeModel.maxOutputBytes,
+          invocationId,
+          traceId,
+          capture,
+        );
+      } finally {
+        execution.close();
+      }
+    },
+  );
 }
 
 /** Creates a reusable runtime for one immutable agent/provider/tool catalog. */

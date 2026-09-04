@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { defineFunction } from "@relkit/functions";
+import {
+  completeSpan,
+  runInExecutionContext,
+  SpanRuntime,
+  startRootSpan,
+  type SpanLifecycle,
+} from "@relkit/invocation";
 import { z } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
 import {
@@ -181,29 +188,42 @@ describe("bounded agent runtime", () => {
   test("resolves the active AI SDK model without exposing it on the descriptor", async () => {
     const state = setup([]);
     const { modelRegistry: _registry, ...runtime } = state.runtime;
-    const spans: import("./src/index.ts").AgentSpanRecord[] = [];
+    const spans: SpanLifecycle[] = [];
+    const spanRuntime = new SpanRuntime({
+      ids: {
+        next: (kind) =>
+          kind === "trace"
+            ? "10000000000000000000000000000001"
+            : `${spans.length + 1}`.padStart(16, "0"),
+      },
+      observer: (event) => spans.push(event),
+    });
+    const root = startRootSpan(spanRuntime, "test", "internal");
     const { model } = createTestModel([{ type: "final", output: { answer: "registry" } }], {
       provider: "test",
       modelId: "model",
     });
 
     await expect(
-      invokeAgent({
-        ...runtime,
-        modelRegistry: {
-          resolveModel: (selector?: string) => ({
-            provider: "test",
-            id: `test:${selector ?? "model"}`,
-            model,
-          }),
-        },
-        input: { question: "Hi" },
-        hooks: { onSpanStart: (span) => spans.push(span) },
-      }),
+      runInExecutionContext({ span: root, runtime: spanRuntime }, () =>
+        invokeAgent({
+          ...runtime,
+          modelRegistry: {
+            resolveModel: (selector?: string) => ({
+              provider: "test",
+              id: `test:${selector ?? "model"}`,
+              model,
+            }),
+          },
+          input: { question: "Hi" },
+        }),
+      ),
     ).resolves.toEqual({ answer: "registry" });
-    expect(spans.find((span) => span.kind === "model")?.attributes).toMatchObject({
-      "relkit.model.id": "test:default",
-    });
+    completeSpan(root);
+    const modelSpan = spans.find(
+      ({ type, span }) => type === "completed" && span.name === "relkit.agent.support.order.model",
+    )?.span;
+    expect(modelSpan?.attributes.get("relkit.model.id")).toBe("test:default");
     expect("model" in state.runtime.agent).toBe(true);
     expect(typeof state.runtime.agent.model).toBe("string");
   });

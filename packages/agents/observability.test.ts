@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { defineFunction } from "@relkit/functions";
+import {
+  completeSpan,
+  runInExecutionContext,
+  SpanRuntime,
+  startRootSpan,
+  type SpanLifecycle,
+} from "@relkit/invocation";
 import { z } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
 import {
@@ -7,7 +14,6 @@ import {
   invokeAgent,
   type AgentCapturePolicy,
   type AgentRuntimeHooks,
-  type AgentSpanRecord,
 } from "./src/index.ts";
 import { createTestModel, type TestModelTurn } from "./test-model.ts";
 
@@ -49,32 +55,57 @@ function setup(hooks?: AgentRuntimeHooks, capture?: AgentCapturePolicy) {
 }
 
 describe("agent observability", () => {
-  test("emits safe spans and observed edges without content by default", async () => {
-    const spans: AgentSpanRecord[] = [];
+  test("records real operations and observed edges without content", async () => {
+    const spans: SpanLifecycle[] = [];
     const edges: unknown[] = [];
     const runtime = setup({
-      onSpanStart: (span) => spans.push(span),
-      onSpanComplete: (span) => spans.push(span),
       onObservedEdge: (edge) => edges.push(edge),
     });
+    const spanRuntime = new SpanRuntime({
+      ids: {
+        next: (kind) =>
+          kind === "trace"
+            ? "10000000000000000000000000000001"
+            : `${spans.length + 1}`.padStart(16, "0"),
+      },
+      observer: (event) => spans.push(event),
+    });
+    const root = startRootSpan(spanRuntime, "test", "internal");
     await expect(
-      invokeAgent({
-        ...runtime,
-        input: { question: "Where?", token: "TOP-SECRET" },
-        invocationId: "agent-1",
-      }),
+      runInExecutionContext({ span: root, runtime: spanRuntime }, () =>
+        invokeAgent({
+          ...runtime,
+          input: { question: "Where?", token: "TOP-SECRET" },
+          invocationId: "agent-1",
+        }),
+      ),
     ).resolves.toEqual({ answer: "ready" });
-    expect(spans.map((span) => span.kind)).toEqual([
-      "agent",
-      "model",
-      "model",
-      "tool",
-      "tool",
-      "model",
-      "model",
-      "agent",
+    completeSpan(root);
+    const completed = spans.filter(({ type }) => type === "completed").map(({ span }) => span);
+    expect(completed.map(({ name }) => name)).toEqual([
+      "relkit.tool.orders.lookup.tool",
+      "relkit.agent.support.order.model",
+      "relkit.agent.support.order.invoke",
+      "test",
     ]);
-    expect(JSON.stringify(spans)).not.toContain("TOP-SECRET");
+    expect(
+      completed.find(({ name }) => name.endsWith(".model"))?.events.map(({ name }) => name),
+    ).toEqual(
+      expect.arrayContaining([
+        "agent.model.step.started",
+        "agent.tool.started",
+        "agent.tool.completed",
+        "agent.model.step.completed",
+      ]),
+    );
+    const recorded = JSON.stringify(
+      completed.map((span) => ({
+        attributes: Object.fromEntries(span.attributes),
+        events: span.events,
+      })),
+      (_key, value) => (typeof value === "bigint" ? value.toString() : value),
+    );
+    expect(recorded).not.toContain("TOP-SECRET");
     expect(edges).toEqual(
       expect.arrayContaining([
         { relationship: "uses-provider-profile", from: "support.order", to: "default" },
@@ -84,23 +115,39 @@ describe("agent observability", () => {
     );
   });
 
-  test("requires explicit bounded redacted capture for content", async () => {
-    const spans: AgentSpanRecord[] = [];
-    const runtime = setup(
-      { onSpanComplete: (span) => spans.push(span) },
-      { mode: "development-redacted", maxBytes: 1_024, redactKeys: ["token"] },
-    );
-    await invokeAgent({
-      ...runtime,
-      input: { question: "Where?", token: "TOP-SECRET" },
-      invocationId: "agent-2",
+  test("never records prompt or tool content as span metadata", async () => {
+    const spans: SpanLifecycle[] = [];
+    const runtime = setup(undefined, {
+      mode: "development-redacted",
+      maxBytes: 1_024,
+      redactKeys: ["token"],
     });
-    const model = spans.find((span) => span.kind === "model");
-    expect(model?.capture?.input?.content).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ content: expect.stringContaining("[REDACTED]") }),
-      ]),
+    const spanRuntime = new SpanRuntime({
+      ids: {
+        next: (kind) =>
+          kind === "trace"
+            ? "10000000000000000000000000000002"
+            : `${spans.length + 1}`.padStart(16, "0"),
+      },
+      observer: (event) => spans.push(event),
+    });
+    const root = startRootSpan(spanRuntime, "test", "internal");
+    await runInExecutionContext({ span: root, runtime: spanRuntime }, () =>
+      invokeAgent({
+        ...runtime,
+        input: { question: "Where?", token: "TOP-SECRET" },
+        invocationId: "agent-2",
+      }),
     );
-    expect(JSON.stringify(model)).not.toContain("TOP-SECRET");
+    completeSpan(root);
+    const metadata = spans.map(({ span }) => ({
+      attributes: Object.fromEntries(span.attributes),
+      events: span.events,
+    }));
+    const serialized = JSON.stringify(metadata, (_key, value) =>
+      typeof value === "bigint" ? value.toString() : value,
+    );
+    expect(serialized).not.toContain("TOP-SECRET");
+    expect(serialized).not.toContain("Where?");
   });
 });
