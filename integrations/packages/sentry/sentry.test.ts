@@ -60,19 +60,19 @@ test("delegates capture, buffering, flush, and close to the Sentry SDK", async (
 
   exporter.exportRecord(
     admitObservabilityRecord({
-      version: 1,
+      version: 2,
       signal: "log",
       timestamp: "2026-09-02T00:00:00.000Z",
       level: "error",
       component: "test",
       message: "redacted failure",
       fields: {},
-      traceId: "trace-1",
+      traceId: "10000000000000000000000000000001",
     })!,
   );
   exporter.exportRecord(
     admitObservabilityRecord({
-      version: 1,
+      version: 2,
       signal: "log",
       timestamp: "2026-09-02T00:00:00.001Z",
       level: "info",
@@ -84,7 +84,10 @@ test("delegates capture, buffering, flush, and close to the Sentry SDK", async (
   expect(initialized).toEqual([{ dsn: "https://public@example.test/1", sendDefaultPii: false }]);
   expect(captured[0]?.message).toBe("redacted failure");
   expect(events[0]).toMatchObject({ message: "safe event", level: "info" });
-  expect(tags).toMatchObject({ "relkit.signal": "log", "relkit.trace_id": "trace-1" });
+  expect(tags).toMatchObject({
+    "relkit.signal": "log",
+    "relkit.trace_id": "10000000000000000000000000000001",
+  });
   expect(await exporter.flush(500)).toBe(true);
   expect(await exporter.close(750)).toBe(true);
   expect(flushes).toEqual([500]);
@@ -92,7 +95,7 @@ test("delegates capture, buffering, flush, and close to the Sentry SDK", async (
   expect(() =>
     exporter.exportRecord(
       admitObservabilityRecord({
-        version: 1,
+        version: 2,
         signal: "diagnostic",
         code: "RELKIT_LATE",
         severity: "error",

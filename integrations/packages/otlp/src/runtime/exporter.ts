@@ -67,6 +67,7 @@ export function createOtlpExporter(options: OtlpExporterOptions): OtlpExporter {
   };
   const exportRecord = (record: RedactedObservabilityRecord): void => {
     if (closing) throw new Error("OTLP exporter is closed");
+    if (otlpSignalFor(record) === undefined) return;
     queue.enqueue({ id: otlpUnitId(record, ++sequence), records: [record] });
     start();
   };
@@ -131,6 +132,7 @@ export function createOtlpExporter(options: OtlpExporterOptions): OtlpExporter {
           otlpPayload(
             options.serviceName,
             selected.map(({ record }) => record),
+            signal,
           ),
           combinedSignal(activeAbort.signal, options.signal),
         );
