@@ -1,6 +1,6 @@
 {
   "name": "@relkit/drizzle",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Drizzle ORM integration for RELKIT functions.",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "@relkit/aws",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "AWS host and infrastructure integration for RELKIT.",
   "license": "MIT",
   "repository": {
