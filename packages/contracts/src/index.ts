@@ -5,3 +5,5 @@ export * from "./source-location.js";
 export * from "./version.js";
 export * from "./runtime-integration.js";
 export * from "./activation.js";
+export * from "./trace-context.js";
+export * from "./trace-propagation.js";
