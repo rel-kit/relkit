@@ -106,6 +106,11 @@ Compilation SHALL generate `application.graph.json`, `runtime.manifest.ts`, `dia
 - **WHEN** the known event set changes
 - **THEN** only changed generated artifacts are atomically replaced and no partial registry is observable
 
+#### Scenario: Invalid source follows a valid compile
+
+- **WHEN** compilation fails after a valid generated artifact set exists
+- **THEN** diagnostics update while the last valid graph and activatable artifacts remain unchanged
+
 ### Requirement: Incremental compilation preserves full-build truth
 
 Watch-mode compilation SHALL invalidate only affected discovery, descriptor, graph, and generated-output dependencies while producing the same diagnostics, canonical bytes, hash, and activatable outputs as a clean full compilation of the same source state.
