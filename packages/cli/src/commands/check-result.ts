@@ -1,6 +1,9 @@
+import { join } from "node:path";
 import { canonicalJson } from "@relkit/contracts";
 import {
+  GENERATED_ARTIFACT_FILES,
   writeGeneratedArtifacts,
+  writeIfChanged,
   type GeneratedOutputs,
   type LoadedToolingConfig,
 } from "@relkit/compiler";
@@ -31,8 +34,16 @@ export async function emitCheckResult(
     outputs.diagnostics === ""
       ? { ...outputs, diagnostics: `${canonicalJson(stable)}\n` }
       : outputs;
+  const hasCompilationErrors = stable.some((diagnostic) => diagnostic.severity === "error");
   try {
-    await writeGeneratedArtifacts(nextOutputs, { directory: generatedDirectory });
+    if (hasCompilationErrors) {
+      await writeIfChanged(
+        join(generatedDirectory, GENERATED_ARTIFACT_FILES.diagnostics),
+        nextOutputs.diagnostics,
+      );
+    } else {
+      await writeGeneratedArtifacts(nextOutputs, { directory: generatedDirectory });
+    }
   } catch (error) {
     stable = sortDiagnostics([
       ...stable,

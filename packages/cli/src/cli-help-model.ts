@@ -173,6 +173,7 @@ const root = command(
           projectRoot,
           option("port", "integer", "Application port"),
           option("inspector-port", "integer", "Inspector port"),
+          option("no-ports", "boolean", "Skip port availability checks"),
           option("pulumi", "boolean", "Require Pulumi"),
           option("no-pulumi", "boolean", "Skip Pulumi requirements"),
         ],
