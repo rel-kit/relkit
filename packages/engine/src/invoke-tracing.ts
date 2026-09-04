@@ -7,11 +7,11 @@ import {
 import { callHook } from "./invoke-utils.js";
 import type {
   InvocationRecord,
-  InvocationSource,
   InvocationTarget,
   InvokeOptions,
   SpanRecord,
 } from "./invoke-types.js";
+import { spanSnapshot } from "@relkit/invocation";
 
 export function createInvocationSpanOptions<
   Input,
@@ -23,6 +23,10 @@ export function createInvocationSpanOptions<
   options: InvokeOptions<Input, Output, Context>,
   controller: AbortController,
 ): InvocationTraceOptions {
+  const observed =
+    options.hooks?.onSpanStart !== undefined ||
+    options.hooks?.onSpanComplete !== undefined ||
+    options.hooks?.observability !== undefined;
   return {
     name: `relkit.invoke.${target.id}`,
     invocationId: record.id,
@@ -33,32 +37,31 @@ export function createInvocationSpanOptions<
     source: record.source,
     signal: controller.signal,
     attributes: { "relkit.function.id": target.id },
-    observer: (event) => {
-      const span = event.span;
-      const parentSpanId = options.parent?.spanId;
-      const value: SpanRecord = Object.freeze({
-        invocationId: record.id,
-        functionId: target.id,
-        name: span.name,
-        spanId: span.spanId,
-        ...(parentSpanId === undefined ? {} : { parentSpanId }),
-        traceId: span.traceId,
-        source: record.source as InvocationSource,
-        ...(record.serviceId === undefined ? {} : { serviceId: record.serviceId }),
-        status: event.type,
-        startedAt: record.startedAt,
-        ...(event.type === "completed" ? { completedAt: new Date().toISOString() } : {}),
-      });
-      void callHook(
-        event.type === "started" ? options.hooks?.onSpanStart : options.hooks?.onSpanComplete,
-        value,
-      );
-      void emitObservabilityEvent(options.hooks?.observability, {
-        protocol: OBSERVABILITY_HOOK_PROTOCOL,
-        version: OBSERVABILITY_HOOK_VERSION,
-        type: event.type === "started" ? "span.started" : "span.completed",
-        record: value,
-      });
-    },
+    ...(observed
+      ? {
+          observer: (event: Parameters<NonNullable<InvocationTraceOptions["observer"]>>[0]) => {
+            const span = event.span;
+            const value = spanSnapshot(event) as SpanRecord;
+            if (event.type !== "updated")
+              void callHook(
+                event.type === "started"
+                  ? options.hooks?.onSpanStart
+                  : options.hooks?.onSpanComplete,
+                value,
+              );
+            void emitObservabilityEvent(options.hooks?.observability, {
+              protocol: OBSERVABILITY_HOOK_PROTOCOL,
+              version: OBSERVABILITY_HOOK_VERSION,
+              type:
+                event.type === "started"
+                  ? "span.started"
+                  : event.type === "updated"
+                    ? "span.updated"
+                    : "span.completed",
+              record: value,
+            });
+          },
+        }
+      : {}),
   };
 }

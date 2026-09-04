@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@relkit/contracts";
+import type { MaybePromise, SpanContext } from "@relkit/contracts";
 import type { BucketOperationObservation } from "@relkit/buckets";
 import type { CacheOperationObservation } from "@relkit/cache";
 import type { GraphEdge, ObservedEdge } from "@relkit/graph";
@@ -49,19 +49,7 @@ export interface InvocationTarget<
 }
 export type InvocationMetadata = SharedInvocationMetadata;
 export type InvocationRecord = SharedInvocationRecord;
-export interface SpanRecord {
-  readonly invocationId: string;
-  readonly functionId: string;
-  readonly name: string;
-  readonly spanId: string;
-  readonly parentSpanId?: string;
-  readonly traceId: string;
-  readonly source: InvocationSource;
-  readonly serviceId?: string;
-  readonly status: "started" | "completed";
-  readonly startedAt: string;
-  readonly completedAt?: string;
-}
+export type SpanRecord = import("@relkit/observability").SpanRecord;
 export type PublicLogger = SharedPublicLogger;
 export type PublicClock = SharedPublicClock;
 export type InvocationParent = SharedInvocationParent;
@@ -128,6 +116,9 @@ export interface InvokeOptions<
   readonly parent?: InvocationParent;
   readonly correlationId?: string;
   readonly traceId?: string;
+  readonly links?: readonly SpanContext[];
+  readonly requestId?: string;
+  readonly originRequestId?: string;
   readonly deadlineMs?: number;
   readonly deadline?: number;
   readonly timeoutMs?: number;

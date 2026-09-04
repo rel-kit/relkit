@@ -37,6 +37,12 @@ export type ObservabilityHookEvent =
   | {
       readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
       readonly version: typeof OBSERVABILITY_HOOK_VERSION;
+      readonly type: "span.updated";
+      readonly record: SpanRecord;
+    }
+  | {
+      readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
+      readonly version: typeof OBSERVABILITY_HOOK_VERSION;
       readonly type: "edge.declared";
       readonly edge: GraphEdge;
     }
@@ -63,6 +69,7 @@ export interface InvocationObservabilityHooks {
   readonly protocol: typeof OBSERVABILITY_HOOK_PROTOCOL;
   readonly version: typeof OBSERVABILITY_HOOK_VERSION;
   readonly emit: (event: ObservabilityHookEvent) => MaybePromise<void>;
+  readonly capture?: import("@relkit/observability").RequestRecordSink["capture"];
 }
 
 export type ObservabilityHooks = InvocationObservabilityHooks;
@@ -100,6 +107,7 @@ export function createInspectableObservabilityHooks(): InspectableObservabilityH
       events.push(event);
       collector.emit(event);
     },
+    capture: collector.capture,
     collect: collector.collect,
     read: (): readonly ObservabilityHookEvent[] => Object.freeze([...events]),
     readRecords: collector.read,

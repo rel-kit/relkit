@@ -8,7 +8,14 @@ const valueOutput = z.object({ value: z.number() });
 
 function ids() {
   let next = 0;
-  return { next: (kind: "trace" | "invocation" | "span") => `${kind}-${++next}` as ProtocolId };
+  return {
+    next: (kind: "trace" | "invocation" | "span") =>
+      (kind === "trace"
+        ? "10000000000000000000000000000001"
+        : kind === "span"
+          ? (++next).toString(16).padStart(16, "0")
+          : `invocation-${++next}`) as ProtocolId,
+  };
 }
 
 describe("direct child descriptor invocation", () => {
@@ -58,7 +65,7 @@ describe("direct child descriptor invocation", () => {
     const childRecord = records.find((record) => record.functionId === "orders.child");
     expect(root).toMatchObject({
       source: "direct",
-      traceId: "trace-1",
+      traceId: "10000000000000000000000000000001",
       correlationId: "request-1",
     });
     expect(childRecord).toMatchObject({

@@ -30,6 +30,7 @@ describe("versioned invocation observability hooks", () => {
     expect(collector.read().filter(({ signal }) => signal === "span")).toMatchObject([
       { functionId: "orders.get", serviceId: "orders" },
       { functionId: "orders.get", serviceId: "orders" },
+      { functionId: "orders.get", serviceId: "orders" },
     ]);
   });
 
@@ -50,6 +51,7 @@ describe("versioned invocation observability hooks", () => {
     expect(events.map((event) => event.type)).toEqual([
       "invocation.started",
       "span.started",
+      "span.updated",
       "span.completed",
       "invocation.completed",
       "invocation.released",
@@ -57,13 +59,14 @@ describe("versioned invocation observability hooks", () => {
     expect(events.every((event) => event.protocol === OBSERVABILITY_HOOK_PROTOCOL)).toBe(true);
     expect(events.every((event) => event.version === OBSERVABILITY_HOOK_VERSION)).toBe(true);
     expect(events[0]).toMatchObject({ type: "invocation.started", record: { status: "started" } });
-    expect(events[3]).toMatchObject({
+    expect(events.find((event) => event.type === "invocation.completed")).toMatchObject({
       type: "invocation.completed",
       completion: { outcome: "success" },
     });
     expect(Object.isFrozen(events[0])).toBe(true);
     expect(hooks.readRecords().map((record) => record.signal)).toEqual([
       "invocation",
+      "span",
       "span",
       "span",
       "invocation",
@@ -88,8 +91,38 @@ describe("versioned invocation observability hooks", () => {
       "invocation",
       "span",
       "span",
+      "span",
       "invocation",
     ]);
+  });
+
+  test("captures redacted invocation input and output only when configured", async () => {
+    const collector = createObservabilityCollector({
+      redaction: { mode: "development-redacted", maxBytes: 512 },
+    });
+    await invokeFunction(
+      {
+        id: "orders.capture",
+        input: z.object({ password: z.string(), value: z.number() }),
+        output: z.object({ ok: z.boolean(), token: z.string() }),
+        handler: () => ({ ok: true, token: "secret-result" }),
+      },
+      { password: "secret-input", value: 1 },
+      { hooks: { observability: collector } },
+    );
+    const span = collector
+      .read()
+      .find((record) => record.signal === "span" && record.status === "completed");
+    expect(span).toMatchObject({
+      inputCapture: {
+        content: { password: "[REDACTED]", value: 1 },
+        truncated: false,
+      },
+      outputCapture: {
+        content: { ok: true, token: "[REDACTED]" },
+        truncated: false,
+      },
+    });
   });
 
   test("emits observed descriptor edges without declared function edges", async () => {

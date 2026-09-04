@@ -21,6 +21,8 @@ export function createDependencyBridge(
       {
         ...(options.name === undefined ? {} : { name: options.name }),
         ...(options.attributes === undefined ? {} : { attributes: options.attributes }),
+        ...(options.kind === undefined ? {} : { kind: options.kind }),
+        ...(options.input === undefined ? {} : { input: options.input }),
         signal: options.signal ?? signal,
       },
     );
