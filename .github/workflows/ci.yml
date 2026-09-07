@@ -458,7 +458,7 @@ jobs:
         with:
           pulumi-version: "3.258.0"
       - run: bun install --frozen-lockfile
-      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+      - uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: ${{ secrets.RELKIT_AWS_ROLE_ARN }}
           aws-region: ${{ secrets.RELKIT_AWS_INTEGRATION_REGION }}
