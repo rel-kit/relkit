@@ -12,11 +12,24 @@ description: Generated public TypeScript reference for @relkit/local.
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - ["./providers.js" (namespace export)](#providersjs-namespace-export)
   - ["@relkit/local-service" (namespace export)](#relkitlocal-service-namespace-export)
 
 ---
 
 # utils
+
+## "./providers.js" (namespace export)
+
+Re-exports all named exports from the "./providers.js" module.
+
+**Signature**
+
+```ts
+export * from "./providers.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
 
 ## "@relkit/local-service" (namespace export)
 
@@ -29,6 +42,100 @@ export * from "@relkit/local-service";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L1)
+
+## `providers.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [Integrations](#integrations)
+  - [localEvent](#localevent)
+  - [localJob](#localjob)
+- [utils](#utils)
+  - [LocalEventAdapter (type alias)](#localeventadapter-type-alias)
+  - [LocalJobAdapter (type alias)](#localjobadapter-type-alias)
+  - [LocalProviderOptions (interface)](#localprovideroptions-interface)
+
+---
+
+# Integrations
+
+## localEvent
+
+Defines the durable filesystem event provider used by local development.
+
+**Example**
+
+```ts
+import { localEvent } from "@relkit/local";
+const events = localEvent();
+```
+
+**Signature**
+
+```ts
+declare const localEvent: (options?: LocalProviderOptions) => LocalEventAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L35)
+
+Since v0.4.0
+
+## localJob
+
+Defines the durable filesystem queue provider for unscheduled local jobs.
+
+**Example**
+
+```ts
+import { localJob } from "@relkit/local";
+const jobs = localJob();
+```
+
+**Signature**
+
+```ts
+declare const localJob: (options?: LocalProviderOptions) => LocalJobAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L50)
+
+Since v0.4.0
+
+# utils
+
+## LocalEventAdapter (type alias)
+
+**Signature**
+
+```ts
+type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L21)
+
+## LocalJobAdapter (type alias)
+
+**Signature**
+
+```ts
+type LocalJobAdapter = ProviderAdapter<typeof job, "local-job">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L22)
+
+## LocalProviderOptions (interface)
+
+**Signature**
+
+```ts
+export interface LocalProviderOptions {
+  readonly root?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L17)
 
 ## `identity.ts`
 
@@ -139,6 +246,7 @@ declare const localResourceName: (
 
 - [utils](#utils)
   - ["./identity.js" (namespace export)](#identityjs-namespace-export)
+  - ["./integration.js" (namespace export)](#integrationjs-namespace-export)
   - ["./lease.js" (namespace export)](#leasejs-namespace-export)
   - ["./provider-overrides.js" (namespace export)](#provider-overridesjs-namespace-export)
   - ["./reconciler.js" (namespace export)](#reconcilerjs-namespace-export)
@@ -161,6 +269,18 @@ export * from "./identity.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L1)
 
+## "./integration.js" (namespace export)
+
+Re-exports all named exports from the "./integration.js" module.
+
+**Signature**
+
+```ts
+export * from "./integration.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
+
 ## "./lease.js" (namespace export)
 
 Re-exports all named exports from the "./lease.js" module.
@@ -171,7 +291,7 @@ Re-exports all named exports from the "./lease.js" module.
 export * from "./lease.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L3)
 
 ## "./provider-overrides.js" (namespace export)
 
@@ -183,7 +303,7 @@ Re-exports all named exports from the "./provider-overrides.js" module.
 export * from "./provider-overrides.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L4)
 
 ## "./reconciler.js" (namespace export)
 
@@ -195,7 +315,7 @@ Re-exports all named exports from the "./reconciler.js" module.
 export * from "./reconciler.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L5)
 
 ## "./service-state.js" (namespace export)
 
@@ -207,7 +327,7 @@ Re-exports all named exports from the "./service-state.js" module.
 export * from "./service-state.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L6)
 
 ## "./state-paths.js" (namespace export)
 
@@ -219,7 +339,30 @@ Re-exports all named exports from the "./state-paths.js" module.
 export * from "./state-paths.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L7)
+
+## `integration.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [runtimeIntegration](#runtimeintegration)
+
+---
+
+# utils
+
+## runtimeIntegration
+
+**Signature**
+
+```ts
+declare const runtimeIntegration: RuntimeProviderIntegration<"local">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/integration.ts#L5)
 
 ## `lease-files.ts`
 

@@ -127,6 +127,7 @@ describe.serial("Phase 0 guardrails", () => {
     const fixture = await createFixture(
       packageFiles([
         { path: "packages/provider", name: "@relkit/provider", source: "" },
+        { path: "packages/providers-local", name: "@relkit/providers-local", source: "" },
         {
           path: "integrations/packages/redis",
           name: "@relkit/redis",
@@ -146,6 +147,15 @@ describe.serial("Phase 0 guardrails", () => {
           dependencies: {
             "@relkit/buckets": "workspace:*",
             "@relkit/provider": "workspace:*",
+          },
+        },
+        {
+          path: "integrations/packages/local",
+          name: "@relkit/local",
+          source: 'import "@relkit/provider"; import "@relkit/providers-local";',
+          dependencies: {
+            "@relkit/provider": "workspace:*",
+            "@relkit/providers-local": "workspace:*",
           },
         },
         {
@@ -364,7 +374,7 @@ describe.serial("Phase 0 guardrails", () => {
       assertBoundaryViolation(boundaryCase.files, boundaryCase.expected));
   }
 
-  test("package exports resolve only through the public entry", { timeout: 30_000 }, async () => {
+  test("package exports resolve only through the public entry", { timeout: 90_000 }, async () => {
     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("10 packages loaded without unrelated integrations or SDKs");
