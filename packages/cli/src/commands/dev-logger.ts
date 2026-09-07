@@ -16,6 +16,7 @@ export function devLogSinks(
 }
 
 export function createDevLogger(options: DevOptions): DevLog {
+  let startupFailed = false;
   return (event) => {
     try {
       const { record, origin, forwarded, transient } = devLogRecord(event);
@@ -33,10 +34,32 @@ export function createDevLogger(options: DevOptions): DevLog {
       });
       const minimum =
         options.logger?.minimumLevel ?? (options.terminal?.verbose ? "debug" : "info");
+      if (safe.message === "dev.build.started") startupFailed = false;
       if (!isLogLevelEnabled(safe.level, minimum)) return;
       if (options.logger?.json) options.logger.json.write(safe);
       if (options.logger?.human === false) return;
-      const line = formatDevLog(safe, {
+      if (
+        /^runtime\.(provider|database|auth)$/.test(safe.component) &&
+        safe.level === "error" &&
+        safe.message.includes("startup failed")
+      )
+        startupFailed = true;
+      const human =
+        !options.terminal?.verbose &&
+        startupFailed &&
+        safe.message === "dev.generation.failed" &&
+        /RELKIT_CANDIDATE_(PROVIDER|ENVIRONMENT)_NOT_READY/.test(String(safe.fields.message))
+          ? {
+              ...safe,
+              fields: {
+                previousActive: safe.fields.previousActive === true,
+                message: safe.fields.previousActive
+                  ? "Resolve the startup error above, then save .env or a source file to retry."
+                  : "Resolve the startup error above, then run relkit dev again.",
+              },
+            }
+          : safe;
+      const line = formatDevLog(human, {
         ...options.terminal,
         color:
           options.terminal?.color ??

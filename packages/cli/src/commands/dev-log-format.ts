@@ -21,14 +21,23 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
     if (event === "dev.starting") message = "Starting development server";
     else if (event === "dev.build.started") {
       message = f.initial ? "Compiling application" : "Rebuilding application";
-      if (Array.isArray(f.files) && f.files.length) details = [f.files.join(", ")];
+      if (Array.isArray(f.files) && f.files.length) {
+        if (options.verbose) details = [f.files.join(", ")];
+        else message += ` (${f.files.length} changed ${f.files.length === 1 ? "file" : "files"})`;
+      }
     } else if (event === "dev.generation.active")
       message = `${f.initial ? "Compiled" : "Reloaded"}${duration}`;
     else if (event === "dev.generation.failed") {
       message = f.previousActive
         ? "Reload failed; previous version is still serving"
         : "Application failed to start";
-      details = [String(f.message ?? "Unknown error")];
+      details = [
+        options.verbose
+          ? String(f.message ?? "Unknown error")
+          : String(f.message ?? "Unknown error").split("\n")[0]!,
+      ];
+      if (!options.verbose && (f.error || String(f.message).includes("\n")))
+        details.push("Use --verbose for diagnostic details.");
     } else if (event === "dev.ready") {
       scope = "server";
       message = "Ready";
@@ -82,11 +91,16 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
 }
 
 function wrap(value: string, width: number): string[] {
-  const characters = Array.from(value);
   const lines: string[] = [];
-  for (let start = 0; start < characters.length; start += width)
-    lines.push(characters.slice(start, start + width).join(""));
-  return lines.length ? lines : [""];
+  let line = "";
+  for (const word of value.split(/\s+/)) {
+    if (line && line.length + 1 + word.length > width) {
+      lines.push(line);
+      line = "";
+    }
+    line += `${line ? " " : ""}${word}`;
+  }
+  return [...lines, line];
 }
 
 function correlations(record: LogRecord) {

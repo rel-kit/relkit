@@ -5,11 +5,18 @@ export function devLogDetails(record: LogRecord, verbose: boolean): string[] {
   const visit = (value: unknown, depth = 0): void => {
     if (depth > 6 || value === null || typeof value !== "object") return;
     const error = value as Record<string, unknown>;
-    if (typeof error.message === "string")
+    const code = error.code ?? (depth === 0 ? record.fields.code : undefined);
+    if (typeof error.message === "string" && (verbose || record.fields.message !== error.message))
       lines.push(
-        `${depth ? "└─ " : ""}${error.name ?? "Error"}${error.code ? ` [${error.code}]` : ""}: ${error.message}`,
+        `${depth ? "└─ " : ""}${error.name ?? "Error"}${code ? ` [${code}]` : ""}: ${error.message}`,
       );
-    if (typeof error.stack === "string") {
+    if (
+      typeof error.stack === "string" &&
+      (verbose ||
+        !["cli.dev", "runtime.provider", "runtime.database", "runtime.auth"].includes(
+          record.component,
+        ))
+    ) {
       const frames = error.stack.split("\n").filter((line) => /^\s*at /.test(line));
       const visible = frames.filter(
         (line) => !/node_modules|node:|bun:|\.relkit\/(build|generated)/.test(line),
@@ -25,7 +32,10 @@ export function devLogDetails(record: LogRecord, verbose: boolean): string[] {
   visit(record.fields.error ?? record.fields.cause);
   if (!verbose && !["cli.dev", "app", "inspector", "runtime.http"].includes(record.component)) {
     const metadata = Object.fromEntries(
-      Object.entries(record.fields).filter(([key]) => !["error", "cause"].includes(key)),
+      Object.entries(record.fields).filter(
+        ([key]) =>
+          !["error", "cause", ...(record.fields.error ? ["code", "detail"] : [])].includes(key),
+      ),
     );
     if (Object.keys(metadata).length) lines.push(JSON.stringify(metadata));
   }
