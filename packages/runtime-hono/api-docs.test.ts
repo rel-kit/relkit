@@ -70,6 +70,46 @@ const manifest: RuntimeManifest = {
 };
 
 describe("OpenAPI and Scalar endpoints", () => {
+  test("serves raw routes and documents them without a precomputed OpenAPI document", async () => {
+    const service = createApp({
+      plan: {
+        ...plan,
+        httpTriggers: [
+          ...plan.httpTriggers,
+          {
+            kind: "trigger",
+            triggerType: "http",
+            id: "raw.details",
+            targetFunctionId: "raw.details",
+            source,
+            config: {
+              method: "GET",
+              path: "/users/:id/details",
+              rawHandler: true,
+              request: null,
+              responses: [],
+              middleware: [],
+              transforms: [],
+            },
+          },
+        ],
+      },
+      manifest: {
+        ...manifest,
+        routes: { "raw.details": { handler: () => Response.json({ ok: true }) } },
+      },
+      engine: { invoke: async () => ({ ok: true }) },
+    });
+    const response = await service.request("/users/123/details");
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    const document = await (await service.request(OPENAPI_PATH)).json();
+    expect(document.paths["/users/{id}/details"].get.responses).toEqual({
+      default: { description: "Response returned by the route handler" },
+    });
+    expect(document.paths["/hello"].get.responses["200"]).toBeDefined();
+    expect(document.paths["/users/{id}/details"].get["x-relkit"]).not.toHaveProperty("functionId");
+  });
   test("serves the active document and URL-backed Scalar page during development", async () => {
     const service = app();
     const raw = await service.request(OPENAPI_PATH);

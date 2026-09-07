@@ -94,7 +94,10 @@ function documentFrom(plan: RegistrationPlan): OpenApiDocument {
     contractVersion: CONTRACT_VERSION,
     nodes: [
       ...plan.functions,
-      ...plan.httpTriggers.filter(({ targetFunctionId }) => functions.has(targetFunctionId)),
+      ...plan.httpTriggers.filter(
+        ({ config, targetFunctionId }) =>
+          (isRecord(config) && config.rawHandler === true) || functions.has(targetFunctionId),
+      ),
       ...(plan.services ?? []),
     ],
     edges: [],

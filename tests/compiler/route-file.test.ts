@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   compareRouteFilePaths,
   parseRouteFilePath,
+  routePathToFilePath,
 } from "../../packages/compiler/src/route-file.ts";
 
 describe("route-file paths", () => {
@@ -36,6 +37,21 @@ describe("route-file paths", () => {
     });
   });
 
+  test("converts canonical route paths back to source files", () => {
+    const cases = {
+      "/": "src/routes/route.ts",
+      "/health": "src/routes/health/route.ts",
+      "/users/:id/details": "src/routes/users/[id]/details/route.ts",
+      "/files/*parts": "src/routes/files/[...parts]/route.ts",
+      "/docs/*parts?": "src/routes/docs/[[...parts]]/route.ts",
+    } as const;
+
+    for (const [routePath, sourcePath] of Object.entries(cases)) {
+      expect(routePathToFilePath(routePath)).toBe(sourcePath);
+      expect(parseRouteFilePath(sourcePath).canonicalPath).toBe(routePath);
+    }
+  });
+
   test("sorts route kinds by documented precedence", () => {
     const paths = [
       "src/routes/[...parts]/route.ts",
@@ -61,5 +77,9 @@ describe("route-file paths", () => {
     ];
 
     for (const path of invalid) expect(() => parseRouteFilePath(path)).toThrow();
+
+    for (const path of ["users", "/users/", "/users//details", "/users/id:value"]) {
+      expect(() => routePathToFilePath(path)).toThrow();
+    }
   });
 });

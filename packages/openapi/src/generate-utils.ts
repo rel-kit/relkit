@@ -6,12 +6,12 @@ import { operationTags } from "./generate-tags.js";
 
 export function buildOperation(
   trigger: HttpGraphTrigger,
-  target: FunctionNode,
+  target: FunctionNode | undefined,
   routePath = trigger.config.path,
   operationId = trigger.id,
   service?: ServiceNode,
 ): OpenApiOperation {
-  const request = buildRequest(trigger.config.request, target.input, routePath);
+  const request = buildRequest(trigger.config.request, target?.input ?? null, routePath);
   const tags = operationTags(service, trigger.config.tags);
   return {
     operationId,
@@ -22,10 +22,13 @@ export function buildOperation(
     ...(tags.length === 0 ? {} : { tags }),
     ...(request.parameters.length === 0 ? {} : { parameters: request.parameters }),
     ...(request.body === undefined ? {} : { requestBody: request.body }),
-    responses: buildResponses(trigger.config.responses, target),
+    responses:
+      target === undefined
+        ? { default: { description: "Response returned by the route handler" } }
+        : buildResponses(trigger.config.responses, target),
     "x-relkit": {
       routeId: trigger.id,
-      functionId: target.id,
+      ...(target === undefined ? {} : { functionId: target.id }),
       ...(service === undefined ? {} : { serviceId: service.id }),
       middleware: trigger.config.middleware.map((entry) => ({ ...entry })),
       transforms: trigger.config.transforms.map((entry) => entry.id),
