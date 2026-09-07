@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
@@ -26,10 +26,14 @@ test("holds reload until a real scaffold transaction finishes installation or ro
   const root = await makeRoot();
   await mkdir(join(root, "src"));
   let builds = 0;
+  const activeScaffoldMarkers: string[] = [];
   const session = await startDev({
     ...options(root, "sha256:scaffold"),
     compile: async (request) => {
       builds++;
+      activeScaffoldMarkers.push(
+        ...(await readdir(root)).filter((file) => file.startsWith(".relkit-scaffold-")),
+      );
       return options(root, "sha256:scaffold").compile(request);
     },
   });
@@ -66,7 +70,7 @@ test("holds reload until a real scaffold transaction finishes installation or ro
       else await applying;
       await waitFor(() => builds > before && session.stateMachine.state === "active");
       await new Promise((resolve) => setTimeout(resolve, 250));
-      expect(builds).toBe(before + 1);
+      expect(activeScaffoldMarkers).toEqual([]);
       expect(await Bun.file(join(root, `src/${name}.ts`)).exists()).toBe(!fail);
     }
     const crashed = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], {
@@ -184,7 +188,7 @@ test("releases the backend port when its terminal closes", async () => {
   await replacement.stop(true);
 });
 
-test("forwards source and root configuration saves through the supervisor watcher", async () => {
+test("forwards source, directory, and root configuration changes through the watcher", async () => {
   const root = await makeRoot();
   await mkdir(join(root, "src"));
   let builds = 0;
@@ -200,7 +204,10 @@ test("forwards source and root configuration saves through the supervisor watche
   try {
     await writeFile(join(root, "src", "app.ts"), "export const changed = true;\n");
     await waitFor(() => builds > 1 && session.stateMachine.state === "active");
-    for (const file of ["relkit.config.ts", ".env", "package.json", "bun.lock"]) {
+    const beforeDirectory = builds;
+    await mkdir(join(root, "src/routes/live/[id]/details"), { recursive: true });
+    await waitFor(() => builds > beforeDirectory && session.stateMachine.state === "active");
+    for (const file of ["relkit.config.ts", ".env", ".env.local", "package.json", "bun.lock"]) {
       const before = builds;
       await writeFile(join(root, file), "changed\n");
       await waitFor(() => builds > before && session.stateMachine.state === "active");

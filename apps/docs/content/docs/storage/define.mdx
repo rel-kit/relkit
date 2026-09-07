@@ -15,13 +15,13 @@ Creates `src/assets/buckets/uploads.bucket.ts` and configures Docker MinIO/S3. W
 flags, scaffolding reuses an eligible default/unique profile or creates a Docker S3 profile.
 A bucket profile can belong to only one bucket; an already-owned profile is rejected.
 
-| Selection | Command options |
-| --- | --- |
-| Unused compatible profile | `--profile uploads` |
-| Docker MinIO/S3 | `--provider s3 --source docker` |
-| Connected S3 | `--provider s3 --source connected` |
-| S3 on an existing AWS/Pulumi deployment | `--provider s3 --source aws` |
-| Connected Cloudflare R2 | `--provider cloudflare-r2 --source connected` |
+| Selection                               | Command options                               |
+| --------------------------------------- | --------------------------------------------- |
+| Unused compatible profile               | `--profile uploads`                           |
+| Docker MinIO/S3                         | `--provider s3 --source docker`               |
+| Connected S3                            | `--provider s3 --source connected`            |
+| S3 on an existing AWS/Pulumi deployment | `--provider s3 --source aws`                  |
+| Connected Cloudflare R2                 | `--provider cloudflare-r2 --source connected` |
 
 Do not combine `--profile` with `--provider` or `--source`. Cloudflare R2 supports only
 `connected`. AWS requires an existing AWS/Pulumi deployment and is not provisioned by this command.

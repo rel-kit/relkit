@@ -32,12 +32,12 @@ mapped names are public service member names, not private filenames or event IDs
 service-route commands need at least one `--map`; supported methods are `GET`, `POST`,
 `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`. `ALL` is auth-only.
 
-| URL passed to the command | Generated file |
-| --- | --- |
-| `/` | `src/routes/route.ts` |
-| `/users/:id/details` | `src/routes/users/[id]/details/route.ts` |
-| `/files/*parts` | `src/routes/files/[...parts]/route.ts` |
-| `/files/*parts?` | `src/routes/files/[[...parts]]/route.ts` |
+| URL passed to the command | Generated file                           |
+| ------------------------- | ---------------------------------------- |
+| `/`                       | `src/routes/route.ts`                    |
+| `/users/:id/details`      | `src/routes/users/[id]/details/route.ts` |
+| `/files/*parts`           | `src/routes/files/[...parts]/route.ts`   |
+| `/files/*parts?`          | `src/routes/files/[[...parts]]/route.ts` |
 
 Quote route paths so your shell does not expand `*` or `?`. Existing target files are never
 overwritten; edit an existing route to add another method. Run `bun run check`, then verify

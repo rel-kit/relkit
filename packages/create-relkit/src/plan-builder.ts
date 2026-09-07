@@ -173,7 +173,7 @@ export class PlanBuilder {
       return;
     }
     await this.update(path, (source) =>
-      present(source) ? source : `${source.replace(/\s*$/, "")}\n${line}\n`,
+      present(source) ? source : `${source.trimEnd()}\n${line}\n`,
     );
   }
 

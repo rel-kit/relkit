@@ -6,7 +6,7 @@ export { addSourceImport } from "./source-import-edit.js";
 export function addSourceExport(source: string, fileName: string, declaration: string): string {
   if (source.includes(declaration)) return source;
   parse(fileName, source);
-  return `${source.replace(/\s*$/, "")}\n${declaration}\n`;
+  return `${source.trimEnd()}\n${declaration}\n`;
 }
 
 /** Inserts one property into a canonical factory object or one nested object property. */

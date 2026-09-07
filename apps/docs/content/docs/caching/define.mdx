@@ -16,13 +16,13 @@ a default/unique compatible cache profile is reused; otherwise Docker Redis is t
 
 Choose one configuration form:
 
-| Selection | Command options |
-| --- | --- |
-| Existing profile | `--profile requests` |
-| Docker Redis | `--provider redis --source docker` |
-| Connected Redis | `--provider redis --source connected` |
-| Redis on an existing AWS/Pulumi deployment | `--provider redis --source aws` |
-| Connected Cloudflare KV | `--provider cloudflare-kv --source connected` |
+| Selection                                  | Command options                               |
+| ------------------------------------------ | --------------------------------------------- |
+| Existing profile                           | `--profile requests`                          |
+| Docker Redis                               | `--provider redis --source docker`            |
+| Connected Redis                            | `--provider redis --source connected`         |
+| Redis on an existing AWS/Pulumi deployment | `--provider redis --source aws`               |
+| Connected Cloudflare KV                    | `--provider cloudflare-kv --source connected` |
 
 Do not combine `--profile` with `--provider` or `--source`. AWS requires an already configured
 AWS/Pulumi deployment; scaffolding does not provision it. Connected profiles add named environment

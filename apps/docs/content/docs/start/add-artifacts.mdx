@@ -28,25 +28,25 @@ for its arguments and options. Start a new app with
 
 Each linked guide includes a runnable command, generated-file behavior, and every CLI option.
 
-| Command | Detailed guide |
-| --- | --- |
-| `relkit add service [name]` | [Services](/docs/service/define#scaffold-a-service) |
-| `relkit add function [name]` | [Functions](/docs/fundamentals/functions#scaffold-a-callable-function) |
-| `relkit add error [name]` | [Typed errors](/docs/fundamentals/errors#scaffold-a-typed-error) |
-| `relkit add event [name]` | [Event contracts](/docs/events/define#scaffold-an-event-contract) |
-| `relkit add event-function [name]` | [Event consumers](/docs/events/consume#scaffold-an-event-only-function) |
-| `relkit add job [name]` | [Jobs](/docs/jobs/define#scaffold-a-job) |
-| `relkit add cache [name]` | [Caches and profiles](/docs/caching/define#scaffold-a-cache) |
-| `relkit add bucket [name]` | [Buckets and profiles](/docs/storage/define#scaffold-a-bucket) |
-| `relkit add tool [name]` | [Tools](/docs/ai/tools#scaffold-a-function-backed-tool) |
-| `relkit add prompt [name]` | [Prompts](/docs/ai/agents#scaffold-a-reusable-prompt) |
-| `relkit add agent [name]` | [Agents and models](/docs/ai/agents#scaffold-an-agent) |
-| `relkit add constants [name]` | [Domain constants](/docs/service/define#scaffold-domain-constants) |
-| `relkit add route [path]` | [Routes and method mappings](/docs/http/define#scaffold-a-route) |
-| `relkit add middleware [name]` | [HTTP middleware](/docs/http/middleware#scaffold-middleware) |
-| `relkit add transform [name]` | [Request transforms](/docs/http/requests#scaffold-a-request-transform) |
-| `relkit add database` | [Drizzle databases](/docs/database/first-database#scaffold-the-database-baseline) |
-| `relkit add auth` | [Better Auth](/docs/auth/first-auth#scaffold-the-auth-baseline) |
+| Command                            | Detailed guide                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| `relkit add service [name]`        | [Services](/docs/service/define#scaffold-a-service)                               |
+| `relkit add function [name]`       | [Functions](/docs/fundamentals/functions#scaffold-a-callable-function)            |
+| `relkit add error [name]`          | [Typed errors](/docs/fundamentals/errors#scaffold-a-typed-error)                  |
+| `relkit add event [name]`          | [Event contracts](/docs/events/define#scaffold-an-event-contract)                 |
+| `relkit add event-function [name]` | [Event consumers](/docs/events/consume#scaffold-an-event-only-function)           |
+| `relkit add job [name]`            | [Jobs](/docs/jobs/define#scaffold-a-job)                                          |
+| `relkit add cache [name]`          | [Caches and profiles](/docs/caching/define#scaffold-a-cache)                      |
+| `relkit add bucket [name]`         | [Buckets and profiles](/docs/storage/define#scaffold-a-bucket)                    |
+| `relkit add tool [name]`           | [Tools](/docs/ai/tools#scaffold-a-function-backed-tool)                           |
+| `relkit add prompt [name]`         | [Prompts](/docs/ai/agents#scaffold-a-reusable-prompt)                             |
+| `relkit add agent [name]`          | [Agents and models](/docs/ai/agents#scaffold-an-agent)                            |
+| `relkit add constants [name]`      | [Domain constants](/docs/service/define#scaffold-domain-constants)                |
+| `relkit add route [path]`          | [Routes and method mappings](/docs/http/define#scaffold-a-route)                  |
+| `relkit add middleware [name]`     | [HTTP middleware](/docs/http/middleware#scaffold-middleware)                      |
+| `relkit add transform [name]`      | [Request transforms](/docs/http/requests#scaffold-a-request-transform)            |
+| `relkit add database`              | [Drizzle databases](/docs/database/first-database#scaffold-the-database-baseline) |
+| `relkit add auth`                  | [Better Auth](/docs/auth/first-auth#scaffold-the-auth-baseline)                   |
 
 Square brackets in usage mean the value can be prompted for, not that names are unnecessary in CI.
 Database and auth take no name argument.
@@ -106,16 +106,16 @@ This creates `src/routes/users/[id]/details/route.ts`. `*parts` and `*parts?` be
 
 ## Shared options and automation
 
-| Option | Behavior |
-| --- | --- |
-| `--project-root <directory>` | Inspect and modify this app instead of the current directory. |
-| `--service <domain>` | Choose an existing generic service for a domain artifact or service route. |
-| `--create-service <domain>` | Create the owning service instead; exclusive with `--service`. |
-| `--no-install` | Skip dependency installation; report any skipped verification. |
-| `--json` | Disable prompts and emit one machine-readable result on stdout. |
-| `--help`, `-h` | Show command-specific usage without scaffolding. |
-| `--version`, `-v` | Print the installed CLI version. |
-| `--completions <shell>` | Print a completion script for `bash`, `zsh`, `fish`, or `sh`. |
+| Option                       | Behavior                                                                   |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `--project-root <directory>` | Inspect and modify this app instead of the current directory.              |
+| `--service <domain>`         | Choose an existing generic service for a domain artifact or service route. |
+| `--create-service <domain>`  | Create the owning service instead; exclusive with `--service`.             |
+| `--no-install`               | Skip dependency installation; report any skipped verification.             |
+| `--json`                     | Disable prompts and emit one machine-readable result on stdout.            |
+| `--help`, `-h`               | Show command-specific usage without scaffolding.                           |
+| `--version`, `-v`            | Print the installed CLI version.                                           |
+| `--completions <shell>`      | Print a completion script for `bash`, `zsh`, `fish`, or `sh`.              |
 
 The service-selection flags do not relocate singleton database/auth services, standalone routes,
 middleware, or transforms. Headless domain selection uses the only generic service when unambiguous;

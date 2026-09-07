@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync, watch } from "node:fs";
+import { existsSync, readdirSync, unwatchFile, watch, watchFile, type Stats } from "node:fs";
 import { join, relative } from "node:path";
 import { createSupervisorWatcher } from "@relkit/supervisor";
 import type { DevSession } from "./dev-session.js";
@@ -26,12 +26,7 @@ export function startDevSourceWatcher(session: DevSession): DevSourceWatcher {
   const fileWatcher = watch(sourceRoot, { recursive: true }, (_event, filename) => {
     if (filename === null) return;
     const changedFile = relative(session.projectRoot, join(sourceRoot, filename.toString()));
-    if (ignored(changedFile)) return;
-    try {
-      if (statSync(join(session.projectRoot, changedFile)).isDirectory()) return;
-    } catch {
-      /* Deleted source files still require a rebuild. */
-    }
+    if (ignored(changedFile) || changedFile === relative(session.projectRoot, sourceRoot)) return;
     supervisor.notify({ version: version++, changedFiles: [changedFile] });
   });
   fileWatcher.on("error", () => undefined);
@@ -41,17 +36,26 @@ export function startDevSourceWatcher(session: DevSession): DevSourceWatcher {
       : watch(session.projectRoot, (_event, filename) => {
           if (
             filename !== null &&
-            ["relkit.config.ts", ".env", ".env.local", "package.json", "bun.lock"].includes(
-              filename.toString(),
-            )
+            ["relkit.config.ts", "package.json", "bun.lock"].includes(filename.toString())
           )
             supervisor.notify({ version: version++, changedFiles: [filename.toString()] });
         });
   configWatcher?.on("error", () => undefined);
+  // Bun's Linux directory watcher can miss hidden-file creation.
+  const envWatchers = [".env", ".env.local"].map((file) => {
+    const path = join(session.projectRoot, file);
+    const listener = (current: Stats, previous: Stats) => {
+      if (current.mtimeMs !== previous.mtimeMs || current.ctimeMs !== previous.ctimeMs)
+        supervisor.notify({ version: version++, changedFiles: [file] });
+    };
+    watchFile(path, { interval: 100 }, listener);
+    return () => unwatchFile(path, listener);
+  });
   return {
     close: () => {
       fileWatcher.close();
       configWatcher?.close();
+      for (const close of envWatchers) close();
       supervisor.dispose();
     },
   };
@@ -60,6 +64,8 @@ export function startDevSourceWatcher(session: DevSession): DevSourceWatcher {
 function ignored(file: string): boolean {
   return (
     file === "" ||
+    file === ".env" ||
+    file === ".env.local" ||
     file.startsWith("node_modules/") ||
     file.startsWith(".relkit/") ||
     /^\.relkit-scaffold-/.test(file) ||
