@@ -3,6 +3,27 @@ title: Define an event
 description: Name an event and choose the data it carries.
 ---
 
+## Scaffold an event contract
+
+From an application's root, with an existing `orders` service:
+
+```sh
+bun run relkit add event "Order Created" --service orders
+```
+
+Creates `src/orders/events/order-created.event.ts`, a version-1 contract with a string `value`
+payload and ID `orders.order-created-event`. It registers the event's type and exposes the event
+through the service. Pass `--internal` to omit service exposure.
+
+Use `--profile events` to select that compatible event profile. Without one, scaffolding reuses
+a configured default or unique profile, or adds a file-backed `localEvent()` profile. The sample
+payload is a starting point; it is different from the hand-authored example below. Declare publication
+on a function and add a consumer when needed.
+
+### Event CLI options
+
+<include cwd>content/generated/add-event-options.mdx</include>
+
 ## Define the event
 
 Use `defineEvent` to name an event and describe its data. In your app, create `src/orders/events/order-created.event.ts`:

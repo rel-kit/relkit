@@ -7,6 +7,54 @@ A domain's `service.ts` assembles its public contract. Keep handlers in their ow
 operations and event contracts that should form that boundary. `defineService` is available from
 `@relkit/app/services`.
 
+## Scaffold a service
+
+From an installed application's root, choose simple, custom, or full contents in the terminal:
+
+```sh
+bun run relkit add service Billing
+bun run relkit add service Receipts --include function --include error --include job
+bun run relkit add service Shipping --full
+```
+
+These create different domains; do not run all three if you only need one. Without a mode in
+headless execution, the default is `service.ts` plus `functions/example.function.ts`, exposed as
+`example`. `--include` is repeatable and cannot be combined with `--full`; dependent sample
+artifacts are added and wired automatically.
+
+The full bundle creates a service, callable function, event-only function, typed error, event,
+job, cache, bucket, tool, prompt, agent, constants, and `GET /shipping`. Auth, database, middleware,
+and transforms are excluded. See [full-bundle prerequisites](/docs/start/add-artifacts#add-a-domain)
+before starting the generated providers.
+
+For `Shipping --full`, the domain files are:
+
+```text
+src/shipping/
+  service.ts
+  functions/example.function.ts
+  functions/on-example.function.ts
+  errors/example.error.ts
+  events/example.event.ts
+  jobs/example.job.ts
+  cache/example.cache.ts
+  buckets/example.bucket.ts
+  tools/example.tool.ts
+  prompts/example.prompt.ts
+  agents/example.agent.ts
+  constants/example.constants.ts
+src/routes/shipping/route.ts
+```
+
+The service exposes the example function and event. The function declares its sample error and
+publishes the event; the event-only function consumes it. The job and tool target the example
+function, the agent uses the tool and prompt, and the route maps `GET` to the public `example`
+member. Provider configuration, environment examples, and package dependencies are merged as needed.
+
+### Service CLI options
+
+<include cwd>content/generated/add-service-options.mdx</include>
+
 ## Select public members
 
 <include cwd lang="ts" meta='title="examples/commerce/src/orders/service.ts"'>
@@ -72,6 +120,22 @@ There is no general service lifecycle, service middleware, or `context.service` 
 [route middleware](/docs/http/middleware). Put rules that must apply to every invocation in function
 logic or [function hooks](/docs/fundamentals/functions#hooks-and-transport-policy). The specialized
 database and authentication services have their own integration APIs.
+
+## Scaffold domain constants
+
+With an existing `orders` service, run from the application root:
+
+```sh
+bun run relkit add constants "Receipt Settings" --service orders
+```
+
+Creates `src/orders/constants/receipt-settings.constants.ts` with a domain-qualified key and
+a `"replace-me"` value. Replace that placeholder in source. Constants remain internal and are
+not added to service member maps. There is no CLI flag for the final value.
+
+### Constants CLI options
+
+<include cwd>content/generated/add-constants-options.mdx</include>
 
 ## Naming and discovery rules
 

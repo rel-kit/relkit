@@ -35,6 +35,14 @@ Docker starts Redis with a persistent `/data` volume and waits for `redis-cli PI
 project-local credentials, persists `/data`, waits for its readiness endpoint, and initializes the `relkit`
 bucket. Both publish random loopback ports instead of claiming fixed host ports.
 
+## File-backed events and jobs
+
+Local event and job profiles do not use Docker. `localEvent()` and `localJob()` from `@relkit/local` register
+the existing durable filesystem runtimes and store their state under `.relkit/state` by default. The `event`,
+`event-function`, and `job` add commands reuse compatible profiles; a full service bundle creates these local
+profiles when no configured defaults exist. See the [Local API](/docs/api/integrations/local) for direct
+authoring. Use a different `root` only when the application needs an isolated local state directory.
+
 ## Control the project lifecycle
 
 ```sh

@@ -6,6 +6,26 @@ description: Give background work a stable identity, a compatible function targe
 Create one default-exported `defineJob` descriptor in the owning domain's `jobs/` directory. The job
 points at a function; it cannot contain a `handler` of its own.
 
+## Scaffold a job
+
+From the application root, with an existing `orders` service and callable `sendReceipt` function:
+
+```sh
+bun run relkit add job "Send Receipt" --service orders --target sendReceipt
+```
+
+Creates `src/orders/jobs/send-receipt.job.ts` and reuses the target's input schema. The target
+must be callable; event-only functions are not valid job targets. Use `--profile queue` for an
+existing compatible profile, or let scaffolding reuse a default/unique profile or add `localJob()`.
+
+The generated job has one attempt and no schedule or idempotency policy. Change its source for
+scheduling, retries, and idempotency; there are no scaffolding flags for those policies. No work is
+enqueued by this command.
+
+### Job CLI options
+
+<include cwd>content/generated/add-job-options.mdx</include>
+
 ## Start from the function contract
 
 <include cwd lang="ts" meta='title="src/receipts/jobs/send-receipt.job.ts"'>

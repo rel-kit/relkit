@@ -5,6 +5,25 @@ description: Let a model call an existing function with a clear description and 
 
 A tool is an action an AI client can ask your app to perform. Use `defineTool` to name the action, explain when to use it, and point it at an existing function.
 
+## Scaffold a function-backed tool
+
+From the application root, with the Agent template's `hello` service and `hello` function:
+
+```sh
+bun run relkit add tool "Greeting Lookup" --service hello \
+  --target hello --side-effect read --approval never
+```
+
+Creates `src/hello/tools/greeting-lookup.tool.ts` using the function's `.asTool()` method.
+Select a callable function in the same service; the CLI accepts its ID, binding, or filename.
+The default side-effect class is `read`, and approval defaults to `never`. Choose accurate policies
+before exposing a real operation. The tool remains internal to the domain, and adding it does not
+automatically add it to an existing agent.
+
+### Tool CLI options
+
+<include cwd>content/generated/add-tool-options.mdx</include>
+
 ## Define the input and output
 
 Declare `input` and `output` on the function the tool will call:

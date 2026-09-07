@@ -7,6 +7,25 @@ A function is RELKIT's reusable unit of application behavior. It declares runtim
 expected errors, provider-backed dependencies, optional publication access, and one handler. Routes, jobs,
 event consumers, tools, agents, and direct calls all enter the same invocation engine.
 
+## Scaffold a callable function
+
+With an existing `orders` service, run from the application root:
+
+```sh
+bun run relkit add function "Send Receipt" --service orders
+```
+
+This creates `src/orders/functions/send-receipt.function.ts` and exposes `sendReceipt` through
+`src/orders/service.ts`. The placeholder accepts and returns a string `value`; replace its schemas
+and handler with your domain behavior. Its stable ID is `orders.send-receipt`.
+
+Pass `--internal` to omit public service exposure. Use `--create-service orders` instead of
+`--service orders` only if the domain does not exist. No test files are generated.
+
+### Function CLI options
+
+<include cwd>content/generated/add-function-options.mdx</include>
+
 ## Read a complete function
 
 <include

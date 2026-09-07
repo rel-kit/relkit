@@ -11,6 +11,32 @@ Use the standard `@app/*` alias. If needed, follow [Create an app](/docs/start/c
 Preserve existing environment fields, service members, routes, and table exports. If your app already
 has a Drizzle or Better Auth service, extend it rather than adding a second one.
 
+## Scaffold the auth baseline
+
+The CLI can create the default email/password Better Auth service and `/api/auth` catch-all route:
+
+```sh
+bun run relkit add auth --adapter better-auth --database-dialect sqlite
+```
+
+It reuses the single statically discoverable Drizzle service. When none exists, it creates one with the
+Better Auth tables instead of the generic `items` table; PostgreSQL and MySQL are also supported. The
+command adds blank `BETTER_AUTH_SECRET` and safe `BETTER_AUTH_URL` examples, but never generates a secret
+or runs migrations. Complete the reported environment and migration next steps before starting auth.
+
+### Auth CLI options
+
+`--adapter` accepts only `better-auth`. `--database-dialect` chooses SQLite (the default),
+PostgreSQL, or MySQL when creating the database; an existing Drizzle service must be compatible.
+The default `--base-path /api/auth` produces
+`src/routes/api/auth/[[...auth]]/route.ts`. Use `--base-path /session-auth` for a different mount.
+
+Auth is a singleton under `src/auth`; `--service` and `--create-service` do not select its
+location. A second auth service or conflicting schema exports are rejected without overwriting them.
+The scaffold enables email/password only; add other providers and protection rules in source.
+
+<include cwd>content/generated/add-auth-options.mdx</include>
+
 ## Prepare the database and environment
 
 Install the compatible packages listed in [Better Auth service](/docs/auth/better-auth#install-compatible-packages).

@@ -3,6 +3,36 @@ title: Define a bucket
 description: Name your bucket and choose which files it accepts.
 ---
 
+## Scaffold a bucket
+
+From the application root, with an existing `assets` service:
+
+```sh
+bun run relkit add bucket Uploads --service assets --provider s3 --source docker
+```
+
+Creates `src/assets/buckets/uploads.bucket.ts` and configures Docker MinIO/S3. Without provider
+flags, scaffolding reuses an eligible default/unique profile or creates a Docker S3 profile.
+A bucket profile can belong to only one bucket; an already-owned profile is rejected.
+
+| Selection | Command options |
+| --- | --- |
+| Unused compatible profile | `--profile uploads` |
+| Docker MinIO/S3 | `--provider s3 --source docker` |
+| Connected S3 | `--provider s3 --source connected` |
+| S3 on an existing AWS/Pulumi deployment | `--provider s3 --source aws` |
+| Connected Cloudflare R2 | `--provider cloudflare-r2 --source connected` |
+
+Do not combine `--profile` with `--provider` or `--source`. Cloudflare R2 supports only
+`connected`. AWS requires an existing AWS/Pulumi deployment and is not provisioned by this command.
+Set connected-profile environment values yourself; the CLI never asks for credentials.
+See [Docker startup after adding a resource](/docs/start/add-artifacts#start-local-resources).
+The bucket remains internal; declare it as a function dependency to use it.
+
+### Bucket CLI options
+
+<include cwd>content/generated/add-bucket-options.mdx</include>
+
 ## Define the bucket
 
 Use `defineBucket` in your app's domain directory. Create `src/assets/buckets/assets.bucket.ts`:
