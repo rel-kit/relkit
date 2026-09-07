@@ -1,4 +1,5 @@
 export * from "./identity.js";
+export * from "./integration.js";
 export * from "./lease.js";
 export * from "./provider-overrides.js";
 export * from "./reconciler.js";

@@ -16,7 +16,15 @@ export async function generateGuides(
   await validateCatalog(root, content);
   await emitNavigation(emit);
   await emit("../generated/capabilities.mdx", renderCapabilities());
-  await emit("../generated/create-options.mdx", renderCreateOptions(command(cli, "create")));
+  await emit(
+    "../generated/create-options.mdx",
+    renderCommandOptions(command(cli, "create"), cli.options),
+  );
+  for (const entry of command(cli, "add").commands)
+    await emit(
+      `../generated/add-${entry.name}-options.mdx`,
+      renderCommandOptions(entry, cli.options),
+    );
   await emit(
     "../generated/coverage.json",
     `${JSON.stringify({
@@ -151,8 +159,11 @@ ${examples}
 `;
 }
 
-export function renderCreateOptions(create: CliHelpCommand): string {
-  const options = create.options
+export function renderCommandOptions(
+  command: CliHelpCommand,
+  inherited: CliHelpCommand["options"] = [],
+): string {
+  const options = [...inherited, ...command.options]
     .map((option) => {
       const type = option.values?.map((value) => JSON.stringify(value)).join(" | ") ?? option.type;
       return `${JSON.stringify(`--${option.name}`)}: { type: ${JSON.stringify(type)}, description: ${JSON.stringify(option.description)} }`;

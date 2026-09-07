@@ -8,6 +8,23 @@ CORS, request metadata, and early rejection. Put it under `src/routes/middleware
 Keep business authorization that must apply to jobs, tools, and direct calls in domain functions as well.
 There is no service-middleware layer or `middleware` option on `defineService`.
 
+## Scaffold middleware
+
+From your application's root:
+
+```sh
+bun run relkit add middleware "Order Policy" --path '/orders/*'
+```
+
+Creates `src/routes/middleware/order-policy.middleware.ts` with a pass-through `next()` call.
+It does not implement authentication or authorization. `--path` is required headlessly; the
+interactive prompt suggests `*`. Use a URL scope such as `/orders/:orderId` or a trailing
+wildcard, not bracket-directory syntax. No service selection is needed.
+
+### Middleware CLI options
+
+<include cwd>content/generated/add-middleware-options.mdx</include>
+
 ## Define path-scoped policy
 
 <include

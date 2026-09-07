@@ -1,10 +1,18 @@
 import { access, chmod, lstat, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { GenerateProjectError } from "./generate.js";
+import { GenerateProjectError } from "./generate-types.js";
 import type { CreateOptions } from "./options.js";
 
 const FILE_MODE = 0o644;
 const DIRECTORY_MODE = 0o755;
+export const EXAMPLE_PATH_PREFIXES = [
+  "src/routes",
+  "src/orders",
+  "src/echo",
+  "src/hello/tools",
+  "src/hello/agents",
+  "tests",
+] as const;
 
 export interface StageCleanupResult {
   readonly temporaryPath?: string;
@@ -151,14 +159,7 @@ export async function replaceOnce(path: string, before: string, after: string): 
 }
 
 export async function removeExamples(root: string): Promise<void> {
-  for (const directory of [
-    "src/routes",
-    "src/orders",
-    "src/echo",
-    "src/hello/tools",
-    "src/hello/agents",
-    "tests",
-  ])
+  for (const directory of EXAMPLE_PATH_PREFIXES)
     await rm(join(root, directory), { recursive: true, force: true });
 }
 

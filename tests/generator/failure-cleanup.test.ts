@@ -65,7 +65,10 @@ async function captureFailure(
   root: string,
 ): Promise<GenerateProjectError> {
   try {
-    await generateProject(createOptions({ install: point === "install" }), contextFor(root, point));
+    await generateProject(
+      createOptions({ install: ["install", "doctor", "check"].includes(point) }),
+      contextFor(root, point),
+    );
   } catch (error) {
     if (error instanceof GenerateProjectError) return error;
     throw error;

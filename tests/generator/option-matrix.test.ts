@@ -109,12 +109,26 @@ test("covers every template and examples/install/Git combination", async () => {
             commands.filter(([executable, action]) => executable === "git" && action === "init")
               .length,
           ).toBe(git ? 1 : 0);
-          expect(commands.slice(-2).map((command) => command.slice(0, 2))).toEqual([
-            ["relkit", "doctor"],
-            ["relkit", "check"],
-          ]);
-          expect(commands.at(-2)).toContain("--no-ports");
-          expect(commands.at(-2)).toContain("--no-pulumi");
+          expect(
+            commands
+              .filter(([executable]) => executable === "relkit")
+              .map((command) => command.slice(0, 2)),
+          ).toEqual(
+            install
+              ? [
+                  ["relkit", "doctor"],
+                  ["relkit", "check"],
+                ]
+              : [],
+          );
+          if (install) {
+            expect(commands.at(-2)).toContain("--no-ports");
+            expect(commands.at(-2)).toContain("--no-pulumi");
+          } else {
+            expect(result.warnings).toContainEqual(
+              expect.objectContaining({ code: "validation-skipped" }),
+            );
+          }
           expect((await readdir(root)).some((entry) => entry.startsWith(`.${name}-relkit-`))).toBe(
             false,
           );
@@ -297,10 +311,7 @@ test("reports only the create milestones that run", async () => {
     ...contextFor(root),
     onProgress: (message) => minimal.push(message),
   });
-  expect(minimal).toEqual([
-    `Creating a new RELKIT app in ${join(root, "minimal-progress")}.`,
-    "Checking generated project...",
-  ]);
+  expect(minimal).toEqual([`Creating a new RELKIT app in ${join(root, "minimal-progress")}.`]);
 });
 
 test("produces byte-identical content from separate destinations", async () => {
@@ -326,7 +337,10 @@ test("rolls back every pre-rename failure and removes its temporary sibling", as
   const root = await makeRoot();
   for (const point of failurePoints) {
     const name = `rollback-${point}`;
-    const options = createOptions(name, { install: point === "install", git: point !== "install" });
+    const options = createOptions(name, {
+      install: ["install", "doctor", "check"].includes(point),
+      git: point !== "install",
+    });
     await expect(
       generateProject(options, {
         ...contextFor(root),

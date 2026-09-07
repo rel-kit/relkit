@@ -7,6 +7,46 @@ Create route descriptors in `src/routes/**/route.ts`. Import the target through 
 `service.ts`; never reach into another domain's private function directory from a route.
 The [file-system conventions](/docs/http/routes) determine the URL and allowed method exports.
 
+## Scaffold a route
+
+From an installed application's root, create a standalone raw handler:
+
+```sh
+bun run relkit add route '/status' --mode route
+```
+
+This creates `src/routes/status/route.ts` with a raw `GET` returning `{ ok: true }`.
+It needs no service or function. It appears in OpenAPI/Scalar with a generic response contract,
+not an inferred function response schema. `--map` is not accepted in this mode.
+
+To route through existing public functions, use service-route mode. With `details` and
+`updateDetails` public callable members in the `users` service:
+
+```sh
+bun run relkit add route '/users/:id/details' --mode service-route --service users \
+  --map GET=details --map PATCH=updateDetails
+```
+
+This creates `src/routes/users/[id]/details/route.ts` with `defineServiceRoutes`. The
+mapped names are public service member names, not private filenames or event IDs. Headless
+service-route commands need at least one `--map`; supported methods are `GET`, `POST`,
+`PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`. `ALL` is auth-only.
+
+| URL passed to the command | Generated file                           |
+| ------------------------- | ---------------------------------------- |
+| `/`                       | `src/routes/route.ts`                    |
+| `/users/:id/details`      | `src/routes/users/[id]/details/route.ts` |
+| `/files/*parts`           | `src/routes/files/[...parts]/route.ts`   |
+| `/files/*parts?`          | `src/routes/files/[[...parts]]/route.ts` |
+
+Quote route paths so your shell does not expand `*` or `?`. Existing target files are never
+overwritten; edit an existing route to add another method. Run `bun run check`, then verify
+the endpoint and its entry in `/_relkit/v1/api-reference` while dev is running.
+
+### Route CLI options
+
+<include cwd>content/generated/add-route-options.mdx</include>
+
 ## Expose one public function
 
 Use `defineRoute` for one method-to-function mapping:

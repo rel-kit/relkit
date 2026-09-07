@@ -167,6 +167,7 @@ test("keeps command and create failures structured in JSON", async () => {
 });
 
 test("renders focused help for every command and nested subcommand", async () => {
+  const addKinds = getCliHelpModel("test").commands.find(({ name }) => name === "add")!.commands;
   const paths = [
     [],
     ...[
@@ -180,7 +181,9 @@ test("renders focused help for every command and nested subcommand", async () =>
       "local",
       "doctor",
       "deploy",
+      "add",
     ].map((name) => [name]),
+    ...addKinds.map(({ name }) => ["add", name]),
     ...["print", "check", "diff"].map((name) => ["graph", name]),
     ...["check", "list", "explain", "example"].map((name) => ["env", name]),
     ...["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) => ["deploy", name]),
@@ -211,6 +214,16 @@ test("parses local lifecycle commands and disables dev reconciliation explicitly
   expect((await parseEffectCli(["local", "up", "--detach"], "test")).invocation).toEqual({
     command: "local",
     args: ["up", "--detach"],
+  });
+});
+
+test("forwards tool function creation through the CLI parser", async () => {
+  expect(
+    (await parseEffectCli(["add", "tool", "Lookup", "--create-function", "Find Order"], "test"))
+      .invocation,
+  ).toEqual({
+    command: "add",
+    args: ["tool", "Lookup", "--create-function", "Find Order"],
   });
 });
 

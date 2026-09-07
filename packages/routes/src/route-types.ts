@@ -63,7 +63,7 @@ export interface RawRouteDescriptor<
   Id extends string,
   Handler extends RawHttpHandler = RawHttpHandler,
 > extends DescriptorBase<"route", Id> {
-  readonly method?: "ALL";
+  readonly method?: HttpMethod;
   readonly path?: string;
   readonly runtimePaths?: readonly string[];
   readonly raw: true;

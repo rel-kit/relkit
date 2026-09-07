@@ -7,6 +7,23 @@ A function-backed route maps transport data into its target's input. The handler
 business data, not a framework request object. Keep parsing choices on the route and reusable constraints
 in the [function's schema](/docs/fundamentals/schemas).
 
+## Scaffold a request transform
+
+From your application's root:
+
+```sh
+bun run relkit add transform "Normalize Id"
+```
+
+Creates `src/routes/transforms/normalize-id.transform.ts` with a string schema. Specialize
+the schema and reference the descriptor with `http.transform` in a route's request mapping;
+the CLI does not attach it to routes automatically. Transforms belong to the route platform,
+so no service selection is needed.
+
+### Transform CLI options
+
+<include cwd>content/generated/add-transform-options.mdx</include>
+
 ## Start with inference
 
 When `request` is omitted, RELKIT projects the target's object input schema:

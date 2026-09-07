@@ -7,6 +7,54 @@ Use `defineAgent` when a model needs to interpret a request and decide which too
 
 The [AI SDK ToolLoopAgent reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent) covers the underlying agent API. For options you can pass to `defineAgent`, use the [RelKit reference](/docs/api/agents#defineagent). AI SDK settings such as `temperature` and `prepareStep` are not currently exposed by `defineAgent`.
 
+## Scaffold an agent
+
+From the application root, with an existing `hello` service, create an agent and a model profile:
+
+```sh
+bun run relkit add agent "Support Assistant" --service hello \
+  --model-provider openai --model-id gpt-5-mini \
+  --instructions "Answer greeting questions."
+```
+
+Creates `src/hello/agents/support-assistant.agent.ts`. The sample accepts a non-empty `question`
+and returns an `answer`; it starts with limits of four steps, four tool calls, and ten seconds.
+In a terminal, the wizard offers model, tool, and prompt choices discovered in the service.
+
+For an existing model profile, use `--model openai:gpt-5-mini` instead of the two profile-creation
+flags. `--model-provider` and `--model-id` must be supplied together when adding a profile.
+Repeat `--tool greetingLookupTool` for tools already in the same service. Omitting `--tool`
+headlessly selects no tools. Supply exactly one of `--instructions` or `--prompt`.
+
+A new profile requires `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in your local environment at server
+startup, even before an agent is invoked. The CLI adds a blank example, never reads a secret from a
+prompt, and never calls the model. Expose the agent through a callable function when needed.
+
+### Agent CLI options
+
+<include cwd>content/generated/add-agent-options.mdx</include>
+
+## Scaffold a reusable prompt
+
+Create a prompt before referencing it from an agent:
+
+```sh
+bun run relkit add prompt "Greeting Policy" --service hello \
+  --text "Answer greeting questions." --text "Keep answers brief."
+bun run relkit add agent "Greeting Assistant" --service hello \
+  --model openai:gpt-5-mini --prompt greetingPolicyPrompt
+```
+
+These commands assume the `openai` model profile is already configured. The prompt is saved as
+`src/hello/prompts/greeting-policy.prompt.ts`; repeated non-empty `--text` values preserve
+separate prompt segments. In headless execution at least one `--text` is required. Prompts are
+internal descriptors, not public service members. Agent `--prompt` accepts the prompt's ID,
+binding, or filename.
+
+### Prompt CLI options
+
+<include cwd>content/generated/add-prompt-options.mdx</include>
+
 ## Define the task
 
 This agent answers greeting questions using a single tool. Create it after [defining the lookup tool](/docs/ai/function-tools).

@@ -11,6 +11,29 @@ Use an installed app with the standard `@app/*` alias. If needed, follow [Create
 If a database service already exists, extend it instead of adding a second one. Preserve existing schema,
 environment fields, public service members, and routes.
 
+## Scaffold the database baseline
+
+From an existing application root, the CLI can create the Drizzle service, dialect-specific `items`
+table, migration configuration, environment contract, ignore rules, dependencies, and database scripts:
+
+```sh
+bun run relkit add database --orm drizzle --dialect sqlite
+```
+
+Use `postgresql` or `mysql` for the other Bun-native Drizzle clients. The command installs packages and
+runs `relkit check`, but deliberately does not create or apply a migration. Run the reported
+`db:generate` and `db:migrate` next steps only after reviewing the schema and setting `DATABASE_PATH` or
+`DATABASE_URL`. To follow the richer Users tutorial below, replace the generated `items` placeholder with
+the shown Users and Memberships schema instead of adding a second database service.
+
+### Database CLI options
+
+SQLite is the headless default and uses `bun:sqlite`; PostgreSQL and MySQL use
+`drizzle-orm/bun-sql`. `--orm` accepts only `drizzle`. Database is a singleton under
+`src/database`; `--service` and `--create-service` do not select its location.
+
+<include cwd>content/generated/add-database-options.mdx</include>
+
 ## Prepare SQLite and the environment
 
 Follow [Define a Drizzle service](/docs/database/define) to install compatible `@relkit/drizzle` and

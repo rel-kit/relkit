@@ -7,6 +7,89 @@ import type { LogRecord } from "@relkit/runtime-effect";
 import { redactFailureDetail } from "@relkit/runtime-effect";
 import type { DevLogEvent } from "./src/commands/dev";
 
+test("scaffold rebuild output is concise while verbose and JSON retain diagnostic details", () => {
+  const base: LogRecord = {
+    version: 2,
+    signal: "log",
+    timestamp: new Date().toISOString(),
+    level: "error",
+    component: "cli.dev",
+    message: "dev.generation.failed",
+    fields: {},
+  };
+  const message =
+    "relkit.config.ts:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED: Cannot resolve dependency";
+  const stack = `Error: ${message}\n    at compile (/workspace/relkit/packages/cli/src/commands/dev-local.ts:48:19)`;
+  const failure = {
+    ...base,
+    fields: { message, previousActive: true, error: { name: "Error", message, stack } },
+  };
+  const normal = formatDevLog(failure, { columns: 100 });
+  expect(normal.match(/RELKIT_EVALUATOR_IMPORT_FAILED/g)).toHaveLength(1);
+  expect(normal).not.toContain("dev-local.ts");
+  expect(normal).toContain("--verbose");
+  expect(formatDevLog(failure, { verbose: true })).toContain("dev-local.ts");
+  const files = ["src/orders/service.ts", "src/orders/agents/example.agent.ts", "relkit.config.ts"];
+  const rebuild = { ...base, message: "dev.build.started", fields: { files, initial: false } };
+  expect(formatDevLog(rebuild)).toContain("3 changed files");
+  expect(formatDevLog(rebuild)).not.toContain("src/orders");
+  expect(formatDevLog(rebuild, { verbose: true })).toContain(files[0]!);
+
+  const human: string[] = [];
+  const json: LogRecord[] = [];
+  const log = createDevLogger({
+    compile: async () => undefined,
+    logger: {
+      human: { write: (line) => human.push(line) },
+      json: { write: (record) => json.push(record) },
+    },
+  });
+  const cause = "OPENAI_API_KEY: Required value is missing";
+  const provider = {
+    ...base,
+    component: "runtime.provider",
+    message: "Provider startup failed",
+    fields: {
+      code: "RELKIT_ENVIRONMENT_INVALID",
+      detail: cause,
+      error: { name: "EnvResolutionError", message: cause, stack },
+    },
+  };
+  log({
+    level: "info",
+    event: "candidate.startup-output",
+    fields: { output: `\u001e${JSON.stringify(provider)}` },
+  });
+  log({
+    level: "error",
+    event: "dev.generation.failed",
+    fields: {
+      message: "RELKIT_CANDIDATE_PROVIDER_NOT_READY: Candidate providers are not ready.",
+      error: { stack },
+      previousActive: true,
+    },
+  });
+  expect(human.join("\n").match(/OPENAI_API_KEY/g)).toHaveLength(1);
+  expect(human.join("\n")).toContain("RELKIT_ENVIRONMENT_INVALID");
+  expect(human.join("\n")).not.toContain("RELKIT_CANDIDATE_PROVIDER_NOT_READY");
+  expect(human.join("\n")).not.toContain("dev-local.ts");
+  expect(json.at(-1)?.fields.error).toEqual({ stack });
+  // An unrelated compile error must not be hidden by a previous failed startup.
+  log({
+    level: "error",
+    event: "dev.generation.failed",
+    fields: { message: "Syntax error in service.ts" },
+  });
+  expect(human.at(-1)).toContain("Syntax error");
+  log({ level: "info", event: "dev.build.started", fields: { initial: false } });
+  log({
+    level: "error",
+    event: "dev.generation.failed",
+    fields: { message: "RELKIT_CANDIDATE_PROVIDER_NOT_READY: No startup details available." },
+  });
+  expect(human.at(-1)).toContain("RELKIT_CANDIDATE_PROVIDER_NOT_READY");
+});
+
 test("dev JSON uses only the supplied stderr sink after redaction", () => {
   const lines: string[] = [];
   const log = createDevLogger({

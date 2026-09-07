@@ -1,7 +1,14 @@
 import { canonicalJson } from "@relkit/contracts";
-import type { LogLevel, LogRecord } from "@relkit/runtime-effect";
+import type {
+  CliFailure,
+  CliIo,
+  CliReporter,
+  CreateRelkitGeneratorApi,
+} from "./main-support-types.js";
 import manifest from "../package.json" with { type: "json" };
 import { findCliHelp, getCliHelpModel } from "./cli-help-model.js";
+
+export type * from "./main-support-types.js";
 
 export const CLI_VERSION = manifest.version;
 export const CLI_EXIT_CODES = Object.freeze({
@@ -11,55 +18,6 @@ export const CLI_EXIT_CODES = Object.freeze({
   sigint: 130,
   sigterm: 143,
 });
-export interface CliIo {
-  readonly stdout: (line: string) => void;
-  readonly stderr: (line: string) => void;
-}
-export interface CliReporter {
-  readonly output: (value: unknown, human?: string) => void;
-  readonly error: (code: string, message: string) => void;
-}
-export type CliLogger = (
-  level: LogLevel,
-  message: string,
-  fields?: Readonly<Record<string, unknown>>,
-) => void;
-export interface CliCommandContext {
-  readonly command: string;
-  readonly args: readonly string[];
-  readonly json: boolean;
-  readonly signal: AbortSignal;
-  readonly tty?: boolean;
-  readonly io?: CliIo;
-  readonly reporter: CliReporter;
-  readonly log: CliLogger;
-  readonly onProgress?: (message: string) => void;
-}
-export interface CreateRelkitGeneratorApi {
-  readonly normalizeCreateOptions: (
-    args: readonly string[],
-    context: { readonly json: boolean },
-  ) => unknown;
-  readonly generateProject: (
-    options: unknown,
-    context: CliCommandContext,
-  ) => unknown | Promise<unknown>;
-}
-export interface CliRuntime {
-  readonly io?: CliIo;
-  readonly version?: string;
-  readonly tty?: boolean;
-  readonly ci?: boolean;
-  readonly signal?: AbortSignal;
-  readonly installSignalHandlers?: boolean;
-  readonly loadCreateRelkit?: () => Promise<CreateRelkitGeneratorApi>;
-}
-export type CliFailure = Error & {
-  readonly code: string;
-  readonly exitCode: number;
-  readonly signal?: "SIGINT" | "SIGTERM";
-};
-
 export async function loadCreateRelkit(): Promise<CreateRelkitGeneratorApi> {
   let loaded: { readonly default?: unknown } & Partial<CreateRelkitGeneratorApi>;
   try {
@@ -146,7 +104,11 @@ export function toFailure(error: unknown, signal: AbortSignal): CliFailure {
     return isFailure(signal.reason)
       ? signal.reason
       : fail("RELKIT_INTERRUPTED", "Operation interrupted.", 130);
-  return isFailure(error) ? error : fail("RELKIT_INTERNAL_ERROR", errorMessage(error));
+  if (isFailure(error)) return error;
+  if (error instanceof Error && "code" in error && typeof error.code === "string") {
+    return fail(error.code, error.message);
+  }
+  return fail("RELKIT_INTERNAL_ERROR", errorMessage(error));
 }
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -160,5 +122,9 @@ export function isGeneratorApi(value: unknown): value is CreateRelkitGeneratorAp
   );
 }
 function isFailure(value: unknown): value is CliFailure {
-  return value instanceof Error && typeof (value as Partial<CliFailure>).code === "string";
+  return (
+    value instanceof Error &&
+    typeof (value as Partial<CliFailure>).code === "string" &&
+    typeof (value as Partial<CliFailure>).exitCode === "number"
+  );
 }

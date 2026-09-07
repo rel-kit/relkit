@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, expect, test } from "bun:test";
@@ -17,9 +17,83 @@ import {
 } from "./src/commands/dev-inspector.js";
 import { createDevLogger } from "./src/commands/dev-logger.js";
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
+import { applyScaffoldPlan, type ScaffoldPlan } from "create-relkit";
 
 const sessions: Array<Awaited<ReturnType<typeof startDev>>> = [];
 const roots: string[] = [];
+
+test("holds reload until a real scaffold transaction finishes installation or rollback", async () => {
+  const root = await makeRoot();
+  await mkdir(join(root, "src"));
+  let builds = 0;
+  const activeScaffoldMarkers: string[] = [];
+  const session = await startDev({
+    ...options(root, "sha256:scaffold"),
+    compile: async (request) => {
+      builds++;
+      activeScaffoldMarkers.push(
+        ...(await readdir(root)).filter((file) => file.startsWith(".relkit-scaffold-")),
+      );
+      return options(root, "sha256:scaffold").compile(request);
+    },
+  });
+  sessions.push(session);
+  const watcher = startDevSourceWatcher(session);
+  try {
+    for (const fail of [false, true]) {
+      const before = builds;
+      const name = fail ? "rollback" : "added";
+      const plan: ScaffoldPlan = {
+        projectRoot: root,
+        request: { kind: "function", name, install: true, internal: false, projectRoot: root },
+        operations: [{ path: `src/${name}.ts`, action: "create", content: "export {};\n" }],
+        dependencies: { example: "1.0.0" },
+        artifacts: [],
+        profiles: [],
+        warnings: [],
+        nextSteps: [],
+      };
+      const applying = applyScaffoldPlan(plan, {
+        commandRunner: async (command) => {
+          if (command[1] === "install") {
+            await new Promise((resolve) => setTimeout(resolve, 350));
+            expect(builds).toBe(before);
+            await writeFile(join(root, "bun.lock"), "installed\n");
+            await new Promise((resolve) => setTimeout(resolve, 150));
+            expect(builds).toBe(before);
+            return { exitCode: fail ? 1 : 0 };
+          }
+          return { exitCode: 0 };
+        },
+      });
+      if (fail) await expect(applying).rejects.toThrow();
+      else await applying;
+      await waitFor(() => builds > before && session.stateMachine.state === "active");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      expect(activeScaffoldMarkers).toEqual([]);
+      expect(await Bun.file(join(root, `src/${name}.ts`)).exists()).toBe(!fail);
+    }
+    const crashed = Bun.spawn([process.execPath, "-e", "setInterval(() => {}, 1000)"], {
+      stdout: "ignore",
+      stderr: "ignore",
+    });
+    try {
+      const before = builds;
+      await writeFile(join(root, `.relkit-scaffold-${crashed.pid}-abcdef.tmp`), "");
+      await writeFile(join(root, "src/crashed.ts"), "export {};\n");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      expect(builds).toBe(before);
+      crashed.kill();
+      await crashed.exited;
+      await waitFor(() => builds > before && session.stateMachine.state === "active");
+    } finally {
+      if (crashed.exitCode === null) crashed.kill();
+      await crashed.exited;
+    }
+  } finally {
+    watcher.close();
+  }
+}, 15_000);
 
 test("owns a stable proxy, dynamic backend, candidate, and clean stop", async () => {
   const root = await makeRoot();
@@ -114,7 +188,7 @@ test("releases the backend port when its terminal closes", async () => {
   await replacement.stop(true);
 });
 
-test("forwards source saves through the supervisor watcher", async () => {
+test("forwards source, directory, and root configuration changes through the watcher", async () => {
   const root = await makeRoot();
   await mkdir(join(root, "src"));
   let builds = 0;
@@ -130,6 +204,14 @@ test("forwards source saves through the supervisor watcher", async () => {
   try {
     await writeFile(join(root, "src", "app.ts"), "export const changed = true;\n");
     await waitFor(() => builds > 1 && session.stateMachine.state === "active");
+    const beforeDirectory = builds;
+    await mkdir(join(root, "src/routes/live/[id]/details"), { recursive: true });
+    await waitFor(() => builds > beforeDirectory && session.stateMachine.state === "active");
+    for (const file of ["relkit.config.ts", ".env", ".env.local", "package.json", "bun.lock"]) {
+      const before = builds;
+      await writeFile(join(root, file), "changed\n");
+      await waitFor(() => builds > before && session.stateMachine.state === "active");
+    }
   } finally {
     watcher.close();
   }

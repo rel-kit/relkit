@@ -170,7 +170,10 @@ function registerRawRoute(
   if (!isRecord(route) || typeof route.handler !== "function") return;
   const handler = route.handler as (request: Request) => Response | Promise<Response>;
   for (const path of trigger.config.runtimePaths ?? [trigger.config.path]) {
-    app.all(path, (context) => Promise.resolve(handler(context.req.raw)));
+    const run = (context: { readonly req: { readonly raw: Request } }) =>
+      Promise.resolve(handler(context.req.raw));
+    if (trigger.config.method === "ALL") app.all(path, run);
+    else app.on(trigger.config.method, path, run);
   }
 }
 export { FRAMEWORK_MIDDLEWARE_ORDER };

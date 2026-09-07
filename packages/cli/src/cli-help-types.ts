@@ -4,6 +4,7 @@ export interface CliHelpOption {
   readonly type: "boolean" | "string" | "integer" | "choice" | "key=value";
   readonly description: string;
   readonly values?: readonly string[];
+  readonly repeatable?: boolean;
 }
 
 export interface CliHelpArgument {

@@ -5,14 +5,14 @@ export interface SchemaMetadata {
   readonly optional?: boolean;
 }
 
-const metadataBySchema = new WeakMap<StandardSchemaV1, SchemaMetadata>();
+const metadataKey = Symbol.for("relkit.schema.metadata");
 
 export function getSchemaMetadata(schema: StandardSchemaV1): SchemaMetadata | undefined {
-  return metadataBySchema.get(schema);
+  return (schema as StandardSchemaV1 & { [metadataKey]?: SchemaMetadata })[metadataKey];
 }
 
 export function setSchemaMetadata(schema: StandardSchemaV1, metadata: SchemaMetadata): void {
-  metadataBySchema.set(schema, metadata);
+  Object.defineProperty(schema, metadataKey, { value: metadata, configurable: true });
 }
 
 export function withOptionalMetadata(schema: StandardSchemaV1): SchemaMetadata {

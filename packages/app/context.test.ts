@@ -55,3 +55,10 @@ test("rejects invalid prompts and duplicate constant keys", () => {
     }),
   ).toThrow('Constant "duplicate" is registered more than once');
 });
+
+test("accepts explicit source-disambiguating context descriptor IDs", () => {
+  expect(definePrompt("Help", { id: "support.prompt" }).id).toBe("support.prompt");
+  expect(defineConstants({ region: "eu" }, { id: "support.constants" }).id).toBe(
+    "support.constants",
+  );
+});

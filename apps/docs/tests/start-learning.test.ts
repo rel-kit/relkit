@@ -6,8 +6,8 @@ import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `start/${page}.mdx`), "utf8");
 
-test("keeps Start to three local onboarding guides before Core concepts", () => {
-  const pages = ["create-an-app", "first-route", "local-development"];
+test("keeps Start to four local onboarding guides before Core concepts", () => {
+  const pages = ["create-an-app", "add-artifacts", "first-route", "local-development"];
   expect(guideGroups.find(({ directory }) => directory === "start")?.pages).toEqual(pages);
   expect(JSON.parse(readFileSync(resolve(content, "start/meta.json"), "utf8"))).toEqual({
     title: "Start",
@@ -15,6 +15,7 @@ test("keeps Start to three local onboarding guides before Core concepts", () => 
     pages,
   });
   expect(readdirSync(resolve(content, "start")).sort()).toEqual([
+    "add-artifacts.mdx",
     "create-an-app.mdx",
     "first-route.mdx",
     "local-development.mdx",

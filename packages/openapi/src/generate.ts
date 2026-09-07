@@ -40,7 +40,7 @@ export interface OpenApiOperation {
   readonly responses: Readonly<Record<string, OpenApiResponse>>;
   readonly "x-relkit": {
     readonly routeId: string;
-    readonly functionId: string;
+    readonly functionId?: string;
     readonly serviceId?: string;
     readonly middleware: readonly {
       readonly id: string;
@@ -92,13 +92,13 @@ export function generateOpenApi(graph: ApplicationGraph): OpenApiDocument {
   const services = serviceContext(graph);
   const paths: Record<string, OpenApiPathItem> = {};
   for (const trigger of triggers) {
-    const target = functions.get(trigger.targetFunctionId);
-    if (target === undefined) {
+    const target = trigger.config.rawHandler ? undefined : functions.get(trigger.targetFunctionId);
+    if (target === undefined && !trigger.config.rawHandler) {
       throw new TypeError(
         `HTTP trigger "${trigger.id}" targets missing function "${trigger.targetFunctionId}".`,
       );
     }
-    const service = serviceFor(services, trigger, target);
+    const service = target === undefined ? undefined : serviceFor(services, trigger, target);
     for (const [index, routePath] of openApiPaths(trigger.config.path).entries()) {
       const path = openApiPath(routePath);
       const method = trigger.config.method.toLowerCase();
@@ -160,7 +160,8 @@ function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
     node.kind === "trigger" &&
     node.triggerType === "http" &&
     isRecord(node.config) &&
-    node.config.rawHandler !== true
+    // Auth's ALL catch-all is not an OpenAPI operation; keep provider-owned auth docs separate.
+    node.config.method !== "ALL"
   );
 }
 

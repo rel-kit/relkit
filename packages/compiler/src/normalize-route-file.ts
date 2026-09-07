@@ -6,6 +6,7 @@ import {
   type NormalizedDescriptor,
   type NormalizationWork,
 } from "./normalize-types.js";
+import { isRecord } from "./normalize-utils.js";
 
 /** Adds file- and export-derived transport metadata to one authored route. */
 export function bindRouteFile(
@@ -50,12 +51,13 @@ export function bindRouteFile(
     );
   } else {
     value.method = nextMethod;
-    if ((nextMethod === "ALL") !== (value.raw === true)) {
+    const authRaw = value.raw === true && isRecord(value.auth) && value.auth.kind === "better-auth";
+    if (nextMethod === "ALL" ? !authRaw : authRaw) {
       add(
         work,
         descriptor,
         NORMALIZE_CODES.routeExport,
-        "ALL is reserved for raw-handler routes, and raw-handler routes must use ALL.",
+        "ALL is reserved for Better Auth routes, and Better Auth routes must use ALL.",
       );
     }
   }

@@ -1,5 +1,6 @@
 import { Command } from "effect/unstable/cli";
 import { basicCommands } from "./cli-command-basic.js";
+import { addCommand } from "./cli-command-add.js";
 import { groupCommands } from "./cli-command-groups.js";
 import { booleanFlag, document, type SelectInvocation } from "./cli-command-shared.js";
 
@@ -7,11 +8,13 @@ import { booleanFlag, document, type SelectInvocation } from "./cli-command-shar
 export function createCliCommand(select: SelectInvocation) {
   const [create, dev, check, build, start, doctor] = basicCommands(select);
   const [graph, env, deploy, client, local] = groupCommands(select);
+  const add = addCommand(select);
   return document(
     Command.make("relkit").pipe(
       Command.withSharedFlags({ json: booleanFlag([], "json") }),
       Command.withSubcommands([
         create,
+        add,
         dev,
         check,
         build,

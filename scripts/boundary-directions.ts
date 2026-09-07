@@ -19,6 +19,9 @@ const coreProtocols = new Set([
   "@relkit/observability",
   "@relkit/provider",
 ]);
+const integrationImplementations = new Map([
+  ["@relkit/local", new Set(["@relkit/providers-local"])],
+]);
 
 export function integrationPackageNames(scopes: readonly Scope[]): Set<string> {
   return new Set(
@@ -57,7 +60,8 @@ export function dependencyDirectionViolations(
       } else if (
         owner.path.startsWith("integrations/packages/") &&
         dependency.startsWith("@relkit/") &&
-        !coreProtocols.has(dependency)
+        !coreProtocols.has(dependency) &&
+        !integrationImplementations.get(owner.manifest?.name ?? "")?.has(dependency)
       ) {
         rule = "integration-non-protocol-dependency";
         message = `${owner.manifest?.name} depends on non-protocol package "${dependency}"`;

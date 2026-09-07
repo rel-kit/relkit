@@ -1,0 +1,664 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`snapshots simple, custom, and full service plans 1`] = `
+{
+  "artifacts": [
+    {
+      "binding": "example",
+      "id": "billing.example",
+      "kind": "function",
+      "path": "src/billing/functions/example.function.ts",
+    },
+  ],
+  "dependencies": {},
+  "nextSteps": [],
+  "operations": [
+    {
+      "action": "create",
+      "content": 
+"import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+
+const example = defineFunction({
+  id: "billing.example",
+  input: z.object({ value: z.string().default("example") }),
+  output: z.object({ value: z.string() }),
+  handler: async ({ value }, context) => {
+    return { value };
+  },
+});
+
+export default example;
+"
+,
+      "path": "src/billing/functions/example.function.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineService } from "@relkit/app/services";
+import example from "@app/billing/functions/example.function.js";
+
+export default defineService({ id: "billing", functions: { example } });
+"
+,
+      "path": "src/billing/service.ts",
+    },
+  ],
+  "profiles": [],
+  "warnings": [],
+}
+`;
+
+exports[`snapshots simple, custom, and full service plans 2`] = `
+{
+  "artifacts": [
+    {
+      "binding": "exampleEvent",
+      "id": "billing.example-event",
+      "kind": "event",
+      "path": "src/billing/events/example.event.ts",
+    },
+    {
+      "binding": "example",
+      "id": "billing.example",
+      "kind": "function",
+      "path": "src/billing/functions/example.function.ts",
+    },
+    {
+      "binding": "exampleTool",
+      "id": "billing.example-tool",
+      "kind": "tool",
+      "path": "src/billing/tools/example.tool.ts",
+    },
+  ],
+  "dependencies": {
+    "@relkit/local": "0.4.0",
+  },
+  "nextSteps": [],
+  "operations": [
+    {
+      "action": "update",
+      "content": 
+"{
+  "name": "my-app",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.10",
+  "scripts": {
+    "build": "relkit build",
+    "check": "relkit check",
+    "dev": "relkit dev",
+    "graph": "relkit graph print",
+    "start": "relkit start",
+    "test": "bun test",
+    "test:integration": "bun test tests/integration",
+    "test:unit": "bun test tests/unit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@relkit/app": "0.4.0",
+    "@relkit/local": "0.4.0"
+  },
+  "devDependencies": {
+    "@relkit/cli": "0.4.0",
+    "@relkit/testing": "0.4.0",
+    "@types/bun": "1.3.10",
+    "typescript": "5.9.3"
+  }
+}
+"
+,
+      "path": "package.json",
+    },
+    {
+      "action": "update",
+      "content": 
+"import { defineApp } from "@relkit/app/config";
+import env from "@app/platform/env.js";
+import { localEvent } from "@relkit/local";
+// relkit:create:deployment-imports
+
+export default defineApp({
+  env,
+  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
+  server: { port: 3000, maxBodyBytes: 1_048_576 },
+  inspector: { port: 3210 },
+  // relkit:create:deployment
+  event: { "local": localEvent() },
+  defaults: { event: "local" },
+});
+"
+,
+      "path": "relkit.config.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineEvent } from "@relkit/app/events";
+import { z } from "@relkit/app/schema";
+
+const exampleEvent = defineEvent({
+  id: "billing.example-event",
+  version: 1,
+  input: z.object({ value: z.string() }),
+  profile: "local",
+});
+
+declare global {
+  namespace Relkit {
+    interface EventRegistry {
+      readonly "billing.example-event": typeof exampleEvent;
+    }
+  }
+}
+
+export default exampleEvent;
+"
+,
+      "path": "src/billing/events/example.event.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+
+const example = defineFunction({
+  id: "billing.example",
+  input: z.object({ value: z.string().default("example") }),
+  output: z.object({ value: z.string() }),
+  publishes: ["billing.example-event"],
+  handler: async ({ value }, context) => {
+    await context.events["billing.example-event"].publish({ value });
+    return { value };
+  },
+});
+
+export default example;
+"
+,
+      "path": "src/billing/functions/example.function.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineService } from "@relkit/app/services";
+import exampleEvent from "@app/billing/events/example.event.js";
+import example from "@app/billing/functions/example.function.js";
+
+export default defineService({ id: "billing", events: { exampleEvent }, functions: { example } });
+"
+,
+      "path": "src/billing/service.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import example from "@app/billing/functions/example.function.js";
+
+const exampleTool = example.asTool({
+  id: "billing.example-tool",
+  description: "Example",
+  sideEffect: "read",
+  approval: "never",
+  timeoutMs: 2_000,
+});
+
+export default exampleTool;
+"
+,
+      "path": "src/billing/tools/example.tool.ts",
+    },
+  ],
+  "profiles": [
+    {
+      "capability": "event",
+      "name": "local",
+    },
+  ],
+  "warnings": [],
+}
+`;
+
+exports[`snapshots simple, custom, and full service plans 3`] = `
+{
+  "artifacts": [
+    {
+      "binding": "exampleError",
+      "id": "billing.example-error",
+      "kind": "error",
+      "path": "src/billing/errors/example.error.ts",
+    },
+    {
+      "binding": "exampleEvent",
+      "id": "billing.example-event",
+      "kind": "event",
+      "path": "src/billing/events/example.event.ts",
+    },
+    {
+      "binding": "example",
+      "id": "billing.example",
+      "kind": "function",
+      "path": "src/billing/functions/example.function.ts",
+    },
+    {
+      "binding": "onExample",
+      "id": "billing.on-example",
+      "kind": "function",
+      "path": "src/billing/functions/on-example.function.ts",
+    },
+    {
+      "binding": "exampleJob",
+      "id": "billing.example-job",
+      "kind": "job",
+      "path": "src/billing/jobs/example.job.ts",
+    },
+    {
+      "binding": "exampleCache",
+      "id": "billing.example-cache",
+      "kind": "cache",
+      "path": "src/billing/cache/example.cache.ts",
+    },
+    {
+      "binding": "exampleBucket",
+      "id": "billing.example-bucket",
+      "kind": "bucket",
+      "path": "src/billing/buckets/example.bucket.ts",
+    },
+    {
+      "binding": "exampleTool",
+      "id": "billing.example-tool",
+      "kind": "tool",
+      "path": "src/billing/tools/example.tool.ts",
+    },
+    {
+      "binding": "examplePrompt",
+      "id": "billing.example-prompt",
+      "kind": "prompt",
+      "path": "src/billing/prompts/example.prompt.ts",
+    },
+    {
+      "binding": "exampleAgent",
+      "id": "billing.example-agent",
+      "kind": "agent",
+      "path": "src/billing/agents/example.agent.ts",
+    },
+    {
+      "binding": "exampleConstants",
+      "id": "billing.example-constants",
+      "kind": "constants",
+      "path": "src/billing/constants/example.constants.ts",
+    },
+  ],
+  "dependencies": {
+    "@relkit/ai-sdk": "0.4.0",
+    "@relkit/docker": "0.4.0",
+    "@relkit/local": "0.4.0",
+    "@relkit/redis": "0.4.0",
+    "@relkit/s3": "0.4.0",
+  },
+  "nextSteps": [
+    "relkit local up",
+  ],
+  "operations": [
+    {
+      "action": "update",
+      "content": 
+"LOG_LEVEL=info
+OPENAI_API_KEY=
+"
+,
+      "path": ".env.example",
+    },
+    {
+      "action": "update",
+      "content": 
+"{
+  "name": "my-app",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.10",
+  "scripts": {
+    "build": "relkit build",
+    "check": "relkit check",
+    "dev": "relkit dev",
+    "graph": "relkit graph print",
+    "start": "relkit start",
+    "test": "bun test",
+    "test:integration": "bun test tests/integration",
+    "test:unit": "bun test tests/unit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@relkit/ai-sdk": "0.4.0",
+    "@relkit/app": "0.4.0",
+    "@relkit/docker": "0.4.0",
+    "@relkit/local": "0.4.0",
+    "@relkit/redis": "0.4.0",
+    "@relkit/s3": "0.4.0"
+  },
+  "devDependencies": {
+    "@relkit/cli": "0.4.0",
+    "@relkit/testing": "0.4.0",
+    "@types/bun": "1.3.10",
+    "typescript": "5.9.3"
+  }
+}
+"
+,
+      "path": "package.json",
+    },
+    {
+      "action": "update",
+      "content": 
+"import { defineApp, env as binding } from "@relkit/app/config";
+import env from "@app/platform/env.js";
+import { localEvent, localJob } from "@relkit/local";
+import { docker } from "@relkit/docker";
+import { redis } from "@relkit/redis";
+import { s3 } from "@relkit/s3";
+import { aiSdk } from "@relkit/ai-sdk";
+// relkit:create:deployment-imports
+
+export default defineApp({
+  env,
+  telemetry: { redaction: { mode: "development-redacted", maxBytes: 65_536 } },
+  server: { port: 3000, maxBodyBytes: 1_048_576 },
+  inspector: { port: 3210 },
+  // relkit:create:deployment
+  event: { "local": localEvent() },
+  defaults: { event: "local", job: "local", cache: "local", bucket: "local", model: "openai" },
+  job: { "local": localJob() },
+  cache: { "local": docker(redis()) },
+  bucket: { "local": docker(s3()) },
+  model: { "openai": aiSdk({ provider: "openai", defaultModel: "gpt-5-mini", apiKey: binding.secret("OPENAI_API_KEY") }) },
+});
+"
+,
+      "path": "relkit.config.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineAgent } from "@relkit/app/agents";
+import { z } from "@relkit/app/schema";
+import exampleTool from "@app/billing/tools/example.tool.js";
+import examplePrompt from "@app/billing/prompts/example.prompt.js";
+
+const exampleAgent = defineAgent({
+  id: "billing.example-agent",
+  input: z.object({ question: z.string().min(1) }),
+  output: z.object({ answer: z.string() }),
+  model: "openai:gpt-5-mini",
+  instructions: examplePrompt,
+  tools: [exampleTool],
+  limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
+});
+
+export default exampleAgent;
+"
+,
+      "path": "src/billing/agents/example.agent.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineBucket } from "@relkit/app/buckets";
+
+const exampleBucket = defineBucket({
+  id: "billing.example-bucket",
+  profile: "local",
+  visibility: "private",
+  maxObjectBytes: 5_000_000,
+  allowedContentTypes: ["application/json"],
+});
+
+export default exampleBucket;
+"
+,
+      "path": "src/billing/buckets/example.bucket.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineCache } from "@relkit/app/cache";
+import { z } from "@relkit/app/schema";
+
+const exampleCache = defineCache({
+  id: "billing.example-cache",
+  profile: "local",
+  key: z.string().min(1),
+  value: z.string(),
+  defaultTtlMs: 60_000,
+  maxTtlMs: 300_000,
+});
+
+export default exampleCache;
+"
+,
+      "path": "src/billing/cache/example.cache.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineConstants } from "@relkit/app";
+
+const exampleConstants = defineConstants({ "billing.example-constants": "replace-me" }, { id: "billing.example-constants" });
+
+export default exampleConstants;
+"
+,
+      "path": "src/billing/constants/example.constants.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineError } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+
+const exampleError = defineError({
+  id: "billing.example-error",
+  data: z.object({ message: z.string() }),
+  message: ({ message }) => message,
+  retry: "never",
+});
+
+export default exampleError;
+"
+,
+      "path": "src/billing/errors/example.error.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineEvent } from "@relkit/app/events";
+import { z } from "@relkit/app/schema";
+
+const exampleEvent = defineEvent({
+  id: "billing.example-event",
+  version: 1,
+  input: z.object({ value: z.string() }),
+  profile: "local",
+});
+
+declare global {
+  namespace Relkit {
+    interface EventRegistry {
+      readonly "billing.example-event": typeof exampleEvent;
+    }
+  }
+}
+
+export default exampleEvent;
+"
+,
+      "path": "src/billing/events/example.event.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineFunction } from "@relkit/app/functions";
+import { z } from "@relkit/app/schema";
+import exampleError from "@app/billing/errors/example.error.js";
+
+const example = defineFunction({
+  id: "billing.example",
+  input: z.object({ value: z.string().default("example") }),
+  output: z.object({ value: z.string() }),
+  errors: [exampleError],
+  publishes: ["billing.example-event"],
+  handler: async ({ value }, context) => {
+    if (value === "error") return exampleError.create({ message: "Example failure" });
+    await context.events["billing.example-event"].publish({ value });
+    return { value };
+  },
+});
+
+export default example;
+"
+,
+      "path": "src/billing/functions/example.function.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineEventFunction } from "@relkit/app/events";
+
+const onExample = defineEventFunction({
+  id: "billing.on-example",
+  event: "billing.example-event",
+  delivery: "durable",
+  profile: "local",
+  handler: async ({ value }, context) => {
+    context.log.info("on-example", { value });
+  },
+});
+
+export default onExample;
+"
+,
+      "path": "src/billing/functions/on-example.function.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineJob } from "@relkit/app/jobs";
+import example from "@app/billing/functions/example.function.js";
+
+const exampleJob = defineJob({
+  id: "billing.example-job",
+  input: example.input,
+  target: example,
+  profile: "local",
+  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+});
+
+export default exampleJob;
+"
+,
+      "path": "src/billing/jobs/example.job.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { definePrompt } from "@relkit/app";
+
+const examplePrompt = definePrompt("Use the available tool and answer concisely.", { id: "billing.example-prompt" });
+
+export default examplePrompt;
+"
+,
+      "path": "src/billing/prompts/example.prompt.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineService } from "@relkit/app/services";
+import exampleEvent from "@app/billing/events/example.event.js";
+import example from "@app/billing/functions/example.function.js";
+
+export default defineService({ id: "billing", events: { exampleEvent }, functions: { example } });
+"
+,
+      "path": "src/billing/service.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import example from "@app/billing/functions/example.function.js";
+
+const exampleTool = example.asTool({
+  id: "billing.example-tool",
+  description: "Example",
+  sideEffect: "read",
+  approval: "never",
+  timeoutMs: 2_000,
+});
+
+export default exampleTool;
+"
+,
+      "path": "src/billing/tools/example.tool.ts",
+    },
+    {
+      "action": "update",
+      "content": 
+"import { defineEnv, env } from "@relkit/app/config";
+
+export default defineEnv({
+  LOG_LEVEL: env.literal("trace", "debug", "info", "warn", "error").default("info"),
+  OPENAI_API_KEY: env.secret(),
+});
+"
+,
+      "path": "src/platform/env.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineServiceRoutes } from "@relkit/app/routes";
+import billing from "@app/billing/service.js";
+
+export const { GET } = defineServiceRoutes(billing, {
+  GET: "example",
+});
+"
+,
+      "path": "src/routes/billing/route.ts",
+    },
+  ],
+  "profiles": [
+    {
+      "capability": "event",
+      "name": "local",
+    },
+    {
+      "capability": "job",
+      "name": "local",
+    },
+    {
+      "capability": "cache",
+      "name": "local",
+    },
+    {
+      "capability": "bucket",
+      "name": "local",
+    },
+    {
+      "capability": "model",
+      "name": "openai",
+    },
+  ],
+  "warnings": [
+    {
+      "code": "docker-required",
+      "message": "Run \`relkit local up\` before using this local resource.",
+    },
+    {
+      "code": "model-secret-required",
+      "message": "Set OPENAI_API_KEY in .env before starting or restarting the server; the model profile requires it at startup.",
+    },
+  ],
+}
+`;

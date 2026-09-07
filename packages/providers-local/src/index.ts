@@ -31,3 +31,4 @@ export type {
   EventDeliveryResult as DurableEventDeliveryResult,
   EventDeliverySnapshot,
 } from "./events/delivery.js";
+export * from "./runtime-capabilities.js";

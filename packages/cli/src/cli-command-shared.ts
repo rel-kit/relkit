@@ -55,6 +55,18 @@ export function optionalChoice(path: readonly string[], name: string) {
   );
 }
 
+export function repeatedString(path: readonly string[], name: string) {
+  const metadata = helpOption(path, name);
+  const value =
+    metadata.type === "choice" && metadata.values?.length
+      ? Flag.choice(name, metadata.values)
+      : Flag.string(name);
+  return aliases(value, metadata).pipe(
+    Flag.withDescription(metadata.description),
+    Flag.atMost(1_024),
+  );
+}
+
 export function optionalKeyValue(path: readonly string[], name: string) {
   return aliases(Flag.keyValuePair(name), helpOption(path, name)).pipe(
     Flag.withDescription(helpOption(path, name).description),

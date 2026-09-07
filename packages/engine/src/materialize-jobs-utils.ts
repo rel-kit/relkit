@@ -21,7 +21,7 @@ export function readPolicy(registration: QueueRegistration): JobPolicy {
       retry: readRetry(registration.retry),
       ...(registration.timeoutMs == null ? {} : { timeoutMs: registration.timeoutMs }),
       ...(registration.concurrency == null ? {} : { concurrency: registration.concurrency }),
-      ...(registration.idempotency === undefined
+      ...(registration.idempotency == null
         ? {}
         : { idempotency: readIdempotency(registration.idempotency) }),
     };
@@ -38,9 +38,7 @@ export function readPolicy(registration: QueueRegistration): JobPolicy {
     retry: readRetry(config.retry),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
     ...(concurrency === undefined ? {} : { concurrency }),
-    ...(config.idempotency === undefined
-      ? {}
-      : { idempotency: readIdempotency(config.idempotency) }),
+    ...(config.idempotency == null ? {} : { idempotency: readIdempotency(config.idempotency) }),
   };
 }
 

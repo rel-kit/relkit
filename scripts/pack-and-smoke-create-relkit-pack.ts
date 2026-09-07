@@ -27,6 +27,11 @@ export async function packPackages(
     "@relkit/schema",
     "@relkit/testing",
     "create-relkit",
+    "@relkit/local",
+    "@relkit/docker",
+    "@relkit/redis",
+    "@relkit/s3",
+    "@relkit/ai-sdk",
   ];
   for (let index = 0; index < names.length; index += 1)
     for (const dependency of Object.keys(manifests.get(names[index]!)?.manifest.dependencies ?? {}))
@@ -76,7 +81,9 @@ export async function startRegistry(
           headers: { "content-type": "application/octet-stream" },
         });
       const manifest = manifests.get(name)?.manifest;
-      if (manifest === undefined || !bytes.has(name))
+      if (manifest !== undefined && !bytes.has(name))
+        return new Response(`Workspace package was not packed: ${name}`, { status: 404 });
+      if (manifest === undefined)
         return fetch(`https://registry.npmjs.org${url.pathname}${url.search}`).then(
           async (response) =>
             new Response(await response.arrayBuffer(), {

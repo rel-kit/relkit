@@ -3,6 +3,37 @@ title: Define a cache
 description: Choose your cache's keys, value shape, and default lifetime.
 ---
 
+## Scaffold a cache
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add cache Prices --service orders --provider redis --source docker
+```
+
+Creates `src/orders/cache/prices.cache.ts` and configures Docker Redis. Without provider flags,
+a default/unique compatible cache profile is reused; otherwise Docker Redis is the fallback.
+
+Choose one configuration form:
+
+| Selection                                  | Command options                               |
+| ------------------------------------------ | --------------------------------------------- |
+| Existing profile                           | `--profile requests`                          |
+| Docker Redis                               | `--provider redis --source docker`            |
+| Connected Redis                            | `--provider redis --source connected`         |
+| Redis on an existing AWS/Pulumi deployment | `--provider redis --source aws`               |
+| Connected Cloudflare KV                    | `--provider cloudflare-kv --source connected` |
+
+Do not combine `--profile` with `--provider` or `--source`. AWS requires an already configured
+AWS/Pulumi deployment; scaffolding does not provision it. Connected profiles add named environment
+references and blank examples, not credentials. Docker startup is a separate
+[post-add confirmation](/docs/start/add-artifacts#start-local-resources).
+Declare the cache as a function dependency before using it.
+
+### Cache CLI options
+
+<include cwd>content/generated/add-cache-options.mdx</include>
+
 ## Define the cache
 
 Use `defineCache` in your app's domain directory. Create `src/orders/cache/prices.cache.ts`:

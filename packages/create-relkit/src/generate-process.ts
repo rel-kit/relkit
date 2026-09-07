@@ -6,7 +6,7 @@ import {
   type GenerateCommandResult,
   type GenerateFailurePoint,
   type GenerateProjectContext,
-} from "./generate.js";
+} from "./generate-types.js";
 import type { StageCleanupResult } from "./generate-files.js";
 
 export function generationError(
@@ -22,6 +22,8 @@ export function generationError(
     failure = new GenerateProjectError(
       (error as unknown as { readonly code: string }).code,
       error.message,
+      undefined,
+      errorExitCode(error),
     );
   else
     failure = new GenerateProjectError(
@@ -35,7 +37,13 @@ export function generationError(
     failure.code,
     `${failure.message} Temporary directory ${state}: ${cleanup.temporaryPath}.`,
     cleanup.temporaryPath,
+    failure.exitCode,
   );
+}
+
+function errorExitCode(error: Error): 1 | 2 | 130 | 143 | undefined {
+  const value = "exitCode" in error ? error.exitCode : undefined;
+  return value === 1 || value === 2 || value === 130 || value === 143 ? value : undefined;
 }
 
 export function injectGenerateFailure(

@@ -19,13 +19,13 @@ Convention-first TypeScript application framework
 
 `relkit` — Convention-first TypeScript application framework
 
-### `relkit create <name>`
+### `relkit create [name]`
 
 Create a new RELKIT application
 
 | Argument | Value    | Description                      |
 | -------- | -------- | -------------------------------- |
-| name     | required | npm package and application name |
+| name     | optional | npm package and application name |
 
 | Option                  | Value               | Description                         |
 | ----------------------- | ------------------- | ----------------------------------- |
@@ -44,6 +44,364 @@ Create a new RELKIT application
 #### Examples
 
 `relkit create` — Create a new RELKIT application
+
+### `relkit add <kind>`
+
+Add a compile-ready artifact
+
+#### Examples
+
+`relkit add` — Add a compile-ready artifact
+
+#### `relkit add service [name]`
+
+Create a domain service
+
+| Argument | Value    | Description  |
+| -------- | -------- | ------------ |
+| name     | optional | Service name |
+
+| Option           | Value                                                                                             | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string                                                                                            | Application directory (defaults to cwd)                                                          |
+| --service        | string                                                                                            | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string                                                                                            | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean                                                                                           | Do not install newly required packages                                                           |
+| --full           | boolean                                                                                           | Create the complete deterministic domain bundle; exclusive with --include                        |
+| --include        | function, error, event, event-function, job, cache, bucket, tool, prompt, agent, constants, route | Artifact kind to include; repeatable                                                             |
+
+##### Examples
+
+`relkit add service` — Create a domain service
+
+#### `relkit add function [name]`
+
+Create a callable function
+
+| Argument | Value    | Description   |
+| -------- | -------- | ------------- |
+| name     | optional | Function name |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --internal       | boolean | Keep the artifact out of the public service API                                                  |
+
+##### Examples
+
+`relkit add function` — Create a callable function
+
+#### `relkit add error [name]`
+
+Create an internal typed error
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Error name  |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+
+##### Examples
+
+`relkit add error` — Create an internal typed error
+
+#### `relkit add event [name]`
+
+Create an event contract
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Event name  |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --internal       | boolean | Keep the artifact out of the public service API                                                  |
+| --profile        | string  | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
+
+##### Examples
+
+`relkit add event` — Create an event contract
+
+#### `relkit add event-function [name]`
+
+Create an event-only function
+
+| Argument | Value    | Description         |
+| -------- | -------- | ------------------- |
+| name     | optional | Event function name |
+
+| Option           | Value              | Description                                                                                      |
+| ---------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string             | Application directory (defaults to cwd)                                                          |
+| --service        | string             | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string             | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean            | Do not install newly required packages                                                           |
+| --event          | string             | Event ID, binding, or filename                                                                   |
+| --delivery       | transient, durable | Delivery mode (default: durable)                                                                 |
+| --profile        | string             | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
+
+##### Examples
+
+`relkit add event-function` — Create an event-only function
+
+#### `relkit add job [name]`
+
+Create an unscheduled single-attempt job
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Job name    |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --target         | string  | Callable function target                                                                         |
+| --profile        | string  | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
+
+##### Examples
+
+`relkit add job` — Create an unscheduled single-attempt job
+
+#### `relkit add cache [name]`
+
+Create a cache descriptor and compatible profile
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Cache name  |
+
+| Option           | Value                  | Description                                                                                      |
+| ---------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string                 | Application directory (defaults to cwd)                                                          |
+| --service        | string                 | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string                 | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean                | Do not install newly required packages                                                           |
+| --profile        | string                 | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
+| --provider       | redis, cloudflare-kv   | Cache provider                                                                                   |
+| --source         | docker, connected, aws | Provider source                                                                                  |
+
+##### Examples
+
+`relkit add cache` — Create a cache descriptor and compatible profile
+
+#### `relkit add bucket [name]`
+
+Create a bucket descriptor and compatible profile
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Bucket name |
+
+| Option           | Value                  | Description                                                                                      |
+| ---------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string                 | Application directory (defaults to cwd)                                                          |
+| --service        | string                 | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string                 | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean                | Do not install newly required packages                                                           |
+| --profile        | string                 | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
+| --provider       | s3, cloudflare-r2      | Bucket provider                                                                                  |
+| --source         | docker, connected, aws | Provider source                                                                                  |
+
+##### Examples
+
+`relkit add bucket` — Create a bucket descriptor and compatible profile
+
+#### `relkit add tool [name]`
+
+Expose a callable function as an agent tool
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Tool name   |
+
+| Option            | Value                       | Description                                                                                      |
+| ----------------- | --------------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root    | string                      | Application directory (defaults to cwd)                                                          |
+| --service         | string                      | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service  | string                      | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install      | boolean                     | Do not install newly required packages                                                           |
+| --target          | string                      | Existing callable function; exclusive with --create-function                                     |
+| --create-function | string                      | Create a callable function; exclusive with --target                                              |
+| --side-effect     | none, read, write, external | Tool side-effect class (default: read)                                                           |
+| --approval        | never, on-write, always     | Tool approval policy (default: never)                                                            |
+
+##### Examples
+
+`relkit add tool` — Expose a callable function as an agent tool
+
+#### `relkit add prompt [name]`
+
+Create a reusable prompt
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Prompt name |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --text           | string  | Prompt text; repeatable                                                                          |
+
+##### Examples
+
+`relkit add prompt` — Create a reusable prompt
+
+#### `relkit add agent [name]`
+
+Create an agent with a model, tools, and instructions
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Agent name  |
+
+| Option           | Value             | Description                                                                                      |
+| ---------------- | ----------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string            | Application directory (defaults to cwd)                                                          |
+| --service        | string            | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string            | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean           | Do not install newly required packages                                                           |
+| --model          | string            | Model selector such as openai:gpt-5-mini                                                         |
+| --tool           | string            | Tool ID, binding, or filename; repeatable                                                        |
+| --prompt         | string            | Service prompt ID, binding, or filename; exclusive with --instructions                           |
+| --instructions   | string            | Inline instructions; exactly one of --prompt or --instructions is required                       |
+| --model-provider | openai, anthropic | Provider for a new model profile; requires --model-id                                            |
+| --model-id       | string            | Default model ID for a new profile; requires --model-provider                                    |
+
+##### Examples
+
+`relkit add agent` — Create an agent with a model, tools, and instructions
+
+#### `relkit add constants [name]`
+
+Create a constants descriptor
+
+| Argument | Value    | Description    |
+| -------- | -------- | -------------- |
+| name     | optional | Constants name |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+
+##### Examples
+
+`relkit add constants` — Create a constants descriptor
+
+#### `relkit add route [path]`
+
+Create a route or service route
+
+| Argument | Value    | Description    |
+| -------- | -------- | -------------- |
+| path     | optional | URL route path |
+
+| Option           | Value                | Description                                                                                      |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string               | Application directory (defaults to cwd)                                                          |
+| --service        | string               | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string               | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean              | Do not install newly required packages                                                           |
+| --mode           | route, service-route | Required headlessly: raw GET route or public service-member mappings                             |
+| --map            | key=value            | METHOD=member mapping; repeatable                                                                |
+
+##### Examples
+
+`relkit add route` — Create a route or service route
+
+#### `relkit add middleware [name]`
+
+Create pass-through route middleware
+
+| Argument | Value    | Description     |
+| -------- | -------- | --------------- |
+| name     | optional | Middleware name |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --path           | string  | Validated middleware route scope                                                                 |
+
+##### Examples
+
+`relkit add middleware` — Create pass-through route middleware
+
+#### `relkit add transform [name]`
+
+Create a string request transform
+
+| Argument | Value    | Description    |
+| -------- | -------- | -------------- |
+| name     | optional | Transform name |
+
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+
+##### Examples
+
+`relkit add transform` — Create a string request transform
+
+#### `relkit add database`
+
+Create the singleton Drizzle database service
+
+| Option           | Value                     | Description                                                                                      |
+| ---------------- | ------------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string                    | Application directory (defaults to cwd)                                                          |
+| --service        | string                    | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string                    | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean                   | Do not install newly required packages                                                           |
+| --orm            | drizzle                   | Database ORM                                                                                     |
+| --dialect        | sqlite, postgresql, mysql | Database dialect (default: sqlite)                                                               |
+
+##### Examples
+
+`relkit add database` — Create the singleton Drizzle database service
+
+#### `relkit add auth`
+
+Create Better Auth and its catch-all route
+
+| Option             | Value                     | Description                                                                                      |
+| ------------------ | ------------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root     | string                    | Application directory (defaults to cwd)                                                          |
+| --service          | string                    | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service   | string                    | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install       | boolean                   | Do not install newly required packages                                                           |
+| --adapter          | better-auth               | Authentication adapter                                                                           |
+| --database-dialect | sqlite, postgresql, mysql | Database dialect when one must be created (default: sqlite)                                      |
+| --base-path        | string                    | Auth base path (default: /api/auth)                                                              |
+
+##### Examples
+
+`relkit add auth` — Create Better Auth and its catch-all route
 
 ### `relkit dev`
 

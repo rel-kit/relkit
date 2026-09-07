@@ -99,7 +99,18 @@ export function targetId(value: unknown): string | undefined {
 export function schemaEntries(descriptor: NormalizedDescriptor): readonly [string, unknown][] {
   const value = descriptor.value;
   if (!isRecord(value)) return [];
-  return ["input", "output", "key", "value", "data"].flatMap((field) =>
+  const fields =
+    (
+      {
+        function: ["input", "output"],
+        job: ["input"],
+        event: ["input"],
+        cache: ["key", "value"],
+        agent: ["input", "output"],
+        error: ["data"],
+      } as Readonly<Record<string, readonly string[]>>
+    )[descriptor.kind] ?? [];
+  return fields.flatMap((field) =>
     value[field] === undefined
       ? []
       : [[schemaKey(descriptor.id, field), value[field]] as [string, unknown]],

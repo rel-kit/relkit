@@ -96,7 +96,7 @@ async function waitFor(check: () => Promise<boolean>): Promise<void> {
   }
   throw new Error("Timed out waiting for the generated development server.");
 }
-async function devSmoke(root: string): Promise<void> {
+async function devSmoke(root: string, exercise?: (port: number) => Promise<void>): Promise<void> {
   const port = await freePort();
   const inspector = await freePort();
   const child = Bun.spawn(
@@ -151,6 +151,7 @@ async function devSmoke(root: string): Promise<void> {
     const scalar = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
     if (!scalar.ok || !(await scalar.text()).toLowerCase().includes("scalar"))
       throw new Error("Scalar API reference failed.");
+    await exercise?.(port);
   } catch (error) {
     failure = error;
   } finally {
@@ -163,17 +164,16 @@ async function devSmoke(root: string): Promise<void> {
   if (failure !== undefined) throw new Error(`${failure}\n${stdout}${stderr}`);
   if (exitCode !== 0 && exitCode !== 143)
     throw new Error(`Development process exited with ${exitCode}.\n${stdout}${stderr}`);
-  await assertPortReleased(port);
-  await assertPortReleased(inspector);
-}
-async function assertPortReleased(port: number): Promise<void> {
-  const probe = Bun.serve({ hostname: "127.0.0.1", port, fetch: () => new Response() });
-  await probe.stop(true);
+  for (const released of [port, inspector]) {
+    const probe = Bun.serve({ hostname: "127.0.0.1", port: released, fetch: () => new Response() });
+    await probe.stop(true);
+  }
 }
 export async function verifyProject(
   root: string,
   registry: string,
   cacheDir: string,
+  exercise?: (port: number) => Promise<void>,
 ): Promise<void> {
   for (const file of [
     "package.json",
@@ -193,8 +193,7 @@ export async function verifyProject(
     registry,
     cacheDir,
   );
-  for (const script of ["check", "typecheck", "test", "build"])
-    await runCommand(["run", script], root);
-  await devSmoke(root);
+  for (const script of ["check", "typecheck"]) await runCommand(["run", script], root);
+  for (let run = 0; run < (exercise ? 2 : 1); run++) await devSmoke(root, exercise);
   await sourceScan(root);
 }

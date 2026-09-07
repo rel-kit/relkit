@@ -40,8 +40,13 @@ Expected output is `1.3.10`. If another version is active, switch before generat
     bunx create-relkit@latest relkit-orders --template api
     ```
 
-    The generator validates the destination before writing, installs dependencies, runs initial checks,
+    In a terminal, missing choices open a guided wizard. `relkit create relkit-orders --template api`
+    uses the same resolver and generator. Both entry points preview the destination, files,
+    dependencies, and profiles before writing. The generator installs dependencies, runs initial checks,
     and does not leave a partial project after a failure.
+
+    After choosing a template, the wizard can add functions, routes, providers, and other artifacts to
+    the staged project before it is published. Accept the defaults and skip that loop for this guide.
 
   </Step>
   <Step>
@@ -139,6 +144,19 @@ available choices, not additional setup steps required for this local app.
 <include cwd>content/generated/create-options.mdx</include>
 
 Run `bunx create-relkit@latest --help` for the generated, version-specific command reference.
+Use `--json` for headless creation, for example from the directory that should contain the app:
+
+```sh
+bunx create-relkit@latest billing-app --template minimal --cloud none --deploy none \
+  --install --no-git --no-examples --directory ./billing-app --json
+```
+
+`--install`/`--no-install`, `--git`/`--no-git`, and `--examples`/`--no-examples` are opposing
+choices; supply only one flag from each pair. `--force-empty-directory` permits an existing empty
+destination, not overwriting a populated directory. Headless creation skips the staged add-artifact
+loop; create the app first, then chain `relkit add` commands inside it.
+
+Continue with [Add artifacts](/docs/start/add-artifacts) for interactive and headless scaffolding.
 
 <Accordions>
   <Accordion title="If generation fails">

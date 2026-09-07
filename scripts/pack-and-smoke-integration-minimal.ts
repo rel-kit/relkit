@@ -1,4 +1,4 @@
-import { access, cp, mkdir } from "node:fs/promises";
+import { access, cp, mkdir, readFile, realpath } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 interface PackedManifest {
@@ -55,15 +55,18 @@ export async function copyExternalDependencies(
   repositoryRoot: string,
   packageDirectories: readonly string[],
 ): Promise<void> {
-  for (const dependency of [...dependencies].sort()) {
-    const candidates = [
-      join(repositoryRoot, "node_modules", ...dependency.split("/")),
-      ...packageDirectories.map((directory) =>
-        join(directory, "node_modules", ...dependency.split("/")),
-      ),
-    ];
+  const pending = [...dependencies].sort();
+  const copied = new Set<string>();
+  const roots = [
+    join(repositoryRoot, "node_modules"),
+    ...packageDirectories.map((directory) => join(directory, "node_modules")),
+  ];
+  while (pending.length > 0) {
+    const dependency = pending.shift()!;
+    if (copied.has(dependency)) continue;
     let source: string | undefined;
-    for (const candidate of candidates) {
+    for (const root of roots) {
+      const candidate = join(root, ...dependency.split("/"));
       try {
         await access(candidate);
         source = candidate;
@@ -74,6 +77,16 @@ export async function copyExternalDependencies(
     const target = join(fixture, "node_modules", ...dependency.split("/"));
     await mkdir(dirname(target), { recursive: true });
     await cp(source, target, { recursive: true, dereference: true });
+    copied.add(dependency);
+    const resolved = await realpath(source);
+    roots.push(
+      dependency.startsWith("@") ? dirname(dirname(resolved)) : dirname(resolved),
+      join(resolved, "node_modules"),
+    );
+    const manifest = JSON.parse(await readFile(join(resolved, "package.json"), "utf8")) as {
+      dependencies?: Record<string, string>;
+    };
+    pending.push(...Object.keys(manifest.dependencies ?? {}).filter((name) => !copied.has(name)));
   }
 }
 

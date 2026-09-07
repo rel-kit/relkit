@@ -4,10 +4,38 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createEventDelivery } from "./src/events/delivery.ts";
+import { admitDelivery } from "./src/events/delivery-utils.ts";
+import { createJobQueue } from "./src/jobs/queue.ts";
+import { createJobStore } from "./src/jobs/store.ts";
 
 const roots: string[] = [];
 
 describe("local durable event delivery", () => {
+  test("acknowledges admission when a polling consumer already leased the delivery", async () => {
+    const store = await createJobStore(await makeRoot());
+    const queue = createJobQueue(store, { now: () => 100 });
+    try {
+      await queue.ready();
+      const result = await admitDelivery(
+        {
+          ...queue,
+          enqueue: async (input) => {
+            const accepted = await queue.enqueue(input);
+            await queue.recover(100);
+            await queue.acquire(accepted.instanceId);
+            return accepted;
+          },
+        },
+        envelope("event-race"),
+        "orders.receipt",
+        "default",
+      );
+      expect(result).toMatchObject({ duplicate: false, entry: { state: "leased", attempt: 1 } });
+      expect(queue.counts()).toMatchObject({ accepted: 0, available: 0, leased: 1 });
+    } finally {
+      await store.close();
+    }
+  });
   test("retries with a durable cursor and exposes duplicate recovery", async () => {
     const root = await makeRoot();
     let now = 100;

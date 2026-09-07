@@ -20,6 +20,10 @@ describe("AST discovery prefilter", () => {
         text: `export { default } from "./orders.function.ts";`,
       },
       {
+        fileName: "src/orders.tool.ts",
+        text: `const target = getOrder; export default target.asTool({ name: "orders" });`,
+      },
+      {
         fileName: "src/brand.ts",
         text: `const brand = Symbol.for("relkit.descriptor"); export const isDescriptor = (value: object) => value[brand];`,
       },
@@ -37,6 +41,7 @@ describe("AST discovery prefilter", () => {
       "src/brand.ts",
       "src/orders.barrel.ts",
       "src/orders.function.ts",
+      "src/orders.tool.ts",
     ]);
     const functionCandidate = result.candidates.find(
       (candidate) => candidate.fileName === "src/orders.function.ts",
@@ -67,6 +72,15 @@ describe("AST discovery prefilter", () => {
       reExports: [
         { moduleSpecifier: "./orders.function.ts", names: ["default"], exportAll: false },
       ],
+    });
+    expect(
+      result.candidates.find((candidate) => candidate.fileName === "src/orders.tool.ts"),
+    ).toMatchObject({
+      factories: ["asTool"],
+      facts: {
+        factoryBindings: [expect.objectContaining({ factory: "asTool", kind: "tool" })],
+      },
+      indicators: ["factory", "default-export"],
     });
     expect(result.skipped).toEqual([
       { fileName: "src/a/__fixtures__/ignored.ts", reason: "excluded" },

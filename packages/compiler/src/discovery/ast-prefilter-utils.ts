@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import type { AstCandidateIndicator, AstPrefilterCandidate, AstReExport } from "./ast-prefilter.js";
 import { readFacts } from "./source-facts.js";
 const KNOWN_FACTORIES = new Set([
+  "asTool",
   "defineConfig",
   "defineConstants",
   "definePrompt",

@@ -3,6 +3,12 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  exerciseScaffoldRoutes,
+  verifyScaffoldBuild,
+  verifyMissingModelKey,
+} from "./scaffold-smoke-workflows.js";
+import { verifyInteractiveResolver, verifyScaffoldTerminal } from "./scaffold-smoke-terminal.js";
+import {
   runCommand,
   snapshotProject,
   verifyProject,
@@ -63,6 +69,8 @@ async function main(): Promise<void> {
       cacheDir,
     );
     const createBin = join(temporary, "node_modules/.bin/create-relkit");
+    const relkitBin = join(temporary, "node_modules/.bin/relkit");
+    await verifyInteractiveResolver(temporary);
     for (const template of ["minimal", "api", "agent"] as const) {
       const base = [
         "--template",
@@ -92,11 +100,7 @@ async function main(): Promise<void> {
       ) as { destination: string };
       const cli = JSON.parse(
         await runCommand(
-          [
-            join(temporary, "node_modules/.bin/relkit"),
-            "create",
-            ...args(`${template}-cli-project`),
-          ],
+          [relkitBin, "create", ...args(`${template}-cli-project`)],
           temporary,
           registry,
           cacheDir,
@@ -110,8 +114,30 @@ async function main(): Promise<void> {
       const directBytes = await snapshotProject(direct.destination);
       if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
         throw new Error(`Packed ${template} generators generated different bytes.`);
-      await verifyProject(direct.destination, registry, cacheDir);
-      await verifyProject(cli.destination, registry, cacheDir);
+      // Starter tests isolate provider credentials/replacements; additions are exercised live below.
+      for (const root of [direct.destination, cli.destination])
+        for (const script of ["test", "build"]) await runCommand(["run", script], root);
+      await addArtifacts(relkitBin, direct.destination, registry, cacheDir);
+      await addArtifacts(relkitBin, cli.destination, registry, cacheDir);
+      if (
+        JSON.stringify(await snapshotProject(direct.destination)) !==
+        JSON.stringify(await snapshotProject(cli.destination))
+      )
+        throw new Error(`Packed ${template} chained additions generated different bytes.`);
+      for (const root of [direct.destination, cli.destination]) {
+        try {
+          if (process.env.RELKIT_TEST_DOCKER === "1") await verifyScaffoldTerminal(root, relkitBin);
+          await verifyScaffoldBuild(root);
+          if (template === "minimal" && root === direct.destination)
+            await verifyMissingModelKey(root, relkitBin);
+          await verifyProject(root, registry, cacheDir, (port) =>
+            exerciseScaffoldRoutes(root, port, relkitBin),
+          );
+        } finally {
+          if (process.env.RELKIT_TEST_DOCKER === "1")
+            await runCommand([relkitBin, "local", "reset", "--yes", "--project-root", root], root);
+        }
+      }
       const second = JSON.parse(
         (
           await runCommand(
@@ -135,4 +161,33 @@ async function main(): Promise<void> {
     await rm(temporary, { recursive: true, force: true });
   }
 }
+
+async function addArtifacts(
+  relkit: string,
+  root: string,
+  registry: string,
+  cacheDir: string,
+): Promise<void> {
+  for (const args of [
+    [
+      "service",
+      "Billing",
+      ...(process.env.RELKIT_TEST_DOCKER === "1"
+        ? ["--full"]
+        : ["--include", "job", "--include", "event", "--include", "agent", "--include", "route"]),
+    ],
+    ...(process.env.RELKIT_TEST_DOCKER === "1" ? [["service", "Shipping", "--full"]] : []),
+  ]) {
+    const result = JSON.parse(
+      await runCommand(
+        [relkit, "--json", "add", ...args, "--project-root", root],
+        root,
+        registry,
+        cacheDir,
+      ),
+    ) as { readonly ok?: boolean };
+    if (result.ok !== true) throw new Error(`Packed add ${args[0]} did not succeed.`);
+  }
+}
+
 if (import.meta.main) await main();

@@ -70,12 +70,12 @@ export async function createEventDelivery(
     ensureOpen();
     const accepted = await admit(normalizeEnvelope(input));
     if (accepted.entry.state === "completed")
-      return resultFrom(accepted.entry, triggerId, true, "completed");
+      return resultFrom(accepted.entry, triggerId, accepted.duplicate, "completed");
     if (accepted.entry.state === "dead-lettered")
       return resultFrom(
         accepted.entry,
         triggerId,
-        true,
+        accepted.duplicate,
         "failed",
         undefined,
         accepted.entry.failure,

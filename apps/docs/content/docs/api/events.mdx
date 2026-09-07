@@ -694,7 +694,7 @@ declare const defineEvent: <
 ) => EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L71)
 
 Since v0.1.0
 
@@ -713,13 +713,14 @@ export interface DefineEventOptions<
   readonly id: Id;
   readonly version?: Version;
   readonly input: InputSchema;
+  readonly profile?: string;
   readonly sensitiveFields?: readonly string[];
   readonly handler?: never;
   readonly output?: never;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L43)
 
 ## EventDescriptor (interface)
 
@@ -735,6 +736,7 @@ export interface EventDescriptor<
   extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
   readonly version: Version;
   readonly input: InputSchema;
+  readonly profile?: string;
   readonly sensitiveFields?: readonly string[];
   readonly handler?: never;
   readonly output?: never;
@@ -742,7 +744,7 @@ export interface EventDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L25)
 
 ## EventDescriptorAny (type alias)
 
@@ -752,7 +754,7 @@ export interface EventDescriptor<
 type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L41)
 
 ## EventEnvelope (type alias)
 
@@ -765,7 +767,7 @@ type EventEnvelope<Id, Version, Payload> = Omit<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L12)
 
 ## EventEnvelopeFor (type alias)
 
@@ -778,7 +780,7 @@ type EventEnvelopeFor<E> =
     : UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L20)
 
 ## UnknownEventEnvelope (type alias)
 
@@ -788,7 +790,7 @@ type EventEnvelopeFor<E> =
 type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L18)
 
 ## assertEventDescriptor
 
@@ -798,7 +800,7 @@ type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 declare const assertEventDescriptor: (value: unknown) => asserts value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L118)
 
 ## isEventDescriptor
 
@@ -808,7 +810,7 @@ declare const assertEventDescriptor: (value: unknown) => asserts value is EventD
 declare const isEventDescriptor: (value: unknown) => value is EventDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L98)
 
 ## `event-function-target.ts`
 

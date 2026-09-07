@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, setSystemTime, test } from "bun:test";
 import {
   createObservabilityCollector,
   type RequestRecord,
@@ -11,6 +11,8 @@ import { runtimeCohort } from "./test-cohort.ts";
 const source = { file: "src/routes/limited/route.ts", line: 1, column: 1 } as const;
 
 describe("route rate limiting", () => {
+  afterEach(() => setSystemTime());
+
   test("uses generation-local memory with standard headers and a safe response", async () => {
     const calls: string[] = [];
     const app = createApp({
@@ -42,6 +44,8 @@ describe("route rate limiting", () => {
   });
 
   test("shares counters across runtimes, isolates keys, expires windows, and records telemetry", async () => {
+    const now = new Date("2026-01-01T00:00:00Z");
+    setSystemTime(now);
     const counter = memoryCounter();
     const collector = createObservabilityCollector();
     const events: string[] = [];
@@ -88,7 +92,7 @@ describe("route rate limiting", () => {
       (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "b" } }))
         .status,
     ).toBe(200);
-    await Bun.sleep(50);
+    setSystemTime(now.getTime() + 50);
     expect(
       (await secondRuntime.request("http://localhost/limited", { headers: { "x-api-key": "a" } }))
         .status,

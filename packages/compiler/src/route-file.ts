@@ -16,6 +16,19 @@ export interface ParsedRouteFilePath {
   readonly precedence: 0 | 1 | 2 | 3;
 }
 
+/** Converts a canonical route path into its nested source-file convention. */
+export function routePathToFilePath(routePath: string): string {
+  if (routePath === "/") return "src/routes/route.ts";
+  if (!routePath.startsWith("/") || routePath.endsWith("/")) {
+    throw new TypeError(`Route path must start with / and omit a trailing slash: ${routePath}`);
+  }
+
+  const segments = routePath.slice(1).split("/").map(routePathSegmentToFileSegment);
+  const sourcePath = `src/routes/${segments.join("/")}/route.ts`;
+  parseRouteFilePath(sourcePath);
+  return sourcePath;
+}
+
 /** Parses the required nested route-file convention without executing source. */
 export function parseRouteFilePath(sourcePath: string): ParsedRouteFilePath {
   const normalized = sourcePath.replaceAll("\\", "/").replace(/^\.\/+/, "");
@@ -78,6 +91,18 @@ function parseSegment(value: string): RouteFileSegment {
   if (dynamic !== null) return named("dynamic", dynamic[1] ?? "");
   if (value.includes("[") || value.includes("]")) invalid(value);
   return { kind: "static", value };
+}
+
+function routePathSegmentToFileSegment(value: string): string {
+  if (value.startsWith(":")) return `[${value.slice(1)}]`;
+  if (value.startsWith("*") && value.endsWith("?")) {
+    return `[[...${value.slice(1, -1)}]]`;
+  }
+  if (value.startsWith("*")) return `[...${value.slice(1)}]`;
+  if (value.includes(":") || value.includes("*")) {
+    throw new TypeError(`Malformed route path segment "${value}"`);
+  }
+  return value;
 }
 
 function named(

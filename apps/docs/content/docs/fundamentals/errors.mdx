@@ -7,6 +7,22 @@ A declared error is an expected domain outcome a caller can handle, such as a mi
 transition. An unexpected exception is a defect: RELKIT records it internally and returns a safe boundary failure
 instead of exposing a stack or provider detail.
 
+## Scaffold a typed error
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add error "Receipt Rejected" --service orders
+```
+
+Creates `src/orders/errors/receipt-rejected.error.ts` with `{ message: string }` data and
+`retry: "never"`. It stays internal. Add it to the relevant function's `errors` list yourself;
+a service bundle containing an error wires it to the bundle's example function automatically.
+
+### Error CLI options
+
+<include cwd>content/generated/add-error-options.mdx</include>
+
 ## Define a stable failure
 
 <include cwd lang="ts" meta='title="examples/commerce/src/orders/errors/order-not-found.error.ts"'>

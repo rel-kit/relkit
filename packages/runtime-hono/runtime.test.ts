@@ -149,3 +149,28 @@ test("rejects a stale or missing runtime-integration plan before adding routes",
     );
   }
 });
+
+test("scopes raw routes to their exported HTTP method", async () => {
+  const app = new Hono();
+  const rawPlan = {
+    ...plan(false),
+    httpTriggers: [
+      {
+        ...plan(false).httpTriggers[0]!,
+        id: "health.raw",
+        config: { ...plan(false).httpTriggers[0]!.config, rawHandler: true },
+      },
+    ],
+  };
+  materializeRoutes(app, {
+    plan: rawPlan,
+    manifest: {
+      ...manifest(),
+      routes: { "health.raw": { handler: () => new Response("healthy") } },
+    },
+    engine: { invoke: async () => undefined },
+  });
+
+  expect(await (await app.request("/hello", { method: "GET" })).text()).toBe("healthy");
+  expect((await app.request("/hello", { method: "POST" })).status).toBe(404);
+});

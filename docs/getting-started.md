@@ -29,6 +29,9 @@ Cloud and deployment default to `none`, so this path avoids Pulumi, AWS
 credentials, and cloud cost.
 The generator validates the destination, installs dependencies, and performs
 its initial checks without leaving a partial project after failure.
+In a TTY, omitted choices open the interactive wizard and an optional staged
+artifact loop. `relkit create` and `bunx create-relkit` share that resolver,
+staging transaction, and generator.
 
 Available templates are `minimal`, `api`, and `agent`. Use `--no-install`,
 `--no-git`, or `--no-examples` only when surrounding automation owns that step.
@@ -122,13 +125,15 @@ The same process serves OpenAPI at
 Reuse the checked hello function through a second filesystem route:
 
 ```sh
-mkdir -p src/routes/status
-cp src/routes/hello/route.ts src/routes/status/route.ts
+bun run relkit add route /status \
+  --mode service-route \
+  --service hello \
+  --map GET=hello
 ```
 
-The copied route remains executable source from the API template. Its new
-folder supplies `/status`; its `GET` export and hello function target stay the
-same. Verify the activated generation:
+The CLI previews the new file, applies the edit as one transaction, and runs
+`relkit check`. Its folder supplies `/status`; its `GET` export targets the
+existing public hello function. Verify the activated generation:
 
 ```sh
 curl -i "http://localhost:3000/status?name=RELKIT"

@@ -45,7 +45,8 @@ export function RouteDetailClient() {
         setRoute(nextRoute);
         setRequests(requestPayload.items);
         const targetId = text(nextRoute.targetFunctionId);
-        if (targetId !== "") {
+        setTarget(undefined);
+        if (targetId !== "" && record(nextRoute.config)?.rawHandler !== true) {
           const targetPayload = await api.detail<InspectorObject>("functions", targetId);
           setTarget(
             record(targetPayload.node) ?? record(targetPayload.descriptor) ?? record(targetPayload),

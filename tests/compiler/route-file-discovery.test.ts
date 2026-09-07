@@ -91,6 +91,24 @@ describe("route-file discovery", () => {
     );
     expect(result.diagnostics.map(({ code }) => code).includes("RELKIT_PATH_INVALID")).toBe(false);
   });
+
+  test("allows method-scoped raw routes and reserves ALL for Better Auth", () => {
+    const raw = defineRoute({ id: "health.raw", handler: async () => Response.json({ ok: true }) });
+    const method = normalizeCompilation({
+      descriptors: [extracted(raw, "GET", "src/routes/health/route.ts")],
+    });
+    const all = normalizeCompilation({
+      descriptors: [extracted(raw, "ALL", "src/routes/health/route.ts")],
+    });
+
+    expect(method.diagnostics.map(({ code }) => code)).toEqual([]);
+    expect(all.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "RELKIT_ROUTE_EXPORT_METHOD",
+        message: expect.stringContaining("Better Auth"),
+      }),
+    );
+  });
 });
 
 function route(id: string) {

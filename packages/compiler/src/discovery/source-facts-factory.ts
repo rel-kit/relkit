@@ -12,6 +12,7 @@ interface FactoryDefinition {
 }
 
 const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
+  asTool: { kind: "tool", idOptional: true },
   defineConfig: { kind: "app", idOptional: true },
   defineConstants: { kind: "constants", idOptional: true },
   definePrompt: { kind: "prompt", idOptional: true },
@@ -49,7 +50,14 @@ export function factoryFor(
     factory,
     kind: definition.kind,
     idOptional: definition.idOptional,
-    id: factory === "defineServiceRoutes" ? "omitted" : idPresence(call.arguments[0]),
+    id:
+      factory === "defineServiceRoutes"
+        ? "omitted"
+        : idPresence(
+            factory === "definePrompt" || factory === "defineConstants"
+              ? call.arguments[1]
+              : call.arguments[0],
+          ),
     position,
     options: optionNames(call.arguments[0]),
   });

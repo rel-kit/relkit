@@ -107,15 +107,29 @@ export function streamResponse(
   const subscription = stream.subscribe(subscriptionOptions);
   let closed = false;
   let connected = false;
+  let heartbeat: ReturnType<typeof setInterval> | undefined;
   const encoder = new TextEncoder();
   const close = (): void => {
     if (closed) return;
     closed = true;
+    clearInterval(heartbeat);
     subscription.close();
     request.signal.removeEventListener("abort", close);
   };
   request.signal.addEventListener("abort", close, { once: true });
   const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      if (request.signal.aborted) {
+        close();
+        controller.close();
+        return;
+      }
+      // SSE comments keep idle connections alive without changing replay cursors.
+      heartbeat = setInterval(() => {
+        if (!closed && (controller.desiredSize ?? 0) > 0)
+          controller.enqueue(encoder.encode(": heartbeat\n\n"));
+      }, 5_000);
+    },
     async pull(controller) {
       try {
         if (!connected) {

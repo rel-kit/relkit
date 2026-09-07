@@ -1,9 +1,7 @@
-import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, rename } from "node:fs/promises";
-import { basename, dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { basename, dirname, join } from "node:path";
 import type { CreateOptions } from "./options.js";
-import { CreateValidationError, validateCreateOptions } from "./validate.js";
+import { validateCreateOptions } from "./validate.js";
 import {
   injectGenerateFailure,
   generationError,
@@ -19,65 +17,12 @@ import {
   requireFiles,
   requireTemplate,
 } from "./generate-files.js";
-import { createGenerateNextSteps, type GenerateNextSteps } from "./generate-output.js";
+import { createGenerateNextSteps } from "./generate-output.js";
+import { addToStagedProject } from "./create-additions.js";
+import { resolveTemplateRoot } from "./template-root.js";
+import { type GenerateProjectContext, type GenerateProjectResult } from "./generate-types.js";
 
 const DIRECTORY_MODE = 0o755;
-
-export interface GenerateCommandResult {
-  readonly exitCode: number;
-  readonly stdout?: string;
-  readonly stderr?: string;
-}
-
-export type GenerateCommandRunner = (
-  command: readonly string[],
-  cwd: string,
-  signal?: AbortSignal,
-) => Promise<GenerateCommandResult>;
-
-export type GenerateFailurePoint =
-  "copy" | "substitute" | "install" | "git" | "doctor" | "check" | "rename";
-
-export interface GenerateProjectContext {
-  readonly cwd?: string;
-  readonly templateRoot?: string;
-  readonly commandRunner?: GenerateCommandRunner;
-  readonly bunExecutable?: string;
-  readonly gitExecutable?: string;
-  readonly relkitExecutable?: string;
-  readonly signal?: AbortSignal;
-  readonly onProgress?: (message: string) => void;
-  readonly failAt?: (point: GenerateFailurePoint) => void;
-}
-
-export interface GenerateProjectResult {
-  readonly ok: true;
-  readonly command: "create";
-  readonly name: string;
-  readonly template: CreateOptions["template"];
-  readonly cloud: CreateOptions["cloud"];
-  readonly deploy: CreateOptions["deploy"];
-  readonly destination: string;
-  readonly files: readonly string[];
-  readonly installed: boolean;
-  readonly gitInitialized: boolean;
-  readonly nextSteps: GenerateNextSteps;
-}
-
-export class GenerateProjectError extends Error {
-  readonly exitCode = 1;
-  readonly temporaryPath: string | undefined;
-
-  constructor(
-    readonly code: string,
-    message: string,
-    temporaryPath?: string,
-  ) {
-    super(message);
-    this.temporaryPath = temporaryPath;
-    this.name = "GenerateProjectError";
-  }
-}
 
 /** Copies, validates, checks, and atomically publishes one generated project. */
 export async function generateProject(
@@ -121,6 +66,9 @@ export async function generateProject(
       ".gitignore",
     ]);
 
+    const stagedAdditions = await addToStagedProject(staged, context);
+    const additions = stagedAdditions.results;
+
     if (options.install) {
       context.onProgress?.("Installing dependencies...");
       await runProjectStep(
@@ -139,30 +87,32 @@ export async function generateProject(
       await runProjectStep(context, [git, "init"], staged, "git", "git");
     }
 
-    const relkit = await resolveRelkitExecutable(context, staged);
-    const deploymentCheck = options.cloud === "none" || options.deploy === "none";
-    context.onProgress?.("Checking generated project...");
-    await runProjectStep(
-      context,
-      [
-        relkit,
-        "doctor",
-        "--project-root",
+    if (options.install) {
+      const relkit = await resolveRelkitExecutable(context, staged);
+      const deploymentCheck = options.cloud === "none" || options.deploy === "none";
+      context.onProgress?.("Checking generated project...");
+      await runProjectStep(
+        context,
+        [
+          relkit,
+          "doctor",
+          "--project-root",
+          staged,
+          "--no-ports",
+          ...(deploymentCheck ? ["--no-pulumi"] : []),
+        ],
         staged,
-        "--no-ports",
-        ...(deploymentCheck ? ["--no-pulumi"] : []),
-      ],
-      staged,
-      "doctor",
-      "doctor",
-    );
-    await runProjectStep(
-      context,
-      [relkit, "check", "--project-root", staged],
-      staged,
-      "check",
-      "check",
-    );
+        "doctor",
+        "doctor",
+      );
+      await runProjectStep(
+        context,
+        [relkit, "check", "--project-root", staged],
+        staged,
+        "check",
+        "check",
+      );
+    }
     throwIfAborted(context.signal);
     injectGenerateFailure(context, "rename");
     await rename(staged, validated.destination);
@@ -179,6 +129,18 @@ export async function generateProject(
       files: Object.freeze(await listProjectFiles(validated.destination)),
       installed: options.install,
       gitInitialized,
+      additions,
+      warnings: Object.freeze([
+        ...additions.flatMap((addition) => addition.warnings),
+        ...(!options.install
+          ? [
+              {
+                code: "validation-skipped",
+                message: "Install dependencies, then run bun run check.",
+              },
+            ]
+          : []),
+      ]),
       nextSteps: createGenerateNextSteps(options, validated.destination, context.cwd),
     });
   } catch (error) {
@@ -187,13 +149,4 @@ export async function generateProject(
       : await cleanupStagedProject(stage, validated.destination);
     throw generationError(error, "RELKIT_CREATE_FAILED", cleanup);
   }
-}
-
-function resolveTemplateRoot(context: GenerateProjectContext): string {
-  if (context.templateRoot !== undefined) return resolve(context.templateRoot);
-  const packaged = fileURLToPath(new URL("./templates/default/v1", import.meta.url));
-  if (existsSync(packaged)) return resolve(packaged);
-  const source = fileURLToPath(new URL("../../../templates/default/v1", import.meta.url));
-  if (existsSync(source)) return resolve(source);
-  return resolve(context.cwd ?? process.cwd(), "templates/default/v1");
 }
