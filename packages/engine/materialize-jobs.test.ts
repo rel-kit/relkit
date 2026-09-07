@@ -10,10 +10,36 @@ import type {
   JobScheduler,
 } from "./src/materialize-jobs.ts";
 import { materializeJobs } from "./src/materialize-jobs.ts";
+import { readPolicy } from "./src/materialize-jobs-utils.ts";
 
 const source = { file: "src/jobs.ts", line: 1, column: 1 } as const;
 
 describe("job materialization", () => {
+  test("accepts absent idempotency but still validates explicit policies", () => {
+    const job = { ...(plan().queues[0] as JobNode) };
+    delete job.idempotency;
+    const queue = {
+      kind: "trigger",
+      triggerType: "queue",
+      id: job.id,
+      source,
+      targetFunctionId: job.targetFunctionId,
+    } as const;
+    expect(readPolicy(job)).not.toHaveProperty("idempotency");
+    expect(readPolicy({ ...job, idempotency: null })).not.toHaveProperty("idempotency");
+    expect(readPolicy({ ...queue, config: {} })).not.toHaveProperty("idempotency");
+    expect(readPolicy({ ...queue, config: { idempotency: null } })).not.toHaveProperty(
+      "idempotency",
+    );
+    const valid = { key: "orderId", retentionMs: 1000 };
+    expect(readPolicy({ ...job, idempotency: valid }).idempotency).toEqual(valid);
+    expect(readPolicy({ ...queue, config: { idempotency: valid } }).idempotency).toEqual(valid);
+    for (const idempotency of [{}, { key: "orderId", retentionMs: 0 }, false]) {
+      expect(() => readPolicy({ ...job, idempotency })).toThrow();
+      expect(() => readPolicy({ ...queue, config: { idempotency } })).toThrow();
+    }
+  });
+
   test("binds schedules to job enqueue and acknowledges successful invocation", async () => {
     const now = Date.UTC(2026, 0, 1, 8, 59);
     const calls: JobInvocationOptions[] = [];
@@ -201,6 +227,7 @@ function plan(options: { readonly schedule?: boolean } = {}): RegistrationPlan {
     targetFunctionId: "orders.run",
     profile: "default",
     concurrency: 3,
+    idempotency: null,
     retry: {
       maxAttempts: 2,
       initialDelayMs: 10,

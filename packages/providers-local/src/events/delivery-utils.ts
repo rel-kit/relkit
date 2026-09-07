@@ -183,9 +183,8 @@ export async function admitDelivery(
     input: json(envelope),
     profile,
   });
-  const available = await queue.transition(deliveryId, "available", {
-    expectedState: "accepted",
-    availableAt: accepted.acceptedAt,
-  });
-  return { entry: available, duplicate: false };
+  // A polling consumer may already have recovered and leased this accepted entry.
+  // Recovery promotes only pending acceptance; it never rewinds an active delivery.
+  await queue.recover(accepted.acceptedAt);
+  return { entry: queue.get(deliveryId)!, duplicate: false };
 }
