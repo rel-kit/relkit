@@ -34,7 +34,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
-    "ai": "7.0.79"
+    "ai": "7.0.92"
   },
   "scripts": {
     "build": "tsc -b",

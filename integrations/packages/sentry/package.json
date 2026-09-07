@@ -58,6 +58,6 @@
   "dependencies": {
     "@relkit/observability": "workspace:*",
     "@relkit/provider": "workspace:*",
-    "@sentry/bun": "10.71.0"
+    "@sentry/bun": "10.73.0"
   }
 }

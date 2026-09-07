@@ -56,8 +56,8 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "4.0.42",
-    "@ai-sdk/openai": "4.0.47",
+    "@ai-sdk/anthropic": "4.0.49",
+    "@ai-sdk/openai": "4.0.58",
     "@relkit/agents": "workspace:*",
     "@relkit/provider": "workspace:*"
   }
