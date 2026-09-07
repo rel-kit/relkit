@@ -61,6 +61,22 @@ describe("add option resolution", () => {
     }
   });
 
+  test("supports creating a tool function and rejects conflicting targets", () => {
+    expect(
+      normalizeAddRequest(["tool", "Lookup", "--create-function", "Find Order"]),
+    ).toMatchObject({
+      kind: "tool",
+      target: "Find Order",
+      createFunction: true,
+    });
+    for (const args of [
+      ["tool", "Lookup"],
+      ["tool", "Lookup", "--create-function", " "],
+      ["tool", "Lookup", "--target", "findOrder", "--create-function", "Find Order"],
+    ])
+      expect(() => normalizeAddRequest(args)).toThrow();
+  });
+
   test("derives a model selector when creating a profile", () => {
     expect(
       normalizeAddRequest(

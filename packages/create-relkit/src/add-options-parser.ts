@@ -12,6 +12,7 @@ const VALUE_OPTIONS = new Set([
   "provider",
   "source",
   "target",
+  "create-function",
   "side-effect",
   "approval",
   "text",

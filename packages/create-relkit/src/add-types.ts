@@ -67,6 +67,7 @@ export type AddRequest =
       "tool",
       {
         target: string;
+        createFunction?: boolean;
         sideEffect: "none" | "read" | "write" | "external";
         approval: "never" | "on-write" | "always";
       }

@@ -17,10 +17,11 @@ export async function renderTool(
   request: Extract<AddRequest, { kind: "tool" }>,
 ): Promise<RenderedArtifact> {
   const functionTarget =
-    target.service ||
-    builder.artifacts.some(
-      (item) => item.domain === target.domain.fileStem && item.kind === "function",
-    )
+    !request.createFunction &&
+    (target.service ||
+      builder.artifacts.some(
+        (item) => item.domain === target.domain.fileStem && item.kind === "function",
+      ))
       ? resolveArtifact(builder, target, "function", request.target)
       : await renderFunction(builder, target, request.target);
   const artifact = domainArtifact(target, request.name, "tools", "tool", "tool");

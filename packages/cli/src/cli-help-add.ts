@@ -91,7 +91,8 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
       option("source", "choice", "Provider source", [], ["docker", "connected", "aws"]),
     ]),
     named("tool", "Expose a callable function as an agent tool", [
-      option("target", "string", "Callable function target"),
+      option("target", "string", "Existing callable function; exclusive with --create-function"),
+      option("create-function", "string", "Create a callable function; exclusive with --target"),
       option(
         "side-effect",
         "choice",

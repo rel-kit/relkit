@@ -171,6 +171,8 @@ test("every standalone add kind compiles in every starter", async () => {
       ["cache", "State", "--service", "hello"],
       ["bucket", "Files", "--service", "hello"],
       ["tool", "Work", "--service", "hello", "--target", "hello.work"],
+      ["tool", "Find Order", "--service", "hello", "--create-function", "Find Order"],
+      ["tool", "Find Order", "--create-service", "Toolbox", "--create-function", "Find Order"],
       ["prompt", "Policy", "--service", "hello", "--text", "Be concise."],
       [
         "agent",
@@ -195,9 +197,40 @@ test("every standalone add kind compiles in every starter", async () => {
     ])
       await add(root, [...args, "--no-install"]);
     await linkDependencies(root);
-    expect((await checkProject({ projectRoot: root })).diagnostics).toEqual([]);
+    const result = await checkProject({ projectRoot: root });
+    expect(result.diagnostics).toEqual([]);
+    const graph = JSON.parse(result.outputs.graph) as ApplicationGraph;
+    for (const domain of ["hello", "toolbox"]) {
+      expect(graph.edges).toContainEqual({
+        from: `${domain}.find-order`,
+        kind: "exposes-as-tool",
+        to: `${domain}.find-order-tool`,
+      });
+    }
   }
 }, 30_000);
+
+test("tool function creation rejects collisions without changing existing files", async () => {
+  const root = await project("minimal");
+  const path = join(root, "src/hello/functions/hello.function.ts");
+  const original = await Bun.file(path).text();
+  await expect(
+    planAdd(
+      normalizeAddRequest([
+        "tool",
+        "Lookup",
+        "--service",
+        "hello",
+        "--create-function",
+        "hello",
+        "--project-root",
+        root,
+      ]),
+    ),
+  ).rejects.toMatchObject({ code: ADD_FAILURE_CODES.collision });
+  expect(await Bun.file(path).text()).toBe(original);
+  expect(await Bun.file(join(root, "src/hello/tools/lookup.tool.ts")).exists()).toBe(false);
+});
 
 test("snapshots simple, custom, and full service plans", async () => {
   const variants = [

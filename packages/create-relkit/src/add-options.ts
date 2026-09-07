@@ -71,15 +71,21 @@ export function normalizeAddRequest(
       return resourceRequest(common, "cache", name(), values);
     case "bucket":
       return resourceRequest(common, "bucket", name(), values);
-    case "tool":
+    case "tool": {
+      const target = one(values, "target");
+      const createFunction = one(values, "create-function");
+      if (target !== undefined && createFunction !== undefined)
+        usage("--target and --create-function are exclusive.");
       return {
         ...common,
         kind: "tool",
         name: name(),
-        target: required(one(values, "target"), "--target is required."),
+        target: required(target ?? createFunction, "--target or --create-function is required."),
+        ...(createFunction === undefined ? {} : { createFunction: true }),
         sideEffect: choice(one(values, "side-effect"), "side-effect", SIDE_EFFECTS, "read")!,
         approval: choice(one(values, "approval"), "approval", APPROVALS, "never")!,
       };
+    }
     case "prompt": {
       const text = many(values, "text").map((entry) => required(entry, "--text cannot be empty."));
       if (text.length === 0) usage("At least one --text is required.");

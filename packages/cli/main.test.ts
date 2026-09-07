@@ -217,6 +217,16 @@ test("parses local lifecycle commands and disables dev reconciliation explicitly
   });
 });
 
+test("forwards tool function creation through the CLI parser", async () => {
+  expect(
+    (await parseEffectCli(["add", "tool", "Lookup", "--create-function", "Find Order"], "test"))
+      .invocation,
+  ).toEqual({
+    command: "add",
+    args: ["tool", "Lookup", "--create-function", "Find Order"],
+  });
+});
+
 test("generates completions, suggestions, help metadata, and command status", async () => {
   for (const shell of ["bash", "zsh", "fish"] as const) {
     const captured = io();

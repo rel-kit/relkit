@@ -14,7 +14,14 @@
       description: "Create and use a new generic service for a domain artifact or service route",
     },
     "--no-install": { type: "boolean", description: "Do not install newly required packages" },
-    "--target": { type: "string", description: "Callable function target" },
+    "--target": {
+      type: "string",
+      description: "Existing callable function; exclusive with --create-function",
+    },
+    "--create-function": {
+      type: "string",
+      description: "Create a callable function; exclusive with --target",
+    },
     "--side-effect": {
       type: '"none" | "read" | "write" | "external"',
       description: "Tool side-effect class (default: read)",

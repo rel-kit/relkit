@@ -77,16 +77,27 @@ async function providerSource(
 }
 
 async function toolOptions(state: AddResolutionState, discovery: ProjectDiscovery): Promise<void> {
-  if (!state.has("target")) {
+  if (!state.has("target") && !state.has("create-function")) {
     const values = artifacts(discovery, selectedDomain(state, discovery), "function");
     if (!state.interactive && values.length === 1)
       state.option("target", values[0]!.id ?? values[0]!.binding);
-    else if (state.parsed.createService) {
-      const value = await state.text("Callable function name to create", "Example", true);
-      if (value) state.option("target", value);
-    } else {
-      const value = await state.select("Callable function target", artifactOptions(values));
-      if (value) state.option("target", value);
+    else if (state.interactive) {
+      const create = "__create_function__";
+      const value =
+        values.length === 0
+          ? create
+          : await state.select("Callable function target", [
+              ...artifactOptions(values),
+              { value: create, label: "Create a new function" },
+            ]);
+      if (value === create) {
+        const name = await state.text(
+          "Callable function name to create",
+          state.parsed.positional,
+          true,
+        );
+        if (name) state.option("create-function", name);
+      } else if (value) state.option("target", value);
     }
   }
   if (!state.has("side-effect")) {
