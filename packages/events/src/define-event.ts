@@ -2,6 +2,7 @@ import {
   createDescriptorBase,
   deepFreeze,
   isDescriptor,
+  normalizeId,
   type DescriptorBase,
   type DescriptorMetadata,
 } from "@relkit/contracts";
@@ -30,6 +31,7 @@ export interface EventDescriptor<
   extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
   readonly version: Version;
   readonly input: InputSchema;
+  readonly profile?: string;
   readonly sensitiveFields?: readonly string[];
   readonly handler?: never;
   readonly output?: never;
@@ -46,6 +48,7 @@ export interface DefineEventOptions<
   readonly id: Id;
   readonly version?: Version;
   readonly input: InputSchema;
+  readonly profile?: string;
   readonly sensitiveFields?: readonly string[];
   readonly handler?: never;
   readonly output?: never;
@@ -79,6 +82,7 @@ export function defineEvent<
     throw new TypeError("Event input must be a Standard Schema v1 validator");
   const version = options.version ?? 1;
   validateVersion(version);
+  const profile = options.profile === undefined ? undefined : normalizeId(options.profile);
   const sensitiveFields = copySensitiveFields(options.sensitiveFields);
   const base = createDescriptorBase("event", options.id, options);
 
@@ -86,6 +90,7 @@ export function defineEvent<
     ...base,
     version,
     input: options.input,
+    ...(profile === undefined ? {} : { profile }),
     ...(sensitiveFields === undefined ? {} : { sensitiveFields }),
   }) as EventDescriptor<Id, Version, InferOutput<InputSchema>, InputSchema>;
 }
@@ -95,9 +100,19 @@ export function isEventDescriptor(value: unknown): value is EventDescriptorAny {
   return (
     isSchema(value.input) &&
     isPositiveInteger(value.version) &&
+    (value.profile === undefined || isStableProfile(value.profile)) &&
     !hasOwn(value, "handler") &&
     !hasOwn(value, "output")
   );
+}
+
+function isStableProfile(value: unknown): value is string {
+  try {
+    normalizeId(value);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function assertEventDescriptor(value: unknown): asserts value is EventDescriptorAny {

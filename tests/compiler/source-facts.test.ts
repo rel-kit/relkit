@@ -15,6 +15,8 @@ const source = `
   export default getOrder;
   const InvalidError = defineError({ data: schema, message: "invalid", retry: "never" });
   let ignoredError = defineError({ data: schema, message: "ignored", retry: "never" });
+  export const lookupTool = getOrder.asTool({ name: "lookup_order", description: "Lookup" });
+  export const help = definePrompt("Help", { id: "orders.help-prompt" });
 `;
 
 describe("TypeScript discovery facts", () => {
@@ -38,6 +40,15 @@ describe("TypeScript discovery facts", () => {
         }),
         expect.objectContaining({ binding: "orders", factory: "defineService", idOptional: true }),
         expect.objectContaining({ binding: "GET", factory: "defineRoute", idOptional: true }),
+        expect.objectContaining({ factory: "definePrompt", id: "explicit" }),
+        expect.objectContaining({
+          binding: "lookupTool",
+          factory: "asTool",
+          kind: "tool",
+          idOptional: true,
+          id: "omitted",
+          options: ["name", "description"],
+        }),
       ]),
     );
     expect(facts.exports.get("lookup")).toMatchObject({ binding: "getOrder" });

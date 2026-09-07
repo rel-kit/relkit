@@ -174,6 +174,7 @@ declare const deriveApplicationId: (packageName: string) => string;
   - [ConstantValue (type alias)](#constantvalue-type-alias)
   - [ConstantsDescriptor (interface)](#constantsdescriptor-interface)
   - [ConstantsShape (type alias)](#constantsshape-type-alias)
+  - [ContextDescriptorOptions (interface)](#contextdescriptoroptions-interface)
   - [ContextResolverOptions (interface)](#contextresolveroptions-interface)
   - [PromptDescriptor (interface)](#promptdescriptor-interface)
   - [PromptValue (type alias)](#promptvalue-type-alias)
@@ -230,6 +231,18 @@ type ConstantsShape = Readonly<Record<string, ConstantValue>>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L21)
 
+## ContextDescriptorOptions (interface)
+
+**Signature**
+
+```ts
+export interface ContextDescriptorOptions {
+  readonly id?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L38)
+
 ## ContextResolverOptions (interface)
 
 **Signature**
@@ -279,7 +292,7 @@ type ResolvedConstants<Descriptor> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L42)
 
 ## ResolvedPrompt (type alias)
 
@@ -289,7 +302,7 @@ type ResolvedConstants<Descriptor> = {
 type ResolvedPrompt<Descriptor> = Descriptor["value"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L46)
 
 ## defineConstants
 
@@ -298,10 +311,11 @@ type ResolvedPrompt<Descriptor> = Descriptor["value"];
 ```ts
 declare const defineConstants: <const Values extends ConstantsShape>(
   values: Values,
+  options?: ContextDescriptorOptions,
 ) => ConstantsDescriptor<Values>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L54)
 
 ## definePrompt
 
@@ -310,10 +324,11 @@ declare const defineConstants: <const Values extends ConstantsShape>(
 ```ts
 declare const definePrompt: <const Value extends PromptValue>(
   value: Value,
+  options?: ContextDescriptorOptions,
 ) => PromptDescriptor<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L73)
 
 ## `context-resolver.ts`
 

@@ -35,6 +35,10 @@ export interface PromptDescriptor<Value extends PromptValue = PromptValue> exten
 
 export type PromptValue = string | readonly string[];
 
+export interface ContextDescriptorOptions {
+  readonly id?: string;
+}
+
 export type ResolvedConstants<Descriptor extends ConstantsDescriptor> = {
   readonly [Key in keyof Descriptor["values"]]: ResolveConstant<Descriptor["values"][Key]>;
 };
@@ -49,22 +53,30 @@ type ResolveConstant<Value> = Value extends (...args: never[]) => infer Result
 
 export function defineConstants<const Values extends ConstantsShape>(
   values: Values,
+  options: ContextDescriptorOptions = {},
 ): ConstantsDescriptor<Values> {
   if (!isRecord(values)) throw new TypeError("Constants must be an object map");
+  if (options === null || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Constants options must be an object");
+  }
   for (const [key, value] of Object.entries(values)) {
     if (key.trim() === "" || (!isEnvRef(value) && typeof value !== "function" && !isJson(value))) {
       throw new TypeError(`Constant "${key}" is invalid`);
     }
   }
   return deepFreeze({
-    ...createDescriptorBase("constants", createUnboundIdentity()),
+    ...createDescriptorBase("constants", options.id ?? createUnboundIdentity()),
     values: { ...values },
   }) as ConstantsDescriptor<Values>;
 }
 
 export function definePrompt<const Value extends PromptValue>(
   value: Value,
+  options: ContextDescriptorOptions = {},
 ): PromptDescriptor<Value> {
+  if (options === null || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Prompt options must be an object");
+  }
   const values = typeof value === "string" ? [value] : value;
   if (
     !Array.isArray(values) ||
@@ -74,7 +86,7 @@ export function definePrompt<const Value extends PromptValue>(
     throw new TypeError("A prompt must contain nonempty text");
   }
   return deepFreeze({
-    ...createDescriptorBase("prompt", createUnboundIdentity()),
+    ...createDescriptorBase("prompt", options.id ?? createUnboundIdentity()),
     value: Array.isArray(value) ? [...value] : value,
   }) as PromptDescriptor<Value>;
 }
