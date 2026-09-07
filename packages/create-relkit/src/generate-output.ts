@@ -4,6 +4,7 @@ import type { CreateOptions } from "./options.js";
 export interface GenerateNextSteps {
   readonly commands: Readonly<{
     readonly cd: string;
+    readonly install?: "bun install";
     readonly dev: "bun run dev";
     readonly test: "bun run test";
     readonly check: "bun run check";
@@ -19,13 +20,14 @@ export interface GenerateNextSteps {
 }
 
 export function createGenerateNextSteps(
-  options: Pick<CreateOptions, "examples">,
+  options: Pick<CreateOptions, "examples" | "install">,
   destination: string,
   cwd = process.cwd(),
 ): GenerateNextSteps {
   const directory = relative(resolve(cwd), resolve(destination)) || basename(destination);
   const commands = Object.freeze({
     cd: `cd ${shellWord(directory)}`,
+    ...(options.install ? {} : { install: "bun install" as const }),
     dev: "bun run dev" as const,
     test: "bun run test" as const,
     check: "bun run check" as const,
@@ -44,11 +46,19 @@ export function createGenerateNextSteps(
 export function formatGenerateResult(value: unknown): string {
   if (!isRecord(value) || !isNextSteps(value.nextSteps)) return JSON.stringify(value);
   const { commands, endpoints } = value.nextSteps;
+  const additions = Array.isArray(value.additions) ? value.additions.length : 0;
+  const warnings = Array.isArray(value.warnings)
+    ? value.warnings.flatMap((warning) =>
+        isRecord(warning) && typeof warning.message === "string" ? [warning.message] : [],
+      )
+    : [];
   return [
     ...(typeof value.name === "string" && typeof value.destination === "string"
       ? [`Success! Created ${value.name} at ${value.destination}.`, ""]
       : []),
+    ...(additions ? [`additions: ${additions}`, ""] : []),
     commands.cd,
+    ...(commands.install ? [commands.install] : []),
     commands.dev,
     "",
     `backend:   ${endpoints.backend}`,
@@ -56,6 +66,7 @@ export function formatGenerateResult(value: unknown): string {
     `openapi:   ${endpoints.openapi}`,
     `api docs:  ${endpoints.apiReference}`,
     ...(endpoints.route === undefined ? [] : [`route:     ${endpoints.route}`]),
+    ...(warnings.length ? ["", ...warnings.map((warning) => `warning:   ${warning}`)] : []),
     "",
     commands.test,
     commands.check,
@@ -74,6 +85,7 @@ function isNextSteps(value: unknown): value is GenerateNextSteps {
   const endpoints = value.endpoints;
   return (
     typeof commands.cd === "string" &&
+    (commands.install === undefined || commands.install === "bun install") &&
     commands.dev === "bun run dev" &&
     commands.test === "bun run test" &&
     commands.check === "bun run check" &&
