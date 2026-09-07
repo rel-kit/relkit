@@ -1,6 +1,7 @@
 import { deepFreeze } from "@relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
+import { addHelp } from "./cli-help-add.js";
 
 export type * from "./cli-help-types.js";
 
@@ -129,8 +130,8 @@ const root = command(
   {
     options: [option("json", "boolean", "Emit machine-readable output")],
     commands: [
-      command("create", "Create a new RELKIT application", "relkit create <name>", {
-        arguments: [argument("name", true, "npm package and application name")],
+      command("create", "Create a new RELKIT application", "relkit create [name]", {
+        arguments: [argument("name", false, "npm package and application name")],
         options: [
           option("template", "choice", "Starter template", [], ["minimal", "api", "agent"]),
           option("cloud", "choice", "Cloud provider", [], ["aws", "none"]),
@@ -142,6 +143,7 @@ const root = command(
           option("force-empty-directory", "boolean", "Allow an existing empty destination"),
         ],
       }),
+      addHelp,
       command("dev", "Run app, inspector, OpenAPI, and Scalar", "relkit dev", {
         options: [
           projectRoot,
@@ -184,17 +186,13 @@ const root = command(
   },
 );
 
-/** Returns the deterministic JSON-safe documentation model used by CLI reference generation. */
 export function getCliHelpModel(version: string): CliHelpModel {
   return deepFreeze({ ...root, version });
 }
 
 export function findCliHelp(path: readonly string[]): CliHelpCommand | undefined {
-  let current: CliHelpCommand = root;
-  for (const name of path) {
-    const next = current.commands.find((entry) => entry.name === name);
-    if (!next) return undefined;
-    current = next;
-  }
-  return current;
+  return path.reduce<CliHelpCommand | undefined>(
+    (current, name) => current?.commands.find((entry) => entry.name === name),
+    root,
+  );
 }

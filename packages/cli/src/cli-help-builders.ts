@@ -35,6 +35,7 @@ export function option(
   description: string,
   aliases: readonly string[] = [],
   values?: readonly string[],
+  repeatable = false,
 ): CliHelpOption {
   return {
     name,
@@ -42,6 +43,7 @@ export function option(
     description,
     ...(aliases.length ? { aliases } : {}),
     ...(values ? { values } : {}),
+    ...(repeatable ? { repeatable: true } : {}),
   };
 }
 

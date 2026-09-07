@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command } from "effect/unstable/cli";
 import {
   booleanArgs,
@@ -18,7 +18,7 @@ export function basicCommands(select: SelectInvocation) {
     Command.make(
       "create",
       {
-        name: stringArgument(createPath, "name"),
+        name: stringArgument(createPath, "name", false),
         template: optionalChoice(createPath, "template"),
         cloud: optionalChoice(createPath, "cloud"),
         deploy: optionalChoice(createPath, "deploy"),
@@ -34,7 +34,7 @@ export function basicCommands(select: SelectInvocation) {
       (value) =>
         Effect.sync(() =>
           select("create", [
-            value.name,
+            ...(Option.isSome(value.name) ? [value.name.value] : []),
             ...optionArgs("template", value.template),
             ...optionArgs("cloud", value.cloud),
             ...optionArgs("deploy", value.deploy),

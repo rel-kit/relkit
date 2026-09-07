@@ -167,6 +167,7 @@ test("keeps command and create failures structured in JSON", async () => {
 });
 
 test("renders focused help for every command and nested subcommand", async () => {
+  const addKinds = getCliHelpModel("test").commands.find(({ name }) => name === "add")!.commands;
   const paths = [
     [],
     ...[
@@ -180,7 +181,9 @@ test("renders focused help for every command and nested subcommand", async () =>
       "local",
       "doctor",
       "deploy",
+      "add",
     ].map((name) => [name]),
+    ...addKinds.map(({ name }) => ["add", name]),
     ...["print", "check", "diff"].map((name) => ["graph", name]),
     ...["check", "list", "explain", "example"].map((name) => ["env", name]),
     ...["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) => ["deploy", name]),
