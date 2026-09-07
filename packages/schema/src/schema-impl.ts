@@ -10,6 +10,7 @@ import type {
   StandardSuccess,
 } from "./standard-schema.js";
 import {
+  getSchemaMetadata,
   setSchemaMetadata,
   withDefaultMetadata,
   withNullableMetadata,
@@ -68,8 +69,8 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
         return check(value, []);
       },
       jsonSchema: {
-        input: (options) => projectJsonSchema(metadata, options.target),
-        output: (options) => projectJsonSchema(metadata, options.target),
+        input: (options) => projectJsonSchema(getSchemaMetadata(this) ?? metadata, options.target),
+        output: (options) => projectJsonSchema(getSchemaMetadata(this) ?? metadata, options.target),
       },
     };
   }
