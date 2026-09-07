@@ -69,7 +69,10 @@ function routeItem(route: InspectorObject): RouteItem {
     id: text(route.id) || "route",
     method: text(config?.method) || "HTTP",
     path: text(config?.path) || "/",
-    target: text(route.targetFunctionId) || "unknown function",
+    target:
+      config?.rawHandler === true
+        ? "Raw HTTP handler"
+        : text(route.targetFunctionId) || "unknown function",
   };
 }
 

@@ -17,7 +17,10 @@ export function RouteContract({
   const config = record(route.config);
   const method = text(config?.method) ?? "HTTP";
   const path = text(config?.path) ?? "/";
-  const targetId = text(route.targetFunctionId) ?? "unknown function";
+  const targetId =
+    config?.rawHandler === true
+      ? "Raw HTTP handler"
+      : text(route.targetFunctionId) || "unknown function";
   const source = record(route.source);
   return (
     <>
@@ -37,7 +40,7 @@ export function RouteContract({
             <dd>{text(route.id) || "unknown"}</dd>
           </div>
           <div>
-            <dt>Target function</dt>
+            <dt>Handler</dt>
             <dd>{targetId}</dd>
           </div>
           <div>

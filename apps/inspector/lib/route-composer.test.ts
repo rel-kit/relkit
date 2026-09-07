@@ -12,6 +12,23 @@ const mapping = {
 };
 
 describe("route composer contract", () => {
+  test("documents raw handlers without a target function or inferred validation response", () => {
+    const operation = openApiOperation(
+      {
+        id: "raw.details",
+        targetFunctionId: "raw.details",
+        config: { rawHandler: true, path: "/users/:id/details", request: null, responses: [] },
+      },
+      undefined,
+    );
+    expect(operation.parameters).toEqual([
+      { name: "id", in: "path", required: true, schema: { type: "string" } },
+    ]);
+    expect(operation.responses).toEqual({
+      default: { description: "Response returned by the route handler" },
+    });
+    expect(operation["x-relkit"]).not.toHaveProperty("functionId");
+  });
   test("extracts mapped fields and builds the active route request", async () => {
     expect(collectRouteFields(mapping)).toEqual([
       { key: "orderId", source: "path", name: "orderId", required: true },

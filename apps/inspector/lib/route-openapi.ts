@@ -28,10 +28,13 @@ export function openApiOperation(
     operationId: text(route.id) || text(route.targetFunctionId) || "route",
     ...(parameters.length === 0 ? {} : { parameters }),
     ...(requestBody === undefined ? {} : { requestBody }),
-    responses: buildRouteResponses(config?.responses, target),
+    responses:
+      config?.rawHandler === true
+        ? { default: { description: "Response returned by the route handler" } }
+        : buildRouteResponses(config?.responses, target),
     "x-relkit": {
       routeId: route.id,
-      functionId: route.targetFunctionId,
+      ...(config?.rawHandler === true ? {} : { functionId: route.targetFunctionId }),
       middleware: Array.isArray(config?.middleware) ? config.middleware : [],
       transforms: Array.isArray(config?.transforms)
         ? config.transforms.flatMap((value) => {

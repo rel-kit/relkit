@@ -44,6 +44,40 @@ test("keeps contracts available when observability is unavailable", async ({ pag
   await expect(page.getByRole("heading", { name: "Agent detail" })).toBeVisible();
 });
 
+test("opens raw route details without looking up a nonexistent function", async ({ page }) => {
+  const functionRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/functions/raw.details")) functionRequests.push(request.url());
+  });
+  await page.route("**/_relkit/v1/routes/raw.details", (route) =>
+    route.fulfill({
+      json: {
+        protocol: "relkit.inspector",
+        version: 1,
+        node: {
+          id: "raw.details",
+          kind: "trigger",
+          targetFunctionId: "raw.details",
+          config: {
+            method: "GET",
+            path: "/users/:id/details",
+            rawHandler: true,
+            request: null,
+            responses: [],
+            middleware: [],
+            transforms: [],
+          },
+        },
+      },
+    }),
+  );
+  await page.goto("/routes/raw.details");
+  await expect(page.getByRole("heading", { name: "Route detail", exact: true })).toBeVisible();
+  await expect(page.getByText("Raw HTTP handler").first()).toBeVisible();
+  await expect(page.getByText("The route API is unavailable.")).toHaveCount(0);
+  expect(functionRequests).toEqual([]);
+});
+
 test("shows a new request live and renders its correlated timeline and edges", async ({
   page,
   request,
