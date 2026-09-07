@@ -37,6 +37,21 @@
       "id": "local",
       "exports": {
         "authoring": ".",
+        "runtime": {
+          "export": "./runtime",
+          "registrations": [
+            {
+              "capability": "event",
+              "adapterId": "local-event",
+              "protocolVersion": 1
+            },
+            {
+              "capability": "job",
+              "adapterId": "local-job",
+              "protocolVersion": 1
+            }
+          ]
+        },
         "localService": "./runtime"
       }
     }
@@ -48,6 +63,8 @@
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
-    "@relkit/local-service": "workspace:*"
+    "@relkit/local-service": "workspace:*",
+    "@relkit/provider": "workspace:*",
+    "@relkit/providers-local": "workspace:*"
   }
 }
