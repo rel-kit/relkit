@@ -1,0 +1,173 @@
+---
+title: Add artifacts
+description: Scaffold compile-ready RELKIT services, functions, routes, providers, database, and auth interactively or from automation.
+---
+
+`relkit add` inspects the current project before proposing a change. In a terminal, omit a kind or required
+value to choose from discovered services, public members, events, tools, prompts, and compatible provider
+profiles. In CI or redirected execution, provide the documented flags; ambiguous input exits with usage code
+`2` instead of prompting.
+
+## Run the installed CLI
+
+Run commands from an installed application's root. `bun run relkit` uses its local CLI binary;
+`relkit` is equivalent when that binary is already on your `PATH`. No global installation is required.
+
+```sh title="Terminal — application root"
+bun run relkit
+bun run relkit add
+bun run relkit add agent --help
+```
+
+The first command opens the context-aware action menu in a TTY; the second opens the add-kind menu.
+Bare `relkit` prints help in CI, redirected execution, or JSON mode. Add `--help` to any command
+for its arguments and options. Start a new app with
+[`bunx create-relkit` or `relkit create`](/docs/start/create-an-app) before adding artifacts.
+
+## Commands by artifact type
+
+Each linked guide includes a runnable command, generated-file behavior, and every CLI option.
+
+| Command | Detailed guide |
+| --- | --- |
+| `relkit add service [name]` | [Services](/docs/service/define#scaffold-a-service) |
+| `relkit add function [name]` | [Functions](/docs/fundamentals/functions#scaffold-a-callable-function) |
+| `relkit add error [name]` | [Typed errors](/docs/fundamentals/errors#scaffold-a-typed-error) |
+| `relkit add event [name]` | [Event contracts](/docs/events/define#scaffold-an-event-contract) |
+| `relkit add event-function [name]` | [Event consumers](/docs/events/consume#scaffold-an-event-only-function) |
+| `relkit add job [name]` | [Jobs](/docs/jobs/define#scaffold-a-job) |
+| `relkit add cache [name]` | [Caches and profiles](/docs/caching/define#scaffold-a-cache) |
+| `relkit add bucket [name]` | [Buckets and profiles](/docs/storage/define#scaffold-a-bucket) |
+| `relkit add tool [name]` | [Tools](/docs/ai/tools#scaffold-a-function-backed-tool) |
+| `relkit add prompt [name]` | [Prompts](/docs/ai/agents#scaffold-a-reusable-prompt) |
+| `relkit add agent [name]` | [Agents and models](/docs/ai/agents#scaffold-an-agent) |
+| `relkit add constants [name]` | [Domain constants](/docs/service/define#scaffold-domain-constants) |
+| `relkit add route [path]` | [Routes and method mappings](/docs/http/define#scaffold-a-route) |
+| `relkit add middleware [name]` | [HTTP middleware](/docs/http/middleware#scaffold-middleware) |
+| `relkit add transform [name]` | [Request transforms](/docs/http/requests#scaffold-a-request-transform) |
+| `relkit add database` | [Drizzle databases](/docs/database/first-database#scaffold-the-database-baseline) |
+| `relkit add auth` | [Better Auth](/docs/auth/first-auth#scaffold-the-auth-baseline) |
+
+Square brackets in usage mean the value can be prompted for, not that names are unnecessary in CI.
+Database and auth take no name argument.
+
+## Add a domain
+
+The smallest service includes a public example function:
+
+```sh title="Terminal — application root"
+bun run relkit add service Billing
+```
+
+Choose a custom bundle with repeatable `--include`, or create every domain artifact with one command:
+
+```sh title="Terminal — application root"
+bun run relkit add service Billing --full
+```
+
+The full bundle wires a public function and event, an event consumer, error, job, cache, bucket, tool,
+prompt, agent, constants, and `GET /billing` route. Missing event and job profiles use file-backed local
+providers; cache and bucket use Docker Redis and MinIO; the agent uses the OpenAI AI SDK `gpt-5-mini`
+default. Set `OPENAI_API_KEY` before starting or restarting the server: the configured model profile
+requires it at startup, even if no agent has been invoked. The CLI never generates secrets, calls models,
+runs migrations, or provisions cloud resources. Docker startup requires the separate approval below.
+
+Friendly names are normalized before mutation. For example, `Send Receipt` previews
+`send-receipt.function.ts`, the `sendReceipt` binding, and its domain-qualified descriptor ID.
+
+## Add to an existing service
+
+Explicit flags make a command deterministic for scripts:
+
+```sh title="Terminal — application root"
+bun run relkit add function "Send Receipt" --service billing
+bun run relkit add prompt "Receipt Policy" --service billing --text "Summarize the receipt."
+bun run relkit add tool "Send Receipt" --service billing \
+  --target billing.send-receipt --side-effect external --approval on-write
+```
+
+Use `--create-service orders` instead of `--service orders` when the domain does not exist. Generic service
+selection excludes the singleton auth and database services. Functions and events are public by default;
+pass `--internal` to keep one out of `defineService`.
+
+## Add routes
+
+Route paths are converted with the compiler's inverse convention:
+
+```sh title="Terminal — application root"
+bun run relkit add route '/users/:id/details' \
+  --mode service-route --service users --map GET=details
+```
+
+This creates `src/routes/users/[id]/details/route.ts`. `*parts` and `*parts?` become `[...parts]` and
+`[[...parts]]`. Repeat `--map METHOD=member` for more methods. A standalone `--mode route` creates a raw
+`GET` handler returning `{ ok: true }`; service routes support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`,
+`HEAD`, and `OPTIONS`. Both appear in OpenAPI/Scalar; only function-backed routes infer function schemas.
+
+## Shared options and automation
+
+| Option | Behavior |
+| --- | --- |
+| `--project-root <directory>` | Inspect and modify this app instead of the current directory. |
+| `--service <domain>` | Choose an existing generic service for a domain artifact or service route. |
+| `--create-service <domain>` | Create the owning service instead; exclusive with `--service`. |
+| `--no-install` | Skip dependency installation; report any skipped verification. |
+| `--json` | Disable prompts and emit one machine-readable result on stdout. |
+| `--help`, `-h` | Show command-specific usage without scaffolding. |
+| `--version`, `-v` | Print the installed CLI version. |
+| `--completions <shell>` | Print a completion script for `bash`, `zsh`, `fish`, or `sh`. |
+
+The service-selection flags do not relocate singleton database/auth services, standalone routes,
+middleware, or transforms. Headless domain selection uses the only generic service when unambiguous;
+otherwise supply `--service` or `--create-service`. Provider selection reuses compatible defaults or
+unique profiles where possible, then documented scaffold defaults. Required unresolved targets are
+usage errors, not guesses.
+
+For deterministic automation, create first and chain add commands. From an installed application:
+
+```sh
+bun run relkit --json add service Billing
+bun run relkit --json add function "Send Receipt" --service billing
+bun run relkit --json add route '/receipts' --mode service-route --service billing \
+  --map GET=sendReceipt
+```
+
+JSON results include `createdFiles`, `updatedFiles`, `installedPackages`, structured `warnings`,
+`verification`, and `nextSteps`. Usage exits `2`, operational failures exit `1`, and interrupt
+cancellation exits `130`. Inspect verification and warnings even when scaffolding succeeds.
+
+## Start local resources
+
+After a successfully checked add that needs Docker, an interactive terminal asks whether to run
+`relkit local up --detach`. Accepting starts this project's declared local services; the Docker warning
+is removed only if startup succeeds. Declining, cancelling this post-add prompt, running headlessly,
+or skipping verification leaves the warning and next step. Cancelling here does not undo an already
+completed scaffold. A failed Docker start also leaves the saved files and reports how to retry.
+
+```sh title="Terminal — application root, Docker running"
+bun run relkit local up --detach
+bun run relkit local status
+```
+
+File-backed local events and jobs need no Docker. Connected resources need their configured environment
+values. Never copy a new `.env.example` over an existing `.env`; merge only the required missing values.
+
+## Review and apply safely
+
+Human output previews created and updated files, dependencies, profiles, and actionable warnings before
+mutation. Fully explicit commands proceed immediately; a prompted command asks for confirmation. Each add is
+one transaction: files and `bun.lock` are restored if installation or `relkit check` fails, while unrelated
+dirty files remain untouched.
+
+Use `--no-install` when another process owns installation. If a newly required package is unavailable, the
+result skips validation and prints the exact install and check commands. `--json` disables prompts, color,
+spinners, and progress, and writes one result object to standard output.
+
+All supported kinds and headless flags are listed in the [CLI reference](/docs/operations/cli-reference).
+
+Scaffolding understands canonical static service/app/env object literals, including imported env
+definitions. Collisions and ambiguous dynamic source forms are rejected without overwriting files.
+A passing `check` verifies the graph, not live credentials or business behavior. Run `bun run typecheck`
+and your own tests after specializing the generated examples; the CLI generates no test files.
+
+<include cwd>content/generated/related/start-add-artifacts.mdx</include>

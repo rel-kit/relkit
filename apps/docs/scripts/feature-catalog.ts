@@ -30,6 +30,8 @@ export const features = [
     [
       ["integrations/packages/docker/src/index.ts", "docker"],
       ["integrations/packages/aws/src/aws.ts", "aws"],
+      ["integrations/packages/local/src/providers.ts", "localEvent"],
+      ["integrations/packages/local/src/providers.ts", "localJob"],
     ],
     ["examples/commerce/relkit.config.ts"],
   ),

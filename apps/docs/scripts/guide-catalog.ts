@@ -10,7 +10,12 @@ import { databaseGuideGroup, databaseGuideRelations } from "./database-guide-cat
 import { authGuideGroup, authGuideRelations } from "./auth-guide-catalog.js";
 
 export const guideGroups = [
-  group("start", "Start", "Rocket", ["create-an-app", "first-route", "local-development"]),
+  group("start", "Start", "Rocket", [
+    "create-an-app",
+    "add-artifacts",
+    "first-route",
+    "local-development",
+  ]),
   group("fundamentals", "Core concepts", "Blocks", [
     "index",
     "application",
@@ -44,6 +49,11 @@ export const guideGroups = [
 const relations = [
   relation("index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
   relation("start/create-an-app", ["app", "config"], ["templates/default/v1/api/README.md"]),
+  relation(
+    "start/add-artifacts",
+    ["services", "functions", "routes"],
+    ["templates/default/v1/api/src/orders/service.ts"],
+  ),
   relation(
     "start/first-route",
     ["functions", "routes"],

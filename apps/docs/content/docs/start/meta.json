@@ -1,5 +1,5 @@
 {
   "title": "Start",
   "icon": "Rocket",
-  "pages": ["create-an-app", "first-route", "local-development"]
+  "pages": ["create-an-app", "add-artifacts", "first-route", "local-development"]
 }

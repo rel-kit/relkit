@@ -55,6 +55,28 @@ or use the existing `/hello` route and its source file instead. Keep `.env` load
   </Step>
 </Steps>
 
+## Add artifacts while dev is running
+
+Keep the dev terminal open and run scaffolding in a second terminal at the application root:
+
+```sh
+bun run relkit add service Billing --full
+```
+
+Dev defers scaffold-triggered reloads until the add transaction finishes writing, installing, and
+checking (or rolling back). It coalesces the changes into a reload instead of compiling half-installed
+dependencies. Temporary scaffold files are ignored. A failed reload keeps the previous active version;
+an initial startup failure has no previous version to serve.
+
+Normal logs show a changed-file count and the actionable error without repeated framework stacks.
+For full file lists and diagnostics, restart with `bun run dev --verbose`. Use
+`bun run relkit --json dev` for structured logs; JSON and Inspector records retain diagnostic details.
+
+If an add introduces a required model profile, populate `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
+before its candidate can start. Saving `.env` retries an active dev session; after an initial startup
+failure, run `bun run dev` again. See [post-add Docker approval](/docs/start/add-artifacts#start-local-resources)
+for cache/bucket dependencies.
+
 ## Configure ports and body limits
 
 The API template's configuration shows the server port, maximum request body size, and inspector port:

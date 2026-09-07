@@ -27,7 +27,9 @@
       "apiPackage": "app",
       "entrypoints": [
         { "source": "integrations/packages/docker/src/index.ts", "name": "docker" },
-        { "source": "integrations/packages/aws/src/aws.ts", "name": "aws" }
+        { "source": "integrations/packages/aws/src/aws.ts", "name": "aws" },
+        { "source": "integrations/packages/local/src/providers.ts", "name": "localEvent" },
+        { "source": "integrations/packages/local/src/providers.ts", "name": "localJob" }
       ],
       "examples": ["examples/commerce/relkit.config.ts"]
     },
@@ -233,6 +235,12 @@
       "path": "start/create-an-app",
       "api": ["app", "config"],
       "examples": ["templates/default/v1/api/README.md"],
+      "next": "start/add-artifacts"
+    },
+    {
+      "path": "start/add-artifacts",
+      "api": ["services", "functions", "routes"],
+      "examples": ["templates/default/v1/api/src/orders/service.ts"],
       "next": "start/first-route"
     },
     {
