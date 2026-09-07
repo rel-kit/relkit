@@ -2,13 +2,14 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  applyScaffoldPlan,
   generateProject,
-  normalizeCreateOptions,
   type CreateOptions,
   type GenerateCommandResult,
 } from "create-relkit";
 import { runCli } from "./main.js";
-import type { CliCommandContext } from "./main-support.js";
+import { loadCreateRelkit, type CliCommandContext } from "./main-support.js";
+import { workspacePackageRoots } from "./local-workspaces.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const cli = fileURLToPath(import.meta.url);
@@ -41,12 +42,13 @@ export async function useWorkspaceDependencies(projectRoot: string): Promise<str
 }
 
 async function workspaceDependencyClosure(direct: ReadonlySet<string>): Promise<string[]> {
+  const paths = await workspacePackageRoots(root);
   const names = new Set(direct);
   const pending = [...direct];
   while (pending.length > 0) {
     const name = pending.pop()!;
     const manifest = JSON.parse(
-      await readFile(join(root, "packages", name.slice("@relkit/".length), "package.json"), "utf8"),
+      await readFile(join(paths.get(name) ?? missingWorkspace(name), "package.json"), "utf8"),
     ) as Manifest;
     for (const dependency of Object.keys(manifest.dependencies ?? {})) {
       if (!dependency.startsWith("@relkit/") || names.has(dependency)) continue;
@@ -62,10 +64,11 @@ export async function prepareWorkspaceLinks(
   signal?: AbortSignal,
 ): Promise<GenerateCommandResult> {
   const names = await useWorkspaceDependencies(projectRoot);
+  const paths = await workspacePackageRoots(root);
   for (const name of names) {
     const result = await runCommand(
       [process.execPath, "link", "--silent"],
-      join(root, "packages", name.slice("@relkit/".length)),
+      paths.get(name) ?? missingWorkspace(name),
       signal,
     );
     if (result.exitCode !== 0) return result;
@@ -108,6 +111,7 @@ async function runCommand(
 
 async function generateLocalProject(options: unknown, context: CliCommandContext) {
   return generateProject(options as CreateOptions, {
+    ...context,
     signal: context.signal,
     bunExecutable: process.execPath,
     relkitExecutable: cli,
@@ -130,10 +134,21 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
         }
       : {}),
     loadCreateRelkit: async () => ({
-      normalizeCreateOptions,
+      ...(await loadCreateRelkit()),
       generateProject: generateLocalProject,
+      applyScaffoldPlan: (plan, context) =>
+        applyScaffoldPlan(plan, {
+          ...context,
+          bunExecutable: process.execPath,
+          relkitExecutable: cli,
+          commandRunner: runLocalCommand,
+        }),
     }),
   });
 }
 
 if (import.meta.main) process.exitCode = await main();
+
+function missingWorkspace(name: string): never {
+  throw new Error(`Workspace package not found: ${name}`);
+}

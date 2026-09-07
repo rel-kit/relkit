@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import { canonicalJson } from "@relkit/contracts";
 import { createLoggerLayer, type LogRecord } from "@relkit/runtime-effect";
-import { formatGenerateResult } from "create-relkit";
 import { executeCommand } from "./command-dispatch.js";
+import { resolveRootMenu } from "./root-menu.js";
+import { executeScaffoldCommand } from "./scaffold-command.js";
+import { createCliStatus } from "./cli-status.js";
 import {
   cliErrorMessage,
   isJsonMode,
@@ -15,11 +17,8 @@ import {
   CLI_VERSION,
   createReporter,
   errorMessage,
-  fail,
   helpPayload,
   installSignals,
-  isGeneratorApi,
-  loadCreateRelkit,
   toFailure,
   type CliIo,
   type CliLogger,
@@ -36,14 +35,29 @@ export async function runCli(
   const io = runtime.io ?? processIo;
   const json = isJsonMode(argv);
   const reporter = createReporter(json, io);
-  if (hasAction(argv, "help", "h") && hasAction(argv, "version", "v")) {
+  let input: readonly string[];
+  try {
+    input = await resolveRootMenu(argv, {
+      enabled:
+        !json &&
+        !(runtime.ci ?? Boolean(process.env.CI)) &&
+        (runtime.tty ?? process.stdin.isTTY) === true,
+      ...(runtime.cwd ? { cwd: runtime.cwd } : {}),
+      ...(runtime.promptDriver ? { promptDriver: runtime.promptDriver } : {}),
+    });
+  } catch (error) {
+    const failure = toFailure(error, new AbortController().signal);
+    reporter.error(failure.code, failure.message);
+    return failure.exitCode;
+  }
+  if (hasAction(input, "help", "h") && hasAction(input, "version", "v")) {
     reporter.error("RELKIT_CLI_USAGE", "--help and --version are exclusive");
     return CLI_EXIT_CODES.usage;
   }
   const version = runtime.version ?? CLI_VERSION;
   let parsed: Awaited<ReturnType<typeof parseEffectCli>>;
   try {
-    parsed = await parseEffectCli(argv, version);
+    parsed = await parseEffectCli(input, version);
   } catch (error) {
     reporter.error("RELKIT_INTERNAL_ERROR", errorMessage(error));
     return CLI_EXIT_CODES.failure;
@@ -101,13 +115,14 @@ async function executeInvocation(
   const removeSignals =
     runtime.installSignalHandlers === false ? () => undefined : installSignals(controller);
   const log = createCliLogger(json, io);
-  const status = richStatus(runtime, json, io, invocation.command);
+  const status = createCliStatus(runtime, json, invocation.command);
   try {
     status.start();
-    const result = await execute(invocation, runtime, signal, reporter, log, json, io);
+    const result = await execute(invocation, runtime, signal, reporter, log, json, io, status);
     if (signal.aborted) {
       const failure = toFailure(signal.reason, signal);
       reporter.error(failure.code, failure.message);
+      status.finish(false);
       return failure.exitCode;
     }
     status.finish(result === CLI_EXIT_CODES.success);
@@ -130,6 +145,7 @@ async function execute(
   log: CliLogger,
   json: boolean,
   io: CliIo,
+  status: ReturnType<typeof createCliStatus>,
 ): Promise<number> {
   const context = {
     command: invocation.command,
@@ -137,24 +153,21 @@ async function execute(
     json,
     signal,
     tty: runtime.tty ?? process.stdin.isTTY,
+    ci: runtime.ci ?? Boolean(process.env.CI),
+    ...(runtime.cwd ? { cwd: runtime.cwd } : {}),
+    ...(runtime.promptDriver ? { promptDriver: runtime.promptDriver } : {}),
     reporter,
     log,
     io,
-    ...(json ? {} : { onProgress: (message: string) => io.stderr(message) }),
+    ...(json
+      ? {}
+      : {
+          onProgress: (message: string) =>
+            runtime.io ? io.stderr(message) : status.message(message),
+        }),
   };
-  if (invocation.command !== "create") return executeCommand(invocation, context);
-  const api = await (runtime.loadCreateRelkit ?? loadCreateRelkit)();
-  if (!isGeneratorApi(api))
-    throw fail("RELKIT_CREATE_API_UNAVAILABLE", "The create-relkit generator API is unavailable.");
-  let options: unknown;
-  try {
-    options = api.normalizeCreateOptions(invocation.args, { json });
-  } catch (error) {
-    throw fail("RELKIT_CLI_USAGE", errorMessage(error), CLI_EXIT_CODES.usage);
-  }
-  const result = await api.generateProject(options, context);
-  if (result !== undefined) reporter.output(result, formatGenerateResult(result));
-  return CLI_EXIT_CODES.success;
+  const scaffold = await executeScaffoldCommand(invocation, context, runtime);
+  return scaffold ?? executeCommand(invocation, context);
 }
 
 function createCliLogger(json: boolean, io: CliIo): CliLogger {
@@ -180,19 +193,6 @@ function actionValue(argv: readonly string[], name: string): string | undefined 
   if (index < 0) return undefined;
   return argv[index]!.includes("=") ? argv[index]!.split("=", 2)[1] : argv[index + 1];
 }
-function richStatus(runtime: CliRuntime, json: boolean, io: CliIo, command: string) {
-  const enabled =
-    !json &&
-    command !== "create" &&
-    command !== "dev" &&
-    !(runtime.ci ?? Boolean(process.env.CI)) &&
-    (runtime.tty ?? process.stderr.isTTY) === true;
-  return {
-    start: () => enabled && io.stderr(`● relkit ${command}`),
-    finish: (ok: boolean) => enabled && io.stderr(`${ok ? "✓" : "✗"} relkit ${command}`),
-  };
-}
-
 const processIo: CliIo = Object.freeze({
   stdout: (line: string) => process.stdout.write(`${line}\n`),
   stderr: (line: string) => process.stderr.write(`${line}\n`),
