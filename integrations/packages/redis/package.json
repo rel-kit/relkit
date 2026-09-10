@@ -48,6 +48,16 @@
               "capability": "cache",
               "adapterId": "redis",
               "protocolVersion": 1
+            },
+            {
+              "capability": "realtime",
+              "adapterId": "redis-realtime",
+              "protocolVersion": 1
+            },
+            {
+              "capability": "agent-state",
+              "adapterId": "redis-agent-state",
+              "protocolVersion": 1
             }
           ]
         },
@@ -64,6 +74,9 @@
     "@relkit/cache": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*"
+    "@relkit/agents": "workspace:*",
+    "@relkit/provider": "workspace:*",
+    "@relkit/providers-local": "workspace:*",
+    "@relkit/realtime": "workspace:*"
   }
 }
