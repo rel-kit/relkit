@@ -1,6 +1,7 @@
 export * from "./lifecycle.js";
 export * from "./registry.js";
 export * from "./invoke.js";
+export * from "./stream-runtime.js";
 export * from "./dependencies.js";
 export * from "./context.js";
 export * from "./concurrency.js";

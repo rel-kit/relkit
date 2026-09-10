@@ -35,6 +35,7 @@ export interface ContextBuildOptions {
       | import("@relkit/cache").CacheOperationObservation,
   ) => void;
   readonly trigger?: unknown;
+  readonly progress?: import("@relkit/invocation").ProgressEmitter;
 }
 
 /** Replaces the six client maps with frozen maps derived only from declarations. */
@@ -69,6 +70,7 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
     cache: clients.cache,
     agents: clients.agents,
     ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
+    ...(options.progress === undefined ? {} : { progress: options.progress }),
   }) as Context;
 }
 

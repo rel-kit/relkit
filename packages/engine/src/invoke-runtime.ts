@@ -54,6 +54,7 @@ export async function runHandler<
   idSource: InvocationIdSource,
   runner: InvocationRunner,
   childInvoker: DirectChildInvoker | undefined,
+  progress: import("@relkit/invocation").ProgressEmitter | undefined,
   onTrace?: (trace: CapturedInvocationTrace) => void,
 ): Promise<unknown> {
   const spanSource: InvocationIdSource = {
@@ -134,6 +135,7 @@ export async function runHandler<
             ? {}
             : { onOperation: options.hooks.onOperation }),
           ...(options.trigger === undefined ? {} : { trigger: options.trigger }),
+          ...(progress === undefined ? {} : { progress }),
         });
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
