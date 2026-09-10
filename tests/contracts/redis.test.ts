@@ -79,5 +79,6 @@ function memoryRedisClient(now: () => number): RedisProtocolClient {
       if (entry === undefined) return -2;
       return entry.expiresAt === undefined ? -1 : Math.max(0, entry.expiresAt - now());
     },
+    command: async () => undefined,
   };
 }

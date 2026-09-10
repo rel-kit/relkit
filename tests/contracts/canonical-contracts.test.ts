@@ -218,7 +218,7 @@ describe.serial("canonical contracts", () => {
       manifest: MANIFEST_VERSION,
       api: API_VERSION,
       protocol: PROTOCOL_VERSION,
-    }).toEqual({ contract: 5, generator: 5, graph: 8, manifest: 8, api: 1, protocol: 1 });
+    }).toEqual({ contract: 7, generator: 7, graph: 10, manifest: 10, api: 1, protocol: 1 });
     expect(PROTOCOL_VERSION).toBe(API_VERSION);
     expect(API_BASE_PATH).toBe("/_relkit/v1");
   });
