@@ -9,6 +9,7 @@ import {
 
 export interface TestApplicationArtifacts {
   readonly graph: FunctionRegistryOptions["graph"];
+  readonly publicFingerprint: string;
   readonly registry: FunctionRegistry;
   readonly runtimeIntegrationModules: readonly LoadedRuntimeIntegrationModule[];
 }
@@ -23,6 +24,9 @@ export async function loadTestApplicationArtifacts(
   const graph = (await Bun.file(
     join(directory, "application.graph.json"),
   ).json()) as FunctionRegistryOptions["graph"];
+  const clientContract = (await Bun.file(join(directory, "client-contract.json")).json()) as {
+    readonly publicFingerprint?: unknown;
+  };
   const manifest = await importGenerated(manifestPath);
   const integrationsPath = join(directory, "runtime-integrations.ts");
   const integrations = (await Bun.file(integrationsPath).exists())
@@ -33,6 +37,10 @@ export async function loadTestApplicationArtifacts(
     throw new TypeError("Generated runtime integration modules are invalid.");
   return {
     graph,
+    publicFingerprint:
+      typeof clientContract.publicFingerprint === "string"
+        ? clientContract.publicFingerprint
+        : "test",
     registry: createFunctionRegistry({
       graph,
       manifest: manifest.runtimeManifest as FunctionRegistryOptions["manifest"],

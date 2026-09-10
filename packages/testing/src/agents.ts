@@ -36,6 +36,7 @@ export type {
   TestModelTurn,
 } from "./agents-types.js";
 export { assertAgentTrace } from "./agents-utils.js";
+export { createTestModel } from "./agents-model.js";
 
 /** Creates an isolated, network-free agent harness around the existing runtime seam. */
 export function createTestAgent<Agent extends TestAgentDescriptor>(
