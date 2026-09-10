@@ -28,7 +28,15 @@ export interface InspectorConfig {
   readonly maxPreviewBytes?: number;
 }
 
-export const APP_PROVIDER_CAPABILITIES = ["bucket", "cache", "job", "event", "model"] as const;
+export const APP_PROVIDER_CAPABILITIES = [
+  "bucket",
+  "cache",
+  "job",
+  "event",
+  "model",
+  "realtime",
+  "agent-state",
+] as const;
 
 export type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 
@@ -42,6 +50,8 @@ export interface AppProviderInputs {
   readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
+  readonly realtime?: CapabilityInput<"realtime">;
+  readonly "agent-state"?: CapabilityInput<"agent-state">;
 }
 
 type Profile<Input> = Input extends ProviderSourceInput ? "default" : Extract<keyof Input, string>;
