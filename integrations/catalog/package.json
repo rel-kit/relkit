@@ -47,10 +47,6 @@
       "types": "./dist/cloudflare.d.ts",
       "import": "./dist/cloudflare.js"
     },
-    "./ai-sdk": {
-      "types": "./dist/ai-sdk.d.ts",
-      "import": "./dist/ai-sdk.js"
-    },
     "./sentry": {
       "types": "./dist/sentry.d.ts",
       "import": "./dist/sentry.js"
@@ -70,7 +66,6 @@
   },
   "relkit": {
     "catalog": {
-      "./ai-sdk": "@relkit/ai-sdk",
       "./aws": "@relkit/aws",
       "./cloudflare": "@relkit/cloudflare",
       "./docker": "@relkit/docker",
@@ -88,7 +83,6 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@relkit/ai-sdk": "workspace:*",
     "@relkit/aws": "workspace:*",
     "@relkit/cloudflare": "workspace:*",
     "@relkit/docker": "workspace:*",
