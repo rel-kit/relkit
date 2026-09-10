@@ -13,6 +13,8 @@
     "storage",
     "caching",
     "ai",
+    "client",
+    "realtime",
     "integrations",
     "operations",
     "api"

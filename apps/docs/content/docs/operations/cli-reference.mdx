@@ -27,19 +27,19 @@ Create a new RELKIT application
 | -------- | -------- | -------------------------------- |
 | name     | optional | npm package and application name |
 
-| Option                  | Value               | Description                         |
-| ----------------------- | ------------------- | ----------------------------------- |
-| --template              | minimal, api, agent | Starter template                    |
-| --cloud                 | aws, none           | Cloud provider                      |
-| --deploy                | pulumi, none        | Deployment adapter                  |
-| --directory             | string              | Destination directory               |
-| --install               | boolean             | Install generated project setup     |
-| --no-install            | boolean             | No install generated project setup  |
-| --git                   | boolean             | Git generated project setup         |
-| --no-git                | boolean             | No git generated project setup      |
-| --examples              | boolean             | Examples generated project setup    |
-| --no-examples           | boolean             | No examples generated project setup |
-| --force-empty-directory | boolean             | Allow an existing empty destination |
+| Option                  | Value                          | Description                         |
+| ----------------------- | ------------------------------ | ----------------------------------- |
+| --template              | minimal, api, agent, fullstack | Starter template                    |
+| --cloud                 | aws, none                      | Cloud provider                      |
+| --deploy                | pulumi, none                   | Deployment adapter                  |
+| --directory             | string                         | Destination directory               |
+| --install               | boolean                        | Install generated project setup     |
+| --no-install            | boolean                        | No install generated project setup  |
+| --git                   | boolean                        | Git generated project setup         |
+| --no-git                | boolean                        | No git generated project setup      |
+| --examples              | boolean                        | Examples generated project setup    |
+| --no-examples           | boolean                        | No examples generated project setup |
+| --force-empty-directory | boolean                        | Allow an existing empty destination |
 
 #### Examples
 
@@ -272,18 +272,16 @@ Create an agent with a model, tools, and instructions
 | -------- | -------- | ----------- |
 | name     | optional | Agent name  |
 
-| Option           | Value             | Description                                                                                      |
-| ---------------- | ----------------- | ------------------------------------------------------------------------------------------------ |
-| --project-root   | string            | Application directory (defaults to cwd)                                                          |
-| --service        | string            | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
-| --create-service | string            | Create and use a new generic service for a domain artifact or service route                      |
-| --no-install     | boolean           | Do not install newly required packages                                                           |
-| --model          | string            | Model selector such as openai:gpt-5-mini                                                         |
-| --tool           | string            | Tool ID, binding, or filename; repeatable                                                        |
-| --prompt         | string            | Service prompt ID, binding, or filename; exclusive with --instructions                           |
-| --instructions   | string            | Inline instructions; exactly one of --prompt or --instructions is required                       |
-| --model-provider | openai, anthropic | Provider for a new model profile; requires --model-id                                            |
-| --model-id       | string            | Default model ID for a new profile; requires --model-provider                                    |
+| Option           | Value   | Description                                                                                      |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string  | Application directory (defaults to cwd)                                                          |
+| --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean | Do not install newly required packages                                                           |
+| --model          | string  | Existing native model profile; omitted uses an offline model                                     |
+| --tool           | string  | Tool ID, binding, or filename; repeatable                                                        |
+| --prompt         | string  | Service prompt ID, binding, or filename; exclusive with --instructions                           |
+| --instructions   | string  | Inline instructions; exactly one of --prompt or --instructions is required                       |
 
 ##### Examples
 
@@ -528,10 +526,10 @@ Inspect value-free environment contracts
 
 Validate environment values
 
-| Option                | Value  | Description                                                             |
-| --------------------- | ------ | ----------------------------------------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd)                                 |
-| --environment / --env | string | Provider environment, including value-free model-provider configuration |
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
 
 ##### Examples
 
@@ -541,10 +539,10 @@ Validate environment values
 
 List environment value status
 
-| Option                | Value  | Description                                                             |
-| --------------------- | ------ | ----------------------------------------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd)                                 |
-| --environment / --env | string | Provider environment, including value-free model-provider configuration |
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
 
 ##### Examples
 
@@ -558,10 +556,10 @@ Explain one environment variable
 | -------- | -------- | ------------------------- |
 | name     | required | Environment variable name |
 
-| Option                | Value  | Description                                                             |
-| --------------------- | ------ | ----------------------------------------------------------------------- |
-| --project-root        | string | Application directory (defaults to cwd)                                 |
-| --environment / --env | string | Provider environment, including value-free model-provider configuration |
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
 
 ##### Examples
 
@@ -571,12 +569,12 @@ Explain one environment variable
 
 Render or write a safe .env example
 
-| Option                | Value   | Description                                                             |
-| --------------------- | ------- | ----------------------------------------------------------------------- |
-| --project-root        | string  | Application directory (defaults to cwd)                                 |
-| --environment / --env | string  | Provider environment, including value-free model-provider configuration |
-| --path / --file       | string  | Output path                                                             |
-| --write               | boolean | Write the rendered example                                              |
+| Option                | Value   | Description                             |
+| --------------------- | ------- | --------------------------------------- |
+| --project-root        | string  | Application directory (defaults to cwd) |
+| --environment / --env | string  | Provider environment configuration      |
+| --path / --file       | string  | Output path                             |
+| --write               | boolean | Write the rendered example              |
 
 ##### Examples
 
@@ -790,3 +788,19 @@ Pull a versioned client contract
 ##### Examples
 
 `relkit client pull` — Pull a versioned client contract
+
+#### `relkit client check <baseUrl> --out <directory>`
+
+Check a pulled client for contract drift
+
+| Argument | Value    | Description                    |
+| -------- | -------- | ------------------------------ |
+| baseUrl  | required | Running RELKIT application URL |
+
+| Option | Value  | Description      |
+| ------ | ------ | ---------------- |
+| --out  | string | Output directory |
+
+##### Examples
+
+`relkit client check` — Check a pulled client for contract drift

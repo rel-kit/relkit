@@ -4,7 +4,7 @@ description: Choose the standalone adapters, local runtimes, exporters, hosts, a
 ---
 
 RELKIT keeps product code separate from physical infrastructure. Services, functions, routes, and events
-depend on checked capability contracts; integrations connect those contracts to Redis, S3, model providers,
+depend on checked capability contracts; integrations connect those contracts to Redis, S3,
 telemetry exporters, local Docker services, and deployment platforms.
 
 ## Choose packages by role
@@ -13,7 +13,6 @@ telemetry exporters, local Docker services, and deployment platforms.
 | -------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
 | `@relkit/redis`      | Redis cache adapter and pinned local recipe                    | [Caching](/docs/caching)                                    |
 | `@relkit/s3`         | S3-compatible bucket adapter and pinned MinIO recipe           | [Storage](/docs/storage)                                    |
-| `@relkit/ai-sdk`     | AI SDK model runtime                                           | [AI](/docs/ai)                                              |
 | `@relkit/sentry`     | Error telemetry exporter                                       | [Observability](/docs/operations/observability)             |
 | `@relkit/otlp`       | OTLP trace exporter                                            | [Observability](/docs/operations/observability)             |
 | `@relkit/docker`     | Local-recipe selector and Docker materializer                  | [Local Docker](/docs/integrations/local-docker)             |
@@ -35,7 +34,8 @@ subpaths. Its root intentionally exports nothing:
   ../../apps/docs/examples/landing/catalog.ts
 </include>
 
-Both import styles describe the same adapter identities. Do not install a standalone package and its catalog
+Native LangChain model packages are installed directly by the application rather than through a RelKit
+integration adapter. Both supported integration import styles describe the same adapter identities. Do not install a standalone package and its catalog
 subpath for the same role in one app.
 
 ## Understand ownership
