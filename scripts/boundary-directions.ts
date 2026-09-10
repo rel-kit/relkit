@@ -18,9 +18,11 @@ const coreProtocols = new Set([
   "@relkit/local-service",
   "@relkit/observability",
   "@relkit/provider",
+  "@relkit/realtime",
 ]);
 const integrationImplementations = new Map([
   ["@relkit/local", new Set(["@relkit/providers-local"])],
+  ["@relkit/redis", new Set(["@relkit/providers-local"])],
 ]);
 
 export function integrationPackageNames(scopes: readonly Scope[]): Set<string> {

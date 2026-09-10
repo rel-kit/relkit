@@ -16,7 +16,7 @@ const vendorProfile =
 const vendorModel =
   /^(?:gpt(?:[-./_].*)?|claude(?:[-./_].*)?|gemini(?:[-./_].*)?|llama(?:[-./_].*)?|mistral(?:[-./_].*)?|command(?:[-./_].*)?|o[134](?:[-./_].*)?)$/i;
 const agentProviderProperty =
-  /^(?:api[-_]?key|access[-_]?key|client|credential(?:s)?|endpoint|model(?:id|name)|provider|sdk|secret(?:key)?|token)$/i;
+  /^(?:api[-_]?key|access[-_]?key|credential(?:s)?|endpoint|model(?:id|name)|provider|sdk|secret(?:key)?|token)$/i;
 const forbiddenSymbols =
   /\b(?:Effect|Layer|Context\.Tag|Schema\.Schema|Fiber|Cause|Hono|Next(?:JS|\.js)?|Pulumi|(?:S3|DynamoDB|Redis|CloudWatch|EventBridge|SQS|ECS|RDS)Client|ProviderClient|CloudClient)\b/g;
 const valueReads =
@@ -45,7 +45,7 @@ function scanCall(
       const key = propertyName(member.name);
       if (
         key === "handler" &&
-        !["defineFunction", "defineEventFunction", "defineRoute"].includes(shortName)
+        !/^(?:defineEventFunction|defineFunction|defineGraphNode|defineRoute)$/.test(shortName)
       )
         add(
           root,

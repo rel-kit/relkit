@@ -1,5 +1,6 @@
 import { access, readFile, readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
+import { scanGeneratedSource } from "./scaffold-smoke-source.js";
 export type Manifest = {
   name: string;
   version: string;
@@ -38,7 +39,7 @@ export async function snapshotProject(root: string, current = root): Promise<Sna
   for (const entry of (await readdir(current, { withFileTypes: true })).sort((a, b) =>
     a.name.localeCompare(b.name),
   )) {
-    if (["node_modules", ".git"].includes(entry.name)) continue;
+    if (["node_modules", ".git", ".next"].includes(entry.name)) continue;
     const path = join(current, entry.name);
     if (entry.isDirectory()) Object.assign(result, await snapshotProject(root, path));
     else if (entry.isFile()) {
@@ -54,30 +55,6 @@ export async function snapshotProject(root: string, current = root): Promise<Sna
     }
   }
   return result;
-}
-async function sourceScan(root: string): Promise<void> {
-  const bad =
-    "effect hono next @pulumi/ @aws-sdk/ @relkit/compiler @relkit/engine @relkit/graph " +
-    "@relkit/runtime-effect @relkit/runtime-hono @relkit/supervisor";
-  const pattern = new RegExp(`(?:from|import)\\s*["'](?:${bad.split(" ").join("|")})`);
-  const scan = async (directory: string): Promise<string[]> => {
-    const result: string[] = [];
-    for (const entry of await readdir(directory, { withFileTypes: true })) {
-      if (["node_modules", ".git", ".relkit"].includes(entry.name)) continue;
-      const path = join(directory, entry.name);
-      if (entry.isDirectory()) result.push(...(await scan(path)));
-      else if (
-        entry.isFile() &&
-        /\.(?:ts|tsx|js|jsx)$/.test(entry.name) &&
-        pattern.test(await readFile(path, "utf8"))
-      )
-        result.push(relative(root, path));
-    }
-    return result;
-  };
-  const violations = await scan(root);
-  if (violations.length > 0)
-    throw new Error(`Generated source scan failed:\n${violations.join("\n")}`);
 }
 async function freePort(): Promise<number> {
   const server = Bun.serve({ port: 0, fetch: () => new Response() });
@@ -96,14 +73,21 @@ async function waitFor(check: () => Promise<boolean>): Promise<void> {
   }
   throw new Error("Timed out waiting for the generated development server.");
 }
-async function devSmoke(root: string, exercise?: (port: number) => Promise<void>): Promise<void> {
+async function devSmokeAttempt(
+  root: string,
+  exercise?: (port: number) => Promise<void>,
+): Promise<void> {
   const port = await freePort();
   const inspector = await freePort();
+  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
+    readonly scripts?: Readonly<Record<string, string>>;
+  };
+  const devScript = manifest.scripts?.["dev:api"] === undefined ? "dev" : "dev:api";
   const child = Bun.spawn(
     [
       process.execPath,
       "run",
-      "dev",
+      devScript,
       "--",
       "--project-root",
       root,
@@ -169,6 +153,15 @@ async function devSmoke(root: string, exercise?: (port: number) => Promise<void>
     await probe.stop(true);
   }
 }
+async function devSmoke(root: string, exercise?: (port: number) => Promise<void>): Promise<void> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await devSmokeAttempt(root, exercise);
+    } catch (error) {
+      if (attempt === 2 || !String(error).match(/already in use|EADDRINUSE/)) throw error;
+    }
+  }
+}
 export async function verifyProject(
   root: string,
   registry: string,
@@ -195,5 +188,5 @@ export async function verifyProject(
   );
   for (const script of ["check", "typecheck"]) await runCommand(["run", script], root);
   for (let run = 0; run < (exercise ? 2 : 1); run++) await devSmoke(root, exercise);
-  await sourceScan(root);
+  await scanGeneratedSource(root);
 }

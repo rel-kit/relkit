@@ -39,6 +39,7 @@ export const publicApplicationPackages = new Set([
   "@relkit/functions",
   "@relkit/integrations",
   "@relkit/jobs",
+  "@relkit/realtime",
   "@relkit/routes",
   "@relkit/schema",
   "@relkit/services",

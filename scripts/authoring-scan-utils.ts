@@ -21,6 +21,7 @@ export function authoringFragments(root: string): Fragment[] {
   }
   const fixtureRoot = resolve(root, "examples/commerce");
   for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: fixtureRoot, onlyFiles: true })) {
+    if (path.startsWith("tests/")) continue;
     const file = resolve(fixtureRoot, path);
     const text = readFileSync(file, "utf8");
     result.push({ path: file, text, fullText: text, offset: 0 });
