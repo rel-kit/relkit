@@ -1,4 +1,6 @@
 export * from "./model.js";
+export * from "./agent-client-contract.js";
+export * from "./agent-node.js";
 export * from "./graph-types.js";
 export * from "./foundation-nodes.js";
 export * from "./provider-nodes.js";

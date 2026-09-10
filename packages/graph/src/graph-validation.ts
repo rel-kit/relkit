@@ -45,6 +45,9 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   if (value.kind === "agent") {
     validateIds(value.toolIds, `Graph nodes[${index}].toolIds`);
     validateGenerated(value.generatedFunction, index, "generatedFunction");
+    if (value.backendBucketId !== undefined) {
+      validateId(value.backendBucketId, `Graph nodes[${index}].backendBucketId`);
+    }
   }
   if (value.kind === "trigger" && value.triggerType === "http") {
     validateHttpIdentities(value.config, index);
