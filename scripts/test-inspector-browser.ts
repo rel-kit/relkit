@@ -170,7 +170,9 @@ async function run(...args: string[]): Promise<string> {
     new Response(child.stderr).text(),
   ]);
   if (code !== 0)
-    throw new Error(error.trim() || output.trim() || `agent-browser ${args[0]} failed`);
+    throw new Error(
+      `agent-browser ${args.join(" ")}: ${error.trim() || output.trim() || "failed"}`,
+    );
   return output;
 }
 function snapshot(): Promise<string> {
