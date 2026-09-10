@@ -6,7 +6,6 @@ const providerProperties = new Set([
   "api_key",
   "accessKey",
   "access_key",
-  "client",
   "credential",
   "credentials",
   "endpoint",

@@ -2,11 +2,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  exerciseScaffoldRoutes,
-  verifyScaffoldBuild,
-  verifyMissingModelKey,
-} from "./scaffold-smoke-workflows.js";
+import { exerciseScaffoldRoutes, verifyScaffoldBuild } from "./scaffold-smoke-workflows.js";
 import { verifyInteractiveResolver, verifyScaffoldTerminal } from "./scaffold-smoke-terminal.js";
 import {
   runCommand,
@@ -19,6 +15,7 @@ import {
   readManifests,
   startRegistry,
 } from "./pack-and-smoke-create-relkit-pack.js";
+import { releaseTemplates } from "./release-templates.js";
 
 async function main(): Promise<void> {
   const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -43,10 +40,8 @@ async function main(): Promise<void> {
     process.env.PORT = String(await allocatePort());
     process.env.RELKIT_INSPECTOR_PORT = String(await allocatePort());
     Object.assign(process.env, {
-      ANTHROPIC_API_KEY: "relkit-smoke-anthropic",
       EVENT_BUS_NAME: "relkit-smoke",
       EVENT_ENDPOINT: "http://127.0.0.1:4566",
-      OPENAI_API_KEY: "relkit-smoke-openai",
     });
     server = await startRegistry(temporary, tarballs, manifests);
     const registry = `http://127.0.0.1:${server.port!}`;
@@ -71,7 +66,8 @@ async function main(): Promise<void> {
     const createBin = join(temporary, "node_modules/.bin/create-relkit");
     const relkitBin = join(temporary, "node_modules/.bin/relkit");
     await verifyInteractiveResolver(temporary);
-    for (const template of ["minimal", "api", "agent"] as const) {
+    for (const template of releaseTemplates) {
+      const generationCache = (name: string) => join(cacheDir, `${template}-${name}`);
       const base = [
         "--template",
         template,
@@ -91,7 +87,7 @@ async function main(): Promise<void> {
             [createBin, ...args(`${template}-tarball-project`)],
             temporary,
             registry,
-            cacheDir,
+            generationCache("direct"),
           )
         )
           .trim()
@@ -103,7 +99,7 @@ async function main(): Promise<void> {
           [relkitBin, "create", ...args(`${template}-cli-project`)],
           temporary,
           registry,
-          cacheDir,
+          generationCache("cli"),
         ),
       ) as { destination: string };
       if (
@@ -128,8 +124,6 @@ async function main(): Promise<void> {
         try {
           if (process.env.RELKIT_TEST_DOCKER === "1") await verifyScaffoldTerminal(root, relkitBin);
           await verifyScaffoldBuild(root);
-          if (template === "minimal" && root === direct.destination)
-            await verifyMissingModelKey(root, relkitBin);
           await verifyProject(root, registry, cacheDir, (port) =>
             exerciseScaffoldRoutes(root, port, relkitBin),
           );
@@ -144,7 +138,7 @@ async function main(): Promise<void> {
             [createBin, ...args(`${template}-second-project`)],
             temporary,
             registry,
-            cacheDir,
+            generationCache("second"),
           )
         )
           .trim()

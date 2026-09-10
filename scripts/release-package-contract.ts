@@ -5,6 +5,7 @@ const appSubpaths = [
   "routes",
   "functions",
   "events",
+  "realtime",
   "agents",
   "jobs",
   "cache",
@@ -14,7 +15,6 @@ const appSubpaths = [
 ] as const;
 
 const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
-  "@relkit/ai-sdk": ["runtime"],
   "@relkit/aws": ["host", "infrastructure", "access"],
   "@relkit/cloudflare": ["runtime"],
   "@relkit/docker": ["runtime"],
@@ -32,7 +32,6 @@ const catalogSubpaths = [
   "docker",
   "local",
   "cloudflare",
-  "ai-sdk",
   "sentry",
   "otlp",
   "aws",
@@ -113,6 +112,44 @@ export function expectedExports(
       "./tanstack-query": {
         types: "./dist/tanstack-query.d.ts",
         import: "./dist/tanstack-query.js",
+      },
+      "./react": {
+        types: "./dist/react/index.d.ts",
+        import: "./dist/react/index.js",
+      },
+      "./build/next": {
+        types: "./dist/build/next.d.ts",
+        import: "./dist/build/next.js",
+        default: "./dist/build/next.js",
+      },
+      "./build/vite": {
+        types: "./dist/build/vite.d.ts",
+        import: "./dist/build/vite.js",
+        default: "./dist/build/vite.js",
+      },
+    };
+  if (directoryName === "better-auth")
+    return {
+      ".": rootExport,
+      "./react": {
+        types: "./dist/react.d.ts",
+        import: "./dist/react.js",
+      },
+    };
+  if (directoryName === "realtime")
+    return {
+      ".": rootExport,
+      "./operation-id": {
+        types: "./dist/operation-id.d.ts",
+        import: "./dist/operation-id.js",
+      },
+    };
+  if (directoryName === "runtime-hono")
+    return {
+      ".": rootExport,
+      "./bun": {
+        types: "./dist/bun.d.ts",
+        import: "./dist/bun.js",
       },
     };
   if (directoryName === "observability")
