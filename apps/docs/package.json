@@ -39,6 +39,7 @@
     "@relkit/integrations": "workspace:*",
     "@relkit/otlp": "workspace:*",
     "@relkit/pulumi": "workspace:*",
+    "@relkit/realtime": "workspace:*",
     "@relkit/redis": "workspace:*",
     "@relkit/s3": "workspace:*",
     "@relkit/sentry": "workspace:*",

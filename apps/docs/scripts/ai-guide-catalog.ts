@@ -4,7 +4,19 @@ export const aiGuideGroup = {
   directory: "ai",
   title: "AI",
   icon: "Bot",
-  pages: ["index", "agents", "tools", "function-tools", "mcp", "approvals", "first-agent"],
+  pages: [
+    "index",
+    "agents",
+    "native-runtime",
+    "graphs-persistence",
+    "streaming",
+    "threads-recovery",
+    "approvals",
+    "tools",
+    "function-tools",
+    "mcp",
+    "first-agent",
+  ],
 } as const;
 
 export const aiGuideRelations = aiGuideGroup.pages.map((page) => ({
