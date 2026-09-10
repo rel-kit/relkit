@@ -1,5 +1,17 @@
 {
   "title": "AI",
   "icon": "Bot",
-  "pages": ["index", "agents", "tools", "function-tools", "mcp", "approvals", "first-agent"]
+  "pages": [
+    "index",
+    "agents",
+    "native-runtime",
+    "graphs-persistence",
+    "streaming",
+    "threads-recovery",
+    "approvals",
+    "tools",
+    "function-tools",
+    "mcp",
+    "first-agent"
+  ]
 }

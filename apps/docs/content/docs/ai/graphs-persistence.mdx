@@ -1,0 +1,80 @@
+---
+title: LangGraph, persistence, and resume
+description: Define typed graph control flow, configure native checkpoint and memory drivers, and resume the same durable thread safely.
+---
+
+Use `defineGraph` when the workflow's nodes and routes are application logic rather than model choices.
+RelKit registers the declared topology and compiles a native LangGraph while preserving native reducers,
+parallel scheduling, conditional edges, loops, `Send`, subgraphs, retry behavior, and pending writes.
+
+## Define state and control flow
+
+The commerce review graph runs two branches, joins them, loops once, interrupts for a boolean, and returns
+only its selected output:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-review.agent.ts"'>
+  ../../examples/commerce/src/orders/agents/order-review.agent.ts
+</include>
+
+`StateSchema` owns native state and reducer behavior. A `defineGraphNode` input schema projects the fields
+that node can read; its output validates an object partial update. Declare every possible `Command`
+destination in `ends`. The edge builder accepts only registered node IDs plus valid `START` and `END`
+sentinels, so stale destinations fail type checking and compilation.
+
+`interrupt()` is graph control flow, not a normal function failure. The review node declares
+`resume: z.boolean()`, then returns a native `Command` that applies the validated reply and routes to
+`finish`. A resumed node starts again according to LangGraph semantics. Put the interrupt before an
+irreversible effect, or make that effect idempotent with a durable business key or application-owned
+transaction.
+
+## Declare checkpoint and memory resources
+
+Checkpoint history and long-term memory are separate resources:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/agents/order-agent-persistence.ts"'
+>
+  ../../examples/commerce/src/orders/agents/order-agent-persistence.ts
+</include>
+
+`defineCheckpointerDb` accepts a native `BaseCheckpointSaver`; `defineMemoryDb` accepts a native
+`BaseStore`. The tested driver cohort is:
+
+| Resource     | Supported native implementations                                                                                                   |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Checkpointer | `MemorySaver`, SQLite `1.0.4`, PostgreSQL `1.0.5`, MongoDB `1.4.1`, Redis and shallow Redis `1.0.11`, or a compatible custom saver |
+| Memory store | `InMemoryStore`, PostgreSQL `1.0.5`, MongoDB `1.4.1`, Redis `1.0.11`, or a compatible custom store                                 |
+
+Driver-specific retention, TTL, serialization, shallow-history, and semantic-search capabilities remain
+native. RelKit does not flatten them into options that every driver supposedly supports.
+
+## Initialize and own resources explicitly
+
+RelKit never calls driver `.setup()`, runs migrations, creates tables or indexes, installs extensions, or
+pushes an application schema during compilation, inspection, activation, or an ordinary request. Perform
+the driver's documented initialization as an explicit application or infrastructure step before starting
+workers.
+
+A supplied instance is borrowed by default and is never closed by RelKit. A factory is owned by default;
+owned resources require a `dispose` callback and are released once. Set `ownership` explicitly when the
+default does not match the real lifecycle.
+
+Prefer a dedicated AI database. Sharing a physical database requires a compatible underlying client,
+isolated tables or schemas, a restricted role, and migration filters that keep checkpoint/store objects out
+of the application Drizzle lifecycle. A RelKit Redis cache provider is not a Redis saver or store.
+
+## Resume the same business thread
+
+Every initial run, observation, stop, steering operation, follow-up, approval, and continuation supplies a
+caller-owned `threadId`. RelKit never derives one from input, remembers an implicit current thread, or
+generates a fallback. Internal run, task, attempt, and operation IDs are separate.
+
+After the graph persists its checkpoint and waiting contract, submit the exact declared reply on the same
+thread with `{ resume: true }`. A boolean wait rejects text such as `"yes"`; RelKit does not interpret it.
+The runtime binds the continuation to the waiting revision, scope, action, policy, and response schema,
+deduplicates an accepted receipt, and fences competing workers.
+
+See [Threads and recovery](/docs/ai/threads-recovery) for restart and external-effect safety, and
+[Agent streaming](/docs/ai/streaming) for the public event sequence.

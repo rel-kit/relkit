@@ -5,7 +5,8 @@ description: Require a trusted decision before a tool performs a sensitive actio
 
 Use approvals when a tool can do something the user should confirm, such as cancel an order or send a message. The model may propose the action; it must not approve itself.
 
-AI SDK documents a separate [needsApproval flow](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#tool-execution-approval). `needsApproval` is not a RelKit tool option; use the policies and invocation callbacks below.
+Native LangChain middleware and tools may interrupt execution, but they do not replace RelKit's tool
+policy. Use the policies and trusted invocation decisions below for function-backed tools.
 
 ## Choose a policy
 
@@ -75,8 +76,11 @@ These unit-test examples show every supported decision value. The unconditional 
 
 A missing callback on an approval-required call fails with `RELKIT_APPROVAL_REQUIRED`; a denied decision fails with `RELKIT_APPROVAL_DENIED`. A callback that throws also stops execution. A callback is not called when the policy does not require approval.
 
-## Agent and MCP limitations
+## Agent and MCP behavior
 
-The standard `context.agents` call does not currently accept a custom approval callback or offer a built-in confirmation-and-resume flow. Do not expect adding an approval policy to a tool to create that flow for an agent. The [agent test helper](/docs/api/testing) can supply scripted approvals for tests.
+A client-exposed agent that declares the `approve` control publishes approval waiting state through its
+durable thread. The typed hook exposes `approve(approvalId, { threadId })` and
+`deny(approvalId, { threadId })`; the caller must use the same authorized business thread. The
+[agent test helper](/docs/api/testing) can supply scripted approvals for deterministic tests.
 
 Over [MCP](/docs/ai/mcp#protect-access), approval-required calls are currently rejected; there is no MCP approval-and-resume flow. Keep these tools out of MCP with `mcp: false` if clients cannot use them.
