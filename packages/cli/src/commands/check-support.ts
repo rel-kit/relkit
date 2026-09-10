@@ -51,6 +51,8 @@ export function emptyCheckOutputs(diagnostics: readonly Diagnostic[]): Generated
     client: "",
     contract: "",
     clientContract: "",
+    clientRegistry: "",
+    clientManifest: "",
   };
 }
 
