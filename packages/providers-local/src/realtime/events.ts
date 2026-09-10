@@ -17,7 +17,6 @@ import {
   scopeGap,
 } from "./common.js";
 import type { RealtimeStateStore } from "./storage.js";
-
 export function appendEvent(
   store: RealtimeStateStore,
   request: AppendChannelEvent,
@@ -123,7 +122,6 @@ export function appendEvent(
     };
   });
 }
-
 export async function lookupEventReceipt(
   store: RealtimeStateStore,
   request: LookupAppendReceipt,
@@ -148,7 +146,6 @@ export async function lookupEventReceipt(
     ? { status: "expired", expiredAt: found.expiresAt }
     : { status: "found", receipt: found.receipt };
 }
-
 export async function readEvents(
   store: RealtimeStateStore,
   request: ReadChannelEvents,
