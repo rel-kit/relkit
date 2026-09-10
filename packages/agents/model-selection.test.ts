@@ -29,7 +29,7 @@ describe("serializable agent model selection", () => {
     });
   });
 
-  test("keeps descriptors value-free and model optional", () => {
+  test("keeps model selection optional and accepts native models", () => {
     const omitted = defineAgent({
       id: "support.omitted",
       input: z.string(),
@@ -50,17 +50,18 @@ describe("serializable agent model selection", () => {
     expect(Object.hasOwn(omitted, "model")).toBe(false);
     expect(selected.model).toBe("openai:gpt-4.1");
     expect(isAgentDescriptor(omitted)).toBe(true);
-    expect(() =>
-      defineAgent({
-        id: "support.live",
-        input: z.string(),
-        output: z.string(),
-        model: { modelId: "live" } as never,
-        instructions: "Answer safely.",
-        tools: [],
-        limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
-      }),
-    ).toThrow("serializable text");
+    const native = { invoke: async () => ({ content: "ok" }) };
+    const direct = defineAgent({
+      id: "support.live",
+      input: z.string(),
+      output: z.string(),
+      model: native,
+      instructions: "Answer safely.",
+      tools: [],
+      limits: { maxSteps: 1, maxToolCalls: 1, timeoutMs: 1_000 },
+    });
+    expect(direct.model).toBe(native);
+    expect(Object.isFrozen(native)).toBe(false);
   });
 
   test("fails safely for unknown and incomplete provider defaults", () => {
