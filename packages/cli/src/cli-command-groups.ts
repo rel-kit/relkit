@@ -11,6 +11,7 @@ import {
 } from "./cli-command-shared.js";
 import { deployCommand } from "./cli-command-deploy.js";
 import { localCommand } from "./cli-command-local.js";
+import { clientCommand } from "./cli-command-client.js";
 
 export function groupCommands(select: SelectInvocation) {
   return [
@@ -20,25 +21,6 @@ export function groupCommands(select: SelectInvocation) {
     clientCommand(select),
     localCommand(select),
   ] as const;
-}
-
-function clientCommand(select: SelectInvocation) {
-  const path = ["client", "pull"] as const;
-  const pull = document(
-    Command.make(
-      "pull",
-      {
-        baseUrl: stringArgument(path, "baseUrl"),
-        out: optionalString(path, "out"),
-      },
-      (value) =>
-        Effect.sync(() =>
-          select("client", ["pull", value.baseUrl, ...optionArgs("out", value.out)]),
-        ),
-    ),
-    path,
-  );
-  return document(Command.make("client").pipe(Command.withSubcommands([pull])), ["client"]);
 }
 
 function graphCommand(select: SelectInvocation) {
