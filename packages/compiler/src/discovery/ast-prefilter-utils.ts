@@ -19,6 +19,8 @@ const KNOWN_FACTORIES = new Set([
   "defineCache",
   "defineTool",
   "defineAgent",
+  "defineGraph",
+  "defineChannel",
   "defineTransform",
   "defineRequestTransform",
   "defineMiddleware",

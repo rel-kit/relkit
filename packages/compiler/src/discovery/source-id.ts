@@ -43,6 +43,7 @@ const KIND_RULES: Readonly<
   cache: { category: "cache", suffixes: ["cache"] },
   tool: { category: "tools", suffixes: ["tool"] },
   agent: { category: "agents", suffixes: ["agent"] },
+  channel: { category: "channels", suffixes: ["channel"] },
   constants: { category: "constants", suffixes: ["constants"] },
   prompt: { category: "prompts", suffixes: ["prompt"] },
   error: { category: "errors", suffixes: ["error"] },

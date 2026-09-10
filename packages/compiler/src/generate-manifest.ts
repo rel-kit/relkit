@@ -78,6 +78,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const middleware = descriptorsOf(input.middleware ?? input.descriptors, "middleware");
   const transforms = descriptorsOf(input.transforms ?? input.descriptors, "transform");
   const agents = descriptorsOf(input.descriptors, "agent");
+  const channels = descriptorsOf(input.descriptors, "channel");
   const tools = descriptorsOf(input.descriptors, "tool");
   const routes = descriptorsOf(input.descriptors, "route");
   const constants = descriptorsOf(input.descriptors, "constants");
@@ -90,6 +91,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     ...agents,
     ...tools,
     ...events,
+    ...channels,
   ]);
   const bindings = importBindings(modules);
   const identityBindings = identityBindingStatements(input.descriptors, bindings, input);
@@ -103,6 +105,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const targetExpressions = functionTargetExpressionsFor(functions, bindings, input);
   const applicationExpression = applicationExpressionFor(application, bindings, input);
   const agentExpressions = descriptorExpressionsFor(agents, bindings, input);
+  const channelExpressions = descriptorExpressionsFor(channels, bindings, input);
   const toolExpressions = descriptorExpressionsFor(tools, bindings, input);
   const routeExpressions = descriptorExpressionsFor(routes, bindings, input);
   const constantExpressions = descriptorExpressionsFor(constants, bindings, input);
@@ -132,6 +135,7 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       transformExpressions,
       applicationExpression,
       agentExpressions,
+      channelExpressions,
       toolExpressions,
       routeExpressions,
       constantExpressions,
