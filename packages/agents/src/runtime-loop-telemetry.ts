@@ -1,71 +1,60 @@
-import type {
-  GenerateTextStepEndEvent,
-  GenerateTextStepStartEvent,
-  ToolExecutionEndEvent,
-  ToolExecutionStartEvent,
-} from "ai";
+import type { ProtocolEvent } from "@langchain/langgraph";
 import { frameworkTrace } from "@relkit/invocation";
-import { emitAgentEdge, type AgentCapturePolicy } from "./observability.js";
-import { findTool } from "./runtime-tools.js";
+import { relkitToolRefs } from "./define-agent-native.js";
+import { emitAgentEdge } from "./observability.js";
 import type { AgentRuntimeOptions } from "./runtime.js";
+import { findModelTool } from "./runtime-tools.js";
 
-export function createLoopTelemetry(options: {
-  readonly runtime: AgentRuntimeOptions;
-  readonly input: unknown;
-  readonly instructions: string;
-  readonly modelId: string;
-  readonly invocationId: string;
-  readonly traceId: string;
-  readonly capture: AgentCapturePolicy;
-  readonly signal: AbortSignal;
-}) {
-  const runtime = options.runtime;
-  const hooks = runtime.hooks;
-  return {
-    close: () => undefined,
-    onStepStart: (event: GenerateTextStepStartEvent) => {
-      frameworkTrace.event("agent.model.step.started", {
-        "relkit.agent.step": event.stepNumber + 1,
-      });
-      emitAgentEdge(hooks, {
-        relationship: "uses-provider-profile",
-        from: runtime.agent.id,
-        to: options.modelId,
-      });
-    },
-    onToolExecutionStart: (event: ToolExecutionStartEvent) => {
-      const descriptor = findTool(runtime.tools, event.toolCall.toolName);
-      frameworkTrace.event("agent.tool.started", {
-        "relkit.tool.id": event.toolCall.toolName,
-        "relkit.tool.call.id": event.toolCall.toolCallId,
-      });
-      if (
-        descriptor !== undefined &&
-        runtime.agent.tools.some((entry) => entry.ref.id === descriptor.id)
-      ) {
-        emitAgentEdge(hooks, {
-          relationship: "uses-tool",
+export function createLoopTelemetry(runtime: AgentRuntimeOptions, modelId: string) {
+  let step = 0;
+  return (event: ProtocolEvent): void => {
+    if (event.method === "tasks" && isRecord(event.params.data)) {
+      const data = event.params.data;
+      if (data.name === "model_request" && !("result" in data)) {
+        step += 1;
+        frameworkTrace.event("agent.model.step.started", { "relkit.agent.step": step });
+        emitAgentEdge(runtime.hooks, {
+          relationship: "uses-provider-profile",
           from: runtime.agent.id,
-          to: descriptor.id,
+          to: modelId,
         });
-        emitAgentEdge(hooks, {
-          relationship: "targets-function",
-          from: descriptor.id,
-          to: descriptor.target.ref.id,
-        });
+      } else if (data.name === "model_request" && "result" in data) {
+        frameworkTrace.event("agent.model.step.completed", { "relkit.agent.step": step });
       }
-    },
-    onToolExecutionEnd: (event: ToolExecutionEndEvent) => {
-      frameworkTrace.event("agent.tool.completed", {
-        "relkit.tool.id": event.toolCall.toolName,
-        "relkit.tool.call.id": event.toolCall.toolCallId,
-        "relkit.tool.failed": event.toolOutput.type === "tool-error",
+      return;
+    }
+    if (event.method !== "tools" || !isRecord(event.params.data)) return;
+    const data = event.params.data;
+    const name = typeof data.tool_name === "string" ? data.tool_name : "unknown";
+    const callId = typeof data.tool_call_id === "string" ? data.tool_call_id : "unknown";
+    const refs = relkitToolRefs(runtime.agent.tools);
+    const descriptor = findModelTool(runtime.tools, refs, name);
+    if (data.event === "tool-started") {
+      frameworkTrace.event("agent.tool.started", {
+        "relkit.tool.id": descriptor?.id ?? name,
+        "relkit.tool.call.id": callId,
       });
-    },
-    onStepEnd: (event: GenerateTextStepEndEvent) =>
-      frameworkTrace.event("agent.model.step.completed", {
-        "relkit.agent.step": event.stepNumber + 1,
-        "relkit.agent.finish_reason": event.finishReason,
-      }),
+      if (descriptor === undefined) return;
+      emitAgentEdge(runtime.hooks, {
+        relationship: "uses-tool",
+        from: runtime.agent.id,
+        to: descriptor.id,
+      });
+      emitAgentEdge(runtime.hooks, {
+        relationship: "targets-function",
+        from: descriptor.id,
+        to: descriptor.target.ref.id,
+      });
+    } else if (data.event === "tool-finished" || data.event === "tool-error") {
+      frameworkTrace.event("agent.tool.completed", {
+        "relkit.tool.id": descriptor?.id ?? name,
+        "relkit.tool.call.id": callId,
+        "relkit.tool.failed": data.event === "tool-error",
+      });
+    }
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
