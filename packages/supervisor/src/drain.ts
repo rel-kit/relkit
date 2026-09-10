@@ -14,7 +14,7 @@ import {
 } from "./drain-types.js";
 export * from "./drain-types.js";
 export { drainPreviousGeneration } from "./drain-state.js";
-export const DEFAULT_SUPERVISOR_DRAIN_TIMEOUT_MS = 1_000;
+export const DEFAULT_SUPERVISOR_DRAIN_TIMEOUT_MS = 60_000;
 interface TrackedWork {
   readonly controller: AbortController;
   readonly interrupt: SupervisorDrainWorkOptions["interrupt"];
