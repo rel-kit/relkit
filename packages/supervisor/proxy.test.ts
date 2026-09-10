@@ -128,3 +128,57 @@ test("drain leases abort old proxy work and reject retired traffic", async () =>
   await expect(oldRequest).rejects.toThrow();
   expect((await proxy.handle(new Request("http://stable.local/new"))).status).toBe(503);
 });
+
+test("WebSocket tunnels remain pinned to the generation selected at upgrade", async () => {
+  const old = echoServer("old");
+  const next = echoServer("new");
+  const proxy = createSupervisorProxy({ port: 0 });
+  try {
+    await proxy.listen();
+    const first = { sourceToken: 1, generationToken: 1 } as const;
+    const second = { sourceToken: 2, generationToken: 2 } as const;
+    expect(proxy.compareAndSwitch(undefined, { token: first, port: old.port })).toBe(true);
+    const oldSocket = await connectSocket(proxy.port);
+    expect(await roundTrip(oldSocket, "one")).toBe("old:one");
+    expect(proxy.compareAndSwitch(first, { token: second, port: next.port })).toBe(true);
+    const nextSocket = await connectSocket(proxy.port);
+    expect(await roundTrip(oldSocket, "two")).toBe("old:two");
+    expect(await roundTrip(nextSocket, "three")).toBe("new:three");
+    oldSocket.close();
+    nextSocket.close();
+  } finally {
+    await proxy.stop();
+    await old.stop(true);
+    await next.stop(true);
+  }
+}, 15_000);
+
+function echoServer(label: string): Bun.Server<undefined> {
+  return Bun.serve({
+    port: 0,
+    fetch: (request, server) =>
+      server.upgrade(request)
+        ? new Response(null)
+        : new Response("upgrade required", { status: 426 }),
+    websocket: {
+      message: (socket, message) => socket.send(`${label}:${String(message)}`),
+    },
+  });
+}
+
+function connectSocket(port: number): Promise<WebSocket> {
+  return new Promise((resolve, reject) => {
+    const socket = new WebSocket(`ws://127.0.0.1:${port}/rpc`, {
+      headers: { origin: `http://127.0.0.1:${port}` },
+    });
+    socket.addEventListener("open", () => resolve(socket), { once: true });
+    socket.addEventListener("error", () => reject(new Error("WebSocket failed.")), { once: true });
+  });
+}
+
+function roundTrip(socket: WebSocket, message: string): Promise<string> {
+  return new Promise((resolve) => {
+    socket.addEventListener("message", (event) => resolve(String(event.data)), { once: true });
+    socket.send(message);
+  });
+}
