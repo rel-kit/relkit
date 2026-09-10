@@ -44,7 +44,7 @@ test("supports keyboard search and accessible route table quick views", async ({
   const search = page.getByRole("dialog", { name: "Search inspector" });
   await expect(search).toBeVisible();
   await search.getByRole("combobox", { name: "Destination" }).fill("Graph");
-  await expect(page.getByRole("option", { name: /Graph Workspace/ })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Application graph Workspace" })).toBeVisible();
   await page.keyboard.press("Escape");
   await search.getByRole("button", { name: "Close dialog" }).click();
 
