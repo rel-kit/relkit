@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { InspectorGraph, InspectorObject } from "./api-types";
-import { agentView, toolView } from "./agents-model";
+import { agentView, agentViews, toolView } from "./agents-model";
 
 const graph = {
   protocol: "relkit.inspector",
@@ -31,9 +31,18 @@ const graph = {
       output: { type: "string" },
       instructions: "raw agent instructions",
       model: "local-fast",
+      client: "protected",
+      controls: ["stop", "approve"],
+      chat: { input: "message", output: "answer" },
       toolIds: ["orders.tool"],
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
       generatedFunction: { functionId: "relkit.agent.orders.agent.invoke" },
+    },
+    {
+      kind: "agent",
+      id: "orders.graph",
+      execution: "graph",
+      workflow: { start: "__start__", end: "__end__", nodes: [], edges: [] },
     },
   ],
 } as InspectorGraph;
@@ -122,6 +131,9 @@ describe("inspector tool and agent projections", () => {
     expect(view).toMatchObject({
       id: "orders.agent",
       model: "local-fast",
+      client: "protected",
+      controls: ["stop", "approve"],
+      chat: true,
       limits: { maxSteps: 4, maxToolCalls: 2, timeoutMs: 10_000 },
       toolIds: ["orders.tool"],
       generatedFunctionId: "relkit.agent.orders.agent.invoke",
@@ -142,5 +154,9 @@ describe("inspector tool and agent projections", () => {
     expect(serialized).not.toContain("raw prompt");
     expect(serialized).not.toContain("raw result");
     expect(serialized).not.toContain("instructions");
+  });
+
+  test("keeps graph definitions out of the agent catalog", () => {
+    expect(agentViews(graph).map((view) => view.id)).toEqual(["orders.agent"]);
   });
 });
