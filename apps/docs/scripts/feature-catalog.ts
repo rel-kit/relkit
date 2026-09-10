@@ -1,6 +1,7 @@
 import { feature, type Feature } from "./documentation-catalog.js";
 import { databaseFeature } from "./database-guide-catalog.js";
 import { authFeature } from "./auth-guide-catalog.js";
+import { realtimeFeature } from "./realtime-feature.js";
 
 export const features = [
   feature(
@@ -103,6 +104,7 @@ export const features = [
     [["packages/client/src/index.ts", "createClient"]],
     ["examples/commerce/src/platform/generated-client.ts"],
   ),
+  realtimeFeature,
   feature(
     "events",
     "Events",

@@ -14,14 +14,8 @@ export const apiPackageDefinitions = [
   apiPackage("tools", "Tools", "@relkit/tools", "packages/tools", "core"),
   apiPackage("agents", "Agents", "@relkit/agents", "packages/agents", "core"),
   apiPackage("client", "Client", "@relkit/client", "packages/client", "core"),
+  apiPackage("realtime", "Realtime", "@relkit/realtime", "packages/realtime", "core"),
   apiPackage("testing", "Testing", "@relkit/testing", "packages/testing", "core"),
-  apiPackage(
-    "integrations/ai-sdk",
-    "AI SDK",
-    "@relkit/ai-sdk",
-    "integrations/packages/ai-sdk",
-    "integrations",
-  ),
   apiPackage("integrations/aws", "AWS", "@relkit/aws", "integrations/packages/aws", "integrations"),
   apiPackage(
     "integrations/cloudflare",
