@@ -18,7 +18,7 @@ import appManifest from "../../packages/app/package.json" with { type: "json" };
 const roots: string[] = [];
 const templateRoot = resolve(import.meta.dir, "../../templates/default/v1");
 const forbiddenImport =
-  /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/[^"']|@aws-sdk\/[^"']|@relkit\/(?:compiler|contracts|deploy|deploy-pulumi|diagnostics|engine|graph|inspector-api|openapi|providers-local|runtime-effect|runtime-hono|supervisor))["']/;
+  /(?:from|import)\s*["'](?:effect|hono|@pulumi\/[^"']|@aws-sdk\/[^"']|@relkit\/(?:compiler|contracts|deploy|deploy-pulumi|diagnostics|engine|graph|inspector-api|openapi|providers-local|runtime-effect|runtime-hono|supervisor))["']/;
 const forbiddenApis = [
   ["define", "Sub", "scription"].join(""),
   ["define", "Per", "sistence"].join(""),
@@ -85,8 +85,23 @@ test("covers every template and examples/install/Git combination", async () => {
           expect(result.gitInitialized).toBe(git);
           expect(manifest).toMatchObject({ packageManager: "bun@1.3.10" });
           expect(manifest.dependencies).toEqual({
-            ...(template === "agent" ? { "@relkit/ai-sdk": appManifest.version } : {}),
+            ...(["agent", "fullstack"].includes(template)
+              ? {
+                  "@langchain/langgraph": "1.4.14",
+                  "@relkit/local": appManifest.version,
+                  langchain: "1.5.10",
+                }
+              : {}),
             "@relkit/app": appManifest.version,
+            ...(template === "fullstack"
+              ? {
+                  "@relkit/client": appManifest.version,
+                  "@tanstack/react-query": "5.102.3",
+                  next: "16.3.3",
+                  react: "19.2.8",
+                  "react-dom": "19.2.8",
+                }
+              : {}),
           });
           expect(manifest.devDependencies).toMatchObject({
             "@types/bun": "1.3.10",
@@ -136,6 +151,29 @@ test("covers every template and examples/install/Git combination", async () => {
       }
     }
   }
+});
+
+test("agent starters ship executable native and typed client examples", async () => {
+  const agent = await readFile(
+    join(templateRoot, "agent/src/hello/agents/assistant.agent.ts"),
+    "utf8",
+  );
+  const graph = await readFile(
+    join(templateRoot, "agent/src/hello/agents/review.agent.ts"),
+    "utf8",
+  );
+  const page = await readFile(join(templateRoot, "fullstack/web/app/page.tsx"), "utf8");
+  const providers = await readFile(join(templateRoot, "fullstack/web/app/providers.tsx"), "utf8");
+
+  expect(agent).toContain("todoListMiddleware()");
+  expect(agent).not.toContain("@relkit/ai-sdk");
+  expect(graph).toContain("new MemorySaver()");
+  expect(graph).toContain("interrupt(");
+  expect(page).toContain("threadId: agentThreadIds.assistant");
+  expect(page).toContain("resume: true");
+  expect(page).toContain("assistant.values?.todos");
+  expect(providers).toContain('useState<AgentTransport>("sse")');
+  expect(providers).toContain("transport={transport}");
 });
 
 test("accepts valid names and rejects invalid names without mutation", async () => {

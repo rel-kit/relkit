@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { SCAFFOLD_DEPENDENCIES } from "../../packages/create-relkit/src/index.ts";
 
 const OWNERS = {
-  "@relkit/ai-sdk": "integrations/packages/ai-sdk/package.json",
   "@relkit/aws": "integrations/packages/aws/package.json",
   "@relkit/better-auth": "packages/better-auth/package.json",
   "@relkit/cloudflare": "integrations/packages/cloudflare/package.json",
@@ -17,6 +16,7 @@ const OWNERS = {
   "better-auth": "packages/better-auth/package.json",
   "drizzle-kit": "examples/auth-drizzle/package.json",
   "drizzle-orm": "packages/drizzle/package.json",
+  langchain: "packages/agents/package.json",
 } as const;
 
 test("keeps scaffold dependency versions aligned with owning manifests", async () => {

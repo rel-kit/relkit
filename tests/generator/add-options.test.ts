@@ -77,16 +77,14 @@ describe("add option resolution", () => {
       expect(() => normalizeAddRequest(args)).toThrow();
   });
 
-  test("derives a model selector when creating a profile", () => {
+  test("accepts an existing model selector or the offline default", () => {
     expect(
       normalizeAddRequest(
         [
           "agent",
           "Support",
-          "--model-provider",
-          "anthropic",
-          "--model-id",
-          "claude-sonnet-4-5",
+          "--model",
+          "anthropic:claude-sonnet-4-5",
           "--instructions",
           "Be concise",
           "--tool",
@@ -96,9 +94,11 @@ describe("add option resolution", () => {
       ),
     ).toMatchObject({
       model: "anthropic:claude-sonnet-4-5",
-      modelProvider: "anthropic",
       tools: ["lookup"],
       instructions: "Be concise",
     });
+    expect(
+      normalizeAddRequest(["agent", "Offline", "--instructions", "Be concise"]),
+    ).not.toHaveProperty("model");
   });
 });

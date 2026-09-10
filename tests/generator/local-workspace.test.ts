@@ -107,7 +107,6 @@ test("local add installs workspace integration exports for a full service bundle
   expect(code).toBe(0);
   const manifest = JSON.parse(await readFile(join(project, "package.json"), "utf8"));
   expect(manifest.dependencies["@relkit/local"]).toBe("link:@relkit/local");
-  expect(manifest.dependencies["@relkit/ai-sdk"]).toBe("link:@relkit/ai-sdk");
   expect(output.warnings).toContainEqual(expect.objectContaining({ code: "docker-required" }));
 }, 60_000);
 

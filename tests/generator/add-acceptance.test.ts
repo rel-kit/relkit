@@ -22,7 +22,7 @@ afterEach(async () => {
 });
 
 test("the full bundle compiles in every starter and preserves its graph relationships", async () => {
-  for (const template of ["minimal", "api", "agent"] as const) {
+  for (const template of ["minimal", "api", "agent", "fullstack"] as const) {
     const root = await project(template);
     await add(root, ["service", "Billing", "--full", "--no-install"]);
     await linkDependencies(root);
@@ -122,7 +122,7 @@ test("reused Docker profiles retain the post-scaffold startup reminder", async (
 });
 
 test("route platform and singleton additions compile in every starter", async () => {
-  for (const template of ["minimal", "api", "agent"] as const) {
+  for (const template of ["minimal", "api", "agent", "fullstack"] as const) {
     const root = await project(template);
     await add(root, ["route", "/users/:id/details", "--mode", "route"]);
     await add(root, ["middleware", "Request Log", "--path", "/users/*"]);
@@ -159,7 +159,7 @@ test("database and auth-chained schemas compile for all Bun-native dialects", as
 }, 30_000);
 
 test("every standalone add kind compiles in every starter", async () => {
-  for (const template of ["minimal", "api", "agent"] as const) {
+  for (const template of ["minimal", "api", "agent", "fullstack"] as const) {
     const root = await project(template);
     for (const args of [
       ["service", "Billing"],
@@ -179,10 +179,6 @@ test("every standalone add kind compiles in every starter", async () => {
         "Worker",
         "--service",
         "hello",
-        "--model-provider",
-        "openai",
-        "--model-id",
-        "gpt-5-mini",
         "--tool",
         "hello.work-tool",
         "--prompt",
@@ -299,9 +295,17 @@ async function linkDependencies(root: string): Promise<void> {
   for (const name of ["app", "testing", "drizzle", "better-auth"]) {
     await link(join(repository, "packages", name), join(relkit, name));
   }
-  for (const name of ["ai-sdk", "docker", "local", "redis", "s3"]) {
+  for (const name of ["docker", "local", "redis", "s3"]) {
     await link(join(repository, "integrations/packages", name), join(relkit, name));
   }
+  await link(
+    join(repository, "packages/agents/node_modules/langchain"),
+    join(root, "node_modules/langchain"),
+  );
+  await link(
+    join(repository, "packages/agents/node_modules/@langchain/langgraph"),
+    join(root, "node_modules/@langchain/langgraph"),
+  );
   await link(
     join(repository, "packages/drizzle/node_modules/drizzle-orm"),
     join(root, "node_modules/drizzle-orm"),
