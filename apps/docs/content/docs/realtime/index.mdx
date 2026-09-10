@@ -1,0 +1,85 @@
+---
+title: Realtime channels
+description: Deliver typed application updates to connected clients without turning events into application state.
+---
+
+A realtime channel carries short-lived facts from your backend to clients that are already connected. An order-status change, a new announcement, or a dashboard invalidation are good channel events.
+
+The channel is not your database. Load the current state from an ordinary route, then use channel events to update or invalidate that state. This distinction makes refresh and reconnect behavior predictable: the route restores the truth, while the channel keeps the page current.
+
+## Realtime channels or application events?
+
+RelKit has two event-shaped features with different jobs:
+
+| Use                                            | Choose                               | Why                                                     |
+| ---------------------------------------------- | ------------------------------------ | ------------------------------------------------------- |
+| Notify browsers that are viewing a resource    | Realtime channel                     | It supports scoped subscriptions, replay, and presence. |
+| Run backend work after something happens       | [Application event](/docs/events)    | It delivers work to server-side consumers.              |
+| Return a sequence to the caller of one request | [Typed stream](/docs/http/streaming) | Its lifetime belongs to that request.                   |
+
+A function may publish both an application event and a channel update when both outcomes are needed. Neither mechanism replaces the other.
+
+## The Realtime API
+
+| API                     | What you use it for                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| `defineChannel()`       | Declare partition parameters, event payloads, browser access, replay, and presence. |
+| `channel.trigger()`     | Append one validated event from backend code.                                       |
+| `channel.getPresence()` | Read declared presence without joining the channel or changing its leases.          |
+| `useChannel()`          | Observe one typed channel partition from React.                                     |
+| `useRealtime()`         | Manage subscriptions directly when a hook per channel is not convenient.            |
+
+## Declare a channel
+
+This public announcements channel has one partition because its parameter schema is empty. It retains recent events for brief reconnects.
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/announcements/channels/announcements.channel.ts"'
+>
+  ../../examples/commerce/src/announcements/channels/announcements.channel.ts
+</include>
+
+The declaration controls both publication and generated client types:
+
+| Option     | Meaning                                                                           |
+| ---------- | --------------------------------------------------------------------------------- |
+| `id`       | Stable channel name used by backend and generated clients.                        |
+| `params`   | Schema that identifies a partition, such as one `orderId`.                        |
+| `events`   | Map of event names to their payload schemas.                                      |
+| `client`   | Omit for backend-only use, set `public: true`, or provide an authorization guard. |
+| `replay`   | Optional retention window and maximum event count for reconnects.                 |
+| `presence` | Optional connection count or protected member projection.                         |
+| `profile`  | Provider profile; otherwise the application default is used.                      |
+
+An empty `events` map is valid only for a presence-only channel. Event binding is never an access-control boundary; browser access always comes from `client`.
+
+## Publish an update
+
+Call `trigger()` from backend code after the application change succeeds:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/announcements/functions/post-announcement.function.ts"'
+>
+  ../../examples/commerce/src/announcements/functions/post-announcement.function.ts
+</include>
+
+RelKit validates the partition parameters and payload before appending the event. The returned receipt contains the event ID, checkpoint, provider profile and epoch, and whether an idempotent request was a duplicate.
+
+`accepted: true` means the provider stored the append and its receipt atomically. It does not mean every subscriber received the event. A subscriber can disconnect immediately after the append and recover according to the channel's replay policy.
+
+For a retryable publish, pass an `idempotencyKey` created by RelKit. Reusing the same UUIDv7 key with the same channel, partition, event, and payload during the 24-hour receipt window returns the original receipt. Reusing it for different content fails. Without a key, retrying after a lost response may append the event twice; RelKit never retries it automatically.
+
+If a database update and publication must succeed together, write an outbox entry in the same database transaction and publish from the outbox. Calling `trigger()` after a database write does not make the two operations atomic.
+
+## Choose the next step
+
+- [Access and revocation](/docs/realtime/access) explains internal, public, and protected channels.
+- [React channels](/docs/realtime/react) connects generated channel types to application state.
+- [Replay and recovery](/docs/realtime/recovery) defines mount, reconnect, refresh, and gap behavior.
+- [Presence](/docs/realtime/presence) adds connection or member awareness.
+
+<include cwd>content/generated/related/realtime-index.mdx</include>

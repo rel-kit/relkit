@@ -1,0 +1,49 @@
+---
+title: Realtime providers
+description: Select local filesystem or Redis storage for replay, fanout, and presence.
+---
+
+Channels use the application's `realtime` provider capability. Agent threads use the separate `agent-state` capability, and ordinary caching continues to use `cache`. Configure only the capabilities your application needs.
+
+## Choose a provider
+
+| Provider          | Best fit                                    | Replay and fanout                                                  | Durability                                 |
+| ----------------- | ------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------ |
+| `localRealtime()` | Local development and one-machine workflows | Filesystem-backed retained state with bounded polling              | Local filesystem                           |
+| `redisRealtime()` | Multiple application or gateway instances   | Redis Streams read independently by every gateway; shared presence | Depends on Redis persistence configuration |
+
+The local provider keeps state under `.relkit/state` by default. Its wait loop polls every 250 ms, so another process can make progress even when filesystem notifications are unavailable. Use its `root` option only when the application needs a different state directory.
+
+Redis uses a stream reader per gateway. Do not replace this with one shared consumer group: consumer groups distribute records among gateways, while realtime fanout requires every gateway with interested subscribers to see the event.
+
+## Configure the application
+
+The commerce application configures distinct Redis-backed realtime, agent-state, and cache capabilities:
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+`defaults.realtime` selects the profile used by channels that omit `profile`. A channel can name another profile when one application needs different retention, tenancy, or infrastructure boundaries.
+
+## Understand acknowledgements and resets
+
+`trigger()` acknowledges an atomic provider append and receipt, not delivery to browser tabs. Redis durability is only as strong as the selected Redis persistence and replication settings. Document that deployment choice rather than describing every Redis-backed append as durable.
+
+Each provider exposes an epoch. If retained state is lost or replaced, the epoch changes. Old checkpoints then produce a recovery gap, and missing idempotency receipts are reported as state loss rather than permission to retry an uncertain publish automatically.
+
+## Capacity and overload
+
+RelKit enforces per-record and aggregate limits for encoded event size, retained bytes, active partitions, live connections, subscriptions, presence members, and receipt retention. Per-principal limits return a typed 429 response; application or provider capacity returns a typed 503 response.
+
+Existing unrelated work is not evicted to admit a new partition or event. Tune provider capacity and retention together: longer replay windows consume more storage, while authoritative route recovery makes short windows safe.
+
+## Production checklist
+
+- Use `redisRealtime()` when subscriptions must survive or fan out across application instances.
+- Configure Redis persistence and replication to match the acknowledgement guarantee your product needs.
+- Monitor provider resets, rejected appends, slow consumers, expired grants, connection counts, and retained bytes.
+- Keep WebSocket upgrades and streaming responses enabled through the generated server and proxy path.
+- Configure exact browser origins and credentialed CORS explicitly.
+
+<include cwd>content/generated/related/realtime-providers.mdx</include>

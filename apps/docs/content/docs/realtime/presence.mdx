@@ -1,0 +1,57 @@
+---
+title: Presence
+description: Show live connection counts or safe member projections for a channel partition.
+---
+
+Presence answers who is connected to one channel partition now. It is lease-based and temporary; use your database for durable membership, permissions, or activity history.
+
+## Choose count or member presence
+
+| Declaration                       | Browser result                          | Use it for                                              |
+| --------------------------------- | --------------------------------------- | ------------------------------------------------------- |
+| No `presence`                     | No presence API                         | Channels that only deliver events.                      |
+| `presence: "count"`               | Connection count and freshness metadata | Viewer counts without identity.                         |
+| `{ member, resolve, maxMembers }` | Counts plus typed public members        | Collaborative views that need safe display information. |
+
+The protected order channel enables connection counts:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+>
+  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+</include>
+
+Member presence is allowed only on a protected channel. Its `member` schema defines the public information, `resolve(params, context)` derives that information from trusted server context, and `maxMembers` limits the returned list. It does not limit how many connections may join; provider admission limits are separate.
+
+Return only data another authorized member may see. RelKit adds an opaque, stable, scope-bound member ID and never exposes the raw ID from your authentication provider.
+
+## Read presence in React
+
+Count presence exposes:
+
+| Field         | Meaning                                                            |
+| ------------- | ------------------------------------------------------------------ |
+| `connections` | Active connection count, or `undefined` before the first snapshot. |
+| `status`      | `loading`, `fresh`, `stale`, or `error`.                           |
+| `revision`    | Provider revision for the snapshot, when available.                |
+| `scope`       | Whether the count covers one process or a shared provider.         |
+
+Member presence adds `memberCount`, `members`, and `membersTruncated`. Each member has `{ id, info }`, where `info` matches the declared member schema.
+
+Several tabs from the same signed-in member count as several connections but one member. When the transport disconnects, the last values remain available with `status: "stale"`; do not present them as a current census.
+
+## Inspect presence from backend code
+
+For a channel that declares presence, call `channel.getPresence(params)`. The return type matches the declaration: count-only channels cannot access member fields, and channels without presence do not have this method.
+
+The read is side-effect free. It does not subscribe, acquire or renew a lease, emit join or leave activity, or change connection and member counts. It uses the same partition authorization and member-list limit as browser observation.
+
+## Understand leases
+
+The client renews its presence lease while the connection remains healthy. A normal unsubscribe releases it; a crashed tab disappears when the lease expires. Access revocation invalidates the lease immediately so presence does not outlive permission to observe the channel.
+
+Presence reloads from a fresh snapshot after reconnect or refresh. A previously cached count is never treated as proof of current occupancy.
+
+<include cwd>content/generated/related/realtime-presence.mdx</include>

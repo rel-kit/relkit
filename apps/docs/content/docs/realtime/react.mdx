@@ -1,0 +1,66 @@
+---
+title: React channels
+description: Combine authoritative route data with typed live updates in React.
+---
+
+Use `useChannel()` when a component needs one channel partition. RelKit shares equivalent subscriptions by channel name and canonical parameters, so multiple components do not create duplicate transport subscriptions.
+
+The component still owns its application state. A channel callback may patch local state, update the TanStack Query cache, or invalidate an ordinary route query.
+
+## Subscribe to a channel
+
+The commerce client listens for public announcements alongside route, mutation, stream, and agent hooks:
+
+<include cwd lang="tsx" meta='title="examples/commerce-web/app/page.tsx"'>
+  ../../examples/commerce-web/app/page.tsx
+</include>
+
+The generated registry determines the allowed channel names, partition parameters, event names, payloads, and presence result. Misspelled events and invalid payload assumptions fail during type checking.
+
+## `useChannel()` options
+
+| Option       | Purpose                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------- |
+| `params`     | Selects one validated channel partition.                                                                |
+| `on`         | Maps declared event names to typed callbacks. Omitted events are ignored.                               |
+| `onCaughtUp` | Runs after RelKit has attached to the live tail and applied any valid reconnect replay.                 |
+| `onGap`      | Restores authoritative state when replay cannot bridge the previous checkpoint. It may be asynchronous. |
+
+The result exposes:
+
+| Field        | Meaning                                                                  |
+| ------------ | ------------------------------------------------------------------------ |
+| `status`     | Transport state: `idle`, `connecting`, `connected`, `stale`, or `error`. |
+| `checkpoint` | Last applied provider checkpoint, when one exists.                       |
+| `caughtUp`   | Whether live delivery is safe to present after catch-up or gap recovery. |
+| `gap`        | The latest recovery reason, when replay could not continue.              |
+| `presence`   | Present only when the channel declares count or member presence.         |
+
+`caughtUp` does not mean your database query has loaded. It means RelKit has completed the subscription handoff. Coordinate it with the loading state of the route query that owns the page's current data.
+
+## Patch or invalidate?
+
+Patch local state when an event carries the complete change and applying it is simple and deterministic. Invalidate the route query when permissions, derived fields, ordering, or server-side calculations could make a local patch incomplete.
+
+`onCaughtUp` is a useful final invalidation point: load the route, attach the channel, then confirm that no update was missed between those operations. `onGap` must perform a full restoration before it resolves.
+
+## Use the lower-level manager
+
+`useRealtime()` exposes the shared connection status and four typed operations:
+
+| Operation                           | Behavior                                                                   |
+| ----------------------------------- | -------------------------------------------------------------------------- |
+| `subscribe(name, params, listener)` | Starts or joins a shared subscription and returns an unsubscribe function. |
+| `bind(...)`                         | Alias of `subscribe()`.                                                    |
+| `unsubscribe(stop)`                 | Calls the returned unsubscribe function.                                   |
+| `unbind(stop)`                      | Alias of `unsubscribe()`.                                                  |
+
+Prefer `useChannel()` for components because it handles subscription cleanup and exposes catch-up state. Use `useRealtime()` for an application-level adapter or store that already owns its own lifecycle.
+
+## Mount and identity behavior
+
+The hook waits until `RelkitClientProvider` has a compatible contract and resolved identity. `identityKey: null` blocks private restoration while application identity is unknown. Changing identity or session aborts the old subscription and rejects late frames from it.
+
+Unmounting the final listener releases the shared subscription. It does not delete authoritative application data from your QueryClient.
+
+<include cwd>content/generated/related/realtime-react.mdx</include>
