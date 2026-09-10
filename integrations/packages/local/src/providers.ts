@@ -9,6 +9,8 @@ import {
 
 const event = defineProviderCapability("event");
 const job = defineProviderCapability("job");
+const realtime = defineProviderCapability("realtime");
+const agentState = defineProviderCapability("agent-state");
 const integration = defineIntegrationReference("local");
 const connectionContract = defineConnectionContract({
   root: { default: ".relkit/state", authoredValue: "fixed" },
@@ -20,6 +22,8 @@ export interface LocalProviderOptions {
 
 export type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 export type LocalJobAdapter = ProviderAdapter<typeof job, "local-job">;
+export type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
+export type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-state">;
 
 /**
  * Defines the durable filesystem event provider used by local development.
@@ -51,9 +55,17 @@ export function localJob(options: LocalProviderOptions = {}): LocalJobAdapter {
   return adapter(job, "local-job", options) as LocalJobAdapter;
 }
 
+export function localRealtime(options: LocalProviderOptions = {}): LocalRealtimeAdapter {
+  return adapter(realtime, "local-realtime", options) as LocalRealtimeAdapter;
+}
+
+export function localAgentState(options: LocalProviderOptions = {}): LocalAgentStateAdapter {
+  return adapter(agentState, "local-agent-state", options) as LocalAgentStateAdapter;
+}
+
 function adapter(
-  capability: typeof event | typeof job,
-  adapterId: "local-event" | "local-job",
+  capability: typeof event | typeof job | typeof realtime | typeof agentState,
+  adapterId: "local-event" | "local-job" | "local-realtime" | "local-agent-state",
   options: LocalProviderOptions,
 ): ProviderAdapter {
   if (options.root !== undefined && options.root.trim() === "") {

@@ -1,5 +1,10 @@
 import { join } from "node:path";
-import { createLocalEventProvider, createLocalJobProvider } from "@relkit/providers-local";
+import {
+  createLocalAgentStateProvider,
+  createLocalEventProvider,
+  createLocalJobProvider,
+  createLocalRealtimeProvider,
+} from "@relkit/providers-local";
 import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
 
 export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.freeze({
@@ -23,6 +28,22 @@ export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.fr
         const provider = createLocalJobProvider(root(connection), profile);
         return { value: provider, release: provider.close };
       },
+    },
+    {
+      capability: "realtime",
+      adapterId: "local-realtime",
+      protocolVersion: 1,
+      create: ({ profile, connection }: RuntimeProviderContext) => ({
+        value: createLocalRealtimeProvider(join(root(connection), "realtime", profile)),
+      }),
+    },
+    {
+      capability: "agent-state",
+      adapterId: "local-agent-state",
+      protocolVersion: 1,
+      create: ({ profile, connection }: RuntimeProviderContext) => ({
+        value: createLocalAgentStateProvider(join(root(connection), "agent-state", profile)),
+      }),
     },
   ]),
 });
