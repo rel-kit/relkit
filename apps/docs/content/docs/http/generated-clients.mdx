@@ -7,8 +7,10 @@ RELKIT generates a typed client from checked function-backed routes. Operation n
 IDs; input, output, and declared application errors come from the target functions.
 Raw handlers do not become generated-client operations.
 
-The client uses **RPC over `/rpc`**, not HTTP request mapping to the original REST URL. Use the
-[OpenAPI document](/docs/http/openapi) or an ordinary HTTP caller when you need that exact REST contract.
+The client uses **RPC over `/rpc`**. Every exposed route has its stable route-ID procedure and a
+deterministic method/path alias. Both execute the original route's authorization, middleware, rate
+limit, timeout, error mapping, and telemetry against its canonical method and path. Use the
+[OpenAPI document](/docs/http/openapi) when you need the native REST request and response shape.
 
 ## Generate the contract
 
@@ -77,13 +79,9 @@ returned responses to `INTERNAL_SERVER_ERROR`. Test these cases if middleware pr
 
 ## Test security at both entry points
 
-Registered Better Auth protection checks the operation's original route path for RPC session
-requirements. Associated path-scoped middleware is also replayed, while global middleware surrounds
-the RPC request. The middleware sees the native `/rpc` request, not synthetic REST parameters or body.
-
-The route's `rateLimit` wrapper is **not applied to RPC calls**. A REST-only limit or middleware that
-assumes the original URL is therefore insufficient to protect every caller. Apply equivalent policy
-at the RPC boundary or in shared domain authorization, and test both reachable transports.
+Registered Better Auth protection and route policy run with the operation's canonical method/path.
+If a policy cannot be reproduced safely over RPC, compilation fails until the route is marked
+`client: false`; that opt-out registers neither RPC identity, and direct calls return `NOT_FOUND`.
 
 Point the client at a running local test server. The current `createTestApplication` HTTP helper does
 not serve `/rpc`, so connecting it through a custom `fetch` is not an RPC integration test.

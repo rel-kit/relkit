@@ -1,0 +1,21 @@
+---
+title: Queries and cache utilities
+description: Call finite client-exposed routes with native TanStack Query types.
+---
+
+## Query finite routes
+
+`useRoute`, `useInfiniteRoute`, `useSuspenseRoute`, and `useRouteUtils` accept only finite exposed
+routes. Inputs, outputs, errors, selection, page parameters, signals, and query options are inferred
+from generated declarations.
+
+<include cwd lang="tsx" meta='title="examples/commerce-web/app/page.tsx"'>
+  ../../examples/commerce-web/app/page.tsx
+</include>
+
+## Keep streams separate
+
+Routes with streaming output are deliberately absent from these selectors. Use `useStream` instead.
+Routes marked `client: false` have neither a route-ID RPC procedure nor a URL alias.
+
+<include cwd>content/generated/related/client-routes.mdx</include>

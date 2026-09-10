@@ -1,0 +1,21 @@
+---
+title: Stream hooks
+description: Start and cancel typed generic streams without treating them as finite queries.
+---
+
+## Start a stream
+
+`useStream` exposes `start`, `cancel`, and `reset`. Query-classified streams may opt into `autoStart`;
+mutation streams always require an explicit start. Classification controls start/retry policy only.
+It does not make a stream a finite cache query.
+
+The low-level client returns a single-consumer `AsyncIterable`. Work starts on the first `next()`, and
+breaking iteration cancels upstream work and releases its pinned invocation generation.
+
+## Use the typed hook
+
+<include cwd lang="tsx" meta='title="examples/commerce-web/app/page.tsx"'>
+  ../../examples/commerce-web/app/page.tsx
+</include>
+
+<include cwd>content/generated/related/client-streams.mdx</include>
