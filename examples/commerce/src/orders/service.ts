@@ -5,7 +5,16 @@ import getOrder from "./functions/get-order.function.js";
 import searchOrders from "./functions/search-orders.function.js";
 import updateOrder from "./functions/update-order.function.js";
 import authorizeOrder from "./functions/authorize-order.function.js";
+import streamOrderReport from "./functions/stream-order-report.function.js";
 
 export default defineService({
-  functions: { createOrder, deleteOrder, getOrder, searchOrders, updateOrder, authorizeOrder },
+  functions: {
+    createOrder,
+    deleteOrder,
+    getOrder,
+    searchOrders,
+    updateOrder,
+    authorizeOrder,
+    streamOrderReport,
+  },
 });
