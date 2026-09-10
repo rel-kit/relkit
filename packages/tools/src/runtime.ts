@@ -20,6 +20,7 @@ export interface ToolEngineInvocation {
   /** Forwarded structurally to the common engine's existing invocation hooks. */
   readonly hooks?: unknown;
   readonly toolHooks?: unknown;
+  readonly progressSink?: import("@relkit/invocation").ProgressSink;
   /** Forwarded structurally to preserve the parent agent span/invocation. */
   readonly parent?: unknown;
 }
