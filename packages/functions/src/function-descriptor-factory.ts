@@ -15,17 +15,20 @@ import {
   validateLimit,
 } from "./define-function-validation.js";
 import type { FunctionRefAny } from "./types.js";
+import { isStreamOutputSchema } from "./stream.js";
 import {
   copyFunctionToolHooks,
   copyFunctionToolMetadata,
   createFunctionTool,
   type FunctionToolOptions,
 } from "./function-tool.js";
+import { createFunctionGraphNode } from "./function-graph-node.js";
 
 export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly id: string;
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
+  readonly progress?: StandardSchemaV1;
   readonly invocationMode: "callable" | "event-only";
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
@@ -42,6 +45,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
 export function createFunctionDescriptor(options: FunctionDescriptorFactoryOptions): unknown {
   assertSchema(options.input, "input");
   assertSchema(options.output, "output");
+  if (options.progress !== undefined) assertSchema(options.progress, "progress");
   if (typeof options.handler !== "function")
     throw new TypeError("Function handler must be a function");
   assertHook(options.onBefore, "onBefore");
@@ -50,6 +54,9 @@ export function createFunctionDescriptor(options: FunctionDescriptorFactoryOptio
   validateLimit(options.concurrency, "concurrency");
   if (options.invocationMode === "event-only" && options.tool !== undefined) {
     throw new TypeError("Event functions cannot declare tool metadata");
+  }
+  if (isStreamOutputSchema(options.output) && options.tool !== undefined) {
+    throw new TypeError("Stream-output functions cannot declare tool metadata");
   }
   const base = createDescriptorBase("function", options.id, options);
   const dependencies = copyDependencies(options.dependencies);
@@ -61,6 +68,7 @@ export function createFunctionDescriptor(options: FunctionDescriptorFactoryOptio
     invocationMode: options.invocationMode,
     input: options.input,
     output: options.output,
+    ...(options.progress === undefined ? {} : { progress: options.progress }),
     ...(options.descriptorFields ?? {}),
     ...(errors === undefined ? {} : { errors }),
     ...(dependencies === undefined ? {} : { dependencies }),
@@ -96,6 +104,9 @@ function addCallableMethods(
   });
   Object.defineProperty(descriptor, "asTool", {
     value: function (this: unknown, toolOptions?: FunctionToolOptions<string>) {
+      if (isStreamOutputSchema(descriptor.output)) {
+        throw new TypeError("Stream-output functions cannot be converted to tools");
+      }
       const metadata = toolOptions === undefined ? tool : copyFunctionToolMetadata(toolOptions);
       if (metadata === undefined) {
         throw new TypeError(
@@ -109,6 +120,17 @@ function addCallableMethods(
         id: toolOptions?.id ?? `${getDescriptorIdentity(target)}.tool`,
         target,
       });
+    },
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  Object.defineProperty(descriptor, "asGraphNode", {
+    value: function (this: unknown, options?: { readonly id?: string }) {
+      if (isStreamOutputSchema(descriptor.output)) {
+        throw new TypeError("Stream-output functions cannot be converted to graph nodes");
+      }
+      return createFunctionGraphNode(this, descriptor as unknown as FunctionRefAny, options);
     },
     enumerable: false,
     writable: false,

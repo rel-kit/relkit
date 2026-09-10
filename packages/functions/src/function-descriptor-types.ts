@@ -10,7 +10,9 @@ import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
 import type { FunctionAsTool } from "./function-as-tool-types.js";
+import type { FunctionAsGraphNode } from "./function-graph-node.js";
 import type { FunctionHandlerResult } from "./handler-result.js";
+import type { StreamOutputSchema } from "./stream.js";
 import type { AgentClients, BucketClients, CacheClients, JobClients } from "./clients.js";
 import type { AgentRefAny, BucketRefAny, CacheRefAny, FunctionRef, JobRefAny } from "./types.js";
 
@@ -61,7 +63,7 @@ type PublishedEventMap<Names extends readonly KnownEventName[]> = {
   readonly [Name in Names[number]]: Relkit.EventRegistry[Name];
 };
 
-export interface FunctionContext<
+export interface FunctionContextBase<
   D extends FunctionDependencies = {},
   Publishes extends readonly KnownEventName[] = readonly [],
 > {
@@ -82,6 +84,15 @@ export interface FunctionContext<
   readonly prompts: RegisteredContext<"prompts", Readonly<Record<string, never>>>;
 }
 
+export type FunctionContext<
+  D extends FunctionDependencies = {},
+  Publishes extends readonly KnownEventName[] = readonly [],
+  Progress = never,
+> = FunctionContextBase<D, Publishes> &
+  ([Progress] extends [never]
+    ? {}
+    : { readonly progress: import("@relkit/invocation").ProgressEmitter<Progress> });
+
 export interface FunctionDescriptor<
   Id extends string,
   Input,
@@ -92,6 +103,7 @@ export interface FunctionDescriptor<
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   ToolMetadata extends FunctionToolMetadata | undefined = undefined,
   Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 >
   extends
     DescriptorBase<"function", Id>,
@@ -99,24 +111,20 @@ export interface FunctionDescriptor<
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
   readonly publishes?: Publishes;
+  readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: ToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes>;
-  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes>;
-  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes>;
-  /** Invokes the descriptor through the active or isolated common engine. */
+  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes, ProgressSchema>;
+  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema>;
   readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
-  /** Creates a handler-free tool view with inherited schemas and declared errors. */
-  readonly asTool: FunctionAsTool<
-    Id,
-    Input,
-    Output,
-    Errors,
-    InputSchema,
-    OutputSchema,
-    ToolMetadata
-  >;
+  readonly asTool: OutputSchema extends StreamOutputSchema
+    ? never
+    : FunctionAsTool<Id, Input, Output, Errors, InputSchema, OutputSchema, ToolMetadata>;
+  readonly asGraphNode: OutputSchema extends StreamOutputSchema
+    ? never
+    : FunctionAsGraphNode<Id, Input, Output, Errors, InputSchema, OutputSchema, Dependencies>;
 }
 
 export interface DefineFunctionOptions<
@@ -126,6 +134,7 @@ export interface DefineFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
   Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
   readonly id?: Id;
   readonly input: InputSchema;
@@ -133,17 +142,29 @@ export interface DefineFunctionOptions<
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
   readonly publishes?: Publishes;
+  readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, Publishes>;
-  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, Publishes>;
+  readonly onBefore?: FunctionLifecycleHook<
+    InferOutput<InputSchema>,
+    Dependencies,
+    Publishes,
+    ProgressSchema
+  >;
+  readonly onAfter?: FunctionLifecycleHook<
+    InferOutput<OutputSchema>,
+    Dependencies,
+    Publishes,
+    ProgressSchema
+  >;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
     Dependencies,
     Errors,
-    Publishes
+    Publishes,
+    ProgressSchema
   >;
 }
 
@@ -153,13 +174,22 @@ export type FunctionHandler<
   Dependencies extends FunctionDependencies,
   Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
   Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > = (
   input: Input,
-  context: FunctionContext<Dependencies, Publishes>,
+  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 
 export type FunctionLifecycleHook<
   Value,
   Dependencies extends FunctionDependencies = {},
   Publishes extends readonly KnownEventName[] = readonly [],
-> = (value: Value, context: FunctionContext<Dependencies, Publishes>) => MaybePromise<Value>;
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+> = (
+  value: Value,
+  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+) => MaybePromise<Value>;
+
+type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends StandardSchemaV1
+  ? InferOutput<Schema>
+  : never;
