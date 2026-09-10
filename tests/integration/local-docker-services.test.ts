@@ -25,6 +25,7 @@ import {
   type LocalServicePlan,
   type ProviderOverrideState,
 } from "../../packages/local-service/src/index.ts";
+import { exerciseSharedRedisProviders } from "./redis-state-acceptance.ts";
 
 const dockerTest = process.env.RELKIT_TEST_DOCKER === "1" ? test : test.skip;
 const graphHash = `sha256:${"a".repeat(64)}`;
@@ -67,6 +68,7 @@ dockerTest(
       });
       await Promise.all([primary.connect(), secondary.connect()]);
       expect(await Promise.all([primary.ping(), secondary.ping()])).toEqual([true, true]);
+      await exerciseSharedRedisProviders(bindingText(firstState, "provider.cache.primary", "url"));
       await Promise.all([primary.set("profile", "primary"), secondary.set("profile", "secondary")]);
       expect(await Promise.all([primary.get("profile"), secondary.get("profile")])).toEqual([
         "primary",

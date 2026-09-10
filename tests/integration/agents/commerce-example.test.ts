@@ -1,73 +1,24 @@
 import { describe, expect, test } from "bun:test";
 import orderSupport from "../../../examples/commerce/src/orders/agents/order-support.agent.ts";
-import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
 import getOrderTool from "../../../examples/commerce/src/orders/tools/lookup-order.tool.ts";
-import {
-  invokeFunction,
-  type InvocationCompletion,
-  type InvocationParent,
-} from "../../../packages/engine/src/index.ts";
-import { bindDescriptorIdentity } from "../../../packages/invocation/dist/index.js";
+import cancelOrderTool from "../../../examples/commerce/src/orders/tools/cancel-order.tool.ts";
 import { createTestAgent } from "../../../packages/testing/src/index.ts";
 
-bindDescriptorIdentity(getOrder, "orders.get-order");
-bindDescriptorIdentity(getOrderTool.target, "orders.get-order");
-
 describe("commerce-example support agent", () => {
-  test("runs a scripted tool call through the function engine without storing content", async () => {
-    const completions: InvocationCompletion[] = [];
+  test("runs its native model with an explicit persistent thread without storing content", async () => {
     const agent = createTestAgent({
       agent: orderSupport,
-      tools: [getOrderTool],
-      engine: {
-        invoke: async (request) => {
-          const parent = request.parent as InvocationParent | undefined;
-          return invokeFunction(getOrder, request.input, {
-            source: request.source,
-            ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
-            ...(request.signal === undefined ? {} : { signal: request.signal }),
-            ...(parent === undefined ? {} : { parent }),
-            hooks: {
-              onCompletion: (completion) => completions.push(completion),
-            },
-          });
-        },
-      },
-      script: [
-        {
-          type: "tool-call",
-          callId: "call-1",
-          toolId: "orders.lookup-order",
-          input: { orderId: "order-1" },
-        },
-        { type: "final", output: { answer: "raw-result-secret" } },
-      ],
+      tools: [getOrderTool, cancelOrderTool],
+      engine: { invoke: () => Promise.reject(new Error("Unexpected RELKIT tool invocation.")) },
     });
 
-    await expect(agent.invoke({ question: "raw-prompt-secret" })).resolves.toEqual({
-      answer: "raw-result-secret",
-    });
+    await expect(
+      agent.invoke({ message: "raw-prompt-secret" }, { threadId: "commerce-support-test" }),
+    ).resolves.toEqual({ answer: "Order demo-1 is ready." });
 
-    expect(orderSupport.model).toBe("openai:gpt-5-mini");
+    expect(typeof orderSupport.model).toBe("object");
     expect(getOrderTool.id).toBe("orders.lookup-order");
-    expect(agent.model.calls).toHaveLength(2);
-    const agentSpanName = `relkit.agent.${orderSupport.id}`;
-    agent.trace.assert({
-      names: [
-        `${agentSpanName}.invoke`,
-        `${agentSpanName}.model`,
-        "relkit.tool.orders.lookup-order",
-        "relkit.invoke.orders.get-order",
-        "relkit.invoke.orders.get-order",
-        "relkit.tool.orders.lookup-order",
-        `${agentSpanName}.model`,
-        `${agentSpanName}.invoke`,
-      ],
-      edges: [
-        { relationship: "uses-provider-profile", from: orderSupport.id, to: "default" },
-        { relationship: "uses-tool", from: orderSupport.id, to: "orders.lookup-order" },
-      ],
-    });
+    expect(agent.model.calls).toHaveLength(0);
 
     const trace = agent.trace.read();
     const agentSpan = trace.spans.find(
@@ -76,37 +27,20 @@ describe("commerce-example support agent", () => {
     const modelSpans = trace.spans.filter(
       (span) => span.name.endsWith(".model") && span.status === "started",
     );
-    const toolSpan = trace.spans.find(
-      (span) => span.name === "relkit.tool.orders.lookup-order" && span.status === "started",
-    );
-    const functionSpan = trace.spans.find(
-      (span) => span.name === "relkit.invoke.orders.get-order" && span.status === "started",
-    );
-    const targetEdge = trace.edges.find(
-      (edge) => edge.relationship === "targets-function" && edge.from === "orders.lookup-order",
-    );
-
     expect(agentSpan?.functionId).toBe(`relkit.agent.${orderSupport.id}.invoke`);
     expect(modelSpans.map((span) => span.parentSpanId)).toEqual([agentSpan?.spanId]);
-    expect(toolSpan).toMatchObject({
-      parentSpanId: modelSpans[0]?.spanId,
-    });
-    expect(targetEdge?.to).toMatch(/^unbound\./);
-    expect(functionSpan).toMatchObject({
-      functionId: "orders.get-order",
-      source: "tool",
-      parentSpanId: toolSpan?.spanId,
-    });
-    expect(completions).toHaveLength(1);
-    expect(completions[0]?.record).toMatchObject({
-      functionId: "orders.get-order",
-      source: "tool",
-    });
+    expect(trace.edges).toEqual(
+      expect.arrayContaining([
+        {
+          relationship: "uses-provider-profile",
+          from: orderSupport.id,
+          to: "native:CommerceModel",
+        },
+      ]),
+    );
 
-    const allSpans = trace.spans;
     const serializedTrace = JSON.stringify(trace);
     expect(trace.spans.every((span) => span.capture === undefined)).toBe(true);
     expect(serializedTrace).not.toContain("raw-prompt-secret");
-    expect(serializedTrace).not.toContain("raw-result-secret");
   });
 });

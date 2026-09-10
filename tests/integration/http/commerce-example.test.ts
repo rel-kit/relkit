@@ -35,6 +35,7 @@ import getOrder from "../../../examples/commerce/src/orders/functions/get-order.
 import searchOrders from "../../../examples/commerce/src/orders/functions/search-orders.function.ts";
 import updateOrder from "../../../examples/commerce/src/orders/functions/update-order.function.ts";
 import uploadAssets from "../../../examples/commerce/src/assets/functions/upload-assets.function.ts";
+import { runWithRealtimeDispatcher } from "../../../packages/realtime/dist/index.js";
 
 const APP_ROOT = resolve(import.meta.dir, "../../../examples/commerce");
 const targets: Readonly<Record<string, InvocationTarget<any, any>>> = {
@@ -62,21 +63,40 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
         invocations.push(invocation);
         const target = targets[invocation.functionId];
         if (target !== undefined)
-          return invokeFunction(target, invocation.input, {
-            ...(invocation.functionId === "assets.upload-assets"
-              ? {
-                  clients: {
-                    buckets: {
-                      assets: {
-                        put: async (key: string) => {
-                          uploadedKeys.push(key);
+          return runWithRealtimeDispatcher(
+            {
+              trigger: async () => ({
+                accepted: true,
+                eventId: crypto.randomUUID(),
+                checkpoint: "1",
+                providerProfile: "default",
+                providerEpoch: "test",
+                duplicate: false,
+              }),
+              getPresence: async () => ({
+                connections: 0,
+                revision: "0",
+                scope: "process",
+                providerEpoch: "test",
+              }),
+            },
+            () =>
+              invokeFunction(target, invocation.input, {
+                ...(invocation.functionId === "assets.upload-assets"
+                  ? {
+                      clients: {
+                        buckets: {
+                          assets: {
+                            put: async (key: string) => {
+                              uploadedKeys.push(key);
+                            },
+                          },
                         },
                       },
-                    },
-                  },
-                }
-              : {}),
-          });
+                    }
+                  : {}),
+              }),
+          );
         if (invocation.functionId === "orders.create-order")
           return createOrderResult(invocation.input);
         throw new Error(`Unexpected function ${invocation.functionId}`);
