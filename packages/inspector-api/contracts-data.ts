@@ -79,6 +79,14 @@ export const graph = {
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
     { kind: "agent", id: "orders.agent", source: source("src/agents.ts") },
     {
+      kind: "channel",
+      id: "orders.updates",
+      source: source("src/channels.ts"),
+      client: { exposure: "protected" },
+      events: { "status.changed": { type: "object" } },
+      presence: { kind: "count" },
+    },
+    {
       kind: "provider",
       id: "provider.buckets.default",
       source: source("relkit.config.ts"),
