@@ -1,6 +1,6 @@
 {
   "contractVersion": 3,
-  "graphHash": "sha256:faeb79e4cfa069ecb2e063b4da7e4a4a4392238a139d9ce93a031a9016d573cb",
+  "graphHash": "sha256:0b639476a2a48a25d0fd1071ba9c7e4e1b9c3678ca9f699480cacd4b22ec1f4d",
   "application": {
     "id": "full-app",
     "image": {
@@ -115,53 +115,6 @@
         {
           "field": "url",
           "name": "CACHE_URL",
-          "sensitive": true,
-          "type": "secret-string"
-        }
-      ]
-    },
-    {
-      "kind": "connected-binding",
-      "bindingId": "provider.model.openai",
-      "capability": "model",
-      "profile": "openai",
-      "adapter": {
-        "integrationId": "ai-sdk",
-        "adapterId": "ai-sdk",
-        "protocolVersion": 1,
-        "behavior": {
-          "defaultModel": "gpt-5-mini",
-          "provider": "openai"
-        },
-        "connectionContract": {
-          "apiKey": {
-            "authoredValue": "fixed",
-            "required": true,
-            "sensitive": true
-          },
-          "baseURL": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          },
-          "organization": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          },
-          "project": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          }
-        },
-        "connection": {},
-        "features": []
-      },
-      "namedValues": [
-        {
-          "field": "apiKey",
-          "name": "MODEL_API_KEY",
           "sensitive": true,
           "type": "secret-string"
         }
