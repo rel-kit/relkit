@@ -1,11 +1,14 @@
 import type { GraphNode } from "./normalize-types.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
+import { clean } from "./normalize-graph-utils.js";
+import { isRecord, refKind } from "./normalize-utils.js";
 
 export function generatedFunctionNode(
   descriptor: NormalizedDescriptor,
   work: NormalizationWork,
 ): GraphNode {
   const generated = generatedAgentMarker(descriptor.id);
+  const value = isRecord(descriptor.value) ? descriptor.value : {};
   return {
     kind: "function",
     invocationMode: "callable",
@@ -16,6 +19,9 @@ export function generatedFunctionNode(
     exposure: "internal",
     input: work.schemas.get(`${descriptor.id}:input`) ?? null,
     output: work.schemas.get(`${descriptor.id}:output`) ?? null,
+    ...(refKind(value.backend) === "bucket"
+      ? { dependencies: { buckets: { backend: clean(value.backend) } } }
+      : {}),
     generated,
   };
 }

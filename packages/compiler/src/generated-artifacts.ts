@@ -10,7 +10,6 @@ import {
 } from "@relkit/contracts";
 import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { GeneratedOutputs } from "./normalize-types.js";
-
 export const GENERATED_ARTIFACT_FILES = Object.freeze({
   graph: "application.graph.json",
   manifest: "runtime.manifest.ts",
@@ -21,8 +20,9 @@ export const GENERATED_ARTIFACT_FILES = Object.freeze({
   diagnostics: "diagnostics.json",
   contract: "contract.ts",
   clientContract: "client-contract.json",
+  clientRegistry: "client-registry.d.ts",
+  clientManifest: "client-manifest.json",
 } as const);
-
 export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
   graph: GRAPH_VERSION,
   manifest: MANIFEST_VERSION,
@@ -33,6 +33,8 @@ export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
   diagnostics: CONTRACT_VERSION,
   contract: CONTRACT_VERSION,
   clientContract: CONTRACT_VERSION,
+  clientRegistry: GENERATOR_VERSION,
+  clientManifest: CONTRACT_VERSION,
   generator: GENERATOR_VERSION,
 } as const);
 
@@ -46,6 +48,8 @@ const GENERATED_ARTIFACT_KINDS = [
   "diagnostics",
   "contract",
   "clientContract",
+  "clientRegistry",
+  "clientManifest",
 ] as const;
 
 export const GENERATED_EXTENSION_VERSIONS = Object.freeze({
