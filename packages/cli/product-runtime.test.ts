@@ -9,43 +9,13 @@ const roots: string[] = [];
 
 test("the emitted full-graph server runs agents and correlated observability", async () => {
   const root = await copyFullProject();
-  const modelServer = Bun.serve({
-    port: 0,
-    fetch: () =>
-      Response.json({
-        id: "resp-local",
-        created_at: Math.floor(Date.now() / 1_000),
-        model: "gpt-5-mini",
-        output: [
-          {
-            type: "message",
-            role: "assistant",
-            id: "msg-local",
-            content: [
-              {
-                type: "output_text",
-                text: JSON.stringify({ answer: "local answer" }),
-                annotations: [],
-              },
-            ],
-          },
-        ],
-        usage: {
-          input_tokens: 0,
-          input_tokens_details: { cached_tokens: 0 },
-          output_tokens: 0,
-          output_tokens_details: { reasoning_tokens: 0 },
-        },
-      }),
-  });
-  await configureProductFixture(root, `http://127.0.0.1:${modelServer.port}/v1`);
+  await configureProductFixture(root);
   const built = await buildProject({ projectRoot: root });
-  expect(built.ok).toBe(true);
+  expect(built).toMatchObject({ ok: true });
   const started = await startProject({
     projectRoot: root,
     port: 0,
     healthTimeoutMs: 3_000,
-    environment: { OPENAI_API_KEY: "local-test-key" },
     spawn: (command, options) => Bun.spawn(command, { ...options, stderr: "inherit" }),
   });
   const base = `http://${started.hostname}:${started.port}`;
@@ -122,7 +92,6 @@ test("the emitted full-graph server runs agents and correlated observability", a
     streamController.abort();
     await started.stop();
     await started.exited;
-    modelServer.stop(true);
   }
 });
 
@@ -164,15 +133,22 @@ async function eventually(check: () => Promise<boolean>): Promise<boolean> {
   return false;
 }
 
-async function configureProductFixture(root: string, modelBaseUrl: string): Promise<void> {
-  const appPath = join(root, "relkit.config.ts");
-  const app = await readFile(appPath, "utf8");
+async function configureProductFixture(root: string): Promise<void> {
+  const agentPath = join(root, "src/orders/agents/order-support.agent.ts");
+  const agent = await readFile(agentPath, "utf8");
   await writeFile(
-    appPath,
-    app.replace(
-      'apiKey: envFactory.secret("MODEL_API_KEY"),',
-      `apiKey: envFactory.secret("OPENAI_API_KEY"),\n      baseURL: "${modelBaseUrl}",`,
-    ),
+    agentPath,
+    agent
+      .replace(
+        'import { defineAgent } from "@relkit/app";',
+        'import { defineAgent } from "@relkit/app";\nimport { createTestModel } from "@relkit/testing";',
+      )
+      .replace(
+        /const fixtureModel = \{[\s\S]*?\} as never;/,
+        `const fixtureModel = createTestModel({
+  script: [{ type: "final", output: { answer: "local answer" } }],
+}).languageModel;`,
+      ),
   );
   const functionPath = join(root, "src/orders/functions/create-order.function.ts");
   const source = await readFile(functionPath, "utf8");

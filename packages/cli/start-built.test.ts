@@ -86,7 +86,7 @@ test("accepts only the current complete built artifact cohort", async () => {
     `${canonicalJson({ ...manifest, graphVersion: GRAPH_VERSION - 1 })}\n`,
   );
   await expect(readBuilt(root)).rejects.toThrow(
-    "Built graph manifest version 7 is unsupported; expected 8. Rebuild with `relkit build`.",
+    `Built graph manifest version ${GRAPH_VERSION - 1} is unsupported; expected ${GRAPH_VERSION}. Rebuild with \`relkit build\`.`,
   );
 });
 

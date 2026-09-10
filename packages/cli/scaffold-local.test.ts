@@ -18,7 +18,6 @@ const result: AddResult = {
   installedPackages: [],
   warnings: [
     { code: "docker-required", message: "Run `relkit local up` before using this local resource." },
-    { code: "model-key", message: "Populate OPENAI_API_KEY before calling a model." },
   ],
   verification: { status: "passed", command: "bun run check" },
   nextSteps: ["relkit local up", "bun run dev"],
@@ -67,7 +66,6 @@ test("removes descriptor duplication and defers the Docker reminder in the previ
   expect(text).not.toContain("orders.example");
   expect(text).not.toContain("relkit local up");
   expect(text).toContain("src/orders/service.ts");
-  expect(text).toContain("OPENAI_API_KEY");
 });
 
 test.each([true, false])(
@@ -94,7 +92,6 @@ test.each([true, false])(
       !approved,
     );
     expect(completed.result.nextSteps.includes("relkit local up")).toBe(!approved);
-    expect(completed.result.warnings.some((warning) => warning.code === "model-key")).toBe(true);
   },
 );
 
