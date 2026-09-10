@@ -113,9 +113,6 @@ export async function renderService(
       target,
       requestFor(builder, "agent", {
         name: "Example",
-        model: "openai:gpt-5-mini",
-        modelProvider: "openai",
-        modelId: "gpt-5-mini",
         tools: tool ? [tool.id] : [],
         prompt: prompt?.id ?? "example",
       }),

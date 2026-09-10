@@ -7,7 +7,6 @@ export interface ScaffoldDependency {
 
 /** Versions copied into generated projects; tests keep these aligned with their owners. */
 export const SCAFFOLD_DEPENDENCIES = Object.freeze({
-  "@relkit/ai-sdk": { version: "0.4.0", section: "dependencies" },
   "@relkit/aws": { version: "0.4.0", section: "dependencies" },
   "@relkit/better-auth": { version: "0.4.0", section: "dependencies" },
   "@relkit/cloudflare": { version: "0.4.0", section: "dependencies" },
@@ -20,6 +19,7 @@ export const SCAFFOLD_DEPENDENCIES = Object.freeze({
   "better-auth": { version: "1.7.1", section: "dependencies" },
   "drizzle-kit": { version: "1.0.0-rc.5-ab785fc", section: "devDependencies" },
   "drizzle-orm": { version: "1.0.0-rc.5-169397b", section: "dependencies" },
+  langchain: { version: "1.5.10", section: "dependencies" },
 } satisfies Readonly<Record<string, ScaffoldDependency>>);
 
 export type ScaffoldDependencyName = keyof typeof SCAFFOLD_DEPENDENCIES;

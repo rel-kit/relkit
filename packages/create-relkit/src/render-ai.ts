@@ -7,7 +7,6 @@ import {
   type DomainTarget,
 } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
-import { ensureProviderProfile } from "./provider-planning.js";
 import { agentSource, toolSource } from "./render-ai-sources.js";
 import { renderFunction, type RenderedArtifact } from "./render-domain.js";
 
@@ -53,22 +52,20 @@ export async function renderAgent(
 ): Promise<RenderedArtifact> {
   const artifact = domainArtifact(target, request.name, "agents", "agent", "agent");
   assertAvailableId(builder, artifact.id);
-  const [provider, modelId] = request.model.split(/:(.*)/s, 2);
-  const profile = builder.discovery.profiles.find(
-    (item) => item.capability === "model" && item.name === provider,
-  );
-  if (!profile) {
-    if (!request.modelProvider || !request.modelId) {
+  if (request.model !== undefined) {
+    const [profile] = request.model.split(":", 1);
+    if (
+      !builder.discovery.profiles.some(
+        (item) => item.capability === "model" && item.name === profile,
+      )
+    ) {
       throw new AddScaffoldError(
         ADD_FAILURE_CODES.usage,
-        `Model profile ${provider} does not exist; use --model-provider and --model-id.`,
+        `Model profile ${profile} does not exist; configure a native model profile first.`,
       );
     }
-    await ensureProviderProfile(builder, "model", {
-      requested: provider,
-      provider: request.modelProvider,
-      modelId: request.modelId,
-    });
+  } else {
+    builder.dependency("langchain");
   }
   const tools = request.tools.map((value) => {
     const tool = resolveArtifact(builder, target, "tool", value);
@@ -77,10 +74,7 @@ export async function renderAgent(
   const instructions = request.prompt
     ? promptInstructions(builder, target, request.prompt)
     : { text: request.instructions! };
-  await builder.create(
-    artifact.path,
-    agentSource(artifact, modelId ? request.model : `${provider}`, tools, instructions),
-  );
+  await builder.create(artifact.path, agentSource(artifact, request.model, tools, instructions));
   builder.registerArtifact("agent", {
     domain: target.domain.fileStem,
     path: artifact.path,
