@@ -7,9 +7,11 @@ import {
   INSPECTOR_BACKEND_CONNECTED_EVENT,
 } from "./client";
 import { normalizeGraphResponse, type GraphSnapshot } from "./graph-model";
+import type { InspectorGraph } from "./api-types";
 import type { StreamConnectionState } from "./stream";
 
 export interface InspectorGraphState {
+  readonly source: InspectorGraph | undefined;
   readonly graph: GraphSnapshot | undefined;
   readonly connection: StreamConnectionState;
   readonly droppedEvents: number;
@@ -18,6 +20,7 @@ export interface InspectorGraphState {
 }
 
 const initialState: InspectorGraphState = {
+  source: undefined,
   graph: undefined,
   connection: "connecting",
   droppedEvents: 0,
@@ -39,6 +42,7 @@ export function useInspectorGraph(): InspectorGraphState {
           if (disposed) return;
           setState((current) => ({
             ...current,
+            source: payload,
             graph: normalizeGraphResponse(payload),
             loading: false,
             error: false,
