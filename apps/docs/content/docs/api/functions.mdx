@@ -650,11 +650,18 @@ export interface DefineFunction {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
+    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes> =
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes>,
+    const Options extends FunctionCallOptions<
+      Id,
+      InputSchema,
+      OutputSchema,
+      {},
+      Publishes,
+      ProgressSchema
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes> &
+    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, Publishes, ProgressSchema> &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
         readonly dependencies?: never;
@@ -668,7 +675,8 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes
+    Publishes,
+    ProgressSchema
   >;
 
   <
@@ -676,16 +684,25 @@ export interface DefineFunction {
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
     const Dependencies extends FunctionDependencies,
+    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Publishes extends readonly Extract<keyof Relkit.EventRegistry, string>[] = readonly [],
     const Options extends FunctionCallOptions<
       Id,
       InputSchema,
       OutputSchema,
       Dependencies,
-      Publishes
-    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes>,
+      Publishes,
+      ProgressSchema
+    > = FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes, ProgressSchema>,
   >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, Publishes> &
+    options: FunctionCallOptions<
+      Id,
+      InputSchema,
+      OutputSchema,
+      Dependencies,
+      Publishes,
+      ProgressSchema
+    > &
       Options &
       FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
   ): FunctionDescriptor<
@@ -697,12 +714,13 @@ export interface DefineFunction {
     InputSchema,
     OutputSchema,
     ToolMetadataOf<Options>,
-    Publishes
+    Publishes,
+    ProgressSchema
   >;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-types.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-types.ts#L76)
 
 ## `define-function-validation.ts`
 
@@ -1069,7 +1087,8 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
   OutputSchema,
   Dependencies,
   Errors,
-  Publishes
+  Publishes,
+  ProgressSchema
 >;
 ```
 
@@ -1160,7 +1179,7 @@ declare const EventRefAny: EventRefAny;
 **Signature**
 
 ```ts
-declare const FunctionContext: FunctionContext<D, Publishes>;
+declare const FunctionContext: FunctionContext<D, Publishes, Progress>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L41)
@@ -1189,7 +1208,8 @@ declare const FunctionDescriptor: FunctionDescriptor<
   InputSchema,
   OutputSchema,
   ToolMetadata,
-  Publishes
+  Publishes,
+  ProgressSchema
 >;
 ```
 
@@ -1418,6 +1438,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
   readonly id: string;
   readonly input: StandardSchemaV1;
   readonly output: StandardSchemaV1;
+  readonly progress?: StandardSchemaV1;
   readonly invocationMode: "callable" | "event-only";
   readonly handler: (...args: any[]) => unknown;
   readonly errors?: readonly ErrorDescriptorAny[];
@@ -1432,7 +1453,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L27)
 
 ## createFunctionDescriptor
 
@@ -1442,7 +1463,7 @@ export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
 declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptions) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-factory.ts#L45)
 
 ## `function-descriptor-types.ts`
 
@@ -1454,7 +1475,8 @@ declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptio
   - [ApplicationContextRegistry (type alias)](#applicationcontextregistry-type-alias)
   - [AuthContext (interface)](#authcontext-interface)
   - [DefineFunctionOptions (interface)](#definefunctionoptions-interface)
-  - [FunctionContext (interface)](#functioncontext-interface)
+  - [FunctionContext (type alias)](#functioncontext-type-alias)
+  - [FunctionContextBase (interface)](#functioncontextbase-interface)
   - [FunctionDependencies (interface)](#functiondependencies-interface)
   - [FunctionDescriptor (interface)](#functiondescriptor-interface)
   - [FunctionHandler (type alias)](#functionhandler-type-alias)
@@ -1478,7 +1500,7 @@ declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptio
 type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L44)
 
 ## AuthContext (interface)
 
@@ -1490,7 +1512,7 @@ export interface AuthContext<Session = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L53)
 
 ## DefineFunctionOptions (interface)
 
@@ -1504,6 +1526,7 @@ export interface DefineFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
   Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
   readonly id?: Id;
   readonly input: InputSchema;
@@ -1511,29 +1534,54 @@ export interface DefineFunctionOptions<
   readonly errors?: Errors;
   readonly dependencies?: Dependencies;
   readonly publishes?: Publishes;
+  readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: FunctionToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, Publishes>;
-  readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, Publishes>;
+  readonly onBefore?: FunctionLifecycleHook<
+    InferOutput<InputSchema>,
+    Dependencies,
+    Publishes,
+    ProgressSchema
+  >;
+  readonly onAfter?: FunctionLifecycleHook<
+    InferOutput<OutputSchema>,
+    Dependencies,
+    Publishes,
+    ProgressSchema
+  >;
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
     Dependencies,
     Errors,
-    Publishes
+    Publishes,
+    ProgressSchema
   >;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L130)
 
-## FunctionContext (interface)
+## FunctionContext (type alias)
 
 **Signature**
 
 ```ts
-export interface FunctionContext<
+type FunctionContext<D, Publishes, Progress> = FunctionContextBase<D, Publishes> &
+  ([Progress] extends [never]
+    ? {}
+    : { readonly progress: import("@relkit/invocation").ProgressEmitter<Progress> });
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L87)
+
+## FunctionContextBase (interface)
+
+**Signature**
+
+```ts
+export interface FunctionContextBase<
   D extends FunctionDependencies = {},
   Publishes extends readonly KnownEventName[] = readonly [],
 > {
@@ -1555,7 +1603,7 @@ export interface FunctionContext<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L66)
 
 ## FunctionDependencies (interface)
 
@@ -1570,7 +1618,7 @@ export interface FunctionDependencies {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L19)
 
 ## FunctionDescriptor (interface)
 
@@ -1587,6 +1635,7 @@ export interface FunctionDescriptor<
   OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
   ToolMetadata extends FunctionToolMetadata | undefined = undefined,
   Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 >
   extends
     DescriptorBase<"function", Id>,
@@ -1594,54 +1643,50 @@ export interface FunctionDescriptor<
   readonly dependencies?: FunctionDependencyOptions<Dependencies>;
   readonly invocationMode: "callable";
   readonly publishes?: Publishes;
+  readonly progress?: ProgressSchema;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly tool?: ToolMetadata;
-  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes>;
-  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes>;
-  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes>;
-  /** Invokes the descriptor through the active or isolated common engine. */
+  readonly onBefore?: FunctionLifecycleHook<Input, Dependencies, Publishes, ProgressSchema>;
+  readonly onAfter?: FunctionLifecycleHook<Output, Dependencies, Publishes, ProgressSchema>;
+  readonly handler: FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema>;
   readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
-  /** Creates a handler-free tool view with inherited schemas and declared errors. */
-  readonly asTool: FunctionAsTool<
-    Id,
-    Input,
-    Output,
-    Errors,
-    InputSchema,
-    OutputSchema,
-    ToolMetadata
-  >;
+  readonly asTool: OutputSchema extends StreamOutputSchema
+    ? never
+    : FunctionAsTool<Id, Input, Output, Errors, InputSchema, OutputSchema, ToolMetadata>;
+  readonly asGraphNode: OutputSchema extends StreamOutputSchema
+    ? never
+    : FunctionAsGraphNode<Id, Input, Output, Errors, InputSchema, OutputSchema, Dependencies>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L96)
 
 ## FunctionHandler (type alias)
 
 **Signature**
 
 ```ts
-type FunctionHandler<Input, Output, Dependencies, Errors, Publishes> = (
+type FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema> = (
   input: Input,
-  context: FunctionContext<Dependencies, Publishes>,
+  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L150)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L171)
 
 ## FunctionLifecycleHook (type alias)
 
 **Signature**
 
 ```ts
-type FunctionLifecycleHook<Value, Dependencies, Publishes> = (
+type FunctionLifecycleHook<Value, Dependencies, Publishes, ProgressSchema> = (
   value: Value,
-  context: FunctionContext<Dependencies, Publishes>,
+  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L161)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L183)
 
 ## InvocationMetadata (type alias)
 
@@ -1651,7 +1696,7 @@ type FunctionLifecycleHook<Value, Dependencies, Publishes> = (
 type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L27)
 
 ## InvocationSource (type alias)
 
@@ -1661,7 +1706,7 @@ type InvocationMetadata = SharedInvocationMetadata;
 type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L26)
 
 ## PublicClock (type alias)
 
@@ -1671,7 +1716,7 @@ type InvocationSource = SharedInvocationSource;
 type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L33)
 
 ## PublicLogger (type alias)
 
@@ -1681,7 +1726,7 @@ type PublicClock = SharedPublicClock;
 type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L32)
 
 ## PublicTrace (type alias)
 
@@ -1691,7 +1736,7 @@ type PublicLogger = SharedPublicLogger;
 type PublicTrace = SharedPublicTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L34)
 
 ## ResolvedApplicationEnv (type alias)
 
@@ -1703,7 +1748,143 @@ type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
   : Readonly<Relkit.ApplicationEnv>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L28)
+
+## `function-graph-node.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FunctionAsGraphNode (type alias)](#functionasgraphnode-type-alias)
+  - [FunctionGraphNodeDescriptor (interface)](#functiongraphnodedescriptor-interface)
+  - [FunctionGraphNodeOptions (interface)](#functiongraphnodeoptions-interface)
+  - [RELKIT_FUNCTION_GRAPH_NODE](#relkit_function_graph_node)
+  - [createFunctionGraphNode](#createfunctiongraphnode)
+  - [isFunctionGraphNode](#isfunctiongraphnode)
+
+---
+
+# utils
+
+## FunctionAsGraphNode (type alias)
+
+**Signature**
+
+```ts
+type FunctionAsGraphNode<
+  FunctionId,
+  Input,
+  Output,
+  Errors,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+> = {
+  <const NodeId extends string>(
+    options: FunctionGraphNodeOptions<NodeId> & { readonly id: NodeId },
+  ): FunctionGraphNodeDescriptor<
+    NodeId,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >;
+  (): FunctionGraphNodeDescriptor<
+    FunctionId,
+    FunctionId,
+    Input,
+    Output,
+    Errors,
+    InputSchema,
+    OutputSchema,
+    Dependencies
+  >;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L48)
+
+## FunctionGraphNodeDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface FunctionGraphNodeDescriptor<
+  Id extends string = string,
+  FunctionId extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Dependencies extends FunctionDependencies = FunctionDependencies,
+> extends DescriptorMetadata {
+  readonly [RELKIT_FUNCTION_GRAPH_NODE]: true;
+  readonly kind: "function-graph-node";
+  readonly id: Id;
+  readonly target: Ref<"function", FunctionId>;
+  readonly input: InputSchema;
+  readonly output: OutputSchema;
+  readonly errors?: Errors;
+  readonly dependencies?: Dependencies;
+  readonly invoke: (input: InferInput<InputSchema>) => Promise<Output>;
+  readonly __input?: Input;
+  readonly __output?: Output;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L25)
+
+## FunctionGraphNodeOptions (interface)
+
+**Signature**
+
+```ts
+export interface FunctionGraphNodeOptions<Id extends string = string> {
+  readonly id?: Id;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L21)
+
+## RELKIT_FUNCTION_GRAPH_NODE
+
+**Signature**
+
+```ts
+declare const RELKIT_FUNCTION_GRAPH_NODE: unique symbol;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L19)
+
+## createFunctionGraphNode
+
+**Signature**
+
+```ts
+declare const createFunctionGraphNode: (
+  receiver: unknown,
+  fallback: FunctionRefAny,
+  options?: FunctionGraphNodeOptions,
+) => FunctionGraphNodeDescriptor;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L81)
+
+## isFunctionGraphNode
+
+**Signature**
+
+```ts
+declare const isFunctionGraphNode: (value: unknown) => value is FunctionGraphNodeDescriptor;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L120)
 
 ## `function-tool-runtime.ts`
 
@@ -2314,7 +2495,9 @@ declare const fail: <const Descriptor extends ErrorDescriptorAny>(
 - [utils](#utils)
   - ["./define-error.js" (namespace export)](#define-errorjs-namespace-export)
   - ["./define-function.js" (namespace export)](#define-functionjs-namespace-export)
+  - ["./function-graph-node.js" (namespace export)](#function-graph-nodejs-namespace-export)
   - ["./handler-result.js" (namespace export)](#handler-resultjs-namespace-export)
+  - ["./stream.js" (namespace export)](#streamjs-namespace-export)
   - [FunctionToolApproval](#functiontoolapproval)
   - [FunctionToolApprovalDecision](#functiontoolapprovaldecision)
   - [FunctionToolApprovalDeniedError](#functiontoolapprovaldeniederror)
@@ -2362,6 +2545,18 @@ export * from "./define-function.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L2)
 
+## "./function-graph-node.js" (namespace export)
+
+Re-exports all named exports from the "./function-graph-node.js" module.
+
+**Signature**
+
+```ts
+export * from "./function-graph-node.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L4)
+
 ## "./handler-result.js" (namespace export)
 
 Re-exports all named exports from the "./handler-result.js" module.
@@ -2374,6 +2569,18 @@ export * from "./handler-result.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L3)
 
+## "./stream.js" (namespace export)
+
+Re-exports all named exports from the "./stream.js" module.
+
+**Signature**
+
+```ts
+export * from "./stream.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L5)
+
 ## FunctionToolApproval
 
 **Signature**
@@ -2382,7 +2589,7 @@ export * from "./handler-result.js";
 declare const FunctionToolApproval: FunctionToolApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L7)
 
 ## FunctionToolApprovalDecision
 
@@ -2392,7 +2599,7 @@ declare const FunctionToolApproval: FunctionToolApproval;
 declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L8)
 
 ## FunctionToolApprovalDeniedError
 
@@ -2402,7 +2609,7 @@ declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
 declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDeniedError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L23)
 
 ## FunctionToolApprovalRequest
 
@@ -2412,7 +2619,7 @@ declare const FunctionToolApprovalDeniedError: typeof FunctionToolApprovalDenied
 declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L9)
 
 ## FunctionToolApprovalRequiredError
 
@@ -2422,7 +2629,7 @@ declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
 declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequiredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L24)
 
 ## FunctionToolApprovalResolver
 
@@ -2432,7 +2639,7 @@ declare const FunctionToolApprovalRequiredError: typeof FunctionToolApprovalRequ
 declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L10)
 
 ## FunctionToolArgumentValidationError
 
@@ -2442,7 +2649,7 @@ declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
 declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L25)
 
 ## FunctionToolContext
 
@@ -2452,7 +2659,7 @@ declare const FunctionToolArgumentValidationError: typeof FunctionToolArgumentVa
 declare const FunctionToolContext: FunctionToolContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L13)
 
 ## FunctionToolDescriptor
 
@@ -2462,7 +2669,7 @@ declare const FunctionToolContext: FunctionToolContext;
 declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L11)
 
 ## FunctionToolHook
 
@@ -2472,7 +2679,7 @@ declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
 declare const FunctionToolHook: FunctionToolHook<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L14)
 
 ## FunctionToolInvokeOptions
 
@@ -2482,7 +2689,7 @@ declare const FunctionToolHook: FunctionToolHook<Value>;
 declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L12)
 
 ## FunctionToolMetadata
 
@@ -2492,7 +2699,7 @@ declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
 declare const FunctionToolMetadata: FunctionToolMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L15)
 
 ## FunctionToolOperationCancelledError
 
@@ -2502,7 +2709,7 @@ declare const FunctionToolMetadata: FunctionToolMetadata;
 declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L26)
 
 ## FunctionToolOptions
 
@@ -2512,7 +2719,7 @@ declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationC
 declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L16)
 
 ## FunctionToolSideEffect
 
@@ -2522,7 +2729,7 @@ declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
 declare const FunctionToolSideEffect: FunctionToolSideEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L17)
 
 ## FunctionToolTarget
 
@@ -2532,7 +2739,7 @@ declare const FunctionToolSideEffect: FunctionToolSideEffect;
 declare const FunctionToolTarget: FunctionToolTarget<Target>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L18)
 
 ## copyFunctionToolHooks
 
@@ -2544,7 +2751,7 @@ declare const copyFunctionToolHooks: (
 ) => Pick<FunctionToolOptions, "onBefore" | "onAfter">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L20)
 
 ## createFunctionToolInvoker
 
@@ -2561,7 +2768,7 @@ declare const createFunctionToolInvoker: <Target extends FunctionRefAny>(
 ) => Promise<InferOutput<Target["output"]>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/index.ts#L22)
 
 ## `internal.ts`
 
@@ -2587,6 +2794,66 @@ export * from "./function-descriptor-factory.js";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/internal.ts#L1)
+
+## `stream.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [StreamOutputSchema (interface)](#streamoutputschema-interface)
+  - [isStreamOutputSchema](#isstreamoutputschema)
+  - [streamOf](#streamof)
+
+---
+
+# utils
+
+## StreamOutputSchema (interface)
+
+**Signature**
+
+```ts
+export interface StreamOutputSchema<
+  ItemSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends StandardSchemaV1<
+  AsyncIterable<InferInput<ItemSchema>>,
+  AsyncIterable<InferOutput<ItemSchema>>
+> {
+  readonly kind: "stream";
+  readonly item: ItemSchema;
+  readonly relkit: {
+    readonly jsonSchema: () => { readonly kind: "stream"; readonly item: object };
+  };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L8)
+
+## isStreamOutputSchema
+
+**Signature**
+
+```ts
+declare const isStreamOutputSchema: (value: unknown) => value is StreamOutputSchema;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L51)
+
+## streamOf
+
+Declares a validated asynchronous stream result.
+
+**Signature**
+
+```ts
+declare const streamOf: <const ItemSchema extends StandardSchemaV1>(
+  item: ItemSchema,
+) => StreamOutputSchema<ItemSchema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/stream.ts#L22)
 
 ## `types.ts`
 
