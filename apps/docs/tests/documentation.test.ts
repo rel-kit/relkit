@@ -73,6 +73,7 @@ test("keeps Core concepts near Start and retires the duplicate Async section", a
       "index",
       "observability",
       "inspector",
+      "realtime-agents-streaming",
       "testing",
       "deployment",
       "troubleshooting",
@@ -232,7 +233,7 @@ test("keeps learning guides focused and actionable", async () => {
       const source = await readFile(resolve(content, directory, `${page}.mdx`), "utf8");
       expect(source).toMatch(/^---\ntitle: .+\ndescription: .+\n---/);
       if (!["events", "storage", "caching", "ai"].includes(directory) || page !== "index") {
-        expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
+        expect(source).toMatch(/```sh|<include[^>]*lang="tsx?"/);
       }
       const focusedGuide =
         ["events", "storage", "caching", "ai"].includes(directory) ||

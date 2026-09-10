@@ -41,8 +41,8 @@ test("documents an existing-app tutorial and MCP's exposure and approval boundar
   expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
   expect(tutorial).toContain("tests/unit/assistant.agent.test.ts");
-  expect(tutorial).toContain("ask-assistant.function.ts");
-  expect(tutorial).toContain("**Invoke locally**");
+  expect(tutorial).toContain("web/app/agent-config.ts");
+  expect(tutorial).toContain("caller-owned thread IDs");
 
   const mcp = await Bun.file(resolve(content, "ai/mcp.mdx")).text();
   expect(mcp).toContain("Streamable HTTP");
@@ -54,10 +54,12 @@ test("documents an existing-app tutorial and MCP's exposure and approval boundar
   expect(mcp).toMatch(/approval-required error without running\s+the function/);
 });
 
-test("explains AI SDK foundations, inherited schemas, callbacks, and streaming limits", async () => {
+test("explains native agent foundations, inherited schemas, callbacks, and streaming", async () => {
   const read = (page: string) => Bun.file(resolve(content, `ai/${page}.mdx`)).text();
-  expect(await read("index")).toContain("built on Vercel's AI SDK");
-  expect(await read("agents")).toContain("do not currently support streaming responses");
+  expect(await read("index")).toContain("native LangChain and LangGraph APIs");
+  expect(await read("index")).toContain("DeepAgents");
+  expect(await read("agents")).toContain("durable thread journal");
+  expect(await read("agents")).toContain("caller's stable business thread ID");
   expect(await read("tools")).toContain("hello/functions/hello.function.ts");
   expect(await read("tools")).toContain("inherits both from `target`");
   const approvals = await read("approvals");
@@ -67,4 +69,21 @@ test("explains AI SDK foundations, inherited schemas, callbacks, and streaming l
   const mcp = await read("mcp");
   expect(mcp).toContain("mcp-options.ts#private-tool");
   expect(mcp).toContain("mcp-options.ts#disable-mcp");
+});
+
+test("documents native compatibility, typed state, graphs, persistence, and resume", async () => {
+  const native = await Bun.file(resolve(content, "ai/native-runtime.mdx")).text();
+  expect(native).toMatch(/`langchain`\s+\| `1\.5\.10`/);
+  expect(native).toContain("RELKIT_DEEPAGENTS_UNAVAILABLE");
+  expect(native).toContain("explicit dynamic");
+  expect(native).toContain("order-support.agent.ts");
+  expect(native).toContain("order-deep.agent.ts");
+
+  const graph = await Bun.file(resolve(content, "ai/graphs-persistence.mdx")).text();
+  expect(graph).toContain("order-review.agent.ts");
+  expect(graph).toContain("defineCheckpointerDb");
+  expect(graph).toContain("never calls driver `.setup()`");
+  expect(graph).toContain("borrowed by default");
+  expect(graph).toContain("caller-owned `threadId`");
+  expect(graph).toContain("{ resume: true }");
 });
