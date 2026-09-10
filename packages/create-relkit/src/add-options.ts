@@ -134,12 +134,6 @@ function agentRequest(
   name: string,
   values: ReadonlyMap<string, readonly string[]>,
 ): AddRequest {
-  const provider = choice(one(values, "model-provider"), "model-provider", ["openai", "anthropic"]);
-  const modelId = one(values, "model-id");
-  const explicitModel = one(values, "model");
-  if ((provider === undefined) !== (modelId === undefined))
-    usage("--model-provider and --model-id must be used together.");
-  const model = explicitModel ?? (provider && modelId ? `${provider}:${modelId}` : undefined);
   const prompt = one(values, "prompt");
   const instructions = one(values, "instructions");
   if ((prompt === undefined) === (instructions === undefined)) {
@@ -149,12 +143,10 @@ function agentRequest(
     ...common,
     kind: "agent",
     name,
-    model: required(model, "--model or --model-provider with --model-id is required."),
+    ...optional("model", one(values, "model")),
     tools: many(values, "tool"),
     ...optional("prompt", prompt),
     ...optional("instructions", instructions),
-    ...optional("modelProvider", provider),
-    ...optional("modelId", modelId),
   } as AddRequest;
 }
 

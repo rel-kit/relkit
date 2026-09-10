@@ -120,7 +120,7 @@ async function toolOptions(state: AddResolutionState, discovery: ProjectDiscover
 
 async function agentOptions(state: AddResolutionState, discovery: ProjectDiscovery): Promise<void> {
   const domain = selectedDomain(state, discovery);
-  if (!state.has("model") && !state.has("model-provider") && !state.has("model-id")) {
+  if (!state.has("model")) {
     const models = profiles(discovery, "model");
     const preferred =
       models.find((profile) => profile.isDefault) ?? (models.length === 1 ? models[0] : undefined);
@@ -157,32 +157,18 @@ async function selectModel(
   state: AddResolutionState,
   models: ReturnType<typeof profiles>,
 ): Promise<void> {
-  const create = "__create__";
   const preferred = models.find((profile) => profile.isDefault) ?? models[0];
+  if (!preferred) return;
   const selected = await state.select(
     "Model",
-    [
-      ...models.map((profile) => ({
-        value: modelValue(profile),
-        label: modelValue(profile),
-        ...(profile.isDefault ? { hint: "configured default" } : {}),
-      })),
-      { value: create, label: "Configure a model provider" },
-    ],
-    preferred ? modelValue(preferred) : create,
+    models.map((profile) => ({
+      value: modelValue(profile),
+      label: modelValue(profile),
+      ...(profile.isDefault ? { hint: "configured default" } : {}),
+    })),
+    modelValue(preferred),
   );
-  if (selected !== create) {
-    if (selected) state.option("model", selected);
-    return;
-  }
-  const provider = await state.select("Model provider", choices(["openai", "anthropic"]), "openai");
-  const modelId = await state.text(
-    "Model ID",
-    provider === "anthropic" ? "claude-sonnet-4-5" : "gpt-5-mini",
-  );
-  if (!provider || !modelId) usage("A model provider and model ID are required.");
-  state.option("model-provider", provider);
-  state.option("model-id", modelId);
+  if (selected) state.option("model", selected);
 }
 
 function modelValue(profile: { readonly name: string; readonly modelId?: string }): string {
