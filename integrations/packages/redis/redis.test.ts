@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createBindingValueRef } from "@relkit/provider";
-import { redis } from "./src/index.ts";
+import { redis, redisAgentState, redisRealtime } from "./src/index.ts";
 import { localRecipe } from "./src/local-recipe/index.ts";
 
 describe("Redis integration authoring", () => {
@@ -32,6 +32,17 @@ describe("Redis integration authoring", () => {
       "Redis url must be a named secret binding value",
     );
     expect(() => redis({ typo: true } as never)).toThrow('Unknown Redis option "typo"');
+  });
+
+  test("defines separate realtime and agent-state adapters", () => {
+    expect(redisRealtime()).toMatchObject({
+      capability: { id: "realtime" },
+      adapterId: "redis-realtime",
+    });
+    expect(redisAgentState()).toMatchObject({
+      capability: { id: "agent-state" },
+      adapterId: "redis-agent-state",
+    });
   });
 });
 
