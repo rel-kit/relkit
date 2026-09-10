@@ -11,19 +11,16 @@ import {
   resolveValue,
   streamBody,
 } from "./internal-endpoints-utils.js";
+import {
+  INTERNAL_ENDPOINT_PROTOCOL,
+  INTERNAL_ENDPOINT_VERSION,
+} from "./internal-endpoint-paths.js";
 
-export const INTERNAL_ENDPOINT_PROTOCOL = "relkit.inspector" as const;
-export const INTERNAL_ENDPOINT_VERSION = contracts.API_VERSION;
-export const INTERNAL_ENDPOINT_PATHS = Object.freeze([
-  `${contracts.API_BASE_PATH}/health/live`,
-  `${contracts.API_BASE_PATH}/health/ready`,
-  `${contracts.API_BASE_PATH}/graph`,
-  `${contracts.API_BASE_PATH}/requests`,
-  `${contracts.API_BASE_PATH}/logs`,
-  `${contracts.API_BASE_PATH}/traces`,
-  `${contracts.API_BASE_PATH}/stream`,
-  `${contracts.API_BASE_PATH}/diagnostics`,
-] as const);
+export {
+  INTERNAL_ENDPOINT_PATHS,
+  INTERNAL_ENDPOINT_PROTOCOL,
+  INTERNAL_ENDPOINT_VERSION,
+} from "./internal-endpoint-paths.js";
 
 export type InternalEndpointMode = "development" | "test" | "production";
 export interface InternalQuery {

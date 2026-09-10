@@ -14,6 +14,7 @@ import { getRequestState } from "./middleware.js";
 import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-record-utils.js";
 import { requestFromContext } from "./request-context.js";
 import { frameworkTrace } from "@relkit/invocation";
+import { nativeStreamResponse } from "./native-stream.js";
 
 export function createRouteHandler(
   trigger: HttpTriggerRegistration,
@@ -74,10 +75,24 @@ async function handleRoute(
       "function",
       trigger.targetFunctionId,
     );
+    if (trigger.config.stream != null) {
+      if (!isAsyncIterable(value))
+        throw new TypeError("Native stream target returned no iterator.");
+      return nativeStreamResponse(value, trigger.config.stream.format);
+    }
     return mapSuccessResponse(trigger, value, responseOptions);
   } catch (cause) {
     return mapFailureResponse(trigger, cause, responseOptions);
   }
+}
+
+function isAsyncIterable(value: unknown): value is AsyncIterable<unknown> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    Symbol.asyncIterator in value &&
+    typeof value[Symbol.asyncIterator] === "function"
+  );
 }
 
 function stripHead(trigger: HttpTriggerRegistration, response: Response): Response {
