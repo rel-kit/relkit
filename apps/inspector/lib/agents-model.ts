@@ -9,88 +9,22 @@ import {
   text,
   timeline,
 } from "./agents-model-utils";
-
-export interface ToolApprovalView {
-  readonly invocationId: string;
-  readonly toolCallId: string;
-  readonly toolId: string;
-  readonly state: "pending" | "approved" | "denied";
-  readonly sideEffect?: string;
-  readonly policy?: string;
-  readonly required?: boolean;
-}
-export interface ToolRuntimeView {
-  readonly id: string;
-  readonly invocationId?: string;
-  readonly toolCallId?: string;
-  readonly traceId?: string;
-  readonly requestId?: string;
-  readonly status?: string;
-  readonly state?: string;
-  readonly outcome?: string;
-  readonly startedAt?: string;
-  readonly completedAt?: string;
-  readonly durationMs?: number;
-  readonly approval?: ToolApprovalView;
-}
-export interface SpanView {
-  readonly kind: "agent" | "model" | "tool";
-  readonly spanId: string;
-  readonly invocationId?: string;
-  readonly name?: string;
-  readonly agentId?: string;
-  readonly functionId?: string;
-  readonly traceId?: string;
-  readonly parentSpanId?: string;
-  readonly toolId?: string;
-  readonly toolCallId?: string;
-  readonly profile?: string;
-  readonly step?: number;
-  readonly status?: string;
-  readonly outcome?: string;
-  readonly startedAt?: string;
-  readonly completedAt?: string;
-  readonly durationMs?: number;
-  readonly inputBytes?: number;
-  readonly outputBytes?: number;
-}
-export interface TimelineEntry {
-  readonly kind: "invocation" | "agent" | "model" | "tool";
-  readonly id: string;
-  readonly at: string;
-  readonly status?: string;
-  readonly outcome?: string;
-  readonly spanId?: string;
-  readonly parentSpanId?: string;
-  readonly toolId?: string;
-}
-export interface ToolView {
-  readonly id: string;
-  readonly targetFunctionId: string;
-  readonly description: string;
-  readonly sideEffect: string;
-  readonly approvalPolicy: string;
-  readonly timeoutMs?: number;
-  readonly input?: unknown;
-  readonly output?: unknown;
-  readonly errors?: unknown;
-  readonly runtime: readonly ToolRuntimeView[];
-  readonly pendingApprovals: readonly ToolApprovalView[];
-  readonly spans: readonly SpanView[];
-  readonly timeline: readonly TimelineEntry[];
-}
-export interface AgentView {
-  readonly id: string;
-  readonly model: string;
-  readonly limits?: unknown;
-  readonly input?: unknown;
-  readonly output?: unknown;
-  readonly toolIds: readonly string[];
-  readonly generatedFunctionId: string;
-  readonly runtime: readonly ToolRuntimeView[];
-  readonly spans: readonly SpanView[];
-  readonly timeline: readonly TimelineEntry[];
-}
+import type {
+  AgentView,
+  SpanView,
+  TimelineEntry,
+  ToolApprovalView,
+  ToolRuntimeView,
+  ToolView,
+} from "./agents-model-types";
+export type {
+  AgentView,
+  SpanView,
+  TimelineEntry,
+  ToolApprovalView,
+  ToolRuntimeView,
+  ToolView,
+} from "./agents-model-types";
 export function toolViews(
   graph: InspectorGraph,
   runtime: readonly InspectorObject[] = [],
@@ -115,8 +49,11 @@ export function agentViews(
   spans: readonly InspectorObject[] = [],
 ): readonly AgentView[] {
   return graphNodes(graph)
-    .filter((node) => node.kind === "agent")
-    .map((node) => makeAgentView(node, runtime, spans))
+    .flatMap((node) =>
+      node.kind === "agent" && node.execution !== "graph"
+        ? [makeAgentView(node, runtime, spans)]
+        : [],
+    )
     .sort((left, right) => left.id.localeCompare(right.id));
 }
 
@@ -188,6 +125,9 @@ function makeAgentView(
   return {
     id,
     model: text(node.model),
+    client: node.client === "public" || node.client === "protected" ? node.client : "internal",
+    controls: strings(node.controls).filter(isAgentControl),
+    chat: record(node.chat) !== undefined,
     ...(node.limits === undefined ? {} : { limits: node.limits }),
     ...(node.input === undefined ? {} : { input: node.input }),
     ...(node.output === undefined ? {} : { output: node.output }),
@@ -197,4 +137,8 @@ function makeAgentView(
     spans: spanViews,
     timeline: timeline(runtimeViews, spanViews),
   };
+}
+
+function isAgentControl(value: string): value is "steer" | "follow-up" | "stop" | "approve" {
+  return value === "steer" || value === "follow-up" || value === "stop" || value === "approve";
 }
