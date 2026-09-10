@@ -67,10 +67,10 @@ bun run relkit add service Billing --full
 
 The full bundle wires a public function and event, an event consumer, error, job, cache, bucket, tool,
 prompt, agent, constants, and `GET /billing` route. Missing event and job profiles use file-backed local
-providers; cache and bucket use Docker Redis and MinIO; the agent uses the OpenAI AI SDK `gpt-5-mini`
-default. Set `OPENAI_API_KEY` before starting or restarting the server: the configured model profile
-requires it at startup, even if no agent has been invoked. The CLI never generates secrets, calls models,
-runs migrations, or provisions cloud resources. Docker startup requires the separate approval below.
+providers; cache and bucket use Docker Redis and MinIO. Agent projects use native LangChain/LangGraph
+dependencies and keep deterministic tests offline; production model packages and credentials remain an
+explicit application choice. The CLI never generates secrets, calls models, runs migrations, or provisions
+cloud resources. Docker startup requires the separate approval below.
 
 Friendly names are normalized before mutation. For example, `Send Receipt` previews
 `send-receipt.function.ts`, the `sendReceipt` binding, and its domain-qualified descriptor ID.

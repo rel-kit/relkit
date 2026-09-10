@@ -132,6 +132,15 @@
       "examples": ["examples/commerce/src/platform/generated-client.ts"]
     },
     {
+      "id": "realtime",
+      "title": "Realtime channels",
+      "summary": "Append typed events and observe authorized partitions with replay and presence.",
+      "guide": "realtime/index",
+      "apiPackage": "realtime",
+      "entrypoints": [{ "source": "packages/realtime/src/channel.ts", "name": "defineChannel" }],
+      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"]
+    },
+    {
       "id": "events",
       "title": "Events",
       "summary": "Publish typed facts and process them with independent listeners.",
@@ -314,7 +323,7 @@
       "api": ["services", "functions", "tools", "agents", "jobs", "events", "cache", "buckets"],
       "examples": [
         "examples/commerce/src/orders/functions/create-order.function.ts",
-        "templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts"
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts"
       ],
       "next": "service/define"
     },
@@ -385,6 +394,12 @@
       "path": "http/responses",
       "api": ["routes", "functions"],
       "examples": ["examples/commerce/src/routes/orders/route.ts"],
+      "next": "http/streaming"
+    },
+    {
+      "path": "http/streaming",
+      "api": ["routes", "functions", "client"],
+      "examples": ["packages/runtime-hono/native-stream.test.ts"],
       "next": "http/raw-handlers"
     },
     {
@@ -724,6 +739,51 @@
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
       ],
+      "next": "ai/native-runtime"
+    },
+    {
+      "path": "ai/native-runtime",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/graphs-persistence"
+    },
+    {
+      "path": "ai/graphs-persistence",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/streaming"
+    },
+    {
+      "path": "ai/streaming",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/threads-recovery"
+    },
+    {
+      "path": "ai/threads-recovery",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
+      "next": "ai/approvals"
+    },
+    {
+      "path": "ai/approvals",
+      "api": ["agents", "tools", "functions", "testing"],
+      "examples": [
+        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
+        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
+      ],
       "next": "ai/tools"
     },
     {
@@ -751,15 +811,6 @@
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
       ],
-      "next": "ai/approvals"
-    },
-    {
-      "path": "ai/approvals",
-      "api": ["agents", "tools", "functions", "testing"],
-      "examples": [
-        "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
-        "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
       "next": "ai/first-agent"
     },
     {
@@ -769,6 +820,84 @@
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
       ],
+      "next": "client/index"
+    },
+    {
+      "path": "client/index",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/routes"
+    },
+    {
+      "path": "client/routes",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/mutations"
+    },
+    {
+      "path": "client/mutations",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/streams"
+    },
+    {
+      "path": "client/streams",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/ssr"
+    },
+    {
+      "path": "client/ssr",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/authentication"
+    },
+    {
+      "path": "client/authentication",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "client/offline"
+    },
+    {
+      "path": "client/offline",
+      "api": ["client", "routes"],
+      "examples": ["tests/types/client-react.ts"],
+      "next": "realtime/index"
+    },
+    {
+      "path": "realtime/index",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"],
+      "next": "realtime/access"
+    },
+    {
+      "path": "realtime/access",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
+      "next": "realtime/react"
+    },
+    {
+      "path": "realtime/react",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce-web/app/page.tsx"],
+      "next": "realtime/presence"
+    },
+    {
+      "path": "realtime/presence",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
+      "next": "realtime/recovery"
+    },
+    {
+      "path": "realtime/recovery",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
+      "next": "realtime/providers"
+    },
+    {
+      "path": "realtime/providers",
+      "api": ["realtime", "client"],
+      "examples": ["examples/commerce/relkit.config.ts"],
       "next": "integrations/index"
     },
     {
@@ -802,6 +931,12 @@
       "path": "operations/inspector",
       "api": ["app", "routes"],
       "examples": ["tests/e2e/inspector-redesign.spec.ts"],
+      "next": "operations/realtime-agents-streaming"
+    },
+    {
+      "path": "operations/realtime-agents-streaming",
+      "api": ["realtime", "agents", "client"],
+      "examples": ["packages/runtime-hono/realtime-rpc.test.ts"],
       "next": "operations/testing"
     },
     {

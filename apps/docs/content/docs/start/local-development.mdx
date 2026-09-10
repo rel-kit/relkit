@@ -72,10 +72,10 @@ Normal logs show a changed-file count and the actionable error without repeated 
 For full file lists and diagnostics, restart with `bun run dev --verbose`. Use
 `bun run relkit --json dev` for structured logs; JSON and Inspector records retain diagnostic details.
 
-If an add introduces a required model profile, populate `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`
-before its candidate can start. Saving `.env` retries an active dev session; after an initial startup
-failure, run `bun run dev` again. See [post-add Docker approval](/docs/start/add-artifacts#start-local-resources)
-for cache/bucket dependencies.
+If an agent uses a production LangChain model package, populate that provider's documented server-side
+credentials before its candidate can start. The generated offline model needs none. Saving `.env` retries an
+active dev session; after an initial startup failure, run `bun run dev` again. See
+[post-add Docker approval](/docs/start/add-artifacts#start-local-resources) for cache/bucket dependencies.
 
 ## Configure ports and body limits
 
