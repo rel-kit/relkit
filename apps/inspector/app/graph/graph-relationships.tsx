@@ -22,6 +22,7 @@ export function GraphRelationships({ edges }: { readonly edges: readonly GraphEd
             <DataTableHead>From</DataTableHead>
             <DataTableHead>To</DataTableHead>
             <DataTableHead>Relationship</DataTableHead>
+            <DataTableHead>Context</DataTableHead>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@ export function GraphRelationships({ edges }: { readonly edges: readonly GraphEd
                   <code>{bounded(edge.to)}</code>
                 </DataTableCell>
                 <DataTableCell>{bounded(edgeLabel(edge))}</DataTableCell>
+                <DataTableCell>{edgeContext(edge)}</DataTableCell>
               </tr>
             ))
           )}
@@ -49,6 +51,15 @@ export function GraphRelationships({ edges }: { readonly edges: readonly GraphEd
       </DataTable>
     </section>
   );
+}
+
+function edgeContext(edge: GraphEdge): string {
+  const values = [
+    edge.role === undefined ? undefined : `role ${edge.role}`,
+    edge.member === undefined ? undefined : `member ${edge.member}`,
+    edge.order === undefined ? undefined : `order ${edge.order}`,
+  ].filter((value): value is string => value !== undefined);
+  return values.join(", ") || "—";
 }
 
 function bounded(value: string): string {
