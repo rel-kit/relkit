@@ -28,6 +28,15 @@ test("check emits activatable success and portable structured diagnostics on fai
     [],
   );
 
+  const stdout: string[] = [];
+  expect(
+    await runCli(["check", "--project-root", validRoot], {
+      io: { stdout: (line) => stdout.push(line), stderr: () => undefined },
+      installSignalHandlers: false,
+    }),
+  ).toBe(0);
+  expect(stdout).toEqual([`Checked ${validRoot}`]);
+
   const invalidRoot = await copyProject("tests/compiler/fixtures/error-duplicate-id");
   const invalid = await checkProject({ projectRoot: invalidRoot });
   expect(invalid.ok).toBe(false);
@@ -186,7 +195,7 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   const staleGraph = JSON.parse(await readFile(graphPath, "utf8")) as Record<string, unknown>;
   await writeFile(graphPath, JSON.stringify({ ...staleGraph, contractVersion: GRAPH_VERSION - 1 }));
   await expect(readBuilt(rebuilt.buildDirectory)).rejects.toThrow(
-    "Built graph contract version 7 is unsupported; expected 8. Rebuild with `relkit build`.",
+    `Built graph contract version ${GRAPH_VERSION - 1} is unsupported; expected ${GRAPH_VERSION}. Rebuild with \`relkit build\`.`,
   );
 
   const invalidRoot = await copyProject("tests/compiler/fixtures/error-route-collision");

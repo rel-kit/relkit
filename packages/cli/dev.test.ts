@@ -149,6 +149,25 @@ test("keeps the active backend when a later candidate fails", async () => {
   expect(await (await fetch(`http://127.0.0.1:${session.backendPort}/hello`)).text()).toBe("hello");
 });
 
+test("preserves the initial candidate failure", async () => {
+  const root = await makeRoot();
+  const logs: Parameters<NonNullable<DevOptions["onLog"]>>[0][] = [];
+  const failure = Object.assign(new Error("local lease held"), {
+    code: "RELKIT_LOCAL_LEASE_HELD",
+  });
+
+  await expect(
+    startDev({
+      ...options(root, "sha256:initial-failure"),
+      compile: async () => {
+        throw failure;
+      },
+      onLog: (event) => logs.push(event),
+    }),
+  ).rejects.toBe(failure);
+  expect(logs.some((event) => event.event === "dev.generation.failed")).toBe(false);
+});
+
 test("stops an inspector child through the external shutdown signal", async () => {
   const root = await makeRoot();
   const controller = new AbortController();

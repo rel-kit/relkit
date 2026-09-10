@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import type { DeploymentPlan } from "@relkit/deploy";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import { hashGraph, type ApplicationGraph } from "@relkit/graph";
 import { runDeploy } from "./src/commands/deploy.js";
 
@@ -13,6 +14,7 @@ const fixtureGraph = JSON.parse(
 ) as ApplicationGraph;
 const graph: ApplicationGraph = {
   ...fixtureGraph,
+  contractVersion: GRAPH_VERSION,
   nodes: fixtureGraph.nodes.map((node) =>
     node.kind === "app"
       ? {
