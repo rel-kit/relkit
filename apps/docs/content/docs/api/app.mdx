@@ -404,7 +404,15 @@ declare const createApplicationContextResolver: (options: {
 **Signature**
 
 ```ts
-declare const APP_PROVIDER_CAPABILITIES: readonly ["bucket", "cache", "job", "event", "model"];
+declare const APP_PROVIDER_CAPABILITIES: readonly [
+  "bucket",
+  "cache",
+  "job",
+  "event",
+  "model",
+  "realtime",
+  "agent-state",
+];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L31)
@@ -430,7 +438,7 @@ export interface ApiDocsConfig {
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L67)
 
 ## AppProviderCapability (type alias)
 
@@ -440,21 +448,21 @@ type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L41)
 
 ## AppProviderDefaults (type alias)
 
 **Signature**
 
 ```ts
-type Readonly<{ bucket?: "bucket" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "bucket"]>> : never; cache?: "cache" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "cache"]>> : never; job?: "job" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "job"]>> : never; event?: "event" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "event"]>> : never; model?: "model" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "model"]>> : never; }> = Readonly<{
+type Readonly<{ bucket?: "bucket" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "bucket"]>> : never; cache?: "cache" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "cache"]>> : never; job?: "job" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "job"]>> : never; event?: "event" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "event"]>> : never; model?: "model" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "model"]>> : never; realtime?: "realtime" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "realtime"]>> : never; "agent-state"?: "agent-state" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "agent-state"]>> : never; }> = Readonly<{
   [Capability in AppProviderCapability]?: Capability extends keyof Providers
     ? Profile<NonNullable<Providers[Capability]>>
     : never;
 }>
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L59)
 
 ## AppProviderInputs (interface)
 
@@ -467,10 +475,12 @@ export interface AppProviderInputs {
   readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
+  readonly realtime?: CapabilityInput<"realtime">;
+  readonly "agent-state"?: CapabilityInput<"agent-state">;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L47)
 
 ## AppTelemetryConfig (type alias)
 
@@ -480,7 +490,7 @@ export interface AppProviderInputs {
 type AppTelemetryConfig<Exporters> = TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L65)
 
 ## ApplicationDescriptor (type alias)
 
@@ -498,7 +508,7 @@ type ApplicationDescriptor<Shape, Providers, Exporters> = DescriptorBase<"app", 
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L99)
 
 ## DefineAppOptions (type alias)
 
@@ -517,7 +527,7 @@ type DefineAppOptions<Shape, Providers, Exporters> = DescriptorMetadata &
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L69)
 
 ## InspectorConfig (interface)
 
@@ -678,6 +688,7 @@ export * from "@relkit/functions";
   - ["@relkit/events" (namespace export)](#relkitevents-namespace-export)
   - ["@relkit/functions" (namespace export)](#relkitfunctions-namespace-export)
   - ["@relkit/jobs" (namespace export)](#relkitjobs-namespace-export)
+  - ["@relkit/realtime" (namespace export)](#relkitrealtime-namespace-export)
   - ["@relkit/routes" (namespace export)](#relkitroutes-namespace-export)
   - ["@relkit/services" (namespace export)](#relkitservices-namespace-export)
   - ["@relkit/tools" (namespace export)](#relkittools-namespace-export)
@@ -798,6 +809,18 @@ export * from "@relkit/jobs";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L11)
 
+## "@relkit/realtime" (namespace export)
+
+Re-exports all named exports from the "@relkit/realtime" module.
+
+**Signature**
+
+```ts
+export * from "@relkit/realtime";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+
 ## "@relkit/routes" (namespace export)
 
 Re-exports all named exports from the "@relkit/routes" module.
@@ -808,7 +831,7 @@ Re-exports all named exports from the "@relkit/routes" module.
 export * from "@relkit/routes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## "@relkit/services" (namespace export)
 
@@ -820,7 +843,7 @@ Re-exports all named exports from the "@relkit/services" module.
 export * from "@relkit/services";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
 
 ## "@relkit/tools" (namespace export)
 
@@ -832,7 +855,7 @@ Re-exports all named exports from the "@relkit/tools" module.
 export * from "@relkit/tools";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
 
 ## EventAttributeValue
 
@@ -898,6 +921,31 @@ export * from "@relkit/jobs";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L1)
+
+## `realtime.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["@relkit/realtime" (namespace export)](#relkitrealtime-namespace-export)
+
+---
+
+# utils
+
+## "@relkit/realtime" (namespace export)
+
+Re-exports all named exports from the "@relkit/realtime" module.
+
+**Signature**
+
+```ts
+export * from "@relkit/realtime";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/realtime.ts#L1)
 
 ## `routes.ts`
 

@@ -1,0 +1,21 @@
+---
+title: Agent streaming and controls
+description: Observe durable content parts, tool progress, approvals, and terminal outcomes.
+---
+
+## Expose the declared controls
+
+Client-exposed agents require an agent-state profile. `useAgent` exposes only controls declared by the
+agent: steer, follow-up, stop, and approval/denial. An agent with a reachable approval-requiring tool
+must declare the approve capability.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-support.agent.ts"'>
+  ../../examples/commerce/src/orders/agents/order-support.agent.ts
+</include>
+
+## Observe without blocking execution
+
+Persistent journal acceptance is separate from browser delivery. Slow observers detach with
+`SLOW_CONSUMER` and recover from the journal; they never backpressure model or tool execution.
+Browser projections contain validated public messages, parts, progress, tool data, and results—not
+provider payloads, internal prompts, credentials, private context, or private reasoning.
