@@ -1,3 +1,4 @@
+import ELK, { type ElkNode } from "elkjs/lib/elk.bundled.js";
 import type { GraphEdge, GraphNode, GraphSnapshot } from "./graph-model";
 
 export interface PositionedNode {
@@ -23,48 +24,96 @@ export interface GraphLayout {
   readonly edges: readonly PositionedEdge[];
 }
 
-/** Uses deterministic kind columns so related capabilities stay visually grouped. */
-export function layoutGraph(graph: GraphSnapshot): GraphLayout {
-  const nodeWidth = 168;
-  const nodeHeight = 64;
-  const padding = 24;
-  const columnGap = 48;
-  const rowGap = 28;
-  const groups = new Map<string, GraphNode[]>();
-  for (const node of graph.nodes) {
-    const group = groups.get(node.kind);
-    if (group === undefined) groups.set(node.kind, [node]);
-    else group.push(node);
-  }
-  const groupEntries = [...groups.entries()].sort(([left], [right]) => left.localeCompare(right));
-  const columns = Math.max(1, groupEntries.length);
-  const rows = Math.max(1, ...groupEntries.map(([, nodes]) => nodes.length));
-  const width = Math.max(720, padding * 2 + columns * nodeWidth + (columns - 1) * columnGap);
-  const height = Math.max(180, padding * 2 + rows * nodeHeight + (rows - 1) * rowGap);
-  const nodes = groupEntries.flatMap(([, group], column) =>
-    group.map((node, row) => ({
-      node,
-      x: padding + column * (nodeWidth + columnGap),
-      y: padding + row * (nodeHeight + rowGap),
-      width: nodeWidth,
-      height: nodeHeight,
-    })),
+const nodeWidth = 184;
+const nodeHeight = 68;
+export type GraphDirection = "RIGHT" | "DOWN";
+
+export async function layoutGraph(
+  graph: GraphSnapshot,
+  direction: GraphDirection = "RIGHT",
+): Promise<GraphLayout> {
+  const sourceNodes = [...graph.nodes].sort((left, right) => left.id.localeCompare(right.id));
+  const sourceEdges = [...graph.declaredEdges, ...graph.observedEdges].sort(compareEdges);
+  const elk = new ELK(
+    typeof Worker !== "undefined"
+      ? {
+          workerFactory: () =>
+            new Worker(new URL("../node_modules/elkjs/lib/elk-worker.min.js", import.meta.url), {
+              type: "module",
+            }),
+        }
+      : {},
   );
-  const positions = new Map(nodes.map((position) => [position.node.id, position]));
-  const edges = [...graph.declaredEdges, ...graph.observedEdges].flatMap((edge, index) => {
-    const from = positions.get(edge.from);
-    const to = positions.get(edge.to);
-    if (from === undefined || to === undefined) return [];
-    return [
-      {
-        ...edge,
-        key: `${edge.relationship}:${edge.kind}:${edge.from}:${edge.to}:${index}`,
-        x1: from.x + from.width / 2,
-        y1: from.y + from.height / 2,
-        x2: to.x + to.width / 2,
-        y2: to.y + to.height / 2,
+  try {
+    const result = await elk.layout({
+      id: "relkit",
+      layoutOptions: {
+        "elk.algorithm": "layered",
+        "elk.direction": direction,
+        "elk.padding": "[top=24,left=24,bottom=24,right=24]",
+        "elk.spacing.nodeNode": "32",
+        "elk.layered.spacing.nodeNodeBetweenLayers": "72",
+        "elk.layered.considerModelOrder.strategy": "NODES_AND_EDGES",
+        "elk.layered.crossingMinimization.forceNodeModelOrder": "true",
       },
-    ];
-  });
-  return { width, height, nodes, edges };
+      children: sourceNodes.map((node) => ({ id: node.id, width: nodeWidth, height: nodeHeight })),
+      edges: sourceEdges.map((edge, index) => ({
+        id: edgeKey(edge, index),
+        sources: [edge.from],
+        targets: [edge.to],
+      })),
+    } satisfies ElkNode);
+    const positions = new Map(
+      (result.children ?? []).map((item) => [
+        item.id,
+        {
+          x: item.x ?? 0,
+          y: item.y ?? 0,
+          width: item.width ?? nodeWidth,
+          height: item.height ?? nodeHeight,
+        },
+      ]),
+    );
+    const nodes = sourceNodes.flatMap((node) => {
+      const position = positions.get(node.id);
+      return position === undefined ? [] : [{ node, ...position }];
+    });
+    const edges = sourceEdges.flatMap((edge, index) => {
+      const from = positions.get(edge.from);
+      const to = positions.get(edge.to);
+      return from === undefined || to === undefined
+        ? []
+        : [
+            {
+              ...edge,
+              key: edgeKey(edge, index),
+              x1: direction === "DOWN" ? from.x + from.width / 2 : from.x + from.width,
+              y1: direction === "DOWN" ? from.y + from.height : from.y + from.height / 2,
+              x2: direction === "DOWN" ? to.x + to.width / 2 : to.x,
+              y2: direction === "DOWN" ? to.y : to.y + to.height / 2,
+            },
+          ];
+    });
+    return {
+      width: Math.max(720, result.width ?? 720),
+      height: Math.max(180, result.height ?? 180),
+      nodes,
+      edges,
+    };
+  } finally {
+    elk.terminateWorker();
+  }
+}
+
+function edgeKey(edge: GraphEdge, index: number): string {
+  return `${edge.relationship}:${edge.kind}:${edge.from}:${edge.to}:${index}`;
+}
+
+function compareEdges(left: GraphEdge, right: GraphEdge): number {
+  return (
+    left.from.localeCompare(right.from) ||
+    left.to.localeCompare(right.to) ||
+    left.kind.localeCompare(right.kind) ||
+    left.relationship.localeCompare(right.relationship)
+  );
 }
