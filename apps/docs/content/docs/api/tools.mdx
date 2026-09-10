@@ -504,7 +504,7 @@ export interface ResolvedToolTarget {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L67)
 
 ## ToolAllowlistEntry (type alias)
 
@@ -514,7 +514,7 @@ export interface ResolvedToolTarget {
 type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L38)
 
 ## ToolArgumentValidationError
 
@@ -524,7 +524,7 @@ type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
 declare const ToolArgumentValidationError: typeof ToolArgumentValidationError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L92)
 
 ## ToolEngine (interface)
 
@@ -538,7 +538,7 @@ export interface ToolEngine {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L29)
 
 ## ToolEngineInvocation (interface)
 
@@ -557,6 +557,7 @@ export interface ToolEngineInvocation {
   /** Forwarded structurally to the common engine's existing invocation hooks. */
   readonly hooks?: unknown;
   readonly toolHooks?: unknown;
+  readonly progressSink?: import("@relkit/invocation").ProgressSink;
   /** Forwarded structurally to preserve the parent agent span/invocation. */
   readonly parent?: unknown;
 }
@@ -574,7 +575,7 @@ export interface ToolInvocationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L55)
 
 ## ToolInvocationRequest (interface)
 
@@ -591,7 +592,7 @@ export interface ToolInvocationRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L46)
 
 ## ToolNotAllowedError (class)
 
@@ -601,7 +602,7 @@ export interface ToolInvocationRequest {
 declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L83)
 
 ### code (property)
 
@@ -611,7 +612,7 @@ declare class ToolNotAllowedError { constructor(readonly toolId: string) }
 readonly code: "RELKIT_TOOL_NOT_ALLOWED"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L84)
 
 ## ToolOperationCancelledError
 
@@ -621,7 +622,7 @@ readonly code: "RELKIT_TOOL_NOT_ALLOWED"
 declare const ToolOperationCancelledError: typeof ToolOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L92)
 
 ## ToolRuntime (interface)
 
@@ -637,7 +638,7 @@ export interface ToolRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L59)
 
 ## ToolRuntimeOptions (interface)
 
@@ -651,7 +652,7 @@ export interface ToolRuntimeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L40)
 
 ## ToolSource (type alias)
 
@@ -664,7 +665,7 @@ type ToolSource =
   | Readonly<Record<string, ToolDescriptor<string>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L33)
 
 ## ToolUnknownError (class)
 
@@ -674,7 +675,7 @@ type ToolSource =
 declare class ToolUnknownError { constructor(readonly toolId: string) }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L74)
 
 ### code (property)
 
@@ -684,7 +685,7 @@ declare class ToolUnknownError { constructor(readonly toolId: string) }
 readonly code: "RELKIT_TOOL_UNKNOWN"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L75)
 
 ## createToolRuntime
 
@@ -694,7 +695,7 @@ readonly code: "RELKIT_TOOL_UNKNOWN"
 declare const createToolRuntime: (options: ToolRuntimeOptions) => ToolRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L135)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L136)
 
 ## invokeTool
 
@@ -706,7 +707,7 @@ Validates and invokes one allowlisted tool through the common engine.
 declare const invokeTool: (options: ToolRuntimeOptions & ToolInvocationRequest) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L106)
 
 ## resolveToolTarget
 
@@ -716,4 +717,4 @@ declare const invokeTool: (options: ToolRuntimeOptions & ToolInvocationRequest) 
 declare const resolveToolTarget: (tool: ToolDescriptor<string>) => ResolvedToolTarget;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/runtime.ts#L94)

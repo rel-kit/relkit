@@ -1,0 +1,23 @@
+---
+title: Authentication and identity
+description: Partition browser state with server-derived identity and session epochs.
+---
+
+## Bootstrap identity
+
+`GET /_relkit/v1/client/identity` is private and non-cacheable. It returns opaque identity scope,
+session epoch, application ID, and public fingerprint. Scope or epoch changes abort in-flight work,
+clear private Relkit stores, grants, and presence, and reject late callbacks.
+
+## Connect a provider
+
+Use `BetterAuthRelkitClientProvider` from `@relkit/better-auth/react` for cookie sessions. A manual
+`identityKey` adds a tenant/application partition but never grants authority. Cross-origin cookies
+still require exact credentialed CORS, suitable cookie `SameSite` policy, CSRF protection, and an
+allowed Origin.
+
+<include cwd lang="ts" meta='title="packages/better-auth/src/react.ts"'>
+  ../../packages/better-auth/src/react.ts
+</include>
+
+<include cwd>content/generated/related/client-authentication.mdx</include>

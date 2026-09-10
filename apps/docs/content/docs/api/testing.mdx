@@ -28,7 +28,7 @@ declare const createTestModel: (
 ) => RuntimeTestAgentModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-model.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-model.ts#L73)
 
 ## `agents-types.ts`
 
@@ -338,6 +338,7 @@ declare const createTrace: (
   - [TestModelTurn](#testmodelturn)
   - [assertAgentTrace](#assertagenttrace)
   - [createTestAgent](#createtestagent)
+  - [createTestModel](#createtestmodel)
 
 ---
 
@@ -508,7 +509,19 @@ declare const createTestAgent: <Agent extends TestAgentDescriptor>(
 ) => TestAgent<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L42)
+
+## createTestModel
+
+**Signature**
+
+```ts
+declare const createTestModel: (
+  options?: TestAgentModelOptions & { readonly script?: readonly TestModelTurn[] },
+) => RuntimeTestAgentModel;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents.ts#L39)
 
 ## `application-http.ts`
 
@@ -537,6 +550,34 @@ declare const handleTestRequest: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L5)
 
+## `application-realtime.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [bindTestRealtime](#bindtestrealtime)
+
+---
+
+# utils
+
+## bindTestRealtime
+
+**Signature**
+
+```ts
+declare const bindTestRealtime: (
+  runtime: TestRuntime,
+  artifacts: TestApplicationArtifacts | undefined,
+  providers: ProviderRegistry | undefined,
+  environment: string,
+) => TestRuntime;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-realtime.ts#L7)
+
 ## `application-registry.ts`
 
 ---
@@ -558,6 +599,7 @@ declare const handleTestRequest: (
 ```ts
 export interface TestApplicationArtifacts {
   readonly graph: FunctionRegistryOptions["graph"];
+  readonly publicFingerprint: string;
   readonly registry: FunctionRegistry;
   readonly runtimeIntegrationModules: readonly LoadedRuntimeIntegrationModule[];
 }
@@ -577,7 +619,7 @@ declare const loadTestApplicationArtifacts: (
 ) => Promise<TestApplicationArtifacts | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-registry.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-registry.ts#L18)
 
 ## `application-routes.ts`
 
@@ -744,7 +786,7 @@ declare const createTestApplication: (
 ) => Promise<TestApplication>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L51)
 
 Since v0.1.0
 
@@ -765,7 +807,7 @@ export interface TestApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L27)
 
 ## TestApplicationOptions (type alias)
 
@@ -778,7 +820,7 @@ type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L22)
 
 ## `buckets-types.ts`
 
@@ -2101,6 +2143,7 @@ declare const responseText: (response: Response, expectedStatus?: number) => Pro
   - [createHttpTestClient](#createhttptestclient)
   - [createObservabilityAssertions](#createobservabilityassertions)
   - [createTestAgent](#createtestagent)
+  - [createTestAgentStateProvider](#createtestagentstateprovider)
   - [createTestApplication](#createtestapplication)
   - [createTestBucket](#createtestbucket)
   - [createTestBucketFake](#createtestbucketfake)
@@ -2113,7 +2156,9 @@ declare const responseText: (response: Response, expectedStatus?: number) => Pro
   - [createTestHttpListener](#createtesthttplistener)
   - [createTestJob](#createtestjob)
   - [createTestJobFake](#createtestjobfake)
+  - [createTestModel](#createtestmodel)
   - [createTestObservability](#createtestobservability)
+  - [createTestRealtimeProvider](#createtestrealtimeprovider)
   - [createTestRuntime](#createtestruntime)
   - [invokeFunction](#invokefunction)
   - [responseJson](#responsejson)
@@ -2171,7 +2216,7 @@ declare const InvokeFunctionOptions: InvokeFunctionOptions<Context>;
 declare const RealListenerPurpose: RealListenerPurpose;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L39)
 
 ## StandaloneFunctionTarget
 
@@ -2191,7 +2236,7 @@ declare const StandaloneFunctionTarget: StandaloneFunctionTarget;
 declare const TestAgent: TestAgent<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L62)
 
 ## TestAgentApproval
 
@@ -2201,7 +2246,7 @@ declare const TestAgent: TestAgent<Agent>;
 declare const TestAgentApproval: TestAgentApproval;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
 
 ## TestAgentApprovalMode
 
@@ -2211,7 +2256,7 @@ declare const TestAgentApproval: TestAgentApproval;
 declare const TestAgentApprovalMode: TestAgentApprovalMode;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
 
 ## TestAgentApprovals
 
@@ -2221,7 +2266,7 @@ declare const TestAgentApprovalMode: TestAgentApprovalMode;
 declare const TestAgentApprovals: TestAgentApprovals;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
 
 ## TestAgentDescriptor
 
@@ -2231,7 +2276,7 @@ declare const TestAgentApprovals: TestAgentApprovals;
 declare const TestAgentDescriptor: TestAgentDescriptor;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
 
 ## TestAgentInvocationOptions
 
@@ -2241,7 +2286,7 @@ declare const TestAgentDescriptor: TestAgentDescriptor;
 declare const TestAgentInvocationOptions: TestAgentInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
 
 ## TestAgentModel
 
@@ -2251,7 +2296,7 @@ declare const TestAgentInvocationOptions: TestAgentInvocationOptions;
 declare const TestAgentModel: TestAgentModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L68)
 
 ## TestAgentModelCall
 
@@ -2261,7 +2306,7 @@ declare const TestAgentModel: TestAgentModel;
 declare const TestAgentModelCall: TestAgentModelCall;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L69)
 
 ## TestAgentModelOptions
 
@@ -2271,7 +2316,7 @@ declare const TestAgentModelCall: TestAgentModelCall;
 declare const TestAgentModelOptions: TestAgentModelOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L70)
 
 ## TestAgentOptions
 
@@ -2281,7 +2326,7 @@ declare const TestAgentModelOptions: TestAgentModelOptions;
 declare const TestAgentOptions: TestAgentOptions<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L71)
 
 ## TestAgentTrace
 
@@ -2291,7 +2336,7 @@ declare const TestAgentOptions: TestAgentOptions<Agent>;
 declare const TestAgentTrace: TestAgentTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L72)
 
 ## TestAgentTraceExpectation
 
@@ -2301,7 +2346,7 @@ declare const TestAgentTrace: TestAgentTrace;
 declare const TestAgentTraceExpectation: TestAgentTraceExpectation;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L73)
 
 ## TestAgentTraceSnapshot
 
@@ -2311,7 +2356,7 @@ declare const TestAgentTraceExpectation: TestAgentTraceExpectation;
 declare const TestAgentTraceSnapshot: TestAgentTraceSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L74)
 
 ## TestApplication
 
@@ -2341,7 +2386,7 @@ declare const TestApplicationOptions: TestApplicationOptions;
 declare const TestBucketFake: TestBucketFake;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L23)
 
 ## TestBucketFakeOptions
 
@@ -2351,7 +2396,7 @@ declare const TestBucketFake: TestBucketFake;
 declare const TestBucketFakeOptions: TestBucketFakeOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L23)
 
 ## TestBucketObject
 
@@ -2361,7 +2406,7 @@ declare const TestBucketFakeOptions: TestBucketFakeOptions;
 declare const TestBucketObject: TestBucketObject;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L23)
 
 ## TestCacheFake
 
@@ -2371,7 +2416,7 @@ declare const TestBucketObject: TestBucketObject;
 declare const TestCacheFake: TestCacheFake<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L25)
 
 ## TestCacheFakeOptions
 
@@ -2381,7 +2426,7 @@ declare const TestCacheFake: TestCacheFake<Key, Value>;
 declare const TestCacheFakeOptions: TestCacheFakeOptions<KeySchema, ValueSchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L25)
 
 ## TestCacheSnapshot
 
@@ -2391,7 +2436,7 @@ declare const TestCacheFakeOptions: TestCacheFakeOptions<KeySchema, ValueSchema>
 declare const TestCacheSnapshot: TestCacheSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L25)
 
 ## TestClock
 
@@ -2411,7 +2456,7 @@ declare const TestClock: TestClock;
 declare const TestEventCloseOptions: TestEventCloseOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
 
 ## TestEventDeliveryAttempt
 
@@ -2421,7 +2466,7 @@ declare const TestEventCloseOptions: TestEventCloseOptions;
 declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
 
 ## TestEventFake
 
@@ -2431,7 +2476,7 @@ declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
 declare const TestEventFake: TestEventFake<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L55)
 
 ## TestEventOptions
 
@@ -2441,7 +2486,7 @@ declare const TestEventFake: TestEventFake<Payload, Output>;
 declare const TestEventOptions: TestEventOptions<Payload, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L56)
 
 ## TestEventPublishResult
 
@@ -2451,7 +2496,7 @@ declare const TestEventOptions: TestEventOptions<Payload, Output>;
 declare const TestEventPublishResult: TestEventPublishResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
 
 ## TestEventTriggerOptions
 
@@ -2461,7 +2506,7 @@ declare const TestEventPublishResult: TestEventPublishResult;
 declare const TestEventTriggerOptions: TestEventTriggerOptions<Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L58)
 
 ## TestFailureControls
 
@@ -2501,7 +2546,7 @@ declare const TestFakesOptions: TestFakesOptions;
 declare const TestHttpApplication: TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L40)
 
 ## TestHttpClient
 
@@ -2511,7 +2556,7 @@ declare const TestHttpApplication: TestHttpApplication;
 declare const TestHttpClient: TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L41)
 
 ## TestHttpClientOptions
 
@@ -2521,7 +2566,7 @@ declare const TestHttpClient: TestHttpClient;
 declare const TestHttpClientOptions: TestHttpClientOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L42)
 
 ## TestHttpInput
 
@@ -2531,7 +2576,7 @@ declare const TestHttpClientOptions: TestHttpClientOptions;
 declare const TestHttpInput: TestHttpInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L43)
 
 ## TestHttpListener
 
@@ -2541,7 +2586,7 @@ declare const TestHttpInput: TestHttpInput;
 declare const TestHttpListener: TestHttpListener;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L44)
 
 ## TestHttpListenerOptions
 
@@ -2551,7 +2596,7 @@ declare const TestHttpListener: TestHttpListener;
 declare const TestHttpListenerOptions: TestHttpListenerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L45)
 
 ## TestHttpRequest
 
@@ -2561,7 +2606,7 @@ declare const TestHttpListenerOptions: TestHttpListenerOptions;
 declare const TestHttpRequest: TestHttpRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L46)
 
 ## TestJobCloseOptions
 
@@ -2571,7 +2616,7 @@ declare const TestHttpRequest: TestHttpRequest;
 declare const TestJobCloseOptions: TestJobCloseOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
 
 ## TestJobFake
 
@@ -2581,7 +2626,7 @@ declare const TestJobCloseOptions: TestJobCloseOptions;
 declare const TestJobFake: TestJobFake<Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
 
 ## TestJobOptions
 
@@ -2591,7 +2636,7 @@ declare const TestJobFake: TestJobFake<Input, Output>;
 declare const TestJobOptions: TestJobOptions<Input, Output>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
 
 ## TestModelTurn
 
@@ -2601,7 +2646,7 @@ declare const TestJobOptions: TestJobOptions<Input, Output>;
 declare const TestModelTurn: TestModelTurn;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L75)
 
 ## TestObservability
 
@@ -2611,7 +2656,7 @@ declare const TestModelTurn: TestModelTurn;
 declare const TestObservability: TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L47)
 
 ## TestProviderReplacements
 
@@ -2619,7 +2664,12 @@ declare const TestObservability: TestObservability;
 
 ```ts
 declare const TestProviderReplacements: Readonly<
-  Partial<Record<"cache" | "bucket" | "job" | "event" | "model", Readonly<Record<string, unknown>>>>
+  Partial<
+    Record<
+      "cache" | "bucket" | "job" | "event" | "model" | "realtime" | "agent-state",
+      Readonly<Record<string, unknown>>
+    >
+  >
 >;
 ```
 
@@ -2666,7 +2716,7 @@ declare const assertAgentTrace: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
 
 ## assertObservabilityHookTypes
 
@@ -2679,7 +2729,7 @@ declare const assertObservabilityHookTypes: (
 ) => readonly ObservabilityHookEvent[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L27)
 
 ## assertResponseStatus
 
@@ -2689,7 +2739,7 @@ declare const assertObservabilityHookTypes: (
 declare const assertResponseStatus: (response: Response, expected: number) => Response;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L28)
 
 ## createBunHttpListener
 
@@ -2702,7 +2752,7 @@ declare const createBunHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L29)
 
 ## createHttpTestClient
 
@@ -2715,7 +2765,7 @@ declare const createHttpTestClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L30)
 
 ## createObservabilityAssertions
 
@@ -2725,7 +2775,7 @@ declare const createHttpTestClient: (
 declare const createObservabilityAssertions: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L31)
 
 ## createTestAgent
 
@@ -2737,7 +2787,17 @@ declare const createTestAgent: <Agent extends TestAgentDescriptor>(
 ) => TestAgent<Agent>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+
+## createTestAgentStateProvider
+
+**Signature**
+
+```ts
+declare const createTestAgentStateProvider: (root: string) => AgentStateProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L21)
 
 ## createTestApplication
 
@@ -2760,7 +2820,7 @@ declare const createTestApplication: (
 declare const createTestBucket: (options?: TestBucketFakeOptions) => TestBucketFake;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L22)
 
 ## createTestBucketFake
 
@@ -2770,7 +2830,7 @@ declare const createTestBucket: (options?: TestBucketFakeOptions) => TestBucketF
 declare const createTestBucketFake: (options?: TestBucketFakeOptions) => TestBucketFake;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L22)
 
 ## createTestCache
 
@@ -2785,7 +2845,7 @@ declare const createTestCache: <
 ) => TestCacheFake<InferInput<KeySchema>, InferOutput<ValueSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
 
 ## createTestCacheFake
 
@@ -2800,7 +2860,7 @@ declare const createTestCacheFake: <
 ) => TestCacheFake<InferInput<KeySchema>, InferOutput<ValueSchema>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
 
 ## createTestEvent
 
@@ -2812,7 +2872,7 @@ declare const createTestEvent: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
 
 ## createTestEventFake
 
@@ -2824,7 +2884,7 @@ declare const createTestEventFake: <Payload = unknown, Output = unknown>(
 ) => Promise<TestEventFake<Payload, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
 
 ## createTestFakes
 
@@ -2847,7 +2907,7 @@ declare const createTestHttpClient: (
 ) => TestHttpClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L32)
 
 ## createTestHttpListener
 
@@ -2860,7 +2920,7 @@ declare const createTestHttpListener: (
 ) => Promise<TestHttpListener>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L33)
 
 ## createTestJob
 
@@ -2872,7 +2932,7 @@ declare const createTestJob: <Input = JsonValue, Output = unknown>(
 ) => Promise<TestJobFake<Input, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
 
 ## createTestJobFake
 
@@ -2884,7 +2944,19 @@ declare const createTestJobFake: <Input = JsonValue, Output = unknown>(
 ) => Promise<TestJobFake<Input, Output>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
+
+## createTestModel
+
+**Signature**
+
+```ts
+declare const createTestModel: (
+  options?: TestAgentModelOptions & { readonly script?: readonly TestModelTurn[] },
+) => RuntimeTestAgentModel;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
 
 ## createTestObservability
 
@@ -2894,7 +2966,17 @@ declare const createTestJobFake: <Input = JsonValue, Output = unknown>(
 declare const createTestObservability: () => TestObservability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L34)
+
+## createTestRealtimeProvider
+
+**Signature**
+
+```ts
+declare const createTestRealtimeProvider: (root: string) => RealtimeProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L21)
 
 ## createTestRuntime
 
@@ -2934,7 +3016,7 @@ declare const responseJson: <T = unknown>(
 ) => Promise<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L35)
 
 ## responseText
 
@@ -2944,7 +3026,7 @@ declare const responseJson: <T = unknown>(
 declare const responseText: (response: Response, expectedStatus?: number) => Promise<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L36)
 
 ## `invoke-function.ts`
 
@@ -3206,7 +3288,7 @@ export interface TestJobOptions<Input = JsonValue, Output = unknown> {
 declare const createFailures: () => TestFailureControls;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L133)
 
 ## createIdSource
 
@@ -3216,7 +3298,7 @@ declare const createFailures: () => TestFailureControls;
 declare const createIdSource: () => InvocationIdSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L103)
 
 ## createJobInvoker
 
@@ -3235,7 +3317,7 @@ declare const createJobInvoker: <Input, Output>(
 ) => (request: JobInvocationOptions) => Promise<unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L58)
 
 ## createPlan
 
@@ -3264,7 +3346,7 @@ declare const createRandom: (
 ) => () => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-utils.ts#L119)
 
 ## defaultRetry
 
@@ -3586,6 +3668,40 @@ declare const createTestRuntime: (options?: TestRuntimeOptions) => TestRuntime;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L56)
+
+## `state-providers.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [createTestAgentStateProvider](#createtestagentstateprovider)
+  - [createTestRealtimeProvider](#createtestrealtimeprovider)
+
+---
+
+# utils
+
+## createTestAgentStateProvider
+
+**Signature**
+
+```ts
+declare const createTestAgentStateProvider: (root: string) => AgentStateProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L12)
+
+## createTestRealtimeProvider
+
+**Signature**
+
+```ts
+declare const createTestRealtimeProvider: (root: string) => RealtimeProvider;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-providers.ts#L8)
 
 ## `state-root.ts`
 

@@ -1,0 +1,19 @@
+---
+title: Offline and uncertain outcomes
+description: Reconcile writes without silently replaying payloads.
+---
+
+## Classify the outcome
+
+Relkit has no implicit offline write queue. A known-offline write is `not-sent`; a lost response after
+transmission is `unknown`. Agent runs, controls, and continuations use scoped operation IDs and durable
+receipt lookup after refresh. Arbitrary mutations remain unknown unless the application supplies a
+reconciliation endpoint. Do not resubmit an uncertain external effect automatically.
+
+## Reconcile safely
+
+<include cwd lang="ts" meta='title="packages/client/src/react/pending.ts"'>
+  ../../packages/client/src/react/pending.ts
+</include>
+
+<include cwd>content/generated/related/client-offline.mdx</include>
