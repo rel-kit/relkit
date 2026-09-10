@@ -20,6 +20,7 @@ export interface RedisProtocolClient {
   ): Promise<readonly [string, readonly string[]]>;
   type(key: string): Promise<string>;
   ttl(key: string): Promise<number>;
+  command(command: string, args: readonly string[]): Promise<unknown>;
 }
 
 export function createRedisClient(options: RedisClientOptions): RedisProtocolClient {
@@ -68,6 +69,7 @@ export function createRedisClient(options: RedisClientOptions): RedisProtocolCli
     },
     type: async (key) => String(await client.send("TYPE", [key])),
     ttl: async (key) => Number(await client.send("PTTL", [key])),
+    command: (command, args) => client.send(command, [...args]),
   };
 }
 

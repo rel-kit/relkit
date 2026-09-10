@@ -13,12 +13,12 @@ import {
 } from "@relkit/provider";
 
 const cache = defineProviderCapability("cache");
-const integration = defineIntegrationReference("redis");
+export const redisIntegration = defineIntegrationReference("redis");
 const atomicIncrement = defineProviderFeature(cache, "atomicIncrement");
-const connectionContract = defineConnectionContract({
+export const redisConnectionContract = defineConnectionContract({
   url: { sensitive: true, authoredValue: "fallback" },
 });
-const localRecipe = defineLocalRecipeReference(integration, "redis-docker", 1);
+export const redisLocalRecipe = defineLocalRecipeReference(redisIntegration, "redis-docker", 1);
 
 export type RedisUrlReference<Name extends string = string> = BindingValueRef<
   Name,
@@ -33,13 +33,13 @@ export interface RedisOptions<
   readonly connectionTimeoutMs?: number;
 }
 
-type RedisConnection<Options extends RedisOptions> = Options extends {
+export type RedisConnection<Options extends RedisOptions> = Options extends {
   readonly url: infer Url extends RedisUrlReference;
 }
   ? Readonly<{ url: Url }>
   : Readonly<Record<never, never>>;
 
-type RedisBehavior<Options extends RedisOptions> = Options extends {
+export type RedisBehavior<Options extends RedisOptions> = Options extends {
   readonly connectionTimeoutMs: infer Timeout extends number;
 }
   ? Readonly<{ connectionTimeoutMs: Timeout }>
@@ -67,25 +67,25 @@ export type RedisAdapter<Options extends RedisOptions = RedisOptions> = Provider
 export function redis<const Options extends RedisOptions = RedisOptions>(
   options: Options = {} as Options,
 ): RedisAdapter<Options> {
-  assertOptions(options);
+  assertRedisOptions(options);
   const connection = options.url === undefined ? {} : { url: options.url };
   const behavior =
     options.connectionTimeoutMs === undefined
       ? {}
       : { connectionTimeoutMs: options.connectionTimeoutMs };
   return defineProviderAdapter({
-    integration,
+    integration: redisIntegration,
     capability: cache,
     adapterId: "redis",
-    connectionContract,
+    connectionContract: redisConnectionContract,
     connection,
     behavior: defineProviderBehavior(behavior),
     features: [atomicIncrement],
-    localRecipe,
+    localRecipe: redisLocalRecipe,
   }) as RedisAdapter<Options>;
 }
 
-function assertOptions(options: RedisOptions): void {
+export function assertRedisOptions(options: RedisOptions): void {
   const value: unknown = options;
   if (!isRecord(value)) throw new TypeError("Redis options must be an object");
   const connectionTimeoutMs = options.connectionTimeoutMs;
