@@ -39,8 +39,10 @@ export async function exerciseScaffoldRoutes(
   }
   let ready = false;
   for (let attempt = 0; attempt < 200; attempt++) {
-    const response = await fetch(`${base}/live/42/details`, { signal: AbortSignal.timeout(2_000) });
-    if (response.status === 200) {
+    const response = await fetch(`${base}/live/42/details`, {
+      signal: AbortSignal.timeout(2_000),
+    }).catch(() => undefined);
+    if (response?.status === 200) {
       ready = true;
       break;
     }
