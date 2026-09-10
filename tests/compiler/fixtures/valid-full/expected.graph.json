@@ -1,6 +1,6 @@
 {
   "appId": "full-app",
-  "contractVersion": 8,
+  "contractVersion": 10,
   "edges": [
     {
       "from": "orders.get",
@@ -71,17 +71,57 @@
     },
     {
       "from": "orders.support-agent",
-      "kind": "uses-provider-profile",
-      "to": "provider.model.openai"
-    },
-    {
-      "from": "orders.support-agent",
       "kind": "uses-tool",
       "to": "orders.lookup-tool"
     }
   ],
   "nodes": [
     {
+      "clientContract": {
+        "events": [],
+        "scopes": [
+          {
+            "id": "orders.support-agent",
+            "kind": "agent"
+          },
+          {
+            "kind": "dynamic"
+          }
+        ],
+        "state": [],
+        "tools": [
+          {
+            "id": "orders.lookup-tool",
+            "input": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "orderId"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                },
+                "totalCents": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "orderId",
+                "totalCents"
+              ],
+              "type": "object"
+            }
+          }
+        ],
+        "waiting": []
+      },
       "domainId": "orders",
       "generatedFunction": {
         "agentId": "orders.support-agent",
@@ -108,7 +148,7 @@
         "maxToolCalls": 2,
         "timeoutMs": 1000
       },
-      "model": "openai:gpt-5-mini",
+      "modelSource": "native",
       "output": {
         "properties": {
           "answer": {
@@ -120,11 +160,16 @@
         ],
         "type": "object"
       },
-      "profile": "openai",
+      "profile": "default",
+      "resourceDependencies": [
+        {
+          "kind": "model"
+        }
+      ],
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 5
+        "line": 11
       },
       "toolIds": [
         "orders.lookup-tool"
@@ -133,8 +178,7 @@
     {
       "defaults": {
         "bucket": "default",
-        "cache": "default",
-        "model": "openai"
+        "cache": "default"
       },
       "deploymentRoles": [],
       "environment": {
@@ -151,7 +195,7 @@
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 11
+        "line": 10
       },
       "telemetry": {
         "redaction": {
@@ -212,7 +256,7 @@
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 11
+        "line": 10
       },
       "type": "port"
     },
@@ -460,7 +504,7 @@
       "source": {
         "column": 22,
         "file": "src/orders/agents/order-support.agent.ts",
-        "line": 5
+        "line": 11
       }
     },
     {
@@ -537,7 +581,7 @@
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 11
+        "line": 10
       }
     },
     {
@@ -582,63 +626,7 @@
       "source": {
         "column": 16,
         "file": "relkit.config.ts",
-        "line": 11
-      }
-    },
-    {
-      "adapter": {
-        "adapterId": "ai-sdk",
-        "behavior": {
-          "defaultModel": "gpt-5-mini",
-          "provider": "openai"
-        },
-        "connection": {},
-        "connectionContract": {
-          "apiKey": {
-            "authoredValue": "fixed",
-            "required": true,
-            "sensitive": true
-          },
-          "baseURL": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          },
-          "organization": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          },
-          "project": {
-            "authoredValue": "fixed",
-            "required": false,
-            "sensitive": false
-          }
-        },
-        "features": [],
-        "integrationId": "ai-sdk",
-        "protocolVersion": 1
-      },
-      "capability": "model",
-      "deploymentRoles": [],
-      "id": "provider.model.openai",
-      "kind": "provider",
-      "namedValues": [
-        {
-          "field": "apiKey",
-          "name": "MODEL_API_KEY",
-          "sensitive": true,
-          "type": "secret-string"
-        }
-      ],
-      "profile": "openai",
-      "providerSource": {
-        "kind": "connected"
-      },
-      "source": {
-        "column": 16,
-        "file": "relkit.config.ts",
-        "line": 11
+        "line": 10
       }
     },
     {
@@ -714,6 +702,9 @@
     {
       "config": {
         "auth": null,
+        "client": {
+          "operation": "query"
+        },
         "maxBodyBytes": null,
         "method": "GET",
         "middleware": [
@@ -764,6 +755,7 @@
         "runtimePaths": [
           "/orders/:orderId"
         ],
+        "stream": null,
         "timeoutMs": null,
         "transforms": [
           {

@@ -1,4 +1,3 @@
-import { aiSdk } from "@relkit/ai-sdk";
 import { defineApp, defineEnv, env as envFactory } from "@relkit/app";
 
 const env = defineEnv({
@@ -8,11 +7,4 @@ const env = defineEnv({
 export default defineApp({
   id: "inferred-app",
   env,
-  model: {
-    openai: aiSdk({
-      provider: "openai",
-      defaultModel: "gpt-5-mini",
-      apiKey: envFactory.secret("MODEL_API_KEY"),
-    }),
-  },
 });
