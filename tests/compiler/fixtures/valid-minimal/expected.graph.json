@@ -1,6 +1,6 @@
 {
   "appId": "minimal-app",
-  "contractVersion": 8,
+  "contractVersion": 10,
   "edges": [
     {
       "from": "hello",
@@ -111,6 +111,9 @@
     {
       "config": {
         "auth": null,
+        "client": {
+          "operation": "query"
+        },
         "maxBodyBytes": null,
         "method": "GET",
         "middleware": [],
@@ -152,6 +155,7 @@
         "runtimePaths": [
           "/hello/:name"
         ],
+        "stream": null,
         "timeoutMs": null,
         "transforms": []
       },
