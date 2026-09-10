@@ -10,6 +10,9 @@ export default defineDrizzleService({
     sqlite.exec(
       "create table if not exists users (id integer primary key autoincrement, email text not null unique)",
     );
+    sqlite.exec(
+      "create table if not exists announcements (id integer primary key autoincrement, message text not null, created_at text not null)",
+    );
     return drizzle({ client: sqlite });
   },
   dispose: (database) => database.$client.close(),
