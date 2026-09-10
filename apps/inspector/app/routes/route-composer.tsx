@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { InspectorObject } from "../../lib/api-types";
 import { collectRouteFields, composeRouteRequest, type RouteField } from "../../lib/route-composer";
 import type { RouteInvocationResult } from "../../lib/route-request";
+import type { RouteStreamFrame } from "../../lib/route-request";
 import type { FormEvent } from "react";
 import { RouteFieldInput } from "./route-field";
 
@@ -11,11 +12,17 @@ export function RouteComposer({
   route,
   target,
   invoke,
+  invokeStream,
   onComplete,
 }: {
   readonly route: InspectorObject;
   readonly target?: InspectorObject;
   readonly invoke: (input: { path: string; init: RequestInit }) => Promise<RouteInvocationResult>;
+  readonly invokeStream?: (
+    input: { path: string; init: RequestInit },
+    onFrame: (frame: RouteStreamFrame) => void,
+    signal: AbortSignal,
+  ) => Promise<RouteInvocationResult>;
   readonly onComplete: (result: RouteInvocationResult) => void;
 }) {
   const config = record(route.config);
@@ -24,8 +31,14 @@ export function RouteComposer({
   const [errors, setErrors] = useState<readonly { key: string; message: string }[]>([]);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
+  const [streamFrames, setStreamFrames] = useState<
+    readonly { readonly id: number; readonly frame: RouteStreamFrame }[]
+  >([]);
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const summaryRef = useRef<HTMLUListElement>(null);
+  const streamController = useRef<AbortController>();
+  const nextFrameId = useRef(0);
+  useEffect(() => () => streamController.current?.abort(), []);
 
   const focusField = (key: string): void => {
     if (key === "request") {
@@ -54,10 +67,28 @@ export function RouteComposer({
       return;
     }
     setPending(true);
-    setStatus("Sending request…");
+    setStatus(invokeStream === undefined ? "Sending request…" : "Opening stream…");
     try {
-      onComplete(await invoke({ path: built.path, init: built.init }));
-      setStatus("Request completed.");
+      if (invokeStream === undefined) {
+        onComplete(await invoke({ path: built.path, init: built.init }));
+        setStatus("Request completed.");
+      } else {
+        streamController.current?.abort();
+        const controller = new AbortController();
+        streamController.current = controller;
+        setStreamFrames([]);
+        onComplete(
+          await invokeStream(
+            { path: built.path, init: built.init },
+            (frame) => {
+              const id = nextFrameId.current++;
+              setStreamFrames((current) => [...current.slice(-99), { id, frame }]);
+            },
+            controller.signal,
+          ),
+        );
+        setStatus("Stream ended.");
+      }
     } catch (error) {
       setErrors([
         { key: "request", message: error instanceof Error ? error.message : "Request failed." },
@@ -118,7 +149,26 @@ export function RouteComposer({
         <button className="button-link" type="submit" disabled={pending}>
           {pending ? "Sending…" : "Send request"}
         </button>
+        {invokeStream === undefined || !pending ? null : (
+          <button
+            className="button-link button-link--quiet"
+            type="button"
+            onClick={() => streamController.current?.abort()}
+          >
+            Cancel stream
+          </button>
+        )}
       </form>
+      {streamFrames.length === 0 ? null : (
+        <ul className="request-list" aria-label="Stream frames">
+          {streamFrames.map(({ id, frame }) => (
+            <li className="request-row" key={id}>
+              <strong>{frame.kind === "sse" ? frame.event : frame.kind}</strong>
+              <pre className="safe-json">{JSON.stringify(frame, null, 2)}</pre>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

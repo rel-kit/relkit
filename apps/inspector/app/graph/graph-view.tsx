@@ -1,89 +1,64 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
-import { Badge } from "../../components/ui/badge";
-import { Card } from "../../components/ui/card";
-import { Field } from "../../components/ui/field";
+import { useCallback, useMemo, useState } from "react";
 import { filterGraph, graphDomains, graphKinds } from "../../lib/graph-filter";
-import {
-  edgeLabel,
-  graphKindColor,
-  type GraphNode,
-  type GraphSnapshot,
-} from "../../lib/graph-model";
+import { edgeLabel, type GraphNode, type GraphSnapshot } from "../../lib/graph-model";
 import { GraphFlow } from "./graph-flow";
 import { GraphRelationships } from "./graph-relationships";
 import { OverlayDialog } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
+import { withExecutionOverlay } from "../../lib/graph-execution-model";
+import { GraphToolbar } from "./graph-toolbar";
 
 export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
   const [search, setSearch] = useState("");
   const [kind, setKind] = useState("all");
   const [domain, setDomain] = useState("all");
   const [selected, setSelected] = useState<GraphNode>();
+  const [execution, setExecution] = useState<{
+    readonly agentId: string;
+    readonly value: unknown;
+  }>();
+  const visibleGraph = useMemo(
+    () =>
+      execution === undefined
+        ? graph
+        : withExecutionOverlay(graph, execution.agentId, execution.value),
+    [execution, graph],
+  );
   const filtered = useMemo(
-    () => filterGraph(graph, search, kind, domain),
-    [domain, graph, kind, search],
+    () => filterGraph(visibleGraph, search, kind, domain),
+    [domain, kind, search, visibleGraph],
   );
-  const kinds = useMemo(
-    () => graphKinds(graph).map((id) => ({ id, label: readable(id) })),
-    [graph],
+  const kinds = useMemo(() => graphKinds(visibleGraph), [visibleGraph]);
+  const domains = useMemo(() => graphDomains(visibleGraph), [visibleGraph]);
+  const agents = useMemo(
+    () => graph.nodes.flatMap((node) => (node.kind === "agent" ? [node.id] : [])),
+    [graph.nodes],
   );
-  const domains = useMemo(() => graphDomains(graph), [graph]);
+  const updateExecution = useCallback(
+    (agentId: string, value: unknown) => setExecution({ agentId, value }),
+    [],
+  );
   const selectedEdges = selected
     ? filtered.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id)
     : [];
   return (
     <>
-      <Card className="graph-toolbar" aria-label="Graph filters">
-        <Field
-          label="Search graph"
-          value={search}
-          onChange={setSearch}
-          placeholder="Node ID or kind"
-        />
-        <div className="graph-kind-tabs" role="group" aria-label="Filter graph by node kind">
-          <KindTab
-            id="all"
-            label="All kinds"
-            count={graph.nodes.length}
-            active={kind === "all"}
-            onSelect={setKind}
-          />
-          {kinds.map((item) => (
-            <KindTab
-              key={item.id}
-              id={item.id}
-              label={item.label}
-              count={graph.nodes.filter((node) => node.kind === item.id).length}
-              active={kind === item.id}
-              onSelect={setKind}
-            />
-          ))}
-        </div>
-        <div className="graph-kind-tabs" role="group" aria-label="Filter graph by domain">
-          <KindTab
-            id="all"
-            label="All domains"
-            count={graph.nodes.length}
-            active={domain === "all"}
-            onSelect={setDomain}
-          />
-          {domains.map((id) => (
-            <KindTab
-              key={id}
-              id={id}
-              label={readable(id)}
-              count={graph.nodes.filter((node) => node.domainId === id).length}
-              active={domain === id}
-              onSelect={setDomain}
-            />
-          ))}
-        </div>
-        <Badge>
-          {filtered.nodes.length} of {graph.nodes.length} nodes
-        </Badge>
-      </Card>
+      <GraphToolbar
+        graph={visibleGraph}
+        filteredCount={filtered.nodes.length}
+        search={search}
+        kind={kind}
+        domain={domain}
+        kinds={kinds}
+        domains={domains}
+        agents={agents}
+        onSearch={setSearch}
+        onKind={setKind}
+        onDomain={setDomain}
+        onOverlay={updateExecution}
+      />
       <section className="panel graph-panel" aria-labelledby="canvas-heading">
         <div className="section-heading">
           <div>
@@ -95,7 +70,7 @@ export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
         <p className="supporting-copy">
           Deterministic positions with keyboard-focusable nodes, pan, zoom, fit view, and a minimap.
         </p>
-        <GraphFlow graph={graph} filtered={filtered} onSelect={setSelected} />
+        <GraphFlow graph={visibleGraph} filtered={filtered} onSelect={setSelected} />
       </section>
       <GraphRelationships edges={filtered.edges} />
       <OverlayDialog
@@ -129,6 +104,14 @@ export function GraphView({ graph }: { readonly graph: GraphSnapshot }) {
               <dd>{selected.domainId ?? "Structural"}</dd>
             </div>
             <div>
+              <dt>Layer</dt>
+              <dd>{selected.observed ? "Live execution" : "Definition"}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{selected.status ?? "Not observed"}</dd>
+            </div>
+            <div>
               <dt>Labels</dt>
               <dd>{selectedEdges.map(edgeLabel).join(", ") || "None"}</dd>
             </div>
@@ -152,43 +135,4 @@ function GraphLegend() {
       </span>
     </div>
   );
-}
-
-function KindTab({
-  id,
-  label,
-  count,
-  active,
-  onSelect,
-}: {
-  readonly id: string;
-  readonly label: string;
-  readonly count: number;
-  readonly active: boolean;
-  readonly onSelect: (id: string) => void;
-}) {
-  return (
-    <button
-      type="button"
-      className="graph-kind-tab"
-      data-active={active}
-      aria-pressed={active}
-      style={
-        {
-          "--kind-color": id === "all" ? "var(--accent)" : graphKindColor(id),
-        } as CSSProperties
-      }
-      onClick={() => onSelect(id)}
-    >
-      <span
-        className="graph-kind-swatch"
-        style={{ background: id === "all" ? "var(--accent)" : graphKindColor(id) }}
-      />
-      {label} <span className="graph-kind-count">{count}</span>
-    </button>
-  );
-}
-
-function readable(value: string): string {
-  return value.replace(/[._-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase());
 }
