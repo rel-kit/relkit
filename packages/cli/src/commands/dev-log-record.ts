@@ -20,6 +20,10 @@ export function devLogRecord(event: DevLogEvent) {
   }
   let level = event.level;
   let transient = false;
+  if (event.event === "dev.shutdown.requested") {
+    level = "debug";
+    transient = true;
+  }
   if ((event.event.startsWith("candidate.") && !child) || event.event.startsWith("supervisor."))
     level =
       event.event === "supervisor.outcome" &&
@@ -28,10 +32,12 @@ export function devLogRecord(event: DevLogEvent) {
         ? "warn"
         : "debug";
   if (origin === "inspector" && child) {
-    const status = /^(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\S+\s+(\d{3})\b/.exec(
-      output.trim(),
-    );
-    if (status) {
+    const trimmed = output.trim();
+    const status = /^(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+\S+\s+(\d{3})\b/.exec(trimmed);
+    if (trimmed === "") {
+      level = "debug";
+      transient = true;
+    } else if (status) {
       if (Number(status[1]) >= 500) level = "error";
       else {
         level = "debug";
@@ -39,7 +45,7 @@ export function devLogRecord(event: DevLogEvent) {
       }
     } else if (
       /^(?:▲ Next\.js\b|[✓✔]\s+(?:Ready in\b|Running next\.config\b)|[-–]\s+(?:Local|Network):|\$ next (?:dev|start)\b)/.test(
-        output.trim(),
+        trimmed,
       )
     ) {
       level = "debug";

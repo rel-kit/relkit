@@ -1,12 +1,15 @@
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import {
+  agentProcedureEntriesFromDocument,
   generateContractFromDocument,
+  generateClientRegistryFromDocument,
   type ContractProcedureDocument,
 } from "@relkit/client-generator";
 import { CONTRACT_VERSION, canonicalJson, type JsonValue } from "@relkit/contracts";
 import { writeIfChanged } from "@relkit/compiler";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "../main-support.js";
+import { checkClientContract, clientManifest } from "./client-check.js";
 
 const MAX_CONTRACT_BYTES = 4 * 1_024 * 1_024;
 
@@ -14,23 +17,37 @@ export async function runClient(
   args: readonly string[],
   context: CliCommandContext,
 ): Promise<number> {
-  if (args[0] !== "pull")
-    throw fail("RELKIT_CLIENT_USAGE", "Usage: relkit client pull <baseUrl> --out <directory>", 2);
+  if (args[0] !== "pull" && args[0] !== "check")
+    throw fail(
+      "RELKIT_CLIENT_USAGE",
+      "Usage: relkit client <pull|check> <baseUrl> --out <directory>",
+      2,
+    );
+  const command = args[0];
   const options = parse(args.slice(1));
   const document = await download(options.baseUrl, context.signal);
   const procedures = validate(document);
   const directory = resolve(options.out);
+  if (command === "check") return checkClientContract(document, directory, context, validate);
   await mkdir(directory, { recursive: true });
   const writes = await Promise.all([
     writeIfChanged(
       `${directory}/client-contract.json`,
       `${canonicalJson(document as unknown as JsonValue)}\n`,
     ),
-    writeIfChanged(`${directory}/contract.ts`, generateContractFromDocument(procedures)),
+    writeIfChanged(
+      `${directory}/contract.ts`,
+      generateContractFromDocument(procedures, agentProcedureEntriesFromDocument(document.agents)),
+    ),
     writeIfChanged(
       `${directory}/client.ts`,
       'export { createClient, ORPCError } from "@relkit/client";\nexport { contract } from "./contract.js";\n',
     ),
+    writeIfChanged(
+      `${directory}/client-registry.d.ts`,
+      generateClientRegistryFromDocument(document as unknown as Record<string, unknown>),
+    ),
+    writeIfChanged(`${directory}/client-manifest.json`, clientManifest(document)),
   ]);
   const result = {
     directory,
@@ -105,11 +122,15 @@ async function boundedBytes(response: Response): Promise<Uint8Array> {
   return output;
 }
 
-interface ContractDocument {
+export interface ContractDocument {
   readonly protocol: string;
   readonly version: number;
   readonly graphHash: string;
+  readonly publicFingerprint: string;
   readonly procedures: readonly unknown[];
+  readonly routes?: readonly unknown[];
+  readonly channels?: readonly unknown[];
+  readonly agents?: readonly unknown[];
 }
 
 function validate(document: ContractDocument): ContractProcedureDocument[] {
@@ -124,7 +145,11 @@ function validate(document: ContractDocument): ContractProcedureDocument[] {
       `Client contract version ${String(document.version)} is unsupported; expected ${CONTRACT_VERSION}. Regenerate the server with \`relkit build\``,
     );
   }
-  if (!/^sha256:[a-f0-9]{64}$/.test(document.graphHash) || !Array.isArray(document.procedures)) {
+  if (
+    !/^sha256:[a-f0-9]{64}$/.test(document.graphHash) ||
+    !/^sha256:[a-f0-9]{64}$/.test(document.publicFingerprint) ||
+    !Array.isArray(document.procedures)
+  ) {
     throw fail("RELKIT_CLIENT_CONTRACT_INVALID", "Client contract hash or procedures are invalid");
   }
   return document.procedures.map((value) => {

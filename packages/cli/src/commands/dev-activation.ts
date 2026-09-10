@@ -123,6 +123,7 @@ export async function activateCandidate(
     await candidate?.dispose().catch(() => undefined);
     session.drains.delete(tokenKey(token));
     failState(session, token, error);
+    if (initial) throw error;
     session.log({
       level: signal.aborted ? "debug" : "error",
       event: "dev.generation.failed",

@@ -6,12 +6,13 @@ export function devLogDetails(record: LogRecord, verbose: boolean): string[] {
     if (depth > 6 || value === null || typeof value !== "object") return;
     const error = value as Record<string, unknown>;
     const code = error.code ?? (depth === 0 ? record.fields.code : undefined);
-    if (typeof error.message === "string" && (verbose || record.fields.message !== error.message))
+    if (typeof error.message === "string" && record.fields.message !== error.message)
       lines.push(
         `${depth ? "└─ " : ""}${error.name ?? "Error"}${code ? ` [${code}]` : ""}: ${error.message}`,
       );
     if (
       typeof error.stack === "string" &&
+      code !== "RELKIT_LOCAL_LEASE_HELD" &&
       (verbose ||
         !["cli.dev", "runtime.provider", "runtime.database", "runtime.auth"].includes(
           record.component,
