@@ -1,3 +1,5 @@
+import { secureApplicationProxyHeaders } from "../../../../lib/backend-proxy-security";
+
 const requestHeadersToDrop = ["connection", "content-length", "host"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];
 const OPENAPI_PATH = "_relkit/v1/openapi.json";
@@ -13,15 +15,27 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
   const incoming = new URL(request.url);
   const target = new URL(`${backend}/${path.map(encodeURIComponent).join("/")}`);
   target.search = incoming.search;
-  const headers = new Headers(request.headers);
+  let headers: Headers;
+  try {
+    headers = secureApplicationProxyHeaders(request);
+  } catch {
+    return Response.json({ error: "Application proxy request origin denied." }, { status: 403 });
+  }
   for (const name of requestHeadersToDrop) headers.delete(name);
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
-  const response = await fetch(target, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.arrayBuffer() : undefined,
-    redirect: "manual",
-  });
+  let response: Response;
+  try {
+    response = await fetch(target, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.arrayBuffer() : undefined,
+      redirect: "manual",
+      signal: request.signal,
+    });
+  } catch (error) {
+    if (request.signal.aborted) return new Response(null, { status: 499 });
+    throw error;
+  }
   const responseHeaders = new Headers(response.headers);
   for (const name of responseHeadersToDrop) responseHeaders.delete(name);
   const body =

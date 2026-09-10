@@ -5,9 +5,10 @@ import { useParams } from "next/navigation";
 import type { InspectorObject } from "../lib/api-types";
 import { agentView, type AgentView } from "../lib/agents-model";
 import { createInspectorClient } from "../lib/client";
+import { AgentLiveConsole } from "./agent-live-console";
 import { AgentDetailView } from "./agent-detail-view";
 
-export function AgentDetailClient() {
+export function AgentDetailClient({ chat = false }: { readonly chat?: boolean }) {
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
   const api = useMemo(() => createInspectorClient(), []);
@@ -45,5 +46,5 @@ export function AgentDetailClient() {
       </section>
     );
   }
-  return <AgentDetailView view={view} />;
+  return chat ? <AgentLiveConsole view={view} /> : <AgentDetailView view={view} />;
 }
