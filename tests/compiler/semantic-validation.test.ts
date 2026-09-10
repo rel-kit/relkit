@@ -6,8 +6,12 @@ import { defineAgent } from "../../packages/agents/src/index.ts";
 import { defineBucket } from "../../packages/buckets/src/index.ts";
 import {
   defineInfrastructureProviderSource,
+  defineConnectionContract,
   defineIntegrationReference,
+  defineProviderAdapter,
   defineProviderAccess,
+  defineProviderBehavior,
+  defineProviderCapability,
 } from "../../packages/provider/src/index.ts";
 import { defineRoute, defineTransform, http } from "../../packages/routes/src/index.ts";
 import { z, type StandardSchemaV1 } from "../../packages/schema/src/index.ts";
@@ -15,7 +19,6 @@ import {
   NORMALIZE_CODES,
   normalizeCompilation as normalize,
 } from "../../packages/compiler/src/index.ts";
-import { aiSdk } from "../../integrations/packages/ai-sdk/src/index.ts";
 import { docker } from "../../integrations/packages/docker/src/index.ts";
 import { redis } from "../../integrations/packages/redis/src/index.ts";
 import { s3 } from "../../integrations/packages/s3/src/index.ts";
@@ -27,7 +30,7 @@ function normalizeCompilation(input: Parameters<typeof normalize>[0] = {}) {
   return normalize({
     ...input,
     runtimeIntegrationPackages: [
-      runtimePackage("ai-sdk"),
+      runtimePackage("test-model", "model", "native-model"),
       runtimePackage("redis"),
       runtimePackage("s3"),
     ],
@@ -44,16 +47,8 @@ describe("compiler semantic validation", () => {
       id: "app",
       env: defineEnv({}),
       model: {
-        openai: aiSdk({
-          provider: "openai",
-          defaultModel: "gpt-5-mini",
-          apiKey: env.secret("OPENAI_API_KEY"),
-        }),
-        anthropic: aiSdk({
-          provider: "anthropic",
-          defaultModel: "claude-sonnet-4-5",
-          apiKey: env.secret("ANTHROPIC_API_KEY"),
-        }),
+        openai: nativeModel("openai", "gpt-5-mini"),
+        anthropic: nativeModel("anthropic", "claude-sonnet-4-5"),
       },
       defaults: { model: "openai" },
     });
@@ -299,14 +294,27 @@ function connectedS3() {
   });
 }
 
-function runtimePackage(integrationId: string) {
-  const capability =
-    integrationId === "ai-sdk" ? "model" : integrationId === "s3" ? "bucket" : "cache";
+function runtimePackage(
+  integrationId: string,
+  capability = integrationId === "s3" ? "bucket" : "cache",
+  adapterId = integrationId,
+) {
   return {
     integrationId,
     packageName: `@relkit/${integrationId}`,
     packageVersion: "0.1.0",
     exportName: "./runtime",
-    registrations: [{ capability, adapterId: integrationId, protocolVersion: 1 }],
+    registrations: [{ capability, adapterId, protocolVersion: 1 }],
   };
+}
+
+function nativeModel(provider: string, defaultModel: string) {
+  return defineProviderAdapter({
+    integration: defineIntegrationReference("test-model"),
+    capability: defineProviderCapability("model"),
+    adapterId: "native-model",
+    connectionContract: defineConnectionContract({}),
+    connection: {},
+    behavior: defineProviderBehavior({ provider, defaultModel }),
+  });
 }
