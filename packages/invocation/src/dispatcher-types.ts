@@ -72,6 +72,7 @@ export interface InvocationDispatchOptions<
   readonly context?: InvocationContextFactory<Context>;
   readonly effectRunner?: InvocationRunner;
   readonly idSource?: InvocationIdSource;
+  readonly progressSink?: import("./progress.js").ProgressSink;
   readonly onInvocationStart?: (record: InvocationRecord) => MaybePromise<void>;
   readonly onCompletion?: (completion: InvocationCompletion) => MaybePromise<void>;
   readonly onRelease?: (release: {

@@ -23,6 +23,8 @@ export * from "./tracing-span.js";
 export * from "./public-trace.js";
 export * from "./trace-propagation.js";
 export * from "./span-snapshot.js";
+export * from "./stream-runtime.js";
+export * from "./progress.js";
 export * from "./root-span.js";
 export {
   currentExecutionContext,

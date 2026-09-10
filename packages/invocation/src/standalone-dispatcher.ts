@@ -10,7 +10,7 @@ import {
 import { createTraceId, isTraceId } from "@relkit/contracts";
 import { InvocationValidationError } from "./contracts.js";
 import { linkSignals } from "./context.js";
-import { normalizeFailure, toPublicEnvelope, type InvocationFailure } from "./failure.js";
+import { normalizeFailure, type InvocationFailure } from "./failure.js";
 import { makeStandaloneContext, createLocalClock } from "./dispatcher-context.js";
 import { currentInvocationScope, runInInvocationScope } from "./dispatcher-scope.js";
 import { createInvocationCallStack, type InvocationCallStack } from "./recursion.js";
@@ -23,11 +23,17 @@ import type {
 } from "./dispatcher-types.js";
 import {
   calculateStandaloneDeadline,
-  completeStandaloneRecord,
   createStandaloneRecord,
   standaloneParent,
 } from "./standalone-utils.js";
 import { runStandaloneLifecycle } from "./standalone-lifecycle.js";
+import {
+  isStreamOutput,
+  lazySingleConsumerStream,
+  managedValidatedStream,
+} from "./stream-runtime.js";
+import { createProgressEmitter } from "./progress.js";
+import { createStandaloneFinisher } from "./standalone-completion.js";
 
 export function createStandaloneDispatcher(
   baseOptions: StandaloneDispatcherOptions = {},
@@ -36,12 +42,20 @@ export function createStandaloneDispatcher(
   dispatcher = Object.freeze({
     dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
       request: InvocationDispatchRequest<Input, Output, Context>,
-    ) =>
-      invokeStandalone(
-        request,
-        { ...baseOptions, ...request.options } as InvocationDispatchOptions<Context>,
-        dispatcher,
-      ),
+    ) => {
+      const options = { ...baseOptions, ...request.options } as InvocationDispatchOptions<Context>;
+      if (isStreamOutput(request.target.output)) {
+        return Promise.resolve(
+          lazySingleConsumerStream(
+            () =>
+              invokeStandalone(request, options, dispatcher, true) as Promise<
+                AsyncIterable<unknown>
+              >,
+          ) as Output,
+        );
+      }
+      return invokeStandalone(request, options, dispatcher, false);
+    },
   });
   return dispatcher;
 }
@@ -50,6 +64,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
   request: InvocationDispatchRequest<Input, Output, Context>,
   options: InvocationDispatchOptions<Context>,
   dispatcher: InvocationDispatcher,
+  streamLifecycle: boolean,
 ): Promise<Output> {
   const active = currentInvocationScope();
   const activeDispatcher = active?.dispatcher === dispatcher ? active : undefined;
@@ -81,10 +96,22 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
   const unlink = linkSignals(controller, [options.signal, parent?.signal]);
   const time = options.time ?? createLocalClock(controller.signal, options.now);
   const runner = options.effectRunner ?? defaultRunner;
+  const progress =
+    request.target.progress === undefined
+      ? undefined
+      : createProgressEmitter(request.target.progress, controller.signal, options.progressSink);
   let value: Output | undefined;
   let error: InvocationValidationError | InvocationFailure | undefined;
   let outcome: Exclude<import("./contracts.js").InvocationRecord["status"], "started"> = "defect";
   let chain: InvocationCallStack | undefined;
+  let deferredCompletion = false;
+  const finish = createStandaloneFinisher({
+    record,
+    options,
+    now: () => options.now?.() ?? time.now().getTime(),
+    settleProgress: progress?.settle,
+    unlink,
+  });
   try {
     chain = (activeDispatcher?.chain ?? createInvocationCallStack()).enterDescriptor(
       request.target,
@@ -109,6 +136,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
       publishes: request.target.publishes ?? [],
       ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(options.clients === undefined ? {} : { clients: options.clients }),
+      ...(progress === undefined ? {} : { progress: progress.emitter }),
     });
     const result = await runInInvocationScope(
       {
@@ -128,7 +156,28 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
         }),
     );
     value = (await validated(request.target.output, result, "output")) as Output;
-    outcome = "success";
+    if (streamLifecycle && isStreamOutput(request.target.output)) {
+      const parentScope = standaloneParent(record, controller.signal, deadlineMs);
+      deferredCompletion = true;
+      value = managedValidatedStream({
+        source: value as AsyncIterable<unknown>,
+        schema: request.target.output.item,
+        maxItemBytes: 1024 * 1024,
+        idleMs: 45_000,
+        abort: (reason) => controller.abort(reason),
+        run: (work) =>
+          runInInvocationScope({ dispatcher, parent: parentScope, chain: chain! }, work),
+        settle: async (streamCause) => {
+          const streamError =
+            streamCause === undefined
+              ? undefined
+              : normalizeFailure(streamCause, { signal: controller.signal });
+          await finish(streamError?.outcome ?? "success", streamError);
+        },
+      }) as Output;
+    } else {
+      outcome = "success";
+    }
   } catch (cause) {
     error =
       cause instanceof InvocationValidationError && cause.phase === "input"
@@ -139,19 +188,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
     error = await validateDeclaredError(request.target.errors, error);
     outcome = error instanceof InvocationValidationError ? "validation-error" : error.outcome;
   } finally {
-    const completed = completeStandaloneRecord(
-      record,
-      outcome,
-      options.now?.() ?? time.now().getTime(),
-    );
-    const completion = Object.freeze({
-      record: completed,
-      outcome,
-      ...(error === undefined ? {} : { error, publicError: toPublicEnvelope(error) }),
-    });
-    await callHook(options.onCompletion, completion);
-    await callHook(options.onRelease, { record: completed, admitted: false });
-    unlink();
+    if (!deferredCompletion) await finish(outcome, error);
   }
   if (error !== undefined) throw error;
   return value as Output;
