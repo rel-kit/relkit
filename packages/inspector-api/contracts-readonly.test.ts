@@ -24,6 +24,7 @@ const graphIds: Record<string, string> = {
   cache: "orders.cache",
   tools: "orders.tool",
   agents: "orders.agent",
+  channels: "orders.updates",
   errors: "orders.invalid",
   services: "orders",
   providers: "provider.buckets.default",
