@@ -1,11 +1,11 @@
 import type { JsonValue } from "@relkit/contracts";
-import type { ToolSet } from "ai";
 import { ApprovalRequiredError } from "./approval.js";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
-import { createAiInputSchema, invokeAgentTool } from "./runtime-tool-adapter.js";
+import { invokeAgentTool } from "./runtime-tool-adapter.js";
 import { jsonValue, signalFailure, withSignal } from "./runtime-utils.js";
 import type { ToolDescriptor, ToolSource } from "@relkit/tools";
+import { relkitToolRefs } from "./define-agent-native.js";
 
 export interface AgentToolCall {
   readonly callId: string;
@@ -23,7 +23,10 @@ export async function runTool(
   parentSpanId?: string,
 ): Promise<JsonValue> {
   const tool = findTool(options.tools, turn.toolId);
-  if (tool === undefined || !options.agent.tools.some((entry) => entry.ref.id === turn.toolId))
+  if (
+    tool === undefined ||
+    !relkitToolRefs(options.agent.tools).some((entry) => entry.ref.id === turn.toolId)
+  )
     return safeToolError("RELKIT_TOOL_NOT_ALLOWED");
   try {
     const result = await withSignal(
@@ -47,28 +50,20 @@ export async function runTool(
   }
 }
 
-export function modelTools(
-  refs: readonly { readonly ref: { readonly id: string } }[],
+export function modelToolName(id: string, index: number): string {
+  const suffix = `_${index}`;
+  return `${id.replaceAll(".", "_").slice(0, 64 - suffix.length)}${suffix}`;
+}
+
+export function findModelTool(
   source: ToolSource,
-  execute: (turn: AgentToolCall) => Promise<JsonValue>,
-  sdk: { readonly tool: typeof import("ai").tool },
-): ToolSet {
-  return Object.fromEntries(
-    refs.map((ref) => {
-      const tool = findTool(source, ref.ref.id);
-      if (tool === undefined)
-        throw new AgentRuntimeError("RELKIT_TOOL_UNKNOWN", "Agent tool is not registered");
-      return [
-        tool.id,
-        sdk.tool({
-          description: tool.description,
-          inputSchema: createAiInputSchema(tool.target.input),
-          execute: (input, options) =>
-            execute({ callId: options.toolCallId, toolId: tool.id, input }),
-        }),
-      ];
-    }),
-  );
+  refs: readonly { readonly ref: { readonly id: string } }[],
+  name: string,
+): ToolDescriptor<string> | undefined {
+  const direct = findTool(source, name);
+  if (direct !== undefined) return direct;
+  const ref = refs.find((entry, index) => modelToolName(entry.ref.id, index) === name);
+  return ref === undefined ? undefined : findTool(source, ref.ref.id);
 }
 
 export function findTool(source: ToolSource, id: string): ToolDescriptor<string> | undefined {

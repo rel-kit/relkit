@@ -16,26 +16,72 @@ import {
 } from "./observability.js";
 import { generatedAgentFunctionId } from "./generated-function.js";
 import { runAgentLoop } from "./runtime-loop.js";
+import { isGraphDescriptor, type GraphDescriptor } from "./define-graph.js";
+import { invokeGraph } from "./graph-runtime.js";
 
-type AgentAny = AgentDescriptor<string, unknown, unknown>;
+type AgentAny = AgentDescriptor<string, unknown, unknown> | GraphDescriptor;
 type ApprovalDecision = "approved" | "denied" | boolean | import("./approval.js").ApprovalRecord;
 export type AgentApprovalHandler = (
   approval: import("./approval.js").PendingApproval,
 ) => MaybePromise<ApprovalDecision>;
 
+export interface AgentSteeringSource {
+  readonly drain: () => MaybePromise<readonly string[]>;
+}
+
+export interface AgentConversationMessage {
+  readonly role: "user" | "assistant";
+  readonly content: string;
+}
+
+export interface AgentContentSink {
+  readonly emitOutput: (value: unknown, signal: AbortSignal) => MaybePromise<void>;
+  readonly finishOutput?: (signal: AbortSignal) => MaybePromise<void>;
+  readonly progressSinkForTool?: (tool: {
+    readonly toolCallId: string;
+    readonly toolId: string;
+  }) => import("@relkit/invocation").ProgressSink;
+  readonly emitTool?: (
+    value: {
+      readonly toolCallId: string;
+      readonly toolId: string;
+      readonly state: import("./state-types.js").ToolPartState;
+      readonly value?: unknown;
+    },
+    signal: AbortSignal,
+  ) => MaybePromise<void>;
+  readonly emitEvent?: (
+    value: import("./runtime-events.js").AgentExecutionEvent,
+    signal: AbortSignal,
+  ) => MaybePromise<void>;
+  readonly emitMessage?: (
+    value: import("@relkit/contracts").BrowserMessage,
+    signal: AbortSignal,
+  ) => MaybePromise<void>;
+  readonly emitWaiting?: (
+    value: Omit<import("./state-types.js").AgentWaitingState, "revision" | "runId">,
+    signal: AbortSignal,
+  ) => MaybePromise<void>;
+}
+
 interface AgentRuntimeBaseOptions {
   readonly agent: AgentAny;
   readonly tools: import("@relkit/tools").ToolSource;
+  readonly bucketBackend?: import("./deepagent-bucket-files.js").DeepAgentBucketClient;
   readonly engine: import("@relkit/tools").ToolEngine;
   readonly maxInputBytes?: number;
   readonly maxOutputBytes?: number;
   readonly approval?: AgentApprovalHandler;
+  readonly messages?: readonly AgentConversationMessage[];
+  readonly steering?: AgentSteeringSource;
+  readonly contentSink?: AgentContentSink;
   readonly hooks?: AgentRuntimeHooks;
   readonly capture?: AgentCapturePolicy;
+  readonly environment?: Readonly<Record<string, unknown>>;
 }
 
 export type AgentRuntimeOptions = AgentRuntimeBaseOptions & {
-  readonly modelRegistry: unknown;
+  readonly modelRegistry?: unknown;
 };
 
 export interface AgentInvocationOptions {
@@ -49,6 +95,8 @@ export interface AgentInvocationOptions {
   readonly parentSpanId?: string;
   readonly hooks?: AgentRuntimeHooks;
   readonly capture?: AgentCapturePolicy;
+  readonly threadId?: string;
+  readonly resume?: boolean;
 }
 
 export interface AgentRuntime {
@@ -64,13 +112,17 @@ export { AgentRuntimeError } from "./runtime-errors.js";
 export async function invokeAgent(
   options: AgentRuntimeOptions & AgentInvocationOptions,
 ): Promise<unknown> {
+  if (isGraphDescriptor(options.agent)) {
+    return invokeGraph({ ...options, agent: options.agent });
+  }
   const hooks = options.hooks;
   const capture = createAgentCapturePolicy(options.capture);
   const invocationId = normalizeId(options.invocationId ?? `agent-${crypto.randomUUID()}`);
   const traceId = normalizeId(options.traceId ?? invocationId);
-  const runtimeModel = resolveRuntimeModel({
-    ...(options.agent.model === undefined ? {} : { selector: options.agent.model }),
+  const runtimeModel = await resolveRuntimeModel({
+    ...(options.agent.model === undefined ? {} : { model: options.agent.model }),
     registry: options.modelRegistry,
+    environment: options.environment ?? {},
     ...(options.maxInputBytes === undefined ? {} : { maxInputBytes: options.maxInputBytes }),
     ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
   });
@@ -89,10 +141,12 @@ export async function invokeAgent(
     async () => {
       try {
         if (execution.signal.aborted) throw signalFailure(execution.signal);
-        const input = await withSignal(
-          validateValue(options.agent.input, options.input, "input"),
-          execution.signal,
-        );
+        const input = options.resume
+          ? options.input
+          : await withSignal(
+              validateValue(options.agent.input, options.input, "input"),
+              execution.signal,
+            );
         return await runAgentLoop(
           options,
           runtimeModel.model,
