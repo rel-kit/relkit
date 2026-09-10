@@ -21,7 +21,8 @@ export function usedCapabilities(
     if (node.kind === "bucket") add("bucket", node.profile);
     if (node.kind === "cache") add("cache", node.profile);
     if (node.kind === "event") add("event", node.profile);
-    if (node.kind === "agent") add("model", node.profile);
+    if (node.kind === "agent" && node.execution !== "graph" && node.modelSource !== "native")
+      add("model", node.profile);
     if (node.kind === "trigger" && node.triggerType === "event") add("event", eventProfile(node));
     if (
       node.kind === "trigger" &&

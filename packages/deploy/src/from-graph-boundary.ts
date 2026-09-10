@@ -16,7 +16,7 @@ export function validateBoundary(value: unknown): void {
 function scan(value: unknown): void {
   if (value === null || typeof value !== "object") return;
   for (const [key, child] of Object.entries(value)) {
-    if (/^(pulumi|client|live(client|object)?|resource)$/i.test(key))
+    if (/^(pulumi|live(client|object)?|resource)$/i.test(key))
       fail(
         "RELKIT_DEPLOY_LIVE_OBJECT_UNSUPPORTED",
         "Live deployment objects cannot cross the graph boundary.",
