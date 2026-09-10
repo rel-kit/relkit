@@ -1,4 +1,5 @@
-import { isRecord, refId } from "./normalize-utils.js";
+import { generatedAgentMarker } from "./normalize-generated-function.js";
+import { isRecord, refId, refKind } from "./normalize-utils.js";
 import type { GraphEdge, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import {
   addDependencyEdges,
@@ -39,7 +40,10 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     if (descriptor.kind === "route") addRouteEdges(add, descriptor, value, work);
     if (descriptor.kind === "event-trigger") addEventEdges(add, descriptor, work);
     if (descriptor.kind === "tool" && target) add("exposes-as-tool", target, descriptor.id);
-    if (descriptor.kind === "agent") addToolEdges(add, descriptor.id, value.tools);
+    if (descriptor.kind === "agent") {
+      addToolEdges(add, descriptor.id, value.tools);
+      addAgentBucketEdges(add, descriptor, value);
+    }
     if (descriptor.kind === "service") addServiceEdges(add, descriptor, value);
     if (descriptor.kind === "function") {
       addDependencyEdges(add, descriptor, value.dependencies);
@@ -73,6 +77,17 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
     }
   }
   return edges;
+}
+
+function addAgentBucketEdges(
+  add: (kind: string, from: string, to: string) => void,
+  descriptor: NormalizedDescriptor,
+  value: Record<string, unknown>,
+): void {
+  const bucketId = refId(value.backend);
+  if (refKind(value.backend) !== "bucket" || bucketId === undefined) return;
+  add("uses-bucket", descriptor.id, bucketId);
+  add("uses-bucket", generatedAgentMarker(descriptor.id).functionId, bucketId);
 }
 function addServiceEdges(
   add: (

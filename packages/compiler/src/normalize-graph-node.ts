@@ -1,14 +1,14 @@
 import type { JsonValue } from "@relkit/contracts";
-import { generatedAgentMarker } from "./normalize-generated-function.js";
 import {
   deploymentRoleProjections,
   environmentMetadata,
-  requestedProviderProfile,
   selectedProviderProfile,
 } from "./normalize-graph-app.js";
 import { eventConfig, httpConfig } from "./normalize-graph-config.js";
 import { clean } from "./normalize-graph-utils.js";
 import { serviceNodeData } from "./normalize-graph-services.js";
+import { channelNodeData } from "./normalize-graph-channel.js";
+import { agentNodeData } from "./normalize-graph-agent.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
 
@@ -58,8 +58,9 @@ export function graphNodeFor(
         ...(descriptor.exposure === undefined ? {} : { exposure: descriptor.exposure }),
         input: schema(work, descriptor, "input"),
         output: schema(work, descriptor, "output"),
+        ...(value.progress === undefined ? {} : { progress: schema(work, descriptor, "progress") }),
         errors: clean(value.errors),
-        dependencies: clean(value.dependencies),
+        dependencies: dependencyMetadata(value.dependencies),
         publishes: clean(value.publishes ?? []),
         timeoutMs: clean(value.timeoutMs),
         concurrency: clean(value.concurrency),
@@ -119,26 +120,9 @@ export function graphNodeFor(
         timeoutMs: clean(value.timeoutMs),
       };
     case "agent":
-      return {
-        ...base,
-        kind: "agent",
-        input: schema(work, descriptor, "input"),
-        output: schema(work, descriptor, "output"),
-        ...(typeof value.model === "string" ? { model: value.model } : {}),
-        instructions:
-          isRecord(value.instructions) && value.instructions.kind === "prompt"
-            ? { promptId: refId(value.instructions) ?? "" }
-            : clean(value.instructions),
-        toolIds: toolIds(value.tools),
-        limits: clean(value.limits),
-        generatedFunction: generatedAgentMarker(descriptor.id),
-        profile:
-          selectedProviderProfile(
-            application,
-            "model",
-            requestedProviderProfile(descriptor.kind, value),
-          ) ?? "default",
-      };
+      return { ...base, kind: "agent", ...agentNodeData(value, descriptor, work, application) };
+    case "channel":
+      return { ...base, kind: "channel", ...channelNodeData(value, descriptor, work, application) };
     case "service":
       return { ...base, kind: "service", ...serviceNodeData(value, descriptor, work) };
     case "error":
@@ -165,6 +149,18 @@ export function graphNodeFor(
   }
 }
 
+function dependencyMetadata(value: unknown): JsonValue {
+  const cleaned = clean(value);
+  if (!isRecord(value) || !isRecord(value.agents) || !isRecord(cleaned)) return cleaned;
+  const agents = Object.fromEntries(
+    Object.entries(value.agents).flatMap(([name, agent]) => {
+      const id = refId(agent);
+      return id === undefined ? [] : [[name, { ref: { kind: "agent", id } }]];
+    }),
+  );
+  return { ...cleaned, agents };
+}
+
 function text(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
@@ -175,13 +171,4 @@ function schema(
   field: string,
 ): JsonValue {
   return work.schemas.get(`${descriptor.id}:${field}`) ?? null;
-}
-
-function toolIds(value: unknown): readonly string[] {
-  return Array.isArray(value)
-    ? value.flatMap((entry) => {
-        const id = refId(entry);
-        return id === undefined ? [] : [id];
-      })
-    : [];
 }
