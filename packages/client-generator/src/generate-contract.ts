@@ -2,15 +2,25 @@ import { canonicalJson, CONTRACT_VERSION, type JsonValue } from "@relkit/contrac
 import type { ApplicationGraph } from "@relkit/graph";
 import { clientRoutes } from "./generate-types.js";
 import { schemaType } from "./generate-schema.js";
+import { publicFingerprint, publicManifest } from "./generate-registry.js";
+import { agentProcedureEntries } from "./generate-agent-procedures.js";
 
 export function generateContract(graph: ApplicationGraph): string {
   return generateContractFromDocument(
-    clientRoutes(graph).map((route) => ({
-      name: route.trigger.id,
-      input: route.target.input,
-      output: route.target.output,
-      errors: errors(route.target.errors),
-    })),
+    clientRoutes(graph).flatMap((route) =>
+      [
+        ...new Set([
+          route.trigger.id,
+          `${route.trigger.config.method} ${route.trigger.config.path}`,
+        ]),
+      ].map((name) => ({
+        name,
+        input: route.target.input,
+        output: route.target.output,
+        errors: errors(route.target.errors),
+      })),
+    ),
+    agentProcedureEntries(graph),
   );
 }
 
@@ -23,6 +33,7 @@ export interface ContractProcedureDocument {
 
 export function generateContractFromDocument(
   procedures: readonly ContractProcedureDocument[],
+  additionalEntries: readonly string[] = [],
 ): string {
   const entries = [...procedures]
     .sort((left, right) => left.name.localeCompare(right.name))
@@ -55,6 +66,7 @@ export function generateContractFromDocument(
     "",
     "export const contract = {",
     ...entries,
+    ...additionalEntries,
     "} as const;",
     "export default contract;",
     "",
@@ -70,6 +82,7 @@ export function generateContractFromDocument(
 export function generateClientContractDocument(graph: ApplicationGraph, graphHash: string): string {
   const procedures = clientRoutes(graph).map((route) => ({
     name: route.trigger.id,
+    selector: `${route.trigger.config.method} ${route.trigger.config.path}`,
     routeId: route.trigger.id,
     functionId: route.target.id,
     input: route.target.input,
@@ -78,12 +91,18 @@ export function generateClientContractDocument(graph: ApplicationGraph, graphHas
     route: {
       method: route.trigger.config.method,
       path: route.trigger.config.path,
+      operation:
+        route.trigger.config.client === false
+          ? "query"
+          : (route.trigger.config.client?.operation ?? "query"),
     },
   }));
   return `${canonicalJson({
+    ...publicManifest(graph),
     protocol: "relkit.client-contract",
     version: CONTRACT_VERSION,
     graphHash,
+    publicFingerprint: publicFingerprint(graph),
     procedures,
   } as unknown as JsonValue)}\n`;
 }
