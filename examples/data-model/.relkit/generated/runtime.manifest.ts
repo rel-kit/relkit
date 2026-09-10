@@ -20,9 +20,9 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["listUsers"], "user
 __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["registerMember"], "users.register-member");
 __relkit_bindDescriptorIdentity(__relkit_module_6["default"]["updateUserEmail"], "users.update-user-email");
 
-export const manifestContractVersion = 8 as const;
-export const manifestGeneratorVersion = 5 as const;
-export const manifestGraphHash = "sha256:138042228b50443a1221fd1d5f7f610d7309e6eb9b8019725a00a49d266ca54e" as const;
+export const manifestContractVersion = 10 as const;
+export const manifestGeneratorVersion = 7 as const;
+export const manifestGraphHash = "sha256:7a43bd86e9bf0b500020ae89342be2419e89ff58711b15765a53fac49412de0a" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
@@ -32,6 +32,7 @@ export const runtimeManifest = {
   functions: { "users.list-users": __relkit_module_3["default"].handler, "users.register-member": __relkit_module_4["default"].handler, "users.update-user-email": __relkit_module_5["default"].handler },
   targets: { "users.list-users": __relkit_module_3["default"], "users.register-member": __relkit_module_4["default"], "users.update-user-email": __relkit_module_5["default"] },
   agents: {  },
+  channels: {  },
   tools: {  },
   routes: { "route.get.users": __relkit_module_2["GET"] },
   constants: {  },
