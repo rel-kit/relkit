@@ -28,6 +28,7 @@ describe("graph model", () => {
       "cache",
       "tool",
       "agent",
+      "channel",
       "provider",
       "service",
       "middleware",
