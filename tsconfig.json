@@ -4,7 +4,6 @@
   "references": [
     { "path": "./apps/inspector" },
     { "path": "./integrations/catalog" },
-    { "path": "./integrations/packages/ai-sdk" },
     { "path": "./integrations/packages/aws" },
     { "path": "./integrations/packages/cloudflare" },
     { "path": "./integrations/packages/docker" },
@@ -44,6 +43,7 @@
     { "path": "./packages/provider" },
     { "path": "./packages/providers-local" },
     { "path": "./packages/providers-standard" },
+    { "path": "./packages/realtime" },
     { "path": "./packages/routes" },
     { "path": "./packages/runtime-effect" },
     { "path": "./packages/runtime-hono" },

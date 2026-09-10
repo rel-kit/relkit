@@ -15,7 +15,7 @@ The main product topology is:
 | `apps/inspector`        | Next.js inspector app, normally served on port `3210`.                                                                          |
 | `examples/commerce`     | Canonical executable example and cross-feature acceptance application.                                                          |
 | `integrations/catalog`  | Optional side-effect-free `@relkit/integrations` catalog.                                                                       |
-| `integrations/packages` | Independently publishable Redis, S3, Docker, local, Cloudflare, AI SDK, telemetry, AWS, and Pulumi integrations.                |
+| `integrations/packages` | Independently publishable Redis, S3, Docker, local, Cloudflare, telemetry, AWS, and Pulumi integrations.                        |
 | `packages/`             | Authoring APIs, compiler/graph, engine, runtimes, providers, CLI, generator, and Pulumi deployment.                             |
 | `templates/default/v1`  | Generated `minimal`, `api`, and `agent` projects.                                                                               |
 | `tests/`                | Type, unit, compiler, contract, integration, restart, inspector, generator, deployment, container, security, and browser tests. |
