@@ -27,6 +27,7 @@ export function passReferences(work: NormalizationWork): void {
       }
     }
     if (descriptor.kind === "function") validateDependencies(work, descriptor, value.dependencies);
+    if (descriptor.kind === "agent") validateAgentBackend(work, descriptor, value.backend);
     if (descriptor.kind === "route") {
       collectTransforms(work, descriptor, value.request);
       validateRateLimitStore(work, descriptor, value.rateLimit);
@@ -38,6 +39,23 @@ export function passReferences(work: NormalizationWork): void {
     if (!work.transformReferences.has(descriptor.id)) {
       add(work, descriptor, NORMALIZE_CODES.missingTransform, "Named transform is not indexed.");
     }
+  }
+}
+
+function validateAgentBackend(
+  work: NormalizationWork,
+  agent: NormalizedDescriptor,
+  backend: unknown,
+): void {
+  const kind = refKind(backend);
+  if (kind === undefined) return;
+  if (kind !== "bucket" || referenceFor(work, backend, "bucket") === undefined) {
+    add(
+      work,
+      agent,
+      NORMALIZE_CODES.missingTarget,
+      "Agent backend descriptor must resolve to a bucket.",
+    );
   }
 }
 
