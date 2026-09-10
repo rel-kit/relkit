@@ -15,6 +15,7 @@ describe("inspector protocol boundary scans", () => {
     expect(result.violations).toEqual([]);
     expect(result.networkFiles).toEqual([
       "apps/inspector/app/%5Frelkit/backend/[...path]/route.ts",
+      "apps/inspector/app/application-runtime-client.ts",
       "apps/inspector/lib/api-transport.ts",
       "apps/inspector/lib/stream.ts",
     ]);

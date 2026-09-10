@@ -4,14 +4,19 @@ import * as ts from "typescript";
 import { dependencyName, importReferences } from "../../scripts/boundary-imports.ts";
 
 const allowedPackages = new Set([
+  "@orpc/client",
+  "@relkit/contracts",
   "@xyflow/react",
   "class-variance-authority",
+  "elkjs",
   "lucide-react",
   "next",
   "radix-ui",
   "react",
   "react-aria-components",
   "react-dom",
+  "streamdown",
+  "uuid",
 ]);
 const sourceDirectories = [
   "apps/inspector/app",
@@ -22,6 +27,7 @@ const bundleExtensions = new Set([".js", ".json", ".map"]);
 const networkFiles = new Set([
   "apps/inspector/app/%5Frelkit/backend/[...path]/route.ts",
   "apps/inspector/lib/api-transport.ts",
+  "apps/inspector/app/application-runtime-client.ts",
   "apps/inspector/lib/stream.ts",
 ]);
 

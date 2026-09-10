@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { createClient } from "../../packages/client/src/index.ts";
+import { createOperationId } from "../../packages/realtime/src/index.ts";
 import { createInspectorFixture, FIXTURE_GRAPH_HASH, FIXTURE_IDS } from "./fixture-backend.ts";
 
 describe("deterministic inspector fixture backend", () => {
@@ -18,7 +20,14 @@ describe("deterministic inspector fixture backend", () => {
       { headers },
     );
     expect(graph.status).toBe(200);
-    expect((await graph.json()).graphHash).toBe(FIXTURE_GRAPH_HASH);
+    const graphValue = await graph.json();
+    expect(graphValue.graphHash).toBe(FIXTURE_GRAPH_HASH);
+    expect(graphValue.graph.nodes.find((node: any) => node.id === FIXTURE_IDS.agent)).toMatchObject(
+      {
+        client: "public",
+        chat: { input: "message", output: "answer" },
+      },
+    );
     expect((await routes.json()).items).toHaveLength(2);
     expect((await route.json()).node.id).toBe(FIXTURE_IDS.route);
     expect((await source.json()).source.file).toBe("src/routes/create-order.route.ts");
@@ -65,4 +74,56 @@ describe("deterministic inspector fixture backend", () => {
     expect(response.status).toBe(200);
     expect((await response.json()).status.state).toBe("available");
   });
+
+  test("streams todo and tool state through a durable human-input resume", async () => {
+    const fixture = createInspectorFixture();
+    const client = createClient<any>({
+      baseUrl: "http://fixture",
+      headers: {
+        "x-relkit-identity-scope": "browser",
+        "x-relkit-session-epoch": "fixture-0",
+      },
+      fetch: (request, init) => fixture.app.fetch(new Request(request, init)),
+    });
+    const threadId = `inspector:${crypto.randomUUID()}`;
+    await client["relkit.agent.run"]({
+      agentId: FIXTURE_IDS.agent,
+      threadId,
+      operationId: createOperationId(),
+      kind: "run",
+      payload: "Review the order",
+    });
+    const waiting = await waitForThread(client, threadId, "waiting");
+    expect(waiting.values.todos).toMatchObject([
+      { content: "Look up the order", status: "completed" },
+      { content: "Ask for approval", status: "in_progress" },
+    ]);
+    expect(waiting.currentMessages.some((message: any) => message.role === "tool")).toBe(true);
+    expect(waiting.waiting.response).toMatchObject({ type: "boolean" });
+    await client["relkit.agent.run"]({
+      agentId: FIXTURE_IDS.agent,
+      threadId,
+      operationId: createOperationId(),
+      kind: "run",
+      resume: true,
+      waitingRevision: waiting.waiting.revision,
+      payload: false,
+    });
+    const complete = await waitForThread(client, threadId, "idle");
+    expect(complete.currentMessages.at(-1)?.parts[0].text).toBe("The order was rejected.");
+  });
 });
+
+async function waitForThread(client: any, threadId: string, status: string): Promise<any> {
+  let latest: any;
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const snapshot = await client["relkit.agent.load"]({
+      agentId: FIXTURE_IDS.agent,
+      threadId,
+    }).catch(() => undefined);
+    latest = snapshot;
+    if (snapshot?.thread.status === status) return snapshot;
+    await Bun.sleep(20);
+  }
+  throw new Error(`Agent thread did not reach ${status}: ${JSON.stringify(latest)}`);
+}
