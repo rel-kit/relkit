@@ -87,7 +87,7 @@ test("keeps plans secret-free and rejects secret/live deployment values", () => 
   const plan = fromGraph(graph, fullOptions);
   const bytes = JSON.stringify(plan);
 
-  expect(bytes).toContain("OPENAI_API_KEY");
+  expect(bytes).toContain("DEPLOYMENT_SECRET");
   expect(bytes).not.toContain("synthetic-secret");
   expect(bytes).not.toContain("pulumiValue");
   expectDeploymentError(
@@ -150,7 +150,7 @@ test("renders deterministic Pulumi program bytes from distinct roots", () => {
 
   expect(leftBytes).toBe(rightBytes);
   expect(leftBytes).not.toContain("/tmp/relkit-");
-  expect(leftBytes).not.toContain("OPENAI_API_KEY");
+  expect(leftBytes).not.toContain("DEPLOYMENT_SECRET");
   expect(leftBytes).not.toContain("pulumiValue");
 });
 
@@ -195,8 +195,8 @@ function mapProvider(
 function withSecretConfiguration(graph: ApplicationGraph): ApplicationGraph {
   const secret: GraphNode = {
     kind: "env",
-    id: "OPENAI_API_KEY",
-    name: "OPENAI_API_KEY",
+    id: "DEPLOYMENT_SECRET",
+    name: "DEPLOYMENT_SECRET",
     type: "secret",
     requiredIn: [],
     hasDefault: false,
@@ -211,7 +211,7 @@ function withSecretConfiguration(graph: ApplicationGraph): ApplicationGraph {
             ...provider.namedValues,
             {
               field: "accessKeyId",
-              name: "OPENAI_API_KEY",
+              name: "DEPLOYMENT_SECRET",
               type: "secret-string",
               sensitive: true,
             },
