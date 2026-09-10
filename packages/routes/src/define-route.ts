@@ -12,6 +12,7 @@ import {
 } from "./http-dsl.js";
 import { copyRateLimit, positive, successStatus } from "./route-options.js";
 import { copyProtectedPaths, readBetterAuthRegistration } from "./route-auth.js";
+import { copyClient, copyStream } from "./route-client.js";
 import type {
   FunctionRouteDescriptor,
   FunctionRouteOptions,
@@ -79,6 +80,8 @@ export function defineRoute(
   const maxBodyBytes = positive(route.maxBodyBytes, "maxBodyBytes");
   const status = successStatus(route.successStatus);
   const rateLimit = copyRateLimit(route.rateLimit);
+  const client = copyClient(route.client);
+  const stream = copyStream(route.stream, route.target.output);
   const id = route.id === undefined ? createUnboundIdentity() : route.id;
   const base = createDescriptorBase("route", id, route);
   const legacy = route as typeof route & {
@@ -98,6 +101,8 @@ export function defineRoute(
     ...(maxBodyBytes === undefined ? {} : { maxBodyBytes }),
     ...(rateLimit === undefined ? {} : { rateLimit }),
     ...(timeoutMs === undefined ? {} : { timeoutMs }),
+    ...(client === undefined ? {} : { client }),
+    ...(stream === undefined ? {} : { stream }),
   }) as FunctionRouteDescriptor<string>;
 }
 
