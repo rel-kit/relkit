@@ -58,7 +58,7 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
   includes(
     await run(
       "eval",
-      "['conditional:approved','parallel','join','loop'].every(label => document.body.innerText.includes(label))",
+      "['conditional approved','parallel','join','loop'].every(label => document.querySelector('.relationship-panel')?.textContent?.includes(label))",
     ),
     "true",
   );
