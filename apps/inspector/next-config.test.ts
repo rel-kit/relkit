@@ -78,6 +78,24 @@ test("forwards the browser abort signal to the upstream request", async () => {
   }
 });
 
+test("keeps proxy route segments inside the configured backend origin", async () => {
+  const originalFetch = globalThis.fetch;
+  let requestedUrl: string | undefined;
+  globalThis.fetch = ((input: RequestInfo | URL) => {
+    requestedUrl = String(input);
+    return Promise.resolve(Response.json({ ok: true }));
+  }) as typeof fetch;
+  process.env.RELKIT_BACKEND_URL = "http://127.0.0.1:3212/base";
+  try {
+    await GET(new Request("http://inspector.local/_relkit/backend/escape"), {
+      params: Promise.resolve({ path: ["//attacker.example", "value"] }),
+    });
+    expect(requestedUrl).toBe("http://127.0.0.1:3212/base/%2F%2Fattacker.example/value");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 afterEach(async () => {
   await backend?.stop(true);
   backend = undefined;

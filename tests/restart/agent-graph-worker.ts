@@ -32,6 +32,12 @@ if (
 }
 
 const root = resolveRestartStateRoot(requestedRoot);
+const resumeReadyPath =
+  contender === "one"
+    ? join(root, "resume-ready-one")
+    : contender === "two"
+      ? join(root, "resume-ready-two")
+      : undefined;
 if (mode === "resume" && contender === "two") {
   while (!(await exists(join(root, "resume-ready-one")))) {
     await new Promise((resolve) => setTimeout(resolve, 5));
@@ -147,11 +153,12 @@ async function run(): Promise<void> {
 }
 
 async function compete(client: any, agentId: string, threadId: string): Promise<void> {
+  if (resumeReadyPath === undefined) throw new Error("Resume contender is required");
   const snapshot = await client["relkit.agent.load"]({ agentId, threadId });
   if (snapshot.waiting?.revision !== expectedRevision) {
     throw new Error("Waiting revision changed before the competing resume");
   }
-  await writeFile(join(root, `resume-ready-${contender}`), "ready");
+  await writeFile(resumeReadyPath, "ready");
   while (!(await exists(join(root, "resume-go")))) {
     await new Promise((resolve) => setTimeout(resolve, 5));
   }

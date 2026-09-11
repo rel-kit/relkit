@@ -8,12 +8,13 @@ const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
 type RouteContext = { readonly params: Promise<{ readonly path: readonly string[] }> };
 
 async function proxy(request: Request, context: RouteContext): Promise<Response> {
-  const backend = process.env.RELKIT_BACKEND_URL?.replace(/\/$/, "");
+  const backend = process.env.RELKIT_BACKEND_URL;
   if (backend === undefined)
     return Response.json({ error: "RELKIT inspector backend is not configured." }, { status: 503 });
   const { path } = await context.params;
   const incoming = new URL(request.url);
-  const target = new URL(`${backend}/${path.map(encodeURIComponent).join("/")}`);
+  const target = new URL(backend);
+  target.pathname = `${target.pathname.replace(/\/$/, "")}/${path.map(encodeURIComponent).join("/")}`;
   target.search = incoming.search;
   let headers: Headers;
   try {

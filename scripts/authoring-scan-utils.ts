@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import * as ts from "typescript";
+import { resolveOwnedSourceFile } from "./check-logger-sinks.ts";
 
 export type AuthoringViolation = {
   file: string;
@@ -14,15 +15,15 @@ export type Fragment = { path: string; text: string; fullText: string; offset: n
 
 export function authoringFragments(root: string): Fragment[] {
   const result: Fragment[] = [];
-  const packageRoot = resolve(root, "packages");
+  const packageRoot = realpathSync(resolve(root, "packages"));
   for (const path of new Bun.Glob("**/README.md").scanSync({ cwd: packageRoot, onlyFiles: true })) {
-    const file = resolve(packageRoot, path);
+    const file = resolveOwnedSourceFile(packageRoot, path);
     result.push(...markdownFragments(file, readFileSync(file, "utf8")));
   }
-  const fixtureRoot = resolve(root, "examples/commerce");
+  const fixtureRoot = realpathSync(resolve(root, "examples/commerce"));
   for (const path of new Bun.Glob("**/*.ts").scanSync({ cwd: fixtureRoot, onlyFiles: true })) {
     if (path.startsWith("tests/")) continue;
-    const file = resolve(fixtureRoot, path);
+    const file = resolveOwnedSourceFile(fixtureRoot, path);
     const text = readFileSync(file, "utf8");
     result.push({ path: file, text, fullText: text, offset: 0 });
   }
