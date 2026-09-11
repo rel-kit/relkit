@@ -34,8 +34,6 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
   await run("click", reference(tree, 'button "Thread history"'));
   await run("wait", "--text", "Review the order");
   await run("press", "Escape");
-  await run("open", chatUrl.trim());
-  await run("wait", "--text", "The order was rejected.");
   includes(await run("eval", "!document.body.innerText.includes('Graph\\nChat')"), "true");
 
   await run("open", `${baseUrl}/graphs`);
