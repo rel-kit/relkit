@@ -26,7 +26,7 @@
     "@relkit/redis": "workspace:*",
     "@relkit/s3": "workspace:*",
     "@relkit/sentry": "workspace:*",
-    "better-auth": "1.7.1",
+    "better-auth": "1.7.3",
     "deepagents": "1.13.3",
     "drizzle-orm": "1.0.0-rc.5-169397b",
     "langchain": "1.5.10"
