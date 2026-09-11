@@ -96,6 +96,14 @@ test("keeps proxy route segments inside the configured backend origin", async ()
   }
 });
 
+test("rejects non-local proxy backends", async () => {
+  process.env.RELKIT_BACKEND_URL = "http://169.254.169.254/latest/meta-data";
+  const response = await GET(new Request("http://inspector.local/_relkit/backend/value"), {
+    params: Promise.resolve({ path: ["value"] }),
+  });
+  expect(response.status).toBe(503);
+});
+
 afterEach(async () => {
   await backend?.stop(true);
   backend = undefined;

@@ -8,7 +8,7 @@ const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
 type RouteContext = { readonly params: Promise<{ readonly path: readonly string[] }> };
 
 async function proxy(request: Request, context: RouteContext): Promise<Response> {
-  const backend = process.env.RELKIT_BACKEND_URL;
+  const backend = localBackend(process.env.RELKIT_BACKEND_URL);
   if (backend === undefined)
     return Response.json({ error: "RELKIT inspector backend is not configured." }, { status: 503 });
   const { path } = await context.params;
@@ -46,6 +46,25 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
     statusText: response.statusText,
     headers: responseHeaders,
   });
+}
+
+function localBackend(value: string | undefined): URL | undefined {
+  if (value === undefined) return undefined;
+  try {
+    const backend = new URL(value);
+    if (
+      backend.protocol !== "http:" ||
+      backend.username !== "" ||
+      backend.password !== "" ||
+      (backend.hostname !== "localhost" &&
+        backend.hostname !== "127.0.0.1" &&
+        backend.hostname !== "::1")
+    )
+      return undefined;
+    return backend;
+  } catch {
+    return undefined;
+  }
 }
 
 async function addProxyServer(response: Response): Promise<BodyInit | null> {
