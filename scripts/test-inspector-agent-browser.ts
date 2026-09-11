@@ -36,7 +36,8 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
   await run("press", "Escape");
   includes(await run("eval", "!document.body.innerText.includes('Graph\\nChat')"), "true");
 
-  await run("open", `${baseUrl}/graphs`);
+  tree = await snapshot();
+  await run("click", reference(tree, 'link "Graphs"'));
   await run("wait", "--text", "Graph definitions");
   tree = await snapshot();
   await run("click", reference(tree, 'link "Open graph"'));
@@ -68,7 +69,8 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
     "true",
   );
 
-  await run("open", `${baseUrl}/graph`);
+  tree = await snapshot();
+  await run("click", reference(tree, 'link "Application graph"'));
   await run("wait", '[aria-label="Interactive capability graph"]');
   includes(
     await run(
