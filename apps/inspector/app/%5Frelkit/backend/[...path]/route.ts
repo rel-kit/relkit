@@ -51,16 +51,21 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
 function localBackend(value: string | undefined): URL | undefined {
   if (value === undefined) return undefined;
   try {
-    const backend = new URL(value);
-    if (
-      backend.protocol !== "http:" ||
-      backend.username !== "" ||
-      backend.password !== "" ||
-      (backend.hostname !== "localhost" &&
-        backend.hostname !== "127.0.0.1" &&
-        backend.hostname !== "::1")
-    )
+    const configured = new URL(value);
+    if (configured.protocol !== "http:" || configured.username !== "" || configured.password !== "")
       return undefined;
+    const origin =
+      configured.hostname === "localhost"
+        ? "http://localhost"
+        : configured.hostname === "127.0.0.1"
+          ? "http://127.0.0.1"
+          : configured.hostname === "[::1]"
+            ? "http://[::1]"
+            : undefined;
+    if (origin === undefined) return undefined;
+    const backend = new URL(origin);
+    backend.port = configured.port;
+    backend.pathname = configured.pathname;
     return backend;
   } catch {
     return undefined;
