@@ -29,6 +29,8 @@ apps/inspector/.next-packaged/
 apps/docs/.source/
 out/
 build
+!packages/client/src/build/
+!packages/client/src/build/**
 dist
 *.tsbuildinfo
 packages/*/CHANGELOG.md
