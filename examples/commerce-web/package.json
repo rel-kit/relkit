@@ -6,7 +6,7 @@
     "check": "bun --cwd ../commerce check && tsc --noEmit",
     "typecheck": "bun run check",
     "test": "bun test",
-    "build": "bun --cwd ../commerce check && next build",
+    "build": "bun --cwd ../commerce check && bun run scripts/build.ts",
     "dev": "bun --cwd ../commerce check && next dev --hostname 127.0.0.1"
   },
   "dependencies": {
