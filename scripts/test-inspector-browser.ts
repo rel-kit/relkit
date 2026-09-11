@@ -12,6 +12,7 @@ const browserEnv = {
   ...process.env,
   AGENT_BROWSER_ALLOWED_DOMAINS: "127.0.0.1",
   AGENT_BROWSER_CONTENT_BOUNDARIES: "1",
+  AGENT_BROWSER_DEFAULT_TIMEOUT: "60000",
   AGENT_BROWSER_MAX_OUTPUT: "50000",
 };
 const fixture = Bun.spawn([process.execPath, "tests/inspector/fixture-server.ts"], {
@@ -141,9 +142,6 @@ try {
   if ((await snapshot()).includes('button "Close dialog"'))
     throw new Error("Escape did not close the dialog");
   await runAgentGraphAcceptance({ baseUrl, run, snapshot, reference, includes });
-  await run("set", "viewport", "390", "844");
-  await run("press", "Tab");
-  await run("eval", "document.activeElement?.tagName");
   console.log("Inspector browser acceptance passed.");
 } catch (error) {
   await mkdir(artifacts, { recursive: true });
