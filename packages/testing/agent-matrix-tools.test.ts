@@ -38,7 +38,7 @@ describe("tool and agent tool matrix", () => {
     expect(unknown.invocations).toHaveLength(0);
     expect(toolMessage(unknownAgent)).toMatchObject({
       role: "tool",
-      content: { error: { code: "RELKIT_TOOL_NOT_ALLOWED" } },
+      content: expect.stringContaining("is not a valid tool"),
     });
 
     const unlisted = makeFixture();
@@ -57,7 +57,7 @@ describe("tool and agent tool matrix", () => {
     });
     expect(unlisted.invocations).toHaveLength(0);
     expect(toolMessage(unlistedAgent)).toMatchObject({
-      content: { error: { code: "RELKIT_TOOL_NOT_ALLOWED" } },
+      content: expect.stringContaining("is not a valid tool"),
     });
 
     const invalid = makeFixture();
@@ -80,7 +80,8 @@ describe("tool and agent tool matrix", () => {
     });
     expect(modelInvalid.invocations).toHaveLength(0);
     expect(toolMessage(modelAgent)).toMatchObject({
-      content: { error: { code: "RELKIT_TOOL_ARGUMENT_VALIDATION" } },
+      role: "tool",
+      content: expect.stringContaining("did not match expected schema"),
     });
   });
 

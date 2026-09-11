@@ -1,10 +1,25 @@
 import * as appExports from "@relkit/app";
-import { aiSdk } from "@relkit/ai-sdk";
 import { defineApp, defineEnv, env } from "@relkit/app/config";
 import { kv, r2 } from "@relkit/cloudflare";
 import { docker } from "@relkit/docker";
+import {
+  defineConnectionContract,
+  defineIntegrationReference,
+  defineProviderAdapter,
+  defineProviderBehavior,
+  defineProviderCapability,
+} from "@relkit/provider";
 import { redis } from "@relkit/redis";
 import { s3 } from "@relkit/s3";
+
+const nativeModel = defineProviderAdapter({
+  integration: defineIntegrationReference("test-model"),
+  capability: defineProviderCapability("model"),
+  adapterId: "native-model",
+  connectionContract: defineConnectionContract({}),
+  connection: {},
+  behavior: defineProviderBehavior({ defaultModel: "test-model" }),
+});
 
 defineApp({
   env: defineEnv({}),
@@ -41,11 +56,7 @@ docker(localRedis);
 
 defineApp({
   env: defineEnv({}),
-  model: aiSdk({
-    provider: "openai",
-    defaultModel: "gpt-5-mini",
-    apiKey: env.secret("OPENAI_API_KEY"),
-  }),
+  model: nativeModel,
   cache: kv({
     accountId: env.string("CLOUDFLARE_ACCOUNT_ID"),
     namespaceId: env.string("CLOUDFLARE_KV_NAMESPACE_ID"),

@@ -1,53 +1,18 @@
 import {
   currentInvocationScope,
   currentExecutionContext,
-  frameworkTrace,
   resolveDescriptorIdentity,
   runInInvocationScope,
   type InvocationDispatchRequest,
   type InvocationDispatcher,
 } from "@relkit/invocation";
-import { getJsonSchema, validate, type StandardSchemaV1 } from "@relkit/schema";
-import {
-  assertApprovalGranted,
-  approveApproval,
-  createApproval,
-  denyApproval,
-  type ApprovalRecord,
-} from "./approval.js";
+import { validate } from "@relkit/schema";
 import type { AgentInvocationOptions, AgentRuntimeOptions } from "./runtime.js";
 import type { AgentToolCall } from "./runtime-tools.js";
 import { AgentRuntimeError } from "./runtime-errors.js";
-import { withSignal } from "./runtime-utils.js";
-import type {
-  ToolApprovalRequest,
-  ToolDescriptor,
-  ToolEngine,
-  ToolEngineInvocation,
-} from "@relkit/tools";
-import type { FlexibleSchema } from "ai";
-
-export function createAiInputSchema(schema: StandardSchemaV1): FlexibleSchema<unknown> {
-  const projection = getJsonSchema(schema);
-  if (!projection.ok) {
-    throw new AgentRuntimeError("RELKIT_SCHEMA_UNAVAILABLE", "Tool input schema is unavailable");
-  }
-  return {
-    "~standard": {
-      version: 1,
-      vendor: "relkit",
-      validate: async (value: unknown) => {
-        const result = await validate(schema, value as never);
-        // RELKIT tool.invoke owns canonical parsing, including transforms and defaults.
-        return "value" in result ? { value } : { issues: result.issues };
-      },
-      jsonSchema: {
-        input: () => projection.schema,
-        output: () => projection.schema,
-      },
-    },
-  } as unknown as FlexibleSchema<unknown>;
-}
+import { ApprovalDeniedError } from "./approval.js";
+import { emitTool, resolveAgentApproval } from "./runtime-tool-events.js";
+import type { ToolDescriptor, ToolEngine, ToolEngineInvocation } from "@relkit/tools";
 
 export async function invokeAgentTool(
   engine: ToolEngine,
@@ -59,75 +24,55 @@ export async function invokeAgentTool(
   traceId?: string,
   parentSpanId?: string,
 ): Promise<unknown> {
+  const parsed = await validate(tool.target.input, turn.input as never);
+  if (!("value" in parsed))
+    throw new AgentRuntimeError("RELKIT_AGENT_INPUT_VALIDATION", "Tool input validation failed");
+  await emitTool(options, turn, "started", undefined, signal);
+  await emitTool(options, turn, "input-ready", parsed.value, signal);
+  const approvalRequired =
+    tool.approval === "always" || (tool.approval === "on-write" && tool.sideEffect === "write");
+  if (!approvalRequired) await emitTool(options, turn, "running", undefined, signal);
   const invoke = () =>
     tool.invoke(turn.input, {
       signal,
       approval: (request) =>
         resolveAgentApproval(options, request, turn.callId, invocationId, signal),
     });
-  if (currentInvocationScope()?.dispatcher !== undefined) return invoke();
-  return runInInvocationScope(
-    {
-      dispatcher: createAgentToolDispatcher(
-        engine,
-        options,
-        invocationId,
-        traceId,
-        parentSpanId,
-        signal,
-      ),
-      parent: {
-        id: invocationId,
-        traceId: traceId ?? invocationId,
-        signal,
-        ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
-      },
-    },
-    invoke,
-  );
-}
-
-async function resolveAgentApproval(
-  options: AgentRuntimeOptions & AgentInvocationOptions,
-  request: ToolApprovalRequest,
-  toolCallId: string,
-  invocationId: string,
-  signal: AbortSignal,
-): Promise<true> {
-  const approval = createApproval({
-    invocationId,
-    toolCallId,
-    toolId: request.toolId,
-    sideEffect: request.sideEffect,
-    policy: request.policy,
+  const progressSink = options.contentSink?.progressSinkForTool?.({
+    toolCallId: turn.callId,
+    toolId: turn.toolId,
   });
-  if (approval.state !== "pending") return true;
-  frameworkTrace.event("agent.tool.approval.requested", {
-    "relkit.tool.id": request.toolId,
-    "relkit.tool.call.id": toolCallId,
-  });
-  const handler = options.approval;
-  if (handler === undefined) {
-    assertApprovalGranted(approval);
-    return true;
+  try {
+    const current = currentInvocationScope();
+    const baseDispatcher =
+      current?.dispatcher ??
+      createAgentInvocationDispatcher(engine, options, invocationId, traceId, parentSpanId, signal);
+    const dispatcher =
+      progressSink === undefined ? baseDispatcher : withProgressSink(baseDispatcher, progressSink);
+    const result = await runInInvocationScope(
+      current === undefined
+        ? {
+            dispatcher,
+            parent: {
+              id: invocationId,
+              traceId: traceId ?? invocationId,
+              signal,
+              ...(parentSpanId === undefined ? {} : { spanId: parentSpanId }),
+            },
+          }
+        : { ...current, dispatcher },
+      invoke,
+    );
+    await emitTool(options, turn, "succeeded", result, signal);
+    return result;
+  } catch (error) {
+    const state = error instanceof ApprovalDeniedError ? "denied" : "failed";
+    await emitTool(options, turn, state, undefined, signal).catch(() => undefined);
+    throw error;
   }
-  const response = await withSignal(handler(approval), signal);
-  const decision: ApprovalRecord =
-    response === "approved" || response === true
-      ? approveApproval(approval)
-      : response === "denied" || response === false
-        ? denyApproval(approval)
-        : response;
-  frameworkTrace.event("agent.tool.approval.resolved", {
-    "relkit.tool.id": request.toolId,
-    "relkit.tool.call.id": toolCallId,
-    "relkit.tool.approval": decision.state,
-  });
-  assertApprovalGranted(decision);
-  return true;
 }
 
-function createAgentToolDispatcher(
+export function createAgentInvocationDispatcher(
   engine: ToolEngine,
   options: AgentRuntimeOptions & AgentInvocationOptions,
   invocationId: string,
@@ -166,9 +111,28 @@ function createAgentToolDispatcher(
         ...(request.options?.toolHooks === undefined
           ? {}
           : { toolHooks: request.options.toolHooks }),
+        ...(request.options?.progressSink === undefined
+          ? {}
+          : { progressSink: request.options.progressSink }),
         parent,
       } satisfies ToolEngineInvocation;
       return engine.invoke(invocation) as Promise<Output>;
     },
   });
+}
+
+function withProgressSink(
+  dispatcher: InvocationDispatcher,
+  progressSink: NonNullable<ToolEngineInvocation["progressSink"]>,
+): InvocationDispatcher {
+  const scoped: InvocationDispatcher = {
+    dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
+      request: InvocationDispatchRequest<Input, Output, Context>,
+    ): Promise<Output> =>
+      dispatcher.dispatch({
+        ...request,
+        options: { ...request.options, progressSink },
+      }),
+  };
+  return Object.freeze(scoped);
 }

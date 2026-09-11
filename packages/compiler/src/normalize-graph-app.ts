@@ -9,18 +9,20 @@ export function environmentMetadata(value: unknown): JsonValue {
 }
 
 export function providerMaps(value: Record<string, unknown>): [string, unknown][] {
-  return ["bucket", "cache", "job", "event", "model"].flatMap((capability) => {
-    const normalized = value[capability];
-    if (
-      !isRecord(normalized) ||
-      normalized.kind !== "normalized-provider-profiles" ||
-      normalized.capability !== capability ||
-      !isRecord(normalized.profiles)
-    ) {
-      return [];
-    }
-    return [[capability, normalized.profiles]];
-  });
+  return ["bucket", "cache", "job", "event", "model", "realtime", "agent-state"].flatMap(
+    (capability) => {
+      const normalized = value[capability];
+      if (
+        !isRecord(normalized) ||
+        normalized.kind !== "normalized-provider-profiles" ||
+        normalized.capability !== capability ||
+        !isRecord(normalized.profiles)
+      ) {
+        return [];
+      }
+      return [[capability, normalized.profiles]];
+    },
+  );
 }
 
 export function selectedProviderProfile(

@@ -1,12 +1,20 @@
 import { afterAll, expect, test } from "bun:test";
-import { createTestApplication } from "@relkit/testing";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import {
+  createTestAgentStateProvider,
+  createTestApplication,
+  createTestRealtimeProvider,
+} from "@relkit/testing";
 import config from "../../relkit.config.js";
 
-const model = {
-  resolveModel: (selector = "test:model") => ({ id: selector, model: {} }),
-};
+const providerRoot = await mkdtemp(join(tmpdir(), "relkit-agent-template-"));
 const testApp = await createTestApplication(config, {
-  providers: { model: { openai: model, anthropic: model } },
+  providers: {
+    "agent-state": { default: createTestAgentStateProvider(join(providerRoot, "agents")) },
+    realtime: { default: createTestRealtimeProvider(join(providerRoot, "realtime")) },
+  },
 });
 
 test("GET /hello", async () => {
@@ -15,4 +23,7 @@ test("GET /hello", async () => {
   expect(await response.json()).toEqual({ message: "Hello, Mustafa!" });
 });
 
-afterAll(() => testApp.close());
+afterAll(async () => {
+  await testApp.close();
+  await rm(providerRoot, { force: true, recursive: true });
+});

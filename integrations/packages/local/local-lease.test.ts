@@ -49,7 +49,12 @@ test("refuses live owners and recovers dead attached owners", () => {
         pid: 202,
         isProcessAlive: (pid) => pid === 101,
       }),
-    ).toThrow(expect.objectContaining({ code: "RELKIT_LOCAL_LEASE_HELD" }));
+    ).toThrow(
+      expect.objectContaining({
+        code: "RELKIT_LOCAL_LEASE_HELD",
+        message: expect.stringContaining("Owner    PID 101"),
+      }),
+    );
 
     const recovered = acquireLocalProjectLease(identity, {
       mode: "attached",

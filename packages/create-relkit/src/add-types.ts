@@ -76,12 +76,10 @@ export type AddRequest =
   | NamedRequest<
       "agent",
       {
-        model: string;
+        model?: string;
         tools: readonly string[];
         prompt?: string;
         instructions?: string;
-        modelProvider?: "openai" | "anthropic";
-        modelId?: string;
       }
     >
   | NamedRequest<"constants">

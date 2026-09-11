@@ -9,6 +9,8 @@ import type {
 import type { RouteRateLimit } from "./route-options.js";
 
 export type RawHttpHandler = (request: Request) => MaybePromise<Response>;
+export type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
+export type NativeStreamFormat = "sse" | "text" | "bytes";
 
 interface RouteSharedOptions<Id extends string> extends DescriptorMetadata {
   readonly id?: Id;
@@ -28,6 +30,8 @@ export interface FunctionRouteOptions<
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
   readonly timeoutMs?: number;
+  readonly client?: RouteClientPolicy;
+  readonly stream?: { readonly format: NativeStreamFormat };
 }
 
 export interface RawRouteOptions<
@@ -57,6 +61,8 @@ export interface FunctionRouteDescriptor<
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
   readonly timeoutMs?: number;
+  readonly client?: RouteClientPolicy;
+  readonly stream?: { readonly format: NativeStreamFormat };
 }
 
 export interface RawRouteDescriptor<

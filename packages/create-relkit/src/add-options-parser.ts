@@ -20,8 +20,6 @@ const VALUE_OPTIONS = new Set([
   "tool",
   "prompt",
   "instructions",
-  "model-provider",
-  "model-id",
   "mode",
   "map",
   "path",

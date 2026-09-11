@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "ai": "7.0.79",
+    "@langchain/core": "1.2.9",
     "@relkit/agents": "workspace:*",
     "@relkit/buckets": "workspace:*",
     "@relkit/cache": "workspace:*",
@@ -45,6 +45,7 @@
     "@relkit/invocation": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/providers-local": "workspace:*",
+    "@relkit/realtime": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/runtime-hono": "workspace:*",
     "@relkit/schema": "workspace:*",

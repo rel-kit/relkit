@@ -9,6 +9,7 @@ export * from "@relkit/functions";
 export { bindDescriptorIdentity } from "@relkit/invocation";
 export type { EventAttributeValue, EventPublishOptions, EventPublishResult } from "@relkit/events";
 export * from "@relkit/jobs";
+export * from "@relkit/realtime";
 export * from "@relkit/routes";
 export * from "@relkit/services";
 export * from "@relkit/tools";

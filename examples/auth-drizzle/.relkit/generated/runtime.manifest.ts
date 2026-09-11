@@ -21,9 +21,9 @@ __relkit_bindDescriptorIdentity(__relkit_module_6["ALL"], "route.all.api.auth.op
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"], "route.get.session");
 __relkit_bindDescriptorIdentity(__relkit_module_7["GET"]["target"], "account.session");
 
-export const manifestContractVersion = 8 as const;
-export const manifestGeneratorVersion = 5 as const;
-export const manifestGraphHash = "sha256:9d12949fea4129657bfd838940ee1597080c3e78ba98268488647c079ca0e7a5" as const;
+export const manifestContractVersion = 10 as const;
+export const manifestGeneratorVersion = 7 as const;
+export const manifestGraphHash = "sha256:9f76d19ca68931f51f6bd1dc1e659671c5a6e51347c55c1bf251edefcd3b7806" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
@@ -33,6 +33,7 @@ export const runtimeManifest = {
   functions: { "account.session": __relkit_module_1["default"].handler },
   targets: { "account.session": __relkit_module_1["default"] },
   agents: {  },
+  channels: {  },
   tools: {  },
   routes: { "route.all.api.auth.optional-catch-all-auth": __relkit_module_6["ALL"], "route.get.account.profile": __relkit_module_5["GET"], "route.get.session": __relkit_module_7["GET"] },
   constants: {  },

@@ -1,8 +1,9 @@
 import { runDevCommand } from "./commands/dev-command.js";
 import { parseProjectArgs } from "./commands/project-args.js";
-import { canonicalJson } from "@relkit/contracts";
+import { formatDiagnostics } from "@relkit/diagnostics";
 import { buildProject } from "./commands/build.js";
-import { checkProject } from "./commands/check.js";
+import { checkProject, type CheckResult } from "./commands/check.js";
+import type { BuildResult } from "./commands/build.js";
 import { runDeploy } from "./commands/deploy.js";
 import { runDoctor } from "./commands/doctor.js";
 import { runEnv } from "./commands/env.js";
@@ -23,7 +24,7 @@ export async function executeCommand(
         ...optionalProjectRoot(parseProjectArgs(invocation.args, "check").projectRoot),
         signal: context.signal,
       });
-      context.reporter.output(result, canonicalJson(result));
+      context.reporter.output(result, formatCheckResult(result));
       return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
     }
     case "build": {
@@ -31,7 +32,7 @@ export async function executeCommand(
         ...optionalProjectRoot(parseProjectArgs(invocation.args, "build").projectRoot),
         signal: context.signal,
       });
-      context.reporter.output(result, canonicalJson(result));
+      context.reporter.output(result, formatBuildResult(result));
       return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
     }
     case "doctor":
@@ -60,6 +61,18 @@ export async function executeCommand(
     default:
       throw fail("RELKIT_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`);
   }
+}
+
+function formatCheckResult(result: CheckResult): string {
+  return result.ok
+    ? `Checked ${result.projectRoot}`
+    : formatDiagnostics(result.diagnostics) || "Application check failed.";
+}
+
+function formatBuildResult(result: BuildResult): string {
+  return result.ok
+    ? `Built ${result.buildDirectory}`
+    : formatDiagnostics(result.diagnostics) || "Application build failed.";
 }
 
 function optionalProjectRoot(

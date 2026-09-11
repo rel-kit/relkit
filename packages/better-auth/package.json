@@ -26,17 +26,27 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
     }
   },
   "dependencies": {
+    "@relkit/client": "workspace:*",
     "@relkit/contracts": "workspace:*",
     "@relkit/drizzle": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/routes": "workspace:*",
     "better-auth": "1.7.1"
   },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
   "devDependencies": {
-    "drizzle-orm": "1.0.0-rc.5-169397b"
+    "@types/react": "19.2.18",
+    "drizzle-orm": "1.0.0-rc.5-169397b",
+    "react": "19.2.8"
   },
   "scripts": {
     "build": "tsc -b",

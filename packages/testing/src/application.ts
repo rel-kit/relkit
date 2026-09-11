@@ -17,6 +17,7 @@ import { handleTestRequest } from "./application-http.js";
 import { activateTestServices } from "./application-services.js";
 import { loadTestApplicationArtifacts } from "./application-registry.js";
 import { activateTestProviders } from "./provider-replacements.js";
+import { bindTestRealtime } from "./application-realtime.js";
 
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
   readonly projectRoot?: string;
@@ -75,6 +76,12 @@ export async function createTestApplication(
     await runtime.close({ failed: true });
     throw error;
   }
+  const applicationRuntime = bindTestRealtime(
+    runtime,
+    artifacts,
+    providers,
+    runtimeOptions.environment ?? "test",
+  );
   const services = await activateTestServices(projectRoot, runtime.env, routes);
   const requests = new AsyncLocalStorage<Request>();
   Object.assign(context, services.context, {
@@ -106,7 +113,7 @@ export async function createTestApplication(
             );
           }
         }
-        return handleTestRequest(routes, runtime, request);
+        return handleTestRequest(routes, applicationRuntime, request);
       });
     },
   };
@@ -132,7 +139,7 @@ export async function createTestApplication(
         throw new AggregateError(failures, "Test application cleanup failed");
     })());
   return Object.freeze({
-    runtime,
+    runtime: applicationRuntime,
     http,
     clock: runtime.clock,
     fakes: runtime.fakes,

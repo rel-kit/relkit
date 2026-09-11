@@ -1,0 +1,79 @@
+---
+title: Native runtime and DeepAgents
+description: Choose supported LangChain packages, expose middleware state safely, and add DeepAgents capabilities without adapters.
+---
+
+RelKit executes ordinary agents with native LangChain and selects native DeepAgents behavior from the
+same `defineAgent` declaration when you add subagents, skills, memory files, a backend, or human-input
+configuration. There is no public conversion wrapper or application-level runtime adapter.
+
+## Use the certified package cohort
+
+The supported native cohort is tested together:
+
+| Package                | Version  | Role                                                        |
+| ---------------------- | -------- | ----------------------------------------------------------- |
+| `langchain`            | `1.5.10` | Agents, native tools, middleware, and structured output     |
+| `@langchain/core`      | `1.2.9`  | Model, message, callback, and tool contracts                |
+| `@langchain/langgraph` | `1.4.14` | State, scheduling, checkpoints, commands, and interruptions |
+| `deepagents`           | `1.13.3` | Optional subagents, skills, memory files, and backends      |
+| `@ag-ui/core`          | `0.0.59` | Public SSE agent-event schemas                              |
+
+`langchain` and LangGraph are runtime dependencies of `@relkit/agents`. Install a model-provider package
+in the application that constructs it. Install `deepagents@1.13.3` only when the declaration uses a deep
+capability.
+
+If a deep capability is activated without that package, execution fails with
+`RELKIT_DEEPAGENTS_UNAVAILABLE` and names the required version. Optional model, saver, store, and backend
+packages remain application dependencies; a missing import fails before execution, while an incompatible
+checkpointer or store fails protocol validation instead of being cast to a supported driver.
+
+## Combine native and RelKit behavior
+
+This agent passes a native model, native tool, real `todoListMiddleware()`, and RelKit function-backed
+tools through one declaration:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-support.agent.ts"'>
+  ../../examples/commerce/src/orders/agents/order-support.agent.ts
+</include>
+
+RelKit function tools still execute through the common function engine, including schema validation,
+authorization, cancellation, tracing, approval policy, and output validation. Native tools execute through
+their native contract. Unknown native output remains `unknown` unless the declaration supplies output
+schema metadata; RelKit does not infer a contract by running the tool.
+
+Middleware state is private unless `client.state` selects a contributed key. In the example, `todos` is
+inferred from `todoListMiddleware()` and becomes a precise generated status union. `values` remains
+undefined until an authorized snapshot or state event arrives. Messages, tool calls, progress, custom
+events, waiting requests, and final `output` remain separate client fields.
+
+Declared custom-event and tool schemas remain exact. Opaque native extensions use an explicit dynamic
+discriminator with `unknown` data instead of widening every known event or tool.
+
+## Add DeepAgents capabilities
+
+This declaration adds a subagent, skills, memory files, a RelKit bucket backend, checkpointer, and store:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-deep.agent.ts"'>
+  ../../examples/commerce/src/orders/agents/order-deep.agent.ts
+</include>
+
+Children inherit the parent model unless they declare one. They share the caller-supplied root thread and
+use isolated native checkpoint namespaces; nested scopes do not become independent business threads.
+Root cancellation and limits include child execution. Start an unrelated child operation with another
+application-owned thread ID.
+
+RelKit does not emulate Python-only APIs, LangSmith Agent Server, or arbitrary structured-agent message
+conversion. A RelKit bucket backend implements the supported DeepAgents filesystem protocol, but Redis
+cache clients are not saver/store drivers and generic S3 clients are not treated as DeepAgents backends.
+
+## Understand public event semantics
+
+One authorized, redacted event sequence feeds HTTP iteration, AG-UI SSE, WebSocket, snapshots, replay,
+generated clients, and Inspector. The transports do not execute the agent independently. Disconnecting an
+observer does not cancel execution; reconnect restores a consistent snapshot and continues after its
+journal cursor. A cursor gap triggers explicit snapshot recovery rather than silent event loss.
+
+Public events preserve root, node, task, attempt, subgraph, and subagent scope where metadata is known.
+Raw checkpoints, commands, private middleware state, provider payloads, system prompts, credentials,
+hidden reasoning, and unrestricted native state never enter browser contracts.

@@ -12,13 +12,12 @@ import { addFactoryObjectMember, addSourceImport } from "./source-edit.js";
 const { awsDefinition, connectedCloudflare, connectedRedis, connectedS3, dockerDefinition } =
   providerDefinitions;
 
-export type ProviderCapability = "cache" | "bucket" | "event" | "job" | "model";
+export type ProviderCapability = "cache" | "bucket" | "event" | "job";
 
 export interface EnsureProfileOptions {
   readonly requested?: string | undefined;
   readonly provider?: string | undefined;
   readonly source?: "docker" | "connected" | "aws" | undefined;
-  readonly modelId?: string | undefined;
 }
 
 export async function ensureProviderProfile(
@@ -27,8 +26,7 @@ export async function ensureProviderProfile(
   options: EnsureProfileOptions = {},
 ): Promise<string> {
   const profiles = builder.profiles.filter((item) => item.capability === capability);
-  const explicitSource =
-    options.provider !== undefined || options.source !== undefined || options.modelId !== undefined;
+  const explicitSource = options.provider !== undefined || options.source !== undefined;
   if (options.requested) {
     const existing = profiles.find((item) => item.name === options.requested);
     if (existing && !explicitSource) return reuseProfile(builder, existing);
@@ -118,7 +116,6 @@ function definitionFor(
   options: EnsureProfileOptions,
 ): ProviderDefinition {
   if (capability === "event" || capability === "job") return localDefinition(capability);
-  if (capability === "model") return modelDefinition(options);
   if (capability === "cache") return cacheDefinition(options);
   return bucketDefinition(options);
 }
@@ -132,29 +129,6 @@ function localDefinition(capability: "event" | "job"): ProviderDefinition {
     ],
     dependencies: ["@relkit/local"],
     environment: [],
-  };
-}
-
-function modelDefinition(options: EnsureProfileOptions): ProviderDefinition {
-  const provider = options.provider;
-  const modelId = options.modelId;
-  if ((provider !== "openai" && provider !== "anthropic") || !modelId) {
-    usage("A new model profile requires --model-provider and --model-id.");
-  }
-  const environment = provider === "openai" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY";
-  return {
-    adapter: "aiSdk",
-    expression: `aiSdk({ provider: "${provider}", defaultModel: "${modelId}", apiKey: binding.secret("${environment}") })`,
-    imports: [
-      `import { aiSdk } from "@relkit/ai-sdk";`,
-      `import { env as binding } from "@relkit/app/config";`,
-    ],
-    dependencies: ["@relkit/ai-sdk"],
-    environment: [{ name: environment, definition: "env.secret()" }],
-    warning: {
-      code: "model-secret-required",
-      message: `Set ${environment} in .env before starting or restarting the server; the model profile requires it at startup.`,
-    },
   };
 }
 

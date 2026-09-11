@@ -3,6 +3,11 @@ import type { SupervisorDrainLease } from "./drain-types.js";
 import { drainResponse, forwardProxyRequest } from "./proxy-forward.js";
 import { validateSupervisorToken } from "./state-machine-telemetry.js";
 import type { SupervisorCandidateToken } from "./state-machine-types.js";
+import {
+  proxyWebSocketHandler,
+  upgradeProxyWebSocket,
+  type ProxySocketData,
+} from "./proxy-websocket.js";
 
 export { forwardProxyRequest } from "./proxy-forward.js";
 
@@ -36,7 +41,7 @@ export class SupervisorProxy {
   private readonly fetcher: typeof fetch;
   private readonly track: SupervisorProxyOptions["track"];
   private readonly intercept: SupervisorProxyOptions["intercept"];
-  private server: Bun.Server<undefined> | undefined;
+  private server: Bun.Server<ProxySocketData> | undefined;
   private stopping: Promise<void> | undefined;
   private target: ActiveSupervisorProxyTarget | undefined;
 
@@ -69,9 +74,22 @@ export class SupervisorProxy {
     this.server = Bun.serve({
       hostname: this.hostname,
       port: this.configuredPort,
-      fetch: (request) => this.handle(request),
+      websocket: proxyWebSocketHandler,
+      fetch: (request, server) =>
+        isWebSocketUpgrade(request) ? this.upgrade(request, server) : this.handle(request),
     });
     return this;
+  }
+
+  private upgrade(
+    request: Request,
+    server: Bun.Server<ProxySocketData>,
+  ): Response | Promise<Response> {
+    const target = this.target;
+    if (target === undefined) return Promise.resolve(drainResponse());
+    const lease = this.track?.(target.token);
+    if (this.track !== undefined && lease === undefined) return Promise.resolve(drainResponse());
+    return upgradeProxyWebSocket(request, server, target, lease);
   }
 
   /** Replaces the target only when the expected active token still matches. */
@@ -126,11 +144,15 @@ export class SupervisorProxy {
     const server = this.server;
     this.server = undefined;
     if (server === undefined) return this.stopping ?? Promise.resolve();
-    this.stopping = server.stop().finally(() => {
+    this.stopping = server.stop(true).finally(() => {
       this.stopping = undefined;
     });
     return this.stopping;
   }
+}
+
+function isWebSocketUpgrade(request: Request): boolean {
+  return request.headers.get("upgrade")?.toLowerCase() === "websocket";
 }
 
 export function createSupervisorProxy(options: SupervisorProxyOptions = {}): SupervisorProxy {

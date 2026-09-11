@@ -10,6 +10,7 @@
     "middleware",
     "rate-limits",
     "responses",
+    "streaming",
     "raw-handlers",
     "openapi",
     "generated-clients",

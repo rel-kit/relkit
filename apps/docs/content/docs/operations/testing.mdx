@@ -19,8 +19,9 @@ Use `invokeFunction` for input and output validation, declared errors, nested in
 bun test tests/unit/orders.function.test.ts
 ```
 
-Pass test clients when the function declares cache, bucket, job, event, or model capabilities. Keep these fakes
-deterministic and inspect their recorded effects instead of sleeping or calling a live service.
+Pass test clients when the function declares cache, bucket, job, or event capabilities. Agent tests should
+declare or inject a deterministic native LangChain model and inspect recorded effects instead of sleeping or
+calling a live service.
 
 ## Test the application boundary
 
@@ -40,7 +41,8 @@ not leak into another test.
 
 ## Replace provider profiles explicitly
 
-The commerce suite shows the complete shape for multiple cache, bucket, and model profiles:
+The commerce suite shows the complete shape for cache, bucket, realtime, and agent-state profiles alongside
+native model execution:
 
 <include cwd lang="ts" meta='title="examples/commerce/tests/http.test.ts"'>
   ../../examples/commerce/tests/http.test.ts

@@ -18,6 +18,7 @@ export type { TestApplication, TestApplicationOptions } from "./application.js";
 export { createTestFakes } from "./fakes.js";
 export type { TestFailureControls, TestFakes, TestFakesOptions } from "./fakes.js";
 export type { TestProviderReplacements } from "./provider-replacements.js";
+export { createTestAgentStateProvider, createTestRealtimeProvider } from "./state-providers.js";
 export { createTestBucket, createTestBucketFake } from "./buckets.js";
 export type { TestBucketFake, TestBucketFakeOptions, TestBucketObject } from "./buckets.js";
 export { createTestCache, createTestCacheFake } from "./cache.js";
@@ -56,7 +57,7 @@ export type {
   TestEventPublishResult,
   TestEventTriggerOptions,
 } from "./events-types.js";
-export { assertAgentTrace, createTestAgent } from "./agents.js";
+export { assertAgentTrace, createTestAgent, createTestModel } from "./agents.js";
 export type {
   TestAgent,
   TestAgentApproval,

@@ -154,3 +154,60 @@ declare const activateBetterAuthService: <
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L97)
+
+## `react.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [BetterAuthClientLike (interface)](#betterauthclientlike-interface)
+  - [BetterAuthRelkitClientProvider](#betterauthrelkitclientprovider)
+  - [BetterAuthRelkitClientProviderProps (interface)](#betterauthrelkitclientproviderprops-interface)
+
+---
+
+# utils
+
+## BetterAuthClientLike (interface)
+
+**Signature**
+
+```ts
+export interface BetterAuthClientLike<Session> {
+  useSession(): {
+    readonly data: Session | null | undefined;
+    readonly isPending: boolean;
+    readonly error?: unknown;
+  };
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.ts#L6)
+
+## BetterAuthRelkitClientProvider
+
+**Signature**
+
+```ts
+declare const BetterAuthRelkitClientProvider: <Session>({
+  authClient,
+  identityKey,
+  ...props
+}: BetterAuthRelkitClientProviderProps<Session>) => ReactNode;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.ts#L18)
+
+## BetterAuthRelkitClientProviderProps (interface)
+
+**Signature**
+
+```ts
+export interface BetterAuthRelkitClientProviderProps<Session> extends RelkitClientProviderProps {
+  readonly authClient: BetterAuthClientLike<Session>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.ts#L14)

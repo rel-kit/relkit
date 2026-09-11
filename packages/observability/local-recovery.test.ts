@@ -21,3 +21,21 @@ test("unexpected worker exit fails pending/future work and requests a session re
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("client shutdown does not report the expected worker exit as a failure", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-worker-close-"));
+  const failures: Error[] = [];
+  const worker = startLocalWorker((error) => failures.push(error));
+  try {
+    await worker.call({ type: "open", root });
+    process.kill(worker.pid, "SIGINT");
+    await Bun.sleep(25);
+    await worker.call({ type: "flush" });
+    await worker.close();
+    await Bun.sleep(25);
+    expect(failures).toEqual([]);
+  } finally {
+    await worker.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});

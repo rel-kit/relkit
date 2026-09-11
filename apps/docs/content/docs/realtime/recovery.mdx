@@ -1,0 +1,57 @@
+---
+title: Replay and recovery
+description: Keep a live view correct across mount, reconnect, refresh, and expired history.
+---
+
+Realtime events describe changes; they do not contain a complete application snapshot. Reliable recovery therefore combines an authoritative route query with a gap-free channel handoff.
+
+## What happens during each lifecycle
+
+| Situation                      | RelKit behavior                                                                            | Application behavior                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Fresh mount                    | Creates a live tail fence and reports `caughtUp`; it does not replay all retained history. | Load authoritative state from a route, then use `onCaughtUp` to check or invalidate it. |
+| Brief reconnect with replay    | Reauthorizes and consumes records after the last applied checkpoint.                       | Continue applying events.                                                               |
+| Brief reconnect without replay | Reports a gap and establishes a new live fence.                                            | Reload authoritative state in `onGap`.                                                  |
+| Full page refresh              | Starts from a new live fence; raw callback cursors are not persisted by default.           | Reload authoritative state.                                                             |
+| Invalid or expired checkpoint  | Reports a typed gap and refuses the checkpoint.                                            | Replace derived state from its authoritative source.                                    |
+
+A cursor without the state it represents is not recovery. RelKit does not persist component state merely because it has persisted or observed a channel position.
+
+## Implement gap recovery
+
+Use `onGap` to refetch the route query or load another authoritative snapshot. The callback may be asynchronous, and `caughtUp` remains false until it resolves. This prevents the UI from presenting partially restored state as current.
+
+Common gap reasons include expired retention, a checkpoint from another identity or session, a policy change, a provider reset, or a future or foreign checkpoint. Do not branch into separate repair algorithms unless your product needs different user messaging; refetching the authoritative view is usually enough.
+
+Use `onCaughtUp` for the final revision check after the live tail is attached. This closes the window in which application data may change between the initial route response and subscription establishment.
+
+## Decide what to retain
+
+Add `replay` when clients benefit from applying a short sequence of missed events after a transient disconnect. Set both:
+
+| Option        | Effect                                        |
+| ------------- | --------------------------------------------- |
+| `retentionMs` | Maximum age of replayable events.             |
+| `maxEvents`   | Maximum retained event count for a partition. |
+
+The order-updates channel keeps a bounded five-minute replay window:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+>
+  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+</include>
+
+Retention is bounded by provider and application-wide storage limits. Reaching a limit does not silently evict unrelated unexpired work; the append fails with a typed overload response.
+
+Replay should be an optimization, not the only way to rebuild a page. Keep an authoritative query even when the retention window is generous.
+
+## Delivery guarantees
+
+The journal is the source of truth. Notifications only wake readers. Providers read after the current checkpoint, register their wait, read again, then wait with a bounded polling fallback. An event appended during replay-to-live attachment is therefore delivered from replay or the next live read rather than falling into a handoff gap.
+
+A provider epoch change signals that retained state may have been reset. RelKit reports the gap instead of claiming that an absent event or receipt never existed.
+
+<include cwd>content/generated/related/realtime-recovery.mdx</include>

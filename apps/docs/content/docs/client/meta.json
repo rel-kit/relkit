@@ -1,0 +1,5 @@
+{
+  "title": "Typed Client",
+  "icon": "PanelsTopLeft",
+  "pages": ["index", "routes", "mutations", "streams", "ssr", "authentication", "offline"]
+}

@@ -14,7 +14,7 @@ export {
   passEventTargets,
   passTools,
   passAgents,
-  passProviders,
   passCollisions,
   passGraph,
 } from "./normalize-pass-semantic.js";
+export { passProviders } from "./normalize-pass-providers.js";

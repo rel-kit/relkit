@@ -13,6 +13,7 @@ export const httpGuideGroup = {
     "middleware",
     "rate-limits",
     "responses",
+    "streaming",
     "raw-handlers",
     "openapi",
     "generated-clients",
@@ -60,6 +61,11 @@ export const httpGuideRelations = [
     path: "http/responses",
     api: ["routes", "functions"],
     examples: ["examples/commerce/src/routes/orders/route.ts"],
+  },
+  {
+    path: "http/streaming",
+    api: ["routes", "functions", "client"],
+    examples: ["packages/runtime-hono/native-stream.test.ts"],
   },
   {
     path: "http/raw-handlers",

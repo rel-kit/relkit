@@ -1,5 +1,5 @@
 import { add } from "./normalize-pass-utils.js";
-import { providerMaps } from "./normalize-graph-app.js";
+import { providerMaps, selectedProviderProfile } from "./normalize-graph-app.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -74,4 +74,26 @@ export function validateUniqueBucketProfiles(work: NormalizationWork): void {
       );
     }
   }
+}
+
+export function validateProviderProfile(
+  work: NormalizationWork,
+  descriptor: NormalizedDescriptor,
+  profiles: ReadonlyMap<string, readonly string[]>,
+  application: unknown,
+  capability: string,
+  requested: unknown,
+): void {
+  const selected = selectedProviderProfile(
+    application,
+    capability,
+    typeof requested === "string" ? requested : undefined,
+  );
+  if (selected !== undefined && profiles.get(selected)?.includes(capability)) return;
+  add(
+    work,
+    descriptor,
+    NORMALIZE_CODES.providerProfile,
+    `Provider profile ${JSON.stringify(selected ?? requested)} does not provide ${capability}.`,
+  );
 }

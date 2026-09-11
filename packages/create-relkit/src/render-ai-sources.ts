@@ -28,7 +28,7 @@ export default ${artifact.binding};
 
 export function agentSource(
   artifact: DomainArtifact,
-  model: string,
+  model: string | undefined,
   tools: readonly {
     readonly binding: string;
     readonly module: string;
@@ -44,6 +44,7 @@ export function agentSource(
   const imports = [
     `import { defineAgent } from "@relkit/app/agents";`,
     `import { z } from "@relkit/app/schema";`,
+    ...(model === undefined ? [`import { FakeToolCallingModel } from "langchain";`] : []),
     ...tools.map((tool) => sourceImport(tool.binding, tool.module, tool.exportKind)),
     ...(instructions.binding && instructions.module
       ? [sourceImport(instructions.binding, instructions.module, instructions.exportKind)]
@@ -54,7 +55,7 @@ export function agentSource(
   id: "${artifact.id}",
   input: z.object({ question: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-  model: "${model}",
+  model: ${model === undefined ? offlineModel() : JSON.stringify(model)},
   instructions: ${prompt},
   tools: [${tools.map((tool) => tool.binding).join(", ")}],
   limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
@@ -62,4 +63,14 @@ export function agentSource(
 
 export default ${artifact.binding};
 `;
+}
+
+function offlineModel(): string {
+  return `new FakeToolCallingModel({
+    toolCalls: [[{
+      name: "relkit_output",
+      args: { value: { answer: "Hello from the offline LangChain model." } },
+      id: "output-1",
+    }]],
+  })`;
 }

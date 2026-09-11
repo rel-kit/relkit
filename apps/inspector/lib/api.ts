@@ -22,8 +22,10 @@ import {
 import { InspectorApiTransport } from "./api-transport";
 import {
   invokeActiveRoute,
+  invokeActiveRouteStream,
   type RouteInvocationInput,
   type RouteInvocationResult,
+  type RouteStreamFrame,
 } from "./route-request";
 export * from "./api-types";
 export class InspectorApiClient extends InspectorApiTransport {
@@ -35,6 +37,16 @@ export class InspectorApiClient extends InspectorApiTransport {
   }
   runtime(): Promise<InspectorObject> {
     return this.request(`${INSPECTOR_API_BASE}/runtime`, { cacheTags: ["runtime"] });
+  }
+  agentExecutions(
+    agentId: string,
+    threadId: string,
+    mode: "live" | "history" = "live",
+  ): Promise<InspectorObject> {
+    const query = new URLSearchParams({ threadId, mode });
+    return this.request(
+      `${INSPECTOR_API_BASE}/runtime/agents/${encodeURIComponent(agentId)}/executions?${query}`,
+    );
   }
   list<T = InspectorObject>(
     collection: InspectorCollection,
@@ -121,6 +133,22 @@ export class InspectorApiClient extends InspectorApiTransport {
   }
   invokeRoute(input: RouteInvocationInput): Promise<RouteInvocationResult> {
     return invokeActiveRoute(this.fetcher, this.baseUrl, this.headers, input);
+  }
+  invokeRouteStream(
+    input: RouteInvocationInput,
+    format: "sse" | "text" | "bytes",
+    onFrame: (frame: RouteStreamFrame) => void,
+    signal: AbortSignal,
+  ): Promise<RouteInvocationResult> {
+    return invokeActiveRouteStream(
+      this.fetcher,
+      this.baseUrl,
+      this.headers,
+      input,
+      format,
+      onFrame,
+      signal,
+    );
   }
 }
 export const createInspectorApiClient = (options: InspectorFetchOptions = {}): InspectorApiClient =>

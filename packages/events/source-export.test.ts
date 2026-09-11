@@ -22,6 +22,11 @@ const providerInternalFiles = new Set([
   "packages/inspector-api/src/observability-utils.ts",
   "packages/observability/src/stream-subscriber.ts",
 ]);
+const realtimeTerminologyFiles = new Set([
+  "packages/client/src/react/realtime-hook.ts",
+  "packages/client/src/react/realtime-manager.ts",
+  "packages/contracts/src/runtime-limits.ts",
+]);
 const scanRoots = ["apps", "packages", "templates", "tests", ".relkit/generated", ".relkit/build"];
 const scanGuardFiles = new Set([
   "packages/events/source-export.test.ts",
@@ -62,7 +67,9 @@ function violations(files: readonly SourceFile[]): string[] {
   return files.flatMap(({ path, text }) => {
     const findings: string[] = [];
     if (forbiddenSuffix.test(path)) findings.push(`${path}:source-suffix`);
-    if (!isProviderInternal(path) && forbidden.test(text)) findings.push(`${path}:source-name`);
+    if (!isProviderInternal(path) && !realtimeTerminologyFiles.has(path) && forbidden.test(text)) {
+      findings.push(`${path}:source-name`);
+    }
     return findings;
   });
 }

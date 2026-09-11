@@ -8,7 +8,7 @@ import {
   type EvaluatorRequest,
 } from "./evaluator-protocol.js";
 
-export const DEFAULT_EVALUATOR_TIMEOUT_MS = 5_000;
+export const DEFAULT_EVALUATOR_TIMEOUT_MS = 10_000;
 export const DEFAULT_ENVIRONMENT_ALLOWLIST = Object.freeze([] as string[]);
 
 export interface EvaluatorOptions {

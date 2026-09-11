@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test";
 import {
   CONTRACT_VERSION,
+  AGENT_PROTOCOL_CAPABILITY,
+  AGENT_STATE_SCHEMA_VERSION,
   GENERATOR_VERSION,
   GRAPH_VERSION,
   MANIFEST_VERSION,
@@ -30,16 +32,31 @@ test("exposes the provider-architecture contract cohort", () => {
     localService: LOCAL_SERVICE_PLAN_VERSION,
     providerOverride: PROVIDER_OVERRIDE_STATE_VERSION,
   }).toEqual({
-    public: 5,
-    generator: 5,
-    graph: 8,
-    manifest: 8,
+    public: 7,
+    generator: 7,
+    graph: 10,
+    manifest: 10,
     deployment: 3,
     provider: 1,
     runtimeIntegration: 1,
     localService: 1,
     providerOverride: 1,
   });
+});
+
+test("publishes the native agent stream capability cohort", () => {
+  expect(AGENT_PROTOCOL_CAPABILITY).toEqual({
+    protocol: "relkit.agent-stream",
+    version: 2,
+    required: [
+      "relkit.agent-stream.v2",
+      "canonical-scoped-events.v1",
+      "public-state.v1",
+      "cursor-replay.v1",
+      "native-checkpoints.v1",
+    ],
+  });
+  expect(AGENT_STATE_SCHEMA_VERSION).toBe(2);
 });
 
 test("keeps runtime integration and provider override contracts JSON-safe", () => {

@@ -9,6 +9,7 @@ import type { ApplicationGraph } from "@relkit/graph";
 import { serverHttpSource, type ServerSourceConfiguration } from "./build-server-http.js";
 import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
+import { SERVER_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
 /** Emits the one Bun entrypoint used by dev, start, and the production container. */
 export function serverSource(
@@ -69,7 +70,7 @@ const localBindingValues = providerOverrideBindingValues(JSON.parse(readFileSync
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 ${providerOverridesImport}
-import { createGeneratedAgentFunction, invokeAgent } from "@relkit/agents";
+import { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAgent, releaseAgentPersistence } from "@relkit/agents";
 import { createApplicationContextResolver } from "@relkit/app";
 import { resolveEnv } from "@relkit/config";
 ${specializedImports}
@@ -80,6 +81,8 @@ import { currentExecutionContext, publicTrace } from "@relkit/invocation";
 import { createObservabilityRuntime, createTelemetryExporterFanout } from "@relkit/observability";
 import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail } from "@relkit/runtime-effect";
 import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";
+import { honoWebSocket, upgradeWebSocket } from "@relkit/runtime-hono/bun";
+import { createProviderRealtimeDispatcher, setActiveRealtimeDispatcher } from "@relkit/realtime";
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
@@ -90,6 +93,7 @@ const graphHash = ${JSON.stringify(graphHash)};
 const activationFingerprint = ${canonicalJson(activation)};
 const openapiDocument = ${canonicalJson(openapi)};
 const clientContractDocument = ${canonicalJson(clientContract)};
+const publicFingerprint = clientContractDocument.publicFingerprint ?? graphHash;
 const plan = createRegistrationPlan(graph);
 const artifactHash = (value) => "sha256:" + createHash("sha256").update(JSON.stringify(value) + "\\n").digest("hex");
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
@@ -116,7 +120,11 @@ const telemetry = await createObservabilityRuntime({ root: process.env.RELKIT_OB
   } : {}) });
 globalThis["__relkit_flush_telemetry"] = telemetry.flush;
 const spanRuntime = createHttpSpanRuntime({ generationId, graphHash, observability: telemetry });
-const executableManifest = { ...runtimeManifest, functions: { ...runtimeManifest.functions } };
+const executableManifest = {
+  ...runtimeManifest,
+  functions: { ...runtimeManifest.functions },
+  targets: { ...runtimeManifest.targets },
+};
 const application = runtimeManifest.application;
 if (application === undefined) throw new Error("Runtime application metadata is unavailable.");
 const environmentResolution = resolveRuntimeEnvironment(application.env, environment, sourceValues);
@@ -133,12 +141,14 @@ const contextResolver = createApplicationContextResolver({
   env: values,
 });
 bindAgents();
+await assertAgentRuntimeDependencies(Object.values(runtimeManifest.agents ?? {}));
 const registry = createFunctionRegistry(graph, executableManifest);
 let materializedJobs;
 let jobWorker;
 const providerStartup = (environmentResolution.error === undefined
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
+  if ((plan.channels ?? []).length > 0) setActiveRealtimeDispatcher(createProviderRealtimeDispatcher({ applicationId: graph.appId, environment, generationId, publicFingerprint, provider: (profile) => provider(value, "realtime", profile) }));
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
   jobWorker = startJobWorker(materializedJobs);
@@ -169,6 +179,7 @@ const activeInvocations = new Set();
 let stopping = false;
 ${serverHttpSource(configuration)}
 ${SERVER_INVOCATION_SOURCE}
+${SERVER_REGISTRATION_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}
 `;

@@ -22,6 +22,10 @@ import {
   type ClientContractEndpointOptions,
 } from "./client-contract.js";
 import type { McpOptions } from "./mcp.js";
+import { installClientIdentityEndpoint, type ClientIdentityRuntime } from "./client-identity.js";
+import { installTransportSecurity } from "./transport-security.js";
+import { installAgentProtocolEndpoints } from "./agent-protocol.js";
+import { installAgentInspectorEndpoints } from "./agent-inspector.js";
 
 export type FrameworkMiddlewareInput =
   | Partial<Record<(typeof FRAMEWORK_MIDDLEWARE_ORDER)[number], MiddlewareHandler>>
@@ -33,6 +37,7 @@ export interface CreateAppOptions extends RouteMaterializationOptions {
   readonly internalEndpoints?: InternalEndpointOptions;
   readonly apiDocs?: ApiDocsOptions;
   readonly clientContract?: ClientContractEndpointOptions;
+  readonly clientIdentity?: ClientIdentityRuntime;
   readonly mcp?: McpOptions;
 }
 
@@ -50,12 +55,18 @@ export function createApp(options: CreateAppOptions): Hono {
     app,
     options.frameworkMiddleware ?? createFrameworkMiddleware(middlewareOptions),
   );
+  installTransportSecurity(app, options.transportSecurity);
   installInternalEndpoints(app, {
     graph: graphSnapshot(options.plan),
     ...(options.internalEndpoints ?? {}),
   });
+  installAgentInspectorEndpoints(app, options, options.internalEndpoints ?? {});
   installApiDocs(app, options.plan, apiDocsOptions(options));
   installClientContractEndpoint(app, options.clientContract);
+  if (options.clientIdentity !== undefined) {
+    installClientIdentityEndpoint(app, options.clientIdentity, options.auth);
+  }
+  installAgentProtocolEndpoints(app, options);
   const requestMapping =
     options.middleware?.maxBodyBytes === undefined
       ? options.requestMapping

@@ -31,7 +31,6 @@ export async function packPackages(
     "@relkit/docker",
     "@relkit/redis",
     "@relkit/s3",
-    "@relkit/ai-sdk",
   ];
   for (let index = 0; index < names.length; index += 1)
     for (const dependency of Object.keys(manifests.get(names[index]!)?.manifest.dependencies ?? {}))
@@ -69,6 +68,31 @@ export async function startRegistry(
 ): Promise<ReturnType<typeof Bun.serve>> {
   const bytes = new Map<string, Uint8Array>();
   for (const [name, path] of tarballs) bytes.set(name, await readFile(path));
+  const upstreamResponses = new Map<
+    string,
+    Promise<{ body: Uint8Array; contentType: string; status: number }>
+  >();
+  const proxyUpstream = async (url: URL): Promise<Response> => {
+    const load = async () => {
+      const response = await fetch(`https://registry.npmjs.org${url.pathname}${url.search}`);
+      return {
+        body: new Uint8Array(await response.arrayBuffer()),
+        contentType: response.headers.get("content-type") ?? "application/json",
+        status: response.status,
+      };
+    };
+    const key = `${url.pathname}${url.search}`;
+    const result = await (upstreamResponses.get(key) ??
+      (() => {
+        const pending = load();
+        upstreamResponses.set(key, pending);
+        return pending;
+      })());
+    return new Response(result.body.slice(), {
+      status: result.status,
+      headers: { "content-type": result.contentType },
+    });
+  };
   let port = 0;
   const server = Bun.serve({
     port: 0,
@@ -83,16 +107,7 @@ export async function startRegistry(
       const manifest = manifests.get(name)?.manifest;
       if (manifest !== undefined && !bytes.has(name))
         return new Response(`Workspace package was not packed: ${name}`, { status: 404 });
-      if (manifest === undefined)
-        return fetch(`https://registry.npmjs.org${url.pathname}${url.search}`).then(
-          async (response) =>
-            new Response(await response.arrayBuffer(), {
-              status: response.status,
-              headers: {
-                "content-type": response.headers.get("content-type") ?? "application/json",
-              },
-            }),
-        );
+      if (manifest === undefined) return proxyUpstream(url);
       const dependencies = Object.fromEntries(
         Object.entries(manifest.dependencies ?? {}).map(([key, value]) => [
           key,

@@ -24,12 +24,13 @@ export type InspectorCollection =
   | "cache"
   | "tools"
   | "agents"
+  | "channels"
   | "errors"
   | "services"
   | "providers";
 export type RuntimeCollection = Exclude<
   InspectorCollection,
-  "descriptors" | "routes" | "middlewares" | "services" | "providers"
+  "descriptors" | "routes" | "middlewares" | "services" | "providers" | "channels"
 >;
 export type SignalCollection = "requests" | "logs" | "traces";
 

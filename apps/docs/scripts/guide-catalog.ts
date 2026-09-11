@@ -8,6 +8,8 @@ import { httpGuideGroup, httpGuideRelations } from "./http-guide-catalog.js";
 import { jobsGuideGroup, jobsGuideRelations } from "./jobs-guide-catalog.js";
 import { databaseGuideGroup, databaseGuideRelations } from "./database-guide-catalog.js";
 import { authGuideGroup, authGuideRelations } from "./auth-guide-catalog.js";
+import { clientGuideGroup, clientGuideRelations } from "./client-guide-catalog.js";
+import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-catalog.js";
 
 export const guideGroups = [
   group("start", "Start", "Rocket", [
@@ -34,11 +36,14 @@ export const guideGroups = [
   storageGuideGroup,
   cachingGuideGroup,
   aiGuideGroup,
+  clientGuideGroup,
+  realtimeGuideGroup,
   group("integrations", "Integrations", "Plug", ["index", "local-docker"]),
   group("operations", "Operations", "Wrench", [
     "index",
     "observability",
     "inspector",
+    "realtime-agents-streaming",
     "testing",
     "deployment",
     "troubleshooting",
@@ -100,6 +105,8 @@ const relations = [
   ...storageGuideRelations,
   ...cachingGuideRelations,
   ...aiGuideRelations,
+  ...clientGuideRelations,
+  ...realtimeGuideRelations,
   relation(
     "integrations/index",
     ["integrations/docker", "integrations/redis", "integrations/s3"],
@@ -120,6 +127,11 @@ const relations = [
     ["templates/default/v1/api/src/hello/functions/hello.function.ts"],
   ),
   relation("operations/inspector", ["app", "routes"], ["tests/e2e/inspector-redesign.spec.ts"]),
+  relation(
+    "operations/realtime-agents-streaming",
+    ["realtime", "agents", "client"],
+    ["packages/runtime-hono/realtime-rpc.test.ts"],
+  ),
   relation(
     "operations/testing",
     ["testing"],

@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { runAgentGraphAcceptance } from "./test-inspector-agent-browser";
 const root = resolve(import.meta.dir, "..");
 const port = Number(process.env.RELKIT_INSPECTOR_BROWSER_PORT ?? "3210");
 if (!Number.isInteger(port) || port < 1 || port > 65_535)
@@ -11,6 +12,7 @@ const browserEnv = {
   ...process.env,
   AGENT_BROWSER_ALLOWED_DOMAINS: "127.0.0.1",
   AGENT_BROWSER_CONTENT_BOUNDARIES: "1",
+  AGENT_BROWSER_DEFAULT_TIMEOUT: "60000",
   AGENT_BROWSER_MAX_OUTPUT: "50000",
 };
 const fixture = Bun.spawn([process.execPath, "tests/inspector/fixture-server.ts"], {
@@ -23,7 +25,11 @@ const inspector = Bun.spawn(
   [process.execPath, "run", "--cwd", "apps/inspector", "dev", "--", "--port", String(port)],
   {
     cwd: root,
-    env: { ...process.env, RELKIT_BACKEND_URL: "http://127.0.0.1:3212" },
+    env: {
+      ...process.env,
+      RELKIT_BACKEND_URL: "http://127.0.0.1:3212",
+      RELKIT_INSPECTOR_DIST_DIR: ".relkit/next-browser",
+    },
     stdout: "ignore",
     stderr: "inherit",
   },
@@ -135,9 +141,7 @@ try {
   await run("wait", "--fn", "!document.querySelector('.overlay-dialog-backdrop')");
   if ((await snapshot()).includes('button "Close dialog"'))
     throw new Error("Escape did not close the dialog");
-  await run("set", "viewport", "390", "844");
-  await run("press", "Tab");
-  await run("eval", "document.activeElement?.tagName");
+  await runAgentGraphAcceptance({ baseUrl, run, snapshot, reference, includes });
   console.log("Inspector browser acceptance passed.");
 } catch (error) {
   await mkdir(artifacts, { recursive: true });
@@ -164,7 +168,9 @@ async function run(...args: string[]): Promise<string> {
     new Response(child.stderr).text(),
   ]);
   if (code !== 0)
-    throw new Error(error.trim() || output.trim() || `agent-browser ${args[0]} failed`);
+    throw new Error(
+      `agent-browser ${args.join(" ")}: ${error.trim() || output.trim() || "failed"}`,
+    );
   return output;
 }
 function snapshot(): Promise<string> {

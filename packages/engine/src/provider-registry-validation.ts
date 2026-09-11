@@ -7,7 +7,7 @@ import {
   type ProviderRequirement,
 } from "./provider-registry-types.js";
 import type { LoadedRuntimeIntegrationModule } from "./runtime-integrations.js";
-type ExpectedProvider = Pick<ProviderBindingNode, "capability" | "profile">;
+import { expectedProviders, isProviderNode } from "./provider-requirements.js";
 export function collectRequirements(graph: ApplicationGraph): ProviderRequirement[] {
   const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
   const required = new Map<string, ProviderRequirement>();
@@ -16,21 +16,23 @@ export function collectRequirements(graph: ApplicationGraph): ProviderRequiremen
   for (const edge of graph.edges) {
     if (edge.kind !== "uses-provider-profile") continue;
     const consumer = nodes.get(edge.from);
-    const expected = expectedProvider(consumer);
     const binding = nodes.get(edge.to);
+    const expected = isProviderNode(binding)
+      ? expectedProviders(consumer).find(
+          (item) => item.capability === binding.capability && item.profile === binding.profile,
+        )
+      : undefined;
     if (expected === undefined || !isProviderNode(binding)) {
       invalidRequirement(
         consumer,
         `Provider requirement "${edge.from}" -> "${edge.to}" is invalid.`,
       );
     }
-    if (covered.has(edge.from)) {
-      invalidRequirement(consumer, `Provider consumer "${edge.from}" has duplicate bindings.`);
-    }
-    if (binding.capability !== expected.capability || binding.profile !== expected.profile) {
+    const requirement = `${edge.from}\0${expected.capability}\0${expected.profile}`;
+    if (covered.has(requirement)) {
       invalidRequirement(
         consumer,
-        `Provider consumer "${edge.from}" requires ${expected.capability}.${expected.profile}, not ${binding.capability}.${binding.profile}.`,
+        `Provider consumer "${edge.from}" has duplicate ${expected.capability}.${expected.profile} bindings.`,
       );
     }
     const profile = key(binding.capability, binding.profile);
@@ -42,7 +44,7 @@ export function collectRequirements(graph: ApplicationGraph): ProviderRequiremen
       );
     }
     profiles.set(profile, binding.id);
-    covered.add(edge.from);
+    covered.add(requirement);
     required.set(binding.id, {
       capability: binding.capability,
       profile: binding.profile,
@@ -52,8 +54,8 @@ export function collectRequirements(graph: ApplicationGraph): ProviderRequiremen
     });
   }
   for (const node of graph.nodes) {
-    const expected = expectedProvider(node);
-    if (expected !== undefined && !covered.has(node.id)) {
+    for (const expected of expectedProviders(node)) {
+      if (covered.has(`${node.id}\0${expected.capability}\0${expected.profile}`)) continue;
       invalidRequirement(
         node,
         `Provider consumer "${node.id}" has no ${expected.capability}.${expected.profile} binding.`,
@@ -160,31 +162,8 @@ function label(
 function invalid(message: string): never {
   throw new ProviderRegistryError([{ code: "RELKIT_PROVIDER_INTEGRATION_INVALID", message }]);
 }
-function isProviderNode(value: GraphNode | undefined): value is ProviderBindingNode {
-  return value?.kind === "provider";
-}
-function expectedProvider(value: GraphNode | undefined): ExpectedProvider | undefined {
-  if (value === undefined) return undefined;
-  if (
-    value.kind === "bucket" ||
-    value.kind === "cache" ||
-    value.kind === "job" ||
-    value.kind === "event"
-  ) {
-    return { capability: value.kind, profile: value.profile };
-  }
-  if (value.kind === "agent") return { capability: "model", profile: value.profile };
-  if (value.kind === "trigger" && value.triggerType === "event") {
-    const config = record(value.config);
-    return {
-      capability: "event",
-      profile: typeof config?.profile === "string" ? config.profile : "default",
-    };
-  }
-  return undefined;
-}
 function invalidRequirement(node: GraphNode | undefined, message: string): never {
-  const expected = expectedProvider(node);
+  const [expected] = expectedProviders(node);
   throw new ProviderRegistryError([
     {
       code: "RELKIT_PROVIDER_METADATA_INVALID",

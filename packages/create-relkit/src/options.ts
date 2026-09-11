@@ -1,4 +1,4 @@
-export const CREATE_TEMPLATES = ["minimal", "api", "agent"] as const;
+export const CREATE_TEMPLATES = ["minimal", "api", "agent", "fullstack"] as const;
 export type CreateTemplate = (typeof CREATE_TEMPLATES)[number];
 
 export const CREATE_CLOUDS = ["aws", "none"] as const;

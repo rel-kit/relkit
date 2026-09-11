@@ -23,18 +23,13 @@ export function addProviderEdge(
   value: Record<string, unknown>,
   work: NormalizationWork,
 ): void {
-  const capability = providerCapability(descriptor.kind);
-  if (capability === undefined) return;
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
-  const profile =
-    selectedProviderProfile(
-      application,
-      capability,
-      requestedProviderProfile(descriptor.kind, value),
-    ) ?? "default";
-  const bindingId = `provider.${capability}.${profile}`;
-  if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
-    add("uses-provider-profile", descriptor.id, bindingId);
+  for (const [capability, requested] of providerCapabilities(descriptor.kind, value)) {
+    const profile = selectedProviderProfile(application, capability, requested) ?? "default";
+    const bindingId = `provider.${capability}.${profile}`;
+    if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
+      add("uses-provider-profile", descriptor.id, bindingId);
+    }
   }
 }
 
@@ -117,15 +112,31 @@ export function isTargetingDescriptor(kind: string): boolean {
   return kind === "route" || kind === "event-trigger" || kind === "job" || kind === "tool";
 }
 
-function providerCapability(kind: string): string | undefined {
-  return (
+function providerCapabilities(
+  kind: string,
+  value: Record<string, unknown>,
+): readonly (readonly [string, string | undefined])[] {
+  if (kind === "agent") {
+    const stateProfile = typeof value.stateProfile === "string" ? value.stateProfile : undefined;
+    const nativeModel = value.model !== undefined && typeof value.model !== "string";
+    return [
+      ...(value.execution === "graph" || nativeModel
+        ? []
+        : [["model", requestedProviderProfile(kind, value)] as const]),
+      ...(stateProfile === undefined ? [] : [["agent-state", stateProfile] as const]),
+    ];
+  }
+  if (kind === "channel") {
+    return [["realtime", typeof value.profile === "string" ? value.profile : undefined]];
+  }
+  const capability = (
     {
       bucket: "bucket",
       cache: "cache",
       job: "job",
       event: "event",
       "event-trigger": "event",
-      agent: "model",
     } as Record<string, string>
   )[kind];
+  return capability === undefined ? [] : [[capability, requestedProviderProfile(kind, value)]];
 }

@@ -4,6 +4,7 @@ import { ObservabilityQueryError } from "../query-types.js";
 
 let database: Awaited<ReturnType<typeof openDuckdbDatabase>> | undefined;
 let tail = Promise.resolve();
+process.on("SIGINT", () => undefined);
 const cleanup = setInterval(() => {
   tail = tail
     .then(() => database?.flush())

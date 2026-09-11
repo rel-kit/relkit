@@ -13,6 +13,7 @@ import {
   type PackageInfo,
   type RecordValue,
 } from "./release-check-support.js";
+import { expectedTemplateScripts, releaseTemplates } from "./release-templates.js";
 async function readJsonFromTar(artifact: string): Promise<RecordValue> {
   return JSON.parse(await command("tar", ["-xOf", artifact, "package/package.json"]));
 }
@@ -85,7 +86,7 @@ function assertListing(item: PackageInfo, listing: string[], packed: RecordValue
   if (forbidden.length > 0)
     throw new Error(`Packed development files found in ${item.name}: ${forbidden.join(", ")}`);
   if (item.name === "create-relkit")
-    for (const template of ["agent", "api", "minimal"])
+    for (const template of releaseTemplates)
       for (const file of ["package.json", "gitignore"])
         if (!listing.includes(`package/dist/templates/default/v1/${template}/${file}`))
           throw new Error(`Packed create-relkit template is missing: ${template}/${file}`);
@@ -149,18 +150,9 @@ export async function templateInputs(
   const result: RecordValue[] = [];
   const forbidden =
     /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
-  const scripts = {
-    dev: "relkit dev",
-    check: "relkit check",
-    typecheck: "tsc --noEmit",
-    test: "bun test",
-    "test:unit": "bun test tests/unit",
-    "test:integration": "bun test tests/integration",
-    build: "relkit build",
-    start: "relkit start",
-    graph: "relkit graph print",
-  };
-  for (const name of ["minimal", "api", "agent"]) {
+  const fullstackForbidden =
+    /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
+  for (const name of releaseTemplates) {
     const directory = join(root, "templates/default/v1", name);
     const manifest = await readJson(join(directory, "package.json"));
     for (const field of packageFields)
@@ -173,7 +165,8 @@ export async function templateInputs(
       manifest.devDependencies?.["@types/bun"] !== rootManifest.devDependencies?.["@types/bun"]
     )
       throw new Error(`Template ${name} tooling versions differ from the workspace`);
-    if (JSON.stringify(stable(manifest.scripts)) !== JSON.stringify(stable(scripts)))
+    const expectedScripts = expectedTemplateScripts(name);
+    if (JSON.stringify(stable(manifest.scripts)) !== JSON.stringify(stable(expectedScripts)))
       throw new Error(`Template ${name} scripts differ from the template contract`);
     const files = [...new Bun.Glob("**/*").scanSync({ cwd: directory, onlyFiles: true })].sort();
     for (const file of files) {
@@ -181,7 +174,7 @@ export async function templateInputs(
       if (
         text.includes("workspace:*") ||
         text.includes("<compatible-version>") ||
-        forbidden.test(text)
+        (name === "fullstack" ? fullstackForbidden : forbidden).test(text)
       )
         throw new Error(`Template scan failed: ${file}`);
     }

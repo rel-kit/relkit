@@ -134,6 +134,7 @@ export interface InvokeOptions<
   readonly effectRunner?: InvocationRunner;
   readonly bridge?: InvocationRunner;
   readonly idSource?: InvocationIdSource;
+  readonly progressSink?: import("@relkit/invocation").ProgressSink;
   readonly trigger?: unknown;
 }
 

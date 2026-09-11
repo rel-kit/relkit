@@ -62,14 +62,14 @@ afterAll(() => testApp.close());
 Provider-backed applications must replace every graph-required capability/profile
 explicitly through the `providers` option. For example, the commerce suite supplies
 separate fakes for cache profiles `requests` and `timeline`, bucket profiles
-`assets` and `receipts`, and model profile `openai`. Missing replacements fail
-before the test application becomes ready; `RELKIT_ENV=test` does not change
-provider selection.
+`assets` and `receipts`, and its realtime and agent-state profiles. Missing
+replacements fail before the test application becomes ready; `RELKIT_ENV=test`
+does not change provider selection.
 
 Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource
 behavior, `createTestJob` and `createTestEvent` for async delivery contracts, and a
-scripted model replacement for agents. Explicit protocol integration tests may
-instead opt into configured adapters. Tests that exercise restart and recovery
+scripted native LangChain model for agents. Explicit protocol integration tests
+may instead opt into configured adapters. Tests that exercise restart and recovery
 should use a disposable state directory and assert durable duplicate behavior
 rather than relying on timing or arbitrary sleeps.
 

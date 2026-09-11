@@ -232,7 +232,11 @@ function registration(capability: string, adapterId: string) {
 const DEFAULT_REGISTRATIONS: Readonly<Record<string, readonly ReturnType<typeof registration>[]>> =
   {
     cloudflare: [registration("bucket", "cloudflare-r2"), registration("cache", "cloudflare-kv")],
-    redis: [registration("cache", "redis")],
+    redis: [
+      registration("agent-state", "redis-agent-state"),
+      registration("cache", "redis"),
+      registration("realtime", "redis-realtime"),
+    ],
     s3: [registration("bucket", "s3")],
   };
 

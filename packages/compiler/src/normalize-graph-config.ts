@@ -25,8 +25,21 @@ export function httpConfig(
     rateLimit: rateLimit(value.rateLimit),
     maxBodyBytes: value.maxBodyBytes,
     timeoutMs: value.timeoutMs,
+    client: clientPolicy(value.client, value.method),
+    stream: value.stream,
     auth: authConfig(value.auth),
   });
+}
+
+function clientPolicy(value: unknown, method: unknown): JsonValue | undefined {
+  if (value === false) return false;
+  const operation =
+    isRecord(value) && (value.operation === "query" || value.operation === "mutation")
+      ? value.operation
+      : method === "GET" || method === "HEAD" || method === "OPTIONS"
+        ? "query"
+        : "mutation";
+  return { operation };
 }
 
 function authConfig(value: unknown): JsonValue | undefined {

@@ -26,6 +26,7 @@ test("proxies browser backend requests using runtime configuration", async () =>
   const response = await POST(
     new Request("http://inspector.local/_relkit/backend/_relkit/v1/actions?dryRun=true", {
       method: "POST",
+      headers: { origin: "http://inspector.local" },
       body: "payload",
     }),
     { params: Promise.resolve({ path: ["_relkit", "v1", "actions"] }) },
@@ -53,6 +54,54 @@ test("adds the inspector proxy base to proxied OpenAPI documents", async () => {
   expect(await response.json()).toMatchObject({
     servers: [{ url: "/_relkit/backend" }],
   });
+});
+
+test("forwards the browser abort signal to the upstream request", async () => {
+  const originalFetch = globalThis.fetch;
+  let forwarded: AbortSignal | null | undefined;
+  globalThis.fetch = ((_input: RequestInfo | URL, init?: RequestInit) => {
+    forwarded = init?.signal;
+    return Promise.resolve(Response.json({ ok: true }));
+  }) as typeof fetch;
+  process.env.RELKIT_BACKEND_URL = "http://127.0.0.1:3212";
+  const controller = new AbortController();
+  try {
+    await GET(
+      new Request("http://inspector.local/_relkit/backend/rpc/relkit.agent.observe", {
+        signal: controller.signal,
+      }),
+      { params: Promise.resolve({ path: ["rpc", "relkit.agent.observe"] }) },
+    );
+    expect(forwarded).toBe(controller.signal);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("keeps proxy route segments inside the configured backend origin", async () => {
+  const originalFetch = globalThis.fetch;
+  let requestedUrl: string | undefined;
+  globalThis.fetch = ((input: RequestInfo | URL) => {
+    requestedUrl = String(input);
+    return Promise.resolve(Response.json({ ok: true }));
+  }) as typeof fetch;
+  process.env.RELKIT_BACKEND_URL = "http://127.0.0.1:3212/base";
+  try {
+    await GET(new Request("http://inspector.local/_relkit/backend/escape"), {
+      params: Promise.resolve({ path: ["//attacker.example", "value"] }),
+    });
+    expect(requestedUrl).toBe("http://127.0.0.1:3212/base/%2F%2Fattacker.example/value");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("rejects non-local proxy backends", async () => {
+  process.env.RELKIT_BACKEND_URL = "http://169.254.169.254/latest/meta-data";
+  const response = await GET(new Request("http://inspector.local/_relkit/backend/value"), {
+    params: Promise.resolve({ path: ["value"] }),
+  });
+  expect(response.status).toBe(503);
 });
 
 afterEach(async () => {

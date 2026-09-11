@@ -15,6 +15,7 @@ import {
   SquareFunction,
   Stethoscope,
   Waypoints,
+  Workflow,
   Wrench,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -25,7 +26,8 @@ export const navigationGroups = [
     label: "Workspace",
     items: [
       { href: "/", label: "Overview", icon: LayoutDashboard },
-      { href: "/graph", label: "Graph", icon: Network },
+      { href: "/graphs", label: "Graphs", icon: Workflow },
+      { href: "/graph", label: "Application graph", icon: Network },
       { href: "/domains", label: "Domains", icon: Layers3 },
       { href: "/routes", label: "Routes", icon: Route },
       { href: "/middlewares", label: "Middleware", icon: ShieldCheck },
@@ -49,6 +51,7 @@ export const navigationGroups = [
       { href: "/providers", label: "Providers", icon: Globe2 },
       { href: "/tools", label: "Tools", icon: Wrench },
       { href: "/agents", label: "Agents", icon: Bot },
+      { href: "/channels", label: "Channels", icon: Radio },
     ],
   },
   {

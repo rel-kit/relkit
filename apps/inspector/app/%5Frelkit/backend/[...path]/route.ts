@@ -1,3 +1,5 @@
+import { secureApplicationProxyHeaders } from "../../../../lib/backend-proxy-security";
+
 const requestHeadersToDrop = ["connection", "content-length", "host"];
 const responseHeadersToDrop = ["connection", "content-encoding", "content-length"];
 const OPENAPI_PATH = "_relkit/v1/openapi.json";
@@ -6,22 +8,35 @@ const INSPECTOR_BACKEND_PATH = "/_relkit/backend";
 type RouteContext = { readonly params: Promise<{ readonly path: readonly string[] }> };
 
 async function proxy(request: Request, context: RouteContext): Promise<Response> {
-  const backend = process.env.RELKIT_BACKEND_URL?.replace(/\/$/, "");
+  const backend = localBackend(process.env.RELKIT_BACKEND_URL);
   if (backend === undefined)
     return Response.json({ error: "RELKIT inspector backend is not configured." }, { status: 503 });
   const { path } = await context.params;
   const incoming = new URL(request.url);
-  const target = new URL(`${backend}/${path.map(encodeURIComponent).join("/")}`);
+  const target = new URL(backend);
+  target.pathname = `${target.pathname.replace(/\/$/, "")}/${path.map(encodeURIComponent).join("/")}`;
   target.search = incoming.search;
-  const headers = new Headers(request.headers);
+  let headers: Headers;
+  try {
+    headers = secureApplicationProxyHeaders(request);
+  } catch {
+    return Response.json({ error: "Application proxy request origin denied." }, { status: 403 });
+  }
   for (const name of requestHeadersToDrop) headers.delete(name);
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
-  const response = await fetch(target, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.arrayBuffer() : undefined,
-    redirect: "manual",
-  });
+  let response: Response;
+  try {
+    response = await fetch(target, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.arrayBuffer() : undefined,
+      redirect: "manual",
+      signal: request.signal,
+    });
+  } catch (error) {
+    if (request.signal.aborted) return new Response(null, { status: 499 });
+    throw error;
+  }
   const responseHeaders = new Headers(response.headers);
   for (const name of responseHeadersToDrop) responseHeaders.delete(name);
   const body =
@@ -31,6 +46,30 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
     statusText: response.statusText,
     headers: responseHeaders,
   });
+}
+
+function localBackend(value: string | undefined): URL | undefined {
+  if (value === undefined) return undefined;
+  try {
+    const configured = new URL(value);
+    if (configured.protocol !== "http:" || configured.username !== "" || configured.password !== "")
+      return undefined;
+    const origin =
+      configured.hostname === "localhost"
+        ? "http://localhost"
+        : configured.hostname === "127.0.0.1"
+          ? "http://127.0.0.1"
+          : configured.hostname === "[::1]"
+            ? "http://[::1]"
+            : undefined;
+    if (origin === undefined) return undefined;
+    const backend = new URL(origin);
+    backend.port = configured.port;
+    backend.pathname = configured.pathname;
+    return backend;
+  } catch {
+    return undefined;
+  }
 }
 
 async function addProxyServer(response: Response): Promise<BodyInit | null> {

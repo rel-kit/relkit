@@ -103,26 +103,6 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
-  test("allows AI SDK vendor dependencies in their integration", async () => {
-    const fixture = await createFixture(
-      packageFiles([
-        {
-          path: "integrations/packages/ai-sdk",
-          name: "@relkit/ai-sdk",
-          source: 'import "@ai-sdk/openai";',
-          dependencies: { "@ai-sdk/openai": "4.0.0" },
-        },
-      ]),
-    );
-    try {
-      const result = await execute(process.execPath, ["run", boundaryScript, fixture]);
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain("Boundary check passed");
-    } finally {
-      await rm(fixture, { recursive: true, force: true });
-    }
-  });
-
   test("allows integration, catalog, and application dependency direction", async () => {
     const fixture = await createFixture(
       packageFiles([
@@ -377,7 +357,7 @@ describe.serial("Phase 0 guardrails", () => {
   test("package exports resolve only through the public entry", { timeout: 90_000 }, async () => {
     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain("10 packages loaded without unrelated integrations or SDKs");
+    expect(result.stdout).toContain("9 packages loaded without unrelated integrations or SDKs");
     expect(result.stdout).toContain("packed entries resolved; internal paths rejected");
   });
 

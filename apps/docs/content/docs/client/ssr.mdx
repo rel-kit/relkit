@@ -1,0 +1,20 @@
+---
+title: Next.js and SSR
+description: Hydrate only data produced for the same backend, identity, session, and contract.
+---
+
+## Create request scope
+
+Create a request-scoped context with `createRelkitServerContext({ baseUrl, request, queryClient,
+identityKey })`, prefetch through its client, then pass `dehydrate()` to `RelkitClientProvider`.
+Hydration installs only when backend, opaque identity scope, session epoch, public fingerprint,
+operation, and canonical key match. A fresh hydrated query avoids unintended duplicate requests
+within its configured `staleTime`; stale-query revalidation remains intentional.
+
+## Inspect the implementation contract
+
+<include cwd lang="ts" meta='title="packages/client/src/server-context.ts"'>
+  ../../packages/client/src/server-context.ts
+</include>
+
+<include cwd>content/generated/related/client-ssr.mdx</include>

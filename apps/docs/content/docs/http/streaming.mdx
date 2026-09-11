@@ -1,0 +1,28 @@
+---
+title: Streaming responses
+description: Use managed typed iterators or native SSE, text, and byte streams.
+---
+
+## Choose managed streaming
+
+Declare `output: streamOf(itemSchema)` and return an async generator. The iterator is lazy,
+single-consumer, schema-validates each item, and retains invocation scope until completion or
+cancellation. The queue is bounded to 32 items and 4 MiB; a fully encoded item over 1 MiB fails
+immediately.
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/functions/stream-order-report.function.ts"'
+>
+  ../../examples/commerce/src/orders/functions/stream-order-report.function.ts
+</include>
+
+## Choose a native format
+
+Managed oRPC iterators preserve typed completion and failure. Native SSE emits `relkit-item` and an
+explicit `relkit-complete` or sanitized `relkit-error`. Native text and bytes abort on a post-header
+application failure; because EOF cannot always distinguish failure, use managed streaming or SSE
+when callers need an explicit terminal result. Existing raw Hono routes remain the escape hatch.
+
+<include cwd>content/generated/related/http-streaming.mdx</include>

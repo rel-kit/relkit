@@ -1,19 +1,13 @@
 import {
-  createInvocationCallStack,
-  assertInvocationMode,
-  currentInvocationScope,
-  getDescriptorServiceIdentity,
   normalizeFailure,
   runInInvocationScope,
+  isStreamOutput,
+  lazySingleConsumerStream,
+  managedValidatedStream,
+  createProgressEmitter,
 } from "@relkit/invocation";
-import { createTraceId, isTraceId } from "@relkit/contracts";
 import {
-  assertSource,
-  callHook,
   canonicalTarget,
-  calculateDeadline,
-  createRecord,
-  defaultIdSource,
   defaultRunner,
   linkSignals,
   resolveTarget,
@@ -22,13 +16,7 @@ import {
 } from "./invoke-utils.js";
 import { runHandler } from "./invoke-runtime.js";
 import { completeInvocation } from "./invoke-completion.js";
-import { createEngineDispatcher } from "./invocation-dispatcher.js";
 import { resolveDirectTarget } from "./direct-target.js";
-import {
-  emitObservabilityEvent,
-  OBSERVABILITY_HOOK_PROTOCOL,
-  OBSERVABILITY_HOOK_VERSION,
-} from "./observability.js";
 import type { DirectFunctionRequest } from "./dependencies.js";
 import type {
   InvocationContext,
@@ -40,59 +28,44 @@ import type {
 } from "./invoke-types.js";
 import { InvocationValidationError as ValidationError } from "./invoke-types.js";
 import { createInvocationExecution } from "./invocation-execution.js";
+import { invocationScopeParent, startInvocation } from "./invoke-start.js";
 
 export * from "./invoke-types.js";
-
 export async function invoke<
   Input = unknown,
   Output = unknown,
   Context extends { readonly signal: AbortSignal } = InvocationContext,
 >(options: InvokeOptions<Input, Output, Context>): Promise<Output> {
-  const activeScope = currentInvocationScope();
-  if (options.parent === undefined && activeScope?.parent !== undefined) {
-    options = { ...options, parent: activeScope.parent };
-  }
-  const dispatcher = createEngineDispatcher(
-    options,
-    (next) => invoke(next),
-    (edge) => {
-      void callHook(options.hooks?.onObservedEdge, edge);
-      void emitObservabilityEvent(options.hooks?.observability, {
-        protocol: OBSERVABILITY_HOOK_PROTOCOL,
-        version: OBSERVABILITY_HOOK_VERSION,
-        type: "edge.observed",
-        edge,
-      });
-    },
-  );
-  const parentChain = activeScope?.chain ?? createInvocationCallStack();
   const target = canonicalTarget(resolveTarget(options));
-  const serviceId = getDescriptorServiceIdentity(target) ?? options.serviceId;
-  const source = options.source ?? "direct";
-  assertSource(source);
-  assertInvocationMode(target, source);
-  const now = options.now?.() ?? Date.now();
-  const deadlineMs = calculateDeadline(target.timeoutMs, options, options.parent?.deadlineMs, now);
-  const idSource = options.idSource ?? defaultIdSource;
-  const candidateTraceId = options.traceId ?? options.parent?.traceId ?? idSource.next("trace");
-  const traceId = isTraceId(candidateTraceId) ? candidateTraceId : createTraceId();
-  const record = createRecord(
-    target.id,
-    source,
-    options,
-    traceId,
-    deadlineMs,
-    now,
-    idSource,
+  if (isStreamOutput(target.output)) {
+    return Promise.resolve(
+      lazySingleConsumerStream(
+        () => invokeNow({ ...options, target }, true) as Promise<AsyncIterable<unknown>>,
+      ) as Output,
+    );
+  }
+  return invokeNow(options, false);
+}
+
+async function invokeNow<
+  Input = unknown,
+  Output = unknown,
+  Context extends { readonly signal: AbortSignal } = InvocationContext,
+>(options: InvokeOptions<Input, Output, Context>, streamLifecycle: boolean): Promise<Output> {
+  const started = await startInvocation(options, (next) => invoke(next));
+  ({ options } = started);
+  const {
+    dispatcher,
+    parentChain,
+    target,
     serviceId,
-  );
-  await callHook(options.hooks?.onInvocationStart, record);
-  await emitObservabilityEvent(options.hooks?.observability, {
-    protocol: OBSERVABILITY_HOOK_PROTOCOL,
-    version: OBSERVABILITY_HOOK_VERSION,
-    type: "invocation.started",
+    source,
+    now,
+    deadlineMs,
+    idSource,
+    traceId,
     record,
-  });
+  } = started;
 
   const controller = new AbortController();
   const execution = createInvocationExecution(target, record, options, controller, idSource);
@@ -104,6 +77,11 @@ export async function invoke<
     let value: Output | undefined;
     let error: InvocationValidationError | ReturnType<typeof normalizeFailure> | undefined;
     let outcome: InvocationOutcome = "defect";
+    let deferredCompletion = false;
+    const progress =
+      target.progress === undefined
+        ? undefined
+        : createProgressEmitter(target.progress, controller.signal, options.progressSink);
     try {
       const chain = parentChain.enterDescriptor(target, record.id);
       if (controller.signal.aborted) {
@@ -142,21 +120,7 @@ export async function invoke<
           effectRunner: runner,
           idSource,
         });
-      const scopeParent: {
-        id: string;
-        traceId: string;
-        correlationId?: string;
-        deadlineMs?: number;
-        signal: AbortSignal;
-        spanId?: string;
-        trace?: unknown;
-      } = {
-        id: record.id,
-        traceId,
-        ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
-        ...(deadlineMs === undefined ? {} : { deadlineMs }),
-        signal: controller.signal,
-      };
+      const scopeParent = invocationScopeParent(record, controller.signal, deadlineMs);
       value = (await runInInvocationScope({ dispatcher, parent: scopeParent, chain }, () =>
         runHandler(
           target,
@@ -169,6 +133,7 @@ export async function invoke<
           idSource,
           runner,
           childInvoker,
+          progress?.emitter,
           (trace) => {
             scopeParent.trace = trace;
             if (trace.context?.spanId !== undefined) scopeParent.spanId = trace.context.spanId;
@@ -176,8 +141,42 @@ export async function invoke<
         ),
       )) as Output;
       value = (await validated(target.output, value, "output")) as Output;
-      execution.captureOutput(value);
-      outcome = "success";
+      if (streamLifecycle && isStreamOutput(target.output)) {
+        const source = value as AsyncIterable<unknown>;
+        deferredCompletion = true;
+        value = managedValidatedStream({
+          source,
+          schema: target.output.item,
+          maxItemBytes: 1024 * 1024,
+          idleMs: 45_000,
+          abort: (reason) => controller.abort(reason),
+          run: (work) =>
+            execution.run(() =>
+              runInInvocationScope({ dispatcher, parent: scopeParent, chain }, work),
+            ),
+          settle: async (streamCause) => {
+            progress?.settle();
+            const streamError =
+              streamCause === undefined
+                ? undefined
+                : normalizeFailure(streamCause, { signal: controller.signal });
+            const streamOutcome: InvocationOutcome = streamError?.outcome ?? "success";
+            execution.complete(streamOutcome, streamError);
+            await completeInvocation({
+              record,
+              outcome: streamOutcome,
+              error: streamError,
+              options,
+              lease,
+              admitted,
+              unlink,
+            });
+          },
+        }) as Output;
+      } else {
+        execution.captureOutput(value);
+        outcome = "success";
+      }
     } catch (cause) {
       error =
         cause instanceof ValidationError && cause.phase === "input"
@@ -188,12 +187,14 @@ export async function invoke<
       error = await validateDeclaredError(target.errors, error);
       outcome = error instanceof ValidationError ? "validation-error" : error.outcome;
     } finally {
-      execution.complete(outcome, error);
-      await completeInvocation({ record, outcome, error, options, lease, admitted, unlink });
+      if (!deferredCompletion) {
+        progress?.settle();
+        execution.complete(outcome, error);
+        await completeInvocation({ record, outcome, error, options, lease, admitted, unlink });
+      }
     }
     if (error !== undefined) throw error;
     return value as Output;
   });
 }
-
 export { invokeFunction } from "./invoke-function.js";

@@ -10,6 +10,7 @@ export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly exposure?: DomainExposure;
   readonly input: JsonValue;
   readonly output: JsonValue;
+  readonly progress?: JsonValue;
   readonly errors?: JsonValue;
   readonly dependencies?: JsonValue;
   readonly timeoutMs?: number;

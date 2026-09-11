@@ -35,6 +35,7 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/events": "workspace:*",
     "@relkit/jobs": "workspace:*",
+    "@relkit/realtime": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "cron-parser": "5.10.0"
   },

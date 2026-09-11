@@ -175,7 +175,7 @@ export const GET = defineRoute({ target: listOrders })
 declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L63)
 
 Since v0.1.0
 
@@ -191,7 +191,7 @@ Re-exports all named exports from the "./route-types.js" module.
 export * from "./route-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-route.ts#L24)
 
 ## `define-service-routes.ts`
 
@@ -1294,6 +1294,43 @@ declare const readBetterAuthRegistration: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-auth.ts#L8)
 
+## `route-client.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [copyClient](#copyclient)
+  - [copyStream](#copystream)
+
+---
+
+# utils
+
+## copyClient
+
+**Signature**
+
+```ts
+declare const copyClient: (value: unknown) => RouteClientPolicy | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L5)
+
+## copyStream
+
+**Signature**
+
+```ts
+declare const copyStream: (
+  value: unknown,
+  output: StandardSchemaV1,
+) => { readonly format: NativeStreamFormat } | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-client.ts#L20)
+
 ## `route-options.ts`
 
 ---
@@ -1376,9 +1413,11 @@ declare const successStatus: (value: number | undefined) => number | undefined;
 - [utils](#utils)
   - [FunctionRouteDescriptor (interface)](#functionroutedescriptor-interface)
   - [FunctionRouteOptions (interface)](#functionrouteoptions-interface)
+  - [NativeStreamFormat (type alias)](#nativestreamformat-type-alias)
   - [RawHttpHandler (type alias)](#rawhttphandler-type-alias)
   - [RawRouteDescriptor (interface)](#rawroutedescriptor-interface)
   - [RawRouteOptions (interface)](#rawrouteoptions-interface)
+  - [RouteClientPolicy (type alias)](#routeclientpolicy-type-alias)
   - [RouteDescriptor (type alias)](#routedescriptor-type-alias)
 
 ---
@@ -1406,10 +1445,12 @@ export interface FunctionRouteDescriptor<
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
   readonly timeoutMs?: number;
+  readonly client?: RouteClientPolicy;
+  readonly stream?: { readonly format: NativeStreamFormat };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L48)
 
 ## FunctionRouteOptions (interface)
 
@@ -1430,10 +1471,22 @@ export interface FunctionRouteOptions<
   readonly maxBodyBytes?: number;
   readonly rateLimit?: RouteRateLimit;
   readonly timeoutMs?: number;
+  readonly client?: RouteClientPolicy;
+  readonly stream?: { readonly format: NativeStreamFormat };
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L19)
+
+## NativeStreamFormat (type alias)
+
+**Signature**
+
+```ts
+type NativeStreamFormat = "sse" | "text" | "bytes";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L13)
 
 ## RawHttpHandler (type alias)
 
@@ -1467,7 +1520,7 @@ export interface RawRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L68)
 
 ## RawRouteOptions (interface)
 
@@ -1486,7 +1539,17 @@ export interface RawRouteOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L37)
+
+## RouteClientPolicy (type alias)
+
+**Signature**
+
+```ts
+type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L12)
 
 ## RouteDescriptor (type alias)
 
@@ -1497,4 +1560,4 @@ type RouteDescriptor<Id, Target, Request> =
   FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L84)

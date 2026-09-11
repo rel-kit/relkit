@@ -144,6 +144,7 @@ function createPlan<Output>(
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     middlewares: [],
   } as Parameters<typeof materializeEvents>[0]["plan"];
 }

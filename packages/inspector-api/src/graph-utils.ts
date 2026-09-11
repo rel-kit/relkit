@@ -10,6 +10,8 @@ delivery profile retry schedule idempotency version sensitiveFields visibility m
 allowedContentTypes key value defaultTtlMs maxTtlMs sideEffect approval model toolIds limits
 generatedFunction capabilities capability adapter ownership configuration
 title tags members functions events order ownerId ownerKind phase domainId exposure data http retry
+execution workflow workflowTopology subagents resourceDependencies backendBucketId
+client chat controls stateProfile clientContract
 `
   .trim()
   .split(/\s+/);

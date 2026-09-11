@@ -12,11 +12,24 @@ description: Generated public TypeScript reference for @relkit/redis.
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - ["./realtime.js" (namespace export)](#realtimejs-namespace-export)
   - ["./redis.js" (namespace export)](#redisjs-namespace-export)
 
 ---
 
 # utils
+
+## "./realtime.js" (namespace export)
+
+Re-exports all named exports from the "./realtime.js" module.
+
+**Signature**
+
+```ts
+export * from "./realtime.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L2)
 
 ## "./redis.js" (namespace export)
 
@@ -73,6 +86,80 @@ declare const localRecipe: Readonly<{
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L10)
 
+## `realtime.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RedisAgentStateAdapter (type alias)](#redisagentstateadapter-type-alias)
+  - [RedisRealtimeAdapter (type alias)](#redisrealtimeadapter-type-alias)
+  - [redisAgentState](#redisagentstate)
+  - [redisRealtime](#redisrealtime)
+
+---
+
+# utils
+
+## RedisAgentStateAdapter (type alias)
+
+**Signature**
+
+```ts
+type RedisAgentStateAdapter<Options> = ProviderAdapter<
+  typeof agentState,
+  "redis-agent-state",
+  RedisConnection<Options>,
+  ProviderBehavior<RedisBehavior<Options>>
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime.ts#L28)
+
+## RedisRealtimeAdapter (type alias)
+
+**Signature**
+
+```ts
+type RedisRealtimeAdapter<Options> = ProviderAdapter<
+  typeof realtime,
+  "redis-realtime",
+  RedisConnection<Options>,
+  ProviderBehavior<RedisBehavior<Options>>
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime.ts#L21)
+
+## redisAgentState
+
+**Signature**
+
+```ts
+declare const redisAgentState: <
+  const Options extends RedisOptions = RedisOptions<RedisUrlReference<string> | undefined>,
+>(
+  options?: Options,
+) => RedisAgentStateAdapter<Options>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime.ts#L41)
+
+## redisRealtime
+
+**Signature**
+
+```ts
+declare const redisRealtime: <
+  const Options extends RedisOptions = RedisOptions<RedisUrlReference<string> | undefined>,
+>(
+  options?: Options,
+) => RedisRealtimeAdapter<Options>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime.ts#L35)
+
 ## `redis.ts`
 
 ---
@@ -83,8 +170,14 @@ declare const localRecipe: Readonly<{
   - [redis](#redis)
 - [utils](#utils)
   - [RedisAdapter (type alias)](#redisadapter-type-alias)
+  - [RedisBehavior (type alias)](#redisbehavior-type-alias)
+  - [RedisConnection (type alias)](#redisconnection-type-alias)
   - [RedisOptions (interface)](#redisoptions-interface)
   - [RedisUrlReference (type alias)](#redisurlreference-type-alias)
+  - [assertRedisOptions](#assertredisoptions)
+  - [redisConnectionContract](#redisconnectioncontract)
+  - [redisIntegration](#redisintegration)
+  - [redisLocalRecipe](#redislocalrecipe)
 
 ---
 
@@ -133,6 +226,34 @@ type RedisAdapter<Options> = ProviderAdapter<
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L48)
 
+## RedisBehavior (type alias)
+
+**Signature**
+
+```ts
+type RedisBehavior<Options> = Options extends {
+  readonly connectionTimeoutMs: infer Timeout extends number;
+}
+  ? Readonly<{ connectionTimeoutMs: Timeout }>
+  : Readonly<Record<never, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L42)
+
+## RedisConnection (type alias)
+
+**Signature**
+
+```ts
+type RedisConnection<Options> = Options extends {
+  readonly url: infer Url extends RedisUrlReference;
+}
+  ? Readonly<{ url: Url }>
+  : Readonly<Record<never, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L36)
+
 ## RedisOptions (interface)
 
 **Signature**
@@ -157,6 +278,86 @@ type RedisUrlReference<Name> = BindingValueRef<Name, string, "secret-string">;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L23)
+
+## assertRedisOptions
+
+**Signature**
+
+```ts
+declare const assertRedisOptions: (options: RedisOptions) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L88)
+
+## redisConnectionContract
+
+**Signature**
+
+```ts
+declare const redisConnectionContract: ProviderConnectionContract;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L18)
+
+## redisIntegration
+
+**Signature**
+
+```ts
+declare const redisIntegration: IntegrationReference<"redis">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L16)
+
+## redisLocalRecipe
+
+**Signature**
+
+```ts
+declare const redisLocalRecipe: ProviderLocalRecipeReference;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L21)
+
+## `agent-state-provider.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RedisAgentStateProviderOptions (interface)](#redisagentstateprovideroptions-interface)
+  - [createRedisAgentStateProvider](#createredisagentstateprovider)
+
+---
+
+# utils
+
+## RedisAgentStateProviderOptions (interface)
+
+**Signature**
+
+```ts
+export interface RedisAgentStateProviderOptions {
+  readonly url: string;
+  readonly profile: string;
+  readonly connectionTimeoutMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L13)
+
+## createRedisAgentStateProvider
+
+**Signature**
+
+```ts
+declare const createRedisAgentStateProvider: (
+  options: RedisAgentStateProviderOptions,
+) => AgentStateProvider & { ready(): Promise<void>; close(): Promise<void> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/agent-state-provider.ts#L19)
 
 ## `client.ts`
 
@@ -208,6 +409,7 @@ export interface RedisProtocolClient {
   ): Promise<readonly [string, readonly string[]]>;
   type(key: string): Promise<string>;
   ttl(key: string): Promise<number>;
+  command(command: string, args: readonly string[]): Promise<unknown>;
 }
 ```
 
@@ -221,7 +423,7 @@ export interface RedisProtocolClient {
 declare const createRedisClient: (options: RedisClientOptions) => RedisProtocolClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/client.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/client.ts#L26)
 
 ## `index.ts`
 
@@ -230,13 +432,27 @@ declare const createRedisClient: (options: RedisClientOptions) => RedisProtocolC
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - ["./agent-state-provider.js" (namespace export)](#agent-state-providerjs-namespace-export)
   - ["./client.js" (namespace export)](#clientjs-namespace-export)
   - ["./provider.js" (namespace export)](#providerjs-namespace-export)
+  - ["./realtime-provider.js" (namespace export)](#realtime-providerjs-namespace-export)
   - [runtimeIntegration](#runtimeintegration)
 
 ---
 
 # utils
+
+## "./agent-state-provider.js" (namespace export)
+
+Re-exports all named exports from the "./agent-state-provider.js" module.
+
+**Signature**
+
+```ts
+export * from "./agent-state-provider.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L9)
 
 ## "./client.js" (namespace export)
 
@@ -248,7 +464,7 @@ Re-exports all named exports from the "./client.js" module.
 export * from "./client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L6)
 
 ## "./provider.js" (namespace export)
 
@@ -260,7 +476,19 @@ Re-exports all named exports from the "./provider.js" module.
 export * from "./provider.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L7)
+
+## "./realtime-provider.js" (namespace export)
+
+Re-exports all named exports from the "./realtime-provider.js" module.
+
+**Signature**
+
+```ts
+export * from "./realtime-provider.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L8)
 
 ## runtimeIntegration
 
@@ -270,20 +498,42 @@ export * from "./provider.js";
 declare const runtimeIntegration: Readonly<{
   kind: "runtime-integration";
   integrationId: "redis";
-  registrations: ReadonlyArray<{
-    capability: string;
-    adapterId: string;
-    protocolVersion: number;
-    create: ({ profile, connection, behavior }: RuntimeProviderContext) => {
-      value: RedisCacheProvider;
-      ready: () => Promise<void>;
-      release: () => Promise<void>;
-    };
-  }>;
+  registrations: ReadonlyArray<
+    | {
+        capability: string;
+        adapterId: string;
+        protocolVersion: number;
+        create: ({ profile, connection, behavior }: RuntimeProviderContext) => {
+          value: RedisCacheProvider;
+          ready: () => Promise<void>;
+          release: () => Promise<void>;
+        };
+      }
+    | {
+        capability: string;
+        adapterId: string;
+        protocolVersion: number;
+        create: ({ profile, connection, behavior }: RuntimeProviderContext) => {
+          value: RealtimeProvider & { ready(): Promise<void>; close(): Promise<void> };
+          ready: () => Promise<void>;
+          release: () => Promise<void>;
+        };
+      }
+    | {
+        capability: string;
+        adapterId: string;
+        protocolVersion: number;
+        create: ({ profile, connection, behavior }: RuntimeProviderContext) => {
+          value: AgentStateProvider & { ready(): Promise<void>; close(): Promise<void> };
+          ready: () => Promise<void>;
+          release: () => Promise<void>;
+        };
+      }
+  >;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/index.ts#L11)
 
 ## `provider.ts`
 
@@ -350,3 +600,139 @@ declare const createRedisCacheProvider: (options: RedisCacheOptions) => RedisCac
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/provider.ts#L30)
+
+## `realtime-provider.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RedisRealtimeProviderOptions (interface)](#redisrealtimeprovideroptions-interface)
+  - [createRedisRealtimeProvider](#createredisrealtimeprovider)
+
+---
+
+# utils
+
+## RedisRealtimeProviderOptions (interface)
+
+**Signature**
+
+```ts
+export interface RedisRealtimeProviderOptions {
+  readonly url: string;
+  readonly profile: string;
+  readonly connectionTimeoutMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime-provider.ts#L9)
+
+## createRedisRealtimeProvider
+
+**Signature**
+
+```ts
+declare const createRedisRealtimeProvider: (
+  options: RedisRealtimeProviderOptions,
+) => RealtimeProvider & { ready(): Promise<void>; close(): Promise<void> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/realtime-provider.ts#L15)
+
+## `state-store.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RedisAgentStore (type alias)](#redisagentstore-type-alias)
+  - [RedisRealtimeStore (type alias)](#redisrealtimestore-type-alias)
+  - [RedisStateStoreOptions (interface)](#redisstatestoreoptions-interface)
+  - [RedisStateWaiter (interface)](#redisstatewaiter-interface)
+  - [createRedisAgentStore](#createredisagentstore)
+  - [createRedisRealtimeStore](#createredisrealtimestore)
+
+---
+
+# utils
+
+## RedisAgentStore (type alias)
+
+**Signature**
+
+```ts
+type RedisAgentStore = AgentStateStore & RedisStateWaiter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L28)
+
+## RedisRealtimeStore (type alias)
+
+**Signature**
+
+```ts
+type RedisRealtimeStore = RealtimeStateStore & RedisStateWaiter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L27)
+
+## RedisStateStoreOptions (interface)
+
+**Signature**
+
+```ts
+export interface RedisStateStoreOptions<State> {
+  readonly url: string;
+  readonly key: string;
+  readonly empty: () => State;
+  readonly valid: (state: unknown) => state is State;
+  readonly connectionTimeoutMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L9)
+
+## RedisStateWaiter (interface)
+
+**Signature**
+
+```ts
+export interface RedisStateWaiter {
+  waitForChange(
+    recheck: () => Promise<boolean>,
+    deadlineMs: number,
+    signal: AbortSignal,
+  ): Promise<void>;
+  ready(): Promise<void>;
+  close(): Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L17)
+
+## createRedisAgentStore
+
+**Signature**
+
+```ts
+declare const createRedisAgentStore: (
+  options: RedisStateStoreOptions<LocalAgentState>,
+) => RedisAgentStore;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L45)
+
+## createRedisRealtimeStore
+
+**Signature**
+
+```ts
+declare const createRedisRealtimeStore: (
+  options: RedisStateStoreOptions<LocalRealtimeState>,
+) => RedisRealtimeStore;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/state-store.ts#L30)

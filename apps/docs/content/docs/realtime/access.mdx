@@ -1,0 +1,60 @@
+---
+title: Access and revocation
+description: Expose only the channel partitions a browser is allowed to observe.
+---
+
+Channel access is decided on the server for each validated partition. A channel ID, its parameters, or a replay checkpoint never grants access by itself.
+
+## Choose an exposure policy
+
+| Declaration                | Who can subscribe                                                             |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| Omit `client`              | Backend code only. The channel is absent from the generated browser registry. |
+| `client: { public: true }` | Any client that can reach the application endpoint.                           |
+| `client: { authorize }`    | Only clients whose current trusted server context passes the guard.           |
+
+Use public access only for data you would return from an unauthenticated route. Protected channels are the normal choice for account, tenant, order, and user-specific updates.
+
+The commerce example protects each order partition:
+
+<include
+  cwd
+  lang="ts"
+  meta='title="examples/commerce/src/orders/channels/order-updates.channel.ts"'
+>
+  ../../examples/commerce/src/orders/channels/order-updates.channel.ts
+</include>
+
+The guard receives validated channel parameters and trusted server context. It should answer one question: may this principal observe this partition now? Authentication alone is often insufficient; an order channel should also verify that the principal can read that order in the active tenant.
+
+A missing session, thrown error, timeout, malformed result, or unavailable authorization dependency denies access.
+
+## How authorization stays current
+
+A successful check creates a short authorization grant for the exact application, identity, session, tenant, channel, and partition. Grants last no longer than 60 seconds. RelKit authorizes again when the client subscribes, reconnects, replays, renews, changes identity or tenant, or crosses a policy or provider epoch.
+
+This prevents an old checkpoint or an already-open connection from extending access indefinitely. A replacement login for the same user also receives a new session epoch, so stale callbacks and buffered private data cannot cross into the new session.
+
+When renewal is denied, RelKit:
+
+- stops the subscription;
+- removes private frames queued under the old grant;
+- invalidates its presence lease;
+- discards recovery state tied to that grant; and
+- refuses old checkpoints on a later subscription.
+
+The client should treat the channel as unavailable until its authoritative route query succeeds under the new identity.
+
+## Browser transport requirements
+
+Cookie-authenticated WebSocket connections require an exact allowed `Origin`; missing, wildcard, `null`, malformed, and disallowed origins are rejected before subscription. Credentialed cross-origin deployments must name allowed origins explicitly. CORS headers do not replace authentication or channel authorization.
+
+State-changing HTTP operations that lead to channel publication still use the route's CSRF protection. A channel guard cannot make an unsafe mutation safe after it has already executed.
+
+## Keep client identity and authority separate
+
+The client provider uses an opaque server-derived identity scope and session epoch to partition cached and realtime state. A manual `identityKey` may add tenant or application partitioning, but it never authorizes access. The server always derives the current principal independently.
+
+On identity or session replacement, the client aborts active subscriptions, clears private RelKit state, and ignores callbacks from the previous scope.
+
+<include cwd>content/generated/related/realtime-access.mdx</include>

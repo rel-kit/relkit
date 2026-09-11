@@ -24,6 +24,8 @@ const outputs: GeneratedOutputs = {
   client: "",
   contract: "export const contract = {};\n",
   clientContract: '{"protocol":"relkit.client-contract"}\n',
+  clientRegistry: 'declare module "@relkit/client/react" {}\n',
+  clientManifest: '{"protocol":"relkit.client-manifest"}\n',
 };
 
 function descriptor(id: string, file: string, value: Record<string, unknown> = {}) {
@@ -47,6 +49,8 @@ describe("compiler generated artifacts", () => {
       expect(first.writes.map(({ fileName }) => fileName)).toEqual([
         GENERATED_ARTIFACT_FILES.graph,
         GENERATED_ARTIFACT_FILES.clientContract,
+        GENERATED_ARTIFACT_FILES.clientManifest,
+        GENERATED_ARTIFACT_FILES.clientRegistry,
         GENERATED_ARTIFACT_FILES.contract,
         GENERATED_ARTIFACT_FILES.diagnostics,
         GENERATED_ARTIFACT_FILES.localServices,
@@ -82,6 +86,8 @@ describe("compiler generated artifacts", () => {
       expect(report.writes.map(({ fileName }) => fileName)).toEqual([
         "application.graph.json",
         "client-contract.json",
+        "client-manifest.json",
+        "client-registry.d.ts",
         "client.ts",
         "contract.ts",
         "deployment.plan.json",

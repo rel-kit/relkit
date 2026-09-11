@@ -51,6 +51,7 @@ const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   cache: { directory: "cache", suffix: ".cache.ts" },
   tool: { directory: "tools", suffix: ".tool.ts" },
   agent: { directory: "agents", suffix: ".agent.ts" },
+  channel: { directory: "channels", suffix: ".channel.ts" },
   constants: { directory: "constants", suffix: ".constants.ts" },
   prompt: { directory: "prompts", suffix: ".prompt.ts" },
 };

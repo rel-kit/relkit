@@ -29,6 +29,7 @@ test("scaffold rebuild output is concise while verbose and JSON retain diagnosti
   expect(normal).not.toContain("dev-local.ts");
   expect(normal).toContain("--verbose");
   expect(formatDevLog(failure, { verbose: true })).toContain("dev-local.ts");
+  expect(formatDevLog({ ...base, message: "dev.starting" }, { verbose: true })).not.toContain("{}");
   const files = ["src/orders/service.ts", "src/orders/agents/example.agent.ts", "relkit.config.ts"];
   const rebuild = { ...base, message: "dev.build.started", fields: { files, initial: false } };
   expect(formatDevLog(rebuild)).toContain("3 changed files");
@@ -44,7 +45,7 @@ test("scaffold rebuild output is concise while verbose and JSON retain diagnosti
       json: { write: (record) => json.push(record) },
     },
   });
-  const cause = "OPENAI_API_KEY: Required value is missing";
+  const cause = "SERVICE_TOKEN: Required value is missing";
   const provider = {
     ...base,
     component: "runtime.provider",
@@ -69,7 +70,7 @@ test("scaffold rebuild output is concise while verbose and JSON retain diagnosti
       previousActive: true,
     },
   });
-  expect(human.join("\n").match(/OPENAI_API_KEY/g)).toHaveLength(1);
+  expect(human.join("\n").match(/SERVICE_TOKEN/g)).toHaveLength(1);
   expect(human.join("\n")).toContain("RELKIT_ENVIRONMENT_INVALID");
   expect(human.join("\n")).not.toContain("RELKIT_CANDIDATE_PROVIDER_NOT_READY");
   expect(human.join("\n")).not.toContain("dev-local.ts");
@@ -152,6 +153,12 @@ test("routine Inspector output is verbose-only and never persisted", () => {
     logger: { human: { write: (line) => visible.push(line) } },
     onRecord: (record) => stored.push(record),
   });
+  log({ level: "info", event: "dev.shutdown.requested", fields: { signal: "SIGINT" } });
+  log({
+    level: "info",
+    event: "inspector.output",
+    fields: { channel: "stdout", output: "" },
+  });
   log({
     level: "warn",
     event: "inspector.output",
@@ -184,6 +191,14 @@ test("routine Inspector output is verbose-only and never persisted", () => {
     },
   });
   expect(verbose.join("\n")).toContain("traces/missing 404");
+  expect(verbose.join("\n")).not.toContain('{"channel"');
+  const visibleLines = verbose.length;
+  verboseLog({
+    level: "info",
+    event: "inspector.output",
+    fields: { channel: "stdout", output: "" },
+  });
+  expect(verbose).toHaveLength(visibleLines);
   expect(stored).toEqual([]);
 
   log({
@@ -197,6 +212,42 @@ test("routine Inspector output is verbose-only and never persisted", () => {
   expect(stored).toHaveLength(1);
   expect(stored[0]).toMatchObject({ component: "inspector", level: "error" });
   expect(visible.join("\n")).toContain("graph 500");
+});
+
+test("verbose lease failures stay actionable without duplicated internals", () => {
+  const message = [
+    "Local services are already in use by another dev session.",
+    "",
+    "  Owner    PID 6900",
+    "  Session  attached-example",
+    "",
+    "Stop that session with Ctrl-C, then try again.",
+  ].join("\n");
+  const output = formatDevLog(
+    {
+      version: 2,
+      signal: "log",
+      timestamp: new Date().toISOString(),
+      level: "error",
+      component: "cli.dev",
+      message: "dev.generation.failed",
+      fields: {
+        message,
+        previousActive: false,
+        error: {
+          name: "LocalProjectLeaseError",
+          code: "RELKIT_LOCAL_LEASE_HELD",
+          message,
+          stack: "Error\n    at statusFor (/workspace/lease.ts:1:1)",
+        },
+      },
+    },
+    { verbose: true },
+  );
+
+  expect(output.match(/Local services are already in use/g)).toHaveLength(1);
+  expect(output).not.toContain("lease.ts");
+  expect(output).not.toContain('"error"');
 });
 
 test("truncated runtime presentation copies are never persisted a second time", async () => {

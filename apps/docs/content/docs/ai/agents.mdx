@@ -5,30 +5,36 @@ description: Give a model a clear task, the tools it needs, and limits on each r
 
 Use `defineAgent` when a model needs to interpret a request and decide which tools to call. For a fixed sequence of steps, use [a function](/docs/fundamentals/functions).
 
-The [AI SDK ToolLoopAgent reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent) covers the underlying agent API. For options you can pass to `defineAgent`, use the [RelKit reference](/docs/api/agents#defineagent). AI SDK settings such as `temperature` and `prepareStep` are not currently exposed by `defineAgent`.
+Pass compatible LangChain models, tools, and middleware directly. RelKit validates the declared input,
+output, limits, tool policies, and public client contract around the native execution. For exact options,
+use the [RelKit reference](/docs/api/agents#defineagent).
+
+See [Native runtime and DeepAgents](/docs/ai/native-runtime) for the supported package cohort, public
+typing boundary, and deep-agent limitations. For explicit workflows and durable continuation, use
+[LangGraph, persistence, and resume](/docs/ai/graphs-persistence).
+
+## Install the native runtime
+
+Generated agent projects already include the supported LangChain and LangGraph packages. Add them to an
+existing application before declaring a native agent:
+
+```sh
+bun add langchain @langchain/langgraph
+```
+
+Model-provider packages are application dependencies. The generated sample uses LangChain's offline
+`FakeToolCallingModel`, so its tests and first run need no account, network request, or paid service.
 
 ## Scaffold an agent
 
-From the application root, with an existing `hello` service, create an agent and a model profile:
+Add a native agent to an existing service with the installed CLI:
 
 ```sh
-bun run relkit add agent "Support Assistant" --service hello \
-  --model-provider openai --model-id gpt-5-mini \
-  --instructions "Answer greeting questions."
+bun run relkit add agent Assistant --service hello
 ```
 
-Creates `src/hello/agents/support-assistant.agent.ts`. The sample accepts a non-empty `question`
-and returns an `answer`; it starts with limits of four steps, four tool calls, and ten seconds.
-In a terminal, the wizard offers model, tool, and prompt choices discovered in the service.
-
-For an existing model profile, use `--model openai:gpt-5-mini` instead of the two profile-creation
-flags. `--model-provider` and `--model-id` must be supplied together when adding a profile.
-Repeat `--tool greetingLookupTool` for tools already in the same service. Omitting `--tool`
-headlessly selects no tools. Supply exactly one of `--instructions` or `--prompt`.
-
-A new profile requires `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` in your local environment at server
-startup, even before an agent is invoked. The CLI adds a blank example, never reads a secret from a
-prompt, and never calls the model. Expose the agent through a callable function when needed.
+The scaffold uses the supported native packages and deterministic offline model. Replace that model in
+server code when you are ready to configure a production provider.
 
 ### Agent CLI options
 
@@ -41,15 +47,12 @@ Create a prompt before referencing it from an agent:
 ```sh
 bun run relkit add prompt "Greeting Policy" --service hello \
   --text "Answer greeting questions." --text "Keep answers brief."
-bun run relkit add agent "Greeting Assistant" --service hello \
-  --model openai:gpt-5-mini --prompt greetingPolicyPrompt
 ```
 
-These commands assume the `openai` model profile is already configured. The prompt is saved as
-`src/hello/prompts/greeting-policy.prompt.ts`; repeated non-empty `--text` values preserve
-separate prompt segments. In headless execution at least one `--text` is required. Prompts are
-internal descriptors, not public service members. Agent `--prompt` accepts the prompt's ID,
-binding, or filename.
+The prompt is saved as `src/hello/prompts/greeting-policy.prompt.ts`; repeated non-empty `--text`
+values preserve separate prompt segments. In headless execution at least one `--text` is required.
+Prompts are internal descriptors, not public service members. Pass the prompt descriptor as the
+agent's `instructions` when you need reusable policy text.
 
 ### Prompt CLI options
 
@@ -81,22 +84,28 @@ If a run exceeds a limit, it fails rather than continuing indefinitely. Set limi
 
 ## Choose a model
 
-`model: "openai:gpt-5-mini"` selects a provider and model. Omit `model` to use your app's configured default. Configure the provider and API key in your app before running a live model; the [tutorial shows the configuration](/docs/ai/first-agent#try-a-live-model).
+`model` accepts a compatible native LangChain model instance or a lazy application model. Install and
+configure the provider package in server code; never put credentials, live instances, or provider
+payloads in browser contracts. Subagents inherit the parent model unless they declare an override.
 
-## Call the agent from a function
+## Run the typed client
 
-Declare the agent under `dependencies.agents`, then call it through the matching context name:
+Expose the agent through `client`, then select it with `useAgent`. Run, observe, stop, and resume calls
+all require the caller's stable business thread ID:
 
-<include cwd lang="ts" meta='title="src/hello/functions/ask-assistant.function.ts"'>
-  ../../templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts
+<include cwd lang="tsx" meta='title="web/app/page.tsx"'>
+  ../../templates/default/v1/fullstack/web/app/page.tsx
 </include>
 
-The result is the agent's validated output. You can expose this function through [an HTTP route](/docs/http/routes) or try it from **Functions** in the Inspector.
+The generated selector narrows initial input, final output, selected middleware state, tools, custom
+events, waiting replies, and controls. A resume uses the same thread with `{ resume: true }`; it does not
+start a replacement run.
 
 Keep authorization in your application functions. Model instructions are not a replacement for checking whether the current user may read or change data.
 
 ## Streaming
 
-RelKit agents do not currently support streaming responses. `context.agents.assistant(input)` returns a Promise that resolves to the complete validated answer. Show a loading state while you await it, then display the result.
-
-There is no supported agent `.stream()` method or token callback in `defineAgent` yet. MCP's **Streamable HTTP** transport does not change this: it is not an API for streaming a RelKit agent's answer.
+The client-exposed agent has a durable thread journal: `useAgent` restores its authorized snapshot and
+observes text parts, tool calls, progress, approvals, selected state, nested execution, and terminal
+output incrementally. Mounting the hook never creates a thread or starts a run. See
+[Agent streaming](/docs/ai/streaming) and [Threads and recovery](/docs/ai/threads-recovery).

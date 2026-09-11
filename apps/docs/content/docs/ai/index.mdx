@@ -3,9 +3,14 @@ title: Getting started
 description: Build AI agents that use your app's functions, and share tools with MCP clients.
 ---
 
-An AI agent uses a language model to decide how to complete a task. Tools let it do useful work in your app: look up an order, search a catalog, or prepare a response using current data.
+An AI agent uses a language model to decide how to complete a task. Tools let it do useful work in
+your app: look up an order, search a catalog, or prepare a response using current data.
 
-**RelKit's AI agents and agent tool calling are built on Vercel's AI SDK.** RelKit connects that model workflow to your application's functions, validation, permissions, and execution limits. You use `defineAgent`, `defineTool`, and `.asTool()` to describe the work.
+**RelKit agents run through native LangChain and LangGraph APIs.** RelKit connects those workflows to
+your application's functions, validation, permissions, durable threads, and execution limits. Use
+`defineAgent` for model-driven work, or `defineGraph` and `defineGraphNode` for explicit workflows.
+Adding subagents, skills, memory files, or a backend to `defineAgent` selects native DeepAgents
+behavior through the same declaration.
 
 Use an agent when the next step depends on a user's question. Use an ordinary function when you already know the steps, such as calculating a total or saving an order.
 
@@ -13,31 +18,35 @@ Use an agent when the next step depends on a user's question. Use an ordinary fu
 
 Usually, adding tools to a model means writing argument schemas, dispatching tool calls, handling results, and controlling how long the model can keep working. RelKit lets you reuse validated functions as tools, choose which tools an agent can use, and set limits on each run.
 
-| API                   | What you use it for                                                       |
-| --------------------- | ------------------------------------------------------------------------- |
-| `defineAgent`         | Set the agent's task, input, output, model, tools, and limits.            |
-| `defineTool`          | Give an existing function a tool name, description, and execution policy. |
-| `function.asTool()`   | Turn a function into a tool directly.                                     |
-| `dependencies.agents` | Give a function access to an agent through `context.agents`.              |
-| `mcp`                 | Choose whether a tool is available to external MCP clients.               |
+| API                 | What you use it for                                                       |
+| ------------------- | ------------------------------------------------------------------------- |
+| `defineAgent`       | Set native model, tool, middleware, DeepAgents, and client behavior.      |
+| `defineGraph`       | Register a typed native LangGraph workflow and its public result.         |
+| `defineGraphNode`   | Validate graph-node state updates, routes, and human continuation.        |
+| `defineTool`        | Give an existing function a tool name, description, and execution policy. |
+| `function.asTool()` | Turn a function into a tool directly.                                     |
+| `mcp`               | Choose whether a tool is available to external MCP clients.               |
 
 The same tool can serve a RelKit agent and an external AI client through **Model Context Protocol (MCP)**. You do not need a RelKit agent just to expose tools over MCP.
 
-## AI SDK references
+## Native framework boundary
 
-Use Vercel's documentation to explore the underlying concepts and full AI SDK APIs:
+Pass compatible LangChain models, tools, and middleware directly—there is no public adapter wrapper.
+RelKit function-backed tools remain native-compatible while preserving function execution, validation,
+authorization, and tool policies. LangGraph owns scheduling and control flow; RelKit validates declared
+state and public output around it.
 
-- [Tool calling](https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling): how models choose tools and use their results.
-- [ToolLoopAgent reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent): the AI SDK's agent API.
-- [tool() reference](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool): the AI SDK's tool options.
+## Observe durable execution
 
-**RelKit does not accept every AI SDK option.** Its APIs are not drop-in replacements for `ToolLoopAgent` or `tool()`, and extra SDK options are not automatically forwarded. Use the [RelKit agent reference](/docs/api/agents#defineagent) and [RelKit tool reference](/docs/api/tools#definetool) for supported options in your app.
+Client-exposed agents stream one canonical event history over HTTP iteration, AG-UI SSE, or WebSocket.
+The typed client exposes messages, tools, progress, selected middleware state, waiting requests, nested
+execution, and final output separately. Every run, observation, control, and continuation supplies an
+application-owned `threadId`; mounting a hook never invents one or starts work.
 
-## Does RelKit support streaming?
+See [Agent streaming](/docs/ai/streaming) and [Threads and recovery](/docs/ai/threads-recovery).
 
-Not yet for agents. An agent call returns one completed, validated result; it does not stream tokens or partial answers. RelKit does not currently expose an agent `.stream()` API.
-
-See [calling an agent](/docs/ai/agents#call-the-agent-from-a-function) for the supported request-and-response usage.
+For the complete native boundary, continue with [Native runtime and DeepAgents](/docs/ai/native-runtime)
+and [LangGraph, persistence, and resume](/docs/ai/graphs-persistence).
 
 ## Choose where to start
 

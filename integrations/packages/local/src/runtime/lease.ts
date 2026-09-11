@@ -84,7 +84,14 @@ function statusFor(
   if (alive(existing.ownerPid!)) {
     throw new LocalProjectLeaseError(
       "RELKIT_LOCAL_LEASE_HELD",
-      `Local services are owned by live session "${existing.sessionId}" (pid ${existing.ownerPid}).`,
+      [
+        "Local services are already in use by another dev session.",
+        "",
+        `  Owner    PID ${existing.ownerPid}`,
+        `  Session  ${existing.sessionId}`,
+        "",
+        "Stop that session with Ctrl-C, then try again.",
+      ].join("\n"),
       existing,
     );
   }

@@ -51,6 +51,7 @@ export function createPlan<Input, Output>(
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
   } as unknown as Parameters<typeof materializeJobs>[0]["plan"];
 }
 

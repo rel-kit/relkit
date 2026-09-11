@@ -101,6 +101,59 @@ test("keeps cache, bucket, job, event, and model profiles independent", async ()
   await registry.release();
 });
 
+test("does not require model providers for graphs or inline native models", async () => {
+  const registry = await createProviderRegistry({
+    generationId: "generation.graph",
+    graph: {
+      contractVersion: GRAPH_VERSION,
+      appId: "graph-test",
+      nodes: [
+        {
+          kind: "agent",
+          id: "orders.review",
+          source,
+          input: null,
+          output: null,
+          instructions: null,
+          toolIds: [],
+          limits: {},
+          generatedFunction: {
+            generated: true,
+            generatedBy: "agent",
+            agentId: "orders.review",
+            functionId: "relkit.agent.orders.review.invoke",
+          },
+          profile: "default",
+          execution: "graph",
+        },
+        {
+          kind: "agent",
+          id: "orders.assistant",
+          source,
+          input: null,
+          output: null,
+          instructions: null,
+          toolIds: [],
+          limits: {},
+          generatedFunction: {
+            generated: true,
+            generatedBy: "agent",
+            agentId: "orders.assistant",
+            functionId: "relkit.agent.orders.assistant.invoke",
+          },
+          profile: "default",
+          modelSource: "native",
+        },
+      ],
+      edges: [],
+    },
+    runtimeIntegrationModules: [],
+  });
+
+  expect(registry.requirements).toEqual([]);
+  await registry.release();
+});
+
 test("rejects a provider edge whose profile differs from its consumer", async () => {
   const binding = provider("cache", "requests");
   const valid = graph([binding], [binding]);

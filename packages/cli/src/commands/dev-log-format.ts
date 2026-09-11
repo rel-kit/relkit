@@ -10,6 +10,7 @@ export interface DevLogFormatOptions {
 export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {}): string {
   const f = record.fields;
   const event = record.message;
+  if (record.component === "inspector" && event.trim() === "") return "";
   let scope = record.component.replace(/^runtime\./, "");
   let message = event;
   let details: string[] = [];
@@ -67,7 +68,13 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
     message = `${f.method} ${f.path} → ${f.status ?? "cancelled"}${duration}`;
   }
   details.push(...devLogDetails(record, options.verbose === true));
-  if (options.verbose) details.push(JSON.stringify({ ...f, ...correlations(record) }));
+  if (
+    options.verbose &&
+    message === event &&
+    record.component !== "inspector" &&
+    typeof f.message !== "string"
+  )
+    details.push(JSON.stringify({ ...f, ...correlations(record) }));
   const width = Math.max(40, options.columns ?? 100);
   const scopeWidth = width < 80 ? 10 : 16;
   const time = timestamp(record.timestamp);

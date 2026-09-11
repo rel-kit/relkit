@@ -1,7 +1,15 @@
 import type { JsonValue } from "@relkit/contracts";
 import type { GraphNodeBase } from "./model.js";
 
-export const PROVIDER_CAPABILITIES = ["bucket", "cache", "job", "event", "model"] as const;
+export const PROVIDER_CAPABILITIES = [
+  "bucket",
+  "cache",
+  "job",
+  "event",
+  "model",
+  "realtime",
+  "agent-state",
+] as const;
 
 export type ProviderCapability = (typeof PROVIDER_CAPABILITIES)[number];
 

@@ -8,12 +8,14 @@ export type ScopeViolation = {
   message: string;
 };
 const approvedPackages = new Set(
-  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard routes runtime-effect runtime-hono schema services supervisor testing tools".split(
+  "agents app better-auth buckets cache cli client client-generator cloud-aws compiler config contracts create-relkit deploy deploy-pulumi diagnostics drizzle engine events functions graph inspector-api invocation jobs local-service observability openapi provider providers-local providers-standard realtime routes runtime-effect runtime-hono schema services supervisor testing tools".split(
     " ",
   ),
 );
 const approvedApps = new Set(["docs", "inspector"]);
-const approvedExamples = new Set(["README.md", "auth-drizzle", "commerce", "data-model"]);
+const approvedExamples = new Set(
+  "README.md auth-drizzle commerce commerce-web data-model".split(" "),
+);
 const approvedTemplates = new Set(["default"]);
 const integrationPath = /^integrations\/(?:catalog(?:\/|$)|packages\/[^/]+(?:\/|$))/;
 const forbiddenNames =

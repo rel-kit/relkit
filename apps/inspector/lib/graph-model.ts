@@ -5,6 +5,7 @@ import {
   type ActivationFingerprint,
   type IntegrationProvenance,
 } from "./graph-topology-model";
+import { readAgentTopology } from "./graph-agent-topology";
 
 export type GraphRelationship = "declared" | "observed";
 
@@ -13,6 +14,10 @@ export interface GraphNode {
   readonly kind: string;
   readonly domainId?: string;
   readonly exposure?: "public" | "internal";
+  readonly parentId?: string;
+  readonly label?: string;
+  readonly status?: string;
+  readonly observed?: boolean;
 }
 
 export interface GraphEdge {
@@ -69,14 +74,15 @@ export function normalizeGraphResponse(payload: InspectorGraph): GraphSnapshot {
   const appId = text(graph.appId);
   const observed = root.observedEdges ?? graph.observedEdges;
   const activationFingerprint = readActivationFingerprint(root.activationFingerprint);
+  const topology = readAgentTopology(graph.nodes);
   return {
     generationId,
     graphHash,
     ...(activationFingerprint === undefined ? {} : { activationFingerprint }),
     integrations: readIntegrationProvenance(root.integrations ?? graph.integrations),
     ...(appId === undefined ? {} : { appId }),
-    nodes: readNodes(graph.nodes),
-    declaredEdges: readEdges(graph.edges, "declared"),
+    nodes: [...readNodes(graph.nodes), ...topology.nodes].sort(compareNodes),
+    declaredEdges: [...readEdges(graph.edges, "declared"), ...topology.edges].sort(compareEdges),
     observedEdges: readEdges(observed, "observed"),
   };
 }
@@ -91,7 +97,7 @@ export function summarizeGraph(graph: GraphSnapshot): GraphSummary {
 }
 
 export function edgeLabel(edge: GraphEdge): string {
-  return edge.kind.replace(/[._-]+/g, " ");
+  return edge.kind.replace(/[.:_-]+/g, " ");
 }
 
 export function graphKindColor(kind: string): string {
@@ -115,7 +121,7 @@ function readNodes(value: readonly unknown[]): readonly GraphNode[] {
         : [
             {
               id,
-              kind,
+              kind: node?.execution === "graph" ? "graph" : kind,
               ...(domainId === undefined ? {} : { domainId }),
               ...(exposure === undefined ? {} : { exposure }),
             },

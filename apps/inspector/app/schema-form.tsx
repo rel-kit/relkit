@@ -8,16 +8,18 @@ export function SchemaForm({
   values,
   onChange,
   errors = [],
+  label = "Function input fields",
 }: {
   readonly schema: unknown;
   readonly values: Readonly<Record<string, unknown>>;
   readonly onChange: (key: string, value: unknown) => void;
   readonly errors?: readonly string[];
+  readonly label?: string;
 }) {
   const fields = useMemo(() => schemaFields(schema), [schema]);
   if (fields.length === 0) return null;
   return (
-    <div className="schema-form" aria-label="Function input fields">
+    <div className="schema-form" aria-label={label}>
       {fields.map((field) => (
         <SchemaFieldInput
           key={field.key}

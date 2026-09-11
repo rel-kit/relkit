@@ -111,11 +111,10 @@ export const providerDefinitions = {
 };
 
 export function defaultProviderProfile(
-  capability: "cache" | "bucket" | "event" | "job" | "model",
+  capability: "cache" | "bucket" | "event" | "job",
   provider?: string,
   source?: "docker" | "connected" | "aws",
 ): string {
-  if (capability === "model") return provider ?? "openai";
   if (provider === "cloudflare-kv" || provider === "cloudflare-r2") return provider;
   if (source === "connected") return capability === "cache" ? "redis" : "s3";
   if (source === "aws") return "aws";

@@ -1,4 +1,3 @@
-import { aiSdk } from "@relkit/ai-sdk";
 import { defineApp, defineEnv, env as envFactory } from "@relkit/app";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
@@ -19,17 +18,9 @@ export default defineApp({
     }),
   },
   cache: { default: docker(redis({ url: envFactory.secret("CACHE_URL") })) },
-  model: {
-    openai: aiSdk({
-      provider: "openai",
-      defaultModel: "gpt-5-mini",
-      apiKey: envFactory.secret("MODEL_API_KEY"),
-    }),
-  },
   defaults: {
     bucket: "default",
     cache: "default",
-    model: "openai",
   },
   telemetry: { redaction: { mode: "off" } },
 });

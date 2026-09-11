@@ -167,7 +167,8 @@ function isHttpTrigger(node: ApplicationGraph["nodes"][number]): node is HttpGra
     node.kind === "trigger" &&
     node.triggerType === "http" &&
     isRecord(node.config) &&
-    (node.config as { readonly rawHandler?: unknown }).rawHandler !== true
+    (node.config as { readonly rawHandler?: unknown }).rawHandler !== true &&
+    (node.config as { readonly client?: unknown }).client !== false
   );
 }
 

@@ -292,25 +292,16 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     },
   ],
   "dependencies": {
-    "@relkit/ai-sdk": "0.4.0",
     "@relkit/docker": "0.4.0",
     "@relkit/local": "0.4.0",
     "@relkit/redis": "0.4.0",
     "@relkit/s3": "0.4.0",
+    "langchain": "1.5.10",
   },
   "nextSteps": [
     "relkit local up",
   ],
   "operations": [
-    {
-      "action": "update",
-      "content": 
-"LOG_LEVEL=info
-OPENAI_API_KEY=
-"
-,
-      "path": ".env.example",
-    },
     {
       "action": "update",
       "content": 
@@ -331,12 +322,12 @@ OPENAI_API_KEY=
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@relkit/ai-sdk": "0.4.0",
     "@relkit/app": "0.4.0",
     "@relkit/docker": "0.4.0",
     "@relkit/local": "0.4.0",
     "@relkit/redis": "0.4.0",
-    "@relkit/s3": "0.4.0"
+    "@relkit/s3": "0.4.0",
+    "langchain": "1.5.10"
   },
   "devDependencies": {
     "@relkit/cli": "0.4.0",
@@ -352,13 +343,12 @@ OPENAI_API_KEY=
     {
       "action": "update",
       "content": 
-"import { defineApp, env as binding } from "@relkit/app/config";
+"import { defineApp } from "@relkit/app/config";
 import env from "@app/platform/env.js";
 import { localEvent, localJob } from "@relkit/local";
 import { docker } from "@relkit/docker";
 import { redis } from "@relkit/redis";
 import { s3 } from "@relkit/s3";
-import { aiSdk } from "@relkit/ai-sdk";
 // relkit:create:deployment-imports
 
 export default defineApp({
@@ -368,11 +358,10 @@ export default defineApp({
   inspector: { port: 3210 },
   // relkit:create:deployment
   event: { "local": localEvent() },
-  defaults: { event: "local", job: "local", cache: "local", bucket: "local", model: "openai" },
+  defaults: { event: "local", job: "local", cache: "local", bucket: "local" },
   job: { "local": localJob() },
   cache: { "local": docker(redis()) },
   bucket: { "local": docker(s3()) },
-  model: { "openai": aiSdk({ provider: "openai", defaultModel: "gpt-5-mini", apiKey: binding.secret("OPENAI_API_KEY") }) },
 });
 "
 ,
@@ -383,6 +372,7 @@ export default defineApp({
       "content": 
 "import { defineAgent } from "@relkit/app/agents";
 import { z } from "@relkit/app/schema";
+import { FakeToolCallingModel } from "langchain";
 import exampleTool from "@app/billing/tools/example.tool.js";
 import examplePrompt from "@app/billing/prompts/example.prompt.js";
 
@@ -390,7 +380,13 @@ const exampleAgent = defineAgent({
   id: "billing.example-agent",
   input: z.object({ question: z.string().min(1) }),
   output: z.object({ answer: z.string() }),
-  model: "openai:gpt-5-mini",
+  model: new FakeToolCallingModel({
+    toolCalls: [[{
+      name: "relkit_output",
+      args: { value: { answer: "Hello from the offline LangChain model." } },
+      id: "output-1",
+    }]],
+  }),
   instructions: examplePrompt,
   tools: [exampleTool],
   limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
@@ -602,19 +598,6 @@ export default exampleTool;
       "path": "src/billing/tools/example.tool.ts",
     },
     {
-      "action": "update",
-      "content": 
-"import { defineEnv, env } from "@relkit/app/config";
-
-export default defineEnv({
-  LOG_LEVEL: env.literal("trace", "debug", "info", "warn", "error").default("info"),
-  OPENAI_API_KEY: env.secret(),
-});
-"
-,
-      "path": "src/platform/env.ts",
-    },
-    {
       "action": "create",
       "content": 
 "import { defineServiceRoutes } from "@relkit/app/routes";
@@ -645,19 +628,11 @@ export const { GET } = defineServiceRoutes(billing, {
       "capability": "bucket",
       "name": "local",
     },
-    {
-      "capability": "model",
-      "name": "openai",
-    },
   ],
   "warnings": [
     {
       "code": "docker-required",
       "message": "Run \`relkit local up\` before using this local resource.",
-    },
-    {
-      "code": "model-secret-required",
-      "message": "Set OPENAI_API_KEY in .env before starting or restarting the server; the model profile requires it at startup.",
     },
   ],
 }

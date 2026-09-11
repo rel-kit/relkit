@@ -45,6 +45,9 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source.indexOf("assertRuntimeIntegrationModules(")).toBeLessThan(
     source.indexOf("createProviderRegistry("),
   );
+  expect(source.indexOf("assertAgentRuntimeDependencies(")).toBeLessThan(
+    source.indexOf("createFunctionRegistry("),
+  );
   expect(source).not.toContain("Runtime local-service plan fingerprint verification failed.");
   expect(source).not.toContain("RELKIT_PROVIDER_OVERRIDES_FILE");
   expect(source.match(/activationFingerprint/g)?.length).toBeGreaterThanOrEqual(4);

@@ -92,6 +92,8 @@ export const allowedKeys = new Set([
   "job",
   "event",
   "model",
+  "realtime",
+  "agent-state",
   "defaults",
   "telemetry",
   "server",

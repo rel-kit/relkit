@@ -2,16 +2,12 @@ import { deepFreeze } from "@relkit/contracts";
 import { argument, command, devLogOptions, option, title } from "./cli-help-builders.js";
 import type { CliHelpCommand, CliHelpModel } from "./cli-help-types.js";
 import { addHelp } from "./cli-help-add.js";
+import { clientHelp } from "./cli-help-client.js";
 
 export type * from "./cli-help-types.js";
 
 const projectRoot = option("project-root", "string", "Application directory (defaults to cwd)");
-const environment = option(
-  "environment",
-  "string",
-  "Provider environment, including value-free model-provider configuration",
-  ["env"],
-);
+const environment = option("environment", "string", "Provider environment configuration", ["env"]);
 const deployOptions = [
   projectRoot,
   option("stack", "string", "Pulumi stack name (default: development)"),
@@ -87,25 +83,6 @@ const deploy = command("deploy", "Manage Pulumi deployments", "relkit deploy <co
   ),
 });
 
-const client = command(
-  "client",
-  "Generate a client from a running application",
-  "relkit client <command>",
-  {
-    commands: [
-      command(
-        "pull",
-        "Pull a versioned client contract",
-        "relkit client pull <baseUrl> --out <directory>",
-        {
-          arguments: [argument("baseUrl", true, "Running RELKIT application URL")],
-          options: [option("out", "string", "Output directory")],
-        },
-      ),
-    ],
-  },
-);
-
 const local = command("local", "Manage project-scoped local services", "relkit local <command>", {
   commands: [
     command("up", "Start all declared local services", "relkit local up", {
@@ -133,7 +110,13 @@ const root = command(
       command("create", "Create a new RELKIT application", "relkit create [name]", {
         arguments: [argument("name", false, "npm package and application name")],
         options: [
-          option("template", "choice", "Starter template", [], ["minimal", "api", "agent"]),
+          option(
+            "template",
+            "choice",
+            "Starter template",
+            [],
+            ["minimal", "api", "agent", "fullstack"],
+          ),
           option("cloud", "choice", "Cloud provider", [], ["aws", "none"]),
           option("deploy", "choice", "Deployment adapter", [], ["pulumi", "none"]),
           option("directory", "string", "Destination directory"),
@@ -181,7 +164,7 @@ const root = command(
         ],
       }),
       deploy,
-      client,
+      clientHelp,
     ],
   },
 );

@@ -29,6 +29,8 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineCache: { kind: "cache", idOptional: false },
   defineTool: { kind: "tool", idOptional: true },
   defineAgent: { kind: "agent", idOptional: true },
+  defineGraph: { kind: "agent", idOptional: true },
+  defineChannel: { kind: "channel", idOptional: false },
   defineMiddleware: { kind: "middleware", idOptional: true },
   defineService: { kind: "service", idOptional: true },
   defineTransform: { kind: "transform", idOptional: true },

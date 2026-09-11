@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { defineFunction } from "@relkit/functions";
+import { defineFunction, streamOf } from "@relkit/functions";
 import { z } from "@relkit/schema";
 import { defineRoute, http } from "./src/index.ts";
 
@@ -89,5 +89,29 @@ describe("defineRoute", () => {
         },
       }),
     ).toThrow("numeric values");
+  });
+
+  test("freezes client exposure and native stream policy", () => {
+    expect(defineRoute({ id: "internal", target, client: false })).toMatchObject({
+      client: false,
+    });
+    const streamed = defineFunction({
+      id: "reports.stream",
+      input: z.object({}),
+      output: streamOf(z.string()),
+      handler: async function* () {
+        yield "ready";
+      },
+    });
+    expect(
+      defineRoute({ id: "reports.route", target: streamed, stream: { format: "sse" } }),
+    ).toMatchObject({ stream: { format: "sse" } });
+    expect(() => defineRoute({ id: "bad-stream", target, stream: { format: "sse" } })).toThrow(
+      "requires streamOf",
+    );
+    expect(() => defineRoute({ id: "bad-client", target, client: {} })).not.toThrow();
+    expect(() =>
+      defineRoute({ id: "bad-client", target, client: { public: true } as never }),
+    ).toThrow("Route client");
   });
 });

@@ -1,3 +1,5 @@
+import { MessageSquare } from "lucide-react";
+import Link from "next/link";
 import type { AgentView } from "../lib/agents-model";
 import { SchemaPanel } from "./schema-panel";
 
@@ -12,7 +14,9 @@ export function AgentDetailView({ view }: { readonly view: AgentView }) {
             Model and tool execution stays bounded, correlated, and redacted at the API boundary.
           </p>
         </div>
-        <span className="badge">{view.id}</span>
+        <Link className="button-link" href={`/agents/${encodeURIComponent(view.id)}/chat`}>
+          <MessageSquare aria-hidden="true" /> {view.chat ? "Open chat" : "Open runner"}
+        </Link>
       </header>
       <section className="panel route-identity" aria-labelledby="agent-identity-heading">
         <div className="section-heading">

@@ -11,7 +11,7 @@ const configuration = parseModelProviderConfiguration({
   anthropic: { defaultModel: "claude-sonnet-4-5" },
 });
 
-describe("offline AI SDK v7 model matrix", () => {
+describe("offline native model matrix", () => {
   for (const entry of [
     { name: "OpenAI global default", selector: undefined, id: "openai:gpt-5-mini" },
     {

@@ -22,11 +22,11 @@ async function runProcess(command: string, args: string[], cwd: string): Promise
     stdout: "pipe",
     stderr: "pipe",
   });
-  const [stdout, stderr] = await Promise.all([
+  const [stdout, stderr, exitCode] = await Promise.all([
     new Response(child.stdout).text(),
     new Response(child.stderr).text(),
+    child.exited,
   ]);
-  const exitCode = await child.exited;
   if (exitCode !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed in ${cwd}\n${stdout}${stderr}`);
   }

@@ -6,7 +6,6 @@ const integrations = [
   "docker",
   "local",
   "cloudflare",
-  "ai-sdk",
   "sentry",
   "otlp",
   "aws",

@@ -5,6 +5,7 @@
     "index",
     "observability",
     "inspector",
+    "realtime-agents-streaming",
     "testing",
     "deployment",
     "troubleshooting",

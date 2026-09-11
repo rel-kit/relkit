@@ -23,7 +23,7 @@ export const serviceGuideRelations = [
     api: ["services", "functions", "tools", "agents", "jobs", "events", "cache", "buckets"],
     examples: [
       "examples/commerce/src/orders/functions/create-order.function.ts",
-      "templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts",
+      "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
     ],
   },
   {

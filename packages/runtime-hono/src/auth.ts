@@ -1,7 +1,7 @@
 import type { Hono } from "hono";
 
 export interface HttpAuthInvocation {
-  readonly getSession: () => Promise<unknown | null>;
+  readonly getSession: (options?: { readonly fresh?: boolean }) => Promise<unknown | null>;
 }
 
 export interface HttpAuthRuntime {
@@ -28,7 +28,10 @@ export function createHttpAuthRuntime(options: CreateHttpAuthRuntimeOptions): Ht
       const headers = new Headers(request.headers);
       let session: Promise<unknown | null> | undefined;
       const context = Object.freeze({
-        getSession: () => (session ??= Promise.resolve(options.getSession(headers))),
+        getSession: (read: { readonly fresh?: boolean } = {}) => {
+          if (read.fresh) session = undefined;
+          return (session ??= Promise.resolve(options.getSession(headers)));
+        },
       });
       contexts.set(request, context);
       return context;

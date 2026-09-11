@@ -60,7 +60,7 @@ test("documents raw and RPC boundaries without promising REST-only policies on R
   expect(read("raw-handlers")).toContain("named export `ALL`");
   expect(read("raw-handlers")).toContain("OpenAPI and generated-client operation");
   expect(read("generated-clients")).toContain("RPC over `/rpc`");
-  expect(read("generated-clients")).toContain("not applied to RPC calls");
+  expect(read("generated-clients")).toContain("Both execute the original route's authorization");
   expect(read("rate-limits")).toContain("tests/compiler/rate-limit.test.ts#local-rate-limit");
   expect(read("rate-limits")).toContain("not hashed");
   expect(read("middleware")).toContain("not token verification");

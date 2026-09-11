@@ -112,7 +112,7 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
       option("text", "string", "Prompt text; repeatable", [], undefined, true),
     ]),
     named("agent", "Create an agent with a model, tools, and instructions", [
-      option("model", "string", "Model selector such as openai:gpt-5-mini"),
+      option("model", "string", "Existing native model profile; omitted uses an offline model"),
       option("tool", "string", "Tool ID, binding, or filename; repeatable", [], undefined, true),
       option(
         "prompt",
@@ -124,14 +124,6 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
         "string",
         "Inline instructions; exactly one of --prompt or --instructions is required",
       ),
-      option(
-        "model-provider",
-        "choice",
-        "Provider for a new model profile; requires --model-id",
-        [],
-        ["openai", "anthropic"],
-      ),
-      option("model-id", "string", "Default model ID for a new profile; requires --model-provider"),
     ]),
     named("constants", "Create a constants descriptor"),
     command("route", "Create a route or service route", "relkit add route [path]", {

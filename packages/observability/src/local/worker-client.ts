@@ -16,6 +16,7 @@ export function startLocalWorker(onFailure: (error: Error) => void = () => undef
   });
   let nextId = 0;
   let closed = false;
+  let closing = false;
   let opened = false;
   let failure: Error | undefined;
   let diagnostic = "";
@@ -42,7 +43,8 @@ export function startLocalWorker(onFailure: (error: Error) => void = () => undef
   };
   child.on("error", fail);
   child.on("exit", (code) => {
-    if (!closed) fail(new Error(`Telemetry worker exited (${code}): ${diagnostic}`));
+    if (!closed && (!closing || pending.size > 0))
+      fail(new Error(`Telemetry worker exited (${code}): ${diagnostic}`));
   });
   child.on("message", (message: LocalWorkerResponse) => {
     if (message.fatal) {
@@ -88,6 +90,7 @@ export function startLocalWorker(onFailure: (error: Error) => void = () => undef
   };
   const close = async (): Promise<void> => {
     if (closed) return;
+    closing = true;
     try {
       if (!failure && opened) await call({ type: "close" });
     } finally {
@@ -96,5 +99,5 @@ export function startLocalWorker(onFailure: (error: Error) => void = () => undef
       child.kill();
     }
   };
-  return { call, close };
+  return { pid: child.pid, call, close };
 }

@@ -6,6 +6,7 @@ import type {
   ApplicationGraph,
   BucketNode,
   CacheNode,
+  ChannelNode,
   EventNode,
   EventTriggerConfig,
   FunctionNode,
@@ -37,6 +38,7 @@ export interface BucketRegistration extends BucketNode {}
 export interface CacheRegistration extends CacheNode {}
 export interface ToolRegistration extends ToolNode {}
 export interface AgentRegistration extends AgentNode {}
+export interface ChannelRegistration extends ChannelNode {}
 export interface ServiceRegistration extends ServiceNode {}
 export interface MiddlewareRegistration extends MiddlewareNode {}
 
@@ -52,6 +54,7 @@ export interface RegistrationPlan {
   readonly caches: readonly CacheRegistration[];
   readonly tools: readonly ToolRegistration[];
   readonly agents: readonly AgentRegistration[];
+  readonly channels: readonly ChannelRegistration[];
   readonly services?: readonly ServiceRegistration[];
   readonly middlewares: readonly MiddlewareRegistration[];
 }
@@ -81,6 +84,7 @@ export function createRegistrationPlan(
     caches: [],
     tools: [],
     agents: [],
+    channels: [],
     services: [],
     middlewares: [],
   };
@@ -124,6 +128,9 @@ function addNode(
       return;
     case "agent":
       plan.agents.push(node);
+      return;
+    case "channel":
+      plan.channels.push(node);
       return;
     case "service":
       plan.services.push(node);
@@ -188,7 +195,6 @@ function routePrecedence(path: string): 0 | 1 | 2 | 3 {
   if (path.includes("*")) return 2;
   return path.split("/").some((segment) => segment.startsWith(":")) ? 1 : 0;
 }
-
 function isRecord(value: unknown): value is Record<string, JsonValue> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

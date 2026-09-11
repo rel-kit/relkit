@@ -42,7 +42,7 @@ export async function startInspector(
     HOSTNAME: hostname,
     RELKIT_INSPECTOR_PORT: String(port),
     RELKIT_BACKEND_PORT: String(backendPort),
-    RELKIT_BACKEND_URL: `http://${hostname}:${backendPort}`,
+    RELKIT_BACKEND_URL: `http://127.0.0.1:${backendPort}`,
     NEXT_PUBLIC_RELKIT_BACKEND_URL: `http://${hostname}:${port}/_relkit/backend`,
   };
   const child = spawn([...options.command], {

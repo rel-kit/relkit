@@ -108,6 +108,7 @@ export interface StandaloneContextOptions<Context extends { readonly signal: Abo
   readonly logger?: PublicLogger;
   readonly clients?: ManagedDependencySources;
   readonly publishes: readonly string[];
+  readonly progress?: import("./progress.js").ProgressEmitter;
 }
 
 export async function makeStandaloneContext<Context extends { readonly signal: AbortSignal }>(
@@ -138,6 +139,7 @@ export async function makeStandaloneContext<Context extends { readonly signal: A
         }),
       ),
     ),
+    ...(options.progress === undefined ? {} : { progress: options.progress }),
   }) as Context;
 }
 

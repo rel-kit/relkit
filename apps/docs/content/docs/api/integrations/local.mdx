@@ -53,9 +53,13 @@ export * from "@relkit/local-service";
   - [localEvent](#localevent)
   - [localJob](#localjob)
 - [utils](#utils)
+  - [LocalAgentStateAdapter (type alias)](#localagentstateadapter-type-alias)
   - [LocalEventAdapter (type alias)](#localeventadapter-type-alias)
   - [LocalJobAdapter (type alias)](#localjobadapter-type-alias)
   - [LocalProviderOptions (interface)](#localprovideroptions-interface)
+  - [LocalRealtimeAdapter (type alias)](#localrealtimeadapter-type-alias)
+  - [localAgentState](#localagentstate)
+  - [localRealtime](#localrealtime)
 
 ---
 
@@ -78,7 +82,7 @@ const events = localEvent();
 declare const localEvent: (options?: LocalProviderOptions) => LocalEventAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L39)
 
 Since v0.4.0
 
@@ -99,11 +103,21 @@ const jobs = localJob();
 declare const localJob: (options?: LocalProviderOptions) => LocalJobAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L54)
 
 Since v0.4.0
 
 # utils
+
+## LocalAgentStateAdapter (type alias)
+
+**Signature**
+
+```ts
+type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-state">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L26)
 
 ## LocalEventAdapter (type alias)
 
@@ -113,7 +127,7 @@ Since v0.4.0
 type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L23)
 
 ## LocalJobAdapter (type alias)
 
@@ -123,7 +137,7 @@ type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 type LocalJobAdapter = ProviderAdapter<typeof job, "local-job">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L24)
 
 ## LocalProviderOptions (interface)
 
@@ -135,7 +149,37 @@ export interface LocalProviderOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L19)
+
+## LocalRealtimeAdapter (type alias)
+
+**Signature**
+
+```ts
+type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L25)
+
+## localAgentState
+
+**Signature**
+
+```ts
+declare const localAgentState: (options?: LocalProviderOptions) => LocalAgentStateAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L62)
+
+## localRealtime
+
+**Signature**
+
+```ts
+declare const localRealtime: (options?: LocalProviderOptions) => LocalRealtimeAdapter;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L58)
 
 ## `identity.ts`
 
@@ -362,7 +406,7 @@ export * from "./state-paths.js";
 declare const runtimeIntegration: RuntimeProviderIntegration<"local">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/integration.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/integration.ts#L10)
 
 ## `lease-files.ts`
 

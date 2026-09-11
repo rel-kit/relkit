@@ -1,0 +1,32 @@
+---
+title: Threads and recovery
+description: Restore a reusable conversation without replaying uncertain work.
+---
+
+## Restore one consistent snapshot
+
+Loading a thread returns one consistent snapshot and matching journal checkpoint. The browser installs
+the snapshot completely, then reads records strictly after that checkpoint. Older history is finite,
+authenticated cursor pagination tied to the pinned snapshot.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/agents/order-support.agent.ts"'>
+  ../../examples/commerce/src/orders/agents/order-support.agent.ts
+</include>
+
+## Keep uncertain work visible
+
+Each execution segment has immutable run state. A settled segment returns its thread to idle when no
+approval or follow-up remains; approval and worker interruption stay visible. Lost responses are
+reconciled through scoped receipts. Claim expiry, generation loss, or an uncertain external effect
+never causes automatic restart.
+
+## Keep interrupted nodes safe to re-enter
+
+LangGraph starts an interrupted node again when its thread resumes. RELKIT binds the reply to the
+persisted waiting revision, admits it once, and fences competing workers, but it cannot make an
+arbitrary database write, payment, email, or third-party request exactly once. Place the interrupt
+before an irreversible effect, or make the effect idempotent with a durable business key or a
+transaction that your application owns.
+
+Every protected thread operation requires current resource authorization and verified ownership.
+Knowing a thread, run, checkpoint, or operation ID grants nothing.

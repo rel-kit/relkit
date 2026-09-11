@@ -72,20 +72,11 @@ An agent's `agents/` file owns its instructions, schemas, model, tool allowlist,
 Store long instructions in a local prompt module if that makes them easier to maintain. Plain text does
 not need a new service. See [defining an agent](/docs/ai/agents).
 
-To let a route or another domain run an agent, expose an ordinary function that declares the agent as a
-dependency. This existing example provides the callable operation:
-
-<include
-  cwd
-  lang="ts"
-  meta='title="templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts"'
->
-  ../../templates/default/v1/agent/src/hello/functions/ask-assistant.function.ts
-</include>
-
-Import that function into `src/hello/service.ts` and add it to `functions` when it needs to be public.
-Do not add an `agents` or `tools` map to `defineService`. A tool in another domain can target a public
-function from the owning service; it should not import that domain's private tool file.
+To let a browser run an agent, expose its `client` contract and select it with the generated
+`useAgent` hook. Every run, observation, control, and continuation supplies the application's stable
+business thread ID. Agents and tools remain compiler-discovered domain files; do not add an `agents` or
+`tools` map to `defineService`. A tool in another domain can target a public function from the owning
+service; it should not import that domain's private tool file.
 
 “Internal to the domain” does not mean “hidden from MCP.” Tools are exposed through MCP by default unless
 disabled. Review [MCP access](/docs/ai/mcp) and [tool approvals](/docs/ai/approvals) before exposing them.

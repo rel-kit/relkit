@@ -17,6 +17,8 @@ emptyContext.buckets.missing;
 emptyContext.cache.missing;
 // @ts-expect-error undeclared agent clients are not available
 emptyContext.agents.missing;
+// @ts-expect-error progress exists only when the function declares a progress schema
+emptyContext.progress;
 
 const output = z.object({ ok: z.literal(true) });
 const input = z.object({});
@@ -39,6 +41,19 @@ defineFunction({
     void environment;
     void now;
     void delayed;
+    return { ok: true as const };
+  },
+});
+
+defineFunction({
+  id: "types.progress",
+  input,
+  output,
+  progress: z.object({ completed: z.number() }),
+  handler: async (_value, context) => {
+    await context.progress.emit({ completed: 1 });
+    // @ts-expect-error progress values are inferred from the declared schema
+    await context.progress.emit({ completed: "one" });
     return { ok: true as const };
   },
 });

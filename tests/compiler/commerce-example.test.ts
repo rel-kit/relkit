@@ -34,7 +34,7 @@ describe("commerce-example compiler acceptance", () => {
     const application = nodes.find(({ kind }) => kind === "app");
     expect(application).toMatchObject({
       id: "commerce-api",
-      defaults: { bucket: "assets", cache: "requests", model: "openai" },
+      defaults: { bucket: "assets", cache: "requests" },
       deploymentRoles: [
         { role: "engine", integrationId: "pulumi" },
         { role: "host", integrationId: "aws" },
@@ -52,11 +52,13 @@ describe("commerce-example compiler acceptance", () => {
     expect(
       Object.fromEntries(providers.map(({ id, providerSource }) => [id, providerSource.kind])),
     ).toEqual({
+      "provider.agent-state.agents": "connected",
+      "provider.bucket.agent-workspace": "connected",
       "provider.bucket.assets": "connected",
       "provider.bucket.receipts": "infrastructure",
       "provider.cache.requests": "connected",
       "provider.cache.timeline": "infrastructure",
-      "provider.model.openai": "connected",
+      "provider.realtime.default": "connected",
     });
     expect(providers.find(({ id }) => id === "provider.bucket.receipts")).toMatchObject({
       providerSource: { kind: "infrastructure", integrationId: "aws" },
@@ -77,10 +79,15 @@ describe("commerce-example compiler acceptance", () => {
         .filter(({ kind }) => kind === "uses-provider-profile")
         .map(({ from, to }) => [from, to]),
     ).toEqual([
+      ["announcements.feed", "provider.realtime.default"],
       ["assets.objects", "provider.bucket.assets"],
-      ["orders.order-support", "provider.model.openai"],
+      ["orders.agent-workspace", "provider.bucket.agent-workspace"],
+      ["orders.order-deep", "provider.agent-state.agents"],
+      ["orders.order-review", "provider.agent-state.agents"],
+      ["orders.order-support", "provider.agent-state.agents"],
       ["orders.prices", "provider.cache.requests"],
       ["orders.rate-limits", "provider.cache.timeline"],
+      ["orders.updates", "provider.realtime.default"],
       ["receipts.objects", "provider.bucket.receipts"],
     ]);
     expect(nodes.find(({ id }) => id === "route.post.orders")?.config.rateLimit).toEqual({
@@ -94,20 +101,29 @@ describe("commerce-example compiler acceptance", () => {
     expect(
       local.services.map(({ bindingId }: { readonly bindingId: string }) => bindingId),
     ).toEqual([
+      "provider.agent-state.agents",
+      "provider.bucket.agent-workspace",
       "provider.bucket.assets",
       "provider.bucket.receipts",
       "provider.cache.requests",
       "provider.cache.timeline",
+      "provider.realtime.default",
     ]);
     const runtime = JSON.parse(run.normalization.outputs.runtimeIntegrations);
     expect(
       runtime.integrations.map(({ packageName }: { readonly packageName: string }) => packageName),
-    ).toEqual(["@relkit/s3", "@relkit/redis", "@relkit/ai-sdk", "@relkit/otlp", "@relkit/sentry"]);
+    ).toEqual([
+      "@relkit/redis",
+      "@relkit/s3",
+      "@relkit/redis",
+      "@relkit/redis",
+      "@relkit/otlp",
+      "@relkit/sentry",
+    ]);
 
     expect(run.manifest).toContain('from "@relkit/app";');
     expect(run.manifest).not.toMatch(/from "@relkit\/(?:agents|events|invocation)"/);
     expect(run.manifest).not.toContain("providerFactories");
-    expect(run.graphBytes).not.toContain("relkit-synthetic-openai-secret");
     assertDataOnly(graph, run.manifest);
   });
 });

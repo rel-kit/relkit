@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -12,7 +12,7 @@ import {
   type Node,
 } from "@xyflow/react";
 import type { FilteredGraph } from "../../lib/graph-filter";
-import { layoutGraph } from "../../lib/graph-layout";
+import { layoutGraph, type GraphDirection, type GraphLayout } from "../../lib/graph-layout";
 import { graphKindColor, type GraphNode, type GraphSnapshot } from "../../lib/graph-model";
 
 type FlowNode = Node<{ node: GraphNode; label: ReactNode }>;
@@ -21,14 +21,32 @@ export function GraphFlow({
   graph,
   filtered,
   onSelect,
+  direction = "RIGHT",
+  ariaLabel = "Interactive capability graph",
 }: {
   readonly graph: GraphSnapshot;
   readonly filtered: FilteredGraph;
   readonly onSelect: (node: GraphNode) => void;
+  readonly direction?: GraphDirection;
+  readonly ariaLabel?: string;
 }) {
-  const layout = useMemo(() => layoutGraph(graph), [graph]);
+  const [layout, setLayout] = useState<GraphLayout>();
+  const [layoutError, setLayoutError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    setLayout(undefined);
+    setLayoutError("");
+    void layoutGraph(graph, direction).then(
+      (next) => !cancelled && setLayout(next),
+      (error) =>
+        !cancelled && setLayoutError(error instanceof Error ? error.message : String(error)),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [direction, graph]);
   const positions = useMemo(
-    () => new Map(layout.nodes.map((item) => [item.node.id, item])),
+    () => new Map((layout?.nodes ?? []).map((item) => [item.node.id, item])),
     [layout],
   );
   const nodes = useMemo<FlowNode[]>(
@@ -44,14 +62,23 @@ export function GraphFlow({
                 data: {
                   node,
                   label: (
-                    <span className="flow-node-label">
+                    <button
+                      type="button"
+                      className="flow-node-label"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onSelect(node);
+                      }}
+                    >
                       <small>{node.kind}</small>
-                      <strong>{node.id}</strong>
-                    </span>
+                      <strong>{node.label ?? node.id}</strong>
+                      {node.status === undefined ? null : <em>{node.status}</em>}
+                    </button>
                   ),
                 },
                 ariaLabel: `${node.kind} ${node.id}`,
-                className: `flow-node flow-node--${safeClass(node.kind)}`,
+                className: `flow-node flow-node--${safeClass(node.kind)}${node.observed ? " flow-node--observed" : ""}`,
+                focusable: false,
                 style: {
                   width: position.width,
                   minHeight: position.height,
@@ -60,7 +87,7 @@ export function GraphFlow({
               },
             ];
       }),
-    [filtered.nodes, positions],
+    [filtered.nodes, onSelect, positions],
   );
   const edges = useMemo<Edge[]>(
     () =>
@@ -69,14 +96,27 @@ export function GraphFlow({
         source: edge.from,
         target: edge.to,
         label: edge.kind,
-        className: `flow-edge flow-edge--${edge.relationship}`,
+        className: edgeClasses(edge.relationship, edge.kind),
+        ariaLabel: `${edge.relationship} ${edge.kind} from ${edge.from} to ${edge.to}`,
         markerEnd: { type: MarkerType.ArrowClosed },
         animated: edge.relationship === "observed",
       })),
     [filtered.edges],
   );
+  if (layoutError !== "")
+    return (
+      <div className="react-flow-panel graph-layout-status" role="alert">
+        {layoutError}
+      </div>
+    );
+  if (layout === undefined)
+    return (
+      <div className="react-flow-panel graph-layout-status" role="status">
+        Laying out graph…
+      </div>
+    );
   return (
-    <div className="react-flow-panel" role="region" aria-label="Interactive capability graph">
+    <div className="react-flow-panel" role="region" aria-label={ariaLabel}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -102,4 +142,9 @@ export function GraphFlow({
 
 function safeClass(value: string): string {
   return value.replace(/[^A-Za-z0-9_-]/g, "-");
+}
+
+function edgeClasses(relationship: string, kind: string): string {
+  const route = safeClass(kind.split(":", 1)[0] ?? kind);
+  return `flow-edge flow-edge--${relationship} flow-edge--${route}${kind.endsWith(":loop") ? " flow-edge--loop" : ""}`;
 }

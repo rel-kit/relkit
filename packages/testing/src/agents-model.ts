@@ -1,4 +1,11 @@
-import { MockLanguageModelV3 } from "ai/test";
+import type { CallbackManagerForLLMRun } from "@langchain/core/callbacks/manager";
+import {
+  BaseChatModel,
+  type BaseChatModelParams,
+  type BindToolsInput,
+} from "@langchain/core/language_models/chat_models";
+import { AIMessage, type BaseMessage } from "@langchain/core/messages";
+import type { ChatResult } from "@langchain/core/outputs";
 import type {
   TestAgentModel,
   TestAgentModelCall,
@@ -7,7 +14,60 @@ import type {
 } from "./agents-types.js";
 
 interface RuntimeTestAgentModel extends TestAgentModel {
-  readonly languageModel: unknown;
+  readonly languageModel: BaseChatModel;
+}
+
+class ScriptedChatModel extends BaseChatModel {
+  private boundTools: readonly BindToolsInput[] = [];
+
+  constructor(
+    private readonly turn: (request: TestAgentModelCall["request"]) => Promise<TestModelTurn>,
+    private readonly provider: string,
+    private readonly modelId: string,
+  ) {
+    super({} satisfies BaseChatModelParams);
+  }
+
+  _llmType(): string {
+    return `${this.provider}:${this.modelId}`;
+  }
+
+  override bindTools(tools: BindToolsInput[]): this {
+    this.boundTools = [...tools];
+    return this;
+  }
+
+  override async _generate(
+    messages: BaseMessage[],
+    _options?: this["ParsedCallOptions"],
+    _runManager?: CallbackManagerForLLMRun,
+  ): Promise<ChatResult> {
+    const turn = await this.turn({
+      messages: messages.map(snapshotMessage),
+      tools: this.boundTools.map(snapshotTool),
+    });
+    if (turn.type === "error" || turn.type === "cancelled") {
+      throw new Error(turn.type === "error" ? turn.message : (turn.reason ?? "cancelled"));
+    }
+    const toolCall =
+      turn.type === "tool-call"
+        ? {
+            name: presentedToolName(turn.toolId, this.boundTools),
+            args: turn.input as Record<string, unknown>,
+            id: turn.callId,
+            type: "tool_call" as const,
+          }
+        : {
+            name: "relkit_output",
+            args: { value: turn.output },
+            id: "relkit-test-output",
+            type: "tool_call" as const,
+          };
+    return {
+      generations: [{ text: "", message: new AIMessage({ content: "", tool_calls: [toolCall] }) }],
+      llmOutput: {},
+    };
+  }
 }
 
 export function createTestModel(
@@ -18,7 +78,17 @@ export function createTestModel(
   const calls: TestAgentModelCall[] = [];
   const provider = options.provider ?? "test";
   const modelId = options.modelId ?? "default";
-
+  const languageModel = new ScriptedChatModel(
+    async (request) => {
+      if (options.hang === true) return new Promise(() => undefined);
+      const turn = turns[nextTurn++];
+      if (turn === undefined) throw new Error("Test model script exhausted");
+      calls.push(Object.freeze({ index: calls.length, request: Object.freeze(request), turn }));
+      return turn;
+    },
+    provider,
+    modelId,
+  );
   const script = (value: readonly TestModelTurn[]): void => {
     if (!Array.isArray(value)) throw new TypeError("Test model script must be an array");
     turns = Object.freeze([...value]);
@@ -29,27 +99,6 @@ export function createTestModel(
     nextTurn = 0;
     calls.length = 0;
   };
-  const languageModel = new MockLanguageModelV3({
-    provider,
-    modelId,
-    doGenerate: async (request) => {
-      if (options.hang === true) return new Promise(() => undefined);
-      const turn = turns[nextTurn++];
-      if (turn === undefined) throw new Error("Test model script exhausted");
-      calls.push(
-        Object.freeze({
-          index: calls.length,
-          request: Object.freeze({
-            messages: snapshotPrompt(request.prompt),
-            tools: Object.freeze([...(request.tools ?? [])]),
-          }),
-          turn,
-        }),
-      );
-      return resultFor(turn) as never;
-    },
-  });
-
   script(options.script ?? []);
   return Object.freeze({
     provider,
@@ -63,65 +112,27 @@ export function createTestModel(
   });
 }
 
-function resultFor(turn: TestModelTurn): unknown {
-  if (turn.type === "error" || turn.type === "cancelled") {
-    throw new Error(turn.type === "error" ? turn.message : (turn.reason ?? "cancelled"));
-  }
-  return {
-    content:
-      turn.type === "tool-call"
-        ? [
-            {
-              type: "tool-call",
-              toolCallId: turn.callId,
-              toolName: turn.toolId,
-              input: JSON.stringify(turn.input),
-            },
-          ]
-        : [{ type: "text", text: JSON.stringify(turn.output) }],
-    finishReason: { unified: turn.type === "tool-call" ? "tool-calls" : "stop", raw: undefined },
-    usage: {
-      inputTokens: { total: 0, noCache: 0, cacheRead: 0, cacheWrite: 0 },
-      outputTokens: { total: 0, text: 0, reasoning: 0 },
-    },
-    warnings: [],
-  };
+function snapshotMessage(message: BaseMessage): unknown {
+  return { role: message.getType(), content: contentValue(message.content) };
 }
 
-function snapshotPrompt(prompt: readonly unknown[]): readonly unknown[] {
-  return Object.freeze(
-    prompt.map((message) => {
-      if (!isRecord(message) || message.role !== "tool" || !Array.isArray(message.content)) {
-        return message;
-      }
-      const part = message.content[0];
-      if (!isRecord(part) || part.type !== "tool-result") return message;
-      return Object.freeze({ role: "tool", content: toolOutput(part.output) });
-    }),
+function contentValue(value: BaseMessage["content"]): unknown {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+function snapshotTool(value: BindToolsInput): unknown {
+  return { name: "name" in value ? value.name : undefined };
+}
+
+function presentedToolName(id: string, tools: readonly BindToolsInput[]): string {
+  const prefix = id.replaceAll(".", "_");
+  const tool = tools.find(
+    (entry) => "name" in entry && (entry.name === prefix || entry.name.startsWith(`${prefix}_`)),
   );
-}
-
-function toolOutput(value: unknown): unknown {
-  if (!isRecord(value)) return value;
-  if (value.type === "json" && "value" in value) return value.value;
-  if (value.type === "text" && typeof value.value === "string") {
-    try {
-      return JSON.parse(value.value);
-    } catch {
-      return value.value;
-    }
-  }
-  if (value.type === "error-text" && typeof value.value === "string") {
-    const code = value.value.includes("AI_NoSuchToolError")
-      ? "RELKIT_TOOL_NOT_ALLOWED"
-      : value.value.includes("AI_InvalidToolInputError")
-        ? "RELKIT_TOOL_ARGUMENT_VALIDATION"
-        : "RELKIT_TOOL_FAILED";
-    return { error: { code, message: "Tool call failed" } };
-  }
-  return value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return tool && "name" in tool ? tool.name : id;
 }

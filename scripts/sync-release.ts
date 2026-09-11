@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
+import { releaseTemplates } from "./release-templates.js";
 
 const root = resolve(import.meta.dir, "..");
 const repository = "https://github.com/rel-kit/relkit";
@@ -39,6 +40,7 @@ const descriptions: Record<string, string> = {
   "@relkit/provider": "Portable provider authoring and binding protocol for RELKIT.",
   "@relkit/providers-local": "Local runtime providers for RELKIT development and testing.",
   "@relkit/providers-standard": "Standard provider adapters for RELKIT applications.",
+  "@relkit/realtime": "Typed realtime channels and provider contracts for RELKIT.",
   "@relkit/routes": "RELKIT route authoring API; prefer @relkit/app/routes in applications.",
   "@relkit/runtime-effect": "Unsupported internal Effect runtime for RELKIT; use @relkit/app.",
   "@relkit/runtime-hono": "Unsupported internal Hono runtime for RELKIT; use @relkit/app.",
@@ -47,7 +49,6 @@ const descriptions: Record<string, string> = {
   "@relkit/supervisor": "Unsupported internal RELKIT process supervisor; use @relkit/cli.",
   "@relkit/testing": "Testing utilities and local providers for RELKIT applications.",
   "@relkit/tools": "RELKIT tool authoring API; prefer @relkit/app/tools in applications.",
-  "@relkit/ai-sdk": "AI SDK model integration for RELKIT.",
   "@relkit/aws": "AWS host and infrastructure integration for RELKIT.",
   "@relkit/cloudflare": "Cloudflare integration for RELKIT.",
   "@relkit/docker": "Docker local-service integration for RELKIT.",
@@ -116,7 +117,7 @@ for (const directory of workspacePackageDirectories(root)) {
 if (versions.size !== 1)
   throw new Error(`Fixed package versions diverged: ${[...versions].join(", ")}`);
 const version = [...versions][0]!;
-for (const template of ["agent", "api", "minimal"]) {
+for (const template of releaseTemplates) {
   const path = join(root, "templates", "default", "v1", template, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as TemplateManifest;
   for (const field of dependencyFields) {

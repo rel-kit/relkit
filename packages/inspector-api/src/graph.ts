@@ -21,6 +21,7 @@ export const GRAPH_COLLECTIONS = Object.freeze([
   "cache",
   "tools",
   "agents",
+  "channels",
   "errors",
   "services",
   "providers",

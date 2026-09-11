@@ -13,6 +13,8 @@ function schema<Value>() {
 }
 
 export const contract = {
+  "GET /account/profile": oc.input(schema<Record<string, unknown>>()).output(schema<{ "authenticated": boolean; "userId"?: string }>()),
+  "GET /session": oc.input(schema<Record<string, unknown>>()).output(schema<{ "authenticated": boolean; "userId"?: string }>()),
   "route.get.account.profile": oc.input(schema<Record<string, unknown>>()).output(schema<{ "authenticated": boolean; "userId"?: string }>()),
   "route.get.session": oc.input(schema<Record<string, unknown>>()).output(schema<{ "authenticated": boolean; "userId"?: string }>()),
 } as const;

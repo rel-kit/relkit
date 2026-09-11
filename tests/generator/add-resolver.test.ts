@@ -30,19 +30,21 @@ test("resolves an interactive add through the same normalized request", async ()
   });
 });
 
-test("uses unique services and configured model defaults headlessly", async () => {
+test("uses unique services and explicit model selectors headlessly", async () => {
   const request = await resolveAddRequestDetails([
     "agent",
     "Assistant",
     "--project-root",
     `${templates}/agent`,
+    "--model",
+    "test:offline",
     "--instructions",
     "Answer concisely.",
     "--no-install",
   ]);
   expect(request).toMatchObject({
     prompted: false,
-    request: { service: "hello", model: "openai:gpt-5-mini", tools: [] },
+    request: { service: "hello", model: "test:offline", tools: [] },
   });
 });
 

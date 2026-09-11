@@ -102,7 +102,7 @@ export function schemaEntries(descriptor: NormalizedDescriptor): readonly [strin
   const fields =
     (
       {
-        function: ["input", "output"],
+        function: ["input", "output", "progress"],
         job: ["input"],
         event: ["input"],
         cache: ["key", "value"],
@@ -110,11 +110,30 @@ export function schemaEntries(descriptor: NormalizedDescriptor): readonly [strin
         error: ["data"],
       } as Readonly<Record<string, readonly string[]>>
     )[descriptor.kind] ?? [];
-  return fields.flatMap((field) =>
+  const direct = fields.flatMap((field) =>
     value[field] === undefined
       ? []
       : [[schemaKey(descriptor.id, field), value[field]] as [string, unknown]],
   );
+  if (descriptor.kind !== "channel") return direct;
+  const events = isRecord(value.events)
+    ? Object.entries(value.events).map(
+        ([event, eventSchema]) =>
+          [`${descriptor.id}:event:${event}`, eventSchema] as [string, unknown],
+      )
+    : [];
+  const presence =
+    isRecord(value.presence) && value.presence.member !== undefined
+      ? [[`${descriptor.id}:presence:member`, value.presence.member] as [string, unknown]]
+      : [];
+  return [
+    ...direct,
+    ...(value.params === undefined
+      ? []
+      : [[`${descriptor.id}:params`, value.params] as [string, unknown]]),
+    ...events,
+    ...presence,
+  ];
 }
 
 export function cronLike(value: unknown): boolean {

@@ -93,5 +93,6 @@ function engineOptions<Context extends { readonly signal: AbortSignal }>(
     ...(options.clients === undefined ? {} : { clients: options.clients }),
     ...(options.effectRunner === undefined ? {} : { effectRunner: options.effectRunner }),
     ...(options.idSource === undefined ? {} : { idSource: options.idSource }),
+    ...(options.progressSink === undefined ? {} : { progressSink: options.progressSink }),
   };
 }

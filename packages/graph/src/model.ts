@@ -1,8 +1,15 @@
 import type { JsonValue, SourceLocation } from "@relkit/contracts";
-import type { AppNode, EnvironmentVariableNode, GeneratedAgentMarker } from "./foundation-nodes.js";
+import type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
 import type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
 import type { ProviderBindingNode } from "./provider-nodes.js";
 import type { ServiceNode } from "./service-nodes.js";
+import type { AgentNode } from "./agent-node.js";
+export type {
+  AgentNode,
+  AgentResourceDependency,
+  AgentSubagentTopology,
+  AgentWorkflowTopology,
+} from "./agent-node.js";
 
 export const GRAPH_NODE_KINDS = [
   "app",
@@ -16,6 +23,7 @@ export const GRAPH_NODE_KINDS = [
   "cache",
   "tool",
   "agent",
+  "channel",
   "provider",
   "service",
   "middleware",
@@ -61,6 +69,8 @@ export interface HttpTriggerConfig {
   };
   readonly maxBodyBytes?: number;
   readonly timeoutMs?: number;
+  readonly client?: false | { readonly operation: "query" | "mutation" };
+  readonly stream?: { readonly format: "sse" | "text" | "bytes" };
 }
 export interface EventTriggerConfig {
   readonly eventId: string;
@@ -126,15 +136,13 @@ export interface HookNode extends GraphNodeBase<"hook"> {
   readonly ownerKind: "function" | "tool";
   readonly phase: "before" | "after";
 }
-export interface AgentNode extends GraphNodeBase<"agent"> {
-  readonly input: JsonValue;
-  readonly output: JsonValue;
-  readonly model?: string;
-  readonly instructions: JsonValue;
-  readonly toolIds: readonly string[];
-  readonly limits: JsonValue;
-  readonly generatedFunction: GeneratedAgentMarker;
+export interface ChannelNode extends GraphNodeBase<"channel"> {
+  readonly params: JsonValue;
+  readonly events: Readonly<Record<string, JsonValue>>;
   readonly profile: string;
+  readonly client: "internal" | "public" | "protected";
+  readonly replay?: JsonValue;
+  readonly presence?: JsonValue;
 }
 export type GraphNode =
   | AppNode
@@ -148,6 +156,7 @@ export type GraphNode =
   | CacheNode
   | ToolNode
   | AgentNode
+  | ChannelNode
   | ProviderBindingNode
   | ServiceNode
   | MiddlewareNode

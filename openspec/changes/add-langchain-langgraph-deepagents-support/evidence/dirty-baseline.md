@@ -1,0 +1,500 @@
+# Pre-existing dirty-path baseline
+
+Captured before implementation source edits for `add-langchain-langgraph-deepagents-support`.
+The OpenSpec change directory itself is excluded.
+
+Files: 490
+
+```text
+ M apps/docs/content/docs/ai/agents.mdx
+ M apps/docs/content/docs/ai/meta.json
+ M apps/docs/content/docs/api/agents.mdx
+ M apps/docs/content/docs/api/app.mdx
+ M apps/docs/content/docs/api/better-auth.mdx
+ M apps/docs/content/docs/api/client.mdx
+ M apps/docs/content/docs/api/functions.mdx
+ M apps/docs/content/docs/api/integrations/local.mdx
+ M apps/docs/content/docs/api/integrations/redis.mdx
+ M apps/docs/content/docs/api/meta.json
+ M apps/docs/content/docs/api/routes.mdx
+ M apps/docs/content/docs/api/testing.mdx
+ M apps/docs/content/docs/http/generated-clients.mdx
+ M apps/docs/content/docs/http/index.mdx
+ M apps/docs/content/docs/http/meta.json
+ M apps/docs/content/docs/meta.json
+ M apps/docs/content/docs/operations/cli-reference.mdx
+ M apps/docs/content/docs/operations/meta.json
+ M apps/docs/content/generated/capabilities.mdx
+ M apps/docs/content/generated/coverage.json
+ M apps/docs/content/generated/create-options.mdx
+ M apps/docs/content/generated/related/ai-agents.mdx
+ M apps/docs/content/generated/related/ai-approvals.mdx
+ M apps/docs/content/generated/related/ai-first-agent.mdx
+ M apps/docs/content/generated/related/ai-mcp.mdx
+ M apps/docs/content/generated/related/http-responses.mdx
+ M apps/docs/content/generated/related/operations-inspector.mdx
+ M apps/docs/next-env.d.ts
+ M apps/docs/package.json
+ M apps/docs/scripts/ai-guide-catalog.ts
+ M apps/docs/scripts/documentation-catalog.ts
+ M apps/docs/scripts/feature-catalog.ts
+ M apps/docs/scripts/guide-catalog.ts
+ M apps/docs/scripts/http-guide-catalog.ts
+ M apps/docs/tests/ai-learning.test.ts
+ M apps/docs/tests/documentation.test.ts
+ M apps/docs/tests/http-learning.test.ts
+ M apps/inspector/app/%5Frelkit/backend/[...path]/route.ts
+ M apps/inspector/app/agent-detail-client.tsx
+ M apps/inspector/app/agent-detail-view.tsx
+ M apps/inspector/app/globals.css
+ M apps/inspector/app/navigation-data.ts
+ M apps/inspector/app/routes/route-composer.tsx
+ M apps/inspector/app/routes/route-detail-client.tsx
+ M apps/inspector/lib/agents-model.test.ts
+ M apps/inspector/lib/agents-model.ts
+ M apps/inspector/lib/api-types.ts
+ M apps/inspector/lib/api.ts
+ M apps/inspector/lib/route-request.ts
+ M apps/inspector/next-env.d.ts
+ M apps/inspector/package.json
+ M bun.lock
+ M examples/auth-drizzle/.relkit/generated/application.graph.json
+ M examples/auth-drizzle/.relkit/generated/client-contract.json
+ M examples/auth-drizzle/.relkit/generated/contract.ts
+ M examples/auth-drizzle/.relkit/generated/openapi.json
+ M examples/auth-drizzle/.relkit/generated/runtime.manifest.ts
+ M examples/commerce/.relkit/generated/application.graph.json
+ M examples/commerce/.relkit/generated/openapi.json
+ M examples/commerce/.relkit/generated/runtime.manifest.ts
+ M examples/commerce/package.json
+ M examples/commerce/relkit.config.ts
+ M examples/commerce/src/orders/agents/order-support.agent.ts
+ M examples/commerce/src/orders/functions/get-order.function.ts
+ M examples/commerce/src/orders/functions/update-order.function.ts
+ M examples/commerce/src/orders/service.ts
+ M examples/commerce/src/platform/schemas.ts
+ M examples/commerce/tests/http.test.ts
+ M examples/data-model/.relkit/generated/application.graph.json
+ M examples/data-model/.relkit/generated/client-contract.json
+ M examples/data-model/.relkit/generated/contract.ts
+ M examples/data-model/.relkit/generated/openapi.json
+ M examples/data-model/.relkit/generated/runtime.manifest.ts
+ M integrations/packages/local/package.json
+ M integrations/packages/local/src/providers.ts
+ M integrations/packages/local/src/runtime/integration.ts
+ M integrations/packages/redis/package.json
+ M integrations/packages/redis/redis.test.ts
+ M integrations/packages/redis/src/index.ts
+ M integrations/packages/redis/src/redis.ts
+ M integrations/packages/redis/src/runtime/client.ts
+ M integrations/packages/redis/src/runtime/index.ts
+ M packages/agents/runtime.test.ts
+ M packages/agents/src/define-agent.ts
+ M packages/agents/src/index.ts
+ M packages/agents/src/runtime-loop-telemetry.ts
+ M packages/agents/src/runtime-loop.ts
+ M packages/agents/src/runtime-tool-adapter.ts
+ M packages/agents/src/runtime-tools.ts
+ M packages/agents/src/runtime-utils.ts
+ M packages/agents/src/runtime.ts
+ M packages/agents/test-model.ts
+ M packages/app/package.json
+ M packages/app/src/define-app-types.ts
+ M packages/app/src/index.ts
+ M packages/better-auth/package.json
+ M packages/cli/__snapshots__/main.test.ts.snap
+ M packages/cli/commands-core.test.ts
+ M packages/cli/deploy.test.ts
+ M packages/cli/package.json
+ M packages/cli/src/cli-command-groups.ts
+ M packages/cli/src/cli-help-model.ts
+ M packages/cli/src/command-dispatch.ts
+ M packages/cli/src/commands/build-server-http.ts
+ M packages/cli/src/commands/build-server-invocation.ts
+ M packages/cli/src/commands/build-server-runtime.ts
+ M packages/cli/src/commands/build-server-shutdown.ts
+ M packages/cli/src/commands/build-server.ts
+ M packages/cli/src/commands/check-support.ts
+ M packages/cli/src/commands/client.ts
+ M packages/cli/start-built.test.ts
+ M packages/client-generator/src/generate-contract.ts
+ M packages/client-generator/src/generate-types.ts
+ M packages/client-generator/src/index.ts
+ M packages/client/client.test.ts
+ M packages/client/package.json
+ M packages/client/src/index.ts
+ M packages/client/src/server.ts
+ M packages/client/tsconfig.json
+ M packages/compiler/src/config-loader-utils.ts
+ M packages/compiler/src/conventions.ts
+ M packages/compiler/src/discovery/ast-prefilter-utils.ts
+ M packages/compiler/src/discovery/source-facts-factory.ts
+ M packages/compiler/src/discovery/source-id.ts
+ M packages/compiler/src/generate-manifest-format.ts
+ M packages/compiler/src/generate-manifest.ts
+ M packages/compiler/src/generated-artifacts.ts
+ M packages/compiler/src/normalize-compat.ts
+ M packages/compiler/src/normalize-graph-app.ts
+ M packages/compiler/src/normalize-graph-config.ts
+ M packages/compiler/src/normalize-graph-edge-helpers.ts
+ M packages/compiler/src/normalize-graph-node.ts
+ M packages/compiler/src/normalize-output.ts
+ M packages/compiler/src/normalize-pass-semantic.ts
+ M packages/compiler/src/normalize-provider-validation.ts
+ M packages/compiler/src/normalize-schema-validation.ts
+ M packages/compiler/src/normalize-types.ts
+ M packages/compiler/src/normalize-utils.ts
+ M packages/contracts/src/descriptor.ts
+ M packages/contracts/src/id.ts
+ M packages/contracts/src/index.ts
+ M packages/contracts/src/version.ts
+ M packages/create-relkit/src/options.ts
+ M packages/deploy/src/from-graph-boundary.ts
+ M packages/engine/src/context.ts
+ M packages/engine/src/index.ts
+ M packages/engine/src/invocation-dispatcher.ts
+ M packages/engine/src/invoke-runtime.ts
+ M packages/engine/src/invoke-types.ts
+ M packages/engine/src/invoke.ts
+ M packages/engine/src/provider-registry-validation.ts
+ M packages/events/source-export.test.ts
+ M packages/functions/src/define-function-types.ts
+ M packages/functions/src/function-descriptor-factory.ts
+ M packages/functions/src/function-descriptor-types.ts
+ M packages/functions/src/index.ts
+ M packages/graph/src/domain-nodes.ts
+ M packages/graph/src/model.ts
+ M packages/graph/src/provider-nodes.ts
+ M packages/graph/src/registration-plan.ts
+ M packages/inspector-api/contracts-data.ts
+ M packages/inspector-api/contracts-readonly.test.ts
+ M packages/inspector-api/src/graph.ts
+ M packages/invocation/src/contracts.ts
+ M packages/invocation/src/dispatcher-context.ts
+ M packages/invocation/src/dispatcher-types.ts
+ M packages/invocation/src/index.ts
+ M packages/invocation/src/standalone-dispatcher.ts
+ M packages/providers-local/package.json
+ M packages/providers-local/src/index.ts
+ M packages/routes/define-route.test.ts
+ M packages/routes/src/define-route.ts
+ M packages/routes/src/route-types.ts
+ M packages/runtime-hono/package.json
+ M packages/runtime-hono/src/auth.ts
+ M packages/runtime-hono/src/create-app.ts
+ M packages/runtime-hono/src/index.ts
+ M packages/runtime-hono/src/materialize-routes-utils.ts
+ M packages/runtime-hono/src/materialize-routes.ts
+ M packages/runtime-hono/src/rpc.ts
+ M packages/supervisor/proxy.test.ts
+ M packages/supervisor/src/drain.ts
+ M packages/supervisor/src/proxy.ts
+ M packages/testing/package.json
+ M packages/testing/src/agents-model.ts
+ M packages/testing/src/application-registry.ts
+ M packages/testing/src/application.ts
+ M packages/testing/src/events.ts
+ M packages/testing/src/index.ts
+ M packages/testing/src/jobs-utils.ts
+ M packages/tools/src/runtime.ts
+ M scripts/authoring-scan-utils.ts
+ M scripts/authoring-scan.ts
+ M scripts/boundary-directions.ts
+ M scripts/boundary-imports.ts
+ M scripts/check-boundaries.ts
+ M scripts/pack-and-smoke-create-relkit-support.ts
+ M scripts/pack-and-smoke-create-relkit.ts
+ M scripts/package-create-relkit-templates.ts
+ M scripts/public-declaration-agent.ts
+ M scripts/release-check-artifacts.ts
+ M scripts/release-package-contract.ts
+ M scripts/scope-scan.ts
+ M scripts/sync-release.ts
+ M tests/compiler/commerce-example.test.ts
+ M tests/compiler/fixtures/valid-full/expected.graph.json
+ M tests/compiler/fixtures/valid-inferred-identities/expected.graph.json
+ M tests/compiler/fixtures/valid-minimal/expected.graph.json
+ M tests/compiler/fixtures/warning-wrong-directory/expected.graph.json
+ M tests/compiler/fixtures/warning-wrong-suffix/expected.graph.json
+ M tests/compiler/generated-artifacts.test.ts
+ M tests/compiler/runtime-integration-plan.test.ts
+ M tests/contracts/canonical-contracts.test.ts
+ M tests/contracts/redis.test.ts
+ M tests/contracts/version-cohort.test.ts
+ M tests/deployment/golden/plan-full.json
+ M tests/deployment/golden/plan-minimal.json
+ M tests/e2e/inspector-redesign.spec.ts-snapshots/routes-table-light-darwin.png
+ M tests/e2e/inspector-redesign.spec.ts-snapshots/shell-mobile-darwin.png
+ M tests/e2e/inspector.spec.ts
+ M tests/generator/add-acceptance.test.ts
+ M tests/generator/option-matrix.test.ts
+ M tests/graph/model.test.ts
+ M tests/inspector/fixture-backend.ts
+ M tests/inspector/inspector-scans.test.ts
+ M tests/inspector/inspector-scans.ts
+ M tests/integration/agents/commerce-example.test.ts
+ M tests/integration/http/commerce-example.test.ts
+ M tests/integration/http/fixtures/orders.openapi.json
+ M tests/integration/local-docker-services.test.ts
+ M tests/types/function-context.ts
+ M tests/types/tsconfig.json
+ M tsconfig.json
+?? .agents/skills/streamdown/SKILL.md
+?? .agents/skills/streamdown/assets/examples/basic-streaming.tsx
+?? .agents/skills/streamdown/assets/examples/custom-security.tsx
+?? .agents/skills/streamdown/assets/examples/full-featured.tsx
+?? .agents/skills/streamdown/assets/examples/static-mode.tsx
+?? .agents/skills/streamdown/assets/examples/with-caret.tsx
+?? .agents/skills/streamdown/references/api.md
+?? .agents/skills/streamdown/references/features.md
+?? .agents/skills/streamdown/references/plugins.md
+?? .agents/skills/streamdown/references/security.md
+?? .agents/skills/streamdown/references/styling.md
+?? .changeset/realtime-runtime.md
+?? apps/docs/content/docs/ai/streaming.mdx
+?? apps/docs/content/docs/ai/threads-recovery.mdx
+?? apps/docs/content/docs/api/realtime.mdx
+?? apps/docs/content/docs/client/authentication.mdx
+?? apps/docs/content/docs/client/index.mdx
+?? apps/docs/content/docs/client/meta.json
+?? apps/docs/content/docs/client/mutations.mdx
+?? apps/docs/content/docs/client/offline.mdx
+?? apps/docs/content/docs/client/routes.mdx
+?? apps/docs/content/docs/client/ssr.mdx
+?? apps/docs/content/docs/client/streams.mdx
+?? apps/docs/content/docs/http/streaming.mdx
+?? apps/docs/content/docs/operations/realtime-agents-streaming.mdx
+?? apps/docs/content/docs/realtime/access.mdx
+?? apps/docs/content/docs/realtime/index.mdx
+?? apps/docs/content/docs/realtime/meta.json
+?? apps/docs/content/docs/realtime/presence.mdx
+?? apps/docs/content/docs/realtime/providers.mdx
+?? apps/docs/content/docs/realtime/react.mdx
+?? apps/docs/content/docs/realtime/recovery.mdx
+?? apps/docs/content/generated/related/ai-streaming.mdx
+?? apps/docs/content/generated/related/ai-threads-recovery.mdx
+?? apps/docs/content/generated/related/client-authentication.mdx
+?? apps/docs/content/generated/related/client-index.mdx
+?? apps/docs/content/generated/related/client-mutations.mdx
+?? apps/docs/content/generated/related/client-offline.mdx
+?? apps/docs/content/generated/related/client-routes.mdx
+?? apps/docs/content/generated/related/client-ssr.mdx
+?? apps/docs/content/generated/related/client-streams.mdx
+?? apps/docs/content/generated/related/http-streaming.mdx
+?? apps/docs/content/generated/related/operations-realtime-agents-streaming.mdx
+?? apps/docs/content/generated/related/realtime-access.mdx
+?? apps/docs/content/generated/related/realtime-index.mdx
+?? apps/docs/content/generated/related/realtime-presence.mdx
+?? apps/docs/content/generated/related/realtime-providers.mdx
+?? apps/docs/content/generated/related/realtime-react.mdx
+?? apps/docs/content/generated/related/realtime-recovery.mdx
+?? apps/docs/scripts/client-guide-catalog.ts
+?? apps/docs/scripts/realtime-feature.ts
+?? apps/docs/scripts/realtime-guide-catalog.ts
+?? apps/inspector/app/agent-activity-panel.tsx
+?? apps/inspector/app/agent-live-console.tsx
+?? apps/inspector/app/agent-live-controls.tsx
+?? apps/inspector/app/agent-live-observer.ts
+?? apps/inspector/app/agent-live-runtime.ts
+?? apps/inspector/app/agent-live-state.tsx
+?? apps/inspector/app/agent-observation.ts
+?? apps/inspector/app/agent-tool-accordion.tsx
+?? apps/inspector/app/agents/[id]/chat/page.tsx
+?? apps/inspector/app/application-runtime-client.ts
+?? apps/inspector/app/application-runtime-types.ts
+?? apps/inspector/app/channels/[id]/page.tsx
+?? apps/inspector/app/channels/channel-detail-client.tsx
+?? apps/inspector/app/channels/channel-live-console.tsx
+?? apps/inspector/app/channels/channels-client.tsx
+?? apps/inspector/app/channels/page.tsx
+?? apps/inspector/lib/agent-live-observer.test.ts
+?? apps/inspector/lib/agent-observation.test.ts
+?? apps/inspector/lib/agents-model-types.ts
+?? apps/inspector/lib/backend-proxy-security.test.ts
+?? apps/inspector/lib/backend-proxy-security.ts
+?? apps/inspector/lib/route-stream.test.ts
+?? docs/specs/realtime-compatibility.md
+?? examples/commerce-web/AGENTS.md
+?? examples/commerce-web/CLAUDE.md
+?? examples/commerce-web/app/layout.tsx
+?? examples/commerce-web/app/page.test.ts
+?? examples/commerce-web/app/page.tsx
+?? examples/commerce-web/app/providers.tsx
+?? examples/commerce-web/next-env.d.ts
+?? examples/commerce-web/next.config.ts
+?? examples/commerce-web/package.json
+?? examples/commerce-web/tsconfig.json
+?? examples/commerce/src/announcements/channels/announcements.channel.ts
+?? examples/commerce/src/announcements/functions/post-announcement.function.ts
+?? examples/commerce/src/announcements/service.ts
+?? examples/commerce/src/orders/channels/order-updates.channel.ts
+?? examples/commerce/src/orders/functions/stream-order-report.function.ts
+?? examples/commerce/src/routes/announcements/route.ts
+?? examples/commerce/src/routes/reports/[reportId]/route.ts
+?? integrations/packages/redis/src/realtime.ts
+?? integrations/packages/redis/src/runtime/agent-state-provider.ts
+?? integrations/packages/redis/src/runtime/realtime-provider.ts
+?? integrations/packages/redis/src/runtime/state-store.ts
+?? packages/agents/client-events.test.ts
+?? packages/agents/src/agent-client.ts
+?? packages/agents/src/agent-validation.ts
+?? packages/agents/src/client-events.ts
+?? packages/agents/src/runtime-tool-events.ts
+?? packages/agents/src/state-control-requests.ts
+?? packages/agents/src/state-provider.ts
+?? packages/agents/src/state-receipts.ts
+?? packages/agents/src/state-thread-requests.ts
+?? packages/agents/src/state-types.ts
+?? packages/agents/src/thread-transition.ts
+?? packages/agents/thread-transition.test.ts
+?? packages/app/src/realtime.ts
+?? packages/better-auth/src/react.ts
+?? packages/cli/src/cli-command-client.ts
+?? packages/cli/src/cli-help-client.ts
+?? packages/cli/src/commands/build-server-registration.ts
+?? packages/cli/src/commands/client-check.ts
+?? packages/client-generator/src/generate-registry.ts
+?? packages/client/agent-observation.test.ts
+?? packages/client/context-support.test.ts
+?? packages/client/src/react/agent-hook-types.ts
+?? packages/client/src/react/agent-hook.ts
+?? packages/client/src/react/agent-observation-index.ts
+?? packages/client/src/react/agent-observation.ts
+?? packages/client/src/react/agent-reconcile.ts
+?? packages/client/src/react/context-support.ts
+?? packages/client/src/react/context.tsx
+?? packages/client/src/react/finite-hooks.ts
+?? packages/client/src/react/index.ts
+?? packages/client/src/react/keys.ts
+?? packages/client/src/react/pending.ts
+?? packages/client/src/react/procedure.ts
+?? packages/client/src/react/realtime-hook.ts
+?? packages/client/src/react/realtime-manager.ts
+?? packages/client/src/react/registry.ts
+?? packages/client/src/react/stream-hook.ts
+?? packages/client/src/server-context.ts
+?? packages/compiler/src/normalize-codes.ts
+?? packages/compiler/src/normalize-graph-agent.ts
+?? packages/compiler/src/normalize-graph-channel.ts
+?? packages/contracts/src/client.ts
+?? packages/contracts/src/runtime-limits.ts
+?? packages/engine/src/invoke-start.ts
+?? packages/engine/src/provider-requirements.ts
+?? packages/engine/src/stream-runtime.ts
+?? packages/functions/progress.test.ts
+?? packages/functions/src/stream.ts
+?? packages/functions/stream.test.ts
+?? packages/invocation/src/progress.ts
+?? packages/invocation/src/standalone-completion.ts
+?? packages/invocation/src/stream-runtime.ts
+?? packages/providers-local/agent-state.test.ts
+?? packages/providers-local/realtime.test.ts
+?? packages/providers-local/src/agent-state/common.ts
+?? packages/providers-local/src/agent-state/continuations.ts
+?? packages/providers-local/src/agent-state/control-lifecycle.ts
+?? packages/providers-local/src/agent-state/control-recovery.ts
+?? packages/providers-local/src/agent-state/controls.ts
+?? packages/providers-local/src/agent-state/index.ts
+?? packages/providers-local/src/agent-state/journal.ts
+?? packages/providers-local/src/agent-state/provider.ts
+?? packages/providers-local/src/agent-state/run-claims.ts
+?? packages/providers-local/src/agent-state/run-completion.ts
+?? packages/providers-local/src/agent-state/run-journal-write.ts
+?? packages/providers-local/src/agent-state/run-recovery.ts
+?? packages/providers-local/src/agent-state/run-state.ts
+?? packages/providers-local/src/agent-state/runs.ts
+?? packages/providers-local/src/agent-state/state.ts
+?? packages/providers-local/src/agent-state/storage.ts
+?? packages/providers-local/src/agent-state/thread-list.ts
+?? packages/providers-local/src/agent-state/threads.ts
+?? packages/providers-local/src/realtime/common.ts
+?? packages/providers-local/src/realtime/events.ts
+?? packages/providers-local/src/realtime/index.ts
+?? packages/providers-local/src/realtime/presence.ts
+?? packages/providers-local/src/realtime/provider.ts
+?? packages/providers-local/src/realtime/state.ts
+?? packages/providers-local/src/realtime/storage.ts
+?? packages/realtime/channel.test.ts
+?? packages/realtime/operation-id.test.ts
+?? packages/realtime/package.json
+?? packages/realtime/src/channel-validation.ts
+?? packages/realtime/src/channel.ts
+?? packages/realtime/src/dispatch.ts
+?? packages/realtime/src/index.ts
+?? packages/realtime/src/operation-id.ts
+?? packages/realtime/src/provider-dispatcher.ts
+?? packages/realtime/src/provider.ts
+?? packages/realtime/src/types.ts
+?? packages/realtime/tsconfig.json
+?? packages/routes/src/route-client.ts
+?? packages/runtime-hono/agent-approval-rpc.test.ts
+?? packages/runtime-hono/agent-protocol.test.ts
+?? packages/runtime-hono/agent-rpc.test.ts
+?? packages/runtime-hono/client-identity.test.ts
+?? packages/runtime-hono/native-stream.test.ts
+?? packages/runtime-hono/realtime-rpc.test.ts
+?? packages/runtime-hono/rpc-websocket.test.ts
+?? packages/runtime-hono/src/agent-active-execution.ts
+?? packages/runtime-hono/src/agent-approval-coordinator.ts
+?? packages/runtime-hono/src/agent-content-sink.ts
+?? packages/runtime-hono/src/agent-control-worker.ts
+?? packages/runtime-hono/src/agent-follow-up.ts
+?? packages/runtime-hono/src/agent-progress-sink.ts
+?? packages/runtime-hono/src/agent-protocol-frame-state.ts
+?? packages/runtime-hono/src/agent-protocol-progress.ts
+?? packages/runtime-hono/src/agent-protocol-stream.ts
+?? packages/runtime-hono/src/agent-protocol-support.ts
+?? packages/runtime-hono/src/agent-protocol-tool.ts
+?? packages/runtime-hono/src/agent-protocol.ts
+?? packages/runtime-hono/src/agent-rpc-errors.ts
+?? packages/runtime-hono/src/agent-rpc-read.ts
+?? packages/runtime-hono/src/agent-rpc-support.ts
+?? packages/runtime-hono/src/agent-rpc-worker.ts
+?? packages/runtime-hono/src/agent-rpc-write.ts
+?? packages/runtime-hono/src/agent-rpc.ts
+?? packages/runtime-hono/src/agent-run-journal.ts
+?? packages/runtime-hono/src/agent-run-tasks.ts
+?? packages/runtime-hono/src/agent-runtime.ts
+?? packages/runtime-hono/src/bun.ts
+?? packages/runtime-hono/src/client-authorization.ts
+?? packages/runtime-hono/src/client-identity.ts
+?? packages/runtime-hono/src/native-stream.ts
+?? packages/runtime-hono/src/realtime-rpc-support.ts
+?? packages/runtime-hono/src/realtime-rpc.ts
+?? packages/runtime-hono/src/realtime-runtime.ts
+?? packages/runtime-hono/src/rpc-identity.ts
+?? packages/runtime-hono/src/rpc-response.ts
+?? packages/runtime-hono/src/rpc-route-types.ts
+?? packages/runtime-hono/src/rpc-websocket.ts
+?? packages/runtime-hono/src/transport-security.ts
+?? packages/runtime-hono/transport-security.test.ts
+?? packages/supervisor/src/proxy-websocket.ts
+?? packages/testing/src/application-realtime.ts
+?? packages/testing/src/state-providers.ts
+?? plans/relkit-full-scope-consolidation-handoff.md
+?? plans/relkit-realtime-client-plan-v3.md
+?? scripts/release-templates.ts
+?? scripts/scaffold-smoke-source.ts
+?? templates/default/v1/fullstack/.env.example
+?? templates/default/v1/fullstack/.gitignore
+?? templates/default/v1/fullstack/README.md
+?? templates/default/v1/fullstack/package.json
+?? templates/default/v1/fullstack/relkit.config.ts
+?? templates/default/v1/fullstack/src/hello/functions/hello.function.ts
+?? templates/default/v1/fullstack/src/hello/service.ts
+?? templates/default/v1/fullstack/src/platform/env.ts
+?? templates/default/v1/fullstack/src/routes/hello/route.ts
+?? templates/default/v1/fullstack/tests/integration/hello.route.test.ts
+?? templates/default/v1/fullstack/tests/unit/hello.function.test.ts
+?? templates/default/v1/fullstack/tsconfig.json
+?? templates/default/v1/fullstack/web/app/layout.tsx
+?? templates/default/v1/fullstack/web/app/page.tsx
+?? templates/default/v1/fullstack/web/app/providers.tsx
+?? templates/default/v1/fullstack/web/next-env.d.ts
+?? templates/default/v1/fullstack/web/next.config.ts
+?? templates/default/v1/fullstack/web/tsconfig.json
+?? tests/integration/redis-state-acceptance.ts
+?? tests/types/client-react.ts
+?? tests/types/realtime.ts
+```
+

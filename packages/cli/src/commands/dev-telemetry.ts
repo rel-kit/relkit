@@ -18,6 +18,7 @@ import {
 } from "@relkit/observability/local";
 import { streamTypeForRecord } from "./dev-telemetry-stream.js";
 import { collectProducerStatus } from "./dev-telemetry-status.js";
+import { telemetryOpenFailure } from "./dev-telemetry-error.js";
 export async function startDevTelemetry(
   projectRoot: string,
   configuration: TelemetryConfiguration = {},
@@ -48,9 +49,7 @@ export async function startDevTelemetry(
     });
   } catch (cause) {
     await worker.close();
-    throw new Error(
-      `Cannot open local telemetry database. Another dev session may own it: ${cause instanceof Error ? cause.message : String(cause)}`,
-    );
+    throw telemetryOpenFailure(root, cause);
   }
   const stream = createObservabilityStream();
   let streamClosed = false;

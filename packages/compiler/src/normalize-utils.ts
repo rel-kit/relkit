@@ -28,6 +28,7 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
     "cache",
     "tool",
     "agent",
+    "channel",
     "constants",
     "prompt",
   ].includes(value as DescriptorKind);

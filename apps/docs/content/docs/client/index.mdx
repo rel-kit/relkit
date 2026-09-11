@@ -1,0 +1,26 @@
+---
+title: Typed React client
+description: Use generated declarations and public hooks without importing application source into the browser.
+---
+
+## Install the provider
+
+Install `@relkit/client`, generate the client contract with `relkit client pull`, and include the
+generated declarations with `withRelkit()` for Next.js or `relkit()` for Vite. Feature components
+import only `@relkit/client/react`.
+
+<include cwd lang="tsx" meta='title="examples/commerce-web/app/providers.tsx"'>
+  ../../examples/commerce-web/app/providers.tsx
+</include>
+
+## Enforce compatibility
+
+The provider defaults to the same-origin backend, credentialed requests, a 30-second finite request
+timeout, and a 10-second stream-establishment timeout. An established healthy stream is not capped by
+the finite timeout. Run `relkit client check` in CI to reject stale declarations or fingerprints.
+
+The exact public-contract fingerprint must match. A mismatch enters `application-updated` and blocks
+new typed work until frontend and backend are coordinated; unresolved mutation or control metadata is
+preserved rather than retried.
+
+<include cwd>content/generated/related/client-index.mdx</include>

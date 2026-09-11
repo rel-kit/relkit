@@ -81,6 +81,7 @@ export function RouteDetailClient() {
         route={route}
         target={target}
         invoke={(input) => api.invokeRoute(input)}
+        {...streamInvocation(route, api)}
         onComplete={(next) => {
           setResult(next);
           loadRequests();
@@ -146,4 +147,16 @@ function record(value: unknown): InspectorObject | undefined {
 }
 function text(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+function streamInvocation(route: InspectorObject, api: ReturnType<typeof createInspectorClient>) {
+  const format = text(record(record(route.config)?.stream)?.format);
+  if (format !== "sse" && format !== "text" && format !== "bytes") return {};
+  return {
+    invokeStream: (
+      input: { path: string; init: RequestInit },
+      onFrame: Parameters<typeof api.invokeRouteStream>[2],
+      signal: AbortSignal,
+    ) => api.invokeRouteStream(input, format, onFrame, signal),
+  };
 }

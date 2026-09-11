@@ -37,6 +37,7 @@ const descriptorKinds: readonly DescriptorKind[] = [
   "cache",
   "tool",
   "agent",
+  "channel",
   "constants",
   "prompt",
 ];

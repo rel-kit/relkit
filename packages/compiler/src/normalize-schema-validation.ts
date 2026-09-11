@@ -56,6 +56,7 @@ function requiredSchemaFields(kind: string): readonly string[] {
         event: ["input"],
         cache: ["key", "value"],
         agent: ["input", "output"],
+        channel: ["params"],
         error: ["data"],
       } as Readonly<Record<string, readonly string[]>>
     )[kind] ?? []

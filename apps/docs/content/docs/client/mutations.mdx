@@ -1,0 +1,23 @@
+---
+title: Mutations
+description: Execute finite writes without implicit retries or an offline queue.
+---
+
+## Submit once
+
+`useRouteMutation` never runs on mount and defaults to no retry. Known-offline work fails as
+`not-sent`; after a request is handed to `fetch`, timeout or disconnect is conservatively `unknown`.
+Relkit stores only scoped reconciliation metadata in `sessionStorage`, never variables or retry
+payloads. Application mutations need an application-owned status endpoint to reconcile an unknown
+outcome.
+
+Every managed write carries the rendered identity scope and session epoch as a precondition. The
+server authenticates independently and compares them before application code runs.
+
+## See the executable client
+
+<include cwd lang="tsx" meta='title="examples/commerce-web/app/page.tsx"'>
+  ../../examples/commerce-web/app/page.tsx
+</include>
+
+<include cwd>content/generated/related/client-mutations.mdx</include>

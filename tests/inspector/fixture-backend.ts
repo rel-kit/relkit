@@ -14,6 +14,7 @@ import {
   type InspectorActionServices,
   type InspectorActiveGeneration,
 } from "../../packages/inspector-api/src/index.ts";
+import { createAgentApplicationFixture } from "./fixture-agent-runtime.ts";
 
 export const FIXTURE_GRAPH_HASH = "sha256:commerce-inspector-fixture-v1";
 export const FIXTURE_GENERATION_ID = "commerce-generation-1";
@@ -268,10 +269,78 @@ const graph = {
       model: "default",
       input: { type: "object", properties: { question: schema("string") } },
       output: { type: "object", properties: { answer: schema("string") } },
+      client: "public",
+      chat: { input: "message", output: "answer" },
+      controls: ["steer", "follow-up", "stop", "approve"],
       toolIds: ["orders.get.tool"],
+      subagents: [{ id: "researcher", subagents: [] }],
+      resourceDependencies: [
+        { kind: "agent-state", profile: "default" },
+        { kind: "memory", id: "customers", ownership: "borrowed" },
+        { kind: "bucket", id: "assets" },
+        { kind: "skills", count: 2 },
+      ],
       generatedFunction: { functionId: "relkit.agent.support.order.invoke", generated: true },
       limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
       source: source("src/agents/order-support.agent.ts", 3),
+    },
+    {
+      kind: "agent",
+      id: "orders.review",
+      execution: "graph",
+      input: { type: "object", properties: { orderId: schema("string") } },
+      output: { type: "object", properties: { approved: schema("boolean") } },
+      client: "public",
+      controls: ["stop"],
+      toolIds: [],
+      clientContract: {
+        state: [
+          { name: "orderId", schema: schema("string") },
+          { name: "approved", optional: true, schema: schema("boolean") },
+        ],
+      },
+      workflow: {
+        start: "__start__",
+        end: "__end__",
+        nodes: [
+          { id: "lookup", kind: "node" },
+          { id: "risk", kind: "node" },
+          { id: "review", kind: "node" },
+          { id: "fulfill", kind: "subgraph" },
+          { id: "retry", kind: "node" },
+        ],
+        edges: [
+          { kind: "edge", from: "__start__", to: "lookup" },
+          { kind: "edge", from: "__start__", to: "risk" },
+          { kind: "join", from: ["lookup", "risk"], to: "review" },
+          { kind: "edge", from: "review", to: "retry" },
+          { kind: "edge", from: "retry", to: "review" },
+          { kind: "edge", from: "fulfill", to: "__end__" },
+        ],
+      },
+      workflowTopology: {
+        start: "__start__",
+        end: "__end__",
+        registeredNodes: ["lookup", "risk", "review", "fulfill", "retry"],
+        conditionalRoutes: [
+          {
+            from: "review",
+            routes: [
+              { label: "approved", to: "fulfill" },
+              { label: "rejected", to: "__end__" },
+            ],
+          },
+        ],
+        dynamicRoutes: ["review"],
+        parallelBranches: [{ from: "__start__", to: ["lookup", "risk"] }],
+        joins: [{ from: ["lookup", "risk"], to: "review" }],
+        loops: [{ from: "retry", to: "review" }],
+        subgraphs: ["fulfill"],
+      },
+      resourceDependencies: [{ kind: "checkpointer", id: "orders", ownership: "owned" }],
+      generatedFunction: { functionId: "relkit.agent.orders.review.invoke", generated: true },
+      limits: { maxSteps: 4, maxToolCalls: 4, timeoutMs: 10_000 },
+      source: source("src/graphs/order-review.graph.ts", 3),
     },
   ],
   edges: [
@@ -403,6 +472,7 @@ export function createInspectorFixture(): InspectorFixture {
   let logs = [...initialLogs];
   let traces = [...initialTraces];
   let releasePaused: (() => void) | undefined;
+  const agentApplication = createAgentApplicationFixture();
   const stream = createObservabilityStream({ maxEvents: 100 });
   const actionServices: InspectorActionServices = {
     functions: {
@@ -444,7 +514,23 @@ export function createInspectorFixture(): InspectorFixture {
     },
   };
   const app = new Hono();
-  app.use("*", cors({ origin: "*", exposeHeaders: ["x-request-id", "x-trace-id"] }));
+  app.use(
+    "*",
+    cors({
+      origin: ["http://127.0.0.1:3210", "http://127.0.0.1:3211", "http://localhost:3211"],
+      credentials: true,
+      exposeHeaders: ["x-request-id", "x-trace-id"],
+    }),
+  );
+  for (const path of [
+    "/rpc",
+    "/rpc/*",
+    "/_relkit/v1/client/identity",
+    "/_relkit/v1/agents/:agentId/workflow",
+    "/_relkit/v1/runtime/agents/:agentId/executions",
+  ]) {
+    app.all(path, (context) => agentApplication.app.fetch(context.req.raw));
+  }
   installInspectorEndpoints(app, {
     mode: "development",
     activeGeneration: () => makeGeneration(),
@@ -604,6 +690,7 @@ export function createInspectorFixture(): InspectorFixture {
     requests = [...initialRequests];
     logs = [...initialLogs];
     traces = [...initialTraces];
+    agentApplication.reset();
   }
 
   function makeGeneration(): InspectorActiveGeneration {

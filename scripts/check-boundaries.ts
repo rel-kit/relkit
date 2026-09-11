@@ -113,6 +113,7 @@ function reportImport(
   if (
     (owner.path === "examples/commerce" || owner.path.startsWith("templates/")) &&
     isFixtureForbidden(dependency) &&
+    !(owner.path === "templates/default" && dependency === "next") &&
     !integrationNames.has(dependency)
   ) {
     add(

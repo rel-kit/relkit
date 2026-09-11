@@ -23,6 +23,8 @@ async function invokeHttp(request) {
     ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
     ...(request.errors === undefined ? {} : { errors: request.errors }),
     ...(request.toolHooks === undefined ? {} : { toolHooks: request.toolHooks }),
+    ...(request.trigger === undefined ? {} : { trigger: request.trigger }),
+    ...(request.progressSink === undefined ? {} : { progressSink: request.progressSink }),
     hooks: { observability: telemetry,
       onSpanStart: (span) => { invocationSpanId = span.spanId; },
       context: (context) => invocationContext(context, invocationSpanId),

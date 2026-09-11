@@ -13,6 +13,7 @@ function schema<Value>() {
 }
 
 export const contract = {
+  "GET /users": oc.input(schema<{ "domain": string }>()).output(schema<readonly { "active": boolean; "email": string; "id": number }[]>()),
   "route.get.users": oc.input(schema<{ "domain": string }>()).output(schema<readonly { "active": boolean; "email": string; "id": number }[]>()),
 } as const;
 export default contract;

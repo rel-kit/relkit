@@ -19,7 +19,9 @@ export function validateModelReadiness(
   graph: ApplicationGraph,
   registryFor: (profile: string) => unknown,
 ): void {
-  const agents = graph.nodes.filter((node) => node.kind === "agent");
+  const agents = graph.nodes
+    .filter((node) => node.kind === "agent")
+    .filter((agent) => agent.execution !== "graph" && agent.modelSource !== "native");
   if (agents.length === 0) return;
   const issues = agents.flatMap((agent) => {
     const registry = registryFor(agent.profile);

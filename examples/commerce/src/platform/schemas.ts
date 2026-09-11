@@ -48,5 +48,5 @@ export const receiptOutput = z.object({ receiptId: z.string() });
 export const authorizationInput = z.object({ authorization: z.string() });
 export const authorizationOutput = z.object({ allowed: z.boolean() });
 
-export const supportInput = z.object({ question: z.string().min(1) });
+export const supportInput = z.object({ message: z.string().min(1) });
 export const supportOutput = z.object({ answer: z.string() });

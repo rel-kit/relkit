@@ -1,4 +1,5 @@
 import type { Hono } from "hono";
+import type { UpgradeWebSocket } from "hono/ws";
 import { GENERATOR_VERSION, MANIFEST_VERSION, type MaybePromise } from "@relkit/contracts";
 import type { HttpTriggerRegistration, RegistrationPlan } from "@relkit/graph";
 import type { RequestRecordSink } from "@relkit/observability";
@@ -14,9 +15,14 @@ import {
 import { withRateLimit, type RateLimitRuntimeOptions } from "./rate-limit.js";
 import { registerAuthMiddleware, type HttpAuthInvocation, type HttpAuthRuntime } from "./auth.js";
 import { installRpc } from "./rpc.js";
+import { installRpcWebSocket } from "./rpc-websocket.js";
 import { installMcp, type McpOptions } from "./mcp.js";
 import { installStaticFiles, type StaticFilesOptions } from "./static-files.js";
 import { assertManifestCohort, RuntimeHonoManifestError } from "./manifest-validation.js";
+import type { ClientIdentityRuntime } from "./client-identity.js";
+import type { TransportSecurityOptions } from "./transport-security.js";
+import type { RealtimeRuntime } from "./realtime-runtime.js";
+import type { AgentRuntime } from "./agent-runtime.js";
 export { RuntimeHonoManifestError } from "./manifest-validation.js";
 export type { RuntimeHonoManifestErrorCode } from "./manifest-validation.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
@@ -28,6 +34,8 @@ export interface RuntimeManifest {
   readonly runtimeIntegrationsPlan: import("@relkit/contracts").RuntimeIntegrationPlanReference;
   readonly functions: ManifestEntries<unknown>;
   readonly targets?: ManifestEntries<unknown>;
+  readonly agents?: ManifestEntries<unknown>;
+  readonly channels?: ManifestEntries<unknown>;
   readonly routes?: ManifestEntries<unknown>;
   readonly tools?: ManifestEntries<unknown>;
   readonly services?: ManifestEntries<unknown>;
@@ -49,6 +57,8 @@ export interface HttpInvocationOptions {
   readonly correlationId?: string;
   readonly timeoutMs?: number;
   readonly auth?: HttpAuthInvocation;
+  readonly trigger?: unknown;
+  readonly progressSink?: import("@relkit/invocation").ProgressSink;
   readonly toolHooks?: {
     readonly onBefore?: (value: unknown, context: unknown) => unknown;
     readonly onAfter?: (value: unknown, context: unknown) => unknown;
@@ -82,8 +92,13 @@ export interface RouteMaterializationOptions {
   readonly observability?: RequestRecordSink;
   readonly rateLimitRuntime?: RateLimitRuntimeOptions;
   readonly auth?: HttpAuthRuntime;
+  readonly clientIdentity?: ClientIdentityRuntime;
+  readonly transportSecurity?: TransportSecurityOptions;
+  readonly realtime?: RealtimeRuntime;
+  readonly agentRuntime?: AgentRuntime;
   readonly mcp?: McpOptions;
   readonly staticFiles?: StaticFilesOptions;
+  readonly upgradeWebSocket?: UpgradeWebSocket;
   readonly middlewareContext?: (options: {
     readonly middlewareId: string;
     readonly signal: AbortSignal;
@@ -156,6 +171,9 @@ export function materializeRoutes(app: Hono, options: RouteMaterializationOption
         app.on(trigger.config.method, path, handler);
       }
     }
+  }
+  if (options.upgradeWebSocket !== undefined) {
+    installRpcWebSocket(app, options, options.upgradeWebSocket);
   }
   installRpc(app, options);
   installMcp(app, options);

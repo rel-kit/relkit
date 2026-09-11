@@ -49,6 +49,16 @@
               "capability": "job",
               "adapterId": "local-job",
               "protocolVersion": 1
+            },
+            {
+              "capability": "realtime",
+              "adapterId": "local-realtime",
+              "protocolVersion": 1
+            },
+            {
+              "capability": "agent-state",
+              "adapterId": "local-agent-state",
+              "protocolVersion": 1
             }
           ]
         },

@@ -1,16 +1,10 @@
 import { buildGraph } from "./normalize-graph.js";
-import { jobCompatible, providerProfiles, schema, schemaEquivalent } from "./normalize-compat.js";
+import { jobCompatible, schema, schemaEquivalent } from "./normalize-compat.js";
 import { add } from "./normalize-pass-utils.js";
 import { referenceFor } from "./normalize-reference-index.js";
 import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-validation.js";
 import { validateEventCompatibility } from "./normalize-event-validation.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
-import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
-import {
-  validateProviderReleaseSources,
-  validateProviderSingletons,
-  validateUniqueBucketProfiles,
-} from "./normalize-provider-validation.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -63,7 +57,6 @@ export function passTools(work: NormalizationWork): void {
     }
   }
 }
-
 export function passAgents(work: NormalizationWork): void {
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "agent")) {
     const value = descriptor.value as Record<string, any>;
@@ -71,65 +64,39 @@ export function passAgents(work: NormalizationWork): void {
       add(work, descriptor, NORMALIZE_CODES.agentTool, "Agent tools must be an array.");
     }
     for (const tool of Array.isArray(value.tools) ? value.tools : []) {
+      if (isNativeAgentTool(tool)) continue;
       const toolId = refId(tool);
-      if (
-        refKind(tool) !== "tool" ||
-        toolId === undefined ||
-        work.referencesByKind.get("tool")?.get(toolId) === undefined
-      )
+      const resolved =
+        toolId === undefined ? undefined : work.referencesByKind.get("tool")?.get(toolId);
+      if (refKind(tool) !== "tool" || toolId === undefined || resolved === undefined)
         add(
           work,
           descriptor,
           NORMALIZE_CODES.agentTool,
           "Agent tool reference does not resolve to a tool.",
         );
-    }
-    if (value.model !== undefined && typeof value.model !== "string")
-      add(work, descriptor, NORMALIZE_CODES.model, "Agent model must be serializable text.");
-  }
-}
-
-export function passProviders(work: NormalizationWork): void {
-  validateProviderSingletons(work);
-  validateProviderReleaseSources(work);
-  validateUniqueBucketProfiles(work);
-  if (!work.descriptors.some((entry) => entry.kind === "app")) return;
-  const profiles = providerProfiles({
-    ...work.input,
-    descriptors: work.descriptors.map((entry) => entry.value),
-  });
-  const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
-  for (const descriptor of work.descriptors) {
-    const value = isRecord(descriptor.value) ? descriptor.value : {};
-    const profileCapability = capabilityFor(descriptor.kind);
-    if (profileCapability !== undefined) {
-      const selected = selectedProviderProfile(
-        application,
-        profileCapability,
-        requestedProviderProfile(descriptor.kind, value),
-      );
-      if (selected === undefined) {
+      else if (
+        value.client !== undefined &&
+        isRecord(resolved.value) &&
+        resolved.value.approval !== "never" &&
+        (!Array.isArray(value.controls) || !value.controls.includes("approve"))
+      )
         add(
           work,
           descriptor,
-          NORMALIZE_CODES.providerProfile,
-          `Unqualified ${profileCapability} use requires a default when multiple profiles exist.`,
+          NORMALIZE_CODES.agentControl,
+          'Client-exposed agents with approval-requiring tools must declare the "approve" control.',
         );
-        continue;
-      }
-      const capabilities = profiles.get(selected);
-      if (capabilities === undefined || !capabilities.includes(profileCapability)) {
-        add(
-          work,
-          descriptor,
-          NORMALIZE_CODES.providerProfile,
-          `Provider profile "${selected}" does not provide ${profileCapability}.`,
-        );
-      }
     }
   }
 }
-
+function isNativeAgentTool(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    ((typeof value.name === "string" && value.schema !== undefined) ||
+      typeof value.type === "string")
+  );
+}
 export function passCollisions(work: NormalizationWork): void {
   const routes = new Map<string, NormalizedDescriptor>();
   const descriptors = work.descriptors
@@ -152,7 +119,6 @@ export function passCollisions(work: NormalizationWork): void {
     }
   }
 }
-
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {
   return (
     left.id.localeCompare(right.id) ||
@@ -161,20 +127,6 @@ function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescrip
     left.source.column - right.source.column
   );
 }
-
-function capabilityFor(kind: string): string | undefined {
-  return (
-    {
-      bucket: "bucket",
-      cache: "cache",
-      job: "job",
-      event: "event",
-      "event-trigger": "event",
-      agent: "model",
-    } as Record<string, string>
-  )[kind];
-}
-
 export function passGraph(work: NormalizationWork): void {
   work.graph = buildGraph(work);
 }

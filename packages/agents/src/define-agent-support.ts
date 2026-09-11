@@ -1,6 +1,9 @@
 import { deepFreeze } from "@relkit/contracts";
-import { isToolRef, type ToolRefAny } from "@relkit/tools";
-import type { AgentInstructions, PromptInstructions, PromptTemplate } from "./define-agent.js";
+import type {
+  AgentInstructions,
+  PromptInstructions,
+  PromptTemplate,
+} from "./define-agent-types.js";
 
 export function copyAgentInstructions(value: unknown): AgentInstructions {
   if (typeof value === "string") return requiredText(value, "Agent instructions");
@@ -50,20 +53,6 @@ function copyPrompt(value: Record<PropertyKey, unknown>): PromptInstructions {
     throw new TypeError("Agent prompt instructions must contain nonempty text");
   }
   return value as unknown as PromptInstructions;
-}
-
-export function copyAgentTools(value: unknown): readonly ToolRefAny[] {
-  if (!Array.isArray(value)) throw new TypeError("Agent tools must be an array");
-  const ids = new Set<string>();
-  return Object.freeze(
-    value.map((tool, index) => {
-      if (!isToolRef(tool)) throw new TypeError(`Agent tool at index ${index} must be a tool ref`);
-      const id = tool.ref.id;
-      if (ids.has(id)) throw new TypeError(`Duplicate agent tool "${id}"`);
-      ids.add(id);
-      return Object.freeze({ ref: Object.freeze({ kind: "tool" as const, id }) });
-    }),
-  );
 }
 
 function copyVariables(value: unknown): readonly string[] | undefined {

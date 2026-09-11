@@ -3,7 +3,10 @@
 <TypeTable
   type={{
     "--json": { type: "boolean", description: "Emit machine-readable output" },
-    "--template": { type: '"minimal" | "api" | "agent"', description: "Starter template" },
+    "--template": {
+      type: '"minimal" | "api" | "agent" | "fullstack"',
+      description: "Starter template",
+    },
     "--cloud": { type: '"aws" | "none"', description: "Cloud provider" },
     "--deploy": { type: '"pulumi" | "none"', description: "Deployment adapter" },
     "--directory": { type: "string", description: "Destination directory" },

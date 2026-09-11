@@ -1,5 +1,5 @@
 {
-  "info": { "title": "commerce", "version": "5" },
+  "info": { "title": "commerce", "version": "7" },
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "openapi": "3.1.0",
   "paths": {
@@ -89,5 +89,5 @@
       }
     }
   },
-  "x-relkit": { "contractVersion": 5, "generatorVersion": 5, "graphVersion": 8, "version": 5 }
+  "x-relkit": { "contractVersion": 7, "generatorVersion": 7, "graphVersion": 10, "version": 7 }
 }

@@ -25,6 +25,7 @@ const httpMiddlewareOptions = {
   } }),
 };
 const app = createApp({
+  upgradeWebSocket,
   plan,
   manifest: executableManifest,
   engine: { invoke: invokeHttp },
@@ -45,6 +46,44 @@ const app = createApp({
     enabled: ${String(configuration.clientContract)},
     document: clientContractDocument,
   },
+  clientIdentity: {
+    applicationId: graph.appId,
+    publicFingerprint,
+    resolve: ({ request, session }) => resolveClientIdentityRegistration(request, session),
+  },
+  transportSecurity: transportSecurityRegistration(),
+  ...((plan.channels ?? []).length === 0 ? {} : {
+    realtime: {
+      applicationId: graph.appId,
+      environment,
+      provider: async (profile) => {
+        const registry = await providerStartup;
+        if (registry === undefined) throw new Error("Realtime provider registry unavailable.");
+        return provider(registry, "realtime", profile);
+      },
+      trustedContext: ({ request, auth }) => ({ request, auth }),
+    },
+  }),
+  ...(plan.agents.every((node) => node.client === undefined) ? {} : {
+    agentRuntime: {
+      applicationId: graph.appId,
+      environment,
+      generationId,
+      publicFingerprint,
+      signal: shutdownController.signal,
+      track: (task) => {
+        activeInvocations.add(task);
+        const done = () => activeInvocations.delete(task);
+        void task.then(done, done);
+      },
+      provider: async (profile) => {
+        const registry = await providerStartup;
+        if (registry === undefined) throw new Error("Agent-state provider registry unavailable.");
+        return provider(registry, "agent-state", profile);
+      },
+      trustedContext: ({ request, auth }) => ({ request, auth }),
+    },
+  }),
   mcp: { enabled: ${String(configuration.mcp)} },
   staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
@@ -116,7 +155,8 @@ installInspectorEndpoints(app, {
 const server = Bun.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
-  fetch: (request) => instrumentHttpRequest(request, httpMiddlewareOptions, async (request) => {
+  websocket: honoWebSocket,
+  fetch: (request, bunServer) => instrumentHttpRequest(request, httpMiddlewareOptions, async (request) => {
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
@@ -125,7 +165,7 @@ const server = Bun.serve({
     if (!providerReady || !databaseReady || !authReady)
       return Response.json({ error: "not-ready" }, { status: 503 });
     try {
-      return await app.fetch(request);
+      return await app.fetch(request, bunServer);
     } catch {
       return Response.json({ error: "internal-error" }, { status: 500 });
     }

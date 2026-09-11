@@ -3,37 +3,6 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { runCommand } from "./pack-and-smoke-create-relkit-support.js";
 
-export async function verifyMissingModelKey(root: string, cli: string): Promise<void> {
-  const child = Bun.spawn(
-    [
-      process.execPath,
-      cli,
-      "dev",
-      "--port",
-      process.env.PORT!,
-      "--inspector-port",
-      process.env.RELKIT_INSPECTOR_PORT!,
-    ],
-    {
-      cwd: root,
-      env: { ...process.env, OPENAI_API_KEY: undefined, ANTHROPIC_API_KEY: undefined },
-      stdout: "pipe",
-      stderr: "pipe",
-      signal: AbortSignal.timeout(60_000),
-    },
-  );
-  const [code, stdout, stderr] = await Promise.all([
-    child.exited,
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  assert.equal(code, 1, stdout + stderr);
-  assert.match(stdout + stderr, /OPENAI_API_KEY/);
-  assert.match(stdout + stderr, /RELKIT_ENVIRONMENT_INVALID/);
-  assert.equal((stdout + stderr).match(/OPENAI_API_KEY/g)?.length, 1);
-  assert.doesNotMatch(stdout + stderr, /RELKIT_CANDIDATE_PROVIDER_NOT_READY|at pollHealth/);
-}
-
 export async function verifyScaffoldBuild(root: string): Promise<void> {
   if (process.env.RELKIT_TEST_DOCKER !== "1") {
     await runCommand(["run", "build"], root);
@@ -70,8 +39,10 @@ export async function exerciseScaffoldRoutes(
   }
   let ready = false;
   for (let attempt = 0; attempt < 200; attempt++) {
-    const response = await fetch(`${base}/live/42/details`, { signal: AbortSignal.timeout(2_000) });
-    if (response.status === 200) {
+    const response = await fetch(`${base}/live/42/details`, {
+      signal: AbortSignal.timeout(2_000),
+    }).catch(() => undefined);
+    if (response?.status === 200) {
       ready = true;
       break;
     }

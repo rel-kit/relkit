@@ -19,7 +19,7 @@
     "test:inspector": "bun test ./tests/inspector",
     "test:inspector:browser": "bun run scripts/test-inspector-browser.ts",
     "test:mcp:inspector": "RELKIT_MCP_INSPECTOR_CLI=1 bun test packages/runtime-hono/mcp.test.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test && playwright test --config playwright.commerce.config.ts",
     "test:generator": "bun test ./tests/generator",
     "test:scaffold": "RELKIT_TEST_DOCKER=1 bun run scripts/pack-and-smoke-create-relkit.ts",
     "test:examples": "bunx turbo run check typecheck test build --filter='./examples/*'",

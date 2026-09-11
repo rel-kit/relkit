@@ -1,6 +1,8 @@
 import {
   generateClient,
   generateClientContractDocument,
+  generateClientManifest,
+  generateClientRegistry,
   generateContract,
 } from "@relkit/client-generator";
 import { canonicalJson, type RuntimeIntegrationPlan } from "@relkit/contracts";
@@ -73,6 +75,8 @@ export function makeOutputs(
     clientContract: errors
       ? ""
       : generateClientContractDocument(graph as unknown as ApplicationGraph, hash),
+    clientRegistry: errors ? "" : generateClientRegistry(graph as unknown as ApplicationGraph),
+    clientManifest: errors ? "" : generateClientManifest(graph as unknown as ApplicationGraph),
   });
 }
 
