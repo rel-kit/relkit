@@ -73,7 +73,7 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     },
   ],
   "dependencies": {
-    "@relkit/local": "0.4.0",
+    "@relkit/local": "<release-version>",
   },
   "nextSteps": [],
   "operations": [
@@ -97,12 +97,12 @@ exports[`snapshots simple, custom, and full service plans 2`] = `
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@relkit/app": "0.4.0",
-    "@relkit/local": "0.4.0"
+    "@relkit/app": "<release-version>",
+    "@relkit/local": "<release-version>"
   },
   "devDependencies": {
-    "@relkit/cli": "0.4.0",
-    "@relkit/testing": "0.4.0",
+    "@relkit/cli": "<release-version>",
+    "@relkit/testing": "<release-version>",
     "@types/bun": "1.3.10",
     "typescript": "5.9.3"
   }
@@ -292,10 +292,10 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     },
   ],
   "dependencies": {
-    "@relkit/docker": "0.4.0",
-    "@relkit/local": "0.4.0",
-    "@relkit/redis": "0.4.0",
-    "@relkit/s3": "0.4.0",
+    "@relkit/docker": "<release-version>",
+    "@relkit/local": "<release-version>",
+    "@relkit/redis": "<release-version>",
+    "@relkit/s3": "<release-version>",
     "langchain": "1.5.10",
   },
   "nextSteps": [
@@ -322,16 +322,16 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@relkit/app": "0.4.0",
-    "@relkit/docker": "0.4.0",
-    "@relkit/local": "0.4.0",
-    "@relkit/redis": "0.4.0",
-    "@relkit/s3": "0.4.0",
+    "@relkit/app": "<release-version>",
+    "@relkit/docker": "<release-version>",
+    "@relkit/local": "<release-version>",
+    "@relkit/redis": "<release-version>",
+    "@relkit/s3": "<release-version>",
     "langchain": "1.5.10"
   },
   "devDependencies": {
-    "@relkit/cli": "0.4.0",
-    "@relkit/testing": "0.4.0",
+    "@relkit/cli": "<release-version>",
+    "@relkit/testing": "<release-version>",
     "@types/bun": "1.3.10",
     "typescript": "5.9.3"
   }

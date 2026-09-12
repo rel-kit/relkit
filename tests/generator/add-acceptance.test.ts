@@ -11,10 +11,12 @@ import {
   applyScaffoldPlan,
   normalizeAddRequest,
   planAdd,
+  SCAFFOLD_DEPENDENCIES,
 } from "../../packages/create-relkit/src/index.ts";
 
 const repository = resolve(import.meta.dir, "../..");
 const templateRoot = join(repository, "templates/default/v1");
+const releaseVersion = SCAFFOLD_DEPENDENCIES["@relkit/local"].version;
 const roots: string[] = [];
 
 afterEach(async () => {
@@ -239,14 +241,17 @@ test("snapshots simple, custom, and full service plans", async () => {
     const plan = await planAdd(
       normalizeAddRequest([...args, "--project-root", root, "--no-install"]),
     );
-    expect({
+    const snapshot = {
       operations: plan.operations,
       dependencies: plan.dependencies,
       artifacts: plan.artifacts,
       profiles: plan.profiles,
       warnings: plan.warnings,
       nextSteps: plan.nextSteps,
-    }).toMatchSnapshot();
+    };
+    expect(
+      JSON.parse(JSON.stringify(snapshot).replaceAll(releaseVersion, "<release-version>")),
+    ).toMatchSnapshot();
   }
 });
 
