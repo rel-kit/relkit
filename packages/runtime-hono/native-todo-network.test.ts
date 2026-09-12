@@ -62,7 +62,7 @@ const clientContract = {
 
 afterEach(async () => {
   servers.splice(0).forEach((server) => server.stop(true));
-  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true })));
+  await Promise.all(roots.splice(0).map((root) => rm(root, { force: true, recursive: true })));
 });
 
 test("native todo values cross HTTP, SSE, and WebSocket before terminal completion", async () => {
