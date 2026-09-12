@@ -37,7 +37,7 @@
     "typecheck": "tsc -b --pretty false && bun ../../scripts/package-create-relkit-templates.ts"
   },
   "dependencies": {
-    "@clack/prompts": "1.7.0",
+    "@clack/prompts": "1.8.0",
     "@relkit/compiler": "workspace:*",
     "typescript": "5.9.3"
   }

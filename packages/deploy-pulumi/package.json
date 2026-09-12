@@ -29,7 +29,7 @@
     }
   },
   "dependencies": {
-    "@pulumi/pulumi": "3.259.0",
+    "@pulumi/pulumi": "3.261.0",
     "@relkit/contracts": "workspace:*",
     "@relkit/deploy": "workspace:*",
     "@relkit/observability": "workspace:*",

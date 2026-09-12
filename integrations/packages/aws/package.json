@@ -57,7 +57,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@pulumi/aws": "7.43.0",
+    "@pulumi/aws": "7.44.0",
     "@relkit/deploy": "workspace:*",
     "@relkit/provider": "workspace:*"
   }
