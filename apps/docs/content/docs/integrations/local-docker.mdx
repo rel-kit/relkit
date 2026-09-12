@@ -15,7 +15,7 @@ selects an exact local-service image rather than whatever a mutable tag points t
 | Adapter    | Image tag                                  | Immutable digest                                                          |
 | ---------- | ------------------------------------------ | ------------------------------------------------------------------------- |
 | Redis      | `redis:7.4.2-alpine`                       | `sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952` |
-| S3 / MinIO | `minio/minio:RELEASE.2025-04-22T22-12-26Z` | `sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e` |
+| S3 / MinIO | `quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z` | `sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e` |
 
 RELKIT discovers the Docker server version at startup but does not currently enforce a minimum engine
 version. Use a maintained Docker Engine or Docker Desktop release with the `docker` CLI available on `PATH`:
