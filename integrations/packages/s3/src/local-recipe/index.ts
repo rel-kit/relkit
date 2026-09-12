@@ -43,23 +43,30 @@ export const localRecipe = Object.freeze({
   outputs: (context: LocalServiceRecipeOutputContext) => Object.freeze(settings(context)),
   initialize: async (context: LocalServiceRecipeOutputContext) => {
     const values = settings(context);
-    const response = await signedRequest(`${values.endpoint}/${BUCKET}`, {
-      region: REGION,
-      credentials: {
-        accessKeyId: values.accessKeyId,
-        secretAccessKey: values.secretAccessKey,
-      },
-      ...(context.fetch === undefined ? {} : { fetch: context.fetch }),
-      init: {
-        method: "PUT",
-        ...(context.signal === undefined ? {} : { signal: context.signal }),
-      },
-    });
-    if (!response.ok && response.status !== 409) {
-      throw new Error(`MinIO bucket initialization failed with status ${response.status}.`);
+    for (let attempt = 0; ; attempt += 1) {
+      const response = await signedRequest(`${values.endpoint}/${BUCKET}`, {
+        region: REGION,
+        credentials: {
+          accessKeyId: values.accessKeyId,
+          secretAccessKey: values.secretAccessKey,
+        },
+        ...(context.fetch === undefined ? {} : { fetch: context.fetch }),
+        init: {
+          method: "PUT",
+          ...(context.signal === undefined ? {} : { signal: context.signal }),
+        },
+      });
+      if (response.ok || response.status === 409) return;
+      if (response.status !== 503 || attempt === INITIALIZATION_RETRIES) {
+        throw new Error(`MinIO bucket initialization failed with status ${response.status}.`);
+      }
+      await wait(INITIALIZATION_RETRY_DELAY_MS, context.signal);
     }
   },
 }) satisfies LocalServiceRecipe<"s3">;
+
+const INITIALIZATION_RETRIES = 12;
+const INITIALIZATION_RETRY_DELAY_MS = 250;
 
 function settings(context: LocalServiceRecipeOutputContext) {
   const apiPort = context.ports.api;
@@ -84,4 +91,19 @@ function text(value: unknown, name: string): string {
   if (typeof value !== "string" || value === "")
     throw new TypeError(`MinIO local ${name} is invalid`);
   return value;
+}
+
+function wait(milliseconds: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason);
+    const aborted = () => {
+      clearTimeout(timer);
+      reject(signal?.reason);
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", aborted);
+      resolve();
+    }, milliseconds);
+    signal?.addEventListener("abort", aborted, { once: true });
+  });
 }
