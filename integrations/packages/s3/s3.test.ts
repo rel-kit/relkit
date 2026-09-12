@@ -96,6 +96,19 @@ test("owns a pinned MinIO recipe with generated credentials and path-style outpu
   expect(request?.url).not.toContain("local-secret");
 });
 
+test("retries MinIO bucket initialization while the service is starting", async () => {
+  let attempts = 0;
+  await localRecipe.initialize({
+    ports: { api: 49_154, console: 49_155 },
+    secrets: { accessKeyId: "local-access", secretAccessKey: "local-secret" },
+    fetch: (async () => {
+      attempts += 1;
+      return new Response(null, { status: attempts === 1 ? 503 : 200 });
+    }) as typeof fetch,
+  });
+  expect(attempts).toBe(2);
+});
+
 describe("S3-compatible runtime", () => {
   for (const variant of [
     { name: "AWS-style", endpoint: "https://s3.us-east-1.amazonaws.com", path: false },
