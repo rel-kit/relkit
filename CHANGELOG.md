@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.4.1
+
+### Changes
+
+- fix(scaffold): follow release package version
+- Add generic streaming, realtime channels and presence, typed React clients, durable agent lifecycle support, shared Redis providers, and full-stack examples and documentation.
+- feat(cli): add interactive scaffolding and comprehensive artifact guides
+
 ## 0.4.0
 
 ### Changes

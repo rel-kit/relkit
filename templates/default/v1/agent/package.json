@@ -16,14 +16,14 @@
   },
   "dependencies": {
     "@langchain/langgraph": "1.4.14",
-    "@relkit/app": "0.4.0",
-    "@relkit/local": "0.4.0",
+    "@relkit/app": "0.4.1",
+    "@relkit/local": "0.4.1",
     "langchain": "1.5.10"
   },
   "devDependencies": {
     "@types/bun": "1.3.10",
-    "@relkit/cli": "0.4.0",
-    "@relkit/testing": "0.4.0",
+    "@relkit/cli": "0.4.1",
+    "@relkit/testing": "0.4.1",
     "typescript": "5.9.3"
   }
 }
