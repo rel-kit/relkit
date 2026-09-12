@@ -6,7 +6,7 @@ import {
 import { signedRequest } from "../runtime/signing.js";
 
 const MINIO_IMAGE =
-  "minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
+  "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
 const BUCKET = "relkit";
 const REGION = "us-east-1";
 

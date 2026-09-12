@@ -1,3 +1,5 @@
+import manifest from "../package.json" with { type: "json" };
+
 export type DependencySection = "dependencies" | "devDependencies";
 
 export interface ScaffoldDependency {
@@ -5,17 +7,17 @@ export interface ScaffoldDependency {
   readonly section: DependencySection;
 }
 
-/** Versions copied into generated projects; tests keep these aligned with their owners. */
+/** Versions copied into generated projects; first-party packages share this fixed release train. */
 export const SCAFFOLD_DEPENDENCIES = Object.freeze({
-  "@relkit/aws": { version: "0.4.0", section: "dependencies" },
-  "@relkit/better-auth": { version: "0.4.0", section: "dependencies" },
-  "@relkit/cloudflare": { version: "0.4.0", section: "dependencies" },
-  "@relkit/docker": { version: "0.4.0", section: "dependencies" },
-  "@relkit/drizzle": { version: "0.4.0", section: "dependencies" },
-  "@relkit/local": { version: "0.4.0", section: "dependencies" },
-  "@relkit/pulumi": { version: "0.4.0", section: "dependencies" },
-  "@relkit/redis": { version: "0.4.0", section: "dependencies" },
-  "@relkit/s3": { version: "0.4.0", section: "dependencies" },
+  "@relkit/aws": { version: manifest.version, section: "dependencies" },
+  "@relkit/better-auth": { version: manifest.version, section: "dependencies" },
+  "@relkit/cloudflare": { version: manifest.version, section: "dependencies" },
+  "@relkit/docker": { version: manifest.version, section: "dependencies" },
+  "@relkit/drizzle": { version: manifest.version, section: "dependencies" },
+  "@relkit/local": { version: manifest.version, section: "dependencies" },
+  "@relkit/pulumi": { version: manifest.version, section: "dependencies" },
+  "@relkit/redis": { version: manifest.version, section: "dependencies" },
+  "@relkit/s3": { version: manifest.version, section: "dependencies" },
   "better-auth": { version: "1.7.1", section: "dependencies" },
   "drizzle-kit": { version: "1.0.0-rc.5-ab785fc", section: "devDependencies" },
   "drizzle-orm": { version: "1.0.0-rc.5-169397b", section: "dependencies" },

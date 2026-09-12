@@ -55,7 +55,7 @@ declare const localRecipe: Readonly<{
   recipeId: "minio-docker";
   recipeVersion: 1;
   materializerId: "docker";
-  image: "minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
+  image: "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e";
   command: ReadonlyArray<string>;
   ports: Readonly<{ api: 9000; console: 9001 }>;
   volume: Readonly<{ mountPath: "/data" }>;
