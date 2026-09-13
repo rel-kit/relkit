@@ -13,6 +13,7 @@ const localLayers = [
   "test:generator",
   "test:examples",
   "test:docs",
+  "test:jobs:matrix",
   "test:container",
   "test:security",
   "test:deployment",

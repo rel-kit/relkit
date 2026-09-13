@@ -163,6 +163,7 @@ async function main(): Promise<void> {
   await run("generator tests", bun, ["run", "test:generator"]);
   await run("executable examples", bun, ["run", "test:examples"]);
   await run("documentation", bun, ["run", "test:docs"]);
+  await run("jobs compatibility and capability matrix", bun, ["run", "test:jobs:matrix"]);
   await run("release readiness", bun, ["run", "release:check"]);
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
   await run("whitespace check", "git", ["diff", "--check"]);
