@@ -41,7 +41,7 @@
     "@relkit/provider": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
     "@relkit/schema": "workspace:*",
-    "effect": "4.0.0-beta.107"
+    "effect": "4.0.0-rc.115"
   },
   "scripts": {
     "build": "tsc -b",
