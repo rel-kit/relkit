@@ -327,7 +327,8 @@ declare const requiredThreadId: (options: AgentThreadOptions | undefined) => str
 **Signature**
 
 ```ts
-type AgentChat<Name> = AgentFor<Name> extends { readonly chat: infer Value } ? Value : false;
+type AgentChat<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly chat: infer Value } ? Value : false;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L10)
@@ -337,7 +338,7 @@ type AgentChat<Name> = AgentFor<Name> extends { readonly chat: infer Value } ? V
 **Signature**
 
 ```ts
-type AgentControls<Name> =
+type AgentControls<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly controls: infer Value } ? Value : never;
 ```
 
@@ -348,7 +349,7 @@ type AgentControls<Name> =
 **Signature**
 
 ```ts
-type AgentCustomEvent<Name> =
+type AgentCustomEvent<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly customEvent: infer Value } ? Value : never;
 ```
 
@@ -359,7 +360,8 @@ type AgentCustomEvent<Name> =
 **Signature**
 
 ```ts
-type AgentInput<Name> = AgentFor<Name> extends { readonly input: infer Value } ? Value : never;
+type AgentInput<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly input: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L4)
@@ -369,7 +371,8 @@ type AgentInput<Name> = AgentFor<Name> extends { readonly input: infer Value } ?
 **Signature**
 
 ```ts
-type AgentOutput<Name> = AgentFor<Name> extends { readonly output: infer Value } ? Value : never;
+type AgentOutput<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly output: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L6)
@@ -379,7 +382,7 @@ type AgentOutput<Name> = AgentFor<Name> extends { readonly output: infer Value }
 **Signature**
 
 ```ts
-type AgentPublicState<Name> =
+type AgentPublicState<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly publicState: infer Value } ? Value : never;
 ```
 
@@ -390,7 +393,8 @@ type AgentPublicState<Name> =
 **Signature**
 
 ```ts
-type AgentResume<Name> = AgentFor<Name> extends { readonly resume: infer Value } ? Value : never;
+type AgentResume<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly resume: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L12)
@@ -400,7 +404,8 @@ type AgentResume<Name> = AgentFor<Name> extends { readonly resume: infer Value }
 **Signature**
 
 ```ts
-type AgentScope<Name> = AgentFor<Name> extends { readonly scope: infer Value } ? Value : never;
+type AgentScope<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly scope: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L20)
@@ -410,7 +415,8 @@ type AgentScope<Name> = AgentFor<Name> extends { readonly scope: infer Value } ?
 **Signature**
 
 ```ts
-type AgentTool<Name> = AgentFor<Name> extends { readonly tool: infer Value } ? Value : never;
+type AgentTool<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly tool: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L14)
@@ -420,7 +426,8 @@ type AgentTool<Name> = AgentFor<Name> extends { readonly tool: infer Value } ? V
 **Signature**
 
 ```ts
-type AgentWaiting<Name> = AgentFor<Name> extends { readonly waiting: infer Value } ? Value : never;
+type AgentWaiting<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly waiting: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L22)
@@ -816,7 +823,7 @@ export interface AgentThreadOptions {
 **Signature**
 
 ```ts
-type AgentTimelineItem<Tool> =
+type AgentTimelineItem<Tool = ClientAgentDynamic> =
   | { readonly key: string; readonly kind: "message"; readonly message: AgentMessage }
   | { readonly key: string; readonly kind: "tool"; readonly toolCall: TypedAgentToolCall<Tool> }
   | { readonly key: string; readonly kind: "progress"; readonly progress: AgentProgress };
@@ -839,7 +846,7 @@ declare const AgentToolCall: AgentToolCall;
 **Signature**
 
 ```ts
-type UseAgentResult<Name> = Omit<ContractBase<Name>, "snapshot"> & {
+type UseAgentResult<Name extends AgentSelector> = Omit<ContractBase<Name>, "snapshot"> & {
   readonly snapshot?: TypedThreadSnapshot<
     AgentOutput<Name>,
     AgentPublicState<Name>,
@@ -1766,9 +1773,9 @@ declare const procedureUtils: (root: unknown, selector: string) => ProcedureUtil
 **Signature**
 
 ```ts
-type Partial<{ readonly [Event in keyof EventsFor<Name>]: (payload: EventsFor<Name>[Event]) => void; }> = Partial<{
+type ChannelHandlers<Name extends ChannelSelector> = Partial<{
   readonly [Event in keyof EventsFor<Name>]: (payload: EventsFor<Name>[Event]) => void;
-}>
+}>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/realtime-hook.ts#L51)
@@ -1793,7 +1800,7 @@ export interface UseChannelOptions<Name extends ChannelSelector> {
 **Signature**
 
 ```ts
-type UseChannelResult<Name> = Omit<ChannelState, "presence"> &
+type UseChannelResult<Name extends ChannelSelector> = Omit<ChannelState, "presence"> &
   ([PresenceFor<Name>] extends [never] ? {} : { readonly presence: PresenceFor<Name> });
 ```
 
@@ -2216,7 +2223,7 @@ export interface ClientStreamContract<Input = unknown, Item = unknown, Failure =
 **Signature**
 
 ```ts
-type ContractFor<Name> = ClientRegistry[Name];
+type ContractFor<Name extends ClientSelector> = ClientRegistry[Name];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L87)
@@ -2226,7 +2233,7 @@ type ContractFor<Name> = ClientRegistry[Name];
 **Signature**
 
 ```ts
-type ErrorFor<Name> =
+type ErrorFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly error: infer Error;
   }
@@ -2253,7 +2260,7 @@ type FiniteSelector = {
 **Signature**
 
 ```ts
-type InputFor<Name> =
+type InputFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly input: infer Input;
   }
@@ -2268,7 +2275,7 @@ type InputFor<Name> =
 **Signature**
 
 ```ts
-type ItemFor<Name> =
+type ItemFor<Name extends StreamSelector> =
   ContractFor<Name> extends {
     readonly item: infer Item;
   }
@@ -2297,7 +2304,7 @@ type MutationSelector = {
 **Signature**
 
 ```ts
-type OutputFor<Name> =
+type OutputFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly output: infer Output;
   }

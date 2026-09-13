@@ -192,10 +192,13 @@ type ChannelClientPolicy<Guard> =
 **Signature**
 
 ```ts
-type ChannelDescriptor<Id, ParamsSchema, Events, Client, Presence> = DescriptorBase<
-  "channel",
-  Id
-> & {
+type ChannelDescriptor<
+  Id extends string,
+  ParamsSchema extends StandardSchemaV1,
+  Events extends Readonly<Record<string, StandardSchemaV1>>,
+  Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
+  Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined,
+> = DescriptorBase<"channel", Id> & {
   readonly params: ParamsSchema;
   readonly events: Events;
   readonly profile?: string;
@@ -240,7 +243,10 @@ type ChannelDescriptorAny = ChannelDescriptor<
 **Signature**
 
 ```ts
-type ChannelGuard<Params, Context> = (params: Params, context: Context) => MaybePromise<boolean>;
+type ChannelGuard<Params = unknown, Context = unknown> = (
+  params: Params,
+  context: Context,
+) => MaybePromise<boolean>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/channel.ts#L25)
@@ -250,7 +256,7 @@ type ChannelGuard<Params, Context> = (params: Params, context: Context) => Maybe
 **Signature**
 
 ```ts
-type ChannelPresence<Params, Context> =
+type ChannelPresence<Params = unknown, Context = unknown> =
   "count" | MemberPresenceDescriptor<StandardSchemaV1, Params, Context>;
 ```
 
@@ -929,7 +935,7 @@ export interface PresenceMember<Member = unknown> {
 **Signature**
 
 ```ts
-type PresenceSnapshot<Member> = CountPresence | MemberPresence<Member>;
+type PresenceSnapshot<Member = unknown> = CountPresence | MemberPresence<Member>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/realtime/src/types.ts#L64)

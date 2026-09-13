@@ -52,10 +52,17 @@ type AgentClientEvents = Readonly<Record<string, import("@relkit/schema").Standa
 **Signature**
 
 ```ts
-type AgentClientPolicy<Guard, StateKey, Events> = (
+type AgentClientPolicy<
+  Guard = (...args: any[]) => unknown,
+  StateKey extends string = string,
+  Events extends AgentClientEvents = AgentClientEvents,
+> = (
   | { readonly public: true; readonly authorize?: never }
   | { readonly authorize: Guard; readonly public?: never }
-) & { readonly state?: readonly StateKey[]; readonly events?: Events };
+) & {
+  readonly state?: readonly StateKey[];
+  readonly events?: Events;
+};
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/agent-client.ts#L5)
@@ -1310,7 +1317,10 @@ declare const hasDeepAgentCapabilities: (value: DeepAgentCapabilities) => boolea
 **Signature**
 
 ```ts
-type AgentClientStateKey<Middleware> = Extract<keyof AgentMiddlewareState<Middleware>, string>;
+type AgentClientStateKey<Middleware extends readonly AgentMiddleware[]> = Extract<
+  keyof AgentMiddlewareState<Middleware>,
+  string
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native.ts#L45)
@@ -1347,13 +1357,14 @@ export interface AgentMiddleware {
 **Signature**
 
 ```ts
-type AgentMiddlewareState<Middleware> = Middleware extends readonly [infer First, ...infer Rest]
-  ? First extends AgentMiddleware
-    ? Rest extends readonly AgentMiddleware[]
-      ? MiddlewareState<First> & AgentMiddlewareState<Rest>
-      : MiddlewareState<First>
-    : {}
-  : {};
+type AgentMiddlewareState<Middleware extends readonly AgentMiddleware[]> =
+  Middleware extends readonly [infer First, ...infer Rest]
+    ? First extends AgentMiddleware
+      ? Rest extends readonly AgentMiddleware[]
+        ? MiddlewareState<First> & AgentMiddlewareState<Rest>
+        : MiddlewareState<First>
+      : {}
+    : {};
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-agent-native.ts#L25)
@@ -1373,7 +1384,7 @@ type AgentModel = string | AgentLanguageModel | AgentModelFactory;
 **Signature**
 
 ```ts
-type AgentModelFactory<Environment> = (
+type AgentModelFactory<Environment = Readonly<Record<string, unknown>>> = (
   environment: Environment,
 ) => MaybePromise<AgentLanguageModel>;
 ```
@@ -2075,7 +2086,11 @@ export interface GraphNodeDescriptor<
 **Signature**
 
 ```ts
-type GraphNodeHandler<InputSchema, OutputSchema, Ends> = (
+type GraphNodeHandler<
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Ends extends readonly string[],
+> = (
   input: InferOutput<InputSchema>,
   config?: LangGraphRunnableConfig,
 ) => MaybePromise<GraphNodeResult<OutputSchema, Ends>>;
@@ -2088,7 +2103,11 @@ type GraphNodeHandler<InputSchema, OutputSchema, Ends> = (
 **Signature**
 
 ```ts
-type GraphNodeImplementation<InputSchema, OutputSchema, Ends> = (
+type GraphNodeImplementation<
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Ends extends readonly string[],
+> = (
   input: InferOutput<InputSchema>,
   config?: LangGraphRunnableConfig,
 ) => MaybePromise<
@@ -2104,7 +2123,7 @@ type GraphNodeImplementation<InputSchema, OutputSchema, Ends> = (
 **Signature**
 
 ```ts
-type GraphNodeResult<OutputSchema, Ends> =
+type GraphNodeResult<OutputSchema extends StandardSchemaV1, Ends extends readonly string[]> =
   NodeUpdate<OutputSchema> | Command<unknown, NodeUpdate<OutputSchema>, CommandNodes<Ends>>;
 ```
 
@@ -2262,7 +2281,7 @@ export interface GraphExecution<State = any> {
 **Signature**
 
 ```ts
-type GraphInput<Graph> = InferInput<Graph["input"]>;
+type GraphInput<Graph extends GraphDescriptor> = InferInput<Graph["input"]>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L197)
@@ -2272,7 +2291,7 @@ type GraphInput<Graph> = InferInput<Graph["input"]>;
 **Signature**
 
 ```ts
-type GraphNodeId<Nodes> = Nodes[number]["id"];
+type GraphNodeId<Nodes extends readonly GraphNodeLike[]> = Nodes[number]["id"];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L35)
@@ -2292,7 +2311,7 @@ type GraphNodeLike = GraphNodeAny | FunctionGraphNodeDescriptor | SubgraphNodeDe
 **Signature**
 
 ```ts
-type GraphOutput<Graph> = InferOutput<Graph["output"]>;
+type GraphOutput<Graph extends GraphDescriptor> = InferOutput<Graph["output"]>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L198)
@@ -2302,7 +2321,7 @@ type GraphOutput<Graph> = InferOutput<Graph["output"]>;
 **Signature**
 
 ```ts
-type GraphState<State> = State["State"];
+type GraphState<State extends AnyStateSchema> = State["State"];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-graph.ts#L36)
@@ -2373,7 +2392,8 @@ declare const isGraphDescriptor: (value: unknown) => value is GraphDescriptor;
 **Signature**
 
 ```ts
-type CheckpointerResource<Value> = PersistenceResource<"checkpointer", Value>;
+type CheckpointerResource<Value extends BaseCheckpointSaver = BaseCheckpointSaver> =
+  PersistenceResource<"checkpointer", Value>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L20)
@@ -2383,7 +2403,7 @@ type CheckpointerResource<Value> = PersistenceResource<"checkpointer", Value>;
 **Signature**
 
 ```ts
-type MemoryResource<Value> = PersistenceResource<"memory", Value>;
+type MemoryResource<Value extends BaseStore = BaseStore> = PersistenceResource<"memory", Value>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/agents/src/define-persistence.ts#L22)
@@ -2784,7 +2804,7 @@ declare const prepareGraphDefinition: (
 **Signature**
 
 ```ts
-type GraphConditionalRoute<Id, State, Key> = (
+type GraphConditionalRoute<Id extends string, State, Key extends string> = (
   state: State,
   config: LangGraphRunnableConfig,
 ) => MaybePromise<Key | Send<Id, Partial<State>> | readonly (Key | Send<Id, Partial<State>>)[]>;
@@ -2821,7 +2841,7 @@ export interface GraphEdgeBuilder<Id extends string, State> {
 **Signature**
 
 ```ts
-type GraphEdgeOperation<Id, State> =
+type GraphEdgeOperation<Id extends string, State> =
   | {
       readonly kind: "edge";
       readonly start: typeof START | Id | readonly Id[];
@@ -2842,7 +2862,7 @@ type GraphEdgeOperation<Id, State> =
 **Signature**
 
 ```ts
-type GraphRoute<Id, State> = (
+type GraphRoute<Id extends string, State> = (
   state: State,
   config: LangGraphRunnableConfig,
 ) => MaybePromise<Id | typeof END | Send<Id> | readonly (Id | Send<Id>)[]>;

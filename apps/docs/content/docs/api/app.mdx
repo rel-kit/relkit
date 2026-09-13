@@ -192,7 +192,7 @@ declare const deriveApplicationId: (packageName: string) => string;
 **Signature**
 
 ```ts
-type ConstantResolver<Value> = (options: ContextResolverOptions) => MaybePromise<Value>;
+type ConstantResolver<Value = unknown> = (options: ContextResolverOptions) => MaybePromise<Value>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L17)
@@ -287,7 +287,7 @@ type PromptValue = string | readonly string[];
 **Signature**
 
 ```ts
-type ResolvedConstants<Descriptor> = {
+type ResolvedConstants<Descriptor extends ConstantsDescriptor> = {
   readonly [Key in keyof Descriptor["values"]]: ResolveConstant<Descriptor["values"][Key]>;
 };
 ```
@@ -299,7 +299,7 @@ type ResolvedConstants<Descriptor> = {
 **Signature**
 
 ```ts
-type ResolvedPrompt<Descriptor> = Descriptor["value"];
+type ResolvedPrompt<Descriptor extends PromptDescriptor> = Descriptor["value"];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/context-descriptors.ts#L46)
@@ -455,11 +455,11 @@ type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 **Signature**
 
 ```ts
-type Readonly<{ bucket?: "bucket" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "bucket"]>> : never; cache?: "cache" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "cache"]>> : never; job?: "job" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "job"]>> : never; event?: "event" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "event"]>> : never; model?: "model" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "model"]>> : never; realtime?: "realtime" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "realtime"]>> : never; "agent-state"?: "agent-state" extends keyof Providers ? Profile<NonNullable<Providers[keyof Providers & "agent-state"]>> : never; }> = Readonly<{
+type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
   [Capability in AppProviderCapability]?: Capability extends keyof Providers
     ? Profile<NonNullable<Providers[Capability]>>
     : never;
-}>
+}>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L59)
@@ -487,7 +487,8 @@ export interface AppProviderInputs {
 **Signature**
 
 ```ts
-type AppTelemetryConfig<Exporters> = TelemetryConfiguration<Exporters>;
+type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExporterMap> =
+  TelemetryConfiguration<Exporters>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L65)
@@ -497,7 +498,11 @@ type AppTelemetryConfig<Exporters> = TelemetryConfiguration<Exporters>;
 **Signature**
 
 ```ts
-type ApplicationDescriptor<Shape, Providers, Exporters> = DescriptorBase<"app", string> &
+type ApplicationDescriptor<
+  Shape extends EnvShape = EnvShape,
+  Providers extends AppProviderInputs = AppProviderInputs,
+  Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+> = DescriptorBase<"app", string> &
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
     readonly defaults: AppProviderDefaults<Providers>;
@@ -515,7 +520,11 @@ type ApplicationDescriptor<Shape, Providers, Exporters> = DescriptorBase<"app", 
 **Signature**
 
 ```ts
-type DefineAppOptions<Shape, Providers, Exporters> = DescriptorMetadata &
+type DefineAppOptions<
+  Shape extends EnvShape,
+  Providers extends AppProviderInputs,
+  Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+> = DescriptorMetadata &
   Providers & {
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;

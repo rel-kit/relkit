@@ -76,7 +76,7 @@ declare const BucketClient: BucketClient;
 **Signature**
 
 ```ts
-type BucketClient = BucketClient;
+type BucketClientFor<T> = BucketClient;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L117)
@@ -1383,7 +1383,15 @@ declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 **Signature**
 
 ```ts
-type FunctionAsTool<FunctionId, Input, Output, Errors, InputSchema, OutputSchema, ToolMetadata> = {
+type FunctionAsTool<
+  FunctionId extends string,
+  Input,
+  Output,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  ToolMetadata extends FunctionToolMetadata | undefined,
+> = {
   <const ToolId extends string>(
     options: FunctionToolOptions<ToolId, Input, Output> & { readonly id: ToolId },
   ): FunctionToolView<ToolId, FunctionId, Input, Output, Errors, InputSchema, OutputSchema>;
@@ -1568,7 +1576,11 @@ export interface DefineFunctionOptions<
 **Signature**
 
 ```ts
-type FunctionContext<D, Publishes, Progress> = FunctionContextBase<D, Publishes> &
+type FunctionContext<
+  D extends FunctionDependencies = {},
+  Publishes extends readonly KnownEventName[] = readonly [],
+  Progress = never,
+> = FunctionContextBase<D, Publishes> &
   ([Progress] extends [never]
     ? {}
     : { readonly progress: import("@relkit/invocation").ProgressEmitter<Progress> });
@@ -1667,7 +1679,14 @@ export interface FunctionDescriptor<
 **Signature**
 
 ```ts
-type FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSchema> = (
+type FunctionHandler<
+  Input,
+  Output,
+  Dependencies extends FunctionDependencies,
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+  Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+> = (
   input: Input,
   context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
@@ -1680,7 +1699,12 @@ type FunctionHandler<Input, Output, Dependencies, Errors, Publishes, ProgressSch
 **Signature**
 
 ```ts
-type FunctionLifecycleHook<Value, Dependencies, Publishes, ProgressSchema> = (
+type FunctionLifecycleHook<
+  Value,
+  Dependencies extends FunctionDependencies = {},
+  Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+> = (
   value: Value,
   context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<Value>;
@@ -1774,13 +1798,13 @@ type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
 
 ```ts
 type FunctionAsGraphNode<
-  FunctionId,
+  FunctionId extends string,
   Input,
   Output,
-  Errors,
-  InputSchema,
-  OutputSchema,
-  Dependencies,
+  Errors extends readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends FunctionDependencies,
 > = {
   <const NodeId extends string>(
     options: FunctionGraphNodeOptions<NodeId> & { readonly id: NodeId },
@@ -2248,7 +2272,10 @@ export interface FunctionToolDescriptor<
 **Signature**
 
 ```ts
-type FunctionToolHook<Value> = (value: Value, context: FunctionToolContext) => MaybePromise<Value>;
+type FunctionToolHook<Value = unknown> = (
+  value: Value,
+  context: FunctionToolContext,
+) => MaybePromise<Value>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-tool.ts#L39)
@@ -2315,7 +2342,7 @@ type FunctionToolSideEffect = "none" | "read" | "write" | "external";
 **Signature**
 
 ```ts
-type FunctionToolTarget<Target> = FunctionRef<
+type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
   Target["ref"]["id"],
   Target extends { readonly __input?: infer Input } ? Input : unknown,
   Target extends { readonly __output?: infer Output } ? Output : unknown,
@@ -2385,7 +2412,7 @@ declare const createFunctionTool: <const Id extends string, const Target extends
 **Signature**
 
 ```ts
-type DeclaredErrorOf<Descriptor> = ReturnType<Descriptor["create"]>;
+type DeclaredErrorOf<Descriptor extends ErrorDescriptorAny> = ReturnType<Descriptor["create"]>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.ts#L19)
@@ -2395,11 +2422,12 @@ type DeclaredErrorOf<Descriptor> = ReturnType<Descriptor["create"]>;
 **Signature**
 
 ```ts
-type DeclaredErrorsOf<Descriptors> = Descriptors[number] extends infer Descriptor
-  ? Descriptor extends ErrorDescriptorAny
-    ? DeclaredErrorOf<Descriptor>
-    : never
-  : never;
+type DeclaredErrorsOf<Descriptors extends readonly ErrorDescriptorAny[]> =
+  Descriptors[number] extends infer Descriptor
+    ? Descriptor extends ErrorDescriptorAny
+      ? DeclaredErrorOf<Descriptor>
+      : never
+    : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/handler-result.ts#L23)
@@ -2442,7 +2470,10 @@ export interface FunctionFailure<Error extends globalThis.Error = globalThis.Err
 **Signature**
 
 ```ts
-type FunctionHandlerResult<Output, Errors> =
+type FunctionHandlerResult<
+  Output,
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+> =
   | Output
   | DeclaredErrorsOf<Errors>
   | FunctionFailure<DeclaredErrorsOf<Errors>>
@@ -2456,7 +2487,7 @@ type FunctionHandlerResult<Output, Errors> =
 **Signature**
 
 ```ts
-type FunctionHandlerValidation<Result, Output, Errors> = [
+type FunctionHandlerValidation<Result, Output, Errors extends readonly ErrorDescriptorAny[]> = [
   InvalidHandlerResult<Awaited<Result>, Output, DeclaredErrorsOf<Errors>>,
 ] extends [never]
   ? [MissingDeclaredErrors<Result, Errors>] extends [never]
@@ -3006,7 +3037,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 **Signature**
 
 ```ts
-type BucketRef<Id> = DescriptorRef<"bucket", Id>;
+type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L65)

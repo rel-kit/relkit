@@ -350,7 +350,11 @@ export interface DefineServiceOptions<
 **Signature**
 
 ```ts
-type ServiceDescriptor<Id, Functions, Events> = DescriptorBase<"service", Id> &
+type ServiceDescriptor<
+  Id extends string,
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
+> = DescriptorBase<"service", Id> &
   PublicMembers<Functions, Events> & {
     readonly [serviceTypes]: {
       readonly functions: Functions;
