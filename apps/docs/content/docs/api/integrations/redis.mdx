@@ -107,7 +107,7 @@ declare const localRecipe: Readonly<{
 **Signature**
 
 ```ts
-type RedisAgentStateAdapter<Options> = ProviderAdapter<
+type RedisAgentStateAdapter<Options extends RedisOptions = RedisOptions> = ProviderAdapter<
   typeof agentState,
   "redis-agent-state",
   RedisConnection<Options>,
@@ -122,7 +122,7 @@ type RedisAgentStateAdapter<Options> = ProviderAdapter<
 **Signature**
 
 ```ts
-type RedisRealtimeAdapter<Options> = ProviderAdapter<
+type RedisRealtimeAdapter<Options extends RedisOptions = RedisOptions> = ProviderAdapter<
   typeof realtime,
   "redis-realtime",
   RedisConnection<Options>,
@@ -216,7 +216,7 @@ Since v0.2.0
 **Signature**
 
 ```ts
-type RedisAdapter<Options> = ProviderAdapter<
+type RedisAdapter<Options extends RedisOptions = RedisOptions> = ProviderAdapter<
   typeof cache,
   "redis",
   RedisConnection<Options>,
@@ -231,7 +231,7 @@ type RedisAdapter<Options> = ProviderAdapter<
 **Signature**
 
 ```ts
-type RedisBehavior<Options> = Options extends {
+type RedisBehavior<Options extends RedisOptions> = Options extends {
   readonly connectionTimeoutMs: infer Timeout extends number;
 }
   ? Readonly<{ connectionTimeoutMs: Timeout }>
@@ -245,7 +245,7 @@ type RedisBehavior<Options> = Options extends {
 **Signature**
 
 ```ts
-type RedisConnection<Options> = Options extends {
+type RedisConnection<Options extends RedisOptions> = Options extends {
   readonly url: infer Url extends RedisUrlReference;
 }
   ? Readonly<{ url: Url }>
@@ -274,7 +274,11 @@ export interface RedisOptions<
 **Signature**
 
 ```ts
-type RedisUrlReference<Name> = BindingValueRef<Name, string, "secret-string">;
+type RedisUrlReference<Name extends string = string> = BindingValueRef<
+  Name,
+  string,
+  "secret-string"
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/redis/src/redis.ts#L23)

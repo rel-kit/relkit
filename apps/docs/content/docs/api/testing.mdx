@@ -3108,7 +3108,9 @@ type FunctionContextOf<Target> =
 **Signature**
 
 ```ts
-type FunctionInput<Target> = InferInput<Target["input"]>;
+type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferInput<
+  Target["input"]
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L29)
@@ -3118,7 +3120,9 @@ type FunctionInput<Target> = InferInput<Target["input"]>;
 **Signature**
 
 ```ts
-type FunctionOutput<Target> = InferOutput<Target["output"]>;
+type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = InferOutput<
+  Target["output"]
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L33)

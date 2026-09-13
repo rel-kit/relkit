@@ -965,7 +965,7 @@ export interface BaseOperations<T extends Table> {
 **Signature**
 
 ```ts
-type DatabaseContext<Service> = {
+type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any>> = {
   readonly [Name in keyof TablesOf<Service[typeof SERVICE_TYPES]["schema"]>]: BaseOperations<
     TablesOf<Service[typeof SERVICE_TYPES]["schema"]>[Name]
   > &
@@ -1003,7 +1003,7 @@ export interface DeleteArgs<T extends Table> {
 **Signature**
 
 ```ts
-type DialectDatabase<T> = T extends SQLiteTable
+type DialectDatabase<T extends Table> = T extends SQLiteTable
   ? Omit<SQLiteAsyncDatabase<any, any, any>, "query">
   : T extends PgTable
     ? Omit<PgAsyncDatabase<any, any>, "query">
@@ -1047,9 +1047,9 @@ export interface DrizzleCapability {
 **Signature**
 
 ```ts
-type Partial<{ readonly [Name in keyof Tables]: ModelDescriptor<Tables[Name], any>; }> = Partial<{
+type DrizzleModelMap<Tables extends TableMap> = Partial<{
   readonly [Name in keyof Tables]: ModelDescriptor<Tables[Name], any>;
-}>
+}>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L104)
@@ -1059,7 +1059,7 @@ type Partial<{ readonly [Name in keyof Tables]: ModelDescriptor<Tables[Name], an
 **Signature**
 
 ```ts
-type DrizzleOverrides<Tables> = {
+type DrizzleOverrides<Tables extends TableMap> = {
   readonly [Name in keyof Tables]?: TableOverrides<Tables[Name]>;
 };
 ```
@@ -1071,7 +1071,12 @@ type DrizzleOverrides<Tables> = {
 **Signature**
 
 ```ts
-type DrizzleServiceDescriptor<Id, Client, Schema, Models> = DescriptorBase<"service", Id> & {
+type DrizzleServiceDescriptor<
+  Id extends string,
+  Client,
+  Schema,
+  Models extends DrizzleModelMap<TablesOf<Schema>>,
+> = DescriptorBase<"service", Id> & {
   readonly capability: DrizzleCapability;
   readonly [SERVICE_TYPES]: {
     readonly client: Client;
@@ -1118,7 +1123,7 @@ export interface FindOneArgs<T extends Table> {
 **Signature**
 
 ```ts
-type { [K in keyof ({ [Key in keyof T["_"]["columns"] & string as RequiredKeyOnly<Key, T["_"]["columns"][Key]>]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; } & { [Key in keyof T["_"]["columns"] & string as OptionalKeyOnly<Key, T["_"]["columns"][Key], false>]?: (T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null) | undefined; })]: ({ [Key in keyof T["_"]["columns"] & string as RequiredKeyOnly<Key, T["_"]["columns"][Key]>]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; } & { [Key in keyof T["_"]["columns"] & string as OptionalKeyOnly<Key, T["_"]["columns"][Key], false>]?: (T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null) | undefined; })[K]; } = InferInsertModel<T>
+type Insert<T extends Table> = InferInsertModel<T>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L19)
@@ -1167,7 +1172,10 @@ type ModelDescriptorAny = ModelDescriptor<Table, ModelExtensionMap<Table>>;
 **Signature**
 
 ```ts
-type ModelExtension<T> = (context: ModelExtensionContext<T>, ...args: any[]) => unknown;
+type ModelExtension<T extends Table> = (
+  context: ModelExtensionContext<T>,
+  ...args: any[]
+) => unknown;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L86)
@@ -1190,7 +1198,7 @@ export interface ModelExtensionContext<T extends Table> {
 **Signature**
 
 ```ts
-type Readonly<Record<string, ModelExtension<T>>> = Readonly<Record<string, ModelExtension<T>>>
+type ModelExtensionMap<T extends Table> = Readonly<Record<string, ModelExtension<T>>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L90)
@@ -1200,7 +1208,8 @@ type Readonly<Record<string, ModelExtension<T>>> = Readonly<Record<string, Model
 **Signature**
 
 ```ts
-type NonEmptyExtensions<Extensions> = keyof Extensions extends never ? never : Extensions;
+type NonEmptyExtensions<Extensions extends Readonly<Record<string, unknown>>> =
+  keyof Extensions extends never ? never : Extensions;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L91)
@@ -1223,7 +1232,7 @@ type OperationOverride<Args, Result> = (options: {
 **Signature**
 
 ```ts
-type { [K in keyof { [Key in keyof T["_"]["columns"] & string]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; }]: { [Key in keyof T["_"]["columns"] & string]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; }[K]; } = InferSelectModel<T>
+type Row<T extends Table> = InferSelectModel<T>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L18)
@@ -1243,7 +1252,7 @@ type TableMap = Readonly<Record<string, Table>>;
 **Signature**
 
 ```ts
-type TableOverrides<T> = {
+type TableOverrides<T extends Table> = {
   readonly [Name in keyof BaseOperations<T>]?: OperationOverride<
     Parameters<BaseOperations<T>[Name]>[0],
     Awaited<ReturnType<BaseOperations<T>[Name]>>
@@ -1287,7 +1296,7 @@ type TablesOf<Schema> = {
 **Signature**
 
 ```ts
-type Partial<{ [K in keyof ({ [Key in keyof T["_"]["columns"] & string as RequiredKeyOnly<Key, T["_"]["columns"][Key]>]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; } & { [Key in keyof T["_"]["columns"] & string as OptionalKeyOnly<Key, T["_"]["columns"][Key], false>]?: (T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null) | undefined; })]: ({ [Key in keyof T["_"]["columns"] & string as RequiredKeyOnly<Key, T["_"]["columns"][Key]>]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; } & { [Key in keyof T["_"]["columns"] & string as OptionalKeyOnly<Key, T["_"]["columns"][Key], false>]?: (T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null) | undefined; })[K]; }> = Partial<Insert<T>>
+type Update<T extends Table> = Partial<Insert<T>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L20)
@@ -1324,7 +1333,7 @@ export interface UpsertArgs<T extends Table> {
 **Signature**
 
 ```ts
-type Partial<{ [K in keyof { [Key in keyof T["_"]["columns"] & string]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; }]: { [Key in keyof T["_"]["columns"] & string]: T["_"]["columns"][Key]["_"]["notNull"] extends true ? T["_"]["columns"][Key]["_"]["data"] : T["_"]["columns"][Key]["_"]["data"] | null; }[K]; }> = Partial<Row<T>>
+type Where<T extends Table> = Partial<Row<T>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L21)
