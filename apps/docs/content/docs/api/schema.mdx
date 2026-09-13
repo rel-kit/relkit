@@ -150,7 +150,7 @@ type AnySchema = StandardSchemaV1;
 **Signature**
 
 ```ts
-type InputOf<S> = InferInput<S>;
+type InputOf<S extends AnySchema> = InferInput<S>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder.ts#L16)
@@ -178,7 +178,7 @@ export interface NumberSchema extends Schema<number, number> {
 **Signature**
 
 ```ts
-type ObjectInput<S> = {
+type ObjectInput<S extends Shape> = {
   [K in RequiredInputKeys<S>]: InputOf<S[K]>;
 } & {
   [K in OptionalInputKeys<S>]?: Exclude<InputOf<S[K]>, undefined>;
@@ -192,7 +192,7 @@ type ObjectInput<S> = {
 **Signature**
 
 ```ts
-type ObjectOutput<S> = {
+type ObjectOutput<S extends Shape> = {
   [K in RequiredOutputKeys<S>]: OutputOf<S[K]>;
 } & {
   [K in OptionalOutputKeys<S>]?: Exclude<OutputOf<S[K]>, undefined>;
@@ -206,7 +206,7 @@ type ObjectOutput<S> = {
 **Signature**
 
 ```ts
-type OutputOf<S> = InferOutput<S>;
+type OutputOf<S extends AnySchema> = InferOutput<S>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/builder.ts#L17)
@@ -1074,7 +1074,7 @@ Infers a schema's accepted input type.
 **Signature**
 
 ```ts
-type InferInput<S> = S["~standard"] extends {
+type InferInput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
   ? Types extends StandardSchemaTypes<infer Input, unknown>
@@ -1092,7 +1092,7 @@ Infers a schema's validated output type.
 **Signature**
 
 ```ts
-type InferOutput<S> = S["~standard"] extends {
+type InferOutput<S extends StandardSchemaV1> = S["~standard"] extends {
   readonly types?: infer Types;
 }
   ? Types extends StandardSchemaTypes<unknown, infer Output>
@@ -1333,7 +1333,7 @@ Namespace aliases matching the official Standard Schema v1 vocabulary.
 **Signature**
 
 ```ts
-type { readonly version: 1; readonly vendor: string; readonly validate: (value: unknown, options?: StandardSchemaOptions) => StandardResult<Output> | Promise<StandardResult<Output>>; readonly types?: StandardSchemaTypes<Input, Output>; } = StandardSchemaV1<Input, Output>["~standard"]
+type Props<Input = unknown, Output = Input> = StandardSchemaV1<Input, Output>["~standard"];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/standard-schema.ts#L70)
@@ -1393,7 +1393,7 @@ type PathSegment = { readonly key: PropertyKey };
 **Signature**
 
 ```ts
-type Types<Input, Output> = StandardSchemaTypes<Input, Output>;
+type Types<Input = unknown, Output = Input> = StandardSchemaTypes<Input, Output>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/standard-schema.ts#L76)
@@ -1413,7 +1413,7 @@ type Options = StandardSchemaOptions;
 **Signature**
 
 ```ts
-type InferInput<S> = import("./standard-schema.js").InferInput<S>;
+type InferInput<S extends StandardSchemaV1> = import("./standard-schema.js").InferInput<S>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/standard-schema.ts#L78)
@@ -1423,7 +1423,7 @@ type InferInput<S> = import("./standard-schema.js").InferInput<S>;
 **Signature**
 
 ```ts
-type InferOutput<S> = import("./standard-schema.js").InferOutput<S>;
+type InferOutput<S extends StandardSchemaV1> = import("./standard-schema.js").InferOutput<S>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/standard-schema.ts#L79)
