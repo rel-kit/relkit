@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-13T17:45:37.853Z",
+  "repository": {
+    "commit": "f6482d13081eeba17c13dcb3853f9b8c2dd63da8",
+    "packageManager": "bun@1.3.10",
+    "lockfile": "bun.lock",
+    "packages": {
+      "@relkit/jobs": "0.4.1",
+      "@relkit/runtime-effect": "0.4.1",
+      "effect": "4.0.0-rc.115",
+      "@effect/sql-pg": "4.0.0-rc.115",
+      "drizzle-orm": "1.0.0-rc.5-169397b",
+      "effect-mq": "0.7.0",
+      "typescript": "5.9.3"
+    },
+    "dirtyPaths": ["openspec/changes/add-task-first-jobs/", "plans/relkit-tasks-jobs-v1.1.md"]
+  },
+  "host": {
+    "os": "macOS 15.7.1",
+    "kernel": "Darwin 24.6.0",
+    "architecture": "arm64",
+    "runtime": {
+      "bun": "1.3.10",
+      "node": "24.12.0"
+    },
+    "docker": {
+      "server": "29.4.3",
+      "os": "linux",
+      "architecture": "arm64",
+      "storageDriver": "overlay2"
+    }
+  },
+  "effectCompatibility": {
+    "installed": {
+      "package": "effect",
+      "version": "4.0.0-rc.115",
+      "packagePath": "packages/runtime-effect/node_modules/effect/package.json",
+      "durationExports": ["fromInput", "fromInputUnsafe", "toMillis"]
+    },
+    "publishedEffectMq": [
+      { "version": "0.1.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.2.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.3.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.3.1", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.3.2", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.4.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.4.1", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.4.2", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.5.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.6.0", "effectPeer": ">=4.0.0-rc <5" },
+      { "version": "0.7.0", "effectPeer": ">=4.0.0-rc <5" }
+    ],
+    "publishedPeerDependencies": {
+      "effect": ">=4.0.0-rc <5",
+      "@effect/sql-pg": ">=4.0.0-rc <5",
+      "@effect/vitest": ">=4.0.0-rc <5",
+      "drizzle-orm": ">=1.0.0-rc <2"
+    },
+    "installedPeerDependencies": {
+      "effect": { "version": "4.0.0-rc.115", "satisfies": true },
+      "@effect/sql-pg": { "version": "4.0.0-rc.115", "satisfies": true },
+      "@effect/vitest": { "installed": false },
+      "drizzle-orm": { "version": "1.0.0-rc.5-169397b", "satisfies": true }
+    },
+    "selectedVersion": "0.7.0",
+    "status": "passed",
+    "statusReason": "native PostgreSQL acceptance, retry, state, cancellation and scheduling probes pass with an explicit PgTypes timestamp boundary"
+  },
+  "persistentBackends": {
+    "configuredByRelkit": [],
+    "localImages": [
+      {
+        "image": "redis:7-alpine",
+        "digest": "sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf",
+        "platform": "linux/arm64",
+        "owner": "Inngest self-hosted native fixture"
+      },
+      {
+        "image": "postgres:16-alpine",
+        "digest": "sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+        "platform": "linux/arm64",
+        "owner": "Inngest self-hosted native fixture"
+      }
+    ]
+  },
+  "providerProfiles": [
+    {
+      "provider": "inngest",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "not-tested",
+      "sdk": {
+        "package": "inngest",
+        "version": "4.20.0",
+        "integrity": "sha512-U6ro6cG+Y2ys79Qxo6hliDhjSjU/616XO1QzaViinSj8jGOpaei+iQ7cB66bL/M3sLceumn2r5i/SKfrevdbsw==",
+        "installed": false
+      },
+      "server": { "kind": "provider-managed", "version": null, "digest": null },
+      "persistentBackend": { "owner": "provider-managed", "settings": "not-observable locally" },
+      "evidence": []
+    },
+    {
+      "provider": "inngest",
+      "profile": "self-hosted",
+      "deployment": "self-hosted",
+      "status": "passed",
+      "sdk": {
+        "package": "inngest",
+        "version": "4.20.0",
+        "integrity": "sha512-U6ro6cG+Y2ys79Qxo6hliDhjSjU/616XO1QzaViinSj8jGOpaei+iQ7cB66bL/M3sLceumn2r5i/SKfrevdbsw==",
+        "installed": true
+      },
+      "server": {
+        "image": "inngest/inngest:v1.44.0",
+        "digest": "sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+        "platform": "linux/arm64"
+      },
+      "persistentBackend": {
+        "owner": "recipe",
+        "redis": "redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf",
+        "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+        "durability": "passed"
+      },
+      "evidence": [
+        "tests/jobs/compatibility/evidence/inngest-native.json",
+        "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+        "tests/jobs/compatibility/evidence/phase0-1.11.json"
+      ]
+    },
+    {
+      "provider": "trigger",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "not-tested",
+      "sdk": {
+        "package": "@trigger.dev/sdk",
+        "version": "4.5.16",
+        "integrity": "sha512-YjHz3Zv/yyLAS6tqFZMTVD2yTP6FopbPaLgtECLUqYx/pV2LQftgs7XI5o6NvtJxaDDLEz2wHqegCte1Ww2lKg==",
+        "installed": false
+      },
+      "server": { "kind": "provider-managed", "version": null, "digest": null },
+      "persistentBackend": { "owner": "provider-managed", "settings": "not-observable locally" },
+      "evidence": []
+    },
+    {
+      "provider": "trigger",
+      "profile": "self-hosted",
+      "deployment": "self-hosted",
+      "status": "not-tested",
+      "sdk": {
+        "package": "@trigger.dev/sdk",
+        "version": "4.5.16",
+        "integrity": "sha512-YjHz3Zv/yyLAS6tqFZMTVD2yTP6FopbPaLgtECLUqYx/pV2LQftgs7XI5o6NvtJxaDDLEz2wHqegCte1Ww2lKg==",
+        "installed": false
+      },
+      "server": {
+        "image": "triggerdotdev/trigger.dev:main",
+        "digest": "sha256:3563088912cf4b880602d99815ddd787274c4ce5fc77738adf1e5bad287fbd1e",
+        "tagPolicy": "moving tag; replace with a release tag before support"
+      },
+      "persistentBackend": { "owner": "self-hosted provider", "settings": "not-tested" },
+      "evidence": ["tests/jobs/compatibility/evidence/phase0-1.6-1.10.json"]
+    },
+    {
+      "provider": "effect-mq",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "unsupported",
+      "sdk": null,
+      "server": { "kind": "none", "version": null, "digest": null },
+      "persistentBackend": {
+        "owner": "none",
+        "settings": "effect-mq is a library, not a managed service"
+      },
+      "evidence": []
+    },
+    {
+      "provider": "effect-mq",
+      "profile": "self-hosted",
+      "deployment": "self-hosted",
+      "status": "passed",
+      "sdk": {
+        "package": "effect-mq",
+        "version": "0.7.0",
+        "integrity": "sha512-MljABw5vOCjqaKN11DGvBnfVoDfE6Jwbdidikxgkjo9JDk797E7vrYSB0ASbxPKCiev1BGWOFyYHXPb8eXmVuw==",
+        "installed": true
+      },
+      "server": { "kind": "application-owned worker", "version": null, "digest": null },
+      "persistentBackend": {
+        "owner": "recipe",
+        "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+        "durability": "passed"
+      },
+      "evidence": [
+        "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+        "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+      ]
+    }
+  ],
+  "probes": {
+    "native": {
+      "status": "passed",
+      "provider": "inngest",
+      "profile": "self-hosted",
+      "evidence": "tests/jobs/compatibility/evidence/inngest-native.json"
+    },
+    "localContractModel": {
+      "status": "executable",
+      "files": [
+        "tests/jobs/compatibility/retry-sleep.ts",
+        "tests/jobs/compatibility/watch-lifecycle.ts",
+        "tests/jobs/compatibility/version-routing.ts"
+      ],
+      "qualification": "Local model checks do not certify native durability, retry, sleep, or routing."
+    },
+    "nativePhase0": {
+      "status": "passed",
+      "provider": "inngest",
+      "profile": "self-hosted",
+      "tasks": ["1.6", "1.7", "1.8", "1.9", "1.10", "1.12"],
+      "evidence": "tests/jobs/compatibility/evidence/phase0-1.11.json"
+    },
+    "schedulePhase0": {
+      "status": "passed",
+      "provider": "inngest",
+      "profile": "self-hosted",
+      "tasks": ["1.11"],
+      "evidence": "tests/jobs/compatibility/evidence/phase0-1.11.json"
+    },
+    "effectMqPhase0": {
+      "status": "passed",
+      "provider": "effect-mq",
+      "profile": "self-hosted-postgresql",
+      "evidence": "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+    }
+  },
+  "capabilityMatrix": {
+    "status": "ready",
+    "evidence": "tests/jobs/compatibility/evidence/capability-matrix.json",
+    "verifier": "tests/jobs/compatibility/capability-matrix.ts",
+    "requiredNativeEngines": 2,
+    "provenNativeEngines": ["inngest", "effect-mq"],
+    "diagnostic": "Inngest and effect-mq prove the declared common subset; Inngest local listing now passes through v2, while unsupported schedule/version features are explicitly refused. Trigger is outside this two-engine phase gate."
+  }
+}
