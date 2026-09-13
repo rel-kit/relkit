@@ -75,6 +75,10 @@ source.
 - Do not stage, commit, push, reset, check out, or delete user-owned work unless
   explicitly requested. Do not modify protected normative documents or
   `repos/effect` during unrelated work.
+- For scoped OpenSpec/provider compatibility work, the user grants standing
+  authority to resolve local blockers autonomously, including changing local
+  dependency pins or revising capability evidence when a native guarantee is
+  unavailable; ask before cloud spend, destructive actions, or Git operations.
 - Inspect overlapping dirty changes before editing and report unavailable or
   intentionally skipped checks honestly.
 
