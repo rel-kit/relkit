@@ -20,7 +20,7 @@ export function createRelkitTracer(
   const tracer: EffectTracer.Tracer = EffectTracer.make({
     span: (options) => runtime.start(options),
     context(primitive, fiber) {
-      const span = fiber.currentSpan;
+      const span = fiber.cache.span;
       if (!(span instanceof RelkitSpan)) return primitive["~effect/Effect/evaluate"](fiber);
       const invocation = Context.get(fiber.context, InvocationTrace);
       return runInExecutionContext(

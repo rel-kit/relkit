@@ -22,20 +22,21 @@ export function document<Name extends string, Input, ContextInput, E, R>(
 }
 
 export function booleanFlag(path: readonly string[], name: string) {
-  return aliases(Flag.boolean(name), helpOption(path, name)).pipe(
+  return aliases(Flag.Boolean(name), helpOption(path, name)).pipe(
+    Flag.withDefault(false),
     Flag.withDescription(helpOption(path, name).description),
   );
 }
 
 export function optionalString(path: readonly string[], name: string) {
-  return aliases(Flag.string(name), helpOption(path, name)).pipe(
+  return aliases(Flag.String(name), helpOption(path, name)).pipe(
     Flag.withDescription(helpOption(path, name).description),
     Flag.optional,
   );
 }
 
 export function optionalInteger(path: readonly string[], name: string, allowZero = false) {
-  return aliases(Flag.integer(name), helpOption(path, name)).pipe(
+  return aliases(Flag.Int(name), helpOption(path, name)).pipe(
     Flag.filter(
       (value) => value >= (allowZero ? 0 : 1) && value <= 65_535,
       () => `${name} must be between ${allowZero ? 0 : 1} and 65535`,
@@ -49,7 +50,7 @@ export function optionalChoice(path: readonly string[], name: string) {
   const metadata = helpOption(path, name);
   if (!metadata.values || metadata.values.length === 0)
     throw new Error(`CLI choice metadata is missing for --${name}.`);
-  return aliases(Flag.choice(name, metadata.values), metadata).pipe(
+  return aliases(Flag.Literals(name, metadata.values), metadata).pipe(
     Flag.withDescription(metadata.description),
     Flag.optional,
   );
@@ -59,8 +60,8 @@ export function repeatedString(path: readonly string[], name: string) {
   const metadata = helpOption(path, name);
   const value =
     metadata.type === "choice" && metadata.values?.length
-      ? Flag.choice(name, metadata.values)
-      : Flag.string(name);
+      ? Flag.Literals(name, metadata.values)
+      : Flag.String(name);
   return aliases(value, metadata).pipe(
     Flag.withDescription(metadata.description),
     Flag.atMost(1_024),
@@ -68,7 +69,7 @@ export function repeatedString(path: readonly string[], name: string) {
 }
 
 export function optionalKeyValue(path: readonly string[], name: string) {
-  return aliases(Flag.keyValuePair(name), helpOption(path, name)).pipe(
+  return aliases(Flag.KeyValuePair(name), helpOption(path, name)).pipe(
     Flag.withDescription(helpOption(path, name).description),
     Flag.optional,
   );
@@ -88,7 +89,7 @@ export function stringArgument(
 export function stringArgument(path: readonly string[], name: string, required = true) {
   const metadata = docs(path).arguments.find((entry) => entry.name === name);
   if (!metadata) throw new Error(`CLI argument metadata is missing for ${name}.`);
-  const argument = Argument.string(name).pipe(Argument.withDescription(metadata.description));
+  const argument = Argument.String(name).pipe(Argument.withDescription(metadata.description));
   return required ? argument : argument.pipe(Argument.optional);
 }
 
