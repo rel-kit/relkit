@@ -1,0 +1,117 @@
+{
+  "recordedAt": "2026-09-13T13:35:48.709Z",
+  "command": "bun run test:jobs:providers",
+  "scope": ["1.6", "1.7", "1.8", "1.9", "1.10"],
+  "environment": {
+    "bun": "1.3.10",
+    "architecture": "linux/arm64 Docker containers from macOS arm64 host",
+    "inngest": {
+      "sdk": "inngest@4.20.0",
+      "server": "inngest/inngest:v1.44.0@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+      "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+      "redis": "redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf"
+    }
+  },
+  "inngest": {
+    "status": "unverified",
+    "persistence": {
+      "externalRedisAndPostgres": true,
+      "baselineStatus": "Completed",
+      "restartRetainedRun": true
+    },
+    "retryPolicy": {
+      "totalAttempts": 2,
+      "retryAfterInput": "2s",
+      "observedDelayMs": 1331,
+      "retryAfterConversion": {
+        "milliseconds": "2",
+        "string": "2",
+        "date": "2023-11-14T22:13:20.000Z"
+      },
+      "defaultBackoff": "not configurable in the Inngest 4.20.0 SDK function options",
+      "maximumDelayHorizon": "not observable from the pinned local server/SDK"
+    },
+    "deadlines": {
+      "finishTimeout": "2s",
+      "terminalStatus": "Cancelled",
+      "semantics": "finish timeout starts at the first successful function request, not event acceptance"
+    },
+    "concurrency": {
+      "functionLimit": 1,
+      "nonOverlappingIntervals": true,
+      "scope": "one self-hosted service and one SDK endpoint",
+      "replicasAndVersions": "not-tested"
+    },
+    "workerResources": {
+      "status": "not-tested",
+      "reason": "the fixture worker is a host Bun process without a declared CPU or memory cgroup"
+    },
+    "listing": {
+      "genericEndpointStatus": 404,
+      "eventScopedEndpointStatus": 200,
+      "cursorExposed": false,
+      "requiredFilters": "unsupported",
+      "fullScanUsed": false,
+      "trustedScope": "signing-key scoped",
+      "unauthenticatedStatus": 401,
+      "historicalOutputFieldPresent": true,
+      "historicalOutputPayloadAvailable": false,
+      "historicalSchemaAvailable": false,
+      "unknownStatusNormalization": "unknown"
+    },
+    "observation": {
+      "tokenFields": ["channel", "topics", "key", "apiBaseUrl"],
+      "streamMethods": ["getJsonStream", "getEncodedStream", "close", "unsubscribe"],
+      "twoSubscribersShareFeed": true,
+      "oneObserverCloseDoesNotStopAnother": true,
+      "lastObserverCloseReachedEof": true,
+      "invalidToken": "rejected",
+      "tokenExpiry": "not-forced",
+      "cursorReplay": "unsupported",
+      "snapshotSubscriptionRace": "not-tested",
+      "terminalEof": "not-certified",
+      "boundedPolling": "per-run native reads only"
+    },
+    "versionRouting": {
+      "registrationStatus": 200,
+      "oldBuild": "build-old",
+      "resumedBuild": "build-new",
+      "oldBuildResume": false,
+      "resumedStatus": "Completed",
+      "newSubmissionBuild": "build-new",
+      "locatorKeyRotation": "not-tested",
+      "retirement": "unsafe unless the old build and signing key remain routable for retained runs"
+    },
+    "recurringSchedule": "passed"
+  },
+  "effectMq": {
+    "status": "not-certified",
+    "package": "effect-mq@0.7.0",
+    "effect": "effect@4.0.0-rc.115",
+    "sql": "@effect/sql-pg@4.0.0-rc.115",
+    "drizzle": "drizzle-orm@1.0.0-rc.5-169397b",
+    "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "tablesCreated": 7,
+    "blockedAt": "PostgreSQL timestamp decode during native claim",
+    "error": "row.runAt.getTime is not a function",
+    "secondaryError": "LISTEN subscription failed; wake-ups degraded to polling",
+    "retryableJobOutcome": "not-certified",
+    "durableSleep": "unsupported by this retryable profile"
+  },
+  "trigger": {
+    "status": "not-tested",
+    "image": "triggerdotdev/trigger.dev:main@sha256:3563088912cf4b880602d99815ddd787274c4ce5fc77738adf1e5bad287fbd1e",
+    "imagePresent": false,
+    "sdk": "@trigger.dev/sdk@4.5.16",
+    "sdkInstalled": false,
+    "reason": "the available image uses the moving main tag; no release-pinned image, registration, or authentication configuration is available for a safe durable-task probe"
+  },
+  "releaseBlockers": [
+    "Inngest does not expose the required bounded, filtered, cursor-stable native listing in the pinned local API.",
+    "An old Inngest run was completed by the replacement build after the old worker stopped; retiring old builds or locator keys is unsafe without retained routing.",
+    "Inngest replica/version distribution and worker CPU/memory isolation were not proven.",
+    "effect-mq PostgreSQL retryable work is not certified on the pinned Effect and SQL driver versions.",
+    "Trigger Docker cannot be certified until a release-pinned image and supported registration/authentication configuration are available."
+  ],
+  "managedCloud": "not-tested; no account or cloud credential was used"
+}

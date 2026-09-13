@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-13T17:45:37.853Z",
+  "status": "ready",
+  "evidence": [
+    "tests/jobs/compatibility/evidence/inngest-native.json",
+    "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+    "tests/jobs/compatibility/evidence/phase0-1.11.json",
+    "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+  ],
+  "requiredCommonSubset": {
+    "features": [
+      "durable acceptance",
+      "retryable execution",
+      "current-state read",
+      "cancel request",
+      "native scheduling"
+    ],
+    "minimumNativeEngines": 2,
+    "nativeEnginesProven": ["inngest", "effect-mq"],
+    "gate": "ready",
+    "diagnostic": "Inngest and effect-mq prove the declared common subset; Inngest local listing now passes through v2, while unsupported schedule/version features are explicitly refused. Trigger is outside this two-engine phase gate."
+  },
+  "variants": [
+    {
+      "provider": "inngest",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "not-tested",
+      "features": {},
+      "evidence": []
+    },
+    {
+      "provider": "inngest",
+      "profile": "self-hosted",
+      "deployment": "docker",
+      "status": "passed",
+      "features": {
+        "durableAcceptance": "native",
+        "retryableExecution": "native",
+        "durableSleep": "native",
+        "currentStateRead": "native",
+        "cancelRequest": "native",
+        "scheduleCron": "native",
+        "scheduleTimezone": "native",
+        "scheduleOwnership": "unverified",
+        "scheduleDst": "unverified",
+        "scheduleOverlap": "unsupported",
+        "scheduleMisfire": "unverified",
+        "workerVersionTargeting": "unsupported",
+        "boundedFilteredListing": "native",
+        "historicalBuildResume": "unsupported"
+      },
+      "evidence": [
+        "tests/jobs/compatibility/evidence/inngest-native.json",
+        "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+        "tests/jobs/compatibility/evidence/phase0-1.11.json"
+      ],
+      "diagnostics": [
+        "The pinned local v2 API proves bounded app/status/function filtering, opaque cursor continuation, event-scoped runs and signing-key authorization without a full scan.",
+        "Replacement registration resumed an old run on the new worker build; old-build retirement is explicitly blocked unless the old route and key remain retained.",
+        "The pinned server does not expose native ownership listing, so schedule reconciliation remains unverified.",
+        "Cron has no portable overlap or misfire control, and DST transition replay is unverified in this SDK/server profile."
+      ]
+    },
+    {
+      "provider": "trigger",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "not-tested",
+      "features": {},
+      "evidence": []
+    },
+    {
+      "provider": "trigger",
+      "profile": "self-hosted",
+      "deployment": "docker",
+      "status": "not-tested",
+      "features": {},
+      "evidence": ["tests/jobs/compatibility/evidence/phase0-1.6-1.10.json"]
+    },
+    {
+      "provider": "effect-mq",
+      "profile": "managed",
+      "deployment": "cloud",
+      "status": "unsupported",
+      "features": { "durableSleep": "unsupported" },
+      "evidence": []
+    },
+    {
+      "provider": "effect-mq",
+      "profile": "self-hosted",
+      "deployment": "docker",
+      "status": "passed",
+      "features": {
+        "durableAcceptance": "native",
+        "retryableExecution": "native",
+        "currentStateRead": "native",
+        "cancelRequest": "native",
+        "nativeScheduling": "native",
+        "scheduleOwnership": "native",
+        "durableSleep": "unsupported"
+      },
+      "evidence": [
+        "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+        "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+      ],
+      "diagnostics": [
+        "LISTEN wake-ups are unavailable under the pinned Effect runtime; native polling fallback was observed and correctness passed.",
+        "Durable sleep remains unsupported by the queue/retryable profile."
+      ]
+    }
+  ]
+}

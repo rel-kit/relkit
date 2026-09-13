@@ -1,0 +1,64 @@
+{
+  "recordedAt": "2026-09-13T17:45:37.853Z",
+  "command": "bun tests/jobs/compatibility/inngest-native-phase0.ts",
+  "scope": ["1.11", "1.12"],
+  "environment": {
+    "provider": "inngest",
+    "profile": "self-hosted",
+    "sdk": "inngest@4.20.0",
+    "server": "inngest/inngest:v1.44.0@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+    "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "redis": "redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf",
+    "architecture": "linux/arm64 Docker containers from macOS arm64 host",
+    "scheduleCron": "TZ=America/New_York * * * * *"
+  },
+  "ownership": {
+    "syncStatuses": [200, 200],
+    "functionListing": "unsupported",
+    "ownedFunctionCount": 0,
+    "idempotentReconciliation": "unverified",
+    "diagnostic": "The pinned local server did not expose a function listing to verify ownership."
+  },
+  "query": {
+    "endpoint": "/v2/runs",
+    "boundedPageLimit": 1,
+    "appAndStatusFilters": true,
+    "functionFilterRequiresAppScope": true,
+    "eventScopedRuns": true,
+    "cursorContinuationWithoutOverlap": true,
+    "unauthenticatedStatus": 401,
+    "fullScanUsed": false
+  },
+  "recurrence": {
+    "firstRunId": "01M2DXWTQRYW9KVH39P7XZSRCK",
+    "firstWorkerVersion": "build-new",
+    "postRestartWorkerVersion": "build-new",
+    "timezonePrefixAccepted": true,
+    "dst": "not-tested; no native clock/transition control in the pinned Docker server"
+  },
+  "downtime": {
+    "status": "passed",
+    "stoppedAt": 1789321470468,
+    "restartedAt": 1789321536392,
+    "durationMs": 65924,
+    "observationsDuringDowntime": 0,
+    "firstObservationAfterRestart": 1789321536714,
+    "misfirePolicy": "unverified; the native run does not expose a scheduledFor value here"
+  },
+  "overlap": {
+    "status": "unsupported",
+    "diagnostic": "The pinned Inngest cron trigger has no portable overlap/misfire option; function concurrency is a separate native control."
+  },
+  "workerVersionTargeting": {
+    "status": "observed-current-registration",
+    "diagnostic": "New scheduled runs used build-new; the existing version probe separately showed an old sleeping run resumed on build-new, so old-build retirement remains unsafe."
+  },
+  "unsupported": [
+    "portable overlap=skip|allow mapping",
+    "portable misfire=skip|latest|all mapping",
+    "DST transition replay under a controllable native clock",
+    "native ownership listing/idempotent reconciliation proof for the pinned local API",
+    "historical build routing after replacement registration without retaining the old worker"
+  ],
+  "evidenceLimit": "This proves the pinned self-hosted Docker behavior only; managed Inngest and Trigger remain untested."
+}
