@@ -1,4 +1,5 @@
 import { type DescriptorKind, type Ref } from "@relkit/contracts";
+export type { JobRef, JobRefAny, TaskRef, TaskRefAny } from "@relkit/contracts/jobs";
 import type { StandardSchemaV1 } from "@relkit/schema";
 import type { ErrorDescriptorAny } from "./define-error.js";
 
@@ -46,14 +47,6 @@ export interface FunctionRef<
   readonly __output?: Output;
 }
 
-export interface JobRef<
-  Id extends string = string,
-  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
-> extends DescriptorRef<"job", Id> {
-  readonly input: InputSchema;
-  readonly profile?: string;
-}
-
 export interface EventRef<
   Id extends string = string,
   InputSchema extends StandardSchemaV1 = StandardSchemaV1,
@@ -83,7 +76,6 @@ export interface AgentRef<
 }
 
 export type FunctionRefAny = FunctionRef;
-export type JobRefAny = JobRef;
 export type EventRefAny = EventRef;
 export type BucketRefAny = BucketRef;
 export type CacheRefAny = CacheRef;
