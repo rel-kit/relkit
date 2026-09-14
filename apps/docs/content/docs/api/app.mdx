@@ -691,6 +691,7 @@ export * from "@relkit/functions";
   - ["./config.js" (namespace export)](#configjs-namespace-export)
   - ["./context-descriptors.js" (namespace export)](#context-descriptorsjs-namespace-export)
   - ["./context-resolver.js" (namespace export)](#context-resolverjs-namespace-export)
+  - ["./tasks.js" (namespace export)](#tasksjs-namespace-export)
   - ["@relkit/agents" (namespace export)](#relkitagents-namespace-export)
   - ["@relkit/buckets" (namespace export)](#relkitbuckets-namespace-export)
   - ["@relkit/cache" (namespace export)](#relkitcache-namespace-export)
@@ -745,6 +746,18 @@ export * from "./context-resolver.js";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L3)
+
+## "./tasks.js" (namespace export)
+
+Re-exports all named exports from the "./tasks.js" module.
+
+**Signature**
+
+```ts
+export * from "./tasks.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
 
 ## "@relkit/agents" (namespace export)
 
@@ -828,7 +841,7 @@ Re-exports all named exports from the "@relkit/realtime" module.
 export * from "@relkit/realtime";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## "@relkit/routes" (namespace export)
 
@@ -840,7 +853,7 @@ Re-exports all named exports from the "@relkit/routes" module.
 export * from "@relkit/routes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
 
 ## "@relkit/services" (namespace export)
 
@@ -852,7 +865,7 @@ Re-exports all named exports from the "@relkit/services" module.
 export * from "@relkit/services";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
 
 ## "@relkit/tools" (namespace export)
 
@@ -864,7 +877,7 @@ Re-exports all named exports from the "@relkit/tools" module.
 export * from "@relkit/tools";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
 
 ## EventAttributeValue
 
@@ -906,6 +919,31 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L9)
 
+## `jobs-legacy.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - ["@relkit/jobs/legacy" (namespace export)](#relkitjobslegacy-namespace-export)
+
+---
+
+# utils
+
+## "@relkit/jobs/legacy" (namespace export)
+
+Re-exports all named exports from the "@relkit/jobs/legacy" module.
+
+**Signature**
+
+```ts
+export * from "@relkit/jobs/legacy";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs-legacy.ts#L1)
+
 ## `jobs.ts`
 
 ---
@@ -914,6 +952,7 @@ declare const bindDescriptorIdentity: <T extends object>(descriptor: T, id: stri
 
 - [utils](#utils)
   - ["@relkit/jobs" (namespace export)](#relkitjobs-namespace-export)
+  - [RunStatus](#runstatus)
 
 ---
 
@@ -930,6 +969,16 @@ export * from "@relkit/jobs";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L1)
+
+## RunStatus
+
+**Signature**
+
+```ts
+declare const RunStatus: JobRunStatus;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/jobs.ts#L2)
 
 ## `realtime.ts`
 
@@ -1030,6 +1079,579 @@ export * from "@relkit/services";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/services.ts#L1)
+
+## `tasks.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [DefineTaskOptions](#definetaskoptions)
+  - [JobDescriptorForThisTask](#jobdescriptorforthistask)
+  - [NormalizedTaskRetryPolicy](#normalizedtaskretrypolicy)
+  - [RunResultOptions](#runresultoptions)
+  - [ServerTriggerOptions](#servertriggeroptions)
+  - [TaskAuthContext](#taskauthcontext)
+  - [TaskCallerInput](#taskcallerinput)
+  - [TaskCanonicalInput](#taskcanonicalinput)
+  - [TaskConcurrency](#taskconcurrency)
+  - [TaskContext](#taskcontext)
+  - [TaskContextBase](#taskcontextbase)
+  - [TaskDependencies](#taskdependencies)
+  - [TaskDescriptor](#taskdescriptor)
+  - [TaskDescriptorAny](#taskdescriptorany)
+  - [TaskExecution](#taskexecution)
+  - [TaskFailureHook](#taskfailurehook)
+  - [TaskHandler](#taskhandler)
+  - [TaskHandlerResult](#taskhandlerresult)
+  - [TaskHookContext](#taskhookcontext)
+  - [TaskInput](#taskinput)
+  - [TaskLogging](#tasklogging)
+  - [TaskOutput](#taskoutput)
+  - [TaskProgressEmitter](#taskprogressemitter)
+  - [TaskProgressInput](#taskprogressinput)
+  - [TaskProgressOutput](#taskprogressoutput)
+  - [TaskRawHandlerOutput](#taskrawhandleroutput)
+  - [TaskResources](#taskresources)
+  - [TaskRetryPolicy](#taskretrypolicy)
+  - [TaskRunContext](#taskruncontext)
+  - [TaskSleepOptions](#tasksleepoptions)
+  - [TaskStartHook](#taskstarthook)
+  - [TaskStreamEmitter](#taskstreamemitter)
+  - [TaskStreamEmitters](#taskstreamemitters)
+  - [TaskStreamFrames](#taskstreamframes)
+  - [TaskStreamInput](#taskstreaminput)
+  - [TaskStreamItem](#taskstreamitem)
+  - [TaskStreamOutput](#taskstreamoutput)
+  - [TaskStreamSchemas](#taskstreamschemas)
+  - [TaskSuccessHook](#tasksuccesshook)
+  - [TaskTriggerOptions](#tasktriggeroptions)
+  - [TaskValidatedOutput](#taskvalidatedoutput)
+  - [TriggerOptions](#triggeroptions)
+  - [assertTaskDescriptor](#asserttaskdescriptor)
+  - [defineTask](#definetask)
+  - [isTaskDescriptor](#istaskdescriptor)
+
+---
+
+# utils
+
+## DefineTaskOptions
+
+**Signature**
+
+```ts
+declare const DefineTaskOptions: DefineTaskOptions<
+  Id,
+  Version,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+  Errors,
+  Publishes,
+  ProgressSchema,
+  Streams,
+  Execution
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L3)
+
+## JobDescriptorForThisTask
+
+**Signature**
+
+```ts
+declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L4)
+
+## NormalizedTaskRetryPolicy
+
+**Signature**
+
+```ts
+declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L5)
+
+## RunResultOptions
+
+**Signature**
+
+```ts
+declare const RunResultOptions: RunResultOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L6)
+
+## ServerTriggerOptions
+
+**Signature**
+
+```ts
+declare const ServerTriggerOptions: ServerTriggerOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L7)
+
+## TaskAuthContext
+
+**Signature**
+
+```ts
+declare const TaskAuthContext: TaskAuthContext<Session>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L8)
+
+## TaskCallerInput
+
+**Signature**
+
+```ts
+declare const TaskCallerInput: TaskCallerInput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L9)
+
+## TaskCanonicalInput
+
+**Signature**
+
+```ts
+declare const TaskCanonicalInput: TaskCanonicalInput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L10)
+
+## TaskConcurrency
+
+**Signature**
+
+```ts
+declare const TaskConcurrency: TaskConcurrency<InputKey>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L11)
+
+## TaskContext
+
+**Signature**
+
+```ts
+declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L12)
+
+## TaskContextBase
+
+**Signature**
+
+```ts
+declare const TaskContextBase: TaskContextBase<Dependencies, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L13)
+
+## TaskDependencies
+
+**Signature**
+
+```ts
+declare const TaskDependencies: TaskDependencies;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L14)
+
+## TaskDescriptor
+
+**Signature**
+
+```ts
+declare const TaskDescriptor: TaskDescriptor<
+  Id,
+  Version,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+  Errors,
+  Publishes,
+  ProgressSchema,
+  Streams,
+  Execution
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L15)
+
+## TaskDescriptorAny
+
+**Signature**
+
+```ts
+declare const TaskDescriptorAny: TaskDescriptorAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L16)
+
+## TaskExecution
+
+**Signature**
+
+```ts
+declare const TaskExecution: TaskExecution;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L17)
+
+## TaskFailureHook
+
+**Signature**
+
+```ts
+declare const TaskFailureHook: TaskFailureHook<Dependencies, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L18)
+
+## TaskHandler
+
+**Signature**
+
+```ts
+declare const TaskHandler: TaskHandler<
+  InputSchema,
+  OutputSchema,
+  Execution,
+  Dependencies,
+  Errors,
+  ProgressSchema,
+  Streams,
+  Publishes
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L19)
+
+## TaskHandlerResult
+
+**Signature**
+
+```ts
+declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L20)
+
+## TaskHookContext
+
+**Signature**
+
+```ts
+declare const TaskHookContext: TaskHookContext<Dependencies, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L21)
+
+## TaskInput
+
+**Signature**
+
+```ts
+declare const TaskInput: TaskInput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L22)
+
+## TaskLogging
+
+**Signature**
+
+```ts
+declare const TaskLogging: TaskLogging;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L23)
+
+## TaskOutput
+
+**Signature**
+
+```ts
+declare const TaskOutput: TaskOutput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L24)
+
+## TaskProgressEmitter
+
+**Signature**
+
+```ts
+declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L27)
+
+## TaskProgressInput
+
+**Signature**
+
+```ts
+declare const TaskProgressInput: TaskProgressInput<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L25)
+
+## TaskProgressOutput
+
+**Signature**
+
+```ts
+declare const TaskProgressOutput: TaskProgressOutput<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L26)
+
+## TaskRawHandlerOutput
+
+**Signature**
+
+```ts
+declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L42)
+
+## TaskResources
+
+**Signature**
+
+```ts
+declare const TaskResources: TaskResources;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L28)
+
+## TaskRetryPolicy
+
+**Signature**
+
+```ts
+declare const TaskRetryPolicy: TaskRetryPolicy;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L29)
+
+## TaskRunContext
+
+**Signature**
+
+```ts
+declare const TaskRunContext: TaskRunContext;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L30)
+
+## TaskSleepOptions
+
+**Signature**
+
+```ts
+declare const TaskSleepOptions: TaskSleepOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L31)
+
+## TaskStartHook
+
+**Signature**
+
+```ts
+declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L32)
+
+## TaskStreamEmitter
+
+**Signature**
+
+```ts
+declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L33)
+
+## TaskStreamEmitters
+
+**Signature**
+
+```ts
+declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L34)
+
+## TaskStreamFrames
+
+**Signature**
+
+```ts
+declare const TaskStreamFrames: TaskStreamFrames<Streams>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L35)
+
+## TaskStreamInput
+
+**Signature**
+
+```ts
+declare const TaskStreamInput: TaskStreamInput<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L37)
+
+## TaskStreamItem
+
+**Signature**
+
+```ts
+declare const TaskStreamItem: TaskStreamItem<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L36)
+
+## TaskStreamOutput
+
+**Signature**
+
+```ts
+declare const TaskStreamOutput: TaskStreamOutput<Schema>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L38)
+
+## TaskStreamSchemas
+
+**Signature**
+
+```ts
+declare const TaskStreamSchemas: Readonly<Record<string, StandardSchemaV1<unknown, unknown>>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L39)
+
+## TaskSuccessHook
+
+**Signature**
+
+```ts
+declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies, Publishes>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L40)
+
+## TaskTriggerOptions
+
+**Signature**
+
+```ts
+declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L41)
+
+## TaskValidatedOutput
+
+**Signature**
+
+```ts
+declare const TaskValidatedOutput: TaskValidatedOutput<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L43)
+
+## TriggerOptions
+
+**Signature**
+
+```ts
+declare const TriggerOptions: TriggerOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L44)
+
+## assertTaskDescriptor
+
+**Signature**
+
+```ts
+declare const assertTaskDescriptor: (value: unknown) => asserts value is TaskDescriptorAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
+
+## defineTask
+
+**Signature**
+
+```ts
+declare const defineTask: <
+  const Id extends string,
+  const Version extends string,
+  const InputSchema extends StandardSchemaV1,
+  const OutputSchema extends StandardSchemaV1,
+  const Dependencies extends TaskDependencies = {},
+  const Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  const Publishes extends readonly PublishedEventName[] = readonly [],
+  const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  const Streams extends TaskStreamSchemas = {},
+  const Execution extends TaskExecution = "durable",
+>(
+  options: DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    Publishes,
+    ProgressSchema,
+    Streams,
+    Execution
+  >,
+) => TaskDescriptor<
+  Id,
+  Version,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+  Errors,
+  Publishes,
+  ProgressSchema,
+  Streams,
+  Execution
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
+
+## isTaskDescriptor
+
+**Signature**
+
+```ts
+declare const isTaskDescriptor: (value: unknown) => value is TaskDescriptorAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/tasks.ts#L1)
 
 ## `tools.ts`
 

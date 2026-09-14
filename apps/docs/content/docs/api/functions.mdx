@@ -1300,7 +1300,7 @@ declare const JobEnqueueResult: JobEnqueueResult;
 **Signature**
 
 ```ts
-declare const JobRef: JobRef<Id, InputSchema>;
+declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L52)
@@ -2924,10 +2924,12 @@ declare const streamOf: <const ItemSchema extends StandardSchemaV1>(
   - [JobClients](#jobclients)
   - [JobEnqueueOptions](#jobenqueueoptions)
   - [JobEnqueueResult](#jobenqueueresult)
-  - [JobRef (interface)](#jobref-interface)
-  - [JobRefAny (type alias)](#jobrefany-type-alias)
+  - [JobRef](#jobref)
+  - [JobRefAny](#jobrefany)
   - [JobState](#jobstate)
   - [JobStatus](#jobstatus)
+  - [TaskRef](#taskref)
+  - [TaskRefAny](#taskrefany)
 
 ---
 
@@ -2943,7 +2945,7 @@ Re-exports all named exports from the "./function-descriptor-types.js" module.
 export * from "./function-descriptor-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L91)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L83)
 
 ## AgentClientFor
 
@@ -2953,7 +2955,7 @@ export * from "./function-descriptor-types.js";
 declare const AgentClientFor: AgentClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L7)
 
 ## AgentClients
 
@@ -2963,7 +2965,7 @@ declare const AgentClientFor: AgentClientFor<T>;
 declare const AgentClients: AgentClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L8)
 
 ## AgentRef (interface)
 
@@ -2980,7 +2982,7 @@ export interface AgentRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L69)
 
 ## AgentRefAny (type alias)
 
@@ -2990,7 +2992,7 @@ export interface AgentRef<
 type AgentRefAny = AgentRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L82)
 
 ## BucketClient
 
@@ -3000,7 +3002,7 @@ type AgentRefAny = AgentRef;
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L9)
 
 ## BucketClientFor
 
@@ -3010,7 +3012,7 @@ declare const BucketClient: BucketClient;
 declare const BucketClientFor: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L10)
 
 ## BucketClients
 
@@ -3020,7 +3022,7 @@ declare const BucketClientFor: BucketClient;
 declare const BucketClients: BucketClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L11)
 
 ## BucketObjectMetadata
 
@@ -3030,7 +3032,7 @@ declare const BucketClients: BucketClients<M>;
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L12)
 
 ## BucketRef (type alias)
 
@@ -3040,7 +3042,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L58)
 
 ## BucketRefAny (type alias)
 
@@ -3050,7 +3052,7 @@ type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 type BucketRefAny = BucketRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L80)
 
 ## CacheClient
 
@@ -3060,7 +3062,7 @@ type BucketRefAny = BucketRef;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L13)
 
 ## CacheClientFor
 
@@ -3070,7 +3072,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 declare const CacheClientFor: CacheClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L14)
 
 ## CacheClients
 
@@ -3080,7 +3082,7 @@ declare const CacheClientFor: CacheClientFor<T>;
 declare const CacheClients: CacheClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L15)
 
 ## CacheOperationOptions
 
@@ -3090,7 +3092,7 @@ declare const CacheClients: CacheClients<M>;
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L16)
 
 ## CacheRef (interface)
 
@@ -3107,7 +3109,7 @@ export interface CacheRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L60)
 
 ## CacheRefAny (type alias)
 
@@ -3117,7 +3119,7 @@ export interface CacheRef<
 type CacheRefAny = CacheRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L81)
 
 ## DescriptorRef (interface)
 
@@ -3129,7 +3131,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L30)
 
 ## EventAttributeValue
 
@@ -3139,7 +3141,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 declare const EventAttributeValue: EventAttributeValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L19)
 
 ## EventClientFor
 
@@ -3149,7 +3151,7 @@ declare const EventAttributeValue: EventAttributeValue;
 declare const EventClientFor: EventClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L17)
 
 ## EventClients
 
@@ -3159,7 +3161,7 @@ declare const EventClientFor: EventClientFor<T>;
 declare const EventClients: EventClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L18)
 
 ## EventPublishOptions
 
@@ -3169,7 +3171,7 @@ declare const EventClients: EventClients<M>;
 declare const EventPublishOptions: EventPublishOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L20)
 
 ## EventPublishResult
 
@@ -3179,7 +3181,7 @@ declare const EventPublishOptions: EventPublishOptions;
 declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L21)
 
 ## EventRef (interface)
 
@@ -3195,7 +3197,7 @@ export interface EventRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L50)
 
 ## EventRefAny (type alias)
 
@@ -3205,7 +3207,7 @@ export interface EventRef<
 type EventRefAny = EventRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L79)
 
 ## FunctionRef (interface)
 
@@ -3229,7 +3231,7 @@ export interface FunctionRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L34)
 
 ## FunctionRefAny (type alias)
 
@@ -3239,7 +3241,7 @@ export interface FunctionRef<
 type FunctionRefAny = FunctionRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L85)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L78)
 
 ## JobClientFor
 
@@ -3249,7 +3251,7 @@ type FunctionRefAny = FunctionRef;
 declare const JobClientFor: JobClientFor<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L23)
 
 ## JobClients
 
@@ -3259,7 +3261,7 @@ declare const JobClientFor: JobClientFor<T>;
 declare const JobClients: JobClients<M>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L24)
 
 ## JobEnqueueOptions
 
@@ -3269,7 +3271,7 @@ declare const JobClients: JobClients<M>;
 declare const JobEnqueueOptions: JobEnqueueOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L22)
 
 ## JobEnqueueResult
 
@@ -3279,33 +3281,27 @@ declare const JobEnqueueOptions: JobEnqueueOptions;
 declare const JobEnqueueResult: JobEnqueueResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L25)
 
-## JobRef (interface)
-
-**Signature**
-
-```ts
-export interface JobRef<
-  Id extends string = string,
-  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
-> extends DescriptorRef<"job", Id> {
-  readonly input: InputSchema;
-  readonly profile?: string;
-}
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L49)
-
-## JobRefAny (type alias)
+## JobRef
 
 **Signature**
 
 ```ts
-type JobRefAny = JobRef;
+declare const JobRef: JobRef<Id, InputSchema, OutputSchema, Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L2)
+
+## JobRefAny
+
+**Signature**
+
+```ts
+declare const JobRefAny: JobRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L2)
 
 ## JobState
 
@@ -3315,7 +3311,7 @@ type JobRefAny = JobRef;
 declare const JobState: JobState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L26)
 
 ## JobStatus
 
@@ -3325,4 +3321,24 @@ declare const JobState: JobState;
 declare const JobStatus: JobStatus;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L27)
+
+## TaskRef
+
+**Signature**
+
+```ts
+declare const TaskRef: TaskRef<Id, InputSchema, OutputSchema, Errors>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L2)
+
+## TaskRefAny
+
+**Signature**
+
+```ts
+declare const TaskRefAny: TaskRefAny;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L2)
