@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
+import { defineApp } from "../../packages/app/src/define-app.ts";
+import { defineEnv } from "../../packages/config/src/index.ts";
 import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
 import { defineJob } from "../../packages/jobs/src/legacy.ts";
@@ -11,6 +13,7 @@ import {
   VALIDATION_PASSES,
   normalizeCompilation,
 } from "../../packages/compiler/src/index.ts";
+import { localJob } from "../../integrations/packages/local/src/index.ts";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
@@ -46,6 +49,28 @@ function values() {
   return [target, event, job, route, trigger] as const;
 }
 
+function legacyJobValues(legacyJobs: boolean) {
+  const target = defineFunction({
+    id: "orders.get",
+    input,
+    output,
+    handler: async () => ({ ok: true }),
+  });
+  const app = defineApp({
+    id: "app",
+    env: defineEnv({}),
+    jobs: localJob(),
+    compatibility: { legacyJobs },
+  });
+  const job = defineJob({
+    id: "orders.refresh",
+    input,
+    target,
+    retry: { maxAttempts: 2, initialDelayMs: 1, maxDelayMs: 5, multiplier: 2, jitter: "none" },
+  });
+  return [app, target, job] as const;
+}
+
 describe("compiler normalization", () => {
   test("runs all v3 passes in their exact order", () => {
     const seen: string[] = [];
@@ -70,6 +95,19 @@ describe("compiler normalization", () => {
     expect(codes).toContain(NORMALIZE_CODES.collision);
     expect(duplicate.outputs.manifest).toBe("");
     expect(duplicate.activatable).toBe(false);
+  });
+
+  test("requires an explicit compatibility opt-in for legacy jobs", () => {
+    const disabled = normalizeCompilation({ descriptors: legacyJobValues(false) });
+    expect(disabled.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
+    expect(disabled.activatable).toBe(false);
+
+    const enabled = normalizeCompilation({ descriptors: legacyJobValues(true) });
+    expect(enabled.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
   });
 
   test("sorts canonical graph bytes independently of descriptor enumeration", () => {

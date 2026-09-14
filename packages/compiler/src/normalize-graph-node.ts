@@ -10,7 +10,9 @@ import { serviceNodeData } from "./normalize-graph-services.js";
 import { channelNodeData } from "./normalize-graph-channel.js";
 import { agentNodeData } from "./normalize-graph-agent.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
-import { isRecord, refId } from "./normalize-utils.js";
+import { isRecord, refId, taskSchemaKey } from "./normalize-utils.js";
+import { graphIdForDescriptor } from "./normalize-graph-id.js";
+import { computeJobBuildId, serviceGenerationFor } from "./jobs/build-id.js";
 
 export function graphNodeFor(
   descriptor: NormalizedDescriptor,
@@ -19,7 +21,7 @@ export function graphNodeFor(
 ): GraphNode | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const base = {
-    id: descriptor.id,
+    id: graphIdForDescriptor(descriptor),
     source: descriptor.source,
     ...(descriptor.domainId === undefined ? {} : { domainId: descriptor.domainId }),
   };
@@ -66,7 +68,57 @@ export function graphNodeFor(
         concurrency: clean(value.concurrency),
         generated: clean(value.generated),
       };
+    case "task":
+      return {
+        ...base,
+        kind: "task",
+        taskId: descriptor.id,
+        version: typeof value.version === "string" ? value.version : "",
+        execution: value.execution === "retryable" ? "retryable" : "durable",
+        input: schema(work, descriptor, "input"),
+        output: schema(work, descriptor, "output"),
+        schemaHashes: schemaHashes(work, descriptor.id, ["input", "output", "progress"]),
+        errors: clean(value.errors),
+        dependencies: dependencyMetadata(value.dependencies),
+        publishes: clean(value.publishes ?? []),
+        policy: clean({ retry: value.retry, maxDuration: value.maxDuration, maxElapsed: value.maxElapsed, logging: value.logging }),
+        resources: clean(value.resources),
+        concurrency: clean(value.concurrency),
+        capabilities: clean({ execution: value.execution, observation: value.observation }),
+      };
     case "job":
+      if (isRecord(value.task) && refId(value.task) !== undefined) {
+        const taskValue = value.task;
+        const taskId = refId(taskValue)!;
+        const taskVersion = typeof taskValue.version === "string" ? taskValue.version : typeof value.version === "string" ? value.version : "";
+        const buildId = typeof value.buildId === "string" && value.buildId.length > 0 ? value.buildId : computeJobBuildId(descriptor, work);
+        return {
+          ...base,
+          kind: "job",
+          executionModel: "task",
+          name: typeof value.name === "string" ? value.name : "",
+          jobId: descriptor.id,
+          taskId,
+          taskVersion,
+          ...(buildId === undefined ? {} : { buildId }),
+          profile: selectedProviderProfile(application, "job", text(value.service ?? value.profile)) ?? "default",
+          serviceGeneration: serviceGenerationFor(work, descriptor),
+          implicit: value.implicit === true,
+          default: value.default === true,
+          input: schema(work, descriptor, "input"),
+          output: schema(work, descriptor, "output"),
+          schemaHashes: schemaHashes(work, taskId, ["input", "output", "progress"]),
+          errors: clean(value.errors),
+          progress: schema(work, descriptor, "progress"),
+          streams: clean(value.streams),
+          policy: clean(value.policy ?? { admission: value.admission }),
+          schedules: clean(value.schedules ?? value.schedule),
+          admission: clean(value.admission),
+          client: clean(value.client),
+          capabilities: clean(value.capabilities),
+          compatibility: clean(value.compatibility),
+        };
+      }
       return {
         ...base,
         kind: "job",
@@ -170,5 +222,32 @@ function schema(
   descriptor: NormalizedDescriptor,
   field: string,
 ): JsonValue {
+  if (descriptor.kind === "task") {
+    const direction = field === "input" ? "input" : "output";
+    return work.schemas.get(taskSchemaKey(descriptor.id, field, direction)) ?? null;
+  }
+  if (descriptor.kind === "job" && isRecord(descriptor.value) && isRecord(descriptor.value.task)) {
+    const taskId = refId(descriptor.value.task);
+    if (taskId !== undefined) {
+      const direction = field === "input" ? "input" : "output";
+      return work.schemas.get(taskSchemaKey(taskId, field, direction)) ?? null;
+    }
+  }
   return work.schemas.get(`${descriptor.id}:${field}`) ?? null;
+}
+
+function schemaHashes(
+  work: NormalizationWork,
+  taskId: string,
+  fields: readonly string[],
+): JsonValue {
+  const result: Record<string, string> = {};
+  for (const field of fields) {
+    for (const direction of ["input", "output"] as const) {
+      const key = taskSchemaKey(taskId, field, direction);
+      const hash = work.schemaHashes.get(key);
+      if (hash !== undefined) result[`${field}:${direction}`] = hash;
+    }
+  }
+  return result;
 }

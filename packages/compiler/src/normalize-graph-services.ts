@@ -18,12 +18,24 @@ export function serviceNodeData(
       ? [{ name, eventId: refId(target)! }]
       : [],
   );
+  const tasks = entries.flatMap(([name, target]) =>
+    isRecord(target) && target.ref?.kind === "task" && refId(target) !== undefined
+      ? [{ name, taskId: refId(target)! }]
+      : [],
+  );
+  const jobs = entries.flatMap(([name, target]) =>
+    isRecord(target) && target.ref?.kind === "job" && refId(target) !== undefined
+      ? [{ name, jobId: refId(target)! }]
+      : [],
+  );
   return {
     ...(typeof value.title === "string" ? { title: value.title } : {}),
     ...(typeof value.description === "string" ? { description: value.description } : {}),
     ...(Array.isArray(value.tags) ? { tags: clean(value.tags) } : {}),
     functions,
     events,
+    ...(tasks.length === 0 ? {} : { tasks }),
+    ...(jobs.length === 0 ? {} : { jobs }),
     ...(isRecord(value.capability)
       ? { capability: capability(value.capability, descriptor.id, work) }
       : {}),

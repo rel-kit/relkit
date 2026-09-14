@@ -2,6 +2,7 @@ import { middlewareForRoute } from "./middleware-coverage.js";
 import { requestedProviderProfile, selectedProviderProfile } from "./normalize-graph-app.js";
 import type { NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
+import { graphIdForDescriptor, graphIdForReference } from "./normalize-graph-id.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
   jobs: "enqueues-job",
@@ -28,7 +29,7 @@ export function addProviderEdge(
     const profile = selectedProviderProfile(application, capability, requested) ?? "default";
     const bindingId = `provider.${capability}.${profile}`;
     if (work.nodes.some((node) => node.kind === "provider" && node.id === bindingId)) {
-      add("uses-provider-profile", descriptor.id, bindingId);
+      add("uses-provider-profile", graphIdForDescriptor(descriptor), bindingId);
     }
   }
 }
@@ -38,10 +39,20 @@ export function addHookEdges(
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
 ): void {
+  if (descriptor.kind === "task") {
+    const ownerId = graphIdForDescriptor(descriptor);
+    for (const phase of ["start", "success", "failure"] as const) {
+      const field = phase === "start" ? "onStart" : phase === "success" ? "onSuccess" : "onFailure";
+      const hook = value[field];
+      if (typeof hook === "function" || (isRecord(hook) && hook.$relkit === "function"))
+        add("uses-hook", ownerId, `${ownerId}.${phase}`, { phase });
+    }
+    return;
+  }
   for (const phase of ["before", "after"] as const) {
     const hook = value[phase === "before" ? "onBefore" : "onAfter"];
     if (typeof hook === "function" || (isRecord(hook) && hook.$relkit === "function")) {
-      add("uses-hook", descriptor.id, `${descriptor.id}.${phase}`, { phase });
+      add("uses-hook", graphIdForDescriptor(descriptor), `${graphIdForDescriptor(descriptor)}.${phase}`, { phase });
     }
   }
 }
@@ -62,7 +73,7 @@ export function addPublicationEdges(
 ): void {
   if (!Array.isArray(publishes)) return;
   for (const eventId of publishes) {
-    if (typeof eventId === "string") add("publishes-event", descriptor.id, eventId);
+    if (typeof eventId === "string") add("publishes-event", graphIdForDescriptor(descriptor), eventId);
   }
 }
 
@@ -70,16 +81,21 @@ export function addDependencyEdges(
   add: GraphEdgeAdder,
   descriptor: NormalizedDescriptor,
   dependencies: unknown,
+  work: NormalizationWork,
 ): void {
   if (!isRecord(dependencies)) return;
   for (const [name, refs] of Object.entries(dependencies)) {
-    const kind = dependencyEdges[name];
+    const kind = descriptor.kind === "task" ? taskDependencyEdge(name) : dependencyEdges[name];
     if (kind === undefined || !isRecord(refs)) continue;
     for (const reference of Object.values(refs)) {
-      const target = refId(reference);
-      if (target) add(kind, descriptor.id, target);
+      const target = graphIdForReference(work, reference);
+      if (target) add(kind, graphIdForDescriptor(descriptor), target);
     }
   }
+}
+
+function taskDependencyEdge(name: string): string | undefined {
+  return ({ tasks: "triggers-task", jobs: "triggers-job" } as Record<string, string>)[name];
 }
 
 export function addToolEdges(add: GraphEdgeAdder, agentId: string, tools: unknown): void {
