@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
 import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/index.ts";
+import { defineJob } from "../../packages/jobs/src/legacy.ts";
 import { defineRoute, http } from "../../packages/routes/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { hashGraph as canonicalGraphHash } from "../../packages/graph/src/index.ts";

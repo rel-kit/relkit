@@ -10,7 +10,7 @@ import { defineBucket, isBucketDescriptor } from "../../packages/buckets/src/ind
 import { defineCache, isCacheDescriptor } from "../../packages/cache/src/index.ts";
 import { defineAgent, isAgentDescriptor } from "../../packages/agents/src/index.ts";
 import { defineEvent, isEventDescriptor } from "../../packages/events/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/index.ts";
+import { defineJob } from "../../packages/jobs/src/legacy.ts";
 import {
   defineMiddleware,
   defineRoute,
