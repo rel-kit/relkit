@@ -539,7 +539,7 @@ export default onExample;
     {
       "action": "create",
       "content": 
-"import { defineJob } from "@relkit/app/jobs";
+"import { defineJob } from "@relkit/app/jobs/legacy";
 import example from "@app/billing/functions/example.function.js";
 
 const exampleJob = defineJob({

@@ -99,7 +99,7 @@ export function jobSource(
   targetModule: string,
   profile?: string,
 ): string {
-  return `import { defineJob } from "@relkit/app/jobs";
+  return `import { defineJob } from "@relkit/app/jobs/legacy";
 ${sourceImport(target.binding, targetModule, target.exportKind)}
 
 const ${artifact.binding} = defineJob({
