@@ -1,5 +1,5 @@
 import { dirname, join, resolve } from "node:path";
-import { cp, mkdtemp, readFile, rename, rm, writeFile, mkdir } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm, writeFile, mkdir } from "node:fs/promises";
 import {
   canonicalJson,
   CONTRACT_VERSION,
@@ -21,6 +21,9 @@ import { createDiagnostic, type Diagnostic } from "@relkit/diagnostics";
 import { checkProject, type CheckOptions, type CheckResult } from "./check.js";
 import { serverSource } from "./build-server.js";
 import { selectedLocalServicePlan } from "./build-cohort.js";
+import { activateBuild } from "./build-activation.js";
+import { parseJobsManifest, stageJobs, taskJobsRuntimeDiagnostic } from "./build-jobs.js";
+import { buildFailure } from "./build-result.js";
 import {
   bundleServer,
   dockerfile,
@@ -47,7 +50,13 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
   const buildDirectory = resolve(options.buildDirectory ?? join(projectRoot, ".relkit", "build"));
   const checked = await (options.check ?? checkProject)({ ...options, mode: "production" });
   if (!checked.ok || checked.graphHash === undefined)
-    return failure(projectRoot, buildDirectory, checked.diagnostics);
+    return buildFailure(projectRoot, buildDirectory, checked.diagnostics);
+  const jobsManifest = parseJobsManifest(checked.outputs.jobsManifest);
+  if (jobsManifest !== undefined)
+    return buildFailure(projectRoot, buildDirectory, [
+      ...checked.diagnostics,
+      taskJobsRuntimeDiagnostic(),
+    ]);
   const stage = await mkdtemp(join(dirname(buildDirectory), ".relkit-build-"));
   try {
     const graph = JSON.parse(checked.outputs.graph) as ApplicationGraph;
@@ -69,6 +78,9 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
     const activationFingerprint = createRuntimeActivationFingerprint({
       graphHash,
       manifestSource,
+      ...(checked.outputs.jobsManifest === undefined
+        ? {}
+        : { jobsManifestSource: checked.outputs.jobsManifest }),
       runtimeIntegrationsPlanSource: checked.outputs.runtimeIntegrations,
       ...(localServicesPlanSource === undefined ? {} : { localServicesPlanSource }),
       ...(options.providerOverridesGeneration === undefined
@@ -80,6 +92,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
     const serverDirectory = join(stage, "server");
     await mkdir(serverDirectory, { recursive: true });
     await writeFile(join(stage, "application.graph.json"), `${canonicalJson(graph)}\n`);
+    await stageJobs(buildDirectory, stage, jobsManifest);
     await writeFile(join(stage, "openapi.json"), openapi === "" ? "{}\n" : openapi);
     await mkdir(join(stage, "public"), { recursive: true });
     await cp(join(projectRoot, "public"), join(stage, "public"), {
@@ -130,6 +143,9 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         graphHash,
         activationFingerprint,
         graphFile: "application.graph.json",
+        ...(jobsManifest === undefined
+          ? {}
+          : { jobsManifestFile: GENERATED_ARTIFACT_FILES.jobsManifest }),
         runtimeManifestFile: "server/runtime.manifest.ts",
         runtimeActivationFile: `server/${RUNTIME_ACTIVATION_FILE}`,
         runtimeIntegrationsPlanFile: `server/${RUNTIME_INTEGRATION_PLAN_FILE}`,
@@ -143,10 +159,9 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         inspector: tooling.inspector,
       })}\n`,
     );
-    await writeFile(join(stage, "Dockerfile"), dockerfile());
-    await writeFile(join(stage, ".dockerignore"), dockerignore());
-    await rm(buildDirectory, { recursive: true, force: true });
-    await rename(stage, buildDirectory);
+    await writeFile(join(stage, "Dockerfile"), dockerfile(jobsManifest !== undefined));
+    await writeFile(join(stage, ".dockerignore"), dockerignore(jobsManifest !== undefined));
+    await activateBuild(stage, buildDirectory);
     return Object.freeze({
       ok: true,
       projectRoot,
@@ -158,6 +173,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
         ".dockerignore",
         "Dockerfile",
         "application.graph.json",
+        ...(jobsManifest === undefined ? [] : [GENERATED_ARTIFACT_FILES.jobsManifest, "jobs/"]),
         "manifest.json",
         "openapi.json",
         "public/",
@@ -174,7 +190,7 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
     });
   } catch (error) {
     await rm(stage, { recursive: true, force: true }).catch(() => undefined);
-    return failure(projectRoot, buildDirectory, [
+    return buildFailure(projectRoot, buildDirectory, [
       ...checked.diagnostics,
       createDiagnostic({
         code: "RELKIT_BUILD_FAILED",
@@ -185,16 +201,3 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
   }
 }
 export const runBuild = buildProject;
-function failure(
-  projectRoot: string,
-  buildDirectory: string,
-  diagnostics: readonly Diagnostic[],
-): BuildResult {
-  return Object.freeze({
-    ok: false,
-    projectRoot,
-    buildDirectory,
-    diagnostics: Object.freeze([...diagnostics]),
-    artifacts: [],
-  });
-}
