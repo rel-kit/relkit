@@ -2,7 +2,7 @@ export { z } from "./builder.js";
 export type { NumberSchema, StringSchema, ZBuilder } from "./builder.js";
 export type { FileSchema, FileSchemaOptions } from "./file.js";
 export { SchemaValidationError, validate, validateSync } from "./standard-schema.js";
-export { isSchemaTransformed } from "./schema-metadata.js";
+export { getSchemaMetadata, isSchemaTransformed } from "./schema-metadata.js";
 export {
   getJsonSchema,
   isJsonSchemaAvailable,
