@@ -39,6 +39,8 @@ export interface RuntimeManifest {
   readonly routes?: ManifestEntries<unknown>;
   readonly tools?: ManifestEntries<unknown>;
   readonly services?: ManifestEntries<unknown>;
+  readonly tasks?: ManifestEntries<unknown>;
+  readonly jobs?: ManifestEntries<unknown>;
   readonly hooks?: ManifestEntries<unknown>;
   readonly application?: {
     readonly env: unknown;
