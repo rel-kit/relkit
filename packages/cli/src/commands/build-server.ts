@@ -43,6 +43,14 @@ export function serverSource(
     activation.localServicesPlanHash === undefined
       ? ""
       : 'import localServicesPlan from "./local-services.plan.json" with { type: "json" };';
+  const jobsManifestImport =
+    activation.jobsManifestHash === undefined
+      ? ""
+      : 'import jobsManifest from "../jobs.manifest.json" with { type: "json" };';
+  const jobsManifestVerification =
+    activation.jobsManifestHash === undefined
+      ? ""
+      : 'if (artifactHash(jobsManifest) !== activationFingerprint.jobsManifestHash) throw new Error("Runtime jobs manifest fingerprint verification failed.");';
   const localServicesVerification =
     activation.localServicesPlanHash === undefined
       ? ""
@@ -86,6 +94,7 @@ import { createProviderRealtimeDispatcher, setActiveRealtimeDispatcher } from "@
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
+${jobsManifestImport}
 import { runtimeManifest } from "./runtime.manifest.ts";
 
 const graph = ${canonicalJson(graph)};
@@ -95,9 +104,12 @@ const openapiDocument = ${canonicalJson(openapi)};
 const clientContractDocument = ${canonicalJson(clientContract)};
 const publicFingerprint = clientContractDocument.publicFingerprint ?? graphHash;
 const plan = createRegistrationPlan(graph);
+if ((plan.tasks ?? []).length > 0 || (plan.jobs ?? []).length > 0) throw new Error("RELKIT_TASK_RUNTIME_UNAVAILABLE");
+if (runtimeManifest.application?.compatibility?.legacyJobs !== true && plan.queues.some((node) => node.kind === "job" && (node.executionModel === undefined || node.executionModel === "legacy-function"))) throw new Error("RELKIT_LEGACY_JOBS_DISABLED");
 const artifactHash = (value) => "sha256:" + createHash("sha256").update(JSON.stringify(value) + "\\n").digest("hex");
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
 if (JSON.stringify(runtimeManifest.activationFingerprint) !== JSON.stringify(activationFingerprint)) throw new Error("Runtime activation fingerprint verification failed.");
+${jobsManifestVerification}
 if (runtimeIntegrationsPlan.version !== ${RUNTIME_INTEGRATION_PLAN_VERSION}) throw new Error("Runtime integration plan version " + String(runtimeIntegrationsPlan.version) + " is unsupported; rebuild with relkit build.");
 if (runtimeIntegrationsPlan.graphHash !== graphHash) throw new Error("Runtime integration plan does not match the application graph; rebuild with relkit build.");
 if (artifactHash(runtimeIntegrationsPlan) !== activationFingerprint.runtimeIntegrationsPlanHash) throw new Error("Runtime integration plan fingerprint verification failed.");
