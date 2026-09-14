@@ -1,5 +1,5 @@
 import type { ScheduleRegistration } from "@relkit/graph";
-import type { ScheduleDefinition } from "@relkit/jobs";
+import type { ScheduleDefinition } from "@relkit/jobs/legacy";
 import {
   completeSpan,
   currentTracePropagation,

@@ -4,7 +4,7 @@ import type {
   JobState,
   RetryPolicy,
   ScheduleDefinition,
-} from "@relkit/jobs";
+} from "@relkit/jobs/legacy";
 import type { PublicFailureEnvelope } from "@relkit/runtime-effect";
 import type { QueueRegistration, RegistrationPlan } from "@relkit/graph";
 import type { InvokeOptions } from "./invoke-types.js";
@@ -155,7 +155,7 @@ export interface MaterializedJob {
   readonly enqueue: (
     input: JsonValue,
     options?: JobEnqueueOptions,
-    context?: import("@relkit/jobs").JobOperationContext,
+    context?: import("@relkit/jobs/legacy").JobOperationContext,
   ) => Promise<JobQueueEntry>;
   readonly runNext: (instanceId?: string) => Promise<JobRunResult | undefined>;
 }

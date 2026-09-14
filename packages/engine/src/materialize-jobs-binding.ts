@@ -5,7 +5,7 @@ import {
   runInExecutionContext,
   startRootSpan,
 } from "@relkit/invocation";
-import type { JobOperationContext } from "@relkit/jobs";
+import type { JobOperationContext } from "@relkit/jobs/legacy";
 import { Tracer } from "effect";
 import type { InvocationAdmit } from "./invoke-types.js";
 import type {

@@ -1,5 +1,5 @@
 import type { QueueRegistration } from "@relkit/graph";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type {
   JobIdempotencyDefinition,
   JobMaterializationOptions,
