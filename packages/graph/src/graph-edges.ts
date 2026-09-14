@@ -1,9 +1,17 @@
-import type { ExposesEventEdge, ExposesFunctionEdge } from "./service-nodes.js";
+import type {
+  ExposesEventEdge,
+  ExposesFunctionEdge,
+  ExposesJobEdge,
+  ExposesTaskEdge,
+} from "./service-nodes.js";
 
 export const GRAPH_EDGE_KINDS = [
   "targets-function",
+  "targets-task",
   "calls-function",
   "enqueues-job",
+  "triggers-job",
+  "triggers-task",
   "publishes-event",
   "listens-to-event",
   "uses-bucket",
@@ -14,6 +22,8 @@ export const GRAPH_EDGE_KINDS = [
   "uses-provider-profile",
   "exposes-function",
   "exposes-event",
+  "exposes-task",
+  "exposes-job",
   "depends-on-service",
   "mounts-service",
   "declares-error",
@@ -29,17 +39,23 @@ export interface GraphEdgeBase<Kind extends GraphEdgeKind = GraphEdgeKind> {
 export interface TargetsFunctionEdge extends GraphEdgeBase<"targets-function"> {
   readonly role: "primary";
 }
+export interface TargetsTaskEdge extends GraphEdgeBase<"targets-task"> {
+  readonly role: "primary";
+}
 export interface UsesMiddlewareEdge extends GraphEdgeBase<"uses-middleware"> {
   readonly order: number;
   readonly match: "always" | "conditional";
 }
 export interface UsesHookEdge extends GraphEdgeBase<"uses-hook"> {
-  readonly phase: "before" | "after";
+  readonly phase: "before" | "after" | "start" | "success" | "failure";
 }
 export type GraphEdge =
   | TargetsFunctionEdge
+  | TargetsTaskEdge
   | GraphEdgeBase<"calls-function">
   | GraphEdgeBase<"enqueues-job">
+  | GraphEdgeBase<"triggers-job">
+  | GraphEdgeBase<"triggers-task">
   | GraphEdgeBase<"publishes-event">
   | GraphEdgeBase<"listens-to-event">
   | GraphEdgeBase<"uses-bucket">
@@ -50,6 +66,8 @@ export type GraphEdge =
   | GraphEdgeBase<"uses-provider-profile">
   | ExposesFunctionEdge
   | ExposesEventEdge
+  | ExposesTaskEdge
+  | ExposesJobEdge
   | GraphEdgeBase<"depends-on-service">
   | GraphEdgeBase<"mounts-service">
   | GraphEdgeBase<"declares-error">

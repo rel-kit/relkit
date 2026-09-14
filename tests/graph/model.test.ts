@@ -20,6 +20,7 @@ describe("graph model", () => {
       "app",
       "env",
       "function",
+      "task",
       "error",
       "trigger",
       "job",
@@ -36,8 +37,11 @@ describe("graph model", () => {
     ]);
     expect(GRAPH_EDGE_KINDS).toEqual([
       "targets-function",
+      "targets-task",
       "calls-function",
       "enqueues-job",
+      "triggers-job",
+      "triggers-task",
       "publishes-event",
       "listens-to-event",
       "uses-bucket",
@@ -48,6 +52,8 @@ describe("graph model", () => {
       "uses-provider-profile",
       "exposes-function",
       "exposes-event",
+      "exposes-task",
+      "exposes-job",
       "depends-on-service",
       "mounts-service",
       "declares-error",
