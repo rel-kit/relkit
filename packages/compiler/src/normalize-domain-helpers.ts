@@ -99,11 +99,15 @@ export function collectPublicMembers(
   for (const [name, member] of Object.entries(value)) {
     if (
       SERVICE_BASE_FIELDS.has(name) ||
-      (refKind(member) !== "function" && refKind(member) !== "event")
+      !["function", "event", "task", "job"].includes(refKind(member) ?? "")
     )
       continue;
     const memberId = refId(member);
-    const target = memberId === undefined ? undefined : descriptors.get(memberId);
+    const memberKind = refKind(member);
+    const target =
+      memberId === undefined || memberKind === undefined
+        ? undefined
+        : descriptors.get(`${memberKind}:${memberId}`);
     if (target === undefined) {
       add(
         work,
@@ -120,7 +124,7 @@ export function collectPublicMembers(
         "error",
         target,
       );
-    } else publicIds.add(target.id);
+    } else publicIds.add(`${target.kind}:${target.id}`);
   }
 }
 

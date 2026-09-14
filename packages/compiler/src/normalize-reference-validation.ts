@@ -12,7 +12,9 @@ import { validateRateLimitStore } from "./normalize-rate-limit.js";
 export function passReferences(work: NormalizationWork): void {
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
-    for (const [name, kind] of targetFields(descriptor.kind)) {
+    const fields =
+      descriptor.kind === "job" && isRecord(value.task) ? [] : targetFields(descriptor.kind);
+    for (const [name, kind] of fields) {
       if (descriptor.kind === "route" && value.raw === true) continue;
       if (referenceFor(work, value[name], kind) === undefined) {
         add(
@@ -26,7 +28,9 @@ export function passReferences(work: NormalizationWork): void {
         rejectEventOnlyTarget(work, descriptor, value[name]);
       }
     }
-    if (descriptor.kind === "function") validateDependencies(work, descriptor, value.dependencies);
+    if (descriptor.kind === "function" || descriptor.kind === "task") {
+      validateDependencies(work, descriptor, value.dependencies);
+    }
     if (descriptor.kind === "agent") validateAgentBackend(work, descriptor, value.backend);
     if (descriptor.kind === "route") {
       collectTransforms(work, descriptor, value.request);
@@ -66,7 +70,7 @@ function validateService(
 ): void {
   for (const target of Object.values(value)) {
     const kind = refKind(target);
-    if (kind === "function" || kind === "event") {
+    if (kind === "function" || kind === "event" || kind === "task" || kind === "job") {
       const resolved = referenceFor(work, target, kind);
       if (resolved === undefined) {
         add(

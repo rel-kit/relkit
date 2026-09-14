@@ -15,8 +15,8 @@ export function passIndex(work: NormalizationWork): void {
     const value = isRecord(service.value) ? service.value : {};
     for (const [member, target] of Object.entries(value)) {
       const kind = refKind(target);
-      if (!isRecord(target) || (kind !== "function" && kind !== "event")) continue;
-      const nested = nestedDescriptor(target, kind, service, work, member);
+      if (!isRecord(target) || !["function", "event", "task", "job"].includes(kind ?? "")) continue;
+      const nested = nestedDescriptor(target, kind!, service, work, member);
       if (nested !== undefined) register(work, nested, true);
     }
   }
@@ -51,11 +51,13 @@ function register(
   work.referencesByKind.set(descriptor.kind, kindIndex);
 
   const previous = work.references.get(descriptor.id);
-  if (previous !== undefined) {
-    if (!(nested && previous.value === descriptor.value)) addDuplicate(work, descriptor, previous);
-    return;
+  if (previous === undefined || previous.kind === descriptor.kind) {
+    if (previous !== undefined) {
+      if (!(nested && previous.value === descriptor.value)) addDuplicate(work, descriptor, previous);
+      return;
+    }
+    work.references.set(descriptor.id, descriptor);
   }
-  work.references.set(descriptor.id, descriptor);
   if (descriptor.kind === "middleware") work.middlewareReferences.set(descriptor.id, descriptor);
   if (descriptor.kind === "transform") work.transformReferences.set(descriptor.id, descriptor);
 }
