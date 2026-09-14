@@ -524,5 +524,14 @@ describe.serial("Phase 2 descriptor cohort", () => {
         ({ code }) => code,
       ),
     ).toEqual([CONVENTION_CODES.directory, CONVENTION_CODES.suffix]);
+
+    const task = createDescriptorBase("task", "orders.send");
+    expect(
+      checkConventions({
+        descriptor: task,
+        sourcePath: "src/orders/tasks/send.task.ts",
+        exportName: "sendEmail",
+      }),
+    ).toEqual([]);
   });
 });

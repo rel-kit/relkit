@@ -24,7 +24,7 @@ export interface DescriptorBase<
 /** A descriptor whose concrete kind and ID are not known by the caller. */
 export type DescriptorAny = DescriptorBase<DescriptorKind, string>;
 
-const descriptorKinds: readonly DescriptorKind[] = [
+export const DESCRIPTOR_KINDS: readonly DescriptorKind[] = [
   "app",
   "function",
   "service",
@@ -53,7 +53,7 @@ export function createRef<Kind extends DescriptorKind, Id extends string>(
 
 /** Returns whether a value is a supported descriptor kind. */
 export function isDescriptorKind(value: unknown): value is DescriptorKind {
-  return typeof value === "string" && descriptorKinds.includes(value as DescriptorKind);
+  return typeof value === "string" && DESCRIPTOR_KINDS.includes(value as DescriptorKind);
 }
 
 /** Returns whether a value has the exact portable descriptor-reference shape. */

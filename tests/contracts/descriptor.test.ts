@@ -9,6 +9,10 @@ import {
   isDescriptor,
   isRef,
 } from "../../packages/contracts/src/index.ts";
+import { defineJob } from "../../packages/jobs/src/define-job.ts";
+import { defineTask } from "../../packages/jobs/src/define-task.ts";
+import { defineService, isServiceDescriptor } from "../../packages/services/src/index.ts";
+import { z } from "../../packages/schema/src/index.ts";
 
 describe("descriptor contracts", () => {
   test("uses the global brand and normalized immutable refs", () => {
@@ -45,5 +49,22 @@ describe("descriptor contracts", () => {
       }),
     ).toBe(false);
     expect(() => assertDescriptor({})).toThrow("Invalid RelKit descriptor");
+  });
+
+  test("flattens task and job members while retaining descriptor identity", () => {
+    const task = defineTask({
+      id: "orders.reconcile",
+      version: "1",
+      input: z.object({ id: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const job = defineJob({ name: "reconcile", task });
+    const service = defineService({ id: "orders", tasks: { reconcileTask: task }, jobs: { reconcile: job } });
+
+    expect(isServiceDescriptor(service)).toBe(true);
+    expect(service.reconcileTask).toBe(task);
+    expect(service.reconcile).toBe(job);
+    expect(Object.isFrozen(service)).toBe(true);
   });
 });
