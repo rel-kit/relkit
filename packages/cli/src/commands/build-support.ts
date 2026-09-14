@@ -2,13 +2,14 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { symlink, unlink } from "node:fs/promises";
 
-export function dockerfile(): string {
+export function dockerfile(includeJobs = false): string {
+  const jobs = includeJobs ? "COPY jobs.manifest.json ./\nCOPY jobs/ ./jobs/\n" : "";
   return `FROM oven/bun:1.3.10
 ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
 COPY server/index.js ./server/index.js
 COPY application.graph.json manifest.json openapi.json ./
-COPY public/ ./public/
+${jobs}COPY public/ ./public/
 RUN mkdir -p .relkit/state .relkit/observability && chown -R bun:bun .relkit
 USER bun
 ENV NODE_ENV=production
@@ -18,14 +19,15 @@ CMD ["bun", "run", "--no-env-file", "server/index.js"]
 `;
 }
 
-export function dockerignore(): string {
+export function dockerignore(includeJobs = false): string {
+  const jobs = includeJobs ? "!jobs.manifest.json\n!jobs/\n!jobs/**\n" : "";
   return `*
 !Dockerfile
 !.dockerignore
 !manifest.json
 !application.graph.json
 !openapi.json
-!public/
+${jobs}!public/
 !public/**
 !server/
 !server/index.js
