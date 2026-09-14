@@ -1,5 +1,6 @@
 export * from "./define-task.js";
 export * from "./define-job.js";
+export * from "./resolve-binding.js";
 export * from "./task-types.js";
 export * from "./task-policy-validation.js";
 export * from "./task-wire.js";
