@@ -162,7 +162,7 @@ __relkit_bindDescriptorIdentity(__relkit_module_48["default"]["databaseUsers"], 
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:a523cc439f1cf8f5cc46e180b6f971fde2162bcf69848ab66b86cf84ec387c5b" as const;
+export const manifestGraphHash = "sha256:666e04924696ba1d1cdb6042fc89f51a239c6998772a2cd271ed882570a342d8" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
@@ -178,6 +178,8 @@ export const runtimeManifest = {
   constants: {  },
   prompts: {  },
   services: { "account": __relkit_module_2["default"], "announcements": __relkit_module_6["default"], "assets": __relkit_module_9["default"], "auth": __relkit_module_10["default"], "database": __relkit_module_11["default"], "navigation": __relkit_module_13["default"], "orders": __relkit_module_28["default"], "receipts": __relkit_module_33["default"], "users": __relkit_module_48["default"] },
+  tasks: {  },
+  jobs: {  },
   runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,
   middleware: { "order-auth": __relkit_module_40["default"] },
   hooks: {  },
