@@ -13,6 +13,7 @@ interface FactoryDefinition {
 
 const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   asTool: { kind: "tool", idOptional: true },
+  defineApp: { kind: "app", idOptional: true },
   defineConfig: { kind: "app", idOptional: true },
   defineConstants: { kind: "constants", idOptional: true },
   definePrompt: { kind: "prompt", idOptional: true },
@@ -63,6 +64,9 @@ export function factoryFor(
           ),
     position,
     options: optionNames(call.arguments[0]),
+    ...(factory === "defineConfig" || factory === "defineApp"
+      ? { optionPaths: optionPaths(call.arguments[0]) }
+      : {}),
   });
 }
 
@@ -78,6 +82,27 @@ function optionNames(argument: ts.Expression | undefined): readonly string[] {
   );
 }
 
+function optionPaths(argument: ts.Expression | undefined): readonly string[] {
+  const value = unwrap(argument);
+  if (!value || !ts.isObjectLiteralExpression(value)) return [];
+  const paths: string[] = [];
+  for (const property of value.properties) {
+    if (ts.isSpreadAssignment(property)) continue;
+    const name = propertyName(property.name);
+    if (name === undefined) continue;
+    paths.push(name);
+    if (name !== "defaults" && name !== "compatibility") continue;
+    if (!ts.isPropertyAssignment(property)) continue;
+    const nested = unwrap(property.initializer);
+    if (!nested || !ts.isObjectLiteralExpression(nested)) continue;
+    for (const child of nested.properties) {
+      const childName = propertyName(child.name);
+      if (childName !== undefined) paths.push(`${name}.${childName}`);
+    }
+  }
+  return Object.freeze(paths);
+}
+
 export function membersFor(
   factory: FactoryBindingFact,
   initializer: ts.Expression | undefined,
@@ -87,24 +112,32 @@ export function membersFor(
   const call = unwrap(initializer);
   const options = call && ts.isCallExpression(call) ? unwrap(call.arguments[0]) : undefined;
   if (!options || !ts.isObjectLiteralExpression(options)) return [];
-  const functions = options.properties.find(
-    (property) => propertyName(property.name) === "functions",
-  );
-  if (!functions || !ts.isPropertyAssignment(functions)) return [];
-  const map = unwrap(functions.initializer);
-  if (!map || !ts.isObjectLiteralExpression(map)) return [];
-  return map.properties.flatMap((property) => {
-    const member = propertyName(property.name);
-    if (member === undefined || ts.isSpreadAssignment(property)) return [];
-    const targetBinding = memberTarget(property);
-    return [
-      Object.freeze({
-        service: factory.binding!,
-        member,
-        ...(targetBinding === undefined ? {} : { targetBinding }),
-        position: property.name?.getStart(sourceFile) ?? property.getStart(sourceFile),
-      }),
-    ];
+  return options.properties.flatMap((property) => {
+    const category = propertyName(property.name);
+    if (
+      category !== "functions" &&
+      category !== "events" &&
+      category !== "tasks" &&
+      category !== "jobs"
+    ) {
+      return [];
+    }
+    if (!ts.isPropertyAssignment(property)) return [];
+    const map = unwrap(property.initializer);
+    if (!map || !ts.isObjectLiteralExpression(map)) return [];
+    return map.properties.flatMap((member) => {
+      const name = propertyName(member.name);
+      if (name === undefined || ts.isSpreadAssignment(member)) return [];
+      const targetBinding = memberTarget(member);
+      return [
+        Object.freeze({
+          service: factory.binding!,
+          member: name,
+          ...(targetBinding === undefined ? {} : { targetBinding }),
+          position: member.name?.getStart(sourceFile) ?? member.getStart(sourceFile),
+        }),
+      ];
+    });
   });
 }
 

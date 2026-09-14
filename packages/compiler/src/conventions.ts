@@ -171,6 +171,7 @@ function recommendedPattern(rule: KindRule): string {
   return rule.directory === "." ? rule.suffix : `${rule.directory}/**/*${rule.suffix}`;
 }
 function hasExportWarning(input: ConventionCheckInput): boolean {
+  if (isDescriptor(input.descriptor) && input.descriptor.kind === "task") return false;
   if (input.exports !== undefined) {
     return !input.exports.some(
       (entry) => entry.isDefault ?? entry.defaultExport ?? entry.name === "default",
