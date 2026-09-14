@@ -7,7 +7,7 @@ import { defineError, defineFunction } from "@relkit/functions";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
 import { defineEvent } from "@relkit/events";
-import { defineJob } from "@relkit/jobs";
+import { defineJob } from "@relkit/jobs/legacy";
 import { z, type InferInput, type InferOutput } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";
 
