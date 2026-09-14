@@ -4,7 +4,7 @@ import type {
   InvocationTarget,
   JobRunResult,
 } from "@relkit/engine";
-import type { JobClient, JobProvider, RetryPolicy } from "@relkit/jobs";
+import type { JobClient, JobProvider, RetryPolicy } from "@relkit/jobs/legacy";
 import type {
   JobAdmin,
   JobIdempotencyDefinition,
