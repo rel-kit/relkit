@@ -57,6 +57,37 @@ export function functionTargetExpressionsFor(
   return expressions;
 }
 
+export function taskExpressionsFor(
+  tasks: readonly NormalizedDescriptor[],
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+): ReadonlyMap<string, string> {
+  return new Map(
+    tasks.flatMap((descriptor) => {
+      const expression = executableExpression(descriptor, "handler", bindings, input);
+      return expression === undefined ? [] : [[descriptor.id, expression] as const];
+    }),
+  );
+}
+
+export function jobExpressionsFor(
+  jobs: readonly NormalizedDescriptor[],
+  bindings: ReadonlyMap<string, ImportBinding>,
+  input: ManifestGenerationInput,
+  tasks: ReadonlyMap<string, string> = new Map(),
+): ReadonlyMap<string, string> {
+  return new Map(
+    jobs.flatMap((descriptor) => {
+      const expression = executableExpression(descriptor, "descriptor", bindings, input);
+      if (expression !== undefined) return [[descriptor.id, expression] as const];
+      const value = isRecord(descriptor.value) ? descriptor.value : {};
+      const task = isRecord(value.task) && typeof value.task.ref?.id === "string" ? value.task.ref.id : undefined;
+      const taskExpression = task === undefined ? undefined : tasks.get(task);
+      return taskExpression === undefined ? [] : [[descriptor.id, `{ task: ${taskExpression} }`] as const];
+    }),
+  );
+}
+
 export function applicationExpressionFor(
   descriptor: NormalizedDescriptor | undefined,
   bindings: ReadonlyMap<string, ImportBinding>,
@@ -135,6 +166,15 @@ export function hookExpressionsFor(
 ): ReadonlyMap<string, string> {
   const expressions = new Map<string, string>();
   for (const descriptor of descriptors) {
+    if (descriptor.kind === "task") {
+      const target = executableExpression(descriptor, "descriptor", bindings, input);
+      for (const phase of ["start", "success", "failure"] as const) {
+        const property = phase === "start" ? "onStart" : phase === "success" ? "onSuccess" : "onFailure";
+        if (!isExecutableProperty(descriptor.value, property)) continue;
+        expressions.set(`${descriptor.id}.${phase}`, target === undefined ? "undefined" : `${target}.${property}`);
+      }
+      continue;
+    }
     if (descriptor.kind !== "function" && descriptor.kind !== "tool") continue;
     const target = executableExpression(descriptor, "descriptor", bindings, input);
     for (const phase of ["before", "after"] as const) {

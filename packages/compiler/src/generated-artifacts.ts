@@ -8,11 +8,13 @@ import {
   RUNTIME_INTEGRATION_PLAN_FILE,
   RUNTIME_INTEGRATION_PLAN_VERSION,
 } from "@relkit/contracts";
+import { JOBS_MANIFEST_VERSION } from "@relkit/contracts/jobs";
 import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { GeneratedOutputs } from "./normalize-types.js";
 export const GENERATED_ARTIFACT_FILES = Object.freeze({
   graph: "application.graph.json",
   manifest: "runtime.manifest.ts",
+  jobsManifest: "jobs.manifest.json",
   runtimeActivation: "runtime-activation.json",
   runtimeIntegrations: RUNTIME_INTEGRATION_PLAN_FILE,
   runtimeIntegrationImports: "runtime-integrations.ts",
@@ -26,6 +28,7 @@ export const GENERATED_ARTIFACT_FILES = Object.freeze({
 export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
   graph: GRAPH_VERSION,
   manifest: MANIFEST_VERSION,
+  jobsManifest: JOBS_MANIFEST_VERSION,
   runtimeActivation: GENERATOR_VERSION,
   runtimeIntegrations: RUNTIME_INTEGRATION_PLAN_VERSION,
   runtimeIntegrationImports: GENERATOR_VERSION,
@@ -41,6 +44,7 @@ export const GENERATED_ARTIFACT_VERSIONS = Object.freeze({
 const GENERATED_ARTIFACT_KINDS = [
   "graph",
   "manifest",
+  "jobsManifest",
   "runtimeActivation",
   "runtimeIntegrations",
   "runtimeIntegrationImports",
@@ -93,9 +97,12 @@ export interface GeneratedArtifactsWriteReport {
 /** Builds compiler-owned artifacts without adding time or process metadata. */
 export function generatedArtifacts(outputs: GeneratedOutputs): readonly GeneratedArtifact[] {
   return Object.freeze(
-    GENERATED_ARTIFACT_KINDS.map((kind) =>
-      artifact(GENERATED_ARTIFACT_FILES[kind], outputs[kind], GENERATED_ARTIFACT_VERSIONS[kind]),
-    ),
+    GENERATED_ARTIFACT_KINDS.flatMap((kind) => {
+      const content = outputs[kind];
+      return content === undefined
+        ? []
+        : [artifact(GENERATED_ARTIFACT_FILES[kind], content, GENERATED_ARTIFACT_VERSIONS[kind])];
+    }),
   );
 }
 

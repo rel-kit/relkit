@@ -15,6 +15,8 @@ import {
   descriptorExpressionsFor,
   functionExpressionsFor,
   functionTargetExpressionsFor,
+  jobExpressionsFor,
+  taskExpressionsFor,
   hookExpressionsFor,
   middlewareExpressionsFor,
   transformExpressionsFor,
@@ -85,6 +87,11 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
   const prompts = descriptorsOf(input.descriptors, "prompt");
   const services = descriptorsOf(input.descriptors, "service");
   const events = descriptorsOf(input.descriptors, "event");
+  const tasks = descriptorsOf(input.descriptors, "task");
+  const jobs = descriptorsOf(input.descriptors, "job").filter((descriptor) => {
+    const value = descriptor.value;
+    return value !== null && typeof value === "object" && !Array.isArray(value) && "task" in value;
+  });
   const functionById = uniqueById(functions, diagnostics);
   const modules = collectModules(functions, middleware, transforms, input, application, [
     ...input.descriptors,
@@ -92,6 +99,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     ...tools,
     ...events,
     ...channels,
+    ...tasks,
+    ...jobs,
   ]);
   const bindings = importBindings(modules);
   const identityBindings = identityBindingStatements(input.descriptors, bindings, input);
@@ -117,9 +126,11 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
     }),
   );
   const serviceExpressions = descriptorExpressionsFor(services, bindings, input);
+  const taskExpressions = taskExpressionsFor(tasks, bindings, input);
+  const jobExpressions = jobExpressionsFor(jobs, bindings, input, taskExpressions);
   const transformExpressions = transformExpressionsFor(transforms, bindings, input, diagnostics);
   const middlewareExpressions = middlewareExpressionsFor(middleware, bindings, input, diagnostics);
-  const hookExpressions = hookExpressionsFor([...functions, ...tools], bindings, input);
+  const hookExpressions = hookExpressionsFor([...functions, ...tools, ...tasks], bindings, input);
 
   if (diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
     return result("", diagnostics, false);
@@ -141,6 +152,8 @@ export function generateManifest(input: ManifestGenerationInput): GeneratedManif
       constantExpressions,
       promptExpressions,
       serviceExpressions,
+      taskExpressions,
+      jobExpressions,
       identityBindings,
     ),
     diagnostics,
