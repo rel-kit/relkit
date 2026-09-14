@@ -11,6 +11,7 @@ import { canonicalGraphJson, type ApplicationGraph } from "@relkit/graph";
 import type { LocalServicePlan } from "@relkit/local-service";
 import { createRuntimeActivationFingerprint } from "./activation-fingerprint.js";
 import { generateManifest, type GeneratedManifest } from "./generate-manifest.js";
+import { generateJobsManifest, type GeneratedJobsManifest } from "./jobs/manifest.js";
 import { isRecord } from "./normalize-utils.js";
 import { generateRuntimeIntegrationImports } from "./runtime-integration-imports.js";
 import type { GeneratedOutputs, NormalizedGraph, NormalizationWork } from "./normalize-types.js";
@@ -21,6 +22,7 @@ export function makeOutputs(
   diagnostics: readonly unknown[],
   work: NormalizationWork,
   manifest?: GeneratedManifest,
+  jobsManifest?: GeneratedJobsManifest,
   runtimeIntegrations?: RuntimeIntegrationPlan,
   localServices?: LocalServicePlan,
 ): GeneratedOutputs {
@@ -36,6 +38,18 @@ export function makeOutputs(
       diagnostics: diagnostics.filter(isDiagnostic),
       ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
     });
+  const generatedJobsManifest =
+    jobsManifest ??
+    (hasTaskJobs(work)
+      ? generateJobsManifest({
+          graph,
+          graphHash: hash,
+          descriptors: work.descriptors,
+          diagnostics: diagnostics.filter(isDiagnostic),
+          work,
+          ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
+        })
+      : undefined);
   const graphSource = `${canonicalGraphJson(
     graph,
     work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot },
@@ -52,6 +66,9 @@ export function makeOutputs(
           createRuntimeActivationFingerprint({
             graphHash: hash,
             manifestSource,
+            ...(generatedJobsManifest?.activatable
+              ? { jobsManifestSource: generatedJobsManifest.source }
+              : {}),
             runtimeIntegrationsPlanSource: runtimeIntegrationsSource,
             ...(localServices?.services.length === 0 || localServicesSource === ""
               ? {}
@@ -69,6 +86,9 @@ export function makeOutputs(
         : generateRuntimeIntegrationImports(runtimeIntegrations),
     localServices: localServicesSource,
     diagnostics: `${canonicalJson(diagnostics)}\n`,
+    ...(generatedJobsManifest === undefined || !generatedJobsManifest.activatable
+      ? {}
+      : { jobsManifest: generatedJobsManifest.source }),
     openapi: generatedOpenApi(graph, diagnostics),
     client: generatedClient(graph, diagnostics),
     contract: errors ? "" : generateContract(graph as unknown as ApplicationGraph),
@@ -78,6 +98,16 @@ export function makeOutputs(
     clientRegistry: errors ? "" : generateClientRegistry(graph as unknown as ApplicationGraph),
     clientManifest: errors ? "" : generateClientManifest(graph as unknown as ApplicationGraph),
   });
+}
+
+function hasTaskJobs(work: NormalizationWork): boolean {
+  return work.descriptors.some(
+    (descriptor) => descriptor.kind === "task" || (descriptor.kind === "job" && isTaskJob(descriptor)),
+  );
+}
+
+function isTaskJob(descriptor: NormalizationWork["descriptors"][number]): boolean {
+  return isRecord(descriptor.value) && isRecord(descriptor.value.task);
 }
 
 function isDiagnostic(value: unknown): value is import("@relkit/diagnostics").Diagnostic {

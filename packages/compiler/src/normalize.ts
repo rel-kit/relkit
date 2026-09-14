@@ -1,5 +1,6 @@
 import { hashGraph } from "./normalize-graph.js";
 import { generateManifest } from "./generate-manifest.js";
+import { generateJobsManifest } from "./jobs/manifest.js";
 import { makeOutputs } from "./normalize-output.js";
 import {
   passAgents,
@@ -49,6 +50,7 @@ export function normalizeCompilation(input: NormalizeInput = {}): NormalizationR
     middlewareReferences: new Map(),
     transformReferences: new Map(),
     schemas: new Map(),
+    schemaHashes: new Map(),
     nodes: [],
     edges: [],
     observedEdges: [...(input.observedEdges ?? [])],
@@ -97,6 +99,7 @@ export function normalizeCompilation(input: NormalizeInput = {}): NormalizationR
     diagnostics: Object.freeze(sortDiagnostics(work.diagnostics)),
     descriptors: Object.freeze([...work.descriptors]),
     references: work.references,
+    referencesByKind: work.referencesByKind,
     observedEdges: Object.freeze([...work.observedEdges]),
     ...(work.graph === undefined ? {} : { graph: work.graph }),
     ...(work.graphHash === undefined ? {} : { graphHash: work.graphHash }),
@@ -143,6 +146,17 @@ function passOutputs(work: NormalizationWork): void {
     ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
   });
   work.diagnostics.push(...manifest.diagnostics);
+  const jobsManifest = hasTaskJobs(work)
+    ? generateJobsManifest({
+        graph: work.graph,
+        graphHash: hash,
+        descriptors: work.descriptors,
+        diagnostics: work.diagnostics,
+        work,
+        ...(work.input.projectRoot === undefined ? {} : { projectRoot: work.input.projectRoot }),
+      })
+    : undefined;
+  if (jobsManifest !== undefined) work.diagnostics.push(...jobsManifest.diagnostics);
   const localServices = generateLocalServicePlan(work.graph, hash);
   work.outputs = makeOutputs(
     work.graph,
@@ -150,6 +164,7 @@ function passOutputs(work: NormalizationWork): void {
     sortDiagnostics(work.diagnostics),
     work,
     manifest,
+    jobsManifest,
     runtimeIntegrations,
     localServices,
   );
@@ -157,12 +172,25 @@ function passOutputs(work: NormalizationWork): void {
     work.outputs = Object.freeze({
       ...work.outputs,
       manifest: "",
+      ...(hasTaskJobs(work) ? { jobsManifest: "" } : {}),
       runtimeActivation: "",
       runtimeIntegrations: "",
       runtimeIntegrationImports: "",
       localServices: "",
     });
   }
+}
+
+function hasTaskJobs(work: NormalizationWork): boolean {
+  return work.descriptors.some(
+    (descriptor) =>
+      descriptor.kind === "task" ||
+      (descriptor.kind === "job" &&
+        descriptor.value !== null &&
+        typeof descriptor.value === "object" &&
+        !Array.isArray(descriptor.value) &&
+        "task" in descriptor.value),
+  );
 }
 
 function sortDiagnostics<
