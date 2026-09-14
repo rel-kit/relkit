@@ -1,5 +1,5 @@
 import { canonicalJson, normalizeId, type JsonValue } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type { JobStore, JobRecord } from "../jobs/store.js";
 import { readEntry } from "../jobs/queue-entry.js";
 import type { JobQueue, JobQueueEntry } from "../jobs/queue-utils.js";

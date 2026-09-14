@@ -1,4 +1,4 @@
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type { UnknownEventEnvelope } from "@relkit/events";
 import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogInput, EventLogRecord } from "./log.js";
