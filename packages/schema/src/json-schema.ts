@@ -1,5 +1,10 @@
 import type { JsonValue, StandardSchemaV1 } from "./standard-schema.js";
-import { getSchemaMetadata } from "./schema-metadata.js";
+import {
+  getMetadataProjection,
+  getSchemaMetadata,
+  isMetadataOptional,
+  type SchemaProjectionDirection,
+} from "./schema-metadata.js";
 
 export const JSON_SCHEMA_UNAVAILABLE = "RELKIT_SCHEMA_UNAVAILABLE" as const;
 
@@ -19,28 +24,68 @@ export interface JsonSchemaUnavailable {
 
 export type JsonSchemaResult = JsonSchemaAvailable | JsonSchemaUnavailable;
 export type JsonSchemaFactory = () => JsonValue;
+export type JsonSchemaDirection = SchemaProjectionDirection;
+export interface JsonSchemaOptions {
+  readonly direction?: JsonSchemaDirection;
+}
 
 /** Returns a schema's deterministic projection hook without executing it. */
-export function getSchemaProjection(schema: StandardSchemaV1): JsonSchemaFactory | undefined {
+export function getSchemaProjection(
+  schema: StandardSchemaV1,
+  direction: JsonSchemaDirection | "legacy" = "legacy",
+): JsonSchemaFactory | undefined {
   const metadata = getSchemaMetadata(schema);
-  if (metadata?.jsonSchema) return metadata.jsonSchema;
-  return (
-    schema as StandardSchemaV1 & { readonly relkit?: { readonly jsonSchema?: JsonSchemaFactory } }
-  ).relkit?.jsonSchema;
+  const projected = getMetadataProjection(metadata, direction);
+  if (projected) return projected;
+  const relkit = schema as StandardSchemaV1 & {
+    readonly relkit?: {
+      readonly jsonSchema?: JsonSchemaFactory;
+      readonly inputJsonSchema?: JsonSchemaFactory;
+      readonly outputJsonSchema?: JsonSchemaFactory;
+    };
+  };
+  const relkitProjection =
+    direction === "input"
+      ? relkit.relkit?.inputJsonSchema
+      : direction === "output"
+        ? relkit.relkit?.outputJsonSchema
+        : relkit.relkit?.jsonSchema;
+  if (relkitProjection) return relkitProjection;
+  if (direction === "legacy") return undefined;
+  const standard = schema?.["~standard"] as StandardSchemaV1["~standard"] & {
+    readonly jsonSchema?: {
+      readonly input?: (options: { readonly target: "draft-2020-12" }) => Record<string, unknown>;
+      readonly output?: (options: { readonly target: "draft-2020-12" }) => Record<string, unknown>;
+    };
+  };
+  const hook = standard.jsonSchema?.[direction];
+  return hook === undefined
+    ? undefined
+    : () => hook({ target: "draft-2020-12" }) as JsonValue;
 }
 
 /** Returns whether a schema accepts an omitted object property. */
-export function isSchemaOptional(schema: StandardSchemaV1): boolean {
-  return getSchemaMetadata(schema)?.optional === true;
+export function isSchemaOptional(
+  schema: StandardSchemaV1,
+  direction: JsonSchemaDirection | "legacy" = "legacy",
+): boolean {
+  return isMetadataOptional(getSchemaMetadata(schema), direction);
 }
 
 /** Obtains or generates a canonical JSON Schema without guessing unsupported behavior. */
-export function getJsonSchema(schema: StandardSchemaV1): JsonSchemaResult {
+export function getJsonSchema(
+  schema: StandardSchemaV1,
+  options?: JsonSchemaOptions,
+): JsonSchemaResult {
   try {
     if (schema?.["~standard"]?.version !== 1) {
       return unavailable("Schema is not a Standard Schema v1 validator");
     }
-    const projection = getSchemaProjection(schema);
+    const direction = options?.direction ?? "legacy";
+    if (direction !== "legacy" && direction !== "input" && direction !== "output") {
+      return unavailable(`Unsupported schema projection direction "${String(direction)}"`);
+    }
+    const projection = getSchemaProjection(schema, direction);
     if (!projection) return unavailable("Schema does not expose a deterministic projection");
     const value = sortJsonValue(projection(), "$", undefined);
     if (!isRecord(value)) return unavailable("Schema projection must be a JSON object");

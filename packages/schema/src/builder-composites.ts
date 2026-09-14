@@ -21,7 +21,9 @@ import type {
 import type { JsonValue } from "./standard-schema.js";
 
 export function objectSchema<S extends Shape>(shape: S): Schema<ObjectInput<S>, ObjectOutput<S>> {
-  const jsonSchema = objectProjection(shape);
+  const legacyJsonSchema = objectProjection(shape, "legacy");
+  const inputJsonSchema = objectProjection(shape, "input");
+  const outputJsonSchema = objectProjection(shape, "output");
   return createSchema(
     (value, path) => {
       if (!isRecord(value)) return issue("Expected an object", path);
@@ -40,12 +42,18 @@ export function objectSchema<S extends Shape>(shape: S): Schema<ObjectInput<S>, 
         },
       );
     },
-    jsonSchema ? { jsonSchema } : {},
+    {
+      ...(legacyJsonSchema === undefined ? {} : { jsonSchema: legacyJsonSchema }),
+      ...(inputJsonSchema === undefined ? {} : { inputJsonSchema }),
+      ...(outputJsonSchema === undefined ? {} : { outputJsonSchema }),
+    },
   );
 }
 
 export function arraySchema<S extends AnySchema>(schema: S): Schema<InputOf<S>[], OutputOf<S>[]> {
-  const itemProjection = getSchemaProjection(schema);
+  const legacyItemProjection = getSchemaProjection(schema);
+  const inputItemProjection = getSchemaProjection(schema, "input");
+  const outputItemProjection = getSchemaProjection(schema, "output");
   return createSchema(
     (value, path) => {
       if (!Array.isArray(value)) return issue("Expected an array", path);
@@ -54,14 +62,26 @@ export function arraySchema<S extends AnySchema>(schema: S): Schema<InputOf<S>[]
       )[];
       return collectResults(results, (items) => items);
     },
-    itemProjection ? { jsonSchema: () => ({ type: "array", items: itemProjection() }) } : {},
+    {
+      ...(legacyItemProjection === undefined
+        ? {}
+        : { jsonSchema: () => ({ type: "array", items: legacyItemProjection() }) }),
+      ...(inputItemProjection === undefined
+        ? {}
+        : { inputJsonSchema: () => ({ type: "array", items: inputItemProjection() }) }),
+      ...(outputItemProjection === undefined
+        ? {}
+        : { outputJsonSchema: () => ({ type: "array", items: outputItemProjection() }) }),
+    },
   );
 }
 
 export function unionSchema<S extends SchemaTuple>(
   schemas: S,
 ): Schema<InputOf<S[number]>, OutputOf<S[number]>> {
-  const projections = schemas.map(getSchemaProjection);
+  const legacyProjections = schemas.map((schema) => getSchemaProjection(schema));
+  const inputProjections = schemas.map((schema) => getSchemaProjection(schema, "input"));
+  const outputProjections = schemas.map((schema) => getSchemaProjection(schema, "output"));
   return createSchema(
     (value, path) => {
       const results = schemas.map((schema) => runSchema(schema, value, path)) as (
@@ -69,18 +89,29 @@ export function unionSchema<S extends SchemaTuple>(
       )[];
       return collectUnion(results, path);
     },
-    projections.every((projection) => projection)
-      ? { jsonSchema: () => ({ anyOf: projections.map((projection) => projection!()) }) }
-      : {},
+    {
+      ...(legacyProjections.every((projection) => projection)
+        ? { jsonSchema: () => ({ anyOf: legacyProjections.map((projection) => projection!()) }) }
+        : {}),
+      ...(inputProjections.every((projection) => projection)
+        ? { inputJsonSchema: () => ({ anyOf: inputProjections.map((projection) => projection!()) }) }
+        : {}),
+      ...(outputProjections.every((projection) => projection)
+        ? { outputJsonSchema: () => ({ anyOf: outputProjections.map((projection) => projection!()) }) }
+        : {}),
+    },
   );
 }
 
-function objectProjection(shape: Shape): SchemaMetadata["jsonSchema"] | undefined {
+function objectProjection(
+  shape: Shape,
+  direction: "input" | "output" | "legacy",
+): SchemaMetadata["jsonSchema"] | undefined {
   const entries = Object.keys(shape)
     .sort()
     .map((key) => {
       const schema = shape[key]!;
-      return [key, getSchemaProjection(schema), isSchemaOptional(schema)] as const;
+      return [key, getSchemaProjection(schema, direction), isSchemaOptional(schema, direction)] as const;
     });
   if (entries.some(([, projection]) => !projection)) return undefined;
   return () => {

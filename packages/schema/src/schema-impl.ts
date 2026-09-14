@@ -15,16 +15,15 @@ import {
   withDefaultMetadata,
   withNullableMetadata,
   withOptionalMetadata,
+  withRefinementMetadata,
+  withTransformMetadata,
+  getMetadataProjection,
   type SchemaMetadata,
 } from "./schema-metadata.js";
-type Check<T> = (
-  value: unknown,
-  path: readonly StandardPathSegment[],
-) => StandardResult<T> | Promise<StandardResult<T>>;
+type Check<T> = (value: unknown, path: readonly StandardPathSegment[]) => StandardResult<T> | Promise<StandardResult<T>>;
 interface InternalSchema<TInput, TOutput> extends Schema<TInput, TOutput> {
   readonly _run: Check<TOutput>;
 }
-/** Error thrown by the familiar `parse` helper when validation fails. */
 export class SchemaValidationError extends TypeError {
   readonly issues: StandardFailure["issues"];
   constructor(issues: StandardFailure["issues"]) {
@@ -33,7 +32,6 @@ export class SchemaValidationError extends TypeError {
     this.issues = issues;
   }
 }
-/** Creates a schema implementation without exposing its concrete class. */
 export function createSchema<TInput, TOutput>(
   check: Check<TOutput>,
   metadata: SchemaMetadata = {},
@@ -42,7 +40,6 @@ export function createSchema<TInput, TOutput>(
   setSchemaMetadata(schema, metadata);
   return schema;
 }
-/** Runs either a RelKit schema or a third-party Standard Schema at a nested path. */
 export function runSchema<TOutput>(
   schema: StandardSchemaV1<unknown, TOutput>,
   value: unknown,
@@ -56,10 +53,22 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
   readonly _run: Check<TOutput>;
   readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
     StandardJSONSchemaV1<TInput, TOutput>["~standard"];
-  readonly relkit: { readonly jsonSchema?: () => JsonValue };
+  readonly relkit: {
+    readonly jsonSchema?: () => JsonValue;
+    readonly inputJsonSchema?: () => JsonValue;
+    readonly outputJsonSchema?: () => JsonValue;
+  };
   constructor(check: Check<TOutput>, metadata: SchemaMetadata) {
     this._run = check;
-    this.relkit = metadata.jsonSchema ? { jsonSchema: metadata.jsonSchema } : {};
+    this.relkit = {
+      ...(metadata.jsonSchema === undefined ? {} : { jsonSchema: metadata.jsonSchema }),
+      ...(metadata.inputJsonSchema === undefined
+        ? {}
+        : { inputJsonSchema: metadata.inputJsonSchema }),
+      ...(metadata.outputJsonSchema === undefined
+        ? {}
+        : { outputJsonSchema: metadata.outputJsonSchema }),
+    };
     this["~standard"] = {
       version: 1,
       vendor: "relkit",
@@ -69,8 +78,10 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
         return check(value, []);
       },
       jsonSchema: {
-        input: (options) => projectJsonSchema(getSchemaMetadata(this) ?? metadata, options.target),
-        output: (options) => projectJsonSchema(getSchemaMetadata(this) ?? metadata, options.target),
+        input: (options) =>
+          projectJsonSchema(getSchemaMetadata(this) ?? metadata, "input", options.target),
+        output: (options) =>
+          projectJsonSchema(getSchemaMetadata(this) ?? metadata, "output", options.target),
       },
     };
   }
@@ -99,7 +110,7 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
     return createSchema((value, path) =>
       flatMapResult(this._run(value, path), (result) =>
         mapValue(transform(result), (output) => success(output)),
-      ),
+      ), withTransformMetadata(this),
     );
   }
   refine(
@@ -109,7 +120,7 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
     return createSchema((value, path) =>
       flatMapResult(this._run(value, path), (result) =>
         mapValue(check(result), (valid) => (valid ? success(result) : failure(message, path))),
-      ),
+      ), withRefinementMetadata(this),
     );
   }
   parse(value: unknown): TOutput {
@@ -122,14 +133,11 @@ class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TO
     return this._run(value, []);
   }
 }
-function projectJsonSchema(
-  metadata: SchemaMetadata,
-  target: StandardJSONSchemaV1.Options["target"],
-): Record<string, unknown> {
+function projectJsonSchema(metadata: SchemaMetadata, direction: "input" | "output", target: StandardJSONSchemaV1.Options["target"]): Record<string, unknown> {
   if (target !== "draft-2020-12" && target !== "draft-07" && target !== "openapi-3.0") {
     throw new TypeError(`Unsupported JSON Schema target "${target}"`);
   }
-  const value = metadata.jsonSchema?.();
+  const value = getMetadataProjection(metadata, direction)?.();
   if (value === undefined || value === null || Array.isArray(value) || typeof value !== "object") {
     throw new TypeError("Schema does not expose a deterministic JSON Schema projection");
   }
@@ -168,12 +176,7 @@ function mapValue<T, U>(value: T | Promise<T>, map: (value: T) => U): U | Promis
   return isPromiseLike(value) ? value.then(map) : map(value);
 }
 function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "then" in value &&
-    typeof value.then === "function"
-  );
+  return typeof value === "object" && value !== null && "then" in value && typeof value.then === "function";
 }
 function isFailure<T>(result: StandardResult<T>): result is StandardFailure {
   return "issues" in result && result.issues !== undefined;
