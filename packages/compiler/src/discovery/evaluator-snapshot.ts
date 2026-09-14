@@ -1,5 +1,6 @@
-import type { JsonValue } from "@relkit/contracts";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
+import { createHash } from "node:crypto";
+import { canonicalJson, type JsonValue } from "@relkit/contracts";
+import { getJsonSchema, getSchemaMetadata, isSchemaTransformed, type StandardSchemaV1 } from "@relkit/schema";
 import type { EvaluatorDescriptorSnapshot } from "./evaluator-protocol.js";
 import { isErrorDescriptorLike } from "../normalize-utils.js";
 
@@ -9,11 +10,17 @@ export function snapshotDescriptor(value: SnapshotDescriptorLike): EvaluatorDesc
     kind: value.kind,
     id: value.id,
     ref: { kind: value.ref.kind, id: value.ref.id },
-    metadata: snapshotValue(value, new WeakSet<object>()),
+    metadata: snapshotValue(value, new WeakSet<object>(), 0, value.kind),
   };
 }
 
-function snapshotValue(value: unknown, seen: WeakSet<object>, depth = 0): JsonValue {
+function snapshotValue(
+  value: unknown,
+  seen: WeakSet<object>,
+  depth = 0,
+  ownerKind?: string,
+  field?: string,
+): JsonValue {
   if (value === null || typeof value === "string" || typeof value === "boolean") return value;
   if (typeof value === "number")
     return Number.isFinite(value) ? value : marker("non-finite-number");
@@ -21,8 +28,13 @@ function snapshotValue(value: unknown, seen: WeakSet<object>, depth = 0): JsonVa
   if (depth > 8) return marker("depth-limit");
   if (typeof value === "function") {
     return isErrorDescriptorLike(value)
-      ? snapshotObject(value, seen, depth)
-      : marker("function", (value as { readonly name: string }).name);
+      ? snapshotObject(value, seen, depth, ownerKind)
+      : executableMarker(
+          ownerKind,
+          field,
+          (value as { readonly name: string }).name,
+          Function.prototype.toString.call(value),
+        );
   }
   if (typeof value === "symbol") return marker("symbol", value.description);
   if (typeof value === "bigint") return marker("bigint");
@@ -32,15 +44,20 @@ function snapshotValue(value: unknown, seen: WeakSet<object>, depth = 0): JsonVa
     if (seen.has(value)) return marker("cycle");
     seen.add(value);
     try {
-      return value.map((entry) => snapshotValue(entry, seen, depth + 1));
+      return value.map((entry) => snapshotValue(entry, seen, depth + 1, ownerKind, field));
     } finally {
       seen.delete(value);
     }
   }
-  return snapshotObject(value, seen, depth);
+  return snapshotObject(value, seen, depth, ownerKind);
 }
 
-function snapshotObject(value: object, seen: WeakSet<object>, depth: number): JsonValue {
+function snapshotObject(
+  value: object,
+  seen: WeakSet<object>,
+  depth: number,
+  ownerKind?: string,
+): JsonValue {
   if (seen.has(value)) return marker("cycle");
   seen.add(value);
   try {
@@ -49,7 +66,7 @@ function snapshotObject(value: object, seen: WeakSet<object>, depth: number): Js
       const descriptor = Object.getOwnPropertyDescriptor(value, key);
       output[key] =
         descriptor && "value" in descriptor
-          ? snapshotValue(descriptor.value, seen, depth + 1)
+          ? snapshotValue(descriptor.value, seen, depth + 1, ownerKind, key)
           : marker("accessor");
     }
     return output;
@@ -70,10 +87,33 @@ function snapshotSchema(value: unknown): JsonValue | undefined {
   if (!isRecord(standard) || standard.version !== 1 || typeof standard.validate !== "function") {
     return undefined;
   }
-  const result = getJsonSchema(value as unknown as StandardSchemaV1);
-  return result.ok
-    ? { $relkit: "schema", jsonSchema: result.schema }
-    : { $relkit: "schema-unavailable", reason: result.reason };
+  const schema = value as unknown as StandardSchemaV1;
+  const legacy = getJsonSchema(schema);
+  const input = getJsonSchema(schema, { direction: "input" });
+  const output = getJsonSchema(schema, { direction: "output" });
+  if (!legacy.ok && !input.ok && !output.ok) {
+    return { $relkit: "schema-unavailable", reason: legacy.reason ?? input.reason ?? output.reason };
+  }
+  const projections = {
+    ...(legacy.ok ? { jsonSchema: legacy.schema } : {}),
+    ...(input.ok ? { inputJsonSchema: input.schema } : {}),
+    ...(output.ok ? { outputJsonSchema: output.schema } : {}),
+  };
+  return {
+    $relkit: "schema",
+    ...projections,
+    contractHash: hashSchemaContract({
+      projections,
+      transformed: isSchemaTransformed(schema),
+      validator: standard.validate.toString(),
+    }),
+    ...(isSchemaTransformed(schema) ? { transformed: true } : {}),
+    ...(getSchemaMetadata(schema)?.refined === true ? { refined: true } : {}),
+  };
+}
+
+function hashSchemaContract(value: JsonValue): string {
+  return `sha256:${createHash("sha256").update(canonicalJson(value), "utf8").digest("hex")}`;
 }
 
 function dataProperty(value: object, key: string): unknown {
@@ -87,4 +127,26 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function marker(type: string, name?: string): JsonValue {
   return name === undefined ? { $relkit: type } : { $relkit: type, name };
+}
+
+function executableMarker(
+  ownerKind: string | undefined,
+  field: string | undefined,
+  name: string,
+  source: string,
+): JsonValue {
+  if (ownerKind !== "task" || !["handler", "onStart", "onSuccess", "onFailure"].includes(field ?? "")) {
+    return marker("function", name);
+  }
+  return {
+    $relkit: "function",
+    name,
+    owner: "task",
+    role: field === "handler" ? "handler" : "hook",
+    sourceHash: hashFunctionSource(source),
+  };
+}
+
+function hashFunctionSource(source: string): string {
+  return `sha256:${createHash("sha256").update(source, "utf8").digest("hex")}`;
 }

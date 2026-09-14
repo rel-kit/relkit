@@ -76,6 +76,18 @@ export interface EvaluatorManifestReference {
   readonly exportName: string;
 }
 
+/** Data-only schema provenance carried across the evaluator process boundary. */
+export interface EvaluatorSchemaSnapshot {
+  readonly $relkit: "schema" | "schema-unavailable";
+  readonly jsonSchema?: JsonValue;
+  readonly inputJsonSchema?: JsonValue;
+  readonly outputJsonSchema?: JsonValue;
+  readonly contractHash?: string;
+  readonly transformed?: boolean;
+  readonly refined?: boolean;
+  readonly reason?: string;
+}
+
 export interface EvaluatorDescriptorSnapshot {
   readonly kind: string;
   readonly id: string;
