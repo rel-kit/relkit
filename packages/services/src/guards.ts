@@ -1,5 +1,6 @@
 import { deepFreeze, isDescriptor, isRef } from "@relkit/contracts";
 import type { FunctionRefAny } from "@relkit/functions";
+import { isJobDescriptor, isTaskDescriptor } from "@relkit/jobs";
 import type { ServiceDescriptorAny, ServiceRefAny } from "./types.js";
 
 export const SERVICE_RESERVED_MEMBER_NAMES = Object.freeze([
@@ -8,6 +9,8 @@ export const SERVICE_RESERVED_MEMBER_NAMES = Object.freeze([
   "ref",
   "functions",
   "events",
+  "tasks",
+  "jobs",
   "capability",
   "title",
   "description",
@@ -55,7 +58,7 @@ export function isServiceDescriptor(value: unknown): value is ServiceDescriptorA
   if (!isRecord(value) || !isDescriptor(value, "service") || hasOwn(value, "handler")) return false;
   for (const [name, member] of serviceMemberEntries(value)) {
     if (isReservedServiceMemberName(name)) continue;
-    if (!isFunctionDescriptor(member) && !isEventDescriptor(member)) return false;
+    if (!isFunctionDescriptor(member) && !isEventDescriptor(member) && !isTaskDescriptor(member) && !isJobDescriptor(member)) return false;
   }
   return true;
 }
