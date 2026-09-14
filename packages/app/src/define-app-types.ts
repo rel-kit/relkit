@@ -28,6 +28,10 @@ export interface InspectorConfig {
   readonly maxPreviewBytes?: number;
 }
 
+export interface AppCompatibilityConfig {
+  readonly legacyJobs?: boolean;
+}
+
 export const APP_PROVIDER_CAPABILITIES = [
   "bucket",
   "cache",
@@ -47,6 +51,9 @@ type CapabilityInput<Capability extends AppProviderCapability> = ProviderInput<
 export interface AppProviderInputs {
   readonly bucket?: CapabilityInput<"bucket">;
   readonly cache?: CapabilityInput<"cache">;
+  /** Public plural spelling for the jobs provider capability. */
+  readonly jobs?: CapabilityInput<"job">;
+  /** @deprecated Use `jobs`. */
   readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
@@ -56,10 +63,37 @@ export interface AppProviderInputs {
 
 type Profile<Input> = Input extends ProviderSourceInput ? "default" : Extract<keyof Input, string>;
 
-export type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in AppProviderCapability]?: Capability extends keyof Providers
-    ? Profile<NonNullable<Providers[Capability]>>
+type ProviderInputFor<
+  Providers extends AppProviderInputs,
+  Capability extends AppProviderCapability,
+> = Capability extends "job"
+  ? "jobs" extends keyof Providers
+    ? NonNullable<Providers["jobs"]>
+    : "job" extends keyof Providers
+      ? NonNullable<Providers["job"]>
+      : never
+  : Capability extends keyof Providers
+    ? NonNullable<Providers[Capability]>
     : never;
+
+type ProfileFor<
+  Providers extends AppProviderInputs,
+  Capability extends AppProviderCapability,
+> = [ProviderInputFor<Providers, Capability>] extends [never]
+  ? never
+  : Profile<ProviderInputFor<Providers, Capability>>;
+
+/** Public provider-default spellings. The normalized descriptor uses `job`. */
+export type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
+}> & {
+  readonly jobs?: ProfileFor<Providers, "job">;
+  /** @deprecated Use `jobs`. */
+  readonly job?: ProfileFor<Providers, "job">;
+};
+
+export type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+  [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
 }>;
 
 export type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExporterMap> =
@@ -75,6 +109,7 @@ export type DefineAppOptions<
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;
     readonly defaults?: AppProviderDefaults<Providers>;
+    readonly compatibility?: AppCompatibilityConfig;
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -91,9 +126,11 @@ type AdapterOf<Input> =
       : never;
 
 type NormalizedProviders<Providers extends AppProviderInputs> = {
-  readonly [Capability in keyof Providers & AppProviderCapability]: NormalizedProviderProfiles<
-    AdapterOf<NonNullable<Providers[Capability]>>
-  >;
+  readonly [Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [
+    never
+  ]
+    ? never
+    : Capability]: NormalizedProviderProfiles<AdapterOf<ProviderInputFor<Providers, Capability>>>;
 };
 
 export type ApplicationDescriptor<
@@ -103,7 +140,8 @@ export type ApplicationDescriptor<
 > = DescriptorBase<"app", string> &
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
-    readonly defaults: AppProviderDefaults<Providers>;
+    readonly defaults: NormalizedAppProviderDefaults<Providers>;
+    readonly compatibility: { readonly legacyJobs: boolean };
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;

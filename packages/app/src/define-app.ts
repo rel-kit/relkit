@@ -11,7 +11,7 @@ import {
   type NormalizedProviderProfiles,
   type ProviderSourceInput,
 } from "@relkit/provider";
-import { isEnvDefinition } from "./app-validation.js";
+import { assertExclusiveAlias, isEnvDefinition, normalizeCompatibility } from "./app-validation.js";
 import {
   APP_PROVIDER_CAPABILITIES,
   type ApplicationDescriptor,
@@ -19,6 +19,7 @@ import {
   type AppProviderDefaults,
   type AppProviderInputs,
   type DefineAppOptions,
+  type NormalizedAppProviderDefaults,
 } from "./define-app-types.js";
 
 export * from "./define-app-types.js";
@@ -30,11 +31,13 @@ const OPTION_KEYS = new Set([
   "tags",
   "env",
   "defaults",
+  "compatibility",
   "telemetry",
   "server",
   "inspector",
   "deployment",
   ...APP_PROVIDER_CAPABILITIES,
+  "jobs",
 ]);
 
 /**
@@ -64,12 +67,20 @@ export function defineApp<
     throw new TypeError("RELKIT app requires an environment definition");
   for (const key of Object.keys(options))
     if (!OPTION_KEYS.has(key)) throw new TypeError(`Unknown defineApp option "${key}"`);
+  assertExclusiveAlias(options as unknown as Record<string, unknown>, "jobs", "job", "defineApp");
+  assertExclusiveAlias(
+    (options.defaults ?? {}) as unknown as Record<string, unknown>,
+    "jobs",
+    "job",
+    "defineApp defaults",
+  );
   const providers = normalizeProviders(options);
   const defaults = normalizeDefaults(providers, options.defaults);
   const base = createDescriptorBase("app", options.id ?? createUnboundIdentity(), options);
   return deepFreeze({
     ...base,
     env: options.env,
+    compatibility: normalizeCompatibility(options.compatibility),
     ...providers,
     defaults,
     ...(options.telemetry === undefined
@@ -86,7 +97,7 @@ function normalizeProviders(
 ): Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> {
   const result: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> = {};
   for (const capability of APP_PROVIDER_CAPABILITIES) {
-    const input = options[capability];
+    const input = capability === "job" ? (options.jobs ?? options.job) : options[capability];
     if (input !== undefined)
       result[capability] = normalizeProviderProfiles(
         defineProviderCapability(capability),
@@ -99,9 +110,10 @@ function normalizeProviders(
 function normalizeDefaults<Providers extends AppProviderInputs>(
   providers: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>>,
   defaults: AppProviderDefaults<Providers> | undefined,
-): AppProviderDefaults<Providers> {
+): NormalizedAppProviderDefaults<Providers> {
   const result: Partial<Record<AppProviderCapability, string>> = {};
-  for (const [capability, selected] of Object.entries(defaults ?? {})) {
+  for (const [rawCapability, selected] of Object.entries(defaults ?? {})) {
+    const capability = rawCapability === "jobs" ? "job" : rawCapability;
     if (!APP_PROVIDER_CAPABILITIES.includes(capability as AppProviderCapability))
       throw new TypeError(`Unknown default capability "${capability}"`);
     const profiles = providers[capability as AppProviderCapability]?.profiles;
@@ -109,7 +121,7 @@ function normalizeDefaults<Providers extends AppProviderInputs>(
       throw new TypeError(`defaults.${capability} must reference a configured profile`);
     result[capability as AppProviderCapability] = selected;
   }
-  return copy(result) as AppProviderDefaults<Providers>;
+  return copy(result) as NormalizedAppProviderDefaults<Providers>;
 }
 
 function copy<Value>(value: Value): Value {

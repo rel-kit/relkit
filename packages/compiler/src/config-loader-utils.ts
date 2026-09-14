@@ -89,6 +89,7 @@ export const allowedKeys = new Set([
   "env",
   "bucket",
   "cache",
+  "jobs",
   "job",
   "event",
   "model",
@@ -99,4 +100,5 @@ export const allowedKeys = new Set([
   "server",
   "inspector",
   "deployment",
+  "compatibility",
 ]);
