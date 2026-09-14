@@ -89,6 +89,8 @@ export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends Standa
     StandardJSONSchemaV1<TInput, TOutput>["~standard"];
   readonly relkit?: {
     readonly jsonSchema?: () => JsonValue;
+    readonly inputJsonSchema?: () => JsonValue;
+    readonly outputJsonSchema?: () => JsonValue;
   };
 }
 

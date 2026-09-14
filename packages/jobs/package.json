@@ -26,13 +26,26 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./adapter": {
+      "types": "./dist/adapter.d.ts",
+      "import": "./dist/adapter.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "import": "./dist/legacy.js"
     }
   },
   "dependencies": {
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
-    "@relkit/schema": "workspace:*"
+    "@relkit/schema": "workspace:*",
+    "effect": "4.0.0-rc.115"
   },
   "scripts": {
     "build": "tsc -b",
