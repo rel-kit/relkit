@@ -195,6 +195,40 @@ describe("registration planning", () => {
       "GET /orders/:",
     ]);
   });
+
+  test("keeps task registrations out of legacy queues and schedules", () => {
+    const input = graph();
+    const task = {
+      kind: "task" as const,
+      id: "orders.refresh-task",
+      source,
+      taskId: "orders.refresh-task",
+      version: "1",
+      execution: "durable" as const,
+      input: { type: "object" },
+      output: { type: "object" },
+    };
+    const job = {
+      kind: "job" as const,
+      id: "orders.refresh-job",
+      source,
+      executionModel: "task" as const,
+      name: "refreshOrders",
+      jobId: "orders.refresh-job",
+      taskId: "orders.refresh-task",
+      taskVersion: "1",
+      profile: "default",
+      implicit: false,
+      default: true,
+      input: { type: "object" },
+    };
+    const plan = createRegistrationPlan({ ...input, nodes: [...input.nodes, task, job] });
+
+    expect(plan.tasks?.map(({ taskId }) => taskId)).toEqual(["orders.refresh-task"]);
+    expect(plan.jobs?.map(({ jobId }) => jobId)).toEqual(["orders.refresh-job"]);
+    expect(plan.queues.map(({ id }) => id)).toEqual(["orders.refresh"]);
+    expect(plan.schedules.map(({ id }) => id)).toEqual(["orders.refresh:hourly"]);
+  });
 });
 
 function httpTrigger(id: string, path: string) {

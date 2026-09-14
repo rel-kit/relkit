@@ -15,8 +15,10 @@ export function validateGraphShape(value: unknown, root?: string): void {
     );
   rejectUnboundIdentities(value);
   if (value.appId !== undefined && !isCanonicalId(value.appId)) fail("Graph appId is invalid.");
-  value.nodes.forEach((node, index) => validateNode(node, root, index));
-  value.edges.forEach((edge, index) => validateEdge(edge, index));
+  const nodes = value.nodes as readonly unknown[];
+  const edges = value.edges as readonly unknown[];
+  nodes.forEach((node, index) => validateNode(node, root, index));
+  edges.forEach((edge, index) => validateEdge(edge, index, nodes));
   validateEventTargets(value as unknown as import("./model.js").ApplicationGraph);
 }
 
@@ -40,6 +42,26 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
       fail(`Function "${value.id}" requires a valid invocationMode.`);
     validateGenerated(value.generated, index, "generated");
     validateExposure(value.exposure, index);
+  }
+  if (value.kind === "task") {
+    validateId(value.taskId, `Graph nodes[${index}].taskId`);
+    if (typeof value.version !== "string" || value.version.length === 0)
+      fail(`Task "${value.id}" requires a version.`);
+    if (value.execution !== "durable" && value.execution !== "retryable")
+      fail(`Task "${value.id}" execution is invalid.`);
+  }
+  if (value.kind === "job") {
+    if (value.executionModel === "task") {
+      if (!nonEmpty(value.name)) fail(`Graph nodes[${index}].name is invalid.`);
+      validateId(value.jobId, `Graph nodes[${index}].jobId`);
+      validateId(value.taskId, `Graph nodes[${index}].taskId`);
+      if (!nonEmpty(value.taskVersion)) fail(`Graph nodes[${index}].taskVersion is invalid.`);
+      if (!nonEmpty(value.profile)) fail(`Graph nodes[${index}].profile is invalid.`);
+      if (typeof value.implicit !== "boolean" || typeof value.default !== "boolean")
+        fail(`Graph nodes[${index}] task binding flags are invalid.`);
+    } else if (value.executionModel !== undefined && value.executionModel !== "legacy-function") {
+      fail(`Graph nodes[${index}].executionModel is invalid.`);
+    }
   }
   if (value.kind === "event" || value.kind === "error") validateExposure(value.exposure, index);
   if (value.kind === "agent") {
@@ -67,10 +89,14 @@ function validateNode(value: unknown, root: string | undefined, index: number): 
   }
   if (value.kind === "hook") {
     validateId(value.ownerId, `Graph nodes[${index}].ownerId`);
-    if (!(value.ownerKind === "function" || value.ownerKind === "tool")) {
+    if (!(value.ownerKind === "function" || value.ownerKind === "tool" || value.ownerKind === "task")) {
       fail(`Graph nodes[${index}].ownerKind is invalid.`);
     }
-    if (!(value.phase === "before" || value.phase === "after")) {
+    const validPhase =
+      value.ownerKind === "task"
+        ? value.phase === "start" || value.phase === "success" || value.phase === "failure"
+        : value.phase === "before" || value.phase === "after";
+    if (!validPhase) {
       fail(`Graph nodes[${index}].phase is invalid.`);
     }
   }
@@ -119,7 +145,7 @@ function validateHttpIdentities(value: unknown, index: number): void {
   }
 }
 
-function validateEdge(value: unknown, index: number): void {
+function validateEdge(value: unknown, index: number, nodes: readonly unknown[]): void {
   if (!isRecord(value) || !isGraphEdgeKind(value.kind)) {
     fail(`Graph edges[${index}] has an invalid kind.`);
   }
@@ -128,8 +154,11 @@ function validateEdge(value: unknown, index: number): void {
   if (value.kind === "targets-function" && value.role !== "primary") {
     fail(`Graph edges[${index}].role is invalid.`);
   }
+  if (value.kind === "targets-task" && value.role !== "primary") {
+    fail(`Graph edges[${index}].role is invalid.`);
+  }
   if (
-    (value.kind === "exposes-function" || value.kind === "exposes-event") &&
+    (value.kind === "exposes-function" || value.kind === "exposes-event" || value.kind === "exposes-task" || value.kind === "exposes-job") &&
     !nonEmpty(value.member)
   ) {
     fail(`Graph edges[${index}].member is invalid.`);
@@ -137,6 +166,8 @@ function validateEdge(value: unknown, index: number): void {
   if (
     (value.kind === "exposes-function" ||
       value.kind === "exposes-event" ||
+      value.kind === "exposes-task" ||
+      value.kind === "exposes-job" ||
       value.kind === "uses-middleware") &&
     (!Number.isSafeInteger(value.order) || (value.order as number) < 0)
   ) {
@@ -144,9 +175,33 @@ function validateEdge(value: unknown, index: number): void {
   }
   if (value.kind === "uses-middleware" && value.match !== "always" && value.match !== "conditional")
     fail(`Graph edges[${index}].match is invalid.`);
-  if (value.kind === "uses-hook" && value.phase !== "before" && value.phase !== "after") {
+  if (
+    value.kind === "uses-hook" &&
+    !["before", "after", "start", "success", "failure"].includes(String(value.phase))
+  ) {
     fail(`Graph edges[${index}].phase is invalid.`);
   }
+  if (value.kind === "uses-hook") validateHookEdge(value, index, nodes);
+}
+
+function validateHookEdge(
+  value: Record<string, unknown>,
+  index: number,
+  nodes: readonly unknown[],
+): void {
+  const hook = nodeFor(nodes, value.to);
+  if (hook?.kind !== "hook") fail(`Graph edges[${index}].to must reference a hook node.`);
+  const owner = nodeFor(nodes, hook.ownerId);
+  if (owner?.kind !== hook.ownerKind)
+    fail(`Graph edges[${index}] hook owner kind does not match its owner node.`);
+  if (value.from !== hook.ownerId) fail(`Graph edges[${index}] must originate at its hook owner.`);
+  if (value.phase !== hook.phase) fail(`Graph edges[${index}].phase does not match its hook node.`);
+}
+
+function nodeFor(nodes: readonly unknown[], id: unknown): Record<string, unknown> | undefined {
+  return nodes.find(
+    (node): node is Record<string, unknown> => isRecord(node) && node.id === id,
+  );
 }
 
 function validateIds(value: unknown, label: string): void {
