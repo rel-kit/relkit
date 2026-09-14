@@ -59,6 +59,14 @@
       "types": "./dist/jobs.d.ts",
       "import": "./dist/jobs.js"
     },
+    "./jobs/legacy": {
+      "types": "./dist/jobs-legacy.d.ts",
+      "import": "./dist/jobs-legacy.js"
+    },
+    "./tasks": {
+      "types": "./dist/tasks.d.ts",
+      "import": "./dist/tasks.js"
+    },
     "./cache": {
       "types": "./dist/cache.d.ts",
       "import": "./dist/cache.js"
