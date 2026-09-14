@@ -103,6 +103,7 @@ export function schemaEntries(descriptor: NormalizedDescriptor): readonly [strin
     (
       {
         function: ["input", "output", "progress"],
+        task: ["input", "output", "progress"],
         job: ["input"],
         event: ["input"],
         cache: ["key", "value"],

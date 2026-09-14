@@ -44,6 +44,7 @@ const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   service: { directory: "", suffix: "service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },
   middleware: { directory: "src/routes/middleware", suffix: ".middleware.ts" },
+  task: { directory: "tasks", suffix: ".task.ts" },
   job: { directory: "jobs", suffix: ".job.ts" },
   event: { directory: "events", suffix: ".event.ts" },
   "event-trigger": { directory: "events", suffix: ".event.ts" },

@@ -21,6 +21,7 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
     "middleware",
     "service",
     "route",
+    "task",
     "job",
     "event",
     "event-trigger",

@@ -52,6 +52,7 @@ function requiredSchemaFields(kind: string): readonly string[] {
     (
       {
         function: ["input", "output"],
+        task: ["input", "output"],
         job: ["input"],
         event: ["input"],
         cache: ["key", "value"],

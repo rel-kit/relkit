@@ -23,6 +23,7 @@ const FACTORIES: Readonly<Record<string, FactoryDefinition>> = Object.freeze({
   defineError: { kind: "error", idOptional: true },
   defineRoute: { kind: "route", idOptional: true },
   defineServiceRoutes: { kind: "route", idOptional: true },
+  defineTask: { kind: "task", idOptional: false },
   defineJob: { kind: "job", idOptional: false },
   defineEvent: { kind: "event", idOptional: false },
   defineBucket: { kind: "bucket", idOptional: false },
