@@ -309,7 +309,30 @@
             "id": "orders.prices",
             "key": {
               "$relkit": "schema",
+              "contractHash": "sha256:65883d35e5ef68a26efbfa5b24c43662c045f138ea742129cf03fa40128839cf",
+              "inputJsonSchema": {
+                "properties": {
+                  "sku": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sku"
+                ],
+                "type": "object"
+              },
               "jsonSchema": {
+                "properties": {
+                  "sku": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sku"
+                ],
+                "type": "object"
+              },
+              "outputJsonSchema": {
                 "properties": {
                   "sku": {
                     "type": "string"
@@ -330,7 +353,14 @@
             },
             "value": {
               "$relkit": "schema",
+              "contractHash": "sha256:c7a8bf943ef31ee44d18527c7082e1718364c68a817b3e2be2dcbe44838489c7",
+              "inputJsonSchema": {
+                "type": "number"
+              },
               "jsonSchema": {
+                "type": "number"
+              },
+              "outputJsonSchema": {
                 "type": "number"
               }
             }
