@@ -34,7 +34,6 @@ import {
 } from "./stream-runtime.js";
 import { createProgressEmitter } from "./progress.js";
 import { createStandaloneFinisher } from "./standalone-completion.js";
-
 export function createStandaloneDispatcher(
   baseOptions: StandaloneDispatcherOptions = {},
 ): InvocationDispatcher {
@@ -59,7 +58,6 @@ export function createStandaloneDispatcher(
   });
   return dispatcher;
 }
-
 async function invokeStandalone<Input, Output, Context extends { readonly signal: AbortSignal }>(
   request: InvocationDispatchRequest<Input, Output, Context>,
   options: InvocationDispatchOptions<Context>,
@@ -68,6 +66,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
 ): Promise<Output> {
   const active = currentInvocationScope();
   const activeDispatcher = active?.dispatcher === dispatcher ? active : undefined;
+  const taskAncestry = options.taskAncestry ?? active?.taskAncestry;
   const parent = options.parent ?? activeDispatcher?.parent;
   const source = options.source ?? "direct";
   assertSource(source);
@@ -143,6 +142,7 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
         dispatcher,
         parent: standaloneParent(record, controller.signal, deadlineMs),
         chain,
+        ...(taskAncestry === undefined ? {} : { taskAncestry }),
       },
       () =>
         runStandaloneLifecycle({
@@ -166,7 +166,12 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
         idleMs: 45_000,
         abort: (reason) => controller.abort(reason),
         run: (work) =>
-          runInInvocationScope({ dispatcher, parent: parentScope, chain: chain! }, work),
+          runInInvocationScope({
+            dispatcher,
+            parent: parentScope,
+            chain: chain!,
+            ...(taskAncestry === undefined ? {} : { taskAncestry }),
+          }, work),
         settle: async (streamCause) => {
           const streamError =
             streamCause === undefined

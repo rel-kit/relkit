@@ -13,6 +13,9 @@ interface LifecycleOptions<Context extends { readonly signal: AbortSignal }> {
   readonly context: Context;
   readonly deadline?: number;
   readonly onSignal?: (signal: AbortSignal) => void;
+  readonly isSuspension?: (cause: unknown) => boolean;
+  readonly validateInput?: boolean;
+  readonly validateOutput?: boolean;
 }
 
 interface ValueHookOptions<Context extends { readonly signal: AbortSignal }> {
@@ -22,6 +25,7 @@ interface ValueHookOptions<Context extends { readonly signal: AbortSignal }> {
   readonly context: Context;
   readonly deadline?: number;
   readonly onSignal?: (signal: AbortSignal) => void;
+  readonly isSuspension?: (cause: unknown) => boolean;
 }
 
 export function invokeFunctionLifecycle<Context extends { readonly signal: AbortSignal }>(
@@ -33,7 +37,12 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
     options.context,
     options.deadline,
     options.onSignal,
-  ).pipe(Effect.flatMap((value) => validateOutput(options.target.input, value)));
+    options.isSuspension,
+  ).pipe(
+    Effect.flatMap((value) =>
+      options.validateInput === false ? Effect.succeed(value) : validateOutput(options.target.input, value),
+    ),
+  );
   return before.pipe(
     Effect.flatMap((input) =>
       invokeValue(
@@ -42,10 +51,13 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         options.context,
         options.deadline,
         options.onSignal,
+        options.isSuspension,
       ),
     ),
     Effect.flatMap((value) =>
-      validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+      options.validateOutput === false
+        ? Effect.succeed(value)
+        : validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
     ),
     Effect.flatMap((output) =>
       invokeValue(
@@ -54,10 +66,13 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         options.context,
         options.deadline,
         options.onSignal,
+        options.isSuspension,
       ),
     ),
     Effect.flatMap((value) =>
-      validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+      options.target.onAfter === undefined
+        ? Effect.succeed(value)
+        : validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
     ),
   );
 }
@@ -71,6 +86,7 @@ export function invokeValueHook<Context extends { readonly signal: AbortSignal }
     options.context,
     options.deadline,
     options.onSignal,
+    options.isSuspension,
   ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value)));
 }
 
@@ -97,6 +113,7 @@ function invokeValue<Context extends { readonly signal: AbortSignal }>(
   context: Context,
   deadline: number | undefined,
   onSignal: ((signal: AbortSignal) => void) | undefined,
+  isSuspension: ((cause: unknown) => boolean) | undefined,
 ): Effect.Effect<unknown, InvocationFailure> {
   if (handler === undefined) return Effect.succeed(value);
   return invokeUserHandler({
@@ -105,6 +122,7 @@ function invokeValue<Context extends { readonly signal: AbortSignal }>(
     publicContext: context,
     ...(deadline === undefined ? {} : { deadline }),
     ...(onSignal === undefined ? {} : { onSignal }),
+    ...(isSuspension === undefined ? {} : { isSuspension }),
   });
 }
 

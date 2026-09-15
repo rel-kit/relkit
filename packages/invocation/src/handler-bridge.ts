@@ -5,6 +5,7 @@ import { withDeadline, withTimeout } from "./deadline.js";
 import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";
 import { normalizeFailure } from "./failure.js";
 import type { InvocationFailure } from "./failure-types.js";
+import { isNativeSuspension, markNativeSuspension } from "./native-suspension.js";
 
 export interface HandlerBridgeOptions<Input, Output, Context extends object> {
   readonly handler: (input: Input, context: Context) => MaybePromise<unknown>;
@@ -13,6 +14,11 @@ export interface HandlerBridgeOptions<Input, Output, Context extends object> {
   readonly deadline?: number;
   readonly timeoutMs?: number;
   readonly onSignal?: (signal: AbortSignal) => void;
+  readonly isSuspension?: (cause: unknown) => boolean;
+}
+
+interface SuspensionOptions {
+  readonly isSuspension?: (cause: unknown) => boolean;
 }
 
 /** Converts one plain handler call into an Effect without creating a runtime. */
@@ -53,13 +59,13 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
     try {
       result = options.handler(options.input, context);
     } catch (cause) {
-      complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal })));
+      complete(Effect.fail(normalizeCause(cause, options, bridge.signal)));
       return;
     }
 
     Promise.resolve(result).then(
-      (value) => completeValue(value, bridge.signal, complete),
-      (cause) => complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal }))),
+      (value) => completeValue(value, bridge.signal, complete, options),
+      (cause) => complete(Effect.fail(normalizeCause(cause, options, bridge.signal))),
     );
 
     return Effect.sync(cleanup);
@@ -69,41 +75,55 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
     options.timeoutMs === undefined
       ? withDeadline(execution, options.deadline)
       : withTimeout(execution, options.timeoutMs, options.deadline);
-  return timed.pipe(Effect.mapError((cause) => normalizeFailure(cause)));
+  return timed.pipe(
+    Effect.mapError((cause) => (isNativeSuspension(cause) ? cause : normalizeFailure(cause))),
+  ) as Effect.Effect<Output, InvocationFailure>;
 }
 
 function completeValue<Output>(
   value: unknown,
   signal: AbortSignal,
   complete: (effect: Effect.Effect<Output, InvocationFailure>) => void,
+  options: SuspensionOptions,
 ): void {
   if (signal.aborted) {
     complete(Effect.fail(normalizeFailure(signal.reason, { signal })));
     return;
   }
   if (isFunctionFailure(value)) {
-    complete(Effect.fail(normalizeFailure(value.error, { signal })));
+    complete(Effect.fail(normalizeCause(value.error, options, signal)));
     return;
   }
   if (isDeclaredError(value)) {
-    complete(Effect.fail(normalizeFailure(value, { signal })));
+    complete(Effect.fail(normalizeCause(value, options, signal)));
     return;
   }
   if (Effect.isEffect(value)) {
     const effect = value.pipe(
       Effect.flatMap((result) =>
         signal.aborted
-          ? Effect.fail(normalizeFailure(signal.reason, { signal }))
-          : isFunctionFailure(result)
-            ? Effect.fail(normalizeFailure(result.error, { signal }))
-            : isDeclaredError(result)
-              ? Effect.fail(normalizeFailure(result, { signal }))
-              : Effect.succeed(result as Output),
+            ? Effect.fail(normalizeFailure(signal.reason, { signal }))
+            : isFunctionFailure(result)
+              ? Effect.fail(normalizeCause(result.error, options, signal))
+              : isDeclaredError(result)
+                ? Effect.fail(normalizeCause(result, options, signal))
+                : Effect.succeed(result as Output),
       ),
-      Effect.mapError((cause) => normalizeFailure(cause, { signal })),
+      Effect.mapError((cause) => normalizeCause(cause, options, signal)),
     );
     complete(effect as Effect.Effect<Output, InvocationFailure>);
     return;
   }
   complete(Effect.succeed(value as Output));
+}
+
+function normalizeCause(
+  cause: unknown,
+  options: { readonly isSuspension?: (cause: unknown) => boolean },
+  signal: AbortSignal,
+): InvocationFailure {
+  if (options.isSuspension?.(cause) === true) {
+    return markNativeSuspension(cause) as unknown as InvocationFailure;
+  }
+  return normalizeFailure(cause, { signal });
 }
