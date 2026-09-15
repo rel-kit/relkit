@@ -50,6 +50,9 @@ export function collectRequirements(graph: ApplicationGraph): ProviderRequiremen
       profile: binding.profile,
       bindingId: binding.id,
       binding,
+      ...(consumer?.kind !== "job"
+        ? {}
+        : { executionModel: consumer.executionModel === "task" ? "task" : "legacy-function" }),
       source: consumer!.source,
     });
   }

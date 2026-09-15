@@ -328,6 +328,74 @@ test("reports release failure without exposing integration details", async () =>
   expect(String(failure)).not.toContain("synthetic-secret-release");
 });
 
+test("requires the native jobs marker for task-backed jobs", async () => {
+  const binding = provider("job", "task-runtime");
+  const taskJob = {
+    kind: "job" as const,
+    id: "job.task-runtime",
+    source,
+    executionModel: "task" as const,
+    name: "taskRuntime",
+    jobId: "task-runtime",
+    taskId: "task-runtime",
+    taskVersion: "1",
+    profile: "task-runtime",
+    implicit: true,
+    default: true,
+    input: null,
+  };
+  const applicationGraph: ApplicationGraph = {
+    contractVersion: GRAPH_VERSION,
+    appId: "registry-task-test",
+    nodes: [binding, taskJob],
+    edges: [{ kind: "uses-provider-profile", from: taskJob.id, to: binding.id }],
+  };
+  await expect(createProviderRegistry({
+    generationId: "generation.task-invalid",
+    graph: applicationGraph,
+    runtimeIntegrationModules: modules([
+      registration("job", "redis", () => ({ value: { createQueue: () => undefined } })),
+    ]),
+  })).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
+});
+
+test("rejects a task adapter for legacy jobs", async () => {
+  const binding = provider("job", "legacy-runtime");
+  const legacyJob = {
+    kind: "job" as const,
+    id: "job.legacy-runtime",
+    source,
+    input: null,
+    targetFunctionId: "jobs.target",
+    profile: "legacy-runtime",
+  };
+  const applicationGraph: ApplicationGraph = {
+    contractVersion: GRAPH_VERSION,
+    appId: "registry-legacy-test",
+    nodes: [binding, legacyJob],
+    edges: [{ kind: "uses-provider-profile", from: legacyJob.id, to: binding.id }],
+  };
+  await expect(createProviderRegistry({
+    generationId: "generation.legacy-invalid",
+    graph: applicationGraph,
+    runtimeIntegrationModules: modules([
+      registration("job", "redis", () => ({
+        value: {
+          kind: "jobs-adapter-runtime",
+          protocolVersion: 1,
+          capabilities: { service: "native", features: {} },
+          submit: async () => ({}),
+          get: async () => ({}),
+          list: async () => ({}),
+          observe: () => (async function* () {})(),
+          cancel: async () => ({}),
+          close: async () => undefined,
+        },
+      })),
+    ]),
+  })).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
+});
+
 function graph(
   providers: readonly ProviderBindingNode[],
   required: readonly ProviderBindingNode[],

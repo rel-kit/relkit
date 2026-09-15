@@ -1,4 +1,5 @@
 import { ProviderBindingResolutionError, type RuntimeProviderRegistration } from "@relkit/provider";
+import { assertJobsAdapterRuntime, isJobsAdapterRuntime } from "@relkit/jobs/adapter";
 import { resolveProviderBindingConfiguration } from "./provider-binding-resolution.js";
 import { validateModelReadiness } from "./model-readiness.js";
 import {
@@ -44,6 +45,7 @@ export async function createProviderRegistry(
           options,
         ));
       acquired.push({ binding: requirement.binding, generation });
+      validateRuntimeValue(generation.value, requirement);
       await ready(generation, requirement, options.signal);
       handles[key(requirement.capability, requirement.profile)] = Object.freeze({
         capability: requirement.capability,
@@ -91,6 +93,28 @@ export async function createProviderRegistry(
   });
 }
 
+function validateRuntimeValue(value: unknown, requirement: ProviderRequirement): void {
+  if (requirement.executionModel === "task") {
+    try {
+      assertJobsAdapterRuntime(value);
+    } catch (error) {
+      throw issue(
+        "RELKIT_PROVIDER_RUNTIME_INVALID",
+        requirement,
+        error instanceof Error ? error.message : "Task jobs provider is not a native jobs adapter.",
+      );
+    }
+    return;
+  }
+  if (requirement.executionModel === "legacy-function" && isJobsAdapterRuntime(value)) {
+    throw issue(
+      "RELKIT_PROVIDER_RUNTIME_INVALID",
+      requirement,
+      `Legacy job binding "${requirement.bindingId}" cannot use a task jobs adapter.`,
+    );
+  }
+}
+
 function configurationFor(requirement: ProviderRequirement, options: ProviderRegistryOptions) {
   try {
     return resolveProviderBindingConfiguration(requirement.binding, {
@@ -117,6 +141,7 @@ async function create(
       bindingId: requirement.bindingId,
       capability: requirement.capability,
       profile: requirement.profile,
+      ...(requirement.executionModel === undefined ? {} : { executionModel: requirement.executionModel }),
       ...configuration,
       ...optional("signal", options.signal),
     });
