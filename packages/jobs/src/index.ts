@@ -5,6 +5,17 @@ export * from "./task-types.js";
 export * from "./task-policy-validation.js";
 export * from "./task-wire.js";
 export * from "./task-progress.js";
+export * from "./identity.js";
+export * from "./adapter.js";
+export * from "./capabilities.js";
+export * from "./runtime.js";
+export * from "./submission.js";
+export * from "./run-id.js";
+export * from "./run-id-router.js";
+export * from "./authorization.js";
+export * from "./control-errors.js";
+export * from "./controls.js";
+export * from "./schedule-controls.js";
 export { assertRfc3339Instant, isRfc3339Instant } from "./instant-validation.js";
 export { copyTriggerOptions, validateResultOptions } from "./trigger-validation.js";
 export type {
