@@ -3,6 +3,7 @@ import type {
   DependencyClientSources,
   DependencyDeclarations,
   DirectFunctionInvoker,
+  DirectTaskInvoker,
 } from "./dependencies.js";
 import { buildDependencyClients } from "./dependencies.js";
 
@@ -27,6 +28,7 @@ export interface ContextBuildOptions {
   readonly traceId?: () => string | undefined;
   readonly now?: () => Date;
   readonly invokeFunction?: DirectFunctionInvoker;
+  readonly invokeTask?: DirectTaskInvoker;
   readonly onDeclaredEdge?: (edge: import("@relkit/graph").GraphEdge) => void;
   readonly onObservedEdge?: (edge: import("@relkit/graph").ObservedEdge) => void;
   readonly onOperation?: (
@@ -58,12 +60,14 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
     ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
     ...(options.now === undefined ? {} : { now: options.now }),
     ...(options.invokeFunction === undefined ? {} : { invokeFunction: options.invokeFunction }),
+    ...(options.invokeTask === undefined ? {} : { invokeTask: options.invokeTask }),
     ...(options.onDeclaredEdge === undefined ? {} : { onDeclaredEdge: options.onDeclaredEdge }),
     ...(options.onObservedEdge === undefined ? {} : { onObservedEdge: options.onObservedEdge }),
     ...(options.onOperation === undefined ? {} : { onOperation: options.onOperation }),
   });
   return Object.freeze({
     ...base,
+    tasks: clients.tasks,
     jobs: clients.jobs,
     events: clients.events,
     buckets: clients.buckets,
@@ -77,6 +81,7 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
 function sourceMaps(base: InvocationContextBase): DependencyClientSources {
   const value = base as InvocationContextBase & Record<string, unknown>;
   return {
+    ...(value.tasks === undefined ? {} : { tasks: value.tasks as Readonly<Record<string, unknown>> }),
     ...(value.jobs === undefined ? {} : { jobs: value.jobs as Readonly<Record<string, unknown>> }),
     ...(value.events === undefined
       ? {}

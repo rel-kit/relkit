@@ -11,6 +11,7 @@ import type {
 } from "./dependencies.js";
 import { createCacheDependencyClient } from "./cache-client.js";
 import { createJobDependencyClient } from "./job-client.js";
+import { createTaskDependencyClient } from "./task-client.js";
 import { notify } from "./edge-hooks.js";
 
 export class DependencyAccessError extends TypeError {
@@ -32,6 +33,7 @@ export class DependencyNotConfiguredError extends Error {
 }
 
 const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
+  tasks: "triggers-task",
   jobs: "enqueues-job",
   events: "publishes-event",
   buckets: "uses-bucket",
@@ -40,6 +42,7 @@ const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
 };
 
 const refKinds: Readonly<Record<DependencyCategory, string>> = {
+  tasks: "task",
   jobs: "job",
   events: "event",
   buckets: "bucket",
@@ -71,6 +74,13 @@ export function createClient(
   options: DependencyClientBuildOptions,
 ): unknown {
   switch (category) {
+    case "tasks":
+      return createTaskDependencyClient(
+        name,
+        source,
+        options,
+        dependencyIdFromClient(options, category, name),
+      );
     case "agents":
       return wrapCallable(category, name, source, options);
     case "jobs":
