@@ -67,6 +67,11 @@
     "status": "passed",
     "statusReason": "native PostgreSQL acceptance, retry, state, cancellation and scheduling probes pass with an explicit PgTypes timestamp boundary"
   },
+  "integrationCatalog": [
+    {"id": "inngest", "package": "@relkit/inngest", "version": "0.4.1", "recipe": "inngest-docker@2"},
+    {"id": "trigger", "package": "@relkit/trigger", "version": "0.4.1", "recipe": "trigger-docker@2"},
+    {"id": "effect-mq", "package": "@relkit/effect-mq", "version": "0.4.1", "recipe": "effect-mq-docker@2"}
+  ],
   "persistentBackends": {
     "configuredByRelkit": [],
     "localImages": [

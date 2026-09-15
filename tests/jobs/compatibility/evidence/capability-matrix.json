@@ -1,12 +1,18 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-13T17:45:37.853Z",
+  "recordedAt": "2026-09-15",
   "status": "ready",
   "evidence": [
     "tests/jobs/compatibility/evidence/inngest-native.json",
     "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
     "tests/jobs/compatibility/evidence/phase0-1.11.json",
-    "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+    "tests/jobs/compatibility/evidence/phase0-effect-mq.json",
+    "tests/jobs/compatibility/evidence/phase5-adapters.json"
+  ],
+  "providerCatalog": [
+    {"provider": "inngest", "package": "@relkit/inngest", "recipe": "inngest-docker@2"},
+    {"provider": "trigger", "package": "@relkit/trigger", "recipe": "trigger-docker@2"},
+    {"provider": "effect-mq", "package": "@relkit/effect-mq", "recipe": "effect-mq-docker@2"}
   ],
   "requiredCommonSubset": {
     "features": [
@@ -19,7 +25,7 @@
     "minimumNativeEngines": 2,
     "nativeEnginesProven": ["inngest", "effect-mq"],
     "gate": "ready",
-    "diagnostic": "Inngest and effect-mq prove the declared common subset; Inngest local listing now passes through v2, while unsupported schedule/version features are explicitly refused. Trigger is outside this two-engine phase gate."
+    "diagnostic": "Inngest and effect-mq prove the declared common subset; Trigger has an executable native-shaped adapter and account-free recipe, but provider-native Docker/managed evidence remains not-tested. Inngest local listing and unsupported schedule/version diagnostics remain unchanged."
   },
   "variants": [
     {
@@ -77,7 +83,13 @@
       "deployment": "docker",
       "status": "not-tested",
       "features": {},
-      "evidence": ["tests/jobs/compatibility/evidence/phase0-1.6-1.10.json"]
+      "evidence": [
+        "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
+        "tests/jobs/compatibility/evidence/phase5-adapters.json"
+      ],
+      "diagnostics": [
+        "Task registration, scoped subscription cleanup, and schedule declarations have local structural coverage only; this does not certify a Trigger server."
+      ]
     },
     {
       "provider": "effect-mq",
@@ -103,7 +115,8 @@
       },
       "evidence": [
         "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
-        "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+        "tests/jobs/compatibility/evidence/phase0-effect-mq.json",
+        "tests/jobs/compatibility/evidence/phase5-adapters.json"
       ],
       "diagnostics": [
         "LISTEN wake-ups are unavailable under the pinned Effect runtime; native polling fallback was observed and correctness passed.",

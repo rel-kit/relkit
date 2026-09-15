@@ -56,11 +56,13 @@
     "tests/jobs/compatibility/evidence/inngest-native.json",
     "tests/jobs/compatibility/evidence/phase0-1.11.json",
     "tests/integration/local-docker-worker.test.ts",
-    "tests/integration/local-docker-composite.test.ts"
+    "tests/integration/local-docker-composite.test.ts",
+    "tests/jobs/compatibility/evidence/phase5-adapters.json"
   ],
   "knownNativeLimits": [
     "Inngest managed/cloud credentials were not used",
     "Inngest native overlap, misfire, DST clock control, and historical build routing remain unsupported or unverified",
-    "worker resource cgroups are not certified by the local fixture"
+    "worker resource cgroups are not certified by the local fixture",
+    "Trigger managed and Docker-native durable-task evidence remains not-tested"
   ]
 }
