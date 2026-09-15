@@ -13,3 +13,4 @@ export * from "./provider-binding-resolution.js";
 export * from "./materialize-jobs.js";
 export * from "./materialize-events.js";
 export * from "./runtime-integrations.js";
+export * from "./task-executor.js";
