@@ -16,6 +16,7 @@ import type {
 import type { InvocationCallStack } from "./recursion.js";
 
 export const MANAGED_DEPENDENCY_CATEGORIES = [
+  "tasks",
   "jobs",
   "events",
   "buckets",
@@ -58,6 +59,7 @@ export interface InvocationDispatchOptions<
 > {
   readonly source?: InvocationSource;
   readonly parent?: InvocationParent;
+  readonly taskAncestry?: TaskAncestry;
   readonly correlationId?: string;
   readonly traceId?: string;
   readonly deadlineMs?: number;
@@ -115,4 +117,15 @@ export interface InvocationDispatchScope {
   readonly parent?: InvocationParent;
   readonly chain?: InvocationCallStack;
   readonly execution?: ExecutionContext;
+  readonly taskAncestry?: TaskAncestry;
+  readonly jobsRuntime?: unknown;
+}
+
+export interface TaskAncestry {
+  readonly runId: string;
+  readonly taskId: string;
+  readonly jobId?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
+  readonly attempt?: number;
 }

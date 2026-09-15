@@ -32,6 +32,12 @@ export interface InvocationMetadata {
   readonly attempt: number;
   readonly source: InvocationSource;
   readonly serviceId?: string;
+  readonly runId?: string;
+  readonly jobId?: string;
+  readonly taskId?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
+  readonly serviceGeneration?: string;
 }
 
 export interface InvocationContext {
@@ -41,6 +47,7 @@ export interface InvocationContext {
   readonly env: Readonly<Record<string, unknown>>;
   readonly log: PublicLogger;
   readonly time: PublicClock;
+  readonly tasks: Readonly<Record<string, never>>;
   readonly jobs: Readonly<Record<string, never>>;
   readonly events: Readonly<Record<string, never>>;
   readonly buckets: Readonly<Record<string, never>>;

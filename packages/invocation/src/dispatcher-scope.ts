@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import type { InvocationDispatchScope } from "./dispatcher-types.js";
+import type { InvocationDispatchScope, TaskAncestry } from "./dispatcher-types.js";
 import type { ExecutionContext } from "./execution-context.js";
 
 const storage = new AsyncLocalStorage<InvocationDispatchScope>();
@@ -15,6 +15,14 @@ export function runInInvocationScope<A>(scope: InvocationDispatchScope, callback
 
 export function currentExecutionContext(): ExecutionContext | undefined {
   return storage.getStore()?.execution;
+}
+
+export function currentTaskAncestry(): TaskAncestry | undefined {
+  return storage.getStore()?.taskAncestry;
+}
+
+export function runInTaskAncestry<A>(ancestry: TaskAncestry, callback: () => A): A {
+  return storage.run(Object.freeze({ ...storage.getStore(), taskAncestry: Object.freeze({ ...ancestry }) }), callback);
 }
 
 export function runInExecutionContext<A>(context: ExecutionContext, callback: () => A): A {

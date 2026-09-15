@@ -22,6 +22,7 @@ export { createStandaloneDispatcher } from "./standalone-dispatcher.js";
 export type {
   InvocationDispatchRequest,
   InvocationDispatcher,
+  InvocationContextFactory,
   InvocationDispatchOptions,
   InvocationDispatchScope,
   InvocationValueHooks,
@@ -30,5 +31,6 @@ export type {
   ManagedDependencySources,
   StandaloneDispatcherOptions,
   StructuredLogRecord,
+  TaskAncestry,
 } from "./dispatcher-types.js";
 export { MANAGED_DEPENDENCY_CATEGORIES } from "./dispatcher-types.js";
