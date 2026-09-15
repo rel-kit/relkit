@@ -13,10 +13,11 @@ import type { FunctionAsTool } from "./function-as-tool-types.js";
 import type { FunctionAsGraphNode } from "./function-graph-node.js";
 import type { FunctionHandlerResult } from "./handler-result.js";
 import type { StreamOutputSchema } from "./stream.js";
-import type { AgentClients, BucketClients, CacheClients, JobClients } from "./clients.js";
-import type { AgentRefAny, BucketRefAny, CacheRefAny, FunctionRef, JobRefAny } from "./types.js";
+import type { AgentClients, BucketClients, CacheClients, JobClients, TaskClients } from "./clients.js";
+import type { AgentRefAny, BucketRefAny, CacheRefAny, FunctionRef, JobRefAny, TaskRefAny } from "./types.js";
 
 export interface FunctionDependencies {
+  readonly tasks?: Readonly<Record<string, TaskRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
   readonly cache?: Readonly<Record<string, CacheRefAny>>;
@@ -73,6 +74,7 @@ export interface FunctionContextBase<
   readonly log: PublicLogger;
   readonly time: PublicClock;
   readonly trace: PublicTrace;
+  readonly tasks: TaskClients<D["tasks"]>;
   readonly jobs: JobClients<D["jobs"]>;
   readonly events: import("./clients.js").EventClients<PublishedEventMap<Publishes>>;
   readonly buckets: BucketClients<D["buckets"]>;

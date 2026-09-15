@@ -25,6 +25,9 @@ export type {
   JobEnqueueResult,
   JobState,
   JobStatus,
+  TaskClientFor,
+  TaskClients,
+  TaskTriggerOptions,
 } from "./clients.js";
 
 export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = string> {
