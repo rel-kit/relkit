@@ -26,6 +26,7 @@ const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
   "@relkit/redis": ["runtime", "local-recipe"],
   "@relkit/s3": ["runtime", "local-recipe"],
   "@relkit/sentry": ["runtime"],
+  "@relkit/inngest": ["runtime", "local-recipe", "deployment"],
 };
 
 const catalogSubpaths = [
@@ -38,6 +39,7 @@ const catalogSubpaths = [
   "otlp",
   "aws",
   "pulumi",
+  "inngest",
 ] as const;
 
 export function expectedExports(

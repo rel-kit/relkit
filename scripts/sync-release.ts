@@ -58,6 +58,7 @@ const descriptions: Record<string, string> = {
   "@relkit/redis": "Redis integration for RELKIT.",
   "@relkit/s3": "S3-compatible storage integration for RELKIT.",
   "@relkit/sentry": "Sentry telemetry integration for RELKIT.",
+  "@relkit/inngest": "Inngest durable-jobs integration for RELKIT.",
   "create-relkit": "Create a RELKIT application from a supported project template.",
 };
 const dependencyFields = [

@@ -171,6 +171,7 @@
         "@relkit/aws": "workspace:*",
         "@relkit/cloudflare": "workspace:*",
         "@relkit/docker": "workspace:*",
+        "@relkit/inngest": "workspace:*",
         "@relkit/local": "workspace:*",
         "@relkit/otlp": "workspace:*",
         "@relkit/pulumi": "workspace:*",
@@ -204,6 +205,19 @@
       "dependencies": {
         "@relkit/local-service": "workspace:*",
         "@relkit/provider": "workspace:*",
+      },
+    },
+    "integrations/packages/inngest": {
+      "name": "@relkit/inngest",
+      "version": "0.4.1",
+      "dependencies": {
+        "@relkit/contracts": "workspace:*",
+        "@relkit/jobs": "workspace:*",
+        "@relkit/local-service": "workspace:*",
+        "@relkit/provider": "workspace:*",
+      },
+      "optionalDependencies": {
+        "inngest": "4.20.0",
       },
     },
     "integrations/packages/local": {
@@ -371,6 +385,7 @@
         "@relkit/graph": "workspace:*",
         "@relkit/inspector-api": "workspace:*",
         "@relkit/invocation": "workspace:*",
+        "@relkit/jobs": "workspace:*",
         "@relkit/local-service": "workspace:*",
         "@relkit/observability": "workspace:*",
         "@relkit/realtime": "workspace:*",
@@ -715,6 +730,7 @@
         "@relkit/events": "workspace:*",
         "@relkit/functions": "workspace:*",
         "@relkit/invocation": "workspace:*",
+        "@relkit/jobs": "workspace:*",
       },
       "devDependencies": {
         "@relkit/schema": "workspace:*",
@@ -1584,6 +1600,8 @@
     "@relkit/functions": ["@relkit/functions@workspace:packages/functions"],
 
     "@relkit/graph": ["@relkit/graph@workspace:packages/graph"],
+
+    "@relkit/inngest": ["@relkit/inngest@workspace:integrations/packages/inngest"],
 
     "@relkit/inspector": ["@relkit/inspector@workspace:apps/inspector"],
 
