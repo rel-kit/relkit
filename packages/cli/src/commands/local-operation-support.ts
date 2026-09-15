@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { isStableId, type RuntimeIntegrationPlan } from "@relkit/contracts";
-import type { LocalServiceRecipe } from "@relkit/local-service";
+import type { LocalServiceRecipeInput } from "@relkit/local-service";
 import { checkProject } from "./check.js";
 import { checkedLocalArtifacts } from "./dev-local.js";
 import { loadLocalRecipe } from "./local-runtime-modules.js";
@@ -34,7 +34,7 @@ export async function loadLocalRecipes(
   projectRoot: string,
   plan: RuntimeIntegrationPlan,
   integrationIds: readonly string[],
-): Promise<Readonly<Record<string, LocalServiceRecipe>>> {
+): Promise<Readonly<Record<string, LocalServiceRecipeInput>>> {
   const entries = await Promise.all(
     [...new Set(integrationIds)].map(
       async (id) => [id, await loadLocalRecipe(projectRoot, plan, id)] as const,

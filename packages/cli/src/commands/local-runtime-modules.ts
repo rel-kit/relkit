@@ -4,7 +4,8 @@ import type { RuntimeIntegrationPlan } from "@relkit/contracts";
 import type {
   LocalServiceMaterializerRuntime,
   LocalServicePlan,
-  LocalServiceRecipe,
+  LocalServiceRecipeInput,
+  LocalServiceInstance,
   LocalServiceState,
 } from "@relkit/local-service";
 
@@ -24,8 +25,12 @@ export interface LoadedLocalReconciler {
   readonly reconcile: (request: {
     readonly plan: LocalServicePlan;
     readonly planHash: string;
-    readonly recipes: Readonly<Record<string, LocalServiceRecipe>>;
+    readonly recipes: Readonly<Record<string, LocalServiceRecipeInput>>;
     readonly scope: "required" | "all";
+    readonly environment?: string;
+    readonly serviceGeneration?: string;
+    readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+    readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
     readonly signal?: AbortSignal;
   }) => Promise<{
     readonly overrides: { readonly generationId: string };
@@ -60,6 +65,10 @@ export interface LoadedLocalRuntime {
     identity: LoadedLocalIdentity,
     name: "lease.json" | "local-services.state.json" | "provider-overrides.json",
   ) => void;
+  readonly groupServiceInstances: (
+    instances: readonly LocalServiceInstance[],
+  ) => readonly LocalServiceInstance[];
+  readonly serviceInstanceIds: (instance: LocalServiceInstance) => readonly string[];
 }
 
 export async function loadLocalRuntimeModules(
@@ -98,6 +107,8 @@ export async function loadLocalRuntimeModules(
     "readLocalServiceState",
     "localStateDirectory",
     "removeLocalStateFile",
+    "groupServiceInstances",
+    "serviceInstanceIds",
   ]);
   assertFunctions(materializerModule, ["createDockerMaterializer"]);
   return Object.freeze({
@@ -112,7 +123,7 @@ export async function loadLocalRecipe(
   projectRoot: string,
   runtimePlan: RuntimeIntegrationPlan,
   integrationId: string,
-): Promise<LocalServiceRecipe> {
+): Promise<LocalServiceRecipeInput> {
   const selected = runtimePlan.integrations.find((entry) => entry.integrationId === integrationId);
   const packageName = selected?.packageName ?? `@relkit/${integrationId}`;
   const selectedRole = resolveIntegrationPackageRole({
@@ -124,7 +135,7 @@ export async function loadLocalRecipe(
   const module = await import(pathToFileURL(selectedRole.resolvedPath).href);
   if (module.localRecipe === undefined)
     throw new Error(`Local recipe export for "${integrationId}" is unavailable.`);
-  return module.localRecipe as LocalServiceRecipe;
+  return module.localRecipe as LocalServiceRecipeInput;
 }
 
 function assertFunctions(module: Record<string, unknown>, names: readonly string[]): void {

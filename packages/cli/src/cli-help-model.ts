@@ -95,7 +95,11 @@ const local = command("local", "Manage project-scoped local services", "relkit l
       options: [projectRoot],
     }),
     command("reset", "Remove project local containers, volumes, and state", "relkit local reset", {
-      options: [projectRoot, option("yes", "boolean", "Confirm reset without prompting")],
+      options: [
+        projectRoot,
+        option("yes", "boolean", "Confirm reset without prompting"),
+        option("dry-run", "boolean", "Show owned resources without removing them"),
+      ],
     }),
   ],
 });

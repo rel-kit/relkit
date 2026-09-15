@@ -29,6 +29,10 @@ export async function runLocal(
       return CLI_EXIT_CODES.success;
     }
     if (!parsed.yes) {
+      if (parsed.dryRun) {
+        await localStop(parsed.projectRoot, true, context, true);
+        return CLI_EXIT_CODES.success;
+      }
       const confirm = dependencies.confirm ?? interactiveConfirm(context);
       if (
         !(await confirm(`Reset local containers, volumes, and state for ${parsed.projectRoot}?`))
@@ -40,7 +44,7 @@ export async function runLocal(
         return CLI_EXIT_CODES.success;
       }
     }
-    await localStop(parsed.projectRoot, true, context);
+    await localStop(parsed.projectRoot, true, context, parsed.dryRun);
     return CLI_EXIT_CODES.success;
   } catch (error) {
     const code = errorCode(error);
@@ -54,6 +58,7 @@ type ParsedLocalArgs = {
   readonly projectRoot: string;
   readonly detach: boolean;
   readonly yes: boolean;
+  readonly dryRun: boolean;
 };
 
 function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
@@ -63,6 +68,7 @@ function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
   let projectRoot = process.cwd();
   let detach = false;
   let yes = false;
+  let dryRun = false;
   for (let index = 1; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === "--project-root") {
@@ -72,9 +78,10 @@ function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
       projectRoot = resolve(value);
     } else if (argument === "--detach" && command === "up") detach = true;
     else if (argument === "--yes" && command === "reset") yes = true;
+    else if (argument === "--dry-run" && command === "reset") dryRun = true;
     else throw usage(`Unknown local ${command} option: ${String(argument)}`);
   }
-  return { command, projectRoot, detach, yes };
+  return { command, projectRoot, detach, yes, dryRun };
 }
 
 function interactiveConfirm(

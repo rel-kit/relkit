@@ -16,6 +16,7 @@ const coreProtocols = new Set([
   "@relkit/contracts",
   "@relkit/deploy",
   "@relkit/local-service",
+  "@relkit/jobs",
   "@relkit/observability",
   "@relkit/provider",
   "@relkit/realtime",
