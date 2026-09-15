@@ -1,9 +1,19 @@
 import { createRequire } from "node:module";
-import { parseTracePropagation } from "@relkit/contracts";
 import type { TaskExecutor } from "@relkit/jobs";
-import type { TaskExecutionBinding, TaskExecutionEnvelope } from "@relkit/jobs/adapter";
+import type { TaskExecutionBinding } from "@relkit/jobs/adapter";
+import type { ScheduleDefinition } from "@relkit/jobs";
 import type { Context, Inngest, InngestFunction } from "inngest";
 import { mapInngestPolicy } from "./policy.js";
+import {
+  duration,
+  envelopeFrom,
+  record,
+  safeSegment,
+  scheduleMetadata,
+  signalFrom,
+  wireInput,
+  withoutSchedules,
+} from "./task-binding-support.js";
 
 type InngestConstructor = typeof import("inngest").Inngest;
 type InngestServe = typeof import("inngest/bun").serve;
@@ -23,19 +33,29 @@ export function loadInngestSdk(): InngestSdk {
 export interface InngestTaskDefinition {
   readonly functionId: string;
   readonly eventName: string;
+  readonly jobId?: string;
+  readonly taskId?: string;
+  readonly version?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
   readonly retries?: number;
   readonly timeoutSeconds?: number;
   readonly concurrency?: number;
   readonly policy?: unknown;
+  readonly schedules?: readonly ScheduleDefinition[];
+  readonly schedule?: ScheduleDefinition;
 }
 
 export function createInngestFunctionConfig(
   definition: InngestTaskDefinition,
 ): Readonly<Record<string, unknown>> {
   const policy = mapInngestPolicy(definition.policy);
+  const triggers = definition.schedule === undefined
+    ? [{ event: definition.eventName }, ...(definition.schedules ?? []).map((schedule) => scheduleTrigger(schedule))]
+    : [scheduleTrigger(definition.schedule)];
   return Object.freeze({
     id: definition.functionId,
-    triggers: [{ event: definition.eventName }],
+    triggers,
     retries: definition.retries ?? policy.retries ?? 0,
     ...(definition.timeoutSeconds === undefined && policy.timeoutSeconds === undefined
       ? {}
@@ -44,6 +64,18 @@ export function createInngestFunctionConfig(
       ? {}
       : { concurrency: { limit: definition.concurrency ?? policy.concurrency, scope: "fn" } }),
   });
+}
+
+function scheduleTrigger(schedule: ScheduleDefinition): Readonly<Record<string, string>> {
+  if ("every" in schedule) throw new Error("Inngest native schedules do not support interval recurrence.");
+  if (schedule.timezone !== "UTC") throw new Error("Inngest native schedules support UTC cron only.");
+  if (schedule.overlap !== undefined && schedule.overlap !== "allow") {
+    throw new Error("Inngest native schedules do not expose overlap policy.");
+  }
+  if (schedule.misfire !== undefined && schedule.misfire !== "skip") {
+    throw new Error("Inngest native schedules do not expose misfire policy.");
+  }
+  return { cron: schedule.cron };
 }
 
 export function inngestFunctionId(jobId: string, taskId: string, taskVersion: string, buildId: string): string {
@@ -56,6 +88,7 @@ export interface InngestWorkerOptions {
   readonly executor: TaskExecutor;
   readonly servePath?: string;
   readonly serveOrigin?: string;
+  readonly startWorker?: boolean;
 }
 
 export type InngestWorkerRegistrationOptions = Omit<InngestWorkerOptions, "client">;
@@ -71,14 +104,18 @@ export function createInngestFunction(
   client: Inngest.Any,
   definition: InngestTaskDefinition,
   executor: TaskExecutor,
+  activeSignals: Set<AbortController> = new Set(),
 ): InngestFunction.Any {
   return client.createFunction(createInngestFunctionConfig(definition) as never, async (ctx: Context) => {
+    const scheduled = definition.schedule !== undefined && ctx.event.name === "inngest/scheduled.timer";
     const data = record(ctx.event.data) ?? {};
-    const native = record(data.relkit);
-    const input = data.input;
+    const native = scheduled ? scheduleMetadata(ctx, definition) : record(data.relkit);
+    const input = scheduled ? wireInput(definition.schedule!.input) : data.input;
     if (native === undefined || input === undefined) throw new Error("RELKIT_INNGEST_EVENT_INVALID");
     const envelope = envelopeFrom(ctx, native, input);
-    const controller = new AbortController();
+    const providerSignal = signalFrom(ctx);
+    const controller = providerSignal === undefined ? new AbortController() : undefined;
+    if (controller !== undefined) activeSignals.add(controller);
     const binding: TaskExecutionBinding = {
       run: {
         runId: envelope.runId,
@@ -95,9 +132,10 @@ export function createInngestFunction(
         ...(envelope.scope === undefined ? {} : { scope: envelope.scope }),
         ...(envelope.inputSchemaHash === undefined ? {} : { inputSchemaHash: envelope.inputSchemaHash }),
         ...(envelope.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: envelope.acceptanceIdentity }),
+        ...(envelope.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: envelope.occurrenceIdentity }),
         ...(envelope.propagation === undefined ? {} : { propagation: envelope.propagation }),
       },
-      signal: controller.signal,
+      signal: providerSignal ?? controller!.signal,
       sleep: {
         sleep: async (key, durationMs) => {
           await ctx.step.sleep(key, duration(durationMs));
@@ -107,7 +145,11 @@ export function createInngestFunction(
         },
       },
     };
-    return executor.execute(envelope, binding);
+    try {
+      return await executor.execute(envelope, binding);
+    } finally {
+      if (controller !== undefined) activeSignals.delete(controller);
+    }
   });
 }
 
@@ -118,87 +160,36 @@ export function createInngestWorker(options: InngestWorkerOptions): {
   readonly close: () => Promise<void>;
 } {
   const path = options.servePath ?? "/api/inngest";
-  const handler = createInngestServeHandler(options);
+  const activeSignals = new Set<AbortController>();
+  const handler = createInngestServeHandler(options, activeSignals);
   const ready = async (): Promise<void> => {
     const target = new URL(`${options.serveOrigin ?? "http://127.0.0.1:3000"}${path}`);
     const response = await handler(new Request(target.toString(), { method: "PUT", headers: { host: target.host } }));
     if (!response.ok) throw new Error(`Inngest worker registration failed with status ${response.status}.`);
   };
-  return Object.freeze({ path, handler, ready, close: async () => undefined });
+  return Object.freeze({ path, handler, ready, close: async () => {
+    for (const controller of activeSignals) controller.abort(new Error("Inngest worker is closing"));
+    activeSignals.clear();
+  } });
 }
 
-export function createInngestServeHandler(options: InngestWorkerOptions): (request: Request) => Promise<Response> {
+export function createInngestServeHandler(
+  options: InngestWorkerOptions,
+  activeSignals = new Set<AbortController>(),
+): (request: Request) => Promise<Response> {
   const { serve } = loadInngestSdk();
-  const functions = options.definitions.map((definition) =>
-    createInngestFunction(options.client, definition, options.executor),
-  );
+  const functions = options.definitions.flatMap((definition) => [
+    createInngestFunction(options.client, withoutSchedules(definition), options.executor, activeSignals),
+    ...(definition.schedules ?? []).map((schedule) => createInngestFunction(options.client, {
+      ...withoutSchedules(definition),
+      functionId: `${definition.functionId}-schedule-${safeSegment(schedule.id)}`,
+      schedule,
+    }, options.executor, activeSignals)),
+  ]);
   return serve({
     client: options.client,
     functions,
     servePath: options.servePath ?? "/api/inngest",
     ...(options.serveOrigin === undefined ? {} : { serveOrigin: options.serveOrigin }),
   });
-}
-
-function envelopeFrom(
-  context: Context,
-  native: Record<string, unknown>,
-  input: unknown,
-): TaskExecutionEnvelope {
-  const wire = input as TaskExecutionEnvelope["input"];
-  const inputHash = textOptional(native.inputHash);
-  const inputSchemaHash = textOptional(native.inputSchemaHash);
-  const acceptedAt = textOptional(native.acceptedAt);
-  const nativeAttempt = number(native.attempt);
-  const attempt = nativeAttempt === undefined
-    ? context.attempt + 1
-    : nativeAttempt > 0
-      ? nativeAttempt
-      : 1;
-  const parentRunId = textOptional(native.parentRunId);
-  const service = textOptional(native.service);
-  const serviceGeneration = textOptional(native.serviceGeneration);
-  const scope = textOptional(native.scope);
-  const acceptanceIdentity = textOptional(native.acceptanceIdentity);
-  const propagation = parseTracePropagation(native.propagation);
-  return {
-    runId: text(native.runId ?? context.runId),
-    jobId: text(native.jobId),
-    taskId: text(native.taskId),
-    taskVersion: text(native.taskVersion),
-    buildId: text(native.buildId),
-    input: wire,
-    ...(inputHash === undefined ? {} : { inputHash }),
-    ...(inputSchemaHash === undefined ? {} : { inputSchemaHash }),
-    ...(acceptedAt === undefined ? {} : { acceptedAt }),
-    attempt,
-    ...(parentRunId === undefined ? {} : { parentRunId }),
-    ...(service === undefined ? {} : { service }),
-    ...(serviceGeneration === undefined ? {} : { serviceGeneration }),
-    ...(scope === undefined ? {} : { scope }),
-    ...(acceptanceIdentity === undefined ? {} : { acceptanceIdentity }),
-    ...(propagation === undefined ? {} : { propagation }),
-  };
-}
-
-function duration(milliseconds: number): `${number}s` {
-  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1) throw new TypeError("Inngest sleep duration is invalid");
-  return `${Math.max(1, Math.ceil(milliseconds / 1_000))}s`;
-}
-
-function record(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
-}
-
-function text(value: unknown): string {
-  if (typeof value !== "string" || value === "") throw new TypeError("Inngest task metadata is invalid");
-  return value;
-}
-
-function textOptional(value: unknown): string | undefined {
-  return typeof value === "string" && value !== "" ? value : undefined;
-}
-
-function number(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : undefined;
 }

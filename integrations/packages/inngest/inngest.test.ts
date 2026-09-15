@@ -4,7 +4,7 @@ import { inngest } from "./src/index.ts";
 import { localRecipe } from "./src/local.ts";
 import { createInngestRuntime } from "./src/runtime/index.ts";
 import { createInngestRunApi, snapshot } from "./src/runtime/runs.ts";
-import { createInngestFunctionConfig } from "./src/runtime/task-binding.ts";
+import { createInngestFunction, createInngestFunctionConfig } from "./src/runtime/task-binding.ts";
 
 test("authoring stays pure and declares the native local recipe", () => {
   const adapter = inngest();
@@ -39,6 +39,53 @@ test("maps only certified native policy fields", () => {
     eventName: "relkit/job/task/v1/build",
     policy: { maxElapsed: "2 seconds" },
   })).toThrow("cannot certify");
+});
+
+test("maps only UTC cron schedules to native Docker triggers", () => {
+  expect(createInngestFunctionConfig({
+    functionId: "relkit-job-task-v1-build",
+    eventName: "relkit/job/task/v1/build",
+    schedules: [{ id: "hourly", cron: "0 * * * *", timezone: "UTC", input: { value: 1 } }],
+  }).triggers).toEqual([
+    { event: "relkit/job/task/v1/build" },
+    { cron: "0 * * * *" },
+  ]);
+  expect(() => createInngestFunctionConfig({
+    functionId: "relkit-job-task-v1-build",
+    eventName: "relkit/job/task/v1/build",
+    schedules: [{ id: "every", every: "1 minute", input: { value: 1 } }],
+  })).toThrow("interval recurrence");
+});
+
+test("executes static cron triggers with the declared schedule input", async () => {
+  let handler: ((context: unknown) => Promise<unknown>) | undefined;
+  const client = {
+    createFunction: (_config: unknown, value: (context: unknown) => Promise<unknown>) => {
+      handler = value;
+      return {};
+    },
+  } as never;
+  let received: { readonly input: unknown; readonly occurrenceIdentity?: string } | undefined;
+  createInngestFunction(client, {
+    functionId: "relkit-job-task-v1-build-schedule-hourly",
+    eventName: "relkit/job/task/v1/build",
+    jobId: "job",
+    taskId: "task",
+    taskVersion: "1",
+    buildId: "build",
+    version: "1",
+    schedule: { id: "hourly", cron: "0 * * * *", timezone: "UTC", input: { value: 1 } },
+  }, { execute: async (envelope) => {
+    received = { input: envelope.input, occurrenceIdentity: envelope.occurrenceIdentity };
+    return { ok: true };
+  } });
+  await handler?.({
+    runId: "run-1",
+    attempt: 0,
+    event: { id: "occurrence-1", name: "inngest/scheduled.timer", data: { cron: "0 * * * *" } },
+    step: { sleep: async () => undefined, sleepUntil: async () => undefined },
+  });
+  expect(received).toEqual({ input: { version: 1, kind: "json", value: { value: 1 } }, occurrenceIdentity: "occurrence-1" });
 });
 
 test("registers a native serve endpoint with the injected task executor", async () => {

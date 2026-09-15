@@ -1,3 +1,9 @@
+import {
+  assertSupportedJobsServiceOptions,
+  deserializeJobsServiceOptions,
+  durationToMillis,
+  type JobsServiceOptions,
+} from "@relkit/jobs";
 import type { JobsAdapterRuntime, NativeControlReceipt, NativeReceipt } from "@relkit/jobs/adapter";
 import { createInngestRunApi, type InngestRunMetadata } from "./runs.js";
 import { observeInngestRun } from "./observe.js";
@@ -29,9 +35,13 @@ export interface InngestRuntimeOptions {
   readonly serveOrigin?: string;
   readonly appVersion?: string;
   readonly fetch?: typeof globalThis.fetch;
+  readonly pollIntervalMs?: number;
+  readonly maxPolls?: number;
+  readonly serviceOptions?: JobsServiceOptions;
 }
 
 export function createInngestRuntime(options: InngestRuntimeOptions): InngestRuntime {
+  assertSupportedJobsServiceOptions(options.serviceOptions ?? {}, ["observation"]);
   text(options.appId, "Inngest appId");
   url(options.baseUrl);
   const { Inngest } = loadInngestSdk();
@@ -88,6 +98,7 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
     list: async (query, context) => listInngestRuns(query, context, api, records),
     observe: (request, context) => observeInngestRun(request, context, {
       get: (runId, operation) => readInngestRun(runId, operation, api, records),
+      ...observationOptions(options),
       subscribe: (runId, onSnapshot, operation) => subscribeInngestRun(
         client,
         options.appId,
@@ -125,8 +136,10 @@ export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.
       capability: "job",
       adapterId: "inngest",
       protocolVersion: 1,
-      create: ({ connection, executionModel }: RuntimeProviderContext) => {
+    create: ({ connection, executionModel, behavior }: RuntimeProviderContext) => {
         if (executionModel !== "task") throw new Error("Inngest requires the task execution model.");
+        const serviceOptions = deserializeJobsServiceOptions(behavior);
+        assertSupportedJobsServiceOptions(serviceOptions, ["observation"]);
         const eventKey = optionalText(connection.eventKey);
         const signingKey = optionalText(connection.signingKey);
         const appVersion = optionalText(connection.appVersion);
@@ -138,6 +151,7 @@ export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.
           ...(signingKey === undefined ? {} : { signingKey }),
           ...(appVersion === undefined ? {} : { appVersion }),
           ...(serveOrigin === undefined ? {} : { serveOrigin }),
+          serviceOptions,
         });
         return { value: runtime, release: runtime.close };
       },
@@ -150,6 +164,18 @@ function duplicateReceipt(value: NativeReceipt): NativeReceipt {
     Object.hasOwn(value, "accepted") && (value as { readonly accepted?: unknown }).accepted === true
     ? Object.freeze({ ...value, duplicate: true })
     : value;
+}
+
+function observationOptions(options: InngestRuntimeOptions): Readonly<Record<string, number>> {
+  const serviceObservation = options.serviceOptions?.observation;
+  return Object.freeze({
+    ...(options.pollIntervalMs === undefined && serviceObservation?.pollInterval === undefined
+      ? {}
+      : { pollIntervalMs: options.pollIntervalMs ?? durationToMillis(serviceObservation!.pollInterval!) }),
+    ...(serviceObservation?.readTimeout === undefined
+      ? {}
+      : { readTimeoutMs: durationToMillis(serviceObservation.readTimeout) }),
+  });
 }
 
 export * from "./observe.js";

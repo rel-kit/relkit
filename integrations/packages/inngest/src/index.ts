@@ -12,6 +12,12 @@ import {
   type ProviderBehavior,
   type ProviderConnectionValues,
 } from "@relkit/provider";
+import {
+  serializeJobsServiceOptions,
+  validateJobsServiceOptions,
+  type JobsServiceBehavior,
+  type JobsServiceOptions,
+} from "@relkit/jobs";
 
 const job = defineProviderCapability("job");
 const durable = defineProviderFeature(job, "durable");
@@ -29,16 +35,17 @@ const connectionContract = defineConnectionContract({
 type SecretReference = BindingValueRef<string, string, "secret-string">;
 type TextReference = BindingValueRef<string, string, "string">;
 
-export interface InngestOptions {
+export interface InngestOptions extends JobsServiceOptions {
   readonly appId?: string;
   readonly baseUrl?: string | URL | TextReference;
   readonly eventKey?: SecretReference;
   readonly signingKey?: SecretReference;
   readonly serveOrigin?: string | URL | TextReference;
   readonly appVersion?: string;
+  readonly native?: Readonly<Record<string, import("@relkit/contracts").JsonValue>>;
 }
 
-export type InngestBehavior = Readonly<Record<never, never>>;
+export type InngestBehavior = JobsServiceBehavior;
 export type InngestAdapter<Options extends InngestOptions = InngestOptions> = ProviderAdapter<
   typeof job,
   "inngest",
@@ -68,7 +75,7 @@ export function inngest<const Options extends InngestOptions = InngestOptions>(
       ...(options.serveOrigin === undefined ? {} : { serveOrigin: urlValue(options.serveOrigin) }),
       ...(options.appVersion === undefined ? {} : { appVersion: options.appVersion }),
     },
-    behavior: defineProviderBehavior({}),
+    behavior: defineProviderBehavior(serializeJobsServiceOptions(options, options.native)),
     features: [durable],
     localRecipe,
   }) as InngestAdapter<Options>;
@@ -77,7 +84,11 @@ export function inngest<const Options extends InngestOptions = InngestOptions>(
 function assertOptions(options: InngestOptions): void {
   if (options === null || typeof options !== "object" || Array.isArray(options))
     throw new TypeError("Inngest options must be an object");
-  const keys = new Set(["appId", "baseUrl", "eventKey", "signingKey", "serveOrigin", "appVersion"]);
+  validateJobsServiceOptions(options);
+  const keys = new Set([
+    "appId", "baseUrl", "eventKey", "signingKey", "serveOrigin", "appVersion", "native",
+    "limits", "workers", "observation", "maxElapsed", "hookTimeout", "shutdownGrace",
+  ]);
   for (const key of Object.keys(options)) if (!keys.has(key)) throw new TypeError(`Unknown Inngest option "${key}"`);
   for (const [name, value] of [["appId", options.appId], ["appVersion", options.appVersion]] as const)
     if (value !== undefined && (typeof value !== "string" || value.trim() === "")) throw new TypeError(`Inngest ${name} is invalid`);
