@@ -146,6 +146,7 @@ export interface TaskExecutionEnvelope {
   readonly serviceGeneration?: string;
   readonly scope?: string;
   readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
   readonly propagation?: TracePropagation;
 }
 
@@ -202,6 +203,7 @@ export interface TaskExecutionBinding {
     readonly scope?: string;
     readonly inputSchemaHash?: string;
     readonly acceptanceIdentity?: string;
+    readonly occurrenceIdentity?: string;
     readonly propagation?: TracePropagation;
   };
   readonly signal: AbortSignal;

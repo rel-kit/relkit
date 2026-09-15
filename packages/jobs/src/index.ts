@@ -16,6 +16,8 @@ export * from "./authorization.js";
 export * from "./control-errors.js";
 export * from "./controls.js";
 export * from "./schedule-controls.js";
+export * from "./schedule-reconciliation.js";
+export * from "./service-options.js";
 export { assertRfc3339Instant, isRfc3339Instant } from "./instant-validation.js";
 export { copyTriggerOptions, validateResultOptions } from "./trigger-validation.js";
 export type {
