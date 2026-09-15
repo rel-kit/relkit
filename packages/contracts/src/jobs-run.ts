@@ -53,6 +53,10 @@ export interface RunCancellationReceipt {
 interface RunSnapshotBase<Input, Progress, Failure> extends RunHandle {
   readonly buildId: string;
   readonly service: string;
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly scope?: string;
+  readonly acceptanceIdentity?: string;
   readonly status: JobRunStatus;
   readonly observedAt: string;
   readonly resultAvailability: ResultAvailability;
