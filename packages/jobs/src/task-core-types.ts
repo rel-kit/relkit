@@ -146,6 +146,7 @@ export interface TaskRunContext {
   readonly acceptedAt: string;
   readonly scheduledFor?: string;
   readonly parentRunId?: string;
+  readonly acceptanceIdentity?: string;
 }
 
 export interface TaskContextBase<

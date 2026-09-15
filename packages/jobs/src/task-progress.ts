@@ -16,11 +16,12 @@ export interface TaskEmitterOptions {
   readonly sink?: TaskEmissionSink;
   readonly durable?: boolean;
   readonly maxBytes?: number;
+  readonly generation?: string;
+  readonly requireGeneration?: boolean;
 }
 
 export interface TaskStreamEmitterOptions extends Omit<TaskEmitterOptions, "sink"> {
   readonly name: string;
-  readonly generation?: string;
   readonly sink?: TaskStreamSink;
 }
 
@@ -37,6 +38,8 @@ export type TaskEmissionErrorCode =
   | "RELKIT_TASK_STREAM_TOO_LARGE"
   | "RELKIT_TASK_PROGRESS_PERSISTENCE"
   | "RELKIT_TASK_STREAM_PERSISTENCE"
+  | "RELKIT_TASK_PROGRESS_RETENTION"
+  | "RELKIT_TASK_STREAM_RETENTION"
   | "RELKIT_TASK_EMISSION_ABORTED";
 
 export class TaskEmissionError extends TypeError {
@@ -86,6 +89,8 @@ function createEmitter<S extends StandardSchemaV1>(
   const largeCode = kind === "progress" ? "RELKIT_TASK_PROGRESS_TOO_LARGE" : "RELKIT_TASK_STREAM_TOO_LARGE";
   const persistenceCode =
     kind === "progress" ? "RELKIT_TASK_PROGRESS_PERSISTENCE" : "RELKIT_TASK_STREAM_PERSISTENCE";
+  const retentionCode =
+    kind === "progress" ? "RELKIT_TASK_PROGRESS_RETENTION" : "RELKIT_TASK_STREAM_RETENTION";
   const signal = options.signal ?? new AbortController().signal;
   return Object.freeze({
     emit: async (input: InferInput<S>) => {
@@ -107,6 +112,14 @@ function createEmitter<S extends StandardSchemaV1>(
       try {
         const receipt = await options.sink(value, signal);
         const normalized = normalizeReceipt(receipt);
+        if (options.generation !== undefined) {
+          if (normalized.generation !== undefined && normalized.generation !== options.generation) {
+            throw new TaskEmissionError(retentionCode, `${kind} receipt generation does not match the active attempt`);
+          }
+          if (options.requireGeneration === true && normalized.generation !== options.generation) {
+            throw new TaskEmissionError(retentionCode, `Durable ${kind} receipt is missing its generation identity`);
+          }
+        }
         if (options.durable && normalized.outcome !== "persisted") {
           throw new TaskEmissionError(persistenceCode, `Durable ${kind} emission was not persisted`);
         }
@@ -134,7 +147,12 @@ async function validated<S extends StandardSchemaV1>(
 
 function normalizeReceipt(receipt: ProgressEmitReceipt | void): ProgressEmitReceipt {
   if (receipt === undefined) return { outcome: "sent" };
-  if (!Object.hasOwn({ persisted: true, sent: true, dropped: true, unavailable: true }, receipt.outcome)) {
+  if (
+    receipt.outcome !== "persisted" &&
+    receipt.outcome !== "sent" &&
+    receipt.outcome !== "dropped" &&
+    receipt.outcome !== "unavailable"
+  ) {
     throw new TypeError("Invalid task emission receipt");
   }
   return {

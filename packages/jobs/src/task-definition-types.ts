@@ -191,6 +191,9 @@ export type TaskDescriptorAny = DescriptorBase<"task", string> &
     readonly maxDuration?: DurationInput | undefined;
     readonly maxElapsed?: DurationInput | undefined;
     readonly logging?: TaskLogging | undefined;
+    readonly onStart?: (...args: never[]) => Promise<void>;
+    readonly onSuccess?: (...args: never[]) => Promise<void>;
+    readonly onFailure?: (...args: never[]) => Promise<void>;
     readonly handler: (...args: never[]) => unknown;
     readonly trigger: (...args: never[]) => Promise<RunHandle>;
   };

@@ -9,8 +9,8 @@ import type {
   ScheduleDefinition,
 } from "./job-types.js";
 import { validateJobName } from "./job-name.js";
-import { copyTriggerOptions } from "./trigger-validation.js";
 import type { TaskDescriptorAny } from "./task-types.js";
+import { submitJob } from "./submission.js";
 
 /** Diagnostic code used when the one-release profile spelling is consumed as service. */
 export const JOB_PROFILE_DEPRECATED_CODE = "RELKIT_JOB_PROFILE_DEPRECATED" as const;
@@ -97,7 +97,7 @@ export function defineJob<
   });
   const base = createDescriptorBase("job", id, options);
 
-  return deepFreeze({
+  const descriptor = {
     ...base,
     name,
     task: options.task,
@@ -114,8 +114,14 @@ export function defineJob<
     ...(schedules === undefined ? {} : { schedules }),
     ...(admission === undefined ? {} : { admission }),
     ...(client === undefined ? {} : { client }),
-    trigger: unboundTrigger,
-  }) as unknown as JobDescriptor<Name, Id, Task>;
+    trigger: (input: Parameters<JobDescriptor<Name, Id, Task>["trigger"]>[0], triggerOptions?: unknown) =>
+      submitJob(
+        descriptor as unknown as JobDescriptorAny,
+        input,
+        triggerOptions,
+      ),
+  };
+  return deepFreeze(descriptor) as unknown as JobDescriptor<Name, Id, Task>;
 }
 
 export function isJobDescriptor(value: unknown): value is JobDescriptorAny {
@@ -125,11 +131,6 @@ export function isJobDescriptor(value: unknown): value is JobDescriptorAny {
 export function assertJobDescriptor(value: unknown): asserts value is JobDescriptorAny {
   if (!isJobDescriptor(value)) throw new TypeError("Invalid job descriptor");
 }
-
-const unboundTrigger = async (_input?: unknown, options?: unknown): Promise<never> => {
-  if (options !== undefined) copyTriggerOptions(options);
-  throw new Error("RELKIT_JOBS_RUNTIME_UNBOUND");
-};
 
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);
