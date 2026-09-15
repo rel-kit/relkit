@@ -25,7 +25,8 @@ export function secrets(value: Readonly<Record<string, LocalServiceGeneratedSecr
   for (const [name, declaration] of Object.entries(value ?? {})) {
     if (
       !isStableId(name) || declaration === null || typeof declaration !== "object" ||
-      !Number.isSafeInteger(declaration.bytes) || declaration.bytes < 8
+      !Number.isSafeInteger(declaration.bytes) || declaration.bytes < 8 ||
+      (declaration.encoding !== undefined && declaration.encoding !== "base64url" && declaration.encoding !== "hex")
     ) invalid("Local-service generated secret");
   }
 }

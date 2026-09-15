@@ -3,6 +3,7 @@ import type {
   LocalServicePlan,
   LocalServiceRecipeInput,
   LocalServiceState,
+  LocalServiceWorkerArtifact,
 } from "@relkit/local-service";
 import type { LocalProjectIdentity } from "./identity.js";
 import type { ProviderOverrideSummary } from "./provider-overrides.js";
@@ -18,6 +19,10 @@ export interface LocalServiceReconcileRequest {
   readonly serviceGeneration?: string;
   readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly environmentOverridesByUnit?: Readonly<
+    Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>
+  >;
+  readonly workerArtifacts?: Readonly<Record<string, LocalServiceWorkerArtifact>>;
   readonly signal?: AbortSignal;
 }
 

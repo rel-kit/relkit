@@ -25,6 +25,7 @@ export interface LocalServiceVolume {
 
 export interface LocalServiceGeneratedSecret {
   readonly bytes: number;
+  readonly encoding?: "base64url" | "hex";
 }
 
 export interface LocalServiceSecretEnvironment {
@@ -45,6 +46,18 @@ export interface CompositeLocalServiceVolume {
 export interface CompositeLocalServiceUnitVolume {
   readonly name: string;
   readonly mountPath: string;
+}
+
+export interface LocalServiceBindMount {
+  readonly source: string;
+  readonly target: string;
+  readonly readOnly?: boolean;
+}
+
+export interface LocalServiceWorkerArtifact {
+  readonly entrypoint: string;
+  readonly providerOverridesFile: string;
+  readonly environment?: Readonly<Record<string, string>>;
 }
 
 export type CompositeLocalServiceUnitKind = "container" | "init" | "worker";
@@ -138,6 +151,9 @@ export interface LocalServiceStartRequest {
   readonly volumeNames?: Readonly<Record<string, string>>;
   readonly networkName?: string;
   readonly serviceGeneration?: string;
+  readonly workerArtifact?: LocalServiceWorkerArtifact;
+  readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;
+  readonly environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   readonly signal?: AbortSignal;
 }
 
