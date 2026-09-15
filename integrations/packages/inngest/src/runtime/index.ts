@@ -130,10 +130,10 @@ export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.
         const eventKey = optionalText(connection.eventKey);
         const signingKey = optionalText(connection.signingKey);
         const appVersion = optionalText(connection.appVersion);
-        const serveOrigin = optionalText(connection.serveOrigin);
+        const serveOrigin = optionalText(process.env.RELKIT_INNGEST_SERVE_ORIGIN) ?? optionalText(connection.serveOrigin);
         const runtime = createInngestRuntime({
           appId: optionalText(connection.appId) ?? "relkit",
-          baseUrl: optionalText(connection.baseUrl) ?? "http://127.0.0.1:8288",
+          baseUrl: optionalText(process.env.RELKIT_INNGEST_BASE_URL) ?? optionalText(connection.baseUrl) ?? "http://127.0.0.1:8288",
           ...(eventKey === undefined ? {} : { eventKey }),
           ...(signingKey === undefined ? {} : { signingKey }),
           ...(appVersion === undefined ? {} : { appVersion }),

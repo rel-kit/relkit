@@ -55,7 +55,7 @@ export function createIamPlan(
   }
 
   for (const node of graph.nodes) {
-    if (node.kind === "job") add(node.targetFunctionId, node.id);
+    if (node.kind === "job" && "targetFunctionId" in node) add(node.targetFunctionId, node.id);
     if (
       node.kind === "trigger" &&
       node.triggerType === "event" &&

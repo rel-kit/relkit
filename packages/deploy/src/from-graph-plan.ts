@@ -1,5 +1,5 @@
 import { deepFreeze } from "@relkit/contracts";
-import type { AppNode, ApplicationGraph, ProviderBindingNode } from "@relkit/graph";
+import type { AppNode, ApplicationGraph, LegacyJobNode, ProviderBindingNode } from "@relkit/graph";
 import { DEPLOYMENT_PLAN_VERSION, type ContainerImagePlan, type DeploymentPlan } from "./plan.js";
 import type { FromGraphOptions } from "./from-graph-validation.js";
 import { byLogical, envNames, isManaged, logicalName, nodes } from "./from-graph-validation.js";
@@ -55,7 +55,7 @@ export function buildPlan(
 
 function jobs(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
-    .filter((job) => isManaged(context.providers, "job", job.profile))
+    .filter((job): job is LegacyJobNode => "targetFunctionId" in job && isManaged(context.providers, "job", job.profile))
     .map((job) => ({
       ...base(
         context,
