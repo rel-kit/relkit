@@ -18,7 +18,6 @@ import {
   normalizeVersion,
 } from "./task-validation.js";
 import { assertBoundedString, copyTaskTags } from "./task-policy-validation.js";
-import { copyTriggerOptions } from "./trigger-validation.js";
 import type {
   DefineTaskOptions,
   TaskDependencies,
@@ -28,8 +27,8 @@ import type {
   TaskStreamSchemas,
   PublishedEventName,
 } from "./task-types.js";
+import { submitTask } from "./submission.js";
 const unsupportedTaskFields = ["invoke", "target"] as const;
-
 export function defineTask<
   const Id extends string,
   const Version extends string,
@@ -105,7 +104,7 @@ export function defineTask<
   assertHook(options.onFailure, "onFailure");
 
   const base = createDescriptorBase("task", id, tags === undefined ? options : { ...options, tags });
-  return deepFreeze({
+  const descriptor = {
     ...base,
     version,
     execution,
@@ -128,8 +127,14 @@ export function defineTask<
     ...(options.onSuccess === undefined ? {} : { onSuccess: options.onSuccess }),
     ...(options.onFailure === undefined ? {} : { onFailure: options.onFailure }),
     handler: options.handler,
-    trigger: unboundTrigger,
-  }) as unknown as TaskDescriptor<
+    trigger: (input: InferInput<InputSchema>, triggerOptions?: unknown) =>
+      submitTask(
+        descriptor as unknown as TaskDescriptorAny,
+        input,
+        triggerOptions,
+      ),
+  };
+  return deepFreeze(descriptor) as unknown as TaskDescriptor<
     Id,
     Version,
     InputSchema,
@@ -160,11 +165,6 @@ export function isTaskDescriptor(value: unknown): value is TaskDescriptorAny {
 export function assertTaskDescriptor(value: unknown): asserts value is TaskDescriptorAny {
   if (!isTaskDescriptor(value)) throw new TypeError("Job task must be a task descriptor");
 }
-const unboundTrigger = async (_input?: unknown, options?: unknown): Promise<never> => {
-  if (options !== undefined) copyTriggerOptions(options);
-  throw new Error("RELKIT_TASK_RUNTIME_UNBOUND");
-};
-
 function copyStrings(value: unknown, name: string): readonly string[] | undefined {
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) throw new TypeError(`Task ${name} must be an array of non-empty strings`);
