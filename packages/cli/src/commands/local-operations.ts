@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { hashGeneratedArtifact } from "@relkit/compiler";
 import type { LocalServiceInstance } from "@relkit/local-service";
+import { normalizeLocalServiceRecipe } from "@relkit/local-service";
 import type { CliCommandContext } from "../main-support.js";
+import { buildProject } from "./build.js";
 import { loadDevLocalServiceOwner } from "./dev-local-runtime.js";
-import { localServiceRuntimeOptions } from "./local-service-options.js";
+import { localServiceRuntimeOptions, localWorkerArtifacts } from "./local-service-options.js";
 import { loadLocalRuntimeModules } from "./local-runtime-modules.js";
 import {
   formatServices,
@@ -42,7 +44,7 @@ export async function localUp(
       project.runtimePlan,
       project.localPlan.services.map((entry) => entry.recipe.integrationId),
     );
-    const result = await owner.reconciler.reconcile({
+    const initial = await owner.reconciler.reconcile({
       plan: project.localPlan,
       planHash: hashGeneratedArtifact(project.checked.outputs.localServices),
       recipes,
@@ -52,6 +54,34 @@ export async function localUp(
       ...localServiceRuntimeOptions(project.localPlan.services, Number(process.env.PORT ?? 3000)),
       signal: context.signal,
     });
+    const workerBindings = project.localPlan.services
+      .filter((entry) => normalizeLocalServiceRecipe(recipes[entry.recipe.integrationId]!).units.some((unit) => unit.kind === "worker"))
+      .map((entry) => entry.bindingId);
+    let result = initial;
+    if (workerBindings.length > 0) {
+      const built = await buildProject({
+        projectRoot: project.root,
+        providerOverridesGeneration: initial.overrides.generationId,
+        check: async () => project.checked,
+      });
+      if (!built.ok) throw new Error("Unable to build the local worker artifact.");
+      result = await owner.reconciler.reconcile({
+        plan: project.localPlan,
+        planHash: hashGeneratedArtifact(project.checked.outputs.localServices),
+        recipes,
+        scope: "all",
+        environment: "development",
+        serviceGeneration: hashGeneratedArtifact(project.checked.outputs.graph),
+        ...localServiceRuntimeOptions(project.localPlan.services, Number(process.env.PORT ?? 3000), true),
+        workerArtifacts: localWorkerArtifacts(
+          project.localPlan.services,
+          workerBindings,
+          built.buildDirectory,
+          owner.overrideFile,
+        ),
+        signal: context.signal,
+      });
+    }
     const output = {
       ok: true as const,
       command: "up" as const,
@@ -172,6 +202,7 @@ export async function localStop(
       "provider-overrides.json",
       "local-services.state.json",
       "lease.json",
+      "local-secrets.json",
     ] as const) {
       local.removeLocalStateFile(identity, name);
     }

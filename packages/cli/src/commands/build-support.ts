@@ -2,9 +2,12 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { symlink, unlink } from "node:fs/promises";
 
+const BUN_IMAGE =
+  "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e";
+
 export function dockerfile(includeJobs = false): string {
   const jobs = includeJobs ? "COPY jobs.manifest.json ./\nCOPY jobs/ ./jobs/\n" : "";
-  return `FROM oven/bun:1.3.10
+  return `FROM ${BUN_IMAGE}
 ARG SOURCE_DATE_EPOCH=0
 WORKDIR /app
 COPY server/index.js ./server/index.js

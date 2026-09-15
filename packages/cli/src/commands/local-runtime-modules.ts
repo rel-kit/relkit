@@ -7,6 +7,7 @@ import type {
   LocalServiceRecipeInput,
   LocalServiceInstance,
   LocalServiceState,
+  LocalServiceWorkerArtifact,
 } from "@relkit/local-service";
 
 export interface LoadedLocalIdentity {
@@ -31,6 +32,8 @@ export interface LoadedLocalReconciler {
     readonly serviceGeneration?: string;
     readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
     readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+    readonly environmentOverridesByUnit?: Readonly<Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>>;
+    readonly workerArtifacts?: Readonly<Record<string, LocalServiceWorkerArtifact>>;
     readonly signal?: AbortSignal;
   }) => Promise<{
     readonly overrides: { readonly generationId: string };
@@ -63,7 +66,7 @@ export interface LoadedLocalRuntime {
   readonly localStateDirectory: (identity: LoadedLocalIdentity) => string;
   readonly removeLocalStateFile: (
     identity: LoadedLocalIdentity,
-    name: "lease.json" | "local-services.state.json" | "provider-overrides.json",
+    name: "lease.json" | "local-services.state.json" | "provider-overrides.json" | "local-secrets.json",
   ) => void;
   readonly groupServiceInstances: (
     instances: readonly LocalServiceInstance[],
