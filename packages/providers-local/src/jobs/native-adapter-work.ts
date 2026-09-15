@@ -87,6 +87,7 @@ export async function nextRun(
     ...(run.request.parentRunId === undefined ? {} : { parentRunId: run.request.parentRunId }),
     ...(run.request.scope === undefined ? {} : { scope: run.request.scope }),
     ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+    ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
     ...(run.request.propagation === undefined ? {} : { propagation: run.request.propagation }),
   };
   const binding: TaskExecutionBinding = {
@@ -104,6 +105,7 @@ export async function nextRun(
       ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
       scope: run.request.scope ?? context.scope,
       ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+      ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
       ...(run.request.propagation === undefined ? {} : { propagation: run.request.propagation }),
     },
     signal: controller.signal,

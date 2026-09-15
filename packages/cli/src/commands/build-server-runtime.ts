@@ -51,9 +51,7 @@ function createNativeJobsRuntimes(providerRegistry) {
       tasks: Object.values(tasks),
       taskExecutor: executor,
     });
-    if ((process.env.RELKIT_WORKER_ROLE ?? "worker") !== "api") {
-      registerNativeJobWorker(runtime, (plan.jobs ?? []).filter((candidate) => candidate.profile === job.profile), tasks, executor);
-    }
+    registerNativeJobWorker(runtime, (plan.jobs ?? []).filter((candidate) => candidate.profile === job.profile), tasks, executor);
     runtimes.set(job.profile, runtime);
   }
   return runtimes;

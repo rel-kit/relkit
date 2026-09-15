@@ -110,6 +110,7 @@ export async function next(
     attempt: run.attempt,
     ...(run.request.scope === undefined ? {} : { scope: run.request.scope }),
     ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+    ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
   };
   const binding: TaskExecutionBinding = {
     run: {
@@ -125,6 +126,7 @@ export async function next(
       scope: run.request.scope ?? context.scope,
       ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
       ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+      ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
     },
     signal: controller.signal,
   };

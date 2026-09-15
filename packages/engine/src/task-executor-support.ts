@@ -35,6 +35,9 @@ export function enrichBinding(
       ...(envelope.acceptanceIdentity === undefined || binding.run.acceptanceIdentity !== undefined
         ? {}
         : { acceptanceIdentity: envelope.acceptanceIdentity }),
+      ...(envelope.occurrenceIdentity === undefined || binding.run.occurrenceIdentity !== undefined
+        ? {}
+        : { occurrenceIdentity: envelope.occurrenceIdentity }),
       ...(envelope.propagation === undefined || binding.run.propagation !== undefined
         ? {}
         : { propagation: envelope.propagation }),

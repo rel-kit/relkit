@@ -92,7 +92,7 @@ import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail }
 import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";
 import { honoWebSocket, upgradeWebSocket } from "@relkit/runtime-hono/bun";
 import { createProviderRealtimeDispatcher, setActiveRealtimeDispatcher } from "@relkit/realtime";
-import { createJobsControls, createJobsRuntime, runInJobsRuntime } from "@relkit/jobs";
+import { createJobsControls, createJobsRuntime, reconcileNativeSchedules, runInJobsRuntime } from "@relkit/jobs";
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
@@ -163,8 +163,10 @@ let nativeJobWorker;
 let nativeJobsRuntimes = new Map();
 let nativeJobWorkerServerReady = false;
 let nativeJobWorkerReady = true;
+const nativeJobWorkerRegistrations = new Set();
+const nativeJobWorkerHandles = new Set();
+const nativeJobWorkerReadyHandles = new Set();
 const nativeJobWorkerEndpoints = new Map();
-const nativeJobWorkerReadyEndpoints = new Set();
 const providerStartup = (environmentResolution.error === undefined
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
   : Promise.reject(environmentResolution.error)).then(async (value) => {

@@ -5,18 +5,28 @@ function registerNativeJobWorker(runtime, jobs, tasks, executor) {
   const profiles = new Set((plan.jobs ?? []).map((candidate) => candidate.profile));
   const first = jobs[0];
   if (first === undefined) return;
-  const endpoint = register({
-    definitions: jobs.map((job) => nativeTaskDefinition(job, tasks)),
+  const definitions = jobs.map((job) => nativeTaskDefinition(job, tasks));
+  const role = process.env.RELKIT_WORKER_ROLE ?? "worker";
+  const handle = register({
+    definitions,
     executor,
+    startWorker: role !== "api",
     ...(profiles.size === 1 ? {} : { servePath: "/api/inngest/" + safeSegment(first.profile) }),
   });
-  if (endpoint === null || typeof endpoint !== "object" || typeof endpoint.path !== "string" || typeof endpoint.handler !== "function") {
-    throw new Error("Native jobs adapter returned an invalid worker endpoint.");
+  if (handle === null || typeof handle !== "object" || typeof handle.ready !== "function" || typeof handle.close !== "function") {
+    throw new Error("Native jobs adapter returned an invalid worker handle.");
   }
+  const registration = { handle, runtime, jobs, definitions, startWorker: role !== "api" };
+  nativeJobWorkerRegistrations.add(registration);
+  nativeJobWorkerHandles.add(handle);
   nativeJobWorkerReady = false;
-  nativeJobWorkerReadyEndpoints.delete(endpoint);
-  nativeJobWorkerEndpoints.set(endpoint.path, endpoint);
-  if (nativeJobWorkerServerReady) void readyNativeJobWorker(endpoint);
+  nativeJobWorkerReadyHandles.delete(handle);
+  if (typeof handle.path === "string" || typeof handle.handler === "function") {
+    if (typeof handle.path !== "string" || typeof handle.handler !== "function") throw new Error("Native jobs adapter returned an incomplete worker endpoint.");
+    nativeJobWorkerEndpoints.set(handle.path, handle);
+  }
+  if (nativeJobWorkerServerReady) void readyNativeJobWorker(registration);
+  return handle;
 }
 
 function nativeTaskDefinition(job, tasks) {
@@ -26,11 +36,27 @@ function nativeTaskDefinition(job, tasks) {
   const manifestJob = nativeJobsManifest?.jobs?.find((candidate) => candidate.id === job.id || candidate.id === jobId);
   const buildId = String(job.buildId ?? manifestJob?.buildId ?? generationId);
   const task = tasks[taskId];
+  const functionId = ["relkit", jobId, taskId, taskVersion, buildId].map(safeSegment).join("-");
+  const schedules = scheduleDefinitions(job);
   return {
-    functionId: ["relkit", jobId, taskId, taskVersion, buildId].map(safeSegment).join("-"),
+    id: functionId,
+    functionId,
     eventName: ["relkit", jobId, taskId, taskVersion, buildId].map(safeSegment).join("/"),
+    jobId,
+    taskId,
+    version: taskVersion,
+    taskVersion,
+    buildId,
+    ...(schedules === undefined ? {} : { schedules }),
     ...(job.policy === undefined && task?.policy === undefined ? {} : { policy: job.policy ?? task.policy }),
+    ...(task?.resources === undefined ? {} : { resources: task.resources }),
   };
+}
+
+function scheduleDefinitions(job) {
+  const value = job.schedules ?? job.schedule;
+  if (value === undefined) return undefined;
+  return Array.isArray(value) ? value : [value];
 }
 
 function safeSegment(value) {
@@ -42,14 +68,28 @@ function nativeJobHandler(request) {
   return endpoint === undefined ? undefined : endpoint.handler(request);
 }
 
-async function readyNativeJobWorker(endpoint) {
+async function readyNativeJobWorker(registration) {
   try {
-    await endpoint.ready();
-    nativeJobWorkerReadyEndpoints.add(endpoint);
-    nativeJobWorkerReady = nativeJobWorkerReadyEndpoints.size === nativeJobWorkerEndpoints.size;
+    await registration.handle.ready();
+    if (registration.startWorker && registration.runtime.adapter.schedules !== undefined) {
+      for (const definition of registration.definitions) {
+        const desired = definition.schedules ?? [];
+        await reconcileNativeSchedules({
+          native: registration.runtime.adapter.schedules,
+          desired,
+          context: registration.runtime.operationContext({ signal: shutdownController.signal }),
+          jobId: definition.jobId,
+          taskId: definition.taskId,
+          taskVersion: definition.taskVersion,
+          buildId: definition.buildId,
+        });
+      }
+    }
+    nativeJobWorkerReadyHandles.add(registration.handle);
+    nativeJobWorkerReady = nativeJobWorkerReadyHandles.size === nativeJobWorkerRegistrations.size;
     return true;
   } catch (error) {
-    nativeJobWorkerReadyEndpoints.delete(endpoint);
+    nativeJobWorkerReadyHandles.delete(registration.handle);
     nativeJobWorkerReady = false;
     recordRuntimeFailure("runtime.native-job-registration", "Native jobs worker registration failed", error, "job");
     return false;
@@ -57,7 +97,7 @@ async function readyNativeJobWorker(endpoint) {
 }
 
 async function readyNativeJobWorkers() {
-  const results = await Promise.all([...nativeJobWorkerEndpoints.values()].map((endpoint) => readyNativeJobWorker(endpoint)));
-  nativeJobWorkerReady = results.length === nativeJobWorkerEndpoints.size && results.every(Boolean);
+  const results = await Promise.all([...nativeJobWorkerRegistrations].map((registration) => readyNativeJobWorker(registration)));
+  nativeJobWorkerReady = results.length === nativeJobWorkerRegistrations.size && results.every(Boolean);
 }
 `;
