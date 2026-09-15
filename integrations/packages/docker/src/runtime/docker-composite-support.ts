@@ -1,4 +1,5 @@
 import type {
+  LocalServiceBindMount,
   LocalServiceStartRequest,
   NormalizedLocalServiceRecipe,
 } from "@relkit/local-service";
@@ -53,6 +54,25 @@ export function resourceName(value: string): void {
 export function mountPath(value: string): string {
   if (!/^\/[a-zA-Z0-9_./-]+$/.test(value) || value.includes("..")) throw new TypeError("Docker mount is invalid");
   return value;
+}
+
+export function bindMountArguments(
+  mounts: readonly LocalServiceBindMount[] | undefined,
+): string[] {
+  return (mounts ?? []).flatMap((mount) => {
+    if (
+      !mount.source.startsWith("/") ||
+      /[\0\r\n]/.test(mount.source) ||
+      (mount.readOnly !== undefined && typeof mount.readOnly !== "boolean")
+    ) {
+      throw new TypeError("Docker bind mount is invalid");
+    }
+    const target = mountPath(mount.target);
+    return [
+      "--mount",
+      `type=bind,source=${argument(mount.source)},target=${target}${mount.readOnly === true ? ",readonly" : ""}`,
+    ];
+  });
 }
 
 export function argument(value: string): string {

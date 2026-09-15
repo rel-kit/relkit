@@ -163,6 +163,76 @@ test("materializes an owned private composite network in dependency order", asyn
   expect(instance.ports.http).toBe(49_152);
 });
 
+test("starts a recipe-owned worker with read-only bundle and state mounts", async () => {
+  const calls: string[][] = [];
+  const client: DockerClient = {
+    discover: async () => ({ version: "29.0.0" }),
+    command: async (arguments_) => {
+      calls.push([...arguments_]);
+      if (arguments_[0] === "network" && arguments_[1] === "inspect") {
+        throw new Error("Docker network inspection failed with exit code 1.");
+      }
+      if (arguments_[0] === "container" && arguments_[1] === "create") {
+        return `container-${calls.filter((call) => call[0] === "container" && call[1] === "create").length}`;
+      }
+      return "";
+    },
+    containers: async () => [],
+    volumes: async () => [],
+    inspectContainer: async (id) => healthy(id),
+    waitForHealthy: async (id) => healthy(id),
+  };
+  const recipe = {
+    kind: "local-service-recipe",
+    protocolVersion: LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
+    integrationId: "test",
+    recipeId: "worker-composite",
+    recipeVersion: 2,
+    materializerId: "docker",
+    containers: [{ id: "inngest", image: "inngest@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }],
+    workers: [{
+      id: "worker",
+      image: "oven/bun@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      dependsOn: ["inngest"],
+      ports: { api: 3000 },
+      health: { command: ["kill", "-0", "1"], intervalMs: 250, timeoutMs: 1_000, retries: 4 },
+    }],
+    volumes: {},
+    outputs: () => ({}),
+  } satisfies CompositeLocalServiceRecipe;
+  const materializer = createDockerMaterializer({ client });
+
+  await materializer.start({
+    name: "relkit-worker",
+    labels: { "dev.relkit.managed": "true" },
+    recipe,
+    networkName: "relkit-worker-network",
+    workerArtifact: {
+      entrypoint: "/tmp/relkit-build/server/index.js",
+      providerOverridesFile: "/tmp/relkit-state/provider-overrides.json",
+    },
+    bindMounts: {
+      worker: [
+        { source: "/tmp/relkit-build", target: "/relkit-worker", readOnly: true },
+        { source: "/tmp/relkit-state", target: "/relkit-state", readOnly: true },
+      ],
+    },
+    environmentVariablesByUnit: {
+      worker: {
+        RELKIT_PROVIDER_OVERRIDES_FILE: "/relkit-state/provider-overrides.json",
+        RELKIT_WORKER_ROLE: "worker",
+      },
+    },
+  });
+
+  const worker = calls.find((call) => call.includes("relkit-worker-worker"));
+  if (worker === undefined) throw new Error("Worker container was not created.");
+  expect(worker).toContain("type=bind,source=/tmp/relkit-build,target=/relkit-worker,readonly");
+  expect(worker).toContain("type=bind,source=/tmp/relkit-state,target=/relkit-state,readonly");
+  expect(worker).toContain("RELKIT_PROVIDER_OVERRIDES_FILE=/relkit-state/provider-overrides.json");
+  expect(worker).toContain("RELKIT_WORKER_ROLE=worker");
+});
+
 function healthy(id: string): DockerContainer {
   return {
     id,

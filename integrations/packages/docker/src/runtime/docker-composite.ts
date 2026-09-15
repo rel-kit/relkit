@@ -7,6 +7,7 @@ import {
 } from "@relkit/local-service";
 import {
   argument,
+  bindMountArguments,
   compositeLabels,
   compositeSignal,
   environmentArguments,
@@ -74,7 +75,20 @@ export async function startComposite(
       }
     }
     const instances: LocalServiceInstance[] = [];
+    const existingUnits = new Map(
+      (await client.containers(request.labels, request.signal))
+        .flatMap((instance) => {
+          const unitId = instance.labels["dev.relkit.unit-id"];
+          return unitId === undefined ? [] : [[unitId, instance] as const];
+        }),
+    );
     for (const unit of recipe.units) {
+      if (unit.kind === "worker" && request.workerArtifact === undefined) continue;
+      const existing = unit.kind === "init" ? undefined : existingUnits.get(unit.id);
+      if (existing !== undefined) {
+        instances.push(reusedUnit(existing, unit, request.name));
+        continue;
+      }
       const instance = await startUnit(client, request, recipe, unit, networkName, volumes);
       createdContainers.push(instance.id);
       if (unit.kind === "init") {
@@ -114,6 +128,27 @@ export async function startComposite(
   }
 }
 
+function reusedUnit(
+  existing: LocalServiceInstance,
+  unit: NormalizedLocalServiceUnit,
+  serviceName: string,
+): LocalServiceInstance {
+  if (existing.state !== "running" || (unit.health !== undefined && existing.health !== "healthy")) {
+    throw new Error("Existing Docker unit " + unit.id + " is not healthy enough to reuse.");
+  }
+  const ports = { ...existing.ports };
+  for (const [name, containerPort] of Object.entries(unit.ports)) {
+    const value = existing.ports[name] ?? existing.ports[String(containerPort) + "/tcp"];
+    if (value !== undefined) ports[name] = value;
+  }
+  return Object.freeze({
+    ...existing,
+    name: serviceName + "-" + unit.id,
+    unitId: unit.id,
+    ports: Object.freeze(ports),
+  });
+}
+
 async function startUnit(
   client: DockerClient,
   request: LocalServiceStartRequest,
@@ -136,6 +171,7 @@ async function startUnit(
     ...[unit.id, ...(unit.networkAliases ?? [])].flatMap((alias) => ["--network-alias", alias]),
     ...Object.entries(unit.hostAliases ?? {}).flatMap(([host, address]) => ["--add-host", `${argument(host)}:${argument(address)}`]),
     ...Object.values(unit.ports).flatMap((port) => ["--publish", randomLoopbackPort(port)]),
+    ...bindMountArguments(request.bindMounts?.[unit.id]),
     ...unit.volumes.flatMap((mount) => [
       "--mount",
       `type=volume,source=${volumes[mount.name]},target=${mountPath(mount.mountPath)}`,
@@ -143,7 +179,10 @@ async function startUnit(
     ...(request.environmentFiles?.[unit.id] ?? request.environmentFile) === undefined
       ? []
       : ["--env-file", (request.environmentFiles?.[unit.id] ?? request.environmentFile)!],
-    ...environmentArguments(request.environmentVariables),
+    ...environmentArguments({
+      ...request.environmentVariables,
+      ...request.environmentVariablesByUnit?.[unit.id],
+    }),
     ...(unit.health === undefined ? [] : healthArgs(unit.health.command, unit.health.intervalMs, unit.health.timeoutMs, unit.health.retries)),
     argument(unit.image),
     ...(unit.command ?? []).map(argument),

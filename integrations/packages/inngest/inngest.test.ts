@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { inngest } from "./src/index.ts";
+import { localRecipe } from "./src/local.ts";
 import { createInngestRuntime } from "./src/runtime/index.ts";
 import { createInngestRunApi, snapshot } from "./src/runtime/runs.ts";
 import { createInngestFunctionConfig } from "./src/runtime/task-binding.ts";
@@ -9,6 +10,21 @@ test("authoring stays pure and declares the native local recipe", () => {
   const adapter = inngest();
   expect(adapter.adapterId).toBe("inngest");
   expect(adapter.localRecipe).toEqual({ integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 });
+  expect(localRecipe.containers?.map((unit) => unit.id)).toEqual(["postgres", "redis", "inngest"]);
+  expect(localRecipe.workers?.map((unit) => unit.id)).toEqual(["worker"]);
+  expect(localRecipe.init?.map((unit) => unit.id)).toEqual(["postgres-ready"]);
+  expect(localRecipe.containers?.find((unit) => unit.id === "redis")?.command).toEqual([
+    "redis-server",
+    "--appendonly",
+    "yes",
+    "--appendfsync",
+    "always",
+  ]);
+  expect(localRecipe.volumes).toMatchObject({
+    postgres: { persistent: true },
+    redis: { persistent: true },
+  });
+  expect(localRecipe.workers?.[0]?.image).toContain("@sha256:");
   expect(() => inngest({ appId: "" })).toThrow();
 });
 

@@ -46,7 +46,7 @@ export function createDockerMaterializer(
     listVolumes: (labels, signal) => client.volumes(labels, signal),
     removeNetworks: async (labels, signal) => {
       const names = (await client.command(
-        ["network", "ls", "--quiet", ...labelArguments(labels)],
+        ["network", "ls", "--quiet", ...networkLabelFilters(labels)],
         "Docker network listing",
         signal === undefined ? {} : { signal },
       )).split(/\r?\n/u).map((name) => name.trim()).filter(Boolean);
@@ -143,6 +143,12 @@ function labelArguments(values: Readonly<Record<string, string>>): string[] {
   return Object.entries(values)
     .sort(([left], [right]) => left.localeCompare(right))
     .flatMap(([key, value]) => ["--label", `${labelKey(key)}=${argument(value)}`]);
+}
+
+function networkLabelFilters(values: Readonly<Record<string, string>>): string[] {
+  return Object.entries(values)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .flatMap(([key, value]) => ["--filter", `label=${labelKey(key)}=${argument(value)}`]);
 }
 
 function labels(values: Readonly<Record<string, string>>): void {
