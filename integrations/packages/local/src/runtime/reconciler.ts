@@ -29,6 +29,11 @@ import type {
   LocalServiceReconciler,
   LocalServiceReconcilerOptions,
 } from "./reconciler-types.js";
+import {
+  readLocalServiceSecrets,
+  upsertLocalServiceSecrets,
+  type LocalServiceSecretState,
+} from "./local-secrets.js";
 import { removeLocalServiceState, writeLocalServiceState } from "./service-state.js";
 import { assertHotSwapSafe } from "./reconciler-generation.js";
 import { createReconcileQueue } from "./reconciler-queue.js";
@@ -54,6 +59,7 @@ export function createLocalServiceReconciler(
       if (closed) throw new Error("Local service reconciler is closed.");
       const desired = desiredServices(request);
       const previous = readProviderOverrides(options.identity);
+      let secretState: LocalServiceSecretState | undefined = readLocalServiceSecrets(options.identity);
       const instances = groupServiceInstances(
         await options.materializer.list(projectLabels, request.signal),
       );
@@ -71,7 +77,9 @@ export function createLocalServiceReconciler(
           const recipe = recipeFor(entry, request.recipes, options.materializer.integrationId);
           const normalizedRecipe = normalizeLocalServiceRecipe(recipe);
           const expectedUnitIds = normalizedRecipe.recipeVersion === 2
-            ? normalizedRecipe.units.filter((unit) => unit.kind !== "init").map((unit) => unit.id)
+            ? normalizedRecipe.units
+                .filter((unit) => unit.kind !== "init" && (unit.kind !== "worker" || request.workerArtifacts?.[entry.bindingId] !== undefined))
+                .map((unit) => unit.id)
             : undefined;
           const signature = serviceSignature(entry);
           const endpointHash = localEndpointHash(request.endpoints?.[entry.bindingId]);
@@ -96,10 +104,26 @@ export function createLocalServiceReconciler(
             request.serviceGeneration,
           );
           const retained = tracked.get(entry.bindingId);
-          let secrets = generatedSecrets(recipe, previous, entry.bindingId, retained?.secrets);
+          const persisted = secretState?.bindings.find(
+            (binding) => binding.bindingId === entry.bindingId &&
+              binding.recipe.integrationId === entry.recipe.integrationId &&
+              binding.recipe.recipeId === entry.recipe.recipeId &&
+              binding.recipe.recipeVersion === entry.recipe.recipeVersion,
+          )?.values;
+          const restored = generatedSecrets(recipe, previous, entry.bindingId, retained?.secrets, persisted);
+          const secrets = restored ?? createSecrets(recipe);
+          if (Object.keys(normalizedRecipe.generatedSecrets).length > 0) {
+            secretState = upsertLocalServiceSecrets(
+              options.identity,
+              secretState,
+              entry.bindingId,
+              entry.recipe,
+              secrets,
+            );
+          }
           let instance = candidates.find(
             (candidate) =>
-              secrets !== undefined &&
+              restored !== undefined &&
               compatible(
                 candidate,
                 labels["dev.relkit.recipe-id"]!,
@@ -112,13 +136,28 @@ export function createLocalServiceReconciler(
                 endpointHash,
               ),
           );
-          for (const candidate of candidates) {
-            if (candidate.id === instance?.id) continue;
-            await removeInstance(options, candidate, request.signal);
-            removed.push(entry.bindingId);
+          const keepCandidates =
+            normalizedRecipe.recipeVersion === 2 &&
+            candidates.some(
+              (candidate) =>
+                candidate.labels[LOCAL_RESOURCE_LABEL.planHash] === request.planHash,
+            ) &&
+            (request.workerArtifacts?.[entry.bindingId] !== undefined ||
+              !candidates.some((candidate) =>
+                candidate.units?.some(
+                  (unit) => unit.labels["dev.relkit.unit-kind"] === "worker",
+                ),
+              ));
+          let removedBeforeStart = false;
+          if (instance === undefined && !keepCandidates) {
+            for (const candidate of candidates) {
+              await removeInstance(options, candidate, request.signal);
+              removed.push(entry.bindingId);
+            }
+            removedBeforeStart = candidates.length > 0;
           }
           if (instance === undefined) {
-            secrets ??= createSecrets(recipe);
+            const existingIds = new Set(candidates.flatMap(serviceInstanceIds));
             instance = await startService(
               options,
               entry,
@@ -127,16 +166,28 @@ export function createLocalServiceReconciler(
               secrets,
               request.signal,
               request.environmentOverrides?.[entry.bindingId],
+              request.workerArtifacts?.[entry.bindingId],
+              request.environmentOverridesByUnit?.[entry.bindingId],
             );
-            startedIds.push(...serviceInstanceIds(instance));
+            startedIds.push(
+              ...serviceInstanceIds(instance).filter((id) => !existingIds.has(id)),
+            );
             started.push(entry.bindingId);
           } else {
             reused.push(entry.bindingId);
           }
+          if (!removedBeforeStart) {
+            const activeIds = new Set(serviceInstanceIds(instance));
+            for (const candidate of candidates) {
+              if (serviceInstanceIds(candidate).some((id) => activeIds.has(id))) continue;
+              await removeInstance(options, candidate, request.signal);
+              removed.push(entry.bindingId);
+            }
+          }
           const ports = outputPorts(recipe, instance);
           await recipe.initialize?.({
             ports,
-            secrets: secrets!,
+            secrets,
             ...(request.endpoints?.[entry.bindingId] === undefined
               ? {}
               : { endpoints: request.endpoints[entry.bindingId] }),
@@ -144,7 +195,7 @@ export function createLocalServiceReconciler(
           });
           const values = recipe.outputs({
             ports,
-            secrets: secrets!,
+            secrets,
             ...(request.endpoints?.[entry.bindingId] === undefined
               ? {}
               : { endpoints: request.endpoints[entry.bindingId] }),
@@ -153,7 +204,7 @@ export function createLocalServiceReconciler(
           next.set(entry.bindingId, {
             instance,
             signature,
-            secrets: secrets!,
+            secrets,
             owned:
               retained?.instance.id === instance.id
                 ? retained.owned
@@ -181,7 +232,9 @@ export function createLocalServiceReconciler(
               phase: desiredIds.has(entry.bindingId) ? "healthy" : "stopped",
               ...(request.environment === undefined ? {} : { environment: request.environment }),
               ...(request.serviceGeneration === undefined ? {} : { serviceGeneration: request.serviceGeneration }),
-              ...(service?.units === undefined ? {} : { units: service.units.map((unit) => unit.id) }),
+              ...(service?.units === undefined
+                ? {}
+                : { units: service.units.map((unit) => unit.unitId ?? unit.id) }),
             };
           }),
         );

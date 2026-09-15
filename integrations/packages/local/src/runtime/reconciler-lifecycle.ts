@@ -3,11 +3,13 @@ import type {
   LocalServicePlanEntry,
   LocalServiceRecipeInput,
   LocalServiceState,
+  LocalServiceWorkerArtifact,
 } from "@relkit/local-service";
 import { normalizeLocalServiceRecipe } from "@relkit/local-service";
 import { localResourceName } from "./identity.js";
 import type { ProviderOverrideSummary } from "./provider-overrides.js";
 import { environmentFile, environmentFiles } from "./reconciler-environment.js";
+import { workerStartOptions } from "./reconciler-worker.js";
 import type {
   LocalServiceReconcileRequest,
   LocalServiceReconcileResult,
@@ -24,8 +26,11 @@ export async function startService(
   secrets: Readonly<Record<string, string>>,
   signal?: AbortSignal,
   environmentVariables?: Readonly<Record<string, string>>,
+  workerArtifact?: LocalServiceWorkerArtifact,
+  environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>,
 ): Promise<LocalServiceInstance> {
   const normalized = normalizeLocalServiceRecipe(recipe);
+  const worker = workerStartOptions(normalized, workerArtifact);
   const request = {
     name: localResourceName(options.identity, entry.bindingId),
     ...(normalized.recipeVersion === 1
@@ -50,6 +55,19 @@ export async function startService(
       : { serviceGeneration: labels["dev.relkit.service-generation"] }),
     ...(signal === undefined ? {} : { signal }),
     ...(environmentVariables === undefined ? {} : { environmentVariables }),
+    ...(workerArtifact === undefined ? {} : { workerArtifact }),
+    ...(worker.bindMounts === undefined ? {} : { bindMounts: worker.bindMounts }),
+    ...(worker.environmentVariablesByUnit === undefined
+      ? {}
+      : { environmentVariablesByUnit: worker.environmentVariablesByUnit }),
+    ...(environmentVariablesByUnit === undefined
+      ? {}
+      : {
+          environmentVariablesByUnit: {
+            ...worker.environmentVariablesByUnit,
+            ...environmentVariablesByUnit,
+          },
+        }),
   };
   const environment = normalized.recipeVersion === 1 ? environmentFile(recipe, secrets) : undefined;
   const unitEnvironments = environmentFiles(recipe, secrets);

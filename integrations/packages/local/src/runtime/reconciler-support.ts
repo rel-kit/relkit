@@ -62,13 +62,14 @@ export function generatedSecrets(
   previous: ProviderOverrideState | undefined,
   bindingId: string,
   retained?: Readonly<Record<string, string>>,
+  persisted?: Readonly<Record<string, string>>,
 ): Readonly<Record<string, string>> | undefined {
   const declarations = Object.entries(normalizeLocalServiceRecipe(recipe).generatedSecrets);
   if (declarations.length === 0) return Object.freeze({});
   const values = previous?.bindings.find((binding) => binding.bindingId === bindingId)?.values;
   const restored: Record<string, string> = {};
   for (const [name] of declarations) {
-    const value = retained?.[name] ?? values?.[name];
+    const value = retained?.[name] ?? persisted?.[name] ?? values?.[name];
     if (typeof value !== "string" || value === "") return undefined;
     restored[name] = value;
   }
@@ -81,7 +82,7 @@ export function createSecrets(recipe: LocalServiceRecipeInput): Readonly<Record<
     if (!isStableId(name) || !Number.isSafeInteger(declaration.bytes) || declaration.bytes < 8) {
       invalid();
     }
-    result[name] = randomBytes(declaration.bytes).toString("base64url");
+    result[name] = randomBytes(declaration.bytes).toString(declaration.encoding ?? "base64url");
   }
   return Object.freeze(result);
 }
@@ -125,13 +126,14 @@ export function groupServiceInstances(
     const unitId = instance.labels["dev.relkit.unit-id"];
     if (bindingId === undefined || unitId === undefined) singles.push(instance);
     else {
+      const enriched = instance.unitId === unitId ? instance : { ...instance, unitId };
       const key = [
         bindingId,
         instance.labels[LOCAL_RESOURCE_LABEL.environment] ?? "",
         instance.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] ?? "",
         instance.labels[LOCAL_RESOURCE_LABEL.recipeId] ?? "",
       ].join("\0");
-      groups.set(key, [...(groups.get(key) ?? []), instance]);
+      groups.set(key, [...(groups.get(key) ?? []), enriched]);
     }
   }
   const composite = [...groups.values()].map((units) => {
