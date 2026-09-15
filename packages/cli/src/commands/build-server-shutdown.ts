@@ -30,6 +30,7 @@ async function shutdown() {
   const drainTimeoutMs = timeoutFrom(process.env.RELKIT_DRAIN_TIMEOUT_MS, 60_000);
   const telemetryTimeoutMs = timeoutFrom(process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
   await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
+  await bounded(Promise.allSettled([...nativeJobWorkerEndpoints.values()].map((endpoint) => endpoint.close?.())), drainTimeoutMs);
   spanRuntime.close();
   await bounded(flushTelemetry(), telemetryTimeoutMs);
   await bounded(providerStartup, drainTimeoutMs);

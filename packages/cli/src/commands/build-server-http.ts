@@ -105,7 +105,7 @@ const app = createApp({
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
     readiness: () => ({
-      ready: providerReady && databaseReady && authReady && !stopping,
+      ready: providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping,
       ...(stopping ? { reason: "stopping" } : providerFailed || specializedFailed ? { reason: "unavailable" } : {}),
     }),
   },
@@ -167,9 +167,11 @@ const server = Bun.serve({
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
-      return healthResponse(providerReady && databaseReady && authReady && !stopping ? "ready" : "not-ready", providerReady && databaseReady && authReady && !stopping ? 200 : 503);
+      return healthResponse(providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? "ready" : "not-ready", providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? 200 : 503);
     if (stopping) return Response.json({ error: "draining" }, { status: 503 });
-    if (!providerReady || !databaseReady || !authReady)
+    const nativeWorker = nativeJobHandler(request);
+    if (nativeWorker !== undefined) return await nativeWorker;
+    if (!providerReady || !nativeJobWorkerReady || !databaseReady || !authReady)
       return Response.json({ error: "not-ready" }, { status: 503 });
     try {
       return await app.fetch(request, bunServer);
@@ -177,5 +179,7 @@ const server = Bun.serve({
       return Response.json({ error: "internal-error" }, { status: 500 });
     }
   }),
-});`;
+});
+nativeJobWorkerServerReady = true;
+void readyNativeJobWorkers();`;
 }

@@ -10,7 +10,7 @@ import { resolve } from "node:path";
 import {
   assertLocalServicePlanVersion,
   type LocalServicePlan,
-  type LocalServiceRecipe,
+  type LocalServiceRecipeInput,
 } from "@relkit/local-service";
 import { validateGraphShape, type ApplicationGraph } from "@relkit/graph";
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
@@ -22,6 +22,7 @@ import {
   type DevLocalServiceOwner,
 } from "./dev-local-runtime.js";
 import type { TelemetryConfiguration } from "@relkit/observability";
+import { localServiceRuntimeOptions } from "./local-service-options.js";
 
 export interface DevLocalCompiler {
   readonly compile: CandidateCompile;
@@ -33,9 +34,10 @@ export function createDevLocalCompiler(
   localEnabled = true,
   configureTelemetry?: (configuration: TelemetryConfiguration) => Promise<void> | undefined,
   color = false,
+  backendPort = 3000,
 ): DevLocalCompiler {
   let owner: DevLocalServiceOwner | undefined;
-  const recipes = new Map<string, LocalServiceRecipe>();
+  const recipes = new Map<string, LocalServiceRecipeInput>();
   return Object.freeze({
     compile: async (request: CandidateCompileRequest) => {
       const checked = await checkProject({
@@ -53,7 +55,7 @@ export function createDevLocalCompiler(
         await configureTelemetry(graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {});
       }
       const local = localEnabled
-        ? await reconcile(projectRoot, checked, recipes, owner, request.signal)
+        ? await reconcile(projectRoot, checked, recipes, owner, request.signal, backendPort)
         : undefined;
       owner = local?.owner ?? owner;
       const built = await buildProject({
@@ -88,9 +90,10 @@ export function createDevLocalCompiler(
 async function reconcile(
   projectRoot: string,
   checked: CheckResult,
-  recipes: Map<string, LocalServiceRecipe>,
+  recipes: Map<string, LocalServiceRecipeInput>,
   current: DevLocalServiceOwner | undefined,
   signal: AbortSignal,
+  backendPort: number,
 ): Promise<
   | {
       owner: DevLocalServiceOwner;
@@ -124,6 +127,9 @@ async function reconcile(
     planHash: hashGeneratedArtifact(checked.outputs.localServices),
     recipes: Object.fromEntries(recipes),
     scope: "required",
+    environment: "development",
+    serviceGeneration: hashGeneratedArtifact(checked.outputs.graph),
+    ...localServiceRuntimeOptions(localPlan.services, backendPort),
     signal,
   });
   return {

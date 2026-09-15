@@ -59,6 +59,7 @@ export async function runDevCommand(
       return telemetry?.configure(next);
     },
     terminal.color,
+    ports.backend,
   );
   const log = createDevLogger({ compile: compiler.compile, logger, terminal });
   telemetry = await startDevTelemetry(projectRoot, configuration, (error) =>

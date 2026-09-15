@@ -8,6 +8,7 @@ import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts"
 import type { ApplicationGraph } from "@relkit/graph";
 import { serverHttpSource, type ServerSourceConfiguration } from "./build-server-http.js";
 import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
+import { SERVER_NATIVE_WORKER_SOURCE } from "./build-server-native-worker.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
@@ -160,6 +161,10 @@ let materializedJobs;
 let jobWorker;
 let nativeJobWorker;
 let nativeJobsRuntimes = new Map();
+let nativeJobWorkerServerReady = false;
+let nativeJobWorkerReady = true;
+const nativeJobWorkerEndpoints = new Map();
+const nativeJobWorkerReadyEndpoints = new Set();
 const providerStartup = (environmentResolution.error === undefined
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
@@ -197,6 +202,7 @@ let stopping = false;
 ${serverHttpSource(configuration)}
 ${SERVER_INVOCATION_SOURCE}
 ${SERVER_REGISTRATION_SOURCE}
+${SERVER_NATIVE_WORKER_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}
 `;

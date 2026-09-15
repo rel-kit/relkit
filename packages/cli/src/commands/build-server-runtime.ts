@@ -51,6 +51,7 @@ function createNativeJobsRuntimes(providerRegistry) {
       tasks: Object.values(tasks),
       taskExecutor: executor,
     });
+    registerNativeJobWorker(runtime, (plan.jobs ?? []).filter((candidate) => candidate.profile === job.profile), tasks, executor);
     runtimes.set(job.profile, runtime);
   }
   return runtimes;
@@ -197,7 +198,7 @@ function writeRuntimeLog(record) {
   else consoleHumanSink.write(formatHumanLog(record), record);
 }
 function healthResponse(status, code = 200) {
-  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
+  return Response.json({ protocol: "relkit.inspector", version: 1, status, graphHash, activationFingerprint, manifestGraphHash: runtimeManifest.graphHash, graphContractVersion: ${GRAPH_VERSION}, manifestContractVersion: ${MANIFEST_VERSION}, manifestGeneratorVersion: ${GENERATOR_VERSION}, environmentReady: true, providerReady: providerReady && nativeJobWorkerReady && !stopping, databaseReady: databaseReady && !stopping, authReady: authReady && !stopping, ...(sourceToken === undefined ? {} : { sourceToken }), ...(generationToken === undefined ? {} : { generationToken }) }, { status: code, headers: { "x-relkit-api-version": "1" } });
 }
 function tokenFrom(value) {
   const parsed = Number(value);
