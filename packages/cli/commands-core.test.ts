@@ -170,7 +170,9 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   expect(firstArtifacts[6]).toContain("createObservabilityRuntime");
   expect(firstArtifacts[6]).toContain("materializeEvents");
   expect(firstArtifacts[6]).toContain("materializeJobs");
-  expect(firstArtifacts[6]).toContain("RELKIT_TASK_RUNTIME_UNAVAILABLE");
+  expect(firstArtifacts[6]).toContain("createJobsRuntime");
+  expect(firstArtifacts[6]).toContain("startNativeJobWorker");
+  expect(firstArtifacts[6]).not.toContain("RELKIT_TASK_RUNTIME_UNAVAILABLE");
   expect(firstArtifacts[6]).toContain("RELKIT_LEGACY_JOBS_DISABLED");
   expect(firstArtifacts[6]).toContain("invokeAgent");
   expect(firstArtifacts[6]).toContain("formatHumanLog(record)");
@@ -209,7 +211,7 @@ test("build succeeds from a checked graph and reports failed checks", async () =
   );
 });
 
-test("refuses to activate task job manifests without a native jobs runtime", async () => {
+test("rejects malformed jobs manifests before activation", async () => {
   const root = await copyProject("tests/compiler/fixtures/valid-minimal");
   const checked = await checkProject({ projectRoot: root });
   const result = await buildProject({
@@ -222,12 +224,8 @@ test("refuses to activate task job manifests without a native jobs runtime", asy
 
   expect(result.ok).toBe(false);
   expect(result.artifacts).toEqual([]);
-  expect(result.diagnostics).toContainEqual(
-    expect.objectContaining({
-      code: "RELKIT_TASK_RUNTIME_UNAVAILABLE",
-      severity: "error",
-    }),
-  );
+  expect(result.diagnostics).toContainEqual(expect.objectContaining({ code: "RELKIT_BUILD_FAILED", severity: "error" }));
+  expect(result.diagnostics).not.toContainEqual(expect.objectContaining({ code: "RELKIT_TASK_RUNTIME_UNAVAILABLE" }));
 });
 
 test("build carries server port, body limit, and API docs settings into runtime artifacts", async () => {

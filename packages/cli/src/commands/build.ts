@@ -22,7 +22,7 @@ import { checkProject, type CheckOptions, type CheckResult } from "./check.js";
 import { serverSource } from "./build-server.js";
 import { selectedLocalServicePlan } from "./build-cohort.js";
 import { activateBuild } from "./build-activation.js";
-import { parseJobsManifest, stageJobs, taskJobsRuntimeDiagnostic } from "./build-jobs.js";
+import { parseJobsManifest, stageJobs } from "./build-jobs.js";
 import { buildFailure } from "./build-result.js";
 import {
   bundleServer,
@@ -52,11 +52,6 @@ export async function buildProject(options: BuildOptions = {}): Promise<BuildRes
   if (!checked.ok || checked.graphHash === undefined)
     return buildFailure(projectRoot, buildDirectory, checked.diagnostics);
   const jobsManifest = parseJobsManifest(checked.outputs.jobsManifest);
-  if (jobsManifest !== undefined)
-    return buildFailure(projectRoot, buildDirectory, [
-      ...checked.diagnostics,
-      taskJobsRuntimeDiagnostic(),
-    ]);
   const stage = await mkdtemp(join(dirname(buildDirectory), ".relkit-build-"));
   try {
     const graph = JSON.parse(checked.outputs.graph) as ApplicationGraph;

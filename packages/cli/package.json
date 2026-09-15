@@ -51,6 +51,7 @@
     "@relkit/engine": "workspace:*",
     "@relkit/inspector-api": "workspace:*",
     "@relkit/invocation": "workspace:*",
+    "@relkit/jobs": "workspace:*",
     "@relkit/local-service": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",

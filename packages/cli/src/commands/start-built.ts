@@ -15,7 +15,7 @@ import {
 import { createRuntimeActivationFingerprint } from "@relkit/compiler";
 import { assertProductionGraph, hashGraph, type ApplicationGraph } from "@relkit/graph";
 import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
-import { assertTaskJobsRuntimeAvailable, parseJobsManifest } from "./build-jobs.js";
+import { parseJobsManifest } from "./build-jobs.js";
 
 export interface BuiltManifest {
   readonly contractVersion: number;
@@ -75,7 +75,7 @@ export async function readBuilt(
     manifest.jobsManifestFile === undefined
       ? undefined
       : await readArtifact(buildDirectory, manifest.jobsManifestFile, "jobs manifest");
-  assertTaskJobsRuntimeAvailable(parseJobsManifest(jobsManifestSource));
+  parseJobsManifest(jobsManifestSource);
   const activation = parseArtifact(
     await readArtifact(buildDirectory, manifest.runtimeActivationFile, "activation fingerprint"),
     "activation fingerprint",
