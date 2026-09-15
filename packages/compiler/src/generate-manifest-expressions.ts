@@ -64,7 +64,7 @@ export function taskExpressionsFor(
 ): ReadonlyMap<string, string> {
   return new Map(
     tasks.flatMap((descriptor) => {
-      const expression = executableExpression(descriptor, "handler", bindings, input);
+      const expression = executableExpression(descriptor, "descriptor", bindings, input);
       return expression === undefined ? [] : [[descriptor.id, expression] as const];
     }),
   );

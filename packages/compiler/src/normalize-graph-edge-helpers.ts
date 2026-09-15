@@ -5,6 +5,7 @@ import { isRecord, refId } from "./normalize-utils.js";
 import { graphIdForDescriptor, graphIdForReference } from "./normalize-graph-id.js";
 
 const dependencyEdges: Readonly<Record<string, string>> = {
+  tasks: "triggers-task",
   jobs: "enqueues-job",
   buckets: "uses-bucket",
   cache: "uses-cache",

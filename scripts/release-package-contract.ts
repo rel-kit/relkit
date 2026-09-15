@@ -8,6 +8,8 @@ const appSubpaths = [
   "realtime",
   "agents",
   "jobs",
+  "jobs/legacy",
+  "tasks",
   "cache",
   "tools",
   "buckets",
@@ -70,12 +72,38 @@ export function expectedExports(
         import: "./dist/runtime/index.js",
       },
     };
+  if (directoryName === "contracts")
+    return {
+      ".": rootExport,
+      "./jobs": {
+        types: "./dist/jobs.d.ts",
+        import: "./dist/jobs.js",
+      },
+    };
+  if (directoryName === "jobs")
+    return {
+      ".": rootExport,
+      "./adapter": {
+        types: "./dist/adapter.d.ts",
+        import: "./dist/adapter.js",
+      },
+      "./server": {
+        types: "./dist/server.d.ts",
+        import: "./dist/server.js",
+      },
+      "./legacy": {
+        types: "./dist/legacy.d.ts",
+        import: "./dist/legacy.js",
+      },
+    };
   if (directoryName === "app")
     return Object.fromEntries([
       [".", rootExport],
       ...appSubpaths.map((subpath) => [
         `./${subpath}`,
-        { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
+        subpath === "jobs/legacy"
+          ? { types: "./dist/jobs-legacy.d.ts", import: "./dist/jobs-legacy.js" }
+          : { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
       ]),
     ]);
   if (directoryName === "cli")
