@@ -13,7 +13,10 @@ import {
 import {
   createLocalProjectIdentity,
   createLocalServiceReconciler,
+  groupServiceInstances,
+  localResourceLabels,
   readProviderOverrides,
+  serviceInstanceIds,
 } from "./src/runtime/index.ts";
 
 const graphHash = `sha256:${"1".repeat(64)}`;
@@ -109,6 +112,66 @@ test("reconciles required bindings and reuses only unchanged healthy services", 
   } finally {
     rmSync(root, { force: true, recursive: true });
   }
+});
+
+test("refuses an unsafe service-generation hot swap without removing the old worker", async () => {
+  const root = mkdtempSync(join(tmpdir(), "relkit-local-generation-"));
+  try {
+    const identity = createLocalProjectIdentity(root, "commerce");
+    const old = {
+      id: "old-container",
+      name: "old-service",
+      labels: localResourceLabels(identity, {
+        bindingId: "provider.cache.default",
+        environment: "development",
+        serviceGeneration: `sha256:${"a".repeat(64)}`,
+        recipe: { integrationId: "redis", recipeId: "redis-docker", recipeVersion: 1 },
+        planHash: firstPlanHash,
+      }),
+      state: "running",
+      health: "healthy" as const,
+      ports: { redis: 49_150 },
+    } satisfies LocalServiceInstance;
+    const removed: string[] = [];
+    const materializer: LocalServiceMaterializerRuntime = {
+      kind: "local-service-materializer-runtime",
+      protocolVersion: LOCAL_SERVICE_PROTOCOL_VERSION,
+      integrationId: "docker",
+      list: async () => [old],
+      start: async () => { throw new Error("start should not be called"); },
+      remove: async (id) => { removed.push(id); },
+      removeVolumes: async () => undefined,
+    };
+    const reconciler = createLocalServiceReconciler({ identity, materializer });
+    await expect(reconciler.reconcile({
+      plan: plan(false),
+      planHash: firstPlanHash,
+      recipes,
+      scope: "required",
+      environment: "development",
+      serviceGeneration: `sha256:${"b".repeat(64)}`,
+    })).rejects.toThrow("cannot hot-swap");
+    expect(removed).toEqual([]);
+    await reconciler.close();
+  } finally {
+    rmSync(root, { force: true, recursive: true });
+  }
+});
+
+test("groups composite units without masking an unhealthy dependency", () => {
+  const labels = localResourceLabels(createLocalProjectIdentity(process.cwd(), "commerce"), {
+    bindingId: "provider.cache.default",
+    recipe: { integrationId: "redis", recipeId: "redis-docker", recipeVersion: 1 },
+    planHash: firstPlanHash,
+  });
+  const grouped = groupServiceInstances([
+    { id: "root", name: "root", labels: { ...labels, "dev.relkit.unit-id": "root" }, state: "running", health: "healthy", ports: {} },
+    { id: "dependency", name: "dependency", labels: { ...labels, "dev.relkit.unit-id": "dependency" }, state: "running", health: "unhealthy", ports: {} },
+  ]);
+  expect(grouped).toHaveLength(1);
+  expect(grouped[0]?.health).toBe("unhealthy");
+  expect(Array.isArray(grouped[0]?.units)).toBe(true);
+  expect(serviceInstanceIds(grouped[0]!)).toEqual(["root", "dependency"]);
 });
 
 const recipes = Object.freeze({

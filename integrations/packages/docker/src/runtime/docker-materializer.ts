@@ -5,6 +5,8 @@ import {
   type LocalServiceStartRequest,
 } from "@relkit/local-service";
 import { createDockerClient, randomLoopbackPort } from "./docker-client.js";
+import { startComposite } from "./docker-composite.js";
+import { environmentArguments } from "./docker-composite-support.js";
 import type { DockerClient, DockerClientOptions } from "./docker-types.js";
 
 export function createDockerMaterializer(
@@ -17,6 +19,13 @@ export function createDockerMaterializer(
     integrationId: "docker",
     list: (labels, signal) => client.containers(labels, signal),
     start: (request) => start(client, request),
+    stop: async (id, signal) => {
+      await client.command(
+        ["container", "stop", "--time", "10", resourceName(id)],
+        "Docker container graceful stop",
+        signal === undefined ? {} : { signal },
+      );
+    },
     remove: async (id, signal) => {
       await client.command(
         ["container", "rm", "--force", resourceName(id)],
@@ -34,6 +43,21 @@ export function createDockerMaterializer(
         );
       }
     },
+    listVolumes: (labels, signal) => client.volumes(labels, signal),
+    removeNetworks: async (labels, signal) => {
+      const names = (await client.command(
+        ["network", "ls", "--quiet", ...labelArguments(labels)],
+        "Docker network listing",
+        signal === undefined ? {} : { signal },
+      )).split(/\r?\n/u).map((name) => name.trim()).filter(Boolean);
+      for (const network of names) {
+        await client.command(
+          ["network", "rm", resourceName(network)],
+          "Docker network removal",
+          signal === undefined ? {} : { signal },
+        );
+      }
+    },
   };
   return Object.freeze(materializer);
 }
@@ -42,6 +66,8 @@ async function start(
   client: DockerClient,
   request: LocalServiceStartRequest,
 ): Promise<LocalServiceInstance> {
+  if (!("image" in request.recipe)) return startComposite(client, request);
+  const recipe = request.recipe;
   name(request.name);
   labels(request.labels);
   await client.discover(request.signal);
@@ -63,25 +89,26 @@ async function start(
       "--publish",
       randomLoopbackPort(port),
     ]),
-    ...(request.volumeName === undefined || request.recipe.volume === undefined
+    ...(request.volumeName === undefined || recipe.volume === undefined
       ? []
       : [
           "--mount",
-          `type=volume,source=${request.volumeName},target=${mountPath(request.recipe.volume.mountPath)}`,
+          `type=volume,source=${request.volumeName},target=${mountPath(recipe.volume.mountPath)}`,
         ]),
     ...(request.environmentFile === undefined
       ? []
       : ["--env-file", argument(request.environmentFile)]),
+    ...environmentArguments(request.environmentVariables),
     "--health-cmd",
-    healthCommand(request.recipe.health.command),
+    healthCommand(recipe.health.command),
     "--health-interval",
-    duration(request.recipe.health.intervalMs),
+    duration(recipe.health.intervalMs),
     "--health-timeout",
-    duration(request.recipe.health.timeoutMs),
+    duration(recipe.health.timeoutMs),
     "--health-retries",
-    String(positive(request.recipe.health.retries)),
-    argument(request.recipe.image),
-    ...(request.recipe.command ?? []).map(argument),
+    String(positive(recipe.health.retries)),
+    argument(recipe.image),
+    ...(recipe.command ?? []).map(argument),
   ];
   let id: string | undefined;
   try {
@@ -98,9 +125,8 @@ async function start(
     );
     return await client.waitForHealthy(id, {
       timeoutMs:
-        request.recipe.health.intervalMs * request.recipe.health.retries +
-        request.recipe.health.timeoutMs,
-      pollIntervalMs: Math.min(250, request.recipe.health.intervalMs),
+        recipe.health.intervalMs * recipe.health.retries + recipe.health.timeoutMs,
+      pollIntervalMs: Math.min(250, recipe.health.intervalMs),
       ...(request.signal === undefined ? {} : { signal: request.signal }),
     });
   } catch (error) {

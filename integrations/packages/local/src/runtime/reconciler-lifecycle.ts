@@ -1,12 +1,13 @@
 import type {
   LocalServiceInstance,
   LocalServicePlanEntry,
-  LocalServiceRecipe,
+  LocalServiceRecipeInput,
   LocalServiceState,
 } from "@relkit/local-service";
+import { normalizeLocalServiceRecipe } from "@relkit/local-service";
 import { localResourceName } from "./identity.js";
 import type { ProviderOverrideSummary } from "./provider-overrides.js";
-import { environmentFile } from "./reconciler-support.js";
+import { environmentFile, environmentFiles } from "./reconciler-environment.js";
 import type {
   LocalServiceReconcileRequest,
   LocalServiceReconcileResult,
@@ -18,26 +19,72 @@ import { withLocalStateTemporaryFile } from "./state-paths.js";
 export async function startService(
   options: LocalServiceReconcilerOptions,
   entry: LocalServicePlanEntry,
-  recipe: LocalServiceRecipe,
+  recipe: LocalServiceRecipeInput,
   labels: Readonly<Record<string, string>>,
   secrets: Readonly<Record<string, string>>,
   signal?: AbortSignal,
+  environmentVariables?: Readonly<Record<string, string>>,
 ): Promise<LocalServiceInstance> {
+  const normalized = normalizeLocalServiceRecipe(recipe);
   const request = {
     name: localResourceName(options.identity, entry.bindingId),
-    ...(recipe.volume === undefined
-      ? {}
-      : { volumeName: localResourceName(options.identity, entry.bindingId, "data") }),
+    ...(normalized.recipeVersion === 1
+      ? {
+          ...(normalized.volumes.data === undefined
+            ? {}
+            : { volumeName: localResourceName(options.identity, entry.bindingId, "data") }),
+        }
+      : {
+          volumeNames: Object.fromEntries(
+            Object.keys(normalized.volumes).map((name) => [
+              name,
+              localResourceName(options.identity, entry.bindingId, name),
+            ]),
+          ),
+          networkName: localResourceName(options.identity, entry.bindingId, "network"),
+        }),
     labels,
     recipe,
+    ...(labels["dev.relkit.service-generation"] === undefined
+      ? {}
+      : { serviceGeneration: labels["dev.relkit.service-generation"] }),
     ...(signal === undefined ? {} : { signal }),
+    ...(environmentVariables === undefined ? {} : { environmentVariables }),
   };
-  const environment = environmentFile(recipe, secrets);
-  return environment === undefined
-    ? options.materializer.start(request)
-    : withLocalStateTemporaryFile(options.identity, environment, (environmentFile) =>
-        options.materializer.start({ ...request, environmentFile }),
-      );
+  const environment = normalized.recipeVersion === 1 ? environmentFile(recipe, secrets) : undefined;
+  const unitEnvironments = environmentFiles(recipe, secrets);
+  const normalizedRequest = normalized.recipeVersion === 2
+    ? { ...request, ...(Object.keys(unitEnvironments).length === 0 ? {} : { environmentFiles: unitEnvironments }) }
+    : request;
+  return withEnvironmentFiles(options, normalizedRequest, environment);
+}
+
+async function withEnvironmentFiles(
+  options: LocalServiceReconcilerOptions,
+  request: Parameters<LocalServiceReconcilerOptions["materializer"]["start"]>[0],
+  environment: string | undefined,
+): Promise<LocalServiceInstance> {
+  if (environment !== undefined) {
+    return withLocalStateTemporaryFile(options.identity, environment, (path) =>
+      options.materializer.start({ ...request, environmentFile: path }),
+    );
+  }
+  const entries = Object.entries(request.environmentFiles ?? {});
+  return withUnitEnvironmentFiles(options, request, entries, 0, {});
+}
+
+async function withUnitEnvironmentFiles(
+  options: LocalServiceReconcilerOptions,
+  request: Parameters<LocalServiceReconcilerOptions["materializer"]["start"]>[0],
+  entries: readonly (readonly [string, string])[],
+  index: number,
+  paths: Readonly<Record<string, string>>,
+): Promise<LocalServiceInstance> {
+  const entry = entries[index];
+  if (entry === undefined) return options.materializer.start({ ...request, environmentFiles: paths });
+  return withLocalStateTemporaryFile(options.identity, entry[1], (path) =>
+    withUnitEnvironmentFiles(options, request, entries, index + 1, { ...paths, [entry[0]]: path }),
+  );
 }
 
 export function writeFailureState(

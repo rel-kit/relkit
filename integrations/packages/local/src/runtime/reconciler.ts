@@ -1,6 +1,10 @@
 import type { JsonValue } from "@relkit/contracts";
-import type { LocalServiceInstance, LocalServicePlanEntry } from "@relkit/local-service";
-import { LOCAL_RESOURCE_LABEL, localProjectLabels, localResourceLabels } from "./identity.js";
+import {
+  normalizeLocalServiceRecipe,
+  type LocalServiceInstance,
+  type LocalServicePlanEntry,
+} from "@relkit/local-service";
+import { LOCAL_RESOURCE_LABEL, localEndpointHash, localProjectLabels, localResourceLabels } from "./identity.js";
 import {
   readProviderOverrides,
   removeProviderOverrides,
@@ -16,10 +20,19 @@ import {
   outputPorts,
   recipeFor,
   sameBindings,
+  groupServiceInstances,
+  serviceInstanceIds,
   serviceSignature,
 } from "./reconciler-support.js";
-import type { LocalServiceReconciler, LocalServiceReconcilerOptions } from "./reconciler-types.js";
+import type {
+  LocalServiceReconcileRequest,
+  LocalServiceReconciler,
+  LocalServiceReconcilerOptions,
+} from "./reconciler-types.js";
 import { removeLocalServiceState, writeLocalServiceState } from "./service-state.js";
+import { assertHotSwapSafe } from "./reconciler-generation.js";
+import { createReconcileQueue } from "./reconciler-queue.js";
+import { removeInstance } from "./reconciler-resource.js";
 
 export * from "./reconciler-types.js";
 
@@ -37,12 +50,13 @@ export function createLocalServiceReconciler(
   const tracked = new Map<string, TrackedService>();
   const signatures = new Map<string, string>();
   let closed = false;
-  const reconciler: LocalServiceReconciler = {
-    reconcile: async (request) => {
+  const reconcileNow = async (request: LocalServiceReconcileRequest) => {
       if (closed) throw new Error("Local service reconciler is closed.");
       const desired = desiredServices(request);
       const previous = readProviderOverrides(options.identity);
-      const instances = await options.materializer.list(projectLabels, request.signal);
+      const instances = groupServiceInstances(
+        await options.materializer.list(projectLabels, request.signal),
+      );
       const next = new Map<string, TrackedService>();
       const bindings: { bindingId: string; values: Readonly<Record<string, JsonValue>> }[] = [];
       const reused: string[] = [];
@@ -55,14 +69,31 @@ export function createLocalServiceReconciler(
           active = entry;
           aborted(request.signal);
           const recipe = recipeFor(entry, request.recipes, options.materializer.integrationId);
+          const normalizedRecipe = normalizeLocalServiceRecipe(recipe);
+          const expectedUnitIds = normalizedRecipe.recipeVersion === 2
+            ? normalizedRecipe.units.filter((unit) => unit.kind !== "init").map((unit) => unit.id)
+            : undefined;
           const signature = serviceSignature(entry);
+          const endpointHash = localEndpointHash(request.endpoints?.[entry.bindingId]);
           const labels = localResourceLabels(options.identity, {
             bindingId: entry.bindingId,
+            ...(request.environment === undefined ? {} : { environment: request.environment }),
+            ...(request.serviceGeneration === undefined ? {} : { serviceGeneration: request.serviceGeneration }),
             recipe: entry.recipe,
             planHash: request.planHash,
+            ...(endpointHash === undefined ? {} : { endpointHash }),
           });
           const candidates = instances.filter(
-            (instance) => instance.labels[LOCAL_RESOURCE_LABEL.bindingId] === entry.bindingId,
+            (instance) =>
+              instance.labels[LOCAL_RESOURCE_LABEL.bindingId] === entry.bindingId &&
+              (request.environment === undefined ||
+                instance.labels[LOCAL_RESOURCE_LABEL.environment] === request.environment),
+          );
+          assertHotSwapSafe(
+            entry.bindingId,
+            candidates,
+            request.environment,
+            request.serviceGeneration,
           );
           const retained = tracked.get(entry.bindingId);
           let secrets = generatedSecrets(recipe, previous, entry.bindingId, retained?.secrets);
@@ -75,17 +106,29 @@ export function createLocalServiceReconciler(
                 request.planHash,
                 signatures.get(entry.bindingId),
                 signature,
+                request.environment,
+                request.serviceGeneration,
+                expectedUnitIds,
+                endpointHash,
               ),
           );
           for (const candidate of candidates) {
             if (candidate.id === instance?.id) continue;
-            await options.materializer.remove(candidate.id, request.signal);
+            await removeInstance(options, candidate, request.signal);
             removed.push(entry.bindingId);
           }
           if (instance === undefined) {
             secrets ??= createSecrets(recipe);
-            instance = await startService(options, entry, recipe, labels, secrets, request.signal);
-            startedIds.push(instance.id);
+            instance = await startService(
+              options,
+              entry,
+              recipe,
+              labels,
+              secrets,
+              request.signal,
+              request.environmentOverrides?.[entry.bindingId],
+            );
+            startedIds.push(...serviceInstanceIds(instance));
             started.push(entry.bindingId);
           } else {
             reused.push(entry.bindingId);
@@ -94,9 +137,18 @@ export function createLocalServiceReconciler(
           await recipe.initialize?.({
             ports,
             secrets: secrets!,
+            ...(request.endpoints?.[entry.bindingId] === undefined
+              ? {}
+              : { endpoints: request.endpoints[entry.bindingId] }),
             ...(request.signal ? { signal: request.signal } : {}),
           });
-          const values = recipe.outputs({ ports, secrets: secrets! });
+          const values = recipe.outputs({
+            ports,
+            secrets: secrets!,
+            ...(request.endpoints?.[entry.bindingId] === undefined
+              ? {}
+              : { endpoints: request.endpoints[entry.bindingId] }),
+          });
           bindings.push({ bindingId: entry.bindingId, values });
           next.set(entry.bindingId, {
             instance,
@@ -111,7 +163,7 @@ export function createLocalServiceReconciler(
         const desiredIds = new Set(desired.map((entry) => entry.bindingId));
         for (const [bindingId, service] of tracked) {
           if (desiredIds.has(bindingId) || !service.owned) continue;
-          await options.materializer.remove(service.instance.id, request.signal);
+          await removeInstance(options, service.instance, request.signal);
           removed.push(bindingId);
         }
         bindings.sort((left, right) => left.bindingId.localeCompare(right.bindingId));
@@ -121,11 +173,17 @@ export function createLocalServiceReconciler(
         const state = writeLocalServiceState(
           options.identity,
           request.planHash,
-          request.plan.services.map((entry) => ({
-            bindingId: entry.bindingId,
-            recipe: entry.recipe,
-            phase: desiredIds.has(entry.bindingId) ? "healthy" : "stopped",
-          })),
+          request.plan.services.map((entry) => {
+            const service = next.get(entry.bindingId)?.instance;
+            return {
+              bindingId: entry.bindingId,
+              recipe: entry.recipe,
+              phase: desiredIds.has(entry.bindingId) ? "healthy" : "stopped",
+              ...(request.environment === undefined ? {} : { environment: request.environment }),
+              ...(request.serviceGeneration === undefined ? {} : { serviceGeneration: request.serviceGeneration }),
+              ...(service?.units === undefined ? {} : { units: service.units.map((unit) => unit.id) }),
+            };
+          }),
         );
         tracked.clear();
         signatures.clear();
@@ -135,18 +193,24 @@ export function createLocalServiceReconciler(
         }
         return frozenResult(overrides, state, reused, started, removed);
       } catch (error) {
-        await Promise.allSettled(startedIds.map((id) => options.materializer.remove(id)));
+        for (const id of [...startedIds].reverse()) {
+          await options.materializer.remove(id).catch(() => undefined);
+        }
         writeFailureState(options, request, active);
         throw error;
       }
-    },
+    };
+  const queue = createReconcileQueue(reconcileNow);
+  const reconciler: LocalServiceReconciler = {
+    reconcile: queue.enqueue,
     close: async () => {
       if (closed) return;
       closed = true;
+      await queue.wait();
       await Promise.allSettled(
         [...tracked.values()]
           .filter((service) => service.owned)
-          .map((service) => options.materializer.remove(service.instance.id)),
+          .map((service) => removeInstance(options, service.instance)),
       );
       if (options.preserveOnClose !== true) {
         removeProviderOverrides(options.identity);

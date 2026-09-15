@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { LOCAL_SERVICE_PROTOCOL_VERSION, type LocalServiceRecipe } from "@relkit/local-service";
+import {
+  LOCAL_SERVICE_PROTOCOL_VERSION,
+  LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
+  type CompositeLocalServiceRecipe,
+  type LocalServiceRecipe,
+} from "@relkit/local-service";
 import {
   createDockerMaterializer,
   type DockerClient,
@@ -71,3 +76,100 @@ test("creates a labeled loopback-only container and persistent volume", async ()
   expect(create.join(" ")).not.toContain("password");
   expect(calls[2]).toEqual(["container", "start", "container-1"]);
 });
+
+test("rejects an invalid composite graph before Docker mutation", async () => {
+  let mutations = 0;
+  const client: DockerClient = {
+    discover: async () => ({ version: "29.0.0" }),
+    command: async () => {
+      mutations += 1;
+      return "container-1";
+    },
+    containers: async () => [],
+    volumes: async () => [],
+    inspectContainer: async () => ({ id: "container-1", name: "x", labels: {}, state: "running", health: "healthy", ports: {} }),
+    waitForHealthy: async () => ({ id: "container-1", name: "x", labels: {}, state: "running", health: "healthy", ports: {} }),
+  };
+  const recipe = {
+    kind: "local-service-recipe",
+    protocolVersion: LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
+    integrationId: "test",
+    recipeId: "composite",
+    recipeVersion: 2,
+    materializerId: "docker",
+    units: [
+      { id: "a", kind: "container", image: "a@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dependsOn: ["b"], ports: { api: 8080 } },
+      { id: "b", kind: "worker", image: "b@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", dependsOn: ["a"], ports: { api: 8080 } },
+    ],
+    volumes: {},
+    outputs: () => ({}),
+  } satisfies CompositeLocalServiceRecipe;
+  const materializer = createDockerMaterializer({ client });
+  await expect(materializer.start({ name: "relkit-test", labels: { "dev.relkit.managed": "true" }, recipe })).rejects.toThrow("dependency cycle");
+  expect(mutations).toBe(0);
+});
+
+test("materializes an owned private composite network in dependency order", async () => {
+  const calls: string[][] = [];
+  const client: DockerClient = {
+    discover: async () => ({ version: "29.0.0" }),
+    command: async (arguments_) => {
+      calls.push([...arguments_]);
+      if (arguments_[0] === "network" && arguments_[1] === "inspect") {
+        throw new Error("Docker network inspection failed with exit code 1.");
+      }
+      if (arguments_[0] === "container" && arguments_[1] === "create") {
+        return `container-${calls.filter((call) => call[0] === "container" && call[1] === "create").length}`;
+      }
+      return "";
+    },
+    containers: async () => [],
+    volumes: async () => [],
+    inspectContainer: async (id) => healthy(id),
+    waitForHealthy: async (id) => healthy(id),
+  };
+  const recipe = {
+    kind: "local-service-recipe",
+    protocolVersion: LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
+    integrationId: "test",
+    recipeId: "composite",
+    recipeVersion: 2,
+    materializerId: "docker",
+    network: { internal: true },
+    containers: [
+      { id: "database", image: "postgres@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+      { id: "api", image: "api@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", dependsOn: ["database"], ports: { http: 8080 } },
+    ],
+    volumes: { data: { mountPath: "/data", persistent: true } },
+    outputs: ({ ports }) => ({ endpoint: `http://127.0.0.1:${ports["api.http"]}` }),
+  } satisfies CompositeLocalServiceRecipe;
+  const instance = await createDockerMaterializer({ client }).start({
+    name: "relkit-test",
+    labels: { "dev.relkit.managed": "true", "dev.relkit.local-project-id": "project" },
+    recipe,
+    volumeNames: { data: "relkit-test-data" },
+    networkName: "relkit-test-network",
+  });
+  const networkCreate = calls.find((call) => call[0] === "network" && call[1] === "create");
+  expect(networkCreate).toContain("--internal");
+  const volumeCreate = calls.find((call) => call[0] === "volume" && call[1] === "create");
+  expect(volumeCreate).toContain("--label");
+  expect(volumeCreate).toContain("dev.relkit.volume=data");
+  expect(calls.filter((call) => call[0] === "container" && call[1] === "create").map((call) => call[call.indexOf("--name") + 1])).toEqual([
+    "relkit-test-database",
+    "relkit-test-api",
+  ]);
+  expect(instance.units?.map((unit) => unit.unitId)).toEqual(["database", "api"]);
+  expect(instance.ports.http).toBe(49_152);
+});
+
+function healthy(id: string): DockerContainer {
+  return {
+    id,
+    name: id,
+    labels: {},
+    state: "running",
+    health: "healthy",
+    ports: { "8080/tcp": 49_152 },
+  };
+}
