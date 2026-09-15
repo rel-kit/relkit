@@ -27,6 +27,8 @@ const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
   "@relkit/s3": ["runtime", "local-recipe"],
   "@relkit/sentry": ["runtime"],
   "@relkit/inngest": ["runtime", "local-recipe", "deployment"],
+  "@relkit/trigger": ["runtime", "local-recipe", "deployment"],
+  "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
 };
 
 const catalogSubpaths = [
@@ -40,6 +42,8 @@ const catalogSubpaths = [
   "aws",
   "pulumi",
   "inngest",
+  "trigger",
+  "effect-mq",
 ] as const;
 
 export function expectedExports(

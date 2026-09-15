@@ -8,6 +8,8 @@
     { "path": "./integrations/packages/cloudflare" },
     { "path": "./integrations/packages/docker" },
     { "path": "./integrations/packages/inngest" },
+    { "path": "./integrations/packages/trigger" },
+    { "path": "./integrations/packages/effect-mq" },
     { "path": "./integrations/packages/local" },
     { "path": "./integrations/packages/otlp" },
     { "path": "./integrations/packages/pulumi" },

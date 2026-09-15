@@ -66,6 +66,14 @@
     "./inngest": {
       "types": "./dist/inngest.d.ts",
       "import": "./dist/inngest.js"
+    },
+    "./trigger": {
+      "types": "./dist/trigger.d.ts",
+      "import": "./dist/trigger.js"
+    },
+    "./effect-mq": {
+      "types": "./dist/effect-mq.d.ts",
+      "import": "./dist/effect-mq.js"
     }
   },
   "relkit": {
@@ -79,7 +87,9 @@
       "./redis": "@relkit/redis",
       "./s3": "@relkit/s3",
       "./sentry": "@relkit/sentry",
-      "./inngest": "@relkit/inngest"
+      "./inngest": "@relkit/inngest",
+      "./trigger": "@relkit/trigger",
+      "./effect-mq": "@relkit/effect-mq"
     }
   },
   "scripts": {
@@ -97,6 +107,8 @@
     "@relkit/redis": "workspace:*",
     "@relkit/s3": "workspace:*",
     "@relkit/sentry": "workspace:*",
-    "@relkit/inngest": "workspace:*"
+    "@relkit/inngest": "workspace:*",
+    "@relkit/trigger": "workspace:*",
+    "@relkit/effect-mq": "workspace:*"
   }
 }
