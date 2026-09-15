@@ -280,6 +280,10 @@ async function admitAndSubmit(
     ...(admission.metadata.correlationId === undefined ? {} : { correlationId: admission.metadata.correlationId }),
     ...(admission.metadata.parentRunId === undefined ? {} : { parentRunId: admission.metadata.parentRunId }),
     ...(admission.metadata.propagation === undefined ? {} : { propagation: admission.metadata.propagation }),
+    ...(admission.metadata.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: admission.metadata.acceptanceIdentity }),
+    ...(admission.metadata.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: admission.metadata.occurrenceIdentity }),
+    ...(admission.metadata.inputSchemaHash === undefined ? {} : { inputSchemaHash: admission.metadata.inputSchemaHash }),
+    ...(admission.metadata.retryOfRunId === undefined ? {} : { retryOfRunId: admission.metadata.retryOfRunId }),
     ...(admission.binding.policy === undefined ? {} : { policy: admission.binding.policy as JsonValue }),
   } as const;
   const receipt = await submitAbortable(runtime.adapter, request, context, signal, admission.metadata);
