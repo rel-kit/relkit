@@ -36,7 +36,16 @@ export function createInvocationSpanOptions<
     ...(record.correlationId === undefined ? {} : { correlationId: record.correlationId }),
     source: record.source,
     signal: controller.signal,
-    attributes: { "relkit.function.id": target.id },
+    attributes: {
+      "relkit.function.id": target.id,
+      ...(record.runId === undefined ? {} : { "relkit.run.id": record.runId }),
+      ...(record.jobId === undefined ? {} : { "relkit.job.id": record.jobId }),
+      ...(record.taskId === undefined ? {} : { "relkit.task.id": record.taskId }),
+      ...(record.taskVersion === undefined ? {} : { "relkit.task.version": record.taskVersion }),
+      ...(record.buildId === undefined ? {} : { "relkit.build.id": record.buildId }),
+      ...(record.serviceGeneration === undefined ? {} : { "relkit.service.generation": record.serviceGeneration }),
+      "relkit.attempt": record.attempt,
+    },
     ...(observed
       ? {
           observer: (event: Parameters<NonNullable<InvocationTraceOptions["observer"]>>[0]) => {

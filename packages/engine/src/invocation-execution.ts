@@ -86,6 +86,15 @@ export function createInvocationExecution<
     ...(record.correlationId === undefined
       ? {}
       : { "relkit.correlation.id": record.correlationId }),
+    ...(record.runId === undefined ? {} : { "relkit.run.id": record.runId }),
+    ...(record.jobId === undefined ? {} : { "relkit.job.id": record.jobId }),
+    ...(record.taskId === undefined ? {} : { "relkit.task.id": record.taskId }),
+    ...(record.taskVersion === undefined ? {} : { "relkit.task.version": record.taskVersion }),
+    ...(record.buildId === undefined ? {} : { "relkit.build.id": record.buildId }),
+    ...(record.serviceGeneration === undefined
+      ? {}
+      : { "relkit.service.generation": record.serviceGeneration }),
+    "relkit.attempt": record.attempt,
     ...(options.requestId === undefined && active?.requestId === undefined
       ? {}
       : { "relkit.request.id": options.requestId ?? active!.requestId! }),
@@ -121,6 +130,10 @@ export function createInvocationExecution<
         span.attribute("error.message", error.message);
       }
       span.end(BigInt(Date.now()) * 1_000_000n, error === undefined ? Exit.void : Exit.fail(error));
+    },
+    suspend: (): void => {
+      span.attribute("relkit.outcome", "suspended");
+      span.end(BigInt(Date.now()) * 1_000_000n, Exit.void);
     },
   });
 }

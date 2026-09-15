@@ -84,6 +84,7 @@ function engineOptions<Context extends { readonly signal: AbortSignal }>(
   if (options === undefined) return {};
   return {
     ...(options.correlationId === undefined ? {} : { correlationId: options.correlationId }),
+    ...(options.taskAncestry === undefined ? {} : { taskAncestry: options.taskAncestry }),
     ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
     ...(options.deadlineMs === undefined ? {} : { deadlineMs: options.deadlineMs }),
     ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
