@@ -16,7 +16,7 @@ import {
   InvocationTrace,
   type CapturedInvocationTrace,
 } from "@relkit/runtime-effect";
-import type { DirectFunctionInvoker, DirectFunctionRequest } from "./dependencies.js";
+import type { DirectFunctionInvoker, DirectFunctionRequest, DirectTaskInvoker } from "./dependencies.js";
 import { createContext } from "./context.js";
 import { callHook, makeContext } from "./invoke-utils.js";
 import { createDependencyBridge } from "./dependency-bridge.js";
@@ -54,6 +54,7 @@ export async function runHandler<
   idSource: InvocationIdSource,
   runner: InvocationRunner,
   childInvoker: DirectChildInvoker | undefined,
+  taskInvoker: DirectTaskInvoker | undefined,
   progress: import("@relkit/invocation").ProgressEmitter | undefined,
   onTrace?: (trace: CapturedInvocationTrace) => void,
 ): Promise<unknown> {
@@ -81,6 +82,7 @@ export async function runHandler<
               signal: request.signal ?? signalRef.current,
               trace,
             });
+    const invokeTask: DirectTaskInvoker | undefined = taskInvoker;
     const context = yield* Effect.tryPromise({
       try: async () => {
         const base = await makeContext<Context>(
@@ -103,6 +105,7 @@ export async function runHandler<
           traceId: () => traceId,
           now: () => time.now(),
           ...(invokeFunction === undefined ? {} : { invokeFunction }),
+          ...(invokeTask === undefined ? {} : { invokeTask }),
           ...(options.hooks?.onDeclaredEdge === undefined &&
           options.hooks?.observability === undefined
             ? {}
@@ -140,7 +143,7 @@ export async function runHandler<
       },
       catch: (cause) => normalizeFailure(cause, { signal: controller.signal }),
     });
-    return yield* runConfiguredLifecycle({
+    const lifecycle = runConfiguredLifecycle({
       target: target as InvocationTarget<unknown, unknown, Context>,
       input,
       context,
@@ -149,7 +152,13 @@ export async function runHandler<
       onSignal: (signal) => {
         signalRef.current = signal;
       },
-    });
+      ...(options.isSuspension === undefined ? {} : { isSuspension: options.isSuspension }),
+      ...(options.skipInputValidation === undefined
+        ? {}
+        : { skipInputValidation: options.skipInputValidation }),
+      ...(options.taskLifecycle === undefined ? {} : { taskLifecycle: options.taskLifecycle }),
+    }) as Effect.Effect<unknown, import("@relkit/invocation").InvocationFailure, never>;
+    return yield* lifecycle;
   });
   const spanOptions = createInvocationSpanOptions(target, record, options, controller);
   const capturedParent = options.parent?.trace as CapturedInvocationTrace | undefined;

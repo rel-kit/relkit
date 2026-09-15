@@ -15,6 +15,7 @@ import {
   type PublicClock as SharedPublicClock,
   type PublicLogger as SharedPublicLogger,
   type InvocationValueHooks,
+  type TaskAncestry,
 } from "@relkit/invocation";
 import type {
   InvocationFailure,
@@ -23,7 +24,7 @@ import type {
 } from "@relkit/invocation";
 import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import type { FunctionRegistry } from "./registry.js";
-import type { DependencyClientSources, DependencyDeclarations } from "./dependencies.js";
+import type { DependencyClientSources, DependencyDeclarations, DirectTaskInvoker } from "./dependencies.js";
 
 type OperationObservation = BucketOperationObservation | CacheOperationObservation;
 
@@ -114,6 +115,7 @@ export interface InvokeOptions<
   readonly triggerLimit?: number;
   readonly attempt?: number;
   readonly parent?: InvocationParent;
+  readonly taskAncestry?: TaskAncestry;
   readonly correlationId?: string;
   readonly traceId?: string;
   readonly links?: readonly SpanContext[];
@@ -126,6 +128,7 @@ export interface InvokeOptions<
   readonly toolHooks?: InvocationValueHooks<Context>;
   readonly env?: Readonly<Record<string, unknown>>;
   readonly clients?: DependencyClientSources;
+  readonly invokeTask?: DirectTaskInvoker;
   readonly serviceId?: string;
   readonly now?: () => number;
   readonly admit?: InvocationAdmit;
@@ -136,6 +139,25 @@ export interface InvokeOptions<
   readonly idSource?: InvocationIdSource;
   readonly progressSink?: import("@relkit/invocation").ProgressSink;
   readonly trigger?: unknown;
+  readonly isSuspension?: (cause: unknown) => boolean;
+  readonly skipInputValidation?: boolean;
+  readonly skipOutputValidation?: boolean;
+  readonly taskLifecycle?: TaskLifecycleHooks<Context>;
+  readonly taskMetadata?: {
+    readonly runId?: string;
+    readonly jobId?: string;
+    readonly taskId?: string;
+    readonly taskVersion?: string;
+    readonly buildId?: string;
+    readonly serviceGeneration?: string;
+  };
+}
+
+export interface TaskLifecycleHooks<Context extends { readonly signal: AbortSignal }> {
+  readonly taskId?: string;
+  readonly onStart?: (input: unknown, context: Context) => MaybePromise<void>;
+  readonly onSuccess?: (output: unknown, context: Context) => MaybePromise<void>;
+  readonly onFailure?: (error: unknown, context: Context) => MaybePromise<void>;
 }
 
 export { InvocationValidationError };
