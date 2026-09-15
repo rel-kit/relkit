@@ -134,6 +134,13 @@ installInspectorEndpoints(app, {
         exists: (functionId) => registry.has(functionId),
         invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.signal === undefined ? {} : { signal: request.signal }) }),
       },
+      jobs: {
+        protocol: "relkit.jobs.admin",
+        version: 1,
+        status: (instanceId) => nativeJobStatus(instanceId),
+        retry: (request) => nativeJobControl(request.instanceId, "retry", request.reason),
+        cancel: (request) => nativeJobControl(request.instanceId, "cancel", request.reason),
+      },
     },
     resources: {
       buckets: {
