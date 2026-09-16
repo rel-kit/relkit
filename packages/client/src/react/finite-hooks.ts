@@ -17,10 +17,18 @@ import {
 } from "@tanstack/react-query";
 import { ORPCError } from "../index.js";
 import { useRelkitClient } from "./context.js";
-import { relkitKey } from "./keys.js";
+import { relkitJobKey, relkitKey } from "./keys.js";
 import { procedureUtils } from "./procedure.js";
 import type { ErrorFor, InputFor, MutationSelector, OutputFor, QuerySelector } from "./registry.js";
-import { forgetPending, pendingScopeKey, rememberPending, updatePending } from "./pending.js";
+import {
+  forgetPending,
+  jobUnknownOutcome,
+  pendingScopeKey,
+  rememberJobPending,
+  rememberPending,
+  updatePending,
+} from "./pending.js";
+import { generatedJobTriggerName, prepareJobRequest } from "./job-hooks-support.js";
 
 type QueryInput<Name extends QuerySelector, Selected> = Omit<
   UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
@@ -88,7 +96,8 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
       if (
         runtime.status !== "ready" ||
         runtime.scope === undefined ||
-        runtime.identityKey === null
+        runtime.identityKey === null ||
+        runtime.identity === undefined
       ) {
         throw new RelkitWriteError("not-sent", `Relkit client is not ready (${runtime.status})`);
       }
@@ -98,19 +107,43 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
         throw new RelkitWriteError("not-sent", "The browser is offline.");
       }
       const scopeKey = pendingScopeKey(runtime.scope);
-      const pending = await rememberPending(scopeKey, "mutation", name, input);
+      const jobName = generatedJobTriggerName(name);
+      const prepared =
+        jobName === undefined
+          ? undefined
+          : prepareJobRequest(input, runtime.identity, mutationContext);
+      const effectiveInput = (prepared?.value ?? input) as InputFor<Name>;
+      const pending =
+        prepared === undefined
+          ? await rememberPending(scopeKey, "mutation", name, effectiveInput)
+          : await rememberJobPending(scopeKey, name, effectiveInput, {
+              operationId: prepared.operationId,
+              ...(prepared.idempotencyKey === undefined ? {} : { idempotencyKey: prepared.idempotencyKey }),
+            });
       try {
-        const value = await original(input, mutationContext);
+        const value = await original(effectiveInput, mutationContext);
         forgetPending(scopeKey, pending.operationId);
         return value;
       } catch (error) {
-        if (error instanceof ORPCError) forgetPending(scopeKey, pending.operationId);
+        const unknown = jobUnknownOutcome(error);
+        if (unknown) {
+          updatePending(scopeKey, {
+            ...pending,
+            state: "unknown",
+            ...(unknown.idempotencyKey === undefined
+              ? {}
+              : { idempotencyKey: unknown.idempotencyKey }),
+            recovery: unknown.recovery,
+          });
+        } else if (error instanceof ORPCError) forgetPending(scopeKey, pending.operationId);
         else updatePending(scopeKey, { ...pending, state: "unknown" });
         throw error;
       }
     },
     mutationKey: runtime.scope
-      ? relkitKey(runtime.scope, "mutation", name)
+      ? generatedJobTriggerName(name) === undefined
+        ? relkitKey(runtime.scope, "mutation", name)
+        : relkitJobKey(runtime.scope, "trigger", { jobId: generatedJobTriggerName(name)! })
       : ["relkit", "blocked", name],
   } as UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>);
 }
@@ -161,7 +194,6 @@ export function useInfiniteRoute<
     PageParam
   >);
 }
-
 export function useRouteUtils<Name extends QuerySelector | MutationSelector>(name: Name) {
   const runtime = useRelkitClient();
   return procedureUtils(runtime.utils, name);
