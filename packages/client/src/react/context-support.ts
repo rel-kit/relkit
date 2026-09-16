@@ -129,6 +129,7 @@ export function scopeFor(
   backend: string,
   identity: ClientIdentityDocument,
   identityKey: string | null | undefined,
+  environment?: string,
 ): RelkitKeyScope {
   return {
     backend,
@@ -137,6 +138,8 @@ export function scopeFor(
     sessionEpoch: identity.sessionEpoch,
     identityKey,
     publicFingerprint: identity.publicFingerprint,
+    ...(environment === undefined ? {} : { environment }),
+    ...(identity.jobs === undefined ? {} : { jobsProtocolVersion: identity.jobs.version }),
   };
 }
 
@@ -147,6 +150,8 @@ export function sameScope(left: RelkitKeyScope, right: RelkitKeyScope): boolean 
     left.identityScope === right.identityScope &&
     left.sessionEpoch === right.sessionEpoch &&
     left.identityKey === right.identityKey &&
-    left.publicFingerprint === right.publicFingerprint
+    left.publicFingerprint === right.publicFingerprint &&
+    left.environment === right.environment &&
+    left.jobsProtocolVersion === right.jobsProtocolVersion
   );
 }

@@ -5,6 +5,8 @@ export interface RelkitKeyScope {
   readonly sessionEpoch: string;
   readonly identityKey: string | null | undefined;
   readonly publicFingerprint: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
 }
 
 export function relkitKey(
@@ -21,8 +23,45 @@ export function relkitKey(
     scope.sessionEpoch,
     scope.identityKey ?? "",
     scope.publicFingerprint,
+    scope.environment ?? "",
+    scope.jobsProtocolVersion ?? 1,
     kind,
     procedureId,
+    canonical(input),
+  ] as const;
+}
+
+export interface RelkitJobKeyOptions {
+  readonly jobId: string;
+  readonly runId?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+}
+
+export function relkitJobKey(
+  scope: RelkitKeyScope,
+  operation: "trigger" | "run" | "cancel" | "retry",
+  options: RelkitJobKeyOptions,
+  input?: unknown,
+): readonly unknown[] {
+  return [
+    "relkit",
+    "job",
+    scope.backend,
+    scope.applicationId,
+    options.environment ?? scope.environment ?? "",
+    scope.identityScope,
+    scope.sessionEpoch,
+    scope.identityKey ?? "",
+    scope.publicFingerprint,
+    options.jobsProtocolVersion ?? scope.jobsProtocolVersion ?? 1,
+    options.jobId,
+    options.runId ?? "",
+    options.projection ?? "",
+    options.schemaVersion ?? "",
+    operation,
     canonical(input),
   ] as const;
 }

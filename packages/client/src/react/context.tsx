@@ -33,14 +33,13 @@ import {
   scopeFor,
   streamClientFor,
 } from "./context-support.js";
-
 export interface RelkitHydrationState {
   readonly scope: RelkitKeyScope;
   readonly dehydrated: unknown;
 }
-
 export interface RelkitClientProviderProps {
   readonly baseUrl?: string;
+  readonly environment?: string;
   readonly credentials?: RequestInit["credentials"];
   readonly headers?: ClientHeaders;
   readonly queryClient?: QueryClient;
@@ -51,7 +50,6 @@ export interface RelkitClientProviderProps {
   readonly streamEstablishmentTimeoutMs?: number;
   readonly children: ReactNode;
 }
-
 export interface RelkitClientRuntime {
   readonly client: ReturnType<typeof createClient>;
   readonly streamClient: ReturnType<typeof createClient>;
@@ -63,9 +61,9 @@ export interface RelkitClientRuntime {
   readonly scope?: RelkitKeyScope;
   readonly transport: "auto" | "websocket" | "http-stream" | "sse";
   readonly streamEstablishmentTimeoutMs: number;
+  readonly environment?: string;
   readonly realtime: RealtimeManager;
 }
-
 const Context = createContext<RelkitClientRuntime | undefined>(undefined);
 
 export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNode {
@@ -115,13 +113,12 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
   );
 
   useEffect(() => () => realtime.dispose(), [realtime]);
-
   useEffect(() => {
     const controller = new AbortController();
     setFailed(false);
     void loadIdentity(baseUrl, props.credentials ?? "include", controller.signal)
       .then((next) => {
-        const key = `${next.identityScope}:${next.sessionEpoch}`;
+        const key = `${next.identityScope}:${next.sessionEpoch}:${props.environment ?? ""}`;
         if (previous.current !== undefined && previous.current !== key) {
           void queryClient.cancelQueries({ predicate: isRelkitQuery });
           queryClient.removeQueries({ predicate: isRelkitQuery });
@@ -131,7 +128,7 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
         }
         previous.current = key;
         const hydration = props.hydratedState;
-        const nextScope = scopeFor(baseUrl, next, props.identityKey);
+        const nextScope = scopeFor(baseUrl, next, props.identityKey, props.environment);
         previousPendingScope.current = pendingScopeKey(nextScope);
         if (hydration !== undefined && sameScope(hydration.scope, nextScope)) {
           hydrate(queryClient, hydration.dehydrated as DehydratedState);
@@ -143,8 +140,7 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
         void error;
       });
     return () => controller.abort();
-  }, [baseUrl, props.credentials, props.hydratedState, props.identityKey, queryClient]);
-
+  }, [baseUrl, props.credentials, props.environment, props.hydratedState, props.identityKey, queryClient]);
   const compiled = compiledFingerprint();
   const status = failed
     ? "error"
@@ -154,8 +150,11 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
         ? "application-updated"
         : "ready";
   const scope = useMemo(
-    () => (identity === undefined ? undefined : scopeFor(baseUrl, identity, props.identityKey)),
-    [baseUrl, identity, props.identityKey],
+    () =>
+      identity === undefined
+        ? undefined
+        : scopeFor(baseUrl, identity, props.identityKey, props.environment),
+    [baseUrl, identity, props.identityKey, props.environment],
   );
   const runtime = useMemo<RelkitClientRuntime>(
     () => ({
@@ -167,6 +166,7 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
       ...(props.identityKey === undefined ? {} : { identityKey: props.identityKey }),
       status,
       ...(scope === undefined ? {} : { scope }),
+      ...(props.environment === undefined ? {} : { environment: props.environment }),
       transport: props.transport ?? "auto",
       streamEstablishmentTimeoutMs: props.streamEstablishmentTimeoutMs ?? 10_000,
       realtime,
@@ -182,6 +182,7 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
       props.streamEstablishmentTimeoutMs,
       status,
       scope,
+      props.environment,
       realtime,
     ],
   );
