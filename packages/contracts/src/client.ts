@@ -1,4 +1,5 @@
 import type { JsonValue } from "./json.js";
+import type { JobUnknownOutcome } from "./jobs-access.js";
 
 declare const operationIdBrand: unique symbol;
 
@@ -25,7 +26,12 @@ export interface ClientIdentityDocument extends ExpectedClientIdentity {
   readonly jobs?: JobsClientProtocol;
 }
 
-export type PendingOperationKind = "mutation" | "agent-run" | "agent-control" | "continuation";
+export type PendingOperationKind =
+  | "mutation"
+  | "agent-run"
+  | "agent-control"
+  | "continuation"
+  | "job-trigger";
 
 export interface PendingOperationMetadata {
   readonly operationId: OperationId;
@@ -36,6 +42,8 @@ export interface PendingOperationMetadata {
   readonly requestDigest: string;
   readonly submittedAt: string;
   readonly state: "submitted" | "accepted" | "unknown";
+  readonly idempotencyKey?: string;
+  readonly recovery?: JobUnknownOutcome["recovery"];
 }
 
 export type ReceiptLookup<Receipt> =

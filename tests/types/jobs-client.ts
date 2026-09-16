@@ -2,6 +2,10 @@ import {
   useRoute,
   useRouteMutation,
   useStream,
+  useJobCancel,
+  useJobRetry,
+  useJobRun,
+  useJobTrigger,
   type JobContract,
   type JobProcedureSelector,
 } from "@relkit/client/react";
@@ -64,6 +68,13 @@ void registry.exportOrders.trigger;
 useRouteMutation("jobs.exportOrders.trigger").mutate({ input: { orderId: "order-1" } });
 useRoute("jobs.exportOrders.runs.get", { input: { runId: "run-1" } });
 useStream("jobs.exportOrders.runs.watch", { input: { runId: "run-1" } });
+useJobTrigger("exportOrders").mutate({ input: { orderId: "order-1" } });
+useJobRun("exportOrders", { runId: "run-1", enabled: false }).run?.status;
+useJobCancel("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });
+useJobRetry("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });
+
+// @ts-expect-error hook names must have their declared operation
+useJobTrigger("hiddenJob");
 
 // @ts-expect-error private or ungenerated job selectors are rejected
 useRoute("jobs.hiddenJob.runs.get", { input: { runId: "run-1" } });

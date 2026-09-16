@@ -110,10 +110,39 @@ async function invoke(
     if (error instanceof ORPCError) throw error;
     const code = errorCode(error);
     if (code !== undefined) {
-      throw new ORPCError(code as never, { message: errorMessage(error) });
+      const data = errorData(error);
+      throw new ORPCError<string, unknown>(code as string, {
+        message: errorMessage(error),
+        ...(data === undefined ? {} : { data }),
+      });
     }
     throw error;
   }
+}
+
+function errorData(value: unknown): unknown {
+  if (!isRecord(value)) return undefined;
+  if (
+    (value.code !== "RELKIT_JOB_SUBMISSION_UNKNOWN" && value.code !== "RELKIT_JOB_CONTROL_UNKNOWN") ||
+    value.outcome !== "unknown" ||
+    typeof value.operationId !== "string" ||
+    !isRecord(value.recovery) ||
+    (value.recovery.action !== "retry-with-same-key" &&
+      value.recovery.action !== "inspect-native" &&
+      value.recovery.action !== "unavailable")
+  ) {
+    return undefined;
+  }
+  return {
+    code: value.code,
+    outcome: "unknown",
+    operationId: value.operationId,
+    ...(typeof value.idempotencyKey === "string" ? { idempotencyKey: value.idempotencyKey } : {}),
+    recovery: {
+      action: value.recovery.action,
+      ...(typeof value.recovery.expiresAt === "string" ? { expiresAt: value.recovery.expiresAt } : {}),
+    },
+  };
 }
 
 const jobErrors = Object.fromEntries(
@@ -134,4 +163,8 @@ function errorCode(value: unknown): string | undefined {
 
 function errorMessage(value: unknown): string {
   return value instanceof Error ? value.message : "Job operation failed.";
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object";
 }
