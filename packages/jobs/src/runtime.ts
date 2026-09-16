@@ -68,7 +68,7 @@ export interface JobsRuntimeOptions {
 }
 
 export type JobsOperationOptions = Pick<OperationContext, "signal"> &
-  Partial<Pick<OperationContext, "operationId" | "deadlineMs" | "correlationId" | "parentRunId" | "propagation" | "acceptanceIdentity" | "occurrenceIdentity" | "inputSchemaHash" | "retryOfRunId">>;
+  Partial<Pick<OperationContext, "scope" | "operationId" | "deadlineMs" | "correlationId" | "parentRunId" | "propagation" | "acceptanceIdentity" | "occurrenceIdentity" | "inputSchemaHash" | "retryOfRunId">>;
 
 export interface JobsRuntime {
   readonly adapter: JobsAdapterRuntime;
@@ -117,7 +117,7 @@ export function createJobsRuntime(options: JobsRuntimeOptions): JobsRuntime {
       Object.freeze({
         application: runtime.application,
         environment: runtime.environment,
-        scope: runtime.scope,
+        scope: context.scope ?? runtime.scope,
         service: runtime.service,
         serviceGeneration: runtime.serviceGeneration,
         signal: context.signal,

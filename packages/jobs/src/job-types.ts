@@ -107,6 +107,14 @@ export interface JobAdmission<Input = unknown> {
 }
 
 export type JobClientField = "status" | "input" | "progress" | "output" | "error";
+export interface JobAuthorizationContext {
+  readonly application: string;
+  readonly environment: string;
+  readonly scope: string;
+  readonly subject?: string;
+  readonly auth?: unknown;
+  readonly run?: import("@relkit/contracts/jobs").RunSnapshot;
+}
 export type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchemas> =
   | {
       readonly public: true;
@@ -117,6 +125,7 @@ export type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchema
   | {
       readonly authorize: (
         request: JobAccessRequest,
+        context: JobAuthorizationContext,
       ) => MaybePromise<JobAccessGrant>;
       readonly public?: never;
       readonly operations: readonly JobClientOperation[];

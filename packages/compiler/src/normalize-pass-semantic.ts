@@ -147,6 +147,27 @@ export function passCollisions(work: NormalizationWork): void {
         );
     }
   }
+  if (hasPublicTaskJobs(work)) {
+    for (const descriptor of descriptors) {
+      if (descriptor.id !== "jobs") continue;
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.collision,
+        'Route selector "jobs" collides with the generated client jobs namespace.',
+        "error",
+      );
+    }
+  }
+}
+
+function hasPublicTaskJobs(work: NormalizationWork): boolean {
+  return work.descriptors.some((descriptor) => {
+    if (descriptor.kind !== "job") return false;
+    const value = isRecord(descriptor.value) ? descriptor.value : {};
+    const client = isRecord(value.client) ? value.client : undefined;
+    return isRecord(value.task) && Array.isArray(client?.operations) && client.operations.length > 0;
+  });
 }
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {
   return (

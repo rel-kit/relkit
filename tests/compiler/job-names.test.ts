@@ -1,4 +1,8 @@
 import { describe, expect, test } from "bun:test";
+import { defineFunction } from "../../packages/functions/src/index.ts";
+import { defineJob, defineTask } from "../../packages/jobs/src/index.ts";
+import { defineRoute, http } from "../../packages/routes/src/index.ts";
+import { z } from "../../packages/schema/src/index.ts";
 import { normalizeCompilation } from "../../packages/compiler/src/index.ts";
 
 const source = { file: "src/orders/tasks/send.task.ts", line: 1, column: 1 } as const;
@@ -341,5 +345,41 @@ describe("task/job compiler discovery", () => {
     const second = { ...taskExport("sendEmail"), descriptor: { ...taskExport("sendEmail").descriptor, metadata: { ...first.descriptor.metadata, version: "2" } } };
     const result = normalizeCompilation({ extracted: [first, second] });
     expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain("RELKIT_DUPLICATE_ID");
+  });
+
+  test("reserves the root jobs namespace for exposed task-backed jobs", () => {
+    const task = defineTask({
+      id: "orders.export",
+      version: "1",
+      input: z.object({ orderId: z.string() }),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const job = defineJob({
+      name: "exportOrders",
+      task,
+      client: { public: true, operations: ["trigger"] },
+    });
+    const target = defineFunction({
+      id: "jobs.handler",
+      input: z.object({}),
+      output: z.object({ ok: z.boolean() }),
+      handler: async () => ({ ok: true }),
+    });
+    const route = defineRoute({
+      id: "jobs",
+      method: "GET",
+      path: "/jobs",
+      target,
+      request: http.input({}),
+      responses: [http.success(200, target.output)],
+    });
+    const result = normalizeCompilation({ descriptors: [task, job, target, route] });
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: "RELKIT_ROUTE_COLLISION",
+        message: expect.stringContaining("generated client jobs namespace"),
+      }),
+    );
   });
 });

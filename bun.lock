@@ -727,6 +727,7 @@
         "@relkit/engine": "workspace:*",
         "@relkit/graph": "workspace:*",
         "@relkit/invocation": "workspace:*",
+        "@relkit/jobs": "workspace:*",
         "@relkit/observability": "workspace:*",
         "@relkit/openapi": "workspace:*",
         "@relkit/realtime": "workspace:*",

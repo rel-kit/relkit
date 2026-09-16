@@ -17,6 +17,7 @@ import {
 import { responseError, rpcError, rpcNotFound } from "./rpc-response.js";
 import { realtimeProcedures } from "./realtime-rpc.js";
 import { agentErrorStatuses, agentProcedures } from "./agent-rpc.js";
+import { jobsErrorStatuses, jobsProcedures } from "./jobs/rpc.js";
 import {
   errorStatuses,
   isMiddleware,
@@ -51,6 +52,7 @@ export function createRpcRouter(options: RouteMaterializationOptions): {
   const errorStatusMap = {
     ...Object.fromEntries(triggers.flatMap((trigger) => errorStatuses(trigger))),
     ...agentErrorStatuses,
+    ...jobsErrorStatuses,
     PROVIDER_STATE_LOST: 503,
     IDENTITY_PRECONDITION_FAILED: 409,
     IDEMPOTENCY_CONFLICT: 409,
@@ -69,6 +71,7 @@ export function createRpcRouter(options: RouteMaterializationOptions): {
     ),
     ...realtimeProcedures(options),
     ...agentProcedures(options),
+    ...jobsProcedures(options),
   } as Router<RpcContext>;
   return { router, errorStatusMap };
 }

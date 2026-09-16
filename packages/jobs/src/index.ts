@@ -20,6 +20,14 @@ export * from "./schedule-reconciliation.js";
 export * from "./service-options.js";
 export { assertRfc3339Instant, isRfc3339Instant } from "./instant-validation.js";
 export { copyTriggerOptions, validateResultOptions } from "./trigger-validation.js";
+export {
+  TASK_INPUT_MAX_BYTES,
+  TASK_OUTPUT_MAX_BYTES,
+  TASK_ITEM_MAX_BYTES,
+  TASK_KEY_MAX_BYTES,
+  TASK_REASON_MAX_BYTES,
+  TASK_MAX_TAGS,
+} from "./task-policy-validation.js";
 export type {
   JobAccessGrant,
   JobAccessRequest,
@@ -48,6 +56,7 @@ export type {
 export type {
   DefineJobOptions,
   JobAdmission,
+  JobAuthorizationContext,
   JobClientAccess,
   JobClientField,
   JobDescriptor,

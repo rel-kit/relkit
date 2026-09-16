@@ -1,5 +1,5 @@
 import type { JobAccessGrant, JobAccessRequest } from "@relkit/contracts/jobs";
-import type { JobDescriptorAny } from "./job-types.js";
+import type { JobAuthorizationContext, JobDescriptorAny } from "./job-types.js";
 import { isRfc3339Instant } from "./instant-validation.js";
 import { JobAuthorizationError } from "./authorization-errors.js";
 import {
@@ -12,6 +12,7 @@ export { JobAuthorizationError, JobCursorError } from "./authorization-errors.js
 export {
   createJobCursor,
   readJobCursor,
+  type JobCursorOptions,
   type JobCursorBinding,
 } from "./authorization-cursor.js";
 export { projectRunPage, projectRunSnapshot } from "./authorization-projection.js";
@@ -27,6 +28,7 @@ export function authorizeJobAccess(
   job: JobDescriptorAny,
   request: JobAccessRequest,
   trusted: TrustedJobScope,
+  context?: JobAuthorizationContext,
 ): Promise<JobAccessGrant> {
   assertBoundedText(trusted.application);
   assertBoundedText(trusted.environment);
@@ -42,7 +44,12 @@ export function authorizeJobAccess(
   if (!("authorize" in policy) || typeof policy.authorize !== "function") {
     throw new JobAuthorizationError();
   }
-  return Promise.resolve(policy.authorize(request)).then(
+  const authorizationContext = context ?? {
+    application: trusted.application,
+    environment: trusted.environment,
+    scope: trusted.scope,
+  };
+  return Promise.resolve(policy.authorize(request, authorizationContext)).then(
     (grant) => {
       assertJobGrant(grant, trusted);
       return Object.freeze({
@@ -60,12 +67,16 @@ export function assertJobGrant(
   now = Date.now(),
 ): asserts value is JobAccessGrant {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new JobAuthorizationError();
+  if (Object.keys(value).some((key) => key !== "scope" && key !== "expiresAt")) {
+    throw new JobAuthorizationError();
+  }
   const grant = value as JobAccessGrant;
   if (typeof grant.scope !== "string" || !ownsScope(trusted.scope, grant.scope)) {
     throw new JobAuthorizationError();
   }
   assertBoundedText(grant.scope);
   if (grant.expiresAt !== undefined) {
+    assertBoundedText(grant.expiresAt);
     if (!isRfc3339Instant(grant.expiresAt)) throw new JobAuthorizationError();
     const expiry = Date.parse(grant.expiresAt);
     if (!Number.isFinite(expiry) || expiry <= now) throw new JobAuthorizationError();

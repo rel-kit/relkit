@@ -121,7 +121,28 @@ export async function prepareSubmission(
 ): Promise<SubmissionAdmission> {
   const copied = copyTriggerOptions(options ?? {});
   const validated = await validateTaskInput(task.input, input);
-  const canonicalInput = decodeJobWire(validated.wire);
+  return prepareAdmission(runtime, task, validated.wire, copied, job);
+}
+
+/** Builds admission metadata from an already canonical caller envelope. */
+export async function prepareCanonicalSubmission(
+  runtime: JobsRuntime,
+  task: TaskDescriptorAny,
+  canonicalInput: ReturnType<typeof encodeJobWire>,
+  options?: unknown,
+  job?: JobDescriptorAny,
+): Promise<SubmissionAdmission> {
+  return prepareAdmission(runtime, task, canonicalInput, copyTriggerOptions(options ?? {}), job);
+}
+
+async function prepareAdmission(
+  runtime: JobsRuntime,
+  task: TaskDescriptorAny,
+  wire: ReturnType<typeof encodeJobWire>,
+  copied: ReturnType<typeof copyTriggerOptions>,
+  job?: JobDescriptorAny,
+): Promise<SubmissionAdmission> {
+  const canonicalInput = decodeJobWire(wire);
   const selectedJob = (copied.job as JobDescriptorAny | undefined) ?? job;
   const binding = runtime.resolveBinding(task, selectedJob);
   const operationId = copied.operationId ?? globalThis.crypto.randomUUID();
@@ -132,7 +153,7 @@ export async function prepareSubmission(
   const propagation = propagationFor(correlationId);
   const parentRunId = currentTaskRunId();
   const scheduledFor = scheduledTime(copied, Date.now());
-  const inputHash = await hashWire(validated.wire);
+  const inputHash = await hashWire(wire);
   const acceptanceIdentity = stableIdentityTuple([
     runtime.application,
     runtime.environment,
@@ -251,6 +272,16 @@ async function admitAndSubmit(
   const admission = await prepareSubmission(runtime, task, input, options, job);
   const copied = copyTriggerOptions(options ?? {});
   const signal = copied.signal ?? new AbortController().signal;
+  return submitPreparedSubmission(runtime, admission, signal);
+}
+
+/** Submits an already admitted canonical payload without applying the caller transform again. */
+export async function submitPreparedSubmission(
+  runtime: JobsRuntime,
+  admission: SubmissionAdmission,
+  signal = new AbortController().signal,
+): Promise<RunHandle> {
+  assertJobsCapability(runtime.capabilities, "submission");
   if (signal.aborted) throw new JobSubmissionCancelledError();
   const context = runtime.operationContext({
     signal,
@@ -268,7 +299,7 @@ async function admitAndSubmit(
     taskId: admission.binding.taskId,
     taskVersion: admission.binding.taskVersion,
     buildId: admission.binding.buildId,
-    execution: task.execution,
+    execution: admission.task.execution,
     scope: runtime.scope,
     input: admission.input,
     canonicalInput: validatedEnvelope(admission),

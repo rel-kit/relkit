@@ -27,6 +27,7 @@
       "@relkit/buckets": ["packages/buckets/src/index.ts"],
       "@relkit/cache": ["packages/cache/src/index.ts"],
       "@relkit/client": ["packages/client/src/index.ts"],
+      "@relkit/client/jobs": ["packages/client/src/jobs/index.ts"],
       "@relkit/client/react": ["packages/client/src/react/index.ts"],
       "@relkit/cloudflare": ["integrations/packages/cloudflare/src/index.ts"],
       "@relkit/config": ["packages/config/src/index.ts"],

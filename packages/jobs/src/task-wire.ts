@@ -127,6 +127,40 @@ export async function validateTaskOutput<S extends StandardSchemaV1>(
   };
 }
 
+/** Validates a retained output that is already in canonical output form. */
+export async function validateCanonicalOutput<S extends StandardSchemaV1>(
+  schema: S,
+  canonical: unknown,
+  maxBytes = TASK_OUTPUT_MAX_BYTES,
+): Promise<InferOutput<S>> {
+  const before = encode(
+    canonical,
+    maxBytes,
+    "RELKIT_TASK_OUTPUT_INVALID",
+    "RELKIT_TASK_OUTPUT_TOO_LARGE",
+    "output",
+  );
+  const value = await validateValue(
+    schema,
+    canonical as InferInput<S>,
+    "RELKIT_TASK_OUTPUT_INVALID",
+  );
+  const after = encode(
+    value,
+    maxBytes,
+    "RELKIT_TASK_OUTPUT_INVALID",
+    "RELKIT_TASK_OUTPUT_TOO_LARGE",
+    "output",
+  );
+  if (canonicalJson(before) !== canonicalJson(after)) {
+    throw new TaskWireValidationError(
+      "RELKIT_TASK_OUTPUT_INVALID",
+      "Retained task output is not canonical",
+    );
+  }
+  return value;
+}
+
 function encode(
   value: unknown,
   maxBytes: number,

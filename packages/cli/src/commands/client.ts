@@ -4,6 +4,7 @@ import {
   agentProcedureEntriesFromDocument,
   generateContractFromDocument,
   generateClientRegistryFromDocument,
+  jobProcedureSourcesFromDocument,
   type ContractProcedureDocument,
 } from "@relkit/client-generator";
 import { CONTRACT_VERSION, canonicalJson, type JsonValue } from "@relkit/contracts";
@@ -37,7 +38,11 @@ export async function runClient(
     ),
     writeIfChanged(
       `${directory}/contract.ts`,
-      generateContractFromDocument(procedures, agentProcedureEntriesFromDocument(document.agents)),
+      generateContractFromDocument(
+        procedures,
+        agentProcedureEntriesFromDocument(document.agents),
+        jobProcedureSourcesFromDocument(document.jobs),
+      ),
     ),
     writeIfChanged(
       `${directory}/client.ts`,
@@ -131,6 +136,9 @@ export interface ContractDocument {
   readonly routes?: readonly unknown[];
   readonly channels?: readonly unknown[];
   readonly agents?: readonly unknown[];
+  readonly jobs?: readonly unknown[];
+  readonly capabilities?: unknown;
+  readonly nameToId?: unknown;
 }
 
 function validate(document: ContractDocument): ContractProcedureDocument[] {

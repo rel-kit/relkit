@@ -23,6 +23,7 @@ import type { ClientIdentityRuntime } from "./client-identity.js";
 import type { TransportSecurityOptions } from "./transport-security.js";
 import type { RealtimeRuntime } from "./realtime-runtime.js";
 import type { AgentRuntime } from "./agent-runtime.js";
+import type { JobsRpcRuntime } from "./jobs/types.js";
 export { RuntimeHonoManifestError } from "./manifest-validation.js";
 export type { RuntimeHonoManifestErrorCode } from "./manifest-validation.js";
 export type ManifestEntries<T> = Readonly<Record<string, T>> | ReadonlyMap<string, T>;
@@ -98,6 +99,9 @@ export interface RouteMaterializationOptions {
   readonly transportSecurity?: TransportSecurityOptions;
   readonly realtime?: RealtimeRuntime;
   readonly agentRuntime?: AgentRuntime;
+  readonly jobs?: JobsRpcRuntime;
+  /** Compatibility alias for callers that name the service explicitly. */
+  readonly jobsRuntime?: JobsRpcRuntime;
   readonly mcp?: McpOptions;
   readonly staticFiles?: StaticFilesOptions;
   readonly upgradeWebSocket?: UpgradeWebSocket;

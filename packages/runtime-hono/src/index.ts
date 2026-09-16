@@ -21,3 +21,6 @@ export * from "./agent-inspector.js";
 export * from "./realtime-runtime.js";
 export * from "./agent-runtime.js";
 export * from "./agent-protocol.js";
+export * from "./jobs/types.js";
+export * from "./jobs/rpc.js";
+export * from "./jobs/cursors.js";

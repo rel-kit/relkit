@@ -49,6 +49,7 @@ const app = createApp({
   clientIdentity: {
     applicationId: graph.appId,
     publicFingerprint,
+    ...((plan.jobs ?? []).length === 0 ? {} : { jobs: { protocol: "relkit.jobs", version: 1 } }),
     resolve: ({ request, session }) => resolveClientIdentityRegistration(request, session),
   },
   transportSecurity: transportSecurityRegistration(),
@@ -82,6 +83,20 @@ const app = createApp({
         return provider(registry, "agent-state", profile);
       },
       trustedContext: ({ request, auth }) => ({ request, auth }),
+    },
+  }),
+  ...((plan.jobs ?? []).length === 0 ? {} : {
+    jobs: {
+      runtimes: () => nativeJobsRuntimes,
+      descriptors: runtimeManifest.jobs,
+      tasks: runtimeManifest.tasks,
+      application: graph.appId,
+      environment,
+      publicFingerprint,
+      protocolVersion: 1,
+      ...(process.env.RELKIT_JOBS_CURSOR_SECRET === undefined
+        ? {}
+        : { cursorSecret: process.env.RELKIT_JOBS_CURSOR_SECRET }),
     },
   }),
   mcp: { enabled: ${String(configuration.mcp)} },

@@ -39,6 +39,10 @@
       "types": "./dist/react/index.d.ts",
       "import": "./dist/react/index.js"
     },
+    "./jobs": {
+      "types": "./dist/jobs/index.d.ts",
+      "import": "./dist/jobs/index.js"
+    },
     "./build/next": {
       "types": "./dist/build/next.d.ts",
       "import": "./dist/build/next.js",

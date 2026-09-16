@@ -2,11 +2,17 @@ import { canonicalJson, isJsonValue, type JsonValue } from "@relkit/contracts";
 import type { RunPage, RunSnapshot } from "@relkit/contracts/jobs";
 import type { JobClientField } from "./job-types.js";
 
+export interface JobProjectionOptions {
+  readonly declaredErrorIds?: readonly string[];
+}
+
 export function projectRunSnapshot(
   run: RunSnapshot,
   fields: readonly JobClientField[] = [],
+  options: JobProjectionOptions = {},
 ): RunSnapshot {
   const selected = new Set(fields);
+  const declaredErrorIds = new Set(options.declaredErrorIds);
   const base: Record<string, unknown> = {
     accepted: true,
     runId: run.runId,
@@ -25,7 +31,9 @@ export function projectRunSnapshot(
   if (selected.has("output") && run.resultAvailability === "available" && "output" in run) {
     copyField(base, "output", run.output);
   }
-  if (selected.has("error") && run.error !== undefined) base.error = safeError(run.error);
+  if (selected.has("error") && run.error !== undefined) {
+    base.error = safeError(run.error, declaredErrorIds);
+  }
   for (const field of ["attempt", "startedAt", "completedAt", "nextEligibleAt", "parentRunId", "retryOfRunId", "scheduledFor"] as const) {
     if (run[field] !== undefined) base[field] = run[field];
   }
@@ -36,9 +44,10 @@ export function projectRunSnapshot(
 export function projectRunPage(
   page: RunPage<RunSnapshot>,
   fields: readonly JobClientField[] = [],
+  options: JobProjectionOptions = {},
 ): RunPage<RunSnapshot> {
   return Object.freeze({
-    items: Object.freeze(page.items.map((run) => projectRunSnapshot(run, fields))),
+    items: Object.freeze(page.items.map((run) => projectRunSnapshot(run, fields, options))),
     ...(page.nextCursor === undefined ? {} : { nextCursor: page.nextCursor }),
     hasMore: page.hasMore,
     availability: Object.freeze(page.availability.map((entry) => Object.freeze({ ...entry }))),
@@ -46,17 +55,31 @@ export function projectRunPage(
   });
 }
 
-function safeError(value: unknown): JsonValue {
-  if (value === null || typeof value !== "object") return { code: "RELKIT_JOB_FAILURE", message: "Job failed" };
-  const candidate = value as { readonly code?: unknown; readonly message?: unknown; readonly retry?: unknown; readonly afterMs?: unknown };
+function safeError(value: unknown, declaredErrorIds: ReadonlySet<string>): JsonValue {
+  if (value === null || typeof value !== "object") return genericError();
+  const candidate = value as {
+    readonly code?: unknown;
+    readonly message?: unknown;
+    readonly details?: unknown;
+    readonly data?: unknown;
+    readonly retry?: unknown;
+    readonly afterMs?: unknown;
+  };
+  const code = safeText(candidate.code, "");
+  const declared = code !== "" && declaredErrorIds.has(code);
   return {
-    code: safeText(candidate.code, "RELKIT_JOB_FAILURE"),
-    message: safeText(candidate.message, "Job failed"),
+    code: declared ? code : "RELKIT_JOB_FAILURE",
+    message: declared ? safeText(candidate.message, "Job failed") : "Job failed",
+    ...(declared ? safeDetails(candidate.details ?? candidate.data) : {}),
     ...(candidate.retry === "never" || candidate.retry === "later" ? { retry: candidate.retry } : {}),
     ...(typeof candidate.afterMs === "number" && Number.isSafeInteger(candidate.afterMs) && candidate.afterMs >= 0
       ? { afterMs: candidate.afterMs }
       : {}),
   };
+}
+
+function genericError(): JsonValue {
+  return { code: "RELKIT_JOB_FAILURE", message: "Job failed" };
 }
 
 function safeText(value: unknown, fallback: string): string {
@@ -75,6 +98,17 @@ function safeJson(value: unknown): JsonValue | undefined {
   } catch {
     return undefined;
   }
+}
+
+function safeDetails(value: unknown): { readonly details?: JsonValue } {
+  const details = safeJson(value);
+  if (details === undefined) return {};
+  try {
+    if (new TextEncoder().encode(canonicalJson(details)).byteLength > 64 * 1024) return {};
+  } catch {
+    return {};
+  }
+  return { details };
 }
 
 function safeCancellation(value: NonNullable<RunSnapshot["cancellation"]>): JsonValue {

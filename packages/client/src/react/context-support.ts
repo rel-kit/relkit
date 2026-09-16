@@ -49,6 +49,10 @@ export async function identityHeaders(
   if (identity) {
     headers.set("x-relkit-identity-scope", identity.identityScope);
     headers.set("x-relkit-session-epoch", identity.sessionEpoch);
+    if (identity.jobs !== undefined) {
+      headers.set("x-relkit-jobs-protocol", String(identity.jobs.version));
+      headers.set("x-relkit-public-fingerprint", identity.publicFingerprint);
+    }
   }
   const csrf = browserCookie("relkit_csrf");
   if (csrf !== undefined && !headers.has("x-relkit-csrf")) {
@@ -104,6 +108,7 @@ export function streamClientFor(options: {
     return createWebSocketClient({
       baseUrl: options.baseUrl,
       establishmentTimeoutMs: options.timeoutMs,
+      headers: () => identityHeaders(options.headers, options.identity),
     });
   }
   const shared = {

@@ -1,3 +1,5 @@
+import type { JsonValue } from "./json.js";
+
 declare const operationIdBrand: unique symbol;
 
 /** A UUIDv7 validated by Relkit for bounded idempotency. */
@@ -8,12 +10,19 @@ export interface ExpectedClientIdentity {
   readonly sessionEpoch: string;
 }
 
+export interface JobsClientProtocol {
+  readonly protocol: "relkit.jobs";
+  readonly version: 1;
+  readonly capabilities?: JsonValue;
+}
+
 export interface ClientIdentityDocument extends ExpectedClientIdentity {
   readonly protocol: "relkit.client-identity";
   readonly version: 1;
   readonly applicationId: string;
   readonly publicFingerprint: string;
   readonly issuedAt: string;
+  readonly jobs?: JobsClientProtocol;
 }
 
 export type PendingOperationKind = "mutation" | "agent-run" | "agent-control" | "continuation";

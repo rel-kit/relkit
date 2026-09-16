@@ -5,10 +5,19 @@ import {
   CONTRACT_VERSION,
   type JsonValue,
 } from "@relkit/contracts";
+import { JOBS_PROTOCOL, JOBS_PROTOCOL_VERSION } from "@relkit/contracts/jobs";
 import type { AgentNode, ApplicationGraph, ChannelNode } from "@relkit/graph";
 import { agentContractType } from "./generate-agent-contract-types.js";
 import { clientRoutes, type ClientRoute } from "./generate-types.js";
 import { schemaType } from "./generate-schema.js";
+import {
+  jobProcedureDocument,
+  jobProcedureSources,
+} from "./generate-job-procedures.js";
+import {
+  generateJobRegistry,
+  generateJobRegistryFromDocument,
+} from "./generate-job-registry.js";
 export function publicFingerprint(graph: ApplicationGraph): string {
   const source = canonicalJson(publicManifest(graph) as unknown as JsonValue);
   return `sha256:${createHash("sha256").update(source).digest("hex")}`;
@@ -45,7 +54,11 @@ export function generateClientRegistryFromDocument(document: Record<string, unkn
       ? [`    readonly ${JSON.stringify(agent.id)}: ${agentDocumentType(agent)};`]
       : [],
   );
-  return registrySource(entries, channels, agents);
+  const jobs = Array.isArray(document.jobs) ? document.jobs : [];
+  return [
+    registrySource(entries, channels, agents),
+    ...(jobs.length === 0 ? [] : [generateJobRegistryFromDocument(jobs)]),
+  ].join("");
 }
 export function generateClientRegistry(graph: ApplicationGraph): string {
   const entries = clientRoutes(graph).flatMap((route) => {
@@ -61,7 +74,11 @@ export function generateClientRegistry(graph: ApplicationGraph): string {
   const agents = publicAgents(graph).map(
     (agent) => `    readonly ${JSON.stringify(agent.id)}: ${agentRegistryType(agent)};`,
   );
-  return registrySource(entries, channels, agents);
+  const jobs = jobProcedureSources(graph);
+  return [
+    registrySource(entries, channels, agents),
+    ...(jobs.length === 0 ? [] : [generateJobRegistry(graph)]),
+  ].join("");
 }
 function registrySource(entries: string[], channels: string[], agents: string[]): string {
   return [
@@ -117,10 +134,16 @@ function registryType(route: ClientRoute): string {
 }
 
 export function publicManifest(graph: ApplicationGraph): object {
+  const jobs = jobProcedureSources(graph).map(jobProcedureDocument);
   return {
     protocol: "relkit.client-manifest",
     version: CONTRACT_VERSION,
-    capabilities: { agentStream: AGENT_PROTOCOL_CAPABILITY },
+    capabilities: {
+      agentStream: AGENT_PROTOCOL_CAPABILITY,
+      ...(jobs.length === 0
+        ? {}
+        : { jobs: { protocol: JOBS_PROTOCOL, version: JOBS_PROTOCOL_VERSION } }),
+    },
     routes: clientRoutes(graph).map((route) => ({
       routeId: route.trigger.id,
       selector: selector(route),
@@ -152,6 +175,9 @@ export function publicManifest(graph: ApplicationGraph): object {
       ...(node.workflow === undefined ? {} : { workflow: node.workflow }),
       ...(node.clientContract === undefined ? {} : { clientContract: node.clientContract }),
     })),
+    ...(jobs.length === 0
+      ? {}
+      : { jobs, nameToId: Object.fromEntries(jobs.map((job) => [job.name, job.jobId])) }),
   };
 }
 

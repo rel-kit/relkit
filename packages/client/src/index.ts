@@ -33,6 +33,7 @@ export interface CreateClientOptions {
 export interface CreateWebSocketClientOptions {
   readonly baseUrl: string;
   readonly establishmentTimeoutMs?: number;
+  readonly headers?: ClientHeaders;
   readonly websocket?: typeof WebSocket;
 }
 
@@ -126,6 +127,7 @@ function webSocketLink(
 ): WebSocketRPCLink<Record<PropertyKey, unknown>> {
   return new WebSocketRPCLink({
     connect,
+    headers: () => resolveHeaders(options.headers),
     reconnect: { enabled: true, onClose: { enabled: true } },
   });
 }

@@ -3,6 +3,7 @@ import {
   CLIENT_IDENTITY_HEADERS,
   type ClientIdentityDocument,
   type ExpectedClientIdentity,
+  type JobsClientProtocol,
 } from "@relkit/contracts";
 import type { Hono } from "hono";
 import type { HttpAuthInvocation } from "./auth.js";
@@ -13,9 +14,12 @@ export interface ResolvedClientIdentity extends ExpectedClientIdentity {
   readonly setCookies?: readonly string[];
 }
 
+export type ClientIdentityHeaders = Readonly<Record<string, string | string[] | undefined>>;
+
 export interface ClientIdentityRuntime {
   readonly applicationId: string;
   readonly publicFingerprint: string;
+  readonly jobs?: JobsClientProtocol;
   readonly resolve: (input: {
     readonly request: Request;
     readonly session: unknown | null;
@@ -41,6 +45,7 @@ export function installClientIdentityEndpoint(
       sessionEpoch: identity.sessionEpoch,
       publicFingerprint: runtime.publicFingerprint,
       issuedAt: new Date().toISOString(),
+      ...(runtime.jobs === undefined ? {} : { jobs: runtime.jobs }),
     };
     return context.json(document, 200, CLIENT_IDENTITY_HEADERS);
   });
@@ -60,10 +65,20 @@ export async function resolveClientIdentity(
   return identity;
 }
 
-export function expectedClientIdentity(request: Request): ExpectedClientIdentity | undefined {
-  const identityScope = request.headers.get("x-relkit-identity-scope");
-  const sessionEpoch = request.headers.get("x-relkit-session-epoch");
+export function expectedClientIdentity(
+  request: Request,
+  rpcHeaders?: ClientIdentityHeaders,
+): ExpectedClientIdentity | undefined {
+  const identityScope = request.headers.get("x-relkit-identity-scope") ?? header(rpcHeaders, "x-relkit-identity-scope");
+  const sessionEpoch = request.headers.get("x-relkit-session-epoch") ?? header(rpcHeaders, "x-relkit-session-epoch");
   return identityScope === null || sessionEpoch === null
     ? undefined
     : { identityScope, sessionEpoch };
+}
+
+function header(headers: ClientIdentityHeaders | undefined, name: string): string | null {
+  if (headers === undefined) return null;
+  const entry = Object.entries(headers).find(([key]) => key.toLowerCase() === name);
+  if (entry === undefined) return null;
+  return Array.isArray(entry[1]) ? entry[1][0] ?? null : entry[1] ?? null;
 }

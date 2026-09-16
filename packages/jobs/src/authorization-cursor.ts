@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { assertJsonValue, canonicalJson, isJsonValue, type JsonValue } from "@relkit/contracts";
 import type { JobClientOperation } from "@relkit/contracts/jobs";
 import { JobCursorError } from "./authorization-errors.js";
@@ -14,9 +15,14 @@ export interface JobCursorBinding {
   readonly position: JsonValue;
 }
 
-export function createJobCursor(binding: JobCursorBinding): string {
+export interface JobCursorOptions {
+  readonly key: string | Uint8Array;
+  readonly keyId?: string;
+}
+
+export function createJobCursor(binding: JobCursorBinding, options?: JobCursorOptions): string {
   assertBinding(binding);
-  const value = {
+  const unsigned = {
     version: 1,
     ...(binding.application === undefined ? {} : { application: binding.application }),
     ...(binding.environment === undefined ? {} : { environment: binding.environment }),
@@ -28,12 +34,23 @@ export function createJobCursor(binding: JobCursorBinding): string {
     schema: binding.schema,
     position: binding.position,
   };
+  const signed = options === undefined
+    ? unsigned
+    : {
+        ...unsigned,
+        ...(options.keyId === undefined ? {} : { keyId: boundedKeyId(options.keyId) }),
+      };
+  const value = options === undefined ? signed : { ...signed, mac: sign(signed, options) };
   const encoded = Buffer.from(canonicalJson(value), "utf8").toString("base64url");
   if (byteLength(encoded) > 4096) throw new JobCursorError();
   return encoded;
 }
 
-export function readJobCursor(cursor: string, expected: JobCursorBinding): JobCursorBinding {
+export function readJobCursor(
+  cursor: string,
+  expected: JobCursorBinding,
+  options?: JobCursorOptions,
+): JobCursorBinding {
   assertBinding(expected);
   if (!isBase64Url(cursor) || byteLength(cursor) > 4096) throw new JobCursorError();
   let value: unknown;
@@ -48,6 +65,7 @@ export function readJobCursor(cursor: string, expected: JobCursorBinding): JobCu
   if (!isRecord(value) || value.version !== 1 || !isJsonValue(value.filters) || !isJsonValue(value.position)) {
     throw new JobCursorError();
   }
+  verifySignature(value, options);
   const candidate = readBinding(value);
   if (
     candidate.application !== expected.application ||
@@ -98,6 +116,35 @@ function readBinding(value: Record<string, unknown>): JobCursorBinding {
   };
   assertBinding(candidate);
   return candidate;
+}
+
+function verifySignature(value: Record<string, unknown>, options: JobCursorOptions | undefined): void {
+  const mac = value.mac;
+  if (mac === undefined && options === undefined) return;
+  if (options === undefined || typeof mac !== "string" || !isBase64Url(mac)) throw new JobCursorError();
+  const keyId = value.keyId;
+  if (keyId !== undefined && (typeof keyId !== "string" || keyId !== options.keyId)) {
+    throw new JobCursorError();
+  }
+  if (options.keyId !== undefined && keyId !== options.keyId) throw new JobCursorError();
+  const { mac: _ignored, ...unsigned } = value;
+  const expected = Buffer.from(sign(unsigned, options), "base64url");
+  const actual = Buffer.from(mac, "base64url");
+  if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+    throw new JobCursorError();
+  }
+}
+
+function sign(value: Record<string, unknown>, options: JobCursorOptions): string {
+  if (!(typeof options.key === "string" || options.key instanceof Uint8Array)) {
+    throw new JobCursorError();
+  }
+  return createHmac("sha256", options.key).update(canonicalJson(value), "utf8").digest("base64url");
+}
+
+function boundedKeyId(value: string): string {
+  assertBoundedText(value);
+  return value;
 }
 
 function assertBoundedText(value: unknown): asserts value is string {
