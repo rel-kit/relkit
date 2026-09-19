@@ -12,6 +12,7 @@ import type {
   ResolvedCandidateGeneration,
 } from "./generation-types.js";
 import type { InspectorResourceExplorers } from "./resource-explorer.js";
+import type { InspectorJobsServices } from "./jobs/types.js";
 export type InspectorMode = "development" | "test" | "production";
 export type InspectorValueSource<T = unknown> = T | (() => MaybePromise<T>);
 export interface InspectorRuntimeServices {
@@ -40,6 +41,7 @@ export interface InspectorGenerationServices extends InspectorRuntimeServices {
   readonly resources?: InspectorValueSource<InspectorResourceExplorers | undefined>;
 }
 export interface InspectorActiveGeneration extends InspectorGenerationServices {
+  readonly jobs?: InspectorJobsServices;
   readonly generationId?: string;
   readonly id?: string;
   readonly graphHash?: string;
@@ -67,6 +69,7 @@ export interface ResolvedActiveGeneration {
   readonly localServices?: unknown;
   readonly telemetry?: unknown;
   readonly runtime?: InspectorRuntimeServices;
+  readonly jobs?: InspectorJobsServices;
   readonly actions?: InspectorActionServices;
   readonly resources?: InspectorResourceExplorers;
   readonly candidate?: ResolvedCandidateGeneration;

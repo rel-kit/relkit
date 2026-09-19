@@ -169,18 +169,18 @@ Depends on Phase 6 and native observation adapters. Read design §§0.6–0.8, 1
 
 Depends on Phases 5–7. Read design §§0.10, 14, 18 and specs/development-inspector, observability. Extend the existing app and protected Inspector API.
 
-- [ ] 9.1 Add `packages/inspector-api/src/jobs/{definitions,runs,filters,controls,schedules}.ts` and services query support using shared authorized jobs operations plus Inspector privileges; add bounded jobs-specific collection routes to existing runtime routing.
-- [ ] 9.2 Replace unpaged job-run enumeration in runtime overview and `apps/inspector/lib/jobs-model.ts` with bounded native query summaries; keep legacy job display semantically separate.
-- [ ] 9.3 Enhance existing /jobs navigation and clients with Definitions/Runs/Schedules/Services tabs; implement /jobs/[id], /jobs/runs/[runId] and /tasks/[id] using encoded opaque IDs and existing table/page/graph conventions.
-- [ ] 9.4 Implement definitions/task detail for API name, durable IDs, implicit/default binding, schema, context dependencies, task policy, resources, lifecycle hooks, versions, native capabilities and generated worker/service health.
-- [ ] 9.5 Implement required service/job/task/status/accepted-time/run-ID filters plus optional certified fields/tags/native query; translate API-name filters to stable job IDs and reject unsupported filters before querying.
-- [ ] 9.6 Implement stable bounded pagination (25 default/100 max), filter-bound cursors and multi-service merge with partial/unavailable service rows and honest exact/approximate/absent counts; no fetch-all fallback or outage-as-zero.
-- [ ] 9.7 Implement run detail with normalized authoritative status, selected input/result/error, attempts/waits, separate progress/content generations, cancellation request state, stale/source/gap indicators and retained-build/schema availability.
-- [ ] 9.8 Implement live page reconciliation with new-runs indication and preserved user page/filter state; use the common controller for run detail and bound native read concurrency instead of subscribing to every historical row.
-- [ ] 9.9 Implement capability/permission-aware cancel/retry and native schedule list/upsert/pause/resume/delete through the shared operation receipts; show unsupported, unknown and pending outcomes without promising immediate cancellation.
-- [ ] 9.10 Add `tests/inspector/job-name-filters.test.ts` and API/browser tests for required native filters, malicious filters/cursors, large history pagination, cross-tenant denial, service outage (F25) and old Inspector tab regressions.
-- [ ] 9.11 Verify keyboard and screen-reader navigation, accessible table/filter/control labels and status announcements, bounded rendering and cleanup on route/tab/identity changes; pass Inspector security/accessibility checks.
-- [ ] 9.12 Implement aggregate consumed-row checkpoints per design §14.3; test interleaved/tied pages, unequal service contributions, unread rows after API restart, unavailable/recovered services, invalid native continuation and oversized cursors. Never advance a fetched page past unreturned rows or embed buffered run payloads in a cursor (RG10).
+- [x] 9.1 Add `packages/inspector-api/src/jobs/{definitions,runs,filters,controls,schedules}.ts` and services query support using shared authorized jobs operations plus Inspector privileges; add bounded jobs-specific collection routes to existing runtime routing.
+- [x] 9.2 Replace unpaged job-run enumeration in runtime overview and `apps/inspector/lib/jobs-model.ts` with bounded native query summaries; keep legacy job display semantically separate.
+- [x] 9.3 Enhance existing /jobs navigation and clients with Definitions/Runs/Schedules/Services tabs; implement /jobs/[id], /jobs/runs/[runId] and /tasks/[id] using encoded opaque IDs and existing table/page/graph conventions.
+- [x] 9.4 Implement definitions/task detail for API name, durable IDs, implicit/default binding, schema, context dependencies, task policy, resources, lifecycle hooks, versions, native capabilities and generated worker/service health.
+- [x] 9.5 Implement required service/job/task/status/accepted-time/run-ID filters plus optional certified fields/tags/native query; translate API-name filters to stable job IDs and reject unsupported filters before querying.
+- [x] 9.6 Implement stable bounded pagination (25 default/100 max), filter-bound cursors and multi-service merge with partial/unavailable service rows and honest exact/approximate/absent counts; no fetch-all fallback or outage-as-zero.
+- [x] 9.7 Implement run detail with normalized authoritative status, selected input/result/error, attempts/waits, separate progress/content generations, cancellation request state, stale/source/gap indicators and retained-build/schema availability.
+- [x] 9.8 Implement live page reconciliation with new-runs indication and preserved user page/filter state; use the common controller for run detail and bound native read concurrency instead of subscribing to every historical row.
+- [x] 9.9 Implement capability/permission-aware cancel/retry and native schedule list/upsert/pause/resume/delete through the shared operation receipts; show unsupported, unknown and pending outcomes without promising immediate cancellation.
+- [x] 9.10 Add `tests/inspector/job-name-filters.test.ts` and API/browser tests for required native filters, malicious filters/cursors, large history pagination, cross-tenant denial, service outage (F25) and old Inspector tab regressions.
+- [x] 9.11 Verify keyboard and screen-reader navigation, accessible table/filter/control labels and status announcements, bounded rendering and cleanup on route/tab/identity changes; pass Inspector security/accessibility checks.
+- [x] 9.12 Implement aggregate consumed-row checkpoints per design §14.3; test interleaved/tied pages, unequal service contributions, unread rows after API restart, unavailable/recovered services, invalid native continuation and oversized cursors. Never advance a fetched page past unreturned rows or embed buffered run payloads in a cursor (RG10).
 
 ## 10. Phase 9 — Deployment, migration, documentation and release gates
 

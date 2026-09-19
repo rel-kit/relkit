@@ -1,5 +1,7 @@
 import type { JsonValue } from "@relkit/contracts";
 import { eventRuntimeList } from "./events-runtime.js";
+import { getJobRun, listJobRuns } from "./jobs/runs.js";
+import { runtimeJobSummary } from "./jobs/runtime-summary.js";
 import { projectRuntimeMetadata } from "./runtime-metadata.js";
 import {
   identity,
@@ -96,6 +98,8 @@ export class InspectorRuntimeError extends Error {
 export async function runtimeSnapshot(generation: ResolvedActiveGeneration): Promise<JsonValue> {
   const entries = await Promise.all(
     RUNTIME_COLLECTIONS.map(async (collection) => {
+      if (collection === "jobs" && generation.jobs !== undefined)
+        return [collection, await runtimeJobSummary(generation)] as const;
       const items = await runtimeItems(generation, collection);
       return [collection, { count: items.length, items }] as const;
     }),
@@ -113,6 +117,7 @@ export async function runtimeList(
   request: Request,
 ): Promise<JsonValue> {
   if (collection === "events") return eventRuntimeList(generation, request);
+  if (collection === "jobs" && generation.jobs !== undefined) return listJobRuns(generation, request);
   const items = await runtimeItems(generation, collection);
   return { ...identity(generation), ...page(items, request) } as JsonValue;
 }
@@ -122,12 +127,18 @@ export async function runtimeDetail(
   collection: RuntimeCollection,
   id: string,
 ): Promise<JsonValue> {
+  if (collection === "jobs" && generation.jobs !== undefined)
+    return getJobRun(generation, new Request(`http://inspector${requestPath(generation, id)}`), id);
   const source = runtimeSource(generation, collection);
   let item = await resolveItem(source, id);
   if (item === undefined)
     item = (await runtimeItems(generation, collection)).find((value) => itemId(value) === id);
   if (item === undefined) throw new InspectorRuntimeError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   return { ...identity(generation), state: projectItem(item) } as JsonValue;
+}
+
+function requestPath(_generation: ResolvedActiveGeneration, id: string): string {
+  return `/_relkit/v1/jobs/runs/${encodeURIComponent(id)}`;
 }
 
 async function runtimeItems(

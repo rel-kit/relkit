@@ -44,6 +44,37 @@ export interface InspectorPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];
   readonly nextCursor?: string;
 }
+export interface InspectorRunPage<T = InspectorObject> extends InspectorIdentity {
+  readonly items: readonly T[];
+  readonly nextCursor?: string;
+  readonly hasMore: boolean;
+  readonly partial?: boolean;
+  readonly availability: readonly InspectorObject[];
+  readonly count?: { readonly value: number; readonly accuracy: "exact" | "approximate" };
+}
+export interface InspectorJobRunQuery extends InspectorQuery {
+  readonly jobId?: string;
+  readonly taskId?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
+  readonly service?: string;
+  readonly acceptedFrom?: string;
+  readonly acceptedTo?: string;
+  readonly startedFrom?: string;
+  readonly startedTo?: string;
+  readonly completedFrom?: string;
+  readonly completedTo?: string;
+  readonly tag?: string;
+  readonly tags?: string;
+  readonly tagMatch?: "all" | "any";
+  readonly correlationId?: string;
+  readonly parentRunId?: string;
+  readonly runId?: string;
+  readonly failure?: string;
+  readonly attempt?: number;
+  readonly timezone?: string;
+  readonly nativeQuery?: string;
+}
 export interface InspectorResourcePage<T = InspectorObject> extends InspectorPage<T> {
   readonly supported: boolean;
   readonly reason?: string;

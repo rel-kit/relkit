@@ -8,6 +8,8 @@ import {
   type InspectorFetchOptions,
   type InspectorGraph,
   type InspectorObject,
+  type InspectorJobRunQuery,
+  type InspectorRunPage,
   type InspectorPage,
   type InspectorQuery,
   type InspectorBucketObject,
@@ -67,6 +69,48 @@ export class InspectorApiClient extends InspectorApiTransport {
   ): Promise<InspectorPage<T>> {
     return this.request(`${INSPECTOR_API_BASE}/runtime/${collection}${this.queryString(query)}`, {
       cacheTags: [collection, "runtime"],
+    });
+  }
+  jobDefinitions<T = InspectorObject>(query: InspectorQuery = {}): Promise<InspectorPage<T>> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions${this.queryString(query)}`, { cacheTags: ["jobs", "graph"] });
+  }
+  jobDefinition<T = InspectorObject>(id: string): Promise<T> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "graph"] });
+  }
+  taskDefinition<T = InspectorObject>(id: string): Promise<T> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/tasks/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "graph"] });
+  }
+  jobRuns<T = InspectorObject>(query: InspectorJobRunQuery = {}): Promise<InspectorRunPage<T>> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/runs${this.queryString(query)}`, { cacheTags: ["jobs", "runtime"] });
+  }
+  jobRun<T = InspectorObject>(id: string): Promise<T> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/runs/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "runtime"] });
+  }
+  jobServices<T = InspectorObject>(): Promise<InspectorPage<T>> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/services`, { cacheTags: ["jobs", "runtime"] });
+  }
+  jobSchedules<T = InspectorObject>(query: InspectorQuery = {}): Promise<InspectorRunPage<T>> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/schedules${this.queryString(query)}`, { cacheTags: ["jobs", "runtime"] });
+  }
+  jobScheduleAction<T = InspectorObject>(action: "upsert" | "pause" | "resume" | "delete", id: string | undefined, body: InspectorObject = {}): Promise<T> {
+    const path = id === undefined
+      ? `${INSPECTOR_API_BASE}/jobs/schedules`
+      : action === "delete"
+        ? `${INSPECTOR_API_BASE}/jobs/schedules/${encodeURIComponent(id)}`
+        : `${INSPECTOR_API_BASE}/jobs/schedules/${encodeURIComponent(id)}/${action}`;
+    return this.request(path, {
+      method: action === "delete" ? "DELETE" : "POST",
+      headers: { "content-type": "application/json", "x-relkit-operation-id": crypto.randomUUID() },
+      body: JSON.stringify(body),
+      cacheTags: ["jobs", "runtime"],
+    });
+  }
+  jobControl<T = InspectorObject>(id: string, action: "cancel" | "retry", body: InspectorObject = {}): Promise<T> {
+    return this.request(`${INSPECTOR_API_BASE}/jobs/runs/${encodeURIComponent(id)}/${action}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+      cacheTags: ["jobs", "runtime"],
     });
   }
   bucketObjects(

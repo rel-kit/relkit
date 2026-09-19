@@ -3,6 +3,7 @@ import { INSPECTOR_ACTION_PATHS } from "./actions.js";
 import { GRAPH_COLLECTIONS } from "./graph.js";
 import { OBSERVABILITY_ENDPOINT_PATHS } from "./observability.js";
 import { RUNTIME_COLLECTIONS } from "./runtime.js";
+import { JOBS_ENDPOINT_PATHS } from "./jobs/routes.js";
 
 export const INSPECTOR_API_PATHS = Object.freeze([
   API_BASE_PATH,
@@ -33,6 +34,7 @@ export const INSPECTOR_API_PATHS = Object.freeze([
   `${API_BASE_PATH}/runtime/cache/:id/keys/value`,
   ...OBSERVABILITY_ENDPOINT_PATHS,
   ...INSPECTOR_ACTION_PATHS,
+  ...JOBS_ENDPOINT_PATHS,
 ] as const);
 
 export const INSPECTOR_ENDPOINT_PATHS = INSPECTOR_API_PATHS;
