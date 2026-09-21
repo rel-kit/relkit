@@ -50,7 +50,8 @@ export async function runNativeQueryChecks(options: {
   const appId = `relkit-${stack.namespace}`;
   const functionId = `${stack.namespace}-acceptance`;
   const eventPath = `/v2/events/${encodeURIComponent(eventId)}/runs`;
-  const filteredPath = `/v2/runs?limit=1&appId=${encodeURIComponent(appId)}&status=COMPLETED`;
+  const queryUntil = encodeURIComponent(new Date().toISOString());
+  const filteredPath = `/v2/runs?limit=1&appId=${encodeURIComponent(appId)}&status=COMPLETED&until=${queryUntil}`;
   const functionPath = `${filteredPath}&functionId=${encodeURIComponent(functionId)}`;
   const generic = await request(stack, filteredPath);
   const functionFiltered = await request(stack, functionPath);

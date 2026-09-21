@@ -53,7 +53,11 @@ void taskAccepted;
 
 const transformedInput = z.string().transform(Number);
 const transformedOutput = z.string().transform(Number);
-type TransformedRef = TaskRef<"types.transformed-ref", typeof transformedInput, typeof transformedOutput>;
+type TransformedRef = TaskRef<
+  "types.transformed-ref",
+  typeof transformedInput,
+  typeof transformedOutput
+>;
 const directionalTask = defineTask({
   id: "types.directional-task",
   version: "1",
@@ -134,18 +138,34 @@ defineJob({ name: "constructor", task });
 const dynamicJobName: string = "dynamicJob";
 // @ts-expect-error job names must be literal strings
 defineJob({ name: dynamicJobName, task });
-// @ts-expect-error authorization must return a scoped grant
-defineJob({ name: "booleanAuthorization", task, client: { authorize: async () => true, operations: ["get"] } });
+defineJob({
+  name: "booleanAuthorization",
+  task,
+  client: {
+    // @ts-expect-error authorization must return a scoped grant
+    authorize: async () => true,
+    operations: ["get"],
+  },
+});
 // @ts-expect-error a generated registry is selected by literal names
-({ sendEmail: job } as const).missing;
+(({ sendEmail: job }) as const).missing;
 
-const functionTarget = defineFunction({ input, output, handler: async () => ({ accepted: true as const }) });
+const functionTarget = defineFunction({
+  input,
+  output,
+  handler: async () => ({ accepted: true as const }),
+});
 // @ts-expect-error new jobs accept tasks, not function targets
 defineJob({ name: "functionTarget", task: functionTarget });
 // @ts-expect-error jobs do not own handlers
 defineJob({ name: "jobHandler", task, handler: async () => ({ accepted: true as const }) });
 // @ts-expect-error task versions are explicit
-defineTask({ id: "types.missing-version", input, output, handler: async () => ({ accepted: true as const }) });
+defineTask({
+  id: "types.missing-version",
+  input,
+  output,
+  handler: async () => ({ accepted: true as const }),
+});
 defineTask({
   id: "types.retryable-sleep",
   version: "1",
@@ -158,14 +178,37 @@ defineTask({
     return { accepted: true as const };
   },
 });
-// @ts-expect-error the public duration grammar excludes calendar months
-defineTask({ id: "types.bad-duration", version: "1", input, output, maxDuration: "1 month", handler: async () => ({ accepted: true as const }) });
-// @ts-expect-error only declared stream names may be exposed
-defineJob({ name: "badStream", task, client: { public: true, operations: ["stream"], streams: ["missing"] } });
+defineTask({
+  id: "types.bad-duration",
+  version: "1",
+  input,
+  output,
+  // @ts-expect-error the public duration grammar excludes calendar months
+  maxDuration: "1 month",
+  handler: async () => ({ accepted: true as const }),
+});
+defineJob({
+  name: "badStream",
+  task,
+  client: {
+    public: true,
+    operations: ["stream"],
+    // @ts-expect-error only declared stream names may be exposed
+    streams: ["missing"],
+  },
+});
 // @ts-expect-error operation names are capability-gated
 defineJob({ name: "badOperation", task, client: { public: true, operations: ["delete"] } });
-// @ts-expect-error public and authorize are an exclusive union
-defineJob({ name: "badAccess", task, client: { public: true, authorize: async () => true, operations: ["get"] } });
+defineJob({
+  name: "badAccess",
+  task,
+  client: {
+    public: true,
+    // @ts-expect-error public and authorize are an exclusive union
+    authorize: async () => true,
+    operations: ["get"],
+  },
+});
 defineTask({
   id: "types.missing-dependency",
   version: "1",
@@ -186,7 +229,11 @@ const serverConfig: RunWithJobsConfig = { projectRoot: "/tmp/project" };
 void adapter;
 void serverConfig;
 
-const legacyTarget = defineFunction({ input, output, handler: async () => ({ accepted: true as const }) });
+const legacyTarget = defineFunction({
+  input,
+  output,
+  handler: async () => ({ accepted: true as const }),
+});
 const legacy = defineLegacyJob({
   id: "types.legacy-job",
   input,

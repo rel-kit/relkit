@@ -9,6 +9,8 @@ import {
   type JobContract,
   type JobProcedureSelector,
 } from "@relkit/client/react";
+import type { PendingOperationMetadata } from "@relkit/contracts";
+import type { RunHandle } from "@relkit/contracts/jobs";
 import type { JobRegistry } from "@relkit/client/jobs";
 
 declare module "@relkit/client/jobs" {
@@ -72,6 +74,39 @@ useJobTrigger("exportOrders").mutate({ input: { orderId: "order-1" } });
 useJobRun("exportOrders", { runId: "run-1", enabled: false }).run?.status;
 useJobCancel("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });
 useJobRetry("exportOrders").mutate({ runId: "run-1", operationId: "operation-1" });
+
+const acceptedRun: RunHandle = {
+  accepted: true,
+  runId: "run-accepted",
+  jobId: "orders.export",
+  taskId: "orders.export",
+  taskVersion: "1",
+  acceptedAt: "2026-01-01T00:00:00.000Z",
+};
+
+function correctedReactJobFixture(pending: PendingOperationMetadata) {
+  const trigger = useJobTrigger("exportOrders");
+  const originalRequest = {
+    input: { orderId: "order-1" },
+    options: { operationId: "operation-1", idempotencyKey: "order-1" },
+  } satisfies Parameters<typeof trigger.mutate>[0];
+  const run = useJobRun("exportOrders", { runId: acceptedRun.runId, enabled: false });
+  const message =
+    pending.state !== "unknown"
+      ? "Submission pending"
+      : pending.recovery?.action === "retry-with-same-key"
+        ? "Outcome unknown; retry only with the same key"
+        : pending.recovery?.action === "inspect-native"
+          ? "Outcome unknown; inspect the provider"
+          : "Outcome unknown; wait for provider recovery";
+  return {
+    message,
+    operationId: pending.operationId,
+    originalRequest,
+    runId: run.run?.runId ?? acceptedRun.runId,
+  };
+}
+void correctedReactJobFixture;
 
 // @ts-expect-error hook names must have their declared operation
 useJobTrigger("hiddenJob");

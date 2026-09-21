@@ -21,7 +21,13 @@ import { z } from "@relkit/schema";
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
 const target = defineFunction({ input, output, handler: async () => ({ ok: true }) });
-const task = defineTask({ id: "types.optional-task", version: "1", input, output, handler: async () => ({ ok: true }) });
+const task = defineTask({
+  id: "types.optional-task",
+  version: "1",
+  input,
+  output,
+  handler: async () => ({ ok: true }),
+});
 
 const optionalFunction = defineFunction({ input, output, handler: async () => ({ ok: true }) });
 const optionalError = defineError({ data: input, message: "Invalid" });

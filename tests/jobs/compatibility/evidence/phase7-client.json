@@ -27,16 +27,16 @@
       "browserHeapBytes": 1016720,
       "terminalAndDisposed": true
     },
-  "connections": [
-    "idle",
-    "connecting",
-    "connecting",
-    "connected",
-    "completed",
-    "completed",
-    "completed",
-    "disposed"
-  ]
+    "connections": [
+      "idle",
+      "connecting",
+      "connecting",
+      "connected",
+      "completed",
+      "completed",
+      "completed",
+      "disposed"
+    ]
   },
   "envelope": {
     "command": "/usr/bin/time -l bun test packages/client/jobs-watch.test.ts",

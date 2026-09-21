@@ -15,7 +15,15 @@ test("accepts safe camelCase job names", () => {
 });
 
 test("rejects unsafe and reserved job names", () => {
-  const invalid = ["", "SendEmail", "send-email", "send_email", "1send", "a".repeat(65), ...JOB_NAME_RESERVED];
+  const invalid = [
+    "",
+    "SendEmail",
+    "send-email",
+    "send_email",
+    "1send",
+    "a".repeat(65),
+    ...JOB_NAME_RESERVED,
+  ];
   for (const name of invalid) {
     expect(isJobName(name)).toBe(false);
     expect(() => assertJobName(name)).toThrow();
