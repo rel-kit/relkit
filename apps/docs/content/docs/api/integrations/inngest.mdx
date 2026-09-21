@@ -370,7 +370,7 @@ Startup budget shared by the Docker worker health check and readiness probes.
 **Signature**
 
 ```ts
-declare const INNGEST_LOCAL_STARTUP_TIMEOUT_MS: 180000;
+declare const INNGEST_LOCAL_STARTUP_TIMEOUT_MS: 300000;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-timeouts.ts#L2)
@@ -1074,7 +1074,7 @@ declare const createInngestRunApi: (options: {
 declare const isAmbiguousInngestWrite: (error: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L177)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L181)
 
 ## rememberInngestRecord
 
@@ -1088,7 +1088,7 @@ declare const rememberInngestRecord: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L181)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L185)
 
 ## snapshot
 
@@ -1102,7 +1102,7 @@ declare const snapshot: (
 ) => RunSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L113)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L117)
 
 ## statusOf
 
@@ -1112,7 +1112,7 @@ declare const snapshot: (
 declare const statusOf: (value: unknown) => RunSnapshot["status"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runs.ts#L167)
 
 ## `submission.ts`
 
