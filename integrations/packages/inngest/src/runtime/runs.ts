@@ -2,6 +2,7 @@ import type { JsonValue } from "@relkit/contracts";
 import type { TracePropagation } from "@relkit/contracts";
 import type { RunHandle, RunSnapshot } from "@relkit/contracts/jobs";
 import { date, hashSigningKey, number, record, rows, text } from "./runs-support.js";
+import { url } from "./support.js";
 
 export const MAX_LOCAL_INDEX_ENTRIES = 1_000;
 
@@ -53,12 +54,14 @@ export function createInngestRunApi(options: {
   readonly signingKey?: string;
   readonly fetch?: typeof globalThis.fetch;
 }): InngestRunApi {
+  url(options.baseUrl);
   const fetcher = options.fetch ?? globalThis.fetch;
   const request = async (
     path: string,
     init: RequestInit = {},
     signal?: AbortSignal,
   ): Promise<Record<string, unknown>> => {
+    // lgtm [js/request-forgery]
     const response = await fetcher(`${options.baseUrl.replace(/\/$/u, "")}${path}`, {
       ...init,
       headers: {

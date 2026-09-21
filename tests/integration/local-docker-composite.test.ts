@@ -72,7 +72,7 @@ dockerTest(
       expect(readLocalServiceSecrets(identity)?.bindings[0]?.values.postgresPassword).toMatch(
         /^[a-f0-9]{48}$/u,
       );
-      expect((await fetch(`${baseUrl}/health`)).ok).toBe(true);
+      expect((await fetch(`${baseUrl}/health`)).ok).toBe(true); // lgtm [js/request-forgery]
       expect(await materializer.listVolumes(labels)).toHaveLength(2);
       expect(
         JSON.parse(

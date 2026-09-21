@@ -32,6 +32,15 @@ test("authoring stays pure and declares the native local recipe", () => {
   expect(() => inngest({ appId: "" })).toThrow();
 });
 
+test("rejects non-http native API endpoints before creating a runtime", () => {
+  expect(() =>
+    createInngestRuntime({
+      appId: "relkit-test",
+      baseUrl: "file:///private/secret",
+    }),
+  ).toThrow("baseUrl is invalid");
+});
+
 test("maps only certified native policy fields", () => {
   expect(
     createInngestFunctionConfig({

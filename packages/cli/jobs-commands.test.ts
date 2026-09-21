@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { jobsBaseUrl } from "./src/commands/jobs-request.js";
 import { runJobs } from "./src/commands/jobs.js";
 
 const roots: string[] = [];
@@ -12,6 +13,12 @@ afterEach(async () => {
 });
 
 describe("jobs CLI", () => {
+  test("pins jobs requests to the local loopback server", () => {
+    const url = new URL(jobsBaseUrl());
+    expect(url.protocol).toBe("http:");
+    expect(url.hostname).toBe("127.0.0.1");
+  });
+
   test("resolves a durable job ID and submits through the jobs RPC", async () => {
     const root = await project({ "input.json": JSON.stringify({ orderId: "order-1" }) });
     const requests: Request[] = [];
