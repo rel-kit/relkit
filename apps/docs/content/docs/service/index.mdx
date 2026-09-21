@@ -21,9 +21,10 @@ These three terms describe different things:
 | Service  | The domain's public boundary, assembled in one `service.ts`.                         | `orders.createOrder` and `orders.orderCreated` are selected public members.        |
 | Function | A validated operation that does the work.                                            | `create-order.function.ts` calculates a total and publishes an event.              |
 
-When we say a service contains tools, agents, caches, or jobs, we mean they belong to its **domain**.
-`defineService` itself accepts public `functions` and `events`; it is not a registry of every file or a
-container that injects resources. A function remains the execution unit.
+When we say a service contains tools, agents, caches, tasks, or jobs, we mean they belong to its **domain**.
+`defineService` accepts public `functions`, `events`, `tasks`, and `jobs`; it is not a registry of every file
+or a container that injects resources. A function remains the immediate execution unit, while a task owns
+durable execution.
 
 ## The application architecture
 
@@ -32,7 +33,7 @@ relkit.config.ts              application settings and provider bindings
 src/
 ├── platform/                 shared environment and infrastructure support
 ├── orders/                   an application domain
-│   ├── service.ts            public functions and event contracts
+│   ├── service.ts            public functions, events, tasks, and jobs
 │   ├── functions/            business operations and event subscribers
 │   ├── events/               facts this domain publishes
 │   ├── tools/                model-callable operations
@@ -41,6 +42,7 @@ src/
 ├── receipts/                 another domain, with its own service.ts
 │   ├── service.ts
 │   ├── functions/
+│   ├── tasks/
 │   └── jobs/
 └── routes/                   URL paths, HTTP methods, and request policy
 ```
@@ -57,7 +59,7 @@ Application authors use ordinary TypeScript descriptors; no Effect imports are r
 
 In the commerce example, an HTTP route selects `orders.createOrder`. The function validates domain input,
 reads the Orders price cache, and publishes `orders.created`. A Receipts event function reacts, looks up
-the order through the Orders service, and enqueues receipt work.
+the order through the Orders service, and triggers receipt work through a task-first job.
 
 Each part has a different job:
 

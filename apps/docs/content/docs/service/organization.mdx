@@ -17,7 +17,7 @@ The paths below are patterns, not files you must create in every domain. Replace
 | Business operation                 | `src/orders/functions/create-order.function.ts`                                                                   | [Functions](/docs/fundamentals/functions)                                                       |
 | Event contract                     | `src/orders/events/order-created.event.ts`                                                                        | [Events: getting started](/docs/events)                                                         |
 | Event subscriber                   | `functions/*.function.ts` in the **receiving** domain, such as `src/receipts/functions/order-receipt.function.ts` | [Consume an event](/docs/events/consume)                                                        |
-| Job and its schedule               | `src/receipts/jobs/send-receipt.job.ts`; its target remains in `src/receipts/functions/`                          | [Jobs: getting started](/docs/jobs) and [schedules](/docs/jobs/schedules)                       |
+| Task and its job                   | `src/receipts/tasks/send-receipt.task.ts` and `src/receipts/jobs/send-receipt.job.ts`                             | [Jobs: getting started](/docs/jobs) and [schedules](/docs/jobs/schedules)                       |
 | AI tool                            | `src/orders/tools/lookup-order.tool.ts`                                                                           | [AI: getting started](/docs/ai), then [tools](/docs/ai/tools)                                   |
 | AI agent                           | `src/orders/agents/order-support.agent.ts`                                                                        | [AI: getting started](/docs/ai), then [your first agent](/docs/ai/first-agent)                  |
 | Cache                              | `src/orders/cache/prices.cache.ts`                                                                                | [Caching: getting started](/docs/caching)                                                       |
@@ -88,9 +88,9 @@ Put the fact in the producing domain's `events/` directory and the reaction in t
 `defineEventFunction` that reacts to it. The subscriber stays out of `service.functions`: it runs through
 event delivery or replay, not direct invocation.
 
-A job descriptor belongs to the domain responsible for completing the queued work. Its function target
-stays in that domain's `functions/` directory. A schedule is an option on the job, not a separate service
-or a reason to move the handler. Follow [your first event](/docs/events/first-event),
+A task and job belong to the domain responsible for completing the durable work. The task stays in that
+domain's `tasks/` directory and the job owns its public name, admission, and schedules. A schedule is an
+option on the job, not a separate service or a reason to move the task. Follow [your first event](/docs/events/first-event),
 [jobs](/docs/jobs), and [schedules](/docs/jobs/schedules) for the complete workflows.
 
 ## Resources do not go in the service member list

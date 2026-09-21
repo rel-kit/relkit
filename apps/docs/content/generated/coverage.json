@@ -155,11 +155,14 @@
     {
       "id": "jobs",
       "title": "Jobs",
-      "summary": "Queue validated work with bounded retry and concurrency.",
-      "guide": "jobs/define",
+      "summary": "Run typed tasks durably with bounded retry, progress, and provider-backed schedules.",
+      "guide": "jobs/quickstart",
       "apiPackage": "jobs",
-      "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"]
+      "entrypoints": [
+        { "source": "packages/jobs/src/define-task.ts", "name": "defineTask" },
+        { "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }
+      ],
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
     },
     {
       "id": "schedules",
@@ -168,7 +171,7 @@
       "guide": "jobs/schedules",
       "apiPackage": "jobs",
       "entrypoints": [{ "source": "packages/jobs/src/define-job.ts", "name": "defineJob" }],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"]
+      "examples": ["examples/commerce/src/orders/jobs/cleanup-orders.job.ts"]
     },
     {
       "id": "buckets",
@@ -458,44 +461,133 @@
     },
     {
       "path": "jobs/index",
-      "api": ["jobs", "services", "functions"],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
-      "next": "jobs/define"
+      "api": ["jobs", "services", "client"],
+      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
+      "next": "jobs/quickstart"
     },
     {
-      "path": "jobs/define",
-      "api": ["jobs", "functions", "config"],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
-      "next": "jobs/enqueue"
+      "path": "jobs/quickstart",
+      "api": ["app", "jobs", "schema", "client"],
+      "examples": [
+        "examples/commerce/src/orders/tasks/export-orders.task.ts",
+        "examples/commerce/src/orders/jobs/export-orders.job.ts",
+        "examples/commerce/src/routes/orders/export/route.ts"
+      ],
+      "next": "jobs/tasks"
     },
     {
-      "path": "jobs/enqueue",
-      "api": ["jobs", "functions", "events"],
-      "examples": ["apps/docs/examples/jobs/queue-receipt.function.ts"],
-      "next": "jobs/retries"
+      "path": "jobs/tasks",
+      "api": ["jobs", "schema"],
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+      "next": "jobs/bindings"
     },
     {
-      "path": "jobs/retries",
-      "api": ["jobs", "functions", "testing"],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts"],
-      "next": "jobs/idempotency"
+      "path": "jobs/bindings",
+      "api": ["app", "jobs", "integrations/docker", "integrations/inngest"],
+      "examples": [
+        "examples/commerce/relkit.config.ts",
+        "examples/commerce/src/orders/jobs/export-orders.job.ts"
+      ],
+      "next": "jobs/durations-and-sleep"
     },
     {
-      "path": "jobs/idempotency",
+      "path": "jobs/durations-and-sleep",
+      "api": ["jobs"],
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+      "next": "jobs/execution-policy"
+    },
+    {
+      "path": "jobs/execution-policy",
+      "api": ["jobs"],
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+      "next": "jobs/retries-and-idempotency"
+    },
+    {
+      "path": "jobs/retries-and-idempotency",
       "api": ["jobs", "testing"],
-      "examples": ["packages/testing/jobs.test.ts"],
+      "examples": [
+        "examples/commerce/src/orders/tasks/export-orders.task.ts",
+        "packages/jobs/task-policy.test.ts"
+      ],
+      "next": "jobs/clients"
+    },
+    {
+      "path": "jobs/clients",
+      "api": ["jobs", "client"],
+      "examples": ["packages/client/jobs-watch.test.ts"],
+      "next": "jobs/progress-and-streams"
+    },
+    {
+      "path": "jobs/progress-and-streams",
+      "api": ["jobs", "client"],
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
+      "next": "jobs/security"
+    },
+    {
+      "path": "jobs/security",
+      "api": ["jobs", "client"],
+      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
       "next": "jobs/schedules"
     },
     {
       "path": "jobs/schedules",
-      "api": ["jobs"],
-      "examples": ["apps/docs/examples/jobs/send-receipt.job.ts", "packages/testing/jobs.test.ts"],
-      "next": "jobs/first-job"
+      "api": ["jobs", "integrations/inngest", "integrations/effect-mq"],
+      "examples": [
+        "examples/commerce/src/orders/jobs/cleanup-orders.job.ts",
+        "packages/jobs/schedule-reconciliation.test.ts"
+      ],
+      "next": "jobs/inspector"
     },
     {
-      "path": "jobs/first-job",
-      "api": ["jobs", "functions", "buckets", "testing"],
-      "examples": ["packages/testing/jobs.test.ts"],
+      "path": "jobs/inspector",
+      "api": ["jobs", "client"],
+      "examples": ["tests/inspector/job-name-filters.test.ts"],
+      "next": "jobs/docker"
+    },
+    {
+      "path": "jobs/docker",
+      "api": [
+        "app",
+        "jobs",
+        "integrations/docker",
+        "integrations/inngest",
+        "integrations/trigger",
+        "integrations/effect-mq"
+      ],
+      "examples": ["templates/default/v1/tasks/relkit.config.ts"],
+      "next": "jobs/providers"
+    },
+    {
+      "path": "jobs/providers",
+      "api": ["integrations/inngest", "integrations/trigger", "integrations/effect-mq"],
+      "examples": ["tests/jobs/compatibility/evidence/capability-matrix.json"],
+      "next": "jobs/deployment"
+    },
+    {
+      "path": "jobs/deployment",
+      "api": ["jobs", "integrations/pulumi"],
+      "examples": ["examples/commerce/relkit.config.ts"],
+      "next": "jobs/testing"
+    },
+    {
+      "path": "jobs/testing",
+      "api": ["jobs", "testing", "client"],
+      "examples": ["packages/jobs/task-wire.test.ts", "packages/client/jobs-watch.test.ts"],
+      "next": "jobs/migration"
+    },
+    {
+      "path": "jobs/migration",
+      "api": ["app", "jobs"],
+      "examples": [
+        "packages/jobs/migration.test.ts",
+        "apps/docs/examples/jobs/send-receipt.job.ts"
+      ],
+      "next": "jobs/troubleshooting"
+    },
+    {
+      "path": "jobs/troubleshooting",
+      "api": ["jobs"],
+      "examples": ["templates/default/v1/tasks/package.json"],
       "next": "database/index"
     },
     {

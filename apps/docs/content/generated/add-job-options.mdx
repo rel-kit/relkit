@@ -14,7 +14,10 @@
       description: "Create and use a new generic service for a domain artifact or service route",
     },
     "--no-install": { type: "boolean", description: "Do not install newly required packages" },
-    "--target": { type: "string", description: "Callable function target" },
+    "--target": {
+      type: "string",
+      description: "Task ID; legacy callable function targets remain readable",
+    },
     "--profile": {
       type: "string",
       description:
