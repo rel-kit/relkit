@@ -194,9 +194,7 @@ export async function resolveCollection(source: unknown): Promise<unknown> {
     return await value.query({ limit: 100 });
   return value;
 }
-
 export async function resolveItem(source: unknown, id: string): Promise<unknown> {
   const value = await resolveService(source);
-  if (isRecord(value) && typeof value.get === "function") return await value.get(id);
-  return undefined;
+  return isRecord(value) && typeof value.get === "function" ? await value.get(id) : undefined;
 }
