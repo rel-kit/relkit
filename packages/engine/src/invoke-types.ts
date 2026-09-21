@@ -24,7 +24,11 @@ import type {
 } from "@relkit/invocation";
 import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
 import type { FunctionRegistry } from "./registry.js";
-import type { DependencyClientSources, DependencyDeclarations, DirectTaskInvoker } from "./dependencies.js";
+import type {
+  DependencyClientSources,
+  DependencyDeclarations,
+  DirectTaskInvoker,
+} from "./dependencies.js";
 
 type OperationObservation = BucketOperationObservation | CacheOperationObservation;
 

@@ -1,7 +1,4 @@
-import {
-  canonicalTarget,
-  resolveTarget,
-} from "./invoke-utils.js";
+import { canonicalTarget, resolveTarget } from "./invoke-utils.js";
 import { invokeNow } from "./invoke-now.js";
 import { lazySingleConsumerStream, isStreamOutput } from "@relkit/invocation";
 import type { InvocationContext, InvokeOptions } from "./invoke-types.js";

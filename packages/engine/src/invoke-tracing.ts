@@ -43,7 +43,9 @@ export function createInvocationSpanOptions<
       ...(record.taskId === undefined ? {} : { "relkit.task.id": record.taskId }),
       ...(record.taskVersion === undefined ? {} : { "relkit.task.version": record.taskVersion }),
       ...(record.buildId === undefined ? {} : { "relkit.build.id": record.buildId }),
-      ...(record.serviceGeneration === undefined ? {} : { "relkit.service.generation": record.serviceGeneration }),
+      ...(record.serviceGeneration === undefined
+        ? {}
+        : { "relkit.service.generation": record.serviceGeneration }),
       "relkit.attempt": record.attempt,
     },
     ...(observed
