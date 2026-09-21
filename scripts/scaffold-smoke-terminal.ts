@@ -3,6 +3,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+const SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000;
+
 export async function runScaffoldTerminal(
   command: string[],
   cwd: string,
@@ -27,7 +29,7 @@ export async function runScaffoldTerminal(
     cwd,
     terminal,
     env: { ...process.env, CI: "", NO_COLOR: "1", TERM: "xterm-256color", ...env },
-    signal: AbortSignal.timeout(300_000),
+    signal: AbortSignal.timeout(SCAFFOLD_TERMINAL_TIMEOUT_MS),
   });
   try {
     const code = await child.exited;

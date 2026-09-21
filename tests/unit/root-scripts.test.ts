@@ -19,6 +19,6 @@ test("test:all points to a checked-in orchestration script", async () => {
     "bun run test:scaffold",
   );
   expect(await readFile(join(root, "scripts", "scaffold-smoke-terminal.ts"), "utf8")).toContain(
-    "AbortSignal.timeout(300_000)",
+    "SCAFFOLD_TERMINAL_TIMEOUT_MS = 600_000",
   );
 });

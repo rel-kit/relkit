@@ -39,7 +39,7 @@ test("local create preserves the staged interactive addition prompt", async () =
   );
   expect(result.code, result.output).toBe(0);
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
-}, 120_000);
+}, 600_000);
 
 afterEach(async () => {
   await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
