@@ -103,7 +103,10 @@ export function createRegistrationPlan(
   return deepFreeze(plan);
 }
 
-function compareRegistration(left: { readonly id: string }, right: { readonly id: string }): number {
+function compareRegistration(
+  left: { readonly id: string },
+  right: { readonly id: string },
+): number {
   return left.id.localeCompare(right.id);
 }
 function compareSchedule(left: ScheduleRegistration, right: ScheduleRegistration): number {

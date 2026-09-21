@@ -10,7 +10,12 @@ export function graphId(
 }
 
 export function isTaskBackedJob(value: unknown): boolean {
-  return isRecord(value) && isRecord(value.task) && isRecord(value.task.ref) && value.task.ref.kind === "task";
+  return (
+    isRecord(value) &&
+    isRecord(value.task) &&
+    isRecord(value.task.ref) &&
+    value.task.ref.kind === "task"
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

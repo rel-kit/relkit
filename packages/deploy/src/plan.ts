@@ -7,6 +7,12 @@ import type {
 } from "./plan-integrations.js";
 import { assertDeploymentPlanShape } from "./plan-validation.js";
 export { DeploymentPlanValidationError } from "./plan-validation.js";
+export type {
+  DeploymentFunctionCapability,
+  DeploymentIamPlan,
+  DeploymentIamStatement,
+} from "./plan-iam.js";
+import type { DeploymentIamPlan } from "./plan-iam.js";
 
 /** Versioned, JSON-safe protocol name for deployment plans. */
 export const DEPLOYMENT_PLAN_PROTOCOL = "relkit.deployment-plan" as const;
@@ -63,12 +69,45 @@ export interface HttpDeploymentPlan {
 }
 
 export interface JobDeploymentPlan extends DeploymentCapabilityPlan {
-  readonly targetFunctionId: string;
+  /** Present only for the one-release legacy function-target form. */
+  readonly targetFunctionId?: string;
+  readonly executionModel?: "legacy-function" | "task";
+  readonly jobId?: string;
+  readonly name?: string;
+  readonly taskId?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
+  readonly serviceGeneration?: string;
   readonly profile: string;
   readonly retry?: JsonValue;
   readonly timeoutMs?: number;
   readonly concurrency?: number;
   readonly idempotency?: JsonValue;
+  readonly policy?: JsonValue;
+  readonly schedules?: JsonValue;
+  readonly worker?: JobWorkerDeploymentPlan;
+}
+
+export interface JobWorkerDeploymentPlan {
+  readonly provider: string;
+  readonly publication: "native";
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly buildId: string;
+  readonly serviceGeneration: string;
+  readonly runtime: "bun" | "node";
+  readonly limits?: JsonValue;
+  readonly schemaHashes?: JsonValue;
+  readonly policy?: JsonValue;
+  readonly stages: readonly [
+    "provision",
+    "secrets",
+    "publish",
+    "register",
+    "readiness",
+    "schedules",
+    "activate",
+  ];
 }
 
 export interface ScheduleDeploymentPlan extends DeploymentCapabilityPlan {
@@ -102,29 +141,6 @@ export interface CacheDeploymentPlan extends DeploymentCapabilityPlan {
   readonly profile: string;
   readonly defaultTtlMs?: number;
   readonly maxTtlMs?: number;
-}
-
-/** One safe, logical-resource IAM statement for the shared application role. */
-export interface DeploymentIamStatement {
-  readonly capability: string;
-  readonly actions: readonly string[];
-  /** Stable deployment logical names, never resolved ARNs or secret values. */
-  readonly resources: readonly string[];
-}
-
-/** Desired isolation metadata retained while the POC uses one shared task role. */
-export interface DeploymentFunctionCapability {
-  readonly functionId: string;
-  readonly capability: string;
-  readonly resourceId: string;
-  readonly actions: readonly string[];
-}
-
-export interface DeploymentIamPlan {
-  readonly serviceRole: {
-    readonly statements: readonly DeploymentIamStatement[];
-  };
-  readonly perFunction: readonly DeploymentFunctionCapability[];
 }
 
 /** Complete provider-neutral deployment input for the Pulumi adapter. */

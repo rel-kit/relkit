@@ -5,7 +5,15 @@ import type { ProviderBindingNode } from "./provider-nodes.js";
 import type { ServiceNode } from "./service-nodes.js";
 import type { AgentNode } from "./agent-node.js";
 import type { HookNode, JobNode, TaskNode } from "./task-nodes.js";
-export type { FunctionHookNode, HookNode, JobNode, LegacyJobNode, TaskHookNode, TaskJobNode, TaskNode } from "./task-nodes.js";
+export type {
+  FunctionHookNode,
+  HookNode,
+  JobNode,
+  LegacyJobNode,
+  TaskHookNode,
+  TaskJobNode,
+  TaskNode,
+} from "./task-nodes.js";
 export type {
   AgentNode,
   AgentResourceDependency,

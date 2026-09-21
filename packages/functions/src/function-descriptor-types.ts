@@ -13,8 +13,23 @@ import type { FunctionAsTool } from "./function-as-tool-types.js";
 import type { FunctionAsGraphNode } from "./function-graph-node.js";
 import type { FunctionHandlerResult } from "./handler-result.js";
 import type { StreamOutputSchema } from "./stream.js";
-import type { AgentClients, BucketClients, CacheClients, JobClients, TaskClients } from "./clients.js";
-import type { AgentRefAny, BucketRefAny, CacheRefAny, FunctionRef, JobRefAny, TaskRefAny } from "./types.js";
+import type {
+  AgentClients,
+  BucketClients,
+  CacheClients,
+  JobClients,
+  TaskClients,
+} from "./clients.js";
+import type {
+  AgentRefAny,
+  BucketRefAny,
+  CacheRefAny,
+  FunctionRef,
+  JobRefAny,
+  TaskRefAny,
+} from "./types.js";
+import type { FunctionLifecycleHook, ProgressValue } from "./function-lifecycle-types.js";
+export type { FunctionLifecycleHook } from "./function-lifecycle-types.js";
 
 export interface FunctionDependencies {
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
@@ -181,17 +196,3 @@ export type FunctionHandler<
   input: Input,
   context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
-
-export type FunctionLifecycleHook<
-  Value,
-  Dependencies extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
-  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-> = (
-  value: Value,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
-) => MaybePromise<Value>;
-
-type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends StandardSchemaV1
-  ? InferOutput<Schema>
-  : never;
