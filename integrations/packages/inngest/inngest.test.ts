@@ -41,6 +41,12 @@ test("rejects non-http native API endpoints before creating a runtime", () => {
   ).toThrow("baseUrl is invalid");
 });
 
+test("rejects non-http native API endpoints before creating a run API", () => {
+  expect(() => createInngestRunApi({ baseUrl: "file:///private/secret" })).toThrow(
+    "baseUrl is invalid",
+  );
+});
+
 test("maps only certified native policy fields", () => {
   expect(
     createInngestFunctionConfig({

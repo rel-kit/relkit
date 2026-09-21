@@ -19,6 +19,12 @@ describe("jobs CLI", () => {
     expect(url.hostname).toBe("127.0.0.1");
   });
 
+  test("rejects an unsafe local server port before building a request URL", () => {
+    expect(() => jobsBaseUrl("3000@attacker.example")).toThrow(
+      "PORT must be a valid local server port.",
+    );
+  });
+
   test("resolves a durable job ID and submits through the jobs RPC", async () => {
     const root = await project({ "input.json": JSON.stringify({ orderId: "order-1" }) });
     const requests: Request[] = [];

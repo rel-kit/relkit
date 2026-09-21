@@ -61,7 +61,7 @@ export function createInngestRunApi(options: {
     init: RequestInit = {},
     signal?: AbortSignal,
   ): Promise<Record<string, unknown>> => {
-    // lgtm [js/request-forgery]
+    // codeql[js/request-forgery]
     const response = await fetcher(`${options.baseUrl.replace(/\/$/u, "")}${path}`, {
       ...init,
       headers: {

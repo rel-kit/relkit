@@ -44,7 +44,7 @@ export async function fetchJobsJson(
     ...(options.signal === undefined ? {} : { signal: options.signal }),
   };
   if (options.body !== undefined) init.body = JSON.stringify(options.body);
-  const response = await fetch(url, init); // lgtm [js/request-forgery]
+  const response = await fetch(url, init); // codeql[js/request-forgery]
   const body = await response.json().catch(() => ({}));
   if (!response.ok)
     throw new JobsCommandError(
@@ -54,8 +54,12 @@ export async function fetchJobsJson(
   return body;
 }
 
-export function jobsBaseUrl(): string {
-  return `http://127.0.0.1:${process.env.PORT ?? "3000"}`;
+export function jobsBaseUrl(environmentPort = process.env.PORT): string {
+  const port = Number(environmentPort ?? "3000");
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new JobsCommandError("RELKIT_JOBS_USAGE", "PORT must be a valid local server port.");
+  }
+  return `http://127.0.0.1:${port}`;
 }
 
 export async function readJobsJsonFile(projectRoot: string, path: string): Promise<unknown> {
