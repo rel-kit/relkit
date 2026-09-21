@@ -1,4 +1,9 @@
-import type { NativeObservation, NativeRun, NativeWatchRequest, OperationContext } from "@relkit/jobs/adapter";
+import type {
+  NativeObservation,
+  NativeRun,
+  NativeWatchRequest,
+  OperationContext,
+} from "@relkit/jobs/adapter";
 import type { RunSnapshot } from "@relkit/contracts/jobs";
 import type { TriggerNativeClient } from "./native.js";
 import { record, triggerSnapshot } from "./sdk-mapping.js";
@@ -53,8 +58,10 @@ async function* pollTriggerRun(
 ): AsyncGenerator<NativeObservation> {
   const pollIntervalMs = options.pollIntervalMs ?? 2_000;
   const maxPolls = options.maxPolls ?? 240;
-  if (!Number.isSafeInteger(pollIntervalMs) || pollIntervalMs < 1) throw new TypeError("Trigger poll interval is invalid");
-  if (!Number.isSafeInteger(maxPolls) || maxPolls < 1) throw new TypeError("Trigger maxPolls is invalid");
+  if (!Number.isSafeInteger(pollIntervalMs) || pollIntervalMs < 1)
+    throw new TypeError("Trigger poll interval is invalid");
+  if (!Number.isSafeInteger(maxPolls) || maxPolls < 1)
+    throw new TypeError("Trigger maxPolls is invalid");
   let current = initial;
   let nextSequence = sequence;
   for (let count = 0; count < maxPolls && !terminal(current); count += 1) {
@@ -68,7 +75,12 @@ async function* pollTriggerRun(
   }
 }
 
-function frame(kind: "snapshot" | "update", run: RunSnapshot, epoch: string, sequence: number): NativeObservation {
+function frame(
+  kind: "snapshot" | "update",
+  run: RunSnapshot,
+  epoch: string,
+  sequence: number,
+): NativeObservation {
   return Object.freeze({
     kind,
     run,
@@ -91,11 +103,14 @@ function rawRun(value: unknown, context: OperationContext): NativeRun {
 
 function rawVersion(value: unknown): number | undefined {
   const record = asRecord(value);
-  return typeof record?.version === "number" && Number.isSafeInteger(record.version) ? record.version : undefined;
+  return typeof record?.version === "number" && Number.isSafeInteger(record.version)
+    ? record.version
+    : undefined;
 }
 
 function ensureScope(run: NativeRun, context: OperationContext): void {
-  if (run.scope !== undefined && run.scope !== context.scope) throw new Error("RELKIT_TRIGGER_SCOPE_MISMATCH");
+  if (run.scope !== undefined && run.scope !== context.scope)
+    throw new Error("RELKIT_TRIGGER_SCOPE_MISMATCH");
 }
 
 function terminal(run: NativeRun): boolean {
@@ -126,9 +141,11 @@ async function read(
   timeoutMs: number | undefined,
 ): Promise<NativeRun> {
   if (timeoutMs === undefined) return get(runId, context);
-  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) throw new TypeError("Trigger read timeout is invalid");
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1)
+    throw new TypeError("Trigger read timeout is invalid");
   const controller = new AbortController();
-  const abort = (): void => controller.abort(context.signal.reason ?? new Error("Trigger observation aborted"));
+  const abort = (): void =>
+    controller.abort(context.signal.reason ?? new Error("Trigger observation aborted"));
   if (context.signal.aborted) abort();
   else context.signal.addEventListener("abort", abort, { once: true });
   const timer = setTimeout(() => controller.abort(new Error("Trigger read timed out")), timeoutMs);
@@ -141,5 +158,7 @@ async function read(
 }
 
 function asRecord(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, any>)
+    : undefined;
 }
