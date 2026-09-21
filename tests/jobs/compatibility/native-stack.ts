@@ -19,6 +19,10 @@ export type NativeStack = {
   readonly close: () => Promise<void>;
 };
 
+export type NativeStackOptions = {
+  readonly healthTimeoutMs?: number;
+};
+
 export async function reservePort(): Promise<number> {
   const server = Bun.serve({ port: 0, fetch: () => new Response() });
   const port = server.port;
@@ -46,7 +50,10 @@ export async function waitFor<T>(
   throw new Error(`Timed out waiting for ${label}: ${String(lastError ?? "not ready")}`);
 }
 
-export async function startNativeStack(workerPort: number): Promise<NativeStack> {
+export async function startNativeStack(
+  workerPort: number,
+  options: NativeStackOptions = {},
+): Promise<NativeStack> {
   const suffix = randomUUID().replaceAll("-", "").slice(0, 12);
   const namespace = `relkit-jobs-${suffix}`;
   const network = `${namespace}-network`;
@@ -154,7 +161,11 @@ export async function startNativeStack(workerPort: number): Promise<NativeStack>
       "--log-level",
       "debug",
     ]);
-    await waitFor("Inngest health", async () => (await fetch(`${baseUrl}/health`)).ok);
+    await waitFor(
+      "Inngest health",
+      async () => (await fetch(`${baseUrl}/health`)).ok,
+      options.healthTimeoutMs ?? 30_000,
+    );
     const close = async () => {
       await docker(["rm", "-f", inngest, redis, postgres], true);
       await docker(["volume", "rm", "-f", redisVolume, postgresVolume], true);

@@ -31,7 +31,7 @@ let stack: NativeStack | undefined;
 let activeWorker: ReturnType<typeof createNativeWorker> | undefined;
 
 try {
-  stack = await startNativeStack(workerPort);
+  stack = await startNativeStack(workerPort, { healthTimeoutMs: 120_000 });
   activeWorker = createNativeWorker({
     namespace: stack.namespace,
     baseUrl: stack.baseUrl,

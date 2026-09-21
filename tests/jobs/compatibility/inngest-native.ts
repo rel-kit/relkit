@@ -22,7 +22,7 @@ let stack: NativeStack | undefined;
 let nativeWorker: ReturnType<typeof createNativeWorker> | undefined;
 
 try {
-  stack = await startNativeStack(workerPort);
+  stack = await startNativeStack(workerPort, { healthTimeoutMs: 120_000 });
   const observerUrl = `http://127.0.0.1:${observer.port}/observe`;
   nativeWorker = createNativeWorker({
     namespace: stack.namespace,
