@@ -2,6 +2,7 @@ import "@relkit/pulumi";
 import { defineApp, env as binding } from "@relkit/app/config";
 import { aws } from "@relkit/aws";
 import { docker } from "@relkit/docker";
+import { inngest } from "@relkit/inngest";
 import { otlp } from "@relkit/otlp";
 import { redis, redisAgentState, redisRealtime } from "@relkit/redis";
 import { s3 } from "@relkit/s3";
@@ -49,12 +50,14 @@ export default defineApp({
   "agent-state": {
     agents: docker(redisAgentState({ url: binding.secret("AGENT_STATE_REDIS_URL") })),
   },
+  jobs: { default: docker(inngest()) },
   // #endregion cache-profile
   defaults: {
     bucket: "assets",
     cache: "requests",
     realtime: "default",
     "agent-state": "agents",
+    jobs: "default",
   },
   // #region telemetry
   telemetry: {
