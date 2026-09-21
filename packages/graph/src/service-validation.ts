@@ -32,7 +32,10 @@ export function validateServiceNode(
     names.add(member.name);
     validateId(member.eventId, `Graph nodes[${index}].events[${memberIndex}].eventId`);
   });
-  for (const [field, idField] of [["tasks", "taskId"], ["jobs", "jobId"]] as const) {
+  for (const [field, idField] of [
+    ["tasks", "taskId"],
+    ["jobs", "jobId"],
+  ] as const) {
     if (value[field] === undefined) continue;
     if (!Array.isArray(value[field])) fail(`Graph nodes[${index}].${field} must be an array.`);
     value[field].forEach((member, memberIndex) => {

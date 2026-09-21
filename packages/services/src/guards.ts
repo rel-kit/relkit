@@ -58,7 +58,13 @@ export function isServiceDescriptor(value: unknown): value is ServiceDescriptorA
   if (!isRecord(value) || !isDescriptor(value, "service") || hasOwn(value, "handler")) return false;
   for (const [name, member] of serviceMemberEntries(value)) {
     if (isReservedServiceMemberName(name)) continue;
-    if (!isFunctionDescriptor(member) && !isEventDescriptor(member) && !isTaskDescriptor(member) && !isJobDescriptor(member)) return false;
+    if (
+      !isFunctionDescriptor(member) &&
+      !isEventDescriptor(member) &&
+      !isTaskDescriptor(member) &&
+      !isJobDescriptor(member)
+    )
+      return false;
   }
   return true;
 }

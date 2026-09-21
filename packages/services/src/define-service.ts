@@ -58,7 +58,12 @@ export const defineService: DefineService = <
   };
   assertServiceDescriptor(descriptor);
   bindDescriptorServiceMembers(
-    [...Object.values(functions), ...Object.values(events), ...Object.values(tasks), ...Object.values(jobs)],
+    [
+      ...Object.values(functions),
+      ...Object.values(events),
+      ...Object.values(tasks),
+      ...Object.values(jobs),
+    ],
     descriptor,
   );
   return deepFreeze(descriptor) as ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>;
@@ -81,9 +86,7 @@ function copyMembers<T>(
   return members;
 }
 
-function assertUniqueMembers(
-  ...maps: readonly Readonly<Record<string, unknown>>[]
-): void {
+function assertUniqueMembers(...maps: readonly Readonly<Record<string, unknown>>[]): void {
   const names = new Set<string>();
   for (const members of maps) {
     for (const name of Object.keys(members)) {
