@@ -1,7 +1,10 @@
 import type { PendingOperationMetadata } from "@relkit/contracts";
 
 export const PENDING_PREFIX = "relkit.pending.";
-export const pendingMemory = new Map<string, { readonly metadata: PendingOperationMetadata; readonly request?: unknown }>();
+export const pendingMemory = new Map<
+  string,
+  { readonly metadata: PendingOperationMetadata; readonly request?: unknown }
+>();
 
 export function pendingEntryKey(scopeKey: string, operationId: string): string {
   return `${PENDING_PREFIX}${scopeKey}.${operationId}`;

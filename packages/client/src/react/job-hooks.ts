@@ -16,11 +16,10 @@ import { useRelkitClient, type RelkitClientRuntime } from "./context.js";
 export type { JobMutationOptions } from "./job-mutation-hooks.js";
 export { useJobCancel, useJobRetry, useJobTrigger } from "./job-mutation-hooks.js";
 
-export interface UseJobRunOptions
-  extends Omit<
-    JobWatchOptions,
-    "runId" | "expectedIdentity" | "identityKey" | "applicationId" | "protocolVersion"
-  > {
+export interface UseJobRunOptions extends Omit<
+  JobWatchOptions,
+  "runId" | "expectedIdentity" | "identityKey" | "applicationId" | "protocolVersion"
+> {
   readonly runId?: string;
   readonly enabled?: boolean;
   readonly autoConnect?: boolean;
@@ -62,7 +61,9 @@ export function useJobRun<Name extends JobWatchName>(
     () =>
       watchOptions === undefined
         ? undefined
-        : (watchJobRun(runtime.streamClient, name, watchOptions) as JobWatchController<JobRunFor<Name>>),
+        : (watchJobRun(runtime.streamClient, name, watchOptions) as JobWatchController<
+            JobRunFor<Name>
+          >),
     [runtime.streamClient, name, watchOptions],
   );
   const subscribe = useCallback(
@@ -83,7 +84,8 @@ export function useJobRun<Name extends JobWatchName>(
     };
   }, [controller]);
   useEffect(() => {
-    if (controller === undefined || options.enabled === false || options.autoConnect === false) return;
+    if (controller === undefined || options.enabled === false || options.autoConnect === false)
+      return;
     void controller.connect().catch(() => undefined);
   }, [controller, options.autoConnect, options.enabled]);
 
@@ -96,9 +98,13 @@ export function useJobRun<Name extends JobWatchName>(
   return { ...state, connect, disconnect, refetch };
 }
 
-function buildWatchOptions(runtime: RelkitClientRuntime, options: UseJobRunOptions): JobWatchOptions | undefined {
+function buildWatchOptions(
+  runtime: RelkitClientRuntime,
+  options: UseJobRunOptions,
+): JobWatchOptions | undefined {
   const identity = runtime.identity;
-  if (options.runId === undefined || runtime.status !== "ready" || identity === undefined) return undefined;
+  if (options.runId === undefined || runtime.status !== "ready" || identity === undefined)
+    return undefined;
   const expectedIdentity = options.expectedIdentity ?? {
     identityScope: identity.identityScope,
     sessionEpoch: identity.sessionEpoch,
@@ -118,9 +124,15 @@ function buildWatchOptions(runtime: RelkitClientRuntime, options: UseJobRunOptio
     ...(options.schemaVersion === undefined ? {} : { schemaVersion: options.schemaVersion }),
     ...(options.source === undefined ? {} : { source: options.source }),
     ...(options.pollIntervalMs === undefined ? {} : { pollIntervalMs: options.pollIntervalMs }),
-    ...(options.maxReconnectAttempts === undefined ? {} : { maxReconnectAttempts: options.maxReconnectAttempts }),
-    ...(options.reconnectMinDelayMs === undefined ? {} : { reconnectMinDelayMs: options.reconnectMinDelayMs }),
-    ...(options.reconnectMaxDelayMs === undefined ? {} : { reconnectMaxDelayMs: options.reconnectMaxDelayMs }),
+    ...(options.maxReconnectAttempts === undefined
+      ? {}
+      : { maxReconnectAttempts: options.maxReconnectAttempts }),
+    ...(options.reconnectMinDelayMs === undefined
+      ? {}
+      : { reconnectMinDelayMs: options.reconnectMinDelayMs }),
+    ...(options.reconnectMaxDelayMs === undefined
+      ? {}
+      : { reconnectMaxDelayMs: options.reconnectMaxDelayMs }),
     ...(options.readTimeoutMs === undefined ? {} : { readTimeoutMs: options.readTimeoutMs }),
   };
 }
@@ -129,4 +141,7 @@ function unavailable(): Promise<never> {
   return Promise.reject(new JobWatchUnavailableError());
 }
 
-const EMPTY_STATE: JobWatchState<RunSnapshot> = Object.freeze({ connection: "idle", isStale: false });
+const EMPTY_STATE: JobWatchState<RunSnapshot> = Object.freeze({
+  connection: "idle",
+  isStale: false,
+});

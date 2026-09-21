@@ -11,41 +11,24 @@ import {
   removePendingStorage,
   writePendingStorage,
 } from "./pending-store.js";
-
-const MAX_JOB_INTENTS = 100;
+import {
+  MAX_JOB_INTENTS,
+  PendingCapacityError,
+  PendingRecoveryUnavailableError,
+  PendingRequestMismatchError,
+} from "./pending-errors.js";
+import { candidates, isRecord } from "./pending-support.js";
+export {
+  PendingCapacityError,
+  PendingRecoveryUnavailableError,
+  PendingRequestMismatchError,
+} from "./pending-errors.js";
 
 export interface PendingRememberOptions {
   readonly operationId?: string;
   readonly idempotencyKey?: string;
   readonly recovery?: JobUnknownOutcome["recovery"];
   readonly retainRequest?: boolean;
-}
-
-export class PendingCapacityError extends Error {
-  readonly code = "RELKIT_PENDING_CAPACITY" as const;
-
-  constructor() {
-    super(`At most ${MAX_JOB_INTENTS} unresolved job submissions may be tracked for one identity.`);
-    this.name = "PendingCapacityError";
-  }
-}
-
-export class PendingRequestMismatchError extends Error {
-  readonly code = "RELKIT_PENDING_REQUEST_MISMATCH" as const;
-
-  constructor() {
-    super("A tracked job operationId cannot be reused with a different request digest.");
-    this.name = "PendingRequestMismatchError";
-  }
-}
-
-export class PendingRecoveryUnavailableError extends Error {
-  readonly code = "RELKIT_PENDING_RECOVERY_UNAVAILABLE" as const;
-
-  constructor() {
-    super("A tracked unknown job operation cannot be retried without an active same-key recovery window.");
-    this.name = "PendingRecoveryUnavailableError";
-  }
 }
 
 export function pendingScopeKey(scope: RelkitKeyScope): string {
@@ -60,16 +43,31 @@ export async function rememberPending(
   references: Pick<PendingOperationMetadata, "threadId" | "runId"> = {},
   options: PendingRememberOptions = {},
 ): Promise<PendingOperationMetadata> {
-  const operationId = (options.operationId ?? createOperationId()) as PendingOperationMetadata["operationId"];
-  const existingMetadata = pendingOperations(scopeKey).find((entry) => entry.operationId === operationId);
-  if (kind === "job-trigger" && existingMetadata === undefined && jobIntentCount(scopeKey) >= MAX_JOB_INTENTS) {
+  const operationId = (options.operationId ??
+    createOperationId()) as PendingOperationMetadata["operationId"];
+  const existingMetadata = pendingOperations(scopeKey).find(
+    (entry) => entry.operationId === operationId,
+  );
+  if (
+    kind === "job-trigger" &&
+    existingMetadata === undefined &&
+    jobIntentCount(scopeKey) >= MAX_JOB_INTENTS
+  ) {
     throw new PendingCapacityError();
   }
   const requestDigest = await digestPendingRequest(value);
-  if (kind === "job-trigger" && existingMetadata !== undefined && existingMetadata.requestDigest !== requestDigest) {
+  if (
+    kind === "job-trigger" &&
+    existingMetadata !== undefined &&
+    existingMetadata.requestDigest !== requestDigest
+  ) {
     throw new PendingRequestMismatchError();
   }
-  if (kind === "job-trigger" && existingMetadata?.state === "unknown" && !sameKeyRecoveryActive(existingMetadata)) {
+  if (
+    kind === "job-trigger" &&
+    existingMetadata?.state === "unknown" &&
+    !sameKeyRecoveryActive(existingMetadata)
+  ) {
     throw new PendingRecoveryUnavailableError();
   }
   const metadata: PendingOperationMetadata = {
@@ -98,10 +96,17 @@ export async function rememberJobPending(
   request: unknown,
   options: PendingRememberOptions = {},
 ): Promise<PendingOperationMetadata> {
-  return rememberPending(scopeKey, "job-trigger", resourceId, request, {}, {
-    ...options,
-    retainRequest: true,
-  });
+  return rememberPending(
+    scopeKey,
+    "job-trigger",
+    resourceId,
+    request,
+    {},
+    {
+      ...options,
+      retainRequest: true,
+    },
+  );
 }
 
 export function updatePending(scopeKey: string, value: PendingOperationMetadata): void {
@@ -122,7 +127,8 @@ export function forgetPending(scopeKey: string, operationId: string): void {
 export function pendingOperations(scopeKey: string): readonly PendingOperationMetadata[] {
   const result = readPendingStorage(scopeKey);
   for (const [key, value] of pendingMemory) {
-    if (key.startsWith(`${PENDING_PREFIX}${scopeKey}.`)) result.set(value.metadata.operationId, value.metadata);
+    if (key.startsWith(`${PENDING_PREFIX}${scopeKey}.`))
+      result.set(value.metadata.operationId, value.metadata);
   }
   return [...result.values()];
 }
@@ -156,7 +162,8 @@ export function jobUnknownOutcome(value: unknown): JobUnknownOutcome | undefined
     if (
       isRecord(candidate) &&
       candidate.outcome === "unknown" &&
-      (candidate.code === "RELKIT_JOB_SUBMISSION_UNKNOWN" || candidate.code === "RELKIT_JOB_CONTROL_UNKNOWN") &&
+      (candidate.code === "RELKIT_JOB_SUBMISSION_UNKNOWN" ||
+        candidate.code === "RELKIT_JOB_CONTROL_UNKNOWN") &&
       typeof candidate.operationId === "string" &&
       isRecord(candidate.recovery) &&
       (candidate.recovery.action === "retry-with-same-key" ||
@@ -185,13 +192,4 @@ function sameKeyRecoveryActive(metadata: PendingOperationMetadata): boolean {
     recovery?.action === "retry-with-same-key" &&
     (recovery.expiresAt === undefined || Date.parse(recovery.expiresAt) > Date.now())
   );
-}
-
-function candidates(value: unknown): readonly unknown[] {
-  if (!isRecord(value)) return [value];
-  return [value, value.data, value.cause, isRecord(value.cause) ? value.cause.data : undefined];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object";
 }

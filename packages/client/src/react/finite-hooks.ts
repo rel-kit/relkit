@@ -29,6 +29,8 @@ import {
   updatePending,
 } from "./pending.js";
 import { generatedJobTriggerName, prepareJobRequest } from "./job-hooks-support.js";
+export { RelkitWriteError } from "./write-error.js";
+import { RelkitWriteError } from "./write-error.js";
 
 type QueryInput<Name extends QuerySelector, Selected> = Omit<
   UseQueryOptions<OutputFor<Name>, ErrorFor<Name>, Selected>,
@@ -118,7 +120,9 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
           ? await rememberPending(scopeKey, "mutation", name, effectiveInput)
           : await rememberJobPending(scopeKey, name, effectiveInput, {
               operationId: prepared.operationId,
-              ...(prepared.idempotencyKey === undefined ? {} : { idempotencyKey: prepared.idempotencyKey }),
+              ...(prepared.idempotencyKey === undefined
+                ? {}
+                : { idempotencyKey: prepared.idempotencyKey }),
             });
       try {
         const value = await original(effectiveInput, mutationContext);
@@ -146,16 +150,6 @@ export function useRouteMutation<Name extends MutationSelector, Context = unknow
         : relkitJobKey(runtime.scope, "trigger", { jobId: generatedJobTriggerName(name)! })
       : ["relkit", "blocked", name],
   } as UseMutationOptions<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>);
-}
-
-export class RelkitWriteError extends Error {
-  constructor(
-    readonly outcome: "not-sent" | "unknown",
-    message: string,
-  ) {
-    super(message);
-    this.name = "RelkitWriteError";
-  }
 }
 
 export function useInfiniteRoute<
