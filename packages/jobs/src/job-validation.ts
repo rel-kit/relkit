@@ -1,9 +1,5 @@
 import type { MaybePromise } from "@relkit/contracts";
-import type {
-  JobAccessGrant,
-  JobAccessRequest,
-  JobClientOperation,
-} from "@relkit/contracts/jobs";
+import type { JobAccessGrant, JobAccessRequest, JobClientOperation } from "@relkit/contracts/jobs";
 import { duration } from "./task-validation.js";
 import type { JobAdmission, JobClientAccess, JobClientField } from "./job-types.js";
 import { assertCanonicalScalarKey, assertFieldName } from "./task-policy-validation.js";
@@ -31,7 +27,8 @@ export function copyAdmission<Input>(
   }
   let idempotency: Record<string, unknown> | undefined;
   if (value.idempotency !== undefined) {
-    if (!isRecord(value.idempotency)) throw new TypeError("admission.idempotency must be an object");
+    if (!isRecord(value.idempotency))
+      throw new TypeError("admission.idempotency must be an object");
     if (
       value.idempotency.key !== undefined &&
       (typeof value.idempotency.key !== "string" || value.idempotency.key.length === 0)
@@ -41,14 +38,24 @@ export function copyAdmission<Input>(
     if (value.idempotency.key !== undefined) {
       assertFieldName(value.idempotency.key, "admission.idempotency.key");
       if (canonicalSchema !== undefined) {
-        assertCanonicalScalarKey(canonicalSchema, value.idempotency.key, "admission.idempotency.key");
+        assertCanonicalScalarKey(
+          canonicalSchema,
+          value.idempotency.key,
+          "admission.idempotency.key",
+        );
       }
     }
     idempotency = {
       ...(value.idempotency.key === undefined ? {} : { key: value.idempotency.key }),
       ...(value.idempotency.retention === undefined
         ? {}
-        : { retention: duration(value.idempotency.retention, "admission.idempotency.retention", true) }),
+        : {
+            retention: duration(
+              value.idempotency.retention,
+              "admission.idempotency.retention",
+              true,
+            ),
+          }),
     };
   }
   return Object.freeze({
@@ -62,7 +69,10 @@ export interface ClientDeclarations {
   readonly streams?: unknown;
 }
 
-export function copyClient(value: unknown, declarations: ClientDeclarations): JobClientAccess | undefined {
+export function copyClient(
+  value: unknown,
+  declarations: ClientDeclarations,
+): JobClientAccess | undefined {
   if (value === undefined) return undefined;
   if (!isRecord(value)) throw new TypeError("Job client access must be an object");
   if (!Array.isArray(value.operations) || value.operations.length === 0) {
@@ -70,8 +80,10 @@ export function copyClient(value: unknown, declarations: ClientDeclarations): Jo
   }
   if (
     value.operations.some(
-      (operation) => typeof operation !== "string" || !OPERATIONS.includes(operation as JobClientOperation),
-    ) || new Set(value.operations).size !== value.operations.length
+      (operation) =>
+        typeof operation !== "string" || !OPERATIONS.includes(operation as JobClientOperation),
+    ) ||
+    new Set(value.operations).size !== value.operations.length
   ) {
     throw new TypeError("client.operations contains an invalid or duplicate operation");
   }
@@ -100,7 +112,11 @@ export function copyClient(value: unknown, declarations: ClientDeclarations): Jo
       throw new TypeError("client.streams must be unique");
     }
     for (const stream of value.streams) {
-      if (typeof stream !== "string" || !isRecord(declarations.streams) || !Object.hasOwn(declarations.streams, stream)) {
+      if (
+        typeof stream !== "string" ||
+        !isRecord(declarations.streams) ||
+        !Object.hasOwn(declarations.streams, stream)
+      ) {
         throw new TypeError(`client.streams contains undeclared stream "${String(stream)}"`);
       }
     }
@@ -112,12 +128,19 @@ export function copyClient(value: unknown, declarations: ClientDeclarations): Jo
   if (publicAccess === (typeof authorize === "function")) {
     throw new TypeError("Job client access must choose public or authorize");
   }
-  if (value.public !== undefined && value.public !== true) throw new TypeError("client.public must be true");
+  if (value.public !== undefined && value.public !== true)
+    throw new TypeError("client.public must be true");
   const result = {
-    ...(publicAccess ? { public: true as const } : { authorize: authorize as (request: JobAccessRequest) => MaybePromise<JobAccessGrant> }),
+    ...(publicAccess
+      ? { public: true as const }
+      : { authorize: authorize as (request: JobAccessRequest) => MaybePromise<JobAccessGrant> }),
     operations: Object.freeze([...operations]) as readonly JobClientOperation[],
-    ...(fields === undefined ? {} : { fields: Object.freeze([...fields]) as readonly JobClientField[] }),
-    ...(value.streams === undefined ? {} : { streams: Object.freeze([...value.streams]) as readonly string[] }),
+    ...(fields === undefined
+      ? {}
+      : { fields: Object.freeze([...fields]) as readonly JobClientField[] }),
+    ...(value.streams === undefined
+      ? {}
+      : { streams: Object.freeze([...value.streams]) as readonly string[] }),
   };
   return Object.freeze(result) as JobClientAccess;
 }

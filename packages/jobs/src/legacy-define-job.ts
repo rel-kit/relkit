@@ -82,8 +82,10 @@ export function defineJob<
 ): JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target> {
   if (!isRecord(options)) throw new TypeError("Job options must be an object");
   if (hasOwn(options, "handler")) throw new TypeError("Jobs cannot own handlers");
-  if (!isSchema(options.input)) throw new TypeError("Job input must be a Standard Schema v1 validator");
-  if (!isFunctionTarget(options.target)) throw new TypeError("Job target must be a function reference");
+  if (!isSchema(options.input))
+    throw new TypeError("Job input must be a Standard Schema v1 validator");
+  if (!isFunctionTarget(options.target))
+    throw new TypeError("Job target must be a function reference");
   const profile = options.profile === undefined ? undefined : normalizeId(options.profile);
   const retry = validateRetry(options.retry);
   if (options.timeoutMs !== undefined) positiveInteger(options.timeoutMs, "timeoutMs");
@@ -139,7 +141,8 @@ function copyIdempotency<Input>(
 }
 
 function positiveInteger(value: unknown, name: string): number {
-  if (!Number.isSafeInteger(value) || (value as number) < 1) throw new TypeError(`${name} must be a positive integer`);
+  if (!Number.isSafeInteger(value) || (value as number) < 1)
+    throw new TypeError(`${name} must be a positive integer`);
   return value as number;
 }
 function requiredText(value: unknown, name: string): string {
@@ -147,10 +150,21 @@ function requiredText(value: unknown, name: string): string {
   return value.trim();
 }
 function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return isRecord(value) && value.invocationMode !== "event-only" && isRef(value.ref, "function") && isSchema(value.input) && isSchema(value.output);
+  return (
+    isRecord(value) &&
+    value.invocationMode !== "event-only" &&
+    isRef(value.ref, "function") &&
+    isSchema(value.input) &&
+    isSchema(value.output)
+  );
 }
 function isSchema(value: unknown): value is StandardSchemaV1 {
-  return isRecord(value) && isRecord(value["~standard"]) && value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
+  return (
+    isRecord(value) &&
+    isRecord(value["~standard"]) &&
+    value["~standard"].version === 1 &&
+    typeof value["~standard"].validate === "function"
+  );
 }
 function hasOwn(value: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(value, key);

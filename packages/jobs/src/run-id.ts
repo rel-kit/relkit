@@ -10,10 +10,7 @@ import {
 } from "./run-id-support.js";
 
 export { RunLocatorError } from "./run-id-errors.js";
-export {
-  namespaceHash,
-  validateRunLocatorKeyRing,
-} from "./run-id-support.js";
+export { namespaceHash, validateRunLocatorKeyRing } from "./run-id-support.js";
 
 export const RUN_LOCATOR_VERSION = 1 as const;
 export const RUN_LOCATOR_MAX_BYTES = 4096 as const;
@@ -80,7 +77,8 @@ export function verifyRunLocator(
   options: RunLocatorVerifyOptions,
 ): VerifiedRunLocator {
   validateRunLocatorKeyRing(options.keyRing);
-  if (typeof locator !== "string" || byteLength(locator) > RUN_LOCATOR_MAX_BYTES) throw new RunLocatorError();
+  if (typeof locator !== "string" || byteLength(locator) > RUN_LOCATOR_MAX_BYTES)
+    throw new RunLocatorError();
   const parts = locator.split(".");
   if (parts.length !== 2) throw new RunLocatorError();
   const [encodedBody, encodedMac] = parts;
@@ -103,10 +101,11 @@ export function verifyRunLocator(
   }
   const payload = normalizePayload(body.payload);
   if (
-    options.application !== undefined && payload.application !== options.application ||
-    options.environment !== undefined && payload.environment !== options.environment ||
-    options.scope !== undefined &&
-    payload.namespaceHash !== namespaceHash(payload.application, payload.environment, options.scope)
+    (options.application !== undefined && payload.application !== options.application) ||
+    (options.environment !== undefined && payload.environment !== options.environment) ||
+    (options.scope !== undefined &&
+      payload.namespaceHash !==
+        namespaceHash(payload.application, payload.environment, options.scope))
   ) {
     throw new RunLocatorError();
   }
@@ -146,8 +145,15 @@ function byteLength(value: string): number {
   return new TextEncoder().encode(value).byteLength;
 }
 
-function isBody(value: unknown): value is { readonly version: 1; readonly keyId: string; readonly payload: RunLocatorPayload } {
-  return isRecord(value) && value.version === 1 && typeof value.keyId === "string" && isRecord(value.payload);
+function isBody(
+  value: unknown,
+): value is { readonly version: 1; readonly keyId: string; readonly payload: RunLocatorPayload } {
+  return (
+    isRecord(value) &&
+    value.version === 1 &&
+    typeof value.keyId === "string" &&
+    isRecord(value.payload)
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, any> {

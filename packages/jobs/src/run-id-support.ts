@@ -11,18 +11,28 @@ export function namespaceHash(application: string, environment: string, scope: s
 
 export function normalizePayload(value: RunLocatorPayload): RunLocatorPayload {
   if (!isRecord(value) || !isRecord(value.native)) throw new RunLocatorError();
-  const fields = ["application", "environment", "serviceGeneration", "jobId", "taskId", "taskVersion", "buildId"] as const;
+  const fields = [
+    "application",
+    "environment",
+    "serviceGeneration",
+    "jobId",
+    "taskId",
+    "taskVersion",
+    "buildId",
+  ] as const;
   for (const field of fields) assertBoundedText(value[field]);
   if (value.scope !== undefined) assertBoundedText(value.scope);
   assertBoundedText(value.native.kind);
   assertBoundedText(value.native.value, 2048);
-  const expectedNamespace = value.scope === undefined
-    ? value.namespaceHash
-    : namespaceHash(value.application, value.environment, value.scope);
+  const expectedNamespace =
+    value.scope === undefined
+      ? value.namespaceHash
+      : namespaceHash(value.application, value.environment, value.scope);
   if (expectedNamespace === undefined || !/^sha256:[0-9a-f]{64}$/u.test(expectedNamespace)) {
     throw new RunLocatorError();
   }
-  if (value.namespaceHash !== undefined && value.namespaceHash !== expectedNamespace) throw new RunLocatorError();
+  if (value.namespaceHash !== undefined && value.namespaceHash !== expectedNamespace)
+    throw new RunLocatorError();
   if (value.schemaHash !== undefined) assertBoundedText(value.schemaHash);
   return Object.freeze({
     application: value.application,
@@ -39,7 +49,8 @@ export function normalizePayload(value: RunLocatorPayload): RunLocatorPayload {
 }
 
 export function validateRunLocatorKeyRing(ring: RunLocatorKeyRing): void {
-  if (!isRecord(ring) || typeof ring.activeKeyId !== "string" || !isRecord(ring.keys)) throw new RunLocatorError();
+  if (!isRecord(ring) || typeof ring.activeKeyId !== "string" || !isRecord(ring.keys))
+    throw new RunLocatorError();
   assertSegment(ring.activeKeyId);
   for (const [keyId, secret] of Object.entries(ring.keys)) {
     assertSegment(keyId);
@@ -62,12 +73,15 @@ export function assertSegment(value: string): void {
 }
 
 function assertBoundedText(value: unknown, limit = 256): asserts value is string {
-  if (typeof value !== "string" || value.length === 0 || byteLength(value) > limit) throw new RunLocatorError();
+  if (typeof value !== "string" || value.length === 0 || byteLength(value) > limit)
+    throw new RunLocatorError();
 }
 
 function isSecret(value: unknown): value is string | Uint8Array {
-  return (typeof value === "string" && value.length > 0 && byteLength(value) <= 4096) ||
-    (value instanceof Uint8Array && value.byteLength > 0 && value.byteLength <= 4096);
+  return (
+    (typeof value === "string" && value.length > 0 && byteLength(value) <= 4096) ||
+    (value instanceof Uint8Array && value.byteLength > 0 && value.byteLength <= 4096)
+  );
 }
 
 function byteLength(value: string): number {

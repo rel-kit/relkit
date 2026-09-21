@@ -46,7 +46,10 @@ export class RunLocatorRouter {
     await store.save(this.snapshot());
   }
 
-  route(locator: string, options: Omit<RunLocatorVerifyOptions, "keyRing"> = {}): VerifiedRunLocator {
+  route(
+    locator: string,
+    options: Omit<RunLocatorVerifyOptions, "keyRing"> = {},
+  ): VerifiedRunLocator {
     for (const [generation, keyRing] of this.generations) {
       try {
         const verified = verifyRunLocator(locator, { ...options, keyRing });

@@ -3,7 +3,6 @@ import type {
   JobAccessGrant,
   JobAccessRequest,
   JobClientOperation,
-  JobUnknownOutcome,
   JobRef,
   RunHandle,
 } from "@relkit/contracts/jobs";
@@ -18,11 +17,33 @@ import type {
   TaskStreamSchemas,
 } from "./task-types.js";
 import type { RunResultOptions, ServerTriggerOptions } from "./trigger-types.js";
+import type {
+  JobScheduleClient,
+  ScheduleDefinition,
+  ScheduleListOptions,
+  ScheduleMisfire,
+  ScheduleOverlap,
+  ScheduleReadReceipt,
+  ScheduleRecord,
+  ScheduleWriteOptions,
+  ScheduleWriteOutcome,
+  ScheduleWriteReceipt,
+} from "./schedule-types.js";
+
+export type {
+  JobScheduleClient,
+  ScheduleDefinition,
+  ScheduleListOptions,
+  ScheduleMisfire,
+  ScheduleOverlap,
+  ScheduleReadReceipt,
+  ScheduleRecord,
+  ScheduleWriteOptions,
+  ScheduleWriteOutcome,
+  ScheduleWriteReceipt,
+} from "./schedule-types.js";
 
 export type { RunResultOptions, ServerTriggerOptions, TriggerOptions } from "./trigger-types.js";
-
-export type ScheduleOverlap = "allow" | "skip";
-export type ScheduleMisfire = "skip" | "latest" | "all";
 
 export type RetryJitter = "none" | "full" | "equal";
 export interface RetryPolicy {
@@ -31,71 +52,6 @@ export interface RetryPolicy {
   readonly maxDelayMs: number;
   readonly multiplier: number;
   readonly jitter: RetryJitter;
-}
-
-export type ScheduleDefinition<Input = unknown> = {
-  readonly id: string;
-  readonly input: Input;
-  readonly overlap?: ScheduleOverlap;
-  readonly misfire?: ScheduleMisfire;
-} & (
-  | { readonly cron: string; readonly timezone: string; readonly every?: never }
-  | { readonly every: DurationInput; readonly cron?: never; readonly timezone?: never }
-);
-
-export interface ScheduleRecord<Definition = ScheduleDefinition> {
-  readonly id: string;
-  readonly jobId: string;
-  readonly state: "active" | "paused" | "missing" | "unknown";
-  readonly definition: Definition;
-  readonly observedAt?: string;
-}
-
-export interface ScheduleReadReceipt<Definition = ScheduleDefinition> {
-  readonly outcome: "available" | "unavailable";
-  readonly schedule?: ScheduleRecord<Definition>;
-  readonly schedules?: readonly ScheduleRecord<Definition>[];
-  readonly nextCursor?: string;
-  readonly hasMore?: boolean;
-  readonly reason?: string;
-}
-
-export type ScheduleWriteOutcome =
-  | "created"
-  | "updated"
-  | "paused"
-  | "resumed"
-  | "deleted"
-  | "requested"
-  | "unsupported";
-
-export interface ScheduleListOptions {
-  readonly limit?: number;
-  readonly cursor?: string;
-  readonly signal?: AbortSignal;
-}
-
-export interface ScheduleWriteOptions {
-  readonly operationId: string;
-  readonly signal?: AbortSignal;
-}
-
-export type ScheduleWriteReceipt<Definition = ScheduleDefinition> =
-  | {
-      readonly operationId: string;
-      readonly scheduleId: string;
-      readonly outcome: ScheduleWriteOutcome;
-      readonly schedule?: ScheduleRecord<Definition>;
-    }
-  | (JobUnknownOutcome & { readonly scheduleId: string });
-
-export interface JobScheduleClient<Definition = ScheduleDefinition> {
-  readonly list: (options?: ScheduleListOptions) => Promise<ScheduleReadReceipt<Definition>>;
-  readonly get: (id: string, options?: { readonly signal?: AbortSignal }) => Promise<ScheduleReadReceipt<Definition>>;
-  readonly upsert: (definition: Definition, options: ScheduleWriteOptions) => Promise<ScheduleWriteReceipt<Definition>>;
-  readonly pause: (id: string, options: ScheduleWriteOptions) => Promise<ScheduleWriteReceipt<Definition>>;
-  readonly resume: (id: string, options: ScheduleWriteOptions) => Promise<ScheduleWriteReceipt<Definition>>;
-  readonly delete: (id: string, options: ScheduleWriteOptions) => Promise<ScheduleWriteReceipt<Definition>>;
 }
 
 export interface JobAdmission<Input = unknown> {
@@ -172,7 +128,9 @@ export type JobDescriptor<
     readonly progress?: Task["progress"];
     readonly streams?: Task["streams"];
     readonly execution: Task["execution"];
-    readonly observation?: TaskObservation<Task["streams"] extends TaskStreamSchemas ? Task["streams"] : {}>;
+    readonly observation?: TaskObservation<
+      Task["streams"] extends TaskStreamSchemas ? Task["streams"] : {}
+    >;
     readonly service?: string;
     readonly default?: boolean;
     readonly schedules?: readonly ScheduleDefinition<InferOutput<Task["input"]>>[];
@@ -186,4 +144,11 @@ export type JobDescriptor<
 
 export type JobRunResultOptions = RunResultOptions;
 
-export type JobDescriptorAny = JobDescriptor<string, string, TaskDescriptorAny>;
+/** Erases task-specific admission keys at runtime boundaries without making concrete jobs invariant. */
+export type JobDescriptorAny = Omit<
+  JobDescriptor<string, string, TaskDescriptorAny>,
+  "admission" | "trigger"
+> & {
+  readonly admission?: JobAdmission<any>;
+  readonly trigger: (input: any, options?: ServerTriggerOptions) => Promise<RunHandle>;
+};
