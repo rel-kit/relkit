@@ -4,13 +4,22 @@ import type { TaskExecutionEnvelope } from "@relkit/jobs/adapter";
 import type { Context } from "inngest";
 import type { InngestTaskDefinition } from "./task-binding.js";
 
-export function withoutSchedules(definition: InngestTaskDefinition): Omit<InngestTaskDefinition, "schedules" | "schedule"> {
+export function withoutSchedules(
+  definition: InngestTaskDefinition,
+): Omit<InngestTaskDefinition, "schedules" | "schedule"> {
   const { schedules: _schedules, schedule: _schedule, ...base } = definition;
   return base;
 }
 
-export function scheduleMetadata(context: Context, definition: InngestTaskDefinition): Record<string, unknown> {
-  if (definition.jobId === undefined || definition.taskId === undefined || definition.buildId === undefined) {
+export function scheduleMetadata(
+  context: Context,
+  definition: InngestTaskDefinition,
+): Record<string, unknown> {
+  if (
+    definition.jobId === undefined ||
+    definition.taskId === undefined ||
+    definition.buildId === undefined
+  ) {
     throw new Error("RELKIT_INNGEST_SCHEDULE_DEFINITION_INVALID");
   }
   const event = record(context.event);
@@ -48,11 +57,8 @@ export function envelopeFrom(
   const inputSchemaHash = textOptional(native.inputSchemaHash);
   const acceptedAt = textOptional(native.acceptedAt);
   const nativeAttempt = number(native.attempt);
-  const attempt = nativeAttempt === undefined
-    ? context.attempt + 1
-    : nativeAttempt > 0
-      ? nativeAttempt
-      : 1;
+  const attempt =
+    nativeAttempt === undefined ? context.attempt + 1 : nativeAttempt > 0 ? nativeAttempt : 1;
   const parentRunId = textOptional(native.parentRunId);
   const service = textOptional(native.service);
   const serviceGeneration = textOptional(native.serviceGeneration);
@@ -82,16 +88,20 @@ export function envelopeFrom(
 }
 
 export function duration(milliseconds: number): `${number}s` {
-  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1) throw new TypeError("Inngest sleep duration is invalid");
+  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1)
+    throw new TypeError("Inngest sleep duration is invalid");
   return `${Math.max(1, Math.ceil(milliseconds / 1_000))}s`;
 }
 
 export function record(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, any>)
+    : undefined;
 }
 
 function text(value: unknown): string {
-  if (typeof value !== "string" || value === "") throw new TypeError("Inngest task metadata is invalid");
+  if (typeof value !== "string" || value === "")
+    throw new TypeError("Inngest task metadata is invalid");
   return value;
 }
 

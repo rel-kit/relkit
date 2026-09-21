@@ -1,9 +1,11 @@
 import type { RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
-import type {
-  NativeLocator,
-  OperationContext,
-} from "@relkit/jobs/adapter";
-import { rememberInngestRecord, snapshot, type InngestRunApi, type InngestRunMetadata } from "./runs.js";
+import type { NativeLocator, OperationContext } from "@relkit/jobs/adapter";
+import {
+  rememberInngestRecord,
+  snapshot,
+  type InngestRunApi,
+  type InngestRunMetadata,
+} from "./runs.js";
 import {
   decodeCursor,
   encodeCursor,
@@ -23,15 +25,18 @@ export async function readInngestRun(
   if (locator.startsWith("event:")) {
     const eventId = locator.slice("event:".length);
     const rows = await api.eventRuns(eventId, context.signal);
-    if (rows.length > 1) throw new Error(`Inngest event "${eventId}" matched multiple native runs.`);
+    if (rows.length > 1)
+      throw new Error(`Inngest event "${eventId}" matched multiple native runs.`);
     if (rows.length === 0) return queued(records.get(eventId) ?? unknownMetadata(eventId, context));
     const native = rows[0]!;
     const nativeId = text(native.id ?? native.run_id, "Inngest run id");
     const resolved = records.get(eventId);
-    if (resolved === undefined) return snapshot(native, { ...unknownMetadata(eventId, context), runId: nativeId });
+    if (resolved === undefined)
+      return snapshot(native, { ...unknownMetadata(eventId, context), runId: nativeId });
     const promoted = { ...resolved, runId: nativeId };
     for (const [key, value] of records) {
-      if (value.eventId === resolved.eventId && value.runId.startsWith("event:")) records.delete(key);
+      if (value.eventId === resolved.eventId && value.runId.startsWith("event:"))
+        records.delete(key);
     }
     rememberInngestRecord(records, eventId, promoted);
     rememberInngestRecord(records, nativeId, promoted);
@@ -62,15 +67,32 @@ export async function listInngestRuns(
     items: Object.freeze(items),
     ...(hasMore ? { nextCursor: encodeCursor(nextOffset) } : {}),
     hasMore,
-    availability: Object.freeze(query.runId === undefined
-      ? [{ service: context.service, state: "unavailable" as const, reason: "Inngest exposes event-scoped run queries only; historical list scope is unavailable." }]
-      : []),
-    count: { value: all.length, accuracy: query.runId === undefined ? "approximate" as const : "exact" as const },
+    availability: Object.freeze(
+      query.runId === undefined
+        ? [
+            {
+              service: context.service,
+              state: "unavailable" as const,
+              reason:
+                "Inngest exposes event-scoped run queries only; historical list scope is unavailable.",
+            },
+          ]
+        : [],
+    ),
+    count: {
+      value: all.length,
+      accuracy: query.runId === undefined ? ("approximate" as const) : ("exact" as const),
+    },
   });
 }
 
 function queued(metadata: InngestRunMetadata): RunSnapshot {
-  return { ...metadata, status: "queued", observedAt: new Date().toISOString(), resultAvailability: "pending" };
+  return {
+    ...metadata,
+    status: "queued",
+    observedAt: new Date().toISOString(),
+    resultAvailability: "pending",
+  };
 }
 
 function unknownMetadata(runId: string, context: OperationContext): InngestRunMetadata {

@@ -1,19 +1,12 @@
-import { createRequire } from "node:module";
-import type { TaskExecutor } from "@relkit/jobs";
-import type { TaskExecutionBinding } from "@relkit/jobs/adapter";
 import type { ScheduleDefinition } from "@relkit/jobs";
-import type { Context, Inngest, InngestFunction } from "inngest";
+import type { TaskExecutor } from "@relkit/jobs/adapter";
+import { Inngest } from "inngest";
+import { serve } from "inngest/bun";
 import { mapInngestPolicy } from "./policy.js";
-import {
-  duration,
-  envelopeFrom,
-  record,
-  safeSegment,
-  scheduleMetadata,
-  signalFrom,
-  wireInput,
-  withoutSchedules,
-} from "./task-binding-support.js";
+import { safeSegment, withoutSchedules } from "./task-binding-support.js";
+import { createInngestFunction } from "./task-binding-function.js";
+
+export { createInngestFunction } from "./task-binding-function.js";
 
 type InngestConstructor = typeof import("inngest").Inngest;
 type InngestServe = typeof import("inngest/bun").serve;
@@ -24,10 +17,7 @@ export interface InngestSdk {
 }
 
 export function loadInngestSdk(): InngestSdk {
-  const require = createRequire(import.meta.url);
-  const module = require("inngest") as { readonly Inngest: InngestConstructor };
-  const bun = require("inngest/bun") as { readonly serve: InngestServe };
-  return Object.freeze({ Inngest: module.Inngest, serve: bun.serve });
+  return Object.freeze({ Inngest, serve });
 }
 
 export interface InngestTaskDefinition {
@@ -50,9 +40,13 @@ export function createInngestFunctionConfig(
   definition: InngestTaskDefinition,
 ): Readonly<Record<string, unknown>> {
   const policy = mapInngestPolicy(definition.policy);
-  const triggers = definition.schedule === undefined
-    ? [{ event: definition.eventName }, ...(definition.schedules ?? []).map((schedule) => scheduleTrigger(schedule))]
-    : [scheduleTrigger(definition.schedule)];
+  const triggers =
+    definition.schedule === undefined
+      ? [
+          { event: definition.eventName },
+          ...(definition.schedules ?? []).map((schedule) => scheduleTrigger(schedule)),
+        ]
+      : [scheduleTrigger(definition.schedule)];
   return Object.freeze({
     id: definition.functionId,
     triggers,
@@ -67,8 +61,10 @@ export function createInngestFunctionConfig(
 }
 
 function scheduleTrigger(schedule: ScheduleDefinition): Readonly<Record<string, string>> {
-  if ("every" in schedule) throw new Error("Inngest native schedules do not support interval recurrence.");
-  if (schedule.timezone !== "UTC") throw new Error("Inngest native schedules support UTC cron only.");
+  if ("every" in schedule)
+    throw new Error("Inngest native schedules do not support interval recurrence.");
+  if (schedule.timezone !== "UTC")
+    throw new Error("Inngest native schedules support UTC cron only.");
   if (schedule.overlap !== undefined && schedule.overlap !== "allow") {
     throw new Error("Inngest native schedules do not expose overlap policy.");
   }
@@ -78,8 +74,15 @@ function scheduleTrigger(schedule: ScheduleDefinition): Readonly<Record<string, 
   return { cron: schedule.cron };
 }
 
-export function inngestFunctionId(jobId: string, taskId: string, taskVersion: string, buildId: string): string {
-  return ["relkit", jobId, taskId, taskVersion, buildId].map((value) => value.replace(/[^a-zA-Z0-9_.-]/gu, "-")).join("-");
+export function inngestFunctionId(
+  jobId: string,
+  taskId: string,
+  taskVersion: string,
+  buildId: string,
+): string {
+  return ["relkit", jobId, taskId, taskVersion, buildId]
+    .map((value) => value.replace(/[^a-zA-Z0-9_.-]/gu, "-"))
+    .join("-");
 }
 
 export interface InngestWorkerOptions {
@@ -100,59 +103,6 @@ export interface InngestWorkerHandle {
   readonly close: () => Promise<void>;
 }
 
-export function createInngestFunction(
-  client: Inngest.Any,
-  definition: InngestTaskDefinition,
-  executor: TaskExecutor,
-  activeSignals: Set<AbortController> = new Set(),
-): InngestFunction.Any {
-  return client.createFunction(createInngestFunctionConfig(definition) as never, async (ctx: Context) => {
-    const scheduled = definition.schedule !== undefined && ctx.event.name === "inngest/scheduled.timer";
-    const data = record(ctx.event.data) ?? {};
-    const native = scheduled ? scheduleMetadata(ctx, definition) : record(data.relkit);
-    const input = scheduled ? wireInput(definition.schedule!.input) : data.input;
-    if (native === undefined || input === undefined) throw new Error("RELKIT_INNGEST_EVENT_INVALID");
-    const envelope = envelopeFrom(ctx, native, input);
-    const providerSignal = signalFrom(ctx);
-    const controller = providerSignal === undefined ? new AbortController() : undefined;
-    if (controller !== undefined) activeSignals.add(controller);
-    const binding: TaskExecutionBinding = {
-      run: {
-        runId: envelope.runId,
-        jobId: envelope.jobId,
-        taskId: envelope.taskId,
-        taskVersion: envelope.taskVersion,
-        buildId: envelope.buildId,
-        ...(envelope.service === undefined ? {} : { service: envelope.service }),
-        ...(envelope.serviceGeneration === undefined ? {} : { serviceGeneration: envelope.serviceGeneration }),
-        ...(envelope.attempt === undefined ? {} : { attempt: envelope.attempt }),
-        ...(envelope.acceptedAt === undefined ? {} : { acceptedAt: envelope.acceptedAt }),
-        ...(envelope.scheduledFor === undefined ? {} : { scheduledFor: envelope.scheduledFor }),
-        ...(envelope.parentRunId === undefined ? {} : { parentRunId: envelope.parentRunId }),
-        ...(envelope.scope === undefined ? {} : { scope: envelope.scope }),
-        ...(envelope.inputSchemaHash === undefined ? {} : { inputSchemaHash: envelope.inputSchemaHash }),
-        ...(envelope.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: envelope.acceptanceIdentity }),
-        ...(envelope.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: envelope.occurrenceIdentity }),
-        ...(envelope.propagation === undefined ? {} : { propagation: envelope.propagation }),
-      },
-      signal: providerSignal ?? controller!.signal,
-      sleep: {
-        sleep: async (key, durationMs) => {
-          await ctx.step.sleep(key, duration(durationMs));
-        },
-        sleepUntil: async (key, instant) => {
-          await ctx.step.sleepUntil(key, instant);
-        },
-      },
-    };
-    try {
-      return await executor.execute(envelope, binding);
-    } finally {
-      if (controller !== undefined) activeSignals.delete(controller);
-    }
-  });
-}
-
 export function createInngestWorker(options: InngestWorkerOptions): {
   readonly path: string;
   readonly handler: (request: Request) => Promise<Response>;
@@ -164,13 +114,22 @@ export function createInngestWorker(options: InngestWorkerOptions): {
   const handler = createInngestServeHandler(options, activeSignals);
   const ready = async (): Promise<void> => {
     const target = new URL(`${options.serveOrigin ?? "http://127.0.0.1:3000"}${path}`);
-    const response = await handler(new Request(target.toString(), { method: "PUT", headers: { host: target.host } }));
-    if (!response.ok) throw new Error(`Inngest worker registration failed with status ${response.status}.`);
+    const response = await handler(
+      new Request(target.toString(), { method: "PUT", headers: { host: target.host } }),
+    );
+    if (!response.ok)
+      throw new Error(`Inngest worker registration failed with status ${response.status}.`);
   };
-  return Object.freeze({ path, handler, ready, close: async () => {
-    for (const controller of activeSignals) controller.abort(new Error("Inngest worker is closing"));
-    activeSignals.clear();
-  } });
+  return Object.freeze({
+    path,
+    handler,
+    ready,
+    close: async () => {
+      for (const controller of activeSignals)
+        controller.abort(new Error("Inngest worker is closing"));
+      activeSignals.clear();
+    },
+  });
 }
 
 export function createInngestServeHandler(
@@ -179,12 +138,24 @@ export function createInngestServeHandler(
 ): (request: Request) => Promise<Response> {
   const { serve } = loadInngestSdk();
   const functions = options.definitions.flatMap((definition) => [
-    createInngestFunction(options.client, withoutSchedules(definition), options.executor, activeSignals),
-    ...(definition.schedules ?? []).map((schedule) => createInngestFunction(options.client, {
-      ...withoutSchedules(definition),
-      functionId: `${definition.functionId}-schedule-${safeSegment(schedule.id)}`,
-      schedule,
-    }, options.executor, activeSignals)),
+    createInngestFunction(
+      options.client,
+      withoutSchedules(definition),
+      options.executor,
+      activeSignals,
+    ),
+    ...(definition.schedules ?? []).map((schedule) =>
+      createInngestFunction(
+        options.client,
+        {
+          ...withoutSchedules(definition),
+          functionId: `${definition.functionId}-schedule-${safeSegment(schedule.id)}`,
+          schedule,
+        },
+        options.executor,
+        activeSignals,
+      ),
+    ),
   ]);
   return serve({
     client: options.client,

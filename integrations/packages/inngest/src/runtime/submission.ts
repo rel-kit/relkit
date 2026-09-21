@@ -92,17 +92,21 @@ export async function submitInngestEvent(
 
 export function providerEventId(request: NativeSubmission, context: OperationContext): string {
   const occurrenceIdentity = request.occurrenceIdentity ?? context.occurrenceIdentity;
-  const identity = request.acceptanceIdentity ?? context.acceptanceIdentity ?? JSON.stringify([
-    context.application,
-    context.environment,
-    context.scope,
-    request.jobId,
-    request.taskId,
-    request.taskVersion,
-    request.buildId,
-    request.idempotencyKey ?? request.operationId,
-  ]);
-  const eventIdentity = occurrenceIdentity === undefined ? identity : JSON.stringify([identity, occurrenceIdentity]);
+  const identity =
+    request.acceptanceIdentity ??
+    context.acceptanceIdentity ??
+    JSON.stringify([
+      context.application,
+      context.environment,
+      context.scope,
+      request.jobId,
+      request.taskId,
+      request.taskVersion,
+      request.buildId,
+      request.idempotencyKey ?? request.operationId,
+    ]);
+  const eventIdentity =
+    occurrenceIdentity === undefined ? identity : JSON.stringify([identity, occurrenceIdentity]);
   return `relkit-${createHash("sha256").update(eventIdentity).digest("hex")}`;
 }
 

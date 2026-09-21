@@ -1,7 +1,7 @@
-import { createHash } from "node:crypto";
 import type { JsonValue } from "@relkit/contracts";
 import type { TracePropagation } from "@relkit/contracts";
 import type { RunHandle, RunSnapshot } from "@relkit/contracts/jobs";
+import { date, hashSigningKey, number, record, rows, text } from "./runs-support.js";
 
 export const MAX_LOCAL_INDEX_ENTRIES = 1_000;
 
@@ -25,16 +25,26 @@ export interface InngestRunMetadata extends RunHandle {
 }
 
 export class InngestApiRequestError extends Error {
-  constructor(readonly status: number, message: string) {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
     super(message);
     this.name = "InngestApiRequestError";
   }
 }
 
 export interface InngestRunApi {
-  readonly eventRuns: (eventId: string, signal?: AbortSignal) => Promise<readonly Record<string, unknown>[]>;
+  readonly eventRuns: (
+    eventId: string,
+    signal?: AbortSignal,
+  ) => Promise<readonly Record<string, unknown>[]>;
   readonly run: (runId: string, signal?: AbortSignal) => Promise<Record<string, unknown>>;
-  readonly cancel: (runId: string, reason: string | undefined, signal?: AbortSignal) => Promise<Record<string, unknown>>;
+  readonly cancel: (
+    runId: string,
+    reason: string | undefined,
+    signal?: AbortSignal,
+  ) => Promise<Record<string, unknown>>;
   readonly retry: (runId: string, signal?: AbortSignal) => Promise<Record<string, unknown>>;
 }
 
@@ -54,30 +64,46 @@ export function createInngestRunApi(options: {
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        ...(options.signingKey === undefined ? {} : { authorization: `Bearer ${hashSigningKey(options.signingKey)}` }),
+        ...(options.signingKey === undefined
+          ? {}
+          : { authorization: `Bearer ${hashSigningKey(options.signingKey)}` }),
         ...(init.headers ?? {}),
       },
       ...(signal === undefined ? {} : { signal }),
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new InngestApiRequestError(response.status, `Inngest native API request failed (${response.status}).`);
+    if (!response.ok)
+      throw new InngestApiRequestError(
+        response.status,
+        `Inngest native API request failed (${response.status}).`,
+      );
     if (body === null || typeof body !== "object" || Array.isArray(body)) return {};
     return body as Record<string, unknown>;
   };
   return Object.freeze({
     eventRuns: async (eventId: string, signal?: AbortSignal) => {
-      const body = await request(`/v2/events/${encodeURIComponent(eventId)}/runs?limit=40`, {}, signal);
+      const body = await request(
+        `/v2/events/${encodeURIComponent(eventId)}/runs?limit=40`,
+        {},
+        signal,
+      );
       return rows(body.data);
     },
     run: async (runId: string, signal?: AbortSignal) => {
       const body = await request(`/v1/runs/${encodeURIComponent(runId)}`, {}, signal);
       return record(body.data) ?? body;
     },
-    cancel: async (runId: string, reason: string | undefined, signal?: AbortSignal) => request(`/v1/runs/${encodeURIComponent(runId)}/cancel`, {
-      method: "POST",
-      body: JSON.stringify(reason === undefined ? {} : { reason }),
-    }, signal),
-    retry: async (runId: string, signal?: AbortSignal) => request(`/v1/runs/${encodeURIComponent(runId)}/retry`, { method: "POST" }, signal),
+    cancel: async (runId: string, reason: string | undefined, signal?: AbortSignal) =>
+      request(
+        `/v1/runs/${encodeURIComponent(runId)}/cancel`,
+        {
+          method: "POST",
+          body: JSON.stringify(reason === undefined ? {} : { reason }),
+        },
+        signal,
+      ),
+    retry: async (runId: string, signal?: AbortSignal) =>
+      request(`/v1/runs/${encodeURIComponent(runId)}/retry`, { method: "POST" }, signal),
   });
 }
 
@@ -99,23 +125,36 @@ export function snapshot(
     service: metadata.service,
     status,
     observedAt,
-    resultAvailability: status === "completed" ? (output === undefined ? "void" : "available") : "pending",
+    resultAvailability:
+      status === "completed" ? (output === undefined ? "void" : "available") : "pending",
     ...(metadata.input === undefined ? {} : { input: metadata.input }),
     ...(metadata.inputHash === undefined ? {} : { inputHash: metadata.inputHash }),
-    ...(metadata.inputSchemaHash === undefined ? {} : { inputSchemaHash: metadata.inputSchemaHash }),
+    ...(metadata.inputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: metadata.inputSchemaHash }),
     ...(metadata.scope === undefined ? {} : { scope: metadata.scope }),
-    ...(metadata.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: metadata.acceptanceIdentity }),
+    ...(metadata.acceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: metadata.acceptanceIdentity }),
     ...(metadata.parentRunId === undefined ? {} : { parentRunId: metadata.parentRunId }),
     ...(metadata.scheduledFor === undefined ? {} : { scheduledFor: metadata.scheduledFor }),
     ...(metadata.retryOfRunId === undefined ? {} : { retryOfRunId: metadata.retryOfRunId }),
     ...(number(value.attempt) === undefined ? {} : { attempt: number(value.attempt) }),
-    ...(date(value.started_at ?? value.startedAt) === undefined ? {} : { startedAt: date(value.started_at ?? value.startedAt) }),
-    ...(date(value.completed_at ?? value.completedAt) === undefined ? {} : { completedAt: date(value.completed_at ?? value.completedAt) }),
-    ...(value.error === undefined ? {} : { error: { code: "INNGEST_RUN_FAILED", message: text(value.error, "native error") } }),
+    ...(date(value.started_at ?? value.startedAt) === undefined
+      ? {}
+      : { startedAt: date(value.started_at ?? value.startedAt) }),
+    ...(date(value.completed_at ?? value.completedAt) === undefined
+      ? {}
+      : { completedAt: date(value.completed_at ?? value.completedAt) }),
+    ...(value.error === undefined
+      ? {}
+      : { error: { code: "INNGEST_RUN_FAILED", message: text(value.error, "native error") } }),
   };
-  return (status === "completed" && output !== undefined
-    ? { ...base, status: "completed", resultAvailability: "available", output: output as unknown }
-    : base) as RunSnapshot;
+  return (
+    status === "completed" && output !== undefined
+      ? { ...base, status: "completed", resultAvailability: "available", output: output as unknown }
+      : base
+  ) as RunSnapshot;
 }
 
 export function statusOf(value: unknown): RunSnapshot["status"] {
@@ -130,33 +169,6 @@ export function statusOf(value: unknown): RunSnapshot["status"] {
   if (status.includes("run")) return "running";
   if (status.includes("queue") || status.includes("pending")) return "queued";
   return "unknown";
-}
-
-function rows(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value) ? value.filter(record) : [];
-}
-
-function record(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
-}
-
-function text(value: unknown, fallback: string): string {
-  return typeof value === "string" && value !== "" ? value : fallback;
-}
-
-function number(value: unknown): number | undefined {
-  return typeof value === "number" && Number.isSafeInteger(value) ? value : undefined;
-}
-
-function date(value: unknown): string | undefined {
-  return typeof value === "string" && value !== "" ? value : undefined;
-}
-
-function hashSigningKey(signingKey: string): string {
-  const prefix = signingKey.match(/^signkey-[\w]+-/u)?.[0] ?? "";
-  const key = signingKey.slice(prefix.length).replace(/[^a-z0-9]/giu, "");
-  const normalized = key.length % 2 === 0 ? key : `0${key}`;
-  return `${prefix}${createHash("sha256").update(Buffer.from(normalized, "hex")).digest("hex")}`;
 }
 
 export function isAmbiguousInngestWrite(error: unknown): boolean {

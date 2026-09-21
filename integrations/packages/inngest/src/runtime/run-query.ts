@@ -5,7 +5,11 @@ const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 25;
 
 export function matchesMetadata(query: RunListQuery, metadata: InngestRunMetadata): boolean {
-  return (query.runId === undefined || query.runId === metadata.runId || query.runId === metadata.eventId || query.runId === `event:${metadata.eventId}`) &&
+  return (
+    (query.runId === undefined ||
+      query.runId === metadata.runId ||
+      query.runId === metadata.eventId ||
+      query.runId === `event:${metadata.eventId}`) &&
     (query.jobId === undefined || query.jobId === metadata.jobId) &&
     (query.taskId === undefined || query.taskId === metadata.taskId) &&
     (query.taskVersion === undefined || query.taskVersion === metadata.taskVersion) &&
@@ -14,13 +18,16 @@ export function matchesMetadata(query: RunListQuery, metadata: InngestRunMetadat
     (query.correlationId === undefined || query.correlationId === metadata.correlationId) &&
     (query.parentRunId === undefined || query.parentRunId === metadata.parentRunId) &&
     inRange(metadata.acceptedAt, query.acceptedFrom, query.acceptedTo) &&
-    tagsMatch(query.tags, query.tagMatch, metadata.tags);
+    tagsMatch(query.tags, query.tagMatch, metadata.tags)
+  );
 }
 
 export function matchesSnapshot(query: RunListQuery, run: RunSnapshot): boolean {
-  return (query.status === undefined || query.status.includes(run.status)) &&
+  return (
+    (query.status === undefined || query.status.includes(run.status)) &&
     inRange(run.startedAt, query.startedFrom, query.startedTo) &&
-    inRange(run.completedAt, query.completedFrom, query.completedTo);
+    inRange(run.completedAt, query.completedFrom, query.completedTo)
+  );
 }
 
 export function uniqueRecords(records: Map<string, InngestRunMetadata>): InngestRunMetadata[] {
@@ -29,7 +36,8 @@ export function uniqueRecords(records: Map<string, InngestRunMetadata>): Inngest
 
 export function normalizeLimit(value: number | undefined): number {
   const limit = value ?? DEFAULT_LIMIT;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > MAX_LIMIT) throw new TypeError("Inngest run list limit is invalid");
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > MAX_LIMIT)
+    throw new TypeError("Inngest run list limit is invalid");
   return limit;
 }
 
@@ -58,11 +66,19 @@ function tagsMatch(
     : requested.some((tag) => values.has(tag));
 }
 
-function inRange(value: string | undefined, from: string | undefined, to: string | undefined): boolean {
+function inRange(
+  value: string | undefined,
+  from: string | undefined,
+  to: string | undefined,
+): boolean {
   if (from === undefined && to === undefined) return true;
   if (value === undefined) return false;
   const timestamp = Date.parse(value);
   const lower = from === undefined ? undefined : Date.parse(from);
   const upper = to === undefined ? undefined : Date.parse(to);
-  return Number.isFinite(timestamp) && (lower === undefined || timestamp >= lower) && (upper === undefined || timestamp <= upper);
+  return (
+    Number.isFinite(timestamp) &&
+    (lower === undefined || timestamp >= lower) &&
+    (upper === undefined || timestamp <= upper)
+  );
 }
