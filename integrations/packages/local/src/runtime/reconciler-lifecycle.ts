@@ -28,6 +28,7 @@ export async function startService(
   environmentVariables?: Readonly<Record<string, string>>,
   workerArtifact?: LocalServiceWorkerArtifact,
   environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>,
+  portBindings?: Readonly<Record<string, Readonly<Record<string, number>>>>,
 ): Promise<LocalServiceInstance> {
   const normalized = normalizeLocalServiceRecipe(recipe);
   const worker = workerStartOptions(normalized, workerArtifact);
@@ -68,6 +69,7 @@ export async function startService(
             ...environmentVariablesByUnit,
           },
         }),
+    ...(portBindings === undefined ? {} : { portBindings }),
   };
   const environment = normalized.recipeVersion === 1 ? environmentFile(recipe, secrets) : undefined;
   const unitEnvironments = environmentFiles(recipe, secrets);

@@ -158,6 +158,7 @@ export interface LocalServiceStartRequest {
   readonly workerArtifact?: LocalServiceWorkerArtifact;
   readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;
   readonly environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly portBindings?: Readonly<Record<string, Readonly<Record<string, number>>>>;
   readonly signal?: AbortSignal;
 }
 

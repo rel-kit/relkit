@@ -255,6 +255,7 @@ test("starts a recipe-owned worker with read-only bundle and state mounts", asyn
       entrypoint: "/tmp/relkit-build/server/index.js",
       providerOverridesFile: "/tmp/relkit-state/provider-overrides.json",
     },
+    portBindings: { worker: { api: 49_152 } },
     bindMounts: {
       worker: [
         { source: "/tmp/relkit-build", target: "/relkit-worker", readOnly: true },
@@ -273,6 +274,7 @@ test("starts a recipe-owned worker with read-only bundle and state mounts", asyn
   if (worker === undefined) throw new Error("Worker container was not created.");
   expect(worker).toContain("type=bind,source=/tmp/relkit-build,target=/relkit-worker,readonly");
   expect(worker).toContain("type=bind,source=/tmp/relkit-state,target=/relkit-state,readonly");
+  expect(worker).toContain("127.0.0.1:49152:3000");
   expect(worker).toContain("RELKIT_PROVIDER_OVERRIDES_FILE=/relkit-state/provider-overrides.json");
   expect(worker).toContain("RELKIT_WORKER_ROLE=worker");
 });

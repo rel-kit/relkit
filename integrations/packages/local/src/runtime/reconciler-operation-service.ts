@@ -2,7 +2,9 @@ import type {
   LocalServiceInstance,
   LocalServicePlanEntry,
   LocalServiceRecipeInput,
+  NormalizedLocalServiceRecipe,
 } from "@relkit/local-service";
+import { normalizeLocalServiceRecipe } from "@relkit/local-service";
 import type {
   LocalServiceReconcileRequest,
   LocalServiceReconcilerOptions,
@@ -10,6 +12,26 @@ import type {
 import { removeInstance } from "./reconciler-resource.js";
 import { serviceInstanceIds } from "./reconciler-support.js";
 import { startService } from "./reconciler-lifecycle.js";
+import { LOCAL_RESOURCE_LABEL } from "./identity.js";
+
+export function keepServiceCandidates(
+  recipe: NormalizedLocalServiceRecipe,
+  candidates: readonly LocalServiceInstance[],
+  request: LocalServiceReconcileRequest,
+  bindingId: string,
+): boolean {
+  return (
+    recipe.recipeVersion === 2 &&
+    candidates.some(
+      (candidate) => candidate.labels[LOCAL_RESOURCE_LABEL.planHash] === request.planHash,
+    ) &&
+    request.environmentOverridesByUnit?.[bindingId] === undefined &&
+    (request.workerArtifacts?.[bindingId] !== undefined ||
+      !candidates.some((candidate) =>
+        candidate.units?.some((unit) => unit.labels["dev.relkit.unit-kind"] === "worker"),
+      ))
+  );
+}
 
 export async function ensureServiceInstance(
   options: LocalServiceReconcilerOptions,
@@ -37,6 +59,7 @@ export async function ensureServiceInstance(
   }
   if (instance === undefined) {
     const existingIds = new Set(candidates.flatMap(serviceInstanceIds));
+    const portBindings = preservedPortBindings(candidates, recipe);
     instance = await startService(
       options,
       entry,
@@ -47,6 +70,7 @@ export async function ensureServiceInstance(
       request.environmentOverrides?.[entry.bindingId],
       request.workerArtifacts?.[entry.bindingId],
       request.environmentOverridesByUnit?.[entry.bindingId],
+      portBindings,
     );
     startedIds.push(...serviceInstanceIds(instance).filter((id) => !existingIds.has(id)));
     started.push(entry.bindingId);
@@ -62,4 +86,28 @@ export async function ensureServiceInstance(
     }
   }
   return instance;
+}
+
+function preservedPortBindings(
+  candidates: readonly LocalServiceInstance[],
+  recipe: LocalServiceRecipeInput,
+): Readonly<Record<string, Readonly<Record<string, number>>>> | undefined {
+  const normalized = normalizeLocalServiceRecipe(recipe);
+  const units = candidates.flatMap((candidate) => candidate.units ?? [candidate]);
+  const bindings = Object.fromEntries(
+    normalized.units.flatMap((recipeUnit) => {
+      const instance = units.find((candidate) => (candidate.unitId ?? "service") === recipeUnit.id);
+      if (instance === undefined) return [];
+      const namedPorts = Object.fromEntries(
+        Object.entries(recipeUnit.ports).flatMap(([name, containerPort]) => {
+          const hostPort = instance.ports[name] ?? instance.ports[`${containerPort}/tcp`];
+          return typeof hostPort === "number" ? [[name, hostPort] as const] : [];
+        }),
+      );
+      return Object.keys(namedPorts).length === 0
+        ? []
+        : [[recipeUnit.id, Object.freeze(namedPorts)] as const];
+    }),
+  );
+  return Object.keys(bindings).length === 0 ? undefined : Object.freeze(bindings);
 }

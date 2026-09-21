@@ -995,7 +995,7 @@ declare const assertHotSwapSafe: (
 declare const aborted: (signal: AbortSignal | undefined) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L140)
 
 ## frozenResult
 
@@ -1011,7 +1011,7 @@ declare const frozenResult: (
 ) => LocalServiceReconcileResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L142)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L144)
 
 ## startService
 
@@ -1028,6 +1028,7 @@ declare const startService: (
   environmentVariables?: Readonly<Record<string, string>>,
   workerArtifact?: LocalServiceWorkerArtifact,
   environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>,
+  portBindings?: Readonly<Record<string, Readonly<Record<string, number>>>>,
 ) => Promise<LocalServiceInstance>;
 ```
 
@@ -1045,7 +1046,7 @@ declare const writeFailureState: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L117)
 
 ## `reconciler-operation-finalize.ts`
 
@@ -1120,6 +1121,7 @@ declare const runReconcileOperation: (
 
 - [utils](#utils)
   - [ensureServiceInstance](#ensureserviceinstance)
+  - [keepServiceCandidates](#keepservicecandidates)
 
 ---
 
@@ -1147,7 +1149,22 @@ declare const ensureServiceInstance: (
 ) => Promise<LocalServiceInstance>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-service.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-service.ts#L36)
+
+## keepServiceCandidates
+
+**Signature**
+
+```ts
+declare const keepServiceCandidates: (
+  recipe: NormalizedLocalServiceRecipe,
+  candidates: readonly LocalServiceInstance[],
+  request: LocalServiceReconcileRequest,
+  bindingId: string,
+) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-service.ts#L17)
 
 ## `reconciler-operation.ts`
 

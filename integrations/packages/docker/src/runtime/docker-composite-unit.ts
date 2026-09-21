@@ -69,7 +69,10 @@ export async function startUnit(
       "--add-host",
       `${argument(host)}:${argument(address)}`,
     ]),
-    ...Object.values(unit.ports).flatMap((port) => ["--publish", randomLoopbackPort(port)]),
+    ...Object.entries(unit.ports).flatMap(([name, port]) => [
+      "--publish",
+      publishedPort(request.portBindings?.[unit.id]?.[name], port),
+    ]),
     ...bindMountArguments(request.bindMounts?.[unit.id]),
     ...unit.volumes.flatMap((mount) => [
       "--mount",
@@ -136,4 +139,12 @@ export async function startUnit(
         .catch(() => undefined);
     throw error;
   }
+}
+
+function publishedPort(hostPort: number | undefined, containerPort: number): string {
+  if (hostPort === undefined) return randomLoopbackPort(containerPort);
+  if (!Number.isSafeInteger(hostPort) || hostPort < 1 || hostPort > 65_535) {
+    throw new TypeError("Docker published port is invalid");
+  }
+  return `127.0.0.1:${hostPort}:${containerPort}`;
 }

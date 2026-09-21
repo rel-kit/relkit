@@ -27,7 +27,7 @@ import {
   type LocalServiceSecretState,
 } from "./local-secrets.js";
 import { assertHotSwapSafe } from "./reconciler-generation.js";
-import { ensureServiceInstance } from "./reconciler-operation-service.js";
+import { ensureServiceInstance, keepServiceCandidates } from "./reconciler-operation-service.js";
 import { finalizeReconcile } from "./reconciler-operation-finalize.js";
 import type { TrackedService } from "./reconciler-operation.js";
 
@@ -129,15 +129,12 @@ export async function runReconcileOperation(
             endpointHash,
           ),
       );
-      const keepCandidates =
-        normalizedRecipe.recipeVersion === 2 &&
-        candidates.some(
-          (candidate) => candidate.labels[LOCAL_RESOURCE_LABEL.planHash] === request.planHash,
-        ) &&
-        (request.workerArtifacts?.[entry.bindingId] !== undefined ||
-          !candidates.some((candidate) =>
-            candidate.units?.some((unit) => unit.labels["dev.relkit.unit-kind"] === "worker"),
-          ));
+      const keepCandidates = keepServiceCandidates(
+        normalizedRecipe,
+        candidates,
+        request,
+        entry.bindingId,
+      );
       const service = await ensureServiceInstance(
         options,
         request,
