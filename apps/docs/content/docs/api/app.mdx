@@ -37,12 +37,29 @@ export * from "@relkit/agents";
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [assertExclusiveAlias](#assertexclusivealias)
   - [deriveApplicationId](#deriveapplicationid)
   - [isEnvDefinition](#isenvdefinition)
+  - [normalizeCompatibility](#normalizecompatibility)
 
 ---
 
 # utils
+
+## assertExclusiveAlias
+
+**Signature**
+
+```ts
+declare const assertExclusiveAlias: (
+  value: Record<string, unknown>,
+  primary: string,
+  legacy: string,
+  label: string,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L38)
 
 ## deriveApplicationId
 
@@ -52,7 +69,7 @@ export * from "@relkit/agents";
 declare const deriveApplicationId: (packageName: string) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L20)
 
 ## isEnvDefinition
 
@@ -62,7 +79,19 @@ declare const deriveApplicationId: (packageName: string) => string;
 declare const isEnvDefinition: (value: unknown) => value is EnvDefinition<EnvShape>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L5)
+
+## normalizeCompatibility
+
+**Signature**
+
+```ts
+declare const normalizeCompatibility: (value: AppCompatibilityConfig | undefined) => {
+  readonly legacyJobs: boolean;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/app-validation.ts#L25)
 
 ## `buckets.ts`
 
@@ -385,6 +414,7 @@ declare const createApplicationContextResolver: (options: {
 - [utils](#utils)
   - [APP_PROVIDER_CAPABILITIES](#app_provider_capabilities)
   - [ApiDocsConfig (interface)](#apidocsconfig-interface)
+  - [AppCompatibilityConfig (interface)](#appcompatibilityconfig-interface)
   - [AppDeploymentConfig (type alias)](#appdeploymentconfig-type-alias)
   - [AppProviderCapability (type alias)](#appprovidercapability-type-alias)
   - [AppProviderDefaults (type alias)](#appproviderdefaults-type-alias)
@@ -393,6 +423,7 @@ declare const createApplicationContextResolver: (options: {
   - [ApplicationDescriptor (type alias)](#applicationdescriptor-type-alias)
   - [DefineAppOptions (type alias)](#defineappoptions-type-alias)
   - [InspectorConfig (interface)](#inspectorconfig-interface)
+  - [NormalizedAppProviderDefaults (type alias)](#normalizedappproviderdefaults-type-alias)
   - [ServerConfig (interface)](#serverconfig-interface)
 
 ---
@@ -415,7 +446,7 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L35)
 
 ## ApiDocsConfig (interface)
 
@@ -430,6 +461,18 @@ export interface ApiDocsConfig {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L12)
 
+## AppCompatibilityConfig (interface)
+
+**Signature**
+
+```ts
+export interface AppCompatibilityConfig {
+  readonly legacyJobs?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L31)
+
 ## AppDeploymentConfig (type alias)
 
 **Signature**
@@ -438,7 +481,7 @@ export interface ApiDocsConfig {
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L100)
 
 ## AppProviderCapability (type alias)
 
@@ -448,21 +491,25 @@ type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L45)
 
 ## AppProviderDefaults (type alias)
+
+Public provider-default spellings. The normalized descriptor uses `job`.
 
 **Signature**
 
 ```ts
 type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in AppProviderCapability]?: Capability extends keyof Providers
-    ? Profile<NonNullable<Providers[Capability]>>
-    : never;
-}>;
+  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
+}> & {
+  readonly jobs?: ProfileFor<Providers, "job">;
+  /** @deprecated Use `jobs`. */
+  readonly job?: ProfileFor<Providers, "job">;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L86)
 
 ## AppProviderInputs (interface)
 
@@ -472,6 +519,9 @@ type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
 export interface AppProviderInputs {
   readonly bucket?: CapabilityInput<"bucket">;
   readonly cache?: CapabilityInput<"cache">;
+  /** Public plural spelling for the jobs provider capability. */
+  readonly jobs?: CapabilityInput<"job">;
+  /** @deprecated Use `jobs`. */
   readonly job?: CapabilityInput<"job">;
   readonly event?: CapabilityInput<"event">;
   readonly model?: CapabilityInput<"model">;
@@ -480,7 +530,7 @@ export interface AppProviderInputs {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L51)
 
 ## AppTelemetryConfig (type alias)
 
@@ -491,7 +541,7 @@ type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExport
   TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L98)
 
 ## ApplicationDescriptor (type alias)
 
@@ -505,7 +555,8 @@ type ApplicationDescriptor<
 > = DescriptorBase<"app", string> &
   NormalizedProviders<Providers> & {
     readonly env: EnvDefinition<Shape>;
-    readonly defaults: AppProviderDefaults<Providers>;
+    readonly defaults: NormalizedAppProviderDefaults<Providers>;
+    readonly compatibility: { readonly legacyJobs: boolean };
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -513,7 +564,7 @@ type ApplicationDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L135)
 
 ## DefineAppOptions (type alias)
 
@@ -529,6 +580,7 @@ type DefineAppOptions<
     readonly id?: string;
     readonly env: EnvDefinition<Shape>;
     readonly defaults?: AppProviderDefaults<Providers>;
+    readonly compatibility?: AppCompatibilityConfig;
     readonly telemetry?: AppTelemetryConfig<Exporters>;
     readonly server?: ServerConfig;
     readonly inspector?: InspectorConfig;
@@ -536,7 +588,7 @@ type DefineAppOptions<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L102)
 
 ## InspectorConfig (interface)
 
@@ -551,6 +603,18 @@ export interface InspectorConfig {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L25)
+
+## NormalizedAppProviderDefaults (type alias)
+
+**Signature**
+
+```ts
+type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+  [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
+}>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app-types.ts#L94)
 
 ## ServerConfig (interface)
 
@@ -613,7 +677,7 @@ declare const defineApp: <
 ) => ApplicationDescriptor<Shape, Providers, Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L59)
 
 Since v0.2.0
 
@@ -629,7 +693,7 @@ Re-exports all named exports from the "./define-app-types.js" module.
 export * from "./define-app-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/define-app.ts#L25)
 
 ## `events.ts`
 
@@ -705,6 +769,9 @@ export * from "@relkit/functions";
   - [EventAttributeValue](#eventattributevalue)
   - [EventPublishOptions](#eventpublishoptions)
   - [EventPublishResult](#eventpublishresult)
+  - [TaskClientFor](#taskclientfor)
+  - [TaskClients](#taskclients)
+  - [TaskTriggerOptions](#tasktriggeroptions)
   - [bindDescriptorIdentity](#binddescriptoridentity)
 
 ---
@@ -757,7 +824,7 @@ Re-exports all named exports from the "./tasks.js" module.
 export * from "./tasks.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
 
 ## "@relkit/agents" (namespace export)
 
@@ -841,7 +908,7 @@ Re-exports all named exports from the "@relkit/realtime" module.
 export * from "@relkit/realtime";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
 
 ## "@relkit/routes" (namespace export)
 
@@ -853,7 +920,7 @@ Re-exports all named exports from the "@relkit/routes" module.
 export * from "@relkit/routes";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
 
 ## "@relkit/services" (namespace export)
 
@@ -865,7 +932,7 @@ Re-exports all named exports from the "@relkit/services" module.
 export * from "@relkit/services";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
 
 ## "@relkit/tools" (namespace export)
 
@@ -877,7 +944,7 @@ Re-exports all named exports from the "@relkit/tools" module.
 export * from "@relkit/tools";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L17)
 
 ## EventAttributeValue
 
@@ -908,6 +975,36 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L10)
+
+## TaskClientFor
+
+**Signature**
+
+```ts
+declare const TaskClientFor: TaskClientFor<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+
+## TaskClients
+
+**Signature**
+
+```ts
+declare const TaskClients: TaskClients<M>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
+
+## TaskTriggerOptions
+
+**Signature**
+
+```ts
+declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/app/src/index.ts#L12)
 
 ## bindDescriptorIdentity
 

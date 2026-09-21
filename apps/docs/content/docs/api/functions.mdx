@@ -34,6 +34,9 @@ description: Generated public TypeScript reference for @relkit/functions.
   - [JobEnqueueResult (interface)](#jobenqueueresult-interface)
   - [JobState (type alias)](#jobstate-type-alias)
   - [JobStatus (interface)](#jobstatus-interface)
+  - [TaskClientFor (type alias)](#taskclientfor-type-alias)
+  - [TaskClients (type alias)](#taskclients-type-alias)
+  - [TaskTriggerOptions (interface)](#tasktriggeroptions-interface)
 
 ---
 
@@ -47,7 +50,7 @@ description: Generated public TypeScript reference for @relkit/functions.
 type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L108)
 
 ## AgentClients (type alias)
 
@@ -59,7 +62,7 @@ type AgentClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L147)
 
 ## BucketClient
 
@@ -69,7 +72,7 @@ type AgentClients<M> = {
 declare const BucketClient: BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L64)
 
 ## BucketClientFor (type alias)
 
@@ -79,7 +82,7 @@ declare const BucketClient: BucketClient;
 type BucketClientFor<T> = BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L129)
 
 ## BucketClients (type alias)
 
@@ -91,7 +94,7 @@ type BucketClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L141)
 
 ## BucketObjectMetadata
 
@@ -101,7 +104,7 @@ type BucketClients<M> = {
 declare const BucketObjectMetadata: BucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L64)
 
 ## BucketPutOptions
 
@@ -111,7 +114,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 declare const BucketPutOptions: BucketPutOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L64)
 
 ## CacheClient
 
@@ -121,7 +124,7 @@ declare const BucketPutOptions: BucketPutOptions;
 declare const CacheClient: CacheClient<Key, Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L65)
 
 ## CacheClientFor (type alias)
 
@@ -131,7 +134,7 @@ declare const CacheClient: CacheClient<Key, Value>;
 type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L130)
 
 ## CacheClients (type alias)
 
@@ -143,7 +146,7 @@ type CacheClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L129)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L144)
 
 ## CacheOperationOptions
 
@@ -153,7 +156,7 @@ type CacheClients<M> = {
 declare const CacheOperationOptions: CacheOperationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L65)
 
 ## EventAttributeValue (type alias)
 
@@ -163,7 +166,7 @@ declare const CacheOperationOptions: CacheOperationOptions;
 type EventAttributeValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L33)
 
 ## EventClientFor (type alias)
 
@@ -178,7 +181,7 @@ type EventClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L111)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L123)
 
 ## EventClients (type alias)
 
@@ -190,7 +193,7 @@ type EventClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L138)
 
 ## EventPublishOptions (interface)
 
@@ -203,7 +206,7 @@ export interface EventPublishOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L51)
 
 ## EventPublishResult (interface)
 
@@ -219,7 +222,7 @@ export interface EventPublishResult<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L56)
 
 ## JobClientFor (type alias)
 
@@ -231,7 +234,7 @@ type JobClientFor<T> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L109)
 
 ## JobClients (type alias)
 
@@ -243,7 +246,7 @@ type JobClients<M> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L132)
 
 ## JobEnqueueOptions (interface)
 
@@ -255,7 +258,7 @@ export interface JobEnqueueOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L18)
 
 ## JobEnqueueResult (interface)
 
@@ -274,7 +277,7 @@ export interface JobEnqueueResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L22)
 
 ## JobState (type alias)
 
@@ -284,7 +287,7 @@ export interface JobEnqueueResult {
 type JobState = "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L7)
 
 ## JobStatus (interface)
 
@@ -300,7 +303,48 @@ export interface JobStatus {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L10)
+
+## TaskClientFor (type alias)
+
+**Signature**
+
+```ts
+type TaskClientFor<T> = {
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L120)
+
+## TaskClients (type alias)
+
+**Signature**
+
+```ts
+type TaskClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L135)
+
+## TaskTriggerOptions (interface)
+
+**Signature**
+
+```ts
+export interface TaskTriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/clients.ts#L112)
 
 ## `define-error-validation.ts`
 
@@ -748,7 +792,7 @@ export interface DefineFunction {
 declare const assertHook: (value: unknown, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L62)
 
 ## assertSchema
 
@@ -758,7 +802,7 @@ declare const assertHook: (value: unknown, name: string) => void;
 declare const assertSchema: (value: unknown, name: string) => asserts value is StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L68)
 
 ## copyDependencies
 
@@ -782,7 +826,7 @@ declare const copyPublishes: <Names extends readonly string[]>(
 ) => Names | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L39)
 
 ## functionTargetForReceiver
 
@@ -795,7 +839,7 @@ declare const functionTargetForReceiver: (
 ) => FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L76)
 
 ## validateLimit
 
@@ -805,7 +849,7 @@ declare const functionTargetForReceiver: (
 declare const validateLimit: (value: number | undefined, name: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function-validation.ts#L56)
 
 ## `define-function.ts`
 
@@ -860,6 +904,9 @@ declare const validateLimit: (value: number | undefined, name: string) => void;
   - [PublicClock](#publicclock)
   - [PublicLogger](#publiclogger)
   - [ResolvedApplicationEnv](#resolvedapplicationenv)
+  - [TaskClientFor](#taskclientfor)
+  - [TaskClients](#taskclients)
+  - [TaskTriggerOptions](#tasktriggeroptions)
 
 ---
 
@@ -900,7 +947,7 @@ void greet;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L93)
 
 Since v0.1.0
 
@@ -1343,7 +1390,7 @@ declare const JobStatus: JobStatus;
 declare const PublicClock: PublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L59)
 
 ## PublicLogger
 
@@ -1353,7 +1400,7 @@ declare const PublicClock: PublicClock;
 declare const PublicLogger: PublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L60)
 
 ## ResolvedApplicationEnv
 
@@ -1361,6 +1408,36 @@ declare const PublicLogger: PublicLogger;
 
 ```ts
 declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L61)
+
+## TaskClientFor
+
+**Signature**
+
+```ts
+declare const TaskClientFor: TaskClientFor<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L56)
+
+## TaskClients
+
+**Signature**
+
+```ts
+declare const TaskClients: TaskClients<M>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L57)
+
+## TaskTriggerOptions
+
+**Signature**
+
+```ts
+declare const TaskTriggerOptions: TaskTriggerOptions;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/define-function.ts#L58)
@@ -1488,7 +1565,7 @@ declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptio
   - [FunctionDependencies (interface)](#functiondependencies-interface)
   - [FunctionDescriptor (interface)](#functiondescriptor-interface)
   - [FunctionHandler (type alias)](#functionhandler-type-alias)
-  - [FunctionLifecycleHook (type alias)](#functionlifecyclehook-type-alias)
+  - [FunctionLifecycleHook](#functionlifecyclehook)
   - [InvocationMetadata (type alias)](#invocationmetadata-type-alias)
   - [InvocationSource (type alias)](#invocationsource-type-alias)
   - [PublicClock (type alias)](#publicclock-type-alias)
@@ -1508,7 +1585,7 @@ declare const createFunctionDescriptor: (options: FunctionDescriptorFactoryOptio
 type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L60)
 
 ## AuthContext (interface)
 
@@ -1520,7 +1597,7 @@ export interface AuthContext<Session = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L69)
 
 ## DefineFunctionOptions (interface)
 
@@ -1569,7 +1646,7 @@ export interface DefineFunctionOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L147)
 
 ## FunctionContext (type alias)
 
@@ -1586,7 +1663,7 @@ type FunctionContext<
     : { readonly progress: import("@relkit/invocation").ProgressEmitter<Progress> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L104)
 
 ## FunctionContextBase (interface)
 
@@ -1603,6 +1680,7 @@ export interface FunctionContextBase<
   readonly log: PublicLogger;
   readonly time: PublicClock;
   readonly trace: PublicTrace;
+  readonly tasks: TaskClients<D["tasks"]>;
   readonly jobs: JobClients<D["jobs"]>;
   readonly events: import("./clients.js").EventClients<PublishedEventMap<Publishes>>;
   readonly buckets: BucketClients<D["buckets"]>;
@@ -1615,7 +1693,7 @@ export interface FunctionContextBase<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L82)
 
 ## FunctionDependencies (interface)
 
@@ -1623,6 +1701,7 @@ export interface FunctionContextBase<
 
 ```ts
 export interface FunctionDependencies {
+  readonly tasks?: Readonly<Record<string, TaskRefAny>>;
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
   readonly cache?: Readonly<Record<string, CacheRefAny>>;
@@ -1630,7 +1709,7 @@ export interface FunctionDependencies {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L34)
 
 ## FunctionDescriptor (interface)
 
@@ -1672,7 +1751,7 @@ export interface FunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L113)
 
 ## FunctionHandler (type alias)
 
@@ -1692,25 +1771,22 @@ type FunctionHandler<
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L171)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L188)
 
-## FunctionLifecycleHook (type alias)
+## FunctionLifecycleHook
 
 **Signature**
 
 ```ts
-type FunctionLifecycleHook<
+declare const FunctionLifecycleHook: FunctionLifecycleHook<
   Value,
-  Dependencies extends FunctionDependencies = {},
-  Publishes extends readonly KnownEventName[] = readonly [],
-  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-> = (
-  value: Value,
-  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
-) => MaybePromise<Value>;
+  Dependencies,
+  Publishes,
+  ProgressSchema
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L183)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L32)
 
 ## InvocationMetadata (type alias)
 
@@ -1720,7 +1796,7 @@ type FunctionLifecycleHook<
 type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L43)
 
 ## InvocationSource (type alias)
 
@@ -1730,7 +1806,7 @@ type InvocationMetadata = SharedInvocationMetadata;
 type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L42)
 
 ## PublicClock (type alias)
 
@@ -1740,7 +1816,7 @@ type InvocationSource = SharedInvocationSource;
 type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L49)
 
 ## PublicLogger (type alias)
 
@@ -1750,7 +1826,7 @@ type PublicClock = SharedPublicClock;
 type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L48)
 
 ## PublicTrace (type alias)
 
@@ -1760,7 +1836,7 @@ type PublicLogger = SharedPublicLogger;
 type PublicTrace = SharedPublicTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L50)
 
 ## ResolvedApplicationEnv (type alias)
 
@@ -1772,7 +1848,7 @@ type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
   : Readonly<Relkit.ApplicationEnv>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-descriptor-types.ts#L44)
 
 ## `function-graph-node.ts`
 
@@ -1909,6 +1985,50 @@ declare const isFunctionGraphNode: (value: unknown) => value is FunctionGraphNod
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-graph-node.ts#L120)
+
+## `function-lifecycle-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FunctionLifecycleHook (type alias)](#functionlifecyclehook-type-alias)
+  - [ProgressValue (type alias)](#progressvalue-type-alias)
+
+---
+
+# utils
+
+## FunctionLifecycleHook (type alias)
+
+**Signature**
+
+```ts
+type FunctionLifecycleHook<
+  Value,
+  Dependencies extends FunctionDependencies = {},
+  Publishes extends readonly KnownEventName[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+> = (
+  value: Value,
+  context: FunctionContext<Dependencies, Publishes, ProgressValue<ProgressSchema>>,
+) => MaybePromise<Value>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-lifecycle-types.ts#L10)
+
+## ProgressValue (type alias)
+
+**Signature**
+
+```ts
+type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends StandardSchemaV1
+  ? InferOutput<Schema>
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/function-lifecycle-types.ts#L7)
 
 ## `function-tool-runtime.ts`
 
@@ -2928,8 +3048,11 @@ declare const streamOf: <const ItemSchema extends StandardSchemaV1>(
   - [JobRefAny](#jobrefany)
   - [JobState](#jobstate)
   - [JobStatus](#jobstatus)
+  - [TaskClientFor](#taskclientfor)
+  - [TaskClients](#taskclients)
   - [TaskRef](#taskref)
   - [TaskRefAny](#taskrefany)
+  - [TaskTriggerOptions](#tasktriggeroptions)
 
 ---
 
@@ -2945,7 +3068,7 @@ Re-exports all named exports from the "./function-descriptor-types.js" module.
 export * from "./function-descriptor-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L86)
 
 ## AgentClientFor
 
@@ -2982,7 +3105,7 @@ export interface AgentRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L72)
 
 ## AgentRefAny (type alias)
 
@@ -2992,7 +3115,7 @@ export interface AgentRef<
 type AgentRefAny = AgentRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L85)
 
 ## BucketClient
 
@@ -3042,7 +3165,7 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L61)
 
 ## BucketRefAny (type alias)
 
@@ -3052,7 +3175,7 @@ type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 type BucketRefAny = BucketRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L83)
 
 ## CacheClient
 
@@ -3109,7 +3232,7 @@ export interface CacheRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L63)
 
 ## CacheRefAny (type alias)
 
@@ -3119,7 +3242,7 @@ export interface CacheRef<
 type CacheRefAny = CacheRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L84)
 
 ## DescriptorRef (interface)
 
@@ -3131,7 +3254,7 @@ export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = 
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L33)
 
 ## EventAttributeValue
 
@@ -3197,7 +3320,7 @@ export interface EventRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L53)
 
 ## EventRefAny (type alias)
 
@@ -3207,7 +3330,7 @@ export interface EventRef<
 type EventRefAny = EventRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L82)
 
 ## FunctionRef (interface)
 
@@ -3231,7 +3354,7 @@ export interface FunctionRef<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L37)
 
 ## FunctionRefAny (type alias)
 
@@ -3241,7 +3364,7 @@ export interface FunctionRef<
 type FunctionRefAny = FunctionRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L81)
 
 ## JobClientFor
 
@@ -3323,6 +3446,26 @@ declare const JobStatus: JobStatus;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L27)
 
+## TaskClientFor
+
+**Signature**
+
+```ts
+declare const TaskClientFor: TaskClientFor<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L28)
+
+## TaskClients
+
+**Signature**
+
+```ts
+declare const TaskClients: TaskClients<M>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L29)
+
 ## TaskRef
 
 **Signature**
@@ -3342,3 +3485,13 @@ declare const TaskRefAny: TaskRefAny;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L2)
+
+## TaskTriggerOptions
+
+**Signature**
+
+```ts
+declare const TaskTriggerOptions: TaskTriggerOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/functions/src/types.ts#L30)

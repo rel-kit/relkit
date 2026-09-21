@@ -19,3 +19,6 @@ Persistent journal acceptance is separate from browser delivery. Slow observers 
 `SLOW_CONSUMER` and recover from the journal; they never backpressure model or tool execution.
 Browser projections contain validated public messages, parts, progress, tool data, and results—not
 provider payloads, internal prompts, credentials, private context, or private reasoning.
+
+Agent content streams and task progress/streams are separate contracts. Use a task job's run ID and generated
+job client for background work; do not treat an agent graph state or realtime channel as a task run.
