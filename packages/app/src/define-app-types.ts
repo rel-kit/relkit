@@ -76,10 +76,9 @@ type ProviderInputFor<
     ? NonNullable<Providers[Capability]>
     : never;
 
-type ProfileFor<
-  Providers extends AppProviderInputs,
-  Capability extends AppProviderCapability,
-> = [ProviderInputFor<Providers, Capability>] extends [never]
+type ProfileFor<Providers extends AppProviderInputs, Capability extends AppProviderCapability> = [
+  ProviderInputFor<Providers, Capability>,
+] extends [never]
   ? never
   : Profile<ProviderInputFor<Providers, Capability>>;
 
@@ -126,11 +125,11 @@ type AdapterOf<Input> =
       : never;
 
 type NormalizedProviders<Providers extends AppProviderInputs> = {
-  readonly [Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [
-    never
-  ]
-    ? never
-    : Capability]: NormalizedProviderProfiles<AdapterOf<ProviderInputFor<Providers, Capability>>>;
+  readonly [
+    Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [never]
+      ? never
+      : Capability
+  ]: NormalizedProviderProfiles<AdapterOf<ProviderInputFor<Providers, Capability>>>;
 };
 
 export type ApplicationDescriptor<

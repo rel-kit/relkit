@@ -1,6 +1,6 @@
 import { canonicalJson } from "@relkit/contracts";
 import type { DeploymentPlan } from "./plan.js";
-
+import { job } from "./plan-validation-jobs.js";
 const ROOT_KEYS = [
   "contractVersion",
   "graphHash",
@@ -45,6 +45,7 @@ export function assertDeploymentPlanShape(value: unknown): asserts value is Depl
   for (const key of ["http", "iam"] as const) object(plan[key], key);
   for (const key of ["jobs", "schedules", "events", "eventTriggers", "buckets", "caches"] as const)
     list(plan[key], key);
+  list(plan.jobs, "jobs").forEach((item, index) => job(item, `jobs[${index}]`));
 
   const connected = list(plan.connectedBindings, "connectedBindings");
   const infrastructure = list(plan.infrastructureOperations, "infrastructureOperations");
@@ -79,7 +80,6 @@ export function assertDeploymentPlanShape(value: unknown): asserts value is Depl
       );
   }
 }
-
 function binding(
   value: unknown,
   path: string,

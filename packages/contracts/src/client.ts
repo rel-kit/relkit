@@ -27,11 +27,7 @@ export interface ClientIdentityDocument extends ExpectedClientIdentity {
 }
 
 export type PendingOperationKind =
-  | "mutation"
-  | "agent-run"
-  | "agent-control"
-  | "continuation"
-  | "job-trigger";
+  "mutation" | "agent-run" | "agent-control" | "continuation" | "job-trigger";
 
 export interface PendingOperationMetadata {
   readonly operationId: OperationId;

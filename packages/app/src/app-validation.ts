@@ -22,11 +22,14 @@ export function deriveApplicationId(packageName: string): string {
   return normalizeId(normalized.replaceAll("/", "."));
 }
 
-export function normalizeCompatibility(
-  value: AppCompatibilityConfig | undefined,
-): { readonly legacyJobs: boolean } {
+export function normalizeCompatibility(value: AppCompatibilityConfig | undefined): {
+  readonly legacyJobs: boolean;
+} {
   if (value === undefined) return Object.freeze({ legacyJobs: false });
-  if (!isRecord(value) || (value.legacyJobs !== undefined && typeof value.legacyJobs !== "boolean")) {
+  if (
+    !isRecord(value) ||
+    (value.legacyJobs !== undefined && typeof value.legacyJobs !== "boolean")
+  ) {
     throw new TypeError("defineApp compatibility.legacyJobs must be a boolean");
   }
   return Object.freeze({ legacyJobs: value.legacyJobs === true });

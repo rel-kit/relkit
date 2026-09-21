@@ -1,13 +1,7 @@
 import type { JsonValue } from "./json.js";
 
 export type JobClientOperation =
-  | "trigger"
-  | "get"
-  | "list"
-  | "watch"
-  | "cancel"
-  | "retry"
-  | "stream";
+  "trigger" | "get" | "list" | "watch" | "cancel" | "retry" | "stream";
 
 export interface JobAccessRequest {
   readonly operation: JobClientOperation;

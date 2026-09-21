@@ -1,6 +1,7 @@
 import type {
   DeploymentAccessIntegration,
   DeploymentHostIntegration,
+  DeploymentHostMaterialization,
   DeploymentInfrastructureIntegration,
   DeploymentInfrastructureMaterialization,
   DeploymentInput,
@@ -9,10 +10,10 @@ import type {
   DeploymentIntegrationRole,
   DeploymentPlan,
   DeploymentProgramMaterialization,
-  DeploymentResourceOperation,
 } from "@relkit/deploy";
 import { deploymentConfiguration } from "@relkit/deploy";
 import { assertDeploymentPlanVersion } from "@relkit/deploy";
+import { nativeWorkerOperations } from "./worker-materialization.js";
 
 export interface MaterializeDeploymentOptions {
   readonly stackName: string;
@@ -63,11 +64,13 @@ export function materializeDeploymentOperations(
       infrastructure: materialized,
     }).resources;
   });
+  const workerResources = nativeWorkerOperations(plan, host);
   return Object.freeze({
     resources: Object.freeze([
       ...host.resources,
       ...[...infrastructure.values()].flatMap((entry) => entry.resources),
       ...accessResources,
+      ...workerResources,
     ]),
     bindings: Object.freeze(bindings),
     outputs: Object.freeze(host.outputs),
