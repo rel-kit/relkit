@@ -60,7 +60,7 @@ export async function resolveDomain(builder: PlanBuilder): Promise<DomainTarget>
 export async function addPublicMember(
   builder: PlanBuilder,
   target: DomainTarget,
-  category: "functions" | "events",
+  category: "functions" | "events" | "tasks" | "jobs",
   artifact: DomainArtifact,
   artifactPath: string,
 ): Promise<void> {
