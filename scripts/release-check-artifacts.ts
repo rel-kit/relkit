@@ -13,7 +13,7 @@ import {
   type PackageInfo,
   type RecordValue,
 } from "./release-check-support.js";
-import { expectedTemplateScripts, releaseTemplates } from "./release-templates.js";
+import { expectedTemplateScripts, packedTemplates } from "./release-templates.js";
 async function readJsonFromTar(artifact: string): Promise<RecordValue> {
   return JSON.parse(await command("tar", ["-xOf", artifact, "package/package.json"]));
 }
@@ -86,7 +86,7 @@ function assertListing(item: PackageInfo, listing: string[], packed: RecordValue
   if (forbidden.length > 0)
     throw new Error(`Packed development files found in ${item.name}: ${forbidden.join(", ")}`);
   if (item.name === "create-relkit")
-    for (const template of releaseTemplates)
+    for (const template of packedTemplates)
       for (const file of ["package.json", "gitignore"])
         if (!listing.includes(`package/dist/templates/default/v1/${template}/${file}`))
           throw new Error(`Packed create-relkit template is missing: ${template}/${file}`);
@@ -152,7 +152,7 @@ export async function templateInputs(
     /(?:from|import)\s*["'](?:effect|hono|next|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
   const fullstackForbidden =
     /(?:from|import)\s*["'](?:effect|hono|@pulumi\/|@aws-sdk\/|@relkit\/(?:compiler|engine|graph|runtime-effect|runtime-hono|supervisor|providers-local|providers-standard|cloud-aws|deploy|deploy-pulumi|observability|inspector-api))["']/;
-  for (const name of releaseTemplates) {
+  for (const name of packedTemplates) {
     const directory = join(root, "templates/default/v1", name);
     const manifest = await readJson(join(directory, "package.json"));
     for (const field of packageFields)

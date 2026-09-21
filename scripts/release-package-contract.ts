@@ -1,50 +1,10 @@
+import {
+  appSubpaths,
+  catalogSubpaths,
+  integrationSubpaths,
+} from "./release-package-contract-tables.js";
+
 const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
-const appSubpaths = [
-  "schema",
-  "config",
-  "routes",
-  "functions",
-  "events",
-  "realtime",
-  "agents",
-  "jobs",
-  "jobs/legacy",
-  "tasks",
-  "cache",
-  "tools",
-  "buckets",
-  "services",
-] as const;
-
-const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
-  "@relkit/aws": ["host", "infrastructure", "access"],
-  "@relkit/cloudflare": ["runtime"],
-  "@relkit/docker": ["runtime"],
-  "@relkit/local": ["runtime"],
-  "@relkit/otlp": ["runtime"],
-  "@relkit/pulumi": ["engine"],
-  "@relkit/redis": ["runtime", "local-recipe"],
-  "@relkit/s3": ["runtime", "local-recipe"],
-  "@relkit/sentry": ["runtime"],
-  "@relkit/inngest": ["runtime", "local-recipe", "deployment"],
-  "@relkit/trigger": ["runtime", "local-recipe", "deployment"],
-  "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
-};
-
-const catalogSubpaths = [
-  "redis",
-  "s3",
-  "docker",
-  "local",
-  "cloudflare",
-  "sentry",
-  "otlp",
-  "aws",
-  "pulumi",
-  "inngest",
-  "trigger",
-  "effect-mq",
-] as const;
 
 export function expectedExports(
   directoryName: string,
@@ -150,6 +110,10 @@ export function expectedExports(
       "./react": {
         types: "./dist/react/index.d.ts",
         import: "./dist/react/index.js",
+      },
+      "./jobs": {
+        types: "./dist/jobs/index.d.ts",
+        import: "./dist/jobs/index.js",
       },
       "./build/next": {
         types: "./dist/build/next.d.ts",

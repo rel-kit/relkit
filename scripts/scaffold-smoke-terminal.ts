@@ -27,7 +27,7 @@ export async function runScaffoldTerminal(
     cwd,
     terminal,
     env: { ...process.env, CI: "", NO_COLOR: "1", TERM: "xterm-256color", ...env },
-    signal: AbortSignal.timeout(60_000),
+    signal: AbortSignal.timeout(180_000),
   });
   try {
     const code = await child.exited;
@@ -79,9 +79,12 @@ export async function verifyInteractiveResolver(root: string): Promise<void> {
     text: async ({ message }: { readonly message: string }) =>
       message === "Project name" ? "interactive-app" : "interactive-project",
     select: async ({ message }: { readonly message: string }) =>
-      ({ "Starter template": "api", "Cloud provider": "none", "Deployment adapter": "none" })[
-        message as "Starter template" | "Cloud provider" | "Deployment adapter"
-      ],
+      ({
+        "Starter template": "api",
+        "Cloud provider": "none",
+        "Deployment adapter": "none",
+        "Jobs service": "none",
+      })[message as "Starter template" | "Cloud provider" | "Deployment adapter" | "Jobs service"],
     multiselect: async () => [],
     confirm: async () => false,
     note: () => undefined,

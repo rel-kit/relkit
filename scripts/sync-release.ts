@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { workspacePackageDirectories } from "./workspace-packages.js";
-import { releaseTemplates } from "./release-templates.js";
+import { packedTemplates } from "./release-templates.js";
 
 const root = resolve(import.meta.dir, "..");
 const repository = "https://github.com/rel-kit/relkit";
@@ -59,6 +59,8 @@ const descriptions: Record<string, string> = {
   "@relkit/s3": "S3-compatible storage integration for RELKIT.",
   "@relkit/sentry": "Sentry telemetry integration for RELKIT.",
   "@relkit/inngest": "Inngest durable-jobs integration for RELKIT.",
+  "@relkit/trigger": "Trigger.dev jobs integration for RELKIT.",
+  "@relkit/effect-mq": "Effect MQ retryable-jobs integration for RELKIT.",
   "create-relkit": "Create a RELKIT application from a supported project template.",
 };
 const dependencyFields = [
@@ -118,7 +120,7 @@ for (const directory of workspacePackageDirectories(root)) {
 if (versions.size !== 1)
   throw new Error(`Fixed package versions diverged: ${[...versions].join(", ")}`);
 const version = [...versions][0]!;
-for (const template of releaseTemplates) {
+for (const template of packedTemplates) {
   const path = join(root, "templates", "default", "v1", template, "package.json");
   const manifest = JSON.parse(await readFile(path, "utf8")) as TemplateManifest;
   for (const field of dependencyFields) {
