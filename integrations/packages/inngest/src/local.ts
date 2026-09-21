@@ -6,7 +6,7 @@ import {
 import { waitForInngestReadiness } from "./local-readiness.js";
 
 const INNGEST_IMAGE =
-  "inngest/inngest@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57";
+  "inngest/inngest@sha256:d5365a31f8bf504dc2d54ddd114fcdc1a0413f8b57a450365c095ab6234ad8c2";
 const POSTGRES_IMAGE =
   "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685";
 const REDIS_IMAGE =

@@ -120,7 +120,7 @@ try {
       {
         provider: "inngest",
         image:
-          "inngest/inngest:v1.44.0@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+          "inngest/inngest:v1.44.0@sha256:d5365a31f8bf504dc2d54ddd114fcdc1a0413f8b57a450365c095ab6234ad8c2",
         acceptance: {
           sameKeyRunId: acceptanceResult.sameRun.run_id,
           sameKeyEventId: acceptanceResult.sameEventId,
