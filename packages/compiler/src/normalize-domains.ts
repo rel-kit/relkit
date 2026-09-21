@@ -112,7 +112,8 @@ export function validateDomains(work: NormalizationWork): void {
     ...(["function", "event", "error"].includes(descriptor.kind)
       ? {
           exposure:
-            publicIds.has(`${descriptor.kind}:${descriptor.id}`) || publicErrorIds.has(descriptor.id)
+            publicIds.has(`${descriptor.kind}:${descriptor.id}`) ||
+            publicErrorIds.has(descriptor.id)
               ? ("public" as const)
               : ("internal" as const),
         }

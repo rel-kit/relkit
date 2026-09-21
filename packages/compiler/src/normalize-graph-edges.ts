@@ -63,7 +63,11 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
       addDependencyEdges(add, descriptor, value.dependencies, work);
       addPublicationEdges(add, descriptor, value.publishes);
     }
-    if (descriptor.kind === "function" || descriptor.kind === "tool" || descriptor.kind === "task") {
+    if (
+      descriptor.kind === "function" ||
+      descriptor.kind === "tool" ||
+      descriptor.kind === "task"
+    ) {
       addHookEdges(add, descriptor, value);
     }
     addProviderEdge(add, descriptor, value, work);
@@ -120,9 +124,15 @@ function addServiceEdges(
     } else if (targetId !== undefined && kind === "event") {
       add("exposes-event", descriptor.id, targetId, { member, order: eventOrder++ });
     } else if (targetId !== undefined && kind === "task") {
-      add("exposes-task", descriptor.id, graphIdForReference(work, target) ?? targetId, { member, order: taskOrder++ });
+      add("exposes-task", descriptor.id, graphIdForReference(work, target) ?? targetId, {
+        member,
+        order: taskOrder++,
+      });
     } else if (targetId !== undefined && kind === "job") {
-      add("exposes-job", descriptor.id, graphIdForReference(work, target) ?? targetId, { member, order: jobOrder++ });
+      add("exposes-job", descriptor.id, graphIdForReference(work, target) ?? targetId, {
+        member,
+        order: jobOrder++,
+      });
     }
   }
 }

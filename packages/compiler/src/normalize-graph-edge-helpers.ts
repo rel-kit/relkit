@@ -53,7 +53,12 @@ export function addHookEdges(
   for (const phase of ["before", "after"] as const) {
     const hook = value[phase === "before" ? "onBefore" : "onAfter"];
     if (typeof hook === "function" || (isRecord(hook) && hook.$relkit === "function")) {
-      add("uses-hook", graphIdForDescriptor(descriptor), `${graphIdForDescriptor(descriptor)}.${phase}`, { phase });
+      add(
+        "uses-hook",
+        graphIdForDescriptor(descriptor),
+        `${graphIdForDescriptor(descriptor)}.${phase}`,
+        { phase },
+      );
     }
   }
 }
@@ -74,7 +79,8 @@ export function addPublicationEdges(
 ): void {
   if (!Array.isArray(publishes)) return;
   for (const eventId of publishes) {
-    if (typeof eventId === "string") add("publishes-event", graphIdForDescriptor(descriptor), eventId);
+    if (typeof eventId === "string")
+      add("publishes-event", graphIdForDescriptor(descriptor), eventId);
   }
 }
 

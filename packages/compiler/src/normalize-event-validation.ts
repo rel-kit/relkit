@@ -21,7 +21,11 @@ export function validateEventCompatibility(work: NormalizationWork): void {
     }
     if (descriptor.kind === "function") validateEventFunction(work, descriptor);
     if (descriptor.kind === "task") {
-      validatePublishes(work, descriptor, isRecord(descriptor.value) ? descriptor.value.publishes : undefined);
+      validatePublishes(
+        work,
+        descriptor,
+        isRecord(descriptor.value) ? descriptor.value.publishes : undefined,
+      );
     }
     if (descriptor.kind === "event-trigger") validateEventTrigger(work, descriptor);
   }

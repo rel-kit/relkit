@@ -102,7 +102,8 @@ export function makeOutputs(
 
 function hasTaskJobs(work: NormalizationWork): boolean {
   return work.descriptors.some(
-    (descriptor) => descriptor.kind === "task" || (descriptor.kind === "job" && isTaskJob(descriptor)),
+    (descriptor) =>
+      descriptor.kind === "task" || (descriptor.kind === "job" && isTaskJob(descriptor)),
   );
 }
 

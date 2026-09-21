@@ -31,7 +31,9 @@ function validateGraphIds(work: NormalizationWork, nodes: readonly GraphNode[]):
   for (const node of nodes) {
     const previous = seen.get(node.id);
     if (previous !== undefined && previous.kind !== node.kind) {
-      const owner = work.descriptors.find((descriptor) => graphIdForDescriptor(descriptor) === node.id) ?? work.descriptors[0];
+      const owner =
+        work.descriptors.find((descriptor) => graphIdForDescriptor(descriptor) === node.id) ??
+        work.descriptors[0];
       if (owner !== undefined) {
         add(
           work,
