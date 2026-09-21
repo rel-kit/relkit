@@ -355,11 +355,13 @@ test("returns an unknown outcome when event transport acceptance is ambiguous", 
 
 test("hashes signing keys for native API authorization and preserves null output", async () => {
   let authorization = "";
+  let redirect: RequestInit["redirect"];
   const api = createInngestRunApi({
     baseUrl: "http://inngest.test",
     signingKey: "signkey-test-abcdef",
     fetch: async (_input, init) => {
       authorization = new Headers(init?.headers).get("authorization") ?? "";
+      redirect = init?.redirect;
       return Response.json({ data: { id: "run-1", status: "Completed", output: null } });
     },
   });
@@ -367,6 +369,7 @@ test("hashes signing keys for native API authorization and preserves null output
   expect(authorization).toBe(
     `Bearer signkey-test-${createHash("sha256").update(Buffer.from("abcdef", "hex")).digest("hex")}`,
   );
+  expect(redirect).toBe("error");
   const metadata = {
     accepted: true,
     runId: "run-1",

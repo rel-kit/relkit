@@ -33,7 +33,10 @@ async function waitForHealth(
   let lastError: unknown;
   while (Date.now() < deadline) {
     try {
-      const response = await fetcher(endpoint, signal === undefined ? {} : { signal });
+      const response = await fetcher(endpoint, {
+        redirect: "error",
+        ...(signal === undefined ? {} : { signal }),
+      });
       if (response.ok) return;
       lastError = new Error("status " + response.status);
     } catch (error) {
@@ -61,6 +64,7 @@ async function waitForNativeRead(
           accept: "application/json",
           authorization: "Bearer " + hashSigningKey(signingKey),
         },
+        redirect: "error",
         ...(signal === undefined ? {} : { signal }),
       });
       if (response.ok) return;

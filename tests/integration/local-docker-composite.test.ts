@@ -67,12 +67,19 @@ dockerTest(
       );
       const overrides = readProviderOverrides(identity, planHash);
       const values = overrides?.bindings.find((binding) => binding.bindingId === bindingId)?.values;
-      const baseUrl = text(values?.baseUrl);
+      const baseUrl = new URL(text(values?.baseUrl));
+      const api = instances.find(
+        (instance) => instance.labels["dev.relkit.unit-id"] === "inngest",
+      );
+      const apiPort = api?.ports["8288/tcp"];
+      expect(apiPort).toBeDefined();
+      expect(baseUrl.hostname).toBe("127.0.0.1");
+      expect(baseUrl.port).toBe(String(apiPort));
       expect(values?.postgresPassword).toBeUndefined();
       expect(readLocalServiceSecrets(identity)?.bindings[0]?.values.postgresPassword).toMatch(
         /^[a-f0-9]{48}$/u,
       );
-      expect((await fetch(`${baseUrl}/health`)).ok).toBe(true); // codeql[js/request-forgery]
+      expect((await fetch(`http://127.0.0.1:${apiPort}/health`)).ok).toBe(true);
       expect(await materializer.listVolumes(labels)).toHaveLength(2);
       expect(
         JSON.parse(
