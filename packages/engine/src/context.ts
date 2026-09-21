@@ -81,7 +81,9 @@ export function createContext<Context extends { readonly signal: AbortSignal }>(
 function sourceMaps(base: InvocationContextBase): DependencyClientSources {
   const value = base as InvocationContextBase & Record<string, unknown>;
   return {
-    ...(value.tasks === undefined ? {} : { tasks: value.tasks as Readonly<Record<string, unknown>> }),
+    ...(value.tasks === undefined
+      ? {}
+      : { tasks: value.tasks as Readonly<Record<string, unknown>> }),
     ...(value.jobs === undefined ? {} : { jobs: value.jobs as Readonly<Record<string, unknown>> }),
     ...(value.events === undefined
       ? {}

@@ -350,13 +350,15 @@ test("requires the native jobs marker for task-backed jobs", async () => {
     nodes: [binding, taskJob],
     edges: [{ kind: "uses-provider-profile", from: taskJob.id, to: binding.id }],
   };
-  await expect(createProviderRegistry({
-    generationId: "generation.task-invalid",
-    graph: applicationGraph,
-    runtimeIntegrationModules: modules([
-      registration("job", "redis", () => ({ value: { createQueue: () => undefined } })),
-    ]),
-  })).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
+  await expect(
+    createProviderRegistry({
+      generationId: "generation.task-invalid",
+      graph: applicationGraph,
+      runtimeIntegrationModules: modules([
+        registration("job", "redis", () => ({ value: { createQueue: () => undefined } })),
+      ]),
+    }),
+  ).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
 });
 
 test("rejects a task adapter for legacy jobs", async () => {
@@ -375,25 +377,27 @@ test("rejects a task adapter for legacy jobs", async () => {
     nodes: [binding, legacyJob],
     edges: [{ kind: "uses-provider-profile", from: legacyJob.id, to: binding.id }],
   };
-  await expect(createProviderRegistry({
-    generationId: "generation.legacy-invalid",
-    graph: applicationGraph,
-    runtimeIntegrationModules: modules([
-      registration("job", "redis", () => ({
-        value: {
-          kind: "jobs-adapter-runtime",
-          protocolVersion: 1,
-          capabilities: { service: "native", features: {} },
-          submit: async () => ({}),
-          get: async () => ({}),
-          list: async () => ({}),
-          observe: () => (async function* () {})(),
-          cancel: async () => ({}),
-          close: async () => undefined,
-        },
-      })),
-    ]),
-  })).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
+  await expect(
+    createProviderRegistry({
+      generationId: "generation.legacy-invalid",
+      graph: applicationGraph,
+      runtimeIntegrationModules: modules([
+        registration("job", "redis", () => ({
+          value: {
+            kind: "jobs-adapter-runtime",
+            protocolVersion: 1,
+            capabilities: { service: "native", features: {} },
+            submit: async () => ({}),
+            get: async () => ({}),
+            list: async () => ({}),
+            observe: () => (async function* () {})(),
+            cancel: async () => ({}),
+            close: async () => undefined,
+          },
+        })),
+      ]),
+    }),
+  ).rejects.toMatchObject({ code: "RELKIT_PROVIDER_RUNTIME_INVALID" });
 });
 
 function graph(

@@ -38,7 +38,13 @@ export const runConfiguredLifecycle = Effect.fnUntraced(function* <
           ...(options.isSuspension === undefined ? {} : { isSuspension: options.isSuspension }),
         });
   const attempt = Effect.gen(function* () {
-    yield* runTaskHook(options.taskLifecycle?.onStart, "start", input, options.context, options.deadline);
+    yield* runTaskHook(
+      options.taskLifecycle?.onStart,
+      "start",
+      input,
+      options.context,
+      options.deadline,
+    );
     const output = yield* invokeFunctionLifecycle({
       target: options.target,
       input,
@@ -60,7 +66,13 @@ export const runConfiguredLifecycle = Effect.fnUntraced(function* <
             onSignal: options.onSignal,
             ...(options.isSuspension === undefined ? {} : { isSuspension: options.isSuspension }),
           });
-    yield* runTaskHook(options.taskLifecycle?.onSuccess, "success", after, options.context, options.deadline);
+    yield* runTaskHook(
+      options.taskLifecycle?.onSuccess,
+      "success",
+      after,
+      options.context,
+      options.deadline,
+    );
     return after;
   });
   return yield* attempt.pipe(
@@ -68,9 +80,13 @@ export const runConfiguredLifecycle = Effect.fnUntraced(function* <
       const suspension = findNativeSuspension(cause);
       return suspension !== undefined
         ? Effect.fail(suspension as unknown as import("@relkit/invocation").InvocationFailure)
-        : runTaskHook(options.taskLifecycle?.onFailure, "failure", cause, options.context, options.deadline).pipe(
-            Effect.flatMap(() => Effect.failCause(cause)),
-          );
+        : runTaskHook(
+            options.taskLifecycle?.onFailure,
+            "failure",
+            cause,
+            options.context,
+            options.deadline,
+          ).pipe(Effect.flatMap(() => Effect.failCause(cause)));
     }),
   );
 });
@@ -88,7 +104,10 @@ function runTaskHook<Context extends { readonly signal: AbortSignal }>(
   return Effect.tryPromise({
     try: () => boundedTaskHook(hook, name, value, context, deadline),
     catch: () => undefined,
-  }).pipe(Effect.asVoid, Effect.catchCause(() => Effect.void));
+  }).pipe(
+    Effect.asVoid,
+    Effect.catchCause(() => Effect.void),
+  );
 }
 
 async function boundedTaskHook<Context extends { readonly signal: AbortSignal }>(
@@ -98,7 +117,8 @@ async function boundedTaskHook<Context extends { readonly signal: AbortSignal }>
   context: Context,
   deadline: number | undefined,
 ): Promise<void> {
-  const remaining = deadline === undefined ? TASK_HOOK_TIMEOUT_MS : Math.max(0, deadline - Date.now());
+  const remaining =
+    deadline === undefined ? TASK_HOOK_TIMEOUT_MS : Math.max(0, deadline - Date.now());
   const limit = Math.min(TASK_HOOK_TIMEOUT_MS, remaining);
   if (limit === 0) {
     warnHook(context, name, "deadline");

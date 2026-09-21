@@ -8,7 +8,14 @@ import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-c
 
 export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-clients.js";
 
-export const DEPENDENCY_CATEGORIES = ["tasks", "jobs", "events", "buckets", "cache", "agents"] as const;
+export const DEPENDENCY_CATEGORIES = [
+  "tasks",
+  "jobs",
+  "events",
+  "buckets",
+  "cache",
+  "agents",
+] as const;
 export type DependencyCategory = (typeof DEPENDENCY_CATEGORIES)[number];
 
 export interface DependencyRefLike {

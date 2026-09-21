@@ -3,7 +3,6 @@ import {
   findNativeSuspension,
   runInInvocationScope,
   isStreamOutput,
-  managedValidatedStream,
   createProgressEmitter,
 } from "@relkit/invocation";
 import {
@@ -29,12 +28,8 @@ import { InvocationValidationError as ValidationError } from "./invoke-types.js"
 import { createInvocationExecution } from "./invocation-execution.js";
 import { invocationScopeParent, startInvocation } from "./invoke-start.js";
 import { releaseSuspendedInvocation } from "./invoke-suspension.js";
-
-type InvokeNext = <
-  NextInput = unknown,
-  NextOutput = unknown,
-  NextContext extends { readonly signal: AbortSignal } = InvocationContext,
->(options: InvokeOptions<NextInput, NextOutput, NextContext>) => Promise<NextOutput>;
+import { createInvocationStream } from "./invoke-now-stream.js";
+import type { InvokeNext } from "./invoke-now-types.js";
 
 export async function invokeNow<
   Input = unknown,
@@ -72,9 +67,10 @@ export async function invokeNow<
     let outcome: InvocationOutcome = "defect";
     let deferredCompletion = false;
     let suspended = false;
-    const progress = target.progress === undefined
-      ? undefined
-      : createProgressEmitter(target.progress, controller.signal, options.progressSink);
+    const progress =
+      target.progress === undefined
+        ? undefined
+        : createProgressEmitter(target.progress, controller.signal, options.progressSink);
     try {
       const chain = parentChain.enterDescriptor(target, record.id);
       if (controller.signal.aborted) {
@@ -117,55 +113,53 @@ export async function invokeNow<
           idSource,
         });
       const scopeParent = invocationScopeParent(record, controller.signal, deadlineMs);
-      value = (await runInInvocationScope({
-        dispatcher,
-        parent: scopeParent,
-        chain,
-        ...(started.taskAncestry === undefined ? {} : { taskAncestry: started.taskAncestry }),
-      }, () => runHandler(
-        target,
-        input,
-        record,
-        options,
-        controller,
-        deadlineMs,
-        traceId,
-        idSource,
-        runner,
-        childInvoker,
-        options.invokeTask,
-        progress?.emitter,
-        (trace) => {
-          scopeParent.trace = trace;
-          if (trace.context?.spanId !== undefined) scopeParent.spanId = trace.context.spanId;
+      value = (await runInInvocationScope(
+        {
+          dispatcher,
+          parent: scopeParent,
+          chain,
+          ...(started.taskAncestry === undefined ? {} : { taskAncestry: started.taskAncestry }),
         },
-      ))) as Output;
-      if (options.skipOutputValidation !== true) value = (await validated(target.output, value, "output")) as Output;
+        () =>
+          runHandler(
+            target,
+            input,
+            record,
+            options,
+            controller,
+            deadlineMs,
+            traceId,
+            idSource,
+            runner,
+            childInvoker,
+            options.invokeTask,
+            progress?.emitter,
+            (trace) => {
+              scopeParent.trace = trace;
+              if (trace.context?.spanId !== undefined) scopeParent.spanId = trace.context.spanId;
+            },
+          ),
+      )) as Output;
+      if (options.skipOutputValidation !== true)
+        value = (await validated(target.output, value, "output")) as Output;
       if (streamLifecycle && isStreamOutput(target.output)) {
-        const stream = value as AsyncIterable<unknown>;
         deferredCompletion = true;
-        value = managedValidatedStream({
-          source: stream,
+        value = createInvocationStream({
+          source: value as AsyncIterable<unknown>,
           schema: target.output.item,
-          maxItemBytes: 1024 * 1024,
-          idleMs: 45_000,
-          abort: (reason) => controller.abort(reason),
-          run: (work) => execution.run(() => runInInvocationScope({
-            dispatcher,
-            parent: scopeParent,
-            chain,
-            ...(started.taskAncestry === undefined ? {} : { taskAncestry: started.taskAncestry }),
-          }, work)),
-          settle: async (streamCause) => {
-            progress?.settle();
-            const streamError = streamCause === undefined
-              ? undefined
-              : normalizeFailure(streamCause, { signal: controller.signal });
-            const streamOutcome: InvocationOutcome = streamError?.outcome ?? "success";
-            execution.complete(streamOutcome, streamError);
-            await completeInvocation({ record, outcome: streamOutcome, error: streamError, options, lease, admitted, unlink });
-          },
-        }) as Output;
+          controller,
+          execution,
+          dispatcher,
+          parent: scopeParent,
+          chain,
+          ...(started.taskAncestry === undefined ? {} : { taskAncestry: started.taskAncestry }),
+          progress,
+          record,
+          options,
+          lease,
+          admitted,
+          unlink,
+        });
       } else {
         execution.captureOutput(value);
         outcome = "success";
@@ -177,11 +171,12 @@ export async function invokeNow<
         execution.suspend();
         throw suspension.value;
       }
-      error = cause instanceof ValidationError && cause.phase === "input"
-        ? cause
-        : cause instanceof ValidationError
-          ? normalizeFailure(cause)
-          : normalizeFailure(cause, { signal: controller.signal });
+      error =
+        cause instanceof ValidationError && cause.phase === "input"
+          ? cause
+          : cause instanceof ValidationError
+            ? normalizeFailure(cause)
+            : normalizeFailure(cause, { signal: controller.signal });
       error = await validateDeclaredError(target.errors, error);
       outcome = error instanceof ValidationError ? "validation-error" : error.outcome;
     } finally {

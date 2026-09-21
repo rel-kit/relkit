@@ -3,7 +3,12 @@ import type { ProtocolId } from "@relkit/contracts";
 import { Effect } from "effect";
 import { defineError, defineFunction, fail } from "@relkit/app";
 import { z } from "@relkit/schema";
-import { InvocationValidationError, invoke, invokeFunction, type InvocationTarget } from "./src/invoke.ts";
+import {
+  InvocationValidationError,
+  invoke,
+  invokeFunction,
+  type InvocationTarget,
+} from "./src/invoke.ts";
 
 const ids = () => {
   let next = 0;
@@ -26,8 +31,12 @@ function target(
 describe("function invocation pipeline", () => {
   test("passes native sync and async suspension through without terminal hooks", async () => {
     for (const handler of [
-      () => { throw parked; },
-      async () => { throw parked; },
+      () => {
+        throw parked;
+      },
+      async () => {
+        throw parked;
+      },
     ]) {
       const events: string[] = [];
       await expect(
@@ -38,13 +47,23 @@ describe("function invocation pipeline", () => {
           idSource: ids(),
           isSuspension: (cause) => cause === parked,
           taskLifecycle: {
-            onStart: () => { events.push("start"); },
-            onSuccess: () => { events.push("success"); },
-            onFailure: () => { events.push("failure"); },
+            onStart: () => {
+              events.push("start");
+            },
+            onSuccess: () => {
+              events.push("success");
+            },
+            onFailure: () => {
+              events.push("failure");
+            },
           },
           hooks: {
-            onCompletion: () => { events.push("completion"); },
-            onRelease: () => { events.push("release"); },
+            onCompletion: () => {
+              events.push("completion");
+            },
+            onRelease: () => {
+              events.push("release");
+            },
           },
         }),
       ).rejects.toBe(parked);
@@ -58,20 +77,35 @@ describe("function invocation pipeline", () => {
     let failed = 0;
     const successful = target((input) => input);
     for (let index = 0; index < 2; index += 1) {
-      await expect(invoke({
-        target: successful,
-        input: { value: index },
-        taskLifecycle: {
-          onStart: () => { started += 1; },
-          onSuccess: () => { succeeded += 1; throw new Error("diagnostic only"); },
-        },
-      })).resolves.toEqual({ value: index });
+      await expect(
+        invoke({
+          target: successful,
+          input: { value: index },
+          taskLifecycle: {
+            onStart: () => {
+              started += 1;
+            },
+            onSuccess: () => {
+              succeeded += 1;
+              throw new Error("diagnostic only");
+            },
+          },
+        }),
+      ).resolves.toEqual({ value: index });
     }
-    await expect(invoke({
-      target: target(() => { throw new Error("handler failure"); }),
-      input: { value: 1 },
-      taskLifecycle: { onFailure: () => { failed += 1; } },
-    })).rejects.toMatchObject({ kind: "defect" });
+    await expect(
+      invoke({
+        target: target(() => {
+          throw new Error("handler failure");
+        }),
+        input: { value: 1 },
+        taskLifecycle: {
+          onFailure: () => {
+            failed += 1;
+          },
+        },
+      }),
+    ).rejects.toMatchObject({ kind: "defect" });
     expect({ started, succeeded, failed }).toEqual({ started: 2, succeeded: 2, failed: 1 });
   });
 

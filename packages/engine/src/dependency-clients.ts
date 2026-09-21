@@ -13,6 +13,7 @@ import { createCacheDependencyClient } from "./cache-client.js";
 import { createJobDependencyClient } from "./job-client.js";
 import { createTaskDependencyClient } from "./task-client.js";
 import { notify } from "./edge-hooks.js";
+export { guardedMap } from "./dependency-clients-guard.js";
 
 export class DependencyAccessError extends TypeError {
   readonly category: DependencyCategory;
@@ -188,17 +189,4 @@ function dependencyIdFromClient(
   const declaration =
     category === "events" ? options.publications?.[name] : options.dependencies?.[category]?.[name];
   return declaration === undefined ? name : dependencyId(category, name, declaration);
-}
-export function guardedMap(
-  category: DependencyCategory,
-  clients: Record<string, unknown>,
-): Readonly<Record<string, unknown>> {
-  const target = Object.freeze(clients);
-  return new Proxy(target, {
-    get(current, property, receiver) {
-      if (typeof property === "string" && !Object.hasOwn(current, property))
-        throw new DependencyAccessError(category, property);
-      return Reflect.get(current, property, receiver);
-    },
-  });
 }
