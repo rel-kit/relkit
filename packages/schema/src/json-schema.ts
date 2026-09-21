@@ -59,9 +59,7 @@ export function getSchemaProjection(
     };
   };
   const hook = standard.jsonSchema?.[direction];
-  return hook === undefined
-    ? undefined
-    : () => hook({ target: "draft-2020-12" }) as JsonValue;
+  return hook === undefined ? undefined : () => hook({ target: "draft-2020-12" }) as JsonValue;
 }
 
 /** Returns whether a schema accepts an omitted object property. */

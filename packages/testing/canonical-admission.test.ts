@@ -1,5 +1,11 @@
 import { expect, test } from "bun:test";
-import { defineJob, defineTask, createJobsRuntime, submitCanonicalTask, submitTask } from "@relkit/jobs";
+import {
+  defineJob,
+  defineTask,
+  createJobsRuntime,
+  submitCanonicalTask,
+  submitTask,
+} from "@relkit/jobs";
 import { z } from "@relkit/schema";
 import { createDeterministicJobsAdapter } from "./src/test-jobs-adapter.ts";
 
@@ -8,7 +14,10 @@ test("replays canonical task input without applying the public transform twice",
   const task = defineTask({
     id: "tasks.canonical",
     version: "1",
-    input: z.string().transform((value) => { transforms += 1; return Number(value); }),
+    input: z.string().transform((value) => {
+      transforms += 1;
+      return Number(value);
+    }),
     inputWire: z.number(),
     output: z.number(),
     handler: async (value) => value,
@@ -26,7 +35,17 @@ test("replays canonical task input without applying the public transform twice",
       version: 1,
       jobsProtocolVersion: 1,
       tasks: [{ id: task.id, version: task.version, buildId: "build-a" }],
-      jobs: [{ id: "jobs.canonical", name: "canonical", taskId: task.id, taskVersion: task.version, buildId: "build-a", profile: "default", default: true }],
+      jobs: [
+        {
+          id: "jobs.canonical",
+          name: "canonical",
+          taskId: task.id,
+          taskVersion: task.version,
+          buildId: "build-a",
+          profile: "default",
+          default: true,
+        },
+      ],
     },
   });
 
@@ -37,7 +56,10 @@ test("replays canonical task input without applying the public transform twice",
   });
   expect(first.runId).not.toBe(replay.runId);
   expect(transforms).toBe(1);
-  expect((await adapter.worker!.next(runtime.operationContext({ signal: new AbortController().signal })))?.envelope.input).toEqual({ version: 1, kind: "json", value: 7 });
+  expect(
+    (await adapter.worker!.next(runtime.operationContext({ signal: new AbortController().signal })))
+      ?.envelope.input,
+  ).toEqual({ version: 1, kind: "json", value: 7 });
   await runtime.close();
 });
 
@@ -56,7 +78,12 @@ test("uses the default configured job admission policy for task triggers", async
     admission: { idempotency: { key: "id" } },
   });
   const adapter = createDeterministicJobsAdapter();
-  const runtime = createJobsRuntime({ adapter, jobs: [job], application: "app", environment: "test" });
+  const runtime = createJobsRuntime({
+    adapter,
+    jobs: [job],
+    application: "app",
+    environment: "test",
+  });
 
   const first = await submitTask(task, { id: "same" }, undefined, runtime);
   const duplicate = await submitTask(task, { id: "same" }, undefined, runtime);

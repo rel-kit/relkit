@@ -59,9 +59,7 @@ export function withTransformMetadata(schema: StandardSchemaV1): SchemaMetadata 
   return {
     ...(metadata?.refined === true ? { refined: true } : {}),
     ...(input === undefined ? {} : { inputJsonSchema: input }),
-    ...(metadata?.inputOptional === undefined
-      ? {}
-      : { inputOptional: metadata.inputOptional }),
+    ...(metadata?.inputOptional === undefined ? {} : { inputOptional: metadata.inputOptional }),
     transformed: true,
   };
 }
@@ -78,9 +76,7 @@ export function withOptionalMetadata(schema: StandardSchemaV1): SchemaMetadata {
 export function withNullableMetadata(schema: StandardSchemaV1): SchemaMetadata {
   const metadata = getSchemaMetadata(schema);
   const wrap = (projection: SchemaProjection | undefined): SchemaProjection | undefined =>
-    projection === undefined
-      ? undefined
-      : () => ({ anyOf: [projection(), { type: "null" }] });
+    projection === undefined ? undefined : () => ({ anyOf: [projection(), { type: "null" }] });
   const legacy = wrap(getMetadataProjection(metadata, "legacy"));
   const input = wrap(getMetadataProjection(metadata, "input"));
   const output = wrap(getMetadataProjection(metadata, "output"));

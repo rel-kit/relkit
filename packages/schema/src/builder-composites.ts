@@ -94,10 +94,16 @@ export function unionSchema<S extends SchemaTuple>(
         ? { jsonSchema: () => ({ anyOf: legacyProjections.map((projection) => projection!()) }) }
         : {}),
       ...(inputProjections.every((projection) => projection)
-        ? { inputJsonSchema: () => ({ anyOf: inputProjections.map((projection) => projection!()) }) }
+        ? {
+            inputJsonSchema: () => ({ anyOf: inputProjections.map((projection) => projection!()) }),
+          }
         : {}),
       ...(outputProjections.every((projection) => projection)
-        ? { outputJsonSchema: () => ({ anyOf: outputProjections.map((projection) => projection!()) }) }
+        ? {
+            outputJsonSchema: () => ({
+              anyOf: outputProjections.map((projection) => projection!()),
+            }),
+          }
         : {}),
     },
   );
@@ -111,7 +117,11 @@ function objectProjection(
     .sort()
     .map((key) => {
       const schema = shape[key]!;
-      return [key, getSchemaProjection(schema, direction), isSchemaOptional(schema, direction)] as const;
+      return [
+        key,
+        getSchemaProjection(schema, direction),
+        isSchemaOptional(schema, direction),
+      ] as const;
     });
   if (entries.some(([, projection]) => !projection)) return undefined;
   return () => {

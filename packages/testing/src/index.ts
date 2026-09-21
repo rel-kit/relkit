@@ -50,7 +50,11 @@ export { createTestJob, createTestJobFake } from "./jobs.js";
 export type { TestJobCloseOptions, TestJobFake, TestJobOptions } from "./jobs-types.js";
 export { createDeterministicJobsAdapter, createTestJobsAdapter } from "./test-jobs-adapter.js";
 export type { TestJobsAdapter, TestJobsAdapterOptions } from "./test-jobs-adapter.js";
-export { createJobsConformanceHarness, runJobsConformance, JOBS_CONFORMANCE_FIXTURES } from "./jobs-conformance.js";
+export {
+  createJobsConformanceHarness,
+  runJobsConformance,
+  JOBS_CONFORMANCE_FIXTURES,
+} from "./jobs-conformance.js";
 export type { JobsConformanceFixture, JobsConformanceHarness } from "./jobs-conformance.js";
 export { createTestEvent, createTestEventFake } from "./events.js";
 export type {

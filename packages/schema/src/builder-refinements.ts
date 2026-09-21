@@ -74,7 +74,7 @@ function withString(
   setSchemaMetadata(
     refined,
     keyword === undefined
-      ? getSchemaMetadata(schema) ?? {}
+      ? (getSchemaMetadata(schema) ?? {})
       : updateProjectionMetadata(schema, projection, keyword[0], keyword[1]),
   );
   return refined;
@@ -120,7 +120,7 @@ function withNumber(
   setSchemaMetadata(
     refined,
     keyword === undefined
-      ? getSchemaMetadata(schema) ?? {}
+      ? (getSchemaMetadata(schema) ?? {})
       : updateProjectionMetadata(schema, projection, keyword[0], keyword[1]),
   );
   return refined;
