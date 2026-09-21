@@ -3,6 +3,10 @@ title: Define a job
 description: Give background work a stable identity, a compatible function target, explicit delivery limits, and a queue provider profile.
 ---
 
+> Legacy compatibility page. It documents `@relkit/app/jobs/legacy`; new applications should start with
+> [task-first jobs](/docs/jobs/quickstart). The old function-target API is gated by
+> `compatibility.legacyJobs` and is not the task runtime.
+
 Create one default-exported `defineJob` descriptor in the owning domain's `jobs/` directory. The job
 points at a function; it cannot contain a `handler` of its own.
 
@@ -95,5 +99,3 @@ bun run typecheck
 Confirm that `.relkit/generated/application.graph.json` contains the job, its function target, and any
 schedules. Fix schema incompatibilities, missing profiles, and invalid references in source, not by
 editing generated artifacts. Next, [enqueue work](/docs/jobs/enqueue).
-
-<include cwd>content/generated/related/jobs-define.mdx</include>

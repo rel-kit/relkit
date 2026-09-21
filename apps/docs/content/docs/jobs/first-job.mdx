@@ -3,6 +3,9 @@ title: Your first job
 description: Define receipt work, enqueue it through a typed dependency, and test admission separately from completion.
 ---
 
+> Legacy compatibility page. This tutorial intentionally preserves `.enqueue()` and the function-target
+> job for migration. New applications should follow [Quickstart](/docs/jobs/quickstart).
+
 Add a receipt job to an existing RELKIT app. The producer receives queue acceptance; the target runs
 separately. These source-backed examples are typechecked with the documentation app.
 
@@ -67,5 +70,3 @@ deduplication, dead-letter, or schedule guarantees; run that integration's contr
 
 Continue with [Retries and delivery](/docs/jobs/retries), [Idempotency](/docs/jobs/idempotency), and
 [Schedules](/docs/jobs/schedules).
-
-<include cwd>content/generated/related/jobs-first-job.mdx</include>

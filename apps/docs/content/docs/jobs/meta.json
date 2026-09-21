@@ -1,5 +1,24 @@
 {
   "title": "Jobs",
   "icon": "ListTodo",
-  "pages": ["index", "define", "enqueue", "retries", "idempotency", "schedules", "first-job"]
+  "pages": [
+    "index",
+    "quickstart",
+    "tasks",
+    "bindings",
+    "durations-and-sleep",
+    "execution-policy",
+    "retries-and-idempotency",
+    "clients",
+    "progress-and-streams",
+    "security",
+    "schedules",
+    "inspector",
+    "docker",
+    "providers",
+    "deployment",
+    "testing",
+    "migration",
+    "troubleshooting"
+  ]
 }

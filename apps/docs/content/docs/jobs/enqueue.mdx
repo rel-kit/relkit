@@ -3,6 +3,9 @@ title: Enqueue work
 description: Declare a typed job dependency, await acceptance, and expose background work without confusing queue admission with completion.
 ---
 
+> Legacy compatibility page. The `.enqueue()` examples use `@relkit/app/jobs/legacy`. New code uses
+> [`.trigger()` on a task-first job](/docs/jobs/quickstart) and retains its accepted `runId`.
+
 Enqueue from a function in the domain that owns the job. Declare the descriptor under `dependencies.jobs`,
 then use its named client on `context.jobs`. Importing the descriptor alone does not grant a client.
 
@@ -67,5 +70,3 @@ of two awaited calls as an outbox guarantee.
 Keep payloads small and avoid secrets or unnecessary personal data: queues and operational records can
 retain them longer than the initiating request. Test acceptance separately from worker completion in
 [your first job](/docs/jobs/first-job).
-
-<include cwd>content/generated/related/jobs-enqueue.mdx</include>

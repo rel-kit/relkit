@@ -3,6 +3,9 @@ title: Idempotency
 description: Choose a stable duplicate key, understand the retention window, and keep repeated worker side effects safe across provider differences.
 ---
 
+> Legacy compatibility page. The receipt example uses the old function-target queue API. Use
+> [task-first admission and idempotency](/docs/jobs/retries-and-idempotency) for new jobs.
+
 Idempotency asks what should happen when the same logical request arrives again. Job admission and
 handler execution are different boundaries: preventing a second queue entry does not prevent the first
 entry from being delivered more than once.
@@ -62,5 +65,3 @@ The [receipt test](/docs/jobs/first-job#test-admission-and-execution) proves the
 enqueue, complete, restart, enqueue the same input, and observe the original instance without another
 execution. Add provider contract tests and side-effect protection before relying on that property in
 production. For recurring work, also read the [constant-input schedule caveat](/docs/jobs/schedules#choose-input-and-idempotency-together).
-
-<include cwd>content/generated/related/jobs-idempotency.mdx</include>
