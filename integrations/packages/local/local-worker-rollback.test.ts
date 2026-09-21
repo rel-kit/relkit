@@ -10,10 +10,7 @@ import {
   type LocalServicePlan,
   type CompositeLocalServiceRecipe,
 } from "@relkit/local-service";
-import {
-  createLocalProjectIdentity,
-  createLocalServiceReconciler,
-} from "./src/runtime/index.ts";
+import { createLocalProjectIdentity, createLocalServiceReconciler } from "./src/runtime/index.ts";
 
 const graphHash = "sha256:" + "1".repeat(64);
 const planHash = "sha256:" + "2".repeat(64);
@@ -82,15 +79,17 @@ function request() {
     plan: {
       version: LOCAL_SERVICE_PLAN_VERSION,
       graphHash,
-      services: [{
-        bindingId,
-        capability: "job",
-        profile: "inngest",
-        materializerId: "docker",
-        recipe: { integrationId: "test", recipeId: "worker", recipeVersion: 2 },
-        configuration: {},
-        requiredBy: ["jobs.worker"],
-      }],
+      services: [
+        {
+          bindingId,
+          capability: "job",
+          profile: "inngest",
+          materializerId: "docker",
+          recipe: { integrationId: "test", recipeId: "worker", recipeVersion: 2 },
+          configuration: {},
+          requiredBy: ["jobs.worker"],
+        },
+      ],
     } satisfies LocalServicePlan,
     planHash,
     recipes: { test: recipe },
@@ -107,15 +106,19 @@ const recipe = {
   recipeId: "worker",
   recipeVersion: 2,
   materializerId: "docker",
-  containers: [{
-    id: "database",
-    image: "database@sha256:" + "a".repeat(64),
-  }],
-  workers: [{
-    id: "worker",
-    image: "worker@sha256:" + "b".repeat(64),
-    dependsOn: ["database"],
-  }],
+  containers: [
+    {
+      id: "database",
+      image: "database@sha256:" + "a".repeat(64),
+    },
+  ],
+  workers: [
+    {
+      id: "worker",
+      image: "worker@sha256:" + "b".repeat(64),
+      dependsOn: ["database"],
+    },
+  ],
   volumes: {},
   outputs: () => ({}),
 } satisfies CompositeLocalServiceRecipe;

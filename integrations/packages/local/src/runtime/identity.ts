@@ -76,23 +76,29 @@ export function localResourceLabels(
     !isStableId(resource.recipe.recipeId) ||
     !Number.isSafeInteger(resource.recipe.recipeVersion) ||
     resource.recipe.recipeVersion < 1 ||
-    !hash(resource.planHash)
-    || (resource.endpointHash !== undefined && !hash(resource.endpointHash))
+    !hash(resource.planHash) ||
+    (resource.endpointHash !== undefined && !hash(resource.endpointHash))
   ) {
     invalid();
   }
   return Object.freeze({
     ...localProjectLabels(identity),
     [LOCAL_RESOURCE_LABEL.bindingId]: resource.bindingId,
-    ...(resource.environment === undefined ? {} : { [LOCAL_RESOURCE_LABEL.environment]: resource.environment }),
-    ...(resource.serviceGeneration === undefined ? {} : { [LOCAL_RESOURCE_LABEL.serviceGeneration]: resource.serviceGeneration }),
+    ...(resource.environment === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.environment]: resource.environment }),
+    ...(resource.serviceGeneration === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.serviceGeneration]: resource.serviceGeneration }),
     [LOCAL_RESOURCE_LABEL.recipeId]: [
       resource.recipe.integrationId,
       resource.recipe.recipeId,
       resource.recipe.recipeVersion,
     ].join(":"),
     [LOCAL_RESOURCE_LABEL.planHash]: resource.planHash,
-    ...(resource.endpointHash === undefined ? {} : { [LOCAL_RESOURCE_LABEL.endpointHash]: resource.endpointHash }),
+    ...(resource.endpointHash === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.endpointHash]: resource.endpointHash }),
   });
 }
 

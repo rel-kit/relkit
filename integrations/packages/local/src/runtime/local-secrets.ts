@@ -34,7 +34,8 @@ export function readLocalServiceSecrets(
       value.applicationId !== identity.applicationId ||
       value.localProjectId !== identity.localProjectId ||
       !Array.isArray(value.bindings)
-    ) invalid();
+    )
+      invalid();
     return deepFreeze({
       version: value.version,
       applicationId: value.applicationId,
@@ -68,12 +69,29 @@ export function upsertLocalServiceSecrets(
 
 function normalizeBindings(value: readonly unknown[]): LocalServiceSecretBinding[] {
   const bindings = value.map((candidate) => {
-    if (!record(candidate) || !isStableId(candidate.bindingId) || !record(candidate.recipe) || !record(candidate.values)) invalid();
+    if (
+      !record(candidate) ||
+      !isStableId(candidate.bindingId) ||
+      !record(candidate.recipe) ||
+      !record(candidate.values)
+    )
+      invalid();
     const recipe = candidate.recipe;
-    if (!isStableId(recipe.integrationId) || !isStableId(recipe.recipeId) || !positive(recipe.recipeVersion)) invalid();
+    if (
+      !isStableId(recipe.integrationId) ||
+      !isStableId(recipe.recipeId) ||
+      !positive(recipe.recipeVersion)
+    )
+      invalid();
     const values: Record<string, string> = {};
     for (const [name, secret] of Object.entries(candidate.values)) {
-      if (!isStableId(name) || typeof secret !== "string" || secret === "" || /[\0\r\n]/.test(secret)) invalid();
+      if (
+        !isStableId(name) ||
+        typeof secret !== "string" ||
+        secret === "" ||
+        /[\0\r\n]/.test(secret)
+      )
+        invalid();
       values[name] = secret;
     }
     return {

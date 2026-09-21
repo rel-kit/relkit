@@ -25,9 +25,10 @@ export const runtimeIntegration: RuntimeProviderIntegration<"local"> = Object.fr
       adapterId: "local-job",
       protocolVersion: 1,
       create: ({ profile, connection, executionModel }: RuntimeProviderContext) => {
-        const provider = executionModel === "task"
-          ? createLocalJobProvider(root(connection), profile, "task")
-          : createLocalJobProvider(root(connection), profile);
+        const provider =
+          executionModel === "task"
+            ? createLocalJobProvider(root(connection), profile, "task")
+            : createLocalJobProvider(root(connection), profile);
         return { value: provider, release: provider.close };
       },
     },

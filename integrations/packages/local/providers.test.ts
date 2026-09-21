@@ -60,7 +60,11 @@ test("selects a separate native task runtime for task-backed jobs", async () => 
       connection: { root },
     };
     const task = await registration.create(context);
-    expect(task.value).toMatchObject({ kind: "jobs-adapter-runtime", protocolVersion: 1, worker: { next: expect.any(Function) } });
+    expect(task.value).toMatchObject({
+      kind: "jobs-adapter-runtime",
+      protocolVersion: 1,
+      worker: { next: expect.any(Function) },
+    });
     await task.release?.();
   } finally {
     await rm(root, { recursive: true, force: true });

@@ -138,19 +138,25 @@ test("refuses an unsafe service-generation hot swap without removing the old wor
       protocolVersion: LOCAL_SERVICE_PROTOCOL_VERSION,
       integrationId: "docker",
       list: async () => [old],
-      start: async () => { throw new Error("start should not be called"); },
-      remove: async (id) => { removed.push(id); },
+      start: async () => {
+        throw new Error("start should not be called");
+      },
+      remove: async (id) => {
+        removed.push(id);
+      },
       removeVolumes: async () => undefined,
     };
     const reconciler = createLocalServiceReconciler({ identity, materializer });
-    await expect(reconciler.reconcile({
-      plan: plan(false),
-      planHash: firstPlanHash,
-      recipes,
-      scope: "required",
-      environment: "development",
-      serviceGeneration: `sha256:${"b".repeat(64)}`,
-    })).rejects.toThrow("cannot hot-swap");
+    await expect(
+      reconciler.reconcile({
+        plan: plan(false),
+        planHash: firstPlanHash,
+        recipes,
+        scope: "required",
+        environment: "development",
+        serviceGeneration: `sha256:${"b".repeat(64)}`,
+      }),
+    ).rejects.toThrow("cannot hot-swap");
     expect(removed).toEqual([]);
     await reconciler.close();
   } finally {
@@ -165,8 +171,22 @@ test("groups composite units without masking an unhealthy dependency", () => {
     planHash: firstPlanHash,
   });
   const grouped = groupServiceInstances([
-    { id: "root", name: "root", labels: { ...labels, "dev.relkit.unit-id": "root" }, state: "running", health: "healthy", ports: {} },
-    { id: "dependency", name: "dependency", labels: { ...labels, "dev.relkit.unit-id": "dependency" }, state: "running", health: "unhealthy", ports: {} },
+    {
+      id: "root",
+      name: "root",
+      labels: { ...labels, "dev.relkit.unit-id": "root" },
+      state: "running",
+      health: "healthy",
+      ports: {},
+    },
+    {
+      id: "dependency",
+      name: "dependency",
+      labels: { ...labels, "dev.relkit.unit-id": "dependency" },
+      state: "running",
+      health: "unhealthy",
+      ports: {},
+    },
   ]);
   expect(grouped).toHaveLength(1);
   expect(grouped[0]?.health).toBe("unhealthy");

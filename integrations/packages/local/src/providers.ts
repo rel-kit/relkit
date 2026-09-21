@@ -4,11 +4,14 @@ import {
   defineProviderAdapter,
   defineProviderBehavior,
   defineProviderCapability,
+  defineProviderFeature,
   type ProviderAdapter,
 } from "@relkit/provider";
 
 const event = defineProviderCapability("event");
 const job = defineProviderCapability("job");
+const durable = defineProviderFeature(job, "durable");
+const retryable = defineProviderFeature(job, "retryable");
 const realtime = defineProviderCapability("realtime");
 const agentState = defineProviderCapability("agent-state");
 const integration = defineIntegrationReference("local");
@@ -52,7 +55,7 @@ export function localEvent(options: LocalProviderOptions = {}): LocalEventAdapte
  * @since 0.4.0
  */
 export function localJob(options: LocalProviderOptions = {}): LocalJobAdapter {
-  return adapter(job, "local-job", options) as LocalJobAdapter;
+  return adapter(job, "local-job", options, [durable, retryable]) as LocalJobAdapter;
 }
 
 export function localRealtime(options: LocalProviderOptions = {}): LocalRealtimeAdapter {
@@ -67,6 +70,7 @@ function adapter(
   capability: typeof event | typeof job | typeof realtime | typeof agentState,
   adapterId: "local-event" | "local-job" | "local-realtime" | "local-agent-state",
   options: LocalProviderOptions,
+  features: readonly import("@relkit/provider").ProviderFeature<"job">[] = [],
 ): ProviderAdapter {
   if (options.root !== undefined && options.root.trim() === "") {
     throw new TypeError("Local provider root must be a non-empty path");
@@ -78,5 +82,6 @@ function adapter(
     connectionContract,
     connection: options.root === undefined ? {} : { root: options.root },
     behavior: defineProviderBehavior({}),
+    features,
   });
 }
