@@ -1,0 +1,23 @@
+---
+title: Security
+description: Protect job inputs, outputs, controls, and provider credentials.
+---
+
+Jobs are private unless their `client` policy sets `public: true` or provides `authorize`. Public means
+the selected operations are exposed; it does not disable input validation, admission, authorization, or
+output limits.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/export-orders.job.ts"'>
+  ../../examples/commerce/src/orders/jobs/export-orders.job.ts
+</include>
+
+- Authorize the caller before triggering, reading, watching, cancelling, or retrying a run.
+- Scope every lookup by tenant or account; opaque run IDs are not authorization.
+- Validate persisted input again inside the task before side effects.
+- Redact secrets and personal data from logs, progress, stream items, and error details.
+- Keep provider tokens in secret configuration and expose only their names in deployment plans.
+- Treat client fingerprints, task versions, and schema hashes as compatibility metadata, not credentials.
+
+Use the Inspector only on a protected local or operator network. The local admin endpoint must not be exposed publicly without an authenticated proxy.
+
+<include cwd>content/generated/related/jobs-security.mdx</include>
