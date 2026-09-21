@@ -10,6 +10,41 @@ import {
   type DockerClient,
   type DockerContainer,
 } from "./src/runtime/index.ts";
+import { publishedPortArguments } from "./src/runtime/docker-health.ts";
+import { parseContainers } from "./src/runtime/docker-inspect.ts";
+
+test("publishes Linux local ports on loopback and the Docker bridge gateway", async () => {
+  expect(await publishedPortArguments(6379, "172.17.0.1", 49_153)).toEqual([
+    "--publish",
+    "127.0.0.1:49153:6379",
+    "--publish",
+    "172.17.0.1:49153:6379",
+  ]);
+  expect(await publishedPortArguments(6379, undefined, 49_153)).toEqual([
+    "--publish",
+    "127.0.0.1:49153:6379",
+  ]);
+  await expect(publishedPortArguments(6379, "0.0.0.0", 49_153)).rejects.toThrow(
+    "gateway is invalid",
+  );
+  const container = {
+    Id: "container-1",
+    Name: "/redis",
+    Config: { Labels: {} },
+    State: { Status: "running" },
+    NetworkSettings: {
+      Ports: {
+        "6379/tcp": [
+          { HostIp: "172.17.0.1", HostPort: "49153" },
+          { HostIp: "127.0.0.1", HostPort: "49153" },
+        ],
+      },
+    },
+  };
+  expect(parseContainers(JSON.stringify([container]))[0]?.ports["6379/tcp"]).toBe(49_153);
+  container.NetworkSettings.Ports["6379/tcp"][0]!.HostIp = "0.0.0.0";
+  expect(() => parseContainers(JSON.stringify([container]))).toThrow("invalid data");
+});
 
 test("creates a labeled loopback-only container and persistent volume", async () => {
   const calls: string[][] = [];

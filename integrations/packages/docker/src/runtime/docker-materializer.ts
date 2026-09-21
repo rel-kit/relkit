@@ -4,7 +4,8 @@ import {
   type LocalServiceMaterializerRuntime,
   type LocalServiceStartRequest,
 } from "@relkit/local-service";
-import { createDockerClient, randomLoopbackPort } from "./docker-client.js";
+import { createDockerClient } from "./docker-client.js";
+import { publishedPortArguments } from "./docker-health.js";
 import { startComposite } from "./docker-composite.js";
 import { environmentArguments } from "./docker-composite-support.js";
 import {
@@ -22,7 +23,10 @@ import {
 import type { DockerClient, DockerClientOptions } from "./docker-types.js";
 
 export function createDockerMaterializer(
-  options: DockerClientOptions & { readonly client?: DockerClient } = {},
+  options: DockerClientOptions & {
+    readonly client?: DockerClient;
+    readonly gatewayAddress?: string;
+  } = {},
 ): LocalServiceMaterializerRuntime {
   const client = options.client ?? createDockerClient(options);
   const materializer: LocalServiceMaterializerRuntime = {
@@ -30,7 +34,18 @@ export function createDockerMaterializer(
     protocolVersion: LOCAL_SERVICE_PROTOCOL_VERSION,
     integrationId: "docker",
     list: (labels, signal) => client.containers(labels, signal),
-    start: (request) => start(client, request),
+    start: async (request) => {
+      const gatewayAddress =
+        options.gatewayAddress ??
+        (options.client === undefined && process.platform === "linux"
+          ? await client.command(
+              ["network", "inspect", "bridge", "--format", "{{(index .IPAM.Config 0).Gateway}}"],
+              "Docker bridge gateway discovery",
+              request.signal === undefined ? {} : { signal: request.signal },
+            )
+          : undefined);
+      return start(client, request, gatewayAddress);
+    },
     stop: async (id, signal) => {
       await client.command(
         ["container", "stop", "--time", "10", resourceName(id)],
@@ -82,8 +97,9 @@ export function createDockerMaterializer(
 async function start(
   client: DockerClient,
   request: LocalServiceStartRequest,
+  gatewayAddress?: string,
 ): Promise<LocalServiceInstance> {
-  if (!("image" in request.recipe)) return startComposite(client, request);
+  if (!("image" in request.recipe)) return startComposite(client, request, gatewayAddress);
   const recipe = request.recipe;
   name(request.name);
   labels(request.labels);
@@ -96,16 +112,20 @@ async function start(
       request.signal === undefined ? {} : { signal: request.signal },
     );
   }
+  const publishArguments = (
+    await Promise.all(
+      Object.values(request.recipe.ports).map((port) =>
+        publishedPortArguments(port, gatewayAddress),
+      ),
+    )
+  ).flat();
   const arguments_ = [
     "container",
     "create",
     "--name",
     request.name,
     ...labelArguments(request.labels),
-    ...Object.values(request.recipe.ports).flatMap((port) => [
-      "--publish",
-      randomLoopbackPort(port),
-    ]),
+    ...publishArguments,
     ...(request.volumeName === undefined || recipe.volume === undefined
       ? []
       : [

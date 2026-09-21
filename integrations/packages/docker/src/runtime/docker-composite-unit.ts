@@ -8,7 +8,7 @@ import {
   mountPath,
   resourceName,
 } from "./docker-composite-support.js";
-import { randomLoopbackPort } from "./docker-client.js";
+import { publishedPortArguments } from "./docker-health.js";
 import type { DockerClient } from "./docker-types.js";
 import type {
   LocalServiceInstance,
@@ -48,6 +48,7 @@ export async function startUnit(
   unit: NormalizedLocalServiceUnit,
   networkName: string,
   volumes: Readonly<Record<string, string>>,
+  gatewayAddress?: string,
 ): Promise<LocalServiceInstance> {
   const nameValue = `${request.name}-${unit.id}`;
   resourceName(nameValue);
@@ -56,6 +57,13 @@ export async function startUnit(
     "dev.relkit.unit-id": unit.id,
     "dev.relkit.unit-kind": unit.kind,
   };
+  const publishArguments = (
+    await Promise.all(
+      Object.entries(unit.ports).map(([name, port]) =>
+        publishedPortArguments(port, gatewayAddress, request.portBindings?.[unit.id]?.[name]),
+      ),
+    )
+  ).flat();
   const args = [
     "container",
     "create",
@@ -69,10 +77,7 @@ export async function startUnit(
       "--add-host",
       `${argument(host)}:${argument(address)}`,
     ]),
-    ...Object.entries(unit.ports).flatMap(([name, port]) => [
-      "--publish",
-      publishedPort(request.portBindings?.[unit.id]?.[name], port),
-    ]),
+    ...publishArguments,
     ...bindMountArguments(request.bindMounts?.[unit.id]),
     ...unit.volumes.flatMap((mount) => [
       "--mount",
@@ -139,12 +144,4 @@ export async function startUnit(
         .catch(() => undefined);
     throw error;
   }
-}
-
-function publishedPort(hostPort: number | undefined, containerPort: number): string {
-  if (hostPort === undefined) return randomLoopbackPort(containerPort);
-  if (!Number.isSafeInteger(hostPort) || hostPort < 1 || hostPort > 65_535) {
-    throw new TypeError("Docker published port is invalid");
-  }
-  return `127.0.0.1:${hostPort}:${containerPort}`;
 }

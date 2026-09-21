@@ -283,6 +283,7 @@ declare const startUnit: (
   unit: NormalizedLocalServiceUnit,
   networkName: string,
   volumes: Readonly<Record<string, string>>,
+  gatewayAddress?: string,
 ) => Promise<LocalServiceInstance>;
 ```
 
@@ -309,6 +310,7 @@ declare const startUnit: (
 declare const startComposite: (
   client: DockerClient,
   request: LocalServiceStartRequest,
+  gatewayAddress?: string,
 ) => Promise<LocalServiceInstance>;
 ```
 
@@ -322,6 +324,7 @@ declare const startComposite: (
 
 - [utils](#utils)
   - [healthTimeout](#healthtimeout)
+  - [publishedPortArguments](#publishedportarguments)
   - [randomLoopbackPort](#randomloopbackport)
   - [wait](#wait)
 
@@ -337,7 +340,21 @@ declare const startComposite: (
 declare const healthTimeout: (id: string) => never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L72)
+
+## publishedPortArguments
+
+**Signature**
+
+```ts
+declare const publishedPortArguments: (
+  containerPort: number,
+  gatewayAddress?: string,
+  hostPort?: number,
+) => Promise<string[]>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L14)
 
 ## randomLoopbackPort
 
@@ -347,7 +364,7 @@ declare const healthTimeout: (id: string) => never;
 declare const randomLoopbackPort: (containerPort: number) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L4)
 
 ## wait
 
@@ -357,7 +374,7 @@ declare const randomLoopbackPort: (containerPort: number) => string;
 declare const wait: (milliseconds: number, signal?: AbortSignal) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L79)
 
 ## `docker-inspect.ts`
 
@@ -381,7 +398,7 @@ declare const wait: (milliseconds: number, signal?: AbortSignal) => Promise<void
 declare const parseContainers: (source: string) => readonly DockerContainer[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L4)
 
 ## parseVolumes
 
@@ -391,7 +408,7 @@ declare const parseContainers: (source: string) => readonly DockerContainer[];
 declare const parseVolumes: (source: string) => readonly DockerVolume[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L31)
 
 ## `docker-materializer-support.ts`
 
@@ -545,11 +562,14 @@ declare const resourceName: (value: string) => string;
 
 ```ts
 declare const createDockerMaterializer: (
-  options?: DockerClientOptions & { readonly client?: DockerClient },
+  options?: DockerClientOptions & {
+    readonly client?: DockerClient;
+    readonly gatewayAddress?: string;
+  },
 ) => LocalServiceMaterializerRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer.ts#L25)
 
 ## `docker-runner.ts`
 

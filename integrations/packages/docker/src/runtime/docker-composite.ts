@@ -26,6 +26,7 @@ import { reusedUnit, startUnit } from "./docker-composite-unit.js";
 export async function startComposite(
   client: DockerClient,
   request: LocalServiceStartRequest,
+  gatewayAddress?: string,
 ): Promise<LocalServiceInstance> {
   const recipe = normalizeLocalServiceRecipe(request.recipe);
   if (recipe.recipeVersion !== 2)
@@ -100,7 +101,15 @@ export async function startComposite(
         instances.push(reusedUnit(existing, unit, request.name));
         continue;
       }
-      const instance = await startUnit(client, request, recipe, unit, networkName, volumes);
+      const instance = await startUnit(
+        client,
+        request,
+        recipe,
+        unit,
+        networkName,
+        volumes,
+        gatewayAddress,
+      );
       createdContainers.push(instance.id);
       if (unit.kind === "init") {
         await client.command(
