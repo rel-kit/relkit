@@ -15,6 +15,7 @@ import {
   renderEventFunction,
   renderFunction,
   renderJob,
+  renderTask,
   renderPrompt,
 } from "./render-domain.js";
 import { renderBucket, renderCache } from "./render-resources.js";
@@ -23,6 +24,7 @@ import { renderRoute } from "./render-routes.js";
 const FULL: readonly ServiceInclude[] = [
   "function",
   "event-function",
+  "task",
   "error",
   "event",
   "job",
@@ -66,6 +68,18 @@ export async function renderService(
         ...(event ? { event } : {}),
       })
     : undefined;
+  const taskExecution = selected.has("task") ? taskExecutionFor(builder) : undefined;
+  const task = selected.has("task")
+    ? await renderTask(
+        builder,
+        target,
+        requestFor(builder, "task", {
+          name: "Example",
+          version: "1",
+          execution: taskExecution ?? "durable",
+        }),
+      )
+    : undefined;
   if (selected.has("event-function")) {
     await renderEventFunction(
       builder,
@@ -81,7 +95,7 @@ export async function renderService(
     await renderJob(
       builder,
       target,
-      requestFor(builder, "job", { name: "Example", target: fn?.id ?? "example" }),
+      requestFor(builder, "job", { name: "Example", target: task?.id ?? fn?.id ?? "example" }),
     );
   }
   if (selected.has("cache")) {
@@ -130,6 +144,11 @@ export async function renderService(
       target,
     );
   }
+}
+
+function taskExecutionFor(builder: PlanBuilder): "durable" | "retryable" {
+  const profile = builder.profiles.find((item) => item.capability === "job" && item.isDefault);
+  return profile?.adapter?.includes("effectMq") ? "retryable" : "durable";
 }
 
 function closure(input: readonly ServiceInclude[]): Set<ServiceInclude> {

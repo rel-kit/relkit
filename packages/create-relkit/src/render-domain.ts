@@ -10,6 +10,7 @@ import {
   type DomainTarget,
 } from "./domain-planning.js";
 import { PlanBuilder } from "./plan-builder.js";
+import { register } from "./render-domain-register.js";
 import { ensureProviderProfile } from "./provider-planning.js";
 import {
   constantsSource,
@@ -19,6 +20,8 @@ import {
   functionSource,
   jobSource,
   promptSource,
+  taskJobSource,
+  taskSource,
 } from "./render-domain-sources.js";
 
 export type RenderedArtifact = DomainArtifact;
@@ -106,6 +109,30 @@ export async function renderJob(
   request: Extract<AddRequest, { kind: "job" }>,
 ): Promise<RenderedArtifact> {
   const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
+  const taskTarget = builder.artifacts.find(
+    (item) =>
+      item.domain === target.domain.fileStem &&
+      item.kind === "task" &&
+      [item.id, item.binding, item.path.split("/").at(-1)?.split(".")[0]].includes(request.target),
+  );
+  if (taskTarget) {
+    const profile = await ensureProviderProfile(builder, "job", { requested: request.profile });
+    const artifact = domainArtifact(target, request.name, "jobs", "job", "job");
+    assertAvailableId(builder, artifact.id);
+    await builder.create(
+      artifact.path,
+      taskJobSource(
+        artifact,
+        taskTarget,
+        sourceModule(taskTarget.path),
+        profile,
+        target.domain.identifier,
+      ),
+    );
+    register(builder, target, "job", artifact);
+    await addPublicMember(builder, target, "jobs", artifact, artifact.path);
+    return artifact;
+  }
   const functionTarget =
     target.service ||
     builder.artifacts.some(
@@ -113,13 +140,30 @@ export async function renderJob(
     )
       ? resolveArtifact(builder, target, "function", request.target)
       : await renderFunction(builder, target, request.target);
-  const profile = await ensureProviderProfile(builder, "job", { requested: request.profile });
+  const profile = await ensureProviderProfile(builder, "job", {
+    requested: request.profile,
+    legacy: true,
+  });
   assertAvailableId(builder, artifact.id);
   await builder.create(
     artifact.path,
     jobSource(artifact, functionTarget, sourceModule(functionTarget.path), profile),
   );
   register(builder, target, "job", artifact);
+  await addPublicMember(builder, target, "jobs", artifact, artifact.path);
+  return artifact;
+}
+
+export async function renderTask(
+  builder: PlanBuilder,
+  target: DomainTarget,
+  request: Extract<AddRequest, { kind: "task" }>,
+): Promise<RenderedArtifact> {
+  const artifact = domainArtifact(target, request.name, "tasks", "task", "task");
+  assertAvailableId(builder, artifact.id);
+  await builder.create(artifact.path, taskSource(artifact, request.version, request.execution));
+  register(builder, target, "task", artifact);
+  await addPublicMember(builder, target, "tasks", artifact, artifact.path);
   return artifact;
 }
 
@@ -146,19 +190,4 @@ export async function renderConstants(
   await builder.create(artifact.path, constantsSource(artifact));
   register(builder, target, "constants", artifact);
   return artifact;
-}
-
-function register(
-  builder: PlanBuilder,
-  target: DomainTarget,
-  kind: "function" | "error" | "event" | "job" | "prompt" | "constants",
-  artifact: RenderedArtifact,
-): void {
-  builder.registerArtifact(kind, {
-    domain: target.domain.fileStem,
-    path: artifact.path,
-    binding: artifact.binding,
-    id: artifact.id,
-    exportKind: artifact.exportKind,
-  });
 }
