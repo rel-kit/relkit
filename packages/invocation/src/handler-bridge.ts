@@ -102,12 +102,12 @@ function completeValue<Output>(
     const effect = value.pipe(
       Effect.flatMap((result) =>
         signal.aborted
-            ? Effect.fail(normalizeFailure(signal.reason, { signal }))
-            : isFunctionFailure(result)
-              ? Effect.fail(normalizeCause(result.error, options, signal))
-              : isDeclaredError(result)
-                ? Effect.fail(normalizeCause(result, options, signal))
-                : Effect.succeed(result as Output),
+          ? Effect.fail(normalizeFailure(signal.reason, { signal }))
+          : isFunctionFailure(result)
+            ? Effect.fail(normalizeCause(result.error, options, signal))
+            : isDeclaredError(result)
+              ? Effect.fail(normalizeCause(result, options, signal))
+              : Effect.succeed(result as Output),
       ),
       Effect.mapError((cause) => normalizeCause(cause, options, signal)),
     );

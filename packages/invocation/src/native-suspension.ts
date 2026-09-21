@@ -14,8 +14,10 @@ export class NativeSuspension extends Error {
 }
 
 export function isNativeSuspension(value: unknown): value is NativeSuspension {
-  return value instanceof NativeSuspension ||
-    (isRecord(value) && value[NATIVE_SUSPENSION] === true && "value" in value);
+  return (
+    value instanceof NativeSuspension ||
+    (isRecord(value) && value[NATIVE_SUSPENSION] === true && "value" in value)
+  );
 }
 
 /** Finds a suspension after an Effect runner has wrapped it in a Cause. */
@@ -23,9 +25,12 @@ export function findNativeSuspension(value: unknown): NativeSuspension | undefin
   if (value instanceof NativeSuspension) return value;
   if (!Cause.isCause(value)) return undefined;
   for (const reason of value.reasons) {
-    const inner = Cause.isFailReason(reason) || Cause.isDieReason(reason)
-      ? Cause.isFailReason(reason) ? reason.error : reason.defect
-      : undefined;
+    const inner =
+      Cause.isFailReason(reason) || Cause.isDieReason(reason)
+        ? Cause.isFailReason(reason)
+          ? reason.error
+          : reason.defect
+        : undefined;
     const candidate = inner === undefined ? undefined : findNativeSuspension(inner);
     if (candidate !== undefined) return candidate;
   }

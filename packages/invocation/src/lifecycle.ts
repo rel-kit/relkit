@@ -40,7 +40,9 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
     options.isSuspension,
   ).pipe(
     Effect.flatMap((value) =>
-      options.validateInput === false ? Effect.succeed(value) : validateOutput(options.target.input, value),
+      options.validateInput === false
+        ? Effect.succeed(value)
+        : validateOutput(options.target.input, value),
     ),
   );
   return before.pipe(
@@ -57,7 +59,11 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
     Effect.flatMap((value) =>
       options.validateOutput === false
         ? Effect.succeed(value)
-        : validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+        : validateOutput(
+            options.target.output,
+            value,
+            options.target.invocationMode === "event-only",
+          ),
     ),
     Effect.flatMap((output) =>
       invokeValue(
@@ -72,7 +78,11 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
     Effect.flatMap((value) =>
       options.target.onAfter === undefined
         ? Effect.succeed(value)
-        : validateOutput(options.target.output, value, options.target.invocationMode === "event-only"),
+        : validateOutput(
+            options.target.output,
+            value,
+            options.target.invocationMode === "event-only",
+          ),
     ),
   );
 }

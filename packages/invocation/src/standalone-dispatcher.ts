@@ -27,13 +27,10 @@ import {
   standaloneParent,
 } from "./standalone-utils.js";
 import { runStandaloneLifecycle } from "./standalone-lifecycle.js";
-import {
-  isStreamOutput,
-  lazySingleConsumerStream,
-  managedValidatedStream,
-} from "./stream-runtime.js";
+import { isStreamOutput, lazySingleConsumerStream } from "./stream-runtime.js";
 import { createProgressEmitter } from "./progress.js";
 import { createStandaloneFinisher } from "./standalone-completion.js";
+import { createStandaloneStream } from "./standalone-stream.js";
 export function createStandaloneDispatcher(
   baseOptions: StandaloneDispatcherOptions = {},
 ): InvocationDispatcher {
@@ -157,29 +154,17 @@ async function invokeStandalone<Input, Output, Context extends { readonly signal
     );
     value = (await validated(request.target.output, result, "output")) as Output;
     if (streamLifecycle && isStreamOutput(request.target.output)) {
-      const parentScope = standaloneParent(record, controller.signal, deadlineMs);
       deferredCompletion = true;
-      value = managedValidatedStream({
+      value = createStandaloneStream({
         source: value as AsyncIterable<unknown>,
         schema: request.target.output.item,
-        maxItemBytes: 1024 * 1024,
-        idleMs: 45_000,
-        abort: (reason) => controller.abort(reason),
-        run: (work) =>
-          runInInvocationScope({
-            dispatcher,
-            parent: parentScope,
-            chain: chain!,
-            ...(taskAncestry === undefined ? {} : { taskAncestry }),
-          }, work),
-        settle: async (streamCause) => {
-          const streamError =
-            streamCause === undefined
-              ? undefined
-              : normalizeFailure(streamCause, { signal: controller.signal });
-          await finish(streamError?.outcome ?? "success", streamError);
-        },
-      }) as Output;
+        controller,
+        dispatcher,
+        parent: standaloneParent(record, controller.signal, deadlineMs),
+        chain: chain!,
+        ...(taskAncestry === undefined ? {} : { taskAncestry }),
+        finish,
+      });
     } else {
       outcome = "success";
     }

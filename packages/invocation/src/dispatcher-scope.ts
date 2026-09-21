@@ -22,7 +22,10 @@ export function currentTaskAncestry(): TaskAncestry | undefined {
 }
 
 export function runInTaskAncestry<A>(ancestry: TaskAncestry, callback: () => A): A {
-  return storage.run(Object.freeze({ ...storage.getStore(), taskAncestry: Object.freeze({ ...ancestry }) }), callback);
+  return storage.run(
+    Object.freeze({ ...storage.getStore(), taskAncestry: Object.freeze({ ...ancestry }) }),
+    callback,
+  );
 }
 
 export function runInExecutionContext<A>(context: ExecutionContext, callback: () => A): A {
