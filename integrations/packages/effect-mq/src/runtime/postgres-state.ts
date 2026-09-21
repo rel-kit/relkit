@@ -25,7 +25,9 @@ export interface EffectMqPostgresState {
   readonly close: () => Promise<void>;
 }
 
-export function createEffectMqPostgresState(options: EffectMqPostgresStateOptions): EffectMqPostgresState {
+export function createEffectMqPostgresState(
+  options: EffectMqPostgresStateOptions,
+): EffectMqPostgresState {
   const jobs = new Map<string, EffectMqJobDefinition["job"]>();
   const definitions = new Map<string, EffectMqTaskDefinition>();
   const entries = (options.definitions ?? []).map((definition) => {
@@ -36,9 +38,7 @@ export function createEffectMqPostgresState(options: EffectMqPostgresStateOption
   });
   const store = createEffectMqPostgresLayer(options.postgresUrl, options.tablePrefix);
   const workerStarted = options.startWorker === true && entries.length > 0;
-  const layer = workerStarted
-    ? buildWorkerLayer(store, entries, options.queue)
-    : store;
+  const layer = workerStarted ? buildWorkerLayer(store, entries, options.queue) : store;
   const runtime = ManagedRuntime.make<any, any>(layer as any);
   let closed = false;
   return Object.freeze({
@@ -46,12 +46,21 @@ export function createEffectMqPostgresState(options: EffectMqPostgresStateOption
     definitions,
     workerStarted,
     run: <A>(effect: Effect.Effect<A, unknown, unknown>, signal?: AbortSignal): Promise<A> =>
-      runtime.runPromise(effect as any, signal === undefined ? undefined : { signal }) as Promise<A>,
-    ready: async () => { await runtime.context(); },
+      runtime.runPromise(
+        effect as any,
+        signal === undefined ? undefined : { signal },
+      ) as Promise<A>,
+    ready: async () => {
+      await runtime.context();
+    },
     ensureJob: (name: string): EffectMqJobDefinition["job"] => {
       const existing = jobs.get(name);
       if (existing !== undefined) return existing;
-      const job = Job.make(name, { payload: { input: Schema.Unknown }, success: Schema.Unknown, error: Schema.Unknown });
+      const job = Job.make(name, {
+        payload: { input: Schema.Unknown },
+        success: Schema.Unknown,
+        error: Schema.Unknown,
+      });
       jobs.set(name, job);
       return job;
     },
@@ -92,6 +101,12 @@ function buildWorkerLayer(
     first.handlerLayer as Layer.Layer<any, any, any>,
     ...entries.slice(1).map((entry) => entry.handlerLayer as Layer.Layer<any, any, any>),
   );
-  const worker = Worker.layer(queue === undefined ? undefined : { queues: { [queue]: { concurrency: 1 } } });
-  return handlers.pipe(Layer.provideMerge(worker), Layer.provideMerge(store)) as Layer.Layer<any, any, any>;
+  const worker = Worker.layer(
+    queue === undefined ? undefined : { queues: { [queue]: { concurrency: 1 } } },
+  );
+  return handlers.pipe(Layer.provideMerge(worker), Layer.provideMerge(store)) as Layer.Layer<
+    any,
+    any,
+    any
+  >;
 }

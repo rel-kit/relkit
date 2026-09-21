@@ -21,6 +21,10 @@ import {
 
 const job = defineProviderCapability("job");
 const durable = defineProviderFeature(job, "durable");
+const retryable = defineProviderFeature(job, "retryable");
+const observation = defineProviderFeature(job, "observation");
+const progress = defineProviderFeature(job, "progress");
+const schedules = defineProviderFeature(job, "native-scheduling");
 const integration = defineIntegrationReference("inngest");
 const localRecipe = defineLocalRecipeReference(integration, "inngest-docker", 2);
 const connectionContract = defineConnectionContract({
@@ -76,7 +80,7 @@ export function inngest<const Options extends InngestOptions = InngestOptions>(
       ...(options.appVersion === undefined ? {} : { appVersion: options.appVersion }),
     },
     behavior: defineProviderBehavior(serializeJobsServiceOptions(options, options.native)),
-    features: [durable],
+    features: [durable, retryable, observation, progress, schedules],
     localRecipe,
   }) as InngestAdapter<Options>;
 }
@@ -86,24 +90,52 @@ function assertOptions(options: InngestOptions): void {
     throw new TypeError("Inngest options must be an object");
   validateJobsServiceOptions(options);
   const keys = new Set([
-    "appId", "baseUrl", "eventKey", "signingKey", "serveOrigin", "appVersion", "native",
-    "limits", "workers", "observation", "maxElapsed", "hookTimeout", "shutdownGrace",
+    "appId",
+    "baseUrl",
+    "eventKey",
+    "signingKey",
+    "serveOrigin",
+    "appVersion",
+    "native",
+    "limits",
+    "workers",
+    "observation",
+    "maxElapsed",
+    "hookTimeout",
+    "shutdownGrace",
   ]);
-  for (const key of Object.keys(options)) if (!keys.has(key)) throw new TypeError(`Unknown Inngest option "${key}"`);
-  for (const [name, value] of [["appId", options.appId], ["appVersion", options.appVersion]] as const)
-    if (value !== undefined && (typeof value !== "string" || value.trim() === "")) throw new TypeError(`Inngest ${name} is invalid`);
-  for (const [name, value] of [["eventKey", options.eventKey], ["signingKey", options.signingKey]] as const)
-    if (value !== undefined && (!isBindingValueRef(value) || value.type !== "secret-string" || !value.sensitive)) throw new TypeError(`Inngest ${name} must be a named secret binding value`);
+  for (const key of Object.keys(options))
+    if (!keys.has(key)) throw new TypeError(`Unknown Inngest option "${key}"`);
+  for (const [name, value] of [
+    ["appId", options.appId],
+    ["appVersion", options.appVersion],
+  ] as const)
+    if (value !== undefined && (typeof value !== "string" || value.trim() === ""))
+      throw new TypeError(`Inngest ${name} is invalid`);
+  for (const [name, value] of [
+    ["eventKey", options.eventKey],
+    ["signingKey", options.signingKey],
+  ] as const)
+    if (
+      value !== undefined &&
+      (!isBindingValueRef(value) || value.type !== "secret-string" || !value.sensitive)
+    )
+      throw new TypeError(`Inngest ${name} must be a named secret binding value`);
   urlValue(options.baseUrl);
   urlValue(options.serveOrigin);
 }
 
 function urlValue(value: undefined): undefined;
 function urlValue(value: string | URL | TextReference): string | TextReference;
-function urlValue(value: string | URL | TextReference | undefined): string | TextReference | undefined;
-function urlValue(value: string | URL | TextReference | undefined): string | TextReference | undefined {
+function urlValue(
+  value: string | URL | TextReference | undefined,
+): string | TextReference | undefined;
+function urlValue(
+  value: string | URL | TextReference | undefined,
+): string | TextReference | undefined {
   if (value === undefined || isBindingValueRef(value)) return value;
   const url = value instanceof URL ? value : new URL(value);
-  if (url.protocol !== "http:" && url.protocol !== "https:") throw new TypeError("Inngest URL must use http or https");
+  if (url.protocol !== "http:" && url.protocol !== "https:")
+    throw new TypeError("Inngest URL must use http or https");
   return url.toString();
 }

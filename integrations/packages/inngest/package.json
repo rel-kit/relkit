@@ -69,9 +69,7 @@
     "@relkit/contracts": "workspace:*",
     "@relkit/jobs": "workspace:*",
     "@relkit/local-service": "workspace:*",
-    "@relkit/provider": "workspace:*"
-  },
-  "optionalDependencies": {
+    "@relkit/provider": "workspace:*",
     "inngest": "4.20.0"
   }
 }

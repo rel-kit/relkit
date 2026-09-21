@@ -24,7 +24,9 @@ export interface EffectMqWorkerHandle {
   readonly close: () => Promise<void>;
 }
 
-export function createEffectMqWorker(options: EffectMqWorkerRegistrationOptions): EffectMqWorkerHandle {
+export function createEffectMqWorker(
+  options: EffectMqWorkerRegistrationOptions,
+): EffectMqWorkerHandle {
   let readyPromise: Promise<void> | undefined;
   const ready = (): Promise<void> => {
     readyPromise ??= Promise.resolve(options.register?.(options.definitions)).then(() => undefined);
