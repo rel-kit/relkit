@@ -29,7 +29,12 @@ export const localRecipe = Object.freeze({
         POSTGRES_USER: Object.freeze({ value: "trigger" }),
         POSTGRES_PASSWORD: Object.freeze({ secret: "postgresPassword" }),
       }),
-      health: Object.freeze({ command: ["pg_isready", "-U", "trigger", "-d", "trigger"], intervalMs: 250, timeoutMs: 2_000, retries: 60 }),
+      health: Object.freeze({
+        command: ["pg_isready", "-U", "trigger", "-d", "trigger"],
+        intervalMs: 250,
+        timeoutMs: 2_000,
+        retries: 60,
+      }),
       networkAliases: Object.freeze(["postgres"]),
     }),
     Object.freeze({
@@ -37,33 +42,63 @@ export const localRecipe = Object.freeze({
       image: TRIGGER_IMAGE,
       dependsOn: Object.freeze(["postgres-ready"]),
       ports: Object.freeze({ api: 8030 }),
-      health: Object.freeze({ command: ["kill", "-0", "1"], intervalMs: 500, timeoutMs: 2_000, retries: 120 }),
+      health: Object.freeze({
+        command: ["kill", "-0", "1"],
+        intervalMs: 500,
+        timeoutMs: 2_000,
+        retries: 120,
+      }),
       networkAliases: Object.freeze(["trigger"]),
       environment: Object.freeze({
-        DATABASE_URL: Object.freeze({ value: "postgres://trigger:$POSTGRES_PASSWORD@postgres:5432/trigger" }),
+        DATABASE_URL: Object.freeze({
+          value: "postgres://trigger:$POSTGRES_PASSWORD@postgres:5432/trigger",
+        }),
         TRIGGER_ACCOUNT_FREE: Object.freeze({ value: "1" }),
         TRIGGER_PROJECT_REF: Object.freeze({ secret: "projectRef" }),
         TRIGGER_SECRET_KEY: Object.freeze({ secret: "secretKey" }),
       }),
     }),
   ]),
-  init: Object.freeze([Object.freeze({
-    id: "postgres-ready",
-    image: POSTGRES_IMAGE,
-    dependsOn: Object.freeze(["postgres"]),
-    command: Object.freeze(["sh", "-c", "until PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U trigger -d trigger -c 'select 1' >/dev/null 2>&1; do sleep 1; done"]),
-    environment: Object.freeze({ POSTGRES_PASSWORD: Object.freeze({ secret: "postgresPassword" }) }),
-  })]),
-  workers: Object.freeze([Object.freeze({
-    id: "worker",
-    image: BUN_IMAGE,
-    command: Object.freeze(["bun", "run", "--no-env-file", "--no-install", "/relkit-worker/server/index.js"]),
-    dependsOn: Object.freeze(["trigger"]),
-    ports: Object.freeze({ api: 3000 }),
-    health: Object.freeze({ command: ["kill", "-0", "1"], intervalMs: 500, timeoutMs: 2_000, retries: 120 }),
-    networkAliases: Object.freeze(["worker"]),
-  })]),
-  volumes: Object.freeze({ postgres: Object.freeze({ mountPath: "/var/lib/postgresql/data", persistent: true }) }),
+  init: Object.freeze([
+    Object.freeze({
+      id: "postgres-ready",
+      image: POSTGRES_IMAGE,
+      dependsOn: Object.freeze(["postgres"]),
+      command: Object.freeze([
+        "sh",
+        "-c",
+        "until PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U trigger -d trigger -c 'select 1' >/dev/null 2>&1; do sleep 1; done",
+      ]),
+      environment: Object.freeze({
+        POSTGRES_PASSWORD: Object.freeze({ secret: "postgresPassword" }),
+      }),
+    }),
+  ]),
+  workers: Object.freeze([
+    Object.freeze({
+      id: "worker",
+      image: BUN_IMAGE,
+      command: Object.freeze([
+        "bun",
+        "run",
+        "--no-env-file",
+        "--no-install",
+        "/relkit-worker/server/index.js",
+      ]),
+      dependsOn: Object.freeze(["trigger"]),
+      ports: Object.freeze({ api: 3000 }),
+      health: Object.freeze({
+        command: ["kill", "-0", "1"],
+        intervalMs: 500,
+        timeoutMs: 2_000,
+        retries: 120,
+      }),
+      networkAliases: Object.freeze(["worker"]),
+    }),
+  ]),
+  volumes: Object.freeze({
+    postgres: Object.freeze({ mountPath: "/var/lib/postgresql/data", persistent: true }),
+  }),
   generatedSecrets: Object.freeze({
     postgresPassword: Object.freeze({ bytes: 24, encoding: "hex" }),
     projectRef: Object.freeze({ bytes: 12, encoding: "hex" }),
@@ -71,11 +106,12 @@ export const localRecipe = Object.freeze({
   }),
   network: Object.freeze({ internal: false }),
   ownership: Object.freeze({ scope: "project", retainVolumes: true }),
-  outputs: ({ ports, secrets }: LocalServiceRecipeOutputContext) => Object.freeze({
-    baseUrl: "http://127.0.0.1:" + number(ports.api, "Trigger API port"),
-    projectRef: text(secrets.projectRef, "Trigger project ref"),
-    secretKey: text(secrets.secretKey, "Trigger secret key"),
-  }),
+  outputs: ({ ports, secrets }: LocalServiceRecipeOutputContext) =>
+    Object.freeze({
+      baseUrl: "http://127.0.0.1:" + number(ports.api, "Trigger API port"),
+      projectRef: text(secrets.projectRef, "Trigger project ref"),
+      secretKey: text(secrets.secretKey, "Trigger secret key"),
+    }),
 }) satisfies CompositeLocalServiceRecipe<"trigger">;
 
 function text(value: unknown, name: string): string {
@@ -84,6 +120,7 @@ function text(value: unknown, name: string): string {
 }
 
 function number(value: unknown, name: string): number {
-  if (!Number.isSafeInteger(value) || (value as number) < 1 || (value as number) > 65_535) throw new TypeError(name + " is invalid");
+  if (!Number.isSafeInteger(value) || (value as number) < 1 || (value as number) > 65_535)
+    throw new TypeError(name + " is invalid");
   return value as number;
 }

@@ -33,9 +33,21 @@ export interface TriggerNativeClient {
   readonly submit: (request: NativeSubmission, context: OperationContext) => Promise<NativeReceipt>;
   readonly get: (runId: string, context: OperationContext) => Promise<NativeRun>;
   readonly list: (query: NativeRunQuery, context: OperationContext) => Promise<NativeRunPage>;
-  readonly cancel: (runId: string, operationId: string, reason: string | undefined, context: OperationContext) => Promise<NativeControlReceipt>;
-  readonly retry: (request: NativeRetryRequest, context: OperationContext) => Promise<NativeControlReceipt>;
-  readonly subscribeToRun?: (runId: string, context: OperationContext, after?: string) => Promise<TriggerSubscription | undefined>;
+  readonly cancel: (
+    runId: string,
+    operationId: string,
+    reason: string | undefined,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly retry: (
+    request: NativeRetryRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly subscribeToRun?: (
+    runId: string,
+    context: OperationContext,
+    after?: string,
+  ) => Promise<TriggerSubscription | undefined>;
   readonly schedules?: NativeScheduleOperations;
   readonly registerTasks?: (tasks: readonly unknown[]) => Promise<void> | void;
   readonly close?: () => Promise<void>;

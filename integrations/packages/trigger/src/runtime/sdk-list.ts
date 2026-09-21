@@ -1,4 +1,9 @@
-import type { NativeRun, NativeRunPage, NativeRunQuery, OperationContext } from "@relkit/jobs/adapter";
+import type {
+  NativeRun,
+  NativeRunPage,
+  NativeRunQuery,
+  OperationContext,
+} from "@relkit/jobs/adapter";
 import type { TriggerSdkApi } from "./native.js";
 import { triggerTaskIdentifier } from "./sdk-support.js";
 import { record, triggerSnapshot } from "./sdk-mapping.js";
@@ -17,7 +22,9 @@ export async function listRuns(
       ? { items: [run], hasMore: false, availability: [], count: { value: 1, accuracy: "exact" } }
       : emptyPage();
   }
-  const response = await client.runs.list(projectRef, listParams(query), { signal: context.signal });
+  const response = await client.runs.list(projectRef, listParams(query), {
+    signal: context.signal,
+  });
   const page = record(response);
   const rows = Array.isArray(page?.data) ? page.data : [];
   const items = rows
@@ -42,8 +49,18 @@ function emptyPage(): NativeRunPage {
 function listParams(query: NativeRunQuery): Record<string, unknown> {
   const params: Record<string, unknown> = { limit: query.limit ?? 25 };
   if (query.status !== undefined) params.status = query.status.map(triggerStatus);
-  if (query.jobId !== undefined && query.taskId !== undefined && query.taskVersion !== undefined && query.buildId !== undefined) {
-    params.taskIdentifier = triggerTaskIdentifier({ jobId: query.jobId, taskId: query.taskId, taskVersion: query.taskVersion, buildId: query.buildId });
+  if (
+    query.jobId !== undefined &&
+    query.taskId !== undefined &&
+    query.taskVersion !== undefined &&
+    query.buildId !== undefined
+  ) {
+    params.taskIdentifier = triggerTaskIdentifier({
+      jobId: query.jobId,
+      taskId: query.taskId,
+      taskVersion: query.taskVersion,
+      buildId: query.buildId,
+    });
   }
   if (query.taskVersion !== undefined) params.version = query.taskVersion;
   if (query.acceptedFrom !== undefined) params.from = date(query.acceptedFrom, "acceptedFrom");
@@ -62,16 +79,38 @@ function matches(run: NativeRun, query: NativeRunQuery): boolean {
   if (query.service !== undefined && run.service !== query.service) return false;
   if (query.acceptedFrom !== undefined && run.acceptedAt < query.acceptedFrom) return false;
   if (query.acceptedTo !== undefined && run.acceptedAt > query.acceptedTo) return false;
-  if (query.startedFrom !== undefined && (run.startedAt === undefined || run.startedAt < query.startedFrom)) return false;
-  if (query.startedTo !== undefined && (run.startedAt === undefined || run.startedAt > query.startedTo)) return false;
-  if (query.completedFrom !== undefined && (run.completedAt === undefined || run.completedAt < query.completedFrom)) return false;
-  if (query.completedTo !== undefined && (run.completedAt === undefined || run.completedAt > query.completedTo)) return false;
+  if (
+    query.startedFrom !== undefined &&
+    (run.startedAt === undefined || run.startedAt < query.startedFrom)
+  )
+    return false;
+  if (
+    query.startedTo !== undefined &&
+    (run.startedAt === undefined || run.startedAt > query.startedTo)
+  )
+    return false;
+  if (
+    query.completedFrom !== undefined &&
+    (run.completedAt === undefined || run.completedAt < query.completedFrom)
+  )
+    return false;
+  if (
+    query.completedTo !== undefined &&
+    (run.completedAt === undefined || run.completedAt > query.completedTo)
+  )
+    return false;
   const details = run as unknown as Record<string, unknown>;
-  if (query.correlationId !== undefined && details.correlationId !== query.correlationId) return false;
+  if (query.correlationId !== undefined && details.correlationId !== query.correlationId)
+    return false;
   if (query.parentRunId !== undefined && run.parentRunId !== query.parentRunId) return false;
   if (query.tags !== undefined) {
-    const tags = Array.isArray(details.tags) ? details.tags.filter((tag): tag is string => typeof tag === "string") : [];
-    const matched = query.tagMatch === "all" ? query.tags.every((tag) => tags.includes(tag)) : query.tags.some((tag) => tags.includes(tag));
+    const tags = Array.isArray(details.tags)
+      ? details.tags.filter((tag): tag is string => typeof tag === "string")
+      : [];
+    const matched =
+      query.tagMatch === "all"
+        ? query.tags.every((tag) => tags.includes(tag))
+        : query.tags.some((tag) => tags.includes(tag));
     if (!matched) return false;
   }
   return true;
@@ -79,18 +118,28 @@ function matches(run: NativeRun, query: NativeRunQuery): boolean {
 
 function belongsToContext(value: unknown, run: NativeRun, context: OperationContext): boolean {
   const metadata = record(record(value)?.metadata);
-  return metadata !== undefined &&
+  return (
+    metadata !== undefined &&
     metadata.relkitApplication === context.application &&
     metadata.relkitEnvironment === context.environment &&
     metadata.relkitService === context.service &&
     metadata.relkitJobId === run.jobId &&
-    (context.scope === "trusted" || metadata.relkitScope === context.scope);
+    (context.scope === "trusted" || metadata.relkitScope === context.scope)
+  );
 }
 
 function triggerStatus(value: string): string {
   const map: Record<string, string> = {
-    queued: "QUEUED", delayed: "DELAYED", running: "EXECUTING", sleeping: "WAITING", retrying: "QUEUED",
-    completed: "COMPLETED", failed: "FAILED", cancelled: "CANCELED", "timed-out": "TIMED_OUT", unknown: "QUEUED",
+    queued: "QUEUED",
+    delayed: "DELAYED",
+    running: "EXECUTING",
+    sleeping: "WAITING",
+    retrying: "QUEUED",
+    completed: "COMPLETED",
+    failed: "FAILED",
+    cancelled: "CANCELED",
+    "timed-out": "TIMED_OUT",
+    unknown: "QUEUED",
   };
   return map[value] ?? value;
 }
