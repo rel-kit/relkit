@@ -9,7 +9,7 @@ import { localPlanFrom, reconcileLocalServices } from "./dev-local-services.js";
 export { checkedLocalArtifacts } from "./dev-local-services.js";
 import type { DevLocalServiceOwner } from "./dev-local-runtime.js";
 import type { TelemetryConfiguration } from "@relkit/observability";
-import { localWorkerArtifacts } from "./local-service-options.js";
+import { localWorkerArtifacts, prepareLocalWorkerOverrides } from "./local-service-options.js";
 
 export interface DevLocalCompiler {
   readonly compile: CandidateCompile;
@@ -42,14 +42,7 @@ export function createDevLocalCompiler(
         await configureTelemetry(graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {});
       }
       let local = localEnabled
-        ? await reconcileLocalServices(
-            projectRoot,
-            checked,
-            recipes,
-            owner,
-            request,
-            backendPort,
-          )
+        ? await reconcileLocalServices(projectRoot, checked, recipes, owner, request, backendPort)
         : undefined;
       owner = local?.owner ?? owner;
       const built = await buildProject({
@@ -64,6 +57,7 @@ export function createDevLocalCompiler(
       });
       if (!built.ok) throw new Error(formatDevDiagnostics(projectRoot, built.diagnostics, color));
       if (local !== undefined && local.workerBindings.length > 0) {
+        const workerOverridesFile = await prepareLocalWorkerOverrides(local.owner.overrideFile);
         const activated = await reconcileLocalServices(
           projectRoot,
           checked,
@@ -76,7 +70,8 @@ export function createDevLocalCompiler(
             localPlanFrom(checked).services,
             local.workerBindings,
             request.outputDirectory,
-            local.owner.overrideFile,
+            resolve(projectRoot, "node_modules"),
+            workerOverridesFile,
           ),
         );
         if (activated === undefined) throw new Error("Local worker activation produced no owner.");

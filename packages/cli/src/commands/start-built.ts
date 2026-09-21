@@ -57,7 +57,8 @@ export async function readBuilt(
     manifest.entrypoint !== "server/index.ts" ||
     manifest.containerEntrypoint !== "server/index.js" ||
     manifest.runtimeManifestFile !== "server/runtime.manifest.ts" ||
-    (manifest.jobsManifestFile !== undefined && manifest.jobsManifestFile !== "jobs.manifest.json") ||
+    (manifest.jobsManifestFile !== undefined &&
+      manifest.jobsManifestFile !== "jobs.manifest.json") ||
     manifest.runtimeActivationFile !== `server/${RUNTIME_ACTIVATION_FILE}` ||
     manifest.runtimeIntegrationsPlanFile !== `server/${RUNTIME_INTEGRATION_PLAN_FILE}` ||
     (manifest.localServicesPlanFile !== undefined &&

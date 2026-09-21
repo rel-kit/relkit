@@ -17,20 +17,34 @@ export async function runLocal(
   try {
     const parsed = parseLocalArgs(args);
     if (parsed.command === "up") {
-      await localUp(parsed.projectRoot, parsed.detach, context);
+      await localUp(parsed.projectRoot, parsed.detach, context, parsed.service, parsed.environment);
       return CLI_EXIT_CODES.success;
     }
     if (parsed.command === "status") {
-      await localStatus(parsed.projectRoot, context);
+      await localStatus(parsed.projectRoot, context, parsed.service, parsed.environment);
       return CLI_EXIT_CODES.success;
     }
     if (parsed.command === "stop") {
-      await localStop(parsed.projectRoot, false, context);
+      await localStop(
+        parsed.projectRoot,
+        false,
+        context,
+        false,
+        parsed.service,
+        parsed.environment,
+      );
       return CLI_EXIT_CODES.success;
     }
     if (!parsed.yes) {
       if (parsed.dryRun) {
-        await localStop(parsed.projectRoot, true, context, true);
+        await localStop(
+          parsed.projectRoot,
+          true,
+          context,
+          true,
+          parsed.service,
+          parsed.environment,
+        );
         return CLI_EXIT_CODES.success;
       }
       const confirm = dependencies.confirm ?? interactiveConfirm(context);
@@ -44,7 +58,14 @@ export async function runLocal(
         return CLI_EXIT_CODES.success;
       }
     }
-    await localStop(parsed.projectRoot, true, context, parsed.dryRun);
+    await localStop(
+      parsed.projectRoot,
+      true,
+      context,
+      parsed.dryRun,
+      parsed.service,
+      parsed.environment,
+    );
     return CLI_EXIT_CODES.success;
   } catch (error) {
     const code = errorCode(error);
@@ -59,6 +80,8 @@ type ParsedLocalArgs = {
   readonly detach: boolean;
   readonly yes: boolean;
   readonly dryRun: boolean;
+  readonly service?: string;
+  readonly environment?: string;
 };
 
 function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
@@ -69,6 +92,8 @@ function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
   let detach = false;
   let yes = false;
   let dryRun = false;
+  let service: string | undefined;
+  let environment: string | undefined;
   for (let index = 1; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === "--project-root") {
@@ -76,12 +101,29 @@ function parseLocalArgs(args: readonly string[]): ParsedLocalArgs {
       if (value === undefined || value.startsWith("-"))
         throw usage("--project-root requires a value.");
       projectRoot = resolve(value);
+    } else if (argument === "--service") {
+      const value = args[++index];
+      if (value === undefined || value.startsWith("-")) throw usage("--service requires a value.");
+      service = value;
+    } else if (argument === "--environment" || argument === "--env") {
+      const value = args[++index];
+      if (value === undefined || value.startsWith("-"))
+        throw usage("--environment requires a value.");
+      environment = value;
     } else if (argument === "--detach" && command === "up") detach = true;
     else if (argument === "--yes" && command === "reset") yes = true;
     else if (argument === "--dry-run" && command === "reset") dryRun = true;
     else throw usage(`Unknown local ${command} option: ${String(argument)}`);
   }
-  return { command, projectRoot, detach, yes, dryRun };
+  return {
+    command,
+    projectRoot,
+    detach,
+    yes,
+    dryRun,
+    ...(service === undefined ? {} : { service }),
+    ...(environment === undefined ? {} : { environment }),
+  };
 }
 
 function interactiveConfirm(

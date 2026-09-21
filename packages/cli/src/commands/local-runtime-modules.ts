@@ -30,9 +30,12 @@ export interface LoadedLocalReconciler {
     readonly scope: "required" | "all";
     readonly environment?: string;
     readonly serviceGeneration?: string;
+    readonly serviceGenerations?: Readonly<Record<string, string>>;
     readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
     readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
-    readonly environmentOverridesByUnit?: Readonly<Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>>;
+    readonly environmentOverridesByUnit?: Readonly<
+      Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>
+    >;
     readonly workerArtifacts?: Readonly<Record<string, LocalServiceWorkerArtifact>>;
     readonly signal?: AbortSignal;
   }) => Promise<{
@@ -66,7 +69,12 @@ export interface LoadedLocalRuntime {
   readonly localStateDirectory: (identity: LoadedLocalIdentity) => string;
   readonly removeLocalStateFile: (
     identity: LoadedLocalIdentity,
-    name: "lease.json" | "local-services.state.json" | "provider-overrides.json" | "local-secrets.json",
+    name:
+      | "lease.json"
+      | "local-services.state.json"
+      | "provider-overrides.json"
+      | "worker-provider-overrides.json"
+      | "local-secrets.json",
   ) => void;
   readonly groupServiceInstances: (
     instances: readonly LocalServiceInstance[],

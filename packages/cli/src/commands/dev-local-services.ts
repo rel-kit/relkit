@@ -19,7 +19,11 @@ import {
   loadLocalRecipe,
   type DevLocalServiceOwner,
 } from "./dev-local-runtime.js";
-import { localServiceRuntimeOptions } from "./local-service-options.js";
+import {
+  localJobServiceGenerations,
+  localServiceGenerations,
+  localServiceRuntimeOptions,
+} from "./local-service-options.js";
 
 export interface DevLocalReconcileResult {
   readonly owner: DevLocalServiceOwner;
@@ -65,7 +69,7 @@ export async function reconcileLocalServices(
     recipes: Object.fromEntries(recipes),
     scope: "required",
     environment: "development",
-    serviceGeneration: hashGeneratedArtifact(checked.outputs.graph),
+    serviceGenerations: localServiceGenerations(required, localJobServiceGenerations(graph)),
     ...localServiceRuntimeOptions(localPlan.services, backendPort, workerEnabled),
     ...(workerArtifacts === undefined ? {} : { workerArtifacts }),
     signal: request.signal,
