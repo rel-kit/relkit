@@ -21,14 +21,19 @@ export function copySchedules<CanonicalInput>(
     if (ids.has(id)) throw new TypeError(`Duplicate job schedule "${id}"`);
     ids.add(id);
     if (!hasOwn(entry, "input")) throw new TypeError("schedule.input is required");
-    const callerInput = options.callerSchema === undefined
-      ? entry.input
-      : validateScheduleInput(options.callerSchema, entry.input, "task input");
-    const input = options.canonicalSchema === undefined
-      ? callerInput
-      : validateScheduleInput(options.canonicalSchema, callerInput, "canonical task input");
+    const callerInput =
+      options.callerSchema === undefined
+        ? entry.input
+        : validateScheduleInput(options.callerSchema, entry.input, "task input");
+    const input =
+      options.canonicalSchema === undefined
+        ? callerInput
+        : validateScheduleInput(options.canonicalSchema, callerInput, "canonical task input");
     assertJsonValue(input);
-    if (options.canonicalSchema !== undefined && canonicalJson(input) !== canonicalJson(callerInput)) {
+    if (
+      options.canonicalSchema !== undefined &&
+      canonicalJson(input) !== canonicalJson(callerInput)
+    ) {
       throw new TypeError("schedule.input must already be canonical task input");
     }
     const hasCron = hasOwn(entry, "cron");

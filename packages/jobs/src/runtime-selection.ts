@@ -15,29 +15,57 @@ export function resolveBinding(
   }
   const configuredJobs = (options.jobs ?? []).filter((job) => job.task.ref.id === taskId);
   const candidates = manifestJobs.length > 0 ? manifestJobs : configuredJobs;
-  const selectedJob = selected === undefined ? undefined : candidates.find((job) => job.id === selected.jobId);
+  const selectedJob =
+    selected === undefined ? undefined : candidates.find((job) => job.id === selected.jobId);
   if (
     selected !== undefined &&
     selectedJob === undefined &&
     (candidates.length > 0 || options.manifest !== undefined || options.jobs !== undefined)
   ) {
-    throw new TypeError(`Job selector "${selected.jobId}" is not present in the compiled jobs manifest`);
+    throw new TypeError(
+      `Job selector "${selected.jobId}" is not present in the compiled jobs manifest`,
+    );
   }
-  const chosen = selectedJob ?? (selected === undefined
-    ? candidates.find((job) => job.default === true) ?? (candidates.length === 1 ? candidates[0] : undefined)
-    : undefined);
-  const configuredJob = selected === undefined
-    ? configuredJobs.find((job) => job.id === chosen?.id) ?? (configuredJobs.length === 1 ? configuredJobs[0] : undefined)
-    : configuredJobs.find((job) => job.id === selected.jobId);
+  const chosen =
+    selectedJob ??
+    (selected === undefined
+      ? (candidates.find((job) => job.default === true) ??
+        (candidates.length === 1 ? candidates[0] : undefined))
+      : undefined);
+  const configuredJob =
+    selected === undefined
+      ? (configuredJobs.find((job) => job.id === chosen?.id) ??
+        (configuredJobs.length === 1 ? configuredJobs[0] : undefined))
+      : configuredJobs.find((job) => job.id === selected.jobId);
   if (selected === undefined && candidates.length > 1 && chosen === undefined) {
     throw new TypeError(`Task "${taskId}" has multiple jobs and no default binding`);
   }
   const jobId = selected?.jobId ?? chosen?.id ?? configuredJob?.id ?? taskId;
-  const taskVersion = firstText(selected?.taskVersion, candidateText(chosen, "taskVersion"), configuredJob?.task.version, taskVersionOf(task));
-  const profile = firstText(selected?.profile, candidateText(chosen, "profile"), configuredJob?.profile, "default");
+  const taskVersion = firstText(
+    selected?.taskVersion,
+    candidateText(chosen, "taskVersion"),
+    configuredJob?.task.version,
+    taskVersionOf(task),
+  );
+  const profile = firstText(
+    selected?.profile,
+    candidateText(chosen, "profile"),
+    configuredJob?.profile,
+    "default",
+  );
   const service = firstText(selected?.service, configuredJob?.service, options.service, profile);
-  const serviceGeneration = firstText(selected?.serviceGeneration, candidateText(chosen, "serviceGeneration"), options.serviceGeneration, "current");
-  const buildId = firstText(selected?.buildId, candidateText(chosen, "buildId"), taskBuildId(taskId, options.manifest), taskVersion);
+  const serviceGeneration = firstText(
+    selected?.serviceGeneration,
+    candidateText(chosen, "serviceGeneration"),
+    options.serviceGeneration,
+    "current",
+  );
+  const buildId = firstText(
+    selected?.buildId,
+    candidateText(chosen, "buildId"),
+    taskBuildId(taskId, options.manifest),
+    taskVersion,
+  );
   const inputSchemaHash = taskSchemaHash(taskId, options.manifest);
   const taskPolicyValue = taskPolicy(taskId, options.manifest) ?? taskPolicyFromJob(configuredJob);
   const jobPolicy = candidateValue(chosen, "policy") ?? candidateValue(configuredJob, "policy");
@@ -52,7 +80,7 @@ export function resolveBinding(
     buildId,
     ...(inputSchemaHash === undefined ? {} : { inputSchemaHash }),
     ...(options.scope === undefined ? {} : { scope: options.scope }),
-    ...((taskPolicyValue === undefined && jobPolicy === undefined)
+    ...(taskPolicyValue === undefined && jobPolicy === undefined
       ? {}
       : { policy: mergePolicies(taskPolicyValue, jobPolicy) }),
   });
@@ -62,17 +90,22 @@ function jobFromSelector(value: JobRefAny): JobsRuntimeBinding {
   const candidate = value as JobRefAny & Record<string, unknown>;
   const task = candidate.task as Record<string, unknown> | undefined;
   return {
-    taskId: typeof task?.ref === "object" && task.ref !== null && "id" in task.ref
-      ? String((task.ref as { readonly id: string }).id)
-      : "",
+    taskId:
+      typeof task?.ref === "object" && task.ref !== null && "id" in task.ref
+        ? String((task.ref as { readonly id: string }).id)
+        : "",
     taskVersion: typeof task?.version === "string" ? task.version : "",
     jobId: candidate.ref.id,
     name: typeof candidate.name === "string" ? candidate.name : candidate.ref.id,
     profile: typeof candidate.profile === "string" ? candidate.profile : "default",
-    service: typeof candidate.service === "string"
-      ? candidate.service
-      : typeof candidate.profile === "string" ? candidate.profile : "",
-    serviceGeneration: typeof candidate.serviceGeneration === "string" ? candidate.serviceGeneration : "",
+    service:
+      typeof candidate.service === "string"
+        ? candidate.service
+        : typeof candidate.profile === "string"
+          ? candidate.profile
+          : "",
+    serviceGeneration:
+      typeof candidate.serviceGeneration === "string" ? candidate.serviceGeneration : "",
     buildId: typeof candidate.buildId === "string" ? candidate.buildId : "",
   };
 }
@@ -118,9 +151,10 @@ function taskPolicyFromJob(job: JobDescriptorAny | undefined): unknown {
 function mergePolicies(taskPolicyValue: unknown, jobPolicy: unknown): unknown {
   if (!isRecord(taskPolicyValue)) return jobPolicy;
   if (!isRecord(jobPolicy)) return taskPolicyValue;
-  const retry = isRecord(taskPolicyValue.retry) && isRecord(jobPolicy.retry)
-    ? { ...taskPolicyValue.retry, ...jobPolicy.retry }
-    : jobPolicy.retry ?? taskPolicyValue.retry;
+  const retry =
+    isRecord(taskPolicyValue.retry) && isRecord(jobPolicy.retry)
+      ? { ...taskPolicyValue.retry, ...jobPolicy.retry }
+      : (jobPolicy.retry ?? taskPolicyValue.retry);
   return { ...taskPolicyValue, ...jobPolicy, ...(retry === undefined ? {} : { retry }) };
 }
 
@@ -128,7 +162,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function taskSchemaHash(taskId: string, manifest: JobsManifestLike | undefined): string | undefined {
+function taskSchemaHash(
+  taskId: string,
+  manifest: JobsManifestLike | undefined,
+): string | undefined {
   const hashes = manifest?.tasks?.find((task) => task.id === taskId)?.schemaHashes;
   if (hashes === null || typeof hashes !== "object" || Array.isArray(hashes)) return undefined;
   const value = (hashes as Record<string, unknown>)["input:input"];

@@ -32,7 +32,8 @@ export async function runWithJobs<A>(
   callback: () => A | PromiseLike<A>,
 ): Promise<Awaited<A>> {
   const ownedRuntime = config.runtime === undefined;
-  const runtime = config.runtime ?? createJobsRuntime(runtimeOptions(config, await readManifest(config)));
+  const runtime =
+    config.runtime ?? createJobsRuntime(runtimeOptions(config, await readManifest(config)));
   const parent = currentInvocationScope();
   try {
     return await runInJobsRuntime(runtime, () =>
@@ -61,7 +62,9 @@ function runtimeOptions(
     ...(config.environment === undefined ? {} : { environment: config.environment }),
     ...(config.scope === undefined ? {} : { scope: config.scope }),
     ...(config.service === undefined ? {} : { service: config.service }),
-    ...(config.serviceGeneration === undefined ? {} : { serviceGeneration: config.serviceGeneration }),
+    ...(config.serviceGeneration === undefined
+      ? {}
+      : { serviceGeneration: config.serviceGeneration }),
     ...(config.capabilities === undefined ? {} : { capabilities: config.capabilities }),
     ...(config.jobs === undefined ? {} : { jobs: config.jobs }),
     ...(config.taskExecutor === undefined ? {} : { taskExecutor: config.taskExecutor }),
@@ -70,7 +73,8 @@ function runtimeOptions(
 }
 
 async function readManifest(config: RunWithJobsConfig): Promise<JobsManifestLike | undefined> {
-  const path = config.manifestPath ?? join(config.projectRoot, ".relkit", "generated", "jobs.manifest.json");
+  const path =
+    config.manifestPath ?? join(config.projectRoot, ".relkit", "generated", "jobs.manifest.json");
   try {
     const value: unknown = JSON.parse(await readFile(path, "utf8"));
     if (value === null || typeof value !== "object" || Array.isArray(value)) {

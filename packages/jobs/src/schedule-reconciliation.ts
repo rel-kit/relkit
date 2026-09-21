@@ -2,6 +2,11 @@ import { assertJsonValue, canonicalJson } from "@relkit/contracts";
 import type { ScheduleDefinition } from "./job-types.js";
 import type { NativeScheduleOperations, OperationContext } from "./adapter.js";
 import { stableIdentityTuple } from "./identity.js";
+import {
+  isScheduleRecord,
+  writeContext,
+  writeWithRecovery,
+} from "./schedule-reconciliation-support.js";
 
 export interface NativeOwnedScheduleRecord {
   readonly id: string;
@@ -37,7 +42,7 @@ export async function reconcileNativeSchedules(
   options: ScheduleReconciliationOptions,
 ): Promise<ScheduleReconciliationResult> {
   await options.workerReady?.();
-  const existing = options.existing ?? await readExisting(options);
+  const existing = options.existing ?? (await readExisting(options));
   const byId = new Map(existing.map((record) => [record.id, record]));
   const upserted: string[] = [];
   const deleted: string[] = [];
@@ -51,12 +56,20 @@ export async function reconcileNativeSchedules(
     }
     const definition = nativeDefinition(schedule, options);
     await writeWithRecovery(
-      () => options.native.upsert(definition as unknown as import("@relkit/contracts").JsonValue, writeContext(options.context, operationId(options, schedule.id))),
+      () =>
+        options.native.upsert(
+          definition as unknown as import("@relkit/contracts").JsonValue,
+          writeContext(options.context, operationId(options, schedule.id)),
+        ),
       options.context,
     );
     if (current?.state === "paused") {
       await writeWithRecovery(
-        () => options.native.pause(schedule.id, writeContext(options.context, operationId(options, schedule.id + ":pause"))),
+        () =>
+          options.native.pause(
+            schedule.id,
+            writeContext(options.context, operationId(options, schedule.id + ":pause")),
+          ),
         options.context,
       );
     }
@@ -70,7 +83,11 @@ export async function reconcileNativeSchedules(
     }
     if (desiredIds.has(record.id)) continue;
     await writeWithRecovery(
-      () => options.native.delete(record.id, writeContext(options.context, operationId(options, record.id))),
+      () =>
+        options.native.delete(
+          record.id,
+          writeContext(options.context, operationId(options, record.id)),
+        ),
       options.context,
     );
     deleted.push(record.id);
@@ -78,7 +95,9 @@ export async function reconcileNativeSchedules(
   return Object.freeze({ upserted, deleted, preserved });
 }
 
-export function scheduleOwner(options: Pick<ScheduleReconciliationOptions, "context" | "jobId">): string {
+export function scheduleOwner(
+  options: Pick<ScheduleReconciliationOptions, "context" | "jobId">,
+): string {
   return stableIdentityTuple([
     "relkit.schedule.owner",
     options.context.application,
@@ -100,7 +119,9 @@ export function scheduleOperationId(
   ]);
 }
 
-async function readExisting(options: ScheduleReconciliationOptions): Promise<readonly NativeOwnedScheduleRecord[]> {
+async function readExisting(
+  options: ScheduleReconciliationOptions,
+): Promise<readonly NativeOwnedScheduleRecord[]> {
   const value = await options.native.list(
     { scope: options.context.scope, jobId: options.jobId },
     options.context,
@@ -133,53 +154,16 @@ function nativeDefinition(
   });
 }
 
-async function writeWithRecovery(
-  write: () => Promise<unknown>,
-  context: OperationContext,
-): Promise<unknown> {
-  let lastUnknown = false;
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const result = await write();
-      if (isUnsupported(result)) throw new Error("RELKIT_SCHEDULE_UNSUPPORTED:" + (context.operationId ?? "operation"));
-      if (!isUnknown(result)) return result;
-      lastUnknown = true;
-    } catch (error) {
-      if (!isAmbiguous(error)) throw error;
-      lastUnknown = true;
-    }
-  }
-  if (lastUnknown) throw new Error("RELKIT_SCHEDULE_WRITE_UNKNOWN:" + (context.operationId ?? "operation"));
-  throw new Error("RELKIT_SCHEDULE_WRITE_FAILED");
-}
-
-function writeContext(context: OperationContext, operationIdValue: string): OperationContext {
-  return Object.freeze({ ...context, operationId: operationIdValue });
-}
-
 function operationId(options: ScheduleReconciliationOptions, scheduleId: string): string {
   return scheduleOperationId(options, scheduleId);
 }
 
-function ownedBy(record: NativeOwnedScheduleRecord, options: ScheduleReconciliationOptions): boolean {
+function ownedBy(
+  record: NativeOwnedScheduleRecord,
+  options: ScheduleReconciliationOptions,
+): boolean {
   const owner = record.metadata?.owner;
   return owner === scheduleOwner(options);
-}
-
-function isScheduleRecord(value: unknown): value is NativeOwnedScheduleRecord {
-  return isRecord(value) && typeof value.id === "string";
-}
-
-function isUnknown(value: unknown): boolean {
-  return isRecord(value) && value.outcome === "unknown";
-}
-
-function isUnsupported(value: unknown): boolean {
-  return isRecord(value) && value.outcome === "unsupported";
-}
-
-function isAmbiguous(value: unknown): boolean {
-  return !(value instanceof Error && /^4\d\d/u.test(value.message));
 }
 
 function isRecord(value: unknown): value is Record<string, any> {

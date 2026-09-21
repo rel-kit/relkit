@@ -68,7 +68,21 @@ export interface JobsRuntimeOptions {
 }
 
 export type JobsOperationOptions = Pick<OperationContext, "signal"> &
-  Partial<Pick<OperationContext, "scope" | "operationId" | "deadlineMs" | "correlationId" | "parentRunId" | "propagation" | "acceptanceIdentity" | "occurrenceIdentity" | "inputSchemaHash" | "retryOfRunId">>;
+  Partial<
+    Pick<
+      OperationContext,
+      | "scope"
+      | "operationId"
+      | "deadlineMs"
+      | "correlationId"
+      | "parentRunId"
+      | "propagation"
+      | "acceptanceIdentity"
+      | "occurrenceIdentity"
+      | "inputSchemaHash"
+      | "retryOfRunId"
+    >
+  >;
 
 export interface JobsRuntime {
   readonly adapter: JobsAdapterRuntime;
@@ -82,13 +96,8 @@ export interface JobsRuntime {
   readonly jobs?: readonly JobDescriptorAny[];
   readonly taskExecutor?: TaskExecutor;
   readonly tasks?: readonly TaskDescriptorAny[];
-  readonly resolveBinding: (
-    task: TaskRefAny,
-    selector?: JobRefAny,
-  ) => JobsRuntimeBinding;
-  readonly operationContext: (
-    options: JobsOperationOptions,
-  ) => OperationContext;
+  readonly resolveBinding: (task: TaskRefAny, selector?: JobRefAny) => JobsRuntimeBinding;
+  readonly operationContext: (options: JobsOperationOptions) => OperationContext;
   readonly close: () => Promise<void>;
 }
 
@@ -126,9 +135,15 @@ export function createJobsRuntime(options: JobsRuntimeOptions): JobsRuntime {
         ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
         ...(context.parentRunId === undefined ? {} : { parentRunId: context.parentRunId }),
         ...(context.propagation === undefined ? {} : { propagation: context.propagation }),
-        ...(context.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: context.acceptanceIdentity }),
-        ...(context.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: context.occurrenceIdentity }),
-        ...(context.inputSchemaHash === undefined ? {} : { inputSchemaHash: context.inputSchemaHash }),
+        ...(context.acceptanceIdentity === undefined
+          ? {}
+          : { acceptanceIdentity: context.acceptanceIdentity }),
+        ...(context.occurrenceIdentity === undefined
+          ? {}
+          : { occurrenceIdentity: context.occurrenceIdentity }),
+        ...(context.inputSchemaHash === undefined
+          ? {}
+          : { inputSchemaHash: context.inputSchemaHash }),
         ...(context.retryOfRunId === undefined ? {} : { retryOfRunId: context.retryOfRunId }),
       }),
     close: closeOnce(adapter),

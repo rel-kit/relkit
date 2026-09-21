@@ -23,7 +23,10 @@ export interface JobsServiceOptions {
       readonly nativeClass?: string;
     }[];
   };
-  readonly observation?: { readonly pollInterval?: DurationInput; readonly readTimeout?: DurationInput };
+  readonly observation?: {
+    readonly pollInterval?: DurationInput;
+    readonly readTimeout?: DurationInput;
+  };
   readonly maxElapsed?: DurationInput;
   readonly hookTimeout?: DurationInput;
   readonly shutdownGrace?: DurationInput;
@@ -32,12 +35,7 @@ export interface JobsServiceOptions {
 export type JobsServiceBehavior = Readonly<Record<string, JsonValue>>;
 
 export type JobsServiceOptionName =
-  | "limits"
-  | "workers"
-  | "observation"
-  | "maxElapsed"
-  | "hookTimeout"
-  | "shutdownGrace";
+  "limits" | "workers" | "observation" | "maxElapsed" | "hookTimeout" | "shutdownGrace";
 
 export function validateJobsServiceOptions(value: JobsServiceOptions | undefined): void {
   if (value === undefined) return;
@@ -57,18 +55,23 @@ export function validateJobsServiceOptions(value: JobsServiceOptions | undefined
     if (duration !== undefined) {
       const milliseconds = durationToMillis(duration);
       if (milliseconds < 1) throw new TypeError(name + " must be positive");
-      if (name === "observation.pollInterval" && milliseconds < 2_000) throw new TypeError(name + " must be at least 2 seconds");
-      if (name === "observation.readTimeout" && milliseconds > 10_000) throw new TypeError(name + " must be at most 10 seconds");
+      if (name === "observation.pollInterval" && milliseconds < 2_000)
+        throw new TypeError(name + " must be at least 2 seconds");
+      if (name === "observation.readTimeout" && milliseconds > 10_000)
+        throw new TypeError(name + " must be at most 10 seconds");
     }
   }
   if (value.workers !== undefined) {
     const ids = new Set<string>();
     for (const worker of value.workers.classes) {
-      if (!isStableId(worker.id) || ids.has(worker.id)) throw new TypeError("workers.classes ids must be unique stable ids");
+      if (!isStableId(worker.id) || ids.has(worker.id))
+        throw new TypeError("workers.classes ids must be unique stable ids");
       ids.add(worker.id);
-      if (!Number.isFinite(worker.cpu) || worker.cpu <= 0) throw new TypeError("workers.classes.cpu must be positive");
+      if (!Number.isFinite(worker.cpu) || worker.cpu <= 0)
+        throw new TypeError("workers.classes.cpu must be positive");
       memoryBytes(worker.memory);
-      if (worker.nativeClass !== undefined && !isStableId(worker.nativeClass)) throw new TypeError("workers.classes.nativeClass is invalid");
+      if (worker.nativeClass !== undefined && !isStableId(worker.nativeClass))
+        throw new TypeError("workers.classes.nativeClass is invalid");
     }
   }
 }
@@ -107,7 +110,14 @@ export function assertSupportedJobsServiceOptions(
   supported: readonly JobsServiceOptionName[],
 ): void {
   const allowed = new Set(supported);
-  for (const name of ["limits", "workers", "observation", "maxElapsed", "hookTimeout", "shutdownGrace"] as const) {
+  for (const name of [
+    "limits",
+    "workers",
+    "observation",
+    "maxElapsed",
+    "hookTimeout",
+    "shutdownGrace",
+  ] as const) {
     if (value[name] !== undefined && !allowed.has(name)) {
       throw new Error(`RELKIT_JOBS_SERVICE_OPTION_UNSUPPORTED:${name}`);
     }
