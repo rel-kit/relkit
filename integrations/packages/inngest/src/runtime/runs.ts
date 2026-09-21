@@ -61,23 +61,20 @@ export function createInngestRunApi(options: {
     init: RequestInit = {},
     signal?: AbortSignal,
   ): Promise<Record<string, unknown>> => {
-    // prettier-ignore
-    const response = await fetcher( // codeql[js/request-forgery]
-      `${options.baseUrl.replace(/\/$/u, "")}${path}`,
-      {
-        ...init,
-        headers: {
-          accept: "application/json",
-          "content-type": "application/json",
-          ...(options.signingKey === undefined
-            ? {}
-            : { authorization: `Bearer ${hashSigningKey(options.signingKey)}` }),
-          ...(init.headers ?? {}),
-        },
-        redirect: "error",
-        ...(signal === undefined ? {} : { signal }),
+    // codeql[js/request-forgery]
+    const response = await fetcher(`${options.baseUrl.replace(/\/$/u, "")}${path}`, {
+      ...init,
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        ...(options.signingKey === undefined
+          ? {}
+          : { authorization: `Bearer ${hashSigningKey(options.signingKey)}` }),
+        ...(init.headers ?? {}),
       },
-    );
+      redirect: "error",
+      ...(signal === undefined ? {} : { signal }),
+    });
     const body = await response.json().catch(() => ({}));
     if (!response.ok)
       throw new InngestApiRequestError(
