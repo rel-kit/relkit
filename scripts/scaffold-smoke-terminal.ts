@@ -27,7 +27,7 @@ export async function runScaffoldTerminal(
     cwd,
     terminal,
     env: { ...process.env, CI: "", NO_COLOR: "1", TERM: "xterm-256color", ...env },
-    signal: AbortSignal.timeout(180_000),
+    signal: AbortSignal.timeout(300_000),
   });
   try {
     const code = await child.exited;

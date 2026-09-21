@@ -27,7 +27,11 @@ export async function artifactFiles(root: string): Promise<SecretScanArtifact[]>
   await add(join(root, ".relkit", "generated"), "generated-source");
   await add(join(root, ".relkit", "build"), "build-image");
   await add(join(root, "templates", "default"), "generated-source");
-  await add(join(root, "apps", "inspector", ".next"), "browser");
+  await add(
+    join(root, "apps", "inspector", ".next"),
+    "browser",
+    (path) => !path.replaceAll("\\", "/").includes("/.next/dev/cache/"),
+  );
   await add(
     join(root, "openspec", "changes", "implement-relkit-typescript-poc-v3", "evidence"),
     "cloud-evidence",

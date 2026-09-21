@@ -18,4 +18,7 @@ test("test:all points to a checked-in orchestration script", async () => {
   expect(await readFile(join(root, ".github/workflows/ci.yml"), "utf8")).toContain(
     "bun run test:scaffold",
   );
+  expect(await readFile(join(root, "scripts", "scaffold-smoke-terminal.ts"), "utf8")).toContain(
+    "AbortSignal.timeout(300_000)",
+  );
 });

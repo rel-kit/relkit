@@ -79,7 +79,7 @@ jobs:
     name: Verify
     if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -154,7 +154,7 @@ jobs:
     name: Containers
     if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:

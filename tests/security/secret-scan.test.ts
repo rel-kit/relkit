@@ -17,8 +17,17 @@ test("recursively scans values and release artifacts without exposing raw matche
   const root = await mkdtemp(join("/tmp", "relkit-secret-scan-"));
   try {
     await mkdir(join(root, ".relkit", "build"), { recursive: true });
+    await mkdir(join(root, "apps", "inspector", ".next", "dev", "cache"), {
+      recursive: true,
+    });
+    await mkdir(join(root, "apps", "inspector", ".next", "server"), { recursive: true });
     await mkdir(join(root, "integrations", "packages", "redis", "dist"), { recursive: true });
     await mkdir(join(root, "tests", "compiler", "fixtures"), { recursive: true });
+    await writeFile(
+      join(root, "apps", "inspector", ".next", "dev", "cache", "transient.meta"),
+      SYNTHETIC_SECRETS.password,
+    );
+    await writeFile(join(root, "apps", "inspector", ".next", "server", "entry.js"), "safe\n");
     await writeFile(join(root, ".relkit", "build", "manifest.json"), '{"status":"safe"}\n');
     await writeFile(
       join(root, "integrations", "packages", "redis", "package.json"),
@@ -32,6 +41,7 @@ test("recursively scans values and release artifacts without exposing raw matche
     expect(clean.categories["build-image"]).toBe(1);
     expect(clean.categories["generated-source"]).toBe(1);
     expect(clean.categories.graph).toBe(1);
+    expect(clean.categories.browser).toBe(1);
 
     await writeFile(
       join(root, ".relkit", "build", "manifest.json"),
