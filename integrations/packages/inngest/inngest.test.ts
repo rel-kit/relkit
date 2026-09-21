@@ -24,6 +24,9 @@ test("authoring stays pure and declares the native local recipe", () => {
   expect(INNGEST_LOCAL_STARTUP_TIMEOUT_MS).toBe(300_000);
   expect(INNGEST_LOCAL_HEALTH_RETRIES).toBe(600);
   expect(localRecipe.workers?.[0]?.health?.retries).toBe(INNGEST_LOCAL_HEALTH_RETRIES);
+  expect(localRecipe.workers?.[0]?.hostAliases).toEqual({
+    "host.docker.internal": "host-gateway",
+  });
   expect(localRecipe.containers?.find((unit) => unit.id === "redis")?.command).toEqual([
     "redis-server",
     "--appendonly",

@@ -100,6 +100,7 @@ export const localRecipe = Object.freeze({
         retries: INNGEST_LOCAL_HEALTH_RETRIES,
       }),
       networkAliases: Object.freeze(["worker"]),
+      hostAliases: Object.freeze({ "host.docker.internal": "host-gateway" }),
     }),
   ]),
   init: Object.freeze([

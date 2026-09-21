@@ -19,6 +19,9 @@ test("declares the pinned PostgreSQL native adapter and account-free recipe", ()
   });
   expect(localRecipe.containers?.map((unit) => unit.id)).toEqual(["postgres"]);
   expect(localRecipe.workers?.map((unit) => unit.id)).toEqual(["worker"]);
+  expect(localRecipe.workers?.[0]?.hostAliases).toEqual({
+    "host.docker.internal": "host-gateway",
+  });
   expect(localRecipe.containers?.[0]?.ports).toEqual({ postgres: 5432 });
   expect(localRecipe.volumes.postgres.persistent).toBe(true);
   expect(localRecipe.init?.[0]?.command?.some((part) => /[\r\n]/u.test(part))).toBe(false);

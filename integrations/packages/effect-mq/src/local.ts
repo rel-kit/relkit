@@ -168,6 +168,7 @@ export const localRecipe = Object.freeze({
         retries: 120,
       }),
       networkAliases: Object.freeze(["worker"]),
+      hostAliases: Object.freeze({ "host.docker.internal": "host-gateway" }),
       environment: Object.freeze({
         RELKIT_EFFECT_MQ_DATABASE_URL: Object.freeze({
           value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit",

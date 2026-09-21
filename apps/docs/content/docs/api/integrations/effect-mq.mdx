@@ -325,6 +325,7 @@ declare const localRecipe: Readonly<{
       ports: Readonly<{ api: 3000 }>;
       health: Readonly<{ command: Array<string>; intervalMs: 500; timeoutMs: 2000; retries: 120 }>;
       networkAliases: ReadonlyArray<string>;
+      hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
         RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
           value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";
@@ -462,6 +463,7 @@ declare const localRecipe: Readonly<{
       ports: Readonly<{ api: 3000 }>;
       health: Readonly<{ command: Array<string>; intervalMs: 500; timeoutMs: 2000; retries: 120 }>;
       networkAliases: ReadonlyArray<string>;
+      hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
         RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
           value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";

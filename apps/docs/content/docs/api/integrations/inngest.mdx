@@ -292,6 +292,7 @@ declare const localRecipe: Readonly<{
         retries: number;
       }>;
       networkAliases: ReadonlyArray<string>;
+      hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
     }>
   >;
   init: ReadonlyArray<
@@ -453,6 +454,7 @@ declare const localRecipe: Readonly<{
         retries: number;
       }>;
       networkAliases: ReadonlyArray<string>;
+      hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
     }>
   >;
   init: ReadonlyArray<
