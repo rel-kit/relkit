@@ -243,6 +243,12 @@ exports[`snapshots simple, custom, and full service plans 3`] = `
       "path": "src/billing/functions/example.function.ts",
     },
     {
+      "binding": "exampleTask",
+      "id": "billing.example-task",
+      "kind": "task",
+      "path": "src/billing/tasks/example.task.ts",
+    },
+    {
       "binding": "onExample",
       "id": "billing.on-example",
       "kind": "function",
@@ -358,8 +364,8 @@ export default defineApp({
   inspector: { port: 3210 },
   // relkit:create:deployment
   event: { "local": localEvent() },
-  defaults: { event: "local", job: "local", cache: "local", bucket: "local" },
-  job: { "local": localJob() },
+  defaults: { event: "local", jobs: "local", cache: "local", bucket: "local" },
+  jobs: { "local": localJob() },
   cache: { "local": docker(redis()) },
   bucket: { "local": docker(s3()) },
 });
@@ -539,15 +545,14 @@ export default onExample;
     {
       "action": "create",
       "content": 
-"import { defineJob } from "@relkit/app/jobs/legacy";
-import example from "@app/billing/functions/example.function.js";
+"import { defineJob } from "@relkit/app/jobs";
+import exampleTask from "@app/billing/tasks/example.task.js";
 
 const exampleJob = defineJob({
   id: "billing.example-job",
-  input: example.input,
-  target: example,
-  profile: "local",
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
+  name: "billingExample",
+  task: exampleTask,
+  service: "local",
 });
 
 export default exampleJob;
@@ -573,11 +578,36 @@ export default examplePrompt;
 "import { defineService } from "@relkit/app/services";
 import exampleEvent from "@app/billing/events/example.event.js";
 import example from "@app/billing/functions/example.function.js";
+import exampleTask from "@app/billing/tasks/example.task.js";
+import exampleJob from "@app/billing/jobs/example.job.js";
 
-export default defineService({ id: "billing", events: { exampleEvent }, functions: { example } });
+export default defineService({ id: "billing", events: { exampleEvent }, functions: { example }, tasks: { exampleTask }, jobs: { exampleJob } });
 "
 ,
       "path": "src/billing/service.ts",
+    },
+    {
+      "action": "create",
+      "content": 
+"import { defineTask } from "@relkit/app/tasks";
+import { z } from "@relkit/app/schema";
+
+const exampleTask = defineTask({
+  id: "billing.example-task",
+  version: "1",
+  execution: "durable",
+  input: z.object({ value: z.string() }),
+  output: z.object({ accepted: z.literal(true) }),
+  handler: async ({ value }, context) => {
+    context.log.info("example task", { value });
+    return { accepted: true as const };
+  },
+});
+
+export default exampleTask;
+"
+,
+      "path": "src/billing/tasks/example.task.ts",
     },
     {
       "action": "create",

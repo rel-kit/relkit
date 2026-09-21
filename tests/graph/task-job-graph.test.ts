@@ -10,13 +10,47 @@ describe("task and job graph contracts", () => {
     const graph = {
       contractVersion: GRAPH_VERSION,
       nodes: [
-        { kind: "task", id: "task.orders.send", source, taskId: "orders.send", version: "1", execution: "durable", input: {}, output: {} },
-        { kind: "job", id: "job.orders.send", source, executionModel: "task", name: "sendEmail", jobId: "orders.send", taskId: "orders.send", taskVersion: "1", profile: "default", implicit: true, default: true, input: {} },
-        { kind: "hook", id: "task.orders.send.start", source, ownerId: "task.orders.send", ownerKind: "task", phase: "start" },
+        {
+          kind: "task",
+          id: "task.orders.send",
+          source,
+          taskId: "orders.send",
+          version: "1",
+          execution: "durable",
+          input: {},
+          output: {},
+        },
+        {
+          kind: "job",
+          id: "job.orders.send",
+          source,
+          executionModel: "task",
+          name: "sendEmail",
+          jobId: "orders.send",
+          taskId: "orders.send",
+          taskVersion: "1",
+          profile: "default",
+          implicit: true,
+          default: true,
+          input: {},
+        },
+        {
+          kind: "hook",
+          id: "task.orders.send.start",
+          source,
+          ownerId: "task.orders.send",
+          ownerKind: "task",
+          phase: "start",
+        },
       ],
       edges: [
         { kind: "targets-task", from: "job.orders.send", to: "task.orders.send", role: "primary" },
-        { kind: "uses-hook", from: "task.orders.send", to: "task.orders.send.start", phase: "start" },
+        {
+          kind: "uses-hook",
+          from: "task.orders.send",
+          to: "task.orders.send.start",
+          phase: "start",
+        },
       ],
     };
     expect(() => validateGraphShape(graph)).not.toThrow();
@@ -33,11 +67,32 @@ describe("task and job graph contracts", () => {
     const graph = {
       contractVersion: GRAPH_VERSION,
       nodes: [
-        { kind: "task", id: "task.orders.send", source, taskId: "orders.send", version: "1", execution: "durable", input: {}, output: {} },
-        { kind: "hook", id: "task.orders.send.start", source, ownerId: "task.orders.send", ownerKind: "task", phase: "start" },
+        {
+          kind: "task",
+          id: "task.orders.send",
+          source,
+          taskId: "orders.send",
+          version: "1",
+          execution: "durable",
+          input: {},
+          output: {},
+        },
+        {
+          kind: "hook",
+          id: "task.orders.send.start",
+          source,
+          ownerId: "task.orders.send",
+          ownerKind: "task",
+          phase: "start",
+        },
       ],
       edges: [
-        { kind: "uses-hook", from: "task.orders.send", to: "task.orders.send.start", phase: "success" },
+        {
+          kind: "uses-hook",
+          from: "task.orders.send",
+          to: "task.orders.send.start",
+          phase: "success",
+        },
       ],
     };
 

@@ -31,7 +31,11 @@ test("local create preserves the staged interactive addition prompt", async () =
       "--examples",
     ],
     parent,
-    [["Add an artifact before finishing?", "n\r"]],
+    [
+      ["Jobs service", "\r"],
+      ["Create this project?", "\r"],
+      ["Add an artifact before finishing?", "n\r"],
+    ],
   );
   expect(result.code, result.output).toBe(0);
   expect(await Bun.file(join(parent, "app/package.json")).exists()).toBe(true);
