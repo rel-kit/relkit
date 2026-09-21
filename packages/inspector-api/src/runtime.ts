@@ -3,6 +3,7 @@ import { eventRuntimeList } from "./events-runtime.js";
 import { getJobRun, listJobRuns } from "./jobs/runs.js";
 import { runtimeJobSummary } from "./jobs/runtime-summary.js";
 import { projectRuntimeMetadata } from "./runtime-metadata.js";
+import { runtimeItemId } from "./runtime-item.js";
 import {
   identity,
   isRecord,
@@ -117,7 +118,8 @@ export async function runtimeList(
   request: Request,
 ): Promise<JsonValue> {
   if (collection === "events") return eventRuntimeList(generation, request);
-  if (collection === "jobs" && generation.jobs !== undefined) return listJobRuns(generation, request);
+  if (collection === "jobs" && generation.jobs !== undefined)
+    return listJobRuns(generation, request);
   const items = await runtimeItems(generation, collection);
   return { ...identity(generation), ...page(items, request) } as JsonValue;
 }
@@ -132,7 +134,9 @@ export async function runtimeDetail(
   const source = runtimeSource(generation, collection);
   let item = await resolveItem(source, id);
   if (item === undefined)
-    item = (await runtimeItems(generation, collection)).find((value) => itemId(value) === id);
+    item = (await runtimeItems(generation, collection)).find(
+      (value) => runtimeItemId(value) === id,
+    );
   if (item === undefined) throw new InspectorRuntimeError("RELKIT_INSPECTOR_NOT_FOUND", 404);
   return { ...identity(generation), state: projectItem(item) } as JsonValue;
 }
@@ -175,26 +179,7 @@ function projectItem(value: unknown): JsonValue | undefined {
   const result = pick(value, RUNTIME_FIELDS);
   const source = safeSource(value.source);
   if (source !== undefined) result.source = source;
-  const id = itemId(value);
+  const id = runtimeItemId(value);
   if (id !== undefined) result.id = id;
   return safeJson(result);
-}
-
-function itemId(value: unknown): string | undefined {
-  if (!isRecord(value)) return undefined;
-  for (const key of [
-    "id",
-    "functionId",
-    "jobId",
-    "instanceId",
-    "eventId",
-    "deliveryId",
-    "bucketId",
-    "cacheId",
-    "toolId",
-    "agentId",
-  ]) {
-    if (typeof value[key] === "string" && value[key].length > 0) return value[key];
-  }
-  return undefined;
 }

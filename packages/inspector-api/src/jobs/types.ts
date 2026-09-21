@@ -83,7 +83,8 @@ export interface InspectorJobsPrivilegeRequest {
 }
 
 export interface InspectorJobsServices {
-  readonly bindings: readonly InspectorJobsBinding[] | (() => MaybePromise<readonly InspectorJobsBinding[]>);
+  readonly bindings:
+    readonly InspectorJobsBinding[] | (() => MaybePromise<readonly InspectorJobsBinding[]>);
   readonly authorize?: (request: InspectorJobsPrivilegeRequest) => MaybePromise<boolean>;
   readonly cursorSecret?: string | Uint8Array;
   readonly maxReadConcurrency?: number;

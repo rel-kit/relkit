@@ -1,4 +1,10 @@
-import { InspectorJobsError, type InspectorJobsBinding, type InspectorJobsOperation, type InspectorJobsOperationContext, type InspectorJobsServices } from "./types.js";
+import {
+  InspectorJobsError,
+  type InspectorJobsBinding,
+  type InspectorJobsOperation,
+  type InspectorJobsOperationContext,
+  type InspectorJobsServices,
+} from "./types.js";
 import { isRecord, type ResolvedActiveGeneration } from "../shared.js";
 
 export function jobsServices(generation: ResolvedActiveGeneration): InspectorJobsServices {
@@ -32,7 +38,11 @@ export async function authorizeJobs(
   if (jobs.authorize !== undefined) {
     let allowed = false;
     try {
-      allowed = await jobs.authorize({ operation, request, ...(service === undefined ? {} : { service }) });
+      allowed = await jobs.authorize({
+        operation,
+        request,
+        ...(service === undefined ? {} : { service }),
+      });
     } catch {
       allowed = false;
     }
