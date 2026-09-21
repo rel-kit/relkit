@@ -5,6 +5,7 @@ export const GET_RETRY_DELAYS_MS = [250, 500, 1_000, 2_000, 4_000, 8_000] as con
 export function shouldRetry(method: string, error: unknown, attempt: number): boolean {
   if (method !== "GET" || attempt >= GET_RETRY_DELAYS_MS.length) return false;
   if (!(error instanceof InspectorApiError)) return false;
+  if (error.code === "RELKIT_INSPECTOR_JOBS_UNAVAILABLE") return false;
   return (
     error.code === "RELKIT_INSPECTOR_INVALID_RESPONSE" ||
     (error.status !== undefined && error.status >= 500)
