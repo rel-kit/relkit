@@ -31,6 +31,11 @@ installing `@relkit/client` in another app does not teach it your server's opera
 Package or share the generated client and contract together with the dependencies they import.
 Regenerate and review them when route identities, input, output, or errors change.
 
+The same generated contract includes public task-first jobs under `jobs.<name>`. A job trigger returns an
+accepted `runId`; inspect, watch, and control it through the generated `runs` procedures rather than treating
+the trigger response as the task output. Keep the original operation ID and request when an acceptance response
+is unknown.
+
 ## Configure the transport
 
 This repository example configures a client instance:

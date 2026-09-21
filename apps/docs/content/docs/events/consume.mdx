@@ -40,6 +40,10 @@ Run `bun run check` from your app's root. RelKit runs the handler when `orders.c
 
 Use `defineFunction` when the caller needs a result, such as the created order. Use `defineEventFunction` for a reaction that runs separately, without returning a result to the publisher.
 
+When the reaction must survive the consumer process or expose run progress, trigger a task-first job from
+the event function. Event delivery and task admission remain separate operations; use an explicit stable
+idempotency key where repeated event delivery could duplicate business work.
+
 ## Add another subscriber
 
 To run multiple reactions, add another event function with a different `id` and the same `event`.

@@ -59,7 +59,7 @@ not a complete internal message or stack trace.
 - `{ kind: "later", afterMs }` supplies a minimum delay; the integration may wait longer.
 
 HTTP and direct invocation do not automatically retry. Jobs and event delivery apply their own bounded policies,
-so a retryable error never means an unbounded loop. See [Job retries](/docs/jobs/retries) and
+so a retryable error never means an unbounded loop. See [task retries](/docs/jobs/retries-and-idempotency) and
 [Event delivery](/docs/events/consume) for transport behavior.
 
 <include cwd>content/generated/related/fundamentals-errors.mdx</include>
