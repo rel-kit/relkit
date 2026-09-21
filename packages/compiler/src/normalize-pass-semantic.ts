@@ -166,7 +166,9 @@ function hasPublicTaskJobs(work: NormalizationWork): boolean {
     if (descriptor.kind !== "job") return false;
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     const client = isRecord(value.client) ? value.client : undefined;
-    return isRecord(value.task) && Array.isArray(client?.operations) && client.operations.length > 0;
+    return (
+      isRecord(value.task) && Array.isArray(client?.operations) && client.operations.length > 0
+    );
   });
 }
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {

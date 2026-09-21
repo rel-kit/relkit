@@ -73,9 +73,7 @@ export function isDescriptorLike(value: NormalizedDescriptor): boolean {
 }
 
 export function targetFields(kind: string): readonly [string, string][] {
-  return ["route", "job", "event-trigger", "tool"].includes(kind)
-    ? [["target", "function"]]
-    : [];
+  return ["route", "job", "event-trigger", "tool"].includes(kind) ? [["target", "function"]] : [];
 }
 
 export function validateDependencies(

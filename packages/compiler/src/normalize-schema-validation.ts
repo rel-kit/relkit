@@ -31,7 +31,7 @@ export function passSchemas(work: NormalizationWork): void {
       if (descriptor.kind === "job" && isRecord(value.task)) continue;
       const candidate =
         descriptor.kind === "task" && field === "input"
-          ? value.inputWire ?? value.input
+          ? (value.inputWire ?? value.input)
           : value[field];
       if (value[field] === undefined)
         validateSchema(

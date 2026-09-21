@@ -53,7 +53,8 @@ function register(
   const previous = work.references.get(descriptor.id);
   if (previous === undefined || previous.kind === descriptor.kind) {
     if (previous !== undefined) {
-      if (!(nested && previous.value === descriptor.value)) addDuplicate(work, descriptor, previous);
+      if (!(nested && previous.value === descriptor.value))
+        addDuplicate(work, descriptor, previous);
       return;
     }
     work.references.set(descriptor.id, descriptor);

@@ -25,10 +25,7 @@ export interface SchemaResult {
 export function schema(value: unknown, direction: SchemaDirection = "legacy"): SchemaResult {
   if (isSchemaSnapshot(value)) return snapshotResult(value, direction);
   if (!isSchema(value)) return { ok: false, reason: "value is not a Standard Schema v1 validator" };
-  const selected = getJsonSchema(
-    value,
-    direction === "legacy" ? undefined : { direction },
-  );
+  const selected = getJsonSchema(value, direction === "legacy" ? undefined : { direction });
   if (!selected.ok) return { ok: false, reason: selected.reason };
   const input = getJsonSchema(value, { direction: "input" });
   const output = getJsonSchema(value, { direction: "output" });
@@ -64,17 +61,15 @@ export function schemaHash(result: SchemaResult): string | undefined {
   return result.contractHash;
 }
 
-function snapshotResult(
-  value: SchemaSnapshot,
-  direction: SchemaDirection,
-): SchemaResult {
+function snapshotResult(value: SchemaSnapshot, direction: SchemaDirection): SchemaResult {
   if (value.$relkit === "schema-unavailable") {
     return { ok: false, reason: typeof value.reason === "string" ? value.reason : "unavailable" };
   }
   const legacy = value.jsonSchema;
   const input = value.inputJsonSchema ?? legacy;
   const output = value.outputJsonSchema ?? legacy;
-  const selected = direction === "input" ? input : direction === "output" ? output : legacy ?? output ?? input;
+  const selected =
+    direction === "input" ? input : direction === "output" ? output : (legacy ?? output ?? input);
   if (!json(selected)) {
     return { ok: false, reason: "schema snapshot has no JSON Schema projection" };
   }
