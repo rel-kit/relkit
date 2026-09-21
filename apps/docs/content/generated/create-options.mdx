@@ -9,6 +9,10 @@
     },
     "--cloud": { type: '"aws" | "none"', description: "Cloud provider" },
     "--deploy": { type: '"pulumi" | "none"', description: "Deployment adapter" },
+    "--jobs": {
+      type: '"inngest-docker" | "effect-mq-docker" | "trigger-docker"',
+      description: "Jobs service and local recipe",
+    },
     "--directory": { type: "string", description: "Destination directory" },
     "--install": { type: "boolean", description: "Install generated project setup" },
     "--no-install": { type: "boolean", description: "No install generated project setup" },
