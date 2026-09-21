@@ -67,6 +67,27 @@ export const apiPackageDefinitions = [
     "integrations/packages/sentry",
     "integrations",
   ),
+  apiPackage(
+    "integrations/inngest",
+    "Inngest",
+    "@relkit/inngest",
+    "integrations/packages/inngest",
+    "integrations",
+  ),
+  apiPackage(
+    "integrations/trigger",
+    "Trigger.dev",
+    "@relkit/trigger",
+    "integrations/packages/trigger",
+    "integrations",
+  ),
+  apiPackage(
+    "integrations/effect-mq",
+    "Effect MQ",
+    "@relkit/effect-mq",
+    "integrations/packages/effect-mq",
+    "integrations",
+  ),
 ] as const;
 
 export type ApiPackage = (typeof apiPackageDefinitions)[number]["slug"];

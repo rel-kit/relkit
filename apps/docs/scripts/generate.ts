@@ -8,6 +8,7 @@ import { guideGroups, guideRelations } from "./guide-catalog.js";
 
 const root = resolve(import.meta.dir, "../../..");
 const content = resolve(import.meta.dir, "../content/docs");
+const examplesTsconfig = resolve(root, "apps/docs/docgen.examples.json");
 const checkOnly = process.argv.includes("--check");
 async function main(): Promise<void> {
   const cliPackage = JSON.parse(
@@ -53,7 +54,7 @@ async function renderApi(definition: (typeof apiPackageDefinitions)[number]): Pr
       "--no-enforce-version",
       "--run-examples",
       "--examples-tsconfig-file",
-      resolve(root, "apps/docs/docgen.examples.json"),
+      examplesTsconfig,
       "--parse-tsconfig-file",
       resolve(root, directory, "tsconfig.json"),
     ];
@@ -143,13 +144,14 @@ function escapeCell(value: string): string {
 
 async function emit(path: string, value: string): Promise<void> {
   const destination = resolve(content, path);
-  const formatted = await format(value, {
+  const options = {
     parser: path.endsWith(".json") ? "json" : "mdx",
     printWidth: 100,
     semi: true,
     singleQuote: false,
     trailingComma: "all",
-  });
+  } as const;
+  const formatted = await format(await format(value, options), options);
   if (checkOnly) {
     const current = await readFile(destination, "utf8").catch(() => undefined);
     if (current !== formatted)
