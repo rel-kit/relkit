@@ -15,7 +15,11 @@ export interface LocalJobProvider {
 }
 
 export function createLocalJobProvider(root: string, profile: string): LocalJobProvider;
-export function createLocalJobProvider(root: string, profile: string, executionModel: "task"): JobsAdapterRuntime;
+export function createLocalJobProvider(
+  root: string,
+  profile: string,
+  executionModel: "task",
+): JobsAdapterRuntime;
 export function createLocalJobProvider(
   root: string,
   profile: string,

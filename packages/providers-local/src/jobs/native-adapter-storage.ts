@@ -1,15 +1,16 @@
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import type { NativeControlReceipt, NativeSubmission } from "@relkit/jobs/adapter";
 import { createJobStore, type JobRecord, type JobStore } from "./store.js";
-import type { LocalNativeRun, LocalNativeState, LocalNativeNamespace } from "./native-adapter-types.js";
+import type {
+  LocalNativeRun,
+  LocalNativeState,
+  LocalNativeNamespace,
+} from "./native-adapter-types.js";
 import type { JobWireEnvelope } from "@relkit/contracts/jobs";
 
 const NATIVE_STATE_VERSION = 1 as const;
 
-export async function openNativeStore(
-  root: string,
-  state: LocalNativeState,
-): Promise<JobStore> {
+export async function openNativeStore(root: string, state: LocalNativeState): Promise<JobStore> {
   const store = await createJobStore(root, { validateData: validateNativeData });
   for (const record of store.snapshot().records) applyRecord(state, record);
   state.store = store;
@@ -17,29 +18,31 @@ export async function openNativeStore(
 }
 
 export function persistNativeRun(store: JobStore, run: LocalNativeRun): Promise<void> {
-  return store.append({
-    instanceId: run.runId,
-    kind: "native-run",
-    data: json({
-      version: NATIVE_STATE_VERSION,
-      kind: "run",
-      runId: run.runId,
-      request: run.request,
-      namespace: run.namespace,
-      service: run.service,
-      acceptedAt: run.acceptedAt,
-      status: run.status,
-      attempt: run.attempt,
-      ...(run.startedAt === undefined ? {} : { startedAt: run.startedAt }),
-      ...(run.completedAt === undefined ? {} : { completedAt: run.completedAt }),
-      ...(run.nextEligibleAt === undefined ? {} : { nextEligibleAt: run.nextEligibleAt }),
-      ...(run.output === undefined ? {} : { output: run.output }),
-      ...(run.error === undefined ? {} : { error: run.error }),
-      ...(run.retryOfRunId === undefined ? {} : { retryOfRunId: run.retryOfRunId }),
-      completedSleeps: [...run.completedSleeps],
-      canonicalInput: run.canonicalInput,
-    }),
-  }).then(() => undefined);
+  return store
+    .append({
+      instanceId: run.runId,
+      kind: "native-run",
+      data: json({
+        version: NATIVE_STATE_VERSION,
+        kind: "run",
+        runId: run.runId,
+        request: run.request,
+        namespace: run.namespace,
+        service: run.service,
+        acceptedAt: run.acceptedAt,
+        status: run.status,
+        attempt: run.attempt,
+        ...(run.startedAt === undefined ? {} : { startedAt: run.startedAt }),
+        ...(run.completedAt === undefined ? {} : { completedAt: run.completedAt }),
+        ...(run.nextEligibleAt === undefined ? {} : { nextEligibleAt: run.nextEligibleAt }),
+        ...(run.output === undefined ? {} : { output: run.output }),
+        ...(run.error === undefined ? {} : { error: run.error }),
+        ...(run.retryOfRunId === undefined ? {} : { retryOfRunId: run.retryOfRunId }),
+        completedSleeps: [...run.completedSleeps],
+        canonicalInput: run.canonicalInput,
+      }),
+    })
+    .then(() => undefined);
 }
 
 export function persistNativeControl(
@@ -48,11 +51,13 @@ export function persistNativeControl(
   key: string,
   receipt: NativeControlReceipt,
 ): Promise<void> {
-  return store.append({
-    instanceId: `native-control:${kind}:${key}`,
-    kind: `native-${kind}`,
-    data: json({ version: NATIVE_STATE_VERSION, kind, key, receipt }),
-  }).then(() => undefined);
+  return store
+    .append({
+      instanceId: `native-control:${kind}:${key}`,
+      kind: `native-${kind}`,
+      data: json({ version: NATIVE_STATE_VERSION, kind, key, receipt }),
+    })
+    .then(() => undefined);
 }
 
 function applyRecord(state: LocalNativeState, record: JobRecord): void {
@@ -66,7 +71,10 @@ function applyRecord(state: LocalNativeState, record: JobRecord): void {
     const key = typeof data.key === "string" ? data.key : undefined;
     if (key === undefined) throw new Error("Native control record key is invalid");
     const receipt = data.receipt as unknown as NativeControlReceipt;
-    (record.kind === "native-cancel" ? state.cancelControls : state.retryControls).set(key, receipt);
+    (record.kind === "native-cancel" ? state.cancelControls : state.retryControls).set(
+      key,
+      receipt,
+    );
   }
 }
 
@@ -83,7 +91,8 @@ function readRun(value: JsonValue): LocalNativeRun {
     !isRecord(value.request) ||
     !isRecord(value.namespace) ||
     value.canonicalInput === undefined
-  ) throw new Error("Native run record is incomplete");
+  )
+    throw new Error("Native run record is incomplete");
   return {
     runId: value.runId,
     request: value.request as unknown as NativeSubmission,
@@ -114,7 +123,8 @@ function validateNativeData(value: JsonValue): void {
     throw new Error("Native state record is invalid");
   }
   if (value.kind === "run") readRun(value);
-  else if ((value.kind === "cancel" || value.kind === "retry") && typeof value.key === "string") return;
+  else if ((value.kind === "cancel" || value.kind === "retry") && typeof value.key === "string")
+    return;
   else throw new Error("Native state record kind is invalid");
 }
 

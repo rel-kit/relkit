@@ -123,7 +123,8 @@ async function invoke(
 function errorData(value: unknown): unknown {
   if (!isRecord(value)) return undefined;
   if (
-    (value.code !== "RELKIT_JOB_SUBMISSION_UNKNOWN" && value.code !== "RELKIT_JOB_CONTROL_UNKNOWN") ||
+    (value.code !== "RELKIT_JOB_SUBMISSION_UNKNOWN" &&
+      value.code !== "RELKIT_JOB_CONTROL_UNKNOWN") ||
     value.outcome !== "unknown" ||
     typeof value.operationId !== "string" ||
     !isRecord(value.recovery) ||
@@ -140,7 +141,9 @@ function errorData(value: unknown): unknown {
     ...(typeof value.idempotencyKey === "string" ? { idempotencyKey: value.idempotencyKey } : {}),
     recovery: {
       action: value.recovery.action,
-      ...(typeof value.recovery.expiresAt === "string" ? { expiresAt: value.recovery.expiresAt } : {}),
+      ...(typeof value.recovery.expiresAt === "string"
+        ? { expiresAt: value.recovery.expiresAt }
+        : {}),
     },
   };
 }

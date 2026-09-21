@@ -69,8 +69,10 @@ export function expectedClientIdentity(
   request: Request,
   rpcHeaders?: ClientIdentityHeaders,
 ): ExpectedClientIdentity | undefined {
-  const identityScope = request.headers.get("x-relkit-identity-scope") ?? header(rpcHeaders, "x-relkit-identity-scope");
-  const sessionEpoch = request.headers.get("x-relkit-session-epoch") ?? header(rpcHeaders, "x-relkit-session-epoch");
+  const identityScope =
+    request.headers.get("x-relkit-identity-scope") ?? header(rpcHeaders, "x-relkit-identity-scope");
+  const sessionEpoch =
+    request.headers.get("x-relkit-session-epoch") ?? header(rpcHeaders, "x-relkit-session-epoch");
   return identityScope === null || sessionEpoch === null
     ? undefined
     : { identityScope, sessionEpoch };
@@ -80,5 +82,5 @@ function header(headers: ClientIdentityHeaders | undefined, name: string): strin
   if (headers === undefined) return null;
   const entry = Object.entries(headers).find(([key]) => key.toLowerCase() === name);
   if (entry === undefined) return null;
-  return Array.isArray(entry[1]) ? entry[1][0] ?? null : entry[1] ?? null;
+  return Array.isArray(entry[1]) ? (entry[1][0] ?? null) : (entry[1] ?? null);
 }

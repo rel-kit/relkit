@@ -22,12 +22,17 @@ export function snapshotOf(run: LocalNativeRun): RunSnapshot {
     buildId: run.request.buildId,
     service: run.service,
     ...(run.request.inputHash === undefined ? {} : { inputHash: run.request.inputHash }),
-    ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
-    ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+    ...(run.request.inputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: run.request.inputSchemaHash }),
+    ...(run.request.acceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: run.request.acceptanceIdentity }),
     ...(run.request.scope === undefined ? {} : { scope: run.request.scope }),
     status: run.status,
     observedAt: new Date().toISOString(),
-    resultAvailability: run.status === "completed" && run.output !== undefined ? "available" : "pending",
+    resultAvailability:
+      run.status === "completed" && run.output !== undefined ? "available" : "pending",
     attempt: run.attempt,
     ...(run.startedAt === undefined ? {} : { startedAt: run.startedAt }),
     ...(run.completedAt === undefined ? {} : { completedAt: run.completedAt }),
@@ -77,9 +82,11 @@ export function namespaceOf(context: OperationContext): LocalNativeNamespace {
 }
 
 export function sameNamespace(run: LocalNativeRun, context: OperationContext): boolean {
-  return run.namespace.application === context.application &&
+  return (
+    run.namespace.application === context.application &&
     run.namespace.environment === context.environment &&
-    run.namespace.scope === context.scope;
+    run.namespace.scope === context.scope
+  );
 }
 
 export function requestKey(
@@ -98,7 +105,14 @@ export function controlKey(
   operationId: string,
   context: OperationContext,
 ): string {
-  return canonicalJson([kind, context.application, context.environment, context.scope, runId, operationId]);
+  return canonicalJson([
+    kind,
+    context.application,
+    context.environment,
+    context.scope,
+    runId,
+    operationId,
+  ]);
 }
 
 export function sleepSuspension(key: string, wakeAt: string): LocalSleepSuspension {
@@ -106,15 +120,22 @@ export function sleepSuspension(key: string, wakeAt: string): LocalSleepSuspensi
 }
 
 export function isSleepSuspension(value: unknown): value is LocalSleepSuspension {
-  return isRecord(value) &&
+  return (
+    isRecord(value) &&
     value.code === LOCAL_SLEEP_SUSPENSION_CODE &&
     typeof value.key === "string" &&
     typeof value.wakeAt === "string" &&
-    Number.isFinite(Date.parse(value.wakeAt));
+    Number.isFinite(Date.parse(value.wakeAt))
+  );
 }
 
 export function terminal(status: RunSnapshot["status"]): boolean {
-  return status === "completed" || status === "failed" || status === "cancelled" || status === "timed-out";
+  return (
+    status === "completed" ||
+    status === "failed" ||
+    status === "cancelled" ||
+    status === "timed-out"
+  );
 }
 
 function isRetry(value: unknown): value is "never" | "later" {
