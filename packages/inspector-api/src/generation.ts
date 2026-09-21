@@ -56,11 +56,11 @@ export async function resolveActiveGeneration(
     (value.resources ?? services.resources) as
       InspectorValueSource<InspectorResourceExplorers | undefined> | undefined,
   );
-  const jobsSource = value.jobs ?? (isRecord(services.jobs) && "bindings" in services.jobs ? services.jobs : undefined);
+  const jobsSource =
+    value.jobs ??
+    (isRecord(services.jobs) && "bindings" in services.jobs ? services.jobs : undefined);
   const jobs = await resolveValue(
-    jobsSource as
-      | InspectorValueSource<InspectorJobsServices | undefined>
-      | undefined,
+    jobsSource as InspectorValueSource<InspectorJobsServices | undefined> | undefined,
   );
   const runtime = value.runtime ?? services.runtime ?? directRuntime(value, services);
   const candidateSource =
