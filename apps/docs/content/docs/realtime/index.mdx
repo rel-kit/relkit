@@ -19,6 +19,9 @@ RelKit has two event-shaped features with different jobs:
 
 A function may publish both an application event and a channel update when both outcomes are needed. Neither mechanism replaces the other.
 
+Use a [job watch](/docs/jobs/clients) for one accepted durable run. Realtime channels remain application
+notifications and do not become a substitute for task output, run status, or provider-backed recovery.
+
 ## The Realtime API
 
 | API                     | What you use it for                                                                 |

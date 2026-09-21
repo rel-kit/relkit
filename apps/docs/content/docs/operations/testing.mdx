@@ -64,4 +64,7 @@ bun run build
 Keep live integration and cloud tests separate and opt-in. In the RELKIT repository, `bun run prepush` runs all
 locally reproducible required CI jobs and expects Docker to be available.
 
+Task-first jobs add focused unit, type, contract, restart, client, Inspector, Docker, and provider suites.
+The Docker/provider commands are explicit gates; managed cloud acceptance remains separately authorized.
+
 <include cwd>content/generated/related/operations-testing.mdx</include>

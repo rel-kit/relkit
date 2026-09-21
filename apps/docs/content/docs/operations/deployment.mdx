@@ -58,6 +58,10 @@ An infrastructure wrapper such as `aws(s3(...))` or `aws(redis(...))` may contri
 least-privilege access operations. A configured adapter passed directly to `defineApp` contributes runtime wiring
 but no resource lifecycle. `docker(adapter)` is development-only and never becomes cloud infrastructure.
 
+Job deployment publishes the immutable task worker and registers schedules only after readiness. Keep the
+previous worker generation and its routing keys while it owns accepted runs; deployment does not rewrite run
+history or turn a provider without native support into a durable fallback.
+
 The AWS host owns ECS/Fargate hosting, networking, the workload role, load balancing, and CloudWatch routing for
 redacted structured stdout. It does not implicitly own application jobs, events, model providers, Sentry, or
 OTLP.

@@ -71,6 +71,10 @@ integrations, environment contracts, diagnostics, requests, logs, traces, graph 
 Provider pages show profile, source kind, integration provenance, local recipe state, and infrastructure roles
 without exposing connection values.
 
+The Jobs area keeps task/job definitions, bounded run pages, schedules, and worker services distinct. Run
+filters push down stable job/service/status/time identities; unavailable providers are shown as partial rather
+than as empty history, and closing the Inspector never cancels accepted work.
+
 Generation views expose the composite activation fingerprint. If a new candidate fails graph, manifest,
 integration-plan, local-service, readiness, or override validation, traffic remains on the last known good
 generation and the Inspector continues to show that active state.
