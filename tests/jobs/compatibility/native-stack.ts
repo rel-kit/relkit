@@ -23,6 +23,12 @@ export type NativeStackOptions = {
   readonly healthTimeoutMs?: number;
 };
 
+export function dockerHostArguments(
+  platform: NodeJS.Platform = process.platform,
+): readonly string[] {
+  return platform === "linux" ? ["--add-host", "host.docker.internal:host-gateway"] : [];
+}
+
 export async function reservePort(): Promise<number> {
   const server = Bun.serve({ port: 0, fetch: () => new Response() });
   const port = server.port;
@@ -125,6 +131,7 @@ export async function startNativeStack(
       inngest,
       "--network",
       network,
+      ...dockerHostArguments(),
       "-p",
       `127.0.0.1:${port}:8288`,
       "-e",
@@ -187,6 +194,8 @@ export async function startNativeStack(
       close,
     };
   } catch (error) {
+    const logs = await docker(["logs", "--tail", "80", inngest], true);
+    if (logs) console.error(`Inngest container logs:\n${logs}`);
     await docker(["rm", "-f", inngest, redis, postgres], true);
     await docker(["volume", "rm", "-f", redisVolume, postgresVolume], true);
     await docker(["network", "rm", network], true);
