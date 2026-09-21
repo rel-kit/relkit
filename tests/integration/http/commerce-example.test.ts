@@ -29,6 +29,7 @@ import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import normalizeOrderId from "../../../examples/commerce/src/routes/transforms/orders/normalize-id.transform.ts";
 import orderAuth from "../../../examples/commerce/src/routes/middleware/order-auth.middleware.ts";
 import { ALL as authRoute } from "../../../examples/commerce/src/routes/api/auth/[[...auth]]/route.ts";
+import { POST as exportOrdersRoute } from "../../../examples/commerce/src/routes/orders/export/route.ts";
 import browsePath from "../../../examples/commerce/src/navigation/functions/browse-path.function.ts";
 import deleteOrder from "../../../examples/commerce/src/orders/functions/delete-order.function.ts";
 import getOrder from "../../../examples/commerce/src/orders/functions/get-order.function.ts";
@@ -261,6 +262,7 @@ function manifestFor(plan: RegistrationPlan): RuntimeManifest {
     functions: {},
     routes: {
       "route.all.api.auth.optional-catch-all-auth": { handler: authRoute.handler },
+      "orders.export": { handler: exportOrdersRoute.handler },
     },
     middleware: {
       "order-auth": {

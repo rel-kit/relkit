@@ -125,29 +125,34 @@ const server = Bun.serve({
       activeWatches += 1;
       const runId = url.searchParams.get("runId") ?? "browser-native";
       const status = runId === "browser-native" ? "completed" : "running";
-      const encoded = new TextEncoder().encode(JSON.stringify({
-        kind: "update",
-        run: run(runId, status),
-        observedAt: new Date().toISOString(),
-        epoch: "browser-epoch",
-        sequence: 1,
-        cursor: "browser-cursor",
-      }) + "\n");
+      const encoded = new TextEncoder().encode(
+        JSON.stringify({
+          kind: "update",
+          run: run(runId, status),
+          observedAt: new Date().toISOString(),
+          epoch: "browser-epoch",
+          sequence: 1,
+          cursor: "browser-cursor",
+        }) + "\n",
+      );
       frameBytes += encoded.byteLength;
       let settled = false;
-      return new Response(new ReadableStream({
-        start(controller) {
-          controller.enqueue(encoded);
-          settled = true;
-          activeWatches -= 1;
-          controller.close();
-        },
-        cancel() {
-          if (settled) return;
-          settled = true;
-          activeWatches -= 1;
-        },
-      }), { headers: { "content-type": "application/x-ndjson" } });
+      return new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoded);
+            settled = true;
+            activeWatches -= 1;
+            controller.close();
+          },
+          cancel() {
+            if (settled) return;
+            settled = true;
+            activeWatches -= 1;
+          },
+        }),
+        { headers: { "content-type": "application/x-ndjson" } },
+      );
     }
     if (url.pathname === "/fixture/get") {
       if (url.searchParams.get("runId") === "browser-polling") pollingReads += 1;
@@ -155,7 +160,9 @@ const server = Bun.serve({
       return response(JSON.stringify(run(url.searchParams.get("runId") ?? "unknown", "completed")));
     }
     if (url.pathname === "/metrics") {
-      return response(JSON.stringify({ activeWatches, watchCalls, nativeReads, pollingReads, frameBytes }));
+      return response(
+        JSON.stringify({ activeWatches, watchCalls, nativeReads, pollingReads, frameBytes }),
+      );
     }
     if (url.pathname === "/shutdown") {
       passed = url.searchParams.get("passed") === "true";
@@ -169,5 +176,17 @@ console.log(`CLIENT_BROWSER_URL=http://127.0.0.1:${server.port}/`);
 await done;
 server.stop(true);
 const cpuAfter = process.cpuUsage(cpuBefore);
-console.log(JSON.stringify({ passed, rssBefore, rssAfter: process.memoryUsage().rss, cpuUserMicros: cpuAfter.user, cpuSystemMicros: cpuAfter.system, watchCalls, nativeReads, pollingReads, frameBytes }));
+console.log(
+  JSON.stringify({
+    passed,
+    rssBefore,
+    rssAfter: process.memoryUsage().rss,
+    cpuUserMicros: cpuAfter.user,
+    cpuSystemMicros: cpuAfter.system,
+    watchCalls,
+    nativeReads,
+    pollingReads,
+    frameBytes,
+  }),
+);
 if (!passed) process.exitCode = 1;

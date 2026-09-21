@@ -69,13 +69,19 @@ dockerTest(
       const values = overrides?.bindings.find((binding) => binding.bindingId === bindingId)?.values;
       const baseUrl = text(values?.baseUrl);
       expect(values?.postgresPassword).toBeUndefined();
-      expect(readLocalServiceSecrets(identity)?.bindings[0]?.values.postgresPassword).toMatch(/^[a-f0-9]{48}$/u);
+      expect(readLocalServiceSecrets(identity)?.bindings[0]?.values.postgresPassword).toMatch(
+        /^[a-f0-9]{48}$/u,
+      );
       expect((await fetch(`${baseUrl}/health`)).ok).toBe(true);
       expect(await materializer.listVolumes(labels)).toHaveLength(2);
-      expect(JSON.parse(await docker.command(
-        ["network", "inspect", "--format", "{{json .Labels}}", network],
-        "Composite network inspection",
-      ))).toMatchObject(labels);
+      expect(
+        JSON.parse(
+          await docker.command(
+            ["network", "inspect", "--format", "{{json .Labels}}", network],
+            "Composite network inspection",
+          ),
+        ),
+      ).toMatchObject(labels);
 
       await first.close();
       const adopted = createLocalServiceReconciler({
@@ -102,10 +108,12 @@ dockerTest(
       await resetter.close();
       await materializer.removeVolumes(labels);
       expect(await materializer.listVolumes(labels)).toHaveLength(0);
-      expect(await docker.command(
-        ["network", "inspect", "--format", "{{json .Labels}}", foreignNetwork],
-        "Foreign network inspection",
-      )).toContain("dev.relkit.managed");
+      expect(
+        await docker.command(
+          ["network", "inspect", "--format", "{{json .Labels}}", foreignNetwork],
+          "Foreign network inspection",
+        ),
+      ).toContain("dev.relkit.managed");
     } finally {
       worker.stop(true);
       await cleanup(docker, materializer, labels, foreignNetwork);
@@ -119,23 +127,32 @@ function reconcileRequest(workerPort: number) {
     plan: {
       version: LOCAL_SERVICE_PLAN_VERSION,
       graphHash,
-      services: [{
-        bindingId,
-        capability: "job",
-        profile: "inngest",
-        materializerId: "docker",
-        recipe: { integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 },
-        configuration: {},
-        requiredBy: ["jobs.inngest"],
-      }],
+      services: [
+        {
+          bindingId,
+          capability: "job",
+          profile: "inngest",
+          materializerId: "docker",
+          recipe: { integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 },
+          configuration: {},
+          requiredBy: ["jobs.inngest"],
+        },
+      ],
     } satisfies LocalServicePlan,
     planHash,
     recipes: { inngest: inngestRecipe },
     scope: "all" as const,
     environment: "development",
     serviceGeneration: "generation-a",
-    endpoints: { [bindingId]: { serveOrigin: `http://host.docker.internal:${workerPort}`, servePath: "/api/inngest" } },
-    environmentOverrides: { [bindingId]: { INNGEST_SDK_URL: `http://host.docker.internal:${workerPort}/api/inngest` } },
+    endpoints: {
+      [bindingId]: {
+        serveOrigin: `http://host.docker.internal:${workerPort}`,
+        servePath: "/api/inngest",
+      },
+    },
+    environmentOverrides: {
+      [bindingId]: { INNGEST_SDK_URL: `http://host.docker.internal:${workerPort}/api/inngest` },
+    },
   };
 }
 
@@ -157,5 +174,7 @@ async function cleanup(
   }
   await materializer.removeVolumes(labels).catch(() => undefined);
   await materializer.removeNetworks?.(labels).catch(() => undefined);
-  await docker.command(["network", "rm", foreignNetwork], "Foreign network cleanup").catch(() => undefined);
+  await docker
+    .command(["network", "rm", foreignNetwork], "Foreign network cleanup")
+    .catch(() => undefined);
 }

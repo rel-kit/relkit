@@ -8,22 +8,44 @@
   "adapters": {
     "inngest": {
       "status": "passed",
-      "coverage": ["UTC cron trigger mapping", "worker registration", "connected credential isolation", "native run receipts"]
+      "coverage": [
+        "UTC cron trigger mapping",
+        "worker registration",
+        "connected credential isolation",
+        "native run receipts"
+      ]
     },
     "effect-mq": {
       "status": "passed",
-      "coverage": ["pinned Job.make/Worker.layer mapping", "PostgreSQL schema/layer declaration", "native receipt routing", "retryable profile without durable sleep"],
+      "coverage": [
+        "pinned Job.make/Worker.layer mapping",
+        "PostgreSQL schema/layer declaration",
+        "native receipt routing",
+        "retryable profile without durable sleep"
+      ],
       "nativeEvidence": "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
     },
     "trigger": {
       "status": "not-tested",
-      "coverage": ["pinned task/worker registration contract", "scoped run subscription cleanup", "output/version guards", "account-free recipe declaration"],
+      "coverage": [
+        "pinned task/worker registration contract",
+        "scoped run subscription cleanup",
+        "output/version guards",
+        "account-free recipe declaration"
+      ],
       "reason": "Local structural fixtures do not certify a Trigger server. Managed credentials and a release-pinned executable Docker image were not authorized or available."
     }
   },
   "scheduleRegression": {
     "status": "passed",
-    "coverage": ["canonical static input", "dynamic input metadata", "owned/operator separation", "pause preservation", "ambiguous write recovery", "fresh occurrence identity"]
+    "coverage": [
+      "canonical static input",
+      "dynamic input metadata",
+      "owned/operator separation",
+      "pause preservation",
+      "ambiguous write recovery",
+      "fresh occurrence identity"
+    ]
   },
   "evidenceLimit": "Mocks and local structural clients are contract evidence only; missing authorized Trigger and managed-cloud evidence remains not-tested."
 }

@@ -14,7 +14,10 @@ import {
   localProjectLabels,
   readLocalServiceSecrets,
 } from "../../integrations/packages/local/src/runtime/index.ts";
-import { LOCAL_SERVICE_PLAN_VERSION, type LocalServicePlan } from "../../packages/local-service/src/index.ts";
+import {
+  LOCAL_SERVICE_PLAN_VERSION,
+  type LocalServicePlan,
+} from "../../packages/local-service/src/index.ts";
 
 const dockerTest = process.env.RELKIT_TEST_DOCKER === "1" ? test : test.skip;
 const graphHash = `sha256:${"e".repeat(64)}`;
@@ -65,7 +68,9 @@ dockerTest(
       expect(activated.started).toEqual([bindingId]);
       const instances = await materializer.list(labels);
       expect(instances).toHaveLength(4);
-      expect(instances.find((instance) => instance.labels["dev.relkit.unit-id"] === "worker")).toMatchObject({
+      expect(
+        instances.find((instance) => instance.labels["dev.relkit.unit-id"] === "worker"),
+      ).toMatchObject({
         health: "healthy",
         labels: { "dev.relkit.unit-kind": "worker" },
       });
@@ -83,15 +88,17 @@ function request() {
     plan: {
       version: LOCAL_SERVICE_PLAN_VERSION,
       graphHash,
-      services: [{
-        bindingId,
-        capability: "job",
-        profile: "inngest",
-        materializerId: "docker",
-        recipe: { integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 },
-        configuration: {},
-        requiredBy: ["jobs.worker"],
-      }],
+      services: [
+        {
+          bindingId,
+          capability: "job",
+          profile: "inngest",
+          materializerId: "docker",
+          recipe: { integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 },
+          configuration: {},
+          requiredBy: ["jobs.worker"],
+        },
+      ],
     } satisfies LocalServicePlan,
     planHash,
     recipes: { inngest: localRecipe },
@@ -102,7 +109,14 @@ function request() {
 }
 
 function firstOverrideFile(identity: ReturnType<typeof createLocalProjectIdentity>): string {
-  return join(identity.projectRoot, ".relkit", "state", "local", identity.localProjectId.slice("sha256:".length), "provider-overrides.json");
+  return join(
+    identity.projectRoot,
+    ".relkit",
+    "state",
+    "local",
+    identity.localProjectId.slice("sha256:".length),
+    "provider-overrides.json",
+  );
 }
 
 function workerSource(): string {

@@ -1,18 +1,27 @@
 {
   "schemaVersion": 1,
-  "recordedAt": "2026-09-15",
+  "recordedAt": "2026-09-20",
   "status": "ready",
+  "completionScope": {
+    "certified": ["inngest self-hosted Docker", "effect-mq self-hosted PostgreSQL"],
+    "deferred": ["Trigger native/Docker evidence", "Pulumi, AWS, and managed-cloud evidence"],
+    "diagnostic": "Deferred modes remain not-tested and are not support claims for this change."
+  },
   "evidence": [
     "tests/jobs/compatibility/evidence/inngest-native.json",
     "tests/jobs/compatibility/evidence/phase0-1.6-1.10.json",
     "tests/jobs/compatibility/evidence/phase0-1.11.json",
     "tests/jobs/compatibility/evidence/phase0-effect-mq.json",
-    "tests/jobs/compatibility/evidence/phase5-adapters.json"
+    "tests/jobs/compatibility/evidence/phase5-adapters.json",
+    "tests/jobs/compatibility/evidence/phase9-regressions.json",
+    "tests/jobs/compatibility/evidence/phase9-native-completion.json",
+    "tests/jobs/compatibility/evidence/phase9-scaffold.json",
+    "tests/jobs/compatibility/evidence/phase9-coverage.json"
   ],
   "providerCatalog": [
-    {"provider": "inngest", "package": "@relkit/inngest", "recipe": "inngest-docker@2"},
-    {"provider": "trigger", "package": "@relkit/trigger", "recipe": "trigger-docker@2"},
-    {"provider": "effect-mq", "package": "@relkit/effect-mq", "recipe": "effect-mq-docker@2"}
+    { "provider": "inngest", "package": "@relkit/inngest", "recipe": "inngest-docker@2" },
+    { "provider": "trigger", "package": "@relkit/trigger", "recipe": "trigger-docker@2" },
+    { "provider": "effect-mq", "package": "@relkit/effect-mq", "recipe": "effect-mq-docker@2" }
   ],
   "requiredCommonSubset": {
     "features": [
