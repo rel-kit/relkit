@@ -22,14 +22,26 @@ export async function effectMqSnapshot(
     service: metadataText(metadata, "relkitService", context.service),
     status,
     observedAt: new Date().toISOString(),
-    resultAvailability: status === "completed" ? "void" as const : "pending" as const,
-    ...(metadataOptional(metadata, "relkitScope") === undefined ? {} : { scope: metadataOptional(metadata, "relkitScope") }),
+    resultAvailability: status === "completed" ? ("void" as const) : ("pending" as const),
+    ...(metadataOptional(metadata, "relkitScope") === undefined
+      ? {}
+      : { scope: metadataOptional(metadata, "relkitScope") }),
     ...(metadata.relkitInputHash === undefined ? {} : { inputHash: metadata.relkitInputHash }),
-    ...(metadata.relkitInputSchemaHash === undefined ? {} : { inputSchemaHash: metadata.relkitInputSchemaHash }),
-    ...(metadata.relkitAcceptanceIdentity === undefined ? {} : { acceptanceIdentity: metadata.relkitAcceptanceIdentity }),
-    ...(metadataOptional(metadata, "relkitScheduledFor") === undefined ? {} : { scheduledFor: metadataOptional(metadata, "relkitScheduledFor") }),
-    ...(metadata.relkitParentRunId === undefined ? {} : { parentRunId: metadata.relkitParentRunId }),
-    ...(metadata.relkitRetryOfRunId === undefined ? {} : { retryOfRunId: metadata.relkitRetryOfRunId }),
+    ...(metadata.relkitInputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: metadata.relkitInputSchemaHash }),
+    ...(metadata.relkitAcceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: metadata.relkitAcceptanceIdentity }),
+    ...(metadataOptional(metadata, "relkitScheduledFor") === undefined
+      ? {}
+      : { scheduledFor: metadataOptional(metadata, "relkitScheduledFor") }),
+    ...(metadata.relkitParentRunId === undefined
+      ? {}
+      : { parentRunId: metadata.relkitParentRunId }),
+    ...(metadata.relkitRetryOfRunId === undefined
+      ? {}
+      : { retryOfRunId: metadata.relkitRetryOfRunId }),
     ...(record.processedAt === undefined ? {} : { startedAt: date(record.processedAt) }),
     ...(record.finishedAt === undefined ? {} : { completedAt: date(record.finishedAt) }),
     ...(record.runAt > Date.now() ? { nextEligibleAt: date(record.runAt) } : {}),
@@ -38,21 +50,33 @@ export async function effectMqSnapshot(
   };
   const payload = object(record.payload);
   const payloadInput = object(payload?.input);
-  const input = payloadInput !== undefined && Object.hasOwn(payloadInput, "input") ? payloadInput.input : payload?.input;
+  const input =
+    payloadInput !== undefined && Object.hasOwn(payloadInput, "input")
+      ? payloadInput.input
+      : payload?.input;
   const job = state.jobs.get(record.name) ?? state.ensureJob(record.name);
-  const polled = await state.run(job.poll(record.id) as never, context.signal).catch(() => Option.none()) as Option.Option<{
+  const polled = (await state
+    .run(job.poll(record.id) as never, context.signal)
+    .catch(() => Option.none())) as Option.Option<{
     readonly exit: Option.Option<Exit.Exit<unknown, unknown>>;
   }>;
   const exit = Option.isSome(polled) ? polled.value.exit : Option.none();
   const tags = parseTags(metadata.relkitTags);
   const extra = {
     ...(input === undefined ? {} : { input }),
-    ...(metadata.relkitCorrelationId === undefined ? {} : { correlationId: metadata.relkitCorrelationId }),
+    ...(metadata.relkitCorrelationId === undefined
+      ? {}
+      : { correlationId: metadata.relkitCorrelationId }),
     ...(tags.length === 0 ? {} : { tags }),
   };
   if (status !== "completed") return { ...base, ...extra } as NativeRun;
   if (Option.isSome(exit) && Exit.isSuccess(exit.value) && exit.value.value !== undefined) {
-    return { ...base, ...extra, resultAvailability: "available", output: exit.value.value } as RunSnapshot;
+    return {
+      ...base,
+      ...extra,
+      resultAvailability: "available",
+      output: exit.value.value,
+    } as RunSnapshot;
   }
   return { ...base, ...extra } as NativeRun;
 }
@@ -72,24 +96,38 @@ function failure(reason: string | undefined): JobErrorEnvelope {
 }
 
 function object(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, any>)
+    : undefined;
 }
 
 function text(value: unknown, fallback: string): string {
   return typeof value === "string" && value !== "" ? value : fallback;
 }
 
-function metadataText(metadata: Readonly<Record<string, string>>, name: string, fallback: string): string {
+function metadataText(
+  metadata: Readonly<Record<string, string>>,
+  name: string,
+  fallback: string,
+): string {
   return text(metadataValue(metadata, name), fallback);
 }
 
-function metadataOptional(metadata: Readonly<Record<string, string>>, name: string): string | undefined {
+function metadataOptional(
+  metadata: Readonly<Record<string, string>>,
+  name: string,
+): string | undefined {
   const value = metadataValue(metadata, name);
   return typeof value === "string" && value !== "" ? value : undefined;
 }
 
-function metadataValue(metadata: Readonly<Record<string, string>>, name: string): string | undefined {
-  const plain = name.startsWith("relkit") ? name.slice(6).replace(/^[A-Z]/u, (value) => value.toLowerCase()) : name;
+function metadataValue(
+  metadata: Readonly<Record<string, string>>,
+  name: string,
+): string | undefined {
+  const plain = name.startsWith("relkit")
+    ? name.slice(6).replace(/^[A-Z]/u, (value) => value.toLowerCase())
+    : name;
   return metadata[name] ?? metadata[plain];
 }
 
@@ -101,7 +139,9 @@ function parseTags(value: string | undefined): readonly string[] {
   if (value === undefined) return [];
   try {
     const parsed: unknown = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
   } catch {
     return [];
   }

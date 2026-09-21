@@ -11,10 +11,13 @@ export function envelopeFrom(
   const value = record(input);
   const metadata = record(value?.metadata);
   const wire = value?.input ?? input;
-  const textValue = (name: string, fallback: string): string => text(metadataValue(metadata, name), fallback);
+  const textValue = (name: string, fallback: string): string =>
+    text(metadataValue(metadata, name), fallback);
   const attempt = number(metadataValue(metadata, "relkitAttempt")) ?? context.attempt;
-  const scheduledFor = textOptional(metadataValue(metadata, "relkitScheduledFor")) ?? scheduledInstant(context.jobId);
-  const occurrenceIdentity = textOptional(metadataValue(metadata, "relkitOccurrenceIdentity")) ??
+  const scheduledFor =
+    textOptional(metadataValue(metadata, "relkitScheduledFor")) ?? scheduledInstant(context.jobId);
+  const occurrenceIdentity =
+    textOptional(metadataValue(metadata, "relkitOccurrenceIdentity")) ??
     (scheduledFor === undefined ? undefined : String(context.jobId));
   const propagation = parseStoredPropagation(metadataValue(metadata, "relkitPropagation"));
   return {
@@ -39,7 +42,10 @@ export function envelopeFrom(
   };
 }
 
-export function bindingFrom(envelope: TaskExecutionEnvelope, signal: AbortSignal): TaskExecutionBinding {
+export function bindingFrom(
+  envelope: TaskExecutionEnvelope,
+  signal: AbortSignal,
+): TaskExecutionBinding {
   return {
     run: {
       runId: envelope.runId,
@@ -52,11 +58,19 @@ export function bindingFrom(envelope: TaskExecutionEnvelope, signal: AbortSignal
       ...(envelope.scheduledFor === undefined ? {} : { scheduledFor: envelope.scheduledFor }),
       ...(envelope.parentRunId === undefined ? {} : { parentRunId: envelope.parentRunId }),
       ...(envelope.service === undefined ? {} : { service: envelope.service }),
-      ...(envelope.serviceGeneration === undefined ? {} : { serviceGeneration: envelope.serviceGeneration }),
+      ...(envelope.serviceGeneration === undefined
+        ? {}
+        : { serviceGeneration: envelope.serviceGeneration }),
       ...(envelope.scope === undefined ? {} : { scope: envelope.scope }),
-      ...(envelope.inputSchemaHash === undefined ? {} : { inputSchemaHash: envelope.inputSchemaHash }),
-      ...(envelope.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: envelope.acceptanceIdentity }),
-      ...(envelope.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: envelope.occurrenceIdentity }),
+      ...(envelope.inputSchemaHash === undefined
+        ? {}
+        : { inputSchemaHash: envelope.inputSchemaHash }),
+      ...(envelope.acceptanceIdentity === undefined
+        ? {}
+        : { acceptanceIdentity: envelope.acceptanceIdentity }),
+      ...(envelope.occurrenceIdentity === undefined
+        ? {}
+        : { occurrenceIdentity: envelope.occurrenceIdentity }),
       ...(envelope.propagation === undefined ? {} : { propagation: envelope.propagation }),
     },
     signal,
@@ -65,29 +79,43 @@ export function bindingFrom(envelope: TaskExecutionEnvelope, signal: AbortSignal
 
 export function attempts(policy: unknown): number | undefined {
   const retry = record(record(policy)?.retry);
-  return typeof retry?.maxAttempts === "number" && Number.isSafeInteger(retry.maxAttempts) && retry.maxAttempts > 0
+  return typeof retry?.maxAttempts === "number" &&
+    Number.isSafeInteger(retry.maxAttempts) &&
+    retry.maxAttempts > 0
     ? retry.maxAttempts
     : undefined;
 }
 
-function optional(metadata: Record<string, unknown> | undefined, name: string, storedName = name): Record<string, string> {
+function optional(
+  metadata: Record<string, unknown> | undefined,
+  name: string,
+  storedName = name,
+): Record<string, string> {
   const value = metadataValue(metadata, storedName);
   return typeof value === "string" ? { [name]: value } : {};
 }
 
 function metadataValue(metadata: Record<string, unknown> | undefined, name: string): unknown {
   if (metadata === undefined) return undefined;
-  const plain = name.startsWith("relkit") ? name.slice(6).replace(/^[A-Z]/u, (value) => value.toLowerCase()) : name;
+  const plain = name.startsWith("relkit")
+    ? name.slice(6).replace(/^[A-Z]/u, (value) => value.toLowerCase())
+    : name;
   return metadata[name] ?? metadata[plain];
 }
 
 function parseStoredPropagation(value: unknown): ReturnType<typeof parseTracePropagation> {
   if (typeof value !== "string") return parseTracePropagation(value);
-  try { return parseTracePropagation(JSON.parse(value)); } catch { return undefined; }
+  try {
+    return parseTracePropagation(JSON.parse(value));
+  } catch {
+    return undefined;
+  }
 }
 
 function record(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 function text(value: unknown, fallback: string): string {

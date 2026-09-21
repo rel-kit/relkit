@@ -10,16 +10,20 @@ export function createEffectMqPostgresSchedules(
   queue: string | undefined,
 ): NativeScheduleOperations {
   const owners = new Map<string, string>();
-  const bridge = (jobName: string) => createEffectMqScheduleOperations({
-    jobName,
-    ...(queue === undefined ? {} : { queue }),
-    store: {
-      listSchedules: (options) => Effect.flatMap(JobStore.JobStore, (store) => store.listSchedules(options)),
-      upsertSchedule: (schedule) => Effect.flatMap(JobStore.JobStore, (store) => store.upsertSchedule(schedule)),
-      removeSchedule: (key) => Effect.flatMap(JobStore.JobStore, (store) => store.removeSchedule(key)),
-    },
-    run: (effect) => getState().run(effect),
-  });
+  const bridge = (jobName: string) =>
+    createEffectMqScheduleOperations({
+      jobName,
+      ...(queue === undefined ? {} : { queue }),
+      store: {
+        listSchedules: (options) =>
+          Effect.flatMap(JobStore.JobStore, (store) => store.listSchedules(options)),
+        upsertSchedule: (schedule) =>
+          Effect.flatMap(JobStore.JobStore, (store) => store.upsertSchedule(schedule)),
+        removeSchedule: (key) =>
+          Effect.flatMap(JobStore.JobStore, (store) => store.removeSchedule(key)),
+      },
+      run: (effect) => getState().run(effect),
+    });
   const ownerFor = async (id: string, context: OperationContext): Promise<string | undefined> => {
     const known = owners.get(id);
     if (known !== undefined) {
@@ -36,15 +40,19 @@ export function createEffectMqPostgresSchedules(
   };
   return {
     list: async (query, context) => {
-      const names = typeof query.jobId === "string"
-        ? [query.jobId]
-        : [...getState().definitions.keys()];
+      const names =
+        typeof query.jobId === "string" ? [query.jobId] : [...getState().definitions.keys()];
       const pages = await Promise.all(names.map((name) => bridge(name).list(query, context)));
       const schedules = pages.flatMap((page) => {
-        const rows = page && typeof page === "object" && Array.isArray((page as { schedules?: unknown }).schedules)
-          ? (page as { schedules: readonly Record<string, unknown>[] }).schedules
-          : [];
-        for (const row of rows) if (typeof row.id === "string" && typeof row.jobId === "string") owners.set(row.id, row.jobId);
+        const rows =
+          page &&
+          typeof page === "object" &&
+          Array.isArray((page as { schedules?: unknown }).schedules)
+            ? (page as { schedules: readonly Record<string, unknown>[] }).schedules
+            : [];
+        for (const row of rows)
+          if (typeof row.id === "string" && typeof row.jobId === "string")
+            owners.set(row.id, row.jobId);
         return rows;
       });
       return { schedules };
@@ -64,7 +72,11 @@ export function createEffectMqPostgresSchedules(
     delete: async (id, context) => {
       const jobName = await ownerFor(id, context);
       return jobName === undefined
-        ? { operationId: context.operationId ?? "effect-mq-schedule", scheduleId: id, outcome: "requested" as const }
+        ? {
+            operationId: context.operationId ?? "effect-mq-schedule",
+            scheduleId: id,
+            outcome: "requested" as const,
+          }
         : bridge(jobName).delete(id, context);
     },
   };
@@ -82,11 +94,17 @@ function scheduleId(value: JsonValue): string {
 }
 
 function operationUnsupported(id: string, context: OperationContext) {
-  return Promise.resolve({ operationId: context.operationId ?? "effect-mq-schedule", scheduleId: id, outcome: "unsupported" as const });
+  return Promise.resolve({
+    operationId: context.operationId ?? "effect-mq-schedule",
+    scheduleId: id,
+    outcome: "unsupported" as const,
+  });
 }
 
 function object(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, any>)
+    : undefined;
 }
 
 function available(value: unknown): boolean {

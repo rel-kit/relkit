@@ -25,8 +25,15 @@ export interface EffectMqNativeClient {
   readonly submit: (request: NativeSubmission, context: OperationContext) => Promise<NativeReceipt>;
   readonly get: (runId: string, context: OperationContext) => Promise<NativeRun>;
   readonly list: (query: NativeRunQuery, context: OperationContext) => Promise<NativeRunPage>;
-  readonly cancel: (runId: string, operationId: string, context: OperationContext) => Promise<NativeControlReceipt>;
-  readonly retry: (request: Parameters<NonNullable<JobsAdapterRuntime["retry"]>>[0], context: OperationContext) => Promise<NativeControlReceipt>;
+  readonly cancel: (
+    runId: string,
+    operationId: string,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly retry: (
+    request: Parameters<NonNullable<JobsAdapterRuntime["retry"]>>[0],
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
   readonly observe?: JobsAdapterRuntime["observe"];
   readonly schedules?: NativeScheduleOperations;
   readonly close?: () => Promise<void>;
@@ -39,7 +46,9 @@ export interface EffectMqPostgresNativeOptions {
   readonly queue?: string;
 }
 
-export function createEffectMqPostgresNativeClient(options: EffectMqPostgresNativeOptions): EffectMqNativeClient {
+export function createEffectMqPostgresNativeClient(
+  options: EffectMqPostgresNativeOptions,
+): EffectMqNativeClient {
   let state: EffectMqPostgresState | undefined;
   const getState = (worker?: EffectMqWorkerRegistrationOptions): EffectMqPostgresState => {
     if (state !== undefined) {
@@ -52,11 +61,13 @@ export function createEffectMqPostgresNativeClient(options: EffectMqPostgresNati
       postgresUrl: options.postgresUrl,
       ...(options.tablePrefix === undefined ? {} : { tablePrefix: options.tablePrefix }),
       ...(options.queue === undefined ? {} : { queue: options.queue }),
-      ...(worker === undefined ? {} : {
-        definitions: worker.definitions,
-        executor: worker.executor,
-        startWorker: worker.startWorker !== false,
-      }),
+      ...(worker === undefined
+        ? {}
+        : {
+            definitions: worker.definitions,
+            executor: worker.executor,
+            startWorker: worker.startWorker !== false,
+          }),
     });
     return state;
   };
@@ -66,7 +77,8 @@ export function createEffectMqPostgresNativeClient(options: EffectMqPostgresNati
     submit: (request, context) => submitEffectMq(getState(), request, context),
     get: (runId, context) => getEffectMqRun(getState(), runId, context),
     list: (query, context) => listEffectMqRuns(getState(), query, context),
-    cancel: (runId, operationId, context) => cancelEffectMqRun(getState(), runId, operationId, context),
+    cancel: (runId, operationId, context) =>
+      cancelEffectMqRun(getState(), runId, operationId, context),
     retry: (request, context) => retryEffectMqRun(getState(), request, context),
     schedules,
     registerWorker: (workerOptions) => {
@@ -80,7 +92,7 @@ export function createEffectMqPostgresNativeClient(options: EffectMqPostgresNati
       let readyPromise: Promise<void> | undefined;
       worker = Object.freeze({
         ...handle,
-        ready: () => readyPromise ??= current.ready(),
+        ready: () => (readyPromise ??= current.ready()),
       });
       return worker;
     },

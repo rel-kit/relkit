@@ -14,7 +14,9 @@ export function metadataFilter(query: NativeRunQuery): Readonly<Record<string, u
   return { ...(Object.keys(metadata).length === 0 ? {} : { metadata }) };
 }
 
-export function states(statuses: NativeRunQuery["status"]): readonly JobStore.JobState[] | undefined {
+export function states(
+  statuses: NativeRunQuery["status"],
+): readonly JobStore.JobState[] | undefined {
   if (statuses === undefined) return undefined;
   const values = new Set<JobStore.JobState>();
   for (const status of statuses) {
@@ -34,20 +36,44 @@ export function matches(query: NativeRunQuery, run: NativeRun): boolean {
   if (query.status !== undefined && !query.status.includes(run.status)) return false;
   if (query.acceptedFrom !== undefined && run.acceptedAt < query.acceptedFrom) return false;
   if (query.acceptedTo !== undefined && run.acceptedAt > query.acceptedTo) return false;
-  if (query.startedFrom !== undefined && (run.startedAt === undefined || run.startedAt < query.startedFrom)) return false;
-  if (query.startedTo !== undefined && (run.startedAt === undefined || run.startedAt > query.startedTo)) return false;
-  if (query.completedFrom !== undefined && (run.completedAt === undefined || run.completedAt < query.completedFrom)) return false;
-  if (query.completedTo !== undefined && (run.completedAt === undefined || run.completedAt > query.completedTo)) return false;
+  if (
+    query.startedFrom !== undefined &&
+    (run.startedAt === undefined || run.startedAt < query.startedFrom)
+  )
+    return false;
+  if (
+    query.startedTo !== undefined &&
+    (run.startedAt === undefined || run.startedAt > query.startedTo)
+  )
+    return false;
+  if (
+    query.completedFrom !== undefined &&
+    (run.completedAt === undefined || run.completedAt < query.completedFrom)
+  )
+    return false;
+  if (
+    query.completedTo !== undefined &&
+    (run.completedAt === undefined || run.completedAt > query.completedTo)
+  )
+    return false;
   if (query.tags !== undefined) {
     const tags = (run as unknown as { readonly tags?: readonly string[] }).tags ?? [];
-    const matched = query.tagMatch === "all" ? query.tags.every((tag) => tags.includes(tag)) : query.tags.some((tag) => tags.includes(tag));
+    const matched =
+      query.tagMatch === "all"
+        ? query.tags.every((tag) => tags.includes(tag))
+        : query.tags.some((tag) => tags.includes(tag));
     if (!matched) return false;
   }
   return true;
 }
 
 export function terminal(status: RunSnapshot["status"]): boolean {
-  return status === "completed" || status === "failed" || status === "cancelled" || status === "timed-out";
+  return (
+    status === "completed" ||
+    status === "failed" ||
+    status === "cancelled" ||
+    status === "timed-out"
+  );
 }
 
 export function terminalState(state: JobStore.JobState): boolean {

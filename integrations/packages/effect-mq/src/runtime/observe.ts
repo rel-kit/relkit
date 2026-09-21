@@ -1,4 +1,9 @@
-import type { NativeObservation, NativeRun, NativeWatchRequest, OperationContext } from "@relkit/jobs/adapter";
+import type {
+  NativeObservation,
+  NativeRun,
+  NativeWatchRequest,
+  OperationContext,
+} from "@relkit/jobs/adapter";
 import type { EffectMqNativeClient } from "./native.js";
 
 export interface EffectMqObservationOptions {
@@ -35,7 +40,12 @@ async function* poll(
   }
 }
 
-function frame(kind: "snapshot" | "update", run: NativeRun, epoch: string, sequence: number): NativeObservation {
+function frame(
+  kind: "snapshot" | "update",
+  run: NativeRun,
+  epoch: string,
+  sequence: number,
+): NativeObservation {
   return Object.freeze({
     kind,
     run,
@@ -57,7 +67,8 @@ function same(left: NativeRun, right: NativeRun): boolean {
 }
 
 function delay(milliseconds: number, signal: AbortSignal): Promise<void> {
-  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1) throw new TypeError("effect-mq poll interval is invalid");
+  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1)
+    throw new TypeError("effect-mq poll interval is invalid");
   return new Promise((resolve, reject) => {
     if (signal.aborted) return reject(signal.reason);
     const timer = setTimeout(() => {
@@ -79,12 +90,17 @@ async function read(
   timeoutMs: number | undefined,
 ): Promise<NativeRun> {
   if (timeoutMs === undefined) return get(runId, context);
-  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) throw new TypeError("effect-mq read timeout is invalid");
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1)
+    throw new TypeError("effect-mq read timeout is invalid");
   const controller = new AbortController();
-  const abort = (): void => controller.abort(context.signal.reason ?? new Error("effect-mq observation aborted"));
+  const abort = (): void =>
+    controller.abort(context.signal.reason ?? new Error("effect-mq observation aborted"));
   if (context.signal.aborted) abort();
   else context.signal.addEventListener("abort", abort, { once: true });
-  const timer = setTimeout(() => controller.abort(new Error("effect-mq read timed out")), timeoutMs);
+  const timer = setTimeout(
+    () => controller.abort(new Error("effect-mq read timed out")),
+    timeoutMs,
+  );
   try {
     return await get(runId, { ...context, signal: controller.signal });
   } finally {

@@ -12,6 +12,7 @@ import { JobStore } from "effect-mq";
 import type { EffectMqPostgresState } from "./postgres-state.js";
 import { effectMqSnapshot } from "./postgres-snapshots.js";
 import { matches, metadataFilter, states, terminal, terminalState } from "./postgres-query.js";
+import { object, submissionId, submissionMetadata, text } from "./postgres-operations-support.js";
 
 export async function submitEffectMq(
   state: EffectMqPostgresState,
@@ -22,7 +23,10 @@ export async function submitEffectMq(
   const runId = submissionId(request);
   const before = await readRecord(state, runId, context.signal);
   const metadata = submissionMetadata(request, context);
-  const payload = { input: request.canonicalInput ?? { version: 1, kind: "json", value: request.input }, metadata };
+  const payload = {
+    input: request.canonicalInput ?? { version: 1, kind: "json", value: request.input },
+    metadata,
+  };
   const enqueue: Record<string, unknown> = { jobId: runId, metadata };
   if (request.scheduledFor !== undefined) enqueue.at = request.scheduledFor;
   await state.run(job.enqueue({ input: payload } as never, enqueue as never), context.signal);
@@ -53,14 +57,20 @@ export async function listEffectMqRuns(
   query: NativeRunQuery,
   context: OperationContext,
 ): Promise<NativeRunPage> {
-  const result = await state.run(Effect.flatMap(JobStore.JobStore, (store) => store.list({
-    ...metadataFilter(query),
-    ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
-    limit: Math.min(query.limit ?? 50, 500),
-    ...(states(query.status) === undefined ? {} : { states: states(query.status) }),
-  })), context.signal);
-  const items = (await Promise.all(result.items.map((record) => effectMqSnapshot(state, record, context))))
-    .filter((run) => matches(query, run));
+  const result = await state.run(
+    Effect.flatMap(JobStore.JobStore, (store) =>
+      store.list({
+        ...metadataFilter(query),
+        ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+        limit: Math.min(query.limit ?? 50, 500),
+        ...(states(query.status) === undefined ? {} : { states: states(query.status) }),
+      }),
+    ),
+    context.signal,
+  );
+  const items = (
+    await Promise.all(result.items.map((record) => effectMqSnapshot(state, record, context)))
+  ).filter((run) => matches(query, run));
   return {
     items,
     ...(result.cursor === undefined ? {} : { nextCursor: result.cursor }),
@@ -78,7 +88,10 @@ export async function cancelEffectMqRun(
 ): Promise<NativeControlReceipt> {
   const run = await getEffectMqRun(state, runId, context);
   if (terminal(run.status)) return { runId, operationId, outcome: "already-terminal", run };
-  await state.run(Effect.flatMap(JobStore.JobStore, (store) => store.cancel(JobStore.JobId(runId))), context.signal);
+  await state.run(
+    Effect.flatMap(JobStore.JobStore, (store) => store.cancel(JobStore.JobId(runId))),
+    context.signal,
+  );
   return { runId, operationId, outcome: "requested", requestedAt: new Date().toISOString() };
 }
 
@@ -95,18 +108,27 @@ export async function retryEffectMqRun(
   const existingPayload = object(original.payload) ?? {};
   const existingInput = object(existingPayload.input) ?? {};
   const input = request.canonicalInput ?? existingInput.input;
-  const payload = { ...existingPayload, input: { ...existingInput, ...(input === undefined ? {} : { input }) } };
+  const payload = {
+    ...existingPayload,
+    input: { ...existingInput, ...(input === undefined ? {} : { input }) },
+  };
   const metadata = {
     ...original.metadata,
     relkitRetryOfRunId: request.runId,
     ...(request.operationId === undefined ? {} : { relkitOperationId: request.operationId }),
   };
   const job = state.ensureJob(original.name);
-  await state.run(job.enqueue({ input: payload.input } as never, {
-    jobId: runId,
-    queue: String(original.queue),
-    metadata,
-  } as never), context.signal);
+  await state.run(
+    job.enqueue(
+      { input: payload.input } as never,
+      {
+        jobId: runId,
+        queue: String(original.queue),
+        metadata,
+      } as never,
+    ),
+    context.signal,
+  );
   return {
     accepted: true,
     runId,
@@ -124,48 +146,12 @@ export async function readRecord(
   runId: string,
   signal: AbortSignal,
 ): Promise<JobStore.JobRecord | undefined> {
-  return state.run(Effect.flatMap(JobStore.JobStore, (store) => store.getJob(JobStore.JobId(runId))), signal)
-    .then((value) => Option.isNone(value) ? undefined : value.value);
-}
-
-function submissionId(request: NativeSubmission): string {
-  return `relkit/${request.acceptanceIdentity ?? request.idempotencyKey ?? request.operationId}`;
-}
-
-function submissionMetadata(request: NativeSubmission, context: OperationContext): Readonly<Record<string, string>> {
-  const scope = request.scope ?? context.scope;
-  const occurrenceIdentity = request.occurrenceIdentity ?? context.occurrenceIdentity;
-  const acceptanceIdentity = request.acceptanceIdentity ?? context.acceptanceIdentity;
-  const correlationId = request.correlationId ?? context.correlationId;
-  const propagation = request.propagation ?? context.propagation;
-  return {
-    relkitJobId: request.jobId,
-    relkitTaskId: request.taskId,
-    relkitTaskVersion: request.taskVersion,
-    relkitBuildId: request.buildId,
-    relkitService: context.service,
-    relkitServiceGeneration: context.serviceGeneration,
-    relkitScope: scope,
-    relkitAcceptedAt: new Date().toISOString(),
-    ...(request.inputHash === undefined ? {} : { relkitInputHash: request.inputHash }),
-    ...(request.inputSchemaHash === undefined ? {} : { relkitInputSchemaHash: request.inputSchemaHash }),
-    ...(acceptanceIdentity === undefined ? {} : { relkitAcceptanceIdentity: acceptanceIdentity }),
-    ...(occurrenceIdentity === undefined ? {} : { relkitOccurrenceIdentity: occurrenceIdentity }),
-    ...(request.scheduledFor === undefined ? {} : { relkitScheduledFor: request.scheduledFor }),
-    ...(request.parentRunId === undefined ? {} : { relkitParentRunId: request.parentRunId }),
-    ...(request.retryOfRunId === undefined ? {} : { relkitRetryOfRunId: request.retryOfRunId }),
-    ...(correlationId === undefined ? {} : { relkitCorrelationId: correlationId }),
-    ...(request.tags === undefined ? {} : { relkitTags: JSON.stringify(request.tags) }),
-    ...(propagation === undefined ? {} : { relkitPropagation: JSON.stringify(propagation) }),
-  };
-}
-
-function object(value: unknown): Record<string, any> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, any> : undefined;
-}
-
-function text(value: unknown, fallback: string): string {
-  return typeof value === "string" && value !== "" ? value : fallback;
+  return state
+    .run(
+      Effect.flatMap(JobStore.JobStore, (store) => store.getJob(JobStore.JobId(runId))),
+      signal,
+    )
+    .then((value) => (Option.isNone(value) ? undefined : value.value));
 }
 
 export type NativeReceiptValue = NativeSubmissionReceipt;
