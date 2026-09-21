@@ -18,7 +18,12 @@ export interface TestNativeRun {
 }
 
 export function isTerminal(status: RunSnapshot["status"]): boolean {
-  return status === "completed" || status === "failed" || status === "cancelled" || status === "timed-out";
+  return (
+    status === "completed" ||
+    status === "failed" ||
+    status === "cancelled" ||
+    status === "timed-out"
+  );
 }
 
 export function snapshotOf(run: TestNativeRun, service: string): RunSnapshot {
@@ -32,8 +37,12 @@ export function snapshotOf(run: TestNativeRun, service: string): RunSnapshot {
     buildId: run.request.buildId,
     service,
     ...(run.request.inputHash === undefined ? {} : { inputHash: run.request.inputHash }),
-    ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
-    ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
+    ...(run.request.inputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: run.request.inputSchemaHash }),
+    ...(run.request.acceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: run.request.acceptanceIdentity }),
     ...(run.request.scope === undefined ? {} : { scope: run.request.scope }),
     status: run.status,
     observedAt: new Date().toISOString(),
@@ -57,14 +66,30 @@ export function snapshotOf(run: TestNativeRun, service: string): RunSnapshot {
 }
 
 export function failureOf(value: unknown): JobErrorEnvelope {
-  const candidate = value !== null && typeof value === "object" ? value as Record<string, unknown> : undefined;
+  const candidate =
+    value !== null && typeof value === "object" ? (value as Record<string, unknown>) : undefined;
   return {
-    code: typeof candidate?.code === "string" ? candidate.code : value instanceof Error ? value.name : "RELKIT_TASK_FAILED",
-    message: typeof candidate?.message === "string" ? candidate.message : value instanceof Error ? value.message : String(value),
+    code:
+      typeof candidate?.code === "string"
+        ? candidate.code
+        : value instanceof Error
+          ? value.name
+          : "RELKIT_TASK_FAILED",
+    message:
+      typeof candidate?.message === "string"
+        ? candidate.message
+        : value instanceof Error
+          ? value.message
+          : String(value),
   };
 }
 
 export function requestKey(request: NativeSubmission): string | undefined {
-  if (request.idempotencyKey === undefined && request.occurrenceIdentity === undefined) return undefined;
-  return canonicalJson([request.jobId, request.idempotencyKey ?? null, request.occurrenceIdentity ?? null]);
+  if (request.idempotencyKey === undefined && request.occurrenceIdentity === undefined)
+    return undefined;
+  return canonicalJson([
+    request.jobId,
+    request.idempotencyKey ?? null,
+    request.occurrenceIdentity ?? null,
+  ]);
 }

@@ -1,4 +1,10 @@
-import type { RunHandle, RunListQuery, RunPage, RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type {
+  RunHandle,
+  RunListQuery,
+  RunPage,
+  RunSnapshot,
+  RunWatchFrame,
+} from "@relkit/contracts/jobs";
 import type {
   NativeRunQuery,
   NativeTaskWork,
@@ -9,7 +15,12 @@ import type {
   TaskExecutionEnvelope,
 } from "@relkit/jobs/adapter";
 import type { TestClock } from "./runtime.js";
-import { failureOf, isTerminal, snapshotOf, type TestNativeRun } from "./test-jobs-adapter-support.js";
+import {
+  failureOf,
+  isTerminal,
+  snapshotOf,
+  type TestNativeRun,
+} from "./test-jobs-adapter-support.js";
 
 export function createRun(
   request: NativeSubmission,
@@ -105,12 +116,18 @@ export async function next(
     buildId: run.request.buildId,
     input: run.canonicalInput,
     ...(run.request.inputHash === undefined ? {} : { inputHash: run.request.inputHash }),
-    ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
+    ...(run.request.inputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: run.request.inputSchemaHash }),
     acceptedAt: run.acceptedAt,
     attempt: run.attempt,
     ...(run.request.scope === undefined ? {} : { scope: run.request.scope }),
-    ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
-    ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
+    ...(run.request.acceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: run.request.acceptanceIdentity }),
+    ...(run.request.occurrenceIdentity === undefined
+      ? {}
+      : { occurrenceIdentity: run.request.occurrenceIdentity }),
   };
   const binding: TaskExecutionBinding = {
     run: {
@@ -124,23 +141,37 @@ export async function next(
       attempt: run.attempt,
       acceptedAt: run.acceptedAt,
       scope: run.request.scope ?? context.scope,
-      ...(run.request.inputSchemaHash === undefined ? {} : { inputSchemaHash: run.request.inputSchemaHash }),
-      ...(run.request.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: run.request.acceptanceIdentity }),
-      ...(run.request.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: run.request.occurrenceIdentity }),
+      ...(run.request.inputSchemaHash === undefined
+        ? {}
+        : { inputSchemaHash: run.request.inputSchemaHash }),
+      ...(run.request.acceptanceIdentity === undefined
+        ? {}
+        : { acceptanceIdentity: run.request.acceptanceIdentity }),
+      ...(run.request.occurrenceIdentity === undefined
+        ? {}
+        : { occurrenceIdentity: run.request.occurrenceIdentity }),
     },
     signal: controller.signal,
   };
   return { envelope, binding };
 }
 
-export async function complete(run: TestNativeRun | undefined, output: unknown, clock: TestClock): Promise<void> {
+export async function complete(
+  run: TestNativeRun | undefined,
+  output: unknown,
+  clock: TestClock,
+): Promise<void> {
   if (run === undefined || isTerminal(run.status)) return;
   run.status = "completed";
   run.output = output;
   run.completedAt = clock.now().toISOString();
 }
 
-export async function fail(run: TestNativeRun | undefined, error: unknown, clock: TestClock): Promise<void> {
+export async function fail(
+  run: TestNativeRun | undefined,
+  error: unknown,
+  clock: TestClock,
+): Promise<void> {
   if (run === undefined || isTerminal(run.status)) return;
   run.status = "failed";
   run.error = failureOf(error);
@@ -148,8 +179,10 @@ export async function fail(run: TestNativeRun | undefined, error: unknown, clock
 }
 
 function matches(run: TestNativeRun, query: RunListQuery): boolean {
-  return (query.runId === undefined || query.runId === run.runId) &&
+  return (
+    (query.runId === undefined || query.runId === run.runId) &&
     (query.jobId === undefined || query.jobId === run.request.jobId) &&
     (query.taskId === undefined || query.taskId === run.request.taskId) &&
-    (query.status === undefined || query.status.includes(run.status));
+    (query.status === undefined || query.status.includes(run.status))
+  );
 }

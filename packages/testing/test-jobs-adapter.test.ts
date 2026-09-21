@@ -20,23 +20,41 @@ test("keeps type-preserving identity tuples distinct", () => {
 test("uses first-wins submission deduplication and native retry deduplication", async () => {
   const adapter = createDeterministicJobsAdapter({ startTimeMs: 1_000 });
   const first = await adapter.submit(request("1", "submit-1"), context);
-  const duplicate = await adapter.submit({ ...request("2", "submit-2"), idempotencyKey: "business-key" }, context);
-  const same = await adapter.submit({ ...request("3", "submit-3"), idempotencyKey: "business-key" }, context);
+  const duplicate = await adapter.submit(
+    { ...request("2", "submit-2"), idempotencyKey: "business-key" },
+    context,
+  );
+  const same = await adapter.submit(
+    { ...request("3", "submit-3"), idempotencyKey: "business-key" },
+    context,
+  );
   expect((first as { readonly accepted: boolean }).accepted).toBe(true);
-  expect((same as { readonly runId: string }).runId).toBe((duplicate as { readonly runId: string }).runId);
+  expect((same as { readonly runId: string }).runId).toBe(
+    (duplicate as { readonly runId: string }).runId,
+  );
   expect((same as { readonly duplicate?: boolean }).duplicate).toBe(true);
 
   const run = first as { readonly runId: string };
   await adapter.worker!.fail(run.runId, new Error("failed"), context);
-  const retried = await adapter.retry!({ runId: run.runId, operationId: "retry-1", retryIdentity: "retry-identity" }, context);
-  const repeated = await adapter.retry!({ runId: run.runId, operationId: "retry-1", retryIdentity: "retry-identity" }, context);
+  const retried = await adapter.retry!(
+    { runId: run.runId, operationId: "retry-1", retryIdentity: "retry-identity" },
+    context,
+  );
+  const repeated = await adapter.retry!(
+    { runId: run.runId, operationId: "retry-1", retryIdentity: "retry-identity" },
+    context,
+  );
   expect((retried as { readonly retryOfRunId: string }).retryOfRunId).toBe(run.runId);
-  expect((repeated as { readonly runId: string }).runId).toBe((retried as { readonly runId: string }).runId);
+  expect((repeated as { readonly runId: string }).runId).toBe(
+    (retried as { readonly runId: string }).runId,
+  );
 });
 
 test("makes cancel race and unknown write outcomes explicit", async () => {
   const adapter = createDeterministicJobsAdapter({ startTimeMs: 1_000 });
-  const accepted = await adapter.submit(request("cancel", "submit"), context) as { readonly runId: string };
+  const accepted = (await adapter.submit(request("cancel", "submit"), context)) as {
+    readonly runId: string;
+  };
   const first = await adapter.cancel({ runId: accepted.runId, operationId: "cancel-1" }, context);
   const second = await adapter.cancel({ runId: accepted.runId, operationId: "cancel-2" }, context);
   expect(first).toMatchObject({ outcome: "requested" });

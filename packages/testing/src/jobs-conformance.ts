@@ -1,6 +1,10 @@
 import type { RunHandle } from "@relkit/contracts/jobs";
 import type { JobsAdapterRuntime, NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
-import { createDeterministicJobsAdapter, type TestJobsAdapter, type TestJobsAdapterOptions } from "./test-jobs-adapter.js";
+import {
+  createDeterministicJobsAdapter,
+  type TestJobsAdapter,
+  type TestJobsAdapterOptions,
+} from "./test-jobs-adapter.js";
 
 export interface JobsConformanceFixture {
   readonly id: string;
@@ -8,12 +12,21 @@ export interface JobsConformanceFixture {
 }
 
 export const JOBS_CONFORMANCE_FIXTURES: readonly JobsConformanceFixture[] = Object.freeze([
-  { id: "runtime-isolation", description: "two runtimes keep their runs and capabilities isolated" },
-  { id: "canonical-validation", description: "native submission carries a canonical wire envelope" },
+  {
+    id: "runtime-isolation",
+    description: "two runtimes keep their runs and capabilities isolated",
+  },
+  {
+    id: "canonical-validation",
+    description: "native submission carries a canonical wire envelope",
+  },
   { id: "unknown-acknowledgement", description: "ambiguous writes retain operation identity" },
   { id: "cancel-race", description: "the first terminal control transition wins" },
   { id: "retry-deduplication", description: "one retry operation creates one new run" },
-  { id: "identity-rotation", description: "accepted identity remains distinct from service generation" },
+  {
+    id: "identity-rotation",
+    description: "accepted identity remains distinct from service generation",
+  },
 ]);
 
 export interface JobsConformanceHarness {
@@ -23,7 +36,9 @@ export interface JobsConformanceHarness {
   readonly run: (fixtureId: string) => Promise<RunHandle | undefined>;
 }
 
-export function createJobsConformanceHarness(options: TestJobsAdapterOptions = {}): JobsConformanceHarness {
+export function createJobsConformanceHarness(
+  options: TestJobsAdapterOptions = {},
+): JobsConformanceHarness {
   const adapter = createDeterministicJobsAdapter(options);
   const context: OperationContext = {
     signal: new AbortController().signal,
@@ -68,22 +83,36 @@ async function runFixture(
 ): Promise<RunHandle | undefined> {
   const first = await adapter.submit(request(fixtureId, "first"), context);
   if (fixtureId === "unknown-acknowledgement") {
-    if (first === undefined || (first as { readonly outcome?: string }).outcome !== "unknown") throw new Error("Unknown outcome fixture did not remain unknown");
+    if (first === undefined || (first as { readonly outcome?: string }).outcome !== "unknown")
+      throw new Error("Unknown outcome fixture did not remain unknown");
     return undefined;
   }
   if (!isHandle(first)) throw new Error(`Fixture ${fixtureId} was not accepted`);
-  if (fixtureId === "runtime-isolation" || fixtureId === "canonical-validation" || fixtureId === "identity-rotation") return first;
+  if (
+    fixtureId === "runtime-isolation" ||
+    fixtureId === "canonical-validation" ||
+    fixtureId === "identity-rotation"
+  )
+    return first;
   if (fixtureId === "cancel-race") {
-    const cancelled = await adapter.cancel({ runId: first.runId, operationId: "cancel-1" }, context);
-    if ((cancelled as { readonly outcome?: string }).outcome !== "requested") throw new Error("Cancel race did not win first transition");
+    const cancelled = await adapter.cancel(
+      { runId: first.runId, operationId: "cancel-1" },
+      context,
+    );
+    if ((cancelled as { readonly outcome?: string }).outcome !== "requested")
+      throw new Error("Cancel race did not win first transition");
     return first;
   }
   if (fixtureId === "retry-deduplication") {
     const worker = adapter.worker;
     if (worker === undefined) throw new Error("Retry fixture requires a worker");
     await worker.fail(first.runId, new Error("fixture"), context);
-    const retried = await adapter.retry?.({ runId: first.runId, operationId: "retry-1", retryIdentity: "retry-identity" }, context);
-    if (!isHandle(retried) || retried.runId === first.runId) throw new Error("Retry fixture did not create a new run");
+    const retried = await adapter.retry?.(
+      { runId: first.runId, operationId: "retry-1", retryIdentity: "retry-identity" },
+      context,
+    );
+    if (!isHandle(retried) || retried.runId === first.runId)
+      throw new Error("Retry fixture did not create a new run");
     return retried;
   }
   throw new Error(`Unknown conformance fixture ${fixtureId}`);
@@ -104,5 +133,10 @@ function request(fixtureId: string, operationId: string): NativeSubmission {
 }
 
 function isHandle(value: unknown): value is RunHandle {
-  return value !== null && typeof value === "object" && (value as { readonly accepted?: unknown }).accepted === true && typeof (value as { readonly runId?: unknown }).runId === "string";
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    (value as { readonly accepted?: unknown }).accepted === true &&
+    typeof (value as { readonly runId?: unknown }).runId === "string"
+  );
 }

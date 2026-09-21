@@ -1,4 +1,8 @@
-import type { JobUnknownOutcome, RunCancellationReceipt, RunRetryReceipt } from "@relkit/contracts/jobs";
+import type {
+  JobUnknownOutcome,
+  RunCancellationReceipt,
+  RunRetryReceipt,
+} from "@relkit/contracts/jobs";
 import type {
   NativeCancelRequest,
   NativeControlReceipt,
@@ -22,8 +26,18 @@ export async function cancel(
   const run = runs.get(request.runId);
   if (run === undefined) throw new Error("Test run was not found");
   const receipt: RunCancellationReceipt = isTerminal(run.status)
-    ? { runId: run.runId, operationId: request.operationId, outcome: "already-terminal", run: snapshotOf(run, service) }
-    : { runId: run.runId, operationId: request.operationId, outcome: "requested", requestedAt: new Date().toISOString() };
+    ? {
+        runId: run.runId,
+        operationId: request.operationId,
+        outcome: "already-terminal",
+        run: snapshotOf(run, service),
+      }
+    : {
+        runId: run.runId,
+        operationId: request.operationId,
+        outcome: "requested",
+        requestedAt: new Date().toISOString(),
+      };
   if (receipt.outcome === "requested") {
     run.status = "cancelled";
     run.completedAt = new Date().toISOString();
@@ -46,8 +60,15 @@ export async function retry(
   const previous = receipts.get(key);
   if (previous !== undefined) return previous;
   const original = runs.get(request.runId);
-  if (original === undefined || !isTerminal(original.status)) throw new Error("Test retry requires a terminal run");
-  const { completedAt: _completedAt, output: _output, error: _error, controller: _controller, ...prior } = original;
+  if (original === undefined || !isTerminal(original.status))
+    throw new Error("Test retry requires a terminal run");
+  const {
+    completedAt: _completedAt,
+    output: _output,
+    error: _error,
+    controller: _controller,
+    ...prior
+  } = original;
   const run: TestNativeRun = {
     ...prior,
     runId: `test-run-${runs.size + 1}`,
