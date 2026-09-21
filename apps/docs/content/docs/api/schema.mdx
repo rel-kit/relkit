@@ -360,6 +360,7 @@ declare const fileSchema: (options?: FileSchemaOptions) => FileSchema;
   - [StringSchema](#stringschema)
   - [ZBuilder](#zbuilder)
   - [getJsonSchema](#getjsonschema)
+  - [getSchemaMetadata](#getschemametadata)
   - [isJsonSchemaAvailable](#isjsonschemaavailable)
   - [isSchemaTransformed](#isschematransformed)
   - [toJsonSchema](#tojsonschema)
@@ -654,6 +655,16 @@ declare const getJsonSchema: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L7)
 
+## getSchemaMetadata
+
+**Signature**
+
+```ts
+declare const getSchemaMetadata: (schema: StandardSchemaV1) => SchemaMetadata | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/index.ts#L5)
+
 ## isJsonSchemaAvailable
 
 **Signature**
@@ -852,7 +863,7 @@ declare const getJsonSchema: (
 ) => JsonSchemaResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L74)
 
 ## getSchemaProjection
 
@@ -877,7 +888,7 @@ declare const getSchemaProjection: (
 declare const isJsonSchemaAvailable: (result: JsonSchemaResult) => result is JsonSchemaAvailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L99)
 
 ## isSchemaOptional
 
@@ -892,7 +903,7 @@ declare const isSchemaOptional: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L66)
 
 ## toJsonSchema
 
@@ -907,7 +918,7 @@ declare const toJsonSchema: (
 ) => JsonSchemaResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/json-schema.ts#L97)
 
 ## `schema-impl.ts`
 
@@ -935,7 +946,7 @@ declare class SchemaValidationError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L39)
 
 ### issues (property)
 
@@ -945,7 +956,7 @@ declare class SchemaValidationError {
 readonly issues: ReadonlyArray<StandardIssue>
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L40)
 
 ## createSchema
 
@@ -958,7 +969,7 @@ declare const createSchema: <TInput, TOutput>(
 ) => Schema<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L47)
 
 ## runSchema
 
@@ -972,7 +983,7 @@ declare const runSchema: <TOutput>(
 ) => StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-impl.ts#L55)
 
 ## `schema-metadata.ts`
 
@@ -1106,7 +1117,7 @@ declare const withDefaultMetadata: <T>(
 ) => SchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L91)
 
 ## withNullableMetadata
 
@@ -1116,7 +1127,7 @@ declare const withDefaultMetadata: <T>(
 declare const withNullableMetadata: (schema: StandardSchemaV1) => SchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L76)
 
 ## withOptionalMetadata
 
@@ -1126,7 +1137,7 @@ declare const withNullableMetadata: (schema: StandardSchemaV1) => SchemaMetadata
 declare const withOptionalMetadata: (schema: StandardSchemaV1) => SchemaMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L67)
 
 ## withRefinementMetadata
 
@@ -1147,6 +1158,101 @@ declare const withTransformMetadata: (schema: StandardSchemaV1) => SchemaMetadat
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-metadata.ts#L56)
+
+## `schema-result.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [failure](#failure)
+  - [flatMapResult](#flatmapresult)
+  - [isFailure](#isfailure)
+  - [isPromiseLike](#ispromiselike)
+  - [mapResult](#mapresult)
+  - [mapValue](#mapvalue)
+  - [success](#success)
+
+---
+
+# utils
+
+## failure
+
+**Signature**
+
+```ts
+declare const failure: (message: string, path: readonly StandardPathSegment[]) => StandardFailure;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L45)
+
+## flatMapResult
+
+**Signature**
+
+```ts
+declare const flatMapResult: <T, U>(
+  result: StandardResult<T> | Promise<StandardResult<T>>,
+  map: (value: T) => StandardResult<U> | Promise<StandardResult<U>>,
+) => StandardResult<U> | Promise<StandardResult<U>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L15)
+
+## isFailure
+
+**Signature**
+
+```ts
+declare const isFailure: <T>(result: StandardResult<T>) => result is StandardFailure;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L37)
+
+## isPromiseLike
+
+**Signature**
+
+```ts
+declare const isPromiseLike: <T>(value: unknown) => value is PromiseLike<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L28)
+
+## mapResult
+
+**Signature**
+
+```ts
+declare const mapResult: <T, U>(
+  result: StandardResult<T> | Promise<StandardResult<T>>,
+  map: (value: StandardResult<T>) => U,
+) => U | Promise<U>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L8)
+
+## mapValue
+
+**Signature**
+
+```ts
+declare const mapValue: <T, U>(value: T | Promise<T>, map: (value: T) => U) => U | Promise<U>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L24)
+
+## success
+
+**Signature**
+
+```ts
+declare const success: <T>(value: T) => StandardSuccess<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/schema/src/schema-result.ts#L41)
 
 ## `standard-schema.ts`
 
