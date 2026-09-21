@@ -44,7 +44,8 @@ export async function fetchJobsJson(
     ...(options.signal === undefined ? {} : { signal: options.signal }),
   };
   if (options.body !== undefined) init.body = JSON.stringify(options.body);
-  const response = await fetch(url, init); // codeql[js/request-forgery]
+  // codeql[js/request-forgery]
+  const response = await fetch(url, init);
   const body = await response.json().catch(() => ({}));
   if (!response.ok)
     throw new JobsCommandError(
