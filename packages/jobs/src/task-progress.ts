@@ -43,7 +43,10 @@ export type TaskEmissionErrorCode =
   | "RELKIT_TASK_EMISSION_ABORTED";
 
 export class TaskEmissionError extends TypeError {
-  constructor(readonly code: TaskEmissionErrorCode, message: string) {
+  constructor(
+    readonly code: TaskEmissionErrorCode,
+    message: string,
+  ) {
     super(message);
     this.name = "TaskEmissionError";
   }
@@ -71,11 +74,7 @@ export function createTaskStreamEmitter<S extends StandardSchemaV1>(
             sink(value, signal, { name, ...(generation === undefined ? {} : { generation }) }),
         }),
   };
-  return createEmitter(
-    schema,
-    emitterOptions,
-    "stream",
-  );
+  return createEmitter(schema, emitterOptions, "stream");
 }
 
 function createEmitter<S extends StandardSchemaV1>(
@@ -84,9 +83,12 @@ function createEmitter<S extends StandardSchemaV1>(
   kind: "progress" | "stream",
 ): TaskProgressEmitter<InferInput<S>> {
   const maxBytes = options.maxBytes ?? TASK_ITEM_MAX_BYTES;
-  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) throw new TypeError("Emission byte limit must be positive");
-  const invalidCode = kind === "progress" ? "RELKIT_TASK_PROGRESS_INVALID" : "RELKIT_TASK_STREAM_INVALID";
-  const largeCode = kind === "progress" ? "RELKIT_TASK_PROGRESS_TOO_LARGE" : "RELKIT_TASK_STREAM_TOO_LARGE";
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1)
+    throw new TypeError("Emission byte limit must be positive");
+  const invalidCode =
+    kind === "progress" ? "RELKIT_TASK_PROGRESS_INVALID" : "RELKIT_TASK_STREAM_INVALID";
+  const largeCode =
+    kind === "progress" ? "RELKIT_TASK_PROGRESS_TOO_LARGE" : "RELKIT_TASK_STREAM_TOO_LARGE";
   const persistenceCode =
     kind === "progress" ? "RELKIT_TASK_PROGRESS_PERSISTENCE" : "RELKIT_TASK_STREAM_PERSISTENCE";
   const retentionCode =
@@ -94,7 +96,8 @@ function createEmitter<S extends StandardSchemaV1>(
   const signal = options.signal ?? new AbortController().signal;
   return Object.freeze({
     emit: async (input: InferInput<S>) => {
-      if (signal.aborted) throw new TaskEmissionError("RELKIT_TASK_EMISSION_ABORTED", "Emission was aborted");
+      if (signal.aborted)
+        throw new TaskEmissionError("RELKIT_TASK_EMISSION_ABORTED", "Emission was aborted");
       const value = await validated(schema, input, invalidCode);
       let encoded: string;
       try {
@@ -106,22 +109,35 @@ function createEmitter<S extends StandardSchemaV1>(
         throw new TaskEmissionError(largeCode, `${kind} item exceeds ${maxBytes} encoded bytes`);
       }
       if (options.sink === undefined) {
-        if (options.durable) throw new TaskEmissionError(persistenceCode, `No durable ${kind} sink is configured`);
-        return Object.freeze({ outcome: "unavailable" as const, reason: `No ${kind} sink is configured` });
+        if (options.durable)
+          throw new TaskEmissionError(persistenceCode, `No durable ${kind} sink is configured`);
+        return Object.freeze({
+          outcome: "unavailable" as const,
+          reason: `No ${kind} sink is configured`,
+        });
       }
       try {
         const receipt = await options.sink(value, signal);
         const normalized = normalizeReceipt(receipt);
         if (options.generation !== undefined) {
           if (normalized.generation !== undefined && normalized.generation !== options.generation) {
-            throw new TaskEmissionError(retentionCode, `${kind} receipt generation does not match the active attempt`);
+            throw new TaskEmissionError(
+              retentionCode,
+              `${kind} receipt generation does not match the active attempt`,
+            );
           }
           if (options.requireGeneration === true && normalized.generation !== options.generation) {
-            throw new TaskEmissionError(retentionCode, `Durable ${kind} receipt is missing its generation identity`);
+            throw new TaskEmissionError(
+              retentionCode,
+              `Durable ${kind} receipt is missing its generation identity`,
+            );
           }
         }
         if (options.durable && normalized.outcome !== "persisted") {
-          throw new TaskEmissionError(persistenceCode, `Durable ${kind} emission was not persisted`);
+          throw new TaskEmissionError(
+            persistenceCode,
+            `Durable ${kind} emission was not persisted`,
+          );
         }
         return Object.freeze(normalized);
       } catch (error) {

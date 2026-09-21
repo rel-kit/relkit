@@ -41,14 +41,16 @@ export function assertFieldName(value: unknown, name = "field name"): asserts va
 
 export function memoryBytes(value: string): number {
   const match = MEMORY_PATTERN.exec(value);
-  if (!match || value.length > 128) throw new TypeError("Memory must be a decimal MiB or GiB value");
+  if (!match || value.length > 128)
+    throw new TypeError("Memory must be a decimal MiB or GiB value");
   const whole = match[1];
   const fraction = match[2] ?? "";
   const unit = match[3] as keyof typeof MEMORY_UNITS;
   const scale = 10n ** BigInt(fraction.length);
   const amount = BigInt(whole!) * scale + BigInt(fraction || "0");
   const bytesNumerator = amount * MEMORY_UNITS[unit];
-  if (bytesNumerator % scale !== 0n) throw new TypeError("Memory must resolve to an exact byte count");
+  if (bytesNumerator % scale !== 0n)
+    throw new TypeError("Memory must resolve to an exact byte count");
   const bytes = bytesNumerator / scale;
   if (bytes < 1n || bytes > MAX_SAFE) throw new TypeError("Memory is outside the safe byte range");
   return Number(bytes);
@@ -60,7 +62,8 @@ export function retryDelayMillis(
   retryAfterMillis = 0,
   random = Math.random,
 ): number {
-  if (!Number.isSafeInteger(attempt) || attempt < 1) throw new TypeError("attempt must be positive");
+  if (!Number.isSafeInteger(attempt) || attempt < 1)
+    throw new TypeError("attempt must be positive");
   if (!Number.isSafeInteger(retryAfterMillis) || retryAfterMillis < 0) {
     throw new TypeError("retry-after must be a non-negative safe integer");
   }
@@ -68,7 +71,8 @@ export function retryDelayMillis(
   const maximum = durationToMillis(policy.maxDelay);
   let cap = initial;
   for (let index = 1; index < attempt && cap < maximum; index += 1) {
-    cap = cap > maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
+    cap =
+      cap > maximum / policy.factor ? maximum : Math.min(maximum, Math.floor(cap * policy.factor));
   }
   if (policy.jitter === "none") return Math.max(cap, retryAfterMillis);
   const sample = random();
@@ -92,7 +96,12 @@ export function copyTaskTags(value: unknown): readonly string[] | undefined {
 
 export function copyResources(value: unknown): TaskResources | undefined {
   if (value === undefined) return undefined;
-  if (!isRecord(value) || typeof value.cpu !== "number" || !Number.isFinite(value.cpu) || value.cpu <= 0) {
+  if (
+    !isRecord(value) ||
+    typeof value.cpu !== "number" ||
+    !Number.isFinite(value.cpu) ||
+    value.cpu <= 0
+  ) {
     throw new TypeError("resources.cpu must be a positive finite number");
   }
   if (typeof value.memory !== "string") {
@@ -115,21 +124,33 @@ export function copyConcurrency(
   const key = value.key;
   if (key !== undefined) {
     assertFieldName(key, "concurrency.key");
-    if (canonicalSchema !== undefined) assertCanonicalScalarKey(canonicalSchema, key, "concurrency.key");
+    if (canonicalSchema !== undefined)
+      assertCanonicalScalarKey(canonicalSchema, key, "concurrency.key");
   }
   return Object.freeze({ limit, ...(key === undefined ? {} : { key }) });
 }
 
-export function assertCanonicalScalarKey(schema: StandardSchemaV1, key: string, name: string): void {
+export function assertCanonicalScalarKey(
+  schema: StandardSchemaV1,
+  key: string,
+  name: string,
+): void {
   const projection = getJsonSchema(schema, { direction: "output" });
-  if (!projection.ok || !isRecord(projection.schema.properties) || !Array.isArray(projection.schema.required)) {
+  if (
+    !projection.ok ||
+    !isRecord(projection.schema.properties) ||
+    !Array.isArray(projection.schema.required)
+  ) {
     throw new TypeError(`${name} requires a projected canonical object schema`);
   }
   if (!projection.schema.required.includes(key)) {
     throw new TypeError(`${name} must identify a required canonical field`);
   }
   const field = projection.schema.properties[key];
-  if (!isRecord(field) || (field.type !== "string" && field.type !== "number" && field.type !== "integer")) {
+  if (
+    !isRecord(field) ||
+    (field.type !== "string" && field.type !== "number" && field.type !== "integer")
+  ) {
     throw new TypeError(`${name} must identify a canonical string or number field`);
   }
 }
@@ -137,7 +158,10 @@ export function assertCanonicalScalarKey(schema: StandardSchemaV1, key: string, 
 export function copyLogging(value: unknown): TaskLogging | undefined {
   if (value === undefined) return undefined;
   if (!isRecord(value)) throw new TypeError("Task logging must be an object");
-  if (value.level !== undefined && !["trace", "debug", "info", "warn", "error"].includes(value.level as string)) {
+  if (
+    value.level !== undefined &&
+    !["trace", "debug", "info", "warn", "error"].includes(value.level as string)
+  ) {
     throw new TypeError("logging.level is invalid");
   }
   if (value.redact !== undefined && !Array.isArray(value.redact)) {

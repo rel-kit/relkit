@@ -3,7 +3,10 @@ import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
 export class JobSubmissionError extends Error {
   readonly code = "RELKIT_JOB_SUBMISSION_FAILED" as const;
 
-  constructor(message: string, readonly cause?: unknown) {
+  constructor(
+    message: string,
+    readonly cause?: unknown,
+  ) {
     super(message);
     this.name = "JobSubmissionError";
   }
@@ -37,7 +40,9 @@ export class JobSubmissionUnknownError extends Error {
     readonly idempotencyKey: string | undefined,
     recovery: JobUnknownOutcome["recovery"] = { action: "inspect-native" },
   ) {
-    super("Native job acceptance is unknown; retry with the same idempotency key or inspect the run");
+    super(
+      "Native job acceptance is unknown; retry with the same idempotency key or inspect the run",
+    );
     this.name = "JobSubmissionUnknownError";
     this.recovery = Object.freeze({ ...recovery });
   }

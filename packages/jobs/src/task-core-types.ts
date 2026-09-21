@@ -2,7 +2,6 @@ import type {
   JobRefAny,
   NamedStreamFrame,
   ProgressEmitReceipt,
-  RunHandle,
   TaskRefAny,
 } from "@relkit/contracts/jobs";
 import type {
@@ -23,7 +22,7 @@ import type {
 } from "@relkit/invocation";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "@relkit/schema";
 import type { DurationInput } from "./duration.js";
-import type { ServerTriggerOptions } from "./trigger-types.js";
+import type { JobTriggerClients, TaskClients } from "./task-client-types.js";
 
 export type {
   JobDescriptorForThisTask,
@@ -34,6 +33,13 @@ export type {
 } from "./trigger-types.js";
 
 export type { DurationInput } from "./duration.js";
+export type {
+  InputOf,
+  JobTriggerClients,
+  OutputOf,
+  TaskClientFor,
+  TaskClients,
+} from "./task-client-types.js";
 
 export type TaskExecution = "durable" | "retryable";
 export type MemoryInput = `${number} MiB` | `${number} GiB`;
@@ -43,7 +49,10 @@ type PublishedEventMap<Names extends readonly string[]> = {
   readonly [Name in Extract<Names[number], PublishedEventName>]: Relkit.EventRegistry[Name];
 };
 
-type RegisteredContext<Key extends PropertyKey, Fallback> = Key extends keyof Relkit.ApplicationContextRegistry
+type RegisteredContext<
+  Key extends PropertyKey,
+  Fallback,
+> = Key extends keyof Relkit.ApplicationContextRegistry
   ? Relkit.ApplicationContextRegistry[Key]
   : Fallback;
 
@@ -80,30 +89,6 @@ export interface TaskConcurrency<InputKey extends string = string> {
 export interface TaskSleepOptions {
   readonly key: string;
 }
-
-export type InputOf<T> = T extends { readonly input: infer Schema }
-  ? Schema extends StandardSchemaV1
-    ? InferInput<Schema>
-    : unknown
-  : unknown;
-export type OutputOf<T> = T extends { readonly output: infer Schema }
-  ? Schema extends StandardSchemaV1
-    ? InferOutput<Schema>
-    : unknown
-  : unknown;
-
-export type TaskClientFor<T> = {
-  readonly trigger: (input: InputOf<T>, options?: ServerTriggerOptions) => Promise<RunHandle>;
-};
-export type TaskClients<M> = {
-  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
-};
-type TaskJobClientFor<T> = {
-  readonly trigger: (input: InputOf<T>, options?: ServerTriggerOptions) => Promise<RunHandle>;
-};
-export type JobTriggerClients<M> = {
-  readonly [Name in keyof NonNullable<M> & string]: TaskJobClientFor<NonNullable<M>[Name]>;
-};
 
 export interface TaskProgressEmitter<Value = unknown> {
   readonly emit: (value: Value) => Promise<ProgressEmitReceipt>;

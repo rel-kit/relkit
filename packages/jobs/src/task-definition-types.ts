@@ -17,68 +17,32 @@ import type {
   TaskRetryPolicy,
   PublishedEventName,
 } from "./task-core-types.js";
+import type {
+  TaskFailureHook,
+  TaskHandler,
+  TaskHandlerResult,
+  TaskLogging,
+  TaskObservation,
+  TaskStartHook,
+  TaskSuccessHook,
+} from "./task-definition-support-types.js";
 
-export type TaskHandler<
-  InputSchema extends StandardSchemaV1,
-  OutputSchema extends StandardSchemaV1,
-  Execution extends TaskExecution,
-  Dependencies extends TaskDependencies,
-  Errors extends readonly ErrorDescriptorAny[],
-  ProgressSchema extends StandardSchemaV1 | undefined,
-  Streams extends TaskStreamSchemas,
-  Publishes extends readonly string[],
-> = (
-  input: InferOutput<InputSchema>,
-  context: TaskContext<Execution, Dependencies, ProgressSchema, Streams, Publishes>,
-) => MaybePromise<TaskHandlerResult<InferInput<OutputSchema>, Errors>>;
+export type {
+  TaskFailureHook,
+  TaskHandler,
+  TaskHandlerResult,
+  TaskLogging,
+  TaskObservation,
+  TaskStartHook,
+  TaskSuccessHook,
+} from "./task-definition-support-types.js";
 
-export type TaskHandlerResult<
-  Output,
-  Errors extends readonly ErrorDescriptorAny[],
-> = Output | DeclaredErrorsOf<Errors> | FunctionFailure<DeclaredErrorsOf<Errors>>;
-
-export type TaskStartHook<
-  InputSchema extends StandardSchemaV1,
-  Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (
-  input: InferOutput<InputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
-) => Promise<void>;
-export type TaskSuccessHook<
-  OutputSchema extends StandardSchemaV1,
-  Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (
-  output: InferOutput<OutputSchema>,
-  context: TaskHookContext<Dependencies, Publishes>,
-) => Promise<void>;
-export type TaskFailureHook<
-  Dependencies extends TaskDependencies,
-  Publishes extends readonly string[] = readonly [],
-> = (
-  error: unknown,
-  context: TaskHookContext<Dependencies, Publishes>,
-) => Promise<void>;
-
-export interface TaskObservation<
-  Streams extends TaskStreamSchemas = TaskStreamSchemas,
-  ProgressSchema extends StandardSchemaV1 | undefined = StandardSchemaV1 | undefined,
-> {
-  readonly progress?: [ProgressSchema] extends [undefined] ? never : "live" | "durable";
-  readonly streams?: Readonly<{ [Name in keyof Streams & string]?: "live" | "history" }>;
-}
-
-export interface TaskLogging {
-  readonly level?: "trace" | "debug" | "info" | "warn" | "error";
-  readonly redact?: readonly string[];
-}
-
-type ValidTaskDependencies<Dependencies extends TaskDependencies> = "functions" extends keyof Dependencies
-  ? never
-  : "events" extends keyof Dependencies
+type ValidTaskDependencies<Dependencies extends TaskDependencies> =
+  "functions" extends keyof Dependencies
     ? never
-    : Dependencies;
+    : "events" extends keyof Dependencies
+      ? never
+      : Dependencies;
 
 type CanonicalInputKey<Schema extends StandardSchemaV1> = string extends keyof InferOutput<Schema>
   ? string
@@ -140,8 +104,8 @@ export interface TaskDescriptor<
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = TaskExecution,
-> extends DescriptorBase<"task", Id>,
-    TaskRef<Id, InputSchema, OutputSchema, Errors> {
+>
+  extends DescriptorBase<"task", Id>, TaskRef<Id, InputSchema, OutputSchema, Errors> {
   readonly version: Version;
   readonly execution: Execution;
   readonly inputWire?: StandardSchemaV1<InferOutput<InputSchema>, InferOutput<InputSchema>>;

@@ -1,6 +1,10 @@
 import { canonicalJson, type JsonValue, type TracePropagation } from "@relkit/contracts";
 import type { JobUnknownOutcome, RunHandle } from "@relkit/contracts/jobs";
-import { currentInvocationScope, currentTaskAncestry, currentTracePropagation } from "@relkit/invocation";
+import {
+  currentInvocationScope,
+  currentTaskAncestry,
+  currentTracePropagation,
+} from "@relkit/invocation";
 import type { JobsAdapterRuntime, OperationContext, NativeReceipt } from "./adapter.js";
 import { durationToMillis } from "./duration.js";
 import {
@@ -81,7 +85,11 @@ export function normalizeReceipt(
   if (required.some((key) => typeof value[key] !== "string" || String(value[key]).length === 0)) {
     throw new JobReceiptError("Native submission receipt is missing durable identity");
   }
-  if (value.jobId !== binding.jobId || value.taskId !== binding.taskId || value.taskVersion !== binding.taskVersion) {
+  if (
+    value.jobId !== binding.jobId ||
+    value.taskId !== binding.taskId ||
+    value.taskVersion !== binding.taskVersion
+  ) {
     throw new JobReceiptError("Native submission receipt does not match the resolved binding");
   }
   return Object.freeze({
@@ -92,7 +100,9 @@ export function normalizeReceipt(
     taskVersion: value.taskVersion as string,
     acceptedAt: value.acceptedAt as string,
     ...(value.duplicate === true ? { duplicate: true } : {}),
-    ...(typeof value.idempotencyExpiresAt === "string" ? { idempotencyExpiresAt: value.idempotencyExpiresAt } : {}),
+    ...(typeof value.idempotencyExpiresAt === "string"
+      ? { idempotencyExpiresAt: value.idempotencyExpiresAt }
+      : {}),
   });
 }
 
@@ -102,9 +112,10 @@ export function explicitOrDerivedKey(
   input: JsonValue | undefined,
 ): string | undefined {
   const field = job?.admission?.idempotency?.key;
-  const derived = field === undefined || input === undefined || !isRecord(input)
-    ? undefined
-    : deriveKey(field, input);
+  const derived =
+    field === undefined || input === undefined || !isRecord(input)
+      ? undefined
+      : deriveKey(field, input);
   if (options.idempotencyKey !== undefined) {
     const explicit = boundedKey(options.idempotencyKey);
     if (derived !== undefined && explicit !== derived) {
@@ -117,14 +128,18 @@ export function explicitOrDerivedKey(
 
 function deriveKey(field: string, input: Record<string, unknown>): string {
   const value = input[field];
-  if ((typeof value !== "string" && typeof value !== "number") || (typeof value === "number" && !Number.isFinite(value))) {
+  if (
+    (typeof value !== "string" && typeof value !== "number") ||
+    (typeof value === "number" && !Number.isFinite(value))
+  ) {
     throw new TypeError(`Idempotency field "${field}" must be a canonical scalar`);
   }
   return boundedKey(stableIdentityTuple([field, value]));
 }
 
 export function boundedKey(value: string): string {
-  if (new TextEncoder().encode(value).byteLength > 256) throw new TypeError("Idempotency key is too long");
+  if (new TextEncoder().encode(value).byteLength > 256)
+    throw new TypeError("Idempotency key is too long");
   return value;
 }
 
@@ -141,7 +156,8 @@ export async function hashWire(value: unknown): Promise<string> {
 }
 
 export function currentCorrelation(): string | undefined {
-  const scope = currentInvocationScope() as { readonly parent?: { readonly correlationId?: string } } | undefined;
+  const scope = currentInvocationScope() as
+    { readonly parent?: { readonly correlationId?: string } } | undefined;
   return scope?.parent?.correlationId;
 }
 
@@ -162,10 +178,18 @@ export function validatedEnvelope(admission: SubmissionAdmission) {
     : { version: 1 as const, kind: "json" as const, value: admission.canonicalInput };
 }
 
-export function isUnknown(value: unknown): value is JobUnknownOutcome & { readonly recovery: JobUnknownOutcome["recovery"] } {
-  return isRecord(value) && value.outcome === "unknown" &&
-    (value.code === "RELKIT_JOB_SUBMISSION_UNKNOWN" || value.code === "RELKIT_JOB_CONTROL_UNKNOWN") &&
-    typeof value.operationId === "string" && isRecord(value.recovery) && typeof value.recovery.action === "string";
+export function isUnknown(
+  value: unknown,
+): value is JobUnknownOutcome & { readonly recovery: JobUnknownOutcome["recovery"] } {
+  return (
+    isRecord(value) &&
+    value.outcome === "unknown" &&
+    (value.code === "RELKIT_JOB_SUBMISSION_UNKNOWN" ||
+      value.code === "RELKIT_JOB_CONTROL_UNKNOWN") &&
+    typeof value.operationId === "string" &&
+    isRecord(value.recovery) &&
+    typeof value.recovery.action === "string"
+  );
 }
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
