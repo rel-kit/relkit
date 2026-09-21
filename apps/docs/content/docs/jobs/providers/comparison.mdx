@@ -1,0 +1,16 @@
+---
+title: Provider capability detail
+description: Review the detailed provider capability table.
+---
+
+| Capability                         | Inngest        | Trigger.dev            | Effect MQ                       |
+| ---------------------------------- | -------------- | ---------------------- | ------------------------------- |
+| Task submission and run lookup     | Supported      | Provider-dependent     | Supported by configured adapter |
+| Observation and run listing        | Supported      | Provider-dependent     | Supported by configured adapter |
+| Retry and cancellation             | Supported path | Provider-dependent     | Retryable queue work            |
+| Durable sleep                      | Supported path | Not claimed for Docker | Not advertised                  |
+| UTC cron schedules                 | Supported path | Provider-dependent     | Configured provider path        |
+| Provider-native worker publication | Inngest SDK    | Trigger SDK            | Effect MQ SDK                   |
+| Docker checkpoint resume           | Not a claim    | Not claimed            | Not claimed                     |
+
+Treat “provider-dependent” as an instruction to inspect the generated capability manifest, not as a promise. `relkit jobs capabilities` reports the selected profile, actual limits, and unsupported operations. The compiler should reject a job that requires a capability the binding cannot prove.

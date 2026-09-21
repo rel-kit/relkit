@@ -1,0 +1,22 @@
+---
+title: Retries and idempotency
+description: Make transient failure safe to retry.
+---
+
+The default retry policy is three attempts with a one-second initial delay, a 30-second maximum delay, factor two, and no jitter.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
+  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+</include>
+
+Set `retry` on `defineTask`, using `maxAttempts`, readable `initialDelay` and `maxDelay`, `factor`, and
+`jitter`. A job can add an admission idempotency key and retention policy, but it cannot multiply the
+task's retry budget.
+
+Retries are at-least-once. Use an idempotency key for every external side effect and store the result before acknowledging the step. A run ID is not an idempotency key: a retry keeps the run identity but may execute the task again.
+
+The dedupe scope is part of compatibility. Changing it can create duplicate work even when the task source is unchanged, so migration diagnostics treat it as a deliberate change.
+
+Classify permanent validation and authorization failures as terminal. Let transient network, rate-limit, and provider failures retry. Never log credentials or full untrusted input while diagnosing a retry loop.
+
+<include cwd>content/generated/related/jobs-retries-and-idempotency.mdx</include>
