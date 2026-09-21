@@ -34,12 +34,13 @@ export function createJobCursor(binding: JobCursorBinding, options?: JobCursorOp
     schema: binding.schema,
     position: binding.position,
   };
-  const signed = options === undefined
-    ? unsigned
-    : {
-        ...unsigned,
-        ...(options.keyId === undefined ? {} : { keyId: boundedKeyId(options.keyId) }),
-      };
+  const signed =
+    options === undefined
+      ? unsigned
+      : {
+          ...unsigned,
+          ...(options.keyId === undefined ? {} : { keyId: boundedKeyId(options.keyId) }),
+        };
   const value = options === undefined ? signed : { ...signed, mac: sign(signed, options) };
   const encoded = Buffer.from(canonicalJson(value), "utf8").toString("base64url");
   if (byteLength(encoded) > 4096) throw new JobCursorError();
@@ -62,7 +63,12 @@ export function readJobCursor(
     if (error instanceof JobCursorError) throw error;
     throw new JobCursorError();
   }
-  if (!isRecord(value) || value.version !== 1 || !isJsonValue(value.filters) || !isJsonValue(value.position)) {
+  if (
+    !isRecord(value) ||
+    value.version !== 1 ||
+    !isJsonValue(value.filters) ||
+    !isJsonValue(value.position)
+  ) {
     throw new JobCursorError();
   }
   verifySignature(value, options);
@@ -99,7 +105,8 @@ function assertBinding(binding: JobCursorBinding): void {
 
 function readBinding(value: Record<string, unknown>): JobCursorBinding {
   const fields = [value.scope, value.jobId, value.operation, value.schema];
-  if (fields.some((field) => typeof field !== "string" || field.length === 0)) throw new JobCursorError();
+  if (fields.some((field) => typeof field !== "string" || field.length === 0))
+    throw new JobCursorError();
   for (const field of [value.application, value.environment, value.subject]) {
     if (field !== undefined && typeof field !== "string") throw new JobCursorError();
   }
@@ -118,10 +125,14 @@ function readBinding(value: Record<string, unknown>): JobCursorBinding {
   return candidate;
 }
 
-function verifySignature(value: Record<string, unknown>, options: JobCursorOptions | undefined): void {
+function verifySignature(
+  value: Record<string, unknown>,
+  options: JobCursorOptions | undefined,
+): void {
   const mac = value.mac;
   if (mac === undefined && options === undefined) return;
-  if (options === undefined || typeof mac !== "string" || !isBase64Url(mac)) throw new JobCursorError();
+  if (options === undefined || typeof mac !== "string" || !isBase64Url(mac))
+    throw new JobCursorError();
   const keyId = value.keyId;
   if (keyId !== undefined && (typeof keyId !== "string" || keyId !== options.keyId)) {
     throw new JobCursorError();
@@ -148,7 +159,8 @@ function boundedKeyId(value: string): string {
 }
 
 function assertBoundedText(value: unknown): asserts value is string {
-  if (typeof value !== "string" || value.length === 0 || byteLength(value) > 256) throw new JobCursorError();
+  if (typeof value !== "string" || value.length === 0 || byteLength(value) > 256)
+    throw new JobCursorError();
 }
 
 function byteLength(value: string): number {

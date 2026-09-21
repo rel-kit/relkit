@@ -45,7 +45,13 @@ test("keeps event-to-run identities and signing-key rotation stable", () => {
     { generation: "generation-old", keyRing: oldRing },
     { generation: "generation-new", keyRing: rotated },
   ]);
-  expect(router.route(oldLocator, { application: "app", environment: "test", scope: "tenant-a" }).serviceGeneration).toBe("generation-old");
-  expect(router.route(newLocator, { application: "app", environment: "test", scope: "tenant-a" }).serviceGeneration).toBe("generation-new");
+  expect(
+    router.route(oldLocator, { application: "app", environment: "test", scope: "tenant-a" })
+      .serviceGeneration,
+  ).toBe("generation-old");
+  expect(
+    router.route(newLocator, { application: "app", environment: "test", scope: "tenant-a" })
+      .serviceGeneration,
+  ).toBe("generation-new");
   expect(stableIdentityTuple([1])).not.toBe(stableIdentityTuple(["1"]));
 });

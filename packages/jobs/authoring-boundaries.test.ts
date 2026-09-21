@@ -1,6 +1,12 @@
 import { expect, test } from "bun:test";
 import { z } from "@relkit/schema";
-import { defineJob, defineTask, durationToMillis, isJobName, JOB_NAME_RESERVED } from "./src/index.js";
+import {
+  defineJob,
+  defineTask,
+  durationToMillis,
+  isJobName,
+  JOB_NAME_RESERVED,
+} from "./src/index.js";
 
 const task = defineTask({
   id: "email",

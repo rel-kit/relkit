@@ -1,10 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { JobDescriptorAny } from "./src/job-types.js";
 import type { TaskDescriptorAny } from "./src/task-types.js";
-import {
-  JobBindingResolutionError,
-  resolveTaskBinding,
-} from "./src/resolve-binding.js";
+import { JobBindingResolutionError, resolveTaskBinding } from "./src/resolve-binding.js";
 
 const task = {
   ref: { kind: "task", id: "billing.charge" },
@@ -65,8 +62,14 @@ describe("resolveTaskBinding", () => {
     expect(() =>
       resolveTaskBinding({
         task,
-        jobs: [job("other", "other", "other", false, { ref: { kind: "task", id: "other" } } as TaskDescriptorAny)],
-        selector: job("other", "other", "other", false, { ref: { kind: "task", id: "other" } } as TaskDescriptorAny),
+        jobs: [
+          job("other", "other", "other", false, {
+            ref: { kind: "task", id: "other" },
+          } as TaskDescriptorAny),
+        ],
+        selector: job("other", "other", "other", false, {
+          ref: { kind: "task", id: "other" },
+        } as TaskDescriptorAny),
       }),
     ).toThrow(/targets task/);
   });

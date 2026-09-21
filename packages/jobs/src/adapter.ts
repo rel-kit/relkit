@@ -1,12 +1,8 @@
 import type {
   JobWireEnvelope,
-  JobUnknownOutcome,
   ProgressEmitReceipt,
-  RunCancellationReceipt,
-  RunHandle,
   RunListQuery,
   RunPage,
-  RunRetryReceipt,
   RunSnapshot,
   RunWatchFrame,
 } from "@relkit/contracts/jobs";
@@ -17,96 +13,46 @@ import {
   type JobsCapabilityReport,
   validateJobsCapabilityReport,
 } from "./capabilities.js";
+import type {
+  NativeCancelRequest,
+  NativeControlReceipt,
+  NativeReceipt,
+  NativeRetryRequest,
+  NativeSubmission,
+  NativeWatchRequest,
+  OperationContext,
+} from "./adapter-requests.js";
+
+export type {
+  NativeCancelRequest,
+  NativeControlReceipt,
+  NativeReceipt,
+  NativeRetryRequest,
+  NativeSubmission,
+  NativeWatchRequest,
+  OperationContext,
+} from "./adapter-requests.js";
 
 export const JOBS_ADAPTER_PROTOCOL_VERSION = JOBS_PROTOCOL_VERSION;
 
 export type { JobsCapabilityReport } from "./capabilities.js";
-export { JobsCapabilityError, assertAdapterMethods, assertJobsCapability, validateJobsCapabilityReport } from "./capabilities.js";
+export {
+  JobsCapabilityError,
+  assertAdapterMethods,
+  assertJobsCapability,
+  validateJobsCapabilityReport,
+} from "./capabilities.js";
 
-export interface OperationContext {
-  readonly signal: AbortSignal;
-  readonly application: string;
-  readonly environment: string;
-  readonly scope: string;
-  readonly service: string;
-  readonly serviceGeneration: string;
-  readonly operationId?: string;
-  readonly deadlineMs?: number;
-  readonly correlationId?: string;
-  readonly parentRunId?: string;
-  readonly propagation?: TracePropagation;
-  readonly acceptanceIdentity?: string;
-  readonly occurrenceIdentity?: string;
-  readonly inputSchemaHash?: string;
-  readonly retryOfRunId?: string;
-}
-
-export interface NativeSubmission {
-  readonly jobId: string;
-  readonly taskId: string;
-  readonly taskVersion: string;
-  readonly buildId: string;
-  readonly execution?: "durable" | "retryable";
-  readonly scope?: string;
-  readonly input: import("@relkit/contracts").JsonValue;
-  readonly operationId: string;
-  readonly idempotencyKey?: string;
-  readonly canonicalInput?: JobWireEnvelope;
-  readonly inputHash?: string;
-  readonly inputSchemaHash?: string;
-  readonly policy?: JsonValue;
-  readonly scheduledFor?: string;
-  readonly tags?: readonly string[];
-  readonly correlationId?: string;
-  readonly parentRunId?: string;
-  readonly propagation?: TracePropagation;
-  readonly acceptanceIdentity?: string;
-  readonly occurrenceIdentity?: string;
-  readonly retryOfRunId?: string;
-}
-
-export type NativeReceipt = RunHandle | JobUnknownOutcome;
 export type NativeRun = RunSnapshot;
 export type NativeRunQuery = RunListQuery;
 export type NativeRunPage = RunPage<NativeRun>;
 export type NativeObservation = RunWatchFrame<NativeRun>;
 export type NativeLocator = string;
-export interface NativeWatchRequest {
-  readonly runId: string;
-  readonly after?: string;
-}
-export interface NativeCancelRequest {
-  readonly runId: string;
-  readonly operationId: string;
-  readonly reason?: string;
-}
-export type NativeControlReceipt =
-  | RunCancellationReceipt
-  | RunRetryReceipt
-  | JobUnknownOutcome;
-
-export interface NativeRetryRequest {
-  readonly runId: string;
-  readonly operationId: string;
-  readonly retryIdentity?: string;
-  readonly canonicalInput?: JobWireEnvelope;
-  readonly inputHash?: string;
-  readonly inputSchemaHash?: string;
-  readonly taskId?: string;
-  readonly jobId?: string;
-  readonly taskVersion?: string;
-  readonly buildId?: string;
-  readonly scope?: string;
-  readonly acceptanceIdentity?: string;
-  readonly canonicalAdmission?: {
-    readonly validatePinnedInput: true;
-    readonly allocateFreshBudget: true;
-    readonly clearInitialDelay: true;
-  };
-}
-
 export interface NativeScheduleOperations {
-  readonly list: (query: Readonly<Record<string, unknown>>, context: OperationContext) => Promise<unknown>;
+  readonly list: (
+    query: Readonly<Record<string, unknown>>,
+    context: OperationContext,
+  ) => Promise<unknown>;
   readonly get: (id: string, context: OperationContext) => Promise<unknown>;
   readonly upsert: (definition: JsonValue, context: OperationContext) => Promise<unknown>;
   readonly pause: (id: string, context: OperationContext) => Promise<unknown>;
@@ -115,11 +61,17 @@ export interface NativeScheduleOperations {
 }
 
 export interface NativeProgressWriter {
-  readonly emit: (value: JsonValue, context?: OperationContext) => MaybePromise<ProgressEmitReceipt | void>;
+  readonly emit: (
+    value: JsonValue,
+    context?: OperationContext,
+  ) => MaybePromise<ProgressEmitReceipt | void>;
 }
 
 export interface NativeStreamWriter {
-  readonly emit: (value: JsonValue, context?: OperationContext) => MaybePromise<ProgressEmitReceipt | void>;
+  readonly emit: (
+    value: JsonValue,
+    context?: OperationContext,
+  ) => MaybePromise<ProgressEmitReceipt | void>;
 }
 
 export type NativeStreamWriters = Readonly<Record<string, NativeStreamWriter>>;
@@ -151,7 +103,10 @@ export interface TaskExecutionEnvelope {
 }
 
 export interface TaskExecutor {
-  readonly execute: (envelope: TaskExecutionEnvelope, binding: TaskExecutionBinding) => Promise<unknown>;
+  readonly execute: (
+    envelope: TaskExecutionEnvelope,
+    binding: TaskExecutionBinding,
+  ) => Promise<unknown>;
 }
 
 export interface JobsAdapterRuntime {
@@ -165,8 +120,14 @@ export interface JobsAdapterRuntime {
     request: NativeWatchRequest,
     context: OperationContext,
   ) => AsyncIterable<NativeObservation>;
-  readonly cancel: (request: NativeCancelRequest, context: OperationContext) => Promise<NativeControlReceipt>;
-  readonly retry?: (request: NativeRetryRequest, context: OperationContext) => Promise<NativeControlReceipt>;
+  readonly cancel: (
+    request: NativeCancelRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly retry?: (
+    request: NativeRetryRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
   readonly close: () => Promise<void>;
   readonly worker?: NativeTaskWorker;
   readonly schedules?: NativeScheduleOperations;
@@ -229,6 +190,9 @@ export function assertJobsAdapterRuntime(value: unknown): asserts value is JobsA
 }
 
 export function isJobsAdapterRuntime(value: unknown): value is JobsAdapterRuntime {
-  return value !== null && typeof value === "object" &&
-    (value as { readonly kind?: unknown }).kind === "jobs-adapter-runtime";
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    (value as { readonly kind?: unknown }).kind === "jobs-adapter-runtime"
+  );
 }

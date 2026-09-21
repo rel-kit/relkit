@@ -47,7 +47,12 @@ test("enforces exact memory, attempt, factor, and ordering boundaries", () => {
     expect(() => memoryBytes(value)).toThrow();
   }
   expect(
-    normalizeRetry({ maxAttempts: 1, initialDelay: "0 milliseconds", maxDelay: "0 milliseconds", factor: 1.5 }),
+    normalizeRetry({
+      maxAttempts: 1,
+      initialDelay: "0 milliseconds",
+      maxDelay: "0 milliseconds",
+      factor: 1.5,
+    }),
   ).toMatchObject({ maxAttempts: 1, factor: 1.5 });
   for (const value of [
     { maxAttempts: 1.5 },
@@ -91,13 +96,16 @@ test("checks calendar instants and positive observer/schedule durations", () => 
   expect(validateResultOptions({ timeout: "1 millisecond" })).toEqual({ timeout: "1 millisecond" });
   expect(() => validateResultOptions({ timeout: "0 milliseconds" })).toThrow();
   expect(
-    copySchedules(
-      [{ id: "repeat", every: "1 millisecond", input: { tenantId: "t" } }],
-      { canonicalSchema: z.object({ tenantId: z.string() }) },
-    ),
+    copySchedules([{ id: "repeat", every: "1 millisecond", input: { tenantId: "t" } }], {
+      canonicalSchema: z.object({ tenantId: z.string() }),
+    }),
   ).toHaveLength(1);
-  expect(() => copySchedules([{ id: "repeat", every: "0 milliseconds", input: { tenantId: "t" } }])).toThrow();
-  expect(() => copySchedules([{ id: "repeat", every: "1 minute", timezone: "UTC", input: { tenantId: "t" } }])).toThrow();
+  expect(() =>
+    copySchedules([{ id: "repeat", every: "0 milliseconds", input: { tenantId: "t" } }]),
+  ).toThrow();
+  expect(() =>
+    copySchedules([{ id: "repeat", every: "1 minute", timezone: "UTC", input: { tenantId: "t" } }]),
+  ).toThrow();
   expect(() => copyTriggerOptions({ delay: "1 second", at: "2026-01-01T00:00:00Z" })).toThrow();
 });
 
@@ -129,7 +137,11 @@ test("requires client projections to match task declarations", () => {
     } as never),
   ).toThrow("progress schema");
   expect(() =>
-    defineJob({ name: "missingStreamDeclaration", task, client: { public: true, operations: ["stream"] } } as never),
+    defineJob({
+      name: "missingStreamDeclaration",
+      task,
+      client: { public: true, operations: ["stream"] },
+    } as never),
   ).toThrow("declared task streams");
   const emptyStreamsTask = defineTask({
     id: "client-empty-stream-task",
@@ -140,7 +152,11 @@ test("requires client projections to match task declarations", () => {
     handler: async () => ({ ok: true }),
   });
   expect(() =>
-    defineJob({ name: "emptyStreamDeclaration", task: emptyStreamsTask, client: { public: true, operations: ["stream"] } } as never),
+    defineJob({
+      name: "emptyStreamDeclaration",
+      task: emptyStreamsTask,
+      client: { public: true, operations: ["stream"] },
+    } as never),
   ).toThrow("declared task streams");
 
   const streamedTask = defineTask({
