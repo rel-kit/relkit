@@ -10,7 +10,9 @@ export class JobControlUnknownError extends Error {
     readonly idempotencyKey?: string,
     recovery: JobUnknownOutcome["recovery"] = { action: "inspect-native" },
   ) {
-    super("Native job control outcome is unknown; inspect the run and retry with the same operation");
+    super(
+      "Native job control outcome is unknown; inspect the run and retry with the same operation",
+    );
     this.name = "JobControlUnknownError";
     this.recovery = Object.freeze({ ...recovery });
   }
@@ -29,7 +31,10 @@ export class JobControlUnknownError extends Error {
 export class JobResultUnavailableError extends Error {
   readonly code = "RELKIT_JOB_RESULT_UNAVAILABLE" as const;
 
-  constructor(readonly availability: string, message = "The requested job result is unavailable") {
+  constructor(
+    readonly availability: string,
+    message = "The requested job result is unavailable",
+  ) {
     super(message);
     this.name = "JobResultUnavailableError";
   }

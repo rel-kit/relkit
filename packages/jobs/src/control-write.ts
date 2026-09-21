@@ -5,7 +5,10 @@ export function controlWrite<A>(
   signal: AbortSignal | undefined,
   operationId: string,
 ): Promise<A> {
-  if (signal?.aborted) return Promise.reject(signal.reason ?? new Error("Job control was cancelled before acceptance"));
+  if (signal?.aborted)
+    return Promise.reject(
+      signal.reason ?? new Error("Job control was cancelled before acceptance"),
+    );
   const pending = Promise.resolve().then(call);
   if (signal === undefined) return pending;
   return new Promise((resolve, reject) => {

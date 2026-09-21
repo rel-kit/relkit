@@ -2,10 +2,7 @@ import type { JobAccessGrant, JobAccessRequest } from "@relkit/contracts/jobs";
 import type { JobAuthorizationContext, JobDescriptorAny } from "./job-types.js";
 import { isRfc3339Instant } from "./instant-validation.js";
 import { JobAuthorizationError } from "./authorization-errors.js";
-import {
-  createJobCursor,
-  readJobCursor,
-} from "./authorization-cursor.js";
+import { createJobCursor, readJobCursor } from "./authorization-cursor.js";
 import { projectRunPage, projectRunSnapshot } from "./authorization-projection.js";
 
 export { JobAuthorizationError, JobCursorError } from "./authorization-errors.js";
@@ -57,7 +54,9 @@ export function authorizeJobAccess(
         ...(grant.expiresAt === undefined ? {} : { expiresAt: grant.expiresAt }),
       });
     },
-    () => { throw new JobAuthorizationError(); },
+    () => {
+      throw new JobAuthorizationError();
+    },
   );
 }
 
@@ -66,7 +65,8 @@ export function assertJobGrant(
   trusted: TrustedJobScope,
   now = Date.now(),
 ): asserts value is JobAccessGrant {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) throw new JobAuthorizationError();
+  if (value === null || typeof value !== "object" || Array.isArray(value))
+    throw new JobAuthorizationError();
   if (Object.keys(value).some((key) => key !== "scope" && key !== "expiresAt")) {
     throw new JobAuthorizationError();
   }
@@ -90,7 +90,8 @@ export function assertAuthorizedOperation(
   now = Date.now(),
 ): void {
   assertJobGrant(grant, trusted, now);
-  if (request.jobId.length === 0 || request.operation.length === 0) throw new JobAuthorizationError();
+  if (request.jobId.length === 0 || request.operation.length === 0)
+    throw new JobAuthorizationError();
 }
 
 export const authorize = authorizeJobAccess;
@@ -103,7 +104,11 @@ function ownsScope(parent: string, child: string): boolean {
 }
 
 function assertBoundedText(value: unknown): asserts value is string {
-  if (typeof value !== "string" || value.length === 0 || new TextEncoder().encode(value).byteLength > 256) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    new TextEncoder().encode(value).byteLength > 256
+  ) {
     throw new JobAuthorizationError();
   }
 }

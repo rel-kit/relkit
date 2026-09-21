@@ -27,14 +27,23 @@ export function projectRunSnapshot(
     resultAvailability: run.resultAvailability,
   };
   if (selected.has("input") && run.input !== undefined) copyField(base, "input", run.input);
-  if (selected.has("progress") && run.progress !== undefined) copyField(base, "progress", run.progress);
+  if (selected.has("progress") && run.progress !== undefined)
+    copyField(base, "progress", run.progress);
   if (selected.has("output") && run.resultAvailability === "available" && "output" in run) {
     copyField(base, "output", run.output);
   }
   if (selected.has("error") && run.error !== undefined) {
     base.error = safeError(run.error, declaredErrorIds);
   }
-  for (const field of ["attempt", "startedAt", "completedAt", "nextEligibleAt", "parentRunId", "retryOfRunId", "scheduledFor"] as const) {
+  for (const field of [
+    "attempt",
+    "startedAt",
+    "completedAt",
+    "nextEligibleAt",
+    "parentRunId",
+    "retryOfRunId",
+    "scheduledFor",
+  ] as const) {
     if (run[field] !== undefined) base[field] = run[field];
   }
   if (run.cancellation !== undefined) base.cancellation = safeCancellation(run.cancellation);
@@ -71,8 +80,12 @@ function safeError(value: unknown, declaredErrorIds: ReadonlySet<string>): JsonV
     code: declared ? code : "RELKIT_JOB_FAILURE",
     message: declared ? safeText(candidate.message, "Job failed") : "Job failed",
     ...(declared ? safeDetails(candidate.details ?? candidate.data) : {}),
-    ...(candidate.retry === "never" || candidate.retry === "later" ? { retry: candidate.retry } : {}),
-    ...(typeof candidate.afterMs === "number" && Number.isSafeInteger(candidate.afterMs) && candidate.afterMs >= 0
+    ...(candidate.retry === "never" || candidate.retry === "later"
+      ? { retry: candidate.retry }
+      : {}),
+    ...(typeof candidate.afterMs === "number" &&
+    Number.isSafeInteger(candidate.afterMs) &&
+    candidate.afterMs >= 0
       ? { afterMs: candidate.afterMs }
       : {}),
   };
@@ -83,7 +96,9 @@ function genericError(): JsonValue {
 }
 
 function safeText(value: unknown, fallback: string): string {
-  return typeof value === "string" && new TextEncoder().encode(value).byteLength <= 256 ? value : fallback;
+  return typeof value === "string" && new TextEncoder().encode(value).byteLength <= 256
+    ? value
+    : fallback;
 }
 
 function copyField(target: Record<string, unknown>, name: string, value: unknown): void {

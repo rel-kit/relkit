@@ -1,8 +1,4 @@
-export function assertCanonicalProjection(
-  value: unknown,
-  name: string,
-  allowVoid = false,
-): void {
+export function assertCanonicalProjection(value: unknown, name: string, allowVoid = false): void {
   visit(value, name, allowVoid, true);
 }
 
