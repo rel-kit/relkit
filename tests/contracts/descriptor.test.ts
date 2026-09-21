@@ -60,7 +60,11 @@ describe("descriptor contracts", () => {
       handler: async () => ({ ok: true }),
     });
     const job = defineJob({ name: "reconcile", task });
-    const service = defineService({ id: "orders", tasks: { reconcileTask: task }, jobs: { reconcile: job } });
+    const service = defineService({
+      id: "orders",
+      tasks: { reconcileTask: task },
+      jobs: { reconcile: job },
+    });
 
     expect(isServiceDescriptor(service)).toBe(true);
     expect(service.reconcileTask).toBe(task);

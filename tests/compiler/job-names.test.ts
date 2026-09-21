@@ -106,7 +106,9 @@ describe("task/job compiler discovery", () => {
   });
 
   test("requires an explicit job for ambiguous task aliases", () => {
-    const result = normalizeCompilation({ extracted: [taskExport("sendEmail"), taskExport("sendReceipt")] });
+    const result = normalizeCompilation({
+      extracted: [taskExport("sendEmail"), taskExport("sendReceipt")],
+    });
     expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
       "RELKIT_JOB_BINDING_INVALID",
     );
@@ -132,11 +134,20 @@ describe("task/job compiler discovery", () => {
     expect(result.graph?.nodes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: "task", id: "task.orders.send", taskId: "orders.send" }),
-        expect.objectContaining({ kind: "job", id: "job.orders.send", executionModel: "task", jobId: "orders.send" }),
+        expect.objectContaining({
+          kind: "job",
+          id: "job.orders.send",
+          executionModel: "task",
+          jobId: "orders.send",
+        }),
       ]),
     );
     expect(result.graph?.edges).toContainEqual(
-      expect.objectContaining({ kind: "targets-task", from: "job.orders.send", to: "task.orders.send" }),
+      expect.objectContaining({
+        kind: "targets-task",
+        from: "job.orders.send",
+        to: "task.orders.send",
+      }),
     );
     expect(result.referencesByKind.get("task")?.has("orders.send")).toBe(true);
     expect(result.referencesByKind.get("job")?.has("orders.send")).toBe(true);
@@ -148,15 +159,28 @@ describe("task/job compiler discovery", () => {
       ...entry,
       descriptor: {
         ...entry.descriptor,
-        metadata: { ...entry.descriptor.metadata, onStart: { $relkit: "function", name: "onStart", owner: "task", role: "hook" } },
+        metadata: {
+          ...entry.descriptor.metadata,
+          onStart: { $relkit: "function", name: "onStart", owner: "task", role: "hook" },
+        },
       },
     };
     const result = normalizeCompilation({ extracted: [hooked] });
     expect(result.graph?.nodes).toContainEqual(
-      expect.objectContaining({ kind: "hook", id: "task.orders.send.start", ownerKind: "task", phase: "start" }),
+      expect.objectContaining({
+        kind: "hook",
+        id: "task.orders.send.start",
+        ownerKind: "task",
+        phase: "start",
+      }),
     );
     expect(result.graph?.edges).toContainEqual(
-      expect.objectContaining({ kind: "uses-hook", from: "task.orders.send", to: "task.orders.send.start", phase: "start" }),
+      expect.objectContaining({
+        kind: "uses-hook",
+        from: "task.orders.send",
+        to: "task.orders.send.start",
+        phase: "start",
+      }),
     );
   });
 
@@ -172,9 +196,17 @@ describe("task/job compiler discovery", () => {
       jobsProtocolVersion: 1,
       nameToId: { sendEmail: "orders.send", shipOrder: "orders.ship" },
     });
-    expect(manifest.tasks).toEqual(expect.arrayContaining([expect.objectContaining({ id: "orders.send" })]));
-    expect(manifest.jobs).toEqual(expect.arrayContaining([expect.objectContaining({ name: "sendEmail", taskId: "orders.send" })]));
-    expect(manifest.workerEntries).toEqual(expect.arrayContaining([expect.objectContaining({ jobId: "orders.send" })]));
+    expect(manifest.tasks).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: "orders.send" })]),
+    );
+    expect(manifest.jobs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "sendEmail", taskId: "orders.send" }),
+      ]),
+    );
+    expect(manifest.workerEntries).toEqual(
+      expect.arrayContaining([expect.objectContaining({ jobId: "orders.send" })]),
+    );
     expect(result.outputs.manifest).toContain('tasks: { "orders.send"');
     expect(result.outputs.manifest).toContain('jobs: { "orders.send"');
   });
@@ -188,7 +220,9 @@ describe("task/job compiler discovery", () => {
         ...baseJob.descriptor,
         metadata: {
           ...baseJob.descriptor.metadata,
-          schedules: [{ id: "hourly", cron: "0 * * * *", timezone: "UTC", input: { secret: "omit" } }],
+          schedules: [
+            { id: "hourly", cron: "0 * * * *", timezone: "UTC", input: { secret: "omit" } },
+          ],
         },
       },
     };
@@ -216,7 +250,9 @@ describe("task/job compiler discovery", () => {
   test("changes public identity without replacing a pinned job durable ID", () => {
     const task = taskExport("sendEmail");
     const first = normalizeCompilation({ extracted: [task, makeExplicitJob(task, "sendEmail")] });
-    const second = normalizeCompilation({ extracted: [task, makeExplicitJob(task, "sendReceipt")] });
+    const second = normalizeCompilation({
+      extracted: [task, makeExplicitJob(task, "sendReceipt")],
+    });
     const firstManifest = JSON.parse(first.outputs.jobsManifest ?? "{}") as Record<string, any>;
     const secondManifest = JSON.parse(second.outputs.jobsManifest ?? "{}") as Record<string, any>;
 
@@ -226,8 +262,12 @@ describe("task/job compiler discovery", () => {
   });
 
   test("keeps executable build identity separate from task semantic version", () => {
-    const first = normalizeCompilation({ extracted: [taskExport("sendEmail", "orders.send", "1")] });
-    const second = normalizeCompilation({ extracted: [taskExport("sendEmail", "orders.send", "2")] });
+    const first = normalizeCompilation({
+      extracted: [taskExport("sendEmail", "orders.send", "1")],
+    });
+    const second = normalizeCompilation({
+      extracted: [taskExport("sendEmail", "orders.send", "2")],
+    });
     const firstManifest = JSON.parse(first.outputs.jobsManifest ?? "{}") as Record<string, any>;
     const secondManifest = JSON.parse(second.outputs.jobsManifest ?? "{}") as Record<string, any>;
 
@@ -276,12 +316,21 @@ describe("task/job compiler discovery", () => {
       ],
     });
     const task = result.graph?.nodes.find((node) => node.kind === "task");
-    const job = result.graph?.nodes.find((node) => node.kind === "job" && node.executionModel === "task");
+    const job = result.graph?.nodes.find(
+      (node) => node.kind === "job" && node.executionModel === "task",
+    );
 
     expect(result.diagnostics).toEqual([]);
-    expect(task?.schemaHashes).toEqual(expect.objectContaining({ "input:input": expect.any(String), "output:output": expect.any(String) }));
+    expect(task?.schemaHashes).toEqual(
+      expect.objectContaining({
+        "input:input": expect.any(String),
+        "output:output": expect.any(String),
+      }),
+    );
     expect(job?.schemaHashes).toEqual(task?.schemaHashes);
-    expect(result.graph?.nodes).toEqual(expect.arrayContaining([expect.objectContaining({ kind: "function", id: "orders.send" })]));
+    expect(result.graph?.nodes).toEqual(
+      expect.arrayContaining([expect.objectContaining({ kind: "function", id: "orders.send" })]),
+    );
   });
 
   test("uses inputWire for a transformed task's canonical projection", () => {
@@ -312,7 +361,11 @@ describe("task/job compiler discovery", () => {
     expect(result.diagnostics).toEqual([]);
     expect(result.graph?.nodes).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: "task", input: { type: "string" }, output: { type: "number" } }),
+        expect.objectContaining({
+          kind: "task",
+          input: { type: "string" },
+          output: { type: "number" },
+        }),
       ]),
     );
   });
@@ -326,12 +379,21 @@ describe("task/job compiler discovery", () => {
             kind: "function",
             id: "task.orders.send",
             ref: { kind: "function", id: "task.orders.send" },
-            metadata: { input: { $relkit: "schema", jsonSchema: {} }, output: { $relkit: "schema", jsonSchema: {} } },
+            metadata: {
+              input: { $relkit: "schema", jsonSchema: {} },
+              output: { $relkit: "schema", jsonSchema: {} },
+            },
           },
           exportName: "handler",
           exportKind: "named" as const,
           source,
-          reference: { generationId: "test", descriptorId: "task.orders.send", kind: "function", module: source.file, exportName: "handler" },
+          reference: {
+            generationId: "test",
+            descriptorId: "task.orders.send",
+            kind: "function",
+            module: source.file,
+            exportName: "handler",
+          },
         },
       ],
     });
@@ -342,9 +404,17 @@ describe("task/job compiler discovery", () => {
 
   test("rejects duplicate IDs within one durable namespace", () => {
     const first = taskExport("sendEmail");
-    const second = { ...taskExport("sendEmail"), descriptor: { ...taskExport("sendEmail").descriptor, metadata: { ...first.descriptor.metadata, version: "2" } } };
+    const second = {
+      ...taskExport("sendEmail"),
+      descriptor: {
+        ...taskExport("sendEmail").descriptor,
+        metadata: { ...first.descriptor.metadata, version: "2" },
+      },
+    };
     const result = normalizeCompilation({ extracted: [first, second] });
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain("RELKIT_DUPLICATE_ID");
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      "RELKIT_DUPLICATE_ID",
+    );
   });
 
   test("reserves the root jobs namespace for exposed task-backed jobs", () => {

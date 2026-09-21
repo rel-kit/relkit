@@ -63,8 +63,16 @@ describe("TypeScript discovery facts", () => {
     expect(facts.serviceMembers).toEqual([
       expect.objectContaining({ service: "orders", member: "getOrder", targetBinding: "getOrder" }),
       expect.objectContaining({ service: "orders", member: "lookup", targetBinding: "named" }),
-      expect.objectContaining({ service: "orders", member: "syncOrders", targetBinding: "syncOrders" }),
-      expect.objectContaining({ service: "orders", member: "dispatchOrders", targetBinding: "dispatchOrders" }),
+      expect.objectContaining({
+        service: "orders",
+        member: "syncOrders",
+        targetBinding: "syncOrders",
+      }),
+      expect.objectContaining({
+        service: "orders",
+        member: "dispatchOrders",
+        targetBinding: "dispatchOrders",
+      }),
     ]);
     expect(facts.errorBindings).toEqual([
       expect.objectContaining({ binding: "InvalidError", id: "omitted" }),

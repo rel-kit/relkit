@@ -4,7 +4,8 @@ import { defineApp } from "../../packages/app/src/define-app.ts";
 import { defineEnv } from "../../packages/config/src/index.ts";
 import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/legacy.ts";
+import { defineJob as defineLegacyJob } from "../../packages/jobs/src/legacy.ts";
+import { defineJob, defineTask } from "../../packages/jobs/src/index.ts";
 import { defineRoute, http } from "../../packages/routes/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { hashGraph as canonicalGraphHash } from "../../packages/graph/src/index.ts";
@@ -26,7 +27,7 @@ function values() {
     handler: async () => ({ ok: true }),
   });
   const event = defineEvent({ id: "orders.created", version: 1, input: input });
-  const job = defineJob({
+  const job = defineLegacyJob({
     id: "orders.refresh",
     input,
     target,
@@ -49,6 +50,36 @@ function values() {
   return [target, event, job, route, trigger] as const;
 }
 
+function taskFirstJobWithProfile() {
+  const task = defineTask({
+    id: "orders.refresh",
+    version: "1",
+    input,
+    output,
+    handler: async () => ({ ok: true }),
+  });
+  const job = defineJob({ name: "refreshOrders", task, profile: "default" });
+  return {
+    descriptor: job,
+    exportName: "refreshOrders",
+    exportKind: "named" as const,
+    source: { file: "src/orders/jobs/refresh.job.ts", line: 1, column: 1 },
+    exportFact: {
+      position: 0,
+      binding: "refreshOrders",
+      factory: {
+        binding: "refreshOrders",
+        factory: "defineJob",
+        kind: "job" as const,
+        idOptional: true,
+        id: "omitted" as const,
+        position: 0,
+        options: ["name", "task", "profile"],
+      },
+    },
+  };
+}
+
 function legacyJobValues(legacyJobs: boolean) {
   const target = defineFunction({
     id: "orders.get",
@@ -62,7 +93,7 @@ function legacyJobValues(legacyJobs: boolean) {
     jobs: localJob(),
     compatibility: { legacyJobs },
   });
-  const job = defineJob({
+  const job = defineLegacyJob({
     id: "orders.refresh",
     input,
     target,
@@ -108,6 +139,20 @@ describe("compiler normalization", () => {
     expect(enabled.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
       NORMALIZE_CODES.legacyJobs,
     );
+  });
+
+  test("treats the task-first profile spelling as a warning, not legacy execution", () => {
+    const result = normalizeCompilation({ extracted: [taskFirstJobWithProfile()] });
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: NORMALIZE_CODES.jobProfile,
+        severity: "warning",
+      }),
+    );
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
+    expect(result.activatable).toBe(true);
   });
 
   test("sorts canonical graph bytes independently of descriptor enumeration", () => {
