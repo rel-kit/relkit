@@ -30,18 +30,18 @@
   },
   "dependencies": {
     "@cfworker/json-schema": "4.1.1",
-    "@langchain/core": "1.2.9",
-    "@langchain/langgraph": "1.4.14",
+    "@langchain/core": "1.2.11",
+    "@langchain/langgraph": "1.4.15",
     "@relkit/contracts": "workspace:*",
     "@relkit/functions": "workspace:*",
     "@relkit/invocation": "workspace:*",
     "@relkit/schema": "workspace:*",
     "@relkit/tools": "workspace:*",
-    "langchain": "1.5.10",
-    "langsmith": "0.9.0"
+    "langchain": "1.5.11",
+    "langsmith": "0.10.4"
   },
   "peerDependencies": {
-    "deepagents": "1.13.3"
+    "deepagents": "1.13.5"
   },
   "peerDependenciesMeta": {
     "deepagents": {
@@ -54,7 +54,7 @@
     "@langchain/langgraph-checkpoint-redis": "1.0.11",
     "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
     "@relkit/buckets": "workspace:*",
-    "deepagents": "1.13.3"
+    "deepagents": "1.13.5"
   },
   "scripts": {
     "build": "tsc -b",
