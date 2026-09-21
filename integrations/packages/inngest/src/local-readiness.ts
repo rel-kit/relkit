@@ -6,20 +6,20 @@ export async function waitForInngestReadiness(
 ): Promise<void> {
   const fetcher = context.fetch ?? globalThis.fetch;
   const apiPort = number(context.ports.api, "Inngest API port");
-  await waitForHealth(fetcher, "http://127.0.0.1:" + apiPort + "/health", context.signal);
+  const workerPort = context.ports["worker.api"];
   await waitForNativeRead(
     fetcher,
     "http://127.0.0.1:" + apiPort,
     text(context.secrets.signingKey, "Inngest signing key"),
     context.signal,
   );
-  const workerPort = context.ports["worker.api"];
   if (workerPort !== undefined) {
     await waitForHealth(
       fetcher,
       "http://127.0.0.1:" + number(workerPort, "Inngest worker port") + "/_relkit/v1/health/ready",
       context.signal,
     );
+    await waitForHealth(fetcher, "http://127.0.0.1:" + apiPort + "/health", context.signal);
   }
 }
 
@@ -40,7 +40,9 @@ async function waitForHealth(
     }
     await pause(signal);
   }
-  throw new Error("Inngest local health check timed out: " + String(lastError ?? "not ready"));
+  throw new Error(
+    "Inngest local health check timed out at " + endpoint + ": " + String(lastError ?? "not ready"),
+  );
 }
 
 async function waitForNativeRead(
@@ -67,7 +69,9 @@ async function waitForNativeRead(
     }
     await pause(signal);
   }
-  throw new Error("Inngest native read check timed out: " + String(lastError ?? "not ready"));
+  throw new Error(
+    "Inngest native read check timed out at " + baseUrl + ": " + String(lastError ?? "not ready"),
+  );
 }
 
 function pause(signal: AbortSignal | undefined): Promise<void> {

@@ -32,7 +32,12 @@ export const localRecipe = Object.freeze({
         POSTGRES_USER: Object.freeze({ value: "inngest" }),
         POSTGRES_PASSWORD: Object.freeze({ secret: "postgresPassword" }),
       }),
-      health: Object.freeze({ command: ["pg_isready", "-U", "inngest", "-d", "inngest"], intervalMs: 250, timeoutMs: 2_000, retries: 60 }),
+      health: Object.freeze({
+        command: ["pg_isready", "-U", "inngest", "-d", "inngest"],
+        intervalMs: 250,
+        timeoutMs: 2_000,
+        retries: 60,
+      }),
       networkAliases: Object.freeze(["postgres"]),
     }),
     Object.freeze({
@@ -41,16 +46,30 @@ export const localRecipe = Object.freeze({
       command: Object.freeze(["redis-server", "--appendonly", "yes", "--appendfsync", "always"]),
       ports: Object.freeze({}),
       volumes: Object.freeze([{ name: "redis", mountPath: "/data" }]),
-      health: Object.freeze({ command: ["redis-cli", "ping"], intervalMs: 250, timeoutMs: 2_000, retries: 60 }),
+      health: Object.freeze({
+        command: ["redis-cli", "ping"],
+        intervalMs: 250,
+        timeoutMs: 2_000,
+        retries: 60,
+      }),
       networkAliases: Object.freeze(["redis"]),
     }),
     Object.freeze({
       id: "inngest",
       image: INNGEST_IMAGE,
-      command: Object.freeze(["sh", "-c", "exec inngest start --host 0.0.0.0 --port 8288 --event-key \"$INNGEST_EVENT_KEY\" --signing-key \"$INNGEST_SIGNING_KEY\" --postgres-uri \"postgres://inngest:$POSTGRES_PASSWORD@postgres:5432/inngest\" --redis-uri redis://redis:6379 --sdk-url \"${INNGEST_SDK_URL:-http://worker:3000/api/inngest}\" --poll-interval 1 --retry-interval 1 --queue-workers 10"]),
+      command: Object.freeze([
+        "sh",
+        "-c",
+        'exec inngest start --host 0.0.0.0 --port 8288 --event-key "$INNGEST_EVENT_KEY" --signing-key "$INNGEST_SIGNING_KEY" --postgres-uri "postgres://inngest:$POSTGRES_PASSWORD@postgres:5432/inngest" --redis-uri redis://redis:6379 --sdk-url "${INNGEST_SDK_URL:-http://worker:3000/api/inngest}" --poll-interval 1 --retry-interval 1 --queue-workers 10',
+      ]),
       dependsOn: Object.freeze(["postgres-ready", "redis"]),
       ports: Object.freeze({ api: 8288 }),
-      health: Object.freeze({ command: ["kill", "-0", "1"], intervalMs: 500, timeoutMs: 2_000, retries: 60 }),
+      health: Object.freeze({
+        command: ["kill", "-0", "1"],
+        intervalMs: 500,
+        timeoutMs: 2_000,
+        retries: 60,
+      }),
       networkAliases: Object.freeze(["inngest"]),
       hostAliases: Object.freeze({ "host.docker.internal": "host-gateway" }),
       environment: Object.freeze({
@@ -64,10 +83,21 @@ export const localRecipe = Object.freeze({
     Object.freeze({
       id: "worker",
       image: BUN_IMAGE,
-      command: Object.freeze(["bun", "run", "--no-env-file", "--no-install", "/relkit-worker/server/index.js"]),
+      command: Object.freeze([
+        "bun",
+        "run",
+        "--no-env-file",
+        "--no-install",
+        "/relkit-worker/server/index.js",
+      ]),
       dependsOn: Object.freeze(["inngest"]),
       ports: Object.freeze({ api: 3000 }),
-      health: Object.freeze({ command: ["kill", "-0", "1"], intervalMs: 500, timeoutMs: 2_000, retries: 120 }),
+      health: Object.freeze({
+        command: ["kill", "-0", "1"],
+        intervalMs: 500,
+        timeoutMs: 2_000,
+        retries: 120,
+      }),
       networkAliases: Object.freeze(["worker"]),
     }),
   ]),
@@ -97,17 +127,19 @@ export const localRecipe = Object.freeze({
   }),
   network: Object.freeze({ internal: false }),
   ownership: Object.freeze({ scope: "project", retainVolumes: true }),
-  outputs: ({ ports, secrets, endpoints }: LocalServiceRecipeOutputContext) => Object.freeze({
-    baseUrl: `http://127.0.0.1:${number(ports.api, "Inngest API port")}`,
-    eventKey: text(secrets.eventKey, "event key"),
-    signingKey: text(secrets.signingKey, "signing key"),
-    serveOrigin: endpoints?.serveOrigin ?? "http://host.docker.internal:3000",
-  }),
+  outputs: ({ ports, secrets, endpoints }: LocalServiceRecipeOutputContext) =>
+    Object.freeze({
+      baseUrl: `http://127.0.0.1:${number(ports.api, "Inngest API port")}`,
+      eventKey: text(secrets.eventKey, "event key"),
+      signingKey: text(secrets.signingKey, "signing key"),
+      serveOrigin: endpoints?.serveOrigin ?? "http://host.docker.internal:3000",
+    }),
   initialize: waitForInngestReadiness,
 }) satisfies CompositeLocalServiceRecipe<"inngest">;
 
 function number(value: unknown, name: string): number {
-  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1 || value > 65_535) throw new TypeError(`${name} is invalid`);
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1 || value > 65_535)
+    throw new TypeError(`${name} is invalid`);
   return value;
 }
 

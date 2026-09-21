@@ -32,9 +32,18 @@ async function* frames(
   yield frame("snapshot", current, epoch, sequence++);
   if (terminal(current)) return;
   let cleanup: (() => void) | undefined;
-  const realtime = options.subscribe === undefined
-    ? undefined
-    : await options.subscribe(request.runId, (run) => { current = run; }, context).catch(() => undefined);
+  const realtime =
+    options.subscribe === undefined
+      ? undefined
+      : await options
+          .subscribe(
+            request.runId,
+            (run) => {
+              current = run;
+            },
+            context,
+          )
+          .catch(() => undefined);
   cleanup = realtime;
   try {
     const maxPolls = options.maxPolls ?? 240;
@@ -67,7 +76,12 @@ function frame(
 }
 
 function terminal(run: RunSnapshot): boolean {
-  return run.status === "completed" || run.status === "failed" || run.status === "cancelled" || run.status === "timed-out";
+  return (
+    run.status === "completed" ||
+    run.status === "failed" ||
+    run.status === "cancelled" ||
+    run.status === "timed-out"
+  );
 }
 
 function sameRunState(left: RunSnapshot, right: RunSnapshot): boolean {
@@ -77,11 +91,19 @@ function sameRunState(left: RunSnapshot, right: RunSnapshot): boolean {
 }
 
 function delay(milliseconds: number, signal: AbortSignal): Promise<void> {
-  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1) throw new TypeError("Inngest observation interval is invalid");
+  if (!Number.isSafeInteger(milliseconds) || milliseconds < 1)
+    throw new TypeError("Inngest observation interval is invalid");
   return new Promise((resolve, reject) => {
     if (signal.aborted) return reject(signal.reason);
     const timer = setTimeout(resolve, milliseconds);
-    signal.addEventListener("abort", () => { clearTimeout(timer); reject(signal.reason); }, { once: true });
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      },
+      { once: true },
+    );
   });
 }
 
@@ -92,9 +114,11 @@ async function read(
   timeoutMs: number | undefined,
 ): Promise<RunSnapshot> {
   if (timeoutMs === undefined) return get(runId, context);
-  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) throw new TypeError("Inngest read timeout is invalid");
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1)
+    throw new TypeError("Inngest read timeout is invalid");
   const controller = new AbortController();
-  const abort = (): void => controller.abort(context.signal.reason ?? new Error("Inngest observation aborted"));
+  const abort = (): void =>
+    controller.abort(context.signal.reason ?? new Error("Inngest observation aborted"));
   if (context.signal.aborted) abort();
   else context.signal.addEventListener("abort", abort, { once: true });
   const timer = setTimeout(() => controller.abort(new Error("Inngest read timed out")), timeoutMs);

@@ -1,7 +1,16 @@
 import type { JobUnknownOutcome } from "@relkit/contracts/jobs";
 import type { RunRetryReceipt, RunSnapshot } from "@relkit/contracts/jobs";
-import type { NativeControlReceipt, NativeRetryRequest, OperationContext } from "@relkit/jobs/adapter";
-import { isAmbiguousInngestWrite, rememberInngestRecord, type InngestRunApi, type InngestRunMetadata } from "./runs.js";
+import type {
+  NativeControlReceipt,
+  NativeRetryRequest,
+  OperationContext,
+} from "@relkit/jobs/adapter";
+import {
+  isAmbiguousInngestWrite,
+  rememberInngestRecord,
+  type InngestRunApi,
+  type InngestRunMetadata,
+} from "./runs.js";
 import { readInngestRun } from "./run-operations.js";
 
 const terminal = new Set<RunSnapshot["status"]>(["completed", "failed", "cancelled", "timed-out"]);
@@ -15,15 +24,22 @@ export async function cancelInngestRun(
   records: Map<string, InngestRunMetadata>,
 ): Promise<NativeControlReceipt> {
   const run = await readInngestRun(locator, context, api, records);
-  if (terminal.has(run.status)) return { runId: run.runId, operationId, outcome: "already-terminal", run };
-  if (run.runId.startsWith("event:")) return { runId: run.runId, operationId, outcome: "unsupported" };
+  if (terminal.has(run.status))
+    return { runId: run.runId, operationId, outcome: "already-terminal", run };
+  if (run.runId.startsWith("event:"))
+    return { runId: run.runId, operationId, outcome: "unsupported" };
   try {
     await api.cancel(run.runId, reason, context.signal);
   } catch (error) {
     if (isAmbiguousInngestWrite(error)) return unknownControl(operationId);
     throw error;
   }
-  return { runId: run.runId, operationId, outcome: "requested", requestedAt: new Date().toISOString() };
+  return {
+    runId: run.runId,
+    operationId,
+    outcome: "requested",
+    requestedAt: new Date().toISOString(),
+  };
 }
 
 export async function retryInngestRun(
@@ -38,12 +54,14 @@ export async function retryInngestRun(
   if (previous !== undefined) return previous;
   const run = await readInngestRun(request.runId, context, api, records);
   if (terminal.has(run.status) === false) throw new Error("Inngest retry requires a terminal run.");
-  if (run.runId.startsWith("event:")) return { runId: run.runId, operationId: request.operationId, outcome: "unsupported" };
+  if (run.runId.startsWith("event:"))
+    return { runId: run.runId, operationId: request.operationId, outcome: "unsupported" };
   let response: Record<string, unknown>;
   try {
     response = await api.retry(run.runId, context.signal);
   } catch (error) {
-    if (isAmbiguousInngestWrite(error)) return rememberRetry(retryResults, retryIdentity, unknownControl(request.operationId));
+    if (isAmbiguousInngestWrite(error))
+      return rememberRetry(retryResults, retryIdentity, unknownControl(request.operationId));
     throw error;
   }
   const data = record(response.data);
@@ -56,7 +74,8 @@ export async function retryInngestRun(
   const inputHash = request.inputHash ?? source?.inputHash ?? run.inputHash;
   const inputSchemaHash = request.inputSchemaHash ?? source?.inputSchemaHash ?? run.inputSchemaHash;
   const scope = request.scope ?? source?.scope ?? run.scope;
-  const acceptanceIdentity = request.acceptanceIdentity ?? source?.acceptanceIdentity ?? run.acceptanceIdentity;
+  const acceptanceIdentity =
+    request.acceptanceIdentity ?? source?.acceptanceIdentity ?? run.acceptanceIdentity;
   const metadata: InngestRunMetadata = {
     accepted: true,
     runId: newRunIdValue,
@@ -72,7 +91,9 @@ export async function retryInngestRun(
     ...(inputSchemaHash === undefined ? {} : { inputSchemaHash }),
     ...(scope === undefined ? {} : { scope }),
     ...(acceptanceIdentity === undefined ? {} : { acceptanceIdentity }),
-    ...(source?.occurrenceIdentity === undefined ? {} : { occurrenceIdentity: source.occurrenceIdentity }),
+    ...(source?.occurrenceIdentity === undefined
+      ? {}
+      : { occurrenceIdentity: source.occurrenceIdentity }),
     ...(source?.parentRunId === undefined ? {} : { parentRunId: source.parentRunId }),
     ...(source?.scheduledFor === undefined ? {} : { scheduledFor: source.scheduledFor }),
     ...(source?.tags === undefined ? {} : { tags: source.tags }),
@@ -118,5 +139,7 @@ function unknownControl(operationId: string): JobUnknownOutcome {
 }
 
 function record(value: unknown): Record<string, unknown> | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }

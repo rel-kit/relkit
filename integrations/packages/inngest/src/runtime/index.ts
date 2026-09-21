@@ -20,11 +20,10 @@ import {
 import { optionalText, text, url } from "./support.js";
 import type { RuntimeProviderContext, RuntimeProviderIntegration } from "@relkit/provider";
 import { providerEventId, submitInngestEvent } from "./submission.js";
+import { duplicateReceipt, observationOptions } from "./support.js";
 
 export interface InngestRuntime extends JobsAdapterRuntime {
-  readonly registerWorker: (
-    options: InngestWorkerRegistrationOptions,
-  ) => InngestWorkerHandle;
+  readonly registerWorker: (options: InngestWorkerRegistrationOptions) => InngestWorkerHandle;
 }
 
 export interface InngestRuntimeOptions {
@@ -68,13 +67,31 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
       provider: "inngest",
       adapterId: "inngest",
       protocolVersion: 1,
-      features: Object.freeze({ submission: true, read: true, list: true, observation: true, cancel: true, retry: true, "durable-sleep": true }),
+      features: Object.freeze({
+        submission: true,
+        read: true,
+        list: true,
+        observation: true,
+        cancel: true,
+        retry: true,
+        "durable-sleep": true,
+      }),
       capabilities: Object.freeze({
         submission: { support: "native" as const, evidence: ["inngest event API"] },
-        list: { support: "adapter" as const, constraints: { scope: "accepted event receipts" }, evidence: ["event-scoped Inngest run API; bounded local index"] },
-        observation: { support: "adapter" as const, evidence: ["Inngest realtime SDK cleanup plus bounded run reads"] },
+        list: {
+          support: "adapter" as const,
+          constraints: { scope: "accepted event receipts" },
+          evidence: ["event-scoped Inngest run API; bounded local index"],
+        },
+        observation: {
+          support: "adapter" as const,
+          evidence: ["Inngest realtime SDK cleanup plus bounded run reads"],
+        },
         retry: { support: "native" as const, evidence: ["Inngest native run control API"] },
-        "durable-sleep": { support: "native" as const, evidence: ["ctx.step.sleep keyed by task sleep identity"] },
+        "durable-sleep": {
+          support: "native" as const,
+          evidence: ["ctx.step.sleep keyed by task sleep identity"],
+        },
       }),
     }),
     submit: async (request, context) => {
@@ -82,7 +99,8 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
       if (request.scheduledFor !== undefined) {
         throw new Error("Inngest scheduled submissions require a certified native schedule.");
       }
-      if (options.eventKey === undefined) throw new Error("Inngest eventKey is required for submission.");
+      if (options.eventKey === undefined)
+        throw new Error("Inngest eventKey is required for submission.");
       const eventId = providerEventId(request, context);
       const pending = pendingSubmissions.get(eventId);
       if (pending !== undefined) return duplicateReceipt(await pending);
@@ -96,19 +114,23 @@ export function createInngestRuntime(options: InngestRuntimeOptions): InngestRun
     },
     get: async (locator, context) => readInngestRun(locator, context, api, records),
     list: async (query, context) => listInngestRuns(query, context, api, records),
-    observe: (request, context) => observeInngestRun(request, context, {
-      get: (runId, operation) => readInngestRun(runId, operation, api, records),
-      ...observationOptions(options),
-      subscribe: (runId, onSnapshot, operation) => subscribeInngestRun(
-        client,
-        options.appId,
-        runId,
-        async () => onSnapshot(await readInngestRun(runId, operation, api, records)),
-        operation,
-      ),
-    }),
-    cancel: async (request, context) => cancelInngestRun(request.runId, request.operationId, request.reason, context, api, records),
-    retry: async (request, context) => retryInngestRun(request, context, api, records, retryResults),
+    observe: (request, context) =>
+      observeInngestRun(request, context, {
+        get: (runId, operation) => readInngestRun(runId, operation, api, records),
+        ...observationOptions(options),
+        subscribe: (runId, onSnapshot, operation) =>
+          subscribeInngestRun(
+            client,
+            options.appId,
+            runId,
+            async () => onSnapshot(await readInngestRun(runId, operation, api, records)),
+            operation,
+          ),
+      }),
+    cancel: async (request, context) =>
+      cancelInngestRun(request.runId, request.operationId, request.reason, context, api, records),
+    retry: async (request, context) =>
+      retryInngestRun(request, context, api, records, retryResults),
     registerWorker: (workerOptions: InngestWorkerRegistrationOptions): InngestWorkerHandle => {
       const worker = createInngestWorker({
         client,
@@ -136,17 +158,23 @@ export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.
       capability: "job",
       adapterId: "inngest",
       protocolVersion: 1,
-    create: ({ connection, executionModel, behavior }: RuntimeProviderContext) => {
-        if (executionModel !== "task") throw new Error("Inngest requires the task execution model.");
+      create: ({ connection, executionModel, behavior }: RuntimeProviderContext) => {
+        if (executionModel !== "task")
+          throw new Error("Inngest requires the task execution model.");
         const serviceOptions = deserializeJobsServiceOptions(behavior);
         assertSupportedJobsServiceOptions(serviceOptions, ["observation"]);
         const eventKey = optionalText(connection.eventKey);
         const signingKey = optionalText(connection.signingKey);
         const appVersion = optionalText(connection.appVersion);
-        const serveOrigin = optionalText(process.env.RELKIT_INNGEST_SERVE_ORIGIN) ?? optionalText(connection.serveOrigin);
+        const serveOrigin =
+          optionalText(process.env.RELKIT_INNGEST_SERVE_ORIGIN) ??
+          optionalText(connection.serveOrigin);
         const runtime = createInngestRuntime({
           appId: optionalText(connection.appId) ?? "relkit",
-          baseUrl: optionalText(process.env.RELKIT_INNGEST_BASE_URL) ?? optionalText(connection.baseUrl) ?? "http://127.0.0.1:8288",
+          baseUrl:
+            optionalText(process.env.RELKIT_INNGEST_BASE_URL) ??
+            optionalText(connection.baseUrl) ??
+            "http://127.0.0.1:8288",
           ...(eventKey === undefined ? {} : { eventKey }),
           ...(signingKey === undefined ? {} : { signingKey }),
           ...(appVersion === undefined ? {} : { appVersion }),
@@ -158,25 +186,6 @@ export const runtimeIntegration: RuntimeProviderIntegration<"inngest"> = Object.
     },
   ]),
 }) satisfies RuntimeProviderIntegration<"inngest">;
-
-function duplicateReceipt(value: NativeReceipt): NativeReceipt {
-  return value !== null && typeof value === "object" && !Array.isArray(value) &&
-    Object.hasOwn(value, "accepted") && (value as { readonly accepted?: unknown }).accepted === true
-    ? Object.freeze({ ...value, duplicate: true })
-    : value;
-}
-
-function observationOptions(options: InngestRuntimeOptions): Readonly<Record<string, number>> {
-  const serviceObservation = options.serviceOptions?.observation;
-  return Object.freeze({
-    ...(options.pollIntervalMs === undefined && serviceObservation?.pollInterval === undefined
-      ? {}
-      : { pollIntervalMs: options.pollIntervalMs ?? durationToMillis(serviceObservation!.pollInterval!) }),
-    ...(serviceObservation?.readTimeout === undefined
-      ? {}
-      : { readTimeoutMs: durationToMillis(serviceObservation.readTimeout) }),
-  });
-}
 
 export * from "./observe.js";
 export * from "./runs.js";

@@ -21,12 +21,15 @@ export async function subscribeInngestRun(
   });
   let subscription: { readonly unsubscribe: (reason?: string) => void };
   try {
-    subscription = await Promise.race([
+    subscription = (await Promise.race([
       pending,
       timeout(1_500, context.signal),
-    ]) as typeof subscription;
+    ])) as typeof subscription;
   } catch {
-    void pending.then((value) => value.unsubscribe("Relkit realtime setup timed out"), () => undefined);
+    void pending.then(
+      (value) => value.unsubscribe("Relkit realtime setup timed out"),
+      () => undefined,
+    );
     return undefined;
   }
   const abort = () => subscription.unsubscribe("Relkit observation aborted");
@@ -39,7 +42,10 @@ export async function subscribeInngestRun(
 
 function timeout(milliseconds: number, signal: AbortSignal): Promise<never> {
   return new Promise((_, reject) => {
-    const timer = setTimeout(() => finish(new Error("Inngest realtime setup timed out")), milliseconds);
+    const timer = setTimeout(
+      () => finish(new Error("Inngest realtime setup timed out")),
+      milliseconds,
+    );
     const abort = () => {
       clearTimeout(timer);
       finish(signal.reason ?? new Error("Observation aborted"));
