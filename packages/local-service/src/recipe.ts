@@ -56,6 +56,7 @@ export interface LocalServiceBindMount {
 
 export interface LocalServiceWorkerArtifact {
   readonly entrypoint: string;
+  readonly nodeModulesDirectory?: string;
   readonly providerOverridesFile: string;
   readonly environment?: Readonly<Record<string, string>>;
 }
@@ -70,7 +71,9 @@ export interface CompositeLocalServiceUnit {
   readonly dependsOn?: readonly string[];
   readonly ports?: Readonly<Record<string, number>>;
   readonly volumes?: readonly CompositeLocalServiceUnitVolume[];
-  readonly environment?: Readonly<Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>>;
+  readonly environment?: Readonly<
+    Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>
+  >;
   readonly health?: LocalServiceHealthCheck;
   readonly networkAliases?: readonly string[];
   readonly hostAliases?: Readonly<Record<string, string>>;
@@ -90,7 +93,9 @@ export interface CompositeLocalServiceRecipe<IntegrationId extends string = stri
   readonly workers?: readonly Omit<CompositeLocalServiceUnit, "kind">[];
   readonly volumes: Readonly<Record<string, CompositeLocalServiceVolume>>;
   readonly generatedSecrets?: Readonly<Record<string, LocalServiceGeneratedSecret>>;
-  readonly environment?: Readonly<Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>>;
+  readonly environment?: Readonly<
+    Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>
+  >;
   readonly network?: Readonly<{ readonly internal?: boolean }>;
   readonly ownership?: Readonly<{
     readonly scope: "project" | "binding";
@@ -103,8 +108,7 @@ export interface CompositeLocalServiceRecipe<IntegrationId extends string = stri
 }
 
 export type LocalServiceRecipeInput<IntegrationId extends string = string> =
-  | LocalServiceRecipe<IntegrationId>
-  | CompositeLocalServiceRecipe<IntegrationId>;
+  LocalServiceRecipe<IntegrationId> | CompositeLocalServiceRecipe<IntegrationId>;
 
 export interface LocalServiceRecipe<IntegrationId extends string = string> {
   readonly kind: "local-service-recipe";

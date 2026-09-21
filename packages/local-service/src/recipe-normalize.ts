@@ -11,7 +11,17 @@ import {
   type CompositeLocalServiceVolume,
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
 } from "./recipe.js";
-import { assertComposite, common, environments, healthCheck, invalid, path, secrets, text } from "./recipe-validation.js";
+import {
+  assertComposite,
+  common,
+  environments,
+  healthCheck,
+  invalid,
+  path,
+  secrets,
+  text,
+} from "./recipe-validation.js";
+import { topologicalOrder, unit } from "./recipe-normalize-units.js";
 
 const LOCAL_SERVICE_PROTOCOL_VERSION = 1 as const;
 
@@ -32,10 +42,17 @@ export interface NormalizedLocalServiceRecipe {
   readonly units: readonly NormalizedLocalServiceUnit[];
   readonly volumes: Readonly<Record<string, CompositeLocalServiceVolume>>;
   readonly generatedSecrets: Readonly<Record<string, LocalServiceGeneratedSecret>>;
-  readonly environment: Readonly<Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>>;
+  readonly environment: Readonly<
+    Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>
+  >;
   readonly network?: Readonly<{ readonly internal?: boolean }>;
-  readonly ownership: Readonly<{ readonly scope: "project" | "binding"; readonly retainVolumes: boolean }>;
-  readonly outputs: (context: LocalServiceRecipeOutputContext) => Readonly<Record<string, JsonValue>>;
+  readonly ownership: Readonly<{
+    readonly scope: "project" | "binding";
+    readonly retainVolumes: boolean;
+  }>;
+  readonly outputs: (
+    context: LocalServiceRecipeOutputContext,
+  ) => Readonly<Record<string, JsonValue>>;
   readonly initialize?: (context: LocalServiceRecipeOutputContext) => Promise<void>;
 }
 
@@ -90,7 +107,14 @@ export function normalizeLocalServiceRecipe(
   const normalized = units.map((candidate) => unit(candidate));
   const knownVolumes = new Set(Object.keys(composite.volumes));
   for (const [name, volume] of Object.entries(composite.volumes)) {
-    if (!isStableId(name) || volume === null || typeof volume !== "object" || !path(volume.mountPath) || (volume.persistent !== undefined && typeof volume.persistent !== "boolean")) invalid("Local-service volume");
+    if (
+      !isStableId(name) ||
+      volume === null ||
+      typeof volume !== "object" ||
+      !path(volume.mountPath) ||
+      (volume.persistent !== undefined && typeof volume.persistent !== "boolean")
+    )
+      invalid("Local-service volume");
   }
   for (const candidate of normalized) {
     for (const dependency of candidate.dependsOn) {
@@ -105,7 +129,8 @@ export function normalizeLocalServiceRecipe(
   topologicalOrder(normalized);
   secrets(composite.generatedSecrets);
   environments(composite.environment, composite.generatedSecrets);
-  for (const candidate of normalized) environments(candidate.environment, composite.generatedSecrets);
+  for (const candidate of normalized)
+    environments(candidate.environment, composite.generatedSecrets);
   return Object.freeze({
     kind: composite.kind,
     protocolVersion: composite.protocolVersion,
@@ -130,67 +155,19 @@ export function normalizeLocalServiceRecipe(
 function compositeUnits(recipe: CompositeLocalServiceRecipe): CompositeLocalServiceUnit[] {
   if (recipe.units !== undefined) {
     if (!Array.isArray(recipe.units)) invalid("Composite recipe units");
-    if (recipe.containers !== undefined || recipe.init !== undefined || recipe.workers !== undefined)
+    if (
+      recipe.containers !== undefined ||
+      recipe.init !== undefined ||
+      recipe.workers !== undefined
+    )
       invalid("Composite recipe cannot mix units with grouped units");
     return [...recipe.units];
   }
-  for (const group of [recipe.containers, recipe.init, recipe.workers]) if (group !== undefined && !Array.isArray(group)) invalid("Composite recipe units");
+  for (const group of [recipe.containers, recipe.init, recipe.workers])
+    if (group !== undefined && !Array.isArray(group)) invalid("Composite recipe units");
   return [
     ...(recipe.containers ?? []).map((value) => ({ ...value, kind: "container" as const })),
     ...(recipe.init ?? []).map((value) => ({ ...value, kind: "init" as const })),
     ...(recipe.workers ?? []).map((value) => ({ ...value, kind: "worker" as const })),
   ];
-}
-
-function unit(value: CompositeLocalServiceUnit): NormalizedLocalServiceUnit {
-  if (!isStableId(value.id) || text(value.image) === "") invalid("Local-service unit identity");
-  if (value.command !== undefined && (!Array.isArray(value.command) || value.command.some((part) => typeof part !== "string" || /[\0\r\n]/.test(part)))) invalid("Local-service unit command");
-  const ports = value.ports ?? {};
-  const portValues = new Set<number>();
-  for (const [name, port] of Object.entries(ports)) {
-    if (!isStableId(name) || !Number.isSafeInteger(port) || port < 1 || port > 65_535)
-      invalid("Local-service unit port");
-    if (portValues.has(port)) invalid("Duplicate local-service unit port");
-    portValues.add(port);
-  }
-  const volumes = (value.volumes ?? []).map((mount) => {
-    if (!isStableId(mount.name) || !path(mount.mountPath)) invalid("Local-service unit volume");
-    return Object.freeze({ name: mount.name, mountPath: mount.mountPath });
-  });
-  if (new Set(volumes.map((mount) => mount.name)).size !== volumes.length)
-    invalid("Duplicate local-service unit volume");
-  if (value.health !== undefined) healthCheck(value.health);
-  if (value.networkAliases !== undefined && (!Array.isArray(value.networkAliases) || value.networkAliases.some((alias) => !isStableId(alias)))) invalid("Local-service network alias");
-  if (value.hostAliases !== undefined && (!record(value.hostAliases) || Object.entries(value.hostAliases).some(([host, address]) => !isStableId(host) || typeof address !== "string" || address === "" || /[\0\r\n]/.test(address)))) invalid("Local-service host alias");
-  return Object.freeze({
-    ...value,
-    image: value.image,
-    dependsOn: Object.freeze([...(value.dependsOn ?? [])]),
-    ports: Object.freeze({ ...ports }),
-    volumes: Object.freeze(volumes),
-    ...(value.networkAliases === undefined
-      ? {}
-      : { networkAliases: Object.freeze([...value.networkAliases]) }),
-    ...(value.hostAliases === undefined ? {} : { hostAliases: Object.freeze({ ...value.hostAliases }) }),
-  });
-}
-
-function topologicalOrder(units: readonly NormalizedLocalServiceUnit[]): NormalizedLocalServiceUnit[] {
-  const remaining = new Map(units.map((candidate) => [candidate.id, candidate]));
-  const ordered: NormalizedLocalServiceUnit[] = [];
-  while (remaining.size > 0) {
-    const ready = [...remaining.values()]
-      .filter((candidate) => candidate.dependsOn.every((dependency) => ordered.some((item) => item.id === dependency)))
-      .sort((left, right) => left.id.localeCompare(right.id));
-    if (ready.length === 0) invalid("Local-service unit dependency cycle");
-    for (const candidate of ready) {
-      remaining.delete(candidate.id);
-      ordered.push(candidate);
-    }
-  }
-  return ordered;
-}
-
-function record(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

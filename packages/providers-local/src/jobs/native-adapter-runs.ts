@@ -1,15 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type {
-  RunHandle,
-  RunListQuery,
-  RunPage,
-  RunSnapshot,
-} from "@relkit/contracts/jobs";
-import type {
-  NativeRunQuery,
-  NativeSubmission,
-  OperationContext,
-} from "@relkit/jobs/adapter";
+import type { RunHandle, RunListQuery, RunPage, RunSnapshot } from "@relkit/contracts/jobs";
+import type { NativeRunQuery, NativeSubmission, OperationContext } from "@relkit/jobs/adapter";
 import { namespaceOf, sameNamespace, snapshotOf } from "./native-adapter-support.js";
 import type { LocalNativeRun, LocalNativeState } from "./native-adapter-types.js";
 
@@ -61,7 +52,10 @@ export function listRuns(
   const limit = query.limit ?? 25;
   const items = [...state.runs.values()]
     .filter((run) => sameNamespace(run, context) && matches(run, query))
-    .sort((left, right) => left.acceptedAt.localeCompare(right.acceptedAt) || left.runId.localeCompare(right.runId))
+    .sort(
+      (left, right) =>
+        left.acceptedAt.localeCompare(right.acceptedAt) || left.runId.localeCompare(right.runId),
+    )
     .slice(0, limit)
     .map(snapshotOf);
   return {
@@ -73,11 +67,13 @@ export function listRuns(
 }
 
 function matches(run: LocalNativeRun, query: RunListQuery): boolean {
-  return (query.runId === undefined || query.runId === run.runId) &&
+  return (
+    (query.runId === undefined || query.runId === run.runId) &&
     (query.jobId === undefined || query.jobId === run.request.jobId) &&
     (query.taskId === undefined || query.taskId === run.request.taskId) &&
     (query.taskVersion === undefined || query.taskVersion === run.request.taskVersion) &&
     (query.buildId === undefined || query.buildId === run.request.buildId) &&
     (query.service === undefined || query.service === run.service) &&
-    (query.status === undefined || query.status.includes(run.status));
+    (query.status === undefined || query.status.includes(run.status))
+  );
 }

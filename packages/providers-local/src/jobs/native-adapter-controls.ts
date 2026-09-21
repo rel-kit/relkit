@@ -23,7 +23,12 @@ export async function cancelRun(
   if (!sameNamespace(run, context)) throw new Error("Native run is outside the operation scope");
   const receipt: RunCancellationReceipt = terminal(run.status)
     ? { runId: run.runId, operationId: request.operationId, outcome: "already-terminal" }
-    : { runId: run.runId, operationId: request.operationId, outcome: "requested", requestedAt: new Date().toISOString() };
+    : {
+        runId: run.runId,
+        operationId: request.operationId,
+        outcome: "requested",
+        requestedAt: new Date().toISOString(),
+      };
   if (receipt.outcome === "requested") {
     run.status = "cancelled";
     run.completedAt = new Date().toISOString();
@@ -43,7 +48,8 @@ export async function retryRun(
   if (previous !== undefined) return previous as NativeControlReceipt;
   const original = state.runs.get(request.runId);
   if (original === undefined) throw new Error("Native run was not found");
-  if (!sameNamespace(original, context)) throw new Error("Native run is outside the operation scope");
+  if (!sameNamespace(original, context))
+    throw new Error("Native run is outside the operation scope");
   if (request.scope !== undefined && request.scope !== context.scope) {
     throw new Error("Native retry scope does not match the operation scope");
   }
@@ -57,7 +63,9 @@ export async function retryRun(
     ...(request.inputHash === undefined ? {} : { inputHash: request.inputHash }),
     ...(request.inputSchemaHash === undefined ? {} : { inputSchemaHash: request.inputSchemaHash }),
     ...(request.acceptanceIdentity === undefined
-      ? { acceptanceIdentity: `${original.request.acceptanceIdentity ?? original.runId}:retry:${identity}` }
+      ? {
+          acceptanceIdentity: `${original.request.acceptanceIdentity ?? original.runId}:retry:${identity}`,
+        }
       : { acceptanceIdentity: request.acceptanceIdentity }),
     retryOfRunId: original.runId,
   };
