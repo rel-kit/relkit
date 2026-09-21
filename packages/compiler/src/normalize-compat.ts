@@ -2,7 +2,13 @@ import { canonicalJson, type JsonValue } from "@relkit/contracts";
 import { id, isRecord, refId, schemaKey, taskSchemaKey } from "./normalize-utils.js";
 import type { NormalizedDescriptor, NormalizeInput } from "./normalize-types.js";
 import { providerMaps } from "./normalize-graph-app.js";
-export { isSchema, schema, type SchemaDirection, type SchemaResult, schemaHash } from "./normalize-schema-projection.js";
+export {
+  isSchema,
+  schema,
+  type SchemaDirection,
+  type SchemaResult,
+  schemaHash,
+} from "./normalize-schema-projection.js";
 import { schema, type SchemaDirection } from "./normalize-schema-projection.js";
 
 export type SchemaEntry = readonly [string, unknown, SchemaDirection?];
@@ -97,8 +103,7 @@ export function schemaEntries(descriptor: NormalizedDescriptor): readonly Schema
   if (descriptor.kind !== "channel") return direct;
   const events = isRecord(value.events)
     ? Object.entries(value.events).map(
-        ([event, eventSchema]) =>
-          [`${descriptor.id}:event:${event}`, eventSchema] as SchemaEntry,
+        ([event, eventSchema]) => [`${descriptor.id}:event:${event}`, eventSchema] as SchemaEntry,
       )
     : [];
   const presence =

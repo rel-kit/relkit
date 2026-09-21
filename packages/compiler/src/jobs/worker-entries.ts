@@ -3,6 +3,13 @@ import { dirname, join } from "node:path";
 import { canonicalJson } from "@relkit/contracts";
 import type { JobsManifestWorkerEntry } from "./manifest.js";
 import { writeIfChanged, type ArtifactWriteResult } from "../generated-artifacts.js";
+import {
+  assertSegment,
+  isMissing,
+  isRoutingManifest,
+  type RoutingEntry,
+  type RoutingManifest,
+} from "./worker-entries-support.js";
 
 export interface JobWorkerWriteOptions {
   readonly buildDirectory: string;
@@ -23,18 +30,11 @@ export class JobWorkerConflictError extends Error {
   }
 }
 
-type RoutingEntry = Omit<JobsManifestWorkerEntry, "path">;
-
-interface RoutingManifest {
-  readonly protocol: "relkit.jobs-routing";
-  readonly version: 1;
-  readonly buildId: string;
-  readonly serviceGeneration: string;
-  readonly entries: readonly RoutingEntry[];
-}
-
 /** Returns the immutable worker path for a compiled job build and service generation. */
-export function jobWorkerPath(buildDirectory: string, entry: Pick<JobsManifestWorkerEntry, "buildId" | "serviceGeneration">): string {
+export function jobWorkerPath(
+  buildDirectory: string,
+  entry: Pick<JobsManifestWorkerEntry, "buildId" | "serviceGeneration">,
+): string {
   assertSegment(entry.buildId, "buildId");
   assertSegment(entry.serviceGeneration, "serviceGeneration");
   return join(buildDirectory, "jobs", entry.buildId, entry.serviceGeneration, "worker.js");
@@ -70,12 +70,17 @@ export async function writeJobWorkerEntries(
       }),
   );
   await assertImmutable(pending.map((entry) => [entry.path, entry.content] as const));
-  const workers = await Promise.all(pending.map((entry) => writeIfChanged(entry.path, entry.content)));
-  const routingManifests = await Promise.all(pending.map((entry) => writeIfChanged(entry.routing, entry.routingContent)));
+  const workers = await Promise.all(
+    pending.map((entry) => writeIfChanged(entry.path, entry.content)),
+  );
+  const routingManifests = await Promise.all(
+    pending.map((entry) => writeIfChanged(entry.routing, entry.routingContent)),
+  );
   return Object.freeze({
     workers: Object.freeze(workers),
     routingManifests: Object.freeze(routingManifests),
-    changed: workers.some((entry) => entry.changed) || routingManifests.some((entry) => entry.changed),
+    changed:
+      workers.some((entry) => entry.changed) || routingManifests.some((entry) => entry.changed),
   });
 }
 
@@ -94,16 +99,18 @@ function renderWorker(
   })}\n`;
 }
 
-function renderRouting(
-  first: JobsManifestWorkerEntry,
-  entries: readonly RoutingEntry[],
-): string {
+function renderRouting(first: JobsManifestWorkerEntry, entries: readonly RoutingEntry[]): string {
   return `${canonicalJson({
     protocol: "relkit.jobs-routing",
     version: 1,
     buildId: first.buildId,
     serviceGeneration: first.serviceGeneration,
-    entries: entries.map(({ jobId, taskId, buildId, serviceGeneration }) => ({ jobId, taskId, buildId, serviceGeneration })),
+    entries: entries.map(({ jobId, taskId, buildId, serviceGeneration }) => ({
+      jobId,
+      taskId,
+      buildId,
+      serviceGeneration,
+    })),
   })}\n`;
 }
 
@@ -162,41 +169,4 @@ async function assertImmutable(entries: readonly (readonly [string, string])[]):
     }
     if (existing !== undefined && existing !== content) throw new JobWorkerConflictError(path);
   }
-}
-
-function assertSegment(value: string, name: string): void {
-  if (value.length === 0 || value === "." || value === ".." || value.includes("/") || value.includes("\\"))
-    throw new TypeError(`Job worker ${name} must be one safe path segment.`);
-}
-
-function isMissing(error: unknown): boolean {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
-}
-
-function isRoutingManifest(value: unknown): value is RoutingManifest {
-  if (
-    !isRecord(value) ||
-    value.protocol !== "relkit.jobs-routing" ||
-    value.version !== 1 ||
-    typeof value.buildId !== "string" ||
-    typeof value.serviceGeneration !== "string" ||
-    !Array.isArray(value.entries)
-  ) {
-    return false;
-  }
-  return value.entries.every(isRoutingEntry);
-}
-
-function isRoutingEntry(value: unknown): value is RoutingEntry {
-  return (
-    isRecord(value) &&
-    typeof value.jobId === "string" &&
-    typeof value.taskId === "string" &&
-    typeof value.buildId === "string" &&
-    typeof value.serviceGeneration === "string"
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

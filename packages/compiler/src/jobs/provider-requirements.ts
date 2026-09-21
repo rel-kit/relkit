@@ -1,12 +1,16 @@
 import { providerMaps, selectedProviderProfile } from "../normalize-graph-app.js";
 import { add } from "../normalize-pass-utils.js";
-import { NORMALIZE_CODES, type NormalizedDescriptor, type NormalizationWork } from "../normalize-types.js";
+import {
+  NORMALIZE_CODES,
+  type NormalizedDescriptor,
+  type NormalizationWork,
+} from "../normalize-types.js";
 import { isRecord, refId } from "../normalize-utils.js";
 
 const FEATURE_ALIASES: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  durable: ["durable-task", "durable-execution", "durable-sleep", "task-execution"],
-  retryable: ["retryable-task", "retryable-execution", "task-execution", "retry"],
-  schedules: ["schedules", "schedule", "native-schedule"],
+  durable: ["durable", "durable-task", "durable-execution", "durable-sleep", "task-execution"],
+  retryable: ["retryable", "retryable-task", "retryable-execution", "task-execution", "retry"],
+  schedules: ["schedules", "schedule", "native-schedule", "native-scheduling"],
   observation: ["observation", "read", "run-observation"],
   cancel: ["cancel", "cancellation", "run-cancel"],
   retry: ["retry", "run-retry"],

@@ -96,7 +96,11 @@ function hasUnstableKey(value: ts.Node): boolean {
   let unstable = false;
   const visit = (node: ts.Node): void => {
     if (unstable) return;
-    if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "Date") {
+    if (
+      ts.isNewExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "Date"
+    ) {
       unstable = true;
       return;
     }
@@ -106,9 +110,12 @@ function hasUnstableKey(value: ts.Node): boolean {
     }
     if (ts.isPropertyAccessExpression(node)) {
       const object = node.expression;
-      if ((ts.isIdentifier(object) && ["Date", "Math", "crypto"].includes(object.text) &&
-        ["now", "random", "randomUUID", "randomBytes"].includes(node.name.text)) ||
-        ORDER_METHODS.has(node.name.text)) {
+      if (
+        (ts.isIdentifier(object) &&
+          ["Date", "Math", "crypto"].includes(object.text) &&
+          ["now", "random", "randomUUID", "randomBytes"].includes(node.name.text)) ||
+        ORDER_METHODS.has(node.name.text)
+      ) {
         unstable = true;
         return;
       }

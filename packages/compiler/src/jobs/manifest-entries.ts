@@ -17,7 +17,8 @@ export function taskEntry(task: NormalizedDescriptor, work: NormalizationWork): 
     buildId: typeof node?.buildId === "string" ? node.buildId : computeTaskBuildId(task, work),
     schemaHashes: node?.schemaHashes === undefined ? {} : clean(node.schemaHashes),
     policy: node?.policy === undefined ? clean(value.policy ?? {}) : clean(node.policy),
-    dependencies: node?.dependencies === undefined ? clean(value.dependencies ?? {}) : clean(node.dependencies),
+    dependencies:
+      node?.dependencies === undefined ? clean(value.dependencies ?? {}) : clean(node.dependencies),
     publishes: node?.publishes === undefined ? clean(value.publishes ?? []) : clean(node.publishes),
     resources: node?.resources === undefined ? clean(value.resources ?? {}) : clean(node.resources),
   };
@@ -28,7 +29,8 @@ export function jobEntry(job: NormalizedDescriptor, work: NormalizationWork): Jo
   const taskId = refId(value.task) ?? "";
   const node = work.graph?.nodes.find((entry) => entry.id === `job.${job.id}`);
   const generation = serviceGenerationFor(work, job);
-  const buildId = typeof node?.buildId === "string" ? node.buildId : computeJobBuildId(job, work) ?? "";
+  const buildId =
+    typeof node?.buildId === "string" ? node.buildId : (computeJobBuildId(job, work) ?? "");
   return {
     id: job.id,
     graphId: `job.${job.id}`,
@@ -37,7 +39,8 @@ export function jobEntry(job: NormalizedDescriptor, work: NormalizationWork): Jo
     taskVersion: text(isRecord(value.task) ? value.task.version : value.version),
     buildId,
     profile: text(node?.profile ?? value.service ?? value.profile) || "default",
-    serviceGeneration: typeof node?.serviceGeneration === "string" ? node.serviceGeneration : generation,
+    serviceGeneration:
+      typeof node?.serviceGeneration === "string" ? node.serviceGeneration : generation,
     implicit: value.implicit === true,
     default: value.default === true,
     client: clientProjection(value.client),
@@ -65,29 +68,51 @@ export function stripScheduleInput(value: unknown): JsonValue {
   return clean(definition);
 }
 
-export function uniqueGenerations(jobs: readonly JobsManifestJob[]): readonly { readonly profile: string; readonly generation: string }[] {
-  const values = new Map(jobs.map((job) => [`${job.profile}\0${job.serviceGeneration}`, { profile: job.profile, generation: job.serviceGeneration }]));
-  return [...values.values()].sort((a, b) => a.profile.localeCompare(b.profile) || a.generation.localeCompare(b.generation));
+export function uniqueGenerations(
+  jobs: readonly JobsManifestJob[],
+): readonly { readonly profile: string; readonly generation: string }[] {
+  const values = new Map(
+    jobs.map((job) => [
+      `${job.profile}\0${job.serviceGeneration}`,
+      { profile: job.profile, generation: job.serviceGeneration },
+    ]),
+  );
+  return [...values.values()].sort(
+    (a, b) => a.profile.localeCompare(b.profile) || a.generation.localeCompare(b.generation),
+  );
 }
 
 export function recipeReferences(work: NormalizationWork): readonly JsonValue[] {
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   if (!isRecord(application)) return [];
-  return providerMaps(application).filter(([capability]) => capability === "job").flatMap(([, profiles]) =>
-    isRecord(profiles) ? Object.values(profiles).flatMap((binding) => isRecord(binding) && binding.local !== undefined ? [clean(binding.local)] : []) : [],
-  );
+  return providerMaps(application)
+    .filter(([capability]) => capability === "job")
+    .flatMap(([, profiles]) =>
+      isRecord(profiles)
+        ? Object.values(profiles).flatMap((binding) =>
+            isRecord(binding) && binding.local !== undefined ? [clean(binding.local)] : [],
+          )
+        : [],
+    );
 }
 
 export function compatibilityHashes(work: NormalizationWork): readonly string[] {
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
   if (!isRecord(application)) return [];
-  return providerMaps(application).filter(([capability]) => capability === "job").flatMap(([, profiles]) =>
-    isRecord(profiles) ? Object.values(profiles).flatMap((binding) => {
-      const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
-      const behavior = isRecord(adapter.behavior) ? adapter.behavior : {};
-      return typeof behavior.compatibilityReportHash === "string" ? [behavior.compatibilityReportHash] : [];
-    }) : [],
-  ).sort();
+  return providerMaps(application)
+    .filter(([capability]) => capability === "job")
+    .flatMap(([, profiles]) =>
+      isRecord(profiles)
+        ? Object.values(profiles).flatMap((binding) => {
+            const adapter = isRecord(binding) && isRecord(binding.adapter) ? binding.adapter : {};
+            const behavior = isRecord(adapter.behavior) ? adapter.behavior : {};
+            return typeof behavior.compatibilityReportHash === "string"
+              ? [behavior.compatibilityReportHash]
+              : [];
+          })
+        : [],
+    )
+    .sort();
 }
 
 function text(value: unknown): string {

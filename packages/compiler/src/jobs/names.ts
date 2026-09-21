@@ -34,21 +34,42 @@ export function validateJobNames(work: NormalizationWork): void {
     } else {
       const previous = names.get(name);
       if (previous !== undefined && previous !== descriptor.id) {
-        add(work, descriptor, NORMALIZE_CODES.jobName, `Job name "${name}" is already used by "${previous}".`);
+        add(
+          work,
+          descriptor,
+          NORMALIZE_CODES.jobName,
+          `Job name "${name}" is already used by "${previous}".`,
+        );
       } else names.set(name, descriptor.id);
     }
     const task = value.task;
     if (refKind(task) !== "task" || refId(task) === undefined) {
-      add(work, descriptor, NORMALIZE_CODES.jobTask, "Task-target jobs must reference a task descriptor.");
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.jobTask,
+        "Task-target jobs must reference a task descriptor.",
+      );
     }
     if (value.target !== undefined) {
-      add(work, descriptor, NORMALIZE_CODES.jobTask, "New jobs cannot target functions; bind a task instead.");
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.jobTask,
+        "New jobs cannot target functions; bind a task instead.",
+      );
     }
     if (value.default === true && refId(task) !== undefined) {
       const taskId = refId(task)!;
       const count = (defaults.get(taskId) ?? 0) + 1;
       defaults.set(taskId, count);
-      if (count > 1) add(work, descriptor, NORMALIZE_CODES.jobBinding, `Task "${taskId}" has more than one default job.`);
+      if (count > 1)
+        add(
+          work,
+          descriptor,
+          NORMALIZE_CODES.jobBinding,
+          `Task "${taskId}" has more than one default job.`,
+        );
     }
   }
 }
