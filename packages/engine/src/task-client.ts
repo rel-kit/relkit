@@ -7,7 +7,12 @@ export function createTaskDependencyClient(
   source: unknown,
   options: DependencyClientBuildOptions,
   taskId: string,
-): { readonly trigger: (input: unknown, request?: Readonly<Record<string, unknown>>) => Promise<unknown> } {
+): {
+  readonly trigger: (
+    input: unknown,
+    request?: Readonly<Record<string, unknown>>,
+  ) => Promise<unknown>;
+} {
   if (source !== undefined && !isTrigger(source) && typeof source !== "function") {
     throw new TypeError(`Invalid task client "${name}"`);
   }
@@ -49,6 +54,12 @@ export function createTaskDependencyClient(
   return Object.freeze({ trigger });
 }
 
-function isTrigger(value: unknown): value is { readonly trigger: (input: unknown, options?: unknown) => MaybePromise<unknown> } {
-  return value !== null && typeof value === "object" && typeof (value as { trigger?: unknown }).trigger === "function";
+function isTrigger(
+  value: unknown,
+): value is { readonly trigger: (input: unknown, options?: unknown) => MaybePromise<unknown> } {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    typeof (value as { trigger?: unknown }).trigger === "function"
+  );
 }

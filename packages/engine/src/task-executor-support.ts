@@ -66,7 +66,10 @@ export async function callTaskHook(
   context: TaskContextBase,
 ): Promise<void> {
   if (hook !== undefined) {
-    await (hook as unknown as (value: unknown, context: TaskContextBase) => Promise<void>)(first, context);
+    await (hook as unknown as (value: unknown, context: TaskContextBase) => Promise<void>)(
+      first,
+      context,
+    );
   }
 }
 
@@ -74,9 +77,10 @@ export function lookupTask(
   tasks: Readonly<Record<string, TaskDescriptorAny>> | ReadonlyMap<string, TaskDescriptorAny>,
   taskId: string,
 ): TaskDescriptorAny {
-  const task = tasks instanceof Map
-    ? tasks.get(taskId)
-    : (tasks as Readonly<Record<string, TaskDescriptorAny>>)[taskId];
+  const task =
+    tasks instanceof Map
+      ? tasks.get(taskId)
+      : (tasks as Readonly<Record<string, TaskDescriptorAny>>)[taskId];
   if (task === undefined) throw new TaskExecutionError(`Task "${taskId}" is not registered`);
   return task;
 }
@@ -94,9 +98,12 @@ export async function assertEnvelope(
     envelope.jobId !== binding.run.jobId ||
     envelope.taskVersion !== binding.run.taskVersion
   ) {
-    throw new TaskExecutionError("Native task envelope does not match the verified execution binding");
+    throw new TaskExecutionError(
+      "Native task envelope does not match the verified execution binding",
+    );
   }
-  if (envelope.buildId !== binding.run.buildId) throw new TaskExecutionError("Task build is not pinned to the native run");
+  if (envelope.buildId !== binding.run.buildId)
+    throw new TaskExecutionError("Task build is not pinned to the native run");
   if (
     envelope.inputSchemaHash !== undefined &&
     binding.run.inputSchemaHash !== undefined &&
@@ -104,7 +111,11 @@ export async function assertEnvelope(
   ) {
     throw new TaskExecutionError("Task input schema is not pinned to the native run");
   }
-  if (envelope.scope !== undefined && binding.run.scope !== undefined && envelope.scope !== binding.run.scope) {
+  if (
+    envelope.scope !== undefined &&
+    binding.run.scope !== undefined &&
+    envelope.scope !== binding.run.scope
+  ) {
     throw new TaskExecutionError("Task scope is not pinned to the native run");
   }
   if (
@@ -114,7 +125,10 @@ export async function assertEnvelope(
   ) {
     throw new TaskExecutionError("Task acceptance identity is not pinned to the native run");
   }
-  if (envelope.attempt !== undefined && (!Number.isSafeInteger(envelope.attempt) || envelope.attempt < 1)) {
+  if (
+    envelope.attempt !== undefined &&
+    (!Number.isSafeInteger(envelope.attempt) || envelope.attempt < 1)
+  ) {
     throw new TaskExecutionError("Native task envelope attempt is invalid");
   }
   if (envelope.inputHash !== undefined) {
@@ -124,6 +138,7 @@ export async function assertEnvelope(
       new TextEncoder().encode(encoded),
     );
     const actual = `sha256:${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
-    if (actual !== envelope.inputHash) throw new TaskExecutionError("Native task input hash is invalid");
+    if (actual !== envelope.inputHash)
+      throw new TaskExecutionError("Native task input hash is invalid");
   }
 }

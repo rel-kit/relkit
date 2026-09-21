@@ -6,15 +6,19 @@ test("forwards task trigger options without injecting unsupported trace fields",
   let received: Readonly<Record<string, unknown>> | undefined;
   const client = createTaskDependencyClient(
     "child",
-    { trigger: async (_input: unknown, options: Readonly<Record<string, unknown>>) => {
-      received = options;
-      return "accepted";
-    } },
+    {
+      trigger: async (_input: unknown, options: Readonly<Record<string, unknown>>) => {
+        received = options;
+        return "accepted";
+      },
+    },
     { ownerId: "parent", signal: () => signal },
     "tasks.parent",
   );
 
-  await expect(client.trigger({ value: 1 }, { idempotencyKey: "business-key", delay: "1 second" })).resolves.toBe("accepted");
+  await expect(
+    client.trigger({ value: 1 }, { idempotencyKey: "business-key", delay: "1 second" }),
+  ).resolves.toBe("accepted");
   expect(received).toMatchObject({ idempotencyKey: "business-key", delay: "1 second", signal });
   expect(received).not.toHaveProperty("propagation");
 });
@@ -34,6 +38,8 @@ test("passes task trigger options to the direct task invoker", async () => {
     "tasks.parent",
   );
 
-  await expect(client.trigger({ value: 1 }, { operationId: "operation-1" })).resolves.toBe("accepted");
+  await expect(client.trigger({ value: 1 }, { operationId: "operation-1" })).resolves.toBe(
+    "accepted",
+  );
   expect(received).toEqual({ operationId: "operation-1" });
 });

@@ -1,4 +1,9 @@
-import type { InvocationContextFactory, InvocationIdSource, InvocationRunner, TaskAncestry } from "@relkit/invocation";
+import type {
+  InvocationContextFactory,
+  InvocationIdSource,
+  InvocationRunner,
+  TaskAncestry,
+} from "@relkit/invocation";
 import { currentJobsRuntime } from "@relkit/jobs";
 import type { JsonValue } from "@relkit/contracts";
 import {
@@ -18,14 +23,11 @@ import type { FunctionRegistry } from "./registry.js";
 import type { InvocationContext, InvocationTarget, InvokeOptions } from "./invoke-types.js";
 import { invoke } from "./invoke.js";
 import { materializeTaskContext } from "./task-context.js";
-import {
-  assertEnvelope,
-  enrichBinding,
-  lookupTask,
-} from "./task-executor-support.js";
+import { assertEnvelope, enrichBinding, lookupTask } from "./task-executor-support.js";
 
 export interface TaskExecutorOptions {
-  readonly tasks: Readonly<Record<string, TaskDescriptorAny>> | ReadonlyMap<string, TaskDescriptorAny>;
+  readonly tasks:
+    Readonly<Record<string, TaskDescriptorAny>> | ReadonlyMap<string, TaskDescriptorAny>;
   readonly registry?: FunctionRegistry;
   readonly clients?: DependencyClientSources;
   readonly invokeTask?: DirectTaskInvoker;
@@ -65,16 +67,19 @@ export async function executeTask(
     attempt: envelope.attempt ?? executionBinding.run.attempt ?? 1,
   };
   const target = taskTarget(task, options);
-  const taskInvoker = options.invokeTask ?? ((request) => submitTask(
-    lookupTask(options.tasks, request.taskId),
-    request.input,
-    request.options === undefined && request.signal === undefined
-      ? undefined
-      : {
-          ...(request.options ?? {}),
-          ...(request.signal === undefined ? {} : { signal: request.signal }),
-        },
-  ));
+  const taskInvoker =
+    options.invokeTask ??
+    ((request) =>
+      submitTask(
+        lookupTask(options.tasks, request.taskId),
+        request.input,
+        request.options === undefined && request.signal === undefined
+          ? undefined
+          : {
+              ...(request.options ?? {}),
+              ...(request.signal === undefined ? {} : { signal: request.signal }),
+            },
+      ));
   const attempt = ancestry.attempt ?? 1;
   const invokeOptions: InvokeOptions<unknown, unknown, TaskContextBase> = {
     target,
@@ -104,7 +109,9 @@ export async function executeTask(
       : { isSuspension: executionBinding.isSuspension }),
     skipInputValidation: true,
     skipOutputValidation: true,
-    ...(executionBinding.run.deadlineMs === undefined ? {} : { deadlineMs: executionBinding.run.deadlineMs }),
+    ...(executionBinding.run.deadlineMs === undefined
+      ? {}
+      : { deadlineMs: executionBinding.run.deadlineMs }),
     ...(options.registry === undefined ? {} : { registry: options.registry }),
     ...(options.clients === undefined ? {} : { clients: options.clients }),
     invokeTask: taskInvoker,
@@ -139,10 +146,12 @@ export async function executeTask(
         ? {}
         : {
             onFailure: (value, context) =>
-              (task.onFailure as unknown as (value: unknown, context: TaskContextBase) => Promise<void>)(
-                value,
-                context,
-              ),
+              (
+                task.onFailure as unknown as (
+                  value: unknown,
+                  context: TaskContextBase,
+                ) => Promise<void>
+              )(value, context),
           }),
     },
   };
@@ -159,7 +168,10 @@ function taskTarget(
     output: task.output,
     ...(task.dependencies === undefined
       ? {}
-      : { dependencies: task.dependencies as unknown as import("./dependencies.js").DependencyDeclarations }),
+      : {
+          dependencies:
+            task.dependencies as unknown as import("./dependencies.js").DependencyDeclarations,
+        }),
     ...(options.publications === undefined ? {} : { publications: options.publications }),
     ...(task.publishes === undefined ? {} : { publishes: task.publishes }),
     handler: (input, context) =>

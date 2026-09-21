@@ -22,7 +22,9 @@ export interface TaskContextMaterializationOptions {
   readonly signal: AbortSignal;
   readonly env: Readonly<Record<string, unknown>>;
   readonly time: PublicClock;
-  readonly context?: (options: InvocationContextOptions) => Promise<TaskContextBase> | TaskContextBase;
+  readonly context?: (
+    options: InvocationContextOptions,
+  ) => Promise<TaskContextBase> | TaskContextBase;
   readonly clients?: DependencyClientSources;
   readonly invokeTask?: DirectTaskInvoker;
   readonly publications?: Readonly<Record<string, import("./dependencies.js").DependencyRefLike>>;
@@ -47,8 +49,12 @@ export async function materializeTaskContext(
     service: options.binding.run.service ?? "default",
     attempt: options.binding.run.attempt ?? 1,
     acceptedAt: options.binding.run.acceptedAt ?? new Date().toISOString(),
-    ...(options.binding.run.scheduledFor === undefined ? {} : { scheduledFor: options.binding.run.scheduledFor }),
-    ...(options.binding.run.parentRunId === undefined ? {} : { parentRunId: options.binding.run.parentRunId }),
+    ...(options.binding.run.scheduledFor === undefined
+      ? {}
+      : { scheduledFor: options.binding.run.scheduledFor }),
+    ...(options.binding.run.parentRunId === undefined
+      ? {}
+      : { parentRunId: options.binding.run.parentRunId }),
     ...(options.binding.run.acceptanceIdentity === undefined
       ? {}
       : { acceptanceIdentity: options.binding.run.acceptanceIdentity }),
@@ -62,18 +68,21 @@ export async function materializeTaskContext(
     run,
     idempotencyKey: (operation: string) => taskOperationIdentity(acceptanceIdentity, operation),
   };
-  const withProgress = options.task.progress === undefined
-    ? taskBase
-    : {
-        ...taskBase,
-        progress: createTaskProgressEmitter(options.task.progress, {
-          signal: options.signal,
-          durable: options.task.observation?.progress === "durable",
-          generation,
-          requireGeneration: options.task.observation?.progress === "durable",
-          ...(options.binding.progress === undefined ? {} : { sink: (value: unknown) => options.binding.progress!.emit(value as JsonValue) }),
-        }),
-      };
+  const withProgress =
+    options.task.progress === undefined
+      ? taskBase
+      : {
+          ...taskBase,
+          progress: createTaskProgressEmitter(options.task.progress, {
+            signal: options.signal,
+            durable: options.task.observation?.progress === "durable",
+            generation,
+            requireGeneration: options.task.observation?.progress === "durable",
+            ...(options.binding.progress === undefined
+              ? {}
+              : { sink: (value: unknown) => options.binding.progress!.emit(value as JsonValue) }),
+          }),
+        };
   const withStreams = Object.entries(options.task.streams ?? {}).reduce<Record<string, unknown>>(
     (current, [name, schema]) => {
       const writer = options.binding.streams?.[name];
@@ -83,27 +92,38 @@ export async function materializeTaskContext(
         durable: options.task.observation?.streams?.[name] === "history",
         requireGeneration: options.task.observation?.streams?.[name] === "history",
         signal: options.signal,
-        ...(writer === undefined ? {} : { sink: (value: unknown) => writer.emit(value as JsonValue) }),
+        ...(writer === undefined
+          ? {}
+          : { sink: (value: unknown) => writer.emit(value as JsonValue) }),
       });
       return current;
     },
     {},
   );
-  const withDurableControls = options.task.execution === "durable"
-    ? {
-        ...withProgress,
-        sleep: (duration: import("@relkit/jobs").DurationInput, sleepOptions: { readonly key: string }) => durableSleep(options, duration, sleepOptions.key),
-        sleepUntil: (instant: string, sleepOptions: { readonly key: string }) => durableSleepUntil(options, instant, sleepOptions.key),
-      }
-    : withProgress;
-  const enriched = Object.keys(withStreams).length === 0
-    ? withDurableControls
-    : { ...withDurableControls, streams: Object.freeze(withStreams) };
+  const withDurableControls =
+    options.task.execution === "durable"
+      ? {
+          ...withProgress,
+          sleep: (
+            duration: import("@relkit/jobs").DurationInput,
+            sleepOptions: { readonly key: string },
+          ) => durableSleep(options, duration, sleepOptions.key),
+          sleepUntil: (instant: string, sleepOptions: { readonly key: string }) =>
+            durableSleepUntil(options, instant, sleepOptions.key),
+        }
+      : withProgress;
+  const enriched =
+    Object.keys(withStreams).length === 0
+      ? withDurableControls
+      : { ...withDurableControls, streams: Object.freeze(withStreams) };
   return createContext(enriched as TaskContextBase, {
     ownerId: options.task.id,
     ...(options.task.dependencies === undefined
       ? {}
-      : { dependencies: options.task.dependencies as unknown as import("./dependencies.js").DependencyDeclarations }),
+      : {
+          dependencies: options.task
+            .dependencies as unknown as import("./dependencies.js").DependencyDeclarations,
+        }),
     ...(options.publications === undefined ? {} : { publications: options.publications }),
     ...(options.clients === undefined ? {} : { clients: options.clients }),
     ...(options.invokeTask === undefined ? {} : { invokeTask: options.invokeTask }),
@@ -125,6 +145,7 @@ function durableSleepUntil(
   key: string,
 ): Promise<void> {
   assertRfc3339Instant(instant, "task.sleepUntil");
-  if (options.binding.sleep?.sleepUntil === undefined) throw new JobsCapabilityError("durable-sleep-until");
+  if (options.binding.sleep?.sleepUntil === undefined)
+    throw new JobsCapabilityError("durable-sleep-until");
   return options.binding.sleep.sleepUntil(key, instant);
 }
