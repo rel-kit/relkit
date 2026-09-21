@@ -18,8 +18,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { createClient, type ClientHeaders } from "../index.js";
-import type { RelkitKeyScope } from "./keys.js";
+import { createClient } from "../index.js";
 import { clearPendingOperations, pendingScopeKey } from "./pending.js";
 import { RealtimeManager } from "./realtime-manager.js";
 import {
@@ -33,37 +32,12 @@ import {
   scopeFor,
   streamClientFor,
 } from "./context-support.js";
-export interface RelkitHydrationState {
-  readonly scope: RelkitKeyScope;
-  readonly dehydrated: unknown;
-}
-export interface RelkitClientProviderProps {
-  readonly baseUrl?: string;
-  readonly environment?: string;
-  readonly credentials?: RequestInit["credentials"];
-  readonly headers?: ClientHeaders;
-  readonly queryClient?: QueryClient;
-  readonly identityKey?: string | null;
-  readonly hydratedState?: RelkitHydrationState;
-  readonly transport?: "auto" | "websocket" | "http-stream" | "sse";
-  readonly requestTimeoutMs?: number;
-  readonly streamEstablishmentTimeoutMs?: number;
-  readonly children: ReactNode;
-}
-export interface RelkitClientRuntime {
-  readonly client: ReturnType<typeof createClient>;
-  readonly streamClient: ReturnType<typeof createClient>;
-  readonly queryClient: QueryClient;
-  readonly utils: unknown;
-  readonly identity?: ClientIdentityDocument;
-  readonly identityKey?: string | null;
-  readonly status: "loading" | "ready" | "application-updated" | "error";
-  readonly scope?: RelkitKeyScope;
-  readonly transport: "auto" | "websocket" | "http-stream" | "sse";
-  readonly streamEstablishmentTimeoutMs: number;
-  readonly environment?: string;
-  readonly realtime: RealtimeManager;
-}
+import type { RelkitClientProviderProps, RelkitClientRuntime } from "./context-types.js";
+export type {
+  RelkitClientProviderProps,
+  RelkitClientRuntime,
+  RelkitHydrationState,
+} from "./context-types.js";
 const Context = createContext<RelkitClientRuntime | undefined>(undefined);
 
 export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNode {
@@ -140,7 +114,14 @@ export function RelkitClientProvider(props: RelkitClientProviderProps): ReactNod
         void error;
       });
     return () => controller.abort();
-  }, [baseUrl, props.credentials, props.environment, props.hydratedState, props.identityKey, queryClient]);
+  }, [
+    baseUrl,
+    props.credentials,
+    props.environment,
+    props.hydratedState,
+    props.identityKey,
+    queryClient,
+  ]);
   const compiled = compiledFingerprint();
   const status = failed
     ? "error"

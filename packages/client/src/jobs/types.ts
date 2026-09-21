@@ -1,9 +1,5 @@
 import type { ExpectedClientIdentity } from "@relkit/contracts";
-import type {
-  RunConnection,
-  RunSnapshot,
-  RunWatchFrame,
-} from "@relkit/contracts/jobs";
+import type { RunConnection, RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
 
 export interface JobWatchOptions {
   readonly runId: string;
@@ -90,5 +86,10 @@ export class JobWatchReadTimeoutError extends Error {
 export function isTerminalRun(run: unknown): boolean {
   if (run === null || typeof run !== "object") return false;
   const status = (run as { readonly status?: unknown }).status;
-  return status === "completed" || status === "failed" || status === "cancelled" || status === "timed-out";
+  return (
+    status === "completed" ||
+    status === "failed" ||
+    status === "cancelled" ||
+    status === "timed-out"
+  );
 }

@@ -28,7 +28,10 @@ export class JobStreamOverflowError extends Error {
 export class JobStreamGapError extends Error {
   readonly code = "RELKIT_JOB_STREAM_GAP" as const;
 
-  constructor(readonly expected: number, readonly received: number) {
+  constructor(
+    readonly expected: number,
+    readonly received: number,
+  ) {
     super(`The named job stream skipped content sequence ${expected} before ${received}.`);
     this.name = "JobStreamGapError";
   }
@@ -47,7 +50,9 @@ export async function watchJobStream<Item extends JsonValue = JsonValue>(
         runId: options.runId,
         name: options.name,
         ...(options.after === undefined ? {} : { after: options.after }),
-        ...(options.expectedIdentity === undefined ? {} : { expectedIdentity: options.expectedIdentity }),
+        ...(options.expectedIdentity === undefined
+          ? {}
+          : { expectedIdentity: options.expectedIdentity }),
       },
       { signal: readSignal },
     ),
@@ -109,7 +114,9 @@ async function* boundedStream<Item extends JsonValue>(
 }
 
 function streamIdentity(frame: NamedStreamFrame): string {
-  return [frame.runId, frame.name, frame.attempt, frame.generation, frame.schemaVersion].join("\u0000");
+  return [frame.runId, frame.name, frame.attempt, frame.generation, frame.schemaVersion].join(
+    "\u0000",
+  );
 }
 
 function validateFrame(value: unknown): NamedStreamFrame {

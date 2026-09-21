@@ -88,7 +88,11 @@ export function resetFrame(value: unknown): unknown {
 
 export function isUnauthorized(value: unknown): boolean {
   if (value === null || typeof value !== "object") return false;
-  const record = value as { readonly code?: unknown; readonly data?: unknown; readonly cause?: unknown };
+  const record = value as {
+    readonly code?: unknown;
+    readonly data?: unknown;
+    readonly cause?: unknown;
+  };
   return (
     record.code === "RELKIT_JOB_ACCESS_DENIED" ||
     record.code === "UNAUTHORIZED" ||

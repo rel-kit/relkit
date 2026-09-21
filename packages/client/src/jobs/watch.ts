@@ -59,7 +59,8 @@ function feedKey(client: unknown, name: string, options: JobWatchOptions): strin
 }
 
 function clientId(value: unknown): string | number {
-  if ((typeof value !== "object" && typeof value !== "function") || value === null) return String(value);
+  if ((typeof value !== "object" && typeof value !== "function") || value === null)
+    return String(value);
   let id = feedIds.get(value);
   if (id === undefined) {
     id = nextFeedId++;
