@@ -48,7 +48,7 @@ function nativeTaskDefinition(job, tasks) {
     taskVersion,
     buildId,
     ...(schedules === undefined ? {} : { schedules }),
-    ...(job.policy === undefined && task?.policy === undefined ? {} : { policy: job.policy ?? task.policy }),
+    ...(task?.policy === undefined ? {} : { policy: task.policy }),
     ...(task?.resources === undefined ? {} : { resources: task.resources }),
   };
 }
