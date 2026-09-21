@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 const INNGEST_IMAGE =
   "inngest/inngest@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57";
@@ -27,6 +27,14 @@ export function dockerHostArguments(
   platform: NodeJS.Platform = process.platform,
 ): readonly string[] {
   return platform === "linux" ? ["--add-host", "host.docker.internal:host-gateway"] : [];
+}
+
+export function inngestReadinessHeaders(signingKey: string): Readonly<Record<string, string>> {
+  return {
+    authorization: `Bearer ${createHash("sha256")
+      .update(Buffer.from(signingKey, "hex"))
+      .digest("hex")}`,
+  };
 }
 
 export async function reservePort(): Promise<number> {
@@ -169,8 +177,13 @@ export async function startNativeStack(
       "debug",
     ]);
     await waitFor(
-      "Inngest health",
-      async () => (await fetch(`${baseUrl}/health`)).ok,
+      "Inngest API",
+      async () =>
+        (
+          await fetch(`${baseUrl}/v2/runs?limit=1`, {
+            headers: inngestReadinessHeaders(signingKey),
+          })
+        ).ok,
       options.healthTimeoutMs ?? 30_000,
     );
     const close = async () => {
@@ -196,6 +209,16 @@ export async function startNativeStack(
   } catch (error) {
     const logs = await docker(["logs", "--tail", "80", inngest], true);
     if (logs) console.error(`Inngest container logs:\n${logs}`);
+    const status = await docker(
+      [
+        "inspect",
+        "--format",
+        "{{.State.Status}} exit={{.State.ExitCode}} error={{.State.Error}}",
+        inngest,
+      ],
+      true,
+    );
+    if (status) console.error(`Inngest container status: ${status}`);
     await docker(["rm", "-f", inngest, redis, postgres], true);
     await docker(["volume", "rm", "-f", redisVolume, postgresVolume], true);
     await docker(["network", "rm", network], true);
@@ -213,5 +236,5 @@ export async function docker(args: readonly string[], tolerateFailure = false): 
   if (exitCode !== 0 && !tolerateFailure) {
     throw new Error(`docker ${args.join(" ")} failed (${exitCode}): ${stderr.trim()}`);
   }
-  return stdout.trim();
+  return [stdout.trim(), stderr.trim()].filter(Boolean).join("\n");
 }

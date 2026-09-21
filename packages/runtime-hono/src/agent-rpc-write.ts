@@ -92,7 +92,11 @@ export async function acceptAgentControl(
     threadId,
     maxEncodedBytes: REALTIME_RUNTIME_LIMITS.initialSnapshotBytes,
   });
-  const runId = snapshot.activeRun?.runId;
+  const runId =
+    snapshot.activeRun?.runId ??
+    [...snapshot.currentRuns].sort((left, right) =>
+      right.acceptedAt.localeCompare(left.acceptedAt),
+    )[0]?.runId;
   if (runId === undefined) throw new Error("Agent has no active run.");
   assertAgentRunWritable(snapshot, runId);
   if (
