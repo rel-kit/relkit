@@ -7,9 +7,7 @@ import type {
 
 export interface WorkerStartOptions {
   readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;
-  readonly environmentVariablesByUnit?: Readonly<
-    Record<string, Readonly<Record<string, string>>>
-  >;
+  readonly environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>;
 }
 
 export function workerStartOptions(
@@ -23,7 +21,7 @@ export function workerStartOptions(
     artifact.providerOverridesFile,
     "worker provider overrides",
   );
-  const bindMount: readonly LocalServiceBindMount[] = Object.freeze([
+  const bindMounts: LocalServiceBindMount[] = [
     Object.freeze({
       source: dirname(dirname(entrypoint)),
       target: "/relkit-worker",
@@ -34,14 +32,28 @@ export function workerStartOptions(
       target: "/relkit-state",
       readOnly: true,
     }),
-  ]);
+  ];
+  const nodeModulesDirectory =
+    artifact.nodeModulesDirectory === undefined
+      ? undefined
+      : absoluteDirectory(artifact.nodeModulesDirectory, "worker node_modules directory");
+  if (nodeModulesDirectory !== undefined) {
+    bindMounts.push(
+      Object.freeze({
+        source: nodeModulesDirectory,
+        target: "/relkit-node-modules",
+        readOnly: true,
+      }),
+    );
+  }
   const environment = Object.freeze({
     RELKIT_PROVIDER_OVERRIDES_FILE: "/relkit-state/" + basename(providerOverridesFile),
     RELKIT_WORKER_ROLE: "worker",
+    ...(nodeModulesDirectory === undefined ? {} : { NODE_PATH: "/relkit-node-modules" }),
     ...(artifact.environment ?? {}),
   });
   return Object.freeze({
-    bindMounts: Object.freeze(Object.fromEntries(workers.map((unit) => [unit.id, bindMount]))),
+    bindMounts: Object.freeze(Object.fromEntries(workers.map((unit) => [unit.id, bindMounts]))),
     environmentVariablesByUnit: Object.freeze(
       Object.fromEntries(workers.map((unit) => [unit.id, environment])),
     ),
@@ -54,4 +66,8 @@ function absoluteFile(value: string, label: string): string {
     throw new TypeError(label + " must be an absolute path.");
   }
   return path;
+}
+
+function absoluteDirectory(value: string, label: string): string {
+  return absoluteFile(value, label);
 }

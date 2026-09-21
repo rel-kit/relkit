@@ -1,22 +1,44 @@
 {
   "name": "@relkit/trigger",
   "version": "0.4.1",
-  "description": "Trigger.dev native jobs integration for RELKIT.",
+  "description": "Trigger.dev jobs integration for RELKIT.",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/rel-kit/relkit.git",
     "directory": "integrations/packages/trigger"
   },
-  "files": ["dist"],
-  "publishConfig": {"access": "public"},
-  "engines": {"bun": ">=1.3.10"},
+  "homepage": "https://github.com/rel-kit/relkit#readme",
+  "bugs": {
+    "url": "https://github.com/rel-kit/relkit/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.10"
+  },
   "type": "module",
   "exports": {
-    ".": {"types": "./dist/index.d.ts", "import": "./dist/index.js"},
-    "./runtime": {"types": "./dist/runtime/index.d.ts", "import": "./dist/runtime/index.js"},
-    "./local-recipe": {"types": "./dist/local-recipe/index.d.ts", "import": "./dist/local-recipe/index.js"},
-    "./deployment": {"types": "./dist/deployment/index.d.ts", "import": "./dist/deployment/index.js"}
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/index.d.ts",
+      "import": "./dist/runtime/index.js"
+    },
+    "./local-recipe": {
+      "types": "./dist/local-recipe/index.d.ts",
+      "import": "./dist/local-recipe/index.js"
+    },
+    "./deployment": {
+      "types": "./dist/deployment/index.d.ts",
+      "import": "./dist/deployment/index.js"
+    }
   },
   "relkit": {
     "integration": {
@@ -25,7 +47,13 @@
         "authoring": ".",
         "runtime": {
           "export": "./runtime",
-          "registrations": [{"capability": "job", "adapterId": "trigger", "protocolVersion": 1}]
+          "registrations": [
+            {
+              "capability": "job",
+              "adapterId": "trigger",
+              "protocolVersion": 1
+            }
+          ]
         },
         "localRecipe": "./local-recipe",
         "deploymentEngine": "./deployment"

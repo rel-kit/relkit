@@ -71,7 +71,8 @@ function normalizeServices(
       !["pending", "starting", "healthy", "unhealthy", "stopped"].includes(service.phase) ||
       (service.environment !== undefined && !text(service.environment)) ||
       (service.serviceGeneration !== undefined && !text(service.serviceGeneration)) ||
-      (service.units !== undefined && (!Array.isArray(service.units) || service.units.some((unit) => !isStableId(unit)))) ||
+      (service.units !== undefined &&
+        (!Array.isArray(service.units) || service.units.some((unit) => !isStableId(unit)))) ||
       (service.message !== undefined && typeof service.message !== "string")
     ) {
       invalid();

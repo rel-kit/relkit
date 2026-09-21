@@ -77,15 +77,33 @@ function assertOptions(options: TriggerOptions): void {
     throw new TypeError("Trigger options must be an object");
   validateJobsServiceOptions(options);
   const keys = new Set([
-    "projectRef", "secretKey", "baseUrl", "native", "limits", "workers", "observation",
-    "maxElapsed", "hookTimeout", "shutdownGrace",
+    "projectRef",
+    "secretKey",
+    "baseUrl",
+    "native",
+    "limits",
+    "workers",
+    "observation",
+    "maxElapsed",
+    "hookTimeout",
+    "shutdownGrace",
   ]);
-  for (const key of Object.keys(options)) if (!keys.has(key)) throw new TypeError("Unknown Trigger option " + key);
+  for (const key of Object.keys(options))
+    if (!keys.has(key)) throw new TypeError("Unknown Trigger option " + key);
   for (const [name, candidate] of [["projectRef", options.projectRef]] as const) {
-    if (candidate !== undefined && !isBindingValueRef(candidate) && (typeof candidate !== "string" || candidate.trim() === ""))
+    if (
+      candidate !== undefined &&
+      !isBindingValueRef(candidate) &&
+      (typeof candidate !== "string" || candidate.trim() === "")
+    )
       throw new TypeError("Trigger " + name + " is invalid");
   }
-  if (options.secretKey !== undefined && (!isBindingValueRef(options.secretKey) || options.secretKey.type !== "secret-string" || !options.secretKey.sensitive))
+  if (
+    options.secretKey !== undefined &&
+    (!isBindingValueRef(options.secretKey) ||
+      options.secretKey.type !== "secret-string" ||
+      !options.secretKey.sensitive)
+  )
     throw new TypeError("Trigger secretKey must be a named secret binding value");
   if (options.baseUrl !== undefined) urlValue(options.baseUrl);
 }
@@ -96,9 +114,12 @@ function value(input: string | TextReference): string | TextReference {
 
 function urlValue(value: undefined): undefined;
 function urlValue(value: string | URL | TextReference): string | TextReference;
-function urlValue(value: string | URL | TextReference | undefined): string | TextReference | undefined {
+function urlValue(
+  value: string | URL | TextReference | undefined,
+): string | TextReference | undefined {
   if (value === undefined || isBindingValueRef(value)) return value;
   const url = value instanceof URL ? value : new URL(value);
-  if (url.protocol !== "http:" && url.protocol !== "https:") throw new TypeError("Trigger baseUrl must use http or https");
+  if (url.protocol !== "http:" && url.protocol !== "https:")
+    throw new TypeError("Trigger baseUrl must use http or https");
   return url.toString();
 }
