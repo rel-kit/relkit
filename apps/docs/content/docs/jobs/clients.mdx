@@ -1,0 +1,23 @@
+---
+title: Clients
+description: Trigger, inspect, watch, and control job runs.
+---
+
+The generated client exposes only jobs with a `client` policy. A trigger returns an accepted handle:
+`client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`.
+Read a run with `client.jobs.exportOrders.runs.get({ runId: accepted.runId })`.
+
+Use `watch` for a live view and always handle reconnects. A reconnect should resume from the last known run state; it must not create a second run. Keep credentials and authorization on the server-side boundary for private jobs.
+
+Run controls are explicit operations:
+
+Watch with `watchJobRun(client, "exportOrders", { runId: accepted.runId })`. Cancel and retry use
+`{ runId, operationId }` so every control is auditable and safely recoverable.
+
+<include cwd lang="ts" meta='title="packages/client/jobs-watch.test.ts"'>
+  ../../packages/client/jobs-watch.test.ts
+</include>
+
+The server returns an operation ID for controls that are processed asynchronously. Poll or watch the run until the requested state is visible. Dispose client watchers when the page or request scope ends.
+
+<include cwd>content/generated/related/jobs-clients.mdx</include>
