@@ -11,11 +11,18 @@ Each top-level application domain under `src/<domain>` SHALL contain exactly one
 - **THEN** the compiler assigns them to the `orders` domain and rejects the project if `src/orders/service.ts` is missing, duplicated, or empty of graph-visible capability
 
 ### Requirement: Generic services expose original public members
-`defineService` SHALL accept optional function and event maps and expose their original descriptor values as direct typed members without cloning, nested member maps, invocation middleware, or service context.
+`defineService` SHALL accept optional function, event, task and job maps and expose their original descriptor values as direct typed members without cloning, nested member maps, invocation middleware, or service context.
 
 #### Scenario: Function is exposed
 - **WHEN** `createOrder` is supplied as the `createOrder` function member
 - **THEN** `orders.createOrder` is referentially equal to `createOrder` and is marked public while unlisted domain functions remain internal
+
+### Requirement: Task domain membership does not expose browser endpoints
+Task/job membership SHALL preserve explicit durable identity and its selected/default binding, require the existing domain service boundary and cross-domain import rules, and SHALL not itself grant client access.
+
+#### Scenario: Private job exposed as domain member
+- **WHEN** a service exposes a private job descriptor
+- **THEN** server callers retain its typed trigger but no browser procedure is generated
 
 ### Requirement: Cross-domain imports use service boundaries
 Application imports crossing domain roots SHALL resolve through the target domain's `service.ts`; routes SHALL import domain services rather than internals, and platform modules SHALL not import domains or routes.
