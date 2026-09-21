@@ -5,8 +5,16 @@ export interface EffectMqJobOptions {
   readonly name: string;
   readonly queue?: string;
   readonly attempts?: number;
-  readonly backoff?: { readonly type: "fixed" | "exponential"; readonly delay: Duration.Input; readonly factor?: number };
-  readonly handler: (input: unknown, signal: AbortSignal, context: Worker.JobContext) => Promise<unknown>;
+  readonly backoff?: {
+    readonly type: "fixed" | "exponential";
+    readonly delay: Duration.Input;
+    readonly factor?: number;
+  };
+  readonly handler: (
+    input: unknown,
+    signal: AbortSignal,
+    context: Worker.JobContext,
+  ) => Promise<unknown>;
   readonly worker?: Parameters<typeof Worker.layer>[0];
 }
 
@@ -30,10 +38,12 @@ export function createEffectMqJob(options: EffectMqJobOptions): EffectMqJobDefin
     },
   });
   const handlerLayer = job.toLayer((payload) =>
-    Effect.flatMap(Worker.CurrentJob, (context) => Effect.tryPromise({
-      try: (signal) => options.handler(payload.input, signal, context),
-      catch: (error) => error,
-    })),
+    Effect.flatMap(Worker.CurrentJob, (context) =>
+      Effect.tryPromise({
+        try: (signal) => options.handler(payload.input, signal, context),
+        catch: (error) => error,
+      }),
+    ),
   );
   return Object.freeze({
     job,
@@ -49,5 +59,6 @@ export function createEffectMqWorkerLayer(
 }
 
 function assertName(value: string): void {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError("effect-mq job name is invalid");
+  if (typeof value !== "string" || value.trim() === "")
+    throw new TypeError("effect-mq job name is invalid");
 }

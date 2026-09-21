@@ -22,7 +22,8 @@ export interface EffectMqPostgresSchema {
 }
 
 export function createEffectMqPostgresSchema(prefix = "effect_mq_jobs"): EffectMqPostgresSchema {
-  if (!/^[a-z][a-z0-9_]{2,62}$/u.test(prefix)) throw new TypeError("effect-mq table prefix is invalid");
+  if (!/^[a-z][a-z0-9_]{2,62}$/u.test(prefix))
+    throw new TypeError("effect-mq table prefix is invalid");
   const jobs = mqJobs(prefix);
   return Object.freeze({
     jobs,
@@ -40,7 +41,8 @@ export function createEffectMqPostgresLayer(
   postgresUrl: string,
   prefix = "effect_mq_jobs",
 ): Layer.Layer<any, any, any> {
-  if (typeof postgresUrl !== "string" || postgresUrl.trim() === "") throw new TypeError("effect-mq postgres URL is invalid");
+  if (typeof postgresUrl !== "string" || postgresUrl.trim() === "")
+    throw new TypeError("effect-mq postgres URL is invalid");
   const schema = createEffectMqPostgresSchema(prefix);
   const pg = PgClient.layer({ url: Redacted.make(postgresUrl) });
   return DrizzleJobStore.layer(schema).pipe(Layer.provide(pg));

@@ -80,21 +80,40 @@ function assertOptions(options: EffectMqOptions): void {
     throw new TypeError("effect-mq options must be an object");
   validateJobsServiceOptions(options);
   const keys = new Set([
-    "postgresUrl", "schema", "tablePrefix", "queue", "native", "limits", "workers", "observation",
-    "maxElapsed", "hookTimeout", "shutdownGrace",
+    "postgresUrl",
+    "schema",
+    "tablePrefix",
+    "queue",
+    "native",
+    "limits",
+    "workers",
+    "observation",
+    "maxElapsed",
+    "hookTimeout",
+    "shutdownGrace",
   ]);
   for (const key of Object.keys(options)) {
     if (!keys.has(key)) throw new TypeError("Unknown effect-mq option " + key);
   }
-  if (options.postgresUrl !== undefined && !isBindingValueRef(options.postgresUrl) && typeof options.postgresUrl !== "string")
+  if (
+    options.postgresUrl !== undefined &&
+    !isBindingValueRef(options.postgresUrl) &&
+    typeof options.postgresUrl !== "string"
+  )
     throw new TypeError("effect-mq postgresUrl is invalid");
-  for (const [name, candidate] of [["schema", options.schema], ["tablePrefix", options.tablePrefix], ["queue", options.queue]] as const) {
+  for (const [name, candidate] of [
+    ["schema", options.schema],
+    ["tablePrefix", options.tablePrefix],
+    ["queue", options.queue],
+  ] as const) {
     if (candidate !== undefined && (candidate.trim() === "" || candidate.includes("\0")))
       throw new TypeError("effect-mq " + name + " is invalid");
   }
 }
 
-function value(input: string | TextReference | SecretReference): string | TextReference | SecretReference {
+function value(
+  input: string | TextReference | SecretReference,
+): string | TextReference | SecretReference {
   if (isBindingValueRef(input)) return input;
   const url = new URL(input);
   if (url.protocol !== "postgres:" && url.protocol !== "postgresql:")
