@@ -11,6 +11,7 @@ import {
   normalizeProviderSource,
 } from "@relkit/provider";
 import { docker } from "./src/index.ts";
+import { owned } from "./src/runtime/docker-composite-support.ts";
 import { dockerMaterializer } from "./src/runtime/index.ts";
 
 const integration = defineIntegrationReference("redis");
@@ -53,4 +54,30 @@ test("exports static Docker materializer identity without engine I/O", () => {
     const contents = readFileSync(join(import.meta.dir, "src", source), "utf8");
     expect(contents).not.toMatch(/node:(?:child_process|fs)|\b(?:Bun\.spawn|process)\b/);
   }
+});
+
+test("treats mutable plan labels as non-ownership metadata", () => {
+  const expected = {
+    "dev.relkit.managed": "true",
+    "dev.relkit.local-project-id": "sha256:project",
+    "dev.relkit.binding-id": "provider.job.default",
+    "dev.relkit.recipe-id": "inngest:inngest-docker:2",
+    "dev.relkit.plan-hash": "sha256:old",
+    "dev.relkit.endpoint-hash": "sha256:old",
+    "dev.relkit.service-generation": "sha256:old",
+  };
+  expect(
+    owned(
+      {
+        ...expected,
+        "dev.relkit.plan-hash": "sha256:new",
+        "dev.relkit.endpoint-hash": "sha256:new",
+        "dev.relkit.service-generation": "sha256:new",
+      },
+      expected,
+    ),
+  ).toBe(true);
+  expect(owned({ ...expected, "dev.relkit.local-project-id": "sha256:foreign" }, expected)).toBe(
+    false,
+  );
 });

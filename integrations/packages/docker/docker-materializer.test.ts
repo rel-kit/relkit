@@ -87,8 +87,22 @@ test("rejects an invalid composite graph before Docker mutation", async () => {
     },
     containers: async () => [],
     volumes: async () => [],
-    inspectContainer: async () => ({ id: "container-1", name: "x", labels: {}, state: "running", health: "healthy", ports: {} }),
-    waitForHealthy: async () => ({ id: "container-1", name: "x", labels: {}, state: "running", health: "healthy", ports: {} }),
+    inspectContainer: async () => ({
+      id: "container-1",
+      name: "x",
+      labels: {},
+      state: "running",
+      health: "healthy",
+      ports: {},
+    }),
+    waitForHealthy: async () => ({
+      id: "container-1",
+      name: "x",
+      labels: {},
+      state: "running",
+      health: "healthy",
+      ports: {},
+    }),
   };
   const recipe = {
     kind: "local-service-recipe",
@@ -98,14 +112,28 @@ test("rejects an invalid composite graph before Docker mutation", async () => {
     recipeVersion: 2,
     materializerId: "docker",
     units: [
-      { id: "a", kind: "container", image: "a@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dependsOn: ["b"], ports: { api: 8080 } },
-      { id: "b", kind: "worker", image: "b@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", dependsOn: ["a"], ports: { api: 8080 } },
+      {
+        id: "a",
+        kind: "container",
+        image: "a@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        dependsOn: ["b"],
+        ports: { api: 8080 },
+      },
+      {
+        id: "b",
+        kind: "worker",
+        image: "b@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        dependsOn: ["a"],
+        ports: { api: 8080 },
+      },
     ],
     volumes: {},
     outputs: () => ({}),
   } satisfies CompositeLocalServiceRecipe;
   const materializer = createDockerMaterializer({ client });
-  await expect(materializer.start({ name: "relkit-test", labels: { "dev.relkit.managed": "true" }, recipe })).rejects.toThrow("dependency cycle");
+  await expect(
+    materializer.start({ name: "relkit-test", labels: { "dev.relkit.managed": "true" }, recipe }),
+  ).rejects.toThrow("dependency cycle");
   expect(mutations).toBe(0);
 });
 
@@ -137,8 +165,16 @@ test("materializes an owned private composite network in dependency order", asyn
     materializerId: "docker",
     network: { internal: true },
     containers: [
-      { id: "database", image: "postgres@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
-      { id: "api", image: "api@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", dependsOn: ["database"], ports: { http: 8080 } },
+      {
+        id: "database",
+        image: "postgres@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+      {
+        id: "api",
+        image: "api@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        dependsOn: ["database"],
+        ports: { http: 8080 },
+      },
     ],
     volumes: { data: { mountPath: "/data", persistent: true } },
     outputs: ({ ports }) => ({ endpoint: `http://127.0.0.1:${ports["api.http"]}` }),
@@ -155,10 +191,11 @@ test("materializes an owned private composite network in dependency order", asyn
   const volumeCreate = calls.find((call) => call[0] === "volume" && call[1] === "create");
   expect(volumeCreate).toContain("--label");
   expect(volumeCreate).toContain("dev.relkit.volume=data");
-  expect(calls.filter((call) => call[0] === "container" && call[1] === "create").map((call) => call[call.indexOf("--name") + 1])).toEqual([
-    "relkit-test-database",
-    "relkit-test-api",
-  ]);
+  expect(
+    calls
+      .filter((call) => call[0] === "container" && call[1] === "create")
+      .map((call) => call[call.indexOf("--name") + 1]),
+  ).toEqual(["relkit-test-database", "relkit-test-api"]);
   expect(instance.units?.map((unit) => unit.unitId)).toEqual(["database", "api"]);
   expect(instance.ports.http).toBe(49_152);
 });
@@ -189,14 +226,21 @@ test("starts a recipe-owned worker with read-only bundle and state mounts", asyn
     recipeId: "worker-composite",
     recipeVersion: 2,
     materializerId: "docker",
-    containers: [{ id: "inngest", image: "inngest@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }],
-    workers: [{
-      id: "worker",
-      image: "oven/bun@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      dependsOn: ["inngest"],
-      ports: { api: 3000 },
-      health: { command: ["kill", "-0", "1"], intervalMs: 250, timeoutMs: 1_000, retries: 4 },
-    }],
+    containers: [
+      {
+        id: "inngest",
+        image: "inngest@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+    ],
+    workers: [
+      {
+        id: "worker",
+        image: "oven/bun@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        dependsOn: ["inngest"],
+        ports: { api: 3000 },
+        health: { command: ["kill", "-0", "1"], intervalMs: 250, timeoutMs: 1_000, retries: 4 },
+      },
+    ],
     volumes: {},
     outputs: () => ({}),
   } satisfies CompositeLocalServiceRecipe;

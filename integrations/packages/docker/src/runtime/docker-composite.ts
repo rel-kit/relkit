@@ -21,13 +21,15 @@ import {
 } from "./docker-composite-support.js";
 import { randomLoopbackPort } from "./docker-client.js";
 import type { DockerClient } from "./docker-types.js";
+import { reusedUnit, startUnit } from "./docker-composite-unit.js";
 
 export async function startComposite(
   client: DockerClient,
   request: LocalServiceStartRequest,
 ): Promise<LocalServiceInstance> {
   const recipe = normalizeLocalServiceRecipe(request.recipe);
-  if (recipe.recipeVersion !== 2) throw new TypeError("Composite materialization requires recipe version 2");
+  if (recipe.recipeVersion !== 2)
+    throw new TypeError("Composite materialization requires recipe version 2");
   const networkName = request.networkName ?? `${request.name}-network`;
   resourceName(networkName);
   const volumes = volumeNames(request.name, request.volumeNames, recipe);
@@ -62,12 +64,22 @@ export async function startComposite(
     for (const [volume, volumeName] of Object.entries(volumes)) {
       const existing = existingVolumes.get(volumeName);
       if (existing !== undefined) {
-        if (!owned(existing.labels, request.labels) || existing.labels["dev.relkit.volume"] !== volume) {
+        if (
+          !owned(existing.labels, request.labels) ||
+          existing.labels["dev.relkit.volume"] !== volume
+        ) {
           throw new Error(`Docker volume "${volumeName}" is not owned by this Relkit project.`);
         }
       } else {
         await client.command(
-          ["volume", "create", ...compositeLabels(request.labels), "--label", `dev.relkit.volume=${volume}`, volumeName],
+          [
+            "volume",
+            "create",
+            ...compositeLabels(request.labels),
+            "--label",
+            `dev.relkit.volume=${volume}`,
+            volumeName,
+          ],
           "Docker volume creation",
           compositeSignal(request),
         );
@@ -76,11 +88,10 @@ export async function startComposite(
     }
     const instances: LocalServiceInstance[] = [];
     const existingUnits = new Map(
-      (await client.containers(request.labels, request.signal))
-        .flatMap((instance) => {
-          const unitId = instance.labels["dev.relkit.unit-id"];
-          return unitId === undefined ? [] : [[unitId, instance] as const];
-        }),
+      (await client.containers(request.labels, request.signal)).flatMap((instance) => {
+        const unitId = instance.labels["dev.relkit.unit-id"];
+        return unitId === undefined ? [] : [[unitId, instance] as const];
+      }),
     );
     for (const unit of recipe.units) {
       if (unit.kind === "worker" && request.workerArtifact === undefined) continue;
@@ -92,8 +103,16 @@ export async function startComposite(
       const instance = await startUnit(client, request, recipe, unit, networkName, volumes);
       createdContainers.push(instance.id);
       if (unit.kind === "init") {
-        await client.command(["container", "wait", instance.id], "Docker init completion", compositeSignal(request));
-        await client.command(["container", "rm", "--force", instance.id], "Docker init cleanup", compositeSignal(request));
+        await client.command(
+          ["container", "wait", instance.id],
+          "Docker init completion",
+          compositeSignal(request),
+        );
+        await client.command(
+          ["container", "rm", "--force", instance.id],
+          "Docker init cleanup",
+          compositeSignal(request),
+        );
         continue;
       }
       instances.push(instance);
@@ -118,98 +137,19 @@ export async function startComposite(
     });
   } catch (error) {
     await Promise.allSettled(
-      createdContainers.map((id) => client.command(["container", "rm", "--force", id], "Docker container cleanup")),
+      createdContainers.map((id) =>
+        client.command(["container", "rm", "--force", id], "Docker container cleanup"),
+      ),
     );
     await Promise.allSettled(
-      createdVolumes.map((volume) => client.command(["volume", "rm", volume], "Docker volume cleanup")),
+      createdVolumes.map((volume) =>
+        client.command(["volume", "rm", volume], "Docker volume cleanup"),
+      ),
     );
-    if (createdNetwork) await client.command(["network", "rm", networkName], "Docker network cleanup").catch(() => undefined);
-    throw error;
-  }
-}
-
-function reusedUnit(
-  existing: LocalServiceInstance,
-  unit: NormalizedLocalServiceUnit,
-  serviceName: string,
-): LocalServiceInstance {
-  if (existing.state !== "running" || (unit.health !== undefined && existing.health !== "healthy")) {
-    throw new Error("Existing Docker unit " + unit.id + " is not healthy enough to reuse.");
-  }
-  const ports = { ...existing.ports };
-  for (const [name, containerPort] of Object.entries(unit.ports)) {
-    const value = existing.ports[name] ?? existing.ports[String(containerPort) + "/tcp"];
-    if (value !== undefined) ports[name] = value;
-  }
-  return Object.freeze({
-    ...existing,
-    name: serviceName + "-" + unit.id,
-    unitId: unit.id,
-    ports: Object.freeze(ports),
-  });
-}
-
-async function startUnit(
-  client: DockerClient,
-  request: LocalServiceStartRequest,
-  recipe: NormalizedLocalServiceRecipe,
-  unit: NormalizedLocalServiceUnit,
-  networkName: string,
-  volumes: Readonly<Record<string, string>>,
-): Promise<LocalServiceInstance> {
-  const nameValue = `${request.name}-${unit.id}`;
-  resourceName(nameValue);
-  const unitLabels = { ...request.labels, "dev.relkit.unit-id": unit.id, "dev.relkit.unit-kind": unit.kind };
-  const args = [
-    "container",
-    "create",
-    "--name",
-    nameValue,
-    ...compositeLabels(unitLabels),
-    "--network",
-    networkName,
-    ...[unit.id, ...(unit.networkAliases ?? [])].flatMap((alias) => ["--network-alias", alias]),
-    ...Object.entries(unit.hostAliases ?? {}).flatMap(([host, address]) => ["--add-host", `${argument(host)}:${argument(address)}`]),
-    ...Object.values(unit.ports).flatMap((port) => ["--publish", randomLoopbackPort(port)]),
-    ...bindMountArguments(request.bindMounts?.[unit.id]),
-    ...unit.volumes.flatMap((mount) => [
-      "--mount",
-      `type=volume,source=${volumes[mount.name]},target=${mountPath(mount.mountPath)}`,
-    ]),
-    ...(request.environmentFiles?.[unit.id] ?? request.environmentFile) === undefined
-      ? []
-      : ["--env-file", (request.environmentFiles?.[unit.id] ?? request.environmentFile)!],
-    ...environmentArguments({
-      ...request.environmentVariables,
-      ...request.environmentVariablesByUnit?.[unit.id],
-    }),
-    ...(unit.health === undefined ? [] : healthArgs(unit.health.command, unit.health.intervalMs, unit.health.timeoutMs, unit.health.retries)),
-    argument(unit.image),
-    ...(unit.command ?? []).map(argument),
-  ];
-  let id: string | undefined;
-  try {
-    id = await client.command(args, "Docker composite container creation", compositeSignal(request));
-    await client.command(["container", "start", id], "Docker composite container startup", compositeSignal(request));
-    const inspected = unit.health === undefined
-      ? await client.inspectContainer(id, request.signal)
-      : await client.waitForHealthy(id, {
-          timeoutMs: unit.health.intervalMs * unit.health.retries + unit.health.timeoutMs,
-          pollIntervalMs: Math.min(250, unit.health.intervalMs),
-          ...(request.signal === undefined ? {} : { signal: request.signal }),
-        });
-    const healthy = {
-      ...inspected,
-      health: inspected.health ?? (inspected.state === "running" ? "healthy" : "unhealthy"),
-    } as LocalServiceInstance;
-    const ports: Record<string, number> = { ...healthy.ports };
-    for (const [key, port] of Object.entries(unit.ports)) {
-      const value = healthy.ports[`${port}/tcp`];
-      if (value !== undefined) ports[key] = value;
-    }
-    return Object.freeze({ ...healthy, name: nameValue, labels: unitLabels, ports: Object.freeze(ports), unitId: unit.id });
-  } catch (error) {
-    if (id !== undefined) await client.command(["container", "rm", "--force", id], "Docker composite container cleanup").catch(() => undefined);
+    if (createdNetwork)
+      await client
+        .command(["network", "rm", networkName], "Docker network cleanup")
+        .catch(() => undefined);
     throw error;
   }
 }

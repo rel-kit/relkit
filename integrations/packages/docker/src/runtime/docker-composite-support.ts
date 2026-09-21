@@ -11,7 +11,9 @@ export function volumeNames(
   recipe: NormalizedLocalServiceRecipe,
 ): Readonly<Record<string, string>> {
   const values = Object.fromEntries(
-    Object.keys(recipe.volumes).sort().map((name) => [name, requested?.[name] ?? `${serviceName}-${name}`]),
+    Object.keys(recipe.volumes)
+      .sort()
+      .map((name) => [name, requested?.[name] ?? `${serviceName}-${name}`]),
   );
   if (new Set(Object.values(values)).size !== Object.keys(values).length) {
     throw new TypeError("Composite local-service volumes must have unique Docker names");
@@ -43,22 +45,24 @@ export function healthArgs(
   ];
 }
 
-export function compositeSignal(request: LocalServiceStartRequest): { readonly signal?: AbortSignal } {
+export function compositeSignal(request: LocalServiceStartRequest): {
+  readonly signal?: AbortSignal;
+} {
   return request.signal === undefined ? {} : { signal: request.signal };
 }
 
 export function resourceName(value: string): void {
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(value)) throw new TypeError("Docker resource name is invalid");
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(value))
+    throw new TypeError("Docker resource name is invalid");
 }
 
 export function mountPath(value: string): string {
-  if (!/^\/[a-zA-Z0-9_./-]+$/.test(value) || value.includes("..")) throw new TypeError("Docker mount is invalid");
+  if (!/^\/[a-zA-Z0-9_./-]+$/.test(value) || value.includes(".."))
+    throw new TypeError("Docker mount is invalid");
   return value;
 }
 
-export function bindMountArguments(
-  mounts: readonly LocalServiceBindMount[] | undefined,
-): string[] {
+export function bindMountArguments(mounts: readonly LocalServiceBindMount[] | undefined): string[] {
   return (mounts ?? []).flatMap((mount) => {
     if (
       !mount.source.startsWith("/") ||
@@ -80,7 +84,9 @@ export function argument(value: string): string {
   return value;
 }
 
-export function environmentArguments(values: Readonly<Record<string, string>> | undefined): string[] {
+export function environmentArguments(
+  values: Readonly<Record<string, string>> | undefined,
+): string[] {
   return Object.entries(values ?? {})
     .sort(([left], [right]) => left.localeCompare(right))
     .flatMap(([key, value]) => {
@@ -92,7 +98,8 @@ export function environmentArguments(values: Readonly<Record<string, string>> | 
 }
 
 export function positive(value: number): number {
-  if (!Number.isSafeInteger(value) || value < 1) throw new TypeError("Docker recipe number is invalid");
+  if (!Number.isSafeInteger(value) || value < 1)
+    throw new TypeError("Docker recipe number is invalid");
   return value;
 }
 
@@ -123,5 +130,13 @@ export function owned(
   actual: Readonly<Record<string, string>>,
   expected: Readonly<Record<string, string>>,
 ): boolean {
-  return Object.entries(expected).every(([key, value]) => actual[key] === value);
+  return Object.entries(expected)
+    .filter(([key]) => !MUTABLE_RESOURCE_LABELS.has(key))
+    .every(([key, value]) => actual[key] === value);
 }
+
+const MUTABLE_RESOURCE_LABELS = new Set([
+  "dev.relkit.endpoint-hash",
+  "dev.relkit.plan-hash",
+  "dev.relkit.service-generation",
+]);
