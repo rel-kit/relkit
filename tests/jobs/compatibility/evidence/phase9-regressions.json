@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-20",
+  "phase": "9",
+  "task": "10.24",
+  "status": "partial",
+  "commands": [
+    "bun run test:all",
+    "RELKIT_TEST_DOCKER=1 bun run test:jobs:providers",
+    "bun run test:scaffold",
+    "bun run test:jobs:quality",
+    "bun run test:inspector:browser",
+    "bun run test:e2e",
+    "bun run prepush"
+  ],
+  "cases": [
+    {
+      "id": "RG01",
+      "status": "passed",
+      "evidence": [
+        "scripts/pack-and-smoke-create-relkit.ts",
+        "tests/integration/local-docker-worker.test.ts",
+        "tests/jobs/compatibility/evidence/inngest-native.json"
+      ],
+      "result": "Packed task projects passed the native Inngest and Effect MQ Docker smoke paths; legacy queue materialization remains separate."
+    },
+    {
+      "id": "RG02",
+      "status": "passed",
+      "evidence": [
+        "tests/compiler/job-names.test.ts",
+        "tests/compiler/source-facts.test.ts",
+        "tests/compiler/normalize.test.ts",
+        "tests/graph/task-job-graph.test.ts"
+      ]
+    },
+    {
+      "id": "RG03",
+      "status": "passed",
+      "evidence": [
+        "packages/jobs/task-wire.test.ts",
+        "packages/jobs/schedule-reconciliation.test.ts",
+        "tests/integration/http/contracts.test.ts",
+        "tests/integration/http/service-contract.test.ts"
+      ]
+    },
+    {
+      "id": "RG04",
+      "status": "passed",
+      "evidence": [
+        "packages/invocation/dispatcher.test.ts",
+        "packages/engine/materialize-jobs.test.ts",
+        "tests/contracts/jobs.test.ts"
+      ]
+    },
+    {
+      "id": "RG05",
+      "status": "passed",
+      "evidence": [
+        "packages/jobs/boundary-policy.test.ts",
+        "packages/jobs/task-policy.test.ts",
+        "packages/jobs/trigger-schedule.test.ts"
+      ]
+    },
+    {
+      "id": "RG06",
+      "status": "passed",
+      "evidence": [
+        "packages/jobs/identity.test.ts",
+        "packages/providers-local/jobs-idempotency.test.ts",
+        "packages/jobs/schedule-reconciliation.test.ts",
+        "tests/restart/jobs.test.ts"
+      ]
+    },
+    {
+      "id": "RG07",
+      "status": "passed",
+      "evidence": [
+        "packages/client/pending.test.ts",
+        "packages/client/src/react/job-hooks-support.ts",
+        "tests/types/jobs-client.ts"
+      ],
+      "result": "The fixture preserves the original request in memory, matches its digest, retains operationId/idempotencyKey, and exposes only bounded same-key recovery."
+    },
+    {
+      "id": "RG08",
+      "status": "passed",
+      "evidence": [
+        "packages/client/jobs-watch.test.ts",
+        "tests/jobs/compatibility/client-browser.ts",
+        "tests/jobs/compatibility/evidence/phase7-client.json"
+      ]
+    },
+    {
+      "id": "RG09",
+      "status": "passed",
+      "evidence": [
+        "packages/jobs/authorization.test.ts",
+        "packages/jobs/authorization-cursor.test.ts",
+        "packages/runtime-hono/jobs-rpc.test.ts",
+        "tests/contracts/jobs.test.ts"
+      ]
+    },
+    {
+      "id": "RG10",
+      "status": "passed",
+      "evidence": [
+        "packages/inspector-api/jobs.test.ts",
+        "tests/inspector/job-name-filters.test.ts",
+        "tests/e2e/inspector.spec.ts"
+      ]
+    },
+    {
+      "id": "RG11",
+      "status": "passed",
+      "evidence": [
+        "packages/jobs/schedule-reconciliation.test.ts",
+        "packages/providers-local/jobs-scheduler.test.ts",
+        "tests/contracts/jobs.test.ts",
+        "tests/jobs/compatibility/evidence/phase5-adapters.json"
+      ]
+    },
+    {
+      "id": "RG12",
+      "status": "passed",
+      "evidence": [
+        "tests/compiler/normalize.test.ts",
+        "tests/compiler/job-names.test.ts",
+        "packages/jobs/migration.test.ts",
+        "tests/types/jobs-names.test-d.ts"
+      ],
+      "result": "The deprecated profile alias is task-backed and independently gated from legacyJobs; application-wide collisions are asserted in compiler fixtures."
+    },
+    {
+      "id": "RG13",
+      "status": "passed",
+      "evidence": [
+        "tests/compiler/job-replay.test.ts",
+        "packages/client/pending.test.ts",
+        "tests/types/jobs-client.ts",
+        "tests/e2e/inspector.spec.ts",
+        "apps/docs/tests/jobs-learning.test.ts"
+      ],
+      "result": "Replay advisories remain warning-only with source/remediation; the corrected React type fixture preserves accepted runId, original request, and safe unknown-recovery messaging, while browser/client suites cover the runtime paths."
+    }
+  ],
+  "limitations": [
+    "Trigger self-hosted Docker and managed/cloud variants are explicitly deferred by this change's completion scope and remain not-tested; see phase5-adapters.json and capability-matrix.json.",
+    "The React unknown-recovery behavior is covered by deterministic client tests and the Inspector browser suite; there is no separate browser test for a pending job mutation screen.",
+    "The focused quality gate passed 90.61% branch coverage across 554 validation/binding/watch branches and killed required tenant, abort, epoch, policy, retry, and duration mutants; see phase9-coverage.json.",
+    "The fresh packed scaffold acceptance passed minimal, Inngest Docker, Effect MQ Docker, API, agent, and fullstack variants; Trigger Docker is explicitly deferred and remains not-tested. See phase9-scaffold.json.",
+    "The fresh provider run passed Inngest and Effect MQ Docker acceptance; Trigger native execution is explicitly deferred and remains not-tested. See phase9-native-completion.json.",
+    "Account-free Docker release readiness now passes, including the exact prepush wrapper's release-readiness stage; Pulumi/AWS/managed-cloud evidence remains explicitly deferred."
+  ]
+}

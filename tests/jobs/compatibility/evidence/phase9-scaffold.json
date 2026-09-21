@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-20",
+  "phase": "9",
+  "task": "10.20",
+  "status": "ready",
+  "scope": {
+    "inScopeVariants": ["tasks-inngest-docker", "tasks-effect-mq-docker"],
+    "deferredVariants": ["tasks-trigger-docker"],
+    "deferredReason": "Trigger Docker evidence is explicitly deferred for this change and remains not-tested."
+  },
+  "command": "bun run test:scaffold",
+  "environment": {
+    "RELKIT_TEST_DOCKER": "1",
+    "docker": "Docker Desktop 4.73.0 / Engine 29.4.3 / linux-arm64"
+  },
+  "passedVariants": [
+    "minimal",
+    "tasks-inngest-docker",
+    "tasks-effect-mq-docker",
+    "api",
+    "agent",
+    "fullstack"
+  ],
+  "acceptance": [
+    "fresh packed artifacts",
+    "account-free install from the local registry",
+    "compile and startup",
+    "task trigger and watch paths",
+    "native provider startup and shutdown",
+    "restart and output retrieval",
+    "Inspector and scaffold route checks"
+  ],
+  "packedPackageCount": 44,
+  "deferredVariants": [
+    {
+      "variant": "tasks-trigger-docker",
+      "reason": "Deferred by the explicit completion-scope decision; no release-pinned Trigger executable image, registration, or SDK authentication configuration is available."
+    }
+  ],
+  "nextAction": "Rerun only if Trigger certification is brought into a later change scope."
+}
