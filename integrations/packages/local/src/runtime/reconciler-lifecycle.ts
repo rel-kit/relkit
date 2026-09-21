@@ -71,9 +71,15 @@ export async function startService(
   };
   const environment = normalized.recipeVersion === 1 ? environmentFile(recipe, secrets) : undefined;
   const unitEnvironments = environmentFiles(recipe, secrets);
-  const normalizedRequest = normalized.recipeVersion === 2
-    ? { ...request, ...(Object.keys(unitEnvironments).length === 0 ? {} : { environmentFiles: unitEnvironments }) }
-    : request;
+  const normalizedRequest =
+    normalized.recipeVersion === 2
+      ? {
+          ...request,
+          ...(Object.keys(unitEnvironments).length === 0
+            ? {}
+            : { environmentFiles: unitEnvironments }),
+        }
+      : request;
   return withEnvironmentFiles(options, normalizedRequest, environment);
 }
 
@@ -99,7 +105,8 @@ async function withUnitEnvironmentFiles(
   paths: Readonly<Record<string, string>>,
 ): Promise<LocalServiceInstance> {
   const entry = entries[index];
-  if (entry === undefined) return options.materializer.start({ ...request, environmentFiles: paths });
+  if (entry === undefined)
+    return options.materializer.start({ ...request, environmentFiles: paths });
   return withLocalStateTemporaryFile(options.identity, entry[1], (path) =>
     withUnitEnvironmentFiles(options, request, entries, index + 1, { ...paths, [entry[0]]: path }),
   );

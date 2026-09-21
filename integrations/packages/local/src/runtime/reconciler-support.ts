@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { isStableId, serializeJson, type JsonValue } from "@relkit/contracts";
+import { isStableId, serializeJson } from "@relkit/contracts";
 import {
   LOCAL_SERVICE_PLAN_VERSION,
   LOCAL_SERVICE_PROTOCOL_VERSION,
@@ -7,10 +7,13 @@ import {
   type LocalServiceInstance,
   type LocalServicePlanEntry,
   type LocalServiceRecipeInput,
+  type ProviderOverrideState,
 } from "@relkit/local-service";
 import { LOCAL_RESOURCE_LABEL } from "./identity.js";
-import type { ProviderOverrideState } from "@relkit/local-service";
 import type { LocalServiceReconcileRequest } from "./reconciler-types.js";
+import { completeUnits, hash, invalid } from "./reconciler-support-validation.js";
+
+export { sameBindings } from "./reconciler-support-validation.js";
 
 export function desiredServices(
   request: LocalServiceReconcileRequest,
@@ -78,7 +81,9 @@ export function generatedSecrets(
 
 export function createSecrets(recipe: LocalServiceRecipeInput): Readonly<Record<string, string>> {
   const result: Record<string, string> = {};
-  for (const [name, declaration] of Object.entries(normalizeLocalServiceRecipe(recipe).generatedSecrets)) {
+  for (const [name, declaration] of Object.entries(
+    normalizeLocalServiceRecipe(recipe).generatedSecrets,
+  )) {
     if (!isStableId(name) || !Number.isSafeInteger(declaration.bytes) || declaration.bytes < 8) {
       invalid();
     }
@@ -139,17 +144,21 @@ export function groupServiceInstances(
   const composite = [...groups.values()].map((units) => {
     const first = units[0]!;
     const health = units.some((unit) => unit.health === "unhealthy")
-      ? "unhealthy" as const
+      ? ("unhealthy" as const)
       : units.every((unit) => unit.health === "healthy")
-        ? "healthy" as const
-        : "starting" as const;
+        ? ("healthy" as const)
+        : ("starting" as const);
     const ports = Object.assign({}, ...units.map((unit) => unit.ports));
     const grouped = {
       ...first,
       ports: Object.freeze(ports),
       units: Object.freeze(units),
-      ...(first.labels[LOCAL_RESOURCE_LABEL.environment] === undefined ? {} : { environment: first.labels[LOCAL_RESOURCE_LABEL.environment] }),
-      ...(first.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] === undefined ? {} : { serviceGeneration: first.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] }),
+      ...(first.labels[LOCAL_RESOURCE_LABEL.environment] === undefined
+        ? {}
+        : { environment: first.labels[LOCAL_RESOURCE_LABEL.environment] }),
+      ...(first.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] === undefined
+        ? {}
+        : { serviceGeneration: first.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] }),
     } satisfies LocalServiceInstance;
     return Object.freeze({ ...grouped, health });
   });
@@ -178,37 +187,13 @@ export function compatible(
   return (
     instance.health === "healthy" &&
     instance.labels[LOCAL_RESOURCE_LABEL.recipeId] === expectedRecipe &&
-    (environment === undefined || instance.labels[LOCAL_RESOURCE_LABEL.environment] === environment) &&
-    (serviceGeneration === undefined || instance.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] === serviceGeneration) &&
+    (environment === undefined ||
+      instance.labels[LOCAL_RESOURCE_LABEL.environment] === environment) &&
+    (serviceGeneration === undefined ||
+      instance.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] === serviceGeneration) &&
     (expectedUnitIds === undefined || completeUnits(instance, expectedUnitIds)) &&
-    (endpointHash === undefined || instance.labels[LOCAL_RESOURCE_LABEL.endpointHash] === endpointHash) &&
+    (endpointHash === undefined ||
+      instance.labels[LOCAL_RESOURCE_LABEL.endpointHash] === endpointHash) &&
     (instance.labels[LOCAL_RESOURCE_LABEL.planHash] === planHash || priorSignature === signature)
   );
-}
-
-function completeUnits(instance: LocalServiceInstance, expectedUnitIds: readonly string[]): boolean {
-  if (instance.units === undefined || instance.units.length !== expectedUnitIds.length) return false;
-  const actual = new Set(instance.units.map((unit) => unit.unitId));
-  return actual.size === expectedUnitIds.length && expectedUnitIds.every((unitId) => actual.has(unitId));
-}
-
-export function sameBindings(
-  previous: ProviderOverrideState | undefined,
-  planHash: string,
-  bindings: readonly {
-    readonly bindingId: string;
-    readonly values: Readonly<Record<string, JsonValue>>;
-  }[],
-): boolean {
-  return (
-    previous?.planHash === planHash && serializeJson(previous.bindings) === serializeJson(bindings)
-  );
-}
-
-function hash(value: unknown): value is string {
-  return typeof value === "string" && /^sha256:[a-f0-9]{64}$/.test(value);
-}
-
-function invalid(): never {
-  throw new Error("Local service recipe or plan is invalid.");
 }

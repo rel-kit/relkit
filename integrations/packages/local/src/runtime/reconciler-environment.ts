@@ -1,14 +1,11 @@
-import {
-  normalizeLocalServiceRecipe,
-  type LocalServiceRecipeInput,
-} from "@relkit/local-service";
+import { normalizeLocalServiceRecipe, type LocalServiceRecipeInput } from "@relkit/local-service";
 
 export function environmentFile(
   recipe: LocalServiceRecipeInput,
   secrets: Readonly<Record<string, string>>,
 ): string | undefined {
-  const entries = Object.entries(normalizeLocalServiceRecipe(recipe).environment).sort(([left], [right]) =>
-    left.localeCompare(right),
+  const entries = Object.entries(normalizeLocalServiceRecipe(recipe).environment).sort(
+    ([left], [right]) => left.localeCompare(right),
   );
   if (entries.length === 0) return undefined;
   return `${entries
@@ -38,12 +35,14 @@ export function environmentFiles(
 }
 
 function resolveEnvironment(
-  values: Readonly<Record<string, { readonly value?: string; readonly secret?: string }>> | undefined,
+  values:
+    Readonly<Record<string, { readonly value?: string; readonly secret?: string }>> | undefined,
   secrets: Readonly<Record<string, string>>,
 ): Readonly<Record<string, string>> {
   const resolved: Record<string, string> = {};
   for (const [name, reference] of Object.entries(values ?? {})) {
-    const value = reference.value ?? (reference.secret === undefined ? undefined : secrets[reference.secret]);
+    const value =
+      reference.value ?? (reference.secret === undefined ? undefined : secrets[reference.secret]);
     validateEnvironment(name, value);
     resolved[name] = value;
   }
@@ -52,7 +51,9 @@ function resolveEnvironment(
 
 function formatEnvironment(values: Readonly<Record<string, string>>): string | undefined {
   const entries = Object.entries(values).sort(([left], [right]) => left.localeCompare(right));
-  return entries.length === 0 ? undefined : `${entries.map(([name, value]) => `${name}=${value}`).join("\n")}\n`;
+  return entries.length === 0
+    ? undefined
+    : `${entries.map(([name, value]) => `${name}=${value}`).join("\n")}\n`;
 }
 
 function validateEnvironment(name: string, value: string | undefined): asserts value is string {

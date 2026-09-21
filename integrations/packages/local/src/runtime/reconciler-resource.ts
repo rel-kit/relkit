@@ -8,7 +8,8 @@ export async function removeInstance(
   signal?: AbortSignal,
 ): Promise<void> {
   for (const id of [...serviceInstanceIds(instance)].reverse()) {
-    if (options.materializer.stop !== undefined) await options.materializer.stop(id, signal).catch(() => undefined);
+    if (options.materializer.stop !== undefined)
+      await options.materializer.stop(id, signal).catch(() => undefined);
     await options.materializer.remove(id, signal);
   }
 }

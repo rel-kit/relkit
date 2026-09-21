@@ -17,6 +17,7 @@ export interface LocalServiceReconcileRequest {
   readonly scope: "required" | "all";
   readonly environment?: string;
   readonly serviceGeneration?: string;
+  readonly serviceGenerations?: Readonly<Record<string, string>>;
   readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
   readonly environmentOverridesByUnit?: Readonly<

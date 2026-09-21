@@ -9,9 +9,11 @@ export function assertHotSwapSafe(
   serviceGeneration: string | undefined,
 ): void {
   if (serviceGeneration === undefined) return;
-  const historical = instances.find((instance) =>
-    (environment === undefined || instance.labels[LOCAL_RESOURCE_LABEL.environment] === environment) &&
-    instance.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] !== serviceGeneration,
+  const historical = instances.find(
+    (instance) =>
+      (environment === undefined ||
+        instance.labels[LOCAL_RESOURCE_LABEL.environment] === environment) &&
+      instance.labels[LOCAL_RESOURCE_LABEL.serviceGeneration] !== serviceGeneration,
   );
   if (historical === undefined) return;
   throw new Error(
