@@ -50,7 +50,10 @@ export function queueCounts(items: readonly InspectorObject[]): JobQueueCounts {
 }
 
 export function runCounts(items: readonly InspectorObject[]): JobRunCounts {
-  const counts = Object.fromEntries(RUN_STATES.map((state) => [state, 0])) as Record<JobRunState, number>;
+  const counts = Object.fromEntries(RUN_STATES.map((state) => [state, 0])) as Record<
+    JobRunState,
+    number
+  >;
   for (const item of items) {
     const state = text(item.status);
     if ((RUN_STATES as readonly string[]).includes(state)) counts[state as JobRunState] += 1;

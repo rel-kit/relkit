@@ -1,7 +1,5 @@
 import {
   INSPECTOR_API_BASE,
-  INSPECTOR_API_PROTOCOL,
-  OBSERVABILITY_QUERY_PROTOCOL,
   type InspectorCollection,
   type InspectorDiagnosticsPage,
   type InspectorEnvironmentPage,
@@ -22,13 +20,18 @@ import {
   type SignalCollection,
 } from "./api-types";
 import { InspectorApiTransport } from "./api-transport";
+import type { RouteInvocationInput, RouteInvocationResult } from "./route-request";
 import {
-  invokeActiveRoute,
-  invokeActiveRouteStream,
-  type RouteInvocationInput,
-  type RouteInvocationResult,
-  type RouteStreamFrame,
-} from "./route-request";
+  agentExecutionsPath,
+  bucketObjectsRequest,
+  bucketPreviewPath,
+  cacheValuePath,
+  cacheKeysRequest,
+  jobControlRequest,
+  jobScheduleActionRequest,
+  invokeInspectorRoute,
+  observabilityQueryRequest,
+} from "./api-methods";
 export * from "./api-types";
 export class InspectorApiClient extends InspectorApiTransport {
   health(kind: "live" | "ready" = "ready"): Promise<InspectorObject> {
@@ -45,10 +48,7 @@ export class InspectorApiClient extends InspectorApiTransport {
     threadId: string,
     mode: "live" | "history" = "live",
   ): Promise<InspectorObject> {
-    const query = new URLSearchParams({ threadId, mode });
-    return this.request(
-      `${INSPECTOR_API_BASE}/runtime/agents/${encodeURIComponent(agentId)}/executions?${query}`,
-    );
+    return this.request(`${INSPECTOR_API_BASE}${agentExecutionsPath(agentId, threadId, mode)}`);
   }
   list<T = InspectorObject>(
     collection: InspectorCollection,
@@ -72,76 +72,86 @@ export class InspectorApiClient extends InspectorApiTransport {
     });
   }
   jobDefinitions<T = InspectorObject>(query: InspectorQuery = {}): Promise<InspectorPage<T>> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions${this.queryString(query)}`, { cacheTags: ["jobs", "graph"] });
+    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions${this.queryString(query)}`, {
+      cacheTags: ["jobs", "graph"],
+    });
   }
   jobDefinition<T = InspectorObject>(id: string): Promise<T> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "graph"] });
+    return this.request(`${INSPECTOR_API_BASE}/jobs/definitions/${encodeURIComponent(id)}`, {
+      cacheTags: ["jobs", "graph"],
+    });
   }
   taskDefinition<T = InspectorObject>(id: string): Promise<T> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/tasks/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "graph"] });
+    return this.request(`${INSPECTOR_API_BASE}/jobs/tasks/${encodeURIComponent(id)}`, {
+      cacheTags: ["jobs", "graph"],
+    });
   }
   jobRuns<T = InspectorObject>(query: InspectorJobRunQuery = {}): Promise<InspectorRunPage<T>> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/runs${this.queryString(query)}`, { cacheTags: ["jobs", "runtime"] });
+    return this.request(`${INSPECTOR_API_BASE}/jobs/runs${this.queryString(query)}`, {
+      cacheTags: ["jobs", "runtime"],
+    });
   }
   jobRun<T = InspectorObject>(id: string): Promise<T> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/runs/${encodeURIComponent(id)}`, { cacheTags: ["jobs", "runtime"] });
+    return this.request(`${INSPECTOR_API_BASE}/jobs/runs/${encodeURIComponent(id)}`, {
+      cacheTags: ["jobs", "runtime"],
+    });
   }
   jobServices<T = InspectorObject>(): Promise<InspectorPage<T>> {
     return this.request(`${INSPECTOR_API_BASE}/jobs/services`, { cacheTags: ["jobs", "runtime"] });
   }
   jobSchedules<T = InspectorObject>(query: InspectorQuery = {}): Promise<InspectorRunPage<T>> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/schedules${this.queryString(query)}`, { cacheTags: ["jobs", "runtime"] });
-  }
-  jobScheduleAction<T = InspectorObject>(action: "upsert" | "pause" | "resume" | "delete", id: string | undefined, body: InspectorObject = {}): Promise<T> {
-    const path = id === undefined
-      ? `${INSPECTOR_API_BASE}/jobs/schedules`
-      : action === "delete"
-        ? `${INSPECTOR_API_BASE}/jobs/schedules/${encodeURIComponent(id)}`
-        : `${INSPECTOR_API_BASE}/jobs/schedules/${encodeURIComponent(id)}/${action}`;
-    return this.request(path, {
-      method: action === "delete" ? "DELETE" : "POST",
-      headers: { "content-type": "application/json", "x-relkit-operation-id": crypto.randomUUID() },
-      body: JSON.stringify(body),
+    return this.request(`${INSPECTOR_API_BASE}/jobs/schedules${this.queryString(query)}`, {
       cacheTags: ["jobs", "runtime"],
     });
   }
-  jobControl<T = InspectorObject>(id: string, action: "cancel" | "retry", body: InspectorObject = {}): Promise<T> {
-    return this.request(`${INSPECTOR_API_BASE}/jobs/runs/${encodeURIComponent(id)}/${action}`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-      cacheTags: ["jobs", "runtime"],
-    });
+  jobScheduleAction<T = InspectorObject>(
+    action: "upsert" | "pause" | "resume" | "delete",
+    id: string | undefined,
+    body: InspectorObject = {},
+  ): Promise<T> {
+    return jobScheduleActionRequest(
+      (path, options) => this.request<T>(path, options),
+      action,
+      id,
+      body,
+    );
+  }
+  jobControl<T = InspectorObject>(
+    id: string,
+    action: "cancel" | "retry",
+    body: InspectorObject = {},
+  ): Promise<T> {
+    return jobControlRequest((path, options) => this.request<T>(path, options), id, action, body);
   }
   bucketObjects(
     bucketId: string,
     query: InspectorQuery = {},
   ): Promise<InspectorResourcePage<InspectorBucketObject>> {
-    return this.request(
-      `${INSPECTOR_API_BASE}/runtime/buckets/${encodeURIComponent(bucketId)}/objects${this.queryString(query)}`,
-      { cacheTags: ["buckets", "runtime"] },
+    return bucketObjectsRequest(
+      (path, options) => this.request(path, options),
+      bucketId,
+      this.queryString(query),
     );
   }
   bucketPreview(bucketId: string, key: string): Promise<InspectorBucketPreview> {
-    return this.request(
-      `${INSPECTOR_API_BASE}/runtime/buckets/${encodeURIComponent(bucketId)}/objects/preview?key=${encodeURIComponent(key)}`,
-      { cacheTags: ["buckets", "runtime"] },
-    );
+    return this.request(`${INSPECTOR_API_BASE}${bucketPreviewPath(bucketId, key)}`, {
+      cacheTags: ["buckets", "runtime"],
+    });
   }
   cacheKeys(
     cacheId: string,
     query: InspectorQuery = {},
   ): Promise<InspectorResourcePage<InspectorCacheKey>> {
-    return this.request(
-      `${INSPECTOR_API_BASE}/runtime/cache/${encodeURIComponent(cacheId)}/keys${this.queryString(query)}`,
-      { cacheTags: ["cache", "runtime"] },
+    return cacheKeysRequest(
+      (path, options) => this.request(path, options),
+      cacheId,
+      this.queryString(query),
     );
   }
   cacheValue(cacheId: string, key: string): Promise<InspectorCacheValue> {
-    return this.request(
-      `${INSPECTOR_API_BASE}/runtime/cache/${encodeURIComponent(cacheId)}/keys/value?key=${encodeURIComponent(key)}`,
-      { cacheTags: ["cache", "runtime"] },
-    );
+    return this.request(`${INSPECTOR_API_BASE}${cacheValuePath(cacheId, key)}`, {
+      cacheTags: ["cache", "runtime"],
+    });
   }
   eventRuntime(query: InspectorQuery = {}): Promise<import("./api-types").InspectorEventRuntime> {
     return this.request(`${INSPECTOR_API_BASE}/runtime/events${this.queryString(query)}`, {
@@ -167,32 +177,14 @@ export class InspectorApiClient extends InspectorApiTransport {
     signal: SignalCollection,
     query: InspectorQuery = {},
   ): Promise<ObservabilityPage<T>> {
-    return this.request<ObservabilityPage<T>>(
-      `${INSPECTOR_API_BASE}/${signal}${this.queryString(query)}`,
-      {
-        cacheTags: [signal, "signals"],
-        responseProtocols: [OBSERVABILITY_QUERY_PROTOCOL, INSPECTOR_API_PROTOCOL],
-      },
+    return observabilityQueryRequest(
+      (path, options) => this.request(path, options),
+      signal,
+      this.queryString(query),
     );
   }
   invokeRoute(input: RouteInvocationInput): Promise<RouteInvocationResult> {
-    return invokeActiveRoute(this.fetcher, this.baseUrl, this.headers, input);
-  }
-  invokeRouteStream(
-    input: RouteInvocationInput,
-    format: "sse" | "text" | "bytes",
-    onFrame: (frame: RouteStreamFrame) => void,
-    signal: AbortSignal,
-  ): Promise<RouteInvocationResult> {
-    return invokeActiveRouteStream(
-      this.fetcher,
-      this.baseUrl,
-      this.headers,
-      input,
-      format,
-      onFrame,
-      signal,
-    );
+    return invokeInspectorRoute(this.fetcher, this.baseUrl, this.headers, input);
   }
 }
 export const createInspectorApiClient = (options: InspectorFetchOptions = {}): InspectorApiClient =>
