@@ -35,11 +35,15 @@ test("validates exclusive schedules and admission policies", () => {
       { id: "interval", every: "1 minute", input: { ok: true }, misfire: "latest" },
     ]),
   ).toHaveLength(2);
-  expect(copyAdmission({ pastAt: "reject", idempotency: { key: "tenantId", retention: "1 day" } })).toEqual({
+  expect(
+    copyAdmission({ pastAt: "reject", idempotency: { key: "tenantId", retention: "1 day" } }),
+  ).toEqual({
     pastAt: "reject",
     idempotency: { key: "tenantId", retention: "1 day" },
   });
-  expect(() => copySchedules([{ id: "bad", cron: "* * *", timezone: "UTC", input: null }])).toThrow();
+  expect(() =>
+    copySchedules([{ id: "bad", cron: "* * *", timezone: "UTC", input: null }]),
+  ).toThrow();
   expect(() => copySchedules([{ id: "bad", every: "0 seconds", input: null }])).toThrow();
   expect(() => copyAdmission({ idempotency: { key: "tenant.id" } })).toThrow();
 });
