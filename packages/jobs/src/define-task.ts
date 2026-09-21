@@ -17,7 +17,8 @@ import {
   normalizeRetry,
   normalizeVersion,
 } from "./task-validation.js";
-import { assertBoundedString, copyTaskTags } from "./task-policy-validation.js";
+import { copyTaskTags } from "./task-policy-validation.js";
+import { assertHook, copyStrings, hasOwn, isRecord, isSchema } from "./define-task-support.js";
 import type {
   DefineTaskOptions,
   TaskDependencies,
@@ -29,6 +30,26 @@ import type {
 } from "./task-types.js";
 import { submitTask } from "./submission.js";
 const unsupportedTaskFields = ["invoke", "target"] as const;
+
+/**
+ * Declares a typed task with an immutable execution contract and handler.
+ *
+ * @example
+ * ```ts
+ * import { defineTask } from "@relkit/app/tasks";
+ * import { z } from "@relkit/app/schema";
+ * const exportOrders = defineTask({
+ *   id: "orders.export",
+ *   version: "1",
+ *   input: z.object({ orderIds: z.array(z.string()) }),
+ *   output: z.object({ exported: z.number() }),
+ *   handler: async ({ orderIds }) => ({ exported: orderIds.length }),
+ * });
+ * void exportOrders;
+ * ```
+ * @category Jobs
+ * @since 0.4.1
+ */
 export function defineTask<
   const Id extends string,
   const Version extends string,
@@ -90,8 +111,12 @@ export function defineTask<
   const streams = copyStreams(options.streams);
   assertCanonicalStreamSupport(streams);
   const observation = copyObservation(options.observation, progress, streams);
-  const maxDuration = options.maxDuration === undefined ? undefined : duration(options.maxDuration, "maxDuration", true);
-  const maxElapsed = options.maxElapsed === undefined ? undefined : duration(options.maxElapsed, "maxElapsed", true);
+  const maxDuration =
+    options.maxDuration === undefined
+      ? undefined
+      : duration(options.maxDuration, "maxDuration", true);
+  const maxElapsed =
+    options.maxElapsed === undefined ? undefined : duration(options.maxElapsed, "maxElapsed", true);
   const errors = copyErrors(options.errors);
   const dependencies = copyDependencies<Dependencies>(options.dependencies);
   const publishes = copyStrings(options.publishes, "publishes");
@@ -103,7 +128,11 @@ export function defineTask<
   assertHook(options.onSuccess, "onSuccess");
   assertHook(options.onFailure, "onFailure");
 
-  const base = createDescriptorBase("task", id, tags === undefined ? options : { ...options, tags });
+  const base = createDescriptorBase(
+    "task",
+    id,
+    tags === undefined ? options : { ...options, tags },
+  );
   const descriptor = {
     ...base,
     version,
@@ -128,11 +157,7 @@ export function defineTask<
     ...(options.onFailure === undefined ? {} : { onFailure: options.onFailure }),
     handler: options.handler,
     trigger: (input: InferInput<InputSchema>, triggerOptions?: unknown) =>
-      submitTask(
-        descriptor as unknown as TaskDescriptorAny,
-        input,
-        triggerOptions,
-      ),
+      submitTask(descriptor as unknown as TaskDescriptorAny, input, triggerOptions),
   };
   return deepFreeze(descriptor) as unknown as TaskDescriptor<
     Id,
@@ -164,37 +189,4 @@ export function isTaskDescriptor(value: unknown): value is TaskDescriptorAny {
 
 export function assertTaskDescriptor(value: unknown): asserts value is TaskDescriptorAny {
   if (!isTaskDescriptor(value)) throw new TypeError("Job task must be a task descriptor");
-}
-function copyStrings(value: unknown, name: string): readonly string[] | undefined {
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) throw new TypeError(`Task ${name} must be an array of non-empty strings`);
-  const strings = value.map((entry) => {
-    if (typeof entry !== "string" || entry.length === 0) {
-      throw new TypeError(`Task ${name} must be an array of non-empty strings`);
-    }
-    assertBoundedString(entry, `Task ${name} entry`);
-    return entry;
-  });
-  if (new Set(strings).size !== strings.length) throw new TypeError(`Task ${name} must be unique`);
-  return Object.freeze(strings);
-}
-
-function assertHook(value: unknown, name: string): void {
-  if (value !== undefined && typeof value !== "function") throw new TypeError(`Task ${name} must be a function`);
-}
-
-function isSchema(value: unknown): boolean {
-  return (
-    isRecord(value) &&
-    isRecord(value["~standard"]) &&
-    value["~standard"].version === 1 &&
-    typeof value["~standard"].validate === "function"
-  );
-}
-
-function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
-}
-function isRecord(value: unknown): value is Record<PropertyKey, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }

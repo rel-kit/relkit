@@ -72,7 +72,9 @@ export type ValidJobName<Name extends string = string> = string extends Name
         : never
       : never;
 
-export type JobName<Name extends string = string> = string extends Name ? string : ValidJobName<Name>;
+export type JobName<Name extends string = string> = string extends Name
+  ? string
+  : ValidJobName<Name>;
 
 export function isJobName(value: unknown): value is JobName {
   return (

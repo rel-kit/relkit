@@ -18,6 +18,7 @@ export * from "./controls.js";
 export * from "./schedule-controls.js";
 export * from "./schedule-reconciliation.js";
 export * from "./service-options.js";
+export * from "./migration.js";
 export { assertRfc3339Instant, isRfc3339Instant } from "./instant-validation.js";
 export { copyTriggerOptions, validateResultOptions } from "./trigger-validation.js";
 export {
@@ -74,12 +75,7 @@ export type {
   ScheduleWriteOutcome,
   ScheduleWriteReceipt,
 } from "./job-types.js";
-export {
-  durationToMillis,
-  isDurationInput,
-  parseDuration,
-  validateDuration,
-} from "./duration.js";
+export { durationToMillis, isDurationInput, parseDuration, validateDuration } from "./duration.js";
 export type { DurationInput, DurationUnit } from "./duration.js";
 export {
   assertJobName,

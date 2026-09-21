@@ -67,9 +67,7 @@ export function defineJob<
   const Name extends string,
   const Task extends TaskDescriptorAny,
   const Id extends string = Name,
->(
-  options: DefineJobOptions<Name, Task, Id>,
-): JobDescriptor<Name, Id, Task> {
+>(options: DefineJobOptions<Name, Task, Id>): JobDescriptor<Name, Id, Task> {
   if (!isRecord(options)) throw new TypeError("Job options must be an object");
   for (const field of forbiddenJobFields) {
     if (hasOwn(options, field)) throw new TypeError(`Jobs cannot own task field ${field}`);
@@ -87,9 +85,7 @@ export function defineJob<
   const schedules = copySchedules(options.schedules, {
     callerSchema: options.task.input,
     canonicalSchema: canonicalInput,
-  }) as
-    | readonly ScheduleDefinition<unknown>[]
-    | undefined;
+  }) as readonly ScheduleDefinition<unknown>[] | undefined;
   const admission = copyAdmission(options.admission, canonicalInput);
   const client = copyClient(options.client, {
     progress: options.task.progress,
@@ -114,12 +110,10 @@ export function defineJob<
     ...(schedules === undefined ? {} : { schedules }),
     ...(admission === undefined ? {} : { admission }),
     ...(client === undefined ? {} : { client }),
-    trigger: (input: Parameters<JobDescriptor<Name, Id, Task>["trigger"]>[0], triggerOptions?: unknown) =>
-      submitJob(
-        descriptor as unknown as JobDescriptorAny,
-        input,
-        triggerOptions,
-      ),
+    trigger: (
+      input: Parameters<JobDescriptor<Name, Id, Task>["trigger"]>[0],
+      triggerOptions?: unknown,
+    ) => submitJob(descriptor as unknown as JobDescriptorAny, input, triggerOptions),
   };
   return deepFreeze(descriptor) as unknown as JobDescriptor<Name, Id, Task>;
 }

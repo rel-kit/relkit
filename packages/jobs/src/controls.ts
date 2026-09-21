@@ -1,4 +1,3 @@
-import { currentTaskAncestry } from "@relkit/invocation";
 import type {
   RunCancellationReceipt,
   RunHandle,
@@ -8,16 +7,10 @@ import type {
   RunSnapshot,
   RunWatchFrame,
 } from "@relkit/contracts/jobs";
-import { durationToMillis } from "./duration.js";
-import type {
-  NativeCancelRequest,
-  NativeRetryRequest,
-  NativeWatchRequest,
-} from "./adapter.js";
+import type { NativeCancelRequest, NativeRetryRequest, NativeWatchRequest } from "./adapter.js";
 import { requireJobsRuntime, type JobsRuntime } from "./runtime.js";
-import { validateResultOptions } from "./trigger-validation.js";
 import type { RunResultOptions } from "./trigger-types.js";
-import { JobControlUnknownError, JobResultUnavailableError, TaskBlockingWaitError } from "./control-errors.js";
+import { JobControlUnknownError } from "./control-errors.js";
 import { createScheduleControls } from "./schedule-controls.js";
 import type { JobScheduleClient } from "./job-types.js";
 import {
@@ -36,6 +29,7 @@ import {
 } from "./control-support.js";
 import { controlWrite } from "./control-write.js";
 import { retryOperationIdentity } from "./identity.js";
+import { waitForResult as waitForResultInternal } from "./control-result.js";
 
 export type { JobObserveOptions } from "./control-support.js";
 export interface JobCancelOptions {
@@ -50,9 +44,18 @@ export interface JobRetryOptions {
 }
 
 export interface JobsControls {
-  readonly get: (locator: string, options?: { readonly signal?: AbortSignal }) => Promise<RunSnapshot>;
-  readonly list: (query?: RunListQuery, options?: { readonly signal?: AbortSignal }) => Promise<RunPage<RunSnapshot>>;
-  readonly observe: (request: NativeWatchRequest, options?: JobObserveOptions) => AsyncIterable<RunWatchFrame<RunSnapshot>>;
+  readonly get: (
+    locator: string,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<RunSnapshot>;
+  readonly list: (
+    query?: RunListQuery,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<RunPage<RunSnapshot>>;
+  readonly observe: (
+    request: NativeWatchRequest,
+    options?: JobObserveOptions,
+  ) => AsyncIterable<RunWatchFrame<RunSnapshot>>;
   readonly cancel: (runId: string, options: JobCancelOptions) => Promise<RunCancellationReceipt>;
   readonly retry: (runId: string, options: JobRetryOptions) => Promise<RunRetryReceipt>;
   readonly result: (runId: string, options: RunResultOptions) => Promise<unknown>;
@@ -61,13 +64,18 @@ export interface JobsControls {
 
 export function createJobsControls(runtime = requireJobsRuntime()): JobsControls {
   return Object.freeze({
-    get: (locator: string, options?: { readonly signal?: AbortSignal }) => getRun(runtime, locator, options?.signal),
-    list: (query?: RunListQuery, options?: { readonly signal?: AbortSignal }) => listRuns(runtime, query, options?.signal),
-    observe: (request: NativeWatchRequest, options?: JobObserveOptions) => observeRun(runtime, request, options),
+    get: (locator: string, options?: { readonly signal?: AbortSignal }) =>
+      getRun(runtime, locator, options?.signal),
+    list: (query?: RunListQuery, options?: { readonly signal?: AbortSignal }) =>
+      listRuns(runtime, query, options?.signal),
+    observe: (request: NativeWatchRequest, options?: JobObserveOptions) =>
+      observeRun(runtime, request, options),
     cancel: (runId: string, options: JobCancelOptions) => cancelRun(runtime, runId, options),
     retry: (runId: string, options: JobRetryOptions) => retryRun(runtime, runId, options),
     result: (runId: string, options: RunResultOptions) => waitForResult(runtime, runId, options),
-    ...(runtime.adapter.schedules === undefined ? {} : { schedules: createScheduleControls(runtime) }),
+    ...(runtime.adapter.schedules === undefined
+      ? {}
+      : { schedules: createScheduleControls(runtime) }),
   });
 }
 
@@ -88,7 +96,8 @@ export async function listRuns(
 ): Promise<RunPage<RunSnapshot>> {
   requireMethod(runtime, "list", "list");
   const limit = query.limit ?? 25;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) throw new RangeError("Run list limit must be between 1 and 100");
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
+    throw new RangeError("Run list limit must be between 1 and 100");
   return runtime.adapter.list({ ...query, limit }, operationContext(runtime, signal));
 }
 
@@ -119,11 +128,16 @@ export async function cancelRun(
     ...(options.reason === undefined ? {} : { reason: options.reason }),
   };
   const value: unknown = await controlWrite(
-    () => runtime.adapter.cancel(request, operationContext(runtime, options.signal, options.operationId)),
+    () =>
+      runtime.adapter.cancel(
+        request,
+        operationContext(runtime, options.signal, options.operationId),
+      ),
     options.signal,
     options.operationId,
   );
-  if (isUnknown(value)) throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
+  if (isUnknown(value))
+    throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
   return normalizeCancellationReceipt(value, runId, options.operationId);
 }
 
@@ -147,8 +161,12 @@ export async function retryRun(
     ...(original.buildId === undefined ? {} : { buildId: original.buildId }),
     ...(original.scope === undefined ? {} : { scope: original.scope }),
     ...(original.inputHash === undefined ? {} : { inputHash: original.inputHash }),
-    ...(original.inputSchemaHash === undefined ? {} : { inputSchemaHash: original.inputSchemaHash }),
-    ...(original.acceptanceIdentity === undefined ? {} : { acceptanceIdentity: original.acceptanceIdentity }),
+    ...(original.inputSchemaHash === undefined
+      ? {}
+      : { inputSchemaHash: original.inputSchemaHash }),
+    ...(original.acceptanceIdentity === undefined
+      ? {}
+      : { acceptanceIdentity: original.acceptanceIdentity }),
     canonicalAdmission: {
       validatePinnedInput: true,
       allocateFreshBudget: true,
@@ -160,7 +178,8 @@ export async function retryRun(
     options.signal,
     options.operationId,
   );
-  if (isUnknown(value)) throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
+  if (isUnknown(value))
+    throw new JobControlUnknownError(value.operationId, unknownKey(value), unknownRecovery(value));
   return normalizeRetryReceipt(value, runId);
 }
 
@@ -169,37 +188,5 @@ export async function waitForResult(
   runId: string,
   options: RunResultOptions,
 ): Promise<unknown> {
-  if (currentTaskAncestry() !== undefined) throw new TaskBlockingWaitError();
-  const parsed = validateResultOptions(options);
-  const timeoutMs = durationToMillis(parsed.timeout);
-  const signal = parsed.signal ?? new AbortController().signal;
-  const deadline = Date.now() + timeoutMs;
-  while (true) {
-    if (signal.aborted) throw signal.reason ?? new Error("Result observation aborted");
-    const run = await getRun(runtime, runId, signal);
-    if (isTerminal(run)) {
-      if (run.resultAvailability === "void") return undefined;
-      if (run.resultAvailability !== "available") throw new JobResultUnavailableError(run.resultAvailability);
-      return "output" in run ? run.output : undefined;
-    }
-    if (Date.now() >= deadline) throw new JobResultUnavailableError("pending", "Timed out waiting for the job result");
-    await sleep(Math.min(50, Math.max(1, deadline - Date.now())), signal);
-  }
-}
-
-function sleep(milliseconds: number, signal: AbortSignal): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const done = (): void => {
-      signal.removeEventListener("abort", abort);
-      resolve();
-    };
-    const timer = setTimeout(done, milliseconds);
-    const abort = (): void => {
-      clearTimeout(timer);
-      signal.removeEventListener("abort", abort);
-      reject(signal.reason ?? new Error("Observation aborted"));
-    };
-    signal.addEventListener("abort", abort, { once: true });
-    if (signal.aborted) abort();
-  });
+  return waitForResultInternal(runtime, runId, options, getRun);
 }

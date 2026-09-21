@@ -16,7 +16,8 @@ export type DurationUnit =
 
 export type DurationInput = `${number} ${DurationUnit}`;
 
-const DURATION_PATTERN = /^((?:0|[1-9]\d*))(?:\.(\d+))? (millisecond|milliseconds|second|seconds|minute|minutes|hour|hours|day|days|week|weeks)$/u;
+const DURATION_PATTERN =
+  /^((?:0|[1-9]\d*))(?:\.(\d+))? (millisecond|milliseconds|second|seconds|minute|minutes|hour|hours|day|days|week|weeks)$/u;
 const MAX_SAFE_INTEGER = BigInt(Number.MAX_SAFE_INTEGER);
 const UNIT_MILLISECONDS: Readonly<Record<DurationUnit, bigint>> = {
   millisecond: 1n,

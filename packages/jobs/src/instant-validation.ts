@@ -20,7 +20,8 @@ export function isRfc3339Instant(value: unknown): value is string {
   const offsetMinutes =
     offset === "Z"
       ? 0
-      : (offset!.startsWith("-") ? -1 : 1) * (Number(offset!.slice(1, 3)) * 60 + Number(offset!.slice(4)));
+      : (offset!.startsWith("-") ? -1 : 1) *
+        (Number(offset!.slice(1, 3)) * 60 + Number(offset!.slice(4)));
   if (offset !== "Z" && (Number(offset!.slice(1, 3)) > 23 || Number(offset!.slice(4)) > 59)) {
     return false;
   }
