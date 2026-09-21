@@ -26,7 +26,12 @@ test("job pending metadata matches the transmitted request and retains input onl
   expect(metadata.requestDigest).toBe(await digestPendingRequest(request));
   expect(pendingRequest(scope, "operation-1")).toBe(request);
   expect(await matchesPendingRequest(scope, "operation-1", request)).toBe(true);
-  expect(await matchesPendingRequest(scope, "operation-1", { ...request, input: { accountId: "other" } })).toBe(false);
+  expect(
+    await matchesPendingRequest(scope, "operation-1", {
+      ...request,
+      input: { accountId: "other" },
+    }),
+  ).toBe(false);
 
   const unknown = jobUnknownOutcome({
     data: {
@@ -74,7 +79,10 @@ test("unknown job intents require an active same-key recovery window before reus
   updatePending(scope, {
     ...metadata,
     state: "unknown",
-    recovery: { action: "retry-with-same-key", expiresAt: new Date(Date.now() + 60_000).toISOString() },
+    recovery: {
+      action: "retry-with-same-key",
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    },
   });
   await expect(
     rememberJobPending(scope, "exports", request, {

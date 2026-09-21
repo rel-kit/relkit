@@ -1,13 +1,10 @@
 import type { ExpectedClientIdentity } from "@relkit/contracts";
 import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
-import {
-  JobWatchAbortedError,
-  type JobWatchOptions,
-} from "./types.js";
+import { JobWatchAbortedError, type JobWatchOptions } from "./types.js";
 import { timedCall } from "./read-timeout.js";
+import { closeIterator, newEpoch } from "./reconcile-support.js";
 
 type Procedure = (...args: readonly unknown[]) => unknown;
-const closedIterators = new WeakSet<object>();
 export interface WatchRequest {
   readonly runId: string;
   readonly after?: string;
@@ -17,7 +14,9 @@ export function watchRequest(options: JobWatchOptions, after = options.after): W
   return {
     runId: options.runId,
     ...(after === undefined ? {} : { after }),
-    ...(options.expectedIdentity === undefined ? {} : { expectedIdentity: options.expectedIdentity }),
+    ...(options.expectedIdentity === undefined
+      ? {}
+      : { expectedIdentity: options.expectedIdentity }),
   };
 }
 export function resolveJobProcedure(root: unknown, name: string, operation: string): Procedure {
@@ -27,7 +26,11 @@ export function resolveJobProcedure(root: unknown, name: string, operation: stri
   }
   return value as Procedure;
 }
-export function ownJobProcedure(root: unknown, name: string, operation: string): Procedure | undefined {
+export function ownJobProcedure(
+  root: unknown,
+  name: string,
+  operation: string,
+): Procedure | undefined {
   let value: unknown = root;
   for (const key of ["jobs", name, "runs", operation]) {
     if (!isRecord(value) || !Object.prototype.hasOwnProperty.call(value, key)) return undefined;
@@ -62,7 +65,9 @@ export async function openWatchIterator(
 ): Promise<AsyncIterator<unknown>> {
   throwIfAborted(signal);
   const call = resolveJobProcedure(client, name, "watch");
-  const value = await timedCall(signal, timeoutMs, (readSignal) => call(request, { signal: readSignal }));
+  const value = await timedCall(signal, timeoutMs, (readSignal) =>
+    call(request, { signal: readSignal }),
+  );
   throwIfAborted(signal);
   return toAsyncIterator(value);
 }
@@ -81,7 +86,12 @@ export async function authoritativeFrame(
     throwIfAborted(signal);
     const run = await timedCall(signal, options.readTimeoutMs ?? 10_000, (readSignal) =>
       get(
-        { runId: options.runId, ...(options.expectedIdentity === undefined ? {} : { expectedIdentity: options.expectedIdentity }) },
+        {
+          runId: options.runId,
+          ...(options.expectedIdentity === undefined
+            ? {}
+            : { expectedIdentity: options.expectedIdentity }),
+        },
         { signal: readSignal },
       ),
     );
@@ -105,31 +115,7 @@ export function frameFromRun(run: RunSnapshot): RunWatchFrame {
   });
 }
 
-export async function closeIterator(iterator: AsyncIterator<unknown>): Promise<void> {
-  if (typeof iterator.return !== "function") return;
-  if (typeof iterator === "object" && iterator !== null) {
-    if (closedIterators.has(iterator)) return;
-    closedIterators.add(iterator);
-  }
-  const closing = Promise.resolve(iterator.return()).then(() => undefined);
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    await Promise.race([
-      closing,
-      new Promise<void>((resolve) => {
-        timer = setTimeout(resolve, 5_000);
-      }),
-    ]);
-  } finally {
-    if (timer !== undefined) clearTimeout(timer);
-  }
-}
-
-export function newEpoch(): string {
-  return typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID()
-    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-}
+export { closeIterator, newEpoch } from "./reconcile-support.js";
 
 function descend(root: unknown, path: readonly string[]): unknown {
   let value = root;
@@ -141,11 +127,16 @@ function descend(root: unknown, path: readonly string[]): unknown {
   return value;
 }
 
-function optionalJobProcedure(root: unknown, name: string, operation: string): Procedure | undefined {
+function optionalJobProcedure(
+  root: unknown,
+  name: string,
+  operation: string,
+): Procedure | undefined {
   try {
     return resolveJobProcedure(root, name, operation);
   } catch (error) {
-    if (error instanceof TypeError && error.message.startsWith("Unknown Relkit job procedure")) return undefined;
+    if (error instanceof TypeError && error.message.startsWith("Unknown Relkit job procedure"))
+      return undefined;
     throw error;
   }
 }

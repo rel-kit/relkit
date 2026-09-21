@@ -30,7 +30,10 @@ test("watch controllers stay idle until connect and share a first-snapshot promi
   expect(first).toBe(controller.connect());
   await first;
   expect(watches).toBe(1);
-  expect(controller.getSnapshot()).toMatchObject({ connection: "connected", run: { runId: "run-1" } });
+  expect(controller.getSnapshot()).toMatchObject({
+    connection: "connected",
+    run: { runId: "run-1" },
+  });
   expect(Object.isFrozen(controller.getSnapshot())).toBe(true);
 
   await controller.disconnect();
@@ -48,7 +51,10 @@ test("terminal watch frames require an authoritative terminal confirmation", asy
   const controller = watchJobRun(client, "exports", { runId: "run-1" });
 
   await controller.connect();
-  expect(controller.getSnapshot()).toMatchObject({ connection: "connected", run: { status: "running" } });
+  expect(controller.getSnapshot()).toMatchObject({
+    connection: "connected",
+    run: { status: "running" },
+  });
   await controller.dispose();
 });
 
@@ -87,7 +93,10 @@ test("proxy clients use get for EOF reconciliation", async () => {
 
   await controller.connect();
   await waitFor(() => controller.getSnapshot().connection === "completed");
-  expect(controller.getSnapshot()).toMatchObject({ connection: "completed", run: { status: "completed" } });
+  expect(controller.getSnapshot()).toMatchObject({
+    connection: "completed",
+    run: { status: "completed" },
+  });
   await controller.dispose();
 });
 
@@ -133,7 +142,10 @@ test("watch-only refetch closes its temporary iterator and remains disconnected"
   const controller = watchJobRun(client, "exports", { runId: "run-1" });
   await controller.disconnect();
   await controller.refetch();
-  expect(controller.getSnapshot()).toMatchObject({ connection: "disconnected", run: { runId: "run-1" } });
+  expect(controller.getSnapshot()).toMatchObject({
+    connection: "disconnected",
+    run: { runId: "run-1" },
+  });
   expect(returned).toBe(1);
   await controller.dispose();
 });
@@ -285,9 +297,9 @@ test("stream establishment is bounded by the read timeout", async () => {
     },
   };
 
-  await expect(watchJobStream(client, "exports", { runId: "run-1", name: "text", readTimeoutMs: 1 })).rejects.toBeInstanceOf(
-    JobWatchReadTimeoutError,
-  );
+  await expect(
+    watchJobStream(client, "exports", { runId: "run-1", name: "text", readTimeoutMs: 1 }),
+  ).rejects.toBeInstanceOf(JobWatchReadTimeoutError);
   expect(aborted).toBe(true);
 });
 
@@ -296,13 +308,53 @@ test("named content resets its sequence per attempt and reports gaps or overflow
     jobs: {
       exports: {
         runs: {
-          stream: async () => finiteIterator([
-            { kind: "start", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1" },
-            { kind: "chunk", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1", sequence: 0, item: "a" },
-            { kind: "start", runId: "run-1", name: "text", attempt: 2, generation: "g2", schemaVersion: "1" },
-            { kind: "chunk", runId: "run-1", name: "text", attempt: 2, generation: "g2", schemaVersion: "1", sequence: 0, item: "b" },
-            { kind: "end", runId: "run-1", name: "text", attempt: 2, generation: "g2", schemaVersion: "1" },
-          ]),
+          stream: async () =>
+            finiteIterator([
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "a",
+              },
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 2,
+                generation: "g2",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 2,
+                generation: "g2",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "b",
+              },
+              {
+                kind: "end",
+                runId: "run-1",
+                name: "text",
+                attempt: 2,
+                generation: "g2",
+                schemaVersion: "1",
+              },
+            ]),
         },
       },
     },
@@ -313,48 +365,151 @@ test("named content resets its sequence per attempt and reports gaps or overflow
   expect(frames.filter((frame) => (frame as { kind: string }).kind === "chunk")).toHaveLength(2);
 
   const boundedClient = {
-    jobs: { exports: { runs: { stream: async () => finiteIterator([
-      { kind: "start", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1" },
-      { kind: "chunk", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1", sequence: 0, item: "a" },
-      { kind: "start", runId: "run-1", name: "text", attempt: 2, generation: "g2", schemaVersion: "1" },
-      { kind: "chunk", runId: "run-1", name: "text", attempt: 2, generation: "g2", schemaVersion: "1", sequence: 0, item: "b" },
-    ]) } } },
+    jobs: {
+      exports: {
+        runs: {
+          stream: async () =>
+            finiteIterator([
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "a",
+              },
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 2,
+                generation: "g2",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 2,
+                generation: "g2",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "b",
+              },
+            ]),
+        },
+      },
+    },
   };
   const bounded = await watchJobStream<string>(boundedClient, "exports", {
     runId: "run-1",
     name: "text",
     maxFrames: 3,
   });
-  await expect((async () => {
-    for await (const _frame of bounded) {}
-  })()).rejects.toBeInstanceOf(JobStreamOverflowError);
+  await expect(
+    (async () => {
+      for await (const _frame of bounded) {
+      }
+    })(),
+  ).rejects.toBeInstanceOf(JobStreamOverflowError);
 
   const gapClient = {
-    jobs: { exports: { runs: { stream: async () => finiteIterator([
-      { kind: "start", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1" },
-      { kind: "chunk", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1", sequence: 0, item: "ok" },
-      { kind: "chunk", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1", sequence: 2, item: "gap" },
-    ]) } } },
+    jobs: {
+      exports: {
+        runs: {
+          stream: async () =>
+            finiteIterator([
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "ok",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+                sequence: 2,
+                item: "gap",
+              },
+            ]),
+        },
+      },
+    },
   };
   const gap = await watchJobStream<string>(gapClient, "exports", { runId: "run-1", name: "text" });
-  await expect((async () => {
-    for await (const _frame of gap) {}
-  })()).rejects.toBeInstanceOf(JobStreamGapError);
+  await expect(
+    (async () => {
+      for await (const _frame of gap) {
+      }
+    })(),
+  ).rejects.toBeInstanceOf(JobStreamGapError);
 
   const overflowClient = {
-    jobs: { exports: { runs: { stream: async () => finiteIterator([
-      { kind: "start", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1" },
-      { kind: "chunk", runId: "run-1", name: "text", attempt: 1, generation: "g1", schemaVersion: "1", sequence: 0, item: "too-large" },
-    ]) } } },
+    jobs: {
+      exports: {
+        runs: {
+          stream: async () =>
+            finiteIterator([
+              {
+                kind: "start",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+              },
+              {
+                kind: "chunk",
+                runId: "run-1",
+                name: "text",
+                attempt: 1,
+                generation: "g1",
+                schemaVersion: "1",
+                sequence: 0,
+                item: "too-large",
+              },
+            ]),
+        },
+      },
+    },
   };
   const overflow = await watchJobStream<string>(overflowClient, "exports", {
     runId: "run-1",
     name: "text",
     maxItemBytes: 1,
   });
-  await expect((async () => {
-    for await (const _frame of overflow) {}
-  })()).rejects.toBeInstanceOf(JobStreamOverflowError);
+  await expect(
+    (async () => {
+      for await (const _frame of overflow) {
+      }
+    })(),
+  ).rejects.toBeInstanceOf(JobStreamOverflowError);
 });
 
 test("shared watch envelope keeps 100 unique feeds and 1,000 leases bounded", async () => {
@@ -404,9 +559,13 @@ function clientWith(procedures: {
 function proxyClient(value: unknown): unknown {
   if (value === null || typeof value !== "object") return value;
   const record = value as Record<string, unknown>;
-  return new Proxy({}, {
-    get: (_target, property) => typeof property === "string" ? proxyClient(record[property]) : undefined,
-  });
+  return new Proxy(
+    {},
+    {
+      get: (_target, property) =>
+        typeof property === "string" ? proxyClient(record[property]) : undefined,
+    },
+  );
 }
 
 function run(status: RunSnapshot["status"]): RunSnapshot {
@@ -450,7 +609,9 @@ function frameFor(runId: string): RunWatchFrame {
   };
 }
 
-function finiteIterator(values: readonly unknown[]): AsyncIterator<unknown> & { returned?: boolean } {
+function finiteIterator(
+  values: readonly unknown[],
+): AsyncIterator<unknown> & { returned?: boolean } {
   let index = 0;
   return {
     returned: false,
@@ -462,7 +623,9 @@ function finiteIterator(values: readonly unknown[]): AsyncIterator<unknown> & { 
   };
 }
 
-function holdingIterator(values: readonly unknown[]): AsyncIterator<unknown> & { returned: boolean } {
+function holdingIterator(
+  values: readonly unknown[],
+): AsyncIterator<unknown> & { returned: boolean } {
   let index = 0;
   let finish: ((result: IteratorResult<unknown>) => void) | undefined;
   const iterator: AsyncIterator<unknown> & { returned: boolean } = {

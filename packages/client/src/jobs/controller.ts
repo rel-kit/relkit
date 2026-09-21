@@ -1,4 +1,4 @@
-import type { RunSnapshot, RunWatchFrame } from "@relkit/contracts/jobs";
+import type { RunSnapshot } from "@relkit/contracts/jobs";
 import {
   JobWatchAbortedError,
   JobWatchDisposedError,
@@ -6,7 +6,6 @@ import {
   type JobWatchListener,
   type JobWatchOptions,
   type JobWatchState,
-  isTerminalRun,
 } from "./types.js";
 import {
   releaseSharedWatchFeed,
@@ -16,6 +15,7 @@ import {
 } from "./watch.js";
 import { freeze, notify, reconnectAfterTeardown, resumedOptions } from "./controller-support.js";
 import type { JobRunFor } from "./job-registry-derived.js";
+import { stateFromFeedEvent } from "./controller-state.js";
 let nextControllerId = 1;
 export class JobRunWatchController<Run = RunSnapshot> implements JobWatchController<Run> {
   private readonly id = `watch-${nextControllerId++}`;
@@ -30,7 +30,11 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
   private manuallyDisconnected = false;
   private disposed = false;
   private disconnectPending: Promise<void> | undefined;
-  constructor(private readonly client: unknown, private readonly name: string, private readonly options: JobWatchOptions) {}
+  constructor(
+    private readonly client: unknown,
+    private readonly name: string,
+    private readonly options: JobWatchOptions,
+  ) {}
   getSnapshot(): JobWatchState<Run> {
     return this.state;
   }
@@ -44,7 +48,9 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
     if (this.connectPromise !== undefined && !this.manuallyDisconnected) return this.connectPromise;
     const previous = this.connectPromise;
     this.manuallyDisconnected = false;
-    const pending = reconnectAfterTeardown(previous, this.disconnectPending, () => this.connectInternal());
+    const pending = reconnectAfterTeardown(previous, this.disconnectPending, () =>
+      this.connectInternal(),
+    );
     const shared = pending.finally(() => {
       if (this.connectPromise === shared) this.connectPromise = undefined;
     });
@@ -57,7 +63,12 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
     this.manuallyDisconnected = true;
     this.epoch += 1;
     this.refetchAbort?.abort();
-    this.setState({ ...this.state, connection: "disconnected", isStale: false, connectionError: undefined });
+    this.setState({
+      ...this.state,
+      connection: "disconnected",
+      isStale: false,
+      connectionError: undefined,
+    });
     const pending = this.releaseLease(new JobWatchAbortedError());
     this.disconnectPending = pending;
     await pending.finally(() => {
@@ -90,13 +101,24 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
         this.setState({ ...this.state, connection: "disconnected" });
       }
     } finally {
-      if (temporary) releaseSharedWatchFeed(this.client, this.name, feedOptions, feed as SharedWatchFeed<unknown>);
+      if (temporary)
+        releaseSharedWatchFeed(
+          this.client,
+          this.name,
+          feedOptions,
+          feed as SharedWatchFeed<unknown>,
+        );
       if (this.refetchAbort === controller) this.refetchAbort = undefined;
     }
   }
   private async connectInternal(): Promise<void> {
     const requestedEpoch = this.epoch;
-    if (this.state.connection === "connected" || this.state.connection === "connecting" || this.state.connection === "reconnecting") return;
+    if (
+      this.state.connection === "connected" ||
+      this.state.connection === "connecting" ||
+      this.state.connection === "reconnecting"
+    )
+      return;
     if (this.state.connection === "completed") {
       await this.refetch();
       if (requestedEpoch !== this.epoch || this.disposed) return;
@@ -111,7 +133,12 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
   private async startConnection(): Promise<void> {
     const epoch = ++this.epoch;
     this.manuallyDisconnected = false;
-    this.setState({ ...this.state, connection: "connecting", isStale: false, connectionError: undefined });
+    this.setState({
+      ...this.state,
+      connection: "connecting",
+      isStale: false,
+      connectionError: undefined,
+    });
     const options = resumedOptions(this.options, this.state);
     const feed = sharedWatchFeed<Run>(this.client, this.name, options);
     const leaseId = `${this.id}:${epoch}`;
@@ -123,51 +150,19 @@ export class JobRunWatchController<Run = RunSnapshot> implements JobWatchControl
     } catch (error) {
       if (epoch !== this.epoch || this.disposed || this.manuallyDisconnected) throw error;
       if (this.state.connection !== "unauthorized") {
-        this.setState({ ...this.state, connection: "error", isStale: false, connectionError: error });
+        this.setState({
+          ...this.state,
+          connection: "error",
+          isStale: false,
+          connectionError: error,
+        });
       }
       throw error;
     }
   }
   private receive(event: FeedEvent<Run>, epoch: number): void {
     if (epoch !== this.epoch || this.disposed) return;
-    if (event.kind === "status") {
-      if (event.status === "unauthorized") {
-        this.setState({ connection: "unauthorized", isStale: false, connectionError: event.error });
-        return;
-      }
-      if (event.status === "error") {
-        this.setState({ ...this.state, connection: "error", isStale: false, connectionError: event.error });
-        return;
-      }
-      const connection = event.status === "completed" ? "completed" : event.status;
-      this.setState({ ...this.state, connection, isStale: event.status === "reconnecting", ...(event.error === undefined ? {} : { connectionError: event.error }) });
-      return;
-    }
-    const frame = event.frame as RunWatchFrame<Run>;
-    const run = frame.run;
-    const {
-      connectionError: _connectionError,
-      resetReason: _resetReason,
-      ...withoutFrameDiagnostics
-    } = this.state;
-    this.setState({
-      ...withoutFrameDiagnostics,
-      ...(isTerminalRun(run) ? { connection: "completed" as const } : { connection: "connected" as const }),
-      run,
-      isStale: frame.kind === "reset",
-      lastObservedAt: frame.observedAt,
-      ...(frame.kind === "snapshot"
-        ? { continuity: frame.continuity }
-        : this.state.continuity === undefined
-          ? {}
-          : { continuity: this.state.continuity }),
-      source: this.options.source ?? this.state.source ?? "native",
-      epoch: frame.epoch,
-      sequence: frame.sequence,
-      ...(frame.cursor === undefined ? {} : { cursor: frame.cursor }),
-      ...(frame.kind === "reset" ? { resetReason: frame.reason } : {}),
-      connectionError: undefined,
-    });
+    this.setState(stateFromFeedEvent(this.state, event, this.options.source));
   }
   private async releaseLease(error: unknown): Promise<void> {
     const feed = this.feed;

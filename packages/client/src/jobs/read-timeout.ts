@@ -32,7 +32,11 @@ export async function timedCall<T>(
     }, boundedTimeout);
   });
   try {
-    return await Promise.race([Promise.resolve(operation(controller.signal)), cancellation, timeout]);
+    return await Promise.race([
+      Promise.resolve(operation(controller.signal)),
+      cancellation,
+      timeout,
+    ]);
   } finally {
     if (timer !== undefined) clearTimeout(timer);
     if (onAbort !== undefined) signal.removeEventListener("abort", onAbort);

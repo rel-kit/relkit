@@ -12,7 +12,10 @@ export function freeze<T>(value: T): T {
   return deepFreeze(value, new WeakSet<object>());
 }
 
-export function resumedOptions<Run>(options: JobWatchOptions, state: JobWatchState<Run>): JobWatchOptions {
+export function resumedOptions<Run>(
+  options: JobWatchOptions,
+  state: JobWatchState<Run>,
+): JobWatchOptions {
   return state.cursor === undefined ? options : { ...options, after: state.cursor };
 }
 
