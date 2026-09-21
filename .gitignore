@@ -16,6 +16,8 @@ node_modules
 coverage
 playwright-report/
 test-results/
+.stryker-tmp/
+reports/mutation/
 
 # Turbo
 .turbo

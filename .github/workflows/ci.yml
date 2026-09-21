@@ -174,6 +174,7 @@ jobs:
           bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
           bun run test:container 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/container.log"
           bun run test:local-docker 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/local-docker.log"
+          bun run test:jobs:docker 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/jobs-docker.log"
           bun run test:scaffold 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/scaffold.log"
       - name: Upload failure evidence
         if: failure()
