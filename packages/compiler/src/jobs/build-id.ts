@@ -36,7 +36,11 @@ export function computeJobBuildId(
   const profile = selectedProviderProfile(
     work.descriptors.find((entry) => entry.kind === "app")?.value,
     "job",
-    typeof value.service === "string" ? value.service : typeof value.profile === "string" ? value.profile : undefined,
+    typeof value.service === "string"
+      ? value.service
+      : typeof value.profile === "string"
+        ? value.profile
+        : undefined,
   );
   return computeTaskBuildId(task, work, {
     profile: profile ?? "default",
@@ -72,7 +76,8 @@ export function serviceGenerationFor(
   if (typeof value.serviceGeneration === "string" && value.serviceGeneration.length > 0)
     return value.serviceGeneration;
   const application = work.descriptors.find((entry) => entry.kind === "app")?.value;
-  const selected = profile ?? selectedProviderProfile(application, "job", text(value.service ?? value.profile));
+  const selected =
+    profile ?? selectedProviderProfile(application, "job", text(value.service ?? value.profile));
   const profiles = isRecord(application)
     ? providerMaps(application).find(([capability]) => capability === "job")?.[1]
     : undefined;
@@ -103,7 +108,9 @@ function selectFields(value: Record<string, unknown>): Record<string, unknown> {
     "onSuccess",
     "onFailure",
   ];
-  return Object.fromEntries(fields.flatMap((field) => (value[field] === undefined ? [] : [[field, value[field]]])));
+  return Object.fromEntries(
+    fields.flatMap((field) => (value[field] === undefined ? [] : [[field, value[field]]])),
+  );
 }
 
 function dependencyClosure(work: NormalizationWork, value: unknown): JsonValue {
@@ -136,7 +143,9 @@ function collectRefs(value: unknown, result: Set<string>): void {
 }
 
 function versionOf(value: NormalizedDescriptor | undefined): string {
-  return isRecord(value?.value) && typeof value.value.version === "string" ? value.value.version : "";
+  return isRecord(value?.value) && typeof value.value.version === "string"
+    ? value.value.version
+    : "";
 }
 
 function schemaHashes(work: NormalizationWork, taskId: string): JsonValue {
@@ -164,7 +173,11 @@ function stableValue(value: unknown, seen = new WeakSet<object>()): JsonValue {
   seen.add(value);
   try {
     if (Array.isArray(value)) return value.map((entry) => stableValue(entry, seen));
-    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stableValue((value as Record<string, unknown>)[key], seen)]));
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, stableValue((value as Record<string, unknown>)[key], seen)]),
+    );
   } finally {
     seen.delete(value);
   }

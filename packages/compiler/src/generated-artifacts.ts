@@ -1,5 +1,4 @@
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
+import { join } from "node:path";
 import {
   CONTRACT_VERSION,
   GENERATOR_VERSION,
@@ -11,6 +10,9 @@ import {
 import { JOBS_MANIFEST_VERSION } from "@relkit/contracts/jobs";
 import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { GeneratedOutputs } from "./normalize-types.js";
+import { writeIfChanged } from "./generated-artifacts-write.js";
+
+export { writeIfChanged } from "./generated-artifacts-write.js";
 export const GENERATED_ARTIFACT_FILES = Object.freeze({
   graph: "application.graph.json",
   manifest: "runtime.manifest.ts",
@@ -115,36 +117,6 @@ export function createGeneratedOutputExtension(
   return Object.freeze({ kind, version: GENERATED_EXTENSION_VERSIONS[kind].version, content });
 }
 
-/** Writes changed bytes only; the unchanged path is never opened for writing. */
-export async function writeIfChanged(
-  filePath: string,
-  content: string,
-): Promise<ArtifactWriteResult> {
-  const next = Buffer.from(content, "utf8");
-  let unchanged = false;
-  try {
-    unchanged = (await readFile(filePath)).equals(next);
-  } catch (error) {
-    if (!isMissingFile(error)) throw error;
-  }
-  if (!unchanged) {
-    await mkdir(dirname(filePath), { recursive: true });
-    const temporary = `${filePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
-    try {
-      await writeFile(temporary, next, { flag: "wx" });
-      await rename(temporary, filePath);
-    } finally {
-      await rm(temporary, { force: true });
-    }
-  }
-  return Object.freeze({
-    fileName: basename(filePath),
-    path: filePath,
-    changed: !unchanged,
-    bytes: next.byteLength,
-  });
-}
-
 /** Writes compiler artifacts plus content-aware OpenAPI/client and explicit extensions. */
 export async function writeGeneratedArtifacts(
   outputs: GeneratedOutputs,
@@ -200,8 +172,4 @@ function extensionArtifact(extension: GeneratedOutputExtension): GeneratedArtifa
     throw new TypeError(`Generated ${extension.kind} content must be text.`);
   }
   return artifact(expected.fileName, extension.content, extension.version);
-}
-
-function isMissingFile(error: unknown): boolean {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
 }

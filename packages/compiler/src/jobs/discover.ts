@@ -1,7 +1,11 @@
 import { canonicalJson } from "@relkit/contracts";
 import { add } from "../normalize-pass-utils.js";
 import { isRecord, refId } from "../normalize-utils.js";
-import { NORMALIZE_CODES, type NormalizedDescriptor, type NormalizationWork } from "../normalize-types.js";
+import {
+  NORMALIZE_CODES,
+  type NormalizedDescriptor,
+  type NormalizationWork,
+} from "../normalize-types.js";
 import { isCanonicalJobName } from "./names.js";
 
 /** Deduplicates evaluator aliases and creates deterministic private implicit jobs. */
@@ -24,7 +28,12 @@ export function discoverTaskJobs(work: NormalizationWork): void {
     if (taskJobs.length > 0) continue;
     const names = [...(sourceNames.get(task.id) ?? new Set<string>())];
     if (names.length !== 1 || !isCanonicalJobName(names[0])) {
-      add(work, task, NORMALIZE_CODES.jobBinding, `Task "${task.id}" requires one explicit named job because its implicit export name is not unique.`);
+      add(
+        work,
+        task,
+        NORMALIZE_CODES.jobBinding,
+        `Task "${task.id}" requires one explicit named job because its implicit export name is not unique.`,
+      );
       continue;
     }
     work.descriptors.push(implicitJob(task, names[0]!));
@@ -62,7 +71,9 @@ function deduplicateAliases(descriptors: readonly NormalizedDescriptor[]): Norma
       output.push(descriptor);
       continue;
     }
-    const previous = output.find((entry) => entry.kind === descriptor.kind && entry.id === descriptor.id);
+    const previous = output.find(
+      (entry) => entry.kind === descriptor.kind && entry.id === descriptor.id,
+    );
     if (previous === undefined) {
       output.push(descriptor);
       continue;
@@ -77,7 +88,8 @@ function deduplicateAliases(descriptors: readonly NormalizedDescriptor[]): Norma
       output.push(descriptor);
       continue;
     }
-    if (canonicalRank(descriptor) < canonicalRank(previous)) output[output.indexOf(previous)] = descriptor;
+    if (canonicalRank(descriptor) < canonicalRank(previous))
+      output[output.indexOf(previous)] = descriptor;
   }
   return output;
 }

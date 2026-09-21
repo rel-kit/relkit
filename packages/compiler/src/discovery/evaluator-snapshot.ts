@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
-import { getJsonSchema, getSchemaMetadata, isSchemaTransformed, type StandardSchemaV1 } from "@relkit/schema";
+import {
+  getJsonSchema,
+  getSchemaMetadata,
+  isSchemaTransformed,
+  type StandardSchemaV1,
+} from "@relkit/schema";
 import type { EvaluatorDescriptorSnapshot } from "./evaluator-protocol.js";
 import { isErrorDescriptorLike } from "../normalize-utils.js";
 
@@ -92,7 +97,10 @@ function snapshotSchema(value: unknown): JsonValue | undefined {
   const input = getJsonSchema(schema, { direction: "input" });
   const output = getJsonSchema(schema, { direction: "output" });
   if (!legacy.ok && !input.ok && !output.ok) {
-    return { $relkit: "schema-unavailable", reason: legacy.reason ?? input.reason ?? output.reason };
+    return {
+      $relkit: "schema-unavailable",
+      reason: legacy.reason ?? input.reason ?? output.reason,
+    };
   }
   const projections = {
     ...(legacy.ok ? { jsonSchema: legacy.schema } : {}),
@@ -135,7 +143,10 @@ function executableMarker(
   name: string,
   source: string,
 ): JsonValue {
-  if (ownerKind !== "task" || !["handler", "onStart", "onSuccess", "onFailure"].includes(field ?? "")) {
+  if (
+    ownerKind !== "task" ||
+    !["handler", "onStart", "onSuccess", "onFailure"].includes(field ?? "")
+  ) {
     return marker("function", name);
   }
   return {
