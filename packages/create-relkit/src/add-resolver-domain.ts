@@ -13,6 +13,7 @@ const INCLUDES: readonly ServiceInclude[] = [
   "error",
   "event",
   "event-function",
+  "task",
   "job",
   "cache",
   "bucket",
@@ -38,6 +39,8 @@ export async function resolveDomainOptions(
     await providerProfile(state, discovery, "event");
   } else if (kind === "event-function") {
     await eventFunctionOptions(state, discovery);
+  } else if (kind === "task") {
+    await taskOptions(state);
   } else if (kind === "job") await jobOptions(state, discovery);
   else if (kind === "prompt" && !state.has("text")) await promptText(state);
 }
@@ -108,9 +111,25 @@ async function eventFunctionOptions(
   await providerProfile(state, discovery, "event");
 }
 
+async function taskOptions(state: AddResolutionState): Promise<void> {
+  if (!state.has("version")) state.option("version", "1");
+  if (!state.has("execution") && state.interactive) {
+    const execution = await state.select(
+      "Task execution",
+      choices(["durable", "retryable"]),
+      "durable",
+    );
+    if (execution) state.option("execution", execution);
+  }
+}
+
 async function jobOptions(state: AddResolutionState, discovery: ProjectDiscovery): Promise<void> {
   if (!state.has("target")) {
-    const values = artifacts(discovery, selectedDomain(state, discovery), "function");
+    const taskValues = artifacts(discovery, selectedDomain(state, discovery), "task");
+    const values =
+      taskValues.length > 0
+        ? taskValues
+        : artifacts(discovery, selectedDomain(state, discovery), "function");
     if (!state.interactive && values.length === 1)
       state.option("target", values[0]!.id ?? values[0]!.binding);
     else if (state.parsed.createService) {

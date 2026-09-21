@@ -12,6 +12,7 @@ const SERVICE_KINDS = new Set<AddKind>([
   "error",
   "event",
   "event-function",
+  "task",
   "job",
   "cache",
   "bucket",
