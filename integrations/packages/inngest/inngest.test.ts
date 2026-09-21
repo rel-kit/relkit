@@ -21,8 +21,8 @@ test("authoring stays pure and declares the native local recipe", () => {
   expect(localRecipe.containers?.map((unit) => unit.id)).toEqual(["postgres", "redis", "inngest"]);
   expect(localRecipe.workers?.map((unit) => unit.id)).toEqual(["worker"]);
   expect(localRecipe.init?.map((unit) => unit.id)).toEqual(["postgres-ready"]);
-  expect(INNGEST_LOCAL_STARTUP_TIMEOUT_MS).toBe(180_000);
-  expect(INNGEST_LOCAL_HEALTH_RETRIES).toBe(360);
+  expect(INNGEST_LOCAL_STARTUP_TIMEOUT_MS).toBe(300_000);
+  expect(INNGEST_LOCAL_HEALTH_RETRIES).toBe(600);
   expect(localRecipe.workers?.[0]?.health?.retries).toBe(INNGEST_LOCAL_HEALTH_RETRIES);
   expect(localRecipe.containers?.find((unit) => unit.id === "redis")?.command).toEqual([
     "redis-server",

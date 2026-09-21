@@ -68,9 +68,7 @@ dockerTest(
       const overrides = readProviderOverrides(identity, planHash);
       const values = overrides?.bindings.find((binding) => binding.bindingId === bindingId)?.values;
       const baseUrl = new URL(text(values?.baseUrl));
-      const api = instances.find(
-        (instance) => instance.labels["dev.relkit.unit-id"] === "inngest",
-      );
+      const api = instances.find((instance) => instance.labels["dev.relkit.unit-id"] === "inngest");
       const apiPort = api?.ports["8288/tcp"];
       expect(apiPort).toBeDefined();
       expect(baseUrl.hostname).toBe("127.0.0.1");

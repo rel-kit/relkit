@@ -69,31 +69,39 @@ function nativeJobHandler(request) {
 }
 
 async function readyNativeJobWorker(registration) {
-  try {
-    await registration.handle.ready();
-    if (registration.startWorker && registration.runtime.adapter.schedules !== undefined) {
-      for (const definition of registration.definitions) {
-        const desired = definition.schedules ?? [];
-        await reconcileNativeSchedules({
-          native: registration.runtime.adapter.schedules,
-          desired,
-          context: registration.runtime.operationContext({ signal: shutdownController.signal }),
-          jobId: definition.jobId,
-          taskId: definition.taskId,
-          taskVersion: definition.taskVersion,
-          buildId: definition.buildId,
-        });
+  let retryDelay = 250;
+  let lastError;
+  while (!stopping) {
+    try {
+      await registration.handle.ready();
+      if (registration.startWorker && registration.runtime.adapter.schedules !== undefined) {
+        for (const definition of registration.definitions) {
+          const desired = definition.schedules ?? [];
+          await reconcileNativeSchedules({
+            native: registration.runtime.adapter.schedules,
+            desired,
+            context: registration.runtime.operationContext({ signal: shutdownController.signal }),
+            jobId: definition.jobId,
+            taskId: definition.taskId,
+            taskVersion: definition.taskVersion,
+            buildId: definition.buildId,
+          });
+        }
       }
+      nativeJobWorkerReadyHandles.add(registration.handle);
+      nativeJobWorkerReady = nativeJobWorkerReadyHandles.size === nativeJobWorkerRegistrations.size;
+      return true;
+    } catch (error) {
+      lastError = error;
+      nativeJobWorkerReadyHandles.delete(registration.handle);
+      nativeJobWorkerReady = false;
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+      retryDelay = Math.min(retryDelay * 2, 5_000);
     }
-    nativeJobWorkerReadyHandles.add(registration.handle);
-    nativeJobWorkerReady = nativeJobWorkerReadyHandles.size === nativeJobWorkerRegistrations.size;
-    return true;
-  } catch (error) {
-    nativeJobWorkerReadyHandles.delete(registration.handle);
-    nativeJobWorkerReady = false;
-    recordRuntimeFailure("runtime.native-job-registration", "Native jobs worker registration failed", error, "job");
-    return false;
   }
+  if (lastError !== undefined)
+    recordRuntimeFailure("runtime.native-job-registration", "Native jobs worker registration failed", lastError, "job");
+  return false;
 }
 
 async function readyNativeJobWorkers() {

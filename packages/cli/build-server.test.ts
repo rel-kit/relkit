@@ -40,6 +40,8 @@ test("generated runtime carries and verifies its activation fingerprint", () => 
   expect(source).toContain("counters: telemetry.exportCounters()");
   expect(source).toContain('process.env.RELKIT_WORKER_ROLE ?? "worker"');
   expect(source).toContain('!== "api"');
+  expect(source).toContain("while (!stopping)");
+  expect(source).toContain("Math.min(retryDelay * 2, 5_000)");
   expect(source).toContain("exporters: telemetry.exporterStats()");
   expect(source).toContain('if (environment === "production") stdoutJsonSink.write(record);');
   expect(source.toLowerCase()).not.toContain("cloudwatch");

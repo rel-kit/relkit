@@ -61,6 +61,7 @@ export function createInngestRunApi(options: {
     init: RequestInit = {},
     signal?: AbortSignal,
   ): Promise<Record<string, unknown>> => {
+    // prettier-ignore
     const response = await fetcher( // codeql[js/request-forgery]
       `${options.baseUrl.replace(/\/$/u, "")}${path}`,
       {
