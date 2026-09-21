@@ -13,7 +13,10 @@ const tabs = [
 export function JobsTabs() {
   const pathname = usePathname() ?? "/jobs";
   return (
-    <nav aria-label="Jobs views" className="mb-4 flex gap-1 overflow-x-auto border-b border-[var(--line)]">
+    <nav
+      aria-label="Jobs views"
+      className="mb-4 flex gap-1 overflow-x-auto border-b border-[var(--line)]"
+    >
       {tabs.map(([label, href]) => {
         const active = pathname === href || (href !== "/jobs" && pathname.startsWith(`${href}/`));
         return (

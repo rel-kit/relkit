@@ -36,7 +36,10 @@ export function JobDetailClient() {
       const detail = await api.jobDefinition<InspectorObject>(id);
       const definition = record(detail.definition) ?? record(detail);
       if (definition === undefined) throw new Error("Job definition unavailable");
-      const runs = await api.jobRuns<InspectorObject>({ jobId: text(definition.jobId) || id, limit: 25 });
+      const runs = await api.jobRuns<InspectorObject>({
+        jobId: text(definition.jobId) || id,
+        limit: 25,
+      });
       setModern({ definition, runs: runs.items });
       setSnapshot(undefined);
       setError(false);
@@ -70,7 +73,9 @@ export function JobDetailClient() {
         await load();
       } catch (failure) {
         setActionError(failure instanceof Error ? failure.message : "Job action failed.");
-      } finally { setPending(false); }
+      } finally {
+        setPending(false);
+      }
       return;
     }
     if (snapshot === undefined) return;
@@ -93,7 +98,16 @@ export function JobDetailClient() {
     }
   };
 
-  if (modern !== undefined) return <ModernJobDetail actionError={actionError} definition={modern.definition} runs={modern.runs} onAction={action} pending={pending} />;
+  if (modern !== undefined)
+    return (
+      <ModernJobDetail
+        actionError={actionError}
+        definition={modern.definition}
+        runs={modern.runs}
+        onAction={action}
+        pending={pending}
+      />
+    );
   if (error || snapshot === undefined)
     return (
       <section className="panel route-state" role={error ? "alert" : "status"}>
