@@ -1,0 +1,26 @@
+---
+title: Deployment
+description: Publish immutable workers and activate compatible job definitions.
+---
+
+Deployment publishes a worker build and its task/job definitions as one identity. The staged flow is:
+
+1. Provision host resources and network/IAM prerequisites.
+2. Resolve secrets without putting values in the plan.
+3. Publish the immutable worker build.
+4. Register definitions and schedules.
+5. Wait for worker readiness.
+6. Activate schedules and the new service generation.
+
+Pulumi emits provider-native worker publication and registration operations. Each operation records the task ID, task version, build ID, service generation, runtime, limits, and capability evidence. Provider integrations export their native publication mechanism rather than pretending all providers share one deployment API.
+
+Keep the previous build, signing keys, and registrations until in-flight runs finish or are explicitly migrated. Readiness must pass before activation, and an old generation must not be retired while it owns active runs. Rollback activates the previous compatible generation; it does not rewrite run history.
+
+Cloud deployment is opt-in. The local Docker gate proves the selected adapter and its persisted state before
+any managed account or infrastructure mutation is authorized.
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+<include cwd>content/generated/related/jobs-deployment.mdx</include>

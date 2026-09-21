@@ -1,0 +1,31 @@
+---
+title: Docker providers
+description: Run local job providers with persisted state.
+---
+
+Choose a Docker-backed provider when creating a project:
+
+```sh
+relkit create my-app --jobs inngest-docker
+relkit create my-app --jobs effect-mq-docker
+relkit create my-app --jobs trigger-docker
+```
+
+The generated binding keeps provider configuration in the project. Persist provider state outside an ephemeral worker container, and use a private network for the admin and worker endpoints.
+
+The generated task template is the account-free source fixture:
+
+<include cwd lang="ts" meta='title="templates/default/v1/tasks/relkit.config.ts"'>
+  ../../templates/default/v1/tasks/relkit.config.ts
+</include>
+
+```sh
+relkit local up
+relkit local status
+relkit local stop
+relkit local reset --dry-run
+```
+
+`local stop` stops services without deleting state. `local reset` is destructive to local job state and should be scoped to a deliberate development environment; use the dry run first. Docker provider capabilities and limits are visible through `relkit jobs capabilities`.
+
+<include cwd>content/generated/related/jobs-docker.mdx</include>

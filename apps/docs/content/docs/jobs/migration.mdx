@@ -1,0 +1,28 @@
+---
+title: Migration
+description: Move legacy function-target jobs to task-first jobs safely.
+---
+
+Migration is an identity change, not a rename. Preserve the existing public job ID, task ID, version, input schema, output schema, dedupe scope, schedule identity, and client fingerprint unless the change is intentional.
+
+This is a one-release compatibility window. Legacy function-target definitions, `.enqueue()` producers,
+and the deprecated `profile` spelling remain available only when explicitly enabled; new code must use a
+task-first definition and `service` selection. The fixed release cohort moves together, so upgrade the
+Relkit packages as one set before changing the application graph.
+
+The migration helper is exposed from the jobs package; run it against the previous and next snapshots before
+activation. It reports identity, binding, schema, history, schedule, dedupe, and client-fingerprint changes.
+
+<include cwd lang="ts" meta='title="packages/jobs/migration.test.ts"'>
+  ../../packages/jobs/migration.test.ts
+</include>
+
+Diagnostics flag pinned/default-derived ID changes, implicit-to-explicit binding changes, task version or schema incompatibility, history and schedule changes, dedupe changes, and client fingerprint changes. Legacy aliases and function-target definitions must be explicit during the migration window; the compiler does not silently rewrite them.
+
+Roll out a compatible worker first, register the task-first definition, wait for readiness, then activate new triggers. Keep the old definition and worker generation until historical runs are terminal. If the input or output contract is incompatible, use a new task version or a new public job ID and document the boundary.
+
+Provider retention, native listing, durable sleep, schedule recovery, and cancellation limits are variant-specific.
+Check the [provider comparison](/docs/jobs/providers) and deployment evidence before relying on them; unsupported
+or not-tested capabilities are not emulated by the Relkit runtime.
+
+<include cwd>content/generated/related/jobs-migration.mdx</include>
