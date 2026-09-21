@@ -12,6 +12,7 @@ import type {
   TaskRetryPolicy,
   TaskStreamSchemas,
 } from "./task-types.js";
+export { copyObservation } from "./task-observation-validation.js";
 
 export function assertSchema(value: unknown, name: string): asserts value is StandardSchemaV1 {
   if (
@@ -42,7 +43,11 @@ export function assertInputWireSupport(input: StandardSchemaV1, inputWire: unkno
   if (outputProjection.ok) assertCanonicalProjection(outputProjection.schema, "Task input", true);
 }
 
-export function assertCanonicalSchemaSupport(schema: StandardSchemaV1, name: string, allowVoid = false): void {
+export function assertCanonicalSchemaSupport(
+  schema: StandardSchemaV1,
+  name: string,
+  allowVoid = false,
+): void {
   if (isSchemaTransformed(schema)) {
     throw new TypeError(`${name} must validate canonical values without a transformation`);
   }
@@ -89,7 +94,13 @@ export function copyDependencies<Dependencies extends TaskDependencies>(
   if (hasOwn(value, "functions") || hasOwn(value, "events")) {
     throw new TypeError("Task dependencies support tasks, jobs, agents, buckets, and cache only");
   }
-  const kinds = { tasks: "task", jobs: "job", agents: "agent", buckets: "bucket", cache: "cache" } as const;
+  const kinds = {
+    tasks: "task",
+    jobs: "job",
+    agents: "agent",
+    buckets: "bucket",
+    cache: "cache",
+  } as const;
   if (Object.keys(value).some((category) => !(category in kinds))) {
     throw new TypeError("Task dependencies contain an unsupported category");
   }
@@ -134,57 +145,6 @@ export function copyStreams(value: unknown): TaskStreamSchemas | undefined {
   return Object.freeze(result);
 }
 
-export function copyObservation(
-  value: unknown,
-  progress: unknown,
-  streams: TaskStreamSchemas | undefined,
-): TaskObservation | undefined {
-  const declaredStreamNames = streams === undefined ? [] : Object.keys(streams);
-  if (value === undefined) {
-    if (progress === undefined && declaredStreamNames.length === 0) return undefined;
-    return Object.freeze({
-      ...(progress === undefined ? {} : { progress: "live" as const }),
-      ...(declaredStreamNames.length === 0
-        ? {}
-        : {
-            streams: Object.freeze(
-              Object.fromEntries(declaredStreamNames.map((name) => [name, "live" as const])),
-            ),
-          }),
-    }) as TaskObservation;
-  }
-  if (!isRecord(value)) throw new TypeError("Task observation must be an object");
-  if (value.progress !== undefined && value.progress !== "live" && value.progress !== "durable") {
-    throw new TypeError('observation.progress must be "live" or "durable"');
-  }
-  if (value.progress !== undefined && progress === undefined) {
-    throw new TypeError("Progress observation requires a progress schema");
-  }
-  let observedStreams: Record<string, "live" | "history"> | undefined;
-  if (value.streams !== undefined) {
-    if (!isRecord(value.streams) || streams === undefined) {
-      throw new TypeError("Observed streams require declared task stream schemas");
-    }
-    observedStreams = {};
-    for (const [name, guarantee] of Object.entries(value.streams)) {
-      if (!(name in streams)) throw new TypeError(`Undeclared observed stream "${name}"`);
-      if (guarantee !== "live" && guarantee !== "history") {
-        throw new TypeError(`Invalid observation guarantee for stream "${name}"`);
-      }
-      observedStreams[name] = guarantee;
-    }
-  } else if (declaredStreamNames.length > 0) {
-    observedStreams = Object.fromEntries(declaredStreamNames.map((name) => [name, "live" as const]));
-  }
-  return Object.freeze({
-    ...(value.progress === undefined
-      ? progress === undefined
-        ? {}
-        : { progress: "live" as const }
-      : { progress: value.progress }),
-    ...(observedStreams === undefined ? {} : { streams: Object.freeze(observedStreams) }),
-  }) as TaskObservation;
-}
 export function duration(value: unknown, name: string, positive = false): DurationInput {
   if (typeof value !== "string") throw new TypeError(`${name} must be a readable duration`);
   const milliseconds = durationToMillis(value as DurationInput);

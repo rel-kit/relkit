@@ -1,11 +1,6 @@
 import { expect, test } from "bun:test";
 import { z } from "@relkit/schema";
-import {
-  defineTask,
-  memoryBytes,
-  retryDelayMillis,
-  TASK_MAX_TAGS,
-} from "./src/index.ts";
+import { defineTask, memoryBytes, retryDelayMillis, TASK_MAX_TAGS } from "./src/index.ts";
 
 const base = {
   id: "policy.task",
@@ -46,14 +41,22 @@ test("rejects unsupported task policy combinations and unsafe bounds", () => {
   expect(() => defineTask({ ...base, resources: { cpu: 1, memory: "0.1 MiB" } })).toThrow();
   expect(() => defineTask({ ...base, concurrency: { limit: 1, key: "tenant.id" } })).toThrow();
   expect(() => defineTask({ ...base, observation: { progress: "live" } })).toThrow();
-  expect(() => defineTask({ ...base, tags: Array.from({ length: TASK_MAX_TAGS + 1 }, () => "tag") })).toThrow();
+  expect(() =>
+    defineTask({ ...base, tags: Array.from({ length: TASK_MAX_TAGS + 1 }, () => "tag") }),
+  ).toThrow();
   expect(() => defineTask({ ...base, dependencies: { functions: {} } as never })).toThrow();
 });
 
 test("requires an identity-preserving wire schema for transformed input", () => {
   const input = z.string().transform(Number);
   expect(() =>
-    defineTask({ id: "transformed.task", version: "1", input, output: z.number(), handler: (value) => value }),
+    defineTask({
+      id: "transformed.task",
+      version: "1",
+      input,
+      output: z.number(),
+      handler: (value) => value,
+    }),
   ).toThrow("inputWire");
   expect(
     defineTask({
@@ -72,9 +75,9 @@ test("rejects declarations without executable canonical validators", () => {
   expect(() => defineTask({ ...base, output: transformed, handler: (value) => value })).toThrow(
     "canonical",
   );
-  expect(() =>
-    defineTask({ ...base, progress: transformed, handler: () => undefined }),
-  ).toThrow("canonical");
+  expect(() => defineTask({ ...base, progress: transformed, handler: () => undefined })).toThrow(
+    "canonical",
+  );
   expect(() =>
     defineTask({ ...base, streams: { values: transformed }, handler: () => undefined }),
   ).toThrow("canonical");

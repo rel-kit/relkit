@@ -53,9 +53,7 @@ test("rejects non-JSON values, unsafe envelopes, and oversized payloads", () => 
   const symbol = { [Symbol("secret")]: true };
   expect(() => encodeTaskInput(accessor)).toThrow(TaskWireValidationError);
   expect(() => encodeTaskInput(symbol)).toThrow(TaskWireValidationError);
-  expect(() => encodeTaskInput("x".repeat(TASK_INPUT_MAX_BYTES))).toThrow(
-    "encoded bytes",
-  );
+  expect(() => encodeTaskInput("x".repeat(TASK_INPUT_MAX_BYTES))).toThrow("encoded bytes");
   expect(() => decodeJobWire({ version: 2, kind: "json", value: 1 })).toThrow(
     "Unsupported job wire version",
   );

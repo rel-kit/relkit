@@ -91,11 +91,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-function assertKnownKeys(
-  value: object,
-  allowed: ReadonlySet<string>,
-  name: string,
-): void {
+function assertKnownKeys(value: object, allowed: ReadonlySet<string>, name: string): void {
   for (const key of Reflect.ownKeys(value)) {
     if (typeof key !== "string" || !allowed.has(key)) {
       throw new TypeError(`${name} contains unsupported field "${String(key)}"`);

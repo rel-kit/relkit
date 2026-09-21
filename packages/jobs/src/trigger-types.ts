@@ -19,8 +19,9 @@ export type JobDescriptorForThisTask<Task extends TaskRefAny = TaskRefAny> = Job
   readonly task: Task;
 };
 
-export interface TaskTriggerOptions<Task extends TaskRefAny = TaskRefAny>
-  extends ServerTriggerOptions {
+export interface TaskTriggerOptions<
+  Task extends TaskRefAny = TaskRefAny,
+> extends ServerTriggerOptions {
   readonly job?: JobDescriptorForThisTask<Task>;
 }
 
