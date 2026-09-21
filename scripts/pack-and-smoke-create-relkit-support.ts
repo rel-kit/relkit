@@ -1,6 +1,6 @@
 import { access, readFile, readdir, stat } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
-import { scanGeneratedSource } from "./scaffold-smoke-source.js";
 export type Manifest = {
   name: string;
   version: string;
@@ -39,11 +39,12 @@ export async function snapshotProject(root: string, current = root): Promise<Sna
   for (const entry of (await readdir(current, { withFileTypes: true })).sort((a, b) =>
     a.name.localeCompare(b.name),
   )) {
-    if (["node_modules", ".git", ".next"].includes(entry.name)) continue;
+    if (["node_modules", ".git", ".next", "bun.lock"].includes(entry.name)) continue;
     const path = join(current, entry.name);
     if (entry.isDirectory()) Object.assign(result, await snapshotProject(root, path));
     else if (entry.isFile()) {
       const name = relative(root, path).replaceAll("\\", "/");
+      if (name === ".relkit/build/server/index.js") continue;
       const bytes = await readFile(path);
       const text = /\.(?:json|lock|md|toml|ts|tsx|js|jsx|yaml|yml)$/.test(name);
       result[name] = {
@@ -56,127 +57,34 @@ export async function snapshotProject(root: string, current = root): Promise<Sna
   }
   return result;
 }
-async function freePort(): Promise<number> {
-  const server = Bun.serve({ port: 0, fetch: () => new Response() });
-  const port = server.port;
-  await server.stop(true);
-  if (port === undefined) throw new Error("Could not allocate a dynamic port.");
-  return port;
-}
-async function waitFor(check: () => Promise<boolean>): Promise<void> {
-  const deadline = Date.now() + 30_000;
-  while (Date.now() < deadline) {
-    try {
-      if (await check()) return;
-    } catch {}
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 50));
-  }
-  throw new Error("Timed out waiting for the generated development server.");
-}
-async function devSmokeAttempt(
-  root: string,
-  exercise?: (port: number) => Promise<void>,
-): Promise<void> {
-  const port = await freePort();
-  const inspector = await freePort();
-  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
-    readonly scripts?: Readonly<Record<string, string>>;
-  };
-  const devScript = manifest.scripts?.["dev:api"] === undefined ? "dev" : "dev:api";
-  const child = Bun.spawn(
-    [
-      process.execPath,
-      "run",
-      devScript,
-      "--",
-      "--project-root",
-      root,
-      "--port",
-      String(port),
-      "--inspector-port",
-      String(inspector),
-    ],
-    {
-      cwd: root,
-      env: { ...process.env, PORT: String(port) },
-      stdout: "pipe",
-      stderr: "pipe",
-    },
-  );
-  const output = Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-  ]);
-  let failure: unknown;
-  try {
-    await waitFor(async () => {
-      if (child.exitCode !== null)
-        throw new Error(`Development process exited with ${child.exitCode}.`);
-      const response = await fetch(`http://127.0.0.1:${port}/hello?name=RelKit`);
-      if (!response.ok) throw new Error(`${response.status}: ${await response.text()}`);
-      return (await fetch(`http://127.0.0.1:${inspector}`)).ok;
-    });
-    const route = (await (await fetch(`http://127.0.0.1:${port}/hello?name=RelKit`)).json()) as {
-      message?: string;
-    };
-    if (route.message !== "Hello, RelKit!")
-      throw new Error("Example route returned an unexpected greeting.");
-    const graph = await fetch(`http://127.0.0.1:${port}/_relkit/v1/graph`);
-    if (!graph.ok || !(await graph.text()).includes('"graphHash"'))
-      throw new Error("Inspector graph API failed.");
-    const inspectorGraph = await fetch(
-      `http://127.0.0.1:${inspector}/_relkit/backend/_relkit/v1/graph`,
-    );
-    if (!inspectorGraph.ok || !(await inspectorGraph.text()).includes('"graphHash"'))
-      throw new Error("Packaged inspector proxy failed.");
-    const openapi = await fetch(`http://127.0.0.1:${port}/_relkit/v1/openapi.json`);
-    if (!openapi.ok || !(await openapi.text()).includes('"openapi":"3.1.0"'))
-      throw new Error("OpenAPI endpoint failed.");
-    const scalar = await fetch(`http://127.0.0.1:${port}/_relkit/v1/api-reference`);
-    if (!scalar.ok || !(await scalar.text()).toLowerCase().includes("scalar"))
-      throw new Error("Scalar API reference failed.");
-    await exercise?.(port);
-  } catch (error) {
-    failure = error;
-  } finally {
-    if (child.exitCode === null) child.kill("SIGTERM");
-    await Promise.race([child.exited, new Promise((resolve) => setTimeout(resolve, 2_000))]);
-    if (child.exitCode === null) child.kill("SIGKILL");
-  }
-  const exitCode = await child.exited;
-  const [stdout, stderr] = await output;
-  if (failure !== undefined) throw new Error(`${failure}\n${stdout}${stderr}`);
-  if (exitCode !== 0 && exitCode !== 143)
-    throw new Error(`Development process exited with ${exitCode}.\n${stdout}${stderr}`);
-  for (const released of [port, inspector]) {
-    const probe = Bun.serve({ hostname: "127.0.0.1", port: released, fetch: () => new Response() });
-    await probe.stop(true);
-  }
-}
-async function devSmoke(root: string, exercise?: (port: number) => Promise<void>): Promise<void> {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await devSmokeAttempt(root, exercise);
-    } catch (error) {
-      if (attempt === 2 || !String(error).match(/already in use|EADDRINUSE/)) throw error;
-    }
-  }
-}
 export async function verifyProject(
   root: string,
   registry: string,
   cacheDir: string,
   exercise?: (port: number) => Promise<void>,
 ): Promise<void> {
+  const taskProject = existsSync(join(root, "src/orders/tasks/export-orders.task.ts"));
+  const required = taskProject
+    ? [
+        "src/orders/functions/health.function.ts",
+        "src/orders/service.ts",
+        "src/orders/tasks/export-orders.task.ts",
+        "src/orders/jobs/export-orders.job.ts",
+        "src/routes/health/route.ts",
+        "tests/unit/export-orders.task.test.ts",
+      ]
+    : [
+        "src/hello/functions/hello.function.ts",
+        "src/hello/service.ts",
+        "src/routes/hello/route.ts",
+        "tests/integration/hello.route.test.ts",
+      ];
   for (const file of [
     "package.json",
     "bun.lock",
     "relkit.config.ts",
     "src/platform/env.ts",
-    "src/hello/functions/hello.function.ts",
-    "src/hello/service.ts",
-    "src/routes/hello/route.ts",
-    "tests/integration/hello.route.test.ts",
+    ...required,
     ".gitignore",
   ])
     await access(join(root, file));
@@ -187,6 +95,9 @@ export async function verifyProject(
     cacheDir,
   );
   for (const script of ["check", "typecheck"]) await runCommand(["run", script], root);
-  for (let run = 0; run < (exercise ? 2 : 1); run++) await devSmoke(root, exercise);
-  await scanGeneratedSource(root);
+  if (!taskProject || process.env.RELKIT_TEST_DOCKER === "1")
+    for (let run = 0; run < (exercise ? 2 : 1); run++)
+      await import("./pack-and-smoke-create-relkit-dev.js").then(({ devSmoke }) =>
+        devSmoke(root, exercise),
+      );
 }

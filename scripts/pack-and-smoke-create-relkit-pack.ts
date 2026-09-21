@@ -29,6 +29,9 @@ export async function packPackages(
     "create-relkit",
     "@relkit/local",
     "@relkit/docker",
+    "@relkit/inngest",
+    "@relkit/effect-mq",
+    "@relkit/trigger",
     "@relkit/redis",
     "@relkit/s3",
   ];
@@ -96,6 +99,7 @@ export async function startRegistry(
   let port = 0;
   const server = Bun.serve({
     port: 0,
+    idleTimeout: 120,
     fetch(request) {
       const url = new URL(request.url);
       const path = decodeURIComponent(url.pathname.slice(1));

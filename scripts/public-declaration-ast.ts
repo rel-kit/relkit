@@ -15,8 +15,11 @@ export function nonFunctionHandlers(file: string, text: string): DeclarationLeak
         ts.forEachChild(node, visit);
         return;
       }
-      const owner = ts.isInterfaceDeclaration(node.parent) ? node.parent.name.text : "type";
-      if (!/Function|GraphNode|Middleware|RawRoute/.test(owner)) {
+      const owner =
+        ts.isInterfaceDeclaration(declaration) || ts.isTypeAliasDeclaration(declaration)
+          ? declaration.name.text
+          : "type";
+      if (!/Function|GraphNode|Middleware|RawRoute|Task/.test(owner)) {
         const location = lineAndColumn(text, node.getStart(source));
         leaks.push({
           file,
