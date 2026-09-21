@@ -134,7 +134,9 @@ try {
         payload: { key: "scheduled" },
       });
       const schedules = yield* service.listSchedules({ group: "phase0-schedules" });
-      yield* Effect.sleep("450 millis");
+      for (let attempt = 0; attempt < 200 && scheduleRuns.length === 0; attempt++) {
+        yield* Effect.sleep("100 millis");
+      }
       const scheduleRunCount = scheduleRuns.length;
       yield* Retryable.unschedule("phase0-schedule");
       return {
