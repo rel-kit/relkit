@@ -12,6 +12,7 @@ import {
 import { deployCommand } from "./cli-command-deploy.js";
 import { localCommand } from "./cli-command-local.js";
 import { clientCommand } from "./cli-command-client.js";
+import { jobsCommand } from "./cli-command-jobs.js";
 
 export function groupCommands(select: SelectInvocation) {
   return [
@@ -20,6 +21,7 @@ export function groupCommands(select: SelectInvocation) {
     deployCommand(select),
     clientCommand(select),
     localCommand(select),
+    jobsCommand(select),
   ] as const;
 }
 

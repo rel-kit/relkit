@@ -7,7 +7,7 @@ import { booleanFlag, document, type SelectInvocation } from "./cli-command-shar
 /** Builds the Effect CLI tree from the same metadata exported to documentation. */
 export function createCliCommand(select: SelectInvocation) {
   const [create, dev, check, build, start, doctor] = basicCommands(select);
-  const [graph, env, deploy, client, local] = groupCommands(select);
+  const [graph, env, deploy, client, local, jobs] = groupCommands(select);
   const add = addCommand(select);
   return document(
     Command.make("relkit").pipe(
@@ -25,6 +25,7 @@ export function createCliCommand(select: SelectInvocation) {
         doctor,
         deploy,
         client,
+        jobs,
       ]),
     ),
     [],

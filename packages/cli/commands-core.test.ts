@@ -224,8 +224,12 @@ test("rejects malformed jobs manifests before activation", async () => {
 
   expect(result.ok).toBe(false);
   expect(result.artifacts).toEqual([]);
-  expect(result.diagnostics).toContainEqual(expect.objectContaining({ code: "RELKIT_BUILD_FAILED", severity: "error" }));
-  expect(result.diagnostics).not.toContainEqual(expect.objectContaining({ code: "RELKIT_TASK_RUNTIME_UNAVAILABLE" }));
+  expect(result.diagnostics).toContainEqual(
+    expect.objectContaining({ code: "RELKIT_BUILD_FAILED", severity: "error" }),
+  );
+  expect(result.diagnostics).not.toContainEqual(
+    expect.objectContaining({ code: "RELKIT_TASK_RUNTIME_UNAVAILABLE" }),
+  );
 });
 
 test("build carries server port, body limit, and API docs settings into runtime artifacts", async () => {

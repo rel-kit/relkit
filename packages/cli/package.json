@@ -39,6 +39,7 @@
     "@clack/prompts": "1.7.0",
     "@relkit/agents": "workspace:*",
     "@relkit/app": "workspace:*",
+    "@relkit/client": "workspace:*",
     "@relkit/config": "workspace:*",
     "@relkit/compiler": "workspace:*",
     "@relkit/client-generator": "workspace:*",
