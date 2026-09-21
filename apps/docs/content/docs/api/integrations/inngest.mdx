@@ -212,7 +212,7 @@ declare const inngestLocalRecipe: ProviderLocalRecipeReference;
 declare const waitForInngestReadiness: (context: LocalServiceRecipeOutputContext) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-readiness.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-readiness.ts#L5)
 
 ## `index.ts`
 
@@ -285,7 +285,12 @@ declare const localRecipe: Readonly<{
       command: ReadonlyArray<string>;
       dependsOn: ReadonlyArray<string>;
       ports: Readonly<{ api: 3000 }>;
-      health: Readonly<{ command: Array<string>; intervalMs: 500; timeoutMs: 2000; retries: 120 }>;
+      health: Readonly<{
+        command: Array<string>;
+        intervalMs: 500;
+        timeoutMs: 2000;
+        retries: number;
+      }>;
       networkAliases: ReadonlyArray<string>;
     }>
   >;
@@ -320,6 +325,55 @@ declare const localRecipe: Readonly<{
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/index.ts#L1)
+
+## `local-timeouts.ts`
+
+Startup budget shared by the Docker worker health check and readiness probes.
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [INNGEST_LOCAL_HEALTH_INTERVAL_MS](#inngest_local_health_interval_ms)
+  - [INNGEST_LOCAL_HEALTH_RETRIES](#inngest_local_health_retries)
+  - [INNGEST_LOCAL_STARTUP_TIMEOUT_MS](#inngest_local_startup_timeout_ms)
+
+---
+
+# utils
+
+## INNGEST_LOCAL_HEALTH_INTERVAL_MS
+
+**Signature**
+
+```ts
+declare const INNGEST_LOCAL_HEALTH_INTERVAL_MS: 500;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-timeouts.ts#L3)
+
+## INNGEST_LOCAL_HEALTH_RETRIES
+
+**Signature**
+
+```ts
+declare const INNGEST_LOCAL_HEALTH_RETRIES: number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-timeouts.ts#L4)
+
+## INNGEST_LOCAL_STARTUP_TIMEOUT_MS
+
+Startup budget shared by the Docker worker health check and readiness probes.
+
+**Signature**
+
+```ts
+declare const INNGEST_LOCAL_STARTUP_TIMEOUT_MS: 180000;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local-timeouts.ts#L2)
 
 ## `local.ts`
 
@@ -392,7 +446,12 @@ declare const localRecipe: Readonly<{
       command: ReadonlyArray<string>;
       dependsOn: ReadonlyArray<string>;
       ports: Readonly<{ api: 3000 }>;
-      health: Readonly<{ command: Array<string>; intervalMs: 500; timeoutMs: 2000; retries: 120 }>;
+      health: Readonly<{
+        command: Array<string>;
+        intervalMs: 500;
+        timeoutMs: 2000;
+        retries: number;
+      }>;
       networkAliases: ReadonlyArray<string>;
     }>
   >;
@@ -426,7 +485,7 @@ declare const localRecipe: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/local.ts#L18)
 
 ## `index.ts`
 
