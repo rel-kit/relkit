@@ -2,6 +2,10 @@ import { expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { inngest } from "./src/index.ts";
 import { localRecipe } from "./src/local.ts";
+import {
+  INNGEST_LOCAL_HEALTH_RETRIES,
+  INNGEST_LOCAL_STARTUP_TIMEOUT_MS,
+} from "./src/local-timeouts.ts";
 import { createInngestRuntime } from "./src/runtime/index.ts";
 import { createInngestRunApi, snapshot } from "./src/runtime/runs.ts";
 import { createInngestFunction, createInngestFunctionConfig } from "./src/runtime/task-binding.ts";
@@ -17,6 +21,9 @@ test("authoring stays pure and declares the native local recipe", () => {
   expect(localRecipe.containers?.map((unit) => unit.id)).toEqual(["postgres", "redis", "inngest"]);
   expect(localRecipe.workers?.map((unit) => unit.id)).toEqual(["worker"]);
   expect(localRecipe.init?.map((unit) => unit.id)).toEqual(["postgres-ready"]);
+  expect(INNGEST_LOCAL_STARTUP_TIMEOUT_MS).toBe(180_000);
+  expect(INNGEST_LOCAL_HEALTH_RETRIES).toBe(360);
+  expect(localRecipe.workers?.[0]?.health?.retries).toBe(INNGEST_LOCAL_HEALTH_RETRIES);
   expect(localRecipe.containers?.find((unit) => unit.id === "redis")?.command).toEqual([
     "redis-server",
     "--appendonly",

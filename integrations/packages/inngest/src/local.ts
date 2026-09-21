@@ -4,6 +4,7 @@ import {
   type LocalServiceRecipeOutputContext,
 } from "@relkit/local-service";
 import { waitForInngestReadiness } from "./local-readiness.js";
+import { INNGEST_LOCAL_HEALTH_RETRIES } from "./local-timeouts.js";
 
 const INNGEST_IMAGE =
   "inngest/inngest@sha256:d5365a31f8bf504dc2d54ddd114fcdc1a0413f8b57a450365c095ab6234ad8c2";
@@ -96,7 +97,7 @@ export const localRecipe = Object.freeze({
         command: ["kill", "-0", "1"],
         intervalMs: 500,
         timeoutMs: 2_000,
-        retries: 120,
+        retries: INNGEST_LOCAL_HEALTH_RETRIES,
       }),
       networkAliases: Object.freeze(["worker"]),
     }),

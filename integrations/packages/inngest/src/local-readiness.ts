@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { LocalServiceRecipeOutputContext } from "@relkit/local-service";
+import { INNGEST_LOCAL_STARTUP_TIMEOUT_MS } from "./local-timeouts.js";
 
 export async function waitForInngestReadiness(
   context: LocalServiceRecipeOutputContext,
@@ -28,7 +29,7 @@ async function waitForHealth(
   endpoint: string,
   signal: AbortSignal | undefined,
 ): Promise<void> {
-  const deadline = Date.now() + 60_000;
+  const deadline = Date.now() + INNGEST_LOCAL_STARTUP_TIMEOUT_MS;
   let lastError: unknown;
   while (Date.now() < deadline) {
     try {
@@ -51,7 +52,7 @@ async function waitForNativeRead(
   signingKey: string,
   signal: AbortSignal | undefined,
 ): Promise<void> {
-  const deadline = Date.now() + 60_000;
+  const deadline = Date.now() + INNGEST_LOCAL_STARTUP_TIMEOUT_MS;
   let lastError: unknown;
   while (Date.now() < deadline) {
     try {
