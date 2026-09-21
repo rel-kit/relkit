@@ -75,11 +75,7 @@ export async function localUp(
         localPlan.services,
         localJobServiceGenerations(graph),
       ),
-      ...localServiceRuntimeOptions(
-        localPlan.services,
-        Number(process.env.PORT ?? 3000),
-        workerBindings.length > 0,
-      ),
+      ...localServiceRuntimeOptions(localPlan.services, Number(process.env.PORT ?? 3000)),
       signal: context.signal,
     });
     let result = initial;

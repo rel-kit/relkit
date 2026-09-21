@@ -5,8 +5,30 @@ import { join } from "node:path";
 import {
   localJobServiceGenerations,
   localServiceGenerations,
+  localServiceRuntimeOptions,
   prepareLocalWorkerOverrides,
 } from "./src/commands/local-service-options.ts";
+
+test("keeps the initial Inngest endpoint on the host until workers are active", () => {
+  const services = [
+    {
+      bindingId: "provider.job.default",
+      capability: "job",
+      profile: "default",
+      materializerId: "docker",
+      recipe: { integrationId: "inngest", recipeId: "inngest-docker", recipeVersion: 2 },
+      configuration: {},
+      requiredBy: ["jobs.default"],
+    },
+  ] as const;
+
+  expect(localServiceRuntimeOptions(services, 3210).environmentOverridesByUnit).toEqual({});
+  expect(localServiceRuntimeOptions(services, 3210, true).environmentOverridesByUnit).toEqual({
+    "provider.job.default": {
+      inngest: { INNGEST_SDK_URL: "http://worker:3000/api/inngest" },
+    },
+  });
+});
 
 test("uses stable compiled job generations for local bindings", () => {
   const generations = localJobServiceGenerations({
