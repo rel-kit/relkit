@@ -42,6 +42,7 @@ bun run test:all
 bun run build
 bun run verify
 bun run prepush
+bun run prepush:full
 ```
 
 Use focused scripts such as `bun run test:packages`, `bun run test:compiler`,
@@ -53,9 +54,10 @@ The repository guardrail suite is `bun test tests/phase0.test.ts`.
 `test:all` is fail-fast and local by default. Cloud acceptance requires
 explicit `RELKIT_TEST_ALL_CLOUD=1`, `RELKIT_AWS_INTEGRATION_REGION`, and
 `RELKIT_AWS_INTEGRATION_IMAGE`; do not incur cloud cost without authorization.
-Before any authorized push, run `bun run prepush` with Docker running. It covers
-every required CI job that is reproducible locally; dependency review and the
-opt-in AWS cloud job remain CI-only.
+Before any authorized push, run `bun run prepush`, which mirrors the focused
+merge-blocking CI checks and needs no Docker daemon. Run `bun run prepush:full`
+with Docker available for full local acceptance. Dependency review is CI-only;
+real AWS acceptance is opt-in locally and is not run by CI.
 
 Generated-project commands are `bun run dev`, `bun run test`, `bun run check`,
 `bun run typecheck`, `bun run build`, and `bun run start`. Cloud and deployment

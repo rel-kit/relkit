@@ -1,296 +1,32 @@
-name: CI
+# Keep this filename: npm trusted publishing is configured for ci.yml.
+name: Release
 
 on:
-  pull_request:
-  push:
-    branches: [main]
-  schedule:
-    - cron: "17 2 * * 1"
-  workflow_dispatch:
-    inputs:
-      run_aws:
-        description: Run the cost-incurring AWS acceptance job
-        required: false
-        type: boolean
-        default: false
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: relkit-release
+  cancel-in-progress: false
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
   TURBO_TELEMETRY_DISABLED: "1"
 
 jobs:
-  auto-changeset:
-    name: Automatic Changeset
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.ref != 'changeset-release/main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      actions: write
-      contents: write
-    env:
-      HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
-      HEAD_REF: ${{ github.event.pull_request.head.ref }}
-      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      PR_TITLE: ${{ github.event.pull_request.title }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24"
-      - name: Generate or require a path-based Changeset
-        run: |
-          args=(--base "$PR_BASE_SHA" --head "$PR_HEAD_SHA" --pr "$PR_NUMBER" --summary "$PR_TITLE")
-          if test "$HEAD_REPOSITORY" = "$GITHUB_REPOSITORY"; then
-            args+=(--write)
-          fi
-          node --experimental-strip-types scripts/auto-changeset.ts "${args[@]}"
-      - name: Commit the generated Changeset and verify the new head
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          if ! git status --porcelain -- .changeset | grep -q .; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .changeset
-          git commit -m "chore: add automatic changeset"
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push origin "HEAD:${HEAD_REF}"
-          gh workflow run ci.yml --ref "$HEAD_REF"
-
-  verify:
-    name: Verify
-    if: github.event_name != 'schedule'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 50
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24"
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: "1.3.10"
-      - name: Run authoritative verification
-        run: |
-          mkdir -p "$RUNNER_TEMP/relkit-evidence"
-          set -o pipefail
-          bun run verify 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/verify.log"
-      - name: Upload failure evidence
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: evidence-verify-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 3
-
-  browser:
-    name: Inspector browser and E2E
-    if: github.event_name != 'schedule'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "24"
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: "1.3.10"
-      - name: Run browser acceptance
-        run: |
-          mkdir -p "$RUNNER_TEMP/relkit-evidence"
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
-          bunx playwright install --with-deps chromium 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/playwright-install.log"
-          bun run test:inspector:browser 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/inspector-browser.log"
-          bun run test:e2e 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/e2e.log"
-      - name: Generate Linux snapshot candidates
-        if: failure()
-        continue-on-error: true
-        run: bunx playwright test --update-snapshots
-      - name: Upload failure evidence
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: evidence-browser-${{ github.run_attempt }}
-          path: |
-            ${{ runner.temp }}/relkit-evidence
-            .relkit/inspector-browser-artifacts
-            test-results
-            tests/e2e/inspector-redesign.spec.ts-snapshots/*-linux.png
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 3
-
-  container:
-    name: Containers
-    if: github.event_name != 'schedule'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 40
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: "1.3.10"
-      - name: Run container acceptance
-        run: |
-          mkdir -p "$RUNNER_TEMP/relkit-evidence"
-          set -o pipefail
-          docker pull "redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952"
-          docker pull "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e"
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
-          bun run test:container 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/container.log"
-          bun run test:local-docker 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/local-docker.log"
-          bun run test:jobs:docker 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/jobs-docker.log"
-          bun run test:scaffold 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/scaffold.log"
-      - name: Upload failure evidence
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: evidence-container-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 3
-
-  deployment:
-    name: Local Pulumi deployment
-    if: github.event_name != 'schedule'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: "1.3.10"
-      - uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7
-        with:
-          pulumi-version: "3.258.0"
-      - name: Run local deployment acceptance
-        run: |
-          mkdir -p "$RUNNER_TEMP/relkit-evidence"
-          set -o pipefail
-          bun install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/install.log"
-          bun run build 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/build.log"
-          bun run test:deployment 2>&1 | tee "$RUNNER_TEMP/relkit-evidence/deployment.log"
-      - name: Upload failure evidence
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: evidence-deployment-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/relkit-evidence
-          if-no-files-found: ignore
-          retention-days: 3
-
-  dependency-review:
-    name: Dependency review
-    if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
-        with:
-          fail-on-severity: moderate
-
-  ci-gate:
-    name: CI Gate
-    if: always() && github.event_name != 'schedule'
-    needs: [auto-changeset, verify, browser, container, deployment, dependency-review]
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions: {}
-    env:
-      VERIFY_RESULT: ${{ needs.verify.result }}
-      BROWSER_RESULT: ${{ needs.browser.result }}
-      CONTAINER_RESULT: ${{ needs.container.result }}
-      DEPLOYMENT_RESULT: ${{ needs.deployment.result }}
-      DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
-      AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
-    steps:
-      - name: Require every safety job
-        run: |
-          test "$VERIFY_RESULT" = success
-          test "$BROWSER_RESULT" = success
-          test "$CONTAINER_RESULT" = success
-          test "$DEPLOYMENT_RESULT" = success
-          test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
-          test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
-
-  release-pr-status:
-    name: Publish release PR gate
-    if: >-
-      always() &&
-      needs.ci-gate.result == 'success' &&
-      github.event_name == 'workflow_dispatch' &&
-      github.ref == 'refs/heads/changeset-release/main'
-    needs: ci-gate
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      statuses: write
-    steps:
-      - name: Attach CI Gate to the release pull request
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_SHA: ${{ github.sha }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
-            -f state=success \
-            -f context="CI Gate" \
-            -f description="Verified by dispatched release CI" \
-            -f target_url="$RUN_URL"
-
   select-release-mode:
     name: Select release mode
     if: >-
-      always() && needs.ci-gate.result == 'success' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/main'
-    needs: ci-gate
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.event.workflow_run.event == 'push' ||
+       github.event.workflow_run.event == 'workflow_dispatch')
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     permissions:
       contents: read
     outputs:
@@ -300,6 +36,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: main
+      - name: Require the verified main commit
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$GITHUB_SHA" = "$VERIFIED_SHA"
+          test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -312,7 +55,7 @@ jobs:
 
   version:
     name: Update release pull request
-    if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'version'
+    if: needs.select-release-mode.outputs.mode == 'version'
     needs: select-release-mode
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -325,6 +68,13 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: main
+      - name: Require the verified main commit
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$GITHUB_SHA" = "$VERIFIED_SHA"
+          test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -346,12 +96,12 @@ jobs:
         run: |
           pr_number="$(gh pr list --base main --head changeset-release/main --state open --json number --jq '.[0].number')"
           test -n "$pr_number"
-          gh workflow run ci.yml --ref changeset-release/main
+          gh workflow run checks.yml --ref changeset-release/main
           gh pr merge "$pr_number" --auto --squash
           for attempt in {1..120}; do
             state="$(gh pr view "$pr_number" --json state --jq .state)"
             if test "$state" = MERGED; then
-              gh workflow run ci.yml --ref main
+              gh workflow run checks.yml --ref main
               exit 0
             fi
             test "$state" = OPEN
@@ -362,10 +112,10 @@ jobs:
 
   pack:
     name: Build validated npm artifacts
-    if: always() && needs.select-release-mode.result == 'success' && needs.select-release-mode.outputs.mode == 'publish'
+    if: needs.select-release-mode.outputs.mode == 'publish'
     needs: select-release-mode
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -373,6 +123,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -380,13 +131,13 @@ jobs:
         with:
           bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
-      - name: Build, pack, and smoke the exact release archives
-        run: bun run scripts/release-check.ts --output "$RUNNER_TEMP/npm-release"
+      - name: Build and validate the exact release archives
+        run: bun run scripts/release-check.ts --ci-pack --output "$RUNNER_TEMP/npm-release"
       - name: Verify the release manifest independently
         run: node --experimental-strip-types scripts/publish-release.ts --directory "$RUNNER_TEMP/npm-release"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: npm-release-${{ github.sha }}
+          name: npm-release-${{ github.event.workflow_run.head_sha }}
           path: ${{ runner.temp }}/npm-release
           if-no-files-found: error
           retention-days: 3
@@ -394,7 +145,7 @@ jobs:
   publish:
     name: Publish npm and GitHub release
     if: >-
-      always() && needs.pack.result == 'success' &&
+      needs.pack.result == 'success' &&
       vars.NPM_RELEASES_ENABLED == 'true' &&
       github.event.repository.visibility == 'public'
     needs: pack
@@ -408,23 +159,29 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: npm-release-${{ github.sha }}
+          name: npm-release-${{ github.event.workflow_run.head_sha }}
           path: npm-release
       - name: Pin the npm trusted-publishing client
         run: npm install --global npm@11.19.0
       - name: Publish missing archives in dependency order
         env:
+          GH_TOKEN: ${{ github.token }}
           NPM_RELEASES_ENABLED: ${{ vars.NPM_RELEASES_ENABLED }}
           GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
-        run: node --experimental-strip-types scripts/publish-release.ts --directory npm-release --publish
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          node --experimental-strip-types scripts/publish-release.ts --directory npm-release --publish
       - name: Publish the immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           version="$(jq -r .version npm-release/manifest.json)"
           tag="v$version"
@@ -434,46 +191,7 @@ jobs:
             exit 0
           fi
           if test "$state" = missing; then
-            gh release create "$tag" --draft --target "$GITHUB_SHA" --title "$tag" --notes-file npm-release/RELEASE_NOTES.md
+            gh release create "$tag" --draft --target "$RELEASE_SHA" --title "$tag" --notes-file npm-release/RELEASE_NOTES.md
           fi
           gh release upload "$tag" npm-release/*.tgz npm-release/SHA256SUMS npm-release/SHA512SUMS npm-release/manifest.json npm-release/RELEASE_NOTES.md --clobber
           gh release edit "$tag" --draft=false
-
-  aws-cloud:
-    name: AWS cloud acceptance
-    if: >-
-      github.event_name == 'schedule' ||
-      (github.event_name == 'workflow_dispatch' && inputs.run_aws)
-    runs-on: ubuntu-24.04
-    timeout-minutes: 60
-    environment: aws-nightly
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: "1.3.10"
-      - uses: pulumi/actions@8e5e406f4007fca908480587cb9893c07090f58d # v7
-        with:
-          pulumi-version: "3.258.0"
-      - run: bun install --frozen-lockfile
-      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
-        with:
-          role-to-assume: ${{ secrets.RELKIT_AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.RELKIT_AWS_INTEGRATION_REGION }}
-      - name: Run cloud acceptance and guaranteed cleanup
-        env:
-          RELKIT_AWS_INTEGRATION: "1"
-          RELKIT_AWS_INTEGRATION_REGION: ${{ secrets.RELKIT_AWS_INTEGRATION_REGION }}
-          RELKIT_AWS_INTEGRATION_IMAGE: ${{ secrets.RELKIT_AWS_INTEGRATION_IMAGE }}
-          RELKIT_AWS_INTEGRATION_BACKEND: ${{ secrets.RELKIT_AWS_INTEGRATION_BACKEND || 'cloud' }}
-          RELKIT_AWS_INTEGRATION_TIMEOUT_MS: "3000000"
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
-        run: |
-          bun run build
-          bun run test:aws-integration

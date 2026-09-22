@@ -36,7 +36,8 @@ docker run --rm -v "$PWD:/repo:ro" ghcr.io/gitleaks/gitleaks:v8.29.0 \
       maintainer, require one approval and CODEOWNER review.
 - [ ] Allow squash merging only. Enable auto-merge and automatic branch deletion.
 - [ ] Keep Actions tokens read-only by default and allow Actions to create pull
-      requests. Require full-SHA actions and allow only the actions in `ci.yml`.
+      requests. Require full-SHA actions and allow only the actions in
+      `checks.yml` and `ci.yml`.
 - [ ] Install the official Changesets bot for advisory missing-changeset comments;
       do not make a changeset mandatory for documentation, tests, or chores.
 - [ ] Create the `npm` environment restricted to `main`, with no npm token.

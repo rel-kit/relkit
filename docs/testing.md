@@ -96,23 +96,29 @@ From the RELKIT repository root, the shipped focused commands are:
 | Documentation and doctests       | `bun run test:docs`             |
 | Browser E2E                      | `bun run test:e2e`              |
 | Deployment plan and Pulumi tests | `bun run test:deployment`       |
-| Release-gated AWS integration    | `bun run test:aws-integration`  |
+| Optional real-AWS integration    | `bun run test:aws-integration`  |
 | Container lifecycle              | `bun run test:container`        |
 | Redis/MinIO Docker lifecycle     | `bun run test:local-docker`     |
 | Redaction and security           | `bun run test:security`         |
 | All local test layers            | `bun run test:all`              |
 | Build                            | `bun run build`                 |
-| Merge-blocking pipeline          | `bun run verify`                |
-| Complete local pre-push gate     | `bun run prepush`               |
+| Full local verification          | `bun run verify`                |
+| Fast local pre-push gate         | `bun run prepush`               |
+| Complete local acceptance        | `bun run prepush:full`          |
 
-`bun run verify` is fail-fast and includes frozen-install/no-diff, formatting,
-lint, boundaries, type checks, co-located package tests, compiler and runtime
-layers, restart, inspector, packed generator smoke, build reproducibility, and
-security scans. Browser, container, Redis/MinIO Docker, and real AWS checks are
-separate commands because they need external runtimes or credentials.
-Run `bun run prepush` with Docker running before pushing to execute `verify`
-and every locally reproducible required CI job. GitHub dependency review and
-the opt-in AWS cloud job are not reproducible by that command.
+GitHub's merge-blocking `CI Gate` runs frozen install, formatting, lint,
+boundaries, TypeScript compilation, and focused unit, compiler, contract, and
+security tests in parallel jobs. It does not run a full build, browser,
+container, scaffold, Pulumi, or cloud acceptance. The separate release workflow
+starts only after successful main-branch CI.
+
+`bun run prepush` mirrors the merge-blocking CI checks without Docker.
+`bun run verify` remains the full local fail-fast sequence. It includes
+co-located package tests, runtime layers, restart, inspector, packed generator
+smoke, build reproducibility, and release readiness. Run `bun run prepush:full`
+with Docker available for the remaining container, Redis/MinIO, local deployment,
+browser, and end-to-end acceptance. Real AWS acceptance requires explicit local
+authorization and is not scheduled or required by GitHub Actions.
 
 For a packed generator smoke run and the reproducible performance baseline:
 
@@ -135,8 +141,10 @@ Release acceptance additionally uses:
 bun run scripts/release-check.ts
 ```
 
-That command expects a clean worktree. Run it from a clean checkout or after
-committing the change.
+That full command expects a clean worktree and includes packed export and
+scaffold smoke. The automated release uses `--ci-pack` to validate the exact
+archive manifest and checksums without those long smoke tests; the full command
+remains available from a clean checkout or after committing the change.
 
 ## Verification of these guides
 
