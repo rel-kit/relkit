@@ -10,6 +10,7 @@ test("test:all points to a checked-in orchestration script", async () => {
   expect(packageJson.scripts?.["test:all"]).toBe("bun run scripts/test-all.ts");
   expect(await Bun.file(join(root, "scripts", "test-all.ts")).exists()).toBe(true);
   expect(packageJson.scripts?.prepush).toContain("bun x tsc -b --pretty false");
+  expect(packageJson.scripts?.prepush).toContain("bun x turbo run typecheck");
   expect(packageJson.scripts?.prepush).toContain("bun run test:security");
   expect(packageJson.scripts?.prepush).not.toContain("bun run verify");
   expect(packageJson.scripts?.["prepush:full"]).toBe(
