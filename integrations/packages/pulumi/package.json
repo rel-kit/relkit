@@ -1,6 +1,6 @@
 {
   "name": "@relkit/pulumi",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Pulumi deployment-engine integration for RELKIT.",
   "license": "MIT",
   "repository": {
