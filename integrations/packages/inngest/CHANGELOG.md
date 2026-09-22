@@ -1,4 +1,4 @@
-# @relkit/redis
+# @relkit/inngest
 
 ## 1.0.0
 
