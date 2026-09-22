@@ -1,0 +1,171 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  auto-changeset:
+    name: Automatic Changeset
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.ref != 'changeset-release/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: write
+      contents: write
+    env:
+      HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - name: Generate or require a path-based Changeset
+        run: |
+          args=(--base "$PR_BASE_SHA" --head "$PR_HEAD_SHA" --pr "$PR_NUMBER" --summary "$PR_TITLE")
+          if test "$HEAD_REPOSITORY" = "$GITHUB_REPOSITORY"; then
+            args+=(--write)
+          fi
+          node --experimental-strip-types scripts/auto-changeset.ts "${args[@]}"
+      - name: Commit the generated Changeset and verify the new head
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if ! git status --porcelain -- .changeset | grep -q .; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .changeset
+          git commit -m "chore: add automatic changeset"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "HEAD:${HEAD_REF}"
+          gh workflow run checks.yml --ref "$HEAD_REF"
+
+  static:
+    name: Static checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Format, lint, and boundaries
+        run: |
+          bun x prettier --check AGENTS.md README.md CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md RELEASE_NOTES.md package.json turbo.json tsconfig.base.json tsconfig.json .prettierrc.json eslint.config.mjs playwright.config.ts .changeset .github apps examples integrations packages scripts templates tests docs/testing.md
+          bun run lint
+          bun run check
+          bun run konsistent -- validate
+          bun run scripts/check-observability-sinks.ts
+
+  types-and-tests:
+    name: Types and focused tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.10"
+      - run: bun install --frozen-lockfile
+      - name: Compile TypeScript projects
+        run: |
+          bun x turbo run typecheck --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only
+          bun x tsc -b --pretty false
+      - name: Run focused tests
+        run: |
+          bun run test:types
+          bun run test:unit
+          bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts tests/graph
+          bun run test:contracts
+          bun run test:security
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request' && github.event.repository.visibility == 'public'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+
+  ci-gate:
+    name: CI Gate
+    if: always()
+    needs: [auto-changeset, static, types-and-tests, dependency-review]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      STATIC_RESULT: ${{ needs.static.result }}
+      TYPES_RESULT: ${{ needs.types-and-tests.result }}
+      DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
+      AUTO_CHANGESET_RESULT: ${{ needs.auto-changeset.result }}
+    steps:
+      - name: Require fast safety jobs
+        run: |
+          test "$STATIC_RESULT" = success
+          test "$TYPES_RESULT" = success
+          test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
+          test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
+
+  release-pr-status:
+    name: Publish release PR gate
+    if: >-
+      always() && needs.ci-gate.result == 'success' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/changeset-release/main'
+    needs: ci-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+    steps:
+      - name: Attach CI Gate to the release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+            -f state=success \
+            -f context="CI Gate" \
+            -f description="Verified by dispatched release CI" \
+            -f target_url="$RUN_URL"

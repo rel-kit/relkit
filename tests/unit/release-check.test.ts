@@ -21,4 +21,6 @@ test("tracked release notes exclude rebuild-dependent tarball hashes", () => {
   expect(notes).not.toContain("unstable-hash");
   expect(notes).not.toContain("unstable-integrity");
   expect(notes).toContain("attached\nrelease manifest and checksum files");
+  expect(notes).toContain("Archive checks run during publication");
+  expect(notes).not.toContain("packed-artifact, template, declaration");
 });

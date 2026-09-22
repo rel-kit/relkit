@@ -1,6 +1,6 @@
 # RELKIT
 
-[![CI](https://github.com/rel-kit/relkit/actions/workflows/ci.yml/badge.svg)](https://github.com/rel-kit/relkit/actions/workflows/ci.yml)
+[![CI](https://github.com/rel-kit/relkit/actions/workflows/checks.yml/badge.svg)](https://github.com/rel-kit/relkit/actions/workflows/checks.yml)
 [![npm](https://img.shields.io/npm/v/%40relkit%2Fapp.svg)](https://www.npmjs.com/package/@relkit/app)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -69,15 +69,16 @@ against a local Docker daemon. `bun run build` builds the workspace and `bun run
 verify` checks package tests, boundaries, scope, declarations, generated
 artifacts, and release invariants.
 
-Before pushing, run the complete local CI equivalent with Docker running:
+For fast local checks before pushing:
 
 ```sh
 bun run prepush
 ```
 
-It runs `verify` followed by the container, Redis/MinIO, local deployment,
-Inspector browser, and end-to-end acceptance checks. GitHub dependency review
-and the explicitly authorized AWS cloud acceptance remain CI-only.
+It mirrors the focused merge-blocking CI gate. For complete local acceptance,
+run `bun run prepush:full` with Docker available; it runs `verify` followed by
+container, Redis/MinIO, local deployment, Inspector browser, and end-to-end
+checks. Real AWS acceptance is opt-in locally and is not run by GitHub Actions.
 
 To exercise the current checkout without publishing packages, use the local
 launcher. It quietly syncs framework packages, links the generated project's
@@ -156,9 +157,9 @@ checkout must be selected explicitly.
 All public packages ship together on one fixed version. Repository pull
 requests that change publishable paths receive an automatic patch Changeset;
 forks and minor or major releases use `bun run changeset`. Automation opens the
-release pull request, auto-merges it after `CI Gate`, and publishes through npm
-trusted publishing. Documentation and internal chores outside release paths
-merge without a release.
+release pull request, auto-merges it after `CI Gate`, and publishes through a
+separate GitHub release workflow using npm trusted publishing. Documentation
+and internal chores outside release paths merge without a release.
 
 `@relkit/app`, `create-relkit`, and the explicitly documented optional
 integrations are supported public entry points. Packages described as

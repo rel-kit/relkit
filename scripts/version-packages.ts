@@ -113,7 +113,13 @@ async function main(): Promise<void> {
   await run("bun", ["run", "scripts/sync-release.ts", "--write"]);
   await run("bun", ["install", "--lockfile-only"]);
   await writeFile(changelogPath, changelog);
-  await run("bun", ["run", "scripts/release-check.ts", "--write-notes", "--allow-dirty"]);
+  await run("bun", [
+    "run",
+    "scripts/release-check.ts",
+    "--notes-only",
+    "--write-notes",
+    "--allow-dirty",
+  ]);
   await writeActionChangelogs(status);
 }
 
