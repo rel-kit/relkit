@@ -31,6 +31,8 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   expect(release).toContain("github.ref == 'refs/heads/main'");
   expect(release).toContain('.conclusion == "success"');
   expect(release).toContain(".head_sha == $sha");
+  expect(release).toContain("ref: ${{ github.sha }}");
+  expect(release).not.toContain("needs.select-release-mode.outputs.sha");
   expect(release).toContain("return_run_details=true");
   expect(release).toContain('gh run watch "$run_id" --exit-status');
   expect(release).toContain(

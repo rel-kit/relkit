@@ -42,7 +42,6 @@ jobs:
       contents: read
     outputs:
       mode: ${{ steps.changesets.outputs.mode }}
-      sha: ${{ steps.verified.outputs.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -50,13 +49,11 @@ jobs:
           persist-credentials: false
           ref: main
       - name: Require the verified main commit
-        id: verified
         env:
           VERIFIED_SHA: ${{ github.event.workflow_run.head_sha || inputs.verified_sha }}
         run: |
           test "$GITHUB_SHA" = "$VERIFIED_SHA"
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
-          echo "sha=$VERIFIED_SHA" >> "$GITHUB_OUTPUT"
       - name: Require a successful CI run for the dispatched commit
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -102,7 +99,7 @@ jobs:
           ref: main
       - name: Require the verified main commit
         env:
-          VERIFIED_SHA: ${{ needs.select-release-mode.outputs.sha }}
+          VERIFIED_SHA: ${{ github.sha }}
         run: |
           test "$GITHUB_SHA" = "$VERIFIED_SHA"
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
@@ -159,7 +156,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ needs.select-release-mode.outputs.sha }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -173,7 +170,7 @@ jobs:
         run: node --experimental-strip-types scripts/publish-release.ts --directory "$RUNNER_TEMP/npm-release"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: npm-release-${{ needs.select-release-mode.outputs.sha }}
+          name: npm-release-${{ github.sha }}
           path: ${{ runner.temp }}/npm-release
           if-no-files-found: error
           retention-days: 3
@@ -184,7 +181,7 @@ jobs:
       needs.pack.result == 'success' &&
       vars.NPM_RELEASES_ENABLED == 'true' &&
       github.event.repository.visibility == 'public'
-    needs: [select-release-mode, pack]
+    needs: pack
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: npm
@@ -195,13 +192,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          ref: ${{ needs.select-release-mode.outputs.sha }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: npm-release-${{ needs.select-release-mode.outputs.sha }}
+          name: npm-release-${{ github.sha }}
           path: npm-release
       - name: Pin the npm trusted-publishing client
         run: npm install --global npm@11.19.0
@@ -210,14 +207,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NPM_RELEASES_ENABLED: ${{ vars.NPM_RELEASES_ENABLED }}
           GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
-          GITHUB_SHA: ${{ needs.select-release-mode.outputs.sha }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
           node --experimental-strip-types scripts/publish-release.ts --directory npm-release --publish
       - name: Publish the immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_SHA: ${{ needs.select-release-mode.outputs.sha }}
+          RELEASE_SHA: ${{ github.sha }}
         run: |
           version="$(jq -r .version npm-release/manifest.json)"
           tag="v$version"
