@@ -1,4 +1,4 @@
-# @relkit/redis
+# @relkit/trigger
 
 ## 1.0.0
 

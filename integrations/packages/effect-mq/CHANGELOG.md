@@ -1,4 +1,4 @@
-# @relkit/redis
+# @relkit/effect-mq
 
 ## 1.0.0
 
