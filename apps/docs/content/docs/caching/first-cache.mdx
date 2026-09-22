@@ -9,22 +9,24 @@ Create the two files below, or update them if they already exist. Run commands f
 
 ## Configure caching
 
-Install `@relkit/redis` and `@relkit/docker`, then import `redis`, `docker`, and `env as binding`
-from their standalone packages and `@relkit/app/config`. Add this singular `cache` entry inside
-`defineApp()`:
+Install the local Redis integration from your app root:
+
+```sh title="Terminal — application root"
+bun add @relkit/redis @relkit/docker
+```
+
+In `relkit.config.ts`, import `redis` from `@relkit/redis`, `docker` from `@relkit/docker`, and
+`env as binding` from `@relkit/app/config`. Create a `cache` object inside `defineApp()` if the
+app has none, then add this `requests` entry. It is the only cache profile needed here:
 
 <include cwd lang="ts" meta='title="relkit.config.ts — cache configuration"'>
-  ../../examples/commerce/relkit.config.ts#cache-profile
+  ../../examples/commerce/relkit.config.ts#cache-local-profile
 </include>
 
-Profile `requests` is a connected Redis binding with a Docker overlay. Development starts its pinned Redis
-recipe and supplies the binding-local URL; release builds resolve `REQUESTS_REDIS_URL` instead. Profile
-`timeline` is a second physical Redis/Valkey server owned by AWS in deployment and also has a local recipe.
-The two profiles do not share state.
-
-`defaults.cache` chooses `requests` for unqualified descriptors. `orders.prices` selects it explicitly.
-`orders.rate-limits` selects `timeline`; the route's `x-customer-email` projection derives a counter key
-inside that cache and does not choose the server.
+The excerpt is from the larger commerce example, which also has a `timeline` profile. Do not add
+that second profile here. `requests` starts a Docker Redis recipe during local development;
+`orders.prices` selects it explicitly. Connected or cloud-owned profiles are covered in
+[Define a cache](/docs/caching/define).
 
 ## Define the prices cache
 
@@ -73,7 +75,7 @@ Open **Cache**, select `orders.prices`, and find the key containing `book-demo`.
 
 Once the minute has passed, invoke `orders.get-price` with the same SKU. A new `price.loaded` log confirms the price was loaded again. Nothing refreshes in the background: the next request does the work.
 
-Tests must pass explicit replacements for both physical profiles; no test environment selects fakes for
-you. In your app, replace the fixed price with a database lookup and
+Tests must pass an explicit replacement for the `requests` profile; no test environment selects
+a fake for you. In your app, replace the fixed price with a database lookup and
 [invalidate the cached price after updates](/docs/caching/expiration). Before deploying, review which
 profiles are connected and which are infrastructure-owned in [Integrations](/docs/integrations).

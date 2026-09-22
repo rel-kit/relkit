@@ -1,111 +1,60 @@
 ---
 title: Your first HTTP route
-description: Add a validated POST endpoint to an existing RELKIT app, test its JSON boundary, and inspect its generated contract.
+description: Read the Orders route in the API starter and verify its request and response boundary.
 ---
 
-Add `POST /echo` to an existing RELKIT app. By the end, a JSON request will reach a public service
-function, return validated output, and reject invalid input before its handler runs.
+Use the `relkit-orders` API starter from [Create and run an application](/docs/start/create-an-app).
+The route already exists; you will follow one `POST /orders` request from JSON to a validated
+function result and verify both accepted and rejected input. Run commands from the app root.
 
-Use an installed application with a working `relkit.config.ts` and the standard `@app/*` alias.
-If you need one, follow [Create an app](/docs/start/create-an-app) first. The API template already
-contains these files: inspect and test them instead of overwriting them. This endpoint adds no
-provider dependency; keep any existing application configuration intact.
+## Select the public operation
 
-## Put behavior in the Echo domain
+The Orders domain calculates a price in `createOrder`. Its service exposes that operation to
+the route. Read the **existing** `src/orders/service.ts`:
 
-Create `src/echo/functions/echo.function.ts`:
-
-<include cwd lang="ts" meta='title="src/echo/functions/echo.function.ts"'>
-  ../../templates/default/v1/api/src/echo/functions/echo.function.ts
+<include cwd lang="ts" meta='title="src/orders/service.ts"'>
+  ../../templates/default/v1/api/src/orders/service.ts
 </include>
 
-The input requires a nonempty `message`. The output contract promises a string. The function knows
-nothing about HTTP methods, JSON parsing, or response status. See [Functions](/docs/fundamentals/functions)
-for dependencies and declared errors.
+The service is the public boundary. A route imports the service, not a private function file.
+The route's folder supplies `/orders`; its named `POST` export supplies the HTTP method:
 
-Expose it through `src/echo/service.ts`:
-
-<include cwd lang="ts" meta='title="src/echo/service.ts"'>
-  ../../templates/default/v1/api/src/echo/service.ts
+<include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
+  ../../templates/default/v1/api/src/routes/orders/route.ts
 </include>
 
-This is the domain's public boundary. Other domains and routes import this service rather than its
-private function file. See [Service](/docs/service) for choosing and organizing domains.
+`member: "createOrder"` selects the public operation. `successStatus: 201` changes only the
+successful response status; RELKIT infers the JSON input and output contracts from the function.
+The [endpoint chapter](/docs/start/first-route) changes the price rule without editing this route.
 
-## Add the HTTP entry point
+## Send a request and inspect the result
 
-Create `src/routes/echo/route.ts`:
+Start the app with `bun run dev`. In another terminal, send a valid request:
 
-<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
-  ../../templates/default/v1/api/src/routes/echo/route.ts
-</include>
-
-The path is `/echo`; the method is `POST`. Since there are no dynamic path parameters, RELKIT reads
-`message` from the JSON body. It infers a JSON `200` response and a validation `422` response.
-No registration array or manual server mount is needed.
-
-From your application's root:
-
-```sh
-bun run check
-bun run typecheck
-bun run dev
-```
-
-Keep the development process running. Use your configured backend port if it differs from `3000`.
-
-## Verify valid and invalid requests
-
-In another terminal:
-
-```sh
-curl -i -X POST 'http://localhost:3000/echo' \
+```sh title="Terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
   -H 'content-type: application/json' \
-  -d '{"message":"hello"}'
+  -d '{"orderId":"route-1","sku":"book","quantity":3}'
 ```
 
-Expect HTTP `200`, JSON content type, and `{ "message": "hello" }`.
+Expect HTTP `201` and `totalCents: 300`. The starter's HTTP test checks the same status and
+body in process:
 
-```sh
-curl -i -X POST 'http://localhost:3000/echo' \
-  -H 'content-type: application/json' \
-  -d '{"message":""}'
-```
-
-Expect HTTP `422` with a validation error and bounded issues, not a successful echo. A missing
-`message` or malformed JSON must also fail. Test those cases as the endpoint evolves.
-
-## Keep an HTTP regression test
-
-Add the API template's test at `tests/integration/echo.route.test.ts` if it is not already present:
-
-<include cwd lang="ts" meta='title="tests/integration/echo.route.test.ts"'>
-  ../../templates/default/v1/api/tests/integration/echo.route.test.ts
+<include cwd lang="ts" meta='title="tests/integration/orders.route.test.ts"'>
+  ../../templates/default/v1/api/tests/integration/orders.route.test.ts
 </include>
 
-Run it from your application's root:
+Run `bun test tests/integration/orders.route.test.ts`. Then send `quantity: 0`; the running
+server returns HTTP `422` before the handler creates an order. The test harness also maps
+function-input validation to `422`, but it does not reproduce every middleware or transport
+behavior. Check security policy and alternate transports against the running server.
 
-```sh
-bun test tests/integration/echo.route.test.ts
-```
+## Inspect the generated contract
 
-The harness exercises this successful route call in process; it does not require the development server
-to stay running. It asserts status and body together. Follow [Testing](/docs/operations/testing) for
-function tests and provider fakes.
+Run `bun run check` and `bun run typecheck`, then open `/_relkit/v1/api-reference` on the
+running backend. Find `POST /orders`, its request fields, success response, and validation
+response. Edit source to change the contract; do not edit `.relkit/generated` output.
 
-The current helper uses a simplified HTTP adapter, not the full server pipeline. It does not reproduce
-all runtime validation responses, declared HTTP middleware, rate limiting, or RPC. Keep the running-backend
-checks above for `422`, and test authentication, limits, and alternate transports against the actual server.
-
-## Inspect what the compiler produced
-
-Read `.relkit/generated/openapi.json` or open the running app's `/_relkit/v1/api-reference` page.
-Find `POST /echo`, its required JSON `message`, and its success and validation responses.
-Inspect the route and its target in the Inspector as well.
-
-Change the source and rerun `bun run check` to refresh artifacts; never edit generated contracts.
-Continue with [request mapping](/docs/http/requests) for headers and cookies,
-[middleware](/docs/http/middleware) for HTTP policy, or [generated clients](/docs/http/generated-clients)
-for typed RPC calls to the same function.
+For path parameters, headers, and cookies, continue with [Request mapping](/docs/http/requests).
 
 <include cwd>content/generated/related/http-first-route.mdx</include>

@@ -55,6 +55,7 @@ const finish = defineGraphNode({
   handler: ({ approved }) => ({ result: approved ? "approved" : "rejected" }),
 });
 
+// #region review-graph
 const orderReview = defineGraph({
   state,
   input: z.object({ orderId: z.string() }),
@@ -80,5 +81,6 @@ const orderReview = defineGraph({
   },
   controls: ["stop"],
 });
+// #endregion review-graph
 
 export default orderReview;

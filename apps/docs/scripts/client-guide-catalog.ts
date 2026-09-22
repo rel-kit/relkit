@@ -10,5 +10,5 @@ export const clientGuideGroup = {
 export const clientGuideRelations = clientGuideGroup.pages.map((page) => ({
   path: `client/${page}`,
   api: ["client", "routes"] satisfies readonly ApiPackage[],
-  examples: ["tests/types/client-react.ts"],
+  examples: [page === "offline" ? "apps/docs/examples/jobs/reconcile-unknown.ts" : "tests/types/client-react.ts"],
 }));

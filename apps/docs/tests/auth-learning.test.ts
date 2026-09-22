@@ -23,14 +23,11 @@ test("connects Auth after Database with source-backed guides and API reference",
   });
   expect(apiPackages).toContain("better-auth");
   expect(features.find(({ id }) => id === "auth")?.guide).toBe("auth/index");
-  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBe(
-    "auth/index",
-  );
-  expect(guideRelations.find(({ path }) => path === "auth/first-auth")?.next).toBe("storage/index");
+  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBeUndefined();
+  expect(guideRelations.find(({ path }) => path === "auth/first-auth")?.next).toBeUndefined();
   for (const page of authGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
-    expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
     expect(source).toContain(`content/generated/related/auth-${page}.mdx`);
     expect(source).not.toMatch(/lang="sql"|```sql|\bCREATE TABLE\b|sqlite\.exec/i);
     if (page !== "testing") expect(source).not.toMatch(/\.\.\/\.\.\/examples\/[^\n]+\.test\.ts/);

@@ -14,6 +14,7 @@ export default defineApp({
   env,
   // #region storage-profile
   bucket: {
+    // #region storage-local-profile
     assets: docker(
       s3({
         endpoint: binding.url("ASSETS_S3_ENDPOINT"),
@@ -26,6 +27,7 @@ export default defineApp({
         forcePathStyle: true,
       }),
     ),
+    // #endregion storage-local-profile
     "agent-workspace": docker(
       s3({
         endpoint: binding.url("ASSETS_S3_ENDPOINT"),
@@ -43,15 +45,20 @@ export default defineApp({
   // #endregion storage-profile
   // #region cache-profile
   cache: {
+    // #region cache-local-profile
     requests: docker(redis({ url: binding.secret("REQUESTS_REDIS_URL") })),
+    // #endregion cache-local-profile
     timeline: aws(redis(), { engine: "valkey", replicas: 1 }),
   },
+  // #endregion cache-profile
+  // #region realtime-profiles
   realtime: docker(redisRealtime({ url: binding.secret("REALTIME_REDIS_URL") })),
   "agent-state": {
     agents: docker(redisAgentState({ url: binding.secret("AGENT_STATE_REDIS_URL") })),
   },
+  // #endregion realtime-profiles
+  // #region jobs-profile
   jobs: { default: docker(inngest()) },
-  // #endregion cache-profile
   defaults: {
     bucket: "assets",
     cache: "requests",
@@ -59,6 +66,7 @@ export default defineApp({
     "agent-state": "agents",
     jobs: "default",
   },
+  // #endregion jobs-profile
   // #region telemetry
   telemetry: {
     redaction: { mode: "development-redacted", maxBytes: 65_536 },
@@ -77,7 +85,9 @@ export default defineApp({
     },
   },
   // #endregion telemetry
+  // #region deployment-profile
   deployment: { engine: "pulumi", host: "aws" },
+  // #endregion deployment-profile
   server: {
     port: 4000,
     maxBodyBytes: 1_048_576,

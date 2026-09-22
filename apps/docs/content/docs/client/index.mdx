@@ -3,11 +3,26 @@ title: Typed React client
 description: Use generated declarations and public hooks without importing application source into the browser.
 ---
 
+## Pull the public contract
+
+Start with a running RELKIT backend and a separate React app that has `@relkit/client` and the
+RELKIT CLI installed. From the frontend root, pull the server's public contract into a
+frontend-owned directory:
+
+```sh title="Terminal — frontend root"
+bun run relkit client pull http://127.0.0.1:3000 --out ./relkit-client
+```
+
+This writes `contract.ts`, `client.ts`, `client-registry.d.ts`, and a manifest. Include the
+generated declarations in your TypeScript project and regenerate them when the public API
+changes. The backend must be reachable while you pull; do not import backend source into a
+browser bundle.
+
 ## Install the provider
 
-Install `@relkit/client`, generate the client contract with `relkit client pull`, and include the
-generated declarations with `withRelkit()` for Next.js or `relkit()` for Vite. Feature components
-import only `@relkit/client/react`.
+Wrap your React tree in `RelkitClientProvider`. The commerce frontend below is an optional,
+separate example with its own backend URL and demo token; it does not belong to the Orders
+tutorial. Its transport selector is specific to that example.
 
 <include cwd lang="tsx" meta='title="examples/commerce-web/app/providers.tsx"'>
   ../../examples/commerce-web/app/providers.tsx
@@ -17,7 +32,15 @@ import only `@relkit/client/react`.
 
 The provider defaults to the same-origin backend, credentialed requests, a 30-second finite request
 timeout, and a 10-second stream-establishment timeout. An established healthy stream is not capped by
-the finite timeout. Run `relkit client check` in CI to reject stale declarations or fingerprints.
+the finite timeout. From the frontend root, check the pulled contract against the running
+backend before shipping:
+
+```sh title="Terminal — frontend root"
+bun run relkit client check http://127.0.0.1:3000 --out ./relkit-client
+```
+
+For Next.js or Vite, `withRelkit()` or `relkit()` can inject the public fingerprint at build
+time; the `client pull` command above is what writes the declarations.
 
 The exact public-contract fingerprint must match. A mismatch enters `application-updated` and blocks
 new typed work until frontend and backend are coordinated; unresolved mutation or control metadata is

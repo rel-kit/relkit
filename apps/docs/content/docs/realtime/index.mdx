@@ -78,6 +78,22 @@ For a retryable publish, pass an `idempotencyKey` created by RelKit. Reusing the
 
 If a database update and publication must succeed together, write an outbox entry in the same database transaction and publish from the outbox. Calling `trigger()` after a database write does not make the two operations atomic.
 
+## Run the backend example offline
+
+The snippets above belong to the repository's `examples/commerce` app. From the repository
+root, with dependencies installed, run its focused HTTP test:
+
+```sh title="Terminal — RELKIT repository root"
+bun test examples/commerce/tests/http.test.ts
+```
+
+The test creates an application with an isolated local realtime provider, posts announcements
+through the public HTTP route, and reads them back. Expect two passing tests; no Docker or
+frontend is needed for this check. A passing test proves the function can append its channel
+event, but does not prove browser delivery or reconnect behavior. The
+[React guide](/docs/realtime/react) connects a browser after this backend path works, and
+[Providers](/docs/realtime/providers) explains the local Redis setup for a live server.
+
 ## Choose the next step
 
 - [Access and revocation](/docs/realtime/access) explains internal, public, and protected channels.

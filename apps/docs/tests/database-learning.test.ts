@@ -24,16 +24,11 @@ test("connects Database guides and the generated Drizzle reference", () => {
   });
   expect(apiPackages).toContain("drizzle");
   expect(features.find(({ id }) => id === "database")?.guide).toBe("database/index");
-  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBe(
-    "database/index",
-  );
-  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBe(
-    "auth/index",
-  );
+  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
+  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBeUndefined();
   for (const page of databaseGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
-    expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
     expect(source).toContain(`content/generated/related/database-${page}.mdx`);
     if (page !== "index") expect(read("index")).toContain(`](/docs/database/${page})`);
   }

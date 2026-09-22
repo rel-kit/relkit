@@ -42,8 +42,7 @@ test("places Events after HTTP Routes and gives every section a supported icon",
     expect(icons).toHaveProperty(metadata.icon);
   }
   const lastHttpPage = guideRelations.find(({ path }) => path === "http/first-route")!;
-  expect(renderRelated(lastHttpPage)).toContain("[Events](/docs/events)");
-  expect(renderRelated(lastHttpPage)).not.toContain("/docs/events/index");
+  expect(renderRelated(lastHttpPage)).not.toContain("Next step");
 });
 
 test("keeps section headings for the Events guides' right-side table of contents", async () => {
@@ -59,7 +58,7 @@ test("keeps section headings for the Events guides' right-side table of contents
 test("introduces the Events API and shows subscribers before the existing-app tutorial", async () => {
   const content = resolve(import.meta.dir, "../content/docs/events");
   const overview = await Bun.file(resolve(content, "index.mdx")).text();
-  expect(overview).toContain("title: Getting started");
+  expect(overview).toContain("title: Events overview");
   for (const api of ["defineEvent", "defineFunction", "defineEventFunction"]) {
     expect(overview).toContain(`\`${api}\``);
   }

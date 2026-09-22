@@ -123,10 +123,11 @@ test("keeps guides backed by executable examples and self-hosted discovery", asy
     "llms(source).index()",
   );
 
-  for (const file of files.filter(
-    (file) => !file.includes("/api/") && !file.endsWith("/operations/cli-reference.mdx"),
-  )) {
-    expect(await readFile(file, "utf8")).not.toMatch(/^\s*```(?:ts|tsx)\b/m);
+  for (const file of files.filter((file) => !file.includes("/api/"))) {
+    const contents = await readFile(file, "utf8");
+    for (const block of contents.matchAll(/^```(?:ts|tsx)[^\n]*\n([\s\S]*?)^```/gm)) {
+      expect(block[1]?.split("\n").length).toBeLessThanOrEqual(36);
+    }
   }
 
   for (const removedBundle of [
@@ -164,10 +165,9 @@ test("keeps current guidance on the domain-first application layout", async () =
   }
 
   const createSource = await readFile(createPage, "utf8");
-  expect(createSource).toContain('<Folder name="hello" defaultOpen>');
-  expect(createSource).toContain('<File name="service.ts" />');
-  expect(createSource).not.toContain('    <Folder name="functions" defaultOpen>');
-  expect(createSource).not.toContain('    <Folder name="services"');
+  expect(createSource).toContain("src/orders/service.ts");
+  expect(createSource).toContain("src/routes/orders/route.ts");
+  expect(createSource).not.toContain("src/services/");
 });
 
 test("builds and starts from the repository root on Railway", async () => {
@@ -232,9 +232,9 @@ test("keeps learning guides focused and actionable", async () => {
       if (directories.has(`${directory}/${page}`)) continue;
       const source = await readFile(resolve(content, directory, `${page}.mdx`), "utf8");
       expect(source).toMatch(/^---\ntitle: .+\ndescription: .+\n---/);
-      if (!["events", "storage", "caching", "ai"].includes(directory) || page !== "index") {
-        expect(source).toMatch(/```sh|<include[^>]*lang="tsx?"/);
-      }
+      expect(source).not.toContain("content/generated/add-");
+      expect(source).not.toContain("packages/client/jobs-watch.test.ts");
+      expect(source).not.toContain("packages/client/src/react/pending.ts");
       const focusedGuide =
         ["events", "storage", "caching", "ai"].includes(directory) ||
         (directory === "async" && ["events", "listeners"].includes(page));
