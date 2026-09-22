@@ -1,6 +1,6 @@
 {
   "name": "@relkit/realtime",
-  "version": "1.0.0",
+  "version": "0.4.1",
   "description": "Typed realtime channels and provider contracts for RELKIT.",
   "license": "MIT",
   "repository": {
