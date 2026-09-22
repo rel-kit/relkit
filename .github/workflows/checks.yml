@@ -146,19 +146,19 @@ jobs:
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
 
-  release-pr-status:
-    name: Publish release PR gate
+  dispatched-branch-status:
+    name: Publish dispatched branch gate
     if: >-
       always() && needs.ci-gate.result == 'success' &&
       github.event_name == 'workflow_dispatch' &&
-      github.ref == 'refs/heads/changeset-release/main'
+      github.ref != 'refs/heads/main'
     needs: ci-gate
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       statuses: write
     steps:
-      - name: Attach CI Gate to the release pull request
+      - name: Attach CI Gate to the dispatched branch
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.sha }}
@@ -167,5 +167,5 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
             -f state=success \
             -f context="CI Gate" \
-            -f description="Verified by dispatched release CI" \
+            -f description="Verified by dispatched branch CI" \
             -f target_url="$RUN_URL"
