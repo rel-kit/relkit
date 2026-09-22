@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.5.1
+
+### Changes
+
+- docs: guide developers through a verified Orders API
+
 ## 0.5.0
 
 ### Changes

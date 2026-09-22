@@ -1,6 +1,6 @@
 {
   "name": "@relkit/observability",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Unsupported internal RELKIT observability contracts; use @relkit/app.",
   "license": "MIT",
   "repository": {
