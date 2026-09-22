@@ -1,5 +1,5 @@
-import { PgClient } from "@effect/sql-pg";
-import { Effect, Layer, Redacted } from "effect";
+import { PgClient, PgTypes } from "@effect/sql-pg";
+import { Effect, Layer, Redacted, Result } from "effect";
 import {
   DrizzleJobStore,
   mqDedupe,
@@ -44,7 +44,21 @@ export function createEffectMqPostgresLayer(
   if (typeof postgresUrl !== "string" || postgresUrl.trim() === "")
     throw new TypeError("effect-mq postgres URL is invalid");
   const schema = createEffectMqPostgresSchema(prefix);
-  const pg = PgClient.layer({ url: Redacted.make(postgresUrl) });
+  const types = PgTypes.makeRegistry();
+  for (const [oid, arrayOid] of [
+    [PgTypes.OID.timestamp, PgTypes.OID.timestampArray],
+    [PgTypes.OID.timestamptz, PgTypes.OID.timestamptzArray],
+  ] as const) {
+    types.register(
+      oid,
+      {
+        encode: (value: Date | number) => PgTypes.encode(value instanceof Date ? value.getTime() : value, oid),
+        decode: (bytes) => Result.map(PgTypes.decode(bytes, oid, 1), (value) => new Date(Number(value))),
+      },
+      { arrayOid },
+    );
+  }
+  const pg = PgClient.layer({ url: Redacted.make(postgresUrl), types });
   return DrizzleJobStore.layer(schema).pipe(Layer.provide(pg));
 }
 

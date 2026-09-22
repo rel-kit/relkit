@@ -11,12 +11,13 @@ export function mapInngestPolicy(value: unknown): InngestPolicyMapping {
   if (value === undefined) return Object.freeze({});
   const policy = record(value, "Inngest task policy");
   const allowed = new Set(["retry", "maxDuration", "concurrency"]);
-  for (const key of Object.keys(policy)) {
+  for (const [key, field] of Object.entries(policy)) {
+    if (field === null || field === undefined) continue;
     if (!allowed.has(key)) throw new Error(`Inngest cannot certify task policy field "${key}".`);
   }
-  const retry = policy.retry === undefined ? undefined : mapRetry(policy.retry);
-  const timeoutSeconds = policy.maxDuration === undefined ? undefined : seconds(policy.maxDuration);
-  const concurrency = policy.concurrency === undefined ? undefined : limit(policy.concurrency);
+  const retry = policy.retry == null ? undefined : mapRetry(policy.retry);
+  const timeoutSeconds = policy.maxDuration == null ? undefined : seconds(policy.maxDuration);
+  const concurrency = policy.concurrency == null ? undefined : limit(policy.concurrency);
   return Object.freeze({
     ...(retry === undefined ? {} : { retries: retry }),
     ...(timeoutSeconds === undefined ? {} : { timeoutSeconds }),

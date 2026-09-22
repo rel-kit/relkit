@@ -153,11 +153,9 @@ export const localRecipe = Object.freeze({
       id: "worker",
       image: BUN_IMAGE,
       command: Object.freeze([
-        "bun",
-        "run",
-        "--no-env-file",
-        "--no-install",
-        "/relkit-worker/server/index.js",
+        "sh",
+        "-c",
+        'export RELKIT_EFFECT_MQ_DATABASE_URL="postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit"; exec bun run --no-env-file --no-install /relkit-worker/server/index.js',
       ]),
       dependsOn: Object.freeze(["postgres-ready"]),
       ports: Object.freeze({ api: 3000 }),
@@ -170,9 +168,7 @@ export const localRecipe = Object.freeze({
       networkAliases: Object.freeze(["worker"]),
       hostAliases: Object.freeze({ "host.docker.internal": "host-gateway" }),
       environment: Object.freeze({
-        RELKIT_EFFECT_MQ_DATABASE_URL: Object.freeze({
-          value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit",
-        }),
+        POSTGRES_PASSWORD: Object.freeze({ secret: "postgresPassword" }),
         RELKIT_EFFECT_MQ_MIGRATIONS: Object.freeze({ value: "owned-by-jobs-service" }),
       }),
     }),

@@ -142,7 +142,7 @@ function simple(
 
 function serialize(value: Readonly<Record<string, unknown>>): readonly string[] {
   return Object.entries(value).flatMap(([name, raw]) => {
-    const option = name.replaceAll("_", "-");
+    const option = name.replaceAll("_", "-").replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
     if (Array.isArray(raw)) return raw.flatMap((entry) => [`--${option}`, String(entry)]);
     if (Option.isOption(raw) && Option.isSome(raw)) return [`--${option}`, String(raw.value)];
     return raw === true ? [`--${option}`] : [];

@@ -327,9 +327,7 @@ declare const localRecipe: Readonly<{
       networkAliases: ReadonlyArray<string>;
       hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
-        RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
-          value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";
-        }>;
+        POSTGRES_PASSWORD: Readonly<{ secret: "postgresPassword" }>;
         RELKIT_EFFECT_MQ_MIGRATIONS: Readonly<{ value: "owned-by-jobs-service" }>;
       }>;
     }>
@@ -465,9 +463,7 @@ declare const localRecipe: Readonly<{
       networkAliases: ReadonlyArray<string>;
       hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
-        RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
-          value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";
-        }>;
+        POSTGRES_PASSWORD: Readonly<{ secret: "postgresPassword" }>;
         RELKIT_EFFECT_MQ_MIGRATIONS: Readonly<{ value: "owned-by-jobs-service" }>;
       }>;
     }>
@@ -557,7 +553,7 @@ declare const runEffectMq: <A, E>(
 ) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L65)
 
 ## `index.ts`
 

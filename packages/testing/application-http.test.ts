@@ -89,3 +89,34 @@ test("maps HTTP data into function input without exposing the request", async ()
     await runtime.close();
   }
 });
+
+test("returns validation 422 for invalid function input", async () => {
+  const target = defineFunction({
+    id: "orders.create",
+    input: z.object({ quantity: z.number().int().positive() }),
+    output: z.object({ accepted: z.boolean() }),
+    handler: async () => ({ accepted: true }),
+  });
+  const route: TestRoute = {
+    method: "POST",
+    path: "/orders",
+    request: { kind: "input", fields: { quantity: { kind: "body", name: "quantity" } } },
+    target,
+    responses: [
+      { kind: "success", status: 201 },
+      { kind: "validation-error", status: 422 },
+    ],
+  };
+  const runtime = createTestRuntime();
+  try {
+    const response = await handleTestRequest([route], runtime, new Request("http://relkit.test/orders", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: '{"quantity":0}',
+    }));
+    expect(response.status).toBe(422);
+    expect(await response.json()).toMatchObject({ error: "validation" });
+  } finally {
+    await runtime.close();
+  }
+});

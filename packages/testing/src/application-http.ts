@@ -1,4 +1,5 @@
 import type { TestRoute } from "./application-routes.js";
+import { InvocationValidationError } from "@relkit/engine";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
 
@@ -30,6 +31,17 @@ export async function handleTestRequest(
       ? new Response(null, { status: response.status, headers: response.headers })
       : response;
   } catch (error) {
+    if (error instanceof InvocationValidationError && error.phase === "input") {
+      const status = matched.responses.find((response) => response.kind === "validation-error")?.status ?? 422;
+      return Response.json({
+        error: "validation",
+        issues: error.issues.map((issue) => ({
+          code: "validation",
+          message: issue.message.slice(0, 500),
+          path: issue.path?.map((part) => typeof part === "object" && part !== null && "key" in part ? part.key : part) ?? [],
+        })),
+      }, { status });
+    }
     const failure = normalizeFailure(error);
     if (failure.kind === "application") {
       const declaration = matched.responses.find(

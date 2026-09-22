@@ -1,7 +1,7 @@
 import { ORPCError, createClient } from "@relkit/client";
 import type { CliCommandContext } from "../main-support.js";
 import { JobsCommandError, requireOption, type ParsedJobs, usage } from "./jobs-support.js";
-import { fetchJobsJson, jobsBaseUrl, readJobsJsonFile } from "./jobs-request.js";
+import { fetchJobsJson, jobsBaseUrl, jobsIdentityHeaders, readJobsJsonFile } from "./jobs-request.js";
 import { readJobsManifest, type JobsManifestView } from "./jobs-manifest.js";
 
 type RpcProcedure = (
@@ -111,10 +111,8 @@ async function createJobsRpcClient(
   return createClient({
     baseUrl: jobsBaseUrl(),
     headers: {
+      ...(await jobsIdentityHeaders()),
       "x-relkit-jobs-protocol": String(manifest?.jobsProtocolVersion ?? 1),
-      ...(manifest?.publicFingerprint === undefined
-        ? {}
-        : { "x-relkit-public-fingerprint": manifest.publicFingerprint }),
     },
   }) as unknown as JobsRpcClient;
 }
