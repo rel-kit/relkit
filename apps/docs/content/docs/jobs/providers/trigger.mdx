@@ -1,10 +1,117 @@
 ---
 title: Trigger.dev
-description: Use the Trigger.dev integration and its native worker publication.
+description: Configure Trigger.dev for an Orders CSV task and check worker publication.
 ---
 
-The Trigger.dev integration exports a provider-native worker publication mechanism and records the task/build/service-generation identity used by deployment. Configure it with a `jobs.default` binding from the [Docker guide](/docs/jobs/docker).
+Trigger.dev requires a project, environment API key, and a published worker generation in
+addition to a RELKIT jobs binding. **The checked-in `trigger-docker` profile does not yet
+provision or publish those pieces**, so it cannot currently provide a verified local Orders
+run or a truthful completed-run screenshot. This page shows the RELKIT side and the exact
+registration checks; it is a compatibility guide, not a passing setup tutorial. For a
+verified local run today, use [Inngest](/docs/jobs/providers/inngest) or
+[Effect MQ](/docs/jobs/providers/effect-mq).
 
-Retry, observation, and run controls depend on the selected Trigger environment. Docker checkpointing and durable sleep are not claimed by the current integration; use `relkit jobs capabilities` before relying on a long pause or checkpoint resume.
+You need Bun 1.3.10 and Docker. Start where `relkit-trigger` does not already exist. The
+task returns CSV text; it does not write a file or read a database.
 
-Keep worker deployment and definition registration staged. A readiness failure must leave the previous generation active, and a previous build must remain available while it owns runs.
+## Create the provider-backed app
+
+```sh title="Terminal — parent directory"
+bunx create-relkit@latest relkit-trigger --jobs trigger-docker --json
+cd relkit-trigger
+bun add @trigger.dev/sdk@4.5.16
+```
+
+The generator installs `@relkit/docker`, `@relkit/trigger`, and `@relkit/local`, and creates
+the task and job. Open the generated `relkit.config.ts` and check that it matches the binding
+below. `jobs.default` connects the provider; `defaults.jobs` selects it. In an existing app,
+install those packages and the Trigger SDK, then extend the existing config while
+retaining its own ID and server settings.
+
+<include cwd lang="ts" meta='title="relkit.config.ts"'>
+  ../../apps/docs/examples/jobs/providers/trigger-config.ts
+</include>
+
+## What provider setup is missing
+
+Trigger's [official Docker Compose setup](https://trigger.dev/docs/self-hosting/docker)
+runs a webapp, database, Redis, and worker supervisor. After bringing that stack up, an
+operator creates a project, obtains a development environment API key, configures the SDK
+base URL and key, and deploys a worker containing the task before triggering a run. These
+are provider-side steps; the RELKIT binding above does not replace them. The generated
+`trigger-docker` recipe instead starts a pinned webapp image with PostgreSQL and a RELKIT
+worker, generates a random `projectRef` and `secretKey`, and passes them to the SDK. It does
+not create those credentials in Trigger.dev or publish a worker generation. Its pinned
+webapp also fails its current environment and port configuration. Running the official
+Compose stack separately does **not** make this generated RELKIT profile compatible by
+itself. The adapter currently imports `@trigger.dev/sdk/v3`; Trigger's
+[self-hosting guidance](https://trigger.dev/docs/self-hosting/overview) says 4.5.0 is the
+last server release supporting v3 tasks. The server, SDK, task publication, and project
+credentials must be aligned together. Do not paste a production Trigger key into the
+generated source or assume that `local up` completing means a task is registered there.
+
+## Read the task before running it
+
+**Replace** the generated `src/orders/tasks/export-orders.task.ts` with this task. It
+validates order lines and computes CSV text and a total in cents. The `durable` declaration
+does not by itself prove checkpoint or resume support. The sample IDs and SKUs contain no
+commas or newlines; escape fields for arbitrary text. This new app keeps task version `1`.
+The generated job already exposes `exportOrders`; do not add a second job.
+
+<include cwd lang="ts" meta='title="src/orders/tasks/export-orders.task.ts"'>
+  ../../apps/docs/examples/jobs/providers/trigger-task.ts
+</include>
+
+**Replace** `examples/export-orders.json` with these two rows. A completed task should
+return `orderCount: 2`, `totalCents: 2100`, and CSV line totals `900` and `1200`.
+
+<include cwd lang="json" meta='title="examples/export-orders.json"'>
+  ../../apps/docs/examples/jobs/providers/export-orders.json
+</include>
+
+## Check the local profile before submitting
+
+The task source can pass RELKIT checks, but these commands are a diagnostic gate. If
+`local status` reports an unhealthy provider, stop here; a RELKIT `jobs list` result only
+proves that the compiler discovered the job, not that Trigger.dev registered it.
+
+```sh title="Terminal — relkit-trigger"
+bun run check
+bun run typecheck
+bun run relkit local up --detach
+bun run relkit local status
+docker ps --filter 'name=service-trigger' --format '{{.Names}} {{.Status}} {{.Ports}}'
+```
+
+If the Trigger container exits, stop here and inspect its logs. If a future compatibility
+fix makes the provider and worker ready, start `bun run dev`, then use `jobs list` to
+confirm RELKIT discovered `exportOrders`, then submit the input. An accepted receipt is
+only an enqueueing signal. Require **all three** before claiming the integration works:
+the task appears in Trigger.dev's project dashboard, its native run reaches `COMPLETED`,
+and the run output includes `orderCount: 2` and `totalCents: 2100`.
+
+```sh title="Second terminal — relkit-trigger"
+bun run relkit jobs capabilities
+bun run relkit --json jobs list
+bun run relkit --json jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id orders-csv-1
+bun run relkit jobs runs get --run-id <runId>
+```
+
+Replace `<runId>` with the accepted handle only if submission succeeds. Compare it with the
+native Trigger.dev run ID and worker logs. No screenshot of a completed native run is shown
+here because this profile did not reach that state in a fresh app. A screenshot of
+`jobs list`, an accepted receipt, or a healthy Docker container would not prove that the
+task was published and executed.
+
+**Current verification limit:** The local-source task passes `check` and `typecheck`, but
+the pinned Trigger image requires service environment variables absent from the current
+recipe and listens on a different port. Once the image was cached, `local up` briefly
+reported healthy while the Trigger container exited. Adding the SDK manually allowed the
+RELKIT backend to start during a diagnostic run, but submission returned an unknown outcome
+and the worker never became ready. We therefore have **no proof** that this task was
+registered with Trigger.dev or executed there. This provider's runtime compatibility remains
+**unverified** in the [capability evidence](/docs/jobs/providers). Do not rely on
+checkpoint resume, durable sleep, observation, or cancellation until the selected environment
+reports and demonstrates them. Keep worker publication and definition registration staged so
+an unsuccessful replacement does not remove the active worker generation. Continue with
+[provider comparison](/docs/jobs/providers) to choose a profile by verified capability.

@@ -19,8 +19,8 @@ Keep the previous build, signing keys, and registrations until in-flight runs fi
 Cloud deployment is opt-in. The local Docker gate proves the selected adapter and its persisted state before
 any managed account or infrastructure mutation is authorized.
 
-<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
-</include>
+The commerce example selects a Docker-backed job profile and a separate Pulumi/AWS
+deployment role. See the [application configuration](https://github.com/rel-kit/relkit/blob/main/examples/commerce/relkit.config.ts)
+for the complete source.
 
 <include cwd>content/generated/related/jobs-deployment.mdx</include>

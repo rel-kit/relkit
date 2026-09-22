@@ -31,9 +31,8 @@ When a trigger response is lost, retain the original `operationId`, idempotency 
 an unknown outcome and use only the provider-certified recovery action; do not discard the handle or submit a
 different payload automatically.
 
-<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
-</include>
+Check the [commerce job binding](https://github.com/rel-kit/relkit/blob/main/examples/commerce/relkit.config.ts)
+against the selected provider when investigating a binding error.
 
 <include cwd lang="json" meta='title="templates/default/v1/tasks/package.json"'>
   ../../templates/default/v1/tasks/package.json

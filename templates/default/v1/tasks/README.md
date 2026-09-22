@@ -5,10 +5,22 @@ through Docker and keeps task code in a domain-owned worker.
 
 ```sh
 bun install
-bun run dev
-bun run jobs:trigger
-bun run test
 bun run check
+bun run relkit local up --detach
+bun run dev
+```
+
+In a second terminal, trigger the generated Orders task and inspect its run:
+
+```sh
+bun run jobs:trigger
+bun run relkit jobs runs get --run-id <runId>
+```
+
+Use the `runId` from the trigger command. Other project checks are:
+
+```sh
+bun run test
 bun run build
 ```
 

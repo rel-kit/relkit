@@ -6,7 +6,7 @@ description: Select the provider that runs each job.
 Bind jobs to a provider in `relkit.config.ts`. The commerce fixture uses the same shape:
 
 <include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
+  ../../examples/commerce/relkit.config.ts#jobs-profile
 </include>
 
 The binding is part of the compiled deployment plan. It records the provider profile, capability evidence, execution limits, and the worker identity used for publication. A job may use an explicit binding when a service needs a different provider or environment.

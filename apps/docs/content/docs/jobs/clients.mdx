@@ -1,23 +1,37 @@
 ---
-title: Clients
-description: Trigger, inspect, watch, and control job runs.
+title: Job clients
+description: Trigger a public job, retain its run ID, and watch or control that run.
 ---
 
-The generated client exposes only jobs with a `client` policy. A trigger returns an accepted handle:
-`client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`.
-Read a run with `client.jobs.exportOrders.runs.get({ runId: accepted.runId })`.
+After [defining and binding a job](/docs/jobs/quickstart), run `relkit client pull` for the app's
+typed contract. Only jobs with a `client` policy appear. Triggering one admits work; the returned
+handle identifies a run and is **not** the completed result:
 
-Use `watch` for a live view and always handle reconnects. A reconnect should resume from the last known run state; it must not create a second run. Keep credentials and authorization on the server-side boundary for private jobs.
+```ts title="In a client with generated job declarations"
+const accepted = await client.jobs.exportOrders.trigger({
+  input: { orderIds },
+  options: { operationId },
+});
+const latest = await client.jobs.exportOrders.runs.get({ runId: accepted.runId });
+```
 
-Run controls are explicit operations:
+Keep `accepted.runId` and `operationId` so a later page load or retry can inspect the same run.
+The app must authorize the caller for this job; a typed client alone does not grant access.
 
-Watch with `watchJobRun(client, "exportOrders", { runId: accepted.runId })`. Cancel and retry use
-`{ runId, operationId }` so every control is auditable and safely recoverable.
+## Watch one accepted run
 
-<include cwd lang="ts" meta='title="packages/client/jobs-watch.test.ts"'>
-  ../../packages/client/jobs-watch.test.ts
+`watchJobRun` uses the accepted run ID. This public API example subscribes to state changes,
+connects once, and disposes the watcher when its caller is finished:
+
+<include cwd lang="ts" meta='title="Watch an export run"'>
+  ../../apps/docs/examples/jobs/watch-run.ts
 </include>
 
-The server returns an operation ID for controls that are processed asynchronously. Poll or watch the run until the requested state is visible. Dispose client watchers when the page or request scope ends.
+Call the returned cleanup function when the component or request scope ends. Reconnection
+resumes observation; it does not trigger a second run. Keep credentials on the server-side
+boundary for private jobs.
+
+Cancel and retry are explicit controls with `{ runId, operationId }`, allowing audit and recovery.
+The server may process them asynchronously; read or watch until the requested state appears.
 
 <include cwd>content/generated/related/jobs-clients.mdx</include>

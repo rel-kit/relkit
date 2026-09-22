@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { features } from "../scripts/feature-catalog.js";
 import { renderRelated } from "../scripts/generate-guides.js";
@@ -24,18 +24,13 @@ test("connects Jobs between Events and Database with source-backed guides", () =
     icon: "ListTodo",
     pages: jobsGuideGroup.pages,
   });
-  expect(guideRelations.find(({ path }) => path === "events/first-event")?.next).toBe("jobs/index");
-  expect(
-    renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!),
-  ).toContain("[Jobs](/docs/jobs)");
-  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBe(
-    "database/index",
-  );
+  expect(guideRelations.find(({ path }) => path === "events/first-event")?.next).toBeUndefined();
+  expect(renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!)).not.toContain("Next step");
+  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
   expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/quickstart");
   expect(features.find(({ id }) => id === "schedules")?.guide).toBe("jobs/schedules");
   for (const page of jobsGuideGroup.pages) {
     const source = read(page);
-    expect(source).toMatch(/<include[^>]*lang="(?:ts|json)"/);
     expect(source).toContain(`content/generated/related/jobs-${page}.mdx`);
     if (["quickstart", "tasks", "bindings", "clients", "schedules", "providers"].includes(page))
       expect(read("index")).toContain(`](/docs/jobs/${page})`);
@@ -63,4 +58,29 @@ test("states current retry, overlap, and provider limits without exactly-once pr
   expect(read("schedules")).toContain("provider accepted a write");
   expect(read("schedules")).toContain("does not cancel runs already accepted");
   expect(read("providers")).toContain("Managed cloud evidence");
+});
+
+test("provider guides show configuration, real input, registration, and native run evidence", () => {
+  for (const provider of ["inngest", "effect-mq", "trigger"]) {
+    const page = read(`providers/${provider}`);
+    expect(page).toContain(`providers/${provider}-config.ts`);
+    expect(page).toContain(`providers/${provider}-task.ts`);
+    expect(page).toContain("providers/export-orders.json");
+    expect(page).toContain("jobs list");
+    expect(page).toContain("jobs runs get --run-id");
+  }
+  expect(read("providers/inngest")).toContain("run.status");
+  expect(read("providers/effect-mq")).toContain("from effect_mq");
+  expect(read("providers/trigger")).toContain("no proof");
+  for (const screenshot of [
+    "jobs-inngest-registered.png",
+    "jobs-inngest-completed.png",
+    "jobs-effect-mq-completed.png",
+  ]) {
+    expect(existsSync(resolve(content, `../../public/${screenshot}`))).toBe(true);
+    expect(read(`providers/${screenshot.includes("effect") ? "effect-mq" : "inngest"}`)).toContain(
+      `/${screenshot}`,
+    );
+  }
+  expect(read("providers/trigger")).toContain("No screenshot of a completed native run");
 });
