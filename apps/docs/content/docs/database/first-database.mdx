@@ -26,13 +26,11 @@ runs `relkit check`, but deliberately does not create or apply a migration. Run 
 `DATABASE_URL`. To follow the richer Users tutorial below, replace the generated `items` placeholder with
 the shown Users and Memberships schema instead of adding a second database service.
 
-### Database CLI options
-
 SQLite is the headless default and uses `bun:sqlite`; PostgreSQL and MySQL use
 `drizzle-orm/bun-sql`. `--orm` accepts only `drizzle`. Database is a singleton under
 `src/database`; `--service` and `--create-service` do not select its location.
 
-<include cwd>content/generated/add-database-options.mdx</include>
+For every scaffolding flag, see the [CLI reference](/docs/operations/cli-reference).
 
 ## Prepare SQLite and the environment
 

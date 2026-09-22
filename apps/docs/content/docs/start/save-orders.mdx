@@ -1,0 +1,129 @@
+---
+title: Save and retrieve orders
+description: Add a local SQLite database, persist POST /orders, and read a saved order after restart.
+---
+
+The Orders route from [the previous chapter](/docs/start/first-route) only calculates a response.
+Here you will store that result in SQLite and add `GET /orders/:orderId`. Stop `bun run dev`
+before changing the database. Keep working in the same `relkit-orders` application.
+
+## Add the local database
+
+Scaffold the supported Drizzle service. This installs the compatible packages and creates an
+`items` placeholder. **Replace** that placeholder with the Orders schema below; do not keep both.
+
+```sh title="Terminal — relkit-orders"
+bun run relkit add database --orm drizzle --dialect sqlite
+```
+
+Replace `src/database/schema/index.ts` with one Orders table. `orderId` is the unique key;
+`ownerId` is empty until the next chapter adds sign-in. Existing anonymous demonstration orders
+will not become anyone's private orders automatically.
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/database/schema/index.ts
+</include>
+
+Use Bun's SQLite driver in `src/database/service.ts`. Replace the scaffolded service with:
+
+<include cwd lang="ts" meta='title="src/database/service.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/database/service.ts
+</include>
+
+Replace `src/platform/env.ts` to keep the existing log-level setting and add the SQLite file path:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/platform/env.ts
+</include>
+
+Update `tsconfig.json` so TypeScript loads the context registry produced by `relkit check`.
+Keep the starter's `@app/*` alias; the complete config below adds the generated declaration
+and includes the migration script.
+
+<include cwd lang="json" meta='title="tsconfig.json"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/tsconfig.json
+</include>
+
+Create the ignored `.env` file with the SQLite path. The same path will be loaded when you
+restart the app or run the production build. Keep the database out of source control too.
+
+```sh title="Terminal — relkit-orders"
+printf 'DATABASE_PATH=./orders.sqlite\n' > .env
+printf '\norders.sqlite\n' >> .gitignore
+```
+
+## Save an order
+
+The existing `createOrder` function already validates input and calls `priceOrder`. Replace
+`src/orders/functions/create-order.function.ts` so it inserts the calculated result into the
+Orders table. The response now includes the original `quantity` as well as the price.
+
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/functions/create-order.function.ts
+</include>
+
+## Add a read operation
+
+Create `src/orders/functions/get-order.function.ts` to look up a saved row by `orderId`.
+It returns `found: false` when there is no row, so callers receive no fabricated order.
+
+<include cwd lang="ts" meta='title="src/orders/functions/get-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/functions/get-order.function.ts
+</include>
+
+Replace `src/orders/service.ts` to expose that operation alongside the existing two functions:
+
+<include cwd lang="ts" meta='title="src/orders/service.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/service.ts
+</include>
+
+Create `src/routes/orders/[orderId]/route.ts`. Its directory supplies the URL parameter;
+the named `GET` export selects the public `getOrder` member.
+
+<include cwd lang="ts" meta='title="src/routes/orders/[orderId]/route.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/routes/orders/[orderId]/route.ts
+</include>
+
+## Migrate, run, and check
+
+Replace the scaffolded `drizzle.config.ts` with this configuration. It refuses an unset or
+in-memory path so the migration cannot quietly target the wrong database.
+
+<include cwd lang="ts" meta='title="drizzle.config.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts
+</include>
+
+Generate and review the initial SQL migration, then apply it and start the app:
+
+Drizzle Kit's `migrate` command currently selects `better-sqlite3` in this Bun project.
+Create `scripts/migrate.ts` to apply generated SQL with the Bun SQLite driver used by the app:
+
+<include cwd lang="ts" meta='title="scripts/migrate.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/scripts/migrate.ts
+</include>
+
+```sh title="Terminal — relkit-orders"
+export DATABASE_PATH=./orders.sqlite
+bun --bun drizzle-kit generate --name=initial
+bun scripts/migrate.ts
+bun run check
+bun run typecheck
+bun run dev
+```
+
+In another terminal, submit a new order and read it back:
+
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"saved-1","sku":"book","quantity":10}'
+curl http://localhost:3000/orders/saved-1
+```
+
+Expect HTTP `201` with `totalCents: 900`; the GET response has `found: true` and the same
+order. Restart `bun run dev` and repeat the GET: the result remains. Use a new `orderId` for
+another POST because the database enforces uniqueness.
+
+This chapter's API has no access control yet.
+
+<include cwd>content/generated/related/start-save-orders.mdx</include>

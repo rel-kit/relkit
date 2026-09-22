@@ -1,0 +1,47 @@
+---
+title: Build and run locally
+description: Build the protected Orders API and verify it with the local production server.
+---
+
+You have a tested Orders API with SQLite and email/password sign-in. This last chapter runs its
+release build locally and confirms the same private order remains available. It does not
+provision a cloud resource.
+
+Stop `bun run dev` first. Keep `DATABASE_PATH`, `BETTER_AUTH_URL`, and the **same**
+`BETTER_AUTH_SECRET` used for the existing accounts. Keep the migrations and SQLite file in place.
+
+```sh title="Terminal — relkit-orders"
+set -a
+. ./.env
+set +a
+bun run check
+bun run typecheck
+bun run test
+bun run build
+bun run start
+```
+
+The ignored `.env` contains the same secret from the auth chapter; changing it would
+invalidate existing sessions. Keep this terminal open while the local production server runs.
+
+In a second terminal, sign in with the account from the authentication chapter and verify the
+protected read again:
+
+```sh title="Second terminal — relkit-orders"
+auth_cookies=$(mktemp -t relkit-orders-cookies)
+curl -i -c "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-in/email \
+  -H 'content-type: application/json' -H 'origin: http://127.0.0.1:3000' \
+  --data '{"email":"demo@example.com","password":"local-demo-password-123"}'
+curl -i http://127.0.0.1:3000/orders/private-1
+curl -i -b "$auth_cookies" http://127.0.0.1:3000/orders/private-1
+```
+
+Expect `401` without a cookie and `found: true` with the same account's valid cookie.
+The order data should survive both development-server and production-server restarts because
+it is stored in `orders.sqlite`.
+
+Your local application is complete. For another capability, use the relevant feature guide;
+for exact signatures or flags, use the API and CLI references. Cloud deployment is a separate
+optional task covered by [Deployment](/docs/operations/deployment).
+
+<include cwd>content/generated/related/start-build-and-run.mdx</include>

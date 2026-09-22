@@ -11,21 +11,22 @@ relkit create my-app --jobs effect-mq-docker
 relkit create my-app --jobs trigger-docker
 ```
 
-The generated binding keeps provider configuration in the project. Persist provider state outside an ephemeral worker container, and use a private network for the admin and worker endpoints.
-
-The generated task template is the account-free source fixture:
-
-<include cwd lang="ts" meta='title="templates/default/v1/tasks/relkit.config.ts"'>
-  ../../templates/default/v1/tasks/relkit.config.ts
-</include>
+The generator creates an Orders task and binds the selected provider in `relkit.config.ts`.
+The local CLI also needs `@relkit/local` in the application, so run `bun add @relkit/local`
+from the generated project before starting the provider. Follow the provider-specific setup:
+[Inngest](/docs/jobs/providers/inngest), [Effect MQ](/docs/jobs/providers/effect-mq), or
+[Trigger.dev](/docs/jobs/providers/trigger).
 
 ```sh
-relkit local up
+relkit local up --detach
 relkit local status
 relkit local stop
 relkit local reset --dry-run
 ```
 
-`local stop` stops services without deleting state. `local reset` is destructive to local job state and should be scoped to a deliberate development environment; use the dry run first. Docker provider capabilities and limits are visible through `relkit jobs capabilities`.
+`--detach` lets you start the backend in the same terminal afterward. Without it, `local up`
+stays attached until interrupted. `local stop` stops services without deleting state.
+`local reset` is destructive to local job state; use the dry run first. Run `relkit jobs capabilities`
+after the backend starts to inspect the selected provider's limits.
 
 <include cwd>content/generated/related/jobs-docker.mdx</include>

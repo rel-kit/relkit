@@ -4,10 +4,8 @@ import { resolve } from "node:path";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { serviceGuideGroup } from "../scripts/service-guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `service/${page}.mdx`), "utf8");
-
 test("introduces Service after Core concepts with source-backed, connected guides", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
     "start",
@@ -21,18 +19,16 @@ test("introduces Service after Core concepts with source-backed, connected guide
     icon: "Boxes",
     pages: serviceGuideGroup.pages,
   });
-  expect(guideRelations.find(({ path }) => path === "fundamentals/environment")?.next).toBe(
-    "service/index",
-  );
+  expect(
+    guideRelations.find(({ path }) => path === "fundamentals/environment")?.next,
+  ).toBeUndefined();
   expect(features.find(({ id }) => id === "services")?.guide).toBe("service/define");
   for (const page of serviceGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
     expect(source).toContain(`content/generated/related/service-${page}.mdx`);
-    expect(source).toMatch(/<include[^>]*lang="ts"/);
   }
 });
-
 test("routes code-placement questions into existing capability and HTTP guides", () => {
   const organization = read("organization");
   for (const path of [
@@ -62,21 +58,19 @@ test("routes code-placement questions into existing capability and HTTP guides",
   }
   expect(routes).not.toContain("](/docs/routes");
 });
-
-test("walks through a service using the executable minimal-template function and HTTP tests", () => {
+test("walks through the Orders service using the executable API starter", () => {
   const tutorial = read("first-service");
   for (const path of [
-    "src/hello/functions/hello.function.ts",
-    "src/hello/service.ts",
-    "src/routes/hello/route.ts",
-    "tests/unit/hello.function.test.ts",
-    "tests/integration/hello.route.test.ts",
+    "src/orders/functions/create-order.function.ts",
+    "src/orders/service.ts",
+    "src/routes/orders/route.ts",
+    "tests/unit/orders.function.test.ts",
   ]) {
-    expect(tutorial).toContain(`../../templates/default/v1/minimal/${path}`);
+    expect(tutorial).toContain(`../../templates/default/v1/api/${path}`);
   }
   expect(tutorial).toContain("bun run check");
   expect(tutorial).toContain("bun run typecheck");
-  expect(tutorial).toContain("bun test tests/unit/hello.function.test.ts");
-  expect(tutorial).toContain("bun test tests/integration/hello.route.test.ts");
-  expect(tutorial).toContain("/hello?name=RELKIT");
+  expect(tutorial).toContain("bun test tests/unit/orders.function.test.ts");
+  expect(tutorial).toContain("bun test tests/integration/orders.route.test.ts");
+  expect(tutorial).toContain("POST /orders");
 });

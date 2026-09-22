@@ -37,10 +37,10 @@ test("teaches caching in an existing app with a tested lookup and local Inspecto
   const tutorial = await Bun.file(resolve(content, "caching/first-cache.mdx")).text();
   expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
-  expect(tutorial).toContain("relkit.config.ts#cache-profile");
+  expect(tutorial).toContain("relkit.config.ts#cache-local-profile");
   expect(tutorial).toContain("examples/commerce/tests/fixtures/get-price.function.ts");
   expect(tutorial).toContain("bun run dev --local=off");
-  expect(tutorial).toContain("explicit replacements for both physical profiles");
+  expect(tutorial).toContain("explicit replacement for the `requests` profile");
   expect(tutorial).toContain("**Invoke locally**");
   expect(tutorial).toContain("## Inspect expiration");
 });

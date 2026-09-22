@@ -1,5 +1,5 @@
 ---
-title: Offline and uncertain outcomes
+title: Offline writes and uncertain outcomes
 description: Reconcile writes without silently replaying payloads.
 ---
 
@@ -14,10 +14,17 @@ Job submissions additionally retain the original operation ID, idempotency key, 
 provider-certified recovery window. A recovered job must use the same request; a discarded `runId` is not a
 safe recovery strategy.
 
-## Reconcile safely
+## Choose recovery from the outcome
 
-<include cwd lang="ts" meta='title="packages/client/src/react/pending.ts"'>
-  ../../packages/client/src/react/pending.ts
+The public `isJobUnknownOutcome` guard tells you whether a caught value includes a job
+recovery action. Show that action to the user or use it in an explicit reconciliation flow:
+
+<include cwd lang="ts" meta='title="Handle an uncertain job outcome"'>
+  ../../apps/docs/examples/jobs/reconcile-unknown.ts
 </include>
+
+For ordinary route mutations, use an application-owned status endpoint before resubmitting.
+The client cannot infer whether a disconnected write reached your backend. For jobs, keep the
+original operation ID and request digest and follow the provider-certified recovery action.
 
 <include cwd>content/generated/related/client-offline.mdx</include>

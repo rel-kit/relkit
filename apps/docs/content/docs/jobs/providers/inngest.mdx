@@ -1,12 +1,122 @@
 ---
 title: Inngest
-description: Use the Inngest integration for durable task execution.
+description: Configure Inngest, prepare an Orders CSV, and verify the registered job and provider run.
 ---
 
-The Inngest integration publishes the task worker through the Inngest SDK and records the provider-native worker identity in the deployment plan. The supported runtime path covers submission, run lookup and listing, observation, cancellation, retry, and durable sleep.
+Inngest gives RELKIT tasks a durable execution path. You will prepare an Orders CSV from
+validated order rows, submit the job, and confirm both registration and completion. You need
+Bun 1.3.10 and a running Docker daemon. Start in a parent directory where `relkit-inngest`
+does not already exist. The task returns CSV text; it does not write a file or query a database.
 
-Configure it with the same `jobs.default` binding shown in the [Docker guide](/docs/jobs/docker).
+## Create the provider-backed app
 
-The current schedule path supports UTC cron schedules. Do not assume interval schedules, arbitrary timezones, overlap policies, or richer misfire behavior are available unless `relkit jobs capabilities` reports them for the selected environment.
+```sh title="Terminal — parent directory"
+bunx create-relkit@latest relkit-inngest --jobs inngest-docker --json
+cd relkit-inngest
+```
 
-The documented limits are 1 MiB input, 1 MiB output, 64 KiB progress/stream items, and 100 maximum run-list items. Progress authoring is available in task code; verify the runtime/provider evidence before depending on provider-native progress retention.
+The generator installs `@relkit/docker`, `@relkit/inngest`, and `@relkit/local`, and creates
+the task, job, and binding. Open the generated `relkit.config.ts`; it should contain this
+configuration. The `jobs` entry connects the default job service to the Docker-backed
+Inngest adapter. `defaults.jobs` selects that service for the Orders job. In an existing app,
+install these packages and extend its existing config with the two jobs entries; keep its
+current app ID and server settings.
+
+<include cwd lang="ts" meta='title="relkit.config.ts"'>
+  ../../apps/docs/examples/jobs/providers/inngest-config.ts
+</include>
+
+## Set up Inngest locally
+
+`inngest-docker` runs Inngest's local server, PostgreSQL, Redis, and a RELKIT worker. You do
+not need an Inngest Cloud account, an API key, or a separate `inngest dev` process for this
+profile. `bun run relkit local up --detach` creates provider credentials and connects the
+worker to the Inngest server. The generated config above is the connection point; do not
+paste the generated signing or event keys into source files. Start the RELKIT backend with
+`bun run dev` after the local services are healthy.
+
+To find Inngest's dashboard address, inspect the mapped port and open the `127.0.0.1` URL
+for the container ending in `service-inngest`. The host port is allocated dynamically, so
+`8288` is the **container** port, not necessarily the port to enter in your browser.
+
+```sh title="Terminal — relkit-inngest"
+docker ps --filter 'name=service-inngest' --format '{{.Names}} {{.Ports}}'
+```
+
+In the dashboard, **Functions** must list the Orders export function after the backend
+starts. This screenshot is from a fresh generated app running the task below; the native
+Inngest function list shows that it was registered, beyond RELKIT's compiled `jobs list`.
+
+![Inngest local Functions page showing the registered Orders export function](/jobs-inngest-registered.png)
+
+## Read the task before running it
+
+**Replace** the generated `src/orders/tasks/export-orders.task.ts` with this example. The
+input describes actual order lines; the task calculates each line total and returns CSV text
+plus a reconciled total. It emits progress after each row. The IDs and SKUs in this example
+are simple values without commas or newlines; add CSV escaping before accepting arbitrary
+customer-provided text. Since this is a fresh app and no run has been deployed, the version
+remains `1`. Bump it when changing a deployed task contract.
+
+<include cwd lang="ts" meta='title="src/orders/tasks/export-orders.task.ts"'>
+  ../../apps/docs/examples/jobs/providers/inngest-task.ts
+</include>
+
+The generated `src/orders/jobs/export-orders.job.ts` names the public `exportOrders` job and
+allows trigger, get, list, and watch operations. The task owns execution; the job controls
+admission and the client-facing operations.
+
+**Replace** `examples/export-orders.json` with the following input. The two rows produce
+`orderCount: 2`, `totalCents: 2100`, and CSV lines with totals `900` and `1200`.
+
+<include cwd lang="json" meta='title="examples/export-orders.json"'>
+  ../../apps/docs/examples/jobs/providers/export-orders.json
+</include>
+
+<include cwd lang="ts" meta='title="src/orders/jobs/export-orders.job.ts"'>
+  ../../templates/default/v1/tasks/src/orders/jobs/export-orders.job.ts
+</include>
+
+## Start and submit a run
+
+Check the app, start Inngest and its local dependencies, then leave the development server
+running. Start the provider **before** the backend so the worker can connect.
+
+```sh title="Terminal — relkit-inngest"
+bun run check
+bun run typecheck
+bun run relkit local up --detach
+bun run relkit local status
+bun run dev
+```
+
+In a second terminal, first prove that RELKIT registered `exportOrders` with task
+`orders.export-orders` on the `default` profile. Then trigger the job. The trigger response
+is an acceptance receipt, not proof of execution. Copy its `runId` into the final command.
+
+```sh title="Second terminal — relkit-inngest"
+bun run relkit jobs capabilities
+bun run relkit --json jobs list
+bun run relkit --json jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id orders-csv-1
+bun run relkit jobs runs get --run-id <runId>
+```
+
+Repeat the read until `run.status` is `completed`. The run moves from the `event:` receipt
+to an Inngest-native run ID. In a local-source check, the worker logged `Orders CSV prepared`
+with `orderCount: 2` and `totalCents: 2100`, and the native run completed. The current
+Inngest run lookup may report `resultAvailability: "void"` even when the task returns CSV;
+use the worker log to verify totals and do not rely on this lookup to download the CSV.
+If the run remains pending, inspect `bun run relkit local status` and the backend terminal.
+
+Open **Runs** in the same Inngest dashboard. The completed row below is the native run of
+the registered Orders export function from that fresh app, not merely a RELKIT acceptance
+receipt. Match its function name and run ID to your own run when repeating the steps.
+
+![Inngest local Runs page showing a completed Orders export run](/jobs-inngest-completed.png)
+
+The current Inngest path supports UTC cron schedules and durable sleep. Interval schedules,
+arbitrary timezones, overlap policies, and historical-build resume are not established by
+this profile. The documented limits are 1 MiB each for input and output, 64 KiB for a
+progress item, and 100 items for run listing. Check `jobs capabilities` for the selected
+environment before using an optional operation. Continue with [job clients](/docs/jobs/clients)
+to trigger and observe runs from application code.

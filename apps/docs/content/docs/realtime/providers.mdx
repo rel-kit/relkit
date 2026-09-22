@@ -21,7 +21,7 @@ Redis uses a stream reader per gateway. Do not replace this with one shared cons
 The commerce application configures distinct Redis-backed realtime, agent-state, and cache capabilities:
 
 <include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
+  ../../examples/commerce/relkit.config.ts#realtime-profiles
 </include>
 
 `defaults.realtime` selects the profile used by channels that omit `profile`. A channel can name another profile when one application needs different retention, tenancy, or infrastructure boundaries.

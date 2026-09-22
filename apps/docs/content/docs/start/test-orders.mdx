@@ -1,0 +1,66 @@
+---
+title: Test the Orders API
+description: Verify pricing, validation, persistence, authentication, and order ownership with executable tests.
+---
+
+This chapter tests the `relkit-orders` app from [Protect your orders](/docs/start/protect-orders).
+It needs the auth migration generated in that chapter. Tests create an isolated SQLite file and
+two accounts, so they do not alter the database used by `bun run dev`.
+
+## Test pricing without HTTP
+
+The price function is reusable application behavior. Add `tests/unit/orders-pricing.test.ts`
+to check the regular and bulk prices directly, without starting a server:
+
+<include cwd lang="ts" meta='title="tests/unit/orders-pricing.test.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/tests/tests/unit/orders-pricing.test.ts
+</include>
+
+Replace the API starter's `tests/unit/orders.function.test.ts` with the version below. Its
+original expectation predates persistence and calls order creation without a database; this
+version tests the public pricing operation instead.
+
+<include cwd lang="ts" meta='title="tests/unit/orders.function.test.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/database/tests/unit/orders.function.test.ts
+</include>
+
+Replace the starter's Hello and Echo integration tests with the versions below. The endpoints
+are unchanged, but every test application now needs the auth secret declared in `src/platform/env.ts`.
+
+<include cwd lang="ts" meta='title="tests/integration/hello.route.test.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/tests/tests/integration/hello.route.test.ts
+</include>
+
+<include cwd lang="ts" meta='title="tests/integration/echo.route.test.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/tests/tests/integration/echo.route.test.ts
+</include>
+
+## Test the HTTP and database boundary
+
+Replace the starter's `tests/integration/orders.route.test.ts` with this test. It migrates a
+temporary SQLite database, signs up Alice and Bob, creates an order for Alice, checks Bob cannot
+read it, and rejects invalid input. It also checks that a signed-out request receives `401`.
+
+<include cwd lang="ts" meta='title="tests/integration/orders.route.test.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/tests/tests/integration/orders.route.test.ts
+</include>
+
+The test uses `createTestApplication` for the in-process HTTP boundary. It covers these paths in
+the test harness; it does not prove every production server behavior. Keep the manual requests
+from the previous chapters for the running backend.
+
+## Run the checks
+
+From the application root, with the migration files still present:
+
+```sh title="Terminal — relkit-orders"
+bun run check
+bun run typecheck
+bun run test
+```
+
+Expect all commands to exit `0`. If the integration test cannot find `drizzle/`, finish the
+two migrations from the preceding chapters. If another test still asserts the starter's old
+response shape, update that assertion to include `quantity` and stored behavior.
+
+<include cwd>content/generated/related/start-test-orders.mdx</include>

@@ -1,5 +1,14 @@
 {
   "title": "Start",
   "icon": "Rocket",
-  "pages": ["create-an-app", "add-artifacts", "first-route", "local-development"]
+  "pages": [
+    "create-an-app",
+    "first-route",
+    "save-orders",
+    "protect-orders",
+    "test-orders",
+    "local-development",
+    "build-and-run",
+    "add-artifacts"
+  ]
 }

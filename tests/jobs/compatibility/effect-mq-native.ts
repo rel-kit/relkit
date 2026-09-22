@@ -1,25 +1,13 @@
 import assert from "node:assert/strict";
-import { PgClient } from "@effect/sql-pg";
-import {
-  DrizzleJobStore,
-  mqDedupe,
-  mqFlowChildren,
-  mqFlowOutbox,
-  mqJobAttempts,
-  mqJobs,
-  mqQueueControl,
-  mqSchedules,
-} from "effect-mq/drizzle-postgres";
 import { Job, JobStore, Worker } from "effect-mq";
-import { Effect, Layer, Option, Redacted, Schema } from "effect";
-import { docker, pgTypes, postgresImage, startPostgres } from "./effect-mq-postgres.ts";
+import { Effect, Layer, Option, Schema } from "effect";
+import { createEffectMqPostgresLayer } from "../../../integrations/packages/effect-mq/src/postgres.ts";
+import { docker, postgresImage, startPostgres } from "./effect-mq-postgres.ts";
 
 const postgres = await startPostgres();
 let started = true;
 
 try {
-  const jobs = mqJobs("effect_mq_jobs");
-  const attempts = mqJobAttempts(jobs);
   class Retryable extends Job.make("phase0-retryable", {
     payload: { key: Schema.String },
     success: Schema.String,
@@ -48,16 +36,7 @@ try {
       return attempt < 3 ? yield* Effect.fail("transient") : `completed-on-${current.attempt}`;
     }),
   );
-  const pg = PgClient.layer({ url: Redacted.make(postgres.url), types: pgTypes });
-  const store = DrizzleJobStore.layer({
-    jobs,
-    attempts,
-    schedules: mqSchedules(),
-    queues: mqQueueControl(),
-    dedupe: mqDedupe(),
-    flowChildren: mqFlowChildren(),
-    flowOutbox: mqFlowOutbox(),
-  }).pipe(Layer.provide(pg));
+  const store = createEffectMqPostgresLayer(postgres.url, "effect_mq_jobs");
 
   const nativeState = await Effect.runPromise(
     Effect.gen(function* () {

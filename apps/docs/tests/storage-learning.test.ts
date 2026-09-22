@@ -36,7 +36,7 @@ test("teaches an existing-app upload with source-backed examples and local verif
   const tutorial = await Bun.file(resolve(content, "storage/first-upload.mdx")).text();
   expect(tutorial).toContain("existing RelKit app");
   expect(tutorial).not.toContain("create-relkit");
-  expect(tutorial).toContain("relkit.config.ts#storage-profile");
+  expect(tutorial).toContain("relkit.config.ts#storage-local-profile");
   expect(tutorial).toContain("bun run dev --local=off");
   expect(tutorial).toContain("explicit replacements for profile `assets`");
   for (const source of [

@@ -5,9 +5,13 @@ description: Compare the three job adapters without hiding provider-specific lim
 
 The three advertised adapters share the task/job contract, but their native guarantees remain different.
 The selected binding and deployment environment are authoritative.
+In the current fresh-app Orders CSV check, Inngest and Effect MQ both registered and
+completed a run. Trigger.dev's local service did not become healthy. The provider guides
+show the exact setup and proof checks, including that unresolved outcome. An adapter
+capability is not a successful application run.
 
 <include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
+  ../../examples/commerce/relkit.config.ts#jobs-profile
 </include>
 
 <include cwd lang="json" meta='title="tests/jobs/compatibility/evidence/capability-matrix.json"'>

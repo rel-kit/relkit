@@ -1,9 +1,13 @@
 import { ORPCError, createClient } from "@relkit/client";
 import type { CliCommandContext } from "../main-support.js";
 import { JobsCommandError, requireOption, type ParsedJobs, usage } from "./jobs-support.js";
-import { fetchJobsJson, jobsBaseUrl, readJobsJsonFile } from "./jobs-request.js";
+import {
+  fetchJobsJson,
+  jobsBaseUrl,
+  jobsIdentityHeaders,
+  readJobsJsonFile,
+} from "./jobs-request.js";
 import { readJobsManifest, type JobsManifestView } from "./jobs-manifest.js";
-
 type RpcProcedure = (
   input: unknown,
   options?: { readonly signal?: AbortSignal },
@@ -16,7 +20,6 @@ interface JobsRpcClient {
     >
   >;
 }
-
 export async function triggerJob(parsed: ParsedJobs, signal: AbortSignal): Promise<unknown> {
   requireOption(parsed, "job");
   const inputFile = parsed.options["input-file"];
@@ -39,7 +42,6 @@ export async function triggerJob(parsed: ParsedJobs, signal: AbortSignal): Promi
     throw triggerError(error, operationId, idempotencyKey);
   }
 }
-
 export async function watchJob(
   parsed: ParsedJobs,
   context: Pick<CliCommandContext, "reporter" | "signal">,
@@ -64,7 +66,6 @@ export async function watchJob(
     await iterator.return?.();
   }
 }
-
 async function resolveWatchJob(
   parsed: ParsedJobs,
   runId: string,
@@ -83,7 +84,6 @@ async function resolveWatchJob(
     );
   return resolveJobName(parsed, jobId, manifest, signal, `run ${runId}`);
 }
-
 async function resolveJobName(
   parsed: ParsedJobs,
   requested: string,
@@ -102,7 +102,6 @@ async function resolveJobName(
     );
   return fromServer;
 }
-
 async function createJobsRpcClient(
   parsed: ParsedJobs,
   existingManifest?: JobsManifestView,
@@ -111,14 +110,11 @@ async function createJobsRpcClient(
   return createClient({
     baseUrl: jobsBaseUrl(),
     headers: {
+      ...(await jobsIdentityHeaders()),
       "x-relkit-jobs-protocol": String(manifest?.jobsProtocolVersion ?? 1),
-      ...(manifest?.publicFingerprint === undefined
-        ? {}
-        : { "x-relkit-public-fingerprint": manifest.publicFingerprint }),
     },
   }) as unknown as JobsRpcClient;
 }
-
 function triggerError(
   error: unknown,
   operationId: string,
@@ -166,7 +162,6 @@ function unknownReceipt(
     idempotencyKey,
   };
 }
-
 function findJobName(values: unknown, jobId: string): string | undefined {
   if (!Array.isArray(values)) return undefined;
   const value = values.find((entry) => {
@@ -175,7 +170,6 @@ function findJobName(values: unknown, jobId: string): string | undefined {
   });
   return text(record(value)?.name);
 }
-
 function toAsyncIterator(value: unknown): AsyncIterator<unknown> {
   if (value !== null && (typeof value === "object" || typeof value === "function")) {
     const candidate = value as {
@@ -188,13 +182,11 @@ function toAsyncIterator(value: unknown): AsyncIterator<unknown> {
   }
   throw new TypeError("Job watch procedure did not return an async iterator.");
 }
-
 function record(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : undefined;
 }
-
 function text(value: unknown): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }

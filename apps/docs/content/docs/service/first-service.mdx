@@ -1,115 +1,64 @@
 ---
-title: Example — your first service
-description: Add one domain function, expose it through a service and route, and verify both the behavior and HTTP boundary.
+title: Your first service
+description: Trace the API starter's Orders function through its public service and HTTP route.
 ---
 
-Build the smallest complete service in an existing RelKit app: a Hello domain with one function, one
-public member, and one HTTP route. No resource provider, cloud deployment, or model API key is needed
-for this operation.
+Use the `relkit-orders` app from [Create and run an application](/docs/start/create-an-app).
+You will identify which file owns pricing, which operations the Orders service exposes, and
+how a route reaches them. These files already exist in the API starter; read them before
+changing anything. Run commands from the app root.
 
-Use an app with its dependencies installed and local environment configured. If you need one, follow
-[Create an application](/docs/start/create-an-app) first. Run the commands below from your app's root,
-not the RELKIT repository root.
+## Keep behavior in the Orders domain
 
-The generated templates already contain Hello. If these files exist, read and verify them instead of
-overwriting them. Otherwise, add the files shown below. If you already have a customized Hello service
-or route, merge only the missing operation and preserve your existing behavior.
+`src/orders/functions/create-order.function.ts` validates an order request and asks
+`priceOrder` to calculate the total. It does not parse an HTTP request:
 
-## 1. Put behavior in a domain function
-
-Create `src/hello/functions/hello.function.ts`:
-
-<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
-  ../../templates/default/v1/minimal/src/hello/functions/hello.function.ts
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../templates/default/v1/api/src/orders/functions/create-order.function.ts
 </include>
 
-The function validates its input and output and records a structured log. It contains no HTTP request
-parsing. The explicit `hello.greet` ID starts with the `hello` domain prefix.
+The function can be called from HTTP, a job, or another function. Its input and output
+schemas apply on every invocation. The starter's focused unit test invokes it without
+starting a server:
 
-## 2. Expose the public operation
-
-Create `src/hello/service.ts`:
-
-<include cwd lang="ts" meta='title="src/hello/service.ts"'>
-  ../../templates/default/v1/minimal/src/hello/service.ts
+<include cwd lang="ts" meta='title="tests/unit/orders.function.test.ts"'>
+  ../../templates/default/v1/api/tests/unit/orders.function.test.ts
 </include>
 
-This single export is the domain's boundary. The service ID is inferred as `hello`. Its public member is
-also named `hello`, so the example route uses `hello.hello`: service variable first, member second.
-Neither name changes the original function's `hello.greet` identity.
+## Expose only selected operations
 
-There is no registration array to update in `relkit.config.ts`. The compiler discovers the service and
-function from source.
+The existing `src/orders/service.ts` selects the functions that other parts of the app may
+call. `priceOrder` and `createOrder` remain separate operations, so changing a price rule
+does not require moving it into a route:
 
-## 3. Add the HTTP entry point
-
-Create `src/routes/hello/route.ts`:
-
-<include cwd lang="ts" meta='title="src/routes/hello/route.ts"'>
-  ../../templates/default/v1/minimal/src/routes/hello/route.ts
+<include cwd lang="ts" meta='title="src/orders/service.ts"'>
+  ../../templates/default/v1/api/src/orders/service.ts
 </include>
 
-The import goes through the public service, not the private function file. The path supplies `/hello`
-and the named export supplies `GET`. Input mapping is inferred from the function's schema.
+The compiler discovers this service from source. You do not add it to a registration array.
+The route imports the service and selects `createOrder` for `POST /orders`:
 
-## 4. Test the function without HTTP
-
-Add `tests/unit/hello.function.test.ts` if your app does not already have the generated test:
-
-<include cwd lang="ts" meta='title="tests/unit/hello.function.test.ts"'>
-  ../../templates/default/v1/minimal/tests/unit/hello.function.test.ts
+<include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
+  ../../templates/default/v1/api/src/routes/orders/route.ts
 </include>
+
+Exposing a service member does not itself create an endpoint or grant caller permission.
+The route provides HTTP exposure; the [auth chapter](/docs/start/protect-orders) later enforces
+identity and ownership.
+
+## Verify the boundary
+
+From `relkit-orders`, run:
 
 ```sh
 bun run check
 bun run typecheck
-bun test tests/unit/hello.function.test.ts
+bun test tests/unit/orders.function.test.ts
+bun test tests/integration/orders.route.test.ts
 ```
 
-Expect all three commands to succeed. `check` validates the domain and route and generates the checked
-application artifacts. The test invokes the function through the test runtime and verifies its result;
-it does not start a server.
-
-## 5. Verify the route boundary
-
-Add `tests/integration/hello.route.test.ts` if it is not already present:
-
-<include cwd lang="ts" meta='title="tests/integration/hello.route.test.ts"'>
-  ../../templates/default/v1/minimal/tests/integration/hello.route.test.ts
-</include>
-
-```sh
-bun test tests/integration/hello.route.test.ts
-```
-
-Expect the in-process HTTP test to return status `200` and the greeting. This check exercises route
-discovery and input mapping in addition to the function behavior.
-
-For a manual request, start the app:
-
-```sh
-bun run dev
-```
-
-In another terminal, run:
-
-```sh
-curl -i 'http://localhost:3000/hello?name=RELKIT'
-```
-
-Expect HTTP `200` and `{ "message": "Hello, RELKIT!" }`. Use your app's configured backend port if it
-differs. The Inspector normally runs at `http://localhost:3210`; use it to inspect the function and its
-invocations. If startup fails because of another capability in your existing app, resolve that provider
-configuration first; Hello itself declares no provider-backed dependencies.
-
-## Grow the domain one capability at a time
-
-Add more functions under `src/hello/functions/`, then expose only those that need public callers. To
-add another capability, return to [the placement map](/docs/service/organization):
-[events](/docs/events), [caching](/docs/caching), [storage](/docs/storage), and [AI](/docs/ai) each have
-their own getting-started guides. Keep HTTP work in the [Routes topics](/docs/service/routes#continue-with-the-routes-topics).
-
-You now have the complete organization pattern: a domain owns the work, a service selects the public
-contract, and a route makes one operation reachable over HTTP.
+Expect all four commands to succeed in the fresh starter. The unit test checks the reusable
+operation; the HTTP test checks the public route's status and body. Continue with
+[the endpoint chapter](/docs/start/first-route) to change pricing and verify the result.
 
 <include cwd>content/generated/related/service-first-service.mdx</include>

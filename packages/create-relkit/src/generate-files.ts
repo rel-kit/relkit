@@ -99,6 +99,7 @@ async function customizeDeployment(root: string, options: CreateOptions): Promis
   if (options.deploy === "pulumi") manifest.dependencies["@relkit/pulumi"] = version;
   if (options.jobs !== undefined) {
     manifest.dependencies["@relkit/docker"] = version;
+    manifest.dependencies["@relkit/local"] = version;
     manifest.dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
   }
   if (options.cloud === "aws" && options.deploy === "pulumi") {

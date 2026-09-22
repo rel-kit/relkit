@@ -5,7 +5,6 @@ export interface JobsManifestView {
   readonly jobs?: readonly unknown[];
   readonly recipes?: readonly unknown[];
   readonly serviceGenerations?: readonly unknown[];
-  readonly publicFingerprint?: string;
   readonly jobsProtocolVersion?: number;
 }
 

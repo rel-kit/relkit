@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Database overview
 description: Organize durable application data, choose a database service, and keep persistence separate from business rules and public APIs.
 ---
 
@@ -41,8 +41,8 @@ MongoDB and Prisma integrations are planned, not available APIs in this release.
 describe their own APIs as they are introduced; Drizzle's method names are not a universal contract
 for future integrations. Database concepts stay separate from the currently implemented Drizzle workflow.
 
-For the Drizzle path, start with [connection setup](/docs/database/define), then
-[Your first database](/docs/database/first-database). Other database clients should remain behind your
+For the Drizzle path, follow [Save and retrieve orders](/docs/start/save-orders) for a complete
+SQLite example, then use [connection setup](/docs/database/define) for other databases. Other database clients should remain behind your
 domain's own operations until a supported integration is available; they are not automatically
 registered by naming a file `service.ts`.
 

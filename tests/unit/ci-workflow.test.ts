@@ -17,7 +17,7 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   expect(checks).toContain("name: Types and focused tests");
   expect(checks).toContain("bun x turbo run typecheck");
   expect(checks).toContain('gh workflow run checks.yml --ref "$HEAD_REF"');
-  expect(checks).toContain("github.ref == 'refs/heads/changeset-release/main'");
+  expect(checks).toContain("github.ref != 'refs/heads/main'");
   expect(checks).toContain('gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA"');
   expect(checks).not.toContain("bun run test:scaffold");
   expect(checks).not.toContain("aws-cloud");

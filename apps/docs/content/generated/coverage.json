@@ -247,79 +247,93 @@
       "path": "start/create-an-app",
       "api": ["app", "config"],
       "examples": ["templates/default/v1/api/README.md"],
-      "next": "start/add-artifacts"
-    },
-    {
-      "path": "start/add-artifacts",
-      "api": ["services", "functions", "routes"],
-      "examples": ["templates/default/v1/api/src/orders/service.ts"],
       "next": "start/first-route"
     },
     {
       "path": "start/first-route",
       "api": ["functions", "routes"],
-      "examples": ["templates/default/v1/api/src/routes/hello/route.ts"],
+      "examples": ["templates/default/v1/api/src/routes/orders/route.ts"],
+      "next": "start/save-orders"
+    },
+    {
+      "path": "start/save-orders",
+      "api": ["drizzle", "functions"],
+      "examples": ["examples/data-model/src/database/service.ts"],
+      "next": "start/protect-orders"
+    },
+    {
+      "path": "start/protect-orders",
+      "api": ["better-auth", "drizzle"],
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
+      "next": "start/test-orders"
+    },
+    {
+      "path": "start/test-orders",
+      "api": ["testing", "routes"],
+      "examples": ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
       "next": "start/local-development"
     },
     {
       "path": "start/local-development",
       "api": ["app", "routes"],
       "examples": ["templates/default/v1/api/relkit.config.ts"],
+      "next": "start/build-and-run"
+    },
+    {
+      "path": "start/build-and-run",
+      "api": ["app", "routes"],
+      "examples": ["templates/default/v1/api/package.json"],
       "next": "fundamentals/index"
+    },
+    {
+      "path": "start/add-artifacts",
+      "api": ["services", "functions", "routes"],
+      "examples": ["templates/default/v1/api/src/orders/service.ts"]
     },
     {
       "path": "fundamentals/index",
       "api": ["app", "functions", "schema"],
-      "examples": ["templates/default/v1/api/relkit.config.ts"],
-      "next": "fundamentals/application"
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
       "path": "fundamentals/application",
       "api": ["app"],
-      "examples": ["templates/default/v1/api/relkit.config.ts"],
-      "next": "fundamentals/functions"
+      "examples": ["templates/default/v1/api/relkit.config.ts"]
     },
     {
       "path": "fundamentals/functions",
       "api": ["functions"],
-      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"],
-      "next": "fundamentals/schemas"
+      "examples": ["templates/default/v1/api/src/orders/functions/create-order.function.ts"]
     },
     {
       "path": "fundamentals/schemas",
       "api": ["schema"],
-      "examples": ["examples/commerce/src/platform/schemas.ts"],
-      "next": "fundamentals/errors"
+      "examples": ["examples/commerce/src/platform/schemas.ts"]
     },
     {
       "path": "fundamentals/errors",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"],
-      "next": "fundamentals/context"
+      "examples": ["examples/commerce/src/orders/errors/order-not-found.error.ts"]
     },
     {
       "path": "fundamentals/context",
       "api": ["functions"],
-      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"],
-      "next": "fundamentals/environment"
+      "examples": ["examples/commerce/src/orders/functions/create-order.function.ts"]
     },
     {
       "path": "fundamentals/environment",
       "api": ["config"],
-      "examples": ["templates/default/v1/api/src/platform/env.ts"],
-      "next": "service/index"
+      "examples": ["templates/default/v1/api/src/platform/env.ts"]
     },
     {
       "path": "service/index",
       "api": ["services", "functions"],
-      "examples": ["examples/commerce/src/orders/service.ts"],
-      "next": "service/domains"
+      "examples": ["examples/commerce/src/orders/service.ts"]
     },
     {
       "path": "service/domains",
       "api": ["services", "events"],
-      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"],
-      "next": "service/organization"
+      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"]
     },
     {
       "path": "service/organization",
@@ -327,20 +341,17 @@
       "examples": [
         "examples/commerce/src/orders/functions/create-order.function.ts",
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts"
-      ],
-      "next": "service/define"
+      ]
     },
     {
       "path": "service/define",
       "api": ["services", "functions"],
-      "examples": ["examples/commerce/src/orders/service.ts"],
-      "next": "service/routes"
+      "examples": ["examples/commerce/src/orders/service.ts"]
     },
     {
       "path": "service/routes",
       "api": ["services", "routes"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "service/first-service"
+      "examples": ["examples/commerce/src/routes/orders/route.ts"]
     },
     {
       "path": "service/first-service",
@@ -348,122 +359,102 @@
       "examples": [
         "templates/default/v1/minimal/src/hello/service.ts",
         "templates/default/v1/minimal/tests/unit/hello.function.test.ts"
-      ],
-      "next": "http/index"
+      ]
     },
     {
       "path": "http/index",
       "api": ["routes", "services"],
-      "examples": ["templates/default/v1/api/src/routes/echo/route.ts"],
-      "next": "http/define"
+      "examples": ["templates/default/v1/api/src/routes/echo/route.ts"]
     },
     {
       "path": "http/define",
       "api": ["routes", "services"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/routes"
+      "examples": ["examples/commerce/src/routes/orders/route.ts"]
     },
     {
       "path": "http/routes",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
-      "next": "http/requests"
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
     },
     {
       "path": "http/requests",
       "api": ["routes", "schema"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/uploads"
+      "examples": ["examples/commerce/src/routes/orders/route.ts"]
     },
     {
       "path": "http/uploads",
       "api": ["routes", "schema", "buckets"],
-      "examples": ["examples/commerce/src/routes/uploads/route.ts"],
-      "next": "http/middleware"
+      "examples": ["examples/commerce/src/routes/uploads/route.ts"]
     },
     {
       "path": "http/middleware",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"],
-      "next": "http/rate-limits"
+      "examples": ["examples/commerce/src/routes/middleware/order-auth.middleware.ts"]
     },
     {
       "path": "http/rate-limits",
       "api": ["routes", "cache"],
-      "examples": ["tests/compiler/rate-limit.test.ts"],
-      "next": "http/responses"
+      "examples": ["tests/compiler/rate-limit.test.ts"]
     },
     {
       "path": "http/responses",
       "api": ["routes", "functions"],
-      "examples": ["examples/commerce/src/routes/orders/route.ts"],
-      "next": "http/streaming"
+      "examples": ["examples/commerce/src/routes/orders/route.ts"]
     },
     {
       "path": "http/streaming",
       "api": ["routes", "functions", "client"],
-      "examples": ["packages/runtime-hono/native-stream.test.ts"],
-      "next": "http/raw-handlers"
+      "examples": ["packages/runtime-hono/native-stream.test.ts"]
     },
     {
       "path": "http/raw-handlers",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"],
-      "next": "http/openapi"
+      "examples": ["examples/commerce/src/routes/api/auth/[[...auth]]/route.ts"]
     },
     {
       "path": "http/openapi",
       "api": ["routes"],
-      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"],
-      "next": "http/generated-clients"
+      "examples": ["examples/commerce/src/routes/orders/[orderId]/route.ts"]
     },
     {
       "path": "http/generated-clients",
       "api": ["client", "routes"],
-      "examples": ["examples/commerce/src/platform/generated-client.ts"],
-      "next": "http/first-route"
+      "examples": ["examples/commerce/src/platform/generated-client.ts"]
     },
     {
       "path": "http/first-route",
       "api": ["routes", "functions", "services", "testing"],
-      "examples": ["templates/default/v1/api/tests/integration/echo.route.test.ts"],
-      "next": "events/index"
+      "examples": ["templates/default/v1/api/tests/integration/echo.route.test.ts"]
     },
     {
       "path": "events/index",
       "api": ["events", "functions"],
-      "examples": ["apps/docs/examples/events/order-created.event.ts"],
-      "next": "events/define"
+      "examples": ["apps/docs/examples/events/order-created.event.ts"]
     },
     {
       "path": "events/define",
       "api": ["events"],
-      "examples": ["apps/docs/examples/events/order-created.event.ts"],
-      "next": "events/publish"
+      "examples": ["apps/docs/examples/events/order-created.event.ts"]
     },
     {
       "path": "events/publish",
       "api": ["events", "functions"],
-      "examples": ["apps/docs/examples/events/create-order.function.ts"],
-      "next": "events/consume"
+      "examples": ["apps/docs/examples/events/create-order.function.ts"]
     },
     {
       "path": "events/consume",
       "api": ["events"],
-      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"],
-      "next": "events/first-event"
+      "examples": ["apps/docs/examples/events/order-confirmation.function.ts"]
     },
     {
       "path": "events/first-event",
       "api": ["events", "functions"],
-      "examples": ["apps/docs/examples/events/create-order.function.ts"],
-      "next": "jobs/index"
+      "examples": ["apps/docs/examples/events/create-order.function.ts"]
     },
     {
       "path": "jobs/index",
       "api": ["jobs", "services", "client"],
-      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
-      "next": "jobs/quickstart"
+      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"]
     },
     {
       "path": "jobs/quickstart",
@@ -472,14 +463,12 @@
         "examples/commerce/src/orders/tasks/export-orders.task.ts",
         "examples/commerce/src/orders/jobs/export-orders.job.ts",
         "examples/commerce/src/routes/orders/export/route.ts"
-      ],
-      "next": "jobs/tasks"
+      ]
     },
     {
       "path": "jobs/tasks",
       "api": ["jobs", "schema"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
-      "next": "jobs/bindings"
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/bindings",
@@ -487,20 +476,17 @@
       "examples": [
         "examples/commerce/relkit.config.ts",
         "examples/commerce/src/orders/jobs/export-orders.job.ts"
-      ],
-      "next": "jobs/durations-and-sleep"
+      ]
     },
     {
       "path": "jobs/durations-and-sleep",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
-      "next": "jobs/execution-policy"
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/execution-policy",
       "api": ["jobs"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
-      "next": "jobs/retries-and-idempotency"
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/retries-and-idempotency",
@@ -508,26 +494,22 @@
       "examples": [
         "examples/commerce/src/orders/tasks/export-orders.task.ts",
         "packages/jobs/task-policy.test.ts"
-      ],
-      "next": "jobs/clients"
+      ]
     },
     {
       "path": "jobs/clients",
       "api": ["jobs", "client"],
-      "examples": ["packages/client/jobs-watch.test.ts"],
-      "next": "jobs/progress-and-streams"
+      "examples": ["apps/docs/examples/jobs/watch-run.ts"]
     },
     {
       "path": "jobs/progress-and-streams",
       "api": ["jobs", "client"],
-      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
-      "next": "jobs/security"
+      "examples": ["examples/commerce/src/orders/tasks/export-orders.task.ts"]
     },
     {
       "path": "jobs/security",
       "api": ["jobs", "client"],
-      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"],
-      "next": "jobs/schedules"
+      "examples": ["examples/commerce/src/orders/jobs/export-orders.job.ts"]
     },
     {
       "path": "jobs/schedules",
@@ -535,14 +517,12 @@
       "examples": [
         "examples/commerce/src/orders/jobs/cleanup-orders.job.ts",
         "packages/jobs/schedule-reconciliation.test.ts"
-      ],
-      "next": "jobs/inspector"
+      ]
     },
     {
       "path": "jobs/inspector",
       "api": ["jobs", "client"],
-      "examples": ["tests/inspector/job-name-filters.test.ts"],
-      "next": "jobs/docker"
+      "examples": ["tests/inspector/job-name-filters.test.ts"]
     },
     {
       "path": "jobs/docker",
@@ -554,101 +534,82 @@
         "integrations/trigger",
         "integrations/effect-mq"
       ],
-      "examples": ["templates/default/v1/tasks/relkit.config.ts"],
-      "next": "jobs/providers"
+      "examples": ["templates/default/v1/tasks/relkit.config.ts"]
     },
     {
       "path": "jobs/providers",
       "api": ["integrations/inngest", "integrations/trigger", "integrations/effect-mq"],
-      "examples": ["tests/jobs/compatibility/evidence/capability-matrix.json"],
-      "next": "jobs/deployment"
+      "examples": ["tests/jobs/compatibility/evidence/capability-matrix.json"]
     },
     {
       "path": "jobs/deployment",
       "api": ["jobs", "integrations/pulumi"],
-      "examples": ["examples/commerce/relkit.config.ts"],
-      "next": "jobs/testing"
+      "examples": ["examples/commerce/relkit.config.ts"]
     },
     {
       "path": "jobs/testing",
       "api": ["jobs", "testing", "client"],
-      "examples": ["packages/jobs/task-wire.test.ts", "packages/client/jobs-watch.test.ts"],
-      "next": "jobs/migration"
+      "examples": ["packages/jobs/task-wire.test.ts", "packages/client/jobs-watch.test.ts"]
     },
     {
       "path": "jobs/migration",
       "api": ["app", "jobs"],
-      "examples": [
-        "packages/jobs/migration.test.ts",
-        "apps/docs/examples/jobs/send-receipt.job.ts"
-      ],
-      "next": "jobs/troubleshooting"
+      "examples": ["packages/jobs/migration.test.ts", "apps/docs/examples/jobs/send-receipt.job.ts"]
     },
     {
       "path": "jobs/troubleshooting",
       "api": ["jobs"],
-      "examples": ["templates/default/v1/tasks/package.json"],
-      "next": "database/index"
+      "examples": ["templates/default/v1/tasks/package.json"]
     },
     {
       "path": "database/index",
       "api": ["services"],
-      "examples": ["examples/data-model/src/users/service.ts"],
-      "next": "database/drizzle"
+      "examples": ["examples/data-model/src/users/service.ts"]
     },
     {
       "path": "database/drizzle",
       "api": ["drizzle", "services"],
-      "examples": ["examples/data-model/src/database/service.ts"],
-      "next": "database/define"
+      "examples": ["examples/data-model/src/database/service.ts"]
     },
     {
       "path": "database/define",
       "api": ["drizzle", "config"],
-      "examples": ["examples/data-model/src/database/service.ts"],
-      "next": "database/schema"
+      "examples": ["examples/data-model/src/database/service.ts"]
     },
     {
       "path": "database/schema",
       "api": ["drizzle", "schema"],
-      "examples": ["examples/data-model/src/database/schema/index.ts"],
-      "next": "database/queries"
+      "examples": ["examples/data-model/src/database/schema/index.ts"]
     },
     {
       "path": "database/queries",
       "api": ["drizzle", "functions"],
-      "examples": ["examples/data-model/src/users/functions/update-user-email.function.ts"],
-      "next": "database/generated-schemas"
+      "examples": ["examples/data-model/src/users/functions/update-user-email.function.ts"]
     },
     {
       "path": "database/generated-schemas",
       "api": ["drizzle", "schema"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
-      "next": "database/models"
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
     },
     {
       "path": "database/models",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/database/models/users.model.ts"],
-      "next": "database/overrides"
+      "examples": ["examples/data-model/src/database/models/users.model.ts"]
     },
     {
       "path": "database/overrides",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/database/service.ts"],
-      "next": "database/transactions"
+      "examples": ["examples/data-model/src/database/service.ts"]
     },
     {
       "path": "database/transactions",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
-      "next": "database/migrations"
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
     },
     {
       "path": "database/migrations",
       "api": ["drizzle"],
-      "examples": ["examples/data-model/drizzle.config.ts"],
-      "next": "database/better-auth"
+      "examples": ["examples/data-model/drizzle.config.ts"]
     },
     {
       "path": "database/better-auth",
@@ -656,44 +617,37 @@
       "examples": [
         "examples/auth-drizzle/src/auth/service.ts",
         "examples/auth-drizzle/src/database/schema/index.ts"
-      ],
-      "next": "database/testing"
+      ]
     },
     {
       "path": "database/testing",
       "api": ["drizzle", "testing"],
-      "examples": ["examples/data-model/tests/data-model.test.ts"],
-      "next": "database/first-database"
+      "examples": ["examples/data-model/tests/data-model.test.ts"]
     },
     {
       "path": "database/first-database",
       "api": ["drizzle", "functions", "routes"],
-      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"],
-      "next": "auth/index"
+      "examples": ["examples/data-model/src/users/functions/register-member.function.ts"]
     },
     {
       "path": "auth/index",
       "api": ["better-auth", "services"],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
-      "next": "auth/better-auth"
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
     },
     {
       "path": "auth/better-auth",
       "api": ["better-auth", "drizzle", "config"],
-      "examples": ["examples/auth-drizzle/src/auth/service.ts"],
-      "next": "auth/sessions"
+      "examples": ["examples/auth-drizzle/src/auth/service.ts"]
     },
     {
       "path": "auth/sessions",
       "api": ["better-auth", "functions"],
-      "examples": ["examples/auth-drizzle/src/account/functions/session.function.ts"],
-      "next": "auth/protect-routes"
+      "examples": ["examples/auth-drizzle/src/account/functions/session.function.ts"]
     },
     {
       "path": "auth/protect-routes",
       "api": ["better-auth", "routes"],
-      "examples": ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"],
-      "next": "auth/clients"
+      "examples": ["examples/auth-drizzle/src/routes/api/auth/[[...auth]]/route.ts"]
     },
     {
       "path": "auth/clients",
@@ -701,8 +655,7 @@
       "examples": [
         "examples/auth-drizzle/src/platform/auth-client.ts",
         "examples/auth-drizzle/public/index.html"
-      ],
-      "next": "auth/customization"
+      ]
     },
     {
       "path": "auth/customization",
@@ -710,20 +663,17 @@
       "examples": [
         "examples/auth-drizzle/src/auth/service.ts",
         "examples/auth-drizzle/src/database/schema/index.ts"
-      ],
-      "next": "auth/testing"
+      ]
     },
     {
       "path": "auth/testing",
       "api": ["testing", "better-auth"],
-      "examples": ["examples/auth-drizzle/tests/auth.test.ts"],
-      "next": "auth/first-auth"
+      "examples": ["examples/auth-drizzle/tests/auth.test.ts"]
     },
     {
       "path": "auth/first-auth",
       "api": ["better-auth", "drizzle", "routes"],
-      "examples": ["examples/auth-drizzle/README.md"],
-      "next": "storage/index"
+      "examples": ["examples/auth-drizzle/README.md"]
     },
     {
       "path": "storage/index",
@@ -731,8 +681,7 @@
       "examples": [
         "examples/commerce/src/assets/buckets/assets.bucket.ts",
         "examples/commerce/src/assets/functions/upload-assets.function.ts"
-      ],
-      "next": "storage/define"
+      ]
     },
     {
       "path": "storage/define",
@@ -740,8 +689,7 @@
       "examples": [
         "examples/commerce/src/assets/buckets/assets.bucket.ts",
         "examples/commerce/src/assets/functions/upload-assets.function.ts"
-      ],
-      "next": "storage/upload"
+      ]
     },
     {
       "path": "storage/upload",
@@ -749,8 +697,7 @@
       "examples": [
         "examples/commerce/src/assets/buckets/assets.bucket.ts",
         "examples/commerce/src/assets/functions/upload-assets.function.ts"
-      ],
-      "next": "storage/read-delete"
+      ]
     },
     {
       "path": "storage/read-delete",
@@ -758,8 +705,7 @@
       "examples": [
         "examples/commerce/src/assets/buckets/assets.bucket.ts",
         "examples/commerce/src/assets/functions/upload-assets.function.ts"
-      ],
-      "next": "storage/first-upload"
+      ]
     },
     {
       "path": "storage/first-upload",
@@ -767,8 +713,7 @@
       "examples": [
         "examples/commerce/src/assets/buckets/assets.bucket.ts",
         "examples/commerce/src/assets/functions/upload-assets.function.ts"
-      ],
-      "next": "caching/index"
+      ]
     },
     {
       "path": "caching/index",
@@ -776,8 +721,7 @@
       "examples": [
         "examples/commerce/src/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
-      ],
-      "next": "caching/define"
+      ]
     },
     {
       "path": "caching/define",
@@ -785,8 +729,7 @@
       "examples": [
         "examples/commerce/src/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
-      ],
-      "next": "caching/read-write"
+      ]
     },
     {
       "path": "caching/read-write",
@@ -794,8 +737,7 @@
       "examples": [
         "examples/commerce/src/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
-      ],
-      "next": "caching/expiration"
+      ]
     },
     {
       "path": "caching/expiration",
@@ -803,8 +745,7 @@
       "examples": [
         "examples/commerce/src/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
-      ],
-      "next": "caching/first-cache"
+      ]
     },
     {
       "path": "caching/first-cache",
@@ -812,8 +753,7 @@
       "examples": [
         "examples/commerce/src/orders/cache/prices.cache.ts",
         "examples/commerce/tests/fixtures/get-price.function.ts"
-      ],
-      "next": "ai/index"
+      ]
     },
     {
       "path": "ai/index",
@@ -821,8 +761,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/agents"
+      ]
     },
     {
       "path": "ai/agents",
@@ -830,8 +769,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/native-runtime"
+      ]
     },
     {
       "path": "ai/native-runtime",
@@ -839,8 +777,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/graphs-persistence"
+      ]
     },
     {
       "path": "ai/graphs-persistence",
@@ -848,8 +785,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/streaming"
+      ]
     },
     {
       "path": "ai/streaming",
@@ -857,8 +793,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/threads-recovery"
+      ]
     },
     {
       "path": "ai/threads-recovery",
@@ -866,8 +801,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/approvals"
+      ]
     },
     {
       "path": "ai/approvals",
@@ -875,8 +809,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/tools"
+      ]
     },
     {
       "path": "ai/tools",
@@ -884,8 +817,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/function-tools"
+      ]
     },
     {
       "path": "ai/function-tools",
@@ -893,8 +825,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/mcp"
+      ]
     },
     {
       "path": "ai/mcp",
@@ -902,8 +833,7 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "ai/first-agent"
+      ]
     },
     {
       "path": "ai/first-agent",
@@ -911,92 +841,77 @@
       "examples": [
         "templates/default/v1/agent/src/hello/agents/assistant.agent.ts",
         "templates/default/v1/agent/src/hello/tools/lookup.tool.ts"
-      ],
-      "next": "client/index"
+      ]
     },
     {
       "path": "client/index",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/routes"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/routes",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/mutations"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/mutations",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/streams"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/streams",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/ssr"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/ssr",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/authentication"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/authentication",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "client/offline"
+      "examples": ["tests/types/client-react.ts"]
     },
     {
       "path": "client/offline",
       "api": ["client", "routes"],
-      "examples": ["tests/types/client-react.ts"],
-      "next": "realtime/index"
+      "examples": ["apps/docs/examples/jobs/reconcile-unknown.ts"]
     },
     {
       "path": "realtime/index",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"],
-      "next": "realtime/access"
+      "examples": ["examples/commerce/src/announcements/channels/announcements.channel.ts"]
     },
     {
       "path": "realtime/access",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
-      "next": "realtime/react"
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/react",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce-web/app/page.tsx"],
-      "next": "realtime/presence"
+      "examples": ["examples/commerce-web/app/page.tsx"]
     },
     {
       "path": "realtime/presence",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
-      "next": "realtime/recovery"
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/recovery",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"],
-      "next": "realtime/providers"
+      "examples": ["examples/commerce/src/orders/channels/order-updates.channel.ts"]
     },
     {
       "path": "realtime/providers",
       "api": ["realtime", "client"],
-      "examples": ["examples/commerce/relkit.config.ts"],
-      "next": "integrations/index"
+      "examples": ["examples/commerce/relkit.config.ts"]
     },
     {
       "path": "integrations/index",
       "api": ["integrations/docker", "integrations/redis", "integrations/s3"],
-      "examples": ["apps/docs/examples/landing/catalog.ts"],
-      "next": "integrations/local-docker"
+      "examples": ["apps/docs/examples/landing/catalog.ts"]
     },
     {
       "path": "integrations/local-docker",
@@ -1004,50 +919,42 @@
       "examples": [
         "integrations/packages/redis/src/local-recipe/index.ts",
         "integrations/packages/s3/src/local-recipe/index.ts"
-      ],
-      "next": "operations/index"
+      ]
     },
     {
       "path": "operations/index",
       "api": ["app", "testing"],
-      "examples": ["templates/default/v1/api/package.json"],
-      "next": "operations/observability"
+      "examples": ["templates/default/v1/api/package.json"]
     },
     {
       "path": "operations/observability",
       "api": ["functions", "routes"],
-      "examples": ["templates/default/v1/api/src/hello/functions/hello.function.ts"],
-      "next": "operations/inspector"
+      "examples": ["templates/default/v1/api/src/hello/functions/hello.function.ts"]
     },
     {
       "path": "operations/inspector",
       "api": ["app", "routes"],
-      "examples": ["tests/e2e/inspector-redesign.spec.ts"],
-      "next": "operations/realtime-agents-streaming"
+      "examples": ["tests/e2e/inspector-redesign.spec.ts"]
     },
     {
       "path": "operations/realtime-agents-streaming",
       "api": ["realtime", "agents", "client"],
-      "examples": ["packages/runtime-hono/realtime-rpc.test.ts"],
-      "next": "operations/testing"
+      "examples": ["packages/runtime-hono/realtime-rpc.test.ts"]
     },
     {
       "path": "operations/testing",
       "api": ["testing"],
-      "examples": ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
-      "next": "operations/deployment"
+      "examples": ["templates/default/v1/api/tests/integration/orders.route.test.ts"]
     },
     {
       "path": "operations/deployment",
       "api": ["app", "jobs", "events", "buckets", "cache"],
-      "examples": ["examples/commerce/relkit.config.ts"],
-      "next": "operations/troubleshooting"
+      "examples": ["examples/commerce/relkit.config.ts"]
     },
     {
       "path": "operations/troubleshooting",
       "api": ["app", "testing"],
-      "examples": ["templates/default/v1/api/package.json"],
-      "next": "operations/cli-reference"
+      "examples": ["templates/default/v1/api/package.json"]
     }
   ]
 }

@@ -1,11 +1,12 @@
 ---
 title: Testing
-description: Test function behavior and complete HTTP boundaries with the same schemas, engine, and explicit provider replacements used by the application.
+description: Test functions and in-process routes, then verify production transport behavior against a running backend.
 ---
 
 Use the smallest layer that proves the behavior. Function tests exercise one descriptor without a server.
 Application tests load checked configuration and call an in-process HTTP client. Neither layer needs remote
-credentials when provider-backed capabilities receive explicit fakes.
+credentials when provider-backed capabilities receive explicit fakes. Use a running backend for final
+HTTP middleware, origin, cookie, and transport behavior.
 
 ## Test one function
 
@@ -25,8 +26,9 @@ calling a live service.
 
 ## Test the application boundary
 
-Use `createTestApplication` for routing, request mapping, middleware, response contracts, OpenAPI behavior, and
-provider wiring:
+Use `createTestApplication` for discovered routes, mapped input, function invocation, and provider
+wiring. The [Orders tutorial test](/docs/start/test-orders) also migrates isolated SQLite and checks
+two users' ownership boundary. The starter's smallest HTTP test is:
 
 <include
   cwd
@@ -36,17 +38,18 @@ provider wiring:
   ../../templates/default/v1/api/tests/integration/orders.route.test.ts
 </include>
 
-The harness runs in process and exposes `application.http`. Close it in `afterAll` so runtime state and handles do
-not leak into another test.
+The harness runs in process and exposes `application.http`. It maps invalid function input to a
+validation `422`, but it does not implement the entire production HTTP pipeline. It does not prove
+all middleware, rate limits, OpenAPI behavior, or RPC transport. Close it in `afterAll` so runtime
+state and handles do not leak into another test, then send representative requests to the running
+backend as the Start journey does.
 
 ## Replace provider profiles explicitly
 
 The commerce suite shows the complete shape for cache, bucket, realtime, and agent-state profiles alongside
 native model execution:
 
-<include cwd lang="ts" meta='title="examples/commerce/tests/http.test.ts"'>
-  ../../examples/commerce/tests/http.test.ts
-</include>
+[Complete commerce HTTP test](https://github.com/rel-kit/relkit/blob/main/examples/commerce/tests/http.test.ts)
 
 Every graph-required capability and profile must have a replacement. `RELKIT_ENV=test` does not silently select
 fakes. Use `createTestCacheFake` and `createTestBucketFake` for deterministic resource behavior, and dedicated
@@ -61,8 +64,8 @@ bun run typecheck
 bun run build
 ```
 
-Keep live integration and cloud tests separate and opt-in. In the RELKIT repository, `bun run prepush` runs all
-locally reproducible required CI jobs and expects Docker to be available.
+Keep live integration and cloud tests separate and opt-in. In the RELKIT repository, `bun run prepush`
+runs the focused merge-blocking checks without Docker; `bun run prepush:full` includes Docker acceptance.
 
 Task-first jobs add focused unit, type, contract, restart, client, Inspector, Docker, and provider suites.
 The Docker/provider commands are explicit gates; managed cloud acceptance remains separately authorized.

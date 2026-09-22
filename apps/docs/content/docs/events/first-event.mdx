@@ -75,9 +75,7 @@ Create the files shown below. If your app already has the Orders example, update
     No environment mode silently substitutes an event provider. For a credential-free behavior test, use
     the deterministic event harness:
 
-    <include cwd lang="ts" meta='title="packages/testing/events.test.ts"'>
-      ../../packages/testing/events.test.ts
-    </include>
+    [Event-harness regression test](https://github.com/rel-kit/relkit/blob/main/packages/testing/events.test.ts)
 
     Run `bun test` and verify publication acceptance separately from consumer completion. A full local or
     deployed run needs the explicitly selected event integration described in

@@ -33,6 +33,8 @@ export async function fetchJobsJson(
   const base = `${jobsBaseUrl()}/_relkit/v1`;
   const url = `${base}${path}${query.size === 0 ? "" : `?${query}`}`;
   const headers: Record<string, string> = { accept: "application/json" };
+  if (path.startsWith("/jobs/runs") || path.startsWith("/jobs/schedules"))
+    Object.assign(headers, await jobsIdentityHeaders(options.signal));
   if (method !== "GET" || options.body !== undefined) {
     headers["content-type"] = "application/json";
     if (parsed.options["operation-id"] !== undefined)
@@ -53,6 +55,29 @@ export async function fetchJobsJson(
       `Jobs service returned ${response.status}.`,
     );
   return body;
+}
+
+export async function jobsIdentityHeaders(signal?: AbortSignal): Promise<Record<string, string>> {
+  const response = await fetch(`${jobsBaseUrl()}/_relkit/v1/client/identity`, {
+    ...(signal === undefined ? {} : { signal }),
+  });
+  if (!response.ok)
+    throw new JobsCommandError("RELKIT_JOBS_REQUEST_FAILED", "Client identity is unavailable.");
+  const identity = (await response.json()) as Record<string, unknown>;
+  const { identityScope, sessionEpoch, publicFingerprint } = identity;
+  if (
+    typeof identityScope !== "string" ||
+    typeof sessionEpoch !== "string" ||
+    typeof publicFingerprint !== "string"
+  )
+    throw new JobsCommandError("RELKIT_JOBS_REQUEST_FAILED", "Client identity is invalid.");
+  const cookies = response.headers.getSetCookie().map((cookie) => cookie.split(";", 1)[0]);
+  return {
+    "x-relkit-identity-scope": identityScope,
+    "x-relkit-session-epoch": sessionEpoch,
+    "x-relkit-public-fingerprint": publicFingerprint,
+    ...(cookies.length === 0 ? {} : { cookie: cookies.join("; ") }),
+  };
 }
 
 export function jobsBaseUrl(environmentPort = process.env.PORT): string {

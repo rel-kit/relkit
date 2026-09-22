@@ -9,17 +9,23 @@ Create the four files below. If your app already has an Assets service or an upl
 
 ## Configure storage
 
-Install `@relkit/s3` and `@relkit/docker`, then import `s3`, `docker`, and `env as binding` from the
-standalone packages and `@relkit/app/config`. Add this singular `bucket` entry inside `defineApp()`:
+Install the local S3-compatible integration from your app root:
+
+```sh title="Terminal — application root"
+bun add @relkit/s3 @relkit/docker
+```
+
+In `relkit.config.ts`, import `s3` from `@relkit/s3`, `docker` from `@relkit/docker`, and
+`env as binding` from `@relkit/app/config`. Create a `bucket` object inside `defineApp()` if the
+app has none, then add this `assets` entry:
 
 <include cwd lang="ts" meta='title="relkit.config.ts — bucket configuration"'>
-  ../../examples/commerce/relkit.config.ts#storage-profile
+  ../../examples/commerce/relkit.config.ts#storage-local-profile
 </include>
 
-Profile `assets` is connected S3-compatible storage with a Docker/MinIO overlay. Development starts the
-pinned local recipe; release builds resolve the named `ASSETS_S3_*` values. Profile `receipts` uses
-`aws(s3())`, so AWS owns its bucket and access operations in deployment. Docker never participates in
-deployment.
+`assets` starts a local MinIO recipe in development. The complete commerce application also has
+other bucket profiles; this first upload needs only `assets`. Connected and cloud ownership
+choices are described in [Define a bucket](/docs/storage/define).
 
 ## Define the bucket
 

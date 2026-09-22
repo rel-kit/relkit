@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: HTTP routes overview
 description: Understand HTTP Routes as the transport layer around domain services, then choose the guide for your endpoint.
 ---
 
@@ -28,15 +28,15 @@ The route does not contain another business handler. It selects a public functio
 HTTP values become that function's input. RELKIT checks the descriptors, generates transport artifacts,
 and registers the checked routes with the runtime.
 
-The API template's Echo endpoint is a complete minimal route:
+The API starter's Orders endpoint uses the same layers:
 
-<include cwd lang="ts" meta='title="src/routes/echo/route.ts"'>
-  ../../templates/default/v1/api/src/routes/echo/route.ts
+<include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
+  ../../templates/default/v1/api/src/routes/orders/route.ts
 </include>
 
-The directory supplies `/echo`, the named export supplies `POST`, and `target` selects the public Echo
-function. Its object input comes from JSON; its validated output becomes a JSON response. Follow
-[your first HTTP route](/docs/http/first-route) to add the function, service, route, and test to an existing app.
+The directory supplies `/orders`, the named export supplies `POST`, and the service member selects
+the public `createOrder` function. Its object input comes from JSON; its validated output becomes a
+JSON `201` response. Follow [your first HTTP route](/docs/http/first-route) to trace and verify it.
 
 ## Know where each change belongs
 

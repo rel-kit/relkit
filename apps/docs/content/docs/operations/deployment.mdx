@@ -17,9 +17,12 @@ runtime wiring remain separate roles.
 The commerce application imports its integrations, binds local, connected, and infrastructure-owned profiles,
 then selects Pulumi and AWS explicitly:
 
-<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
-  ../../examples/commerce/relkit.config.ts
+<include cwd lang="ts" meta='title="relkit.config.ts — deployment role"'>
+  ../../examples/commerce/relkit.config.ts#deployment-profile
 </include>
+
+The [complete commerce configuration](https://github.com/rel-kit/relkit/blob/main/examples/commerce/relkit.config.ts)
+also binds storage, caching, jobs, and telemetry explicitly.
 
 Cloud and deployment default to `none`. A project created with `--cloud aws --deploy pulumi` receives the
 required packages and configuration, but creation, checking, and building still provision nothing.

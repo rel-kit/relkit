@@ -22,6 +22,12 @@ test("declares the pinned PostgreSQL native adapter and account-free recipe", ()
   expect(localRecipe.workers?.[0]?.hostAliases).toEqual({
     "host.docker.internal": "host-gateway",
   });
+  expect(localRecipe.workers?.[0]?.environment?.POSTGRES_PASSWORD).toEqual({
+    secret: "postgresPassword",
+  });
+  expect(localRecipe.workers?.[0]?.command?.join(" ")).toContain(
+    'RELKIT_EFFECT_MQ_DATABASE_URL="postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit"',
+  );
   expect(localRecipe.containers?.[0]?.ports).toEqual({ postgres: 5432 });
   expect(localRecipe.volumes.postgres.persistent).toBe(true);
   expect(localRecipe.init?.[0]?.command?.some((part) => /[\r\n]/u.test(part))).toBe(false);

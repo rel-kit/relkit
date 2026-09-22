@@ -42,6 +42,24 @@ Optional integrations such as `@relkit/client`, `@relkit/drizzle`,
 `@relkit/better-auth`, providers, testing, and the CLI remain separate so the
 core API does not install the full AWS, Pulumi, Next.js, or testing stack.
 
+## AI agent skills
+
+Install the [application skill](.agents/skills/relkit-app/SKILL.md) and
+[deployment skill](.agents/skills/relkit-deploy/SKILL.md) in an application
+repository with the [Skills CLI](https://github.com/vercel-labs/skills):
+
+```sh
+npx skills add rel-kit/relkit --skill relkit-app relkit-deploy
+```
+
+The application skill covers RELKIT code placement, public APIs, and verification.
+The deployment skill covers AWS/Pulumi checks, preview, apply, and post-deploy
+verification. Both skills are also available directly in this repository under
+`.agents/skills/`.
+
+Agents can read the Fumadocs-generated [documentation index](https://relkit.up.railway.app/llms.txt)
+or [full processed documentation](https://relkit.up.railway.app/llms-full.txt).
+
 ## Develop the repository
 
 The repository requires Bun `1.3.10`.

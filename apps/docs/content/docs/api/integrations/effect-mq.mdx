@@ -327,9 +327,7 @@ declare const localRecipe: Readonly<{
       networkAliases: ReadonlyArray<string>;
       hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
-        RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
-          value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";
-        }>;
+        POSTGRES_PASSWORD: Readonly<{ secret: "postgresPassword" }>;
         RELKIT_EFFECT_MQ_MIGRATIONS: Readonly<{ value: "owned-by-jobs-service" }>;
       }>;
     }>
@@ -465,9 +463,7 @@ declare const localRecipe: Readonly<{
       networkAliases: ReadonlyArray<string>;
       hostAliases: Readonly<{ "host.docker.internal": "host-gateway" }>;
       environment: Readonly<{
-        RELKIT_EFFECT_MQ_DATABASE_URL: Readonly<{
-          value: "postgres://relkit:$POSTGRES_PASSWORD@postgres:5432/relkit";
-        }>;
+        POSTGRES_PASSWORD: Readonly<{ secret: "postgresPassword" }>;
         RELKIT_EFFECT_MQ_MIGRATIONS: Readonly<{ value: "owned-by-jobs-service" }>;
       }>;
     }>
@@ -519,7 +515,7 @@ export interface EffectMqPostgresSchema {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L13)
 
 ## createEffectMqPostgresLayer
 
@@ -534,7 +530,7 @@ declare const createEffectMqPostgresLayer: (
 ) => Layer.Layer<any, any, any>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L37)
 
 ## createEffectMqPostgresSchema
 
@@ -544,7 +540,7 @@ declare const createEffectMqPostgresLayer: (
 declare const createEffectMqPostgresSchema: (prefix?: string) => EffectMqPostgresSchema;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L22)
 
 ## runEffectMq
 
@@ -557,7 +553,7 @@ declare const runEffectMq: <A, E>(
 ) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/effect-mq/src/postgres.ts#L63)
 
 ## `index.ts`
 

@@ -6,7 +6,8 @@ description: Write and review RELKIT documentation using Relkit, repository-back
 # RELKIT Documentation Writer
 
 Write clear, task-focused documentation grounded in the current repository.
-Use Relkit to separate reader needs, not to reorganize the site's existing navigation.
+Use Relkit to separate reader needs. Change navigation through the guide catalogs when the task
+explicitly calls for a new learning sequence.
 
 ## Choose the reader's goal
 
@@ -84,6 +85,17 @@ describe the expected result, and include the catalog-generated related-content 
 ```
 
 Use the filename generated for the actual page, not the example filename above.
+
+For tutorials, state the outcome and starting application first. Before each instructional code
+block, explain why the change belongs in that file and whether the reader creates, replaces, or
+extends it. Afterward, explain the important behavior and verify it with an expected result.
+Keep one application and its file state continuous across a tutorial sequence. Put option tables
+and internal implementation details in reference or advanced guides.
+
+Prefer short named regions of executable source over entire internal test or implementation
+files. Show application-relative filenames on code blocks and link the complete source separately.
+Preserve the published sidebar order unless the user asks to change it. Link to the first working example from each feature overview.
+Use specific page titles so navigation and search results identify the task or concept.
 
 ## Verify the change
 

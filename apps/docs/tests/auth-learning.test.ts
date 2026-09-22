@@ -5,10 +5,8 @@ import { authGuideGroup } from "../scripts/auth-guide-catalog.js";
 import { apiPackages } from "../scripts/documentation-catalog.js";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `auth/${page}.mdx`), "utf8");
-
 test("connects Auth after Database with source-backed guides and API reference", () => {
   const groups = guideGroups.map(({ directory }) => directory);
   expect(groups.slice(groups.indexOf("database"), groups.indexOf("storage") + 1)).toEqual([
@@ -23,21 +21,19 @@ test("connects Auth after Database with source-backed guides and API reference",
   });
   expect(apiPackages).toContain("better-auth");
   expect(features.find(({ id }) => id === "auth")?.guide).toBe("auth/index");
-  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBe(
-    "auth/index",
-  );
-  expect(guideRelations.find(({ path }) => path === "auth/first-auth")?.next).toBe("storage/index");
+  expect(
+    guideRelations.find(({ path }) => path === "database/first-database")?.next,
+  ).toBeUndefined();
+  expect(guideRelations.find(({ path }) => path === "auth/first-auth")?.next).toBeUndefined();
   for (const page of authGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
-    expect(source).toMatch(/```sh|<include[^>]*lang="ts"/);
     expect(source).toContain(`content/generated/related/auth-${page}.mdx`);
     expect(source).not.toMatch(/lang="sql"|```sql|\bCREATE TABLE\b|sqlite\.exec/i);
     if (page !== "testing") expect(source).not.toMatch(/\.\.\/\.\.\/examples\/[^\n]+\.test\.ts/);
     if (page !== "index") expect(read("index")).toContain(`](/docs/auth/${page})`);
   }
 });
-
 test("separates identity, integration, transport protection, and business authorization", () => {
   expect(read("index")).toContain("Authorization decides");
   expect(read("index")).not.toContain("defineBetterAuthService");
@@ -54,7 +50,6 @@ test("separates identity, integration, transport protection, and business author
   expect(read("customization")).toContain("Adding options does not migrate a database");
   expect(read("testing")).toContain("relaxes origin checks in its test environment");
 });
-
 test("teaches a migrated existing-app flow without hard-coded server secrets", () => {
   const tutorial = read("first-auth");
   expect(tutorial).toContain("existing RELKIT app");

@@ -75,7 +75,7 @@ export const jobsGuideRelations = [
   {
     path: "jobs/clients",
     api: ["jobs", "client"],
-    examples: ["packages/client/jobs-watch.test.ts"],
+    examples: ["apps/docs/examples/jobs/watch-run.ts"],
   },
   {
     path: "jobs/progress-and-streams",
