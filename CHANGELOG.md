@@ -2,13 +2,6 @@
 
 ## Unreleased
 
-## 1.0.0
-
-### Changes
-
-- test(runtime-hono): make temp state cleanup idempotent
-- Adopt task-first durable jobs with explicit task identity, job admission, generated clients, and provider-specific capability diagnostics. Legacy function-target jobs and enqueue helpers remain behind the one-release compatibility window; migrate with the jobs migration guide before the next major release.
-
 ## 0.4.1
 
 ### Changes

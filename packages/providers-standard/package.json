@@ -1,6 +1,6 @@
 {
   "name": "@relkit/providers-standard",
-  "version": "1.0.0",
+  "version": "0.4.1",
   "description": "Standard provider adapters for RELKIT applications.",
   "license": "MIT",
   "repository": {
