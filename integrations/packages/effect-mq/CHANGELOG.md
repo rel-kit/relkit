@@ -1,4 +1,4 @@
-# @relkit/sentry
+# @relkit/effect-mq
 
 ## 0.5.0
 

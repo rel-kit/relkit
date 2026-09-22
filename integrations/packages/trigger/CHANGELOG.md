@@ -1,4 +1,4 @@
-# @relkit/sentry
+# @relkit/trigger
 
 ## 0.5.0
 

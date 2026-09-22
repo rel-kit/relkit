@@ -1,4 +1,4 @@
-# @relkit/sentry
+# @relkit/inngest
 
 ## 0.5.0
 
