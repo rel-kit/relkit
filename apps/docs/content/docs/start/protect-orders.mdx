@@ -1,0 +1,107 @@
+---
+title: Protect your orders
+description: Add email and password sign-in, bind new orders to the session, and keep each customer's orders private.
+---
+
+This chapter extends the same SQLite-backed `relkit-orders` app. You will add a local Better Auth
+service, then require a session for both Orders routes. A caller cannot choose an order owner in
+request JSON; the server gets that identity from the session. Stop `bun run dev` before migrating.
+
+## Add authentication to the existing database
+
+The auth scaffold installs Better Auth and creates its service and `/api/auth` route. It reuses
+the database service already in the app. It does not apply a migration or create a secret.
+
+```sh title="Terminal — relkit-orders"
+bun run relkit add auth --adapter better-auth --database-dialect sqlite
+```
+
+**Extend** `src/database/schema/index.ts` with the auth tables. The complete source below
+retains `orders` and adds the `user`, `session`, `account`, and `verification` exports Better Auth
+requires. Do not replace an existing business table when adapting this to your own application.
+
+<include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/database/schema/index.ts
+</include>
+
+Replace `src/platform/env.ts` with the existing fields plus the auth secret and base URL:
+
+<include cwd lang="ts" meta='title="src/platform/env.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/platform/env.ts
+</include>
+
+Set a stable local secret in the terminal that starts the app, then append it to the ignored
+`.env` for later restarts. Never commit that file.
+
+```sh title="Terminal — relkit-orders"
+export DATABASE_PATH=./orders.sqlite
+export BETTER_AUTH_URL=http://127.0.0.1:3000
+export BETTER_AUTH_SECRET="$(openssl rand -base64 32)"
+printf 'BETTER_AUTH_URL=%s\nBETTER_AUTH_SECRET=%s\n' \
+  "$BETTER_AUTH_URL" "$BETTER_AUTH_SECRET" >> .env
+```
+
+Review `src/auth/service.ts` and make it match the email/password configuration below:
+
+<include cwd lang="ts" meta='title="src/auth/service.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/auth/service.ts
+</include>
+
+The auth mount handles `/api/auth` and rejects signed-out calls to both `/orders` and
+`/orders/*`. Replace the scaffolded route with:
+
+<include cwd lang="ts" meta='title="src/routes/api/auth/[[...auth]]/route.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/routes/api/auth/[[...auth]]/route.ts
+</include>
+
+Generate a second migration and inspect its SQL before applying it. This keeps the existing
+Orders table and adds auth tables; do not regenerate the initial migration.
+
+```sh title="Terminal — relkit-orders"
+bun --bun drizzle-kit generate --name=auth
+bun scripts/migrate.ts
+bun run check
+```
+
+## Associate orders with the signed-in user
+
+Replace the two Orders functions below. `createOrder` obtains the user ID from the session
+and stores it with the row. `getOrder` matches both `orderId` and the session's user ID;
+someone else's order returns `found: false`.
+
+<include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/orders/functions/create-order.function.ts
+</include>
+
+<include cwd lang="ts" meta='title="src/orders/functions/get-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/auth/src/orders/functions/get-order.function.ts
+</include>
+
+```text
+request cookie → session → user ID → Orders query → owner-matching row
+```
+
+Rows created in the previous chapter have no owner. These protected reads do not reveal them to
+new accounts; this tutorial does not guess who owned an anonymous order.
+
+## Sign in and verify access
+
+Run `bun run typecheck` and `bun run dev` in the terminal with the auth environment set. In
+another terminal, first call `GET /orders/saved-1` without a cookie; expect HTTP `401`.
+Then create a local account and save its cookie:
+
+```sh title="Second terminal — relkit-orders"
+auth_cookies=$(mktemp -t relkit-orders-cookies)
+curl -i -c "$auth_cookies" http://127.0.0.1:3000/api/auth/sign-up/email \
+  -H 'content-type: application/json' -H 'origin: http://127.0.0.1:3000' \
+  --data '{"name":"Demo","email":"demo@example.com","password":"local-demo-password-123"}'
+curl -i -b "$auth_cookies" -X POST http://127.0.0.1:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"private-1","sku":"book","quantity":3}'
+curl -b "$auth_cookies" http://127.0.0.1:3000/orders/private-1
+```
+
+Expect sign-up and POST success, followed by `found: true`. A different signed-in account
+receives `found: false` for `private-1`.
+
+<include cwd>content/generated/related/start-protect-orders.mdx</include>

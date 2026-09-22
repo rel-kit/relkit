@@ -13,7 +13,7 @@
     "generate": "bun run scripts/generate.ts",
     "generate:check": "bun run scripts/generate.ts --check",
     "start": "next start --hostname 0.0.0.0",
-    "test": "bun test tests",
+    "test": "bun test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

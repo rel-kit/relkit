@@ -1,66 +1,41 @@
 import { expect, test } from "bun:test";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
+import { guideGroups, guideRelations, startJourney } from "../scripts/guide-catalog.js";
 
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `start/${page}.mdx`), "utf8");
 
-test("keeps Start to four local onboarding guides before Core concepts", () => {
-  const pages = ["create-an-app", "add-artifacts", "first-route", "local-development"];
+test("keeps a single ordered Orders journey with optional scaffolding last", () => {
+  const pages = [...startJourney.map((path) => path.slice(6)), "add-artifacts"];
   expect(guideGroups.find(({ directory }) => directory === "start")?.pages).toEqual(pages);
   expect(JSON.parse(readFileSync(resolve(content, "start/meta.json"), "utf8"))).toEqual({
     title: "Start",
     icon: "Rocket",
     pages,
   });
-  expect(readdirSync(resolve(content, "start")).sort()).toEqual([
-    "add-artifacts.mdx",
-    "create-an-app.mdx",
-    "first-route.mdx",
-    "local-development.mdx",
-    "meta.json",
-  ]);
-  expect(guideRelations.find(({ path }) => path === "start/local-development")?.next).toBe(
-    "fundamentals/index",
-  );
+  for (const [index, path] of startJourney.entries()) {
+    expect(existsSync(resolve(content, `${path}.mdx`))).toBe(true);
+    expect(guideRelations.find((item) => item.path === path)?.next).toBe(
+      startJourney[index + 1] ?? "fundamentals/index",
+    );
+  }
   for (const page of ["check", "build", "production"]) {
     expect(guideRelations.some(({ path }) => path === `start/${page}`)).toBe(false);
     expect(existsSync(resolve(content, `../generated/related/start-${page}.mdx`))).toBe(false);
   }
 });
 
-test("connects the existing-app workflow to public service operations and capability guides", () => {
+test("uses the same Orders app from creation through the production build", () => {
   expect(read("create-an-app")).toContain("--template api");
-  expect(read("create-an-app")).toContain("Cloud and deployment default to `none`");
-  expect(read("first-route")).toContain("../../templates/default/v1/api/src/hello/service.ts");
-  expect(read("first-route")).toContain(
-    "../../templates/default/v1/api/src/hello/functions/hello.function.ts",
-  );
-  expect(read("first-route")).toContain("../../templates/default/v1/api/src/routes/hello/route.ts");
-  expect(read("first-route")).toContain("rather than overwriting it");
-  const local = read("local-development");
-  for (const command of ["bun run check", "bun run typecheck", "bun run test"])
-    expect(local).toContain(command);
-  for (const guide of [
-    "service",
-    "http",
-    "events",
-    "jobs",
-    "database",
-    "auth",
-    "storage",
-    "caching",
-    "ai",
-  ]) {
-    expect(local).toContain(`](/docs/${guide})`);
-  }
-  for (const command of ["check", "build", "start"]) {
-    expect(local).toContain(`/docs/operations/cli-reference#relkit-${command}`);
-  }
+  expect(read("create-an-app")).toContain("POST http://localhost:3000/orders");
+  expect(read("first-route")).toContain("../../templates/default/v1/api/src/routes/orders/route.ts");
+  expect(read("save-orders")).toContain("src/database/schema/index.ts");
+  expect(read("protect-orders")).toContain("session's user ID");
+  expect(read("test-orders")).toContain("bun run test");
+  expect(read("build-and-run")).toContain("bun run start");
   const landing = readFileSync(resolve(content, "index.mdx"), "utf8");
   expect(landing).toContain('href="/docs/fundamentals"');
-  expect(landing).not.toContain("through a local production build");
 });
 
 test("redirects retired Start URLs directly to current guidance", () => {

@@ -1,137 +1,63 @@
 ---
-title: Run and add your first route
-description: Start the generated API, understand the existing hello operation, then add and verify a new status endpoint.
+title: Understand and change an endpoint
+description: Trace POST /orders through the route, service, and functions, then change pricing and verify validation.
 ---
 
-You will first prove that the generated application works unchanged. Then you will reuse its Hello
-function through a new route so the compiler, reload loop, OpenAPI document, and inspector all receive
-a real source change. To add a new domain function and validated POST endpoint together, follow
-[Your first HTTP route](/docs/http/first-route).
+This chapter continues the `relkit-orders` app from [Create and run an application](/docs/start/create-an-app).
+You will change the price for bulk orders and verify both successful and invalid requests. Keep `bun run dev`
+running and use a second terminal for commands.
 
-Start in the `relkit-orders` directory from [Create an application](/docs/start/create-an-app), with
-dependencies installed and `.env` copied from `.env.example`. The commands below run inside that app,
-not the RELKIT monorepo root.
+## Follow the request
 
-## Run the generated route
+The path and HTTP method come from `src/routes/orders/route.ts`. The route selects the public
+`createOrder` operation and returns `201` after it succeeds:
 
-<Steps>
-  <Step>
-    ### Start development
-
-    ```sh title="Terminal — relkit-orders"
-    bun run dev
-    ```
-
-    Keep this terminal open. RELKIT starts the backend on `http://localhost:3000` and the inspector on
-    `http://localhost:3210`.
-
-  </Step>
-  <Step>
-    ### Call the hello route
-
-    In a second terminal:
-
-    ```sh title="Terminal — relkit-orders"
-    curl "http://localhost:3000/hello?name=RELKIT"
-    ```
-
-    Expected response:
-
-    ```json title="HTTP 200"
-    { "message": "Hello, RELKIT!" }
-    ```
-
-  </Step>
-</Steps>
-
-## Follow the domain operation
-
-The Hello function owns validation and behavior:
-
-<include cwd lang="ts" meta='title="src/hello/functions/hello.function.ts"'>
-  ../../templates/default/v1/api/src/hello/functions/hello.function.ts
+<include cwd lang="ts" meta='title="src/routes/orders/route.ts"'>
+  ../../templates/default/v1/api/src/routes/orders/route.ts
 </include>
 
-The owning service exposes it as `hello`:
+The service exposes `createOrder` and `priceOrder` from the Orders domain:
 
-<include cwd lang="ts" meta='title="src/hello/service.ts"'>
-  ../../templates/default/v1/api/src/hello/service.ts
+<include cwd lang="ts" meta='title="src/orders/service.ts"'>
+  ../../templates/default/v1/api/src/orders/service.ts
 </include>
 
-The route imports that service and targets `hello.hello`. Its folder supplies `/hello`, its named `GET`
-export supplies the HTTP method, and the input schema supplies the `name` query parameter and its
-`world` default. The request reaches the same function through this boundary:
+`createOrder` validates `orderId`, `sku`, and a positive integer `quantity`, then invokes `priceOrder`.
+That function owns the price rule. The route stays small so the same behavior can serve other callers.
 
 ```text
-GET /hello?name=RELKIT → route → Hello service's hello operation → function → validated response
+POST /orders → route → Orders service → createOrder → priceOrder → validated JSON
 ```
 
-Keep business logic in the owning domain, not the route file. See [Service organization](/docs/service/organization)
-for where to add functions and other capabilities, and [HTTP Routes](/docs/http) for transport details.
+## Change one rule
 
-## Add a second route
+Open the **existing** `src/orders/functions/price-order.function.ts`. Replace its handler with the
+source below. Orders of 10 or more units now cost 90 cents each; smaller orders still cost 100 cents
+each. The input and output schemas remain unchanged.
 
-<Files>
-  <Folder name="src" defaultOpen>
-    <Folder name="routes" defaultOpen>
-      <Folder name="status" defaultOpen>
-        <File name="route.ts" />
-      </Folder>
-    </Folder>
-  </Folder>
-</Files>
+<include cwd lang="ts" meta='title="src/orders/functions/price-order.function.ts"'>
+  ../../apps/docs/examples/orders-tutorial/steps/endpoint/src/orders/functions/price-order.function.ts
+</include>
 
-<Steps>
-  <Step>
-    ### Create the route directory
+The development server checks and reloads this source. Verify the changed price:
 
-    Reuse the checked hello function through a second transport descriptor:
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"bulk-1","sku":"book","quantity":10}'
+```
 
-    This tutorial assumes `src/routes/status/route.ts` does not already exist. If your app already has
-    that route, choose another unused path rather than overwriting it.
+Expect HTTP `201` and `totalCents: 900`. Then send an invalid quantity:
 
-    ```sh title="Terminal — relkit-orders"
-    mkdir -p src/routes/status
-    cp src/routes/hello/route.ts src/routes/status/route.ts
-    ```
+```sh title="Second terminal — relkit-orders"
+curl -i -X POST http://localhost:3000/orders \
+  -H 'content-type: application/json' \
+  -d '{"orderId":"bad-1","sku":"book","quantity":0}'
+```
 
-  </Step>
-  <Step>
-    ### Understand the executable source
+Expect a validation response, not an order. Run `bun run check` and `bun run typecheck` after the
+change. `check` verifies the discovered route and function contracts; typecheck verifies TypeScript.
 
-    The copied file is the canonical API-template route below:
-
-    <include cwd lang="ts" meta='title="src/routes/status/route.ts"'>
-      ../../templates/default/v1/api/src/routes/hello/route.ts
-    </include>
-
-    The filesystem folder changes the route path to `/status`; the `GET` export and hello target remain
-    unchanged. `@app/*` maps to the project's `src/*` directory, so imports stay stable when a file moves
-    deeper in the route tree. Keep the `.js` extension because the compiled application runs as ESM.
-
-  </Step>
-  <Step>
-    ### Verify reload and transport output
-
-    ```sh title="Terminal — relkit-orders"
-    curl -i "http://localhost:3000/status?name=RELKIT"
-    bun run check
-    ```
-
-    Expect `HTTP/1.1 200`, `{ "message": "Hello, RELKIT!" }`, and a successful check. OpenAPI, the
-    generated client contract, graph, and inspector now contain both `/hello` and `/status`.
-
-  </Step>
-</Steps>
-
-<Callout type="warn" title="Do not edit generated route data">
-  Route identity, OpenAPI, the client, and graph files are derived from source. Correct the
-  descriptor and rerun `check`; never patch `.relkit/generated`.
-</Callout>
-
-You now have two HTTP paths to one domain operation, without duplicating its handler or schemas.
-Continue with [Local development](/docs/start/local-development) to inspect reloads and verify changes.
-When you need a new business operation rather than another path, follow
-[Your first service](/docs/service/first-service) and [Your first HTTP route](/docs/http/first-route).
+The response still disappears after each request because this chapter has no database.
 
 <include cwd>content/generated/related/start-first-route.mdx</include>

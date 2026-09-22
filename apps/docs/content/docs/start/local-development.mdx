@@ -1,184 +1,63 @@
 ---
-title: Local development
-description: Iterate on a running app, inspect routes and diagnostics, verify changes, and choose the next capability to add.
+title: Inspect and develop
+description: Use reload diagnostics, the Inspector, and generated HTTP documentation to understand a running Orders API.
 ---
 
-`bun run dev` runs the complete local feedback loop. It watches application source, checks a candidate
-generation, starts it, verifies readiness, and only then makes it active.
+import inspectorLight from "../../../public/inspector-light.png";
+import inspectorDark from "../../../public/inspector-dark.png";
 
-This guide continues in the app created by [Create an application](/docs/start/create-an-app). The reload
-exercise uses `/status` from [Run and add your first route](/docs/start/first-route); add that route first,
-or use the existing `/hello` route and its source file instead. Keep `.env` loaded with the local defaults.
+Continue in the tested `relkit-orders` app from [Test the Orders API](/docs/start/test-orders).
+Keep the same SQLite file and authentication environment. This chapter deliberately makes one
+temporary source error, repairs it, and checks the active app.
 
-## Development endpoints
+## Know the local surfaces
 
-| Surface          | Default URL                                      | Use it for                                     |
-| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
-| Application      | `http://localhost:3000`                          | Calling authored routes                        |
-| Inspector        | `http://localhost:3210`                          | Graph, diagnostics, logs, requests, and traces |
-| OpenAPI JSON     | `http://localhost:3000/_relkit/v1/openapi.json`  | Tooling and client generation                  |
-| Scalar reference | `http://localhost:3000/_relkit/v1/api-reference` | Interactive HTTP documentation                 |
-| Readiness        | `http://localhost:3000/_relkit/v1/health/ready`  | Confirming the active generation can serve     |
+| Surface | Default address | What it shows |
+| --- | --- | --- |
+| Backend | `http://localhost:3000` | Your Orders routes |
+| Inspector | `http://localhost:3210` | Functions, routes, requests, logs, and diagnostics |
+| HTTP reference | `http://localhost:3000/_relkit/v1/api-reference` | Generated endpoint contracts |
+| Readiness | `http://localhost:3000/_relkit/v1/health/ready` | Whether the active generation can serve |
 
-## Follow a source change
+Start `bun run dev` and open the Inspector. Choose **Routes**, then `POST /orders` to see the
+public function it targets. Open **Functions** and find the Orders pricing and creation
+operations. The inspector shows the checked application, not a second configuration to edit.
 
-<Steps>
-  <Step>
-    ### Keep the supervisor running
+The commerce demo below shows the same **Routes** navigation item and **Open route** action
+you will use in your app:
 
-    ```sh title="Terminal — relkit-orders"
-    bun run dev
-    ```
+<div className="dark:hidden">
+  <ImageZoom src={inspectorLight} alt="Inspector Routes page in light mode, with Orders routes and Open route controls" />
+</div>
+<div className="hidden dark:block">
+  <ImageZoom src={inspectorDark} alt="Inspector Routes page in dark mode, with Orders routes and Open route controls" />
+</div>
 
-    Wait for both URLs before editing.
+## See a failed reload safely
 
-  </Step>
-  <Step>
-    ### Make an invalid edit safely
+In `src/routes/orders/route.ts`, temporarily misspell `defineServiceRoutes` and save. The
+development terminal reports a source diagnostic. The last valid generation remains active;
+a new broken candidate does not replace it. Restore the spelling and save again.
 
-    Temporarily misspell `defineRoute` in `src/routes/status/route.ts` and save. The candidate fails with a
-    source-located diagnostic, while the last valid `/status` generation remains active.
+Check readiness and the protected route after the repaired generation activates:
 
-  </Step>
-  <Step>
-    ### Repair and verify activation
-
-    Restore `defineRoute`, save, and call:
-
-    ```sh title="Terminal — relkit-orders"
-    curl "http://localhost:3000/status"
-    curl "http://localhost:3000/_relkit/v1/health/ready"
-    ```
-
-    The status route returns `{ "message": "Hello, world!" }`; readiness succeeds for the new generation.
-
-  </Step>
-</Steps>
-
-## Add artifacts while dev is running
-
-Keep the dev terminal open and run scaffolding in a second terminal at the application root:
-
-```sh
-bun run relkit add service Billing --full
+```sh title="Second terminal — relkit-orders"
+curl -i http://localhost:3000/_relkit/v1/health/ready
+curl -i http://localhost:3000/orders/private-1
 ```
 
-Dev defers scaffold-triggered reloads until the add transaction finishes writing, installing, and
-checking (or rolling back). It coalesces the changes into a reload instead of compiling half-installed
-dependencies. Temporary scaffold files are ignored. A failed reload keeps the previous active version;
-an initial startup failure has no previous version to serve.
+Expect readiness success and `401` for the signed-out Orders request. If the app did not
+reactivate, run `bun run check` and fix its first diagnostic. The last valid generation can
+serve requests while a changed candidate is invalid, but an initial startup failure has no
+previous generation to keep serving.
 
-Normal logs show a changed-file count and the actionable error without repeated framework stacks.
-For full file lists and diagnostics, restart with `bun run dev --verbose`. Use
-`bun run relkit --json dev` for structured logs; JSON and Inspector records retain diagnostic details.
+## Inspect the generated contract
 
-If an agent uses a production LangChain model package, populate that provider's documented server-side
-credentials before its candidate can start. The generated offline model needs none. Saving `.env` retries an
-active dev session; after an initial startup failure, run `bun run dev` again. See
-[post-add Docker approval](/docs/start/add-artifacts#start-local-resources) for cache/bucket dependencies.
+Open the HTTP reference above and find `POST /orders` and `GET /orders/{orderId}`. Compare
+their methods, paths, and request shapes with the source. The checked graph and OpenAPI files
+under `.relkit/generated` are useful for diagnosis; repair source, then rerun `check`.
 
-## Configure ports and body limits
-
-The API template's configuration shows the server port, maximum request body size, and inspector port:
-
-<include cwd lang="ts" meta='title="API template — relkit.config.ts"'>
-  ../../templates/default/v1/api/relkit.config.ts
-</include>
-
-Cloud and deployment default to `none`; the generated configuration therefore contains no AWS or Pulumi
-selection. Passing `--cloud aws --deploy pulumi` adds those explicit imports and roles, but still provisions
-nothing until a deployment command runs.
-
-Application port precedence is `--port`, `PORT`, `server.port`, then `3000`. Inspector precedence is
-`--inspector-port`, `RELKIT_INSPECTOR_PORT`, `inspector.port`, then `3210`.
-
-To choose different ports for one local run, stop the current development process and run:
-
-```sh title="Terminal — relkit-orders"
-bun run dev --port 3002 --inspector-port 3212
-```
-
-Use the printed URLs for subsequent requests. For request-size behavior, see [HTTP requests](/docs/http/requests).
-
-<Accordions type="multiple">
-  <Accordion title="The backend port is already in use">
-    Run `bun run relkit doctor --no-pulumi --port 3000 --inspector-port 3210`. Stop the reported
-    process or choose a different port.
-  </Accordion>
-  <Accordion title="A save does not activate">
-    Read the first candidate diagnostic and run `bun run check`. A schema, graph,
-    provider-readiness, or evaluation error prevents activation by design.
-  </Accordion>
-  <Accordion title="Stopping development">
-    Press `Ctrl-C` once in the supervisor terminal. RELKIT forwards shutdown to both child
-    processes.
-  </Accordion>
-</Accordions>
-
-Installed projects use the inspector bundled with `@relkit/cli`. `RELKIT_INSPECTOR_ROOT` is only for
-framework contributors selecting another compatible inspector checkout.
-
-## Control declared local services
-
-`check` writes a deterministic local-service plan without probing Docker. During `dev`, RELKIT starts only
-the graph-required `docker(adapter)` recipes and waits for their protocol health checks before activation.
-Unchanged healthy services and persistent volumes survive candidate reloads.
-
-```sh title="Terminal — relkit-orders"
-bun run relkit local status
-bun run relkit local up --detach
-bun run dev --local=off
-bun run relkit local stop
-```
-
-Use `--local=off` when you want every required binding to resolve from its connected or infrastructure
-values. `local reset --yes` also removes this project's labelled volumes and override state; it refuses a
-live attached lease and never targets another checkout.
-
-## Verify changes
-
-From the application root, run these checks after changing a function, service, route, or configuration:
-
-```sh title="Terminal — relkit-orders"
-bun run check
-bun run typecheck
-bun run test
-```
-
-`check` validates RELKIT's application graph and refreshes generated contracts; `typecheck` checks
-project-wide TypeScript types; tests exercise behavior. Fix the first source-located diagnostic and
-rerun the checks. A valid graph alone does not prove business correctness or provision external services.
-
-Inspect `.relkit/generated/application.graph.json` and `diagnostics.json` when troubleshooting, but
-change the authored source rather than generated files. For command flags, see
-[`relkit check`](/docs/operations/cli-reference#relkit-check). For focused tests and fakes, see
-[Testing](/docs/operations/testing); for runtime investigation, see [Inspector](/docs/operations/inspector)
-and [Troubleshooting](/docs/operations/troubleshooting).
-
-When you need to check a release locally, stop `dev`, run `bun run build`, then `bun run start`. Building
-and starting are not cloud deployment. Use the CLI reference for
-[`build`](/docs/operations/cli-reference#relkit-build) and [`start`](/docs/operations/cli-reference#relkit-start),
-and [Deployment](/docs/operations/deployment) only when you are ready to configure cloud resources.
-
-## Continue with your application's capabilities
-
-Read [Core concepts](/docs/fundamentals) to understand the application graph and function runtime, then
-use [Service](/docs/service) for domain ownership and public boundaries. Choose the guide for your next
-product requirement:
-
-| What you want to add                    | Getting started            |
-| --------------------------------------- | -------------------------- |
-| A new endpoint or request mapping       | [HTTP Routes](/docs/http)  |
-| Facts other operations react to         | [Events](/docs/events)     |
-| Deferred or scheduled work              | [Jobs](/docs/jobs)         |
-| Durable records and data models         | [Database](/docs/database) |
-| Sign-in, sessions, and protected access | [Auth](/docs/auth)         |
-| File upload and retrieval               | [Storage](/docs/storage)   |
-| Reusable cached results                 | [Caching](/docs/caching)   |
-| Tools and agents                        | [AI](/docs/ai)             |
-
-Add each capability to its owning domain as the product needs it; completing Start does not require
-configuring every integration. Use [Service organization](/docs/service/organization) when deciding
-where a new function, tool, agent, event, or resource should live.
+`bun run check`, `bun run typecheck`, and `bun run test` cover different concerns: graph
+relationships, TypeScript types, and behavior.
 
 <include cwd>content/generated/related/start-local-development.mdx</include>
