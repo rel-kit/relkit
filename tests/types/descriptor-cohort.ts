@@ -5,7 +5,7 @@ import { defineCache } from "@relkit/cache";
 import { defineEnv, env, type EnvRef } from "@relkit/config";
 import { defineEvent, defineEventFunction, type EventEnvelope } from "@relkit/events";
 import { defineError, defineFunction } from "@relkit/functions";
-import { defineJob } from "@relkit/jobs";
+import { defineJob } from "@relkit/jobs/legacy";
 import { defineRoute, http } from "@relkit/routes";
 import { z, type InferInput, type InferOutput } from "@relkit/schema";
 import { defineTool } from "@relkit/tools";

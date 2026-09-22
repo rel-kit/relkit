@@ -17,6 +17,12 @@ import {
 } from "./api-request-utils";
 import { assertEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
+import { invokeInspectorRouteStream } from "./api-methods";
+import type {
+  RouteInvocationInput,
+  RouteInvocationResult,
+  RouteStreamFrame,
+} from "./route-request";
 
 interface CacheEntry {
   readonly value: unknown;
@@ -104,6 +110,23 @@ export class InspectorApiTransport {
     const selected = new Set(tags);
     for (const [key, entry] of this.cache)
       if (entry.tags.some((tag) => selected.has(tag))) this.cache.delete(key);
+  }
+
+  invokeRouteStream(
+    input: RouteInvocationInput,
+    format: "sse" | "text" | "bytes",
+    onFrame: (frame: RouteStreamFrame) => void,
+    signal: AbortSignal,
+  ): Promise<RouteInvocationResult> {
+    return invokeInspectorRouteStream(
+      this.fetcher,
+      this.baseUrl,
+      this.headers,
+      input,
+      format,
+      onFrame,
+      signal,
+    );
   }
 
   protected queryString(input: InspectorQuery): string {

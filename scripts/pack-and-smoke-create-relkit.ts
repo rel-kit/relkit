@@ -4,6 +4,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { exerciseScaffoldRoutes, verifyScaffoldBuild } from "./scaffold-smoke-workflows.js";
 import { verifyInteractiveResolver, verifyScaffoldTerminal } from "./scaffold-smoke-terminal.js";
+import { addArtifacts } from "./pack-and-smoke-create-relkit-artifacts.js";
 import {
   runCommand,
   snapshotProject,
@@ -67,120 +68,116 @@ async function main(): Promise<void> {
     const relkitBin = join(temporary, "node_modules/.bin/relkit");
     await verifyInteractiveResolver(temporary);
     for (const template of releaseTemplates) {
-      const generationCache = (name: string) => join(cacheDir, `${template}-${name}`);
-      const base = [
-        "--template",
-        template,
-        "--cloud",
-        "none",
-        "--deploy",
-        "none",
-        "--install",
-        "--no-git",
-        "--examples",
-        "--json",
-      ];
-      const args = (directory: string) => [`${template}-app`, "--directory", directory, ...base];
-      const direct = JSON.parse(
-        (
+      const jobVariants: readonly (string | undefined)[] =
+        template === "minimal"
+          ? [
+              undefined,
+              "inngest-docker",
+              "effect-mq-docker",
+              ...(process.env.RELKIT_TEST_DOCKER === "1" ? [] : ["trigger-docker"]),
+            ]
+          : [undefined];
+      for (const jobs of jobVariants) {
+        const projectTemplate = jobs === undefined ? template : `tasks-${jobs}`;
+        const generationCache = (name: string) => join(cacheDir, `${projectTemplate}-${name}`);
+        const base = [
+          "--template",
+          template,
+          ...(jobs === undefined ? [] : ["--jobs", jobs]),
+          "--cloud",
+          "none",
+          "--deploy",
+          "none",
+          "--install",
+          "--no-git",
+          "--examples",
+          "--json",
+        ];
+        const args = (directory: string) => [
+          `${projectTemplate}-app`,
+          "--directory",
+          directory,
+          ...base,
+        ];
+        const direct = JSON.parse(
+          (
+            await runCommand(
+              [createBin, ...args(`${projectTemplate}-tarball-project`)],
+              temporary,
+              registry,
+              generationCache("direct"),
+            )
+          )
+            .trim()
+            .split(/\r?\n/)
+            .at(-1)!,
+        ) as { destination: string };
+        const cli = JSON.parse(
           await runCommand(
-            [createBin, ...args(`${template}-tarball-project`)],
+            [relkitBin, "create", ...args(`${projectTemplate}-cli-project`)],
             temporary,
             registry,
-            generationCache("direct"),
-          )
+            generationCache("cli"),
+          ),
+        ) as { destination: string };
+        if (
+          !direct.destination.endsWith(`/${projectTemplate}-tarball-project`) ||
+          !cli.destination.endsWith(`/${projectTemplate}-cli-project`)
         )
-          .trim()
-          .split(/\r?\n/)
-          .at(-1)!,
-      ) as { destination: string };
-      const cli = JSON.parse(
-        await runCommand(
-          [relkitBin, "create", ...args(`${template}-cli-project`)],
-          temporary,
-          registry,
-          generationCache("cli"),
-        ),
-      ) as { destination: string };
-      if (
-        !direct.destination.endsWith(`/${template}-tarball-project`) ||
-        !cli.destination.endsWith(`/${template}-cli-project`)
-      )
-        throw new Error(`Packed ${template} generators returned unexpected destinations.`);
-      const directBytes = await snapshotProject(direct.destination);
-      if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(cli.destination)))
-        throw new Error(`Packed ${template} generators generated different bytes.`);
-      // Starter tests isolate provider credentials/replacements; additions are exercised live below.
-      for (const root of [direct.destination, cli.destination])
-        for (const script of ["test", "build"]) await runCommand(["run", script], root);
-      await addArtifacts(relkitBin, direct.destination, registry, cacheDir);
-      await addArtifacts(relkitBin, cli.destination, registry, cacheDir);
-      if (
-        JSON.stringify(await snapshotProject(direct.destination)) !==
-        JSON.stringify(await snapshotProject(cli.destination))
-      )
-        throw new Error(`Packed ${template} chained additions generated different bytes.`);
-      for (const root of [direct.destination, cli.destination]) {
-        try {
-          if (process.env.RELKIT_TEST_DOCKER === "1") await verifyScaffoldTerminal(root, relkitBin);
-          await verifyScaffoldBuild(root);
-          await verifyProject(root, registry, cacheDir, (port) =>
-            exerciseScaffoldRoutes(root, port, relkitBin),
-          );
-        } finally {
-          if (process.env.RELKIT_TEST_DOCKER === "1")
-            await runCommand([relkitBin, "local", "reset", "--yes", "--project-root", root], root);
+          throw new Error(`Packed ${projectTemplate} generators returned unexpected destinations.`);
+        const directBytes = await snapshotProject(direct.destination);
+        const cliBytes = await snapshotProject(cli.destination);
+        if (JSON.stringify(directBytes) !== JSON.stringify(cliBytes))
+          throw new Error(`Packed ${projectTemplate} generators generated different bytes.`);
+        // Starter tests isolate provider credentials/replacements; additions are exercised live below.
+        for (const root of [direct.destination, cli.destination])
+          for (const script of ["test", "build"]) await runCommand(["run", script], root);
+        await addArtifacts(relkitBin, direct.destination, registry, cacheDir);
+        await addArtifacts(relkitBin, cli.destination, registry, cacheDir);
+        const directAfterAdd = await snapshotProject(direct.destination);
+        const cliAfterAdd = await snapshotProject(cli.destination);
+        if (JSON.stringify(directAfterAdd) !== JSON.stringify(cliAfterAdd))
+          throw new Error(`Packed ${projectTemplate} chained additions generated different bytes.`);
+        for (const root of [direct.destination, cli.destination]) {
+          try {
+            if (process.env.RELKIT_TEST_DOCKER === "1")
+              await verifyScaffoldTerminal(root, relkitBin);
+            await verifyScaffoldBuild(root);
+            await verifyProject(root, registry, cacheDir, (port) =>
+              exerciseScaffoldRoutes(root, port, relkitBin),
+            );
+          } finally {
+            if (process.env.RELKIT_TEST_DOCKER === "1")
+              await runCommand(
+                [relkitBin, "local", "reset", "--yes", "--project-root", root],
+                root,
+              );
+          }
         }
-      }
-      const second = JSON.parse(
-        (
-          await runCommand(
-            [createBin, ...args(`${template}-second-project`)],
-            temporary,
-            registry,
-            generationCache("second"),
+        const second = JSON.parse(
+          (
+            await runCommand(
+              [createBin, ...args(`${projectTemplate}-second-project`)],
+              temporary,
+              registry,
+              generationCache("second"),
+            )
           )
+            .trim()
+            .split(/\r?\n/)
+            .at(-1)!,
+        ) as { destination: string };
+        if (
+          JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(second.destination))
         )
-          .trim()
-          .split(/\r?\n/)
-          .at(-1)!,
-      ) as { destination: string };
-      if (JSON.stringify(directBytes) !== JSON.stringify(await snapshotProject(second.destination)))
-        throw new Error(`${template} generation was not byte-deterministic.`);
-      console.log(`packed ${template} smoke passed`);
+          throw new Error(`${projectTemplate} generation was not byte-deterministic.`);
+        console.log(`packed ${projectTemplate} smoke passed`);
+      }
     }
     console.log(`packed create smoke passed (${tarballs.size} packages)`);
   } finally {
     server?.stop(true);
     await rm(temporary, { recursive: true, force: true });
-  }
-}
-
-async function addArtifacts(
-  relkit: string,
-  root: string,
-  registry: string,
-  cacheDir: string,
-): Promise<void> {
-  for (const args of [
-    [
-      "service",
-      "Billing",
-      ...(process.env.RELKIT_TEST_DOCKER === "1"
-        ? ["--full"]
-        : ["--include", "job", "--include", "event", "--include", "agent", "--include", "route"]),
-    ],
-    ...(process.env.RELKIT_TEST_DOCKER === "1" ? [["service", "Shipping", "--full"]] : []),
-  ]) {
-    const result = JSON.parse(
-      await runCommand(
-        [relkit, "--json", "add", ...args, "--project-root", root],
-        root,
-        registry,
-        cacheDir,
-      ),
-    ) as { readonly ok?: boolean };
-    if (result.ok !== true) throw new Error(`Packed add ${args[0]} did not succeed.`);
   }
 }
 

@@ -5,7 +5,7 @@ import {
   type JsonValue,
   type MaybePromise,
 } from "@relkit/contracts";
-import type { ScheduleDefinition, ScheduleOverlap } from "@relkit/jobs";
+import type { ScheduleDefinition, ScheduleOverlap } from "@relkit/jobs/legacy";
 import { nextCronFire } from "./cron.js";
 export class ScheduleValidationError extends TypeError {
   readonly code = "RELKIT_SCHEDULE_INVALID" as const;

@@ -99,7 +99,7 @@ export function jobSource(
   targetModule: string,
   profile?: string,
 ): string {
-  return `import { defineJob } from "@relkit/app/jobs";
+  return `import { defineJob } from "@relkit/app/jobs/legacy";
 ${sourceImport(target.binding, targetModule, target.exportKind)}
 
 const ${artifact.binding} = defineJob({
@@ -113,10 +113,62 @@ export default ${artifact.binding};
 `;
 }
 
+export function taskSource(
+  artifact: DomainArtifact,
+  version: string,
+  execution: "durable" | "retryable",
+): string {
+  return `import { defineTask } from "@relkit/app/tasks";
+import { z } from "@relkit/app/schema";
+
+const ${artifact.binding} = defineTask({
+  id: "${artifact.id}",
+  version: "${version}",
+  execution: "${execution}",
+  input: z.object({ value: z.string() }),
+  output: z.object({ accepted: z.literal(true) }),
+  handler: async ({ value }, context) => {
+    context.log.info("${artifact.name.fileStem} task", { value });
+    return { accepted: true as const };
+  },
+});
+
+export default ${artifact.binding};
+`;
+}
+
+export function taskJobSource(
+  artifact: DomainArtifact,
+  target: ArtifactReference,
+  targetModule: string,
+  profile?: string,
+  domain?: string,
+): string {
+  const name =
+    domain === undefined
+      ? artifact.name.identifier
+      : `${domain}${capitalize(artifact.name.identifier)}`;
+  return `import { defineJob } from "@relkit/app/jobs";
+${sourceImport(target.binding, targetModule, target.exportKind)}
+
+const ${artifact.binding} = defineJob({
+  id: "${artifact.id}",
+  name: "${name}",
+  task: ${target.binding},${profile ? `\n  service: "${profile}",` : ""}
+});
+
+export default ${artifact.binding};
+`;
+}
+
 export function promptSource(artifact: DomainArtifact, text: readonly string[]): string {
   return `import { definePrompt } from "@relkit/app";\n\nconst ${artifact.binding} = definePrompt(${JSON.stringify(text.length === 1 ? text[0] : text, null, 2)}, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
 }
 
 export function constantsSource(artifact: DomainArtifact): string {
   return `import { defineConstants } from "@relkit/app";\n\nconst ${artifact.binding} = defineConstants({ "${artifact.id}": "replace-me" }, { id: "${artifact.id}" });\n\nexport default ${artifact.binding};\n`;
+}
+
+function capitalize(value: string): string {
+  return `${value[0]!.toUpperCase()}${value.slice(1)}`;
 }

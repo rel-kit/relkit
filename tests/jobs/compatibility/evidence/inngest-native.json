@@ -1,0 +1,54 @@
+{
+  "recordedAt": "2026-09-13T08:27:41Z",
+  "command": "bun tests/jobs/compatibility/inngest-native.ts",
+  "provider": "inngest",
+  "profile": "self-hosted",
+  "sdk": {
+    "package": "inngest",
+    "version": "4.20.0",
+    "integrity": "sha512-U6ro6cG+Y2ys79Qxo6hliDhjSjU/616XO1QzaViinSj8jGOpaei+iQ7cB66bL/M3sLceumn2r5i/SKfrevdbsw=="
+  },
+  "server": {
+    "image": "inngest/inngest:v1.44.0",
+    "digest": "sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+    "platform": "linux/arm64"
+  },
+  "persistentBackends": {
+    "postgres": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "redis": "redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf",
+    "dockerOwnedResources": ["network", "postgres", "redis", "inngest", "named volumes"],
+    "postgresTablesAfterMigration": 14,
+    "postgresTablesAfterInngestRestart": 14
+  },
+  "acceptance": {
+    "sameKeyRunId": "01M2CXZ5ADSE8F4H33NMVNTTF1",
+    "sameKeyEventId": "01M2CXZ54NX6HZABBGF39ZH935",
+    "lostResponseRunId": "01M2CXZM628V3PM86S989SS6EE",
+    "sameKeyConcurrentReceiptsObservedOneRun": true,
+    "lostResponseRecoveredByNativeReceiptQuery": true,
+    "receiptIdsAreNativeUlids": true,
+    "restartedProviderRetainedRun": true
+  },
+  "sleep": {
+    "runId": "01M2CXZNXGP565RBZR3NG726RW",
+    "waits": ["wait-one", "wait-two"],
+    "dueTimes": ["2026-09-13T08:26:34.130Z", "2026-09-13T08:26:49.198Z"],
+    "firstWaitRestartMs": 12556,
+    "secondWaitRestartMs": 12446,
+    "waitAttempts": [0],
+    "dueTimesRemainImmutable": true,
+    "onePersistedHistoryRowPerWait": true,
+    "restartedBeforeEachWait": true
+  },
+  "retry": {
+    "attempts": [0, 1, 2],
+    "failureStages": ["fail-before-one@0", "fail-after-two@1"],
+    "completedStage": "completed@2",
+    "applicationAttemptsObservedExactlyOnce": true
+  },
+  "limits": {
+    "unknownSubmission": "response loss is unknown until the original event id is queried or retried",
+    "retention": "provider default; exact TTL is not exposed by the SDK",
+    "scope": "self-hosted Docker only; managed/cloud and Trigger native paths were not tested"
+  }
+}

@@ -10,7 +10,7 @@ import { defineBucket, isBucketDescriptor } from "../../packages/buckets/src/ind
 import { defineCache, isCacheDescriptor } from "../../packages/cache/src/index.ts";
 import { defineAgent, isAgentDescriptor } from "../../packages/agents/src/index.ts";
 import { defineEvent, isEventDescriptor } from "../../packages/events/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/index.ts";
+import { defineJob } from "../../packages/jobs/src/legacy.ts";
 import {
   defineMiddleware,
   defineRoute,
@@ -524,5 +524,14 @@ describe.serial("Phase 2 descriptor cohort", () => {
         ({ code }) => code,
       ),
     ).toEqual([CONVENTION_CODES.directory, CONVENTION_CODES.suffix]);
+
+    const task = createDescriptorBase("task", "orders.send");
+    expect(
+      checkConventions({
+        descriptor: task,
+        sourcePath: "src/orders/tasks/send.task.ts",
+        exportName: "sendEmail",
+      }),
+    ).toEqual([]);
   });
 });

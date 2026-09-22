@@ -1,0 +1,68 @@
+{
+  "recordedAt": "2026-09-15",
+  "phase": "5",
+  "environment": {
+    "bun": "1.3.10",
+    "docker": "Docker Desktop 4.73.0",
+    "dockerEngine": "29.4.3",
+    "containerPlatform": "linux/arm64",
+    "inngestImage": "inngest/inngest@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+    "postgresImage": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "redisImage": "redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf",
+    "workerImage": "oven/bun:1.3.10@sha256:b86c67b531d87b4db11470d9b2bd0c519b1976eee6fcd71634e73abfa6230d2e"
+  },
+  "commands": {
+    "workerOwnership": "RELKIT_TEST_DOCKER=1 bun test tests/integration/local-docker-worker.test.ts",
+    "compositeLifecycle": "RELKIT_TEST_DOCKER=1 bun test tests/integration/local-docker-composite.test.ts",
+    "legacyDockerLifecycle": "RELKIT_TEST_DOCKER=1 bun run test:local-docker",
+    "nativeProviders": "bun run test:jobs:providers"
+  },
+  "results": {
+    "workerOwnership": {
+      "status": "passed",
+      "tests": 1,
+      "expects": 4,
+      "assertions": [
+        "dependency-only reconciliation leaves the worker absent",
+        "generated Bun bundle starts as a separate healthy worker unit",
+        "bundle and provider state are mounted read-only",
+        "worker reaches its readiness endpoint"
+      ]
+    },
+    "compositeLifecycle": {
+      "status": "passed",
+      "tests": 1,
+      "expects": 15,
+      "assertions": [
+        "persistent Inngest dependencies survive adoption",
+        "authenticated native run-list readiness succeeds",
+        "generated secrets remain stable",
+        "foreign network ownership is preserved",
+        "reset removes only owned resources"
+      ]
+    },
+    "legacyDockerLifecycle": {
+      "status": "passed",
+      "tests": 1,
+      "expects": 25
+    },
+    "nativeProviders": {
+      "inngest": "passed",
+      "effectMqPostgresql": "passed",
+      "triggerDocker": "not-tested: no release-pinned executable image and no installed SDK/auth configuration"
+    }
+  },
+  "sourceEvidence": [
+    "tests/jobs/compatibility/evidence/inngest-native.json",
+    "tests/jobs/compatibility/evidence/phase0-1.11.json",
+    "tests/integration/local-docker-worker.test.ts",
+    "tests/integration/local-docker-composite.test.ts",
+    "tests/jobs/compatibility/evidence/phase5-adapters.json"
+  ],
+  "knownNativeLimits": [
+    "Inngest managed/cloud credentials were not used",
+    "Inngest native overlap, misfire, DST clock control, and historical build routing remain unsupported or unverified",
+    "worker resource cgroups are not certified by the local fixture",
+    "Trigger managed and Docker-native durable-task evidence remains not-tested"
+  ]
+}

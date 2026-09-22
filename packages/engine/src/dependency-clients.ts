@@ -11,7 +11,9 @@ import type {
 } from "./dependencies.js";
 import { createCacheDependencyClient } from "./cache-client.js";
 import { createJobDependencyClient } from "./job-client.js";
+import { createTaskDependencyClient } from "./task-client.js";
 import { notify } from "./edge-hooks.js";
+export { guardedMap } from "./dependency-clients-guard.js";
 
 export class DependencyAccessError extends TypeError {
   readonly category: DependencyCategory;
@@ -32,6 +34,7 @@ export class DependencyNotConfiguredError extends Error {
 }
 
 const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
+  tasks: "triggers-task",
   jobs: "enqueues-job",
   events: "publishes-event",
   buckets: "uses-bucket",
@@ -40,6 +43,7 @@ const edgeKinds: Readonly<Record<DependencyCategory, GraphEdge["kind"]>> = {
 };
 
 const refKinds: Readonly<Record<DependencyCategory, string>> = {
+  tasks: "task",
   jobs: "job",
   events: "event",
   buckets: "bucket",
@@ -71,6 +75,13 @@ export function createClient(
   options: DependencyClientBuildOptions,
 ): unknown {
   switch (category) {
+    case "tasks":
+      return createTaskDependencyClient(
+        name,
+        source,
+        options,
+        dependencyIdFromClient(options, category, name),
+      );
     case "agents":
       return wrapCallable(category, name, source, options);
     case "jobs":
@@ -178,17 +189,4 @@ function dependencyIdFromClient(
   const declaration =
     category === "events" ? options.publications?.[name] : options.dependencies?.[category]?.[name];
   return declaration === undefined ? name : dependencyId(category, name, declaration);
-}
-export function guardedMap(
-  category: DependencyCategory,
-  clients: Record<string, unknown>,
-): Readonly<Record<string, unknown>> {
-  const target = Object.freeze(clients);
-  return new Proxy(target, {
-    get(current, property, receiver) {
-      if (typeof property === "string" && !Object.hasOwn(current, property))
-        throw new DependencyAccessError(category, property);
-      return Reflect.get(current, property, receiver);
-    },
-  });
 }

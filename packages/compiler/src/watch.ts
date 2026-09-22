@@ -4,6 +4,7 @@ import type { NormalizedDescriptor } from "./normalize-types.js";
 export const WATCH_ARTIFACTS = Object.freeze([
   "application.graph.json",
   "runtime.manifest.ts",
+  "jobs.manifest.json",
   "runtime-activation.json",
   "runtime-integrations.plan.json",
   "runtime-integrations.ts",

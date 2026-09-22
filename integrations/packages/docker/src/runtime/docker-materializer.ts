@@ -4,11 +4,29 @@ import {
   type LocalServiceMaterializerRuntime,
   type LocalServiceStartRequest,
 } from "@relkit/local-service";
-import { createDockerClient, randomLoopbackPort } from "./docker-client.js";
+import { createDockerClient } from "./docker-client.js";
+import { publishedPortArguments } from "./docker-health.js";
+import { startComposite } from "./docker-composite.js";
+import { environmentArguments } from "./docker-composite-support.js";
+import {
+  argument,
+  duration,
+  healthCommand,
+  labels,
+  labelArguments,
+  mountPath,
+  name,
+  networkLabelFilters,
+  positive,
+  resourceName,
+} from "./docker-materializer-support.js";
 import type { DockerClient, DockerClientOptions } from "./docker-types.js";
 
 export function createDockerMaterializer(
-  options: DockerClientOptions & { readonly client?: DockerClient } = {},
+  options: DockerClientOptions & {
+    readonly client?: DockerClient;
+    readonly gatewayAddress?: string;
+  } = {},
 ): LocalServiceMaterializerRuntime {
   const client = options.client ?? createDockerClient(options);
   const materializer: LocalServiceMaterializerRuntime = {
@@ -16,7 +34,25 @@ export function createDockerMaterializer(
     protocolVersion: LOCAL_SERVICE_PROTOCOL_VERSION,
     integrationId: "docker",
     list: (labels, signal) => client.containers(labels, signal),
-    start: (request) => start(client, request),
+    start: async (request) => {
+      const gatewayAddress =
+        options.gatewayAddress ??
+        (options.client === undefined && process.platform === "linux"
+          ? await client.command(
+              ["network", "inspect", "bridge", "--format", "{{(index .IPAM.Config 0).Gateway}}"],
+              "Docker bridge gateway discovery",
+              request.signal === undefined ? {} : { signal: request.signal },
+            )
+          : undefined);
+      return start(client, request, gatewayAddress);
+    },
+    stop: async (id, signal) => {
+      await client.command(
+        ["container", "stop", "--time", "10", resourceName(id)],
+        "Docker container graceful stop",
+        signal === undefined ? {} : { signal },
+      );
+    },
     remove: async (id, signal) => {
       await client.command(
         ["container", "rm", "--force", resourceName(id)],
@@ -34,6 +70,26 @@ export function createDockerMaterializer(
         );
       }
     },
+    listVolumes: (labels, signal) => client.volumes(labels, signal),
+    removeNetworks: async (labels, signal) => {
+      const names = (
+        await client.command(
+          ["network", "ls", "--quiet", ...networkLabelFilters(labels)],
+          "Docker network listing",
+          signal === undefined ? {} : { signal },
+        )
+      )
+        .split(/\r?\n/u)
+        .map((name) => name.trim())
+        .filter(Boolean);
+      for (const network of names) {
+        await client.command(
+          ["network", "rm", resourceName(network)],
+          "Docker network removal",
+          signal === undefined ? {} : { signal },
+        );
+      }
+    },
   };
   return Object.freeze(materializer);
 }
@@ -41,7 +97,10 @@ export function createDockerMaterializer(
 async function start(
   client: DockerClient,
   request: LocalServiceStartRequest,
+  gatewayAddress?: string,
 ): Promise<LocalServiceInstance> {
+  if (!("image" in request.recipe)) return startComposite(client, request, gatewayAddress);
+  const recipe = request.recipe;
   name(request.name);
   labels(request.labels);
   await client.discover(request.signal);
@@ -53,35 +112,40 @@ async function start(
       request.signal === undefined ? {} : { signal: request.signal },
     );
   }
+  const publishArguments = (
+    await Promise.all(
+      Object.values(request.recipe.ports).map((port) =>
+        publishedPortArguments(port, gatewayAddress),
+      ),
+    )
+  ).flat();
   const arguments_ = [
     "container",
     "create",
     "--name",
     request.name,
     ...labelArguments(request.labels),
-    ...Object.values(request.recipe.ports).flatMap((port) => [
-      "--publish",
-      randomLoopbackPort(port),
-    ]),
-    ...(request.volumeName === undefined || request.recipe.volume === undefined
+    ...publishArguments,
+    ...(request.volumeName === undefined || recipe.volume === undefined
       ? []
       : [
           "--mount",
-          `type=volume,source=${request.volumeName},target=${mountPath(request.recipe.volume.mountPath)}`,
+          `type=volume,source=${request.volumeName},target=${mountPath(recipe.volume.mountPath)}`,
         ]),
     ...(request.environmentFile === undefined
       ? []
       : ["--env-file", argument(request.environmentFile)]),
+    ...environmentArguments(request.environmentVariables),
     "--health-cmd",
-    healthCommand(request.recipe.health.command),
+    healthCommand(recipe.health.command),
     "--health-interval",
-    duration(request.recipe.health.intervalMs),
+    duration(recipe.health.intervalMs),
     "--health-timeout",
-    duration(request.recipe.health.timeoutMs),
+    duration(recipe.health.timeoutMs),
     "--health-retries",
-    String(positive(request.recipe.health.retries)),
-    argument(request.recipe.image),
-    ...(request.recipe.command ?? []).map(argument),
+    String(positive(recipe.health.retries)),
+    argument(recipe.image),
+    ...(recipe.command ?? []).map(argument),
   ];
   let id: string | undefined;
   try {
@@ -97,10 +161,8 @@ async function start(
       request.signal === undefined ? {} : { signal: request.signal },
     );
     return await client.waitForHealthy(id, {
-      timeoutMs:
-        request.recipe.health.intervalMs * request.recipe.health.retries +
-        request.recipe.health.timeoutMs,
-      pollIntervalMs: Math.min(250, request.recipe.health.intervalMs),
+      timeoutMs: recipe.health.intervalMs * recipe.health.retries + recipe.health.timeoutMs,
+      pollIntervalMs: Math.min(250, recipe.health.intervalMs),
       ...(request.signal === undefined ? {} : { signal: request.signal }),
     });
   } catch (error) {
@@ -111,62 +173,4 @@ async function start(
     }
     throw error;
   }
-}
-
-function labelArguments(values: Readonly<Record<string, string>>): string[] {
-  return Object.entries(values)
-    .sort(([left], [right]) => left.localeCompare(right))
-    .flatMap(([key, value]) => ["--label", `${labelKey(key)}=${argument(value)}`]);
-}
-
-function labels(values: Readonly<Record<string, string>>): void {
-  if (Object.keys(values).length === 0) invalid("Docker labels");
-  labelArguments(values);
-}
-
-function labelKey(value: string): string {
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.\-/]*$/.test(value)) invalid("Docker label");
-  return value;
-}
-
-function healthCommand(values: readonly string[]): string {
-  if (values.length === 0 || values.some((value) => !/^[a-zA-Z0-9_./:=?-]+$/.test(value))) {
-    invalid("Docker health command");
-  }
-  return values.join(" ");
-}
-
-function resourceName(value: string): string {
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.:-]*$/.test(value)) invalid("Docker resource");
-  return value;
-}
-
-function name(value: string): string {
-  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(value)) invalid("Docker resource name");
-  return value;
-}
-
-function mountPath(value: string): string {
-  if (!/^\/[a-zA-Z0-9_./-]+$/.test(value) || value.includes("..")) invalid("Docker mount");
-  return value;
-}
-
-function duration(value: number): string {
-  return `${positive(value)}ms`;
-}
-
-function positive(value: number): number {
-  if (!Number.isSafeInteger(value) || value < 1) invalid("Docker recipe number");
-  return value;
-}
-
-function argument(value: string): string {
-  if (typeof value !== "string" || value === "" || /[\0\r\n]/.test(value)) {
-    invalid("Docker argument");
-  }
-  return value;
-}
-
-function invalid(name: string): never {
-  throw new TypeError(`${name} is invalid.`);
 }

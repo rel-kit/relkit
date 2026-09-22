@@ -36,8 +36,11 @@ export function clientManifest(document: ContractDocument): string {
     protocol: "relkit.client-manifest",
     version: document.version,
     publicFingerprint: document.publicFingerprint,
+    ...(document.capabilities === undefined ? {} : { capabilities: document.capabilities }),
     routes: document.routes ?? [],
     channels: document.channels ?? [],
     agents: document.agents ?? [],
+    ...(document.jobs === undefined ? {} : { jobs: document.jobs }),
+    ...(document.nameToId === undefined ? {} : { nameToId: document.nameToId }),
   } as JsonValue)}\n`;
 }

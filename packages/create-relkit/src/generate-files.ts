@@ -2,23 +2,28 @@ import { access, chmod, lstat, mkdir, readdir, readFile, rm, writeFile } from "n
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { GenerateProjectError } from "./generate-types.js";
 import type { CreateOptions } from "./options.js";
+export {
+  EXAMPLE_PATH_PREFIXES,
+  cleanupStagedProject,
+  listProjectFiles,
+  projectId,
+  removeExamples,
+  replaceOnce,
+  requireFiles,
+  requireTemplate,
+  type StageCleanupResult,
+} from "./generate-files-utilities.js";
+import {
+  EXAMPLE_PATH_PREFIXES,
+  compareNames,
+  listProjectFiles,
+  projectId,
+  removeExamples,
+  replaceOnce,
+} from "./generate-files-utilities.js";
 
 const FILE_MODE = 0o644;
 const DIRECTORY_MODE = 0o755;
-export const EXAMPLE_PATH_PREFIXES = [
-  "src/routes",
-  "src/orders",
-  "src/echo",
-  "src/hello/tools",
-  "src/hello/agents",
-  "tests",
-] as const;
-
-export interface StageCleanupResult {
-  readonly temporaryPath?: string;
-  readonly removed: boolean;
-}
-
 export async function copyTemplate(source: string, target: string): Promise<void> {
   await mkdir(target, { recursive: true, mode: DIRECTORY_MODE });
   await chmod(target, DIRECTORY_MODE);
@@ -59,15 +64,30 @@ async function customizeDeployment(root: string, options: CreateOptions): Promis
   const imports = [
     ...(options.cloud === "aws" ? ['import "@relkit/aws";'] : []),
     ...(options.deploy === "pulumi" ? ['import "@relkit/pulumi";'] : []),
+    ...(options.jobs === undefined ? [] : ['import { docker } from "@relkit/docker";']),
+    ...(options.jobs === "inngest-docker" ? ['import { inngest } from "@relkit/inngest";'] : []),
+    ...(options.jobs === "effect-mq-docker"
+      ? ['import { effectMq } from "@relkit/effect-mq";']
+      : []),
+    ...(options.jobs === "trigger-docker" ? ['import { trigger } from "@relkit/trigger";'] : []),
   ].join("\n");
   await replaceOnce(configPath, "// relkit:create:deployment-imports", imports);
   await replaceOnce(
     configPath,
     "  // relkit:create:deployment",
-    options.cloud === "aws" && options.deploy === "pulumi"
-      ? '  deployment: { engine: "pulumi", host: "aws" },'
-      : "",
+    [
+      options.cloud === "aws" && options.deploy === "pulumi"
+        ? '  deployment: { engine: "pulumi", host: "aws" },'
+        : "",
+      options.jobs === "inngest-docker" ? "  jobs: { default: docker(inngest()) }," : "",
+      options.jobs === "effect-mq-docker" ? "  jobs: { default: docker(effectMq()) }," : "",
+      options.jobs === "trigger-docker" ? "  jobs: { default: docker(trigger()) }," : "",
+      options.jobs === undefined ? "" : '  defaults: { jobs: "default" },',
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
+  await customizeTaskFixture(root, options);
 
   const manifestPath = join(root, "package.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as {
@@ -77,6 +97,10 @@ async function customizeDeployment(root: string, options: CreateOptions): Promis
   const version = manifest.dependencies["@relkit/app"]!;
   if (options.cloud === "aws") manifest.dependencies["@relkit/aws"] = version;
   if (options.deploy === "pulumi") manifest.dependencies["@relkit/pulumi"] = version;
+  if (options.jobs !== undefined) {
+    manifest.dependencies["@relkit/docker"] = version;
+    manifest.dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
+  }
   if (options.cloud === "aws" && options.deploy === "pulumi") {
     manifest.scripts["deploy:preview"] = "relkit deploy preview";
     manifest.scripts.deploy = "relkit deploy up";
@@ -87,102 +111,37 @@ async function customizeDeployment(root: string, options: CreateOptions): Promis
   await chmod(manifestPath, FILE_MODE);
 }
 
+async function customizeTaskFixture(root: string, options: CreateOptions): Promise<void> {
+  if (options.jobs === undefined || options.jobs === "inngest-docker") return;
+  const taskPath = join(root, "src/orders/tasks/export-orders.task.ts");
+  const jobPath = join(root, "src/orders/jobs/export-orders.job.ts");
+  if (options.jobs === "effect-mq-docker")
+    await replaceOnce(taskPath, 'execution: "durable"', 'execution: "retryable"');
+  await replaceOnce(
+    taskPath,
+    "  progress: z.object({ completed: z.number().int().nonnegative() }),\n",
+    "",
+  );
+  await replaceOnce(taskPath, "    await context.progress.emit({ completed: 0 });\n", "");
+  await replaceOnce(
+    taskPath,
+    "    await context.progress.emit({ completed: orderIds.length });\n",
+    "",
+  );
+  await replaceOnce(
+    jobPath,
+    '    operations: ["trigger", "get", "list", "watch"],',
+    '    operations: ["trigger"],',
+  );
+  await replaceOnce(
+    jobPath,
+    '    fields: ["status", "progress", "output"],',
+    '    fields: ["status", "output"],',
+  );
+}
+
 function sorted(values: Record<string, string>): Record<string, string> {
   return Object.fromEntries(
     Object.entries(values).sort(([left], [right]) => left.localeCompare(right)),
   );
-}
-
-/** Removes only a verified mkdtemp sibling; broad or unresolved paths are never recursed. */
-export async function cleanupStagedProject(
-  stage: string | undefined,
-  destination: string,
-): Promise<StageCleanupResult> {
-  if (stage === undefined) return { removed: false };
-  const temporaryPath = resolve(stage);
-  const parent = resolve(dirname(destination));
-  const prefix = `.${basename(destination)}-relkit-`;
-  if (dirname(temporaryPath) !== parent || !basename(temporaryPath).startsWith(prefix)) {
-    return { removed: false };
-  }
-  try {
-    const info = await lstat(temporaryPath);
-    if (!info.isDirectory() || info.isSymbolicLink()) return { temporaryPath, removed: false };
-    await rm(temporaryPath, { recursive: true, force: true });
-    return { temporaryPath, removed: true };
-  } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
-      return { temporaryPath, removed: true };
-    }
-    return { temporaryPath, removed: false };
-  }
-}
-
-export async function requireTemplate(path: string): Promise<void> {
-  try {
-    if ((await readdir(path)).length === 0) throw new Error("empty");
-  } catch {
-    throw new GenerateProjectError(
-      "RELKIT_CREATE_TEMPLATE_MISSING",
-      "Selected template is missing.",
-    );
-  }
-}
-
-export async function requireFiles(root: string, paths: readonly string[]): Promise<void> {
-  for (const path of paths) {
-    try {
-      await access(join(root, path));
-    } catch {
-      throw new GenerateProjectError(
-        "RELKIT_CREATE_TEMPLATE_INVALID",
-        `Template file is missing: ${path}`,
-      );
-    }
-  }
-}
-
-export async function replaceOnce(path: string, before: string, after: string): Promise<void> {
-  const content = await readFile(path, "utf8");
-  const first = content.indexOf(before);
-  if (first < 0 || first !== content.lastIndexOf(before))
-    throw new GenerateProjectError(
-      "RELKIT_CREATE_TEMPLATE_INVALID",
-      `Template substitution is unavailable: ${path}`,
-    );
-  await writeFile(
-    path,
-    content.slice(0, first) + after + content.slice(first + before.length),
-    "utf8",
-  );
-  await chmod(path, FILE_MODE);
-}
-
-export async function removeExamples(root: string): Promise<void> {
-  for (const directory of EXAMPLE_PATH_PREFIXES)
-    await rm(join(root, directory), { recursive: true, force: true });
-}
-
-export async function listProjectFiles(root: string, current = root): Promise<string[]> {
-  const result: string[] = [];
-  for (const entry of (await readdir(current, { withFileTypes: true })).sort(compareNames)) {
-    if (entry.name === ".git" || entry.name === "node_modules" || entry.name === ".relkit")
-      continue;
-    const path = join(current, entry.name);
-    if (entry.isDirectory()) result.push(...(await listProjectFiles(root, path)));
-    else if (entry.isFile()) result.push(relative(root, path).replaceAll("\\", "/"));
-  }
-  return result;
-}
-
-export function projectId(name: string): string {
-  const value = name
-    .replace(/^@/, "")
-    .replace("/", "-")
-    .replace(/[^A-Za-z0-9._-]+/g, "-");
-  return value.replace(/^[._-]+/, "").replace(/(?<![._-])[._-]+$/, "") || "app";
-}
-
-function compareNames(left: { name: string }, right: { name: string }): number {
-  return left.name < right.name ? -1 : left.name > right.name ? 1 : 0;
 }

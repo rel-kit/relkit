@@ -94,6 +94,7 @@ export function createRecord<
     attempt: options.attempt ?? 1,
     source,
     ...(serviceId === undefined ? {} : { serviceId }),
+    ...(options.taskMetadata === undefined ? {} : options.taskMetadata),
   };
   return Object.freeze({ ...metadata, functionId, status: "started" as const });
 }

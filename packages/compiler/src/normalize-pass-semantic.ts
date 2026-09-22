@@ -5,6 +5,8 @@ import { referenceFor } from "./normalize-reference-index.js";
 import { routeCollisionKeys, validateHttpCompatibility } from "./normalize-http-validation.js";
 import { validateEventCompatibility } from "./normalize-event-validation.js";
 import { isRecord, refId, refKind } from "./normalize-utils.js";
+import { validateJobNames } from "./jobs/names.js";
+import { validateJobRequirements } from "./jobs/diagnostics.js";
 import {
   NORMALIZE_CODES,
   type NormalizedDescriptor,
@@ -14,14 +16,41 @@ export function passRoutes(work: NormalizationWork): void {
   validateHttpCompatibility(work);
 }
 export function passJobs(work: NormalizationWork): void {
+  validateJobNames(work);
+  validateLegacyJobs(work);
   for (const descriptor of work.descriptors.filter((entry) => entry.kind === "job")) {
     const value = descriptor.value as Record<string, any>;
+    if (value.task !== undefined) continue;
     const target = referenceFor(work, value.target, "function");
     const reason = jobCompatible(
       value.input,
       isRecord(target?.value) ? target.value.input : undefined,
     );
     if (reason !== undefined) add(work, descriptor, NORMALIZE_CODES.jobInput, reason);
+  }
+  validateJobRequirements(work);
+}
+
+function validateLegacyJobs(work: NormalizationWork): void {
+  const application = work.descriptors.find((entry) => entry.kind === "app");
+  if (application === undefined) return;
+  const applicationValue = isRecord(application.value) ? application.value : {};
+  const compatibility = isRecord(applicationValue.compatibility)
+    ? applicationValue.compatibility
+    : {};
+  if (compatibility.legacyJobs === true) return;
+  for (const job of work.descriptors.filter((entry) => entry.kind === "job")) {
+    const value = isRecord(job.value) ? job.value : {};
+    if (isRecord(value.task)) continue;
+    add(
+      work,
+      job,
+      NORMALIZE_CODES.legacyJobs,
+      "Legacy function-target jobs require compatibility.legacyJobs to be enabled.",
+      "error",
+      undefined,
+      "Set defineApp({ compatibility: { legacyJobs: true } }) during the migration window.",
+    );
   }
 }
 export function passEvents(work: NormalizationWork): void {
@@ -118,6 +147,29 @@ export function passCollisions(work: NormalizationWork): void {
         );
     }
   }
+  if (hasPublicTaskJobs(work)) {
+    for (const descriptor of descriptors) {
+      if (descriptor.id !== "jobs") continue;
+      add(
+        work,
+        descriptor,
+        NORMALIZE_CODES.collision,
+        'Route selector "jobs" collides with the generated client jobs namespace.',
+        "error",
+      );
+    }
+  }
+}
+
+function hasPublicTaskJobs(work: NormalizationWork): boolean {
+  return work.descriptors.some((descriptor) => {
+    if (descriptor.kind !== "job") return false;
+    const value = isRecord(descriptor.value) ? descriptor.value : {};
+    const client = isRecord(value.client) ? value.client : undefined;
+    return (
+      isRecord(value.task) && Array.isArray(client?.operations) && client.operations.length > 0
+    );
+  });
 }
 function compareDescriptors(left: NormalizedDescriptor, right: NormalizedDescriptor): number {
   return (

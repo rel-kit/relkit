@@ -1,27 +1,15 @@
-import {
-  assertRuntimeIntegrationPlanVersion,
-  isStableId,
-  type RuntimeIntegrationPlan,
-} from "@relkit/contracts";
-import { hashGeneratedArtifact } from "@relkit/compiler";
 import { formatDiagnostics, type Diagnostic } from "@relkit/diagnostics";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import {
-  assertLocalServicePlanVersion,
-  type LocalServicePlan,
-  type LocalServiceRecipe,
-} from "@relkit/local-service";
-import { validateGraphShape, type ApplicationGraph } from "@relkit/graph";
+import type { LocalServiceRecipeInput } from "@relkit/local-service";
 import type { CandidateCompile, CandidateCompileRequest } from "@relkit/supervisor";
 import { buildProject } from "./build.js";
-import { checkProject, type CheckResult } from "./check.js";
-import {
-  loadDevLocalServiceOwner,
-  loadLocalRecipe,
-  type DevLocalServiceOwner,
-} from "./dev-local-runtime.js";
+import { checkProject } from "./check.js";
+import { localPlanFrom, reconcileLocalServices } from "./dev-local-services.js";
+export { checkedLocalArtifacts } from "./dev-local-services.js";
+import type { DevLocalServiceOwner } from "./dev-local-runtime.js";
 import type { TelemetryConfiguration } from "@relkit/observability";
+import { localWorkerArtifacts, prepareLocalWorkerOverrides } from "./local-service-options.js";
 
 export interface DevLocalCompiler {
   readonly compile: CandidateCompile;
@@ -33,9 +21,10 @@ export function createDevLocalCompiler(
   localEnabled = true,
   configureTelemetry?: (configuration: TelemetryConfiguration) => Promise<void> | undefined,
   color = false,
+  backendPort = 3000,
 ): DevLocalCompiler {
   let owner: DevLocalServiceOwner | undefined;
-  const recipes = new Map<string, LocalServiceRecipe>();
+  const recipes = new Map<string, LocalServiceRecipeInput>();
   return Object.freeze({
     compile: async (request: CandidateCompileRequest) => {
       const checked = await checkProject({
@@ -52,8 +41,8 @@ export function createDevLocalCompiler(
         };
         await configureTelemetry(graph.nodes.find((node) => node.kind === "app")?.telemetry ?? {});
       }
-      const local = localEnabled
-        ? await reconcile(projectRoot, checked, recipes, owner, request.signal)
+      let local = localEnabled
+        ? await reconcileLocalServices(projectRoot, checked, recipes, owner, request, backendPort)
         : undefined;
       owner = local?.owner ?? owner;
       const built = await buildProject({
@@ -67,6 +56,28 @@ export function createDevLocalCompiler(
           : { providerOverridesGeneration: local.generationId }),
       });
       if (!built.ok) throw new Error(formatDevDiagnostics(projectRoot, built.diagnostics, color));
+      if (local !== undefined && local.workerBindings.length > 0) {
+        const workerOverridesFile = await prepareLocalWorkerOverrides(local.owner.overrideFile);
+        const activated = await reconcileLocalServices(
+          projectRoot,
+          checked,
+          recipes,
+          local.owner,
+          request,
+          backendPort,
+          true,
+          localWorkerArtifacts(
+            localPlanFrom(checked).services,
+            local.workerBindings,
+            request.outputDirectory,
+            resolve(projectRoot, "node_modules"),
+            workerOverridesFile,
+          ),
+        );
+        if (activated === undefined) throw new Error("Local worker activation produced no owner.");
+        local = activated;
+        owner = local.owner;
+      }
       return {
         entrypoint: "server/index.js",
         ...(local === undefined
@@ -76,80 +87,16 @@ export function createDevLocalCompiler(
                 RELKIT_LOCAL_SERVICE_INSPECTOR_STATE: local.inspectorState,
                 ...(local.generationId === undefined
                   ? {}
-                  : { RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile }),
+                  : {
+                      RELKIT_PROVIDER_OVERRIDES_FILE: local.owner.overrideFile,
+                      ...(local.workerBindings.length === 0 ? {} : { RELKIT_WORKER_ROLE: "api" }),
+                    }),
               },
             }),
       };
     },
     close: async () => owner?.close(),
   });
-}
-
-async function reconcile(
-  projectRoot: string,
-  checked: CheckResult,
-  recipes: Map<string, LocalServiceRecipe>,
-  current: DevLocalServiceOwner | undefined,
-  signal: AbortSignal,
-): Promise<
-  | {
-      owner: DevLocalServiceOwner;
-      inspectorState: string;
-      generationId?: string;
-    }
-  | undefined
-> {
-  const { graph, localPlan, runtimePlan } = checkedLocalArtifacts(projectRoot, checked);
-  const required = localPlan.services.filter((entry) => {
-    if (!Array.isArray(entry.requiredBy)) throw new Error("Local-service plan is invalid.");
-    return entry.requiredBy.length > 0;
-  });
-  if (required.length === 0 && current === undefined) return undefined;
-  const applicationId = graph.appId;
-  if (!isStableId(applicationId)) throw new Error("Local application identity is invalid.");
-  const materializers = new Set(required.map((entry) => entry.materializerId));
-  if (materializers.size > 1) throw new Error("Local bindings require multiple materializers.");
-  const materializerId = [...materializers][0] ?? "docker";
-  const owner =
-    current ?? (await loadDevLocalServiceOwner(projectRoot, applicationId, materializerId));
-  if (owner.applicationId !== applicationId) throw new Error("Local application identity changed.");
-  await Promise.all(
-    [...new Set(required.map((entry) => entry.recipe.integrationId))].map(async (integrationId) => {
-      if (!recipes.has(integrationId))
-        recipes.set(integrationId, await loadLocalRecipe(projectRoot, runtimePlan, integrationId));
-    }),
-  );
-  const result = await owner.reconciler.reconcile({
-    plan: localPlan,
-    planHash: hashGeneratedArtifact(checked.outputs.localServices),
-    recipes: Object.fromEntries(recipes),
-    scope: "required",
-    signal,
-  });
-  return {
-    owner,
-    inspectorState: JSON.stringify({ state: result.state, lease: owner.inspectorLease }),
-    ...(required.length === 0 ? {} : { generationId: result.overrides.generationId }),
-  };
-}
-
-export function checkedLocalArtifacts(
-  projectRoot: string,
-  checked: CheckResult,
-): {
-  graph: ApplicationGraph;
-  localPlan: LocalServicePlan;
-  runtimePlan: RuntimeIntegrationPlan;
-} {
-  const graph = JSON.parse(checked.outputs.graph) as ApplicationGraph;
-  validateGraphShape(graph, projectRoot);
-  const localPlan = JSON.parse(checked.outputs.localServices) as unknown;
-  const runtimePlan = JSON.parse(checked.outputs.runtimeIntegrations) as unknown;
-  assertLocalServicePlanVersion(localPlan);
-  assertRuntimeIntegrationPlanVersion(runtimePlan);
-  if (localPlan.graphHash !== checked.graphHash || runtimePlan.graphHash !== checked.graphHash)
-    throw new Error("Local development artifacts do not match the application graph.");
-  return { graph, localPlan, runtimePlan };
 }
 
 export function formatDevDiagnostics(

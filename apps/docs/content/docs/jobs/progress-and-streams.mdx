@@ -1,0 +1,19 @@
+---
+title: Progress and streams
+description: Report typed progress and consume bounded live output.
+---
+
+Progress is an observation channel, not a second source of truth. Define its shape and emit snapshots from
+the task:
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
+  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+</include>
+
+Progress and stream items are limited to 64 KiB. Keep payloads small, include a sequence or cursor when consumers need ordering, and store durable results in the task output or application database.
+
+Streams may be live, durable, or unavailable depending on the binding. A reconnect can observe a gap when retention has expired; reset the UI from the latest run snapshot instead of replaying untrusted client state. Provider capability output is authoritative for the selected environment.
+
+Progress does not authorize a client to read a private run. Apply the same ownership and field-level redaction rules to progress and stream payloads as to the final output.
+
+<include cwd>content/generated/related/jobs-progress-and-streams.mdx</include>

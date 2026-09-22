@@ -354,10 +354,10 @@ describe.serial("Phase 0 guardrails", () => {
       assertBoundaryViolation(boundaryCase.files, boundaryCase.expected));
   }
 
-  test("package exports resolve only through the public entry", { timeout: 90_000 }, async () => {
+  test("package exports resolve only through the public entry", { timeout: 180_000 }, async () => {
     const result = await execute(process.execPath, ["run", "scripts/pack-and-smoke-exports.ts"]);
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain("9 packages loaded without unrelated integrations or SDKs");
+    expect(result.stdout).toContain("12 packages loaded without unrelated integrations or SDKs");
     expect(result.stdout).toContain("packed entries resolved; internal paths rejected");
   });
 

@@ -1,0 +1,26 @@
+---
+title: Inspector
+description: Inspect job definitions, runs, schedules, and services locally.
+---
+
+The Inspector exposes job operations under the Jobs area:
+
+- Definitions: task/job IDs, versions, schema hashes, bindings, and limits.
+- Runs: status, attempts, progress, output metadata, errors, and controls.
+- Schedules: registered definitions, pause state, next occurrence, and ownership.
+- Services: worker generations, provider identity, readiness, and rollout state.
+
+Run lists are bounded: 25 by default and 100 maximum. Filters should be scoped to a service, job, tenant, or time range before loading history.
+
+Controls are asynchronous. A cancel, retry, or schedule write returns an operation ID; keep the operation visible until the Inspector observes the resulting state. The Inspector reports provider capability errors rather than presenting an unsupported control as successful.
+
+Protect the Inspector endpoint. It is an operator surface, not a replacement for application authorization.
+
+The run detail keeps the accepted `runId`, task version, service generation, result availability, progress,
+and native diagnostics separate. A disconnected Inspector view never cancels accepted work.
+
+<include cwd lang="ts" meta='title="tests/inspector/job-name-filters.test.ts"'>
+  ../../tests/inspector/job-name-filters.test.ts
+</include>
+
+<include cwd>content/generated/related/jobs-inspector.mdx</include>

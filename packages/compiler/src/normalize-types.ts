@@ -87,6 +87,11 @@ export interface NormalizedDescriptor {
   readonly facts?: ExportFacts;
   readonly exportFact?: ExportFact;
   readonly reference?: EvaluatorManifestReference;
+  readonly origin?: {
+    readonly file: string;
+    readonly exportName: string;
+    readonly exportKind: "default" | "named";
+  };
   readonly value: unknown;
 }
 export interface GeneratedOutputs {
@@ -97,6 +102,7 @@ export interface GeneratedOutputs {
   readonly runtimeIntegrationImports: string;
   readonly localServices: string;
   readonly diagnostics: string;
+  readonly jobsManifest?: string;
   readonly openapi: string;
   readonly client: string;
   readonly contract: string;
@@ -109,6 +115,7 @@ export interface NormalizationResult {
   readonly diagnostics: readonly Diagnostic[];
   readonly descriptors: readonly NormalizedDescriptor[];
   readonly references: ReadonlyMap<string, NormalizedDescriptor>;
+  readonly referencesByKind: ReadonlyMap<string, ReadonlyMap<string, NormalizedDescriptor>>;
   readonly observedEdges: readonly ObservedEdge[];
   readonly graph?: NormalizedGraph;
   readonly graphHash?: string;
@@ -124,6 +131,7 @@ export interface NormalizationWork {
   middlewareReferences: Map<string, NormalizedDescriptor>;
   transformReferences: Map<string, NormalizedDescriptor>;
   schemas: Map<string, JsonValue>;
+  schemaHashes: Map<string, string>;
   nodes: GraphNode[];
   edges: GraphEdge[];
   observedEdges: ObservedEdge[];

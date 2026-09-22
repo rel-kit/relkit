@@ -77,7 +77,7 @@ declare const BETTER_AUTH_HANDLER: unique symbol;
 **Signature**
 
 ```ts
-type BetterAuthHandler<Session> = RawHttpHandler & {
+type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
   readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
   readonly __session?: Session;
 };

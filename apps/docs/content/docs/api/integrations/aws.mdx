@@ -152,7 +152,9 @@ type AwsAdapter = S3Adapter | RedisAdapter;
 **Signature**
 
 ```ts
-type AwsOptions<Adapter> = Adapter extends S3Adapter ? AwsS3Options : AwsRedisOptions;
+type AwsOptions<Adapter extends AwsAdapter> = Adapter extends S3Adapter
+  ? AwsS3Options
+  : AwsRedisOptions;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/aws/src/aws.ts#L25)

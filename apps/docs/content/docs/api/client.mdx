@@ -135,7 +135,7 @@ declare const createClient: <Contract extends RouterContract = RouterContract>(
 ) => RouterContractClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L56)
 
 Since v0.1.0
 
@@ -171,7 +171,7 @@ export interface CreateAutoClientOptions
   extends CreateClientOptions, CreateWebSocketClientOptions {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L40)
 
 ## CreateClientOptions (interface)
 
@@ -196,6 +196,7 @@ export interface CreateClientOptions {
 export interface CreateWebSocketClientOptions {
   readonly baseUrl: string;
   readonly establishmentTimeoutMs?: number;
+  readonly headers?: ClientHeaders;
   readonly websocket?: typeof WebSocket;
 }
 ```
@@ -246,7 +247,7 @@ declare const createAutoClient: <Contract extends RouterContract = RouterContrac
 ) => RouterContractClient<Contract>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L70)
 
 ## createWebSocketClient
 
@@ -258,7 +259,2599 @@ declare const createWebSocketClient: <Contract extends RouterContract = RouterCo
 ) => RouterContractClient<Contract>;
 ```
 
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L62)
+
+## `controller-state.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [stateFromFeedEvent](#statefromfeedevent)
+
+---
+
+# utils
+
+## stateFromFeedEvent
+
+**Signature**
+
+```ts
+declare const stateFromFeedEvent: <Run>(
+  current: JobWatchState<Run>,
+  event: FeedEvent<Run>,
+  source: JobWatchOptions["source"],
+) => JobWatchState<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller-state.ts#L5)
+
+## `controller-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [freeze](#freeze)
+  - [notify](#notify)
+  - [reconnectAfterTeardown](#reconnectafterteardown)
+  - [resumedOptions](#resumedoptions)
+
+---
+
+# utils
+
+## freeze
+
+**Signature**
+
+```ts
+declare const freeze: <T>(value: T) => T;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller-support.ts#L11)
+
+## notify
+
+**Signature**
+
+```ts
+declare const notify: <Run>(listener: JobWatchListener<Run>, state: JobWatchState<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller-support.ts#L3)
+
+## reconnectAfterTeardown
+
+**Signature**
+
+```ts
+declare const reconnectAfterTeardown: (
+  previous: Promise<void> | undefined,
+  teardown: Promise<void> | undefined,
+  start: () => Promise<void>,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller-support.ts#L22)
+
+## resumedOptions
+
+**Signature**
+
+```ts
+declare const resumedOptions: <Run>(
+  options: JobWatchOptions,
+  state: JobWatchState<Run>,
+) => JobWatchOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller-support.ts#L15)
+
+## `controller.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobRunWatchController (class)](#jobrunwatchcontroller-class)
+    - [getSnapshot (method)](#getsnapshot-method)
+    - [subscribe (method)](#subscribe-method)
+    - [connect (method)](#connect-method)
+    - [disconnect (method)](#disconnect-method)
+    - [dispose (method)](#dispose-method)
+    - [refetch (method)](#refetch-method)
+    - [connectInternal (method)](#connectinternal-method)
+    - [startConnection (method)](#startconnection-method)
+    - [receive (method)](#receive-method)
+    - [releaseLease (method)](#releaselease-method)
+    - [setState (method)](#setstate-method)
+    - [assertLive (method)](#assertlive-method)
+  - [watchJobRun](#watchjobrun)
+
+---
+
+# utils
+
+## JobRunWatchController (class)
+
+**Signature**
+
+```ts
+declare class JobRunWatchController<Run> { constructor(
+    private readonly client: unknown,
+    private readonly name: string,
+    private readonly options: JobWatchOptions,
+  ) }
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L20)
+
+### getSnapshot (method)
+
+**Signature**
+
+```ts
+declare const getSnapshot: () => JobWatchState<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L38)
+
+### subscribe (method)
+
+**Signature**
+
+```ts
+declare const subscribe: (listener: JobWatchListener<Run>) => () => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L41)
+
+### connect (method)
+
+**Signature**
+
+```ts
+declare const connect: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L46)
+
+### disconnect (method)
+
+**Signature**
+
+```ts
+declare const disconnect: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L60)
+
+### dispose (method)
+
+**Signature**
+
+```ts
+declare const dispose: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L78)
+
+### refetch (method)
+
+**Signature**
+
+```ts
+declare const refetch: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L87)
+
+### connectInternal (method)
+
+**Signature**
+
+```ts
+declare const connectInternal: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L114)
+
+### startConnection (method)
+
+**Signature**
+
+```ts
+declare const startConnection: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L133)
+
+### receive (method)
+
+**Signature**
+
+```ts
+declare const receive: (event: FeedEvent<Run>, epoch: number) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L163)
+
+### releaseLease (method)
+
+**Signature**
+
+```ts
+declare const releaseLease: (error: unknown) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L167)
+
+### setState (method)
+
+**Signature**
+
+```ts
+declare const setState: (value: JobWatchState<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L178)
+
+### assertLive (method)
+
+**Signature**
+
+```ts
+declare const assertLive: () => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L182)
+
+## watchJobRun
+
+**Signature**
+
+```ts
+declare const watchJobRun: <Name extends string>(
+  client: unknown,
+  name: Name,
+  options: JobWatchOptions,
+) => JobWatchController<JobRunFor<Name>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/controller.ts#L186)
+
+## `index.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobCancelInput (type alias)](#jobcancelinput-type-alias)
+  - [JobCancelInputFor](#jobcancelinputfor)
+  - [JobCancelName](#jobcancelname)
+  - [JobCancelOutputFor](#jobcanceloutputfor)
+  - [JobClientField (type alias)](#jobclientfield-type-alias)
+  - [JobClientOperation](#jobclientoperation)
+  - [JobContract](#jobcontract)
+  - [JobErrorEnvelope](#joberrorenvelope)
+  - [JobFailureFor](#jobfailurefor)
+  - [JobFor](#jobfor)
+  - [JobGetInput (type alias)](#jobgetinput-type-alias)
+  - [JobListInput (type alias)](#joblistinput-type-alias)
+  - [JobListQuery (type alias)](#joblistquery-type-alias)
+  - [JobProcedureContract (interface)](#jobprocedurecontract-interface)
+  - [JobProcedureSelector](#jobprocedureselector)
+  - [JobRegistry](#jobregistry)
+  - [JobRetryInput (type alias)](#jobretryinput-type-alias)
+  - [JobRetryInputFor](#jobretryinputfor)
+  - [JobRetryName](#jobretryname)
+  - [JobRetryOutputFor](#jobretryoutputfor)
+  - [JobRunFor](#jobrunfor)
+  - [JobRunSelector](#jobrunselector)
+  - [JobRunStatus](#jobrunstatus)
+  - [JobRunWatchController](#jobrunwatchcontroller)
+  - [JobSelector](#jobselector)
+  - [JobSnapshotFor](#jobsnapshotfor)
+  - [JobStreamGapError](#jobstreamgaperror)
+  - [JobStreamInput (type alias)](#jobstreaminput-type-alias)
+  - [JobStreamOptions](#jobstreamoptions)
+  - [JobStreamOverflowError](#jobstreamoverflowerror)
+  - [JobStreamProcedureContract (interface)](#jobstreamprocedurecontract-interface)
+  - [JobTriggerInput (type alias)](#jobtriggerinput-type-alias)
+  - [JobTriggerInputFor](#jobtriggerinputfor)
+  - [JobTriggerName](#jobtriggername)
+  - [JobTriggerOptions (interface)](#jobtriggeroptions-interface)
+  - [JobTriggerOutputFor](#jobtriggeroutputfor)
+  - [JobTriggerSelector](#jobtriggerselector)
+  - [JobWatchAbortedError](#jobwatchabortederror)
+  - [JobWatchController](#jobwatchcontroller)
+  - [JobWatchDisposedError](#jobwatchdisposederror)
+  - [JobWatchFrame](#jobwatchframe)
+  - [JobWatchFrameFor](#jobwatchframefor)
+  - [JobWatchInput (type alias)](#jobwatchinput-type-alias)
+  - [JobWatchListener](#jobwatchlistener)
+  - [JobWatchName](#jobwatchname)
+  - [JobWatchOptions](#jobwatchoptions)
+  - [JobWatchReadTimeoutError](#jobwatchreadtimeouterror)
+  - [JobWatchState](#jobwatchstate)
+  - [JobWatchUnavailableError](#jobwatchunavailableerror)
+  - [NamedStreamFrame](#namedstreamframe)
+  - [RunCancellationReceipt](#runcancellationreceipt)
+  - [RunHandle](#runhandle)
+  - [RunListQuery](#runlistquery)
+  - [RunPage](#runpage)
+  - [RunRetryReceipt](#runretryreceipt)
+  - [RunSnapshot](#runsnapshot)
+  - [RunWatchFrame](#runwatchframe)
+  - [SelectedJobField](#selectedjobfield)
+  - [watchJobRun](#watchjobrun)
+  - [watchJobStream](#watchjobstream)
+
+---
+
+# utils
+
+## JobCancelInput (type alias)
+
+**Signature**
+
+```ts
+type JobCancelInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly reason?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L79)
+
+## JobCancelInputFor
+
+**Signature**
+
+```ts
+declare const JobCancelInputFor: JobCancelInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L104)
+
+## JobCancelName
+
+**Signature**
+
+```ts
+declare const JobCancelName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L113)
+
+## JobCancelOutputFor
+
+**Signature**
+
+```ts
+declare const JobCancelOutputFor: JobCancelOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L105)
+
+## JobClientField (type alias)
+
+**Signature**
+
+```ts
+type JobClientField = "status" | "input" | "progress" | "output" | "error";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L21)
+
+## JobClientOperation
+
+**Signature**
+
+```ts
+declare const JobClientOperation: JobClientOperation;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L5)
+
+## JobContract
+
+**Signature**
+
+```ts
+declare const JobContract: JobContract<
+  Name,
+  JobId,
+  Input,
+  Output,
+  Failure,
+  Progress,
+  Streams,
+  Operations,
+  Fields
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L93)
+
+## JobErrorEnvelope
+
+**Signature**
+
+```ts
+declare const JobErrorEnvelope: JobErrorEnvelope;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L6)
+
+## JobFailureFor
+
+**Signature**
+
+```ts
+declare const JobFailureFor: JobFailureFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L106)
+
+## JobFor
+
+**Signature**
+
+```ts
+declare const JobFor: JobFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L94)
+
+## JobGetInput (type alias)
+
+**Signature**
+
+```ts
+type JobGetInput = {
+  readonly runId: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L56)
+
+## JobListInput (type alias)
+
+**Signature**
+
+```ts
+type JobListInput = {
+  readonly query?: JobListQuery;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L61)
+
+## JobListQuery (type alias)
+
+Filters accepted by a generated job-specific list; ownership is server-derived.
+
+**Signature**
+
+```ts
+type JobListQuery = Omit<RunListQuery, "jobId" | "service">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L19)
+
+## JobProcedureContract (interface)
+
+**Signature**
+
+```ts
+export interface JobProcedureContract<Input, Output, Failure = Error> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L33)
+
+## JobProcedureSelector
+
+**Signature**
+
+```ts
+declare const JobProcedureSelector: JobProcedureSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L95)
+
+## JobRegistry
+
+**Signature**
+
+```ts
+declare const JobRegistry: JobRegistry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L96)
+
+## JobRetryInput (type alias)
+
+**Signature**
+
+```ts
+type JobRetryInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L86)
+
+## JobRetryInputFor
+
+**Signature**
+
+```ts
+declare const JobRetryInputFor: JobRetryInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L107)
+
+## JobRetryName
+
+**Signature**
+
+```ts
+declare const JobRetryName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L114)
+
+## JobRetryOutputFor
+
+**Signature**
+
+```ts
+declare const JobRetryOutputFor: JobRetryOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L108)
+
+## JobRunFor
+
+**Signature**
+
+```ts
+declare const JobRunFor: JobRunFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L109)
+
+## JobRunSelector
+
+**Signature**
+
+```ts
+declare const JobRunSelector: JobRunSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L100)
+
+## JobRunStatus
+
+**Signature**
+
+```ts
+declare const JobRunStatus: JobRunStatus;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L7)
+
+## JobRunWatchController
+
+**Signature**
+
+```ts
+declare const JobRunWatchController: typeof JobRunWatchController;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L132)
+
+## JobSelector
+
+**Signature**
+
+```ts
+declare const JobSelector: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L97)
+
+## JobSnapshotFor
+
+**Signature**
+
+```ts
+declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L98)
+
+## JobStreamGapError
+
+**Signature**
+
+```ts
+declare const JobStreamGapError: typeof JobStreamGapError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L133)
+
+## JobStreamInput (type alias)
+
+**Signature**
+
+```ts
+type JobStreamInput<StreamName extends string = string> = {
+  readonly runId: string;
+  readonly name: StreamName;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L72)
+
+## JobStreamOptions
+
+**Signature**
+
+```ts
+declare const JobStreamOptions: JobStreamOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L134)
+
+## JobStreamOverflowError
+
+**Signature**
+
+```ts
+declare const JobStreamOverflowError: typeof JobStreamOverflowError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L133)
+
+## JobStreamProcedureContract (interface)
+
+**Signature**
+
+```ts
+export interface JobStreamProcedureContract<Input, Item, Failure = Error> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L41)
+
+## JobTriggerInput (type alias)
+
+**Signature**
+
+```ts
+type JobTriggerInput<Input> = {
+  readonly input: Input;
+  readonly options?: JobTriggerOptions;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L50)
+
+## JobTriggerInputFor
+
+**Signature**
+
+```ts
+declare const JobTriggerInputFor: JobTriggerInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L110)
+
+## JobTriggerName
+
+**Signature**
+
+```ts
+declare const JobTriggerName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L115)
+
+## JobTriggerOptions (interface)
+
+Browser-safe options accepted by a generated job trigger.
+
+**Signature**
+
+```ts
+export interface JobTriggerOptions {
+  readonly operationId?: OperationId | string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L24)
+
+## JobTriggerOutputFor
+
+**Signature**
+
+```ts
+declare const JobTriggerOutputFor: JobTriggerOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L111)
+
+## JobTriggerSelector
+
+**Signature**
+
+```ts
+declare const JobTriggerSelector: JobTriggerSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L99)
+
+## JobWatchAbortedError
+
+**Signature**
+
+```ts
+declare const JobWatchAbortedError: typeof JobWatchAbortedError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L127)
+
+## JobWatchController
+
+**Signature**
+
+```ts
+declare const JobWatchController: JobWatchController<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L120)
+
+## JobWatchDisposedError
+
+**Signature**
+
+```ts
+declare const JobWatchDisposedError: typeof JobWatchDisposedError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L128)
+
+## JobWatchFrame
+
+**Signature**
+
+```ts
+declare const JobWatchFrame: JobWatchFrame<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L121)
+
+## JobWatchFrameFor
+
+**Signature**
+
+```ts
+declare const JobWatchFrameFor: JobWatchFrameFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L112)
+
+## JobWatchInput (type alias)
+
+**Signature**
+
+```ts
+type JobWatchInput = {
+  readonly runId: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L66)
+
+## JobWatchListener
+
+**Signature**
+
+```ts
+declare const JobWatchListener: JobWatchListener<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L122)
+
+## JobWatchName
+
+**Signature**
+
+```ts
+declare const JobWatchName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L116)
+
+## JobWatchOptions
+
+**Signature**
+
+```ts
+declare const JobWatchOptions: JobWatchOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L123)
+
+## JobWatchReadTimeoutError
+
+**Signature**
+
+```ts
+declare const JobWatchReadTimeoutError: typeof JobWatchReadTimeoutError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L130)
+
+## JobWatchState
+
+**Signature**
+
+```ts
+declare const JobWatchState: JobWatchState<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L124)
+
+## JobWatchUnavailableError
+
+**Signature**
+
+```ts
+declare const JobWatchUnavailableError: typeof JobWatchUnavailableError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L129)
+
+## NamedStreamFrame
+
+**Signature**
+
+```ts
+declare const NamedStreamFrame: NamedStreamFrame<Item>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
+
+## RunCancellationReceipt
+
+**Signature**
+
+```ts
+declare const RunCancellationReceipt: RunCancellationReceipt;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
+
+## RunHandle
+
+**Signature**
+
+```ts
+declare const RunHandle: RunHandle;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
+
+## RunListQuery
+
+**Signature**
+
+```ts
+declare const RunListQuery: RunListQuery;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L11)
+
+## RunPage
+
+**Signature**
+
+```ts
+declare const RunPage: RunPage<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L12)
+
+## RunRetryReceipt
+
+**Signature**
+
+```ts
+declare const RunRetryReceipt: RunRetryReceipt;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L13)
+
+## RunSnapshot
+
+**Signature**
+
+```ts
+declare const RunSnapshot: RunSnapshot<Input, Output, Progress, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L14)
+
+## RunWatchFrame
+
+**Signature**
+
+```ts
+declare const RunWatchFrame: RunWatchFrame<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L15)
+
+## SelectedJobField
+
+**Signature**
+
+```ts
+declare const SelectedJobField: SelectedJobField<Fields, Field>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L101)
+
+## watchJobRun
+
+**Signature**
+
+```ts
+declare const watchJobRun: <Name extends string>(
+  client: unknown,
+  name: Name,
+  options: JobWatchOptions,
+) => JobWatchController<JobRunFor<Name>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L132)
+
+## watchJobStream
+
+**Signature**
+
+```ts
+declare const watchJobStream: <Item extends JsonValue = JsonValue>(
+  client: unknown,
+  job: string,
+  options: JobStreamOptions,
+) => Promise<AsyncIterable<NamedStreamFrame<Item>>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L133)
+
+## `job-registry-derived.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobCancelInputFor (type alias)](#jobcancelinputfor-type-alias)
+  - [JobCancelName (type alias)](#jobcancelname-type-alias)
+  - [JobCancelOutputFor (type alias)](#jobcanceloutputfor-type-alias)
+  - [JobFailureFor (type alias)](#jobfailurefor-type-alias)
+  - [JobRetryInputFor (type alias)](#jobretryinputfor-type-alias)
+  - [JobRetryName (type alias)](#jobretryname-type-alias)
+  - [JobRetryOutputFor (type alias)](#jobretryoutputfor-type-alias)
+  - [JobRunFor (type alias)](#jobrunfor-type-alias)
+  - [JobRunName (type alias)](#jobrunname-type-alias)
+  - [JobTriggerInputFor (type alias)](#jobtriggerinputfor-type-alias)
+  - [JobTriggerName (type alias)](#jobtriggername-type-alias)
+  - [JobTriggerOutputFor (type alias)](#jobtriggeroutputfor-type-alias)
+  - [JobWatchFrameFor (type alias)](#jobwatchframefor-type-alias)
+  - [JobWatchName (type alias)](#jobwatchname-type-alias)
+
+---
+
+# utils
+
+## JobCancelInputFor (type alias)
+
+**Signature**
+
+```ts
+type JobCancelInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobCancelInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L72)
+
+## JobCancelName (type alias)
+
+**Signature**
+
+```ts
+type JobCancelName = JobRunName<"cancel">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L27)
+
+## JobCancelOutputFor (type alias)
+
+**Signature**
+
+```ts
+type JobCancelOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly output: infer Output }
+        ? Output
+        : RunCancellationReceipt
+      : RunCancellationReceipt
+    : RunCancellationReceipt
+  : RunCancellationReceipt;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L82)
+
+## JobFailureFor (type alias)
+
+**Signature**
+
+```ts
+type JobFailureFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly error: infer Failure }
+      ? Failure
+      : JobErrorEnvelope
+    : JobErrorEnvelope
+  : JobErrorEnvelope;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L46)
+
+## JobRetryInputFor (type alias)
+
+**Signature**
+
+```ts
+type JobRetryInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobRetryInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L92)
+
+## JobRetryName (type alias)
+
+**Signature**
+
+```ts
+type JobRetryName = JobRunName<"retry">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L28)
+
+## JobRetryOutputFor (type alias)
+
+**Signature**
+
+```ts
+type JobRetryOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly output: infer Output }
+        ? Output
+        : RunRetryReceipt
+      : RunRetryReceipt
+    : RunRetryReceipt
+  : RunRetryReceipt;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L102)
+
+## JobRunFor (type alias)
+
+**Signature**
+
+```ts
+type JobRunFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly get: infer Get }
+      ? Get extends { readonly output: infer Output }
+        ? Output
+        : RunSnapshot
+      : Runs extends { readonly watch: infer Watch }
+        ? Watch extends { readonly output: AsyncIterable<infer Frame> }
+          ? Frame extends { readonly run: infer Run }
+            ? Run
+            : RunSnapshot
+          : RunSnapshot
+        : RunSnapshot
+    : RunSnapshot
+  : RunSnapshot;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L54)
+
+## JobRunName (type alias)
+
+**Signature**
+
+```ts
+type JobRunName<Operation extends JobRunOperation> = {
+  [Name in JobSelector]: JobFor<Name> extends { readonly runs: infer Runs }
+    ? Operation extends keyof Runs
+      ? Name
+      : never
+    : never;
+}[JobSelector];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L18)
+
+## JobTriggerInputFor (type alias)
+
+**Signature**
+
+```ts
+type JobTriggerInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly input: infer Input }
+      ? Input
+      : never
+    : never
+  : unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L30)
+
+## JobTriggerName (type alias)
+
+**Signature**
+
+```ts
+type JobTriggerName = {
+  [Name in JobSelector]: JobFor<Name> extends { readonly trigger: unknown } ? Name : never;
+}[JobSelector];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L14)
+
+## JobTriggerOutputFor (type alias)
+
+**Signature**
+
+```ts
+type JobTriggerOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly output: infer Output }
+      ? Output
+      : never
+    : never
+  : RunHandle;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L38)
+
+## JobWatchFrameFor (type alias)
+
+**Signature**
+
+```ts
+type JobWatchFrameFor<Name extends string> = RunWatchFrame<JobRunFor<Name>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L70)
+
+## JobWatchName (type alias)
+
+**Signature**
+
+```ts
+type JobWatchName = JobRunName<"watch">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-derived.ts#L26)
+
+## `job-registry-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobContract (type alias)](#jobcontract-type-alias)
+  - [JobFor (type alias)](#jobfor-type-alias)
+  - [JobProcedureSelector (type alias)](#jobprocedureselector-type-alias)
+  - [JobRegistry (interface)](#jobregistry-interface)
+  - [JobRunSelector (type alias)](#jobrunselector-type-alias)
+  - [JobSelector (type alias)](#jobselector-type-alias)
+  - [JobSnapshotFor (type alias)](#jobsnapshotfor-type-alias)
+  - [JobTriggerSelector (type alias)](#jobtriggerselector-type-alias)
+  - [SelectedJobField (type alias)](#selectedjobfield-type-alias)
+
+---
+
+# utils
+
+## JobContract (type alias)
+
+**Signature**
+
+```ts
+type JobContract<
+  Name extends string = string,
+  JobId extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Failure = JobErrorEnvelope,
+  Progress = unknown,
+  Streams extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,
+  Operations extends readonly JobClientOperation[] = readonly JobClientOperation[],
+  Fields extends readonly JobClientField[] = readonly [],
+> = {
+  readonly name: Name;
+  readonly jobId: JobId;
+} & TriggerMember<Input, Failure, Operations> &
+  RunMembers<Input, Output, Progress, Failure, Streams, Operations, Fields>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L114)
+
+## JobFor (type alias)
+
+**Signature**
+
+```ts
+type JobFor<Name extends JobSelector> = JobRegistry[Name];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L133)
+
+## JobProcedureSelector (type alias)
+
+**Signature**
+
+```ts
+type JobProcedureSelector<Name extends JobSelector = JobSelector> =
+  JobTriggerSelector<Name> | JobRunSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L150)
+
+## JobRegistry (interface)
+
+**Signature**
+
+```ts
+export interface JobRegistry {}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L130)
+
+## JobRunSelector (type alias)
+
+**Signature**
+
+```ts
+type JobRunSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly runs: infer Runs }
+    ? {
+        [
+          Operation in "get" | "list" | "watch" | "stream" | "cancel" | "retry"
+        ]: Runs extends Record<Operation, unknown>
+          ? Runs[Operation] extends never
+            ? never
+            : `${Name}.runs.${Operation}`
+          : never;
+      }["get" | "list" | "watch" | "stream" | "cancel" | "retry"]
+    : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L137)
+
+## JobSelector (type alias)
+
+**Signature**
+
+```ts
+type JobSelector = Extract<keyof JobRegistry, string>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L132)
+
+## JobSnapshotFor (type alias)
+
+**Signature**
+
+```ts
+type JobSnapshotFor<
+  Input,
+  Output,
+  Progress,
+  Failure,
+  Fields extends readonly JobClientField[],
+> = RunSnapshot<
+  SelectedJobField<Fields, "input"> extends true ? Input : never,
+  SelectedJobField<Fields, "output"> extends true ? Output : never,
+  SelectedJobField<Fields, "progress"> extends true ? Progress : never,
+  SelectedJobField<Fields, "error"> extends true ? Failure : never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L30)
+
+## JobTriggerSelector (type alias)
+
+**Signature**
+
+```ts
+type JobTriggerSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly trigger: unknown } ? `${Name}.trigger` : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L135)
+
+## SelectedJobField (type alias)
+
+**Signature**
+
+```ts
+type SelectedJobField<
+  Fields extends readonly JobClientField[],
+  Field extends JobClientField,
+> = Field extends Fields[number] ? true : false;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-registry-types.ts#L25)
+
+## `read-timeout.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [readWatchNext](#readwatchnext)
+  - [timedCall](#timedcall)
+
+---
+
+# utils
+
+## readWatchNext
+
+**Signature**
+
+```ts
+declare const readWatchNext: (
+  iterator: AsyncIterator<unknown>,
+  signal: AbortSignal,
+  timeoutMs?: number,
+) => Promise<IteratorResult<unknown>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/read-timeout.ts#L3)
+
+## timedCall
+
+**Signature**
+
+```ts
+declare const timedCall: <T>(
+  signal: AbortSignal,
+  timeoutMs: number,
+  operation: (signal: AbortSignal) => Promise<T> | T,
+) => Promise<T>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/read-timeout.ts#L11)
+
+## `reconcile-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [closeIterator](#closeiterator)
+  - [newEpoch](#newepoch)
+
+---
+
+# utils
+
+## closeIterator
+
+**Signature**
+
+```ts
+declare const closeIterator: (iterator: AsyncIterator<unknown>) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile-support.ts#L3)
+
+## newEpoch
+
+**Signature**
+
+```ts
+declare const newEpoch: () => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile-support.ts#L23)
+
+## `reconcile.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [WatchRequest (interface)](#watchrequest-interface)
+  - [authoritativeFrame](#authoritativeframe)
+  - [closeIterator](#closeiterator)
+  - [frameFromRun](#framefromrun)
+  - [newEpoch](#newepoch)
+  - [openWatchIterator](#openwatchiterator)
+  - [ownJobProcedure](#ownjobprocedure)
+  - [readFirstWatchFrame](#readfirstwatchframe)
+  - [resolveJobProcedure](#resolvejobprocedure)
+  - [watchRequest](#watchrequest)
+
+---
+
+# utils
+
+## WatchRequest (interface)
+
+**Signature**
+
+```ts
+export interface WatchRequest {
+  readonly runId: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L8)
+
+## authoritativeFrame
+
+**Signature**
+
+```ts
+declare const authoritativeFrame: (
+  client: unknown,
+  name: string,
+  options: JobWatchOptions,
+  signal: AbortSignal,
+) => Promise<RunWatchFrame | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L75)
+
+## closeIterator
+
+**Signature**
+
+```ts
+declare const closeIterator: (iterator: AsyncIterator<unknown>) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L118)
+
+## frameFromRun
+
+**Signature**
+
+```ts
+declare const frameFromRun: (run: RunSnapshot) => RunWatchFrame;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L107)
+
+## newEpoch
+
+**Signature**
+
+```ts
+declare const newEpoch: () => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L118)
+
+## openWatchIterator
+
+**Signature**
+
+```ts
+declare const openWatchIterator: (
+  client: unknown,
+  name: string,
+  request: WatchRequest,
+  signal: AbortSignal,
+  timeoutMs?: number,
+) => Promise<AsyncIterator<unknown>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L59)
+
+## ownJobProcedure
+
+**Signature**
+
+```ts
+declare const ownJobProcedure: (
+  root: unknown,
+  name: string,
+  operation: string,
+) => Procedure | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L29)
+
+## readFirstWatchFrame
+
+**Signature**
+
+```ts
+declare const readFirstWatchFrame: (
+  client: unknown,
+  name: string,
+  request: WatchRequest,
+  signal: AbortSignal,
+  timeoutMs?: number,
+) => Promise<RunWatchFrame | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L41)
+
+## resolveJobProcedure
+
+**Signature**
+
+```ts
+declare const resolveJobProcedure: (root: unknown, name: string, operation: string) => Procedure;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L22)
+
+## watchRequest
+
+**Signature**
+
+```ts
+declare const watchRequest: (options: JobWatchOptions, after?: string | undefined) => WatchRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/reconcile.ts#L13)
+
+## `stream.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobStreamGapError (class)](#jobstreamgaperror-class)
+    - [code (property)](#code-property)
+  - [JobStreamOptions (interface)](#jobstreamoptions-interface)
+  - [JobStreamOverflowError (class)](#jobstreamoverflowerror-class)
+    - [code (property)](#code-property-1)
+  - [watchJobStream](#watchjobstream)
+
+---
+
+# utils
+
+## JobStreamGapError (class)
+
+**Signature**
+
+```ts
+declare class JobStreamGapError { constructor(
+    readonly expected: number,
+    readonly received: number,
+  ) }
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L28)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_STREAM_GAP"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L29)
+
+## JobStreamOptions (interface)
+
+**Signature**
+
+```ts
+export interface JobStreamOptions {
+  readonly runId: string;
+  readonly name: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly signal?: AbortSignal;
+  readonly readTimeoutMs?: number;
+  readonly maxFrames?: number;
+  readonly maxBytes?: number;
+  readonly maxItemBytes?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L7)
+
+## JobStreamOverflowError (class)
+
+**Signature**
+
+```ts
+declare class JobStreamOverflowError { constructor(readonly limit: "frames" | "bytes" | "item-bytes") }
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L19)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_STREAM_OVERFLOW"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L20)
+
+## watchJobStream
+
+**Signature**
+
+```ts
+declare const watchJobStream: <Item extends JsonValue = JsonValue>(
+  client: unknown,
+  job: string,
+  options: JobStreamOptions,
+) => Promise<AsyncIterable<NamedStreamFrame<Item>>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream.ts#L40)
+
+## `types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobWatchAbortedError (class)](#jobwatchabortederror-class)
+    - [code (property)](#code-property)
+  - [JobWatchController (interface)](#jobwatchcontroller-interface)
+  - [JobWatchDisposedError (class)](#jobwatchdisposederror-class)
+    - [code (property)](#code-property-1)
+  - [JobWatchFrame (type alias)](#jobwatchframe-type-alias)
+  - [JobWatchListener (type alias)](#jobwatchlistener-type-alias)
+  - [JobWatchOptions (interface)](#jobwatchoptions-interface)
+  - [JobWatchReadTimeoutError (class)](#jobwatchreadtimeouterror-class)
+    - [code (property)](#code-property-2)
+  - [JobWatchState (interface)](#jobwatchstate-interface)
+  - [JobWatchUnavailableError (class)](#jobwatchunavailableerror-class)
+    - [code (property)](#code-property-3)
+  - [isTerminalRun](#isterminalrun)
+
+---
+
+# utils
+
+## JobWatchAbortedError (class)
+
+**Signature**
+
+```ts
+declare class JobWatchAbortedError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L59)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_WATCH_ABORTED"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L60)
+
+## JobWatchController (interface)
+
+**Signature**
+
+```ts
+export interface JobWatchController<Run = RunSnapshot> {
+  getSnapshot(): JobWatchState<Run>;
+  subscribe(listener: JobWatchListener<Run>): () => void;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  dispose(): Promise<void>;
+  refetch(): Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L41)
+
+## JobWatchDisposedError (class)
+
+**Signature**
+
+```ts
+declare class JobWatchDisposedError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L50)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_WATCH_DISPOSED"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L51)
+
+## JobWatchFrame (type alias)
+
+**Signature**
+
+```ts
+type JobWatchFrame<Run = RunSnapshot> = RunWatchFrame<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L38)
+
+## JobWatchListener (type alias)
+
+**Signature**
+
+```ts
+type JobWatchListener<Run = RunSnapshot> = (state: JobWatchState<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L39)
+
+## JobWatchOptions (interface)
+
+**Signature**
+
+```ts
+export interface JobWatchOptions {
+  readonly runId: string;
+  readonly jobId?: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly identityKey?: string | null;
+  readonly applicationId?: string;
+  readonly environment?: string;
+  readonly grantScope?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly protocolVersion?: number;
+  readonly source?: "native" | "polling";
+  readonly pollIntervalMs?: number;
+  readonly maxReconnectAttempts?: number;
+  readonly reconnectMinDelayMs?: number;
+  readonly reconnectMaxDelayMs?: number;
+  readonly readTimeoutMs?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L4)
+
+## JobWatchReadTimeoutError (class)
+
+**Signature**
+
+```ts
+declare class JobWatchReadTimeoutError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L77)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_WATCH_READ_TIMEOUT"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L78)
+
+## JobWatchState (interface)
+
+**Signature**
+
+```ts
+export interface JobWatchState<Run = RunSnapshot> {
+  readonly run?: Run;
+  readonly connection: RunConnection;
+  readonly isStale: boolean;
+  readonly lastObservedAt?: string;
+  readonly connectionError?: unknown;
+  readonly continuity?: "state" | "history";
+  readonly resetReason?: "reconnected" | "cursor-expired" | "history-unavailable" | "overflow";
+  readonly source?: "native" | "polling";
+  readonly epoch?: string;
+  readonly sequence?: number;
+  readonly cursor?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L24)
+
+## JobWatchUnavailableError (class)
+
+**Signature**
+
+```ts
+declare class JobWatchUnavailableError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L68)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_JOB_WATCH_UNAVAILABLE"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L69)
+
+## isTerminalRun
+
+**Signature**
+
+```ts
+declare const isTerminalRun: (run: unknown) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/types.ts#L86)
+
+## `watch-feed-loop.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [WatchFeedLoop (interface)](#watchfeedloop-interface)
+  - [runWatchFeed](#runwatchfeed)
+
+---
+
+# utils
+
+## WatchFeedLoop (interface)
+
+**Signature**
+
+```ts
+export interface WatchFeedLoop<Run> {
+  readonly client: unknown;
+  readonly name: string;
+  readonly options: JobWatchOptions;
+  readonly isActive: (generation: number) => boolean;
+  readonly lastCursor: () => string | undefined;
+  readonly setAbort: (controller: AbortController | undefined) => void;
+  readonly setIterator: (iterator: AsyncIterator<unknown> | undefined) => void;
+  readonly acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
+  readonly emit: (event: FeedEvent<Run>) => void;
+  readonly verifyTerminal: (
+    frame: RunWatchFrame<Run>,
+    signal: AbortSignal,
+  ) => Promise<boolean | undefined>;
+  readonly releaseTerminal: () => void;
+  readonly resolveFirsts: () => void;
+  readonly rejectFirsts: (error: unknown) => void;
+  readonly failureCount: () => number;
+  readonly setFailureCount: (value: number) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-loop.ts#L17)
+
+## runWatchFeed
+
+**Signature**
+
+```ts
+declare const runWatchFeed: <Run>(feed: WatchFeedLoop<Run>, generation: number) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-loop.ts#L38)
+
+## `watch-feed-observers.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [WatchFeedObservers (type alias)](#watchfeedobservers-type-alias)
+  - [emitObservers](#emitobservers)
+  - [rejectObserverFirsts](#rejectobserverfirsts)
+  - [releaseWatchFeedTerminal](#releasewatchfeedterminal)
+  - [resolveObserverFirsts](#resolveobserverfirsts)
+
+---
+
+# utils
+
+## WatchFeedObservers (type alias)
+
+**Signature**
+
+```ts
+type WatchFeedObservers<Run> = ReadonlyMap<
+  string,
+  { readonly observer: FeedObserver<Run>; readonly first: Pending }
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-observers.ts#L4)
+
+## emitObservers
+
+**Signature**
+
+```ts
+declare const emitObservers: <Run>(
+  observers: WatchFeedObservers<Run>,
+  event: FeedEvent<Run>,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-observers.ts#L9)
+
+## rejectObserverFirsts
+
+**Signature**
+
+```ts
+declare const rejectObserverFirsts: <Run>(
+  observers: WatchFeedObservers<Run>,
+  error: unknown,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-observers.ts#L26)
+
+## releaseWatchFeedTerminal
+
+**Signature**
+
+```ts
+declare const releaseWatchFeedTerminal: <Run>(
+  observers: Map<string, { readonly observer: FeedObserver<Run>; readonly first: Pending }>,
+  abort: AbortController | undefined,
+  onEmpty: () => void,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-observers.ts#L33)
+
+## resolveObserverFirsts
+
+**Signature**
+
+```ts
+declare const resolveObserverFirsts: <Run>(observers: WatchFeedObservers<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-observers.ts#L22)
+
+## `watch-feed-polling.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [runPollingFeed](#runpollingfeed)
+
+---
+
+# utils
+
+## runPollingFeed
+
+**Signature**
+
+```ts
+declare const runPollingFeed: <Run>(feed: WatchFeedLoop<Run>, generation: number) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-polling.ts#L7)
+
+## `watch-feed-refetch.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [refetchSharedWatchFeed](#refetchsharedwatchfeed)
+
+---
+
+# utils
+
+## refetchSharedWatchFeed
+
+**Signature**
+
+```ts
+declare const refetchSharedWatchFeed: <Run>(
+  client: unknown,
+  name: string,
+  options: JobWatchOptions,
+  lastCursor: string | undefined,
+  signal?: AbortSignal,
+) => Promise<RunWatchFrame<Run> | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-refetch.ts#L6)
+
+## `watch-feed-state.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [WatchFeedState (interface)](#watchfeedstate-interface)
+  - [acceptWatchFrame](#acceptwatchframe)
+  - [emptyWatchFeedState](#emptywatchfeedstate)
+
+---
+
+# utils
+
+## WatchFeedState (interface)
+
+**Signature**
+
+```ts
+export interface WatchFeedState<Run> {
+  readonly lastFrame: RunWatchFrame<Run> | undefined;
+  readonly lastCursor: string | undefined;
+  readonly lastSequence: number;
+  readonly nativeEpoch: string | undefined;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-state.ts#L4)
+
+## acceptWatchFrame
+
+**Signature**
+
+```ts
+declare const acceptWatchFrame: <Run>(
+  state: WatchFeedState<Run>,
+  value: unknown,
+) => { readonly state: WatchFeedState<Run>; readonly frame: RunWatchFrame<Run> | undefined };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-state.ts#L15)
+
+## emptyWatchFeedState
+
+**Signature**
+
+```ts
+declare const emptyWatchFeedState: <Run>() => WatchFeedState<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-state.ts#L11)
+
+## `watch-feed-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [Pending (type alias)](#pending-type-alias)
+  - [backoff](#backoff)
+  - [closeEmptyIterator](#closeemptyiterator)
+  - [deferred](#deferred)
+  - [isFrame](#isframe)
+  - [isUnauthorized](#isunauthorized)
+  - [offline](#offline)
+  - [resetFrame](#resetframe)
+  - [wait](#wait)
+  - [withAfter](#withafter)
+
+---
+
+# utils
+
+## Pending (type alias)
+
+**Signature**
+
+```ts
+type Pending = {
+  readonly promise: Promise<void>;
+  readonly resolve: () => void;
+  readonly reject: (error: unknown) => void;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L4)
+
+## backoff
+
+**Signature**
+
+```ts
+declare const backoff: (attempt: number, options: JobWatchOptions) => number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L20)
+
+## closeEmptyIterator
+
+**Signature**
+
+```ts
+declare const closeEmptyIterator: () => AsyncIterator<unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L68)
+
+## deferred
+
+**Signature**
+
+```ts
+declare const deferred: () => Pending;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L10)
+
+## isFrame
+
+**Signature**
+
+```ts
+declare const isFrame: (value: unknown) => value is RunWatchFrame;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L72)
+
+## isUnauthorized
+
+**Signature**
+
+```ts
+declare const isUnauthorized: (value: unknown) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L89)
+
+## offline
+
+**Signature**
+
+```ts
+declare const offline: (signal: AbortSignal) => Promise<boolean>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L42)
+
+## resetFrame
+
+**Signature**
+
+```ts
+declare const resetFrame: (value: unknown) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L76)
+
+## wait
+
+**Signature**
+
+```ts
+declare const wait: (milliseconds: number, signal: AbortSignal) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L27)
+
+## withAfter
+
+**Signature**
+
+```ts
+declare const withAfter: (options: JobWatchOptions, after: string | undefined) => JobWatchOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-support.ts#L64)
+
+## `watch-feed-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FeedEvent (type alias)](#feedevent-type-alias)
+  - [FeedObserver (type alias)](#feedobserver-type-alias)
+  - [FeedStatus (type alias)](#feedstatus-type-alias)
+
+---
+
+# utils
+
+## FeedEvent (type alias)
+
+**Signature**
+
+```ts
+type FeedEvent<Run> =
+  | { readonly kind: "frame"; readonly frame: RunWatchFrame<Run> }
+  | { readonly kind: "status"; readonly status: FeedStatus; readonly error?: unknown };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-types.ts#L3)
+
+## FeedObserver (type alias)
+
+**Signature**
+
+```ts
+type FeedObserver<Run> = (event: FeedEvent<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-types.ts#L10)
+
+## FeedStatus (type alias)
+
+**Signature**
+
+```ts
+type FeedStatus =
+  "connecting" | "connected" | "reconnecting" | "completed" | "unauthorized" | "error";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed-types.ts#L7)
+
+## `watch-feed.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FeedEvent](#feedevent)
+  - [FeedStatus](#feedstatus)
+  - [SharedWatchFeed (class)](#sharedwatchfeed-class)
+    - [addLease (method)](#addlease-method)
+    - [removeLease (method)](#removelease-method)
+    - [refetch (method)](#refetch-method)
+    - [ensureRunning (method)](#ensurerunning-method)
+    - [consume (method)](#consume-method)
+    - [loop (method)](#loop-method)
+    - [verifyTerminal (method)](#verifyterminal-method)
+    - [releaseTerminal (method)](#releaseterminal-method)
+    - [acceptFrame (method)](#acceptframe-method)
+    - [emit (method)](#emit-method)
+
+---
+
+# utils
+
+## FeedEvent
+
+**Signature**
+
+```ts
+declare const FeedEvent: FeedEvent<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L15)
+
+## FeedStatus
+
+**Signature**
+
+```ts
+declare const FeedStatus: FeedStatus;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L15)
+
+## SharedWatchFeed (class)
+
+**Signature**
+
+```ts
+declare class SharedWatchFeed<Run> { constructor(
+    private readonly client: unknown,
+    private readonly name: string,
+    private readonly options: JobWatchOptions,
+    private readonly onEmpty: () => void = () => undefined,
+  ) }
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L17)
+
+### addLease (method)
+
+**Signature**
+
+```ts
+declare const addLease: (id: string, observer: FeedObserver<Run>) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L37)
+
+### removeLease (method)
+
+**Signature**
+
+```ts
+declare const removeLease: (id: string, error?: unknown) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L50)
+
+### refetch (method)
+
+**Signature**
+
+```ts
+declare const refetch: (signal?: AbortSignal) => Promise<RunWatchFrame<Run> | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L93)
+
+### ensureRunning (method)
+
+**Signature**
+
+```ts
+declare const ensureRunning: () => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L107)
+
+### consume (method)
+
+**Signature**
+
+```ts
+declare const consume: () => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L126)
+
+### loop (method)
+
+**Signature**
+
+```ts
+declare const loop: (generation: number) => {
+  client: unknown;
+  name: string;
+  options: JobWatchOptions;
+  isActive: (generation: number) => boolean;
+  lastCursor: () => string | undefined;
+  setAbort: (controller: AbortController | undefined) => void;
+  setIterator: (iterator: AsyncIterator<unknown> | undefined) => void;
+  acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
+  emit: (event: FeedEvent<Run>) => void;
+  verifyTerminal: (frame: RunWatchFrame<Run>, signal: AbortSignal) => Promise<boolean | undefined>;
+  releaseTerminal: () => void;
+  resolveFirsts: () => void;
+  rejectFirsts: (error: unknown) => void;
+  failureCount: () => number;
+  setFailureCount: (value: number) => void;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L131)
+
+### verifyTerminal (method)
+
+**Signature**
+
+```ts
+declare const verifyTerminal: (
+  frame: RunWatchFrame<Run>,
+  signal: AbortSignal,
+) => Promise<boolean | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L161)
+
+### releaseTerminal (method)
+
+**Signature**
+
+```ts
+declare const releaseTerminal: () => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L179)
+
+### acceptFrame (method)
+
+**Signature**
+
+```ts
+declare const acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L187)
+
+### emit (method)
+
+**Signature**
+
+```ts
+declare const emit: (event: FeedEvent<Run>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch-feed.ts#L193)
+
+## `watch.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [FeedEvent](#feedevent)
+  - [FeedStatus](#feedstatus)
+  - [SharedWatchFeed](#sharedwatchfeed)
+  - [releaseSharedWatchFeed](#releasesharedwatchfeed)
+  - [sharedWatchFeed](#sharedwatchfeed-1)
+
+---
+
+# utils
+
+## FeedEvent
+
+**Signature**
+
+```ts
+declare const FeedEvent: FeedEvent<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch.ts#L9)
+
+## FeedStatus
+
+**Signature**
+
+```ts
+declare const FeedStatus: FeedStatus;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch.ts#L9)
+
+## SharedWatchFeed
+
+**Signature**
+
+```ts
+declare const SharedWatchFeed: typeof SharedWatchFeed;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch.ts#L8)
+
+## releaseSharedWatchFeed
+
+**Signature**
+
+```ts
+declare const releaseSharedWatchFeed: (
+  client: unknown,
+  name: string,
+  options: JobWatchOptions,
+  feed: SharedWatchFeed<unknown>,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch.ts#L26)
+
+## sharedWatchFeed
+
+**Signature**
+
+```ts
+declare const sharedWatchFeed: <Run>(
+  client: unknown,
+  name: string,
+  options: JobWatchOptions,
+) => SharedWatchFeed<Run>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/watch.ts#L11)
 
 ## `agent-continuation.ts`
 
@@ -327,7 +2920,8 @@ declare const requiredThreadId: (options: AgentThreadOptions | undefined) => str
 **Signature**
 
 ```ts
-type AgentChat<Name> = AgentFor<Name> extends { readonly chat: infer Value } ? Value : false;
+type AgentChat<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly chat: infer Value } ? Value : false;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L10)
@@ -337,7 +2931,7 @@ type AgentChat<Name> = AgentFor<Name> extends { readonly chat: infer Value } ? V
 **Signature**
 
 ```ts
-type AgentControls<Name> =
+type AgentControls<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly controls: infer Value } ? Value : never;
 ```
 
@@ -348,7 +2942,7 @@ type AgentControls<Name> =
 **Signature**
 
 ```ts
-type AgentCustomEvent<Name> =
+type AgentCustomEvent<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly customEvent: infer Value } ? Value : never;
 ```
 
@@ -359,7 +2953,8 @@ type AgentCustomEvent<Name> =
 **Signature**
 
 ```ts
-type AgentInput<Name> = AgentFor<Name> extends { readonly input: infer Value } ? Value : never;
+type AgentInput<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly input: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L4)
@@ -369,7 +2964,8 @@ type AgentInput<Name> = AgentFor<Name> extends { readonly input: infer Value } ?
 **Signature**
 
 ```ts
-type AgentOutput<Name> = AgentFor<Name> extends { readonly output: infer Value } ? Value : never;
+type AgentOutput<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly output: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L6)
@@ -379,7 +2975,7 @@ type AgentOutput<Name> = AgentFor<Name> extends { readonly output: infer Value }
 **Signature**
 
 ```ts
-type AgentPublicState<Name> =
+type AgentPublicState<Name extends AgentSelector> =
   AgentFor<Name> extends { readonly publicState: infer Value } ? Value : never;
 ```
 
@@ -390,7 +2986,8 @@ type AgentPublicState<Name> =
 **Signature**
 
 ```ts
-type AgentResume<Name> = AgentFor<Name> extends { readonly resume: infer Value } ? Value : never;
+type AgentResume<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly resume: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L12)
@@ -400,7 +2997,8 @@ type AgentResume<Name> = AgentFor<Name> extends { readonly resume: infer Value }
 **Signature**
 
 ```ts
-type AgentScope<Name> = AgentFor<Name> extends { readonly scope: infer Value } ? Value : never;
+type AgentScope<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly scope: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L20)
@@ -410,7 +3008,8 @@ type AgentScope<Name> = AgentFor<Name> extends { readonly scope: infer Value } ?
 **Signature**
 
 ```ts
-type AgentTool<Name> = AgentFor<Name> extends { readonly tool: infer Value } ? Value : never;
+type AgentTool<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly tool: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L14)
@@ -420,7 +3019,8 @@ type AgentTool<Name> = AgentFor<Name> extends { readonly tool: infer Value } ? V
 **Signature**
 
 ```ts
-type AgentWaiting<Name> = AgentFor<Name> extends { readonly waiting: infer Value } ? Value : never;
+type AgentWaiting<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly waiting: infer Value } ? Value : never;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/agent-contract-selection.ts#L22)
@@ -499,7 +3099,7 @@ declare const snapshotProjection: <Output>(
 ```ts
 declare const terminalProjection: <Output>(value: unknown) => {
   output?: Output;
-  status: "succeeded" | "failed" | "cancelled";
+  status: "failed" | "cancelled" | "succeeded";
 };
 ```
 
@@ -816,7 +3416,7 @@ export interface AgentThreadOptions {
 **Signature**
 
 ```ts
-type AgentTimelineItem<Tool> =
+type AgentTimelineItem<Tool = ClientAgentDynamic> =
   | { readonly key: string; readonly kind: "message"; readonly message: AgentMessage }
   | { readonly key: string; readonly kind: "tool"; readonly toolCall: TypedAgentToolCall<Tool> }
   | { readonly key: string; readonly kind: "progress"; readonly progress: AgentProgress };
@@ -839,7 +3439,7 @@ declare const AgentToolCall: AgentToolCall;
 **Signature**
 
 ```ts
-type UseAgentResult<Name> = Omit<ContractBase<Name>, "snapshot"> & {
+type UseAgentResult<Name extends AgentSelector> = Omit<ContractBase<Name>, "snapshot"> & {
   readonly snapshot?: TypedThreadSnapshot<
     AgentOutput<Name>,
     AgentPublicState<Name>,
@@ -1204,7 +3804,7 @@ declare const compiledFingerprint: () => string | undefined;
 declare const finiteFetcher: (timeoutMs: number) => typeof fetch;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L73)
 
 ## identityHeaders
 
@@ -1251,7 +3851,7 @@ declare const loadIdentity: (
 declare const sameScope: (left: RelkitKeyScope, right: RelkitKeyScope) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L146)
 
 ## scopeFor
 
@@ -1262,10 +3862,11 @@ declare const scopeFor: (
   backend: string,
   identity: ClientIdentityDocument,
   identityKey: string | null | undefined,
+  environment?: string,
 ) => RelkitKeyScope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L128)
 
 ## streamClientFor
 
@@ -1282,7 +3883,7 @@ declare const streamClientFor: (options: {
 }) => ReturnType<typeof createClient>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L99)
 
 ## streamFetcher
 
@@ -1292,7 +3893,80 @@ declare const streamClientFor: (options: {
 declare const streamFetcher: (timeoutMs: number) => typeof fetch;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-support.ts#L81)
+
+## `context-types.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RelkitClientProviderProps (interface)](#relkitclientproviderprops-interface)
+  - [RelkitClientRuntime (interface)](#relkitclientruntime-interface)
+  - [RelkitHydrationState (interface)](#relkithydrationstate-interface)
+
+---
+
+# utils
+
+## RelkitClientProviderProps (interface)
+
+**Signature**
+
+```ts
+export interface RelkitClientProviderProps {
+  readonly baseUrl?: string;
+  readonly environment?: string;
+  readonly credentials?: RequestInit["credentials"];
+  readonly headers?: ClientHeaders;
+  readonly queryClient?: QueryClient;
+  readonly identityKey?: string | null;
+  readonly hydratedState?: RelkitHydrationState;
+  readonly transport?: "auto" | "websocket" | "http-stream" | "sse";
+  readonly requestTimeoutMs?: number;
+  readonly streamEstablishmentTimeoutMs?: number;
+  readonly children: ReactNode;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-types.ts#L13)
+
+## RelkitClientRuntime (interface)
+
+**Signature**
+
+```ts
+export interface RelkitClientRuntime {
+  readonly client: ReturnType<typeof createClient>;
+  readonly streamClient: ReturnType<typeof createClient>;
+  readonly queryClient: QueryClient;
+  readonly utils: unknown;
+  readonly identity?: ClientIdentityDocument;
+  readonly identityKey?: string | null;
+  readonly status: "loading" | "ready" | "application-updated" | "error";
+  readonly scope?: RelkitKeyScope;
+  readonly transport: "auto" | "websocket" | "http-stream" | "sse";
+  readonly streamEstablishmentTimeoutMs: number;
+  readonly environment?: string;
+  readonly realtime: RealtimeManager;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-types.ts#L27)
+
+## RelkitHydrationState (interface)
+
+**Signature**
+
+```ts
+export interface RelkitHydrationState {
+  readonly scope: RelkitKeyScope;
+  readonly dehydrated: unknown;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/context-types.ts#L8)
 
 ## `finite-hooks.ts`
 
@@ -1301,7 +3975,7 @@ declare const streamFetcher: (timeoutMs: number) => typeof fetch;
 ## Exports Grouped by Category
 
 - [utils](#utils)
-  - [RelkitWriteError (class)](#relkitwriteerror-class)
+  - [RelkitWriteError](#relkitwriteerror)
   - [useInfiniteRoute](#useinfiniteroute)
   - [useRoute](#useroute)
   - [useRouteMutation](#useroutemutation)
@@ -1312,18 +3986,15 @@ declare const streamFetcher: (timeoutMs: number) => typeof fetch;
 
 # utils
 
-## RelkitWriteError (class)
+## RelkitWriteError
 
 **Signature**
 
 ```ts
-declare class RelkitWriteError { constructor(
-    readonly outcome: "not-sent" | "unknown",
-    message: string,
-  ) }
+declare const RelkitWriteError: typeof RelkitWriteError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L32)
 
 ## useInfiniteRoute
 
@@ -1349,7 +4020,7 @@ declare const useInfiniteRoute: <
 ) => UseInfiniteQueryResult<Selected, ErrorFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L155)
 
 ## useRoute
 
@@ -1362,7 +4033,7 @@ declare const useRoute: <Name extends QuerySelector, Selected = OutputFor<Name>>
 ) => UseQueryResult<Selected, ErrorFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L40)
 
 ## useRouteMutation
 
@@ -1378,7 +4049,7 @@ declare const useRouteMutation: <Name extends MutationSelector, Context = unknow
 ) => UseMutationResult<OutputFor<Name>, ErrorFor<Name>, InputFor<Name>, Context>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L77)
 
 ## useRouteUtils
 
@@ -1390,7 +4061,7 @@ declare const useRouteUtils: <Name extends QuerySelector | MutationSelector>(
 ) => ProcedureUtilsLike;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L165)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L191)
 
 ## useSuspenseRoute
 
@@ -1408,7 +4079,7 @@ declare const useSuspenseRoute: <Name extends QuerySelector, Selected = OutputFo
 ) => UseSuspenseQueryResult<Selected, ErrorFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/finite-hooks.ts#L58)
 
 ## `index.ts`
 
@@ -1421,13 +4092,47 @@ declare const useSuspenseRoute: <Name extends QuerySelector, Selected = OutputFo
   - ["./agent-reconcile.js" (namespace export)](#agent-reconcilejs-namespace-export)
   - ["./context.js" (namespace export)](#contextjs-namespace-export)
   - ["./finite-hooks.js" (namespace export)](#finite-hooksjs-namespace-export)
+  - ["./job-hooks.js" (namespace export)](#job-hooksjs-namespace-export)
   - ["./keys.js" (namespace export)](#keysjs-namespace-export)
   - ["./pending.js" (namespace export)](#pendingjs-namespace-export)
   - ["./realtime-hook.js" (namespace export)](#realtime-hookjs-namespace-export)
   - ["./registry.js" (namespace export)](#registryjs-namespace-export)
   - ["./stream-hook.js" (namespace export)](#stream-hookjs-namespace-export)
   - [CountPresence](#countpresence)
+  - [JobCancelInput](#jobcancelinput)
+  - [JobCancelInputFor](#jobcancelinputfor)
+  - [JobCancelName](#jobcancelname)
+  - [JobCancelOutputFor](#jobcanceloutputfor)
+  - [JobClientField](#jobclientfield)
+  - [JobContract](#jobcontract)
+  - [JobFor](#jobfor)
+  - [JobGetInput](#jobgetinput)
+  - [JobListInput](#joblistinput)
+  - [JobListQuery](#joblistquery)
+  - [JobProcedureContract](#jobprocedurecontract)
+  - [JobProcedureSelector](#jobprocedureselector)
+  - [JobRegistry](#jobregistry)
+  - [JobRetryInput](#jobretryinput)
+  - [JobRetryInputFor](#jobretryinputfor)
+  - [JobRetryName](#jobretryname)
+  - [JobRetryOutputFor](#jobretryoutputfor)
+  - [JobRunFor](#jobrunfor)
+  - [JobRunSelector](#jobrunselector)
+  - [JobSelector](#jobselector)
+  - [JobSnapshotFor](#jobsnapshotfor)
+  - [JobStreamInput](#jobstreaminput)
+  - [JobStreamProcedureContract](#jobstreamprocedurecontract)
+  - [JobTriggerInput](#jobtriggerinput)
+  - [JobTriggerInputFor](#jobtriggerinputfor)
+  - [JobTriggerName](#jobtriggername)
+  - [JobTriggerOptions](#jobtriggeroptions)
+  - [JobTriggerOutputFor](#jobtriggeroutputfor)
+  - [JobTriggerSelector](#jobtriggerselector)
+  - [JobWatchFrameFor](#jobwatchframefor)
+  - [JobWatchInput](#jobwatchinput)
+  - [JobWatchName](#jobwatchname)
   - [MemberPresence](#memberpresence)
+  - [SelectedJobField](#selectedjobfield)
 
 ---
 
@@ -1481,6 +4186,18 @@ export * from "./finite-hooks.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L4)
 
+## "./job-hooks.js" (namespace export)
+
+Re-exports all named exports from the "./job-hooks.js" module.
+
+**Signature**
+
+```ts
+export * from "./job-hooks.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L5)
+
 ## "./keys.js" (namespace export)
 
 Re-exports all named exports from the "./keys.js" module.
@@ -1491,7 +4208,7 @@ Re-exports all named exports from the "./keys.js" module.
 export * from "./keys.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L6)
 
 ## "./pending.js" (namespace export)
 
@@ -1503,7 +4220,7 @@ Re-exports all named exports from the "./pending.js" module.
 export * from "./pending.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L7)
 
 ## "./realtime-hook.js" (namespace export)
 
@@ -1515,7 +4232,7 @@ Re-exports all named exports from the "./realtime-hook.js" module.
 export * from "./realtime-hook.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
 
 ## "./registry.js" (namespace export)
 
@@ -1527,7 +4244,7 @@ Re-exports all named exports from the "./registry.js" module.
 export * from "./registry.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
 
 ## "./stream-hook.js" (namespace export)
 
@@ -1539,7 +4256,7 @@ Re-exports all named exports from the "./stream-hook.js" module.
 export * from "./stream-hook.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
 
 ## CountPresence
 
@@ -1549,7 +4266,337 @@ export * from "./stream-hook.js";
 declare const CountPresence: CountPresence;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L11)
+
+## JobCancelInput
+
+**Signature**
+
+```ts
+declare const JobCancelInput: JobCancelInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L15)
+
+## JobCancelInputFor
+
+**Signature**
+
+```ts
+declare const JobCancelInputFor: JobCancelInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L16)
+
+## JobCancelName
+
+**Signature**
+
+```ts
+declare const JobCancelName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L17)
+
+## JobCancelOutputFor
+
+**Signature**
+
+```ts
+declare const JobCancelOutputFor: JobCancelOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L18)
+
+## JobClientField
+
+**Signature**
+
+```ts
+declare const JobClientField: JobClientField;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L14)
+
+## JobContract
+
+**Signature**
+
+```ts
+declare const JobContract: JobContract<
+  Name,
+  JobId,
+  Input,
+  Output,
+  Failure,
+  Progress,
+  Streams,
+  Operations,
+  Fields
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L13)
+
+## JobFor
+
+**Signature**
+
+```ts
+declare const JobFor: JobFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L19)
+
+## JobGetInput
+
+**Signature**
+
+```ts
+declare const JobGetInput: JobGetInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L20)
+
+## JobListInput
+
+**Signature**
+
+```ts
+declare const JobListInput: JobListInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L22)
+
+## JobListQuery
+
+**Signature**
+
+```ts
+declare const JobListQuery: JobListQuery;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L21)
+
+## JobProcedureContract
+
+**Signature**
+
+```ts
+declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L24)
+
+## JobProcedureSelector
+
+**Signature**
+
+```ts
+declare const JobProcedureSelector: JobProcedureSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L23)
+
+## JobRegistry
+
+**Signature**
+
+```ts
+declare const JobRegistry: JobRegistry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L25)
+
+## JobRetryInput
+
+**Signature**
+
+```ts
+declare const JobRetryInput: JobRetryInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L26)
+
+## JobRetryInputFor
+
+**Signature**
+
+```ts
+declare const JobRetryInputFor: JobRetryInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L27)
+
+## JobRetryName
+
+**Signature**
+
+```ts
+declare const JobRetryName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L28)
+
+## JobRetryOutputFor
+
+**Signature**
+
+```ts
+declare const JobRetryOutputFor: JobRetryOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L29)
+
+## JobRunFor
+
+**Signature**
+
+```ts
+declare const JobRunFor: JobRunFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L33)
+
+## JobRunSelector
+
+**Signature**
+
+```ts
+declare const JobRunSelector: JobRunSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L30)
+
+## JobSelector
+
+**Signature**
+
+```ts
+declare const JobSelector: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L31)
+
+## JobSnapshotFor
+
+**Signature**
+
+```ts
+declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L32)
+
+## JobStreamInput
+
+**Signature**
+
+```ts
+declare const JobStreamInput: JobStreamInput<StreamName>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L34)
+
+## JobStreamProcedureContract
+
+**Signature**
+
+```ts
+declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L35)
+
+## JobTriggerInput
+
+**Signature**
+
+```ts
+declare const JobTriggerInput: JobTriggerInput<Input>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L36)
+
+## JobTriggerInputFor
+
+**Signature**
+
+```ts
+declare const JobTriggerInputFor: JobTriggerInputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L37)
+
+## JobTriggerName
+
+**Signature**
+
+```ts
+declare const JobTriggerName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L38)
+
+## JobTriggerOptions
+
+**Signature**
+
+```ts
+declare const JobTriggerOptions: JobTriggerOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L40)
+
+## JobTriggerOutputFor
+
+**Signature**
+
+```ts
+declare const JobTriggerOutputFor: JobTriggerOutputFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L39)
+
+## JobTriggerSelector
+
+**Signature**
+
+```ts
+declare const JobTriggerSelector: JobTriggerSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L41)
+
+## JobWatchFrameFor
+
+**Signature**
+
+```ts
+declare const JobWatchFrameFor: JobWatchFrameFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L43)
+
+## JobWatchInput
+
+**Signature**
+
+```ts
+declare const JobWatchInput: JobWatchInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L42)
+
+## JobWatchName
+
+**Signature**
+
+```ts
+declare const JobWatchName: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L44)
 
 ## MemberPresence
 
@@ -1559,7 +4606,406 @@ declare const CountPresence: CountPresence;
 declare const MemberPresence: MemberPresence<Member>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L11)
+
+## SelectedJobField
+
+**Signature**
+
+```ts
+declare const SelectedJobField: SelectedJobField<Fields, Field>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L45)
+
+## `job-hooks-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [PreparedJobRequest (interface)](#preparedjobrequest-interface)
+  - [generatedJobTriggerName](#generatedjobtriggername)
+  - [isRecord](#isrecord)
+  - [prepareJobRequest](#preparejobrequest)
+  - [readOperationId](#readoperationid)
+  - [readRunId](#readrunid)
+
+---
+
+# utils
+
+## PreparedJobRequest (interface)
+
+**Signature**
+
+```ts
+export interface PreparedJobRequest {
+  readonly value: unknown;
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L4)
+
+## generatedJobTriggerName
+
+**Signature**
+
+```ts
+declare const generatedJobTriggerName: (name: string) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L52)
+
+## isRecord
+
+**Signature**
+
+```ts
+declare const isRecord: (value: unknown) => value is Record<string, unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L57)
+
+## prepareJobRequest
+
+**Signature**
+
+```ts
+declare const prepareJobRequest: (
+  value: unknown,
+  expectedIdentity: ExpectedClientIdentity,
+  mutationContext?: object,
+) => PreparedJobRequest;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L12)
+
+## readOperationId
+
+**Signature**
+
+```ts
+declare const readOperationId: (value: unknown) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L40)
+
+## readRunId
+
+**Signature**
+
+```ts
+declare const readRunId: (value: unknown) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks-support.ts#L48)
+
+## `job-hooks.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobMutationOptions](#jobmutationoptions)
+  - [UseJobRunOptions (interface)](#usejobrunoptions-interface)
+  - [UseJobRunResult (interface)](#usejobrunresult-interface)
+  - [useJobCancel](#usejobcancel)
+  - [useJobRetry](#usejobretry)
+  - [useJobRun](#usejobrun)
+  - [useJobTrigger](#usejobtrigger)
+
+---
+
+# utils
+
+## JobMutationOptions
+
+**Signature**
+
+```ts
+declare const JobMutationOptions: JobMutationOptions<Output, Failure, Input, Context>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L16)
+
+## UseJobRunOptions (interface)
+
+**Signature**
+
+```ts
+export interface UseJobRunOptions extends Omit<
+  JobWatchOptions,
+  "runId" | "expectedIdentity" | "identityKey" | "applicationId" | "protocolVersion"
+> {
+  readonly runId?: string;
+  readonly enabled?: boolean;
+  readonly autoConnect?: boolean;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L19)
+
+## UseJobRunResult (interface)
+
+**Signature**
+
+```ts
+export interface UseJobRunResult<Run = RunSnapshot> extends JobWatchState<Run> {
+  readonly connect: () => Promise<void>;
+  readonly disconnect: () => Promise<void>;
+  readonly refetch: () => Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L29)
+
+## useJobCancel
+
+**Signature**
+
+```ts
+declare const useJobCancel: <Name extends JobCancelName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobCancelOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobCancelInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobCancelOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobCancelInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L17)
+
+## useJobRetry
+
+**Signature**
+
+```ts
+declare const useJobRetry: <Name extends JobRetryName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobRetryOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobRetryInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobRetryOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobRetryInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L17)
+
+## useJobRun
+
+**Signature**
+
+```ts
+declare const useJobRun: <Name extends JobWatchName>(
+  name: Name,
+  options?: UseJobRunOptions,
+) => UseJobRunResult<JobRunFor<Name>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L35)
+
+## useJobTrigger
+
+**Signature**
+
+```ts
+declare const useJobTrigger: <Name extends JobTriggerName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobTriggerOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobTriggerInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobTriggerOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobTriggerInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-hooks.ts#L17)
+
+## `job-mutation-hooks.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [JobMutationOptions (type alias)](#jobmutationoptions-type-alias)
+  - [useJobCancel](#usejobcancel)
+  - [useJobRetry](#usejobretry)
+  - [useJobTrigger](#usejobtrigger)
+
+---
+
+# utils
+
+## JobMutationOptions (type alias)
+
+**Signature**
+
+```ts
+type JobMutationOptions<Output, Failure, Input, Context> = Omit<
+  UseMutationOptions<Output, Failure, Input, Context>,
+  "mutationKey" | "mutationFn"
+> & { readonly jobId?: string };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-hooks.ts#L33)
+
+## useJobCancel
+
+**Signature**
+
+```ts
+declare const useJobCancel: <Name extends JobCancelName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobCancelOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobCancelInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobCancelOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobCancelInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-hooks.ts#L99)
+
+## useJobRetry
+
+**Signature**
+
+```ts
+declare const useJobRetry: <Name extends JobRetryName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobRetryOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobRetryInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobRetryOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobRetryInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-hooks.ts#L116)
+
+## useJobTrigger
+
+**Signature**
+
+```ts
+declare const useJobTrigger: <Name extends JobTriggerName, Context = unknown>(
+  name: Name,
+  options?: JobMutationOptions<
+    JobTriggerOutputFor<Name>,
+    JobFailureFor<Name>,
+    JobTriggerInputFor<Name>,
+    Context
+  >,
+) => UseMutationResult<
+  JobTriggerOutputFor<Name>,
+  JobFailureFor<Name>,
+  JobTriggerInputFor<Name>,
+  Context
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-hooks.ts#L38)
+
+## `job-mutation-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [controlReferences](#controlreferences)
+  - [offline](#offline)
+  - [settlePending](#settlepending)
+  - [writableScope](#writablescope)
+
+---
+
+# utils
+
+## controlReferences
+
+**Signature**
+
+```ts
+declare const controlReferences: (input: unknown) => { readonly runId?: string };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-support.ts#L37)
+
+## offline
+
+**Signature**
+
+```ts
+declare const offline: () => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-support.ts#L42)
+
+## settlePending
+
+**Signature**
+
+```ts
+declare const settlePending: (
+  scopeKey: string,
+  pending: PendingOperationMetadata,
+  error: unknown,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-support.ts#L17)
+
+## writableScope
+
+**Signature**
+
+```ts
+declare const writableScope: (
+  runtime: RelkitClientRuntime,
+) => NonNullable<RelkitClientRuntime["scope"]>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/job-mutation-support.ts#L8)
 
 ## `keys.ts`
 
@@ -1568,12 +5014,31 @@ declare const MemberPresence: MemberPresence<Member>;
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [RelkitJobKeyOptions (interface)](#relkitjobkeyoptions-interface)
   - [RelkitKeyScope (interface)](#relkitkeyscope-interface)
+  - [relkitJobKey](#relkitjobkey)
   - [relkitKey](#relkitkey)
 
 ---
 
 # utils
+
+## RelkitJobKeyOptions (interface)
+
+**Signature**
+
+```ts
+export interface RelkitJobKeyOptions {
+  readonly jobId: string;
+  readonly runId?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/keys.ts#L34)
 
 ## RelkitKeyScope (interface)
 
@@ -1587,10 +5052,27 @@ export interface RelkitKeyScope {
   readonly sessionEpoch: string;
   readonly identityKey: string | null | undefined;
   readonly publicFingerprint: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
 }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/keys.ts#L1)
+
+## relkitJobKey
+
+**Signature**
+
+```ts
+declare const relkitJobKey: (
+  scope: RelkitKeyScope,
+  operation: "trigger" | "run" | "cancel" | "retry",
+  options: RelkitJobKeyOptions,
+  input?: unknown,
+) => readonly unknown[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/keys.ts#L43)
 
 ## relkitKey
 
@@ -1605,7 +5087,228 @@ declare const relkitKey: (
 ) => readonly unknown[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/keys.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/keys.ts#L12)
+
+## `pending-errors.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [MAX_JOB_INTENTS](#max_job_intents)
+  - [PendingCapacityError (class)](#pendingcapacityerror-class)
+    - [code (property)](#code-property)
+  - [PendingRecoveryUnavailableError (class)](#pendingrecoveryunavailableerror-class)
+    - [code (property)](#code-property-1)
+  - [PendingRequestMismatchError (class)](#pendingrequestmismatcherror-class)
+    - [code (property)](#code-property-2)
+
+---
+
+# utils
+
+## MAX_JOB_INTENTS
+
+**Signature**
+
+```ts
+declare const MAX_JOB_INTENTS: 100;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L1)
+
+## PendingCapacityError (class)
+
+**Signature**
+
+```ts
+declare class PendingCapacityError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L3)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_PENDING_CAPACITY"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L4)
+
+## PendingRecoveryUnavailableError (class)
+
+**Signature**
+
+```ts
+declare class PendingRecoveryUnavailableError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L21)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_PENDING_RECOVERY_UNAVAILABLE"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L22)
+
+## PendingRequestMismatchError (class)
+
+**Signature**
+
+```ts
+declare class PendingRequestMismatchError {
+  constructor();
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L12)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_PENDING_REQUEST_MISMATCH"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-errors.ts#L13)
+
+## `pending-store.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [PENDING_PREFIX](#pending_prefix)
+  - [clearPendingStorage](#clearpendingstorage)
+  - [pendingEntryKey](#pendingentrykey)
+  - [pendingMemory](#pendingmemory)
+  - [readPendingStorage](#readpendingstorage)
+  - [removePendingStorage](#removependingstorage)
+  - [writePendingStorage](#writependingstorage)
+
+---
+
+# utils
+
+## PENDING_PREFIX
+
+**Signature**
+
+```ts
+declare const PENDING_PREFIX: "relkit.pending.";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L3)
+
+## clearPendingStorage
+
+**Signature**
+
+```ts
+declare const clearPendingStorage: (scopeKey: string) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L43)
+
+## pendingEntryKey
+
+**Signature**
+
+```ts
+declare const pendingEntryKey: (scopeKey: string, operationId: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L9)
+
+## pendingMemory
+
+**Signature**
+
+```ts
+declare const pendingMemory: Map<
+  string,
+  { readonly metadata: PendingOperationMetadata; readonly request?: unknown }
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L4)
+
+## readPendingStorage
+
+**Signature**
+
+```ts
+declare const readPendingStorage: (scopeKey: string) => Map<string, PendingOperationMetadata>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L25)
+
+## removePendingStorage
+
+**Signature**
+
+```ts
+declare const removePendingStorage: (key: string) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L19)
+
+## writePendingStorage
+
+**Signature**
+
+```ts
+declare const writePendingStorage: (key: string, value: PendingOperationMetadata) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-store.ts#L13)
+
+## `pending-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [candidates](#candidates)
+  - [isRecord](#isrecord)
+
+---
+
+# utils
+
+## candidates
+
+**Signature**
+
+```ts
+declare const candidates: (value: unknown) => readonly unknown[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-support.ts#L1)
+
+## isRecord
+
+**Signature**
+
+```ts
+declare const isRecord: (value: unknown) => value is Record<string, unknown>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending-support.ts#L6)
 
 ## `pending.ts`
 
@@ -1614,16 +5317,71 @@ declare const relkitKey: (
 ## Exports Grouped by Category
 
 - [utils](#utils)
+  - [PendingCapacityError](#pendingcapacityerror)
+  - [PendingRecoveryUnavailableError](#pendingrecoveryunavailableerror)
+  - [PendingRememberOptions (interface)](#pendingrememberoptions-interface)
+  - [PendingRequestMismatchError](#pendingrequestmismatcherror)
   - [clearPendingOperations](#clearpendingoperations)
+  - [digestPendingRequest](#digestpendingrequest)
   - [forgetPending](#forgetpending)
+  - [isJobUnknownOutcome](#isjobunknownoutcome)
+  - [jobUnknownOutcome](#jobunknownoutcome)
+  - [matchesPendingRequest](#matchespendingrequest)
   - [pendingOperations](#pendingoperations)
+  - [pendingRequest](#pendingrequest)
   - [pendingScopeKey](#pendingscopekey)
+  - [rememberJobPending](#rememberjobpending)
   - [rememberPending](#rememberpending)
   - [updatePending](#updatepending)
 
 ---
 
 # utils
+
+## PendingCapacityError
+
+**Signature**
+
+```ts
+declare const PendingCapacityError: typeof PendingCapacityError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L22)
+
+## PendingRecoveryUnavailableError
+
+**Signature**
+
+```ts
+declare const PendingRecoveryUnavailableError: typeof PendingRecoveryUnavailableError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L23)
+
+## PendingRememberOptions (interface)
+
+**Signature**
+
+```ts
+export interface PendingRememberOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly recovery?: JobUnknownOutcome["recovery"];
+  readonly retainRequest?: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L27)
+
+## PendingRequestMismatchError
+
+**Signature**
+
+```ts
+declare const PendingRequestMismatchError: typeof PendingRequestMismatchError;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L24)
 
 ## clearPendingOperations
 
@@ -1633,7 +5391,17 @@ declare const relkitKey: (
 declare const clearPendingOperations: (scopeKey: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L149)
+
+## digestPendingRequest
+
+**Signature**
+
+```ts
+declare const digestPendingRequest: (value: unknown) => Promise<string>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L179)
 
 ## forgetPending
 
@@ -1643,7 +5411,41 @@ declare const clearPendingOperations: (scopeKey: string) => void;
 declare const forgetPending: (scopeKey: string, operationId: string) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L122)
+
+## isJobUnknownOutcome
+
+**Signature**
+
+```ts
+declare const isJobUnknownOutcome: (value: unknown) => value is JobUnknownOutcome;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L156)
+
+## jobUnknownOutcome
+
+**Signature**
+
+```ts
+declare const jobUnknownOutcome: (value: unknown) => JobUnknownOutcome | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L160)
+
+## matchesPendingRequest
+
+**Signature**
+
+```ts
+declare const matchesPendingRequest: (
+  scopeKey: string,
+  operationId: string,
+  request: unknown,
+) => Promise<boolean>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L140)
 
 ## pendingOperations
 
@@ -1653,7 +5455,17 @@ declare const forgetPending: (scopeKey: string, operationId: string) => void;
 declare const pendingOperations: (scopeKey: string) => readonly PendingOperationMetadata[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L127)
+
+## pendingRequest
+
+**Signature**
+
+```ts
+declare const pendingRequest: (scopeKey: string, operationId: string) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L136)
 
 ## pendingScopeKey
 
@@ -1663,7 +5475,22 @@ declare const pendingOperations: (scopeKey: string) => readonly PendingOperation
 declare const pendingScopeKey: (scope: RelkitKeyScope) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L34)
+
+## rememberJobPending
+
+**Signature**
+
+```ts
+declare const rememberJobPending: (
+  scopeKey: string,
+  resourceId: string,
+  request: unknown,
+  options?: PendingRememberOptions,
+) => Promise<PendingOperationMetadata>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L93)
 
 ## rememberPending
 
@@ -1676,10 +5503,11 @@ declare const rememberPending: (
   resourceId: string,
   value: unknown,
   references?: Pick<PendingOperationMetadata, "threadId" | "runId">,
+  options?: PendingRememberOptions,
 ) => Promise<PendingOperationMetadata>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L38)
 
 ## updatePending
 
@@ -1689,7 +5517,7 @@ declare const rememberPending: (
 declare const updatePending: (scopeKey: string, value: PendingOperationMetadata) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/pending.ts#L112)
 
 ## `procedure.ts`
 
@@ -1701,6 +5529,7 @@ declare const updatePending: (scopeKey: string, value: PendingOperationMetadata)
   - [ProcedureUtilsLike (interface)](#procedureutilslike-interface)
   - [procedureCall](#procedurecall)
   - [procedureUtils](#procedureutils)
+  - [resolveProcedure](#resolveprocedure)
 
 ---
 
@@ -1728,20 +5557,38 @@ export interface ProcedureUtilsLike {
 **Signature**
 
 ```ts
-declare const procedureCall: (root: unknown, selector: string) => (...args: unknown[]) => unknown;
+declare const procedureCall: (
+  root: unknown,
+  selector: string | readonly string[],
+) => (...args: unknown[]) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/procedure.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/procedure.ts#L21)
 
 ## procedureUtils
 
 **Signature**
 
 ```ts
-declare const procedureUtils: (root: unknown, selector: string) => ProcedureUtilsLike;
+declare const procedureUtils: (
+  root: unknown,
+  selector: string | readonly string[],
+) => ProcedureUtilsLike;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/procedure.ts#L12)
+
+## resolveProcedure
+
+Resolves generated paths without changing exact dotted route-key semantics.
+
+**Signature**
+
+```ts
+declare const resolveProcedure: (root: unknown, selector: string | readonly string[]) => unknown;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/procedure.ts#L32)
 
 ## `realtime-hook.ts`
 
@@ -1766,9 +5613,9 @@ declare const procedureUtils: (root: unknown, selector: string) => ProcedureUtil
 **Signature**
 
 ```ts
-type Partial<{ readonly [Event in keyof EventsFor<Name>]: (payload: EventsFor<Name>[Event]) => void; }> = Partial<{
+type ChannelHandlers<Name extends ChannelSelector> = Partial<{
   readonly [Event in keyof EventsFor<Name>]: (payload: EventsFor<Name>[Event]) => void;
-}>
+}>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/realtime-hook.ts#L51)
@@ -1793,7 +5640,7 @@ export interface UseChannelOptions<Name extends ChannelSelector> {
 **Signature**
 
 ```ts
-type UseChannelResult<Name> = Omit<ChannelState, "presence"> &
+type UseChannelResult<Name extends ChannelSelector> = Omit<ChannelState, "presence"> &
   ([PresenceFor<Name>] extends [never] ? {} : { readonly presence: PresenceFor<Name> });
 ```
 
@@ -2042,9 +5889,30 @@ declare const realtimeSubscriptionKey: (channel: string, params: unknown) => str
   - [FiniteSelector (type alias)](#finiteselector-type-alias)
   - [InputFor (type alias)](#inputfor-type-alias)
   - [ItemFor (type alias)](#itemfor-type-alias)
+  - [JobCancelInput](#jobcancelinput)
+  - [JobClientField](#jobclientfield)
+  - [JobContract](#jobcontract)
+  - [JobFor](#jobfor)
+  - [JobGetInput](#jobgetinput)
+  - [JobListInput](#joblistinput)
+  - [JobListQuery](#joblistquery)
+  - [JobProcedureContract](#jobprocedurecontract)
+  - [JobProcedureSelector](#jobprocedureselector)
+  - [JobRegistry](#jobregistry)
+  - [JobRetryInput](#jobretryinput)
+  - [JobRunSelector](#jobrunselector)
+  - [JobSelector](#jobselector)
+  - [JobSnapshotFor](#jobsnapshotfor)
+  - [JobStreamInput](#jobstreaminput)
+  - [JobStreamProcedureContract](#jobstreamprocedurecontract)
+  - [JobTriggerInput](#jobtriggerinput)
+  - [JobTriggerOptions](#jobtriggeroptions)
+  - [JobTriggerSelector](#jobtriggerselector)
+  - [JobWatchInput](#jobwatchinput)
   - [MutationSelector (type alias)](#mutationselector-type-alias)
   - [OutputFor (type alias)](#outputfor-type-alias)
   - [QuerySelector (type alias)](#queryselector-type-alias)
+  - [SelectedJobField](#selectedjobfield)
   - [StreamSelector (type alias)](#streamselector-type-alias)
 
 ---
@@ -2059,7 +5927,7 @@ declare const realtimeSubscriptionKey: (channel: string, params: unknown) => str
 export interface AgentRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L88)
 
 ## AgentSelector (type alias)
 
@@ -2069,7 +5937,7 @@ export interface AgentRegistry {}
 type AgentSelector = Extract<keyof AgentRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L91)
 
 ## ChannelRegistry (interface)
 
@@ -2079,7 +5947,7 @@ type AgentSelector = Extract<keyof AgentRegistry, string>;
 export interface ChannelRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L87)
 
 ## ChannelSelector (type alias)
 
@@ -2089,7 +5957,7 @@ export interface ChannelRegistry {}
 type ChannelSelector = Extract<keyof ChannelRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L90)
 
 ## ClientAgentContract (interface)
 
@@ -2121,7 +5989,7 @@ export interface ClientAgentContract<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L58)
 
 ## ClientAgentDynamic (interface)
 
@@ -2134,7 +6002,7 @@ export interface ClientAgentDynamic {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L82)
 
 ## ClientChannelContract (interface)
 
@@ -2152,7 +6020,7 @@ export interface ClientChannelContract<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L48)
 
 ## ClientRegistry (interface)
 
@@ -2192,7 +6060,7 @@ export interface ClientRouteContract<
 type ClientSelector = Extract<keyof ClientRegistry, string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L93)
 
 ## ClientStreamContract (interface)
 
@@ -2216,17 +6084,17 @@ export interface ClientStreamContract<Input = unknown, Item = unknown, Failure =
 **Signature**
 
 ```ts
-type ContractFor<Name> = ClientRegistry[Name];
+type ContractFor<Name extends ClientSelector> = ClientRegistry[Name];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L111)
 
 ## ErrorFor (type alias)
 
 **Signature**
 
 ```ts
-type ErrorFor<Name> =
+type ErrorFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly error: infer Error;
   }
@@ -2234,7 +6102,7 @@ type ErrorFor<Name> =
     : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L124)
 
 ## FiniteSelector (type alias)
 
@@ -2246,14 +6114,14 @@ type FiniteSelector = {
 }[ClientSelector];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L94)
 
 ## InputFor (type alias)
 
 **Signature**
 
 ```ts
-type InputFor<Name> =
+type InputFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly input: infer Input;
   }
@@ -2261,14 +6129,14 @@ type InputFor<Name> =
     : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L88)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L112)
 
 ## ItemFor (type alias)
 
 **Signature**
 
 ```ts
-type ItemFor<Name> =
+type ItemFor<Name extends StreamSelector> =
   ContractFor<Name> extends {
     readonly item: infer Item;
   }
@@ -2276,7 +6144,217 @@ type ItemFor<Name> =
     : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L130)
+
+## JobCancelInput
+
+**Signature**
+
+```ts
+declare const JobCancelInput: JobCancelInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L27)
+
+## JobClientField
+
+**Signature**
+
+```ts
+declare const JobClientField: JobClientField;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L26)
+
+## JobContract
+
+**Signature**
+
+```ts
+declare const JobContract: JobContract<
+  Name,
+  JobId,
+  Input,
+  Output,
+  Failure,
+  Progress,
+  Streams,
+  Operations,
+  Fields
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L25)
+
+## JobFor
+
+**Signature**
+
+```ts
+declare const JobFor: JobFor<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L28)
+
+## JobGetInput
+
+**Signature**
+
+```ts
+declare const JobGetInput: JobGetInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L29)
+
+## JobListInput
+
+**Signature**
+
+```ts
+declare const JobListInput: JobListInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L31)
+
+## JobListQuery
+
+**Signature**
+
+```ts
+declare const JobListQuery: JobListQuery;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L30)
+
+## JobProcedureContract
+
+**Signature**
+
+```ts
+declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L33)
+
+## JobProcedureSelector
+
+**Signature**
+
+```ts
+declare const JobProcedureSelector: JobProcedureSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L32)
+
+## JobRegistry
+
+**Signature**
+
+```ts
+declare const JobRegistry: JobRegistry;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L34)
+
+## JobRetryInput
+
+**Signature**
+
+```ts
+declare const JobRetryInput: JobRetryInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L35)
+
+## JobRunSelector
+
+**Signature**
+
+```ts
+declare const JobRunSelector: JobRunSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L36)
+
+## JobSelector
+
+**Signature**
+
+```ts
+declare const JobSelector: never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L37)
+
+## JobSnapshotFor
+
+**Signature**
+
+```ts
+declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L38)
+
+## JobStreamInput
+
+**Signature**
+
+```ts
+declare const JobStreamInput: JobStreamInput<StreamName>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L39)
+
+## JobStreamProcedureContract
+
+**Signature**
+
+```ts
+declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item, Failure>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L40)
+
+## JobTriggerInput
+
+**Signature**
+
+```ts
+declare const JobTriggerInput: JobTriggerInput<Input>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L41)
+
+## JobTriggerOptions
+
+**Signature**
+
+```ts
+declare const JobTriggerOptions: JobTriggerOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L42)
+
+## JobTriggerSelector
+
+**Signature**
+
+```ts
+declare const JobTriggerSelector: JobTriggerSelector<Name>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L43)
+
+## JobWatchInput
+
+**Signature**
+
+```ts
+declare const JobWatchInput: JobWatchInput;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L44)
 
 ## MutationSelector (type alias)
 
@@ -2290,14 +6368,14 @@ type MutationSelector = {
 }[FiniteSelector];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L102)
 
 ## OutputFor (type alias)
 
 **Signature**
 
 ```ts
-type OutputFor<Name> =
+type OutputFor<Name extends ClientSelector> =
   ContractFor<Name> extends {
     readonly output: infer Output;
   }
@@ -2305,7 +6383,7 @@ type OutputFor<Name> =
     : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L118)
 
 ## QuerySelector (type alias)
 
@@ -2319,7 +6397,17 @@ type QuerySelector = {
 }[FiniteSelector];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L97)
+
+## SelectedJobField
+
+**Signature**
+
+```ts
+declare const SelectedJobField: SelectedJobField<Fields, Field>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L45)
 
 ## StreamSelector (type alias)
 
@@ -2331,7 +6419,7 @@ type StreamSelector = {
 }[ClientSelector];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/registry.ts#L107)
 
 ## `stream-hook.ts`
 
@@ -2388,6 +6476,32 @@ declare const useStream: <Name extends StreamSelector>(
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/stream-hook.ts#L20)
+
+## `write-error.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [RelkitWriteError (class)](#relkitwriteerror-class)
+
+---
+
+# utils
+
+## RelkitWriteError (class)
+
+**Signature**
+
+```ts
+declare class RelkitWriteError { constructor(
+    readonly outcome: "not-sent" | "unknown",
+    message: string,
+  ) }
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/write-error.ts#L1)
 
 ## `server-context.ts`
 

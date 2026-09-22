@@ -3,6 +3,7 @@ import type { AstCandidateIndicator, AstPrefilterCandidate, AstReExport } from "
 import { readFacts } from "./source-facts.js";
 const KNOWN_FACTORIES = new Set([
   "asTool",
+  "defineApp",
   "defineConfig",
   "defineConstants",
   "definePrompt",
@@ -12,6 +13,7 @@ const KNOWN_FACTORIES = new Set([
   "defineError",
   "defineRoute",
   "defineServiceRoutes",
+  "defineTask",
   "defineJob",
   "defineEvent",
   "defineEventFunction",

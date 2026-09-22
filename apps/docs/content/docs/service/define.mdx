@@ -62,7 +62,8 @@ member. Provider configuration, environment examples, and package dependencies a
 </include>
 
 `functions` contains ordinary callable function descriptors. `events` contains handler-free event
-contracts. Both maps are optional. They are **definition options**, not namespaces on the resulting
+contracts. `tasks` and `jobs` contain the task/job descriptors owned by the service. All maps are optional.
+They are **definition options**, not namespaces on the resulting
 service: callers use `orders.createOrder` and `orders.orderCreated`, not
 `orders.functions.createOrder` or `orders.events.orderCreated`.
 
@@ -76,7 +77,8 @@ Leave a function out of the service if only its own domain uses it. It is still 
 called by other functions in that domain. A helper does not become public just because its module
 exports it in TypeScript.
 
-Do not put caches, buckets, jobs, tools, agents, or plain helper values into the member maps.
+Do not put caches, buckets, tools, agents, or plain helper values into the member maps. A task/job member
+does not expose a browser client by itself; its explicit `client` policy still controls that boundary.
 `defineEventFunction` subscribers are event-only and cannot be public callable members either. Keep
 those artifacts in the domain; expose an ordinary function when another domain needs their behavior.
 

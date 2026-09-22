@@ -323,7 +323,10 @@ declare const ToolArgumentValidationError: typeof FunctionToolArgumentValidation
 **Signature**
 
 ```ts
-type ToolDescriptor<Id, Target> = FunctionToolDescriptor<Id, Target>;
+type ToolDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+> = FunctionToolDescriptor<Id, Target>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L60)
@@ -388,7 +391,7 @@ type ToolSideEffect = FunctionToolSideEffect;
 **Signature**
 
 ```ts
-type ToolTarget<Target> = FunctionToolTarget<Target>;
+type ToolTarget<Target extends FunctionRefAny> = FunctionToolTarget<Target>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/tools/src/define-tool.ts#L58)

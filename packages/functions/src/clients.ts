@@ -2,6 +2,7 @@ import type { BucketClient } from "@relkit/buckets";
 import type { CacheClient } from "@relkit/cache";
 import { type InferInput, type InferOutput, type StandardSchemaV1 } from "@relkit/schema";
 import type { TracePropagation } from "@relkit/contracts";
+import type { RunHandle } from "@relkit/contracts/jobs";
 
 export type JobState =
   "accepted" | "available" | "leased" | "delayed" | "completed" | "dead-lettered";
@@ -108,6 +109,17 @@ export type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 export type JobClientFor<T> = {
   enqueue(input: InputOf<T>, options?: JobEnqueueOptions): Promise<JobEnqueueResult>;
 };
+export interface TaskTriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
+export type TaskClientFor<T> = {
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
 export type EventClientFor<T> = {
   publish(
     payload: EventInputOf<T>,
@@ -119,6 +131,9 @@ export type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 
 export type JobClients<M> = {
   readonly [Name in keyof NonNullable<M> & string]: JobClientFor<NonNullable<M>[Name]>;
+};
+export type TaskClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
 };
 export type EventClients<M> = {
   readonly [Name in keyof NonNullable<M> & string]: EventClientFor<NonNullable<M>[Name]>;

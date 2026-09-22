@@ -4,6 +4,7 @@ export const ADD_KINDS = [
   "error",
   "event",
   "event-function",
+  "task",
   "job",
   "cache",
   "bucket",
@@ -46,6 +47,7 @@ export type AddRequest =
       "event-function",
       { event: string; delivery: "transient" | "durable"; profile?: string }
     >
+  | NamedRequest<"task", { version: string; execution: "durable" | "retryable" }>
   | NamedRequest<"job", { target: string; profile?: string }>
   | NamedRequest<
       "cache",

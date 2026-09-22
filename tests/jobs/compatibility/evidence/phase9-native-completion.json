@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-20",
+  "phase": "9",
+  "task": "10.19",
+  "status": "ready",
+  "scope": {
+    "certified": ["inngest self-hosted Docker", "effect-mq self-hosted PostgreSQL"],
+    "deferred": ["Trigger native/Docker evidence", "Pulumi, AWS, and managed-cloud evidence"],
+    "deferredReason": "Explicit completion-scope decision for this change; deferred modes remain not-tested and are not support claims."
+  },
+  "commands": ["RELKIT_TEST_DOCKER=1 bun run test:jobs:providers", "bun run test:jobs:matrix"],
+  "providers": {
+    "inngest": {
+      "profile": "self-hosted Docker",
+      "status": "passed",
+      "evidence": [
+        "tests/jobs/compatibility/evidence/inngest-native.json",
+        "tests/jobs/compatibility/evidence/phase0-1.11.json"
+      ],
+      "freshAcceptance": [
+        "same-key deduplication",
+        "lost-response receipt recovery",
+        "two durable waits across worker restarts",
+        "application retry-attempt behavior",
+        "PostgreSQL retention",
+        "invalid-token rejection"
+      ]
+    },
+    "effect-mq": {
+      "profile": "self-hosted PostgreSQL",
+      "status": "passed",
+      "evidence": ["tests/jobs/compatibility/evidence/phase0-effect-mq.json"],
+      "freshAcceptance": [
+        "duplicate receipt",
+        "worker restart recovery",
+        "retry attempts",
+        "cancellation terminal state",
+        "schedule ownership reconciliation",
+        "PostgreSQL retention"
+      ],
+      "unsupported": ["durable sleep"],
+      "diagnostic": "LISTEN wake-ups fell back to polling under the pinned Effect runtime; no correctness failure was observed."
+    },
+    "trigger": {
+      "profile": "self-hosted Docker",
+      "status": "not-tested",
+      "evidence": ["tests/jobs/compatibility/evidence/phase5-adapters.json"],
+      "diagnostic": "Deferred by the explicit completion-scope decision; the available main-tag image is moving and absent locally, and no release-pinned registration/auth configuration is available."
+    }
+  },
+  "crashRaceMatrix": {
+    "passedOrCovered": [
+      "F01",
+      "F02",
+      "F05",
+      "F06",
+      "F07",
+      "F08",
+      "F16",
+      "F18",
+      "F19",
+      "F23",
+      "F24",
+      "F25",
+      "F26"
+    ],
+    "partialOrUnverified": [
+      "F04",
+      "F09",
+      "F10",
+      "F11",
+      "F12",
+      "F14",
+      "F15",
+      "F17",
+      "F20",
+      "F21",
+      "F22",
+      "F27",
+      "F28"
+    ],
+    "notTested": ["F03", "F13"],
+    "reason": "The native matrix is complete for the two pinned local engines only where their advertised capabilities expose the required injection point; unsupported provider capabilities remain explicit."
+  },
+  "requirementStatus": {
+    "passedLocalOrNative": [
+      "TJ-001",
+      "TJ-002",
+      "TJ-003",
+      "TJ-004",
+      "TJ-005",
+      "TJ-006",
+      "TJ-007",
+      "TJ-009",
+      "TJ-012",
+      "TJ-013",
+      "TJ-014",
+      "TJ-017",
+      "TJ-018",
+      "TJ-022",
+      "TJ-023",
+      "TJ-024",
+      "TJ-025",
+      "TJ-026",
+      "TJ-027",
+      "TJ-028",
+      "TJ-029",
+      "TJ-030",
+      "TJ-031",
+      "TJ-032",
+      "TJ-033",
+      "TJ-034",
+      "TJ-035",
+      "TJ-036",
+      "TJ-037",
+      "TJ-039",
+      "TJ-040",
+      "TJ-042",
+      "TJ-043",
+      "TJ-044",
+      "TJ-045"
+    ],
+    "partialOrProviderScoped": [
+      "TJ-008",
+      "TJ-010",
+      "TJ-011",
+      "TJ-015",
+      "TJ-016",
+      "TJ-019",
+      "TJ-020",
+      "TJ-021",
+      "TJ-038",
+      "TJ-041"
+    ],
+    "notTestedOrUnavailable": []
+  },
+  "loadAndSecurity": {
+    "status": "partial",
+    "localClientEnvelope": "passed; 100 active feeds, 1000 shared observers, and 10000 dispose cycles",
+    "authorizationAndCursorFixtures": "passed locally",
+    "nativeProviderLoad": "not-tested beyond the pinned local acceptance envelopes",
+    "managedCloud": "deferred by scope; remains not-tested and no cloud claim is made"
+  },
+  "deferredChecks": [
+    "Trigger native self-hosted evidence",
+    "Pulumi, AWS, and managed-cloud evidence"
+  ]
+}

@@ -2,6 +2,7 @@ import { feature, type Feature } from "./documentation-catalog.js";
 import { databaseFeature } from "./database-guide-catalog.js";
 import { authFeature } from "./auth-guide-catalog.js";
 import { realtimeFeature } from "./realtime-feature.js";
+import { testingFeature } from "./feature-catalog-testing.js";
 
 export const features = [
   feature(
@@ -120,11 +121,14 @@ export const features = [
   feature(
     "jobs",
     "Jobs",
-    "Queue validated work with bounded retry and concurrency.",
-    "jobs/define",
+    "Run typed tasks durably with bounded retry, progress, and provider-backed schedules.",
+    "jobs/quickstart",
     "jobs",
-    [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["apps/docs/examples/jobs/send-receipt.job.ts"],
+    [
+      ["packages/jobs/src/define-task.ts", "defineTask"],
+      ["packages/jobs/src/define-job.ts", "defineJob"],
+    ],
+    ["examples/commerce/src/orders/tasks/export-orders.task.ts"],
   ),
   feature(
     "schedules",
@@ -133,7 +137,7 @@ export const features = [
     "jobs/schedules",
     "jobs",
     [["packages/jobs/src/define-job.ts", "defineJob"]],
-    ["apps/docs/examples/jobs/send-receipt.job.ts"],
+    ["examples/commerce/src/orders/jobs/cleanup-orders.job.ts"],
   ),
   feature(
     "buckets",
@@ -183,16 +187,5 @@ export const features = [
     [["packages/agents/src/define-agent.ts", "defineAgent"]],
     ["examples/commerce/src/orders/agents/order-support.agent.ts"],
   ),
-  feature(
-    "testing",
-    "Testing",
-    "Exercise the engine with HTTP helpers and deterministic fakes.",
-    "operations/testing",
-    "testing",
-    [
-      ["packages/testing/src/invoke-function.ts", "invokeFunction"],
-      ["packages/testing/src/application.ts", "createTestApplication"],
-    ],
-    ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
-  ),
+  testingFeature,
 ] as const satisfies readonly Feature[];

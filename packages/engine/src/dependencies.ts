@@ -8,7 +8,14 @@ import { createClient, dependencyId, edgeKind, guardedMap } from "./dependency-c
 
 export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-clients.js";
 
-export const DEPENDENCY_CATEGORIES = ["jobs", "events", "buckets", "cache", "agents"] as const;
+export const DEPENDENCY_CATEGORIES = [
+  "tasks",
+  "jobs",
+  "events",
+  "buckets",
+  "cache",
+  "agents",
+] as const;
 export type DependencyCategory = (typeof DEPENDENCY_CATEGORIES)[number];
 
 export interface DependencyRefLike {
@@ -72,7 +79,18 @@ export interface DirectFunctionRequest {
   readonly signal?: AbortSignal;
 }
 
+export interface DirectTaskRequest {
+  readonly taskId: string;
+  readonly name: string;
+  readonly declaration: DependencyRefLike;
+  readonly source: unknown;
+  readonly input: unknown;
+  readonly options?: Readonly<Record<string, unknown>>;
+  readonly signal?: AbortSignal;
+}
+
 export type DirectFunctionInvoker = (request: DirectFunctionRequest) => MaybePromise<unknown>;
+export type DirectTaskInvoker = (request: DirectTaskRequest) => MaybePromise<unknown>;
 
 export interface DependencyClientBuildOptions {
   readonly ownerId: string;
@@ -87,6 +105,7 @@ export interface DependencyClientBuildOptions {
   readonly traceId?: () => string | undefined;
   readonly now?: () => Date;
   readonly invokeFunction?: DirectFunctionInvoker;
+  readonly invokeTask?: DirectTaskInvoker;
   readonly onDeclaredEdge?: (edge: GraphEdge) => void;
   readonly onObservedEdge?: (edge: ObservedEdge) => void;
   readonly onOperation?: (
@@ -102,6 +121,7 @@ export function buildDependencyClients(
     throw new TypeError("Event dependencies are not supported; declare publishes instead");
   }
   return Object.freeze({
+    tasks: buildCategory("tasks", options),
     jobs: buildCategory("jobs", options),
     events: buildCategory("events", options),
     buckets: buildCategory("buckets", options),

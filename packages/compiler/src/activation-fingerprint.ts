@@ -4,6 +4,7 @@ import type { RuntimeActivationFingerprint } from "@relkit/contracts";
 export interface RuntimeActivationFingerprintInput {
   readonly graphHash: string;
   readonly manifestSource: string;
+  readonly jobsManifestSource?: string;
   readonly runtimeIntegrationsPlanSource: string;
   readonly localServicesPlanSource?: string;
   readonly providerOverridesGeneration?: string;
@@ -14,6 +15,8 @@ export function createRuntimeActivationFingerprint(
 ): RuntimeActivationFingerprint {
   required(input.graphHash, "graphHash");
   required(input.manifestSource, "manifestSource");
+  if (input.jobsManifestSource !== undefined)
+    required(input.jobsManifestSource, "jobsManifestSource");
   required(input.runtimeIntegrationsPlanSource, "runtimeIntegrationsPlanSource");
   if (input.localServicesPlanSource !== undefined)
     required(input.localServicesPlanSource, "localServicesPlanSource");
@@ -22,6 +25,9 @@ export function createRuntimeActivationFingerprint(
   return Object.freeze({
     graphHash: input.graphHash,
     manifestHash: hashGeneratedArtifact(input.manifestSource),
+    ...(input.jobsManifestSource === undefined
+      ? {}
+      : { jobsManifestHash: hashGeneratedArtifact(input.jobsManifestSource) }),
     runtimeIntegrationsPlanHash: hashGeneratedArtifact(input.runtimeIntegrationsPlanSource),
     ...(input.localServicesPlanSource === undefined
       ? {}

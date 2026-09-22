@@ -1,0 +1,33 @@
+---
+title: Tasks
+description: The typed, durable unit of job execution.
+---
+
+A task contains the code and schemas for one durable operation. A task is not a request handler: it may be resumed, retried, observed, or run after the original process exits.
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
+  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+</include>
+
+## Scaffold a task
+
+From the application root, with an existing `orders` service:
+
+```sh
+bun run relkit add task "Export Orders" --service orders
+```
+
+This creates a task-first definition under `src/orders/tasks/`. Expose it through a
+[task-first job](/docs/jobs/quickstart) when callers need admission, run handles, and observation.
+
+### Task CLI options
+
+<include cwd>content/generated/add-task-options.mdx</include>
+
+Use a stable task ID. The version identifies a compatible task definition, not a deployment build. Schema hashes and the client fingerprint are recorded with each job definition so migration checks can reject accidental contract changes.
+
+Tasks can emit typed progress, return a bounded output, sleep when their provider supports durable sleep, and throw declared errors for retry or terminal failure. Keep business side effects idempotent and put provider-specific code behind the integration boundary. A retryable task does not expose durable sleep.
+
+See [durations and sleep](/docs/jobs/durations-and-sleep), [execution policy](/docs/jobs/execution-policy), and [retries and idempotency](/docs/jobs/retries-and-idempotency).
+
+<include cwd>content/generated/related/jobs-tasks.mdx</include>

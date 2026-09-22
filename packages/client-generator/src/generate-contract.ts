@@ -4,6 +4,11 @@ import { clientRoutes } from "./generate-types.js";
 import { schemaType } from "./generate-schema.js";
 import { publicFingerprint, publicManifest } from "./generate-registry.js";
 import { agentProcedureEntries } from "./generate-agent-procedures.js";
+import {
+  jobProcedureEntriesFromSources,
+  jobProcedureSources,
+  type JobProcedureSource,
+} from "./generate-job-procedures.js";
 
 export function generateContract(graph: ApplicationGraph): string {
   return generateContractFromDocument(
@@ -21,6 +26,7 @@ export function generateContract(graph: ApplicationGraph): string {
       })),
     ),
     agentProcedureEntries(graph),
+    jobProcedureSources(graph),
   );
 }
 
@@ -34,6 +40,7 @@ export interface ContractProcedureDocument {
 export function generateContractFromDocument(
   procedures: readonly ContractProcedureDocument[],
   additionalEntries: readonly string[] = [],
+  jobs: readonly JobProcedureSource[] = [],
 ): string {
   const entries = [...procedures]
     .sort((left, right) => left.name.localeCompare(right.name))
@@ -66,6 +73,7 @@ export function generateContractFromDocument(
     "",
     "export const contract = {",
     ...entries,
+    ...jobProcedureEntriesFromSources(jobs),
     ...additionalEntries,
     "} as const;",
     "export default contract;",

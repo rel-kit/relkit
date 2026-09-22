@@ -10,6 +10,8 @@ import {
 } from "@relkit/contracts";
 import type { NormalizeInput, NormalizedDescriptor } from "./normalize-types.js";
 
+export { schemaKey, stableKey, taskSchemaKey } from "./normalize-utils-keys.js";
+
 export function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -21,6 +23,7 @@ export function isDescriptorKindValue(value: string): value is DescriptorKind {
     "middleware",
     "service",
     "route",
+    "task",
     "job",
     "event",
     "event-trigger",
@@ -184,12 +187,4 @@ export function refKind(value: unknown): string | undefined {
   return isRecord(value) && isRecord(value.ref) && typeof value.ref.kind === "string"
     ? value.ref.kind
     : undefined;
-}
-
-export function schemaKey(descriptorId: string, field: string): string {
-  return `${descriptorId}:${field}`;
-}
-
-export function stableKey(value: string, source: SourceLocation): string {
-  return `${value}\0${source.file}\0${source.line}\0${source.column}`;
 }

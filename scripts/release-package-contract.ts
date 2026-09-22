@@ -1,42 +1,10 @@
+import {
+  appSubpaths,
+  catalogSubpaths,
+  integrationSubpaths,
+} from "./release-package-contract-tables.js";
+
 const rootExport = { types: "./dist/index.d.ts", import: "./dist/index.js" };
-const appSubpaths = [
-  "schema",
-  "config",
-  "routes",
-  "functions",
-  "events",
-  "realtime",
-  "agents",
-  "jobs",
-  "cache",
-  "tools",
-  "buckets",
-  "services",
-] as const;
-
-const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
-  "@relkit/aws": ["host", "infrastructure", "access"],
-  "@relkit/cloudflare": ["runtime"],
-  "@relkit/docker": ["runtime"],
-  "@relkit/local": ["runtime"],
-  "@relkit/otlp": ["runtime"],
-  "@relkit/pulumi": ["engine"],
-  "@relkit/redis": ["runtime", "local-recipe"],
-  "@relkit/s3": ["runtime", "local-recipe"],
-  "@relkit/sentry": ["runtime"],
-};
-
-const catalogSubpaths = [
-  "redis",
-  "s3",
-  "docker",
-  "local",
-  "cloudflare",
-  "sentry",
-  "otlp",
-  "aws",
-  "pulumi",
-] as const;
 
 export function expectedExports(
   directoryName: string,
@@ -70,12 +38,38 @@ export function expectedExports(
         import: "./dist/runtime/index.js",
       },
     };
+  if (directoryName === "contracts")
+    return {
+      ".": rootExport,
+      "./jobs": {
+        types: "./dist/jobs.d.ts",
+        import: "./dist/jobs.js",
+      },
+    };
+  if (directoryName === "jobs")
+    return {
+      ".": rootExport,
+      "./adapter": {
+        types: "./dist/adapter.d.ts",
+        import: "./dist/adapter.js",
+      },
+      "./server": {
+        types: "./dist/server.d.ts",
+        import: "./dist/server.js",
+      },
+      "./legacy": {
+        types: "./dist/legacy.d.ts",
+        import: "./dist/legacy.js",
+      },
+    };
   if (directoryName === "app")
     return Object.fromEntries([
       [".", rootExport],
       ...appSubpaths.map((subpath) => [
         `./${subpath}`,
-        { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
+        subpath === "jobs/legacy"
+          ? { types: "./dist/jobs-legacy.d.ts", import: "./dist/jobs-legacy.js" }
+          : { types: `./dist/${subpath}.d.ts`, import: `./dist/${subpath}.js` },
       ]),
     ]);
   if (directoryName === "cli")
@@ -116,6 +110,10 @@ export function expectedExports(
       "./react": {
         types: "./dist/react/index.d.ts",
         import: "./dist/react/index.js",
+      },
+      "./jobs": {
+        types: "./dist/jobs/index.d.ts",
+        import: "./dist/jobs/index.js",
       },
       "./build/next": {
         types: "./dist/build/next.d.ts",

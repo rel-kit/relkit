@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-09-15",
+  "phase": "5",
+  "command": "bun test packages/jobs/schedule-reconciliation.test.ts packages/jobs/trigger-schedule.test.ts packages/jobs/boundary-policy.test.ts integrations/packages/inngest/inngest.test.ts integrations/packages/effect-mq/effect-mq.test.ts integrations/packages/trigger/trigger.test.ts",
+  "status": "passed",
+  "tests": 33,
+  "scope": "local adapter contracts and shared native schedule reconciliation",
+  "adapters": {
+    "inngest": {
+      "status": "passed",
+      "coverage": [
+        "UTC cron trigger mapping",
+        "worker registration",
+        "connected credential isolation",
+        "native run receipts"
+      ]
+    },
+    "effect-mq": {
+      "status": "passed",
+      "coverage": [
+        "pinned Job.make/Worker.layer mapping",
+        "PostgreSQL schema/layer declaration",
+        "native receipt routing",
+        "retryable profile without durable sleep"
+      ],
+      "nativeEvidence": "tests/jobs/compatibility/evidence/phase0-effect-mq.json"
+    },
+    "trigger": {
+      "status": "not-tested",
+      "coverage": [
+        "pinned task/worker registration contract",
+        "scoped run subscription cleanup",
+        "output/version guards",
+        "account-free recipe declaration"
+      ],
+      "reason": "Local structural fixtures do not certify a Trigger server. Managed credentials and a release-pinned executable Docker image were not authorized or available."
+    }
+  },
+  "scheduleRegression": {
+    "status": "passed",
+    "coverage": [
+      "canonical static input",
+      "dynamic input metadata",
+      "owned/operator separation",
+      "pause preservation",
+      "ambiguous write recovery",
+      "fresh occurrence identity"
+    ]
+  },
+  "evidenceLimit": "Mocks and local structural clients are contract evidence only; missing authorized Trigger and managed-cloud evidence remains not-tested."
+}

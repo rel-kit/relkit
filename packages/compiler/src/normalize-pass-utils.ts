@@ -34,17 +34,21 @@ export function toDescriptor(
   const rawId = isRecord(snapshot) ? snapshot.id : undefined;
   const descriptorId = id(rawId) ?? `unknown-${index + 1}`;
   const sourceValue = extracted?.source ?? (isRecord(entry) ? entry.source : undefined);
+  const descriptorSource = source(sourceValue, input);
+  const exportName =
+    extracted?.exportName ??
+    (isRecord(entry) && typeof entry.exportName === "string" ? entry.exportName : "default");
+  const exportKind = extracted?.exportKind ?? "default";
   return {
     kind,
     id: descriptorId,
-    source: source(sourceValue, input),
-    exportName:
-      extracted?.exportName ??
-      (isRecord(entry) && typeof entry.exportName === "string" ? entry.exportName : "default"),
-    exportKind: extracted?.exportKind ?? "default",
+    source: descriptorSource,
+    exportName,
+    exportKind,
     ...(extracted?.facts === undefined ? {} : { facts: extracted.facts }),
     ...(extracted?.exportFact === undefined ? {} : { exportFact: extracted.exportFact }),
     ...(extracted?.reference === undefined ? {} : { reference: extracted.reference }),
+    origin: { file: descriptorSource.file, exportName, exportKind },
     value: snapshot,
   };
 }
@@ -104,6 +108,7 @@ function dependencyKind(category: string): string {
     (
       {
         jobs: "job",
+        tasks: "task",
         buckets: "bucket",
         cache: "cache",
         agents: "agent",

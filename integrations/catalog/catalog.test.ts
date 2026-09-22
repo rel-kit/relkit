@@ -10,6 +10,9 @@ const integrations = [
   "otlp",
   "aws",
   "pulumi",
+  "inngest",
+  "trigger",
+  "effect-mq",
 ] as const;
 
 test("subpaths re-export the standalone authoring modules exactly", async () => {

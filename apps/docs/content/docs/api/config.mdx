@@ -270,7 +270,7 @@ The immutable declaration returned by `defineEnv`.
 **Signature**
 
 ```ts
-type EnvDefinition<S> = {
+type EnvDefinition<S extends EnvShape> = {
   readonly kind: "env-definition";
   readonly shape: S;
   readonly metadata: EnvMetadataMap<S>;
@@ -307,7 +307,7 @@ export interface EnvMetadata {
 **Signature**
 
 ```ts
-type EnvMetadataMap<S> = {
+type EnvMetadataMap<S extends EnvShape> = {
   readonly [K in keyof S]: EnvMetadata;
 };
 ```
@@ -369,7 +369,7 @@ type InferEnvValue<B> = B extends EnvBuilder<infer T> ? T : never;
 **Signature**
 
 ```ts
-type InferEnvValues<S> = {
+type InferEnvValues<S extends EnvShape> = {
   readonly [K in keyof S]: InferEnvValue<S[K]>;
 };
 ```
@@ -1058,7 +1058,7 @@ export interface ResolveEnvOptions {
 **Signature**
 
 ```ts
-type Readonly<InferEnvValues<S>> = Readonly<InferEnvValues<S>>
+type ResolvedEnv<S extends EnvShape> = Readonly<InferEnvValues<S>>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/config/src/resolve.ts#L33)

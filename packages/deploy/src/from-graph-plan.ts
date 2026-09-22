@@ -6,6 +6,7 @@ import { byLogical, envNames, isManaged, logicalName, nodes } from "./from-graph
 import { accessActions } from "./from-graph-providers.js";
 import { base, type PlanContext } from "./from-graph-context.js";
 import { createIamPlan } from "./iam.js";
+import { jobs } from "./from-graph-jobs.js";
 import { buckets, caches, eventTriggers, events, routes } from "./from-graph-resources.js";
 import {
   accessOperations,
@@ -53,34 +54,13 @@ export function buildPlan(
   } as DeploymentPlan);
 }
 
-function jobs(context: PlanContext) {
-  return nodes(context.graph.nodes, "job")
-    .filter((job) => isManaged(context.providers, "job", job.profile))
-    .map((job) => ({
-      ...base(
-        context,
-        job.id,
-        "job",
-        "job",
-        job.profile,
-        accessActions(context.providers.get(`provider.job.${job.profile}`)!),
-      ),
-      targetFunctionId: job.targetFunctionId,
-      profile: job.profile,
-      ...(defined(job.retry) ? { retry: job.retry } : {}),
-      ...(defined(job.timeoutMs) ? { timeoutMs: job.timeoutMs } : {}),
-      ...(defined(job.concurrency) ? { concurrency: job.concurrency } : {}),
-      ...(defined(job.idempotency) ? { idempotency: job.idempotency } : {}),
-    }))
-    .sort(byLogical);
-}
-
 function schedules(context: PlanContext) {
   return nodes(context.graph.nodes, "job")
     .filter((job) => isManaged(context.providers, "job", job.profile))
     .flatMap((job) => {
-      if (!Array.isArray(job.schedule)) return [];
-      return job.schedule.map((schedule, index) => ({
+      const value = "schedules" in job ? (job.schedules ?? job.schedule) : job.schedule;
+      if (!Array.isArray(value)) return [];
+      return value.map((schedule, index) => ({
         ...base(
           context,
           descriptorId(schedule, `${job.id}:schedule:${index}`),
@@ -125,8 +105,4 @@ function validateImage(image: ContainerImagePlan): void {
     image.health.port < 1
   )
     throw new TypeError("Deployment image health metadata is invalid.");
-}
-
-function defined<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined;
 }

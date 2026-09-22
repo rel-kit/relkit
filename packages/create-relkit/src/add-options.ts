@@ -11,6 +11,7 @@ import {
 import { resourceRequest } from "./add-options-resource.js";
 
 const DELIVERIES = ["transient", "durable"] as const;
+const EXECUTIONS = ["durable", "retryable"] as const;
 const SIDE_EFFECTS = ["none", "read", "write", "external"] as const;
 const APPROVALS = ["never", "on-write", "always"] as const;
 const DIALECTS = ["sqlite", "postgresql", "mysql"] as const;
@@ -58,6 +59,14 @@ export function normalizeAddRequest(
         event: required(one(values, "event"), "--event is required."),
         delivery: choice(one(values, "delivery"), "delivery", DELIVERIES, "durable")!,
         ...optional("profile", one(values, "profile")),
+      };
+    case "task":
+      return {
+        ...common,
+        kind: "task",
+        name: name(),
+        version: one(values, "version") ?? "1",
+        execution: choice(one(values, "execution"), "execution", EXECUTIONS, "durable")!,
       };
     case "job":
       return {

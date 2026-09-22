@@ -36,7 +36,7 @@ export function readAppDiscovery(
 function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
   const defaults = objectPropertyObject(object, "defaults");
   return CAPABILITIES.flatMap((capability) => {
-    const item = objectProperty(object, capability);
+    const item = profileProperty(object, capability);
     if (!item || !ts.isPropertyAssignment(item)) return [];
     const value = unwrap(item.initializer);
     const profiles = value && ts.isObjectLiteralExpression(value) ? value.properties : [];
@@ -60,7 +60,10 @@ function readProfiles(object: ts.ObjectLiteralExpression): DiscoveredProfile[] {
               ? callStringOption(expression, "defaultModel")
               : undefined,
           ),
-          isDefault: defaultValue(defaults, capability) === name || (direct && name === "default"),
+          isDefault:
+            defaultValue(defaults, capability === "job" ? "jobs" : capability) === name ||
+            (capability === "job" && defaultValue(defaults, "job") === name) ||
+            (direct && name === "default"),
         },
       ];
     });
@@ -90,6 +93,11 @@ function importedEnvPath(
 function objectProperty(object: ts.ObjectLiteralExpression, name: string) {
   return object.properties.find((item) => staticPropertyName(item.name) === name);
 }
+function profileProperty(object: ts.ObjectLiteralExpression, capability: string) {
+  return capability === "job"
+    ? (objectProperty(object, "jobs") ?? objectProperty(object, "job"))
+    : objectProperty(object, capability);
+}
 function objectPropertyObject(object: ts.ObjectLiteralExpression, name: string) {
   const item = objectProperty(object, name);
   const value = item && ts.isPropertyAssignment(item) ? unwrap(item.initializer) : undefined;
@@ -105,11 +113,20 @@ function defaultValue(
     : undefined;
 }
 function callName(call: ts.CallExpression): string | undefined {
-  return ts.isIdentifier(call.expression)
+  const name = ts.isIdentifier(call.expression)
     ? call.expression.text
     : ts.isPropertyAccessExpression(call.expression)
       ? call.expression.name.text
       : undefined;
+  if (name === undefined) return undefined;
+  const nested = call.arguments
+    .map((argument) => unwrap(argument))
+    .find(
+      (argument): argument is ts.CallExpression =>
+        argument !== undefined && ts.isCallExpression(argument),
+    );
+  const nestedName = nested === undefined ? undefined : callName(nested);
+  return nestedName === undefined ? name : `${name}(${nestedName})`;
 }
 function callStringOption(call: ts.CallExpression, name: string): string | undefined {
   const value = unwrap(call.arguments[0]);

@@ -1,0 +1,8 @@
+---
+title: Effect MQ
+description: Use the Effect MQ integration for queue-backed jobs.
+---
+
+Effect MQ provides queue-backed execution with provider-native worker publication and explicit job identity. It is a good fit when the application already owns PostgreSQL-backed queue state and wants task execution close to its services. Configure it with a `jobs.default` binding from the [Docker guide](/docs/jobs/docker).
+
+The integration supports retryable work and provider-native scheduling where configured. It does not advertise durable sleep; use an external schedule or a new run instead of keeping a worker process asleep. Confirm limits, schedule support, and run controls with `relkit jobs capabilities` for the deployed profile.

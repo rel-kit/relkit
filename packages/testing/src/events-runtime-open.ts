@@ -5,7 +5,7 @@ import {
   type InvocationTarget,
 } from "@relkit/engine";
 import type { UnknownEventEnvelope } from "@relkit/events";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import { createEventLog, createEventRouter, type EventRouter } from "@relkit/providers-local";
 import type { InvocationRunner } from "@relkit/runtime-effect";
 import { createEventInvoker } from "./events-runtime-utils.js";

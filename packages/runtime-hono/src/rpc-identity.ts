@@ -8,6 +8,7 @@ export interface RpcIdentityContext {
   readonly hono: Context;
   readonly auth:
     ReturnType<NonNullable<RouteMaterializationOptions["auth"]>["contextFor"]> | undefined;
+  readonly rpcHeaders?: Readonly<Record<string, string | string[] | undefined>>;
 }
 
 export async function assertRpcSecurity(
@@ -29,7 +30,7 @@ export async function assertExpectedIdentity(
   runtime: NonNullable<RouteMaterializationOptions["clientIdentity"]>,
   supplied?: import("@relkit/contracts").ExpectedClientIdentity,
 ): Promise<void> {
-  const expected = supplied ?? expectedClientIdentity(context.hono.req.raw);
+  const expected = supplied ?? expectedClientIdentity(context.hono.req.raw, context.rpcHeaders);
   const actual = await resolveClientIdentity(runtime, context.hono.req.raw, context.auth);
   if (
     expected === undefined ||

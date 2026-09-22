@@ -5,11 +5,15 @@ import { mapSourceLocations } from "../../packages/compiler/src/discovery/source
 
 const source = `
   import { defineError, defineFunction } from "@relkit/functions";
+  import { defineJob } from "@relkit/jobs";
   import { defineRoute } from "@relkit/routes";
   import { defineService } from "@relkit/services";
+  import { defineTask } from "@relkit/tasks";
   const getOrder = defineFunction({ input: schema, output: schema, handler: async () => ({}) });
   const named = defineFunction({ id: "orders.named", input: schema, output: schema, handler: async () => ({}) });
-  const orders = defineService({ functions: { getOrder, lookup: named } });
+  const syncOrders = defineTask("orders.sync", { handler: async () => ({}) });
+  const dispatchOrders = defineJob("orders.dispatch", { task: syncOrders });
+  const orders = defineService({ functions: { getOrder, lookup: named }, tasks: { syncOrders }, jobs: { dispatchOrders } });
   export const GET = defineRoute({ target: orders.getOrder });
   export { getOrder as lookup, orders as OrderService };
   export default getOrder;
@@ -59,6 +63,16 @@ describe("TypeScript discovery facts", () => {
     expect(facts.serviceMembers).toEqual([
       expect.objectContaining({ service: "orders", member: "getOrder", targetBinding: "getOrder" }),
       expect.objectContaining({ service: "orders", member: "lookup", targetBinding: "named" }),
+      expect.objectContaining({
+        service: "orders",
+        member: "syncOrders",
+        targetBinding: "syncOrders",
+      }),
+      expect.objectContaining({
+        service: "orders",
+        member: "dispatchOrders",
+        targetBinding: "dispatchOrders",
+      }),
     ]);
     expect(facts.errorBindings).toEqual([
       expect.objectContaining({ binding: "InvalidError", id: "omitted" }),

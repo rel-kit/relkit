@@ -1,8 +1,10 @@
 import { join } from "node:path";
 import type { JsonValue } from "@relkit/contracts";
+import type { JobsAdapterRuntime } from "@relkit/jobs/adapter";
 import { createJobQueue, type JobQueue } from "./jobs/queue.js";
 import type { JobIdempotencyDefinition } from "./jobs/queue-utils.js";
 import { createJobStore, type JobStore } from "./jobs/store.js";
+import { createLocalNativeJobProvider } from "./jobs/native-adapter.js";
 
 export interface LocalJobProvider {
   readonly createQueue: (context: {
@@ -12,7 +14,18 @@ export interface LocalJobProvider {
   readonly close: () => Promise<void>;
 }
 
-export function createLocalJobProvider(root: string, profile: string): LocalJobProvider {
+export function createLocalJobProvider(root: string, profile: string): LocalJobProvider;
+export function createLocalJobProvider(
+  root: string,
+  profile: string,
+  executionModel: "task",
+): JobsAdapterRuntime;
+export function createLocalJobProvider(
+  root: string,
+  profile: string,
+  executionModel?: "task",
+): LocalJobProvider | JobsAdapterRuntime {
+  if (executionModel === "task") return createLocalNativeJobProvider(root, profile);
   const stores = new Map<string, JobStore>();
   return Object.freeze({
     createQueue: async (context: {

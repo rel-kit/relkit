@@ -15,6 +15,7 @@ import {
 import { createRuntimeActivationFingerprint } from "@relkit/compiler";
 import { assertProductionGraph, hashGraph, type ApplicationGraph } from "@relkit/graph";
 import { LOCAL_SERVICE_PLAN_FILE, LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
+import { parseJobsManifest } from "./build-jobs.js";
 
 export interface BuiltManifest {
   readonly contractVersion: number;
@@ -26,6 +27,7 @@ export interface BuiltManifest {
   readonly entrypoint: string;
   readonly containerEntrypoint: string;
   readonly runtimeManifestFile: string;
+  readonly jobsManifestFile?: string;
   readonly runtimeActivationFile: string;
   readonly runtimeIntegrationsPlanFile: string;
   readonly localServicesPlanFile?: string;
@@ -55,6 +57,8 @@ export async function readBuilt(
     manifest.entrypoint !== "server/index.ts" ||
     manifest.containerEntrypoint !== "server/index.js" ||
     manifest.runtimeManifestFile !== "server/runtime.manifest.ts" ||
+    (manifest.jobsManifestFile !== undefined &&
+      manifest.jobsManifestFile !== "jobs.manifest.json") ||
     manifest.runtimeActivationFile !== `server/${RUNTIME_ACTIVATION_FILE}` ||
     manifest.runtimeIntegrationsPlanFile !== `server/${RUNTIME_INTEGRATION_PLAN_FILE}` ||
     (manifest.localServicesPlanFile !== undefined &&
@@ -68,6 +72,11 @@ export async function readBuilt(
     join(buildDirectory, manifest.runtimeManifestFile),
     "utf8",
   );
+  const jobsManifestSource =
+    manifest.jobsManifestFile === undefined
+      ? undefined
+      : await readArtifact(buildDirectory, manifest.jobsManifestFile, "jobs manifest");
+  parseJobsManifest(jobsManifestSource);
   const activation = parseArtifact(
     await readArtifact(buildDirectory, manifest.runtimeActivationFile, "activation fingerprint"),
     "activation fingerprint",
@@ -96,6 +105,7 @@ export async function readBuilt(
   const expected = createRuntimeActivationFingerprint({
     graphHash,
     manifestSource: runtimeManifest,
+    ...(jobsManifestSource === undefined ? {} : { jobsManifestSource }),
     runtimeIntegrationsPlanSource: runtimeIntegrations,
     ...(localServices === undefined ? {} : { localServicesPlanSource: localServices }),
     ...(activation.providerOverridesGeneration === undefined

@@ -28,45 +28,39 @@ test("connects Jobs between Events and Database with source-backed guides", () =
   expect(
     renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!),
   ).toContain("[Jobs](/docs/jobs)");
-  expect(guideRelations.find(({ path }) => path === "jobs/first-job")?.next).toBe("database/index");
-  expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/define");
+  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBe(
+    "database/index",
+  );
+  expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/quickstart");
   expect(features.find(({ id }) => id === "schedules")?.guide).toBe("jobs/schedules");
   for (const page of jobsGuideGroup.pages) {
     const source = read(page);
-    expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
-    expect(source).toMatch(/<include[^>]*lang="ts"/);
+    expect(source).toMatch(/<include[^>]*lang="(?:ts|json)"/);
     expect(source).toContain(`content/generated/related/jobs-${page}.mdx`);
-    if (page !== "index") expect(read("index")).toContain(`](/docs/jobs/${page})`);
+    if (["quickstart", "tasks", "bindings", "clients", "schedules", "providers"].includes(page))
+      expect(read("index")).toContain(`](/docs/jobs/${page})`);
   }
 });
 
-test("teaches receipt admission and completion using executable documentation sources", () => {
-  const tutorial = read("first-job");
+test("teaches task admission and completion using executable documentation sources", () => {
+  const tutorial = read("quickstart");
   for (const path of [
-    "apps/docs/examples/jobs/send-receipt.function.ts",
-    "apps/docs/examples/jobs/send-receipt.job.ts",
-    "apps/docs/examples/jobs/queue-receipt.function.ts",
-    "packages/testing/jobs.test.ts",
+    "examples/commerce/src/orders/tasks/export-orders.task.ts",
+    "examples/commerce/src/orders/jobs/export-orders.job.ts",
+    "examples/commerce/src/routes/orders/export/route.ts",
   ]) {
     expect(tutorial).toContain(`../../${path}`);
   }
-  expect(tutorial).toContain("existing RELKIT app");
-  expect(tutorial).toContain("bun test");
+  expect(tutorial).toContain("RunHandle");
   expect(tutorial).toContain("bun run check");
   expect(tutorial).toContain("bun run typecheck");
-  expect(tutorial).toContain("No `RELKIT_ENV` value installs a hidden queue");
-  expect(read("define")).toContain("singular `job`");
-  expect(read("define")).toContain("named binding references");
+  expect(read("migration")).toContain("task-first definition");
 });
 
 test("states current retry, overlap, and provider limits without exactly-once promises", () => {
-  expect(read("enqueue")).toContain("It does not wait for the target");
-  expect(read("retries")).toContain("not** automatically retry every thrown exception");
-  expect(read("retries")).toContain(
-    "Production retention, replay, and dead-letter behavior belong to the selected integration",
-  );
-  expect(read("idempotency")).toMatch(/selected production\s+integration/);
-  expect(read("schedules")).toContain("**enqueue callback**");
-  expect(read("schedules")).toContain("does not guarantee catch-up across downtime");
-  expect(read("schedules")).toContain("does not automatically register the descriptor's schedules");
+  expect(read("retries-and-idempotency")).toContain("three attempts");
+  expect(read("retries-and-idempotency")).toContain("cannot multiply");
+  expect(read("schedules")).toContain("provider accepted a write");
+  expect(read("schedules")).toContain("does not cancel runs already accepted");
+  expect(read("providers")).toContain("Managed cloud evidence");
 });

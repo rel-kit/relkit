@@ -2,6 +2,7 @@ import { deepFreeze, isStableId, serializeJson, type JsonValue } from "@relkit/c
 import type { ProviderLocalRecipeReference } from "@relkit/provider";
 
 export * from "./recipe.js";
+export * from "./recipe-normalize.js";
 
 export const LOCAL_SERVICE_PROTOCOL_VERSION = 1 as const;
 export const LOCAL_SERVICE_PLAN_VERSION = 1 as const;
@@ -39,6 +40,9 @@ export interface LocalServiceBindingState {
   readonly bindingId: string;
   readonly recipe: ProviderLocalRecipeReference;
   readonly phase: LocalServicePhase;
+  readonly environment?: string;
+  readonly serviceGeneration?: string;
+  readonly units?: readonly string[];
   readonly message?: string;
 }
 

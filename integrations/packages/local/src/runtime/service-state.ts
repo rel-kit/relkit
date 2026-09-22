@@ -69,11 +69,18 @@ function normalizeServices(
       !Number.isSafeInteger(service.recipe.recipeVersion) ||
       service.recipe.recipeVersion < 1 ||
       !["pending", "starting", "healthy", "unhealthy", "stopped"].includes(service.phase) ||
+      (service.environment !== undefined && !text(service.environment)) ||
+      (service.serviceGeneration !== undefined && !text(service.serviceGeneration)) ||
+      (service.units !== undefined &&
+        (!Array.isArray(service.units) || service.units.some((unit) => !isStableId(unit)))) ||
       (service.message !== undefined && typeof service.message !== "string")
     ) {
       invalid();
     }
-    return deepFreeze({ ...service });
+    return deepFreeze({
+      ...service,
+      ...(service.units === undefined ? {} : { units: [...service.units].sort() }),
+    });
   });
   values.sort((left, right) => left.bindingId.localeCompare(right.bindingId));
   if (new Set(values.map((value) => value.bindingId)).size !== values.length) invalid();
@@ -90,4 +97,8 @@ function hash(value: unknown): value is string {
 
 function invalid(): never {
   throw new Error("Local service state is invalid.");
+}
+
+function text(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0 && !/[\0\r\n]/.test(value);
 }

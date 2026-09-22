@@ -1,0 +1,61 @@
+---
+title: Quickstart
+description: Define and trigger a durable task in a few steps.
+---
+
+## 1. Define a task
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/tasks/export-orders.task.ts"'>
+  ../../examples/commerce/src/orders/tasks/export-orders.task.ts
+</include>
+
+The task ID and version are stable compatibility identifiers. Change the version when the input or output contract is intentionally incompatible.
+
+## 2. Expose a job
+
+<include cwd lang="ts" meta='title="examples/commerce/src/orders/jobs/export-orders.job.ts"'>
+  ../../examples/commerce/src/orders/jobs/export-orders.job.ts
+</include>
+
+<include cwd lang="ts" meta='title="examples/commerce/src/routes/orders/export/route.ts"'>
+  ../../examples/commerce/src/routes/orders/export/route.ts
+</include>
+
+Keep the job in a service module so the compiler can discover it and its provider binding.
+
+To scaffold the task-first job after creating the task, run:
+
+```sh
+bun run relkit add job "Export Orders" --service orders --target orders.export-orders-task
+```
+
+The `--target` value is the task ID. The generated job owns admission and client operations while
+the task remains the unit of execution and compatibility.
+
+### Job CLI options
+
+<include cwd>content/generated/add-job-options.mdx</include>
+
+## 3. Trigger and observe
+
+The generated trigger receives `{ input, options }` and returns an accepted `RunHandle`. For example,
+call `client.jobs.exportOrders.trigger({ input: { orderIds }, options: { operationId } })`, then read
+`client.jobs.exportOrders.runs.get({ runId: accepted.runId })`. Keep the accepted `runId` and
+`operationId`; a handle is an admission receipt, not the task output.
+
+Use [clients](/docs/jobs/clients) for browser/server clients and [progress and streams](/docs/jobs/progress-and-streams) for live updates.
+
+## 4. Run locally
+
+```sh
+relkit local up
+relkit local status
+relkit jobs capabilities
+```
+
+The local provider is selected by the project binding. Use `relkit local reset --dry-run` before clearing local state.
+
+Verify the generated project with `bun run check`, `bun run typecheck`, and `bun test` before using a
+provider-specific Docker workflow.
+
+<include cwd>content/generated/related/jobs-quickstart.mdx</include>

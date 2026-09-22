@@ -29,27 +29,32 @@ import * as __relkit_module_24 from "../../src/orders/functions/get-order.functi
 import * as __relkit_module_25 from "../../src/orders/functions/search-orders.function.ts";
 import * as __relkit_module_26 from "../../src/orders/functions/stream-order-report.function.ts";
 import * as __relkit_module_27 from "../../src/orders/functions/update-order.function.ts";
-import * as __relkit_module_28 from "../../src/orders/service.ts";
-import * as __relkit_module_29 from "../../src/orders/tools/cancel-order.tool.ts";
-import * as __relkit_module_30 from "../../src/orders/tools/lookup-order.tool.ts";
-import * as __relkit_module_31 from "../../src/receipts/buckets/receipts.bucket.ts";
-import * as __relkit_module_32 from "../../src/receipts/functions/send-receipt.function.ts";
-import * as __relkit_module_33 from "../../src/receipts/service.ts";
-import * as __relkit_module_34 from "../../src/routes/account/profile/route.ts";
-import * as __relkit_module_35 from "../../src/routes/announcements/route.ts";
-import * as __relkit_module_36 from "../../src/routes/api/auth/[[...auth]]/route.ts";
-import * as __relkit_module_37 from "../../src/routes/database/users/route.ts";
-import * as __relkit_module_38 from "../../src/routes/docs/[[...parts]]/route.ts";
-import * as __relkit_module_39 from "../../src/routes/files/[...parts]/route.ts";
-import * as __relkit_module_40 from "../../src/routes/middleware/order-auth.middleware.ts";
-import * as __relkit_module_41 from "../../src/routes/orders/[orderId]/route.ts";
-import * as __relkit_module_42 from "../../src/routes/orders/route.ts";
-import * as __relkit_module_43 from "../../src/routes/orders/search/route.ts";
-import * as __relkit_module_44 from "../../src/routes/reports/[reportId]/route.ts";
-import * as __relkit_module_45 from "../../src/routes/transforms/orders/normalize-id.transform.ts";
-import * as __relkit_module_46 from "../../src/routes/uploads/route.ts";
-import * as __relkit_module_47 from "../../src/users/functions/database-users.function.ts";
-import * as __relkit_module_48 from "../../src/users/service.ts";
+import * as __relkit_module_28 from "../../src/orders/jobs/cleanup-orders.job.ts";
+import * as __relkit_module_29 from "../../src/orders/jobs/export-orders.job.ts";
+import * as __relkit_module_30 from "../../src/orders/service.ts";
+import * as __relkit_module_31 from "../../src/orders/tasks/cleanup-orders.task.ts";
+import * as __relkit_module_32 from "../../src/orders/tasks/export-orders.task.ts";
+import * as __relkit_module_33 from "../../src/orders/tools/cancel-order.tool.ts";
+import * as __relkit_module_34 from "../../src/orders/tools/lookup-order.tool.ts";
+import * as __relkit_module_35 from "../../src/receipts/buckets/receipts.bucket.ts";
+import * as __relkit_module_36 from "../../src/receipts/functions/send-receipt.function.ts";
+import * as __relkit_module_37 from "../../src/receipts/service.ts";
+import * as __relkit_module_38 from "../../src/routes/account/profile/route.ts";
+import * as __relkit_module_39 from "../../src/routes/announcements/route.ts";
+import * as __relkit_module_40 from "../../src/routes/api/auth/[[...auth]]/route.ts";
+import * as __relkit_module_41 from "../../src/routes/database/users/route.ts";
+import * as __relkit_module_42 from "../../src/routes/docs/[[...parts]]/route.ts";
+import * as __relkit_module_43 from "../../src/routes/files/[...parts]/route.ts";
+import * as __relkit_module_44 from "../../src/routes/middleware/order-auth.middleware.ts";
+import * as __relkit_module_45 from "../../src/routes/orders/[orderId]/route.ts";
+import * as __relkit_module_46 from "../../src/routes/orders/export/route.ts";
+import * as __relkit_module_47 from "../../src/routes/orders/route.ts";
+import * as __relkit_module_48 from "../../src/routes/orders/search/route.ts";
+import * as __relkit_module_49 from "../../src/routes/reports/[reportId]/route.ts";
+import * as __relkit_module_50 from "../../src/routes/transforms/orders/normalize-id.transform.ts";
+import * as __relkit_module_51 from "../../src/routes/uploads/route.ts";
+import * as __relkit_module_52 from "../../src/users/functions/database-users.function.ts";
+import * as __relkit_module_53 from "../../src/users/service.ts";
 
 __relkit_bindDescriptorIdentity(__relkit_module_0["default"], "commerce-api");
 __relkit_bindDescriptorIdentity(__relkit_module_1["default"], "account.account-session");
@@ -90,97 +95,112 @@ __relkit_bindDescriptorIdentity(__relkit_module_24["default"]["errors"][0], "ord
 __relkit_bindDescriptorIdentity(__relkit_module_25["default"], "orders.search-orders");
 __relkit_bindDescriptorIdentity(__relkit_module_26["default"], "orders.stream-order-report");
 __relkit_bindDescriptorIdentity(__relkit_module_27["default"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"], "orders");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["authorizeOrder"], "orders.authorize-order");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["createOrder"], "orders.create-order");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["createOrder"]["dependencies"]["cache"]["prices"], "orders.prices");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["deleteOrder"], "orders.delete-order");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["getOrder"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["getOrder"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["searchOrders"], "orders.search-orders");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["streamOrderReport"], "orders.stream-order-report");
-__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["updateOrder"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_29["default"], "orders.cancel-order");
-__relkit_bindDescriptorIdentity(__relkit_module_29["default"]["target"], "orders.delete-order");
-__relkit_bindDescriptorIdentity(__relkit_module_30["default"], "orders.lookup-order");
-__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_31["default"], "receipts.objects");
-__relkit_bindDescriptorIdentity(__relkit_module_32["default"], "receipts.send-receipt");
-__relkit_bindDescriptorIdentity(__relkit_module_32["default"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
-__relkit_bindDescriptorIdentity(__relkit_module_32["default"]["errors"][0], "receipts.storage-unavailable");
-__relkit_bindDescriptorIdentity(__relkit_module_33["default"], "receipts");
-__relkit_bindDescriptorIdentity(__relkit_module_33["default"]["sendReceipt"], "receipts.send-receipt");
-__relkit_bindDescriptorIdentity(__relkit_module_33["default"]["sendReceipt"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
-__relkit_bindDescriptorIdentity(__relkit_module_33["default"]["sendReceipt"]["errors"][0], "receipts.storage-unavailable");
-__relkit_bindDescriptorIdentity(__relkit_module_34["GET"], "route.get.account.profile");
-__relkit_bindDescriptorIdentity(__relkit_module_34["GET"]["target"], "account.account-session");
-__relkit_bindDescriptorIdentity(__relkit_module_35["GET"], "route.get.announcements");
-__relkit_bindDescriptorIdentity(__relkit_module_35["GET"]["target"], "announcements.get-announcements");
-__relkit_bindDescriptorIdentity(__relkit_module_35["POST"], "route.post.announcements");
-__relkit_bindDescriptorIdentity(__relkit_module_35["POST"]["target"], "announcements.post-announcement");
-__relkit_bindDescriptorIdentity(__relkit_module_36["ALL"], "route.all.api.auth.optional-catch-all-auth");
-__relkit_bindDescriptorIdentity(__relkit_module_37["GET"], "route.get.database.users");
-__relkit_bindDescriptorIdentity(__relkit_module_37["GET"]["target"], "users.database-users");
-__relkit_bindDescriptorIdentity(__relkit_module_38["GET"], "route.get.docs.optional-catch-all-parts");
-__relkit_bindDescriptorIdentity(__relkit_module_38["GET"]["target"], "navigation.browse-path");
-__relkit_bindDescriptorIdentity(__relkit_module_39["GET"], "route.get.files.catch-all-parts");
-__relkit_bindDescriptorIdentity(__relkit_module_39["GET"]["target"], "navigation.browse-path");
-__relkit_bindDescriptorIdentity(__relkit_module_40["default"], "order-auth");
-__relkit_bindDescriptorIdentity(__relkit_module_41["DELETE"], "route.delete.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["DELETE"]["target"], "orders.delete-order");
-__relkit_bindDescriptorIdentity(__relkit_module_41["GET"], "route.get.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["GET"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_41["GET"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_41["HEAD"], "route.head.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["HEAD"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_41["HEAD"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_41["OPTIONS"], "route.options.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["OPTIONS"]["target"], "orders.get-order");
-__relkit_bindDescriptorIdentity(__relkit_module_41["OPTIONS"]["target"]["errors"][0], "orders.not-found");
-__relkit_bindDescriptorIdentity(__relkit_module_41["PATCH"], "route.patch.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["PATCH"]["target"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_41["PUT"], "route.put.orders.by-order-id");
-__relkit_bindDescriptorIdentity(__relkit_module_41["PUT"]["target"], "orders.update-order");
-__relkit_bindDescriptorIdentity(__relkit_module_42["GET"], "route.get.orders");
-__relkit_bindDescriptorIdentity(__relkit_module_42["GET"]["target"], "orders.search-orders");
-__relkit_bindDescriptorIdentity(__relkit_module_42["POST"], "route.post.orders");
-__relkit_bindDescriptorIdentity(__relkit_module_42["POST"]["rateLimit"]["store"], "orders.rate-limits");
-__relkit_bindDescriptorIdentity(__relkit_module_42["POST"]["target"], "orders.create-order");
-__relkit_bindDescriptorIdentity(__relkit_module_42["POST"]["target"]["dependencies"]["cache"]["prices"], "orders.prices");
-__relkit_bindDescriptorIdentity(__relkit_module_43["GET"], "route.get.orders.search");
-__relkit_bindDescriptorIdentity(__relkit_module_43["GET"]["target"], "orders.search-orders");
-__relkit_bindDescriptorIdentity(__relkit_module_44["GET"], "route.get.reports.by-report-id");
-__relkit_bindDescriptorIdentity(__relkit_module_44["GET"]["target"], "orders.stream-order-report");
-__relkit_bindDescriptorIdentity(__relkit_module_45["default"], "orders.normalize-id");
-__relkit_bindDescriptorIdentity(__relkit_module_46["POST"], "route.post.uploads");
-__relkit_bindDescriptorIdentity(__relkit_module_46["POST"]["target"], "assets.upload-assets");
-__relkit_bindDescriptorIdentity(__relkit_module_46["POST"]["target"]["dependencies"]["buckets"]["assets"], "assets.objects");
-__relkit_bindDescriptorIdentity(__relkit_module_47["default"], "users.database-users");
-__relkit_bindDescriptorIdentity(__relkit_module_48["default"], "users");
-__relkit_bindDescriptorIdentity(__relkit_module_48["default"]["databaseUsers"], "users.database-users");
+__relkit_bindDescriptorIdentity(__relkit_module_28["default"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_28["default"]["task"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_29["default"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_29["default"]["task"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"], "orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["authorizeOrder"], "orders.authorize-order");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["cleanupOrders"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["cleanupOrders"]["task"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["cleanupOrdersTask"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["createOrder"], "orders.create-order");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["createOrder"]["dependencies"]["cache"]["prices"], "orders.prices");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["deleteOrder"], "orders.delete-order");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["exportOrders"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["exportOrders"]["task"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["exportOrdersTask"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["getOrder"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["getOrder"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["searchOrders"], "orders.search-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["streamOrderReport"], "orders.stream-order-report");
+__relkit_bindDescriptorIdentity(__relkit_module_30["default"]["updateOrder"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_31["default"], "orders.cleanup");
+__relkit_bindDescriptorIdentity(__relkit_module_32["default"], "orders.export-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_33["default"], "orders.cancel-order");
+__relkit_bindDescriptorIdentity(__relkit_module_33["default"]["target"], "orders.delete-order");
+__relkit_bindDescriptorIdentity(__relkit_module_34["default"], "orders.lookup-order");
+__relkit_bindDescriptorIdentity(__relkit_module_34["default"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_34["default"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_35["default"], "receipts.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"], "receipts.send-receipt");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_36["default"]["errors"][0], "receipts.storage-unavailable");
+__relkit_bindDescriptorIdentity(__relkit_module_37["default"], "receipts");
+__relkit_bindDescriptorIdentity(__relkit_module_37["default"]["sendReceipt"], "receipts.send-receipt");
+__relkit_bindDescriptorIdentity(__relkit_module_37["default"]["sendReceipt"]["dependencies"]["buckets"]["receipts"], "receipts.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_37["default"]["sendReceipt"]["errors"][0], "receipts.storage-unavailable");
+__relkit_bindDescriptorIdentity(__relkit_module_38["GET"], "route.get.account.profile");
+__relkit_bindDescriptorIdentity(__relkit_module_38["GET"]["target"], "account.account-session");
+__relkit_bindDescriptorIdentity(__relkit_module_39["GET"], "route.get.announcements");
+__relkit_bindDescriptorIdentity(__relkit_module_39["GET"]["target"], "announcements.get-announcements");
+__relkit_bindDescriptorIdentity(__relkit_module_39["POST"], "route.post.announcements");
+__relkit_bindDescriptorIdentity(__relkit_module_39["POST"]["target"], "announcements.post-announcement");
+__relkit_bindDescriptorIdentity(__relkit_module_40["ALL"], "route.all.api.auth.optional-catch-all-auth");
+__relkit_bindDescriptorIdentity(__relkit_module_41["GET"], "route.get.database.users");
+__relkit_bindDescriptorIdentity(__relkit_module_41["GET"]["target"], "users.database-users");
+__relkit_bindDescriptorIdentity(__relkit_module_42["GET"], "route.get.docs.optional-catch-all-parts");
+__relkit_bindDescriptorIdentity(__relkit_module_42["GET"]["target"], "navigation.browse-path");
+__relkit_bindDescriptorIdentity(__relkit_module_43["GET"], "route.get.files.catch-all-parts");
+__relkit_bindDescriptorIdentity(__relkit_module_43["GET"]["target"], "navigation.browse-path");
+__relkit_bindDescriptorIdentity(__relkit_module_44["default"], "order-auth");
+__relkit_bindDescriptorIdentity(__relkit_module_45["DELETE"], "route.delete.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["DELETE"]["target"], "orders.delete-order");
+__relkit_bindDescriptorIdentity(__relkit_module_45["GET"], "route.get.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["GET"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_45["GET"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_45["HEAD"], "route.head.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["HEAD"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_45["HEAD"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_45["OPTIONS"], "route.options.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["OPTIONS"]["target"], "orders.get-order");
+__relkit_bindDescriptorIdentity(__relkit_module_45["OPTIONS"]["target"]["errors"][0], "orders.not-found");
+__relkit_bindDescriptorIdentity(__relkit_module_45["PATCH"], "route.patch.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["PATCH"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_45["PUT"], "route.put.orders.by-order-id");
+__relkit_bindDescriptorIdentity(__relkit_module_45["PUT"]["target"], "orders.update-order");
+__relkit_bindDescriptorIdentity(__relkit_module_46["POST"], "orders.export");
+__relkit_bindDescriptorIdentity(__relkit_module_47["GET"], "route.get.orders");
+__relkit_bindDescriptorIdentity(__relkit_module_47["GET"]["target"], "orders.search-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_47["POST"], "route.post.orders");
+__relkit_bindDescriptorIdentity(__relkit_module_47["POST"]["rateLimit"]["store"], "orders.rate-limits");
+__relkit_bindDescriptorIdentity(__relkit_module_47["POST"]["target"], "orders.create-order");
+__relkit_bindDescriptorIdentity(__relkit_module_47["POST"]["target"]["dependencies"]["cache"]["prices"], "orders.prices");
+__relkit_bindDescriptorIdentity(__relkit_module_48["GET"], "route.get.orders.search");
+__relkit_bindDescriptorIdentity(__relkit_module_48["GET"]["target"], "orders.search-orders");
+__relkit_bindDescriptorIdentity(__relkit_module_49["GET"], "route.get.reports.by-report-id");
+__relkit_bindDescriptorIdentity(__relkit_module_49["GET"]["target"], "orders.stream-order-report");
+__relkit_bindDescriptorIdentity(__relkit_module_50["default"], "orders.normalize-id");
+__relkit_bindDescriptorIdentity(__relkit_module_51["POST"], "route.post.uploads");
+__relkit_bindDescriptorIdentity(__relkit_module_51["POST"]["target"], "assets.upload-assets");
+__relkit_bindDescriptorIdentity(__relkit_module_51["POST"]["target"]["dependencies"]["buckets"]["assets"], "assets.objects");
+__relkit_bindDescriptorIdentity(__relkit_module_52["default"], "users.database-users");
+__relkit_bindDescriptorIdentity(__relkit_module_53["default"], "users");
+__relkit_bindDescriptorIdentity(__relkit_module_53["default"]["databaseUsers"], "users.database-users");
 
 export const manifestContractVersion = 10 as const;
 export const manifestGeneratorVersion = 7 as const;
-export const manifestGraphHash = "sha256:a523cc439f1cf8f5cc46e180b6f971fde2162bcf69848ab66b86cf84ec387c5b" as const;
+export const manifestGraphHash = "sha256:4857a4a6c6c39909a2f30dcef339d6d4f51282770351909374ad7f37a18b5dd4" as const;
 export const runtimeIntegrationsPlanReference = { version: 1, fileName: "runtime-integrations.plan.json", graphHash: manifestGraphHash } as const;
 export const runtimeManifest = {
   contractVersion: manifestContractVersion,
   generatorVersion: manifestGeneratorVersion,
   graphHash: manifestGraphHash,
   activationFingerprint: runtimeActivationFingerprint,
-  functions: { "account.account-session": __relkit_module_1["default"].handler, "announcements.get-announcements": __relkit_module_4["default"].handler, "announcements.post-announcement": __relkit_module_5["default"].handler, "assets.upload-assets": __relkit_module_8["default"].handler, "navigation.browse-path": __relkit_module_12["default"].handler, "orders.authorize-order": __relkit_module_21["default"].handler, "orders.create-order": __relkit_module_22["default"].handler, "orders.delete-order": __relkit_module_23["default"].handler, "orders.get-order": __relkit_module_24["default"].handler, "orders.search-orders": __relkit_module_25["default"].handler, "orders.stream-order-report": __relkit_module_26["default"].handler, "orders.update-order": __relkit_module_27["default"].handler, "receipts.send-receipt": __relkit_module_32["default"].handler, "relkit.agent.orders.order-deep.invoke": __relkit_createGeneratedAgentFunction("orders.order-deep"), "relkit.agent.orders.order-review.invoke": __relkit_createGeneratedAgentFunction("orders.order-review"), "relkit.agent.orders.order-support.invoke": __relkit_createGeneratedAgentFunction("orders.order-support"), "users.database-users": __relkit_module_47["default"].handler },
-  targets: { "account.account-session": __relkit_module_1["default"], "announcements.get-announcements": __relkit_module_4["default"], "announcements.post-announcement": __relkit_module_5["default"], "assets.upload-assets": __relkit_module_8["default"], "navigation.browse-path": __relkit_module_12["default"], "orders.authorize-order": __relkit_module_21["default"], "orders.create-order": __relkit_module_22["default"], "orders.delete-order": __relkit_module_23["default"], "orders.get-order": __relkit_module_24["default"], "orders.search-orders": __relkit_module_25["default"], "orders.stream-order-report": __relkit_module_26["default"], "orders.update-order": __relkit_module_27["default"], "receipts.send-receipt": __relkit_module_32["default"], "users.database-users": __relkit_module_47["default"] },
+  functions: { "account.account-session": __relkit_module_1["default"].handler, "announcements.get-announcements": __relkit_module_4["default"].handler, "announcements.post-announcement": __relkit_module_5["default"].handler, "assets.upload-assets": __relkit_module_8["default"].handler, "navigation.browse-path": __relkit_module_12["default"].handler, "orders.authorize-order": __relkit_module_21["default"].handler, "orders.create-order": __relkit_module_22["default"].handler, "orders.delete-order": __relkit_module_23["default"].handler, "orders.get-order": __relkit_module_24["default"].handler, "orders.search-orders": __relkit_module_25["default"].handler, "orders.stream-order-report": __relkit_module_26["default"].handler, "orders.update-order": __relkit_module_27["default"].handler, "receipts.send-receipt": __relkit_module_36["default"].handler, "relkit.agent.orders.order-deep.invoke": __relkit_createGeneratedAgentFunction("orders.order-deep"), "relkit.agent.orders.order-review.invoke": __relkit_createGeneratedAgentFunction("orders.order-review"), "relkit.agent.orders.order-support.invoke": __relkit_createGeneratedAgentFunction("orders.order-support"), "users.database-users": __relkit_module_52["default"].handler },
+  targets: { "account.account-session": __relkit_module_1["default"], "announcements.get-announcements": __relkit_module_4["default"], "announcements.post-announcement": __relkit_module_5["default"], "assets.upload-assets": __relkit_module_8["default"], "navigation.browse-path": __relkit_module_12["default"], "orders.authorize-order": __relkit_module_21["default"], "orders.create-order": __relkit_module_22["default"], "orders.delete-order": __relkit_module_23["default"], "orders.get-order": __relkit_module_24["default"], "orders.search-orders": __relkit_module_25["default"], "orders.stream-order-report": __relkit_module_26["default"], "orders.update-order": __relkit_module_27["default"], "receipts.send-receipt": __relkit_module_36["default"], "users.database-users": __relkit_module_52["default"] },
   agents: { "orders.order-deep": __relkit_module_14["default"], "orders.order-review": __relkit_module_15["default"], "orders.order-support": __relkit_module_16["default"] },
   channels: { "announcements.feed": __relkit_module_3["default"], "orders.updates": __relkit_module_20["default"] },
-  tools: { "orders.cancel-order": __relkit_module_29["default"], "orders.lookup-order": __relkit_module_30["default"] },
-  routes: { "route.all.api.auth.optional-catch-all-auth": __relkit_module_36["ALL"], "route.delete.orders.by-order-id": __relkit_module_41["DELETE"], "route.get.account.profile": __relkit_module_34["GET"], "route.get.announcements": __relkit_module_35["GET"], "route.get.database.users": __relkit_module_37["GET"], "route.get.docs.optional-catch-all-parts": __relkit_module_38["GET"], "route.get.files.catch-all-parts": __relkit_module_39["GET"], "route.get.orders": __relkit_module_42["GET"], "route.get.orders.by-order-id": __relkit_module_41["GET"], "route.get.orders.search": __relkit_module_43["GET"], "route.get.reports.by-report-id": __relkit_module_44["GET"], "route.head.orders.by-order-id": __relkit_module_41["HEAD"], "route.options.orders.by-order-id": __relkit_module_41["OPTIONS"], "route.patch.orders.by-order-id": __relkit_module_41["PATCH"], "route.post.announcements": __relkit_module_35["POST"], "route.post.orders": __relkit_module_42["POST"], "route.post.uploads": __relkit_module_46["POST"], "route.put.orders.by-order-id": __relkit_module_41["PUT"] },
+  tools: { "orders.cancel-order": __relkit_module_33["default"], "orders.lookup-order": __relkit_module_34["default"] },
+  routes: { "orders.export": __relkit_module_46["POST"], "route.all.api.auth.optional-catch-all-auth": __relkit_module_40["ALL"], "route.delete.orders.by-order-id": __relkit_module_45["DELETE"], "route.get.account.profile": __relkit_module_38["GET"], "route.get.announcements": __relkit_module_39["GET"], "route.get.database.users": __relkit_module_41["GET"], "route.get.docs.optional-catch-all-parts": __relkit_module_42["GET"], "route.get.files.catch-all-parts": __relkit_module_43["GET"], "route.get.orders": __relkit_module_47["GET"], "route.get.orders.by-order-id": __relkit_module_45["GET"], "route.get.orders.search": __relkit_module_48["GET"], "route.get.reports.by-report-id": __relkit_module_49["GET"], "route.head.orders.by-order-id": __relkit_module_45["HEAD"], "route.options.orders.by-order-id": __relkit_module_45["OPTIONS"], "route.patch.orders.by-order-id": __relkit_module_45["PATCH"], "route.post.announcements": __relkit_module_39["POST"], "route.post.orders": __relkit_module_47["POST"], "route.post.uploads": __relkit_module_51["POST"], "route.put.orders.by-order-id": __relkit_module_45["PUT"] },
   constants: {  },
   prompts: {  },
-  services: { "account": __relkit_module_2["default"], "announcements": __relkit_module_6["default"], "assets": __relkit_module_9["default"], "auth": __relkit_module_10["default"], "database": __relkit_module_11["default"], "navigation": __relkit_module_13["default"], "orders": __relkit_module_28["default"], "receipts": __relkit_module_33["default"], "users": __relkit_module_48["default"] },
+  services: { "account": __relkit_module_2["default"], "announcements": __relkit_module_6["default"], "assets": __relkit_module_9["default"], "auth": __relkit_module_10["default"], "database": __relkit_module_11["default"], "navigation": __relkit_module_13["default"], "orders": __relkit_module_30["default"], "receipts": __relkit_module_37["default"], "users": __relkit_module_53["default"] },
+  tasks: { "orders.cleanup": __relkit_module_31["default"], "orders.export-orders": __relkit_module_32["default"] },
+  jobs: { "orders.cleanup": __relkit_module_28["default"], "orders.export-orders": __relkit_module_29["default"] },
   runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,
-  middleware: { "order-auth": __relkit_module_40["default"] },
+  middleware: { "order-auth": __relkit_module_44["default"] },
   hooks: {  },
-  requestTransforms: { "orders.normalize-id": __relkit_module_45["default"].schema },
+  requestTransforms: { "orders.normalize-id": __relkit_module_50["default"].schema },
   application: __relkit_module_0["default"],
 } as const;

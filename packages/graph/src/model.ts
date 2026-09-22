@@ -4,6 +4,16 @@ import type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js"
 import type { ProviderBindingNode } from "./provider-nodes.js";
 import type { ServiceNode } from "./service-nodes.js";
 import type { AgentNode } from "./agent-node.js";
+import type { HookNode, JobNode, TaskNode } from "./task-nodes.js";
+export type {
+  FunctionHookNode,
+  HookNode,
+  JobNode,
+  LegacyJobNode,
+  TaskHookNode,
+  TaskJobNode,
+  TaskNode,
+} from "./task-nodes.js";
 export type {
   AgentNode,
   AgentResourceDependency,
@@ -15,6 +25,7 @@ export const GRAPH_NODE_KINDS = [
   "app",
   "env",
   "function",
+  "task",
   "error",
   "trigger",
   "job",
@@ -89,16 +100,6 @@ export interface TriggerNode<
   readonly targetFunctionId: string;
   readonly config: Config;
 }
-export interface JobNode extends GraphNodeBase<"job"> {
-  readonly input: JsonValue;
-  readonly targetFunctionId: string;
-  readonly profile: string;
-  readonly retry?: JsonValue;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: JsonValue;
-  readonly idempotency?: JsonValue;
-}
 export interface EventNode extends GraphNodeBase<"event"> {
   readonly exposure?: DomainExposure;
   readonly version: number;
@@ -131,11 +132,6 @@ export interface MiddlewareNode extends GraphNodeBase<"middleware"> {
   readonly path: string;
   readonly order: number;
 }
-export interface HookNode extends GraphNodeBase<"hook"> {
-  readonly ownerId: string;
-  readonly ownerKind: "function" | "tool";
-  readonly phase: "before" | "after";
-}
 export interface ChannelNode extends GraphNodeBase<"channel"> {
   readonly params: JsonValue;
   readonly events: Readonly<Record<string, JsonValue>>;
@@ -148,6 +144,7 @@ export type GraphNode =
   | AppNode
   | EnvironmentVariableNode
   | FunctionNode
+  | TaskNode
   | ErrorNode
   | TriggerNode
   | JobNode
@@ -167,6 +164,7 @@ export {
   type GraphEdge,
   type GraphEdgeBase,
   type GraphEdgeKind,
+  type TargetsTaskEdge,
   type TargetsFunctionEdge,
   type UsesHookEdge,
   type UsesMiddlewareEdge,

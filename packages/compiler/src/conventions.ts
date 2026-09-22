@@ -44,6 +44,7 @@ const rules: Readonly<Record<DescriptorKind, KindRule>> = {
   service: { directory: "", suffix: "service.ts" },
   route: { directory: "src/routes", suffix: "route.ts" },
   middleware: { directory: "src/routes/middleware", suffix: ".middleware.ts" },
+  task: { directory: "tasks", suffix: ".task.ts" },
   job: { directory: "jobs", suffix: ".job.ts" },
   event: { directory: "events", suffix: ".event.ts" },
   "event-trigger": { directory: "events", suffix: ".event.ts" },
@@ -170,6 +171,7 @@ function recommendedPattern(rule: KindRule): string {
   return rule.directory === "." ? rule.suffix : `${rule.directory}/**/*${rule.suffix}`;
 }
 function hasExportWarning(input: ConventionCheckInput): boolean {
+  if (isDescriptor(input.descriptor) && input.descriptor.kind === "task") return false;
   if (input.exports !== undefined) {
     return !input.exports.some(
       (entry) => entry.isDefault ?? entry.defaultExport ?? entry.name === "default",

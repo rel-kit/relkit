@@ -34,7 +34,7 @@
     "@relkit/deploy": "workspace:*",
     "@relkit/observability": "workspace:*",
     "@relkit/runtime-effect": "workspace:*",
-    "effect": "4.0.0-beta.107"
+    "effect": "4.0.0-rc.115"
   },
   "scripts": {
     "build": "tsc -b",

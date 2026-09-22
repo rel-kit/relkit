@@ -23,6 +23,7 @@ export function makeContext<Context extends { readonly signal: AbortSignal }>(
       env: options.env,
       log: Object.freeze({ trace: noop, debug: noop, info: noop, warn: noop, error: noop }),
       time,
+      tasks: Object.freeze({}),
       jobs: Object.freeze({}),
       events: Object.freeze({}),
       buckets: Object.freeze({}),

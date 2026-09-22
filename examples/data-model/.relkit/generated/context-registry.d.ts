@@ -6,6 +6,10 @@ declare global {
     interface ApplicationContextRegistry {
     readonly database: import("@relkit/drizzle").DatabaseContext<typeof import("../../src/database/service.js")["default"]>;
     }
+    interface TaskRegistry {
+    }
+    interface JobRegistry {
+    }
   }
 }
 

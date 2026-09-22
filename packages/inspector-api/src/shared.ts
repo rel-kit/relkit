@@ -12,6 +12,7 @@ import type {
   ResolvedCandidateGeneration,
 } from "./generation-types.js";
 import type { InspectorResourceExplorers } from "./resource-explorer.js";
+import type { InspectorJobsServices } from "./jobs/types.js";
 export type InspectorMode = "development" | "test" | "production";
 export type InspectorValueSource<T = unknown> = T | (() => MaybePromise<T>);
 export interface InspectorRuntimeServices {
@@ -40,6 +41,7 @@ export interface InspectorGenerationServices extends InspectorRuntimeServices {
   readonly resources?: InspectorValueSource<InspectorResourceExplorers | undefined>;
 }
 export interface InspectorActiveGeneration extends InspectorGenerationServices {
+  readonly jobs?: InspectorJobsServices;
   readonly generationId?: string;
   readonly id?: string;
   readonly graphHash?: string;
@@ -67,6 +69,7 @@ export interface ResolvedActiveGeneration {
   readonly localServices?: unknown;
   readonly telemetry?: unknown;
   readonly runtime?: InspectorRuntimeServices;
+  readonly jobs?: InspectorJobsServices;
   readonly actions?: InspectorActionServices;
   readonly resources?: InspectorResourceExplorers;
   readonly candidate?: ResolvedCandidateGeneration;
@@ -191,9 +194,7 @@ export async function resolveCollection(source: unknown): Promise<unknown> {
     return await value.query({ limit: 100 });
   return value;
 }
-
 export async function resolveItem(source: unknown, id: string): Promise<unknown> {
   const value = await resolveService(source);
-  if (isRecord(value) && typeof value.get === "function") return await value.get(id);
-  return undefined;
+  return isRecord(value) && typeof value.get === "function" ? await value.get(id) : undefined;
 }

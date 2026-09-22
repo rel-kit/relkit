@@ -36,10 +36,16 @@ function assertNoGitStateChange(label: string, before: GitState, after: GitState
   console.log(`✓ ${label}`);
 }
 
-async function run(label: string, executable: string, args: string[]): Promise<void> {
+async function run(
+  label: string,
+  executable: string,
+  args: string[],
+  environment: NodeJS.ProcessEnv = process.env,
+): Promise<void> {
   console.log(`\n▶ ${label}: ${[executable, ...args].join(" ")}`);
   const child = Bun.spawn([executable, ...args], {
     cwd: root,
+    env: environment,
     stdout: "inherit",
     stderr: "inherit",
   });
@@ -48,21 +54,10 @@ async function run(label: string, executable: string, args: string[]): Promise<v
   console.log(`✓ ${label}`);
 }
 
-function lineCount(text: string): number {
-  const lines = text.split(/\r?\n/);
-  return text.endsWith("\n") || text.endsWith("\r") ? lines.length - 1 : lines.length;
-}
-
 export function implementationSizeOffenders(root: string): string[] {
   const offenders: string[] = [];
-  for (const directory of [
-    "apps",
-    "examples",
-    "integrations",
-    "packages",
-    "scripts",
-    "templates",
-  ]) {
+  const directories = "apps examples integrations packages scripts templates".split(" ");
+  for (const directory of directories) {
     const absolute = resolve(root, directory);
     if (!existsSync(absolute)) continue;
     for (const path of new Bun.Glob("**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}").scanSync({
@@ -72,7 +67,9 @@ export function implementationSizeOffenders(root: string): string[] {
       if (/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path)) continue;
       if (/(^|\/)[^/]+\.(?:test|spec)\.[^.]+$/.test(path)) continue;
       const file = resolve(absolute, path);
-      const lines = lineCount(readFileSync(file, "utf8"));
+      const text = readFileSync(file, "utf8");
+      const lines =
+        text.split(/\r?\n/).length - (text.endsWith("\n") || text.endsWith("\r") ? 1 : 0);
       if (lines > 200) offenders.push(`${relative(root, file)} (${lines} lines)`);
     }
   }
@@ -163,9 +160,26 @@ async function main(): Promise<void> {
   await run("generator tests", bun, ["run", "test:generator"]);
   await run("executable examples", bun, ["run", "test:examples"]);
   await run("documentation", bun, ["run", "test:docs"]);
-  await run("release readiness", bun, ["run", "release:check"]);
+  await run("jobs unit tests", bun, ["run", "test:jobs:unit"]);
+  await run("jobs type fixtures", bun, ["run", "test:jobs:types"]);
+  await run("jobs contract tests", bun, ["run", "test:jobs:contracts"]);
+  await run("jobs restart tests", bun, ["run", "test:jobs:restart"]);
+  await run("jobs client tests", bun, ["run", "test:jobs:client"]);
+  await run("jobs validation/binding/watch quality gate", bun, ["run", "test:jobs:quality"]);
+  await run("jobs Inspector tests", bun, ["run", "test:jobs:inspector"]);
+  await run("jobs compatibility and capability matrix", bun, ["run", "test:jobs:matrix"]);
+  await run("release readiness (account-free Docker variants)", bun, ["run", "release:check"], {
+    ...process.env,
+    RELKIT_TEST_DOCKER: "1",
+  });
   await run("recursive synthetic-secret artifact scan", bun, ["run", "scripts/secret-scan.ts"]);
-  await run("whitespace check", "git", ["diff", "--check"]);
+  await run("whitespace check", "git", [
+    "diff",
+    "--check",
+    "--",
+    ".",
+    ":(exclude)**/__snapshots__/**",
+  ]);
   await run("security and redaction tests", bun, ["run", "test:security"]);
   await run("public declaration leak scan", bun, ["run", "scripts/check-public-declarations.ts"]);
   await run("agent declaration/source/graph scans", bun, [

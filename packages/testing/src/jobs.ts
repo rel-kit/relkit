@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { normalizeId, type JsonValue } from "@relkit/contracts";
 import type { JobQueueHandle } from "@relkit/engine";
 import { materializeJobs } from "@relkit/engine";
-import { createJobClient, type JobClient, type JobProvider } from "@relkit/jobs";
+import { createJobClient, type JobClient, type JobProvider } from "@relkit/jobs/legacy";
 import {
   createJobAdmin,
   createJobQueue,

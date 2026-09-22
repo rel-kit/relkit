@@ -1,0 +1,12 @@
+---
+title: Inngest
+description: Use the Inngest integration for durable task execution.
+---
+
+The Inngest integration publishes the task worker through the Inngest SDK and records the provider-native worker identity in the deployment plan. The supported runtime path covers submission, run lookup and listing, observation, cancellation, retry, and durable sleep.
+
+Configure it with the same `jobs.default` binding shown in the [Docker guide](/docs/jobs/docker).
+
+The current schedule path supports UTC cron schedules. Do not assume interval schedules, arbitrary timezones, overlap policies, or richer misfire behavior are available unless `relkit jobs capabilities` reports them for the selected environment.
+
+The documented limits are 1 MiB input, 1 MiB output, 64 KiB progress/stream items, and 100 maximum run-list items. Progress authoring is available in task code; verify the runtime/provider evidence before depending on provider-native progress retention.

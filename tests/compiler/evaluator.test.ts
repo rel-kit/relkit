@@ -3,6 +3,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { evaluateCandidates } from "../../packages/compiler/src/discovery/evaluator.ts";
+import {
+  snapshotDescriptor,
+  type SnapshotDescriptorLike,
+} from "../../packages/compiler/src/discovery/evaluator-snapshot.ts";
 
 const brand = 'Symbol.for("relkit.descriptor")';
 
@@ -166,6 +170,40 @@ describe.serial("isolated evaluator", () => {
     } finally {
       await rm(projectRoot, { recursive: true, force: true });
     }
+  });
+
+  test("retains executable source hashes in task descriptor snapshots", () => {
+    const firstHandler = new Function("return 1;") as () => number;
+    const secondHandler = new Function("return 2;") as () => number;
+    const first = snapshotDescriptor({
+      kind: "task",
+      id: "orders.send",
+      ref: { kind: "task", id: "orders.send" },
+      handler: firstHandler,
+    } as SnapshotDescriptorLike);
+    const second = snapshotDescriptor({
+      kind: "task",
+      id: "orders.send",
+      ref: { kind: "task", id: "orders.send" },
+      handler: secondHandler,
+    } as SnapshotDescriptorLike);
+
+    expect(first.metadata).toMatchObject({
+      handler: {
+        $relkit: "function",
+        owner: "task",
+        role: "handler",
+        sourceHash: expect.stringMatching(/^sha256:/),
+      },
+    });
+    expect(second.metadata).toMatchObject({
+      handler: {
+        $relkit: "function",
+        owner: "task",
+        role: "handler",
+        sourceHash: expect.stringMatching(/^sha256:/),
+      },
+    });
   });
 });
 

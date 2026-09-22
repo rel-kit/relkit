@@ -30,6 +30,7 @@ export type DescriptorKind =
   | "service"
   | "route"
   | "middleware"
+  | "task"
   | "job"
   | "event"
   | "event-trigger"

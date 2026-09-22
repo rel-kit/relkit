@@ -77,6 +77,245 @@ declare const randomLoopbackPort: (containerPort: number) => string;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-client.ts#L177)
 
+## `docker-composite-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [argument](#argument)
+  - [bindMountArguments](#bindmountarguments)
+  - [compositeLabels](#compositelabels)
+  - [compositeSignal](#compositesignal)
+  - [environmentArguments](#environmentarguments)
+  - [healthArgs](#healthargs)
+  - [inspectNetwork](#inspectnetwork)
+  - [mountPath](#mountpath)
+  - [owned](#owned)
+  - [positive](#positive)
+  - [resourceName](#resourcename)
+  - [volumeNames](#volumenames)
+
+---
+
+# utils
+
+## argument
+
+**Signature**
+
+```ts
+declare const argument: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L82)
+
+## bindMountArguments
+
+**Signature**
+
+```ts
+declare const bindMountArguments: (
+  mounts: readonly LocalServiceBindMount[] | undefined,
+) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L65)
+
+## compositeLabels
+
+**Signature**
+
+```ts
+declare const compositeLabels: (values: Readonly<Record<string, string>>) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L24)
+
+## compositeSignal
+
+**Signature**
+
+```ts
+declare const compositeSignal: (request: LocalServiceStartRequest) => {
+  readonly signal?: AbortSignal;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L48)
+
+## environmentArguments
+
+**Signature**
+
+```ts
+declare const environmentArguments: (
+  values: Readonly<Record<string, string>> | undefined,
+) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L87)
+
+## healthArgs
+
+**Signature**
+
+```ts
+declare const healthArgs: (
+  command: readonly string[],
+  interval: number,
+  timeout: number,
+  retries: number,
+) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L30)
+
+## inspectNetwork
+
+**Signature**
+
+```ts
+declare const inspectNetwork: (
+  client: DockerClient,
+  networkName: string,
+  request: LocalServiceStartRequest,
+) => Promise<Readonly<Record<string, string>> | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L106)
+
+## mountPath
+
+**Signature**
+
+```ts
+declare const mountPath: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L59)
+
+## owned
+
+**Signature**
+
+```ts
+declare const owned: (
+  actual: Readonly<Record<string, string>>,
+  expected: Readonly<Record<string, string>>,
+) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L129)
+
+## positive
+
+**Signature**
+
+```ts
+declare const positive: (value: number) => number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L100)
+
+## resourceName
+
+**Signature**
+
+```ts
+declare const resourceName: (value: string) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L54)
+
+## volumeNames
+
+**Signature**
+
+```ts
+declare const volumeNames: (
+  serviceName: string,
+  requested: Readonly<Record<string, string>> | undefined,
+  recipe: NormalizedLocalServiceRecipe,
+) => Readonly<Record<string, string>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-support.ts#L8)
+
+## `docker-composite-unit.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [reusedUnit](#reusedunit)
+  - [startUnit](#startunit)
+
+---
+
+# utils
+
+## reusedUnit
+
+**Signature**
+
+```ts
+declare const reusedUnit: (
+  existing: LocalServiceInstance,
+  unit: NormalizedLocalServiceUnit,
+  serviceName: string,
+) => LocalServiceInstance;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-unit.ts#L20)
+
+## startUnit
+
+**Signature**
+
+```ts
+declare const startUnit: (
+  client: DockerClient,
+  request: LocalServiceStartRequest,
+  recipe: NormalizedLocalServiceRecipe,
+  unit: NormalizedLocalServiceUnit,
+  networkName: string,
+  volumes: Readonly<Record<string, string>>,
+  gatewayAddress?: string,
+) => Promise<LocalServiceInstance>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite-unit.ts#L44)
+
+## `docker-composite.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [startComposite](#startcomposite)
+
+---
+
+# utils
+
+## startComposite
+
+**Signature**
+
+```ts
+declare const startComposite: (
+  client: DockerClient,
+  request: LocalServiceStartRequest,
+  gatewayAddress?: string,
+) => Promise<LocalServiceInstance>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-composite.ts#L26)
+
 ## `docker-health.ts`
 
 ---
@@ -85,6 +324,7 @@ declare const randomLoopbackPort: (containerPort: number) => string;
 
 - [utils](#utils)
   - [healthTimeout](#healthtimeout)
+  - [publishedPortArguments](#publishedportarguments)
   - [randomLoopbackPort](#randomloopbackport)
   - [wait](#wait)
 
@@ -100,7 +340,21 @@ declare const randomLoopbackPort: (containerPort: number) => string;
 declare const healthTimeout: (id: string) => never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L72)
+
+## publishedPortArguments
+
+**Signature**
+
+```ts
+declare const publishedPortArguments: (
+  containerPort: number,
+  gatewayAddress?: string,
+  hostPort?: number,
+) => Promise<string[]>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L14)
 
 ## randomLoopbackPort
 
@@ -110,7 +364,7 @@ declare const healthTimeout: (id: string) => never;
 declare const randomLoopbackPort: (containerPort: number) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L4)
 
 ## wait
 
@@ -120,7 +374,7 @@ declare const randomLoopbackPort: (containerPort: number) => string;
 declare const wait: (milliseconds: number, signal?: AbortSignal) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-health.ts#L79)
 
 ## `docker-inspect.ts`
 
@@ -144,7 +398,7 @@ declare const wait: (milliseconds: number, signal?: AbortSignal) => Promise<void
 declare const parseContainers: (source: string) => readonly DockerContainer[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L4)
 
 ## parseVolumes
 
@@ -154,7 +408,140 @@ declare const parseContainers: (source: string) => readonly DockerContainer[];
 declare const parseVolumes: (source: string) => readonly DockerVolume[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-inspect.ts#L31)
+
+## `docker-materializer-support.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [argument](#argument)
+  - [duration](#duration)
+  - [healthCommand](#healthcommand)
+  - [labelArguments](#labelarguments)
+  - [labelKey](#labelkey)
+  - [labels](#labels)
+  - [mountPath](#mountpath)
+  - [name](#name)
+  - [networkLabelFilters](#networklabelfilters)
+  - [positive](#positive)
+  - [resourceName](#resourcename)
+
+---
+
+# utils
+
+## argument
+
+**Signature**
+
+```ts
+declare const argument: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L54)
+
+## duration
+
+**Signature**
+
+```ts
+declare const duration: (value: number) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L45)
+
+## healthCommand
+
+**Signature**
+
+```ts
+declare const healthCommand: (values: readonly string[]) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L23)
+
+## labelArguments
+
+**Signature**
+
+```ts
+declare const labelArguments: (values: Readonly<Record<string, string>>) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L1)
+
+## labelKey
+
+**Signature**
+
+```ts
+declare const labelKey: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L18)
+
+## labels
+
+**Signature**
+
+```ts
+declare const labels: (values: Readonly<Record<string, string>>) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L13)
+
+## mountPath
+
+**Signature**
+
+```ts
+declare const mountPath: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L40)
+
+## name
+
+**Signature**
+
+```ts
+declare const name: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L35)
+
+## networkLabelFilters
+
+**Signature**
+
+```ts
+declare const networkLabelFilters: (values: Readonly<Record<string, string>>) => string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L7)
+
+## positive
+
+**Signature**
+
+```ts
+declare const positive: (value: number) => number;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L49)
+
+## resourceName
+
+**Signature**
+
+```ts
+declare const resourceName: (value: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer-support.ts#L30)
 
 ## `docker-materializer.ts`
 
@@ -175,11 +562,14 @@ declare const parseVolumes: (source: string) => readonly DockerVolume[];
 
 ```ts
 declare const createDockerMaterializer: (
-  options?: DockerClientOptions & { readonly client?: DockerClient },
+  options?: DockerClientOptions & {
+    readonly client?: DockerClient;
+    readonly gatewayAddress?: string;
+  },
 ) => LocalServiceMaterializerRuntime;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/docker/src/docker-materializer.ts#L25)
 
 ## `docker-runner.ts`
 

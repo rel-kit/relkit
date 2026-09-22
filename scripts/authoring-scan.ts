@@ -7,6 +7,7 @@ import {
   fullName,
   hasFunction,
   propertyName,
+  sortAuthoringViolations,
   stringValue,
   type AuthoringViolation,
   type Fragment,
@@ -45,7 +46,9 @@ function scanCall(
       const key = propertyName(member.name);
       if (
         key === "handler" &&
-        !/^(?:defineEventFunction|defineFunction|defineGraphNode|defineRoute)$/.test(shortName)
+        !/^(?:defineEventFunction|defineFunction|defineGraphNode|defineRoute|defineTask)$/.test(
+          shortName,
+        )
       )
         add(
           root,
@@ -190,11 +193,7 @@ function scanFragment(
 
 export function scanAuthoring(root: string): AuthoringViolation[] {
   const integrations = repositoryIntegrationPackageNames(root);
-  return authoringFragments(root)
-    .flatMap((fragment) => scanFragment(root, fragment, integrations))
-    .sort((left, right) =>
-      `${left.file}:${left.line}:${left.column}:${left.rule}`.localeCompare(
-        `${right.file}:${right.line}:${right.column}:${right.rule}`,
-      ),
-    );
+  return sortAuthoringViolations(
+    authoringFragments(root).flatMap((fragment) => scanFragment(root, fragment, integrations)),
+  );
 }

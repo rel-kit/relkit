@@ -23,6 +23,20 @@ test("manages detached project services and protects live attached leases", asyn
     services: [expect.objectContaining({ phase: "healthy" })],
   });
 
+  const preview = capture();
+  expect(await runLocal(["reset", "--dry-run", "--project-root", root], preview.context)).toBe(0);
+  expect(preview.outputs[0]).toMatchObject({
+    command: "reset",
+    dryRun: true,
+    containers: 1,
+    volumesRemoved: false,
+  });
+  const afterPreview = capture();
+  expect(await runLocal(["status", "--project-root", root], afterPreview.context)).toBe(0);
+  expect(afterPreview.outputs[0]).toMatchObject({
+    services: [expect.objectContaining({ phase: "healthy", containerState: "running" })],
+  });
+
   const status = capture();
   expect(await runLocal(["status", "--project-root", root], status.context)).toBe(0);
   expect(status.outputs[0]).toMatchObject({

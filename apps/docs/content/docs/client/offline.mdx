@@ -10,6 +10,10 @@ transmission is `unknown`. Agent runs, controls, and continuations use scoped op
 receipt lookup after refresh. Arbitrary mutations remain unknown unless the application supplies a
 reconciliation endpoint. Do not resubmit an uncertain external effect automatically.
 
+Job submissions additionally retain the original operation ID, idempotency key, request digest, and any
+provider-certified recovery window. A recovered job must use the same request; a discarded `runId` is not a
+safe recovery strategy.
+
 ## Reconcile safely
 
 <include cwd lang="ts" meta='title="packages/client/src/react/pending.ts"'>

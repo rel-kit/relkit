@@ -17,7 +17,11 @@ import { createLocalProjectIdentity, type LocalProjectIdentity } from "./identit
 
 const MAX_STATE_BYTES = 1024 * 1024;
 export type LocalStateFileName =
-  "lease.json" | "local-services.state.json" | "provider-overrides.json";
+  | "lease.json"
+  | "local-services.state.json"
+  | "provider-overrides.json"
+  | "worker-provider-overrides.json"
+  | "local-secrets.json";
 
 export class LocalStateError extends Error {
   readonly code = "RELKIT_LOCAL_STATE_INVALID" as const;

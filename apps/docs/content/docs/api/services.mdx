@@ -37,7 +37,7 @@ void orders;
 declare const defineService: DefineService;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/define-service.ts#L34)
 
 Since v0.1.0
 
@@ -76,6 +76,8 @@ declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
   "ref",
   "functions",
   "events",
+  "tasks",
+  "jobs",
   "capability",
   "title",
   "description",
@@ -87,7 +89,7 @@ declare const RESERVED_SERVICE_MEMBER_NAMES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L24)
 
 ## SERVICE_RESERVED_MEMBER_NAMES
 
@@ -100,6 +102,8 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
   "ref",
   "functions",
   "events",
+  "tasks",
+  "jobs",
   "capability",
   "title",
   "description",
@@ -111,7 +115,7 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L6)
 
 ## assertServiceDescriptor
 
@@ -121,7 +125,7 @@ declare const SERVICE_RESERVED_MEMBER_NAMES: readonly [
 declare const assertServiceDescriptor: (value: unknown) => asserts value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L72)
 
 ## assertServiceMemberName
 
@@ -131,7 +135,7 @@ declare const assertServiceDescriptor: (value: unknown) => asserts value is Serv
 declare const assertServiceMemberName: (value: unknown) => asserts value is string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L40)
 
 ## assertServiceRef
 
@@ -141,7 +145,7 @@ declare const assertServiceMemberName: (value: unknown) => asserts value is stri
 declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L53)
 
 ## freezeServiceDescriptor
 
@@ -151,7 +155,7 @@ declare const assertServiceRef: (value: unknown) => asserts value is ServiceRefA
 declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T) => T;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L76)
 
 ## isFunctionDescriptor
 
@@ -161,7 +165,7 @@ declare const freezeServiceDescriptor: <T extends ServiceDescriptorAny>(value: T
 declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L85)
 
 ## isReservedServiceMemberName
 
@@ -171,7 +175,7 @@ declare const isFunctionDescriptor: (value: unknown) => value is FunctionRefAny;
 declare const isReservedServiceMemberName: (value: unknown) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L33)
 
 ## isServiceDescriptor
 
@@ -181,7 +185,7 @@ declare const isReservedServiceMemberName: (value: unknown) => boolean;
 declare const isServiceDescriptor: (value: unknown) => value is ServiceDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L57)
 
 ## isServiceRef
 
@@ -191,7 +195,7 @@ declare const isServiceDescriptor: (value: unknown) => value is ServiceDescripto
 declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L49)
 
 ## normalizeServiceMemberName
 
@@ -201,7 +205,7 @@ declare const isServiceRef: (value: unknown) => value is ServiceRefAny;
 declare const normalizeServiceMemberName: (value: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L26)
 
 ## serviceMemberEntries
 
@@ -211,7 +215,7 @@ declare const normalizeServiceMemberName: (value: unknown) => string;
 declare const serviceMemberEntries: (service: ServiceDescriptorAny) => [string, unknown][];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/guards.ts#L81)
 
 ## `index.ts`
 
@@ -302,8 +306,12 @@ declare const freezeServiceContextValue: (value: unknown, seen: WeakMap<object, 
   - [ServiceEvents (type alias)](#serviceevents-type-alias)
   - [ServiceFunctionMap (type alias)](#servicefunctionmap-type-alias)
   - [ServiceFunctions (type alias)](#servicefunctions-type-alias)
+  - [ServiceJobMap (type alias)](#servicejobmap-type-alias)
+  - [ServiceJobs (type alias)](#servicejobs-type-alias)
   - [ServiceRef (interface)](#serviceref-interface)
   - [ServiceRefAny (type alias)](#servicerefany-type-alias)
+  - [ServiceTaskMap (type alias)](#servicetaskmap-type-alias)
+  - [ServiceTasks (type alias)](#servicetasks-type-alias)
 
 ---
 
@@ -319,13 +327,15 @@ export interface DefineService {
     const Id extends string,
     const Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
     const Events extends ServiceEventMap = Readonly<Record<never, never>>,
+    const Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+    const Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
   >(
-    options: DefineServiceOptions<Id, Functions, Events>,
-  ): ServiceDescriptor<Id, Functions, Events>;
+    options: DefineServiceOptions<Id, Functions, Events, Tasks, Jobs>,
+  ): ServiceDescriptor<Id, Functions, Events, Tasks, Jobs>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L88)
 
 ## DefineServiceOptions (interface)
 
@@ -336,30 +346,37 @@ export interface DefineServiceOptions<
   Id extends string,
   Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
   Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
 > extends DescriptorMetadata {
   readonly id?: Id;
   readonly functions?: Functions;
   readonly events?: Events;
+  readonly tasks?: Tasks;
+  readonly jobs?: Jobs;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L74)
 
 ## ServiceDescriptor (type alias)
 
 **Signature**
 
 ```ts
-type ServiceDescriptor<Id, Functions, Events> = DescriptorBase<"service", Id> &
-  PublicMembers<Functions, Events> & {
-    readonly [serviceTypes]: {
-      readonly functions: Functions;
-      readonly events: Events;
-    };
+type ServiceDescriptor<
+  Id extends string,
+  Functions extends ServiceFunctionMap = Readonly<Record<never, never>>,
+  Events extends ServiceEventMap = Readonly<Record<never, never>>,
+  Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
+  Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
+> = DescriptorBase<"service", Id> &
+  PublicMembers<Functions, Events, Tasks, Jobs> & {
+    readonly [serviceTypes]: ServiceTypeMembers<Functions, Events, Tasks, Jobs>;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L37)
 
 ## ServiceDescriptorAny (type alias)
 
@@ -369,7 +386,7 @@ type ServiceDescriptor<Id, Functions, Events> = DescriptorBase<"service", Id> &
 type ServiceDescriptorAny = DescriptorBase<"service", string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L48)
 
 ## ServiceEventMap (type alias)
 
@@ -379,7 +396,7 @@ type ServiceDescriptorAny = DescriptorBase<"service", string>;
 type ServiceEventMap = Readonly<Record<string, EventDescriptorAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L12)
 
 ## ServiceEvents (type alias)
 
@@ -393,7 +410,7 @@ type ServiceEvents<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L56)
 
 ## ServiceFunctionMap (type alias)
 
@@ -403,7 +420,7 @@ type ServiceEvents<Service> = Service extends {
 type ServiceFunctionMap = Readonly<Record<string, FunctionRefAny>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L11)
 
 ## ServiceFunctions (type alias)
 
@@ -417,7 +434,31 @@ type ServiceFunctions<Service> = Service extends {
   : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L50)
+
+## ServiceJobMap (type alias)
+
+**Signature**
+
+```ts
+type ServiceJobMap = Readonly<Record<string, JobDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L14)
+
+## ServiceJobs (type alias)
+
+**Signature**
+
+```ts
+type ServiceJobs<Service> = Service extends {
+  readonly [serviceTypes]: { readonly jobs: infer Jobs };
+}
+  ? Jobs
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L68)
 
 ## ServiceRef (interface)
 
@@ -429,7 +470,7 @@ export interface ServiceRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L6)
 
 ## ServiceRefAny (type alias)
 
@@ -439,4 +480,28 @@ export interface ServiceRef<Id extends string = string> {
 type ServiceRefAny = ServiceRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L10)
+
+## ServiceTaskMap (type alias)
+
+**Signature**
+
+```ts
+type ServiceTaskMap = Readonly<Record<string, TaskDescriptorAny>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L13)
+
+## ServiceTasks (type alias)
+
+**Signature**
+
+```ts
+type ServiceTasks<Service> = Service extends {
+  readonly [serviceTypes]: { readonly tasks: infer Tasks };
+}
+  ? Tasks
+  : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/services/src/types.ts#L62)

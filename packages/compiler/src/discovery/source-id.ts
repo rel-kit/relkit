@@ -36,6 +36,7 @@ const KIND_RULES: Readonly<
   function: { category: "functions", suffixes: ["function"] },
   service: { suffixes: ["service"] },
   route: { suffixes: ["route"] },
+  task: { category: "tasks", suffixes: ["task"] },
   job: { category: "jobs", suffixes: ["job"] },
   event: { category: "events", suffixes: ["event"] },
   "event-trigger": { category: "events", suffixes: ["event"] },

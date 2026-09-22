@@ -139,7 +139,8 @@ describe("compiler generated artifacts", () => {
       "src/page.ts",
       "src/routes.ts",
     ]);
-    expect(result.invalidatedArtifacts).toHaveLength(7);
+    expect(result.invalidatedArtifacts).toHaveLength(8);
+    expect(result.invalidatedArtifacts).toContain(GENERATED_ARTIFACT_FILES.jobsManifest);
     expect(invalidateWatchDependencies(index, ["src/unchanged.ts"]).affectedDescriptorIds).toEqual(
       [],
     );

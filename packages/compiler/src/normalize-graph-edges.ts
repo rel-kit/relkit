@@ -12,6 +12,7 @@ import {
   isTargetingDescriptor,
 } from "./normalize-graph-edge-helpers.js";
 import { serviceEntries } from "./normalize-graph-services.js";
+import { graphIdForDescriptor, graphIdForReference } from "./normalize-graph-id.js";
 export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
@@ -35,8 +36,11 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
   for (const descriptor of work.descriptors) {
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     const target = refId(value.target);
+    const taskTarget = graphIdForReference(work, value.task);
     if (target && isTargetingDescriptor(descriptor.kind))
-      add("targets-function", descriptor.id, target, "primary");
+      add("targets-function", graphIdForDescriptor(descriptor), target, "primary");
+    if (descriptor.kind === "job" && taskTarget && refKind(value.task) === "task")
+      add("targets-task", graphIdForDescriptor(descriptor), taskTarget, "primary");
     if (descriptor.kind === "route") addRouteEdges(add, descriptor, value, work);
     if (descriptor.kind === "event-trigger") addEventEdges(add, descriptor, work);
     if (descriptor.kind === "tool" && target) add("exposes-as-tool", target, descriptor.id);
@@ -44,9 +48,9 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
       addToolEdges(add, descriptor.id, value.tools);
       addAgentBucketEdges(add, descriptor, value);
     }
-    if (descriptor.kind === "service") addServiceEdges(add, descriptor, value);
+    if (descriptor.kind === "service") addServiceEdges(add, descriptor, value, work);
     if (descriptor.kind === "function") {
-      addDependencyEdges(add, descriptor, value.dependencies);
+      addDependencyEdges(add, descriptor, value.dependencies, work);
       addPublicationEdges(add, descriptor, value.publishes);
       if (Array.isArray(value.errors)) {
         for (const error of value.errors) {
@@ -55,7 +59,15 @@ export function buildGraphEdges(work: NormalizationWork): GraphEdge[] {
         }
       }
     }
-    if (descriptor.kind === "function" || descriptor.kind === "tool") {
+    if (descriptor.kind === "task") {
+      addDependencyEdges(add, descriptor, value.dependencies, work);
+      addPublicationEdges(add, descriptor, value.publishes);
+    }
+    if (
+      descriptor.kind === "function" ||
+      descriptor.kind === "tool" ||
+      descriptor.kind === "task"
+    ) {
       addHookEdges(add, descriptor, value);
     }
     addProviderEdge(add, descriptor, value, work);
@@ -98,9 +110,12 @@ function addServiceEdges(
   ) => void,
   descriptor: NormalizedDescriptor,
   value: Record<string, unknown>,
+  work: NormalizationWork,
 ): void {
   let functionOrder = 0;
   let eventOrder = 0;
+  let taskOrder = 0;
+  let jobOrder = 0;
   for (const [member, target] of serviceEntries(value, descriptor)) {
     const targetId = refId(target);
     const kind = isRecord(target) && isRecord(target.ref) ? target.ref.kind : undefined;
@@ -108,6 +123,16 @@ function addServiceEdges(
       add("exposes-function", descriptor.id, targetId, { member, order: functionOrder++ });
     } else if (targetId !== undefined && kind === "event") {
       add("exposes-event", descriptor.id, targetId, { member, order: eventOrder++ });
+    } else if (targetId !== undefined && kind === "task") {
+      add("exposes-task", descriptor.id, graphIdForReference(work, target) ?? targetId, {
+        member,
+        order: taskOrder++,
+      });
+    } else if (targetId !== undefined && kind === "job") {
+      add("exposes-job", descriptor.id, graphIdForReference(work, target) ?? targetId, {
+        member,
+        order: jobOrder++,
+      });
     }
   }
 }

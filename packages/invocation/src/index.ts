@@ -9,6 +9,7 @@ export * from "./failure.js";
 export * from "./abort.js";
 export * from "./deadline.js";
 export * from "./handler-bridge.js";
+export * from "./native-suspension.js";
 export * from "./lifecycle.js";
 export * from "./dispatcher.js";
 export * from "./dispatcher-context.js";
@@ -28,6 +29,8 @@ export * from "./progress.js";
 export * from "./root-span.js";
 export {
   currentExecutionContext,
+  currentTaskAncestry,
   runInExecutionContext,
+  runInTaskAncestry,
   runDetachedExecution,
 } from "./dispatcher-scope.js";

@@ -17,7 +17,7 @@ Adapter, source, profile, deployment, and local-overlay constructors SHALL synch
 
 ### Requirement: Direct bindings and profile maps normalize deterministically
 
-Each singular capability input SHALL accept either one binding or a named profile map; a direct binding SHALL normalize to profile `default`, descriptor selection SHALL outrank `defaults.<capability>`, a sole profile SHALL be selected automatically, and an unresolved choice among multiple profiles SHALL fail compilation.
+Existing singular capability inputs SHALL retain binding/map normalization, direct default profile, explicit-selection precedence and automatic sole-profile resolution. New public jobs SHALL normalize to internal job profiles; explicit job.service SHALL outrank defaults.jobs and an implicit/direct default profile SHALL be usable. A sole non-default named jobs profile SHALL require defaults.jobs or job.service. Old/new configuration spellings SHALL conflict rather than silently override.
 
 #### Scenario: Two cache servers are declared
 
@@ -28,6 +28,29 @@ Each singular capability input SHALL accept either one binding or a named profil
 
 - **WHEN** a capability has multiple profiles and neither its logical descriptor nor application defaults select one
 - **THEN** compilation fails with a diagnostic naming the capability, logical descriptor, and available profiles
+
+### Requirement: TJ-003 Public jobs service configuration
+
+Applications MUST configure jobs services through `jobs` and `defaults.jobs`, normalized into the existing provider system.
+
+#### Scenario: Public jobs service configuration
+
+- **WHEN** both job and jobs, defaults.job and defaults.jobs, or profile and service are supplied
+- **THEN** compilation fails without choosing a value; the single new spelling normalizes to capability job
+
+### Requirement: Job binding changes apply only to new acceptance
+
+Service clients SHALL be isolated per application/environment/service generation. Credentials and runtime instances SHALL not share mutable global defaults. Retained runs SHALL keep the original binding and supported locator-verification keys; removal, resource shrinking or retention changes SHALL expose impact and block unsafe retirement.
+
+#### Scenario: Same provider different credentials
+
+- **WHEN** two configured jobs services use one provider with different credentials
+- **THEN** every operation and callback remains scoped to its own service generation
+
+#### Scenario: Retired service referenced by history
+
+- **WHEN** a removal would make a retained run unroutable
+- **THEN** retirement is blocked until an explicit drain/retention decision resolves the impact
 
 ### Requirement: Application environment and binding values remain distinct
 
@@ -111,3 +134,35 @@ The test harness SHALL accept binding replacements by capability and profile, an
 
 - **WHEN** a test supplies a fake for `cache.requests`
 - **THEN** only that binding is replaced and every other required real binding must be explicitly configured or replaced
+
+### Requirement: Scaffolding discovers and reuses compatible profiles
+
+Add planning SHALL inspect canonical application and source declarations to discover services, public members, events, tools, prompts, model profiles, and compatible provider profiles. A unique or configured compatible profile SHALL be reused before a documented first-party default is created.
+
+#### Scenario: Compatible cache profile exists
+
+- **WHEN** a cache is added and the application has one compatible configured cache profile
+- **THEN** the new cache uses that profile without adding a duplicate integration or profile
+
+### Requirement: First-party profile edits remain secret-safe
+
+The CLI SHALL scaffold only known first-party cache, bucket, event, job, and model integrations. It SHALL merge imports, profile maps, defaults, environment declarations, blank `.env.example` entries, dependencies, and scripts without resolving or writing secret values. AWS-backed options SHALL be offered only when AWS with Pulumi deployment is already declared.
+
+#### Scenario: Docker cache default is selected
+
+- **WHEN** cache configuration is otherwise unresolved
+- **THEN** the plan adds a Docker-backed Redis profile, required package/script declarations, and a warning to start local services
+
+#### Scenario: Connected provider needs a credential
+
+- **WHEN** a connected first-party provider profile is created
+- **THEN** the source references a named environment value and `.env.example` contains only a blank placeholder
+
+### Requirement: Resource provider choices are constrained and deterministic
+
+Cache scaffolding SHALL support discovered profiles, Redis from Docker, connected Redis, Redis on existing AWS/Pulumi, and connected Cloudflare KV. Bucket scaffolding SHALL support discovered profiles, S3 from Docker, connected S3, S3 on existing AWS/Pulumi, and connected Cloudflare R2. File-backed RELKIT profiles SHALL be the fallback for events and jobs.
+
+#### Scenario: Unsupported provisioning source is requested
+
+- **WHEN** AWS is requested without an existing AWS/Pulumi deployment declaration
+- **THEN** planning returns a usage failure before files or package metadata are changed

@@ -33,6 +33,10 @@ export async function createRelkitServerContext(
   const identity = (await identityResponse.json()) as ClientIdentityDocument;
   forwarded.set("x-relkit-identity-scope", identity.identityScope);
   forwarded.set("x-relkit-session-epoch", identity.sessionEpoch);
+  if (identity.jobs !== undefined) {
+    forwarded.set("x-relkit-jobs-protocol", String(identity.jobs.version));
+    forwarded.set("x-relkit-public-fingerprint", identity.publicFingerprint);
+  }
   const client = createClient({ baseUrl: options.baseUrl, headers: forwarded });
   const utils = createTanstackQueryUtils(client);
   const scope = scopeFor(options.baseUrl, identity, options.identityKey);

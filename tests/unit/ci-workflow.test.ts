@@ -24,6 +24,8 @@ test("release jobs run after green dependencies with skipped optional jobs", asy
   expect(workflow).toContain("github.ref == 'refs/heads/changeset-release/main'");
   expect(workflow).toContain('gh api --method POST "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA"');
   expect(workflow).toContain("bun run test:local-docker");
+  expect(workflow).toMatch(/name: Verify[\s\S]*?timeout-minutes: 50/);
+  expect(workflow).toMatch(/name: Containers[\s\S]*?timeout-minutes: 40/);
   expect(verify).toContain('await run("package tests", bun, ["run", "test:packages"]);');
   expect(testAll).toContain('"test:packages"');
 });

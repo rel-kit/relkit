@@ -339,7 +339,30 @@
           },
           "data": {
             "$relkit": "schema",
+            "contractHash": "sha256:43efba68b9be06c674b44bb84f44081a86d35d0287c29668d76e059f6719e508",
+            "inputJsonSchema": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "orderId"
+              ],
+              "type": "object"
+            },
             "jsonSchema": {
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "orderId"
+              ],
+              "type": "object"
+            },
+            "outputJsonSchema": {
               "properties": {
                 "orderId": {
                   "type": "string"

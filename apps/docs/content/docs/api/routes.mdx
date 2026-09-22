@@ -258,7 +258,7 @@ type ServiceRouteMethod = (typeof SERVICE_ROUTE_METHODS)[number];
 **Signature**
 
 ```ts
-type ServiceRouteOptions<Name, Target> = Omit<
+type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
   FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
   "target"
 > & {
@@ -273,9 +273,9 @@ type ServiceRouteOptions<Name, Target> = Omit<
 **Signature**
 
 ```ts
-type Partial<Readonly<Record<"GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS", ServiceRouteEntry<Service>>>> = Partial<
+type ServiceRoutesOptions<Service> = Partial<
   Readonly<Record<ServiceRouteMethod, ServiceRouteEntry<Service>>>
->
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L41)
@@ -285,12 +285,12 @@ type Partial<Readonly<Record<"GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD
 **Signature**
 
 ```ts
-type Readonly<{ [Method in keyof Options]: FunctionRouteDescriptor<string, Extract<ServiceFunctions<Service>[Extract<EntryName<Options[Method]>, Extract<keyof ServiceFunctions<Service>, string>>], FunctionRefAny>, HttpRequestMapping | undefined>; }> = Readonly<{
+type ServiceRoutesResult<Service, Options> = Readonly<{
   [Method in keyof Options]: FunctionRouteDescriptor<
     string,
     ServiceFunction<Service, Extract<EntryName<Options[Method]>, ServiceFunctionName<Service>>>
   >;
-}>
+}>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/define-service-routes.ts#L51)
@@ -796,7 +796,7 @@ export interface HttpWholeBodyMapping<Output = unknown> extends HttpMapping<Outp
 **Signature**
 
 ```ts
-type MappingShapeOutput<S> = {
+type MappingShapeOutput<S extends HttpMappingShape> = {
   readonly [K in keyof S]: HttpMappingOutput<S[K]>;
 };
 ```
@@ -1556,8 +1556,11 @@ type RouteClientPolicy = false | { readonly operation?: "query" | "mutation" };
 **Signature**
 
 ```ts
-type RouteDescriptor<Id, Target, Request> =
-  FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
+type RouteDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+  Request extends HttpRequestMapping | undefined = HttpRequestMapping | undefined,
+> = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/routes/src/route-types.ts#L84)

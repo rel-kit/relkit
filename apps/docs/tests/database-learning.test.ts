@@ -24,7 +24,9 @@ test("connects Database guides and the generated Drizzle reference", () => {
   });
   expect(apiPackages).toContain("drizzle");
   expect(features.find(({ id }) => id === "database")?.guide).toBe("database/index");
-  expect(guideRelations.find(({ path }) => path === "jobs/first-job")?.next).toBe("database/index");
+  expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBe(
+    "database/index",
+  );
   expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBe(
     "auth/index",
   );

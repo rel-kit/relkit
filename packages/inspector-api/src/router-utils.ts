@@ -3,6 +3,7 @@ import type { Hono } from "hono";
 import { installObservabilityEndpoints, INSPECTOR_API_PROTOCOL } from "./observability.js";
 import { InspectorGraphError } from "./graph.js";
 import { InspectorRuntimeError } from "./runtime.js";
+import { InspectorJobsError } from "./jobs/types.js";
 import {
   InspectorQueryError,
   type InspectorMode,
@@ -163,6 +164,7 @@ export function errorResponse(error: unknown): Response {
   if (error instanceof InspectorEndpointError) return json({ error: error.code }, error.status);
   if (error instanceof InspectorGraphError || error instanceof InspectorRuntimeError)
     return json({ error: error.code }, error.status);
+  if (error instanceof InspectorJobsError) return json({ error: error.code }, error.status);
   if (error instanceof InspectorQueryError)
     return json({ error: "RELKIT_INSPECTOR_QUERY_INVALID" }, 400);
   return json({ error: "RELKIT_INSPECTOR_INTERNAL" }, 500);

@@ -23,6 +23,8 @@ export function renderManifest(
   constants: ReadonlyMap<string, string> = new Map(),
   prompts: ReadonlyMap<string, string> = new Map(),
   services: ReadonlyMap<string, string> = new Map(),
+  tasks: ReadonlyMap<string, string> = new Map(),
+  jobs: ReadonlyMap<string, string> = new Map(),
   identityBindings: readonly string[] = [],
 ): string {
   const imports = [...bindings.values()]
@@ -70,6 +72,8 @@ export function renderManifest(
     `  constants: ${renderMap(constants)},`,
     `  prompts: ${renderMap(prompts)},`,
     `  services: ${renderMap(services)},`,
+    `  tasks: ${renderMap(tasks)},`,
+    `  jobs: ${renderMap(jobs)},`,
     "  runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,",
     `  middleware: ${renderMap(middleware)},`,
     `  hooks: ${renderMap(hooks)},`,

@@ -11,6 +11,7 @@ import { runGraph } from "./commands/graph.js";
 import { runLocal } from "./commands/local.js";
 import { runStart } from "./commands/start.js";
 import { runClient } from "./commands/client.js";
+import { runJobs } from "./commands/jobs.js";
 import { CLI_EXIT_CODES, fail, type CliCommandContext } from "./main-support.js";
 import type { CliInvocation } from "./cli-effect-runtime.js";
 
@@ -58,6 +59,8 @@ export async function executeCommand(
       return runDeploy(invocation.args, context);
     case "client":
       return runClient(invocation.args, context);
+    case "jobs":
+      return runJobs(invocation.args, context);
     default:
       throw fail("RELKIT_COMMAND_UNAVAILABLE", `Command is not implemented: ${invocation.command}`);
   }

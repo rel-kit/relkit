@@ -1,5 +1,7 @@
 import { canonicalJson } from "@relkit/contracts";
 import type { JsonValue } from "@relkit/contracts";
+import { isEvaluatorResponse } from "./evaluator-protocol-validation.js";
+export { isEvaluatorRequest, isEvaluatorResponse } from "./evaluator-protocol-validation.js";
 
 export const EVALUATOR_PROTOCOL = "relkit.evaluator" as const;
 export const EVALUATOR_PROTOCOL_VERSION = 1 as const;
@@ -76,6 +78,18 @@ export interface EvaluatorManifestReference {
   readonly exportName: string;
 }
 
+/** Data-only schema provenance carried across the evaluator process boundary. */
+export interface EvaluatorSchemaSnapshot {
+  readonly $relkit: "schema" | "schema-unavailable";
+  readonly jsonSchema?: JsonValue;
+  readonly inputJsonSchema?: JsonValue;
+  readonly outputJsonSchema?: JsonValue;
+  readonly contractHash?: string;
+  readonly transformed?: boolean;
+  readonly refined?: boolean;
+  readonly reason?: string;
+}
+
 export interface EvaluatorDescriptorSnapshot {
   readonly kind: string;
   readonly id: string;
@@ -142,57 +156,4 @@ export function decodeEvaluatorFrame(
   } catch {
     return undefined;
   }
-}
-
-export function isEvaluatorRequest(value: unknown): value is EvaluatorRequest {
-  if (!isRecord(value)) return false;
-  return (
-    value.protocol === EVALUATOR_PROTOCOL &&
-    value.version === EVALUATOR_PROTOCOL_VERSION &&
-    typeof value.generationId === "string" &&
-    typeof value.projectRoot === "string" &&
-    Array.isArray(value.candidates) &&
-    value.candidates.every(isCandidate) &&
-    Array.isArray(value.environmentAllowlist) &&
-    value.environmentAllowlist.every((name) => typeof name === "string") &&
-    typeof value.generatedDirectory === "string" &&
-    Array.isArray(value.networkAllowlist) &&
-    value.networkAllowlist.every((host) => typeof host === "string") &&
-    typeof value.sourceMaps === "boolean" &&
-    typeof value.timeoutMs === "number"
-  );
-}
-
-function isCandidate(value: unknown): value is EvaluatorCandidate {
-  return isRecord(value) && typeof value.file === "string";
-}
-
-function isEvaluatorResponse(value: unknown): value is EvaluatorResponse {
-  if (!isRecord(value)) return false;
-  return (
-    value.protocol === EVALUATOR_PROTOCOL &&
-    value.version === EVALUATOR_PROTOCOL_VERSION &&
-    typeof value.generationId === "string" &&
-    typeof value.sourceMaps === "boolean" &&
-    isDetectorCoverage(value.detectorCoverage) &&
-    (value.status === "ok" || value.status === "failed") &&
-    Array.isArray(value.modules) &&
-    Array.isArray(value.failures) &&
-    typeof value.stdout === "string" &&
-    typeof value.stderr === "string"
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function isDetectorCoverage(value: unknown): value is EvaluatorDetectorCoverage {
-  return (
-    isRecord(value) &&
-    Array.isArray(value.supported) &&
-    value.supported.every((entry) => typeof entry === "string") &&
-    Array.isArray(value.unsupported) &&
-    value.unsupported.every((entry) => typeof entry === "string")
-  );
 }

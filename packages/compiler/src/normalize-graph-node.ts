@@ -1,4 +1,3 @@
-import type { JsonValue } from "@relkit/contracts";
 import {
   deploymentRoleProjections,
   environmentMetadata,
@@ -11,6 +10,14 @@ import { channelNodeData } from "./normalize-graph-channel.js";
 import { agentNodeData } from "./normalize-graph-agent.js";
 import type { GraphNode, NormalizedDescriptor, NormalizationWork } from "./normalize-types.js";
 import { isRecord, refId } from "./normalize-utils.js";
+import { graphIdForDescriptor } from "./normalize-graph-id.js";
+import {
+  dependencyMetadata,
+  jobGraphNode,
+  schema,
+  schemaHashes,
+  text,
+} from "./normalize-graph-node-support.js";
 
 export function graphNodeFor(
   descriptor: NormalizedDescriptor,
@@ -19,7 +26,7 @@ export function graphNodeFor(
 ): GraphNode | undefined {
   const value = isRecord(descriptor.value) ? descriptor.value : {};
   const base = {
-    id: descriptor.id,
+    id: graphIdForDescriptor(descriptor),
     source: descriptor.source,
     ...(descriptor.domainId === undefined ? {} : { domainId: descriptor.domainId }),
   };
@@ -66,19 +73,31 @@ export function graphNodeFor(
         concurrency: clean(value.concurrency),
         generated: clean(value.generated),
       };
-    case "job":
+    case "task":
       return {
         ...base,
-        kind: "job",
+        kind: "task",
+        taskId: descriptor.id,
+        version: typeof value.version === "string" ? value.version : "",
+        execution: value.execution === "retryable" ? "retryable" : "durable",
         input: schema(work, descriptor, "input"),
-        targetFunctionId: refId(value.target) ?? "",
-        profile: selectedProviderProfile(application, "job", text(value.profile)) ?? "default",
-        retry: clean(value.retry),
-        timeoutMs: clean(value.timeoutMs),
+        output: schema(work, descriptor, "output"),
+        schemaHashes: schemaHashes(work, descriptor.id, ["input", "output", "progress"]),
+        errors: clean(value.errors),
+        dependencies: dependencyMetadata(value.dependencies),
+        publishes: clean(value.publishes ?? []),
+        policy: clean({
+          retry: value.retry,
+          maxDuration: value.maxDuration,
+          maxElapsed: value.maxElapsed,
+          logging: value.logging,
+        }),
+        resources: clean(value.resources),
         concurrency: clean(value.concurrency),
-        schedule: clean(value.schedule),
-        idempotency: clean(value.idempotency),
+        capabilities: clean({ execution: value.execution, observation: value.observation }),
       };
+    case "job":
+      return jobGraphNode(base, value, descriptor, work, application);
     case "event":
       return {
         ...base,
@@ -147,28 +166,4 @@ export function graphNodeFor(
     default:
       return undefined;
   }
-}
-
-function dependencyMetadata(value: unknown): JsonValue {
-  const cleaned = clean(value);
-  if (!isRecord(value) || !isRecord(value.agents) || !isRecord(cleaned)) return cleaned;
-  const agents = Object.fromEntries(
-    Object.entries(value.agents).flatMap(([name, agent]) => {
-      const id = refId(agent);
-      return id === undefined ? [] : [[name, { ref: { kind: "agent", id } }]];
-    }),
-  );
-  return { ...cleaned, agents };
-}
-
-function text(value: unknown): string | undefined {
-  return typeof value === "string" ? value : undefined;
-}
-
-function schema(
-  work: NormalizationWork,
-  descriptor: NormalizedDescriptor,
-  field: string,
-): JsonValue {
-  return work.schemas.get(`${descriptor.id}:${field}`) ?? null;
 }

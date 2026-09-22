@@ -1,35 +1,44 @@
 export const SERVER_INVOCATION_SOURCE = `
+function jobsRuntimeForInvocation() {
+  const preferred = (plan.jobs ?? []).find((job) => job.default === true) ?? (plan.jobs ?? [])[0];
+  return preferred === undefined ? undefined : nativeJobsRuntimes.get(preferred.profile);
+}
+
 async function invokeHttp(request) {
   const providerRegistry = await providerStartup;
   if (providerRegistry === undefined) throw new Error("Provider registry unavailable.");
   const target = targetFor(request.functionId);
   let invocationSpanId;
-  const execute = () => invoke({
-    input: request.input,
-    source: request.source ?? "http",
-    registry,
-    functionId: request.functionId,
-    ...(target === undefined ? {} : { target }),
-    ...(request.signal === undefined
-      ? { signal: shutdownController.signal }
-      : { signal: AbortSignal.any([request.signal, shutdownController.signal]) }),
-    ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
-    ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
-    ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
-    clients: createDependencySources(providerRegistry),
-    serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
-    ...(request.parent === undefined ? {} : { parent: request.parent }),
-    ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
-    ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
-    ...(request.errors === undefined ? {} : { errors: request.errors }),
-    ...(request.toolHooks === undefined ? {} : { toolHooks: request.toolHooks }),
-    ...(request.trigger === undefined ? {} : { trigger: request.trigger }),
-    ...(request.progressSink === undefined ? {} : { progressSink: request.progressSink }),
-    hooks: { observability: telemetry,
-      onSpanStart: (span) => { invocationSpanId = span.spanId; },
-      context: (context) => invocationContext(context, invocationSpanId),
-    },
-  });
+  const execute = () => {
+    const run = () => invoke({
+      input: request.input,
+      source: request.source ?? "http",
+      registry,
+      functionId: request.functionId,
+      ...(target === undefined ? {} : { target }),
+      ...(request.signal === undefined
+        ? { signal: shutdownController.signal }
+        : { signal: AbortSignal.any([request.signal, shutdownController.signal]) }),
+      ...(request.traceId === undefined ? {} : { traceId: request.traceId }),
+      ...(request.correlationId === undefined ? {} : { correlationId: request.correlationId }),
+      ...(request.timeoutMs === undefined ? {} : { timeoutMs: request.timeoutMs }),
+      clients: createDependencySources(providerRegistry),
+      serviceId: graph.nodes.find((node) => node.kind === "function" && node.id === request.functionId)?.domainId,
+      ...(request.parent === undefined ? {} : { parent: request.parent }),
+      ...(request.inputSchema === undefined ? {} : { inputSchema: request.inputSchema }),
+      ...(request.outputSchema === undefined ? {} : { outputSchema: request.outputSchema }),
+      ...(request.errors === undefined ? {} : { errors: request.errors }),
+      ...(request.toolHooks === undefined ? {} : { toolHooks: request.toolHooks }),
+      ...(request.trigger === undefined ? {} : { trigger: request.trigger }),
+      ...(request.progressSink === undefined ? {} : { progressSink: request.progressSink }),
+      hooks: { observability: telemetry,
+        onSpanStart: (span) => { invocationSpanId = span.spanId; },
+        context: (context) => invocationContext(context, invocationSpanId),
+      },
+    });
+    const jobsRuntime = jobsRuntimeForInvocation();
+    return jobsRuntime === undefined ? run() : runInJobsRuntime(jobsRuntime, run);
+  };
   const task = request.auth === undefined
     ? execute()
     : authRequestStorage.run(request.auth, execute);

@@ -1,5 +1,5 @@
 import { canonicalJson, deepFreeze } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import {
   JobQueueStateError,

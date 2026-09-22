@@ -39,6 +39,14 @@ export interface ServiceEventRef {
   readonly name: string;
   readonly eventId: string;
 }
+export interface ServiceTaskRef {
+  readonly name: string;
+  readonly taskId: string;
+}
+export interface ServiceJobRef {
+  readonly name: string;
+  readonly jobId: string;
+}
 
 export interface ServiceNode {
   readonly kind: "service";
@@ -49,6 +57,8 @@ export interface ServiceNode {
   readonly tags?: readonly string[];
   readonly functions: readonly ServiceMemberRef[];
   readonly events: readonly ServiceEventRef[];
+  readonly tasks?: readonly ServiceTaskRef[];
+  readonly jobs?: readonly ServiceJobRef[];
   readonly capability?: ServiceCapability;
 }
 
@@ -62,6 +72,22 @@ export interface ExposesFunctionEdge {
 
 export interface ExposesEventEdge {
   readonly kind: "exposes-event";
+  readonly from: string;
+  readonly to: string;
+  readonly member: string;
+  readonly order: number;
+}
+
+export interface ExposesTaskEdge {
+  readonly kind: "exposes-task";
+  readonly from: string;
+  readonly to: string;
+  readonly member: string;
+  readonly order: number;
+}
+
+export interface ExposesJobEdge {
+  readonly kind: "exposes-job";
   readonly from: string;
   readonly to: string;
   readonly member: string;

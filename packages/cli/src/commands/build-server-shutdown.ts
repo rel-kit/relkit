@@ -25,10 +25,12 @@ async function shutdown() {
   if (stopping) return;
   stopping = true;
   if (jobWorker !== undefined) clearInterval(jobWorker);
+  if (nativeJobWorker !== undefined) clearInterval(nativeJobWorker);
   shutdownController.abort(new Error("Runtime is stopping."));
   const drainTimeoutMs = timeoutFrom(process.env.RELKIT_DRAIN_TIMEOUT_MS, 60_000);
   const telemetryTimeoutMs = timeoutFrom(process.env.RELKIT_TELEMETRY_FLUSH_TIMEOUT_MS, 1_000);
   await bounded(Promise.allSettled(activeInvocations), drainTimeoutMs);
+  await bounded(Promise.allSettled([...nativeJobWorkerHandles].map((handle) => handle.close?.())), drainTimeoutMs);
   spanRuntime.close();
   await bounded(flushTelemetry(), telemetryTimeoutMs);
   await bounded(providerStartup, drainTimeoutMs);

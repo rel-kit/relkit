@@ -82,7 +82,7 @@ const events = localEvent();
 declare const localEvent: (options?: LocalProviderOptions) => LocalEventAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L42)
 
 Since v0.4.0
 
@@ -103,7 +103,7 @@ const jobs = localJob();
 declare const localJob: (options?: LocalProviderOptions) => LocalJobAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L57)
 
 Since v0.4.0
 
@@ -117,7 +117,7 @@ Since v0.4.0
 type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-state">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L29)
 
 ## LocalEventAdapter (type alias)
 
@@ -127,7 +127,7 @@ type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-st
 type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L26)
 
 ## LocalJobAdapter (type alias)
 
@@ -137,7 +137,7 @@ type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 type LocalJobAdapter = ProviderAdapter<typeof job, "local-job">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L27)
 
 ## LocalProviderOptions (interface)
 
@@ -149,7 +149,7 @@ export interface LocalProviderOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L22)
 
 ## LocalRealtimeAdapter (type alias)
 
@@ -159,7 +159,7 @@ export interface LocalProviderOptions {
 type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L28)
 
 ## localAgentState
 
@@ -169,7 +169,7 @@ type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
 declare const localAgentState: (options?: LocalProviderOptions) => LocalAgentStateAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L65)
 
 ## localRealtime
 
@@ -179,7 +179,7 @@ declare const localAgentState: (options?: LocalProviderOptions) => LocalAgentSta
 declare const localRealtime: (options?: LocalProviderOptions) => LocalRealtimeAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L61)
 
 ## `identity.ts`
 
@@ -191,6 +191,7 @@ declare const localRealtime: (options?: LocalProviderOptions) => LocalRealtimeAd
   - [LOCAL_RESOURCE_LABEL](#local_resource_label)
   - [LocalProjectIdentity (interface)](#localprojectidentity-interface)
   - [createLocalProjectIdentity](#createlocalprojectidentity)
+  - [localEndpointHash](#localendpointhash)
   - [localProjectLabels](#localprojectlabels)
   - [localResourceLabels](#localresourcelabels)
   - [localResourceName](#localresourcename)
@@ -209,8 +210,13 @@ declare const LOCAL_RESOURCE_LABEL: Readonly<{
   readonly applicationId: "dev.relkit.application-id";
   readonly localProjectId: "dev.relkit.local-project-id";
   readonly bindingId: "dev.relkit.binding-id";
+  readonly environment: "dev.relkit.environment";
+  readonly serviceGeneration: "dev.relkit.service-generation";
+  readonly unitId: "dev.relkit.unit-id";
+  readonly unitKind: "dev.relkit.unit-kind";
   readonly recipeId: "dev.relkit.recipe-id";
   readonly planHash: "dev.relkit.plan-hash";
+  readonly endpointHash: "dev.relkit.endpoint-hash";
 }>;
 ```
 
@@ -228,7 +234,7 @@ export interface LocalProjectIdentity {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L19)
 
 ## createLocalProjectIdentity
 
@@ -241,7 +247,19 @@ declare const createLocalProjectIdentity: (
 ) => LocalProjectIdentity;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L38)
+
+## localEndpointHash
+
+**Signature**
+
+```ts
+declare const localEndpointHash: (
+  endpoints: Readonly<Record<string, string>> | undefined,
+) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L105)
 
 ## localProjectLabels
 
@@ -253,7 +271,7 @@ declare const localProjectLabels: (
 ) => Readonly<Record<string, string>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L58)
 
 ## localResourceLabels
 
@@ -266,7 +284,7 @@ declare const localResourceLabels: (
 ) => Readonly<Record<string, string>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L69)
 
 ## localResourceName
 
@@ -280,7 +298,7 @@ declare const localResourceName: (
 ) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/identity.ts#L113)
 
 ## `index.ts`
 
@@ -292,10 +310,13 @@ declare const localResourceName: (
   - ["./identity.js" (namespace export)](#identityjs-namespace-export)
   - ["./integration.js" (namespace export)](#integrationjs-namespace-export)
   - ["./lease.js" (namespace export)](#leasejs-namespace-export)
+  - ["./local-secrets.js" (namespace export)](#local-secretsjs-namespace-export)
   - ["./provider-overrides.js" (namespace export)](#provider-overridesjs-namespace-export)
   - ["./reconciler.js" (namespace export)](#reconcilerjs-namespace-export)
   - ["./service-state.js" (namespace export)](#service-statejs-namespace-export)
   - ["./state-paths.js" (namespace export)](#state-pathsjs-namespace-export)
+  - [groupServiceInstances](#groupserviceinstances)
+  - [serviceInstanceIds](#serviceinstanceids)
 
 ---
 
@@ -337,6 +358,18 @@ export * from "./lease.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L3)
 
+## "./local-secrets.js" (namespace export)
+
+Re-exports all named exports from the "./local-secrets.js" module.
+
+**Signature**
+
+```ts
+export * from "./local-secrets.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L4)
+
 ## "./provider-overrides.js" (namespace export)
 
 Re-exports all named exports from the "./provider-overrides.js" module.
@@ -347,7 +380,7 @@ Re-exports all named exports from the "./provider-overrides.js" module.
 export * from "./provider-overrides.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L5)
 
 ## "./reconciler.js" (namespace export)
 
@@ -359,7 +392,7 @@ Re-exports all named exports from the "./reconciler.js" module.
 export * from "./reconciler.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L6)
 
 ## "./service-state.js" (namespace export)
 
@@ -371,7 +404,7 @@ Re-exports all named exports from the "./service-state.js" module.
 export * from "./service-state.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L8)
 
 ## "./state-paths.js" (namespace export)
 
@@ -381,6 +414,28 @@ Re-exports all named exports from the "./state-paths.js" module.
 
 ```ts
 export * from "./state-paths.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L9)
+
+## groupServiceInstances
+
+**Signature**
+
+```ts
+declare const groupServiceInstances: (
+  instances: readonly LocalServiceInstance[],
+) => readonly LocalServiceInstance[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L7)
+
+## serviceInstanceIds
+
+**Signature**
+
+```ts
+declare const serviceInstanceIds: (instance: LocalServiceInstance) => readonly string[];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/index.ts#L7)
@@ -669,6 +724,94 @@ declare const readLocalProjectLease: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/lease.ts#L64)
 
+## `local-secrets.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [LOCAL_SERVICE_SECRETS_FILE](#local_service_secrets_file)
+  - [LocalServiceSecretBinding (interface)](#localservicesecretbinding-interface)
+  - [LocalServiceSecretState (interface)](#localservicesecretstate-interface)
+  - [readLocalServiceSecrets](#readlocalservicesecrets)
+  - [upsertLocalServiceSecrets](#upsertlocalservicesecrets)
+
+---
+
+# utils
+
+## LOCAL_SERVICE_SECRETS_FILE
+
+**Signature**
+
+```ts
+declare const LOCAL_SERVICE_SECRETS_FILE: "local-secrets.json";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/local-secrets.ts#L5)
+
+## LocalServiceSecretBinding (interface)
+
+**Signature**
+
+```ts
+export interface LocalServiceSecretBinding {
+  readonly bindingId: string;
+  readonly recipe: Readonly<{
+    readonly integrationId: string;
+    readonly recipeId: string;
+    readonly recipeVersion: number;
+  }>;
+  readonly values: Readonly<Record<string, string>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/local-secrets.ts#L8)
+
+## LocalServiceSecretState (interface)
+
+**Signature**
+
+```ts
+export interface LocalServiceSecretState {
+  readonly version: typeof LOCAL_SERVICE_SECRETS_VERSION;
+  readonly applicationId: string;
+  readonly localProjectId: string;
+  readonly bindings: readonly LocalServiceSecretBinding[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/local-secrets.ts#L18)
+
+## readLocalServiceSecrets
+
+**Signature**
+
+```ts
+declare const readLocalServiceSecrets: (
+  identity: LocalProjectIdentity,
+) => LocalServiceSecretState | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/local-secrets.ts#L25)
+
+## upsertLocalServiceSecrets
+
+**Signature**
+
+```ts
+declare const upsertLocalServiceSecrets: (
+  identity: LocalProjectIdentity,
+  current: LocalServiceSecretState | undefined,
+  bindingId: string,
+  recipe: LocalServiceSecretBinding["recipe"],
+  values: Readonly<Record<string, string>>,
+) => LocalServiceSecretState;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/local-secrets.ts#L50)
+
 ## `provider-overrides.ts`
 
 ---
@@ -758,6 +901,76 @@ declare const writeProviderOverrides: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/provider-overrides.ts#L29)
 
+## `reconciler-environment.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [environmentFile](#environmentfile)
+  - [environmentFiles](#environmentfiles)
+
+---
+
+# utils
+
+## environmentFile
+
+**Signature**
+
+```ts
+declare const environmentFile: (
+  recipe: LocalServiceRecipeInput,
+  secrets: Readonly<Record<string, string>>,
+) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-environment.ts#L3)
+
+## environmentFiles
+
+**Signature**
+
+```ts
+declare const environmentFiles: (
+  recipe: LocalServiceRecipeInput,
+  secrets: Readonly<Record<string, string>>,
+) => Readonly<Record<string, string>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-environment.ts#L22)
+
+## `reconciler-generation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [assertHotSwapSafe](#asserthotswapsafe)
+
+---
+
+# utils
+
+## assertHotSwapSafe
+
+Refuses an unsafe source-generation swap while an older service is owned.
+
+**Signature**
+
+```ts
+declare const assertHotSwapSafe: (
+  bindingId: string,
+  instances: readonly LocalServiceInstance[],
+  environment: string | undefined,
+  serviceGeneration: string | undefined,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-generation.ts#L5)
+
 ## `reconciler-lifecycle.ts`
 
 ---
@@ -782,7 +995,7 @@ declare const writeProviderOverrides: (
 declare const aborted: (signal: AbortSignal | undefined) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L140)
 
 ## frozenResult
 
@@ -798,7 +1011,7 @@ declare const frozenResult: (
 ) => LocalServiceReconcileResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L144)
 
 ## startService
 
@@ -808,14 +1021,18 @@ declare const frozenResult: (
 declare const startService: (
   options: LocalServiceReconcilerOptions,
   entry: LocalServicePlanEntry,
-  recipe: LocalServiceRecipe,
+  recipe: LocalServiceRecipeInput,
   labels: Readonly<Record<string, string>>,
   secrets: Readonly<Record<string, string>>,
   signal?: AbortSignal,
+  environmentVariables?: Readonly<Record<string, string>>,
+  workerArtifact?: LocalServiceWorkerArtifact,
+  environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>,
+  portBindings?: Readonly<Record<string, Readonly<Record<string, number>>>>,
 ) => Promise<LocalServiceInstance>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L21)
 
 ## writeFailureState
 
@@ -829,7 +1046,302 @@ declare const writeFailureState: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-lifecycle.ts#L117)
+
+## `reconciler-operation-finalize.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [finalizeReconcile](#finalizereconcile)
+
+---
+
+# utils
+
+## finalizeReconcile
+
+**Signature**
+
+```ts
+declare const finalizeReconcile: (
+  options: LocalServiceReconcilerOptions,
+  request: LocalServiceReconcileRequest,
+  desired: readonly LocalServicePlanEntry[],
+  previous: ProviderOverrideState | undefined,
+  next: Map<string, TrackedService>,
+  tracked: Map<string, TrackedService>,
+  signatures: Map<string, string>,
+  bindings: { bindingId: string; values: Readonly<Record<string, JsonValue>> }[],
+  reused: string[],
+  started: string[],
+  removed: string[],
+) => Promise<LocalServiceReconcileResult>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-finalize.ts#L14)
+
+## `reconciler-operation-run.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [runReconcileOperation](#runreconcileoperation)
+
+---
+
+# utils
+
+## runReconcileOperation
+
+**Signature**
+
+```ts
+declare const runReconcileOperation: (
+  options: LocalServiceReconcilerOptions,
+  projectLabels: Readonly<Record<string, string>>,
+  tracked: Map<string, TrackedService>,
+  signatures: Map<string, string>,
+  isClosed: () => boolean,
+  request: LocalServiceReconcileRequest,
+) => Promise<LocalServiceReconcileResult>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-run.ts#L34)
+
+## `reconciler-operation-service.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ensureServiceInstance](#ensureserviceinstance)
+  - [keepServiceCandidates](#keepservicecandidates)
+
+---
+
+# utils
+
+## ensureServiceInstance
+
+**Signature**
+
+```ts
+declare const ensureServiceInstance: (
+  options: LocalServiceReconcilerOptions,
+  request: LocalServiceReconcileRequest,
+  entry: LocalServicePlanEntry,
+  recipe: LocalServiceRecipeInput,
+  labels: Readonly<Record<string, string>>,
+  secrets: Readonly<Record<string, string>>,
+  candidates: readonly LocalServiceInstance[],
+  existing: LocalServiceInstance | undefined,
+  keepCandidates: boolean,
+  startedIds: string[],
+  started: string[],
+  reused: string[],
+  removed: string[],
+) => Promise<LocalServiceInstance>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-service.ts#L36)
+
+## keepServiceCandidates
+
+**Signature**
+
+```ts
+declare const keepServiceCandidates: (
+  recipe: NormalizedLocalServiceRecipe,
+  candidates: readonly LocalServiceInstance[],
+  request: LocalServiceReconcileRequest,
+  bindingId: string,
+) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation-service.ts#L17)
+
+## `reconciler-operation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [TrackedService (interface)](#trackedservice-interface)
+  - [createReconcileOperation](#createreconcileoperation)
+
+---
+
+# utils
+
+## TrackedService (interface)
+
+**Signature**
+
+```ts
+export interface TrackedService {
+  readonly instance: LocalServiceInstance;
+  readonly signature: string;
+  readonly secrets: Readonly<Record<string, string>>;
+  readonly owned: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation.ts#L8)
+
+## createReconcileOperation
+
+**Signature**
+
+```ts
+declare const createReconcileOperation: (
+  options: LocalServiceReconcilerOptions,
+  projectLabels: Readonly<Record<string, string>>,
+  tracked: Map<string, TrackedService>,
+  signatures: Map<string, string>,
+  isClosed: () => boolean,
+) => (request: LocalServiceReconcileRequest) => Promise<LocalServiceReconcileResult>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-operation.ts#L15)
+
+## `reconciler-queue.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [ReconcileQueue (interface)](#reconcilequeue-interface)
+  - [createReconcileQueue](#createreconcilequeue)
+
+---
+
+# utils
+
+## ReconcileQueue (interface)
+
+**Signature**
+
+```ts
+export interface ReconcileQueue {
+  readonly enqueue: (request: LocalServiceReconcileRequest) => Promise<LocalServiceReconcileResult>;
+  readonly wait: () => Promise<void>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-queue.ts#L6)
+
+## createReconcileQueue
+
+**Signature**
+
+```ts
+declare const createReconcileQueue: (
+  reconcile: (request: LocalServiceReconcileRequest) => Promise<LocalServiceReconcileResult>,
+) => ReconcileQueue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-queue.ts#L11)
+
+## `reconciler-resource.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [removeInstance](#removeinstance)
+
+---
+
+# utils
+
+## removeInstance
+
+**Signature**
+
+```ts
+declare const removeInstance: (
+  options: LocalServiceReconcilerOptions,
+  instance: LocalServiceInstance,
+  signal?: AbortSignal,
+) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-resource.ts#L5)
+
+## `reconciler-support-validation.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [completeUnits](#completeunits)
+  - [hash](#hash)
+  - [invalid](#invalid)
+  - [sameBindings](#samebindings)
+
+---
+
+# utils
+
+## completeUnits
+
+**Signature**
+
+```ts
+declare const completeUnits: (
+  instance: LocalServiceInstance,
+  expectedUnitIds: readonly string[],
+) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support-validation.ts#L4)
+
+## hash
+
+**Signature**
+
+```ts
+declare const hash: (value: unknown) => value is string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support-validation.ts#L29)
+
+## invalid
+
+**Signature**
+
+```ts
+declare const invalid: () => never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support-validation.ts#L33)
+
+## sameBindings
+
+**Signature**
+
+```ts
+declare const sameBindings: (
+  previous: ProviderOverrideState | undefined,
+  planHash: string,
+  bindings: readonly {
+    readonly bindingId: string;
+    readonly values: Readonly<Record<string, JsonValue>>;
+  }[],
+) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support-validation.ts#L16)
 
 ## `reconciler-support.ts`
 
@@ -841,11 +1353,12 @@ declare const writeFailureState: (
   - [compatible](#compatible)
   - [createSecrets](#createsecrets)
   - [desiredServices](#desiredservices)
-  - [environmentFile](#environmentfile)
   - [generatedSecrets](#generatedsecrets)
+  - [groupServiceInstances](#groupserviceinstances)
   - [outputPorts](#outputports)
   - [recipeFor](#recipefor)
   - [sameBindings](#samebindings)
+  - [serviceInstanceIds](#serviceinstanceids)
   - [serviceSignature](#servicesignature)
 
 ---
@@ -863,20 +1376,24 @@ declare const compatible: (
   planHash: string,
   priorSignature: string | undefined,
   signature: string,
+  environment?: string,
+  serviceGeneration?: string,
+  expectedUnitIds?: readonly string[],
+  endpointHash?: string,
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L119)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L176)
 
 ## createSecrets
 
 **Signature**
 
 ```ts
-declare const createSecrets: (recipe: LocalServiceRecipe) => Readonly<Record<string, string>>;
+declare const createSecrets: (recipe: LocalServiceRecipeInput) => Readonly<Record<string, string>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L82)
 
 ## desiredServices
 
@@ -888,20 +1405,7 @@ declare const desiredServices: (
 ) => readonly LocalServicePlanEntry[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L14)
-
-## environmentFile
-
-**Signature**
-
-```ts
-declare const environmentFile: (
-  recipe: LocalServiceRecipe,
-  secrets: Readonly<Record<string, string>>,
-) => string | undefined;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L18)
 
 ## generatedSecrets
 
@@ -909,14 +1413,27 @@ declare const environmentFile: (
 
 ```ts
 declare const generatedSecrets: (
-  recipe: LocalServiceRecipe,
+  recipe: LocalServiceRecipeInput,
   previous: ProviderOverrideState | undefined,
   bindingId: string,
   retained?: Readonly<Record<string, string>>,
+  persisted?: Readonly<Record<string, string>>,
 ) => Readonly<Record<string, string>> | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L63)
+
+## groupServiceInstances
+
+**Signature**
+
+```ts
+declare const groupServiceInstances: (
+  instances: readonly LocalServiceInstance[],
+) => readonly LocalServiceInstance[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L124)
 
 ## outputPorts
 
@@ -924,12 +1441,12 @@ declare const generatedSecrets: (
 
 ```ts
 declare const outputPorts: (
-  recipe: LocalServiceRecipe,
+  recipe: LocalServiceRecipeInput,
   instance: LocalServiceInstance,
 ) => Readonly<Record<string, number>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L95)
 
 ## recipeFor
 
@@ -938,12 +1455,12 @@ declare const outputPorts: (
 ```ts
 declare const recipeFor: (
   entry: LocalServicePlanEntry,
-  recipes: Readonly<Record<string, LocalServiceRecipe>>,
+  recipes: Readonly<Record<string, LocalServiceRecipeInput>>,
   materializerId: string,
-) => LocalServiceRecipe;
+) => LocalServiceRecipeInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L34)
 
 ## sameBindings
 
@@ -960,7 +1477,17 @@ declare const sameBindings: (
 ) => boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L133)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L16)
+
+## serviceInstanceIds
+
+**Signature**
+
+```ts
+declare const serviceInstanceIds: (instance: LocalServiceInstance) => readonly string[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L168)
 
 ## serviceSignature
 
@@ -970,7 +1497,7 @@ declare const sameBindings: (
 declare const serviceSignature: (entry: LocalServicePlanEntry) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-support.ts#L55)
 
 ## `reconciler-types.ts`
 
@@ -994,10 +1521,10 @@ declare const serviceSignature: (entry: LocalServicePlanEntry) => string;
 **Signature**
 
 ```ts
-type LocalServiceRecipeMap = Readonly<Record<string, LocalServiceRecipe>>;
+type LocalServiceRecipeMap = Readonly<Record<string, LocalServiceRecipeInput>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L11)
 
 ## LocalServiceReconcileRequest (interface)
 
@@ -1009,11 +1536,20 @@ export interface LocalServiceReconcileRequest {
   readonly planHash: string;
   readonly recipes: LocalServiceRecipeMap;
   readonly scope: "required" | "all";
+  readonly environment?: string;
+  readonly serviceGeneration?: string;
+  readonly serviceGenerations?: Readonly<Record<string, string>>;
+  readonly endpoints?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly environmentOverrides?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+  readonly environmentOverridesByUnit?: Readonly<
+    Record<string, Readonly<Record<string, Readonly<Record<string, string>>>>>
+  >;
+  readonly workerArtifacts?: Readonly<Record<string, LocalServiceWorkerArtifact>>;
   readonly signal?: AbortSignal;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L13)
 
 ## LocalServiceReconcileResult (interface)
 
@@ -1029,7 +1565,7 @@ export interface LocalServiceReconcileResult {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L30)
 
 ## LocalServiceReconciler (interface)
 
@@ -1044,7 +1580,7 @@ export interface LocalServiceReconciler {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L44)
 
 ## LocalServiceReconcilerOptions (interface)
 
@@ -1058,7 +1594,47 @@ export interface LocalServiceReconcilerOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-types.ts#L38)
+
+## `reconciler-worker.ts`
+
+---
+
+## Exports Grouped by Category
+
+- [utils](#utils)
+  - [WorkerStartOptions (interface)](#workerstartoptions-interface)
+  - [workerStartOptions](#workerstartoptions)
+
+---
+
+# utils
+
+## WorkerStartOptions (interface)
+
+**Signature**
+
+```ts
+export interface WorkerStartOptions {
+  readonly bindMounts?: Readonly<Record<string, readonly LocalServiceBindMount[]>>;
+  readonly environmentVariablesByUnit?: Readonly<Record<string, Readonly<Record<string, string>>>>;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-worker.ts#L8)
+
+## workerStartOptions
+
+**Signature**
+
+```ts
+declare const workerStartOptions: (
+  recipe: NormalizedLocalServiceRecipe,
+  artifact: LocalServiceWorkerArtifact | undefined,
+) => WorkerStartOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler-worker.ts#L13)
 
 ## `reconciler.ts`
 
@@ -1084,7 +1660,7 @@ Re-exports all named exports from the "./reconciler-types.js" module.
 export * from "./reconciler-types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler.ts#L9)
 
 ## createLocalServiceReconciler
 
@@ -1096,7 +1672,7 @@ declare const createLocalServiceReconciler: (
 ) => LocalServiceReconciler;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/reconciler.ts#L11)
 
 ## `service-state.ts`
 
@@ -1180,7 +1756,7 @@ declare class LocalStateError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L26)
 
 ### code (property)
 
@@ -1190,14 +1766,19 @@ declare class LocalStateError {
 readonly code: "RELKIT_LOCAL_STATE_INVALID"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L27)
 
 ## LocalStateFileName (type alias)
 
 **Signature**
 
 ```ts
-type LocalStateFileName = "lease.json" | "local-services.state.json" | "provider-overrides.json";
+type LocalStateFileName =
+  | "lease.json"
+  | "local-services.state.json"
+  | "provider-overrides.json"
+  | "worker-provider-overrides.json"
+  | "local-secrets.json";
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L19)
@@ -1210,7 +1791,7 @@ type LocalStateFileName = "lease.json" | "local-services.state.json" | "provider
 declare const ensureLocalStateDirectory: (identity: LocalProjectIdentity) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L48)
 
 ## localStateDirectory
 
@@ -1220,7 +1801,7 @@ declare const ensureLocalStateDirectory: (identity: LocalProjectIdentity) => str
 declare const localStateDirectory: (identity: LocalProjectIdentity) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L35)
 
 ## readLocalStateText
 
@@ -1233,7 +1814,7 @@ declare const readLocalStateText: (
 ) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L58)
 
 ## removeLocalStateFile
 
@@ -1246,7 +1827,7 @@ declare const removeLocalStateFile: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L100)
 
 ## withLocalStateTemporaryFile
 
@@ -1260,7 +1841,7 @@ declare const withLocalStateTemporaryFile: <Value>(
 ) => Promise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L113)
 
 ## writeLocalStateText
 
@@ -1274,4 +1855,4 @@ declare const writeLocalStateText: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/state-paths.ts#L72)

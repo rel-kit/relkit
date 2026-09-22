@@ -7,8 +7,13 @@ export const LOCAL_RESOURCE_LABEL = Object.freeze({
   applicationId: "dev.relkit.application-id",
   localProjectId: "dev.relkit.local-project-id",
   bindingId: "dev.relkit.binding-id",
+  environment: "dev.relkit.environment",
+  serviceGeneration: "dev.relkit.service-generation",
+  unitId: "dev.relkit.unit-id",
+  unitKind: "dev.relkit.unit-kind",
   recipeId: "dev.relkit.recipe-id",
   planHash: "dev.relkit.plan-hash",
+  endpointHash: "dev.relkit.endpoint-hash",
 } as const);
 
 export interface LocalProjectIdentity {
@@ -19,12 +24,15 @@ export interface LocalProjectIdentity {
 
 interface LocalResourceIdentity {
   readonly bindingId: string;
+  readonly environment?: string;
+  readonly serviceGeneration?: string;
   readonly recipe: {
     readonly integrationId: string;
     readonly recipeId: string;
     readonly recipeVersion: number;
   };
   readonly planHash: string;
+  readonly endpointHash?: string;
 }
 
 export function createLocalProjectIdentity(
@@ -68,20 +76,38 @@ export function localResourceLabels(
     !isStableId(resource.recipe.recipeId) ||
     !Number.isSafeInteger(resource.recipe.recipeVersion) ||
     resource.recipe.recipeVersion < 1 ||
-    !hash(resource.planHash)
+    !hash(resource.planHash) ||
+    (resource.endpointHash !== undefined && !hash(resource.endpointHash))
   ) {
     invalid();
   }
   return Object.freeze({
     ...localProjectLabels(identity),
     [LOCAL_RESOURCE_LABEL.bindingId]: resource.bindingId,
+    ...(resource.environment === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.environment]: resource.environment }),
+    ...(resource.serviceGeneration === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.serviceGeneration]: resource.serviceGeneration }),
     [LOCAL_RESOURCE_LABEL.recipeId]: [
       resource.recipe.integrationId,
       resource.recipe.recipeId,
       resource.recipe.recipeVersion,
     ].join(":"),
     [LOCAL_RESOURCE_LABEL.planHash]: resource.planHash,
+    ...(resource.endpointHash === undefined
+      ? {}
+      : { [LOCAL_RESOURCE_LABEL.endpointHash]: resource.endpointHash }),
   });
+}
+
+export function localEndpointHash(
+  endpoints: Readonly<Record<string, string>> | undefined,
+): string | undefined {
+  if (endpoints === undefined) return undefined;
+  const value = Object.entries(endpoints).sort(([left], [right]) => left.localeCompare(right));
+  return `sha256:${createHash("sha256").update(JSON.stringify(value)).digest("hex")}`;
 }
 
 export function localResourceName(

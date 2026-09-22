@@ -1,4 +1,4 @@
-import { createJobClient, type JobObservedEdge } from "@relkit/jobs";
+import { createJobClient, type JobObservedEdge } from "@relkit/jobs/legacy";
 import type { ObservedEdge } from "@relkit/graph";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 

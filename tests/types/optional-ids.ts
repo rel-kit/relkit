@@ -8,6 +8,7 @@ import {
   defineEvent,
   defineFunction,
   defineJob,
+  defineTask,
   defineMiddleware,
   defineRoute,
   defineService,
@@ -20,6 +21,13 @@ import { z } from "@relkit/schema";
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
 const target = defineFunction({ input, output, handler: async () => ({ ok: true }) });
+const task = defineTask({
+  id: "types.optional-task",
+  version: "1",
+  input,
+  output,
+  handler: async () => ({ ok: true }),
+});
 
 const optionalFunction = defineFunction({ input, output, handler: async () => ({ ok: true }) });
 const optionalError = defineError({ data: input, message: "Invalid" });
@@ -83,12 +91,8 @@ void optionalAgentId;
 defineApp({ env: defineEnv({}) });
 // @ts-expect-error event IDs are mandatory
 defineEvent({ version: 1, input: input });
-// @ts-expect-error job IDs are mandatory
-defineJob({
-  input,
-  target,
-  retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
-});
+// @ts-expect-error job names are mandatory
+defineJob({ task });
 // @ts-expect-error bucket IDs are mandatory
 defineBucket({ visibility: "private" });
 // @ts-expect-error cache IDs are mandatory

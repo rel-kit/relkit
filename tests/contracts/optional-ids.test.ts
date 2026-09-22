@@ -6,7 +6,7 @@ import { defineCache } from "../../packages/cache/src/index.ts";
 import { defineEvent } from "../../packages/events/src/index.ts";
 import { defineError, defineFunction } from "../../packages/functions/src/index.ts";
 import { createUnboundIdentity, isUnboundIdentity } from "../../packages/invocation/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/index.ts";
+import { defineJob } from "../../packages/jobs/src/legacy.ts";
 import {
   defineMiddleware,
   defineRoute,

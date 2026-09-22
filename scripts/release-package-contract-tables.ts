@@ -1,0 +1,46 @@
+export const appSubpaths = [
+  "schema",
+  "config",
+  "routes",
+  "functions",
+  "events",
+  "realtime",
+  "agents",
+  "jobs",
+  "jobs/legacy",
+  "tasks",
+  "cache",
+  "tools",
+  "buckets",
+  "services",
+] as const;
+
+export const integrationSubpaths: Readonly<Record<string, readonly string[]>> = {
+  "@relkit/aws": ["host", "infrastructure", "access"],
+  "@relkit/cloudflare": ["runtime"],
+  "@relkit/docker": ["runtime"],
+  "@relkit/local": ["runtime"],
+  "@relkit/otlp": ["runtime"],
+  "@relkit/pulumi": ["engine"],
+  "@relkit/redis": ["runtime", "local-recipe"],
+  "@relkit/s3": ["runtime", "local-recipe"],
+  "@relkit/sentry": ["runtime"],
+  "@relkit/inngest": ["runtime", "local-recipe", "deployment"],
+  "@relkit/trigger": ["runtime", "local-recipe", "deployment"],
+  "@relkit/effect-mq": ["runtime", "local-recipe", "deployment"],
+};
+
+export const catalogSubpaths = [
+  "redis",
+  "s3",
+  "docker",
+  "local",
+  "cloudflare",
+  "sentry",
+  "otlp",
+  "aws",
+  "pulumi",
+  "inngest",
+  "trigger",
+  "effect-mq",
+] as const;

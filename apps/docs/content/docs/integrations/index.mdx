@@ -20,6 +20,9 @@ telemetry exporters, local Docker services, and deployment platforms.
 | `@relkit/aws`        | AWS host, infrastructure ownership, and access materialization | [Deployment](/docs/operations/deployment)                   |
 | `@relkit/pulumi`     | Pulumi deployment engine                                       | [Deployment](/docs/operations/deployment)                   |
 | `@relkit/cloudflare` | Cloudflare runtime adapters                                    | [Application configuration](/docs/fundamentals/application) |
+| `@relkit/inngest`    | Native durable-task adapter and account-free Docker recipe     | [Jobs](/docs/jobs/providers/inngest)                        |
+| `@relkit/trigger`    | Trigger.dev task adapter and worker publication                | [Jobs](/docs/jobs/providers/trigger)                        |
+| `@relkit/effect-mq`  | PostgreSQL-backed retryable task adapter                       | [Jobs](/docs/jobs/providers/effect-mq)                      |
 
 Install standalone packages when you want the smallest dependency surface:
 

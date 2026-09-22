@@ -6,6 +6,7 @@ import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
 import { invokeJobAction, jobActionCapabilities, type JobAction } from "../../lib/job-actions";
 import { JobContract } from "./job-contract";
+import { ModernJobDetail } from "./modern-job-detail";
 
 interface JobSnapshot {
   readonly node: InspectorObject;
@@ -14,11 +15,16 @@ interface JobSnapshot {
   readonly generationId: string;
   readonly graphHash: string;
 }
+interface ModernSnapshot {
+  readonly definition: InspectorObject;
+  readonly runs: readonly InspectorObject[];
+}
 
 export function JobDetailClient() {
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
   const [snapshot, setSnapshot] = useState<JobSnapshot>();
+  const [modern, setModern] = useState<ModernSnapshot>();
   const [error, setError] = useState(false);
   const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState(false);
@@ -26,6 +32,19 @@ export function JobDetailClient() {
 
   const load = useCallback(async () => {
     if (id === "") return;
+    try {
+      const detail = await api.jobDefinition<InspectorObject>(id);
+      const definition = record(detail.definition) ?? record(detail);
+      if (definition === undefined) throw new Error("Job definition unavailable");
+      const runs = await api.jobRuns<InspectorObject>({
+        jobId: text(definition.jobId) || id,
+        limit: 25,
+      });
+      setModern({ definition, runs: runs.items });
+      setSnapshot(undefined);
+      setError(false);
+      return;
+    } catch {}
     const [detail, runtime, capabilities] = await Promise.all([
       api.detail<InspectorObject>("jobs", id),
       api.runtimeList<InspectorObject>("jobs", { limit: 100 }),
@@ -45,6 +64,20 @@ export function JobDetailClient() {
   }, [load]);
 
   const action = async (kind: JobAction, instanceId: string) => {
+    if (modern !== undefined) {
+      setPending(true);
+      setActionError("");
+      try {
+        await api.jobControl(instanceId, kind, { operationId: crypto.randomUUID() });
+        api.invalidate(["jobs", "runtime"]);
+        await load();
+      } catch (failure) {
+        setActionError(failure instanceof Error ? failure.message : "Job action failed.");
+      } finally {
+        setPending(false);
+      }
+      return;
+    }
     if (snapshot === undefined) return;
     setPending(true);
     setActionError("");
@@ -65,6 +98,16 @@ export function JobDetailClient() {
     }
   };
 
+  if (modern !== undefined)
+    return (
+      <ModernJobDetail
+        actionError={actionError}
+        definition={modern.definition}
+        runs={modern.runs}
+        onAction={action}
+        pending={pending}
+      />
+    );
   if (error || snapshot === undefined)
     return (
       <section className="panel route-state" role={error ? "alert" : "status"}>

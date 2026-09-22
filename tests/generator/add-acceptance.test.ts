@@ -4,8 +4,6 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { checkProject } from "../../packages/cli/src/commands/check.ts";
 import { createRegistrationPlan, type ApplicationGraph } from "../../packages/graph/src/index.ts";
-import { materializeJobs } from "../../packages/engine/src/materialize-jobs.ts";
-import { createLocalJobProvider } from "../../packages/providers-local/src/runtime-capabilities.ts";
 import {
   ADD_FAILURE_CODES,
   applyScaffoldPlan,
@@ -31,21 +29,17 @@ test("the full bundle compiles in every starter and preserves its graph relation
     const result = await checkProject({ projectRoot: root });
     expect(result.diagnostics).toEqual([]);
     const graph = JSON.parse(result.outputs.graph) as ApplicationGraph;
-    const provider = createLocalJobProvider(join(root, ".relkit/state"), "local");
-    try {
-      const jobs = await materializeJobs({
-        plan: createRegistrationPlan(graph),
-        createQueue: provider.createQueue,
-        engine: { invoke: async ({ input }) => input },
-      });
-      await jobs.jobs.get("billing.example-job")!.enqueue({ value: "example" });
-      expect(await jobs.runNext("billing.example-job")).toMatchObject({
-        state: "completed",
-        value: { value: "example" },
-      });
-    } finally {
-      await provider.close();
-    }
+    const plan = createRegistrationPlan(graph);
+    expect(plan.queues).toEqual([]);
+    expect(plan.tasks).toContainEqual(expect.objectContaining({ id: "task.billing.example-task" }));
+    expect(plan.jobs).toContainEqual(
+      expect.objectContaining({
+        id: "job.billing.example-job",
+        executionModel: "task",
+        jobId: "billing.example-job",
+        taskId: "billing.example-task",
+      }),
+    );
     expect(graph.edges).toEqual(
       expect.arrayContaining([
         {
@@ -65,9 +59,23 @@ test("the full bundle compiles in every starter and preserves its graph relation
         { from: "billing.example", kind: "declares-error", to: "billing.example-error" },
         { from: "billing.example", kind: "publishes-event", to: "billing.example-event" },
         {
-          from: "billing.example-job",
-          kind: "targets-function",
-          to: "billing.example",
+          from: "billing",
+          kind: "exposes-task",
+          to: "task.billing.example-task",
+          member: "exampleTask",
+          order: 0,
+        },
+        {
+          from: "billing",
+          kind: "exposes-job",
+          to: "job.billing.example-job",
+          member: "exampleJob",
+          order: 0,
+        },
+        {
+          from: "job.billing.example-job",
+          kind: "targets-task",
+          to: "task.billing.example-task",
           role: "primary",
         },
         { from: "billing.example-agent", kind: "uses-tool", to: "billing.example-tool" },
@@ -169,7 +177,8 @@ test("every standalone add kind compiles in every starter", async () => {
       ["event", "Updated", "--service", "hello"],
       ["function", "Work", "--service", "hello"],
       ["event-function", "On Updated", "--service", "hello", "--event", "hello.updated-event"],
-      ["job", "Work", "--service", "hello", "--target", "hello.work"],
+      ["task", "Work", "--service", "hello"],
+      ["job", "Work", "--service", "hello", "--target", "hello.work-task"],
       ["cache", "State", "--service", "hello"],
       ["bucket", "Files", "--service", "hello"],
       ["tool", "Work", "--service", "hello", "--target", "hello.work"],

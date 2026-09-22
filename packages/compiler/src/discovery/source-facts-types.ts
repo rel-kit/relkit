@@ -12,6 +12,8 @@ export interface FactoryBindingFact {
   readonly id: FactoryIdPresence;
   readonly position: number;
   readonly options: readonly string[];
+  /** Object-property paths used for source-only alias diagnostics. */
+  readonly optionPaths?: readonly string[];
 }
 
 export interface RouteOperationFact {

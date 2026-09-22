@@ -1,6 +1,6 @@
 import { parseTracePropagation, type JsonValue, type TracePropagation } from "@relkit/contracts";
 import type { JobQueueFactoryContext, JobQueueHandle } from "@relkit/engine";
-import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@relkit/jobs";
+import type { JobEnqueueOptions, JobOperationContext, JobProvider } from "@relkit/jobs/legacy";
 import { type AwsCredentials, text } from "./config.js";
 import { assertResponse, awsRequest } from "./http.js";
 

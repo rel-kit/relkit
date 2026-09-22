@@ -66,6 +66,22 @@ describe("inspector API client", () => {
     expect(attempts).toBe(2);
   });
 
+  test("falls back immediately when task-first job APIs are unavailable", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return envelope({ error: "RELKIT_INSPECTOR_JOBS_UNAVAILABLE" }, 503);
+      },
+    });
+
+    await expect(client.jobDefinition("receipts.send-job")).rejects.toMatchObject({
+      code: "RELKIT_INSPECTOR_JOBS_UNAVAILABLE",
+    });
+    expect(attempts).toBe(1);
+  });
+
   test("rejects protocol mismatch and reports network disconnection", async () => {
     const mismatch = createInspectorApiClient({
       cacheTtlMs: 0,

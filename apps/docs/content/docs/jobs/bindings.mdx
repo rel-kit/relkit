@@ -1,0 +1,22 @@
+---
+title: Bindings
+description: Select the provider that runs each job.
+---
+
+Bind jobs to a provider in `relkit.config.ts`. The commerce fixture uses the same shape:
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+The binding is part of the compiled deployment plan. It records the provider profile, capability evidence, execution limits, and the worker identity used for publication. A job may use an explicit binding when a service needs a different provider or environment.
+
+An explicit job selects a named service with `service: "default"`; it does not use a `binding` field.
+If no service is specified, the compiler resolves the application's default jobs binding and records the
+selected adapter in the manifest.
+
+The compiler rejects a job whose requested execution mode is not provided by its binding. Run `relkit jobs capabilities` to inspect the selected provider and its actual limits.
+
+Provider guides: [Inngest](/docs/jobs/providers/inngest), [Trigger.dev](/docs/jobs/providers/trigger), and [Effect MQ](/docs/jobs/providers/effect-mq).
+
+<include cwd>content/generated/related/jobs-bindings.mdx</include>

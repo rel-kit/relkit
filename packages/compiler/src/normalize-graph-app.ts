@@ -45,7 +45,12 @@ export function requestedProviderProfile(
   descriptorKind: string,
   value: Record<string, unknown>,
 ): string | undefined {
-  const selected = descriptorKind === "agent" ? value.model : value.profile;
+  const selected =
+    descriptorKind === "agent"
+      ? value.model
+      : descriptorKind === "job"
+        ? (value.service ?? value.profile)
+        : value.profile;
   return typeof selected === "string" ? selected.split(":", 1)[0] : undefined;
 }
 

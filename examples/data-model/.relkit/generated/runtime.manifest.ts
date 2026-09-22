@@ -38,6 +38,8 @@ export const runtimeManifest = {
   constants: {  },
   prompts: {  },
   services: { "database": __relkit_module_1["default"], "users": __relkit_module_6["default"] },
+  tasks: {  },
+  jobs: {  },
   runtimeIntegrationsPlan: runtimeIntegrationsPlanReference,
   middleware: {  },
   hooks: {  },

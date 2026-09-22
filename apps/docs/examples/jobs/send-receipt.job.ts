@@ -1,4 +1,4 @@
-import { defineJob } from "@relkit/app/jobs";
+import { defineJob } from "@relkit/app/jobs/legacy";
 import sendReceipt, { receiptInput } from "./send-receipt.function.js";
 
 const sendReceiptJob = defineJob({

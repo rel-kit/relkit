@@ -5,7 +5,7 @@ import type {
   FunctionDependencies,
   FunctionHandlerResult,
 } from "@relkit/functions";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type { InferOutput } from "@relkit/schema";
 import type {
   EventDescriptorByName,

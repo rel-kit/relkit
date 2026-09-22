@@ -1,0 +1,42 @@
+---
+title: Troubleshooting
+description: Diagnose common job and provider failures.
+---
+
+### Capability or binding errors
+
+Run `relkit jobs capabilities` and compare the job's requested execution mode with the selected binding. The compiler and deployment plan report the missing capability and the provider's actual limit.
+
+### A run is not progressing
+
+Check worker readiness, service generation, provider health, and the run's last attempt. Do not trigger a duplicate while a run is merely delayed; use the run ID and operation history.
+
+### Watch reconnects or shows a gap
+
+Reload the latest run snapshot, then resume observation. Progress and stream retention are bounded and are not a durable replacement for task output.
+
+### A schedule fires twice
+
+Check for a process-local scheduler, overlapping provider registrations, and a changed dedupe scope. Pause the schedule before removing a registration.
+
+### Deployment rollback is blocked
+
+An old build may still own active runs or a key/registration may still be referenced. Finish or migrate those runs before retiring the generation.
+
+### Trigger is unavailable
+
+The generic CLI trigger command validates its input and reports an explicit unavailable error until a server trigger endpoint is configured. Use the generated client or provider-native trigger path in the meantime; never report a local validation-only command as a successful run.
+
+When a trigger response is lost, retain the original `operationId`, idempotency key, and request digest. Show
+an unknown outcome and use only the provider-certified recovery action; do not discard the handle or submit a
+different payload automatically.
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+<include cwd lang="json" meta='title="templates/default/v1/tasks/package.json"'>
+  ../../templates/default/v1/tasks/package.json
+</include>
+
+<include cwd>content/generated/related/jobs-troubleshooting.mdx</include>

@@ -11,6 +11,20 @@ export const JOB_STATES = [
 
 export type JobState = (typeof JOB_STATES)[number];
 export type JobQueueCounts = Readonly<Record<JobState, number>>;
+export const RUN_STATES = [
+  "queued",
+  "delayed",
+  "running",
+  "sleeping",
+  "retrying",
+  "completed",
+  "failed",
+  "cancelled",
+  "timed-out",
+  "unknown",
+] as const;
+export type JobRunState = (typeof RUN_STATES)[number];
+export type JobRunCounts = Readonly<Record<JobRunState, number>>;
 
 export function itemsForJob(
   items: readonly InspectorObject[],
@@ -31,6 +45,18 @@ export function queueCounts(items: readonly InspectorObject[]): JobQueueCounts {
   for (const item of items) {
     const state = text(item.state);
     if (isJobState(state)) counts[state] += 1;
+  }
+  return counts;
+}
+
+export function runCounts(items: readonly InspectorObject[]): JobRunCounts {
+  const counts = Object.fromEntries(RUN_STATES.map((state) => [state, 0])) as Record<
+    JobRunState,
+    number
+  >;
+  for (const item of items) {
+    const state = text(item.status);
+    if ((RUN_STATES as readonly string[]).includes(state)) counts[state as JobRunState] += 1;
   }
   return counts;
 }

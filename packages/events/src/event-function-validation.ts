@@ -1,5 +1,5 @@
 import { normalizeId } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type { EventDelivery } from "./event-function-types.js";
 
 const DEFAULT_RETRY: RetryPolicy = Object.freeze({

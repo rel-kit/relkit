@@ -14,6 +14,7 @@ export function copyDependencies<D extends FunctionDependencies>(
   }
   const result: Record<string, unknown> = {};
   const kinds: Readonly<Record<string, DescriptorKind>> = {
+    tasks: "task",
     jobs: "job",
     buckets: "bucket",
     cache: "cache",

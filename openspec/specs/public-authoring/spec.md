@@ -13,9 +13,9 @@ Application developers SHALL author normal synchronous or asynchronous TypeScrip
 - **WHEN** the public packages and generated application declarations are emitted and scanned
 - **THEN** no internal framework type appears in an application-facing signature
 
-### Requirement: Function-only authored execution
+### Requirement: Distinct function and task authoring
 
-Functions SHALL be the only authored descriptors that own business handlers; path-scoped route middleware MAY own HTTP handlers, routes, jobs, schedules, event listeners, tools, and service members SHALL target function references, services SHALL group functions and invocation policy, and agents SHALL compile to generated internal function identities.
+Functions SHALL own immediate business handlers and tasks SHALL own background handlers. Jobs SHALL target only tasks and schedules SHALL submit jobs. Routes and tools SHALL continue targeting callable functions, event functions SHALL remain event-only functions, and agents SHALL retain their existing generated/native execution. Path-scoped route middleware SHALL retain HTTP handlers. Services SHALL group original members without owning a business handler or invocation policy.
 
 #### Scenario: Non-function handler is declared
 
@@ -34,8 +34,44 @@ Functions SHALL be the only authored descriptors that own business handlers; pat
 
 #### Scenario: Managed dependency is declared
 
-- **WHEN** a function declares a job, event, bucket, cache, or agent dependency
+- **WHEN** a function declares a task, job, bucket, cache, or agent dependency, or declares exact publishes event IDs
 - **THEN** its handler and lifecycle hooks expose only the correspondingly named and typed Promise-based clients
+
+### Requirement: TJ-044 Dot-access job names
+
+Authored jobs MUST declare a literal camelCase `name` with the validation and uniqueness rules specified below. Generated clients, hook selectors, context aliases and Inspector usage MUST use identifier-safe names. No generator may silently normalize IDs into names or produce bracket-only job keys. Names SHALL be 1–64 ASCII characters matching `^[a-z][A-Za-z0-9]*$`, with no trimming/sanitization. The reserved set is `then`, `constructor`, `prototype`, `toJSON`, `toString`, `valueOf`, `hasOwnProperty`, `isPrototypeOf`, `propertyIsEnumerable`, `toLocaleString`, and `__proto__`. Uniqueness SHALL cover all private/exposed/implicit/explicit jobs across the application; context aliases use the same grammar.
+
+#### Scenario: Dot-access job names
+
+- **WHEN** a job uses name "exportOrders" and id "orders.export"
+- **THEN** client.jobs.exportOrders.trigger and runs.watch typecheck, while invalid/reserved/colliding names fail without normalization
+
+### Requirement: TJ-045 Naming does not reset durable identity
+
+Relkit MUST keep API names separate from resolved durable IDs in manifests, generated metadata and execution routing. Renaming a public name MUST change the client contract; preserving a pinned durable ID MUST preserve historical run/schedule/dedup routing. A rename that also changes a default-derived ID MUST require an explicit identity migration.
+
+#### Scenario: Naming does not reset durable identity
+
+- **WHEN** the public name changes to exportAccountOrders while id "orders.export" remains pinned
+- **THEN** the public fingerprint changes but durable schedule, deduplication and historical run routing remain unchanged
+
+### Requirement: Task exports support deterministic private bindings
+
+Task discovery SHALL preserve canonical source exports, recognize named bindings/default aliases of the same descriptor, deduplicate re-exports, and require explicit named jobs when an implicit source name cannot be resolved unambiguously. Recommended domain task/job paths SHALL not exclude otherwise valid descriptors.
+
+#### Scenario: Named task export
+
+- **WHEN** a named task is exported from its domain task file
+- **THEN** no default-export-only warning is emitted and its unique valid source name supplies the private implicit binding
+
+### Requirement: Job service spelling migration does not enable legacy execution
+
+For one compatibility release, task-target job options SHALL accept deprecated profile as an exclusive alias of service with a migration diagnostic. Both spellings together SHALL fail. This alias SHALL preserve task execution and SHALL not require or enable the separate legacyJobs execution gate.
+
+#### Scenario: Task job uses a deprecated profile spelling
+
+- **WHEN** a task-target job uses profile without service or legacyJobs
+- **THEN** it resolves the same service with a deprecation diagnostic and retains trigger-only task semantics
 
 ### Requirement: Standard Schema validation and projection
 
@@ -77,7 +113,7 @@ Environment declarations SHALL produce static resolved types, runtime parsing ru
 
 ### Requirement: Stable immutable descriptors
 
-Every compiled application descriptor SHALL have a stable ID, kind, global descriptor brand, typed reference, serializable declaration metadata, and development/test immutability; application, event, job, bucket, and cache IDs SHALL be explicit, while function, route, service, tool, agent, error, middleware, and transform IDs MAY be deterministically inferred from source hierarchy when omitted.
+Every compiled descriptor SHALL retain a stable ID, kind, global descriptor brand, typed reference, serializable metadata and immutability. Task ID and semantic version SHALL be explicit. An explicit job SHALL require a literal name and resolve omitted durable id to that name; an implicit job SHALL retain its task ID. Application/event/bucket/cache IDs SHALL remain explicit; existing function/route/service/tool/agent/error/middleware/transform inference SHALL remain supported. Task and job namespaces SHALL permit one task and one job with equal durable IDs while graph identities remain distinct; all collisions within required uniqueness scopes SHALL fail.
 
 #### Scenario: Descriptor is mutated in development
 
@@ -96,7 +132,7 @@ Every compiled application descriptor SHALL have a stable ID, kind, global descr
 
 #### Scenario: Inferred identities collide
 
-- **WHEN** two descriptors derive the same stable ID
+- **WHEN** two distinct descriptors derive the same stable ID within a required uniqueness scope
 - **THEN** compilation fails with a collision diagnostic identifying both source bindings and suggests an explicit override
 
 ### Requirement: Transport-independent function lifecycle
@@ -303,7 +339,7 @@ RELKIT SHALL expose contract-only `defineEvent`, callable `defineFunction`, and 
 
 ### Requirement: defineApp is the canonical application contract
 
-`defineApp` SHALL be the sole application configuration constructor and SHALL accept application identity, handler-visible environment, singular provider capability inputs, profile defaults, telemetry, server, Inspector, and deployment descriptors as one immutable plain-TypeScript topology.
+`defineApp` SHALL remain the sole immutable application configuration constructor. It SHALL accept plural `jobs` and `defaults.jobs` over the existing internal `job` capability, existing singular other capabilities, environment, telemetry, server, Inspector and deployment. One-release `job`/`defaults.job` aliases SHALL issue migration diagnostics and conflict with their new spellings. Explicit `compatibility: { legacyJobs: true }` SHALL enable the deprecated legacy descriptor runtime only.
 
 #### Scenario: Direct cache binding is authored
 

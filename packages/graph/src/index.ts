@@ -1,4 +1,6 @@
 export * from "./model.js";
+export * from "./graph-ids.js";
+export * from "./task-nodes.js";
 export * from "./agent-client-contract.js";
 export * from "./agent-node.js";
 export * from "./graph-types.js";

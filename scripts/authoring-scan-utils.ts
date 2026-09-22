@@ -86,3 +86,13 @@ export function stringValue(node: ts.Expression): string | undefined {
     ? node.text
     : undefined;
 }
+
+export function sortAuthoringViolations(
+  findings: readonly AuthoringViolation[],
+): AuthoringViolation[] {
+  return [...findings].sort((left, right) =>
+    `${left.file}:${left.line}:${left.column}:${left.rule}`.localeCompare(
+      `${right.file}:${right.line}:${right.column}:${right.rule}`,
+    ),
+  );
+}

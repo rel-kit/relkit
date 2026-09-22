@@ -9,6 +9,9 @@ An event tells your app that something happened: an order was created, a payment
 
 The original operation does not wait for these reactions to finish. Use events for follow-up work; use a normal function call when you need the result before continuing.
 
+An event consumer may submit a [task-first job](/docs/jobs/quickstart) when the follow-up needs durable
+execution. Publishing an event is not an atomic database write plus task admission.
+
 ## The Events API
 
 | API                   | What you use it for                                                                                             |

@@ -18,6 +18,7 @@ export interface EnsureProfileOptions {
   readonly requested?: string | undefined;
   readonly provider?: string | undefined;
   readonly source?: "docker" | "connected" | "aws" | undefined;
+  readonly legacy?: boolean | undefined;
 }
 
 export async function ensureProviderProfile(
@@ -25,6 +26,7 @@ export async function ensureProviderProfile(
   capability: ProviderCapability,
   options: EnsureProfileOptions = {},
 ): Promise<string> {
+  const configCapability = capability === "job" && options.legacy !== true ? "jobs" : capability;
   const profiles = builder.profiles.filter((item) => item.capability === capability);
   const explicitSource = options.provider !== undefined || options.source !== undefined;
   if (options.requested) {
@@ -41,7 +43,7 @@ export async function ensureProviderProfile(
   const definition = definitionFor(capability, options);
   const existing = profiles.find((item) => item.name === name);
   if (existing) {
-    if (existing.adapter && existing.adapter !== definition.adapter) {
+    if (existing.adapter && !sameProviderAdapter(existing.adapter, definition.adapter)) {
       usage(
         `Provider profile ${name} already uses ${existing.adapter}, not ${definition.adapter}.`,
       );
@@ -59,17 +61,17 @@ export async function ensureProviderProfile(
     await ensureEnvironment(builder, environment.name, environment.definition);
   }
   await builder.update("relkit.config.ts", (source) => {
-    const path = profiles.length === 0 ? [] : [capability];
+    const path = profiles.length === 0 ? [] : [configCapability];
     const member =
       profiles.length === 0
-        ? `${capability}: { ${JSON.stringify(name)}: ${definition.expression} }`
+        ? `${configCapability}: { ${JSON.stringify(name)}: ${definition.expression} }`
         : `${JSON.stringify(name)}: ${definition.expression}`;
     return addFactoryObjectMember(
       source,
       "relkit.config.ts",
       [builder.discovery.appFactory],
       path,
-      profiles.length === 0 ? capability : name,
+      profiles.length === 0 ? configCapability : name,
       member,
     );
   });
@@ -80,8 +82,8 @@ export async function ensureProviderProfile(
         "relkit.config.ts",
         [builder.discovery.appFactory],
         ["defaults"],
-        capability,
-        `${capability}: "${name}"`,
+        configCapability,
+        `${configCapability}: "${name}"`,
       ),
     );
   }
@@ -161,10 +163,16 @@ function usage(message: string): never {
 }
 
 function reuseProfile(builder: PlanBuilder, profile: DiscoveredProfile): string {
-  if (profile.adapter === "docker") {
+  if (profile.adapter?.startsWith("docker")) {
     const warning = providerDefinitions.dockerWarning;
     builder.warning(warning.code, warning.message);
     builder.nextStep("relkit local up");
   }
   return profile.name;
+}
+
+function sameProviderAdapter(existing: string, requested: string): boolean {
+  return requested === "docker"
+    ? existing === "docker" || existing.startsWith("docker(")
+    : existing === requested;
 }

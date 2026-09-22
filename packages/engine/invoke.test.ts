@@ -3,7 +3,12 @@ import type { ProtocolId } from "@relkit/contracts";
 import { Effect } from "effect";
 import { defineError, defineFunction, fail } from "@relkit/app";
 import { z } from "@relkit/schema";
-import { InvocationValidationError, invokeFunction, type InvocationTarget } from "./src/invoke.ts";
+import {
+  InvocationValidationError,
+  invoke,
+  invokeFunction,
+  type InvocationTarget,
+} from "./src/invoke.ts";
 
 const ids = () => {
   let next = 0;
@@ -24,6 +29,86 @@ function target(
 }
 
 describe("function invocation pipeline", () => {
+  test("passes native sync and async suspension through without terminal hooks", async () => {
+    for (const handler of [
+      () => {
+        throw parked;
+      },
+      async () => {
+        throw parked;
+      },
+    ]) {
+      const events: string[] = [];
+      await expect(
+        invoke({
+          target: target(handler),
+          input: { value: 1 },
+          source: "job",
+          idSource: ids(),
+          isSuspension: (cause) => cause === parked,
+          taskLifecycle: {
+            onStart: () => {
+              events.push("start");
+            },
+            onSuccess: () => {
+              events.push("success");
+            },
+            onFailure: () => {
+              events.push("failure");
+            },
+          },
+          hooks: {
+            onCompletion: () => {
+              events.push("completion");
+            },
+            onRelease: () => {
+              events.push("release");
+            },
+          },
+        }),
+      ).rejects.toBe(parked);
+      expect(events).toEqual(["start", "release"]);
+    }
+  });
+
+  test("runs task hooks as repeatable observational effects", async () => {
+    let started = 0;
+    let succeeded = 0;
+    let failed = 0;
+    const successful = target((input) => input);
+    for (let index = 0; index < 2; index += 1) {
+      await expect(
+        invoke({
+          target: successful,
+          input: { value: index },
+          taskLifecycle: {
+            onStart: () => {
+              started += 1;
+            },
+            onSuccess: () => {
+              succeeded += 1;
+              throw new Error("diagnostic only");
+            },
+          },
+        }),
+      ).resolves.toEqual({ value: index });
+    }
+    await expect(
+      invoke({
+        target: target(() => {
+          throw new Error("handler failure");
+        }),
+        input: { value: 1 },
+        taskLifecycle: {
+          onFailure: () => {
+            failed += 1;
+          },
+        },
+      }),
+    ).rejects.toMatchObject({ kind: "defect" });
+    expect({ started, succeeded, failed }).toEqual({ started: 2, succeeded: 2, failed: 1 });
+  });
+
   test("passes only validated input and execution context to handlers", async () => {
     let seen: unknown;
     await invokeFunction(
@@ -244,3 +329,5 @@ describe("function invocation pipeline", () => {
     }
   });
 });
+
+const parked = { kind: "native-park", token: "sleep-1" };

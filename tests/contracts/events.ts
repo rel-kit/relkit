@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { UnknownEventEnvelope } from "../../packages/events/src/index.ts";
 import type { InvocationContext } from "../../packages/engine/src/index.ts";
-import type { RetryPolicy } from "../../packages/jobs/src/index.ts";
+import type { RetryPolicy } from "../../packages/jobs/src/legacy.ts";
 import type { TestEventFake } from "../../packages/testing/src/index.ts";
 
 export interface EventContractTrigger {

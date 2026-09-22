@@ -26,6 +26,7 @@ import { resolveActiveGeneration } from "./generation.js";
 import type { Context, Hono } from "hono";
 import { installResourceExplorerEndpoints } from "./resource-routes.js";
 import { INSPECTOR_API_PATHS } from "./inspector-endpoint-paths.js";
+import { installJobsEndpoints } from "./jobs/routes.js";
 export { INSPECTOR_API_PATHS, INSPECTOR_ENDPOINT_PATHS } from "./inspector-endpoint-paths.js";
 export interface InspectorApiOptions extends ActiveGenerationOptions {
   readonly mode?: InspectorMode;
@@ -123,6 +124,7 @@ export function installInspectorEndpoints(app: Hono, options: InspectorApiOption
       json(sourceDetail(await required(generation), requiredParam(context, "id"))),
     ),
   );
+  installJobsEndpoints(app, guard);
   for (const collection of GRAPH_COLLECTIONS) {
     app.get(
       `${API_BASE_PATH}/${collection}`,

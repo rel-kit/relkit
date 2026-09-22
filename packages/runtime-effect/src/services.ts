@@ -34,6 +34,8 @@ export interface RuntimeManifest {
   readonly activationFingerprint: RuntimeActivationFingerprint;
   readonly runtimeIntegrationsPlan: RuntimeIntegrationPlanReference;
   readonly functions: Readonly<Record<string, RuntimeHandler>>;
+  readonly tasks?: Readonly<Record<string, unknown>>;
+  readonly jobs?: Readonly<Record<string, unknown>>;
   readonly middleware: Readonly<Record<string, RuntimeHandler>>;
   readonly requestTransforms: Readonly<Record<string, RuntimeHandler>>;
 }

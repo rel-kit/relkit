@@ -1,6 +1,7 @@
 export const releaseTemplates = ["minimal", "api", "agent", "fullstack"] as const;
+export const packedTemplates = [...releaseTemplates, "tasks"] as const;
 
-export type ReleaseTemplate = (typeof releaseTemplates)[number];
+export type ReleaseTemplate = (typeof packedTemplates)[number];
 
 const backendScripts = {
   dev: "relkit dev",
@@ -25,6 +26,19 @@ const fullstackScripts = {
   start: "relkit start",
 };
 
+const taskScripts = {
+  dev: "relkit dev",
+  check: "relkit check",
+  typecheck: "tsc --noEmit",
+  test: "bun test",
+  build: "relkit build",
+  start: "relkit start",
+  "jobs:trigger":
+    "relkit jobs trigger --job exportOrders --input-file examples/export-orders.json --operation-id example-trigger",
+};
+
 export function expectedTemplateScripts(template: ReleaseTemplate) {
-  return template === "fullstack" ? fullstackScripts : backendScripts;
+  if (template === "fullstack") return fullstackScripts;
+  if (template === "tasks") return taskScripts;
+  return backendScripts;
 }

@@ -4,7 +4,7 @@ Defines domain services as first-class groups of functions with shared invocatio
 ## Requirements
 ### Requirement: Services group typed function members
 
-A service SHALL identify one source domain and MAY expose named function and event descriptors as direct, typed, referentially identical public members without owning a business handler or invocation policy. A compiler SHALL allow an empty authored facade only when the same domain owns another graph-visible capability.
+A domain service SHALL expose optional function, event, task and job maps as flattened direct, typed, referentially identical members without owning a business handler or invocation policy. Empty facades SHALL remain valid only when the domain owns another graph-visible capability. Task/job member names SHALL obey safe alias validation and all member categories SHALL reject collisions/reserved names/cross-domain ownership.
 
 #### Scenario: Service member targets a route
 
@@ -18,7 +18,7 @@ A service SHALL identify one source domain and MAY expose named function and eve
 
 ### Requirement: Service metadata is consistently projected
 
-The compiler and runtimes SHALL project domain identity, service metadata, public function/event membership, specialized capability metadata, dependencies, and public/internal exposure consistently into the graph, manifest, OpenAPI grouping, logs, traces, and Inspector without cloning member descriptors.
+The compiler and runtimes SHALL project domain identity, service metadata, public function/event/task/job membership, specialized capability metadata, dependencies, and public/internal exposure consistently into the graph, manifest, OpenAPI grouping, logs, traces, and Inspector without cloning member descriptors.
 
 #### Scenario: Service-backed API is compiled
 

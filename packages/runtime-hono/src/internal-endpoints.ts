@@ -150,6 +150,8 @@ export function graphSnapshot(plan: RegistrationPlan): contracts.JsonValue {
     manifestContractVersion: contracts.MANIFEST_VERSION,
     manifestGeneratorVersion: contracts.GENERATOR_VERSION,
     functions: plan.functions,
+    tasks: plan.tasks ?? [],
+    jobs: plan.jobs ?? [],
     httpTriggers: plan.httpTriggers,
     queues: plan.queues,
     schedules: plan.schedules,

@@ -128,7 +128,7 @@ function serviceMembers(
     }));
   }
   const root = readFactoryObject(source, path, [factory]);
-  return ["functions", "events"].flatMap((category) => {
+  return ["functions", "events", "tasks", "jobs"].flatMap((category) => {
     const item = objectProperty(root, category);
     if (!item || !ts.isPropertyAssignment(item)) return [];
     const value = unwrap(item.initializer);

@@ -1,5 +1,5 @@
 import { PROTOCOL_VERSION, type JsonValue, type MaybePromise } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type { JobFailureMetadata, JobQueueState } from "../jobs/queue-utils.js";
 
 export const EVENT_ADMIN_PROTOCOL = "relkit.events.admin" as const;

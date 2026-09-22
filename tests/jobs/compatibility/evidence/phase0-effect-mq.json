@@ -1,0 +1,53 @@
+{
+  "recordedAt": "2026-09-13T17:24:38.567Z",
+  "command": "bun tests/jobs/compatibility/effect-mq-native.ts",
+  "scope": ["effect-mq-native-proof"],
+  "provider": "effect-mq",
+  "profile": "self-hosted-postgresql",
+  "status": "passed",
+  "packages": {
+    "effect-mq": "0.7.0",
+    "effect": "4.0.0-rc.115",
+    "@effect/sql-pg": "4.0.0-rc.115",
+    "drizzle-orm": "1.0.0-rc.5-169397b",
+    "bun": "1.3.10"
+  },
+  "postgres": {
+    "image": "postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685",
+    "tablesCreated": 7,
+    "scheduleKeepColumn": true,
+    "timestampBoundary": "PgTypes timestamp/timestamptz codecs return Date and accept native epoch-millisecond parameters"
+  },
+  "durableAcceptance": {
+    "acceptedId": "phase0-accepted",
+    "duplicateReceipt": "phase0-accepted",
+    "queuedState": "waiting",
+    "cancelledState": "cancelled"
+  },
+  "workerRestart": {
+    "acceptedBeforeRestart": true,
+    "output": "completed-after-worker-restart"
+  },
+  "retryableExecution": {
+    "output": "completed-on-3",
+    "outcomes": ["retried", "retried", "completed"],
+    "totalAttempts": 3
+  },
+  "cancellation": {
+    "activeStarted": true,
+    "terminalState": "cancelled"
+  },
+  "nativeScheduling": {
+    "ownershipReconciled": true,
+    "scheduleGroup": "phase0-schedules",
+    "firedOccurrences": 4,
+    "duplicateSafeUpsert": true
+  },
+  "durableSleep": "unsupported by this retryable profile",
+  "wakeups": {
+    "listen": "unavailable under the pinned Effect runtime",
+    "fallback": "polling",
+    "correctnessImpact": "none observed"
+  },
+  "evidenceLimit": "This proves the pinned self-hosted PostgreSQL recipe only; managed effect-mq does not exist and Redis remains separately untested."
+}

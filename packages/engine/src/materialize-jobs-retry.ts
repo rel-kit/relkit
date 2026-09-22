@@ -1,6 +1,6 @@
 import { canonicalJson } from "@relkit/contracts";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import type {
   JobFailureMetadata,
   JobQueueEntry,

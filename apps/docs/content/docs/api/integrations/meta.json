@@ -1,5 +1,18 @@
 {
   "title": "Integrations",
   "icon": "Plug",
-  "pages": ["aws", "cloudflare", "docker", "local", "otlp", "pulumi", "redis", "s3", "sentry"]
+  "pages": [
+    "aws",
+    "cloudflare",
+    "docker",
+    "local",
+    "otlp",
+    "pulumi",
+    "redis",
+    "s3",
+    "sentry",
+    "inngest",
+    "trigger",
+    "effect-mq"
+  ]
 }

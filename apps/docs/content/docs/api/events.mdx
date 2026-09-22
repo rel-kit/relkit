@@ -538,10 +538,11 @@ declare const EventProviderError: typeof EventProviderError;
 **Signature**
 
 ```ts
-type EventProviderResult<Id, Version, Payload> = Pick<
-  EventPublishResult<Id, Version, Payload>,
-  "instanceId" | "accepted"
-> &
+type EventProviderResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
   Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
@@ -761,10 +762,11 @@ type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchem
 **Signature**
 
 ```ts
-type EventEnvelope<Id, Version, Payload> = Omit<
-  EventPublishResult<Id, Version, Payload>,
-  "accepted"
->;
+type EventEnvelope<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Omit<EventPublishResult<Id, Version, Payload>, "accepted">;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/define-event.ts#L12)
@@ -962,7 +964,12 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
 **Signature**
 
 ```ts
-type EventFunctionHandler<Event, Publishes, Dependencies, Errors> = (
+type EventFunctionHandler<
+  Event extends EventName,
+  Publishes extends readonly EventName[],
+  Dependencies extends FunctionDependencies,
+  Errors extends readonly ErrorDescriptorAny[],
+> = (
   input: EventInputByName<Event>,
   context: EventFunctionContext<Event, Publishes, Dependencies>,
 ) => MaybePromise<FunctionHandlerResult<void, Errors>>;
@@ -1085,7 +1092,7 @@ declare const rejectEventFunctionFields: (options: Record<PropertyKey, unknown>)
 **Signature**
 
 ```ts
-type EventDescriptorByName<Name> = EventRegistry[Name] extends EventDescriptorAny
+type EventDescriptorByName<Name extends EventName> = EventRegistry[Name] extends EventDescriptorAny
   ? EventRegistry[Name]
   : never;
 ```
@@ -1097,7 +1104,7 @@ type EventDescriptorByName<Name> = EventRegistry[Name] extends EventDescriptorAn
 **Signature**
 
 ```ts
-type EventInputByName<Name> = InferOutput<EventDescriptorByName<Name>["input"]>;
+type EventInputByName<Name extends EventName> = InferOutput<EventDescriptorByName<Name>["input"]>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L18)
@@ -1127,7 +1134,7 @@ type EventRegistry = Relkit.EventRegistry;
 **Signature**
 
 ```ts
-type EventVersionByName<Name> = EventDescriptorByName<Name>["version"];
+type EventVersionByName<Name extends EventName> = EventDescriptorByName<Name>["version"];
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/events/src/event-registry.ts#L22)

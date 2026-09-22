@@ -30,9 +30,13 @@ export function installRpcWebSocket(
             return;
           }
           const peer = (socket.raw ?? socket) as WebSocketLike;
-          void handler.message(peer, event.data as string | ArrayBuffer, { context }).catch(() => {
-            socket.close(1011, "Relkit RPC transport failed.");
-          });
+          void handler
+            .message(peer, event.data as string | ArrayBuffer, {
+              context: (request) => ({ ...context, rpcHeaders: request.headers }),
+            })
+            .catch(() => {
+              socket.close(1011, "Relkit RPC transport failed.");
+            });
         },
         onClose(_event, socket) {
           void handler.close((socket.raw ?? socket) as WebSocketLike);

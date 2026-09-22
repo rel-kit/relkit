@@ -7,10 +7,14 @@ export type CreateCloud = (typeof CREATE_CLOUDS)[number];
 export const CREATE_DEPLOYMENTS = ["pulumi", "none"] as const;
 export type CreateDeployment = (typeof CREATE_DEPLOYMENTS)[number];
 
+export const CREATE_JOBS = ["inngest-docker", "effect-mq-docker", "trigger-docker"] as const;
+export type CreateJobs = (typeof CREATE_JOBS)[number];
+
 export const CREATE_OPTION_DEFAULTS = Object.freeze({
   template: "minimal" as CreateTemplate,
   cloud: "none" as CreateCloud,
   deploy: "none" as CreateDeployment,
+  jobs: undefined as CreateJobs | undefined,
   install: true as boolean,
   git: true as boolean,
   examples: true as boolean,
@@ -23,6 +27,7 @@ export interface CreateOptions {
   readonly template: CreateTemplate;
   readonly cloud: CreateCloud;
   readonly deploy: CreateDeployment;
+  readonly jobs?: CreateJobs;
   readonly install: boolean;
   readonly git: boolean;
   readonly examples: boolean;
@@ -54,6 +59,7 @@ export function normalizeCreateOptions(
   let template = CREATE_OPTION_DEFAULTS.template;
   let cloud = CREATE_OPTION_DEFAULTS.cloud;
   let deploy = CREATE_OPTION_DEFAULTS.deploy;
+  let jobs: CreateJobs | undefined = CREATE_OPTION_DEFAULTS.jobs;
   let install = CREATE_OPTION_DEFAULTS.install;
   let git = CREATE_OPTION_DEFAULTS.git;
   let examples = CREATE_OPTION_DEFAULTS.examples;
@@ -82,6 +88,10 @@ export function normalizeCreateOptions(
       const option = readValue(args, index, argument, "--deploy");
       index = option.index;
       deploy = choice(option.value, "--deploy", CREATE_DEPLOYMENTS);
+    } else if (argument === "--jobs" || argument.startsWith("--jobs=")) {
+      const option = readValue(args, index, argument, "--jobs");
+      index = option.index;
+      jobs = choice(option.value, "--jobs", CREATE_JOBS);
     } else if (argument === "--directory" || argument.startsWith("--directory=")) {
       const option = readValue(args, index, argument, "--directory");
       index = option.index;
@@ -98,6 +108,7 @@ export function normalizeCreateOptions(
     template,
     cloud,
     deploy,
+    ...(jobs === undefined ? {} : { jobs }),
     install,
     git,
     examples,

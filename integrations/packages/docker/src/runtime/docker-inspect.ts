@@ -1,4 +1,5 @@
 import { DockerEngineError, type DockerContainer, type DockerVolume } from "./docker-types.js";
+import { isIP } from "node:net";
 
 export function parseContainers(source: string): readonly DockerContainer[] {
   return array(source).map((value) => {
@@ -62,11 +63,25 @@ function ports(value: unknown): Readonly<Record<string, number>> {
   const result: Record<string, number> = {};
   for (const [containerPort, bindings] of Object.entries(source)) {
     if (bindings === null) continue;
-    if (!Array.isArray(bindings) || bindings.length !== 1) invalid();
-    const binding = record(bindings[0]);
-    if (binding.HostIp !== "127.0.0.1" && binding.HostIp !== "::1") invalid();
+    if (!Array.isArray(bindings) || bindings.length < 1 || bindings.length > 2) invalid();
+    const parsed = bindings.map(record);
+    const binding = parsed.find(
+      (candidate) => candidate.HostIp === "127.0.0.1" || candidate.HostIp === "::1",
+    );
+    if (binding === undefined) invalid();
     const hostPort = Number(binding.HostPort);
     if (!Number.isSafeInteger(hostPort) || hostPort < 1 || hostPort > 65_535) invalid();
+    for (const candidate of parsed) {
+      if (candidate === binding) continue;
+      if (
+        typeof candidate.HostIp !== "string" ||
+        isIP(candidate.HostIp) !== 4 ||
+        candidate.HostIp === "0.0.0.0" ||
+        candidate.HostIp.startsWith("127.") ||
+        Number(candidate.HostPort) !== hostPort
+      )
+        invalid();
+    }
     result[containerPort] = hostPort;
   }
   return Object.freeze(result);

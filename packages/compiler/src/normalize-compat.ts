@@ -1,37 +1,17 @@
 import { canonicalJson, type JsonValue } from "@relkit/contracts";
-import { getJsonSchema, type StandardSchemaV1 } from "@relkit/schema";
-import { id, isRecord, json, refId, schemaKey } from "./normalize-utils.js";
+import { id, isRecord, refId, schemaKey, taskSchemaKey } from "./normalize-utils.js";
 import type { NormalizedDescriptor, NormalizeInput } from "./normalize-types.js";
 import { providerMaps } from "./normalize-graph-app.js";
+export {
+  isSchema,
+  schema,
+  type SchemaDirection,
+  type SchemaResult,
+  schemaHash,
+} from "./normalize-schema-projection.js";
+import { schema, type SchemaDirection } from "./normalize-schema-projection.js";
 
-export interface SchemaResult {
-  readonly ok: boolean;
-  readonly schema?: JsonValue;
-  readonly reason?: string;
-}
-
-export function schema(value: unknown): SchemaResult {
-  if (isSchemaSnapshot(value)) {
-    if (value.$relkit === "schema-unavailable") {
-      return { ok: false, reason: typeof value.reason === "string" ? value.reason : "unavailable" };
-    }
-    return json(value.jsonSchema)
-      ? { ok: true, schema: value.jsonSchema }
-      : { ok: false, reason: "schema snapshot has no JSON Schema projection" };
-  }
-  if (!isSchema(value)) return { ok: false, reason: "value is not a Standard Schema v1 validator" };
-  const result = getJsonSchema(value);
-  return result.ok ? result : { ok: false, reason: result.reason };
-}
-
-export function isSchema(value: unknown): value is StandardSchemaV1 {
-  return (
-    isRecord(value) &&
-    isRecord(value["~standard"]) &&
-    value["~standard"].version === 1 &&
-    typeof value["~standard"].validate === "function"
-  );
-}
+export type SchemaEntry = readonly [string, unknown, SchemaDirection?];
 
 export function schemaEquivalent(left: unknown, right: unknown): boolean {
   const a = schema(left);
@@ -96,44 +76,71 @@ export function targetId(value: unknown): string | undefined {
   return refId(value);
 }
 
-export function schemaEntries(descriptor: NormalizedDescriptor): readonly [string, unknown][] {
+export function schemaEntries(descriptor: NormalizedDescriptor): readonly SchemaEntry[] {
   const value = descriptor.value;
   if (!isRecord(value)) return [];
   const fields =
     (
       {
         function: ["input", "output", "progress"],
-        job: ["input"],
+        task: ["input", "output", "progress"],
+        job: ["input", "output", "progress"],
         event: ["input"],
         cache: ["key", "value"],
         agent: ["input", "output"],
         error: ["data"],
       } as Readonly<Record<string, readonly string[]>>
     )[descriptor.kind] ?? [];
-  const direct = fields.flatMap((field) =>
-    value[field] === undefined
-      ? []
-      : [[schemaKey(descriptor.id, field), value[field]] as [string, unknown]],
-  );
+  if (descriptor.kind === "job" && isRecord(value.task)) return [];
+  const direct =
+    descriptor.kind === "task"
+      ? taskSchemaEntries(descriptor.id, value, fields)
+      : fields.flatMap((field) =>
+          value[field] === undefined
+            ? []
+            : [[schemaKey(descriptor.id, field), value[field]] as SchemaEntry],
+        );
   if (descriptor.kind !== "channel") return direct;
   const events = isRecord(value.events)
     ? Object.entries(value.events).map(
-        ([event, eventSchema]) =>
-          [`${descriptor.id}:event:${event}`, eventSchema] as [string, unknown],
+        ([event, eventSchema]) => [`${descriptor.id}:event:${event}`, eventSchema] as SchemaEntry,
       )
     : [];
   const presence =
     isRecord(value.presence) && value.presence.member !== undefined
-      ? [[`${descriptor.id}:presence:member`, value.presence.member] as [string, unknown]]
+      ? [[`${descriptor.id}:presence:member`, value.presence.member] as SchemaEntry]
       : [];
   return [
     ...direct,
     ...(value.params === undefined
       ? []
-      : [[`${descriptor.id}:params`, value.params] as [string, unknown]]),
+      : [[`${descriptor.id}:params`, value.params] as SchemaEntry]),
     ...events,
     ...presence,
   ];
+}
+
+function taskSchemaEntries(
+  taskId: string,
+  value: Record<string, unknown>,
+  fields: readonly string[],
+): readonly SchemaEntry[] {
+  const entries: SchemaEntry[] = [];
+  for (const field of fields) {
+    const candidate = value[field];
+    if (candidate === undefined) continue;
+    if (field === "input") {
+      entries.push([taskSchemaKey(taskId, field, "input"), candidate, "input"]);
+      entries.push([
+        taskSchemaKey(taskId, field, "output"),
+        value.inputWire ?? candidate,
+        "output",
+      ]);
+      continue;
+    }
+    entries.push([taskSchemaKey(taskId, field, "output"), candidate, "output"]);
+  }
+  return entries;
 }
 
 export function cronLike(value: unknown): boolean {
@@ -157,14 +164,11 @@ export function providerProfiles(input: NormalizeInput): ReadonlyMap<string, rea
   return new Map([...profiles.entries()].map(([name, values]) => [name, [...values].sort()]));
 }
 
-function isSchemaSnapshot(value: unknown): value is {
-  readonly $relkit: string;
-  readonly jsonSchema?: JsonValue;
-  readonly reason?: string;
-} {
-  return isRecord(value) && typeof value.$relkit === "string" && value.$relkit.startsWith("schema");
-}
-
 export function isJsonMetadata(value: unknown): value is JsonValue {
-  return json(value);
+  try {
+    canonicalJson(value);
+    return true;
+  } catch {
+    return false;
+  }
 }

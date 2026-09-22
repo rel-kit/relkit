@@ -7,6 +7,10 @@ A function is RELKIT's reusable unit of application behavior. It declares runtim
 expected errors, provider-backed dependencies, optional publication access, and one handler. Routes, jobs,
 event consumers, tools, agents, and direct calls all enter the same invocation engine.
 
+Functions remain request- or event-scoped operations. When work must outlive the initiating request, define a
+[task](/docs/jobs/tasks) and expose it through a [task-first job](/docs/jobs/quickstart); do not turn a
+function target into a durable worker by adding queue fields.
+
 ## Scaffold a callable function
 
 With an existing `orders` service, run from the application root:

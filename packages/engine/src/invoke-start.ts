@@ -31,6 +31,7 @@ import type {
   InvocationTarget,
   InvokeOptions,
 } from "./invoke-types.js";
+import type { TaskAncestry } from "@relkit/invocation";
 
 export interface InvocationStart<Input, Output, Context extends { readonly signal: AbortSignal }> {
   readonly options: InvokeOptions<Input, Output, Context>;
@@ -44,6 +45,7 @@ export interface InvocationStart<Input, Output, Context extends { readonly signa
   readonly idSource: InvocationIdSource;
   readonly traceId: string;
   readonly record: InvocationRecord;
+  readonly taskAncestry?: TaskAncestry;
 }
 
 export interface MutableInvocationParent extends InvocationParent {
@@ -115,6 +117,7 @@ export async function startInvocation<
     type: "invocation.started",
     record,
   });
+  const taskAncestry = options.taskAncestry ?? activeScope?.taskAncestry;
   return {
     options,
     dispatcher,
@@ -127,5 +130,6 @@ export async function startInvocation<
     idSource,
     traceId,
     record,
+    ...(taskAncestry === undefined ? {} : { taskAncestry }),
   };
 }

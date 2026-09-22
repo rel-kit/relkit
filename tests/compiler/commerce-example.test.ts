@@ -18,7 +18,7 @@ describe("commerce-example compiler acceptance", () => {
     expect(run.manifest.match(/manifestGraphHash = "([^"]+)"/)?.[1]).toBe(run.graphHash);
 
     const authored = run.normalization.descriptors.filter(({ identity }) => identity !== undefined);
-    expect(new Set(authored.map(({ id }) => id)).size).toBe(authored.length);
+    expect(new Set(authored.map(({ kind, id }) => `${kind}:${id}`)).size).toBe(authored.length);
     expect(authored.map(({ id }) => id)).toEqual(
       expect.arrayContaining([
         "commerce-api",
@@ -58,6 +58,7 @@ describe("commerce-example compiler acceptance", () => {
       "provider.bucket.receipts": "infrastructure",
       "provider.cache.requests": "connected",
       "provider.cache.timeline": "infrastructure",
+      "provider.job.default": "connected",
       "provider.realtime.default": "connected",
     });
     expect(providers.find(({ id }) => id === "provider.bucket.receipts")).toMatchObject({
@@ -81,6 +82,8 @@ describe("commerce-example compiler acceptance", () => {
     ).toEqual([
       ["announcements.feed", "provider.realtime.default"],
       ["assets.objects", "provider.bucket.assets"],
+      ["job.orders.cleanup", "provider.job.default"],
+      ["job.orders.export-orders", "provider.job.default"],
       ["orders.agent-workspace", "provider.bucket.agent-workspace"],
       ["orders.order-deep", "provider.agent-state.agents"],
       ["orders.order-review", "provider.agent-state.agents"],
@@ -107,6 +110,7 @@ describe("commerce-example compiler acceptance", () => {
       "provider.bucket.receipts",
       "provider.cache.requests",
       "provider.cache.timeline",
+      "provider.job.default",
       "provider.realtime.default",
     ]);
     const runtime = JSON.parse(run.normalization.outputs.runtimeIntegrations);
@@ -116,6 +120,7 @@ describe("commerce-example compiler acceptance", () => {
       "@relkit/redis",
       "@relkit/s3",
       "@relkit/redis",
+      "@relkit/inngest",
       "@relkit/redis",
       "@relkit/otlp",
       "@relkit/sentry",

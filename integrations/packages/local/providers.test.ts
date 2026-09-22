@@ -45,3 +45,28 @@ test("registers durable local event and unscheduled job runtimes", async () => {
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("selects a separate native task runtime for task-backed jobs", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-local-task-providers-"));
+  try {
+    const registration = runtimeIntegration.registrations[1]!;
+    const context = {
+      generationId: "generation.task",
+      bindingId: "provider.task.default",
+      capability: "job",
+      profile: "default",
+      executionModel: "task" as const,
+      behavior: {},
+      connection: { root },
+    };
+    const task = await registration.create(context);
+    expect(task.value).toMatchObject({
+      kind: "jobs-adapter-runtime",
+      protocolVersion: 1,
+      worker: { next: expect.any(Function) },
+    });
+    await task.release?.();
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

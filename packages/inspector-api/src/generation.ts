@@ -15,6 +15,7 @@ import type {
   ResolvedCandidateGeneration,
 } from "./generation-types.js";
 import type { InspectorResourceExplorers } from "./resource-explorer.js";
+import type { InspectorJobsServices } from "./jobs/types.js";
 
 export async function resolveActiveGeneration(
   options: ActiveGenerationOptions,
@@ -55,6 +56,12 @@ export async function resolveActiveGeneration(
     (value.resources ?? services.resources) as
       InspectorValueSource<InspectorResourceExplorers | undefined> | undefined,
   );
+  const jobsSource =
+    value.jobs ??
+    (isRecord(services.jobs) && "bindings" in services.jobs ? services.jobs : undefined);
+  const jobs = await resolveValue(
+    jobsSource as InspectorValueSource<InspectorJobsServices | undefined> | undefined,
+  );
   const runtime = value.runtime ?? services.runtime ?? directRuntime(value, services);
   const candidateSource =
     value.candidateGeneration ??
@@ -74,6 +81,7 @@ export async function resolveActiveGeneration(
     ...(localServices === undefined ? {} : { localServices }),
     ...(telemetry === undefined ? {} : { telemetry }),
     ...(runtime === undefined ? {} : { runtime: runtime as InspectorRuntimeServices }),
+    ...(jobs === undefined ? {} : { jobs }),
     ...(actions === undefined ? {} : { actions }),
     ...(resources === undefined ? {} : { resources }),
     ...(candidate === undefined ? {} : { candidate }),

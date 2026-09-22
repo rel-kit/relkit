@@ -130,6 +130,10 @@ test("approval interruption admits one continuation without replaying agent exec
   expect(settled.controls).toMatchObject([
     { controlId: operationId, status: "applied", effect: "confirmed" },
   ]);
+  expect(await client["relkit.agent.control"](control)).toMatchObject({
+    operationId,
+    duplicate: true,
+  });
   await waitForAgentRun(accepted.runId);
 });
 

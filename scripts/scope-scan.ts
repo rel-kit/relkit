@@ -24,15 +24,15 @@ const proseAllowlist = [
   /^AGENTS\.md$/,
   /^docs\/(?:README\.md|briefs\/|records\/|relkit-typescript-poc-(?:technical-spec|review-gates)-v3\.md)/,
   /^openspec\/changes\/implement-relkit-typescript-poc-v3\//,
+  /^tests\/jobs\/compatibility\/evidence\//,
 ];
 const implementationFiles = new Set(["apps/docs/tsconfig.json", "scripts/scope-scan.ts"]);
 const contentExtensions = /\.(?:c|m)?(?:ts|tsx|js|jsx)|\.json$|\.toml$|\.ya?ml$|\.md$/i;
 const alternateIac =
   /\b(?:terraform|opentofu|cloudformation|(?:aws-)?cdk|sst|alchemy|serverless|bicep)\b|@cdktf|aws-cdk-lib|arm[-_ ]?template/i;
 
-function isAllowlistedProse(path: string): boolean {
-  return proseAllowlist.some((pattern) => pattern.test(path));
-}
+const isAllowlistedProse = (path: string): boolean =>
+  proseAllowlist.some((pattern) => pattern.test(path));
 function position(text: string, offset: number): { line: number; column: number } {
   const before = text.slice(0, offset);
   const line = before.split("\n").length;

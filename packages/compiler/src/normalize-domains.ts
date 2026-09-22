@@ -47,7 +47,9 @@ export function validateDomains(work: NormalizationWork): void {
   }
 
   work.descriptors = work.descriptors.map((descriptor) => assignDomain(descriptor));
-  const byId = new Map(work.descriptors.map((descriptor) => [descriptor.id, descriptor]));
+  const byId = new Map(
+    work.descriptors.map((descriptor) => [`${descriptor.kind}:${descriptor.id}`, descriptor]),
+  );
   const publicIds = new Set<string>();
   const publicErrorIds = new Set<string>();
   const services = new Map<string, NormalizedDescriptor>();
@@ -96,7 +98,7 @@ export function validateDomains(work: NormalizationWork): void {
   }
 
   for (const descriptor of work.descriptors) {
-    if (descriptor.kind !== "function" || !publicIds.has(descriptor.id)) continue;
+    if (descriptor.kind !== "function" || !publicIds.has(`function:${descriptor.id}`)) continue;
     const value = isRecord(descriptor.value) ? descriptor.value : {};
     if (Array.isArray(value.errors)) {
       for (const error of value.errors) {
@@ -110,7 +112,8 @@ export function validateDomains(work: NormalizationWork): void {
     ...(["function", "event", "error"].includes(descriptor.kind)
       ? {
           exposure:
-            publicIds.has(descriptor.id) || publicErrorIds.has(descriptor.id)
+            publicIds.has(`${descriptor.kind}:${descriptor.id}`) ||
+            publicErrorIds.has(descriptor.id)
               ? ("public" as const)
               : ("internal" as const),
         }

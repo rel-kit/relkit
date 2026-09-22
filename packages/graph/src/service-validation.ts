@@ -32,6 +32,19 @@ export function validateServiceNode(
     names.add(member.name);
     validateId(member.eventId, `Graph nodes[${index}].events[${memberIndex}].eventId`);
   });
+  for (const [field, idField] of [
+    ["tasks", "taskId"],
+    ["jobs", "jobId"],
+  ] as const) {
+    if (value[field] === undefined) continue;
+    if (!Array.isArray(value[field])) fail(`Graph nodes[${index}].${field} must be an array.`);
+    value[field].forEach((member, memberIndex) => {
+      if (!isRecord(member) || !nonEmpty(member.name) || names.has(member.name))
+        fail(`Graph nodes[${index}].${field}[${memberIndex}] is invalid.`);
+      names.add(member.name);
+      validateId(member[idField], `Graph nodes[${index}].${field}[${memberIndex}].${idField}`);
+    });
+  }
   if (value.tags !== undefined && !textArray(value.tags))
     fail(`Graph nodes[${index}].tags is invalid.`);
   for (const field of ["title", "description"] as const) {

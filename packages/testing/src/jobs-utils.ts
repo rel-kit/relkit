@@ -8,7 +8,7 @@ import {
   type JobInvocationOptions,
 } from "@relkit/engine";
 import type { ProtocolId } from "@relkit/contracts";
-import type { RetryPolicy } from "@relkit/jobs";
+import type { RetryPolicy } from "@relkit/jobs/legacy";
 import { applicationFailure } from "@relkit/runtime-effect";
 import type { InvocationRunner } from "@relkit/runtime-effect";
 import type { TestFailureControls } from "./fakes.js";

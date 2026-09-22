@@ -3,11 +3,12 @@ import {
   RUNTIME_INTEGRATION_PLAN_VERSION,
   canonicalJson,
 } from "@relkit/contracts";
-import { LOCAL_SERVICE_PLAN_VERSION } from "@relkit/local-service";
 import type { JsonValue, RuntimeActivationFingerprint } from "@relkit/contracts";
 import type { ApplicationGraph } from "@relkit/graph";
+import { serverSourceOptions } from "./build-server-options.js";
 import { serverHttpSource, type ServerSourceConfiguration } from "./build-server-http.js";
 import { SERVER_INVOCATION_SOURCE } from "./build-server-invocation.js";
+import { SERVER_NATIVE_WORKER_SOURCE } from "./build-server-native-worker.js";
 import { SERVER_RUNTIME_SOURCE } from "./build-server-runtime.js";
 import { SERVER_REGISTRATION_SOURCE } from "./build-server-registration.js";
 import { SERVER_SHUTDOWN_SOURCE } from "./build-server-shutdown.js";
@@ -26,47 +27,16 @@ export function serverSource(
     maxPreviewBytes: 1_048_576,
   },
 ): string {
-  const serviceCapabilities = graph.nodes
-    .filter((node) => node.kind === "service")
-    .map((node) => node.capability?.kind);
-  const specializedImports = [
-    serviceCapabilities.includes("better-auth")
-      ? 'import { activateBetterAuthService } from "@relkit/better-auth";'
-      : undefined,
-    serviceCapabilities.includes("drizzle")
-      ? 'import { activateDrizzleService } from "@relkit/drizzle/internal";'
-      : undefined,
-  ]
-    .filter((value) => value !== undefined)
-    .join("\n");
-  const localServicesImport =
-    activation.localServicesPlanHash === undefined
-      ? ""
-      : 'import localServicesPlan from "./local-services.plan.json" with { type: "json" };';
-  const localServicesVerification =
-    activation.localServicesPlanHash === undefined
-      ? ""
-      : `if (localServicesPlan.version !== ${LOCAL_SERVICE_PLAN_VERSION}) throw new Error("Runtime local-service plan version " + String(localServicesPlan.version) + " is unsupported; rebuild with relkit build.");
-if (localServicesPlan.graphHash !== graphHash) throw new Error("Runtime local-service plan does not match the application graph; rebuild with relkit build.");
-if (artifactHash(localServicesPlan) !== activationFingerprint.localServicesPlanHash) throw new Error("Runtime local-service plan fingerprint verification failed.");`;
-  const localServicesInspectorSource =
-    activation.localServicesPlanHash === undefined
-      ? "const localServicesInspector = undefined;"
-      : `const localServicesRuntime = readLocalServiceInspectorState(process.env.RELKIT_LOCAL_SERVICE_INSPECTOR_STATE);
-const localServicesInspector = { plan: localServicesPlan, ...(localServicesRuntime === undefined ? {} : { runtime: localServicesRuntime }) };`;
-  const providerOverridesImport =
-    activation.providerOverridesGeneration === undefined
-      ? ""
-      : `import { lstatSync, readFileSync } from "node:fs";
-import { providerOverrideBindingValues } from "@relkit/local-service";`;
-  const providerOverridesSource =
-    activation.providerOverridesGeneration === undefined
-      ? "const localBindingValues = undefined;"
-      : `const providerOverridesFile = process.env.RELKIT_PROVIDER_OVERRIDES_FILE;
-if (providerOverridesFile === undefined) throw new Error("Runtime provider-override file is required.");
-const providerOverridesInfo = lstatSync(providerOverridesFile);
-if (!providerOverridesInfo.isFile() || providerOverridesInfo.isSymbolicLink()) throw new Error("Runtime provider-override file is invalid.");
-const localBindingValues = providerOverrideBindingValues(JSON.parse(readFileSync(providerOverridesFile, "utf8")), { applicationId: graph.appId, planHash: activationFingerprint.localServicesPlanHash, generationId: activationFingerprint.providerOverridesGeneration });`;
+  const {
+    specializedImports,
+    localServicesImport,
+    jobsManifestImport,
+    jobsManifestVerification,
+    localServicesVerification,
+    localServicesInspectorSource,
+    providerOverridesImport,
+    providerOverridesSource,
+  } = serverSourceOptions(graph, activation);
   return `import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 ${providerOverridesImport}
@@ -74,7 +44,7 @@ import { assertAgentRuntimeDependencies, createGeneratedAgentFunction, invokeAge
 import { createApplicationContextResolver } from "@relkit/app";
 import { resolveEnv } from "@relkit/config";
 ${specializedImports}
-import { assertRuntimeIntegrationModules, createFunctionRegistry, createProviderRegistry, invoke, materializeEvents, materializeJobs, parseInfrastructureBindingValues } from "@relkit/engine";
+import { assertRuntimeIntegrationModules, createFunctionRegistry, createProviderRegistry, createTaskExecutor, invoke, materializeEvents, materializeJobs, parseInfrastructureBindingValues } from "@relkit/engine";
 import { createRegistrationPlan } from "@relkit/graph";
 import { installInspectorEndpoints } from "@relkit/inspector-api";
 import { currentExecutionContext, publicTrace } from "@relkit/invocation";
@@ -83,9 +53,11 @@ import { consoleHumanSink, formatHumanLog, stdoutJsonSink, redactFailureDetail }
 import { createApp, createHttpAuthRuntime, createHttpSpanRuntime, instrumentHttpRequest } from "@relkit/runtime-hono";
 import { honoWebSocket, upgradeWebSocket } from "@relkit/runtime-hono/bun";
 import { createProviderRealtimeDispatcher, setActiveRealtimeDispatcher } from "@relkit/realtime";
+import { createJobsControls, createJobsRuntime, reconcileNativeSchedules, runInJobsRuntime } from "@relkit/jobs";
 import runtimeIntegrationsPlan from "./${RUNTIME_INTEGRATION_PLAN_FILE}" with { type: "json" };
 import { runtimeIntegrationModules } from "./runtime-integrations.ts";
 ${localServicesImport}
+${jobsManifestImport}
 import { runtimeManifest } from "./runtime.manifest.ts";
 
 const graph = ${canonicalJson(graph)};
@@ -95,9 +67,12 @@ const openapiDocument = ${canonicalJson(openapi)};
 const clientContractDocument = ${canonicalJson(clientContract)};
 const publicFingerprint = clientContractDocument.publicFingerprint ?? graphHash;
 const plan = createRegistrationPlan(graph);
+if (runtimeManifest.application?.compatibility?.legacyJobs !== true && plan.queues.some((node) => node.kind === "job" && (node.executionModel === undefined || node.executionModel === "legacy-function"))) throw new Error("RELKIT_LEGACY_JOBS_DISABLED");
 const artifactHash = (value) => "sha256:" + createHash("sha256").update(JSON.stringify(value) + "\\n").digest("hex");
 if (plan.graphHash !== graphHash) throw new Error("Runtime graph hash verification failed.");
 if (JSON.stringify(runtimeManifest.activationFingerprint) !== JSON.stringify(activationFingerprint)) throw new Error("Runtime activation fingerprint verification failed.");
+${jobsManifestVerification}
+const nativeJobsManifest = ${activation.jobsManifestHash === undefined ? "undefined" : "jobsManifest"};
 if (runtimeIntegrationsPlan.version !== ${RUNTIME_INTEGRATION_PLAN_VERSION}) throw new Error("Runtime integration plan version " + String(runtimeIntegrationsPlan.version) + " is unsupported; rebuild with relkit build.");
 if (runtimeIntegrationsPlan.graphHash !== graphHash) throw new Error("Runtime integration plan does not match the application graph; rebuild with relkit build.");
 if (artifactHash(runtimeIntegrationsPlan) !== activationFingerprint.runtimeIntegrationsPlanHash) throw new Error("Runtime integration plan fingerprint verification failed.");
@@ -145,13 +120,23 @@ await assertAgentRuntimeDependencies(Object.values(runtimeManifest.agents ?? {})
 const registry = createFunctionRegistry(graph, executableManifest);
 let materializedJobs;
 let jobWorker;
+let nativeJobWorker;
+let nativeJobsRuntimes = new Map();
+let nativeJobWorkerServerReady = false;
+let nativeJobWorkerReady = true;
+const nativeJobWorkerRegistrations = new Set();
+const nativeJobWorkerHandles = new Set();
+const nativeJobWorkerReadyHandles = new Set();
+const nativeJobWorkerEndpoints = new Map();
 const providerStartup = (environmentResolution.error === undefined
   ? createProviderRegistry({ generationId, graph, runtimeIntegrationModules, bindingValues: sourceValues, localBindingValues, infrastructureBindingValues, signal: shutdownController.signal })
   : Promise.reject(environmentResolution.error)).then(async (value) => {
   if ((plan.channels ?? []).length > 0) setActiveRealtimeDispatcher(createProviderRealtimeDispatcher({ applicationId: graph.appId, environment, generationId, publicFingerprint, provider: (profile) => provider(value, "realtime", profile) }));
   await materializeEvents({ plan, providerRegistry: value, engine: { invoke: invokeHttp } });
   materializedJobs = await materializeJobs({ plan, engine: { invoke: invokeHttp }, createQueue: (context) => queueProvider(value, context), spanRuntime });
-  jobWorker = startJobWorker(materializedJobs);
+  jobWorker = plan.queues.length === 0 ? undefined : startJobWorker(materializedJobs);
+  nativeJobsRuntimes = createNativeJobsRuntimes(value);
+  nativeJobWorker = startNativeJobWorker(nativeJobsRuntimes);
   await waitForProviderReady();
   providerReady = true;
   providers = value;
@@ -180,6 +165,7 @@ let stopping = false;
 ${serverHttpSource(configuration)}
 ${SERVER_INVOCATION_SOURCE}
 ${SERVER_REGISTRATION_SOURCE}
+${SERVER_NATIVE_WORKER_SOURCE}
 ${SERVER_RUNTIME_SOURCE}
 ${SERVER_SHUTDOWN_SOURCE}
 `;

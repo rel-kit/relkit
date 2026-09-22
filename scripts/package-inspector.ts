@@ -9,10 +9,7 @@ const standalone = join(build, "standalone");
 const standaloneApp = join(standalone, "apps/inspector");
 const output = join(root, "packages/cli/dist/inspector");
 const nextEnv = join(inspector, "next-env.d.ts");
-const nextEnvSource = (await readFile(nextEnv, "utf8")).replaceAll(
-  /import "\.\/[^\"]+\/types\//g,
-  'import "./.next/types/',
-);
+const nextEnvSource = await readFile(nextEnv, "utf8");
 
 const child = Bun.spawn([process.execPath, "run", "build"], {
   cwd: inspector,

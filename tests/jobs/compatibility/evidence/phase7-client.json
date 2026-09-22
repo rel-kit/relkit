@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-17",
+  "phase": "7",
+  "task": "8.13",
+  "status": "passed",
+  "browserAcceptance": {
+    "harness": "tests/jobs/compatibility/client-browser.ts",
+    "execution": "agent-browser browser-eval against the printed localhost URL",
+    "status": "passed",
+    "native": {
+      "connection": "completed",
+      "run": "completed",
+      "source": "native",
+      "watchCalls": 1,
+      "nativeReads": 1,
+      "frameBytes": 441
+    },
+    "polling": {
+      "connection": "completed",
+      "run": "completed",
+      "source": "polling",
+      "pollingReads": 2
+    },
+    "cleanup": {
+      "activeWatches": 0,
+      "browserHeapBytes": 1016720,
+      "terminalAndDisposed": true
+    },
+    "connections": [
+      "idle",
+      "connecting",
+      "connecting",
+      "connected",
+      "completed",
+      "completed",
+      "completed",
+      "disposed"
+    ]
+  },
+  "envelope": {
+    "command": "/usr/bin/time -l bun test packages/client/jobs-watch.test.ts",
+    "status": "passed",
+    "tests": 12,
+    "uniqueFeeds": 100,
+    "sharedObservers": 1000,
+    "disposeCycles": 10000,
+    "upstreamReturns": 100,
+    "cleanupBaseline": "passed; every shared feed returned and the cycle bound stayed under 5 seconds",
+    "maxResidentSetBytes": 97271808,
+    "peakMemoryFootprintBytes": 71944384,
+    "realSeconds": 0.25,
+    "userSeconds": 0.09,
+    "systemSeconds": 0.08
+  },
+  "nativeSdkFeed": {
+    "command": "bun tests/jobs/compatibility/inngest-native-phase0.ts",
+    "status": "passed",
+    "provider": "inngest",
+    "profile": "self-hosted Docker",
+    "server": "inngest/inngest:v1.44.0@sha256:169c1d84801db304ca3c2c267810c67141c8f17bf7c01557b024a9a02fe67e57",
+    "sharedFeedCleanup": {
+      "twoObserversReceiveFirstMessage": true,
+      "oneObserverCloseLeavesTheOtherAlive": true,
+      "lastObserverCloseReachesEof": true,
+      "invalidTokenRejected": true
+    },
+    "nativePolling": "per-run native reads only; no fetch-all polling",
+    "resourceLimit": "provider worker CPU/memory cgroup was not available; client RSS/CPU and browser heap are recorded above"
+  },
+  "evidenceLimit": "Managed/cloud providers and Trigger native Docker were not tested; no cloud credentials or spend were used."
+}

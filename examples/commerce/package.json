@@ -20,6 +20,7 @@
     "@relkit/client": "workspace:*",
     "@relkit/docker": "workspace:*",
     "@relkit/drizzle": "workspace:*",
+    "@relkit/inngest": "workspace:*",
     "@relkit/local": "workspace:*",
     "@relkit/otlp": "workspace:*",
     "@relkit/pulumi": "workspace:*",

@@ -1,6 +1,7 @@
 import {
   CREATE_CLOUDS,
   CREATE_DEPLOYMENTS,
+  CREATE_JOBS,
   CREATE_TEMPLATES,
   normalizeCreateOptions,
   type CreateOptions,
@@ -8,7 +9,7 @@ import {
 import { createClackPromptDriver, type PromptDriver } from "./prompt-driver.js";
 import { isValidPackageName } from "./validate.js";
 
-const VALUE_OPTIONS = new Set(["template", "cloud", "deploy", "directory"]);
+const VALUE_OPTIONS = new Set(["template", "cloud", "deploy", "jobs", "directory"]);
 
 export interface ResolveCreateContext {
   readonly json?: boolean;
@@ -45,7 +46,7 @@ export async function resolveCreateOptionsDetails(
   const output = [...args];
   const complete =
     Boolean(positional(output)) &&
-    ["template", "cloud", "deploy", "directory"].every((name) => has(output, name)) &&
+    ["template", "cloud", "deploy", "jobs", "directory"].every((name) => has(output, name)) &&
     ["examples", "install", "git"].every((name) => has(output, name) || has(output, `no-${name}`));
   let name = positional(output);
   if (!name) {
@@ -83,6 +84,17 @@ export async function resolveCreateOptionsDetails(
         initialValue: "none",
       }),
     );
+  if (!has(output, "jobs")) {
+    const selected = await prompt.select({
+      message: "Jobs service",
+      options: [
+        { value: "none", label: "None" },
+        ...CREATE_JOBS.map((value) => ({ value, label: title(value) })),
+      ],
+      initialValue: "none",
+    });
+    if (selected !== "none") output.push("--jobs", selected);
+  }
   await booleanChoice(output, prompt, "examples", "Include examples?", true);
   await booleanChoice(output, prompt, "install", "Install dependencies?", true);
   await booleanChoice(output, prompt, "git", "Initialize a Git repository?", true);

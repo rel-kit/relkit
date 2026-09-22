@@ -23,7 +23,10 @@ export async function planCreate(
     options,
     context.cwd === undefined ? {} : { cwd: context.cwd },
   );
-  const root = join(resolveTemplateRoot(context), options.template);
+  const root = join(
+    resolveTemplateRoot(context),
+    options.jobs === undefined ? options.template : "tasks",
+  );
   const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
     dependencies?: Record<string, string>;
     devDependencies?: Record<string, string>;
@@ -32,6 +35,10 @@ export async function planCreate(
   const version = dependencies["@relkit/app"] ?? "0.4.0";
   if (options.cloud === "aws") dependencies["@relkit/aws"] = version;
   if (options.deploy === "pulumi") dependencies["@relkit/pulumi"] = version;
+  if (options.jobs !== undefined) {
+    dependencies["@relkit/docker"] = version;
+    dependencies[`@relkit/${options.jobs.replace(/-docker$/u, "")}`] = version;
+  }
   const configPath = join(root, "relkit.config.ts");
   const app = readAppDiscovery(await readFile(configPath, "utf8"), configPath, root);
   const files = (await listProjectFiles(root))

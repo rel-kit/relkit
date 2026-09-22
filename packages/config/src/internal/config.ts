@@ -17,11 +17,11 @@ function makeConfig<S extends EnvShape>(
   environment: string,
 ): Config.Config<ResolvedEnv<S>> {
   const fields = Object.fromEntries(
-    Object.keys(definition.shape).map((name) => [name, Config.option(Config.string(name))]),
+    Object.keys(definition.shape).map((name) => [name, Config.option(Config.String(name))]),
   ) as Record<string, Config.Config<Option.Option<string>>>;
 
   return Config.all(fields).pipe(
-    Config.mapOrFail((raw) =>
+    Config.mapEffect((raw) =>
       Effect.try({
         try: () => resolveEnv(definition, { source: toSource(raw), environment }),
         catch: (cause) => toConfigError(cause),

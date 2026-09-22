@@ -21,6 +21,30 @@ export interface ClientStreamContract<Input = unknown, Item = unknown, Failure =
 
 export interface ClientRegistry {}
 
+export type {
+  JobContract,
+  JobClientField,
+  JobCancelInput,
+  JobFor,
+  JobGetInput,
+  JobListQuery,
+  JobListInput,
+  JobProcedureSelector,
+  JobProcedureContract,
+  JobRegistry,
+  JobRetryInput,
+  JobRunSelector,
+  JobSelector,
+  JobSnapshotFor,
+  JobStreamInput,
+  JobStreamProcedureContract,
+  JobTriggerInput,
+  JobTriggerOptions,
+  JobTriggerSelector,
+  JobWatchInput,
+  SelectedJobField,
+} from "../jobs/index.js";
+
 export interface ClientChannelContract<
   Params = unknown,
   Events extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,

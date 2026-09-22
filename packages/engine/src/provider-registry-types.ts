@@ -14,6 +14,7 @@ export interface ProviderRequirement {
   readonly profile: string;
   readonly bindingId: string;
   readonly binding: ProviderBindingNode;
+  readonly executionModel?: "task" | "legacy-function";
   readonly source?: SourceLocation;
 }
 
@@ -60,6 +61,7 @@ export type ProviderRegistryErrorCode =
   | "RELKIT_PROVIDER_READINESS_FAILED"
   | "RELKIT_PROVIDER_RELEASE_FAILED"
   | "RELKIT_PROVIDER_ABORTED"
+  | "RELKIT_PROVIDER_RUNTIME_INVALID"
   | "RELKIT_MODEL_PROVIDER_REGISTRY_INVALID"
   | "RELKIT_MODEL_PROVIDER_CONFIGURATION_INVALID"
   | "RELKIT_MODEL_PROVIDER_UNSUPPORTED"

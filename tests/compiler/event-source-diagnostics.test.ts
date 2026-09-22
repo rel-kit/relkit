@@ -10,7 +10,7 @@ test("reports source-located event function option, result, capability, and targ
     import { defineEventFunction as reaction } from "../../packages/events/src/index.js";
     import { defineError, defineFunction } from "../../packages/functions/src/index.js";
     import { Effect } from "../../packages/runtime-effect/node_modules/effect/dist/index.js";
-    import { defineJob } from "../../packages/jobs/src/index.js";
+    import { defineJob } from "../../packages/jobs/src/legacy.js";
     import { z } from "../../packages/schema/src/index.js";
     const consumer = reaction({ id: "consumer", event: "created" as never, handler: () => {} });
     consumer.invoke({});

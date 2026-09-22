@@ -42,7 +42,7 @@ export async function generateProject(
   context.onProgress?.(`Creating a new RELKIT app in ${validated.destination}.`);
 
   const templateRoot = resolveTemplateRoot(context);
-  const template = join(templateRoot, options.template);
+  const template = join(templateRoot, options.jobs === undefined ? options.template : "tasks");
   let stage: string | undefined;
   let published = false;
 

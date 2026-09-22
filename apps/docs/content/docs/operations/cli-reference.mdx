@@ -27,19 +27,20 @@ Create a new RELKIT application
 | -------- | -------- | -------------------------------- |
 | name     | optional | npm package and application name |
 
-| Option                  | Value                          | Description                         |
-| ----------------------- | ------------------------------ | ----------------------------------- |
-| --template              | minimal, api, agent, fullstack | Starter template                    |
-| --cloud                 | aws, none                      | Cloud provider                      |
-| --deploy                | pulumi, none                   | Deployment adapter                  |
-| --directory             | string                         | Destination directory               |
-| --install               | boolean                        | Install generated project setup     |
-| --no-install            | boolean                        | No install generated project setup  |
-| --git                   | boolean                        | Git generated project setup         |
-| --no-git                | boolean                        | No git generated project setup      |
-| --examples              | boolean                        | Examples generated project setup    |
-| --no-examples           | boolean                        | No examples generated project setup |
-| --force-empty-directory | boolean                        | Allow an existing empty destination |
+| Option                  | Value                                            | Description                         |
+| ----------------------- | ------------------------------------------------ | ----------------------------------- |
+| --template              | minimal, api, agent, fullstack                   | Starter template                    |
+| --cloud                 | aws, none                                        | Cloud provider                      |
+| --deploy                | pulumi, none                                     | Deployment adapter                  |
+| --jobs                  | inngest-docker, effect-mq-docker, trigger-docker | Jobs service and local recipe       |
+| --directory             | string                                           | Destination directory               |
+| --install               | boolean                                          | Install generated project setup     |
+| --no-install            | boolean                                          | No install generated project setup  |
+| --git                   | boolean                                          | Git generated project setup         |
+| --no-git                | boolean                                          | No git generated project setup      |
+| --examples              | boolean                                          | Examples generated project setup    |
+| --no-examples           | boolean                                          | No examples generated project setup |
+| --force-empty-directory | boolean                                          | Allow an existing empty destination |
 
 #### Examples
 
@@ -61,14 +62,14 @@ Create a domain service
 | -------- | -------- | ------------ |
 | name     | optional | Service name |
 
-| Option           | Value                                                                                             | Description                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| --project-root   | string                                                                                            | Application directory (defaults to cwd)                                                          |
-| --service        | string                                                                                            | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
-| --create-service | string                                                                                            | Create and use a new generic service for a domain artifact or service route                      |
-| --no-install     | boolean                                                                                           | Do not install newly required packages                                                           |
-| --full           | boolean                                                                                           | Create the complete deterministic domain bundle; exclusive with --include                        |
-| --include        | function, error, event, event-function, job, cache, bucket, tool, prompt, agent, constants, route | Artifact kind to include; repeatable                                                             |
+| Option           | Value                                                                                                   | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string                                                                                                  | Application directory (defaults to cwd)                                                          |
+| --service        | string                                                                                                  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string                                                                                                  | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean                                                                                                 | Do not install newly required packages                                                           |
+| --full           | boolean                                                                                                 | Create the complete deterministic domain bundle; exclusive with --include                        |
+| --include        | function, task, error, event, event-function, job, cache, bucket, tool, prompt, agent, constants, route | Artifact kind to include; repeatable                                                             |
 
 ##### Examples
 
@@ -93,6 +94,27 @@ Create a callable function
 ##### Examples
 
 `relkit add function` — Create a callable function
+
+#### `relkit add task [name]`
+
+Create a task artifact
+
+| Argument | Value    | Description |
+| -------- | -------- | ----------- |
+| name     | optional | Task name   |
+
+| Option           | Value              | Description                                                                                      |
+| ---------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
+| --project-root   | string             | Application directory (defaults to cwd)                                                          |
+| --service        | string             | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
+| --create-service | string             | Create and use a new generic service for a domain artifact or service route                      |
+| --no-install     | boolean            | Do not install newly required packages                                                           |
+| --version        | string             | Task semantic version (default: 1)                                                               |
+| --execution      | durable, retryable | Task execution model (default: durable)                                                          |
+
+##### Examples
+
+`relkit add task` — Create a task artifact
 
 #### `relkit add error [name]`
 
@@ -170,7 +192,7 @@ Create an unscheduled single-attempt job
 | --service        | string  | Existing generic service for domain artifacts or service routes; exclusive with --create-service |
 | --create-service | string  | Create and use a new generic service for a domain artifact or service route                      |
 | --no-install     | boolean | Do not install newly required packages                                                           |
-| --target         | string  | Callable function target                                                                         |
+| --target         | string  | Task ID; legacy callable function targets remain readable                                        |
 | --profile        | string  | Compatible profile name; otherwise reuse a default/unique profile or scaffold a local profile    |
 
 ##### Examples
@@ -592,10 +614,12 @@ Manage project-scoped local services
 
 Start all declared local services
 
-| Option         | Value   | Description                             |
-| -------------- | ------- | --------------------------------------- |
-| --project-root | string  | Application directory (defaults to cwd) |
-| --detach       | boolean | Keep services running after exit        |
+| Option                | Value   | Description                             |
+| --------------------- | ------- | --------------------------------------- |
+| --project-root        | string  | Application directory (defaults to cwd) |
+| --environment / --env | string  | Provider environment configuration      |
+| --service             | string  | Limit to one service binding            |
+| --detach              | boolean | Keep services running after exit        |
 
 ##### Examples
 
@@ -605,9 +629,11 @@ Start all declared local services
 
 Show local service and lease status
 
-| Option         | Value  | Description                             |
-| -------------- | ------ | --------------------------------------- |
-| --project-root | string | Application directory (defaults to cwd) |
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Limit to one service binding            |
 
 ##### Examples
 
@@ -617,9 +643,11 @@ Show local service and lease status
 
 Stop project local containers and preserve volumes
 
-| Option         | Value  | Description                             |
-| -------------- | ------ | --------------------------------------- |
-| --project-root | string | Application directory (defaults to cwd) |
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Limit to one service binding            |
 
 ##### Examples
 
@@ -629,14 +657,273 @@ Stop project local containers and preserve volumes
 
 Remove project local containers, volumes, and state
 
-| Option         | Value   | Description                             |
-| -------------- | ------- | --------------------------------------- |
-| --project-root | string  | Application directory (defaults to cwd) |
-| --yes          | boolean | Confirm reset without prompting         |
+| Option                | Value   | Description                                |
+| --------------------- | ------- | ------------------------------------------ |
+| --project-root        | string  | Application directory (defaults to cwd)    |
+| --environment / --env | string  | Provider environment configuration         |
+| --service             | string  | Limit to one service binding               |
+| --yes                 | boolean | Confirm reset without prompting            |
+| --dry-run             | boolean | Show owned resources without removing them |
 
 ##### Examples
 
 `relkit local reset` — Remove project local containers, volumes, and state
+
+### `relkit jobs <command>`
+
+Inspect and operate task-backed jobs
+
+#### Examples
+
+`relkit jobs` — Inspect and operate task-backed jobs
+
+#### `relkit jobs list`
+
+List compiled job definitions
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+
+##### Examples
+
+`relkit jobs list` — List compiled job definitions
+
+#### `relkit jobs runs <command>`
+
+Inspect accepted job runs
+
+##### Examples
+
+`relkit jobs runs` — Inspect accepted job runs
+
+##### `relkit jobs runs list`
+
+List runs with native filters
+
+| Option                | Value                                                                          | Description                             |
+| --------------------- | ------------------------------------------------------------------------------ | --------------------------------------- |
+| --project-root        | string                                                                         | Application directory (defaults to cwd) |
+| --environment / --env | string                                                                         | Provider environment configuration      |
+| --service             | string                                                                         | Jobs service profile                    |
+| --job                 | string                                                                         | Job name or ID                          |
+| --task-id             | string                                                                         | Task ID                                 |
+| --status              | accepted, running, sleeping, retrying, completed, failed, cancelled, timed-out | Run status                              |
+| --from                | string                                                                         | Lower time bound                        |
+| --to                  | string                                                                         | Upper time bound                        |
+| --tag                 | string                                                                         | Run tag; repeatable                     |
+| --tag-match           | all, any                                                                       | Tag matching mode                       |
+| --limit               | integer                                                                        | Rows (1-100)                            |
+| --cursor              | string                                                                         | Opaque page cursor                      |
+
+###### Examples
+
+`relkit jobs runs list` — List runs with native filters
+
+##### `relkit jobs runs get`
+
+Read one run
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --run-id              | string | Opaque run locator                      |
+
+###### Examples
+
+`relkit jobs runs get` — Read one run
+
+##### `relkit jobs runs watch`
+
+Watch one run as newline-delimited frames
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --run-id              | string | Opaque run locator                      |
+| --after               | string | Resume cursor                           |
+
+###### Examples
+
+`relkit jobs runs watch` — Watch one run as newline-delimited frames
+
+#### `relkit jobs trigger`
+
+Submit validated task input
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --job                 | string | Job name or ID                          |
+| --input-file          | string | JSON input file                         |
+| --idempotency-key     | string | External idempotency key                |
+| --operation-id        | string | Stable operation ID                     |
+| --delay               | string | Readable delay                          |
+| --at                  | string | RFC3339 scheduled time                  |
+
+##### Examples
+
+`relkit jobs trigger` — Submit validated task input
+
+#### `relkit jobs cancel`
+
+Cancel one run
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --run-id              | string | Opaque run locator                      |
+| --operation-id        | string | Required control operation ID           |
+| --reason              | string | Cancellation reason                     |
+
+##### Examples
+
+`relkit jobs cancel` — Cancel one run
+
+#### `relkit jobs retry`
+
+Retry one terminal run
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --run-id              | string | Opaque run locator                      |
+| --operation-id        | string | Required control operation ID           |
+
+##### Examples
+
+`relkit jobs retry` — Retry one terminal run
+
+#### `relkit jobs capabilities`
+
+Show provider capability reports
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+
+##### Examples
+
+`relkit jobs capabilities` — Show provider capability reports
+
+#### `relkit jobs schedules <command>`
+
+Administer native schedules
+
+##### Examples
+
+`relkit jobs schedules` — Administer native schedules
+
+##### `relkit jobs schedules list`
+
+List schedules
+
+| Option                | Value   | Description                             |
+| --------------------- | ------- | --------------------------------------- |
+| --project-root        | string  | Application directory (defaults to cwd) |
+| --environment / --env | string  | Provider environment configuration      |
+| --service             | string  | Jobs service profile                    |
+| --job                 | string  | Job name or ID                          |
+| --limit               | integer | Rows (1-100)                            |
+| --cursor              | string  | Opaque page cursor                      |
+
+###### Examples
+
+`relkit jobs schedules list` — List schedules
+
+##### `relkit jobs schedules get`
+
+Read one schedule
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --schedule-id         | string | Schedule ID                             |
+
+###### Examples
+
+`relkit jobs schedules get` — Read one schedule
+
+##### `relkit jobs schedules upsert`
+
+Create or update a schedule
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --schedule-id         | string | Schedule ID                             |
+| --definition-file     | string | JSON definition file                    |
+| --operation-id        | string | Stable operation ID                     |
+
+###### Examples
+
+`relkit jobs schedules upsert` — Create or update a schedule
+
+##### `relkit jobs schedules pause`
+
+Pause a schedule
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --schedule-id         | string | Schedule ID                             |
+| --operation-id        | string | Stable operation ID                     |
+
+###### Examples
+
+`relkit jobs schedules pause` — Pause a schedule
+
+##### `relkit jobs schedules resume`
+
+Resume a schedule
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --schedule-id         | string | Schedule ID                             |
+| --operation-id        | string | Stable operation ID                     |
+
+###### Examples
+
+`relkit jobs schedules resume` — Resume a schedule
+
+##### `relkit jobs schedules delete`
+
+Delete a schedule
+
+| Option                | Value  | Description                             |
+| --------------------- | ------ | --------------------------------------- |
+| --project-root        | string | Application directory (defaults to cwd) |
+| --environment / --env | string | Provider environment configuration      |
+| --service             | string | Jobs service profile                    |
+| --schedule-id         | string | Schedule ID                             |
+| --operation-id        | string | Stable operation ID                     |
+
+###### Examples
+
+`relkit jobs schedules delete` — Delete a schedule
 
 ### `relkit doctor`
 

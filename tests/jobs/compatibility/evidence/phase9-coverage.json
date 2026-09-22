@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-20",
+  "phase": "9",
+  "task": "10.18",
+  "status": "passed",
+  "scope": {
+    "description": "Focused validation, binding, and watch implementation modules; unrelated jobs runtime modules are excluded from this gate.",
+    "deferred": ["Trigger native/provider acceptance", "Pulumi, AWS, and managed-cloud evidence"]
+  },
+  "toolchain": {
+    "branchCoverage": {
+      "runner": "Vitest 5.0.1",
+      "provider": "@vitest/coverage-v8 5.0.1",
+      "runtime": "Node v24.12.0",
+      "reason": "Bun 1.3.10 does not emit branch records; Vitest V8 supplies branch coverage on the compatible Node runtime."
+    },
+    "mutation": {
+      "runner": "Stryker 10.0.0",
+      "bunRunner": "@hughescr/stryker-bun-runner 1.4.0",
+      "runtime": "Bun 1.3.10"
+    }
+  },
+  "result": {
+    "testsPassed": 70,
+    "testsFailed": 0,
+    "sourceModules": 12,
+    "functions": { "covered": 87, "total": 89, "percent": 97.75 },
+    "lines": { "covered": 499, "total": 513, "percent": 97.27 },
+    "branches": { "covered": 502, "total": 554, "percent": 90.61 },
+    "statements": { "covered": 554, "total": 583, "percent": 95.02 }
+  },
+  "transitionAndErrorCoverage": {
+    "status": "passed",
+    "evidence": [
+      "packages/client/jobs-watch.test.ts",
+      "packages/client/jobs-watch-quality.test.ts",
+      "packages/client/pending.test.ts",
+      "packages/jobs/jobs-quality.test.ts",
+      "packages/jobs/resolve-binding.test.ts",
+      "packages/jobs/task-policy.test.ts",
+      "packages/jobs/task-wire.test.ts",
+      "packages/jobs/schedule-reconciliation.test.ts",
+      "packages/jobs/authorization.test.ts",
+      "packages/jobs/authorization-cursor.test.ts"
+    ]
+  },
+  "mutation": {
+    "status": "passed",
+    "total": 818,
+    "killed": 536,
+    "timeout": 4,
+    "survived": 249,
+    "noCoverage": 29,
+    "errors": 0,
+    "mutationScore": 66.01,
+    "semanticGate": {
+      "tenantChecks": "18/35 killed",
+      "abortCleanup": "11/22 killed",
+      "staleEpochs": "25/60 killed",
+      "invalidPolicyConversion": "29/34 killed",
+      "retryBudgetMultiplication": "25/31 killed",
+      "durationConversion": "49/69 killed"
+    },
+    "verification": "scripts/jobs-coverage/verify-mutation.ts"
+  },
+  "commands": ["bun run test:jobs:coverage", "bun run test:jobs:mutation"],
+  "nextAction": "Rerun the focused quality gate when validation, binding, or watch modules change."
+}

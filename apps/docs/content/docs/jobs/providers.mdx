@@ -1,0 +1,33 @@
+---
+title: Provider comparison
+description: Compare the three job adapters without hiding provider-specific limits.
+---
+
+The three advertised adapters share the task/job contract, but their native guarantees remain different.
+The selected binding and deployment environment are authoritative.
+
+<include cwd lang="ts" meta='title="examples/commerce/relkit.config.ts"'>
+  ../../examples/commerce/relkit.config.ts
+</include>
+
+<include cwd lang="json" meta='title="tests/jobs/compatibility/evidence/capability-matrix.json"'>
+  ../../tests/jobs/compatibility/evidence/capability-matrix.json
+</include>
+
+| Capability             | Inngest            | Trigger.dev        | Effect MQ                               |
+| ---------------------- | ------------------ | ------------------ | --------------------------------------- |
+| Durable task execution | Native Docker path | Provider-dependent | Not advertised by the retryable profile |
+| Retryable execution    | Native Docker path | Provider-dependent | Native PostgreSQL path                  |
+| Run reads and controls | Native subset      | Provider-dependent | Native adapter subset                   |
+| Durable sleep          | Supported path     | Not claimed        | Unsupported                             |
+| UTC cron               | Supported path     | Provider-dependent | Configured path                         |
+| Managed cloud evidence | Not tested         | Not tested         | Unsupported                             |
+
+Read the [Inngest](/docs/jobs/providers/inngest), [Trigger.dev](/docs/jobs/providers/trigger), and
+[Effect MQ](/docs/jobs/providers/effect-mq) guides before selecting a capability. `relkit jobs capabilities`
+reports the binding's actual limits; the compiler rejects a task that requires an unproven capability.
+
+The [evidence matrix](https://github.com/rel-kit/relkit/blob/main/tests/jobs/compatibility/evidence/capability-matrix.json)
+keeps unsupported and not-tested variants explicit. Local structural tests do not certify a provider server.
+
+<include cwd>content/generated/related/jobs-providers.mdx</include>

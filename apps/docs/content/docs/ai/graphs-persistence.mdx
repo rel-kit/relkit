@@ -7,6 +7,10 @@ Use `defineGraph` when the workflow's nodes and routes are application logic rat
 RelKit registers the declared topology and compiles a native LangGraph while preserving native reducers,
 parallel scheduling, conditional edges, loops, `Send`, subgraphs, retry behavior, and pending writes.
 
+Agent graph state and checkpoint resources remain the authority for graph continuation. A task may invoke an
+agent, but task retries do not silently replace the graph's thread or checkpoint identity; use the existing
+agent continuation contract.
+
 ## Define state and control flow
 
 The commerce review graph runs two branches, joins them, loops once, interrupts for a boolean, and returns

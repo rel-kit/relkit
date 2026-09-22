@@ -47,6 +47,7 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
         [],
         [
           "function",
+          "task",
           "error",
           "event",
           "event-function",
@@ -63,6 +64,16 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
       ),
     ]),
     named("function", "Create a callable function", [internal]),
+    named("task", "Create a task artifact", [
+      option("version", "string", "Task semantic version (default: 1)"),
+      option(
+        "execution",
+        "choice",
+        "Task execution model (default: durable)",
+        [],
+        ["durable", "retryable"],
+      ),
+    ]),
     named("error", "Create an internal typed error"),
     named("event", "Create an event contract", [internal, profile]),
     named("event-function", "Create an event-only function", [
@@ -77,7 +88,7 @@ export const addHelp = command("add", "Add a compile-ready artifact", "relkit ad
       profile,
     ]),
     named("job", "Create an unscheduled single-attempt job", [
-      option("target", "string", "Callable function target"),
+      option("target", "string", "Task ID; legacy callable function targets remain readable"),
       profile,
     ]),
     named("cache", "Create a cache descriptor and compatible profile", [

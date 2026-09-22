@@ -5,10 +5,24 @@ import {
   CONTRACT_VERSION,
   type JsonValue,
 } from "@relkit/contracts";
+import { JOBS_PROTOCOL, JOBS_PROTOCOL_VERSION } from "@relkit/contracts/jobs";
 import type { AgentNode, ApplicationGraph, ChannelNode } from "@relkit/graph";
 import { agentContractType } from "./generate-agent-contract-types.js";
 import { clientRoutes, type ClientRoute } from "./generate-types.js";
 import { schemaType } from "./generate-schema.js";
+import { jobProcedureDocument, jobProcedureSources } from "./generate-job-procedures.js";
+import { generateJobRegistry, generateJobRegistryFromDocument } from "./generate-job-registry.js";
+import { publicManifest } from "./generate-public-manifest.js";
+import {
+  agentDocumentType,
+  arrayRecords,
+  channelDocumentType,
+  isRecord,
+  publicAgents,
+  publicChannels,
+  selector,
+} from "./generate-registry-support.js";
+export { publicManifest } from "./generate-public-manifest.js";
 export function publicFingerprint(graph: ApplicationGraph): string {
   const source = canonicalJson(publicManifest(graph) as unknown as JsonValue);
   return `sha256:${createHash("sha256").update(source).digest("hex")}`;
@@ -45,7 +59,11 @@ export function generateClientRegistryFromDocument(document: Record<string, unkn
       ? [`    readonly ${JSON.stringify(agent.id)}: ${agentDocumentType(agent)};`]
       : [],
   );
-  return registrySource(entries, channels, agents);
+  const jobs = Array.isArray(document.jobs) ? document.jobs : [];
+  return [
+    registrySource(entries, channels, agents),
+    ...(jobs.length === 0 ? [] : [generateJobRegistryFromDocument(jobs)]),
+  ].join("");
 }
 export function generateClientRegistry(graph: ApplicationGraph): string {
   const entries = clientRoutes(graph).flatMap((route) => {
@@ -61,7 +79,11 @@ export function generateClientRegistry(graph: ApplicationGraph): string {
   const agents = publicAgents(graph).map(
     (agent) => `    readonly ${JSON.stringify(agent.id)}: ${agentRegistryType(agent)};`,
   );
-  return registrySource(entries, channels, agents);
+  const jobs = jobProcedureSources(graph);
+  return [
+    registrySource(entries, channels, agents),
+    ...(jobs.length === 0 ? [] : [generateJobRegistry(graph)]),
+  ].join("");
 }
 function registrySource(entries: string[], channels: string[], agents: string[]): string {
   return [
@@ -114,86 +136,4 @@ function registryType(route: ClientRoute): string {
     return `import("@relkit/client/react").ClientStreamContract<${input}, ${schemaType(output.item)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
   }
   return `import("@relkit/client/react").ClientRouteContract<${input}, ${schemaType(output)}, ${error}> & { readonly operation: ${JSON.stringify(operation)} }`;
-}
-
-export function publicManifest(graph: ApplicationGraph): object {
-  return {
-    protocol: "relkit.client-manifest",
-    version: CONTRACT_VERSION,
-    capabilities: { agentStream: AGENT_PROTOCOL_CAPABILITY },
-    routes: clientRoutes(graph).map((route) => ({
-      routeId: route.trigger.id,
-      selector: selector(route),
-      functionId: route.target.id,
-      operation:
-        route.trigger.config.client === false
-          ? "query"
-          : (route.trigger.config.client?.operation ?? "query"),
-      stream:
-        route.target.output !== null &&
-        typeof route.target.output === "object" &&
-        !Array.isArray(route.target.output) &&
-        (route.target.output as Record<string, unknown>).kind === "stream",
-    })),
-    channels: publicChannels(graph).map((node) => ({
-      id: node.id,
-      client: node.client,
-      params: node.params,
-      events: node.events,
-      presence: node.presence ?? null,
-    })),
-    agents: publicAgents(graph).map((node) => ({
-      id: node.id,
-      client: node.client,
-      controls: node.controls ?? [],
-      chat: node.chat ?? null,
-      input: node.input,
-      output: node.output,
-      ...(node.workflow === undefined ? {} : { workflow: node.workflow }),
-      ...(node.clientContract === undefined ? {} : { clientContract: node.clientContract }),
-    })),
-  };
-}
-
-function channelDocumentType(channel: Record<string, unknown>): string {
-  const events = isRecord(channel.events)
-    ? Object.entries(channel.events)
-        .map(([name, schema]) => `${JSON.stringify(name)}: ${schemaType(schema)}`)
-        .join("; ")
-    : "";
-  const presence =
-    channel.presence === "count"
-      ? 'import("@relkit/client/react").CountPresence'
-      : isRecord(channel.presence) && channel.presence.member !== undefined
-        ? `import("@relkit/client/react").MemberPresence<${schemaType(channel.presence.member)}>`
-        : "never";
-  return `import("@relkit/client/react").ClientChannelContract<${schemaType(channel.params)}, { ${events} }, ${presence}>`;
-}
-
-function agentDocumentType(agent: Record<string, unknown>): string {
-  return agentContractType(agent);
-}
-
-function arrayRecords(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value) ? value.filter(isRecord) : [];
-}
-
-function publicChannels(graph: ApplicationGraph): readonly ChannelNode[] {
-  return graph.nodes.filter(
-    (node): node is ChannelNode => node.kind === "channel" && node.client !== "internal",
-  );
-}
-
-function publicAgents(graph: ApplicationGraph): readonly AgentNode[] {
-  return graph.nodes.filter(
-    (node): node is AgentNode => node.kind === "agent" && node.client !== undefined,
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function selector(route: ClientRoute): string {
-  return `${route.trigger.config.method} ${route.trigger.config.path}`;
 }

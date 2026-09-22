@@ -20,6 +20,13 @@ export function validateEventCompatibility(work: NormalizationWork): void {
       }
     }
     if (descriptor.kind === "function") validateEventFunction(work, descriptor);
+    if (descriptor.kind === "task") {
+      validatePublishes(
+        work,
+        descriptor,
+        isRecord(descriptor.value) ? descriptor.value.publishes : undefined,
+      );
+    }
     if (descriptor.kind === "event-trigger") validateEventTrigger(work, descriptor);
   }
 }
@@ -77,13 +84,14 @@ export function validatePublishes(
   descriptor: NormalizedDescriptor,
   publishes: unknown,
 ): void {
+  const owner = descriptor.kind === "task" ? "Task" : "Function";
   if (publishes === undefined) return;
   if (!Array.isArray(publishes)) {
     add(
       work,
       descriptor,
       NORMALIZE_CODES.publishes,
-      `Function "${descriptor.id}" publishes must be an array.`,
+      `${owner} "${descriptor.id}" publishes must be an array.`,
     );
     return;
   }
@@ -94,7 +102,7 @@ export function validatePublishes(
         work,
         descriptor,
         NORMALIZE_CODES.publishes,
-        `Function "${descriptor.id}" publishes unknown event "${String(entry)}".`,
+        `${owner} "${descriptor.id}" publishes unknown event "${String(entry)}".`,
         "error",
         undefined,
         "Use a registered event ID in publishes.",
@@ -106,7 +114,7 @@ export function validatePublishes(
         work,
         descriptor,
         NORMALIZE_CODES.publishesDuplicate,
-        `Function "${descriptor.id}" publishes event "${entry}" more than once.`,
+        `${owner} "${descriptor.id}" publishes event "${entry}" more than once.`,
         "error",
         undefined,
         `Remove the duplicate "${entry}" entry from publishes.`,

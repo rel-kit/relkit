@@ -1,8 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
+import { defineApp } from "../../packages/app/src/define-app.ts";
+import { defineEnv } from "../../packages/config/src/index.ts";
 import { defineEvent, defineEventFunction } from "../../packages/events/src/index.ts";
 import { defineFunction } from "../../packages/functions/src/index.ts";
-import { defineJob } from "../../packages/jobs/src/index.ts";
+import { defineJob as defineLegacyJob } from "../../packages/jobs/src/legacy.ts";
+import { defineJob, defineTask } from "../../packages/jobs/src/index.ts";
 import { defineRoute, http } from "../../packages/routes/src/index.ts";
 import { z } from "../../packages/schema/src/index.ts";
 import { hashGraph as canonicalGraphHash } from "../../packages/graph/src/index.ts";
@@ -11,6 +14,7 @@ import {
   VALIDATION_PASSES,
   normalizeCompilation,
 } from "../../packages/compiler/src/index.ts";
+import { localJob } from "../../integrations/packages/local/src/index.ts";
 
 const input = z.object({ id: z.string() });
 const output = z.object({ ok: z.boolean() });
@@ -23,7 +27,7 @@ function values() {
     handler: async () => ({ ok: true }),
   });
   const event = defineEvent({ id: "orders.created", version: 1, input: input });
-  const job = defineJob({
+  const job = defineLegacyJob({
     id: "orders.refresh",
     input,
     target,
@@ -44,6 +48,58 @@ function values() {
     delivery: "ephemeral",
   });
   return [target, event, job, route, trigger] as const;
+}
+
+function taskFirstJobWithProfile() {
+  const task = defineTask({
+    id: "orders.refresh",
+    version: "1",
+    input,
+    output,
+    handler: async () => ({ ok: true }),
+  });
+  const job = defineJob({ name: "refreshOrders", task, profile: "default" });
+  return {
+    descriptor: job,
+    exportName: "refreshOrders",
+    exportKind: "named" as const,
+    source: { file: "src/orders/jobs/refresh.job.ts", line: 1, column: 1 },
+    exportFact: {
+      position: 0,
+      binding: "refreshOrders",
+      factory: {
+        binding: "refreshOrders",
+        factory: "defineJob",
+        kind: "job" as const,
+        idOptional: true,
+        id: "omitted" as const,
+        position: 0,
+        options: ["name", "task", "profile"],
+      },
+    },
+  };
+}
+
+function legacyJobValues(legacyJobs: boolean) {
+  const target = defineFunction({
+    id: "orders.get",
+    input,
+    output,
+    handler: async () => ({ ok: true }),
+  });
+  const app = defineApp({
+    id: "app",
+    env: defineEnv({}),
+    jobs: localJob(),
+    compatibility: { legacyJobs },
+  });
+  const job = defineLegacyJob({
+    id: "orders.refresh",
+    input,
+    target,
+    retry: { maxAttempts: 2, initialDelayMs: 1, maxDelayMs: 5, multiplier: 2, jitter: "none" },
+  });
+  return [app, target, job] as const;
 }
 
 describe("compiler normalization", () => {
@@ -70,6 +126,33 @@ describe("compiler normalization", () => {
     expect(codes).toContain(NORMALIZE_CODES.collision);
     expect(duplicate.outputs.manifest).toBe("");
     expect(duplicate.activatable).toBe(false);
+  });
+
+  test("requires an explicit compatibility opt-in for legacy jobs", () => {
+    const disabled = normalizeCompilation({ descriptors: legacyJobValues(false) });
+    expect(disabled.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
+    expect(disabled.activatable).toBe(false);
+
+    const enabled = normalizeCompilation({ descriptors: legacyJobValues(true) });
+    expect(enabled.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
+  });
+
+  test("treats the task-first profile spelling as a warning, not legacy execution", () => {
+    const result = normalizeCompilation({ extracted: [taskFirstJobWithProfile()] });
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        code: NORMALIZE_CODES.jobProfile,
+        severity: "warning",
+      }),
+    );
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+      NORMALIZE_CODES.legacyJobs,
+    );
+    expect(result.activatable).toBe(true);
   });
 
   test("sorts canonical graph bytes independently of descriptor enumeration", () => {

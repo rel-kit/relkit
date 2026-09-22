@@ -1,14 +1,5 @@
 import { extractDescriptors } from "./discovery/extract.js";
-import {
-  id,
-  isRecord,
-  locationFor,
-  method,
-  path,
-  positive,
-  profile,
-  text,
-} from "./normalize-utils.js";
+import { id, isRecord, locationFor, profile, text } from "./normalize-utils.js";
 import {
   add,
   isDescriptorLike,
@@ -17,16 +8,14 @@ import {
   toDescriptor,
   validateRetry,
 } from "./normalize-pass-utils.js";
-import { validateJob } from "./normalize-job-validation.js";
 import { bindRouteFile } from "./normalize-route-file.js";
 import { inferRouteContract } from "./normalize-route-inference.js";
-import { validateRateLimit } from "./normalize-rate-limit.js";
 import { normalizeEventFunctions } from "./normalize-event-function.js";
 import { normalizeSourceIdentities } from "./normalize-source-identities.js";
 import { NORMALIZE_CODES, type NormalizationWork } from "./normalize-types.js";
 import { normalizeSelector } from "./normalize-model-selection.js";
-import { isMiddlewarePath } from "./middleware-coverage.js";
-import { validateDomains } from "./normalize-domains.js";
+import { discoverTaskJobs } from "./jobs/discover.js";
+export { passLocal } from "./normalize-pass-local.js";
 
 export { passSchemas } from "./normalize-schema-validation.js";
 
@@ -67,7 +56,9 @@ export function passNormalize(work: NormalizationWork): void {
         add(work, descriptor, NORMALIZE_CODES.id, "Descriptor ID is not a valid stable ID.");
       value.id = nextId ?? descriptor.id;
       if (descriptor.kind === "route") inferRouteContract(work, descriptor, value);
-      for (const key of ["profile"] as const) {
+      const profileKeys =
+        descriptor.kind === "job" ? (["profile", "service"] as const) : (["profile"] as const);
+      for (const key of profileKeys) {
         if (value[key] !== undefined) {
           const nextProfile = profile(value[key]);
           if (nextProfile === undefined) {
@@ -103,64 +94,7 @@ export function passNormalize(work: NormalizationWork): void {
       return { ...descriptor, id: nextId ?? descriptor.id, value };
     }),
   );
-}
-
-export function passLocal(work: NormalizationWork): void {
-  if (work.input.sources !== undefined) validateDomains(work);
-  for (const descriptor of work.descriptors) {
-    const value = isRecord(descriptor.value) ? descriptor.value : {};
-    if (!isDescriptorLike(descriptor)) {
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.descriptor,
-        "Exported value is not a RelKit descriptor.",
-      );
-      continue;
-    }
-    if (descriptor.kind === "route") {
-      if (method(value.method) === undefined)
-        add(work, descriptor, NORMALIZE_CODES.method, "HTTP method is invalid.");
-      if (path(value.path) === undefined)
-        add(work, descriptor, NORMALIZE_CODES.path, "HTTP path is invalid.");
-      validateRateLimit(work, descriptor, value.rateLimit);
-    }
-    if (descriptor.kind === "middleware" && !isMiddlewarePath(value.path)) {
-      add(work, descriptor, NORMALIZE_CODES.path, "Middleware path is invalid.");
-    }
-    if (descriptor.kind === "job" || descriptor.kind === "event-trigger")
-      validateRetry(work, descriptor, value, descriptor.kind === "job");
-    if (descriptor.kind === "job") validateJob(work, descriptor, value);
-    if (descriptor.kind === "function" && value.invocationMode === "event-only") {
-      for (const field of ["input", "output", "tool", "trigger"] as const) {
-        if (descriptor.exportFact?.factory?.options.includes(field)) {
-          add(
-            work,
-            descriptor,
-            NORMALIZE_CODES.eventFunctionOption,
-            `Event function "${descriptor.id}" cannot declare ${field}.`,
-            "error",
-            undefined,
-            `Remove ${field}; the event contract supplies input and successful output is void.`,
-          );
-        }
-      }
-    }
-    if (descriptor.kind === "event" && !positive(value.version))
-      add(
-        work,
-        descriptor,
-        NORMALIZE_CODES.descriptor,
-        "Event version must be a positive integer.",
-      );
-    if (
-      descriptor.kind === "agent" &&
-      (!positive(value.limits?.maxSteps) ||
-        !positive(value.limits?.maxToolCalls) ||
-        !positive(value.limits?.timeoutMs))
-    )
-      add(work, descriptor, NORMALIZE_CODES.descriptor, "Agent limits must be positive integers.");
-  }
+  discoverTaskJobs(work);
 }
 
 export { passIndex } from "./normalize-reference-index.js";

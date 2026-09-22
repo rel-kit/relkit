@@ -1,4 +1,5 @@
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "@relkit/contracts";
+import { inspectorEndpointsSource } from "./build-server-http-inspector.js";
 
 export interface ServerSourceConfiguration {
   readonly maxBodyBytes: number;
@@ -49,6 +50,7 @@ const app = createApp({
   clientIdentity: {
     applicationId: graph.appId,
     publicFingerprint,
+    ...((plan.jobs ?? []).length === 0 ? {} : { jobs: { protocol: "relkit.jobs", version: 1 } }),
     resolve: ({ request, session }) => resolveClientIdentityRegistration(request, session),
   },
   transportSecurity: transportSecurityRegistration(),
@@ -84,6 +86,20 @@ const app = createApp({
       trustedContext: ({ request, auth }) => ({ request, auth }),
     },
   }),
+  ...((plan.jobs ?? []).length === 0 ? {} : {
+    jobs: {
+      runtimes: () => nativeJobsRuntimes,
+      descriptors: runtimeManifest.jobs,
+      tasks: runtimeManifest.tasks,
+      application: graph.appId,
+      environment,
+      publicFingerprint,
+      protocolVersion: 1,
+      ...(process.env.RELKIT_JOBS_CURSOR_SECRET === undefined
+        ? {}
+        : { cursorSecret: process.env.RELKIT_JOBS_CURSOR_SECRET }),
+    },
+  }),
   mcp: { enabled: ${String(configuration.mcp)} },
   staticFiles: { root: process.env.RELKIT_PUBLIC_ROOT ?? new URL("../public", import.meta.url).pathname },
   rateLimitRuntime: { resolveStore: resolveRateLimitStore },
@@ -105,53 +121,12 @@ const app = createApp({
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
     readiness: () => ({
-      ready: providerReady && databaseReady && authReady && !stopping,
+      ready: providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping,
       ...(stopping ? { reason: "stopping" } : providerFailed || specializedFailed ? { reason: "unavailable" } : {}),
     }),
   },
 });
-installInspectorEndpoints(app, {
-  mode: environment,
-  enabled: internalEndpointsEnabled,
-  ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
-    ? {}
-    : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),
-  activeGeneration: {
-    generationId,
-    graphHash,
-    activationFingerprint,
-    graph,
-    diagnostics: [],
-    integrations: runtimeIntegrationsPlan,
-    localServices: localServicesInspector,
-    telemetry: () => ({
-      sampling: telemetryConfiguration?.exportSampling ?? {},
-      counters: telemetry.exportCounters(),
-      exporters: telemetry.exporterStats(),
-    }),
-    actions: {
-      functions: {
-        exists: (functionId) => registry.has(functionId),
-        invoke: (request) => invokeHttp({ functionId: request.functionId, input: request.input, source: "direct", ...(request.signal === undefined ? {} : { signal: request.signal }) }),
-      },
-    },
-    resources: {
-      buckets: {
-        supports: (bucketId) => supportsInspector("bucket", plan.buckets, bucketId, "list", "preview"),
-        list: async ({ bucketId, ...request }) => (await resourceInspector("bucket", plan.buckets, bucketId)).list(request),
-        preview: async ({ bucketId, ...request }) => (await resourceInspector("bucket", plan.buckets, bucketId)).preview(request),
-      },
-      cache: {
-        supports: (cacheId) => supportsInspector("cache", plan.caches, cacheId, "scan", "value"),
-        scan: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).scan(request),
-        value: async ({ cacheId, ...request }) => (await resourceInspector("cache", plan.caches, cacheId)).value(request),
-      },
-    },
-  },
-  maxPreviewBytes: ${configuration.maxPreviewBytes},
-  query: telemetry.query,
-  stream: telemetry.stream,
-});
+${inspectorEndpointsSource(configuration)}
 const server = Bun.serve({
   hostname: "0.0.0.0",
   port: Number(process.env.PORT ?? 3000),
@@ -160,9 +135,11 @@ const server = Bun.serve({
     const path = new URL(request.url).pathname;
     if (path === "/_relkit/v1/health/live") return healthResponse("ok");
     if (path === "/_relkit/v1/health/ready")
-      return healthResponse(providerReady && databaseReady && authReady && !stopping ? "ready" : "not-ready", providerReady && databaseReady && authReady && !stopping ? 200 : 503);
+      return healthResponse(providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? "ready" : "not-ready", providerReady && nativeJobWorkerReady && databaseReady && authReady && !stopping ? 200 : 503);
     if (stopping) return Response.json({ error: "draining" }, { status: 503 });
-    if (!providerReady || !databaseReady || !authReady)
+    const nativeWorker = nativeJobHandler(request);
+    if (nativeWorker !== undefined) return await nativeWorker;
+    if (!providerReady || !nativeJobWorkerReady || !databaseReady || !authReady)
       return Response.json({ error: "not-ready" }, { status: 503 });
     try {
       return await app.fetch(request, bunServer);
@@ -170,5 +147,7 @@ const server = Bun.serve({
       return Response.json({ error: "internal-error" }, { status: 500 });
     }
   }),
-});`;
+});
+nativeJobWorkerServerReady = true;
+void readyNativeJobWorkers();`;
 }

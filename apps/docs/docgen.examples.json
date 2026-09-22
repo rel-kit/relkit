@@ -9,6 +9,13 @@
     "noUncheckedIndexedAccess": true,
     "paths": {
       "@relkit/app/*": ["../../packages/app/src/*.ts"],
+      "@relkit/app/jobs": ["../../packages/app/src/jobs.ts"],
+      "@relkit/app/tasks": ["../../packages/app/src/tasks.ts"],
+      "@relkit/client/jobs": ["../../packages/client/src/jobs/index.ts"],
+      "@relkit/contracts/jobs": ["../../packages/contracts/src/jobs.ts"],
+      "@relkit/jobs/adapter": ["../../packages/jobs/src/adapter.ts"],
+      "@relkit/jobs/server": ["../../packages/jobs/src/server.ts"],
+      "@relkit/jobs/legacy": ["../../packages/jobs/src/legacy.ts"],
       "@relkit/*": ["../../packages/*/src/index.ts", "../../integrations/packages/*/src/index.ts"],
       "drizzle-orm/*": ["../../packages/drizzle/node_modules/drizzle-orm/*"]
     },

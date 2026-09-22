@@ -1,4 +1,4 @@
-import type { RetryPolicy } from "./define-job.js";
+import type { RetryPolicy } from "./legacy-define-job.js";
 
 export function validateRetry(value: RetryPolicy): RetryPolicy {
   if (!isRecord(value)) throw new TypeError("Job retry policy is required");

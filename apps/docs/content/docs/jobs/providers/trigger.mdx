@@ -1,0 +1,10 @@
+---
+title: Trigger.dev
+description: Use the Trigger.dev integration and its native worker publication.
+---
+
+The Trigger.dev integration exports a provider-native worker publication mechanism and records the task/build/service-generation identity used by deployment. Configure it with a `jobs.default` binding from the [Docker guide](/docs/jobs/docker).
+
+Retry, observation, and run controls depend on the selected Trigger environment. Docker checkpointing and durable sleep are not claimed by the current integration; use `relkit jobs capabilities` before relying on a long pause or checkpoint resume.
+
+Keep worker deployment and definition registration staged. A readiness failure must leave the previous generation active, and a previous build must remain available while it owns runs.

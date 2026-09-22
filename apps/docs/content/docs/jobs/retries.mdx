@@ -3,6 +3,9 @@ title: Retries and delivery
 description: Classify retryable failures, bound attempts and delays, and understand leases, timeouts, concurrency, and terminal failure.
 ---
 
+> Legacy compatibility page. The retry and delivery model below applies to function-target jobs in the
+> one-release compatibility path. For new work, put retry policy on [the task](/docs/jobs/tasks).
+
 A queued job can run more than once. A worker may complete the external side effect and stop before
 acknowledging it; recovery can deliver the same work again. Retry limits do not turn delivery into
 exactly-once execution. Make the target safe to repeat as well as configuring queue policy.
@@ -79,5 +82,3 @@ Add tests for a retryable declared error, a terminal error, exhausted attempts, 
 handler succeeds but before acknowledgement. Advance the harness clock rather than sleeping. Check both
 queue state and the external side effect, not just how many times a mock was called. See the
 [Testing API](/docs/api/testing) for the harness controls.
-
-<include cwd>content/generated/related/jobs-retries.mdx</include>
