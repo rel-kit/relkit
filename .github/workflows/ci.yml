@@ -5,6 +5,14 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
+  workflow_dispatch:
+    inputs:
+      verified_sha:
+        required: true
+        type: string
+      ci_run_id:
+        required: true
+        type: string
 
 permissions: {}
 
@@ -20,14 +28,17 @@ jobs:
   select-release-mode:
     name: Select release mode
     if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.head_repository.full_name == github.repository &&
-      (github.event.workflow_run.event == 'push' ||
-       github.event.workflow_run.event == 'workflow_dispatch')
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       github.event.workflow_run.event == 'push') ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
+      actions: read
       contents: read
     outputs:
       mode: ${{ steps.changesets.outputs.mode }}
@@ -39,10 +50,27 @@ jobs:
           ref: main
       - name: Require the verified main commit
         env:
-          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha || inputs.verified_sha }}
         run: |
           test "$GITHUB_SHA" = "$VERIFIED_SHA"
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
+      - name: Require a successful CI run for the dispatched commit
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          VERIFIED_SHA: ${{ inputs.verified_sha }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN_ID" |
+            jq -e --arg sha "$VERIFIED_SHA" --arg repo "$GITHUB_REPOSITORY" '
+              .name == "CI" and
+              .path == ".github/workflows/checks.yml" and
+              .head_branch == "main" and
+              .head_repository.full_name == $repo and
+              .head_sha == $sha and
+              .status == "completed" and
+              .conclusion == "success"
+            '
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -71,7 +99,7 @@ jobs:
           ref: main
       - name: Require the verified main commit
         env:
-          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
+          VERIFIED_SHA: ${{ github.sha }}
         run: |
           test "$GITHUB_SHA" = "$VERIFIED_SHA"
           test "$(git rev-parse HEAD)" = "$VERIFIED_SHA"
@@ -101,7 +129,12 @@ jobs:
           for attempt in {1..120}; do
             state="$(gh pr view "$pr_number" --json state --jq .state)"
             if test "$state" = MERGED; then
-              gh workflow run checks.yml --ref main
+              sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+              run_id="$(gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/checks.yml/dispatches" -f ref=main -F return_run_details=true --jq .workflow_run_id)"
+              test -n "$run_id"
+              gh run watch "$run_id" --exit-status
+              test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" --jq .head_sha)" = "$sha"
+              gh workflow run ci.yml --ref main -f verified_sha="$sha" -f ci_run_id="$run_id"
               exit 0
             fi
             test "$state" = OPEN
@@ -123,7 +156,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
@@ -137,7 +170,7 @@ jobs:
         run: node --experimental-strip-types scripts/publish-release.ts --directory "$RUNNER_TEMP/npm-release"
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: npm-release-${{ github.event.workflow_run.head_sha }}
+          name: npm-release-${{ github.sha }}
           path: ${{ runner.temp }}/npm-release
           if-no-files-found: error
           retention-days: 3
@@ -159,13 +192,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.sha }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: npm-release-${{ github.event.workflow_run.head_sha }}
+          name: npm-release-${{ github.sha }}
           path: npm-release
       - name: Pin the npm trusted-publishing client
         run: npm install --global npm@11.19.0
@@ -174,14 +207,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NPM_RELEASES_ENABLED: ${{ vars.NPM_RELEASES_ENABLED }}
           GITHUB_REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
-          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
           node --experimental-strip-types scripts/publish-release.ts --directory npm-release --publish
       - name: Publish the immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+          RELEASE_SHA: ${{ github.sha }}
         run: |
           version="$(jq -r .version npm-release/manifest.json)"
           tag="v$version"

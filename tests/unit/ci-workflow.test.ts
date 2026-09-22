@@ -27,7 +27,17 @@ test("fast CI gates merges and only green main runs start releases", async () =>
   expect(release).toContain(
     "github.event.workflow_run.head_repository.full_name == github.repository",
   );
-  expect(release).toContain("gh workflow run checks.yml --ref main");
+  expect(release).toContain("github.event.workflow_run.event == 'push'");
+  expect(release).toContain("github.ref == 'refs/heads/main'");
+  expect(release).toContain('.conclusion == "success"');
+  expect(release).toContain(".head_sha == $sha");
+  expect(release).toContain("ref: ${{ github.sha }}");
+  expect(release).not.toContain("needs.select-release-mode.outputs.sha");
+  expect(release).toContain("return_run_details=true");
+  expect(release).toContain('gh run watch "$run_id" --exit-status');
+  expect(release).toContain(
+    'gh workflow run ci.yml --ref main -f verified_sha="$sha" -f ci_run_id="$run_id"',
+  );
   expect(release).toContain("--ci-pack --output");
   expect(release).toContain("needs.pack.result == 'success'");
   expect(release).not.toContain("aws-cloud");
