@@ -12,7 +12,6 @@ import { databaseGuideGroup, databaseGuideRelations } from "./database-guide-cat
 import { authGuideGroup, authGuideRelations } from "./auth-guide-catalog.js";
 import { clientGuideGroup, clientGuideRelations } from "./client-guide-catalog.js";
 import { realtimeGuideGroup, realtimeGuideRelations } from "./realtime-guide-catalog.js";
-
 export const guideGroups = [
   group("start", "Start", "Rocket", [
     "create-an-app",
@@ -56,7 +55,6 @@ export const guideGroups = [
     "cli-reference",
   ]),
 ] as const;
-
 const relations = [
   relation("index", ["app", "routes", "testing"], ["templates/default/v1/api/README.md"]),
   relation("start/create-an-app", ["app", "config"], ["templates/default/v1/api/README.md"]),
@@ -65,16 +63,32 @@ const relations = [
     ["functions", "routes"],
     ["templates/default/v1/api/src/routes/orders/route.ts"],
   ),
-  relation("start/save-orders", ["drizzle", "functions"], ["examples/data-model/src/database/service.ts"]),
-  relation("start/protect-orders", ["better-auth", "drizzle"], ["examples/auth-drizzle/src/auth/service.ts"]),
-  relation("start/test-orders", ["testing", "routes"], ["templates/default/v1/api/tests/integration/orders.route.test.ts"]),
+  relation(
+    "start/save-orders",
+    ["drizzle", "functions"],
+    ["examples/data-model/src/database/service.ts"],
+  ),
+  relation(
+    "start/protect-orders",
+    ["better-auth", "drizzle"],
+    ["examples/auth-drizzle/src/auth/service.ts"],
+  ),
+  relation(
+    "start/test-orders",
+    ["testing", "routes"],
+    ["templates/default/v1/api/tests/integration/orders.route.test.ts"],
+  ),
   relation(
     "start/local-development",
     ["app", "routes"],
     ["templates/default/v1/api/relkit.config.ts"],
   ),
   relation("start/build-and-run", ["app", "routes"], ["templates/default/v1/api/package.json"]),
-  relation("start/add-artifacts", ["services", "functions", "routes"], ["templates/default/v1/api/src/orders/service.ts"]),
+  relation(
+    "start/add-artifacts",
+    ["services", "functions", "routes"],
+    ["templates/default/v1/api/src/orders/service.ts"],
+  ),
   relation(
     "fundamentals/index",
     ["app", "functions", "schema"],
@@ -154,20 +168,18 @@ const relations = [
     ["templates/default/v1/api/package.json"],
   ),
 ] as const;
-
 export const guideRelations = relations.map((item) => ({
   ...item,
   next: startJourney.includes(item.path as (typeof startJourney)[number])
-    ? startJourney[startJourney.indexOf(item.path as (typeof startJourney)[number]) + 1] ?? "fundamentals/index"
+    ? (startJourney[startJourney.indexOf(item.path as (typeof startJourney)[number]) + 1] ??
+      "fundamentals/index")
     : item.path === "index"
       ? "start/create-an-app"
       : undefined,
 }));
-
 function group(directory: string, title: string, icon: string, pages: readonly string[]) {
   return { directory, title, icon, pages };
 }
-
 function relation(path: string, api: readonly ApiPackage[], examples: readonly string[]) {
   return { path, api, examples };
 }

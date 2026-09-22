@@ -5,10 +5,8 @@ import { features } from "../scripts/feature-catalog.js";
 import { renderRelated } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { httpGuideGroup } from "../scripts/http-guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `http/${page}.mdx`), "utf8");
-
 test("connects Service to HTTP Routes without changing existing HTTP guide URLs", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
     "start",
@@ -23,7 +21,9 @@ test("connects Service to HTTP Routes without changing existing HTTP guide URLs"
     pages: httpGuideGroup.pages,
   });
   expect(guideRelations.find(({ path }) => path === "service/first-service")?.next).toBeUndefined();
-  expect(renderRelated(guideRelations.find(({ path }) => path === "service/first-service")!)).not.toContain("Next step");
+  expect(
+    renderRelated(guideRelations.find(({ path }) => path === "service/first-service")!),
+  ).not.toContain("Next step");
   expect(features.find(({ id }) => id === "http")?.guide).toBe("http/define");
   for (const page of httpGuideGroup.pages) {
     const source = read(page);
@@ -32,7 +32,6 @@ test("connects Service to HTTP Routes without changing existing HTTP guide URLs"
     if (page !== "index") expect(read("index")).toContain(`](/docs/http/${page})`);
   }
 });
-
 test("teaches the Orders HTTP boundary with executable starter source and tests", () => {
   const tutorial = read("first-route");
   for (const path of [
@@ -49,7 +48,6 @@ test("teaches the Orders HTTP boundary with executable starter source and tests"
   expect(tutorial).toContain("HTTP `422`");
   expect(tutorial).toContain("test harness");
 });
-
 test("documents raw and RPC boundaries without promising REST-only policies on RPC", () => {
   expect(read("raw-handlers")).toContain("named export `ALL`");
   expect(read("raw-handlers")).toContain("OpenAPI and generated-client operation");

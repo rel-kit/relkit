@@ -4,7 +4,6 @@ import { z } from "@relkit/schema";
 import { handleTestRequest } from "./src/application-http.ts";
 import { createTestRuntime, type TestRuntime } from "./src/runtime.ts";
 import type { TestRoute } from "./src/application-routes.ts";
-
 test("maps inferred declared errors in the in-process HTTP harness", async () => {
   const unavailable = defineError({
     id: "orders.unavailable",
@@ -30,14 +29,12 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
     ],
   };
   const runtime: TestRuntime = createTestRuntime();
-
   try {
     const response = await handleTestRequest(
       [route],
       runtime,
       new Request("http://relkit.test/orders"),
     );
-
     expect(response.status).toBe(500);
     expect(await response.json()).toMatchObject({
       code: unavailable.id,
@@ -48,7 +45,6 @@ test("maps inferred declared errors in the in-process HTTP harness", async () =>
     await runtime.close();
   }
 });
-
 test("maps HTTP data into function input without exposing the request", async () => {
   let observedInput: unknown;
   let observedContext: unknown;
@@ -70,7 +66,6 @@ test("maps HTTP data into function input without exposing the request", async ()
     responses: [{ kind: "success", status: 200 }],
   };
   const runtime: TestRuntime = createTestRuntime();
-
   try {
     const response = await handleTestRequest(
       [route],
@@ -81,7 +76,6 @@ test("maps HTTP data into function input without exposing the request", async ()
         body: '{"value":"ready"}',
       }),
     );
-
     expect(response.status).toBe(200);
     expect(observedInput).toEqual({ value: "ready" });
     expect((observedContext as Record<string, unknown>).request).toBeUndefined();
@@ -89,7 +83,6 @@ test("maps HTTP data into function input without exposing the request", async ()
     await runtime.close();
   }
 });
-
 test("returns validation 422 for invalid function input", async () => {
   const target = defineFunction({
     id: "orders.create",
@@ -109,11 +102,15 @@ test("returns validation 422 for invalid function input", async () => {
   };
   const runtime = createTestRuntime();
   try {
-    const response = await handleTestRequest([route], runtime, new Request("http://relkit.test/orders", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: '{"quantity":0}',
-    }));
+    const response = await handleTestRequest(
+      [route],
+      runtime,
+      new Request("http://relkit.test/orders", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: '{"quantity":0}',
+      }),
+    );
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({ error: "validation" });
   } finally {

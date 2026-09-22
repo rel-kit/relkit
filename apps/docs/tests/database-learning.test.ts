@@ -5,10 +5,8 @@ import { apiPackages } from "../scripts/documentation-catalog.js";
 import { databaseGuideGroup } from "../scripts/database-guide-catalog.js";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `database/${page}.mdx`), "utf8");
-
 test("connects Database guides and the generated Drizzle reference", () => {
   const groups = guideGroups.map(({ directory }) => directory);
   expect(groups.slice(groups.indexOf("jobs"), groups.indexOf("storage") + 1)).toEqual([
@@ -25,7 +23,9 @@ test("connects Database guides and the generated Drizzle reference", () => {
   expect(apiPackages).toContain("drizzle");
   expect(features.find(({ id }) => id === "database")?.guide).toBe("database/index");
   expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
-  expect(guideRelations.find(({ path }) => path === "database/first-database")?.next).toBeUndefined();
+  expect(
+    guideRelations.find(({ path }) => path === "database/first-database")?.next,
+  ).toBeUndefined();
   for (const page of databaseGuideGroup.pages) {
     const source = read(page);
     expect((source.match(/^## .+$/gm) ?? []).length).toBeGreaterThanOrEqual(2);
@@ -33,7 +33,6 @@ test("connects Database guides and the generated Drizzle reference", () => {
     if (page !== "index") expect(read("index")).toContain(`](/docs/database/${page})`);
   }
 });
-
 test("uses application workflows and Drizzle Kit rather than SQL bootstrap or test snippets", () => {
   const tutorial = read("first-database");
   expect(tutorial).toContain("existing RELKIT app");
@@ -68,7 +67,6 @@ test("uses application workflows and Drizzle Kit rather than SQL bootstrap or te
   );
   expect(service).not.toMatch(/\.exec\(|create table/i);
 });
-
 test("states validation, override, transaction, and lifecycle boundaries", () => {
   expect(read("index")).toContain("MongoDB and Prisma integrations are planned");
   expect(read("index")).not.toContain("defineDrizzleService");
@@ -81,7 +79,6 @@ test("states validation, override, transaction, and lifecycle boundaries", () =>
   expect(read("transactions")).toContain("ordinary operations outside the helper are not gated");
   expect(read("testing")).toContain("closing it does not currently remove the cache");
 });
-
 test("explains generated data shapes and Better Auth's native-client boundary", () => {
   const schemas = read("generated-schemas");
   for (const name of [

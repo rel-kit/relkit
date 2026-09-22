@@ -21,19 +21,19 @@ Replace `src/database/schema/index.ts` with one Orders table. `orderId` is the u
 will not become anyone's private orders automatically.
 
 <include cwd lang="ts" meta='title="src/database/schema/index.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/database/schema/index.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/database/schema/index.ts
 </include>
 
 Use Bun's SQLite driver in `src/database/service.ts`. Replace the scaffolded service with:
 
 <include cwd lang="ts" meta='title="src/database/service.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/database/service.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/database/service.ts
 </include>
 
 Replace `src/platform/env.ts` to keep the existing log-level setting and add the SQLite file path:
 
 <include cwd lang="ts" meta='title="src/platform/env.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/platform/env.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/platform/env.ts
 </include>
 
 Update `tsconfig.json` so TypeScript loads the context registry produced by `relkit check`.
@@ -41,7 +41,7 @@ Keep the starter's `@app/*` alias; the complete config below adds the generated 
 and includes the migration script.
 
 <include cwd lang="json" meta='title="tsconfig.json"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/tsconfig.json
+  ../../apps/docs/examples/orders-tutorial/steps/database/tsconfig.json
 </include>
 
 Create the ignored `.env` file with the SQLite path. The same path will be loaded when you
@@ -59,7 +59,7 @@ The existing `createOrder` function already validates input and calls `priceOrde
 Orders table. The response now includes the original `quantity` as well as the price.
 
 <include cwd lang="ts" meta='title="src/orders/functions/create-order.function.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/orders/functions/create-order.function.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/functions/create-order.function.ts
 </include>
 
 ## Add a read operation
@@ -68,20 +68,20 @@ Create `src/orders/functions/get-order.function.ts` to look up a saved row by `o
 It returns `found: false` when there is no row, so callers receive no fabricated order.
 
 <include cwd lang="ts" meta='title="src/orders/functions/get-order.function.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/orders/functions/get-order.function.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/functions/get-order.function.ts
 </include>
 
 Replace `src/orders/service.ts` to expose that operation alongside the existing two functions:
 
 <include cwd lang="ts" meta='title="src/orders/service.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/orders/service.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/orders/service.ts
 </include>
 
 Create `src/routes/orders/[orderId]/route.ts`. Its directory supplies the URL parameter;
 the named `GET` export selects the public `getOrder` member.
 
 <include cwd lang="ts" meta='title="src/routes/orders/[orderId]/route.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/src/routes/orders/[orderId]/route.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/src/routes/orders/[orderId]/route.ts
 </include>
 
 ## Migrate, run, and check
@@ -90,7 +90,7 @@ Replace the scaffolded `drizzle.config.ts` with this configuration. It refuses a
 in-memory path so the migration cannot quietly target the wrong database.
 
 <include cwd lang="ts" meta='title="drizzle.config.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/drizzle.config.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/drizzle.config.ts
 </include>
 
 Generate and review the initial SQL migration, then apply it and start the app:
@@ -99,7 +99,7 @@ Drizzle Kit's `migrate` command currently selects `better-sqlite3` in this Bun p
 Create `scripts/migrate.ts` to apply generated SQL with the Bun SQLite driver used by the app:
 
 <include cwd lang="ts" meta='title="scripts/migrate.ts"'>
-  ../../apps/docs/examples/orders-tutorial/steps/persistence/scripts/migrate.ts
+  ../../apps/docs/examples/orders-tutorial/steps/database/scripts/migrate.ts
 </include>
 
 ```sh title="Terminal — relkit-orders"

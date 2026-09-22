@@ -10,7 +10,6 @@ import {
   type SelectInvocation,
 } from "./cli-command-shared.js";
 import { runCommands } from "./cli-command-jobs-runs.js";
-
 export function jobsCommand(select: SelectInvocation) {
   const list = command(select, "list", [optionalString, optionalString, optionalString]);
   const runs = runCommands(select);
@@ -42,9 +41,7 @@ export function jobsCommand(select: SelectInvocation) {
     ["jobs"],
   );
 }
-
 type FlagFactory = typeof optionalString;
-
 function command(select: SelectInvocation, name: "list", factories: readonly FlagFactory[]) {
   const path = ["jobs", name] as const;
   return document(
@@ -68,7 +65,6 @@ function command(select: SelectInvocation, name: "list", factories: readonly Fla
     path,
   );
 }
-
 function scheduleList(select: SelectInvocation) {
   const path = ["jobs", "schedules", "list"] as const;
   return document(
@@ -87,7 +83,6 @@ function scheduleList(select: SelectInvocation) {
     path,
   );
 }
-
 function scheduleGet(select: SelectInvocation) {
   const path = ["jobs", "schedules", "get"] as const;
   return document(
@@ -104,7 +99,6 @@ function scheduleGet(select: SelectInvocation) {
     path,
   );
 }
-
 function scheduleWrite(select: SelectInvocation, name: "upsert" | "pause" | "resume" | "delete") {
   const path = ["jobs", "schedules", name] as const;
   const fields = {
@@ -122,7 +116,6 @@ function scheduleWrite(select: SelectInvocation, name: "upsert" | "pause" | "res
     path,
   );
 }
-
 function simple(
   select: SelectInvocation,
   name: "trigger" | "cancel" | "retry" | "capabilities",
@@ -139,10 +132,11 @@ function simple(
     path,
   );
 }
-
 function serialize(value: Readonly<Record<string, unknown>>): readonly string[] {
   return Object.entries(value).flatMap(([name, raw]) => {
-    const option = name.replaceAll("_", "-").replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    const option = name
+      .replaceAll("_", "-")
+      .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
     if (Array.isArray(raw)) return raw.flatMap((entry) => [`--${option}`, String(entry)]);
     if (Option.isOption(raw) && Option.isSome(raw)) return [`--${option}`, String(raw.value)];
     return raw === true ? [`--${option}`] : [];

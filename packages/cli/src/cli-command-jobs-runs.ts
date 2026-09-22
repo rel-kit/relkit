@@ -8,13 +8,11 @@ import {
   repeatedString,
   type SelectInvocation,
 } from "./cli-command-shared.js";
-
 export function runCommands(select: SelectInvocation) {
   return Command.make("runs").pipe(
     Command.withSubcommands([runList(select), runGet(select), runWatch(select)]),
   );
 }
-
 function runList(select: SelectInvocation) {
   const path = ["jobs", "runs", "list"] as const;
   return document(
@@ -39,7 +37,6 @@ function runList(select: SelectInvocation) {
     path,
   );
 }
-
 function runGet(select: SelectInvocation) {
   const path = ["jobs", "runs", "get"] as const;
   return document(
@@ -56,7 +53,6 @@ function runGet(select: SelectInvocation) {
     path,
   );
 }
-
 function runWatch(select: SelectInvocation) {
   const path = ["jobs", "runs", "watch"] as const;
   return document(
@@ -74,10 +70,11 @@ function runWatch(select: SelectInvocation) {
     path,
   );
 }
-
 function serialize(value: Readonly<Record<string, unknown>>): readonly string[] {
   return Object.entries(value).flatMap(([name, raw]) => {
-    const option = name.replaceAll("_", "-").replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    const option = name
+      .replaceAll("_", "-")
+      .replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
     if (Array.isArray(raw)) return raw.flatMap((entry) => [`--${option}`, String(entry)]);
     if (Option.isOption(raw) && Option.isSome(raw)) return [`--${option}`, String(raw.value)];
     return raw === true ? [`--${option}`] : [];

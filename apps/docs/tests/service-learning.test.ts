@@ -4,10 +4,8 @@ import { resolve } from "node:path";
 import { features } from "../scripts/feature-catalog.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { serviceGuideGroup } from "../scripts/service-guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `service/${page}.mdx`), "utf8");
-
 test("introduces Service after Core concepts with source-backed, connected guides", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 5)).toEqual([
     "start",
@@ -21,7 +19,9 @@ test("introduces Service after Core concepts with source-backed, connected guide
     icon: "Boxes",
     pages: serviceGuideGroup.pages,
   });
-  expect(guideRelations.find(({ path }) => path === "fundamentals/environment")?.next).toBeUndefined();
+  expect(
+    guideRelations.find(({ path }) => path === "fundamentals/environment")?.next,
+  ).toBeUndefined();
   expect(features.find(({ id }) => id === "services")?.guide).toBe("service/define");
   for (const page of serviceGuideGroup.pages) {
     const source = read(page);
@@ -29,7 +29,6 @@ test("introduces Service after Core concepts with source-backed, connected guide
     expect(source).toContain(`content/generated/related/service-${page}.mdx`);
   }
 });
-
 test("routes code-placement questions into existing capability and HTTP guides", () => {
   const organization = read("organization");
   for (const path of [
@@ -59,7 +58,6 @@ test("routes code-placement questions into existing capability and HTTP guides",
   }
   expect(routes).not.toContain("](/docs/routes");
 });
-
 test("walks through the Orders service using the executable API starter", () => {
   const tutorial = read("first-service");
   for (const path of [

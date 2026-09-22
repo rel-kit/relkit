@@ -5,10 +5,8 @@ import { features } from "../scripts/feature-catalog.js";
 import { renderRelated } from "../scripts/generate-guides.js";
 import { guideGroups, guideRelations } from "../scripts/guide-catalog.js";
 import { jobsGuideGroup } from "../scripts/jobs-guide-catalog.js";
-
 const content = resolve(import.meta.dir, "../content/docs");
 const read = (page: string) => readFileSync(resolve(content, `jobs/${page}.mdx`), "utf8");
-
 test("connects Jobs between Events and Database with source-backed guides", () => {
   expect(guideGroups.map(({ directory }) => directory).slice(0, 7)).toEqual([
     "start",
@@ -25,7 +23,9 @@ test("connects Jobs between Events and Database with source-backed guides", () =
     pages: jobsGuideGroup.pages,
   });
   expect(guideRelations.find(({ path }) => path === "events/first-event")?.next).toBeUndefined();
-  expect(renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!)).not.toContain("Next step");
+  expect(
+    renderRelated(guideRelations.find(({ path }) => path === "events/first-event")!),
+  ).not.toContain("Next step");
   expect(guideRelations.find(({ path }) => path === "jobs/troubleshooting")?.next).toBeUndefined();
   expect(features.find(({ id }) => id === "jobs")?.guide).toBe("jobs/quickstart");
   expect(features.find(({ id }) => id === "schedules")?.guide).toBe("jobs/schedules");
@@ -36,7 +36,6 @@ test("connects Jobs between Events and Database with source-backed guides", () =
       expect(read("index")).toContain(`](/docs/jobs/${page})`);
   }
 });
-
 test("teaches task admission and completion using executable documentation sources", () => {
   const tutorial = read("quickstart");
   for (const path of [
@@ -51,7 +50,6 @@ test("teaches task admission and completion using executable documentation sourc
   expect(tutorial).toContain("bun run typecheck");
   expect(read("migration")).toContain("task-first definition");
 });
-
 test("states current retry, overlap, and provider limits without exactly-once promises", () => {
   expect(read("retries-and-idempotency")).toContain("three attempts");
   expect(read("retries-and-idempotency")).toContain("cannot multiply");
@@ -59,7 +57,6 @@ test("states current retry, overlap, and provider limits without exactly-once pr
   expect(read("schedules")).toContain("does not cancel runs already accepted");
   expect(read("providers")).toContain("Managed cloud evidence");
 });
-
 test("provider guides show configuration, real input, registration, and native run evidence", () => {
   for (const provider of ["inngest", "effect-mq", "trigger"]) {
     const page = read(`providers/${provider}`);

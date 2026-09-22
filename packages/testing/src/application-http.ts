@@ -2,7 +2,6 @@ import type { TestRoute } from "./application-routes.js";
 import { InvocationValidationError } from "@relkit/engine";
 import { normalizeFailure, toPublicEnvelope } from "@relkit/runtime-effect";
 import type { TestRuntime } from "./runtime.js";
-
 export async function handleTestRequest(
   routes: readonly TestRoute[],
   runtime: TestRuntime,
@@ -32,15 +31,22 @@ export async function handleTestRequest(
       : response;
   } catch (error) {
     if (error instanceof InvocationValidationError && error.phase === "input") {
-      const status = matched.responses.find((response) => response.kind === "validation-error")?.status ?? 422;
-      return Response.json({
-        error: "validation",
-        issues: error.issues.map((issue) => ({
-          code: "validation",
-          message: issue.message.slice(0, 500),
-          path: issue.path?.map((part) => typeof part === "object" && part !== null && "key" in part ? part.key : part) ?? [],
-        })),
-      }, { status });
+      const status =
+        matched.responses.find((response) => response.kind === "validation-error")?.status ?? 422;
+      return Response.json(
+        {
+          error: "validation",
+          issues: error.issues.map((issue) => ({
+            code: "validation",
+            message: issue.message.slice(0, 500),
+            path:
+              issue.path?.map((part) =>
+                typeof part === "object" && part !== null && "key" in part ? part.key : part,
+              ) ?? [],
+          })),
+        },
+        { status },
+      );
     }
     const failure = normalizeFailure(error);
     if (failure.kind === "application") {
@@ -65,7 +71,6 @@ export async function handleTestRequest(
     );
   }
 }
-
 function mapInput(
   mapping: unknown,
   url: URL,
@@ -108,7 +113,6 @@ function mapInput(
   if (mapping.kind === "transform") return mapInput(mapping.value, url, params, request, body);
   throw new TypeError(`Unsupported test HTTP mapping: ${String(mapping.kind)}`);
 }
-
 async function readBody(request: Request): Promise<unknown> {
   if (request.headers.get("content-type")?.startsWith("multipart/form-data")) {
     return request.formData();
@@ -121,7 +125,6 @@ async function readBody(request: Request): Promise<unknown> {
     return text;
   }
 }
-
 function cookie(header: string | null, name: string): string | undefined {
   const encoded = header
     ?.split(";")
@@ -135,7 +138,6 @@ function cookie(header: string | null, name: string): string | undefined {
     return encoded;
   }
 }
-
 function match(path: string, url: URL): Record<string, string | readonly string[]> | undefined {
   const expected = path.split("/").filter(Boolean);
   const actual = url.pathname.split("/").filter(Boolean);
@@ -155,11 +157,9 @@ function match(path: string, url: URL): Record<string, string | readonly string[
   }
   return actual.length === expected.length ? params : undefined;
 }
-
 function valueAt(value: unknown, name: string): unknown {
   return isRecord(value) ? value[name] : undefined;
 }
-
 function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

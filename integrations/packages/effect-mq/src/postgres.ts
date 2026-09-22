@@ -10,7 +10,6 @@ import {
   mqQueueControl,
   mqSchedules,
 } from "effect-mq/drizzle-postgres";
-
 export interface EffectMqPostgresSchema {
   readonly jobs: ReturnType<typeof mqJobs>;
   readonly attempts: ReturnType<typeof mqJobAttempts>;
@@ -20,7 +19,6 @@ export interface EffectMqPostgresSchema {
   readonly flowChildren: ReturnType<typeof mqFlowChildren>;
   readonly flowOutbox: ReturnType<typeof mqFlowOutbox>;
 }
-
 export function createEffectMqPostgresSchema(prefix = "effect_mq_jobs"): EffectMqPostgresSchema {
   if (!/^[a-z][a-z0-9_]{2,62}$/u.test(prefix))
     throw new TypeError("effect-mq table prefix is invalid");
@@ -35,7 +33,6 @@ export function createEffectMqPostgresSchema(prefix = "effect_mq_jobs"): EffectM
     flowOutbox: mqFlowOutbox(),
   });
 }
-
 /** Creates the native PostgreSQL store layer; migrations remain owned by this service. */
 export function createEffectMqPostgresLayer(
   postgresUrl: string,
@@ -52,8 +49,10 @@ export function createEffectMqPostgresLayer(
     types.register(
       oid,
       {
-        encode: (value: Date | number) => PgTypes.encode(value instanceof Date ? value.getTime() : value, oid),
-        decode: (bytes) => Result.map(PgTypes.decode(bytes, oid, 1), (value) => new Date(Number(value))),
+        encode: (value: Date | number) =>
+          PgTypes.encode(value instanceof Date ? value.getTime() : value, oid),
+        decode: (bytes) =>
+          Result.map(PgTypes.decode(bytes, oid, 1), (value) => new Date(Number(value))),
       },
       { arrayOid },
     );
@@ -61,5 +60,4 @@ export function createEffectMqPostgresLayer(
   const pg = PgClient.layer({ url: Redacted.make(postgresUrl), types });
   return DrizzleJobStore.layer(schema).pipe(Layer.provide(pg));
 }
-
 export const runEffectMq = Effect.runPromise;

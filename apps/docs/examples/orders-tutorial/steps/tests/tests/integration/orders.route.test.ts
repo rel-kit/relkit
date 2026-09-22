@@ -7,7 +7,6 @@ import { createTestApplication } from "@relkit/testing";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import config from "../../relkit.config.js";
-
 test("orders persist and remain private to their owner", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-orders-guide-"));
   const path = join(root, "orders.sqlite");
@@ -15,7 +14,9 @@ test("orders persist and remain private to their owner", async () => {
   process.env.BETTER_AUTH_SECRET = "isolated-test-secret-never-use-in-production-12345";
   const sqlite = new Database(path);
   try {
-    await migrate(drizzle({ client: sqlite }), { migrationsFolder: resolve(import.meta.dir, "../../drizzle") });
+    await migrate(drizzle({ client: sqlite }), {
+      migrationsFolder: resolve(import.meta.dir, "../../drizzle"),
+    });
   } finally {
     sqlite.close();
   }
@@ -41,8 +42,12 @@ test("orders persist and remain private to their owner", async () => {
     });
     expect(created.status).toBe(201);
     expect(await created.json()).toMatchObject({ totalCents: 900 });
-    expect(await (await app.http.get("/orders/order-1", { headers: alice })).json()).toMatchObject({ found: true });
-    expect(await (await app.http.get("/orders/order-1", { headers: bob })).json()).toEqual({ found: false });
+    expect(await (await app.http.get("/orders/order-1", { headers: alice })).json()).toMatchObject({
+      found: true,
+    });
+    expect(await (await app.http.get("/orders/order-1", { headers: bob })).json()).toEqual({
+      found: false,
+    });
     const invalid = await app.http.post("/orders", {
       headers: { ...headers, ...alice },
       body: JSON.stringify({ orderId: "bad", sku: "book", quantity: 0 }),

@@ -14,11 +14,7 @@ export default defineFunction({
       .optional(),
   }),
   handler: async ({ orderId }, context) => {
-    const session = await context.auth.getSession();
-    if (session === null) throw new Error("Authentication required");
-    const row = await context.database.orders.findOne({
-      where: { orderId, ownerId: session.user.id },
-    });
+    const row = await context.database.orders.findOne({ where: { orderId } });
     return row === null
       ? { found: false }
       : {

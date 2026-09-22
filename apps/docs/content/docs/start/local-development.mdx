@@ -12,12 +12,12 @@ temporary source error, repairs it, and checks the active app.
 
 ## Know the local surfaces
 
-| Surface | Default address | What it shows |
-| --- | --- | --- |
-| Backend | `http://localhost:3000` | Your Orders routes |
-| Inspector | `http://localhost:3210` | Functions, routes, requests, logs, and diagnostics |
-| HTTP reference | `http://localhost:3000/_relkit/v1/api-reference` | Generated endpoint contracts |
-| Readiness | `http://localhost:3000/_relkit/v1/health/ready` | Whether the active generation can serve |
+| Surface        | Default address                                  | What it shows                                      |
+| -------------- | ------------------------------------------------ | -------------------------------------------------- |
+| Backend        | `http://localhost:3000`                          | Your Orders routes                                 |
+| Inspector      | `http://localhost:3210`                          | Functions, routes, requests, logs, and diagnostics |
+| HTTP reference | `http://localhost:3000/_relkit/v1/api-reference` | Generated endpoint contracts                       |
+| Readiness      | `http://localhost:3000/_relkit/v1/health/ready`  | Whether the active generation can serve            |
 
 Start `bun run dev` and open the Inspector. Choose **Routes**, then `POST /orders` to see the
 public function it targets. Open **Functions** and find the Orders pricing and creation
@@ -27,10 +27,17 @@ The commerce demo below shows the same **Routes** navigation item and **Open rou
 you will use in your app:
 
 <div className="dark:hidden">
-  <ImageZoom src={inspectorLight} alt="Inspector Routes page in light mode, with Orders routes and Open route controls" />
+  <ImageZoom
+    src={inspectorLight}
+    alt="Inspector Routes page in light mode, with Orders routes and Open route controls"
+  />
 </div>
+
 <div className="hidden dark:block">
-  <ImageZoom src={inspectorDark} alt="Inspector Routes page in dark mode, with Orders routes and Open route controls" />
+  <ImageZoom
+    src={inspectorDark}
+    alt="Inspector Routes page in dark mode, with Orders routes and Open route controls"
+  />
 </div>
 
 ## See a failed reload safely
@@ -56,7 +63,6 @@ previous generation to keep serving.
 Open the HTTP reference above and find `POST /orders` and `GET /orders/{orderId}`. Compare
 their methods, paths, and request shapes with the source. The checked graph and OpenAPI files
 under `.relkit/generated` are useful for diagnosis; repair source, then rerun `check`.
-
 `bun run check`, `bun run typecheck`, and `bun run test` cover different concerns: graph
 relationships, TypeScript types, and behavior.
 

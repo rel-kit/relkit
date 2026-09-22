@@ -18,6 +18,12 @@
     "forceConsistentCasingInFileNames": true
   },
   "files": [".relkit/generated/context-registry.d.ts"],
-  "include": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "drizzle.config.ts", "relkit.config.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "drizzle.config.ts",
+    "relkit.config.ts"
+  ],
   "exclude": ["node_modules", ".relkit"]
 }
