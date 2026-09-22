@@ -1,6 +1,6 @@
 {
   "name": "@relkit/trigger",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Trigger.dev jobs integration for RELKIT.",
   "license": "MIT",
   "repository": {

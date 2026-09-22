@@ -1,5 +1,5 @@
 # @relkit/pulumi
 
-## 0.5.0
+## 0.5.1
 
 See the root CHANGELOG.md for this fixed release train.
