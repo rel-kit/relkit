@@ -3,8 +3,9 @@ export default {
   testRunner: "bun",
   coverageAnalysis: "perTest",
   reporters: ["clear-text", "json"],
+  buildCommand: "bun scripts/jobs-coverage/link-sandbox-dependencies.ts",
   disableTypeChecks: false,
-  ignorePatterns: [".relkit/**", "repos/effect/**"],
+  ignorePatterns: [".relkit", ".relkit-*", "repos/effect/**"],
   mutate: [
     "packages/jobs/src/authorization.ts:24-83",
     "packages/jobs/src/duration.ts:37-72",
@@ -15,9 +16,10 @@ export default {
     "packages/client/src/jobs/watch.ts:11-34",
     "packages/client/src/jobs/watch-feed-polling.ts:7-82",
   ],
-  concurrency: 2,
+  concurrency: 6,
+  symlinkNodeModules: false,
   maxTestRunnerReuse: 50,
-  tempDirName: "relkit-jobs-mutation",
+  tempDirName: ".stryker-tmp",
   bun: {
     testFiles: [
       "packages/jobs/task-progress.test.ts",

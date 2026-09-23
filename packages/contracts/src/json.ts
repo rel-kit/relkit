@@ -1,62 +1,60 @@
-/** A value or a promise of that value. */
-export type MaybePromise<T> = T | Promise<T>;
+import { Effect } from "effect";
+import { observeContract, runContract } from "./contract-observability.js";
+import { JsonValueError } from "./json-validation.js";
 
-/** Values represented directly by JSON. Non-finite numbers are rejected at runtime. */
-export type JsonPrimitive = string | number | boolean | null;
+export type { JsonPrimitive, JsonValue, MaybePromise } from "./json.types.js";
+export {
+  assertJsonValue,
+  assertJsonValueEffect,
+  isJsonPrimitive,
+  isJsonPrimitiveEffect,
+  isJsonValue,
+  isJsonValueEffect,
+  JsonValueError,
+} from "./json-validation.js";
 
-/** A recursively JSON-serializable value. */
-export type JsonValue =
-  JsonPrimitive | readonly JsonValue[] | { readonly [key: string]: JsonValue };
-
-/** Raised when a value cannot cross the JSON boundary. */
-export class JsonValueError extends TypeError {
-  readonly path: string;
-
-  constructor(path: string, reason: string) {
-    super(`Invalid JSON value at ${path}: ${reason}`);
-    this.name = "JsonValueError";
-    this.path = path;
-  }
-}
-
-/** Returns whether a value is a JSON primitive accepted by RelKit. */
-export function isJsonPrimitive(value: unknown): value is JsonPrimitive {
-  return (
-    value === null ||
-    typeof value === "string" ||
-    typeof value === "boolean" ||
-    (typeof value === "number" && Number.isFinite(value))
+/**
+ * Serializes JSON deterministically by sorting object keys at every depth.
+ * @param value - Candidate JSON value.
+ * @returns An Effect containing canonical JSON, or JsonValueError.
+ * @example Effect.runSync(serializeJsonEffect({ b: 2, a: 1 }));
+ */
+export function serializeJsonEffect(value: unknown): Effect.Effect<string, JsonValueError> {
+  return observeContract(
+    "json.serialize",
+    Effect.try({
+      try: () => serialize(value, "$", new Set<object>()),
+      catch: (error) => error,
+    }).pipe(
+      Effect.catch((error) =>
+        error instanceof JsonValueError ? Effect.fail(error) : Effect.die(error),
+      ),
+    ),
   );
 }
 
-/** Returns whether a value is recursively JSON-safe. */
-export function isJsonValue(value: unknown): value is JsonValue {
-  try {
-    serializeJson(value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/** Asserts that a value is recursively JSON-safe. */
-export function assertJsonValue(value: unknown): asserts value is JsonValue {
-  serializeJson(value);
-}
-
 /**
- * Serializes JSON deterministically by sorting every object key at every depth.
- * Undefined values, executable values, cycles, and non-JSON objects are errors.
+ * Synchronous compatibility adapter for canonical JSON serialization.
+ * @param value - Candidate JSON value.
+ * @returns JSON with object keys sorted at each depth.
+ * @throws JsonValueError for unsupported values or cycles.
+ * @example serializeJson({ b: 2, a: 1 });
  */
 export function serializeJson(value: unknown): string {
-  return serialize(value, "$", new Set<object>());
+  return runContract(serializeJsonEffect(value));
 }
 
 /** Alias for the one canonical JSON serializer. */
 export const canonicalJson = serializeJson;
 
 function serialize(value: unknown, path: string, active: Set<object>): string {
-  if (isJsonPrimitive(value)) return JSON.stringify(value);
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean" ||
+    (typeof value === "number" && Number.isFinite(value))
+  )
+    return JSON.stringify(value);
 
   switch (typeof value) {
     case "undefined":

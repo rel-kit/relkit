@@ -94,6 +94,7 @@ export function streamResponse(
   stream: ObservabilityStream,
   request: Request,
   apiVersion: number,
+  heartbeatIntervalMs = 5_000,
 ): Response {
   const input = readStreamOptions(request);
   const type = input.type;
@@ -128,7 +129,7 @@ export function streamResponse(
       heartbeat = setInterval(() => {
         if (!closed && (controller.desiredSize ?? 0) > 0)
           controller.enqueue(encoder.encode(": heartbeat\n\n"));
-      }, 5_000);
+      }, heartbeatIntervalMs);
     },
     async pull(controller) {
       try {

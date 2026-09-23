@@ -4,9 +4,14 @@ import { streamResponse } from "./src/observability-utils.js";
 
 test("idle Inspector streams survive Bun's timeout through an HTTP proxy", async () => {
   const stream = createObservabilityStream();
-  const backend = Bun.serve({ port: 0, fetch: (request) => streamResponse(stream, request, 1) });
+  const backend = Bun.serve({
+    port: 0,
+    idleTimeout: 1,
+    fetch: (request) => streamResponse(stream, request, 1, 200),
+  });
   const proxy = Bun.serve({
     port: 0,
+    idleTimeout: 1,
     fetch: (request) =>
       fetch(new URL("/?type=log.emitted", backend.url), { signal: request.signal }),
   });
@@ -16,7 +21,7 @@ test("idle Inspector streams survive Bun's timeout through an HTTP proxy", async
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
     expect(decoder.decode((await reader.read()).value)).toBe(": connected\n\n");
-    for (let heartbeat = 0; heartbeat < 3; heartbeat += 1) {
+    for (let heartbeat = 0; heartbeat < 7; heartbeat += 1) {
       expect(decoder.decode((await reader.read()).value)).toBe(": heartbeat\n\n");
     }
     expect(stream.stats()).toMatchObject({ cursor: "0", published: 0, subscribers: 1 });

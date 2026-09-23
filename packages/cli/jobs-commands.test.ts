@@ -30,6 +30,7 @@ describe("jobs CLI", () => {
     const requests: Request[] = [];
     globalThis.fetch = async (input, init) => {
       const request = new Request(input, init);
+      if (isIdentityRequest(request)) return identityResponse();
       requests.push(request);
       if (new URL(request.url).pathname.endsWith("/jobs/definitions"))
         return json({ items: [{ id: "orders.export", name: "exportOrders" }] });
@@ -73,6 +74,7 @@ describe("jobs CLI", () => {
     const root = await project({ "input.json": JSON.stringify({ orderId: "order-1" }) });
     globalThis.fetch = async (input) => {
       const path = new URL(input).pathname;
+      if (path.endsWith("/client/identity")) return identityResponse();
       if (path.endsWith("/jobs/definitions"))
         return json({ items: [{ id: "orders.export", name: "exportOrders" }] });
       return new Response(
@@ -130,6 +132,7 @@ describe("jobs CLI", () => {
     const requests: Request[] = [];
     globalThis.fetch = async (input, init) => {
       const request = new Request(input, init);
+      if (isIdentityRequest(request)) return identityResponse();
       requests.push(request);
       return json({ items: [{ service: "local", health: { state: "ready" } }] });
     };
@@ -171,6 +174,7 @@ describe("jobs CLI", () => {
     const requests: Request[] = [];
     globalThis.fetch = async (input, init) => {
       const request = new Request(input, init);
+      if (isIdentityRequest(request)) return identityResponse();
       requests.push(request);
       const path = new URL(request.url).pathname;
       if (path.endsWith("/jobs/runs/run-1")) return json({ run: { jobId: "orders.export" } });
@@ -227,6 +231,18 @@ function json(value: unknown): Response {
   return new Response(JSON.stringify(value), {
     status: 200,
     headers: { "content-type": "application/json" },
+  });
+}
+
+function isIdentityRequest(request: Request): boolean {
+  return new URL(request.url).pathname.endsWith("/client/identity");
+}
+
+function identityResponse(): Response {
+  return json({
+    identityScope: "scope-1",
+    sessionEpoch: "epoch-1",
+    publicFingerprint: "sha256:contract-1",
   });
 }
 

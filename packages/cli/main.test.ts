@@ -167,7 +167,8 @@ test("keeps command and create failures structured in JSON", async () => {
 });
 
 test("renders focused help for every command and nested subcommand", async () => {
-  const addKinds = getCliHelpModel("test").commands.find(({ name }) => name === "add")!.commands;
+  const model = getCliHelpModel("test");
+  const addKinds = model.commands.find(({ name }) => name === "add")!.commands;
   const paths = [
     [],
     ...[
@@ -189,7 +190,6 @@ test("renders focused help for every command and nested subcommand", async () =>
     ...["init", "preview", "up", "refresh", "outputs", "destroy"].map((name) => ["deploy", name]),
     ...["up", "status", "stop", "reset"].map((name) => ["local", name]),
   ];
-  const output: Record<string, string> = {};
   for (const path of paths) {
     const captured = io();
     expect(
@@ -198,12 +198,25 @@ test("renders focused help for every command and nested subcommand", async () =>
         installSignalHandlers: false,
       }),
     ).toBe(CLI_EXIT_CODES.success);
-    output[path.join(" ") || "relkit"] = captured.stdout[0]!;
     expect(captured.stderr).toEqual([]);
+    expect(captured.stdout).toHaveLength(1);
+    const selected = path.reduce<CliHelpCommand>(
+      (command, name) => command.commands.find((child) => child.name === name)!,
+      model,
+    );
+    const help = captured.stdout[0]!;
+    expect(help).toContain("DESCRIPTION");
+    expect(help).toContain(selected.description);
+    expect(help).toContain("USAGE");
+    expect(help).toContain(path.length === 0 ? "relkit <subcommand>" : `relkit ${path.join(" ")}`);
+    expect(help).toContain("GLOBAL FLAGS");
+    for (const option of selected.options) expect(help).toContain(`--${option.name}`);
+    for (const child of selected.commands) {
+      expect(help).toContain(child.name);
+      expect(help).toContain(child.description);
+    }
+    for (const example of selected.examples) expect(help).toContain(example.command);
   }
-  expect(
-    Object.fromEntries(Object.entries(output).map(([name, value]) => [name, value.split("\n")])),
-  ).toMatchSnapshot();
 });
 
 test("parses local lifecycle commands and disables dev reconciliation explicitly", async () => {

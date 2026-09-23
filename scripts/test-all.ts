@@ -1,52 +1,75 @@
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
-const localLayers = [
+const firstLayers = [
+  "test:jobs:quality",
+  "test:e2e",
+  "test:jobs:matrix",
   "test:types",
-  "test:packages",
   "test:unit",
   "test:compiler",
   "test:contracts",
   "test:integration",
-  "test:restart",
   "test:inspector",
-  "test:generator",
-  "test:examples",
-  "test:docs",
-  "test:jobs:unit",
-  "test:jobs:types",
-  "test:jobs:contracts",
-  "test:jobs:restart",
-  "test:jobs:client",
-  "test:jobs:quality",
-  "test:jobs:inspector",
-  "test:jobs:matrix",
   "test:container",
   "test:security",
   "test:deployment",
-  "test:e2e",
+  "test:examples",
 ] as const;
+const finalLayers = ["test:packages", "test:generator"] as const;
 
-/** Runs the root test layers in their documented fail-fast order. */
+/** Runs every distinct local test layer with bounded concurrency. */
 export async function runAllTests(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
-  await runScript("build", environment);
-  for (const script of localLayers)
-    await runScript(script, { ...environment, RELKIT_AWS_INTEGRATION: "0" });
-  if (environment.RELKIT_TEST_ALL_CLOUD !== "1") {
-    console.log("Cloud deployment integration skipped; set RELKIT_TEST_ALL_CLOUD=1 to enable it.");
-    return;
+  const startedAt = performance.now();
+  try {
+    await runScript("build", environment);
+    const localEnvironment = { ...environment, RELKIT_AWS_INTEGRATION: "0" };
+    await runScript("test:docs", localEnvironment);
+    await runScript("test:restart", localEnvironment);
+    await runLayers(firstLayers, localEnvironment);
+    for (const script of finalLayers) await runScript(script, localEnvironment);
+    if (environment.RELKIT_TEST_ALL_CLOUD !== "1") {
+      console.log(
+        "Cloud deployment integration skipped; set RELKIT_TEST_ALL_CLOUD=1 to enable it.",
+      );
+      return;
+    }
+    for (const name of ["RELKIT_AWS_INTEGRATION_REGION", "RELKIT_AWS_INTEGRATION_IMAGE"])
+      if (environment[name] === undefined || environment[name]!.trim() === "")
+        throw new Error(`${name} is required when RELKIT_TEST_ALL_CLOUD=1.`);
+    await runScript("test:aws-integration", {
+      ...environment,
+      RELKIT_AWS_INTEGRATION: "1",
+    });
+  } finally {
+    console.log(`Test suite elapsed: ${((performance.now() - startedAt) / 1000).toFixed(1)}s`);
   }
-  for (const name of ["RELKIT_AWS_INTEGRATION_REGION", "RELKIT_AWS_INTEGRATION_IMAGE"])
-    if (environment[name] === undefined || environment[name]!.trim() === "")
-      throw new Error(`${name} is required when RELKIT_TEST_ALL_CLOUD=1.`);
-  await runScript("test:aws-integration", {
-    ...environment,
-    RELKIT_AWS_INTEGRATION: "1",
+}
+
+async function runLayers(
+  scripts: readonly string[],
+  environment: NodeJS.ProcessEnv,
+): Promise<void> {
+  let next = 0;
+  let failure: Error | undefined;
+  const workers = Array.from({ length: Math.min(3, scripts.length) }, async () => {
+    while (failure === undefined && next < scripts.length) {
+      const script = scripts[next++]!;
+      try {
+        await runScript(script, environment);
+      } catch (error) {
+        if (failure !== undefined) return;
+        failure = error instanceof Error ? error : new Error(String(error));
+      }
+    }
   });
+  await Promise.all(workers);
+  if (failure !== undefined) throw failure;
 }
 
 async function runScript(script: string, environment: NodeJS.ProcessEnv): Promise<void> {
   console.log(`\n▶ ${script}`);
+  const startedAt = performance.now();
   const child = Bun.spawn([process.execPath, "run", script], {
     cwd: root,
     env: environment,
@@ -54,6 +77,7 @@ async function runScript(script: string, environment: NodeJS.ProcessEnv): Promis
     stderr: "inherit",
   });
   const exitCode = await child.exited;
+  console.log(`◀ ${script}: ${((performance.now() - startedAt) / 1000).toFixed(1)}s`);
   if (exitCode !== 0) throw new Error(`${script} failed with exit code ${exitCode}.`);
 }
 

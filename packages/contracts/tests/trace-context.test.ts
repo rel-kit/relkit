@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   createSpanId,
   createTraceId,
@@ -9,7 +9,7 @@ import {
   parseTracePropagation,
   parseTraceState,
   toTraceId,
-} from "./src/index.js";
+} from "../src/index.js";
 
 const traceId = "4bf92f3577b34da6a3ce929d0e0e4736";
 const spanId = "00f067aa0ba902b7";
@@ -78,6 +78,31 @@ describe("portable W3C tracing", () => {
     }
   });
 
+  test("leaves headers untouched for invalid local context and rejects throwing metadata", () => {
+    const headers = new Headers();
+    injectTraceContext(headers, {
+      traceId: "0".repeat(32) as never,
+      spanId: spanId as never,
+      traceFlags: 1,
+      remote: false,
+    });
+    expect(headers.has("traceparent")).toBe(false);
+    injectTraceContext(headers, {
+      traceId: traceId as never,
+      spanId: "0".repeat(16) as never,
+      traceFlags: 1,
+      remote: false,
+    });
+    expect(headers.has("traceparent")).toBe(false);
+    const throwing = {
+      version: 2,
+      get producer() {
+        throw new Error("untrusted metadata");
+      },
+    };
+    expect(parseTracePropagation(throwing)).toBeUndefined();
+  });
+
   test("durable envelope contains causation only and tolerates malformed metadata", () => {
     const producer = parseTraceParent(parent)!;
     const parsed = parseTracePropagation({
@@ -96,12 +121,20 @@ describe("portable W3C tracing", () => {
       correlationId: "business-1",
     });
     expect(Object.isFrozen(parsed?.producer)).toBe(true);
+    expect(
+      parseTracePropagation({
+        version: 2,
+        producer: { ...producer, traceState: "vendor=state" },
+      })?.producer.traceState,
+    ).toBe("vendor=state");
     for (const value of [
       null,
       {},
       { version: 1, producer },
       { version: 2, producer: {} },
       { version: 2, producer: { ...producer, traceFlags: NaN } },
+      { version: 2, producer: { ...producer, traceFlags: -1 } },
+      { version: 2, producer: { ...producer, traceFlags: 256 } },
       {
         get version() {
           throw new Error("metadata");

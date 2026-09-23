@@ -1,3 +1,4 @@
+/** One ordered native execution event within an agent run. */
 export interface AgentExecutionEvent {
   readonly nativeSequence: number;
   readonly kind: string;
@@ -13,6 +14,7 @@ export interface AgentExecutionEvent {
   readonly value?: unknown;
 }
 
+/** Latest public state of a native execution scope. */
 export interface AgentExecutionSnapshot {
   readonly scope: readonly string[];
   readonly agent?: string;

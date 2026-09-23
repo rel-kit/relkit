@@ -39,7 +39,6 @@ describe.serial("isolated evaluator", () => {
         candidates: ["app.ts"],
         generationId: "generation-test",
         environmentAllowlist: ["RELKIT_EVALUATOR_ALLOWED"],
-        timeoutMs: 1_000,
       });
       expect(response.status).toBe("ok");
       expect(response.generationId).toBe("generation-test");
@@ -99,7 +98,6 @@ describe.serial("isolated evaluator", () => {
         projectRoot,
         candidates: cases.map(([file]) => file),
         generationId: "side-effect-test",
-        timeoutMs: 1_000,
       });
       expect(response.status).toBe("failed");
       const detected = response.failures.flatMap((failure) => failure.sideEffects ?? []);

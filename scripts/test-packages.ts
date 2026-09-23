@@ -20,15 +20,39 @@ export function packageTestFiles(repositoryRoot: string): string[] {
 export async function runPackageTests(environment: NodeJS.ProcessEnv = process.env): Promise<void> {
   const files = packageTestFiles(root);
   if (files.length === 0) throw new Error("No package tests were discovered.");
-  console.log(`Running ${files.length} package and integration test files.`);
-  const child = Bun.spawn([process.execPath, "test", "--reporter=dot", ...files], {
+  const importsVitest = await Promise.all(
+    files.map(async (file) =>
+      /from ["']vitest["']/.test(await Bun.file(resolve(root, file)).text()),
+    ),
+  );
+  const vitestFiles = files.filter((_, index) => importsVitest[index]);
+  const bunFiles = files.filter((_, index) => !importsVitest[index]);
+  const cliFiles = bunFiles.filter((file) => file.startsWith("packages/cli/"));
+  const otherFiles = bunFiles.filter((file) => !file.startsWith("packages/cli/"));
+  console.log(
+    `Running ${vitestFiles.length} Vitest and ${bunFiles.length} Bun package test files.`,
+  );
+  const testEnvironment = {
+    ...environment,
+    RELKIT_AWS_INTEGRATION: "0",
+    RELKIT_MCP_INSPECTOR_CLI: "0",
+    RELKIT_TEST_DOCKER: "0",
+  };
+  if (vitestFiles.length > 0)
+    await runTests([process.execPath, "x", "vitest", "run", ...vitestFiles], testEnvironment);
+  const runs = [cliFiles, otherFiles]
+    .filter((group) => group.length > 0)
+    .map((group) =>
+      runTests([process.execPath, "test", "--reporter=dot", ...group], testEnvironment),
+    );
+  const results = await Promise.allSettled(runs);
+  for (const result of results) if (result.status === "rejected") throw result.reason;
+}
+
+async function runTests(command: string[], environment: NodeJS.ProcessEnv): Promise<void> {
+  const child = Bun.spawn(command, {
     cwd: root,
-    env: {
-      ...environment,
-      RELKIT_AWS_INTEGRATION: "0",
-      RELKIT_MCP_INSPECTOR_CLI: "0",
-      RELKIT_TEST_DOCKER: "0",
-    },
+    env: environment,
     stdout: "inherit",
     stderr: "inherit",
   });

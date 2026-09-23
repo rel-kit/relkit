@@ -1,3 +1,4 @@
+/** Browser-safe message snapshot shown for one agent run. */
 export interface BrowserMessage {
   readonly messageId: string;
   readonly runId?: string;
@@ -6,6 +7,7 @@ export interface BrowserMessage {
   readonly createdAt: string;
 }
 
+/** Text, tool, or progress content carried by a browser message. */
 export type BrowserMessagePart =
   | {
       readonly partId: string;
@@ -30,10 +32,12 @@ export type BrowserMessagePart =
       readonly value: unknown;
     } & AgentProgressScope);
 
+/** Identifies whether progress belongs to a run or a particular tool call. */
 export type AgentProgressScope =
   | { readonly scope: "run"; readonly toolCallId?: never; readonly toolId?: never }
   | { readonly scope: "tool"; readonly toolCallId: string; readonly toolId: string };
 
+/** Lifecycle state of a tool part in a streamed browser message. */
 export type ToolPartState =
   | "started"
   | "input-streaming"
