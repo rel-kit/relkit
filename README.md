@@ -124,7 +124,8 @@ bun run relkit:local -- create my-app --cloud none --deploy none
   templates.
 - `tests/` and `scripts/` contain the focused test layers and verification
   tooling.
-- `repos/effect` is vendored reference source, not a RELKIT edit target.
+- `repos/effect` is local Effect reference source for agents, ignored by Git
+  and not a RELKIT edit target.
 
 Run `bunx turbo run dev --filter=@relkit/docs` for documentation development and
 `bun run test:docs` for generated-reference, doctest, link, and search checks.

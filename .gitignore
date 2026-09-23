@@ -40,6 +40,8 @@ packages/*/CHANGELOG.md
 # RelKit generated and local runtime data
 .relkit/
 
+# Local reference repositories for coding agents
+repos/*
 
 # Debug
 npm-debug.log*
