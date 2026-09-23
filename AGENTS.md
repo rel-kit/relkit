@@ -22,7 +22,7 @@ The main product topology is:
 | `scripts/`              | Boundary, build, release, smoke, performance, and verification tooling.                                                         |
 | `docs/`                 | User documentation, technical specifications, decisions, and evidence.                                                          |
 | `openspec/`             | Change proposals, tasks, delta specifications, and change evidence.                                                             |
-| `repos/effect`          | Vendored Effect reference source; never edit or install in it.                                                                  |
+| `repos/effect`          | Local Effect reference source, ignored by Git; never edit or install in it.                                                     |
 
 Generated projects run a backend on `PORT=3000` and the real Next inspector on
 port `3210` by default. `.relkit/generated` contains graph and manifest outputs;
@@ -86,4 +86,6 @@ source.
 
 Before changing exports, imports, directories, or naming conventions, read
 `.agents/skills/konsistent-config/SKILL.md`. For Effect API reference, first
-read `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md`.
+read `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md` when the local
+source is present. Git ignores `repos/*`, so use `rg --no-ignore` when searching
+there; direct file reads continue to work.
