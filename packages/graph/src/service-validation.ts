@@ -1,16 +1,53 @@
+import { Effect } from "effect";
+import {
+  failValidation,
+  runValidation,
+  validationEffect,
+  type GraphValidationError,
+} from "./graph-validation-error.js";
 function fail(message: string): never {
-  throw new TypeError(message);
+  return failValidation(message);
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-
 function nonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
-
+/**
+ * Validates service membership names and referenced identities.
+ * @param value - Candidate service node fields.
+ * @param index - Node index used in error messages.
+ * @param validateId - Canonical ID validator supplied by graph validation.
+ * @returns An Effect that succeeds with void or fails with GraphValidationError.
+ * @example Effect.runSync(validateServiceNodeEffect(service, 0, validateId));
+ */
+export function validateServiceNodeEffect(
+  value: Record<string, unknown>,
+  index: number,
+  validateId: (value: unknown, label: string) => void,
+): Effect.Effect<void, GraphValidationError> {
+  return validationEffect("validation.service", () =>
+    validateServiceNodeUnsafe(value, index, validateId),
+  );
+}
+/**
+ * Synchronous compatibility adapter for service node validation.
+ * @param value - Candidate service node fields.
+ * @param index - Node index used in error messages.
+ * @param validateId - Canonical ID validator.
+ * @returns Void when the service shape is valid.
+ * @throws TypeError for invalid members or IDs.
+ * @example validateServiceNode(service, 0, validateId);
+ */
 export function validateServiceNode(
+  value: Record<string, unknown>,
+  index: number,
+  validateId: (value: unknown, label: string) => void,
+): void {
+  return runValidation(validateServiceNodeEffect(value, index, validateId));
+}
+function validateServiceNodeUnsafe(
   value: Record<string, unknown>,
   index: number,
   validateId: (value: unknown, label: string) => void,
@@ -53,7 +90,6 @@ export function validateServiceNode(
     }
   }
 }
-
 function textArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string");
 }

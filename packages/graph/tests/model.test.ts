@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
+import { describe, expect, test } from "vitest";
+import { GRAPH_VERSION } from "@relkit/contracts";
 import {
   GRAPH_EDGE_KINDS,
   GRAPH_NODE_KINDS,
@@ -10,7 +10,7 @@ import {
   type ApplicationGraph,
   type HttpTriggerConfig,
   type TargetsFunctionEdge,
-} from "../../packages/graph/src/index.ts";
+} from "../src/index.js";
 
 const source = { file: "src/app.ts", line: 1, column: 1 } as const;
 
@@ -93,6 +93,7 @@ describe("graph model", () => {
       instructions: "help with orders",
       toolIds: ["orders.lookup"],
       limits: { maxSteps: 3 },
+      profile: "default",
       generatedFunction: generated,
     };
     const edge: TargetsFunctionEdge = {

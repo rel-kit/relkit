@@ -107,7 +107,8 @@ jobs:
         run: |
           bun run test:types
           bun run test:unit
-          bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts tests/graph
+          bun test tests/compiler/manifest.test.ts tests/compiler/graph-construction.test.ts tests/compiler/job-names.test.ts
+          bun run test:graph
           bun run test:contracts
           bun run test:security
 

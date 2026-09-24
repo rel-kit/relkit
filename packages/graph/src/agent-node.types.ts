@@ -1,8 +1,13 @@
 import type { JsonValue } from "@relkit/contracts";
-import type { AgentClientContractMetadata } from "./agent-client-contract.js";
-import type { GeneratedAgentMarker } from "./foundation-nodes.js";
+import type { AgentClientContractMetadata } from "./agent-client-contract.types.js";
+import type { GeneratedAgentMarker } from "./foundation-nodes.types.js";
 import type { GraphNodeBase } from "./model.js";
 
+/**
+ * Agent execution contract including tools, resources, and generated function identity.
+ * @remarks The compiler records this as serializable graph data.
+ * @example const inspect = (value: AgentNode): void => { console.log(value); };
+ */
 export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly input: JsonValue;
   readonly output: JsonValue;
@@ -26,6 +31,11 @@ export interface AgentNode extends GraphNodeBase<"agent"> {
   readonly clientContract?: AgentClientContractMetadata;
 }
 
+/**
+ * Static topology of a compiled agent workflow.
+ * @remarks The compiler records this as serializable graph data.
+ * @example const inspect = (value: AgentWorkflowTopology): void => { console.log(value); };
+ */
 export interface AgentWorkflowTopology {
   readonly start: string;
   readonly end: string;
@@ -41,11 +51,21 @@ export interface AgentWorkflowTopology {
   readonly subgraphs: readonly string[];
 }
 
+/**
+ * Recursive subagent membership projected into the graph.
+ * @remarks The compiler records this as serializable graph data.
+ * @example const inspect = (value: AgentSubagentTopology): void => { console.log(value); };
+ */
 export interface AgentSubagentTopology {
   readonly id: string;
   readonly subagents: readonly AgentSubagentTopology[];
 }
 
+/**
+ * External resource required by an agent.
+ * @remarks The compiler records this as serializable graph data.
+ * @example const inspect = (value: AgentResourceDependency): void => { console.log(value); };
+ */
 export interface AgentResourceDependency {
   readonly kind:
     "model" | "agent-state" | "bucket" | "checkpointer" | "memory" | "skills" | "memory-files";

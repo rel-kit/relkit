@@ -1,9 +1,19 @@
 import type { JsonValue } from "@relkit/contracts";
-import type { GeneratedFunctionMarker } from "./foundation-nodes.js";
+import type { GeneratedFunctionMarker } from "./foundation-nodes.types.js";
 import type { GraphNodeBase } from "./model.js";
 
+/**
+ * Whether a domain contract is public or internal.
+ * @remarks IDs and source locations follow the versioned graph contract.
+ * @example const inspect = (value: DomainExposure): void => { console.log(value); };
+ */
 export type DomainExposure = "public" | "internal";
 
+/**
+ * Function contract with invocation mode and schemas.
+ * @remarks IDs and source locations follow the versioned graph contract.
+ * @example const inspect = (value: FunctionNode): void => { console.log(value); };
+ */
 export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly invocationMode: "callable" | "event-only";
   readonly publishes?: JsonValue;
@@ -18,6 +28,11 @@ export interface FunctionNode extends GraphNodeBase<"function"> {
   readonly generated?: GeneratedFunctionMarker;
 }
 
+/**
+ * Named error contract emitted by the compiler.
+ * @remarks IDs and source locations follow the versioned graph contract.
+ * @example const inspect = (value: ErrorNode): void => { console.log(value); };
+ */
 export interface ErrorNode extends GraphNodeBase<"error"> {
   readonly exposure: DomainExposure;
   readonly data: JsonValue;

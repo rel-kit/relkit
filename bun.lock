@@ -625,6 +625,10 @@
       "version": "0.5.1",
       "dependencies": {
         "@relkit/contracts": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "vitest": "5.0.1",
       },
     },
     "packages/inspector-api": {

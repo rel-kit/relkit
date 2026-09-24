@@ -1,10 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import {
-  canonicalGraphJson,
-  hashGraph,
-  type GraphCanonicalizationOptions,
-} from "../../packages/graph/src/index.ts";
-
+import { describe, expect, test } from "vitest";
+import { canonicalGraphJson, hashGraph, type GraphCanonicalizationOptions } from "../src/index.js";
 type TestGraph = {
   readonly contractVersion: number;
   readonly appId: string;
@@ -15,7 +10,6 @@ type TestGraph = {
   readonly pid: number;
   readonly randomId: string;
 };
-
 function makeGraph(root: string, reverse: boolean): TestGraph {
   const windows = root.includes(":\\");
   const file = (name: string) => (windows ? `${root}\\src\\${name}` : `${root}/src/${name}`);
@@ -49,7 +43,6 @@ function makeGraph(root: string, reverse: boolean): TestGraph {
     randomId: reverse ? "random-b" : "random-a",
   };
 }
-
 describe("canonical graph hashing", () => {
   test("normalizes roots/separators, sorts nodes/edges, and excludes ephemeral metadata", () => {
     const first = makeGraph("/tmp/relkit-a", false);
@@ -58,7 +51,6 @@ describe("canonical graph hashing", () => {
     const secondOptions: GraphCanonicalizationOptions = { projectRoot: "C:\\relkit-b" };
     const firstJson = canonicalGraphJson(first, firstOptions);
     const secondJson = canonicalGraphJson(second, secondOptions);
-
     expect(secondJson).toBe(firstJson);
     expect(hashGraph(second, secondOptions)).toBe(hashGraph(first, firstOptions));
     expect(hashGraph(first, firstOptions)).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -68,7 +60,6 @@ describe("canonical graph hashing", () => {
     expect(firstJson).not.toMatch(/"(?:generationId|timestamp|pid|randomId)"/);
     expect(firstJson).not.toContain("/tmp/relkit-a");
   });
-
   test("keeps ordered service edges in declaration order", () => {
     const graph = {
       contractVersion: 3,

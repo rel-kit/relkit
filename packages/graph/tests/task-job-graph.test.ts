@@ -1,7 +1,7 @@
-import { describe, expect, test } from "bun:test";
-import { GRAPH_VERSION } from "../../packages/contracts/src/index.ts";
-import { validateGraphShape } from "../../packages/graph/src/graph-validation.ts";
-import { graphId, isTaskBackedJob } from "../../packages/graph/src/graph-ids.ts";
+import { describe, expect, test } from "vitest";
+import { GRAPH_VERSION } from "@relkit/contracts";
+import { validateGraphShape } from "../src/graph-validation.js";
+import { graphId, isTaskBackedJob } from "../src/graph-ids.js";
 
 const source = { file: "src/orders/tasks/send.task.ts", line: 1, column: 1 } as const;
 
