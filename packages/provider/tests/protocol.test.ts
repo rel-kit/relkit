@@ -1,6 +1,5 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import {
   defineConnectionContract,
   defineIntegrationReference,
@@ -13,7 +12,7 @@ import {
   defineProviderCapability,
   defineProviderFeature,
   normalizeProviderSource,
-} from "./src/index.ts";
+} from "../src/index.js";
 
 test("creates detached immutable provider protocol descriptors", () => {
   const options = { keyPrefix: "commerce" };
@@ -149,7 +148,7 @@ test("keeps provider declaration and normalization code free of I/O", () => {
     "binding-normalization.ts",
     "binding-resolution.ts",
   ]) {
-    const contents = readFileSync(join(import.meta.dir, "src", source), "utf8");
+    const contents = readFileSync(new URL(`../src/${source}`, import.meta.url), "utf8");
     expect(contents).not.toMatch(/node:(?:fs|process)|\b(?:process|Bun\.file|readFile)\b/);
   }
 });

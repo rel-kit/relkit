@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   ProviderProfileSelectionError,
   defineConnectionContract,
@@ -8,7 +8,7 @@ import {
   defineProviderCapability,
   normalizeProviderProfiles,
   selectProviderProfile,
-} from "./src/index.ts";
+} from "../src/index.js";
 
 const cache = defineProviderCapability("cache");
 const redis = (url: string) =>
@@ -62,6 +62,7 @@ test("reports ambiguous and unknown profiles with logical descriptor context", (
     error = cause;
   }
   expect(error).toBeInstanceOf(ProviderProfileSelectionError);
+  expect(error).toBeInstanceOf(TypeError);
   expect(error).toMatchObject({
     code: "AMBIGUOUS_PROVIDER_PROFILE",
     capability: "cache",

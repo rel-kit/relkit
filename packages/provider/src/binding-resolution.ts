@@ -1,50 +1,61 @@
-import { deepFreeze, normalizeId, serializeJson, type JsonValue } from "@relkit/contracts";
-import { isBindingValueRef } from "./binding-values.js";
-import type { ProviderConnectionField, ProviderConnectionValues } from "./protocol-types.js";
-
-export type ProviderBindingResolutionCode =
-  "CONFLICTING_CONNECTION_VALUE" | "MISSING_CONNECTION_VALUE" | "UNKNOWN_CONNECTION_OUTPUT";
-
-export class ProviderBindingResolutionError extends TypeError {
-  readonly code: ProviderBindingResolutionCode;
-  readonly bindingId: string;
-  readonly field: string;
-
-  constructor(
-    code: ProviderBindingResolutionCode,
-    bindingId: string,
-    field: string,
-    reason: string,
-  ) {
-    super(`${bindingId} connection field "${field}" ${reason}`);
-    this.name = "ProviderBindingResolutionError";
-    this.code = code;
-    this.bindingId = bindingId;
-    this.field = field;
-  }
+import { deepFreeze, type JsonValue } from "@relkit/contracts";
+import { Effect } from "effect";
+import { providerNormalizeId, providerSerializeJson } from "./protocol-builder-utils.js";
+import { isBindingValueRefCore } from "./binding-values.js";
+import { ProviderBindingResolutionError } from "./provider-compat-errors.js";
+import {
+  observeProvider,
+  providerCalculation,
+  runProvider,
+  type ProviderError,
+} from "./provider-observability.js";
+import type {
+  ProviderConnectionDescriptor,
+  ResolveProviderConnectionOptions,
+} from "./binding-resolution.types.js";
+import type { ProviderConnectionField } from "./protocol.types.js";
+export { ProviderBindingResolutionError } from "./provider-compat-errors.js";
+export type { ProviderBindingResolutionCode } from "./provider-errors.js";
+export type {
+  ProviderConnectionDescriptor,
+  ResolveProviderConnectionOptions,
+} from "./binding-resolution.types.js";
+/** Resolve a provider's connection values in an Effect with tagged failures.
+ * @param adapter - Adapter connection contract and authored values.
+ * @param options - Binding profile and optional materialized values.
+ * @returns An Effect with frozen connection values or a tagged provider error.
+ * @example Effect.runSync(resolveProviderConnectionEffect(adapter, { profile: "default" }));
+ */
+export function resolveProviderConnectionEffect(
+  adapter: ProviderConnectionDescriptor,
+  options: ResolveProviderConnectionOptions,
+): Effect.Effect<Readonly<Record<string, JsonValue>>, ProviderError> {
+  return observeProvider(
+    "binding.resolve",
+    providerCalculation("INVALID_CONNECTION", () =>
+      resolveProviderConnectionCore(adapter, options),
+    ),
+  );
 }
-
-export interface ResolveProviderConnectionOptions {
-  readonly profile: string;
-  readonly bindingId?: string;
-  readonly local?: Readonly<Record<string, JsonValue>>;
-  readonly infrastructure?: Readonly<Record<string, JsonValue>>;
-  readonly values?: Readonly<Record<string, JsonValue>>;
-}
-
-export interface ProviderConnectionDescriptor {
-  readonly capability: Readonly<{ readonly id: string }>;
-  readonly connectionContract: Readonly<{
-    readonly fields: Readonly<Record<string, ProviderConnectionField>>;
-  }>;
-  readonly connection: ProviderConnectionValues;
-}
-
+/** Resolve provider connection values synchronously for legacy callers.
+ * @param adapter - Adapter connection contract and authored values.
+ * @param options - Binding profile and optional materialized values.
+ * @returns Frozen resolved connection values.
+ * @throws ProviderBindingResolutionError for missing or conflicting values; TypeError for invalid input.
+ * @example resolveProviderConnection(adapter, { profile: "default" });
+ */
 export function resolveProviderConnection(
   adapter: ProviderConnectionDescriptor,
   options: ResolveProviderConnectionOptions,
 ): Readonly<Record<string, JsonValue>> {
-  const bindingId = options.bindingId ?? `${adapter.capability.id}.${normalizeId(options.profile)}`;
+  return runProvider(resolveProviderConnectionEffect(adapter, options));
+}
+function resolveProviderConnectionCore(
+  adapter: ProviderConnectionDescriptor,
+  options: ResolveProviderConnectionOptions,
+): Readonly<Record<string, JsonValue>> {
+  const bindingId =
+    options.bindingId ?? `${adapter.capability.id}.${providerNormalizeId(options.profile)}`;
   assertDeclaredOutputs(bindingId, adapter, "local", options.local);
   assertDeclaredOutputs(bindingId, adapter, "infrastructure", options.infrastructure);
   const result: Record<string, JsonValue> = {};
@@ -52,9 +63,8 @@ export function resolveProviderConnection(
     const resolved = resolveField(bindingId, name, field, adapter, options);
     if (resolved !== undefined) result[name] = resolved;
   }
-  return deepFreeze(JSON.parse(serializeJson(result)) as Record<string, JsonValue>);
+  return deepFreeze(JSON.parse(providerSerializeJson(result)) as Record<string, JsonValue>);
 }
-
 function resolveField(
   bindingId: string,
   name: string,
@@ -76,7 +86,7 @@ function resolveField(
   if (infrastructure) return options.infrastructure![name];
   if (authored) {
     const value = adapter.connection[name];
-    if (!isBindingValueRef(value)) return value;
+    if (!isBindingValueRefCore(value)) return value;
     if (own(options.values, value.name)) return options.values![value.name];
     if (own(field, "default")) return field.default;
     if (field.required)
@@ -98,7 +108,6 @@ function resolveField(
     );
   return undefined;
 }
-
 function assertDeclaredOutputs(
   bindingId: string,
   adapter: ProviderConnectionDescriptor,
@@ -115,7 +124,6 @@ function assertDeclaredOutputs(
         `is not declared for ${source} output`,
       );
 }
-
 function own(value: object | undefined, key: PropertyKey): boolean {
   return value !== undefined && Object.prototype.hasOwnProperty.call(value, key);
 }

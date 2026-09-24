@@ -4,6 +4,7 @@ import type {
   RuntimeIntegrationRegistrationMetadata,
 } from "@relkit/contracts";
 
+/** Binding data passed to a runtime provider generation. */
 export interface RuntimeProviderContext {
   readonly generationId: string;
   readonly bindingId: string;
@@ -15,6 +16,7 @@ export interface RuntimeProviderContext {
   readonly signal?: AbortSignal;
 }
 
+/** Acquired runtime value and optional readiness and disposal hooks. */
 export interface RuntimeProviderGeneration {
   readonly value: unknown;
   readonly ready?: () => MaybePromise<void>;
@@ -23,10 +25,12 @@ export interface RuntimeProviderGeneration {
   readonly dispose?: () => MaybePromise<void>;
 }
 
+/** Registration factory for one runtime provider capability. */
 export interface RuntimeProviderRegistration extends RuntimeIntegrationRegistrationMetadata {
   readonly create: (context: RuntimeProviderContext) => MaybePromise<RuntimeProviderGeneration>;
 }
 
+/** Collection of runtime provider registrations owned by an integration. */
 export interface RuntimeProviderIntegration<IntegrationId extends string = string> {
   readonly kind: "runtime-integration";
   readonly integrationId: IntegrationId;

@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   ProviderFeatureMismatchError,
   defineConnectionContract,
@@ -13,7 +13,7 @@ import {
   normalizeProviderBinding,
   normalizeProviderProfiles,
   selectProviderProfile,
-} from "./src/index.ts";
+} from "../src/index.js";
 
 const cache = defineProviderCapability("cache");
 const redis = defineIntegrationReference("redis");
@@ -79,6 +79,7 @@ test("reports logical resource, profile, and every missing feature", () => {
     error = cause;
   }
   expect(error).toBeInstanceOf(ProviderFeatureMismatchError);
+  expect(error).toBeInstanceOf(TypeError);
   expect(error).toMatchObject({
     capability: "cache",
     profile: "default",

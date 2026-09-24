@@ -1,47 +1,61 @@
-import { deepFreeze, normalizeId, serializeJson } from "@relkit/contracts";
-import type { ProviderProfileSelection } from "./profile-normalization.js";
-import type { NormalizedProviderBinding, ProviderAdapter } from "./protocol-types.js";
-
-export class ProviderFeatureMismatchError extends TypeError {
-  readonly code = "MISSING_PROVIDER_FEATURE" as const;
-  readonly capability: string;
-  readonly profile: string;
-  readonly descriptorId: string;
-  readonly features: readonly string[];
-
-  constructor(
-    capability: string,
-    profile: string,
-    descriptorId: string,
-    features: readonly string[],
-  ) {
-    super(
-      `${capability} logical descriptor "${descriptorId}" requires missing features from profile "${profile}": ${features.join(", ")}`,
-    );
-    this.name = "ProviderFeatureMismatchError";
-    this.capability = capability;
-    this.profile = profile;
-    this.descriptorId = descriptorId;
-    this.features = features;
-  }
+import { deepFreeze } from "@relkit/contracts";
+import { Effect } from "effect";
+import { providerNormalizeId, providerSerializeJson } from "./protocol-builder-utils.js";
+import { ProviderFeatureMismatchError } from "./provider-compat-errors.js";
+import {
+  observeProvider,
+  providerCalculation,
+  runProvider,
+  type ProviderError,
+} from "./provider-observability.js";
+import type { NormalizeProviderBindingOptions } from "./binding-normalization.types.js";
+import type { ProviderProfileSelection } from "./profile-normalization.types.js";
+import type { NormalizedProviderBinding, ProviderAdapter } from "./protocol.types.js";
+export { ProviderFeatureMismatchError } from "./provider-compat-errors.js";
+export type { NormalizeProviderBindingOptions } from "./binding-normalization.types.js";
+/** Normalize a selected binding in an Effect after checking features.
+ * @param selection - Selected profile and adapter.
+ * @param options - Logical descriptor and required feature names.
+ * @returns An Effect with a frozen binding or a tagged feature failure.
+ * @example Effect.runSync(normalizeProviderBindingEffect(selection, { descriptorId: "cart" }));
+ */
+export function normalizeProviderBindingEffect(
+  selection: ProviderProfileSelection,
+  options: NormalizeProviderBindingOptions,
+): Effect.Effect<NormalizedProviderBinding, ProviderError> {
+  return observeProvider(
+    "binding.normalize",
+    providerCalculation("INVALID_DESCRIPTOR", () =>
+      normalizeProviderBindingCore(selection, options),
+    ),
+  );
 }
-
+/** Normalize a selected binding for synchronous callers.
+ * @param selection - Selected profile and adapter.
+ * @param options - Logical descriptor and required feature names.
+ * @returns A frozen normalized binding.
+ * @throws ProviderFeatureMismatchError when required features are absent.
+ * @example normalizeProviderBinding(selection, { descriptorId: "cart" });
+ */
 export function normalizeProviderBinding(
   selection: ProviderProfileSelection,
-  options: {
-    readonly descriptorId: string;
-    readonly requiredFeatures?: readonly string[];
-  },
+  options: NormalizeProviderBindingOptions,
+): NormalizedProviderBinding {
+  return runProvider(normalizeProviderBindingEffect(selection, options));
+}
+function normalizeProviderBindingCore(
+  selection: ProviderProfileSelection,
+  options: NormalizeProviderBindingOptions,
 ): NormalizedProviderBinding {
   const adapter = selection.binding.adapter;
   const supported = new Set(adapter.features.map((feature) => feature.id));
-  const required = [...new Set((options.requiredFeatures ?? []).map(normalizeId))].sort();
+  const required = [...new Set((options.requiredFeatures ?? []).map(providerNormalizeId))].sort();
   const missing = required.filter((feature) => !supported.has(feature));
   if (missing.length > 0)
     throw new ProviderFeatureMismatchError(
       selection.capability,
       selection.profile,
-      normalizeId(options.descriptorId),
+      providerNormalizeId(options.descriptorId),
       missing,
     );
   return frozen({
@@ -54,7 +68,6 @@ export function normalizeProviderBinding(
     ...(selection.binding.access === undefined ? {} : { access: selection.binding.access }),
   }) as NormalizedProviderBinding;
 }
-
 function projectAdapter(adapter: ProviderAdapter): NormalizedProviderBinding["adapter"] {
   return {
     integrationId: adapter.integration.integrationId,
@@ -66,7 +79,6 @@ function projectAdapter(adapter: ProviderAdapter): NormalizedProviderBinding["ad
     features: adapter.features.map((feature) => feature.id),
   };
 }
-
 function frozen<Value>(value: Value): Value {
-  return deepFreeze(JSON.parse(serializeJson(value)) as Value);
+  return deepFreeze(JSON.parse(providerSerializeJson(value)) as Value);
 }

@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   ProviderBindingResolutionError,
   createBindingValueRef,
@@ -8,7 +8,7 @@ import {
   defineProviderBehavior,
   defineProviderCapability,
   resolveProviderConnection,
-} from "./src/index.ts";
+} from "../src/index.js";
 
 const cache = defineProviderCapability("cache");
 const integration = defineIntegrationReference("redis");
@@ -76,6 +76,7 @@ test("rejects authoritative conflicts and reports missing names without values",
     error = cause;
   }
   expect(error).toBeInstanceOf(ProviderBindingResolutionError);
+  expect(error).toBeInstanceOf(TypeError);
   expect(error).toMatchObject({
     code: "MISSING_CONNECTION_VALUE",
     bindingId: "cache.requests",
