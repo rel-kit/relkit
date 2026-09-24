@@ -1,30 +1,12 @@
-import {
-  createBindingValueRef,
-  type BindingValueRef,
-  type BindingValueType,
-} from "@relkit/provider";
-import { createEnvBuilder } from "./env-builder.js";
-import { toJsonValue, type JsonValue } from "./env-json.js";
-import { createEnvRef, isEnvRef } from "./env-ref.js";
-import { parseBoolean, parseLiteral, parseNumber, parsePort } from "./env-parsers.js";
+import { Effect } from "effect";
+import { observeConfig, runConfigSync } from "./config-observability.js";
+import { ConfigValidationError } from "./config-validation-error.js";
+import { createEnvRefEffect } from "./env-ref.js";
+import type { EnvDefinition, EnvMetadataMap, EnvShape } from "./env.types.js";
 
-export { isEnvRef };
-import {
-  type EnvBuilder,
-  type EnvBuilderBase,
-  type EnvBuilderFactory,
-  type EnvDefinition,
-  type EnvMetadata,
-  type EnvMetadataMap,
-  type EnvShape,
-  type EnvValueType,
-  type EnvRef,
-  type InferEnvValue,
-  type InferEnvValues,
-  type LiteralValue,
-} from "./env-types.js";
-
-export type { JsonValue } from "./env-json.js";
+export { env } from "./env-factory.js";
+export { isEnvRef } from "./env-ref.js";
+export type { JsonValue } from "./env-json.types.js";
 export type {
   EnvBuilder,
   EnvBuilderBase,
@@ -39,105 +21,83 @@ export type {
   InferEnvValue,
   InferEnvValues,
   LiteralValue,
-} from "./env-types.js";
+} from "./env.types.js";
 
-/**
- * Provides application-field builders and named binding-local value references.
- *
- * @example
- * ```ts
- * import { defineEnv, env } from "@relkit/app/config";
- * const applicationEnv = defineEnv({ PUBLIC_ORIGIN: env.url() });
- * const cacheUrl = env.secret("CACHE_URL");
- * void applicationEnv;
- * void cacheUrl;
- * ```
- * @category Environment
- * @since 0.2.0
+/** Build an immutable declaration without reading runtime values.
+ * @param shape - Field builders keyed by public environment names.
+ * @returns Effect with a frozen declaration or ConfigValidationError.
+ * @example Effect.runSync(defineEnvEffect({ MODE: env.string() }));
  */
-export const env: EnvBuilderFactory = Object.freeze({
-  string: ((name?: string) =>
-    bindingOrBuilder(name, "string", (value) => value)) as EnvBuilderFactory["string"],
-  number: ((name?: string) =>
-    bindingOrBuilder(name, "number", parseNumber)) as EnvBuilderFactory["number"],
-  boolean: ((name?: string) =>
-    bindingOrBuilder(name, "boolean", parseBoolean)) as EnvBuilderFactory["boolean"],
-  port: ((name?: string) => bindingOrBuilder(name, "port", parsePort)) as EnvBuilderFactory["port"],
-  literal: <const Values extends readonly [LiteralValue, ...LiteralValue[]]>(...values: Values) => {
-    if (values.some((value) => typeof value === "number" && !Number.isFinite(value))) {
-      throw new TypeError("Literal values must be finite");
-    }
-    const options = Object.freeze([...values]);
-    return createEnvBuilder<Values[number]>(
-      "literal",
-      (value) => parseLiteral(value, options),
-      false,
-      options,
-    );
-  },
-  url: ((name?: string) =>
-    bindingOrBuilder(name, "url", (value) => new URL(value))) as EnvBuilderFactory["url"],
-  json: ((name?: string) =>
-    bindingOrBuilder(name, "json", (value) =>
-      toJsonValue(JSON.parse(value)),
-    )) as EnvBuilderFactory["json"],
-  secret: ((name?: string) =>
-    bindingOrBuilder(name, "secret-string", (value) => value, true)) as EnvBuilderFactory["secret"],
-});
+export function defineEnvEffect<const S extends EnvShape>(
+  shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
+): Effect.Effect<EnvDefinition<S>, ConfigValidationError> {
+  return observeConfig(
+    "define",
+    Effect.gen(function* () {
+      if (shape === null || typeof shape !== "object" || Array.isArray(shape)) {
+        return yield* Effect.fail(
+          new ConfigValidationError({
+            message: "Environment definitions must contain env builders",
+          }),
+        );
+      }
+      const entries = Object.keys(shape).map((name) => [name, shape[name]!] as const);
+      if (
+        entries.some(
+          ([, field]) =>
+            field === null || typeof field !== "object" || field.kind !== "env-builder",
+        )
+      ) {
+        return yield* Effect.fail(
+          new ConfigValidationError({
+            message: "Environment definitions must contain env builders",
+          }),
+        );
+      }
+      const frozenShape = Object.freeze({ ...shape }) as S;
+      const metadata = Object.freeze(
+        Object.fromEntries(entries.map(([name, field]) => [name, field.metadata])),
+      ) as EnvMetadataMap<S>;
+      const definition: Record<string, unknown> = {
+        kind: "env-definition",
+        shape: frozenShape,
+        metadata,
+      };
+      for (const [name, field] of entries) {
+        if (name === "PORT" || name === "RELKIT_ENV") {
+          return yield* Effect.fail(
+            new ConfigValidationError({
+              message: `Environment variable name "${name}" is framework-reserved${
+                name === "PORT" ? "; configure server.port instead" : ""
+              }.`,
+            }),
+          );
+        }
+        if (name === "kind" || name === "shape" || name === "metadata") {
+          return yield* Effect.fail(
+            new ConfigValidationError({
+              message: `Environment variable name "${name}" is reserved`,
+            }),
+          );
+        }
+        Object.defineProperty(definition, name, {
+          value: yield* createEnvRefEffect(name, field),
+          enumerable: false,
+        });
+      }
+      return Object.freeze(definition) as EnvDefinition<S>;
+    }),
+  );
+}
 
-/**
- * Creates an immutable environment declaration without reading runtime values.
- *
- * @example
- * ```ts
- * import { defineEnv, env } from "@relkit/app/config"
- * defineEnv({ API_URL: env.url(), API_TOKEN: env.secret() })
- * ```
- * @category Environment
- * @since 0.1.0
+/** Build a declaration synchronously for existing callers.
+ * @param shape - Field builders keyed by public environment names.
+ * @returns Immutable declaration and typed references.
+ * @throws TypeError for a reserved name or invalid builder.
+ * @example defineEnv({ MODE: env.string() });
  */
 export function defineEnv<const S extends EnvShape>(
   shape: S & { readonly PORT?: never; readonly RELKIT_ENV?: never },
 ): EnvDefinition<S> {
-  const entries = Object.keys(shape).map((name) => [name, shape[name]!] as const);
-  if (entries.some(([, field]) => field.kind !== "env-builder")) {
-    throw new TypeError("Environment definitions must contain env builders");
-  }
-  const frozenShape = Object.freeze({ ...shape }) as S;
-  const metadata = Object.freeze(
-    Object.fromEntries(entries.map(([name, field]) => [name, field.metadata])),
-  ) as EnvMetadataMap<S>;
-  const definition: Record<string, unknown> = {
-    kind: "env-definition",
-    shape: frozenShape,
-    metadata,
-  };
-  for (const [name, field] of entries) {
-    if (name === "PORT" || name === "RELKIT_ENV") {
-      throw new TypeError(
-        `Environment variable name "${name}" is framework-reserved${
-          name === "PORT" ? "; configure server.port instead" : ""
-        }.`,
-      );
-    }
-    if (name === "kind" || name === "shape" || name === "metadata") {
-      throw new TypeError(`Environment variable name "${name}" is reserved`);
-    }
-    Object.defineProperty(definition, name, {
-      value: createEnvRef(name, field),
-      enumerable: false,
-    });
-  }
-  return Object.freeze(definition) as EnvDefinition<S>;
-}
-
-function bindingOrBuilder<Value>(
-  name: string | undefined,
-  type: BindingValueType,
-  parse: (value: string) => Exclude<Value, undefined>,
-  sensitive = false,
-): EnvBuilder<Value> | BindingValueRef<string, Value> {
-  return name === undefined
-    ? createEnvBuilder(type, parse, sensitive)
-    : createBindingValueRef<string, Value>(name, type);
+  return runConfigSync(defineEnvEffect(shape));
 }

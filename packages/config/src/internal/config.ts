@@ -1,15 +1,47 @@
 import { Config, ConfigProvider, Effect, Option } from "effect";
-import type { EnvDefinition, EnvShape } from "../env-types.js";
-import { EnvResolutionError, resolveEnv, type EnvSource, type ResolvedEnv } from "../resolve.js";
+import { observeConfig } from "../config-observability.js";
+import type { EnvDefinition, EnvShape } from "../env.types.js";
+import {
+  EnvResolutionError,
+  resolveEnvEffect,
+  type EnvSource,
+  type ResolvedEnv,
+} from "../resolve.js";
 
-/** Internal bridge; the public package root intentionally does not expose this module. */
+/** Resolve through an explicit Effect ConfigProvider.
+ * @param definition - Value-free field declaration.
+ * @param source - Explicit source values.
+ * @param environment - Environment name for requirement rules.
+ * @returns Effect with inferred values or Config.ConfigError.
+ * @example Effect.runPromise(resolveEnvWithEffectEffect(definition, { MODE: "test" }, "test"));
+ */
+export function resolveEnvWithEffectEffect<S extends EnvShape>(
+  definition: EnvDefinition<S>,
+  source: EnvSource,
+  environment: string,
+): Effect.Effect<ResolvedEnv<S>, Config.ConfigError> {
+  return observeConfig(
+    "resolve-provider",
+    Effect.suspend(() => {
+      const provider = ConfigProvider.fromEnvRecord({ ...source }, { preserveEmptyStrings: true });
+      return makeConfig(definition, environment).parse(provider);
+    }),
+  );
+}
+
+/** Promise compatibility adapter for the internal ConfigProvider bridge.
+ * @param definition - Value-free field declaration.
+ * @param source - Explicit source values.
+ * @param environment - Environment name for requirement rules.
+ * @returns Promise with inferred values; rejects with Config.ConfigError.
+ * @example await resolveEnvWithEffect(definition, { MODE: "test" }, "test");
+ */
 export function resolveEnvWithEffect<S extends EnvShape>(
   definition: EnvDefinition<S>,
   source: EnvSource,
   environment: string,
 ): Promise<ResolvedEnv<S>> {
-  const provider = ConfigProvider.fromEnvRecord({ ...source }, { preserveEmptyStrings: true });
-  return Effect.runPromise(makeConfig(definition, environment).parse(provider));
+  return Effect.runPromise(resolveEnvWithEffectEffect(definition, source, environment));
 }
 
 function makeConfig<S extends EnvShape>(
@@ -22,10 +54,10 @@ function makeConfig<S extends EnvShape>(
 
   return Config.all(fields).pipe(
     Config.mapEffect((raw) =>
-      Effect.try({
-        try: () => resolveEnv(definition, { source: toSource(raw), environment }),
-        catch: (cause) => toConfigError(cause),
-      }),
+      Effect.mapError(
+        resolveEnvEffect(definition, { source: toSource(raw), environment }),
+        toConfigError,
+      ),
     ),
   );
 }

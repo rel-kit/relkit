@@ -1,4 +1,4 @@
-import { defineEnv, env } from "../../../packages/config/src/index.ts";
+import { defineEnv, env } from "../../src/index.js";
 
 export const valueFreeDeclaration = defineEnv({
   apiKey: env.secret().default("fixture-secret-default"),

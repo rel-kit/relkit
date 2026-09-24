@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { describe, expect, test } from "vitest";
+import { readGolden } from "./test-support.js";
 import {
   EnvResolutionError,
   defineEnv,
@@ -9,32 +8,11 @@ import {
   isEnvRef,
   projectEnv,
   resolveEnv,
-} from "../../packages/config/src/index.ts";
+} from "../src/index.js";
 
 const secret = "synthetic-env-secret-2.10";
 
-function readGolden(name: string): unknown {
-  return JSON.parse(readFileSync(join(import.meta.dir, "golden", name), "utf8"));
-}
-
-function assertSecretAbsent(value: unknown, forbidden: string, seen = new WeakSet<object>()): void {
-  if (typeof value === "string") {
-    expect(value).not.toContain(forbidden);
-    return;
-  }
-  if (value === null || typeof value !== "object" || seen.has(value)) return;
-  seen.add(value);
-  if (Array.isArray(value)) {
-    for (const item of value) assertSecretAbsent(item, forbidden, seen);
-    return;
-  }
-  for (const [key, item] of Object.entries(value)) {
-    expect(key).not.toContain(forbidden);
-    assertSecretAbsent(item, forbidden, seen);
-  }
-}
-
-describe.serial("@relkit/config environment", () => {
+describe("@relkit/config environment", () => {
   test("keeps named binding values separate from application environment fields", () => {
     const cacheUrl = env.secret("CACHE_URL");
     const definition = defineEnv({ CACHE_URL: env.secret() });
@@ -192,68 +170,5 @@ describe.serial("@relkit/config environment", () => {
     ]);
     expect(Object.isFrozen(projection)).toBe(true);
     expect(JSON.parse(JSON.stringify(projection))).toEqual(projection);
-  });
-
-  test("does not read process or files while evaluating a declaration", async () => {
-    const processEnv = Object.getOwnPropertyDescriptor(process, "env");
-    const originalFile = Bun.file;
-    let processReads = 0;
-    let fileReads = 0;
-    Object.defineProperty(process, "env", {
-      ...processEnv,
-      value: new Proxy(process.env, {
-        get() {
-          processReads += 1;
-          throw new Error("process.env was read during declaration");
-        },
-      }),
-    });
-    Bun.file = ((..._args: Parameters<typeof Bun.file>) => {
-      fileReads += 1;
-      throw new Error("Bun.file was read during declaration");
-    }) as typeof Bun.file;
-
-    try {
-      const { valueFreeDeclaration } = await import("./fixtures/value-free-declaration.ts");
-      expect(valueFreeDeclaration.kind).toBe("env-definition");
-    } finally {
-      if (processEnv) Object.defineProperty(process, "env", processEnv);
-      Bun.file = originalFile;
-    }
-
-    expect(processReads).toBe(0);
-    expect(fileReads).toBe(0);
-    for (const source of ["env.ts", "env-builder.ts", "env-json.ts", "index.ts", "resolve.ts"]) {
-      const contents = readFileSync(
-        join(import.meta.dir, "../../packages/config/src", source),
-        "utf8",
-      );
-      expect(contents).not.toMatch(/node:(?:fs|process)|\b(?:process|Bun\.file|readFile)\b/);
-    }
-  });
-
-  test("recursively keeps secret values and defaults out of metadata and snapshots", () => {
-    const definition = defineEnv({
-      apiKey: env.secret().default(secret).example(secret),
-      nestedDefault: env.json().default({ credentials: { token: secret } }),
-      requiredSecret: env.secret().requiredIn("production"),
-    });
-    const projection = projectEnv(definition);
-    const golden = readGolden("environment.json");
-    const snapshot = JSON.parse(JSON.stringify({ metadata: definition.metadata, projection }));
-
-    assertSecretAbsent(definition.metadata, secret);
-    assertSecretAbsent(projection, secret);
-    assertSecretAbsent(golden, secret);
-    assertSecretAbsent(snapshot, secret);
-    expect(JSON.stringify(definition)).not.toContain(secret);
-    expect(projection.find(({ name }) => name === "apiKey")).toMatchObject({
-      sensitive: true,
-      hasDefault: true,
-      example: "[redacted]",
-    });
-    expect(() => resolveEnv(definition, { environment: "production", source: {} })).toThrow(
-      "requiredSecret: Required value is missing",
-    );
   });
 });

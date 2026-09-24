@@ -44,6 +44,20 @@ types, requirements, default presence, and sensitivity without resolved values
 or secret defaults. `resolveEnv` returns an immutable value object and reports
 missing or malformed values with structured issues.
 
+## Effect operations
+
+The synchronous functions above run their Effect implementations. Applications
+that already use Effect can call `defineEnvEffect`, `projectEnvEffect`, and
+`resolveEnvEffect` directly with an explicit source and environment name.
+
+Expected failures have stable `ConfigValidationError` or `EnvResolutionError`
+tags, so an Effect caller can recover with `Effect.catchTag`. Operations emit
+`config.*` spans and bounded call, failure, and duration metrics by default.
+Provide `ConfigTelemetry` as a Layer when a different observer is needed.
+
+Run this package's behavior suite with `bun run --cwd packages/config test` or
+its enforced coverage gate with `bun run --cwd packages/config test:coverage`.
+
 `PORT` is reserved for framework server selection and is rejected by
 `defineEnv`; configure it with `server.port`, the `PORT` process variable, or
 the CLI `--port` flag.
