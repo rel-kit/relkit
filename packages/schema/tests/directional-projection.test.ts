@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
-import { getJsonSchema, z } from "./src/index.ts";
-import { getSchemaMetadata } from "./src/schema-metadata.ts";
+import { expect, test } from "vitest";
+import { getJsonSchema, z } from "../src/index.js";
+import { getSchemaMetadata } from "../src/schema-metadata.js";
 
 test("projects transformed schemas by input/output direction", () => {
   const refined = z.string().min(1);

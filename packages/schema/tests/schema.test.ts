@@ -1,15 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import {
-  getJsonSchema,
-  JSON_SCHEMA_UNAVAILABLE,
-  validate,
-  validateSync,
-  z,
-} from "../../packages/schema/src/index.ts";
-import { thirdPartyProduct } from "./fixtures/third-party.ts";
-import { unavailableJsonSchema } from "./fixtures/unavailable-json-schema.ts";
+import { getJsonSchema, JSON_SCHEMA_UNAVAILABLE, validate, validateSync, z } from "../src/index.js";
+import { thirdPartyProduct } from "./fixtures/third-party.js";
+import { unavailableJsonSchema } from "./fixtures/unavailable-json-schema.js";
 
 const orderSchema = z.object({
   orderId: z.string().uuid(),
@@ -19,10 +12,10 @@ const orderSchema = z.object({
 });
 
 function readGolden(name: string): unknown {
-  return JSON.parse(readFileSync(join(import.meta.dir, "golden", name), "utf8"));
+  return JSON.parse(readFileSync(new URL(`./golden/${name}`, import.meta.url), "utf8"));
 }
 
-describe.serial("@relkit/schema", () => {
+describe("@relkit/schema", () => {
   test("validates sync and async Standard Schema values", async () => {
     const defaulted = validateSync(orderSchema, {
       orderId: "550e8400-e29b-41d4-a716-446655440000",

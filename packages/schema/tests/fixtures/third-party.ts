@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "../../../../packages/schema/src/index.ts";
+import type { StandardSchemaV1 } from "../../src/index.js";
 
 type Product = { readonly name: string };
 

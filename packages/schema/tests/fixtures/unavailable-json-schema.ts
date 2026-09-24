@@ -1,4 +1,4 @@
-import type { StandardSchemaV1 } from "../../../../packages/schema/src/index.ts";
+import type { StandardSchemaV1 } from "../../src/index.js";
 
 /** A compatible validator that intentionally has no deterministic JSON Schema hook. */
 export const unavailableJsonSchema: StandardSchemaV1 = {

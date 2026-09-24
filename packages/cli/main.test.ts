@@ -1,7 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import manifest from "./package.json" with { type: "json" };
-import { CLI_EXIT_CODES, getCliHelpModel, runCli, type CliHelpCommand } from "./src/main.js";
 import { parseEffectCli } from "./src/cli-effect-runtime.js";
+import { CLI_EXIT_CODES, getCliHelpModel, runCli, type CliHelpCommand } from "./src/main.js";
 
 function io() {
   const stdout: string[] = [];

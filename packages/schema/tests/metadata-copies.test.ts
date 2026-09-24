@@ -1,21 +1,25 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { mkdtemp, rm } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getJsonSchema, z } from "./src/index.ts";
-import { getSchemaMetadata } from "./src/schema-metadata.ts";
+import { getJsonSchema, z } from "../src/index.js";
+import { getSchemaMetadata } from "../src/schema-metadata.js";
 
 test("schema metadata survives independent package copies", async () => {
   const root = await mkdtemp(join(tmpdir(), "relkit-schema-copy-"));
   try {
     // A second bundled copy has its own module-local state, just like packed installs.
-    const result = await Bun.build({
-      entrypoints: [new URL("./src/index.ts", import.meta.url).pathname],
-      target: "bun",
-      outdir: root,
-    });
-    expect(result.success).toBe(true);
-    const other = await import(result.outputs[0]!.path);
+    const output = join(root, "schema.js");
+    execFileSync("bun", [
+      "build",
+      new URL("../src/index.ts", import.meta.url).pathname,
+      "--target",
+      "bun",
+      "--outfile",
+      output,
+    ]);
+    const other = await import(output);
     const schema = other.z.string().min(1).max(8);
     expect(getJsonSchema(schema)).toEqual({
       ok: true,

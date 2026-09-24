@@ -1,120 +1,178 @@
-import type { JsonValue, StandardSchemaV1 } from "./standard-schema.js";
+import { Data, Effect } from "effect";
+import { runSchemaSync } from "./schema-observability.js";
+import type { StandardSchemaV1 } from "./standard-schema.types.js";
+import type {
+  SchemaMetadata,
+  SchemaProjection,
+  SchemaProjectionDirection,
+} from "./schema-metadata.types.js";
 
-export type SchemaProjection = () => JsonValue;
-export type SchemaProjectionDirection = "input" | "output";
-
-export interface SchemaMetadata {
-  /** The historical projection used by getJsonSchema(schema) without options. */
-  readonly jsonSchema?: SchemaProjection;
-  readonly inputJsonSchema?: SchemaProjection;
-  readonly outputJsonSchema?: SchemaProjection;
-  readonly optional?: boolean;
-  readonly inputOptional?: boolean;
-  readonly outputOptional?: boolean;
-  readonly transformed?: boolean;
-  readonly refined?: boolean;
-}
+export type {
+  SchemaMetadata,
+  SchemaProjection,
+  SchemaProjectionDirection,
+} from "./schema-metadata.types.js";
+export {
+  withDefaultMetadata,
+  withNullableMetadata,
+  withOptionalMetadata,
+  withRefinementMetadata,
+  withTransformMetadata,
+} from "./schema-metadata-composition.js";
 
 const metadataKey = Symbol.for("relkit.schema.metadata");
 
+/**
+ * Tagged failure when schema metadata cannot be attached.
+ * The original exception remains available in `cause`.
+ * @example Effect.catchTag("SchemaMetadataError", (error) => Effect.succeed(error.cause));
+ */
+export class SchemaMetadataError extends Data.TaggedError("SchemaMetadataError")<{
+  readonly cause: unknown;
+}> {}
+
+/**
+ * Reads attached metadata inside Effect.
+ * @param schema - Schema to inspect.
+ * @returns Optional metadata in the Effect success channel.
+ * @example Effect.runSync(getSchemaMetadataEffect(z.string()));
+ */
+export function getSchemaMetadataEffect(
+  schema: StandardSchemaV1,
+): Effect.Effect<SchemaMetadata | undefined> {
+  return Effect.sync(
+    () => (schema as StandardSchemaV1 & { [metadataKey]?: SchemaMetadata })[metadataKey],
+  );
+}
+
+/**
+ * Reads metadata attached to a schema.
+ * @param schema - Schema to inspect.
+ * @returns Attached metadata, if present.
+ * @example getSchemaMetadata(z.string());
+ */
 export function getSchemaMetadata(schema: StandardSchemaV1): SchemaMetadata | undefined {
-  return (schema as StandardSchemaV1 & { [metadataKey]?: SchemaMetadata })[metadataKey];
+  return runSchemaSync(getSchemaMetadataEffect(schema));
 }
 
+/**
+ * Attaches metadata inside Effect.
+ * @param schema - Schema to annotate.
+ * @param metadata - Projection and refinement metadata.
+ * @returns An Effect that completes after metadata is attached, or SchemaMetadataError.
+ * @example Effect.runSync(setSchemaMetadataEffect(z.string(), {}));
+ */
+export function setSchemaMetadataEffect(
+  schema: StandardSchemaV1,
+  metadata: SchemaMetadata,
+): Effect.Effect<void, SchemaMetadataError> {
+  return Effect.try({
+    try: () => {
+      Object.defineProperty(schema, metadataKey, { value: metadata, configurable: true });
+    },
+    catch: (cause) => new SchemaMetadataError({ cause }),
+  });
+}
+
+/**
+ * Attaches metadata for cross-copy projection lookup.
+ * @param schema - Schema to annotate.
+ * @param metadata - Projection and refinement metadata.
+ * @returns Nothing after metadata is attached.
+ * @throws The original property-definition error.
+ * @example setSchemaMetadata(z.string(), { optional: true });
+ */
 export function setSchemaMetadata(schema: StandardSchemaV1, metadata: SchemaMetadata): void {
-  Object.defineProperty(schema, metadataKey, { value: metadata, configurable: true });
+  try {
+    runSchemaSync(setSchemaMetadataEffect(schema, metadata));
+  } catch (error) {
+    if (error instanceof SchemaMetadataError) throw error.cause;
+    throw error;
+  }
 }
 
+/**
+ * Selects the requested projection hook inside Effect.
+ * @param metadata - Optional schema metadata.
+ * @param direction - Legacy, input, or output direction.
+ * @returns The matching hook, if one exists.
+ * @example Effect.runSync(getMetadataProjectionEffect({}, "input"));
+ */
+export function getMetadataProjectionEffect(
+  metadata: SchemaMetadata | undefined,
+  direction: SchemaProjectionDirection | "legacy" = "legacy",
+): Effect.Effect<SchemaMetadata["jsonSchema"]> {
+  return Effect.sync(() => {
+    if (metadata === undefined) return undefined;
+    if (direction === "input") return metadata.inputJsonSchema ?? metadata.jsonSchema;
+    if (direction === "output") return metadata.outputJsonSchema ?? metadata.jsonSchema;
+    return metadata.jsonSchema;
+  });
+}
+
+/**
+ * Selects the projection hook for a direction.
+ * @param metadata - Optional schema metadata.
+ * @param direction - Legacy, input, or output direction.
+ * @returns The matching hook, if present.
+ * @example getMetadataProjection({}, "output");
+ */
 export function getMetadataProjection(
   metadata: SchemaMetadata | undefined,
   direction: SchemaProjectionDirection | "legacy" = "legacy",
 ): SchemaProjection | undefined {
-  if (metadata === undefined) return undefined;
-  if (direction === "input") return metadata.inputJsonSchema ?? metadata.jsonSchema;
-  if (direction === "output") return metadata.outputJsonSchema ?? metadata.jsonSchema;
-  return metadata.jsonSchema;
+  return runSchemaSync(getMetadataProjectionEffect(metadata, direction));
 }
 
+/**
+ * Checks optionality inside Effect.
+ * @param metadata - Optional schema metadata.
+ * @param direction - Legacy, input, or output direction.
+ * @returns Whether an omitted property is accepted.
+ * @example Effect.runSync(isMetadataOptionalEffect({ optional: true }));
+ */
+export function isMetadataOptionalEffect(
+  metadata: SchemaMetadata | undefined,
+  direction: SchemaProjectionDirection | "legacy" = "legacy",
+): Effect.Effect<boolean> {
+  return Effect.sync(() => {
+    if (metadata === undefined) return false;
+    if (direction === "input") return metadata.inputOptional ?? metadata.optional === true;
+    if (direction === "output") return metadata.outputOptional ?? metadata.optional === true;
+    return metadata.optional === true;
+  });
+}
+
+/**
+ * Checks whether a schema accepts an omitted property.
+ * @param metadata - Optional schema metadata.
+ * @param direction - Legacy, input, or output direction.
+ * @returns Whether the schema is optional in that direction.
+ * @example isMetadataOptional({ optional: true });
+ */
 export function isMetadataOptional(
   metadata: SchemaMetadata | undefined,
   direction: SchemaProjectionDirection | "legacy" = "legacy",
 ): boolean {
-  if (metadata === undefined) return false;
-  if (direction === "input") return metadata.inputOptional ?? metadata.optional === true;
-  if (direction === "output") return metadata.outputOptional ?? metadata.optional === true;
-  return metadata.optional === true;
+  return runSchemaSync(isMetadataOptionalEffect(metadata, direction));
 }
 
+/**
+ * Checks whether a schema has been transformed inside Effect.
+ * @param schema - Schema to inspect.
+ * @returns Whether transform metadata is set.
+ * @example Effect.runSync(isSchemaTransformedEffect(z.string()));
+ */
+export function isSchemaTransformedEffect(schema: StandardSchemaV1): Effect.Effect<boolean> {
+  return Effect.map(getSchemaMetadataEffect(schema), (metadata) => metadata?.transformed === true);
+}
+
+/**
+ * Checks whether a schema has a value transform.
+ * @param schema - Schema to inspect.
+ * @returns Whether transform metadata is set.
+ * @example isSchemaTransformed(z.string().transform(Number));
+ */
 export function isSchemaTransformed(schema: StandardSchemaV1): boolean {
-  return getSchemaMetadata(schema)?.transformed === true;
-}
-
-export function withRefinementMetadata(schema: StandardSchemaV1): SchemaMetadata {
-  return { ...(getSchemaMetadata(schema) ?? {}), refined: true };
-}
-
-export function withTransformMetadata(schema: StandardSchemaV1): SchemaMetadata {
-  const metadata = getSchemaMetadata(schema);
-  const input = getMetadataProjection(metadata, "input");
-  return {
-    ...(metadata?.refined === true ? { refined: true } : {}),
-    ...(input === undefined ? {} : { inputJsonSchema: input }),
-    ...(metadata?.inputOptional === undefined ? {} : { inputOptional: metadata.inputOptional }),
-    transformed: true,
-  };
-}
-
-export function withOptionalMetadata(schema: StandardSchemaV1): SchemaMetadata {
-  return {
-    ...(getSchemaMetadata(schema) ?? {}),
-    optional: true,
-    inputOptional: true,
-    outputOptional: true,
-  };
-}
-
-export function withNullableMetadata(schema: StandardSchemaV1): SchemaMetadata {
-  const metadata = getSchemaMetadata(schema);
-  const wrap = (projection: SchemaProjection | undefined): SchemaProjection | undefined =>
-    projection === undefined ? undefined : () => ({ anyOf: [projection(), { type: "null" }] });
-  const legacy = wrap(getMetadataProjection(metadata, "legacy"));
-  const input = wrap(getMetadataProjection(metadata, "input"));
-  const output = wrap(getMetadataProjection(metadata, "output"));
-  return {
-    ...(metadata ?? {}),
-    ...(legacy === undefined ? {} : { jsonSchema: legacy }),
-    ...(input === undefined ? {} : { inputJsonSchema: input }),
-    ...(output === undefined ? {} : { outputJsonSchema: output }),
-  };
-}
-
-export function withDefaultMetadata<T>(
-  schema: StandardSchemaV1,
-  value: T | (() => T),
-): SchemaMetadata {
-  const metadata = getSchemaMetadata(schema);
-  const addDefault = (projection: SchemaProjection | undefined): SchemaProjection | undefined =>
-    projection === undefined || typeof value === "function"
-      ? projection
-      : () => {
-          const projected = projection();
-          if (!isRecord(projected)) throw new TypeError("Schema projection must be an object");
-          return { ...projected, default: value as unknown as JsonValue };
-        };
-  const legacy = addDefault(getMetadataProjection(metadata, "legacy"));
-  const input = getMetadataProjection(metadata, "input");
-  const output = addDefault(getMetadataProjection(metadata, "output"));
-  return {
-    ...(metadata ?? {}),
-    optional: true,
-    inputOptional: true,
-    outputOptional: false,
-    ...(legacy === undefined ? {} : { jsonSchema: legacy }),
-    ...(input === undefined ? {} : { inputJsonSchema: input }),
-    ...(output === undefined ? {} : { outputJsonSchema: output }),
-  };
-}
-
-function isRecord(value: JsonValue): value is { readonly [key: string]: JsonValue } {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return runSchemaSync(isSchemaTransformedEffect(schema));
 }

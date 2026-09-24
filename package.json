@@ -11,7 +11,7 @@
     "test": "bun run scripts/test-all.ts",
     "test:types": "bun run scripts/test-types.ts",
     "test:packages": "bun run scripts/test-packages.ts",
-    "test:unit": "bun test ./tests/unit ./tests/schema",
+    "test:unit": "bun test ./tests/unit",
     "test:compiler": "bun test --timeout 15000 ./tests/compiler ./tests/graph",
     "test:contracts": "bun test ./tests/contracts",
     "test:integration": "bun test ./tests/integration",
