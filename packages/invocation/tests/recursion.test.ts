@@ -1,9 +1,9 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   bindDescriptorIdentity,
   createInvocationCallStack,
   RecursionPolicyError,
-} from "./src/index.ts";
+} from "../src/index.ts";
 
 describe("shared invocation recursion policy", () => {
   test("rejects direct and dynamic cycles before appending a frame", () => {

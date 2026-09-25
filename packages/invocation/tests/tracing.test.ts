@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { Context, Exit, Option } from "effect";
 import {
   SpanRuntime,
@@ -8,7 +8,7 @@ import {
   runDetachedExecution,
   type SpanLifecycle,
   type RelkitSpan,
-} from "./src/index.js";
+} from "../src/index.js";
 import { createSpanId, createTraceId } from "@relkit/contracts";
 
 function setup(limits = {}, observer?: (event: SpanLifecycle) => unknown) {

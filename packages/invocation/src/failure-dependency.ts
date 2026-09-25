@@ -1,11 +1,17 @@
-import { makeFailure } from "./failure-runtime.js";
-import type { ProviderFailure } from "./failure-types.js";
+import { Effect } from "effect";
+import { makeFailureEffect } from "./failure-runtime.js";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import type { DependencyNotConfiguredCause, ProviderFailure } from "./failure-dependency.types.js";
 
-export function dependencyNotConfiguredFailure(cause: {
-  readonly category: string;
-  readonly dependencyName: string;
-}): ProviderFailure {
-  return makeFailure(
+/** Constructs a provider failure for a missing managed client.
+ * @param cause - Category and dependency name.
+ * @returns A frozen provider failure with no expected error.
+ * @example Effect.runSync(dependencyNotConfiguredFailureEffect({ category: "cache", dependencyName: "main" }));
+ */
+export function dependencyNotConfiguredFailureEffect(
+  cause: DependencyNotConfiguredCause,
+): Effect.Effect<ProviderFailure> {
+  return observeInvocation("failure.dependency", Effect.map(makeFailureEffect(
     {
       _tag: "ProviderFailure",
       kind: "provider",
@@ -16,5 +22,14 @@ export function dependencyNotConfiguredFailure(cause: {
       profile: cause.dependencyName,
     },
     cause,
-  ) as ProviderFailure;
+  ), (failure) => failure as ProviderFailure));
+}
+
+/** Synchronous missing dependency failure adapter.
+ * @param cause - Category and dependency name.
+ * @returns A frozen provider failure.
+ * @example dependencyNotConfiguredFailure({ category: "cache", dependencyName: "main" });
+ */
+export function dependencyNotConfiguredFailure(cause: DependencyNotConfiguredCause): ProviderFailure {
+  return runInvocationSync(dependencyNotConfiguredFailureEffect(cause));
 }

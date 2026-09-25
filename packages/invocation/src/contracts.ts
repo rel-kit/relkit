@@ -1,172 +1,12 @@
-import type { MaybePromise, ProtocolId } from "@relkit/contracts";
-import type { StandardIssue, StandardSchemaV1 } from "@relkit/schema";
+import type { StandardIssue } from "@relkit/schema";
 import { Effect } from "effect";
-import type { InvocationFailure, PublicFailureEnvelope } from "./failure-types.js";
-import type { PublicTrace } from "./public-trace.js";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
 
-export type InvocationSource =
-  "direct" | "http" | "job" | "event-delivery" | "event-replay" | "tool" | "agent";
-export type InvocationKind = "trace" | "invocation" | "span";
-export type InvocationIdSource = { readonly next: (kind: InvocationKind) => ProtocolId };
+export type * from "./contracts.types.js";
 
-export interface PublicLogger {
-  readonly trace: (message: string, fields?: Readonly<Record<string, unknown>>) => void;
-  readonly debug: (message: string, fields?: Readonly<Record<string, unknown>>) => void;
-  readonly info: (message: string, fields?: Readonly<Record<string, unknown>>) => void;
-  readonly warn: (message: string, fields?: Readonly<Record<string, unknown>>) => void;
-  readonly error: (message: string, fields?: Readonly<Record<string, unknown>>) => void;
-}
-
-export interface PublicClock {
-  readonly now: () => Date;
-  readonly sleep: (milliseconds: number) => Promise<void>;
-}
-
-export interface InvocationMetadata {
-  readonly id: string;
-  readonly parentId?: string;
-  readonly traceId: string;
-  readonly correlationId?: string;
-  readonly startedAt: string;
-  readonly deadline?: string;
-  readonly attempt: number;
-  readonly source: InvocationSource;
-  readonly serviceId?: string;
-  readonly runId?: string;
-  readonly jobId?: string;
-  readonly taskId?: string;
-  readonly taskVersion?: string;
-  readonly buildId?: string;
-  readonly serviceGeneration?: string;
-}
-
-export interface InvocationContext {
-  readonly trace: PublicTrace;
-  readonly invocation: InvocationMetadata;
-  readonly signal: AbortSignal;
-  readonly env: Readonly<Record<string, unknown>>;
-  readonly log: PublicLogger;
-  readonly time: PublicClock;
-  readonly tasks: Readonly<Record<string, never>>;
-  readonly jobs: Readonly<Record<string, never>>;
-  readonly events: Readonly<Record<string, never>>;
-  readonly buckets: Readonly<Record<string, never>>;
-  readonly cache: Readonly<Record<string, never>>;
-  readonly agents: Readonly<Record<string, never>>;
-  readonly database: Readonly<Record<string, never>>;
-  readonly auth: { readonly getSession: () => Promise<unknown | null> };
-  readonly constants: Readonly<Record<string, never>>;
-  readonly prompts: Readonly<Record<string, never>>;
-  readonly trigger?: unknown;
-}
-
-export interface InvocationErrorDefinition {
-  readonly id: string;
-  readonly data: StandardSchemaV1;
-}
-
-export interface InvocationTarget<
-  Input = unknown,
-  Output = unknown,
-  Context extends { readonly signal: AbortSignal } = InvocationContext,
-> {
-  readonly id: string;
-  readonly invocationMode?: "callable" | "event-only";
-  readonly input: StandardSchemaV1;
-  readonly output: StandardSchemaV1;
-  readonly progress?: StandardSchemaV1;
-  readonly errors?: readonly InvocationErrorDefinition[];
-  readonly publications?: Readonly<Record<string, unknown>>;
-  readonly publishes?: readonly string[];
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly onBefore?: (input: Input, context: Context) => MaybePromise<Input>;
-  readonly onAfter?: (output: Output, context: Context) => MaybePromise<Output>;
-  readonly handler: (input: Input, context: Context) => MaybePromise<Output>;
-}
-
-export interface InvocationRecord extends InvocationMetadata {
-  readonly functionId: string;
-  readonly status:
-    | "started"
-    | "success"
-    | "validation-error"
-    | "declared-error"
-    | "provider-failure"
-    | "cancelled"
-    | "timeout"
-    | "defect";
-  readonly completedAt?: string;
-  readonly durationMs?: number;
-}
-
-export interface SpanRecord {
-  readonly invocationId: string;
-  readonly functionId: string;
-  readonly name: string;
-  readonly spanId: string;
-  readonly parentSpanId?: string;
-  readonly traceId: string;
-  readonly source: InvocationSource;
-  readonly serviceId?: string;
-  readonly status: "started" | "completed";
-  readonly startedAt: string;
-  readonly completedAt?: string;
-}
-
-export interface InvocationParent {
-  readonly id: string;
-  readonly traceId: string;
-  readonly spanId?: string;
-  readonly correlationId?: string;
-  readonly deadlineMs?: number;
-  readonly signal?: AbortSignal;
-  readonly trace?: unknown;
-}
-
-export interface InvocationAdmissionRequest {
-  readonly functionId: string;
-  readonly source: InvocationSource;
-  readonly triggerLimit?: number;
-  readonly limit?: number;
-  readonly deadlineMs?: number;
-  readonly signal: AbortSignal;
-}
-
-export interface InvocationLease {
-  readonly release: () => MaybePromise<void>;
-}
-
-export type InvocationAdmit = (
-  request: InvocationAdmissionRequest,
-) => MaybePromise<InvocationLease | void>;
-
-export interface InvocationContextOptions {
-  readonly invocation: InvocationRecord;
-  readonly signal: AbortSignal;
-  readonly env: Readonly<Record<string, unknown>>;
-  readonly time: PublicClock;
-}
-
-export interface InvocationRunner {
-  readonly run: <A, E>(
-    effect: Effect.Effect<A, E, never>,
-    options?: { readonly signal?: AbortSignal },
-  ) => Promise<A>;
-}
-
-export interface InvocationCompletion {
-  readonly record: InvocationRecord;
-  readonly outcome: Exclude<InvocationRecord["status"], "started">;
-  readonly error?: InvocationValidationError | InvocationFailure;
-  readonly publicError?: PublicFailureEnvelope;
-}
-
-export interface InvocationRelease {
-  readonly record: InvocationRecord;
-  readonly admitted: boolean;
-}
-
+/** Public input or output schema validation error with frozen issue data.
+ * @example new InvocationValidationError("input", issues);
+ */
 export class InvocationValidationError extends TypeError {
   readonly code: "RELKIT_INPUT_VALIDATION" | "RELKIT_OUTPUT_VALIDATION";
   readonly phase: "input" | "output";
@@ -177,6 +17,23 @@ export class InvocationValidationError extends TypeError {
     this.name = "InvocationValidationError";
     this.code = phase === "input" ? "RELKIT_INPUT_VALIDATION" : "RELKIT_OUTPUT_VALIDATION";
     this.phase = phase;
-    this.issues = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
+    this.issues = runInvocationSync(observeInvocation(
+      "validation.error-create",
+      Effect.sync(() => Object.freeze(issues.map((issue) => Object.freeze({ ...issue })))),
+    ));
   }
+}
+
+/** Constructs a public validation error through Effect.
+ * @param phase - Input or output phase.
+ * @param issues - Standard Schema issues.
+ * @returns Frozen validation error; malformed issue objects remain defects.
+ * @example Effect.runSync(makeInvocationValidationErrorEffect("input", issues));
+ */
+export function makeInvocationValidationErrorEffect(
+  phase: "input" | "output",
+  issues: readonly StandardIssue[],
+): Effect.Effect<InvocationValidationError> {
+  return observeInvocation("validation.error-factory", Effect.sync(() =>
+    new InvocationValidationError(phase, issues)));
 }

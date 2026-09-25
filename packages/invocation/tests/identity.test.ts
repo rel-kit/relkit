@@ -1,11 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   bindDescriptorIdentity,
   createUnboundIdentity,
   getDescriptorIdentity,
   isDescriptorIdentityBound,
   resolveDescriptorIdentity,
-} from "./src/index.ts";
+} from "../src/index.ts";
 
 describe("descriptor identity binding", () => {
   test("binds a canonical ID without mutating the descriptor", () => {

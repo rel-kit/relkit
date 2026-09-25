@@ -1,7 +1,27 @@
-import type { SpanLifecycle } from "./span-runtime.js";
-import type { SpanCapture } from "./span-runtime.js";
+import { Effect } from "effect";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import type { SpanLifecycle, SpanCapture } from "./span-snapshot.types.js";
 
-export function spanSnapshot(event: SpanLifecycle) {
+/** Serializes one span lifecycle event through Effect.
+ * @param event - Span lifecycle event to snapshot.
+ * @returns An immutable public snapshot; malformed internal data is a defect.
+ * @example Effect.runSync(spanSnapshotEffect({ type: "started", span, revision: 0 }));
+ */
+export function spanSnapshotEffect(event: SpanLifecycle) {
+  return observeInvocation("span.snapshot", Effect.sync(() => buildSnapshot(event)));
+}
+
+/** Synchronous span snapshot compatibility adapter.
+ * @param event - Span lifecycle event to snapshot.
+ * @returns An immutable public snapshot.
+ * @throws A defect for malformed internal span data.
+ * @example spanSnapshot({ type: "started", span, revision: 0 });
+ */
+export function spanSnapshot(event: SpanLifecycle): ReturnType<typeof buildSnapshot> {
+  return runInvocationSync(spanSnapshotEffect(event));
+}
+
+function buildSnapshot(event: SpanLifecycle) {
   const span = event.span;
   const attributes = Object.fromEntries(span.attributes);
   const text = (key: string): string | undefined =>

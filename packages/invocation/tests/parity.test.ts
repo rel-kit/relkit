@@ -1,5 +1,5 @@
 import { Cause, Effect } from "effect";
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   InvocationValidationError,
   invokeUserHandler,
@@ -9,7 +9,7 @@ import {
   validated,
   type InvocationRecord,
   type InvocationTarget,
-} from "./src/index.ts";
+} from "../src/index.ts";
 import { z } from "@relkit/schema";
 
 const record: InvocationRecord = {

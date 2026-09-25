@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   DependencyNotConfiguredError,
   dispatchInvocation,
@@ -11,7 +11,7 @@ import {
   type InvocationDispatcher,
   type LocalStructuredLogger,
   type InvocationTarget,
-} from "./src/index.ts";
+} from "../src/index.ts";
 import { z } from "@relkit/schema";
 
 const empty = z.object({});

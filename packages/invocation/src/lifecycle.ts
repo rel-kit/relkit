@@ -1,33 +1,19 @@
 import { Effect } from "effect";
-import type { StandardSchemaV1 } from "@relkit/schema";
 import { invokeUserHandler } from "./handler-bridge.js";
-import type { InvocationTarget } from "./contracts.js";
-import type { InvocationValueHooks } from "./dispatcher-types.js";
 import { normalizeFailure } from "./failure.js";
-import type { InvocationFailure } from "./failure-types.js";
-import { validated } from "./validation.js";
+import type { InvocationFailure } from "./failure.types.js";
+import { validatedEffect } from "./validation.js";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import type { BaseExecutionContext, LifecycleOptions, ValueHookOptions } from "./lifecycle.types.js";
+import type { StandardSchemaV1 } from "@relkit/schema";
 
-interface LifecycleOptions<Context extends { readonly signal: AbortSignal }> {
-  readonly target: InvocationTarget<unknown, unknown, Context>;
-  readonly input: unknown;
-  readonly context: Context;
-  readonly deadline?: number;
-  readonly onSignal?: (signal: AbortSignal) => void;
-  readonly isSuspension?: (cause: unknown) => boolean;
-  readonly validateInput?: boolean;
-  readonly validateOutput?: boolean;
-}
+export type { BaseExecutionContext, LifecycleOptions, ValueHookOptions } from "./lifecycle.types.js";
 
-interface ValueHookOptions<Context extends { readonly signal: AbortSignal }> {
-  readonly hook: InvocationValueHooks<Context>["onBefore"];
-  readonly value: unknown;
-  readonly schema: StandardSchemaV1;
-  readonly context: Context;
-  readonly deadline?: number;
-  readonly onSignal?: (signal: AbortSignal) => void;
-  readonly isSuspension?: (cause: unknown) => boolean;
-}
-
+/** Runs target before hook, handler, output validation, and after hook in order.
+ * @param options - Target, input, context, deadline, and validation flags.
+ * @returns Validated output or an invocation failure.
+ * @example await Effect.runPromise(invokeFunctionLifecycle({ target, input, context }));
+ */
 export function invokeFunctionLifecycle<Context extends { readonly signal: AbortSignal }>(
   options: LifecycleOptions<Context>,
 ): Effect.Effect<unknown, InvocationFailure> {
@@ -45,7 +31,7 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         : validateOutput(options.target.input, value),
     ),
   );
-  return before.pipe(
+  return observeInvocation("lifecycle.function", before.pipe(
     Effect.flatMap((input) =>
       invokeValue(
         options.target.handler,
@@ -84,37 +70,52 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
             options.target.invocationMode === "event-only",
           ),
     ),
-  );
+  ));
 }
 
+/** Runs and validates one value hook through Effect.
+ * @param options - Hook, value, schema, and public context.
+ * @returns Validated value or an invocation failure.
+ * @example await Effect.runPromise(invokeValueHook({ hook, value, schema, context }));
+ */
 export function invokeValueHook<Context extends { readonly signal: AbortSignal }>(
   options: ValueHookOptions<Context>,
 ): Effect.Effect<unknown, InvocationFailure> {
-  return invokeValue(
+  return observeInvocation("lifecycle.value-hook", invokeValue(
     options.hook,
     options.value,
     options.context,
     options.deadline,
     options.onSignal,
     options.isSuspension,
-  ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value)));
+  ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value))));
 }
 
-export function baseExecutionContext(value: unknown): {
-  readonly invocation: unknown;
-  readonly signal: AbortSignal;
-  readonly env: unknown;
-  readonly log: unknown;
-  readonly time: unknown;
-} {
-  const context = value as Record<string, unknown> & { readonly signal: AbortSignal };
-  return Object.freeze({
-    invocation: context.invocation,
-    signal: context.signal,
-    env: context.env,
-    log: context.log,
-    time: context.time,
-  });
+/** Builds the restricted context visible to tool value hooks.
+ * @param value - Full handler context.
+ * @returns Immutable invocation, signal, environment, logger, and time fields.
+ * @example Effect.runSync(baseExecutionContextEffect(context));
+ */
+export function baseExecutionContextEffect(value: unknown): Effect.Effect<BaseExecutionContext> {
+  return observeInvocation("lifecycle.base-context", Effect.sync(() => {
+    const context = value as Record<string, unknown> & { readonly signal: AbortSignal };
+    return Object.freeze({
+      invocation: context.invocation,
+      signal: context.signal,
+      env: context.env,
+      log: context.log,
+      time: context.time,
+    });
+  }));
+}
+
+/** Synchronous restricted context adapter.
+ * @param value - Full handler context.
+ * @returns Immutable base context.
+ * @example baseExecutionContext(context);
+ */
+export function baseExecutionContext(value: unknown): BaseExecutionContext {
+  return runInvocationSync(baseExecutionContextEffect(value));
 }
 
 function invokeValue<Context extends { readonly signal: AbortSignal }>(
@@ -141,12 +142,10 @@ function validateOutput(
   value: unknown,
   eventOnly = false,
 ): Effect.Effect<unknown, InvocationFailure> {
-  return Effect.tryPromise({
-    try: async () => {
-      if (eventOnly && value !== undefined)
-        throw new TypeError("Event-only functions must return void on success");
-      return validated(schema, value, "output");
-    },
-    catch: (cause) => normalizeFailure(cause),
-  });
+  return observeInvocation("lifecycle.validate-output", Effect.gen(function* () {
+    if (eventOnly && value !== undefined)
+      return yield* Effect.fail(normalizeFailure(new TypeError("Event-only functions must return void on success")));
+    return yield* Effect.mapError(validatedEffect(schema, value, "output"),
+      (failure) => normalizeFailure(failure.cause));
+  }));
 }

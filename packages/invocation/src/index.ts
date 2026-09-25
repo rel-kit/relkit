@@ -1,10 +1,11 @@
 export * from "./contracts.js";
-export * from "./failure-types.js";
+export * from "./failure.types.js";
 export * from "./failure-guards.js";
 export * from "./failure-internals.js";
 export * from "./failure-runtime.js";
 export * from "./failure-dependency.js";
 export * from "./error-retry.js";
+export * from "./invocation-observability.js";
 export * from "./failure.js";
 export * from "./abort.js";
 export * from "./deadline.js";
@@ -28,9 +29,19 @@ export * from "./stream-runtime.js";
 export * from "./progress.js";
 export * from "./root-span.js";
 export {
+  InvocationScopeStorage,
+  InvocationScopeStorageLive,
   currentExecutionContext,
+  currentExecutionContextEffect,
+  currentInvocationScopeEffect,
   currentTaskAncestry,
+  currentTaskAncestryEffect,
   runInExecutionContext,
+  runInExecutionContextEffect,
+  runInInvocationScopeEffect,
   runInTaskAncestry,
+  runInTaskAncestryEffect,
   runDetachedExecution,
+  runDetachedExecutionEffect,
 } from "./dispatcher-scope.js";
+export type { InvocationScopeStorageService } from "./dispatcher-scope.types.js";
