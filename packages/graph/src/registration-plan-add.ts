@@ -1,20 +1,47 @@
+import { Effect } from "effect";
+import { observeGraph, runGraph } from "./graph-observability.js";
 import type { JsonValue } from "@relkit/contracts";
 import type { GraphNode, LegacyJobNode, TriggerNode } from "./model.js";
 import type {
   EventTriggerRegistration,
   HttpTriggerRegistration,
-  RegistrationPlan,
-} from "./registration-plan.js";
-
-export type MutableRegistrationPlan = {
-  -readonly [Key in keyof RegistrationPlan]-?: NonNullable<
-    RegistrationPlan[Key]
-  > extends readonly (infer Item)[]
-    ? Item[]
-    : NonNullable<RegistrationPlan[Key]>;
-};
-
+} from "./registration-plan.types.js";
+import type { MutableRegistrationPlan } from "./registration-plan-add.types.js";
+export type { MutableRegistrationPlan } from "./registration-plan-add.types.js";
+/**
+ * Adds a canonical node to its registration family.
+ * @param plan - Mutable plan being assembled.
+ * @param node - Canonical graph node to project.
+ * @param serviceIds - Function-to-service identity map.
+ * @returns An Effect that mutates the plan and succeeds with void; it has no expected failure.
+ * @example Effect.runSync(addNodeEffect(plan, node, new Map()));
+ */
+export function addNodeEffect(
+  plan: MutableRegistrationPlan,
+  node: GraphNode,
+  serviceIds: ReadonlyMap<string, string>,
+): Effect.Effect<void> {
+  return observeGraph(
+    "registration.add-node",
+    Effect.sync(() => addNodeUnsafe(plan, node, serviceIds)),
+  );
+}
+/**
+ * Synchronous compatibility adapter for node registration.
+ * @param plan - Mutable plan being assembled.
+ * @param node - Canonical graph node to project.
+ * @param serviceIds - Function-to-service identity map.
+ * @returns Void after updating the plan.
+ * @example addNode(plan, node, new Map());
+ */
 export function addNode(
+  plan: MutableRegistrationPlan,
+  node: GraphNode,
+  serviceIds: ReadonlyMap<string, string>,
+): void {
+  return runGraph(addNodeEffect(plan, node, serviceIds));
+}
+function addNodeUnsafe(
   plan: MutableRegistrationPlan,
   node: GraphNode,
   serviceIds: ReadonlyMap<string, string>,
@@ -66,7 +93,6 @@ export function addNode(
       return;
   }
 }
-
 function addTrigger(
   plan: MutableRegistrationPlan,
   node: TriggerNode,
@@ -85,7 +111,6 @@ function addTrigger(
     plan.queues.push(node as unknown as TriggerNode<"queue", JsonValue>);
   else plan.schedules.push(scheduleFromTrigger(node));
 }
-
 function addSchedules(output: MutableRegistrationPlan["schedules"], node: LegacyJobNode): void {
   if (!Array.isArray(node.schedule)) return;
   node.schedule.forEach((schedule, index) => {
@@ -93,14 +118,12 @@ function addSchedules(output: MutableRegistrationPlan["schedules"], node: Legacy
     output.push({ id: `${node.id}:${id}`, source: node.source, jobId: node.id, schedule });
   });
 }
-
 function scheduleFromTrigger(node: TriggerNode): MutableRegistrationPlan["schedules"][number] {
   const config = isRecord(node.config) ? node.config : {};
   const schedule = config.schedule ?? node.config;
   const jobId = typeof config.jobId === "string" ? config.jobId : node.targetFunctionId;
   return { id: node.id, source: node.source, jobId, schedule };
 }
-
 function isRecord(value: unknown): value is Record<string, JsonValue> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

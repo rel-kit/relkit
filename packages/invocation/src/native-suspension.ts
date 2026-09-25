@@ -1,8 +1,11 @@
-import { Cause } from "effect";
+import { Cause, Effect } from "effect";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
 
 const NATIVE_SUSPENSION = Symbol.for("relkit.native-suspension");
 
-/** A provider-owned continuation value that is not an invocation outcome. */
+/** Provider-owned continuation value excluded from invocation outcomes.
+ * @example new NativeSuspension({ token: "resume-later" });
+ */
 export class NativeSuspension extends Error {
   readonly code = "RELKIT_NATIVE_SUSPENSION" as const;
   readonly [NATIVE_SUSPENSION] = true as const;
@@ -13,15 +16,79 @@ export class NativeSuspension extends Error {
   }
 }
 
+/** Recognizes a native continuation through an Effect operation.
+ * @param value - Candidate continuation value.
+ * @returns Whether the value is marked as a continuation; no expected failure.
+ * @example Effect.runSync(isNativeSuspensionEffect(new NativeSuspension(1)));
+ */
+export function isNativeSuspensionEffect(value: unknown): Effect.Effect<boolean> {
+  return observeInvocation(
+    "suspension.is",
+    Effect.sync(() => isSuspension(value)),
+  );
+}
+
+/** Synchronous continuation type guard.
+ * @param value - Candidate continuation value.
+ * @returns Whether the value is a native continuation.
+ * @example isNativeSuspension(new NativeSuspension(1));
+ */
 export function isNativeSuspension(value: unknown): value is NativeSuspension {
+  return runInvocationSync(isNativeSuspensionEffect(value));
+}
+
+/** Finds a suspension inside a wrapped Effect Cause.
+ * @param value - Candidate value or Cause.
+ * @returns The first continuation, if any; no expected failure.
+ * @example Effect.runSync(findNativeSuspensionEffect(new NativeSuspension(1)));
+ */
+export function findNativeSuspensionEffect(
+  value: unknown,
+): Effect.Effect<NativeSuspension | undefined> {
+  return observeInvocation(
+    "suspension.find",
+    Effect.sync(() => findSuspension(value)),
+  );
+}
+
+/** Synchronous Cause inspection adapter.
+ * @param value - Candidate value or Cause.
+ * @returns The first continuation, if any.
+ * @example findNativeSuspension(new NativeSuspension(1));
+ */
+export function findNativeSuspension(value: unknown): NativeSuspension | undefined {
+  return runInvocationSync(findNativeSuspensionEffect(value));
+}
+
+/** Wraps a provider continuation in an Effect operation.
+ * @param cause - Provider continuation data.
+ * @returns A marked continuation; no expected failure.
+ * @example Effect.runSync(markNativeSuspensionEffect({ token: "later" }));
+ */
+export function markNativeSuspensionEffect(cause: unknown): Effect.Effect<NativeSuspension> {
+  return observeInvocation(
+    "suspension.mark",
+    Effect.sync(() => new NativeSuspension(cause)),
+  );
+}
+
+/** Synchronous provider continuation adapter.
+ * @param cause - Provider continuation data.
+ * @returns A marked continuation.
+ * @example markNativeSuspension({ token: "later" });
+ */
+export function markNativeSuspension(cause: unknown): NativeSuspension {
+  return runInvocationSync(markNativeSuspensionEffect(cause));
+}
+
+function isSuspension(value: unknown): boolean {
   return (
     value instanceof NativeSuspension ||
     (isRecord(value) && value[NATIVE_SUSPENSION] === true && "value" in value)
   );
 }
 
-/** Finds a suspension after an Effect runner has wrapped it in a Cause. */
-export function findNativeSuspension(value: unknown): NativeSuspension | undefined {
+function findSuspension(value: unknown): NativeSuspension | undefined {
   if (value instanceof NativeSuspension) return value;
   if (!Cause.isCause(value)) return undefined;
   for (const reason of value.reasons) {
@@ -31,14 +98,10 @@ export function findNativeSuspension(value: unknown): NativeSuspension | undefin
           ? reason.error
           : reason.defect
         : undefined;
-    const candidate = inner === undefined ? undefined : findNativeSuspension(inner);
+    const candidate = inner === undefined ? undefined : findSuspension(inner);
     if (candidate !== undefined) return candidate;
   }
   return undefined;
-}
-
-export function markNativeSuspension(cause: unknown): NativeSuspension {
-  return new NativeSuspension(cause);
 }
 
 function isRecord(value: unknown): value is Record<PropertyKey, unknown> {

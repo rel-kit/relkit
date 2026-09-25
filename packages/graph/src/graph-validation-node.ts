@@ -1,19 +1,67 @@
-import { isStableId, normalizeSourceLocation } from "@relkit/contracts";
+import { normalizeSourceLocation, SourceLocationError } from "@relkit/contracts";
+import { Effect } from "effect";
+import {
+  failValidation as fail,
+  runValidation,
+  validationEffect,
+  type GraphValidationError,
+} from "./graph-validation-error.js";
+import { isCanonicalId, isRecord, nonEmpty, validateId } from "./graph-validation-primitives.js";
+import {
+  validateExposure,
+  validateGenerated,
+  validateHttpIdentities,
+  validateIds,
+} from "./graph-validation-node-details.js";
 import { isGraphNodeKind } from "./model.js";
 import { validateDeploymentRoles, validateProviderNode } from "./provider-validation.js";
 import { validateServiceNode } from "./service-validation.js";
 import { validateTelemetryConfiguration } from "./telemetry-validation.js";
-
+export {
+  isCanonicalId,
+  isCanonicalIdEffect,
+  nonEmpty,
+  nonEmptyEffect,
+  validateId,
+  validateIdEffect,
+} from "./graph-validation-primitives.js";
+/**
+ * Validates one graph node's identity, source, and kind-specific projection.
+ * @param value - Candidate graph node.
+ * @param root - Optional project root for source path validation.
+ * @param index - Node index used in failure messages.
+ * @returns An Effect that succeeds with void or fails with GraphValidationError.
+ * @example Effect.runSync(validateNodeEffect(node, undefined, 0));
+ */
+export function validateNodeEffect(
+  value: unknown,
+  root: string | undefined,
+  index: number,
+): Effect.Effect<void, GraphValidationError> {
+  return validationEffect("validation.node", () => validateNodeUnsafe(value, root, index));
+}
+/**
+ * Synchronous compatibility adapter for node validation.
+ * @param value - Candidate graph node.
+ * @param root - Optional project root for source path validation.
+ * @param index - Node index used in failure messages.
+ * @returns Void when the node is valid.
+ * @throws TypeError for invalid identity, source, or metadata.
+ * @example validateNode(node, undefined, 0);
+ */
 export function validateNode(value: unknown, root: string | undefined, index: number): void {
+  return runValidation(validateNodeEffect(value, root, index));
+}
+function validateNodeUnsafe(value: unknown, root: string | undefined, index: number): void {
   if (!isRecord(value) || !isGraphNodeKind(value.kind) || !isCanonicalId(value.id)) {
     fail(`Graph nodes[${index}] has an invalid kind or canonical id.`);
   }
   try {
     normalizeSourceLocation(value.source as never, root);
   } catch (error) {
-    fail(
-      `Graph nodes[${index}].source is invalid: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    if (error instanceof SourceLocationError)
+      fail(`Graph nodes[${index}].source is invalid: ${error.message}`);
+    throw error;
   }
   if ("targetFunctionId" in value)
     validateId(value.targetFunctionId, `Graph nodes[${index}].targetFunctionId`);
@@ -76,67 +124,4 @@ export function validateNode(value: unknown, root: string | undefined, index: nu
         : value.phase === "before" || value.phase === "after";
     if (!validPhase) fail(`Graph nodes[${index}].phase is invalid.`);
   }
-}
-
-function validateExposure(value: unknown, index: number): void {
-  if (value !== undefined && value !== "public" && value !== "internal")
-    fail(`Graph nodes[${index}].exposure is invalid.`);
-}
-
-function validateGenerated(value: unknown, index: number, field: string): void {
-  if (value === undefined || value === null) return;
-  if (!isRecord(value)) fail(`Graph nodes[${index}].${field} is invalid.`);
-  for (const key of ["agentId", "functionId"] as const)
-    if (value[key] !== undefined) validateId(value[key], `Graph nodes[${index}].${field}.${key}`);
-}
-
-function validateHttpIdentities(value: unknown, index: number): void {
-  if (!isRecord(value)) return;
-  for (const field of ["middleware", "transforms"] as const) {
-    if (!Array.isArray(value[field])) continue;
-    value[field].forEach((entry, entryIndex) => {
-      if (!isRecord(entry))
-        fail(`Graph nodes[${index}].config.${field}[${entryIndex}] is invalid.`);
-      validateId(entry.id, `Graph nodes[${index}].config.${field}[${entryIndex}].id`);
-      if (
-        field === "middleware" &&
-        (typeof entry.path !== "string" ||
-          !Number.isSafeInteger(entry.order) ||
-          (entry.match !== "always" && entry.match !== "conditional"))
-      )
-        fail(`Graph nodes[${index}].config.middleware[${entryIndex}] is invalid.`);
-      if (entry.targetFunctionId !== undefined)
-        validateId(
-          entry.targetFunctionId,
-          `Graph nodes[${index}].config.${field}[${entryIndex}].targetFunctionId`,
-        );
-    });
-  }
-  if (isRecord(value.rateLimit) && value.rateLimit.storeId !== undefined)
-    validateId(value.rateLimit.storeId, `Graph nodes[${index}].config.rateLimit.storeId`);
-}
-
-function validateIds(value: unknown, label: string): void {
-  if (!Array.isArray(value)) fail(`${label} is invalid.`);
-  value.forEach((entry, index) => validateId(entry, `${label}[${index}]`));
-}
-
-export function validateId(value: unknown, label: string): void {
-  if (!isCanonicalId(value)) fail(`${label} is invalid.`);
-}
-
-export function isCanonicalId(value: unknown): value is string {
-  return isStableId(value) && !value.startsWith("unbound.");
-}
-
-export function nonEmpty(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function fail(message: string): never {
-  throw new TypeError(message);
 }

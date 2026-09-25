@@ -21,6 +21,9 @@ const providerInternalPrefixes = [
 const providerInternalFiles = new Set([
   "packages/inspector-api/src/observability-utils.ts",
   "packages/observability/src/stream-subscriber.ts",
+  // Observability stream APIs use their established consumer terminology.
+  "packages/observability/src/stream.ts",
+  "packages/observability/src/stream.types.ts",
 ]);
 const realtimeTerminologyFiles = new Set([
   "packages/client/src/react/realtime-hook.ts",

@@ -1,0 +1,42 @@
+import { expect, test } from "vitest";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { setTimeout } from "node:timers/promises";
+import { startLocalWorker } from "../src/local/worker-client";
+
+test("unexpected worker exit fails pending/future work and requests a session restart", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-worker-failure-"));
+  let failure: Error | undefined;
+  const worker = startLocalWorker((error) => {
+    failure = error;
+  });
+  try {
+    await worker.call({ type: "open", root });
+    await worker.call({ type: "close" });
+    for (let attempt = 0; attempt < 100 && !failure; attempt++) await setTimeout(10);
+    expect(failure?.message).toContain("Telemetry worker exited");
+    await expect(worker.call({ type: "query", kind: "logs", query: {} })).rejects.toThrow();
+  } finally {
+    await worker.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("client shutdown does not report the expected worker exit as a failure", async () => {
+  const root = await mkdtemp(join(tmpdir(), "relkit-worker-close-"));
+  const failures: Error[] = [];
+  const worker = startLocalWorker((error) => failures.push(error));
+  try {
+    await worker.call({ type: "open", root });
+    process.kill(worker.pid, "SIGINT");
+    await setTimeout(25);
+    await worker.call({ type: "flush" });
+    await worker.close();
+    await setTimeout(25);
+    expect(failures).toEqual([]);
+  } finally {
+    await worker.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});

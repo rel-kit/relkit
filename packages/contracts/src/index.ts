@@ -9,6 +9,8 @@ export * from "./client.js";
 export * from "./runtime-limits.js";
 export * from "./trace-context.js";
 export * from "./trace-propagation.js";
+export * from "./trace-random.js";
+export * from "./contract-observability.js";
 export * from "./agent-content.js";
 export * from "./agent-events.js";
 export * from "./agent-execution.js";

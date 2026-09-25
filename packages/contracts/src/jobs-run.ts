@@ -1,5 +1,13 @@
 import type { JsonValue } from "./json.js";
 
+export type {
+  NamedStreamFrame,
+  RunConnection,
+  RunWatchFrame,
+  StreamIdentity,
+} from "./jobs-run-stream.js";
+
+/** Persisted lifecycle state of a job run. */
 export type JobRunStatus =
   | "queued"
   | "delayed"
@@ -11,8 +19,10 @@ export type JobRunStatus =
   | "cancelled"
   | "timed-out"
   | "unknown";
+/** Backward-compatible alias for a job run status. */
 export type RunStatus = JobRunStatus;
 
+/** Availability of a run result after retention and policy checks. */
 export type ResultAvailability =
   | "pending"
   | "available"
@@ -23,6 +33,7 @@ export type ResultAvailability =
   | "version-incompatible"
   | "unavailable";
 
+/** Identity and acceptance metadata returned after triggering a run. */
 export interface RunHandle {
   readonly accepted: true;
   readonly runId: string;
@@ -34,6 +45,7 @@ export interface RunHandle {
   readonly idempotencyExpiresAt?: string;
 }
 
+/** Public error details safe to return from a job run. */
 export interface JobErrorEnvelope {
   readonly code: string;
   readonly message: string;
@@ -42,6 +54,7 @@ export interface JobErrorEnvelope {
   readonly afterMs?: number;
 }
 
+/** Outcome of requesting cancellation for a job run. */
 export interface RunCancellationReceipt {
   readonly runId: string;
   readonly operationId: string;
@@ -50,6 +63,7 @@ export interface RunCancellationReceipt {
   readonly run?: RunSnapshot;
 }
 
+/** Fields shared across all run snapshot result states. */
 interface RunSnapshotBase<Input, Progress, Failure> extends RunHandle {
   readonly buildId: string;
   readonly service: string;
@@ -74,6 +88,7 @@ interface RunSnapshotBase<Input, Progress, Failure> extends RunHandle {
   readonly error?: Failure;
 }
 
+/** Discriminated run snapshot whose output exists only when available. */
 export type RunSnapshot<
   Input = unknown,
   Output = unknown,
@@ -95,6 +110,7 @@ export type RunSnapshot<
       readonly output?: never;
     });
 
+/** Filters and pagination inputs for listing job runs. */
 export interface RunListQuery {
   readonly status?: readonly JobRunStatus[];
   readonly jobId?: string;
@@ -117,12 +133,14 @@ export interface RunListQuery {
   readonly cursor?: string;
 }
 
+/** Per-service availability reported with a run page. */
 export interface RunAvailability {
   readonly service: string;
   readonly state: "available" | "unavailable";
   readonly reason?: string;
 }
 
+/** Paginated run results and provider availability. */
 export interface RunPage<Run = RunSnapshot> {
   readonly items: readonly Run[];
   readonly nextCursor?: string;
@@ -131,67 +149,7 @@ export interface RunPage<Run = RunSnapshot> {
   readonly count?: { readonly value: number; readonly accuracy: "exact" | "approximate" };
 }
 
+/** Acceptance receipt linking a retry to its original run. */
 export interface RunRetryReceipt extends RunHandle {
   readonly retryOfRunId: string;
 }
-
-export type RunConnection =
-  | "idle"
-  | "connecting"
-  | "connected"
-  | "reconnecting"
-  | "disconnected"
-  | "completed"
-  | "unauthorized"
-  | "error"
-  | "disposed";
-
-export type RunWatchFrame<Run = RunSnapshot> =
-  | {
-      readonly kind: "snapshot";
-      readonly run: Run;
-      readonly observedAt: string;
-      readonly epoch: string;
-      readonly sequence: number;
-      readonly cursor?: string;
-      readonly continuity: "state" | "history";
-    }
-  | {
-      readonly kind: "update";
-      readonly run: Run;
-      readonly observedAt: string;
-      readonly epoch: string;
-      readonly sequence: number;
-      readonly cursor?: string;
-    }
-  | {
-      readonly kind: "reset";
-      readonly run: Run;
-      readonly observedAt: string;
-      readonly epoch: string;
-      readonly sequence: number;
-      readonly reason: "reconnected" | "cursor-expired" | "history-unavailable" | "overflow";
-      readonly cursor?: string;
-    };
-
-export interface StreamIdentity {
-  readonly runId: string;
-  readonly name: string;
-  readonly attempt: number;
-  readonly generation: string;
-  readonly schemaVersion: string;
-}
-
-export type NamedStreamFrame<Item = JsonValue> =
-  | (StreamIdentity & { readonly kind: "start" })
-  | (StreamIdentity & {
-      readonly kind: "chunk";
-      readonly sequence: number;
-      readonly item: Item;
-      readonly cursor?: string;
-    })
-  | (StreamIdentity & {
-      readonly kind: "reset";
-      readonly reason: "reconnected" | "cursor-expired" | "overflow";
-    })
-  | (StreamIdentity & { readonly kind: "end" });

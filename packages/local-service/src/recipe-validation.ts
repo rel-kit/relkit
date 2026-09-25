@@ -1,4 +1,6 @@
 import { isStableId } from "@relkit/contracts";
+import { Effect } from "effect";
+import { LocalServiceValidationFailure } from "./local-service-errors.js";
 import type {
   CompositeLocalServiceRecipe,
   LocalServiceGeneratedSecret,
@@ -6,9 +8,24 @@ import type {
   LocalServiceLiteralEnvironment,
   LocalServiceRecipeInput,
   LocalServiceSecretEnvironment,
-} from "./recipe.js";
+} from "./recipe.types.js";
 
-export function common(recipe: LocalServiceRecipeInput): void {
+/** Produce an expected recipe validation failure within an Effect.
+ * @param message - Stable compatibility message for the invalid field.
+ * @returns An Effect that fails with LocalServiceValidationFailure.
+ * @example yield* invalid("Local-service volume");
+ */
+export const invalid = (message: string): Effect.Effect<never, LocalServiceValidationFailure> =>
+  Effect.fail(new LocalServiceValidationFailure({ message }));
+
+/** Validate fields shared by both recipe versions.
+ * @param recipe - Candidate recipe.
+ * @returns An Effect that succeeds or fails with LocalServiceValidationFailure.
+ * @example Effect.runSync(common(recipe));
+ */
+export const common = Effect.fn("LocalService.validateCommon")(function* (
+  recipe: LocalServiceRecipeInput,
+) {
   if (
     recipe === null ||
     typeof recipe !== "object" ||
@@ -18,14 +35,23 @@ export function common(recipe: LocalServiceRecipeInput): void {
     recipe.materializerId !== "docker" ||
     (recipe.recipeVersion === 1 && recipe.protocolVersion !== 1) ||
     (recipe.recipeVersion === 2 && recipe.protocolVersion !== 2) ||
-    (recipe.recipeVersion !== 1 && recipe.recipeVersion !== 2)
+    (recipe.recipeVersion !== 1 && recipe.recipeVersion !== 2) ||
+    typeof recipe.outputs !== "function" ||
+    (recipe.initialize !== undefined && typeof recipe.initialize !== "function")
   )
-    invalid("Local-service recipe");
-}
+    yield* invalid("Local-service recipe");
+});
 
-export function secrets(
+/** Validate generated-secret declarations.
+ * @param value - Secret declarations, if any.
+ * @returns An Effect that succeeds or fails with LocalServiceValidationFailure.
+ * @example Effect.runSync(secrets(recipe.generatedSecrets));
+ */
+export const secrets = Effect.fn("LocalService.validateSecrets")(function* (
   value: Readonly<Record<string, LocalServiceGeneratedSecret>> | undefined,
-): void {
+) {
+  if (value !== undefined && (value === null || typeof value !== "object" || Array.isArray(value)))
+    yield* invalid("Local-service generated secret");
   for (const [name, declaration] of Object.entries(value ?? {})) {
     if (
       !isStableId(name) ||
@@ -37,32 +63,50 @@ export function secrets(
         declaration.encoding !== "base64url" &&
         declaration.encoding !== "hex")
     )
-      invalid("Local-service generated secret");
+      yield* invalid("Local-service generated secret");
   }
-}
+});
 
-export function environments(
+/** Validate literal and generated-secret environment entries.
+ * @param value - Environment references, if any.
+ * @param declarations - Available generated-secret declarations.
+ * @returns An Effect that succeeds or fails with LocalServiceValidationFailure.
+ * @example Effect.runSync(environments(recipe.environment, recipe.generatedSecrets));
+ */
+export const environments = Effect.fn("LocalService.validateEnvironments")(function* (
   value:
     | Readonly<Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>>
     | undefined,
   declarations: Readonly<Record<string, LocalServiceGeneratedSecret>> | undefined,
-): void {
+) {
+  if (value !== undefined && (value === null || typeof value !== "object" || Array.isArray(value)))
+    yield* invalid("Local-service secret environment");
   for (const [name, reference] of Object.entries(value ?? {})) {
-    if (!/^[A-Z][A-Z0-9_]*$/.test(name)) invalid("Local-service secret environment");
+    if (!/^[A-Z][A-Z0-9_]*$/.test(name)) yield* invalid("Local-service secret environment");
     if (reference === null || typeof reference !== "object")
-      invalid("Local-service secret environment");
+      yield* invalid("Local-service secret environment");
     if ("value" in reference) {
       if (typeof reference.value !== "string" || /[\0\r\n]/.test(reference.value))
-        invalid("Local-service literal environment");
+        yield* invalid("Local-service literal environment");
       continue;
     }
     if (!isStableId(reference.secret) || declarations?.[reference.secret] === undefined)
-      invalid("Local-service secret environment");
+      yield* invalid("Local-service secret environment");
   }
-}
+});
 
-export function healthCheck(value: LocalServiceHealthCheck): void {
+/** Validate a container health check.
+ * @param value - Health command and positive timing values.
+ * @returns An Effect that succeeds or fails with LocalServiceValidationFailure.
+ * @example Effect.runSync(healthCheck(recipe.health));
+ */
+export const healthCheck = Effect.fn("LocalService.validateHealth")(function* (
+  value: LocalServiceHealthCheck,
+) {
   if (
+    value === null ||
+    typeof value !== "object" ||
+    !Array.isArray(value.command) ||
     value.command.length === 0 ||
     value.command.some(
       (part) => typeof part !== "string" || !/^[a-zA-Z0-9_./:=?\-]+$/.test(part),
@@ -74,32 +118,46 @@ export function healthCheck(value: LocalServiceHealthCheck): void {
     !Number.isSafeInteger(value.retries) ||
     value.retries < 1
   )
-    invalid("Local-service health check");
-}
+    yield* invalid("Local-service health check");
+});
 
-export function text(value: unknown): string {
+/** Trim a string candidate without coercing untrusted values.
+ * @param value - Candidate image name or other text.
+ * @returns An Effect containing trimmed text or an empty string.
+ * @example Effect.runSync(text(" api "));
+ */
+export const text = Effect.fn("LocalService.text")(function* (value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
+});
 
-export function path(value: unknown): value is string {
+/** Check an absolute volume path.
+ * @param value - Candidate mount path.
+ * @returns An Effect containing whether the path is valid.
+ * @example Effect.runSync(path("/data"));
+ */
+export const path = Effect.fn("LocalService.path")(function* (value: unknown) {
   return typeof value === "string" && /^\/[a-zA-Z0-9_./-]+$/.test(value) && !value.includes("..");
-}
+});
 
-export function invalid(message: string): never {
-  throw new TypeError(message);
-}
-
-export function assertComposite(recipe: CompositeLocalServiceRecipe): void {
+/** Validate composite recipe container settings.
+ * @param recipe - Composite recipe candidate.
+ * @returns An Effect that succeeds or fails with LocalServiceValidationFailure.
+ * @example Effect.runSync(assertComposite(recipe));
+ */
+export const assertComposite = Effect.fn("LocalService.validateComposite")(function* (
+  recipe: CompositeLocalServiceRecipe,
+) {
   if (!recipe.volumes || typeof recipe.volumes !== "object" || Array.isArray(recipe.volumes))
-    invalid("Local-service volumes");
+    yield* invalid("Local-service volumes");
   if (
     recipe.network !== undefined &&
     (typeof recipe.network !== "object" ||
       recipe.network === null ||
+      Array.isArray(recipe.network) ||
       (typeof recipe.network.internal !== "undefined" &&
         typeof recipe.network.internal !== "boolean"))
   )
-    invalid("Local-service network");
+    yield* invalid("Local-service network");
   if (
     recipe.ownership !== undefined &&
     (typeof recipe.ownership !== "object" ||
@@ -108,5 +166,5 @@ export function assertComposite(recipe: CompositeLocalServiceRecipe): void {
       (recipe.ownership.retainVolumes !== undefined &&
         typeof recipe.ownership.retainVolumes !== "boolean"))
   )
-    invalid("Local-service ownership");
-}
+    yield* invalid("Local-service ownership");
+});

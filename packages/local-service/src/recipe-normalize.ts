@@ -1,16 +1,14 @@
-import { isStableId, type JsonValue } from "@relkit/contracts";
-import {
-  type CompositeLocalServiceRecipe,
-  type CompositeLocalServiceUnit,
-  type LocalServiceRecipeInput,
-  type LocalServiceHealthCheck,
-  type LocalServiceGeneratedSecret,
-  type LocalServiceRecipeOutputContext,
-  type LocalServiceSecretEnvironment,
-  type LocalServiceLiteralEnvironment,
-  type CompositeLocalServiceVolume,
-  LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
-} from "./recipe.js";
+import { isStableId } from "@relkit/contracts";
+import { Effect } from "effect";
+import type {
+  CompositeLocalServiceRecipe,
+  CompositeLocalServiceUnit,
+  LocalServiceRecipeInput,
+} from "./recipe.types.js";
+import type {
+  NormalizedLocalServiceRecipe,
+  NormalizedLocalServiceUnit,
+} from "./recipe-normalize.types.js";
 import {
   assertComposite,
   common,
@@ -19,52 +17,59 @@ import {
   invalid,
   path,
   secrets,
-  text,
 } from "./recipe-validation.js";
-import { topologicalOrder, unit } from "./recipe-normalize-units.js";
-
-const LOCAL_SERVICE_PROTOCOL_VERSION = 1 as const;
-
-export interface NormalizedLocalServiceUnit extends CompositeLocalServiceUnit {
-  readonly dependsOn: readonly string[];
-  readonly ports: Readonly<Record<string, number>>;
-  readonly volumes: readonly { readonly name: string; readonly mountPath: string }[];
-  readonly health?: LocalServiceHealthCheck;
-}
-
-export interface NormalizedLocalServiceRecipe {
-  readonly kind: "local-service-recipe";
-  readonly protocolVersion: 1 | typeof LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION;
-  readonly integrationId: string;
-  readonly recipeId: string;
-  readonly recipeVersion: number;
-  readonly materializerId: "docker";
-  readonly units: readonly NormalizedLocalServiceUnit[];
-  readonly volumes: Readonly<Record<string, CompositeLocalServiceVolume>>;
-  readonly generatedSecrets: Readonly<Record<string, LocalServiceGeneratedSecret>>;
-  readonly environment: Readonly<
-    Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>
-  >;
-  readonly network?: Readonly<{ readonly internal?: boolean }>;
-  readonly ownership: Readonly<{
-    readonly scope: "project" | "binding";
-    readonly retainVolumes: boolean;
-  }>;
-  readonly outputs: (
-    context: LocalServiceRecipeOutputContext,
-  ) => Readonly<Record<string, JsonValue>>;
-  readonly initialize?: (context: LocalServiceRecipeOutputContext) => Promise<void>;
-}
-
+import { normalizeUnitEffect, topologicalOrderEffect } from "./recipe-normalize-units.js";
+import { observeLocalService, runLocalService } from "./local-service-observability.js";
+export type {
+  NormalizedLocalServiceRecipe,
+  NormalizedLocalServiceUnit,
+} from "./recipe-normalize.types.js";
+/** Normalize a supported recipe in the Effect error channel.
+ * @param recipe - Version 1 or version 2 recipe candidate.
+ * @returns An Effect containing a frozen recipe or LocalServiceValidationFailure.
+ * @example Effect.runSync(normalizeLocalServiceRecipeEffect(recipe));
+ */
+export const normalizeLocalServiceRecipeEffect = Effect.fn(
+  "LocalService.normalizeLocalServiceRecipe",
+)(function* (recipe: LocalServiceRecipeInput) {
+  return yield* observeLocalService("recipe.normalize", normalizeRecipe(recipe));
+});
+/** Normalize a recipe synchronously for existing callers.
+ * @param recipe - Version 1 or version 2 recipe candidate.
+ * @returns The frozen canonical recipe.
+ * @throws TypeError when a recipe field or dependency is invalid.
+ * @example normalizeLocalServiceRecipe(recipe);
+ */
 export function normalizeLocalServiceRecipe(
   recipe: LocalServiceRecipeInput,
 ): NormalizedLocalServiceRecipe {
-  common(recipe);
+  return runLocalService(normalizeLocalServiceRecipeEffect(recipe));
+}
+const normalizeRecipe = Effect.fn("LocalService.normalizeRecipe")(function* (
+  recipe: LocalServiceRecipeInput,
+) {
+  yield* common(recipe);
   if (recipe.recipeVersion === 1) {
     const legacy = recipe as Extract<LocalServiceRecipeInput, { readonly image: string }>;
-    secrets(legacy.generatedSecrets);
-    environments(legacy.environment, legacy.generatedSecrets);
-    healthCheck(legacy.health);
+    yield* secrets(legacy.generatedSecrets);
+    yield* environments(legacy.environment, legacy.generatedSecrets);
+    yield* healthCheck(legacy.health);
+    if (
+      legacy.volume !== undefined &&
+      (legacy.volume === null || typeof legacy.volume !== "object" || Array.isArray(legacy.volume))
+    )
+      yield* invalid("Local-service volume");
+    const service = yield* normalizeUnitEffect({
+      id: "service",
+      kind: "container",
+      image: legacy.image,
+      ...(legacy.command === undefined ? {} : { command: legacy.command }),
+      ports: legacy.ports,
+      ...(legacy.volume === undefined
+        ? {}
+        : { volumes: [{ name: "data", mountPath: legacy.volume.mountPath }] }),
+      health: legacy.health,
+    });
     return Object.freeze({
       kind: recipe.kind,
       protocolVersion: recipe.protocolVersion,
@@ -72,19 +77,7 @@ export function normalizeLocalServiceRecipe(
       recipeId: recipe.recipeId,
       recipeVersion: 1,
       materializerId: recipe.materializerId,
-      units: Object.freeze([
-        unit({
-          id: "service",
-          kind: "container",
-          image: legacy.image,
-          ...(legacy.command === undefined ? {} : { command: legacy.command }),
-          ports: legacy.ports,
-          ...(legacy.volume === undefined
-            ? {}
-            : { volumes: [{ name: "data", mountPath: legacy.volume.mountPath }] }),
-          health: legacy.health,
-        }),
-      ]),
+      units: Object.freeze([service]),
       volumes: Object.freeze(
         legacy.volume === undefined ? {} : { data: { mountPath: legacy.volume.mountPath } },
       ),
@@ -96,41 +89,44 @@ export function normalizeLocalServiceRecipe(
     });
   }
   const composite = recipe as CompositeLocalServiceRecipe;
-  assertComposite(composite);
-  const units = compositeUnits(composite);
-  if (units.length === 0) invalid("Composite recipe must declare at least one unit");
+  yield* assertComposite(composite);
+  const units = yield* compositeUnits(composite);
+  if (units.length === 0) yield* invalid("Composite recipe must declare at least one unit");
   const ids = new Set<string>();
   for (const candidate of units) {
-    if (ids.has(candidate.id)) invalid(`Duplicate local-service unit "${candidate.id}"`);
+    if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate))
+      yield* invalid("Local-service unit identity");
+    if (ids.has(candidate.id))
+      yield* invalid('Duplicate local-service unit "' + candidate.id + '"');
     ids.add(candidate.id);
   }
-  const normalized = units.map((candidate) => unit(candidate));
+  const normalized: NormalizedLocalServiceUnit[] = [];
+  for (const candidate of units) normalized.push(yield* normalizeUnitEffect(candidate));
   const knownVolumes = new Set(Object.keys(composite.volumes));
   for (const [name, volume] of Object.entries(composite.volumes)) {
     if (
       !isStableId(name) ||
       volume === null ||
       typeof volume !== "object" ||
-      !path(volume.mountPath) ||
+      !(yield* path(volume.mountPath)) ||
       (volume.persistent !== undefined && typeof volume.persistent !== "boolean")
     )
-      invalid("Local-service volume");
+      yield* invalid("Local-service volume");
   }
   for (const candidate of normalized) {
     for (const dependency of candidate.dependsOn) {
-      if (dependency === candidate.id || !ids.has(dependency)) {
-        invalid(`Local-service unit "${candidate.id}" has an invalid dependency`);
-      }
+      if (dependency === candidate.id || !ids.has(dependency))
+        yield* invalid('Local-service unit "' + candidate.id + '" has an invalid dependency');
     }
-    for (const mount of candidate.volumes) {
-      if (!knownVolumes.has(mount.name)) invalid(`Unknown local-service volume "${mount.name}"`);
-    }
+    for (const mount of candidate.volumes)
+      if (!knownVolumes.has(mount.name))
+        yield* invalid('Unknown local-service volume "' + mount.name + '"');
   }
-  topologicalOrder(normalized);
-  secrets(composite.generatedSecrets);
-  environments(composite.environment, composite.generatedSecrets);
+  const ordered = yield* topologicalOrderEffect(normalized);
+  yield* secrets(composite.generatedSecrets);
+  yield* environments(composite.environment, composite.generatedSecrets);
   for (const candidate of normalized)
-    environments(candidate.environment, composite.generatedSecrets);
+    yield* environments(candidate.environment, composite.generatedSecrets);
   return Object.freeze({
     kind: composite.kind,
     protocolVersion: composite.protocolVersion,
@@ -138,7 +134,7 @@ export function normalizeLocalServiceRecipe(
     recipeId: composite.recipeId,
     recipeVersion: 2,
     materializerId: composite.materializerId,
-    units: Object.freeze(topologicalOrder(normalized)),
+    units: Object.freeze(ordered),
     volumes: Object.freeze({ ...composite.volumes }),
     generatedSecrets: Object.freeze({ ...(composite.generatedSecrets ?? {}) }),
     environment: Object.freeze({ ...(composite.environment ?? {}) }),
@@ -150,24 +146,26 @@ export function normalizeLocalServiceRecipe(
     outputs: composite.outputs,
     ...(composite.initialize === undefined ? {} : { initialize: composite.initialize }),
   });
-}
-
-function compositeUnits(recipe: CompositeLocalServiceRecipe): CompositeLocalServiceUnit[] {
+});
+/** Resolve flat or grouped unit declarations; mixed forms fail before unit validation. */
+const compositeUnits = Effect.fn("LocalService.compositeUnits")(function* (
+  recipe: CompositeLocalServiceRecipe,
+) {
   if (recipe.units !== undefined) {
-    if (!Array.isArray(recipe.units)) invalid("Composite recipe units");
+    if (!Array.isArray(recipe.units)) yield* invalid("Composite recipe units");
     if (
       recipe.containers !== undefined ||
       recipe.init !== undefined ||
       recipe.workers !== undefined
     )
-      invalid("Composite recipe cannot mix units with grouped units");
+      yield* invalid("Composite recipe cannot mix units with grouped units");
     return [...recipe.units];
   }
   for (const group of [recipe.containers, recipe.init, recipe.workers])
-    if (group !== undefined && !Array.isArray(group)) invalid("Composite recipe units");
+    if (group !== undefined && !Array.isArray(group)) yield* invalid("Composite recipe units");
   return [
     ...(recipe.containers ?? []).map((value) => ({ ...value, kind: "container" as const })),
     ...(recipe.init ?? []).map((value) => ({ ...value, kind: "init" as const })),
     ...(recipe.workers ?? []).map((value) => ({ ...value, kind: "worker" as const })),
   ];
-}
+});

@@ -1,38 +1,43 @@
-import { createSchema, issue, type Schema } from "./standard-schema.js";
+import { createSchema, issue } from "./standard-schema.js";
+import { buildSchema } from "./builder-effect.js";
+import type { FileSchema, FileSchemaOptions } from "./file.types.js";
 
-export interface FileSchemaOptions {
-  readonly maxBytes?: number;
-  readonly mediaTypes?: readonly string[];
-}
+export type { FileSchema, FileSchemaOptions } from "./file.types.js";
 
-export type FileSchema = Schema<File, File>;
-
-/** Validates a buffered Web File and projects it as an OpenAPI binary value. */
+/**
+ * Builds a buffered Web File validator with binary projection metadata.
+ * @param options - Maximum bytes and accepted media types.
+ * @returns A File schema, or SchemaBuilderError from file options in Effect.
+ * @throws TypeError for invalid options in this synchronous adapter.
+ * @example fileSchema({ maxBytes: 1024, mediaTypes: ["image/*"] });
+ */
 export function fileSchema(options: FileSchemaOptions = {}): FileSchema {
-  const maxBytes = positive(options.maxBytes);
-  const mediaTypes = normalizeMediaTypes(options.mediaTypes);
-  return createSchema(
-    (value, path) => {
-      if (typeof File === "undefined" || !(value instanceof File)) {
-        return issue("Expected a file", path);
-      }
-      if (maxBytes !== undefined && value.size > maxBytes) {
-        return issue(`File exceeds ${maxBytes} bytes`, path);
-      }
-      if (mediaTypes !== undefined && !mediaTypes.some((type) => matches(type, value.type))) {
-        return issue(`Unsupported file media type "${mediaType(value.type) || "unknown"}"`, path);
-      }
-      return { value };
-    },
-    {
-      jsonSchema: () => ({
-        type: "string",
-        format: "binary",
-        ...(maxBytes === undefined ? {} : { "x-relkit-maxBytes": maxBytes }),
-        ...(mediaTypes === undefined ? {} : { "x-relkit-mediaTypes": mediaTypes }),
-      }),
-    },
-  );
+  return buildSchema("builder.file", () => {
+    const maxBytes = positive(options.maxBytes);
+    const mediaTypes = normalizeMediaTypes(options.mediaTypes);
+    return createSchema(
+      (value, path) => {
+        if (typeof File === "undefined" || !(value instanceof File)) {
+          return issue("Expected a file", path);
+        }
+        if (maxBytes !== undefined && value.size > maxBytes) {
+          return issue(`File exceeds ${maxBytes} bytes`, path);
+        }
+        if (mediaTypes !== undefined && !mediaTypes.some((type) => matches(type, value.type))) {
+          return issue(`Unsupported file media type "${mediaType(value.type) || "unknown"}"`, path);
+        }
+        return { value };
+      },
+      {
+        jsonSchema: () => ({
+          type: "string",
+          format: "binary",
+          ...(maxBytes === undefined ? {} : { "x-relkit-maxBytes": maxBytes }),
+          ...(mediaTypes === undefined ? {} : { "x-relkit-mediaTypes": mediaTypes }),
+        }),
+      },
+    );
+  });
 }
 
 function positive(value: number | undefined): number | undefined {

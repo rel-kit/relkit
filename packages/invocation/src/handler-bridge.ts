@@ -1,33 +1,28 @@
 import { Effect } from "effect";
-import type { MaybePromise } from "@relkit/contracts";
+import { observeInvocation } from "./invocation-observability.js";
 import { createAbortBridge } from "./abort.js";
 import { withDeadline, withTimeout } from "./deadline.js";
 import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";
 import { normalizeFailure } from "./failure.js";
-import type { InvocationFailure } from "./failure-types.js";
+import type {
+  HandlerBridgeOptions,
+  InvocationFailure,
+  SuspensionOptions,
+} from "./handler-bridge.types.js";
 import { isNativeSuspension, markNativeSuspension } from "./native-suspension.js";
 
-export interface HandlerBridgeOptions<Input, Output, Context extends object> {
-  readonly handler: (input: Input, context: Context) => MaybePromise<unknown>;
-  readonly input: Input;
-  readonly publicContext: Context;
-  readonly deadline?: number;
-  readonly timeoutMs?: number;
-  readonly onSignal?: (signal: AbortSignal) => void;
-  readonly isSuspension?: (cause: unknown) => boolean;
-}
+export type { HandlerBridgeOptions } from "./handler-bridge.types.js";
 
-interface SuspensionOptions {
-  readonly isSuspension?: (cause: unknown) => boolean;
-}
-
-/** Converts one plain handler call into an Effect without creating a runtime. */
+/** Converts one handler call into an abortable Effect without creating a runtime.
+ * @param options - Handler, input, public context, deadlines, and signal hook.
+ * @returns Handler output or an invocation failure, with native suspension preserved.
+ * @example Effect.runPromise(invokeUserHandler({ handler, input, publicContext }));
+ */
 export function invokeUserHandler<Input, Output, Context extends { readonly signal: AbortSignal }>(
   options: HandlerBridgeOptions<Input, Output, Context>,
 ): Effect.Effect<Output, InvocationFailure> {
   const execution = Effect.callback<Output, InvocationFailure>((resume, fiberSignal) => {
     const bridge = createAbortBridge(fiberSignal, options.publicContext.signal);
-    options.onSignal?.(bridge.signal);
     let completed = false;
 
     const cleanup = (): void => {
@@ -48,14 +43,25 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
         ),
       );
 
+    try {
+      options.onSignal?.(bridge.signal);
+    } catch (cause) {
+      complete(Effect.fail(normalizeFailure(cause, { signal: bridge.signal })));
+      return Effect.sync(cleanup);
+    }
+
     if (bridge.signal.aborted) {
       complete(Effect.fail(normalizeFailure(bridge.signal.reason, { signal: bridge.signal })));
       return;
     }
     bridge.signal.addEventListener("abort", onAbort, { once: true });
+    if (bridge.signal.aborted) {
+      onAbort();
+      return Effect.sync(cleanup);
+    }
     const context = Object.freeze({ ...options.publicContext, signal: bridge.signal }) as Context;
 
-    let result: MaybePromise<unknown>;
+    let result: unknown;
     try {
       result = options.handler(options.input, context);
     } catch (cause) {
@@ -70,13 +76,17 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
 
     return Effect.sync(cleanup);
   });
-  if (options.deadline === undefined && options.timeoutMs === undefined) return execution;
+  if (options.deadline === undefined && options.timeoutMs === undefined)
+    return observeInvocation("handler.invoke", execution);
   const timed =
     options.timeoutMs === undefined
       ? withDeadline(execution, options.deadline)
       : withTimeout(execution, options.timeoutMs, options.deadline);
-  return timed.pipe(
-    Effect.mapError((cause) => (isNativeSuspension(cause) ? cause : normalizeFailure(cause))),
+  return observeInvocation(
+    "handler.invoke",
+    timed.pipe(
+      Effect.mapError((cause) => (isNativeSuspension(cause) ? cause : normalizeFailure(cause))),
+    ),
   ) as Effect.Effect<Output, InvocationFailure>;
 }
 

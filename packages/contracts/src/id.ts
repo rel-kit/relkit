@@ -1,56 +1,37 @@
-import { isTraceId } from "./trace-context.js";
+import { Effect } from "effect";
+import { observeContract, runContract } from "./contract-observability.js";
+import type { ProtocolId, StableId } from "./id.types.js";
+
+export * from "./id-conversions.js";
+
+export type {
+  DescriptorId,
+  DescriptorKind,
+  EventInstanceId,
+  GenerationId,
+  GraphHash,
+  InvocationId,
+  ProtocolId,
+  Ref,
+  RequestId,
+  StableId,
+  TraceId,
+} from "./id.types.js";
 
 const STABLE_ID_PATTERN = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$/;
 
-declare const StableIdBrand: unique symbol;
-declare const ProtocolIdBrand: unique symbol;
-
-/** A validated identifier whose value is independent of a source path. */
-export type StableId = string & { readonly [StableIdBrand]: "StableId" };
-
-/** Alias used by descriptor contracts for stable IDs. */
-export type DescriptorId = StableId;
-
-/** A stable identifier used to address a versioned protocol value. */
-export type ProtocolId<Name extends string = "ProtocolId"> = StableId & {
-  readonly [ProtocolIdBrand]: Name;
-};
-
-export type GraphHash = ProtocolId<"GraphHash">;
-export type GenerationId = ProtocolId<"GenerationId">;
-export type RequestId = ProtocolId<"RequestId">;
-export type TraceId = ProtocolId<"TraceId">;
-export type InvocationId = ProtocolId<"InvocationId">;
-export type EventInstanceId = ProtocolId<"EventInstanceId">;
-
-/** The descriptor kinds represented by the public v3 contracts. */
-export type DescriptorKind =
-  | "app"
-  | "function"
-  | "service"
-  | "route"
-  | "middleware"
-  | "task"
-  | "job"
-  | "event"
-  | "event-trigger"
-  | "bucket"
-  | "cache"
-  | "tool"
-  | "agent"
-  | "channel"
-  | "constants"
-  | "prompt";
-
-/** A typed reference to a descriptor identified by an explicit stable ID. */
-export interface Ref<Kind extends DescriptorKind, Id extends string = string> {
-  readonly kind: Kind;
-  readonly id: Id;
-}
-
-/** Raised when an identifier is missing or cannot be normalized safely. */
+/**
+ * Tagged failure when an identifier cannot be represented as a stable ID.
+ * The `reason` field identifies the violated stable-ID rule.
+ * @example Effect.catchTag("StableIdError", (error) => Effect.logWarning(error.reason));
+ */
+// TODO(better-pkg): Use Data.TaggedError after TypeError-based callers migrate.
+// Audit TypeError guards in packages/runtime-hono/src/agent-rpc-errors.ts,
+// agent-protocol-support.ts, agent-inspector.ts, packages/cli/src/commands/dev-telemetry.ts,
+// and packages/client/src/jobs/reconcile.ts before removing this compatibility.
 export class StableIdError extends TypeError {
-  constructor(reason: string) {
+  readonly _tag = "StableIdError" as const;
+  constructor(readonly reason: string) {
     super(`Invalid stable ID: ${reason}`);
     this.name = "StableIdError";
   }
@@ -58,60 +39,151 @@ export class StableIdError extends TypeError {
 
 export { StableIdError as IdError, StableIdError as IdValidationError };
 
-/** Trims and validates an explicit stable ID without deriving it from a path. */
-export function normalizeId(value: unknown): StableId {
-  if (typeof value !== "string") {
-    throw new StableIdError("expected a string");
-  }
-
-  const normalized = value.normalize("NFC").trim();
-  if (normalized.length === 0) {
-    throw new StableIdError("expected a non-empty value");
-  }
-  if (!STABLE_ID_PATTERN.test(normalized)) {
-    throw new StableIdError("use letters, numbers, '.', '_' or '-' between alphanumeric segments");
-  }
-  return normalized as StableId;
+/**
+ * Normalizes and validates a stable ID without deriving identity from a path.
+ * @param value - Candidate identifier.
+ * @returns An Effect containing the canonical stable ID.
+ * @example
+ * const id = Effect.runSync(normalizeIdEffect(" orders.list "));
+ */
+export function normalizeIdEffect(value: unknown): Effect.Effect<StableId, StableIdError> {
+  return observeContract(
+    "id.normalize",
+    Effect.gen(function* () {
+      if (typeof value !== "string")
+        return yield* Effect.fail(new StableIdError("expected a string"));
+      const normalized = value.normalize("NFC").trim();
+      if (normalized.length === 0)
+        return yield* Effect.fail(new StableIdError("expected a non-empty value"));
+      if (!STABLE_ID_PATTERN.test(normalized)) {
+        return yield* Effect.fail(
+          new StableIdError("use letters, numbers, '.', '_' or '-' between alphanumeric segments"),
+        );
+      }
+      return normalized as StableId;
+    }),
+  );
 }
 
-/** Returns whether a value is already a canonical stable ID. */
+/**
+ * Synchronous compatibility adapter for stable ID normalization.
+ * @param value - Candidate identifier.
+ * @returns The canonical stable ID.
+ * @throws StableIdError when the value cannot be normalized.
+ * @example
+ * const id = normalizeId(" orders.list ");
+ */
+export function normalizeId(value: unknown): StableId {
+  return runContract(normalizeIdEffect(value));
+}
+
+/**
+ * Checks a value without normalizing it.
+ * @param value - Candidate stable ID.
+ * @returns An Effect containing whether the value is canonical.
+ * @example
+ * const valid = Effect.runSync(isStableIdEffect("orders.list"));
+ */
+export function isStableIdEffect(value: unknown): Effect.Effect<boolean> {
+  return observeContract(
+    "id.is-stable",
+    Effect.sync(
+      () => typeof value === "string" && value === value.trim() && STABLE_ID_PATTERN.test(value),
+    ),
+  );
+}
+
+/**
+ * Synchronous compatibility predicate for a canonical stable ID.
+ * @param value - Candidate stable ID.
+ * @returns Whether the value is canonical; narrows its TypeScript type.
+ * @example
+ * if (isStableId(value)) consume(value);
+ */
 export function isStableId(value: unknown): value is StableId {
-  if (typeof value !== "string" || value !== value.trim()) return false;
-  return STABLE_ID_PATTERN.test(value);
+  return runContract(isStableIdEffect(value));
 }
 
 export const isValidId = isStableId;
 
-/** Asserts that a value is already a canonical stable ID. */
+/**
+ * Validates a canonical stable ID without trimming it.
+ * @param value - Candidate stable ID.
+ * @returns An Effect completing when the value is valid.
+ * @example
+ * Effect.runSync(assertStableIdEffect("orders.list"));
+ */
+export function assertStableIdEffect(value: unknown): Effect.Effect<void, StableIdError> {
+  return observeContract(
+    "id.assert-stable",
+    Effect.gen(function* () {
+      if (!(yield* isStableIdEffect(value))) {
+        return yield* Effect.fail(new StableIdError("expected a canonical stable ID"));
+      }
+    }),
+  );
+}
+
+/**
+ * Synchronous compatibility assertion for a canonical stable ID.
+ * @param value - Candidate stable ID.
+ * @returns Nothing; narrows the input type on success.
+ * @throws StableIdError when the input is invalid.
+ * @example
+ * assertStableId("orders.list");
+ */
 export function assertStableId(value: unknown): asserts value is StableId {
-  if (!isStableId(value)) {
-    throw new StableIdError("expected a canonical stable ID");
-  }
+  runContract(assertStableIdEffect(value));
 }
 
 export const assertValidId = assertStableId;
 
-/** Normalizes an explicit protocol ID while preserving its nominal type. */
+/**
+ * Normalizes a versioned protocol ID.
+ * @param value - Candidate protocol ID.
+ * @returns An Effect containing the nominal protocol ID.
+ * @example
+ * const id = Effect.runSync(normalizeProtocolIdEffect("request-1"));
+ */
+export function normalizeProtocolIdEffect(
+  value: unknown,
+): Effect.Effect<ProtocolId, StableIdError> {
+  return observeContract(
+    "id.normalize-protocol",
+    Effect.map(normalizeIdEffect(value), (id) => id as ProtocolId),
+  );
+}
+
+/**
+ * Synchronous compatibility adapter for protocol ID normalization.
+ * @param value - Candidate protocol ID.
+ * @returns The nominal protocol ID.
+ * @throws StableIdError when the input is invalid.
+ * @example
+ * const id = normalizeProtocolId("request-1");
+ */
 export function normalizeProtocolId(value: unknown): ProtocolId {
-  return normalizeId(value) as ProtocolId;
+  return runContract(normalizeProtocolIdEffect(value));
 }
 
-/** Returns whether a value is a canonical protocol ID. */
+/**
+ * Checks whether a candidate is a canonical protocol ID.
+ * @param value - Candidate protocol ID.
+ * @returns An Effect containing the validation result.
+ * @example
+ * const valid = Effect.runSync(isProtocolIdEffect("request-1"));
+ */
+export function isProtocolIdEffect(value: unknown): Effect.Effect<boolean> {
+  return observeContract("id.is-protocol", isStableIdEffect(value));
+}
+
+/**
+ * Synchronous compatibility predicate for a protocol ID.
+ * @param value - Candidate protocol ID.
+ * @returns Whether the value is canonical; narrows its TypeScript type.
+ * @example
+ * if (isProtocolId(value)) consume(value);
+ */
 export function isProtocolId(value: unknown): value is ProtocolId {
-  return isStableId(value);
+  return runContract(isProtocolIdEffect(value));
 }
-
-export const toGraphHash = (value: unknown): GraphHash =>
-  normalizeProtocolId(value) as unknown as GraphHash;
-export const toGenerationId = (value: unknown): GenerationId =>
-  normalizeProtocolId(value) as unknown as GenerationId;
-export const toRequestId = (value: unknown): RequestId =>
-  normalizeProtocolId(value) as unknown as RequestId;
-export const toTraceId = (value: unknown): TraceId => {
-  if (!isTraceId(value)) throw new TypeError("Invalid W3C trace ID");
-  return value;
-};
-export const toInvocationId = (value: unknown): InvocationId =>
-  normalizeProtocolId(value) as unknown as InvocationId;
-export const toEventInstanceId = (value: unknown): EventInstanceId =>
-  normalizeProtocolId(value) as unknown as EventInstanceId;

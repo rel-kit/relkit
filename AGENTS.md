@@ -69,7 +69,7 @@ source.
 ## Editing rules
 
 - Use strict TypeScript, double quotes, semicolons, and the shared configs.
-- Keep implementation files at or below 200 lines; split by responsibility.
+- Keep implementation files at or below 250 lines; split by responsibility.
 - Prefer existing utilities and standard-library APIs over new abstractions or
   dependencies. Add focused regression coverage for non-trivial behavior.
 - Use `apply_patch` for source and documentation edits; do not hand-edit
@@ -85,7 +85,20 @@ source.
   intentionally skipped checks honestly.
 
 Before changing exports, imports, directories, or naming conventions, read
-`.agents/skills/konsistent-config/SKILL.md`. For Effect API reference, first
-read `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md` when the local
-source is present. Git ignores `repos/*`, so use `rg --no-ignore` when searching
-there; direct file reads continue to work.
+`.agents/skills/konsistent-config/SKILL.md`.
+
+## Effect work
+
+- For Effect implementation or review, read `.agents/skills/effect/SKILL.md`
+  and the references matching the task before editing. Apply it alongside the
+  nearest `AGENTS.md` and established RELKIT conventions. Use the skill to
+  identify relevant Effect APIs and patterns.
+- For each relevant API or pattern, always inspect its implementation, tests,
+  and examples in the read-only `repos/effect` checkout, even when the skill
+  describes it. Check the pinned Effect version and installed
+  `node_modules/effect` source to verify compatibility. If the checkout lacks
+  a relevant file, note the gap and use the installed package source.
+- Read
+  `repos/effect/.agents/AGENTS.md` and `repos/effect/LLMS.md` if those files
+  exist. Git ignores `repos/*`, so use `rg --no-ignore` when searching there;
+  direct file reads continue to work. Do not edit or install in `repos/effect`.

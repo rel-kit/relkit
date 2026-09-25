@@ -1,7 +1,28 @@
 export { z } from "./builder.js";
-export type { NumberSchema, StringSchema, ZBuilder } from "./builder.js";
-export type { FileSchema, FileSchemaOptions } from "./file.js";
+export { buildSchemaEffect, SchemaBuilderError } from "./builder-effect.js";
+export type { NumberSchema, StringSchema, ZBuilder } from "./builder.types.js";
+export type { FileSchema, FileSchemaOptions } from "./file.types.js";
 export { SchemaValidationError, validate, validateSync } from "./standard-schema.js";
+export {
+  SchemaAsyncError,
+  SchemaExecutionError,
+  SchemaInvalidError,
+  SchemaIssuesError,
+  SchemaValidator,
+  SchemaValidatorLive,
+  validateEffect,
+  validateSyncEffect,
+} from "./standard-schema-effect.js";
+export type { SchemaValidatorService } from "./standard-schema-effect.types.js";
+export {
+  JsonSchemaUnavailableError,
+  SchemaProjector,
+  SchemaProjectorLive,
+  getJsonSchemaEffect,
+} from "./json-schema-effect.js";
+export type { SchemaProjectorService } from "./json-schema-effect.types.js";
+export { SchemaTelemetry, SchemaTelemetryLive } from "./schema-observability.js";
+export type { SchemaTelemetryService } from "./schema-observability.types.js";
 export { getSchemaMetadata, isSchemaTransformed } from "./schema-metadata.js";
 export {
   getJsonSchema,
@@ -17,7 +38,7 @@ export type {
   JsonSchemaOptions,
   JsonSchemaResult,
   JsonSchemaUnavailable,
-} from "./json-schema.js";
+} from "./json-schema.types.js";
 export type {
   InferInput,
   InferOutput,
@@ -32,4 +53,4 @@ export type {
   StandardJSONSchemaV1,
   StandardSuccess,
   RelkitSchema,
-} from "./standard-schema.js";
+} from "./standard-schema.types.js";

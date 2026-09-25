@@ -6,18 +6,21 @@ import {
   type TraceId,
   type SpanId,
 } from "@relkit/contracts";
-import { Context, Exit, Option, Tracer } from "effect";
+import { Context, Effect, Exit, Option, Tracer } from "effect";
 import type { SpanCapture, SpanRuntime } from "./span-runtime.js";
-import { boundedTraceText, safeTraceAttribute } from "./trace-limits.js";
+import { boundedTraceText } from "./trace-limits.js";
+import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
+import { setSpanAttribute } from "./span-attributes.js";
+import { appendSpanLinks, captureSpan, completeSpan, recordSpanEvent } from "./span-operations.js";
+import type { TraceEvent } from "./tracing-span.types.js";
 
-export interface TraceEvent {
-  name: string;
-  readonly time: bigint;
-  readonly attributes: Readonly<Record<string, string | number | boolean>>;
-  readonly droppedAttributes: number;
-}
+export type { TraceEvent } from "./tracing-span.types.js";
+/** A mutable span with bounded trace data and observed Effect operations.
+ * @example const span = runtime.start(options);
+ */
 export class RelkitSpan implements Tracer.Span {
   readonly _tag = "Span" as const;
+  readonly relkitInvocationSpan = true;
   readonly spanId: SpanId;
   readonly traceId: TraceId;
   readonly sampled: boolean;
@@ -68,124 +71,152 @@ export class RelkitSpan implements Tracer.Span {
       this.budget.spans < runtime.limits.spansPerTrace;
     if (this.recording) this.budget.spans++;
     else this.budget.dropped++;
-    for (const [key, value] of Object.entries(initialAttributes)) this.setAttribute(key, value);
+    for (const [key, value] of Object.entries(initialAttributes))
+      if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits))
+        this.droppedAttributes++;
     this.addLinks(options.links, false);
   }
+  /** Completes the span exactly once and notifies its runtime.
+   * @param endTime - Monotonic completion time. @param exit - Invocation exit.
+   * @returns An observed Effect with no expected failure.
+   * @example Effect.runSync(span.endEffect(2n, Exit.void));
+   */
+  endEffect(endTime: bigint, exit: Exit.Exit<unknown, unknown>): Effect.Effect<void> {
+    return observeInvocation(
+      "span.end",
+      Effect.sync(() => completeSpan(this, endTime, exit)),
+    );
+  }
 
+  /** Synchronous Effect tracer completion adapter.
+   * @param endTime - Monotonic completion time. @param exit - Invocation exit.
+   * @example span.end(2n, Exit.void);
+   */
   end(endTime: bigint, exit: Exit.Exit<unknown, unknown>): void {
-    if (this.status._tag === "Ended") return;
-    this.status = { _tag: "Ended", startTime: this.startTime, endTime, exit };
-    this.revision++;
-    this.runtime.active.delete(this);
-    this.runtime.notify("completed", this);
+    runInvocationSync(this.endEffect(endTime, exit));
+  }
+  /** Records one safe attribute through Effect.
+   * @param key - Attribute key. @param value - Candidate scalar value.
+   * @returns An observed Effect with no expected failure.
+   * @example Effect.runSync(span.attributeEffect("status", 200));
+   */
+  attributeEffect(key: string, value: unknown): Effect.Effect<void> {
+    return observeInvocation(
+      "span.attribute",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits))
+          this.droppedAttributes++;
+        this.update();
+      }),
+    );
   }
 
+  /** Synchronous Effect tracer attribute adapter.
+   * @param key - Attribute key. @param value - Candidate scalar value.
+   * @example span.attribute("status", 200);
+   */
   attribute(key: string, value: unknown): void {
-    if (!this.writable()) return;
-    this.setAttribute(key, value);
-    this.update();
+    runInvocationSync(this.attributeEffect(key, value));
   }
 
+  /** Renames the span through Effect with its text budget.
+   * @param name - Candidate span name. @returns An observed Effect.
+   * @example Effect.runSync(span.renameEffect("request"));
+   */
+  renameEffect(name: string): Effect.Effect<void> {
+    return observeInvocation(
+      "span.rename",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        this.name = boundedTraceText(name, this.runtime.limits.nameBytes);
+        this.update();
+      }),
+    );
+  }
+
+  /** Synchronous Effect tracer rename adapter. @param name - Candidate span name.
+   * @example span.rename("request"); */
   rename(name: string): void {
-    if (!this.writable()) return;
-    this.name = boundedTraceText(name, this.runtime.limits.nameBytes);
-    this.update();
+    runInvocationSync(this.renameEffect(name));
   }
 
+  /** Records a bounded event through Effect.
+   * @param name - Event name. @param time - Event time. @param attributes - Event metadata.
+   * @returns An observed Effect with no expected failure.
+   * @example Effect.runSync(span.eventEffect("received", 2n));
+   */
+  eventEffect(
+    name: string,
+    time: bigint,
+    attributes: Record<string, unknown> = {},
+  ): Effect.Effect<void> {
+    return observeInvocation(
+      "span.event",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        recordSpanEvent(this, name, time, attributes);
+        this.update();
+      }),
+    );
+  }
+
+  /** Synchronous Effect tracer event adapter.
+   * @param name - Event name. @param time - Event time. @param attributes - Event metadata.
+   * @example span.event("received", 2n);
+   */
   event(name: string, time: bigint, attributes: Record<string, unknown> = {}): void {
-    if (!this.writable()) return;
-    if (this.events.length >= this.runtime.limits.events) this.droppedEvents++;
-    else {
-      const metadata = this.metadata(attributes);
-      this.events.push(
-        Object.freeze({
-          name: boundedTraceText(name, this.runtime.limits.nameBytes),
-          time,
-          attributes: metadata.attributes,
-          droppedAttributes: metadata.dropped,
-        }),
-      );
-    }
-    this.update();
+    runInvocationSync(this.eventEffect(name, time, attributes));
   }
 
+  /** Captures a bounded input or output through Effect.
+   * @param kind - Capture slot. @param value - Candidate payload.
+   * @returns An observed Effect with no expected failure.
+   * @example Effect.runSync(span.captureEffect("input", request));
+   */
+  captureEffect(kind: "input" | "output", value: unknown): Effect.Effect<void> {
+    return observeInvocation(
+      "span.capture",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        if (!captureSpan(this, kind, value)) return;
+        this.update();
+      }),
+    );
+  }
+
+  /** Synchronous capture adapter. @param kind - Capture slot. @param value - Candidate payload.
+   * @example span.capture("input", request); */
   capture(kind: "input" | "output", value: unknown): void {
-    if (!this.writable()) return;
-    const captured = this.runtime.capture(value);
-    if (captured === undefined) return;
-    this.captures[kind] = captured;
-    this.update();
+    runInvocationSync(this.captureEffect(kind, value));
   }
 
+  /** Adds valid links up to the span's link budget through Effect.
+   * @param links - Candidate span links. @param notify - Whether to emit an update.
+   * @returns An observed Effect with no expected failure.
+   * @example Effect.runSync(span.addLinksEffect([]));
+   */
+  addLinksEffect(links: ReadonlyArray<Tracer.SpanLink>, notify = true): Effect.Effect<void> {
+    return observeInvocation(
+      "span.links",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        appendSpanLinks(this, links);
+        if (notify && links.length > 0) this.update();
+      }),
+    );
+  }
+
+  /** Synchronous link adapter.
+   * @param links - Candidate span links. @param notify - Whether to emit an update.
+   * @example span.addLinks([]);
+   */
   addLinks(links: ReadonlyArray<Tracer.SpanLink>, notify = true): void {
-    if (!this.writable()) return;
-    for (const link of links) {
-      if (
-        this.links.length >= this.runtime.limits.links ||
-        !isTraceId(link.span.traceId) ||
-        !isSpanId(link.span.spanId)
-      ) {
-        this.droppedLinks++;
-        continue;
-      }
-      const metadata = this.metadata(link.attributes);
-      this.links.push(
-        Object.freeze({
-          span: Tracer.externalSpan({
-            traceId: link.span.traceId,
-            spanId: link.span.spanId,
-            sampled: link.span.sampled,
-          }),
-          attributes: metadata.attributes,
-        }),
-      );
-      this.droppedAttributes += metadata.dropped;
-    }
-    if (notify && links.length > 0) this.update();
+    runInvocationSync(this.addLinksEffect(links, notify));
   }
 
   private writable(): boolean {
     return this.recording && this.status._tag !== "Ended";
-  }
-
-  private setAttribute(key: string, value: unknown): void {
-    const limits = this.runtime.limits;
-    const scalar = safeTraceAttribute(value, limits.attributeBytes);
-    if (
-      !key ||
-      boundedTraceText(key, limits.keyBytes) !== key ||
-      scalar === undefined ||
-      (!this.attributes.has(key) && this.attributes.size >= limits.attributes)
-    ) {
-      this.droppedAttributes++;
-    } else {
-      this.attributes.set(key, scalar);
-    }
-  }
-
-  private metadata(input: Readonly<Record<string, unknown>>) {
-    const attributes: Record<string, string | number | boolean> = Object.create(null);
-    let dropped = 0;
-    let count = 0;
-    for (const key of Object.keys(input)) {
-      const descriptor = Object.getOwnPropertyDescriptor(input, key);
-      const value =
-        descriptor && "value" in descriptor
-          ? safeTraceAttribute(descriptor.value, this.runtime.limits.attributeBytes)
-          : undefined;
-      if (
-        !key ||
-        boundedTraceText(key, this.runtime.limits.keyBytes) !== key ||
-        value === undefined ||
-        count >= this.runtime.limits.attributes
-      ) {
-        dropped++;
-        continue;
-      }
-      attributes[key] = value;
-      count++;
-    }
-    return { attributes: Object.freeze(attributes), dropped };
   }
 
   private update(): void {

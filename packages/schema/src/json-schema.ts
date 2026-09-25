@@ -1,110 +1,129 @@
-import type { JsonValue, StandardSchemaV1 } from "./standard-schema.js";
-import {
-  getMetadataProjection,
-  getSchemaMetadata,
-  isMetadataOptional,
-  type SchemaProjectionDirection,
-} from "./schema-metadata.js";
+import { Data, Effect } from "effect";
+import { getJsonSchemaEffect, SchemaProjectorLive } from "./json-schema-effect.js";
+import { runSchemaSync } from "./schema-observability.js";
+import type { JsonValue, StandardSchemaV1 } from "./standard-schema.types.js";
+import type {
+  JsonSchemaAvailable,
+  JsonSchemaOptions,
+  JsonSchemaResult,
+  JsonSchemaUnavailable,
+} from "./json-schema.types.js";
 
+/** Stable code for unavailable deterministic JSON Schema projections. */
 export const JSON_SCHEMA_UNAVAILABLE = "RELKIT_SCHEMA_UNAVAILABLE" as const;
+export { getSchemaProjection, isSchemaOptional } from "./json-schema-inspection.js";
 
-/** A JSON Schema document with JSON-safe values and deterministic key order. */
-export type JsonSchema = { readonly [key: string]: JsonValue };
+export type {
+  JsonSchema,
+  JsonSchemaAvailable,
+  JsonSchemaDirection,
+  JsonSchemaFactory,
+  JsonSchemaOptions,
+  JsonSchemaResult,
+  JsonSchemaUnavailable,
+} from "./json-schema.types.js";
 
-export interface JsonSchemaAvailable {
-  readonly ok: true;
-  readonly schema: JsonSchema;
-}
-
-export interface JsonSchemaUnavailable {
-  readonly ok: false;
-  readonly code: typeof JSON_SCHEMA_UNAVAILABLE;
-  readonly reason: string;
-}
-
-export type JsonSchemaResult = JsonSchemaAvailable | JsonSchemaUnavailable;
-export type JsonSchemaFactory = () => JsonValue;
-export type JsonSchemaDirection = SchemaProjectionDirection;
-export interface JsonSchemaOptions {
-  readonly direction?: JsonSchemaDirection;
-}
-
-/** Returns a schema's deterministic projection hook without executing it. */
-export function getSchemaProjection(
-  schema: StandardSchemaV1,
-  direction: JsonSchemaDirection | "legacy" = "legacy",
-): JsonSchemaFactory | undefined {
-  const metadata = getSchemaMetadata(schema);
-  const projected = getMetadataProjection(metadata, direction);
-  if (projected) return projected;
-  const relkit = schema as StandardSchemaV1 & {
-    readonly relkit?: {
-      readonly jsonSchema?: JsonSchemaFactory;
-      readonly inputJsonSchema?: JsonSchemaFactory;
-      readonly outputJsonSchema?: JsonSchemaFactory;
-    };
-  };
-  const relkitProjection =
-    direction === "input"
-      ? relkit.relkit?.inputJsonSchema
-      : direction === "output"
-        ? relkit.relkit?.outputJsonSchema
-        : relkit.relkit?.jsonSchema;
-  if (relkitProjection) return relkitProjection;
-  if (direction === "legacy") return undefined;
-  const standard = schema?.["~standard"] as StandardSchemaV1["~standard"] & {
-    readonly jsonSchema?: {
-      readonly input?: (options: { readonly target: "draft-2020-12" }) => Record<string, unknown>;
-      readonly output?: (options: { readonly target: "draft-2020-12" }) => Record<string, unknown>;
-    };
-  };
-  const hook = standard.jsonSchema?.[direction];
-  return hook === undefined ? undefined : () => hook({ target: "draft-2020-12" }) as JsonValue;
-}
-
-/** Returns whether a schema accepts an omitted object property. */
-export function isSchemaOptional(
-  schema: StandardSchemaV1,
-  direction: JsonSchemaDirection | "legacy" = "legacy",
-): boolean {
-  return isMetadataOptional(getSchemaMetadata(schema), direction);
-}
-
-/** Obtains or generates a canonical JSON Schema without guessing unsupported behavior. */
+/**
+ * Produces a canonical JSON Schema or an unavailable result.
+ * @param schema - Compatible schema to project.
+ * @param options - Optional input or output direction.
+ * @returns A projection result with schema or structured reason.
+ * @example getJsonSchema(z.string());
+ */
 export function getJsonSchema(
   schema: StandardSchemaV1,
   options?: JsonSchemaOptions,
 ): JsonSchemaResult {
-  try {
-    if (schema?.["~standard"]?.version !== 1) {
-      return unavailable("Schema is not a Standard Schema v1 validator");
-    }
-    const direction = options?.direction ?? "legacy";
-    if (direction !== "legacy" && direction !== "input" && direction !== "output") {
-      return unavailable(`Unsupported schema projection direction "${String(direction)}"`);
-    }
-    const projection = getSchemaProjection(schema, direction);
-    if (!projection) return unavailable("Schema does not expose a deterministic projection");
-    const value = sortJsonValue(projection(), "$", undefined);
-    if (!isRecord(value)) return unavailable("Schema projection must be a JSON object");
-    return { ok: true, schema: value };
-  } catch (error) {
-    return unavailable(error instanceof Error ? error.message : String(error));
-  }
+  return runSchemaSync(
+    Effect.provide(
+      getJsonSchemaEffect(schema, options).pipe(
+        Effect.map((value) => ({ ok: true, schema: value }) as const),
+        Effect.catchTag("JsonSchemaUnavailableError", (error) =>
+          Effect.succeed(unavailable(error.reason)),
+        ),
+      ),
+      SchemaProjectorLive,
+    ),
+  );
 }
 
-/** Alias for callers that describe projection as a conversion. */
+/**
+ * Alias for callers that describe projection as a conversion.
+ * @example toJsonSchema(z.string());
+ */
 export const toJsonSchema = getJsonSchema;
 
+/**
+ * Narrows a successful projection result.
+ * @param result - Projection result to inspect.
+ * @returns Whether the result contains a JSON Schema.
+ * @example isJsonSchemaAvailable(getJsonSchema(z.string()));
+ */
 export function isJsonSchemaAvailable(result: JsonSchemaResult): result is JsonSchemaAvailable {
-  return result.ok;
+  return runSchemaSync(isJsonSchemaAvailableEffect(result));
+}
+
+/**
+ * Checks projection availability inside Effect.
+ * @param result - Projection result to inspect.
+ * @returns Whether a JSON Schema is available.
+ * @example Effect.runSync(isJsonSchemaAvailableEffect(getJsonSchema(z.string())));
+ */
+export function isJsonSchemaAvailableEffect(result: JsonSchemaResult): Effect.Effect<boolean> {
+  return Effect.sync(() => result.ok);
 }
 
 function unavailable(reason: string): JsonSchemaUnavailable {
   return { ok: false, code: JSON_SCHEMA_UNAVAILABLE, reason };
 }
 
-function sortJsonValue(value: unknown, path: string, key: string | undefined): JsonValue {
+/**
+ * Tagged failure for non-JSON projection data.
+ * The original validation exception remains in `cause`.
+ * @example Effect.catchTag("JsonSchemaValueError", (error) => Effect.succeed(error.cause));
+ */
+export class JsonSchemaValueError extends Data.TaggedError("JsonSchemaValueError")<{
+  readonly cause: unknown;
+}> {}
+
+/**
+ * Canonicalizes JSON-safe projection data inside Effect.
+ * @param value - Projection value to canonicalize.
+ * @param path - Current diagnostic path.
+ * @param key - Parent property name when ordering required fields.
+ * @returns Sorted JSON data, or JsonSchemaValueError.
+ * @example Effect.runSync(sortJsonValueEffect({ b: 2, a: 1 }, "$", undefined));
+ */
+export function sortJsonValueEffect(
+  value: unknown,
+  path: string,
+  key: string | undefined,
+): Effect.Effect<JsonValue, JsonSchemaValueError> {
+  return Effect.try({
+    try: () => sortJsonValueRaw(value, path, key),
+    catch: (cause) => new JsonSchemaValueError({ cause }),
+  });
+}
+
+/**
+ * Canonicalizes JSON-safe projection data and preserves TypeError behavior.
+ * @param value - Projection value to canonicalize.
+ * @param path - Current diagnostic path.
+ * @param key - Parent property name when ordering required fields.
+ * @returns Sorted JSON data.
+ * @throws TypeError for unsupported data.
+ * @example sortJsonValue({ b: 2, a: 1 }, "$", undefined);
+ */
+export function sortJsonValue(value: unknown, path: string, key: string | undefined): JsonValue {
+  try {
+    return runSchemaSync(sortJsonValueEffect(value, path, key));
+  } catch (error) {
+    if (error instanceof JsonSchemaValueError) throw error.cause;
+    throw error;
+  }
+}
+
+function sortJsonValueRaw(value: unknown, path: string, key: string | undefined): JsonValue {
   if (value === null || typeof value === "string" || typeof value === "boolean") return value;
   if (typeof value === "number") {
     if (!Number.isFinite(value)) throw invalid(path, "non-finite numbers are not supported");
@@ -116,7 +135,9 @@ function sortJsonValue(value: unknown, path: string, key: string | undefined): J
     if (names.some((name) => name !== "length" && !isArrayIndex(name, value.length))) {
       throw invalid(path, "array properties");
     }
-    const items = value.map((item, index) => sortJsonValue(item, `${path}[${index}]`, undefined));
+    const items = value.map((item, index) =>
+      sortJsonValueRaw(item, `${path}[${index}]`, undefined),
+    );
     return key === "required" && items.every((item): item is string => typeof item === "string")
       ? [...items].sort()
       : items;
@@ -128,17 +149,13 @@ function sortJsonValue(value: unknown, path: string, key: string | undefined): J
   for (const name of Object.keys(value).sort()) {
     const descriptor = Object.getOwnPropertyDescriptor(value, name);
     if (!descriptor || !("value" in descriptor)) throw invalid(`${path}.${name}`, "accessor");
-    result[name] = sortJsonValue(descriptor.value, `${path}.${name}`, name);
+    result[name] = sortJsonValueRaw(descriptor.value, `${path}.${name}`, name);
   }
   return result;
 }
 
 function invalid(path: string, reason: string): TypeError {
   return new TypeError(`Invalid JSON Schema projection at ${path}: ${reason}`);
-}
-
-function isRecord(value: JsonValue): value is JsonSchema {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function isPlainObject(value: object): value is Record<string, unknown> {

@@ -1,26 +1,9 @@
-import type { JsonValue, SourceLocation } from "@relkit/contracts";
-import type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
-import type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
-import type { ProviderBindingNode } from "./provider-nodes.js";
-import type { ServiceNode } from "./service-nodes.js";
-import type { AgentNode } from "./agent-node.js";
-import type { HookNode, JobNode, TaskNode } from "./task-nodes.js";
-export type {
-  FunctionHookNode,
-  HookNode,
-  JobNode,
-  LegacyJobNode,
-  TaskHookNode,
-  TaskJobNode,
-  TaskNode,
-} from "./task-nodes.js";
-export type {
-  AgentNode,
-  AgentResourceDependency,
-  AgentSubagentTopology,
-  AgentWorkflowTopology,
-} from "./agent-node.js";
-
+import { Effect } from "effect";
+import { observeGraph, runGraph } from "./graph-observability.js";
+import type { GraphNodeKind } from "./model.types.js";
+export type * from "./model.types.js";
+export { GRAPH_EDGE_KINDS, isGraphEdgeKind, isGraphEdgeKindEffect } from "./graph-edges.js";
+/** Supported graph node kinds in canonical protocol order. */
 export const GRAPH_NODE_KINDS = [
   "app",
   "env",
@@ -40,137 +23,26 @@ export const GRAPH_NODE_KINDS = [
   "middleware",
   "hook",
 ] as const;
-export type GraphNodeKind = (typeof GRAPH_NODE_KINDS)[number];
-export type GraphTriggerType = "http" | "queue" | "schedule" | "event";
-export interface GraphNodeBase<Kind extends GraphNodeKind = GraphNodeKind> {
-  readonly kind: Kind;
-  readonly id: string;
-  readonly source: SourceLocation;
-  readonly domainId?: string;
+/**
+ * Checks whether a candidate is a supported graph node kind.
+ * @param value - Candidate kind.
+ * @returns An Effect containing the boolean result; it has no expected failure.
+ * @example Effect.runSync(isGraphNodeKindEffect("function"));
+ */
+export function isGraphNodeKindEffect(value: unknown): Effect.Effect<boolean> {
+  return observeGraph(
+    "model.is-node-kind",
+    Effect.sync(
+      () => typeof value === "string" && (GRAPH_NODE_KINDS as readonly string[]).includes(value),
+    ),
+  );
 }
-export type { DomainExposure, ErrorNode, FunctionNode } from "./domain-nodes.js";
-export type { AppNode, EnvironmentVariableNode } from "./foundation-nodes.js";
-export interface MiddlewareRouteRef {
-  readonly id: string;
-  readonly path: string;
-  readonly order: number;
-  readonly match: "always" | "conditional";
-}
-export interface TransformProjection {
-  readonly id: string;
-  readonly schema: JsonValue;
-}
-export interface HttpTriggerConfig {
-  readonly method: string;
-  readonly path: string;
-  readonly rawHandler?: boolean;
-  readonly title?: string;
-  readonly description?: string;
-  readonly tags?: readonly string[];
-  readonly runtimePaths?: readonly string[];
-  readonly request: JsonValue;
-  readonly responses: JsonValue;
-  readonly middleware: readonly MiddlewareRouteRef[];
-  readonly transforms: readonly TransformProjection[];
-  readonly rateLimit?: {
-    readonly limit: number;
-    readonly windowMs: number;
-    readonly key: JsonValue;
-    readonly storeId?: string;
-  };
-  readonly maxBodyBytes?: number;
-  readonly timeoutMs?: number;
-  readonly client?: false | { readonly operation: "query" | "mutation" };
-  readonly stream?: { readonly format: "sse" | "text" | "bytes" };
-}
-export interface EventTriggerConfig {
-  readonly eventId: string;
-  readonly eventVersion: number;
-  readonly delivery: "ephemeral" | "durable";
-  readonly profile?: string;
-  readonly retry?: JsonValue;
-  readonly concurrency?: number;
-  readonly timeoutMs?: number;
-}
-export interface TriggerNode<
-  Trigger extends GraphTriggerType = GraphTriggerType,
-  Config = JsonValue,
-> extends GraphNodeBase<"trigger"> {
-  readonly triggerType: Trigger;
-  readonly targetFunctionId: string;
-  readonly config: Config;
-}
-export interface EventNode extends GraphNodeBase<"event"> {
-  readonly exposure?: DomainExposure;
-  readonly version: number;
-  readonly input: JsonValue;
-  readonly sensitiveFields?: readonly string[];
-  readonly profile: string;
-}
-export interface BucketNode extends GraphNodeBase<"bucket"> {
-  readonly profile: string;
-  readonly visibility: "private" | "public";
-  readonly maxObjectBytes?: number;
-  readonly allowedContentTypes?: readonly string[];
-}
-export interface CacheNode extends GraphNodeBase<"cache"> {
-  readonly key: JsonValue;
-  readonly value: JsonValue;
-  readonly profile: string;
-  readonly defaultTtlMs?: number;
-  readonly maxTtlMs?: number;
-}
-export interface ToolNode extends GraphNodeBase<"tool"> {
-  readonly targetFunctionId: string;
-  readonly description: string;
-  readonly sideEffect: "none" | "read" | "write" | "external";
-  readonly approval: "never" | "on-write" | "always";
-  readonly timeoutMs?: number;
-  readonly mcp: boolean;
-}
-export interface MiddlewareNode extends GraphNodeBase<"middleware"> {
-  readonly path: string;
-  readonly order: number;
-}
-export interface ChannelNode extends GraphNodeBase<"channel"> {
-  readonly params: JsonValue;
-  readonly events: Readonly<Record<string, JsonValue>>;
-  readonly profile: string;
-  readonly client: "internal" | "public" | "protected";
-  readonly replay?: JsonValue;
-  readonly presence?: JsonValue;
-}
-export type GraphNode =
-  | AppNode
-  | EnvironmentVariableNode
-  | FunctionNode
-  | TaskNode
-  | ErrorNode
-  | TriggerNode
-  | JobNode
-  | EventNode
-  | BucketNode
-  | CacheNode
-  | ToolNode
-  | AgentNode
-  | ChannelNode
-  | ProviderBindingNode
-  | ServiceNode
-  | MiddlewareNode
-  | HookNode;
-export {
-  GRAPH_EDGE_KINDS,
-  isGraphEdgeKind,
-  type GraphEdge,
-  type GraphEdgeBase,
-  type GraphEdgeKind,
-  type TargetsTaskEdge,
-  type TargetsFunctionEdge,
-  type UsesHookEdge,
-  type UsesMiddlewareEdge,
-} from "./graph-edges.js";
-export type TargetFunctionRole = "primary";
-export type { ApplicationGraph, Graph, ObservedEdge } from "./graph-types.js";
+/**
+ * Synchronous compatibility adapter for graph node kind detection.
+ * @param value - Candidate kind.
+ * @returns Whether the value is a supported node kind.
+ * @example isGraphNodeKind("function");
+ */
 export function isGraphNodeKind(value: unknown): value is GraphNodeKind {
-  return typeof value === "string" && (GRAPH_NODE_KINDS as readonly string[]).includes(value);
+  return runGraph(isGraphNodeKindEffect(value));
 }

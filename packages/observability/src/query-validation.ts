@@ -1,160 +1,84 @@
+import { Effect } from "effect";
 import type { ObservabilityRecord } from "./model.js";
+import type { NormalizedQuery } from "./query-validation.types.js";
 import {
-  DEFAULT_OBSERVABILITY_QUERY_LIMIT,
-  MAX_OBSERVABILITY_QUERY_LIMIT,
   ObservabilityQueryError,
   type ObservabilityQueryPage,
   type ObservabilityQueryRequest,
 } from "./query-types.js";
-
-export interface NormalizedQuery extends ObservabilityQueryRequest {
-  readonly limit: number;
-  readonly fromMs?: number;
-  readonly toMs?: number;
+import {
+  inQueryTimeRangeEffect,
+  matchesQueryEffect,
+  positiveQueryEffect,
+  queryResponseEffect,
+  validateQueryEffect,
+  type QueryValidationError,
+} from "./query-validation-effect.js";
+export type { NormalizedQuery } from "./query-validation.types.js";
+function run<A>(effect: Effect.Effect<A, QueryValidationError>): A {
+  return Effect.runSync(
+    effect.pipe(
+      Effect.catchTag("QueryValidationError", (error) =>
+        Effect.sync(() => {
+          throw new ObservabilityQueryError(error.code, error.message);
+        }),
+      ),
+    ),
+  );
 }
-
+/**
+ * Validates and normalizes a query request.
+ * @param value - Query fields.
+ * @param maximum - Maximum page size.
+ * @returns A normalized query.
+ * @throws {ObservabilityQueryError} If input or protocol fields are invalid.
+ * @example
+ * const query = validate({ limit: 10 }, 100);
+ */
 export function validate(value: ObservabilityQueryRequest, maximum: number): NormalizedQuery {
-  if (value.search !== undefined && (typeof value.search !== "string" || value.search.length > 512))
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Search must contain at most 512 characters",
-    );
-  if (value.source !== undefined && !["application", "relkit", "inspector"].includes(value.source))
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Log source is invalid",
-    );
-  if (value.order !== undefined && value.order !== "asc" && value.order !== "desc")
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Query order is invalid",
-    );
-  if (value.protocol !== undefined && value.protocol !== "relkit.observability.query")
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
-      "Unsupported observability query protocol",
-    );
-  if (value.version !== undefined && value.version !== 1)
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
-      "Unsupported observability query version",
-    );
-  const limit = value.limit ?? DEFAULT_OBSERVABILITY_QUERY_LIMIT;
-  if (!Number.isSafeInteger(limit) || limit < 1)
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query limit is invalid",
-    );
-  const fromMs = value.from === undefined ? undefined : parseTime(value.from, "from");
-  const toMs = value.to === undefined ? undefined : parseTime(value.to, "to");
-  if (fromMs !== undefined && toMs !== undefined && fromMs > toMs)
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query time range is invalid",
-    );
-  if (value.cursor !== undefined && value.cursor.length === 0)
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query cursor is invalid",
-    );
-  if (
-    value.cursor !== undefined &&
-    (!/^\d+$/.test(value.cursor) ||
-      !Number.isSafeInteger(Number(value.cursor)) ||
-      Number(value.cursor) < 0)
-  )
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query cursor is invalid",
-    );
-  if (
-    value.severity !== undefined &&
-    !["trace", "debug", "info", "warn", "error", "fatal"].includes(value.severity)
-  )
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query severity is invalid",
-    );
-  for (const [name, item] of [
-    ["routeId", value.routeId],
-    ["functionId", value.functionId],
-    ["outcome", value.outcome],
-    ["requestId", value.requestId],
-    ["originRequestId", value.originRequestId],
-    ["traceId", value.traceId],
-    ["spanId", value.spanId],
-    ["serviceId", value.serviceId],
-    ["generationId", value.generationId],
-    ["graphHash", value.graphHash],
-  ] as const) {
-    if (item !== undefined && item.length === 0)
-      throw new ObservabilityQueryError(
-        "RELKIT_OBSERVABILITY_QUERY_INVALID",
-        `Observability query ${name} is invalid`,
-      );
-  }
-  return {
-    ...value,
-    limit: Math.min(limit, maximum),
-    ...(fromMs === undefined ? {} : { fromMs }),
-    ...(toMs === undefined ? {} : { toMs }),
-  };
+  return run(validateQueryEffect(value, maximum));
 }
-
+/**
+ * Tests a record against validated filters.
+ * @param record - Candidate record.
+ * @param query - Normalized query.
+ * @returns True when the record matches.
+ * @example
+ * const included = matches(record, query);
+ */
 export function matches(record: ObservabilityRecord, query: NormalizedQuery): boolean {
-  const value = record as ObservabilityRecord & { readonly correlationId?: string };
-  return (
-    (query.search === undefined ||
-      JSON.stringify(record).toLowerCase().includes(query.search.trim().toLowerCase())) &&
-    (query.source === undefined ||
-      (record.signal === "log" &&
-        (record.component.startsWith("cli.")
-          ? "relkit"
-          : record.component === "inspector"
-            ? "inspector"
-            : "application") === query.source)) &&
-    (query.requestId === undefined || value.requestId === query.requestId) &&
-    (query.originRequestId === undefined ||
-      ("originRequestId" in value && value.originRequestId === query.originRequestId)) &&
-    (query.generationId === undefined || value.generationId === query.generationId) &&
-    (query.graphHash === undefined || value.graphHash === query.graphHash) &&
-    (query.serviceId === undefined || value.serviceId === query.serviceId)
-  );
+  return run(matchesQueryEffect(record, query));
 }
-
+/**
+ * Tests a timestamp against query time bounds.
+ * @param timestamp - Record timestamp.
+ * @param query - Normalized query.
+ * @returns True when the timestamp is in range.
+ * @example
+ * const included = inTimeRange(record.timestamp, query);
+ */
 export function inTimeRange(timestamp: string, query: NormalizedQuery): boolean {
-  const time = Date.parse(timestamp);
-  return (
-    Number.isFinite(time) &&
-    (query.fromMs === undefined || time >= query.fromMs) &&
-    (query.toMs === undefined || time <= query.toMs)
-  );
+  return run(inQueryTimeRangeEffect(timestamp, query));
 }
-
+/**
+ * Creates an immutable protocol query page.
+ * @param items - Page items.
+ * @param nextCursor - Optional next-page cursor.
+ * @returns A frozen versioned page.
+ * @example
+ * const page = response([record]);
+ */
 export function response<T>(items: readonly T[], nextCursor?: string): ObservabilityQueryPage<T> {
-  return Object.freeze({
-    protocol: "relkit.observability.query" as const,
-    version: 1 as const,
-    items: Object.freeze([...items]),
-    ...(nextCursor === undefined ? {} : { nextCursor }),
-  });
+  return run(queryResponseEffect(items, nextCursor));
 }
-
+/**
+ * Validates and caps a positive query bound.
+ * @param value - Requested bound.
+ * @returns A bounded positive number.
+ * @throws {ObservabilityQueryError} If the value is not a positive safe integer.
+ * @example
+ * const size = positive(10);
+ */
 export function positive(value: number): number {
-  if (!Number.isSafeInteger(value) || value < 1)
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      "Observability query bound is invalid",
-    );
-  return Math.min(value, MAX_OBSERVABILITY_QUERY_LIMIT);
-}
-
-function parseTime(value: string, name: string): number {
-  const result = Date.parse(value);
-  if (!Number.isFinite(result))
-    throw new ObservabilityQueryError(
-      "RELKIT_OBSERVABILITY_QUERY_INVALID",
-      `Observability query ${name} time is invalid`,
-    );
-  return result;
+  return run(positiveQueryEffect(value));
 }

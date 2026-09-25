@@ -1,68 +1,79 @@
-import { deepFreeze, normalizeId, serializeJson } from "@relkit/contracts";
-import { normalizeProviderSource } from "./source-normalization.js";
+import { deepFreeze } from "@relkit/contracts";
+import { Effect } from "effect";
+import { ProviderInputError } from "./provider-compat-errors.js";
+import { providerNormalizeId, providerSerializeJson } from "./protocol-builder-utils.js";
+import { normalizeProviderSourceCore } from "./source-normalization.js";
+import { ProviderProfileSelectionError } from "./provider-compat-errors.js";
+import {
+  observeProvider,
+  providerCalculation,
+  runProvider,
+  type ProviderError,
+} from "./provider-observability.js";
+import type {
+  NormalizedProviderProfiles,
+  ProviderInput,
+  ProviderProfileSelection,
+  ProviderProfileSelectionSource,
+  SelectProviderProfileOptions,
+} from "./profile-normalization.types.js";
 import type {
   NormalizedProviderSource,
   ProviderAdapter,
   ProviderCapability,
   ProviderSourceInput,
-} from "./protocol-types.js";
-
-export type ProviderInput<Binding> = Binding | Readonly<Record<string, Binding>>;
-
-export interface NormalizedProviderProfiles<Adapter extends ProviderAdapter = ProviderAdapter> {
-  readonly kind: "normalized-provider-profiles";
-  readonly capability: string;
-  readonly profiles: Readonly<Record<string, NormalizedProviderSource<Adapter>>>;
+} from "./protocol.types.js";
+export { ProviderProfileSelectionError } from "./provider-compat-errors.js";
+export type {
+  NormalizedProviderProfiles,
+  ProviderInput,
+  ProviderProfileSelection,
+  ProviderProfileSelectionSource,
+  SelectProviderProfileOptions,
+} from "./profile-normalization.types.js";
+/** Normalize a direct source or named profile map in an Effect.
+ * @param capability - Required provider capability.
+ * @param input - Direct source or profile map.
+ * @returns An Effect with sorted frozen profiles or a tagged provider error.
+ * @example Effect.runSync(normalizeProviderProfilesEffect(cache, adapter));
+ */
+export function normalizeProviderProfilesEffect<Adapter extends ProviderAdapter>(
+  capability: ProviderCapability,
+  input: ProviderInput<ProviderSourceInput<Adapter>>,
+): Effect.Effect<NormalizedProviderProfiles<Adapter>, ProviderError> {
+  return observeProvider(
+    "profile.normalize",
+    providerCalculation("INVALID_PROFILE", () => normalizeProviderProfilesCore(capability, input)),
+  );
 }
-
-export type ProviderProfileSelectionSource = "descriptor" | "default" | "sole";
-
-export interface ProviderProfileSelection<Adapter extends ProviderAdapter = ProviderAdapter> {
-  readonly capability: string;
-  readonly profile: string;
-  readonly source: ProviderProfileSelectionSource;
-  readonly binding: NormalizedProviderSource<Adapter>;
-}
-
-export class ProviderProfileSelectionError extends TypeError {
-  readonly code: "AMBIGUOUS_PROVIDER_PROFILE" | "UNKNOWN_PROVIDER_PROFILE";
-  readonly capability: string;
-  readonly descriptorId: string;
-  readonly profiles: readonly string[];
-
-  constructor(
-    code: ProviderProfileSelectionError["code"],
-    capability: string,
-    descriptorId: string,
-    profiles: readonly string[],
-    reason: string,
-  ) {
-    super(
-      `${capability} logical descriptor "${descriptorId}" ${reason}; available profiles: ${profiles.join(", ")}`,
-    );
-    this.name = "ProviderProfileSelectionError";
-    this.code = code;
-    this.capability = capability;
-    this.descriptorId = descriptorId;
-    this.profiles = profiles;
-  }
-}
-
+/** Normalize provider profiles for synchronous callers.
+ * @param capability - Required provider capability.
+ * @param input - Direct source or profile map.
+ * @returns Sorted frozen profiles.
+ * @throws TypeError when a profile is empty, duplicated, or mismatched.
+ * @example normalizeProviderProfiles(cache, adapter);
+ */
 export function normalizeProviderProfiles<Adapter extends ProviderAdapter>(
+  capability: ProviderCapability,
+  input: ProviderInput<ProviderSourceInput<Adapter>>,
+): NormalizedProviderProfiles<Adapter> {
+  return runProvider(normalizeProviderProfilesEffect(capability, input));
+}
+function normalizeProviderProfilesCore<Adapter extends ProviderAdapter>(
   capability: ProviderCapability,
   input: ProviderInput<ProviderSourceInput<Adapter>>,
 ): NormalizedProviderProfiles<Adapter> {
   const entries = isDirectInput(input) ? [["default", input] as const] : Object.entries(input);
   if (entries.length === 0)
-    throw new TypeError(`${capability.id} provider profiles must not be empty`);
+    throw new ProviderInputError(`${capability.id} provider profiles must not be empty`);
   const profiles: Record<string, NormalizedProviderSource<Adapter>> = {};
   for (const [name, source] of entries.sort(([left], [right]) => left.localeCompare(right))) {
-    const profile = normalizeId(name);
+    const profile = providerNormalizeId(name);
     if (profiles[profile] !== undefined)
-      throw new TypeError(`Duplicate ${capability.id} provider profile "${profile}"`);
-    const normalized = normalizeProviderSource(source);
+      throw new ProviderInputError(`Duplicate ${capability.id} provider profile "${profile}"`);
+    const normalized = normalizeProviderSourceCore(source);
     if (normalized.adapter.capability.id !== capability.id)
-      throw new TypeError(
+      throw new ProviderInputError(
         `${capability.id} provider profile "${profile}" received ${normalized.adapter.capability.id}.${normalized.adapter.adapterId}`,
       );
     profiles[profile] = normalized;
@@ -73,14 +84,37 @@ export function normalizeProviderProfiles<Adapter extends ProviderAdapter>(
     profiles,
   });
 }
-
+/** Select a descriptor, default, or sole provider profile in an Effect.
+ * @param normalized - Available normalized profiles.
+ * @param options - Descriptor choice and optional default.
+ * @returns An Effect with the selected binding or a tagged selection error.
+ * @example Effect.runSync(selectProviderProfileEffect(profiles, { descriptorId: "cart" }));
+ */
+export function selectProviderProfileEffect<Adapter extends ProviderAdapter>(
+  normalized: NormalizedProviderProfiles<Adapter>,
+  options: SelectProviderProfileOptions,
+): Effect.Effect<ProviderProfileSelection<Adapter>, ProviderError> {
+  return observeProvider(
+    "profile.select",
+    providerCalculation("INVALID_PROFILE", () => selectProviderProfileCore(normalized, options)),
+  );
+}
+/** Select a provider profile synchronously for legacy callers.
+ * @param normalized - Available normalized profiles.
+ * @param options - Descriptor choice and optional default.
+ * @returns The selected profile and binding.
+ * @throws ProviderProfileSelectionError for ambiguity or an unknown profile.
+ * @example selectProviderProfile(profiles, { descriptorId: "cart" });
+ */
 export function selectProviderProfile<Adapter extends ProviderAdapter>(
   normalized: NormalizedProviderProfiles<Adapter>,
-  options: {
-    readonly descriptorId: string;
-    readonly profile?: string;
-    readonly defaultProfile?: string;
-  },
+  options: SelectProviderProfileOptions,
+): ProviderProfileSelection<Adapter> {
+  return runProvider(selectProviderProfileEffect(normalized, options));
+}
+function selectProviderProfileCore<Adapter extends ProviderAdapter>(
+  normalized: NormalizedProviderProfiles<Adapter>,
+  options: SelectProviderProfileOptions,
 ): ProviderProfileSelection<Adapter> {
   const profiles = Object.keys(normalized.profiles);
   const selected =
@@ -95,34 +129,31 @@ export function selectProviderProfile<Adapter extends ProviderAdapter>(
     throw new ProviderProfileSelectionError(
       "AMBIGUOUS_PROVIDER_PROFILE",
       normalized.capability,
-      normalizeId(options.descriptorId),
+      providerNormalizeId(options.descriptorId),
       profiles,
       "requires an explicit profile",
     );
-  const profile = normalizeId(selected);
+  const profile = providerNormalizeId(selected);
   const binding = normalized.profiles[profile];
   if (binding === undefined)
     throw new ProviderProfileSelectionError(
       "UNKNOWN_PROVIDER_PROFILE",
       normalized.capability,
-      normalizeId(options.descriptorId),
+      providerNormalizeId(options.descriptorId),
       profiles,
       `selected unknown profile "${profile}"`,
     );
   return frozen({ capability: normalized.capability, profile, source, binding });
 }
-
 function isDirectInput(value: unknown): value is ProviderSourceInput {
   if (!isRecord(value) || typeof value.kind !== "string") return false;
   return ["provider-adapter", "provider-local-source", "provider-infrastructure-source"].includes(
     value.kind,
   );
 }
-
 function frozen<Value>(value: Value): Value {
-  return deepFreeze(JSON.parse(serializeJson(value)) as Value);
+  return deepFreeze(JSON.parse(providerSerializeJson(value)) as Value);
 }
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }

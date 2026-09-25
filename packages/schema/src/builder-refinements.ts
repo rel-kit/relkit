@@ -1,26 +1,41 @@
 import { createSchema, issue, type Schema } from "./standard-schema.js";
+import { buildSchema } from "./builder-effect.js";
 import { getMetadataProjection, getSchemaMetadata, setSchemaMetadata } from "./schema-metadata.js";
 import type { JsonSchemaFactory } from "./json-schema.js";
-import type { NumberSchema, StringSchema } from "./builder.js";
+import type { NumberSchema, StringSchema } from "./builder-refinements.types.js";
 import type { JsonValue } from "./standard-schema.js";
 
+/**
+ * Builds a string schema with format and length refinements.
+ * @returns A string schema with typed validation results.
+ * @example stringSchema().min(2).parse("ok");
+ */
 export function stringSchema(): StringSchema {
-  return withString(
-    createSchema(
-      (value, path) => (typeof value === "string" ? { value } : issue("Expected a string", path)),
-      { jsonSchema: () => ({ type: "string" }) },
+  return buildSchema("builder.string", () =>
+    withString(
+      createSchema(
+        (value, path) => (typeof value === "string" ? { value } : issue("Expected a string", path)),
+        { jsonSchema: () => ({ type: "string" }) },
+      ),
     ),
   );
 }
 
+/**
+ * Builds a finite-number schema with numeric refinements.
+ * @returns A finite-number schema with typed validation results.
+ * @example numberSchema().int().parse(2);
+ */
 export function numberSchema(): NumberSchema {
-  return withNumber(
-    createSchema(
-      (value, path) =>
-        typeof value === "number" && Number.isFinite(value)
-          ? { value }
-          : issue("Expected a finite number", path),
-      { jsonSchema: () => ({ type: "number" }) },
+  return buildSchema("builder.number", () =>
+    withNumber(
+      createSchema(
+        (value, path) =>
+          typeof value === "number" && Number.isFinite(value)
+            ? { value }
+            : issue("Expected a finite number", path),
+        { jsonSchema: () => ({ type: "number" }) },
+      ),
     ),
   );
 }
@@ -32,43 +47,53 @@ function withString(
 ): StringSchema {
   const refined = Object.assign(schema, {
     min: (length: number, message?: string) =>
-      withString(
-        schema.refine(
-          (value) => value.length >= length,
-          message ?? `Must contain at least ${length} characters`,
+      buildSchema("builder.string-refine", () =>
+        withString(
+          schema.refine(
+            (value) => value.length >= length,
+            message ?? `Must contain at least ${length} characters`,
+          ),
+          addKeyword(projection, "minLength", length),
+          ["minLength", length],
         ),
-        addKeyword(projection, "minLength", length),
-        ["minLength", length],
       ),
     max: (length: number, message?: string) =>
-      withString(
-        schema.refine(
-          (value) => value.length <= length,
-          message ?? `Must contain at most ${length} characters`,
+      buildSchema("builder.string-refine", () =>
+        withString(
+          schema.refine(
+            (value) => value.length <= length,
+            message ?? `Must contain at most ${length} characters`,
+          ),
+          addKeyword(projection, "maxLength", length),
+          ["maxLength", length],
         ),
-        addKeyword(projection, "maxLength", length),
-        ["maxLength", length],
       ),
     uuid: (message?: string) =>
-      withString(
-        schema.refine((value) => UUID.test(value), message ?? "Expected a UUID"),
-        addKeyword(projection, "format", "uuid"),
-        ["format", "uuid"],
+      buildSchema("builder.string-refine", () =>
+        withString(
+          schema.refine((value) => UUID.test(value), message ?? "Expected a UUID"),
+          addKeyword(projection, "format", "uuid"),
+          ["format", "uuid"],
+        ),
       ),
     datetime: (message?: string) =>
-      withString(
-        schema.refine(
-          (value) => !Number.isNaN(Date.parse(value)),
-          message ?? "Expected an ISO datetime",
+      buildSchema("builder.string-refine", () =>
+        withString(
+          schema.refine(
+            (value) => !Number.isNaN(Date.parse(value)),
+            message ?? "Expected an ISO datetime",
+          ),
+          addKeyword(projection, "format", "date-time"),
+          ["format", "date-time"],
         ),
-        addKeyword(projection, "format", "date-time"),
-        ["format", "date-time"],
       ),
     email: (message?: string) =>
-      withString(
-        schema.refine((value) => EMAIL.test(value), message ?? "Expected an email address"),
-        addKeyword(projection, "format", "email"),
-        ["format", "email"],
+      buildSchema("builder.string-refine", () =>
+        withString(
+          schema.refine((value) => EMAIL.test(value), message ?? "Expected an email address"),
+          addKeyword(projection, "format", "email"),
+          ["format", "email"],
+        ),
       ),
   }) as StringSchema;
   setSchemaMetadata(
@@ -87,34 +112,44 @@ function withNumber(
 ): NumberSchema {
   const refined = Object.assign(schema, {
     min: (minimum: number, message?: string) =>
-      withNumber(
-        schema.refine((value) => value >= minimum, message ?? `Must be at least ${minimum}`),
-        addKeyword(projection, "minimum", minimum),
-        ["minimum", minimum],
+      buildSchema("builder.number-refine", () =>
+        withNumber(
+          schema.refine((value) => value >= minimum, message ?? `Must be at least ${minimum}`),
+          addKeyword(projection, "minimum", minimum),
+          ["minimum", minimum],
+        ),
       ),
     max: (maximum: number, message?: string) =>
-      withNumber(
-        schema.refine((value) => value <= maximum, message ?? `Must be at most ${maximum}`),
-        addKeyword(projection, "maximum", maximum),
-        ["maximum", maximum],
+      buildSchema("builder.number-refine", () =>
+        withNumber(
+          schema.refine((value) => value <= maximum, message ?? `Must be at most ${maximum}`),
+          addKeyword(projection, "maximum", maximum),
+          ["maximum", maximum],
+        ),
       ),
     int: (message?: string) =>
-      withNumber(
-        schema.refine(Number.isInteger, message ?? "Expected an integer"),
-        addKeyword(projection, "type", "integer"),
-        ["type", "integer"],
+      buildSchema("builder.number-refine", () =>
+        withNumber(
+          schema.refine(Number.isInteger, message ?? "Expected an integer"),
+          addKeyword(projection, "type", "integer"),
+          ["type", "integer"],
+        ),
       ),
     positive: (message?: string) =>
-      withNumber(
-        schema.refine((value) => value > 0, message ?? "Expected a positive number"),
-        addKeyword(projection, "exclusiveMinimum", 0),
-        ["exclusiveMinimum", 0],
+      buildSchema("builder.number-refine", () =>
+        withNumber(
+          schema.refine((value) => value > 0, message ?? "Expected a positive number"),
+          addKeyword(projection, "exclusiveMinimum", 0),
+          ["exclusiveMinimum", 0],
+        ),
       ),
     nonnegative: (message?: string) =>
-      withNumber(
-        schema.refine((value) => value >= 0, message ?? "Expected a nonnegative number"),
-        addKeyword(projection, "minimum", 0),
-        ["minimum", 0],
+      buildSchema("builder.number-refine", () =>
+        withNumber(
+          schema.refine((value) => value >= 0, message ?? "Expected a nonnegative number"),
+          addKeyword(projection, "minimum", 0),
+          ["minimum", 0],
+        ),
       ),
   }) as NumberSchema;
   setSchemaMetadata(

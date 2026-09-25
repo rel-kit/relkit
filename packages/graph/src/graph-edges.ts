@@ -1,10 +1,15 @@
-import type {
-  ExposesEventEdge,
-  ExposesFunctionEdge,
-  ExposesJobEdge,
-  ExposesTaskEdge,
-} from "./service-nodes.js";
-
+import { Effect } from "effect";
+import { observeGraph, runGraph } from "./graph-observability.js";
+import type { GraphEdgeKind } from "./graph-edges.types.js";
+export type {
+  GraphEdgeKind,
+  GraphEdgeBase,
+  TargetsFunctionEdge,
+  TargetsTaskEdge,
+  UsesMiddlewareEdge,
+  UsesHookEdge,
+  GraphEdge,
+} from "./graph-edges.types.js";
 export const GRAPH_EDGE_KINDS = [
   "targets-function",
   "targets-task",
@@ -30,50 +35,26 @@ export const GRAPH_EDGE_KINDS = [
   "uses-middleware",
   "uses-hook",
 ] as const;
-export type GraphEdgeKind = (typeof GRAPH_EDGE_KINDS)[number];
-export interface GraphEdgeBase<Kind extends GraphEdgeKind = GraphEdgeKind> {
-  readonly kind: Kind;
-  readonly from: string;
-  readonly to: string;
+/**
+ * Checks whether a value names a supported declared graph edge.
+ * @param value - Candidate edge kind.
+ * @returns An Effect containing the boolean result; it has no expected failure.
+ * @example Effect.runSync(isGraphEdgeKindEffect("calls-function"));
+ */
+export function isGraphEdgeKindEffect(value: unknown): Effect.Effect<boolean> {
+  return observeGraph(
+    "model.is-edge-kind",
+    Effect.sync(
+      () => typeof value === "string" && (GRAPH_EDGE_KINDS as readonly string[]).includes(value),
+    ),
+  );
 }
-export interface TargetsFunctionEdge extends GraphEdgeBase<"targets-function"> {
-  readonly role: "primary";
-}
-export interface TargetsTaskEdge extends GraphEdgeBase<"targets-task"> {
-  readonly role: "primary";
-}
-export interface UsesMiddlewareEdge extends GraphEdgeBase<"uses-middleware"> {
-  readonly order: number;
-  readonly match: "always" | "conditional";
-}
-export interface UsesHookEdge extends GraphEdgeBase<"uses-hook"> {
-  readonly phase: "before" | "after" | "start" | "success" | "failure";
-}
-export type GraphEdge =
-  | TargetsFunctionEdge
-  | TargetsTaskEdge
-  | GraphEdgeBase<"calls-function">
-  | GraphEdgeBase<"enqueues-job">
-  | GraphEdgeBase<"triggers-job">
-  | GraphEdgeBase<"triggers-task">
-  | GraphEdgeBase<"publishes-event">
-  | GraphEdgeBase<"listens-to-event">
-  | GraphEdgeBase<"uses-bucket">
-  | GraphEdgeBase<"uses-cache">
-  | GraphEdgeBase<"invokes-agent">
-  | GraphEdgeBase<"exposes-as-tool">
-  | GraphEdgeBase<"uses-tool">
-  | GraphEdgeBase<"uses-provider-profile">
-  | ExposesFunctionEdge
-  | ExposesEventEdge
-  | ExposesTaskEdge
-  | ExposesJobEdge
-  | GraphEdgeBase<"depends-on-service">
-  | GraphEdgeBase<"mounts-service">
-  | GraphEdgeBase<"declares-error">
-  | UsesMiddlewareEdge
-  | UsesHookEdge;
-
+/**
+ * Synchronous compatibility adapter for graph edge kind detection.
+ * @param value - Candidate edge kind.
+ * @returns Whether the value is a declared edge kind.
+ * @example isGraphEdgeKind("calls-function");
+ */
 export function isGraphEdgeKind(value: unknown): value is GraphEdgeKind {
-  return typeof value === "string" && (GRAPH_EDGE_KINDS as readonly string[]).includes(value);
+  return runGraph(isGraphEdgeKindEffect(value));
 }

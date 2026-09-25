@@ -43,6 +43,7 @@ test("keeps contracts available when observability is unavailable", async ({ pag
   await page.goto("/agents/support.order");
   await expect(page.getByRole("heading", { name: "Agent detail" })).toBeVisible();
   await page.getByRole("link", { name: "Open chat" }).click();
+  await expect(page).toHaveURL(/\/agents\/support\.order\/chat(?:\?|$)/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { name: "support.order" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Conversation" })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "Agent activity" })).toBeVisible();

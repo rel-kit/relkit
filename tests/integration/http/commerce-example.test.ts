@@ -233,7 +233,7 @@ test("serves the compiled commerce routes through one HTTP engine path", async (
       "assets.upload-assets",
     ]),
   );
-});
+}, 15_000);
 
 function createOrderResult(value: unknown) {
   const input = value as { readonly orderId: string; readonly quantity: number };

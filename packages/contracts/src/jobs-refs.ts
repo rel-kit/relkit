@@ -1,5 +1,6 @@
 import type { Ref } from "./id.js";
 
+/** Standard Schema type parameters captured by a browser-safe reference. */
 export interface SchemaTypeParameters<Input = unknown, Output = Input> {
   readonly input: Input;
   readonly output: Output;
@@ -12,18 +13,21 @@ export interface SchemaLike<Input = unknown, Output = Input> {
   };
 }
 
+/** Input type inferred from a structural Standard Schema reference. */
 export type SchemaInput<S> = S extends {
   readonly "~standard": { readonly types?: SchemaTypeParameters<infer Input, unknown> };
 }
   ? Input
   : unknown;
 
+/** Output type inferred from a structural Standard Schema reference. */
 export type SchemaOutput<S> = S extends {
   readonly "~standard": { readonly types?: SchemaTypeParameters<unknown, infer Output> };
 }
   ? Output
   : unknown;
 
+/** Browser-safe reference to a task and its input, output, and errors. */
 export interface TaskRef<
   Id extends string = string,
   InputSchema = unknown,
@@ -36,8 +40,10 @@ export interface TaskRef<
   readonly errors?: Errors;
 }
 
+/** Task reference with unconstrained type parameters. */
 export type TaskRefAny = TaskRef;
 
+/** Browser-safe reference to a job and its underlying task. */
 export interface JobRef<
   Id extends string = string,
   InputSchema = unknown,
@@ -52,4 +58,5 @@ export interface JobRef<
   readonly profile?: string;
 }
 
+/** Job reference with unconstrained type parameters. */
 export type JobRefAny = JobRef;

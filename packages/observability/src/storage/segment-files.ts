@@ -1,200 +1,125 @@
-import { randomUUID } from "node:crypto";
-import {
-  lstat,
-  mkdir,
-  open,
-  readFile,
-  readdir,
-  rename,
-  rm,
-  stat,
-  writeFile,
-  type FileHandle,
-} from "node:fs/promises";
-import { basename, dirname, join, resolve } from "node:path";
-import { canonicalJson } from "@relkit/contracts";
-import {
-  OBSERVABILITY_MODEL_VERSION,
-  type ObservabilityRecord,
-  type ObservabilitySignal,
-} from "../model.js";
-import { admitObservabilityRecord } from "../record-admission.js";
+import type { FileHandle } from "node:fs/promises";
+import { Effect } from "effect";
 import type { RedactionPolicy } from "../redaction.js";
-import type { RedactedObservabilityRecord } from "../record-admission.js";
-export const SEGMENT_DIRECTORIES = ["requests", "logs", "traces"] as const;
-export type SegmentDirectory = (typeof SEGMENT_DIRECTORIES)[number];
-const TRACE_SIGNALS = new Set<ObservabilitySignal>([
-  "invocation",
-  "job",
-  "event",
-  "operation",
-  "tool",
-  "agent",
-  "span",
-  "trace",
-  "diagnostic",
-  "generation",
-]);
-export interface SegmentFile {
-  readonly path: string;
-  readonly number: number;
-  readonly active: boolean;
-  readonly bytes: number;
-  readonly records: number;
+import { SEGMENT_DIRECTORIES } from "./segment-files-core.js";
+import type { SegmentDirectory, SegmentFile } from "./segment-files.types.js";
+import {
+  ensureDirectoryEffect,
+  ensureSegmentRootEffect,
+  repairSegmentsEffect,
+  listSegmentsEffect,
+  appendLineEffect,
+  writeAtomicEffect,
+  syncDirectoryEffect,
+  segmentDirectoryForEffect,
+  type SegmentFileError,
+} from "./segment-files-effect.js";
+export { SEGMENT_DIRECTORIES };
+export type { SegmentDirectory, SegmentFile } from "./segment-files.types.js";
+export {
+  SegmentFileError,
+  ensureDirectoryEffect,
+  ensureSegmentRootEffect,
+  repairSegmentsEffect,
+  listSegmentsEffect,
+  appendLineEffect,
+  writeAtomicEffect,
+  syncDirectoryEffect,
+  segmentDirectoryForEffect,
+} from "./segment-files-effect.js";
+function legacy(error: SegmentFileError): Error {
+  return error.cause instanceof Error ? error.cause : new Error(error.message);
 }
-
-export async function ensureDirectory(path: string): Promise<void> {
-  try {
-    const info = await lstat(path);
-    if (!info.isDirectory() || info.isSymbolicLink()) throw new Error("not a directory");
-  } catch (cause) {
-    if ((cause as NodeJS.ErrnoException).code !== "ENOENT") throw cause;
-    await mkdir(path, { recursive: true, mode: 0o700 });
-  }
+function run<A>(effect: Effect.Effect<A, SegmentFileError>): Promise<A> {
+  return Effect.runPromise(effect.pipe(Effect.mapError(legacy)));
 }
-
-export async function ensureSegmentRoot(requestedRoot?: string): Promise<string> {
-  if (requestedRoot !== undefined && requestedRoot.trim() === "") {
-    throw new TypeError("Observability root must not be empty");
-  }
-  const root = resolve(requestedRoot ?? join(process.cwd(), ".relkit", "observability"));
-  if (root === resolve("/")) throw new TypeError("Observability root is too broad");
-  await ensureDirectory(root);
-  return root;
+/**
+ * Creates a private directory or checks an existing one without following links.
+ * @param path - Directory path.
+ * @returns Completion after the directory is safe.
+ * @throws {Error} If the path is not a directory or IO fails.
+ * @example
+ * await ensureDirectory(root);
+ */
+export function ensureDirectory(path: string): Promise<void> {
+  return run(ensureDirectoryEffect(path));
 }
-
-export async function repairSegments(root: string, policy?: RedactionPolicy): Promise<void> {
-  await Promise.all(
-    SEGMENT_DIRECTORIES.map(async (directory) => {
-      const signalRoot = join(root, directory);
-      await ensureDirectory(signalRoot);
-      for (const day of await readdir(signalRoot, { withFileTypes: true })) {
-        if (!day.isDirectory() || !/^\d{4}-\d{2}-\d{2}$/.test(day.name)) continue;
-        const dayRoot = join(signalRoot, day.name);
-        for (const entry of await readdir(dayRoot, { withFileTypes: true })) {
-          const match = /^(?:segment-)?(\d{1,12})(\.active)?\.ndjson$/.exec(entry.name);
-          if (!entry.isFile() || match === null) continue;
-          await repairFile(join(dayRoot, entry.name), directory, policy);
-        }
-      }
-    }),
-  );
+/**
+ * Resolves and creates the bounded observability storage root.
+ * @param requestedRoot - Optional configured root path.
+ * @returns The absolute root path.
+ * @throws {TypeError} If the root is empty or too broad.
+ * @example
+ * const root = await ensureSegmentRoot("/tmp/records");
+ */
+export function ensureSegmentRoot(requestedRoot?: string): Promise<string> {
+  return run(ensureSegmentRootEffect(requestedRoot));
 }
-
-export async function listSegments(directory: string): Promise<SegmentFile[]> {
-  await ensureDirectory(directory);
-  const files: SegmentFile[] = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const match = /^(?:segment-)?(\d{1,12})(\.active)?\.ndjson$/.exec(entry.name);
-    if (!entry.isFile() || match === null) continue;
-    const path = join(directory, entry.name);
-    const contents = await readFile(path, "utf8");
-    const info = await stat(path);
-    files.push({
-      path,
-      number: Number(match[1]),
-      active: match[2] !== undefined,
-      bytes: info.size,
-      records: contents.split("\n").filter((line) => line !== "").length,
-    });
-  }
-  return files.sort((left, right) => left.number - right.number);
+/**
+ * Repairs malformed or partially written segment tails.
+ * @param root - Segment root directory.
+ * @param policy - Optional redaction policy.
+ * @returns Completion after every signal directory is scanned.
+ * @throws {Error} If repair or filesystem IO fails.
+ * @example
+ * await repairSegments(root);
+ */
+export function repairSegments(root: string, policy?: RedactionPolicy): Promise<void> {
+  return run(repairSegmentsEffect(root, policy));
 }
-
-export async function appendLine(handle: FileHandle, line: string): Promise<void> {
-  await handle.writeFile(line, "utf8");
+/**
+ * Lists valid segment files and their record counts.
+ * @param directory - One day directory.
+ * @returns Sorted segment metadata.
+ * @throws {Error} If directory or file IO fails.
+ * @example
+ * const files = await listSegments(dayRoot);
+ */
+export function listSegments(directory: string): Promise<SegmentFile[]> {
+  return run(listSegmentsEffect(directory));
 }
-
-export async function writeAtomic(path: string, value: string): Promise<void> {
-  const temporary = join(dirname(path), `.relkit-repair-${randomUUID()}.tmp`);
-  let handle: FileHandle | undefined;
-  try {
-    handle = await open(temporary, "wx", 0o600);
-    await handle.writeFile(value, "utf8");
-    await handle.sync();
-    await handle.close();
-    handle = undefined;
-    await rename(temporary, path);
-    await syncDirectory(dirname(path));
-  } finally {
-    await handle?.close().catch(() => undefined);
-    await rm(temporary, { force: true }).catch(() => undefined);
-  }
+/**
+ * Appends one NDJSON line to an owned handle.
+ * @param handle - Open segment handle.
+ * @param line - Complete line including its newline.
+ * @returns Completion after the write.
+ * @throws {Error} If writing fails.
+ * @example
+ * await appendLine(handle, "{}\\n");
+ */
+export function appendLine(handle: FileHandle, line: string): Promise<void> {
+  return run(appendLineEffect(handle, line));
 }
-
-export async function syncDirectory(path: string): Promise<void> {
-  const handle = await open(path, "r");
-  try {
-    await handle.sync();
-  } finally {
-    await handle.close();
-  }
+/**
+ * Replaces a file through a synced temporary file and directory rename.
+ * @param path - Destination path.
+ * @param value - Complete file contents.
+ * @returns Completion after durable replacement.
+ * @throws {Error} If writing, sync, or rename fails.
+ * @example
+ * await writeAtomic(path, "{}\\n");
+ */
+export function writeAtomic(path: string, value: string): Promise<void> {
+  return run(writeAtomicEffect(path, value));
 }
-
+/**
+ * Syncs a directory after a durable rename.
+ * @param path - Directory path.
+ * @returns Completion after sync and handle close.
+ * @throws {Error} If open or sync fails.
+ * @example
+ * await syncDirectory(root);
+ */
+export function syncDirectory(path: string): Promise<void> {
+  return run(syncDirectoryEffect(path));
+}
+/**
+ * Chooses the storage directory for a model signal.
+ * @param signal - Candidate signal.
+ * @returns A known directory or undefined.
+ * @example
+ * const directory = segmentDirectoryFor("log");
+ */
 export function segmentDirectoryFor(signal: unknown): SegmentDirectory | undefined {
-  if (signal === "request") return "requests";
-  if (signal === "log") return "logs";
-  return typeof signal === "string" && TRACE_SIGNALS.has(signal as ObservabilitySignal)
-    ? "traces"
-    : undefined;
-}
-
-async function repairFile(path: string, directory: SegmentDirectory, policy?: RedactionPolicy) {
-  const contents = await readFile(path, "utf8");
-  const safeLines: string[] = [];
-  let malformed = false;
-  let changed = !contents.endsWith("\n") && contents.length > 0;
-  for (const line of contents.split("\n")) {
-    if (line === "") continue;
-    let value: unknown;
-    try {
-      value = JSON.parse(line) as unknown;
-    } catch {
-      malformed = true;
-      break;
-    }
-    if (isRecord(value) && value.version !== OBSERVABILITY_MODEL_VERSION) {
-      throw new Error("RELKIT_OBSERVABILITY_STATE_INCOMPATIBLE: use fresh development state");
-    }
-    try {
-      const safe = isRecord(value) ? admitObservabilityRecord(value, policy) : undefined;
-      if (!isStoredRecord(safe, directory)) throw new Error("invalid segment record");
-      const canonical = canonicalJson(safe);
-      safeLines.push(canonical);
-      changed ||= canonical !== line;
-    } catch {
-      malformed = true;
-      break;
-    }
-  }
-  if (!malformed && !changed) return;
-  if (malformed) await quarantine(path);
-  await writeAtomic(path, safeLines.length === 0 ? "" : `${safeLines.join("\n")}\n`);
-}
-
-async function quarantine(path: string): Promise<void> {
-  const root = join(dirname(dirname(dirname(path))), ".relkit-quarantine");
-  await ensureDirectory(root);
-  await writeFile(
-    join(root, `${basename(path)}.${randomUUID()}.bad`),
-    canonicalJson({ version: OBSERVABILITY_MODEL_VERSION, reason: "malformed-observability-tail" }),
-    { mode: 0o600 },
-  );
-}
-
-function isStoredRecord(
-  value: unknown,
-  directory: SegmentDirectory,
-): value is RedactedObservabilityRecord {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    (value as { readonly version?: unknown }).version === OBSERVABILITY_MODEL_VERSION &&
-    segmentDirectoryFor((value as { readonly signal?: unknown }).signal) === directory
-  );
-}
-
-function isRecord(value: unknown): value is ObservabilityRecord & { readonly version?: unknown } {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return Effect.runSync(segmentDirectoryForEffect(signal));
 }

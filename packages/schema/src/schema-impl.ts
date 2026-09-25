@@ -1,187 +1,106 @@
+import { Effect } from "effect";
+import { SchemaImplementation } from "./schema-implementation.js";
+import { throwCause } from "./schema-execution.js";
+import { observeSchema, runSchemaSync } from "./schema-observability.js";
+import { SchemaExecutionError } from "./standard-schema-effect.js";
+import type { InternalSchema, SchemaCheck } from "./schema-impl.types.js";
 import type {
-  JsonValue,
   Schema,
-  StandardFailure,
   StandardPathSegment,
   StandardResult,
-  StandardSchemaTypes,
   StandardSchemaV1,
-  StandardJSONSchemaV1,
-  StandardSuccess,
-} from "./standard-schema.js";
-import {
-  getSchemaMetadata,
-  setSchemaMetadata,
-  withDefaultMetadata,
-  withNullableMetadata,
-  withOptionalMetadata,
-  withRefinementMetadata,
-  withTransformMetadata,
-  getMetadataProjection,
-  type SchemaMetadata,
-} from "./schema-metadata.js";
-import {
-  failure,
-  flatMapResult,
-  isFailure,
-  isPromiseLike,
-  mapResult,
-  mapValue,
-  success,
-} from "./schema-result.js";
-type Check<T> = (
-  value: unknown,
-  path: readonly StandardPathSegment[],
-) => StandardResult<T> | Promise<StandardResult<T>>;
-interface InternalSchema<TInput, TOutput> extends Schema<TInput, TOutput> {
-  readonly _run: Check<TOutput>;
+} from "./standard-schema.types.js";
+import { setSchemaMetadata } from "./schema-metadata.js";
+import type { SchemaMetadata } from "./schema-metadata.types.js";
+import { addPath } from "./schema-impl-helpers.js";
+export { SchemaValidationError } from "./schema-validation-error.js";
+
+/**
+ * Constructs a schema within an observed Effect.
+ * @param check - Path-aware validator callback.
+ * @param metadata - Optional projection and refinement metadata.
+ * @returns A RELKIT schema, or SchemaExecutionError if construction fails.
+ * @example Effect.runSync(createSchemaEffect((value) => ({ value })));
+ */
+export function createSchemaEffect<TInput, TOutput>(
+  check: SchemaCheck<TOutput>,
+  metadata: SchemaMetadata = {},
+): Effect.Effect<Schema<TInput, TOutput>, SchemaExecutionError> {
+  return observeSchema(
+    "schema.create",
+    Effect.try({
+      try: () => {
+        const schema = new SchemaImplementation<TInput, TOutput>(check, metadata);
+        setSchemaMetadata(schema, metadata);
+        return schema;
+      },
+      catch: (cause) => new SchemaExecutionError({ cause }),
+    }),
+  );
 }
-export class SchemaValidationError extends TypeError {
-  readonly issues: StandardFailure["issues"];
-  constructor(issues: StandardFailure["issues"]) {
-    super("Schema validation failed");
-    this.name = "SchemaValidationError";
-    this.issues = issues;
-  }
-}
+
+/**
+ * Synchronous compatibility adapter for schema construction.
+ * @param check - Path-aware validator callback.
+ * @param metadata - Optional projection metadata.
+ * @returns A RELKIT schema.
+ * @throws The original construction error if creation fails.
+ * @example createSchema((value) => ({ value }));
+ */
 export function createSchema<TInput, TOutput>(
-  check: Check<TOutput>,
+  check: SchemaCheck<TOutput>,
   metadata: SchemaMetadata = {},
 ): Schema<TInput, TOutput> {
-  const schema = new SchemaImplementation<TInput, TOutput>(check, metadata);
-  setSchemaMetadata(schema, metadata);
-  return schema;
+  try {
+    return runSchemaSync(createSchemaEffect<TInput, TOutput>(check, metadata));
+  } catch (error) {
+    throwCause(error);
+  }
 }
+
+/**
+ * Evaluates a schema while preserving its synchronous or asynchronous result.
+ * @param schema - Schema to evaluate.
+ * @param value - Input value.
+ * @param path - Prefix for nested issue paths.
+ * @returns A result or promise of a result, with typed execution failure.
+ * @example Effect.runSync(runSchemaEffect(z.string(), "ok"));
+ */
+export function runSchemaEffect<TOutput>(
+  schema: StandardSchemaV1<unknown, TOutput>,
+  value: unknown,
+  path: readonly StandardPathSegment[] = [],
+): Effect.Effect<StandardResult<TOutput> | Promise<StandardResult<TOutput>>, SchemaExecutionError> {
+  return observeSchema(
+    "schema.run",
+    Effect.try({
+      try: () => {
+        const internal = schema as Partial<InternalSchema<unknown, TOutput>>;
+        if (typeof internal._run === "function") return internal._run(value, path);
+        return addPath(schema["~standard"].validate(value), path);
+      },
+      catch: (cause) => new SchemaExecutionError({ cause }),
+    }),
+  );
+}
+
+/**
+ * Compatibility adapter for path-aware schema validation.
+ * @param schema - Schema to evaluate.
+ * @param value - Input value.
+ * @param path - Prefix for nested issue paths.
+ * @returns A result or promise of a result.
+ * @throws The original validator error if evaluation fails.
+ * @example runSchema(z.string(), "ok", ["name"]);
+ */
 export function runSchema<TOutput>(
   schema: StandardSchemaV1<unknown, TOutput>,
   value: unknown,
   path: readonly StandardPathSegment[] = [],
 ): StandardResult<TOutput> | Promise<StandardResult<TOutput>> {
-  const internal = schema as Partial<InternalSchema<unknown, TOutput>>;
-  if (typeof internal._run === "function") return internal._run(value, path);
-  return addPath(schema["~standard"].validate(value), path);
-}
-class SchemaImplementation<TInput, TOutput> implements InternalSchema<TInput, TOutput> {
-  readonly _run: Check<TOutput>;
-  readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
-    StandardJSONSchemaV1<TInput, TOutput>["~standard"];
-  readonly relkit: {
-    readonly jsonSchema?: () => JsonValue;
-    readonly inputJsonSchema?: () => JsonValue;
-    readonly outputJsonSchema?: () => JsonValue;
-  };
-  constructor(check: Check<TOutput>, metadata: SchemaMetadata) {
-    this._run = check;
-    this.relkit = {
-      ...(metadata.jsonSchema === undefined ? {} : { jsonSchema: metadata.jsonSchema }),
-      ...(metadata.inputJsonSchema === undefined
-        ? {}
-        : { inputJsonSchema: metadata.inputJsonSchema }),
-      ...(metadata.outputJsonSchema === undefined
-        ? {}
-        : { outputJsonSchema: metadata.outputJsonSchema }),
-    };
-    this["~standard"] = {
-      version: 1,
-      vendor: "relkit",
-      types: undefined as unknown as StandardSchemaTypes<TInput, TOutput>,
-      validate: (value, options) => {
-        void options;
-        return check(value, []);
-      },
-      jsonSchema: {
-        input: (options) =>
-          projectJsonSchema(getSchemaMetadata(this) ?? metadata, "input", options.target),
-        output: (options) =>
-          projectJsonSchema(getSchemaMetadata(this) ?? metadata, "output", options.target),
-      },
-    };
+  try {
+    return runSchemaSync(runSchemaEffect(schema, value, path));
+  } catch (error) {
+    throwCause(error);
   }
-  optional(): Schema<TInput | undefined, TOutput | undefined> {
-    return createSchema(
-      (value, path) => (value === undefined ? success(value) : this._run(value, path)),
-      withOptionalMetadata(this),
-    );
-  }
-  nullable(): Schema<TInput | null, TOutput | null> {
-    return createSchema(
-      (value, path) => (value === null ? success(value) : this._run(value, path)),
-      withNullableMetadata(this),
-    );
-  }
-  default(value: TInput | (() => TInput)): Schema<TInput | undefined, TOutput> {
-    return createSchema(
-      (input, path) =>
-        input === undefined
-          ? this._run(typeof value === "function" ? (value as () => TInput)() : value, path)
-          : this._run(input, path),
-      withDefaultMetadata(this, value),
-    );
-  }
-  transform<TNext>(transform: (value: TOutput) => TNext | Promise<TNext>): Schema<TInput, TNext> {
-    return createSchema(
-      (value, path) =>
-        flatMapResult(this._run(value, path), (result) =>
-          mapValue(transform(result), (output) => success(output)),
-        ),
-      withTransformMetadata(this),
-    );
-  }
-  refine(
-    check: (value: TOutput) => boolean | Promise<boolean>,
-    message = "Invalid value",
-  ): Schema<TInput, TOutput> {
-    return createSchema(
-      (value, path) =>
-        flatMapResult(this._run(value, path), (result) =>
-          mapValue(check(result), (valid) => (valid ? success(result) : failure(message, path))),
-        ),
-      withRefinementMetadata(this),
-    );
-  }
-  parse(value: unknown): TOutput {
-    return unwrapSync(this._run(value, []));
-  }
-  async parseAsync(value: unknown): Promise<TOutput> {
-    return unwrap(await Promise.resolve(this._run(value, [])));
-  }
-  safeParse(value: unknown): StandardResult<TOutput> | Promise<StandardResult<TOutput>> {
-    return this._run(value, []);
-  }
-}
-function projectJsonSchema(
-  metadata: SchemaMetadata,
-  direction: "input" | "output",
-  target: StandardJSONSchemaV1.Options["target"],
-): Record<string, unknown> {
-  if (target !== "draft-2020-12" && target !== "draft-07" && target !== "openapi-3.0") {
-    throw new TypeError(`Unsupported JSON Schema target "${target}"`);
-  }
-  const value = getMetadataProjection(metadata, direction)?.();
-  if (value === undefined || value === null || Array.isArray(value) || typeof value !== "object") {
-    throw new TypeError("Schema does not expose a deterministic JSON Schema projection");
-  }
-  return value as Record<string, unknown>;
-}
-function addPath<T>(
-  result: StandardResult<T> | Promise<StandardResult<T>>,
-  path: readonly StandardPathSegment[],
-): StandardResult<T> | Promise<StandardResult<T>> {
-  return mapResult(result, (resolved) => {
-    if (!isFailure(resolved) || path.length === 0) return resolved;
-    return {
-      issues: resolved.issues.map((issue) => ({
-        ...issue,
-        path: [...path, ...(issue.path ?? [])],
-      })),
-    };
-  });
-}
-function unwrap<T>(result: StandardResult<T>): T {
-  if (isFailure(result)) throw new SchemaValidationError(result.issues);
-  return result.value;
-}
-function unwrapSync<T>(result: StandardResult<T> | Promise<StandardResult<T>>): T {
-  if (isPromiseLike(result)) throw new TypeError("Schema validation is asynchronous");
-  return unwrap(result);
 }

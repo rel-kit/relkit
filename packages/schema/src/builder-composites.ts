@@ -1,12 +1,6 @@
-import {
-  createSchema,
-  issue,
-  isPromiseLike,
-  runSchema,
-  type Schema,
-  type StandardPathSegment,
-  type StandardResult,
-} from "./standard-schema.js";
+import { createSchema, issue, runSchema, type Schema } from "./standard-schema.js";
+import { buildSchema } from "./builder-effect.js";
+import { collectResults, collectUnion } from "./schema-collection.js";
 import { getSchemaProjection, isSchemaOptional } from "./json-schema.js";
 import type { SchemaMetadata } from "./schema-metadata.js";
 import type {
@@ -17,96 +11,127 @@ import type {
   OutputOf,
   SchemaTuple,
   Shape,
-} from "./builder.js";
+} from "./builder-composites.types.js";
 import type { JsonValue } from "./standard-schema.js";
+import type { StandardSchemaV1 } from "./standard-schema.types.js";
 
+/**
+ * Builds an object validator from named child schemas.
+ * @param shape - Child schemas by property name.
+ * @returns An object schema with inferred optional keys and ordered issues.
+ * @example objectSchema({ id: z.string() });
+ */
 export function objectSchema<S extends Shape>(shape: S): Schema<ObjectInput<S>, ObjectOutput<S>> {
-  const legacyJsonSchema = objectProjection(shape, "legacy");
-  const inputJsonSchema = objectProjection(shape, "input");
-  const outputJsonSchema = objectProjection(shape, "output");
-  return createSchema(
-    (value, path) => {
-      if (!isRecord(value)) return issue("Expected an object", path);
-      const entries = Object.entries(shape).map(
-        ([key, schema]) => [key, runSchema(schema, value[key], [...path, key])] as const,
-      );
-      return collectResults(
-        entries.map(([, result]) => result),
-        (values) => {
-          const output: Record<string, unknown> = {};
-          entries.forEach(([key], index) => {
-            const item = values[index];
-            if (item !== undefined || key in value) output[key] = item;
-          });
-          return output as ObjectOutput<S>;
-        },
-      );
-    },
-    {
-      ...(legacyJsonSchema === undefined ? {} : { jsonSchema: legacyJsonSchema }),
-      ...(inputJsonSchema === undefined ? {} : { inputJsonSchema }),
-      ...(outputJsonSchema === undefined ? {} : { outputJsonSchema }),
-    },
-  );
+  return buildSchema("builder.object", () => {
+    const legacyJsonSchema = objectProjection(shape, "legacy");
+    const inputJsonSchema = objectProjection(shape, "input");
+    const outputJsonSchema = objectProjection(shape, "output");
+    return createSchema(
+      (value, path) => {
+        if (!isRecord(value)) return issue("Expected an object", path);
+        const entries = Object.entries(shape);
+        return collectResults(
+          entries.map(
+            ([key, schema]) =>
+              () =>
+                runSchema(schema, value[key], [...path, key]),
+          ),
+          (values) => {
+            const output: Record<string, unknown> = {};
+            entries.forEach(([key], index) => {
+              const item = values[index];
+              if (item !== undefined || key in value) output[key] = item;
+            });
+            return output as ObjectOutput<S>;
+          },
+        );
+      },
+      {
+        ...(legacyJsonSchema === undefined ? {} : { jsonSchema: legacyJsonSchema }),
+        ...(inputJsonSchema === undefined ? {} : { inputJsonSchema }),
+        ...(outputJsonSchema === undefined ? {} : { outputJsonSchema }),
+      },
+    );
+  });
 }
 
+/**
+ * Builds an array validator from one item schema.
+ * @param schema - Validator for each array item.
+ * @returns An array schema with ordered issues and outputs.
+ * @example arraySchema(z.number());
+ */
 export function arraySchema<S extends AnySchema>(schema: S): Schema<InputOf<S>[], OutputOf<S>[]> {
-  const legacyItemProjection = getSchemaProjection(schema);
-  const inputItemProjection = getSchemaProjection(schema, "input");
-  const outputItemProjection = getSchemaProjection(schema, "output");
-  return createSchema(
-    (value, path) => {
-      if (!Array.isArray(value)) return issue("Expected an array", path);
-      const results = value.map((item, index) => runSchema(schema, item, [...path, index])) as (
-        StandardResult<OutputOf<S>> | Promise<StandardResult<OutputOf<S>>>
-      )[];
-      return collectResults(results, (items) => items);
-    },
-    {
-      ...(legacyItemProjection === undefined
-        ? {}
-        : { jsonSchema: () => ({ type: "array", items: legacyItemProjection() }) }),
-      ...(inputItemProjection === undefined
-        ? {}
-        : { inputJsonSchema: () => ({ type: "array", items: inputItemProjection() }) }),
-      ...(outputItemProjection === undefined
-        ? {}
-        : { outputJsonSchema: () => ({ type: "array", items: outputItemProjection() }) }),
-    },
-  );
+  return buildSchema("builder.array", () => {
+    const legacyItemProjection = getSchemaProjection(schema);
+    const inputItemProjection = getSchemaProjection(schema, "input");
+    const outputItemProjection = getSchemaProjection(schema, "output");
+    return createSchema(
+      (value, path) => {
+        if (!Array.isArray(value)) return issue("Expected an array", path);
+        const tasks = value.map(
+          (item, index) => () =>
+            runSchema(schema as StandardSchemaV1<unknown, OutputOf<S>>, item, [...path, index]),
+        );
+        return collectResults(tasks, (items) => items);
+      },
+      {
+        ...(legacyItemProjection === undefined
+          ? {}
+          : { jsonSchema: () => ({ type: "array", items: legacyItemProjection() }) }),
+        ...(inputItemProjection === undefined
+          ? {}
+          : { inputJsonSchema: () => ({ type: "array", items: inputItemProjection() }) }),
+        ...(outputItemProjection === undefined
+          ? {}
+          : { outputJsonSchema: () => ({ type: "array", items: outputItemProjection() }) }),
+      },
+    );
+  });
 }
 
+/**
+ * Builds a nonempty union with first-success precedence.
+ * @param schemas - Member validators in declaration order.
+ * @returns A union schema with inferred member types.
+ * @example unionSchema([z.string(), z.number()]);
+ */
 export function unionSchema<S extends SchemaTuple>(
   schemas: S,
 ): Schema<InputOf<S[number]>, OutputOf<S[number]>> {
-  const legacyProjections = schemas.map((schema) => getSchemaProjection(schema));
-  const inputProjections = schemas.map((schema) => getSchemaProjection(schema, "input"));
-  const outputProjections = schemas.map((schema) => getSchemaProjection(schema, "output"));
-  return createSchema(
-    (value, path) => {
-      const results = schemas.map((schema) => runSchema(schema, value, path)) as (
-        StandardResult<OutputOf<S[number]>> | Promise<StandardResult<OutputOf<S[number]>>>
-      )[];
-      return collectUnion(results, path);
-    },
-    {
-      ...(legacyProjections.every((projection) => projection)
-        ? { jsonSchema: () => ({ anyOf: legacyProjections.map((projection) => projection!()) }) }
-        : {}),
-      ...(inputProjections.every((projection) => projection)
-        ? {
-            inputJsonSchema: () => ({ anyOf: inputProjections.map((projection) => projection!()) }),
-          }
-        : {}),
-      ...(outputProjections.every((projection) => projection)
-        ? {
-            outputJsonSchema: () => ({
-              anyOf: outputProjections.map((projection) => projection!()),
-            }),
-          }
-        : {}),
-    },
-  );
+  return buildSchema("builder.union", () => {
+    const legacyProjections = schemas.map((schema) => getSchemaProjection(schema));
+    const inputProjections = schemas.map((schema) => getSchemaProjection(schema, "input"));
+    const outputProjections = schemas.map((schema) => getSchemaProjection(schema, "output"));
+    return createSchema(
+      (value, path) => {
+        const tasks = schemas.map(
+          (schema) => () =>
+            runSchema(schema as StandardSchemaV1<unknown, OutputOf<S[number]>>, value, path),
+        );
+        return collectUnion(tasks, path);
+      },
+      {
+        ...(legacyProjections.every((projection) => projection)
+          ? { jsonSchema: () => ({ anyOf: legacyProjections.map((projection) => projection!()) }) }
+          : {}),
+        ...(inputProjections.every((projection) => projection)
+          ? {
+              inputJsonSchema: () => ({
+                anyOf: inputProjections.map((projection) => projection!()),
+              }),
+            }
+          : {}),
+        ...(outputProjections.every((projection) => projection)
+          ? {
+              outputJsonSchema: () => ({
+                anyOf: outputProjections.map((projection) => projection!()),
+              }),
+            }
+          : {}),
+      },
+    );
+  });
 }
 
 function objectProjection(
@@ -135,51 +160,6 @@ function objectProjection(
     if (required.length > 0) schema.required = required;
     return schema;
   };
-}
-
-function objectValue(value: StandardResult<unknown>): value is { readonly value: unknown } {
-  return !("issues" in value) || value.issues === undefined;
-}
-
-function collectResults<T, U>(
-  results: readonly (StandardResult<T> | Promise<StandardResult<T>>)[],
-  map: (values: T[]) => U,
-): StandardResult<U> | Promise<StandardResult<U>> {
-  if (results.some(isPromiseLike)) {
-    return Promise.all(results.map((result) => Promise.resolve(result))).then((resolved) =>
-      collectValues(resolved, map),
-    );
-  }
-  return collectValues(results as readonly StandardResult<T>[], map);
-}
-
-function collectValues<T, U>(
-  results: readonly StandardResult<T>[],
-  map: (values: T[]) => U,
-): StandardResult<U> {
-  const issues = results.flatMap((result) => (objectValue(result) ? [] : result.issues));
-  if (issues.length > 0) return { issues };
-  return { value: map(results.map((result) => (result as { value: T }).value)) };
-}
-
-function collectUnion<T>(
-  results: readonly (StandardResult<T> | Promise<StandardResult<T>>)[],
-  path: readonly StandardPathSegment[],
-): StandardResult<T> | Promise<StandardResult<T>> {
-  if (results.some(isPromiseLike)) {
-    return Promise.all(results.map((result) => Promise.resolve(result))).then((resolved) =>
-      unionValues(resolved, path),
-    );
-  }
-  return unionValues(results as readonly StandardResult<T>[], path);
-}
-
-function unionValues<T>(
-  results: readonly StandardResult<T>[],
-  path: readonly StandardPathSegment[],
-): StandardResult<T> {
-  const success = results.find(objectValue);
-  return success ?? issue("Value did not match any union member", path);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

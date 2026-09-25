@@ -1,60 +1,68 @@
-import { OBSERVABILITY_MODEL_VERSION } from "./model.js";
-
-export type RecordLike = Record<string, unknown>;
-
-export const INVOCATION_OUTCOMES = new Set([
-  "success",
-  "validation-error",
-  "declared-error",
-  "provider-failure",
-  "cancelled",
-  "timeout",
-  "defect",
-]);
-
+import { Effect } from "effect";
+import type { RecordLike } from "./collector-values.types.js";
+import {
+  collectorTextEffect,
+  isCollectorRecordEffect,
+  isInvocationEffect,
+  isModelRecordEffect,
+  isRuntimeLogEffect,
+} from "./collector-values-effect.js";
+export type { RecordLike } from "./collector-values.types.js";
+export { INVOCATION_OUTCOMES } from "./collector-values-core.js";
+export {
+  collectorTextEffect,
+  isCollectorRecordEffect,
+  isInvocationEffect,
+  isModelRecordEffect,
+  isRuntimeLogEffect,
+} from "./collector-values-effect.js";
+/**
+ * Checks a supported model signal and version.
+ * @param value - Candidate record.
+ * @returns True when the model version and signal are supported.
+ * @example
+ * if (isModelRecord(value)) use(value);
+ */
 export function isModelRecord(value: RecordLike): boolean {
-  return (
-    value.version === OBSERVABILITY_MODEL_VERSION &&
-    typeof value.signal === "string" &&
-    [
-      "request",
-      "invocation",
-      "job",
-      "event",
-      "operation",
-      "tool",
-      "agent",
-      "log",
-      "span",
-      "trace",
-      "diagnostic",
-      "generation",
-    ].includes(value.signal)
-  );
+  return Effect.runSync(isModelRecordEffect(value));
 }
-
+/**
+ * Checks invocation identity fields in a legacy event.
+ * @param value - Candidate event.
+ * @returns True when required fields are present.
+ * @example
+ * const valid = isInvocation(value);
+ */
 export function isInvocation(value: RecordLike): boolean {
-  return (
-    text(value.id) !== undefined &&
-    text(value.functionId) !== undefined &&
-    text(value.traceId) !== undefined &&
-    text(value.startedAt) !== undefined &&
-    text(value.source) !== undefined
-  );
+  return Effect.runSync(isInvocationEffect(value));
 }
-
+/**
+ * Checks runtime log fields in a legacy event.
+ * @param value - Candidate event.
+ * @returns True when required fields are present.
+ * @example
+ * const valid = isRuntimeLog(value);
+ */
 export function isRuntimeLog(value: RecordLike): boolean {
-  return (
-    text(value.timestamp) !== undefined &&
-    text(value.component) !== undefined &&
-    text(value.message) !== undefined
-  );
+  return Effect.runSync(isRuntimeLogEffect(value));
 }
-
+/**
+ * Returns nonempty text when present.
+ * @param value - Candidate value.
+ * @returns Text or undefined.
+ * @example
+ * const name = text(value.name);
+ */
 export function text(value: unknown): string | undefined {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
+  return Effect.runSync(collectorTextEffect(value));
 }
-
+/**
+ * Narrows a value to a non-array object record.
+ * @param value - Candidate value.
+ * @returns True when value is a record.
+ * @example
+ * if (isRecord(value)) use(value.type);
+ */
 export function isRecord(value: unknown): value is RecordLike {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return Effect.runSync(isCollectorRecordEffect(value));
 }

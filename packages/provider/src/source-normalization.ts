@@ -1,4 +1,21 @@
-import { deepFreeze, serializeJson, type JsonValue } from "@relkit/contracts";
+import { deepFreeze, type JsonValue } from "@relkit/contracts";
+import { Effect } from "effect";
+import { ProviderInputError } from "./provider-compat-errors.js";
+import { providerSerializeJson } from "./protocol-builder-utils.js";
+import {
+  observeProvider,
+  providerCalculation,
+  runProvider,
+  type ProviderError,
+} from "./provider-observability.js";
+import {
+  assertAdapter,
+  assertConnected,
+  isAdapter,
+  isConfigured,
+  isRecord,
+  label,
+} from "./source-validation.js";
 import type {
   InfrastructureProviderSource,
   IntegrationReference,
@@ -8,26 +25,68 @@ import type {
   ProviderAdapter,
   ProviderBindingSource,
   ProviderSourceInput,
-} from "./protocol-types.js";
-
-/**
- * Adds an adapter's declared local recipe without starting it.
- * @category Provider protocol
- * @since 0.2.0
+} from "./protocol.types.js";
+/** Add an adapter's local recipe without starting it.
+ * @param adapter - Adapter with a local recipe.
+ * @returns An Effect with a frozen local source or a tagged validation error.
+ * @example Effect.runSync(defineLocalProviderSourceEffect(adapter));
+ */
+export function defineLocalProviderSourceEffect<const Adapter extends ProviderAdapter>(
+  adapter: Adapter,
+): Effect.Effect<LocalProviderSource<Adapter>, ProviderError> {
+  return observeProvider(
+    "source.local",
+    providerCalculation("INVALID_DESCRIPTOR", () => defineLocalProviderSourceCore(adapter)),
+  );
+}
+/** Add an adapter's local recipe for synchronous callers.
+ * @param adapter - Adapter with a local recipe.
+ * @returns A frozen local source.
+ * @throws TypeError when the adapter is invalid or has no local recipe.
+ * @example defineLocalProviderSource(adapter);
  */
 export function defineLocalProviderSource<const Adapter extends ProviderAdapter>(
   adapter: Adapter,
 ): LocalProviderSource<Adapter> {
+  return runProvider(defineLocalProviderSourceEffect(adapter));
+}
+function defineLocalProviderSourceCore<const Adapter extends ProviderAdapter>(
+  adapter: Adapter,
+): LocalProviderSource<Adapter> {
   assertAdapter(adapter);
   if (adapter.localRecipe === undefined)
-    throw new TypeError(`${label(adapter)} does not declare a local recipe`);
+    throw new ProviderInputError(`${label(adapter)} does not declare a local recipe`);
   return frozen({ kind: "provider-local-source", adapter }) as LocalProviderSource<Adapter>;
 }
-
-/**
- * Adds an infrastructure release source and explicit access metadata.
- * @category Provider protocol
- * @since 0.2.0
+/** Add an infrastructure source in an Effect.
+ * @param adapter - Adapter with a default local recipe.
+ * @param integration - Infrastructure integration identity.
+ * @param options - Infrastructure-specific options.
+ * @param access - Optional access metadata.
+ * @returns An Effect with a frozen source or tagged validation error.
+ * @example Effect.runSync(defineInfrastructureProviderSourceEffect(adapter, integration, {}));
+ */
+export function defineInfrastructureProviderSourceEffect<const Adapter extends ProviderAdapter>(
+  adapter: Adapter,
+  integration: IntegrationReference,
+  options: JsonValue,
+  access?: ProviderAccess,
+): Effect.Effect<InfrastructureProviderSource<Adapter>, ProviderError> {
+  return observeProvider(
+    "source.infrastructure",
+    providerCalculation("INVALID_DESCRIPTOR", () =>
+      defineInfrastructureProviderSourceCore(adapter, integration, options, access),
+    ),
+  );
+}
+/** Add an infrastructure source synchronously.
+ * @param adapter - Adapter with a default local recipe.
+ * @param integration - Infrastructure integration identity.
+ * @param options - Infrastructure-specific options.
+ * @param access - Optional access metadata.
+ * @returns A frozen infrastructure source.
+ * @throws TypeError when the adapter is invalid or has no local recipe.
+ * @example defineInfrastructureProviderSource(adapter, integration, {});
  */
 export function defineInfrastructureProviderSource<const Adapter extends ProviderAdapter>(
   adapter: Adapter,
@@ -35,9 +94,19 @@ export function defineInfrastructureProviderSource<const Adapter extends Provide
   options: JsonValue,
   access?: ProviderAccess,
 ): InfrastructureProviderSource<Adapter> {
+  return runProvider(
+    defineInfrastructureProviderSourceEffect(adapter, integration, options, access),
+  );
+}
+function defineInfrastructureProviderSourceCore<const Adapter extends ProviderAdapter>(
+  adapter: Adapter,
+  integration: IntegrationReference,
+  options: JsonValue,
+  access?: ProviderAccess,
+): InfrastructureProviderSource<Adapter> {
   assertAdapter(adapter);
   if (adapter.localRecipe === undefined)
-    throw new TypeError(`${label(adapter)} does not declare a default local recipe`);
+    throw new ProviderInputError(`${label(adapter)} does not declare a default local recipe`);
   return frozen({
     kind: "provider-infrastructure-source",
     adapter,
@@ -46,8 +115,37 @@ export function defineInfrastructureProviderSource<const Adapter extends Provide
     ...(access === undefined ? {} : { access }),
   }) as InfrastructureProviderSource<Adapter>;
 }
-
+/** Normalize any provider source in an Effect.
+ * @param input - Direct adapter or source wrapper.
+ * @returns An Effect with a frozen source or tagged validation error.
+ * @example Effect.runSync(normalizeProviderSourceEffect(adapter));
+ */
+export function normalizeProviderSourceEffect<const Adapter extends ProviderAdapter>(
+  input: ProviderSourceInput<Adapter>,
+): Effect.Effect<NormalizedProviderSource<Adapter>, ProviderError> {
+  return observeProvider(
+    "source.normalize",
+    providerCalculation("INVALID_DESCRIPTOR", () => normalizeProviderSourceCore(input)),
+  );
+}
+/** Normalize a provider source synchronously.
+ * @param input - Direct adapter or source wrapper.
+ * @returns A frozen normalized source.
+ * @throws TypeError for invalid descriptors, nested wrappers, or missing values.
+ * @example normalizeProviderSource(adapter);
+ */
 export function normalizeProviderSource<const Adapter extends ProviderAdapter>(
+  input: ProviderSourceInput<Adapter>,
+): NormalizedProviderSource<Adapter> {
+  return runProvider(normalizeProviderSourceEffect(input));
+}
+/** Pure normalization shared by observed source and profile operations.
+ * @param input - Direct adapter or source wrapper.
+ * @returns Frozen normalized source.
+ * @throws TypeError for invalid descriptors or missing required values.
+ * @example normalizeProviderSourceCore(adapter);
+ */
+export function normalizeProviderSourceCore<const Adapter extends ProviderAdapter>(
   input: ProviderSourceInput<Adapter>,
 ): NormalizedProviderSource<Adapter> {
   if (isRecord(input) && input.kind === "provider-adapter") {
@@ -57,7 +155,7 @@ export function normalizeProviderSource<const Adapter extends ProviderAdapter>(
   }
   if (isRecord(input) && isRecord(input.adapter)) assertAdapter(input.adapter);
   if (!isRecord(input) || !isAdapter(input.adapter))
-    throw new TypeError("Provider source wrappers cannot be nested");
+    throw new ProviderInputError("Provider source wrappers cannot be nested");
   if (input.kind === "provider-local-source") {
     const source: ProviderBindingSource = isConfigured(input.adapter)
       ? { kind: "connected" }
@@ -75,9 +173,8 @@ export function normalizeProviderSource<const Adapter extends ProviderAdapter>(
       input.adapter.localRecipe,
       input.access?.value,
     );
-  throw new TypeError("Invalid provider source descriptor");
+  throw new ProviderInputError("Invalid provider source descriptor");
 }
-
 function normalized<Adapter extends ProviderAdapter>(
   adapter: Adapter,
   source: ProviderBindingSource,
@@ -92,49 +189,6 @@ function normalized<Adapter extends ProviderAdapter>(
     ...(access === undefined ? {} : { access }),
   }) as NormalizedProviderSource<Adapter>;
 }
-
-function assertConnected(adapter: ProviderAdapter): void {
-  const missing = Object.entries(adapter.connectionContract.fields)
-    .filter(
-      ([name, field]) =>
-        field.required &&
-        !Object.prototype.hasOwnProperty.call(adapter.connection, name) &&
-        !Object.prototype.hasOwnProperty.call(field, "default"),
-    )
-    .map(([name]) => name);
-  if (missing.length > 0)
-    throw new TypeError(`${label(adapter)} is missing connection fields: ${missing.join(", ")}`);
-}
-
-function isConfigured(adapter: ProviderAdapter): boolean {
-  try {
-    assertConnected(adapter);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function assertAdapter(value: unknown): asserts value is ProviderAdapter {
-  if (isRecord(value) && value.kind === "provider-adapter" && value.protocolVersion !== 1)
-    throw new TypeError(
-      `Provider protocol version ${String(value.protocolVersion)} is unsupported; rewrite the app with current integration constructors.`,
-    );
-  if (!isAdapter(value)) throw new TypeError("Provider source wrappers cannot be nested");
-}
-
-function isAdapter(value: unknown): value is ProviderAdapter {
-  return isRecord(value) && value.kind === "provider-adapter" && value.protocolVersion === 1;
-}
-
-function label(adapter: ProviderAdapter): string {
-  return `${adapter.capability.id}.${adapter.adapterId}`;
-}
-
 function frozen<Value>(value: Value): Value {
-  return deepFreeze(JSON.parse(serializeJson(value)) as Value);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return deepFreeze(JSON.parse(providerSerializeJson(value)) as Value);
 }

@@ -38,6 +38,9 @@ Other Standard Schema-compatible values can be passed to the same validation
 helpers. `getJsonSchema` returns a deterministic projection when the schema
 provides one, or a structured `RELKIT_SCHEMA_UNAVAILABLE` result when it does not.
 
+For Effect APIs, tagged failures, telemetry, and bounded composite validation,
+see [Effect operations](docs/effect.md).
+
 ```ts
 import { getJsonSchema, z } from "@relkit/app/schema";
 
