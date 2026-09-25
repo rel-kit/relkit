@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import {
   CacheCapabilityError,
@@ -10,8 +10,7 @@ import {
   createCacheClient,
   type CacheOperationContext,
   type CacheProvider,
-} from "./src/client.ts";
-
+} from "../src/client.ts";
 function provider(overrides: Partial<CacheProvider> = {}): CacheProvider {
   return {
     get: async () => 3,
@@ -24,7 +23,6 @@ function provider(overrides: Partial<CacheProvider> = {}): CacheProvider {
     ...overrides,
   };
 }
-
 describe("cache Promise client", () => {
   test("validates values, applies TTL, bridges operations, and reports hooks", async () => {
     const bridgeNames: string[] = [];
@@ -61,21 +59,19 @@ describe("cache Promise client", () => {
       onObservedEdge: (edge) => edges.push(edge),
       onOperation: (operation) => operations.push(operation),
     });
-
     await client.set({ sku: "a" }, 3);
     await client.get({ sku: "a" });
     await client.delete({ sku: "a" });
     await client.has({ sku: "a" });
     await client.getOrSet({ sku: "a" }, async () => 4, { ttlMs: 2000 });
     await client.increment({ sku: "a" }, 2);
-
     expect(bridgeNames).toEqual([
-      "relkit.cache.prices.set",
-      "relkit.cache.prices.get",
-      "relkit.cache.prices.delete",
-      "relkit.cache.prices.has",
-      "relkit.cache.prices.getOrSet",
-      "relkit.cache.prices.increment",
+      "relkit.cache.set",
+      "relkit.cache.get",
+      "relkit.cache.delete",
+      "relkit.cache.has",
+      "relkit.cache.getOrSet",
+      "relkit.cache.increment",
     ]);
     expect(edges).toHaveLength(6);
     expect(edges[0]).toEqual({ relationship: "uses-cache", from: "orders.create", to: "prices" });
@@ -85,7 +81,26 @@ describe("cache Promise client", () => {
     ).toBe(true);
     expect(contexts[0]?.signal).toBeInstanceOf(AbortSignal);
   });
-
+  test("keeps bridge span names and labels bounded", async () => {
+    const metadata: unknown[] = [];
+    const client = createCacheClient({
+      ownerId: "orders",
+      cacheId: "secret-cache-id",
+      source: { get: () => 1 },
+      bridge: {
+        run: (operation, options) => {
+          metadata.push(options);
+          return Promise.resolve(operation());
+        },
+      },
+    });
+    expect(await client.get("sku")).toBe(1);
+    expect(metadata).toMatchObject([{
+      name: "relkit.cache.get",
+      attributes: { "relkit.cache.operation": "get" },
+    }]);
+    expect(JSON.stringify(metadata)).not.toContain("secret-cache-id");
+  });
   test("rejects invalid values and TTLs before provider writes", async () => {
     let writes = 0;
     const client = createCacheClient({
@@ -96,14 +111,14 @@ describe("cache Promise client", () => {
       valueSchema: z.number(),
       maxTtlMs: 100,
     });
-
     await expect(client.set("sku", "bad" as never)).rejects.toBeInstanceOf(
       CacheSchemaValidationError,
     );
+    await expect(client.set("sku", "bad" as never)).rejects.toBeInstanceOf(TypeError);
     await expect(client.set("sku", 1, { ttlMs: 101 })).rejects.toBeInstanceOf(CacheTtlPolicyError);
+    await expect(client.set("sku", 1, { ttlMs: 101 })).rejects.toBeInstanceOf(RangeError);
     expect(writes).toBe(0);
   });
-
   test("keeps increment unavailable for nonnumeric contracts and unsupported providers", async () => {
     const text = createCacheClient({
       ownerId: "orders.create",
@@ -115,7 +130,6 @@ describe("cache Promise client", () => {
     await expect(
       (text as { increment: () => Promise<unknown> }).increment(),
     ).rejects.toBeInstanceOf(CacheIncrementUnsupportedError);
-
     const unsupported = createCacheClient({
       ownerId: "orders.create",
       cacheId: "prices",
@@ -125,7 +139,6 @@ describe("cache Promise client", () => {
     });
     await expect(unsupported.increment("sku")).rejects.toBeInstanceOf(CacheCapabilityError);
   });
-
   test("propagates cancellation and undeclared access", async () => {
     const controller = new AbortController();
     const pending = new Promise<void>(() => undefined);
@@ -146,7 +159,6 @@ describe("cache Promise client", () => {
     const execution = client.get("sku");
     controller.abort();
     await expect(execution).rejects.toBeInstanceOf(CacheOperationCancelledError);
-
     const undeclared = createCacheClient({
       ownerId: "orders.create",
       cacheId: "prices",

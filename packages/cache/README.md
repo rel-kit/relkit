@@ -20,3 +20,29 @@ export default defineCache({
 Declared functions receive a Promise client with schema-validated keys and
 values. TTL options use the descriptor policy; numeric value schemas also
 expose `increment`.
+
+The package also exposes Effect operations for callers that compose workflows
+or replace the provider with a test Layer. The Promise client runs the same
+Effect implementation.
+
+```ts
+import { createCacheClientEffect } from "@relkit/cache";
+import { Effect } from "effect";
+
+const cache = Effect.runSync(
+  createCacheClientEffect({
+    ownerId: "orders.create",
+    cacheId: "prices",
+    source: { get: async () => 42 },
+  }),
+);
+
+const price = await Effect.runPromise(cache.get("sku"));
+```
+
+Cache operations emit `cache.<operation>` spans and bounded call, failure, and
+duration metrics. Bridge spans use `relkit.cache.<operation>` without cache IDs
+in names or attributes. A `CacheTelemetry` Layer can replace that observer in tests.
+Schema and TTL failures retain their exported names, codes, messages, and
+`TypeError` or `RangeError` classifications. Their `_tag` fields also support
+typed Effect recovery.
