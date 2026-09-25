@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   BucketCapabilityError,
   BucketDependencyError,
@@ -7,7 +7,7 @@ import {
   createBucketClient,
   type BucketOperationContext,
   type BucketProvider,
-} from "./src/client.ts";
+} from "../src/client.ts";
 
 function provider(overrides: Partial<BucketProvider> = {}): BucketProvider {
   return {
@@ -76,6 +76,26 @@ describe("bucket Promise client", () => {
       operations.every((operation) => (operation as { outcome: string }).outcome === "success"),
     ).toBe(true);
     expect(contexts[0]?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  test("lets the bridge own an already aborted invocation", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    let started = false;
+    const client = createBucketClient({
+      ownerId: "orders.create",
+      bucketId: "assets",
+      source: provider({
+        get: () => {
+          started = true;
+          return undefined;
+        },
+      }),
+      signal: () => controller.signal,
+      bridge: { run: async (operation) => operation() },
+    });
+    await expect(client.get("asset.bin")).resolves.toBeUndefined();
+    expect(started).toBe(true);
   });
 
   test("rejects unsupported signed URLs and undeclared clients explicitly", async () => {
