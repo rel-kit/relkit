@@ -1,6 +1,6 @@
 {
   "name": "@relkit/docker",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Docker local-service integration for RELKIT.",
   "license": "MIT",
   "repository": {

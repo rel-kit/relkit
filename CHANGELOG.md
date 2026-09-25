@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.5.2
+
+### Changes
+
+- Refactor RELKIT foundations and stabilize fast CI
+
 ## 0.5.1
 
 ### Changes
