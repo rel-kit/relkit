@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
-import * as localService from "./src/index.ts";
+import { expect, test } from "vitest";
+import * as localService from "../src/index.js";
 
 test("keeps the local-service protocol entrypoint side-effect free", () => {
   expect(localService).toMatchObject({

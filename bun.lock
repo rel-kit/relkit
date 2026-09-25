@@ -648,6 +648,10 @@
         "@relkit/schema": "workspace:*",
         "effect": "4.0.0-rc.115",
       },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
+      },
     },
     "packages/jobs": {
       "name": "@relkit/jobs",
@@ -666,6 +670,11 @@
       "dependencies": {
         "@relkit/contracts": "workspace:*",
         "@relkit/provider": "workspace:*",
+        "effect": "4.0.0-rc.115",
+      },
+      "devDependencies": {
+        "@vitest/coverage-v8": "5.0.1",
+        "vitest": "5.0.1",
       },
     },
     "packages/observability": {

@@ -1,9 +1,9 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import {
   LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION,
   normalizeLocalServiceRecipe,
   type CompositeLocalServiceRecipe,
-} from "./src/index.ts";
+} from "../src/index.js";
 
 const base = {
   kind: "local-service-recipe" as const,
