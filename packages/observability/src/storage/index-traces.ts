@@ -1,61 +1,29 @@
-import {
-  boundedLimit,
-  matches,
-  parseCursor,
-  type IndexConfig,
-  type IndexState,
-} from "./index-state.js";
-import type {
-  ObservabilityIndexEntry,
-  ObservabilityIndexPage,
-  ObservabilityIndexPageOptions,
-} from "./index-types.js";
-
+import { Effect } from "effect";
+import { readTracePageEffect } from "./index-traces-effect.js";
+import type { IndexConfig, IndexState } from "./index-state.types.js";
+import type { ObservabilityIndexPage, ObservabilityIndexPageOptions } from "./index.types.js";
+export { IndexTracePageError, readTracePageEffect } from "./index-traces-effect.js";
+/**
+ * Reads one deduplicated trace page from index state.
+ * The caller owns synchronization with index mutation.
+ * @param state - Current index state.
+ * @param config - Page size and index settings.
+ * @param options - Cursor, order, and filters.
+ * @returns One immutable trace page.
+ * @throws {Error} If a cursor or page bound is invalid.
+ * @example
+ * const page = readTracePage(state, config, { limit: 10 });
+ */
 export function readTracePage(
   state: IndexState,
   config: IndexConfig,
   options: ObservabilityIndexPageOptions,
 ): ObservabilityIndexPage {
-  const limit = boundedLimit(options.limit, config.pageSize, config.pageSize);
-  const descending = options.order === "desc";
-  const after =
-    options.cursor === undefined ? (descending ? Infinity : 0) : parseCursor(options.cursor);
-  const traceIds = new Set(
-    [...state.records.values()]
-      .filter((entry) => traceEntry(entry) && matches(entry, options))
-      .map((entry) => entry.traceId!),
+  return Effect.runSync(
+    readTracePageEffect(state, config, options).pipe(
+      Effect.mapError((error) =>
+        error.cause instanceof Error ? error.cause : new Error(error.message),
+      ),
+    ),
   );
-  const representatives = new Map<string, ObservabilityIndexEntry>();
-  for (const entry of state.records.values()) {
-    if (!traceEntry(entry) || !traceIds.has(entry.traceId!)) continue;
-    const current = representatives.get(entry.traceId!);
-    if (current === undefined || better(entry, current)) representatives.set(entry.traceId!, entry);
-  }
-  const values = [...representatives.values()]
-    .filter((entry) => (descending ? Number(entry.cursor) < after : Number(entry.cursor) > after))
-    .sort((left, right) => Number(left.cursor) - Number(right.cursor));
-  if (descending) values.reverse();
-  const entries = values.slice(0, limit);
-  return Object.freeze({
-    entries: Object.freeze(entries),
-    ...(values.length <= limit ? {} : { nextCursor: entries.at(-1)!.cursor }),
-  });
-}
-
-function traceEntry(entry: ObservabilityIndexEntry): boolean {
-  return (
-    entry.traceId !== undefined &&
-    (entry.signal === "request" || entry.signal === "trace" || entry.signal === "span")
-  );
-}
-
-function better(next: ObservabilityIndexEntry, current: ObservabilityIndexEntry): boolean {
-  return (
-    priority(next) > priority(current) ||
-    (priority(next) === priority(current) && Number(next.cursor) > Number(current.cursor))
-  );
-}
-
-function priority(entry: ObservabilityIndexEntry): number {
-  return entry.signal === "request" ? 3 : entry.signal === "trace" ? 2 : 1;
 }

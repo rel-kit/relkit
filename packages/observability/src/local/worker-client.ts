@@ -1,103 +1,47 @@
-import { fork } from "node:child_process";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import type { LocalWorkerCommand, LocalWorkerResponse } from "./types.js";
+import { Effect } from "effect";
 import { ObservabilityQueryError } from "../query-types.js";
+import { LocalWorkerError } from "./worker-client-error.js";
+import { startLocalWorkerEffect } from "./worker-client-effect.js";
+import type { LocalWorkerCommand } from "./types.types.js";
 
+export { LocalWorkerError } from "./worker-client-error.js";
+export { startLocalWorkerEffect } from "./worker-client-effect.js";
+export { LocalWorkerService, localWorkerLayer } from "./worker-client-service.js";
+export type { LocalWorkerEffects } from "./worker-client.types.js";
+
+const compatibilityError = (error: LocalWorkerError): Error =>
+  error.code ? new ObservabilityQueryError(error.code, error.message) : new Error(error.message);
+
+/**
+ * Starts a local worker with the existing Promise API.
+ *
+ * @param onFailure - Receives the first unexpected worker failure.
+ * @returns A live worker with Promise based `call` and `close` methods.
+ * @throws {Error} If process creation fails.
+ * @example
+ * const worker = startLocalWorker();
+ * try { await worker.call({ type: "flush" }); } finally { await worker.close(); }
+ */
 export function startLocalWorker(onFailure: (error: Error) => void = () => undefined) {
-  const built = new URL("./duckdb-worker.js", import.meta.url);
-  const workerPath = existsSync(built)
-    ? built
-    : new URL("../../dist/local/duckdb-worker.js", import.meta.url);
-  const child = fork(fileURLToPath(workerPath), [], {
-    execPath: "node",
-    execArgv: [],
-    stdio: ["ignore", "ignore", "pipe", "ipc"],
-  });
-  let nextId = 0;
-  let closed = false;
-  let closing = false;
-  let opened = false;
-  let failure: Error | undefined;
-  let diagnostic = "";
-  const pending = new Map<
-    number,
-    {
-      resolve: (value: unknown) => void;
-      reject: (error: Error) => void;
-      timer: ReturnType<typeof setTimeout>;
-    }
-  >();
-  child.stderr?.on("data", (value: Buffer) => {
-    diagnostic = `${diagnostic}${value.toString()}`.slice(-8192);
-  });
-  const fail = (error: Error): void => {
-    if (failure) return;
-    failure = error;
-    for (const item of pending.values()) {
-      clearTimeout(item.timer);
-      item.reject(error);
-    }
-    pending.clear();
-    if (!closed) onFailure(error);
+  const worker = Effect.runSync(
+    startLocalWorkerEffect(onFailure).pipe(
+      Effect.catchTag("LocalWorkerError", (error) =>
+        Effect.sync(() => {
+          throw compatibilityError(error);
+        }),
+      ),
+    ),
+  );
+  const legacy = <A>(effect: Effect.Effect<A, LocalWorkerError>): Promise<A> =>
+    Effect.runPromise(
+      effect.pipe(
+        Effect.catchTag("LocalWorkerError", (error) => Effect.fail(compatibilityError(error))),
+      ),
+    );
+  return {
+    pid: worker.pid,
+    call: <T>(command: LocalWorkerCommand): Promise<T> =>
+      legacy(worker.call(command)) as Promise<T>,
+    close: (): Promise<void> => legacy(worker.close()),
   };
-  child.on("error", fail);
-  child.on("exit", (code) => {
-    if (!closed && (!closing || pending.size > 0))
-      fail(new Error(`Telemetry worker exited (${code}): ${diagnostic}`));
-  });
-  child.on("message", (message: LocalWorkerResponse) => {
-    if (message.fatal) {
-      fail(new Error(message.error ?? "Telemetry worker failed; restart dev to recover"));
-      return;
-    }
-    const item = pending.get(message.id);
-    if (!item) return;
-    clearTimeout(item.timer);
-    pending.delete(message.id);
-    if (message.error)
-      item.reject(
-        message.code
-          ? new ObservabilityQueryError(message.code, message.error)
-          : new Error(message.error),
-      );
-    else item.resolve(message.value);
-  });
-  const call = <T>(command: LocalWorkerCommand): Promise<T> => {
-    if (failure || closed)
-      return Promise.reject(failure ?? new Error("Telemetry worker is closed"));
-    return new Promise<T>((resolve, reject) => {
-      const id = ++nextId;
-      const timer = setTimeout(
-        () => {
-          fail(new Error("Telemetry worker timed out; restart dev to recover"));
-          child.kill();
-        },
-        command.type === "open" ? 120_000 : 15_000,
-      );
-      pending.set(id, {
-        resolve: (value) => {
-          if (command.type === "open") opened = true;
-          resolve(value as T);
-        },
-        reject,
-        timer,
-      });
-      child.send({ id, command }, (error) => {
-        if (error) fail(error);
-      });
-    });
-  };
-  const close = async (): Promise<void> => {
-    if (closed) return;
-    closing = true;
-    try {
-      if (!failure && opened) await call({ type: "close" });
-    } finally {
-      closed = true;
-      if (child.connected) child.disconnect();
-      child.kill();
-    }
-  };
-  return { pid: child.pid, call, close };
 }

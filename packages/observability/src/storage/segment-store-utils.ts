@@ -1,47 +1,54 @@
-import type { FileHandle } from "node:fs/promises";
+import { Effect } from "effect";
+import type { ObservabilityRecord, ObservabilitySignal } from "../model.js";
 import {
-  OBSERVABILITY_MODEL_VERSION,
-  type ObservabilityRecord,
-  type ObservabilitySignal,
-} from "../model.js";
-
-export interface SegmentState {
-  readonly directory: string;
-  readonly activePath: string;
-  handle: FileHandle;
-  bytes: number;
-  records: number;
+  dayForEffect,
+  isRecordForSignalEffect,
+  positiveSegmentBoundEffect,
+  type SegmentUtilityError,
+} from "./segment-store-utils-effect.js";
+export type { SegmentState } from "./segment-store-utils.types.js";
+export {
+  SegmentUtilityError,
+  dayForEffect,
+  isRecordForSignalEffect,
+  positiveSegmentBoundEffect,
+} from "./segment-store-utils-effect.js";
+function legacy(error: SegmentUtilityError): TypeError {
+  return new TypeError(error.message);
 }
-
+/**
+ * Validates a positive segment size bound.
+ * @param value - Requested bound.
+ * @returns The valid bound.
+ * @throws {TypeError} If the bound is not a positive safe integer.
+ * @example
+ * const size = positive(1024);
+ */
 export function positive(value: number): number {
-  if (!Number.isSafeInteger(value) || value <= 0) {
-    throw new TypeError("Segment bound must be positive");
-  }
-  return value;
+  return Effect.runSync(positiveSegmentBoundEffect(value).pipe(Effect.mapError(legacy)));
 }
-
+/**
+ * Checks that a candidate record carries the expected signal and model version.
+ * @param value - Candidate record.
+ * @param signal - Expected signal.
+ * @returns True if the value has the required discriminator fields.
+ * @example
+ * if (isRecordForSignal(value, "log")) console.log(value.signal);
+ */
 export function isRecordForSignal(
   value: unknown,
   signal: ObservabilitySignal,
 ): value is ObservabilityRecord {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    (value as { readonly version?: unknown }).version === OBSERVABILITY_MODEL_VERSION &&
-    (value as { readonly signal?: unknown }).signal === signal
-  );
+  return Effect.runSync(isRecordForSignalEffect(value, signal));
 }
-
+/**
+ * Converts a model timestamp to its UTC calendar day.
+ * @param record - Record with a timestamp or signal-specific time field.
+ * @returns An ISO calendar date.
+ * @throws {TypeError} If the timestamp is absent or invalid.
+ * @example
+ * const day = dayFor(record);
+ */
 export function dayFor(record: ObservabilityRecord): string {
-  const time = Date.parse(timestampFor(record));
-  if (!Number.isFinite(time)) throw new TypeError("Observability record timestamp is invalid");
-  return new Date(time).toISOString().slice(0, 10);
-}
-
-function timestampFor(record: ObservabilityRecord): string {
-  const value = record as unknown as Record<string, unknown>;
-  const timestamp = value.timestamp ?? value.startedAt ?? value.occurredAt ?? value.acceptedAt;
-  if (typeof timestamp === "string" && timestamp.trim() !== "") return timestamp;
-  throw new TypeError("Observability record timestamp is required");
+  return Effect.runSync(dayForEffect(record).pipe(Effect.mapError(legacy)));
 }

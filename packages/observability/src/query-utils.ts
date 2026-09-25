@@ -1,25 +1,62 @@
+import { Effect } from "effect";
 import type { ObservabilityRecord, ObservabilitySignal } from "./model.js";
-import { admitObservabilityRecord } from "./record-admission.js";
-import type { RedactionPolicy } from "./redaction.js";
-import type { RedactedObservabilityRecord } from "./record-admission.js";
-import type {
-  ObservabilityIndex,
-  ObservabilityIndexEntry,
-  ObservabilityIndexPageOptions,
-} from "./storage/index.js";
-import { type ObservabilityQueryPage, type ObservabilityQueryRequest } from "./query-types.js";
+import type { RedactionPolicy } from "./redaction.types.js";
+import type { RedactedObservabilityRecord } from "./record-admission.types.js";
+import type { ObservabilityIndexEntry } from "./storage/index.types.js";
+import type { QueryIndex } from "./query-utils.types.js";
 import {
-  inTimeRange,
-  matches,
-  type NormalizedQuery,
-  response,
-  validate,
-} from "./query-validation.js";
-
-type Index = Pick<ObservabilityIndex, "page" | "tracePage" | "read">;
-
-export async function readPage<T extends ObservabilityRecord>(
-  index: Index,
+  ObservabilityQueryError,
+  type ObservabilityQueryPage,
+  type ObservabilityQueryRequest,
+} from "./query-types.js";
+import { type QueryValidationError } from "./query-validation-effect.js";
+import { collectQueryEffect, readPageEffect } from "./query-page-effect.js";
+import {
+  findCursorEffect,
+  QueryIndexService,
+  QueryReadError,
+  queryIndexLayer,
+  safeReadEffect,
+} from "./query-read-effect.js";
+export { collectQueryEffect, readPageEffect } from "./query-page-effect.js";
+export {
+  findCursorEffect,
+  QueryIndexService,
+  QueryReadError,
+  queryIndexLayer,
+  safeReadEffect,
+} from "./query-read-effect.js";
+function run<A>(
+  index: QueryIndex,
+  effect: Effect.Effect<A, QueryReadError | QueryValidationError, QueryIndexService>,
+): Promise<A> {
+  return Effect.runPromise(
+    effect.pipe(
+      Effect.provide(queryIndexLayer(index)),
+      Effect.mapError((error) =>
+        error._tag === "QueryReadError"
+          ? error.cause
+          : new ObservabilityQueryError(error.code, error.message),
+      ),
+    ),
+  );
+}
+/**
+ * Reads a bounded page in index order and re-admits each record.
+ * @param index - Borrowed index; the runtime retains ownership.
+ * @param input - Query filters and cursor.
+ * @param maxPageSize - Maximum index page size.
+ * @param redaction - Optional query redaction policy.
+ * @param signal - Optional required record signal.
+ * @param accept - Optional record predicate.
+ * @param pageKind - Record or trace index.
+ * @returns A Promise with a versioned page.
+ * @throws {ObservabilityQueryError} If query fields are invalid.
+ * @example
+ * const page = await readPage(index, { limit: 10 }, 100, undefined, "log");
+ */
+export function readPage<T extends ObservabilityRecord>(
+  index: QueryIndex,
   input: ObservabilityQueryRequest,
   maxPageSize: number,
   redaction: RedactionPolicy | undefined,
@@ -28,110 +65,61 @@ export async function readPage<T extends ObservabilityRecord>(
     signal === undefined || record.signal === signal,
   pageKind: "records" | "traces" = "records",
 ): Promise<ObservabilityQueryPage<T>> {
-  const query = validate(input, maxPageSize);
-  const items: T[] = [];
-  let cursor = query.cursor;
-  let lastCursor: string | undefined;
-  while (true) {
-    const page = (pageKind === "traces" ? index.tracePage : index.page)(
-      indexOptions(query, cursor, maxPageSize, signal),
-    );
-    for (const entry of page.entries) {
-      if (!inTimeRange(entry.timestamp, query) || entry.cursor === cursor) continue;
-      const record = await safeRead(index, entry, redaction);
-      if (record === undefined || !accept(record) || !matches(record, query)) continue;
-      if (items.length === query.limit) return response(items, lastCursor);
-      items.push(
-        (record.signal === "log" ? { ...record, cursor: entry.cursor } : record) as unknown as T,
-      );
-      lastCursor = entry.cursor;
-    }
-    if (page.nextCursor === undefined || page.nextCursor === cursor) break;
-    cursor = page.nextCursor;
-  }
-  return response(items);
+  return run(index, readPageEffect<T>(input, maxPageSize, redaction, signal, accept, pageKind));
 }
-
-export async function collect(
-  index: Index,
+/**
+ * Collects admitted records for a bounded detail query.
+ * @param index - Borrowed index.
+ * @param input - Query filters.
+ * @param maximum - Maximum record count.
+ * @param options - Optional redaction policy.
+ * @param accept - Optional record predicate.
+ * @returns A Promise with admitted records.
+ * @example
+ * const records = await collect(index, { requestId }, 200, {});
+ */
+export function collect(
+  index: QueryIndex,
   input: ObservabilityQueryRequest,
   maximum: number,
   options: { readonly redaction?: RedactionPolicy },
   accept?: (record: ObservabilityRecord) => boolean,
 ): Promise<RedactedObservabilityRecord[]> {
-  const page = await readPage<RedactedObservabilityRecord>(
-    index,
-    { ...input, limit: maximum },
-    maximum,
-    options.redaction,
-    undefined,
-    accept ?? (() => true),
-  );
-  return [...page.items];
+  return run(index, collectQueryEffect(input, maximum, options, accept));
 }
-
-export async function findCursor(
-  index: Index,
+/**
+ * Finds one cursor by paging the index in order.
+ * @param index - Borrowed index.
+ * @param cursor - Target cursor.
+ * @param maxPageSize - Index page bound.
+ * @param signal - Required record signal.
+ * @returns A Promise with the entry or undefined.
+ * @example
+ * const entry = await findCursor(index, "3", 100, "log");
+ */
+export function findCursor(
+  index: QueryIndex,
   cursor: string,
   maxPageSize: number,
   signal: ObservabilitySignal,
 ): Promise<ObservabilityIndexEntry | undefined> {
-  validate({ cursor, limit: 1 }, maxPageSize);
-  let after: string | undefined;
-  while (true) {
-    const page = index.page({
-      signal,
-      ...(after === undefined ? {} : { cursor: after }),
-      limit: maxPageSize,
-    });
-    const found = page.entries.find((entry) => entry.cursor === cursor);
-    if (found !== undefined) return found;
-    if (page.nextCursor === undefined || page.nextCursor === after) return undefined;
-    after = page.nextCursor;
-  }
+  return run(index, findCursorEffect(cursor, maxPageSize, signal));
 }
-
-export async function safeRead(
-  index: Index,
+/**
+ * Reads, redacts, and validates one index entry.
+ * @param index - Borrowed index.
+ * @param entry - Entry to read.
+ * @param redaction - Optional redaction policy.
+ * @param signal - Optional required signal.
+ * @returns A Promise with an admitted record or undefined.
+ * @example
+ * const record = await safeRead(index, entry, undefined, "log");
+ */
+export function safeRead(
+  index: QueryIndex,
   entry: ObservabilityIndexEntry,
   redaction: RedactionPolicy | undefined,
   signal?: ObservabilitySignal,
 ): Promise<RedactedObservabilityRecord | undefined> {
-  const value = await index.read(entry);
-  if (value === undefined || (signal !== undefined && value.signal !== signal)) return undefined;
-  const safe = admitObservabilityRecord(value, redaction);
-  return isRecord(safe) && safe.version === value.version && typeof safe.signal === "string"
-    ? safe
-    : undefined;
-}
-
-function indexOptions(
-  query: NormalizedQuery,
-  cursor: string | undefined,
-  maxPageSize: number,
-  signal: ObservabilitySignal | undefined,
-): ObservabilityIndexPageOptions {
-  return {
-    ...(signal === undefined ? {} : { signal }),
-    ...(cursor === undefined ? {} : { cursor }),
-    limit: maxPageSize,
-    ...(query.order === undefined ? {} : { order: query.order }),
-    ...(query.severity === undefined ? {} : { severity: query.severity }),
-    ...(query.routeId === undefined ? {} : { routeId: query.routeId }),
-    ...(query.functionId === undefined ? {} : { functionId: query.functionId }),
-    ...(query.outcome === undefined ? {} : { outcome: query.outcome }),
-    ...(query.requestId === undefined ? {} : { requestId: query.requestId }),
-    ...(query.originRequestId === undefined ? {} : { originRequestId: query.originRequestId }),
-    ...(query.traceId === undefined ? {} : { traceId: query.traceId }),
-    ...(query.spanId === undefined ? {} : { spanId: query.spanId }),
-    ...(query.serviceId === undefined ? {} : { serviceId: query.serviceId }),
-    ...(query.generationId === undefined ? {} : { generationId: query.generationId }),
-    ...(query.graphHash === undefined ? {} : { graphHash: query.graphHash }),
-  };
-}
-
-function isRecord(
-  value: unknown,
-): value is { readonly version?: unknown; readonly signal?: unknown } {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return run(index, safeReadEffect(entry, redaction, signal));
 }

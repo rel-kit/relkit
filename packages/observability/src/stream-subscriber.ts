@@ -1,16 +1,30 @@
-import type {
-  ObservabilityStreamEvent,
-  ObservabilityStreamOverflow,
-  ObservabilityStreamSubscription,
-  ObservabilityStreamSubscriptionStats,
-} from "./stream-types.js";
+import { Effect } from "effect";
+import type { ObservabilityStreamOverflow } from "./stream-types.js";
 import { ObservabilityStreamError } from "./stream-types.js";
-
-export type StreamSubscriber = ObservabilityStreamSubscription & {
-  readonly enqueue: (event: ObservabilityStreamEvent) => void;
-};
-type Waiter = (result: IteratorResult<ObservabilityStreamEvent>) => void;
-
+import type { StreamSubscriber } from "./stream-subscriber.types.js";
+import { makeStreamSubscriberEffect } from "./stream-subscriber-effect.js";
+export type { StreamSubscriber } from "./stream-subscriber.types.js";
+export {
+  StreamSubscriberError,
+  StreamSubscriberService,
+  makeStreamSubscriberEffect,
+  streamSubscriberLayer,
+} from "./stream-subscriber-effect.js";
+/**
+ * Creates one bounded stream subscriber compatibility handle.
+ * Close the handle when its consumer is finished; the Effect Layer can own
+ * this release automatically for Effect programs.
+ * @param id - Internal subscriber identity.
+ * @param queueSize - Maximum queued events.
+ * @param overflow - Overflow policy.
+ * @param remove - Owner removal callback.
+ * @param onDrop - Owner drop-count callback.
+ * @returns A subscriber with async reads and synchronous queue operations.
+ * @throws {ObservabilityStreamError} If overflow policy is invalid.
+ * @example
+ * const subscriber = createStreamSubscriber("one", 8, "drop-oldest", remove, onDrop);
+ * subscriber.close();
+ */
 export function createStreamSubscriber(
   id: string,
   queueSize: number,
@@ -18,78 +32,32 @@ export function createStreamSubscriber(
   remove: () => void,
   onDrop: (count: number) => void,
 ): StreamSubscriber {
-  if (!["drop-oldest", "drop-newest", "disconnect"].includes(overflow))
-    throw new ObservabilityStreamError(
-      "RELKIT_OBSERVABILITY_STREAM_INVALID",
-      "subscriber overflow mode is invalid",
-    );
-  const queue: ObservabilityStreamEvent[] = [];
-  let dropped = 0;
-  let cursor = "0";
-  let closed = false;
-  let waiter: Waiter | undefined;
-  const close = (): void => {
-    if (closed) return;
-    closed = true;
-    queue.length = 0;
-    remove();
-    waiter?.({ value: undefined as never, done: true });
-    waiter = undefined;
-  };
-  const enqueue = (event: ObservabilityStreamEvent): void => {
-    if (closed) return;
-    if (waiter !== undefined) {
-      const resolve = waiter;
-      waiter = undefined;
-      cursor = event.cursor;
-      resolve({ value: event, done: false });
-      return;
-    }
-    if (queue.length < queueSize) return void queue.push(event);
-    dropped += 1;
-    onDrop(1);
-    if (overflow === "disconnect") return close();
-    if (overflow === "drop-newest") return;
-    queue.shift();
-    queue.push(event);
-  };
-  const next = (): Promise<IteratorResult<ObservabilityStreamEvent>> => {
-    if (queue.length > 0) {
-      const value = queue.shift()!;
-      cursor = value.cursor;
-      return Promise.resolve({ value, done: false });
-    }
-    if (closed) return Promise.resolve({ value: undefined as never, done: true });
-    if (waiter !== undefined)
-      return Promise.reject(
-        new ObservabilityStreamError(
-          "RELKIT_OBSERVABILITY_STREAM_INVALID",
-          "only one pending subscriber read is supported",
-        ),
-      );
-    return new Promise((resolve) => {
-      waiter = resolve;
-    });
-  };
-  const subscription = {
-    id,
-    next,
+  const consumer = Effect.runSync(
+    makeStreamSubscriberEffect(id, queueSize, overflow, remove, onDrop).pipe(
+      Effect.mapError((error) => new ObservabilityStreamError(error.code, error.message)),
+    ),
+  );
+  const result: StreamSubscriber = {
+    id: consumer.id,
+    enqueue: (event) => Effect.runSync(consumer.enqueue(event)),
+    next: () =>
+      Effect.runPromise(
+        consumer
+          .next()
+          .pipe(
+            Effect.mapError((error) => new ObservabilityStreamError(error.code, error.message)),
+          ),
+      ),
+    close: () => Effect.runSync(consumer.close()),
+    dropped: () => Effect.runSync(consumer.dropped()),
+    stats: () => Effect.runSync(consumer.stats()),
     return: async () => {
-      close();
+      Effect.runSync(consumer.close());
       return { value: undefined as never, done: true } as const;
     },
     [Symbol.asyncIterator]() {
-      return subscription;
+      return result;
     },
-    close,
-    dropped: () => dropped,
-    stats: (): ObservabilityStreamSubscriptionStats => ({
-      queued: queue.length,
-      dropped,
-      cursor,
-      closed,
-    }),
-    enqueue,
-  } as StreamSubscriber;
-  return subscription;
+  };
+  return result;
 }

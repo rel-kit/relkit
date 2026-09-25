@@ -1,87 +1,106 @@
-import { OBSERVABILITY_MODEL_VERSION, type ObservabilityRecord } from "./model.js";
-import { isSpanId, isTraceId } from "@relkit/contracts";
-import { redactRecord, type RedactionPolicy } from "./redaction.js";
-
-declare const redactedRecordBrand: unique symbol;
-
-/** A record that has crossed the observability redaction boundary. */
-export type RedactedObservabilityRecord = ObservabilityRecord & {
-  readonly [redactedRecordBrand]: true;
-};
-
-const admittedRecords = new WeakSet<object>();
-
-/** Redacts and brands one model record before a collector-owned sink sees it. */
+import type { ObservabilityRecord } from "./model.js";
+import { recordAdmissionCore } from "./record-admission-core.js";
+import { Clock, Duration, Effect, Exit, Metric, Schema } from "effect";
+import { redactRecordEffect, type RedactionPolicy } from "./redaction.js";
+import type { RedactedObservabilityRecord } from "./record-admission.types.js";
+export type { RedactedObservabilityRecord } from "./record-admission.types.js";
+/**
+ * Tagged redaction failure while admitting a model record.
+ * @example
+ * if (error._tag === "RecordAdmissionError") console.error(error.message);
+ */
+export class RecordAdmissionError extends Schema.TaggedError<RecordAdmissionError>()(
+  "RecordAdmissionError",
+  { message: Schema.String },
+) {}
+function observe<A, E>(
+  operation: "admit" | "isRedacted",
+  effect: Effect.Effect<A, E>,
+): Effect.Effect<A, E> {
+  return Effect.gen(function* () {
+    const started = yield* Clock.currentTimeMillis;
+    return yield* Effect.onExit(effect, (exit) =>
+      Effect.gen(function* () {
+        yield* Metric.update(
+          Metric.counter("relkit_observability_record_admission_total", {
+            attributes: { operation, outcome: Exit.isSuccess(exit) ? "success" : "failure" },
+          }),
+          1,
+        );
+        yield* Metric.update(
+          Metric.timer("relkit_observability_record_admission_duration", {
+            attributes: { operation },
+          }),
+          Duration.millis((yield* Clock.currentTimeMillis) - started),
+        );
+      }),
+    );
+  });
+}
+/**
+ * Redacts and brands a model record within an observed Effect.
+ * @param record - Model record to admit.
+ * @param policy - Optional redaction policy.
+ * @returns An Effect with the admitted record, undefined, or a tagged redaction error.
+ * @example
+ * const safe = Effect.runSync(admitObservabilityRecordEffect(record));
+ */
+export const admitObservabilityRecordEffect = Effect.fn("ObservabilityRecord.admit")(
+  (record: ObservabilityRecord, policy?: RedactionPolicy) =>
+    observe(
+      "admit",
+      redactRecordEffect(record, policy).pipe(
+        Effect.mapError((error) => new RecordAdmissionError({ message: error.message })),
+        Effect.map(recordAdmissionCore.admitRedacted),
+      ),
+    ),
+);
+/**
+ * Checks the in-memory admission brand within an observed Effect.
+ * @param value - Candidate object.
+ * @returns An Effect with true only for an admitted object.
+ * @example
+ * const admitted = Effect.runSync(isRedactedObservabilityRecordEffect(value));
+ */
+export const isRedactedObservabilityRecordEffect = Effect.fn("ObservabilityRecord.isRedacted")(
+  (value: unknown) =>
+    observe(
+      "isRedacted",
+      Effect.sync(() => recordAdmissionCore.isRedactedRecord(value)),
+    ),
+);
+/**
+ * Redacts and brands one model record before a collector-owned sink sees it.
+ * @param record - Model record to admit.
+ * @param policy - Optional redaction policy.
+ * @returns The admitted record, or undefined if validation rejects it.
+ * @throws {TypeError} If the redaction policy is invalid.
+ * @example
+ * const safe = admitObservabilityRecord(record);
+ */
 export function admitObservabilityRecord(
   record: ObservabilityRecord,
   policy?: RedactionPolicy,
 ): RedactedObservabilityRecord | undefined {
-  const value = redactRecord(record, policy);
-  if (!isModelRecord(value)) return undefined;
-  const normalized =
-    value.signal === "log" && !("fields" in value)
-      ? Object.freeze({ ...value, fields: {} })
-      : value;
-  admittedRecords.add(normalized);
-  return normalized as RedactedObservabilityRecord;
+  return Effect.runSync(
+    admitObservabilityRecordEffect(record, policy).pipe(
+      Effect.catchTag("RecordAdmissionError", (error) =>
+        Effect.sync(() => {
+          throw new TypeError(error.message);
+        }),
+      ),
+    ),
+  );
 }
-
-/** Returns true only for the in-memory object produced by admission. */
+/**
+ * Checks whether this exact object came from admission.
+ * @param value - Candidate object.
+ * @returns True only for an admitted in-memory object.
+ * @example
+ * if (isRedactedObservabilityRecord(value)) consume(value);
+ */
 export function isRedactedObservabilityRecord(
   value: unknown,
 ): value is RedactedObservabilityRecord {
-  return isModelRecord(value) && admittedRecords.has(value);
-}
-
-function isModelRecord(
-  value: unknown,
-): value is object & { readonly version: number; readonly signal: string } {
-  if (!(
-    value !== null &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    (value as { readonly version?: unknown }).version === OBSERVABILITY_MODEL_VERSION &&
-    typeof (value as { readonly signal?: unknown }).signal === "string"
-  ))
-    return false;
-  const record = value as Record<string, unknown>;
-  if (
-    !new Set([
-      "request",
-      "invocation",
-      "job",
-      "event",
-      "operation",
-      "tool",
-      "agent",
-      "log",
-      "span",
-      "trace",
-      "diagnostic",
-      "generation",
-    ]).has(String(record.signal))
-  )
-    return false;
-  if (record.traceId !== undefined && !isTraceId(record.traceId)) return false;
-  if (record.spanId !== undefined && !isSpanId(record.spanId)) return false;
-  if (record.signal === "span") {
-    if (
-      !isTraceId(record.traceId) ||
-      !isSpanId(record.spanId) ||
-      typeof record.name !== "string" ||
-      !["internal", "server", "client", "producer", "consumer"].includes(String(record.kind)) ||
-      !["started", "updated", "completed"].includes(String(record.status)) ||
-      !Number.isSafeInteger(record.revision) ||
-      (record.revision as number) < 0
-    )
-      return false;
-  }
-  if (
-    record.signal === "request" &&
-    (!["started", "completed"].includes(String(record.phase)) ||
-      typeof record.requestId !== "string" ||
-      typeof record.startedAt !== "string")
-  )
-    return false;
-  return true;
+  return Effect.runSync(isRedactedObservabilityRecordEffect(value));
 }

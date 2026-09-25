@@ -1,7 +1,6 @@
-import { PROTOCOL_VERSION, type JsonValue } from "@relkit/contracts";
-import type { ObservabilityCollector } from "./collector.js";
-import type { ObservabilityRecord } from "./model.js";
-import type { RedactionPolicy } from "./redaction.js";
+import { PROTOCOL_VERSION } from "@relkit/contracts";
+import type { ObservabilityStreamErrorCode } from "./stream.types.js";
+export type * from "./stream.types.js";
 
 export const OBSERVABILITY_STREAM_PROTOCOL = "relkit.observability.stream" as const;
 export const OBSERVABILITY_STREAM_VERSION = PROTOCOL_VERSION;
@@ -22,80 +21,20 @@ export const OBSERVABILITY_STREAM_EVENT_TYPES = [
   "generation.changed",
   "diagnostic.changed",
 ] as const;
-export type ObservabilityStreamEventType = (typeof OBSERVABILITY_STREAM_EVENT_TYPES)[number];
-export type ObservabilityStreamOverflow = "drop-oldest" | "drop-newest" | "disconnect";
-
-export interface ObservabilityStreamEvent {
-  readonly protocol: typeof OBSERVABILITY_STREAM_PROTOCOL;
-  readonly version: typeof OBSERVABILITY_STREAM_VERSION;
-  readonly cursor: string;
-  readonly type: ObservabilityStreamEventType;
-  readonly data: JsonValue;
-}
-export type ObservabilityStreamInput =
-  | { readonly type: ObservabilityStreamEventType; readonly data: unknown }
-  | { readonly type: ObservabilityStreamEventType; readonly record: ObservabilityRecord };
-export interface ObservabilityStreamReplayOptions {
-  readonly cursor?: string;
-  readonly afterCursor?: string;
-  readonly limit?: number;
-  readonly type?: ObservabilityStreamEventType;
-}
-export interface ObservabilityStreamPage {
-  readonly protocol: typeof OBSERVABILITY_STREAM_PROTOCOL;
-  readonly version: typeof OBSERVABILITY_STREAM_VERSION;
-  readonly events: readonly ObservabilityStreamEvent[];
-  readonly nextCursor?: string;
-  readonly earliestCursor?: string;
-  readonly latestCursor: string;
-}
-export interface ObservabilityStreamSubscriptionOptions {
-  readonly cursor?: string;
-  readonly afterCursor?: string;
-  readonly queueSize?: number;
-  readonly overflow?: ObservabilityStreamOverflow;
-  readonly backpressure?: ObservabilityStreamOverflow;
-}
-export interface ObservabilityStreamSubscriptionStats {
-  readonly queued: number;
-  readonly dropped: number;
-  readonly cursor: string;
-  readonly closed: boolean;
-}
-export interface ObservabilityStreamSubscription extends AsyncIterableIterator<ObservabilityStreamEvent> {
-  readonly id: string;
-  readonly close: () => void;
-  readonly dropped: () => number;
-  readonly stats: () => ObservabilityStreamSubscriptionStats;
-}
-export interface ObservabilityStreamCounters {
-  readonly published: number;
-  readonly retainedDropped: number;
-  readonly subscriberDropped: number;
-  readonly dropped: number;
-}
-export interface ObservabilityStreamStats extends ObservabilityStreamCounters {
-  readonly retained: number;
-  readonly subscribers: number;
-  readonly cursor: string;
-  readonly earliestCursor?: string;
-}
-export interface ObservabilityStreamOptions {
-  readonly maxEvents?: number;
-  readonly queueSize?: number;
-  readonly maxQueueSize?: number;
-  readonly maxSubscribers?: number;
-  readonly overflow?: ObservabilityStreamOverflow;
-  readonly backpressure?: ObservabilityStreamOverflow;
-  readonly redaction?: RedactionPolicy;
-  readonly collector?: Pick<ObservabilityCollector, "collect">;
-}
-export type ObservabilityStreamErrorCode =
-  | "RELKIT_OBSERVABILITY_STREAM_INVALID"
-  | "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED"
-  | "RELKIT_OBSERVABILITY_STREAM_CURSOR_FUTURE"
-  | "RELKIT_OBSERVABILITY_STREAM_CLOSED";
+/**
+ * Compatibility error for invalid, expired, or closed stream operations.
+ * Effect stream utilities return `StreamValidationError` for input failures.
+ * @example
+ * if (error instanceof ObservabilityStreamError) console.error(error.code);
+ */
 export class ObservabilityStreamError extends TypeError {
+  /**
+   * Creates a stream error with a stable public code.
+   * @param code - Invalid, expired, future, or closed operation code.
+   * @param message - Human-readable explanation.
+   * @example
+   * throw new ObservabilityStreamError("RELKIT_OBSERVABILITY_STREAM_INVALID", "Invalid cursor");
+   */
   constructor(
     readonly code: ObservabilityStreamErrorCode,
     message: string,
@@ -103,33 +42,4 @@ export class ObservabilityStreamError extends TypeError {
     super(message);
     this.name = "ObservabilityStreamError";
   }
-}
-export type ObservabilityStreamPublish = {
-  (input: ObservabilityStreamInput): ObservabilityStreamEvent | undefined;
-  (
-    type: ObservabilityStreamEventType,
-    record: ObservabilityRecord,
-  ): ObservabilityStreamEvent | undefined;
-};
-export type ObservabilityStreamRecordPublisher = (
-  type: ObservabilityStreamEventType,
-  record: ObservabilityRecord,
-) => ObservabilityStreamEvent | undefined;
-export type ObservabilityStreamReplay = {
-  (options?: ObservabilityStreamReplayOptions): ObservabilityStreamPage;
-  (cursor?: string, limit?: number): ObservabilityStreamPage;
-};
-export interface ObservabilityStream {
-  readonly publish: ObservabilityStreamPublish;
-  readonly emit: ObservabilityStreamPublish;
-  readonly publishRecord: ObservabilityStreamRecordPublisher;
-  readonly replay: ObservabilityStreamReplay;
-  readonly read: ObservabilityStreamReplay;
-  readonly subscribe: (
-    options?: ObservabilityStreamSubscriptionOptions,
-  ) => ObservabilityStreamSubscription;
-  readonly dropped: () => number;
-  readonly counters: () => ObservabilityStreamCounters;
-  readonly stats: () => ObservabilityStreamStats;
-  readonly close: () => void;
 }

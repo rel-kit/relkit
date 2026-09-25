@@ -1,92 +1,25 @@
 import { PROTOCOL_VERSION } from "@relkit/contracts";
-import type {
-  LogLevel,
-  LogRecord,
-  ObservabilityRecord,
-  RequestRecord,
-  SpanRecord,
-  TraceRecord,
-} from "./model.js";
-import type { RedactionPolicy } from "./redaction.js";
-import type { RequestExecutionDetail } from "./execution-assembly.js";
+export type * from "./query.types.js";
 
 export const OBSERVABILITY_QUERY_PROTOCOL = "relkit.observability.query" as const;
 export const OBSERVABILITY_QUERY_VERSION = PROTOCOL_VERSION;
 export const DEFAULT_OBSERVABILITY_QUERY_LIMIT = 50;
 export const MAX_OBSERVABILITY_QUERY_LIMIT = 100;
 
-export interface ObservabilityQueryRequest {
-  readonly search?: string;
-  readonly source?: "application" | "relkit" | "inspector";
-  readonly order?: "asc" | "desc";
-  readonly protocol?: typeof OBSERVABILITY_QUERY_PROTOCOL;
-  readonly version?: typeof OBSERVABILITY_QUERY_VERSION;
-  readonly cursor?: string;
-  readonly limit?: number;
-  readonly from?: string;
-  readonly to?: string;
-  readonly severity?: LogLevel;
-  readonly routeId?: string;
-  readonly functionId?: string;
-  readonly outcome?: string;
-  readonly requestId?: string;
-  readonly originRequestId?: string;
-  readonly traceId?: string;
-  readonly spanId?: string;
-  readonly serviceId?: string;
-  readonly generationId?: string;
-  readonly graphHash?: string;
-}
-
-export interface ObservabilityQueryVersion {
-  readonly protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
-  readonly version: typeof OBSERVABILITY_QUERY_VERSION;
-}
-
-export interface ObservabilityQueryPage<T> extends ObservabilityQueryVersion {
-  readonly items: readonly T[];
-  readonly nextCursor?: string;
-}
-
-export type RequestQueryResponse = ObservabilityQueryPage<RequestRecord>;
-export interface LogQueryItem extends LogRecord {
-  readonly cursor?: string;
-  readonly origin?: "application" | "relkit" | "inspector";
-}
-export type LogQueryResponse = ObservabilityQueryPage<LogQueryItem>;
-export type TraceQueryItem = TraceRecord | SpanRecord | RequestRecord;
-export type TraceQueryResponse = ObservabilityQueryPage<TraceQueryItem>;
-
-export interface RequestDetailResponse extends ObservabilityQueryVersion, RequestExecutionDetail {}
-
-export interface LogDetailResponse extends ObservabilityQueryVersion {
-  readonly log: LogQueryItem;
-}
-
-export interface TraceDetailResponse extends ObservabilityQueryVersion {
-  readonly nextCursor?: string;
-  readonly trace?: TraceRecord;
-  readonly spans: readonly SpanRecord[];
-  readonly records: readonly TraceQueryItem[];
-}
-
-export interface ObservabilityQueryOptions {
-  readonly maxPageSize?: number;
-  readonly pageSize?: number;
-  readonly maxDetailRecords?: number;
-  readonly redaction?: RedactionPolicy;
-}
-
-export interface ObservabilityQuery {
-  readonly requests: (query?: ObservabilityQueryRequest) => Promise<RequestQueryResponse>;
-  readonly logs: (query?: ObservabilityQueryRequest) => Promise<LogQueryResponse>;
-  readonly traces: (query?: ObservabilityQueryRequest) => Promise<TraceQueryResponse>;
-  readonly request: (requestId: string) => Promise<RequestDetailResponse | undefined>;
-  readonly log: (cursor: string) => Promise<LogDetailResponse | undefined>;
-  readonly trace: (traceId: string) => Promise<TraceDetailResponse | undefined>;
-}
-
+/**
+ * Compatibility error for invalid query input or protocol versions.
+ * Effect callers receive `QueryValidationError` instead.
+ * @example
+ * if (error instanceof ObservabilityQueryError) console.error(error.code);
+ */
 export class ObservabilityQueryError extends TypeError {
+  /**
+   * Creates a query validation error with a stable public code.
+   * @param code - Invalid-input or protocol-mismatch code.
+   * @param message - Human-readable explanation.
+   * @example
+   * throw new ObservabilityQueryError("RELKIT_OBSERVABILITY_QUERY_INVALID", "Invalid cursor");
+   */
   constructor(
     readonly code:
       "RELKIT_OBSERVABILITY_QUERY_INVALID" | "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",

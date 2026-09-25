@@ -1,167 +1,50 @@
-import type { ObservabilityRecord, RequestOutcome, RequestRecord } from "./model.js";
-
-export interface RequestRecordSink {
-  readonly collect: (record: ObservabilityRecord) => unknown;
-  readonly capture?: (value: unknown) => import("./redaction.js").RedactedCapture | undefined;
-  readonly read?: () => readonly ObservabilityRecord[];
-  readonly readRecords?: () => readonly ObservabilityRecord[];
-}
-
-export interface RequestRecordBuilderOptions {
-  readonly requestId: string;
-  readonly traceId: string;
-  readonly generationId: string;
-  readonly graphHash: string;
-  readonly method: string;
-  readonly rawPath: string;
-  readonly serviceId?: string;
-  readonly startedAt?: number;
-  readonly requestBytes?: number;
-  readonly now?: () => number;
-}
-
-export interface RequestDetailInput {
-  readonly kind: string;
-  readonly at?: number | string;
-  readonly durationMs?: number;
-  readonly targetId?: string;
-  readonly status?: number;
-  readonly outcome?: RequestOutcome;
-}
-
-export interface RequestRecordBuilder {
-  readonly started: RequestRecord;
-  readonly add: (detail: RequestDetailInput) => void;
-  readonly setTraceId: (traceId: string) => void;
-  readonly setRoute: (routeId: string, functionId: string) => void;
-  readonly setServiceId: (serviceId: string | undefined) => void;
-  readonly setInvocationId: (invocationId: string) => void;
-  readonly setOutcome: (outcome: RequestOutcome, errorId?: string) => RequestOutcome;
-  readonly finish: (options: {
-    readonly status: number;
-    readonly completedAt?: number;
-    readonly responseBytes?: number;
-  }) => RequestRecord;
-}
-
-/** Builds one immutable request record while keeping body values outside telemetry. */
+import { Effect } from "effect";
+import { makeRequestRecordBuilderEffect } from "./request-record-effect.js";
+import type { RequestRecordError } from "./request-record-effect.js";
+import type { RequestRecordBuilder, RequestRecordBuilderOptions } from "./request-record.types.js";
+export { makeRequestRecordBuilderEffect } from "./request-record-effect.js";
+export { RequestRecordError } from "./request-record-effect.js";
+export type {
+  RequestDetailInput,
+  RequestFinishOptions,
+  RequestRecordBuilder,
+  RequestRecordBuilderEffects,
+  RequestRecordBuilderOptions,
+  RequestRecordSink,
+} from "./request-record.types.js";
+/**
+ * Builds one immutable request record while keeping body values outside telemetry.
+ * Every synchronous method delegates to its Effect implementation.
+ *
+ * @param options - Request identity, input size, and optional clock.
+ * @returns A builder with a stable started record and one final result.
+ * @throws {RangeError} If a start or completion timestamp cannot form a date.
+ * @example
+ * const builder = createRequestRecordBuilder(options);
+ * const completed = builder.finish({ status: 200 });
+ */
 export function createRequestRecordBuilder(
   options: RequestRecordBuilderOptions,
 ): RequestRecordBuilder {
-  const now = options.now ?? Date.now;
-  const startedAt = options.startedAt ?? now();
-  let traceId = options.traceId;
-  let routeId = "unknown";
-  let functionId = "unknown";
-  let serviceId = options.serviceId;
-  let invocationId = `request:${options.requestId}`;
-  let requestOutcome: RequestOutcome = "success";
-  let errorId: string | undefined;
-  let finished: RequestRecord | undefined;
-  const started = Object.freeze({
-    version: 2,
-    signal: "request",
-    phase: "started",
-    requestId: options.requestId,
-    originRequestId: options.requestId,
-    traceId,
-    generationId: options.generationId,
-    graphHash: options.graphHash,
-    startedAt: new Date(startedAt).toISOString(),
-    method: options.method,
-    rawPath: options.rawPath,
-    ...(serviceId === undefined ? {} : { serviceId }),
-    ...(validBytes(options.requestBytes) ? { requestBytes: options.requestBytes } : {}),
-  } as const satisfies RequestRecord);
-
-  const add = (detail: RequestDetailInput): void => {
-    if (finished !== undefined) return;
-    void detail;
-  };
-  const finish = (finishOptions: {
-    readonly status: number;
-    readonly completedAt?: number;
-    readonly responseBytes?: number;
-  }): RequestRecord => {
-    if (finished !== undefined) return finished;
-    const completedAt = finishOptions.completedAt ?? now();
-    finished = Object.freeze({
-      version: 2,
-      signal: "request",
-      phase: "completed",
-      requestId: options.requestId,
-      originRequestId: options.requestId,
-      traceId,
-      generationId: options.generationId,
-      graphHash: options.graphHash,
-      invocationId,
-      startedAt: new Date(startedAt).toISOString(),
-      completedAt: new Date(completedAt).toISOString(),
-      durationMs: Math.max(0, completedAt - startedAt),
-      method: options.method,
-      rawPath: options.rawPath,
-      normalizedRoute: routeId,
-      routeId,
-      functionId,
-      ...(serviceId === undefined ? {} : { serviceId }),
-      status: validStatus(finishOptions.status) ? finishOptions.status : 500,
-      ...(validBytes(options.requestBytes) ? { requestBytes: options.requestBytes } : {}),
-      ...(validBytes(finishOptions.responseBytes)
-        ? { responseBytes: finishOptions.responseBytes }
-        : {}),
-      outcome: requestOutcome,
-      ...(errorId === undefined ? {} : { errorId }),
-    });
-    return finished;
-  };
+  const run = <A>(effect: Effect.Effect<A, RequestRecordError>): A =>
+    Effect.runSync(
+      effect.pipe(
+        Effect.catchTag("RequestRecordError", (error) =>
+          Effect.sync(() => {
+            throw new RangeError(error.message);
+          }),
+        ),
+      ),
+    );
+  const builder = run(makeRequestRecordBuilderEffect(options));
   return Object.freeze({
-    started,
-    add,
-    setTraceId: (value: string): void => {
-      if (finished === undefined && text(value) !== undefined) traceId = value;
-    },
-    setRoute: (nextRouteId: string, nextFunctionId: string): void => {
-      if (finished !== undefined) return;
-      if (text(nextRouteId) !== undefined) routeId = nextRouteId;
-      if (text(nextFunctionId) !== undefined) functionId = nextFunctionId;
-    },
-    setServiceId: (value: string | undefined): void => {
-      if (finished === undefined && text(value) !== undefined) serviceId = value;
-    },
-    setInvocationId: (value: string): void => {
-      if (finished === undefined && text(value) !== undefined) invocationId = value;
-    },
-    setOutcome: (outcome: RequestOutcome, nextErrorId?: string): RequestOutcome => {
-      if (finished !== undefined) return requestOutcome;
-      if (requestOutcome === "success" || outcome !== "success") requestOutcome = outcome;
-      if (text(nextErrorId) !== undefined) errorId = nextErrorId;
-      return requestOutcome;
-    },
-    finish,
-  });
-}
-
-function toMillis(value: number | string | undefined, fallback: number): number {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Date.parse(value);
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return fallback;
-}
-
-function text(value: string | undefined): string | undefined {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
-}
-
-function validDuration(value: number | undefined): value is number {
-  return value !== undefined && Number.isFinite(value) && value >= 0;
-}
-
-function validBytes(value: number | undefined): value is number {
-  return value !== undefined && Number.isSafeInteger(value) && value >= 0;
-}
-
-function validStatus(value: number | undefined): value is number {
-  return value !== undefined && Number.isSafeInteger(value) && value >= 100 && value <= 599;
+    started: builder.started,
+    add: (detail) => run(builder.add(detail)),
+    setTraceId: (traceId) => run(builder.setTraceId(traceId)),
+    setRoute: (routeId, functionId) => run(builder.setRoute(routeId, functionId)),
+    setServiceId: (serviceId) => run(builder.setServiceId(serviceId)),
+    setInvocationId: (invocationId) => run(builder.setInvocationId(invocationId)),
+    setOutcome: (outcome, errorId) => run(builder.setOutcome(outcome, errorId)),
+    finish: (finishOptions) => run(builder.finish(finishOptions)),
+  } satisfies RequestRecordBuilder);
 }
