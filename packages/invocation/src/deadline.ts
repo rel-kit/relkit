@@ -94,7 +94,9 @@ export function withDeadline<A, E, R>(
       return yield* Effect.clockWith((clock) => {
         const remaining = deadline - clock.currentTimeMillisUnsafe();
         const timed =
-          remaining <= 0 ? Effect.fail(new Cause.TimeoutError()) : Effect.timeout(effect, remaining);
+          remaining <= 0
+            ? Effect.fail(new Cause.TimeoutError())
+            : Effect.timeout(effect, remaining);
         return Effect.provideService(timed, Deadline, deadline);
       });
     }),
@@ -119,14 +121,21 @@ export function withTimeout<A, E, R>(
       Effect.gen(function* () {
         const inherited = yield* Effect.service(Deadline);
         const parent = earliest(inherited, parentDeadline);
-        const deadline = yield* composeDeadlineEffect(parent, timeoutMs, clock.currentTimeMillisUnsafe());
+        const deadline = yield* composeDeadlineEffect(
+          parent,
+          timeoutMs,
+          clock.currentTimeMillisUnsafe(),
+        );
         return yield* withDeadline(effect, deadline);
       }),
     ),
   );
 }
 
-function earliest(first: DeadlineValue | undefined, second: DeadlineValue | undefined): DeadlineValue | undefined {
+function earliest(
+  first: DeadlineValue | undefined,
+  second: DeadlineValue | undefined,
+): DeadlineValue | undefined {
   if (first === undefined) return second;
   if (second === undefined) return first;
   return Math.min(first, second);

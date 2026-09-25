@@ -1,6 +1,14 @@
 import { Effect } from "effect";
 import { resolveDescriptorIdentityEffect } from "./identity-resolve.js";
-import { freezeFrame, isFrame, recursionOperation, RecursionFailure, RecursionPolicyError, runRecursionSync, validateFunctionId } from "./recursion-policy.js";
+import {
+  freezeFrame,
+  isFrame,
+  recursionOperation,
+  RecursionFailure,
+  RecursionPolicyError,
+  runRecursionSync,
+  validateFunctionId,
+} from "./recursion-policy.js";
 import type { DescriptorIdentitySource } from "./identity.types.js";
 import type { InvocationCallFrame } from "./recursion.types.js";
 
@@ -20,15 +28,17 @@ export class InvocationCallStack {
     keys: readonly (object | string)[] = frames.map((frame) => frame.functionId),
     descriptors: readonly (object | undefined)[] = frames.map(() => undefined),
   ) {
-    const prepared = runRecursionSync(recursionOperation("recursion.create", () => {
-      if (keys.length !== frames.length || descriptors.length !== frames.length)
-        throw new TypeError("Invocation call stack internals must match its frames");
-      return {
-        frames: Object.freeze(frames.map(freezeFrame)),
-        keys: Object.freeze([...keys]),
-        descriptors: Object.freeze([...descriptors]),
-      };
-    }));
+    const prepared = runRecursionSync(
+      recursionOperation("recursion.create", () => {
+        if (keys.length !== frames.length || descriptors.length !== frames.length)
+          throw new TypeError("Invocation call stack internals must match its frames");
+        return {
+          frames: Object.freeze(frames.map(freezeFrame)),
+          keys: Object.freeze([...keys]),
+          descriptors: Object.freeze([...descriptors]),
+        };
+      }),
+    );
     this.frames = prepared.frames;
     this.keys = prepared.keys;
     this.descriptors = prepared.descriptors;
@@ -48,7 +58,8 @@ export class InvocationCallStack {
    */
   functionIdsEffect(): Effect.Effect<readonly string[], RecursionFailure> {
     return recursionOperation("recursion.ids", () =>
-      Object.freeze(this.frames.map((frame) => frame.functionId)));
+      Object.freeze(this.frames.map((frame) => frame.functionId)),
+    );
   }
 
   /** Checks whether a function ID already appears on this path.
@@ -58,7 +69,8 @@ export class InvocationCallStack {
    */
   hasEffect(functionId: string): Effect.Effect<boolean, RecursionFailure> {
     return recursionOperation("recursion.has", () =>
-      this.frames.some((frame) => frame.functionId === functionId));
+      this.frames.some((frame) => frame.functionId === functionId),
+    );
   }
 
   /** Synchronous membership adapter.
@@ -82,7 +94,8 @@ export class InvocationCallStack {
         { functionId: frameOrTarget, ...(invocationId === undefined ? {} : { invocationId }) },
         frameOrTarget,
       );
-    if (isFrame(frameOrTarget)) return this.enterFrameEffect(frameOrTarget, frameOrTarget.functionId);
+    if (isFrame(frameOrTarget))
+      return this.enterFrameEffect(frameOrTarget, frameOrTarget.functionId);
     return this.enterDescriptorEffect(frameOrTarget, invocationId);
   }
 
@@ -96,7 +109,10 @@ export class InvocationCallStack {
   enter(frame: InvocationCallFrame): InvocationCallStack;
   enter(functionId: string, invocationId?: string): InvocationCallStack;
   enter(target: object & DescriptorIdentitySource, invocationId?: string): InvocationCallStack;
-  enter(frameOrTarget: InvocationCallFrame | object | string, invocationId?: string): InvocationCallStack {
+  enter(
+    frameOrTarget: InvocationCallFrame | object | string,
+    invocationId?: string,
+  ): InvocationCallStack {
     return runRecursionSync(this.enterEffect(frameOrTarget, invocationId));
   }
 
@@ -112,7 +128,8 @@ export class InvocationCallStack {
         { functionId: identity.id, ...(invocationId === undefined ? {} : { invocationId }) },
         identity.key,
         descriptor,
-      ));
+      ),
+    );
   }
 
   /** Synchronous descriptor entry adapter.
@@ -122,7 +139,10 @@ export class InvocationCallStack {
    * @throws RecursionPolicyError for a repeated descriptor.
    * @example stack.enterDescriptor(descriptor);
    */
-  enterDescriptor(descriptor: object & DescriptorIdentitySource, invocationId?: string): InvocationCallStack {
+  enterDescriptor(
+    descriptor: object & DescriptorIdentitySource,
+    invocationId?: string,
+  ): InvocationCallStack {
     return runRecursionSync(this.enterDescriptorEffect(descriptor, invocationId));
   }
 
@@ -143,18 +163,26 @@ export class InvocationCallStack {
    * @throws RecursionPolicyError for a repeated target.
    * @example stack.enterTarget(descriptor);
    */
-  enterTarget(descriptor: object & DescriptorIdentitySource, invocationId?: string): InvocationCallStack {
+  enterTarget(
+    descriptor: object & DescriptorIdentitySource,
+    invocationId?: string,
+  ): InvocationCallStack {
     return runRecursionSync(this.enterTargetEffect(descriptor, invocationId));
   }
 
   private enterFrameEffect(frame: InvocationCallFrame, key: object | string, descriptor?: object) {
     return recursionOperation("recursion.enter", () => {
       validateFunctionId(frame.functionId);
-      const repeatedAt = this.keys.findIndex((entry, index) =>
-        entry === key || (descriptor !== undefined && this.descriptors[index] === descriptor));
+      const repeatedAt = this.keys.findIndex(
+        (entry, index) =>
+          entry === key || (descriptor !== undefined && this.descriptors[index] === descriptor),
+      );
       if (repeatedAt >= 0) {
         const ids = this.frames.map((entry) => entry.functionId);
-        throw new RecursionPolicyError(frame.functionId, ids, [...ids.slice(repeatedAt), frame.functionId]);
+        throw new RecursionPolicyError(frame.functionId, ids, [
+          ...ids.slice(repeatedAt),
+          frame.functionId,
+        ]);
       }
       return new InvocationCallStack(
         [...this.frames, frame],
@@ -180,7 +208,9 @@ export function createInvocationCallStackEffect(frames: readonly InvocationCallF
  * @throws TypeError for invalid frames.
  * @example createInvocationCallStack();
  */
-export function createInvocationCallStack(frames: readonly InvocationCallFrame[] = []): InvocationCallStack {
+export function createInvocationCallStack(
+  frames: readonly InvocationCallFrame[] = [],
+): InvocationCallStack {
   return runRecursionSync(createInvocationCallStackEffect(frames));
 }
 

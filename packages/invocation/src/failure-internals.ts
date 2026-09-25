@@ -15,9 +15,10 @@ export class FailureDetailError extends Data.TaggedError("FailureDetailError")<{
 /** Substitutable private failure detail registry.
  * @example Effect.provide(readFailureDetailEffect(failure), FailureDetailStoreLive);
  */
-export class FailureDetailStore extends Context.Service<FailureDetailStore, FailureDetailStoreService>()(
-  "relkit/invocation/FailureDetailStore",
-) {}
+export class FailureDetailStore extends Context.Service<
+  FailureDetailStore,
+  FailureDetailStoreService
+>()("relkit/invocation/FailureDetailStore") {}
 
 const liveStore: FailureDetailStoreService = { details: new WeakMap() };
 
@@ -38,23 +39,25 @@ export function rememberFailureEffect(
   cause: unknown,
   fallbackStack: string | undefined,
 ): Effect.Effect<void, FailureDetailError> {
-  return observeInvocation("failure.detail-remember", Effect.flatMap(
-    Effect.serviceOption(FailureDetailStore),
-    (provided) => Effect.suspend(() => {
-      try {
-        const stack = readStack(cause) ?? fallbackStack;
-        (Option.isSome(provided) ? provided.value : liveStore).details.set(target, {
-          ...(cause === undefined ? {} : { cause }),
-          ...(stack === undefined ? {} : { stack }),
-        });
-        return Effect.void;
-      } catch (cause) {
-        return cause instanceof TypeError
-          ? Effect.fail(new FailureDetailError({ cause, message: cause.message }))
-          : Effect.die(cause);
-      }
-    }),
-  ));
+  return observeInvocation(
+    "failure.detail-remember",
+    Effect.flatMap(Effect.serviceOption(FailureDetailStore), (provided) =>
+      Effect.suspend(() => {
+        try {
+          const stack = readStack(cause) ?? fallbackStack;
+          (Option.isSome(provided) ? provided.value : liveStore).details.set(target, {
+            ...(cause === undefined ? {} : { cause }),
+            ...(stack === undefined ? {} : { stack }),
+          });
+          return Effect.void;
+        } catch (cause) {
+          return cause instanceof TypeError
+            ? Effect.fail(new FailureDetailError({ cause, message: cause.message }))
+            : Effect.die(cause);
+        }
+      }),
+    ),
+  );
 }
 
 /** Synchronous private detail store adapter.
@@ -70,8 +73,9 @@ export function rememberFailure(
   cause: unknown,
   fallbackStack: string | undefined,
 ): void {
-  try { runInvocationSync(rememberFailureEffect(target, cause, fallbackStack)); }
-  catch (cause) {
+  try {
+    runInvocationSync(rememberFailureEffect(target, cause, fallbackStack));
+  } catch (cause) {
     if (cause instanceof FailureDetailError) throw cause.cause;
     throw cause;
   }
@@ -83,11 +87,12 @@ export function rememberFailure(
  * @example Effect.runSync(readFailureDetailEffect(failure));
  */
 export function readFailureDetailEffect(target: object): Effect.Effect<FailureDetail | undefined> {
-  return observeInvocation("failure.detail-read", Effect.flatMap(
-    Effect.serviceOption(FailureDetailStore),
-    (provided) => Effect.sync(() =>
-      (Option.isSome(provided) ? provided.value : liveStore).details.get(target)),
-  ));
+  return observeInvocation(
+    "failure.detail-read",
+    Effect.flatMap(Effect.serviceOption(FailureDetailStore), (provided) =>
+      Effect.sync(() => (Option.isSome(provided) ? provided.value : liveStore).details.get(target)),
+    ),
+  );
 }
 
 /** Synchronous private detail lookup adapter.

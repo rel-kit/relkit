@@ -1,12 +1,7 @@
 import { Effect } from "effect";
 import { FailureDetailError, rememberFailureEffect } from "./failure-internals.js";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
-import type {
-  ErrorRetry,
-  FailureKind,
-  FailureOutcome,
-  FailureTag,
-} from "./failure.types.js";
+import type { ErrorRetry, FailureKind, FailureOutcome, FailureTag } from "./failure.types.js";
 import type { FailureSpec } from "./failure-runtime.types.js";
 
 export type { FailureSpec } from "./failure-runtime.types.js";
@@ -40,8 +35,14 @@ export class RuntimeFailure {
  * @returns A RuntimeFailure; malformed inputs remain defects.
  * @example Effect.runSync(makeFailureEffect(spec, cause));
  */
-export function makeFailureEffect(spec: FailureSpec, cause: unknown): Effect.Effect<RuntimeFailure> {
-  return observeInvocation("failure.create", Effect.sync(() => new RuntimeFailure(spec, cause)));
+export function makeFailureEffect(
+  spec: FailureSpec,
+  cause: unknown,
+): Effect.Effect<RuntimeFailure> {
+  return observeInvocation(
+    "failure.create",
+    Effect.sync(() => new RuntimeFailure(spec, cause)),
+  );
 }
 
 /** Synchronous runtime failure construction adapter.
@@ -60,9 +61,12 @@ function initializeRuntimeFailureEffect(
   spec: FailureSpec,
   cause: unknown,
 ): Effect.Effect<void, FailureDetailError> {
-  return observeInvocation("failure.construct", Effect.gen(function* () {
-    yield* Effect.sync(() => Object.assign(target, spec));
-    yield* rememberFailureEffect(target, cause, undefined);
-    yield* Effect.sync(() => Object.freeze(target));
-  }));
+  return observeInvocation(
+    "failure.construct",
+    Effect.gen(function* () {
+      yield* Effect.sync(() => Object.assign(target, spec));
+      yield* rememberFailureEffect(target, cause, undefined);
+      yield* Effect.sync(() => Object.freeze(target));
+    }),
+  );
 }

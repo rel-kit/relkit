@@ -15,7 +15,7 @@ import {
 describe("trace propagation", () => {
   test("reads the live execution scope and preserves trace identity", () => {
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
     });
     const span = startRootSpan(runtime, "request", "server");
     expect(Effect.runSync(spanContextEffect(span))).toEqual(spanContext(span));
@@ -35,19 +35,24 @@ describe("trace propagation", () => {
 
   test("uses a deterministic reader Layer and rejects invalid IDs", () => {
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
     });
     const span = startRootSpan(runtime, "request", "server");
     const valid = Layer.succeed(TraceContextReader, {
       current: () => ({ span, runtime, correlationId: "correlation-1" }),
     });
-    expect(
-      Effect.runSync(Effect.provide(currentTracePropagationEffect(), valid)),
-    ).toMatchObject({ correlationId: "correlation-1" });
-    const invalid = Layer.succeed(TraceContextReader, {
-      current: () => ({ span: Tracer.externalSpan({ traceId: "bad", spanId: "bad", sampled: true }), runtime }),
+    expect(Effect.runSync(Effect.provide(currentTracePropagationEffect(), valid))).toMatchObject({
+      correlationId: "correlation-1",
     });
-    expect(Effect.runSync(Effect.provide(currentTracePropagationEffect(), invalid))).toBeUndefined();
+    const invalid = Layer.succeed(TraceContextReader, {
+      current: () => ({
+        span: Tracer.externalSpan({ traceId: "bad", spanId: "bad", sampled: true }),
+        runtime,
+      }),
+    });
+    expect(
+      Effect.runSync(Effect.provide(currentTracePropagationEffect(), invalid)),
+    ).toBeUndefined();
     runtime.close();
   });
 });

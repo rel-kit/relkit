@@ -14,7 +14,10 @@ import type { JsonPrimitive, JsonValue } from "./json.types.js";
 // and packages/client/src/jobs/reconcile.ts before removing this compatibility.
 export class JsonValueError extends TypeError {
   readonly _tag = "JsonValueError" as const;
-  constructor(readonly path: string, readonly reason: string) {
+  constructor(
+    readonly path: string,
+    readonly reason: string,
+  ) {
     super(`Invalid JSON value at ${path}: ${reason}`);
     this.name = "JsonValueError";
   }

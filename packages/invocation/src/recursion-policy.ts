@@ -39,14 +39,18 @@ export function recursionOperation<A>(
   operation: "recursion.create" | "recursion.ids" | "recursion.has" | "recursion.enter",
   body: () => A,
 ): Effect.Effect<A, RecursionFailure> {
-  return observeInvocation(operation, Effect.suspend(() => {
-    try { return Effect.succeed(body()); }
-    catch (cause) {
-      if (cause instanceof RecursionPolicyError || cause instanceof TypeError)
-        return Effect.fail(new RecursionFailure({ cause, message: cause.message }));
-      return Effect.die(cause);
-    }
-  }));
+  return observeInvocation(
+    operation,
+    Effect.suspend(() => {
+      try {
+        return Effect.succeed(body());
+      } catch (cause) {
+        if (cause instanceof RecursionPolicyError || cause instanceof TypeError)
+          return Effect.fail(new RecursionFailure({ cause, message: cause.message }));
+        return Effect.die(cause);
+      }
+    }),
+  );
 }
 
 /** Runs a recursion Effect as a synchronous compatibility operation.
@@ -58,8 +62,9 @@ export function recursionOperation<A>(
 export function runRecursionSync<A>(
   effect: Effect.Effect<A, RecursionFailure | DescriptorIdentityFailure>,
 ): A {
-  try { return runInvocationSync(effect); }
-  catch (cause) {
+  try {
+    return runInvocationSync(effect);
+  } catch (cause) {
     if (cause instanceof RecursionFailure || cause instanceof DescriptorIdentityFailure)
       throw cause.cause;
     throw cause;

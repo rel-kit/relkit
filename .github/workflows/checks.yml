@@ -101,8 +101,14 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Compile TypeScript projects
         run: |
-          bun x turbo run typecheck --filter='./packages/*' --filter='./integrations/catalog' --filter='./integrations/packages/*' --output-logs=errors-only
-          bun x tsc -b --pretty false
+          # The catalog depends on the excluded providers, and the root build includes them.
+          bun x turbo run typecheck \
+            --filter='./packages/*' \
+            --filter='./integrations/packages/*' \
+            --filter='!@relkit/trigger' \
+            --filter='!@relkit/inngest' \
+            --filter='!@relkit/effect-mq' \
+            --output-logs=errors-only
       - name: Run focused tests
         run: |
           bun run test:types

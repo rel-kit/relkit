@@ -33,8 +33,10 @@ describe("invocation deadlines", () => {
       [undefined, Number.MAX_VALUE, Number.MAX_VALUE, "timeoutMs"],
     ] as const) {
       const error = Effect.runSync(
-        Effect.catchTag(composeDeadlineEffect(parent, timeout, now), "DeadlineValidationError", (e) =>
-          Effect.succeed(e),
+        Effect.catchTag(
+          composeDeadlineEffect(parent, timeout, now),
+          "DeadlineValidationError",
+          (e) => Effect.succeed(e),
         ),
       );
       expect(error).toBeInstanceOf(DeadlineValidationError);

@@ -128,7 +128,9 @@ export interface InvocationDispatcher {
     Input = unknown,
     Output = unknown,
     Context extends { readonly signal: AbortSignal } = InvocationContext,
-  >(request: InvocationDispatchRequest<Input, Output, Context>) => Promise<Output>;
+  >(
+    request: InvocationDispatchRequest<Input, Output, Context>,
+  ) => Promise<Output>;
 }
 
 /** Dynamic scope inherited by nested invocation calls.

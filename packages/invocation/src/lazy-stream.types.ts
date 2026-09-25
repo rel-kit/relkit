@@ -11,19 +11,26 @@ export interface LazyEffectIterator<T> extends AsyncIterator<T> {
    * @returns An iterator result or a typed lifecycle/source failure.
    * @example Effect.runPromise(iterator.nextEffect());
    */
-  readonly nextEffect: () => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
+  readonly nextEffect: () => Effect.Effect<
+    IteratorResult<T>,
+    StreamLifecycleFailure | StreamSourceFailure
+  >;
   /** Closes the source through Effect.
    * @param value - Optional final value.
    * @returns Final iterator result or typed lifecycle/source failure.
    * @example Effect.runPromise(iterator.returnEffect());
    */
-  readonly returnEffect: (value?: unknown) => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
+  readonly returnEffect: (
+    value?: unknown,
+  ) => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
   /** Throws into the source through Effect.
    * @param error - Error to deliver.
    * @returns Iterator result or typed lifecycle/source failure.
    * @example Effect.runPromise(iterator.throwEffect(error));
    */
-  readonly throwEffect: (error?: unknown) => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
+  readonly throwEffect: (
+    error?: unknown,
+  ) => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
 }
 
 /** Single-consumer iterable with an Effect-capable iterator.

@@ -25,13 +25,15 @@ describe("span Effect operations", () => {
       },
     });
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
       limits: { attributes: 1, events: 1, links: 1, updates: 10 },
       capture: (value) => ({ bytes: 1, truncated: false, content: value as null }),
     });
     const span = runtime.start(options);
     const linked = Tracer.externalSpan({
-      traceId: createTraceId(), spanId: createSpanId(), sampled: true,
+      traceId: createTraceId(),
+      spanId: createSpanId(),
+      sampled: true,
     });
     const program = Effect.gen(function* () {
       yield* span.attributeEffect("key", "value");
@@ -56,8 +58,15 @@ describe("span Effect operations", () => {
     expect(span.droppedLinks).toBe(1);
     expect(span.captures.input?.content).toBeNull();
     expect(span.status._tag).toBe("Ended");
-    expect(operations).toEqual(expect.arrayContaining([
-      "span.attribute", "span.rename", "span.event", "span.capture", "span.links", "span.end",
-    ]));
+    expect(operations).toEqual(
+      expect.arrayContaining([
+        "span.attribute",
+        "span.rename",
+        "span.event",
+        "span.capture",
+        "span.links",
+        "span.end",
+      ]),
+    );
   });
 });

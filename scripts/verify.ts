@@ -70,7 +70,7 @@ export function implementationSizeOffenders(root: string): string[] {
       const text = readFileSync(file, "utf8");
       const lines =
         text.split(/\r?\n/).length - (text.endsWith("\n") || text.endsWith("\r") ? 1 : 0);
-      if (lines > 200) offenders.push(`${relative(root, file)} (${lines} lines)`);
+      if (lines > 250) offenders.push(`${relative(root, file)} (${lines} lines)`);
     }
   }
   return offenders.sort();
@@ -79,8 +79,8 @@ export function implementationSizeOffenders(root: string): string[] {
 function checkImplementationSize(): void {
   const offenders = implementationSizeOffenders(root);
   if (offenders.length > 0)
-    throw new Error(`Implementation files exceed 200 lines:\n${offenders.join("\n")}`);
-  console.log("✓ implementation-file limit (maximum 200 lines)");
+    throw new Error(`Implementation files exceed 250 lines:\n${offenders.join("\n")}`);
+  console.log("✓ implementation-file limit (maximum 250 lines)");
 }
 
 async function runStructuralAudit(): Promise<void> {

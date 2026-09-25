@@ -23,7 +23,9 @@ export class RuntimeIntegrationPlanVersionError extends TypeError {
   readonly _tag = "RuntimeIntegrationPlanVersionError" as const;
   readonly code = "RELKIT_RUNTIME_INTEGRATION_PLAN_VERSION_UNSUPPORTED" as const;
   constructor(readonly version: unknown) {
-    super(`Runtime-integration plan version ${String(version)} is unsupported; expected ${RUNTIME_INTEGRATION_PLAN_VERSION}. Regenerate with \`relkit check\`.`);
+    super(
+      `Runtime-integration plan version ${String(version)} is unsupported; expected ${RUNTIME_INTEGRATION_PLAN_VERSION}. Regenerate with \`relkit check\`.`,
+    );
     this.name = "RuntimeIntegrationPlanVersionError";
   }
 }

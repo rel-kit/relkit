@@ -11,18 +11,24 @@ import type { DependencyNotConfiguredCause, ProviderFailure } from "./failure-de
 export function dependencyNotConfiguredFailureEffect(
   cause: DependencyNotConfiguredCause,
 ): Effect.Effect<ProviderFailure> {
-  return observeInvocation("failure.dependency", Effect.map(makeFailureEffect(
-    {
-      _tag: "ProviderFailure",
-      kind: "provider",
-      outcome: "provider-failure",
-      code: "RELKIT_DEPENDENCY_NOT_CONFIGURED",
-      message: `Managed dependency "${cause.category}.${cause.dependencyName}" is not configured`,
-      capability: cause.category,
-      profile: cause.dependencyName,
-    },
-    cause,
-  ), (failure) => failure as ProviderFailure));
+  return observeInvocation(
+    "failure.dependency",
+    Effect.map(
+      makeFailureEffect(
+        {
+          _tag: "ProviderFailure",
+          kind: "provider",
+          outcome: "provider-failure",
+          code: "RELKIT_DEPENDENCY_NOT_CONFIGURED",
+          message: `Managed dependency "${cause.category}.${cause.dependencyName}" is not configured`,
+          capability: cause.category,
+          profile: cause.dependencyName,
+        },
+        cause,
+      ),
+      (failure) => failure as ProviderFailure,
+    ),
+  );
 }
 
 /** Synchronous missing dependency failure adapter.
@@ -30,6 +36,8 @@ export function dependencyNotConfiguredFailureEffect(
  * @returns A frozen provider failure.
  * @example dependencyNotConfiguredFailure({ category: "cache", dependencyName: "main" });
  */
-export function dependencyNotConfiguredFailure(cause: DependencyNotConfiguredCause): ProviderFailure {
+export function dependencyNotConfiguredFailure(
+  cause: DependencyNotConfiguredCause,
+): ProviderFailure {
   return runInvocationSync(dependencyNotConfiguredFailureEffect(cause));
 }

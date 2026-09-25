@@ -440,6 +440,9 @@
         "react": "19.2.8",
         "react-dom": "19.2.8",
       },
+      "devDependencies": {
+        "vitest": "5.0.1",
+      },
     },
     "packages/client": {
       "name": "@relkit/client",

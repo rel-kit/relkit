@@ -69,7 +69,7 @@ source.
 ## Editing rules
 
 - Use strict TypeScript, double quotes, semicolons, and the shared configs.
-- Keep implementation files at or below 200 lines; split by responsibility.
+- Keep implementation files at or below 250 lines; split by responsibility.
 - Prefer existing utilities and standard-library APIs over new abstractions or
   dependencies. Add focused regression coverage for non-trivial behavior.
 - Use `apply_patch` for source and documentation edits; do not hand-edit

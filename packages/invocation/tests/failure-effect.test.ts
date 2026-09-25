@@ -20,9 +20,14 @@ import {
 
 describe("Effect failure construction and normalization", () => {
   test("builds each stable failure kind", () => {
-    const application = Effect.runSync(applicationFailureEffect({
-      id: "errors.duplicate", message: "Duplicate", data: { key: 1 }, retry: "never",
-    }));
+    const application = Effect.runSync(
+      applicationFailureEffect({
+        id: "errors.duplicate",
+        message: "Duplicate",
+        data: { key: 1 },
+        retry: "never",
+      }),
+    );
     expect(application).toMatchObject({ _tag: "ApplicationFailure", retry: "never" });
     expect(Effect.runSync(providerFailureEffect(new Error("offline"))).kind).toBe("provider");
     expect(Effect.runSync(cancellationFailureEffect()).kind).toBe("cancellation");
@@ -35,9 +40,11 @@ describe("Effect failure construction and normalization", () => {
 
   test("tags malformed factory input and preserves the public TypeError", () => {
     const options = { id: "", message: "Duplicate", data: null };
-    const failure = Effect.runSync(Effect.catchTag(
-      applicationFailureEffect(options), "RequiredTextError", (error) => Effect.succeed(error),
-    ));
+    const failure = Effect.runSync(
+      Effect.catchTag(applicationFailureEffect(options), "RequiredTextError", (error) =>
+        Effect.succeed(error),
+      ),
+    );
     expect(failure).toBeInstanceOf(RequiredTextError);
     expect(() => applicationFailure(options)).toThrow(TypeError);
   });
@@ -47,21 +54,32 @@ describe("Effect failure construction and normalization", () => {
     const failure = Effect.runSync(normalizeFailureEffect(cause, { source: "provider" }));
     expect(failure).toMatchObject({ _tag: "ProviderFailure", code: "RELKIT_PROVIDER_FAILURE" });
     expect(Effect.runSync(toPublicEnvelopeEffect(failure))).toEqual({
-      kind: "provider", outcome: "provider-failure", code: "RELKIT_PROVIDER_FAILURE",
+      kind: "provider",
+      outcome: "provider-failure",
+      code: "RELKIT_PROVIDER_FAILURE",
       message: "Provider operation failed",
     });
   });
 
   test("includes safe declared data and optional retry fields only when present", () => {
     const declared = applicationFailure({
-      id: "errors.retry", message: "Retry later", data: { safe: true },
-      retry: "later", afterMs: 25, status: 429,
+      id: "errors.retry",
+      message: "Retry later",
+      data: { safe: true },
+      retry: "later",
+      afterMs: 25,
+      status: 429,
     });
     expect(toPublicEnvelope(declared)).toMatchObject({
-      data: { safe: true }, retry: "later", afterMs: 25, status: 429,
+      data: { safe: true },
+      retry: "later",
+      afterMs: 25,
+      status: 429,
     });
     const unsafe = applicationFailure({
-      id: "errors.unsafe", message: "Unsafe", data: new Error("private"),
+      id: "errors.unsafe",
+      message: "Unsafe",
+      data: new Error("private"),
     });
     expect(toPublicEnvelope(unsafe)).not.toHaveProperty("data");
     expect(toPublicEnvelope(unsafe)).not.toHaveProperty("status");
@@ -75,10 +93,11 @@ describe("Effect failure construction and normalization", () => {
       ref: { kind: "error", id: "" },
       data: null,
     });
-    const failure = Effect.runSync(Effect.catchTag(
-      normalizeFailureEffect(declared), "FailureNormalizationError",
-      (error) => Effect.succeed(error),
-    ));
+    const failure = Effect.runSync(
+      Effect.catchTag(normalizeFailureEffect(declared), "FailureNormalizationError", (error) =>
+        Effect.succeed(error),
+      ),
+    );
     expect(failure).toBeInstanceOf(FailureNormalizationError);
     expect(() => normalizeFailure(declared)).toThrow(TypeError);
     expect(() => toPublicEnvelope(declared)).toThrow(TypeError);

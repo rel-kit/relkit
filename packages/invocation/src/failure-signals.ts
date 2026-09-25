@@ -17,7 +17,9 @@ export class RequiredTextError extends Data.TaggedError("RequiredTextError")<{
 export function isProviderErrorEffect(value: unknown): Effect.Effect<boolean> {
   return observeInvocation(
     "failure.is-provider",
-    Effect.sync(() => isRecord(value) && (value._tag === "ProviderError" || value.name === "ProviderError")),
+    Effect.sync(
+      () => isRecord(value) && (value._tag === "ProviderError" || value.name === "ProviderError"),
+    ),
   );
 }
 
@@ -38,11 +40,12 @@ export function isProviderError(value: unknown): boolean {
 export function isDependencyNotConfiguredEffect(value: unknown): Effect.Effect<boolean> {
   return observeInvocation(
     "failure.is-dependency",
-    Effect.sync(() =>
-      isRecord(value) &&
-      value.name === "DependencyNotConfiguredError" &&
-      typeof value.category === "string" &&
-      typeof value.dependencyName === "string",
+    Effect.sync(
+      () =>
+        isRecord(value) &&
+        value.name === "DependencyNotConfiguredError" &&
+        typeof value.category === "string" &&
+        typeof value.dependencyName === "string",
     ),
   );
 }
@@ -68,13 +71,14 @@ export function isDependencyNotConfigured(value: unknown): value is {
 export function isCancellationEffect(value: unknown): Effect.Effect<boolean> {
   return observeInvocation(
     "failure.is-cancellation",
-    Effect.sync(() =>
-      isRecord(value) &&
-      (value.name === "AbortError" ||
-        value.name === "CanceledError" ||
-        value.code === "ABORT_ERR" ||
-        value.code === "ERR_ABORTED" ||
-        value._tag === "Abort"),
+    Effect.sync(
+      () =>
+        isRecord(value) &&
+        (value.name === "AbortError" ||
+          value.name === "CanceledError" ||
+          value.code === "ABORT_ERR" ||
+          value.code === "ERR_ABORTED" ||
+          value._tag === "Abort"),
     ),
   );
 }
@@ -96,12 +100,13 @@ export function isCancellation(value: unknown): boolean {
 export function isTimeoutEffect(value: unknown): Effect.Effect<boolean> {
   return observeInvocation(
     "failure.is-timeout",
-    Effect.sync(() =>
-      Cause.isTimeoutError(value) ||
-      (isRecord(value) &&
-        (value.name === "TimeoutError" ||
-          value._tag === "TimeoutError" ||
-          value.code === "ETIMEDOUT")),
+    Effect.sync(
+      () =>
+        Cause.isTimeoutError(value) ||
+        (isRecord(value) &&
+          (value.name === "TimeoutError" ||
+            value._tag === "TimeoutError" ||
+            value.code === "ETIMEDOUT")),
     ),
   );
 }
@@ -121,13 +126,18 @@ export function isTimeout(value: unknown): boolean {
  * @returns Original value or `RequiredTextError`.
  * @example Effect.runSync(requiredTextEffect("orders.not-found", "id"));
  */
-export function requiredTextEffect(value: string, label: string): Effect.Effect<string, RequiredTextError> {
+export function requiredTextEffect(
+  value: string,
+  label: string,
+): Effect.Effect<string, RequiredTextError> {
   return observeInvocation(
     "failure.required-text",
     Effect.suspend(() =>
       value.trim().length > 0
         ? Effect.succeed(value)
-        : Effect.fail(new RequiredTextError({ field: label, message: `${label} must be non-empty` })),
+        : Effect.fail(
+            new RequiredTextError({ field: label, message: `${label} must be non-empty` }),
+          ),
     ),
   );
 }

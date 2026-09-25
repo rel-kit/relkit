@@ -4,7 +4,11 @@ import { createAbortBridge } from "./abort.js";
 import { withDeadline, withTimeout } from "./deadline.js";
 import { isDeclaredError, isFunctionFailure } from "./failure-guards.js";
 import { normalizeFailure } from "./failure.js";
-import type { HandlerBridgeOptions, InvocationFailure, SuspensionOptions } from "./handler-bridge.types.js";
+import type {
+  HandlerBridgeOptions,
+  InvocationFailure,
+  SuspensionOptions,
+} from "./handler-bridge.types.js";
 import { isNativeSuspension, markNativeSuspension } from "./native-suspension.js";
 
 export type { HandlerBridgeOptions } from "./handler-bridge.types.js";
@@ -78,9 +82,12 @@ export function invokeUserHandler<Input, Output, Context extends { readonly sign
     options.timeoutMs === undefined
       ? withDeadline(execution, options.deadline)
       : withTimeout(execution, options.timeoutMs, options.deadline);
-  return observeInvocation("handler.invoke", timed.pipe(
-    Effect.mapError((cause) => (isNativeSuspension(cause) ? cause : normalizeFailure(cause))),
-  )) as Effect.Effect<Output, InvocationFailure>;
+  return observeInvocation(
+    "handler.invoke",
+    timed.pipe(
+      Effect.mapError((cause) => (isNativeSuspension(cause) ? cause : normalizeFailure(cause))),
+    ),
+  ) as Effect.Effect<Output, InvocationFailure>;
 }
 
 function completeValue<Output>(

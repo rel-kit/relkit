@@ -21,23 +21,29 @@ import type {
 export function applicationFailureEffect(
   options: ApplicationFailureOptions,
 ): Effect.Effect<ApplicationFailure, ErrorRetryValidationError | RequiredTextError> {
-  return observeInvocation("failure.application", Effect.gen(function* () {
-    const retry = yield* normalizeErrorRetryEffect(options.retry, options.afterMs);
-    const code = yield* requiredTextEffect(options.id, "application failure id");
-    const message = yield* requiredTextEffect(options.message, "application failure message");
-    return makeFailure({
-      _tag: "ApplicationFailure",
-      kind: "application",
-      outcome: "declared-error",
-      code,
-      message,
-      id: options.id,
-      data: options.data,
-      retry: retry.retry,
-      ...(retry.afterMs === undefined ? {} : { afterMs: retry.afterMs }),
-      ...(options.status === undefined ? {} : { status: options.status }),
-    }, options.cause) as ApplicationFailure;
-  }));
+  return observeInvocation(
+    "failure.application",
+    Effect.gen(function* () {
+      const retry = yield* normalizeErrorRetryEffect(options.retry, options.afterMs);
+      const code = yield* requiredTextEffect(options.id, "application failure id");
+      const message = yield* requiredTextEffect(options.message, "application failure message");
+      return makeFailure(
+        {
+          _tag: "ApplicationFailure",
+          kind: "application",
+          outcome: "declared-error",
+          code,
+          message,
+          id: options.id,
+          data: options.data,
+          retry: retry.retry,
+          ...(retry.afterMs === undefined ? {} : { afterMs: retry.afterMs }),
+          ...(options.status === undefined ? {} : { status: options.status }),
+        },
+        options.cause,
+      ) as ApplicationFailure;
+    }),
+  );
 }
 
 /** Synchronous declared application failure adapter.
@@ -47,8 +53,9 @@ export function applicationFailureEffect(
  * @example applicationFailure({ id: "errors.duplicate", message: "Duplicate", data: null });
  */
 export function applicationFailure(options: ApplicationFailureOptions): ApplicationFailure {
-  try { return runInvocationSync(applicationFailureEffect(options)); }
-  catch (cause) {
+  try {
+    return runInvocationSync(applicationFailureEffect(options));
+  } catch (cause) {
     if (cause instanceof ErrorRetryValidationError || cause instanceof RequiredTextError)
       throw new TypeError(cause.message);
     throw cause;
@@ -65,14 +72,23 @@ export function providerFailureEffect(
   cause: unknown,
   options: Omit<ProviderFailureOptions, "cause"> = {},
 ): Effect.Effect<ProviderFailure> {
-  return observeInvocation("failure.provider", Effect.sync(() => makeFailure({
-    _tag: "ProviderFailure",
-    kind: "provider",
-    outcome: "provider-failure",
-    code: "RELKIT_PROVIDER_FAILURE",
-    message: "Provider operation failed",
-    ...options,
-  }, cause) as ProviderFailure));
+  return observeInvocation(
+    "failure.provider",
+    Effect.sync(
+      () =>
+        makeFailure(
+          {
+            _tag: "ProviderFailure",
+            kind: "provider",
+            outcome: "provider-failure",
+            code: "RELKIT_PROVIDER_FAILURE",
+            message: "Provider operation failed",
+            ...options,
+          },
+          cause,
+        ) as ProviderFailure,
+    ),
+  );
 }
 
 /** Synchronous provider failure adapter.
@@ -94,10 +110,22 @@ export function providerFailure(
  * @example Effect.runSync(cancellationFailureEffect());
  */
 export function cancellationFailureEffect(cause?: unknown): Effect.Effect<CancellationFailure> {
-  return observeInvocation("failure.cancellation", Effect.sync(() => makeFailure({
-    _tag: "Cancellation", kind: "cancellation", outcome: "cancelled",
-    code: "RELKIT_CANCELLED", message: "Operation cancelled",
-  }, cause) as CancellationFailure));
+  return observeInvocation(
+    "failure.cancellation",
+    Effect.sync(
+      () =>
+        makeFailure(
+          {
+            _tag: "Cancellation",
+            kind: "cancellation",
+            outcome: "cancelled",
+            code: "RELKIT_CANCELLED",
+            message: "Operation cancelled",
+          },
+          cause,
+        ) as CancellationFailure,
+    ),
+  );
 }
 
 /** Synchronous cancellation failure adapter.
@@ -115,10 +143,22 @@ export function cancellationFailure(cause?: unknown): CancellationFailure {
  * @example Effect.runSync(timeoutFailureEffect());
  */
 export function timeoutFailureEffect(cause?: unknown): Effect.Effect<TimeoutFailure> {
-  return observeInvocation("failure.timeout", Effect.sync(() => makeFailure({
-    _tag: "Timeout", kind: "timeout", outcome: "timeout",
-    code: "RELKIT_TIMEOUT", message: "Operation timed out",
-  }, cause) as TimeoutFailure));
+  return observeInvocation(
+    "failure.timeout",
+    Effect.sync(
+      () =>
+        makeFailure(
+          {
+            _tag: "Timeout",
+            kind: "timeout",
+            outcome: "timeout",
+            code: "RELKIT_TIMEOUT",
+            message: "Operation timed out",
+          },
+          cause,
+        ) as TimeoutFailure,
+    ),
+  );
 }
 
 /** Synchronous timeout failure adapter.
@@ -140,11 +180,22 @@ export function unexpectedDefectEffect(
   cause?: unknown,
   options?: { readonly code?: string; readonly message?: string },
 ): Effect.Effect<UnexpectedDefect> {
-  return observeInvocation("failure.defect", Effect.sync(() => makeFailure({
-    _tag: "UnexpectedDefect", kind: "defect", outcome: "defect",
-    code: options?.code ?? "RELKIT_UNEXPECTED_DEFECT",
-    message: options?.message ?? "Unexpected internal error",
-  }, cause) as UnexpectedDefect));
+  return observeInvocation(
+    "failure.defect",
+    Effect.sync(
+      () =>
+        makeFailure(
+          {
+            _tag: "UnexpectedDefect",
+            kind: "defect",
+            outcome: "defect",
+            code: options?.code ?? "RELKIT_UNEXPECTED_DEFECT",
+            message: options?.message ?? "Unexpected internal error",
+          },
+          cause,
+        ) as UnexpectedDefect,
+    ),
+  );
 }
 
 /** Synchronous unexpected defect adapter.

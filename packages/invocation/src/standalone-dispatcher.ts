@@ -17,23 +17,34 @@ import type {
 export function createStandaloneDispatcherEffect(
   baseOptions: StandaloneDispatcherOptions = {},
 ): Effect.Effect<InvocationDispatcher> {
-  return observeInvocation("standalone.dispatcher-create", Effect.sync(() => {
-    let dispatcher!: InvocationDispatcher;
-    dispatcher = Object.freeze({
-      dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
-        request: InvocationDispatchRequest<Input, Output, Context>,
-      ) => {
-        const options = { ...baseOptions, ...request.options } as InvocationDispatchOptions<Context>;
-        if (isStreamOutput(request.target.output)) {
-          return Promise.resolve(lazySingleConsumerStream(
-            () => runStandalone(request, options, dispatcher, true) as Promise<AsyncIterable<unknown>>,
-          ) as Output);
-        }
-        return runStandalone(request, options, dispatcher, false);
-      },
-    });
-    return dispatcher;
-  }));
+  return observeInvocation(
+    "standalone.dispatcher-create",
+    Effect.sync(() => {
+      let dispatcher!: InvocationDispatcher;
+      dispatcher = Object.freeze({
+        dispatch: <Input, Output, Context extends { readonly signal: AbortSignal }>(
+          request: InvocationDispatchRequest<Input, Output, Context>,
+        ) => {
+          const options = {
+            ...baseOptions,
+            ...request.options,
+          } as InvocationDispatchOptions<Context>;
+          if (isStreamOutput(request.target.output)) {
+            return Promise.resolve(
+              lazySingleConsumerStream(
+                () =>
+                  runStandalone(request, options, dispatcher, true) as Promise<
+                    AsyncIterable<unknown>
+                  >,
+              ) as Output,
+            );
+          }
+          return runStandalone(request, options, dispatcher, false);
+        },
+      });
+      return dispatcher;
+    }),
+  );
 }
 
 /** Synchronous standalone dispatcher compatibility adapter.
@@ -41,7 +52,9 @@ export function createStandaloneDispatcherEffect(
  * @returns An immutable dispatcher.
  * @example createStandaloneDispatcher();
  */
-export function createStandaloneDispatcher(baseOptions: StandaloneDispatcherOptions = {}): InvocationDispatcher {
+export function createStandaloneDispatcher(
+  baseOptions: StandaloneDispatcherOptions = {},
+): InvocationDispatcher {
   return runInvocationSync(createStandaloneDispatcherEffect(baseOptions));
 }
 
@@ -51,8 +64,11 @@ async function runStandalone<Input, Output, Context extends { readonly signal: A
   dispatcher: InvocationDispatcher,
   streamLifecycle: boolean,
 ): Promise<Output> {
-  try { return await Effect.runPromise(invokeStandaloneEffect(request, options, dispatcher, streamLifecycle)); }
-  catch (cause) {
+  try {
+    return await Effect.runPromise(
+      invokeStandaloneEffect(request, options, dispatcher, streamLifecycle),
+    );
+  } catch (cause) {
     if (cause instanceof StandaloneInvocationFailure) throw cause.cause;
     throw cause;
   }

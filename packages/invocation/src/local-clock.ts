@@ -23,35 +23,49 @@ export function createLocalClockEffect(
   signal: AbortSignal,
   now?: () => number,
 ): Effect.Effect<LocalEffectClock> {
-  return observeInvocation("clock.create", Effect.sync(() => {
-    const nowEffect = (): Effect.Effect<Date> => observeInvocation("clock.now",
-      Effect.map(now === undefined ? Clock.currentTimeMillis : Effect.sync(now),
-        (milliseconds) => new Date(milliseconds)));
-    const sleepEffect = (milliseconds: number): Effect.Effect<void, LocalClockFailure> =>
-      observeInvocation("clock.sleep", Effect.suspend(() => {
-        if (!Number.isFinite(milliseconds) || milliseconds < 0)
-          return Effect.fail(new LocalClockFailure({
-            kind: "duration",
-            cause: new RangeError("sleep duration must be finite and non-negative"),
-            message: "Invalid sleep duration",
-          }));
-        if (signal.aborted) return Effect.fail(aborted(signal));
-        return Effect.raceFirst(Effect.sleep(milliseconds), waitForAbort(signal));
-      }));
-    const sleep = async (milliseconds: number): Promise<void> => {
-      try { await Effect.runPromise(sleepEffect(milliseconds)); }
-      catch (cause) {
-        if (cause instanceof LocalClockFailure) throw cause.cause;
-        throw cause;
-      }
-    };
-    return Object.freeze({
-      now: () => runInvocationSync(nowEffect()),
-      sleep,
-      nowEffect,
-      sleepEffect,
-    });
-  }));
+  return observeInvocation(
+    "clock.create",
+    Effect.sync(() => {
+      const nowEffect = (): Effect.Effect<Date> =>
+        observeInvocation(
+          "clock.now",
+          Effect.map(
+            now === undefined ? Clock.currentTimeMillis : Effect.sync(now),
+            (milliseconds) => new Date(milliseconds),
+          ),
+        );
+      const sleepEffect = (milliseconds: number): Effect.Effect<void, LocalClockFailure> =>
+        observeInvocation(
+          "clock.sleep",
+          Effect.suspend(() => {
+            if (!Number.isFinite(milliseconds) || milliseconds < 0)
+              return Effect.fail(
+                new LocalClockFailure({
+                  kind: "duration",
+                  cause: new RangeError("sleep duration must be finite and non-negative"),
+                  message: "Invalid sleep duration",
+                }),
+              );
+            if (signal.aborted) return Effect.fail(aborted(signal));
+            return Effect.raceFirst(Effect.sleep(milliseconds), waitForAbort(signal));
+          }),
+        );
+      const sleep = async (milliseconds: number): Promise<void> => {
+        try {
+          await Effect.runPromise(sleepEffect(milliseconds));
+        } catch (cause) {
+          if (cause instanceof LocalClockFailure) throw cause.cause;
+          throw cause;
+        }
+      };
+      return Object.freeze({
+        now: () => runInvocationSync(nowEffect()),
+        sleep,
+        nowEffect,
+        sleepEffect,
+      });
+    }),
+  );
 }
 
 /** Synchronous clock factory compatibility adapter.
@@ -60,7 +74,10 @@ export function createLocalClockEffect(
  * @returns A public clock with abortable Promise sleep.
  * @example createLocalClock(new AbortController().signal);
  */
-export function createLocalClock(signal: AbortSignal, now: () => number = Date.now): LocalEffectClock {
+export function createLocalClock(
+  signal: AbortSignal,
+  now: () => number = Date.now,
+): LocalEffectClock {
   return runInvocationSync(createLocalClockEffect(signal, now));
 }
 

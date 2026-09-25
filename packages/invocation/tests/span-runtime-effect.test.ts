@@ -7,13 +7,21 @@ import { SpanRuntime } from "../src/index.js";
 describe("span runtime Effect", () => {
   test("uses Effect operations for start, capture, notify, and close", async () => {
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
-      observer: () => { throw new Error("observer failed"); },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+      observer: () => {
+        throw new Error("observer failed");
+      },
       capture: (value) => ({ bytes: 1, truncated: false, content: value as null }),
     });
     const options = {
-      name: "request", parent: Option.none(), annotations: Context.empty(), links: [],
-      startTime: 1n, kind: "server" as const, root: true, sampled: true,
+      name: "request",
+      parent: Option.none(),
+      annotations: Context.empty(),
+      links: [],
+      startTime: 1n,
+      kind: "server" as const,
+      root: true,
+      sampled: true,
     };
     const program = Effect.gen(function* () {
       const span = yield* runtime.startRootEffect(options, createTraceId());

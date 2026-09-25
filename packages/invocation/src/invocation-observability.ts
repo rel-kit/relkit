@@ -4,7 +4,10 @@ import type {
   InvocationTelemetryService,
 } from "./invocation-observability.types.js";
 
-export type { InvocationOperation, InvocationTelemetryService } from "./invocation-observability.types.js";
+export type {
+  InvocationOperation,
+  InvocationTelemetryService,
+} from "./invocation-observability.types.js";
 
 /** Substitutable telemetry for invocation operations.
  * @example Effect.provide(normalizeErrorRetryEffect("later"), InvocationTelemetryLive);
@@ -35,7 +38,9 @@ export function observeInvocation<A, E, R>(
   operation: InvocationOperation,
   effect: Effect.Effect<A, E, R>,
 ): Effect.Effect<A, E, R> {
-  const execute = Effect.fn(function* () { return yield* effect; });
+  const execute = Effect.fn(function* () {
+    return yield* effect;
+  });
   return Effect.flatMap(Effect.serviceOption(InvocationTelemetry), (service) =>
     Option.isSome(service)
       ? service.value.observe(operation, execute())
@@ -49,17 +54,17 @@ function observeLive<A, E, R>(
 ): Effect.Effect<A, E, R> {
   const attributes = { operation };
   const measured = Effect.gen(function* () {
-      const started = yield* Clock.monotonicTimeNanos;
-      yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
-      return yield* Effect.onExit(effect, (exit) =>
-        Effect.gen(function* () {
-          const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
-          yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
-          if (Exit.isFailure(exit))
-            yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
-        }),
-      );
-    });
+    const started = yield* Clock.monotonicTimeNanos;
+    yield* Metric.update(Metric.withAttributes(calls, attributes), 1);
+    return yield* Effect.onExit(effect, (exit) =>
+      Effect.gen(function* () {
+        const elapsed = Number((yield* Clock.monotonicTimeNanos) - started) / 1_000_000;
+        yield* Metric.update(Metric.withAttributes(duration, attributes), Math.max(0, elapsed));
+        if (Exit.isFailure(exit))
+          yield* Metric.update(Metric.withAttributes(failures, attributes), 1);
+      }),
+    );
+  });
   return Effect.flatMap(Effect.option(Effect.currentSpan), (current) =>
     Option.isSome(current) && Reflect.get(current.value, "relkitInvocationSpan") === true
       ? measured

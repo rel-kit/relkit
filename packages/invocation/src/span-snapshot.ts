@@ -8,7 +8,10 @@ import type { SpanLifecycle, SpanCapture } from "./span-snapshot.types.js";
  * @example Effect.runSync(spanSnapshotEffect({ type: "started", span, revision: 0 }));
  */
 export function spanSnapshotEffect(event: SpanLifecycle) {
-  return observeInvocation("span.snapshot", Effect.sync(() => buildSnapshot(event)));
+  return observeInvocation(
+    "span.snapshot",
+    Effect.sync(() => buildSnapshot(event)),
+  );
 }
 
 /** Synchronous span snapshot compatibility adapter.

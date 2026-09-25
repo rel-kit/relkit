@@ -1,11 +1,7 @@
 import { Effect, Semaphore } from "effect";
 import { observeInvocation } from "./invocation-observability.js";
 import { failingManagedIteratorEffect, publicStreamError } from "./managed-stream-failure.js";
-import {
-  runStreamPromise,
-  StreamLifecycleFailure,
-  StreamSourceFailure,
-} from "./stream-errors.js";
+import { runStreamPromise, StreamLifecycleFailure, StreamSourceFailure } from "./stream-errors.js";
 import type {
   ManagedEffectIterator,
   ManagedStreamIOService,
@@ -46,10 +42,14 @@ function activeIterator<T>(
   let terminal: StreamLifecycleFailure | StreamSourceFailure | undefined;
   let cancelIdle: (() => void) | undefined;
 
-  const abortSafely = (reason: unknown): Effect.Effect<void> => Effect.sync(() => {
-    try { options.abort(reason); }
-    catch { /* An observer failure must not prevent stream cleanup. */ }
-  });
+  const abortSafely = (reason: unknown): Effect.Effect<void> =>
+    Effect.sync(() => {
+      try {
+        options.abort(reason);
+      } catch {
+        /* An observer failure must not prevent stream cleanup. */
+      }
+    });
 
   const finish = (error?: unknown): Effect.Effect<void, StreamSourceFailure> =>
     Effect.suspend(() => {
@@ -78,7 +78,8 @@ function activeIterator<T>(
             yield* ignoreFailure(
               Effect.tryPromise({
                 try: () => options.run(async () => source.return?.()),
-                catch: (cause) => new StreamSourceFailure({ cause, message: "Stream close failed" }),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream close failed" }),
               }),
             );
             yield* finish(publicStreamError(failure));
@@ -88,7 +89,9 @@ function activeIterator<T>(
     });
   };
 
-  const cleanup = (failure: StreamLifecycleFailure | StreamSourceFailure): Effect.Effect<never, StreamLifecycleFailure | StreamSourceFailure> =>
+  const cleanup = (
+    failure: StreamLifecycleFailure | StreamSourceFailure,
+  ): Effect.Effect<never, StreamLifecycleFailure | StreamSourceFailure> =>
     Effect.gen(function* () {
       terminal = failure;
       yield* abortSafely(publicStreamError(failure));
@@ -102,58 +105,73 @@ function activeIterator<T>(
       return yield* Effect.fail(failure);
     });
 
-  const nextEffect = (): Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure> =>
+  const nextEffect = (): Effect.Effect<
+    IteratorResult<T>,
+    StreamLifecycleFailure | StreamSourceFailure
+  > =>
     observeInvocation(
       "stream.managed-next",
       semaphore.withPermits(1)(
-        Effect.onInterrupt(Effect.matchEffect(
-          Effect.gen(function* () {
-            if (terminal !== undefined) return yield* Effect.fail(terminal);
-            if (settled) return { value: undefined as T, done: true };
-            cancelIdle?.();
-            const result = yield* Effect.tryPromise({
-              try: () => options.run(() => source.next()),
-              catch: (cause) => new StreamSourceFailure({ cause, message: "Stream source failed" }),
-            });
-            if (result.done) {
-              yield* finish();
-              return { value: undefined as T, done: true };
-            }
-            const validated = yield* Effect.tryPromise({
-              try: () => io.validate(options.schema, result.value),
-              catch: (cause) => new StreamSourceFailure({ cause, message: "Stream validation failed" }),
-            });
-            if (!("value" in validated))
-              return yield* Effect.fail(
-                new StreamLifecycleFailure({
-                  code: "RELKIT_STREAM_ITEM_VALIDATION",
-                  message: "Stream item validation failed",
-                }),
-              );
-            const value = validated.value as T;
-            const bytes = yield* Effect.try({
-              try: () => encodedBytes(value),
-              catch: () =>
-                new StreamLifecycleFailure({
-                  code: "RELKIT_STREAM_ITEM_ENCODING",
-                  message: "Stream item is not JSON encodable",
-                }),
-            });
-            if (bytes > options.maxItemBytes)
-              return yield* Effect.fail(
-                new StreamLifecycleFailure({
-                  code: "RELKIT_STREAM_ITEM_TOO_LARGE",
-                  message: "Encoded stream item exceeds the configured limit",
-                }),
-              );
-            armIdle();
-            return { value, done: false };
-          }),
-          { onFailure: cleanup, onSuccess: Effect.succeed },
-        ), () => Effect.asVoid(Effect.exit(cleanup(new StreamSourceFailure({
-          cause: new DOMException("Stream pull interrupted", "AbortError"),
-          message: "Stream pull interrupted",
-        }))))),
+        Effect.onInterrupt(
+          Effect.matchEffect(
+            Effect.gen(function* () {
+              if (terminal !== undefined) return yield* Effect.fail(terminal);
+              if (settled) return { value: undefined as T, done: true };
+              cancelIdle?.();
+              const result = yield* Effect.tryPromise({
+                try: () => options.run(() => source.next()),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream source failed" }),
+              });
+              if (result.done) {
+                yield* finish();
+                return { value: undefined as T, done: true };
+              }
+              const validated = yield* Effect.tryPromise({
+                try: () => io.validate(options.schema, result.value),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream validation failed" }),
+              });
+              if (!("value" in validated))
+                return yield* Effect.fail(
+                  new StreamLifecycleFailure({
+                    code: "RELKIT_STREAM_ITEM_VALIDATION",
+                    message: "Stream item validation failed",
+                  }),
+                );
+              const value = validated.value as T;
+              const bytes = yield* Effect.try({
+                try: () => encodedBytes(value),
+                catch: () =>
+                  new StreamLifecycleFailure({
+                    code: "RELKIT_STREAM_ITEM_ENCODING",
+                    message: "Stream item is not JSON encodable",
+                  }),
+              });
+              if (bytes > options.maxItemBytes)
+                return yield* Effect.fail(
+                  new StreamLifecycleFailure({
+                    code: "RELKIT_STREAM_ITEM_TOO_LARGE",
+                    message: "Encoded stream item exceeds the configured limit",
+                  }),
+                );
+              armIdle();
+              return { value, done: false };
+            }),
+            { onFailure: cleanup, onSuccess: Effect.succeed },
+          ),
+          () =>
+            Effect.asVoid(
+              Effect.exit(
+                cleanup(
+                  new StreamSourceFailure({
+                    cause: new DOMException("Stream pull interrupted", "AbortError"),
+                    message: "Stream pull interrupted",
+                  }),
+                ),
+              ),
+            ),
+        ),
       ),
     );
 
@@ -169,7 +187,8 @@ function activeIterator<T>(
               catch: (cause) => new StreamSourceFailure({ cause, message: "Stream return failed" }),
             }),
             {
-              onFailure: (failure) => Effect.flatMap(ignoreFailure(finish(failure)), () => Effect.fail(failure)),
+              onFailure: (failure) =>
+                Effect.flatMap(ignoreFailure(finish(failure)), () => Effect.fail(failure)),
               onSuccess: () => Effect.as(finish(), { value: value as T, done: true as const }),
             },
           );

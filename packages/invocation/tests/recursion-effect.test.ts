@@ -20,11 +20,11 @@ describe("Effect recursion policy", () => {
 
   test("tags a cycle with the same public cause", () => {
     const stack = createInvocationCallStack().enter("tasks.run");
-    const failure = Effect.runSync(Effect.catchTag(
-      stack.enterEffect("tasks.run"),
-      "RecursionFailure",
-      (error) => Effect.succeed(error),
-    ));
+    const failure = Effect.runSync(
+      Effect.catchTag(stack.enterEffect("tasks.run"), "RecursionFailure", (error) =>
+        Effect.succeed(error),
+      ),
+    );
     expect(failure).toBeInstanceOf(RecursionFailure);
     expect(failure.cause).toMatchObject({
       code: "RELKIT_RECURSION_DENIED",
@@ -35,11 +35,13 @@ describe("Effect recursion policy", () => {
   });
 
   test("rejects malformed initial frames", () => {
-    const failure = Effect.runSync(Effect.catchTag(
-      createInvocationCallStackEffect([{ functionId: "" }]),
-      "RecursionFailure",
-      (error) => Effect.succeed(error),
-    ));
+    const failure = Effect.runSync(
+      Effect.catchTag(
+        createInvocationCallStackEffect([{ functionId: "" }]),
+        "RecursionFailure",
+        (error) => Effect.succeed(error),
+      ),
+    );
     expect(failure.cause).toBeInstanceOf(TypeError);
     expect(() => createInvocationCallStack([{ functionId: "" }])).toThrow(TypeError);
   });

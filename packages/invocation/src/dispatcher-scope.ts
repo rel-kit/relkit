@@ -32,7 +32,10 @@ export const InvocationScopeStorageLive = Layer.succeed(InvocationScopeStorage, 
  * @example Effect.runSync(currentInvocationScopeEffect());
  */
 export function currentInvocationScopeEffect(): Effect.Effect<InvocationDispatchScope | undefined> {
-  return observeInvocation("scope.current", withStorage((carrier) => carrier.current()));
+  return observeInvocation(
+    "scope.current",
+    withStorage((carrier) => carrier.current()),
+  );
 }
 
 /** Synchronous scope reader compatibility adapter.
@@ -57,7 +60,10 @@ export function runInInvocationScopeEffect<A>(
     "scope.run",
     withStorage((carrier) => {
       const execution = scope.execution ?? carrier.current()?.execution;
-      return carrier.run(Object.freeze({ ...scope, ...(execution ? { execution } : {}) }), callback);
+      return carrier.run(
+        Object.freeze({ ...scope, ...(execution ? { execution } : {}) }),
+        callback,
+      );
     }),
   );
 }
@@ -78,7 +84,10 @@ export function runInInvocationScope<A>(scope: InvocationDispatchScope, callback
  * @example Effect.runSync(currentExecutionContextEffect());
  */
 export function currentExecutionContextEffect(): Effect.Effect<ExecutionContext | undefined> {
-  return observeInvocation("scope.execution-current", withStorage((carrier) => carrier.current()?.execution));
+  return observeInvocation(
+    "scope.execution-current",
+    withStorage((carrier) => carrier.current()?.execution),
+  );
 }
 
 /** Synchronous execution context reader.
@@ -94,7 +103,10 @@ export function currentExecutionContext(): ExecutionContext | undefined {
  * @example Effect.runSync(currentTaskAncestryEffect());
  */
 export function currentTaskAncestryEffect(): Effect.Effect<TaskAncestry | undefined> {
-  return observeInvocation("scope.ancestry-current", withStorage((carrier) => carrier.current()?.taskAncestry));
+  return observeInvocation(
+    "scope.ancestry-current",
+    withStorage((carrier) => carrier.current()?.taskAncestry),
+  );
 }
 
 /** Synchronous task ancestry reader.
@@ -111,7 +123,10 @@ export function currentTaskAncestry(): TaskAncestry | undefined {
  * @returns The callback result; callback failures are defects.
  * @example Effect.runSync(runInTaskAncestryEffect({ runId: "r", taskId: "t" }, () => 1));
  */
-export function runInTaskAncestryEffect<A>(ancestry: TaskAncestry, callback: () => A): Effect.Effect<A> {
+export function runInTaskAncestryEffect<A>(
+  ancestry: TaskAncestry,
+  callback: () => A,
+): Effect.Effect<A> {
   return observeInvocation(
     "scope.ancestry-run",
     withStorage((carrier) =>
@@ -140,7 +155,10 @@ export function runInTaskAncestry<A>(ancestry: TaskAncestry, callback: () => A):
  * @returns The callback result; callback failures are defects.
  * @example Effect.runSync(runInExecutionContextEffect(context, () => 1));
  */
-export function runInExecutionContextEffect<A>(context: ExecutionContext, callback: () => A): Effect.Effect<A> {
+export function runInExecutionContextEffect<A>(
+  context: ExecutionContext,
+  callback: () => A,
+): Effect.Effect<A> {
   return observeInvocation(
     "scope.execution-run",
     withStorage((carrier) =>
@@ -169,7 +187,10 @@ export function runInExecutionContext<A>(context: ExecutionContext, callback: ()
  * @example Effect.runSync(runDetachedExecutionEffect(() => 1));
  */
 export function runDetachedExecutionEffect<A>(callback: () => A): Effect.Effect<A> {
-  return observeInvocation("scope.detached-run", withStorage((carrier) => carrier.run(Object.freeze({}), callback)));
+  return observeInvocation(
+    "scope.detached-run",
+    withStorage((carrier) => carrier.run(Object.freeze({}), callback)),
+  );
 }
 
 /** Synchronous detached execution compatibility adapter.

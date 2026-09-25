@@ -13,15 +13,18 @@ export function safeTraceAttributesEffect(
   attributes: TraceAttributes,
   allowReserved: boolean,
 ): Effect.Effect<TraceAttributes> {
-  return observeInvocation("trace.safe-attributes", Effect.sync(() => {
-    const safe: Record<string, string | number | boolean> = Object.create(null);
-    for (const key of Object.keys(attributes)) {
-      const descriptor = Object.getOwnPropertyDescriptor(attributes, key);
-      if ((allowReserved || !isReservedTraceKey(key)) && descriptor && "value" in descriptor)
-        safe[key] = descriptor.value;
-    }
-    return safe;
-  }));
+  return observeInvocation(
+    "trace.safe-attributes",
+    Effect.sync(() => {
+      const safe: Record<string, string | number | boolean> = Object.create(null);
+      for (const key of Object.keys(attributes)) {
+        const descriptor = Object.getOwnPropertyDescriptor(attributes, key);
+        if ((allowReserved || !isReservedTraceKey(key)) && descriptor && "value" in descriptor)
+          safe[key] = descriptor.value;
+      }
+      return safe;
+    }),
+  );
 }
 
 /** Synchronous safe attribute adapter.
@@ -30,6 +33,9 @@ export function safeTraceAttributesEffect(
  * @returns A safe attribute record.
  * @example safeTraceAttributes({ ok: true }, false);
  */
-export function safeTraceAttributes(attributes: TraceAttributes, allowReserved: boolean): TraceAttributes {
+export function safeTraceAttributes(
+  attributes: TraceAttributes,
+  allowReserved: boolean,
+): TraceAttributes {
   return runInvocationSync(safeTraceAttributesEffect(attributes, allowReserved));
 }

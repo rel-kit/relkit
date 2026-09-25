@@ -1,7 +1,12 @@
 import { isStableId } from "@relkit/contracts";
 import { Effect } from "effect";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
-import { assertIdentityObject, DescriptorIdentityError, identityOperation, runIdentitySync } from "./identity-state.js";
+import {
+  assertIdentityObject,
+  DescriptorIdentityError,
+  identityOperation,
+  runIdentitySync,
+} from "./identity-state.js";
 import type {
   DescriptorIdentitySource,
   IdentityStoreService,
@@ -15,8 +20,10 @@ export const UNBOUND_DESCRIPTOR_ID_PREFIX = "unbound.";
  * @example Effect.runSync(createUnboundIdentityEffect());
  */
 export function createUnboundIdentityEffect() {
-  return identityOperation("identity.create", (store) =>
-    `${UNBOUND_DESCRIPTOR_ID_PREFIX}${store.nextUnboundId()}`);
+  return identityOperation(
+    "identity.create",
+    (store) => `${UNBOUND_DESCRIPTOR_ID_PREFIX}${store.nextUnboundId()}`,
+  );
 }
 
 /** Synchronous unbound ID adapter.
@@ -97,7 +104,10 @@ export function getDescriptorServiceIdentity(descriptor: object): string | undef
  * @example Effect.runSync(isUnboundIdentityEffect("unbound.123"));
  */
 export function isUnboundIdentityEffect(value: unknown): Effect.Effect<boolean> {
-  return observeInvocation("identity.is-unbound", Effect.sync(() => isUnboundIdentityValue(value)));
+  return observeInvocation(
+    "identity.is-unbound",
+    Effect.sync(() => isUnboundIdentityValue(value)),
+  );
 }
 
 /** Synchronous unbound ID predicate adapter.
@@ -142,8 +152,10 @@ function resolveWithStore(
   const declared = readDeclaredId(descriptor);
   if (declared !== undefined && !isUnboundIdentityValue(declared))
     return Object.freeze({ id: declared, canonical: true, key: declared });
-  const id = store.unbound.get(descriptor) ?? declared
-    ?? `${UNBOUND_DESCRIPTOR_ID_PREFIX}${store.nextUnboundId()}`;
+  const id =
+    store.unbound.get(descriptor) ??
+    declared ??
+    `${UNBOUND_DESCRIPTOR_ID_PREFIX}${store.nextUnboundId()}`;
   store.unbound.set(descriptor, id);
   return Object.freeze({ id, canonical: false, key: descriptor });
 }

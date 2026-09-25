@@ -21,9 +21,7 @@ export class RelkitStreamError extends Error {
  */
 export class StreamLifecycleFailure extends Data.TaggedError("StreamLifecycleFailure")<{
   readonly code:
-    | RelkitStreamError["code"]
-    | "RELKIT_STREAM_ITEM_VALIDATION"
-    | "RELKIT_STREAM_ITEM_ENCODING";
+    RelkitStreamError["code"] | "RELKIT_STREAM_ITEM_VALIDATION" | "RELKIT_STREAM_ITEM_ENCODING";
   readonly message: string;
 }> {}
 
@@ -46,7 +44,10 @@ export async function runStreamPromise<A, E>(effect: Effect.Effect<A, E>): Promi
     return await Effect.runPromise(effect);
   } catch (cause) {
     if (cause instanceof StreamLifecycleFailure) {
-      if (cause.code === "RELKIT_STREAM_ITEM_VALIDATION" || cause.code === "RELKIT_STREAM_ITEM_ENCODING")
+      if (
+        cause.code === "RELKIT_STREAM_ITEM_VALIDATION" ||
+        cause.code === "RELKIT_STREAM_ITEM_ENCODING"
+      )
         throw new TypeError(cause.message);
       throw new RelkitStreamError(cause.code, cause.message);
     }

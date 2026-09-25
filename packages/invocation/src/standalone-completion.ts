@@ -22,38 +22,53 @@ export type {
 export function createStandaloneFinisherEffect<Context extends { readonly signal: AbortSignal }>(
   args: StandaloneFinisherOptions<Context>,
 ): Effect.Effect<StandaloneFinisher> {
-  return observeInvocation("standalone.finisher-create", Effect.gen(function* () {
-    let completed = false;
-    const completion = yield* Deferred.make<void, StandaloneRecordError>();
-    const finishEffect: StandaloneFinisher["finishEffect"] = (outcome, error) =>
-      observeInvocation("standalone.finish", Effect.uninterruptible(Effect.gen(function* () {
-        if (completed) {
-          yield* Effect.exit(Deferred.await(completion));
-          return;
+  return observeInvocation(
+    "standalone.finisher-create",
+    Effect.gen(function* () {
+      let completed = false;
+      const completion = yield* Deferred.make<void, StandaloneRecordError>();
+      const finishEffect: StandaloneFinisher["finishEffect"] = (outcome, error) =>
+        observeInvocation(
+          "standalone.finish",
+          Effect.uninterruptible(
+            Effect.gen(function* () {
+              if (completed) {
+                yield* Effect.exit(Deferred.await(completion));
+                return;
+              }
+              completed = true;
+              const result = yield* Effect.exit(
+                Effect.gen(function* () {
+                  yield* Effect.sync(() => args.settleProgress?.());
+                  const record = yield* completeStandaloneRecordEffect(
+                    args.record,
+                    outcome,
+                    args.now(),
+                  );
+                  yield* callHookEffect(args.options.onCompletion, {
+                    record,
+                    outcome,
+                    ...(error === undefined ? {} : { error, publicError: toPublicEnvelope(error) }),
+                  });
+                  yield* callHookEffect(args.options.onRelease, { record, admitted: false });
+                }).pipe(Effect.ensuring(Effect.sync(args.unlink))),
+              );
+              yield* Deferred.done(completion, result);
+              return yield* result;
+            }),
+          ),
+        );
+      const finish: StandaloneFinisher["finish"] = async (outcome, error) => {
+        try {
+          await Effect.runPromise(finishEffect(outcome, error));
+        } catch (cause) {
+          if (cause instanceof StandaloneRecordError) throw new RangeError(cause.message);
+          throw cause;
         }
-        completed = true;
-        const result = yield* Effect.exit(Effect.gen(function* () {
-          yield* Effect.sync(() => args.settleProgress?.());
-          const record = yield* completeStandaloneRecordEffect(args.record, outcome, args.now());
-          yield* callHookEffect(args.options.onCompletion, {
-            record,
-            outcome,
-            ...(error === undefined ? {} : { error, publicError: toPublicEnvelope(error) }),
-          });
-          yield* callHookEffect(args.options.onRelease, { record, admitted: false });
-        }).pipe(Effect.ensuring(Effect.sync(args.unlink))));
-        yield* Deferred.done(completion, result);
-        return yield* result;
-      })));
-    const finish: StandaloneFinisher["finish"] = async (outcome, error) => {
-      try { await Effect.runPromise(finishEffect(outcome, error)); }
-      catch (cause) {
-        if (cause instanceof StandaloneRecordError) throw new RangeError(cause.message);
-        throw cause;
-      }
-    };
-    return { finishEffect, finish };
-  }));
+      };
+      return { finishEffect, finish };
+    }),
+  );
 }
 
 /** Creates the Promise finalizer used by standalone dispatch.

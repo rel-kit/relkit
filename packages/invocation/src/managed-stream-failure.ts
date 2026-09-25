@@ -35,7 +35,10 @@ export function failingManagedIteratorEffect<T>(): Effect.Effect<ManagedEffectIt
  */
 export function publicStreamError(failure: StreamLifecycleFailure | StreamSourceFailure): unknown {
   if (failure instanceof StreamSourceFailure) return failure.cause;
-  if (failure.code === "RELKIT_STREAM_ITEM_VALIDATION" || failure.code === "RELKIT_STREAM_ITEM_ENCODING")
+  if (
+    failure.code === "RELKIT_STREAM_ITEM_VALIDATION" ||
+    failure.code === "RELKIT_STREAM_ITEM_ENCODING"
+  )
     return new TypeError(failure.message);
   return new RelkitStreamError(failure.code, failure.message);
 }

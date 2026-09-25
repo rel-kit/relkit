@@ -15,10 +15,19 @@ export class InvocationPolicyFailure extends Data.TaggedError("InvocationPolicyF
  * @example Effect.runSync(assertSourceEffect("direct"));
  */
 export function assertSourceEffect(value: string): Effect.Effect<void, InvocationPolicyFailure> {
-  return observeInvocation("validation.source", Effect.gen(function* () {
-    if (!("direct http job event-delivery event-replay tool agent" as string).split(" ").includes(value))
-      return yield* Effect.fail(new InvocationPolicyFailure({ message: `Unknown invocation source: ${value}` }));
-  }));
+  return observeInvocation(
+    "validation.source",
+    Effect.gen(function* () {
+      if (
+        !("direct http job event-delivery event-replay tool agent" as string)
+          .split(" ")
+          .includes(value)
+      )
+        return yield* Effect.fail(
+          new InvocationPolicyFailure({ message: `Unknown invocation source: ${value}` }),
+        );
+    }),
+  );
 }
 
 /** Synchronous source assertion compatibility adapter.
@@ -28,8 +37,9 @@ export function assertSourceEffect(value: string): Effect.Effect<void, Invocatio
  * @example assertSource("direct");
  */
 export function assertSource(value: string): asserts value is InvocationSource {
-  try { runInvocationSync(assertSourceEffect(value)); }
-  catch (cause) {
+  try {
+    runInvocationSync(assertSourceEffect(value));
+  } catch (cause) {
     if (cause instanceof InvocationPolicyFailure) throw new TypeError(cause.message);
     throw cause;
   }
@@ -45,17 +55,24 @@ export function assertInvocationModeEffect(
   target: Pick<InvocationTarget, "id" | "invocationMode">,
   source: InvocationSource,
 ): Effect.Effect<void, InvocationPolicyFailure> {
-  return observeInvocation("validation.mode", Effect.gen(function* () {
-    const eventSource = source === "event-delivery" || source === "event-replay";
-    if (target.invocationMode === "event-only" && !eventSource)
-      return yield* Effect.fail(new InvocationPolicyFailure({
-        message: `Event-only function "${target.id}" cannot be invoked from ${source}`,
-      }));
-    if (target.invocationMode !== "event-only" && eventSource)
-      return yield* Effect.fail(new InvocationPolicyFailure({
-        message: `Event delivery cannot target callable function "${target.id}"`,
-      }));
-  }));
+  return observeInvocation(
+    "validation.mode",
+    Effect.gen(function* () {
+      const eventSource = source === "event-delivery" || source === "event-replay";
+      if (target.invocationMode === "event-only" && !eventSource)
+        return yield* Effect.fail(
+          new InvocationPolicyFailure({
+            message: `Event-only function "${target.id}" cannot be invoked from ${source}`,
+          }),
+        );
+      if (target.invocationMode !== "event-only" && eventSource)
+        return yield* Effect.fail(
+          new InvocationPolicyFailure({
+            message: `Event delivery cannot target callable function "${target.id}"`,
+          }),
+        );
+    }),
+  );
 }
 
 /** Synchronous invocation mode assertion compatibility adapter.
@@ -69,8 +86,9 @@ export function assertInvocationMode(
   target: Pick<InvocationTarget, "id" | "invocationMode">,
   source: InvocationSource,
 ): void {
-  try { runInvocationSync(assertInvocationModeEffect(target, source)); }
-  catch (cause) {
+  try {
+    runInvocationSync(assertInvocationModeEffect(target, source));
+  } catch (cause) {
     if (cause instanceof InvocationPolicyFailure) throw new TypeError(cause.message);
     throw cause;
   }

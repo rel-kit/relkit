@@ -34,8 +34,9 @@ describe("standalone lifecycle Effect", () => {
         return Effect.runPromise(effect, runnerOptions);
       },
     });
-    expect(await Effect.runPromise(Effect.provide(runStandaloneLifecycleEffect(options()), layer)))
-      .toBe(2);
+    expect(
+      await Effect.runPromise(Effect.provide(runStandaloneLifecycleEffect(options()), layer)),
+    ).toBe(2);
     expect(phases).toEqual([1, 2, 3]);
     expect(await runStandaloneLifecycle(options())).toBe(2);
   });
@@ -50,11 +51,13 @@ describe("standalone lifecycle Effect", () => {
         return 1;
       },
     };
-    const typed = await Effect.runPromise(Effect.catchTag(
-      runStandaloneLifecycleEffect({ ...options(), runner }),
-      "StandaloneLifecycleFailure",
-      (error) => Effect.succeed(error),
-    ));
+    const typed = await Effect.runPromise(
+      Effect.catchTag(
+        runStandaloneLifecycleEffect({ ...options(), runner }),
+        "StandaloneLifecycleFailure",
+        (error) => Effect.succeed(error),
+      ),
+    );
     expect(typed).toBeInstanceOf(StandaloneLifecycleFailure);
     expect(typed).toMatchObject({ phase: "handler", cause });
     calls = 0;
@@ -64,22 +67,26 @@ describe("standalone lifecycle Effect", () => {
   test("interrupts a pending handler through the public lifecycle Effect", async () => {
     const controller = new AbortController();
     let started!: () => void;
-    const handlerStarted = new Promise<void>((resolve) => { started = resolve; });
+    const handlerStarted = new Promise<void>((resolve) => {
+      started = resolve;
+    });
     let handlerSignal!: AbortSignal;
     const base = options();
-    const fiber = Effect.runFork(runStandaloneLifecycleEffect({
-      ...base,
-      signal: controller.signal,
-      context: { signal: controller.signal },
-      target: {
-        ...base.target,
-        handler: (_input, context) => {
-          handlerSignal = context.signal;
-          started();
-          return new Promise<number>(() => undefined);
+    const fiber = Effect.runFork(
+      runStandaloneLifecycleEffect({
+        ...base,
+        signal: controller.signal,
+        context: { signal: controller.signal },
+        target: {
+          ...base.target,
+          handler: (_input, context) => {
+            handlerSignal = context.signal;
+            started();
+            return new Promise<number>(() => undefined);
+          },
         },
-      },
-    }));
+      }),
+    );
 
     try {
       await handlerStarted;
@@ -95,11 +102,16 @@ describe("standalone lifecycle Effect", () => {
     const add = vi.spyOn(controller.signal, "addEventListener");
     const remove = vi.spyOn(controller.signal, "removeEventListener");
     let started!: () => void;
-    const phaseStarted = new Promise<void>((resolve) => { started = resolve; });
+    const phaseStarted = new Promise<void>((resolve) => {
+      started = resolve;
+    });
     let runnerSignal!: AbortSignal;
     let phases = 0;
     const runner = {
-      run: <A, E>(effect: Effect.Effect<A, E, never>, runnerOptions?: { readonly signal?: AbortSignal }): Promise<A> => {
+      run: <A, E>(
+        effect: Effect.Effect<A, E, never>,
+        runnerOptions?: { readonly signal?: AbortSignal },
+      ): Promise<A> => {
         phases++;
         if (phases === 1) return Effect.runPromise(effect, runnerOptions);
         if (runnerOptions?.signal === undefined) throw new Error("Missing runner signal");
@@ -109,12 +121,14 @@ describe("standalone lifecycle Effect", () => {
       },
     };
     const base = options();
-    const fiber = Effect.runFork(runStandaloneLifecycleEffect({
-      ...base,
-      context: { signal: controller.signal },
-      signal: controller.signal,
-      runner,
-    }));
+    const fiber = Effect.runFork(
+      runStandaloneLifecycleEffect({
+        ...base,
+        context: { signal: controller.signal },
+        signal: controller.signal,
+        runner,
+      }),
+    );
 
     await phaseStarted;
     await Effect.runPromise(Fiber.interrupt(fiber));

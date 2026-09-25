@@ -17,12 +17,15 @@ export function traceEventEffect(
   attributes: TraceAttributes = {},
   allowReserved = false,
 ): Effect.Effect<void> {
-  return observeInvocation("trace.event", Effect.gen(function* () {
-    const active = (yield* currentExecutionContextEffect())?.span;
-    if (!(active instanceof RelkitSpan)) return;
-    const safe = yield* safeTraceAttributesEffect(attributes, allowReserved);
-    active.event(name, yield* Clock.currentTimeNanos, safe);
-  }));
+  return observeInvocation(
+    "trace.event",
+    Effect.gen(function* () {
+      const active = (yield* currentExecutionContextEffect())?.span;
+      if (!(active instanceof RelkitSpan)) return;
+      const safe = yield* safeTraceAttributesEffect(attributes, allowReserved);
+      active.event(name, yield* Clock.currentTimeNanos, safe);
+    }),
+  );
 }
 
 /** Synchronous event adapter for public trace facades.
@@ -32,7 +35,11 @@ export function traceEventEffect(
  * @returns Void.
  * @example traceEvent("cache.hit");
  */
-export function traceEvent(name: string, attributes: TraceAttributes = {}, allowReserved = false): void {
+export function traceEvent(
+  name: string,
+  attributes: TraceAttributes = {},
+  allowReserved = false,
+): void {
   runInvocationSync(traceEventEffect(name, attributes, allowReserved));
 }
 
@@ -46,12 +53,17 @@ export function traceSetAttributesEffect(
   attributes: TraceAttributes,
   allowReserved = false,
 ): Effect.Effect<void> {
-  return observeInvocation("trace.set-attributes", Effect.gen(function* () {
-    const active = (yield* currentExecutionContextEffect())?.span;
-    if (!(active instanceof RelkitSpan)) return;
-    for (const [key, value] of Object.entries(yield* safeTraceAttributesEffect(attributes, allowReserved)))
-      active.attribute(key, value);
-  }));
+  return observeInvocation(
+    "trace.set-attributes",
+    Effect.gen(function* () {
+      const active = (yield* currentExecutionContextEffect())?.span;
+      if (!(active instanceof RelkitSpan)) return;
+      for (const [key, value] of Object.entries(
+        yield* safeTraceAttributesEffect(attributes, allowReserved),
+      ))
+        active.attribute(key, value);
+    }),
+  );
 }
 
 /** Synchronous attribute adapter for public trace facades.
@@ -70,12 +82,15 @@ export function traceSetAttributes(attributes: TraceAttributes, allowReserved = 
  * @example Effect.runSync(traceRenameEffect("http.request"));
  */
 export function traceRenameEffect(name: string): Effect.Effect<void> {
-  return observeInvocation("trace.rename", Effect.flatMap(currentExecutionContextEffect(), (context) =>
-    Effect.sync(() => {
-      const active = context?.span;
-      if (active instanceof RelkitSpan) active.rename(name);
-    }),
-  ));
+  return observeInvocation(
+    "trace.rename",
+    Effect.flatMap(currentExecutionContextEffect(), (context) =>
+      Effect.sync(() => {
+        const active = context?.span;
+        if (active instanceof RelkitSpan) active.rename(name);
+      }),
+    ),
+  );
 }
 
 /** Synchronous span rename adapter.

@@ -34,7 +34,9 @@ describe("invocation streams", () => {
     let starts = 0;
     const stream = lazySingleConsumerStream(async () => {
       starts += 1;
-      return (async function* () { yield 1; })();
+      return (async function* () {
+        yield 1;
+      })();
     });
     const iterator = stream[Symbol.asyncIterator]();
     expect(await iterator.return?.("closed")).toEqual({ value: "closed", done: true });
@@ -51,7 +53,11 @@ describe("invocation streams", () => {
     });
     const stream = Effect.runSync(
       Effect.provide(
-        lazySingleConsumerStreamEffect(async () => (async function* () { yield 3; })()),
+        lazySingleConsumerStreamEffect(async () =>
+          (async function* () {
+            yield 3;
+          })(),
+        ),
         telemetry,
       ),
     );
@@ -88,7 +94,9 @@ describe("invocation streams", () => {
       idleMs: 1000,
       abort: () => events.push("abort"),
       run: (work) => work(),
-      settle: async () => { events.push("settle"); },
+      settle: async () => {
+        events.push("settle");
+      },
     });
     const values: number[] = [];
     for await (const value of stream) values.push(value);
@@ -102,8 +110,11 @@ describe("invocation streams", () => {
   test("aborts, closes, and settles on an invalid item", async () => {
     const events: string[] = [];
     const source = (async function* () {
-      try { yield "wrong"; }
-      finally { events.push("source-return"); }
+      try {
+        yield "wrong";
+      } finally {
+        events.push("source-return");
+      }
     })();
     const stream = managedValidatedStream<number>({
       source,
@@ -112,7 +123,9 @@ describe("invocation streams", () => {
       idleMs: 1000,
       abort: () => events.push("abort"),
       run: (work) => work(),
-      settle: async () => { events.push("settle"); },
+      settle: async () => {
+        events.push("settle");
+      },
     });
     await expect(stream[Symbol.asyncIterator]().next()).rejects.toThrow(
       "Stream item validation failed",
@@ -124,13 +137,17 @@ describe("invocation streams", () => {
     const aborted: unknown[] = [];
     let settlements = 0;
     const stream = managedValidatedStream<string>({
-      source: (async function* () { yield "x".repeat(20); })(),
+      source: (async function* () {
+        yield "x".repeat(20);
+      })(),
       schema: z.string(),
       maxItemBytes: 10,
       idleMs: 1000,
       abort: (reason) => aborted.push(reason),
       run: (work) => work(),
-      settle: async () => { settlements += 1; },
+      settle: async () => {
+        settlements += 1;
+      },
     });
     await expect(stream[Symbol.asyncIterator]().next()).rejects.toMatchObject({
       code: "RELKIT_STREAM_ITEM_TOO_LARGE",
@@ -139,13 +156,17 @@ describe("invocation streams", () => {
     expect(settlements).toBe(1);
 
     const cancelled = managedValidatedStream<number>({
-      source: (async function* () { yield 1; })(),
+      source: (async function* () {
+        yield 1;
+      })(),
       schema: z.number(),
       maxItemBytes: 10,
       idleMs: 1000,
       abort: (reason) => aborted.push(reason),
       run: (work) => work(),
-      settle: async () => { settlements += 1; },
+      settle: async () => {
+        settlements += 1;
+      },
     });
     const iterator = cancelled[Symbol.asyncIterator]();
     expect(await iterator.return?.("stop")).toEqual({ value: "stop", done: true });

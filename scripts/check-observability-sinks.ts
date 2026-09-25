@@ -24,7 +24,9 @@ export const OBSERVABILITY_RECORD_ADAPTERS = Object.freeze([
   // Byte accounting and search operate on admitted, redacted records.
   "packages/observability/src/local/batch-queue-effect.ts",
   "packages/observability/src/query.ts",
+  "packages/observability/src/query-detail-effect.ts",
   "packages/observability/src/query-validation.ts",
+  "packages/observability/src/query-validation-core.ts",
   "packages/observability/src/storage/segments.ts",
   "packages/observability/src/storage/index.ts",
   "packages/observability/src/storage/index-files.ts",

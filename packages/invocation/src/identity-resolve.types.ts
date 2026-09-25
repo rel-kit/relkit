@@ -1,1 +1,5 @@
-export type { DescriptorIdentitySource, IdentityStoreService, ResolvedDescriptorIdentity } from "./identity.types.js";
+export type {
+  DescriptorIdentitySource,
+  IdentityStoreService,
+  ResolvedDescriptorIdentity,
+} from "./identity.types.js";

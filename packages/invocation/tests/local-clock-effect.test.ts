@@ -21,9 +21,9 @@ describe("local Effect clock", () => {
   test("tags invalid duration and preserves RangeError adapter", async () => {
     const clock = createLocalClock(new AbortController().signal, () => 42);
     expect(clock.now().getTime()).toBe(42);
-    const failure = Effect.runSync(Effect.catchTag(
-      clock.sleepEffect(-1), "LocalClockFailure", (error) => Effect.succeed(error),
-    ));
+    const failure = Effect.runSync(
+      Effect.catchTag(clock.sleepEffect(-1), "LocalClockFailure", (error) => Effect.succeed(error)),
+    );
     expect(failure).toBeInstanceOf(LocalClockFailure);
     await expect(clock.sleep(-1)).rejects.toBeInstanceOf(RangeError);
   });
@@ -39,14 +39,17 @@ describe("local Effect clock", () => {
 
   test("removes its listener when abort races with callback registration", async () => {
     const signal = new AbortController().signal;
-    const aborted = vi.spyOn(signal, "aborted", "get")
+    const aborted = vi
+      .spyOn(signal, "aborted", "get")
       .mockReturnValueOnce(false)
       .mockReturnValue(true);
     const add = vi.spyOn(signal, "addEventListener");
     const remove = vi.spyOn(signal, "removeEventListener");
     const clock = createLocalClock(signal);
 
-    await expect(Effect.runPromise(clock.sleepEffect(1_000))).rejects.toBeInstanceOf(LocalClockFailure);
+    await expect(Effect.runPromise(clock.sleepEffect(1_000))).rejects.toBeInstanceOf(
+      LocalClockFailure,
+    );
     expect(add).toHaveBeenCalledTimes(1);
     expect(remove).toHaveBeenCalledTimes(1);
     aborted.mockRestore();

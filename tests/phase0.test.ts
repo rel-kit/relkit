@@ -409,13 +409,13 @@ describe.serial("Phase 0 guardrails", () => {
     }
   });
 
-  test("reports implementation files over the 200-line limit", async () => {
+  test("reports implementation files over the 250-line limit", async () => {
     const fixture = await createFixture({
-      "packages/app/src/too-long.ts": Array.from({ length: 201 }, () => "export {};\n").join(""),
+      "packages/app/src/too-long.ts": Array.from({ length: 251 }, () => "export {};\n").join(""),
     });
     try {
       expect(implementationSizeOffenders(fixture)).toEqual([
-        "packages/app/src/too-long.ts (201 lines)",
+        "packages/app/src/too-long.ts (251 lines)",
       ]);
     } finally {
       await rm(fixture, { recursive: true, force: true });

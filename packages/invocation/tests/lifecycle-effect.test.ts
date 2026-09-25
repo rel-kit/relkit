@@ -17,10 +17,20 @@ describe("invocation lifecycle Effect", () => {
     const context = { signal: new AbortController().signal, env: { mode: "test" } };
     const target = {
       id: "tasks.run",
-      input: z.number(), output: z.number(),
-      onBefore: (input: number) => { calls.push("before"); return input + 1; },
-      handler: (input: number) => { calls.push("handler"); return input * 2; },
-      onAfter: (output: number) => { calls.push("after"); return output + 1; },
+      input: z.number(),
+      output: z.number(),
+      onBefore: (input: number) => {
+        calls.push("before");
+        return input + 1;
+      },
+      handler: (input: number) => {
+        calls.push("handler");
+        return input * 2;
+      },
+      onAfter: (output: number) => {
+        calls.push("after");
+        return output + 1;
+      },
     };
     const layer = Layer.succeed(InvocationTelemetry, {
       observe: <A, E, R>(operation: InvocationOperation, effect: Effect.Effect<A, E, R>) => {
@@ -28,14 +38,30 @@ describe("invocation lifecycle Effect", () => {
         return effect;
       },
     });
-    expect(await Effect.runPromise(Effect.provide(invokeFunctionLifecycle({
-      target, input: 1, context,
-    }), layer))).toBe(5);
+    expect(
+      await Effect.runPromise(
+        Effect.provide(
+          invokeFunctionLifecycle({
+            target,
+            input: 1,
+            context,
+          }),
+          layer,
+        ),
+      ),
+    ).toBe(5);
     expect(calls).toEqual(["before", "handler", "after"]);
     expect(observed).toContain("lifecycle.function");
-    expect(await Effect.runPromise(invokeValueHook({
-      hook: (value: number) => value + 1, value: 2, schema: z.number(), context,
-    }))).toBe(3);
+    expect(
+      await Effect.runPromise(
+        invokeValueHook({
+          hook: (value: number) => value + 1,
+          value: 2,
+          schema: z.number(),
+          context,
+        }),
+      ),
+    ).toBe(3);
   });
 
   test("builds restricted context through Effect and rejects nonvoid event output", async () => {
@@ -43,13 +69,23 @@ describe("invocation lifecycle Effect", () => {
     const base = Effect.runSync(baseExecutionContextEffect(context));
     expect(base).toEqual(baseExecutionContext(context));
     expect("extra" in base).toBe(false);
-    const failure = await Effect.runPromise(Effect.catchTag(invokeFunctionLifecycle({
-      target: {
-        id: "events.posted", invocationMode: "event-only",
-        input: z.number(), output: z.number(), handler: () => 1,
-      },
-      input: 1, context,
-    }), "UnexpectedDefect", (error) => Effect.succeed(error)));
+    const failure = await Effect.runPromise(
+      Effect.catchTag(
+        invokeFunctionLifecycle({
+          target: {
+            id: "events.posted",
+            invocationMode: "event-only",
+            input: z.number(),
+            output: z.number(),
+            handler: () => 1,
+          },
+          input: 1,
+          context,
+        }),
+        "UnexpectedDefect",
+        (error) => Effect.succeed(error),
+      ),
+    );
     expect(failure).toMatchObject({ _tag: "UnexpectedDefect" });
   });
 });

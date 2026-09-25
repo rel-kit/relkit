@@ -7,9 +7,10 @@ import type { TraceContextReaderService, TracePropagation } from "./trace-propag
 /** Substitutable reader for the active execution context.
  * @example Effect.provide(currentTracePropagationEffect(), TraceContextReaderLive);
  */
-export class TraceContextReader extends Context.Service<TraceContextReader, TraceContextReaderService>()(
-  "relkit/invocation/TraceContextReader",
-) {}
+export class TraceContextReader extends Context.Service<
+  TraceContextReader,
+  TraceContextReaderService
+>()("relkit/invocation/TraceContextReader") {}
 
 /** Live reader backed by the invocation execution scope.
  * @example Effect.runSync(Effect.provide(currentTracePropagationEffect(), TraceContextReaderLive));
@@ -40,7 +41,9 @@ export function currentTracePropagationEffect(): Effect.Effect<TracePropagation 
             traceFlags: context.span.sampled ? 1 : 0,
           }),
           ...(context.requestId === undefined ? {} : { requestId: context.requestId }),
-          ...(context.originRequestId === undefined ? {} : { originRequestId: context.originRequestId }),
+          ...(context.originRequestId === undefined
+            ? {}
+            : { originRequestId: context.originRequestId }),
           ...(context.correlationId === undefined ? {} : { correlationId: context.correlationId }),
           ...(context.invocationId === undefined ? {} : { invocationId: context.invocationId }),
         });

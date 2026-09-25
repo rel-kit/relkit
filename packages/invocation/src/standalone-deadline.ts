@@ -76,7 +76,9 @@ export function calculateStandaloneDeadline(
   now: number,
 ): number | undefined {
   try {
-    return runInvocationSync(calculateStandaloneDeadlineEffect(targetTimeout, options, parent, now));
+    return runInvocationSync(
+      calculateStandaloneDeadlineEffect(targetTimeout, options, parent, now),
+    );
   } catch (cause) {
     if (cause instanceof StandaloneDeadlineError) throw new RangeError(cause.message);
     throw cause;

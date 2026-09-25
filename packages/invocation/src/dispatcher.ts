@@ -12,9 +12,10 @@ import type {
 /** Substitutable lookup and fallback for invocation dispatch.
  * @example Effect.provide(dispatchInvocationEffect(request), DispatcherBoundaryLive);
  */
-export class DispatcherBoundary extends Context.Service<DispatcherBoundary, DispatcherBoundaryService>()(
-  "relkit/invocation/DispatcherBoundary",
-) {}
+export class DispatcherBoundary extends Context.Service<
+  DispatcherBoundary,
+  DispatcherBoundaryService
+>()("relkit/invocation/DispatcherBoundary") {}
 
 const liveBoundary: DispatcherBoundaryService = {
   current: () => currentInvocationScope()?.dispatcher,
@@ -38,7 +39,9 @@ export class InvocationDispatchFailure extends Data.TaggedError("InvocationDispa
  * @returns The active dispatcher or undefined; no expected failure.
  * @example Effect.runSync(currentInvocationDispatcherEffect());
  */
-export function currentInvocationDispatcherEffect(): Effect.Effect<InvocationDispatcher | undefined> {
+export function currentInvocationDispatcherEffect(): Effect.Effect<
+  InvocationDispatcher | undefined
+> {
   return observeInvocation(
     "dispatcher.current",
     Effect.flatMap(Effect.serviceOption(DispatcherBoundary), (provided) =>
@@ -60,7 +63,11 @@ export function currentInvocationDispatcher(): InvocationDispatcher | undefined 
  * @returns Target output, or `InvocationDispatchFailure` carrying the original cause.
  * @example Effect.runPromise(dispatchInvocationEffect({ target, input }));
  */
-export function dispatchInvocationEffect<Input, Output, Context extends { readonly signal: AbortSignal }>(
+export function dispatchInvocationEffect<
+  Input,
+  Output,
+  Context extends { readonly signal: AbortSignal },
+>(
   request: InvocationDispatchRequest<Input, Output, Context>,
 ): Effect.Effect<Output, InvocationDispatchFailure> {
   return observeInvocation(
@@ -68,24 +75,33 @@ export function dispatchInvocationEffect<Input, Output, Context extends { readon
     Effect.flatMap(Effect.serviceOption(DispatcherBoundary), (provided) =>
       Effect.suspend(() => {
         let cancel: (() => void) | undefined;
-        return Effect.onInterrupt(Effect.tryPromise({
-          try: (fiberSignal) => {
-            const boundary = Option.isSome(provided) ? provided.value : liveBoundary;
-            const controller = new AbortController();
-            const unlink = linkSignals(controller, [request.options?.signal, fiberSignal]);
-            cancel = () => { controller.abort(fiberSignal.reason); unlink(); };
-            try {
-              return Promise.resolve((boundary.current() ?? boundary.fallback()).dispatch({
-                ...request,
-                options: { ...request.options, signal: controller.signal },
-              })).finally(unlink);
-            } catch (cause) {
-              unlink();
-              throw cause;
-            }
-          },
-          catch: (cause) => new InvocationDispatchFailure({ cause, message: "Invocation dispatch failed" }),
-        }), () => Effect.sync(() => cancel?.()));
+        return Effect.onInterrupt(
+          Effect.tryPromise({
+            try: (fiberSignal) => {
+              const boundary = Option.isSome(provided) ? provided.value : liveBoundary;
+              const controller = new AbortController();
+              const unlink = linkSignals(controller, [request.options?.signal, fiberSignal]);
+              cancel = () => {
+                controller.abort(fiberSignal.reason);
+                unlink();
+              };
+              try {
+                return Promise.resolve(
+                  (boundary.current() ?? boundary.fallback()).dispatch({
+                    ...request,
+                    options: { ...request.options, signal: controller.signal },
+                  }),
+                ).finally(unlink);
+              } catch (cause) {
+                unlink();
+                throw cause;
+              }
+            },
+            catch: (cause) =>
+              new InvocationDispatchFailure({ cause, message: "Invocation dispatch failed" }),
+          }),
+          () => Effect.sync(() => cancel?.()),
+        );
       }),
     ),
   );
@@ -97,9 +113,11 @@ export function dispatchInvocationEffect<Input, Output, Context extends { readon
  * @throws The original dispatcher failure.
  * @example await dispatchInvocation({ target, input });
  */
-export async function dispatchInvocation<Input, Output, Context extends { readonly signal: AbortSignal }>(
-  request: InvocationDispatchRequest<Input, Output, Context>,
-): Promise<Output> {
+export async function dispatchInvocation<
+  Input,
+  Output,
+  Context extends { readonly signal: AbortSignal },
+>(request: InvocationDispatchRequest<Input, Output, Context>): Promise<Output> {
   try {
     return await Effect.runPromise(dispatchInvocationEffect(request));
   } catch (cause) {
@@ -109,7 +127,10 @@ export async function dispatchInvocation<Input, Output, Context extends { readon
 }
 
 export { currentInvocationScope, runInInvocationScope };
-export { createStandaloneDispatcher, createStandaloneDispatcherEffect } from "./standalone-dispatcher.js";
+export {
+  createStandaloneDispatcher,
+  createStandaloneDispatcherEffect,
+} from "./standalone-dispatcher.js";
 export type {
   InvocationDispatchRequest,
   InvocationDispatcher,
@@ -119,6 +140,13 @@ export type {
   StandaloneDispatcherOptions,
   TaskAncestry,
 } from "./dispatcher.types.js";
-export type { InvocationContextFactory, LocalStructuredLogger, StructuredLogRecord } from "./dispatcher-context.types.js";
-export type { ManagedDependencyCategory, ManagedDependencySources } from "./dispatcher-categories.types.js";
+export type {
+  InvocationContextFactory,
+  LocalStructuredLogger,
+  StructuredLogRecord,
+} from "./dispatcher-context.types.js";
+export type {
+  ManagedDependencyCategory,
+  ManagedDependencySources,
+} from "./dispatcher-categories.types.js";
 export { MANAGED_DEPENDENCY_CATEGORIES } from "./dispatcher-categories.js";

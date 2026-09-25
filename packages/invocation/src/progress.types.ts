@@ -1,7 +1,11 @@
 import type { MaybePromise } from "@relkit/contracts";
 import type { StandardResult, StandardSchemaV1 } from "@relkit/schema";
 import type { Effect } from "effect";
-import type { ProgressEmissionFailure, ProgressSinkFailure, ProgressValidationFailure } from "./progress.js";
+import type {
+  ProgressEmissionFailure,
+  ProgressSinkFailure,
+  ProgressValidationFailure,
+} from "./progress.js";
 
 /** External destination for validated progress values.
  * @example const sink: ProgressSink = { emit: async (value) => { console.log(value); } };
@@ -66,7 +70,12 @@ export interface ProgressEffectHandle {
    * @returns Void or a tagged validation, lifecycle, or sink failure.
    * @example await Effect.runPromise(handle.emitEffect("working"));
    */
-  readonly emitEffect: (value: unknown) => Effect.Effect<void, ProgressEmissionFailure | ProgressSinkFailure | ProgressValidationFailure>;
+  readonly emitEffect: (
+    value: unknown,
+  ) => Effect.Effect<
+    void,
+    ProgressEmissionFailure | ProgressSinkFailure | ProgressValidationFailure
+  >;
   /** Marks the lifecycle settled through Effect.
    * @returns Void with no expected failure.
    * @example Effect.runSync(handle.settleEffect());

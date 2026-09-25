@@ -17,10 +17,12 @@ export class InvocationValidationError extends TypeError {
     this.name = "InvocationValidationError";
     this.code = phase === "input" ? "RELKIT_INPUT_VALIDATION" : "RELKIT_OUTPUT_VALIDATION";
     this.phase = phase;
-    this.issues = runInvocationSync(observeInvocation(
-      "validation.error-create",
-      Effect.sync(() => Object.freeze(issues.map((issue) => Object.freeze({ ...issue })))),
-    ));
+    this.issues = runInvocationSync(
+      observeInvocation(
+        "validation.error-create",
+        Effect.sync(() => Object.freeze(issues.map((issue) => Object.freeze({ ...issue })))),
+      ),
+    );
   }
 }
 
@@ -34,6 +36,8 @@ export function makeInvocationValidationErrorEffect(
   phase: "input" | "output",
   issues: readonly StandardIssue[],
 ): Effect.Effect<InvocationValidationError> {
-  return observeInvocation("validation.error-factory", Effect.sync(() =>
-    new InvocationValidationError(phase, issues)));
+  return observeInvocation(
+    "validation.error-factory",
+    Effect.sync(() => new InvocationValidationError(phase, issues)),
+  );
 }

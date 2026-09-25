@@ -1,4 +1,11 @@
-import { createSpanId, createTraceId, isSpanId, isTraceId, type TraceId, type SpanId } from "@relkit/contracts";
+import {
+  createSpanId,
+  createTraceId,
+  isSpanId,
+  isTraceId,
+  type TraceId,
+  type SpanId,
+} from "@relkit/contracts";
 import { Context, Effect, Exit, Option, Tracer } from "effect";
 import type { SpanCapture, SpanRuntime } from "./span-runtime.js";
 import { boundedTraceText } from "./trace-limits.js";
@@ -55,7 +62,8 @@ export class RelkitSpan implements Tracer.Span {
     this.kind = options.kind;
     this.status = { _tag: "Started", startTime: options.startTime };
     this.budget = parent instanceof RelkitSpan ? parent.budget : { spans: 0, dropped: 0 };
-    if (parent instanceof RelkitSpan && parent.traceState !== undefined) this.traceState = parent.traceState;
+    if (parent instanceof RelkitSpan && parent.traceState !== undefined)
+      this.traceState = parent.traceState;
     this.recording =
       runtime.recording &&
       !runtime.closed &&
@@ -63,7 +71,9 @@ export class RelkitSpan implements Tracer.Span {
       this.budget.spans < runtime.limits.spansPerTrace;
     if (this.recording) this.budget.spans++;
     else this.budget.dropped++;
-    for (const [key, value] of Object.entries(initialAttributes)) if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits)) this.droppedAttributes++;
+    for (const [key, value] of Object.entries(initialAttributes))
+      if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits))
+        this.droppedAttributes++;
     this.addLinks(options.links, false);
   }
   /** Completes the span exactly once and notifies its runtime.
@@ -72,7 +82,10 @@ export class RelkitSpan implements Tracer.Span {
    * @example Effect.runSync(span.endEffect(2n, Exit.void));
    */
   endEffect(endTime: bigint, exit: Exit.Exit<unknown, unknown>): Effect.Effect<void> {
-    return observeInvocation("span.end", Effect.sync(() => completeSpan(this, endTime, exit)));
+    return observeInvocation(
+      "span.end",
+      Effect.sync(() => completeSpan(this, endTime, exit)),
+    );
   }
 
   /** Synchronous Effect tracer completion adapter.
@@ -88,11 +101,15 @@ export class RelkitSpan implements Tracer.Span {
    * @example Effect.runSync(span.attributeEffect("status", 200));
    */
   attributeEffect(key: string, value: unknown): Effect.Effect<void> {
-    return observeInvocation("span.attribute", Effect.sync(() => {
-      if (!this.writable()) return;
-      if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits)) this.droppedAttributes++;
-      this.update();
-    }));
+    return observeInvocation(
+      "span.attribute",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        if (!setSpanAttribute(this.attributes, key, value, this.runtime.limits))
+          this.droppedAttributes++;
+        this.update();
+      }),
+    );
   }
 
   /** Synchronous Effect tracer attribute adapter.
@@ -108,11 +125,14 @@ export class RelkitSpan implements Tracer.Span {
    * @example Effect.runSync(span.renameEffect("request"));
    */
   renameEffect(name: string): Effect.Effect<void> {
-    return observeInvocation("span.rename", Effect.sync(() => {
-      if (!this.writable()) return;
-      this.name = boundedTraceText(name, this.runtime.limits.nameBytes);
-      this.update();
-    }));
+    return observeInvocation(
+      "span.rename",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        this.name = boundedTraceText(name, this.runtime.limits.nameBytes);
+        this.update();
+      }),
+    );
   }
 
   /** Synchronous Effect tracer rename adapter. @param name - Candidate span name.
@@ -126,12 +146,19 @@ export class RelkitSpan implements Tracer.Span {
    * @returns An observed Effect with no expected failure.
    * @example Effect.runSync(span.eventEffect("received", 2n));
    */
-  eventEffect(name: string, time: bigint, attributes: Record<string, unknown> = {}): Effect.Effect<void> {
-    return observeInvocation("span.event", Effect.sync(() => {
-      if (!this.writable()) return;
-      recordSpanEvent(this, name, time, attributes);
-      this.update();
-    }));
+  eventEffect(
+    name: string,
+    time: bigint,
+    attributes: Record<string, unknown> = {},
+  ): Effect.Effect<void> {
+    return observeInvocation(
+      "span.event",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        recordSpanEvent(this, name, time, attributes);
+        this.update();
+      }),
+    );
   }
 
   /** Synchronous Effect tracer event adapter.
@@ -148,11 +175,14 @@ export class RelkitSpan implements Tracer.Span {
    * @example Effect.runSync(span.captureEffect("input", request));
    */
   captureEffect(kind: "input" | "output", value: unknown): Effect.Effect<void> {
-    return observeInvocation("span.capture", Effect.sync(() => {
-      if (!this.writable()) return;
-      if (!captureSpan(this, kind, value)) return;
-      this.update();
-    }));
+    return observeInvocation(
+      "span.capture",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        if (!captureSpan(this, kind, value)) return;
+        this.update();
+      }),
+    );
   }
 
   /** Synchronous capture adapter. @param kind - Capture slot. @param value - Candidate payload.
@@ -167,11 +197,14 @@ export class RelkitSpan implements Tracer.Span {
    * @example Effect.runSync(span.addLinksEffect([]));
    */
   addLinksEffect(links: ReadonlyArray<Tracer.SpanLink>, notify = true): Effect.Effect<void> {
-    return observeInvocation("span.links", Effect.sync(() => {
-      if (!this.writable()) return;
-      appendSpanLinks(this, links);
-      if (notify && links.length > 0) this.update();
-    }));
+    return observeInvocation(
+      "span.links",
+      Effect.sync(() => {
+        if (!this.writable()) return;
+        appendSpanLinks(this, links);
+        if (notify && links.length > 0) this.update();
+      }),
+    );
   }
 
   /** Synchronous link adapter.

@@ -22,11 +22,22 @@ const ids = {
 
 describe("standalone invocation records", () => {
   test("chooses the earliest valid deadline and tags invalid inputs", () => {
-    const parent = { id: "parent", traceId: "trace", signal: new AbortController().signal, deadlineMs: 300 };
-    expect(Effect.runSync(calculateStandaloneDeadlineEffect(100, { timeoutMs: 50 }, parent, 200))).toBe(250);
+    const parent = {
+      id: "parent",
+      traceId: "trace",
+      signal: new AbortController().signal,
+      deadlineMs: 300,
+    };
+    expect(
+      Effect.runSync(calculateStandaloneDeadlineEffect(100, { timeoutMs: 50 }, parent, 200)),
+    ).toBe(250);
     expect(calculateStandaloneDeadline(undefined, {}, parent, 200)).toBe(300);
     const failure = Effect.runSync(
-      Effect.catchTag(calculateStandaloneDeadlineEffect(-1, {}, undefined, 0), "StandaloneDeadlineError", (e) => Effect.succeed(e)),
+      Effect.catchTag(
+        calculateStandaloneDeadlineEffect(-1, {}, undefined, 0),
+        "StandaloneDeadlineError",
+        (e) => Effect.succeed(e),
+      ),
     );
     expect(failure).toBeInstanceOf(StandaloneDeadlineError);
     expect(failure.field).toBe("timeoutMs");
@@ -36,16 +47,35 @@ describe("standalone invocation records", () => {
   test("creates, completes, and propagates immutable records", () => {
     const signal = new AbortController().signal;
     const record = Effect.runSync(
-      createStandaloneRecordEffect("orders.get", "direct", { correlationId: "correlation-1" }, "trace-1", 200, 100, ids),
+      createStandaloneRecordEffect(
+        "orders.get",
+        "direct",
+        { correlationId: "correlation-1" },
+        "trace-1",
+        200,
+        100,
+        ids,
+      ),
     );
     expect(record).toMatchObject({
-      id: "invocation-1", functionId: "orders.get", status: "started",
-      correlationId: "correlation-1", deadline: new Date(200).toISOString(),
+      id: "invocation-1",
+      functionId: "orders.get",
+      status: "started",
+      correlationId: "correlation-1",
+      deadline: new Date(200).toISOString(),
     });
     expect(Object.isFrozen(record)).toBe(true);
-    expect(createStandaloneRecord("orders.get", "direct", {}, "trace-1", undefined, 100, ids).id).toBe(record.id);
+    expect(
+      createStandaloneRecord("orders.get", "direct", {}, "trace-1", undefined, 100, ids).id,
+    ).toBe(record.id);
     const parent = Effect.runSync(standaloneParentEffect(record, signal, 200));
-    expect(parent).toMatchObject({ id: record.id, traceId: record.traceId, correlationId: "correlation-1", deadlineMs: 200, signal });
+    expect(parent).toMatchObject({
+      id: record.id,
+      traceId: record.traceId,
+      correlationId: "correlation-1",
+      deadlineMs: 200,
+      signal,
+    });
     expect(standaloneParent(record, signal, undefined).deadlineMs).toBeUndefined();
     const complete = Effect.runSync(completeStandaloneRecordEffect(record, "success", 150));
     expect(complete).toMatchObject({ status: "success", durationMs: 50 });
@@ -54,18 +84,34 @@ describe("standalone invocation records", () => {
 
   test("tags timestamp and ID source failures and keeps adapter errors", () => {
     const invalid = Effect.runSync(
-      Effect.catchTag(createStandaloneRecordEffect("task", "direct", {}, "trace", undefined, NaN, ids), "StandaloneRecordError", (e) => Effect.succeed(e)),
+      Effect.catchTag(
+        createStandaloneRecordEffect("task", "direct", {}, "trace", undefined, NaN, ids),
+        "StandaloneRecordError",
+        (e) => Effect.succeed(e),
+      ),
     );
     expect(invalid).toBeInstanceOf(StandaloneRecordError);
-    expect(() => createStandaloneRecord("task", "direct", {}, "trace", undefined, NaN, ids)).toThrow(RangeError);
+    expect(() =>
+      createStandaloneRecord("task", "direct", {}, "trace", undefined, NaN, ids),
+    ).toThrow(RangeError);
     const cause = new Error("id source offline");
-    const broken = { next: (): import("@relkit/contracts").ProtocolId => { throw cause; } };
+    const broken = {
+      next: (): import("@relkit/contracts").ProtocolId => {
+        throw cause;
+      },
+    };
     const failure = Effect.runSync(
-      Effect.catchTag(createStandaloneRecordEffect("task", "direct", {}, "trace", undefined, 0, broken), "StandaloneIdSourceFailure", (e) => Effect.succeed(e)),
+      Effect.catchTag(
+        createStandaloneRecordEffect("task", "direct", {}, "trace", undefined, 0, broken),
+        "StandaloneIdSourceFailure",
+        (e) => Effect.succeed(e),
+      ),
     );
     expect(failure).toBeInstanceOf(StandaloneIdSourceFailure);
     expect(failure.cause).toBe(cause);
-    expect(() => createStandaloneRecord("task", "direct", {}, "trace", undefined, 0, broken)).toThrow(cause);
+    expect(() =>
+      createStandaloneRecord("task", "direct", {}, "trace", undefined, 0, broken),
+    ).toThrow(cause);
   });
 
   test("supports deterministic telemetry substitution", () => {
@@ -78,11 +124,24 @@ describe("standalone invocation records", () => {
     });
     const program = Effect.gen(function* () {
       yield* calculateStandaloneDeadlineEffect(1, {}, undefined, 0);
-      const record = yield* createStandaloneRecordEffect("task", "direct", {}, "trace", undefined, 0, ids);
+      const record = yield* createStandaloneRecordEffect(
+        "task",
+        "direct",
+        {},
+        "trace",
+        undefined,
+        0,
+        ids,
+      );
       yield* standaloneParentEffect(record, new AbortController().signal, undefined);
       yield* completeStandaloneRecordEffect(record, "success", 1);
     });
     Effect.runSync(Effect.provide(program, layer));
-    expect(seen).toEqual(["standalone.deadline", "standalone.record-create", "standalone.parent", "standalone.record-complete"]);
+    expect(seen).toEqual([
+      "standalone.deadline",
+      "standalone.record-create",
+      "standalone.parent",
+      "standalone.record-complete",
+    ]);
   });
 });

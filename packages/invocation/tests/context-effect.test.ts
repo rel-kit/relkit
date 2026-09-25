@@ -24,7 +24,9 @@ const time = { now: () => new Date(0), sleep: async () => undefined };
 describe("public invocation context Effect", () => {
   test("creates a frozen default context and observes its fallback methods", async () => {
     const signal = new AbortController().signal;
-    const context = Effect.runSync(makeContextEffect(undefined, record, signal, { token: "secret" }, time));
+    const context = Effect.runSync(
+      makeContextEffect(undefined, record, signal, { token: "secret" }, time),
+    );
     expect(Object.isFrozen(context)).toBe(true);
     expect(Object.isFrozen(context.env)).toBe(true);
     expect(context.env).toEqual({ token: "secret" });
@@ -37,7 +39,11 @@ describe("public invocation context Effect", () => {
     const signal = new AbortController().signal;
     const factory = (): Promise<{ signal: AbortSignal }> => Promise.reject(failure);
     const tagged = await Effect.runPromise(
-      Effect.catchTag(makeContextEffect(factory, record, signal, {}, time), "ContextFactoryFailure", (error) => Effect.succeed(error)),
+      Effect.catchTag(
+        makeContextEffect(factory, record, signal, {}, time),
+        "ContextFactoryFailure",
+        (error) => Effect.succeed(error),
+      ),
     );
     expect(tagged).toBeInstanceOf(ContextFactoryFailure);
     expect(tagged.cause).toBe(failure);
@@ -54,10 +60,15 @@ describe("public invocation context Effect", () => {
       listen: (signal: AbortSignal, onAbort: () => void) => {
         listens += 1;
         signal.addEventListener("abort", onAbort);
-        return () => { removals += 1; signal.removeEventListener("abort", onAbort); };
+        return () => {
+          removals += 1;
+          signal.removeEventListener("abort", onAbort);
+        };
       },
     });
-    const handle = Effect.runSync(Effect.provide(linkSignalsEffect(target, [undefined, parent.signal]), layer));
+    const handle = Effect.runSync(
+      Effect.provide(linkSignalsEffect(target, [undefined, parent.signal]), layer),
+    );
     expect(listens).toBe(1);
     const reason = new Error("parent cancelled");
     parent.abort(reason);
@@ -87,10 +98,11 @@ describe("public invocation context Effect", () => {
         };
       },
     });
-    expect(() => Effect.runSync(Effect.provide(
-      linkSignalsEffect(target, [first.signal, second.signal]),
-      layer,
-    ))).toThrow("registration failed");
+    expect(() =>
+      Effect.runSync(
+        Effect.provide(linkSignalsEffect(target, [first.signal, second.signal]), layer),
+      ),
+    ).toThrow("registration failed");
     expect(removals).toBe(1);
     first.abort("late");
     expect(target.signal.aborted).toBe(false);
@@ -107,7 +119,9 @@ describe("public invocation context Effect", () => {
         return () => undefined;
       },
     });
-    const handle = Effect.runSync(Effect.provide(linkSignalsEffect(target, [parent.signal]), layer));
+    const handle = Effect.runSync(
+      Effect.provide(linkSignalsEffect(target, [parent.signal]), layer),
+    );
     expect(target.signal.reason).toBe("during registration");
     handle.unlink();
   });

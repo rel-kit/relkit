@@ -28,7 +28,10 @@ export class StandaloneLifecycleRunner extends Context.Service<
 /** Live runner for standalone lifecycle Effects.
  * @example Effect.runPromise(Effect.provide(runStandaloneLifecycleEffect(options), StandaloneLifecycleRunnerLive));
  */
-export const StandaloneLifecycleRunnerLive = Layer.succeed(StandaloneLifecycleRunner, defaultRunner);
+export const StandaloneLifecycleRunnerLive = Layer.succeed(
+  StandaloneLifecycleRunner,
+  defaultRunner,
+);
 
 /** Runs before hook, handler, and after hook in dependency order.
  * @param options - Target, context, signal, and runner.
@@ -39,32 +42,52 @@ export function runStandaloneLifecycleEffect<
   Input,
   Output,
   Context extends { readonly signal: AbortSignal },
->(options: StandaloneLifecycleOptions<Input, Output, Context>): Effect.Effect<unknown, StandaloneLifecycleFailure> {
-  return observeInvocation("standalone.lifecycle", Effect.gen(function* () {
-    const provided = yield* Effect.serviceOption(StandaloneLifecycleRunner);
-    const runner = Option.isSome(provided) ? provided.value : options.runner;
-    const hookContext = baseExecutionContext(options.context) as unknown as Context;
-    const input = yield* runPhase("before", runner, invokeValueHook({
-      hook: options.toolHooks?.onBefore,
-      value: options.input,
-      schema: options.target.input,
-      context: hookContext,
-      ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
-    }), options.signal);
-    const output = yield* runPhase("handler", runner, invokeFunctionLifecycle({
-      target: options.target as InvocationTarget<unknown, unknown, Context>,
-      input,
-      context: options.context,
-      ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
-    }), options.signal);
-    return yield* runPhase("after", runner, invokeValueHook({
-      hook: options.toolHooks?.onAfter,
-      value: output,
-      schema: options.target.output,
-      context: hookContext,
-      ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
-    }), options.signal);
-  }));
+>(
+  options: StandaloneLifecycleOptions<Input, Output, Context>,
+): Effect.Effect<unknown, StandaloneLifecycleFailure> {
+  return observeInvocation(
+    "standalone.lifecycle",
+    Effect.gen(function* () {
+      const provided = yield* Effect.serviceOption(StandaloneLifecycleRunner);
+      const runner = Option.isSome(provided) ? provided.value : options.runner;
+      const hookContext = baseExecutionContext(options.context) as unknown as Context;
+      const input = yield* runPhase(
+        "before",
+        runner,
+        invokeValueHook({
+          hook: options.toolHooks?.onBefore,
+          value: options.input,
+          schema: options.target.input,
+          context: hookContext,
+          ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
+        }),
+        options.signal,
+      );
+      const output = yield* runPhase(
+        "handler",
+        runner,
+        invokeFunctionLifecycle({
+          target: options.target as InvocationTarget<unknown, unknown, Context>,
+          input,
+          context: options.context,
+          ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
+        }),
+        options.signal,
+      );
+      return yield* runPhase(
+        "after",
+        runner,
+        invokeValueHook({
+          hook: options.toolHooks?.onAfter,
+          value: output,
+          schema: options.target.output,
+          context: hookContext,
+          ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
+        }),
+        options.signal,
+      );
+    }),
+  );
 }
 
 /** Promise compatibility adapter for standalone lifecycle execution.
@@ -78,8 +101,9 @@ export async function runStandaloneLifecycle<
   Output,
   Context extends { readonly signal: AbortSignal },
 >(options: StandaloneLifecycleOptions<Input, Output, Context>): Promise<unknown> {
-  try { return await Effect.runPromise(runStandaloneLifecycleEffect(options)); }
-  catch (cause) {
+  try {
+    return await Effect.runPromise(runStandaloneLifecycleEffect(options));
+  } catch (cause) {
     if (cause instanceof StandaloneLifecycleFailure) throw cause.cause;
     throw cause;
   }
@@ -93,21 +117,32 @@ function runPhase(
 ): Effect.Effect<unknown, StandaloneLifecycleFailure> {
   return Effect.suspend(() => {
     let cancel: (() => void) | undefined;
-    return Effect.onInterrupt(Effect.tryPromise({
-      try: (fiberSignal) => {
-        const controller = new AbortController();
-        const unlink = linkSignals(controller, [signal, fiberSignal]);
-        cancel = () => { controller.abort(fiberSignal.reason); unlink(); };
-        try {
-          return Promise.resolve(runner.run(effect, { signal: controller.signal })).finally(unlink);
-        } catch (cause) {
-          unlink();
-          throw cause;
-        }
-      },
-      catch: (cause) => new StandaloneLifecycleFailure({
-        phase, cause, message: `Standalone ${phase} phase failed`,
+    return Effect.onInterrupt(
+      Effect.tryPromise({
+        try: (fiberSignal) => {
+          const controller = new AbortController();
+          const unlink = linkSignals(controller, [signal, fiberSignal]);
+          cancel = () => {
+            controller.abort(fiberSignal.reason);
+            unlink();
+          };
+          try {
+            return Promise.resolve(runner.run(effect, { signal: controller.signal })).finally(
+              unlink,
+            );
+          } catch (cause) {
+            unlink();
+            throw cause;
+          }
+        },
+        catch: (cause) =>
+          new StandaloneLifecycleFailure({
+            phase,
+            cause,
+            message: `Standalone ${phase} phase failed`,
+          }),
       }),
-    }), () => Effect.sync(() => cancel?.()));
+      () => Effect.sync(() => cancel?.()),
+    );
   });
 }

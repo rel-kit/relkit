@@ -4,10 +4,18 @@ import { normalizeFailure } from "./failure.js";
 import type { InvocationFailure } from "./failure.types.js";
 import { validatedEffect } from "./validation.js";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
-import type { BaseExecutionContext, LifecycleOptions, ValueHookOptions } from "./lifecycle.types.js";
+import type {
+  BaseExecutionContext,
+  LifecycleOptions,
+  ValueHookOptions,
+} from "./lifecycle.types.js";
 import type { StandardSchemaV1 } from "@relkit/schema";
 
-export type { BaseExecutionContext, LifecycleOptions, ValueHookOptions } from "./lifecycle.types.js";
+export type {
+  BaseExecutionContext,
+  LifecycleOptions,
+  ValueHookOptions,
+} from "./lifecycle.types.js";
 
 /** Runs target before hook, handler, output validation, and after hook in order.
  * @param options - Target, input, context, deadline, and validation flags.
@@ -31,46 +39,49 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
         : validateOutput(options.target.input, value),
     ),
   );
-  return observeInvocation("lifecycle.function", before.pipe(
-    Effect.flatMap((input) =>
-      invokeValue(
-        options.target.handler,
-        input,
-        options.context,
-        options.deadline,
-        options.onSignal,
-        options.isSuspension,
+  return observeInvocation(
+    "lifecycle.function",
+    before.pipe(
+      Effect.flatMap((input) =>
+        invokeValue(
+          options.target.handler,
+          input,
+          options.context,
+          options.deadline,
+          options.onSignal,
+          options.isSuspension,
+        ),
+      ),
+      Effect.flatMap((value) =>
+        options.validateOutput === false
+          ? Effect.succeed(value)
+          : validateOutput(
+              options.target.output,
+              value,
+              options.target.invocationMode === "event-only",
+            ),
+      ),
+      Effect.flatMap((output) =>
+        invokeValue(
+          options.target.onAfter,
+          output,
+          options.context,
+          options.deadline,
+          options.onSignal,
+          options.isSuspension,
+        ),
+      ),
+      Effect.flatMap((value) =>
+        options.target.onAfter === undefined
+          ? Effect.succeed(value)
+          : validateOutput(
+              options.target.output,
+              value,
+              options.target.invocationMode === "event-only",
+            ),
       ),
     ),
-    Effect.flatMap((value) =>
-      options.validateOutput === false
-        ? Effect.succeed(value)
-        : validateOutput(
-            options.target.output,
-            value,
-            options.target.invocationMode === "event-only",
-          ),
-    ),
-    Effect.flatMap((output) =>
-      invokeValue(
-        options.target.onAfter,
-        output,
-        options.context,
-        options.deadline,
-        options.onSignal,
-        options.isSuspension,
-      ),
-    ),
-    Effect.flatMap((value) =>
-      options.target.onAfter === undefined
-        ? Effect.succeed(value)
-        : validateOutput(
-            options.target.output,
-            value,
-            options.target.invocationMode === "event-only",
-          ),
-    ),
-  ));
+  );
 }
 
 /** Runs and validates one value hook through Effect.
@@ -81,14 +92,17 @@ export function invokeFunctionLifecycle<Context extends { readonly signal: Abort
 export function invokeValueHook<Context extends { readonly signal: AbortSignal }>(
   options: ValueHookOptions<Context>,
 ): Effect.Effect<unknown, InvocationFailure> {
-  return observeInvocation("lifecycle.value-hook", invokeValue(
-    options.hook,
-    options.value,
-    options.context,
-    options.deadline,
-    options.onSignal,
-    options.isSuspension,
-  ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value))));
+  return observeInvocation(
+    "lifecycle.value-hook",
+    invokeValue(
+      options.hook,
+      options.value,
+      options.context,
+      options.deadline,
+      options.onSignal,
+      options.isSuspension,
+    ).pipe(Effect.flatMap((value) => validateOutput(options.schema, value))),
+  );
 }
 
 /** Builds the restricted context visible to tool value hooks.
@@ -97,16 +111,19 @@ export function invokeValueHook<Context extends { readonly signal: AbortSignal }
  * @example Effect.runSync(baseExecutionContextEffect(context));
  */
 export function baseExecutionContextEffect(value: unknown): Effect.Effect<BaseExecutionContext> {
-  return observeInvocation("lifecycle.base-context", Effect.sync(() => {
-    const context = value as Record<string, unknown> & { readonly signal: AbortSignal };
-    return Object.freeze({
-      invocation: context.invocation,
-      signal: context.signal,
-      env: context.env,
-      log: context.log,
-      time: context.time,
-    });
-  }));
+  return observeInvocation(
+    "lifecycle.base-context",
+    Effect.sync(() => {
+      const context = value as Record<string, unknown> & { readonly signal: AbortSignal };
+      return Object.freeze({
+        invocation: context.invocation,
+        signal: context.signal,
+        env: context.env,
+        log: context.log,
+        time: context.time,
+      });
+    }),
+  );
 }
 
 /** Synchronous restricted context adapter.
@@ -142,10 +159,16 @@ function validateOutput(
   value: unknown,
   eventOnly = false,
 ): Effect.Effect<unknown, InvocationFailure> {
-  return observeInvocation("lifecycle.validate-output", Effect.gen(function* () {
-    if (eventOnly && value !== undefined)
-      return yield* Effect.fail(normalizeFailure(new TypeError("Event-only functions must return void on success")));
-    return yield* Effect.mapError(validatedEffect(schema, value, "output"),
-      (failure) => normalizeFailure(failure.cause));
-  }));
+  return observeInvocation(
+    "lifecycle.validate-output",
+    Effect.gen(function* () {
+      if (eventOnly && value !== undefined)
+        return yield* Effect.fail(
+          normalizeFailure(new TypeError("Event-only functions must return void on success")),
+        );
+      return yield* Effect.mapError(validatedEffect(schema, value, "output"), (failure) =>
+        normalizeFailure(failure.cause),
+      );
+    }),
+  );
 }

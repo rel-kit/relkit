@@ -30,28 +30,39 @@ describe("handler bridge Effect", () => {
 
   test("turns a thrown handler error into an invocation failure", async () => {
     const context = { signal: new AbortController().signal };
-    const failure = await Effect.runPromise(Effect.catchTag(
-      invokeUserHandler({
-        handler: () => { throw new Error("private"); },
-        input: 1,
-        publicContext: context,
-      }),
-      "UnexpectedDefect",
-      (error) => Effect.succeed(error),
-    ));
+    const failure = await Effect.runPromise(
+      Effect.catchTag(
+        invokeUserHandler({
+          handler: () => {
+            throw new Error("private");
+          },
+          input: 1,
+          publicContext: context,
+        }),
+        "UnexpectedDefect",
+        (error) => Effect.succeed(error),
+      ),
+    );
     expect(failure).toMatchObject({
-      _tag: "UnexpectedDefect", code: "RELKIT_UNEXPECTED_DEFECT",
+      _tag: "UnexpectedDefect",
+      code: "RELKIT_UNEXPECTED_DEFECT",
     });
   });
 
   test("normalizes a timed handler failure through the deadline boundary", async () => {
     const context = { signal: new AbortController().signal };
-    await expect(Effect.runPromise(invokeUserHandler({
-      handler: async () => { throw new Error("private"); },
-      input: 1,
-      publicContext: context,
-      timeoutMs: 100,
-    }))).rejects.toMatchObject({ _tag: "UnexpectedDefect" });
+    await expect(
+      Effect.runPromise(
+        invokeUserHandler({
+          handler: async () => {
+            throw new Error("private");
+          },
+          input: 1,
+          publicContext: context,
+          timeoutMs: 100,
+        }),
+      ),
+    ).rejects.toMatchObject({ _tag: "UnexpectedDefect" });
   });
 
   test("releases the abort bridge when the signal hook throws", async () => {
@@ -59,10 +70,15 @@ describe("handler bridge Effect", () => {
     const remove = vi.spyOn(parent.signal, "removeEventListener");
     let started = false;
     const result = invokeUserHandler({
-      handler: () => { started = true; return 1; },
+      handler: () => {
+        started = true;
+        return 1;
+      },
       input: 1,
       publicContext: { signal: parent.signal },
-      onSignal: () => { throw new Error("signal hook failed"); },
+      onSignal: () => {
+        throw new Error("signal hook failed");
+      },
     });
     await expect(Effect.runPromise(result)).rejects.toMatchObject({ _tag: "UnexpectedDefect" });
     expect(started).toBe(false);

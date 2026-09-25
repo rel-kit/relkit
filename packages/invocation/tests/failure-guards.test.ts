@@ -36,11 +36,20 @@ describe("failure classification", () => {
     });
     expect(Effect.runSync(isDeclaredErrorEffect(declared))).toBe(true);
     expect(isDeclaredError(declared)).toBe(true);
-    expect(isDeclaredError(Object.assign(new Error("missing"), {
-      name: "DeclaredError", id: "orders.missing", data: {},
-      ref: { kind: "error", id: "orders.missing" }, retry: "soon",
-    }))).toBe(false);
-    expect(isDeclaredError(Object.assign(new Error("missing"), { ...declared, ref: null }))).toBe(false);
+    expect(
+      isDeclaredError(
+        Object.assign(new Error("missing"), {
+          name: "DeclaredError",
+          id: "orders.missing",
+          data: {},
+          ref: { kind: "error", id: "orders.missing" },
+          retry: "soon",
+        }),
+      ),
+    ).toBe(false);
+    expect(isDeclaredError(Object.assign(new Error("missing"), { ...declared, ref: null }))).toBe(
+      false,
+    );
   });
 
   test("checks provider, dependency, cancellation, and timeout markers", () => {

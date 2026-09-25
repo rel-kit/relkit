@@ -1,19 +1,28 @@
 import { Context, Effect, Layer, Option } from "effect";
 import { createSpanId, createTraceId } from "@relkit/contracts";
 import { observeInvocation, runInvocationSync } from "./invocation-observability.js";
-import type { InvocationIdSource, InvocationKind, StandardSchemaV1 } from "./validation-defaults.types.js";
+import type {
+  InvocationIdSource,
+  InvocationKind,
+  StandardSchemaV1,
+} from "./validation-defaults.types.js";
 
 const liveIdSource: InvocationIdSource = {
-  next: (kind) => (kind === "trace" ? createTraceId() : kind === "span"
-    ? createSpanId() : `invocation-${crypto.randomUUID()}`) as import("@relkit/contracts").ProtocolId,
+  next: (kind) =>
+    (kind === "trace"
+      ? createTraceId()
+      : kind === "span"
+        ? createSpanId()
+        : `invocation-${crypto.randomUUID()}`) as import("@relkit/contracts").ProtocolId,
 };
 
 /** Substitutable ID generator for invocation records.
  * @example Effect.provide(nextInvocationIdEffect("trace"), InvocationIdSourceLive);
  */
-export class InvocationIdGenerator extends Context.Service<InvocationIdGenerator, InvocationIdSource>()(
-  "relkit/invocation/InvocationIdGenerator",
-) {}
+export class InvocationIdGenerator extends Context.Service<
+  InvocationIdGenerator,
+  InvocationIdSource
+>()("relkit/invocation/InvocationIdGenerator") {}
 
 /** Process-local live ID generator.
  * @example Effect.runSync(Effect.provide(nextInvocationIdEffect("span"), InvocationIdSourceLive));
@@ -26,11 +35,12 @@ export const InvocationIdSourceLive = Layer.succeed(InvocationIdGenerator, liveI
  * @example Effect.runSync(nextInvocationIdEffect("trace"));
  */
 export function nextInvocationIdEffect(kind: InvocationKind) {
-  return observeInvocation("validation.next-id", Effect.flatMap(
-    Effect.serviceOption(InvocationIdGenerator),
-    (provided) => Effect.sync(() =>
-      (Option.isSome(provided) ? provided.value : liveIdSource).next(kind)),
-  ));
+  return observeInvocation(
+    "validation.next-id",
+    Effect.flatMap(Effect.serviceOption(InvocationIdGenerator), (provided) =>
+      Effect.sync(() => (Option.isSome(provided) ? provided.value : liveIdSource).next(kind)),
+    ),
+  );
 }
 
 /** Default ID source for standalone invocation compatibility callers. */

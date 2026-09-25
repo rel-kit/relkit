@@ -15,30 +15,33 @@ export type { StandaloneStreamOptions } from "./standalone-stream.types.js";
 export function createStandaloneStreamEffect<Output>(
   args: StandaloneStreamOptions,
 ): Effect.Effect<Output> {
-  return observeInvocation("standalone.stream-create", Effect.map(managedValidatedStreamEffect({
-    source: args.source,
-    schema: args.schema,
-    maxItemBytes: 1024 * 1024,
-    idleMs: 45_000,
-    abort: (reason) => args.controller.abort(reason),
-    run: (work) =>
-      runInInvocationScope(
-        {
-          dispatcher: args.dispatcher,
-          parent: args.parent,
-          chain: args.chain,
-          ...(args.taskAncestry === undefined ? {} : { taskAncestry: args.taskAncestry }),
+  return observeInvocation(
+    "standalone.stream-create",
+    Effect.map(
+      managedValidatedStreamEffect({
+        source: args.source,
+        schema: args.schema,
+        maxItemBytes: 1024 * 1024,
+        idleMs: 45_000,
+        abort: (reason) => args.controller.abort(reason),
+        run: (work) =>
+          runInInvocationScope(
+            {
+              dispatcher: args.dispatcher,
+              parent: args.parent,
+              chain: args.chain,
+              ...(args.taskAncestry === undefined ? {} : { taskAncestry: args.taskAncestry }),
+            },
+            work,
+          ),
+        settle: async (streamCause) => {
+          const streamError = streamCause === undefined ? undefined : normalizeFailure(streamCause);
+          await args.finish(streamError?.outcome ?? "success", streamError);
         },
-        work,
-      ),
-    settle: async (streamCause) => {
-      const streamError =
-        streamCause === undefined
-          ? undefined
-          : normalizeFailure(streamCause);
-      await args.finish(streamError?.outcome ?? "success", streamError);
-    },
-  }), (stream) => stream as Output));
+      }),
+      (stream) => stream as Output,
+    ),
+  );
 }
 
 /** Synchronous compatibility adapter for deferred standalone streams.

@@ -45,7 +45,8 @@ export function makeContextEffect<Context extends { readonly signal: AbortSignal
         });
         return Object.freeze({ ...context, trace: publicTrace }) as Context;
       }
-      const noop = (): void => runInvocationSync(observeInvocation("context.log-noop", Effect.void));
+      const noop = (): void =>
+        runInvocationSync(observeInvocation("context.log-noop", Effect.void));
       return Object.freeze({
         invocation: record,
         trace: publicTrace,
@@ -61,7 +62,8 @@ export function makeContextEffect<Context extends { readonly signal: AbortSignal
         agents: Object.freeze({}),
         database: Object.freeze({}),
         auth: Object.freeze({
-          getSession: () => Effect.runPromise(observeInvocation("context.session", Effect.succeed(null))),
+          getSession: () =>
+            Effect.runPromise(observeInvocation("context.session", Effect.succeed(null))),
         }),
         constants: Object.freeze({}),
         prompts: Object.freeze({}),
@@ -135,10 +137,7 @@ export function linkSignalsEffect(
           scope,
         );
         const unlinkEffect = (): Effect.Effect<void> =>
-          observeInvocation(
-            "context.unlink-signals",
-            Scope.close(scope, Exit.void),
-          );
+          observeInvocation("context.unlink-signals", Scope.close(scope, Exit.void));
         return { unlinkEffect, unlink: () => runInvocationSync(unlinkEffect()) };
       }),
     ),

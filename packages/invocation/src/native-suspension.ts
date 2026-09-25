@@ -45,7 +45,10 @@ export function isNativeSuspension(value: unknown): value is NativeSuspension {
 export function findNativeSuspensionEffect(
   value: unknown,
 ): Effect.Effect<NativeSuspension | undefined> {
-  return observeInvocation("suspension.find", Effect.sync(() => findSuspension(value)));
+  return observeInvocation(
+    "suspension.find",
+    Effect.sync(() => findSuspension(value)),
+  );
 }
 
 /** Synchronous Cause inspection adapter.
@@ -63,7 +66,10 @@ export function findNativeSuspension(value: unknown): NativeSuspension | undefin
  * @example Effect.runSync(markNativeSuspensionEffect({ token: "later" }));
  */
 export function markNativeSuspensionEffect(cause: unknown): Effect.Effect<NativeSuspension> {
-  return observeInvocation("suspension.mark", Effect.sync(() => new NativeSuspension(cause)));
+  return observeInvocation(
+    "suspension.mark",
+    Effect.sync(() => new NativeSuspension(cause)),
+  );
 }
 
 /** Synchronous provider continuation adapter.

@@ -31,10 +31,13 @@ export function lazySingleConsumerStreamEffect<T>(
               "stream.lazy-next",
               Effect.tryPromise({
                 try: async () => (await get()).next(),
-                catch: (cause) => new StreamSourceFailure({ cause, message: "Stream source failed" }),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream source failed" }),
               }),
             );
-          const returnEffect = (value?: unknown): Effect.Effect<IteratorResult<T>, StreamSourceFailure> =>
+          const returnEffect = (
+            value?: unknown,
+          ): Effect.Effect<IteratorResult<T>, StreamSourceFailure> =>
             observeInvocation(
               "stream.lazy-return",
               Effect.tryPromise({
@@ -43,10 +46,13 @@ export function lazySingleConsumerStreamEffect<T>(
                   const iterator = await source;
                   return iterator.return?.(value) ?? { value: value as T, done: true };
                 },
-                catch: (cause) => new StreamSourceFailure({ cause, message: "Stream return failed" }),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream return failed" }),
               }),
             );
-          const throwEffect = (error?: unknown): Effect.Effect<IteratorResult<T>, StreamSourceFailure> =>
+          const throwEffect = (
+            error?: unknown,
+          ): Effect.Effect<IteratorResult<T>, StreamSourceFailure> =>
             observeInvocation(
               "stream.lazy-throw",
               Effect.tryPromise({
@@ -55,7 +61,8 @@ export function lazySingleConsumerStreamEffect<T>(
                   if (iterator.throw) return iterator.throw(error);
                   throw error;
                 },
-                catch: (cause) => new StreamSourceFailure({ cause, message: "Stream throw failed" }),
+                catch: (cause) =>
+                  new StreamSourceFailure({ cause, message: "Stream throw failed" }),
               }),
             );
           return {
@@ -77,7 +84,9 @@ export function lazySingleConsumerStreamEffect<T>(
  * @returns A lazy async iterable.
  * @example lazySingleConsumerStream(async () => source);
  */
-export function lazySingleConsumerStream<T>(start: () => Promise<AsyncIterable<T>>): AsyncIterable<T> {
+export function lazySingleConsumerStream<T>(
+  start: () => Promise<AsyncIterable<T>>,
+): AsyncIterable<T> {
   return runInvocationSync(lazySingleConsumerStreamEffect(start));
 }
 
@@ -98,7 +107,9 @@ function failingIterator<T>(): LazyEffectIterator<T> {
   const returnEffect = () => failureEffect("stream.lazy-return");
   const throwEffect = () => failureEffect("stream.lazy-throw");
   return {
-    nextEffect, returnEffect, throwEffect,
+    nextEffect,
+    returnEffect,
+    throwEffect,
     next: () => runStreamPromise(nextEffect()),
     return: () => runStreamPromise(returnEffect()),
     throw: () => runStreamPromise(throwEffect()),

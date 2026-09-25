@@ -10,7 +10,11 @@ import { spanMetadata } from "./span-attributes.js";
  * @returns Void; repeated completion has no effect.
  * @example completeSpan(span, 2n, Exit.void);
  */
-export function completeSpan(span: RelkitSpan, endTime: bigint, exit: Exit.Exit<unknown, unknown>): void {
+export function completeSpan(
+  span: RelkitSpan,
+  endTime: bigint,
+  exit: Exit.Exit<unknown, unknown>,
+): void {
   if (span.status._tag === "Ended") return;
   span.status = { _tag: "Ended", startTime: span.startTime, endTime, exit };
   span.revision++;
@@ -48,12 +52,14 @@ export function recordSpanEvent(
     return;
   }
   const metadata = spanMetadata(attributes, span.runtime.limits);
-  span.events.push(Object.freeze({
-    name: boundedTraceText(name, span.runtime.limits.nameBytes),
-    time,
-    attributes: metadata.attributes,
-    droppedAttributes: metadata.dropped,
-  }));
+  span.events.push(
+    Object.freeze({
+      name: boundedTraceText(name, span.runtime.limits.nameBytes),
+      time,
+      attributes: metadata.attributes,
+      droppedAttributes: metadata.dropped,
+    }),
+  );
 }
 
 /** Adds valid span links as part of an observed span operation.
@@ -72,14 +78,16 @@ export function appendSpanLinks(span: RelkitSpan, links: ReadonlyArray<Tracer.Sp
       continue;
     }
     const metadata = spanMetadata(link.attributes, span.runtime.limits);
-    span.links.push(Object.freeze({
-      span: Tracer.externalSpan({
-        traceId: link.span.traceId,
-        spanId: link.span.spanId,
-        sampled: link.span.sampled,
+    span.links.push(
+      Object.freeze({
+        span: Tracer.externalSpan({
+          traceId: link.span.traceId,
+          spanId: link.span.spanId,
+          sampled: link.span.sampled,
+        }),
+        attributes: metadata.attributes,
       }),
-      attributes: metadata.attributes,
-    }));
+    );
     span.droppedAttributes += metadata.dropped;
   }
 }

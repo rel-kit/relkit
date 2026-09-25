@@ -35,8 +35,10 @@ describe("declared error retry", () => {
       ["later", Number.MAX_SAFE_INTEGER + 1, "afterMs"],
     ] as const) {
       const error = Effect.runSync(
-        Effect.catchTag(normalizeErrorRetryEffect(value, afterMs), "ErrorRetryValidationError", (e) =>
-          Effect.succeed(e),
+        Effect.catchTag(
+          normalizeErrorRetryEffect(value, afterMs),
+          "ErrorRetryValidationError",
+          (e) => Effect.succeed(e),
         ),
       );
       expect(error).toBeInstanceOf(ErrorRetryValidationError);
@@ -67,14 +69,19 @@ describe("declared error retry", () => {
   });
 
   test("creates an operation span inside an existing span", () => {
-    const names = Effect.runSync(Effect.withSpan(Effect.gen(function* () {
-      const parent = (yield* Effect.currentSpan).name;
-      const child = yield* observeInvocation(
-        "retry.normalize",
-        Effect.map(Effect.currentSpan, (span) => span.name),
-      );
-      return { parent, child };
-    }), "existing.parent"));
+    const names = Effect.runSync(
+      Effect.withSpan(
+        Effect.gen(function* () {
+          const parent = (yield* Effect.currentSpan).name;
+          const child = yield* observeInvocation(
+            "retry.normalize",
+            Effect.map(Effect.currentSpan, (span) => span.name),
+          );
+          return { parent, child };
+        }),
+        "existing.parent",
+      ),
+    );
     expect(names).toEqual({ parent: "existing.parent", child: "invocation.retry.normalize" });
   });
 
@@ -107,8 +114,10 @@ describe("declared error retry", () => {
     const before = counts();
     Effect.runSync(normalizeErrorRetryEffect("never"));
     Effect.runSync(
-      Effect.catchTag(normalizeErrorRetryEffect("invalid"), "ErrorRetryValidationError", () =>
-        Effect.void,
+      Effect.catchTag(
+        normalizeErrorRetryEffect("invalid"),
+        "ErrorRetryValidationError",
+        () => Effect.void,
       ),
     );
     const after = counts();
@@ -128,8 +137,10 @@ describe("declared error retry", () => {
     Effect.runSync(Effect.withTracer(normalizeErrorRetryEffect("never"), tracer));
     Effect.runSync(
       Effect.withTracer(
-        Effect.catchTag(normalizeErrorRetryEffect("invalid"), "ErrorRetryValidationError", () =>
-          Effect.void,
+        Effect.catchTag(
+          normalizeErrorRetryEffect("invalid"),
+          "ErrorRetryValidationError",
+          () => Effect.void,
         ),
         tracer,
       ),

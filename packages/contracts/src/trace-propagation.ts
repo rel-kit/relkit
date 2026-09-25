@@ -1,7 +1,12 @@
 import { Effect } from "effect";
 import { observeContract, runContract } from "./contract-observability.js";
 import type { TraceId } from "./id.types.js";
-import { isSpanIdEffect, isTraceIdEffect, type SpanContext, type TracePropagation } from "./trace-context.js";
+import {
+  isSpanIdEffect,
+  isTraceIdEffect,
+  type SpanContext,
+  type TracePropagation,
+} from "./trace-context.js";
 import type { SpanId } from "./trace-context.types.js";
 
 /**
@@ -22,7 +27,11 @@ export function parseTraceParentEffect(
       const match = /^([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(.*)$/.exec(value);
       if (!match || match[0] !== value) return undefined;
       const [, version, traceId, spanId, flags, suffix] = match;
-      if (version === "ff" || !(yield* isTraceIdEffect(traceId)) || !(yield* isSpanIdEffect(spanId)))
+      if (
+        version === "ff" ||
+        !(yield* isTraceIdEffect(traceId)) ||
+        !(yield* isSpanIdEffect(spanId))
+      )
         return undefined;
       if (version === "00" ? suffix !== "" : suffix !== "" && !suffix?.startsWith("-"))
         return undefined;

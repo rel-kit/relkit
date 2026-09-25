@@ -32,21 +32,30 @@ export function validatedEffect(
   value: unknown,
   phase: "input" | "output",
 ): Effect.Effect<unknown, SchemaValidationFailure> {
-  return observeInvocation("validation.schema", Effect.gen(function* () {
-    const result = yield* Effect.tryPromise({
-      try: () => Promise.resolve(validate(schema, value as never)) as Promise<StandardResult<unknown>>,
-      catch: (cause) => new SchemaValidationFailure({
-        phase, cause: unexpectedDefect(cause), message: "Schema validator failed",
-      }),
-    });
-    if (!("value" in result))
-      return yield* Effect.fail(new SchemaValidationFailure({
-        phase,
-        cause: new InvocationValidationError(phase, result.issues),
-        message: `${phase} validation failed`,
-      }));
-    return result.value;
-  }));
+  return observeInvocation(
+    "validation.schema",
+    Effect.gen(function* () {
+      const result = yield* Effect.tryPromise({
+        try: () =>
+          Promise.resolve(validate(schema, value as never)) as Promise<StandardResult<unknown>>,
+        catch: (cause) =>
+          new SchemaValidationFailure({
+            phase,
+            cause: unexpectedDefect(cause),
+            message: "Schema validator failed",
+          }),
+      });
+      if (!("value" in result))
+        return yield* Effect.fail(
+          new SchemaValidationFailure({
+            phase,
+            cause: new InvocationValidationError(phase, result.issues),
+            message: `${phase} validation failed`,
+          }),
+        );
+      return result.value;
+    }),
+  );
 }
 
 /** Promise compatibility adapter for Standard Schema validation.
@@ -62,8 +71,9 @@ export async function validated(
   value: unknown,
   phase: "input" | "output",
 ): Promise<unknown> {
-  try { return await Effect.runPromise(validatedEffect(schema, value, phase)); }
-  catch (cause) {
+  try {
+    return await Effect.runPromise(validatedEffect(schema, value, phase));
+  } catch (cause) {
     if (cause instanceof SchemaValidationFailure) throw cause.cause;
     throw cause;
   }
@@ -79,9 +89,17 @@ export function callHookEffect<T>(
   hook: ((value: T) => unknown) | undefined,
   value: T,
 ): Effect.Effect<void> {
-  return observeInvocation("validation.hook", Effect.ignore(
-    Effect.tryPromise({ try: async () => { await hook?.(value); }, catch: (cause) => cause }),
-  ));
+  return observeInvocation(
+    "validation.hook",
+    Effect.ignore(
+      Effect.tryPromise({
+        try: async () => {
+          await hook?.(value);
+        },
+        catch: (cause) => cause,
+      }),
+    ),
+  );
 }
 
 /** Promise compatibility adapter for an observational hook.
@@ -104,21 +122,31 @@ export function validateDeclaredErrorEffect(
   definitions: readonly InvocationErrorDefinition[] | undefined,
   error: InvocationValidationError | InvocationFailure,
 ): Effect.Effect<InvocationValidationError | InvocationFailure> {
-  return observeInvocation("validation.declared-error", Effect.gen(function* () {
-    if (error instanceof InvocationValidationError || error.kind !== "application") return error;
-    const checked = yield* Effect.exit(Effect.tryPromise({
-      try: async () => {
-        const definition = definitions?.find(
-          (candidate) => getDescriptorIdentity(candidate as object) === error.id,
-        );
-        if (definition === undefined) throw new Error("Undeclared application error");
-        return await validate(definition.data, error.data as never) as StandardResult<unknown>;
-      },
-      catch: (cause) => cause,
-    }));
-    if (Exit.isFailure(checked)) return unexpectedDefect(Cause.squash(checked.cause));
-    return "value" in checked.value ? error : unexpectedDefect(new Error("Invalid declared error data"));
-  }));
+  return observeInvocation(
+    "validation.declared-error",
+    Effect.gen(function* () {
+      if (error instanceof InvocationValidationError || error.kind !== "application") return error;
+      const checked = yield* Effect.exit(
+        Effect.tryPromise({
+          try: async () => {
+            const definition = definitions?.find(
+              (candidate) => getDescriptorIdentity(candidate as object) === error.id,
+            );
+            if (definition === undefined) throw new Error("Undeclared application error");
+            return (await validate(
+              definition.data,
+              error.data as never,
+            )) as StandardResult<unknown>;
+          },
+          catch: (cause) => cause,
+        }),
+      );
+      if (Exit.isFailure(checked)) return unexpectedDefect(Cause.squash(checked.cause));
+      return "value" in checked.value
+        ? error
+        : unexpectedDefect(new Error("Invalid declared error data"));
+    }),
+  );
 }
 
 /** Promise compatibility adapter for declared error validation.

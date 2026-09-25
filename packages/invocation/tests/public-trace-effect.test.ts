@@ -22,8 +22,10 @@ describe("public trace Effect operations", () => {
   test("records child span events and attributes using TestClock", async () => {
     const events: SpanLifecycle[] = [];
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
-      observer: (event) => { events.push(event); },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+      observer: (event) => {
+        events.push(event);
+      },
     });
     const root = startRootSpan(runtime, "request", "server");
     await runInExecutionContext({ span: root, runtime }, async () => {
@@ -37,7 +39,9 @@ describe("public trace Effect operations", () => {
       });
       expect(await Effect.runPromise(Effect.provide(program, TestClock.layer()))).toBe(42);
     });
-    const child = events.find((event) => event.type === "completed" && event.span.name === "renamed")?.span;
+    const child = events.find(
+      (event) => event.type === "completed" && event.span.name === "renamed",
+    )?.span;
     expect(child?.attributes.get("cached")).toBe(true);
     expect(child?.attributes.get("ok")).toBe(true);
     expect(child?.events.map((event) => event.name)).toContain("cache.hit");
@@ -46,43 +50,61 @@ describe("public trace Effect operations", () => {
 
   test("tags a callback failure and strips reserved public keys", async () => {
     const cause = new Error("callback failed");
-    const failure = await Effect.runPromise(Effect.catchTag(
-      runTraceSpanEffect("work", async () => { throw cause; }),
-      "TraceOperationFailure", (error) => Effect.succeed(error),
-    ));
+    const failure = await Effect.runPromise(
+      Effect.catchTag(
+        runTraceSpanEffect("work", async () => {
+          throw cause;
+        }),
+        "TraceOperationFailure",
+        (error) => Effect.succeed(error),
+      ),
+    );
     expect(failure).toBeInstanceOf(TraceOperationFailure);
     expect(failure.cause).toBe(cause);
-    const safe = Effect.runSync(safeTraceAttributesEffect({
-      "relkit.invocation.id": "forged", cached: true,
-    }, false));
+    const safe = Effect.runSync(
+      safeTraceAttributesEffect(
+        {
+          "relkit.invocation.id": "forged",
+          cached: true,
+        },
+        false,
+      ),
+    );
     expect(safe).toEqual({ cached: true });
   });
 
   test("ends an active child span when its Effect is interrupted", async () => {
     const events: SpanLifecycle[] = [];
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
-      observer: (event) => { events.push(event); },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
+      observer: (event) => {
+        events.push(event);
+      },
     });
     const root = startRootSpan(runtime, "request", "server");
     let started!: () => void;
-    const callbackStarted = new Promise<void>((resolve) => { started = resolve; });
+    const callbackStarted = new Promise<void>((resolve) => {
+      started = resolve;
+    });
     await runInExecutionContext({ span: root, runtime }, async () => {
-      const fiber = Effect.runFork(runTraceSpanEffect("interrupted", async () => {
-        started();
-        return new Promise<number>(() => undefined);
-      }));
+      const fiber = Effect.runFork(
+        runTraceSpanEffect("interrupted", async () => {
+          started();
+          return new Promise<number>(() => undefined);
+        }),
+      );
       await callbackStarted;
       await Effect.runPromise(Fiber.interrupt(fiber));
     });
-    expect(events.some((event) => event.type === "completed" && event.span.name === "interrupted"))
-      .toBe(true);
+    expect(
+      events.some((event) => event.type === "completed" && event.span.name === "interrupted"),
+    ).toBe(true);
     runtime.close();
   });
 
   test("facades preserve public key filtering and framework span mutation", async () => {
     const runtime = new SpanRuntime({
-      ids: { next: (kind) => kind === "trace" ? createTraceId() : createSpanId() },
+      ids: { next: (kind) => (kind === "trace" ? createTraceId() : createSpanId()) },
     });
     const root = startRootSpan(runtime, "request", "server");
     await runInExecutionContext({ span: root, runtime }, async () => {

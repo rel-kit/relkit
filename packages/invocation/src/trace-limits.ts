@@ -133,11 +133,12 @@ export function safeTraceAttribute(
 export function isReservedTraceKeyEffect(key: string): Effect.Effect<boolean> {
   return observeInvocation(
     "trace.reserved-key",
-    Effect.sync(() =>
-      key.startsWith("relkit.") ||
-      /^(?:traceId|spanId|parentSpanId|requestId|originRequestId|invocationId|correlationId)$/.test(
-        key,
-      ),
+    Effect.sync(
+      () =>
+        key.startsWith("relkit.") ||
+        /^(?:traceId|spanId|parentSpanId|requestId|originRequestId|invocationId|correlationId)$/.test(
+          key,
+        ),
     ),
   );
 }

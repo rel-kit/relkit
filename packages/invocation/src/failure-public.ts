@@ -12,23 +12,26 @@ import type { PublicFailureEnvelope } from "./failure-public.types.js";
 export function toPublicEnvelopeEffect(
   value: unknown,
 ): Effect.Effect<PublicFailureEnvelope, FailureNormalizationError> {
-  return observeInvocation("failure.public-envelope", Effect.map(normalizeFailureEffect(value), (failure) => {
-    const base = {
-      kind: failure.kind,
-      outcome: failure.outcome,
-      code: failure.code,
-      message: failure.message,
-    };
-    if (failure._tag !== "ApplicationFailure") return base;
-    const data = isJsonValue(failure.data) ? failure.data : undefined;
-    return {
-      ...base,
-      ...(data === undefined ? {} : { data }),
-      ...(failure.status === undefined ? {} : { status: failure.status }),
-      retry: failure.retry,
-      ...(failure.afterMs === undefined ? {} : { afterMs: failure.afterMs }),
-    };
-  }));
+  return observeInvocation(
+    "failure.public-envelope",
+    Effect.map(normalizeFailureEffect(value), (failure) => {
+      const base = {
+        kind: failure.kind,
+        outcome: failure.outcome,
+        code: failure.code,
+        message: failure.message,
+      };
+      if (failure._tag !== "ApplicationFailure") return base;
+      const data = isJsonValue(failure.data) ? failure.data : undefined;
+      return {
+        ...base,
+        ...(data === undefined ? {} : { data }),
+        ...(failure.status === undefined ? {} : { status: failure.status }),
+        retry: failure.retry,
+        ...(failure.afterMs === undefined ? {} : { afterMs: failure.afterMs }),
+      };
+    }),
+  );
 }
 
 /** Synchronous public envelope adapter.
@@ -38,8 +41,9 @@ export function toPublicEnvelopeEffect(
  * @example toPublicEnvelope(new Error("broken"));
  */
 export function toPublicEnvelope(value: unknown): PublicFailureEnvelope {
-  try { return runInvocationSync(toPublicEnvelopeEffect(value)); }
-  catch (cause) {
+  try {
+    return runInvocationSync(toPublicEnvelopeEffect(value));
+  } catch (cause) {
     if (cause instanceof FailureNormalizationError) throw cause.cause;
     throw cause;
   }

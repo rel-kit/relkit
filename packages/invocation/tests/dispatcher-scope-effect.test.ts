@@ -20,12 +20,14 @@ import type { InvocationDispatchScope } from "../src/index.js";
 describe("Effect invocation scopes", () => {
   test("retains scope across an asynchronous callback and detaches on request", async () => {
     const ancestry = { runId: "run-1", taskId: "task-1" };
-    const result = Effect.runSync(runInInvocationScopeEffect({ taskAncestry: ancestry }, async () => {
-      await Promise.resolve();
-      expect(currentTaskAncestry()).toEqual(ancestry);
-      expect(currentInvocationScope()?.taskAncestry).toEqual(ancestry);
-      return runDetachedExecution(() => currentTaskAncestry());
-    }));
+    const result = Effect.runSync(
+      runInInvocationScopeEffect({ taskAncestry: ancestry }, async () => {
+        await Promise.resolve();
+        expect(currentTaskAncestry()).toEqual(ancestry);
+        expect(currentInvocationScope()?.taskAncestry).toEqual(ancestry);
+        return runDetachedExecution(() => currentTaskAncestry());
+      }),
+    );
     expect(await result).toBeUndefined();
     expect(currentInvocationScope()).toBeUndefined();
   });
@@ -37,8 +39,12 @@ describe("Effect invocation scopes", () => {
       expect(yield* currentInvocationScopeEffect()).toBeUndefined();
       expect(yield* currentExecutionContextEffect()).toBeUndefined();
       expect(yield* currentTaskAncestryEffect()).toBeUndefined();
-      expect(yield* runInTaskAncestryEffect(ancestry, () => currentTaskAncestry())).toEqual(ancestry);
-      expect(yield* runInExecutionContextEffect(context, () => currentExecutionContext())).toEqual(context);
+      expect(yield* runInTaskAncestryEffect(ancestry, () => currentTaskAncestry())).toEqual(
+        ancestry,
+      );
+      expect(yield* runInExecutionContextEffect(context, () => currentExecutionContext())).toEqual(
+        context,
+      );
       return yield* runDetachedExecutionEffect(() => currentExecutionContext());
     });
     expect(Effect.runSync(program)).toBeUndefined();
@@ -60,6 +66,6 @@ describe("Effect invocation scopes", () => {
       return yield* runInInvocationScopeEffect({}, () => "done");
     });
     expect(Effect.runSync(Effect.provide(program, layer))).toBe("done");
-    expect(seen).toEqual([{ }]);
+    expect(seen).toEqual([{}]);
   });
 });

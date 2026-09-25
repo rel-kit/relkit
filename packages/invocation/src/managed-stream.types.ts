@@ -61,7 +61,10 @@ export interface ManagedEffectIterator<T> extends AsyncIterator<T> {
    * @returns An iterator result or typed stream failure.
    * @example await Effect.runPromise(iterator.nextEffect());
    */
-  readonly nextEffect: () => Effect.Effect<IteratorResult<T>, StreamLifecycleFailure | StreamSourceFailure>;
+  readonly nextEffect: () => Effect.Effect<
+    IteratorResult<T>,
+    StreamLifecycleFailure | StreamSourceFailure
+  >;
 }
 
 /** Validated iterable with an Effect-capable iterator.

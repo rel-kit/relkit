@@ -145,5 +145,4 @@ describe("standalone descriptor runtime", () => {
     expect(childSignal?.aborted).toBe(false);
     expect(currentInvocationDispatcher()).toBeUndefined();
   });
-
 });

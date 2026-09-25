@@ -1,10 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { Effect, Layer } from "effect";
 import { z } from "@relkit/schema";
-import {
-  ManagedStreamIO,
-  managedValidatedStreamEffect,
-} from "../src/index.js";
+import { ManagedStreamIO, managedValidatedStreamEffect } from "../src/index.js";
 
 describe("managed stream Effect operations", () => {
   test("uses an injected validator and keeps item order with one active pull", async () => {
@@ -14,15 +11,22 @@ describe("managed stream Effect operations", () => {
     let next = 0;
     let release!: () => void;
     let started!: () => void;
-    const gate = new Promise<void>((resolve) => { release = resolve; });
-    const ready = new Promise<void>((resolve) => { started = resolve; });
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const ready = new Promise<void>((resolve) => {
+      started = resolve;
+    });
     const source: AsyncIterable<unknown> = {
       [Symbol.asyncIterator]: () => ({
         next: async () => {
           active += 1;
           maximum = Math.max(maximum, active);
           next += 1;
-          if (next === 1) { started(); await gate; }
+          if (next === 1) {
+            started();
+            await gate;
+          }
           active -= 1;
           return { value: next, done: false };
         },
@@ -36,15 +40,18 @@ describe("managed stream Effect operations", () => {
       scheduleIdle: () => () => undefined,
     });
     const stream = Effect.runSync(
-      Effect.provide(managedValidatedStreamEffect<number>({
-        source,
-        schema: z.number(),
-        maxItemBytes: 10,
-        idleMs: 1000,
-        abort: () => undefined,
-        run: (work) => work(),
-        settle: async () => undefined,
-      }), layer),
+      Effect.provide(
+        managedValidatedStreamEffect<number>({
+          source,
+          schema: z.number(),
+          maxItemBytes: 10,
+          idleMs: 1000,
+          abort: () => undefined,
+          run: (work) => work(),
+          settle: async () => undefined,
+        }),
+        layer,
+      ),
     );
     const iterator = stream[Symbol.asyncIterator]();
     const first = Effect.runPromise(iterator.nextEffect());
@@ -72,21 +79,24 @@ describe("managed stream Effect operations", () => {
         return: async () => ({ value: undefined, done: true }),
       }),
     };
-    const stream = Effect.runSync(managedValidatedStreamEffect<number>({
-      source,
-      schema: z.number(),
-      maxItemBytes: 10,
-      idleMs: 1000,
-      abort: () => undefined,
-      run: (work) => work(),
-      settle: async () => undefined,
-    }));
-    const iterator = stream[Symbol.asyncIterator]();
-    const recover = () => Effect.runPromise(
-      Effect.catchTag(iterator.nextEffect(), "StreamLifecycleFailure", (error) =>
-        Effect.succeed(error.code),
-      ),
+    const stream = Effect.runSync(
+      managedValidatedStreamEffect<number>({
+        source,
+        schema: z.number(),
+        maxItemBytes: 10,
+        idleMs: 1000,
+        abort: () => undefined,
+        run: (work) => work(),
+        settle: async () => undefined,
+      }),
     );
+    const iterator = stream[Symbol.asyncIterator]();
+    const recover = () =>
+      Effect.runPromise(
+        Effect.catchTag(iterator.nextEffect(), "StreamLifecycleFailure", (error) =>
+          Effect.succeed(error.code),
+        ),
+      );
     expect(await Promise.all([recover(), recover()])).toEqual([
       "RELKIT_STREAM_ITEM_VALIDATION",
       "RELKIT_STREAM_ITEM_VALIDATION",
@@ -99,30 +109,45 @@ describe("managed stream Effect operations", () => {
     let cancelled = false;
     let closed = 0;
     let settle!: () => void;
-    const settled = new Promise<void>((resolve) => { settle = resolve; });
+    const settled = new Promise<void>((resolve) => {
+      settle = resolve;
+    });
     const reasons: unknown[] = [];
     const layer = Layer.succeed(ManagedStreamIO, {
       validate: async (_schema, value) => ({ value }),
       scheduleIdle: (_ms, onIdle) => {
         expire = onIdle;
-        return () => { cancelled = true; };
+        return () => {
+          cancelled = true;
+        };
       },
     });
     const source: AsyncIterable<unknown> = {
       [Symbol.asyncIterator]: () => ({
         next: async () => ({ value: 1, done: false }),
-        return: async () => { closed += 1; throw new Error("close failed"); },
+        return: async () => {
+          closed += 1;
+          throw new Error("close failed");
+        },
       }),
     };
-    const stream = Effect.runSync(Effect.provide(managedValidatedStreamEffect({
-      source,
-      schema: z.number(),
-      maxItemBytes: 10,
-      idleMs: 1000,
-      abort: (reason) => reasons.push(reason),
-      run: (work) => work(),
-      settle: async () => { settle(); throw new Error("settlement observer failed"); },
-    }), layer));
+    const stream = Effect.runSync(
+      Effect.provide(
+        managedValidatedStreamEffect({
+          source,
+          schema: z.number(),
+          maxItemBytes: 10,
+          idleMs: 1000,
+          abort: (reason) => reasons.push(reason),
+          run: (work) => work(),
+          settle: async () => {
+            settle();
+            throw new Error("settlement observer failed");
+          },
+        }),
+        layer,
+      ),
+    );
     stream[Symbol.asyncIterator]();
     expire();
     await settled;
@@ -134,28 +159,47 @@ describe("managed stream Effect operations", () => {
   test("closes and settles even when the abort observer throws", async () => {
     let expire!: () => void;
     let finish!: () => void;
-    const settled = new Promise<void>((resolve) => { finish = resolve; });
+    const settled = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
     let closes = 0;
     let settlements = 0;
     const layer = Layer.succeed(ManagedStreamIO, {
       validate: async (_schema, value) => ({ value }),
-      scheduleIdle: (_ms, onIdle) => { expire = onIdle; return () => undefined; },
+      scheduleIdle: (_ms, onIdle) => {
+        expire = onIdle;
+        return () => undefined;
+      },
     });
     const source: AsyncIterable<unknown> = {
       [Symbol.asyncIterator]: () => ({
         next: async () => ({ value: 1, done: false }),
-        return: async () => { closes += 1; return { value: undefined, done: true }; },
+        return: async () => {
+          closes += 1;
+          return { value: undefined, done: true };
+        },
       }),
     };
-    const make = () => Effect.runSync(Effect.provide(managedValidatedStreamEffect({
-      source,
-      schema: z.number(),
-      maxItemBytes: 10,
-      idleMs: 1000,
-      abort: () => { throw new Error("observer failed"); },
-      run: (work) => work(),
-      settle: async () => { settlements += 1; finish(); },
-    }), layer));
+    const make = () =>
+      Effect.runSync(
+        Effect.provide(
+          managedValidatedStreamEffect({
+            source,
+            schema: z.number(),
+            maxItemBytes: 10,
+            idleMs: 1000,
+            abort: () => {
+              throw new Error("observer failed");
+            },
+            run: (work) => work(),
+            settle: async () => {
+              settlements += 1;
+              finish();
+            },
+          }),
+          layer,
+        ),
+      );
     make()[Symbol.asyncIterator]();
     expire();
     await settled;

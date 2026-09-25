@@ -16,10 +16,12 @@ describe("invocation progress", () => {
   test("validates and emits values before settlement", async () => {
     const signal = new AbortController().signal;
     const seen: unknown[] = [];
-    const sink = { emit: (value: unknown, received: AbortSignal) => {
-      expect(received).toBe(signal);
-      seen.push(value);
-    } };
+    const sink = {
+      emit: (value: unknown, received: AbortSignal) => {
+        expect(received).toBe(signal);
+        seen.push(value);
+      },
+    };
     const handle = Effect.runSync(createProgressEmitterEffect(z.string(), signal, sink));
     await Effect.runPromise(handle.emitEffect("loading"));
     await handle.emitter.emit("ready");
@@ -85,17 +87,23 @@ describe("invocation progress", () => {
 
   test("keeps a rejecting validator in the typed Effect error channel", async () => {
     const failure = new Error("validator offline");
-    const handle = Effect.runSync(createProgressEmitterEffect(z.number(), new AbortController().signal));
+    const handle = Effect.runSync(
+      createProgressEmitterEffect(z.number(), new AbortController().signal),
+    );
     const layer = Layer.succeed(ProgressIO, {
-      validate: async () => { throw failure; },
+      validate: async () => {
+        throw failure;
+      },
       emit: async () => undefined,
     });
-    const typed = await Effect.runPromise(Effect.provide(
-      Effect.catchTag(handle.emitEffect(1), "ProgressValidationFailure", (error) =>
-        Effect.succeed(error),
+    const typed = await Effect.runPromise(
+      Effect.provide(
+        Effect.catchTag(handle.emitEffect(1), "ProgressValidationFailure", (error) =>
+          Effect.succeed(error),
+        ),
+        layer,
       ),
-      layer,
-    ));
+    );
     expect(typed).toBeInstanceOf(ProgressValidationFailure);
     expect(typed.cause).toBe(failure);
   });

@@ -9,7 +9,12 @@ import type {
   ProgressSink,
 } from "./progress.types.js";
 
-export type { ProgressEffectHandle, ProgressEmitter, ProgressIOService, ProgressSink } from "./progress.types.js";
+export type {
+  ProgressEffectHandle,
+  ProgressEmitter,
+  ProgressIOService,
+  ProgressSink,
+} from "./progress.types.js";
 
 /** Maximum encoded size of one progress record in bytes. */
 export const MAX_PROGRESS_RECORD_BYTES = 256 * 1024;
@@ -96,7 +101,10 @@ export function createProgressEmitterEffect(
         );
       const emitEffect = (
         value: unknown,
-      ): Effect.Effect<void, ProgressEmissionFailure | ProgressSinkFailure | ProgressValidationFailure> =>
+      ): Effect.Effect<
+        void,
+        ProgressEmissionFailure | ProgressSinkFailure | ProgressValidationFailure
+      > =>
         observeInvocation(
           "progress.emit",
           Effect.gen(function* () {
@@ -111,10 +119,11 @@ export function createProgressEmitterEffect(
             const io = Option.isSome(provided) ? provided.value : liveIO;
             const result = yield* Effect.tryPromise({
               try: () => io.validate(schema, value),
-              catch: (cause) => new ProgressValidationFailure({
-                cause,
-                message: "Progress validation failed",
-              }),
+              catch: (cause) =>
+                new ProgressValidationFailure({
+                  cause,
+                  message: "Progress validation failed",
+                }),
             });
             if (!("value" in result))
               return yield* Effect.fail(
@@ -141,13 +150,14 @@ export function createProgressEmitterEffect(
         );
       return {
         emitter: Object.freeze({
-          emit: (value: unknown) => Effect.runPromise(emitEffect(value)).catch((cause: unknown) => {
-            if (cause instanceof ProgressEmissionFailure)
-              throw new ProgressEmissionError(cause.code, cause.message);
-            if (cause instanceof ProgressSinkFailure) throw cause.cause;
-            if (cause instanceof ProgressValidationFailure) throw cause.cause;
-            throw cause;
-          }),
+          emit: (value: unknown) =>
+            Effect.runPromise(emitEffect(value)).catch((cause: unknown) => {
+              if (cause instanceof ProgressEmissionFailure)
+                throw new ProgressEmissionError(cause.code, cause.message);
+              if (cause instanceof ProgressSinkFailure) throw cause.cause;
+              if (cause instanceof ProgressValidationFailure) throw cause.cause;
+              throw cause;
+            }),
         }),
         settle: () => runInvocationSync(settleEffect()),
         emitEffect,

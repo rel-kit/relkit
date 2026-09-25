@@ -1,6 +1,11 @@
 import { normalizeId } from "@relkit/contracts";
 import { Effect } from "effect";
-import { assertIdentityObject, DescriptorIdentityError, identityOperation, runIdentitySync } from "./identity-state.js";
+import {
+  assertIdentityObject,
+  DescriptorIdentityError,
+  identityOperation,
+  runIdentitySync,
+} from "./identity-state.js";
 import { isUnboundIdentityValue, readDeclaredId } from "./identity-resolve.js";
 import type { DescriptorIdentitySource } from "./identity-bind.types.js";
 

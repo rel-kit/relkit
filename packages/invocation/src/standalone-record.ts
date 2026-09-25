@@ -54,7 +54,8 @@ export function createStandaloneRecordEffect(
       if (deadlineMs !== undefined) yield* validDate(deadlineMs, "deadlineMs");
       const id = yield* Effect.try({
         try: () => idSource.next("invocation"),
-        catch: (cause) => new StandaloneIdSourceFailure({ cause, message: "Invocation ID source failed" }),
+        catch: (cause) =>
+          new StandaloneIdSourceFailure({ cause, message: "Invocation ID source failed" }),
       });
       const correlationId = options.correlationId ?? options.parent?.correlationId;
       const metadata: InvocationMetadata = {
@@ -97,7 +98,18 @@ export function createStandaloneRecord(
   serviceId?: string,
 ): InvocationRecord {
   try {
-    return runInvocationSync(createStandaloneRecordEffect(functionId, source, options, traceId, deadlineMs, now, idSource, serviceId));
+    return runInvocationSync(
+      createStandaloneRecordEffect(
+        functionId,
+        source,
+        options,
+        traceId,
+        deadlineMs,
+        now,
+        idSource,
+        serviceId,
+      ),
+    );
   } catch (cause) {
     if (cause instanceof StandaloneRecordError) throw new RangeError(cause.message);
     if (cause instanceof StandaloneIdSourceFailure) throw cause.cause;
@@ -123,7 +135,9 @@ export function completeStandaloneRecordEffect(
       yield* validDate(now, "now");
       const started = Date.parse(record.startedAt);
       if (!Number.isFinite(started))
-        return yield* Effect.fail(new StandaloneRecordError({ field: "startedAt", message: "Invalid record startedAt" }));
+        return yield* Effect.fail(
+          new StandaloneRecordError({ field: "startedAt", message: "Invalid record startedAt" }),
+        );
       return Object.freeze({
         ...record,
         status: outcome,
@@ -193,7 +207,10 @@ export function standaloneParent(
 ): InvocationParent {
   return runInvocationSync(standaloneParentEffect(record, signal, deadlineMs));
 }
-function validDate(value: number, field: "now" | "deadlineMs"): Effect.Effect<void, StandaloneRecordError> {
+function validDate(
+  value: number,
+  field: "now" | "deadlineMs",
+): Effect.Effect<void, StandaloneRecordError> {
   return Number.isFinite(new Date(value).getTime())
     ? Effect.void
     : Effect.fail(new StandaloneRecordError({ field, message: `Invalid ${field} timestamp` }));

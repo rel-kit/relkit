@@ -26,48 +26,66 @@ export function runTraceSpanEffect<A>(
   callback?: () => MaybePromise<A>,
   allowReserved = false,
 ): Effect.Effect<A, TraceOperationFailure> {
-  return observeInvocation("trace.child-span", Effect.gen(function* () {
-    const options = typeof optionsOrCallback === "function" ? {} : optionsOrCallback;
-    const run = typeof optionsOrCallback === "function" ? optionsOrCallback : callback!;
-    const context = yield* currentExecutionContextEffect();
-    if (!context || context.runtime.closed) return yield* runCallback(run);
-    const startTime = yield* Clock.currentTimeNanos;
-    const attributes = options.attributes === undefined ? undefined
-      : yield* safeTraceAttributesEffect(options.attributes, allowReserved);
-    const child = context.runtime.start({
-      name,
-      parent: Option.some(context.span),
-      annotations: Context.empty(),
-      links: [],
-      startTime,
-      kind: options.kind ?? "internal",
-      root: false,
-      sampled: context.span.sampled,
-    }, attributes);
-    if ("input" in options) child.capture("input", options.input);
-    return yield* Effect.onInterrupt(Effect.matchEffect(
-      Effect.flatMap(
-        runInExecutionContextEffect({ ...context, span: child }, () => Promise.resolve().then(run)),
-        (pending) => Effect.tryPromise({
-          try: () => pending,
-          catch: (cause) => new TraceOperationFailure({ cause, message: "Trace callback failed" }),
-        }),
-      ),
-      {
-        onFailure: (failure) => Effect.gen(function* () {
-          child.end(yield* Clock.currentTimeNanos, Exit.fail(failure.cause));
-          return yield* Effect.fail(failure);
-        }),
-        onSuccess: (value) => Effect.gen(function* () {
-          child.capture("output", value);
-          child.end(yield* Clock.currentTimeNanos, Exit.void);
-          return value;
-        }),
-      },
-    ), () => Effect.gen(function* () {
-      child.end(yield* Clock.currentTimeNanos, Exit.interrupt());
-    }));
-  }));
+  return observeInvocation(
+    "trace.child-span",
+    Effect.gen(function* () {
+      const options = typeof optionsOrCallback === "function" ? {} : optionsOrCallback;
+      const run = typeof optionsOrCallback === "function" ? optionsOrCallback : callback!;
+      const context = yield* currentExecutionContextEffect();
+      if (!context || context.runtime.closed) return yield* runCallback(run);
+      const startTime = yield* Clock.currentTimeNanos;
+      const attributes =
+        options.attributes === undefined
+          ? undefined
+          : yield* safeTraceAttributesEffect(options.attributes, allowReserved);
+      const child = context.runtime.start(
+        {
+          name,
+          parent: Option.some(context.span),
+          annotations: Context.empty(),
+          links: [],
+          startTime,
+          kind: options.kind ?? "internal",
+          root: false,
+          sampled: context.span.sampled,
+        },
+        attributes,
+      );
+      if ("input" in options) child.capture("input", options.input);
+      return yield* Effect.onInterrupt(
+        Effect.matchEffect(
+          Effect.flatMap(
+            runInExecutionContextEffect({ ...context, span: child }, () =>
+              Promise.resolve().then(run),
+            ),
+            (pending) =>
+              Effect.tryPromise({
+                try: () => pending,
+                catch: (cause) =>
+                  new TraceOperationFailure({ cause, message: "Trace callback failed" }),
+              }),
+          ),
+          {
+            onFailure: (failure) =>
+              Effect.gen(function* () {
+                child.end(yield* Clock.currentTimeNanos, Exit.fail(failure.cause));
+                return yield* Effect.fail(failure);
+              }),
+            onSuccess: (value) =>
+              Effect.gen(function* () {
+                child.capture("output", value);
+                child.end(yield* Clock.currentTimeNanos, Exit.void);
+                return value;
+              }),
+          },
+        ),
+        () =>
+          Effect.gen(function* () {
+            child.end(yield* Clock.currentTimeNanos, Exit.interrupt());
+          }),
+      );
+    }),
+  );
 }
 
 /** Promise adapter for a traced callback.
@@ -85,8 +103,11 @@ export async function runTraceSpan<A>(
   callback?: () => MaybePromise<A>,
   allowReserved = false,
 ): Promise<A> {
-  try { return await Effect.runPromise(runTraceSpanEffect(name, optionsOrCallback, callback, allowReserved)); }
-  catch (cause) {
+  try {
+    return await Effect.runPromise(
+      runTraceSpanEffect(name, optionsOrCallback, callback, allowReserved),
+    );
+  } catch (cause) {
     if (cause instanceof TraceOperationFailure) throw cause.cause;
     throw cause;
   }

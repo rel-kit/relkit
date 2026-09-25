@@ -19,7 +19,8 @@ export function setSpanAttribute(
     boundedTraceText(key, limits.keyBytes) !== key ||
     scalar === undefined ||
     (!attributes.has(key) && attributes.size >= limits.attributes)
-  ) return false;
+  )
+    return false;
   attributes.set(key, scalar);
   return true;
 }
@@ -35,9 +36,10 @@ export function spanMetadata(input: Readonly<Record<string, unknown>>, limits: T
   let count = 0;
   for (const key of Object.keys(input)) {
     const descriptor = Object.getOwnPropertyDescriptor(input, key);
-    const value = descriptor && "value" in descriptor
-      ? safeTraceAttribute(descriptor.value, limits.attributeBytes)
-      : undefined;
+    const value =
+      descriptor && "value" in descriptor
+        ? safeTraceAttribute(descriptor.value, limits.attributeBytes)
+        : undefined;
     if (
       !key ||
       boundedTraceText(key, limits.keyBytes) !== key ||

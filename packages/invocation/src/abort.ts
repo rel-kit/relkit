@@ -54,15 +54,20 @@ export function createAbortBridgeEffect(
           if (!controller.signal.aborted) controller.abort(source.reason);
         };
         const register = (source: AbortSignal): Effect.Effect<void, never, Scope.Scope> =>
-          Effect.asVoid(Effect.acquireRelease(
-            Effect.sync(() => io.listen(source, () => abortFrom(source))),
-            (remove) => Effect.sync(remove),
-          ));
+          Effect.asVoid(
+            Effect.acquireRelease(
+              Effect.sync(() => io.listen(source, () => abortFrom(source))),
+              (remove) => Effect.sync(remove),
+            ),
+          );
         yield* Scope.provide(
           Effect.gen(function* () {
-            const preAborted = parentSignal?.aborted === true
-              ? parentSignal
-              : fiberSignal.aborted ? fiberSignal : undefined;
+            const preAborted =
+              parentSignal?.aborted === true
+                ? parentSignal
+                : fiberSignal.aborted
+                  ? fiberSignal
+                  : undefined;
             if (preAborted !== undefined) {
               abortFrom(preAborted);
               return;
@@ -70,9 +75,12 @@ export function createAbortBridgeEffect(
             yield* register(fiberSignal);
             if (parentSignal !== undefined && parentSignal !== fiberSignal)
               yield* register(parentSignal);
-            const racedAbort = parentSignal?.aborted === true
-              ? parentSignal
-              : fiberSignal.aborted ? fiberSignal : undefined;
+            const racedAbort =
+              parentSignal?.aborted === true
+                ? parentSignal
+                : fiberSignal.aborted
+                  ? fiberSignal
+                  : undefined;
             if (racedAbort !== undefined) abortFrom(racedAbort);
           }).pipe(Effect.onError(() => Scope.close(scope, Exit.succeed(undefined)))),
           scope,
@@ -96,7 +104,10 @@ export function createAbortBridgeEffect(
  * @throws A defect if AbortController or listener registration fails.
  * @example createAbortBridge(new AbortController().signal);
  */
-export function createAbortBridge(fiberSignal: AbortSignal, parentSignal?: AbortSignal): AbortBridge {
+export function createAbortBridge(
+  fiberSignal: AbortSignal,
+  parentSignal?: AbortSignal,
+): AbortBridge {
   return runInvocationSync(createAbortBridgeEffect(fiberSignal, parentSignal));
 }
 
@@ -123,24 +134,26 @@ export function abortablePromiseEffect<A>(
         };
         return yield* Effect.acquireUseRelease(
           Effect.sync(() => io.listen(signal, onAbort)),
-          () => Effect.gen(function* () {
-            if (signal.aborted) return yield* Effect.fail(aborted(signal));
-            return yield* Effect.raceFirst(
-              Effect.gen(function* () {
-                // Preserve the same-turn chance to abort before starting work.
-                yield* Effect.yieldNow;
-                return yield* Effect.tryPromise({
-                  try: () => operation(signal),
-                  catch: (cause) => new AbortOperationFailure({
-                    kind: "operation",
-                    cause,
-                    message: "Promise operation failed",
-                  }),
-                });
-              }),
-              Deferred.await(stopped),
-            );
-          }),
+          () =>
+            Effect.gen(function* () {
+              if (signal.aborted) return yield* Effect.fail(aborted(signal));
+              return yield* Effect.raceFirst(
+                Effect.gen(function* () {
+                  // Preserve the same-turn chance to abort before starting work.
+                  yield* Effect.yieldNow;
+                  return yield* Effect.tryPromise({
+                    try: () => operation(signal),
+                    catch: (cause) =>
+                      new AbortOperationFailure({
+                        kind: "operation",
+                        cause,
+                        message: "Promise operation failed",
+                      }),
+                  });
+                }),
+                Deferred.await(stopped),
+              );
+            }),
           (remove) => Effect.sync(remove),
         );
       }),

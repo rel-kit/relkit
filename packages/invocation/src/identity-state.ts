@@ -47,21 +47,31 @@ export const IdentityStoreLive = Layer.succeed(IdentityStore, liveStore);
  * @example identityOperation("identity.bound", (store) => store.canonical.has(descriptor));
  */
 export function identityOperation<A>(
-  operation: "identity.create" | "identity.bind" | "identity.is-bound" | "identity.service-bind"
-    | "identity.service-get" | "identity.resolve" | "identity.get" | "identity.is-unbound",
+  operation:
+    | "identity.create"
+    | "identity.bind"
+    | "identity.is-bound"
+    | "identity.service-bind"
+    | "identity.service-get"
+    | "identity.resolve"
+    | "identity.get"
+    | "identity.is-unbound",
   body: (store: IdentityStoreService) => A,
 ): Effect.Effect<A, DescriptorIdentityFailure> {
-  return observeInvocation(operation, Effect.flatMap(
-    Effect.serviceOption(IdentityStore),
-    (provided) => Effect.suspend(() => {
-      try { return Effect.succeed(body(Option.isSome(provided) ? provided.value : liveStore)); }
-      catch (cause) {
-        if (cause instanceof DescriptorIdentityError || cause instanceof TypeError)
-          return Effect.fail(new DescriptorIdentityFailure({ cause, message: cause.message }));
-        return Effect.die(cause);
-      }
-    }),
-  ));
+  return observeInvocation(
+    operation,
+    Effect.flatMap(Effect.serviceOption(IdentityStore), (provided) =>
+      Effect.suspend(() => {
+        try {
+          return Effect.succeed(body(Option.isSome(provided) ? provided.value : liveStore));
+        } catch (cause) {
+          if (cause instanceof DescriptorIdentityError || cause instanceof TypeError)
+            return Effect.fail(new DescriptorIdentityFailure({ cause, message: cause.message }));
+          return Effect.die(cause);
+        }
+      }),
+    ),
+  );
 }
 
 /** Verifies an identity input is an object or function.
@@ -82,8 +92,9 @@ export function assertIdentityObject(value: object): void {
  * @example runIdentitySync(createUnboundIdentityEffect());
  */
 export function runIdentitySync<A>(effect: Effect.Effect<A, DescriptorIdentityFailure>): A {
-  try { return runInvocationSync(effect); }
-  catch (cause) {
+  try {
+    return runInvocationSync(effect);
+  } catch (cause) {
     if (cause instanceof DescriptorIdentityFailure) throw cause.cause;
     throw cause;
   }
