@@ -1,194 +1,181 @@
 import { normalizeId } from "@relkit/contracts";
-import { getDescriptorIdentity, resolveDescriptorIdentity } from "@relkit/invocation";
+import { getDescriptorIdentityEffect } from "@relkit/invocation";
+import { Effect } from "effect";
+import { ToolEngineService, ToolEngineLive } from "./runtime-engine.js";
 import {
-  FunctionToolArgumentValidationError as ToolArgumentValidationError,
-  FunctionToolOperationCancelledError as ToolOperationCancelledError,
-  type ErrorDescriptorAny,
-} from "@relkit/functions";
-import { validate, type StandardIssue, type StandardSchemaV1 } from "@relkit/schema";
-import { isToolDescriptor, type ToolDescriptor, type ToolRefAny } from "./define-tool.js";
+  ToolCancelledFailure,
+  ToolEngineFailure,
+  ToolNotAllowedError,
+  ToolNotAllowedFailure,
+  ToolOperationCancelledError,
+  ToolUnknownError,
+  ToolUnknownFailure,
+} from "./runtime-errors.js";
+import { parseToolArgumentsEffect, validateToolArgumentsEffect } from "./runtime-input.js";
+import {
+  findToolEffect,
+  isToolAllowedEffect,
+  resolveToolTargetEffect,
+} from "./runtime-resolution.js";
+import {
+  observeTool,
+  runToolPromise,
+  runToolSync,
+  ToolOperationFailure,
+  toolAttempt,
+} from "./tool-observability.js";
+import type {
+  ToolEffectOptions,
+  ToolInvocationContext,
+  ToolRuntime,
+  ToolRuntimeOptions,
+} from "./runtime.types.js";
 
-export interface ToolEngineInvocation {
-  readonly functionId: string;
-  readonly input: unknown;
-  readonly source: "tool";
-  readonly inputSchema: StandardSchemaV1;
-  readonly outputSchema: StandardSchemaV1;
-  readonly errors?: readonly ErrorDescriptorAny[];
-  readonly timeoutMs?: number;
-  readonly signal?: AbortSignal;
-  /** Forwarded structurally to the common engine's existing invocation hooks. */
-  readonly hooks?: unknown;
-  readonly toolHooks?: unknown;
-  readonly progressSink?: import("@relkit/invocation").ProgressSink;
-  /** Forwarded structurally to preserve the parent agent span/invocation. */
-  readonly parent?: unknown;
+export type * from "./runtime.types.js";
+export {
+  ToolArgumentValidationError,
+  ToolOperationCancelledError,
+  ToolUnknownError,
+  ToolNotAllowedError,
+  ToolUnknownFailure,
+  ToolNotAllowedFailure,
+  ToolCancelledFailure,
+  ToolArgumentsFailure,
+  ToolEngineFailure,
+} from "./runtime-errors.js";
+export { ToolEngineService, ToolEngineLive, ToolEngineLiveEffect } from "./runtime-engine.js";
+export { resolveToolTarget, resolveToolTargetEffect } from "./runtime-resolution.js";
+
+/** Invokes an allowlisted tool with a replaceable Effect engine service.
+ * Validation finishes before engine dispatch. Cancellation before dispatch
+ * prevents the engine from starting. Interruption and caller cancellation reach
+ * the engine through its invocation signal.
+ * @param options - Tool source, request, and optional allowlist.
+ * @returns Engine result or tagged lookup, policy, input, cancellation, or engine failure.
+ * @example await Effect.runPromise(Effect.provide(invokeToolEffect({ tools: [tool], toolId: "orders.lookup", arguments: {} }), ToolEngineLive(engine)));
+ */
+export const invokeToolEffect = Effect.fn("tools.invoke")((options: ToolEffectOptions) =>
+  observeTool(
+    "invoke",
+    Effect.gen(function* () {
+      const toolId = yield* toolAttempt("invoke", () => normalizeId(options.toolId));
+      const tool = yield* findToolEffect(options.tools, toolId);
+      const resolvedToolId =
+        tool === undefined
+          ? undefined
+          : yield* getDescriptorIdentityEffect(tool).pipe(
+              Effect.mapError(
+                (failure) =>
+                  new ToolOperationFailure({
+                    operation: "invoke",
+                    reason: failure.message,
+                    cause: failure.cause,
+                  }),
+              ),
+            );
+      if (resolvedToolId !== toolId) {
+        return yield* Effect.fail(
+          new ToolUnknownFailure({
+            toolId,
+            cause: new ToolUnknownError(toolId),
+          }),
+        );
+      }
+      if (
+        options.allowedTools !== undefined &&
+        !(yield* isToolAllowedEffect(toolId, options.allowedTools))
+      ) {
+        return yield* Effect.fail(
+          new ToolNotAllowedFailure({
+            toolId,
+            cause: new ToolNotAllowedError(toolId),
+          }),
+        );
+      }
+      if (options.signal?.aborted) {
+        return yield* Effect.fail(
+          new ToolCancelledFailure({
+            cause: new ToolOperationCancelledError(),
+          }),
+        );
+      }
+      const target = yield* resolveToolTargetEffect(tool);
+      const input = yield* parseToolArgumentsEffect(options.arguments);
+      yield* validateToolArgumentsEffect(target.input, input);
+      if (options.signal?.aborted) {
+        return yield* Effect.fail(
+          new ToolCancelledFailure({
+            cause: new ToolOperationCancelledError(),
+          }),
+        );
+      }
+      const engine = yield* ToolEngineService;
+      return yield* Effect.tryPromise({
+        try: (effectSignal) =>
+          engine.invoke({
+            functionId: target.functionId,
+            input,
+            source: "tool",
+            inputSchema: target.input,
+            outputSchema: target.output,
+            ...(target.errors === undefined ? {} : { errors: target.errors }),
+            ...(tool.timeoutMs === undefined ? {} : { timeoutMs: tool.timeoutMs }),
+            signal:
+              options.signal === undefined
+                ? effectSignal
+                : AbortSignal.any([options.signal, effectSignal]),
+            ...(options.hooks === undefined ? {} : { hooks: options.hooks }),
+            ...(options.parent === undefined ? {} : { parent: options.parent }),
+          }),
+        catch: (cause) => new ToolEngineFailure({ cause }),
+      });
+    }),
+  ),
+);
+
+/** Invokes one allowlisted tool through the common engine.
+ * @param options - Runtime dependencies and invocation request.
+ * @returns Promise of the engine result.
+ * @throws ToolUnknownError, ToolNotAllowedError, argument errors, or engine rejection.
+ * @example await invokeTool({ tools: [tool], engine, toolId: "orders.lookup", arguments: {} });
+ */
+export function invokeTool(options: ToolRuntimeOptions & ToolEffectOptions): Promise<unknown> {
+  return runToolPromise(Effect.provide(invokeToolEffect(options), ToolEngineLive(options.engine)));
 }
 
-/** The small engine seam keeps the public tools package independent of the engine package. */
-export interface ToolEngine {
-  readonly invoke: (options: ToolEngineInvocation) => Promise<unknown>;
-}
-
-export type ToolSource =
-  | readonly ToolDescriptor<string>[]
-  | ReadonlyMap<string, ToolDescriptor<string>>
-  | Readonly<Record<string, ToolDescriptor<string>>>;
-
-export type ToolAllowlistEntry = string | ToolRefAny | ToolRefAny["ref"];
-
-export interface ToolRuntimeOptions {
-  readonly tools: ToolSource;
-  readonly engine: ToolEngine;
-  readonly allowedTools?: readonly ToolAllowlistEntry[];
-}
-
-export interface ToolInvocationRequest {
-  readonly toolId: string;
-  /** A parsed JSON value or the JSON text returned by a model. */
-  readonly arguments: unknown;
-  readonly signal?: AbortSignal;
-  readonly hooks?: unknown;
-  readonly parent?: unknown;
-}
-
-export interface ToolInvocationContext {
-  readonly signal?: AbortSignal;
-}
-
-export interface ToolRuntime {
-  readonly invoke: (
-    toolId: string,
-    arguments_: unknown,
-    options?: ToolInvocationContext,
-  ) => Promise<unknown>;
-}
-
-export interface ResolvedToolTarget {
-  readonly functionId: string;
-  readonly input: StandardSchemaV1;
-  readonly output: StandardSchemaV1;
-  readonly errors?: readonly ErrorDescriptorAny[];
-}
-
-export class ToolUnknownError extends TypeError {
-  readonly code = "RELKIT_TOOL_UNKNOWN" as const;
-
-  constructor(readonly toolId: string) {
-    super(`Tool "${toolId}" is not registered`);
-    this.name = "ToolUnknownError";
-  }
-}
-
-export class ToolNotAllowedError extends TypeError {
-  readonly code = "RELKIT_TOOL_NOT_ALLOWED" as const;
-
-  constructor(readonly toolId: string) {
-    super(`Tool "${toolId}" is not allowed for this invocation`);
-    this.name = "ToolNotAllowedError";
-  }
-}
-
-export { ToolArgumentValidationError, ToolOperationCancelledError };
-
-export function resolveToolTarget(tool: ToolDescriptor<string>): ResolvedToolTarget {
-  if (!isToolDescriptor(tool)) throw new TypeError("Invalid tool descriptor");
-  const target = tool.target;
-  return Object.freeze({
-    functionId: functionTargetId(target),
-    input: target.input,
-    output: target.output,
-    ...(target.errors === undefined ? {} : { errors: target.errors }),
-  });
-}
-
-/** Validates and invokes one allowlisted tool through the common engine. */
-export async function invokeTool(
-  options: ToolRuntimeOptions & ToolInvocationRequest,
-): Promise<unknown> {
-  const toolId = normalizeId(options.toolId);
-  const tool = findTool(options.tools, toolId);
-  if (tool === undefined || getDescriptorIdentity(tool) !== toolId) {
-    throw new ToolUnknownError(toolId);
-  }
-  if (options.allowedTools !== undefined && !isAllowed(toolId, options.allowedTools)) {
-    throw new ToolNotAllowedError(toolId);
-  }
-  if (options.signal?.aborted) throw new ToolOperationCancelledError();
-
-  const target = resolveToolTarget(tool);
-  const input = parseArguments(options.arguments);
-  await validateArguments(target.input, input);
-  return options.engine.invoke({
-    functionId: target.functionId,
-    input,
-    source: "tool",
-    inputSchema: target.input,
-    outputSchema: target.output,
-    ...(target.errors === undefined ? {} : { errors: target.errors }),
-    ...(tool.timeoutMs === undefined ? {} : { timeoutMs: tool.timeoutMs }),
-    ...(options.signal === undefined ? {} : { signal: options.signal }),
-    ...(options.hooks === undefined ? {} : { hooks: options.hooks }),
-    ...(options.parent === undefined ? {} : { parent: options.parent }),
-  });
-}
-
-export function createToolRuntime(options: ToolRuntimeOptions): ToolRuntime {
-  const allowedTools =
-    options.allowedTools === undefined ? undefined : Object.freeze([...options.allowedTools]);
-  return Object.freeze({
-    invoke: (toolId: string, arguments_: unknown, context: ToolInvocationContext = {}) =>
-      invokeTool({
-        ...options,
-        toolId,
-        arguments: arguments_,
-        ...(allowedTools === undefined ? {} : { allowedTools }),
-        ...(context.signal === undefined ? {} : { signal: context.signal }),
+/** Creates a reusable compatibility runtime through Effect.
+ * The allowlist is copied at creation; the caller retains ownership of tools and engine.
+ * @param options - Tool source, engine, and optional allowlist.
+ * @returns Frozen runtime; creation has no typed failure.
+ * @example Effect.runSync(createToolRuntimeEffect({ tools: [tool], engine }));
+ */
+export const createToolRuntimeEffect = Effect.fn("tools.create-runtime")(
+  (options: ToolRuntimeOptions) =>
+    observeTool(
+      "create-runtime",
+      Effect.sync((): ToolRuntime => {
+        const allowedTools =
+          options.allowedTools === undefined ? undefined : Object.freeze([...options.allowedTools]);
+        return Object.freeze({
+          invoke: (toolId: string, arguments_: unknown, context: ToolInvocationContext = {}) =>
+            invokeTool({
+              ...options,
+              toolId,
+              arguments: arguments_,
+              ...(allowedTools === undefined ? {} : { allowedTools }),
+              ...(context.signal === undefined ? {} : { signal: context.signal }),
+            }),
+        });
       }),
-  });
-}
+    ),
+);
 
-function findTool(source: ToolSource, id: string): ToolDescriptor<string> | undefined {
-  if (Array.isArray(source)) return source.find((tool) => getDescriptorIdentity(tool) === id);
-  if (source instanceof Map)
-    return (
-      source.get(id) ?? [...source.values()].find((tool) => getDescriptorIdentity(tool) === id)
-    );
-  const record = source as Readonly<Record<string, ToolDescriptor<string>>>;
-  return record[id] ?? Object.values(record).find((tool) => getDescriptorIdentity(tool) === id);
-}
-
-function isAllowed(id: string, allowlist: readonly ToolAllowlistEntry[]): boolean {
-  return allowlist.some(
-    (entry) =>
-      (typeof entry === "string"
-        ? normalizeId(entry)
-        : "id" in entry
-          ? getDescriptorIdentity(entry)
-          : entry.ref.id) === id,
-  );
-}
-
-function functionTargetId(target: ToolDescriptor<string>["target"]): string {
-  const identity = resolveDescriptorIdentity(target);
-  return identity.canonical ? identity.id : target.ref.id;
-}
-
-function parseArguments(value: unknown): unknown {
-  if (typeof value !== "string") return value;
-  try {
-    return JSON.parse(value) as unknown;
-  } catch {
-    throw new ToolArgumentValidationError([{ message: "Tool arguments must be valid JSON" }]);
-  }
-}
-
-async function validateArguments(schema: StandardSchemaV1, value: unknown): Promise<void> {
-  try {
-    const result = await validate(schema, value as never);
-    if (result.issues !== undefined) throw new ToolArgumentValidationError(result.issues);
-  } catch (cause) {
-    if (cause instanceof ToolArgumentValidationError) throw cause;
-    throw new ToolArgumentValidationError([{ message: "Tool arguments failed validation" }]);
-  }
+/** Creates a reusable Promise runtime.
+ * @param options - Tool source, engine, and optional allowlist.
+ * @returns Frozen runtime.
+ * @throws Unexpected defects from runtime construction.
+ * @example const runtime = createToolRuntime({ tools: [tool], engine });
+ */
+export function createToolRuntime(options: ToolRuntimeOptions): ToolRuntime {
+  return runToolSync(createToolRuntimeEffect(options));
 }

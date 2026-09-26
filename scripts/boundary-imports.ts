@@ -86,6 +86,7 @@ export const descriptorRuntimeDependencies = new Map<string, ReadonlySet<string>
   ["@relkit/functions", new Set(["effect"])],
   ["@relkit/jobs", new Set(["effect"])],
   ["@relkit/routes", new Set(["hono"])],
+  ["@relkit/tools", new Set(["effect"])],
 ]);
 
 export const nodeBuiltins = new Set(builtinModules.map((name) => name.replace(/^node:/, "")));

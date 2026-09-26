@@ -1,89 +1,182 @@
-import { deepFreeze, isRef } from "@relkit/contracts";
-import { resolveDescriptorIdentity } from "@relkit/invocation";
+import { deepFreeze } from "@relkit/contracts";
+import { resolveDescriptorIdentityEffect } from "@relkit/invocation";
+import { Effect } from "effect";
+import { runToolSync, ToolOperationFailure, toolTry } from "./tool-observability.js";
 import {
-  isErrorDescriptor,
-  type FunctionRefAny,
-  type FunctionToolApproval,
-  type FunctionToolSideEffect,
-  type FunctionToolTarget,
-} from "@relkit/functions";
+  isFunctionTargetEffect,
+  isPositiveIntegerEffect,
+  isToolApprovalEffect,
+  isToolSideEffectEffect,
+} from "./tool-predicates.js";
+import type { ToolApproval, ToolSideEffect } from "./define-tool.types.js";
+import type { FunctionRefAny, FunctionToolTarget } from "@relkit/functions";
 
+export {
+  hasOwn,
+  hasOwnEffect,
+  isFunctionTarget,
+  isFunctionTargetEffect,
+  isNonEmptyString,
+  isNonEmptyStringEffect,
+  isPositiveInteger,
+  isPositiveIntegerEffect,
+  isRecord,
+  isRecordEffect,
+  isToolApproval,
+  isToolApprovalEffect,
+  isToolSideEffect,
+  isToolSideEffectEffect,
+} from "./tool-predicates.js";
+
+/** Copies and freezes a function target through Effect.
+ * @param target - Function reference to validate.
+ * @returns Frozen tool target or tagged input failure.
+ * @example Effect.runSync(copyFunctionTargetEffect(target));
+ */
+export const copyFunctionTargetEffect = Effect.fn("tools.copy-target")(
+  <Target extends FunctionRefAny>(target: Target) =>
+    Effect.gen(function* () {
+      const validTarget = yield* isFunctionTargetEffect(target);
+      if (!validTarget) {
+        return yield* toolTry("copy-target", () => {
+          throw new TypeError("Tool target must be a function reference");
+        });
+      }
+      const identity = yield* resolveDescriptorIdentityEffect(target).pipe(
+        Effect.mapError(
+          (failure) =>
+            new ToolOperationFailure({
+              operation: "copy-target",
+              reason: failure.message,
+              cause: failure.cause,
+            }),
+        ),
+      );
+      return yield* toolTry("copy-target", () => {
+        return deepFreeze({
+          ref: Object.freeze({
+            kind: "function" as const,
+            id: identity.canonical ? identity.id : target.ref.id,
+          }),
+          input: target.input,
+          output: target.output,
+          ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
+        }) as FunctionToolTarget<Target>;
+      });
+    }),
+);
+
+/** Copies a validated function target.
+ * @param target - Function reference.
+ * @returns Frozen target metadata.
+ * @throws TypeError when the target is malformed.
+ * @example copyFunctionTarget(target);
+ */
 export function copyFunctionTarget<Target extends FunctionRefAny>(
   target: Target,
 ): FunctionToolTarget<Target> {
-  if (!isFunctionTarget(target)) throw new TypeError("Tool target must be a function reference");
-  const identity = resolveDescriptorIdentity(target);
-  return deepFreeze({
-    ref: Object.freeze({
-      kind: "function" as const,
-      id: identity.canonical ? identity.id : target.ref.id,
-    }),
-    input: target.input,
-    output: target.output,
-    ...(target.errors === undefined ? {} : { errors: Object.freeze([...target.errors]) }),
-  }) as FunctionToolTarget<Target>;
+  return runToolSync(copyFunctionTargetEffect(target));
 }
 
-export function validateSideEffect(value: unknown): FunctionToolSideEffect {
-  if (!isToolSideEffect(value)) {
-    throw new TypeError("Tool sideEffect must be none, read, write, or external");
-  }
-  return value;
+/** Validates a tool side-effect policy through Effect.
+ * @param value - Candidate policy.
+ * @returns Policy or tagged input failure.
+ * @example Effect.runSync(validateSideEffectEffect("read"));
+ */
+export const validateSideEffectEffect = Effect.fn("tools.validate-side-effect")((value: unknown) =>
+  Effect.gen(function* () {
+    const valid = yield* isToolSideEffectEffect(value);
+    return yield* toolTry("validate-side-effect", () => {
+      if (!valid) throw new TypeError("Tool sideEffect must be none, read, write, or external");
+      return value as ToolSideEffect;
+    });
+  }),
+);
+
+/** Validates a tool side-effect policy.
+ * @param value - Candidate policy.
+ * @returns Supported policy.
+ * @throws TypeError when the policy is unknown.
+ * @example validateSideEffect("read");
+ */
+export function validateSideEffect(value: unknown): ToolSideEffect {
+  return runToolSync(validateSideEffectEffect(value));
 }
 
-export function validateApproval(value: unknown): FunctionToolApproval {
-  if (!isToolApproval(value)) {
-    throw new TypeError("Tool approval must be never, on-write, or always");
-  }
-  return value;
+/** Validates a tool approval policy through Effect.
+ * @param value - Candidate policy.
+ * @returns Policy or tagged input failure.
+ * @example Effect.runSync(validateApprovalEffect("never"));
+ */
+export const validateApprovalEffect = Effect.fn("tools.validate-approval")((value: unknown) =>
+  Effect.gen(function* () {
+    const valid = yield* isToolApprovalEffect(value);
+    return yield* toolTry("validate-approval", () => {
+      if (!valid) throw new TypeError("Tool approval must be never, on-write, or always");
+      return value as ToolApproval;
+    });
+  }),
+);
+
+/** Validates a tool approval policy.
+ * @param value - Candidate policy.
+ * @returns Supported policy.
+ * @throws TypeError when the policy is unknown.
+ * @example validateApproval("never");
+ */
+export function validateApproval(value: unknown): ToolApproval {
+  return runToolSync(validateApprovalEffect(value));
 }
 
-export function isToolSideEffect(value: unknown): value is FunctionToolSideEffect {
-  return value === "none" || value === "read" || value === "write" || value === "external";
-}
+/** Requires nonempty trimmed text through Effect.
+ * @param value - Candidate text.
+ * @param name - Field label.
+ * @returns Trimmed text or tagged input failure.
+ * @example Effect.runSync(requiredTextEffect(" read ", "description"));
+ */
+export const requiredTextEffect = Effect.fn("tools.required-text")((value: unknown, name: string) =>
+  toolTry("required-text", () => {
+    if (typeof value !== "string" || value.trim() === "")
+      throw new TypeError(`${name} is required`);
+    return value.trim();
+  }),
+);
 
-export function isToolApproval(value: unknown): value is FunctionToolApproval {
-  return value === "never" || value === "on-write" || value === "always";
-}
-
+/** Requires nonempty trimmed text.
+ * @param value - Candidate text.
+ * @param name - Field label.
+ * @returns Trimmed text.
+ * @throws TypeError when the value is empty.
+ * @example requiredText(" read ", "description");
+ */
 export function requiredText(value: unknown, name: string): string {
-  if (typeof value !== "string" || value.trim() === "") throw new TypeError(`${name} is required`);
-  return value.trim();
+  return runToolSync(requiredTextEffect(value, name));
 }
 
+/** Requires a safe positive integer through Effect.
+ * @param value - Candidate number.
+ * @param name - Field label.
+ * @returns Number or tagged input failure.
+ * @example Effect.runSync(positiveIntegerEffect(5, "timeoutMs"));
+ */
+export const positiveIntegerEffect = Effect.fn("tools.positive-integer")(
+  (value: unknown, name: string) =>
+    Effect.gen(function* () {
+      const valid = yield* isPositiveIntegerEffect(value);
+      return yield* toolTry("positive-integer", () => {
+        if (!valid) throw new TypeError(`${name} must be a positive integer`);
+        return value as number;
+      });
+    }),
+);
+
+/** Asserts a safe positive integer.
+ * @param value - Candidate number.
+ * @param name - Field label.
+ * @returns Nothing when valid.
+ * @throws TypeError when the value is invalid.
+ * @example positiveInteger(5, "timeoutMs");
+ */
 export function positiveInteger(value: unknown, name: string): asserts value is number {
-  if (!isPositiveInteger(value)) throw new TypeError(`${name} must be a positive integer`);
-}
-
-export function isPositiveInteger(value: unknown): value is number {
-  return Number.isSafeInteger(value) && (value as number) > 0;
-}
-
-export function isFunctionTarget(value: unknown): value is FunctionRefAny {
-  return (
-    isRecord(value) &&
-    isRef(value.ref, "function") &&
-    isSchema(value.input) &&
-    isSchema(value.output) &&
-    (!hasOwn(value, "handler") || typeof value.handler === "function") &&
-    (value.errors === undefined ||
-      (Array.isArray(value.errors) && value.errors.every(isErrorDescriptor)))
-  );
-}
-
-function isSchema(value: unknown): boolean {
-  if (!isRecord(value) || !isRecord(value["~standard"])) return false;
-  return value["~standard"].version === 1 && typeof value["~standard"].validate === "function";
-}
-
-export function isNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.trim() !== "";
-}
-
-export function isRecord(value: unknown): value is Record<PropertyKey, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-export function hasOwn(value: object, key: PropertyKey): boolean {
-  return Object.prototype.hasOwnProperty.call(value, key);
+  runToolSync(positiveIntegerEffect(value, name));
 }
