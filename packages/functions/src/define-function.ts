@@ -1,15 +1,14 @@
 import { createUnboundIdentity } from "@relkit/invocation";
-import type { DefineFunction } from "./define-function-types.js";
+import { Effect } from "effect";
+import type { DefineFunction, DefineFunctionEffect } from "./define-function.types.js";
+import { createFunctionDescriptorEffect } from "./function-descriptor-factory.js";
 import {
-  createFunctionDescriptor,
-  type FunctionDescriptorFactoryOptions,
-} from "./function-descriptor-factory.js";
+  FunctionOperationError,
+  observeFunction,
+  runFunctionSync,
+} from "./function-observability.js";
+import type { FunctionImplementationOptions } from "./define-function.types.js";
 import type { FunctionDependencies, FunctionDescriptor } from "./types.js";
-
-type FunctionImplementationOptions = Omit<
-  FunctionDescriptorFactoryOptions,
-  "id" | "invocationMode"
-> & { readonly id?: string };
 
 export type {
   AgentClientFor,
@@ -61,6 +60,35 @@ export type {
   ResolvedApplicationEnv,
 } from "./types.js";
 
+const defineFunctionOperation = Effect.fn("functions.function.define")(
+  (
+    options: FunctionImplementationOptions,
+  ): Effect.Effect<
+    FunctionDescriptor<string, unknown, unknown, FunctionDependencies>,
+    FunctionOperationError
+  > =>
+    observeFunction(
+      "function.define",
+      Effect.gen(function* () {
+        const id = yield* Effect.sync(() =>
+          options.id === undefined ? createUnboundIdentity() : options.id,
+        );
+        return (yield* createFunctionDescriptorEffect({
+          ...options,
+          id,
+          invocationMode: "callable",
+        })) as FunctionDescriptor<string, unknown, unknown, FunctionDependencies>;
+      }),
+    ),
+);
+
+/** Defines a callable function through Effect.
+ * @param options - Function schemas, handler, and metadata.
+ * @returns Descriptor or tagged validation failure.
+ * @example Effect.runSync(defineFunctionEffect({ input, output, handler }));
+ */
+export const defineFunctionEffect: DefineFunctionEffect = defineFunctionOperation;
+
 /**
  * Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
  *
@@ -70,6 +98,9 @@ export type {
  * for nested calls so the
  * common engine preserves validation, service policy, limits, and telemetry.
  *
+ * @param options - Function schemas, handler, and metadata.
+ * @returns Frozen callable descriptor.
+ * @throws TypeError for invalid definition inputs.
  * @example
  * ```ts
  * import { defineFunction } from "@relkit/app/functions"
@@ -90,13 +121,5 @@ export type {
  * @category Functions
  * @since 0.1.0
  */
-export const defineFunction: DefineFunction = (
-  options: FunctionImplementationOptions,
-): FunctionDescriptor<string, unknown, unknown, FunctionDependencies> => {
-  const id = options.id === undefined ? createUnboundIdentity() : options.id;
-  return createFunctionDescriptor({
-    ...options,
-    id,
-    invocationMode: "callable",
-  }) as FunctionDescriptor<string, unknown, unknown, FunctionDependencies>;
-};
+export const defineFunction: DefineFunction = (options: FunctionImplementationOptions) =>
+  runFunctionSync(defineFunctionOperation(options));

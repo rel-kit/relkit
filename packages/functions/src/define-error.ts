@@ -1,11 +1,12 @@
-import { deepFreeze, normalizeId, type DescriptorMetadata } from "@relkit/contracts";
+import { FunctionInputError } from "./function-input-error.js";
+import { deepFreeze, normalizeId } from "@relkit/contracts";
 import {
   createUnboundIdentity,
   getDescriptorIdentity,
-  normalizeErrorRetry,
+  normalizeErrorRetryEffect,
   type ErrorRetry,
-  type ErrorRetryInput,
 } from "@relkit/invocation";
+import { Effect } from "effect";
 import {
   validateSync,
   type InferInput,
@@ -13,20 +14,34 @@ import {
   type StandardSchemaV1,
 } from "@relkit/schema";
 import { assertErrorSchema, validateErrorHttp } from "./define-error-validation.js";
+import {
+  FunctionOperationError,
+  functionAttempt,
+  functionTry,
+  observeFunction,
+  runFunctionSync,
+} from "./function-observability.js";
+import type {
+  DefineErrorOptions,
+  ErrorDescriptor,
+  ErrorHttpMapping,
+  ErrorRef,
+} from "./define-error.types.js";
 
-export { isErrorDescriptor } from "./define-error-validation.js";
+export { isErrorDescriptor, isErrorDescriptorEffect } from "./define-error-validation.js";
 
 export type { ErrorRetry, ErrorRetryInput, NormalizedErrorRetry } from "@relkit/invocation";
+export type {
+  DefineErrorOptions,
+  ErrorDescriptor,
+  ErrorDescriptorAny,
+  ErrorHttpMapping,
+  ErrorRef,
+} from "./define-error.types.js";
 
-export interface ErrorHttpMapping {
-  readonly status: number;
-}
-
-export interface ErrorRef<Id extends string = string> {
-  readonly kind: "error";
-  readonly id: Id;
-}
-
+/** Validated application error instance.
+ * @example const error = new NotFound({ id: "one" });
+ */
 export class DeclaredError<Id extends string = string, Data = unknown> extends Error {
   readonly id: Id;
   readonly ref: ErrorRef<Id>;
@@ -56,128 +71,130 @@ export class DeclaredError<Id extends string = string, Data = unknown> extends E
   }
 }
 
-export interface ErrorDescriptor<
-  Id extends string,
-  Data,
-  DataSchema extends StandardSchemaV1 = StandardSchemaV1,
-> extends DescriptorMetadata {
-  readonly kind: "error";
-  readonly id: Id;
-  readonly ref: ErrorRef<Id>;
-  readonly data: DataSchema;
-  readonly message: string | ((data: Data) => string);
-  readonly http?: ErrorHttpMapping;
-  readonly retry: ErrorRetry;
-  readonly afterMs?: number;
-  readonly create: (input: InferInput<DataSchema>) => DeclaredError<Id, Data>;
-  new (input: InferInput<DataSchema>): DeclaredError<Id, Data>;
-}
-
-export type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
-
-export interface DefineErrorOptions<
-  Id extends string,
-  DataSchema extends StandardSchemaV1,
-> extends DescriptorMetadata {
-  readonly id?: Id;
-  readonly data: DataSchema;
-  readonly message: string | ((data: InferOutput<DataSchema>) => string);
-  readonly http?: ErrorHttpMapping;
-  readonly retry?: ErrorRetryInput;
-}
-
 /**
  * Defines a typed application error with safe data, transport metadata, and an optional retry hint.
+ * The compiler derives omitted IDs. Omitted retry means never; `later` only hints to durable work.
  *
- * Source-scoped errors may omit `id`; the compiler derives an identity from a statically
- * identifiable binding such as `InvalidError`. Omitted `retry` is non-retryable. Use
- * `{ kind: "later", afterMs }` to provide a minimum delay hint for jobs and durable events;
- * HTTP and direct calls never repeat the function automatically.
- *
+ * @param options - Error schema, message, and retry metadata.
+ * @returns Effect yielding the callable descriptor or a tagged validation failure.
  * @example
- * ```ts
- * import { defineError } from "@relkit/app/functions"
- * import { z } from "@relkit/app/schema"
- *
- * const notFound = defineError({
+ * const NotFound = Effect.runSync(defineErrorEffect({
  *   id: "orders.not-found",
  *   data: z.object({ orderId: z.string() }),
  *   message: ({ orderId }) => `Order ${orderId} was not found`,
- *   http: { status: 404 },
- *   retry: "never"
- * })
- * const failure = new notFound({ orderId: "order-1" })
- * void failure
- * ```
+ * }));
+ * new NotFound({ orderId: "order-1" });
  * @category Errors
  * @since 0.1.0
+ */
+export const defineErrorEffect = Effect.fn("functions.error.define")(
+  <const Id extends string, const DataSchema extends StandardSchemaV1>(
+    options: DefineErrorOptions<Id, DataSchema>,
+  ): Effect.Effect<
+    ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>,
+    import("./function-observability.js").FunctionOperationError
+  > =>
+    observeFunction(
+      "error.define",
+      Effect.gen(function* () {
+        const id = yield* functionAttempt("error.define", () => {
+          assertErrorSchema(options.data);
+          if (typeof options.message !== "string" && typeof options.message !== "function")
+            throw new FunctionInputError("Error message must be a string or function");
+          const id = normalizeId(
+            options.id === undefined ? createUnboundIdentity() : options.id,
+          ) as unknown as Id;
+          validateErrorHttp(options.http);
+          return id;
+        });
+        const retry = yield* normalizeErrorRetryEffect(options.retry).pipe(
+          Effect.mapError(
+            (failure) =>
+              new FunctionOperationError({
+                operation: "error.define",
+                reason: failure.message,
+                cause: new TypeError(failure.message),
+              }),
+          ),
+        );
+        return yield* functionAttempt("error.define", () => {
+          const ref = Object.freeze({ kind: "error" as const, id });
+          const http =
+            options.http === undefined ? undefined : Object.freeze({ status: options.http.status });
+          const makeError = (
+            input: InferInput<DataSchema>,
+          ): {
+            readonly data: InferOutput<DataSchema>;
+            readonly message: string;
+          } =>
+            runFunctionSync(
+              functionTry("error.create", () => {
+                const result = validateSync(options.data, input);
+                if (!("value" in result))
+                  throw new FunctionInputError(`Invalid data for declared error "${id}"`);
+                const data = deepFreeze(result.value);
+                const message =
+                  typeof options.message === "function" ? options.message(data) : options.message;
+                if (typeof message !== "string")
+                  throw new FunctionInputError(`Error message for "${id}" must be a string`);
+                return { data, message };
+              }),
+            );
+
+          class DefinedError extends DeclaredError<Id, InferOutput<DataSchema>> {
+            constructor(input: InferInput<DataSchema>) {
+              const error = makeError(input);
+              const boundId = getDescriptorIdentity(DefinedError);
+              const boundRef = Object.freeze({ kind: "error" as const, id: boundId });
+              super(
+                boundId as Id,
+                boundRef as ErrorRef<Id>,
+                error.data,
+                error.message,
+                retry.retry,
+                retry.afterMs,
+                http,
+              );
+            }
+          }
+
+          Object.defineProperty(DefinedError, "name", { value: id });
+          const descriptor = deepFreeze({
+            kind: "error" as const,
+            id,
+            ref,
+            data: options.data,
+            message: options.message,
+            retry: retry.retry,
+            ...(retry.afterMs === undefined ? {} : { afterMs: retry.afterMs }),
+            ...(http === undefined ? {} : { http }),
+            ...(options.title === undefined ? {} : { title: options.title }),
+            ...(options.description === undefined ? {} : { description: options.description }),
+            ...(options.tags === undefined ? {} : { tags: Object.freeze([...options.tags]) }),
+            create: (input: InferInput<DataSchema>): DeclaredError<Id, InferOutput<DataSchema>> =>
+              new DefinedError(input),
+          });
+          Object.assign(DefinedError, descriptor);
+          Object.freeze(DefinedError.prototype);
+          Object.freeze(DefinedError);
+          return DefinedError as unknown as ErrorDescriptor<
+            Id,
+            InferOutput<DataSchema>,
+            DataSchema
+          >;
+        });
+      }),
+    ),
+);
+
+/** Defines a typed application error.
+ * @param options - Error schema, message, and transport metadata.
+ * @returns Callable frozen error descriptor.
+ * @throws TypeError for invalid schema, retry, HTTP status, or message.
+ * @example const NotFound = defineError({ id: "orders.not-found", data: z.object({ id: z.string() }), message: "Missing" });
  */
 export function defineError<const Id extends string, const DataSchema extends StandardSchemaV1>(
   options: DefineErrorOptions<Id, DataSchema>,
 ): ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema> {
-  assertErrorSchema(options.data);
-  if (typeof options.message !== "string" && typeof options.message !== "function") {
-    throw new TypeError("Error message must be a string or function");
-  }
-  const id = normalizeId(
-    options.id === undefined ? createUnboundIdentity() : options.id,
-  ) as unknown as Id;
-  validateErrorHttp(options.http);
-  const retry = normalizeErrorRetry(options.retry);
-
-  const ref = Object.freeze({ kind: "error" as const, id });
-  const http =
-    options.http === undefined ? undefined : Object.freeze({ status: options.http.status });
-  const makeError = (
-    input: InferInput<DataSchema>,
-  ): {
-    readonly data: InferOutput<DataSchema>;
-    readonly message: string;
-  } => {
-    const result = validateSync(options.data, input);
-    if (!("value" in result)) throw new TypeError(`Invalid data for declared error "${id}"`);
-    const data = deepFreeze(result.value);
-    const message = typeof options.message === "function" ? options.message(data) : options.message;
-    if (typeof message !== "string")
-      throw new TypeError(`Error message for "${id}" must be a string`);
-    return { data, message };
-  };
-
-  class DefinedError extends DeclaredError<Id, InferOutput<DataSchema>> {
-    constructor(input: InferInput<DataSchema>) {
-      const error = makeError(input);
-      const boundId = getDescriptorIdentity(DefinedError);
-      const boundRef = Object.freeze({ kind: "error" as const, id: boundId });
-      super(
-        boundId as Id,
-        boundRef as ErrorRef<Id>,
-        error.data,
-        error.message,
-        retry.retry,
-        retry.afterMs,
-        http,
-      );
-    }
-  }
-
-  Object.defineProperty(DefinedError, "name", { value: id });
-  const descriptor = deepFreeze({
-    kind: "error" as const,
-    id,
-    ref,
-    data: options.data,
-    message: options.message,
-    retry: retry.retry,
-    ...(retry.afterMs === undefined ? {} : { afterMs: retry.afterMs }),
-    ...(http === undefined ? {} : { http }),
-    ...(options.title === undefined ? {} : { title: options.title }),
-    ...(options.description === undefined ? {} : { description: options.description }),
-    ...(options.tags === undefined ? {} : { tags: Object.freeze([...options.tags]) }),
-    create: (input: InferInput<DataSchema>): DeclaredError<Id, InferOutput<DataSchema>> =>
-      new DefinedError(input),
-  });
-  Object.assign(DefinedError, descriptor);
-  Object.freeze(DefinedError.prototype);
-  Object.freeze(DefinedError);
-  return DefinedError as unknown as ErrorDescriptor<Id, InferOutput<DataSchema>, DataSchema>;
+  return runFunctionSync(defineErrorEffect(options));
 }

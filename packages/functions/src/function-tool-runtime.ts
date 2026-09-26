@@ -1,66 +1,153 @@
 import { normalizeId } from "@relkit/contracts";
 import {
-  abortablePromise,
-  dispatchInvocation,
+  dispatchInvocationEffect,
   getDescriptorIdentity,
   type InvocationTarget,
 } from "@relkit/invocation";
-import { validate, type InferInput, type InferOutput, type StandardIssue } from "@relkit/schema";
+import {
+  SchemaIssuesError,
+  SchemaValidatorLive,
+  validateEffect,
+  type InferInput,
+  type InferOutput,
+} from "@relkit/schema";
+import { Effect } from "effect";
 import type { FunctionRefAny } from "./types.js";
-import type {
-  FunctionToolApprovalRequest,
-  FunctionToolInvokeOptions,
-  FunctionToolMetadata,
-  FunctionToolHook,
-} from "./function-tool.js";
+import type { FunctionToolApprovalRequest, FunctionToolInvokeOptions } from "./function-tool.js";
+import type { FunctionToolRuntimeMetadata } from "./function-tool-runtime.types.js";
+import {
+  FunctionToolApprovalDeniedError,
+  FunctionToolApprovalRequiredError,
+  FunctionToolArgumentValidationError,
+  FunctionToolOperationCancelledError,
+} from "./function-tool-errors.js";
+import {
+  FunctionToolArgumentFailure,
+  FunctionToolCancelledFailure,
+} from "./function-tool-failures.js";
+import { resolveFunctionToolApprovalEffect } from "./function-tool-approval.js";
+import {
+  FunctionOperationError,
+  functionTry,
+  observeFunction,
+  runFunctionPromise,
+  runFunctionSync,
+} from "./function-observability.js";
 
-type FunctionToolRuntimeMetadata = Pick<
-  FunctionToolMetadata,
-  "sideEffect" | "approval" | "timeoutMs"
-> & {
-  readonly id: string;
-  readonly onBefore?: FunctionToolHook;
-  readonly onAfter?: FunctionToolHook;
-};
+export {
+  FunctionToolApprovalDeniedError,
+  FunctionToolApprovalRequiredError,
+  FunctionToolArgumentValidationError,
+  FunctionToolOperationCancelledError,
+} from "./function-tool-errors.js";
+export {
+  FunctionToolApprovalDeniedFailure,
+  FunctionToolApprovalRequiredFailure,
+  FunctionToolArgumentFailure,
+  FunctionToolCancelledFailure,
+} from "./function-tool-failures.js";
 
-export class FunctionToolArgumentValidationError extends TypeError {
-  readonly code = "RELKIT_TOOL_ARGUMENT_VALIDATION" as const;
-  readonly issues: readonly StandardIssue[];
+/** Invokes a tool through schema validation, approval, and the Effect dispatcher.
+ * @param target - Callable function target.
+ * @param metadata - Tool policy and hooks.
+ * @param input - Tool argument input.
+ * @param options - Abort signal and approval resolver.
+ * @param identity - Optional bound descriptor identity.
+ * @returns Validated function output or a tagged tool failure.
+ * @example Effect.runPromise(Effect.provide(invokeFunctionToolEffect(fn, metadata, input), SchemaValidatorLive));
+ */
+export const invokeFunctionToolEffect = Effect.fn("functions.tool.invoke")(
+  <Target extends FunctionRefAny>(
+    target: Target,
+    metadata: FunctionToolRuntimeMetadata,
+    input: InferInput<Target["input"]>,
+    options: FunctionToolInvokeOptions = {},
+    identity?: object,
+  ) =>
+    observeFunction(
+      "tool.invoke",
+      Effect.gen(function* () {
+        const toolId = yield* functionTry("tool.invoker-create", () =>
+          identity === undefined ? normalizeId(metadata.id) : getDescriptorIdentity(identity),
+        );
+        const validatedInput = yield* validateEffect(target.input, input).pipe(
+          Effect.mapError((cause) => {
+            const issues =
+              cause instanceof SchemaIssuesError
+                ? cause.issues
+                : [{ message: "Tool arguments failed validation" }];
+            return new FunctionToolArgumentFailure({
+              issues,
+              cause: new FunctionToolArgumentValidationError(issues),
+            });
+          }),
+        );
+        if (options.signal?.aborted)
+          return yield* Effect.fail(
+            new FunctionToolCancelledFailure({
+              cause: new FunctionToolOperationCancelledError(),
+            }),
+          );
+        const approval = Object.freeze({
+          toolId,
+          sideEffect: metadata.sideEffect,
+          policy: metadata.approval,
+        }) satisfies FunctionToolApprovalRequest;
+        yield* resolveFunctionToolApprovalEffect(approval, options);
+        return (yield* dispatchInvocationEffect({
+          target: target as unknown as InvocationTarget,
+          input: validatedInput,
+          options: {
+            source: "tool",
+            ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
+            ...(options.signal === undefined ? {} : { signal: options.signal }),
+            ...(metadata.onBefore === undefined && metadata.onAfter === undefined
+              ? {}
+              : {
+                  toolHooks: {
+                    ...(metadata.onBefore === undefined ? {} : { onBefore: metadata.onBefore }),
+                    ...(metadata.onAfter === undefined ? {} : { onAfter: metadata.onAfter }),
+                  },
+                }),
+          },
+        }).pipe(
+          Effect.mapError(
+            (cause) => new FunctionOperationError({ operation: "tool.invoke", cause: cause.cause }),
+          ),
+        )) as InferOutput<Target["output"]>;
+      }),
+    ),
+);
 
-  constructor(issues: readonly StandardIssue[]) {
-    super("Tool arguments failed validation");
-    this.name = "ToolArgumentValidationError";
-    this.issues = Object.freeze(issues.map((issue) => Object.freeze({ ...issue })));
-  }
-}
+/** Creates an Effect invoker that resolves services when each call runs.
+ * @param target - Callable function target.
+ * @param metadata - Tool policy and hooks.
+ * @param identity - Optional bound descriptor identity.
+ * @returns Effect invoker or tagged construction failure.
+ * @example Effect.runSync(createFunctionToolInvokerEffect(fn, metadata));
+ */
+export const createFunctionToolInvokerEffect = Effect.fn("functions.tool.invoker-create")(
+  <Target extends FunctionRefAny>(
+    target: Target,
+    metadata: FunctionToolRuntimeMetadata,
+    identity?: object,
+  ) =>
+    functionTry(
+      "tool.invoker-create",
+      () =>
+        (input: InferInput<Target["input"]>, options: FunctionToolInvokeOptions = {}) =>
+          invokeFunctionToolEffect(target, metadata, input, options, identity),
+    ),
+);
 
-export class FunctionToolOperationCancelledError extends Error {
-  readonly code = "ABORT_ERR" as const;
-
-  constructor() {
-    super("Tool operation cancelled");
-    this.name = "AbortError";
-  }
-}
-
-export class FunctionToolApprovalRequiredError extends Error {
-  readonly code = "RELKIT_APPROVAL_REQUIRED" as const;
-
-  constructor(readonly approval: FunctionToolApprovalRequest) {
-    super(`Approval required for tool "${approval.toolId}"`);
-    this.name = "FunctionToolApprovalRequiredError";
-  }
-}
-
-export class FunctionToolApprovalDeniedError extends Error {
-  readonly code = "RELKIT_APPROVAL_DENIED" as const;
-
-  constructor(readonly approval: FunctionToolApprovalRequest) {
-    super(`Approval denied for tool "${approval.toolId}"`);
-    this.name = "FunctionToolApprovalDeniedError";
-  }
-}
-
+/** Creates a Promise compatibility invoker for a tool.
+ * @param target - Callable function target.
+ * @param metadata - Tool policy and hooks.
+ * @param identity - Optional bound descriptor identity.
+ * @returns Promise invoker preserving established error classes.
+ * @throws TypeError if construction metadata is invalid.
+ * @example const invoke = createFunctionToolInvoker(fn, metadata);
+ */
 export function createFunctionToolInvoker<Target extends FunctionRefAny>(
   target: Target,
   metadata: FunctionToolRuntimeMetadata,
@@ -69,74 +156,7 @@ export function createFunctionToolInvoker<Target extends FunctionRefAny>(
   input: InferInput<Target["input"]>,
   options?: FunctionToolInvokeOptions,
 ) => Promise<InferOutput<Target["output"]>> {
-  return async (input, options = {}) => {
-    const toolId =
-      identity === undefined ? normalizeId(metadata.id) : getDescriptorIdentity(identity);
-    const validatedInput = await validateToolInput(target.input, input);
-    if (options.signal?.aborted) throw new FunctionToolOperationCancelledError();
-    const approval = Object.freeze({
-      toolId,
-      sideEffect: metadata.sideEffect,
-      policy: metadata.approval,
-    }) satisfies FunctionToolApprovalRequest;
-    await resolveApproval(approval, options);
-    const result = dispatchInvocation({
-      target: target as unknown as InvocationTarget,
-      input: validatedInput,
-      options: {
-        source: "tool",
-        ...(metadata.timeoutMs === undefined ? {} : { timeoutMs: metadata.timeoutMs }),
-        ...(options.signal === undefined ? {} : { signal: options.signal }),
-        ...(metadata.onBefore === undefined && metadata.onAfter === undefined
-          ? {}
-          : {
-              toolHooks: {
-                ...(metadata.onBefore === undefined ? {} : { onBefore: metadata.onBefore }),
-                ...(metadata.onAfter === undefined ? {} : { onAfter: metadata.onAfter }),
-              },
-            }),
-      },
-    });
-    return result as Promise<InferOutput<Target["output"]>>;
-  };
+  const invokeEffect = runFunctionSync(createFunctionToolInvokerEffect(target, metadata, identity));
+  return (input, options) =>
+    runFunctionPromise(Effect.provide(invokeEffect(input, options), SchemaValidatorLive));
 }
-
-async function validateToolInput(schema: TargetSchema, input: unknown): Promise<unknown> {
-  try {
-    const result = await validate(schema, input as never);
-    if (result.issues !== undefined) throw new FunctionToolArgumentValidationError(result.issues);
-    return result.value;
-  } catch (cause) {
-    if (cause instanceof FunctionToolArgumentValidationError) throw cause;
-    throw new FunctionToolArgumentValidationError([
-      { message: "Tool arguments failed validation" },
-    ]);
-  }
-}
-
-async function resolveApproval(
-  approval: FunctionToolApprovalRequest,
-  options: FunctionToolInvokeOptions,
-): Promise<void> {
-  if (!requiresApproval(approval.policy, approval.sideEffect)) return;
-  const resolver = options.approval;
-  if (resolver === undefined) throw new FunctionToolApprovalRequiredError(approval);
-  const decision =
-    options.signal === undefined
-      ? await resolver(approval)
-      : await abortablePromise(options.signal, () => Promise.resolve(resolver(approval)));
-  if (decision !== true && decision !== "approved") {
-    throw new FunctionToolApprovalDeniedError(approval);
-  }
-}
-
-function requiresApproval(
-  policy: FunctionToolApprovalRequest["policy"],
-  sideEffect: FunctionToolApprovalRequest["sideEffect"],
-): boolean {
-  return (
-    policy === "always" || (policy === "on-write" && sideEffect !== "none" && sideEffect !== "read")
-  );
-}
-
-type TargetSchema = FunctionRefAny["input"];

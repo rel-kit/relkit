@@ -3,7 +3,8 @@ import type {
   FunctionDependencies,
   FunctionHandlerValidation,
 } from "@relkit/functions";
-import { defineError, defineFunction } from "@relkit/functions";
+import { Effect } from "effect";
+import { defineError, defineFunction, defineFunctionEffect } from "@relkit/functions";
 import { defineBucket } from "@relkit/buckets";
 import { defineCache } from "@relkit/cache";
 import { defineEvent } from "@relkit/events";
@@ -51,6 +52,36 @@ const detachedLookup: (
 ) => Promise<InferOutput<typeof lookup.output>> = lookup.invoke;
 const detachedLookupResult = detachedLookup({ rawId: "order-1" });
 void detachedLookupResult;
+
+const lookupEffect = defineFunctionEffect({
+  id: "types.inference-effect-lookup",
+  input: transformedInput,
+  output: lookupOutput,
+  errors: [notFound],
+  handler: (input) =>
+    input.orderId === "missing"
+      ? new notFound({ orderId: input.orderId })
+      : { orderId: input.orderId, totalCents: 100 },
+});
+const effectLookup = Effect.runSync(lookupEffect);
+const effectLookupId: "types.inference-effect-lookup" = effectLookup.id;
+const effectLookupResult: Promise<InferOutput<typeof lookupOutput>> = effectLookup.invoke({
+  rawId: "order-1",
+});
+const effectLookupErrorId: "types.inference-not-found" | undefined = effectLookup.errors?.[0]?.id;
+void effectLookupId;
+void effectLookupResult;
+void effectLookupErrorId;
+// @ts-expect-error the Effect descriptor accepts rawId, not the transformed orderId
+effectLookup.invoke({ orderId: "order-1" });
+
+defineFunctionEffect({
+  id: "types.inference-effect-invalid-output",
+  input: transformedInput,
+  output: lookupOutput,
+  // @ts-expect-error the handler result must match the declared output schema
+  handler: () => ({ orderId: "order-1", totalCents: "invalid" }),
+});
 
 const jobInput = z.object({ rawId: z.string() });
 const sendReceipt = defineJob({
@@ -106,6 +137,20 @@ const createOrder = defineFunction({
 });
 
 void createOrder;
+
+const createOrderEffect = defineFunctionEffect({
+  id: "types.inference-effect-parent",
+  input: z.object({ orderId: z.string() }),
+  output: z.object({ totalCents: z.number() }),
+  dependencies,
+  handler: async ({ orderId }, context) => {
+    const price: number | undefined = await context.cache.prices.get({ sku: orderId });
+    return { totalCents: price ?? 0 };
+  },
+});
+const effectParent = Effect.runSync(createOrderEffect);
+const effectParentId: "types.inference-effect-parent" = effectParent.id;
+void effectParentId;
 
 const tool = defineTool({
   id: "types.inference-tool",

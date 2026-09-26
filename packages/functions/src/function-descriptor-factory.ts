@@ -1,141 +1,82 @@
-import { createDescriptorBase, deepFreeze, type DescriptorMetadata } from "@relkit/contracts";
-import {
-  dispatchInvocation,
-  getDescriptorIdentity,
-  type InvocationTarget,
-} from "@relkit/invocation";
-import type { StandardSchemaV1 } from "@relkit/schema";
+import { FunctionInputError } from "./function-input-error.js";
+import { createDescriptorBase, deepFreeze } from "@relkit/contracts";
+import { Effect } from "effect";
 import { isErrorDescriptor, type ErrorDescriptorAny } from "./define-error.js";
+import { functionTry, runFunctionSync } from "./function-observability.js";
+import { addCallableMethods } from "./function-descriptor-methods.js";
 import {
   assertHook,
   assertSchema,
   copyDependencies,
   copyPublishes,
-  functionTargetForReceiver,
   validateLimit,
 } from "./define-function-validation.js";
-import type { FunctionRefAny } from "./types.js";
 import { isStreamOutputSchema } from "./stream.js";
-import {
-  copyFunctionToolHooks,
-  copyFunctionToolMetadata,
-  createFunctionTool,
-  type FunctionToolOptions,
-} from "./function-tool.js";
-import { createFunctionGraphNode } from "./function-graph-node.js";
+import { copyFunctionToolMetadata } from "./function-tool.js";
+import type { FunctionDescriptorFactoryOptions } from "./function-descriptor-factory.types.js";
 
-export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
-  readonly id: string;
-  readonly input: StandardSchemaV1;
-  readonly output: StandardSchemaV1;
-  readonly progress?: StandardSchemaV1;
-  readonly invocationMode: "callable" | "event-only";
-  readonly handler: (...args: any[]) => unknown;
-  readonly errors?: readonly ErrorDescriptorAny[];
-  readonly dependencies?: import("./types.js").FunctionDependencies;
-  readonly publishes?: readonly string[];
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly tool?: import("./function-tool.js").FunctionToolMetadata;
-  readonly onBefore?: (...args: any[]) => unknown;
-  readonly onAfter?: (...args: any[]) => unknown;
-  readonly descriptorFields?: Readonly<Record<string, unknown>>;
-}
+export type { FunctionDescriptorFactoryOptions } from "./function-descriptor-factory.types.js";
 
+/** Creates a function descriptor through Effect.
+ * @param options - Definition, handler, and metadata.
+ * @returns The frozen descriptor or a tagged validation failure.
+ * @example Effect.runSync(createFunctionDescriptorEffect(options));
+ */
+export const createFunctionDescriptorEffect = Effect.fn("functions.function.create-descriptor")(
+  (
+    options: FunctionDescriptorFactoryOptions,
+  ): Effect.Effect<unknown, import("./function-observability.js").FunctionOperationError> =>
+    functionTry("function.create-descriptor", () => {
+      assertSchema(options.input, "input");
+      assertSchema(options.output, "output");
+      if (options.progress !== undefined) assertSchema(options.progress, "progress");
+      if (typeof options.handler !== "function")
+        throw new FunctionInputError("Function handler must be a function");
+      assertHook(options.onBefore, "onBefore");
+      assertHook(options.onAfter, "onAfter");
+      validateLimit(options.timeoutMs, "timeoutMs");
+      validateLimit(options.concurrency, "concurrency");
+      if (options.invocationMode === "event-only" && options.tool !== undefined) {
+        throw new FunctionInputError("Event functions cannot declare tool metadata");
+      }
+      if (isStreamOutputSchema(options.output) && options.tool !== undefined) {
+        throw new FunctionInputError("Stream-output functions cannot declare tool metadata");
+      }
+      const base = createDescriptorBase("function", options.id, options);
+      const dependencies = copyDependencies(options.dependencies);
+      const publishes = copyPublishes(options.publishes);
+      const errors = copyErrors(options.errors);
+      const tool = options.tool === undefined ? undefined : copyFunctionToolMetadata(options.tool);
+      const descriptor = {
+        ...base,
+        invocationMode: options.invocationMode,
+        input: options.input,
+        output: options.output,
+        ...(options.progress === undefined ? {} : { progress: options.progress }),
+        ...(options.descriptorFields ?? {}),
+        ...(errors === undefined ? {} : { errors }),
+        ...(dependencies === undefined ? {} : { dependencies }),
+        ...(publishes === undefined ? {} : { publishes }),
+        ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+        ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
+        ...(tool === undefined ? {} : { tool }),
+        ...(options.onBefore === undefined ? {} : { onBefore: options.onBefore }),
+        ...(options.onAfter === undefined ? {} : { onAfter: options.onAfter }),
+        handler: options.handler,
+      };
+      if (options.invocationMode === "callable") addCallableMethods(descriptor, tool);
+      return deepFreeze(descriptor);
+    }),
+);
+
+/** Creates a frozen function descriptor for an authoring package.
+ * @param options - Definition, handler, and metadata.
+ * @returns The frozen descriptor.
+ * @throws TypeError for malformed schemas, hooks, limits, or dependencies.
+ * @example createFunctionDescriptor(options);
+ */
 export function createFunctionDescriptor(options: FunctionDescriptorFactoryOptions): unknown {
-  assertSchema(options.input, "input");
-  assertSchema(options.output, "output");
-  if (options.progress !== undefined) assertSchema(options.progress, "progress");
-  if (typeof options.handler !== "function")
-    throw new TypeError("Function handler must be a function");
-  assertHook(options.onBefore, "onBefore");
-  assertHook(options.onAfter, "onAfter");
-  validateLimit(options.timeoutMs, "timeoutMs");
-  validateLimit(options.concurrency, "concurrency");
-  if (options.invocationMode === "event-only" && options.tool !== undefined) {
-    throw new TypeError("Event functions cannot declare tool metadata");
-  }
-  if (isStreamOutputSchema(options.output) && options.tool !== undefined) {
-    throw new TypeError("Stream-output functions cannot declare tool metadata");
-  }
-  const base = createDescriptorBase("function", options.id, options);
-  const dependencies = copyDependencies(options.dependencies);
-  const publishes = copyPublishes(options.publishes);
-  const errors = copyErrors(options.errors);
-  const tool = options.tool === undefined ? undefined : copyFunctionToolMetadata(options.tool);
-  const descriptor = {
-    ...base,
-    invocationMode: options.invocationMode,
-    input: options.input,
-    output: options.output,
-    ...(options.progress === undefined ? {} : { progress: options.progress }),
-    ...(options.descriptorFields ?? {}),
-    ...(errors === undefined ? {} : { errors }),
-    ...(dependencies === undefined ? {} : { dependencies }),
-    ...(publishes === undefined ? {} : { publishes }),
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...(options.concurrency === undefined ? {} : { concurrency: options.concurrency }),
-    ...(tool === undefined ? {} : { tool }),
-    ...(options.onBefore === undefined ? {} : { onBefore: options.onBefore }),
-    ...(options.onAfter === undefined ? {} : { onAfter: options.onAfter }),
-    handler: options.handler,
-  };
-  if (options.invocationMode === "callable") addCallableMethods(descriptor, tool);
-  return deepFreeze(descriptor);
-}
-
-function addCallableMethods(
-  descriptor: Record<string, any>,
-  tool: import("./function-tool.js").FunctionToolMetadata | undefined,
-): void {
-  Object.defineProperty(descriptor, "invoke", {
-    value: function (this: unknown, input: unknown) {
-      return dispatchInvocation({
-        target: functionTargetForReceiver(
-          this,
-          descriptor as unknown as FunctionRefAny,
-        ) as unknown as InvocationTarget,
-        input,
-      });
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  Object.defineProperty(descriptor, "asTool", {
-    value: function (this: unknown, toolOptions?: FunctionToolOptions<string>) {
-      if (isStreamOutputSchema(descriptor.output)) {
-        throw new TypeError("Stream-output functions cannot be converted to tools");
-      }
-      const metadata = toolOptions === undefined ? tool : copyFunctionToolMetadata(toolOptions);
-      if (metadata === undefined) {
-        throw new TypeError(
-          `Function "${descriptor.id}" must declare complete tool metadata before calling asTool()`,
-        );
-      }
-      const target = functionTargetForReceiver(this, descriptor as unknown as FunctionRefAny);
-      return createFunctionTool({
-        ...metadata,
-        ...(toolOptions === undefined ? {} : copyFunctionToolHooks(toolOptions)),
-        id: toolOptions?.id ?? `${getDescriptorIdentity(target)}.tool`,
-        target,
-      });
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
-  Object.defineProperty(descriptor, "asGraphNode", {
-    value: function (this: unknown, options?: { readonly id?: string }) {
-      if (isStreamOutputSchema(descriptor.output)) {
-        throw new TypeError("Stream-output functions cannot be converted to graph nodes");
-      }
-      return createFunctionGraphNode(this, descriptor as unknown as FunctionRefAny, options);
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
+  return runFunctionSync(createFunctionDescriptorEffect(options));
 }
 
 function copyErrors(
@@ -143,6 +84,6 @@ function copyErrors(
 ): readonly ErrorDescriptorAny[] | undefined {
   if (errors === undefined) return undefined;
   if (!errors.every(isErrorDescriptor))
-    throw new TypeError("Function errors must be declared errors");
+    throw new FunctionInputError("Function errors must be declared errors");
   return Object.freeze([...errors]);
 }

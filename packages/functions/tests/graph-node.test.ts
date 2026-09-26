@@ -1,7 +1,13 @@
-import { describe, expect, expectTypeOf, test } from "bun:test";
-import { bindDescriptorIdentity } from "@relkit/invocation";
+import { describe, expect, expectTypeOf, test } from "vitest";
+import { bindDescriptorIdentity, DispatcherBoundary } from "@relkit/invocation";
 import { z } from "@relkit/schema";
-import { defineFunction, isFunctionGraphNode, streamOf } from "./src/index.ts";
+import { Cause, Effect, Exit, Layer } from "effect";
+import { defineFunction, isFunctionGraphNode, streamOf } from "../src/index.js";
+import {
+  createFunctionGraphNodeEffect,
+  invokeFunctionGraphNodeEffect,
+} from "../src/function-graph-node.js";
+import { FunctionOperationError } from "../src/function-observability.js";
 
 describe("function graph-node views", () => {
   test("preserves function contracts and invokes the original function once", async () => {
@@ -51,6 +57,10 @@ describe("function graph-node views", () => {
       summary: "order-1",
     });
     expect(calls).toBe(1);
+    await expect(
+      Effect.runPromise(invokeFunctionGraphNodeEffect(target, { orderId: "order-2" })),
+    ).resolves.toEqual({ summary: "order-2" });
+    expect(calls).toBe(2);
   });
 
   test("rejects invalid options and streaming function views", () => {
@@ -78,4 +88,50 @@ describe("function graph-node views", () => {
     );
     expect(() => target.asGraphNode({ id: "not a valid id" })).toThrow("Invalid stable ID");
   });
+
+  test("reports graph invocation dispatch failure through the tagged channel", async () => {
+    const target = defineFunction({
+      id: "orders.lookup",
+      input: z.object({ orderId: z.string() }),
+      output: z.object({ summary: z.string() }),
+      handler: ({ orderId }) => ({ summary: orderId }),
+    });
+    const dispatcher = {
+      dispatch: async () => {
+        throw new Error("graph dispatch failed");
+      },
+    };
+    const boundary = Layer.succeed(DispatcherBoundary, {
+      current: () => dispatcher,
+      fallback: () => dispatcher,
+    });
+    const exit = await Effect.runPromiseExit(
+      Effect.provide(invokeFunctionGraphNodeEffect(target, { orderId: "one" }), boundary),
+    );
+    expect(Exit.isFailure(exit)).toBe(true);
+    if (Exit.isFailure(exit)) {
+      const failure = Cause.squash(exit.cause);
+      expect(failure).toBeInstanceOf(FunctionOperationError);
+      expect((failure as FunctionOperationError).cause).toEqual(new Error("graph dispatch failed"));
+    }
+  });
+});
+
+test("a graph view invokes with the dispatcher supplied at call time", async () => {
+  const target = defineFunction({
+    id: "orders.lookup",
+    input: z.object({ id: z.string() }),
+    output: z.object({ id: z.string() }),
+    handler: () => ({ id: "handler" }),
+  });
+  const node = await Effect.runPromise(createFunctionGraphNodeEffect(target, target));
+  const dispatcher = { dispatch: async () => ({ id: "layer" }) };
+  const layer = Layer.succeed(DispatcherBoundary, {
+    current: () => dispatcher,
+    fallback: () => dispatcher,
+  });
+  await expect(
+    Effect.runPromise(Effect.provide(node.invokeEffect({ id: "one" }), layer)),
+  ).resolves.toEqual({ id: "layer" });
+  await expect(node.invoke({ id: "one" })).resolves.toEqual({ id: "handler" });
 });

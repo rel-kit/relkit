@@ -1,9 +1,33 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { createStandaloneDispatcher, RelkitStreamError } from "@relkit/invocation";
-import { z } from "@relkit/schema";
-import { defineFunction, streamOf } from "./src/index.ts";
+import { z, type StandardSchemaV1 } from "@relkit/schema";
+import { defineFunction, streamOf } from "../src/index.js";
 
 describe("streamOf invocation", () => {
+  test("projects item JSON Schema and validates iterable shape", async () => {
+    const schema = streamOf(z.string());
+    expect(schema.relkit.jsonSchema()).toMatchObject({ kind: "stream", item: { type: "string" } });
+    const values = (async function* () {
+      yield "one";
+    })();
+    expect(await schema["~standard"].validate(values)).toHaveProperty("value", values);
+    expect(await schema["~standard"].validate(["one"])).toEqual({
+      issues: [{ message: "Expected an AsyncIterable stream" }],
+    });
+  });
+
+  test("reports an item schema that cannot be projected to JSON Schema", () => {
+    const item = {
+      "~standard": {
+        version: 1,
+        vendor: "custom",
+        validate: (value: unknown) => ({ value }),
+      },
+    } as StandardSchemaV1;
+    const schema = streamOf(item);
+    expect(() => schema.relkit.jsonSchema()).toThrow();
+  });
+
   test("starts lazily, validates items, and cleans up on consumer return", async () => {
     const events: string[] = [];
     const target = defineFunction({

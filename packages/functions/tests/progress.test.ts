@@ -1,7 +1,7 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { createStandaloneDispatcher } from "@relkit/invocation";
 import { z } from "@relkit/schema";
-import { defineFunction } from "./src/index.ts";
+import { defineFunction } from "../src/index.js";
 
 describe("function progress", () => {
   test("validates and discards unobserved progress without blocking", async () => {
