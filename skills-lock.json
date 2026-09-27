@@ -139,6 +139,13 @@
       "skillPath": "skills/typescript-pro/SKILL.md",
       "computedHash": "b53b57340243eab4b75acee9096f0444319bb1b9e8530fdab4d1d75e1568fa6c"
     },
+    "ui-taste": {
+      "source": "uizze.sh",
+      "sourceUrl": "https://uizze.sh/",
+      "sourceType": "well-known",
+      "computedHash": "9b73951ae54b7d1eb81e69bb2f47d1622b3813bbefbd6c0aaa36dfcf938f1f27",
+      "wellKnownDigest": "sha256:3b88468608bc7ceec66b8333fab1729590e7af62487fcdbdf79ef60ff626def7"
+    },
     "upstream-patches": {
       "source": "pulumi/agent-skills",
       "sourceType": "github",
