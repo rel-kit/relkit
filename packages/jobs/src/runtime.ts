@@ -1,113 +1,82 @@
-import { AsyncLocalStorage } from "node:async_hooks";
 import type { JobRefAny, TaskRefAny } from "@relkit/contracts/jobs";
+import { Effect, Result } from "effect";
 import {
-  assertJobsAdapterRuntime,
+  assertJobsAdapterRuntimeEffect,
+  JobsAdapterValidationError,
   type JobsAdapterRuntime,
-  type NativeLocator,
-  type OperationContext,
-  type TaskExecutor,
 } from "./adapter.js";
-import { validateJobsCapabilityReport, type JobsCapabilityReport } from "./capabilities.js";
-import type { JobDescriptorAny } from "./job-types.js";
-import type { TaskDescriptorAny } from "./task-types.js";
+import {
+  JobsCapabilityError,
+  JobsCapabilityFailure,
+  validateJobsCapabilityReportEffect,
+  type JobsCapabilityReport,
+} from "./capabilities.js";
+import { observeJobs } from "./jobs-observability.js";
 import { resolveBinding } from "./runtime-selection.js";
-
-export interface JobsManifestLike {
-  readonly protocol?: string;
-  readonly version?: number;
-  readonly app?: string;
-  readonly environment?: string;
-  readonly jobsProtocolVersion?: number;
-  readonly tasks?: readonly {
-    readonly id: string;
-    readonly version?: string;
-    readonly buildId?: string;
-    readonly schemaHashes?: unknown;
-    readonly policy?: unknown;
-  }[];
-  readonly jobs?: readonly {
-    readonly id: string;
-    readonly name: string;
-    readonly taskId: string;
-    readonly taskVersion?: string;
-    readonly buildId?: string;
-    readonly profile?: string;
-    readonly serviceGeneration?: string;
-    readonly default?: boolean;
-  }[];
-}
-
-export interface JobsRuntimeBinding {
-  readonly taskId: string;
-  readonly taskVersion: string;
-  readonly jobId: string;
-  readonly name: string;
-  readonly profile: string;
-  readonly service: string;
-  readonly serviceGeneration: string;
-  readonly buildId: string;
-  readonly inputSchemaHash?: string;
-  readonly scope?: string;
-  readonly policy?: unknown;
-}
-
-export interface JobsRuntimeOptions {
-  readonly adapter?: unknown;
-  readonly provider?: unknown;
-  readonly providerHandle?: { readonly value: unknown };
-  readonly capabilities?: JobsCapabilityReport;
-  readonly application?: string;
-  readonly environment?: string;
-  readonly scope?: string;
-  readonly service?: string;
-  readonly serviceGeneration?: string;
-  readonly manifest?: JobsManifestLike;
-  readonly jobs?: readonly JobDescriptorAny[];
-  readonly taskExecutor?: TaskExecutor;
-  readonly tasks?: readonly TaskDescriptorAny[];
-}
-
-export type JobsOperationOptions = Pick<OperationContext, "signal"> &
-  Partial<
-    Pick<
-      OperationContext,
-      | "scope"
-      | "operationId"
-      | "deadlineMs"
-      | "correlationId"
-      | "parentRunId"
-      | "propagation"
-      | "acceptanceIdentity"
-      | "occurrenceIdentity"
-      | "inputSchemaHash"
-      | "retryOfRunId"
-    >
-  >;
-
-export interface JobsRuntime {
-  readonly adapter: JobsAdapterRuntime;
-  readonly capabilities: JobsCapabilityReport;
-  readonly application: string;
-  readonly environment: string;
-  readonly scope: string;
-  readonly service: string;
-  readonly serviceGeneration: string;
-  readonly manifest?: JobsManifestLike;
-  readonly jobs?: readonly JobDescriptorAny[];
-  readonly taskExecutor?: TaskExecutor;
-  readonly tasks?: readonly TaskDescriptorAny[];
-  readonly resolveBinding: (task: TaskRefAny, selector?: JobRefAny) => JobsRuntimeBinding;
-  readonly operationContext: (options: JobsOperationOptions) => OperationContext;
-  readonly close: () => Promise<void>;
-}
-
-const runtimeStorage = new AsyncLocalStorage<JobsRuntime>();
-
+import { JobsRuntimeError } from "./runtime-context.js";
+export {
+  JobsRuntimeError,
+  JobsRuntimeCallbackError,
+  currentJobsRuntime,
+  currentJobsRuntimeEffect,
+  requireJobsRuntime,
+  requireJobsRuntimeEffect,
+  runInJobsRuntime,
+  runInJobsRuntimeEffect,
+  runWithJobsRuntime,
+  runWithJobsRuntimeEffect,
+} from "./runtime-context.js";
+import type {
+  JobsManifestLike,
+  JobsOperationOptions,
+  JobsRuntime,
+  JobsRuntimeOptions,
+  JobsRuntimeBinding,
+} from "./runtime.types.js";
+export type {
+  JobsManifestLike,
+  JobsOperationOptions,
+  JobsRuntime,
+  JobsRuntimeOptions,
+  JobsRuntimeBinding,
+} from "./runtime.types.js";
+/** Creates a validated jobs runtime in Effect.
+ * @param options - Provider, manifest, and runtime defaults.
+ * @returns A runtime or a tagged runtime, adapter, or capability failure.
+ * @example Effect.runSync(createJobsRuntimeEffect({ adapter }));
+ */
+export const createJobsRuntimeEffect = Effect.fn("Jobs.createRuntime")(
+  function* (options: JobsRuntimeOptions) {
+    yield* validateManifestEffect(options.manifest);
+    const adapter = options.adapter ?? options.providerHandle?.value ?? options.provider;
+    const checked = yield* assertJobsAdapterRuntimeEffect(adapter);
+    const capabilities = yield* validateJobsCapabilityReportEffect(
+      options.capabilities ?? checked.capabilities,
+    );
+    return makeRuntime(options, checked, capabilities);
+  },
+  (effect) => observeJobs("runtime.create", effect),
+);
+/** Synchronously creates a validated jobs runtime.
+ * @param options - Provider, manifest, and runtime defaults.
+ * @returns A frozen runtime owned by the caller.
+ * @throws TypeError or JobsCapabilityError for invalid configuration.
+ * @example createJobsRuntime({ adapter });
+ */
 export function createJobsRuntime(options: JobsRuntimeOptions): JobsRuntime {
-  validateManifest(options.manifest);
-  const adapter = options.adapter ?? options.providerHandle?.value ?? options.provider;
-  assertJobsAdapterRuntime(adapter);
-  const capabilities = validateJobsCapabilityReport(options.capabilities ?? adapter.capabilities);
+  const result = Effect.runSync(Effect.result(createJobsRuntimeEffect(options)));
+  if (Result.isSuccess(result)) return result.success;
+  const failure = result.failure;
+  if (failure instanceof JobsCapabilityFailure)
+    throw new JobsCapabilityError(failure.capability, failure.reason);
+  if (failure instanceof JobsAdapterValidationError) throw new TypeError(failure.reason);
+  throw new TypeError(failure.reason);
+}
+function makeRuntime(
+  options: JobsRuntimeOptions,
+  adapter: JobsAdapterRuntime,
+  capabilities: JobsCapabilityReport,
+): JobsRuntime {
   const runtime = {
     adapter,
     capabilities,
@@ -150,25 +119,6 @@ export function createJobsRuntime(options: JobsRuntimeOptions): JobsRuntime {
   } as JobsRuntime;
   return Object.freeze(runtime);
 }
-
-export function currentJobsRuntime(): JobsRuntime | undefined {
-  return runtimeStorage.getStore();
-}
-
-export function requireJobsRuntime(): JobsRuntime {
-  const runtime = currentJobsRuntime();
-  if (runtime === undefined) throw new Error("RELKIT_JOBS_RUNTIME_UNBOUND");
-  return runtime;
-}
-
-export function runInJobsRuntime<A>(runtime: JobsRuntime, callback: () => A): A {
-  return runtimeStorage.run(runtime, callback);
-}
-
-export function runWithJobsRuntime<A>(runtime: JobsRuntime, callback: () => A): A {
-  return runInJobsRuntime(runtime, callback);
-}
-
 function closeOnce(adapter: JobsAdapterRuntime): () => Promise<void> {
   let closed: Promise<void> | undefined;
   return () => {
@@ -176,19 +126,20 @@ function closeOnce(adapter: JobsAdapterRuntime): () => Promise<void> {
     return closed;
   };
 }
-
-export type { NativeLocator };
-export type { TaskDescriptorAny };
-
-function validateManifest(manifest: JobsManifestLike | undefined): void {
-  if (manifest === undefined) return;
-  if (manifest.protocol !== undefined && manifest.protocol !== "relkit.jobs-manifest") {
-    throw new TypeError("Unsupported jobs manifest protocol");
-  }
-  if (manifest.version !== undefined && manifest.version !== 1) {
-    throw new TypeError("Unsupported jobs manifest version");
-  }
-  if (manifest.jobsProtocolVersion !== undefined && manifest.jobsProtocolVersion !== 1) {
-    throw new TypeError("Unsupported jobs protocol version");
-  }
-}
+export type { NativeLocator } from "./adapter.js";
+export type { TaskDescriptorAny } from "./task-types.js";
+const validateManifestEffect = Effect.fn("Jobs.validateManifest")(
+  function* (manifest: JobsManifestLike | undefined) {
+    if (manifest === undefined) return;
+    if (manifest.protocol !== undefined && manifest.protocol !== "relkit.jobs-manifest") {
+      return yield* new JobsRuntimeError({ reason: "Unsupported jobs manifest protocol" });
+    }
+    if (manifest.version !== undefined && manifest.version !== 1) {
+      return yield* new JobsRuntimeError({ reason: "Unsupported jobs manifest version" });
+    }
+    if (manifest.jobsProtocolVersion !== undefined && manifest.jobsProtocolVersion !== 1) {
+      return yield* new JobsRuntimeError({ reason: "Unsupported jobs protocol version" });
+    }
+  },
+  (effect) => observeJobs("runtime.validateManifest", effect),
+);

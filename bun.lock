@@ -681,6 +681,9 @@
         "@relkit/schema": "workspace:*",
         "effect": "4.0.0-rc.115",
       },
+      "devDependencies": {
+        "vitest": "5.0.1",
+      },
     },
     "packages/local-service": {
       "name": "@relkit/local-service",

@@ -1,18 +1,75 @@
 import type { JsonValue } from "@relkit/contracts";
-import type { RunHandle } from "@relkit/contracts/jobs";
-import { assertJobsCapability } from "./capabilities.js";
+import type { JobWireEnvelope, RunHandle } from "@relkit/contracts/jobs";
+import { Effect, Result } from "effect";
+import { assertJobsCapabilityEffect } from "./capabilities.js";
 import type { JobsRuntime } from "./runtime.js";
 import { JobSubmissionCancelledError } from "./submission-errors.js";
-import { normalizeReceipt, submitAbortable, validatedEnvelope } from "./submission-support.js";
-import type { SubmissionAdmission } from "./submission-types.js";
-
+import { normalizeReceiptEffect, validatedEnvelopeEffect } from "./submission-support.js";
+import { submitAbortableEffect } from "./submission-write.js";
+import { JobSubmissionPipelineFailure } from "./submission-failure.js";
+import { observeJobs } from "./jobs-observability.js";
+import type { SubmissionAdmission } from "./submission.types.js";
+/** Submits prepared canonical input in Effect.
+ * @param runtime - Jobs runtime and native adapter.
+ * @param admission - Pinned binding and canonical input.
+ * @param signal - Caller cancellation signal.
+ * @returns Native run handle or JobSubmissionPipelineFailure.
+ * @example Effect.runPromise(submitPreparedSubmissionEffect(runtime, admission));
+ */
+export const submitPreparedSubmissionEffect = Effect.fn("Jobs.submitPreparedSubmission")(
+  (runtime: JobsRuntime, admission: SubmissionAdmission, signal = new AbortController().signal) =>
+    observeJobs(
+      "submission.submitPrepared",
+      Effect.gen(function* () {
+        const failure = (cause: unknown) => new JobSubmissionPipelineFailure({ cause });
+        yield* Effect.mapError(
+          assertJobsCapabilityEffect(runtime.capabilities, "submission"),
+          failure,
+        );
+        if (signal.aborted) return yield* failure(new JobSubmissionCancelledError());
+        const envelope = yield* Effect.mapError(validatedEnvelopeEffect(admission), (error) =>
+          failure(error.cause),
+        );
+        const { context, request } = yield* Effect.try({
+          try: () => preparedRequest(runtime, admission, signal, envelope),
+          catch: failure,
+        });
+        const receipt = yield* Effect.mapError(
+          submitAbortableEffect(runtime.adapter, request, context, signal, admission.metadata),
+          (error) => failure(error.cause),
+        );
+        return yield* Effect.mapError(
+          normalizeReceiptEffect(receipt, admission.binding, admission.metadata),
+          (error) => failure(error.cause),
+        );
+      }),
+    ),
+);
+/** Promise compatibility prepared submission.
+ * @param runtime - Jobs runtime and native adapter.
+ * @param admission - Pinned binding and canonical input.
+ * @param signal - Caller cancellation signal.
+ * @returns Accepted run handle.
+ * @throws Original capability, cancellation, or provider error.
+ * @example await submitPreparedSubmission(runtime, admission);
+ */
 export async function submitPreparedSubmission(
   runtime: JobsRuntime,
   admission: SubmissionAdmission,
   signal = new AbortController().signal,
 ): Promise<RunHandle> {
-  assertJobsCapability(runtime.capabilities, "submission");
-  if (signal.aborted) throw new JobSubmissionCancelledError();
+  const result = await Effect.runPromise(
+    Effect.result(submitPreparedSubmissionEffect(runtime, admission, signal)),
+  );
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return result.success;
+}
+function preparedRequest(
+  runtime: JobsRuntime,
+  admission: SubmissionAdmission,
+  signal: AbortSignal,
+  envelope: JobWireEnvelope,
+) {
   const context = runtime.operationContext({
     signal,
     operationId: admission.metadata.operationId,
@@ -46,7 +103,7 @@ export async function submitPreparedSubmission(
     execution: admission.task.execution,
     scope: runtime.scope,
     input: admission.input,
-    canonicalInput: validatedEnvelope(admission),
+    canonicalInput: envelope,
     inputHash: admission.inputHash,
     operationId: admission.metadata.operationId,
     ...(admission.metadata.idempotencyKey === undefined
@@ -81,12 +138,5 @@ export async function submitPreparedSubmission(
       ? {}
       : { policy: admission.binding.policy as JsonValue }),
   } as const;
-  const receipt = await submitAbortable(
-    runtime.adapter,
-    request,
-    context,
-    signal,
-    admission.metadata,
-  );
-  return normalizeReceipt(receipt, admission.binding, admission.metadata);
+  return { request, context };
 }

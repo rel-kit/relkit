@@ -17,22 +17,22 @@ if (errors.length > 0) {
 }
 
 const categories = [
-  { name: "tenant checks", file: "packages/jobs/src/authorization.ts", start: 29, end: 43 },
+  { name: "tenant checks", file: "packages/jobs/src/authorization-grant.ts", start: 26, end: 37 },
   { name: "abort cleanup", file: "packages/client/src/jobs/controller.ts", start: 60, end: 83 },
   { name: "stale epochs", file: "packages/client/src/jobs/controller.ts", start: 122, end: 165 },
   {
-    name: "invalid policy conversion",
-    file: "packages/jobs/src/task-policy-validation.ts",
-    start: 42,
-    end: 56,
+    name: "memory conversion",
+    file: "packages/jobs/src/task-policy-value.ts",
+    start: 74,
+    end: 88,
   },
   {
     name: "retry-budget multiplication",
-    file: "packages/jobs/src/task-policy-validation.ts",
-    start: 73,
-    end: 81,
+    file: "packages/jobs/src/task-policy-value.ts",
+    start: 113,
+    end: 116,
   },
-  { name: "duration conversion", file: "packages/jobs/src/duration.ts", start: 37, end: 72 },
+  { name: "duration conversion", file: "packages/jobs/src/duration.ts", start: 60, end: 88 },
 ];
 
 for (const category of categories) {

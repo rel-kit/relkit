@@ -1,161 +1,187 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { canonicalJson } from "@relkit/contracts";
+import { Effect, Result, Schema } from "effect";
+import { observeJobs } from "./jobs-observability.js";
+import type {
+  RunLocatorPayload,
+  RunLocatorKeyRing,
+  RunLocatorCreateOptions,
+  RunLocatorVerifyOptions,
+  VerifiedRunLocator,
+} from "./run-id.types.js";
+export type {
+  RunLocatorPayload,
+  RunLocatorKeyRing,
+  RunLocatorKeyRingStore,
+  RunLocatorCreateOptions,
+  RunLocatorVerifyOptions,
+  VerifiedRunLocator,
+} from "./run-id.types.js";
 import { RunLocatorError } from "./run-id-errors.js";
 import {
-  assertSegment,
-  isBase64Url,
-  namespaceHash,
-  normalizePayload,
-  validateRunLocatorKeyRing,
+  namespaceHash as namespaceHashValue,
+  validateRunLocatorKeyRing as validateRunLocatorKeyRingValue,
 } from "./run-id-support.js";
-
+import {
+  createRunLocatorValue,
+  verifyRunLocatorValue,
+  rotateRunLocatorKeysValue,
+} from "./run-id-codec.js";
 export { RunLocatorError } from "./run-id-errors.js";
-export { namespaceHash, validateRunLocatorKeyRing } from "./run-id-support.js";
-
+/** Wire format version for signed run locators.
+ * @example RUN_LOCATOR_VERSION === 1;
+ */
 export const RUN_LOCATOR_VERSION = 1 as const;
+/** Maximum encoded locator size accepted at the jobs boundary.
+ * @example locator.length <= RUN_LOCATOR_MAX_BYTES;
+ */
 export const RUN_LOCATOR_MAX_BYTES = 4096 as const;
-
-export interface RunLocatorPayload {
-  readonly application: string;
-  readonly environment: string;
-  readonly serviceGeneration: string;
-  readonly jobId: string;
-  readonly taskId: string;
-  readonly taskVersion: string;
-  readonly buildId: string;
-  /** Accepted only while creating a locator; the clear-text scope is never encoded. */
-  readonly scope?: string;
-  readonly namespaceHash?: string;
-  readonly schemaHash?: string;
-  readonly native: { readonly kind: string; readonly value: string };
+/** Invalid signed run locator or key rotation.
+ * @example if (error instanceof RunLocatorFailure) console.log(error.message);
+ */
+export class RunLocatorFailure extends Schema.TaggedError<RunLocatorFailure>()(
+  "Jobs.RunLocatorFailure",
+  { operation: Schema.String },
+) {}
+/** Hashes a trusted deployment namespace in Effect.
+ * @param application - Application identity.
+ * @param environment - Environment identity.
+ * @param scope - Trusted scope identity.
+ * @returns A namespace hash or RunLocatorFailure.
+ * @example Effect.runSync(namespaceHashEffect("shop", "production", "orders"));
+ */
+export const namespaceHashEffect = Effect.fn("Jobs.namespaceHash")(
+  (application: string, environment: string, scope: string) =>
+    observeJobs(
+      "runLocator.namespaceHash",
+      locatorTry("namespaceHash", () => namespaceHashValue(application, environment, scope)),
+    ),
+);
+/** Synchronously hashes a trusted deployment namespace.
+ * @param application - Application identity.
+ * @param environment - Environment identity.
+ * @param scope - Trusted scope identity.
+ * @returns A namespace hash.
+ * @throws RunLocatorError for invalid identities.
+ * @example namespaceHash("shop", "production", "orders");
+ */
+export function namespaceHash(application: string, environment: string, scope: string): string {
+  return runLocator(namespaceHashEffect(application, environment, scope));
 }
-
-export interface RunLocatorKeyRing {
-  readonly activeKeyId: string;
-  readonly keys: Readonly<Record<string, string | Uint8Array>>;
+/** Validates a locator key ring in Effect.
+ * @param ring - Active and retained signing keys.
+ * @returns Void or RunLocatorFailure.
+ * @example Effect.runSync(validateRunLocatorKeyRingEffect(ring));
+ */
+export const validateRunLocatorKeyRingEffect = Effect.fn("Jobs.validateRunLocatorKeyRing")(
+  (ring: RunLocatorKeyRing) =>
+    observeJobs(
+      "runLocator.validateKeyRing",
+      locatorTry("validateKeyRing", () => validateRunLocatorKeyRingValue(ring)),
+    ),
+);
+/** Synchronously validates a locator key ring.
+ * @param ring - Active and retained signing keys.
+ * @returns Nothing when the ring is usable.
+ * @throws RunLocatorError for invalid keys or IDs.
+ * @example validateRunLocatorKeyRing(ring);
+ */
+export function validateRunLocatorKeyRing(ring: RunLocatorKeyRing): void {
+  runLocator(validateRunLocatorKeyRingEffect(ring));
 }
-
-export interface RunLocatorKeyRingStore {
-  readonly load: () => RunLocatorKeyRing | Promise<RunLocatorKeyRing>;
-  readonly save: (ring: RunLocatorKeyRing) => void | Promise<void>;
-}
-
-export interface RunLocatorCreateOptions {
-  readonly payload: RunLocatorPayload;
-  readonly keyRing: RunLocatorKeyRing;
-}
-
-export interface RunLocatorVerifyOptions {
-  readonly keyRing: RunLocatorKeyRing;
-  readonly application?: string;
-  readonly environment?: string;
-  readonly scope?: string;
-}
-
-export interface VerifiedRunLocator extends RunLocatorPayload {
-  readonly keyId: string;
-  readonly version: typeof RUN_LOCATOR_VERSION;
-}
-
+/** Signs a run locator in Effect.
+ * @param options - Payload and active signing key ring.
+ * @returns Encoded locator or RunLocatorFailure.
+ * @example Effect.runSync(createRunLocatorEffect({ payload, keyRing }));
+ */
+export const createRunLocatorEffect = Effect.fn("Jobs.createRunLocator")(
+  (options: RunLocatorCreateOptions) =>
+    observeJobs(
+      "runLocator.create",
+      locatorTry("create", () => createRunLocatorValue(options)),
+    ),
+);
+/** Synchronously signs a run locator.
+ * @param options - Payload and active signing key ring.
+ * @returns Encoded locator.
+ * @throws RunLocatorError when the payload or key ring is invalid.
+ * @example createRunLocator({ payload, keyRing });
+ */
 export function createRunLocator(options: RunLocatorCreateOptions): string {
-  validateRunLocatorKeyRing(options.keyRing);
-  const keyId = options.keyRing.activeKeyId;
-  const secret = options.keyRing.keys[keyId];
-  assertSegment(keyId);
-  if (secret === undefined) throw new RunLocatorError();
-  const payload = normalizePayload(options.payload);
-  const body = { version: RUN_LOCATOR_VERSION, keyId, payload } as const;
-  const encodedBody = encode(canonicalJson(body));
-  const mac = macFor(encodedBody, secret);
-  const locator = `${encodedBody}.${encode(mac)}`;
-  if (byteLength(locator) > RUN_LOCATOR_MAX_BYTES) throw new RunLocatorError();
-  return locator;
+  return runLocator(createRunLocatorEffect(options));
 }
-
+/** Verifies a run locator in Effect.
+ * @param locator - Encoded signed locator.
+ * @param options - Key ring and optional expected namespace.
+ * @returns Verified payload or RunLocatorFailure.
+ * @example Effect.runSync(verifyRunLocatorEffect(locator, { keyRing }));
+ */
+export const verifyRunLocatorEffect = Effect.fn("Jobs.verifyRunLocator")(
+  (locator: string, options: RunLocatorVerifyOptions) =>
+    observeJobs(
+      "runLocator.verify",
+      locatorTry("verify", () => verifyRunLocatorValue(locator, options)),
+    ),
+);
+/** Synchronously verifies a signed run locator.
+ * @param locator - Encoded signed locator.
+ * @param options - Key ring and optional expected namespace.
+ * @returns Verified payload.
+ * @throws RunLocatorError when the locator is invalid or has another namespace.
+ * @example verifyRunLocator(locator, { keyRing });
+ */
 export function verifyRunLocator(
   locator: string,
   options: RunLocatorVerifyOptions,
 ): VerifiedRunLocator {
-  validateRunLocatorKeyRing(options.keyRing);
-  if (typeof locator !== "string" || byteLength(locator) > RUN_LOCATOR_MAX_BYTES)
-    throw new RunLocatorError();
-  const parts = locator.split(".");
-  if (parts.length !== 2) throw new RunLocatorError();
-  const [encodedBody, encodedMac] = parts;
-  if (!isBase64Url(encodedBody) || !isBase64Url(encodedMac)) throw new RunLocatorError();
-  let body: unknown;
-  let signature: Buffer;
-  try {
-    body = JSON.parse(Buffer.from(encodedBody!, "base64url").toString("utf8"));
-    signature = Buffer.from(encodedMac!, "base64url");
-  } catch {
-    throw new RunLocatorError();
-  }
-  if (!isBody(body)) throw new RunLocatorError();
-  assertSegment(body.keyId);
-  const secret = options.keyRing.keys[body.keyId];
-  if (secret === undefined) throw new RunLocatorError();
-  const expected = macFor(encodedBody!, secret);
-  if (expected.length !== signature.length || !timingSafeEqual(expected, signature)) {
-    throw new RunLocatorError();
-  }
-  const payload = normalizePayload(body.payload);
-  if (
-    (options.application !== undefined && payload.application !== options.application) ||
-    (options.environment !== undefined && payload.environment !== options.environment) ||
-    (options.scope !== undefined &&
-      payload.namespaceHash !==
-        namespaceHash(payload.application, payload.environment, options.scope))
-  ) {
-    throw new RunLocatorError();
-  }
-  return Object.freeze({
-    version: RUN_LOCATOR_VERSION,
-    keyId: body.keyId,
-    ...payload,
-    ...(options.scope === undefined ? {} : { scope: options.scope }),
-  });
+  return runLocator(verifyRunLocatorEffect(locator, options));
 }
-
+/** Compatibility alias for createRunLocator.
+ * @example encodeRunLocator({ payload, keyRing });
+ */
 export const encodeRunLocator = createRunLocator;
+/** Compatibility alias for verifyRunLocator.
+ * @example decodeRunLocator(locator, { keyRing });
+ */
 export const decodeRunLocator = verifyRunLocator;
-
+/** Rotates the active locator signing key in Effect.
+ * @param ring - Existing key ring.
+ * @param keyId - New active key identifier.
+ * @param secret - New signing secret.
+ * @returns Frozen rotated ring or RunLocatorFailure.
+ * @example Effect.runSync(rotateRunLocatorKeysEffect(ring, "v2", secret));
+ */
+export const rotateRunLocatorKeysEffect = Effect.fn("Jobs.rotateRunLocatorKeys")(
+  (ring: RunLocatorKeyRing, keyId: string, secret: string | Uint8Array) =>
+    observeJobs(
+      "runLocator.rotate",
+      locatorTry("rotate", () => rotateRunLocatorKeysValue(ring, keyId, secret)),
+    ),
+);
+/** Synchronously rotates a locator signing key.
+ * @param ring - Existing key ring.
+ * @param keyId - New active key identifier.
+ * @param secret - New signing secret.
+ * @returns Frozen rotated ring.
+ * @throws RunLocatorError when the ring or key identifier is invalid.
+ * @example rotateRunLocatorKeys(ring, "v2", secret);
+ */
 export function rotateRunLocatorKeys(
   ring: RunLocatorKeyRing,
   keyId: string,
   secret: string | Uint8Array,
 ): RunLocatorKeyRing {
-  validateRunLocatorKeyRing(ring);
-  assertSegment(keyId);
-  return Object.freeze({
-    activeKeyId: keyId,
-    keys: Object.freeze({ ...ring.keys, [keyId]: secret }),
+  return runLocator(rotateRunLocatorKeysEffect(ring, keyId, secret));
+}
+function locatorTry<A>(operation: string, compute: () => A): Effect.Effect<A, RunLocatorFailure> {
+  return Effect.try({
+    try: compute,
+    catch: (error) => {
+      if (error instanceof RunLocatorError) return new RunLocatorFailure({ operation });
+      throw error;
+    },
   });
 }
-
-function macFor(value: string, secret: string | Uint8Array): Buffer {
-  return createHmac("sha256", secret).update(value, "utf8").digest();
-}
-
-function encode(value: string | Uint8Array): string {
-  return Buffer.from(value).toString("base64url");
-}
-
-function byteLength(value: string): number {
-  return new TextEncoder().encode(value).byteLength;
-}
-
-function isBody(
-  value: unknown,
-): value is { readonly version: 1; readonly keyId: string; readonly payload: RunLocatorPayload } {
-  return (
-    isRecord(value) &&
-    value.version === 1 &&
-    typeof value.keyId === "string" &&
-    isRecord(value.payload)
-  );
-}
-
-function isRecord(value: unknown): value is Record<string, any> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function runLocator<A>(effect: Effect.Effect<A, RunLocatorFailure>): A {
+  const result = Effect.runSync(Effect.result(effect));
+  if (Result.isFailure(result)) throw new RunLocatorError();
+  return result.success;
 }

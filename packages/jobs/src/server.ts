@@ -1,104 +1,100 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { Effect, Result } from "effect";
 import { runInInvocationScope, currentInvocationScope } from "@relkit/invocation";
+import { createJobsRuntime, runInJobsRuntime } from "./runtime.js";
+import { observeJobs } from "./jobs-observability.js";
 import {
-  createJobsRuntime,
-  runInJobsRuntime,
-  type JobsManifestLike,
-  type JobsRuntime,
-  type JobsRuntimeOptions,
-} from "./runtime.js";
+  JobsManifestReaderLive,
+  JobsServerError,
+  readJobsManifestEffect,
+} from "./server-manifest.js";
+import type { JobsManifestLike, JobsRuntimeOptions, RunWithJobsConfig } from "./server.types.js";
+import type { JobsRuntime } from "./runtime.js";
 
-export interface RunWithJobsConfig {
-  readonly projectRoot: string;
-  readonly environment?: string;
-  readonly manifestPath?: string;
-  readonly runtime?: JobsRuntime;
-  readonly adapter?: unknown;
-  readonly provider?: unknown;
-  readonly providerHandle?: { readonly value: unknown };
-  readonly application?: string;
-  readonly scope?: string;
-  readonly service?: string;
-  readonly serviceGeneration?: string;
-  readonly capabilities?: JobsRuntimeOptions["capabilities"];
-  readonly jobs?: JobsRuntimeOptions["jobs"];
-  readonly taskExecutor?: JobsRuntimeOptions["taskExecutor"];
-}
+export type { RunWithJobsConfig } from "./server.types.js";
+export { JobsManifestReader, JobsManifestReaderLive, JobsServerError } from "./server-manifest.js";
 
-/** Server runtime hook; the native runtime is installed by the selected adapter. */
+/** Runs a server callback inside an owned or borrowed jobs runtime.
+ * An owned runtime closes after success, typed failure, or interruption.
+ * @param config - Runtime and manifest configuration.
+ * @param callback - Work that uses the installed jobs runtime.
+ * @returns An Effect of the callback result or JobsServerError.
+ * @example Effect.provide(runWithJobsEffect({ projectRoot: "." }, () => "ok"), JobsManifestReaderLive);
+ */
+export const runWithJobsEffect = Effect.fn("Jobs.runWithJobs")(
+  function* <A>(config: RunWithJobsConfig, callback: () => A | PromiseLike<A>) {
+    const parent = currentInvocationScope();
+    const use = (runtime: JobsRuntime) =>
+      Effect.tryPromise({
+        try: async () =>
+          await runInJobsRuntime(runtime, () =>
+            runInInvocationScope(
+              Object.freeze({ ...(parent ?? {}), jobsRuntime: runtime }),
+              callback,
+            ),
+          ),
+        catch: (cause: unknown) => new JobsServerError({ operation: "callback", cause }),
+      });
+    if (config.runtime !== undefined) return yield* use(config.runtime);
+    const manifest = yield* readJobsManifestEffect(config);
+    const options = yield* runtimeOptionsEffect(config, manifest);
+    return yield* Effect.acquireUseRelease(
+      Effect.try({
+        try: () => createJobsRuntime(options),
+        catch: (cause) => new JobsServerError({ operation: "createRuntime", cause }),
+      }),
+      use,
+      (runtime) =>
+        Effect.tryPromise({
+          try: () => runtime.close(),
+          catch: (cause) => new JobsServerError({ operation: "closeRuntime", cause }),
+        }),
+    );
+  },
+  (effect) => observeJobs("server.run", effect),
+);
+
+/** Promise compatibility adapter for server invocation.
+ * @param config - Runtime and manifest configuration.
+ * @param callback - Work that uses the jobs runtime.
+ * @returns A Promise of the callback result.
+ * @throws The original manifest, runtime, callback, or close error.
+ * @example await runWithJobs({ projectRoot: "." }, () => "ok");
+ */
 export async function runWithJobs<A>(
   config: RunWithJobsConfig,
   callback: () => A | PromiseLike<A>,
 ): Promise<Awaited<A>> {
-  const ownedRuntime = config.runtime === undefined;
-  const runtime =
-    config.runtime ?? createJobsRuntime(runtimeOptions(config, await readManifest(config)));
-  const parent = currentInvocationScope();
-  try {
-    return await runInJobsRuntime(runtime, () =>
-      runInInvocationScope(
-        Object.freeze({
-          ...(parent ?? {}),
-          jobsRuntime: runtime,
-        }),
-        callback,
-      ),
-    );
-  } finally {
-    if (ownedRuntime) await runtime.close();
-  }
+  const result = await Effect.runPromise(
+    Effect.result(Effect.provide(runWithJobsEffect(config, callback), JobsManifestReaderLive)),
+  );
+  if (Result.isFailure(result)) throw result.failure.cause;
+  return await Promise.resolve(result.success);
 }
 
-function runtimeOptions(
-  config: RunWithJobsConfig,
-  manifest: JobsManifestLike | undefined,
-): JobsRuntimeOptions {
-  return {
-    ...(config.adapter === undefined ? {} : { adapter: config.adapter }),
-    ...(config.provider === undefined ? {} : { provider: config.provider }),
-    ...(config.providerHandle === undefined ? {} : { providerHandle: config.providerHandle }),
-    ...(config.application === undefined ? {} : { application: config.application }),
-    ...(config.environment === undefined ? {} : { environment: config.environment }),
-    ...(config.scope === undefined ? {} : { scope: config.scope }),
-    ...(config.service === undefined ? {} : { service: config.service }),
-    ...(config.serviceGeneration === undefined
-      ? {}
-      : { serviceGeneration: config.serviceGeneration }),
-    ...(config.capabilities === undefined ? {} : { capabilities: config.capabilities }),
-    ...(config.jobs === undefined ? {} : { jobs: config.jobs }),
-    ...(config.taskExecutor === undefined ? {} : { taskExecutor: config.taskExecutor }),
-    ...(manifest === undefined ? {} : { manifest }),
-  };
-}
+/** Copies runtime options without sharing mutable user input. */
+const runtimeOptionsEffect = Effect.fn("Jobs.runtimeOptions")(
+  function* (
+    config: RunWithJobsConfig,
+    manifest: JobsManifestLike | undefined,
+  ): Generator<never, JobsRuntimeOptions, never> {
+    return {
+      ...(config.adapter === undefined ? {} : { adapter: config.adapter }),
+      ...(config.provider === undefined ? {} : { provider: config.provider }),
+      ...(config.providerHandle === undefined ? {} : { providerHandle: config.providerHandle }),
+      ...(config.application === undefined ? {} : { application: config.application }),
+      ...(config.environment === undefined ? {} : { environment: config.environment }),
+      ...(config.scope === undefined ? {} : { scope: config.scope }),
+      ...(config.service === undefined ? {} : { service: config.service }),
+      ...(config.serviceGeneration === undefined
+        ? {}
+        : { serviceGeneration: config.serviceGeneration }),
+      ...(config.capabilities === undefined ? {} : { capabilities: config.capabilities }),
+      ...(config.jobs === undefined ? {} : { jobs: config.jobs }),
+      ...(config.taskExecutor === undefined ? {} : { taskExecutor: config.taskExecutor }),
+      ...(manifest === undefined ? {} : { manifest }),
+    };
+  },
+  (effect) => observeJobs("server.runtimeOptions", effect),
+);
 
-async function readManifest(config: RunWithJobsConfig): Promise<JobsManifestLike | undefined> {
-  const path =
-    config.manifestPath ?? join(config.projectRoot, ".relkit", "generated", "jobs.manifest.json");
-  try {
-    const value: unknown = JSON.parse(await readFile(path, "utf8"));
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      throw new TypeError("Jobs manifest must be an object");
-    }
-    const manifest = value as JobsManifestLike;
-    if (manifest.protocol !== undefined && manifest.protocol !== "relkit.jobs-manifest") {
-      throw new TypeError("Unsupported jobs manifest protocol");
-    }
-    if (manifest.version !== undefined && manifest.version !== 1) {
-      throw new TypeError("Unsupported jobs manifest version");
-    }
-    if (manifest.jobsProtocolVersion !== undefined && manifest.jobsProtocolVersion !== 1) {
-      throw new TypeError("Unsupported jobs protocol version");
-    }
-    return Object.freeze(manifest);
-  } catch (error) {
-    if (isMissing(error)) return undefined;
-    throw error;
-  }
-}
-
-function isMissing(error: unknown): boolean {
-  return error instanceof Error && "code" in error && error.code === "ENOENT";
-}
-
-export type { RunResultOptions, ServerTriggerOptions, TriggerOptions } from "./trigger-types.js";
+export type { RunResultOptions, ServerTriggerOptions, TriggerOptions } from "./trigger.types.js";

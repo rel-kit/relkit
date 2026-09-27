@@ -4,76 +4,78 @@ import {
   deepFreeze,
   isRef,
   normalizeId,
-  type DescriptorBase,
-  type DescriptorMetadata,
   type JsonValue,
 } from "@relkit/contracts";
 import type { FunctionRefAny } from "@relkit/functions";
+import { Effect, Result, Schema } from "effect";
+import { observeJobs } from "./jobs-observability.js";
+import type {
+  DefineJobOptions,
+  JobDescriptor,
+  ScheduleDefinition,
+  IdempotencyDefinition,
+} from "./legacy-define-job.types.js";
+export type {
+  RetryJitter,
+  RetryPolicy,
+  ScheduleOverlap,
+  ScheduleDefinition,
+  IdempotencyDefinition,
+  JobDescriptor,
+  DefineJobOptions,
+} from "./legacy-define-job.types.js";
 import { type InferInput, type StandardSchemaV1 } from "@relkit/schema";
 import { validateRetry } from "./retry-policy.js";
-
-export type RetryJitter = "none" | "full" | "equal";
-
-export interface RetryPolicy {
-  readonly maxAttempts: number;
-  readonly initialDelayMs: number;
-  readonly maxDelayMs: number;
-  readonly multiplier: number;
-  readonly jitter: RetryJitter;
-}
-
-export type ScheduleOverlap = "skip" | "allow";
-
-export interface ScheduleDefinition<Input = JsonValue> {
-  readonly id: string;
-  readonly cron: string;
-  readonly timezone: string;
-  readonly input: Input;
-  readonly overlap: ScheduleOverlap;
-}
-
-type IdempotencyKey<Input> = [Extract<keyof Input, string>] extends [never]
-  ? string
-  : Extract<keyof Input, string>;
-
-export interface IdempotencyDefinition<Input = unknown> {
-  readonly key: IdempotencyKey<Input>;
-  readonly retentionMs: number;
-}
-
-export interface JobDescriptor<
-  Id extends string,
-  Input,
-  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
-  Target extends FunctionRefAny = FunctionRefAny,
-> extends DescriptorBase<"job", Id> {
-  readonly input: InputSchema;
-  readonly target: Target;
-  readonly profile?: string;
-  readonly retry: RetryPolicy;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: readonly ScheduleDefinition<Input>[];
-  readonly idempotency?: IdempotencyDefinition<Input>;
-}
-
-export interface DefineJobOptions<
-  Id extends string,
-  InputSchema extends StandardSchemaV1,
-  Target extends FunctionRefAny,
-> extends DescriptorMetadata {
-  readonly id: Id;
-  readonly input: InputSchema;
-  readonly target: Target;
-  readonly profile?: string;
-  readonly retry: RetryPolicy;
-  readonly timeoutMs?: number;
-  readonly concurrency?: number;
-  readonly schedule?: readonly ScheduleDefinition<InferInput<InputSchema>>[];
-  readonly idempotency?: IdempotencyDefinition<InferInput<InputSchema>>;
-}
-
+/** Invalid legacy job authoring options.
+ * @example if (error instanceof LegacyJobValidationError) console.log(error.message);
+ */
+export class LegacyJobValidationError extends Schema.TaggedError<LegacyJobValidationError>()(
+  "Jobs.LegacyJobValidationError",
+  { reason: Schema.String },
+) {}
+/** Defines a legacy function backed job in Effect.
+ * @param options - Job identity, input schema, target, and policy.
+ * @returns A frozen descriptor or LegacyJobValidationError.
+ * @example Effect.runSync(defineJobEffect(options));
+ */
+export const defineJobEffect = Effect.fn("Jobs.defineLegacyJob")(
+  <
+    const Id extends string,
+    const InputSchema extends StandardSchemaV1,
+    const Target extends FunctionRefAny,
+  >(
+    options: DefineJobOptions<Id, InputSchema, Target>,
+  ) =>
+    observeJobs(
+      "legacy.defineJob",
+      Effect.try({
+        try: () => defineJobValue(options),
+        catch: (error) => {
+          if (error instanceof Error)
+            return new LegacyJobValidationError({ reason: error.message });
+          throw error;
+        },
+      }),
+    ),
+);
+/** Synchronous compatibility adapter for legacy job authoring.
+ * @param options - Job identity, input schema, target, and policy.
+ * @returns A frozen descriptor.
+ * @throws TypeError when the authored job is invalid.
+ * @example defineJob(options);
+ */
 export function defineJob<
+  const Id extends string,
+  const InputSchema extends StandardSchemaV1,
+  const Target extends FunctionRefAny,
+>(
+  options: DefineJobOptions<Id, InputSchema, Target>,
+): JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target> {
+  const result = Effect.runSync(Effect.result(defineJobEffect(options)));
+  if (Result.isFailure(result)) throw new TypeError(result.failure.reason);
+  return result.success;
+}
+function defineJobValue<
   const Id extends string,
   const InputSchema extends StandardSchemaV1,
   const Target extends FunctionRefAny,
@@ -105,7 +107,6 @@ export function defineJob<
     ...(idempotency === undefined ? {} : { idempotency }),
   }) as JobDescriptor<Id, InferInput<InputSchema>, InputSchema, Target>;
 }
-
 function copySchedules<Input>(
   value: readonly ScheduleDefinition<Input>[] | undefined,
 ): readonly ScheduleDefinition<Input>[] | undefined {
@@ -128,7 +129,6 @@ function copySchedules<Input>(
   });
   return Object.freeze(schedules);
 }
-
 function copyIdempotency<Input>(
   value: IdempotencyDefinition<Input> | undefined,
 ): IdempotencyDefinition<Input> | undefined {
@@ -139,7 +139,6 @@ function copyIdempotency<Input>(
     retentionMs: positiveInteger(value.retentionMs, "idempotency.retentionMs"),
   }) as IdempotencyDefinition<Input>;
 }
-
 function positiveInteger(value: unknown, name: string): number {
   if (!Number.isSafeInteger(value) || (value as number) < 1)
     throw new TypeError(`${name} must be a positive integer`);

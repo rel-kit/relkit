@@ -369,6 +369,7 @@ describe.serial("Phase 0 guardrails", () => {
     const internalPackage = ["@relkit/", persistence].join("");
     const graphKind = [`nodeKind: "`, persistence, `"`].join("");
     const navigation = [`const path = "/`, persistence, `"`].join("");
+    const upperNavigation = [`const path = "/`, persistence.toUpperCase(), `"`].join("");
     const template = [`template: "`, plugin, `"`].join("");
     const alternateIac = ["terra", "form"].join("");
     const fixture = await createFixture({
@@ -381,6 +382,8 @@ describe.serial("Phase 0 guardrails", () => {
       "packages/app/src/internal-import.ts": `export const value = "${internalPackage}";\n`,
       "packages/app/src/graph-kind.ts": `export const value = ${graphKind};\n`,
       "packages/app/src/navigation.ts": `export const value = ${navigation};\n`,
+      "packages/app/src/error-code.ts": 'export const code = "PERSISTENCE";\n',
+      "packages/app/src/upper-navigation.ts": `export ${upperNavigation};\n`,
       "packages/app/src/template.ts": `export const value = ${template};\n`,
       "packages/app/src/iac.ts": `export const value = ${alternateIac};\n`,
       "examples/commerce/src/persistence.ts": "export {};\n",
@@ -395,6 +398,7 @@ describe.serial("Phase 0 guardrails", () => {
       ["packages/app/src/internal-import.ts", "out-of-scope-package"],
       ["packages/app/src/graph-kind.ts", "out-of-scope-graph-name"],
       ["packages/app/src/navigation.ts", "out-of-scope-navigation-name"],
+      ["packages/app/src/upper-navigation.ts", "out-of-scope-navigation-name"],
       ["packages/app/src/template.ts", "out-of-scope-template-name"],
       ["packages/app/src/iac.ts", "alternate-iac"],
       ["examples/commerce/src/persistence.ts", "out-of-scope-navigation-name"],
@@ -404,6 +408,9 @@ describe.serial("Phase 0 guardrails", () => {
       for (const [file, rule] of expected) {
         expect(findings).toContainEqual(expect.objectContaining({ file, rule }));
       }
+      expect(findings).not.toContainEqual(
+        expect.objectContaining({ file: "packages/app/src/error-code.ts" }),
+      );
     } finally {
       await rm(fixture, { recursive: true, force: true });
     }
