@@ -1,11 +1,12 @@
-import { expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { expect, test } from "vitest";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
-import * as eventExports from "./src/index.ts";
+import * as eventExports from "../src/index.js";
+import * as eventEffects from "../src/effect.js";
 
 type SourceFile = { path: string; text: string };
 
-const repositoryRoot = resolve(import.meta.dir, "../..");
+const repositoryRoot = resolve(import.meta.dirname, "../../..");
 const term = ["sub", "scription"].join("");
 const defineName = ["define", "Sub", "scription"].join("");
 const pascalTerm = ["Sub", "scription"].join("");
@@ -33,7 +34,7 @@ const realtimeTerminologyFiles = new Set([
 const evidencePathPrefix = "tests/jobs/compatibility/evidence/";
 const scanRoots = ["apps", "packages", "templates", "tests", ".relkit/generated", ".relkit/build"];
 const scanGuardFiles = new Set([
-  "packages/events/source-export.test.ts",
+  "packages/events/tests/source-export.test.ts",
   "tests/e2e/inspector.spec.ts",
   "tests/phase0.test.ts",
 ]);
@@ -47,18 +48,25 @@ function isProviderInternal(path: string): boolean {
 
 function sourceFiles(directory: string): SourceFile[] {
   if (!existsSync(directory)) return [];
-  return [
-    ...new Bun.Glob("**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json}").scanSync({
-      cwd: directory,
-      onlyFiles: true,
-    }),
-  ]
-    .filter((path) => !/(^|\/)(dist|node_modules|\.turbo|\.relkit)(\/|$)/.test(path))
-    .sort()
-    .map((path) => ({
-      path: relative(repositoryRoot, join(directory, path)).replaceAll("\\", "/"),
-      text: readFileSync(join(directory, path), "utf8"),
-    }));
+  const paths: string[] = [];
+  const pending = [directory];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (current === undefined) continue;
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const path = join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (!/^(dist|node_modules|\.turbo|\.relkit|\.next|\.next-packaged)$/.test(entry.name))
+          pending.push(path);
+      } else if (entry.isFile() && /\.(?:ts|tsx|mts|cts|js|jsx|mjs|cjs|json)$/.test(entry.name)) {
+        paths.push(relative(directory, path));
+      }
+    }
+  }
+  return paths.sort().map((path) => ({
+    path: relative(repositoryRoot, join(directory, path)).replaceAll("\\", "/"),
+    text: readFileSync(join(directory, path), "utf8"),
+  }));
 }
 
 function repositorySources(): SourceFile[] {
@@ -90,6 +98,17 @@ test("event source and exports keep consumers as event functions", () => {
   expect(eventExports).toHaveProperty("defineEventFunction");
   expect(eventExports).not.toHaveProperty("onEvent");
   expect(eventExports).not.toHaveProperty("events");
+});
+
+test("keeps Effect operations on their separate entry point", () => {
+  expect(eventExports).toHaveProperty("defineEvent");
+  expect(eventExports).toHaveProperty("createEventClient");
+  expect(eventExports).not.toHaveProperty("defineEventEffect");
+  expect(eventExports).not.toHaveProperty("publishEventEffect");
+  expect(eventExports).not.toHaveProperty("EventPublisher");
+  expect(eventEffects).toHaveProperty("defineEventEffect");
+  expect(eventEffects).toHaveProperty("publishEventEffect");
+  expect(eventEffects).toHaveProperty("EventPublisher");
 });
 
 test("artifact scans reject application names in generated, graph, API, and inspector contracts", () => {

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { z } from "@relkit/schema";
 import { createSpanId, createTraceId } from "@relkit/contracts";
 import {
@@ -12,7 +12,7 @@ import {
   EventPayloadValidationError,
   type EventOperationContext,
   type EventProvider,
-} from "./src/client.ts";
+} from "../src/client.js";
 
 const payload = z.object({ orderId: z.string(), totalCents: z.number() });
 

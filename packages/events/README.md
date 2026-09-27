@@ -56,3 +56,24 @@ The graph contains the authored event-only function and one generated trigger
 `relkit.event.<function-id>.trigger`, with exact event ID/version and delivery
 policy. Inspector derives consumers through those trigger edges. Durable
 delivery is at-least-once: make side effects idempotent before retry or replay.
+
+## Effect operations
+
+Import these operations from `@relkit/events/effect`. The application authoring
+entry points continue to expose the synchronous factories and Promise client.
+
+The authoring factories and validators expose `*Effect` variants. Their failures
+use tagged `EventDefinitionError` or `EventBindingError` values. The established
+synchronous APIs call these Effect operations and continue to throw `TypeError`
+for invalid definitions.
+
+Publishing through a supplied `EventPublisher` service is available with
+`publishEventEffect(setup, payload)`. Use `eventPublisherLayer(provider)` for a
+live provider, or supply a test Layer. `createEventClient` retains the Promise
+API used by handlers; its payload validation error remains a `TypeError`.
+The Effect path reports `EventPayloadValidationFailure` by tag.
+
+Event operations emit bounded operation and failure counters, a duration
+histogram, and spans. Supply `EventTelemetry` to inspect or replace the
+observer. `EventIdentity` supplies the envelope clock and ID generator; its
+default Layer uses the wall clock and random UUIDs.

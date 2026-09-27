@@ -1,6 +1,6 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { z } from "@relkit/schema";
-import { defineEvent } from "./src/index.ts";
+import { defineEvent } from "../src/index.js";
 
 test("retains an explicit provider profile", () => {
   expect(
